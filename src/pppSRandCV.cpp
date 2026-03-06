@@ -5,7 +5,7 @@
 extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_80330060;
-extern f64 lbl_80330068;
+static f64 const lbl_80330068 = 4503601774854144.0;
 extern u8 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 

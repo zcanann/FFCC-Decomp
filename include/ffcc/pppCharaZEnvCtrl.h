@@ -2,9 +2,9 @@
 #define _FFCC_PPPCHARAZENVCTRL_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/partMng.h"
 
 struct pppCharaZEnvCtrlUnkB;
-struct pppCharaZEnvCtrlUnkC;
 
 struct pppCharaZEnvCtrl
 {
@@ -17,9 +17,9 @@ void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 extern "C" {
 #endif
 
-void pppConCharaZEnvCtrl(void);
-void pppDesCharaZEnvCtrl(void);
-void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl*, pppCharaZEnvCtrlUnkB*, pppCharaZEnvCtrlUnkC*);
+void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*);
+void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*);
+void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl*, pppCharaZEnvCtrlUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

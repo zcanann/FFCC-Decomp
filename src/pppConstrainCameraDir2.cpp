@@ -28,7 +28,8 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(void*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2, pppConstrainCameraDirUnkC* param_3)
+void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
+                                 _pppCtrlTable* param_3)
 {
 	_pppMngSt* pppMngSt;
 	float fVar1;

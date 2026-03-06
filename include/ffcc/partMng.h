@@ -171,7 +171,10 @@ struct _pppCtrlTable
     pppProg* m_prog;                    // 0x0
     int m_initialWork;                  // 0x4
     int m_unk8;                         // 0x8
-    _pppCtrlTableData* m_serializedDef; // 0xC
+    union {
+        _pppCtrlTableData* m_serializedDef; // 0xC
+        int* m_serializedDataOffsets;       // 0xC
+    };
 };
 
 struct _pppDataHead

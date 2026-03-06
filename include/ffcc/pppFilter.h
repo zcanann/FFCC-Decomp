@@ -1,6 +1,8 @@
 #ifndef _PPP_FILTER_H_
 #define _PPP_FILTER_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/gx/GXStruct.h>
 
 struct pppFilter {
@@ -14,19 +16,14 @@ struct pppFilterUnkB {
     unsigned int m_dataValIndex;
 };
 
-struct pppFilterUnkC {
-    char padding[0x0c];
-    int* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructFilter(void);
-void pppDestructFilter(void);
-void pppFrameFilter(void);
-void pppRenderFilter(pppFilter* pppFilter, pppFilterUnkB* param_2, pppFilterUnkC* param_3);
+void pppConstructFilter(_pppPObjLink*, _pppCtrlTable*);
+void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*);
+void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*);
+void pppRenderFilter(pppFilter* pppFilter, pppFilterUnkB* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

@@ -2,10 +2,6 @@
 #include "ffcc/partMng.h"
 #include "dolphin/gx/GXPixel.h"
 
-struct pppCharaZEnvCtrlUnkC {
-    unsigned char pad0[0xC];
-    int* m_serializedDataOffsets;
-};
 extern int lbl_8032ED70;
 extern u8* lbl_8032ED50;
 
@@ -23,7 +19,7 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlUnkB* param_2, pppCharaZEnvCtrlUnkC* param_3)
+void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlUnkB* param_2, _pppCtrlTable* param_3)
 {
 	if (lbl_8032ED70 != 0) {
 		return;
@@ -47,7 +43,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesCharaZEnvCtrl(void)
+void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
 	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xd8), 0);
 	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -65,7 +61,7 @@ void pppDesCharaZEnvCtrl(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConCharaZEnvCtrl(void)
+void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
 	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xd8), 0);
 	GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);

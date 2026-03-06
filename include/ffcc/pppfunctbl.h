@@ -1848,7 +1848,7 @@ static pppProg s_pppSysProgTable[159] = {
         { 0, 0, 0 },
         PPP_FN(pppConstructConstrainCameraForLoc),
         PPP_FN(pppConstruct2ConstrainCameraForLoc),
-        PPP_FN(fn_80167EC4),
+        PPP_FN(pppConstruct3ConstrainCameraForLoc),
         PPP_FN(pppDestructConstrainCameraForLoc)
     },
     {

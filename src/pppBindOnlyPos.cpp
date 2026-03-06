@@ -1,7 +1,7 @@
 #include "ffcc/pppBindOnlyPos.h"
 
 extern int lbl_8032ED70;
-extern int* lbl_8032ED50;
+extern unsigned char* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -12,7 +12,7 @@ extern int* lbl_8032ED50;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructBindOnlyPos(void)
+void pppConstructBindOnlyPos(_pppPObjLink*, _pppCtrlTable*)
 {
 	return;
 }
@@ -26,7 +26,7 @@ void pppConstructBindOnlyPos(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameBindOnlyPos(void)
+void pppFrameBindOnlyPos(_pppPObject*, void*, _pppCtrlTable*)
 {
 	if (lbl_8032ED70 != 0) {
 		return;

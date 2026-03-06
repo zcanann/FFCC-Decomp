@@ -18,25 +18,18 @@ typedef struct pppConstrainCameraForLocParams {
     float m_stepValue;
 } pppConstrainCameraForLocParams;
 
-typedef struct pppConstrainCameraForLocData {
-    int m_unk0;
-    float m_unk4;
-    float m_unk8;
-    int* m_serializedDataOffsets;
-} pppConstrainCameraForLocData;
-
 int CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructConstrainCameraForLoc(void);
-void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocData*);
+void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*);
+void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable*);
 void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*,
-                                      pppConstrainCameraForLocData*);
-void fn_80167EC4(pppConstrainCameraForLoc*, pppConstrainCameraForLocData*);
-void pppFrameConstrainCameraForLoc(void);
+                                      _pppCtrlTable*);
+void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable*);
+void pppFrameConstrainCameraForLoc(_pppPObject*, void*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

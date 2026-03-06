@@ -37,5 +37,15 @@ public:
 STATIC_ASSERT(sizeof(CGamePcs) == 0x11F98);
 
 extern CGamePcs Game;
+extern unsigned int m_table_desc0__8CGamePcs[];
+extern unsigned int m_table_desc1__8CGamePcs[];
+extern unsigned int m_table_desc2__8CGamePcs[];
+extern unsigned int m_table_desc3__8CGamePcs[];
+extern unsigned int m_table_desc4__8CGamePcs[];
+extern unsigned int m_table_desc5__8CGamePcs[];
+extern unsigned int m_table_desc6__8CGamePcs[];
+extern unsigned int m_table_desc7__8CGamePcs[];
+extern unsigned int m_table_desc8__8CGamePcs[];
+extern unsigned char m_table__8CGamePcs[];
 
 #endif // _FFCC_P_GAME_H_

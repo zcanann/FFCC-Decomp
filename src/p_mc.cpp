@@ -9,11 +9,6 @@ extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
 extern unsigned char MenuPcs[];
-
-extern unsigned int lbl_80211D88[];
-extern unsigned int lbl_80211D94[];
-extern unsigned int lbl_80211DA0[];
-extern unsigned char lbl_80211DAC[];
 extern unsigned char PTR_PTR_s_CMcPcs_80211f28[];
 extern unsigned int lbl_8032EE88;
 
@@ -54,7 +49,7 @@ void CMcPcs::Quit()
  */
 void* CMcPcs::GetTable(unsigned long index)
 {
-	return lbl_80211DAC + (index * 0x15c);
+	return m_table__6CMcPcs + (index * 0x15c);
 }
 
 /*
@@ -164,10 +159,10 @@ extern "C" void __sinit_p_mc_cpp(void)
     unsigned int* table2;
 
     lbl_8032EE88 = (unsigned int)PTR_PTR_s_CMcPcs_80211f28;
-    table = (unsigned int*)lbl_80211DAC;
-    table0 = lbl_80211D88;
-    table1 = lbl_80211D94;
-    table2 = lbl_80211DA0;
+    table = (unsigned int*)m_table__6CMcPcs;
+    table0 = m_table_desc0__6CMcPcs;
+    table1 = m_table_desc1__6CMcPcs;
+    table2 = m_table_desc2__6CMcPcs;
 
     table[1] = table0[0];
     table[2] = table0[1];

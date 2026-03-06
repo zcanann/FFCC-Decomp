@@ -81,5 +81,16 @@ public:
 };
 
 extern CGraphicPcs GraphicsPcs;
+extern u32 m_table_desc0__11CGraphicPcs[];
+extern u32 m_table_desc1__11CGraphicPcs[];
+extern u32 m_table_desc2__11CGraphicPcs[];
+extern u32 m_table_desc3__11CGraphicPcs[];
+extern u32 m_table_desc4__11CGraphicPcs[];
+extern u32 m_table_desc5__11CGraphicPcs[];
+extern u32 m_table_desc6__11CGraphicPcs[];
+extern u32 m_table_desc7__11CGraphicPcs[];
+extern u32 m_table_desc8__11CGraphicPcs[];
+extern u32 m_table_desc9__11CGraphicPcs[];
+extern u32 m_table__11CGraphicPcs[];
 
 #endif // _FFCC_P_GRAPHIC_H_

@@ -15,16 +15,10 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 
 extern CUSBPcs USBPcs;
 extern CGraphic Graphic;
-extern unsigned char m_table__18CMaterialEditorPcs[];
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
 extern unsigned char lbl_8026D338[];
-extern unsigned int lbl_801EA498[];
-extern unsigned int lbl_801EA4A4[];
-extern unsigned int lbl_801EA4B0[];
-extern unsigned int lbl_801EA4BC[];
-extern unsigned int lbl_801EA4C8[];
 extern float lbl_8032FCAC;
 extern float lbl_8032FCB0;
 extern unsigned char DAT_8032ed1c;
@@ -80,19 +74,19 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
     __ct__5ZLISTFv(self + 0xD8);
     __register_global_object(&MaterialEditorPcs, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), lbl_8026D338);
 
-    unsigned int* dst = lbl_801EA4C8;
-    dst[1] = lbl_801EA498[0];
-    dst[2] = lbl_801EA498[1];
-    dst[3] = lbl_801EA498[2];
-    dst[4] = lbl_801EA4A4[0];
-    dst[5] = lbl_801EA4A4[1];
-    dst[6] = lbl_801EA4A4[2];
-    dst[7] = lbl_801EA4B0[0];
-    dst[8] = lbl_801EA4B0[1];
-    dst[9] = lbl_801EA4B0[2];
-    dst[12] = lbl_801EA4BC[0];
-    dst[13] = lbl_801EA4BC[1];
-    dst[14] = lbl_801EA4BC[2];
+    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
+    dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
+    dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
+    dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
+    dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
+    dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
+    dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
+    dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
+    dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
+    dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
+    dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
+    dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
+    dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
 }
 
 /*

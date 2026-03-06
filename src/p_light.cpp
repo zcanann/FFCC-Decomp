@@ -16,13 +16,6 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" int __cntlzw(unsigned int);
 
-extern unsigned int lbl_801EA298[];
-extern unsigned int lbl_801EA2A4[];
-extern unsigned int lbl_801EA2B0[];
-extern unsigned int lbl_801EA2BC[];
-extern unsigned int lbl_801EA2C8[];
-extern unsigned int lbl_801EA2D4[];
-
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;
@@ -100,23 +93,23 @@ CLightPcs::CLightPcs()
     __construct_array(m_sceneLights, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, sizeof(CLight), 0x20);
     __construct_array(m_bumpLights, (ConstructorDestructor)__ct__Q29CLightPcs10CBumpLightFv, 0, sizeof(CBumpLight), 0x20);
 
-    unsigned int* table = lbl_801EA2D4;
+    unsigned int* table = m_table__9CLightPcs;
 
-    table[0x004 / 4] = lbl_801EA298[0];
-    table[0x008 / 4] = lbl_801EA298[1];
-    table[0x00C / 4] = lbl_801EA298[2];
-    table[0x010 / 4] = lbl_801EA2A4[0];
-    table[0x014 / 4] = lbl_801EA2A4[1];
-    table[0x018 / 4] = lbl_801EA2A4[2];
-    table[0x01C / 4] = lbl_801EA2B0[0];
-    table[0x020 / 4] = lbl_801EA2B0[1];
-    table[0x024 / 4] = lbl_801EA2B0[2];
-    table[0x030 / 4] = lbl_801EA2BC[0];
-    table[0x034 / 4] = lbl_801EA2BC[1];
-    table[0x038 / 4] = lbl_801EA2BC[2];
-    table[0x044 / 4] = lbl_801EA2C8[0];
-    table[0x048 / 4] = lbl_801EA2C8[1];
-    table[0x04C / 4] = lbl_801EA2C8[2];
+    table[0x004 / 4] = m_table_desc0__9CLightPcs[0];
+    table[0x008 / 4] = m_table_desc0__9CLightPcs[1];
+    table[0x00C / 4] = m_table_desc0__9CLightPcs[2];
+    table[0x010 / 4] = m_table_desc1__9CLightPcs[0];
+    table[0x014 / 4] = m_table_desc1__9CLightPcs[1];
+    table[0x018 / 4] = m_table_desc1__9CLightPcs[2];
+    table[0x01C / 4] = m_table_desc2__9CLightPcs[0];
+    table[0x020 / 4] = m_table_desc2__9CLightPcs[1];
+    table[0x024 / 4] = m_table_desc2__9CLightPcs[2];
+    table[0x030 / 4] = m_table_desc3__9CLightPcs[0];
+    table[0x034 / 4] = m_table_desc3__9CLightPcs[1];
+    table[0x038 / 4] = m_table_desc3__9CLightPcs[2];
+    table[0x044 / 4] = m_table_desc4__9CLightPcs[0];
+    table[0x048 / 4] = m_table_desc4__9CLightPcs[1];
+    table[0x04C / 4] = m_table_desc4__9CLightPcs[2];
 }
 
 /*
@@ -193,7 +186,7 @@ void CLightPcs::Quit()
  */
 int CLightPcs::GetTable(unsigned long index)
 {
-    return (int)lbl_801EA2D4 + (index * 0x15c);
+    return (int)m_table__9CLightPcs + (index * 0x15c);
 }
 
 /*

@@ -24,11 +24,11 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     Vec local_88;
     Vec local_94;
     Vec local_a0;
+    _GXColor local_a8;
+    float radius;
     Mtx sphereMtx;
     Mtx cameraMtx;
-    _GXColor local_a8;
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
-    float radius;
 
     local_88.z = lbl_80332080;
     local_88.y = lbl_80332080;
@@ -57,6 +57,7 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
 
     if ((*(u32*)(CFlat + 0x129c) & 0x200000) != 0) {
+        f32 sphereScale = radius;
         local_a8.r = 0xFF;
         local_a8.g = 0xFF;
         local_a8.b = 0xFF;
@@ -64,9 +65,9 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         register MtxPtr sphereMtxPtr = sphereMtx;
         PSMTXIdentity(cameraMtx);
         PSMTXIdentity(sphereMtxPtr);
-        sphereMtxPtr[0][0] = radius;
-        sphereMtxPtr[1][1] = radius;
-        sphereMtxPtr[2][2] = radius;
+        sphereMtxPtr[0][0] = sphereScale;
+        sphereMtxPtr[1][1] = sphereScale;
+        sphereMtxPtr[2][2] = sphereScale;
         PSMTXConcat(ppvCameraMatrix02, cameraMtx, cameraMtx);
         PSMTXMultVec(cameraMtx, &local_94, &local_a0);
         sphereMtxPtr[0][3] = local_a0.x;

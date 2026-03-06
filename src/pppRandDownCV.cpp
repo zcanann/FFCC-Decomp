@@ -62,21 +62,20 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
 
     target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->field4 + 0x80);
 
-    f32 scale = *valuePtr;
     {
         s8 baseValue = in->field8;
-        target[0] = (u8)(target[0] + (s32)((f32)baseValue * scale));
+        target[0] = (u8)(target[0] + (s32)((f32)baseValue * *valuePtr));
     }
     {
         s8 baseValue = in->field9;
-        target[1] = (u8)(target[1] + (s32)((f32)baseValue * scale));
+        target[1] = (u8)(target[1] + (s32)((f32)baseValue * *valuePtr));
     }
     {
         s8 baseValue = in->fieldA;
-        target[2] = (u8)(target[2] + (s32)((f32)baseValue * scale));
+        target[2] = (u8)(target[2] + (s32)((f32)baseValue * *valuePtr));
     }
     {
         s8 baseValue = in->fieldB;
-        target[3] = (u8)(target[3] + (s32)((f32)baseValue * scale));
+        target[3] = (u8)(target[3] + (s32)((f32)baseValue * *valuePtr));
     }
 }

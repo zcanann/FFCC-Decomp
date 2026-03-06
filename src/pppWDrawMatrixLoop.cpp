@@ -21,9 +21,8 @@ void pppWDrawMatrixLoop(_pppPObject* object, void*, _pppCtrlTable*)
 
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)(base + 0x10), *(Mtx*)(base + 0x40));
 
-    PSVECScale((Vec*)(base + 0x40), (Vec*)(base + 0x40), *(float*)(pppMngStPtr + 0x28));
-    PSVECScale((Vec*)(base + 0x50), (Vec*)(base + 0x50), *(float*)(pppMngStPtr + 0x2c));
-    PSVECScale((Vec*)(base + 0x60), (Vec*)(base + 0x60), *(float*)(pppMngStPtr + 0x30));
+    PSVECScale((Vec*)(base + 0x40), (Vec*)(base + 0x40), pppMngStPtr->m_scale.x);
+    PSVECScale((Vec*)(base + 0x50), (Vec*)(base + 0x50), pppMngStPtr->m_scale.y);
+    PSVECScale((Vec*)(base + 0x60), (Vec*)(base + 0x60), pppMngStPtr->m_scale.z);
 }
-
 

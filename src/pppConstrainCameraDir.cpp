@@ -1,5 +1,6 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
@@ -8,10 +9,6 @@ extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
 } CameraPcs;
-extern float lbl_803320B8;
-extern float lbl_803320BC;
-extern float lbl_803320C0;
-extern float lbl_803320C4;
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
@@ -26,7 +23,7 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = lbl_803320C4;
+    float uVar1 = kPppConstrainCameraDirInitScale;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -44,7 +41,7 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = lbl_803320C4;
+    float uVar1 = kPppConstrainCameraDirInitScale;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -103,12 +100,12 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             fVar6 = CameraPcs._224_4_;
             fVar5 = CameraPcs._228_4_;
             fVar4 = CameraPcs._232_4_;
-            fVar3 = lbl_803320B8 + ((CameraPcs._252_4_ - lbl_803320BC) / lbl_803320BC);
+            fVar3 = kPppConstrainCameraDirScaleBase + ((CameraPcs._252_4_ - kPppConstrainCameraDirDistanceBase) / kPppConstrainCameraDirDistanceBase);
             
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
             
-            fVar2 = lbl_803320B8;
-            pppMngSt->m_scale.x = lbl_803320C0 * fVar3;
+            fVar2 = kPppConstrainCameraDirScaleBase;
+            pppMngSt->m_scale.x = kPppConstrainCameraDirScaleMul * fVar3;
             pppMngSt->m_scale.y = fVar3;
             pppMngSt->m_scale.z = fVar2;
             

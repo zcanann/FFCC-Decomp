@@ -4,11 +4,10 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/symbols_shared.h"
 
 extern CGame Game;
 extern unsigned char Graphic[];
-extern float lbl_80330330;
-extern float lbl_80330334;
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
@@ -178,11 +177,11 @@ void pppDrawMng::ClearOt()
 
 	if (Game.m_currentMapId == 0x21)
 	{
-		m_depthScale = lbl_80330330;
+		m_depthScale = kPppDrawDepthScaleNear;
 	}
 	else
 	{
-		m_depthScale = lbl_80330334;
+		m_depthScale = kPppDrawDepthScaleFar;
 	}
 
 	do

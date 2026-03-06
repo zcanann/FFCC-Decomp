@@ -22,7 +22,7 @@ struct _pppColorWork
 extern int gPppCalcDisabled;
 struct _pppMngSt;
 extern _pppMngSt* pppMngStPtr;
-extern double lbl_8032FED0;
+extern double kPppColorScale;
 
 #ifdef __cplusplus
 extern "C" {

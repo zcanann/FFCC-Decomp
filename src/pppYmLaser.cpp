@@ -4,6 +4,7 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 
 #include <string.h>
 
@@ -18,7 +19,6 @@ extern Mtx ppvCameraMatrix0;
 extern CGraphic Graphic;
 extern const f32 FLOAT_80330dc0;
 extern const f32 FLOAT_80330df0;
-extern f32 lbl_80330DC0;
 extern f32 FLOAT_80330de0;
 extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
@@ -116,7 +116,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
  */
 extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 one = lbl_80330DC0;
+	f32 one = kPppYmLaserOne;
 	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
 	work[6] = one;

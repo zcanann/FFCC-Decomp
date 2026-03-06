@@ -1,9 +1,9 @@
 #include "ffcc/pppYmTraceMove.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
 extern int gPppCalcDisabled;
-extern float lbl_80330E40;
 
 extern "C" {
 	void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -34,7 +34,7 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
 	*(u32*)&dir.y = *(u32*)&dest[1].z;
 	*(u32*)&dir.z = *(u32*)&dest[2].x;
 	pppCopyVector__FR3Vec3Vec(dest, &dir);
-	zero = lbl_80330E40;
+	zero = kPppYmTraceMoveZero;
 	dest[3].x = zero;
 	dest[2].z = zero;
 	dest[2].y = zero;

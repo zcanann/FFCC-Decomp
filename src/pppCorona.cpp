@@ -2,14 +2,10 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/symbols_shared.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern float lbl_803310C0;
-extern float lbl_803310C4;
-extern float lbl_803310C8;
-extern float lbl_803310CC;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -43,7 +39,7 @@ struct CoronaVecWork {
  */
 void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
 {
-    float fVar1 = lbl_803310C8;
+    float fVar1 = kPppCoronaViewDirZ;
     u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
     puVar2[2] = 0;
     puVar2[1] = 0;
@@ -138,15 +134,15 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
 
     PSMTXIdentity(mtx.value);
 
-    viewDir.x = lbl_803310C0;
-    viewDir.y = lbl_803310C4;
-    viewDir.z = lbl_803310C8;
+    viewDir.x = kPppCoronaViewDirX;
+    viewDir.y = kPppCoronaViewDirY;
+    viewDir.z = kPppCoronaViewDirZ;
     PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
     mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
     if (mag < param2->m_distRange) {
-        scale = (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - (mag / param2->m_distRange));
+        scale = (param2->m_distMax - param2->m_distMin) * (kPppCoronaDistanceScaleBase - (mag / param2->m_distRange));
         scale += param2->m_distMin;
     }
 

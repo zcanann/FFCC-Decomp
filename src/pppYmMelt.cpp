@@ -4,10 +4,10 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
 extern int gPppCalcDisabled;
-extern float lbl_80330AF0;
 extern float FLOAT_80330af0;
 extern float FLOAT_80330af4;
 extern float FLOAT_80330b08;
@@ -187,7 +187,7 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
  */
 void pppConstructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
 {
-    f32 value = lbl_80330AF0;
+    f32 value = kPppYmMeltZero;
     u8* work = (u8*)pppYmMelt + *param_2->m_serializedDataOffsets + 0x80;
 
     *(u32*)(work + 0x0) = 0;

@@ -2,16 +2,11 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/symbols_shared.h"
 
 #include <dolphin/types.h>
 
 extern int gPppCalcDisabled;
-
-// Float constants (addresses from Ghidra)
-extern float lbl_80330ED0;
-extern float lbl_80330ED4;
-extern float lbl_80330ED8;
-extern float lbl_80330EDC;
 
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
@@ -54,23 +49,23 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         float currentY = pppMngSt->m_matrix.value[1][3];
         float updatedY = currentY;
 
-        direction.x = lbl_80330ED0;
-        direction.y = lbl_80330ED4;
-        direction.z = lbl_80330ED0;
+        direction.x = kPppYmCheckBGHeightAxisZero;
+        direction.y = kPppYmCheckBGHeightProbeDirY;
+        direction.z = kPppYmCheckBGHeightAxisZero;
 
         cyl[0] = pppMngSt->m_matrix.value[0][3];
         cyl[1] = currentY + param_2->m_unk0x4;
         cyl[2] = pppMngSt->m_matrix.value[2][3];
-        cyl[6] = lbl_80330ED0;
-        cyl[7] = lbl_80330ED4;
-        cyl[8] = lbl_80330ED8;
-        cyl[9] = lbl_80330ED8;
-        cyl[10] = lbl_80330ED8;
-        cyl[11] = lbl_80330EDC;
-        cyl[12] = lbl_80330EDC;
-        cyl[13] = lbl_80330EDC;
-        cyl[14] = lbl_80330ED0;
-        cyl[15] = lbl_80330ED0;
+        cyl[6] = kPppYmCheckBGHeightAxisZero;
+        cyl[7] = kPppYmCheckBGHeightProbeDirY;
+        cyl[8] = kPppYmCheckBGHeightCylinderScale;
+        cyl[9] = kPppYmCheckBGHeightCylinderScale;
+        cyl[10] = kPppYmCheckBGHeightCylinderScale;
+        cyl[11] = kPppYmCheckBGHeightCylinderOffset;
+        cyl[12] = kPppYmCheckBGHeightCylinderOffset;
+        cyl[13] = kPppYmCheckBGHeightCylinderOffset;
+        cyl[14] = kPppYmCheckBGHeightAxisZero;
+        cyl[15] = kPppYmCheckBGHeightAxisZero;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)cyl, &direction, -1) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);

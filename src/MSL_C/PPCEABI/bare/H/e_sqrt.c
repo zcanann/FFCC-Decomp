@@ -37,7 +37,7 @@ double __ieee754_sqrt(double x) {
     }
 
     if (ix0 <= 0) {
-        if (((ix0 & (~0x80000000)) | ix1) == 0) {
+        if ((ix1 | (ix0 & (~0x80000000))) == 0) {
             return x;
         }
         if (ix0 < 0) {
@@ -109,9 +109,9 @@ double __ieee754_sqrt(double x) {
     }
 
     if ((ix0 | ix1) != 0) {
-        z = one - tiny;
-        if (z >= one) {
-            z = one + tiny;
+        z = 1.0 - tiny;
+        if (z >= 1.0) {
+            z = 1.0 + tiny;
             if (q1 == 0xffffffff) {
                 q1 = 0;
                 q += 1;

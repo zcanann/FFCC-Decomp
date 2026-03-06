@@ -72,38 +72,46 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
         return;
     }
 
-    if ((work->m_angle >= 90) && (work->m_countA > 0)) {
-        work->m_countA--;
-        work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
-        work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
-        work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
-    } else if ((work->m_angle >= 270) && (work->m_countB > 0)) {
-        work->m_countB--;
-        work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
-        work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
-        work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
-    } else {
-        work->m_step++;
-        if (work->m_step > step->m_stepCount) {
-            work->m_step = 0;
-            work->m_angle = 0;
-            work->m_countA = step->m_countA;
-            work->m_countB = step->m_countB;
+    if (work->m_angle >= 90) {
+        if (work->m_countA > 0) {
+            work->m_countA--;
+            work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
+            work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
+            work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
             return;
         }
+    }
 
-        work->m_angle += 360 / (s32)step->m_stepCount;
-
-        {
-            s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 360.0f);
-            f32 sinVal = *(f32*)((u8*)lbl_801EC9F0 + (tableAngle & 0xFFFC));
-            f32 delta = (step->m_amplitude * sinVal) * step->m_scale;
-
-            work->m_delta = delta;
-            work->m_scale[0] = work->m_baseScale[0] + delta;
-            work->m_scale[1] = work->m_baseScale[1] + delta;
-            work->m_scale[2] = work->m_baseScale[2] + delta;
+    if (work->m_angle >= 270) {
+        if (work->m_countB > 0) {
+            work->m_countB--;
+            work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
+            work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
+            work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
+            return;
         }
+    }
+
+    work->m_step++;
+    if (work->m_step > step->m_stepCount) {
+        work->m_step = 0;
+        work->m_angle = 0;
+        work->m_countA = step->m_countA;
+        work->m_countB = step->m_countB;
+        return;
+    }
+
+    work->m_angle += 360 / (s32)step->m_stepCount;
+
+    {
+        s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 360.0f);
+        f32 sinVal = *(f32*)((u8*)lbl_801EC9F0 + (tableAngle & 0xFFFC));
+        f32 delta = (step->m_amplitude * sinVal) * step->m_scale;
+
+        work->m_delta = delta;
+        work->m_scale[0] = work->m_baseScale[0] + delta;
+        work->m_scale[1] = work->m_baseScale[1] + delta;
+        work->m_scale[2] = work->m_baseScale[2] + delta;
     }
 }
 

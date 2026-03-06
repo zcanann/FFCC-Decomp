@@ -100,11 +100,9 @@ void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTa
 
     int textureIndex = 0;
     _pppTextureInfo* textureInfo = (_pppTextureInfo*)GetTexture__8CMapMeshFP12CMaterialSetRi(
-        &pppEnvStPtr->m_mapMeshPtr[step->dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+        ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
     RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
         &gUtil, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
         &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
-
-
 

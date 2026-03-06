@@ -7,83 +7,56 @@ extern "C" char lbl_801E88A4[];
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022704
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUSB::Init()
+extern "C" void __sinit_usb_cpp()
+{
+	void* vtbl = __vt__8CManager;
+	*reinterpret_cast<void**>(&USB) = vtbl;
+	*reinterpret_cast<void**>(&USB) = lbl_801E88A4;
+}
+
+/*
+ * --INFO--
+ * Address:\tTODO
+ * Size:\tTODO
+ */
+void CUSB::Printf(char*, ...)
 {
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002249c
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUSB::Quit()
+void CUSB::RemoveMessageCallback(MessageCallback callback)
 {
-}
+    CUSBCallbackEntry* callbackEntry;
+    unsigned int i;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSB::Connect()
-{ 
-	m_connectionState = 7;
-}
+    for (callbackEntry = m_callbacks, i = 0; i < 8; callbackEntry++, i++)
+    {
+        if (callbackEntry->m_inUse != 0 && callbackEntry->m_callback == callback)
+        {
+            callbackEntry->m_inUse = 0;
+            break;
+        }
+    }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSB::Disconnect()
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSB::Frame()
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-bool CUSB::Write(void*, int)
-{
-	return true;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-bool CUSB::SendMessage(unsigned long, MCCChannel)
-{
-	return true;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-bool CUSB::IsConnected()
-{
-	if (m_connectionState == 8)
-	{
-		return true;
-	}
-
-	return false;
+    if (i == 8U)
+    {
+        System.Printf("CUSB.AddMessageCallback: イベント関数は登録されていません。\n");
+    }
 }
 
 /*
@@ -126,54 +99,81 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 
 /*
  * --INFO--
- * PAL Address: 0x8002249c
- * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:\tTODO
+ * Size:\tTODO
  */
-void CUSB::RemoveMessageCallback(MessageCallback callback)
+bool CUSB::IsConnected()
 {
-    CUSBCallbackEntry* callbackEntry;
-    unsigned int i;
+	if (m_connectionState == 8)
+	{
+		return true;
+	}
 
-    for (callbackEntry = m_callbacks, i = 0; i < 8; callbackEntry++, i++)
-    {
-        if (callbackEntry->m_inUse != 0 && callbackEntry->m_callback == callback)
-        {
-            callbackEntry->m_inUse = 0;
-            break;
-        }
-    }
-
-    if (i == 8U)
-    {
-        System.Printf("CUSB.AddMessageCallback: イベント関数は登録されていません。\n");
-    }
+	return false;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:\tTODO
+ * Size:\tTODO
  */
-void CUSB::Printf(char*, ...)
+bool CUSB::SendMessage(unsigned long, MCCChannel)
+{
+	return true;
+}
+
+/*
+ * --INFO--
+ * Address:\tTODO
+ * Size:\tTODO
+ */
+bool CUSB::Write(void*, int)
+{
+	return true;
+}
+
+/*
+ * --INFO--
+ * Address:\tTODO
+ * Size:\tTODO
+ */
+void CUSB::Frame()
 {
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80022704
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:\tTODO
+ * Size:\tTODO
  */
-extern "C" void __sinit_usb_cpp()
+void CUSB::Disconnect()
 {
-	void* vtbl = __vt__8CManager;
-	*reinterpret_cast<void**>(&USB) = vtbl;
-	*reinterpret_cast<void**>(&USB) = lbl_801E88A4;
+}
+
+/*
+ * --INFO--
+ * Address:\tTODO
+ * Size:\tTODO
+ */
+void CUSB::Connect()
+{
+	m_connectionState = 7;
+}
+
+/*
+ * --INFO--
+ * Address:\tTODO
+ * Size:\tTODO
+ */
+void CUSB::Quit()
+{
+}
+
+/*
+ * --INFO--
+ * Address:\tTODO
+ * Size:\tTODO
+ */
+void CUSB::Init()
+{
 }

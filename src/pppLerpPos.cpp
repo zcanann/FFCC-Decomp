@@ -24,12 +24,12 @@ void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 void pppCopyVector__FR3Vec3Vec(void* dst, void* src);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt* pppMngSt);
 }
-extern _pppEnvSt* pppEnvStPtr;
-extern _pppMngSt* pppMngStPtr;
-extern float FLOAT_80331bf8;
-extern float FLOAT_80331bfc;
-extern char s_pppLerpPos_cpp_801dd418[];
-extern s32 DAT_8032ed70;
+extern unsigned char* lbl_8032ED50;
+extern unsigned char* lbl_8032ED54;
+extern f32 lbl_80331BF8;
+extern f32 lbl_80331BFC;
+extern char lbl_801DD418[];
+extern int lbl_8032ED70;
 
 /*
  * --INFO--
@@ -78,7 +78,7 @@ void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* pa
  */
 void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param_2, struct pppLerpPosUnkC* param_3)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
+    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
     s32 iVar1;
     s32 iVar2;
     s32 iVar4;
@@ -90,26 +90,26 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     u32 count;
     Vec** historyPtr;
 
-    if (DAT_8032ed70 == 0) {
+    if (lbl_8032ED70 == 0) {
         iVar2 = *param_3->m_serializedDataOffsets;
         historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + iVar2);
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr, s_pppLerpPos_cpp_801dd418,
+                (u32)(u8)param_2->m_dataValIndex * 0xc, ((_pppEnvSt*)lbl_8032ED54)->m_stagePtr, lbl_801DD418,
                 0x37);
             iVar5 = 0;
             for (iVar7 = 0; iVar7 < (s32)(u8)param_2->m_dataValIndex; iVar7 = iVar7 + 1) {
                 iVar4 = iVar5 + 4;
                 iVar1 = iVar5 + 8;
-                *(f32*)((u8*)*historyPtr + iVar5) = pppMngStPtr->m_matrix.value[0][3];
+                *(f32*)((u8*)*historyPtr + iVar5) = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3];
                 iVar5 = iVar5 + 0xc;
-                *(f32*)((u8*)*historyPtr + iVar4) = pppMngStPtr->m_matrix.value[1][3];
-                *(f32*)((u8*)*historyPtr + iVar1) = pppMngStPtr->m_matrix.value[2][3];
+                *(f32*)((u8*)*historyPtr + iVar4) = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3];
+                *(f32*)((u8*)*historyPtr + iVar1) = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3];
             }
         } else {
-            local_2c.z = FLOAT_80331bf8;
-            local_2c.y = FLOAT_80331bf8;
-            local_2c.x = FLOAT_80331bf8;
+            local_2c.z = lbl_80331BF8;
+            local_2c.y = lbl_80331BF8;
+            local_2c.x = lbl_80331BF8;
 
             iVar5 = (u8)param_2->m_dataValIndex - 1;
             iVar7 = iVar5 * 0xc;
@@ -122,9 +122,9 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 iVar7 = iVar7 - 0xc;
             }
 
-            (*historyPtr)->x = pppMngStPtr->m_matrix.value[0][3];
-            *(f32*)((u8*)*historyPtr + 4) = pppMngStPtr->m_matrix.value[1][3];
-            *(f32*)((u8*)*historyPtr + 8) = pppMngStPtr->m_matrix.value[2][3];
+            (*historyPtr)->x = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3];
+            *(f32*)((u8*)*historyPtr + 4) = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3];
+            *(f32*)((u8*)*historyPtr + 8) = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3];
 
             iVar7 = 0;
             for (iVar5 = 0, count = (u32)(u8)param_2->m_dataValIndex; iVar5 < (s32)count; iVar5 = iVar5 + 1) {
@@ -132,12 +132,11 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 iVar7 = iVar7 + 0xc;
             }
 
-            PSVECScale(&local_2c, &local_2c, FLOAT_80331bfc / (f32)count);
-            pppMngStPtr->m_matrix.value[0][3] = local_2c.x;
-            pppMngStPtr->m_matrix.value[1][3] = local_2c.y;
-            pppMngStPtr->m_matrix.value[2][3] = local_2c.z;
+            PSVECScale(&local_2c, &local_2c, lbl_80331BFC / (f32)count);
+            ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3] = local_2c.x;
+            ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3] = local_2c.y;
+            ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3] = local_2c.z;
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         }
     }
 }
-

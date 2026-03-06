@@ -36,7 +36,7 @@ extern "C" void __dla__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* lbl_801EA488[];
+extern "C" void* __vt__8CPtrArrayIP12CMapAnimNode[];
 extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
 extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
     CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
@@ -64,7 +64,7 @@ static char s_mapanim_cpp[] = "mapanim.cpp";
 template <>
 CPtrArray<CMapAnimNode*>::CPtrArray()
 {
-    m_vtable = lbl_801EA488;
+    m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;
@@ -100,7 +100,7 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
 extern "C" CPtrArray<CMapAnimNode*>* dtor_8004AE60(CPtrArray<CMapAnimNode*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = lbl_801EA488;
+        ptrArray->m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
         ptrArray->RemoveAll();
         if (0 < param_2) {
             __dl__FPv(ptrArray);

@@ -5,7 +5,7 @@
 extern unsigned int lbl_801EA0D0[];
 extern unsigned int lbl_801EA0DC[];
 extern unsigned int lbl_801EA0E8[];
-extern unsigned int lbl_801EA270[];
+extern unsigned int PTR_PTR_s_CSystemPcs_801ea270[];
 extern unsigned char lbl_801EA0F4[];
 extern unsigned int lbl_8032ED08;
 
@@ -25,7 +25,7 @@ extern "C" void __sinit_p_system_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    lbl_8032ED08 = reinterpret_cast<unsigned int>(lbl_801EA270);
+    lbl_8032ED08 = reinterpret_cast<unsigned int>(PTR_PTR_s_CSystemPcs_801ea270);
     table = reinterpret_cast<unsigned int*>(lbl_801EA0F4);
     table0 = lbl_801EA0D0;
     table1 = lbl_801EA0DC;

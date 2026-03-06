@@ -94,21 +94,21 @@ extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
 extern "C" u8 lbl_801DE6AC[];
-extern "C" char* lbl_80214140[];
-extern "C" char* lbl_80214160[];
-extern "C" char* lbl_80214180[];
-extern "C" char* lbl_802141A0[];
-extern "C" char* lbl_802141C0[];
+extern "C" char* PTR_s_Blacksmith_80214140[];
+extern "C" char* PTR_s_Schmied_80214160[];
+extern "C" char* PTR_s_Fabbri_80214180[];
+extern "C" char* PTR_s_Forgeron_802141a0[];
+extern "C" char* PTR_s_Herrero_802141c0[];
 extern "C" char* lbl_802141E0[];
 extern "C" char* lbl_802142C0[];
 extern "C" char* lbl_802143A0[];
 extern "C" char* lbl_80214480[];
 extern "C" char* lbl_80214560[];
-extern "C" char* lbl_80214640[];
-extern "C" char* lbl_802146C0[];
-extern "C" char* lbl_80214740[];
+extern "C" char* PTR_s_Cowlick_80214640[];
+extern "C" char* PTR_s_Spitzschopf_802146c0[];
+extern "C" char* PTR_s_Ciuffo_ribelle_80214740[];
 extern "C" char* lbl_802147C0[];
-extern "C" char* lbl_80214840[];
+extern "C" char* PTR_s_Remolino_80214840[];
 extern "C" char* lbl_802148C0[];
 extern "C" char* lbl_80214910[];
 extern "C" char* lbl_80214960[];
@@ -2369,7 +2369,7 @@ char* CMenuPcs::GetTribeStr(int index)
  */
 char* CMenuPcs::GetJobStr(int index)
 {
-    return GetLanguageTableString(index, lbl_80214140, lbl_80214160, lbl_80214180, lbl_802141A0, lbl_802141C0);
+    return GetLanguageTableString(index, PTR_s_Blacksmith_80214140, PTR_s_Schmied_80214160, PTR_s_Fabbri_80214180, PTR_s_Forgeron_802141a0, PTR_s_Herrero_802141c0);
 }
 
 /*
@@ -2383,7 +2383,7 @@ char* CMenuPcs::GetJobStr(int index)
  */
 char* CMenuPcs::GetHairStr(int index)
 {
-    return GetLanguageTableString(index, lbl_80214640, lbl_802146C0, lbl_80214740, lbl_802147C0, lbl_80214840);
+    return GetLanguageTableString(index, PTR_s_Cowlick_80214640, PTR_s_Spitzschopf_802146c0, PTR_s_Ciuffo_ribelle_80214740, lbl_802147C0, PTR_s_Remolino_80214840);
 }
 
 /*

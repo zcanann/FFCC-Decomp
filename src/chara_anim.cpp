@@ -21,7 +21,7 @@ extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 
 extern "C" unsigned char Chara[];
 extern unsigned char CharaPcs[];
-extern "C" char lbl_80210534[];
+extern "C" char PTR_PTR_s_CChara_CAnim_80210534[];
 extern "C" char s_chara_anim_cpp_801da980[];
 extern "C" char DAT_801da990[];
 
@@ -132,7 +132,7 @@ CChara::CAnim::CAnim()
 	unsigned char* const p = (unsigned char*)this;
 
 	__ct__4CRefFv(this);
-	*(void**)p = lbl_80210534;
+	*(void**)p = PTR_PTR_s_CChara_CAnim_80210534;
 	*(unsigned short*)(p + 0xE) = 0;
 	*(int*)(p + 0x14) = 0;
 	*(void**)(p + 0x20) = 0;
@@ -164,7 +164,7 @@ CChara::CAnim::~CAnim()
 	void* nodeArray;
 	void* bank;
 
-	*(void**)p = lbl_80210534;
+	*(void**)p = PTR_PTR_s_CChara_CAnim_80210534;
 
 	nodeArray = *(void**)(p + 0x14);
 	if (nodeArray != 0) {

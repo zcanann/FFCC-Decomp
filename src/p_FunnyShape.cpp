@@ -39,7 +39,7 @@ extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
-extern void* lbl_801EA924;
+extern void* PTR_PTR_s_CFunnyShapePcs_801ea924;
 extern u32 DAT_801EA778;
 extern u32 DAT_801EA77C;
 extern u32 PTR_createViewer__14CFunnyShapePcsFv_801EA780;
@@ -111,7 +111,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CManager;
     *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801E8668;
-    *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801EA924;
+    *reinterpret_cast<void**>(FunnyShapePcs) = &PTR_PTR_s_CFunnyShapePcs_801ea924;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x3C));
     __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x50));

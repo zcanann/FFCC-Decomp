@@ -17,7 +17,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern unsigned char lbl_801FCE10[];
+extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -343,7 +343,7 @@ void CCharaPcs::Quit()
  */
 int CCharaPcs::GetTable(unsigned long index)
 {
-    unsigned char* table = lbl_801FCE10;
+    unsigned char* table = PTR_s_CCharaPcs_GAME__801fce10;
     unsigned long offset = index * 0x15c;
     return (int)(table + offset);
 }

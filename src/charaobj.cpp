@@ -28,7 +28,7 @@ extern CPartMng PartMng;
 extern int DAT_8032ee68;
 extern unsigned char DAT_8032ee6c;
 extern float FLOAT_80331964;
-extern "C" char lbl_801DC5AC[];
+extern "C" char s__d__d__d__d__d_801dc5ac[];
 extern "C" float lbl_80331970;
 
 /*
@@ -1440,7 +1440,7 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		double posYDouble;
 		double widthDouble;
 
-		sprintf(text, lbl_801DC5AC,
+		sprintf(text, s__d__d__d__d__d_801dc5ac,
 		        *reinterpret_cast<short*>(script + 0x1C),
 		        *reinterpret_cast<short*>(script + 0x1A),
 		        *reinterpret_cast<short*>(script + 0x1E),

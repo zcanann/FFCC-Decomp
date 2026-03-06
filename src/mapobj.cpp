@@ -11,12 +11,12 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 
-extern float lbl_8032F938;
-extern float lbl_8032F93C;
+extern float kMapObjBoundMinInit;
+extern float kMapObjBoundMaxInit;
 extern float lbl_8032F940;
 extern float lbl_8032F944;
 extern float lbl_8032F948;
-extern float lbl_8032F950;
+extern float kMapObjDegToRad;
 extern float lbl_8032F958;
 extern unsigned int DAT_8032e498;
 extern CMaterialMan MaterialMan;
@@ -106,8 +106,8 @@ template class CPtrArray<CMapShadow*>;
 CBound::CBound()
 {
     float* bounds = (float*)this;
-    float max = lbl_8032F93C;
-    float min = lbl_8032F938;
+    float max = kMapObjBoundMaxInit;
+    float min = kMapObjBoundMinInit;
 
     bounds[2] = min;
     bounds[1] = min;
@@ -519,11 +519,11 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             U8At(obj, 0x1B) = 0;
             if (U8At(obj, 0x1C) != 0) {
                 PSMTXScale(MtxAt(obj, 0x88), F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
-                PSMTXRotRad(mtx2, 'x', lbl_8032F950 * F32At(obj, 0x70));
+                PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * F32At(obj, 0x70));
                 PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
-                PSMTXRotRad(mtx2, 'y', lbl_8032F950 * F32At(obj, 0x74));
+                PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * F32At(obj, 0x74));
                 PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
-                PSMTXRotRad(mtx2, 'z', lbl_8032F950 * F32At(obj, 0x78));
+                PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * F32At(obj, 0x78));
                 PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
                 PSMTXTrans(mtx2, F32At(obj, 0x64), F32At(obj, 0x68), F32At(obj, 0x6C));
                 PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
@@ -543,11 +543,11 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                 U8At(child, 0x1B) = 0;
                 if (U8At(child, 0x1C) != 0) {
                     PSMTXScale(MtxAt(child, 0x88), F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
-                    PSMTXRotRad(mtx1, 'x', lbl_8032F950 * F32At(child, 0x70));
+                    PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * F32At(child, 0x70));
                     PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
-                    PSMTXRotRad(mtx1, 'y', lbl_8032F950 * F32At(child, 0x74));
+                    PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * F32At(child, 0x74));
                     PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
-                    PSMTXRotRad(mtx1, 'z', lbl_8032F950 * F32At(child, 0x78));
+                    PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * F32At(child, 0x78));
                     PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
                     PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
                     PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
@@ -568,11 +568,11 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                     if (U8At(grandChild, 0x1C) != 0) {
                         PSMTXScale(
                             MtxAt(grandChild, 0x88), F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
-                        PSMTXRotRad(mtx0, 'x', lbl_8032F950 * F32At(grandChild, 0x70));
+                        PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * F32At(grandChild, 0x70));
                         PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
-                        PSMTXRotRad(mtx0, 'y', lbl_8032F950 * F32At(grandChild, 0x74));
+                        PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * F32At(grandChild, 0x74));
                         PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
-                        PSMTXRotRad(mtx0, 'z', lbl_8032F950 * F32At(grandChild, 0x78));
+                        PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * F32At(grandChild, 0x78));
                         PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
                         PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
                         PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
@@ -847,7 +847,7 @@ void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
     if (Get__12CMapKeyFrameFRiRiRf(keyFrame, &key0, &key1, &blend) == 0) {
         out = colors[key0];
     } else {
-        int blendRate = static_cast<int>(lbl_8032F950 * blend);
+        int blendRate = static_cast<int>(kMapObjDegToRad * blend);
         _GXColor c0 = colors[key0];
         _GXColor c1 = colors[key1];
 

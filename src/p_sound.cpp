@@ -6,7 +6,7 @@ extern unsigned int lbl_8021058C[];
 extern unsigned int lbl_80210598[];
 extern unsigned int lbl_802105A4[];
 extern unsigned char lbl_802105B0[];
-extern unsigned int lbl_8021072C[];
+extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
 extern unsigned int lbl_8032EDE0;
 class CSound;
 extern CSound Sound[];
@@ -31,7 +31,7 @@ void Draw__6CSoundFv(CSound*);
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    lbl_8032EDE0 = (unsigned int)&lbl_8021072C;
+    lbl_8032EDE0 = (unsigned int)&PTR_PTR_s_CSoundPcs_8021072c;
 
     unsigned int* table = (unsigned int*)lbl_802105B0;
 

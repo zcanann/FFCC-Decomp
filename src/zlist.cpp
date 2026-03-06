@@ -2,7 +2,7 @@
 
 #include "ffcc/p_MaterialEditor.h"
 
-extern char lbl_801D7DC0[];
+extern char s_zlist_cpp_801d7dc0[];
 
 /*
  * --INFO--
@@ -76,7 +76,7 @@ void ZLIST::DeleteList()
  */
 bool ZLIST::AddTail(void* data)
 {
-	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, lbl_801D7DC0, 0x107) _ZLISTITEM;
+	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, s_zlist_cpp_801d7dc0, 0x107) _ZLISTITEM;
 
 	if (newItem == (_ZLISTITEM*)nullptr)
 	{

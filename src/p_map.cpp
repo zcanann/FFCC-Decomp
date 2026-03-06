@@ -13,7 +13,7 @@
 #include <dolphin/mtx.h>
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
-extern void* lbl_801E900C;
+extern void* PTR_PTR_s_CMapPcs_801e900c;
 
 extern unsigned char MapPcs[];
 
@@ -41,7 +41,7 @@ extern unsigned int lbl_801E8AA8[];
 extern unsigned int lbl_801E8AB4[];
 extern unsigned int lbl_801E8AC0[];
 extern unsigned int lbl_801E8ACC[];
-extern unsigned int lbl_801E8AD8[];
+extern unsigned int PTR_s_CMapPcs_GAME__801e8ad8[];
 
 extern unsigned int lbl_8032ECC8;
 extern unsigned int lbl_8032ECCC;
@@ -52,13 +52,13 @@ extern float DrawRangeDefault;
 extern float lbl_8032FA0C;
 extern float lbl_8032FA10;
 extern "C" char lbl_801E8EEC[];
-extern "C" const char lbl_801D7844[];
+extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
 extern CLightPcs LightPcs;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" const char s_p_map_cpp_801d7728[];
-extern "C" const char lbl_801D7734[];
+extern "C" const char s__________________________________801d7734[];
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void _MapFileRead__7CMapMngFPcRUl(CMapMng*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
@@ -121,7 +121,7 @@ void CMapPcs::Quit()
  */
 void* CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return lbl_801E8AD8 + tableIndex * 0x57;
+	return PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57;
 }
 
 /*
@@ -190,7 +190,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
     lbl_8032ECC0 = static_cast<unsigned int>(stageNo);
     lbl_8032ECC4 = static_cast<unsigned int>(mapNo);
-    sprintf(mapPath, lbl_801D7844, stageNo, mapNo);
+    sprintf(mapPath, s_dvd_map_stg_03d_map_03d_801d7844, stageNo, mapNo);
 
     if (mode != 2) {
         MapMng.DestroyMap();
@@ -402,7 +402,7 @@ void CMapPcs::calc()
 
             Printf__7CSystemFPce(
                 &System,
-                lbl_801D7734,
+                s__________________________________801d7734,
                 m_mapName,
                 *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x8),
@@ -825,9 +825,9 @@ extern "C" void __sinit_p_map_cpp(void)
 	volatile void** base = reinterpret_cast<volatile void**>(MapPcs);
 	*base = &__vt__8CManager;
 	*base = &lbl_801E8668;
-	*base = &lbl_801E900C;
+	*base = &PTR_PTR_s_CMapPcs_801e900c;
 
-	unsigned int* dst = lbl_801E8AD8;
+	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;
 
 	dst[0x004 / 4] = lbl_801E89B8[0];
 	dst[0x008 / 4] = lbl_801E89B8[1];

@@ -8,9 +8,9 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
 
-extern float lbl_8032F96C;
-extern float lbl_8032F970;
-extern float lbl_8032F960;
+extern float kOctTreeBoundMinInit;
+extern float kOctTreeBoundMaxInit;
+extern float kOctTreeCylinderPad;
 extern float lbl_8032F964;
 extern CMaterialMan MaterialMan;
 extern CLightPcs LightPcs;
@@ -635,8 +635,8 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 	     (localZ < *reinterpret_cast<float*>(Ptr(octNode, 0x08))))) {
 		Vec localCorner;
 		Vec viewPos;
-		float maxDepth = lbl_8032F96C;
-		float minDepth = lbl_8032F970;
+		float maxDepth = kOctTreeBoundMinInit;
+		float minDepth = kOctTreeBoundMaxInit;
 		unsigned int andMask = 0xF;
 		int farCount = 0;
 
@@ -1785,24 +1785,24 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 			fVar1 = s_cyl.m_bottom.x;
 			fVar2 = s_cyl.m_direction.x;
 		}
-		s_cyl.m_direction2.z = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
-		s_cyl.m_top.z = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_cyl.m_direction2.z = fVar2 + kOctTreeCylinderPad + s_cyl.m_top.y;
+		s_cyl.m_top.z = fVar1 - (kOctTreeCylinderPad + s_cyl.m_top.y);
 		fVar1 = s_cyl.m_direction.y;
 		fVar2 = s_cyl.m_bottom.y;
 		if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
 			fVar1 = s_cyl.m_bottom.y;
 			fVar2 = s_cyl.m_direction.y;
 		}
-		s_cyl.m_radius2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
-		s_cyl.m_direction2.x = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_cyl.m_radius2 = fVar2 + kOctTreeCylinderPad + s_cyl.m_top.y;
+		s_cyl.m_direction2.x = fVar1 - (kOctTreeCylinderPad + s_cyl.m_top.y);
 		fVar1 = s_cyl.m_direction.z;
 		fVar2 = s_cyl.m_bottom.z;
 		if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
 			fVar1 = s_cyl.m_bottom.z;
 			fVar2 = s_cyl.m_direction.z;
 		}
-		s_cyl.m_height2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
-		s_cyl.m_direction2.y = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_cyl.m_height2 = fVar2 + kOctTreeCylinderPad + s_cyl.m_top.y;
+		s_cyl.m_direction2.y = fVar1 - (kOctTreeCylinderPad + s_cyl.m_top.y);
 		s_checkHitCylinderMask = flag;
 		hit = CheckHitCylinder_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
 		if (hit != 0) {
@@ -2007,24 +2007,24 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 			fVar1 = s_cyl.m_bottom.x;
 			fVar2 = s_cyl.m_direction.x;
 		}
-		s_cyl.m_direction2.z = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
-		s_cyl.m_top.z = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_cyl.m_direction2.z = fVar2 + kOctTreeCylinderPad + s_cyl.m_top.y;
+		s_cyl.m_top.z = fVar1 - (kOctTreeCylinderPad + s_cyl.m_top.y);
 		fVar1 = s_cyl.m_direction.y;
 		fVar2 = s_cyl.m_bottom.y;
 		if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
 			fVar1 = s_cyl.m_bottom.y;
 			fVar2 = s_cyl.m_direction.y;
 		}
-		s_cyl.m_radius2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
-		s_cyl.m_direction2.x = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_cyl.m_radius2 = fVar2 + kOctTreeCylinderPad + s_cyl.m_top.y;
+		s_cyl.m_direction2.x = fVar1 - (kOctTreeCylinderPad + s_cyl.m_top.y);
 		fVar1 = s_cyl.m_direction.z;
 		fVar2 = s_cyl.m_bottom.z;
 		if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
 			fVar1 = s_cyl.m_bottom.z;
 			fVar2 = s_cyl.m_direction.z;
 		}
-		s_cyl.m_height2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
-		s_cyl.m_direction2.y = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_cyl.m_height2 = fVar2 + kOctTreeCylinderPad + s_cyl.m_top.y;
+		s_cyl.m_direction2.y = fVar1 - (kOctTreeCylinderPad + s_cyl.m_top.y);
 		s_checkHitCylinderMask = flag;
 		CheckHitCylinderNear_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
 	}
@@ -2133,8 +2133,8 @@ int CBound::CheckCross(CBound& other)
  */
 COctNode::COctNode()
 {
-	float min = lbl_8032F96C;
-	float max = lbl_8032F970;
+	float min = kOctTreeBoundMinInit;
+	float max = kOctTreeBoundMaxInit;
 	float* bounds = (float*)this;
 
 	bounds[2] = min;
@@ -2160,17 +2160,17 @@ extern "C" void __sinit_mapocttree_cpp()
 {
 	float* bound = reinterpret_cast<float*>(Ptr(&s_bound, 0x0));
 
-	bound[2] = lbl_8032F96C;
-	bound[1] = lbl_8032F96C;
-	bound[0] = lbl_8032F96C;
-	bound[5] = lbl_8032F970;
-	bound[4] = lbl_8032F970;
-	bound[3] = lbl_8032F970;
+	bound[2] = kOctTreeBoundMinInit;
+	bound[1] = kOctTreeBoundMinInit;
+	bound[0] = kOctTreeBoundMinInit;
+	bound[5] = kOctTreeBoundMaxInit;
+	bound[4] = kOctTreeBoundMaxInit;
+	bound[3] = kOctTreeBoundMaxInit;
 
-	s_cyl.m_direction2.y = lbl_8032F96C;
-	s_cyl.m_direction2.x = lbl_8032F96C;
-	s_cyl.m_top.z = lbl_8032F96C;
-	s_cyl.m_height2 = lbl_8032F970;
-	s_cyl.m_radius2 = lbl_8032F970;
-	s_cyl.m_direction2.z = lbl_8032F970;
+	s_cyl.m_direction2.y = kOctTreeBoundMinInit;
+	s_cyl.m_direction2.x = kOctTreeBoundMinInit;
+	s_cyl.m_top.z = kOctTreeBoundMinInit;
+	s_cyl.m_height2 = kOctTreeBoundMaxInit;
+	s_cyl.m_radius2 = kOctTreeBoundMaxInit;
+	s_cyl.m_direction2.z = kOctTreeBoundMaxInit;
 }

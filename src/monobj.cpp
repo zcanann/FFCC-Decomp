@@ -2563,7 +2563,7 @@ void CGMonObj::moveFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int fn_8011548C(CGMonObj* monObj, int partyIndex)
+extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyIndex)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
@@ -2709,7 +2709,7 @@ extern "C" int fn_8011548C(CGMonObj* monObj, int partyIndex)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void fn_80115C00(CGMonObj* monObj)
+extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
@@ -2730,7 +2730,7 @@ extern "C" void fn_80115C00(CGMonObj* monObj)
 				}
 			}
 
-			int nextAction = fn_8011548C(monObj, targetPartyIndex);
+			int nextAction = CGMonObj_SelectActionFromAIScript(monObj, targetPartyIndex);
 			if (nextAction == -2) {
 				actionState = 0;
 				memset(mon + 0x70C, 0, 0x34);
@@ -2813,7 +2813,7 @@ extern "C" void fn_80115C00(CGMonObj* monObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void fn_80114B74(CGMonObj* monObj)
+extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 
@@ -2834,7 +2834,7 @@ extern "C" void fn_80114B74(CGMonObj* monObj)
 	}
 
 	if (*reinterpret_cast<int*>(mon + 0x520) == 0) {
-		fn_80115C00(monObj);
+		CGMonObj_UpdateActionStateFromTarget(monObj);
 	}
 }
 
@@ -2847,7 +2847,7 @@ extern "C" void fn_80114B74(CGMonObj* monObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void fn_801162B4(CGMonObj* monObj)
+extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;

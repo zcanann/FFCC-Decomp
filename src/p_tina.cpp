@@ -87,8 +87,8 @@ extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
 extern char s_dvd_tina_stage_03d_title_801d7f94[];
 extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
 extern char s_dvd__smenu__s_801d7fb0[];
-extern char lbl_801D7FC0[];
-extern char lbl_801D7FD4[];
+extern char s_dvd_tina_mon_m_03d_801d7fc0[];
+extern char s_dvd_tina_mon_m_03d__c_801d7fd4[];
 extern unsigned char ARRAY_80273928[];
 extern unsigned char ARRAY_80273968[];
 extern unsigned char ARRAY_802739e8[];
@@ -151,7 +151,7 @@ extern unsigned int DAT_801eaa88;
 extern unsigned int DAT_801eaa8c;
 extern unsigned int PTR_drawAfterViewer__8CPartPcsFv_801eaa90;
 extern unsigned int DAT_801eaa98;
-extern unsigned char lbl_801EAA94[];
+extern unsigned char PTR_s_CPartPcs_GAME__801eaa94[];
 extern unsigned int DAT_801eaa9c;
 extern unsigned int DAT_801eaaa0;
 extern unsigned int DAT_801eaaa4;
@@ -449,7 +449,7 @@ void CPartPcs::onScriptChanging(char*)
 void* CPartPcs::GetTable(unsigned long index)
 {
 	unsigned long offset = index * 0x15c;
-	return lbl_801EAA94 + offset;
+	return PTR_s_CPartPcs_GAME__801eaa94 + offset;
 }
 
 /*
@@ -1365,9 +1365,9 @@ void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdt
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
 
     if (variant == 0) {
-        sprintf(path, lbl_801D7FC0, monsterId);
+        sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);
     } else {
-        sprintf(path, lbl_801D7FD4, monsterId, variant + 0x61);
+        sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
     }
 
     *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;

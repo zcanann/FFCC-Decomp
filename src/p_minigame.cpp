@@ -15,7 +15,7 @@ extern unsigned int lbl_802121A8[];
 extern unsigned int lbl_802121B4[];
 extern unsigned int lbl_802121C0[];
 extern unsigned char lbl_802121CC[];
-extern unsigned int lbl_80212348[];
+extern unsigned int PTR_PTR_s_CMiniGamePcs_80212348[];
 extern int DAT_800000f8;
 extern char DAT_80331bf0[];
 
@@ -62,7 +62,7 @@ extern "C" void __sinit_p_minigame_cpp(void)
     unsigned int* desc1 = lbl_802121B4;
     unsigned int* desc2 = lbl_802121C0;
 
-    *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(lbl_80212348);
+    *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CMiniGamePcs_80212348);
 
     table[1] = desc0[0];
     table[2] = desc0[1];

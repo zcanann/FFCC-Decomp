@@ -15,7 +15,7 @@ struct Vec2d {
     float y;
 };
 
-extern char lbl_801DC4D0[];
+extern char s_Render_Mana2___801dc4d0[];
 extern float FLOAT_803318fc;
 extern float FLOAT_80331898;
 extern float FLOAT_8033189c;
@@ -435,7 +435,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
  */
 void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
 {
-    Graphic.Printf(lbl_801DC4D0);
+    Graphic.Printf(s_Render_Mana2___801dc4d0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
     GXSetNumChans(1);

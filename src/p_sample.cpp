@@ -5,7 +5,7 @@ extern unsigned int lbl_801E84A4[];
 extern unsigned int lbl_801E84B0[];
 extern unsigned int lbl_801E84BC[];
 extern unsigned char lbl_801E84C8[];
-extern unsigned int lbl_801E8644[];
+extern unsigned int PTR_PTR_s_CSamplePcs_801e8644[];
 extern unsigned int lbl_8032EC60;
 
 /*
@@ -123,7 +123,7 @@ extern "C" void __sinit_p_sample_cpp(void)
 	unsigned int* srcD = lbl_801E84BC;
 	unsigned int* table;
 
-	lbl_8032EC60 = (unsigned int)&lbl_801E8644;
+	lbl_8032EC60 = (unsigned int)&PTR_PTR_s_CSamplePcs_801e8644;
 	table = (unsigned int*)lbl_801E84C8;
 	table[1] = srcA[0];
 	table[2] = srcA[1];

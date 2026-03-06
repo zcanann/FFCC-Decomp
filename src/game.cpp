@@ -129,7 +129,7 @@ extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
 extern const s16 DAT_8032e3d0[];
 extern const char* lbl_801D60B0[];
-extern const char* lbl_801E8344[];
+extern const char* PTR_s_dvd__scft_param_cfd_801e8344[];
 int sprintf(char*, const char*, ...);
 int rand(void);
 void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);

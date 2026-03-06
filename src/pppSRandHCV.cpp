@@ -96,29 +96,22 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
 
-	targetColor = (in->field4 == -1) ? lbl_801EADC8 : (s16*)(base + in->field4 + 0x80);
-
-	{
-		s16 baseValue = in->field8;
-		s8 delta = (s8)((float)baseValue * target[0] - (float)baseValue);
-		targetColor[0] = (s16)(targetColor[0] + delta);
+	s32 colorOffset = in->field4;
+	if (colorOffset == -1) {
+		targetColor = lbl_801EADC8;
+	} else {
+		targetColor = (s16*)(base + colorOffset + 0x80);
 	}
 
-	{
-		s16 baseValue = in->fieldA;
-		s8 delta = (s8)((float)baseValue * target[1] - (float)baseValue);
-		targetColor[1] = (s16)(targetColor[1] + delta);
-	}
+	s16 baseValue = in->field8;
+	targetColor[0] = (s16)(targetColor[0] + (s8)((float)baseValue * target[0] - (float)baseValue));
 
-	{
-		s16 baseValue = in->fieldC;
-		s8 delta = (s8)((float)baseValue * target[2] - (float)baseValue);
-		targetColor[2] = (s16)(targetColor[2] + delta);
-	}
+	baseValue = in->fieldA;
+	targetColor[1] = (s16)(targetColor[1] + (s8)((float)baseValue * target[1] - (float)baseValue));
 
-	{
-		s16 baseValue = in->fieldE;
-		s8 delta = (s8)((float)baseValue * target[3] - (float)baseValue);
-		targetColor[3] = (s16)(targetColor[3] + delta);
-	}
+	baseValue = in->fieldC;
+	targetColor[2] = (s16)(targetColor[2] + (s8)((float)baseValue * target[2] - (float)baseValue));
+
+	baseValue = in->fieldE;
+	targetColor[3] = (s16)(targetColor[3] + (s8)((float)baseValue * target[3] - (float)baseValue));
 }

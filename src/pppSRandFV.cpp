@@ -7,25 +7,8 @@ extern float lbl_80330098;
 extern float lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath*);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randfloat(float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randf(unsigned char)
-{
-	// TODO
-}
+void randfloat(float, float);
+void randf(unsigned char);
 
 /*
  * --INFO--

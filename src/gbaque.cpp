@@ -2903,10 +2903,12 @@ void GbaQueue::ClrMkSmithFlg(int channel)
  */
 void GbaQueue::SetResetFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
-	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D30] = obj[0x2D30] | (1 << channel);
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(this) + channel * 0xC);
+
+	OSWaitSemaphore(semaphore);
+	reinterpret_cast<unsigned char*>(this)[0x2D3D] =
+		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2D3D] | (1 << channel));
+	OSSignalSemaphore(semaphore);
 }
 
 /*

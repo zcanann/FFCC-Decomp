@@ -170,8 +170,7 @@ public:
     unsigned char m_letterSlots[1188];          // 0x03F8
     unsigned int m_evtState0;                   // 0x089C
     unsigned int m_evtState1;                   // 0x08A0
-    unsigned short m_evtWorkArr[80];            // 0x08A4
-    unsigned char m_evtWorkPadding[96];         // 0x0944
+    unsigned short m_evtWorkArr[128];           // 0x08A4
     short m_evtWordArr[256];                    // 0x09A4
     unsigned char m_bonusCondition;             // 0x0BA4
     unsigned char m_shopBusyFlag;               // 0x0BA5

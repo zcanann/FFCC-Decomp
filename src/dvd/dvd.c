@@ -173,13 +173,12 @@ static void cbForStateReadingFST(u32 intType) {
 
 static void cbForStateError(u32 intType) {
 	DVDCommandBlock* finished;
-    executing->state = -1;
-
 	if (intType == 16) {
 		stateTimeout();
 		return;
 	}
 
+    executing->state = -1;
     __DVDPrintFatalMessage();
 
 	FatalErrorFlag = TRUE;

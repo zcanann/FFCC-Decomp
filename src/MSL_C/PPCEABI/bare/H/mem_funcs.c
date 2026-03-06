@@ -9,6 +9,8 @@
 void __copy_longs_aligned(void* dst, const void* src, size_t n)
 {
 	unsigned long i;
+	unsigned long* lps_aligned;
+	unsigned long* lpd_aligned;
 
 	i = (-(unsigned long)dst) & 3;
 
@@ -23,32 +25,35 @@ void __copy_longs_aligned(void* dst, const void* src, size_t n)
 		while (--i);
 	}
 
-	lps = ((unsigned long*)(cps + 1)) - 1;
-	lpd = ((unsigned long*)(cpd + 1)) - 1;
+	lps_aligned = ((unsigned long*)(cps + 1)) - 1;
+	lpd_aligned = ((unsigned long*)(cpd + 1)) - 1;
 
 	i = n >> 5;
 
-	if (i)
+	if (i) {
 		do {
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			lpd_aligned[1] = lps_aligned[1];
+			lpd_aligned[2] = lps_aligned[2];
+			lpd_aligned[3] = lps_aligned[3];
+			lpd_aligned[4] = lps_aligned[4];
+			lpd_aligned[5] = lps_aligned[5];
+			lpd_aligned[6] = lps_aligned[6];
+			lpd_aligned[7] = lps_aligned[7];
+			lpd_aligned[8] = lps_aligned[8];
+			lps_aligned += 8;
+			lpd_aligned += 8;
 		} while (--i);
+	}
 
 	i = (n & 31) >> 2;
 
 	if (i)
 		do
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			*++lpd_aligned = *++lps_aligned;
 		while (--i);
 
-	cps = ((unsigned char*)(lps + 1)) - 1;
-	cpd = ((unsigned char*)(lpd + 1)) - 1;
+	cps = ((unsigned char*)(lps_aligned + 1)) - 1;
+	cpd = ((unsigned char*)(lpd_aligned + 1)) - 1;
 
 	n &= 3;
 

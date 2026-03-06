@@ -331,11 +331,11 @@ char* strtok(char* str, const char* delim)
 		return NULL;
 	}
 
-	while ((ch = *p) != 0) {
+	p--;
+	while ((ch = *++p) != 0) {
 		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) == 0) {
 			break;
 		}
-		++p;
 	}
 
 	token = p;

@@ -30,6 +30,7 @@ struct Vec4d {
 };
 
 struct YmDeformationScreenData {
+	char pad[0xc];
 	int* m_serializedDataOffsets;
 };
 

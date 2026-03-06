@@ -184,7 +184,7 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
     VtMimeData* data = (VtMimeData*)step;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

@@ -1,9 +1,9 @@
 #include "ffcc/pppWDrawMatrix.h"
-#include "ffcc/partMng.h"
 
 #include <dolphin/mtx.h>
 
 extern "C" float ppvCameraMatrix02[3][4];
+extern "C" u8* pppMngStPtr;
 
 /*
  * --INFO--
@@ -26,5 +26,3 @@ void pppWDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
     PSVECScale((Vec*)(p + 0x60), (Vec*)(p + 0x60),
                *(float*)(pppMngStPtr + 0x30));
 }
-
-

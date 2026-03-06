@@ -1,4 +1,5 @@
 #include "ffcc/pppPoint.h"
+#include "ffcc/partMng.h"
 
 extern int lbl_8032ED70;
 
@@ -11,10 +12,10 @@ extern int lbl_8032ED70;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointCon(PppData* a, PppData* b)
+void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	int* dataOffset = *(int**)&b->values[2];
-	float* dst = (float*)((char*)a + *dataOffset + 0x80);
+	int dataOffset = ctrlTable->m_serializedDef->m_workOffset;
+	float* dst = (float*)((char*)pObject + dataOffset + 0x80);
 	float value = 0.0f;
 
 	dst[2] = value;
@@ -31,20 +32,20 @@ void pppPointCon(PppData* a, PppData* b)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPoint(PppData* a, PppData* b, PppData* c)
+void pppPoint(_pppPObject* pObject, pppPointStep* step, _pppCtrlTable* ctrlTable)
 {
 	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
-	if (b->id != *(int*)&a->values[2]) {
+	if (step->m_graphId != *(int*)((char*)pObject + 0xC)) {
 		return;
 	}
 
-	int* dataOffset = *(int**)&c->values[2];
-	float* dst = (float*)((char*)a + *dataOffset + 0x80);
+	int dataOffset = ctrlTable->m_serializedDef->m_workOffset;
+	float* dst = (float*)((char*)pObject + dataOffset + 0x80);
 
-	dst[0] += b->values[1];
-	dst[1] += b->values[2];
-	dst[2] += b->values[3];
+	dst[0] += step->m_x;
+	dst[1] += step->m_y;
+	dst[2] += step->m_z;
 }

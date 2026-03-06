@@ -1,5 +1,6 @@
 #include "ffcc/pppPointRAp.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
@@ -12,7 +13,16 @@ extern float lbl_8032FEEC;
 extern float lbl_8032FEF0;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
-extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+struct pppPointRApStep {
+    u32 m_unknown0;
+    float m_radius;
+    float m_speedScale;
+    u32 m_createProgramIndex;
+    u32 m_childPosOffset;
+    u32 m_unused14;
+    u32 m_childVelocityOffset;
+    u8 m_cooldown;
+};
 
 /*
  * --INFO--
@@ -23,11 +33,11 @@ extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointRApCon(_pppMngSt* mngSt, _pppPDataVal* dataVal)
+void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    u32* ctrlData = *(u32**)((u8*)dataVal + 0xC);
+    u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
     u32 offset = ctrlData[1];
-    u8* state = (u8*)mngSt + offset;
+    u8* state = (u8*)pObject + offset;
     state[0x81] = 0;
 }
 
@@ -40,18 +50,19 @@ void pppPointRApCon(_pppMngSt* mngSt, _pppPDataVal* dataVal)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable)
+void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
-    u32* ctrlData = *(u32**)((u8*)ctrlTable + 0xC);
-    u8* state = (u8*)mngSt + ctrlData[1] + 0x80;
+    pppPointRApStep* payload = (pppPointRApStep*)step;
+    u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
+    u8* state = (u8*)pObject + ctrlData[1] + 0x80;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (state[1] == 0) {
-        u32 createId = *(u32*)((u8*)dataVal + 0xC);
-        Vec* srcPos = (Vec*)((u8*)mngSt + ctrlData[0] + 0x80);
+        u32 createId = payload->m_createProgramIndex;
+        Vec* srcPos = (Vec*)((u8*)pObject + ctrlData[0] + 0x80);
 
         if ((createId + 0x10000) == 0xFFFF) {
             return;
@@ -64,17 +75,17 @@ void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable)
             obj = 0;
         } else {
             obj = (_pppPObject*)pppCreatePObject((_pppMngSt*)lbl_8032ED50, objData);
-            *(void**)((u8*)obj + 0x4) = mngSt;
+            *(_pppPObject**)((u8*)obj + 0x4) = pObject;
         }
 
         float* trig = lbl_801EC9F0;
         s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(math) - lbl_8032FEEC);
-        float scaleA = *(float*)((u8*)dataVal + 0x4);
+        float scaleA = payload->m_radius;
         float yOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
         float planarOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
         s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(math)));
-        Vec* dstPos = (Vec*)((u8*)obj + *(u32*)((u8*)dataVal + 0x10) + 0x80);
-        Vec* dstVel = (Vec*)((u8*)obj + *(u32*)((u8*)dataVal + 0x18) + 0x80);
+        Vec* dstPos = (Vec*)((u8*)obj + payload->m_childPosOffset + 0x80);
+        Vec* dstVel = (Vec*)((u8*)obj + payload->m_childVelocityOffset + 0x80);
         float xOff = planarOff * *(float*)((u8*)trig + (angleB & 0xFFFC));
         float zOff = planarOff * *(float*)((u8*)trig + ((angleB + 0x4000) & 0xFFFC));
 
@@ -82,11 +93,11 @@ void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable)
         dstPos->y = srcPos->y + yOff;
         dstPos->z = srcPos->z + zOff;
 
-        dstVel->x = xOff * *(float*)((u8*)dataVal + 0x8);
-        dstVel->y = yOff * *(float*)((u8*)dataVal + 0x8);
-        dstVel->z = zOff * *(float*)((u8*)dataVal + 0x8);
+        dstVel->x = xOff * payload->m_speedScale;
+        dstVel->y = yOff * payload->m_speedScale;
+        dstVel->z = zOff * payload->m_speedScale;
 
-        state[1] = *(u8*)((u8*)dataVal + 0x1C);
+        state[1] = payload->m_cooldown;
     }
 
     state[1]--;

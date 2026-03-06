@@ -1,9 +1,18 @@
 #include "ffcc/pppPointApMtx.h"
+#include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
 
 extern int lbl_8032ED70;
-extern _pppMngSt* lbl_8032ED50;
-extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+extern u8* lbl_8032ED50;
+
+struct pppPointApMtxStep {
+	u32 m_unknown0;
+	u32 m_createProgramIndex;
+	u32 m_childMatrixOffset;
+	u8 m_cooldown;
+	u8 m_useWorldMatrix;
+};
 
 /*
  * --INFO--
@@ -14,19 +23,20 @@ extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
+void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
+	pppPointApMtxStep* payload = (pppPointApMtxStep*)step;
 	Vec pos;
-	u32* offsets = *(u32**)((u8*)pppMngSt + 0xC);
-	Vec* source = (Vec*)((u8*)pppPObject + offsets[0] + 0x80);
-	Mtx* target = (Mtx*)((u8*)pppPObject + offsets[1] + 0x80);
+	u32* offsets = (u32*)ctrlTable->m_serializedDef;
+	Vec* source = (Vec*)((u8*)pObject + offsets[0] + 0x80);
+	Mtx* target = (Mtx*)((u8*)pObject + offsets[1] + 0x80);
 
 	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
 	if (((u8*)target)[1] == 0) {
-		u32 objectId = *(u32*)((u8*)pppPDataVal + 4);
+		u32 objectId = payload->m_createProgramIndex;
 		_pppPObject* object;
 		_pppPDataVal* objectData;
 		Mtx* matrix;
@@ -39,12 +49,12 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 		if (objectData == 0) {
 			object = 0;
 		} else {
-			object = (_pppPObject*)pppCreatePObject(lbl_8032ED50, objectData);
-			*(void**)((u8*)object + 4) = pppPObject;
+			object = (_pppPObject*)pppCreatePObject((_pppMngSt*)lbl_8032ED50, objectData);
+			*(_pppPObject**)((u8*)object + 4) = pObject;
 		}
 
-		matrix = (Mtx*)((u8*)object + *(u32*)((u8*)pppPDataVal + 8) + 0x80);
-		if (((u8*)pppPDataVal)[0xD] == 0) {
+		matrix = (Mtx*)((u8*)object + payload->m_childMatrixOffset + 0x80);
+		if (payload->m_useWorldMatrix == 0) {
 			PSMTXIdentity(*matrix);
 			(*matrix)[0][3] = source->x;
 			(*matrix)[1][3] = source->x;
@@ -57,7 +67,7 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 			(*matrix)[2][3] = pos.z;
 		}
 
-		((u8*)target)[1] = ((u8*)pppPDataVal)[0xC];
+		((u8*)target)[1] = payload->m_cooldown;
 	}
 
 	((u8*)target)[1]--;
@@ -72,11 +82,10 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
+void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	unsigned long data = *(unsigned long*)((char*)pppPDataVal + 0xC);
-	unsigned long offset = *(unsigned long*)(data + 0x4);
-	_pppPObject* object = (_pppPObject*)((char*)pppPObject + offset);
+	unsigned long offset = (unsigned long)(((u32*)ctrlTable->m_serializedDef)[1]);
+	_pppPObject* object = (_pppPObject*)((char*)pObject + offset);
 
 	*(unsigned char*)((char*)object + 0x81) = 0;
 }

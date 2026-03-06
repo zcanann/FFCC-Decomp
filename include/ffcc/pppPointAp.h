@@ -1,12 +1,15 @@
 #ifndef _PPP_POINTAP_H_
 #define _PPP_POINTAP_H_
 
+struct _pppPObject;
+struct _pppCtrlTable;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppPointApCon(void* param1, void* param2);
-void pppPointAp(void* param1, void* param2, void* param3);
+void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable);
+void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

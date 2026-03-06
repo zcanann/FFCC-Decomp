@@ -2,16 +2,14 @@
 #define _PPP_POINTAPMTX_H_
 
 struct _pppPObject;
-struct _pppMngSt;
-struct _pppPDataVal;
-struct Vec;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt);
-void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal);
+void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable);
+void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

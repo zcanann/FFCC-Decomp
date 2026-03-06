@@ -1,18 +1,24 @@
 #ifndef _PPP_POINT_H_
 #define _PPP_POINT_H_
 
-struct PppData {
-    int id;
-    float values[4]; // x, y, z, w
-    void* ptr;
+struct _pppPObject;
+struct _pppCtrlTable;
+
+struct pppPointStep
+{
+    int m_graphId;
+    float m_unknown4;
+    float m_x;
+    float m_y;
+    float m_z;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppPoint(PppData* a, PppData* b, PppData* c);
-void pppPointCon(PppData* a, PppData* b);
+void pppPoint(_pppPObject* pObject, pppPointStep* step, _pppCtrlTable* ctrlTable);
+void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

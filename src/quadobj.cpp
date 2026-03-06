@@ -97,25 +97,24 @@ int CGQuadObj::GetCID()
 bool CGQuadObj::isInner(Vec* vec)
 {
     u32 count = (u32)m_vertexCount;
-    float px;
-    float pz;
 
-    if (((count != 0 && (px = vec->x, m_bboxMinX <= px)) && (pz = vec->z, m_bboxMinZ <= pz)) &&
-        ((px <= m_bboxMaxX) && (pz <= m_bboxMaxZ))) {
+    if ((count != 0) && (m_bboxMinX <= vec->x) && (m_bboxMinZ <= vec->z) && (vec->x <= m_bboxMaxX) &&
+        (vec->z <= m_bboxMaxZ)) {
         if ((m_yBase <= vec->y) && (vec->y <= m_yBase + m_yHeight)) {
             u32 i = 0;
             u32 remaining = count;
-            QuadVertex* pVert = m_vertices;
+            QuadVertex* vert = m_vertices;
 
             while (remaining != 0) {
-                float z0 = pVert->z;
-                float x0 = pVert->x;
+                float z0 = vert->z;
+                float x0 = vert->x;
                 int next = (i + 1) - ((int)(i + 1) / (int)count) * count;
-                float cross = (m_vertices[next].x - x0) * (pz - z0) - (m_vertices[next].z - z0) * (px - x0);
+                float cross =
+                    (m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0);
                 if (cross < EPS) {
                     break;
                 }
-                pVert++;
+                vert++;
                 i++;
                 remaining--;
             }

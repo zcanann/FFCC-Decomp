@@ -77,7 +77,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
 void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2,
                                 _pppCtrlTable* param_3)
 {
-    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
+    _pppMngSt* pppMngSt = pppMngStPtr;
 
     if (lbl_8032ED70 == 0) {
         float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
@@ -105,7 +105,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             fVar4 = CameraPcs._232_4_;
             fVar3 = lbl_803320B8 + ((CameraPcs._252_4_ - lbl_803320BC) / lbl_803320BC);
             
-            PSMTXIdentity(((_pppMngSt*)lbl_8032ED50)->m_matrix.value);
+            PSMTXIdentity(pppMngStPtr->m_matrix.value);
             
             fVar2 = lbl_803320B8;
             pppMngSt->m_scale.x = lbl_803320C0 * fVar3;
@@ -116,16 +116,16 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             PSMTXScale(MStack_e8, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
             
             if (flags[1] != 0) {
-                PSMTXInverse(MStack_b8, ((_pppMngSt*)lbl_8032ED50)->m_matrix.value);
+                PSMTXInverse(MStack_b8, pppMngStPtr->m_matrix.value);
             }
             
-            PSMTXConcat((MtxPtr)MStack_e8, ((_pppMngSt*)lbl_8032ED50)->m_matrix.value, ((_pppMngSt*)lbl_8032ED50)->m_matrix.value);
+            PSMTXConcat((MtxPtr)MStack_e8, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
             
             if (flags[0] != 0) {
                 fVar3 = *value;
-                ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3] = fVar7 * fVar3 + fVar6;
-                ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3] = fVar8 * fVar3 + fVar5;
-                ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3] = fVar9 * fVar3 + fVar4;
+                pppMngStPtr->m_matrix.value[0][3] = fVar7 * fVar3 + fVar6;
+                pppMngStPtr->m_matrix.value[1][3] = fVar8 * fVar3 + fVar5;
+                pppMngStPtr->m_matrix.value[2][3] = fVar9 * fVar3 + fVar4;
             }
             
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);

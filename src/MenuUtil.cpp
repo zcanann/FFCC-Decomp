@@ -163,10 +163,14 @@ void CMenuPcs::DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, fl
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float)
+#pragma dont_inline on
+void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXColor color, int tlut, float margin, float scaleY)
 {
-	// TODO
+	if (msgNo >= 0) {
+		DrawHelpMessageUS(msgNo, font, posX, posY, color, tlut, margin, scaleY);
+	}
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

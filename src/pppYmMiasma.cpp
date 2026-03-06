@@ -17,6 +17,7 @@ extern float FLOAT_80330660;
 extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
+extern float lbl_80330644;
 extern int DAT_8032ed70;
 extern double DOUBLE_80330648;
 extern float RandF__5CMathFf(float, void*);
@@ -279,7 +280,7 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
-    float fVar1 = FLOAT_80330644;
+    float fVar1 = lbl_80330644;
     float* work = (float*)workBytes;
 
     *(u32*)workBytes = 0;
@@ -308,9 +309,9 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
-    float fVar1 = FLOAT_80330644;
+    float fVar1 = lbl_80330644;
 
-    *(float*)(workBytes + 0x1c) = FLOAT_80330644;
+    *(float*)(workBytes + 0x1c) = lbl_80330644;
     *(float*)(workBytes + 0x20) = fVar1;
     *(float*)(workBytes + 0x24) = fVar1;
 }
@@ -497,4 +498,3 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
         particle += 0x14;
     }
 }
-

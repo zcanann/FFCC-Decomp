@@ -31,15 +31,16 @@ struct pppColum {
 };
 
 struct pppColumUnkB {
-    u32 m_dataValIndex;
-    u16 m_initWOrk;
-    
-    // Extended fields from decompilation
-    char pad[4];
-    u32 m_stepValue;
-    u8 m_arg3;
-    char pad2[3];
-    char* m_payload;
+    u32 m_unk0;            // 0x00
+    u32 m_dataValIndex;    // 0x04
+    s16 m_initWOrk;        // 0x08
+    u16 m_unkA;            // 0x0A
+    u32 m_stepValue;       // 0x0C
+    u8 m_arg3;             // 0x10
+    u8 m_count;            // 0x11
+    u8 m_unk12;            // 0x12
+    u8 m_unk13;            // 0x13
+    char m_payload[0x19];  // 0x14
 };
 
 struct pppColumUnkC {
@@ -60,4 +61,3 @@ void pppRenderColum(pppColum* column, pppColumUnkB* param_2, pppColumUnkC* param
 #endif
 
 #endif // _FFCC_PPPCOLUM_H_
-

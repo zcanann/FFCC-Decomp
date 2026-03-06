@@ -30,6 +30,7 @@ extern "C" int AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern "C" int m_tempVar__4CMes[];
 
 struct GbaFlatDataTableEntryView
 {
@@ -1722,9 +1723,59 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::MakeLetterData(int, char*, int)
+int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
-	// TODO
+    char* srcText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+        0x400, Game.game.m_mainStage, s_gbaque_cpp, 0x859));
+    if (srcText == 0) {
+        if (System.m_execParam != 0) {
+            Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x85B);
+        }
+        return -1;
+    }
+    memset(srcText, 0, 0x400);
+
+    char* workText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+        0x400, Game.game.m_mainStage, s_gbaque_cpp, 0x862));
+    if (workText == 0) {
+        if (System.m_execParam != 0) {
+            Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x864);
+        }
+        __dla__FPv(srcText);
+        return -1;
+    }
+    memset(workText, 0, 0x400);
+
+    unsigned int scriptFood = Game.game.m_scriptFoodBase[channel];
+    int entry = scriptFood + letterIndex * 0xC;
+    m_tempVar__4CMes[0] = *reinterpret_cast<unsigned short*>(entry + 0x3F0);
+    m_tempVar__4CMes[1] = *reinterpret_cast<unsigned short*>(entry + 0x3F2);
+    m_tempVar__4CMes[2] = *reinterpret_cast<unsigned short*>(entry + 0x3F4);
+    m_tempVar__4CMes[3] = *reinterpret_cast<unsigned short*>(entry + 0x3F6);
+
+    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(entry + 0x3EC);
+    int mesIndex = (msgIndex & 0x7FC) >> 1;
+    char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+
+    strcpy(srcText, mesPtr[mesIndex]);
+    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    int totalSize = static_cast<int>(strlen(workText) + 1);
+    memcpy(outData, workText, totalSize);
+
+    memset(srcText, 0, 0x400);
+    memset(workText, 0, 0x400);
+    strcpy(srcText, mesPtr[mesIndex + 1]);
+    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    int line2Size = static_cast<int>(strlen(workText));
+    memcpy(outData + totalSize, workText, line2Size + 1);
+    totalSize += line2Size + 1;
+
+    __dla__FPv(workText);
+    __dla__FPv(srcText);
+
+    reinterpret_cast<unsigned char*>(this)[0x2C89] |= static_cast<unsigned char>(0x10 << channel);
+    Joybus.SetLetterSize(channel, totalSize);
+    return totalSize;
 }
 
 /*

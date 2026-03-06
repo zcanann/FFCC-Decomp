@@ -10,24 +10,6 @@ void RenderBlur__8CGraphicFiUcUcUcUcs(void* graphic, int enable, u8 r, u8 g, u8 
 
 extern char Graphic[];
 
-typedef struct {
-    u8 data[0x80];
-} pppScreenBlur;
-
-typedef struct {
-    u32 m_dataValIndex; // 0x00
-    u8 m_blurR;         // 0x04
-    u8 m_blurG;         // 0x05
-    u8 m_blurB;         // 0x06
-    u8 m_pad7;          // 0x07
-    s16 m_initWOrk;     // 0x08
-} pppScreenBlurParam;
-
-typedef struct {
-    u8 pad[0x0C];
-    s32* m_serializedDataOffsets; // 0x0C
-} pppScreenBlurOffsets;
-
 extern float ppvScreenMatrix[4][4];
 extern int lbl_8032ED70;
 
@@ -40,13 +22,10 @@ extern int lbl_8032ED70;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBlur(void* param1, void* param2, void* param3)
+void pppRenderScreenBlur(pppScreenBlur* blur, pppScreenBlurUnkB* blurParam, _pppCtrlTable* ctrlTable)
 {
-    pppScreenBlur* blur = (pppScreenBlur*)param1;
-    pppScreenBlurParam* blurParam = (pppScreenBlurParam*)param2;
-    pppScreenBlurOffsets* offsets = (pppScreenBlurOffsets*)param3;
-    s32 blurActiveOffset = offsets->m_serializedDataOffsets[1] + 0x80;
-    u8* blurValuePtr = blur->data + offsets->m_serializedDataOffsets[0] + 0x80;
+    s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1] + 0x80;
+    u8* blurValuePtr = blur->data + ctrlTable->m_serializedDataOffsets[0] + 0x80;
     u32 blurMask;
 
     blurParam->m_blurB = 0;
@@ -67,7 +46,7 @@ void pppRenderScreenBlur(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenBlur(void)
+void pppFrameScreenBlur(_pppPObject*, void*, _pppCtrlTable*)
 {
     if (lbl_8032ED70 == 0) {
         return;
@@ -84,7 +63,7 @@ void pppFrameScreenBlur(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenBlur(void)
+void pppDesScreenBlur(_pppPObjLink*, _pppCtrlTable*)
 {
     InitBlurParameter__8CGraphicFv(Graphic);
 }
@@ -98,7 +77,7 @@ void pppDesScreenBlur(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenBlur(void)
+void pppCon2ScreenBlur(pppScreenBlur*)
 {
     return;
 }
@@ -112,11 +91,9 @@ void pppCon2ScreenBlur(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenBlur(void* param1, void* param2)
+void pppConScreenBlur(pppScreenBlur* blur, _pppCtrlTable* ctrlTable)
 {
-    pppScreenBlur* blur = (pppScreenBlur*)param1;
-    pppScreenBlurOffsets* offsets = (pppScreenBlurOffsets*)param2;
-    s32 blurOffset = offsets->m_serializedDataOffsets[1] + 0x80;
+    s32 blurOffset = ctrlTable->m_serializedDataOffsets[1] + 0x80;
 
     InitBlurParameter__8CGraphicFv(Graphic);
     blur->data[blurOffset] = 0;

@@ -60,10 +60,10 @@ void DCFlushRange(void* addr, unsigned long nBytes);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMime(void* param1, void* param2, void* param3)
+void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param3 + 0xC) + 0x80);
-    VtMimeData* data = (VtMimeData*)param2;
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    VtMimeData* data = (VtMimeData*)step;
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -71,7 +71,7 @@ void pppVtMime(void* param1, void* param2, void* param3)
 
     state->velocity += state->accel;
     state->value += state->velocity;
-    if (data->id == *(int*)((char*)param1 + 0xC)) {
+    if (data->id == *(int*)((char*)object + 0xC)) {
         state->value += data->addX;
         state->velocity += data->addY;
         state->accel += data->addZ;
@@ -87,18 +87,18 @@ void pppVtMime(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawVtMime(void* param1, void* param2, void* param3)
+void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 {
-    *(void**)((char*)param1 + 0x70) = 0;
+    *(void**)((char*)object + 0x70) = 0;
 
-    int vertIdx1 = *(int*)((char*)param2 + 0x4);
-    if (vertIdx1 == 0xFFFF && *(int*)((char*)param2 + 0x8) == 0xFFFF) {
+    int vertIdx1 = *(int*)((char*)step + 0x4);
+    if (vertIdx1 == 0xFFFF && *(int*)((char*)step + 0x8) == 0xFFFF) {
         return;
     }
 
-    VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param3 + 0xC) + 0x80);
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
     void** sourceTable = lbl_8032ED54->sourceTable;
-    int vertIdx2 = *(int*)((char*)param2 + 0x8);
+    int vertIdx2 = *(int*)((char*)step + 0x8);
     VtMimeSource* vert1Data = (VtMimeSource*)sourceTable[vertIdx1];
     VtMimeSource* vert2Data = (VtMimeSource*)sourceTable[vertIdx2];
     float* vert1Pos = vert1Data->positions;
@@ -133,7 +133,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 
     DCFlushRange(*memPtr, (unsigned long)(vertCount * 0xC));
 
-    *(void**)((char*)param1 + 0x70) = *memPtr;
+    *(void**)((char*)object + 0x70) = *memPtr;
 }
 
 /*
@@ -145,9 +145,9 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMimeCon(void* param1, void* param2, void* param3)
+void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
     float zero = lbl_803300F0;
 
     state->accel = zero;
@@ -165,9 +165,9 @@ void pppVtMimeCon(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMimeCon2(void* param1, void* param2, void* param3)
+void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
     float zero = lbl_803300F0;
 
     state->accel = zero;
@@ -184,9 +184,9 @@ void pppVtMimeCon2(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMimeDes(void* param1, void* param2)
+void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
 
     if (state->vertexBuffer != 0) {
         void* graphic = &Graphic;

@@ -40,7 +40,7 @@ void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlend
  * Address:	TODO
  * Size:	TODO
  */
-void pppConstructFilter(void)
+void pppConstructFilter(_pppPObjLink*, _pppCtrlTable*)
 {
 	// TODO
 }
@@ -50,7 +50,7 @@ void pppConstructFilter(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDestructFilter(void)
+void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*)
 {
 	// TODO
 }
@@ -64,7 +64,7 @@ void pppDestructFilter(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameFilter(void)
+void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*)
 {
 	volatile int* stateFlag = &lbl_8032ED70;
 	if (*stateFlag == 0) {
@@ -81,7 +81,7 @@ void pppFrameFilter(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, pppFilterUnkC* param_3)
+void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTable* param_3)
 {
     struct FilterStep {
         unsigned int unk0;

@@ -80,7 +80,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
  * JP Size: TODO
  */
 #pragma scheduling off
-void pppDesScreenQuake(void)
+void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
 {
 	float value = lbl_80331FC8;
 
@@ -143,7 +143,7 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenQuake(void)
+void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeUnkB*, pppScreenQuakeUnkC*)
 {
 }
 

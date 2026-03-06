@@ -9,7 +9,9 @@
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#define FFCC_PPPFUNCTBL_IMPLEMENTATION
 #include "ffcc/pppfunctbl.h"
+#undef FFCC_PPPFUNCTBL_IMPLEMENTATION
 #include "ffcc/stopwatch.h"
 
 #include <string.h>

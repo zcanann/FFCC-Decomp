@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppFrameFovAdjustMatrix(void)
+void pppFrameFovAdjustMatrix(_pppPObject*, void*, _pppCtrlTable*)
 {
 	return;
 }
@@ -15,7 +15,7 @@ void pppFrameFovAdjustMatrix(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppConstructFovAdjustMatrix(void)
+void pppConstructFovAdjustMatrix(_pppPObjLink*, _pppCtrlTable*)
 {
 	return;
 }
@@ -25,7 +25,7 @@ void pppConstructFovAdjustMatrix(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDestructFovAdjustMatrix(void)
+void pppDestructFovAdjustMatrix(_pppPObjLink*, _pppCtrlTable*)
 {
 	return;
 }

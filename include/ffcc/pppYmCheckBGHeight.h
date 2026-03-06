@@ -15,8 +15,8 @@ struct pppYmCheckBGHeightUnkC {
 extern "C" {
 #endif
 
-void pppConstructYmCheckBGHeight(void);
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* param1, struct pppYmCheckBGHeightUnkC* param2);
+void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight* param1, struct pppYmCheckBGHeightUnkC* param2);
+struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* param1, void* param2, struct pppYmCheckBGHeightUnkC* param3);
 
 #ifdef __cplusplus
 }

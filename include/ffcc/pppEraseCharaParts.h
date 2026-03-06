@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 void pppConstructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*);
-void pppDestructEraseCharaParts(void);
+void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*);
 void pppFrameEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkB*, pppEraseCharaPartsUnkC*);
 
 #ifdef __cplusplus

@@ -24,7 +24,7 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkC* param_2)
+void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
     float uVar1 = lbl_803320C4;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
@@ -42,7 +42,7 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkC* param_2)
+void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
     float uVar1 = lbl_803320C4;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
@@ -60,7 +60,7 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructConstrainCameraDir(void)
+void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
 {
     return;
 }
@@ -74,7 +74,8 @@ void pppDestructConstrainCameraDir(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2, pppConstrainCameraDirUnkC* param_3)
+void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2,
+                                _pppCtrlTable* param_3)
 {
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
 

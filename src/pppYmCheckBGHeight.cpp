@@ -29,7 +29,7 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmCheckBGHeight(void)
+void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight*, struct pppYmCheckBGHeightUnkC*)
 {
 	return;
 }
@@ -43,7 +43,7 @@ void pppConstructYmCheckBGHeight(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct pppYmCheckBGHeightUnkC* param_2)
+struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, void*, struct pppYmCheckBGHeightUnkC* param_2)
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
 

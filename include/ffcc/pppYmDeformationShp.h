@@ -36,7 +36,7 @@ extern "C" {
 
 void pppConstructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
 void pppConstruct2YmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
-void pppDestructYmDeformationShp(void);
+void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
 void pppFrameYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, pppYmDeformationShpUnkC*);
 void pppRenderYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, pppYmDeformationShpUnkC*);
 

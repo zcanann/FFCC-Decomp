@@ -129,7 +129,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
  * PAL Address: 0x80167E70
  * PAL Size: 48b
  */
-void pppConstructConstrainCameraForLoc(void)
+void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
 	// pppMngStPtr points to a structure, access CGObject at offset 0xd8
 	CGObject* obj = *(CGObject**)(lbl_8032ED50 + 0xd8);
@@ -147,7 +147,7 @@ void pppConstructConstrainCameraForLoc(void)
  * JP Size: TODO
  */
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
-                                        pppConstrainCameraForLocData* data)
+                                        _pppCtrlTable* data)
 {
     float fVar1 = lbl_803331A8;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
@@ -167,7 +167,7 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  */
 void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
                                       pppConstrainCameraForLocParams* params,
-                                      pppConstrainCameraForLocData* data)
+                                      _pppCtrlTable* data)
 {
 	float* value;
 	int modelPtr;
@@ -195,7 +195,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  * JP Address: TODO
  * JP Size: TODO
  */
-void fn_80167EC4(pppConstrainCameraForLoc* constrainCameraForLoc, pppConstrainCameraForLocData* data)
+void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
     float fVar1 = lbl_803331A8;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
@@ -210,7 +210,7 @@ void fn_80167EC4(pppConstrainCameraForLoc* constrainCameraForLoc, pppConstrainCa
  * PAL Address: TODO
  * PAL Size: TODO
  */
-void pppFrameConstrainCameraForLoc(void)
+void pppFrameConstrainCameraForLoc(_pppPObject*, void*, _pppCtrlTable*)
 {
 	// TODO - frame processing function
 }

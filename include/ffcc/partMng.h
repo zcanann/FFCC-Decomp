@@ -117,15 +117,16 @@ struct _pppPObject
 };
 
 struct _pppPObjLink;
+struct _pppCtrlTable;
 
 typedef void (*pppProgAnyCallback)(void);
-typedef void (*pppProgOperationCallback)(_pppPObject*, void*, void*);
+typedef void (*pppProgOperationCallback)(_pppPObject*, void*, _pppCtrlTable*);
 typedef void (*pppProgOperation2Callback)(_pppPObject*, void*);
-typedef void (*pppProgRenderCallback)(_pppPObject*, void*, void*);
-typedef void (*pppProgConstructCallback)(_pppPObjLink*, void*);
+typedef void (*pppProgRenderCallback)(_pppPObject*, void*, _pppCtrlTable*);
+typedef void (*pppProgConstructCallback)(_pppPObjLink*, _pppCtrlTable*);
 typedef void (*pppProgConstruct2Callback)(_pppPObject*);
-typedef void (*pppProgConstruct3Callback)(_pppPObject*, void*);
-typedef void (*pppProgDestructCallback)(_pppPObjLink*, void*);
+typedef void (*pppProgConstruct3Callback)(_pppPObject*, _pppCtrlTable*);
+typedef void (*pppProgDestructCallback)(_pppPObjLink*, _pppCtrlTable*);
 
 struct pppFVECTOR4
 {
@@ -171,7 +172,10 @@ struct _pppCtrlTable
     pppProg* m_prog;                    // 0x0
     int m_initialWork;                  // 0x4
     int m_unk8;                         // 0x8
-    _pppCtrlTableData* m_serializedDef; // 0xC
+    union {
+        _pppCtrlTableData* m_serializedDef; // 0xC
+        int* m_serializedDataOffsets;       // 0xC
+    };
 };
 
 struct _pppDataHead

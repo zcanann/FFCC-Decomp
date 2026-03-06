@@ -1,15 +1,17 @@
 #ifndef _PPP_VTMIME_H_
 #define _PPP_VTMIME_H_
 
+#include "ffcc/partMng.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppVtMime(void* param1, void* param2, void* param3);
-void pppDrawVtMime(void* param1, void* param2, void* param3);
-void pppVtMimeCon(void* param1, void* param2, void* param3);
-void pppVtMimeCon2(void* param1, void* param2, void* param3);
-void pppVtMimeDes(void* param1, void* param2);
+void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl);
+void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl);
+void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl);
+void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl);
+void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

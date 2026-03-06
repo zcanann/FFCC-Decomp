@@ -1,8 +1,12 @@
 #ifndef _FFCC_FUNCTBL_H_
 #define _FFCC_FUNCTBL_H_
 
-#include "ffcc/LocationTitle2.h"
 #include "ffcc/partMng.h"
+
+pppProg* pppGetSysProgTable();
+
+#ifdef FFCC_PPPFUNCTBL_IMPLEMENTATION
+#include "ffcc/LocationTitle2.h"
 #include "ffcc/pppAccele.h"
 #include "ffcc/pppAlignmentScale.h"
 #include "ffcc/pppAngAccele.h"
@@ -1848,7 +1852,7 @@ static pppProg s_pppSysProgTable[159] = {
         { 0, 0, 0 },
         PPP_FN(pppConstructConstrainCameraForLoc),
         PPP_FN(pppConstruct2ConstrainCameraForLoc),
-        PPP_FN(fn_80167EC4),
+        PPP_FN(pppConstruct3ConstrainCameraForLoc),
         PPP_FN(pppDestructConstrainCameraForLoc)
     },
     {
@@ -1912,10 +1916,10 @@ static _pppSysProgTbl pppSysProgTbl = {
     s_pppSysProgTable,
 };
 
-static inline pppProg* pppGetSysProgTable()
+pppProg* pppGetSysProgTable()
 {
     return pppSysProgTbl.m_progs;
 }
+#endif // FFCC_PPPFUNCTBL_IMPLEMENTATION
 
 #endif // _FFCC_FUNCTBL_H_
-

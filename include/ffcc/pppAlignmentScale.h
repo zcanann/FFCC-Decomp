@@ -13,7 +13,7 @@ struct pppAlignmentScaleData
 #ifdef __cplusplus
 extern "C" {
 #endif
-void pppConstructAlignmentScale(void);
+void pppConstructAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleData*);
 struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleData*);
 
 #ifdef __cplusplus

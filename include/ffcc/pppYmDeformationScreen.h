@@ -15,7 +15,7 @@ extern "C" {
 
 void pppConstructYmDeformationScreen(pppYmDeformationScreen*, void*);
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen*, void*);
-void pppDestructYmDeformationScreen(void);
+void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*);
 void pppFrameYmDeformationScreen(pppYmDeformationScreen*, void*, void*);
 void pppRenderYmDeformationScreen(pppYmDeformationScreen*, void*, void*);
 

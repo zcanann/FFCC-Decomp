@@ -109,7 +109,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructEraseCharaParts(void)
+void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
 {
     void* handle;
     int model;

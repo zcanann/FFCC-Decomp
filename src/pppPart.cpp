@@ -444,7 +444,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 					pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 					if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 					{
-						((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+						((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
 					}
 				}
 
@@ -606,7 +606,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 						pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 						{
-							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
 						}
 					}
 
@@ -746,7 +746,7 @@ void callCon2Prog(_pppPObject* pObject)
 		{
 			if (prog->m_pppFunctionConstructor3 != 0)
 			{
-				((pppProgConstruct3Callback)prog->m_pppFunctionConstructor3)(pObject, (void*)(((u8*)stage) + 0x28));
+				((pppProgConstruct3Callback)prog->m_pppFunctionConstructor3)(pObject, (_pppCtrlTable*)(((u8*)stage) + 0x28));
 			}
 			else
 			{
@@ -934,7 +934,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 					pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 					if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 					{
-						((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+						((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
 					}
 				}
 
@@ -1008,7 +1008,7 @@ done_insert:
 		*initWork++ = entry->m_initWork;
 		if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionConstructor != 0)
 		{
-			((pppProgConstructCallback)entry->m_prog->m_pppFunctionConstructor)(newObj, entry);
+			((pppProgConstructCallback)entry->m_prog->m_pppFunctionConstructor)(newObj, (_pppCtrlTable*)entry);
 		}
 	}
 
@@ -1108,7 +1108,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 			if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 			{
-				((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+				((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
 			}
 		}
 
@@ -2056,7 +2056,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 								{
 									fn((_pppPObject*)obj,
 									   *(void**)(((u8*)obj) + *(s32*)(progSet + 0x20) + workOffsetStep),
-									   stageIter + 0x28);
+									   (_pppCtrlTable*)(stageIter + 0x28));
 								}
 								count--;
 								obj = (s32*)next;
@@ -2120,7 +2120,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 							{
 								fn((_pppPObject*)obj,
 								   *(void**)(((u8*)obj) + *(s32*)(pDataVal[0] + 0x20) + workOffsetStep),
-								   stageIter + 0x28);
+								   (_pppCtrlTable*)(stageIter + 0x28));
 							}
 							count--;
 							obj = (s32*)next;
@@ -2238,7 +2238,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 							pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
 							if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 							{
-								((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (void*)(((u8*)stage) + 0x28));
+								((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)(((u8*)stage) + 0x28));
 							}
 							stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 						}
@@ -2283,7 +2283,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
 					if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 					{
-						((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (void*)(((u8*)stage) + 0x28));
+						((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)(((u8*)stage) + 0x28));
 					}
 					stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 				}

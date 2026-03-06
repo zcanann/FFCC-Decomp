@@ -34,9 +34,9 @@ typedef struct {
 
 void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2);
 void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2);
-void pppDesScreenQuake(void);
+void pppDesScreenQuake(pppScreenQuake* quake, pppScreenQuakeUnkC* param2);
 void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppScreenQuakeUnkC *param3);
-void pppRenderScreenQuake(void);
+void pppRenderScreenQuake(pppScreenQuake* quake, pppScreenQuakeUnkB* param2, pppScreenQuakeUnkC* param3);
 
 #ifdef __cplusplus
 }

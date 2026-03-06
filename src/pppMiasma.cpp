@@ -520,7 +520,7 @@ void pppConstruct2Miasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructMiasma(void)
+void pppDestructMiasma(pppMiasma*, pppMiasmaCtrl*)
 {
 	return;
 }

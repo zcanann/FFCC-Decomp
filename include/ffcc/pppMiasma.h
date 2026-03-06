@@ -44,7 +44,7 @@ extern "C" {
 void pppRenderMiasma(pppMiasma*, void*, pppMiasmaCtrl*);
 void pppConstructMiasma(pppMiasma*, pppMiasmaCtrl*);
 void pppConstruct2Miasma(pppMiasma*, pppMiasmaCtrl*);
-void pppDestructMiasma(void);
+void pppDestructMiasma(pppMiasma*, pppMiasmaCtrl*);
 void pppFrameMiasma(pppMiasma*, pppMiasmaFrameStep*, pppMiasmaCtrl*);
 
 #ifdef __cplusplus

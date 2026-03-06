@@ -2,7 +2,7 @@
 #include "dolphin/mtx.h"
 
 extern s32 lbl_8032ED70;
-extern void* lbl_8032ED50;
+extern void* pppMngStPtr;
 extern u8 lbl_801EADC8[32];
 
 typedef struct PObjPointEntry {
@@ -35,7 +35,7 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
         if ((objData->field_4 + 0x10000) == 0xFFFF) {
             vecPtr = (u8*)lbl_801EADC8;
         } else {
-            PObjPointEntry* table = *(PObjPointEntry**)((u8*)lbl_8032ED50 + 0xD4);
+            PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
             vecPtr = (u8*)objData->data + 0x80;
             vecPtr += table[objData->field_4].vecOffset;
         }

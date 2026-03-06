@@ -16,11 +16,11 @@ static u32 Gwid ATTRIBUTE_ALIGN(32);
 static f32 *Gq ATTRIBUTE_ALIGN(32);
 static u8 *__THPLCWork512[3];
 static u8 *__THPLCWork640[3];
-static u32 __THPOldGQR5;
-static u32 __THPOldGQR6;
+u32 __THPOldGQR5;
+u32 __THPOldGQR6;
 static u8 *__THPWorkArea;
 static THPCoeff *__THPMCUBuffer[6];
-static THPFileInfo *__THPInfo;
+THPFileInfo *__THPInfo;
 static BOOL __THPInitFlag = FALSE;
 
 #ifdef DEBUG

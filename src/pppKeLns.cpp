@@ -48,8 +48,11 @@ void pppKeLnsLpCon2(void* pObject, void* pPart)
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsLpDraw(void)
+void pppKeLnsLpDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)stepData;
+	(void)ctrlTable;
 	return;
 }
 
@@ -58,8 +61,10 @@ void pppKeLnsLpDraw(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsFlsCon(void)
+void pppKeLnsFlsCon(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)ctrlTable;
 	return;
 }
 
@@ -68,7 +73,10 @@ void pppKeLnsFlsCon(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsFlsDraw(void)
+void pppKeLnsFlsDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)stepData;
+	(void)ctrlTable;
 	return;
 }

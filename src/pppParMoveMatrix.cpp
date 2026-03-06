@@ -16,8 +16,11 @@ extern float lbl_80330E3C;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParMoveMatrix(void)
+void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)stepData;
+	(void)ctrlTable;
 	_pppMngSt *pppMngSt;
 	Vec local_44;
 	Vec local_50;

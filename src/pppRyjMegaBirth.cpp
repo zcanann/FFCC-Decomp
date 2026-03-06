@@ -490,8 +490,11 @@ void set_matrix(_pppPObject*, pppFMATRIX&, PRyjMegaBirth*, VRyjMegaBirth*, _PART
  * Address:	TODO
  * Size:	TODO
  */
-void pppRyjDrawMegaBirth(void)
+void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)stepData;
+	(void)ctrlTable;
 	// TODO
 }
 

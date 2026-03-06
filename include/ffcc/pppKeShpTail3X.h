@@ -22,7 +22,7 @@ extern "C" {
 void pppKeShpTail3X(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct pppKeShpTail3XUnkC*);
 void pppKeShpTail3XDraw(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct pppKeShpTail3XUnkC*);
 void pppKeShpTail3XCon(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkC*);
-void pppKeShpTail3XDes(void);
+void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable);
 void S4ToF32(pppFVECTOR4*, short*);
 
 #ifdef __cplusplus

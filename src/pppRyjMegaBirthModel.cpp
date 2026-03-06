@@ -419,8 +419,11 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRyjDrawMegaBirthModel(void)
+void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
+    (void)obj;
+    (void)stepData;
+    (void)ctrlTable;
     // Decomp fill pass: draw path kept intentionally minimal until full renderer mapping is in place.
 }
 

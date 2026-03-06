@@ -673,7 +673,8 @@ int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
  */
 void CCaravanWork::DeleteCmdList(int commandListIndex, int updateJoybus)
 {
-	m_commandListInventorySlotRef[commandListIndex] = 0xFFFF;
+	short* slot = (short*)m_commandListInventorySlotRef + commandListIndex;
+	*slot = -1;
 	if (updateJoybus != 0) {
 		Joybus.SetCmdLst(m_joybusCaravanId, commandListIndex, -1);
 	}

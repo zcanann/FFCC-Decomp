@@ -56,31 +56,16 @@ void pppRandCV(void* param1, void* param2, void* param3)
         randomValue = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s32 colorOffset = params->colorOffset;
-    u8* target = (colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + colorOffset + 0x80);
+    u8* target;
+    if (params->colorOffset == -1) {
+        target = gPppDefaultValueBuffer;
+    } else {
+        target = base + params->colorOffset + 0x80;
+    }
+
     f32 scale = *randomValue;
-
-    {
-        s8 baseValue = params->delta[0];
-        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
-        target[0] = (u8)(target[0] + delta);
-    }
-
-    {
-        s8 baseValue = params->delta[1];
-        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
-        target[1] = (u8)(target[1] + delta);
-    }
-
-    {
-        s8 baseValue = params->delta[2];
-        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
-        target[2] = (u8)(target[2] + delta);
-    }
-
-    {
-        s8 baseValue = params->delta[3];
-        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
-        target[3] = (u8)(target[3] + delta);
-    }
+    target[0] = (u8)(target[0] + (s32)((f32)params->delta[0] * scale - (f32)params->delta[0]));
+    target[1] = (u8)(target[1] + (s32)((f32)params->delta[1] * scale - (f32)params->delta[1]));
+    target[2] = (u8)(target[2] + (s32)((f32)params->delta[2] * scale - (f32)params->delta[2]));
+    target[3] = (u8)(target[3] + (s32)((f32)params->delta[3] * scale - (f32)params->delta[3]));
 }

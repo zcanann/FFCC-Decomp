@@ -81,8 +81,6 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             }
         }
 
-        if ((s8)target[1] > 0) {
-            target[1]--;
-        }
+        target[1]--;
     }
 }

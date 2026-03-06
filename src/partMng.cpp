@@ -2566,7 +2566,8 @@ void CPartMng::pppEndPart(int index)
  */
 PPPIFPARAM* CPartMng::pppGetIfDt(short index)
 {
-	return reinterpret_cast<PPPIFPARAM*>(reinterpret_cast<char*>(this) + (index * 0x158) + 0x130);
+    int offset = index * 0x158;
+    return reinterpret_cast<PPPIFPARAM*>(reinterpret_cast<char*>(this) + offset + 0x2B48);
 }
 
 /*
@@ -2580,7 +2581,7 @@ PPPIFPARAM* CPartMng::pppGetIfDt(short index)
  */
 void CPartMng::pppShowIdx(short index, unsigned char visible)
 {
-	reinterpret_cast<unsigned char*>(this)[(index * 0x158) + 0xe9] = visible;
+	reinterpret_cast<unsigned char*>(this)[(index * 0x158) + 0x2b01] = visible;
 }
 
 /*

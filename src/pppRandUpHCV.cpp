@@ -42,21 +42,22 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
     RandUpHCVCtx* ctx = (RandUpHCVCtx*)p3;
     f32* valuePtr;
     if (params->index == *(int*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(math);
+        f32 value = RandF__5CMathFv(&math[0]);
         if (params->flag != 0) {
-            value = (value + RandF__5CMathFv(math)) * lbl_80330008;
+            f32 random = RandF__5CMathFv(&math[0]);
+            f32 blend = value + random;
+            value = blend * lbl_80330008;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
         *valuePtr = value;
+    } else if (params->index != *(int*)(base + 0xC)) {
+        return;
     } else {
-        if (params->index != *(int*)(base + 0xC)) {
-            return;
-        }
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s16* target = (params->colorOffset == -1) ? lbl_801EADC8 : (s16*)(base + params->colorOffset + 0x80);
+    s16* target = (params->colorOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + params->colorOffset + 0x80);
 
     f32 scale = *valuePtr;
 

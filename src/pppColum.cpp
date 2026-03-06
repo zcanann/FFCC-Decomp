@@ -194,7 +194,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
             }
         }
 
-        if (param_2->m_dataValIndex != 0xffff) {
+        if ((param_2->m_dataValIndex + 0x10000) != 0xFFFF) {
             long* animData = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
             pppCalcFrameShape__FPlRsRsRss(
                 animData,

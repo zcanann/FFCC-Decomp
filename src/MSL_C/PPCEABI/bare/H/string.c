@@ -316,6 +316,7 @@ char* strtok(char* str, const char* delim)
 	unsigned char ch;
 	unsigned char* p;
 	unsigned char* token;
+	unsigned long mask;
 
 	if (str != NULL) {
 		strtok_ptr = str;
@@ -323,13 +324,14 @@ char* strtok(char* str, const char* delim)
 
 	p = (unsigned char*)delim - 1;
 	while ((ch = *++p) != 0) {
-		delimiter_table[ch >> 3] |= (unsigned char)(1 << (ch & 7));
+		mask = 1 << (ch & 7);
+		delimiter_table[ch >> 3] |= (unsigned char)mask;
 	}
 
-	p = (unsigned char*)strtok_ptr;
-	if (p == NULL) {
+	if (strtok_ptr == NULL) {
 		return NULL;
 	}
+	p = (unsigned char*)strtok_ptr;
 
 	p--;
 	while ((ch = *++p) != 0) {

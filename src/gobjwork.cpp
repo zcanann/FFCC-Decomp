@@ -586,12 +586,21 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2100
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::ChgCmdLst(int, int)
+void CCaravanWork::ChgCmdLst(int commandListIndex, int itemSlot)
 {
-	// TODO
+	m_commandListInventorySlotRef[commandListIndex] = static_cast<unsigned short>(itemSlot);
+	if ((itemSlot < 0) && (static_cast<short>(m_currentCmdListIndex) == commandListIndex)) {
+		m_currentCmdListIndex =
+			static_cast<unsigned short>(GetNextCmdListIdx(static_cast<short>(m_currentCmdListIndex), -1));
+	}
+	CheckAndResetCurrentWeaponIdx(0);
 }
 
 /*
@@ -655,12 +664,19 @@ int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1fbc
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::DeleteCmdList(int, int)
+void CCaravanWork::DeleteCmdList(int commandListIndex, int updateJoybus)
 {
-	// TODO
+	m_commandListInventorySlotRef[commandListIndex] = 0xFFFF;
+	if (updateJoybus != 0) {
+		Joybus.SetCmdLst(m_joybusCaravanId, commandListIndex, -1);
+	}
 }
 
 /*
@@ -2172,12 +2188,20 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f178
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::CheckAndResetCurrentWeaponIdx(int)
 {
-	// TODO
+	int weaponItem = DelCmdListAndItem(static_cast<short>(m_weaponIdx), 0);
+	if ((weaponItem < 1) || (*GetItemDataPtr(weaponItem) != 1)) {
+		m_currentCmdListIndex = 0;
+		m_weaponIdx = 0;
+	}
 }
 
 /*

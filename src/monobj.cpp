@@ -2566,8 +2566,10 @@ void CGMonObj::moveFrame()
 extern "C" int fn_8011548C(CGMonObj* monObj, int partyIndex)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	CGObject* object = reinterpret_cast<CGObject*>(monObj);
+	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 	__ptmf* checkFn = reinterpret_cast<__ptmf*>(mon + 0x78C);
-	if (__ptmf_test(checkFn) != 0) {
+	if (__ptmf_test(checkFn + 7) != 0) {
 		typedef int (*PtmfScallRet)(CGMonObj*, int, void*);
 		int result = reinterpret_cast<PtmfScallRet>(__ptmf_scall)(monObj, partyIndex, mon + 0x708);
 		if (result == -2) {
@@ -2578,7 +2580,124 @@ extern "C" int fn_8011548C(CGMonObj* monObj, int partyIndex)
 		}
 	}
 
-	return -1;
+	float targetDist = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0);
+	short aiState = *reinterpret_cast<short*>(mon + 0x6E4);
+	unsigned char* aiScript = baseScript;
+	if (aiState != 0) {
+		aiScript = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[1]) +
+			(aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10;
+	}
+
+	short selectorType = *reinterpret_cast<short*>(aiScript + 0x108);
+	if (selectorType == -1) {
+		return -1;
+	}
+
+	unsigned int groupTable[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+	int groupCount[8] = { 0 };
+	int selectedAction = -1;
+
+	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
+		int actionOffset = actionIndex * 0x10;
+		unsigned short actionFlags = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110);
+		if (actionFlags == 0xFFFF) {
+			if (actionIndex == 0) {
+				return -2;
+			}
+			continue;
+		}
+
+		unsigned short actionType;
+		if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+			actionType = actionFlags & 3;
+		} else {
+			actionType = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118);
+		}
+
+		if ((actionType == 3) && (Game.game.m_gameWork.m_menuStageMode != 0)) {
+			continue;
+		}
+
+		int artifactLevel;
+		if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			int idx = Game.game.m_gameWork.m_bossArtifactStageIndex;
+			int stage = Game.game.m_gameWork.m_bossArtifactStageTable[idx];
+			artifactLevel = stage < 2 ? stage : 2;
+		} else {
+			artifactLevel = 0;
+		}
+
+		if (((actionType == 1) && (artifactLevel <= 0)) ||
+			((actionType == 2) && (artifactLevel <= 1))) {
+			continue;
+		}
+
+		if ((actionFlags & 0x40) != 0) {
+			float targetRot = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x610);
+			float baseRot =
+				0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
+				object->m_rotBaseY;
+			float angleLimit =
+				0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
+			float angleDelta = fabsf(Math.DstRot(targetRot, baseRot));
+			if (angleLimit <= angleDelta) {
+				continue;
+			}
+		}
+
+		if (selectorType == 0) {
+			float minDist = static_cast<float>(*reinterpret_cast<short*>(aiScript + actionOffset + 0x112));
+			float maxDist = static_cast<float>(*reinterpret_cast<short*>(aiScript + actionOffset + 0x114));
+			unsigned short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
+
+			if ((targetDist <= minDist) || (maxDist < targetDist)) {
+				continue;
+			}
+
+			if (Math.Rand(100) <= chance) {
+				selectedAction = actionIndex;
+				if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+					break;
+				}
+			}
+		} else {
+			unsigned int groupIndex;
+			if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+				groupIndex = (actionFlags >> 2) & 7;
+			} else {
+				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
+			}
+
+			if (groupIndex < 8) {
+				groupTable[actionIndex] = groupIndex;
+				groupCount[groupIndex] += 1;
+			}
+		}
+	}
+
+	if (selectorType == 1) {
+		int& groupCursor = *reinterpret_cast<int*>(mon + 0x6CC);
+		while ((groupCount[groupCursor] == 0) && (groupCursor < 8)) {
+			groupCursor += 1;
+		}
+		if (groupCursor >= 8) {
+			groupCursor = 0;
+		}
+
+		unsigned int pick = Math.Rand(8);
+		unsigned int seen = 0;
+		for (int i = 0; i < 8; i++) {
+			if (groupTable[i] == static_cast<unsigned int>(groupCursor)) {
+				if (seen == pick) {
+					groupCursor = (groupCursor + 1) & 7;
+					return i;
+				}
+				seen += 1;
+			}
+		}
+	}
+
+	return selectedAction;
 }
 
 /*

@@ -47,7 +47,7 @@ void CGQuadObj::onDraw()
         CColor color(0xff, 0xff, 0xff, 0xff);
         GXSetChanMatColor(GX_COLOR0A0, color.color);
         GXLoadPosMtxImm(*(Mtx*)(CameraPcs + 0x4), GX_PNMTX0);
-        GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
+        GXBegin(GX_LINES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
         int i = 0;
         QuadVertex* vert = m_vertices;

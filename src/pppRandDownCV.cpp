@@ -25,16 +25,6 @@ struct PppRandDownCVParam3 {
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randchar(char value, float multiplier)
-{
-    return;
-}
-
-/*
- * --INFO--
  * PAL Address: 80061384
  * PAL Size: 472b
  * EN Address: TODO

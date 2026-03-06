@@ -9,6 +9,7 @@
 extern CMemory Memory;
 extern CPartMng PartMng;
 extern unsigned char PartPcs[];
+extern u8* lbl_8032EDC0;
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int sprintf(char*, const char*, ...);
@@ -459,12 +460,16 @@ void CCharaPcs::TryReleaseAnimBank(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079754
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCharaPcs::SetSpecularAlpha(int)
+void CCharaPcs::SetSpecularAlpha(int alpha)
 {
-	// TODO
+    lbl_8032EDC0[0x6B] = (u8)alpha;
 }
 
 /*

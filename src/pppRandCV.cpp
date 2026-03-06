@@ -23,18 +23,6 @@ typedef struct RandCVCtx {
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- */
-void randchar(char range, float factor)
-{
-	f32 value = (f32)range;
-	f32 scaled = value * factor;
-	(void)scaled;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80066194
  * PAL Size: 540b
  * EN Address: TODO

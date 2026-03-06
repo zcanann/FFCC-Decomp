@@ -2,6 +2,17 @@
 #define _FFCC_FUNCTBL_H_
 
 #include "ffcc/partMng.h"
+#include "ffcc/pppBreathModel.h"
+#include "ffcc/pppConstrainCameraDir.h"
+#include "ffcc/pppConstrainCameraDir2.h"
+#include "ffcc/pppConstrainCameraForLoc.h"
+#include "ffcc/pppFovAdjustMatrix.h"
+#include "ffcc/pppLaser.h"
+#include "ffcc/pppLocationTitle.h"
+#include "ffcc/pppMiasma.h"
+#include "ffcc/pppYmBreath.h"
+#include "ffcc/pppYmMiasma.h"
+#include "ffcc/LocationTitle2.h"
 
 extern "C" {
 void pppAccele(void);
@@ -145,11 +156,6 @@ void pppDestructYmDeformationShp(void);
 void pppWDrawMatrix(void);
 void pppWDrawMatrixFront(void);
 void pppParMoveLine(void);
-void pppFrameYmMiasma(void);
-void pppRenderYmMiasma(void);
-void pppConstructYmMiasma(void);
-void pppConstruct2YmMiasma(void);
-void pppDestructYmMiasma(void);
 void pppFrameYmDeformationScreen(void);
 void pppRenderYmDeformationScreen(void);
 void pppConstructYmDeformationScreen(void);
@@ -168,11 +174,6 @@ void pppDestructYmMelt(void);
 void pppFrameYmCallBack(void);
 void pppConstructYmCallBack(void);
 void pppDestructYmCallBack(void);
-void pppFrameYmBreath(void);
-void pppRenderYmBreath(void);
-void pppConstructYmBreath(void);
-void pppConstruct2YmBreath(void);
-void pppDestructYmBreath(void);
 void pppWDrawMatrixLoop(void);
 void pppWDrawMatrixFrontLoop(void);
 void pppFrameYmMoveCircle(void);
@@ -211,23 +212,11 @@ void pppFrameYmLookOn(void);
 void pppConstructYmLookOn(void);
 void pppFrameYmCheckBGHeight(void);
 void pppConstructYmCheckBGHeight(void);
-void pppFrameLocationTitle(void);
-void pppRenderLocationTitle(void);
-void pppConstructLocationTitle(void);
-void pppDestructLocationTitle(void);
-void pppFrameLocationTitle2(void);
-void pppRenderLocationTitle2(void);
-void pppConstructLocationTitle2(void);
-void pppDestructLocationTitle2(void);
 void pppCalcShape2(void);
 void pppDrawShape2(void);
 void pppDrawShape2Construct(void);
 void pppLight(void);
 void pppLightCon(void);
-void pppFrameBreathModel(void);
-void pppRenderBreathModel(void);
-void pppConstructBreathModel(void);
-void pppDestructBreathModel(void);
 void pppFrameCrystal(void);
 void pppRenderCrystal(void);
 void pppConstructCrystal(void);
@@ -274,11 +263,6 @@ void pppFrameConformBGNormal(void);
 void pppConstructConformBGNormal(void);
 void pppFrameAlignmentScale(void);
 void pppConstructAlignmentScale(void);
-void pppFrameMiasma(void);
-void pppRenderMiasma(void);
-void pppConstructMiasma(void);
-void pppConstruct2Miasma(void);
-void pppDestructMiasma(void);
 void pppFrameBindOnlyPos(void);
 void pppConstructBindOnlyPos(void);
 void pppFrameLerpPos(void);
@@ -322,31 +306,14 @@ void pppFrameCallBackDistance(void);
 void pppConstructCallBackDistance(void);
 void pppDestructCallBackDistance(void);
 void pppParHitSphMat(void);
-void pppFrameConstrainCameraDir(void);
-void pppConstructConstrainCameraDir(void);
-void pppConstruct2ConstrainCameraDir(void);
-void pppDestructConstrainCameraDir(void);
 void pppFrameFilter(void);
 void pppRenderFilter(void);
 void pppConstructFilter(void);
 void pppDestructFilter(void);
-void pppDestructConstrainCameraForLoc(void);
-void fn_80167EC4(void);
-void pppConstruct2ConstrainCameraForLoc(void);
-void pppConstructConstrainCameraForLoc(void);
 void pppDrawMatrixLoc(void);
 void pppFrameCharaZEnvCtrl(void);
 void pppConCharaZEnvCtrl(void);
 void pppDesCharaZEnvCtrl(void);
-void pppFrameConstrainCameraDir2(void);
-void pppFrameFovAdjustMatrix(void);
-void pppConstructFovAdjustMatrix(void);
-void pppDestructFovAdjustMatrix(void);
-void pppFrameLaser(void);
-void pppRenderLaser(void);
-void pppConstructLaser(void);
-void pppConstruct2Laser(void);
-void pppDestructLaser(void);
 }
 
 struct _pppSysProgTbl
@@ -2041,13 +2008,13 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppConstrainCameraForLoc",
         0,
-        (void*)pppDestructConstrainCameraForLoc,
+        (void*)pppFrameConstrainCameraForLoc,
         0,
         { 0, 0, 0 },
-        (void*)fn_80167EC4,
+        (void*)pppConstructConstrainCameraForLoc,
         (void*)pppConstruct2ConstrainCameraForLoc,
-        0,
-        (void*)pppConstructConstrainCameraForLoc
+        (void*)fn_80167EC4,
+        (void*)pppDestructConstrainCameraForLoc
     },
     {
         (char*)"pppDrawMatrixLoc",

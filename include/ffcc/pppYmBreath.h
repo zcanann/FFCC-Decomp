@@ -1,15 +1,19 @@
 #ifndef _PPP_YMBREATH_H_
 #define _PPP_YMBREATH_H_
 
+#include <dolphin/mtx.h>
+
 struct _pppPObject;
 struct pppYmBreath;
 struct pppYmBreathUnkC;
 struct VYmBreath;
 struct PYmBreath;
 struct VColor;
-struct PARTICLE_DATA;
-struct PARTICLE_WMAT;
-struct PARTICLE_COLOR;
+struct _PARTICLE_DATA;
+struct _PARTICLE_COLOR;
+typedef _PARTICLE_DATA PARTICLE_DATA;
+typedef Mtx PARTICLE_WMAT;
+typedef _PARTICLE_COLOR PARTICLE_COLOR;
 
 void get_rand(void);
 void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);

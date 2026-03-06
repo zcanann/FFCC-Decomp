@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern s16 gPppDefaultValueBuffer[];
 extern f32 lbl_8032FF48;
@@ -59,9 +59,9 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        f32 value = -RandF__5CMathFv(&math[0]);
+        f32 value = -RandF__5CMathFv(&Math);
         if (in->field10 != 0) {
-            f32 random = RandF__5CMathFv(&math[0]);
+            f32 random = RandF__5CMathFv(&Math);
             f32 blend = value - random;
             value = blend * lbl_8032FF48;
         }

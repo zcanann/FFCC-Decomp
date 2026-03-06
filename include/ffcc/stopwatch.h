@@ -6,6 +6,10 @@
 
 #include "ffcc/manager.h"
 
+extern char s_stopwatchDefaultName;
+extern const float kStopwatchTickToMilliseconds;
+extern const float kStopwatchZeroFloat;
+
 class CStopWatch : public OSStopwatch
 {
 public:

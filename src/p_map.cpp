@@ -46,8 +46,6 @@ extern unsigned int s_mapRelProfile2__7CMapPcs;
 extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 extern float DrawRangeDefault;
-extern float lbl_8032FA0C;
-extern float lbl_8032FA10;
 extern "C" char s_lastLoadedMapPath__7CMapPcs[];
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern unsigned int CFlatFlags;
@@ -226,12 +224,12 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
                 if (rootNode != 0) {
                     float* bounds = reinterpret_cast<float*>(rootNode);
-                    unusedVec.x = (bounds[0] + bounds[3]) * lbl_8032FA0C;
-                    unusedVec.y = (bounds[1] + bounds[4]) * lbl_8032FA0C;
-                    unusedVec.z = (bounds[2] + bounds[5]) * lbl_8032FA0C;
+                    unusedVec.x = (bounds[0] + bounds[3]) * kMapBoundsCenterScale;
+                    unusedVec.y = (bounds[1] + bounds[4]) * kMapBoundsCenterScale;
+                    unusedVec.z = (bounds[2] + bounds[5]) * kMapBoundsCenterScale;
                 }
             }
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y + lbl_8032FA10;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y + kMapCameraCenterYOffset;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = unusedVec.x;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = unusedVec.z;
         }
@@ -381,13 +379,13 @@ void CMapPcs::calc()
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
                 if (rootNode != 0) {
                     float* bounds = reinterpret_cast<float*>(rootNode);
-                    cameraPos.x = (bounds[0] + bounds[3]) * lbl_8032FA0C;
-                    cameraPos.y = (bounds[1] + bounds[4]) * lbl_8032FA0C;
-                    cameraPos.z = (bounds[2] + bounds[5]) * lbl_8032FA0C;
+                    cameraPos.x = (bounds[0] + bounds[3]) * kMapBoundsCenterScale;
+                    cameraPos.y = (bounds[1] + bounds[4]) * kMapBoundsCenterScale;
+                    cameraPos.z = (bounds[2] + bounds[5]) * kMapBoundsCenterScale;
                 }
             }
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + lbl_8032FA10;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + kMapCameraCenterYOffset;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
         }
 

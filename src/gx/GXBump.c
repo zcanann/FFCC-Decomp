@@ -301,7 +301,6 @@ void __GXUpdateBPMask(void) {
     u32 texMap;
 
     mask = 0;
-    i = 0;
     numStages = (__GXData->genMode >> 16) & 7;
 
     for (i = 0; i < numStages; i++) {
@@ -317,9 +316,6 @@ void __GXUpdateBPMask(void) {
             break;
         case 3:
             texMap = (__GXData->iref >> 18) & 7;
-            break;
-        default:
-            texMap = 0;
             break;
         }
         mask |= (1 << texMap);

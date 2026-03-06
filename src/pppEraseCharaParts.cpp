@@ -87,7 +87,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 
     serializedDataOffsets = param_2->m_serializedDataOffsets;
     colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
-    gObject = *(void**)(pppMngStPtr + 0xD8);
+    gObject = pppMngStPtr->m_programControlArray;
     colorPtr[0] = 0x80;
     colorPtr[1] = 0x80;
     colorPtr[2] = 0x80;
@@ -113,7 +113,7 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
     void* handle;
     int model;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(pppMngStPtr + 0xD8), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programControlArray, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(void**)(model + 0xE4) = 0;
     *(void**)(model + 0xE8) = 0;

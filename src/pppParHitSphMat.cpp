@@ -5,7 +5,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern unsigned char* lbl_8032ED50;
 extern float lbl_80332080;
 extern unsigned char CFlat[];
 extern unsigned char Graphic[];
@@ -29,7 +28,7 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     Mtx sphereMtx;
     Mtx cameraMtx ATTRIBUTE_ALIGN(8);
     _GXColor local_a8;
-    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
+    _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
     float radius;
 
     local_88.z = lbl_80332080;
@@ -41,9 +40,9 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         Vec* src = (Vec*)((u8*)param_1 + offsets[1] + 0x80);
         PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
     } else {
-        local_94.x = *(float*)(lbl_8032ED50 + 0x84);
-        local_94.y = *(float*)(lbl_8032ED50 + 0x94);
-        local_94.z = *(float*)(lbl_8032ED50 + 0xA4);
+        local_94.x = *(float*)(pppMngStPtr + 0x84);
+        local_94.y = *(float*)(pppMngStPtr + 0x94);
+        local_94.z = *(float*)(pppMngStPtr + 0xA4);
         s32* offsets = *(s32**)(param_3 + 0xC);
         Vec* src = (Vec*)((u8*)param_1 + offsets[1] + 0x80);
         local_94.x += src->x;
@@ -76,3 +75,5 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         DrawSphere__8CGraphicFPA4_f8_GXColor(Graphic, sphereMtx, local_a8);
     }
 }
+
+

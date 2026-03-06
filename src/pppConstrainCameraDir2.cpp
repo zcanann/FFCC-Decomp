@@ -5,7 +5,6 @@
 
 extern int gPppCalcDisabled;
 extern char gPppInConstructor;
-extern _pppMngSt* lbl_8032ED50;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
@@ -53,7 +52,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 	Mtx MStack_b4;
 	Mtx MStack_84;
 
-	pppMngSt = lbl_8032ED50;
+	pppMngSt = pppMngStPtr;
 	if (gPppCalcDisabled == 0) {
 		value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
 		flags = (unsigned char*)&param_2->m_arg3;
@@ -81,7 +80,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			fVar3 = CameraPcs._232_4_;
 			fVar2 = FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4);
 			
-			PSMTXIdentity(lbl_8032ED50->m_matrix.value);
+			PSMTXIdentity(pppMngStPtr->m_matrix.value);
 			fVar1 = FLOAT_803331e0;
 			pppMngSt->m_scale.x = FLOAT_803331e8 * fVar2;
 			pppMngSt->m_scale.y = fVar2;
@@ -90,10 +89,10 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			PSMTXScale(MStack_b4, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
 			
 			if (flags[1] != 0) {
-				PSMTXInverse(MStack_84, lbl_8032ED50->m_matrix.value);
+				PSMTXInverse(MStack_84, pppMngStPtr->m_matrix.value);
 			}
 			
-			PSMTXConcat(MStack_b4, lbl_8032ED50->m_matrix.value, lbl_8032ED50->m_matrix.value);
+			PSMTXConcat(MStack_b4, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 			
 			if (flags[0] != 0) {
 				fVar2 = *value;
@@ -120,11 +119,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			PSVECAdd(&local_c0, &local_f0, &local_c0);
 			PSVECAdd(&local_c0, &local_fc, &local_c0);
 			
-			lbl_8032ED50->m_matrix.value[0][3] = local_c0.x;
-			lbl_8032ED50->m_matrix.value[1][3] = local_c0.y;
-			lbl_8032ED50->m_matrix.value[2][3] = local_c0.z;
+			pppMngStPtr->m_matrix.value[0][3] = local_c0.x;
+			pppMngStPtr->m_matrix.value[1][3] = local_c0.y;
+			pppMngStPtr->m_matrix.value[2][3] = local_c0.z;
 			
 			pppSetFpMatrix__FP9_pppMngSt((void*)pppMngSt);
 		}
 	}
 }
+
+

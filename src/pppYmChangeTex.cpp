@@ -13,10 +13,10 @@ struct _pppEnvStYmChangeTex {
 	CMaterialSet* m_materialSetPtr;
 	CMapMesh** m_mapMeshPtr;
 };
-
-extern char MaterialMan[];
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
+
+extern char MaterialMan[];
 extern float DAT_80330e10;
 extern int gPppCalcDisabled;
 extern char gUtil[];
@@ -449,3 +449,4 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChange
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	}
 }
+

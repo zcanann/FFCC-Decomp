@@ -45,8 +45,6 @@ struct _pppPDataVal;
 
 extern CMath math;
 extern int gPppCalcDisabled;
-extern u8* lbl_8032ED50;
-extern VertexApAtEnv* lbl_8032ED54;
 extern "C" f32 RandF__5CMathFv(CMath*);
 extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
@@ -107,7 +105,8 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
     if (state->countdown == 0) {
         int count = vtxData->spawnCount;
-        VertexApAtEntry* entry = &lbl_8032ED54->entries[vtxData->entryIndex];
+        VertexApAtEnv* env = (VertexApAtEnv*)pppEnvStPtr;
+        VertexApAtEntry* entry = &env->entries[vtxData->entryIndex];
 
         switch (vtxData->mode) {
         case 0:
@@ -121,13 +120,13 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {
                     s32 childId = vtxData->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
@@ -144,13 +143,13 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {
                     s32 childId = vtxData->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
@@ -165,3 +164,5 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
     state->countdown--;
 }
+
+

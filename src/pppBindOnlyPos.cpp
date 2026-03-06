@@ -1,7 +1,6 @@
 #include "ffcc/pppBindOnlyPos.h"
 
 extern int gPppCalcDisabled;
-extern unsigned char* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -32,7 +31,9 @@ void pppFrameBindOnlyPos(_pppPObject*, void*, _pppCtrlTable*)
 		return;
 	}
 
-	if (*(volatile unsigned int*)((char*)lbl_8032ED50 + 0xd8) != 0) {
+	if (*(volatile unsigned int*)((char*)pppMngStPtr + 0xd8) != 0) {
 		return;
 	}
 }
+
+

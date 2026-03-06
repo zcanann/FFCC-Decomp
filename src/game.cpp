@@ -126,7 +126,7 @@ extern const char DAT_8032f6a0[];
 extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
 extern const s16 DAT_8032e3d0[];
-extern const char* lbl_801D60B0[];
+extern const char* s_localLangDirs[];
 extern const char* PTR_s_dvd__scft_param_cfd_801e8344[];
 int sprintf(char*, const char*, ...);
 int rand(void);
@@ -1634,12 +1634,12 @@ const char* CGame::GetLangString()
 {
     const char* localLangDirs[6];
 
-    localLangDirs[0] = lbl_801D60B0[0];
-    localLangDirs[1] = lbl_801D60B0[1];
-    localLangDirs[2] = lbl_801D60B0[2];
-    localLangDirs[3] = lbl_801D60B0[3];
-    localLangDirs[4] = lbl_801D60B0[4];
-    localLangDirs[5] = lbl_801D60B0[5];
+    localLangDirs[0] = s_localLangDirs[0];
+    localLangDirs[1] = s_localLangDirs[1];
+    localLangDirs[2] = s_localLangDirs[2];
+    localLangDirs[3] = s_localLangDirs[3];
+    localLangDirs[4] = s_localLangDirs[4];
+    localLangDirs[5] = s_localLangDirs[5];
 
     return localLangDirs[m_gameWork.m_languageId];
 }
@@ -1820,3 +1820,4 @@ CGame::CGameWork::CGameWork()
 }
 
 template class CPtrArray<CMapLightHolder*>;
+

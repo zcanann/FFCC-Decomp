@@ -52,8 +52,6 @@ struct _pppPDataVal;
 
 extern CMath math;
 extern int gPppCalcDisabled;
-extern u8* lbl_8032ED50;
-extern VertexApLcEnv* lbl_8032ED54;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -103,11 +101,12 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     }
 
     if (state->countdown == 0) {
-        VertexApLcEntry* entry = &lbl_8032ED54->entries[data->entryIndex];
+        VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
+        VertexApLcEntry* entry = &env->entries[data->entryIndex];
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
-            u32* srcTable = *(u32**)((u8*)lbl_8032ED54 + 0x8);
+            u32* srcTable = *(u32**)((u8*)env + 0x8);
             VertexApLcSource* src = *(VertexApLcSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
             points = src->points;
         }
@@ -130,12 +129,12 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
                     s32 childId = data->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
@@ -160,12 +159,12 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
                     s32 childId = data->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
@@ -183,3 +182,5 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
+
+

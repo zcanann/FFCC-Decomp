@@ -11,13 +11,11 @@ struct pppYmMoveParabola {
 
 struct pppYmMoveParabolaUnkB {
     u32 m_graphId;
-    u32 _pad0x04;
-    u32 _pad0x08;
-    f32 m_stepValue;
-    s32 m_arg3;
-    void* m_payload;
-    s32 m_dataValIndex;
+    f32 m_dataValIndex;
     s32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32 m_payload;
 };
 
 struct pppYmMoveParabolaUnkC {
@@ -39,4 +37,3 @@ void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveP
 #endif
 
 #endif // _FFCC_PPP_YMMOVEPARABOLA_H_
-

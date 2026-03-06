@@ -1,12 +1,10 @@
 #include "ffcc/pppYmLookOn.h"
+#include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
 extern float lbl_80330EC8;
 extern float lbl_80330ECC;
-
-struct _pppMngSt;
-extern struct _pppMngSt* pppMngStPtr;
 
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 
@@ -103,3 +101,4 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 }
+

@@ -3,7 +3,7 @@
 #include <dolphin/mtx.h>
 
 extern int lbl_8032ED70;
-extern char lbl_8032ED78;
+extern unsigned char lbl_8032ED78;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
@@ -132,4 +132,3 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
         }
     }
 }
-

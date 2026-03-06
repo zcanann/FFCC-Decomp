@@ -26,7 +26,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
 
 	int dataOffset = *param_3->m_serializedDataOffsets;
 	void* work = (void*)((char*)pppCharaZEnvCtrl + dataOffset + 0x80);
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programControlArray, 0);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
 	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 	*(void**)(model + 0xe4) = work;
 	*(pppCharaZEnvCtrlUnkB**)(model + 0xe8) = param_2;
@@ -44,7 +44,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
  */
 void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programControlArray, 0);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
 	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 	*(void**)(model + 0xe4) = 0;
 	*(void**)(model + 0xe8) = 0;
@@ -62,7 +62,7 @@ void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programControlArray, 0);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
 	GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 }
 
@@ -80,5 +80,4 @@ void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void* data,
     unsigned char* zModeState = (unsigned char*)data;
     GXSetZMode((GXBool)zModeState[4], GX_LEQUAL, (GXBool)zModeState[5]);
 }
-
 

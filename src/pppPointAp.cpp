@@ -19,7 +19,6 @@ struct _pppPointApStep {
 };
 
 extern int lbl_8032ED70;
-extern u8* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -48,8 +47,8 @@ void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
  */
 void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
-    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
     _pppPointApStep* payload = (_pppPointApStep*)step;
+    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
     u8* target = (u8*)pObject + data->targetOffset + 0x80;
     Vec* src = (Vec*)((u8*)pObject + data->srcOffset + 0x80);
 
@@ -58,18 +57,19 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     }
 
     if (target[1] == 0) {
-        u32 objId = payload->m_createProgramIndex;
-        if ((objId + 0x10000) == 0xFFFF) {
+        u32 createId = payload->m_createProgramIndex;
+
+        if ((createId + 0x10000) == 0xFFFF) {
             return;
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = (_pppPDataVal*)(*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (objId << 4));
+        _pppPDataVal* objData = (_pppPDataVal*)((u8*)(*(u32*)((u8*)pppMngStPtr + 0xD4)) + (createId << 4));
 
         if (objData == 0) {
             obj = 0;
         } else {
-            obj = pppCreatePObject((_pppMngSt*)lbl_8032ED50, objData);
+            obj = pppCreatePObject(pppMngStPtr, objData);
             *(_pppPObject**)((u8*)obj + 4) = pObject;
         }
 
@@ -79,7 +79,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             dst->y = src->y;
             dst->z = src->z;
         } else {
-            PSMTXMultVec((MtxPtr)((u8*)lbl_8032ED50 + 0x78), src, dst);
+            PSMTXMultVec((MtxPtr)((u8*)pppMngStPtr + 0x78), src, dst);
         }
 
         target[1] = payload->m_cooldown;

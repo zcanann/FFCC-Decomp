@@ -40,6 +40,7 @@ int udp_cc_peek(void);
 int udp_cc_read(void);
 int udp_cc_write(void);
 int udp_cc_open(void);
+int udp_cc_close(void);
 int udp_cc_pre_continue(void);
 int udp_cc_post_stop(void);
 
@@ -108,7 +109,7 @@ int InitMetroTRKCommTable(int hwId)
 
         gDBCommTable.initialize_func      = (DBCommInitFunc)udp_cc_initialize;
         gDBCommTable.open_func            = (DBCommFunc)udp_cc_open;
-        gDBCommTable.close_func           = (DBCommFunc)udp_cc_open;
+        gDBCommTable.close_func           = (DBCommFunc)udp_cc_close;
         gDBCommTable.read_func            = (DBCommReadFunc)udp_cc_read;
         gDBCommTable.write_func           = (DBCommWriteFunc)udp_cc_write;
         gDBCommTable.shutdown_func        = (DBCommFunc)udp_cc_shutdown;

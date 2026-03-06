@@ -45,7 +45,7 @@ int GetWait__4CMesFv(void*);
 int GetSysControl__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
-unsigned char lbl_8032ECB8;
+unsigned char gMapHitDrawMode;
 }
 extern "C" double fmod(double, double);
 extern "C" double atan2(double, double);
@@ -1119,7 +1119,7 @@ extern "C" void GetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
  */
 extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
 {
-    lbl_8032ECB8 = drawMode;
+    gMapHitDrawMode = drawMode;
 }
 
 /*

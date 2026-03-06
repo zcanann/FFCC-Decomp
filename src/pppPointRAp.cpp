@@ -6,6 +6,7 @@
 
 extern CMath math[];
 extern int gPppCalcDisabled;
+extern _pppMngSt* lbl_8032ED50;
 extern float lbl_801EC9F0[];
 extern float lbl_8032FEE8;
 extern float lbl_8032FEEC;
@@ -68,12 +69,12 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = (_pppPDataVal*)((u8*)(*(u32*)((u8*)pppMngStPtr + 0xD4)) + (createId << 4));
+        _pppPDataVal* objData = (_pppPDataVal*)((u8*)(*(u32*)((u8*)lbl_8032ED50 + 0xD4)) + (createId << 4));
 
         if (objData == 0) {
             obj = 0;
         } else {
-            obj = (_pppPObject*)pppCreatePObject(pppMngStPtr, objData);
+            obj = (_pppPObject*)pppCreatePObject(lbl_8032ED50, objData);
             *(_pppPObject**)((u8*)obj + 0x4) = pObject;
         }
 

@@ -52,7 +52,6 @@ extern "C" char s_lastLoadedMapPath__7CMapPcs[];
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
-extern CLightPcs LightPcs;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" const char s_p_map_cpp_801d7728[];
 extern "C" const char s__________________________________801d7734[];

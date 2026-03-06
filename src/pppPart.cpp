@@ -62,8 +62,6 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
-extern CPartMng PartMng;
-extern CLightPcs LightPcs;
 extern CMath Math;
 
 Mtx ppvCameraMatrix0;

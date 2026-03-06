@@ -31,7 +31,6 @@ extern u32 lbl_801E9CFC[];
 extern u32 lbl_801E9D08[];
 extern int DAT_802381a0;
 extern unsigned char MaterialMan[];
-extern CMiniGamePcs MiniGamePcs;
 extern unsigned char MaterialMan[];
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];

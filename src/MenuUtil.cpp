@@ -1,4 +1,5 @@
 #include "ffcc/MenuUtil.h"
+#include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
@@ -18,7 +19,6 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
-extern unsigned char PartMng[];
 
 extern float kMenuCenteringHalfWidth;
 extern float kOptionAnimMin;
@@ -200,7 +200,7 @@ void CMenuPcs::SetCrystalCageAttr()
 	CrystalState* state = reinterpret_cast<CrystalState*>(this);
 
 	if (state->m_crystalPart != -1) {
-		pppDeletePart__8CPartMngFi(PartMng, state->m_crystalPart);
+		pppDeletePart__8CPartMngFi(&PartMng, state->m_crystalPart);
 	}
 
 	unsigned int chaliceElement = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0x10CC);
@@ -240,7 +240,7 @@ void CMenuPcs::SetManaWaterEffect()
 	int partNo = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x840) + 0x19B8);
 
 	if (partNo != -1) {
-		pppDeletePart__8CPartMngFi(PartMng, partNo);
+		pppDeletePart__8CPartMngFi(&PartMng, partNo);
 	}
 
 	BindEffect__8CMenuPcsFiii(this, 5, Game.game.m_gameWork.m_timerA + 0x13, -1);
@@ -593,14 +593,14 @@ void CMenuPcs::BindMcObj(int slotNo)
 				*reinterpret_cast<unsigned char**>(self + 0x840) + (slot + 0x11) * 0x524);
 
 			if (obj[1] >= 0) {
-				pppDeletePart__8CPartMngFi(PartMng, obj[1]);
+				pppDeletePart__8CPartMngFi(&PartMng, obj[1]);
 				obj[1] = -1;
 				obj[2] = -1;
 				obj[0] = -1;
 			}
 
 			if (obj[0x525] >= 0) {
-				pppDeletePart__8CPartMngFi(PartMng, obj[0x525]);
+				pppDeletePart__8CPartMngFi(&PartMng, obj[0x525]);
 				obj[0x525] = -1;
 				obj[0x526] = -1;
 				obj[0x524] = -1;

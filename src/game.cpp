@@ -97,7 +97,6 @@ void AfterFrame__12CFlatRuntimeFi(void*, int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 unsigned char CFlat[];
-unsigned char PartMng[];
 unsigned char McPcs[];
 unsigned char GbaPcs[];
 unsigned char MenuPcs[];
@@ -874,8 +873,8 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
  */
 void CGame::ScriptChanging(char*)
 {
-	pppDeleteAll__8CPartMngFv(PartMng);
-	pppDestroyAll__8CPartMngFv(PartMng);
+	pppDeleteAll__8CPartMngFv(&PartMng);
+	pppDestroyAll__8CPartMngFv(&PartMng);
 }
 
 /*

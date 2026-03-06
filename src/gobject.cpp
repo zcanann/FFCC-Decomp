@@ -18,9 +18,7 @@
 #include <math.h>
 #include <string.h>
 
-extern CPartMng PartMng;
 extern CMath Math;
-extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
 extern u32 CFlatFlags;
 extern Mtx gFlatPosMtx;

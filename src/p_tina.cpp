@@ -51,7 +51,6 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     void*,
     unsigned long);
 
-extern CPartMng PartMng;
 extern unsigned char PartPcs[];
 extern unsigned char MenuPcs[];
 extern unsigned char USBPcs[];

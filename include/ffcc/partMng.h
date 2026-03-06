@@ -428,6 +428,7 @@ public:
 extern Mtx ppvCameraMatrix0;
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvWorldMatrixWood;
+extern CPartMng PartMng;
 
 extern _pppEnvSt* pppEnvStPtr;
 extern _pppMngSt* pppMngStPtr;

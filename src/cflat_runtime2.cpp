@@ -81,7 +81,6 @@ extern int DAT_8032ed98;
 extern unsigned char DAT_8032ed9c;
 extern char DAT_801d8fc4[];
 extern CTextureMan TextureMan;
-extern CPartMng PartMng;
 extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];

@@ -1,6 +1,7 @@
 #include "ffcc/shopmenu.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/sound.h"
 
@@ -50,7 +51,6 @@ extern char DAT_80332e54[];
 extern unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];
 extern unsigned char PartPcs[];
-extern unsigned char PartMng[];
 extern void* Graphic;
 extern void* ppvAmemCacheSet;
 extern float FLOAT_80332d28;
@@ -144,7 +144,8 @@ void CMenuPcs::CreateShopMenu()
         LoadMenuPdt__8CPartPcsFPc(PartPcs, DAT_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
-    _pppDataHead* pppDataHead = *reinterpret_cast<_pppDataHead**>(PartMng + 0x22E18 + slotIndex * 0x38);
+    _pppDataHead* pppDataHead =
+        *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
         GetData__13CAmemCacheSetFsPci(ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
@@ -183,7 +184,8 @@ void CMenuPcs::CreateSmithMenu()
         LoadMenuPdt__8CPartPcsFPc(PartPcs, DAT_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
-    _pppDataHead* pppDataHead = *reinterpret_cast<_pppDataHead**>(PartMng + 0x22E18 + slotIndex * 0x38);
+    _pppDataHead* pppDataHead =
+        *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
         GetData__13CAmemCacheSetFsPci(ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);

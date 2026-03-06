@@ -20,7 +20,6 @@ extern float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
 extern unsigned int DAT_8032e498;
 extern CMaterialMan MaterialMan;
-extern CLightPcs LightPcs;
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);

@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern f32 lbl_803300C0;
 extern f32 gPppDefaultValueBuffer[];
@@ -49,9 +49,9 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300C0;
             }
             randVec[0] = value;
@@ -59,9 +59,9 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300C0;
             }
             randVec[1] = value;
@@ -69,9 +69,9 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300C0;
             }
             randVec[2] = value;

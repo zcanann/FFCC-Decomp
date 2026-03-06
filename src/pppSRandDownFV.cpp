@@ -52,7 +52,10 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = -RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+                f32 random = RandF__5CMathFv(math);
+                f32 blend = value - random;
+                f32 scale = lbl_80330080;
+                value = blend * scale;
             }
             randVec[0] = value;
         }
@@ -61,7 +64,10 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = -RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+                f32 random = RandF__5CMathFv(math);
+                f32 blend = value - random;
+                f32 scale = lbl_80330080;
+                value = blend * scale;
             }
             randVec[1] = value;
         }
@@ -70,7 +76,10 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = -RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+                f32 random = RandF__5CMathFv(math);
+                f32 blend = value - random;
+                f32 scale = lbl_80330080;
+                value = blend * scale;
             }
             randVec[2] = value;
         }

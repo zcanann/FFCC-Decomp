@@ -462,11 +462,13 @@ static void stateCheckID2() {
 
 static void cbForStateCheckID1(u32 intType) {
     if (intType == 16) {
+        executing->state = -1;
 		stateTimeout();
 		return;
 	}
 
     if (intType & DVD_INTTYPE_DE) {
+        executing->state = -1;
         stateError(0x01234567);
         return;
     }

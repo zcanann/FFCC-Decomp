@@ -116,7 +116,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
-                if ((s16)state->index >= entry->maxValue) {
+                if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 

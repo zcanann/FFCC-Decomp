@@ -161,10 +161,11 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     GXLoadPosMtxImm(mtx.value, 0);
 
     scale = work->m_scaleX * (f32)vecWork->m_alpha;
+    u8 alpha = (u8)(s32)scale;
     color.rgba[0] = param2->m_colorR;
     color.rgba[1] = param2->m_colorG;
     color.rgba[2] = param2->m_colorB;
-    color.rgba[3] = (u8)(s32)scale;
+    color.rgba[3] = alpha;
 
     pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);

@@ -6,7 +6,7 @@ extern float lbl_80330EC8;
 extern float lbl_80330ECC;
 
 struct _pppMngSt;
-extern struct _pppMngSt* lbl_8032ED50;
+extern struct _pppMngSt* pppMngStPtr;
 
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 
@@ -51,7 +51,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
         return;
     }
 
-    pppMngSt = lbl_8032ED50;
+    pppMngSt = pppMngStPtr;
     owner = *(u8**)((u8*)pppMngSt + 0xdc);
     workOffset = *param_3->m_serializedDataOffsets;
     work = (u8**)((u8*)pppYmLookOn + workOffset + 0x80);
@@ -69,9 +69,9 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
     local_4c.y = *(f32*)(owner + 0x160);
     local_4c.z = *(f32*)(owner + 0x164);
     local_4c.y += param_2->m_dataValIndex;
-    local_58.x = *(f32*)((u8*)lbl_8032ED50 + 0x84);
-    local_58.y = *(f32*)((u8*)lbl_8032ED50 + 0x94);
-    local_58.z = *(f32*)((u8*)lbl_8032ED50 + 0xa4);
+    local_58.x = *(f32*)((u8*)pppMngStPtr + 0x84);
+    local_58.y = *(f32*)((u8*)pppMngStPtr + 0x94);
+    local_58.z = *(f32*)((u8*)pppMngStPtr + 0xa4);
     PSVECSubtract(&local_58, &local_4c, &local_44);
 
     if (((lbl_80330EC8 != local_44.x) || (lbl_80330EC8 != local_44.y)) || (lbl_80330EC8 != local_44.z)) {
@@ -91,15 +91,15 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
             PSVECCrossProduct(&local_40, &local_28, &local_34);
             PSVECNormalize(&local_34, &local_34);
         }
-        *(f32*)((u8*)lbl_8032ED50 + 0x78) = local_28.x;
-        *(f32*)((u8*)lbl_8032ED50 + 0x88) = local_28.y;
-        *(f32*)((u8*)lbl_8032ED50 + 0x98) = local_28.z;
-        *(f32*)((u8*)lbl_8032ED50 + 0x7c) = local_34.x;
-        *(f32*)((u8*)lbl_8032ED50 + 0x8c) = local_34.y;
-        *(f32*)((u8*)lbl_8032ED50 + 0x9c) = local_34.z;
-        *(f32*)((u8*)lbl_8032ED50 + 0x80) = local_40.x;
-        *(f32*)((u8*)lbl_8032ED50 + 0x90) = local_40.y;
-        *(f32*)((u8*)lbl_8032ED50 + 0xa0) = local_40.z;
+        *(f32*)((u8*)pppMngStPtr + 0x78) = local_28.x;
+        *(f32*)((u8*)pppMngStPtr + 0x88) = local_28.y;
+        *(f32*)((u8*)pppMngStPtr + 0x98) = local_28.z;
+        *(f32*)((u8*)pppMngStPtr + 0x7c) = local_34.x;
+        *(f32*)((u8*)pppMngStPtr + 0x8c) = local_34.y;
+        *(f32*)((u8*)pppMngStPtr + 0x9c) = local_34.z;
+        *(f32*)((u8*)pppMngStPtr + 0x80) = local_40.x;
+        *(f32*)((u8*)pppMngStPtr + 0x90) = local_40.y;
+        *(f32*)((u8*)pppMngStPtr + 0xa0) = local_40.z;
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 }

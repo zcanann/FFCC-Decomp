@@ -76,9 +76,9 @@ float CStopWatch::Get()
 	u32 lo = p[0];
 	float ticks = __cvt_sll_flt(lo, hi);
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
-	float scale = lbl_8032F850;
 	float denom = (float)(scaled >> 3);
-	return scale * (ticks / denom);
+	ticks = ticks / denom;
+	return lbl_8032F850 * ticks;
 }
 
 /*
@@ -136,7 +136,8 @@ void CProfile::ProfEnd()
 	float ticks = __cvt_sll_flt(lo, hi);
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
-	m_lastTime = lbl_8032F850 * (ticks / denom);
+	float elapsed = ticks / denom;
+	m_lastTime = elapsed * lbl_8032F850;
 
 	int next = m_frame + 1;
 	m_frame = next;

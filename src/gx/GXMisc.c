@@ -115,10 +115,10 @@ void GXSetDrawSync(u16 token) {
     CHECK_GXBEGIN(430, "GXSetDrawSync");
 
     enabled = OSDisableInterrupts();
-    reg = token | 0x48000000;
+    reg = ((u32)token & 0xFFFF) | 0x48000000;
     GX_WRITE_RAS_REG(reg);
-    SET_REG_FIELD(443, reg, 16, 0, token);
-    SET_REG_FIELD(443, reg, 8, 24, 0x47);
+    reg = (reg & ~0xFFFF) | ((u32)token & 0xFFFF);
+    reg = (reg & ~0xFF000000) | ((u32)0x47 << 24);
     GX_WRITE_RAS_REG(reg);
     GXFlush();
     OSRestoreInterrupts(enabled);
@@ -289,9 +289,13 @@ void GXPokeDither(GXBool dither) {
  */
 void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
     volatile u16* pe_reg = (volatile u16*)__peReg;
-    u16 reg = (u16)(((compare_enable & 0xF1) | ((u16)func << 1)) & 0xFFEF);
-    reg = (u16)(reg | (((u16)update_enable << 4) & 0xFF0));
-    pe_reg[0] = reg;
+    u32 reg = compare_enable;
+
+    reg &= 0xFFFFFFF1;
+    reg |= func << 1;
+    reg &= 0xFFFFFFEF;
+    reg |= (u32)update_enable << 4;
+    pe_reg[0] = (u16)reg;
 }
 
 void GXPeekARGB(u16 x, u16 y, u32* color) {

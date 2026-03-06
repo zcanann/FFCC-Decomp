@@ -1172,7 +1172,36 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
             voiceData[0x2B] += voiceData[0x19];
             if ((voiceData[0x18] == 0) && (voiceData[0x17] < 3)) {
                 voiceData[0x17] += 1;
-                _AdsrDataCompute(voice);
+                {
+                    int stage = *(int*)((int)voice + 0x5c);
+                    u32 prevValue = 0;
+                    u32 stepCount = 0;
+                    u32 level = 0;
+                    u32 current = *(u32*)((int)voice + 0xac);
+
+                    while (stage < 3) {
+                        level = (u32)*(u8*)((int)voice + stage + 0x59);
+                        stepCount = (u32)*(u16*)((int)voice + stage * 2 + 0x50);
+                        if (level != 0) {
+                            level = ((level + 1) * 0x100 - 1) * 0x1000;
+                        }
+                        prevValue = current;
+                        if (stepCount != 0) {
+                            break;
+                        }
+                        stage = stage + 1;
+                        *(int*)((int)voice + 0x5c) = stage;
+                        current = level;
+                    }
+
+                    *(u32*)((int)voice + 0x60) = stepCount;
+                    if (stepCount == 0) {
+                        *(u32*)((int)voice + 0xac) = level;
+                    } else {
+                        *(u32*)((int)voice + 0xac) = prevValue;
+                        *(int*)((int)voice + 100) = (int)((level | 0x800) - prevValue) / (int)stepCount;
+                    }
+                }
             }
         }
     } else {

@@ -303,9 +303,9 @@ BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset,
     ASSERTMSGLINE(743, !(length & 0x1F), "DVDReadAsync(): length must be  multiple of 32 byte  ");
     ASSERTMSGLINE(745, !(offset & 3), "DVDReadAsync(): offset must be multiple of 4 byte  ");
 
-    DVD_ASSERTMSGLINE(750, (0 <= offset) && (offset < fileInfo->length), "DVDReadAsync(): specified area is out of the file  ");
+    DVD_ASSERTMSGLINE(742, (0 <= offset) && (offset < fileInfo->length), "DVDReadAsync(): specified area is out of the file  ");
     
-    DVD_ASSERTMSGLINE(756, (0 <= offset + length) && (offset + length < fileInfo->length + DVD_MIN_TRANSFER_SIZE), "DVDReadAsync(): specified area is out of the file  ");
+    DVD_ASSERTMSGLINE(748, (0 <= offset + length) && (offset + length < fileInfo->length + DVD_MIN_TRANSFER_SIZE), "DVDReadAsync(): specified area is out of the file  ");
     
     fileInfo->callback = callback;
     DVDReadAbsAsyncPrio(&(fileInfo->cb), addr, length, (s32)(fileInfo->startAddr + offset),

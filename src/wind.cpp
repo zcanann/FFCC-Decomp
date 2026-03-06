@@ -533,35 +533,38 @@ found:
 void CWind::ChangePower(int id, float power)
 {
     WindObject* obj = m_objects;
-    WindObject* found = 0;
     int i = 8;
 
     do {
-        if ((s8)obj[0].flags < 0 && id == obj[0].id) {
-            found = &obj[0];
-            break;
+        if ((s8)obj->flags < 0 && id == obj->id) {
+            goto found;
         }
-        if ((s8)obj[1].flags < 0 && id == obj[1].id) {
-            found = &obj[1];
-            break;
-        }
-        if ((s8)obj[2].flags < 0 && id == obj[2].id) {
-            found = &obj[2];
-            break;
-        }
-        if ((s8)obj[3].flags < 0 && id == obj[3].id) {
-            found = &obj[3];
-            break;
-        }
+        obj++;
 
-        obj += 4;
+        if ((s8)obj->flags < 0 && id == obj->id) {
+            goto found;
+        }
+        obj++;
+
+        if ((s8)obj->flags < 0 && id == obj->id) {
+            goto found;
+        }
+        obj++;
+
+        if ((s8)obj->flags < 0 && id == obj->id) {
+            goto found;
+        }
+        obj++;
         i--;
     } while (i != 0);
 
-    if (found == 0) {
+    obj = 0;
+
+found:
+    if (obj == 0) {
         return;
     }
 
-    found->targetPower = power;
-    found->basePower = power;
+    obj->targetPower = power;
+    obj->basePower = power;
 }

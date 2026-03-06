@@ -30,6 +30,7 @@ struct Vec4d {
 };
 
 struct YmDeformationScreenData {
+	char pad[0xc];
 	int* m_serializedDataOffsets;
 };
 
@@ -217,9 +218,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				cameraY = CameraPcs._216_4_;
 				cameraZ = CameraPcs._220_4_;
 			}
-			*(float*)(lbl_8032ED50 + 0x10) = cameraX;
-			*(float*)(lbl_8032ED50 + 0x20) = cameraY;
-			*(float*)(lbl_8032ED50 + 0x30) = cameraZ;
+			*(float*)(lbl_8032ED50 + 0x84) = cameraX;
+			*(float*)(lbl_8032ED50 + 0x94) = cameraY;
+			*(float*)(lbl_8032ED50 + 0xA4) = cameraZ;
 			pppSetFpMatrix__FP9_pppMngSt((_pppMngSt*)lbl_8032ED50);
 		}
 	}

@@ -74,11 +74,13 @@ static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
 
 static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
-    u32 reg = __GXData->cpEnable;
+    u32* cpEnable = &__GXData->cpEnable;
+    u32 reg = *cpEnable;
+    u32 val = 0;
 
-    SOME_SET_REG_MACRO(reg, 1, 5, 0);
-    __GXData->cpEnable = reg;
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    SOME_SET_REG_MACRO(reg, 1, 5, val);
+    *cpEnable = reg;
+    GX_SET_CP_REG(1, *cpEnable);
     if (BreakPointCB != NULL) {
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);

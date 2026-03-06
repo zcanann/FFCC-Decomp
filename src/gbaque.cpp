@@ -30,6 +30,7 @@ extern "C" int AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern "C" int m_tempVar__4CMes[];
 
 struct GbaFlatDataTableEntryView
 {
@@ -972,32 +973,64 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFAFC
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetStageNo(int, int*, int*)
+void GbaQueue::GetStageNo(int channel, int* stageNo, int* mapNo)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	*stageNo = *reinterpret_cast<int*>(obj + 0x444);
+	*mapNo = *reinterpret_cast<int*>(obj + 0x448);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFA84
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetStageFlg(int)
+unsigned int GbaQueue::GetStageFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+	char stageFlg;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	stageFlg = *(reinterpret_cast<char*>(this) + 0x44C);
+	flag = static_cast<unsigned int>(stageFlg) & static_cast<unsigned int>(1 << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFA10
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrStageFlg(int)
+void GbaQueue::ClrStageFlg(int channel)
 {
-	// TODO
+	unsigned char bitMask;
+	char* obj = reinterpret_cast<char*>(this);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	bitMask = static_cast<unsigned char>(1 << channel);
+	obj[0x44C] = static_cast<char>(obj[0x44C] & ~bitMask);
+	obj[0x2C89] = static_cast<char>(obj[0x2C89] | bitMask);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -1113,12 +1146,26 @@ void GbaQueue::SetRadarType()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CF6EC
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMBasePos(int, short*, short*)
+void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
 {
-	// TODO
+	unsigned int actualChannel;
+	char* obj = reinterpret_cast<char*>(this);
+
+	actualChannel = static_cast<unsigned int>(channel) &
+	                ~static_cast<unsigned int>(
+	                    (-obj[0x2D56] | obj[0x2D56]) >> 31);
+
+	OSWaitSemaphore(accessSemaphores + actualChannel);
+	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x32);
+	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x34);
+	OSSignalSemaphore(accessSemaphores + actualChannel);
 }
 
 /*
@@ -1722,9 +1769,59 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::MakeLetterData(int, char*, int)
+int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
-	// TODO
+    char* srcText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+        0x400, Game.game.m_mainStage, s_gbaque_cpp, 0x859));
+    if (srcText == 0) {
+        if (System.m_execParam != 0) {
+            Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x85B);
+        }
+        return -1;
+    }
+    memset(srcText, 0, 0x400);
+
+    char* workText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+        0x400, Game.game.m_mainStage, s_gbaque_cpp, 0x862));
+    if (workText == 0) {
+        if (System.m_execParam != 0) {
+            Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x864);
+        }
+        __dla__FPv(srcText);
+        return -1;
+    }
+    memset(workText, 0, 0x400);
+
+    unsigned int scriptFood = Game.game.m_scriptFoodBase[channel];
+    int entry = scriptFood + letterIndex * 0xC;
+    m_tempVar__4CMes[0] = *reinterpret_cast<unsigned short*>(entry + 0x3F0);
+    m_tempVar__4CMes[1] = *reinterpret_cast<unsigned short*>(entry + 0x3F2);
+    m_tempVar__4CMes[2] = *reinterpret_cast<unsigned short*>(entry + 0x3F4);
+    m_tempVar__4CMes[3] = *reinterpret_cast<unsigned short*>(entry + 0x3F6);
+
+    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(entry + 0x3EC);
+    int mesIndex = (msgIndex & 0x7FC) >> 1;
+    char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+
+    strcpy(srcText, mesPtr[mesIndex]);
+    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    int totalSize = static_cast<int>(strlen(workText) + 1);
+    memcpy(outData, workText, totalSize);
+
+    memset(srcText, 0, 0x400);
+    memset(workText, 0, 0x400);
+    strcpy(srcText, mesPtr[mesIndex + 1]);
+    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    int line2Size = static_cast<int>(strlen(workText));
+    memcpy(outData + totalSize, workText, line2Size + 1);
+    totalSize += line2Size + 1;
+
+    __dla__FPv(workText);
+    __dla__FPv(srcText);
+
+    reinterpret_cast<unsigned char*>(this)[0x2C89] |= static_cast<unsigned char>(0x10 << channel);
+    Joybus.SetLetterSize(channel, totalSize);
+    return totalSize;
 }
 
 /*

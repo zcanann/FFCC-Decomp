@@ -486,4 +486,3 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		pppInitBlendMode__Fv();
 	}
 }
-

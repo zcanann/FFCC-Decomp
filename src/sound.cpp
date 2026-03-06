@@ -1078,14 +1078,14 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
  */
 void CSound::CancelLoadWaveASync()
 {
-    CSoundLayout& sound = SoundData(this);
-    CFile::CHandle* handle = sound.m_waveFile;
+    u8* self = reinterpret_cast<u8*>(this);
+    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(self + 0x10);
     if (handle != 0) {
         File.Close(handle);
-        sound.m_waveFile = 0;
+        *reinterpret_cast<CFile::CHandle**>(self + 0x10) = 0;
         Printf__7CSystemFPce(&System, DAT_801db190);
     }
-    SetWaveData__9CRedSoundFiPvi(reinterpret_cast<CRedSound*>(this), -1, nullptr, 0);
+    SetWaveData__9CRedSoundFiPvi(reinterpret_cast<CRedSound*>(self + 8), -1, nullptr, 0);
 }
 
 /*
@@ -1099,7 +1099,7 @@ void CSound::CancelLoadWaveASync()
  */
 int CSound::IsLoadWaveASyncCompleted()
 {
-    CFile::CHandle* waveFile = SoundData(this).m_waveFile;
+    CFile::CHandle* waveFile = (*reinterpret_cast<CSoundLayout*>(reinterpret_cast<u8*>(this) + 8)).m_waveFile;
     return (u32)__cntlzw((u32)waveFile) >> 5;
 }
 

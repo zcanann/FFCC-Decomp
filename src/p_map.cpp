@@ -58,8 +58,10 @@ extern CMaterialMan MaterialMan;
 extern CLightPcs LightPcs;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" const char s_p_map_cpp_801d7728[];
+extern "C" const char lbl_801D7734[];
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void _MapFileRead__7CMapMngFPcRUl(CMapMng*);
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
@@ -392,6 +394,27 @@ void CMapPcs::calc()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + lbl_8032FA10;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
         }
+
+        if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+            CMemory::CStage* mapStage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
+            int heapUnuse = mapStage->GetHeapUnuse();
+            int heapUnuseKB = (heapUnuse >> 10) + static_cast<int>((heapUnuse < 0) && ((heapUnuse & 0x3FF) != 0));
+
+            Printf__7CSystemFPce(
+                &System,
+                lbl_801D7734,
+                m_mapName,
+                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0xC),
+                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x8),
+                heapUnuseKB);
+        }
+
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr =
+            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
+        if (mapLightHolderArr[1].GetSize() != 0) {
+            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(&lbl_8032ECC8), 0);
+        }
+
         m_forceMapReload = 0;
         m_mapCalcReady = 1;
     }

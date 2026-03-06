@@ -1,16 +1,11 @@
 #include "ffcc/pppYmMoveParabola.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
+#include "ffcc/ppp_constants.h"
 #include "ffcc/p_game.h"
 #include "types.h"
 #include "dolphin/mtx.h"
 
-extern float lbl_80330E1C;
-extern float lbl_80330E18;
-extern float lbl_80330E20;
-extern float lbl_80330E24;
-extern float lbl_80330E28;
-extern float lbl_801EC9F0[];
 extern int gPppCalcDisabled;
 extern _pppMngSt* pppMngStPtr;
 
@@ -33,7 +28,7 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
-    f32 fVar2 = lbl_80330E1C;
+    f32 fVar2 = gPppYmMoveParabolaZero;
     f32* pfVar = (f32*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
     Vec local_48;
     Vec local_24;
@@ -47,7 +42,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     f32 local_14;
     f32 local_10;
 
-    pfVar[2] = lbl_80330E1C;
+    pfVar[2] = gPppYmMoveParabolaZero;
     pfVar[1] = fVar2;
     *pfVar = fVar2;
     *(u16*)(pfVar + 3) = 1;
@@ -70,7 +65,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         local_48.y = pfVar[5];
         local_48.z = pfVar[6];
         pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x68), &local_48);
-        *(f32*)((u8*)pppMngSt + 0x68) = *(f32*)((u8*)pppMngSt + 0x68) + lbl_80330E18;
+        *(f32*)((u8*)pppMngSt + 0x68) = *(f32*)((u8*)pppMngSt + 0x68) + gPppYmMoveParabolaYOffsetStep;
     }
 }
 
@@ -104,9 +99,9 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         
         Vec direction;
         if (Game.game.m_currentSceneId == 7) {
-            direction.y = lbl_80330E1C;
-            direction.x = lbl_80330E18;
-            direction.z = lbl_80330E1C;
+            direction.y = gPppYmMoveParabolaZero;
+            direction.x = gPppYmMoveParabolaYOffsetStep;
+            direction.z = gPppYmMoveParabolaZero;
         } else {
             PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &direction);
         }
@@ -116,14 +111,14 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppNormalize__FR3Vec3Vec(&direction, &tempDir);
         
         // Trigonometric parabolic motion calculations
-        u32 sinIndex = (u32)((lbl_80330E20 * stepData->m_dataValIndex) / lbl_80330E24);
+        u32 sinIndex = (u32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
         
         f32 baseValue = *pfVar;
-        f32 horizontalScale = (f32)(frameCount * (double)(baseValue * lbl_801EC9F0[((sinIndex + 0x4000) & 0xfffc) / 4]));
+        f32 horizontalScale = (f32)(frameCount * (double)(baseValue * gPppTrigTable[((sinIndex + 0x4000) & 0xfffc) / 4]));
         f32 horizontalX = direction.x * horizontalScale;
         f32 horizontalZ = direction.z * horizontalScale;
-        f32 verticalY = (f32)(frameCount * (double)(baseValue * lbl_801EC9F0[(sinIndex & 0xfffc) / 4]) - 
-                             (double)(f32)(frameCount * (double)(f32)((double)(lbl_80330E28 * (f32)stepData->m_initWOrk) * frameCount)));
+        f32 verticalY = (f32)(frameCount * (double)(baseValue * gPppTrigTable[(sinIndex & 0xfffc) / 4]) - 
+                             (double)(f32)(frameCount * (double)(f32)((double)(gPppYmMoveParabolaGravityScale * (f32)stepData->m_initWOrk) * frameCount)));
         
         Vec newPosition;
         if (Game.game.m_currentSceneId == 7) {

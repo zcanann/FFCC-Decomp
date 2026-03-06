@@ -1,15 +1,12 @@
 #include "ffcc/pppPointRAp.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/ppp_constants.h"
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern float lbl_801EC9F0[];
-extern float lbl_8032FEE8;
-extern float lbl_8032FEEC;
-extern float lbl_8032FEF0;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct pppPointRApStep {
@@ -77,12 +74,12 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             *(_pppPObject**)((u8*)obj + 0x4) = pObject;
         }
 
-        float* trig = lbl_801EC9F0;
-        s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(&Math) - lbl_8032FEEC);
+        float* trig = gPppTrigTable;
+        s32 angleA = (s32)(gPppPointRApRandomAngleRange * RandF__5CMathFv(&Math) - gPppPointRApRandomAngleBias);
         float scaleA = payload->m_radius;
         float yOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
         float planarOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
-        s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(&Math)));
+        s32 angleB = (s32)(gPppPointRApSpinScale * (gPppPointRApRandomAngleRange * RandF__5CMathFv(&Math)));
         Vec* dstPos = (Vec*)((u8*)obj + payload->m_childPosOffset + 0x80);
         Vec* dstVel = (Vec*)((u8*)obj + payload->m_childVelocityOffset + 0x80);
         float xOff = planarOff * *(float*)((u8*)trig + (angleB & 0xFFFC));

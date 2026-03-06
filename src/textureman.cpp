@@ -40,7 +40,7 @@ extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* lbl_801E9BA0[];
+extern "C" void* PTR_PTR_s_CPtrArray_P8CTexture_801e9ba0[];
 extern "C" void* PTR_PTR_s_CTextureSet_801e9b34;
 extern "C" void* PTR_PTR_s_CTexture_801e9b78;
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -140,7 +140,7 @@ static inline CTexture* AllocTexture()
 template <>
 CPtrArray<CTexture*>::CPtrArray()
 {
-    m_vtable = lbl_801E9BA0;
+    m_vtable = PTR_PTR_s_CPtrArray_P8CTexture_801e9ba0;
     m_numItems = 0;
     m_size = 0;
     m_defaultSize = 0x10;
@@ -176,7 +176,7 @@ CPtrArray<CTexture*>::~CPtrArray()
 extern "C" CPtrArray<CTexture*>* dtor_8003BE70(CPtrArray<CTexture*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = lbl_801E9BA0;
+        ptrArray->m_vtable = PTR_PTR_s_CPtrArray_P8CTexture_801e9ba0;
         ptrArray->RemoveAll();
         if (0 < param_2) {
             __dl__FPv(ptrArray);

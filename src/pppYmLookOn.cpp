@@ -1,10 +1,9 @@
 #include "ffcc/pppYmLookOn.h"
 #include "ffcc/partMng.h"
+#include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
-extern float lbl_80330EC8;
-extern float lbl_80330ECC;
 
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 
@@ -72,18 +71,18 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
     local_58.z = *(f32*)((u8*)pppMngStPtr + 0xa4);
     PSVECSubtract(&local_58, &local_4c, &local_44);
 
-    if (((lbl_80330EC8 != local_44.x) || (lbl_80330EC8 != local_44.y)) || (lbl_80330EC8 != local_44.z)) {
+    if (((gPppYmLookOnZero != local_44.x) || (gPppYmLookOnZero != local_44.y)) || (gPppYmLookOnZero != local_44.z)) {
         PSVECNormalize(&local_44, &local_40);
         local_28.x = local_40.z;
-        local_28.y = lbl_80330EC8;
+        local_28.y = gPppYmLookOnZero;
         local_28.z = -local_40.x;
-        if (!((local_40.z != lbl_80330EC8) || (lbl_80330EC8 != local_28.z))) {
-            local_28.x = lbl_80330ECC;
-            local_28.y = lbl_80330EC8;
-            local_28.z = lbl_80330EC8;
-            local_34.x = lbl_80330EC8;
-            local_34.y = lbl_80330EC8;
-            local_34.z = lbl_80330ECC;
+        if (!((local_40.z != gPppYmLookOnZero) || (gPppYmLookOnZero != local_28.z))) {
+            local_28.x = gPppYmLookOnOne;
+            local_28.y = gPppYmLookOnZero;
+            local_28.z = gPppYmLookOnZero;
+            local_34.x = gPppYmLookOnZero;
+            local_34.y = gPppYmLookOnZero;
+            local_34.z = gPppYmLookOnOne;
         } else {
             PSVECNormalize(&local_28, &local_28);
             PSVECCrossProduct(&local_40, &local_28, &local_34);

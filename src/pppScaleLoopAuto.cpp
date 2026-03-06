@@ -1,9 +1,8 @@
 #include "ffcc/pppScaleLoopAuto.h"
+#include "ffcc/ppp_constants.h"
 #include <dolphin/types.h>
 
 extern int gPppCalcDisabled;
-extern float lbl_801EC9F0[];
-extern float lbl_80331C08;
 
 struct pppScaleLoopAutoWork {
     float m_scale[3];
@@ -105,7 +104,7 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 
     {
         s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 360.0f);
-        f32 sinVal = *(f32*)((u8*)lbl_801EC9F0 + (tableAngle & 0xFFFC));
+        f32 sinVal = *(f32*)((u8*)gPppTrigTable + (tableAngle & 0xFFFC));
         f32 delta = (step->m_amplitude * sinVal) * step->m_scale;
 
         work->m_delta = delta;
@@ -129,7 +128,7 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	int** arg2Data = (int**)arg2;
 	int* data = arg2Data[3];
 	int* ptr = (int*)data[0];
-	float zero = lbl_80331C08;
+	float zero = gPppScaleLoopAutoZero;
 	
 	void* targetPtr = (void*)((char*)arg1 + (int)ptr + 0x80);
 	float* targetData = (float*)targetPtr;

@@ -1,5 +1,6 @@
 #include "ffcc/fontman.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/symbols_shared.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include <dolphin/mtx.h>
 #include <math.h>
@@ -7,7 +8,6 @@
 extern CFontMan FontMan;
 extern CTextureMan TextureMan;
 extern void* ARRAY_802ea170;
-extern "C" unsigned char lbl_801FE080[];
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -215,7 +215,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
 
     m_usesEmbeddedData = static_cast<unsigned char>((filePtr == 0) && (stage == 0));
     if (m_usesEmbeddedData != 0) {
-        filePtr = lbl_801FE080;
+        filePtr = gFontResArchiveData;
     }
 
     chunkFile.SetBuf(filePtr);
@@ -810,3 +810,4 @@ extern "C" void __sinit_fontman_cpp(void)
 {
 	__register_global_object(&FontMan, __dt__8CFontManFv, &ARRAY_802ea170);
 }
+

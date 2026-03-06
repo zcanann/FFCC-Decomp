@@ -1,8 +1,8 @@
 #include "ffcc/pppScreenQuake.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/symbols_shared.h"
 
-extern float lbl_80331FC8;
 extern int gPppCalcDisabled;
 extern unsigned char CameraPcs[];
 
@@ -85,12 +85,12 @@ void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
         0,
         0,
         0,
-        lbl_80331FC8,
-        lbl_80331FC8,
-        lbl_80331FC8,
-        lbl_80331FC8,
-        lbl_80331FC8,
-        lbl_80331FC8,
+        kPppScreenQuakeZero,
+        kPppScreenQuakeZero,
+        kPppScreenQuakeZero,
+        kPppScreenQuakeZero,
+        kPppScreenQuakeZero,
+        kPppScreenQuakeZero,
         1);
 }
 #pragma scheduling reset
@@ -106,7 +106,7 @@ void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
  */
 void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
 {
-    float val = lbl_80331FC8;
+    float val = kPppScreenQuakeZero;
     float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 
     data[2] = val;
@@ -131,7 +131,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
  */
 void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
 {
-    float val = lbl_80331FC8;
+    float val = kPppScreenQuakeZero;
     float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 
     data[2] = val;
@@ -144,3 +144,4 @@ void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
     data[7] = val;
     data[6] = val;
 }
+

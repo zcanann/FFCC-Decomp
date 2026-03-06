@@ -2,6 +2,7 @@
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedGlobals.h"
 
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
@@ -12,16 +13,6 @@
 #include "dolphin/ax.h"
 #include "dolphin/axart.h"
 
-// Global variables (external declarations)
-extern CRedDriver CRedDriver_8032f4c0;
-extern CRedMemory DAT_8032f480;
-extern CRedEntry DAT_8032e154;
-extern int DAT_8032f408; // Debug flag
-extern volatile unsigned int DAT_8032f4c4; // Auto ID counter
-extern int DAT_8032e17c[0x40]; // Standby ID table
-extern void* DAT_8032e170; // Registration memory
-extern void* DAT_8032f4c8; // Internal sound state buffer
-extern FILE DAT_8021d1a8; // File handle for fflush
 extern "C" {
 	void __dl__FPv(void*);
 	void* RedNew__Fi(int);

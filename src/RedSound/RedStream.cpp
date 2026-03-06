@@ -4,16 +4,10 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include <dolphin/os.h>
 #include <string.h>
 
-extern void* DAT_8032f438;
-extern int DAT_8021d1a8;
-extern int DAT_8032f408;
-extern CRedEntry DAT_8032e154;
-extern CRedMemory DAT_8032f480;
-extern unsigned int* DAT_8032f444;
-extern void* DAT_8032f474;
 extern char DAT_801e7f44;
 extern char s__sPause___Stream___ON__d_801e7fb0[];
 extern char s__sPause___Stream___OFF__d_801e7fcb[];
@@ -23,7 +17,6 @@ void RedDelete__FPv(void*);
 void RedDeleteA__Fi(int);
 int PitchCompute__Fiiii(int, int, int, int);
 int SearchSeEmptyTrack__Fiii(int, int, int);
-int fflush(void*);
 }
 
 /*

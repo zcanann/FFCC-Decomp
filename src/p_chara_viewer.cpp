@@ -1,6 +1,7 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/file.h"
 #include "ffcc/pad.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
 
@@ -50,22 +51,6 @@ extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char s_no_texture____801da7e8[];
 extern "C" void* System;
-extern "C" float lbl_80330BE8;
-extern "C" float lbl_80330BF4;
-extern "C" float lbl_80330BF8;
-extern "C" float lbl_80330BFC;
-extern "C" float lbl_80330C00;
-extern "C" float lbl_80330C28;
-extern "C" float lbl_80330C2C;
-extern "C" float lbl_80330C48;
-extern "C" float lbl_80330C4C;
-extern "C" float lbl_80330C50;
-extern "C" float lbl_80330C54;
-extern "C" float lbl_80330C58;
-extern "C" float lbl_80330C5C;
-extern "C" char lbl_80330C44[];
-extern "C" double lbl_80330BE0;
-extern "C" double lbl_80330C10;
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
@@ -147,12 +132,12 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
             color.b = 0x80;
             color.a = (i == 0) ? 0x60 : 0x20;
             GXSetChanMatColor(GX_COLOR0A0, color);
-            float x = (float)i * lbl_80330BFC;
+            float x = (float)i * kCharaViewerGridSpacing;
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
-            GXPosition3f32(x, lbl_80330BE8, lbl_80330C00);
-            GXPosition3f32(x, lbl_80330BE8, lbl_80330BF4);
-            GXPosition3f32(lbl_80330BF4, lbl_80330BE8, x);
-            GXPosition3f32(lbl_80330C00, lbl_80330BE8, x);
+            GXPosition3f32(x, kCharaViewerZero, kCharaViewerGridMin);
+            GXPosition3f32(x, kCharaViewerZero, kCharaViewerGridMax);
+            GXPosition3f32(kCharaViewerGridMax, kCharaViewerZero, x);
+            GXPosition3f32(kCharaViewerGridMin, kCharaViewerZero, x);
         }
     }
 
@@ -362,25 +347,25 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
     float frameAdvance;
     if (*(int*)(p + 0x6F4) == 0) {
-        float deltaY = lbl_80330BF8;
+        float deltaY = kCharaViewerUnitStep;
         if ((heldButtons & 0x200) != 0) {
-            deltaY = lbl_80330C28;
+            deltaY = kCharaViewerFineStep;
         }
-        float speedScale = lbl_80330BF8;
+        float speedScale = kCharaViewerUnitStep;
         if ((heldButtons & 0x100) != 0) {
-            speedScale = lbl_80330C2C;
+            speedScale = kCharaViewerLerpScale;
         }
         frameAdvance = deltaY * speedScale;
     } else {
-        float offsetA = lbl_80330BE8;
+        float offsetA = kCharaViewerZero;
         if ((triggerButtons & 0x100) != 0) {
-            offsetA = lbl_80330BF8;
+            offsetA = kCharaViewerUnitStep;
         }
-        float offsetB = lbl_80330BE8;
+        float offsetB = kCharaViewerZero;
         if ((triggerButtons & 0x200) != 0) {
-            offsetB = lbl_80330C28;
+            offsetB = kCharaViewerFineStep;
         }
-        frameAdvance = lbl_80330BE8 + offsetA + offsetB;
+        frameAdvance = kCharaViewerZero + offsetA + offsetB;
     }
 
     for (unsigned int i = 0; i < 2; i++) {
@@ -467,23 +452,23 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
         p[0xF0 + i * 4 + 2] = c;
         p[0xF0 + i * 4 + 3] = 0xFF;
     }
-    *(float*)(p + 0x108) = lbl_80330BE8;
-    *(float*)(p + 0x10C) = lbl_80330BE8;
-    *(float*)(p + 0x110) = lbl_80330C28;
-    *(float*)(p + 0x114) = lbl_80330BE8;
-    *(float*)(p + 0x118) = lbl_80330BE8;
-    *(float*)(p + 0x11C) = lbl_80330C28;
-    *(float*)(p + 0x120) = lbl_80330BE8;
-    *(float*)(p + 0x124) = lbl_80330BE8;
-    *(float*)(p + 0x128) = lbl_80330C28;
+    *(float*)(p + 0x108) = kCharaViewerZero;
+    *(float*)(p + 0x10C) = kCharaViewerZero;
+    *(float*)(p + 0x110) = kCharaViewerFineStep;
+    *(float*)(p + 0x114) = kCharaViewerZero;
+    *(float*)(p + 0x118) = kCharaViewerZero;
+    *(float*)(p + 0x11C) = kCharaViewerFineStep;
+    *(float*)(p + 0x120) = kCharaViewerZero;
+    *(float*)(p + 0x124) = kCharaViewerZero;
+    *(float*)(p + 0x128) = kCharaViewerFineStep;
 
     for (i = 0; i < 5; i++) {
         __ct__6CColorFUcUcUcUc(white, 0xFF, 0xFF, 0xFF, 0xFF);
         __ct__6CColorFv(colorTmp);
         x = i ^ 0x80000000;
         for (int c = 0; c < 4; c++) {
-            double v = (double)(float)(((double)(unsigned int)white[c] - lbl_80330C10) *
-                                        ((float)((double)x - lbl_80330BE0) * lbl_80330C2C));
+            double v = (double)(float)(((double)(unsigned int)white[c] - kCharaViewerColorWhiteBias) *
+                                        ((float)((double)x - kCharaViewerColorCenterBias) * kCharaViewerLerpScale));
             colorTmp[c] = (unsigned char)(int)v;
         }
         __ct__6CColorFR6CColor(p + 0x12C + i * 4, colorTmp);
@@ -507,7 +492,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(int*)(p + 0x6F4) = 0;
     *(int*)(p + 0x6F8) = 1;
     *(int*)(p + 0x6FC) = 0;
-    *(float*)(p + 0x700) = lbl_80330BE8;
+    *(float*)(p + 0x700) = kCharaViewerZero;
     *(int*)(p + 0x704) = 0;
     *(int*)(p + 0x708) = 0;
     *(int*)(p + 0x70C) = 0;
@@ -527,7 +512,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(int*)(p + 0x3C0) = 1;
     strcpy((char*)(p + 0x4C8), s_no_texture____801da7e8 + 0x164);
     *(int*)(p + 0x4C4) = 1;
-    strcpy((char*)(p + 0x5CC), lbl_80330C44);
+    strcpy((char*)(p + 0x5CC), kCharaViewerDefaultModelPath);
     *(int*)(p + 0x5EC) = -1;
     *(int*)(p + 0x5C8) = 1;
 
@@ -542,20 +527,20 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
 
     __ct__Q29CLightPcs10CBumpLightFv(bumpLight);
     *(int*)(bumpLight + 0x00) = 1;
-    lightPos.x = lbl_80330C48;
-    lightPos.y = lbl_80330C4C;
-    lightPos.z = lbl_80330C50;
-    lightTarget.x = lbl_80330C54;
-    lightTarget.y = lbl_80330C58;
-    lightTarget.z = lbl_80330C5C;
+    lightPos.x = kCharaViewerLightPosX;
+    lightPos.y = kCharaViewerLightPosY;
+    lightPos.z = kCharaViewerLightPosZ;
+    lightTarget.x = kCharaViewerLightTargetX;
+    lightTarget.y = kCharaViewerLightTargetY;
+    lightTarget.z = kCharaViewerLightTargetZ;
     PSVECSubtract(&lightTarget, &lightPos, &lightDir);
     PSVECNormalize(&lightDir, &lightDir);
     *(unsigned char*)(bumpLight + 0x68) = 0x80;
     *(unsigned char*)(bumpLight + 0x69) = 0x80;
     *(unsigned char*)(bumpLight + 0x6A) = 0;
     *(unsigned char*)(bumpLight + 0x6B) = 0xFF;
-    *(float*)(bumpLight + 0x2C) = lbl_80330BE8;
-    *(float*)(bumpLight + 0x30) = lbl_80330BE8;
+    *(float*)(bumpLight + 0x2C) = kCharaViewerZero;
+    *(float*)(bumpLight + 0x30) = kCharaViewerZero;
     DAT_8032edc0 = AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
         LightPcs, bumpLight, 0, *(void**)(Chara + 0x2058), 4);
 
@@ -652,3 +637,19 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     DestroyStage__7CMemoryFPQ27CMemory6CStage(Memory, *(void**)(p + 0xD0));
     DestroyStage__7CMemoryFPQ27CMemory6CStage(Memory, *(void**)(p + 0xD4));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

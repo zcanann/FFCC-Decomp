@@ -1,6 +1,7 @@
 #include "ffcc/pppYmMegaBirthShpTail2.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 #include <string.h>
 
@@ -16,7 +17,6 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     unsigned char);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
-extern float lbl_80330560;
 extern pppFMATRIX g_matUnit2;
 extern int gPppCalcDisabled;
 
@@ -71,7 +71,7 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBi
     float initVal;
 
     pppUnitMatrix__FR10pppFMATRIX(work);
-    initVal = lbl_80330560;
+    initVal = kPppYmMegaBirthShpTail2Zero;
 
     work[1].value[0][2] = initVal;
     work[1].value[0][1] = initVal;
@@ -317,8 +317,8 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     frameWindow = frameState[5];
     if ((frameWindow != 0) && (frameState[4] <= frameWindow)) {
         *blend = *blend - ((float)alpha / (float)frameWindow);
-        if (*blend < lbl_80330560) {
-            *blend = lbl_80330560;
+        if (*blend < kPppYmMegaBirthShpTail2Zero) {
+            *blend = kPppYmMegaBirthShpTail2Zero;
         }
     }
 
@@ -674,4 +674,5 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         }
     }
 }
+
 

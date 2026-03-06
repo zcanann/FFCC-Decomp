@@ -1,4 +1,5 @@
 #include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include <dolphin/os.h>
 
 // Memory functions
@@ -8,12 +9,8 @@ extern "C" {
 	void* memset(void* s, int c, unsigned int n);
 }
 
-// Runtime library state (__files + 0x50, used as flush target in decomp).
-extern char lbl_8021D1A8;
-
 // Function declarations
 extern "C" {
-	void fflush(void*);
 	void __dl__FPv(void*);
 }
 
@@ -89,7 +86,7 @@ int RedNew(int param_1)
 				}
 			} else if (gRedMemoryDebugEnabled != 0) {
 				OSReport(s__s_sMemory_Bank_Full____s_801e7888, &s_redMemoryLogPrefix_801E78A3, &s_redMemoryLogSuffixA_80333D20, &s_redMemoryLogSuffixB_80333D28);
-				fflush(&lbl_8021D1A8);
+				fflush(&DAT_8021d1a8);
 			}
 			break;
 		}
@@ -183,7 +180,7 @@ int RedNewA(int size, int offset, int maxSize)
 	if (gRedAMemoryBlockList[0x7FF] >= 1) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s__s_sA_Memory_Bank_Full____s_801e78b5, &s_redMemoryLogPrefix_801E78A3, &s_redMemoryLogSuffixA_80333D20, &s_redMemoryLogSuffixB_80333D28);
-			fflush(&lbl_8021D1A8);
+			fflush(&DAT_8021d1a8);
 		}
 		return 0;
 	}

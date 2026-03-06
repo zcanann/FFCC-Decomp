@@ -315,36 +315,72 @@ void CWind::getObj(int)
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	int freeIdx = -1;
-	for (int i = 0; i < 32; i++) {
-		if ((s8)m_objects[i].flags >= 0) {
-			freeIdx = i;
-			break;
-		}
-	}
+    int blocks = 4;
+    WindObject* cur = m_objects;
+    WindObject* obj;
 
-	if (freeIdx < 0) {
-		System.Printf(DAT_801db568, 28);
-		return -1;
-	}
+    do {
+        obj = &cur[0];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[1];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[2];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[3];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[4];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[5];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[6];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
+        obj = &cur[7];
+        if ((s8)obj->flags >= 0) {
+            goto found;
+        }
 
-	WindObject* obj = &m_objects[freeIdx];
-	obj->type = 0;
-	obj->flags = (obj->flags & 0x7F) | 0x80;
+        cur += 8;
+        blocks--;
+    } while (blocks != 0);
 
-	int id = m_nextId;
-	m_nextId = id + 1;
-	obj->id = id;
+    obj = 0;
 
-	obj->targetDir = dir;
-	obj->curDir = dir;
-	obj->baseDir = dir;
+found:
+    if (obj == 0) {
+        System.Printf(DAT_801db568);
+        return -1;
+    }
 
-	obj->targetPower = speed;
-	obj->curPower = speed;
-	obj->basePower = speed;
+    obj->type = 0;
+    obj->flags = (obj->flags & 0x7F) | 0x80;
 
-	return obj->id;
+    int id = m_nextId;
+    m_nextId = id + 1;
+    obj->id = id;
+
+    obj->targetDir = dir;
+    obj->curDir = dir;
+    obj->baseDir = dir;
+
+    obj->targetPower = speed;
+    obj->curPower = speed;
+    obj->basePower = speed;
+
+    return obj->id;
 }
 
 /*
@@ -397,7 +433,7 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 			goto found;
 		}
 
-		checked += 8;
+		checked += 7;
 		cur += 8;
 		blocks--;
 	} while (blocks != 0);
@@ -488,7 +524,7 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 			goto found;
 		}
 
-		checked += 8;
+		checked += 7;
 		cur += 8;
 		blocks--;
 	} while (blocks != 0);

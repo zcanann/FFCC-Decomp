@@ -28,7 +28,7 @@ struct VertexAttendEnv
     VertexSetEntry* vertexSetTable;
 };
 
-extern VertexAttendEnv* lbl_8032ED54;
+extern VertexAttendEnv* pppEnvStPtr;
 
 /*
  * --INFO--
@@ -56,8 +56,8 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
         return;
     }
 
+    env = pppEnvStPtr;
     stream = *(VertexAttendStream**)((u8*)r5 + 0xC);
-    env = lbl_8032ED54;
     setEntry = (VertexSetEntry*)((u8*)env->vertexSetTable + (entryIndex * sizeof(VertexSetEntry)));
     sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
     output = (f32*)((u8*)r3 + stream->destOffset + 0x80);

@@ -16,6 +16,9 @@ class CMapPcs;
 class CGObject;
 class CGBaseObj;
 
+extern const Vec sMap21WorldUpAxis;
+extern const Vec sMap21TangentAxis;
+
 class CGObject : public CGBaseObj
 {
 public:

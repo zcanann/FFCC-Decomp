@@ -23,11 +23,8 @@ extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern unsigned char CFlat[];
-extern int DAT_8032ee68;
-extern unsigned char DAT_8032ee6c;
 extern float FLOAT_80331964;
 extern "C" char s__d__d__d__d__d_801dc5ac[];
-extern "C" float lbl_80331970;
 
 /*
  * --INFO--
@@ -120,13 +117,13 @@ void CGCharaObj::onCreate()
 {
 	CGPrgObj::onCreate();
 
-	if (DAT_8032ee6c == 0) {
-		DAT_8032ee68 = 0;
-		DAT_8032ee6c = 1;
+	if (gCGCharaObjCreateSerialInit == 0) {
+		gCGCharaObjCreateSerial = 0;
+		gCGCharaObjCreateSerialInit = 1;
 	}
 
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54D) = DAT_8032ee68;
-	DAT_8032ee68 += 1;
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54D) = gCGCharaObjCreateSerial;
+	gCGCharaObjCreateSerial += 1;
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	self[0x63C] &= 0x7F;
@@ -1447,7 +1444,7 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 		posYDouble = (double)posY;
 		widthDouble = (double)GetWidth__5CFontFPc(font, text);
-		SetPosX__5CFontFf(-(float)((double)lbl_80331970 * widthDouble - (double)posX), font);
+		SetPosX__5CFontFf(-(float)((double)kHalfF32 * widthDouble - (double)posX), font);
 		SetPosY__5CFontFf((float)posYDouble, font);
 		SetPosZ__5CFontFf((float)posZ, font);
 		Draw__5CFontFPc(font, text);

@@ -77,9 +77,6 @@ extern unsigned char CFlat[];
 extern unsigned char m_objItem[];
 extern unsigned char m_objParty[];
 extern unsigned char m_objMon[];
-extern int DAT_8032ed98;
-extern unsigned char DAT_8032ed9c;
-extern char DAT_801d8fc4[];
 extern CTextureMan TextureMan;
 extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
@@ -1670,14 +1667,14 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 		return;
 	}
 
-	if (DAT_8032ed9c == 0) {
-		DAT_8032ed98 = 0;
-		DAT_8032ed9c = 1;
+	if (gCFlatRuntime2DebugDrawOverflowInit == 0) {
+		gCFlatRuntime2DebugDrawOverflowFrame = 0;
+		gCFlatRuntime2DebugDrawOverflowInit = 1;
 	}
 
-	if (DAT_8032ed98 != static_cast<int>(System.m_frameCounter)) {
-		printf(&DAT_801d8fc4[0]);
-		DAT_8032ed98 = System.m_frameCounter;
+	if (gCFlatRuntime2DebugDrawOverflowFrame != static_cast<int>(System.m_frameCounter)) {
+		printf(&sCFlatRuntime2DebugDrawOverflowMsg[0]);
+		gCFlatRuntime2DebugDrawOverflowFrame = System.m_frameCounter;
 	}
 }
 

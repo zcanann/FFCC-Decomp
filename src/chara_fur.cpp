@@ -19,8 +19,6 @@ extern "C" unsigned char Graphic[];
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
 extern "C" unsigned char Game[];
 extern "C" unsigned char m_mogWork[];
-extern "C" char lbl_801DB694[];
-extern "C" char lbl_801DB6B4[];
 extern "C" void* gMogFurTexBuffer;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
@@ -278,12 +276,12 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		char** radarLabel = reinterpret_cast<char**>(lbl_801DB694);
+		char** radarLabel = reinterpret_cast<char**>(sMogRadarTypeLabels);
 		Printf__8CGraphicFUlUlPce(
 		    Graphic,
 		    5,
 		    0xB,
-		    lbl_801DB6B4 + 0x18,
+		    sMogRadarDebugFormatBlock + 0x18,
 		    *reinterpret_cast<int*>(self + 0x2048),
 		    *reinterpret_cast<int*>(self + 0x204C),
 		    *reinterpret_cast<int*>(self + 0x2050),
@@ -299,7 +297,7 @@ void CChara::CalcMogScore()
 		    Graphic,
 		    5,
 		    0xC,
-		    lbl_801DB6B4 + 0x4C,
+		    sMogRadarDebugFormatBlock + 0x4C,
 		    *reinterpret_cast<int*>(self + 0x2030),
 		    *reinterpret_cast<int*>(self + 0x2034),
 		    *reinterpret_cast<int*>(self + 0x2038),
@@ -340,7 +338,6 @@ extern "C" unsigned char Chara[];
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" char lbl_80331114;
 extern "C" char s_chara_fur_cpp_801db72c[];
 extern "C" void makeFurTex__6CCharaFv();
 
@@ -456,7 +453,7 @@ void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
-	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &lbl_80331114));
+	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &sMogFurTextureName[0]));
 	CTexture* texture = (*textureArray)[textureIdx];
 
 	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
@@ -465,7 +462,7 @@ void CChara::CModel::InitMogFurTex()
 
 		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
-		textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &lbl_80331114));
+		textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &sMogFurTextureName[0]));
 		CTexture* textureData = (*textureArray)[textureIdx];
 		if (textureData != 0) {
 			void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<char*>(textureData) + 0x78);
@@ -574,7 +571,7 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		return 0;
 	}
 	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
-	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &lbl_80331114));
+	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &sMogFurTextureName[0]));
 	CTexture* texture = (*textureArray)[textureIdx];
 	if (texture == 0) {
 		return 0;

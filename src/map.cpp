@@ -83,7 +83,6 @@ extern char DAT_801d7350[];
 extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
 extern char DAT_8032f984[];
-extern CLightPcs LightPcs;
 extern CMath Math;
 extern unsigned char DAT_8032ecb9;
 extern CPartPcs PartPcs;

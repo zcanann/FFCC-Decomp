@@ -13,14 +13,13 @@
 
 extern float kMapObjBoundMinInit;
 extern float kMapObjBoundMaxInit;
-extern float lbl_8032F940;
-extern float lbl_8032F944;
-extern float lbl_8032F948;
+extern const float kMapObjZero;
+extern const float kMapObjOne;
+extern const float kMapObjInitNegOne;
 extern float kMapObjDegToRad;
-extern float lbl_8032F958;
+extern const float kMapObjInitValue50;
 extern unsigned int DAT_8032e498;
 extern CMaterialMan MaterialMan;
-extern CLightPcs LightPcs;
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -211,10 +210,10 @@ void CMapObj::Init()
     U8At(this, 0x19) = 1;
     U16At(this, 0x34) = 0xFFFF;
 
-    F32At(this, 0x48) = lbl_8032F948;
-    F32At(this, 0x44) = lbl_8032F948;
-    F32At(this, 0x4C) = lbl_8032F948;
-    F32At(this, 0x50) = lbl_8032F958;
+    F32At(this, 0x48) = kMapObjInitNegOne;
+    F32At(this, 0x44) = kMapObjInitNegOne;
+    F32At(this, 0x4C) = kMapObjInitNegOne;
+    F32At(this, 0x50) = kMapObjInitValue50;
 
     U16At(this, 0x2C) = 0;
     U16At(this, 0x2A) = 0;
@@ -226,11 +225,11 @@ void CMapObj::Init()
     U8At(this, 0x22) = 1;
     S32At(this, 0x3C) = -1;
 
-    F32At(this, 0x60) = lbl_8032F944;
-    F32At(this, 0x5C) = lbl_8032F944;
-    F32At(this, 0x58) = lbl_8032F944;
+    F32At(this, 0x60) = kMapObjOne;
+    F32At(this, 0x5C) = kMapObjOne;
+    F32At(this, 0x58) = kMapObjOne;
     U8At(this, 0x1A) = 0;
-    F32At(this, 0x40) = lbl_8032F944;
+    F32At(this, 0x40) = kMapObjOne;
     U8At(this, 0x25) = 1;
     U8At(this, 0x26) = 0;
     S32At(this, 0x38) = -1;
@@ -366,9 +365,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (((Game.game.m_currentSceneId == 4) || (Game.game.m_currentSceneId == 7)) &&
                 (static_cast<signed char>(U8At(this, 0x1E)) > 7) && (static_cast<signed char>(U8At(this, 0x1E)) < 10)) {
-                F32At(this, 0x58) = lbl_8032F940;
-                F32At(this, 0x5C) = lbl_8032F944;
-                F32At(this, 0x60) = lbl_8032F940;
+                F32At(this, 0x58) = kMapObjZero;
+                F32At(this, 0x5C) = kMapObjOne;
+                F32At(this, 0x60) = kMapObjZero;
             }
         } else if (chunk.m_id == CHUNK_TRNS) {
             F32At(this, 0x58) = chunkFile.GetF4();
@@ -386,10 +385,10 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             F32At(this, 0x84) = chunkFile.GetF4();
 
             if (((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) &&
-                ((F32At(this, 0x7C) != lbl_8032F940) || (F32At(this, 0x80) != lbl_8032F940) || (F32At(this, 0x84) != lbl_8032F940))) {
-                F32At(this, 0x7C) = lbl_8032F940;
-                F32At(this, 0x80) = lbl_8032F940;
-                F32At(this, 0x84) = lbl_8032F940;
+                ((F32At(this, 0x7C) != kMapObjZero) || (F32At(this, 0x80) != kMapObjZero) || (F32At(this, 0x84) != kMapObjZero))) {
+                F32At(this, 0x7C) = kMapObjZero;
+                F32At(this, 0x80) = kMapObjZero;
+                F32At(this, 0x84) = kMapObjZero;
             }
 
             U8At(this, 0x1C) = 1;
@@ -893,7 +892,7 @@ void CMapObj::Calc()
     if ((static_cast<signed char>(U8At(this, 0x1D)) == 1) && (PtrAt(this, 0xC) != 0) &&
         (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
         ((U8At(this, 0x18) & 1) != 0)) {
-        if ((lbl_8032F944 <= F32At(this, 0x50)) || (F32At(this, 0x4C) < lbl_8032F948)) {
+        if ((kMapObjOne <= F32At(this, 0x50)) || (F32At(this, 0x4C) < kMapObjInitNegOne)) {
             Vec pos;
             Vec posCam;
             Mtx cameraMtx;
@@ -1120,7 +1119,7 @@ void CMapObj::Draw(unsigned char priority)
     LightPcs.SetBumpTexMatirx(MtxAt(this, 0xB8), reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
                               reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
 
-    if (lbl_8032F944 != F32At(this, 0x40)) {
+    if (kMapObjOne != F32At(this, 0x40)) {
         CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
     }
     if (U8At(this, 0x27) != 0) {
@@ -1134,7 +1133,7 @@ void CMapObj::Draw(unsigned char priority)
     if (U8At(this, 0x27) != 0) {
         GXSetZMode(1, GX_LEQUAL, 1);
     }
-    if (lbl_8032F944 != F32At(this, 0x40)) {
+    if (kMapObjOne != F32At(this, 0x40)) {
         CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
     }
 }
@@ -1242,7 +1241,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     PSMTXMultVec(inverseMtx, &cylinder->m_direction, &localCylinder.m_direction);
 
     localCylinder.m_top.y = cylinder->m_top.y;
-    float margin = lbl_8032F940 + localCylinder.m_top.y;
+    float margin = kMapObjZero + localCylinder.m_top.y;
 
     float minValue = localCylinder.m_direction.x;
     float maxValue = localCylinder.m_bottom.x;
@@ -1350,7 +1349,7 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     PSMTXMultVecSR(inverseMtx, move, &localMove);
 
     localCylinder.m_top.y = cylinder->m_top.y;
-    float margin = lbl_8032F940 + localCylinder.m_top.y;
+    float margin = kMapObjZero + localCylinder.m_top.y;
 
     float minValue = localCylinder.m_direction.x;
     float maxValue = localCylinder.m_bottom.x;

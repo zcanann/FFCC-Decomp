@@ -30,10 +30,10 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
     float radius;
 
-    PSVECSubtract((Vec*)(pppMngStPtr + 0x8), (Vec*)(pppMngStPtr + 0x48), &local_88);
-    local_94.x = *(float*)(pppMngStPtr + 0x84);
-    local_94.y = *(float*)(pppMngStPtr + 0x94);
-    local_94.z = *(float*)(pppMngStPtr + 0xA4);
+    PSVECSubtract((Vec*)((u8*)pppMngStPtr + 0x8), (Vec*)((u8*)pppMngStPtr + 0x48), &local_88);
+    local_94.x = *(float*)((u8*)pppMngStPtr + 0x84);
+    local_94.y = *(float*)((u8*)pppMngStPtr + 0x94);
+    local_94.z = *(float*)((u8*)pppMngStPtr + 0xA4);
     radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
 
     if (((lbl_80330700 == local_88.x) && (lbl_80330700 == local_88.y)) &&
@@ -61,5 +61,4 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         DrawSphere__8CGraphicFPA4_f8_GXColor(Graphic, sphereMtx, local_a8);
     }
 }
-
 

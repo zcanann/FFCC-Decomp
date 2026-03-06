@@ -116,5 +116,6 @@ public:
 };
 
 void setchanctrl(CLightPcs::TARGET, unsigned long);
+extern CLightPcs LightPcs;
 
 #endif // _FFCC_P_LIGHT_H_

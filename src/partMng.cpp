@@ -87,7 +87,6 @@ extern CProfile g_par_calc_prof;
 extern unsigned char PartPcs[];
 extern unsigned char MapPcs[];
 extern void* CAMemCacheSet;
-extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";

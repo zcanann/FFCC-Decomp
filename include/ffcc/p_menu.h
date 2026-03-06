@@ -217,5 +217,4 @@ public:
     void GetFontWorld();
 };
 
-
 #endif // _FFCC_P_MENU_H_

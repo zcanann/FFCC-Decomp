@@ -30,7 +30,6 @@ extern CTextureMan TextureMan;
 extern CMaterialMan MaterialMan;
 extern CFontMan FontMan;
 extern "C" int __cntlzw(unsigned int);
-extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
 extern void* __vt__7CSystem[];
 CSystem System;

@@ -11,7 +11,7 @@ typedef struct FSTEntry {
 
 static OSBootInfo* BootInfo;
 static FSTEntry* FstStart_8032F064;
-char* FstStringStart;
+static char* FstStringStart_8032F068;
 static u32 MaxEntryNum;
 static u32 lbl_8032F070;
 
@@ -35,7 +35,7 @@ void __DVDFSInit(void) {
     FstStart_8032F064 = BootInfo->FSTLocation;
     if (FstStart_8032F064) {
         MaxEntryNum = FstStart_8032F064->nextEntryOrLength;
-        FstStringStart = (char*)FstStart_8032F064 + (MaxEntryNum* sizeof(FSTEntry));
+        FstStringStart_8032F068 = (char*)FstStart_8032F064 + (MaxEntryNum * sizeof(FSTEntry));
     }
 }
 
@@ -142,7 +142,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
                 continue;
             }
         
-            stringPtr = FstStringStart + stringOff(i);
+            stringPtr = FstStringStart_8032F068 + stringOff(i);
         
             if (isSame(ptr, stringPtr) == TRUE) {
                 goto next_hier;
@@ -231,7 +231,7 @@ static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
         return 0;
     }
     
-    name = FstStringStart + stringOff(entry);
+    name = FstStringStart_8032F068 + stringOff(entry);
     
     loc = entryToPath(parentDir(entry), path, maxlen);
     
@@ -488,7 +488,7 @@ int DVDReadDir(DVDDir* dir, DVDDirEntry* dirent) {
     }
     dirent->entryNum = loc;
     dirent->isDir = entryIsDir(loc);
-    dirent->name = FstStringStart + stringOff(loc);
+    dirent->name = FstStringStart_8032F068 + stringOff(loc);
     dir->location = entryIsDir(loc) ? nextDir(loc) : loc + 1;
     return 1;
 }

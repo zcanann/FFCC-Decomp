@@ -6,7 +6,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern _pppEnvSt* lbl_8032ED54;
 extern float lbl_803310C0;
 extern float lbl_803310C4;
 extern float lbl_803310C8;
@@ -95,7 +94,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)lbl_8032ED54 + 0xC) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
     pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
 
     if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
@@ -135,7 +134,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)lbl_8032ED54 + 0xC) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
 
     PSMTXIdentity(mtx.value);
 
@@ -170,5 +169,5 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
-    pppDrawShp(*shape, work->m_shapeY, lbl_8032ED54->m_materialSetPtr, param2->m_blendMode);
+    pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
 }

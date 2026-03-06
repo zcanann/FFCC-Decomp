@@ -5,7 +5,6 @@
 extern CMath math[];
 extern int gPppCalcDisabled;
 extern float lbl_80330060;
-static f64 const lbl_80330068 = 4503601774854144.0;
 extern u8 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
@@ -38,7 +37,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     PppSRandCVParam2* in = (PppSRandCVParam2*)param2;
     PppSRandCVParam3* out = (PppSRandCVParam3*)param3;
-    u8* color;
+    u8* targetColor;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -92,25 +91,30 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
             }
             target[3] = value;
         }
+    } else if (in->field0 != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (in->field0 != *(s32*)(base + 0xC)) {
-            return;
-        }
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
     s32 colorOffset = in->field4;
-    color = (colorOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + colorOffset + 0x80);
+    u8* colorPtr;
+    if (colorOffset == -1) {
+        colorPtr = gPppDefaultValueBuffer;
+    } else {
+        colorPtr = (u8*)(base + colorOffset + 0x80);
+    }
+    targetColor = colorPtr;
 
     s8 baseValue = in->field8;
-    color[0] = (u8)(color[0] + (s32)((f32)baseValue * target[0] - (f32)baseValue));
+    targetColor[0] = (u8)(targetColor[0] + (s8)((float)baseValue * target[0] - (float)baseValue));
 
     baseValue = in->field9;
-    color[1] = (u8)(color[1] + (s32)((f32)baseValue * target[1] - (f32)baseValue));
+    targetColor[1] = (u8)(targetColor[1] + (s8)((float)baseValue * target[1] - (float)baseValue));
 
     baseValue = in->fieldA;
-    color[2] = (u8)(color[2] + (s32)((f32)baseValue * target[2] - (f32)baseValue));
+    targetColor[2] = (u8)(targetColor[2] + (s8)((float)baseValue * target[2] - (float)baseValue));
 
     baseValue = in->fieldB;
-    color[3] = (u8)(color[3] + (s32)((f32)baseValue * target[3] - (f32)baseValue));
+    targetColor[3] = (u8)(targetColor[3] + (s8)((float)baseValue * target[3] - (float)baseValue));
 }

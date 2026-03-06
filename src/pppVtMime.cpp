@@ -53,29 +53,63 @@ void DCFlushRange(void* addr, unsigned long nBytes);
 
 /*
  * --INFO--
- * PAL Address: 800652d0
- * PAL Size: 128b
+ * PAL Address: 80065034
+ * PAL Size: 104b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
+void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-    VtMimeData* data = (VtMimeData*)step;
 
-    if (gPppCalcDisabled != 0) {
-        return;
+    if (state->vertexBuffer != 0) {
+        void* graphic = &Graphic;
+        char* file = lbl_801D8520;
+        _WaitDrawDone__8CGraphicFPci(graphic, file, 0x50);
+        pppHeapUseRate__FPQ27CMemory6CStage(state->vertexBuffer);
+        state->vertexBuffer = 0;
     }
+}
 
-    state->velocity += state->accel;
-    state->value += state->velocity;
-    if (data->id == *(int*)((char*)object + 0xC)) {
-        state->value += data->addX;
-        state->velocity += data->addY;
-        state->accel += data->addZ;
-    }
+/*
+ * --INFO--
+ * PAL Address: 8006509c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
+{
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    float zero = lbl_803300F0;
+
+    state->accel = zero;
+    state->velocity = zero;
+    state->value = zero;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 800650c0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
+{
+    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    float zero = lbl_803300F0;
+
+    state->accel = zero;
+    state->velocity = zero;
+    state->value = zero;
+    state->vertexBuffer = 0;
 }
 
 /*
@@ -103,7 +137,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     VtMimeSource* vert2Data = (VtMimeSource*)sourceTable[vertIdx2];
     float* vert1Pos = vert1Data->positions;
     float* vert2Pos = vert2Data->positions;
-    unsigned short vertCount = (unsigned short)vert1Data->vertexCount;
+    unsigned short vertCount = (unsigned short)vert2Data->vertexCount;
     void** memPtr = &state->vertexBuffer;
 
     if (*memPtr == 0) {
@@ -138,61 +172,27 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 
 /*
  * --INFO--
- * PAL Address: 800650c0
- * PAL Size: 44b
+ * PAL Address: 800652d0
+ * PAL Size: 128b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
+void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-    float zero = lbl_803300F0;
+    VtMimeData* data = (VtMimeData*)step;
 
-    state->accel = zero;
-    state->velocity = zero;
-    state->value = zero;
-    state->vertexBuffer = 0;
-}
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
 
-/*
- * --INFO--
- * PAL Address: 8006509c
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
-{
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-    float zero = lbl_803300F0;
-
-    state->accel = zero;
-    state->velocity = zero;
-    state->value = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: 80065034
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
-{
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-
-    if (state->vertexBuffer != 0) {
-        void* graphic = &Graphic;
-        char* file = lbl_801D8520;
-        _WaitDrawDone__8CGraphicFPci(graphic, file, 0x50);
-        pppHeapUseRate__FPQ27CMemory6CStage(state->vertexBuffer);
-        state->vertexBuffer = 0;
+    state->velocity += state->accel;
+    state->value += state->velocity;
+    if (data->id == *(int*)((char*)object + 0xC)) {
+        state->value += data->addX;
+        state->velocity += data->addY;
+        state->accel += data->addZ;
     }
 }

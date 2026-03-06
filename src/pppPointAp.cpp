@@ -47,24 +47,22 @@ void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
  */
 void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
-    _pppPointApStep* payload = (_pppPointApStep*)step;
     _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
     u8* target = (u8*)pObject + data->targetOffset + 0x80;
     Vec* src = (Vec*)((u8*)pObject + data->srcOffset + 0x80);
+    _pppPointApStep* payload = (_pppPointApStep*)step;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     if (target[1] == 0) {
-        u32 createId = payload->m_createProgramIndex;
-
-        if ((createId + 0x10000) == 0xFFFF) {
+        if ((payload->m_createProgramIndex + 0x10000) == 0xFFFF) {
             return;
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = (_pppPDataVal*)((u8*)(*(u32*)((u8*)pppMngStPtr + 0xD4)) + (createId << 4));
+        _pppPDataVal* objData = (_pppPDataVal*)((u8*)(*(u32*)((u8*)pppMngStPtr + 0xD4)) + (payload->m_createProgramIndex << 4));
 
         if (objData == 0) {
             obj = 0;

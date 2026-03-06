@@ -103,7 +103,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     VtMimeSource* vert2Data = (VtMimeSource*)sourceTable[vertIdx2];
     float* vert1Pos = vert1Data->positions;
     float* vert2Pos = vert2Data->positions;
-    unsigned short vertCount = (unsigned short)vert1Data->vertexCount;
+    unsigned short vertCount = (unsigned short)vert2Data->vertexCount;
     void** memPtr = &state->vertexBuffer;
 
     if (*memPtr == 0) {

@@ -2,10 +2,10 @@
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
+#include "ffcc/symbols_shared.h"
 #include <string.h>
 
 extern CMath math;
-extern float lbl_80330F70;
 extern float FLOAT_80330F80;
 extern int gPppCalcDisabled;
 extern u32 CFlatFlags;
@@ -183,7 +183,7 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     }
 
     *(float*)(particle + 0x8C) = *(float*)(breath + 0x14);
-    if (*(float*)(breath + 0xA8) != lbl_80330F70) {
+    if (*(float*)(breath + 0xA8) != kPppBreathModelZero) {
         *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * math.RandF() - *(float*)(breath + 0xA8);
     }
 
@@ -209,12 +209,12 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     }
 
     PSMTXCopy(*(Mtx*)particleWmat, workMtx);
-    workMtx[0][3] = lbl_80330F70;
-    workMtx[1][3] = lbl_80330F70;
-    workMtx[2][3] = lbl_80330F70;
+    workMtx[0][3] = kPppBreathModelZero;
+    workMtx[1][3] = kPppBreathModelZero;
+    workMtx[2][3] = kPppBreathModelZero;
 
-    *(float*)(particle + 0x0C) = lbl_80330F70;
-    *(float*)(particle + 0x10) = lbl_80330F70;
+    *(float*)(particle + 0x0C) = kPppBreathModelZero;
+    *(float*)(particle + 0x10) = kPppBreathModelZero;
     *(float*)(particle + 0x14) = 1.0f;
     dir = (Vec*)(particle + 0x0C);
     PSMTXMultVec(workMtx, dir, dir);
@@ -238,8 +238,8 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, workMtx);
 
-    *(float*)(particle + 0x0C) = lbl_80330F70;
-    *(float*)(particle + 0x10) = lbl_80330F70;
+    *(float*)(particle + 0x0C) = kPppBreathModelZero;
+    *(float*)(particle + 0x10) = kPppBreathModelZero;
     *(float*)(particle + 0x14) = 1.0f;
 }
 
@@ -441,13 +441,13 @@ found_search_index:
         int* group = groupTable + groupIndex * 0x17;
         if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
             Vec unitVelocity;
-            unitVelocity.x = lbl_80330F70;
-            unitVelocity.y = lbl_80330F70;
+            unitVelocity.x = kPppBreathModelZero;
+            unitVelocity.y = kPppBreathModelZero;
             unitVelocity.z = 1.0f;
             group[9] = *(int*)((unsigned char*)pBreathModel + 0x14);
-            *(float*)(group + 3) = lbl_80330F70;
-            *((float*)(group + 3) + 1) = lbl_80330F70;
-            *((float*)(group + 3) + 2) = lbl_80330F70;
+            *(float*)(group + 3) = kPppBreathModelZero;
+            *((float*)(group + 3) + 1) = kPppBreathModelZero;
+            *((float*)(group + 3) + 2) = kPppBreathModelZero;
             *(Vec*)(group + 6) = unitVelocity;
             PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
@@ -551,8 +551,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             }
         }
 
-        *(float*)(work + 0x48) = lbl_80330F70;
-        *(float*)(work + 0x4C) = lbl_80330F70;
+        *(float*)(work + 0x48) = kPppBreathModelZero;
+        *(float*)(work + 0x4C) = kPppBreathModelZero;
         *(float*)(work + 0x50) = FLOAT_80330F80;
         PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
@@ -596,9 +596,9 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
                 PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0xC), &origin);
 
                 PSMTXCopy(*particleMtx, rotMtx.value);
-                rotMtx.value[0][3] = lbl_80330F70;
-                rotMtx.value[1][3] = lbl_80330F70;
-                rotMtx.value[2][3] = lbl_80330F70;
+                rotMtx.value[0][3] = kPppBreathModelZero;
+                rotMtx.value[1][3] = kPppBreathModelZero;
+                rotMtx.value[2][3] = kPppBreathModelZero;
 
                 dir = *(Vec*)(groupPtr + 0x18);
                 PSMTXMultVec(rotMtx.value, &dir, &dir);
@@ -745,9 +745,9 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
     float fVar1;
 
     PSMTXIdentity(*(Mtx*)state);
-    fVar1 = lbl_80330F70;
+    fVar1 = kPppBreathModelZero;
 
-    *(float*)(state + 0x50) = lbl_80330F70;
+    *(float*)(state + 0x50) = kPppBreathModelZero;
     *(float*)(state + 0x4C) = fVar1;
     *(float*)(state + 0x48) = fVar1;
 
@@ -823,7 +823,7 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
     int i;
     int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)groupIndex * 0x5C;
     bool isDead = true;
-    float zero = lbl_80330F70;
+    float zero = kPppBreathModelZero;
     int* groupData = (int*)groupTable;
 
     for (i = 0; i < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); i++) {

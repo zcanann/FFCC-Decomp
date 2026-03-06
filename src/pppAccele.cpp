@@ -1,7 +1,7 @@
 #include "ffcc/pppAccele.h"
+#include "ffcc/symbols_shared.h"
 
 extern int gPppCalcDisabled;
-extern float lbl_8032FEC8;
 
 /*
  * --INFO--
@@ -15,7 +15,7 @@ extern float lbl_8032FEC8;
 void pppAcceleCon(pppAcceleObj* obj, pppAcceleUnkC* param)
 {
 	float* puVar2 = (float*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
-	float uVar1 = lbl_8032FEC8;
+	float uVar1 = kPppAcceleZero;
 
 	puVar2[2] = uVar1;
 	puVar2[1] = uVar1;

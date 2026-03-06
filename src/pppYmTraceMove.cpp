@@ -3,6 +3,7 @@
 #include "dolphin/mtx.h"
 
 extern int DAT_8032ed70;
+extern float lbl_80330E40;
 
 extern "C" {
 	void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -28,12 +29,10 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
 	Vec dir;
 	f32 zero;
 
-	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &paramVec, &savedPosition);
-	dir.x = dest[1].y;
-	dir.y = dest[1].z;
-	dir.z = dest[2].x;
+	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &savedPosition, &paramVec);
+	dir = *(Vec*)&dest[1].y;
 	pppCopyVector__FR3Vec3Vec(dest, &dir);
-	zero = 0.0f;
+	zero = lbl_80330E40;
 	dest[3].x = zero;
 	dest[2].z = zero;
 	dest[2].y = zero;
@@ -183,4 +182,3 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	((_pppMngSt*)pppMngSt)->m_matrix.value[1][3] = local_ec.y;
 	((_pppMngSt*)pppMngSt)->m_matrix.value[2][3] = local_ec.z;
 }
-

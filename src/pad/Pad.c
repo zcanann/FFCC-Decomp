@@ -307,15 +307,16 @@ int PADReset(u32 mask) {
     ASSERTMSGLINE(0x381, !(mask & 0x0FFFFFFF), "PADReset(): invalid mask");
 
     enabled = OSDisableInterrupts();
-    mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
-    ResettingBits |= mask;
+    mask |= PendingBits;
+    mask &= ~(WaitingBits | CheckingBits);
     PendingBits = 0;
+    ResettingBits = ResettingBits | mask;
     disableBits = ResettingBits & EnabledBits;
-    if (Spec == 4) {
-        RecalibrateBits |= mask;
+    if (Spec == PAD_SPEC_4) {
+        RecalibrateBits = RecalibrateBits | mask;
     }
 
-    EnabledBits &= ~mask;
+    EnabledBits = EnabledBits & ~mask;
     SIDisablePolling(disableBits);
 
     if (ResettingChan == 0x20) {

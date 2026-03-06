@@ -1,4 +1,5 @@
 #include "ffcc/pppAngle.h"
+#include "ffcc/partMng.h"
 
 extern int lbl_8032ED70;
 
@@ -7,7 +8,7 @@ extern int lbl_8032ED70;
  * PAL Address: 0x80064dfc
  * PAL Size: 96b
  */
-void pppAngle(void* dest, void* src, void* param1, void* param2)
+void pppAngle(void* dest, void* src, _pppCtrlTable* ctrlTable)
 {
     if (lbl_8032ED70 != 0) {
         return;
@@ -17,10 +18,7 @@ void pppAngle(void* dest, void* src, void* param1, void* param2)
         return;
     }
 
-    (void)param2;
-
-    int* offsetPtr = (int*)((int*)param1)[3];
-    int offset = offsetPtr[0];
+    int offset = ((int*)ctrlTable->m_serializedDef)[0];
     int* destPtr = (int*)((char*)dest + offset + 0x80);
     int* srcPtr = (int*)((char*)src + 8);
 
@@ -34,11 +32,9 @@ void pppAngle(void* dest, void* src, void* param1, void* param2)
  * PAL Address: 0x80064dd8
  * PAL Size: 36b
  */
-void pppAngleCon(void* dest, void* param)
+void pppAngleCon(void* dest, _pppCtrlTable* ctrlTable)
 {
-    int* paramData = (int*)param;
-    int* offsetPtr = (int*)paramData[3];
-    int offset = offsetPtr[0];
+    int offset = ((int*)ctrlTable->m_serializedDef)[0];
     
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[2] = 0;

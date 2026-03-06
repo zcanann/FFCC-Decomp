@@ -15,9 +15,9 @@ extern unsigned char* lbl_8032ED50;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppWDrawMatrix(_pppPObject* pppPObject)
+void pppWDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
 {
-    register char* p = (char*)pppPObject;
+    register char* p = (char*)object;
 
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)(p + 0x10), *(Mtx*)(p + 0x40));
     PSVECScale((Vec*)(p + 0x40), (Vec*)(p + 0x40),

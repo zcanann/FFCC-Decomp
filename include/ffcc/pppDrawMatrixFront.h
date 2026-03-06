@@ -2,12 +2,13 @@
 #define _FFCC_PPPDRAWMATRIXFRONT_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppDrawMatrixFront(_pppPObject* param_1);
+void pppDrawMatrixFront(_pppPObject* object, void* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

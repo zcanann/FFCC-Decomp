@@ -15,25 +15,25 @@ extern unsigned char* lbl_8032ED50;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixFront(_pppPObject* param_1)
+void pppDrawMatrixFront(_pppPObject* object, void*, _pppCtrlTable*)
 {
     Vec localPos;
 
     PSMTXScaleApply(
-        *(Mtx*)((char*)param_1 + 0x10),
-        *(Mtx*)((char*)param_1 + 0x40),
+        *(Mtx*)((char*)object + 0x10),
+        *(Mtx*)((char*)object + 0x40),
         *(f32*)(lbl_8032ED50 + 0x28),
         *(f32*)(lbl_8032ED50 + 0x2C),
         *(f32*)(lbl_8032ED50 + 0x30)
     );
 
-    localPos.x = *(float*)((char*)param_1 + 0x1c);
-    localPos.y = *(float*)((char*)param_1 + 0x2c);
-    localPos.z = *(float*)((char*)param_1 + 0x3c);
+    localPos.x = *(float*)((char*)object + 0x1c);
+    localPos.y = *(float*)((char*)object + 0x2c);
+    localPos.z = *(float*)((char*)object + 0x3c);
 
     PSMTXMultVec(ppvWorldMatrix, &localPos, &localPos);
 
-    *(float*)((char*)param_1 + 0x4c) = localPos.x;
-    *(float*)((char*)param_1 + 0x5c) = localPos.y;
-    *(float*)((char*)param_1 + 0x6c) = localPos.z;
+    *(float*)((char*)object + 0x4c) = localPos.x;
+    *(float*)((char*)object + 0x5c) = localPos.y;
+    *(float*)((char*)object + 0x6c) = localPos.z;
 }

@@ -2,12 +2,13 @@
 #define _FFCC_PPPDRAWMATRIXWOOD_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppDrawMatrixWood(_pppPObject* param_1);
+void pppDrawMatrixWood(_pppPObject* object, void* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

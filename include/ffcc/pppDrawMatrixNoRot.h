@@ -2,12 +2,13 @@
 #define _FFCC_PPPDRAWMATRIXNOROT_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppDrawMatrixNoRot(struct _pppPObject* param_1);
+void pppDrawMatrixNoRot(struct _pppPObject* object, void* stepData, struct _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

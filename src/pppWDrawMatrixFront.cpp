@@ -16,25 +16,25 @@ extern Mtx ppvCameraMatrix02;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppWDrawMatrixFront(struct _pppPObject* param_1)
+void pppWDrawMatrixFront(struct _pppPObject* object, void*, struct _pppCtrlTable*)
 {
     Vec localPos;
 
     PSMTXScaleApply(
-        *(Mtx*)((char*)param_1 + 0x10),
-        *(Mtx*)((char*)param_1 + 0x40),
+        *(Mtx*)((char*)object + 0x10),
+        *(Mtx*)((char*)object + 0x40),
         *(f32*)(lbl_8032ED50 + 0x28),
         *(f32*)(lbl_8032ED50 + 0x2C),
         *(f32*)(lbl_8032ED50 + 0x30)
     );
 
-    localPos.x = *(float*)((char*)param_1 + 0x1C);
-    localPos.y = *(float*)((char*)param_1 + 0x2C);
-    localPos.z = *(float*)((char*)param_1 + 0x3C);
+    localPos.x = *(float*)((char*)object + 0x1C);
+    localPos.y = *(float*)((char*)object + 0x2C);
+    localPos.z = *(float*)((char*)object + 0x3C);
 
     PSMTXMultVec(ppvCameraMatrix02, &localPos, &localPos);
 
-    *(float*)((char*)param_1 + 0x4C) = localPos.x;
-    *(float*)((char*)param_1 + 0x5C) = localPos.y;
-    *(float*)((char*)param_1 + 0x6C) = localPos.z;
+    *(float*)((char*)object + 0x4C) = localPos.x;
+    *(float*)((char*)object + 0x5C) = localPos.y;
+    *(float*)((char*)object + 0x6C) = localPos.z;
 }

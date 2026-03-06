@@ -131,8 +131,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
  */
 void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
-	// pppMngStPtr points to a structure, access CGObject at offset 0xd8
-	CGObject* obj = *(CGObject**)(pppMngStPtr + 0xd8);
+	CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
 	int modelPtr = GetModelPtr__FP8CGObject(obj);
 	*(int*)(modelPtr + 0xec) = 0;
 }
@@ -174,7 +173,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 
 	if (gPppCalcDisabled == 0) {
 		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-		CGObject* obj = *(CGObject**)(pppMngStPtr + 0xd8);
+		CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
 		modelPtr = GetModelPtr__FP8CGObject(obj);
 		*(float**)(modelPtr + 0xe4) = value;
 		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;

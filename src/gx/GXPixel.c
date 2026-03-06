@@ -4,6 +4,10 @@
 
 #include "dolphin/gx/__gx.h"
 
+extern GXData* const gx;
+#undef __GXData
+#define __GXData gx
+
 void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     u32 fogclr;
     u32 fog0;
@@ -254,14 +258,14 @@ void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
 }
 
 void GXSetZCompLoc(GXBool before_tex) {
-    GXData *gx;
+    GXData *gxData;
 
     CHECK_GXBEGIN(474, "GXSetZCompLoc");
 
-    gx = __GXData;
-    gx->peCtrl = (gx->peCtrl & 0xFFFFFFBF) | ((u32)(u8)before_tex << 6);
-    GX_WRITE_RAS_REG(gx->peCtrl);
-    gx->bpSentNot = 0;
+    gxData = __GXData;
+    gxData->peCtrl = (gxData->peCtrl & 0xFFFFFFBF) | ((u32)(u8)before_tex << 6);
+    GX_WRITE_RAS_REG(gxData->peCtrl);
+    gxData->bpSentNot = 0;
 }
 
 void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
@@ -330,13 +334,13 @@ void GXSetFieldMask(GXBool odd_mask, GXBool even_mask) {
 }
 
 void GXSetFieldMode(GXBool field_mode, GXBool half_aspect_ratio) {
-    GXData* gx;
+    GXData* gxData;
     u32 reg;
 
     CHECK_GXBEGIN(637, "GXSetFieldMode");
-    gx = __GXData;
-    gx->lpSize = (gx->lpSize & ~0x00400000) | ((u32)(u8)half_aspect_ratio << 22);
-    GX_WRITE_RAS_REG(gx->lpSize);
+    gxData = __GXData;
+    gxData->lpSize = (gxData->lpSize & ~0x00400000) | ((u32)(u8)half_aspect_ratio << 22);
+    GX_WRITE_RAS_REG(gxData->lpSize);
     __GXFlushTextureState();
     reg = (u32)(u8)field_mode | 0x68000000;
     GX_WRITE_RAS_REG(reg);

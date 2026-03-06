@@ -41,7 +41,7 @@ public:
     void SetSmithData(int, unsigned int);
     void SetStageNo(int, int);
     void GetStageNo(int, int*, int*);
-    void GetStageFlg(int);
+    unsigned int GetStageFlg(int);
     void ClrStageFlg(int);
     void SetRadarType();
     void GetMBasePos(int, short*, short*);
@@ -59,7 +59,7 @@ public:
     void GetScrFlg();
     int GetPlayerHP(int, unsigned char*);
     void MakeLetterList(int, char*);
-    void MakeLetterData(int, char*, int);
+    int MakeLetterData(int, char*, int);
     void GetLetterLstFlg(int);
     void ClrLetterLstFlg(int);
     void GetLetterDatFlg(int);

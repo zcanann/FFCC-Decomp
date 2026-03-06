@@ -212,10 +212,10 @@ void GXPokeAlphaUpdate(GXBool update_enable) {
     volatile u16* pe_reg;
     u16 reg;
 
-    pe_reg = (volatile u16*)__peReg;
-    reg = pe_reg[1];
+    pe_reg = (volatile u16*)__peReg + 1;
+    reg = *pe_reg;
     reg = (reg & ~(1 << 4)) | ((u16)update_enable << 4);
-    pe_reg[1] = reg;
+    *pe_reg = reg;
 }
 
 void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
@@ -249,10 +249,10 @@ void GXPokeColorUpdate(GXBool update_enable) {
     volatile u16* pe_reg;
     u16 reg;
 
-    pe_reg = (volatile u16*)__peReg;
-    reg = pe_reg[1];
+    pe_reg = (volatile u16*)__peReg + 1;
+    reg = *pe_reg;
     reg = (reg & ~(1 << 3)) | ((u16)update_enable << 3);
-    pe_reg[1] = reg;
+    *pe_reg = reg;
 }
 
 /*

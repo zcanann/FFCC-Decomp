@@ -51,7 +51,7 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
         value = -RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
             f32 randValue = value - RandF__5CMathFv(&math[0]);
-            value = randValue * lbl_8032FF68;
+            value = lbl_8032FF68 * randValue;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

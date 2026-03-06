@@ -91,10 +91,13 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
 
     shapeData->currentId = shapeData->counter;
     shapeData->value = (u16)(shapeData->value + controlData->step);
-    if (shapeData->value < shape->maxValue) {
+    s32 value = shapeData->value;
+    s32 maxValue = shape->maxValue;
+
+    if (value < maxValue) {
         return;
     }
-    shapeData->value = (u16)(shapeData->value - shape->maxValue);
+    shapeData->value = (u16)(value - maxValue);
 
     shapeData->counter++;
     if (shapeData->counter < *(s16*)((u8*)shapeSpec + 0x6)) {

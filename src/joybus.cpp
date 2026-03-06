@@ -963,6 +963,11 @@ void JoyBus::WriteInitialCode(ThreadParam* threadParam)
 	// TODO
 }
 
+struct ThreadSleepAlarm {
+    OSAlarm alarm;
+    OSThread* thread;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800ae228
@@ -974,7 +979,7 @@ void JoyBus::WriteInitialCode(ThreadParam* threadParam)
  */
 void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
 {
-    OSResumeThread((OSThread*)alarm->start);
+    OSResumeThread(((ThreadSleepAlarm*)alarm)->thread);
 }
 
 /*
@@ -984,16 +989,16 @@ void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
  */
 void JoyBus::ThreadSleep(long long ticks)
 {
-    OSAlarm alarm;
+    ThreadSleepAlarm alarm;
 	
-    OSCreateAlarm(&alarm);
-    OSSetAlarmTag(&alarm, 1);
+    OSCreateAlarm(&alarm.alarm);
+    OSSetAlarmTag(&alarm.alarm, 1);
 	
-    OSThread* thread = OSGetCurrentThread();
+    alarm.thread = OSGetCurrentThread();
     unsigned int level = OSDisableInterrupts();
 
-    OSSetAlarm(&alarm, ticks, ThreadAlarmHandler);
-    OSSuspendThread(thread);
+    OSSetAlarm(&alarm.alarm, ticks, ThreadAlarmHandler);
+    OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(level);
 }
 

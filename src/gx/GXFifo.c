@@ -69,7 +69,9 @@ static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
 
 static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
-    u32 reg = __GXData->cpEnable;
+    u32* cpEnable = &__GXData->cpEnable;
+    u32 reg = *cpEnable;
+    u32 val = 0;
 
     reg &= ~0x20;
     __GXData->cpEnable = reg;

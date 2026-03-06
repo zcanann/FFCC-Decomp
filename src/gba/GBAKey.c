@@ -7,18 +7,22 @@
 
 static s32 F152(void* task)
 {
-    if (task == &__GBA[0].task) {
-        return 0;
-    } else if (task == &__GBA[1].task) {
-        return 1;
-    } else if (task == &__GBA[2].task) {
-        return 2;
-    } else if (task == &__GBA[3].task) {
-        return 3;
+    s32 chan;
+
+    if (&__GBA[0].task == task) {
+        chan = 0;
+    } else if (&__GBA[1].task == task) {
+        chan = 1;
+    } else if (&__GBA[2].task == task) {
+        chan = 2;
+    } else if (&__GBA[3].task == task) {
+        chan = 3;
     } else {
         OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
-        return -1;
+        chan = -1;
     }
+
+    return chan;
 }
 
 static void F23(void* task)

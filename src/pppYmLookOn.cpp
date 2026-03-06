@@ -79,7 +79,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
         local_28.x = local_40.z;
         local_28.y = lbl_80330EC8;
         local_28.z = -local_40.x;
-        if ((local_40.z == lbl_80330EC8) && (local_28.z == lbl_80330EC8)) {
+        if (!((local_40.z != lbl_80330EC8) || (lbl_80330EC8 != local_28.z))) {
             local_28.x = lbl_80330ECC;
             local_28.y = lbl_80330EC8;
             local_28.z = lbl_80330EC8;
@@ -103,4 +103,3 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 }
-

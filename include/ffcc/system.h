@@ -84,5 +84,6 @@ public:
 };
 
 extern CSystem System;
+extern void* __vt__8CProcess;
 
 #endif // _FFCC_SYSTEM_H

@@ -38,7 +38,6 @@ extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
 
 extern void* __vt__8CManager;
-extern void* lbl_801E8668;
 extern void* PTR_PTR_s_CFunnyShapePcs_801ea924;
 extern u32 DAT_801EA778;
 extern u32 DAT_801EA77C;
@@ -110,7 +109,7 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CManager;
-    *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801E8668;
+    *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CProcess;
     *reinterpret_cast<void**>(FunnyShapePcs) = &PTR_PTR_s_CFunnyShapePcs_801ea924;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x3C));
@@ -501,3 +500,4 @@ extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*
 
 template class CPtrArray<_GXTexObj*>;
 template class CPtrArray<OSFS_TEXTURE_ST*>;
+

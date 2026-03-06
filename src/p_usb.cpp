@@ -14,7 +14,6 @@ extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, 
 extern "C" int IsConnected__4CUSBFv(void*);
 
 extern "C" char __vt__8CManager[];
-extern "C" char lbl_801E8668[];
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
 extern char s_CUSBPcs_8032f810;
 extern char s_plot_kmitsuru__801d6d14[];
@@ -252,7 +251,7 @@ extern "C" void __sinit_p_usb_cpp()
 {
     void* vtbl = __vt__8CManager;
     *reinterpret_cast<void**>(&USBPcs) = vtbl;
-    *reinterpret_cast<void**>(&USBPcs) = lbl_801E8668;
+    *reinterpret_cast<void**>(&USBPcs) = __vt__8CProcess;
     *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
 
     u32* dst = m_table__7CUSBPcs;
@@ -270,3 +269,4 @@ extern "C" void __sinit_p_usb_cpp()
     dst[8] = src2[1];
     dst[9] = src2[2];
 }
+

@@ -7,7 +7,6 @@
 
 CGbaPcs GbaPcs;
 extern char __vt__8CManager[];
-extern char lbl_801E8668[];
 extern char PTR_PTR_s_CGbaPcs_8020f4a4[];
 extern char s_CGbaPcs_80330870[];
 extern char s_JoyBus__LoadBin___error_801d9de0[];
@@ -29,7 +28,7 @@ extern "C" unsigned int lbl_8020F328[];
 extern "C" void __sinit_p_gba_cpp(void)
 {
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
-	*reinterpret_cast<void**>(&GbaPcs) = lbl_801E8668;
+	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CProcess;
 	*reinterpret_cast<void**>(&GbaPcs) = PTR_PTR_s_CGbaPcs_8020f4a4;
 
 	unsigned int* table = lbl_8020F328;
@@ -212,3 +211,4 @@ void CGbaPcs::SetFirstZone()
 {
 	GbaQue.ClrRadarTypeFlg();
 }
+

@@ -3,8 +3,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 
-extern "C" void pppDeletePart__8CPartMngFi(void*, int);
-
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -22,19 +20,17 @@ extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 extern unsigned char PartMng[];
 
-extern float lbl_80333558;
-extern float lbl_8033354C;
-extern float lbl_8033356C;
-extern float lbl_8033358C;
-extern float lbl_80333598;
+extern float kMenuCenteringHalfWidth;
+extern float kOptionAnimMin;
+extern float kOptionAnimMax;
+extern float kMenuCenteringOffset;
+extern float kOptionRowAnimStep;
 extern double lbl_80333640;
-extern float lbl_80333648;
-extern float lbl_8033364C;
-extern float lbl_80333650;
+extern float kOptionOpenAnimStep;
+extern float kOptionColumnAnimStep;
+extern float kOptionVolumeScale;
 
 extern "C" int __cntlzw(unsigned int);
-
-extern unsigned char PartMng[];
 
 static unsigned short GetMenuPress()
 {
@@ -78,8 +74,8 @@ float CMenuPcs::CalcCenteringPos2(char* text, float margin, float scale)
 	SetShadow__5CFontFi(font, 1);
 	SetMargin__5CFontFf(margin, font);
 	SetScaleX__5CFontFf(scale, font);
-	SetScaleY__5CFontFf(lbl_8033356C, font);
-	return -(GetWidth__5CFontFPc(font, text) * lbl_80333558 - lbl_8033358C);
+	SetScaleY__5CFontFf(kOptionAnimMax, font);
+	return -(GetWidth__5CFontFPc(font, text) * kMenuCenteringHalfWidth - kMenuCenteringOffset);
 }
 
 /*
@@ -90,7 +86,7 @@ float CMenuPcs::CalcCenteringPos2(char* text, float margin, float scale)
 float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 {
     float width = GetWidth__5CFontFPc(font, text);
-    return -(width * lbl_80333558 - lbl_8033358C);
+    return -(width * kMenuCenteringHalfWidth - kMenuCenteringOffset);
 }
 
 /*
@@ -318,10 +314,10 @@ void CMenuPcs::CalcOptionMenu()
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	bool optionChanged = false;
 
-	const float minValue = lbl_8033354C;
-	const float maxValue = lbl_8033356C;
-	const float animStep = lbl_80333598;
-	const float animStep2 = lbl_8033364C;
+	const float minValue = kOptionAnimMin;
+	const float maxValue = kOptionAnimMax;
+	const float animStep = kOptionRowAnimStep;
+	const float animStep2 = kOptionColumnAnimStep;
 	const unsigned short press = GetMenuPress();
 
 	signed char& menuState = *reinterpret_cast<signed char*>(self + 0x9C);
@@ -342,7 +338,7 @@ void CMenuPcs::CalcOptionMenu()
 	signed char* const specialModeFlags = reinterpret_cast<signed char*>(self + 0xB5);
 
 	if (menuState == 0) {
-		openAnim += lbl_80333648;
+		openAnim += kOptionOpenAnimStep;
 		if (openAnim < maxValue) {
 			return;
 		}
@@ -353,7 +349,7 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (menuState == 2) {
-		openAnim -= lbl_80333648;
+		openAnim -= kOptionOpenAnimStep;
 		rowAnim -= animStep;
 		colAnim -= animStep2;
 
@@ -363,7 +359,7 @@ void CMenuPcs::CalcOptionMenu()
 		if (colAnim <= minValue) {
 			colAnim = minValue;
 		}
-		if (static_cast<int>(openAnim / lbl_80333648) == 5) {
+		if (static_cast<int>(openAnim / kOptionOpenAnimStep) == 5) {
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		}
 		if (openAnim > minValue) {
@@ -562,8 +558,8 @@ void CMenuPcs::CalcOptionMenu()
 	if (optionChanged) {
 		Game.game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(gameInitMode == 0);
 		Sound.SetStereo(stereoMode == 0);
-		Sound.SetSeMasterVolume(static_cast<int>(lbl_80333650 * static_cast<float>(seVolume)));
-		Sound.SetBgmMasterVolume(static_cast<int>(lbl_80333650 * static_cast<float>(bgmVolume)));
+		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(seVolume)));
+		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(bgmVolume)));
 	}
 }
 

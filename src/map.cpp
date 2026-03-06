@@ -44,10 +44,10 @@ extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
 extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
-extern "C" float lbl_8032F990;
-extern "C" float lbl_8032F994;
-extern "C" float lbl_8032F998;
-extern "C" float lbl_8032F99C;
+extern "C" float kMapViewScaleXPrimary;
+extern "C" float kMapViewScaleY;
+extern "C" float kMapViewScaleZ;
+extern "C" float kMapViewScaleXSecondary;
 extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" void SetDrawFlag__8COctTreeFv(void*);
@@ -55,11 +55,11 @@ extern "C" void Draw__8COctTreeFUc(void*, unsigned char);
 extern "C" void Draw__7CMapObjFUc(void*, unsigned char);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
-extern "C" void* lbl_801E89A8[];
-extern "C" void* lbl_801E899C[];
-extern "C" void* lbl_801E8990[];
-extern "C" void* lbl_801E8984[];
-extern "C" void* lbl_801E8978[];
+extern "C" void* __vt__8CPtrArrayIP14CMapLightHolder[];
+extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
+extern "C" void* __vt__8CPtrArrayIP7CMapAnim[];
+extern "C" void* __vt__8CPtrArrayIP13CMapAnimKeyDt[];
+extern "C" void* __vt__8CPtrArrayIP10CMapShadow[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -360,7 +360,7 @@ CPtrArray<CMapLightHolder*>::~CPtrArray()
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E89A8;
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP14CMapLightHolder;
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
@@ -788,7 +788,7 @@ CPtrArray<CMapAnimRun*>::~CPtrArray()
 extern "C" CPtrArray<CMapAnimRun*>* dtor_800344C4(CPtrArray<CMapAnimRun*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E899C;
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP11CMapAnimRun;
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
@@ -860,7 +860,7 @@ CPtrArray<CMapAnim*>::~CPtrArray()
 extern "C" CPtrArray<CMapAnim*>* dtor_80034574(CPtrArray<CMapAnim*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E8990;
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP7CMapAnim;
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
@@ -926,7 +926,7 @@ CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 extern "C" CPtrArray<CMapAnimKeyDt*>* dtor_80034624(CPtrArray<CMapAnimKeyDt*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E8984;
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP13CMapAnimKeyDt;
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
@@ -992,7 +992,7 @@ CPtrArray<CMapShadow*>::~CPtrArray()
 extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E8978;
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP10CMapShadow;
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
@@ -2820,15 +2820,15 @@ void CMapMng::GetAnimRunID(int)
 void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
 {
     float* proj = reinterpret_cast<float*>(projMtx);
-    float scaleY = lbl_8032F994 * proj[5];
+    float scaleY = kMapViewScaleY * proj[5];
     float scaleX = proj[0];
     Mtx* viewCopy = reinterpret_cast<Mtx*>(Ptr(this, 0x228F8));
 
     PSMTXCopy(viewMtx, *viewCopy);
     PSMTXScaleApply(
-        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22928)), lbl_8032F990 * scaleX, scaleY, lbl_8032F998);
+        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22928)), kMapViewScaleXPrimary * scaleX, scaleY, kMapViewScaleZ);
     PSMTXScaleApply(
-        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22958)), lbl_8032F99C * scaleX, scaleY, lbl_8032F998);
+        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22958)), kMapViewScaleXSecondary * scaleX, scaleY, kMapViewScaleZ);
 }
 
 /*

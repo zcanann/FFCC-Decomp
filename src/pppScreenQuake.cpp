@@ -79,20 +79,18 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
 #pragma scheduling off
 void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
 {
-    float value = lbl_80331FC8;
-
     SetQuakeParameter__10CCameraPcsFiissffffffi(
         &CameraPcs,
         0,
         0,
         0,
         0,
-        value,
-        value,
-        value,
-        value,
-        value,
-        value,
+        lbl_80331FC8,
+        lbl_80331FC8,
+        lbl_80331FC8,
+        lbl_80331FC8,
+        lbl_80331FC8,
+        lbl_80331FC8,
         1);
 }
 #pragma scheduling reset

@@ -3275,8 +3275,8 @@ void CMapMng::ShowMapMeshID(int id, int show)
  */
 void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 {
-    int i = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+    int i = 0;
 
     while (i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC)) {
         if (static_cast<int>(*reinterpret_cast<unsigned short*>(mapObj + 0x982)) == id) {

@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern float lbl_80330060;
 extern u8 gPppDefaultValueBuffer[];
@@ -50,9 +50,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330060;
             }
@@ -61,9 +61,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330060;
             }
@@ -72,9 +72,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330060;
             }
@@ -83,9 +83,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330060;
             }

@@ -2,12 +2,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
-extern unsigned int lbl_801EA0D0[];
-extern unsigned int lbl_801EA0DC[];
-extern unsigned int lbl_801EA0E8[];
 extern unsigned int PTR_PTR_s_CSystemPcs_801ea270[];
-extern unsigned char lbl_801EA0F4[];
-extern unsigned int lbl_8032ED08;
 
 /*
  * --INFO--
@@ -25,11 +20,11 @@ extern "C" void __sinit_p_system_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    lbl_8032ED08 = reinterpret_cast<unsigned int>(PTR_PTR_s_CSystemPcs_801ea270);
-    table = reinterpret_cast<unsigned int*>(lbl_801EA0F4);
-    table0 = lbl_801EA0D0;
-    table1 = lbl_801EA0DC;
-    table2 = lbl_801EA0E8;
+    *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CSystemPcs_801ea270);
+    table = reinterpret_cast<unsigned int*>(m_table__10CSystemPcs);
+    table0 = m_table_desc0__10CSystemPcs;
+    table1 = m_table_desc1__10CSystemPcs;
+    table2 = m_table_desc2__10CSystemPcs;
 
     table[1] = table0[0];
     table[2] = table0[1];
@@ -83,7 +78,7 @@ void CSystemPcs::Quit()
  */
 int CSystemPcs::GetTable(unsigned long index)
 {
-	unsigned char* table = lbl_801EA0F4;
+	unsigned char* table = m_table__10CSystemPcs;
 	unsigned long offset = index * 0x15c;
 	return (int)(table + offset);
 }

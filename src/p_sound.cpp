@@ -1,15 +1,8 @@
 #include "ffcc/p_sound.h"
+#include "ffcc/sound.h"
 
 extern unsigned char CFlat[];
-extern unsigned int lbl_80210580[];
-extern unsigned int lbl_8021058C[];
-extern unsigned int lbl_80210598[];
-extern unsigned int lbl_802105A4[];
-extern unsigned char lbl_802105B0[];
 extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
-extern unsigned int lbl_8032EDE0;
-class CSound;
-extern CSound Sound[];
 extern "C" {
 void LoadBlock__6CSoundFv(CSound*);
 void CancelLoadWaveASync__6CSoundFv(CSound*);
@@ -31,22 +24,22 @@ void Draw__6CSoundFv(CSound*);
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    lbl_8032EDE0 = (unsigned int)&PTR_PTR_s_CSoundPcs_8021072c;
+    *reinterpret_cast<unsigned int*>(&SoundPcs) = (unsigned int)&PTR_PTR_s_CSoundPcs_8021072c;
 
-    unsigned int* table = (unsigned int*)lbl_802105B0;
+    unsigned int* table = (unsigned int*)m_table__9CSoundPcs;
 
-    table[1] = lbl_80210580[0];
-    table[2] = lbl_80210580[1];
-    table[3] = lbl_80210580[2];
-    table[4] = lbl_8021058C[0];
-    table[5] = lbl_8021058C[1];
-    table[6] = lbl_8021058C[2];
-    table[7] = lbl_80210598[0];
-    table[8] = lbl_80210598[1];
-    table[9] = lbl_80210598[2];
-    table[12] = lbl_802105A4[0];
-    table[13] = lbl_802105A4[1];
-    table[14] = lbl_802105A4[2];
+    table[1] = m_table_desc0__9CSoundPcs[0];
+    table[2] = m_table_desc0__9CSoundPcs[1];
+    table[3] = m_table_desc0__9CSoundPcs[2];
+    table[4] = m_table_desc1__9CSoundPcs[0];
+    table[5] = m_table_desc1__9CSoundPcs[1];
+    table[6] = m_table_desc1__9CSoundPcs[2];
+    table[7] = m_table_desc2__9CSoundPcs[0];
+    table[8] = m_table_desc2__9CSoundPcs[1];
+    table[9] = m_table_desc2__9CSoundPcs[2];
+    table[12] = m_table_desc3__9CSoundPcs[0];
+    table[13] = m_table_desc3__9CSoundPcs[1];
+    table[14] = m_table_desc3__9CSoundPcs[2];
 }
 
 /*
@@ -86,7 +79,7 @@ void CSoundPcs::Quit()
  */
 void* CSoundPcs::GetTable(unsigned long index)
 {
-    return lbl_802105B0 + (index * 0x15C);
+    return m_table__9CSoundPcs + (index * 0x15C);
 }
 
 /*
@@ -113,7 +106,7 @@ void CSoundPcs::create()
  */
 void CSoundPcs::createLoad()
 {
-    LoadBlock__6CSoundFv(Sound);
+    LoadBlock__6CSoundFv(&Sound);
 }
 
 /*
@@ -127,10 +120,10 @@ void CSoundPcs::createLoad()
  */
 void CSoundPcs::destroy()
 {
-    CancelLoadWaveASync__6CSoundFv(Sound);
-    StopStream__6CSoundFv(Sound);
-    StopAndFreeAllSe__6CSoundFi(Sound, 1);
-    FreeBlock__6CSoundFv(Sound);
+    CancelLoadWaveASync__6CSoundFv(&Sound);
+    StopStream__6CSoundFv(&Sound);
+    StopAndFreeAllSe__6CSoundFi(&Sound, 1);
+    FreeBlock__6CSoundFv(&Sound);
 }
 
 /*
@@ -144,7 +137,7 @@ void CSoundPcs::destroy()
  */
 void CSoundPcs::calc()
 {
-    Frame__6CSoundFv(Sound);
+    Frame__6CSoundFv(&Sound);
 }
 
 /*
@@ -159,6 +152,6 @@ void CSoundPcs::calc()
 void CSoundPcs::draw()
 {
     if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
-        Draw__6CSoundFv(Sound);
+        Draw__6CSoundFv(&Sound);
     }
 }

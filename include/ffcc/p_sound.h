@@ -20,4 +20,11 @@ public:
     void draw();
 };
 
+extern CSoundPcs SoundPcs;
+extern unsigned int m_table_desc0__9CSoundPcs[];
+extern unsigned int m_table_desc1__9CSoundPcs[];
+extern unsigned int m_table_desc2__9CSoundPcs[];
+extern unsigned int m_table_desc3__9CSoundPcs[];
+extern unsigned char m_table__9CSoundPcs[];
+
 #endif

@@ -12,7 +12,7 @@ extern float lbl_80330E24;
 extern float lbl_80330E28;
 extern float lbl_801EC9F0[];
 extern int gPppCalcDisabled;
-extern unsigned char* lbl_8032ED50;
+extern _pppMngSt* pppMngStPtr;
 
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -32,9 +32,9 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
-    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
+    _pppMngSt* pppMngSt = pppMngStPtr;
     f32 fVar2 = lbl_80330E1C;
-    f32* pfVar = (f32*)((u8*)(&basePtr->field0_0x0 + 2) + *dataPtr->m_serializedDataOffsets);
+    f32* pfVar = (f32*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
     Vec local_48;
     Vec local_24;
     f32 local_3c;
@@ -56,9 +56,9 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         local_24.y = *(f32*)((u8*)pppMngSt + 0x5c);
         local_24.z = *(f32*)((u8*)pppMngSt + 0x60);
         pppCopyVector__FR3Vec3Vec((Vec*)(pfVar + 4), &local_24);
-        local_3c = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3];
-        local_38 = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3];
-        local_34 = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3];
+        local_3c = pppMngStPtr->m_matrix.value[0][3];
+        local_38 = pppMngStPtr->m_matrix.value[1][3];
+        local_34 = pppMngStPtr->m_matrix.value[2][3];
         local_30 = pfVar[4];
         local_2c = pfVar[5];
         local_28 = pfVar[6];
@@ -86,17 +86,17 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
     if (gPppCalcDisabled == 0) {
-        _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
-        f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
+        _pppMngSt* pppMngSt = pppMngStPtr;
+        f32* pfVar = (f32*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
         
         // Update velocity and position
         pfVar[1] = pfVar[1] + pfVar[2];
         *pfVar = *pfVar + pfVar[1];
         
-        if (stepData->m_graphId == basePtr->field0_0x0.m_graphId) {
+        if (stepData->m_graphId == *(s32*)((u8*)basePtr + 0xC)) {
             *pfVar = *pfVar + stepData->m_stepValue;
-            pfVar[1] = pfVar[1] + (f32)stepData->m_arg3;
-            pfVar[2] = pfVar[2] + *(f32*)stepData->m_payload;
+            pfVar[1] = pfVar[1] + stepData->m_arg3;
+            pfVar[2] = pfVar[2] + stepData->m_payload;
         }
         
         u16 counter = *(u16*)(pfVar + 3);
@@ -116,7 +116,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppNormalize__FR3Vec3Vec(&direction, &tempDir);
         
         // Trigonometric parabolic motion calculations
-        u32 sinIndex = (u32)((lbl_80330E20 * (f32)stepData->m_dataValIndex) / lbl_80330E24);
+        u32 sinIndex = (u32)((lbl_80330E20 * stepData->m_dataValIndex) / lbl_80330E24);
         
         f32 baseValue = *pfVar;
         f32 horizontalScale = (f32)(frameCount * (double)(baseValue * lbl_801EC9F0[((sinIndex + 0x4000) & 0xfffc) / 4]));
@@ -152,13 +152,12 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &newPosition);
         
         // Update matrix with new position
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3] = newPosition.x;
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3] = newPosition.y;
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3] = newPosition.z;
+        pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
+        pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
+        pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
         
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         
         *(u16*)(pfVar + 3) = *(u16*)(pfVar + 3) + 1;
     }
 }
-

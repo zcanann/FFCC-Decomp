@@ -50,8 +50,8 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
     _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
     _pppPointApStep* payload = (_pppPointApStep*)step;
-    Vec* src = (Vec*)((u8*)pObject + data->srcOffset + 0x80);
     u8* target = (u8*)pObject + data->targetOffset + 0x80;
+    Vec* src = (Vec*)((u8*)pObject + data->srcOffset + 0x80);
 
     if (lbl_8032ED70 != 0) {
         return;

@@ -73,7 +73,7 @@ public:
     void LoadFinished();
     void Init(int, CRomWork*, int);
     void SetBonusCondition(int);
-    void IsOutOfShouki();
+    int IsOutOfShouki();
     void AddLetter(int, int, int, int, int, int, int, int, int);
     void FGLetterOpen(int);
     void FGLetterReply(int, int, int, int);

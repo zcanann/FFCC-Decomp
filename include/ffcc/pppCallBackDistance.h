@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2);
-void pppDestructCallBackDistance(void);
+void pppDestructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2);
 void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkB* param2, pppCallBackDistanceUnkC* param3);
 
 #ifdef __cplusplus

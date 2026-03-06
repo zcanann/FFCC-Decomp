@@ -206,7 +206,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmDeformationShp(void)
+void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*)
 {
 	return;
 }

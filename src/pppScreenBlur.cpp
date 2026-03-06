@@ -67,7 +67,7 @@ void pppRenderScreenBlur(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenBlur(void)
+void pppFrameScreenBlur(void*, void*, void*)
 {
     if (lbl_8032ED70 == 0) {
         return;
@@ -84,7 +84,7 @@ void pppFrameScreenBlur(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenBlur(void)
+void pppDesScreenBlur(void*, void*)
 {
     InitBlurParameter__8CGraphicFv(Graphic);
 }
@@ -98,7 +98,7 @@ void pppDesScreenBlur(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenBlur(void)
+void pppCon2ScreenBlur(void*)
 {
     return;
 }

@@ -63,7 +63,7 @@ void pppConstructLensFlare(void* obj, void* param)
  * PAL Address: 0x800dec10
  * PAL Size: 4b
  */
-void pppDestructLensFlare(void)
+void pppDestructLensFlare(void*, void*)
 {
 	return;
 }

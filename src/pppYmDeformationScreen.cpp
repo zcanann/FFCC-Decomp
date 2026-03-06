@@ -144,7 +144,7 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
  * PAL Address: 0x80098a60
  * PAL Size: 4b
  */
-void pppDestructYmDeformationScreen(void)
+void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
 {
 	return;
 }

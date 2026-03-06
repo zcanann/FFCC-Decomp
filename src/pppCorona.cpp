@@ -63,7 +63,7 @@ void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCorona(void)
+void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
 {
 }
 

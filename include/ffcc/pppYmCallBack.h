@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-void pppConstructYmCallBack(void);
-void pppDestructYmCallBack(void);
-void pppFrameYmCallBack(void* pppYmCallBack, void* param_2);
+void pppConstructYmCallBack(void* pppYmCallBack, void* param_2);
+void pppDestructYmCallBack(void* pppYmCallBack, void* param_2);
+void pppFrameYmCallBack(void* pppYmCallBack, void* param_2, void* param_3);
 
 #ifdef __cplusplus
 }

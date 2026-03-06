@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 void pppConstructLensFlare(void* obj, void* param);
-void pppDestructLensFlare(void);
+void pppDestructLensFlare(void* obj, void* param);
 void pppFrameLensFlare(void* obj, void* param2, void* param3);
 void pppRenderLensFlare(void* obj, void* param2, void* param3);
 

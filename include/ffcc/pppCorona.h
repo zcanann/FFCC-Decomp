@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2);
-void pppDestructCorona(void);
+void pppDestructCorona(pppCorona* param1, pppCoronaUnkC* param2);
 void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3);
 void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3);
 

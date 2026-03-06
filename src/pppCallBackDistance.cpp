@@ -51,7 +51,7 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistan
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCallBackDistance(void)
+void pppDestructCallBackDistance(pppCallBackDistance*, pppCallBackDistanceUnkC*)
 {
 }
 

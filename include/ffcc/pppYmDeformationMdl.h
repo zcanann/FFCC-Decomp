@@ -37,7 +37,7 @@ extern "C" {
 
 void pppConstructYmDeformationMdl(pppYmDeformationMdl*, struct pppYmDeformationMdlUnkC*);
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl*, struct pppYmDeformationMdlUnkC*);
-void pppDestructYmDeformationMdl(void);
+void pppDestructYmDeformationMdl(pppYmDeformationMdl*, struct pppYmDeformationMdlUnkC*);
 void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3);
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3);
 

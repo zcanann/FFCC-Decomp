@@ -27,7 +27,7 @@ void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructAlignmentScale(void)
+void pppConstructAlignmentScale(pppAlignmentScale*, pppAlignmentScaleData*)
 {
     return;
 }

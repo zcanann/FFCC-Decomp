@@ -37,7 +37,7 @@ extern "C" {
 void pppConstructYmMana(PYmMana*, pppYmManaUnkC*);
 void pppDestructYmMana(PYmMana*, pppYmManaUnkC*);
 void pppFrameYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*);
-void pppRenderYmMana(void);
+void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*);
 
 #ifdef __cplusplus
 }

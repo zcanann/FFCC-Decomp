@@ -134,7 +134,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmDeformationMdl(void)
+void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
 {
 	return;
 }

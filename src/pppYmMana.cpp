@@ -746,7 +746,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMana(void)
+void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*)
 {
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);

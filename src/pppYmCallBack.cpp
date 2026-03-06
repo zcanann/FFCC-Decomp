@@ -24,7 +24,7 @@ struct YmCallBackParam {
  * PAL Address: 0x800a6090
  * PAL Size: 4b
  */
-void pppConstructYmCallBack(void)
+void pppConstructYmCallBack(void*, void*)
 {
 	return;
 }
@@ -34,7 +34,7 @@ void pppConstructYmCallBack(void)
  * PAL Address: TODO
  * PAL Size: 4b
  */
-void pppDestructYmCallBack(void)
+void pppDestructYmCallBack(void*, void*)
 {
 	return;
 }
@@ -48,7 +48,7 @@ void pppDestructYmCallBack(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
+void pppFrameYmCallBack(void* pppYmCallBack, void* param_2, void*)
 {
     YmCallBackParam* frameParam = (YmCallBackParam*)param_2;
     YmCallBackObj* ymCallBack = (YmCallBackObj*)pppYmCallBack;

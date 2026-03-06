@@ -6,9 +6,9 @@ extern "C" {
 #endif
 
 void pppConScreenBlur(void* param1, void* param2);
-void pppCon2ScreenBlur(void);
-void pppDesScreenBlur(void);
-void pppFrameScreenBlur(void);
+void pppCon2ScreenBlur(void* param1);
+void pppDesScreenBlur(void* param1, void* param2);
+void pppFrameScreenBlur(void* param1, void* param2, void* param3);
 void pppRenderScreenBlur(void* param1, void* param2, void* param3);
 
 #ifdef __cplusplus

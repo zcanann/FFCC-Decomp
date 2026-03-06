@@ -48,4 +48,6 @@ private:
     u8 m_pad185[3];                      // 0x185
 };
 
+extern CMapPcs MapPcs;
+
 #endif // _FFCC_P_MAP_H_

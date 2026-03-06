@@ -16,7 +16,6 @@ extern "C" void* memset(void*, int, unsigned long);
 extern "C" int GetPadType__6JoyBusFi(void*, int);
 
 extern void* __vt__8CManager;
-extern void* lbl_801E8668;
 extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
 
 extern u32 lbl_801E9C90[];
@@ -32,7 +31,6 @@ extern u32 lbl_801E9CFC[];
 extern u32 lbl_801E9D08[];
 extern int DAT_802381a0;
 extern unsigned char MaterialMan[];
-extern CGraphicPcs GraphicsPcs;
 extern CMiniGamePcs MiniGamePcs;
 extern unsigned char MaterialMan[];
 extern char* PTR_DAT_801e9e64[];
@@ -62,7 +60,7 @@ extern "C" void __sinit_p_graphic_cpp(void)
 {
     volatile void** base = (volatile void**)&GraphicsPcs;
     *base = &__vt__8CManager;
-    *base = &lbl_801E8668;
+    *base = &__vt__8CProcess;
     *base = &PTR_PTR_s_CGraphicPcs_801e9e9c;
 
     u32* dst = lbl_801E9D08;
@@ -1070,3 +1068,4 @@ void CGraphicPcs::drawScreenFade()
     PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }
+

@@ -18,7 +18,6 @@ extern CGraphic Graphic;
 extern unsigned char m_table__18CMaterialEditorPcs[];
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* __vt__8CManager;
-extern void* lbl_801E8668;
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
 extern unsigned char lbl_8026D338[];
 extern unsigned int lbl_801EA498[];
@@ -72,7 +71,7 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     volatile void** base = reinterpret_cast<volatile void**>(&MaterialEditorPcs);
     *base = &__vt__8CManager;
-    *base = &lbl_801E8668;
+    *base = &__vt__8CProcess;
     *base = &PTR_PTR_s_CMaterialEditorPcs_801ea644;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
@@ -585,3 +584,4 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
         }
     }
 }
+

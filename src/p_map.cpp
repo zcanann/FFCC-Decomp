@@ -12,46 +12,43 @@
 
 #include <dolphin/mtx.h>
 extern void* __vt__8CManager;
-extern void* lbl_801E8668;
 extern void* PTR_PTR_s_CMapPcs_801e900c;
 
-extern unsigned char MapPcs[];
-
-extern unsigned int lbl_801E89B8[];
-extern unsigned int lbl_801E89C4[];
-extern unsigned int lbl_801E89D0[];
-extern unsigned int lbl_801E89DC[];
-extern unsigned int lbl_801E89E8[];
-extern unsigned int lbl_801E89F4[];
-extern unsigned int lbl_801E8A00[];
-extern unsigned int lbl_801E8A0C[];
-extern unsigned int lbl_801E8A18[];
-extern unsigned int lbl_801E8A24[];
-extern unsigned int lbl_801E8A30[];
-extern unsigned int lbl_801E8A3C[];
-extern unsigned int lbl_801E8A48[];
-extern unsigned int lbl_801E8A54[];
-extern unsigned int lbl_801E8A60[];
-extern unsigned int lbl_801E8A6C[];
-extern unsigned int lbl_801E8A78[];
-extern unsigned int lbl_801E8A84[];
-extern unsigned int lbl_801E8A90[];
-extern unsigned int lbl_801E8A9C[];
-extern unsigned int lbl_801E8AA8[];
-extern unsigned int lbl_801E8AB4[];
-extern unsigned int lbl_801E8AC0[];
-extern unsigned int lbl_801E8ACC[];
+extern unsigned int m_table_desc0__7CMapPcs[];
+extern unsigned int m_table_desc1__7CMapPcs[];
+extern unsigned int m_table_desc2__7CMapPcs[];
+extern unsigned int m_table_desc3__7CMapPcs[];
+extern unsigned int m_table_desc4__7CMapPcs[];
+extern unsigned int m_table_desc5__7CMapPcs[];
+extern unsigned int m_table_desc6__7CMapPcs[];
+extern unsigned int m_table_desc7__7CMapPcs[];
+extern unsigned int m_table_desc8__7CMapPcs[];
+extern unsigned int m_table_desc9__7CMapPcs[];
+extern unsigned int m_table_desc10__7CMapPcs[];
+extern unsigned int m_table_desc11__7CMapPcs[];
+extern unsigned int m_table_desc12__7CMapPcs[];
+extern unsigned int m_table_desc13__7CMapPcs[];
+extern unsigned int m_table_desc14__7CMapPcs[];
+extern unsigned int m_table_desc15__7CMapPcs[];
+extern unsigned int m_table_desc16__7CMapPcs[];
+extern unsigned int m_table_desc17__7CMapPcs[];
+extern unsigned int m_table_desc18__7CMapPcs[];
+extern unsigned int m_table_desc19__7CMapPcs[];
+extern unsigned int m_table_desc20__7CMapPcs[];
+extern unsigned int m_table_desc21__7CMapPcs[];
+extern unsigned int m_table_desc22__7CMapPcs[];
+extern unsigned int m_table_desc23__7CMapPcs[];
 extern unsigned int PTR_s_CMapPcs_GAME__801e8ad8[];
 
-extern unsigned int lbl_8032ECC8;
-extern unsigned int lbl_8032ECCC;
-extern unsigned int lbl_8032ECD0;
-extern unsigned int lbl_8032ECC0;
-extern unsigned int lbl_8032ECC4;
+extern unsigned int s_mapRelProfile0__7CMapPcs;
+extern unsigned int s_mapRelProfile1__7CMapPcs;
+extern unsigned int s_mapRelProfile2__7CMapPcs;
+extern unsigned int s_loadedStageNo__7CMapPcs;
+extern unsigned int s_loadedMapNo__7CMapPcs;
 extern float DrawRangeDefault;
 extern float lbl_8032FA0C;
 extern float lbl_8032FA10;
-extern "C" char lbl_801E8EEC[];
+extern "C" char s_lastLoadedMapPath__7CMapPcs[];
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
@@ -183,13 +180,13 @@ void CMapPcs::LoadMap(char*, void*, unsigned long, unsigned char)
  */
 void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSize, unsigned char mode)
 {
-    unsigned int prevStageNo = lbl_8032ECC0;
-    unsigned int prevMapNo = lbl_8032ECC4;
+    unsigned int prevStageNo = s_loadedStageNo__7CMapPcs;
+    unsigned int prevMapNo = s_loadedMapNo__7CMapPcs;
     Vec unusedVec;
     char mapPath[0x104];
 
-    lbl_8032ECC0 = static_cast<unsigned int>(stageNo);
-    lbl_8032ECC4 = static_cast<unsigned int>(mapNo);
+    s_loadedStageNo__7CMapPcs = static_cast<unsigned int>(stageNo);
+    s_loadedMapNo__7CMapPcs = static_cast<unsigned int>(mapNo);
     sprintf(mapPath, s_dvd_map_stg_03d_map_03d_801d7844, stageNo, mapNo);
 
     if (mode != 2) {
@@ -223,8 +220,8 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
     if ((mode != 1) && (mode != 2)) {
         if ((m_viewerMode != 0) &&
-            (strcmp(lbl_801E8EEC, mapPath) != 0)) {
-            strcpy(lbl_801E8EEC, mapPath);
+            (strcmp(s_lastLoadedMapPath__7CMapPcs, mapPath) != 0)) {
+            strcpy(s_lastLoadedMapPath__7CMapPcs, mapPath);
             if (MapMng.GetDebugPlaySta(0, &unusedVec) == 0) {
                 COctNode* rootNode =
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
@@ -242,8 +239,8 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     }
 
     if (mode == 2) {
-        lbl_8032ECC0 = prevStageNo;
-        lbl_8032ECC4 = prevMapNo;
+        s_loadedStageNo__7CMapPcs = prevStageNo;
+        s_loadedMapNo__7CMapPcs = prevMapNo;
     }
 }
 
@@ -378,8 +375,8 @@ void CMapPcs::calc()
         MapMng.ReadOtm(m_mapName);
         MapMng.ReadMid(m_mapName);
         if ((m_viewerMode != 0) &&
-            (strcmp(lbl_801E8EEC, m_mapName) != 0)) {
-            strcpy(lbl_801E8EEC, m_mapName);
+            (strcmp(s_lastLoadedMapPath__7CMapPcs, m_mapName) != 0)) {
+            strcpy(s_lastLoadedMapPath__7CMapPcs, m_mapName);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode =
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
@@ -412,7 +409,7 @@ void CMapPcs::calc()
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
         if (mapLightHolderArr[1].GetSize() != 0) {
-            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(&lbl_8032ECC8), 0);
+            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(&s_mapRelProfile0__7CMapPcs), 0);
         }
 
         m_forceMapReload = 0;
@@ -822,91 +819,94 @@ void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
  */
 extern "C" void __sinit_p_map_cpp(void)
 {
-	volatile void** base = reinterpret_cast<volatile void**>(MapPcs);
+	volatile void** base = reinterpret_cast<volatile void**>(&MapPcs);
 	*base = &__vt__8CManager;
-	*base = &lbl_801E8668;
+	*base = &__vt__8CProcess;
 	*base = &PTR_PTR_s_CMapPcs_801e900c;
 
 	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;
 
-	dst[0x004 / 4] = lbl_801E89B8[0];
-	dst[0x008 / 4] = lbl_801E89B8[1];
-	dst[0x00C / 4] = lbl_801E89B8[2];
-	dst[0x010 / 4] = lbl_801E89C4[0];
-	dst[0x014 / 4] = lbl_801E89C4[1];
-	dst[0x018 / 4] = lbl_801E89C4[2];
-	dst[0x01C / 4] = lbl_801E89D0[0];
-	dst[0x020 / 4] = lbl_801E89D0[1];
-	dst[0x024 / 4] = lbl_801E89D0[2];
-	dst[0x030 / 4] = lbl_801E89DC[0];
-	dst[0x034 / 4] = lbl_801E89DC[1];
-	dst[0x038 / 4] = lbl_801E89DC[2];
-	dst[0x044 / 4] = lbl_801E89E8[0];
-	dst[0x048 / 4] = lbl_801E89E8[1];
-	dst[0x04C / 4] = lbl_801E89E8[2];
-	dst[0x058 / 4] = lbl_801E89F4[0];
-	dst[0x05C / 4] = lbl_801E89F4[1];
-	dst[0x060 / 4] = lbl_801E89F4[2];
-	dst[0x06C / 4] = lbl_801E8A00[0];
-	dst[0x070 / 4] = lbl_801E8A00[1];
-	dst[0x074 / 4] = lbl_801E8A00[2];
-	dst[0x080 / 4] = lbl_801E8A0C[0];
-	dst[0x084 / 4] = lbl_801E8A0C[1];
-	dst[0x088 / 4] = lbl_801E8A0C[2];
-	dst[0x160 / 4] = lbl_801E8A18[0];
-	dst[0x164 / 4] = lbl_801E8A18[1];
-	dst[0x168 / 4] = lbl_801E8A18[2];
+	dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
+	dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];
+	dst[0x00C / 4] = m_table_desc0__7CMapPcs[2];
+	dst[0x010 / 4] = m_table_desc1__7CMapPcs[0];
+	dst[0x014 / 4] = m_table_desc1__7CMapPcs[1];
+	dst[0x018 / 4] = m_table_desc1__7CMapPcs[2];
+	dst[0x01C / 4] = m_table_desc2__7CMapPcs[0];
+	dst[0x020 / 4] = m_table_desc2__7CMapPcs[1];
+	dst[0x024 / 4] = m_table_desc2__7CMapPcs[2];
+	dst[0x030 / 4] = m_table_desc3__7CMapPcs[0];
+	dst[0x034 / 4] = m_table_desc3__7CMapPcs[1];
+	dst[0x038 / 4] = m_table_desc3__7CMapPcs[2];
+	dst[0x044 / 4] = m_table_desc4__7CMapPcs[0];
+	dst[0x048 / 4] = m_table_desc4__7CMapPcs[1];
+	dst[0x04C / 4] = m_table_desc4__7CMapPcs[2];
+	dst[0x058 / 4] = m_table_desc5__7CMapPcs[0];
+	dst[0x05C / 4] = m_table_desc5__7CMapPcs[1];
+	dst[0x060 / 4] = m_table_desc5__7CMapPcs[2];
+	dst[0x06C / 4] = m_table_desc6__7CMapPcs[0];
+	dst[0x070 / 4] = m_table_desc6__7CMapPcs[1];
+	dst[0x074 / 4] = m_table_desc6__7CMapPcs[2];
+	dst[0x080 / 4] = m_table_desc7__7CMapPcs[0];
+	dst[0x084 / 4] = m_table_desc7__7CMapPcs[1];
+	dst[0x088 / 4] = m_table_desc7__7CMapPcs[2];
+	dst[0x160 / 4] = m_table_desc8__7CMapPcs[0];
+	dst[0x164 / 4] = m_table_desc8__7CMapPcs[1];
+	dst[0x168 / 4] = m_table_desc8__7CMapPcs[2];
 
-	dst[0x16C / 4] = lbl_801E8A24[0];
-	dst[0x170 / 4] = lbl_801E8A24[1];
-	dst[0x174 / 4] = lbl_801E8A24[2];
-	dst[0x178 / 4] = lbl_801E8A30[0];
-	dst[0x17C / 4] = lbl_801E8A30[1];
-	dst[0x180 / 4] = lbl_801E8A30[2];
-	dst[0x18C / 4] = lbl_801E8A3C[0];
-	dst[0x190 / 4] = lbl_801E8A3C[1];
-	dst[0x194 / 4] = lbl_801E8A3C[2];
-	dst[0x1A0 / 4] = lbl_801E8A48[0];
-	dst[0x1A4 / 4] = lbl_801E8A48[1];
-	dst[0x1A8 / 4] = lbl_801E8A48[2];
-	dst[0x1B4 / 4] = lbl_801E8A54[0];
-	dst[0x1B8 / 4] = lbl_801E8A54[1];
-	dst[0x1BC / 4] = lbl_801E8A54[2];
-	dst[0x1C8 / 4] = lbl_801E8A60[0];
-	dst[0x1CC / 4] = lbl_801E8A60[1];
-	dst[0x1D0 / 4] = lbl_801E8A60[2];
-	dst[0x1DC / 4] = lbl_801E8A6C[0];
-	dst[0x1E0 / 4] = lbl_801E8A6C[1];
-	dst[0x1E4 / 4] = lbl_801E8A6C[2];
-	dst[0x2BC / 4] = lbl_801E8A78[0];
-	dst[0x2C0 / 4] = lbl_801E8A78[1];
-	dst[0x2C4 / 4] = lbl_801E8A78[2];
-	dst[0x2C8 / 4] = lbl_801E8A84[0];
-	dst[0x2CC / 4] = lbl_801E8A84[1];
-	dst[0x2D0 / 4] = lbl_801E8A84[2];
-	dst[0x2D4 / 4] = lbl_801E8A90[0];
-	dst[0x2D8 / 4] = lbl_801E8A90[1];
-	dst[0x2DC / 4] = lbl_801E8A90[2];
-	dst[0x2E8 / 4] = lbl_801E8A9C[0];
-	dst[0x2EC / 4] = lbl_801E8A9C[1];
-	dst[0x2F0 / 4] = lbl_801E8A9C[2];
+	dst[0x16C / 4] = m_table_desc9__7CMapPcs[0];
+	dst[0x170 / 4] = m_table_desc9__7CMapPcs[1];
+	dst[0x174 / 4] = m_table_desc9__7CMapPcs[2];
+	dst[0x178 / 4] = m_table_desc10__7CMapPcs[0];
+	dst[0x17C / 4] = m_table_desc10__7CMapPcs[1];
+	dst[0x180 / 4] = m_table_desc10__7CMapPcs[2];
+	dst[0x18C / 4] = m_table_desc11__7CMapPcs[0];
+	dst[0x190 / 4] = m_table_desc11__7CMapPcs[1];
+	dst[0x194 / 4] = m_table_desc11__7CMapPcs[2];
+	dst[0x1A0 / 4] = m_table_desc12__7CMapPcs[0];
+	dst[0x1A4 / 4] = m_table_desc12__7CMapPcs[1];
+	dst[0x1A8 / 4] = m_table_desc12__7CMapPcs[2];
+	dst[0x1B4 / 4] = m_table_desc13__7CMapPcs[0];
+	dst[0x1B8 / 4] = m_table_desc13__7CMapPcs[1];
+	dst[0x1BC / 4] = m_table_desc13__7CMapPcs[2];
+	dst[0x1C8 / 4] = m_table_desc14__7CMapPcs[0];
+	dst[0x1CC / 4] = m_table_desc14__7CMapPcs[1];
+	dst[0x1D0 / 4] = m_table_desc14__7CMapPcs[2];
+	dst[0x1DC / 4] = m_table_desc15__7CMapPcs[0];
+	dst[0x1E0 / 4] = m_table_desc15__7CMapPcs[1];
+	dst[0x1E4 / 4] = m_table_desc15__7CMapPcs[2];
+	dst[0x2BC / 4] = m_table_desc16__7CMapPcs[0];
+	dst[0x2C0 / 4] = m_table_desc16__7CMapPcs[1];
+	dst[0x2C4 / 4] = m_table_desc16__7CMapPcs[2];
+	dst[0x2C8 / 4] = m_table_desc17__7CMapPcs[0];
+	dst[0x2CC / 4] = m_table_desc17__7CMapPcs[1];
+	dst[0x2D0 / 4] = m_table_desc17__7CMapPcs[2];
+	dst[0x2D4 / 4] = m_table_desc18__7CMapPcs[0];
+	dst[0x2D8 / 4] = m_table_desc18__7CMapPcs[1];
+	dst[0x2DC / 4] = m_table_desc18__7CMapPcs[2];
+	dst[0x2E8 / 4] = m_table_desc19__7CMapPcs[0];
+	dst[0x2EC / 4] = m_table_desc19__7CMapPcs[1];
+	dst[0x2F0 / 4] = m_table_desc19__7CMapPcs[2];
 
-	dst[0x2FC / 4] = lbl_801E8AA8[0];
-	dst[0x300 / 4] = lbl_801E8AA8[1];
-	dst[0x304 / 4] = lbl_801E8AA8[2];
-	dst[0x310 / 4] = lbl_801E8AB4[0];
-	dst[0x314 / 4] = lbl_801E8AB4[1];
-	dst[0x318 / 4] = lbl_801E8AB4[2];
-	dst[0x324 / 4] = lbl_801E8AC0[0];
-	dst[0x328 / 4] = lbl_801E8AC0[1];
-	dst[0x32C / 4] = lbl_801E8AC0[2];
-	dst[0x338 / 4] = lbl_801E8ACC[0];
-	dst[0x33C / 4] = lbl_801E8ACC[1];
-	dst[0x340 / 4] = lbl_801E8ACC[2];
+	dst[0x2FC / 4] = m_table_desc20__7CMapPcs[0];
+	dst[0x300 / 4] = m_table_desc20__7CMapPcs[1];
+	dst[0x304 / 4] = m_table_desc20__7CMapPcs[2];
+	dst[0x310 / 4] = m_table_desc21__7CMapPcs[0];
+	dst[0x314 / 4] = m_table_desc21__7CMapPcs[1];
+	dst[0x318 / 4] = m_table_desc21__7CMapPcs[2];
+	dst[0x324 / 4] = m_table_desc22__7CMapPcs[0];
+	dst[0x328 / 4] = m_table_desc22__7CMapPcs[1];
+	dst[0x32C / 4] = m_table_desc22__7CMapPcs[2];
+	dst[0x338 / 4] = m_table_desc23__7CMapPcs[0];
+	dst[0x33C / 4] = m_table_desc23__7CMapPcs[1];
+	dst[0x340 / 4] = m_table_desc23__7CMapPcs[2];
 
-	__register_global_object(&lbl_8032ECC8, reinterpret_cast<void*>(__dt__11CRelProfileFv), MapPcs + 0x188);
-	__register_global_object(&lbl_8032ECCC, reinterpret_cast<void*>(__dt__11CRelProfileFv), MapPcs + 0x194);
-	__register_global_object(&lbl_8032ECD0, reinterpret_cast<void*>(__dt__11CRelProfileFv), MapPcs + 0x1A0);
+	__register_global_object(&s_mapRelProfile0__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
+                             reinterpret_cast<unsigned char*>(&MapPcs) + 0x188);
+	__register_global_object(&s_mapRelProfile1__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
+                             reinterpret_cast<unsigned char*>(&MapPcs) + 0x194);
+	__register_global_object(&s_mapRelProfile2__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
+                             reinterpret_cast<unsigned char*>(&MapPcs) + 0x1A0);
 }
 
 /*
@@ -926,3 +926,4 @@ extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDel
 	}
 	return self;
 }
+

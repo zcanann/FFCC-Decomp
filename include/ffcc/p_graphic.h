@@ -80,4 +80,6 @@ public:
     short m_blurScale;              // 0x0F2
 };
 
+extern CGraphicPcs GraphicsPcs;
+
 #endif // _FFCC_P_GRAPHIC_H_

@@ -2,11 +2,11 @@
 #include "ffcc/gxfunc.h"
 #include <string.h>
 
-extern float lbl_8032f888;
-extern float lbl_8032f88c;
-extern float lbl_8032f8a0;
-extern float lbl_8032f8a4;
-extern float lbl_8032f8a8;
+extern float FLOAT_8032F888;
+extern float FLOAT_8032F88C;
+extern float FLOAT_8032F8A0;
+extern float FLOAT_8032F8A4;
+extern float FLOAT_8032F8A8;
 extern CMath Math;
 
 extern struct {
@@ -173,8 +173,8 @@ void CUtil::SetOrthoEnv()
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
     GXSetCurrentMtx(0);
-    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888,
-               lbl_8032f88c);
+    C_MTXOrtho(orthoMtx, FLOAT_8032F888, FLOAT_8032F8A0, FLOAT_8032F888, FLOAT_8032F8A4, FLOAT_8032F888,
+               FLOAT_8032F88C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 }
 
@@ -216,14 +216,14 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	float t2 = t * t;
 	float t3 = t2 * t;
 
-	extern float lbl_8032f8ac;
-	extern float lbl_8032f8b0;
-	extern float lbl_8032f8b4;
-	extern float lbl_8032f88c;
+	extern float FLOAT_8032F8AC;
+	extern float FLOAT_8032F8B0;
+	extern float FLOAT_8032F8B4;
+	extern float FLOAT_8032F88C;
 
-	float h01 = (lbl_8032f8b4 * t3) + (lbl_8032f8b0 * t2);
-	float h00 = lbl_8032f88c + (lbl_8032f8ac * t3) - (lbl_8032f8b0 * t2);
-	float h10 = t - ((lbl_8032f8ac * t2) - t3);
+	float h01 = (FLOAT_8032F8B4 * t3) + (FLOAT_8032F8B0 * t2);
+	float h00 = FLOAT_8032F88C + (FLOAT_8032F8AC * t3) - (FLOAT_8032F8B0 * t2);
+	float h10 = t - ((FLOAT_8032F8AC * t2) - t3);
 	float h11 = t3 - t2;
 
 	out.x = (h11 * tan1.x) + (h10 * tan0.x) + (h00 * p1.x) + (h01 * p2.x);
@@ -327,14 +327,14 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
 	float u1, v1, u2, v2;
 	
 	// Default UV coordinates if null
-	extern float lbl_8032f888;  // 0.0f
-	extern float lbl_8032f88c;  // 1.0f
+	extern float FLOAT_8032F888;  // 0.0f
+	extern float FLOAT_8032F88C;  // 1.0f
 	
 	if (uv1 == NULL || uv2 == NULL) {
-		u1 = lbl_8032f888;  // 0.0f
-		v1 = lbl_8032f888;  // 0.0f  
-		u2 = lbl_8032f88c;  // 1.0f
-		v2 = lbl_8032f88c;  // 1.0f
+		u1 = FLOAT_8032F888;  // 0.0f
+		v1 = FLOAT_8032F888;  // 0.0f  
+		u2 = FLOAT_8032F88C;  // 1.0f
+		v2 = FLOAT_8032F88C;  // 1.0f
 	} else {
 		u1 = uv1->x;
 		v1 = uv1->y;
@@ -379,14 +379,14 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
 	float u1, v1, u2, v2;
 	
 	// Default UV coordinates if null
-	extern float lbl_8032f888;  // 0.0f
-	extern float lbl_8032f88c;  // 1.0f
+	extern float FLOAT_8032F888;  // 0.0f
+	extern float FLOAT_8032F88C;  // 1.0f
 	
 	if (uv1 == NULL || uv2 == NULL) {
-		u1 = lbl_8032f888;  // 0.0f
-		v1 = lbl_8032f888;  // 0.0f
-		u2 = lbl_8032f88c;  // 1.0f
-		v2 = lbl_8032f88c;  // 1.0f
+		u1 = FLOAT_8032F888;  // 0.0f
+		v1 = FLOAT_8032F888;  // 0.0f
+		u2 = FLOAT_8032F88C;  // 1.0f
+		v2 = FLOAT_8032F88C;  // 1.0f
 	} else {
 		u1 = uv1->x;
 		v1 = uv1->y;
@@ -463,8 +463,8 @@ void CUtil::BeginQuadEnv()
     GXLoadPosMtxImm(modelMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888,
-               lbl_8032f88c);
+    C_MTXOrtho(orthoMtx, FLOAT_8032F888, FLOAT_8032F8A0, FLOAT_8032F888, FLOAT_8032F8A4, FLOAT_8032F888,
+               FLOAT_8032F88C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     GXSetCullMode(GX_CULL_NONE);
@@ -533,7 +533,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXLoadPosMtxImm(modelMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    C_MTXOrtho(orthoMtx, FLOAT_8032F888, FLOAT_8032F8A0, FLOAT_8032F888, FLOAT_8032F8A4, FLOAT_8032F888, FLOAT_8032F88C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     GXSetCullMode(GX_CULL_NONE);
@@ -569,13 +569,13 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetAlphaUpdate(GX_FALSE);
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, lbl_8032f8a8);
+    GXPosition3f32(x, y, FLOAT_8032F8A8);
     GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x2, y, lbl_8032f8a8);
+    GXPosition3f32(x2, y, FLOAT_8032F8A8);
     GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x2, y2, lbl_8032f8a8);
+    GXPosition3f32(x2, y2, FLOAT_8032F8A8);
     GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x, y2, lbl_8032f8a8);
+    GXPosition3f32(x, y2, FLOAT_8032F8A8);
     GXColor1u32(*reinterpret_cast<u32*>(&white));
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -613,7 +613,7 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXLoadPosMtxImm(modelMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    C_MTXOrtho(orthoMtx, FLOAT_8032F888, FLOAT_8032F8A0, FLOAT_8032F888, FLOAT_8032F8A4, FLOAT_8032F888, FLOAT_8032F88C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     GXSetCullMode(GX_CULL_NONE);
@@ -646,13 +646,13 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXSetNumChans(1);
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, lbl_8032f888);
+    GXPosition3f32(x, y, FLOAT_8032F888);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
-    GXPosition3f32(x2, y, lbl_8032f888);
+    GXPosition3f32(x2, y, FLOAT_8032F888);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
-    GXPosition3f32(x2, y2, lbl_8032f888);
+    GXPosition3f32(x2, y2, FLOAT_8032F888);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
-    GXPosition3f32(x, y2, lbl_8032f888);
+    GXPosition3f32(x, y2, FLOAT_8032F888);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -686,7 +686,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     GXLoadPosMtxImm(modelMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    C_MTXOrtho(orthoMtx, FLOAT_8032F888, FLOAT_8032F8A0, FLOAT_8032F888, FLOAT_8032F8A4, FLOAT_8032F888, FLOAT_8032F88C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     GXSetCullMode(GX_CULL_NONE);
@@ -728,10 +728,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     }
 
     if (color == 0) {
-        float u1 = lbl_8032f888;
-        float v1 = lbl_8032f888;
-        float u2 = lbl_8032f88c;
-        float v2 = lbl_8032f88c;
+        float u1 = FLOAT_8032F888;
+        float v1 = FLOAT_8032F888;
+        float u2 = FLOAT_8032F88C;
+        float v2 = FLOAT_8032F88C;
 
         if (uv1 != 0 && uv2 != 0) {
             u1 = uv1->x;
@@ -741,26 +741,26 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         }
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-        GXPosition3f32(x, y, lbl_8032f888);
+        GXPosition3f32(x, y, FLOAT_8032F888);
         GXColor1u32(0xFFFFFFFF);
         GXTexCoord2f32(u1, v1);
 
-        GXPosition3f32(x2, y, lbl_8032f888);
+        GXPosition3f32(x2, y, FLOAT_8032F888);
         GXColor1u32(0xFFFFFFFF);
         GXTexCoord2f32(u2, v1);
 
-        GXPosition3f32(x2, y2, lbl_8032f888);
+        GXPosition3f32(x2, y2, FLOAT_8032F888);
         GXColor1u32(0xFFFFFFFF);
         GXTexCoord2f32(u2, v2);
 
-        GXPosition3f32(x, y2, lbl_8032f888);
+        GXPosition3f32(x, y2, FLOAT_8032F888);
         GXColor1u32(0xFFFFFFFF);
         GXTexCoord2f32(u1, v2);
     } else {
-        float u1 = lbl_8032f888;
-        float v1 = lbl_8032f888;
-        float u2 = lbl_8032f88c;
-        float v2 = lbl_8032f88c;
+        float u1 = FLOAT_8032F888;
+        float v1 = FLOAT_8032F888;
+        float u2 = FLOAT_8032F88C;
+        float v2 = FLOAT_8032F88C;
         u32 colorValue = *reinterpret_cast<u32*>(color);
 
         if (uv1 != 0 && uv2 != 0) {
@@ -771,19 +771,19 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         }
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-        GXPosition3f32(x, y, lbl_8032f888);
+        GXPosition3f32(x, y, FLOAT_8032F888);
         GXColor1u32(colorValue);
         GXTexCoord2f32(u1, v1);
 
-        GXPosition3f32(x2, y, lbl_8032f888);
+        GXPosition3f32(x2, y, FLOAT_8032F888);
         GXColor1u32(colorValue);
         GXTexCoord2f32(u2, v1);
 
-        GXPosition3f32(x2, y2, lbl_8032f888);
+        GXPosition3f32(x2, y2, FLOAT_8032F888);
         GXColor1u32(colorValue);
         GXTexCoord2f32(u2, v2);
 
-        GXPosition3f32(x, y2, lbl_8032f888);
+        GXPosition3f32(x, y2, FLOAT_8032F888);
         GXColor1u32(colorValue);
         GXTexCoord2f32(u1, v2);
     }
@@ -825,7 +825,7 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     GXLoadPosMtxImm(modelMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    C_MTXOrtho(orthoMtx, FLOAT_8032F888, FLOAT_8032F8A0, FLOAT_8032F888, FLOAT_8032F8A4, FLOAT_8032F888, FLOAT_8032F88C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     GXSetCullMode(GX_CULL_NONE);
@@ -869,10 +869,10 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
         SetPaletteEnv(texture);
     }
 
-    float u1 = lbl_8032f888;
-    float v1 = lbl_8032f888;
-    float u2 = lbl_8032f88c;
-    float v2 = lbl_8032f88c;
+    float u1 = FLOAT_8032F888;
+    float v1 = FLOAT_8032F888;
+    float u2 = FLOAT_8032F88C;
+    float v2 = FLOAT_8032F88C;
     if (uv1 != 0 && uv2 != 0) {
         u1 = uv1->x;
         v1 = uv1->y;
@@ -886,19 +886,19 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     }
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, lbl_8032f888);
+    GXPosition3f32(x, y, FLOAT_8032F888);
     GXColor1u32(colorValue);
     GXTexCoord2f32(u1, v1);
 
-    GXPosition3f32(x2, y, lbl_8032f888);
+    GXPosition3f32(x2, y, FLOAT_8032F888);
     GXColor1u32(colorValue);
     GXTexCoord2f32(u2, v1);
 
-    GXPosition3f32(x2, y2, lbl_8032f888);
+    GXPosition3f32(x2, y2, FLOAT_8032F888);
     GXColor1u32(colorValue);
     GXTexCoord2f32(u2, v2);
 
-    GXPosition3f32(x, y2, lbl_8032f888);
+    GXPosition3f32(x, y2, FLOAT_8032F888);
     GXColor1u32(colorValue);
     GXTexCoord2f32(u1, v2);
 
@@ -1306,3 +1306,4 @@ void CUtil::SNl()
 {
 	// TODO
 }
+

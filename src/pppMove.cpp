@@ -1,8 +1,8 @@
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 
 extern int gPppCalcDisabled;   // Global enable flag
-extern float lbl_8032FED8; // Zero constant
 
 struct PppMoveObj {
     f32 x;           // 0x0
@@ -30,7 +30,7 @@ void pppMoveCon(void* basePtr, _pppCtrlTable* ctrlTable)
     PppMoveObj* moveObj = (PppMoveObj*)((u8*)basePtr + offset + 0x80);
     
     // Initialize to zero (store order: z, y, x to match assembly)
-    f32 zero = lbl_8032FED8;
+    f32 zero = kPppMoveZero;
     moveObj->z = zero;
     moveObj->y = zero;
     moveObj->x = zero;

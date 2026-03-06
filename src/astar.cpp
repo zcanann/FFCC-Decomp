@@ -7,6 +7,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 
@@ -37,7 +38,6 @@ extern Mtx gFlatPosMtx;
 extern unsigned char gMapHitFace[];
 extern char s_A__GROUP__d_801dd6a8[];
 extern char s_addAStar___5f____5f____5f___d____801dd6b4[];
-extern char lbl_803320A0[];
 extern CMath Math;
 extern "C" int __cntlzw(unsigned int);
 
@@ -738,7 +738,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	portal.m_groupA = groupLow;
 	portal.m_groupB = groupHigh;
 
-	System.Printf(lbl_803320A0);
+	System.Printf(kAStarGroupDebugLabel);
 
 	for (int i = 0; i < 64; ++i)
 	{

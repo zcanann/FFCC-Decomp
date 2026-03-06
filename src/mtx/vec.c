@@ -1,8 +1,6 @@
 #include "dolphin/mtx.h"
+#include "ffcc/symbols_shared.h"
 #include "math.h"
-
-extern f32 lbl_80333718;
-extern f32 lbl_8033371C;
 
 #define R_RET fp1
 #define FP2 fp2
@@ -123,7 +121,7 @@ f32 PSVECMag(const register Vec *v)
     register f32 recip;
     register f32 n_0;
 
-    half_c = lbl_80333718;
+    half_c = kVecInvSqrtHalfConst;
 #ifdef __MWERKS__ // clang-format off
 	asm {
 		psq_l       f0, 0(v), 0, 0 /* qr0 */
@@ -148,7 +146,7 @@ f32 PSVECMag(const register Vec *v)
 		}
 #endif // clang-format on
 
-        three_c = lbl_8033371C;
+        three_c = kVecInvSqrtThreeConst;
 
 #ifdef __MWERKS__ // clang-format off
 		asm {
@@ -288,7 +286,7 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
         ps_sub      f0, f0, f1    
 	}
 
-    half_c = lbl_80333718;
+    half_c = kVecInvSqrtHalfConst;
 
     asm {
         ps_madd     square_dist, f0, f0, f2
@@ -303,7 +301,7 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
     if (zero == square_dist) {
     }
     else {
-        three_c = lbl_8033371C;
+        three_c = kVecInvSqrtThreeConst;
 
         asm {
             frsqrte     recip, square_dist

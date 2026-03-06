@@ -1,5 +1,6 @@
 #include "ffcc/pppChangeTex.h"
 #include "ffcc/graphic.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/gx.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -41,7 +42,6 @@ struct ChangeTexMeshRef {
 extern char MaterialMan[];
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 extern void GXCallDisplayList(void*, unsigned int);
-extern float lbl_80332040;
 extern float FLOAT_80332020;
 extern float FLOAT_80332028;
 extern double DOUBLE_80332030;
@@ -175,7 +175,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
  */
 void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
-	float init = lbl_80332040;
+	float init = kPppChangeTexInit;
 	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
 	int* stateInt = (int*)state;
 
@@ -201,7 +201,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
-	float init = lbl_80332040;
+	float init = kPppChangeTexInit;
 
 	state[0] = init;
 	state[2] = init;

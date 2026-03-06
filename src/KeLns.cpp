@@ -1,7 +1,6 @@
 #include "ffcc/KeLns.h"
 #include "ffcc/pppPart.h"
-
-extern "C" const float lbl_803305E8;
+#include "ffcc/symbols_shared.h"
 
 /*
  * --INFO--
@@ -15,5 +14,5 @@ extern "C" const float lbl_803305E8;
 void KeLnsLp_Init(_KeLnsLp* kelnsLp)
 {
 	pppUnitMatrix(kelnsLp->matrix);
-	kelnsLp->field_0x9c = lbl_803305E8;
+	kelnsLp->field_0x9c = kKeLnsLineDefaultLength;
 }

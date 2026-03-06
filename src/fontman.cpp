@@ -532,7 +532,7 @@ void CFont::DrawQuit()
 {
     Mtx44 screenMtx;
 
-    PSMTX44Copy((float(*)[4])(CameraPcs + 0x48), screenMtx);
+    PSMTX44Copy((float(*)[4])(CameraPcs + 0x94), screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 

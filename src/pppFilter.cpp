@@ -1,5 +1,6 @@
 #include "ffcc/pppFilter.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 #include <stddef.h>
 
@@ -10,9 +11,6 @@ struct _pppEnvStLite {
     CMapMesh** m_mapMeshPtr;
 };
 
-extern float lbl_803320C8;
-extern float lbl_803320CC;
-extern float lbl_803320D0;
 extern CUtil gUtil;
 extern int gPppCalcDisabled;
 
@@ -94,7 +92,7 @@ void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTa
 
     if (step->dataValIndex == 0xFFFF) {
         gUtil.RenderColorQuad(
-            lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, serializedData->m_color);
+            kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY, serializedData->m_color);
         return;
     }
 
@@ -102,7 +100,10 @@ void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTa
     _pppTextureInfo* textureInfo = (_pppTextureInfo*)GetTexture__8CMapMeshFP12CMaterialSetRi(
         ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
     RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-        &gUtil, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
+        &gUtil, kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY, &textureInfo->m_texObj, 0, 0,
         &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
+
+
+
 

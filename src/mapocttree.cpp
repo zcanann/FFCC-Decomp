@@ -7,11 +7,11 @@
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
+#include "ffcc/symbols_shared.h"
 
 extern float kOctTreeBoundMinInit;
 extern float kOctTreeBoundMaxInit;
 extern float kOctTreeCylinderPad;
-extern float lbl_8032F964;
 extern CMaterialMan MaterialMan;
 static unsigned long s_clearFlagMask;
 struct CBoundRaw
@@ -774,7 +774,7 @@ void COctTree::Draw(unsigned char drawType)
 	                          reinterpret_cast<CLightPcs::CBumpLight*>(*reinterpret_cast<void**>(mapObj + 0x10)),
 	                          reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
 
-	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
 		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
 	}
 
@@ -789,7 +789,7 @@ void COctTree::Draw(unsigned char drawType)
 		GXSetZMode(1, GX_LEQUAL, 1);
 	}
 
-	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
 		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
 	}
 }
@@ -819,14 +819,14 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 
 	LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8), 0, reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
 
-	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
 		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
 	}
 
 	reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
 	DrawCharaShadowTypeMeshFlag_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
 
-	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+	if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(mapObj + 0x40)) {
 		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
 	}
 }
@@ -2173,3 +2173,4 @@ extern "C" void __sinit_mapocttree_cpp()
 	s_cyl.m_radius2 = kOctTreeBoundMaxInit;
 	s_cyl.m_direction2.z = kOctTreeBoundMaxInit;
 }
+

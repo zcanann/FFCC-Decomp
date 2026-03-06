@@ -3,17 +3,12 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include <math.h>
 
 extern int gPppCalcDisabled;
-extern f32 lbl_80331908;
-extern f32 lbl_8033190C;
-extern f32 lbl_80331910;
-extern f32 lbl_80331914;
-extern f32 lbl_80331918;
-extern f32 lbl_8033191C;
 
 extern "C" {
 s32 CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
@@ -39,7 +34,7 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct pp
 
     serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
     pfVar2 = (f32*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
-    scale = lbl_80331908;
+    scale = kPppConformBgNormalZero;
     pfVar2[2] = scale;
     pfVar2[1] = scale;
     pfVar2[0] = scale;
@@ -128,44 +123,44 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     local_164.y = *(f32*)((u8*)owner + 0x4f0);
                     local_164.z = *(f32*)((u8*)owner + 0x4f4);
                 } else {
-                    local_164.x = lbl_80331908;
-                    local_164.y = lbl_8033190C;
-                    local_164.z = lbl_80331908;
+                    local_164.x = kPppConformBgNormalZero;
+                    local_164.y = kPppConformBgNormalOne;
+                    local_164.z = kPppConformBgNormalZero;
                 }
             } else if (mode == 1) {
                 hitFound = 1;
                 Game.game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
             } else if (mode == 2) {
-                local_17c = lbl_80331908;
-                local_178 = lbl_80331910;
-                local_174 = lbl_80331908;
+                local_17c = kPppConformBgNormalZero;
+                local_178 = kPppConformBgNormalDownRayY;
+                local_174 = kPppConformBgNormalZero;
                 local_f0 = matrixY + param2->m_arg3;
-                local_c4 = lbl_80331914;
-                local_c8 = lbl_80331914;
-                local_cc = lbl_80331914;
-                local_b8 = lbl_80331918;
-                local_bc = lbl_80331918;
-                local_c0 = lbl_80331918;
-                local_dc = lbl_80331908;
-                local_d8 = lbl_80331910;
-                local_d4 = lbl_80331908;
-                local_d0 = lbl_80331908;
+                local_c4 = kPppConformBgNormalCylinderRadius;
+                local_c8 = kPppConformBgNormalCylinderRadius;
+                local_cc = kPppConformBgNormalCylinderRadius;
+                local_b8 = kPppConformBgNormalCylinderHeight;
+                local_bc = kPppConformBgNormalCylinderHeight;
+                local_c0 = kPppConformBgNormalCylinderHeight;
+                local_dc = kPppConformBgNormalZero;
+                local_d8 = kPppConformBgNormalDownRayY;
+                local_d4 = kPppConformBgNormalZero;
+                local_d0 = kPppConformBgNormalZero;
                 local_f4 = matrixX;
                 local_ec = matrixZ;
 
                 hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                     &MapMng, &local_f4, &local_17c, 0xffffffff);
                 if (hitFound == 0) {
-                    local_164.x = lbl_80331908;
-                    local_164.y = lbl_8033190C;
-                    local_164.z = lbl_80331908;
+                    local_164.x = kPppConformBgNormalZero;
+                    local_164.y = kPppConformBgNormalOne;
+                    local_164.z = kPppConformBgNormalZero;
                     local_170.x = matrixX;
                     local_170.y = matrixY;
                     local_170.z = matrixZ;
                 } else {
                     CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
                     GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_164);
-                    if (local_170.y < matrixY - lbl_8033191C) {
+                    if (local_170.y < matrixY - kPppConformBgNormalGroundSnapLimit) {
                         local_170.y = matrixY;
                     }
                 }
@@ -181,11 +176,11 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             local_18c.x = serializedState[0];
             local_18c.y = serializedState[1];
             local_18c.z = serializedState[2];
-            local_18c.w = lbl_8033190C;
+            local_18c.w = kPppConformBgNormalOne;
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
-            local_19c.w = lbl_8033190C;
+            local_19c.w = kPppConformBgNormalOne;
             C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
             serializedState[0] = local_1ac.x;
             serializedState[1] = local_1ac.y;
@@ -199,7 +194,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
                 trigValue = sin((f64)*(f32*)((u8*)owner + 0x1a8));
                 local_14c.x = (f32)trigValue;
-                local_14c.y = lbl_80331908;
+                local_14c.y = kPppConformBgNormalZero;
                 trigValue = cos((f64)*(f32*)((u8*)owner + 0x1a8));
                 local_14c.z = (f32)trigValue;
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
@@ -207,9 +202,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
             } else {
-                local_140.x = lbl_8033190C;
-                local_140.y = lbl_80331908;
-                local_140.z = lbl_80331908;
+                local_140.x = kPppConformBgNormalOne;
+                local_140.y = kPppConformBgNormalZero;
+                local_140.z = kPppConformBgNormalZero;
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
@@ -241,19 +236,19 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     local_134 = *(f32*)((u8*)owner + 0x15c);
                     local_130 = *(f32*)((u8*)owner + 0x160);
                     local_12c = *(f32*)((u8*)owner + 0x164);
-                    local_1b8 = lbl_80331908;
-                    local_1b4 = lbl_80331910;
-                    local_1b0 = lbl_80331908;
-                    local_104 = lbl_80331914;
-                    local_108 = lbl_80331914;
-                    local_10c = lbl_80331914;
-                    local_f8 = lbl_80331918;
-                    local_fc = lbl_80331918;
-                    local_100 = lbl_80331918;
-                    local_11c = lbl_80331908;
-                    local_118 = lbl_80331910;
-                    local_114 = lbl_80331908;
-                    local_110 = lbl_80331908;
+                    local_1b8 = kPppConformBgNormalZero;
+                    local_1b4 = kPppConformBgNormalDownRayY;
+                    local_1b0 = kPppConformBgNormalZero;
+                    local_104 = kPppConformBgNormalCylinderRadius;
+                    local_108 = kPppConformBgNormalCylinderRadius;
+                    local_10c = kPppConformBgNormalCylinderRadius;
+                    local_f8 = kPppConformBgNormalCylinderHeight;
+                    local_fc = kPppConformBgNormalCylinderHeight;
+                    local_100 = kPppConformBgNormalCylinderHeight;
+                    local_11c = kPppConformBgNormalZero;
+                    local_118 = kPppConformBgNormalDownRayY;
+                    local_114 = kPppConformBgNormalZero;
+                    local_110 = kPppConformBgNormalZero;
 
                     hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                         &MapMng, &local_134, &local_1b8, 0xffffffff);
@@ -294,4 +289,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         }
     }
 }
+
+
+
+
+
+
 

@@ -9,31 +9,7 @@
 #include "dolphin/axfx.h"
 #include <string.h>
 
-extern u32* DAT_8032f444;
-extern int* DAT_8032f41c;
-extern int* DAT_8032f420;
-extern unsigned int DAT_8032ec30;
-extern int DAT_8032f4ac;
-extern u32* DAT_8032f4b0;
-extern u32 DAT_8032f4b4;
-extern int* DAT_8032f4b8;
-extern int DAT_8032f470;
-extern void* DAT_8032f3f0;
-extern int DAT_8032f3f8;
-extern void* DAT_8032f3fc;
-extern int DAT_8032f430;
-extern int DAT_8032f434;
-extern int DAT_8032f478;
-extern int DAT_8032f410;
-extern int DAT_8032f40c;
-extern int DAT_8032f424;
-extern void* DAT_8032f3f4;
 extern int DAT_8032f400;
-extern s16 DAT_8021ddce[];
-extern s16 DAT_8021dfce[];
-extern s16 DAT_8021de4e;
-extern u32 DAT_8021d7f0[];
-extern int DAT_8021d820[];
 struct RedReverbDATA {
     void (*callback)(void*, void*);
     void* context;
@@ -51,9 +27,6 @@ struct RedReverbDATA {
  */
 u8 GetRandomData()
 {
-    extern u8 DAT_8032f4a8;
-    extern u8 DAT_8021dcce[];
-    
     u8 uVar1 = (u8)DAT_8032f4a8;
     DAT_8032f4a8 = DAT_8032f4a8 + 1;
     return DAT_8021dcce[uVar1];
@@ -473,7 +446,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
  */
 void _VoiceEnvelopeCheck()
 {
-    u32* voiceData = DAT_8032f444;
+    unsigned int* voiceData = DAT_8032f444;
     do {
         if ((((u8*)voiceData)[0x1A] & 7) != 0) {
             voiceData[0x2C] = 0x8000;
@@ -1226,7 +1199,7 @@ u32 _AdsrDataExecute(RedVoiceDATA* voice)
  */
 void _VoiceDropedCallback(void* param_1)
 {
-    u32* puVar1;
+    unsigned int* puVar1;
     int iParam1 = (int)param_1;
     
     puVar1 = DAT_8032f444;
@@ -1427,7 +1400,7 @@ void _KeyOnControl()
     u32 local_24 = 0;
     u32 local_28 = 0;
     int* reserve = (int*)DAT_8032f3fc;
-    u32* voiceData = DAT_8032f444;
+    unsigned int* voiceData = DAT_8032f444;
     int (*waveFunc)(int);
 
     _VoiceEnvelopeCheck();
@@ -1435,7 +1408,7 @@ void _KeyOnControl()
     if (DAT_8032f3f8 != 0) {
         do {
             if ((*reserve != 0) && (*(int*)(*reserve + 0x1C) != 0)) {
-                voiceData = (u32*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
+                voiceData = (unsigned int*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
             }
             reserve += 2;
         } while ((voiceData != 0) && (reserve < (int*)DAT_8032f3fc + 0x180));
@@ -1480,7 +1453,7 @@ void _KeyOnControl()
     }
 
     {
-        u32* voice = DAT_8032f444;
+        unsigned int* voice = DAT_8032f444;
         do {
             if ((voice[0x23] != 0) && (*voice != 0) && ((*(u32*)(*voice + 0xFC) & 9) == 0)) {
                 if (((voice[0x2E] & 2) != 0) || (*(int*)(*voice + 0x94) != 0) || (*(int*)(*voice + 0xB4) != 0)) {
@@ -1536,7 +1509,7 @@ void _KeyOnControl()
 
     {
         u32 bit = 1;
-        u32* voice = DAT_8032f444;
+        unsigned int* voice = DAT_8032f444;
         do {
             if ((local_28 & bit) != 0) {
                 local_28 &= ~bit;
@@ -1549,7 +1522,7 @@ void _KeyOnControl()
 
     {
         u32 bit = 1;
-        u32* voice = DAT_8032f444 + 0x600;
+        unsigned int* voice = DAT_8032f444 + 0x600;
         do {
             if ((local_24 & bit) != 0) {
                 local_24 &= ~bit;
@@ -1574,7 +1547,7 @@ void _ExecuteExtraData()
 {
     u32* sound = (u32*)DAT_8032f3f0;
     u32* soundBase;
-    u32* voice;
+    unsigned int* voice;
     int* track;
     u32 musicBase;
 

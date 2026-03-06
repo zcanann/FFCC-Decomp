@@ -2894,42 +2894,74 @@ void GbaQueue::ClrMkSmithFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca8ec
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetResetFlg(int)
+void GbaQueue::SetResetFlg(int channel)
 {
-	// TODO
+	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(this) + channel * 0xC);
+
+	OSWaitSemaphore(semaphore);
+	reinterpret_cast<unsigned char*>(this)[0x2D3D] =
+		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2D3D] | (1 << channel));
+	OSSignalSemaphore(semaphore);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca888
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetBonus(int)
+unsigned char GbaQueue::GetBonus(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned char value = static_cast<unsigned char>(obj[channel * 0xDC + 0x527]);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca810
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetArtifactFlg(int)
+unsigned int GbaQueue::GetArtifactFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2C89])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return (-value | value) >> 31;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca7a8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrArtifactFlg(int)
+void GbaQueue::ClrArtifactFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2C89] = obj[0x2C89] & ~(1 << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*

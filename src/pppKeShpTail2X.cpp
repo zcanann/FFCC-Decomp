@@ -2,14 +2,13 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 #include <string.h>
 
 extern int gPppCalcDisabled;
-extern float lbl_80330500;
-extern float lbl_80330504;
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvCameraMatrix02;
 
@@ -236,17 +235,17 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     }
 
     invCountMinusOne = (float)(step->m_drawCount - 1);
-    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / lbl_80330504;
-    if (invCountMinusOne != lbl_80330500) {
+    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
+    if (invCountMinusOne != kPppKeShpTail2XZero) {
         colorStepR = ((float)step->m_colorStartR - (float)step->m_colorEndR) / invCountMinusOne;
         colorStepG = ((float)step->m_colorStartG - (float)step->m_colorEndG) / invCountMinusOne;
         colorStepB = ((float)step->m_colorStartB - (float)step->m_colorEndB) / invCountMinusOne;
         colorStepA = (((float)step->m_colorStartA * alphaMul) - ((float)step->m_colorEndA * alphaMul)) / invCountMinusOne;
     } else {
-        colorStepR = lbl_80330500;
-        colorStepG = lbl_80330500;
-        colorStepB = lbl_80330500;
-        colorStepA = lbl_80330500;
+        colorStepR = kPppKeShpTail2XZero;
+        colorStepG = kPppKeShpTail2XZero;
+        colorStepB = kPppKeShpTail2XZero;
+        colorStepA = kPppKeShpTail2XZero;
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
@@ -265,7 +264,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
     drawScaleStep = step->m_stepDistance * mng->m_scale.x;
-    if (drawScaleStep <= lbl_80330500) {
+    if (drawScaleStep <= kPppKeShpTail2XZero) {
         return;
     }
 
@@ -284,12 +283,12 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = lbl_80330500;
-    zeroVec.y = lbl_80330500;
-    zeroVec.z = lbl_80330500;
+    zeroVec.x = kPppKeShpTail2XZero;
+    zeroVec.y = kPppKeShpTail2XZero;
+    zeroVec.z = kPppKeShpTail2XZero;
     segLen = PSVECDistance(&zeroVec, &seg);
     segRemain = segLen;
-    segCursor = lbl_80330500;
+    segCursor = kPppKeShpTail2XZero;
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;
@@ -323,7 +322,7 @@ draw_loop:
 
     zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx,
-                                                               (step->m_useEnvDepth != 0) ? step->m_envDepth : lbl_80330500, 0,
+                                                               (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
                                                                step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
 
     {
@@ -349,7 +348,7 @@ draw_loop:
     colorA -= colorStepA;
     drawScale -= scaleStepDelta;
     drawScaleStep -= scaleStepDelta;
-    if (drawScaleStep <= lbl_80330500) {
+    if (drawScaleStep <= kPppKeShpTail2XZero) {
         return;
     }
 
@@ -452,6 +451,8 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }
+
+
 
 
 

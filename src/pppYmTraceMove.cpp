@@ -30,7 +30,9 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
 	f32 zero;
 
 	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &savedPosition, &paramVec);
-	dir = *(Vec*)&dest[1].y;
+	*(u32*)&dir.x = *(u32*)&dest[1].y;
+	*(u32*)&dir.y = *(u32*)&dest[1].z;
+	*(u32*)&dir.z = *(u32*)&dest[2].x;
 	pppCopyVector__FR3Vec3Vec(dest, &dir);
 	zero = lbl_80330E40;
 	dest[3].x = zero;

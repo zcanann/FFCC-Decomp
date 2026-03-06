@@ -5,17 +5,6 @@
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedGlobals.h"
 
-extern unsigned int* DAT_8032f444;
-extern unsigned int DAT_8032f4b4;
-extern int DAT_8032f3f8;
-extern void* DAT_8032f3f0;
-extern int* DAT_8032f420;
-extern int DAT_8032f424;
-extern int DAT_8032f414;
-extern CRedEntry DAT_8032e154;
-extern int DAT_8021dc20[];
-extern signed char DAT_8021dcce[];
-extern int DAT_8021e1d0[];
 extern int PTR_SineSwing__Fi_8021e9d0[];
 
 extern "C" {

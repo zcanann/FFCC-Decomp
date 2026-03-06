@@ -1,10 +1,9 @@
 #include "ffcc/pppRandHCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern float lbl_8032FF98;
 extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
@@ -51,7 +50,7 @@ void pppRandHCV(void* p1, void* p2, void* p3)
         if (params->field10 != 0) {
             value += RandF__5CMathFv(&Math);
         } else {
-            value *= lbl_8032FF98;
+            value *= kPppRandHCVSingleSampleScale;
         }
 
         randomValue = (f32*)(base + *ctx->fieldC + 0x80);

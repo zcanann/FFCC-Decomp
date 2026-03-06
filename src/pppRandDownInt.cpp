@@ -1,10 +1,9 @@
 #include "ffcc/pppRandDownInt.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FF58;
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
@@ -48,7 +47,7 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
         f32 value = -RandF__5CMathFv(&Math);
         if (in->fieldC != 0) {
             f32 mixed = value - RandF__5CMathFv(&Math);
-            value = mixed * lbl_8032FF58;
+            value = mixed * kPppRandDownIntDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

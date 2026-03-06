@@ -1,10 +1,9 @@
 #include "ffcc/pppSRandCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern float lbl_80330060;
 extern u8 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
@@ -54,7 +53,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330060;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[0] = value;
         }
@@ -65,7 +64,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330060;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[1] = value;
         }
@@ -76,7 +75,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330060;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[2] = value;
         }
@@ -87,7 +86,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330060;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[3] = value;
         }

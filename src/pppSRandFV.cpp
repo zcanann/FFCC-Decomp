@@ -1,9 +1,8 @@
 #include "ffcc/pppSRandFV.h"
 #include "ffcc/math.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern float lbl_80330098;
 extern float gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath*);
 
@@ -54,7 +53,7 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330098;
+                value = value * kPppSRandFVSingleSampleScale;
             }
             valuePtr[0] = value;
         }
@@ -65,7 +64,7 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330098;
+                value = value * kPppSRandFVSingleSampleScale;
             }
             valuePtr[1] = value;
         }
@@ -76,7 +75,7 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
-                value = value * lbl_80330098;
+                value = value * kPppSRandFVSingleSampleScale;
             }
             valuePtr[2] = value;
         }

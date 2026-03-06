@@ -1,6 +1,6 @@
 #include "ffcc/pppVtMime.h"
 #include "ffcc/partMng.h"
-
+#include "ffcc/ppp_constants.h"
 struct VtMimeCtrl
 {
     unsigned char pad0[0xC];
@@ -40,7 +40,6 @@ struct VtMimeEnv
 };
 
 extern int gPppCalcDisabled;
-extern const float lbl_803300F0;
 extern char Graphic[];
 static char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
@@ -85,7 +84,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-    float zero = lbl_803300F0;
+    float zero = kPppVtMimeZero;
 
     state->accel = zero;
     state->velocity = zero;
@@ -104,7 +103,7 @@ void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-    float zero = lbl_803300F0;
+    float zero = kPppVtMimeZero;
 
     state->accel = zero;
     state->velocity = zero;

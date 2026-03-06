@@ -1,10 +1,9 @@
 #include "ffcc/pppSRandUpFV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_803300C0;
 extern f32 gPppDefaultValueBuffer[];
 extern "C" f32 RandF__5CMathFv(CMath*);
 
@@ -52,7 +51,7 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300C0;
+                value = randomPair * kPppSRandUpFVDualSampleScale;
             }
             randVec[0] = value;
         }
@@ -62,7 +61,7 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300C0;
+                value = randomPair * kPppSRandUpFVDualSampleScale;
             }
             randVec[1] = value;
         }
@@ -72,7 +71,7 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300C0;
+                value = randomPair * kPppSRandUpFVDualSampleScale;
             }
             randVec[2] = value;
         }

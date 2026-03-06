@@ -1,8 +1,7 @@
 #include "ffcc/pppSclMove.h"
 #include <dolphin/mtx.h>
-
+#include "ffcc/ppp_constants.h"
 extern int gPppCalcDisabled;
-extern float lbl_80330058;
 
 /*
  * --INFO--
@@ -18,7 +17,7 @@ void pppSclMoveCon(void* param1, void* param2)
     void* ptr = (void*)((int*)((char*)param2 + 0xC))[0];
     ptr = (void*)((int*)((char*)ptr + 0x4))[0];
     float* data1 = (float*)((char*)param1 + (int)ptr + 0x80);
-    float zero = lbl_80330058;
+    float zero = kPppSclMoveZero;
     data1[2] = zero;
     data1[1] = zero;
     data1[0] = zero;

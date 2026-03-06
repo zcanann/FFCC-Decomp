@@ -1,13 +1,12 @@
 #include "ffcc/pppRandUpHCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern float lbl_80330008;
 extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
-static f64 const lbl_80330010 = 4503601774854144.0;
+static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;
 
 typedef struct RandUpHCVParams {
     int index;
@@ -46,7 +45,7 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
         if (params->flag != 0) {
             f32 random = RandF__5CMathFv(&Math);
             f32 blend = value + random;
-            value = blend * lbl_80330008;
+            value = blend * kPppRandUpHCVDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

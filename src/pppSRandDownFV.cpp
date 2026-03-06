@@ -1,10 +1,9 @@
 #include "ffcc/pppSRandDownFV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math[];
 extern int gPppCalcDisabled;
-extern f32 lbl_80330080;
 extern f32 gPppDefaultValueBuffer[];
 
 extern "C" f32 RandF__5CMathFv(CMath*);
@@ -54,7 +53,7 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 f32 random = RandF__5CMathFv(Math);
                 f32 blend = value - random;
-                f32 scale = lbl_80330080;
+                f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
             }
             randVec[0] = value;
@@ -66,7 +65,7 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 f32 random = RandF__5CMathFv(Math);
                 f32 blend = value - random;
-                f32 scale = lbl_80330080;
+                f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
             }
             randVec[1] = value;
@@ -78,7 +77,7 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 f32 random = RandF__5CMathFv(Math);
                 f32 blend = value - random;
-                f32 scale = lbl_80330080;
+                f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
             }
             randVec[2] = value;

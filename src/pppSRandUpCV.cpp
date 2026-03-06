@@ -1,11 +1,10 @@
 #include "ffcc/pppSRandUpCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
 extern u8 gPppDefaultValueBuffer[];
-extern float lbl_803300B0;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct SRandUpCVParam {
@@ -48,7 +47,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300B0;
+                value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[0] = value;
         }
@@ -58,7 +57,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300B0;
+                value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[1] = value;
         }
@@ -68,7 +67,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300B0;
+                value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[2] = value;
         }
@@ -78,7 +77,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * lbl_803300B0;
+                value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[3] = value;
         }

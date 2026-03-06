@@ -12,6 +12,17 @@ static inline unsigned short* GetItemDataPtr(int itemIdx)
 	return (unsigned short*)(Game.game.unkCFlatData0[2] + (itemIdx * 0x48));
 }
 
+struct GobjworkFlatTableEntry {
+	int count;
+	const char** index;
+	char* buffer;
+};
+
+struct GobjworkFlatData {
+	char pad[0x6C];
+	GobjworkFlatTableEntry table[8];
+};
+
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;
@@ -25,6 +36,7 @@ extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, char);
+extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
 extern "C" int m_tempVar__4CMes[];
@@ -33,6 +45,7 @@ extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
 extern char DAT_801d9ff0[];
 extern unsigned char CFlat[];
+extern unsigned char MenuPcs[];
 
 /*
  * --INFO--
@@ -1882,12 +1895,23 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f6ac
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetWeaponAttrib(int)
+int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
-	// TODO
+	int weaponType = GetCmdListItem(cmdListIdx);
+	if (weaponType < 0 || weaponType > 2) {
+		int itemId = DelCmdListAndItem(cmdListIdx, 0);
+		const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.game.m_cFlatDataArr[1]);
+		return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
+	}
+
+	return GetSkillStr__8CMenuPcsFi(MenuPcs, weaponType);
 }
 
 /*

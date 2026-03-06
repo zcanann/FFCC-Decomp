@@ -1,7 +1,7 @@
 #include "ffcc/pppSRandFV.h"
 #include "ffcc/math.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern float lbl_80330098;
 extern float gPppDefaultValueBuffer[];
@@ -50,9 +50,9 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
         {
             unsigned char flag = in->field18;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330098;
             }
@@ -61,9 +61,9 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
         {
             unsigned char flag = in->field18;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330098;
             }
@@ -72,9 +72,9 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
         {
             unsigned char flag = in->field18;
-            float value = RandF__5CMathFv(&math[0]);
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&math[0]);
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * lbl_80330098;
             }

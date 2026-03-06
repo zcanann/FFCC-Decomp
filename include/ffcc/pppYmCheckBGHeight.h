@@ -6,9 +6,10 @@
 struct pppYmCheckBGHeight;
 
 struct pppYmCheckBGHeightUnkC {
-    float m_serializedDataOffsets;
+    float m_unk0x0;
     float m_unk0x4;
     float m_unk0x8;
+    float m_unk0xC;
 };
 
 #ifdef __cplusplus

@@ -56,7 +56,6 @@ struct _pppPDataVal;
 extern CMath math;
 extern int gPppCalcDisabled;
 extern u8* lbl_8032ED50;
-extern VertexApEnv* lbl_8032ED54;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -110,26 +109,27 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
     }
 
     if (state->countdown == 0) {
-        VertexApEntry* entry = &lbl_8032ED54->entries[data->entryIndex];
+        VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
+        VertexApEntry* entry = &env->entries[data->entryIndex];
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
-            u32* srcTable = *(u32**)((u8*)lbl_8032ED54 + 0x8);
+            u32* srcTable = *(u32**)((u8*)env + 0x8);
             VertexApSource* src = *(VertexApSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
             points = src->points;
         }
 
-        u8 count = data->spawnCount;
+        s32 count = data->spawnCount;
 
         switch (data->mode) {
         case 0:
-            while (count-- != 0) {
-                if ((s16)state->index >= entry->maxValue) {
+            do {
+                if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 vertexIndex = entry->vertexIndices[state->index];
-                state->index++;
+                u16 index = state->index++;
+                u16 vertexIndex = entry->vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -162,11 +162,11 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, outPos);
                     }
                 }
-            }
+            } while (count-- != 0);
             break;
         case 1:
-            while (count-- != 0) {
-                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+            do {
+                u16 vertexIndex = entry->vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -199,7 +199,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, outPos);
                     }
                 }
-            }
+            } while (count-- != 0);
             break;
         }
 

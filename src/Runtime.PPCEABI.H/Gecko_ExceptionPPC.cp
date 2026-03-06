@@ -79,7 +79,7 @@ namespace std {
 
 class exception {
 public:
-	virtual ~exception();
+	virtual ~exception() {}
 	virtual const char* what() const;
 };
 

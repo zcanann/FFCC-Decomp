@@ -251,9 +251,9 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     obj->ldir[0] = vx * mag;
     obj->ldir[1] = vy * mag;
     obj->ldir[2] = vz * mag;
-    obj->lpos[0] = nx * -1000000000000000000.0f;
-    obj->lpos[1] = ny * -1000000000000000000.0f;
-    obj->lpos[2] = nz * -1000000000000000000.0f;
+    obj->lpos[0] = nx * -1.0e18f;
+    obj->lpos[1] = ny * -1.0e18f;
+    obj->lpos[2] = nz * -1.0e18f;
 }
 
 void GXInitSpecularDirHA(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32 hy, f32 hz) {
@@ -266,9 +266,9 @@ void GXInitSpecularDirHA(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32
     obj->ldir[0] = hx;
     obj->ldir[1] = hy;
     obj->ldir[2] = hz;
-    obj->lpos[0] = nx * -1000000000000000000.0f;
-    obj->lpos[1] = ny * -1000000000000000000.0f;
-    obj->lpos[2] = nz * -1000000000000000000.0f;
+    obj->lpos[0] = nx * -1.0e18f;
+    obj->lpos[1] = ny * -1.0e18f;
+    obj->lpos[2] = nz * -1.0e18f;
 }
 
 void GXInitLightColor(GXLightObj* lt_obj, GXColor color) {
@@ -556,16 +556,16 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorS
 #endif
 
     reg = (((u32)enable & 0xFF) << 1) | (u32)mat_src;
-    reg = (reg & ~0x40) | ((u32)amb_src << 6);
+    reg |= (u32)amb_src << 6;
 
     if (attn_fn == GX_AF_SPEC) {
         diff_fn = GX_DF_NONE;
     }
 
-    reg = (reg & ~0x180) | ((u32)diff_fn << 7);
-    reg = (reg & ~0x3C) | ((light_mask << 2) & 0x3C);
-    reg = (reg & ~0x1E00) | ((light_mask << 7) & 0x1E00);
-    reg = (reg & ~0x600) | ((u32)(attn_fn != GX_AF_NONE) << 9) | ((u32)(attn_fn != GX_AF_SPEC) << 10);
+    reg |= (u32)diff_fn << 7;
+    reg |= (light_mask & 0x0F) << 2;
+    reg |= (light_mask & 0xF0) << 7;
+    reg |= ((u32)(attn_fn != GX_AF_NONE) << 9) | ((u32)(attn_fn != GX_AF_SPEC) << 10);
 
     GX_WRITE_XF_REG(idx + 14, reg);
     

@@ -287,18 +287,12 @@ static void TimeoutHandler(OSAlarm* alarm, OSContext* context) {
 static void SetupTimeoutAlarm(CARDControl* card) {
     OSCancelAlarm(&card->alarm);
     switch (card->cmd[0]) {
-    case 0xF2: 
-        OSSetAlarm(&card->alarm, OSMillisecondsToTicks(100),
-                   TimeoutHandler);
+    case 0xF2:
+        OSSetAlarm(&card->alarm, OSMillisecondsToTicks(100), TimeoutHandler);
         break;
     case 0xF3:
         break;
     case 0xF4:
-        if (card->pageSize > 0x80) {
-            OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->cBlock / 0x40),
-                       TimeoutHandler);
-            break;
-        }
     case 0xF1:
         OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->sectorSize / 0x2000),
                    TimeoutHandler);
@@ -339,7 +333,7 @@ static s32 Retry(s32 chan) {
         return CARD_RESULT_READY;
     }
 
-    if (!EXIDma(chan, card->buffer, (s32)((card->cmd[0] == 0x52) ? 512 : card->pageSize), card->mode,
+    if (!EXIDma(chan, card->buffer, (s32)((card->cmd[0] == 0x52) ? 512 : 0x80), card->mode,
                 __CARDTxHandler))
     {
         EXIDeselect(chan);

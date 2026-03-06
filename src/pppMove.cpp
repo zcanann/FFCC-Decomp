@@ -1,7 +1,20 @@
 #include "ffcc/pppMove.h"
 
-extern s32 lbl_8032ED70;   // Global enable flag
-extern f32 lbl_8032FED8;   // Zero constant
+extern int lbl_8032ED70;   // Global enable flag
+extern float lbl_8032FED8; // Zero constant
+
+struct _pppCtrlTableData {
+    int m_workOffset;
+    int m_workOffsetAlt;
+    int m_ownerWorkOffset;
+};
+
+struct _pppCtrlTable {
+    void* m_prog;
+    int m_initialWork;
+    int m_unk8;
+    _pppCtrlTableData* m_serializedDef;
+};
 
 struct PppMoveObj {
     f32 x;           // 0x0
@@ -23,11 +36,9 @@ struct PppMoveOffsets {
  * JP Address: TODO  
  * JP Size: TODO
  */
-void pppMoveCon(void* basePtr, PppMoveData* data)
+void pppMoveCon(void* basePtr, _pppCtrlTable* ctrlTable)
 {
-    // Get object pointer from data structure
-    void* objPtr = data->ptrData;
-    u32 offset = *((u32*)((u8*)objPtr + 0x4));
+    u32 offset = static_cast<u32>(ctrlTable->m_serializedDef->m_workOffsetAlt);
     PppMoveObj* moveObj = (PppMoveObj*)((u8*)basePtr + offset + 0x80);
     
     // Initialize to zero (store order: z, y, x to match assembly)
@@ -46,13 +57,11 @@ void pppMoveCon(void* basePtr, PppMoveData* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2)
+void pppMove(void* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
 {
-    PppMoveOffsets* offsets = (PppMoveOffsets*)data1->ptrData;
+    PppMoveOffsets* offsets = (PppMoveOffsets*)ctrlTable->m_serializedDef;
     PppMoveObj* a = (PppMoveObj*)((u8*)basePtr + offsets->a + 0x80);
     PppMoveObj* b = (PppMoveObj*)((u8*)basePtr + offsets->b + 0x80);
-
-    (void)data2;
 
     if (lbl_8032ED70 != 0) {
         return;

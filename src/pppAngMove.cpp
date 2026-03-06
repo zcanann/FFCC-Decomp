@@ -2,6 +2,19 @@
 
 extern int lbl_8032ED70;
 
+struct _pppCtrlTableData {
+    int m_workOffset;
+    int m_workOffsetAlt;
+    int m_ownerWorkOffset;
+};
+
+struct _pppCtrlTable {
+    void* m_prog;
+    int m_initialWork;
+    int m_unk8;
+    _pppCtrlTableData* m_serializedDef;
+};
+
 struct PppAngMoveObj {
     int x;
     int y;
@@ -11,13 +24,6 @@ struct PppAngMoveObj {
 struct PppAngMoveOffsets {
     int a;
     int b;
-};
-
-struct PppAngMoveData {
-    void* field_0;
-    void* field_4;
-    int field_8;
-    void* ptrData;
 };
 
 struct PppAngMoveInput {
@@ -37,14 +43,12 @@ struct PppAngMoveInput {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngMove(void* basePtr, void* input, void* data1, void* data2)
+void pppAngMove(void* basePtr, void* input, _pppCtrlTable* ctrlTable)
 {
-    PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)((PppAngMoveData*)data1)->ptrData;
+    PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)ctrlTable->m_serializedDef;
     PppAngMoveObj* a = (PppAngMoveObj*)((char*)basePtr + offsets->a + 0x80);
     PppAngMoveObj* b = (PppAngMoveObj*)((char*)basePtr + offsets->b + 0x80);
     PppAngMoveInput* inputData = (PppAngMoveInput*)input;
-
-    (void)data2;
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -73,10 +77,9 @@ void pppAngMove(void* basePtr, void* input, void* data1, void* data2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngMoveCon(void* dest, void* param)
+void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
 {
-    int* paramPtr = (int*)param;
-    int offset = ((int*)paramPtr[3])[1];
+    int offset = ctrlTable->m_serializedDef->m_workOffsetAlt;
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[2] = 0;
     ptr[1] = 0;

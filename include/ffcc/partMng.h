@@ -148,6 +148,21 @@ struct pppProg
     void* m_pppFunctionDestructor;   // 0x28
 }; // Size 0x2c
 
+struct _pppCtrlTableData
+{
+    int m_workOffset;       // 0x0
+    int m_workOffsetAlt;    // 0x4
+    int m_ownerWorkOffset;  // 0x8
+};
+
+struct _pppCtrlTable
+{
+    pppProg* m_prog;                    // 0x0
+    int m_initialWork;                  // 0x4
+    int m_unk8;                         // 0x8
+    _pppCtrlTableData* m_serializedDef; // 0xC
+};
+
 struct _pppDataHead
 {
     unsigned int m_version;           // 0x0

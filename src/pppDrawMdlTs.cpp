@@ -54,10 +54,10 @@ void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
  * PAL Address: 0x80087fd0
  * PAL Size: 208b
  */
-void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct PDrawMdlTs* param)
+void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    struct PDrawMdlTs* stream = param;
-    struct PDrawMdlTs* input = data;
+    _pppCtrlTable* stream = ctrl;
+    PDrawMdlTs* input = data;
 
     // Get texture coordinate offset 
     void* inner = *((void**)((char*)stream + 0xc));

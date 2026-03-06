@@ -3,12 +3,7 @@
 
 #include "dolphin/types.h"
 
-struct PppMoveData {
-    void* field_0;   // 0x0
-    void* matrix;    // 0x4 
-    u32 field_8;     // 0x8
-    void* ptrData;   // 0xc
-};
+struct _pppCtrlTable;
 
 struct PppMoveInput {
     f32 field_0;     // 0x0
@@ -22,8 +17,8 @@ struct PppMoveInput {
 extern "C" {
 #endif
 
-void pppMoveCon(void* basePtr, PppMoveData* data);
-void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2);
+void pppMoveCon(void* basePtr, _pppCtrlTable* ctrlTable);
+void pppMove(void* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

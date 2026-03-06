@@ -3,6 +3,10 @@
 
 #include "dolphin/gx/__gx.h"
 
+extern GXData* const gx;
+#undef __GXData
+#define __GXData gx
+
 GXRenderModeObj GXNtsc240Ds = {
     1,
     640, 240, 240,
@@ -194,18 +198,18 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
  * JP Size: TODO
  */
 void GXSetDispCopyFrame2Field(GXCopyMode mode) {
-    GXData* gx;
+    GXData* gxData;
     u32* cpTex;
     u32 reg;
 
     CHECK_GXBEGIN(1410, "GXSetDispCopyFrame2Field");
-    gx = __GXData;
+    gxData = __GXData;
 
-    reg = gx->cpDisp;
+    reg = gxData->cpDisp;
     reg = (reg & 0xFFFFCFFF) | ((u32)mode << 12);
-    gx->cpDisp = reg;
+    gxData->cpDisp = reg;
 
-    cpTex = &gx->cpTex;
+    cpTex = &gxData->cpTex;
     reg = *cpTex;
     reg &= 0xFFFFCFFF;
     *cpTex = reg;
@@ -221,21 +225,21 @@ void GXSetDispCopyFrame2Field(GXCopyMode mode) {
  * JP Size: TODO
  */
 void GXSetCopyClamp(GXFBClamp clamp) {
-    GXData* gx;
+    GXData* gxData;
     u32 clmpB;
     u32 clmpT;
 
     CHECK_GXBEGIN(1431, "GXSetCopyClamp");
-    gx = __GXData;
+    gxData = __GXData;
 
     clmpT = ((u32)__cntlzw((clamp & GX_CLAMP_TOP) - GX_CLAMP_TOP) >> 5) & 0xFF;
     clmpB = ((u32)__cntlzw((clamp & GX_CLAMP_BOTTOM) - GX_CLAMP_BOTTOM) >> 4) & 0x1FE;
 
-    gx->cpDisp = (gx->cpDisp & ~1) | clmpT;
-    gx->cpDisp = (gx->cpDisp & ~2) | clmpB;
+    gxData->cpDisp = (gxData->cpDisp & ~1) | clmpT;
+    gxData->cpDisp = (gxData->cpDisp & ~2) | clmpB;
 
-    gx->cpTex = (gx->cpTex & ~1) | clmpT;
-    gx->cpTex = (gx->cpTex & ~2) | clmpB;
+    gxData->cpTex = (gxData->cpTex & ~1) | clmpT;
+    gxData->cpTex = (gxData->cpTex & ~2) | clmpB;
 }
 
 static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
@@ -308,7 +312,7 @@ f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
 }
 
 u32 GXSetDispCopyYScale(f32 vscale) {
-    GXData* gx;
+    GXData* gxData;
     u32 iScale;
     u32 copyYScaleEnable;
 
@@ -317,13 +321,13 @@ u32 GXSetDispCopyYScale(f32 vscale) {
     ASSERTMSGLINE(1559, vscale >= 1.0f, "GXSetDispCopyYScale: Vertical scale must be >= 1.0");
 
     iScale = (u32)(256.0f / vscale) & 0x1FF;
-    gx = __GXData;
+    gxData = __GXData;
 
     GX_WRITE_RAS_REG((iScale & 0x1FF) | 0x4E000000);
     copyYScaleEnable = (iScale != 0x100);
-    gx->bpSentNot = 0;
-    gx->cpDisp = (gx->cpDisp & ~0x400) | (copyYScaleEnable << 10);
-    return __GXGetNumXfbLines((((u32)gx->cpDispSize >> 10) & 0x3FF) + 1, iScale);
+    gxData->bpSentNot = 0;
+    gxData->cpDisp = (gxData->cpDisp & ~0x400) | (copyYScaleEnable << 10);
+    return __GXGetNumXfbLines((((u32)gxData->cpDispSize >> 10) & 0x3FF) + 1, iScale);
 }
 
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {

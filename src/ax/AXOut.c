@@ -14,7 +14,7 @@ volatile static u32 __AXOutFrame;
 volatile static u32 __AXAiDmaFrame;
 volatile static u32 __AXOutDspReady;
 volatile static OSTime __AXOsTime;
-static void (*__AXUserFrameCallback)();
+void (*__AXUserFrameCallback)();
 volatile static int __AXDSPInitFlag;
 static int __AXDSPDoneFlag;
 

@@ -15,17 +15,17 @@ static const double one = 1.0, tiny = 1.0e-300;
  * JP Size: TODO
  */
 double __ieee754_sqrt(double x) {
+    unsigned r;
+    unsigned t1;
+    unsigned s1;
+    unsigned ix1;
+    unsigned q1;
     int ix0;
     int s0;
     int q;
     int m;
     int t;
     int i;
-    unsigned ix1;
-    unsigned q1;
-    unsigned s1;
-    unsigned r;
-    unsigned t1;
     double z;
 
     ix0 = __HI(x);

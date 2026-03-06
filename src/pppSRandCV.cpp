@@ -7,6 +7,7 @@ extern int lbl_8032ED70;
 extern float lbl_80330060;
 extern u8 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
+static f64 const lbl_80330068 = 4503601774854144.0;
 
 struct PppSRandCVParam2 {
     s32 field0;
@@ -98,12 +99,8 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
-    if (in->field4 == -1) {
-        color = lbl_801EADC8;
-    } else {
-        s32 colorOffset = in->field4;
-        color = (u8*)(base + colorOffset + 0x80);
-    }
+    s32 colorOffset = in->field4;
+    color = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
 
     s8 baseValue = in->field8;
     color[0] = (u8)(color[0] + (s32)((f32)baseValue * target[0] - (f32)baseValue));

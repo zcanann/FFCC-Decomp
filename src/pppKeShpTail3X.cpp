@@ -470,8 +470,10 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XDes(void)
+void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)ctrlTable;
 	// TODO
 }
 

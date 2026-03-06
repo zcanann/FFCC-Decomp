@@ -711,65 +711,44 @@ void pppMngStHeapCheck(CMemory::CStage* stage)
  */
 void callCon2Prog(_pppPObject* pObject)
 {
-	struct pppProgSetRaw
-	{
-		u8 m_pad0[0x14];
-		u32 m_endFrame;
-		u32 m_loopFrame;
-		u32 m_workBaseOffset;
-		s16 m_numStages;
-		u8 m_pad1[0x28 - 0x26];
-	};
-
-	struct pppStageDefRaw
-	{
-		u8 m_pad0[0x2C];
-		u16 m_workOffset;
-	};
-
-	struct pppPDataValRaw
-	{
-		pppProgSetRaw* m_progSet;
-	};
-
-	pppPDataValRaw* owner = (pppPDataValRaw*)*(_pppPObjLink**)(((u8*)pObject) + 8);
-	pppProgSetRaw* progSet = owner->m_progSet;
-	pppStageDefRaw* stage = (pppStageDefRaw*)progSet;
+	_pppPDataVal* owner = (_pppPDataVal*)*(_pppPObjLink**)(((u8*)pObject) + 8);
+	_pppProgSetDef* progSet = owner->m_programSetDef;
+	_pppCtrlTable* stage = progSet->m_stages;
 	int stageIdx = 0;
 
 	lbl_8032ED78 = 1;
 
 	for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 	{
-		pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
+		pppProg* prog = stage->m_prog;
 		if (prog != 0)
 		{
 			if (prog->m_pppFunctionConstructor3 != 0)
 			{
-				((pppProgConstruct3Callback)prog->m_pppFunctionConstructor3)(pObject, (_pppCtrlTable*)(((u8*)stage) + 0x28));
+				((pppProgConstruct3Callback)prog->m_pppFunctionConstructor3)(pObject, stage);
 			}
 			else
 			{
-				*(u32*)(((u8*)pObject) + progSet->m_workBaseOffset + stageIdx * 4) = *(u32*)(((u8*)stage) + 0x30);
+				*(u32*)(((u8*)pObject) + progSet->m_workBaseOffset + stageIdx * 4) = stage->m_unk8;
 				if (prog->m_pppFunctionConstructor2 != 0)
 				{
 					((pppProgConstruct2Callback)prog->m_pppFunctionConstructor2)(pObject);
 				}
 			}
 		}
-		stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
+		stage++;
 	}
 
 	*(u32*)(((u8*)pObject) + 0x0C) = 0;
 	while (true)
 	{
-		stage = (pppStageDefRaw*)progSet;
+		stage = progSet->m_stages;
 		for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 		{
 			u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 			u32* stageSlot = *(u32**)(((u8*)pObject) + stageSlotOffset);
-			pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
-			u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
+			pppProg* prog = stage->m_prog;
+			u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workInfo.m_workOffset);
 
 			if (*nextSlot == *(u32*)(((u8*)pObject) + 0x0C))
 			{
@@ -780,7 +759,7 @@ void callCon2Prog(_pppPObject* pObject)
 				}
 			}
 
-			stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
+			stage++;
 		}
 
 		*(u32*)(((u8*)pObject) + 0x0C) += 0x1000;
@@ -2025,29 +2004,29 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 	for (s32 i = 0; i < *(s32*)(((u8*)pppMngSt) + 0xB8); i++)
 	{
 		u8* pDataVals = (u8*)(*(void**)(((u8*)pppMngSt) + 0xC8));
-		s32* pDataVal = (s32*)(pDataVals + pDataOffset);
+		_pppPDataVal* pDataVal = (_pppPDataVal*)(pDataVals + pDataOffset);
 
-		if (pDataVals != 0 && pDataVal[0] != 0)
+		if (pDataVals != 0 && pDataVal->m_programSetDef != 0)
 		{
-			s32 progSet = pDataVal[0];
-			u16 activeCount = *(u16*)(((u8*)pDataVal) + 0xC);
+			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
+			u16 activeCount = pDataVal->m_activeCount;
 			DAT_8032ed80 += activeCount;
 
 			if (activeCount != 0)
 			{
 				s32 workOffsetStep = 0;
-				u8* stageIter = (u8*)progSet;
+				_pppCtrlTable* stageIter = progSet->m_stages;
 
-				for (s32 stage = 0; stage < *(s16*)(progSet + 0x26); stage++)
+				for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 				{
-					s32 prog = *(s32*)(stageIter + 0x28);
+					pppProg* prog = stageIter->m_prog;
 					if (prog != 0)
 					{
-						pppProgOperationCallback fn = (pppProgOperationCallback)(*(void**)(prog + 8));
+						pppProgOperationCallback fn = (pppProgOperationCallback)prog->m_pppFunctionOperation;
 						if (fn != 0)
 						{
 							u16 count = activeCount;
-							s32* obj = (s32*)(pDataVal[1]);
+							s32* obj = (s32*)pDataVal->m_pppPObjLink;
 
 							while (count != 0)
 							{
@@ -2055,8 +2034,8 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 								if (*((u8*)obj + 0x7C) == 0)
 								{
 									fn((_pppPObject*)obj,
-									   *(void**)(((u8*)obj) + *(s32*)(progSet + 0x20) + workOffsetStep),
-									   (_pppCtrlTable*)(stageIter + 0x28));
+									   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
+									   stageIter);
 								}
 								count--;
 								obj = (s32*)next;
@@ -2064,7 +2043,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 						}
 					}
 
-					stageIter += 0x10;
+					stageIter++;
 					workOffsetStep += 4;
 				}
 			}
@@ -2095,23 +2074,24 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	for (s32 i = 0; i < *(s32*)(((u8*)pppMngSt) + 0xB8); i++)
 	{
 		u8* pDataVals = (u8*)(*(void**)(((u8*)pppMngSt) + 0xC8));
-		s32* pDataVal = (s32*)(pDataVals + pDataOffset);
+		_pppPDataVal* pDataVal = (_pppPDataVal*)(pDataVals + pDataOffset);
 
-		if (pDataVals != 0 && pDataVal[0] != 0 && (s16)*(u16*)(((u8*)pDataVal) + 0xC) > 0)
+		if (pDataVals != 0 && pDataVal->m_programSetDef != 0 && pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
-			u8* stageIter = (u8*)pDataVal[0];
+			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
+			_pppCtrlTable* stageIter = progSet->m_stages;
 
-			for (s32 stage = 0; stage < *(s16*)(pDataVal[0] + 0x26); stage++)
+			for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 			{
-				s32 prog = *(s32*)(stageIter + 0x28);
+				pppProg* prog = stageIter->m_prog;
 				if (prog != 0)
 				{
-					pppProgRenderCallback fn = (pppProgRenderCallback)(*(void**)(prog + 0xC));
+					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
 					if (fn != 0)
 					{
-						u16 count = *(u16*)(((u8*)pDataVal) + 0xC);
-						s32* obj = (s32*)(pDataVal[1]);
+						u16 count = pDataVal->m_activeCount;
+						s32* obj = (s32*)pDataVal->m_pppPObjLink;
 
 						while (count != 0)
 						{
@@ -2119,8 +2099,8 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 							if (*((u8*)obj + 0x7C) == 0)
 							{
 								fn((_pppPObject*)obj,
-								   *(void**)(((u8*)obj) + *(s32*)(pDataVal[0] + 0x20) + workOffsetStep),
-								   (_pppCtrlTable*)(stageIter + 0x28));
+								   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
+								   stageIter);
 							}
 							count--;
 							obj = (s32*)next;
@@ -2130,7 +2110,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 					}
 				}
 
-				stageIter += 0x10;
+				stageIter++;
 				workOffsetStep += 4;
 			}
 		}

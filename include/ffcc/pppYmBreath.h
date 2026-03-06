@@ -28,7 +28,7 @@ extern "C" {
 void pppFrameYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
 void pppRenderYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
 void pppConstructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
-void pppConstruct2YmBreath(void);
+void pppConstruct2YmBreath(_pppPObject* obj);
 void pppDestructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
 
 #ifdef __cplusplus

@@ -861,8 +861,9 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dat
  * Address:	800bff70
  * Size:	4
  */
-void pppConstruct2YmBreath(void)
+void pppConstruct2YmBreath(_pppPObject* obj)
 {
+    (void)obj;
 }
 
 /*

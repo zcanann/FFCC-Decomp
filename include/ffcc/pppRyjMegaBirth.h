@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 void pppRyjMegaBirth(_pppPObject*, PRyjMegaBirth*, PRyjMegaBirthOffsets*);
-void pppRyjDrawMegaBirth(void);
+void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable);
 void pppRyjMegaBirthCon(_pppPObject*, PRyjMegaBirthOffsets*);
 void pppRyjMegaBirthDes(_pppPObject*, PRyjMegaBirthOffsets*);
 

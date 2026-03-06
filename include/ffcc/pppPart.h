@@ -12,6 +12,7 @@ class CParModelSet;
 class CMapPcs;
 
 struct _pppPDataVal;
+struct _pppProgSetDef;
 
 // Note: Not officially part of the decomp .MAP file, so this is speculative,
 // but it seems to work.
@@ -24,7 +25,28 @@ struct _pppPObjLink
 
 struct _pppPDataVal
 {
+    _pppProgSetDef* m_programSetDef; // 0x0
+    s32 m_nextSpawnTime;             // 0x4
+    _pppPObjLink* m_pppPObjLink;     // 0x8
+    s16 m_activeCount;               // 0xc
+    u8 m_index;                      // 0xe
+    u8 m_pad;                        // 0xf
 }; // Size 0x10
+
+struct _pppProgSetDef
+{
+    _pppProgSetDef* m_next;      // 0x0
+    u16 m_spawnCount;            // 0x4
+    u16 m_reserved6;             // 0x6
+    u32 m_flags;                 // 0x8
+    u8 m_pad0C[0x0C];            // 0xC
+    s32 m_endFrame;              // 0x18
+    s32 m_loopFrame;             // 0x1C
+    u32 m_workBaseOffset;        // 0x20
+    u16 m_stageFlags;            // 0x24
+    s16 m_numStages;             // 0x26
+    _pppCtrlTable m_stages[1];   // 0x28
+};
 
 struct pppCVECTOR
 {

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppParMoveMatrix(void);
+void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

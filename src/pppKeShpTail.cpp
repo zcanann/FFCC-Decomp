@@ -92,8 +92,11 @@ void pppKeShpTailCon(void* r3, void* r4)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTailDraw(void)
+void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
+	(void)obj;
+	(void)stepData;
+	(void)ctrlTable;
 	return;
 }
 

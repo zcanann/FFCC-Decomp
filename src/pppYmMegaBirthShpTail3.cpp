@@ -17,8 +17,8 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern int rand();
-extern float FLOAT_803305a4;
-extern pppFMATRIX MatUnit3;
+extern float lbl_803305A4;
+extern pppFMATRIX g_matUnit3;
 extern _pppEnvSt* pppEnvStPtr;
 extern _pppMngSt* pppMngStPtr;
 extern s32 DAT_8032ed70;
@@ -66,12 +66,12 @@ void alloc_check(VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*)
  */
 void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3UnkC* param_2)
 {
-    pppFMATRIX* work = (pppFMATRIX*)((u8*)pppYmMegaBirthShpTail3_ + 8 + param_2->m_serializedDataOffsets[2]);
+    pppFMATRIX* work = (pppFMATRIX*)((u8*)pppYmMegaBirthShpTail3_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     float initVal;
 
     pppUnitMatrix__FR10pppFMATRIX(work);
-    initVal = FLOAT_803305a4;
-    work[1].value[0][2] = FLOAT_803305a4;
+    initVal = lbl_803305A4;
+    work[1].value[0][2] = lbl_803305A4;
     work[1].value[0][1] = initVal;
     work[1].value[0][0] = initVal;
     *reinterpret_cast<u32*>(&work[1].value[0][3]) = 0;
@@ -82,7 +82,7 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;
     *(u16*)work[2].value[2] = (u16)rand();
-    pppUnitMatrix__FR10pppFMATRIX(&MatUnit3);
+    pppUnitMatrix__FR10pppFMATRIX(&g_matUnit3);
     memset(work[1].value + 2, 0, 8);
     memset(work[1].value[2] + 2, 0, 8);
     memset(work + 2, 0, 8);
@@ -712,4 +712,3 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         }
     }
 }
-

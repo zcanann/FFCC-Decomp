@@ -5,9 +5,9 @@
 extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_80330060;
+static f64 const lbl_80330068 = 4503601774854144.0;
 extern u8 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
-static f64 const lbl_80330068 = 4503601774854144.0;
 
 struct PppSRandCVParam2 {
     s32 field0;
@@ -113,24 +113,4 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
     baseValue = in->fieldB;
     color[3] = (u8)(color[3] + (s32)((f32)baseValue * target[3] - (f32)baseValue));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randchar(char, float)
-{
-    // TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randf(unsigned char)
-{
-    // TODO
 }

@@ -16,7 +16,7 @@ static CircleBuffer gRecvCB;
 static u8 gRecvBuf[DDH_BUF_SIZE];
 
 /* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
-static BOOL gIsInitialized;
+BOOL gIsInitialized;
 
 /*
  * --INFO--

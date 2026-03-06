@@ -3,7 +3,7 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 extern "C" void __dl__FPv(void* ptr);
 
-extern char lbl_8032F860;
+extern char s_no_name_8032f860;
 extern float lbl_8032F850;
 extern float lbl_8032F854;  // 0.0f
 
@@ -92,7 +92,7 @@ float CStopWatch::Get()
  */
 CProfile::CProfile(char* name)
 {
-	OSInitStopwatch(this, &lbl_8032F860);
+	OSInitStopwatch(this, &s_no_name_8032f860);
 	OSResetStopwatch(this);
 
 	OSStopwatch tmp;

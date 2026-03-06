@@ -14,7 +14,7 @@
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
-extern "C" char lbl_801E8408[];
+extern "C" char PTR_PTR_s_CGraphic_801e8408[];
 extern GXRenderModeObj lbl_801E83C0;
 extern u8 DAT_801E83F2[7];
 extern char DAT_80238030[];
@@ -54,8 +54,8 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dla__FPv(void*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" char lbl_801D6348[];
-extern "C" char lbl_801D6330[];
+extern "C" char s_graphic_cpp_801d6348[];
+extern "C" char s_CGraphic_801d6330[];
 extern "C" char lbl_801D6498[];
 extern "C" OSThread m_thread;
 extern "C" u8 m_threadStack[];
@@ -107,7 +107,7 @@ extern "C" void __sinit_graphic_cpp(void)
 {
     void* vtbl = __vt__8CManager;
     *reinterpret_cast<void**>(&Graphic) = vtbl;
-    *reinterpret_cast<void**>(&Graphic) = lbl_801E8408;
+    *reinterpret_cast<void**>(&Graphic) = PTR_PTR_s_CGraphic_801e8408;
 }
 
 /*
@@ -142,7 +142,7 @@ CGraphic::CGraphic()
  */
 void CGraphic::Init()
 {
-    PtrAt(this, 0x4) = CreateStage__7CMemoryFUlPci(&Memory, 0x19C000, lbl_801D6330, 0);
+    PtrAt(this, 0x4) = CreateStage__7CMemoryFUlPci(&Memory, 0x19C000, s_CGraphic_801d6330, 0);
     PtrAt(this, 0x8) = CreateStage__7CMemoryFUlPci(&Memory, 0xD6000, lbl_801D6498, 0);
 
     S32At(this, 0x14) = 0;
@@ -174,21 +174,21 @@ void CGraphic::Init()
 
     PtrAt(this, 0x71E4) = __nwa__FUlPQ27CMemory6CStagePci(alignedWidth * xfbHeight * 2,
                                                            reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)),
-                                                           lbl_801D6348, 0x86);
+                                                           s_graphic_cpp_801d6348, 0x86);
     memset(PtrAt(this, 0x71E4), 0, 4);
 
     PtrAt(this, 0x71EC) = __nwa__FUlPQ27CMemory6CStagePci(alignedWidth * efbHeight * 2,
                                                            reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)),
-                                                           lbl_801D6348, 0x88);
+                                                           s_graphic_cpp_801d6348, 0x88);
     memset(PtrAt(this, 0x71EC), 0, 4);
 
     PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, alignedWidth * efbHeight * 2 + 0x46000,
                                                                      reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                                                                     lbl_801D6348, 0xB53, 0);
+                                                                     s_graphic_cpp_801d6348, 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x60000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), lbl_801D6348, 0x8B);
+        __nwa__FUlPQ27CMemory6CStagePci(0x60000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), s_graphic_cpp_801d6348, 0x8B);
 
     VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
     GXInit(PtrAt(this, 0x10), 0x60000);
@@ -229,7 +229,7 @@ void CGraphic::Init()
     U8At(this, 0x735D) = 0;
     U8At(this, 0x735E) = 0;
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-    PtrAt(this, 0x7368) = lbl_801D6348;
+    PtrAt(this, 0x7368) = s_graphic_cpp_801d6348;
     S32At(this, 0x736C) = 0xBE;
     S32At(this, 0x7364) = 1;
     GXSetDrawDone();
@@ -660,7 +660,7 @@ void CGraphic::Flip()
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-        PtrAt(this, 0x7368) = lbl_801D6348;
+        PtrAt(this, 0x7368) = s_graphic_cpp_801d6348;
         S32At(this, 0x736C) = 0x26D;
         S32At(this, 0x7364) = 1;
         GXSetDrawDone();
@@ -1089,7 +1089,7 @@ void CGraphic::makeSphere()
     S32At(this, 0x71F8) = 0x880;
     PtrAt(this, 0x71FC) = __nwa__FUlPQ27CMemory6CStagePci(S32At(this, 0x71F8),
                                                            reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)),
-                                                           lbl_801D6348, 0x41A);
+                                                           s_graphic_cpp_801d6348, 0x41A);
 
     DCInvalidateRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
     GXBeginDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
@@ -2043,7 +2043,7 @@ void CGraphic::CreateTempBuffer()
 {
 	u32 bufferSize = ((U16At(PtrAt(this, 0x71E0), 4) + 0xF) & 0xFFF0) * U16At(PtrAt(this, 0x71E0), 6) * 2 + 0x46000;
 	u8* tempBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-	    &Memory, bufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), lbl_801D6348, 0xB53, 0));
+	    &Memory, bufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), s_graphic_cpp_801d6348, 0xB53, 0));
 
 	PtrAt(this, 0x71E8) = tempBuffer;
 	memset(tempBuffer, 0, 0x46004);

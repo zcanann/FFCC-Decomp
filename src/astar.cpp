@@ -35,8 +35,8 @@ struct CMapCylinderRaw
 
 extern Mtx gFlatPosMtx;
 extern unsigned char gMapHitFace[];
-extern char lbl_801DD6A8[];
-extern char lbl_801DD6B4[];
+extern char s_A__GROUP__d_801dd6a8[];
+extern char s_addAStar___5f____5f____5f___d____801dd6b4[];
 extern char lbl_803320A0[];
 extern CMath Math;
 extern "C" int __cntlzw(unsigned int);
@@ -629,7 +629,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
 	}
 
-	Graphic.Printf(10, 10, lbl_801DD6A8, static_cast<int>(gPartyObj->m_aStarGroupId));
+	Graphic.Printf(10, 10, s_A__GROUP__d_801dd6a8, static_cast<int>(gPartyObj->m_aStarGroupId));
 
 	bool padBusy = false;
 
@@ -753,7 +753,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		if (used)
 		{
 			System.Printf(
-				lbl_801DD6B4,
+				s_addAStar___5f____5f____5f___d____801dd6b4,
 				static_cast<double>(p.m_position.x),
 				static_cast<double>(p.m_position.y),
 				static_cast<double>(p.m_position.z),

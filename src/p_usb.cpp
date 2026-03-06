@@ -15,13 +15,13 @@ extern "C" int IsConnected__4CUSBFv(void*);
 
 extern "C" char __vt__8CManager[];
 extern "C" char lbl_801E8668[];
-extern "C" char lbl_801E8830[];
+extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
 extern u32 lbl_801E8690[];
 extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
 extern u32 lbl_801E86B4[];
-extern char lbl_8032F810;
-extern char lbl_801D6D14[];
+extern char s_CUSBPcs_8032f810;
+extern char s_plot_kmitsuru__801d6d14[];
 extern CUSBPcs USBPcs;
 
 
@@ -44,7 +44,7 @@ void CUSBPcs::Init()
 	m_smallStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x2000, "p_usb.cpp", 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
-	strcpy(m_rootPath, lbl_801D6D14);
+	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
 	m_unk0x104 = 0;
 	m_unk0x108 = 0;
 
@@ -85,7 +85,7 @@ void* CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, &lbl_8032F810, 0);
+        m_bigStage = Memory.CreateStage(0x100000, &s_CUSBPcs_8032f810, 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
@@ -258,7 +258,7 @@ extern "C" void __sinit_p_usb_cpp()
     void* vtbl = __vt__8CManager;
     *reinterpret_cast<void**>(&USBPcs) = vtbl;
     *reinterpret_cast<void**>(&USBPcs) = lbl_801E8668;
-    *reinterpret_cast<void**>(&USBPcs) = lbl_801E8830;
+    *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
 
     u32* dst = lbl_801E86B4;
     u32* src0 = lbl_801E8690;

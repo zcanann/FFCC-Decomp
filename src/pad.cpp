@@ -18,7 +18,7 @@ CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 extern "C" char __vt__8CManager[];
-extern "C" char lbl_801E8864[];
+extern "C" char PTR_PTR_DAT_801e8864[];
 extern CMiniGamePcs MiniGamePcs;
 extern "C" unsigned char BYTE_ARRAY_8024430c[];
 extern "C" float FLOAT_8032f820;
@@ -40,7 +40,7 @@ extern "C" void __sinit_pad_cpp()
 {
 	void* vtbl = __vt__8CManager;
 	*reinterpret_cast<void**>(&Pad) = vtbl;
-	*reinterpret_cast<void**>(&Pad) = lbl_801E8864;
+	*reinterpret_cast<void**>(&Pad) = PTR_PTR_DAT_801e8864;
 	Pad._1b4_4_ = 0;
 	Pad._1b8_4_ = 0;
 }

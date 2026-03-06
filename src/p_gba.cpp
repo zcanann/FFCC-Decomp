@@ -8,9 +8,9 @@
 CGbaPcs GbaPcs;
 extern char __vt__8CManager[];
 extern char lbl_801E8668[];
-extern char lbl_8020F4A4[];
-extern char lbl_80330870[];
-extern char lbl_801D9DE0[];
+extern char PTR_PTR_s_CGbaPcs_8020f4a4[];
+extern char s_CGbaPcs_80330870[];
+extern char s_JoyBus__LoadBin___error_801d9de0[];
 extern "C" unsigned int lbl_8020F2F8[];
 extern "C" unsigned int lbl_8020F304[];
 extern "C" unsigned int lbl_8020F310[];
@@ -30,7 +30,7 @@ extern "C" void __sinit_p_gba_cpp(void)
 {
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
 	*reinterpret_cast<void**>(&GbaPcs) = lbl_801E8668;
-	*reinterpret_cast<void**>(&GbaPcs) = lbl_8020F4A4;
+	*reinterpret_cast<void**>(&GbaPcs) = PTR_PTR_s_CGbaPcs_8020f4a4;
 
 	unsigned int* table = lbl_8020F328;
 	table[1] = lbl_8020F2F8[0];
@@ -108,11 +108,11 @@ void* CGbaPcs::GetTable(unsigned long tableIndex)
  */
 void CGbaPcs::create()
 {
-	m_stage = Memory.CreateStage(0x56000, lbl_80330870, 0);
+	m_stage = Memory.CreateStage(0x56000, s_CGbaPcs_80330870, 0);
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
 	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
-		System.Printf(lbl_801D9DE0);
+		System.Printf(s_JoyBus__LoadBin___error_801d9de0);
 	}
 	Joybus.ThreadInit();
 }

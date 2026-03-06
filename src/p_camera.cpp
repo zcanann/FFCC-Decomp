@@ -64,7 +64,7 @@ extern CMath Math;
 extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
 extern unsigned char DAT_8032ecd8;
-extern unsigned int lbl_801E915C[];
+extern unsigned int PTR_s_CCameraPcs_GAME__801e915c[];
 extern unsigned int lbl_801E9030[];
 extern unsigned int lbl_801E903C[];
 extern unsigned int lbl_801E9048[];
@@ -90,7 +90,7 @@ extern unsigned int lbl_801E912C[];
 extern unsigned int lbl_801E9138[];
 extern unsigned int lbl_801E9144[];
 extern unsigned int lbl_801E9150[];
-extern unsigned int lbl_801E9B00[];
+extern unsigned int PTR_PTR_s_CCameraPcs_801e9b00[];
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
 extern Vec g_shadow_pos;
@@ -133,9 +133,9 @@ void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
  */
 extern "C" void __sinit_p_camera_cpp(void)
 {
-    unsigned int* dst = lbl_801E915C;
+    unsigned int* dst = PTR_s_CCameraPcs_GAME__801e915c;
 
-    *reinterpret_cast<unsigned int*>(&CameraPcs) = reinterpret_cast<unsigned int>(lbl_801E9B00);
+    *reinterpret_cast<unsigned int*>(&CameraPcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CCameraPcs_801e9b00);
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x414) = FLOAT_8032fa78;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x418) = FLOAT_8032fa78;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x41C) = FLOAT_8032fa78;
@@ -271,7 +271,7 @@ void CCameraPcs::Quit()
  */
 void* CCameraPcs::GetTable(unsigned long tableIndex)
 {
-	return lbl_801E915C + tableIndex * 0x57;
+	return PTR_s_CCameraPcs_GAME__801e915c + tableIndex * 0x57;
 }
 
 /*

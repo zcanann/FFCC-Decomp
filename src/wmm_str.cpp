@@ -2,9 +2,9 @@
 #include "ffcc/p_game.h"
 #include "ffcc/fontman.h"
 
-extern const char* lbl_80215BD8[];
-extern const char* lbl_80215BE8[];
-extern const char* lbl_80215BF8[];
+extern const char* PTR_s_The_data_is_corrupt__80215bd8[];
+extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[];
+extern const char* PTR_s_I_dati_sono_danneggiati__80215bf8[];
 extern const char* lbl_80215C08[];
 extern const char* lbl_80215C18[];
 
@@ -49,15 +49,15 @@ const char* CMenuPcs::GetMcStr(int index)
 {
     switch (Game.game.m_gameWork.m_languageId) {
     case 2:
-        return lbl_80215BE8[index];
+        return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
     case 3:
-        return lbl_80215BF8[index];
+        return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
     case 4:
         return lbl_80215C08[index];
     case 5:
         return lbl_80215C18[index];
     default:
-        return lbl_80215BD8[index];
+        return PTR_s_The_data_is_corrupt__80215bd8[index];
     }
 }
 

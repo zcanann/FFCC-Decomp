@@ -48,7 +48,7 @@ extern "C" int AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CM
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
-extern "C" char lbl_801DA7E8[];
+extern "C" char s_no_texture____801da7e8[];
 extern "C" void* System;
 extern "C" float lbl_80330BE8;
 extern "C" float lbl_80330BF4;
@@ -160,7 +160,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
         unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
         if (model != 0) {
             if (*(int*)(model + 0xB0) == 0) {
-                Printf__8CGraphicFPce(Graphic, lbl_801DA7E8);
+                Printf__8CGraphicFPce(Graphic, s_no_texture____801da7e8);
             } else {
                 SetFog__8CGraphicFii(Graphic, 0, 0);
                 SetAmbient__9CLightPcsF8_GXColor(LightPcs, p + 0xE8);
@@ -181,7 +181,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
                 DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
                 if (i == 0) {
-                    _WaitDrawDone__8CGraphicFPci(Graphic, lbl_801DA7E8 + 0x10, 0x2A7);
+                    _WaitDrawDone__8CGraphicFPci(Graphic, s_no_texture____801da7e8 + 0x10, 0x2A7);
                 }
             }
         }
@@ -212,7 +212,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
     if ((*(int*)(p + 0x2BC) != 0) || (*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x4C4) != 0) || (*(int*)(p + 0x710) != 0)) {
         if (*(int*)(p + 0x2BC) != 0) {
-            Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x2C0);
+            Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x2C0);
             fileHandle = File.Open((char*)(p + 0x2C0), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x194);
@@ -228,7 +228,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0xEA);
+                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(Chara + 0x2058), s_no_texture____801da7e8 + 0x10, 0xEA);
                 if (*(void**)(p + 0x190) != 0) {
                     *(void**)(p + 0x190) = __ct__Q26CChara6CModelFv(*(void**)(p + 0x190));
                 }
@@ -240,7 +240,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         if ((*(int*)(p + 0x5F0) != 0) && (*(void**)(p + 0x190) != 0)) {
-            Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x5F4);
+            Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x5F4);
             fileHandle = File.Open((char*)(p + 0x5F4), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
@@ -263,14 +263,14 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
             if (*(int*)(p + 0x3C0) == 0) {
                 for (i = 0; i < *(unsigned int*)(p + 0x1A8); i++) {
                     unsigned int idx = *(unsigned int*)(p + 0x1A4);
-                    sprintf(pathBuf, lbl_801DA7E8 + 0x64, p + 0x3C4, idx);
-                    Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, pathBuf);
+                    sprintf(pathBuf, s_no_texture____801da7e8 + 0x64, p + 0x3C4, idx);
+                    Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         releaseRef(p, 0x1B0 + idx * 4);
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0x124);
+                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), s_no_texture____801da7e8 + 0x10, 0x124);
                         if (*(void**)(p + 0x1B0 + idx * 4) != 0) {
                             *(void**)(p + 0x1B0 + idx * 4) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x1B0 + idx * 4));
                         }
@@ -285,12 +285,12 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 }
                 *(int*)(p + 0x710) = 0;
             } else {
-                Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x3C4);
+                Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x3C4);
                 fileHandle = File.Open((char*)(p + 0x3C4), 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0x111);
+                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), s_no_texture____801da7e8 + 0x10, 0x111);
                     if (*(void**)(p + 0x198) != 0) {
                         *(void**)(p + 0x198) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x198));
                     }
@@ -302,7 +302,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         if (*(int*)(p + 0x4C4) != 0) {
-            Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x4C8);
+            Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x4C8);
             fileHandle = File.Open((char*)(p + 0x4C8), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x2B0);
@@ -452,9 +452,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     Vec lightDir;
 
     memset(p + 0xCC, 0, 0x18);
-    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(Memory, 0x177000, lbl_801DA7E8 + 0xDC, 0);
-    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(Memory, 0x200000, lbl_801DA7E8 + 0xF0, 0);
-    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(Memory, 0x190000, lbl_801DA7E8 + 0x108, 0);
+    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(Memory, 0x177000, s_no_texture____801da7e8 + 0xDC, 0);
+    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(Memory, 0x200000, s_no_texture____801da7e8 + 0xF0, 0);
+    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(Memory, 0x190000, s_no_texture____801da7e8 + 0x108, 0);
 
     p[0xE8] = 0x3F;
     p[0xE9] = 0x3F;
@@ -519,19 +519,19 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
         *(int*)(p + 0x1B0 + i * 4) = 0;
     }
 
-    strcpy((char*)(p + 0x2C0), lbl_801DA7E8 + 0x11C);
+    strcpy((char*)(p + 0x2C0), s_no_texture____801da7e8 + 0x11C);
     *(int*)(p + 0x2BC) = 1;
-    strcpy((char*)(p + 0x5F4), lbl_801DA7E8 + 0x134);
+    strcpy((char*)(p + 0x5F4), s_no_texture____801da7e8 + 0x134);
     *(int*)(p + 0x5F0) = 1;
-    strcpy((char*)(p + 0x3C4), lbl_801DA7E8 + 0x14C);
+    strcpy((char*)(p + 0x3C4), s_no_texture____801da7e8 + 0x14C);
     *(int*)(p + 0x3C0) = 1;
-    strcpy((char*)(p + 0x4C8), lbl_801DA7E8 + 0x164);
+    strcpy((char*)(p + 0x4C8), s_no_texture____801da7e8 + 0x164);
     *(int*)(p + 0x4C4) = 1;
     strcpy((char*)(p + 0x5CC), lbl_80330C44);
     *(int*)(p + 0x5EC) = -1;
     *(int*)(p + 0x5C8) = 1;
 
-    sprintf(pathBuf, lbl_801DA7E8 + 0x17C, *(unsigned int*)(USBPcs + 4));
+    sprintf(pathBuf, s_no_texture____801da7e8 + 0x17C, *(unsigned int*)(USBPcs + 4));
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
         File.Read(fileHandle);

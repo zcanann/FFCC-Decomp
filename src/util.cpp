@@ -28,7 +28,7 @@ struct CTextureLite {
     GXTlutObj m_tlutObj1;
 };
 
-extern void* lbl_801E88C4[];
+extern void* PTR_PTR_s_CUtil_801e88c4[];
 
 CUtil gUtil;
 
@@ -43,7 +43,7 @@ CUtil gUtil;
  */
 extern "C" void __sinit_util_cpp(void)
 {
-    *reinterpret_cast<void**>(&gUtil) = lbl_801E88C4;
+    *reinterpret_cast<void**>(&gUtil) = PTR_PTR_s_CUtil_801e88c4;
 }
 
 /*

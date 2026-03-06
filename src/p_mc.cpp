@@ -14,7 +14,7 @@ extern unsigned int lbl_80211D88[];
 extern unsigned int lbl_80211D94[];
 extern unsigned int lbl_80211DA0[];
 extern unsigned char lbl_80211DAC[];
-extern unsigned char lbl_80211F28[];
+extern unsigned char PTR_PTR_s_CMcPcs_80211f28[];
 extern unsigned int lbl_8032EE88;
 
 struct MenuPcsMcLayout
@@ -163,7 +163,7 @@ extern "C" void __sinit_p_mc_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    lbl_8032EE88 = (unsigned int)lbl_80211F28;
+    lbl_8032EE88 = (unsigned int)PTR_PTR_s_CMcPcs_80211f28;
     table = (unsigned int*)lbl_80211DAC;
     table0 = lbl_80211D88;
     table1 = lbl_80211D94;

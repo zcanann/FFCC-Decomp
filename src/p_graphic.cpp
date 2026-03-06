@@ -17,7 +17,7 @@ extern "C" int GetPadType__6JoyBusFi(void*, int);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
-extern void* lbl_801E9E9C;
+extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
 
 extern u32 lbl_801E9C90[];
 extern u32 lbl_801E9C9C[];
@@ -63,7 +63,7 @@ extern "C" void __sinit_p_graphic_cpp(void)
     volatile void** base = (volatile void**)&GraphicsPcs;
     *base = &__vt__8CManager;
     *base = &lbl_801E8668;
-    *base = &lbl_801E9E9C;
+    *base = &PTR_PTR_s_CGraphicPcs_801e9e9c;
 
     u32* dst = lbl_801E9D08;
     dst[1] = lbl_801E9C90[0];

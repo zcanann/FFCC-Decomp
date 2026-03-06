@@ -10,6 +10,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/sound.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
@@ -93,27 +94,15 @@ extern "C" char* PTR_s_Masculin_802144c4[];
 extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
-extern "C" u8 lbl_801DE6AC[];
 extern "C" char* PTR_s_Blacksmith_80214140[];
 extern "C" char* PTR_s_Schmied_80214160[];
 extern "C" char* PTR_s_Fabbri_80214180[];
 extern "C" char* PTR_s_Forgeron_802141a0[];
 extern "C" char* PTR_s_Herrero_802141c0[];
-extern "C" char* lbl_802141E0[];
-extern "C" char* lbl_802142C0[];
-extern "C" char* lbl_802143A0[];
-extern "C" char* lbl_80214480[];
-extern "C" char* lbl_80214560[];
 extern "C" char* PTR_s_Cowlick_80214640[];
 extern "C" char* PTR_s_Spitzschopf_802146c0[];
 extern "C" char* PTR_s_Ciuffo_ribelle_80214740[];
-extern "C" char* lbl_802147C0[];
 extern "C" char* PTR_s_Remolino_80214840[];
-extern "C" char* lbl_802148C0[];
-extern "C" char* lbl_80214910[];
-extern "C" char* lbl_80214960[];
-extern "C" char* lbl_802149B0[];
-extern "C" char* lbl_80214A00[];
 extern "C" unsigned char DAT_80214a50[];
 extern "C" char s_DynamicMessStr[];
 
@@ -232,21 +221,21 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
 
     u8 languageId = Game.game.m_gameWork.m_languageId;
     if (languageId == 3) {
-        return lbl_802143A0[staticText];
+        return gSingMenuTextTableIt[staticText];
     }
     if (languageId < 3) {
         if ((languageId == 0) || (languageId == 1)) {
-            return lbl_802141E0[staticText];
+            return gSingMenuTextTableEn[staticText];
         }
-        return lbl_802142C0[staticText];
+        return gSingMenuTextTableDe[staticText];
     }
     if (languageId == 5) {
-        return lbl_80214560[staticText];
+        return gSingMenuTextTableEs[staticText];
     }
     if (languageId < 5) {
-        return lbl_80214480[staticText];
+        return gSingMenuTextTableFr[staticText];
     }
-    return lbl_802141E0[staticText];
+    return gSingMenuTextTableEn[staticText];
 }
 
 static inline double SingWinUIntToDouble(unsigned int value)
@@ -841,19 +830,19 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         char* label;
         if (languageId == 3) {
-            label = lbl_802143A0[i + 5];
+            label = gSingMenuTextTableIt[i + 5];
         } else if (languageId < 3) {
             if ((languageId == 0) || (languageId == 1)) {
-                label = lbl_802141E0[i + 5];
+                label = gSingMenuTextTableEn[i + 5];
             } else {
-                label = lbl_802142C0[i + 5];
+                label = gSingMenuTextTableDe[i + 5];
             }
         } else if (languageId == 5) {
-            label = lbl_80214560[i + 5];
+            label = gSingMenuTextTableEs[i + 5];
         } else if (languageId > 4) {
-            label = lbl_802141E0[i + 5];
+            label = gSingMenuTextTableEn[i + 5];
         } else {
-            label = lbl_80214480[i + 5];
+            label = gSingMenuTextTableFr[i + 5];
         }
 
         if ((languageId == 2) && (i == 3)) {
@@ -1417,7 +1406,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
 
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x25);
     if (rawIcon == 0) {
-        iconNo = static_cast<int>(lbl_801DE6AC[iconNo]);
+        iconNo = static_cast<int>(gSingMenuItemIconByType[iconNo]);
     }
 
     int row = iconNo / 8;
@@ -2383,7 +2372,7 @@ char* CMenuPcs::GetJobStr(int index)
  */
 char* CMenuPcs::GetHairStr(int index)
 {
-    return GetLanguageTableString(index, PTR_s_Cowlick_80214640, PTR_s_Spitzschopf_802146c0, PTR_s_Ciuffo_ribelle_80214740, lbl_802147C0, PTR_s_Remolino_80214840);
+    return GetLanguageTableString(index, PTR_s_Cowlick_80214640, PTR_s_Spitzschopf_802146c0, PTR_s_Ciuffo_ribelle_80214740, gSingMenuHairTableFr, PTR_s_Remolino_80214840);
 }
 
 /*
@@ -2397,7 +2386,7 @@ char* CMenuPcs::GetHairStr(int index)
  */
 char* CMenuPcs::GetMenuStr(int index)
 {
-    return GetLanguageTableString(index, lbl_802141E0, lbl_802142C0, lbl_802143A0, lbl_80214480, lbl_80214560);
+    return GetLanguageTableString(index, gSingMenuTextTableEn, gSingMenuTextTableDe, gSingMenuTextTableIt, gSingMenuTextTableFr, gSingMenuTextTableEs);
 }
 
 /*
@@ -2411,7 +2400,7 @@ char* CMenuPcs::GetMenuStr(int index)
  */
 char* CMenuPcs::GetAttrStr(int index)
 {
-    return GetLanguageTableString(index, lbl_802148C0, lbl_80214910, lbl_80214960, lbl_802149B0, lbl_80214A00);
+    return GetLanguageTableString(index, gSingMenuAttrTableEn, gSingMenuAttrTableDe, gSingMenuAttrTableIt, gSingMenuAttrTableFr, gSingMenuAttrTableEs);
 }
 
 /*
@@ -2425,5 +2414,5 @@ char* CMenuPcs::GetAttrStr(int index)
  */
 u8 CMenuPcs::GetItemIcon(int index)
 {
-    return lbl_801DE6AC[index];
+    return gSingMenuItemIconByType[index];
 }

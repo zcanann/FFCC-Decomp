@@ -3,10 +3,6 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 extern "C" void __dl__FPv(void* ptr);
 
-extern char s_no_name_8032f860;
-extern float lbl_8032F850;
-extern float lbl_8032F854;  // 0.0f
-
 /*
  * --INFO--
  * Address:	TODO
@@ -78,7 +74,7 @@ float CStopWatch::Get()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	ticks = ticks / denom;
-	return lbl_8032F850 * ticks;
+	return kStopwatchTickToMilliseconds * ticks;
 }
 
 /*
@@ -92,14 +88,14 @@ float CStopWatch::Get()
  */
 CProfile::CProfile(char* name)
 {
-	OSInitStopwatch(this, &s_no_name_8032f860);
+	OSInitStopwatch(this, &s_stopwatchDefaultName);
 	OSResetStopwatch(this);
 
 	OSStopwatch tmp;
 	OSInitStopwatch(&tmp, name);
 	OSResetStopwatch(&tmp);
 
-	float time = lbl_8032F854;
+	float time = kStopwatchZeroFloat;
 	m_maxTime = time;
 	m_lastTime = time;
 	m_frame = 0;
@@ -137,13 +133,13 @@ void CProfile::ProfEnd()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	float elapsed = ticks / denom;
-	m_lastTime = elapsed * lbl_8032F850;
+	m_lastTime = elapsed * kStopwatchTickToMilliseconds;
 
 	int next = m_frame + 1;
 	m_frame = next;
 	if (next == 0x5A)
 	{
-		m_maxTime = lbl_8032F854;
+		m_maxTime = kStopwatchZeroFloat;
 		m_frame = 0;
 	}
 

@@ -8,19 +8,7 @@ extern "C" {
 	void* memset(void* s, int c, unsigned int n);
 }
 
-// Global memory management data
-extern int* lbl_8032F4A0;  // Main memory block list
-extern int* lbl_8032F4A4;  // A memory block list  
-extern int lbl_8032F490;   // Main memory base
-extern int lbl_8032F494;   // A memory base
-extern int lbl_8032F498;   // Main memory size
-extern int lbl_8032F49C;   // A memory size
-extern int lbl_8032F408;   // Debug output flag
-extern char s__s_sMemory_Bank_Full____s_801e7888[];
-extern char s__s_sA_Memory_Bank_Full____s_801e78b5[];
-extern char lbl_801E78A3;
-extern char lbl_80333D20;
-extern char lbl_80333D28;
+// Runtime library state (__files + 0x50, used as flush target in decomp).
 extern char lbl_8021D1A8;
 
 // Function declarations
@@ -75,20 +63,20 @@ int RedNew(int param_1)
 	int entryCount;
 	int* slot;
 
-	if (((param_1 < 1) || (lbl_8032F4A0 == (int*)0)) || (lbl_8032F490 == 0)) {
+	if (((param_1 < 1) || (gRedMainMemoryBlockList == (int*)0)) || (gRedMainMemoryBase == 0)) {
 		return 0;
 	}
 
 	interrupts = OSDisableInterrupts();
 	alignedSize = param_1 + 0x1FU & 0xFFFFFFE0;
-	address = lbl_8032F490;
-	slot = lbl_8032F4A0;
+	address = gRedMainMemoryBase;
+	slot = gRedMainMemoryBlockList;
 	do {
 		if ((slot[1] == 0) || (address + (int)alignedSize <= *slot)) {
-			if (lbl_8032F4A0[0x7FF] < 1) {
-				if (address + (int)alignedSize <= lbl_8032F490 + lbl_8032F498) {
+			if (gRedMainMemoryBlockList[0x7FF] < 1) {
+				if (address + (int)alignedSize <= gRedMainMemoryBase + gRedMainMemorySize) {
 					if (0 < slot[1]) {
-						moveCount = (int)lbl_8032F4A0 + (0x2000 - (int)(slot + 2));
+						moveCount = (int)gRedMainMemoryBlockList + (0x2000 - (int)(slot + 2));
 						entryCount = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
 						if (0 < entryCount) {
 							memmove(slot + 2, slot, entryCount * 8);
@@ -99,8 +87,8 @@ int RedNew(int param_1)
 					OSRestoreInterrupts(interrupts);
 					return address;
 				}
-			} else if (lbl_8032F408 != 0) {
-				OSReport(s__s_sMemory_Bank_Full____s_801e7888, &lbl_801E78A3, &lbl_80333D20, &lbl_80333D28);
+			} else if (gRedMemoryDebugEnabled != 0) {
+				OSReport(s__s_sMemory_Bank_Full____s_801e7888, &s_redMemoryLogPrefix_801E78A3, &s_redMemoryLogSuffixA_80333D20, &s_redMemoryLogSuffixB_80333D28);
 				fflush(&lbl_8021D1A8);
 			}
 			break;
@@ -109,7 +97,7 @@ int RedNew(int param_1)
 		entry = slot + 1;
 		slot = slot + 2;
 		address = address + *entry;
-	} while (slot < lbl_8032F4A0 + 0x800);
+	} while (slot < gRedMainMemoryBlockList + 0x800);
 	OSRestoreInterrupts(interrupts);
 	return 0;
 }
@@ -130,16 +118,16 @@ void RedDelete(int address)
 	}
 	
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockPtr = lbl_8032F4A0;
+	int* blockPtr = gRedMainMemoryBlockList;
 	
 	if (blockPtr) {
-		while (blockPtr[1] != 0 && blockPtr < lbl_8032F4A0 + 0x800) {
+		while (blockPtr[1] != 0 && blockPtr < gRedMainMemoryBlockList + 0x800) {
 			if (blockPtr[0] == address) {
-				unsigned int moveCount = (int)lbl_8032F4A0 + (0x2000 - (int)(blockPtr + 2));
+				unsigned int moveCount = (int)gRedMainMemoryBlockList + (0x2000 - (int)(blockPtr + 2));
 				int entryCount = (int)moveCount / 8;
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(lbl_8032F4A0 + 0x7FE, 0, 8);
+					memset(gRedMainMemoryBlockList + 0x7FE, 0, 8);
 				}
 				break;
 			}
@@ -189,34 +177,34 @@ int RedNewA(int size, int offset, int maxSize)
 	int* blockPtr;
 	int* scanPtr;
 
-	if (size < 1 || lbl_8032F4A4 == (int*)0 || lbl_8032F494 == 0) {
+	if (size < 1 || gRedAMemoryBlockList == (int*)0 || gRedAMemoryBase == 0) {
 		return 0;
 	}
-	if (lbl_8032F4A4[0x7FF] >= 1) {
-		if (lbl_8032F408 != 0) {
-			OSReport(s__s_sA_Memory_Bank_Full____s_801e78b5, &lbl_801E78A3, &lbl_80333D20, &lbl_80333D28);
+	if (gRedAMemoryBlockList[0x7FF] >= 1) {
+		if (gRedMemoryDebugEnabled != 0) {
+			OSReport(s__s_sA_Memory_Bank_Full____s_801e78b5, &s_redMemoryLogPrefix_801E78A3, &s_redMemoryLogSuffixA_80333D20, &s_redMemoryLogSuffixB_80333D28);
 			fflush(&lbl_8021D1A8);
 		}
 		return 0;
 	}
 
 	interrupts = OSDisableInterrupts();
-	iVar6 = lbl_8032F494 + offset;
+	iVar6 = gRedAMemoryBase + offset;
 	if (maxSize == 0) {
-		maxSize = lbl_8032F49C;
+		maxSize = gRedAMemorySize;
 	}
 	maxSize = maxSize - offset;
 	alignedSize = size + 0x1FU & 0xFFFFFFE0;
 	iVar7 = -1;
 	bestBlock = (int*)0;
-	for (blockPtr = lbl_8032F4A4; (blockPtr[1] != 0 && *blockPtr < iVar6); blockPtr = blockPtr + 2) {
+	for (blockPtr = gRedAMemoryBlockList; (blockPtr[1] != 0 && *blockPtr < iVar6); blockPtr = blockPtr + 2) {
 	}
 	iVar5 = maxSize;
 	result = iVar6;
 	iVar8 = iVar6;
 	scanPtr = blockPtr;
 	if (blockPtr[1] != 0) {
-		for (; scanPtr[1] != 0 && scanPtr < lbl_8032F4A4 + 0x800; scanPtr = scanPtr + 2) {
+		for (; scanPtr[1] != 0 && scanPtr < gRedAMemoryBlockList + 0x800; scanPtr = scanPtr + 2) {
 			if (iVar8 < iVar6 + maxSize) {
 				if ((int)(iVar8 + alignedSize) <= *scanPtr) {
 					iVar7 = iVar8;
@@ -226,13 +214,13 @@ int RedNewA(int size, int offset, int maxSize)
 					}
 				}
 			} else {
-				scanPtr = lbl_8032F4A4 + 0x800;
+				scanPtr = gRedAMemoryBlockList + 0x800;
 			}
 			iVar8 = *scanPtr + scanPtr[1];
 		}
 		result = iVar7;
 		blockPtr = bestBlock;
-		if (((scanPtr[1] == 0 && scanPtr < lbl_8032F4A4 + 0x800) &&
+		if (((scanPtr[1] == 0 && scanPtr < gRedAMemoryBlockList + 0x800) &&
 		     (iVar7 = (iVar6 + maxSize) - iVar8, (int)alignedSize <= iVar7)) &&
 		    iVar7 < iVar5) {
 			result = iVar8;
@@ -244,7 +232,7 @@ int RedNewA(int size, int offset, int maxSize)
 		return 0;
 	}
 	if (0 < blockPtr[1]) {
-		moveCount = (int)lbl_8032F4A4 + (0x2000 - (int)(blockPtr + 2));
+		moveCount = (int)gRedAMemoryBlockList + (0x2000 - (int)(blockPtr + 2));
 		iVar6 = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
 		if (0 < iVar6) {
 			memmove(blockPtr + 2, blockPtr, iVar6 * 8);
@@ -272,16 +260,16 @@ void RedDeleteA(int address)
 	}
 	
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockPtr = lbl_8032F4A4;
+	int* blockPtr = gRedAMemoryBlockList;
 	
 	if (blockPtr) {
-		while (blockPtr[1] != 0 && blockPtr < lbl_8032F4A4 + 0x800) {
+		while (blockPtr[1] != 0 && blockPtr < gRedAMemoryBlockList + 0x800) {
 			if (blockPtr[0] == address) {
-				unsigned int moveCount = (int)lbl_8032F4A4 + (0x2000 - (int)(blockPtr + 2));
+				unsigned int moveCount = (int)gRedAMemoryBlockList + (0x2000 - (int)(blockPtr + 2));
 				int entryCount = (int)moveCount / 8;
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(lbl_8032F4A4 + 0x7FE, 0, 8);
+					memset(gRedAMemoryBlockList + 0x7FE, 0, 8);
 				}
 				break;
 			}
@@ -321,14 +309,14 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
 	int* bankA = (int*)(param1 + 0x2000);
 
-	lbl_8032F498 = param2 - 0x4000;
-	lbl_8032F4A4 = bankA;
-	lbl_8032F490 = param1 + 0x4000;
-	lbl_8032F4A0 = (int*)param1;
+	gRedMainMemorySize = param2 - 0x4000;
+	gRedAMemoryBlockList = bankA;
+	gRedMainMemoryBase = param1 + 0x4000;
+	gRedMainMemoryBlockList = (int*)param1;
 	memset((void*)param1, 0, 0x2000);
 	memset(bankA, 0, 0x2000);
-	lbl_8032F494 = param3;
-	lbl_8032F49C = param4;
+	gRedAMemoryBase = param3;
+	gRedAMemorySize = param4;
 }
 
 /*
@@ -342,7 +330,7 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
  */
 int CRedMemory::GetMainBufferAddress()
 {
-	return lbl_8032F490;
+	return gRedMainMemoryBase;
 }
 
 /*
@@ -356,7 +344,7 @@ int CRedMemory::GetMainBufferAddress()
  */
 int CRedMemory::GetMainBufferSize()
 {
-	return lbl_8032F498;
+	return gRedMainMemorySize;
 }
 
 /*
@@ -370,7 +358,7 @@ int CRedMemory::GetMainBufferSize()
  */
 int* CRedMemory::GetMainBankAddress()
 {
-	return lbl_8032F4A0;
+	return gRedMainMemoryBlockList;
 }
 
 /*
@@ -384,7 +372,7 @@ int* CRedMemory::GetMainBankAddress()
  */
 int CRedMemory::GetABufferAddress()
 {
-	return lbl_8032F494;
+	return gRedAMemoryBase;
 }
 
 /*
@@ -398,7 +386,7 @@ int CRedMemory::GetABufferAddress()
  */
 int CRedMemory::GetABufferSize()
 {
-	return lbl_8032F49C;
+	return gRedAMemorySize;
 }
 
 /*
@@ -412,5 +400,5 @@ int CRedMemory::GetABufferSize()
  */
 int* CRedMemory::GetABankAddress()
 {
-	return lbl_8032F4A4;
+	return gRedAMemoryBlockList;
 }

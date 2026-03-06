@@ -1256,9 +1256,9 @@ void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 {
     Vec local_vec;
 
-    extern Vec lbl_801d7070;
+    extern Vec gUtilUpVector;
 
-    local_vec = lbl_801d7070;
+    local_vec = gUtilUpVector;
 
     PSVECCrossProduct(&param_4, &local_vec, param_2);
     PSVECNormalize(param_2, param_2);

@@ -1,10 +1,8 @@
 #include "ffcc/pppParMoveMatrix.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/ppp_constants.h"
 
 #include <dolphin/mtx.h>
-
-extern float lbl_80330E38;
-extern float lbl_80330E3C;
 
 /*
  * --INFO--
@@ -32,18 +30,18 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 	Vec* position = &pppMngSt->m_position;
 	PSVECSubtract(previousPosition, position, &local_44);
 	
-	if (((lbl_80330E38 != local_44.x) || (lbl_80330E38 != local_44.y)) || (lbl_80330E38 != local_44.z)) {
+	if (((gPppParMoveMatrixZero != local_44.x) || (gPppParMoveMatrixZero != local_44.y)) || (gPppParMoveMatrixZero != local_44.z)) {
 		PSVECNormalize(&local_44, &local_68);
 		local_50.x = local_68.z;
-		local_50.y = lbl_80330E38;
+		local_50.y = gPppParMoveMatrixZero;
 		local_50.z = -local_68.x;
-		if (!((local_68.z != lbl_80330E38) || (lbl_80330E38 != local_50.z))) {
-			local_50.y = lbl_80330E38;
-			local_50.x = lbl_80330E3C;
-			local_50.z = lbl_80330E38;
-			local_5c.x = lbl_80330E38;
-			local_5c.y = lbl_80330E38;
-			local_5c.z = lbl_80330E3C;
+		if (!((local_68.z != gPppParMoveMatrixZero) || (gPppParMoveMatrixZero != local_50.z))) {
+			local_50.y = gPppParMoveMatrixZero;
+			local_50.x = gPppParMoveMatrixOne;
+			local_50.z = gPppParMoveMatrixZero;
+			local_5c.x = gPppParMoveMatrixZero;
+			local_5c.y = gPppParMoveMatrixZero;
+			local_5c.z = gPppParMoveMatrixOne;
 		}
 		else {
 			PSVECNormalize(&local_50, &local_50);

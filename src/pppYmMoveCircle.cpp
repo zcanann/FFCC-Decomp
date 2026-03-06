@@ -1,6 +1,7 @@
 #include "ffcc/pppYmMoveCircle.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
+#include "ffcc/ppp_constants.h"
 #include "types.h"
 #include "dolphin/mtx.h"
 #include "math.h"
@@ -19,14 +20,6 @@ struct pppYmMoveCircleWork {
 };
 
 extern int gPppCalcDisabled;
-extern f32 lbl_801EC9F0[];
-extern f32 lbl_80330D78;
-extern f32 lbl_80330D7C;
-extern f32 lbl_80330D80;
-extern f32 lbl_80330D84;
-extern f32 lbl_80330D88;
-extern f32 lbl_80330D8C;
-extern f32 lbl_80330D90;
 
 /*
  * --INFO--
@@ -56,10 +49,10 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = lbl_80330D90 * acosf(PSVECDotProduct(&tempUp, &temp1));
+    work->m_angle = gPppYmMoveCircleRadToAngleScale * acosf(PSVECDotProduct(&tempUp, &temp1));
 
     if ((temp1.x <= 0.0f && temp1.z >= 0.0f) || (temp1.x >= 0.0f && temp1.z >= 0.0f)) {
-        work->m_angle = lbl_80330D78 - work->m_angle;
+        work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;
     }
 
     work->m_radiusStepStep = 0.0f;
@@ -116,20 +109,20 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
     work->m_angle += work->m_angleStep;
 
-    if (work->m_angle > lbl_80330D78) {
-        work->m_angle -= lbl_80330D78;
+    if (work->m_angle > gPppYmMoveCircleTurnSpan) {
+        work->m_angle -= gPppYmMoveCircleTurnSpan;
     }
-    if (work->m_angle < lbl_80330D7C) {
-        work->m_angle += lbl_80330D78;
+    if (work->m_angle < gPppYmMoveCircleZero) {
+        work->m_angle += gPppYmMoveCircleTurnSpan;
     }
 
-    tableIndex = (s32)((lbl_80330D80 * (lbl_80330D84 * work->m_angle)) / lbl_80330D88);
-    sinAngle = *(f32*)((u8*)lbl_801EC9F0 + (tableIndex & 0xFFFC));
-    cosAngle = *(f32*)((u8*)lbl_801EC9F0 + ((tableIndex + 0x4000) & 0xFFFC));
+    tableIndex = (s32)((gPppYmMoveCircleAngleScale * (gPppYmMoveCircleAngleToTableScale * work->m_angle)) / gPppYmMoveCircleTableDivisor);
+    sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
+    cosAngle = *(f32*)((u8*)gPppTrigTable + ((tableIndex + 0x4000) & 0xFFFC));
     radiusX = work->m_radius * cosAngle;
     radiusZ = work->m_radius * -sinAngle;
     nextPos.x = radiusX + work->m_center.x;
-    nextPos.y = lbl_80330D7C;
+    nextPos.y = gPppYmMoveCircleZero;
     nextPos.y = *(f32*)(pppMngSt + 0xC);
     nextPos.z = radiusZ + work->m_center.z;
 

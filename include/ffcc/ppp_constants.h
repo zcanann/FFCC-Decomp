@@ -1,51 +1,86 @@
 #ifndef FFCC_PPP_CONSTANTS_H
 #define FFCC_PPP_CONSTANTS_H
 
-#include "types.h"
+extern float gPppTrigTable[];
 
-extern f32 kPppRandCharSingleSampleScale;
-extern f64 kPppRandCharIntToFloatBias;
-extern f32 kPppRandCVSingleSampleScale;
-extern f32 kPppRandDownCharDualSampleScale;
-extern f32 kPppRandDownCVDualSampleScale;
-extern f32 kPppRandDownFloatDualSampleScale;
-extern f32 kPppRandDownFVDualSampleScale;
-extern f32 kPppRandDownHCVDualSampleScale;
-extern f32 kPppRandDownIntDualSampleScale;
-extern f32 kPppRandDownIVDualSampleScale;
-extern f32 kPppRandDownShortDualSampleScale;
-extern f64 kPppRandDownShortIntToFloatBias;
-extern f32 kPppRandFloatSingleSampleScale;
-extern f32 kPppRandFVSingleSampleScale;
-extern f32 kPppRandHCVSingleSampleScale;
-extern f32 kPppRandIntSingleSampleScale;
-extern f64 kPppRandIntIntToFloatBias;
-extern f32 kPppRandIVSingleSampleScale;
-extern f32 kPppRandShortSingleSampleScale;
-extern f64 kPppRandShortIntToFloatBias;
-extern f32 kPppRandUpCharDualSampleScale;
-extern f64 kPppRandUpCharIntToFloatBias;
-extern f32 kPppRandUpCVDualSampleScale;
-extern f64 kPppRandUpCVIntToFloatBias;
-extern f32 kPppRandUpFloatDualSampleScale;
-extern f32 kPppRandUpFVDualSampleScale;
-extern f32 kPppRandUpHCVDualSampleScale;
-extern f32 kPppRandUpIntDualSampleScale;
-extern f64 kPppRandUpIntIntToFloatBias;
-extern f32 kPppRandUpIVDualSampleScale;
-extern f32 kPppRandUpShortDualSampleScale;
-extern f64 kPppRandUpShortIntToFloatBias;
-extern f32 kPppSclAcceleZero;
-extern f32 kPppSclMoveZero;
-extern f32 kPppSRandCVSingleSampleScale;
-extern f32 kPppSRandDownCVDualSampleScale;
-extern f32 kPppSRandDownFVDualSampleScale;
-extern f32 kPppSRandDownHCVDualSampleScale;
-extern f32 kPppSRandFVSingleSampleScale;
-extern f32 kPppSRandHCVSingleSampleScale;
-extern f32 kPppSRandUpCVDualSampleScale;
-extern f32 kPppSRandUpFVDualSampleScale;
-extern f32 kPppSRandUpHCVDualSampleScale;
-extern f32 kPppVtMimeZero;
+extern float gPppPointRApRandomAngleRange;
+extern float gPppPointRApRandomAngleBias;
+extern float gPppPointRApSpinScale;
+
+extern float gPppScaleLoopAutoZero;
+
+extern float gPppYmMoveCircleTurnSpan;
+extern float gPppYmMoveCircleZero;
+extern float gPppYmMoveCircleAngleScale;
+extern float gPppYmMoveCircleAngleToTableScale;
+extern float gPppYmMoveCircleTableDivisor;
+extern float gPppYmMoveCircleOne;
+extern float gPppYmMoveCircleRadToAngleScale;
+
+extern float gPppYmMoveParabolaYOffsetStep;
+extern float gPppYmMoveParabolaZero;
+extern float gPppYmMoveParabolaAngleScale;
+extern float gPppYmMoveParabolaAngleDivisor;
+extern float gPppYmMoveParabolaGravityScale;
+
+extern float gPppParMoveMatrixZero;
+extern float gPppParMoveMatrixOne;
+
+extern float gPppYmLookOnZero;
+extern float gPppYmLookOnOne;
+
+extern float kPppZero;
+extern float kPppOne;
+extern float kPppAcceleZero;
+extern float kPppBreathModelZero;
+extern float kPppChangeTexInit;
+extern float kPppKeLnsZero;
+extern float kPppMoveZero;
+extern float kPppSclAcceleZero;
+extern float kPppSclMoveZero;
+extern float kPppVtMimeZero;
+
+extern float kPppRandCharSingleSampleScale;
+extern double kPppRandCharIntToFloatBias;
+extern float kPppRandCVSingleSampleScale;
+extern float kPppRandDownCharDualSampleScale;
+extern float kPppRandDownCVDualSampleScale;
+extern float kPppRandDownFloatDualSampleScale;
+extern float kPppRandDownFVDualSampleScale;
+extern float kPppRandDownHCVDualSampleScale;
+extern float kPppRandDownIntDualSampleScale;
+extern float kPppRandDownIVDualSampleScale;
+extern float kPppRandDownShortDualSampleScale;
+extern double kPppRandDownShortIntToFloatBias;
+extern float kPppRandFloatSingleSampleScale;
+extern float kPppRandFVSingleSampleScale;
+extern float kPppRandHCVSingleSampleScale;
+extern float kPppRandIntSingleSampleScale;
+extern double kPppRandIntIntToFloatBias;
+extern float kPppRandIVSingleSampleScale;
+extern float kPppRandShortSingleSampleScale;
+extern double kPppRandShortIntToFloatBias;
+extern float kPppRandUpCharDualSampleScale;
+extern double kPppRandUpCharIntToFloatBias;
+extern float kPppRandUpCVDualSampleScale;
+extern double kPppRandUpCVIntToFloatBias;
+extern float kPppRandUpFloatDualSampleScale;
+extern float kPppRandUpFVDualSampleScale;
+extern float kPppRandUpHCVDualSampleScale;
+extern float kPppRandUpIntDualSampleScale;
+extern double kPppRandUpIntIntToFloatBias;
+extern float kPppRandUpIVDualSampleScale;
+extern float kPppRandUpShortDualSampleScale;
+extern double kPppRandUpShortIntToFloatBias;
+
+extern float kPppSRandCVSingleSampleScale;
+extern float kPppSRandDownCVDualSampleScale;
+extern float kPppSRandDownFVDualSampleScale;
+extern float kPppSRandDownHCVDualSampleScale;
+extern float kPppSRandFVSingleSampleScale;
+extern float kPppSRandHCVSingleSampleScale;
+extern float kPppSRandUpCVDualSampleScale;
+extern float kPppSRandUpFVDualSampleScale;
+extern float kPppSRandUpHCVDualSampleScale;
 
 #endif

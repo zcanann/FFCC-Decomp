@@ -15,7 +15,7 @@
 #include "dolphin/vi/vifuncs.h"
 
 extern "C" char PTR_PTR_s_CGraphic_801e8408[];
-extern GXRenderModeObj lbl_801E83C0;
+extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
 extern char DAT_80238030[];
 extern CUtil gUtil;
@@ -56,7 +56,7 @@ extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" char s_graphic_cpp_801d6348[];
 extern "C" char s_CGraphic_801d6330[];
-extern "C" char lbl_801D6498[];
+extern "C" char sGraphicMemoryStageName[];
 extern "C" OSThread m_thread;
 extern "C" u8 m_threadStack[];
 
@@ -143,7 +143,7 @@ CGraphic::CGraphic()
 void CGraphic::Init()
 {
     PtrAt(this, 0x4) = CreateStage__7CMemoryFUlPci(&Memory, 0x19C000, s_CGraphic_801d6330, 0);
-    PtrAt(this, 0x8) = CreateStage__7CMemoryFUlPci(&Memory, 0xD6000, lbl_801D6498, 0);
+    PtrAt(this, 0x8) = CreateStage__7CMemoryFUlPci(&Memory, 0xD6000, sGraphicMemoryStageName, 0);
 
     S32At(this, 0x14) = 0;
     U8At(this, 0x7200) = 0;
@@ -164,7 +164,7 @@ void CGraphic::Init()
     OSResumeThread(&m_thread);
 
     VIInit();
-    PtrAt(this, 0x71E0) = &lbl_801E83C0;
+    PtrAt(this, 0x71E0) = &gDefaultGXRenderMode;
     S32At(this, 0x71F0) = 1;
 
     void* renderMode = PtrAt(this, 0x71E0);
@@ -296,8 +296,8 @@ int CGraphic::GetProgressive()
 void CGraphic::ChangeProgressive(int mode)
 {
     GXRenderModeObj** renderMode = reinterpret_cast<GXRenderModeObj**>(reinterpret_cast<u8*>(this) + 0x71E0);
-    if (*renderMode != &lbl_801E83C0) {
-        *renderMode = &lbl_801E83C0;
+    if (*renderMode != &gDefaultGXRenderMode) {
+        *renderMode = &gDefaultGXRenderMode;
         GXAdjustForOverscan(*renderMode, *renderMode, 0, 0x10);
         VIConfigure(*renderMode);
         GXSetCopyFilter((*renderMode)->aa, (*renderMode)->sample_pattern, GX_TRUE, DAT_801E83F2);

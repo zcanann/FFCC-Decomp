@@ -3,6 +3,7 @@
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include "types.h"
 #include "dolphin/ax.h"
 #include "dolphin/axfx.h"
@@ -33,8 +34,6 @@ extern s16 DAT_8021dfce[];
 extern s16 DAT_8021de4e;
 extern u32 DAT_8021d7f0[];
 extern int DAT_8021d820[];
-extern int lbl_8021EA10[];
-
 struct RedReverbDATA {
     void (*callback)(void*, void*);
     void* context;
@@ -1834,7 +1833,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 unsigned char* cmd = (unsigned char*)*track;
                 int delta;
                 *track = (int)(cmd + 1);
-                ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))lbl_8021EA10[*cmd])(
+                ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))gRedCommandHandlerTable[*cmd])(
                     control, keyOnData, (RedTrackDATA*)track);
                 if (*track != 0) {
                     if (track[0x42] < 1) {
@@ -2365,7 +2364,7 @@ void _SeMidiNoteExecute(
                     *(s16*)(track + 0x51) += 1;
                     cmd = (unsigned char*)*track;
                     *track = (int)(cmd + 1);
-                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))lbl_8021EA10[*cmd])(
+                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))gRedCommandHandlerTable[*cmd])(
                         control, keyOnData, (RedTrackDATA*)track);
                     if (*track != 0) {
                         delta = DeltaTimeSumup((unsigned char**)track);

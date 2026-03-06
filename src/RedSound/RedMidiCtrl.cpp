@@ -3,6 +3,7 @@
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedGlobals.h"
 
 extern unsigned int* DAT_8032f444;
 extern unsigned int DAT_8032f4b4;
@@ -15,7 +16,6 @@ extern CRedEntry DAT_8032e154;
 extern int DAT_8021dc20[];
 extern signed char DAT_8021dcce[];
 extern int DAT_8021e1d0[];
-extern int lbl_8021EA10[];
 extern int PTR_SineSwing__Fi_8021e9d0[];
 
 extern "C" {
@@ -460,7 +460,7 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData
                 while ((currentDelta < 1) && (*nextTrack != 0)) {
                     unsigned char* cmd = (unsigned char*)*nextTrack;
                     *nextTrack = (int)(cmd + 1);
-                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))lbl_8021EA10[*cmd])(
+                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))gRedCommandHandlerTable[*cmd])(
                         control, keyOnData, (RedTrackDATA*)nextTrack);
 
                     if (*nextTrack != 0) {

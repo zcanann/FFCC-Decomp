@@ -306,7 +306,7 @@ u32 OSSetProgressiveMode(void) {
     u32 on;
 
     sram = __OSLockSram();
-    on = sram->ntd;
+    on = sram->language;
     __OSUnlockSram(FALSE);
     return on;
 }

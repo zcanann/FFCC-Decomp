@@ -16,11 +16,10 @@ extern "C" {
 #endif
 
 void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight* param1, struct pppYmCheckBGHeightUnkC* param2);
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* param1, void* param2, struct pppYmCheckBGHeightUnkC* param3);
+struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* param1, struct pppYmCheckBGHeightUnkC* param2, void* param3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_YMCHECKBGHEIGHT_H_
-

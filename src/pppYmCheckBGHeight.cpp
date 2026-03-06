@@ -16,7 +16,7 @@ extern float lbl_80330EDC;
 
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
-    void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+    void CalcHitPosition__7CMapObjFP3Vec(CMapObj*, Vec*);
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
@@ -43,29 +43,26 @@ void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight*, struct pppYmCheckBG
  * JP Address: TODO
  * JP Size: TODO
  */
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, void*, struct pppYmCheckBGHeightUnkC* param_2)
+struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, void* unused, struct pppYmCheckBGHeightUnkC* param_2)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
+    _pppMngSt* pppMngSt;
 
     if (lbl_8032ED70 == 0) {
         Vec direction;
         CMapCylinder cyl;
         Vec hitPos;
-        double currentY;
-        float baseX;
-        float baseZ;
+        f32 currentY;
+
+        pppMngSt = pppMngStPtr;
 
         direction.x = lbl_80330ED0;
         direction.y = lbl_80330ED4;
         direction.z = lbl_80330ED0;
 
-        currentY = (double)pppMngSt->m_matrix.value[1][3];
-        baseX = pppMngSt->m_matrix.value[0][3];
-        baseZ = pppMngSt->m_matrix.value[2][3];
-
-        cyl.m_bottom.x = baseX;
-        cyl.m_bottom.y = (float)(currentY + (double)param_2->m_unk0x4);
-        cyl.m_bottom.z = baseZ;
+        currentY = pppMngSt->m_matrix.value[1][3];
+        cyl.m_bottom.x = pppMngSt->m_matrix.value[0][3];
+        cyl.m_bottom.y = currentY + param_2->m_unk0x4;
+        cyl.m_bottom.z = pppMngSt->m_matrix.value[2][3];
         cyl.m_top.x = lbl_80330ED8;
         cyl.m_top.y = lbl_80330ED8;
         cyl.m_top.z = lbl_80330ED8;
@@ -80,16 +77,16 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         cyl.m_radius2 = lbl_80330ED0;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &direction, 0xFFFFFFFF) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if ((float)(currentY - (double)param_2->m_serializedDataOffsets) <= hitPos.y) {
-                currentY = (double)(hitPos.y + param_2->m_unk0x8);
+            CalcHitPosition__7CMapObjFP3Vec(*(CMapObj**)((u8*)&MapMng + 0x22A78), &hitPos);
+            if (currentY - param_2->m_serializedDataOffsets <= hitPos.y) {
+                currentY = hitPos.y + param_2->m_unk0x8;
             }
         }
 
-        pppMngSt->m_position.y = (float)currentY;
-        pppMngSt->m_savedPosition.y = (float)currentY;
-        pppMngSt->m_paramVec0.y = (float)currentY;
-        pppMngSt->m_previousPosition.y = (float)currentY;
+        pppMngSt->m_position.y = currentY;
+        pppMngSt->m_savedPosition.y = currentY;
+        pppMngSt->m_paramVec0.y = currentY;
+        pppMngSt->m_previousPosition.y = currentY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
@@ -97,6 +94,6 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
 
         pppYmCheckBGHeight = (struct pppYmCheckBGHeight*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
+
     return pppYmCheckBGHeight;
 }
-

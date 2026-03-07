@@ -4724,11 +4724,11 @@ void McCtrl::LoadDat()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::Format(int unmountAfter)
+int McCtrl::Format(int unmountAfter)
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
-		return;
+		return m_lastResult;
 	}
 
 	m_previousState = m_state;
@@ -4744,33 +4744,33 @@ void McCtrl::Format(int unmountAfter)
 			m_iteration = 0;
 		} else if (m_state > -1 && MemoryCardMan.AsyncFinished() == 1) {
 			m_lastResult = MemoryCardMan.GetResult();
-			if (m_lastResult == -6 || m_lastResult == -0xD || m_lastResult == 0) {
-				m_state = 2;
-			} else {
-				if (m_lastResult == -5) {
+				if (m_lastResult == -6 || m_lastResult == -0xD || m_lastResult == 0) {
+					m_state = 2;
+				} else {
+					if (m_lastResult == -5) {
+						MemoryCardMan.m_opDoneFlag = 1;
+						MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+						m_state = -1;
+						m_lastResult = -2;
+						return m_lastResult;
+					}
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
 					m_state = -1;
-					m_lastResult = -2;
-					return;
 				}
-				MemoryCardMan.m_opDoneFlag = 1;
-				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
-				m_state = -1;
 			}
-		}
-	} else if (m_state != 4 && m_state < 4 && MemoryCardMan.AsyncFinished() == 1) {
-		m_lastResult = MemoryCardMan.GetResult();
-		if (m_lastResult < 0) {
-			MemoryCardMan.McUnmount(m_cardChannel);
-			m_state = -1;
-			if (m_lastResult == -5) {
-				m_lastResult = -2;
-				return;
-			}
-		} else {
-			if (unmountAfter != 0) {
+		} else if (m_state != 4 && m_state < 4 && MemoryCardMan.AsyncFinished() == 1) {
+			m_lastResult = MemoryCardMan.GetResult();
+			if (m_lastResult < 0) {
 				MemoryCardMan.McUnmount(m_cardChannel);
+				m_state = -1;
+				if (m_lastResult == -5) {
+					m_lastResult = -2;
+					return m_lastResult;
+				}
+			} else {
+				if (unmountAfter != 0) {
+					MemoryCardMan.McUnmount(m_cardChannel);
 			}
 			m_state = 4;
 		}
@@ -4783,6 +4783,8 @@ void McCtrl::Format(int unmountAfter)
 	} else {
 		m_lastResult = 0;
 	}
+
+	return m_lastResult;
 }
 
 /*

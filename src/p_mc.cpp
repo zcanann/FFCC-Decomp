@@ -5,9 +5,7 @@
 #include "ffcc/wm_menu.h"
 
 extern CMath Math;
-extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
-extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
 
 struct MenuPcsMcLayout
@@ -81,16 +79,18 @@ void CMcPcs::destroy()
  */
 void CMcPcs::calc()
 {
+    MenuPcsMcLayout* menu;
     int result;
     int worldParam;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
+    menu = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs);
 
-    if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field14 != 1)
+    if (menu->field14 != 1)
     {
-        if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 == 0x13)
+        if (menu->field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->m_mcCtrl, 1);
+            result = menu->m_mcCtrl.Format(1);
             if (result != 0)
             {
                 if (result == 1)
@@ -106,12 +106,11 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
-                reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 = 0;
+                MenuPcs.CallWorldParam(6, worldParam, 0);
+                menu->field18 = 0;
             }
         }
-        else if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 == 0x12 &&
-                 (result = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (menu->field18 == 0x12 && (result = menu->m_mcCtrl.ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {
@@ -134,8 +133,8 @@ void CMcPcs::calc()
                 worldParam = 6;
             }
 
-            CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
-            reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 = 0;
+            MenuPcs.CallWorldParam(5, worldParam, 0);
+            menu->field18 = 0;
         }
     }
 }

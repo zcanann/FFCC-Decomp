@@ -92,6 +92,7 @@ static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt C
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
 
 struct CPtrArrayBare {
+    void* m_vtable;
     unsigned long m_size;
     unsigned long m_numItems;
     unsigned long m_defaultSize;

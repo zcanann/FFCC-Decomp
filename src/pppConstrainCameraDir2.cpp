@@ -42,8 +42,12 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 	float local_100;
 	Vec local_fc;
 	Vec local_f0;
-	Vec local_e4;
-	Vec local_d8;
+	float local_e4;
+	float local_e0;
+	float local_dc;
+	float local_d8;
+	float local_d4;
+	float local_d0;
 	float local_cc;
 	float local_c8;
 	float local_c4;
@@ -106,14 +110,14 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			local_104 = local_c8;
 			local_100 = local_c4;
 			
-			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_d8, &local_e4, *(Vec*)&local_108);
+			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, (Vec*)&local_d8, (Vec*)&local_e4, *(Vec*)&local_108);
 			
-			local_f0.x = fVar2 * local_d8.x;
-			local_f0.y = fVar2 * local_d8.y;
-			local_f0.z = fVar2 * local_d8.z;
-			local_fc.x = fVar3 * local_e4.x;
-			local_fc.y = fVar3 * local_e4.y;
-			local_fc.z = fVar3 * local_e4.z;
+			local_f0.x = fVar2 * local_d8;
+			local_f0.y = fVar2 * local_d4;
+			local_f0.z = fVar2 * local_d0;
+			local_fc.x = fVar3 * local_e4;
+			local_fc.y = fVar3 * local_e0;
+			local_fc.z = fVar3 * local_dc;
 			
 			PSVECAdd(&local_c0, &local_f0, &local_c0);
 			PSVECAdd(&local_c0, &local_fc, &local_c0);

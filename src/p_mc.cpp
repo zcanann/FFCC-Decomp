@@ -38,6 +38,8 @@ struct MenuPcsMcLayout
     McCtrl m_mcCtrl;
 };
 
+#define MENU_PCS_MC_LAYOUT (*reinterpret_cast<MenuPcsMcLayout*>(MenuPcs))
+
 /*
  * --INFO--
  * Address:	TODO
@@ -101,16 +103,14 @@ void CMcPcs::calc()
 {
     int result;
     int worldParam;
-    MenuPcsMcLayout* menuPcs;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
-    menuPcs = reinterpret_cast<MenuPcsMcLayout*>(MenuPcs);
 
-    if (menuPcs->field14 != 1)
+    if (MENU_PCS_MC_LAYOUT.field14 != 1)
     {
-        if (menuPcs->field18 == 0x13)
+        if (MENU_PCS_MC_LAYOUT.field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&menuPcs->m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&MENU_PCS_MC_LAYOUT.m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -127,11 +127,11 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(MenuPcs, 6, worldParam, 0);
-                menuPcs->field18 = 0;
+                MENU_PCS_MC_LAYOUT.field18 = 0;
             }
         }
-        else if (menuPcs->field18 == 0x12 &&
-                 (result = menuPcs->m_mcCtrl.ChkEmpty(0), result != 0))
+        else if ((MENU_PCS_MC_LAYOUT.field18 == 0x12) &&
+                 ((result = MENU_PCS_MC_LAYOUT.m_mcCtrl.ChkEmpty(0)) != 0))
         {
             if (result == 1)
             {
@@ -155,7 +155,7 @@ void CMcPcs::calc()
             }
 
             CallWorldParam__8CMenuPcsFiii(MenuPcs, 5, worldParam, 0);
-            menuPcs->field18 = 0;
+            MENU_PCS_MC_LAYOUT.field18 = 0;
         }
     }
 }

@@ -65,7 +65,8 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void SetOffsetZBuff__10CCameraPcsFf(double, void*);
-extern unsigned char CameraPcs[];
+class CCameraPcs;
+extern CCameraPcs CameraPcs;
 unsigned char DAT_8032ec88;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
@@ -2535,7 +2536,7 @@ void CMapMng::Draw()
     LightPcs.SetNumDiffuse(0);
 
     Mtx44 projection;
-    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(CameraPcs, 0x94)), projection);
+    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(&CameraPcs, 0x94)), projection);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298A)) = 1;
 
@@ -2648,7 +2649,7 @@ void CMapMng::DrawAfter()
     }
 
     Mtx44 projection;
-    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(CameraPcs, 0x94)), projection);
+    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(&CameraPcs, 0x94)), projection);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
 
     GXSetColorUpdate(1);

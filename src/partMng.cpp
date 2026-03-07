@@ -51,7 +51,8 @@ extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
 extern "C" float FLOAT_8032fe58;
 extern "C" float FLOAT_8032fe18;
-extern unsigned char CameraPcs[];
+class CCameraPcs;
+extern CCameraPcs CameraPcs;
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
@@ -73,7 +74,8 @@ extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 extern CProfile g_par_calc_prof;
 extern CPartPcs PartPcs;
-extern unsigned char MapPcs[];
+class CMapPcs;
+extern CMapPcs MapPcs;
 extern void* CAMemCacheSet;
 extern PPPCREATEPARAM g_dcp;
 extern "C" {
@@ -1009,14 +1011,14 @@ void CPartMng::pppEditBeforeCalc()
     case 0x18:
         Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x7a4);
         LoadMap__7CMapPcsFiiPvUlUc(
-            MapPcs,
+            &MapPcs,
             *reinterpret_cast<int*>(self + 0x188),
             *reinterpret_cast<int*>(self + 0x18c),
             0,
             0,
             0
         );
-        *reinterpret_cast<unsigned int*>(MapPcs + 0x180) = 1;
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MapPcs) + 0x180) = 1;
         break;
     case 0x19: {
         Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x7ad);
@@ -1076,7 +1078,8 @@ void CPartMng::pppEditBeforeCalc()
         }
         break;
     case 0x1b:
-        *reinterpret_cast<unsigned int*>(MapPcs + 0x180) = *reinterpret_cast<unsigned int*>(self + 0x1bc);
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MapPcs) + 0x180) =
+            *reinterpret_cast<unsigned int*>(self + 0x1bc);
         break;
     case 0x1c:
         if (*editorObj != 0 && (*editorObj)->m_charaModelHandle != 0) {
@@ -1441,8 +1444,8 @@ void pppSetProjection()
  */
 void CPartMng::pppSetRendMatrix()
 {
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x94), ppvScreenMatrix);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 4), ppvCameraMatrix02);
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x94), ppvScreenMatrix);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), ppvCameraMatrix02);
     gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
     gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
     gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];

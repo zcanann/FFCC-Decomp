@@ -1,8 +1,9 @@
 #include "ffcc/pppChangeBGColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/map.h"
 
 // External global variables 
-extern unsigned char MapMng[];
+extern CMapMng MapMng;
 
 /*
  * --INFO--
@@ -25,7 +26,7 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
 	}
 
 	iVar1 = param_3->m_serializedDataOffsets[1];
-	mapMng = MapMng;
+	mapMng = reinterpret_cast<unsigned char*>(&MapMng);
 	data = (unsigned char*)pppChangeBGColor + iVar1 + 0x80;
 	mapMng += 0x20000;
 	mapMng[0x2989] = 1;

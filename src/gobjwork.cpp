@@ -135,7 +135,27 @@ void CGObjWork::CalcStatus()
  */
 CCaravanWork::CCaravanWork()
 {
-	// TODO
+	*(void**)this = __vt__9CGObjWork;
+	m_objType = -1;
+	m_saveSlot = 0xFF;
+	m_partyIndex = 0xFF;
+	m_isLoadingFlag = 0xFF;
+	m_miscFlags = 0xFF;
+	m_ownerObj = 0;
+	*(void**)this = __vt__12CCaravanWork;
+
+	m_shopState = 0;
+	unk_0x3a8 = 0;
+	unk_0x3ac = 0;
+	m_objType = 0;
+	m_joybusCaravanId = -1;
+	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
+
+	for (int i = 0; i < 8; i++) {
+		m_letterMeta[i] = 0xFFFF;
+	}
+
+	clearCaravanWork();
 }
 
 /*

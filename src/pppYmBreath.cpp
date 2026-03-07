@@ -1,5 +1,6 @@
 #include "ffcc/pppYmBreath.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "dolphin/mtx.h"
 
@@ -23,7 +24,6 @@ extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern Mtx ppvCameraMatrix0;
-extern unsigned int CFlatFlags;
 extern CMath math;
 extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;

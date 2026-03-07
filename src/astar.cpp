@@ -3,6 +3,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/maphit.h"
 #include "ffcc/pad.h"
@@ -35,7 +36,6 @@ struct CMapCylinderRaw
 	float m_height2;
 };
 
-extern Mtx gFlatPosMtx;
 extern "C" int __cntlzw(unsigned int);
 
 static inline int GetDbgFlags()

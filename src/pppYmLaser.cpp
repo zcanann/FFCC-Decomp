@@ -4,6 +4,7 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 
@@ -11,7 +12,6 @@
 
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 

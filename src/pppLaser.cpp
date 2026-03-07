@@ -4,6 +4,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 
@@ -19,7 +20,6 @@ extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 extern const f64 DOUBLE_80333440;
 extern const f64 DOUBLE_80333438;
-extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 

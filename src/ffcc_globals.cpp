@@ -7,6 +7,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/graphic.h"
 #include "ffcc/joybus.h"
+#include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/materialman.h"
 #include "ffcc/memory.h"
@@ -33,3 +34,6 @@ CGamePcs Game;
 CPad Pad;
 CSound Sound;
 CUSB USB;
+
+u32 CFlatFlags;
+Mtx gFlatPosMtx;

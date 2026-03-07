@@ -318,9 +318,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
     int textureBase = 0;
-    int textureIndex = 0;
+    int textureIndex;
     int colorOffset = param_3->m_serializedDataOffsets[1];
     int texOffset = param_3->m_serializedDataOffsets[2];
+    int objPosBase = *(int*)((char*)blurChara + 0x84 + texOffset);
     pppBlurCharaWork* work = GetBlurWork(blurChara, param_3);
     _GXTexObj smallBackTex;
     _GXColor drawColor;
@@ -341,8 +342,11 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     float projX;
     float projY;
     float projZ;
+    Vec quadA;
+    Vec quadB;
 
     if (*((unsigned char*)&param_2->m_dataValIndex + 1) == 1) {
+        textureIndex = 0;
         if (param_2->m_initWOrk == -1) {
             return;
         }
@@ -359,7 +363,6 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
                                                                0, FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1,
                                                                1, 0);
 
-    drawColor = *(_GXColor*)((char*)blurChara + 0x88 + colorOffset);
     PSMTXIdentity(identityMtx);
 
     cameraPos.x = CameraPcs._224_4_;
@@ -375,9 +378,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXGetViewportv(viewport);
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-    objPos.x = *(float*)(*(int*)((char*)blurChara + 0x84 + texOffset) + 0x15C);
-    objPos.y = *(float*)(*(int*)((char*)blurChara + 0x84 + texOffset) + 0x160);
-    objPos.z = *(float*)(*(int*)((char*)blurChara + 0x84 + texOffset) + 0x164);
+    objPos.x = *(float*)(objPosBase + 0x15C);
+    objPos.y = *(float*)(objPosBase + 0x160);
+    objPos.z = *(float*)(objPosBase + 0x164);
 
     GXProject(cameraPos.x + objPos.x, FLOAT_80331030, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);
@@ -392,6 +395,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
+    drawColor = *(_GXColor*)((char*)blurChara + 0x88 + colorOffset);
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
@@ -451,8 +455,6 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     uv1.x = -param_2->m_arg3;
     uv1.y = FLOAT_8033104c + param_2->m_arg3;
 
-    Vec quadA;
-    Vec quadB;
     quadA.x = uv0.x;
     quadA.y = uv0.y;
     quadA.z = outVec.z;

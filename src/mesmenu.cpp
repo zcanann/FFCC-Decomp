@@ -1,6 +1,8 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
+#include "ffcc/sound.h"
 
 #include <math.h>
 #include <string.h>
@@ -39,8 +41,6 @@ int GetWait__4CMesFv(void* mes);
 int useFlag__4CMesFii(void* mes, int flag, int value);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
-extern unsigned char MenuPcs[];
-extern unsigned char Sound[];
 extern void* __vt__8CMesMenu[];
 extern const char DAT_801d9e9c[];
 extern int DAT_8020f998[4];
@@ -303,8 +303,8 @@ void CMesMenu::onCalc()
             if (maxButtons > 0) {
                 for (int button = 0; button < 4; button++) {
                     if ((*(unsigned int*)((char*)this + 0x3D90) & (1U << button)) != 0) {
-                        downMask |= GetButtonDown__8CMenuPcsFi(MenuPcs, button) & 0xFFFF;
-                        repeatMask |= GetButtonRepeat__8CMenuPcsFi(MenuPcs, button) & 0xFFFF;
+                        downMask |= GetButtonDown__8CMenuPcsFi(&MenuPcs, button) & 0xFFFF;
+                        repeatMask |= GetButtonRepeat__8CMenuPcsFi(&MenuPcs, button) & 0xFFFF;
                     }
                 }
             }
@@ -319,7 +319,7 @@ void CMesMenu::onCalc()
                         cursor = *(int*)((char*)this + 0x3D30) - 1;
                     }
                     if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                        PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+                        PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
                     }
                 } else if ((repeatMask & 4) != 0) {
                     cursor++;
@@ -327,17 +327,17 @@ void CMesMenu::onCalc()
                         cursor = 0;
                     }
                     if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                        PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+                        PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
                     }
                 } else if ((downMask & 0x200) != 0) {
                     if (altCursor < 0) {
                         if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                            PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+                            PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
                         }
                     } else {
                         cursor = altCursor;
                         if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                            PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                            PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
                         }
                     }
                 }
@@ -368,12 +368,12 @@ void CMesMenu::onCalc()
                 } else {
                     int wait3 = GetWait__4CMesFv((char*)this + 0x1C);
                     if ((wait3 == 3) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                        PlaySe__6CSoundFiiii(Sound, 2, 0x40, 0x7F, 0);
+                        PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
                     }
                     int wait4 = GetWait__4CMesFv((char*)this + 0x1C);
                     if ((wait4 != 1) && (GetWait__4CMesFv((char*)this + 0x1C) != 5) &&
                         (*(int*)((char*)this + 0x3C90) == 0) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                        PlaySe__6CSoundFiiii(Sound, 0xC, 0x40, 0x7F, 0);
+                        PlaySe__6CSoundFiiii(&Sound, 0xC, 0x40, 0x7F, 0);
                     }
                 }
 
@@ -398,7 +398,7 @@ void CMesMenu::onCalc()
                             *(int*)((char*)this + 0x14) = 4;
                             if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
                                 ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                                PlaySe__6CSoundFiiii(Sound, 6, 0x40, 0x7F, 0);
+                                PlaySe__6CSoundFiiii(&Sound, 6, 0x40, 0x7F, 0);
                             }
                         } else {
                             int stack[2];
@@ -410,7 +410,7 @@ void CMesMenu::onCalc()
                             *(int*)((char*)this + 0x0C) = 4;
                             *(int*)((char*)this + 0x08) = 0;
                             if (*(int*)((char*)this + 0x18) < 4) {
-                                SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
                             }
                         }
                     }
@@ -450,7 +450,7 @@ void CMesMenu::onCalc()
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
-                SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
             }
         }
     }
@@ -471,10 +471,10 @@ void CMesMenu::onDraw()
         return;
     }
 
-    void* font = *(void**)(MenuPcs + 0xF8);
+    void* font = *(void**)((unsigned char*)&MenuPcs + 0xF8);
     SetMargin__5CFontFf(FLOAT_803308d8, font);
     SetShadow__5CFontFi(font, 1);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
     float stageBlend = (float)*(int*)((char*)this + 0x3DF4) * FLOAT_80330918;
     if (*(int*)((char*)this + 0x3DF8) != 0) {
@@ -516,14 +516,14 @@ void CMesMenu::onDraw()
         unsigned char alpha = (unsigned char)(int)alphaF;
         unsigned char colorStorage[8];
         __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha);
-        SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+        SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
         DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(
-            MenuPcs, baseX, baseY, *(float*)((char*)this + 0x3D7C) * stateBlend, *(float*)((char*)this + 0x3D80) * stateBlend, 2,
+            &MenuPcs, baseX, baseY, *(float*)((char*)this + 0x3D7C) * stateBlend, *(float*)((char*)this + 0x3D80) * stateBlend, 2,
             FLOAT_8033092c);
 
         if ((*(int*)((char*)this + 0x0C) == 1) && (stageBlend == FLOAT_80330914)) {
             Draw__4CMesFv((char*)this + 0x1C);
-            DrawInit__8CMenuPcsFv(MenuPcs);
+            DrawInit__8CMenuPcsFv(&MenuPcs);
         }
 
         DrawHeart(baseX, baseY, FLOAT_803308d8, alphaF);
@@ -544,20 +544,20 @@ void CMesMenu::onDraw()
             }
             unsigned char colorStorage[8];
             __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-            SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+            SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
 
             int tex = ((*(unsigned int*)((char*)this + 0x3D8C) & 0x200) != 0) ? 2 : 0xB;
-            DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(MenuPcs, drawX, drawY, sizeX, sizeY, tex, FLOAT_8033092c);
+            DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(&MenuPcs, drawX, drawY, sizeX, sizeY, tex, FLOAT_8033092c);
         }
 
         if (*(int*)((char*)this + 0x0C) == 1) {
             Draw__4CMesFv((char*)this + 0x1C);
-            DrawInit__8CMenuPcsFv(MenuPcs);
+            DrawInit__8CMenuPcsFv(&MenuPcs);
         }
     }
 
     if ((*(int*)((char*)this + 0x0C) == 1) && (GetWait__4CMesFv((char*)this + 0x1C) == 3)) {
-        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0);
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0);
         float alphaF = FLOAT_80330908 * stageBlend;
         if (alphaF < FLOAT_803308d8) {
             alphaF = FLOAT_803308d8;
@@ -566,10 +566,10 @@ void CMesMenu::onDraw()
         }
         unsigned char colorStorage[8];
         __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-        SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+        SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
 
         DrawRect__8CMenuPcsFUlfffffffff(
-            MenuPcs, 0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),
+            &MenuPcs, 0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),
             (float)*(int*)((char*)this + 0x3D34) * *(float*)((char*)this + 0x3D40) + FLOAT_803308e8 +
                 *(float*)((char*)this + 0x3CBC) + *(float*)((char*)this + 0x3D3C),
             FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
@@ -684,8 +684,8 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     unsigned char colorStorage[8];
     int colorAlpha = (int)(FLOAT_80330908 * alpha);
     __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)colorAlpha);
-    SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x17);
+    SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
     float baseX = x + (float)((*(unsigned int*)((char*)this + 0x18) & 1) != 0 ? 0x30 : 0x4C);
     float baseY = y + FLOAT_8033090c;
@@ -714,7 +714,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         float drawY = baseY + (float)shakeY;
 
         DrawRect__8CMenuPcsFUlfffffffff(
-            MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8, pulse, pulse,
+            &MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8, pulse, pulse,
             FLOAT_803308d8);
 
         if (heartValue > 0) {
@@ -726,7 +726,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
             float u = *(unsigned short*)(scriptFood + 0x42) != 0 ? 24.0f : 0.0f;
             float v = (float)((0x0C - fillAmount) * 0x18);
             DrawRect__8CMenuPcsFUlfffffffff(
-                MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse, FLOAT_803308d8);
+                &MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse, FLOAT_803308d8);
         }
 
         baseX += ((*(unsigned int*)((char*)this + 0x18) & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
@@ -750,7 +750,7 @@ void CMesMenu::onScriptChanging(char*)
     *(int*)((char*)this + 0x0C) = 4;
     *(int*)((char*)this + 0x08) = 0;
     if (*(int*)((char*)this + 0x18) < 4) {
-        SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
     }
 }
 
@@ -786,7 +786,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(unsigned int*)((char*)this + 0x3D8C) = (unsigned int)flags;
 
     if (*(int*)((char*)this + 0x18) < 4) {
-        SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
+        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
         *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
         *(float*)((char*)this + 0x3DA0) = FLOAT_803308e4;
     } else {
@@ -848,7 +848,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(int*)((char*)this + 0x10) = 0;
     *(int*)((char*)this + 0x14) = 8;
     if ((flags & 0x11) == 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-        PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+        PlaySe__6CSoundFiiii(&Sound, 5, 0x40, 0x7F, 0);
     }
 }
 
@@ -876,7 +876,7 @@ void CMesMenu::CloseRequest(int closeReason)
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
-                SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
             }
         } else {
             *(int*)((char*)this + 0x0C) = 2;
@@ -884,7 +884,7 @@ void CMesMenu::CloseRequest(int closeReason)
             *(int*)((char*)this + 0x14) = 4;
             if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
                 ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                PlaySe__6CSoundFiiii(Sound, 6, 0x40, 0x7F, 0);
+                PlaySe__6CSoundFiiii(&Sound, 6, 0x40, 0x7F, 0);
             }
         }
     }
@@ -914,3 +914,4 @@ void CMesMenu::close(int)
 {
 	// TODO
 }
+

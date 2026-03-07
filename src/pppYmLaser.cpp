@@ -16,7 +16,6 @@ extern void* gUtil;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
-extern CGraphic Graphic;
 extern const f32 FLOAT_80330dc0;
 extern const f32 FLOAT_80330df0;
 extern f32 FLOAT_80330de0;

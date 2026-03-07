@@ -39,7 +39,6 @@ extern struct {
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
-extern CGraphic Graphic;
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);

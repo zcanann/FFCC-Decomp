@@ -11,7 +11,6 @@
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
 
-extern CGraphic Graphic;
 extern struct {
     char _0[4];
     Mtx m_cameraMatrix;

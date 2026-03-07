@@ -93,5 +93,6 @@ private:
 };
 
 extern CDbgMenuPcs DbgMenuPcs;
+extern unsigned char m_table__11CDbgMenuPcs[];
 
 #endif // _FFCC_P_DBGMENU_H_

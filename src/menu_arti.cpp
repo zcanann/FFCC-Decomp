@@ -9,21 +9,21 @@
 typedef signed short s16;
 typedef unsigned char u8;
 
-extern double DOUBLE_80332fb0;
-extern double DOUBLE_80332fb8;
-extern double DOUBLE_80332fe0;
-extern float FLOAT_80332fa8;
-extern float FLOAT_80332fac;
-extern float FLOAT_80332fc0;
-extern float FLOAT_80332fc4;
-extern float FLOAT_80332fc8;
-extern float FLOAT_80332fcc;
-extern float FLOAT_80332fd0;
-extern float FLOAT_80332fd4;
-extern float FLOAT_80332fd8;
-extern float FLOAT_80332fe8;
-extern float FLOAT_80332fec;
-extern float FLOAT_80332ff0;
+static const double DOUBLE_80332fb0 = 1.0;
+static const double DOUBLE_80332fb8 = 0.5;
+static const double DOUBLE_80332fe0 = 4503601774854144.0;
+static const float FLOAT_80332fa8 = 0.0f;
+static const float FLOAT_80332fac = 1.0f;
+static const float FLOAT_80332fc0 = 255.0f;
+static const float FLOAT_80332fc4 = 0.8999999761581421f;
+static const float FLOAT_80332fc8 = 4.0f;
+static const float FLOAT_80332fcc = 352.0f;
+static const float FLOAT_80332fd0 = 3.0f;
+static const float FLOAT_80332fd4 = 320.0f;
+static const float FLOAT_80332fd8 = 0.5f;
+static const float FLOAT_80332fe8 = 128.0f;
+static const float FLOAT_80332fec = 8.0f;
+static const float FLOAT_80332ff0 = 0.75f;
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);

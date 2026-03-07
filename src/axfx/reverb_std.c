@@ -44,14 +44,13 @@ static void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
 
 /*
  * --INFO--
- * PAL Address: 0x80194F34
+ * PAL Address: 0x80194f34
  * PAL Size: 1036b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-// NONMATCHING RELEASE - regalloc
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
     u8 k;
@@ -81,19 +80,13 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 2; i++) {
-            if (DLcreate(&rv->C[i + (k * 2)], lens[i] + 2) == 0) {
-				ReverbSTDFree(rv);
-				return 0;
-			}
+            DLcreate(&rv->C[i + (k * 2)], lens[i] + 2);
             DLsetdelay(&rv->C[i + (k * 2)], lens[i]);
             rv->combCoef[i + (k * 2)] = powf(10.0f, (lens[i] * -3) / (32000.0f * time));
         }
 
         for (i = 0; i < 2; i++) {
-            if (DLcreate(&rv->AP[i + (k * 2)], lens[i + 2] + 2) == 0) {
-				ReverbSTDFree(rv);
-				return 0;
-			}
+            DLcreate(&rv->AP[i + (k * 2)], lens[i + 2] + 2);
             DLsetdelay(&rv->AP[i + (k * 2)], lens[i + 2]);
         }
         rv->lpLastout[k] = 0.0f;

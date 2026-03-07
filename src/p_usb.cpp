@@ -25,6 +25,8 @@ extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, 
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
+extern "C" char __vt__8CManager[];
+extern "C" char __vt_CProcess[];
 
 
 /*
@@ -33,17 +35,23 @@ extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
  * Size:	TODO
  */
 CUSBPcs::CUSBPcs()
+    : CProcess()
 {
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80020370
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = Memory.CreateStage(0x2000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
+	m_smallStage = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
+	    &Memory, 0x2000, s_CUSBPcs_8032f810, 0));
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
@@ -55,17 +63,21 @@ void CUSBPcs::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80020314
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSBPcs::Quit()
 { 
 	if (m_bigStage != (CMemory::CStage*)nullptr)
 	{
-		Memory.DestroyStage(m_bigStage);
+		DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
 	}
 	
-	Memory.DestroyStage(m_smallStage);
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_smallStage);
 	USB.Disconnect();
 }
 
@@ -81,15 +93,20 @@ void* CUSBPcs::GetTable(unsigned long param)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002027c
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
+        m_bigStage = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
+            &Memory, 0x100000, s_CUSBPcs_8032f810, 0));
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
-        Memory.DestroyStage(m_bigStage);
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
     }
 }
@@ -257,6 +274,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
+    *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
+    *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
     *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
 
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];

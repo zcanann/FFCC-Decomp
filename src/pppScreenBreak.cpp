@@ -678,7 +678,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25E);
         *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25F);
-        InitPieceData((CChara::CModel*)model, pppScreenBreak, (VScreenBreak*)param_2);
+        InitPieceData((CChara::CModel*)model, pppScreenBreak, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 

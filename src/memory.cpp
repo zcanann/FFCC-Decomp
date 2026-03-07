@@ -11,7 +11,7 @@
 #include <string.h>
 
 static char s_memory_cpp[] = "memory.cpp";
-extern void* PTR_PTR_s_CMemory_801e8488;
+extern char PTR_PTR_s_CMemory_801e8488[];
 extern "C" char __vt__8CManager[];
 extern CMemory Memory;
 extern char DAT_801d6648[];
@@ -174,9 +174,8 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 extern "C" void __sinit_memory_cpp(void)
 {
-    void* vtbl = __vt__8CManager;
-    *reinterpret_cast<void**>(&Memory) = vtbl;
-    *reinterpret_cast<void**>(&Memory) = &PTR_PTR_s_CMemory_801e8488;
+    *reinterpret_cast<void**>(&Memory) = __vt__8CManager;
+    *reinterpret_cast<void**>(&Memory) = PTR_PTR_s_CMemory_801e8488;
 }
 
 /*

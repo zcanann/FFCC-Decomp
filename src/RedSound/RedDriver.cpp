@@ -113,7 +113,6 @@ extern OSThread DAT_8032de08;
 extern OSThread DAT_8032d460;
 extern ARQRequest DAT_8032dde4;
 extern FILE DAT_8021d1a8;
-extern int DAT_800000f8;
 
 extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);
@@ -770,7 +769,7 @@ void RedSleep(int param_1)
     currentThread = OSGetCurrentThread();
     OSCreateAlarm(&alarm);
     alarm.start = (OSTime)currentThread;
-    OSSetAlarm(&alarm, (param_1 * (DAT_800000f8 / 500000)) >> 3, _MyAlarmHandler);
+    OSSetAlarm(&alarm, (param_1 * (OS_BUS_CLOCK / 500000)) >> 3, _MyAlarmHandler);
     OSSuspendThread(currentThread);
     OSRestoreInterrupts(interruptLevel);
 }

@@ -68,5 +68,8 @@ public:
 
 extern CMapHitFace* gMapHitFace;
 extern unsigned char gMapHitDrawMode;
+extern unsigned char gMapHitFaceFlag;
+extern int g_hit_edge_idx_min;
+extern float g_hit_t_min;
 
 #endif // _FFCC_MAPHIT_H_

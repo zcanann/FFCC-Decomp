@@ -23,8 +23,8 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 }
 }
 
-int DAT_8032ec78 = -1;
-float FLOAT_8032ec80 = 3.4e38f;
+int g_hit_edge_idx_min = -1;
+float g_hit_t_min = 3.4e38f;
 CMapHitFace* gMapHitFace = 0;
 
 /*
@@ -475,13 +475,13 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         float topY = g_hit_cyl.m_top.y;
         float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
         hitT = -((hitDot - (planeD + topY)) / dot);
-        if (hitT <= 0.0f || FLOAT_8032ec80 <= hitT) {
+        if (hitT <= 0.0f || g_hit_t_min <= hitT) {
             continue;
         }
 
-        FLOAT_8032ec80 = hitT;
+        g_hit_t_min = hitT;
         gMapHitFace = reinterpret_cast<CMapHitFace*>(face);
-        DAT_8032ec78 = -1;
+        g_hit_edge_idx_min = -1;
         g_hit_cyl_min = g_hit_cyl;
         return 1;
     }
@@ -541,14 +541,14 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
         return 1;
     }
 
-    if (DAT_8032ec78 == -1) {
+    if (g_hit_edge_idx_min == -1) {
         if (y <= gMapHitFace->m_boundsMin.y) {
             float len = PSVECMag(&g_hit_cyl_min.m_direction);
-            PSVECScale(&g_hit_cyl_min.m_direction, out, FLOAT_8032ec80 - (s_push / len));
+            PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t_min - (s_push / len));
             return 0;
         }
 
-        if (s_epsilon < FLOAT_8032ec80) {
+        if (s_epsilon < g_hit_t_min) {
             Vec* normal = reinterpret_cast<Vec*>(gMapHitFace);
             float planeD = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(gMapHitFace) + 0x0C);
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_direction, normal);
@@ -568,7 +568,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
     if (y <= gMapHitFace->m_boundsMin.y) {
         float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, out, FLOAT_8032ec80 - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_direction, out, g_hit_t_min - (s_push / len));
         return 0;
     }
 
@@ -578,12 +578,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
     Vec edgeStart;
     Vec edgeEnd;
-    if (DAT_8032ec78 == 0) {
+    if (g_hit_edge_idx_min == 0) {
         edgeStart = m_vertices[faceIndices[vertexCount - 1]];
         edgeEnd = m_vertices[faceIndices[0]];
     } else {
-        edgeStart = m_vertices[faceIndices[DAT_8032ec78 - 1]];
-        edgeEnd = m_vertices[faceIndices[DAT_8032ec78]];
+        edgeStart = m_vertices[faceIndices[g_hit_edge_idx_min - 1]];
+        edgeEnd = m_vertices[faceIndices[g_hit_edge_idx_min]];
     }
 
     Vec edge;
@@ -634,12 +634,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
  */
 void CMapHit::CalcHitPosition(Vec* position)
 {
-    if (DAT_8032ec78 == -1) {
+    if (g_hit_edge_idx_min == -1) {
         float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, position, FLOAT_8032ec80 - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_direction, position, g_hit_t_min - (s_push / len));
     } else {
         float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, position, FLOAT_8032ec80 - (s_epsilon / len));
+        PSVECScale(&g_hit_cyl_min.m_direction, position, g_hit_t_min - (s_epsilon / len));
     }
     PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
 }
@@ -662,7 +662,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int i = 0;
     while (i < m_faceCount) {
         gMapHitFace = face;
-        FLOAT_8032ec80 = s_large_pos;
+        g_hit_t_min = s_large_pos;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
@@ -691,7 +691,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
 
     while (faceIndex < endFace) {
         m_faces = reinterpret_cast<CMapHitFace*>(Ptr(savedFaces, faceOffset));
-        FLOAT_8032ec80 = s_large_pos;
+        g_hit_t_min = s_large_pos;
         m_faceCount = 1;
 
         if (CheckHitFaceCylinder(mask) != 0) {
@@ -718,9 +718,9 @@ int CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsi
 {
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
-    FLOAT_8032ec80 = s_large_pos;
+    g_hit_t_min = s_large_pos;
     gMapHitFace = 0;
-    DAT_8032ec78 = -1;
+    g_hit_edge_idx_min = -1;
 
     return CheckHitFaceCylinder(mask);
 }

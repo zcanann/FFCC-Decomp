@@ -109,7 +109,7 @@ unsigned char MaterialEditorPcs[];
 unsigned char FunnyShapePcs[];
 extern unsigned char GraphicsPcs[];
 unsigned char CameraPcs[];
-unsigned char DAT_8032ed00[];
+unsigned char GamePcs[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
 extern const char DAT_801d60d4[];
@@ -436,7 +436,7 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, GamePcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
@@ -483,7 +483,7 @@ void CGame::Exec()
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, GamePcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
 			break;
 		case 5:
@@ -1819,4 +1819,3 @@ CGame::CGameWork::CGameWork()
 }
 
 template class CPtrArray<CMapLightHolder*>;
-

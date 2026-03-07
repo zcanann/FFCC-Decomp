@@ -43,7 +43,7 @@ CUSBPcs::CUSBPcs()
 void CUSBPcs::Init()
 { 
 	m_smallStage = static_cast<CMemory::CStage*>(
-	    CreateStage__7CMemoryFUlPci(reinterpret_cast<CMemory*>(gMemory), 0x2000, "p_usb.cpp", 0));
+	    CreateStage__7CMemoryFUlPci(reinterpret_cast<CMemory*>(gMemory), 0x2000, s_CUSBPcs_8032f810, 0));
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);

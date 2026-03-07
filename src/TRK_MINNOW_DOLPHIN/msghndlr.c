@@ -5,7 +5,7 @@
 #include <string.h>
 
 /* 8044F288-8044F290 07BFA8 0004+04 4/4 0/0 0/0 .bss             IsTRKConnected */
-static BOOL IsTRKConnected;
+BOOL IsTRKConnected;
 
 /* 8036ECDC-8036ED84 36961C 00A8+00 0/0 1/1 0/0 .text            OutputData */
 void OutputData(void* data, int length) {

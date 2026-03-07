@@ -501,28 +501,24 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
  */
 void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
 {
-    unsigned short remaining = count;
+    int remaining = static_cast<int>(count);
     MeshDrawEntry* entry = DrawEntries(this) + startIdx;
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
 
-    if (remaining != 0) {
-        do {
-            if (entry->size != 0) {
-                CMaterial* material =
-                    (*reinterpret_cast<CPtrArray<CMaterial*>*>(
-                        reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x21434)) + 8))[
-                        entry->materialIdx];
+    while (remaining-- != 0) {
+        if (entry->size != 0) {
+            CMaterial* material =
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>(
+                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x21434)) + 8))[
+                    entry->materialIdx];
 
-                if (material != 0) {
-                    if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
-                         0x100000) != 0) {
-                        SetMaterialCharaShadow__12CMaterialManFP9CMaterial(&MaterialMan, material);
-                        GXCallDisplayList(entry->displayList, entry->size);
-                    }
-                }
+            if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
+                 0x100000) != 0) {
+                SetMaterialCharaShadow__12CMaterialManFP9CMaterial(&MaterialMan, material);
+                GXCallDisplayList(entry->displayList, entry->size);
             }
-            entry++;
-        } while (--remaining != 0);
+        }
+        entry++;
     }
 }
 
@@ -538,20 +534,19 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 void CMapMesh::Draw(CMaterialSet* materialSet)
 {
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
+    int remaining = static_cast<int>(U16At(this, 0xA));
 
     if (materialSet == 0) {
         materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21434);
     }
 
-    while (remaining != 0) {
+    while (remaining-- != 0) {
         if (entry->size != 0) {
             SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->materialIdx);
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->materialIdx, 0,
                                                                        1);
             GXCallDisplayList(entry->displayList, entry->size);
         }
-        remaining--;
         entry++;
     }
 }

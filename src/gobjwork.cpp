@@ -130,12 +130,31 @@ void CGObjWork::CalcStatus()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2bf8
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CCaravanWork::CCaravanWork()
 {
-	// TODO
+	*(void**)this = __vt__12CCaravanWork;
+	m_shopState = 0;
+	unk_0x3a8 = 0;
+	unk_0x3ac = 0;
+	m_objType = 0;
+	m_joybusCaravanId = -1;
+	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
+	m_letterMeta[0] = 0xFFFF;
+	m_letterMeta[1] = 0xFFFF;
+	m_letterMeta[2] = 0xFFFF;
+	m_letterMeta[3] = 0xFFFF;
+	m_letterMeta[4] = 0xFFFF;
+	m_letterMeta[5] = 0xFFFF;
+	m_letterMeta[6] = 0xFFFF;
+	m_letterMeta[7] = 0xFFFF;
+	clearCaravanWork();
 }
 
 /*

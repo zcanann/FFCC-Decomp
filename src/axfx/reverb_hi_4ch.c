@@ -132,6 +132,15 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     return 1;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80196EF4
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay) {
     u8 i;
 
@@ -156,7 +165,11 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
+    }
 
     for (i = 0; i < 12; i++) {
         DLdeleteDpl2(&rv->AP[i]);

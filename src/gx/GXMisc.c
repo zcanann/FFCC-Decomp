@@ -349,7 +349,8 @@ GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb) {
 static void GXTokenInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
     u16 token;
     OSContext exceptionContext;
-    u32 reg;
+    volatile u16* peReg;
+    u16 reg;
 
     token = GX_GET_PE_REG(7);
     if (TokenCB != NULL) {
@@ -359,9 +360,10 @@ static void GXTokenInterruptHandler(__OSInterrupt interrupt, OSContext* context)
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(context);
     }
-    reg = GX_GET_PE_REG(5);
-    SET_REG_FIELD(0, reg, 1, 2, 1);
-    GX_SET_PE_REG(5, reg);
+    peReg = (volatile u16*)__peReg + 5;
+    reg = *peReg;
+    reg = (reg & ~(1 << 2)) | (1 << 2);
+    *peReg = reg;
 }
 
 GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb) {
@@ -377,11 +379,13 @@ GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb) {
 
 static void GXFinishInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
-    u32 reg;
+    volatile u16* peReg;
+    u16 reg;
 
-    reg = GX_GET_PE_REG(5);
-    SET_REG_FIELD(0, reg, 1, 3, 1);
-    GX_SET_PE_REG(5, reg);
+    peReg = (volatile u16*)__peReg + 5;
+    reg = *peReg;
+    reg = (reg & ~(1 << 3)) | (1 << 3);
+    *peReg = reg;
     DrawDone = 1;
     if (DrawDoneCB != NULL) {
         OSClearContext(&exceptionContext);

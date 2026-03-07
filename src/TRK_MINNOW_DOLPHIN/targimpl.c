@@ -97,6 +97,8 @@ void TRKUARTInterruptHandler();
 DSError TRKTargetReadInstruction(void* data, u32 start);
 
 static BOOL TRKTargetCheckStep();
+static DSError TRKTargetEnableTrace(BOOL val);
+static DSError TRKTargetDoStep();
 
 asm u32 __TRK_get_MSR()
 {
@@ -971,16 +973,38 @@ asm void TRKInterruptHandlerEnableInterrupts(void)
 DSError TRKTargetInterrupt(TRKEvent* event)
 {
     DSError error = DS_NoError;
-    switch (event->eventType) {
-    case NUBEVENT_Breakpoint:
-    case NUBEVENT_Exception:
-        if (TRKTargetCheckStep() == FALSE) {
+    BOOL stepDone;
+
+    if ((event->eventType == NUBEVENT_Breakpoint)
+        || (event->eventType == NUBEVENT_Exception)) {
+        if (gTRKStepStatus.active) {
+            stepDone = TRUE;
+            TRKTargetEnableTrace(FALSE);
+
+            if (((u16)gTRKCPUState.Extended1.exceptionID) == PPC_Trace) {
+                if (gTRKStepStatus.type == DSSTEP_IntoRange) {
+                    if ((gTRKStepStatus.rangeStart <= gTRKCPUState.Default.PC)
+                        && (gTRKCPUState.Default.PC
+                            <= gTRKStepStatus.rangeEnd)) {
+                        stepDone = FALSE;
+                    }
+                } else if ((gTRKStepStatus.type == DSSTEP_IntoCount)
+                           && (gTRKStepStatus.count != 0)) {
+                    stepDone = FALSE;
+                }
+            }
+
+            if (stepDone) {
+                gTRKStepStatus.active = FALSE;
+            } else {
+                TRKTargetDoStep();
+            }
+        }
+
+        if (!gTRKStepStatus.active) {
             TRKTargetSetStopped(TRUE);
             error = TRKDoNotifyStopped(DSMSG_NotifyStopped);
         }
-        break;
-    default:
-        break;
     }
 
     return error;
@@ -1059,6 +1083,7 @@ static BOOL TRKTargetStepDone()
 static DSError TRKTargetDoStep()
 {
     gTRKStepStatus.active = TRUE;
+    MWTRACE(1, "TargetDoStep:\n");
     TRKTargetEnableTrace(TRUE);
 
     if (gTRKStepStatus.type == DSSTEP_IntoCount

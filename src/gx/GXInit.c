@@ -135,7 +135,7 @@ static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {
     if (idx >= 20) {
         return NULL;
     }
-    return (GXTlutRegion*)((u32)__GXData + idx * 0x10 + 0x2D0);
+    return (GXTlutRegion*)((u32)gx + idx * 0x10 + 0x2D0);
 }
 
 #if DEBUG

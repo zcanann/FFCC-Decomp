@@ -1,6 +1,6 @@
 #include "ffcc/chunkfile.h"
 
-#include "string.h"
+extern "C" void* memcpy(void* dst, const void* src, unsigned long n);
 
 /*
  * --INFO--

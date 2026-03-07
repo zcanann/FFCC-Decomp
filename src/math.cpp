@@ -1021,51 +1021,53 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
  */
 unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
-    int sat = (saturation * 0xFF) / 100 + ((saturation * 0xFF) >> 31);
-    int val = (brightness * 0xFF) / 100 + ((brightness * 0xFF) >> 31);
-    sat -= sat >> 31;
-    val -= val >> 31;
+    int temp = (saturation * 0xFF) / 100 + ((saturation * 0xFF) >> 31);
+    unsigned int sat = temp - (temp >> 31);
+    temp = (brightness * 0xFF) / 100 + ((brightness * 0xFF) >> 31);
+    unsigned int val = temp - (temp >> 31);
+    unsigned char cVal = (unsigned char)val;
 
     unsigned char rgba[4];
     if ((float)sat == 0.0f) {
-        rgba[0] = (unsigned char)val;
-        rgba[1] = (unsigned char)val;
-        rgba[2] = (unsigned char)val;
+        rgba[0] = cVal;
+        rgba[1] = cVal;
+        rgba[2] = cVal;
     } else {
-        int tmp = (0xFF - sat) * val;
-        int lo = tmp / 0xFF + (tmp >> 31);
-        lo -= lo >> 31;
-        tmp = hue / 60 + (hue >> 31);
-        tmp = (hue + (tmp - (tmp >> 31)) * -60) * (val - lo);
-        tmp = tmp / 60 + (tmp >> 31);
+        int low = (0xFF - sat) * val;
+        int x = low / 0xFF + (low >> 31);
+        x -= x >> 31;
 
-        unsigned char x = (unsigned char)(tmp - (tmp >> 31));
-        unsigned char cLo = (unsigned char)lo;
-        unsigned char cHi = (unsigned char)val;
+        int h = hue / 60 + (hue >> 31);
+        h = (hue + (h - (h >> 31)) * -60) * (val - x);
+        h = h / 60 + (h >> 31);
+
+        unsigned char add = (unsigned char)(h - (h >> 31));
+        unsigned char cLow = (unsigned char)x;
+        unsigned char cHigh = (unsigned char)val;
         if (hue < 60) {
-            rgba[0] = cHi;
-            rgba[1] = cLo + x;
-            rgba[2] = cLo;
+            rgba[0] = cHigh;
+            rgba[1] = cLow + add;
+            rgba[2] = cLow;
         } else if (hue < 120) {
-            rgba[0] = cHi - x;
-            rgba[1] = cHi;
-            rgba[2] = cLo;
+            rgba[0] = cHigh - add;
+            rgba[1] = cHigh;
+            rgba[2] = cLow;
         } else if (hue < 180) {
-            rgba[0] = cLo;
-            rgba[1] = cHi;
-            rgba[2] = cLo + x;
+            rgba[0] = cLow;
+            rgba[1] = cHigh;
+            rgba[2] = cLow + add;
         } else if (hue < 240) {
-            rgba[0] = cLo;
-            rgba[1] = cHi - x;
-            rgba[2] = cHi;
+            rgba[0] = cLow;
+            rgba[1] = cHigh - add;
+            rgba[2] = cHigh;
         } else if (hue < 300) {
-            rgba[0] = cLo + x;
-            rgba[1] = cLo;
-            rgba[2] = cHi;
+            rgba[0] = cLow + add;
+            rgba[1] = cLow;
+            rgba[2] = cHigh;
         } else if (hue < 360) {
-            rgba[0] = cHi;
-            rgba[1] = cLo;
-            rgba[2] = cHi - x;
+            rgba[0] = cHigh;
+            rgba[1] = cLow;
+            rgba[2] = cHigh - add;
         } else {
             rgba[0] = 0;
             rgba[1] = 0;

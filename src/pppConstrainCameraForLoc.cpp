@@ -6,7 +6,7 @@
 
 // External references
 extern int gUtil;
-extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern struct {
     int field0_0x0;
     Mtx m_cameraMatrix;
@@ -92,7 +92,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 
     fVar3 = *(float*)(owner + 0x1c);
     fVar2 = *(float*)(owner + 0x2c);
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, (Vec*)&local_f8);
+    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, *(Vec*)&local_f8);
 
     local_e0.x = fVar3 * local_c8.x;
     local_e0.y = fVar3 * local_c8.y;

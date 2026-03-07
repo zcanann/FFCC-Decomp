@@ -646,7 +646,7 @@ extern "C" void __ct__9CGBaseObjFv(CGBaseObj* obj)
  */
 CMemory::CStage* CFlatRuntime2::getStage()
 {
-	return Game.game.m_mainStage;
+	return reinterpret_cast<CGame*>(&Game)->m_mainStage;
 }
 
 /*
@@ -660,7 +660,7 @@ CMemory::CStage* CFlatRuntime2::getStage()
  */
 CMemory::CStage* CFlatRuntime2::getDebugStage()
 {
-	return Game.game.m_debugStage;
+	return reinterpret_cast<CGame*>(&Game)->m_debugStage;
 }
 
 /*

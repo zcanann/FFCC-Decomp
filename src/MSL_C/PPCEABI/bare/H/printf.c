@@ -477,6 +477,12 @@ static char* longlong2str_801B80A0(long long num, char* pBuf, print_format fmt)
         return 0;
     }
 
+    while (digits + 8 <= fmt.precision) {
+        p -= 8;
+        strncpy(p, "00000000", 8);
+        digits += 8;
+    }
+
     while (digits < fmt.precision) {
         *--p = '0';
         ++digits;

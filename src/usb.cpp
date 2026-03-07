@@ -1,7 +1,6 @@
 #include "ffcc/usb.h"
 
 #include "ffcc/system.h"
-
 extern "C" char __vt__8CManager[];
 
 /*
@@ -17,7 +16,7 @@ extern "C" void __sinit_usb_cpp()
 {
 	void* vtbl = __vt__8CManager;
 	*reinterpret_cast<void**>(&USB) = vtbl;
-	*reinterpret_cast<void**>(&USB) = PTR_PTR_DAT_801e88a4;
+	*reinterpret_cast<void**>(&USB) = __vt__4CUSB;
 }
 
 /*

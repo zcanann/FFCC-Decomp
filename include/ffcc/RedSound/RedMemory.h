@@ -12,8 +12,8 @@ extern int* gRedAMemoryBlockList;
 extern char s_redMemoryLogPrefix_801E78A3;
 extern char s_redMemoryLogSuffixA_80333D20;
 extern char s_redMemoryLogSuffixB_80333D28;
-extern char s__s_sMemory_Bank_Full____s_801e7888[];
-extern char s__s_sA_Memory_Bank_Full____s_801e78b5[];
+extern char s_redMemoryMainBankFullFmt[];
+extern char s_redMemoryAuxBankFullFmt[];
 
 int RedNew(int);
 void RedDelete(int);

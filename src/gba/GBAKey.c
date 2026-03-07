@@ -9,20 +9,14 @@ static s32 F152(void* task)
 {
     s32 chan;
 
-    if (&__GBA[0].task == task) {
-        chan = 0;
-    } else if (&__GBA[1].task == task) {
-        chan = 1;
-    } else if (&__GBA[2].task == task) {
-        chan = 2;
-    } else if (&__GBA[3].task == task) {
-        chan = 3;
-    } else {
-        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
-        chan = -1;
+    for (chan = 0; chan < 4; chan++) {
+        if (&__GBA[chan].task == task) {
+            return chan;
+        }
     }
 
-    return chan;
+    OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
+    return -1;
 }
 
 static void F23(void* task)

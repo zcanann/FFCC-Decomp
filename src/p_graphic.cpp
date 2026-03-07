@@ -11,6 +11,7 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 
+CGraphicPcs GraphicsPcs;
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
 extern "C" double cos(double);

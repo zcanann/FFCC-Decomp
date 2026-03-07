@@ -48,9 +48,6 @@ extern "C" float FLOAT_8032fb38;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" int __cntlzw(unsigned int);
 
-extern CMemory Memory;
-extern CSystem System;
-extern CMath Math;
 extern float FLOAT_8032fb3c;
 extern float FLOAT_8032fb4c;
 extern double DOUBLE_8032fb40;

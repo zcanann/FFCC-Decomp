@@ -2,6 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/ppp_constants.h"
+#include "ffcc/pppColor.h"
 /*
  * --INFO--
  * PAL Address: 0x80062194
@@ -12,8 +13,6 @@
  * JP Size: TODO
  */
 
-extern CMath Math;
-extern int gPppCalcDisabled;
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {

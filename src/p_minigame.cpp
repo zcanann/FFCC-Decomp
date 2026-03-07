@@ -9,6 +9,7 @@
 #include <dolphin/si.h>
 #include <string.h>
 
+CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
 extern unsigned char PartPcs[];
 extern unsigned int PTR_PTR_s_CMiniGamePcs_80212348[];

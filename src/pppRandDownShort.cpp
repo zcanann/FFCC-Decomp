@@ -2,10 +2,9 @@
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/ppp_constants.h"
-extern CMath Math;
+#include "ffcc/pppColor.h"
 extern "C" f32 RandF__5CMathFv(CMath*);
 
-extern int gPppCalcDisabled;
 extern s16 gPppDefaultValueBuffer[];
 
 struct RandDownShortParam {

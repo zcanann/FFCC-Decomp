@@ -83,4 +83,6 @@ public:
 	unsigned char m_tlutData[0x400];
 };
 
+extern CFontMan FontMan;
+
 #endif // _FFCC_FONTMAN_H_

@@ -17,7 +17,6 @@
 
 #include <string.h>
 
-extern CFontMan FontMan;
 extern CUtil gUtil;
 
 static char s_fileCpp[] = "file.cpp";

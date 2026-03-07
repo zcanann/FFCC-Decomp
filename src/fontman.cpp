@@ -5,7 +5,6 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-extern CFontMan FontMan;
 extern void* ARRAY_802ea170;
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);

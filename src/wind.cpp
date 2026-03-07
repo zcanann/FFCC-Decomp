@@ -16,7 +16,6 @@ extern struct {
     Mtx m_cameraMatrix;
 } CameraPcs;
 extern unsigned char CFlat[];
-extern CMath Math;
 
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" float RandF__5CMathFv(CMath*);

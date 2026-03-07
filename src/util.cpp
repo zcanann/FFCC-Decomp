@@ -10,7 +10,6 @@ extern float kUtilQuadDepth;
 extern float kUtilHermiteCoeff2;
 extern float kUtilHermiteCoeff3;
 extern float kUtilHermiteCoeffNeg2;
-extern CMath Math;
 
 extern struct {
     u8 _0x0[0x4];

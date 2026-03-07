@@ -357,9 +357,11 @@ extern "C" void CalcBound__9CLine2(CLine* line)
  */
 extern "C" void __sinit_sound_cpp(void)
 {
-    *reinterpret_cast<void**>(&Sound) = &PTR_PTR_s_CSound_8021056c;
-    __ct__9CRedSoundFv(&Sound);
-    __construct_array(SoundData(&Sound).m_lineWork, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
+    unsigned char* sound = reinterpret_cast<unsigned char*>(&Sound);
+
+    *reinterpret_cast<void**>(sound) = &PTR_PTR_s_CSound_8021056c;
+    __ct__9CRedSoundFv(sound + 8);
+    __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
     __register_global_object(&Sound, __dt__6CSoundFv, &ARRAY_802f26c8);
 }
 

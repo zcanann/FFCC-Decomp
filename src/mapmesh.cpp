@@ -593,18 +593,19 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
  */
 void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
-    void* texture;
     int* drawEntry;
 
-    if ((U16At(this, 0xA) == 0) || (drawEntry = reinterpret_cast<int*>(PtrAt(this, 0x40)), *drawEntry == 0)) {
-        texture = 0;
-    } else {
-        textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))
-            [*reinterpret_cast<unsigned short*>(drawEntry + 2)];
-        texture = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+    if (U16At(this, 0xA) != 0) {
+        drawEntry = reinterpret_cast<int*>(PtrAt(this, 0x40));
+        if ((int)*drawEntry != 0) {
+            textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
+            CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
+                reinterpret_cast<unsigned char*>(materialSet) + 8))[*reinterpret_cast<unsigned short*>(drawEntry + 2)];
+            return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+        }
     }
-    return texture;
+
+    return 0;
 }
 
 /*

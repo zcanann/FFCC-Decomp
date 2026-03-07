@@ -10,7 +10,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "string.h"
 
-extern CMath Math;
 char sMcSaveFileName[] = "FFCC";
 char* PTR_DAT_8032e854 = sMcSaveFileName;
 CMemoryCardMan MemoryCardMan;

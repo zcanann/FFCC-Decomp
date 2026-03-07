@@ -1,5 +1,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/graphic.h"
+#include "ffcc/materialman.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
@@ -20,8 +21,7 @@ extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
 extern int DAT_802381a0;
-extern unsigned char MaterialMan[];
-extern unsigned char MaterialMan[];
+extern CMaterialMan MaterialMan;
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
@@ -31,7 +31,6 @@ extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
-extern CMath Math;
 
 static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
 
@@ -602,20 +601,21 @@ void CGraphicPcs::setViewport()
  */
 void CGraphicPcs::preDrawEnvInit()
 {
-    *(u32*)(MaterialMan + 0x48) = 0x000ACE0F;
-    *(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
-    *(u8*)(MaterialMan + 0x4C) = 0xFF;
-    *(u32*)(MaterialMan + 0x128) = 0;
-    *(u32*)(MaterialMan + 0x11C) = 0;
-    *(u32*)(MaterialMan + 0x12C) = 0x1E;
-    *(u32*)(MaterialMan + 0x120) = 0x1E;
-    *(u32*)(MaterialMan + 0x130) = 0;
-    *(u32*)(MaterialMan + 0x124) = 0;
-    *(u8*)(MaterialMan + 0x205) = 0xFF;
-    *(u8*)(MaterialMan + 0x206) = 0xFF;
-    *(u32*)(MaterialMan + 0x58) = 0;
-    *(u32*)(MaterialMan + 0x5C) = 0;
-    *(u8*)(MaterialMan + 0x208) = 0;
+    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    *(u32*)(materialMan + 0x48) = 0x000ACE0F;
+    *(u32*)(materialMan + 0x44) = 0xFFFFFFFF;
+    *(u8*)(materialMan + 0x4C) = 0xFF;
+    *(u32*)(materialMan + 0x128) = 0;
+    *(u32*)(materialMan + 0x11C) = 0;
+    *(u32*)(materialMan + 0x12C) = 0x1E;
+    *(u32*)(materialMan + 0x120) = 0x1E;
+    *(u32*)(materialMan + 0x130) = 0;
+    *(u32*)(materialMan + 0x124) = 0;
+    *(u8*)(materialMan + 0x205) = 0xFF;
+    *(u8*)(materialMan + 0x206) = 0xFF;
+    *(u32*)(materialMan + 0x58) = 0;
+    *(u32*)(materialMan + 0x5C) = 0;
+    *(u8*)(materialMan + 0x208) = 0;
 }
 
 /*
@@ -629,10 +629,11 @@ void CGraphicPcs::preDrawEnvInit()
  */
 void CGraphicPcs::stdDrawEnvInit()
 {
-	*(u32*)(MaterialMan + 0x128) = *(u32*)(MaterialMan + 0x11C);
-	*(u32*)(MaterialMan + 0x12C) = *(u32*)(MaterialMan + 0x120);
-	*(u32*)(MaterialMan + 0x130) = *(u32*)(MaterialMan + 0x124);
-	*(u32*)(MaterialMan + 0x40) = *(u32*)(MaterialMan + 0x48);
+	unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+	*(u32*)(materialMan + 0x128) = *(u32*)(materialMan + 0x11C);
+	*(u32*)(materialMan + 0x12C) = *(u32*)(materialMan + 0x120);
+	*(u32*)(materialMan + 0x130) = *(u32*)(materialMan + 0x124);
+	*(u32*)(materialMan + 0x40) = *(u32*)(materialMan + 0x48);
 }
 
 /*

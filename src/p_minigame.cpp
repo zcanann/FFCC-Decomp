@@ -3,6 +3,7 @@
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_tina.h"
 
 #include <dolphin/gba/GBA.h>
 #include <dolphin/os.h>
@@ -11,9 +12,8 @@
 
 CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
-extern unsigned char PartPcs[];
-extern unsigned int PTR_PTR_s_CMiniGamePcs_80212348[];
-extern char DAT_80331bf0[];
+extern "C" void* __vt__12CMiniGamePcs[];
+static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int sprintf(char* buffer, const char* format, ...);
@@ -58,7 +58,7 @@ extern "C" void __sinit_p_minigame_cpp(void)
     unsigned int* desc1 = m_table_desc1__12CMiniGamePcs;
     unsigned int* desc2 = m_table_desc2__12CMiniGamePcs;
 
-    *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CMiniGamePcs_80212348);
+    *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(__vt__12CMiniGamePcs);
 
     table[1] = desc0[0];
     table[2] = desc0[1];
@@ -376,7 +376,8 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
     self[0x6494] = 0;
 
-    CMemory::CStage* stageLoad = reinterpret_cast<CMemory::CStage*>(PartPcs + 0x20);
+    CMemory::CStage* stageLoad =
+        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x20);
     *reinterpret_cast<void**>(self + 0x1354) =
         __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, "p_minigame.cpp", 0xF1);
     *reinterpret_cast<void**>(self + 0x135C) =
@@ -388,7 +389,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x135C) + 200) =
         *reinterpret_cast<unsigned int*>(self + 0x1364);
 
-    strncpy(reinterpret_cast<char*>(self + 0x1344), DAT_80331bf0, 4);
+    strncpy(reinterpret_cast<char*>(self + 0x1344), s_miniGameDefaultTag, 4);
 
     void* managerImage = *reinterpret_cast<void**>(self + 0x1354);
     CFile::CHandle* fileHandle = File.Open(managerFilePath, 0, CFile::PRI_LOW);

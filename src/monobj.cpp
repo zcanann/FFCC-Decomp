@@ -13,7 +13,6 @@
 #include <math.h>
 #include <string.h>
 
-extern CMath Math;
 extern unsigned char DbgMenuPcs[];
 extern unsigned char ARRAY_8030918c[];
 extern unsigned char CFlat[];

@@ -9,9 +9,10 @@
 #include "ffcc/p_light.h"
 #include "ffcc/symbols_shared.h"
 
-extern float kOctTreeBoundMinInit;
-extern float kOctTreeBoundMaxInit;
-extern float kOctTreeCylinderPad;
+// Linkage definitions from config/GCCP01/symbols.txt.
+float kOctTreeBoundMinInit = 10000000000.0f;
+float kOctTreeBoundMaxInit = -10000000000.0f;
+float kOctTreeCylinderPad = 1.0f;
 extern CMaterialMan MaterialMan;
 static unsigned long s_clearFlagMask;
 struct CBoundRaw

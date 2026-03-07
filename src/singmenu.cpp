@@ -176,7 +176,6 @@ extern float FLOAT_803329c0;
 extern float FLOAT_803329c4;
 extern float FLOAT_803329c8;
 extern float FLOAT_803329cc;
-extern CUtil gUtil;
 extern int DAT_8032eeb8;
 extern int DAT_8032eebc;
 extern int DAT_8032eec0;

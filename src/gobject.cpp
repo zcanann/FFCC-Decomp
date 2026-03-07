@@ -19,7 +19,6 @@
 #include <math.h>
 #include <string.h>
 
-extern CMath Math;
 extern u32 CFlatFlags;
 extern Mtx gFlatPosMtx;
 extern "C" int __cntlzw(unsigned int);

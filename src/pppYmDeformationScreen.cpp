@@ -59,8 +59,6 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern CMath Math;
-extern CUtil gUtil;
 extern "C" float ppvCameraMatrix02[3][4];
 extern float ppvScreenMatrix[4][4];
 

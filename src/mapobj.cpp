@@ -11,14 +11,15 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 
-extern float kMapObjBoundMinInit;
-extern float kMapObjBoundMaxInit;
-extern const float kMapObjZero;
-extern const float kMapObjOne;
-extern const float kMapObjInitNegOne;
-extern float kMapObjDegToRad;
-extern const float kMapObjInitValue50;
-extern unsigned int DAT_8032e498;
+// Linkage definitions from config/GCCP01/symbols.txt.
+float kMapObjBoundMinInit = 10000000000.0f;
+float kMapObjBoundMaxInit = -10000000000.0f;
+extern const float kMapObjZero = 1.0f;
+extern const float kMapObjOne = 0.0f;
+extern const float kMapObjInitNegOne = 1000000000000000.0f;
+float kMapObjDegToRad = 0.017453292f;
+extern const float kMapObjInitValue50 = -1.0f;
+unsigned int DAT_8032e498 = 0xFFFFFFFF;
 extern CMaterialMan MaterialMan;
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);

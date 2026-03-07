@@ -6,7 +6,6 @@
 
 #include <math.h>
 
-extern CMath Math;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
 extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);

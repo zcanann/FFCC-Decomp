@@ -58,8 +58,6 @@ extern float FLOAT_80331cd8;
 extern float FLOAT_80331ce8;
 extern float FLOAT_80331cec;
 extern float FLOAT_80331cf0;
-extern CUtil gUtil;
-extern CMath Math;
 extern float DAT_801dd4bc;
 extern float DAT_801dd4c0;
 extern float DAT_801dd4c4;

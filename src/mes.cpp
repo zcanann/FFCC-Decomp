@@ -1,6 +1,7 @@
 #include "ffcc/mes.h"
 #include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/joybus.h"
 #include <string.h>
 
@@ -23,7 +24,6 @@ extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(
     void*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern unsigned char MenuPcs[];
 extern float FLOAT_80330890;
 extern float FLOAT_80330894;
 extern float FLOAT_80330898;
@@ -344,13 +344,14 @@ void CMes::getFont(int, int)
  */
 void CMes::addString(char** text, int branchMode)
 {
-	CFont* font = *(CFont**)(MenuPcs + 0x100);
+	unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
+	CFont* font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 	int fontSel = *(int*)((char*)this + 0x3D40);
 	int caseMode = 0;
 	int flowMode = branchMode;
 	if (fontSel == 0)
 	{
-		font = *(CFont**)(MenuPcs + 0x0F8);
+		font = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
 	}
 	else if ((fontSel == 1) || (fontSel >= 4))
 	{
@@ -358,7 +359,7 @@ void CMes::addString(char** text, int branchMode)
 	}
 	else
 	{
-		font = *(CFont**)(MenuPcs + 0x100);
+		font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 	}
 
 	if (font == 0)
@@ -486,11 +487,11 @@ void CMes::addString(char** text, int branchMode)
 				int nextFontSel = *(int*)((char*)this + 0x3D40);
 				if (nextFontSel == 0)
 				{
-					font = *(CFont**)(MenuPcs + 0x0F8);
+					font = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
 				}
 				else
 				{
-					font = *(CFont**)(MenuPcs + 0x100);
+					font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 				}
 				SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), font);
 				SetMargin__5CFontFf(FLOAT_8033089c, font);
@@ -765,6 +766,7 @@ void CMes::Draw()
 {
 	if (*(int*)((char*)this + 8) != 0)
 	{
+		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
 		unsigned int globalAlpha;
 		if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
 		{
@@ -793,7 +795,7 @@ void CMes::Draw()
 					{
 						DrawQuit__5CFontFv(font);
 					}
-					DrawInit__8CMenuPcsFv(MenuPcs);
+					DrawInit__8CMenuPcsFv(&MenuPcs);
 
 					unsigned int iconId = ch;
 					if (ch == 7)
@@ -863,11 +865,11 @@ void CMes::Draw()
 
 					unsigned char colorStorage[8];
 					__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
-					SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
-					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x15);
+					SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x15);
 
 					DrawRect__8CMenuPcsFUlfffffffff(
-					    MenuPcs, 0, *(float*)((char*)this + 0x3C9C) + *glyph,
+					    &MenuPcs, 0, *(float*)((char*)this + 0x3C9C) + *glyph,
 					    FLOAT_80330890 + *(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2),
 					    FLOAT_80330894, FLOAT_80330894, (float)((iconId % 5) * 0x16),
 					    (float)((iconId / 5) * 0x16), FLOAT_80330898, FLOAT_80330898, 0.0f);
@@ -882,10 +884,10 @@ void CMes::Draw()
 					unsigned int fontId = (unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F;
 					if (activeFontId != fontId)
 					{
-						nextFont = *(CFont**)(MenuPcs + 0x100);
+						nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 						if (fontId == 0)
 						{
-							nextFont = *(CFont**)(MenuPcs + 0x0F8);
+							nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
 						}
 						else if ((fontId == 1) || (fontId >= 4))
 						{

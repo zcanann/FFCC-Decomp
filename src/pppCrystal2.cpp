@@ -11,7 +11,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern CUtil gUtil;
 extern float DAT_801dd60c;
 extern float DAT_801dd610;
 extern float DAT_801dd614;

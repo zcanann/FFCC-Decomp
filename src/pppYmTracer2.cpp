@@ -28,7 +28,6 @@ extern float FLOAT_80331848;
 extern float FLOAT_80331860;
 extern double DOUBLE_80331850;
 extern double DOUBLE_80331858;
-extern CUtil gUtil;
 
 static char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 

@@ -29,7 +29,6 @@ struct CameraPcsForEmission {
 
 extern "C" int rand(void);
 
-extern CMath Math;
 extern CameraPcsForEmission CameraPcs;
 extern char MaterialMan[];
 extern char DAT_803311fc[];

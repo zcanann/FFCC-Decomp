@@ -9,7 +9,6 @@ extern "C" float RandF__5CMathFv(CMath*);
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
-extern CMath Math;
 
 static Mtx g_matUnit;
 

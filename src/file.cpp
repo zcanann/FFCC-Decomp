@@ -17,7 +17,6 @@
 
 #include <string.h>
 
-extern CUtil gUtil;
 
 static char s_fileCpp[] = "file.cpp";
 static char s_cFile[] = "CFile";

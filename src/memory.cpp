@@ -11,6 +11,11 @@
 #include <string.h>
 
 static char s_memory_cpp[] = "memory.cpp";
+static char s_heapWalkerTitle[] = "---- Heap Walker ----\n";
+static char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
+static char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
+static char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
+static char s_drawHeapTitleFmt[] = "%4d %4d %4d";
 extern char PTR_PTR_s_CMemory_801e8488[];
 extern "C" char __vt__8CManager[];
 extern CMemory Memory;
@@ -22,10 +27,6 @@ extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
-extern char s____Heap_Walker_801d6bfc[];
-extern char s_Use____5dKB__s_801d6c0c[];
-extern char s_Unuse___5dKB_801d6c20[];
-extern char s_Total___5dKB_Use___5dKB_Unuse____801d6c30[];
 extern char DAT_801d669c[];
 extern char DAT_801d67d8[];
 extern char DAT_801d6bdc[];
@@ -38,7 +39,6 @@ extern float FLOAT_8032f7dc;
 extern float FLOAT_8032f7fc;
 extern float FLOAT_8032f800;
 extern float FLOAT_8032f804;
-extern char s__4d__4d__4d_801d6800[];
 extern unsigned int DAT_801d64a8;
 extern unsigned int DAT_801d64ac;
 extern unsigned int DAT_801d64b0;
@@ -58,10 +58,6 @@ extern unsigned int DAT_801d64e4;
 extern int DAT_8032ec58;
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
-extern char s____Heap_Walker_801d6bfc[];
-extern char s_Use____5dKB__s_801d6c0c[];
-extern char s_Unuse___5dKB_801d6c20[];
-extern char s_Total___5dKB_Use___5dKB_Unuse____801d6c30[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
@@ -509,7 +505,7 @@ void CMemory::HeapWalker()
 {
     Printf__7CSystemFPce(&System, DAT_8032f7e8);
     Printf__7CSystemFPce(&System, DAT_8032f808);
-    Printf__7CSystemFPce(&System, s____Heap_Walker_801d6bfc);
+    Printf__7CSystemFPce(&System, s_heapWalkerTitle);
     Printf__7CSystemFPce(&System, DAT_8032f808);
 
     CStage* listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(this) + 4);
@@ -531,20 +527,20 @@ void CMemory::HeapWalker()
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8))
                     >> 10;
-                Printf__7CSystemFPce(&System, s_Use____5dKB__s_801d6c0c, useKB, stageGetSourceName(stage));
+                Printf__7CSystemFPce(&System, s_heapWalkerUseFmt, useKB, stageGetSourceName(stage));
                 useTotal += useKB;
 
                 unsigned int unuseKB = static_cast<unsigned int>(
                     *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 4) + 8) -
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC))
                     >> 10;
-                Printf__7CSystemFPce(&System, s_Unuse___5dKB_801d6c20, unuseKB);
+                Printf__7CSystemFPce(&System, s_heapWalkerUnuseFmt, unuseKB);
                 stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
                 unuseTotal += unuseKB;
             }
 
             Printf__7CSystemFPce(
-                &System, s_Total___5dKB_Use___5dKB_Unuse____801d6c30, useTotal + unuseTotal, useTotal, unuseTotal);
+                &System, s_heapWalkerTotalFmt, useTotal + unuseTotal, useTotal, unuseTotal);
         }
 
         listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(listHead) + 0x27D8);
@@ -1424,7 +1420,7 @@ void CMemory::CStage::drawHeapTitle(int y)
                 totalRound = 1;
             }
 
-            sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
+            sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
                     (totalUnuse >> 10) + totalRound, (maxUnuse >> 10) + maxRound);
             Graphic.DrawDebugStringDirect(0x208, y, line, 8);
             return;
@@ -2415,3 +2411,4 @@ void CMemory::CStage::GetTop()
 {
 	// TODO
 }
+

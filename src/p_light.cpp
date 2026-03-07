@@ -1,6 +1,7 @@
 #include "ffcc/p_light.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/materialman.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapocttree.h"
@@ -52,7 +53,7 @@ extern double DOUBLE_8032fc58;
 extern double DOUBLE_8032fc68;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
-extern unsigned char MaterialMan[];
+extern CMaterialMan MaterialMan;
 
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 
@@ -665,7 +666,7 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
     GXSetChanAmbColor((GXChannelID)4, ambColor);
 
     if ((enable == 0) || (alpha == 0) || (FLOAT_8032fc80 <= atten)) {
-        MaterialMan[519] = ambColor.a;
+        reinterpret_cast<unsigned char*>(&MaterialMan)[519] = ambColor.a;
         GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, *(u32*)(self + 0xb4), (GXDiffuseFn)2,
                       (GXAttnFn)1);
         if (ambColor.a == 0xFF) {
@@ -709,7 +710,7 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
 
     int lightIdMask = 1 << *(u32*)(self + 0xb0);
     GXLoadLightObjImm((GXLightObj*)(self + 0x4370), (GXLightID)lightIdMask);
-    MaterialMan[519] = 0;
+    reinterpret_cast<unsigned char*>(&MaterialMan)[519] = 0;
     GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, *(u32*)(self + 0xb4), (GXDiffuseFn)2,
                   (GXAttnFn)1);
     GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, lightIdMask, (GXDiffuseFn)0, (GXAttnFn)1);

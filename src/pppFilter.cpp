@@ -11,7 +11,6 @@ struct _pppEnvStLite {
     CMapMesh** m_mapMeshPtr;
 };
 
-extern CUtil gUtil;
 
 struct _pppFilterSerializedData {
     unsigned int m_unk80;

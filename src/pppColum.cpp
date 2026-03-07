@@ -15,7 +15,6 @@ static inline int* GetColumSerializedDataOffsets(void* param) {
     return *(int**)((char*)param + 0xc);
 }
 
-extern CMath Math;
 static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {

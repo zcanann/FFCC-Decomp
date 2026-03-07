@@ -36,7 +36,6 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst, int op);
 }
 
-extern CUtil gUtil;
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;

@@ -33,7 +33,6 @@ struct pppMngStBlurCharaRaw {
     void* m_charaObj;
 };
 
-extern CUtil gUtil;
 extern char MaterialMan[];
 
 extern float FLOAT_80331030;

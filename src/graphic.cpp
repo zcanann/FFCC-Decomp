@@ -19,7 +19,6 @@
 extern "C" char PTR_PTR_s_CGraphic_801e8408[];
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
-extern CUtil gUtil;
 extern "C" char __vt__8CManager[];
 extern "C" char DAT_801d637c[];
 extern "C" char DAT_801d63c0[];

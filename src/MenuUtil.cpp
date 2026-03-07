@@ -20,14 +20,15 @@ extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 
-extern float kMenuCenteringHalfWidth;
-extern float kOptionAnimMin;
-extern float kOptionAnimMax;
-extern float kMenuCenteringOffset;
-extern float kOptionRowAnimStep;
-extern float kOptionOpenAnimStep;
-extern float kOptionColumnAnimStep;
-extern float kOptionVolumeScale;
+// Linkage definitions from config/GCCP01/symbols.txt.
+float kMenuCenteringHalfWidth = 0.5f;
+float kOptionAnimMin = 0.0f;
+float kOptionAnimMax = 1.0f;
+float kMenuCenteringOffset = 320.0f;
+float kOptionRowAnimStep = 0.125f;
+float kOptionOpenAnimStep = 0.04f;
+float kOptionColumnAnimStep = 0.2f;
+float kOptionVolumeScale = 10.583333f;
 
 extern "C" int __cntlzw(unsigned int);
 

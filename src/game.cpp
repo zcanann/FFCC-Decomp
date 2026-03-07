@@ -95,6 +95,11 @@ void MapChanged__7CSystemFiii(CSystem*, int, int, int);
 void Draw__13CFlatRuntime2Fv(void*);
 void Frame__13CFlatRuntime2Fii(void*, int, int);
 void AfterFrame__12CFlatRuntimeFi(void*, int);
+void Calc__13CFlatRuntime2Fv(void*);
+void ResetPerformance__12CFlatRuntimeFv(void*);
+void Frame__5CWindFv(void*);
+int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
+void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
@@ -1026,87 +1031,76 @@ void CGame::loadCfd()
 void CGame::Calc()
 {
 	Mtx rotMtx;
+    int mapObjIdx;
+    float position;
 
     if (m_frameCounterEnable != 0) {
         m_gameWork.m_frameCounter++;
     }
 
-    const float minInit = FLOAT_8032f688;
-    const float maxInit = FLOAT_8032f68c;
+    m_partyMinZ = FLOAT_8032f688;
+    m_partyMinY = FLOAT_8032f688;
+    m_partyMinX = FLOAT_8032f688;
+    m_partyMaxZ = FLOAT_8032f68c;
+    m_partyMaxY = FLOAT_8032f68c;
+    m_partyMaxX = FLOAT_8032f68c;
 
-    m_partyMinX = minInit;
-    m_partyMinY = minInit;
-    m_partyMinZ = minInit;
+    for (int i = 0; i < 4; i++) {
+        CGPartyObj* partyObj = m_partyObjArr[i];
 
-    m_partyMaxX = maxInit;
-    m_partyMaxY = maxInit;
-    m_partyMaxZ = maxInit;
+        if (partyObj != 0) {
+            position = partyObj->m_worldPosition.x;
+            if (m_partyMinX < position) {
+                position = m_partyMinX;
+            }
+            m_partyMinX = position;
 
-    for (int i = 0; i < 4; ++i)
-    {
-        CGPartyObj* obj = m_partyObjArr[i];
+            position = partyObj->m_worldPosition.y;
+            if (m_partyMinY < position) {
+                position = m_partyMinY;
+            }
+            m_partyMinY = position;
 
-        if (!obj)
-		{
-            continue;
-		}
+            position = partyObj->m_worldPosition.z;
+            if (m_partyMinZ < position) {
+                position = m_partyMinZ;
+            }
+            m_partyMinZ = position;
 
-        const CVector& pos = (CVector&)obj; // obj->field0_0x0.gObject.maybeRotation;
+            position = partyObj->m_worldPosition.x;
+            if (position < m_partyMaxX) {
+                position = m_partyMaxX;
+            }
+            m_partyMaxX = position;
 
-        if (pos.x < m_partyMinX)
-		{
-			m_partyMinX = pos.x;
-		}
+            position = partyObj->m_worldPosition.y;
+            if (position < m_partyMaxY) {
+                position = m_partyMaxY;
+            }
+            m_partyMaxY = position;
 
-        if (pos.y < m_partyMinY)
-		{
-			m_partyMinY = pos.y;
-		}
-
-        if (pos.z < m_partyMinZ)
-		{
-			m_partyMinZ = pos.z;
-		}
-
-        if (pos.x > m_partyMaxX)
-		{
-			m_partyMaxX = pos.x;
-		}
-
-        if (pos.y > m_partyMaxY)
-		{
-			m_partyMaxY = pos.y;
-		}
-
-        if (pos.z > m_partyMaxZ)
-		{
-			m_partyMaxZ = pos.z;
-		}
+            position = partyObj->m_worldPosition.z;
+            if (position < m_partyMaxZ) {
+                position = m_partyMaxZ;
+            }
+            m_partyMaxZ = position;
+        }
     }
 
-    // Wind.Frame();
+    Frame__5CWindFv(Wind);
+    Calc__13CFlatRuntime2Fv(CFlat);
+    ResetPerformance__12CFlatRuntimeFv(CFlat);
+    Frame__13CFlatRuntime2Fii(CFlat, 1, 0);
 
-    // CFlat.Calc(); // Calc__13CFlatRuntime2Fv
-    // CFlat.ResetPerformance();
-    // CFlat.Frame(1, 0);
-
-    if (m_currentMapId == 0x21)
-    {
-        int objIdx = (int)this; // = MapMng.GetMapObjIdx(0);
-
-        if (objIdx >= 0)
-        {
+    if ((m_currentMapId == 0x21) && ((mapObjIdx = GetMapObjIdx__7CMapMngFUs(&MapMng, 0)) >= 0)) {
             if (!BOOL_8032ec44) {
                 BOOL_8032ec44 = true;
                 FLOAT_8032ec40 = FLOAT_8032f690;
             }
 
             FLOAT_8032ec40 += FLOAT_8032f694;
-
-            PSMTXRotRad(rotMtx, 0, FLOAT_8032ec40);
-
-            // MapMng.SetMapObjLMtx(objIdx, rotMtx);
-        }
+            PSMTXRotRad(rotMtx, 'y', FLOAT_8032ec40);
+            SetMapObjLMtx__7CMapMngFiPA4_f(&MapMng, mapObjIdx, rotMtx);
     }
 }
 

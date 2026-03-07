@@ -987,15 +987,17 @@ DSError TRKTargetInterrupt(TRKEvent* event)
 
 DSError TRKTargetAddStopInfo(TRKBuffer* buffer)
 {
-    u8 stopInfo[0x40];
+    size_t length = 4;
     u32 instruction;
+    u8 stopInfo[0x40];
 
     memset(stopInfo, 0, sizeof(stopInfo));
     *(u32*)&stopInfo[0x0] = sizeof(stopInfo);
     stopInfo[0x4]         = DSMSG_NotifyStopped;
     *(u32*)&stopInfo[0xC] = gTRKCPUState.Default.PC;
 
-    TRKTargetReadInstruction(&instruction, gTRKCPUState.Default.PC);
+    TRKTargetAccessMemory(&instruction, gTRKCPUState.Default.PC, &length,
+                          MEMACCESS_UserMemory, TRUE);
     *(u32*)&stopInfo[0x10] = instruction;
     *(u32*)&stopInfo[0x14] = (u16)gTRKCPUState.Extended1.exceptionID;
 
@@ -1004,15 +1006,17 @@ DSError TRKTargetAddStopInfo(TRKBuffer* buffer)
 
 DSError TRKTargetAddExceptionInfo(TRKBuffer* buffer)
 {
-    u8 exceptionInfo[0x40];
+    size_t length = 4;
     u32 instruction;
+    u8 exceptionInfo[0x40];
 
     memset(exceptionInfo, 0, sizeof(exceptionInfo));
     *(u32*)&exceptionInfo[0x0] = sizeof(exceptionInfo);
     exceptionInfo[0x4]         = DSMSG_NotifyException;
     *(u32*)&exceptionInfo[0xC] = gTRKExceptionStatus.exceptionInfo.PC;
 
-    TRKTargetReadInstruction(&instruction, gTRKExceptionStatus.exceptionInfo.PC);
+    TRKTargetAccessMemory(&instruction, gTRKExceptionStatus.exceptionInfo.PC, &length,
+                          MEMACCESS_UserMemory, TRUE);
     *(u32*)&exceptionInfo[0x10] = instruction;
     *(u32*)&exceptionInfo[0x14] = (u16)gTRKExceptionStatus.exceptionInfo.exceptionID;
 

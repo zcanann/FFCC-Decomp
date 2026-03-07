@@ -82,26 +82,29 @@ struct CMapCylinderRaw {
  */
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
+	f32 one = kPppYmLaserOne;
+	f64 randArg = (f64)FLOAT_80330df0;
 	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
-	*work = kPppYmLaserOne;
-	work[6] = kPppYmLaserOne;
-	work[5] = kPppYmLaserOne;
-	work[4] = kPppYmLaserOne;
-	work[3] = kPppYmLaserOne;
-	work[2] = kPppYmLaserOne;
-	work[1] = kPppYmLaserOne;
-	*(u32*)((u8*)work + 0x1c) = 0;
-	work[10] = kPppYmLaserOne;
-	work[9] = kPppYmLaserOne;
-	work[8] = kPppYmLaserOne;
+	*work = one;
+	work[6] = one;
+	work[5] = one;
+	work[4] = one;
+	work[3] = one;
+	work[2] = one;
+	work[1] = one;
+	work[7] = 0.0f;
+	work[10] = one;
+	work[9] = one;
+	work[8] = one;
 	*((u8*)work + 0x2c) = 0;
 	*((u8*)work + 0x2d) = 0;
 	*((u8*)work + 0x2e) = 0;
 	*((u16*)((u8*)work + 0x30)) = 0;
-	*((u16*)((u8*)work + 0x34)) = 0;
 	*((u16*)((u8*)work + 0x32)) = 0;
-	work[14] = RandF__5CMathFf(FLOAT_80330df0, &Math);
+	*((u16*)((u8*)work + 0x34)) = 0;
+	randArg = (f64)RandF__5CMathFf(randArg, &Math);
+	work[14] = (f32)randArg;
 }
 
 /*

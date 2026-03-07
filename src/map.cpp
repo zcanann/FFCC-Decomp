@@ -69,7 +69,6 @@ extern unsigned char CameraPcs[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
-extern unsigned char DAT_8032ecb8;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
 extern float FLOAT_8032f9a8;
@@ -2502,7 +2501,7 @@ void CMapMng::DrawBefore()
     GXSetZMode(1, GX_LEQUAL, 1);
     LightPcs.SetNumDiffuse(0);
 
-    if ((DAT_8032ecb8 & 8) == 0) {
+    if ((gMapHitDrawMode & 8) == 0) {
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
         for (int i = 0; i < mapObjCount; i++) {
             Draw__7CMapObjFUc(mapObj, 0xFE);
@@ -2545,7 +2544,7 @@ void CMapMng::Draw()
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298A)) = 1;
 
-    if ((DAT_8032ecb8 & 8) == 0) {
+    if ((gMapHitDrawMode & 8) == 0) {
         const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
 
         void* octTree = Ptr(this, 0x14);
@@ -2581,7 +2580,7 @@ void CMapMng::Draw()
         }
     }
 
-    if ((DAT_8032ecb8 & 8) != 0) {
+    if ((gMapHitDrawMode & 8) != 0) {
         _GXColor clearColor;
         clearColor.r = 0xFF;
         clearColor.g = 0xFF;
@@ -2590,7 +2589,7 @@ void CMapMng::Draw()
         GXSetCopyClear(clearColor, 0x00FFFFFF);
     }
 
-    if ((DAT_8032ecb8 & 4) != 0) {
+    if ((gMapHitDrawMode & 4) != 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
         GXSetZCompLoc(0);
@@ -2663,7 +2662,7 @@ void CMapMng::DrawAfter()
     GXSetZMode(1, GX_LEQUAL, 1);
     LightPcs.SetNumDiffuse(0);
 
-    if (DAT_8032ecb8 == 0) {
+    if (gMapHitDrawMode == 0) {
         void* octTree = Ptr(this, 0x14);
         const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
         for (int i = 0; i < octTreeCount; i++) {

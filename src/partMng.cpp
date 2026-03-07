@@ -48,9 +48,6 @@ extern "C" float FLOAT_8032fe4c;
 extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
 extern "C" float FLOAT_8032fe58;
-extern "C" float FLOAT_8032ed58;
-extern "C" float FLOAT_8032ed5c;
-extern "C" float FLOAT_8032ed60;
 extern "C" float FLOAT_8032fe18;
 extern "C" unsigned char DAT_8032ed68;
 extern "C" int DAT_8032ed6c;
@@ -962,9 +959,9 @@ void CPartMng::pppEditBeforeCalc()
 
         PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix02);
         C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
-        FLOAT_8032ed58 = ppvScreenMatrix[2][0];
-        FLOAT_8032ed5c = ppvScreenMatrix[2][1];
-        FLOAT_8032ed60 = ppvScreenMatrix[2][3];
+        gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
+        gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
+        gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];
         PSMTXCopy(ppvCameraMatrix02, ppvCameraMatrix0);
         PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
@@ -1318,7 +1315,7 @@ void CPartMng::pppEditDraw()
         }
     }
 
-    ppvScreenMatrix[2][3] = FLOAT_8032ed60;
+    ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
 

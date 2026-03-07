@@ -8,7 +8,6 @@
 #include "dolphin/mtx.h"
 
 extern int gPppCalcDisabled;
-extern float FLOAT_80330af0;
 extern float FLOAT_80330af4;
 extern float FLOAT_80330b08;
 extern float FLOAT_80330b0c;
@@ -117,7 +116,7 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
     pointCount = param_2->m_gridSize + 1;
     pointCount *= pointCount;
     savedY = ((Vec*)((u8*)pppMngStPtr + 0x58))->y;
-    zero = FLOAT_80330af0;
+    zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
     expand = FLOAT_80330b18;
@@ -256,7 +255,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
             for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
                 vtx->m_position.x = (float)x;
-                vtx->m_position.y = FLOAT_80330af0;
+                vtx->m_position.y = kPppYmMeltZero;
                 vtx->m_position.z = (float)z;
 
                 if (phaseDiv != 0) {
@@ -324,7 +323,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)ymMelt + 0x88 + colorOffset, &ppvCameraMatrix0, FLOAT_80330af0, ctrl->m_payload[0x19],
+        (u8*)ymMelt + 0x88 + colorOffset, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
         ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
     pppSetBlendMode__FUc(*(u8*)&ctrl->m_arg3);
 

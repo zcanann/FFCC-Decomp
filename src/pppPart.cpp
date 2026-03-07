@@ -18,6 +18,7 @@
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/gxfunc.h"
 
 #include <string.h>
@@ -30,7 +31,6 @@ extern "C" unsigned char gPppBlendModeState;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" unsigned char MaterialMan[];
 extern "C" float ppvScreenMatrix[4][4];
-extern "C" float FLOAT_8032ed60;
 extern "C" float FLOAT_8032ed8c;
 extern "C" double DOUBLE_8032fdf0;
 extern "C" double DOUBLE_8032fe00;
@@ -2525,7 +2525,7 @@ void pppClearDrawEnv()
 {
 	if (kPppZero != FLOAT_8032ed8c) {
 		FLOAT_8032ed8c = kPppZero;
-		ppvScreenMatrix[2][3] = FLOAT_8032ed60;
+		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 }
@@ -2549,7 +2549,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 
 	if ((double)FLOAT_8032ed8c != depthOffset) {
 		FLOAT_8032ed8c = (float)depthOffset;
-		ppvScreenMatrix[2][3] = FLOAT_8032ed60 + (float)depthOffset;
+		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W + (float)depthOffset;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 

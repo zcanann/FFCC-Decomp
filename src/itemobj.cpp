@@ -1,4 +1,5 @@
 #include "ffcc/itemobj.h"
+#include "ffcc/maphit.h"
 #include "ffcc/math.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/p_game.h"
@@ -93,7 +94,6 @@ extern float FLOAT_80331b9c;
 extern float FLOAT_80331bbc;
 extern float FLOAT_80331b68;
 extern double DOUBLE_80331ba0;
-extern unsigned char DAT_8032ec90[];
 extern int DAT_8032ee90;
 extern char SoundBuffer[];
 extern char DAT_80331b7c[];
@@ -1174,7 +1174,7 @@ void CGItemObj::ItemJump(int state, float jump)
 		local_5c = local_68;
 		local_58 = local_64;
 		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &local_60, &local_78, *(unsigned int*)(itemObj + 0x1c4)) != 0 &&
-		    DAT_8032ec90[0x47] == state) {
+		    reinterpret_cast<unsigned char*>(gMapHitFace)[0x47] == state) {
 			*(float*)(itemObj + 0x108) = *(float*)(itemObj + 0x108) + jump;
 		}
 	}

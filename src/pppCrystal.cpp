@@ -10,29 +10,29 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-extern float DAT_801db5b8;
-extern float DAT_801db5bc;
-extern float DAT_801db5c0;
-extern float DAT_801db5c4;
-extern float DAT_801db5c8;
-extern float DAT_801db5cc;
-extern float DAT_801db5d0;
-extern float DAT_801db5d4;
-extern float DAT_801db5d8;
-extern float DAT_801db5dc;
-extern float DAT_801db5e0;
-extern float DAT_801db5e4;
-extern float DAT_801db5ec;
-extern float DAT_801db5f0;
-extern float DAT_801db5f4;
-extern float DAT_801db5fc;
-extern float FLOAT_80330fa8;
-extern float FLOAT_80330fac;
-extern float FLOAT_80330fb0;
-extern float FLOAT_80330fb4;
-extern float FLOAT_80330fb8;
-extern float FLOAT_80330fbc;
-extern float FLOAT_80330fc0;
+static const float DAT_801db5b8 = 0.5f;
+static const float DAT_801db5bc = 0.0f;
+static const float DAT_801db5c0 = 0.0f;
+static const float DAT_801db5c4 = 0.5f;
+static const float DAT_801db5c8 = 0.0f;
+static const float DAT_801db5cc = -0.5f;
+static const float DAT_801db5d0 = 0.0f;
+static const float DAT_801db5d4 = 0.5f;
+static const float DAT_801db5d8 = 0.0f;
+static const float DAT_801db5dc = 0.0f;
+static const float DAT_801db5e0 = 0.0f;
+static const float DAT_801db5e4 = 1.0f;
+static const float DAT_801db5ec = 0.0f;
+static const float DAT_801db5f0 = 0.0f;
+static const float DAT_801db5f4 = 0.0f;
+static const float DAT_801db5fc = 0.0f;
+static const float FLOAT_80330fa8 = 32.0f;
+static const float FLOAT_80330fac = -0.5f;
+static const float FLOAT_80330fb0 = 640.0f;
+static const float FLOAT_80330fb4 = 448.0f;
+static const float FLOAT_80330fb8 = 33.3f;
+static const float FLOAT_80330fbc = 1.3333334f;
+static const float FLOAT_80330fc0 = 0.5f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 

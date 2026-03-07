@@ -48,28 +48,28 @@ struct pppScreenBreakUnkC {
 };
 
 extern int DAT_802381a0;
-extern float FLOAT_80331cc0;
-extern float FLOAT_80331cc4;
-extern float FLOAT_80331cc8;
-extern float FLOAT_80331ccc;
-extern float FLOAT_80331cd0;
-extern float FLOAT_80331cd4;
-extern float FLOAT_80331cd8;
-extern float FLOAT_80331ce8;
-extern float FLOAT_80331cec;
-extern float FLOAT_80331cf0;
-extern float DAT_801dd4bc;
-extern float DAT_801dd4c0;
-extern float DAT_801dd4c4;
-extern float DAT_801dd4b0;
-extern float DAT_801dd4b4;
-extern float DAT_801dd4b8;
+static const float FLOAT_80331cc0 = 2.0f;
+static const float FLOAT_80331cc4 = 0.0f;
+static const float FLOAT_80331cc8 = 0.3f;
+static const float FLOAT_80331ccc = -0.5f;
+static const float FLOAT_80331cd0 = 1.0f;
+static const float FLOAT_80331cd4 = -1.0f;
+static const float FLOAT_80331cd8 = 0.017453292f;
+static const float FLOAT_80331ce8 = 30.0f;
+static const float FLOAT_80331cec = 4.0f;
+static const float FLOAT_80331cf0 = -3.0f;
+static const float DAT_801dd4bc = 0.0f;
+static const float DAT_801dd4c0 = 1.0f;
+static const float DAT_801dd4c4 = 0.0f;
+static const float DAT_801dd4b0 = 0.0f;
+static const float DAT_801dd4b4 = 1.0f;
+static const float DAT_801dd4b8 = 0.0f;
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
-extern char s_f999_root_801dd4c8[];
+static char s_f999_root_801dd4c8[] = "f999_root";
 char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 extern CGraphic GraphicsPcs;
-extern float FLOAT_80331cf4;
+static const float FLOAT_80331cf4 = 0.5f;
 
 struct ScreenBreakCameraPcs {
     u8 _pad0[4];

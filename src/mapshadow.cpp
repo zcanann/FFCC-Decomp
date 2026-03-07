@@ -11,7 +11,8 @@ extern float FLOAT_8032fcf0;
 extern float FLOAT_8032fce0;
 
 class CMapMng;
-extern CMapMng MapMng;
+extern CMapMng g_MapMng;
+extern "C" CMaterial* __vc__22CPtrArray_P9CMaterial_FUl(void*, unsigned long);
 
 /*
  * --INFO--
@@ -33,7 +34,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 
 	octTree.ClearShadow();
 	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
-		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow>*>((char*)&MapMng + 0x21434);
+		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow>*>((char*)&g_MapMng + 0x21434);
 		for (i = 0; i < mapShadowArray->GetSize(); i++) {
 			octTreeMask = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);
 			if ((octTreeMask & (1U << i)) == 0) {
@@ -70,9 +71,9 @@ void CMapShadow::Init()
 	u32 materialMode;
 	u32 materialIndex;
 
-	materialArray = *(int*)((char*)&MapMng + 0x213d4);
+	materialArray = *(int*)((char*)&g_MapMng + 0x213d4);
 	materialIndex = m_materialIndex;
-	material = (int)(((CPtrArray<CMaterial*>*)(materialArray + 8))->operator[](materialIndex));
+	material = (int)__vc__22CPtrArray_P9CMaterial_FUl((void*)(materialArray + 8), materialIndex);
 	material = *(int*)(material + 0x3c);
 	materialWidth = *(u32*)(material + 0x64);
 	materialHeight = *(u32*)(material + 0x68);

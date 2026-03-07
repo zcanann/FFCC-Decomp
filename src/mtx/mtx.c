@@ -832,73 +832,65 @@ void C_MTXRotAxisRad(Mtx m, const Vec *axis, f32 rad)
  */
 void __PSMTXRotAxisRadInternal(register f32 sT, register f32 cT, register Mtx m, register const Vec *axis)
 {
-    register f32 rad;
-    register f32 tmp0, tmp1, tmp2, tmp3, tmp4;
-    register f32 tmp5, tmp6, tmp7, tmp8, tmp9;
+    register f32 tT;
+    register f32 fc0;
+    register f32 tmp0;
+    register f32 tmp1;
+    register f32 tmp2;
+    register f32 tmp3;
+    register f32 tmp4;
+    register f32 tmp5;
+    register f32 tmp6;
+    register f32 tmp7;
+    register f32 tmp8;
+    register f32 tmp9;
 
-    register f32 oneMinusCosT;
-    register f32 zero;
-    register f32 half = 0.5f;
-    register f32 three = 3.0f;
-    register f32 FP2, FP3;
-    register f32 xx_zz, xx_yy;
-    register f32 square_sum;
-    register f32 ret_sqrt;
-    register f32 n_0, n_1;
-    Vec axisNormalized;
-    register Vec *axisNormalizedPtr;
-
-    zero = 0.0f;
-    axisNormalizedPtr = &axisNormalized;
-    oneMinusCosT = 1.0f - cT;
-
-    #ifdef __MWERKS__ // clang-format off
-    asm {
-		psq_l       FP2, 0(axis), 0, 0;
-		ps_mul      xx_yy, FP2, FP2;
-		psq_l       FP3, 8(axis), 1, 0;
-		ps_madd     xx_zz, FP3, FP3, xx_yy;
-		ps_sum0     square_sum, xx_zz, FP3, xx_yy;
-		frsqrte     ret_sqrt, square_sum;
-		fmuls       n_0, ret_sqrt, ret_sqrt;
-		fmuls       n_1, ret_sqrt, half;
-		fnmsubs     n_0, n_0, square_sum, three;
-		fmuls       ret_sqrt, n_0, n_1;
-		ps_muls0    FP2, FP2, ret_sqrt;
-		psq_st      FP2, 0(axisNormalizedPtr), 0, 0;
-		ps_muls0    FP3, FP3, ret_sqrt;
-		psq_st      FP3, 8(axisNormalizedPtr), 1, 0;
-    }
-    #endif // clang-format on
+    tmp9 = 0.5f;
+    tmp8 = 3.0f;
 
 #ifdef __MWERKS__ // clang-format off
-  asm {
-		psq_l rad, 0x0(axisNormalizedPtr), 0, qr0
-		lfs tmp1, 0x8(axisNormalizedPtr)
-		ps_merge00 tmp0, cT, cT
-		ps_muls0   tmp4, rad, oneMinusCosT
-		ps_muls0   tmp5, tmp1, oneMinusCosT
-		ps_muls1   tmp3, tmp4, rad
-		ps_muls0   tmp2, tmp4, rad
-		ps_muls0   rad, rad, sT
-		ps_muls0   tmp4, tmp4, tmp1
-		fnmsubs    tmp6, tmp1, sT, tmp3
-		fmadds     tmp7, tmp1, sT, tmp3
-		ps_neg     tmp9, rad
-		ps_sum0    tmp8, tmp4, zero, rad
-		ps_sum0    tmp2, tmp2, tmp6, tmp0
-		ps_sum1    tmp3, tmp0, tmp7, tmp3
-		ps_sum0    tmp6, tmp9, zero, tmp4
-		ps_sum0    tmp9, tmp4, tmp4, tmp9
-		psq_st     tmp8, 0x8(m), 0, qr0
-		ps_muls0   tmp5, tmp5, tmp1
-		psq_st     tmp2, 0x0(m), 0, qr0
-		ps_sum1    tmp4, rad, tmp9, tmp4
-		psq_st     tmp3, 0x10(m), 0, qr0
-		ps_sum0    tmp5, tmp5, zero, tmp0
-		psq_st     tmp6, 0x18(m), 0, qr0
-		psq_st     tmp4, 0x20(m), 0, qr0
-		psq_st     tmp5, 0x28(m), 0, qr0
+    asm {
+        frsp cT, cT
+        psq_l tmp0, 0x0(axis), 0, 0
+        frsp sT, sT
+        lfs tmp1, 0x8(axis)
+        ps_mul tmp2, tmp0, tmp0
+        fadds tmp7, tmp9, tmp9
+        ps_madd tmp3, tmp1, tmp1, tmp2
+        fsubs fc0, tmp9, tmp9
+        ps_sum0 tmp4, tmp3, tmp1, tmp2
+        fsubs tT, tmp7, cT
+        frsqrte tmp5, tmp4
+        fmuls tmp2, tmp5, tmp5
+        fmuls tmp3, tmp5, tmp9
+        fnmsubs tmp2, tmp2, tmp4, tmp8
+        fmuls tmp5, tmp2, tmp3
+        ps_merge00 cT, cT, cT
+        ps_muls0 tmp0, tmp0, tmp5
+        ps_muls0 tmp1, tmp1, tmp5
+        ps_muls0 tmp4, tmp0, tT
+        ps_muls0 tmp9, tmp0, sT
+        ps_muls0 tmp5, tmp1, tT
+        ps_muls1 tmp3, tmp4, tmp0
+        ps_muls0 tmp2, tmp4, tmp0
+        ps_muls0 tmp4, tmp4, tmp1
+        fnmsubs tmp6, tmp1, sT, tmp3
+        fmadds tmp7, tmp1, sT, tmp3
+        ps_neg tmp0, tmp9
+        ps_sum0 tmp8, tmp4, fc0, tmp9
+        ps_sum0 tmp2, tmp2, tmp6, cT
+        ps_sum1 tmp3, cT, tmp7, tmp3
+        ps_sum0 tmp6, tmp0, fc0, tmp4
+        psq_st tmp8, 0x8(m), 0, qr0
+        ps_sum0 tmp0, tmp4, tmp4, tmp0
+        psq_st tmp2, 0x0(m), 0, qr0
+        ps_muls0 tmp5, tmp5, tmp1
+        psq_st tmp3, 0x10(m), 0, qr0
+        ps_sum1 tmp4, tmp9, tmp0, tmp4
+        psq_st tmp6, 0x18(m), 0, qr0
+        ps_sum0 tmp5, tmp5, fc0, cT
+        psq_st tmp4, 0x20(m), 0, qr0
+        psq_st tmp5, 0x28(m), 0, qr0
   }
 #endif // clang-format on
 }

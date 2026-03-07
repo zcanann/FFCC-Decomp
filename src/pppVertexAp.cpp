@@ -58,8 +58,9 @@ extern int gPppCalcDisabled;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
-_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 }
+
+_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -207,5 +208,4 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
-
 

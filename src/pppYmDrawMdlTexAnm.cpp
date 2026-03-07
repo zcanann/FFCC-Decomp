@@ -1,6 +1,6 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
 #include "dolphin/os.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 struct pppYmDrawMdlTexAnmWork {
     u32 m_frame;

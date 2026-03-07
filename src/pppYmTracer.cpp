@@ -7,7 +7,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 
 extern f32 FLOAT_803306e8;
 extern f32 FLOAT_803306ec;

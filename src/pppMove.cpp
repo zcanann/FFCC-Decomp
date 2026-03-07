@@ -1,7 +1,6 @@
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
-extern int gPppCalcDisabled;
 
 
 struct PppMoveObj {

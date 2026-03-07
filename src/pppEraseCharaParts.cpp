@@ -3,7 +3,6 @@
 #include "ffcc/partMng.h"
 
 #include <dolphin/gx.h>
-extern int gPppCalcDisabled;
 
 extern CMaterialMan MaterialMan;
 

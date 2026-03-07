@@ -8,7 +8,6 @@
 #include "ffcc/util.h"
 
 #include <string.h>
-extern int gPppCalcDisabled;
 
 extern CMath Math;
 extern const f32 FLOAT_80333448;

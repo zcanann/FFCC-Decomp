@@ -3,7 +3,6 @@
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 #include <stddef.h>
-extern int gPppCalcDisabled;
 
 class CMaterialSet;
 struct _pppEnvStLite {

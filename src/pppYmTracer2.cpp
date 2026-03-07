@@ -8,7 +8,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);

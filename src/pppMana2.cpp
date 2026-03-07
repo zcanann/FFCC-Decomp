@@ -10,7 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <dolphin/os/OSCache.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 struct Vec2d {
     float x;

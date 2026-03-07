@@ -8,7 +8,7 @@
 
 #include <string.h>
 #include <dolphin/os/OSCache.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 extern Mtx ppvCameraMatrix0;
 

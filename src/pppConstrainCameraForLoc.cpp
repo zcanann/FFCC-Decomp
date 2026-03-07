@@ -4,7 +4,6 @@
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 
 // External references
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);

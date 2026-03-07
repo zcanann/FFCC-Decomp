@@ -3,7 +3,6 @@
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
-extern int gPppCalcDisabled;
 
 struct pppLerpPos {
     u8 m_pad[0x80];

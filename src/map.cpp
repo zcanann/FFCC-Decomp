@@ -66,7 +66,7 @@ extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_G
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void SetOffsetZBuff__10CCameraPcsFf(double, void*);
 extern unsigned char CameraPcs[];
-extern unsigned char DAT_8032ec88;
+unsigned char DAT_8032ec88;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
 extern float FLOAT_8032f9a8;

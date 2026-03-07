@@ -4,7 +4,7 @@
 #include "dolphin/mtx.h"
 
 #include <string.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 struct pppFMATRIX;
 

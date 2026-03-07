@@ -6,7 +6,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 
 struct CoronaWork {
     s16 m_shapeX;

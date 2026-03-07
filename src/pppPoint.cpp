@@ -1,6 +1,5 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
-extern int gPppCalcDisabled;
 
 
 /*

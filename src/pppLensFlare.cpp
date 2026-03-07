@@ -8,7 +8,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 
 
 extern struct {

@@ -5,7 +5,6 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 #include "math.h"
-extern int gPppCalcDisabled;
 
 struct pppYmMoveCircleWork {
     f32 m_angle;

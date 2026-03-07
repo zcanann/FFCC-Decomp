@@ -2,7 +2,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
-extern int gPppCalcDisabled;
 struct VtMimeCtrl
 {
     unsigned char pad0[0xC];

@@ -5,7 +5,6 @@
 #include <dolphin/mtx.h>
 #include <dolphin/gx.h>
 #include <string.h>
-extern int gPppCalcDisabled;
 
 extern int rand();
 extern float ppvSinTbl[];

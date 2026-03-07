@@ -8,7 +8,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 
 struct Vec2d {
     float x;

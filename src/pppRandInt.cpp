@@ -3,7 +3,8 @@
 #include "types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
+extern s32 gPppDefaultValueBuffer[];
 /*
  * --INFO--
  * PAL Address: 0x80062194
@@ -14,7 +15,6 @@ extern int gPppCalcDisabled;
  * JP Size: TODO
  */
 
-extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);

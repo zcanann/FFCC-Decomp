@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include <string.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);

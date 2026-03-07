@@ -3,8 +3,7 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
+#include "ffcc/ppp_linkage.h"
 
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;

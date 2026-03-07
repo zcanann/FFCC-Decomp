@@ -2,7 +2,6 @@
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 #include <string.h>
-extern int gPppCalcDisabled;
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);

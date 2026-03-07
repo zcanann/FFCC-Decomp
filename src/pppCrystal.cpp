@@ -8,7 +8,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 extern float DAT_801db5b8;
 extern float DAT_801db5bc;

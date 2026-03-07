@@ -6,9 +6,9 @@
 
 #include <math.h>
 
-extern CMapCylinder g_hit_cyl;
-extern CMapCylinder g_hit_cyl_min;
-extern Vec g_hit_mvec;
+CMapCylinder g_hit_cyl;
+CMapCylinder g_hit_cyl_min;
+Vec g_hit_mvec;
 
 namespace {
 static char s_maphit_cpp[] = "maphit.cpp";
@@ -26,6 +26,7 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 int g_hit_edge_idx_min = -1;
 float g_hit_t_min = 3.4e38f;
 CMapHitFace* gMapHitFace = 0;
+unsigned char gMapHitFaceFlag = 0;
 
 /*
  * --INFO--

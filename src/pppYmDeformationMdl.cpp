@@ -40,6 +40,7 @@ extern struct {
 } CameraPcs;
 
 extern "C" {
+int __cntlzw(unsigned int);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 void pppInitBlendMode__Fv(void);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -189,6 +190,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 {
     short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
     u8* control = (u8*)&param_2->m_payload0;
+    unsigned int controlMode = static_cast<unsigned int>(__cntlzw(control[0x18])) >> 5;
     int textureIndex = 0;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
@@ -208,13 +210,14 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     int height = 0x1c0;
     int backTexture = 0;
 
-    pppInitBlendMode__Fv();
+    PSMTXIdentity(texMtx);
+    pppSetBlendMode__FUc(0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + param_3->m_serializedDataOffsets[1]),
         (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40), *(float*)(control + 0x10), control[0x17], control[0x16], control[0x14],
-        control[0x15], (u8)(control[0x18] == 0), 1, 0);
+        control[0x15], (u8)controlMode, 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -247,7 +250,6 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
     if (backTexture != 0) {
-        PSMTXIdentity(texMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
@@ -316,5 +318,3 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
-
-

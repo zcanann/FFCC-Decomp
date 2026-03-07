@@ -232,9 +232,9 @@ UARTError TRKReadUARTPoll(u8* arg0)
     return readErr;
 }
 
-void ReserveEXI2Port(void) { gDBCommTable.open_func(); }
+void ReserveEXI2Port(void) { gDBCommTable.post_stop_func(); }
 
-void UnreserveEXI2Port(void) { gDBCommTable.close_func(); }
+void UnreserveEXI2Port(void) { gDBCommTable.pre_continue_func(); }
 
 /*
  * --INFO--

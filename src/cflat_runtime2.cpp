@@ -73,10 +73,13 @@ extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 extern unsigned char Chara[];
-extern unsigned char CFlat[];
-extern unsigned char m_objItem[];
-extern unsigned char m_objParty[];
-extern unsigned char m_objMon[];
+
+// Linkage definitions from config/GCCP01/symbols.txt.
+// Keeping these as raw byte buffers matches current decomp access patterns.
+unsigned char CFlat[0x10440];
+unsigned char m_objItem[0xAF80];
+unsigned char m_objParty[0x1BE0];
+unsigned char m_objMon[0x1D000];
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];

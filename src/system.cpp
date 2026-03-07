@@ -3,6 +3,7 @@
 #include "ffcc/file.h"
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
@@ -25,9 +26,7 @@ extern "C" {
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
 }
 
-extern CMaterialMan MaterialMan;
 extern "C" int __cntlzw(unsigned int);
-extern unsigned char CFlat[];
 extern void* __vt__7CSystem[];
 CSystem System;
 

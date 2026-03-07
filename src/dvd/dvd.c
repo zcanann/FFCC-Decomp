@@ -523,9 +523,12 @@ static void cbForStateCheckID2(u32 intType) {
 
 static void cbForStateCheckID3(u32 intType) {
     if (intType == 16) {
-		stateTimeout();
-		return;
-	}
+        ((volatile DVDCommandBlock*)executing)->state = DVD_STATE_FATAL_ERROR;
+        __DVDStoreErrorCode(0x01234568);
+        DVDReset();
+        cbForStateError(0);
+        return;
+    }
 
     ASSERTLINE(1336, (intType & DVD_INTTYPE_CVR) == 0);
 

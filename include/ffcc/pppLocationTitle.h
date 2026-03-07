@@ -5,31 +5,24 @@
 #include "ffcc/partMng.h"
 
 struct pppLocationTitle {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-            pppFMATRIX m_localMatrix;
-        };
-    } field0_0x0;
-    
-    // Add padding up to offset 0x88 (rough estimate)
-    char pad[0x50];
+    u32 m_graphId;
+    pppFMATRIX m_localMatrix;
+    char m_pad[0x54];
     void* field_0x88;
 };
 
 struct pppLocationTitleUnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
-    
-    // Extended fields from decompilation
+    u16 m_pad;
     u32 m_graphId;
     float m_arg3;
-    void* m_payload;
-    u8 m_stepValue;
+    u8* m_payload;
+    float m_stepValue;
 };
 
 struct pppLocationTitleUnkC {
+    char pad[0xC];
     s32* m_serializedDataOffsets;
 };
 
@@ -47,4 +40,3 @@ void pppRenderLocationTitle(pppLocationTitle* param_1, pppLocationTitleUnkB* par
 #endif
 
 #endif // _PPP_LOCATIONTITLE_H_
-

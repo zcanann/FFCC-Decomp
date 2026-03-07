@@ -42,13 +42,16 @@ extern struct {
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
-extern char MaterialMan[];
+class CMaterialMan;
+extern CMaterialMan MaterialMan;
 extern char DAT_80331900[];
 extern char DAT_803318d4[];
 extern char DAT_803318dc[];
 extern char DAT_803318e4[];
 extern char DAT_803318ec[];
 extern char DAT_803318f4[];
+
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -158,33 +161,33 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 DCFlushRange((u8*)work + 0x38, 4);
                 GXSetArray((GXAttr)0xB, *(void**)((char*)work + 0x68), 4);
                 GXSetArray((GXAttr)0xD, *(void**)((char*)work + 0x6C), 4);
-                *(u32*)(MaterialMan + 0x08) = *(u32*)((char*)work + 0x64);
-                *(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
-                *(u8*)(MaterialMan + 0x4C) = 0xFF;
-                *(u32*)(MaterialMan + 0x11C) = 0;
-                *(u32*)(MaterialMan + 0x120) = 0x1E;
-                *(u32*)(MaterialMan + 0x124) = 0;
-                *(u8*)(MaterialMan + 0x205) = 0xFF;
-                *(u8*)(MaterialMan + 0x206) = 0xFF;
-                *(u32*)(MaterialMan + 0x58) = 0;
-                *(u32*)(MaterialMan + 0x5C) = 0;
-                *(u8*)(MaterialMan + 0x208) = 0;
-                *(u32*)(MaterialMan + 0x48) = 0x2ACE0F;
-                *(u32*)(MaterialMan + 0x128) = 0;
-                *(u32*)(MaterialMan + 0x12C) = 0x1E;
-                *(u32*)(MaterialMan + 0x130) = 0;
-                *(u32*)(MaterialMan + 0x40) = 0x2ACE0F;
-                *(u32*)(MaterialMan + 0xD0) = *(u32*)((char*)work + 0x20);
+                *(u32*)(MaterialManRaw() + 0x08) = *(u32*)((char*)work + 0x64);
+                *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
+                *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+                *(u32*)(MaterialManRaw() + 0x11C) = 0;
+                *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
+                *(u32*)(MaterialManRaw() + 0x124) = 0;
+                *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+                *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+                *(u32*)(MaterialManRaw() + 0x58) = 0;
+                *(u32*)(MaterialManRaw() + 0x5C) = 0;
+                *(u8*)(MaterialManRaw() + 0x208) = 0;
+                *(u32*)(MaterialManRaw() + 0x48) = 0x2ACE0F;
+                *(u32*)(MaterialManRaw() + 0x128) = 0;
+                *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
+                *(u32*)(MaterialManRaw() + 0x130) = 0;
+                *(u32*)(MaterialManRaw() + 0x40) = 0x2ACE0F;
+                *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((char*)work + 0x20);
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
                 SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                    MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+                    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
                 GXCallDisplayList(*(void**)(*(int*)((char*)work + 0x60) + dlIndex * 4), *dlEntry);
             }
         } else {
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+                &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
             GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
         }
     }
@@ -359,8 +362,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
 
-    MaterialMan[0x228] = *((u8*)pppMana2 + 0x8B + setupOffset);
-    *((u8*)(work + 0x38)) = MaterialMan[0x228];
+    MaterialManRaw()[0x228] = *((u8*)pppMana2 + 0x8B + setupOffset);
+    *((u8*)(work + 0x38)) = MaterialManRaw()[0x228];
 
     if (*(s32*)pppMana2 != 0) {
         return;

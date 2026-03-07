@@ -19,7 +19,8 @@ extern struct _pppEnvSt {
     CMemory::CStage* m_stagePtr;
 } *pppEnvStPtr;
 extern char gUtil[];
-extern char MaterialMan[];
+class CMaterialMan;
+extern CMaterialMan MaterialMan;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
@@ -41,6 +42,8 @@ extern int DAT_801dd68c;
 extern int ppvSinTbl;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
 extern "C" {
 int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
@@ -112,7 +115,7 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
         u16 faceCount = *(u16*)((u8*)displayList + 8);
         u16 i;
 
-        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, *(void**)((u8*)*(s32*)((u8*)model + 0xA4) + 0x24),
+        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, *(void**)((u8*)*(s32*)((u8*)model + 0xA4) + 0x24),
                                                                     *(u16*)((u8*)materialData + 8), 0, 0);
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);

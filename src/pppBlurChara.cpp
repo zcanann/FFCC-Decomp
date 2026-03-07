@@ -33,7 +33,8 @@ struct pppMngStBlurCharaRaw {
     void* m_charaObj;
 };
 
-extern char MaterialMan[];
+class CMaterialMan;
+extern CMaterialMan MaterialMan;
 
 extern float FLOAT_80331030;
 extern float FLOAT_80331034;
@@ -56,6 +57,8 @@ extern struct {
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
+
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -106,7 +109,7 @@ static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBl
 void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    *(unsigned int*)(MaterialMan + 0x48) |= 0x10000;
+    *(unsigned int*)(MaterialManRaw() + 0x48) |= 0x10000;
 }
 
 /*

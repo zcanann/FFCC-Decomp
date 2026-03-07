@@ -55,7 +55,7 @@ extern unsigned int DAT_801d64d8;
 extern unsigned int DAT_801d64dc;
 extern unsigned int DAT_801d64e0;
 extern unsigned int DAT_801d64e4;
-extern int DAT_8032ec58;
+long long DAT_8032ec58;
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);

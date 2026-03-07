@@ -4,13 +4,12 @@
 #include "types.h"
 
 struct pppYmMoveParabola {
-    struct {
-        s32 m_graphId;
-    } field0_0x0;
+    u8 _pad0x00[0xC];
+    s32 m_graphId;
 };
 
 struct pppYmMoveParabolaUnkB {
-    u32 m_graphId;
+    s32 m_graphId;
     f32 m_dataValIndex;
     f32 m_initWOrk;
     f32 m_stepValue;

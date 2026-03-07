@@ -44,7 +44,7 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x2000, s_CUSBPcs_8032f810, 0));
+	m_smallStage = Memory.CreateStage(0x2000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
@@ -63,10 +63,10 @@ void CUSBPcs::Quit()
 { 
 	if (m_bigStage != (CMemory::CStage*)nullptr)
 	{
-		DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
+		Memory.DestroyStage(m_bigStage);
 	}
 	
-	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_smallStage);
+	Memory.DestroyStage(m_smallStage);
 	USB.Disconnect();
 }
 
@@ -88,9 +88,9 @@ void* CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x100000, s_CUSBPcs_8032f810, 0));
+        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
+        Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
     }
 }
@@ -258,20 +258,17 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    volatile void** base = (volatile void**)&USBPcs;
-    *base = __vt__8CManager;
-    *base = __vt__8CProcess;
-    *base = PTR_PTR_s_CUSBPcs_801e8830;
+    *(void**)&USBPcs = __vt__8CManager;
+    *(void**)&USBPcs = &__vt__8CProcess;
+    *(void**)&USBPcs = PTR_PTR_s_CUSBPcs_801e8830;
 
-    u32* table = m_table__7CUSBPcs;
-
-    table[1] = m_table_desc0__7CUSBPcs[0];
-    table[2] = m_table_desc0__7CUSBPcs[1];
-    table[3] = m_table_desc0__7CUSBPcs[2];
-    table[4] = m_table_desc1__7CUSBPcs[0];
-    table[5] = m_table_desc1__7CUSBPcs[1];
-    table[6] = m_table_desc1__7CUSBPcs[2];
-    table[7] = m_table_desc2__7CUSBPcs[0];
-    table[8] = m_table_desc2__7CUSBPcs[1];
-    table[9] = m_table_desc2__7CUSBPcs[2];
+    m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
+    m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
+    m_table__7CUSBPcs[3] = m_table_desc0__7CUSBPcs[2];
+    m_table__7CUSBPcs[4] = m_table_desc1__7CUSBPcs[0];
+    m_table__7CUSBPcs[5] = m_table_desc1__7CUSBPcs[1];
+    m_table__7CUSBPcs[6] = m_table_desc1__7CUSBPcs[2];
+    m_table__7CUSBPcs[7] = m_table_desc2__7CUSBPcs[0];
+    m_table__7CUSBPcs[8] = m_table_desc2__7CUSBPcs[1];
+    m_table__7CUSBPcs[9] = m_table_desc2__7CUSBPcs[2];
 }

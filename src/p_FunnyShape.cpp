@@ -38,6 +38,11 @@ extern "C" void* __register_global_object(void* object, void* destructor, void* 
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
 
+inline void* operator new(unsigned long, void* p)
+{
+    return p;
+}
+
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CFunnyShapePcs_801ea924;
 extern u32 DAT_801EA778;
@@ -107,8 +112,8 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x3C));
     __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x50));
-    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(FunnyShapePcs + 0x61BC)->CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray();
-    reinterpret_cast<CPtrArray<_GXTexObj*>*>(FunnyShapePcs + 0x61D8)->CPtrArray<_GXTexObj*>::CPtrArray();
+    new (FunnyShapePcs + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>();
+    new (FunnyShapePcs + 0x61D8) CPtrArray<_GXTexObj*>();
 
     __register_global_object(FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 
@@ -493,5 +498,3 @@ extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*
 
 template class CPtrArray<_GXTexObj*>;
 template class CPtrArray<OSFS_TEXTURE_ST*>;
-
-

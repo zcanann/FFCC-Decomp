@@ -23,8 +23,6 @@ public:
     class CLight
     {
     public:
-        CLight();
-
         void Set(CLightPcs::CLight*);
 
         u32 m_type;               // 0x00
@@ -55,8 +53,6 @@ public:
         : public CLight
     {
     public:
-        CBumpLight();
-        
         void MakeLightMap();
         void SetTexture(_GXTexMapID, int);
 

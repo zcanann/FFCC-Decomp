@@ -1522,30 +1522,29 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
  * JP Address: TODO
  * JP Size: TODO
  */
-CLightPcs::CBumpLight::CBumpLight()
+void __ct__Q29CLightPcs10CBumpLightFv(void* bumpLight)
 {
-    __ct__Q29CLightPcs6CLightFv(this);
-
+    CLightPcs::CBumpLight* bump = (CLightPcs::CBumpLight*)bumpLight;
     float f3 = FLOAT_8032fc1c;
     float f2 = FLOAT_8032fc14;
     float f1 = FLOAT_8032fc10;
 
-    m_radius = FLOAT_8032fc1c;
-    m_offsetZ = f2;
-    m_offsetX = f2;
-    m_attenFalloff = f1;
-    m_directionMode = 0;
-    m_spotFn = 0;
-    m_unk4D = 4;
-    m_specularMode = 0;
-    m_partMask = -1;
-    m_part = 0;
-    *(u32*)&m_targetColor[0] = 0;
-    *(u32*)&m_targetColor[1] = 0;
-    *(u32*)&m_targetColor[2] = 0;
-    *(u32*)&m_targetColor[3] = 0;
-    m_radius = f3;
-    m_hasTexture = 0;
+    bump->m_radius = FLOAT_8032fc1c;
+    bump->m_offsetZ = f2;
+    bump->m_offsetX = f2;
+    bump->m_attenFalloff = f1;
+    bump->m_directionMode = 0;
+    bump->m_spotFn = 0;
+    bump->m_unk4D = 4;
+    bump->m_specularMode = 0;
+    bump->m_partMask = -1;
+    bump->m_part = 0;
+    *(u32*)&bump->m_targetColor[0] = 0;
+    *(u32*)&bump->m_targetColor[1] = 0;
+    *(u32*)&bump->m_targetColor[2] = 0;
+    *(u32*)&bump->m_targetColor[3] = 0;
+    bump->m_radius = f3;
+    bump->m_hasTexture = 0;
 }
 
 /*
@@ -1571,25 +1570,26 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-CLightPcs::CLight::CLight()
+void __ct__Q29CLightPcs6CLightFv(void* light)
 {
+    CLightPcs::CLight* l = (CLightPcs::CLight*)light;
     float f2 = FLOAT_8032fc14;
     float f1 = FLOAT_8032fc10;
 
-    m_radius = FLOAT_8032fc1c;
-    m_offsetZ = f2;
-    m_offsetX = f2;
-    m_attenFalloff = f1;
-    m_directionMode = 0;
-    m_spotFn = 0;
-    m_unk4D = 4;
-    m_specularMode = 0;
-    m_partMask = -1;
-    m_part = 0;
-    *(u32*)&m_targetColor[0] = 0;
-    *(u32*)&m_targetColor[1] = 0;
-    *(u32*)&m_targetColor[2] = 0;
-    *(u32*)&m_targetColor[3] = 0;
+    l->m_radius = FLOAT_8032fc1c;
+    l->m_offsetZ = f2;
+    l->m_offsetX = f2;
+    l->m_attenFalloff = f1;
+    l->m_directionMode = 0;
+    l->m_spotFn = 0;
+    l->m_unk4D = 4;
+    l->m_specularMode = 0;
+    l->m_partMask = -1;
+    l->m_part = 0;
+    *(u32*)&l->m_targetColor[0] = 0;
+    *(u32*)&l->m_targetColor[1] = 0;
+    *(u32*)&l->m_targetColor[2] = 0;
+    *(u32*)&l->m_targetColor[3] = 0;
 }
 
 /*
@@ -1601,4 +1601,3 @@ void CLightPcs::CLight::Set(CLightPcs::CLight*)
 {
 	// TODO
 }
-

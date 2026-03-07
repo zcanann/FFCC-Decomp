@@ -16,7 +16,7 @@ extern int gUtil;
 
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
-extern "C" void pppSetFpMatrix__FP9_pppMngSt(void*);
+extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
 /*
  * --INFO--
@@ -123,7 +123,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			pppMngStPtr->m_matrix.value[1][3] = local_c0.y;
 			pppMngStPtr->m_matrix.value[2][3] = local_c0.z;
 			
-			pppSetFpMatrix__FP9_pppMngSt((void*)pppMngSt);
+			pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
 		}
 	}
 }

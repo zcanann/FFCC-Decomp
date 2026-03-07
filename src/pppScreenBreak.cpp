@@ -33,13 +33,13 @@ struct Vec4d {
 };
 
 struct pppScreenBreakUnkB {
-    float m_dataValIndex;
+    s32 m_graphId;
+    s32 m_dataValIndex;
     u16 m_initWOrk;
     u16 _pad6;
     float m_stepValue;
-    s32 m_graphId;
     float m_arg3;
-    u8* m_payload;
+    u8 m_payload[0x20];
 };
 
 struct pppScreenBreakUnkC {
@@ -654,7 +654,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     }
 
     s32 index = param_3->m_serializedDataOffsets[0];
-    float* value = (float*)((u8*)&pppScreenBreak->field0_0x0 + 8 + param_3->m_serializedDataOffsets[2]);
+    float* value = (float*)((u8*)pppScreenBreak + param_3->m_serializedDataOffsets[2] + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(float**)(model + 0xE4) = value;

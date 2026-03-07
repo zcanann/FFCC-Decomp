@@ -22,6 +22,7 @@ extern struct {
 } CameraPcs;
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
+extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 /*
  * --INFO--
@@ -168,6 +169,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	int iVar1;
 	int iVar2;
 	long* shape;
+	s16 dataValIndex;
 	u8* lensBytes;
 	u8* shapeBytes;
 	u8* colorBytes;
@@ -181,8 +183,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	colorBytes = lensBytes + iVar1;
 	arg3Bytes = (u8*)&unkB->m_arg3;
 	stepValue = *(float*)&unkB->m_stepValue;
-	if ((unkB->m_dataValIndex != 0xffff) &&
-		(shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4),
+	dataValIndex = unkB->m_dataValIndex;
+	if ((dataValIndex != -1) &&
+		(shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
 		 shapeBytes[0xb2] != 0)) {
 		pppCVECTOR local_70;
 		Vec local_6c;
@@ -209,7 +212,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_6c.y = local_60.y;
 		local_6c.z = local_60.z;
 
-		pppCopyVector(*(Vec*)(shapeBytes + 0xa0), local_6c);
+		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBytes + 0xa0), &local_6c);
 
 		GXLoadPosMtxImm(local_54, 0);
 
@@ -226,5 +229,4 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		pppSetBlendMode(3);
 	}
 }
-
 

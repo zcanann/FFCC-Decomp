@@ -272,8 +272,8 @@ void CPtrArray<CMaterial*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
 }
 
 template <>
@@ -1783,12 +1783,31 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003e660
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetShadowBit32(CMapShadow::TARGET, unsigned long*, float (*) [4])
+void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shadowBit32, float (*viewMtx) [4])
 {
-	// TODO
+    (void)target;
+
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* shadow = (*mapShadowArray)[i];
+        unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
+
+        if (*(shadowBytes + 0xF0) == 0) {
+            continue;
+        }
+
+        unsigned int bitMask = 1u << (i & 0x1F);
+        if ((*(shadowBytes + 7) == 1) || ((shadowBit32[i >> 5] & bitMask) != 0)) {
+            SetShadow(*shadow, viewMtx, static_cast<int>(i), 0xFFFFFFFF);
+        }
+    }
 }
 
 /*
@@ -2948,13 +2967,13 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
  */
 void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
 {
-    *reinterpret_cast<unsigned long*>(Ptr(this, 0x24)) = tag;
+    *reinterpret_cast<unsigned long*>(Ptr(this, 0x24)) = static_cast<unsigned long>(tevBit);
     *reinterpret_cast<void**>(Ptr(this, 0x28)) = 0;
     *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = 0;
     *reinterpret_cast<float*>(Ptr(this, 0x30)) = 1.0f;
     *reinterpret_cast<float*>(Ptr(this, 0x2C)) = 1.0f;
     *Ptr(this, 0xA7) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = static_cast<unsigned short>(tevBit);
+    *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = static_cast<unsigned short>(tag);
 }
 
 /*

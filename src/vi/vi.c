@@ -1068,7 +1068,6 @@ u32 VIGetTvFormat(void) {
     case VI_NTSC:
     case VI_DEBUG:
     case 6:
-    case 7:
         format = VI_NTSC;
         break;
     case VI_PAL:

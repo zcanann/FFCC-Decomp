@@ -85,7 +85,7 @@ int RedNew(int param_1)
 					return address;
 				}
 			} else if (gRedMemoryDebugEnabled != 0) {
-				OSReport(s_redMemoryMainBankFullFmt, &s_redMemoryLogPrefix_801E78A3, &s_redMemoryLogSuffixA_80333D20, &s_redMemoryLogSuffixB_80333D28);
+				OSReport(s_redMemoryMainBankFullFmt, &sRedMemoryLogPrefix, &sRedMemoryLogSuffixA, &sRedMemoryLogSuffixB);
 				fflush(&DAT_8021d1a8);
 			}
 			break;
@@ -179,7 +179,7 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 	if (gRedAMemoryBlockList[0x7FF] >= 1) {
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport(s_redMemoryAuxBankFullFmt, &s_redMemoryLogPrefix_801E78A3, &s_redMemoryLogSuffixA_80333D20, &s_redMemoryLogSuffixB_80333D28);
+			OSReport(s_redMemoryAuxBankFullFmt, &sRedMemoryLogPrefix, &sRedMemoryLogSuffixA, &sRedMemoryLogSuffixB);
 			fflush(&DAT_8021d1a8);
 		}
 		return 0;

@@ -9,9 +9,9 @@ extern int gRedAMemorySize;
 extern int* gRedMainMemoryBlockList;
 extern int* gRedAMemoryBlockList;
 
-extern char s_redMemoryLogPrefix_801E78A3;
-extern char s_redMemoryLogSuffixA_80333D20;
-extern char s_redMemoryLogSuffixB_80333D28;
+extern char sRedMemoryLogPrefix;
+extern char sRedMemoryLogSuffixA;
+extern char sRedMemoryLogSuffixB;
 extern char s_redMemoryMainBankFullFmt[];
 extern char s_redMemoryAuxBankFullFmt[];
 

@@ -90,7 +90,7 @@ void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicO
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
-static char s_pppBlurCharaCpp[] = "pppBlurChara.cpp";
+extern char s_pppBlurChara_cpp_801DB620[];
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
     return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
@@ -296,9 +296,9 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
         work->m_captureBuffer = pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr,
-                                                                      s_pppBlurCharaCpp, 0xD5);
+                                                                      s_pppBlurChara_cpp_801DB620, 0xD5);
         work->m_smallTexObj = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
-                                                                    s_pppBlurCharaCpp, 0xD7);
+                                                                    s_pppBlurChara_cpp_801DB620, 0xD7);
 
         *(pppBlurCharaWork**)(model + 0xE4) = work;
         *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;

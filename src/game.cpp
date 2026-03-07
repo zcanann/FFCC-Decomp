@@ -14,6 +14,14 @@
 #include "ffcc/file.h"
 #include "ffcc/partMng.h"
 #include "ffcc/maplight.h"
+#include "ffcc/chara.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_FunnyShape.h"
+#include "ffcc/p_graphic.h"
+#include "ffcc/p_light.h"
+#include "ffcc/p_map.h"
+#include "ffcc/p_menu.h"
+#include "ffcc/p_usb.h"
 
 #include <string.h>
 
@@ -22,6 +30,10 @@
 #include <string.h>
 
 typedef void* ConstructorDestructor;
+class CFunnyShapePcs;
+class CMaterialEditorPcs;
+extern CFunnyShapePcs FunnyShapePcs;
+extern CMaterialEditorPcs MaterialEditorPcs;
 
 extern "C" {
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
@@ -99,17 +111,8 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
 unsigned char CFlat[];
 unsigned char McPcs[];
 unsigned char GbaPcs[];
-extern unsigned char MenuPcs[];
-extern unsigned char USBPcs[];
 unsigned char PartPcs[];
 unsigned char Chara[];
-unsigned char LightPcs[];
-extern unsigned char MapPcs[];
-unsigned char MaterialEditorPcs[];
-unsigned char FunnyShapePcs[];
-extern unsigned char GraphicsPcs[];
-unsigned char CameraPcs[];
-unsigned char GamePcs[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
 extern const char DAT_801d60d4[];
@@ -331,15 +334,15 @@ void CGame::Init()
     }
 
     Init__10CCameraPcsFv(&CameraPcs);
-    Init__11CGraphicPcsFv(GraphicsPcs);
+    Init__11CGraphicPcsFv(&GraphicsPcs);
     Init__6CCharaFv(Chara);
-    Init__9CLightPcsFv(LightPcs);
+    Init__9CLightPcsFv(&LightPcs);
     Init__9CCharaPcsFv(&CharaPcs);
-    Init__7CMapPcsFv(MapPcs);
-    Init__18CMaterialEditorPcsFv(MaterialEditorPcs);
-    Init__14CFunnyShapePcsFv(FunnyShapePcs);
-    Init__7CUSBPcsFv(USBPcs);
-    Init__8CMenuPcsFv(MenuPcs);
+    Init__7CMapPcsFv(&MapPcs);
+    Init__18CMaterialEditorPcsFv(&MaterialEditorPcs);
+    Init__14CFunnyShapePcsFv(&FunnyShapePcs);
+    Init__7CUSBPcsFv(&USBPcs);
+    Init__8CMenuPcsFv(&MenuPcs);
     Init__7CGbaPcsFv(&GbaPcs);
     Init__6CMcPcsFv(McPcs);
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
@@ -380,15 +383,15 @@ void CGame::Quit()
 	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
 	Quit__6CMcPcsFv(McPcs);
 	Quit__7CGbaPcsFv(&GbaPcs);
-	Quit__8CMenuPcsFv(MenuPcs);
-	Quit__7CUSBPcsFv(USBPcs);
+	Quit__8CMenuPcsFv(&MenuPcs);
+	Quit__7CUSBPcsFv(&USBPcs);
 	Quit__6CCharaFv(Chara);
 	Quit__9CCharaPcsFv(&CharaPcs);
-	Quit__9CLightPcsFv(LightPcs);
-	Quit__7CMapPcsFv(MapPcs);
-	Quit__18CMaterialEditorPcsFv(MaterialEditorPcs);
-	Quit__14CFunnyShapePcsFv(FunnyShapePcs);
-	Quit__11CGraphicPcsFv(GraphicsPcs);
+	Quit__9CLightPcsFv(&LightPcs);
+	Quit__7CMapPcsFv(&MapPcs);
+	Quit__18CMaterialEditorPcsFv(&MaterialEditorPcs);
+	Quit__14CFunnyShapePcsFv(&FunnyShapePcs);
+	Quit__11CGraphicPcsFv(&GraphicsPcs);
 	Quit__10CCameraPcsFv(&CameraPcs);
 }
 
@@ -422,8 +425,8 @@ void CGame::LoadLogoWaitingData()
 void CGame::Exec()
 {
 	AddScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
-	AddScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
-	AddScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, &GraphicsPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
 	AddScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
 
 	do {
@@ -439,21 +442,21 @@ void CGame::Exec()
 
 		switch (m_currentSceneId) {
 		case 2:
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 1);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
 			break;
 		case 3:
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 2);
-			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 2);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			break;
 		case 4:
-			AddScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &MenuPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, GamePcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &Game, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
@@ -461,20 +464,20 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			break;
 		case 5:
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
-			AddScenegraph__7CSystemFP8CProcessi(&System, MaterialEditorPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 3);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &MaterialEditorPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
 			break;
 		case 6:
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 4);
-			AddScenegraph__7CSystemFP8CProcessi(&System, FunnyShapePcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 4);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &FunnyShapePcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
 			break;
 		case 7:
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 5);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 5);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
-			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
-			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
 			break;
 		}
@@ -483,39 +486,39 @@ void CGame::Exec()
 
 		switch (m_currentSceneId) {
 		case 2:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 1);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
 			break;
 		case 3:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 2);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 2);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
 			break;
 		case 4:
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, GamePcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &Game, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MenuPcs, 0);
 			break;
 		case 5:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, MaterialEditorPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 3);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MaterialEditorPcs, 0);
 			break;
 		case 6:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 4);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, FunnyShapePcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 4);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &FunnyShapePcs, 0);
 			break;
 		case 7:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 5);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 5);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
 			break;
 		}
@@ -525,8 +528,8 @@ void CGame::Exec()
 	} while (m_sceneId != 0);
 
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, &GraphicsPcs, 0);
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
 }
 
@@ -582,7 +585,7 @@ void CGame::Create()
         m_currentMapId = mapId;
         m_currentMapVariantId = mapVariant;
 
-        LoadMap__7CMapPcsFiiPvUlUc(MapPcs, mapId, mapVariant, 0, 0, 0);
+        LoadMap__7CMapPcsFiiPvUlUc(&MapPcs, mapId, mapVariant, 0, 0, 0);
         LoadFieldPdt__8CPartPcsFiiPvUlUc(&PartPcs, mapId, mapVariant, 0, 0, 0);
 
         MapChanged__7CSystemFiii(&System, mapId, mapVariant, 1);
@@ -861,7 +864,7 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
         hasParamMask = (u32)((-param4 | param4) >> 31);
 
         LoadMap__7CMapPcsFiiPvUlUc(
-            MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
+            &MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
 
         hasParamMask = (u32)((-param4 | param4) >> 31);
         LoadFieldPdt__8CPartPcsFiiPvUlUc(
@@ -871,7 +874,7 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
     } else {
         hasParamMask = (u32)((-param4 | param4) >> 31);
         LoadMap__7CMapPcsFiiPvUlUc(
-            MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
+            &MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
 
         hasParamMask = (u32)((-param4 | param4) >> 31);
         LoadFieldPdt__8CPartPcsFiiPvUlUc(

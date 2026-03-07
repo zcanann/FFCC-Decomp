@@ -1,6 +1,7 @@
 #include "ffcc/p_camera.h"
 
 #include "ffcc/materialman.h"
+#include "ffcc/map.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
@@ -92,7 +93,6 @@ extern unsigned int m_table_desc22__10CCameraPcs[];
 extern unsigned int m_table_desc23__10CCameraPcs[];
 extern unsigned int m_table_desc24__10CCameraPcs[];
 extern unsigned int PTR_PTR_s_CCameraPcs_801e9b00[];
-extern unsigned char MapMng[];
 extern unsigned char CFlat[];
 extern Vec g_shadow_pos;
 extern Vec g_shadow_refpos;
@@ -1201,13 +1201,14 @@ void CCameraPcs::calcMap()
             hitCylinder.center = *reinterpret_cast<Vec*>(self + 0xE0);
             hitCylinder.delta = moveDelta;
             if (CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(
-                    MapMng, &hitCylinder, &moveDelta, 0xFFFFFFFF) == 0) {
+                    &MapMng, &hitCylinder, &moveDelta, 0xFFFFFFFF) == 0) {
                 *reinterpret_cast<float*>(self + 0xE0) += moveDelta.x;
                 *reinterpret_cast<float*>(self + 0xE4) += moveDelta.y;
                 *reinterpret_cast<float*>(self + 0xE8) += moveDelta.z;
                 break;
             }
-            CalcHitSlide__7CMapObjFP3Vecf(*reinterpret_cast<void**>(MapMng + 0x22A88), &moveDelta);
+            CalcHitSlide__7CMapObjFP3Vecf(
+                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88), &moveDelta);
         }
     }
 
@@ -1258,7 +1259,7 @@ void CCameraPcs::createFullShadow()
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
-    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(MapMng);
+    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
 
     *reinterpret_cast<void**>(self + 0x31C) = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);

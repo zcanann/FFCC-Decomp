@@ -5,6 +5,7 @@
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
 #include "ffcc/graphic.h"
+#include "ffcc/p_camera.h"
 
 #include <dolphin/mtx.h>
 
@@ -51,11 +52,11 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
 extern "C" void* PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc[];
-extern unsigned char Game[];
+class CGamePcs;
+extern CGamePcs Game;
 class CMapMng;
 extern CMapMng MapMng;
 extern CMaterialMan MaterialMan;
-extern unsigned char CameraPcs[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -438,7 +439,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = *Ptr(material, 0xA1);
-    if ((*reinterpret_cast<unsigned int*>(Game + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x141704) == 0)) {
+    if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x141704) == 0)) {
         fogEnable = 0;
     }
 
@@ -1108,8 +1109,9 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx matrixB;
     Mtx44 screenMtx;
     PSMTXIdentity(matrixA);
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), screenMtx);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), matrixB);
+    unsigned char* cameraPcs = reinterpret_cast<unsigned char*>(&CameraPcs);
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x48), screenMtx);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(cameraPcs + 0x4), matrixB);
 
     matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
     matrixA[1][1] = screenMtx[1][1] * -(FLOAT_8032fb0c / static_cast<float>(height));

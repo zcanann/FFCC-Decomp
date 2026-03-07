@@ -1440,7 +1440,7 @@ void _KeyOnControl()
                             if ((1U << (((idxSign * 0x20 |
                                           (u32)(*(s8*)(*voice + 0x14E) * 0x8000000 + idxSign) >> 0x1B) -
                                          idxSign) &
-                                        (&DAT_8032f478)[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
+                                        DAT_8032f478[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
                                 volume = ((*(s8*)((u8*)DAT_8032f3f0 + 0x926) + 1) * (((int*)((u32*)DAT_8032f3f0)[300])[0] >> 0xC)) >> 7;
                                 if (((u32*)DAT_8032f3f0)[0x23C] != 0) {
                                     volume = (volume * (((int*)((u32*)DAT_8032f3f0)[0x23A])[0] >> 0xC)) >> 9;
@@ -1456,7 +1456,7 @@ void _KeyOnControl()
                         if ((1U << (((idxSign * 0x20 |
                                       (u32)(*(s8*)(*voice + 0x14E) * 0x8000000 + idxSign) >> 0x1B) -
                                      idxSign) &
-                                    (&DAT_8032f478)[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
+                                    DAT_8032f478[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
                             volume = ((*(s8*)((u8*)DAT_8032f3f0 + 0x492) + 1) * (((int*)((u32*)DAT_8032f3f0)[7])[0] >> 0xC)) >> 7;
                             if (((u32*)DAT_8032f3f0)[0x117] != 0) {
                                 volume = (volume * (((int*)((u32*)DAT_8032f3f0)[0x115])[0] >> 0xC)) >> 9;

@@ -66,7 +66,7 @@ extern int DAT_8032f468;
 extern void* DAT_8032f46c;
 extern int DAT_8032f470;
 extern void* DAT_8032f474;
-extern int DAT_8032f478;
+extern int DAT_8032f478[2];
 extern int DAT_8032f484;
 extern CRedMemory DAT_8032f480;
 extern u8 DAT_8032f4a8;

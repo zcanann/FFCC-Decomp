@@ -42,6 +42,13 @@ extern "C" {
     void AXFXSetHooks(void (*)(unsigned long), void (*)(void*));
 }
 
+struct RedWaveSettingState {
+    int slot;
+    int waveID;
+    void* waveData;
+    int waveSize;
+};
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 int DAT_8032f3c4;
 int DAT_8032f3c0;
@@ -84,23 +91,15 @@ void* DAT_8032f46c;
 void* DAT_8032f454;
 int DAT_8032f460;
 
-// Linkage kept external until type/size cleanup is finished.
-extern int DAT_8032f488;
-extern int DAT_8032f44c;
-extern int DAT_8032f448;
-extern int DAT_8032f47c;
-extern int DAT_8032f478;
+int DAT_8032f488[2];
+int DAT_8032f448[2];
+int DAT_8032f478[2];
 int DAT_8032f3bc;
-extern int DAT_8032f3b8;
+int DAT_8032f3b8;
 extern int DAT_8032e12c[];
-extern int DAT_8032daac;
-extern int DAT_8032dab0;
-extern void* DAT_8032dab4;
-extern int DAT_8032dab8;
-extern void* DAT_8032f3e0;
-extern void* DAT_8032f3e8;
-extern void* DAT_8032f3e4;
-extern void* DAT_8032f3ec;
+RedWaveSettingState DAT_8032daac;
+void* DAT_8032f3e0[2];
+void* DAT_8032f3e8[2];
 extern void* DAT_8032b860;
 extern void* DAT_8032c660;
 extern int DAT_8021ec10[];
@@ -875,17 +874,17 @@ int _MainThread(void*)
 int _WaveSettingThread(void* param_1)
 {
     int threadResult;
-    int* waveSetting;
+    RedWaveSettingState* waveSetting;
 
-    waveSetting = (int*)param_1;
+    waveSetting = (RedWaveSettingState*)param_1;
     DAT_8032f3c4 = DAT_8032f3c4 | 4;
     DAT_8032f460 = 0;
     while (DAT_8032f3c0 != 0) {
         OSWaitSemaphore(&DAT_8032daa0);
         if (DAT_8032f3c0 != 0) {
             DAT_8032f460 = DAT_8032f460 + 1;
-            DAT_8032e154.SetWaveData(waveSetting[1], (void*)waveSetting[2], waveSetting[3]);
-            *(int*)waveSetting[0] = 0;
+            DAT_8032e154.SetWaveData(waveSetting->waveID, waveSetting->waveData, waveSetting->waveSize);
+            *(int*)waveSetting->slot = 0;
             do {
                 threadResult = OSTryWaitSemaphore(&DAT_8032daa0);
             } while (0 < threadResult);
@@ -916,7 +915,8 @@ void _DMACheckProcess()
         fflush(&DAT_8021d1a8);
 
         semCount = OSGetSemaphoreCount(&DAT_8032ddd8);
-        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", DAT_8032f468, semCount, DAT_8032f484, DAT_8032f488);
+        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", DAT_8032f468, semCount, DAT_8032f484,
+                 DAT_8032f488[0]);
         fflush(&DAT_8021d1a8);
     }
 
@@ -970,9 +970,9 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
     interrupt = OSDisableInterrupts();
     if ((param_1 & 0xffff7fff) == 0) {
         baseAddr = &DAT_8032c660;
-        queuePtr = &DAT_8032f3e4;
+        queuePtr = &DAT_8032f3e0[1];
     } else {
-        queuePtr = &DAT_8032f3e0;
+        queuePtr = &DAT_8032f3e0[0];
         baseAddr = &DAT_8032b860;
     }
     queueEntry = (int*)*queuePtr;
@@ -1076,19 +1076,19 @@ void _DmaExecute()
 
     do {
         do {
-            if ((DAT_8032f3e0 == DAT_8032f3e8) && (DAT_8032f3e4 == DAT_8032f3ec)) {
-                DAT_8032f488 = 0;
+            if ((DAT_8032f3e0[0] == DAT_8032f3e8[0]) && (DAT_8032f3e0[1] == DAT_8032f3e8[1])) {
+                DAT_8032f488[0] = 0;
                 return;
             }
-            if (DAT_8032f3e0 == DAT_8032f3e8) {
-                ppiVar5 = (int**)&DAT_8032f3ec;
+            if (DAT_8032f3e0[0] == DAT_8032f3e8[0]) {
+                ppiVar5 = (int**)&DAT_8032f3e8[1];
                 piVar4 = (int*)&DAT_8032c660;
             } else {
-                ppiVar5 = (int**)&DAT_8032f3e8;
+                ppiVar5 = (int**)&DAT_8032f3e8[0];
                 piVar4 = (int*)&DAT_8032b860;
             }
             piVar7 = *ppiVar5;
-            DAT_8032f488 = 2;
+            DAT_8032f488[0] = 2;
             piVar6 = 0;
             if (*piVar7 != 0) {
                 DAT_8032f468 = 1;
@@ -1101,7 +1101,7 @@ void _DmaExecute()
                     iVar3 = piVar7[3];
                     iVar2 = piVar7[2];
                 }
-                DAT_8032f488 = 3;
+                DAT_8032f488[0] = 3;
                 ARQSetChunkSize((u32)piVar7[4]);
                 ARQPostRequest(&DAT_8032dde4, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
                                (u32)piVar7[4], _DmaCallback);
@@ -1114,15 +1114,15 @@ void _DmaExecute()
             *ppiVar5 = piVar8;
         } while (piVar6 == 0);
         while (piVar6 != 0) {
-            DAT_8032f488 = 7;
+            DAT_8032f488[0] = 7;
             if (DAT_8032f468 == 0) {
-                DAT_8032f488 = 8;
+                DAT_8032f488[0] = 8;
                 if (piVar6[5] != 0) {
                     uVar1 = OSDisableInterrupts();
                     ((void (*)(void*))piVar6[5])((void*)piVar6[6]);
                     OSRestoreInterrupts(uVar1);
                 }
-                DAT_8032f488 = 9;
+                DAT_8032f488[0] = 9;
                 if (piVar6[1] == 1) {
                     DCFlushRange((void*)piVar6[2], (u32)piVar6[4]);
                 }
@@ -1146,7 +1146,7 @@ void _DmaExecute()
 int _DmaExecuteThread(void*)
 {
     DAT_8032f3c4 |= 2;
-    DAT_8032f488 = 0;
+    DAT_8032f488[0] = 0;
     while ((DAT_8032f484 = 0, DAT_8032f3c0 != 0)) {
         OSWaitSemaphore(&DAT_8032ddd8);
         DAT_8032f484 = 1;
@@ -1299,8 +1299,8 @@ void CRedDriver::Init()
         *(unsigned int*)((char*)DAT_8032f444 + iVar2 + 0xa8) =
             (iVar4 * 0x20 | (unsigned int)(iVar5 + iVar4) >> 0x1b) - iVar4;
     } while (iVar6 < 0x40);
-    DAT_8032f44c = 0;
-    DAT_8032f448 = 0;
+    DAT_8032f448[1] = 0;
+    DAT_8032f448[0] = 0;
     uVar3 = RedNew__Fi(0x2a80);
     *(void**)((char*)DAT_8032f3f0 + 0xdbc) = uVar3;
     memset(*(void**)((char*)DAT_8032f3f0 + 0xdbc), 0, 0x2a80);
@@ -1316,8 +1316,8 @@ void CRedDriver::Init()
     memset(DAT_8032f450, 0, 0x154);
     DAT_8032f474 = RedNew__Fi(0x18);
     memset(DAT_8032f474, 0, 0x18);
-    DAT_8032f47c = 0;
-    DAT_8032f478 = 0;
+    DAT_8032f478[1] = 0;
+    DAT_8032f478[0] = 0;
     DAT_8032f428 = (void**)RedNew__Fi(0x10);
     *DAT_8032f428 = (void*)-1;
     DAT_8032f424 = 0;
@@ -1325,10 +1325,10 @@ void CRedDriver::Init()
     memset(DAT_8032f438, 0, 0x4c0);
     DAT_8032f43c = 0;
     memset(&DAT_8032b860, 0, 0x1c00);
-    DAT_8032f3e0 = &DAT_8032b860;
-    DAT_8032f3e8 = &DAT_8032b860;
-    DAT_8032f3e4 = &DAT_8032c660;
-    DAT_8032f3ec = &DAT_8032c660;
+    DAT_8032f3e0[0] = &DAT_8032b860;
+    DAT_8032f3e8[0] = &DAT_8032b860;
+    DAT_8032f3e0[1] = &DAT_8032c660;
+    DAT_8032f3e8[1] = &DAT_8032c660;
     DAT_8032f3b8 = 0;
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
@@ -2153,22 +2153,22 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedSleep(0);
     }
 
-    DAT_8032dab8 = waveSize;
+    DAT_8032daac.waveSize = waveSize;
     waveHeader = (char*)waveData;
     if (waveSize == -1) {
         if ((waveHeader[0] == 'W') && (waveHeader[1] == 'D')) {
-            DAT_8032dab8 = *(int*)(waveHeader + 4) +
-                           (((*(int*)(waveHeader + 8) * 4) + 0x3fU) & 0xffffffc0) +
-                           (*(int*)(waveHeader + 0xc) * 0x60) + 0x20;
+            DAT_8032daac.waveSize = *(int*)(waveHeader + 4) +
+                                    (((*(int*)(waveHeader + 8) * 4) + 0x3fU) & 0xffffffc0) +
+                                    (*(int*)(waveHeader + 0xc) * 0x60) + 0x20;
         }
         else {
-            DAT_8032dab8 = 0;
+            DAT_8032daac.waveSize = 0;
         }
     }
 
-    DAT_8032daac = slot;
-    DAT_8032dab0 = waveID;
-    DAT_8032dab4 = waveData;
+    DAT_8032daac.slot = slot;
+    DAT_8032daac.waveID = waveID;
+    DAT_8032daac.waveData = waveData;
     OSSignalSemaphore(&DAT_8032daa0);
 }
 

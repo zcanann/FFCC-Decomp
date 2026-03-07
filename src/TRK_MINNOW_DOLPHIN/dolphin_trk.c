@@ -11,11 +11,11 @@
 
 #define EXCEPTIONMASK_ADDR 0x80000044
 
-static u32 lbl_8032A6A0;
+static u32 gTRKDBAT3StartAddress;
 extern u32 _db_stack_addr;
 extern void* TRK_memcpy(void* dst, const void* src, unsigned int n);
 
-static u32 lbl_8021CFF8[15] = { PPC_SystemReset,
+static u32 gTRKExceptionVectorOffsets[15] = { PPC_SystemReset,
 	                               PPC_MachineCheck,
 	                               PPC_DataStorage,
 	                               PPC_InstructionStorage,
@@ -163,8 +163,8 @@ void EnableMetroTRKInterrupts(void) { EnableEXI2Interrupts(); }
 
 u32 TRKTargetTranslate(u32 param_0)
 {
-	if (param_0 >= lbl_8032A6A0) {
-		if ((param_0 < lbl_8032A6A0 + 0x4000)
+	if (param_0 >= gTRKDBAT3StartAddress) {
+		if ((param_0 < gTRKDBAT3StartAddress + 0x4000)
 		    && ((gTRKCPUState.Extended1.DBAT3U & 3) != 0)) {
 			return param_0;
 		}
@@ -195,7 +195,7 @@ void __TRK_copy_vectors(void)
 
 	for (i = 0; i <= 14; ++i) {
 		if ((mask & (1 << i)) && i != 4) {
-			TRK_copy_vector(lbl_8021CFF8[i]);
+			TRK_copy_vector(gTRKExceptionVectorOffsets[i]);
 		}
 	}
 }
@@ -204,7 +204,7 @@ DSError TRKInitializeTarget()
 {
 	gTRKState.isStopped = TRUE;
 	gTRKState.msr       = __TRK_get_MSR();
-	lbl_8032A6A0        = 0xE0000000;
+	gTRKDBAT3StartAddress = 0xE0000000;
 	return DS_NoError;
 }
 

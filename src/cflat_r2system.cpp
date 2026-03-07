@@ -47,10 +47,6 @@ void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
-extern "C" double fmod(double, double);
-extern "C" double atan2(double, double);
-extern "C" double cos(double);
-extern "C" double sin(double);
 extern float FLOAT_80330cec;
 extern float FLOAT_80330cf0;
 extern float FLOAT_80330d10;

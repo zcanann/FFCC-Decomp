@@ -34,4 +34,8 @@ class CChara
 	};
 };
 
+extern "C" char __vt__Q26CChara5CAnim[];
+extern "C" char s_charaAnimSourceFile[];
+extern "C" char s_charaAnimAllocWarn[];
+
 #endif // _FFCC_CHARA_ANIM_H_

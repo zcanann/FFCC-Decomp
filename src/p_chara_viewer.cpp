@@ -4,6 +4,7 @@
 #include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
+#include <string.h>
 
 extern "C" int DAT_8032edc0;
 extern "C" unsigned char Chara[];
@@ -51,8 +52,6 @@ extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char s_no_texture____801da7e8[];
 extern "C" void* System;
-extern "C" void* memset(void*, int, unsigned long);
-extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double fmod(double, double);
 

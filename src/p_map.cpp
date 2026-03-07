@@ -11,6 +11,7 @@
 #include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>
+#include <string.h>
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMapPcs_801e900c;
 
@@ -61,10 +62,6 @@ extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
 extern "C" int sprintf(char*, const char*, ...);
-extern "C" void* memcpy(void*, const void*, unsigned long);
-extern "C" void* memset(void*, int, unsigned long);
-extern "C" int strcmp(const char*, const char*);
-extern "C" char* strcpy(char*, const char*);
 
 struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);

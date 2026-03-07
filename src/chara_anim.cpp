@@ -21,9 +21,6 @@ extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 
 extern "C" unsigned char Chara[];
 extern unsigned char CharaPcs[];
-extern "C" char PTR_PTR_s_CChara_CAnim_80210534[];
-extern "C" char s_chara_anim_cpp_801da980[];
-extern "C" char DAT_801da990[];
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -132,7 +129,7 @@ CChara::CAnim::CAnim()
 	unsigned char* const p = (unsigned char*)this;
 
 	__ct__4CRefFv(this);
-	*(void**)p = PTR_PTR_s_CChara_CAnim_80210534;
+	*(void**)p = __vt__Q26CChara5CAnim;
 	*(unsigned short*)(p + 0xE) = 0;
 	*(int*)(p + 0x14) = 0;
 	*(void**)(p + 0x20) = 0;
@@ -164,7 +161,7 @@ CChara::CAnim::~CAnim()
 	void* nodeArray;
 	void* bank;
 
-	*(void**)p = PTR_PTR_s_CChara_CAnim_80210534;
+	*(void**)p = __vt__Q26CChara5CAnim;
 
 	nodeArray = *(void**)(p + 0x14);
 	if (nodeArray != 0) {
@@ -216,7 +213,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 				unsigned short nodeCount = *(unsigned short*)(p + 0xE);
 
 				void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
-				    (unsigned long)nodeCount * 0x18 + 0x10, stage, s_chara_anim_cpp_801da980, 0x5F);
+				    (unsigned long)nodeCount * 0x18 + 0x10, stage, s_charaAnimSourceFile, 0x5F);
 				nodeArray = __construct_new_array(
 				    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
 				    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, nodeCount);
@@ -235,7 +232,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 						} else if (((int)chunk.m_id < 0x4652414D) && (chunk.m_id == 0x42414E4B)) {
 							*(unsigned int*)(p + 0x1C) = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
 							*(void**)(p + 0x20) =
-						    __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_chara_anim_cpp_801da980, 0x7C);
+						    __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
 							chunkFile.Get(*(void**)(p + 0x20), chunk.m_size);
 
 							Memory.CopyToAMemorySync(
@@ -306,7 +303,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 	}
 
 	if ((unsigned int)System.m_execParam >= 2) {
-		System.Printf(DAT_801da990);
+		System.Printf(s_charaAnimAllocWarn);
 	}
 }
 
@@ -384,7 +381,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 			}
 
 			*reinterpret_cast<void**>(Ptr(anim, 0x20)) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			    &Memory, U32At(anim, 0x1C), *reinterpret_cast<CMemory::CStage**>(Ptr(anim, 0x2C)), s_chara_anim_cpp_801da980, 0x160, 1);
+			    &Memory, U32At(anim, 0x1C), *reinterpret_cast<CMemory::CStage**>(Ptr(anim, 0x2C)), s_charaAnimSourceFile, 0x160, 1);
 
 			if (S32At(anim, 0x20) != 0) {
 				continue;

@@ -1426,7 +1426,6 @@ struct CharaGlobal {
 } Chara;
 
 extern "C" char __vt__8CManager[];
-extern "C" char PTR_PTR_s_CChara_801fcd24[];
 
 /*
  * --INFO--
@@ -1440,5 +1439,5 @@ extern "C" char PTR_PTR_s_CChara_801fcd24[];
 extern "C" void __sinit_chara_cpp(void)
 {
 	*(void**)&Chara = __vt__8CManager;
-	*(void**)&Chara = PTR_PTR_s_CChara_801fcd24;
+	*(void**)&Chara = __vt__6CChara;
 }

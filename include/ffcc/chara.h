@@ -161,4 +161,6 @@ class CChara
     void ChangeMogMode(int);
 };
 
+extern "C" char __vt__6CChara[];
+
 #endif // _FFCC_CHARA_H_

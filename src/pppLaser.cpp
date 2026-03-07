@@ -100,6 +100,9 @@ struct CMapCylinderRaw {
 void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
 {
     f32 fVar1 = kPppLaserZero;
+    u8* mngRaw = (u8*)pppMngStPtr;
+    PPPIFPARAM* hitParams = (PPPIFPARAM*)(mngRaw + 0x130);
+    PPPSEST* se = (PPPSEST*)(mngRaw + 0x11c);
     f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
     int local_24;
     int local_28;
@@ -129,8 +132,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, &Math);
     *((u8*)pfVar3 + 0x4c) = 1;
 
-    iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
-        &Game.game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
+    iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(&Game.game, hitParams, &local_24, &local_28);
     if (iVar2 != 0) {
         GetTargetCursor__5CGameFiR3VecR3Vec(&Game.game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
 
@@ -145,8 +147,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
         }
     } else {
         pfVar3[15] = FLOAT_80333448;
-        *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
+        *(u8*)(mngRaw + 0xe8) = 1;
+        pppStopSe__FP9_pppMngStP7PPPSEST(pppMngStPtr, se);
     }
 }
 
@@ -592,4 +594,3 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
         }
     }
 }
-

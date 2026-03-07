@@ -172,10 +172,10 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 {
     if (gPppCalcDisabled == 0) {
         int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+        float* values;
         unsigned char* work = (unsigned char*)((char*)column + 0x80 + serializedDataOffsets[3]);
         if (*(void**)(work + 8) == 0) {
             char* payload = param_2->m_payload;
-            float* values;
             int i;
 
             *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci(

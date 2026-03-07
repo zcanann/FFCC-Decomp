@@ -130,8 +130,12 @@ void CGObjWork::CalcStatus()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2bf8
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CCaravanWork::CCaravanWork()
 {
@@ -142,12 +146,10 @@ CCaravanWork::CCaravanWork()
 	m_isLoadingFlag = 0xFF;
 	m_miscFlags = 0xFF;
 	m_ownerObj = 0;
-	*(void**)this = __vt__12CCaravanWork;
 
 	m_shopState = 0;
 	unk_0x3a8 = 0;
 	unk_0x3ac = 0;
-	m_objType = 0;
 	m_joybusCaravanId = -1;
 	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
 

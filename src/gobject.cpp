@@ -2345,9 +2345,9 @@ bool CGObject::IsDispRader()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::onHit(int, CGObject*, int, Vec*)
+int CGObject::onHit(int, CGObject*, int, Vec*)
 {
-	// TODO
+	return 0;
 }
 
 /*

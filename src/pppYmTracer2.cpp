@@ -81,7 +81,7 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
  */
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-	float fVar1 = FLOAT_80331844;
+	float fVar1 = FLOAT_80331840;
 	unsigned char* puVar2 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
 	
 	*(u32*)(puVar2 + 0x28) = 0;

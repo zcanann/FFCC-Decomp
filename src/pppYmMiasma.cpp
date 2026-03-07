@@ -21,7 +21,7 @@ extern int gPppCalcDisabled;
 extern double DOUBLE_80330648;
 extern float RandF__5CMathFf(float, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
-extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
 extern void pppCalcFrameShape__FPlRsRsRss(long*, short*, short*, short*, short);
 extern char Math;
@@ -497,4 +497,3 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
         particle += 0x14;
     }
 }
-

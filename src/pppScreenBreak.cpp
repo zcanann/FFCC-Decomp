@@ -400,15 +400,16 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
     s16 sVar8;
     s16 sVar10;
     s16 sVar13;
+    u8* modelData = *(u8**)((u8*)model + 0xA4);
 
-    memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(*(u8**)model + 0xC) * 0x3C);
+    memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(modelData + 0xC) * 0x3C);
     iVar16 = *(s32*)((u8*)model + 0xAC);
     inVec = *(Vec**)((u8*)work + 0xC);
     local_d0 = -0x7FFF;
     sStack_ce = -0x7FFF;
     local_cc = -0x7FFF;
 
-    for (uVar15 = 0; uVar15 < *(u32*)(*(u8**)model + 0xC); uVar15++) {
+    for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
         iVar5 = *(s32*)((u8*)model + 0xA8) + (*(s32*)(iVar14 + 0x5C) * 0xC0);
         *(u8*)(iVar5 + 0xBC) &= 0x7F;
@@ -490,7 +491,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
         local_e0.x = local_d8.x;
         local_e0.y = local_d8.y;
         local_d8.z = local_e0.z;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, &local_e0, *(u32*)(*(u8**)model + 0x34));
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, &local_e0, *(u32*)(modelData + 0x34));
         PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = (double)inVec[3].x;
@@ -530,7 +531,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
     local_e8.x = local_d0;
     local_e8.y = sStack_ce;
     local_e8.z = local_cc;
-    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), &local_e8, *(u32*)(*(u8**)model + 0x34));
+    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), &local_e8, *(u32*)(modelData + 0x34));
 }
 
 /*

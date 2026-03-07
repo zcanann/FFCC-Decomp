@@ -130,8 +130,12 @@ void CGObjWork::CalcStatus()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2bf8
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CCaravanWork::CCaravanWork()
 {

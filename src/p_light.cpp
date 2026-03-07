@@ -1,6 +1,7 @@
 #include "ffcc/p_light.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/p_graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapocttree.h"
 
@@ -52,7 +53,6 @@ extern double DOUBLE_8032fc68;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
 extern unsigned char MaterialMan[];
-extern void* GraphicsPcs;
 
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 
@@ -1343,7 +1343,7 @@ void CLightPcs::MakeLightMap()
     }
 
     Graphic.SetStdPixelFmt();
-    setViewport__11CGraphicPcsFv(GraphicsPcs);
+    setViewport__11CGraphicPcsFv(&GraphicsPcs);
     GXSetCullMode(GX_CULL_FRONT);
     GXSetAlphaUpdate(GX_FALSE);
     GXSetTexCopySrc(0, 0, 0x40, 0x40);

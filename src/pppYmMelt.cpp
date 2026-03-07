@@ -8,14 +8,14 @@
 #include "dolphin/mtx.h"
 
 extern int gPppCalcDisabled;
-extern float FLOAT_80330af4;
-extern float FLOAT_80330b08;
-extern float FLOAT_80330b0c;
-extern double DOUBLE_80330af8;
-extern double DOUBLE_80330b00;
-extern float FLOAT_80330b10;
-extern float FLOAT_80330b14;
-extern float FLOAT_80330b18;
+extern const float FLOAT_80330af4 = 1.0f;
+extern const float FLOAT_80330b08 = 0.5f;
+extern const float FLOAT_80330b0c = 0.017453292f;
+extern const double DOUBLE_80330af8 = 4503599627370496.0;
+extern const double DOUBLE_80330b00 = 4503601774854144.0;
+extern const float FLOAT_80330b10 = -2000.0f;
+extern const float FLOAT_80330b14 = 10000000000.0f;
+extern const float FLOAT_80330b18 = -10000000000.0f;
 extern CMapMng MapMng;
 
 extern "C" {

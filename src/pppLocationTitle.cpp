@@ -8,7 +8,11 @@
 
 static int GetGraphFrameFromId(u32 graphId)
 {
-    return ((int)graphId >> 12) + (int)((graphId & 0x80000000) != 0 && (graphId & 0xFFF) != 0);
+    int frame = (int)graphId >> 12;
+    if (((int)graphId < 0) && ((graphId & 0xFFF) != 0)) {
+        frame++;
+    }
+    return frame;
 }
 
 extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float,

@@ -413,10 +413,6 @@ void __AXSyncPBs(u32 lessDlpfycles) {
                     cycles += __AXSrcCycles[pvpb->pb.src.ratioHi];
                 }
 
-                if (pvpb->pb.lpf.on) {
-                    cycles += 555;
-                }
-
                 cycles += __AXMainMixCycles[pvpb->pb.mixerCtrl & 0xF] + __AXAuxMixCycles[(pvpb->pb.mixerCtrl >> 4) & 0x1F] + __AXAuxMixCycles[(pvpb->pb.mixerCtrl >> 9) & 0x1F] + 0x8C;
                 if (__AXMaxDspCycles > cycles) {
                     __AXServiceVPB(pvpb);

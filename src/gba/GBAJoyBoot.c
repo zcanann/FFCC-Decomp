@@ -162,12 +162,11 @@ static void F27(s32 chan, s32 ret) {
 void __GBAX01(s32 chan, s32 ret) {
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
-    GBASecParam* param = gba->param;
     int val200;
 
     if (ret == GBA_READY) {
-        bootInfo->keyA = param->keyA;
-        bootInfo->keyB = param->keyB;
+        bootInfo->keyA = gba->param->keyA;
+        bootInfo->keyB = gba->param->keyB;
 
         if (bootInfo->readbuf[3] == 0 || bootInfo->readbuf[2] == 0 ||
             (bootInfo->keyA & (D54[5] << 9)) == 0 || bootInfo->readbuf[1] == 0 ||

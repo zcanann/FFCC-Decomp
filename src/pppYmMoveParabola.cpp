@@ -8,6 +8,7 @@
 
 extern int gPppCalcDisabled;
 extern _pppMngSt* pppMngStPtr;
+extern int ppvSinTbl;
 
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -84,11 +85,10 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         _pppMngSt* pppMngSt = pppMngStPtr;
         f32* pfVar = (f32*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
         
-        // Update velocity and position
         pfVar[1] = pfVar[1] + pfVar[2];
         *pfVar = *pfVar + pfVar[1];
         
-        if (stepData->m_graphId == *(s32*)((u8*)basePtr + 0xC)) {
+        if (stepData->m_graphId == basePtr->field0_0x0.m_graphId) {
             *pfVar = *pfVar + stepData->m_stepValue;
             pfVar[1] = pfVar[1] + stepData->m_arg3;
             pfVar[2] = pfVar[2] + stepData->m_payload;
@@ -106,18 +106,16 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &direction);
         }
         
-        // Normalize the direction vector
         Vec tempDir = direction;
         pppNormalize__FR3Vec3Vec(&direction, &tempDir);
         
-        // Trigonometric parabolic motion calculations
         u32 sinIndex = (u32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
         
         f32 baseValue = *pfVar;
-        f32 horizontalScale = (f32)(frameCount * (double)(baseValue * gPppTrigTable[((sinIndex + 0x4000) & 0xfffc) / 4]));
+        f32 horizontalScale = (f32)(frameCount * (double)(baseValue * *(f32*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC))));
         f32 horizontalX = direction.x * horizontalScale;
         f32 horizontalZ = direction.z * horizontalScale;
-        f32 verticalY = (f32)(frameCount * (double)(baseValue * gPppTrigTable[(sinIndex & 0xfffc) / 4]) - 
+        f32 verticalY = (f32)(frameCount * (double)(baseValue * *(f32*)((u8*)ppvSinTbl + (sinIndex & 0xFFFC))) - 
                              (double)(f32)(frameCount * (double)(f32)((double)(gPppYmMoveParabolaGravityScale * (f32)stepData->m_initWOrk) * frameCount)));
         
         Vec newPosition;
@@ -146,7 +144,6 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), (Vec*)((u8*)pppMngSt + 0x8));
         pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &newPosition);
         
-        // Update matrix with new position
         pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
         pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
         pppMngStPtr->m_matrix.value[2][3] = newPosition.z;

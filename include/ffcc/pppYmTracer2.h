@@ -7,7 +7,12 @@ struct PYmTracer2;
 struct TRACE_POLYGON;
 
 struct pppYmTracer2UnkB {
+    s32 m_graphId;
     u32 m_dataValIndex;
+    s32 m_initWOrk;
+    s32 m_stepValue;
+    s32 m_arg3;
+    u8 m_payload[0x20];
 };
 
 struct pppYmTracer2UnkC {
@@ -36,4 +41,3 @@ void pppRenderYmTracer2(pppYmTracer2*, pppYmTracer2UnkB*, pppYmTracer2UnkC*);
 #endif
 
 #endif // _FFCC_PPP_YMTRACER2_H_
-

@@ -32,15 +32,6 @@ extern CUtil gUtil;
 
 static char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
-struct YmTracer2Step {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_initWOrk;
-    s32 m_stepValue;
-    s32 m_arg3;
-    u8* m_payload;
-};
-
 struct TraceEntry {
     Vec pos;
     float pad0;
@@ -168,7 +159,6 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     Mtx MStack_78;
     u32 uStack_44;
     u32 uStack_3c;
-    YmTracer2Step* step = (YmTracer2Step*)param_2;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -178,29 +168,29 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     iVar4 = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
 
-    if (step->m_initWOrk == -1) {
+    if (param_2->m_initWOrk == -1) {
         pWorkPtr = gPppDefaultValueBuffer;
     } else {
-        pWorkPtr = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + step->m_stepValue;
+        pWorkPtr = (u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue;
     }
     *(void**)(work + 0x20) = pWorkPtr;
 
-    if (step->m_arg3 == -1) {
+    if (param_2->m_arg3 == -1) {
         pWorkPtr = gPppDefaultValueBuffer;
     } else {
-        pWorkPtr = (u8*)&pppMngStPtr->m_kind + step->m_arg3 * 0x10 + *(s32*)step->m_payload;
+        pWorkPtr = (u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload;
     }
     *(void**)(work + 0x24) = pWorkPtr;
 
     if (*(u32*)(work + 0x28) == 0) {
         useFallback = 1;
-        *(u16*)(work + 0x30) = (u16)step->m_payload[8] / *(u16*)(step->m_payload + 6);
+        *(u16*)(work + 0x30) = (u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6);
         *(void**)(work + 0x28) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (u32)*(u16*)(step->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
+            (u32)*(u16*)(param_2->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
 
         fVar2 = FLOAT_80331840;
         pfVar6 = *(float**)(work + 0x28);
-        for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar8++) {
+        for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar8++) {
             *(u8*)(pfVar6 + 8) = 0;
             *(u8*)((u8*)pfVar6 + 0x1f) = 0;
             pfVar6[2] = fVar2;
@@ -217,8 +207,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     *(u8*)&source[2].z = 1;
     pVVar10 = source;
 
-    for (i = 0; (s32)i < (s32)(step->m_payload[9] + 1); i++) {
-        iVar8 = *(u16*)(step->m_payload + 4) - 2;
+    for (i = 0; (s32)i < (s32)(param_2->m_payload[9] + 1); i++) {
+        iVar8 = *(u16*)(param_2->m_payload + 4) - 2;
         pfVar6 = (float*)((u8*)source + iVar8 * 0x28);
 
         for (; (s32)i <= iVar8; iVar8--) {
@@ -267,7 +257,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             PSMTXMultVec(MStack_78, (Vec*)&source[1].y, (Vec*)&source[1].y);
         } else if (useFallback == 0) {
             uStack_3c = i ^ 0x80000000;
-            uStack_44 = (step->m_payload[9] + 1) ^ 0x80000000;
+            uStack_44 = (param_2->m_payload[9] + 1) ^ 0x80000000;
             if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(
                     (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
                         (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858),
@@ -286,7 +276,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     if (useFallback != 0) {
         Vec* pFallback = source;
 
-        for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
+        for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
             local_84.x = source->x;
             local_84.y = source->y;
             local_84.z = source->z;
@@ -300,8 +290,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     visibleCount = 0;
-    for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
-        alpha = (u16)step->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
+    for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
+        alpha = (u16)param_2->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
         if ((alpha < 0) || ((useFallback = *(char*)&source[2].z == '\0'), useFallback != 0)) {
             *(u8*)((u8*)&source[2].y + 3) = 0;
         } else if (useFallback == 0) {
@@ -324,25 +314,24 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  */
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    YmTracer2Step* step = (YmTracer2Step*)param_2;
     s32 dataOffset = *param_3->m_serializedDataOffsets;
     s32 colorOffset = param_3->m_serializedDataOffsets[1];
     TraceEntry* entries = *(TraceEntry**)((u8*)pppYmTracer2 + 0x80 + dataOffset + 0x28);
-    CMapMesh* mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
+    CMapMesh* mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
     CTexture* texture;
     int textureIndex;
     u16 visibleCount;
     float uvStep;
     float alphaScale;
 
-    if (step->m_dataValIndex == 0xFFFF) {
+    if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    pppSetBlendMode__FUc(step->m_payload[10]);
+    pppSetBlendMode__FUc(param_2->m_payload[10]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (void*)((u8*)pppYmTracer2 + 0x88 + colorOffset), (void*)&ppvCameraMatrix0, FLOAT_80331840, step->m_payload[0xC],
-        step->m_payload[0xB], step->m_payload[10], 0, 1, 1, 0);
+        (void*)((u8*)pppYmTracer2 + 0x88 + colorOffset), (void*)&ppvCameraMatrix0, FLOAT_80331840,
+        param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
     textureIndex = 0;
@@ -365,7 +354,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
         SetUpPaletteEnv(texture);
     }
 
-    if (step->m_payload[0xD] == 0) {
+    if (param_2->m_payload[0xD] == 0) {
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
     } else {
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
@@ -418,4 +407,3 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
         }
     }
 }
-

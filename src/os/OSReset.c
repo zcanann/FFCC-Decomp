@@ -191,6 +191,7 @@ void __OSShutdownDevices(BOOL doRecal) {
 void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     OSResetFunctionInfo* info;
     int err;
+    BOOL done;
     OSSram* sram;
     OSThread* thread;
     OSThread* next;
@@ -211,7 +212,12 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
             info = info->next;
         }
         err |= !__OSSyncSram();
-    } while (err != 0);
+        if (err != 0) {
+            done = FALSE;
+        } else {
+            done = TRUE;
+        }
+    } while (done == FALSE);
 
     if (reset == OS_RESET_HOTRESET && forceMenu) {
         sram = __OSLockSram();

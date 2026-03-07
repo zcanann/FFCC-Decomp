@@ -3,6 +3,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 
 #include <dolphin/gx.h>
@@ -22,7 +23,6 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 extern int gPppCalcDisabled;
-extern int DAT_801eadc8;
 extern float FLOAT_80331840;
 extern float FLOAT_80331844;
 extern float FLOAT_80331848;
@@ -180,14 +180,14 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
 
     if (step->m_initWOrk == -1) {
-        pWorkPtr = &DAT_801eadc8;
+        pWorkPtr = gPppDefaultValueBuffer;
     } else {
         pWorkPtr = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + step->m_stepValue;
     }
     *(void**)(work + 0x20) = pWorkPtr;
 
     if (step->m_arg3 == -1) {
-        pWorkPtr = &DAT_801eadc8;
+        pWorkPtr = gPppDefaultValueBuffer;
     } else {
         pWorkPtr = (u8*)&pppMngStPtr->m_kind + step->m_arg3 * 0x10 + *(s32*)step->m_payload;
     }

@@ -12,8 +12,6 @@ extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
 extern CMath Math;
 
-#define FLOAT_80330448 kPppRyjMegaBirthZero
-
 static Mtx g_matUnit;
 
 static char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
@@ -223,18 +221,18 @@ void calc(
 	*(float*)(particlePayload + 0x58) = *(float*)(particlePayload + 0x58) + *(float*)(paramPayload + 0xA8);
 	if ((s8)paramPayload[0x8E] == 0)
 	{
-		if ((*(float*)(paramPayload + 0xAC) <= FLOAT_80330448) || (FLOAT_80330448 <= *(float*)(paramPayload + 0xA8)))
+		if ((*(float*)(paramPayload + 0xAC) <= kPppRyjMegaBirthZero) || (kPppRyjMegaBirthZero <= *(float*)(paramPayload + 0xA8)))
 		{
-			if ((*(float*)(paramPayload + 0xAC) < FLOAT_80330448) &&
-				((FLOAT_80330448 < *(float*)(paramPayload + 0xA8)) &&
-				 (FLOAT_80330448 < *(float*)(particlePayload + 0x58))))
+			if ((*(float*)(paramPayload + 0xAC) < kPppRyjMegaBirthZero) &&
+				((kPppRyjMegaBirthZero < *(float*)(paramPayload + 0xA8)) &&
+				 (kPppRyjMegaBirthZero < *(float*)(particlePayload + 0x58))))
 			{
-				*(float*)(particlePayload + 0x58) = FLOAT_80330448;
+				*(float*)(particlePayload + 0x58) = kPppRyjMegaBirthZero;
 			}
 		}
-		else if (*(float*)(particlePayload + 0x58) < FLOAT_80330448)
+		else if (*(float*)(particlePayload + 0x58) < kPppRyjMegaBirthZero)
 		{
-			*(float*)(particlePayload + 0x58) = FLOAT_80330448;
+			*(float*)(particlePayload + 0x58) = kPppRyjMegaBirthZero;
 		}
 	}
 
@@ -513,8 +511,8 @@ void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 	float zero;
 
 	PSMTXIdentity(work->m_worldMatrix);
-	zero = FLOAT_80330448;
-	work->m_accelerationAxis.z = FLOAT_80330448;
+	zero = kPppRyjMegaBirthZero;
+	work->m_accelerationAxis.z = kPppRyjMegaBirthZero;
 	work->m_accelerationAxis.y = zero;
 	work->m_accelerationAxis.x = zero;
 	work->m_particleBlock = 0;

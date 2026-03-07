@@ -30,12 +30,6 @@ extern const char s_WinMessTable[];
 extern const char* s_NoTextByLanguage[];
 extern const char* s_SlotBTextByLanguage[];
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
-
 /*
  * --INFO--
  * PAL Address: 0x8017b3f8
@@ -164,15 +158,15 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     CFont* font = menuFont;
-    SetMargin__5CFontFf(1.0f, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(1.0f, font);
+    font->SetMargin(1.0f);
+    font->SetShadow(0);
+    font->SetScale(1.0f);
 
-    const int yesWidth = (int)GetWidth__5CFontFPc(font, yesText + 1);
+    const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int noWidth = (int)GetWidth__5CFontFPc(font, s_NoTextByLanguage[languageId - 1]);
+        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;
     }
     return x - 0x1e;
@@ -208,16 +202,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     CFont* font = menuFont;
-    SetMargin__5CFontFf(1.0f, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(1.0f, font);
-    SetTlut__5CFontFi(font, 0x23);
+    font->SetMargin(1.0f);
+    font->SetShadow(0);
+    font->SetScale(1.0f);
+    font->SetTlut(0x23);
 
-    const int slotAWidth = (int)GetWidth__5CFontFPc(font, slotAText + 1);
+    const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int slotBWidth = (int)GetWidth__5CFontFPc(font, s_SlotBTextByLanguage[languageId - 1]);
+        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
     }
     return x - 0x1e;

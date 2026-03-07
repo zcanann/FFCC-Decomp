@@ -135,7 +135,24 @@ void CGObjWork::CalcStatus()
  */
 CCaravanWork::CCaravanWork()
 {
-	// TODO
+	m_objType = -1;
+	*reinterpret_cast<unsigned int*>(&m_saveSlot) = 0xFFFFFFFF;
+	m_ownerObj = 0;
+	m_shopState = 0;
+	unk_0x3a8 = 0;
+	unk_0x3ac = 0;
+	m_objType = 0;
+	m_joybusCaravanId = -1;
+	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
+	m_letterMeta[0] = 0xFFFF;
+	m_letterMeta[1] = 0xFFFF;
+	m_letterMeta[2] = 0xFFFF;
+	m_letterMeta[3] = 0xFFFF;
+	m_letterMeta[4] = 0xFFFF;
+	m_letterMeta[5] = 0xFFFF;
+	m_letterMeta[6] = 0xFFFF;
+	m_letterMeta[7] = 0xFFFF;
+	clearCaravanWork();
 }
 
 /*

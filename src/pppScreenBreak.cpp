@@ -615,7 +615,7 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
  */
 void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
-    s32* serializedDataOffsets = *(s32**)param_2;
+    s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
     s32 dataOffset = serializedDataOffsets[2];
     u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
@@ -760,6 +760,3 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
         value[0x24] = 1;
     }
 }
-
-
-

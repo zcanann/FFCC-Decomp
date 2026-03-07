@@ -559,7 +559,8 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
+    u8* pppData = (u8*)pppScreenBreak + dataOffset + 0x80;
+    float* value = (float*)pppData;
     void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -569,8 +570,8 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
     *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
     *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;
-    value[3] = 0.0f;
-    value[4] = 0.0f;
+    *(void**)(pppData + 0xC) = NULL;
+    *(void**)(pppData + 0x10) = NULL;
     value[8] = f;
     value[7] = f;
     value[6] = f;
@@ -618,7 +619,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     s32 dataOffset = serializedDataOffsets[2];
     u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    u8* model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     if (model != 0) {
         *(void**)(model + 0xF0) = NULL;
         *(void**)(model + 0xFC) = NULL;

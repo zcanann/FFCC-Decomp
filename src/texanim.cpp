@@ -549,13 +549,22 @@ CTexAnimSet::CTexAnimSet()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80044a24
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#pragma dont_inline on
 CTexAnimSet::~CTexAnimSet()
 {
-	// TODO
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnimSet_801e9c6c;
+    reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8))->ReleaseAndRemoveAll();
+    reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8))->~CPtrArray<CTexAnim*>();
+    __dt__4CRefFv(this, 0);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

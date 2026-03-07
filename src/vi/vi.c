@@ -75,7 +75,7 @@ typedef struct {
 } SomeVIStruct;
 
 static BOOL IsInitialized;
-static volatile u32 retraceCount;
+extern volatile u32 lbl_8032F0E4;
 
 static volatile u32 flushFlag;
 static OSThreadQueue retraceQueue;
@@ -90,7 +90,7 @@ static volatile u64 changed;
 static volatile u32 shdwChangeMode;
 static volatile u16 regs[59];
 static volatile u64 shdwChanged;
-static VITiming* CurrTiming;
+extern VITiming* lbl_8032F120;
 static u32 CurrTvMode;
 static u32 NextBufAddr;
 static u32 CurrBufAddr;
@@ -130,6 +130,9 @@ static u16 taps[25] = {
 static SomeVIStruct HorVer;
 static u32 FBSet;
 static VITiming* timingExtra;
+
+#define retraceCount lbl_8032F0E4
+#define CurrTiming lbl_8032F120
 
 // prototypes
 static u32 getCurrentFieldEvenOdd(void);

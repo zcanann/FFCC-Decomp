@@ -41,6 +41,8 @@ struct LocationTitleParticle {
     s16 m_shapeB;
 };
 
+static char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
+
 /*
  * --INFO--
  * PAL Address: 0x800d92cc
@@ -127,13 +129,13 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         work->m_acc += *(float*)((u8*)param_2->m_payload + 4);
     }
 
-    maxCount = *(u16*)((u8*)&param_2->m_initWOrk + 2);
+    maxCount = param_2->m_pad;
     if (work->m_particles == NULL) {
         LocationTitleParticle* particle;
 
         work->m_particles =
             pppMemAlloc__FUlPQ27CMemory6CStagePci(maxCount * sizeof(LocationTitleParticle),
-                                                  pppEnvStPtr->m_stagePtr, (char*)"pppLocationTitle.cpp", 0x6d);
+                                                  pppEnvStPtr->m_stagePtr, s_pppLocationTitle_cpp, 0x6d);
         particle = (LocationTitleParticle*)work->m_particles;
 
         for (u16 i = 0; i < maxCount; i++) {
@@ -157,7 +159,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
     graphId = *(u32*)pppLocationTitle;
     graphFrame = GetGraphFrameFromId(graphId);
-    if (graphFrame < *(u16*)((u8*)param_2->m_payload + 8)) {
+    if (graphFrame < *(u16*)(param_2->m_payload + 8)) {
         return;
     }
 
@@ -248,9 +250,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     Vec* source = *(Vec**)((u8*)pppLocationTitle + 8 + serializedOffset);
     long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
 
-    if ((int)(u16)*(u16*)((u8*)param_2->m_payload + 10) <= graphFrame) {
-        fadeDivisor = (int)(u16)*(u16*)((u8*)param_2->m_payload + 12)
-                      + (graphFrame - (int)(u16)*(u16*)((u8*)param_2->m_payload + 10));
+    if ((int)(u16)*(u16*)(param_2->m_payload + 10) <= graphFrame) {
+        fadeDivisor = (int)(u16)*(u16*)(param_2->m_payload + 12)
+                      + (graphFrame - (int)(u16)*(u16*)(param_2->m_payload + 10));
     }
 
     for (int i = 0; i < (int)(u16)*(u16*)((u8*)pppLocationTitle + 12 + serializedOffset); i++) {
@@ -285,4 +287,3 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         source = (Vec*)&source[2].y;
     }
 }
-

@@ -617,6 +617,7 @@ cflat_runtime2.cpp:
 	extabindex  start:0x8000D2F4 end:0x8000D4C8
 	.text       start:0x80069B08 end:0x8006EB04
 	.ctors      start:0x801D540C end:0x801D5410
+	.sbss       start:0x8032ED98 end:0x8032EDA0
 
 chara.cpp:
 	extab       start:0x80007480 end:0x800075E0
@@ -1100,6 +1101,7 @@ charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
+	.sbss       start:0x8032EE68 end:0x8032EE70
 
 monobj.cpp:
 	extab       start:0x800092E4 end:0x8000944C
@@ -1169,6 +1171,7 @@ bonus_menu.cpp:
 	extab       start:0x80009A34 end:0x80009AC4
 	extabindex  start:0x80010C18 end:0x80010CF0
 	.text       start:0x80133108 end:0x8013E294
+	.sbss       start:0x8032EEA8 end:0x8032EEB8
 
 pppScreenBlur.cpp:
 	extab       start:0x80009AC4 end:0x80009ADC

@@ -93,6 +93,9 @@ extern "C" void update__8CGObjectFv(CGObject*);
 extern "C" void hit__8CGObjectFv(CGObject*);
 extern "C" void copy__8CGObjectFv(CGObject*);
 
+int gCFlatRuntime2DebugDrawOverflowFrame = 0;
+unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
+
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
 	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);

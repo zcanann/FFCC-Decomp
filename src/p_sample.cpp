@@ -2,6 +2,11 @@
 
 CSamplePcs SamplePcs;
 extern unsigned int PTR_PTR_s_CSamplePcs_801e8644[];
+unsigned int m_table_desc0__10CSamplePcs[3];
+unsigned int m_table_desc1__10CSamplePcs[3];
+unsigned int m_table_desc2__10CSamplePcs[3];
+unsigned int m_table_desc3__10CSamplePcs[3];
+unsigned char m_table__10CSamplePcs[0x15C];
 
 /*
  * --INFO--

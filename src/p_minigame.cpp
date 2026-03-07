@@ -11,6 +11,10 @@
 #include <string.h>
 
 CMiniGamePcs MiniGamePcs;
+unsigned int m_table_desc0__12CMiniGamePcs[3];
+unsigned int m_table_desc1__12CMiniGamePcs[3];
+unsigned int m_table_desc2__12CMiniGamePcs[3];
+unsigned char m_table__12CMiniGamePcs[0x15C];
 extern unsigned char CFlat[];
 extern "C" void* __vt__12CMiniGamePcs[];
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};

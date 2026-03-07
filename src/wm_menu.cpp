@@ -2,6 +2,7 @@
 
 #include "ffcc/goout.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/graphic.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_game.h"
 #include "ffcc/THPSimple.h"
@@ -61,7 +62,6 @@ extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" unsigned char CameraPcs[];
 extern "C" unsigned char CharaPcs[];
 extern "C" unsigned char LightPcs[];
-extern "C" unsigned char Graphic[];
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 
@@ -1820,7 +1820,7 @@ void CMenuPcs::RestoreProjection()
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), projectionMtx);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	SetViewport__8CGraphicFv(Graphic);
+	SetViewport__8CGraphicFv(&Graphic);
 	GXSetScissor(0, 0, 0x280, 0x1C0);
 	DrawInit__8CMenuPcsFv(this);
 }
@@ -3233,7 +3233,7 @@ void CMenuPcs::SetLight(int mode)
 	int localColor;
 	int* const lightTable = DAT_8021082c + mode * 0xE;
 
-	SetFog__8CGraphicFii(Graphic, 1, 0);
+	SetFog__8CGraphicFii(&Graphic, 1, 0);
 	SetAmbient__9CLightPcsF8_GXColor(LightPcs, &DAT_80210830[mode * 0xE]);
 	SetNumDiffuse__9CLightPcsFUl(LightPcs, static_cast<unsigned long>(lightTable[0]));
 

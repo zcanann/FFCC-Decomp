@@ -1,10 +1,10 @@
 #include "ffcc/pppScreenQuake.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
 
 extern int gPppCalcDisabled;
-extern unsigned char CameraPcs[];
 
 extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
     void*,

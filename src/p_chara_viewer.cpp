@@ -1,5 +1,6 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/file.h"
+#include "ffcc/graphic.h"
 #include "ffcc/pad.h"
 #include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
@@ -9,7 +10,6 @@
 extern "C" unsigned char Chara[];
 extern "C" unsigned char LightPcs[];
 extern "C" unsigned char Memory[];
-extern "C" unsigned char Graphic[];
 extern "C" unsigned char USBPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -144,9 +144,9 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
         unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
         if (model != 0) {
             if (*(int*)(model + 0xB0) == 0) {
-                Printf__8CGraphicFPce(Graphic, s_no_texture____801da7e8);
+                Printf__8CGraphicFPce(&Graphic, s_no_texture____801da7e8);
             } else {
-                SetFog__8CGraphicFii(Graphic, 0, 0);
+                SetFog__8CGraphicFii(&Graphic, 0, 0);
                 SetAmbient__9CLightPcsF8_GXColor(LightPcs, p + 0xE8);
                 SetNumDiffuse__9CLightPcsFUl(LightPcs, 3);
                 for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
@@ -165,7 +165,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
                 DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
                 if (i == 0) {
-                    _WaitDrawDone__8CGraphicFPci(Graphic, s_no_texture____801da7e8 + 0x10, 0x2A7);
+                    _WaitDrawDone__8CGraphicFPci(&Graphic, s_no_texture____801da7e8 + 0x10, 0x2A7);
                 }
             }
         }
@@ -474,7 +474,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     }
 
     *(unsigned int*)(p + 0x0C) = 0x404040FF;
-    SetCopyClear__8CGraphicF8_GXColori(Graphic, p + 0x0C, 0xFFFF);
+    SetCopyClear__8CGraphicF8_GXColori(&Graphic, p + 0x0C, 0xFFFF);
 
     *(int*)(p + 0x190) = 0;
     *(int*)(p + 0x194) = 0;

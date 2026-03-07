@@ -1,6 +1,7 @@
 #include "ffcc/chara_fur.h"
 #include "ffcc/chara.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/graphic.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
@@ -15,7 +16,6 @@ public:
 	T operator[](unsigned long index);
 };
 
-extern "C" unsigned char Graphic[];
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
 extern "C" unsigned char Game[];
 extern "C" unsigned char m_mogWork[];
@@ -278,7 +278,7 @@ void CChara::CalcMogScore()
 	{
 		char** radarLabel = reinterpret_cast<char**>(sMogRadarTypeLabels);
 		Printf__8CGraphicFUlUlPce(
-		    Graphic,
+		    &Graphic,
 		    5,
 		    0xB,
 		    sMogRadarDebugFormatBlock + 0x18,
@@ -294,7 +294,7 @@ void CChara::CalcMogScore()
 		    *reinterpret_cast<int*>(self + 0x202C));
 
 		Printf__8CGraphicFUlUlPce(
-		    Graphic,
+		    &Graphic,
 		    5,
 		    0xC,
 		    sMogRadarDebugFormatBlock + 0x4C,
@@ -458,7 +458,7 @@ void CChara::CModel::InitMogFurTex()
 
 	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
-		_WaitDrawDone__8CGraphicFPci(Graphic, s_chara_fur_cpp_801db72c, 0x506);
+		_WaitDrawDone__8CGraphicFPci(&Graphic, s_chara_fur_cpp_801db72c, 0x506);
 
 		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);

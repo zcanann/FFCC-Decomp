@@ -220,7 +220,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = pppMngStPtr->m_owner;
+    void* ownerObj = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle;
     int model;
 
@@ -286,7 +286,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(pppMngStPtr + 0xDC), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     *(pppBlurCharaWork**)(model + 0xE4) = work;
@@ -466,4 +466,3 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppInitBlendMode__Fv();
 }
-

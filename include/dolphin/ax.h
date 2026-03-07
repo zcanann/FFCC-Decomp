@@ -130,7 +130,7 @@ typedef struct _AXPB {
     /* 0xA6 */ AXPBSRC src;
     /* 0xB4 */ AXPBADPCMLOOP adpcmLoop;
     /* 0xBA */ AXPBLPF lpf;
-    /* 0xC2 */ u16 pad[25];
+    /* 0xC2 */ u16 pad[21];
 } AXPB;
 
 typedef struct _AXVPB {

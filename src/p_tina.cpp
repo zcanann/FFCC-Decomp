@@ -609,13 +609,15 @@ void CPartPcs::create()
     usb->m_miruraEventActive = 0;
     usb->m_disableShokiDraw = 0;
 
-    stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
-    usb->m_stageLoad = stage;
-    usb->m_stageDefault = stage;
-
     if (Game.game.m_currentSceneId == 7) {
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
         usb->m_stageAmem = 0;
     } else {
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
         usb->m_stageAmem = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, s_CPartPcs_amem_801d811c, 2);
     }
 

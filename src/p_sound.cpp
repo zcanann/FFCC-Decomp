@@ -1,9 +1,9 @@
 #include "ffcc/p_sound.h"
 #include "ffcc/linkage.h"
-#include "ffcc/sound.h"
 
 CSoundPcs SoundPcs;
 extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
+extern unsigned char Sound[];
 extern "C" {
 void LoadBlock__6CSoundFv(void*);
 void CancelLoadWaveASync__6CSoundFv(void*);
@@ -107,7 +107,7 @@ void CSoundPcs::create()
  */
 void CSoundPcs::createLoad()
 {
-    LoadBlock__6CSoundFv(&Sound);
+    LoadBlock__6CSoundFv(Sound);
 }
 
 /*
@@ -121,10 +121,10 @@ void CSoundPcs::createLoad()
  */
 void CSoundPcs::destroy()
 {
-    CancelLoadWaveASync__6CSoundFv(&Sound);
-    StopStream__6CSoundFv(&Sound);
-    StopAndFreeAllSe__6CSoundFi(&Sound, 1);
-    FreeBlock__6CSoundFv(&Sound);
+    CancelLoadWaveASync__6CSoundFv(Sound);
+    StopStream__6CSoundFv(Sound);
+    StopAndFreeAllSe__6CSoundFi(Sound, 1);
+    FreeBlock__6CSoundFv(Sound);
 }
 
 /*
@@ -138,7 +138,7 @@ void CSoundPcs::destroy()
  */
 void CSoundPcs::calc()
 {
-    Frame__6CSoundFv(&Sound);
+    Frame__6CSoundFv(Sound);
 }
 
 /*
@@ -153,6 +153,6 @@ void CSoundPcs::calc()
 void CSoundPcs::draw()
 {
     if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
-        Draw__6CSoundFv(&Sound);
+        Draw__6CSoundFv(Sound);
     }
 }

@@ -1,17 +1,17 @@
 #include "ffcc/p_sound.h"
-#include "ffcc/sound.h"
 
 CSoundPcs SoundPcs;
 extern unsigned char CFlat[];
+extern unsigned char Sound[];
 extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
 extern "C" {
-void LoadBlock__6CSoundFv(CSound*);
-void CancelLoadWaveASync__6CSoundFv(CSound*);
-void StopStream__6CSoundFv(CSound*);
-void StopAndFreeAllSe__6CSoundFi(CSound*, int);
-void FreeBlock__6CSoundFv(CSound*);
-void Frame__6CSoundFv(CSound*);
-void Draw__6CSoundFv(CSound*);
+void LoadBlock__6CSoundFv(void*);
+void CancelLoadWaveASync__6CSoundFv(void*);
+void StopStream__6CSoundFv(void*);
+void StopAndFreeAllSe__6CSoundFi(void*, int);
+void FreeBlock__6CSoundFv(void*);
+void Frame__6CSoundFv(void*);
+void Draw__6CSoundFv(void*);
 }
 
 /*

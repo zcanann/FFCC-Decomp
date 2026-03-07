@@ -275,12 +275,17 @@ static void cbForStateGettingError(u32 intType) {
 	u32 resume;
 
 	if (intType == 16) {
-		stateTimeout();
+		executing->state = -1;
+		__DVDStoreErrorCode(0x1234568);
+		DVDReset();
+		cbForStateError(0);
 		return;
 	}
 
 	if (intType & 2) {
-		stateError(0x1234567);
+		executing->state = -1;
+		__DVDStoreErrorCode(0x1234567);
+		DVDLowStopMotor(cbForStateError);
 		return;
 	}
 
@@ -292,7 +297,9 @@ static void cbForStateGettingError(u32 intType) {
 	errorCategory = CategorizeError(error);
 
 	if (errorCategory == 1) {
-		stateError(error);
+		executing->state = -1;
+		__DVDStoreErrorCode(error);
+		DVDLowStopMotor(cbForStateError);
 		return;
 	}
 
@@ -340,7 +347,9 @@ static void cbForStateGettingError(u32 intType) {
 		stateMotorStopped();
 		return;
 	} else {
-		stateError(0x1234567);
+		executing->state = -1;
+		__DVDStoreErrorCode(0x1234567);
+		DVDLowStopMotor(cbForStateError);
 		return;
 	}
 }

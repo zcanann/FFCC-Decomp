@@ -973,35 +973,10 @@ asm void TRKInterruptHandlerEnableInterrupts(void)
 DSError TRKTargetInterrupt(TRKEvent* event)
 {
     DSError error = DS_NoError;
-    BOOL stepDone;
 
     if ((event->eventType == NUBEVENT_Breakpoint)
         || (event->eventType == NUBEVENT_Exception)) {
-        if (gTRKStepStatus.active) {
-            stepDone = TRUE;
-            TRKTargetEnableTrace(FALSE);
-
-            if (((u16)gTRKCPUState.Extended1.exceptionID) == PPC_Trace) {
-                if (gTRKStepStatus.type == DSSTEP_IntoRange) {
-                    if ((gTRKStepStatus.rangeStart <= gTRKCPUState.Default.PC)
-                        && (gTRKCPUState.Default.PC
-                            <= gTRKStepStatus.rangeEnd)) {
-                        stepDone = FALSE;
-                    }
-                } else if ((gTRKStepStatus.type == DSSTEP_IntoCount)
-                           && (gTRKStepStatus.count != 0)) {
-                    stepDone = FALSE;
-                }
-            }
-
-            if (stepDone) {
-                gTRKStepStatus.active = FALSE;
-            } else {
-                TRKTargetDoStep();
-            }
-        }
-
-        if (!gTRKStepStatus.active) {
+        if (!TRKTargetCheckStep()) {
             TRKTargetSetStopped(TRUE);
             error = TRKDoNotifyStopped(DSMSG_NotifyStopped);
         }

@@ -20,9 +20,9 @@ public:
     unsigned long size;
     unsigned long numItems;
     unsigned long defaultSize;
+    int growCapacity;
     T* items;
     CMemory::CStage* stage;
-    int growCapacity;
 
     CPtrArray();
     virtual ~CPtrArray();
@@ -493,8 +493,5 @@ extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*
 
 template class CPtrArray<_GXTexObj*>;
 template class CPtrArray<OSFS_TEXTURE_ST*>;
-
-
-
 
 

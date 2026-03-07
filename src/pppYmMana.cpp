@@ -1,5 +1,6 @@
 #include "ffcc/pppYmMana.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
@@ -21,7 +22,6 @@ extern float FLOAT_80330e68;
 extern float FLOAT_80330eb8;
 extern float FLOAT_80330ec0;
 extern double DOUBLE_80330e70;
-extern void* DAT_80238030;
 extern char DAT_80330e50[];
 extern char DAT_80330e88[];
 extern char DAT_80330e90[];

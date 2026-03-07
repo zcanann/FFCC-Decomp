@@ -1,5 +1,6 @@
 #include "ffcc/pppMana2.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
@@ -30,7 +31,6 @@ extern float FLOAT_803318cc;
 extern float FLOAT_803318d0;
 extern float FLOAT_80331904;
 extern Mtx ppvCameraMatrix0;
-extern void* DAT_80238030;
 extern struct {
     float _212_4_;
     float _216_4_;

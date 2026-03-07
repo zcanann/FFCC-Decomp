@@ -1,5 +1,6 @@
 #include "ffcc/pppBlurChara.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
@@ -33,7 +34,6 @@ struct pppMngStBlurCharaRaw {
 };
 
 extern int gPppCalcDisabled;
-extern void* DAT_80238030;
 extern CUtil gUtil;
 extern char MaterialMan[];
 
@@ -466,6 +466,4 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppInitBlendMode__Fv();
 }
-
-
 

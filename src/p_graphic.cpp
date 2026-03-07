@@ -1,5 +1,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
 #include "ffcc/math.h"
@@ -24,7 +25,6 @@ extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
 extern u32 DAT_8032fb74;
-extern void* DAT_80238030;
 extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;

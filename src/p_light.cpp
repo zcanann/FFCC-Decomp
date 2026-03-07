@@ -1,6 +1,7 @@
 #include "ffcc/p_light.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>
@@ -49,7 +50,6 @@ extern double DOUBLE_8032fc50;
 extern double DOUBLE_8032fc58;
 extern double DOUBLE_8032fc68;
 extern double DAT_8032ec20;
-extern void* DAT_80238030;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
 extern unsigned char MaterialMan[];
@@ -1602,3 +1602,4 @@ void CLightPcs::CLight::Set(CLightPcs::CLight*)
 {
 	// TODO
 }
+

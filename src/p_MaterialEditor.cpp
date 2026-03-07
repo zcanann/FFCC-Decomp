@@ -19,13 +19,7 @@ extern CGraphic Graphic;
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
-extern unsigned char lbl_8026D338[];
-extern unsigned char DAT_8032ed1c;
-extern char* DAT_8032ed18;
-extern char DAT_8032fcb4[];
-extern unsigned char DAT_8032ed24;
-extern int DAT_8032ed20;
-extern unsigned int DAT_8032fca8;
+extern unsigned char ARRAY_8026D338[];
 static char s_MaterialEditor[] = "MaterialEditor=%c";
 extern class CCameraPcs {
 public:
@@ -71,7 +65,8 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
     __ct__14CUSBStreamDataFv(self + 0x84);
     __ct__5ZLISTFv(self + 0xC8);
     __ct__5ZLISTFv(self + 0xD8);
-    __register_global_object(&MaterialEditorPcs, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), lbl_8026D338);
+    __register_global_object(
+        &MaterialEditorPcs, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), ARRAY_8026D338);
 
     unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
     dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
@@ -477,19 +472,19 @@ void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (DAT_8032ed1c == 0) {
-        DAT_8032ed18 = DAT_8032fcb4;
-        DAT_8032ed1c = 1;
+    if (gDebugSpinnerTextInitialized == 0) {
+        gDebugSpinnerText = sMaterialEditorSpinnerText;
+        gDebugSpinnerTextInitialized = 1;
     }
-    if (DAT_8032ed24 == 0) {
-        DAT_8032ed20 = 0;
-        DAT_8032ed24 = 1;
+    if (gDebugSpinnerFrameInitialized == 0) {
+        gDebugSpinnerFrame = 0;
+        gDebugSpinnerFrameInitialized = 1;
     }
 
-    DAT_8032ed20 = DAT_8032ed20 + 1;
-    int sign = DAT_8032ed20 >> 31;
-    int idx = (sign * 4 | (unsigned int)(((DAT_8032ed20 >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)DAT_8032ed18[idx]);
+    gDebugSpinnerFrame = gDebugSpinnerFrame + 1;
+    int sign = gDebugSpinnerFrame >> 31;
+    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame >> 4) * 0x40000000) + sign) >> 30) - sign;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)gDebugSpinnerText[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;
@@ -513,10 +508,10 @@ void CMaterialEditorPcs::drawViewer()
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
         GXColor matColor;
-        matColor.r = static_cast<unsigned char>((DAT_8032fca8 >> 24) & 0xFF);
-        matColor.g = static_cast<unsigned char>((DAT_8032fca8 >> 16) & 0xFF);
-        matColor.b = static_cast<unsigned char>((DAT_8032fca8 >> 8) & 0xFF);
-        matColor.a = static_cast<unsigned char>(DAT_8032fca8 & 0xFF);
+        matColor.r = static_cast<unsigned char>((kMaterialEditorDefaultColorRgba >> 24) & 0xFF);
+        matColor.g = static_cast<unsigned char>((kMaterialEditorDefaultColorRgba >> 16) & 0xFF);
+        matColor.b = static_cast<unsigned char>((kMaterialEditorDefaultColorRgba >> 8) & 0xFF);
+        matColor.a = static_cast<unsigned char>(kMaterialEditorDefaultColorRgba & 0xFF);
         GXSetChanAmbColor(GX_COLOR0A0, matColor);
         GXSetChanMatColor(GX_COLOR0A0, matColor);
 

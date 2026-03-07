@@ -1,6 +1,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
+#include "ffcc/linkage.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/mes.h"
 #include "ffcc/p_game.h"
@@ -46,7 +47,6 @@ extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
 extern float FLOAT_803309a8;
 extern char DAT_801d9ff0[];
-extern unsigned char CFlat[];
 
 /*
  * --INFO--

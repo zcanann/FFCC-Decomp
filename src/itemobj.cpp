@@ -1,4 +1,5 @@
 #include "ffcc/itemobj.h"
+#include "ffcc/linkage.h"
 #include "ffcc/maphit.h"
 #include "ffcc/math.h"
 #include "ffcc/prgobj.h"
@@ -66,7 +67,6 @@ extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, unsigned int);
 
-extern unsigned char CFlat[];
 extern CMapMng MapMng;
 extern CMath Math;
 extern float FLOAT_80331b20;

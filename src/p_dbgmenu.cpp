@@ -1,6 +1,7 @@
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/system.h"
@@ -11,7 +12,6 @@ CDbgMenuPcs DbgMenuPcs;
 class CPartMng;
 extern CPartMng PartMng;
 
-extern unsigned char CFlat[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
 extern unsigned char CharaPcs[];

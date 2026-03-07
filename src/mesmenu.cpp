@@ -1,4 +1,5 @@
 #include "ffcc/mesmenu.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_game.h"
 
 #include <math.h>
@@ -38,7 +39,6 @@ int GetWait__4CMesFv(void* mes);
 int useFlag__4CMesFii(void* mes, int flag, int value);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
-extern unsigned char CFlat[];
 extern unsigned char MenuPcs[];
 extern unsigned char Sound[];
 extern void* __vt__8CMesMenu[];

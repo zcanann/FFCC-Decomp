@@ -1,6 +1,5 @@
 #include "ffcc/baseobj.h"
-
-extern unsigned char CFlat[];
+#include "ffcc/linkage.h"
 
 void CGBaseObj::onCreate()
 {

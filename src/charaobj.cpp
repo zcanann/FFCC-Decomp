@@ -1,5 +1,6 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/fontman.h"
+#include "ffcc/linkage.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_minigame.h"
@@ -22,7 +23,6 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
-extern unsigned char CFlat[];
 extern "C" char sCharaObjDebugStatFormat[];
 
 int gCGCharaObjCreateSerial = 0;

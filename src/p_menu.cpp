@@ -20,7 +20,7 @@
 #include <math.h>
 #include <string.h>
 
-extern CMenuPcs MenuPcs;
+CMenuPcs MenuPcs;
 extern CGame Game;
 
 struct Vec4d

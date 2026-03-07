@@ -2,6 +2,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
+CSystemPcs SystemPcs;
 extern unsigned int PTR_PTR_s_CSystemPcs_801ea270[];
 
 /*

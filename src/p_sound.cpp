@@ -1,6 +1,7 @@
 #include "ffcc/p_sound.h"
 #include "ffcc/sound.h"
 
+CSoundPcs SoundPcs;
 extern unsigned char CFlat[];
 extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
 extern "C" {

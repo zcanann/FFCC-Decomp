@@ -12,6 +12,7 @@
 
 #include <dolphin/mtx.h>
 #include <string.h>
+CMapPcs MapPcs;
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMapPcs_801e900c;
 

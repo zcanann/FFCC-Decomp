@@ -7,6 +7,7 @@
 #include <dolphin/gx.h>
 #include <string.h>
 
+CDbgMenuPcs DbgMenuPcs;
 class CPartMng;
 extern CPartMng PartMng;
 

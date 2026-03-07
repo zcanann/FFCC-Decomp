@@ -6,6 +6,7 @@
 #include "string.h"
 #include "types.h"
 
+CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
 

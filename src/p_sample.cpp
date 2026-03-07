@@ -1,5 +1,6 @@
 #include "ffcc/p_sample.h"
 
+CSamplePcs SamplePcs;
 extern unsigned int PTR_PTR_s_CSamplePcs_801e8644[];
 
 /*

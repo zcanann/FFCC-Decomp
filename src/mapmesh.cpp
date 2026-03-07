@@ -668,8 +668,8 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
  */
 void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
+    int remaining = static_cast<int>(U16At(this, 0xA));
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
     while (remaining-- != 0) {
         if (entry->size != 0) {
             if (entry->materialIdx == 0xFFFF) {
@@ -713,8 +713,8 @@ void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*)
  */
 void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
+    int remaining = static_cast<int>(U16At(this, 0xA));
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
     while (remaining-- != 0) {
         if (entry->size != 0) {
             if (entry->materialIdx == 0xFFFF) {

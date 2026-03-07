@@ -7,10 +7,6 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-extern int DAT_8032e12c[];
-extern int DAT_8032f440;
-extern int DAT_8032f42c;
-extern OSSemaphore DAT_8032e120;
 extern char DAT_801e7e3e;
 extern char DAT_8021dcab;
 extern char DAT_80333d68;

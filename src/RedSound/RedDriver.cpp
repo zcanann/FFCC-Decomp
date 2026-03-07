@@ -4,14 +4,13 @@
 #include "ffcc/RedSound/RedStream.h"
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedExecute.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
 #include "dolphin/os.h"
 
 // Global objects that need initialization
-extern CRedMemory DAT_8032f480;
-extern CRedEntry DAT_8032e154;
 extern void* DAT_8032e13c;
 extern void* DAT_8032e148;
 
@@ -43,63 +42,65 @@ extern "C" {
     void AXFXSetHooks(void (*)(unsigned long), void (*)(void*));
 }
 
-// Global data references from Ghidra
-extern int DAT_8032f3c4;
-extern int DAT_8032f3c0;
-extern int DAT_8032f3c8;
-extern int gRedMemoryDebugEnabled;
-extern int DAT_8032f400;
-extern int DAT_8032f414;
-extern int DAT_8032f404;
-extern int DAT_8032f410;
-extern int DAT_8032f40c;
-extern int DAT_8032f468;
-extern int DAT_8032f484;
-extern int DAT_8032f434;
-extern int DAT_8032f430;
+// RedDriver-owned linkage (sbss/sdata tracked symbols)
+int DAT_8032f3c4;
+int DAT_8032f3c0;
+int DAT_8032f3c8;
+int gRedMemoryDebugEnabled;
+int DAT_8032f400;
+int DAT_8032f414;
+int DAT_8032f404;
+int DAT_8032f410;
+int DAT_8032f40c;
+int DAT_8032f468;
+int DAT_8032f484;
+int DAT_8032f434;
+int DAT_8032f430;
+int DAT_8032f424;
+int DAT_8032f440;
+int DAT_8032f43c;
+int DAT_8032f470;
+int DAT_8032f458;
+void* DAT_8032f3f0;
+void* DAT_8032f418;
+int DAT_8032f42c;
+int* DAT_8032f3cc;
+void* DAT_8032f3d0;
+int* DAT_8032f41c;
+int* DAT_8032f420;
+void* DAT_8032f3d4;
+void* DAT_8032f3d8;
+void* DAT_8032f3dc;
+void* DAT_8032f3f4;
+void* DAT_8032f3fc;
+unsigned int* DAT_8032f444;
+void* DAT_8032f450;
+void* DAT_8032f474;
+void** DAT_8032f428;
+void* DAT_8032f438;
+void* DAT_8032f464;
+void* DAT_8032f45c;
+void* DAT_8032f46c;
+void* DAT_8032f454;
+int DAT_8032f460;
+
+// Linkage kept external until type/size cleanup is finished.
 extern int DAT_8032f488;
 extern int DAT_8032f44c;
 extern int DAT_8032f448;
 extern int DAT_8032f47c;
 extern int DAT_8032f478;
-extern int DAT_8032f424;
-extern int DAT_8032f440;
-extern int DAT_8032f43c;
 extern int DAT_8032f3bc;
 extern int DAT_8032f3b8;
-extern int DAT_8032f470;
-extern int DAT_8032e12c;
-extern int DAT_8032f458;
+extern int DAT_8032e12c[];
 extern int DAT_8032daac;
 extern int DAT_8032dab0;
 extern void* DAT_8032dab4;
 extern int DAT_8032dab8;
-extern void* DAT_8032f3f0;
-extern void* DAT_8032f418;
-extern int DAT_8032f42c;
-extern int* DAT_8032f3cc;
-extern void* DAT_8032f3d0;
-extern void* DAT_8032f41c;
-extern void* DAT_8032f420;
-extern void* DAT_8032f3d4;
-extern void* DAT_8032f3d8;
-extern void* DAT_8032f3dc;
-extern void* DAT_8032f3f4;
-extern void* DAT_8032f3fc;
-extern unsigned int* DAT_8032f444;
-extern void* DAT_8032f450;
-extern void* DAT_8032f474;
-extern void** DAT_8032f428;
-extern void* DAT_8032f438;
 extern void* DAT_8032f3e0;
 extern void* DAT_8032f3e8;
 extern void* DAT_8032f3e4;
 extern void* DAT_8032f3ec;
-extern void* DAT_8032f464;
-extern void* DAT_8032f45c;
-extern void* DAT_8032f46c;
-extern void* DAT_8032f454;
-extern int DAT_8032f460;
 extern void* DAT_8032b860;
 extern void* DAT_8032c660;
 extern int DAT_8021ec10[];
@@ -404,9 +405,9 @@ void _SetSeBlockData(int* param_1)
     unsigned char* puVar2;
 
     uVar1 = (unsigned int)*param_1 & 3;
-    if ((&DAT_8032e12c)[uVar1] != 0) {
-        RedDelete__FPv((void*)(&DAT_8032e12c)[uVar1]);
-        (&DAT_8032e12c)[uVar1] = 0;
+    if (DAT_8032e12c[uVar1] != 0) {
+        RedDelete__FPv((void*)DAT_8032e12c[uVar1]);
+        DAT_8032e12c[uVar1] = 0;
     }
     if (param_1[1] != 0) {
         puVar2 = (unsigned char*)param_1[1];
@@ -417,7 +418,7 @@ void _SetSeBlockData(int* param_1)
         puVar2[4] = 'o';
         puVar2[5] = 'c';
         puVar2[6] = 'k';
-        (&DAT_8032e12c)[uVar1] = param_1[1];
+        DAT_8032e12c[uVar1] = param_1[1];
     }
 }
 
@@ -1256,16 +1257,16 @@ void CRedDriver::Init()
     iVar6 = 0;
     do {
         iVar5 = iVar6 + 1;
-        (&DAT_8032e12c)[iVar6] = 0;
+        DAT_8032e12c[iVar6] = 0;
         iVar6 = iVar5;
     } while (iVar5 < 4);
     DAT_8032f3d0 = RedNew__Fi(0x1000);
     memset(DAT_8032f3d0, 0, 0x1000);
     DAT_8032f418 = RedNew__Fi(0x400);
     memset(DAT_8032f418, 0, 0x400);
-    DAT_8032f41c = RedNew__Fi(0xc);
+    DAT_8032f41c = (int*)RedNew__Fi(0xc);
     memset(DAT_8032f41c, 0, 0xc);
-    DAT_8032f420 = RedNew__Fi(0xc);
+    DAT_8032f420 = (int*)RedNew__Fi(0xc);
     memset(DAT_8032f420, 0, 0xc);
     DAT_8032f3d4 = RedNew__Fi(0x2000);
     DAT_8032f3d8 = DAT_8032f3d4;

@@ -651,7 +651,11 @@ config.libs = [
             Object(NonMatching, "stopwatch.cpp"),
             Object(NonMatching, "system.cpp"),
             Object(NonMatching, "texanim.cpp"),
-            Object(NonMatching, "textureman.cpp"),
+            Object(
+                NonMatching,
+                "textureman.cpp",
+                cflags=[*cflags_game_cpp_exceptions, "-sdata 0", "-sdata2 0"],
+            ),
             Object(NonMatching, "THPDraw.cpp", cflags=[*cflags_thp, "-use_lmw_stmw on"]),
             Object(NonMatching, "THPSimple.cpp"),
             Object(NonMatching, "usb.cpp"),

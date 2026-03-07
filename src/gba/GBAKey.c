@@ -48,27 +48,19 @@ static void F25(void* task)
 static void F232(void* task)
 {
     s32 chan;
+    s32 result;
 
-    if (&__GBA[0].task == task) {
-        chan = 0;
-    } else if (&__GBA[1].task == task) {
-        chan = 1;
-    } else if (&__GBA[2].task == task) {
-        chan = 2;
-    } else if (&__GBA[3].task == task) {
-        chan = 3;
-    } else {
-        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
-        chan = -1;
-    }
+    chan = F152(task);
 
     DSPSendMailToDSP(0xabba0000);
-    while (DSPCheckMailToDSP() != 0) {
-    }
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 
-    DSPSendMailToDSP((u32)((u8*)__GBA + (chan << 8) + 0xf8));
-    while (DSPCheckMailToDSP() != 0) {
-    }
+    DSPSendMailToDSP((u32)&__GBA[chan].param);
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 }
 
 static void F252(void* task)
@@ -98,9 +90,9 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.dram_addr = 0x380;
     gba->task.dram_length = 0;
     gba->task.dsp_init_vector = 0x10;
-    gba->task.init_cb = F232;
+    gba->task.init_cb = F23;
     gba->task.res_cb = 0;
-    gba->task.done_cb = (DSPCallback)F252;
+    gba->task.done_cb = (DSPCallback)F25;
     gba->task.req_cb = 0;
     
     DSPAddTask(&gba->task);

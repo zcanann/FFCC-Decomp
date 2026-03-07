@@ -128,8 +128,6 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     _GXColor white;
     Vec posA;
     Vec posB;
-    Vec2d uvA;
-    Vec2d uvB;
     unsigned int width;
     unsigned int height;
 
@@ -192,13 +190,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         posB.y = FLOAT_80331054 - blur;
         posB.z = FLOAT_80331030;
 
-        uvA.x = FLOAT_80331030;
-        uvA.y = FLOAT_80331030;
-        uvB.x = FLOAT_80331030;
-        uvB.y = FLOAT_80331030;
-
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
-        gUtil.RenderQuad(posA, posB, white, &uvA, &uvB);
+        gUtil.RenderQuad(posA, posB, white, 0, 0);
         gUtil.EndQuadEnv();
 
         Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, width, height, 0,

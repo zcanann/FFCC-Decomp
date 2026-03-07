@@ -45,12 +45,13 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 {
 	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
 	int* track = (int*)*trackBasePtr;
+	u8 mask = (u8)attrMask;
 
 	do {
 		if ((*track != 0) && ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
-		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)attrMask) != 0)) {
-			unsigned char trackNo;
-			unsigned int* seTrack;
+		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)mask) != 0)) {
+			int trackNo;
+			int seTrackOffset;
 
 			KeyOnReserveClear((RedKeyOnDATA*)DAT_8032f3fc, (RedTrackDATA*)track);
 			track[0x3e] = 0;
@@ -58,13 +59,13 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 			*track = 0;
 			track[0x16] = 0;
 
-			trackNo = *(unsigned char*)((char*)track + 0x14e);
-			((unsigned char*)DAT_8032f444)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
-			seTrack = (unsigned int*)((unsigned char*)DAT_8032f444 + trackNo * 0xc0);
-			seTrack[0x25] &= 0xfffffff7;
-			seTrack[0x24] &= 0xfffffffe;
-			seTrack[0x24] |= 2;
-			seTrack[0x23] = 0;
+			trackNo = *(char*)((char*)track + 0x14e);
+			seTrackOffset = trackNo * 0xc0;
+			((unsigned char*)DAT_8032f444)[seTrackOffset + 0x1a] &= (unsigned char)0xfa;
+			*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x94) &= 0xfffffff7;
+			*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x90) &= 0xfffffffe;
+			*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x90) |= 2;
+			*(unsigned int*)((unsigned char*)DAT_8032f444 + seTrackOffset + 0x8c) = 0;
 
 			DAT_8032e154.SeSepHistoryManager(0, track[0x3d]);
 			if (track[6] != 0) {

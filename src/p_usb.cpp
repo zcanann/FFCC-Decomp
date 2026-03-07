@@ -250,24 +250,20 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    void* vtbl = __vt__8CManager;
-    *reinterpret_cast<void**>(&USBPcs) = vtbl;
-    *reinterpret_cast<void**>(&USBPcs) = __vt__8CProcess;
-    *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
+    volatile void** base = (volatile void**)&USBPcs;
+    *base = __vt__8CManager;
+    *base = __vt__8CProcess;
+    *base = PTR_PTR_s_CUSBPcs_801e8830;
 
-    u32* dst = m_table__7CUSBPcs;
-    u32* src0 = m_table_desc0__7CUSBPcs;
-    u32* src1 = m_table_desc1__7CUSBPcs;
-    u32* src2 = m_table_desc2__7CUSBPcs;
+    u32* table = m_table__7CUSBPcs;
 
-    dst[1] = src0[0];
-    dst[2] = src0[1];
-    dst[3] = src0[2];
-    dst[4] = src1[0];
-    dst[5] = src1[1];
-    dst[6] = src1[2];
-    dst[7] = src2[0];
-    dst[8] = src2[1];
-    dst[9] = src2[2];
+    table[1] = m_table_desc0__7CUSBPcs[0];
+    table[2] = m_table_desc0__7CUSBPcs[1];
+    table[3] = m_table_desc0__7CUSBPcs[2];
+    table[4] = m_table_desc1__7CUSBPcs[0];
+    table[5] = m_table_desc1__7CUSBPcs[1];
+    table[6] = m_table_desc1__7CUSBPcs[2];
+    table[7] = m_table_desc2__7CUSBPcs[0];
+    table[8] = m_table_desc2__7CUSBPcs[1];
+    table[9] = m_table_desc2__7CUSBPcs[2];
 }
-

@@ -1,12 +1,32 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/math.h"
-#include "ffcc/p_menu.h"
 #include "ffcc/symbols_shared.h"
-#include "ffcc/wm_menu.h"
+
+class McCtrl;
 
 extern CMath Math;
+extern unsigned char MenuPcs[];
+extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
+extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
+
+class McCtrl
+{
+public:
+    int ChkEmpty(int);
+
+    int m_previousState;
+    int m_state;
+    int m_cardChannel;
+    int m_lastResult;
+    int m_saveIndex;
+    int m_iteration;
+    int m_createFlag;
+    void* m_userBuffer;
+    unsigned int m_serialLo;
+    unsigned int m_serialHi;
+};
 
 struct MenuPcsMcLayout
 {
@@ -82,6 +102,7 @@ void CMcPcs::calc()
     MenuPcsMcLayout* menu;
     int result;
     int worldParam;
+    MenuPcsMcLayout* menuPcs;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
     menu = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs);

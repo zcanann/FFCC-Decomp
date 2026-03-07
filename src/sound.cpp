@@ -357,9 +357,11 @@ extern "C" void CalcBound__9CLine2(CLine* line)
  */
 extern "C" void __sinit_sound_cpp(void)
 {
-    *reinterpret_cast<void**>(&Sound) = &PTR_PTR_s_CSound_8021056c;
-    __ct__9CRedSoundFv(&Sound);
-    __construct_array(SoundData(&Sound).m_lineWork, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
+    unsigned char* sound = reinterpret_cast<unsigned char*>(&Sound);
+
+    *reinterpret_cast<void**>(sound) = &PTR_PTR_s_CSound_8021056c;
+    __ct__9CRedSoundFv(sound + 8);
+    __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
     __register_global_object(&Sound, __dt__6CSoundFv, &ARRAY_802f26c8);
 }
 
@@ -1904,37 +1906,37 @@ found_se:
 void CSound::StopSe3DGroup(int group)
 {
     u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u32 i = 0;
 
-    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
-        if (static_cast<s8>(*se) < 0 && *reinterpret_cast<int*>(se + 0x24) >= 0 &&
-            *reinterpret_cast<int*>(se + 0x24) == group) {
-            const int se3dHandle = *reinterpret_cast<int*>(se + 4);
+    do {
+        if ((static_cast<s8>(*se) < 0) && (-1 < *reinterpret_cast<int*>(se + 0x24)) &&
+            (*reinterpret_cast<int*>(se + 0x24) == group)) {
+            int se3dHandle = *reinterpret_cast<int*>(se + 4);
             if (se3dHandle < 0) {
                 Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
             } else {
                 u8* search = reinterpret_cast<u8*>(this) + 0x2C;
-                u8* found = 0;
-                for (int j = 0; j < 0x20; j++, search += 0xA0) {
-                    if (static_cast<s8>(search[0]) < 0 && *reinterpret_cast<int*>(search + 4) == se3dHandle) {
-                        found = search;
-                        break;
+                int count = 0x20;
+                u8* found;
+                do {
+                    if (((static_cast<s8>(search[0]) < 0 &&
+                          (found = search, *reinterpret_cast<int*>(search + 4) == se3dHandle)) ||
+                         (found = search + 0x28, static_cast<s8>(*found) < 0 &&
+                          (*reinterpret_cast<int*>(search + 0x2C) == se3dHandle)) ||
+                         (found = search + 0x50, static_cast<s8>(*found) < 0 &&
+                          (*reinterpret_cast<int*>(search + 0x54) == se3dHandle)) ||
+                         (static_cast<s8>(search[0x78]) < 0 &&
+                          (found = search + 0x78, *reinterpret_cast<int*>(search + 0x7C) == se3dHandle)))) {
+                        goto found_se;
                     }
-                    if (static_cast<s8>(search[0x28]) < 0 && *reinterpret_cast<int*>(search + 0x2C) == se3dHandle) {
-                        found = search + 0x28;
-                        break;
-                    }
-                    if (static_cast<s8>(search[0x50]) < 0 && *reinterpret_cast<int*>(search + 0x54) == se3dHandle) {
-                        found = search + 0x50;
-                        break;
-                    }
-                    if (static_cast<s8>(search[0x78]) < 0 && *reinterpret_cast<int*>(search + 0x7C) == se3dHandle) {
-                        found = search + 0x78;
-                        break;
-                    }
-                }
+                    search += 0xA0;
+                    count--;
+                } while (count != 0);
+                found = 0;
+found_se:
 
                 if (found != 0) {
-                    const int playId = *reinterpret_cast<int*>(found + 8);
+                    int playId = *reinterpret_cast<int*>(found + 8);
                     if (playId < 0) {
                         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
                     } else {
@@ -1945,7 +1947,12 @@ void CSound::StopSe3DGroup(int group)
             }
             *se &= 0x7F;
         }
-    }
+        i++;
+        se += 0x28;
+        if (0x7F < i) {
+            return;
+        }
+    } while (true);
 }
 
 /*
@@ -2434,4 +2441,3 @@ void CSound::WaitASync()
 {
 	// TODO
 }
-

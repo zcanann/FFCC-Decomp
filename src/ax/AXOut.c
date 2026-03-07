@@ -6,8 +6,8 @@
 
 static s16 __AXOutBuffer[2][320];
 static s32 __AXOutSBuffer[160];
-static u16 __AXDramImage[8192];
 static DSPTaskInfo __AXDSPTask;
+static u16 __AXDramImage[8192];
 AXPROFILE __AXLocalProfile;
 
 volatile static u32 __AXOutFrame;

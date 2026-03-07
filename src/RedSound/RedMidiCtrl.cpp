@@ -237,26 +237,24 @@ int SineSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 4
 int TriangleSwingR(int phase)
 {
-    u32 original = (u32)phase;
-    u32 flipped = original ^ 0x200;
-    u32 mode = (flipped >> 8) & 3;
-    u32 step = flipped & 0xFF;
-    int result = (int)(step << 8);
-
+    u32 mode = ((u32)phase ^ 0x200) >> 8 & 3;
+    u32 step = ((u32)phase ^ 0x200) & 0xFF;
+    int result = (int)(step * 0x100);
     if (mode == 2) {
-        result = -(int)(step << 8);
+        result = (int)(step * -0x100);
     } else if (mode < 2) {
         if (mode != 0) {
-            result = -(int)(step << 8) + 0x10000;
+            result = (int)(step * -0x100 + 0x10000);
         }
     } else if (mode < 4) {
-        result -= 0x10000;
+        result = result + -0x10000;
     }
-
-    return (int)((u32)result & 0xFFFFFF00 | (original & 0xFF));
+    return (result & 0xFFFFFF00) | (phase & 0xFF);
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--

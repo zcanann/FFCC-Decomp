@@ -9,6 +9,10 @@ extern struct {
 } CameraPcs;
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+float kPppConstrainCameraDirScaleBase = 1.0f;
+float kPppConstrainCameraDirDistanceBase = 25.0f;
+float kPppConstrainCameraDirScaleMul = 1.3333f;
+float kPppConstrainCameraDirInitScale = 0.0f;
 
 /*
  * --INFO--

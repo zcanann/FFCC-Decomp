@@ -8,7 +8,7 @@
 
 void __copy_longs_aligned(void* dst, const void* src, size_t n)
 {
-	unsigned long i;
+	unsigned long i, v1, v2;
 
 	i = (-(unsigned long)dst) & 3;
 
@@ -30,21 +30,30 @@ void __copy_longs_aligned(void* dst, const void* src, size_t n)
 
 	if (i)
 		do {
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			v1     = lps[2];
+			lpd[1] = lps[1];
+			v2     = lps[3];
+			lpd[2] = v1;
+			v1     = lps[4];
+			lpd[3] = v2;
+			v2     = lps[5];
+			lpd[4] = v1;
+			v1     = lps[6];
+			lpd[5] = v2;
+			v2     = lps[7];
+			lpd[6] = v1;
+			lps += 8;
+			v1     = *lps;
+			lpd[7] = v2;
+			lpd += 8;
+			*lpd = v1;
 		} while (--i);
 
 	i = (n & 31) >> 2;
 
 	if (i)
 		do
-			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			*++lpd = *++lps;
 		while (--i);
 
 	cps = ((unsigned char*)(lps + 1)) - 1;
@@ -62,7 +71,7 @@ void __copy_longs_aligned(void* dst, const void* src, size_t n)
 
 void __copy_longs_rev_aligned(void* dst, const void* src, size_t n)
 {
-	unsigned long i;
+	unsigned long i, v1, v2;
 
 	cps = ((unsigned char*)src) + n;
 	cpd = ((unsigned char*)dst) + n;
@@ -81,14 +90,23 @@ void __copy_longs_rev_aligned(void* dst, const void* src, size_t n)
 
 	if (i)
 		do {
-			*--lpd = *--lps;
-			*--lpd = *--lps;
-			*--lpd = *--lps;
-			*--lpd = *--lps;
-			*--lpd = *--lps;
-			*--lpd = *--lps;
-			*--lpd = *--lps;
-			*--lpd = *--lps;
+			v1      = lps[-2];
+			lpd[-1] = lps[-1];
+			v2      = lps[-3];
+			lpd[-2] = v1;
+			v1      = lps[-4];
+			lpd[-3] = v2;
+			v2      = lps[-5];
+			lpd[-4] = v1;
+			v1      = lps[-6];
+			lpd[-5] = v2;
+			v2      = lps[-7];
+			lpd[-6] = v1;
+			lps -= 8;
+			v1      = *lps;
+			lpd[-7] = v2;
+			lpd -= 8;
+			*lpd = v1;
 		} while (--i);
 
 	i = (n & 31) >> 2;

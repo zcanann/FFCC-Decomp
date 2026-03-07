@@ -103,24 +103,22 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     int iVar1;
     int iVar2;
 
-    int shapePtr = (int)shape;
-
     *(int*)(MaterialMan + 296) = *(int*)(MaterialMan + 284);
     *(int*)(MaterialMan + 300) = *(int*)(MaterialMan + 288);
     *(int*)(MaterialMan + 304) = *(int*)(MaterialMan + 292);
     *(int*)(MaterialMan + 64) = *(int*)(MaterialMan + 72);
 
     SetMaterialPart__12CMaterialManFP12CMaterialSetii((CMaterialMan*)MaterialMan, materialSet,
-                                                      *(unsigned char*)(shapePtr + 10), 0);
+                                                      *(unsigned char*)((int)shape + 10), 0);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, GX_DIRECT);
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    iVar2 = shapePtr;
-    for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
-        if (blendMode == 0xFF) {
+    iVar2 = (int)shape;
+    for (iVar1 = 0; iVar1 < *(short*)((int)shape + 2); iVar1 = iVar1 + 1) {
+        if ((char)blendMode == -1) {
             pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
         }
         GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);

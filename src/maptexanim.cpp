@@ -326,15 +326,14 @@ void CMapTexAnimSet::Calc()
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
     int found = 0;
-    int i = 0;
     int setPtr = reinterpret_cast<int>(this);
+    short material = static_cast<short>(materialId);
 
-    while (i < S16At(this, 8)) {
-        int anim = *reinterpret_cast<int*>(setPtr + 0xC);
-        void* animPtr = reinterpret_cast<void*>(anim);
-        if (S16At(animPtr, 0x12) == static_cast<short>(materialId)) {
+    for (int i = 0; i < S16At(this, 8); i++) {
+        void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
+        if (S16At(animPtr, 0x12) == material) {
+            int end = frameEnd;
             if (U8At(animPtr, 0x15) != 0) {
-                int end = frameEnd;
                 S32At(animPtr, 0x30) = frameStart;
                 S32At(animPtr, 0x2C) = frameStart;
                 if (frameEnd > S32At(animPtr, 0x38)) {
@@ -344,7 +343,6 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
                 U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
                 U8At(animPtr, 0x28) = 1;
             } else {
-                int end = frameEnd;
                 S16At(animPtr, 0xE) = static_cast<short>(frameStart);
                 F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
                 if (frameEnd > S16At(animPtr, 0xC)) {
@@ -356,7 +354,6 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
             found = 1;
         }
         setPtr += 4;
-        i++;
     }
 
     if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {

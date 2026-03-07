@@ -238,7 +238,7 @@ void __AXServiceVPB(AXVPB* pvpb) {
             u32 count;
 
             dst_ = (void*)&__AXUpdates[pvpb->index];
-            src_ = (void*)&pvpb->updateData;
+            src_ = (void*)pvpb->updateData;
 
             for (count = pvpb->updateCounter; count; count--) {
                 *(dst_) = *(src_); dst_+=1; src_+=1;

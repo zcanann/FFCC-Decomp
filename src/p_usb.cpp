@@ -24,7 +24,6 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 
-extern "C" char __vt__8CManager[];
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
 
 
@@ -258,20 +257,15 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    volatile void** base = (volatile void**)&USBPcs;
-    *base = __vt__8CManager;
-    *base = __vt__8CProcess;
-    *base = PTR_PTR_s_CUSBPcs_801e8830;
+    *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
 
-    u32* table = m_table__7CUSBPcs;
-
-    table[1] = m_table_desc0__7CUSBPcs[0];
-    table[2] = m_table_desc0__7CUSBPcs[1];
-    table[3] = m_table_desc0__7CUSBPcs[2];
-    table[4] = m_table_desc1__7CUSBPcs[0];
-    table[5] = m_table_desc1__7CUSBPcs[1];
-    table[6] = m_table_desc1__7CUSBPcs[2];
-    table[7] = m_table_desc2__7CUSBPcs[0];
-    table[8] = m_table_desc2__7CUSBPcs[1];
-    table[9] = m_table_desc2__7CUSBPcs[2];
+    m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
+    m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
+    m_table__7CUSBPcs[3] = m_table_desc0__7CUSBPcs[2];
+    m_table__7CUSBPcs[4] = m_table_desc1__7CUSBPcs[0];
+    m_table__7CUSBPcs[5] = m_table_desc1__7CUSBPcs[1];
+    m_table__7CUSBPcs[6] = m_table_desc1__7CUSBPcs[2];
+    m_table__7CUSBPcs[7] = m_table_desc2__7CUSBPcs[0];
+    m_table__7CUSBPcs[8] = m_table_desc2__7CUSBPcs[1];
+    m_table__7CUSBPcs[9] = m_table_desc2__7CUSBPcs[2];
 }

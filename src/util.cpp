@@ -1,5 +1,6 @@
 #include "ffcc/util.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/p_camera.h"
 #include <string.h>
 
 const float kUtilZero = 0.0f;
@@ -11,12 +12,15 @@ const float kUtilHermiteCoeff2 = 2.0f;
 const float kUtilHermiteCoeff3 = 3.0f;
 const float kUtilHermiteCoeffNeg2 = -2.0f;
 
-extern struct {
-    u8 _0x0[0x4];
-    Mtx m_cameraMatrix;
-    u8 _0x34[0x60];
-    Mtx44 m_screenMatrix;
-} CameraPcs;
+static inline MtxPtr GetCameraMatrix()
+{
+    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+}
+
+static inline Mtx44Ptr GetScreenMatrix()
+{
+    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+}
 
 // Vec2d definition 
 struct Vec2d {
@@ -492,8 +496,8 @@ void CUtil::EndQuadEnv()
     Mtx cameraMtx;
     Mtx44 screenMtx;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(GetCameraMatrix(), cameraMtx);
+    PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
@@ -571,8 +575,8 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXPosition3f32(x, y2, kUtilQuadDepth);
     GXColor1u32(*reinterpret_cast<u32*>(&white));
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(GetCameraMatrix(), cameraMtx);
+    PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
     GXSetColorUpdate(GX_TRUE);
@@ -648,8 +652,8 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXPosition3f32(x, y2, kUtilZero);
     GXColor1u32(*reinterpret_cast<u32*>(&color));
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(GetCameraMatrix(), cameraMtx);
+    PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
@@ -781,8 +785,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         GXTexCoord2f32(u1, v2);
     }
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(GetCameraMatrix(), cameraMtx);
+    PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 
@@ -895,8 +899,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     GXColor1u32(colorValue);
     GXTexCoord2f32(u1, v2);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(GetCameraMatrix(), cameraMtx);
+    PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 

@@ -54,6 +54,8 @@ extern "C" char s_no_texture____801da7e8[];
 extern "C" void* System;
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double fmod(double, double);
+class CCameraPcs;
+extern CCameraPcs CameraPcs;
 
 static void releaseRef(unsigned char* p, int offset)
 {
@@ -76,16 +78,15 @@ static void addRef(unsigned char* p, int offset)
     }
 }
 
-extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-    Mtx44 m_screenMatrix;
-} CameraPcs;
+static inline MtxPtr GetCameraMatrix()
+{
+    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+}
+
+static inline Mtx44Ptr GetScreenMatrix()
+{
+    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+}
 
 /*
  * --INFO--
@@ -103,8 +104,8 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
     Mtx scratchMtx;
     Mtx44 projMtx;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+    PSMTXCopy(GetCameraMatrix(), cameraMtx);
+    PSMTX44Copy(GetScreenMatrix(), projMtx);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
     if (*(int*)(p + 0x6F8) != 0) {

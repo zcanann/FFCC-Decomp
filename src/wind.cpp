@@ -9,13 +9,15 @@
 #include "ffcc/math.h"
 #include "ffcc/goout.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/system.h"
 
-extern struct {
-    char _0[4];
-    Mtx m_cameraMatrix;
-} CameraPcs;
 extern unsigned char CFlat[];
+
+static inline MtxPtr GetCameraMatrix()
+{
+    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+}
 
 const float FLOAT_80330ef0 = 0.0f;
 const float FLOAT_80330ef4 = 0.0001f;
@@ -164,7 +166,7 @@ void CWind::Draw()
     WindObject* obj = m_objects;
     Mtx viewMtx;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
+    PSMTXCopy(GetCameraMatrix(), viewMtx);
     _GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
     GXSetZCompLoc(0);
     _GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);

@@ -675,8 +675,8 @@ void CFlatRuntime::AfterFrame(int mode)
 
 			object->m_flags &= 0xEF;
 
-			typedef void (*OnDeleteFn)(CFlatRuntime*);
-			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this);
+			typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
+			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
 		}
 
 		object = next;
@@ -705,8 +705,8 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 
 	object->m_flags &= 0xEF;
 
-	typedef void (*OnDeleteFn)(CFlatRuntime*);
-	reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this);
+	typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
+	reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
 }
 
 /*
@@ -835,8 +835,8 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		request(object, 1, 0, 0, 0);
 	}
 
-	typedef void (*OnNewFn)(CFlatRuntime*);
-	reinterpret_cast<OnNewFn>((*reinterpret_cast<void***>(this))[6])(this);
+	typedef void (*OnNewFn)(CFlatRuntime*, CObject*);
+	reinterpret_cast<OnNewFn>((*reinterpret_cast<void***>(this))[6])(this, object);
 
 	return object;
 }

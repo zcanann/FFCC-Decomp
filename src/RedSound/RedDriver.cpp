@@ -1392,13 +1392,15 @@ int CRedDriver::GetProgramTime()
     int sum;
     int* p;
     int* end;
+    int value;
 
     sum = 0;
     p = DAT_8032f3cc;
-    end = p + 100;
+    end = DAT_8032f3cc + 100;
     do {
-        sum += *p;
-        p++;
+        value = *p;
+        p = p + 1;
+        sum = sum + value;
     } while (p < end);
     return sum;
 }
@@ -1892,24 +1894,21 @@ void CRedDriver::SePause(int param_1, int param_2)
  */
 int CRedDriver::GetSeVolume(int param_1, int param_2)
 {
-    int srcBuffer;
     int* seInfo;
 
-    srcBuffer = (int)DAT_8032f3f0;
-    seInfo = *(int**)(srcBuffer + 0xdbc);
+    seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
     while (1) {
-        if ((*seInfo != 0) && (((param_1 == -1) || (param_1 == seInfo[0x3e])) && (*seInfo != 0))) {
-            break;
+        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == seInfo[0x3e]))) {
+            if (param_2 == 1) {
+                return seInfo[0x15];
+            }
+            return seInfo[0x13] >> 0xc;
         }
         seInfo += 0x55;
-        if ((int*)(*(int*)(srcBuffer + 0xdbc) + 0x2a80) <= seInfo) {
+        if ((int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80) <= seInfo) {
             return 0;
         }
     }
-    if (param_2 == 1) {
-        return seInfo[0x15];
-    }
-    return seInfo[0x13] >> 0xc;
 }
 
 /*

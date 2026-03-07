@@ -286,7 +286,7 @@ int DutySwingR(int phase)
  */
 int SawSwingR(int phase)
 {
-    return static_cast<int>(static_cast<signed char>(~phase >> 2)) << 8;
+    return (int)(char)((int)((u32)phase ^ 0xFFFFFFFF) >> 2) << 8;
 }
 
 /*
@@ -1621,55 +1621,43 @@ void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrackDATA* track)
 {
-	unsigned int depth;
-	int rate;
-	void* entry;
-	
-	// Set vibrato depth from first parameter byte (12-bit shift)
-	((int*)track)[0x20] = (unsigned int)(*(unsigned char*)((int*)track)[0]) << 0xc;
-	
-	// Set vibrato rate from second parameter byte
-	if (*(char*)(((int*)track)[0] + 1) == '\0') {
-		depth = 0x100;
-	} else {
-		depth = (unsigned int)(*(unsigned char*)(((int*)track)[0] + 1));
-	}
-	((int*)track)[0x1e] = 0x100000 / depth;
-	
-	// Set vibrato type from third parameter byte (lower 4 bits) 
-	// Note: This should reference a function pointer table, using placeholder for now
-	((int*)track)[0x1d] = (int)SineSwing; // Simplified for compilation
-	
-	// Initialize vibrato state
-	*(short*)((int)track + 0x8e) = 0;
-	*(short*)(((int*)track) + 0x23) = 0;
-	
-	// Advance parameter pointer by 3 bytes
-	((int*)track)[0] = ((int*)track)[0] + 3;
-	
-	// Apply to active sound entries
-	entry = (void*)0x8032f444; // DAT_8032f444
-	do {
-		if ((RedTrackDATA*)*(int*)entry == track) {
-			rate = 0x100;
-			*(short*)((int)entry + 0x28) = *(short*)(((int*)track) + 0x24);
-			
-			if (((int*)track)[0x1e] >> 0xc != 0) {
-				rate = 0x100 / (((int*)track)[0x1e] >> 0xc);
-			}
-			
-			if (*(short*)((int)track + 0x92) == 0) {
-				rate = 0;
-			} else {
-				rate = (int)*(short*)((int)track + 0x92) * rate * 4;
-			}
-			
-			((int*)entry)[8] = rate;
-			((int*)entry)[9] = 0;
-			((int*)entry)[7] = 0;
-		}
-		entry = (void*)((int)entry + 0xc0);
-	} while (entry < (void*)(0x8032f444 + 0xc00));
+    unsigned int depth;
+    int value;
+    unsigned int* entry;
+    int* trackData = (int*)track;
+
+    trackData[0x20] = (unsigned int)(*(unsigned char*)trackData[0]) << 0xc;
+    if (*(char*)(trackData[0] + 1) == '\0') {
+        depth = 0x100;
+    } else {
+        depth = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
+    }
+
+    trackData[0x1e] = 0x100000 / depth;
+    trackData[0x1d] = PTR_SineSwing__Fi_8021e9d0[*(unsigned char*)(trackData[0] + 2) & 0xf];
+    *(short*)((int)trackData + 0x8e) = 0;
+    *(short*)(trackData + 0x23) = 0;
+    trackData[0] = trackData[0] + 3;
+
+    entry = DAT_8032f444;
+    do {
+        if ((int*)*entry == trackData) {
+            value = 0x100;
+            *(short*)(entry + 10) = *(short*)(trackData + 0x24);
+            if (trackData[0x1e] >> 0xc != 0) {
+                value = 0x100 / (trackData[0x1e] >> 0xc);
+            }
+            if (*(short*)((int)trackData + 0x92) == 0) {
+                value = 0;
+            } else {
+                value = (int)*(short*)((int)trackData + 0x92) * value * 4;
+            }
+            entry[8] = value;
+            entry[9] = 0;
+            entry[7] = 0;
+        }
+        entry = entry + 0x30;
+    } while (entry < DAT_8032f444 + 0xc00);
 }
 
 /*

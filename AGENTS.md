@@ -118,7 +118,7 @@ tools/objdiff-cli --version  # Should show v3.6.1+
 This is likely the starting point for the agent.
 
 ### Step 1 - Select Target & Gather Context (automated)
-Run the selector once. It prints random viable targets across multiple buckets (code opportunities, data opportunities, linkage opportunities, and name/linkage blockers) with symbol summaries.
+Run the selector once. It prints random viable targets across multiple buckets (code opportunities and data opportunities) with symbol summaries.
 
 ```sh
 python3 tools/agent_select_target.py
@@ -135,8 +135,6 @@ Code opportunities (3)
       - pppMoveCon (0.0% match, 36b)
       - pppMove (0.0% match, 156b)
 Data opportunities (3)
-Linkage opportunities (3)
-Name/linkage blockers (3)
 ```
 
 WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. `configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.

@@ -4,8 +4,6 @@ FFCC-Decomp Target Selection Script
 Selects random viable targets across multiple opportunity buckets:
 - Code matching opportunities
 - Data matching opportunities
-- Linkage opportunities
-- Name/linkage blocker opportunities (mangling symptoms)
 """
 
 import json
@@ -17,7 +15,7 @@ import extract_symbols
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
 WARNING_BUILD_MISMATCH = (
-    "⚠️WARNING: ADDRESS AND SIZES ARE FOR A DIFFERENT BUILD AND COULD BE WRONG. ALWAYS CHECK GHIDRA. ⚠️"
+    "WARNING: ADDRESS AND SIZES ARE FOR A DIFFERENT BUILD AND COULD BE WRONG. ALWAYS CHECK GHIDRA."
 )
 COMPLETE_THRESHOLD_PERCENT = 100
 
@@ -112,23 +110,6 @@ def summarize_symbols(label, all_info):
     return lines
 
 
-def is_mangling_blocker(entry):
-    source_file = entry["source_file"]
-    unit_name = entry["name"]
-
-    if source_file.startswith("ppp"):
-        return True
-    if "/ppp" in unit_name:
-        return True
-
-    for func in entry["top_functions"]:
-        name = func["name"]
-        match = func["match"]
-        if match <= 1.0 and (name.startswith("ppp") or "__F" in name or "__Q" in name):
-            return True
-    return False
-
-
 def extract_candidates(report_path):
     """Extract viable candidates from report.json."""
     with open(report_path) as f:
@@ -201,21 +182,10 @@ def build_buckets(candidates, per_bucket):
         if c["total_data"] > 0 and c["matched_data_percent"] < COMPLETE_THRESHOLD_PERCENT
     ]
 
-    # Linkage opportunities: near matches that are likely close to linkability.
-    linkage_candidates = [
-        c for c in candidates
-        if 90.0 <= c["fuzzy_match"] < COMPLETE_THRESHOLD_PERCENT
-    ]
-
-    # Mangling/linkage blockers: common signatures of linkage/name mismatch work.
-    mangling_candidates = [c for c in candidates if is_mangling_blocker(c)]
-
     used_units = set()
     buckets = {
         "code": select_unique_random(code_candidates, per_bucket, used_units),
         "data": select_unique_random(data_candidates, per_bucket, used_units),
-        "linkage": select_unique_random(linkage_candidates, per_bucket, used_units),
-        "mangling": select_unique_random(mangling_candidates, per_bucket, used_units),
     }
 
     return buckets
@@ -299,13 +269,6 @@ def main():
     print("=" * 70)
     print_bucket(f"Code opportunities ({per_bucket})", buckets["code"], pal_map, en_map)
     print_bucket(f"Data opportunities ({per_bucket})", buckets["data"], pal_map, en_map)
-    print_bucket(f"Linkage opportunities ({per_bucket})", buckets["linkage"], pal_map, en_map)
-    print_bucket(
-        f"Name/linkage blockers ({per_bucket})",
-        buckets["mangling"],
-        pal_map,
-        en_map,
-    )
 
     return 0
 

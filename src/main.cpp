@@ -13,6 +13,43 @@ static const char kLanguageArgIt[] = "it";
 static const char kLanguageArgFr[] = "fr";
 static const char kLanguageArgSp[] = "sp";
 
+void game(int argc, char** argv);
+
+/*
+ * --INFO--
+ * PAL Address: 0x80019f88
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void main(int argc, char** argv)
+{
+    if (argc != 0) {
+        for (int i = 1; i < argc; i++) {
+            const char* argument = argv[i];
+
+            if ((argument[0] != '-') && (argument[0] != '/')) {
+                continue;
+            }
+
+            switch (argument[1]) {
+            case 'r':
+                Pad._1b4_4_ = 1;
+                break;
+            case 'w':
+                Pad._1b8_4_ = 1;
+                break;
+            }
+        }
+    }
+
+    System.Init();
+    game(argc, argv);
+    System.Quit();
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8001a054
@@ -96,39 +133,4 @@ void game(int argc, char** argv)
 
     Game.game.Exec();
     Game.game.Quit();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80019f88
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void main(int argc, char** argv)
-{
-    if (argc != 0) {
-        for (int i = 1; i < argc; i++) {
-            const char* argument = argv[i];
-
-            if ((argument[0] != '-') && (argument[0] != '/')) {
-                continue;
-            }
-
-            switch (argument[1]) {
-            case 'r':
-                Pad._1b4_4_ = 1;
-                break;
-            case 'w':
-                Pad._1b8_4_ = 1;
-                break;
-            }
-        }
-    }
-
-    System.Init();
-    game(argc, argv);
-    System.Quit();
 }

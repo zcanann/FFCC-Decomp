@@ -288,13 +288,11 @@ void GXPokeDither(GXBool dither) {
  * JP Size: TODO
  */
 void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
+    u32 reg = (u32)compare_enable;
     volatile u16* pe_reg = (volatile u16*)__peReg;
-    u32 reg = compare_enable;
 
-    reg &= 0xFFFFFFF1;
-    reg |= func << 1;
-    reg &= 0xFFFFFFEF;
-    reg |= (u32)update_enable << 4;
+    reg = (reg & 0xFFFFFFF1) | ((u32)func << 1);
+    reg = (reg & 0xFFFFFFEF) | ((u32)update_enable << 4);
     pe_reg[0] = (u16)reg;
 }
 

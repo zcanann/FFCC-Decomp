@@ -139,7 +139,9 @@ void CGObjWork::CalcStatus()
  */
 CCaravanWork::CCaravanWork()
 {
-	*(void**)this = __vt__12CCaravanWork;
+	m_objType = -1;
+	*reinterpret_cast<unsigned int*>(&m_saveSlot) = 0xFFFFFFFF;
+	m_ownerObj = 0;
 	m_shopState = 0;
 	unk_0x3a8 = 0;
 	unk_0x3ac = 0;

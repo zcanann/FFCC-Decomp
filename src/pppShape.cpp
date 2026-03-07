@@ -120,7 +120,7 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
 
     iVar2 = (int)shape;
     for (iVar1 = 0; iVar1 < *(short*)((int)shape + 2); iVar1 = iVar1 + 1) {
-        if ((char)blendMode == -1) {
+        if (blendMode == 0xFF) {
             pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
         }
         GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);

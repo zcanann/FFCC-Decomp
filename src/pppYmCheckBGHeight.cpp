@@ -13,6 +13,17 @@ extern "C" {
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
+struct CMapCylinderRaw {
+    Vec m_bottom;
+    Vec m_direction;
+    f32 m_radius;
+    f32 m_height;
+    Vec m_top;
+    Vec m_direction2;
+    f32 m_radius2;
+    f32 m_height2;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800d8c18
@@ -43,42 +54,41 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
     if (gPppCalcDisabled == 0) {
         Vec direction;
-        float cyl[16];
+        CMapCylinderRaw cyl;
         Vec hitPos;
-        float currentY = pppMngSt->m_matrix.value[1][3];
-        float updatedY = currentY;
+        f64 currentY = pppMngStPtr->m_matrix.value[1][3];
 
         direction.x = kPppYmCheckBGHeightAxisZero;
         direction.y = kPppYmCheckBGHeightProbeDirY;
         direction.z = kPppYmCheckBGHeightAxisZero;
 
-        cyl[0] = pppMngSt->m_matrix.value[0][3];
-        cyl[1] = currentY + param_2->m_unk0x4;
-        cyl[2] = pppMngSt->m_matrix.value[2][3];
-        cyl[6] = kPppYmCheckBGHeightAxisZero;
-        cyl[7] = kPppYmCheckBGHeightProbeDirY;
-        cyl[8] = kPppYmCheckBGHeightAxisZero;
-        cyl[9] = kPppYmCheckBGHeightAxisZero;
-        cyl[10] = kPppYmCheckBGHeightCylinderScale;
-        cyl[11] = kPppYmCheckBGHeightCylinderScale;
-        cyl[12] = kPppYmCheckBGHeightCylinderScale;
-        cyl[13] = kPppYmCheckBGHeightCylinderOffset;
-        cyl[14] = kPppYmCheckBGHeightCylinderOffset;
-        cyl[15] = kPppYmCheckBGHeightCylinderOffset;
+        cyl.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
+        cyl.m_bottom.y = (f32)(currentY + (f64)param_2->m_unk0x4);
+        cyl.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
+        cyl.m_direction.x = kPppYmCheckBGHeightAxisZero;
+        cyl.m_direction.y = kPppYmCheckBGHeightProbeDirY;
+        cyl.m_direction.z = kPppYmCheckBGHeightAxisZero;
+        cyl.m_radius = kPppYmCheckBGHeightAxisZero;
+        cyl.m_height = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_top.x = kPppYmCheckBGHeightAxisZero;
+        cyl.m_top.y = kPppYmCheckBGHeightAxisZero;
+        cyl.m_top.z = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_direction2.x = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_direction2.y = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_direction2.z = kPppYmCheckBGHeightCylinderOffset;
+        cyl.m_radius2 = kPppYmCheckBGHeightCylinderOffset;
+        cyl.m_height2 = kPppYmCheckBGHeightCylinderOffset;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)cyl, &direction, -1) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if (currentY - param_2->m_unk0xC > hitPos.y) {
-                updatedY = currentY;
-            } else {
-                updatedY = hitPos.y + param_2->m_unk0x8;
-            }
+        if ((CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &direction, 0xFFFFFFFF) != 0) &&
+            (CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos),
+             (f32)(currentY - (f64)param_2->m_unk0xC) <= hitPos.y)) {
+            currentY = (f64)(hitPos.y + param_2->m_unk0x8);
         }
 
-        pppMngSt->m_position.y = updatedY;
-        pppMngSt->m_savedPosition.y = updatedY;
-        pppMngSt->m_paramVec0.y = updatedY;
-        pppMngSt->m_previousPosition.y = updatedY;
+        pppMngSt->m_position.y = (f32)currentY;
+        pppMngSt->m_savedPosition.y = (f32)currentY;
+        pppMngSt->m_paramVec0.y = (f32)currentY;
+        pppMngSt->m_previousPosition.y = (f32)currentY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

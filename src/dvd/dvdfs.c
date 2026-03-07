@@ -9,10 +9,10 @@ typedef struct FSTEntry {
     /* 0x08 */ unsigned int nextEntryOrLength;
 } FSTEntry;
 
-static OSBootInfo* BootInfo;
+static OSBootInfo* BootInfo_8032F060;
 static FSTEntry* FstStart_8032F064;
-char* FstStringStart;
-static u32 MaxEntryNum;
+char* FstStringStart_8032F068;
+static u32 MaxEntryNum_8032F06C;
 static u32 sDvdfsCurrentDirEntry;
 
 OSThreadQueue __DVDThreadQueue;
@@ -31,11 +31,11 @@ static void cbForPrepareStreamAsync(s32 result, DVDCommandBlock* block);
 static void cbForPrepareStreamSync(s32 result, DVDCommandBlock* block);
 
 void __DVDFSInit(void) {
-    BootInfo = (void*)OSPhysicalToCached(0);
-    FstStart_8032F064 = BootInfo->FSTLocation;
+    BootInfo_8032F060 = (void*)OSPhysicalToCached(0);
+    FstStart_8032F064 = BootInfo_8032F060->FSTLocation;
     if (FstStart_8032F064) {
-        MaxEntryNum = FstStart_8032F064->nextEntryOrLength;
-        FstStringStart = (char*)FstStart_8032F064 + (MaxEntryNum* sizeof(FSTEntry));
+        MaxEntryNum_8032F06C = FstStart_8032F064->nextEntryOrLength;
+        FstStringStart_8032F068 = (char*)FstStart_8032F064 + (MaxEntryNum_8032F06C* sizeof(FSTEntry));
     }
 }
 
@@ -142,7 +142,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
                 continue;
             }
         
-            stringPtr = FstStringStart + stringOff(i);
+            stringPtr = FstStringStart_8032F068 + stringOff(i);
         
             if (isSame(ptr, stringPtr) == TRUE) {
                 goto next_hier;
@@ -163,10 +163,10 @@ next_hier:
 
 BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo) {
     ASSERTMSGLINE(455, fileInfo, "DVDFastOpen(): null pointer is specified to file info address  ");
-    ASSERTMSG1LINE(458, (entrynum >= 0) && ((u32) entrynum < (u32) MaxEntryNum), "DVDFastOpen(): specified entry number '%d' is out of range  ", entrynum);
+    ASSERTMSG1LINE(458, (entrynum >= 0) && ((u32) entrynum < (u32) MaxEntryNum_8032F06C), "DVDFastOpen(): specified entry number '%d' is out of range  ", entrynum);
     ASSERTMSG1LINE(461, !entryIsDir(entrynum), "DVDFastOpen(): entry number '%d' is assigned to a directory  ", entrynum);
     
-    if (entrynum < 0 || entrynum >= MaxEntryNum || entryIsDir(entrynum)) {
+    if (entrynum < 0 || entrynum >= MaxEntryNum_8032F06C || entryIsDir(entrynum)) {
         return FALSE;
     }
     
@@ -231,7 +231,7 @@ static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
         return 0;
     }
     
-    name = FstStringStart + stringOff(entry);
+    name = FstStringStart_8032F068 + stringOff(entry);
     
     loc = entryToPath(parentDir(entry), path, maxlen);
     
@@ -249,7 +249,7 @@ static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
 static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
     u32 loc;
     
-    ASSERTMSG1LINE(622, (entrynum >= 0) && (entrynum < MaxEntryNum), "DVDConvertEntrynumToPath: specified entrynum(%d) is out of range  ", entrynum);
+    ASSERTMSG1LINE(622, (entrynum >= 0) && (entrynum < MaxEntryNum_8032F06C), "DVDConvertEntrynumToPath: specified entrynum(%d) is out of range  ", entrynum);
     ASSERTMSG1LINE(624, maxlen > 1, "DVDConvertEntrynumToPath: maxlen should be more than 1 (%d is specified)", maxlen);
     ASSERTMSGLINE(629, entryIsDir(entrynum), "DVDConvertEntrynumToPath: cannot convert an entry num for a file to path  ");
     
@@ -441,10 +441,10 @@ s32 DVDGetFileInfoStatus(const DVDFileInfo* fileInfo) {
 
 BOOL DVDFastOpenDir(s32 entrynum, DVDDir* dir) {
     ASSERTMSGLINE(1048, dir, "DVDFastOpenDir(): null pointer is specified to dir structure address  ");
-    ASSERTMSG1LINE(1051, entrynum >= 0 && entrynum < MaxEntryNum, "DVDFastOpenDir(): specified entry number \'%d\' is out of range  ", entrynum);
+    ASSERTMSG1LINE(1051, entrynum >= 0 && entrynum < MaxEntryNum_8032F06C, "DVDFastOpenDir(): specified entry number \'%d\' is out of range  ", entrynum);
     ASSERTMSG1LINE(1054, entryIsDir(entrynum), "DVDFastOpenDir(): entry number \'%d\' is assigned to a file  ", entrynum);
 
-    if (entrynum < 0 || entrynum >= MaxEntryNum || !entryIsDir(entrynum)) {
+    if (entrynum < 0 || entrynum >= MaxEntryNum_8032F06C || !entryIsDir(entrynum)) {
         return FALSE;
     }
 
@@ -488,7 +488,7 @@ int DVDReadDir(DVDDir* dir, DVDDirEntry* dirent) {
     }
     dirent->entryNum = loc;
     dirent->isDir = entryIsDir(loc);
-    dirent->name = FstStringStart + stringOff(loc);
+    dirent->name = FstStringStart_8032F068 + stringOff(loc);
     dir->location = entryIsDir(loc) ? nextDir(loc) : loc + 1;
     return 1;
 }
@@ -502,7 +502,7 @@ void DVDRewindDir(DVDDir* dir) {
 }
 
 void* DVDGetFSTLocation(void) {
-    return BootInfo->FSTLocation;
+    return BootInfo_8032F060->FSTLocation;
 }
 
 #define RoundUp32KB(x) (((u32)(x) + 32 * 1024 - 1) & ~(32 * 1024 - 1))

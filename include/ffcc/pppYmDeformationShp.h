@@ -12,9 +12,10 @@ struct Vec4d;
 struct pppYmDeformationShpUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
+    s32 m_unk_0x8;
     f32 m_payload[6];
     s16 m_payload3;
-    u8 m_pad_0x22[0x1a];
+    u8 m_pad_0x26[0x16];
 };
 struct pppYmDeformationShpUnkC {
     u8 m_pad_0x0[0xc];
@@ -45,4 +46,3 @@ void pppRenderYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, p
 #endif
 
 #endif // _PPP_YMDEFORMATIONSHP_H_
-

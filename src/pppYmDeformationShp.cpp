@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
 
 #include <dolphin/gx.h>
@@ -38,8 +39,6 @@ struct _pppEnvStYmDeformationShp {
 	CMapMesh** m_mapMeshPtr;
 };
 
-
-extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -239,12 +238,12 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 
 	state = (FrameState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		param_2->m_payload[0], pppYmDeformationShp_, param_2->m_graphId, &state->m_values[0], &state->m_values[1],
-		&state->m_values[2], &param_2->m_payload[1], &param_2->m_payload[2]);
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		param_2->m_payload[3], pppYmDeformationShp_, param_2->m_graphId, &state->m_values[3], &state->m_values[4],
-		&state->m_values[5], &param_2->m_payload[4], &param_2->m_payload[5]);
+	CalcGraphValue(
+		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_values[0], state->m_values[1],
+		state->m_values[2], param_2->m_payload[0], param_2->m_payload[1], param_2->m_payload[2]);
+	CalcGraphValue(
+		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_values[3], state->m_values[4],
+		state->m_values[5], param_2->m_payload[3], param_2->m_payload[4], param_2->m_payload[5]);
 
 	if (gPppInConstructor != 0) {
 		return;
@@ -745,6 +744,5 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 }
-
 
 

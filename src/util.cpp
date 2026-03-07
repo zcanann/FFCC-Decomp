@@ -262,7 +262,7 @@ void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
  */
 void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
 {
-    unsigned int scaleInt = (unsigned int)(1 << shift);
+    int scaleInt = 1 << shift;
     float y = in.y;
     float z = in.z;
     double scaleY = (double)scaleInt;
@@ -1303,4 +1303,3 @@ void CUtil::SNl()
 {
 	// TODO
 }
-

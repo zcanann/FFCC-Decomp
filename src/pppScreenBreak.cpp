@@ -33,13 +33,13 @@ struct Vec4d {
 };
 
 struct pppScreenBreakUnkB {
-    float m_dataValIndex;
+    s32 m_graphId;
+    s32 m_dataValIndex;
     u16 m_initWOrk;
     u16 _pad6;
     float m_stepValue;
-    s32 m_graphId;
     float m_arg3;
-    u8* m_payload;
+    u8 m_payload[0x20];
 };
 
 struct pppScreenBreakUnkC {

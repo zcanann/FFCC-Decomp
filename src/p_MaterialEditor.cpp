@@ -29,6 +29,7 @@ extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
+extern "C" void SetViewerSRT__10CCameraPcsFPC3SRT(void*, const void*);
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -391,71 +392,73 @@ void CMaterialEditorPcs::ClearTextureData()
  */
 void CMaterialEditorPcs::calcViewer()
 {
-	USBPcs.mccReadData();
-	
-	if (m_usbStream.IsUSBStreamDataDone()) {
-		SetUSBData();
-		m_usbStream.SetUSBStreamDataDone();
-	}
-	
-	// Set up scaling and translation vectors
-	float scaleX = 4.0f;
-	float scaleY = 4.0f; 
-	float scaleZ = 4.0f;
-	float transX = 1.0f;
-	float transY = 1.0f;
-	float transZ = 1.0f;
-	
-	// Set viewer position
-	float posX = field268_0x15c.x;
-	float posY = field268_0x15c.y;
-	float posZ = -field268_0x15c.z;
-	
-	// Call SetViewerSRT with SRT structure
-	struct SRT {
-		float x, y, z;
-	} srtPos = { posX, posY, posZ };
-	// CameraPcs.SetViewerSRT(&srtPos);
-	
-	Mtx cameraMatrix;
-	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
-	
-	// Copy matrix data from fields to m_unkMatrix
-	m_unkMatrix.value[0][0] = *(float*)&field_0x12c;
-	m_unkMatrix.value[0][1] = *(float*)&field_0x130;
-	m_unkMatrix.value[0][2] = *(float*)&field_0x134;
-	m_unkMatrix.value[0][3] = *(float*)&field_0x138;
-	m_unkMatrix.value[1][0] = *(float*)&field_0x13c;
-	m_unkMatrix.value[1][1] = *(float*)&field_0x140;
-	m_unkMatrix.value[1][2] = *(float*)&field_0x144;
-	m_unkMatrix.value[1][3] = *(float*)&field_0x148;
-	m_unkMatrix.value[2][0] = *(float*)&field_0x14c;
-	m_unkMatrix.value[2][1] = *(float*)&field_0x150;
-	m_unkMatrix.value[2][2] = *(float*)&field_0x154;
-	m_unkMatrix.value[2][3] = *(float*)&field_0x158;
-	
-	PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
-	
-	// Negate specific matrix elements
-	m_unkMatrix.value[0][1] = -m_unkMatrix.value[0][1];
-	m_unkMatrix.value[1][1] = -m_unkMatrix.value[1][1]; 
-	m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
-	m_unkMatrix.value[2][0] = -m_unkMatrix.value[2][0];
-	m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
-	m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
-	
-	// Apply scaling transformations
-	Mtx scaleMatrix;
-	PSMTXIdentity(scaleMatrix);
-	scaleMatrix[1][1] = -1.0f;
-	PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
-	
-	PSMTXIdentity(scaleMatrix);
-	scaleMatrix[2][2] = -1.0f;
-	PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
-	
-	PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);
-	GXLoadPosMtxImm(cameraMatrix, 0);
+    struct ViewerSRT {
+        float scaleX;
+        float scaleY;
+        float scaleZ;
+        float rotX;
+        float rotY;
+        float rotZ;
+        float transX;
+        float transY;
+        float transZ;
+    };
+
+    USBPcs.mccReadData();
+
+    if (m_usbStream.IsUSBStreamDataDone()) {
+        SetUSBData();
+        m_usbStream.SetUSBStreamDataDone();
+    }
+
+    ViewerSRT srt;
+    srt.scaleX = 4.0f;
+    srt.scaleY = 4.0f;
+    srt.scaleZ = 4.0f;
+    srt.rotX = 1.0f;
+    srt.rotY = 1.0f;
+    srt.rotZ = 1.0f;
+    srt.transX = field268_0x15c.x;
+    srt.transY = field268_0x15c.y;
+    srt.transZ = -field268_0x15c.z;
+    SetViewerSRT__10CCameraPcsFPC3SRT(&CameraPcs, &srt);
+
+    Mtx cameraMatrix;
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
+
+    m_unkMatrix.value[0][0] = *reinterpret_cast<float*>(&field_0x12c);
+    m_unkMatrix.value[0][1] = *reinterpret_cast<float*>(&field_0x130);
+    m_unkMatrix.value[0][2] = *reinterpret_cast<float*>(&field_0x134);
+    m_unkMatrix.value[0][3] = *reinterpret_cast<float*>(&field_0x138);
+    m_unkMatrix.value[1][0] = *reinterpret_cast<float*>(&field_0x13c);
+    m_unkMatrix.value[1][1] = *reinterpret_cast<float*>(&field_0x140);
+    m_unkMatrix.value[1][2] = *reinterpret_cast<float*>(&field_0x144);
+    m_unkMatrix.value[1][3] = *reinterpret_cast<float*>(&field_0x148);
+    m_unkMatrix.value[2][0] = *reinterpret_cast<float*>(&field_0x14c);
+    m_unkMatrix.value[2][1] = *reinterpret_cast<float*>(&field_0x150);
+    m_unkMatrix.value[2][2] = *reinterpret_cast<float*>(&field_0x154);
+    m_unkMatrix.value[2][3] = *reinterpret_cast<float*>(&field_0x158);
+
+    PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
+
+    m_unkMatrix.value[0][1] = -m_unkMatrix.value[0][1];
+    m_unkMatrix.value[1][1] = -m_unkMatrix.value[1][1];
+    m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
+    m_unkMatrix.value[2][0] = -m_unkMatrix.value[2][0];
+    m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
+    m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
+
+    Mtx scaleMatrix;
+    PSMTXIdentity(scaleMatrix);
+    scaleMatrix[1][1] = -1.0f;
+    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
+
+    PSMTXIdentity(scaleMatrix);
+    scaleMatrix[2][2] = -1.0f;
+    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
+
+    PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);
+    GXLoadPosMtxImm(cameraMatrix, 0);
 }
 
 /*

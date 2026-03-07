@@ -130,7 +130,7 @@ public:
     void TryReleaseAnimBank(int);
     void SetSpecularAlpha(int);
     void InitEnv(int);
-    void GetNumTexShadow();
+    int GetNumTexShadow();
     void GetTexShadow(int, int, _GXTexObj*, Vec*, float(*)[3][4]);
     void draw();
     void drawBefore();

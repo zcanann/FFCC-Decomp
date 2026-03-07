@@ -10,12 +10,37 @@
 
 extern int gPppCalcDisabled;
 
+struct ConformState {
+    Vec m_normal;
+    u8 m_initialized;
+    u8 _pad[3];
+};
+
+struct ConformCylinderQuery {
+    Vec m_pos;
+    Vec m_fieldC;
+    Vec m_field18;
+    Vec m_field24;
+    f32 m_field30;
+};
+
 extern "C" {
-s32 CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
+s32 CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 }
+
+struct CMapCylinderRaw {
+    Vec m_bottom;
+    Vec m_direction;
+    f32 m_radius;
+    f32 m_height;
+    Vec m_top;
+    Vec m_direction2;
+    f32 m_radius2;
+    f32 m_height2;
+};
 
 /*
  * --INFO--
@@ -59,69 +84,39 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 ownerY;
     _pppMngSt* pppMngSt;
     s32 hitFound;
-    f32* serializedState;
-    Vec* owner;
+    ConformState* state;
+    u8* owner;
     f64 trigValue;
-    f32 local_1b8;
-    f32 local_1b4;
-    f32 local_1b0;
     Quaternion local_1ac;
     Quaternion local_19c;
     Quaternion local_18c;
-    f32 local_17c;
-    f32 local_178;
-    f32 local_174;
     Vec local_170;
     Vec local_164;
     Vec local_158;
     Vec local_14c;
     Vec local_140;
-    f32 local_134;
-    f32 local_130;
-    f32 local_12c;
-    f32 local_11c;
-    f32 local_118;
-    f32 local_114;
-    f32 local_110;
-    f32 local_10c;
-    f32 local_108;
-    f32 local_104;
-    f32 local_100;
-    f32 local_fc;
-    f32 local_f8;
-    f32 local_f4;
-    f32 local_f0;
-    f32 local_ec;
-    f32 local_dc;
-    f32 local_d8;
-    f32 local_d4;
-    f32 local_d0;
-    f32 local_cc;
-    f32 local_c8;
-    f32 local_c4;
-    f32 local_c0;
-    f32 local_bc;
-    f32 local_b8;
+    CMapCylinderRaw cylinder;
+    Vec rayDirection;
     Mtx scaleMtx;
     Mtx basisMtx;
 
     pppMngSt = pppMngStPtr;
     if (gPppCalcDisabled == 0) {
-        owner = *(Vec**)((u8*)pppMngStPtr + 0xd8);
+        owner = *(u8**)((u8*)pppMngStPtr + 0xd8);
         hitFound = 0;
         matrixX = pppMngStPtr->m_matrix.value[0][3];
         matrixY = pppMngStPtr->m_matrix.value[1][3];
         matrixZ = pppMngStPtr->m_matrix.value[2][3];
-        serializedState = (f32*)((u8*)pppConformBGNormal + 0x80 + *param3->m_serializedDataOffsets);
+        state = (ConformState*)((u8*)pppConformBGNormal + 0x80 + *param3->m_serializedDataOffsets);
 
         if ((Game.game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
 
             if (mode == 0) {
-                if (((s32)((u32)*(u8*)((u8*)owner + 0x50) << 24) < 0)) {
-                    local_164.x = *(f32*)((u8*)owner + 0x4ec);
-                    local_164.y = *(f32*)((u8*)owner + 0x4f0);
-                    local_164.z = *(f32*)((u8*)owner + 0x4f4);
+                if (((s32)((u32)*(u8*)(owner + 0x50) << 24) < 0)) {
+                    local_164.x = *(f32*)(owner + 0x4ec);
+                    local_164.y = *(f32*)(owner + 0x4f0);
+                    local_164.z = *(f32*)(owner + 0x4f4);
                 } else {
                     local_164.x = kPppConformBgNormalZero;
                     local_164.y = kPppConformBgNormalOne;
@@ -131,25 +126,29 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 hitFound = 1;
                 Game.game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
             } else if (mode == 2) {
-                local_17c = kPppConformBgNormalZero;
-                local_178 = kPppConformBgNormalDownRayY;
-                local_174 = kPppConformBgNormalZero;
-                local_f0 = matrixY + param2->m_arg3;
-                local_c4 = kPppConformBgNormalCylinderRadius;
-                local_c8 = kPppConformBgNormalCylinderRadius;
-                local_cc = kPppConformBgNormalCylinderRadius;
-                local_b8 = kPppConformBgNormalCylinderHeight;
-                local_bc = kPppConformBgNormalCylinderHeight;
-                local_c0 = kPppConformBgNormalCylinderHeight;
-                local_dc = kPppConformBgNormalZero;
-                local_d8 = kPppConformBgNormalDownRayY;
-                local_d4 = kPppConformBgNormalZero;
-                local_d0 = kPppConformBgNormalZero;
-                local_f4 = matrixX;
-                local_ec = matrixZ;
+                rayDirection.x = kPppConformBgNormalZero;
+                rayDirection.y = kPppConformBgNormalDownRayY;
+                rayDirection.z = kPppConformBgNormalZero;
+
+                cylinder.m_bottom.x = matrixX;
+                cylinder.m_bottom.y = matrixY + param2->m_arg3;
+                cylinder.m_bottom.z = matrixZ;
+                cylinder.m_direction.x = kPppConformBgNormalCylinderRadius;
+                cylinder.m_direction.y = kPppConformBgNormalCylinderRadius;
+                cylinder.m_direction.z = kPppConformBgNormalCylinderRadius;
+                cylinder.m_radius = kPppConformBgNormalCylinderHeight;
+                cylinder.m_height = kPppConformBgNormalCylinderHeight;
+                cylinder.m_top.x = kPppConformBgNormalCylinderHeight;
+                cylinder.m_top.y = kPppConformBgNormalZero;
+                cylinder.m_top.z = kPppConformBgNormalDownRayY;
+                cylinder.m_direction2.x = kPppConformBgNormalZero;
+                cylinder.m_direction2.y = kPppConformBgNormalZero;
+                cylinder.m_direction2.z = kPppConformBgNormalZero;
+                cylinder.m_radius2 = kPppConformBgNormalZero;
+                cylinder.m_height2 = kPppConformBgNormalZero;
 
                 hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, &local_f4, &local_17c, 0xffffffff);
+                    &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
                 if (hitFound == 0) {
                     local_164.x = kPppConformBgNormalZero;
                     local_164.y = kPppConformBgNormalOne;
@@ -166,36 +165,36 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             }
 
-            if (*(u8*)(serializedState + 3) == 0) {
-                *(u8*)(serializedState + 3) = 1;
-                serializedState[0] = local_164.x;
-                serializedState[1] = local_164.y;
-                serializedState[2] = local_164.z;
+            if (state->m_initialized == 0) {
+                state->m_initialized = 1;
+                state->m_normal.x = local_164.x;
+                state->m_normal.y = local_164.y;
+                state->m_normal.z = local_164.z;
             }
 
-            local_18c.x = serializedState[0];
-            local_18c.y = serializedState[1];
-            local_18c.z = serializedState[2];
+            local_18c.x = state->m_normal.x;
+            local_18c.y = state->m_normal.y;
+            local_18c.z = state->m_normal.z;
             local_18c.w = kPppConformBgNormalOne;
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
             local_19c.w = kPppConformBgNormalOne;
             C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
-            serializedState[0] = local_1ac.x;
-            serializedState[1] = local_1ac.y;
-            serializedState[2] = local_1ac.z;
+            state->m_normal.x = local_1ac.x;
+            state->m_normal.y = local_1ac.y;
+            state->m_normal.z = local_1ac.z;
 
-            local_164.x = serializedState[0];
-            local_164.y = serializedState[1];
-            local_164.z = serializedState[2];
+            local_164.x = state->m_normal.x;
+            local_164.y = state->m_normal.y;
+            local_164.z = state->m_normal.z;
             PSVECNormalize(&local_164, &local_158);
 
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
-                trigValue = sin((f64)*(f32*)((u8*)owner + 0x1a8));
+                trigValue = sin((f64)*(f32*)(owner + 0x1a8));
                 local_14c.x = (f32)trigValue;
                 local_14c.y = kPppConformBgNormalZero;
-                trigValue = cos((f64)*(f32*)((u8*)owner + 0x1a8));
+                trigValue = cos((f64)*(f32*)(owner + 0x1a8));
                 local_14c.z = (f32)trigValue;
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
                 PSVECNormalize(&local_140, &local_140);
@@ -233,29 +232,33 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[1][3] = *(f32*)((u8*)owner + 0x160);
                     pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
                 } else if ((((*(u8*)((u8*)owner + 0x9a) & 1) == 0) || (*(s32*)((u8*)owner + 0x18c) == 0))) {
-                    local_134 = *(f32*)((u8*)owner + 0x15c);
-                    local_130 = *(f32*)((u8*)owner + 0x160);
-                    local_12c = *(f32*)((u8*)owner + 0x164);
-                    local_1b8 = kPppConformBgNormalZero;
-                    local_1b4 = kPppConformBgNormalDownRayY;
-                    local_1b0 = kPppConformBgNormalZero;
-                    local_104 = kPppConformBgNormalCylinderRadius;
-                    local_108 = kPppConformBgNormalCylinderRadius;
-                    local_10c = kPppConformBgNormalCylinderRadius;
-                    local_f8 = kPppConformBgNormalCylinderHeight;
-                    local_fc = kPppConformBgNormalCylinderHeight;
-                    local_100 = kPppConformBgNormalCylinderHeight;
-                    local_11c = kPppConformBgNormalZero;
-                    local_118 = kPppConformBgNormalDownRayY;
-                    local_114 = kPppConformBgNormalZero;
-                    local_110 = kPppConformBgNormalZero;
+                    rayDirection.x = kPppConformBgNormalZero;
+                    rayDirection.y = kPppConformBgNormalDownRayY;
+                    rayDirection.z = kPppConformBgNormalZero;
+
+                    cylinder.m_bottom.x = *(f32*)((u8*)owner + 0x15c);
+                    cylinder.m_bottom.y = *(f32*)((u8*)owner + 0x160);
+                    cylinder.m_bottom.z = *(f32*)((u8*)owner + 0x164);
+                    cylinder.m_direction.x = kPppConformBgNormalCylinderRadius;
+                    cylinder.m_direction.y = kPppConformBgNormalCylinderRadius;
+                    cylinder.m_direction.z = kPppConformBgNormalCylinderRadius;
+                    cylinder.m_radius = kPppConformBgNormalCylinderHeight;
+                    cylinder.m_height = kPppConformBgNormalCylinderHeight;
+                    cylinder.m_top.x = kPppConformBgNormalCylinderHeight;
+                    cylinder.m_top.y = kPppConformBgNormalZero;
+                    cylinder.m_top.z = kPppConformBgNormalDownRayY;
+                    cylinder.m_direction2.x = kPppConformBgNormalZero;
+                    cylinder.m_direction2.y = kPppConformBgNormalZero;
+                    cylinder.m_direction2.z = kPppConformBgNormalZero;
+                    cylinder.m_radius2 = kPppConformBgNormalZero;
+                    cylinder.m_height2 = kPppConformBgNormalZero;
 
                     hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                        &MapMng, &local_134, &local_1b8, 0xffffffff);
+                        &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
                     if (hitFound == 0) {
-                        pppMngStPtr->m_matrix.value[0][3] = *(f32*)((u8*)owner + 0x15c);
+                        pppMngStPtr->m_matrix.value[0][3] = *(f32*)(owner + 0x15c);
                         pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                        pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
+                        pppMngStPtr->m_matrix.value[2][3] = *(f32*)(owner + 0x164);
                     } else {
                         CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
                         pppMngStPtr->m_matrix.value[0][3] = local_170.x;
@@ -263,10 +266,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         pppMngStPtr->m_matrix.value[2][3] = local_170.z;
                     }
                 } else {
-                    ownerY = *(f32*)(*(s32*)((u8*)owner + 0x18c) + 0x160);
-                    pppMngStPtr->m_matrix.value[0][3] = *(f32*)((u8*)owner + 0x15c);
+                    ownerY = *(f32*)(*(s32*)(owner + 0x18c) + 0x160);
+                    pppMngStPtr->m_matrix.value[0][3] = *(f32*)(owner + 0x15c);
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
-                    pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
+                    pppMngStPtr->m_matrix.value[2][3] = *(f32*)(owner + 0x164);
                 }
             } else if (mode == 1) {
                 if (hitFound == 0) {
@@ -289,7 +292,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         }
     }
 }
-
 
 
 

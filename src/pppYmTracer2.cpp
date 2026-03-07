@@ -8,6 +8,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+extern int gPppCalcDisabled;
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
@@ -22,7 +23,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
-extern int gPppCalcDisabled;
 extern float FLOAT_80331840;
 extern float FLOAT_80331844;
 extern float FLOAT_80331848;

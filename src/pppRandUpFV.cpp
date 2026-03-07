@@ -3,6 +3,7 @@
 #include "types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
+extern int gPppCalcDisabled;
 extern f32 gPppDefaultValueBuffer[];
 extern "C" f32 RandF__5CMathFv(CMath*);
 

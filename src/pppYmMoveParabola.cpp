@@ -5,8 +5,8 @@
 #include "ffcc/p_game.h"
 #include "types.h"
 #include "dolphin/mtx.h"
-
 extern int gPppCalcDisabled;
+
 extern _pppMngSt* pppMngStPtr;
 extern int ppvSinTbl;
 

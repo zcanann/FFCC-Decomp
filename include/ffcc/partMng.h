@@ -432,5 +432,7 @@ extern CPartMng PartMng;
 
 extern _pppEnvSt* pppEnvStPtr;
 extern _pppMngSt* pppMngStPtr;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 
 #endif

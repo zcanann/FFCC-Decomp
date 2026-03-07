@@ -8,6 +8,8 @@
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
 #include <string.h>
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 
 struct _pppMngStEmission {
     u8 _pad0[0xD8];
@@ -31,8 +33,6 @@ extern "C" int rand(void);
 extern CMath Math;
 extern CameraPcsForEmission CameraPcs;
 extern char MaterialMan[];
-extern int gPppCalcDisabled;
-extern u8 gPppInConstructor;
 extern char DAT_803311fc[];
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;

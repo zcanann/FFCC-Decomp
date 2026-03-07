@@ -14,6 +14,8 @@
 #include "ffcc/stopwatch.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 
 class CPartPcs;
 
@@ -76,15 +78,27 @@ extern CPartPcs PartPcs;
 extern unsigned char MapPcs[];
 extern void* CAMemCacheSet;
 extern PPPCREATEPARAM g_dcp;
-extern "C" unsigned char DAT_8032ed68 = 0;
-extern "C" int DAT_8032ed6c = 0;
-extern "C" int DAT_8032ed74 = 0;
-extern "C" unsigned char gPppInConstructor = 0;
-extern "C" unsigned char gPppInSubFrameCalc = 0;
-extern "C" int DAT_8032ed7c = 0;
-extern "C" unsigned char DAT_8032ed90 = 0;
-extern "C" unsigned char DAT_8032ed91 = 0;
-extern "C" int gPppCalcDisabled = 0;
+extern "C" unsigned char DAT_8032ed68;
+extern "C" int DAT_8032ed6c;
+extern "C" int DAT_8032ed74;
+extern "C" unsigned char gPppInConstructor;
+extern "C" unsigned char gPppInSubFrameCalc;
+extern "C" int DAT_8032ed7c;
+extern "C" unsigned char DAT_8032ed90;
+extern "C" unsigned char DAT_8032ed91;
+extern "C" int gPppCalcDisabled;
+
+extern "C" {
+unsigned char DAT_8032ed68 = 0;
+int DAT_8032ed6c = 0;
+int DAT_8032ed74 = 0;
+unsigned char gPppInConstructor = 0;
+unsigned char gPppInSubFrameCalc = 0;
+int DAT_8032ed7c = 0;
+unsigned char DAT_8032ed90 = 0;
+unsigned char DAT_8032ed91 = 0;
+int gPppCalcDisabled = 0;
+}
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";

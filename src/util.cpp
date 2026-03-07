@@ -11,6 +11,10 @@ const float kUtilQuadDepth = -0.99999988f;
 const float kUtilHermiteCoeff2 = 2.0f;
 const float kUtilHermiteCoeff3 = 3.0f;
 const float kUtilHermiteCoeffNeg2 = -2.0f;
+extern "C" const Vec gUtilUpVector;
+extern "C" {
+const Vec gUtilUpVector = {0.0f, 1.0f, 0.0f};
+}
 
 static inline MtxPtr GetCameraMatrix()
 {
@@ -1252,9 +1256,6 @@ primitive_bad:
 void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 {
     Vec local_vec;
-
-    extern Vec gUtilUpVector;
-
     local_vec = gUtilUpVector;
 
     PSVECCrossProduct(&param_4, &local_vec, param_2);

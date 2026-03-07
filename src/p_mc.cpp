@@ -2,7 +2,10 @@
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 
-extern "C" unsigned int gMcPcsSingletonPtr = 0;
+extern "C" unsigned int gMcPcsSingletonPtr;
+extern "C" {
+unsigned int gMcPcsSingletonPtr = 0;
+}
 
 class McCtrl;
 

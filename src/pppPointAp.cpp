@@ -4,6 +4,7 @@
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
+extern int gPppCalcDisabled;
 
 struct _pppPointApOffsets {
     u32 srcOffset;
@@ -18,7 +19,6 @@ struct _pppPointApStep {
     u8 m_useWorldMatrix;
 };
 
-extern int gPppCalcDisabled;
 
 /*
  * --INFO--

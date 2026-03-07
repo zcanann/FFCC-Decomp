@@ -2,10 +2,11 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/util.h"
 #include <dolphin/mtx.h>
+extern int gPppCalcDisabled;
 
 // External references
-extern int gUtil;
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern struct {
     int field0_0x0;

@@ -7,6 +7,8 @@
 #include "dolphin/mtx.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 
 struct _pppMngStCharaBreak {
     u8 _pad0[0xD8];
@@ -17,8 +19,6 @@ extern _pppMngStCharaBreak* pppMngStPtr;
 extern struct _pppEnvSt {
     CMemory::CStage* m_stagePtr;
 } *pppEnvStPtr;
-extern int gPppCalcDisabled;
-extern u8 gPppInConstructor;
 extern char gUtil[];
 extern char MaterialMan[];
 extern struct {

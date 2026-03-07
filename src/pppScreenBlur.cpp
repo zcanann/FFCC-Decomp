@@ -3,6 +3,7 @@
 #include "ffcc/pppPart.h"
 #include "global.h"
 #include <dolphin/gx.h>
+extern int gPppCalcDisabled;
 
 extern "C" {
 void InitBlurParameter__8CGraphicFv(void* graphic);
@@ -10,7 +11,6 @@ void RenderBlur__8CGraphicFiUcUcUcUcs(void* graphic, int enable, u8 r, u8 g, u8 
 }
 
 extern float ppvScreenMatrix[4][4];
-extern int gPppCalcDisabled;
 
 /*
  * --INFO--

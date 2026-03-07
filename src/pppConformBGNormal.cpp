@@ -7,8 +7,8 @@
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include <math.h>
-
 extern int gPppCalcDisabled;
+
 
 struct ConformState {
     Vec m_normal;

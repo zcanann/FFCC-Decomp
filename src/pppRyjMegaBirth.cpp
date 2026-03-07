@@ -2,11 +2,11 @@
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" float RandF__5CMathFv(CMath*);
-extern int gPppCalcDisabled;
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;

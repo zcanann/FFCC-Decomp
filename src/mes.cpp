@@ -32,7 +32,8 @@ extern float FLOAT_803308a0;
 extern float FLOAT_803308a4;
 extern float FLOAT_803308ac;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
-extern "C" int m_tempVar__4CMes[];
+// PAL map: m_tempVar__4CMes in mes.o, .bss size 0x50.
+extern "C" int m_tempVar__4CMes[0x14] = {};
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int toupper(int);
 extern "C" int tolower(int);

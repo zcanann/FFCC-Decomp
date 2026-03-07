@@ -5,6 +5,7 @@
 #include "ffcc/util.h"
 
 #include <math.h>
+extern int gPppCalcDisabled;
 
 struct Vec2d {
     float x;
@@ -15,9 +16,7 @@ static inline int* GetColumSerializedDataOffsets(void* param) {
     return *(int**)((char*)param + 0xc);
 }
 
-extern int gPppCalcDisabled;
 extern CMath Math;
-extern void* gUtil;
 static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {

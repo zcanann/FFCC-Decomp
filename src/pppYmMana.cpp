@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include <dolphin/os/OSCache.h>
+extern int gPppCalcDisabled;
 
 extern Mtx ppvCameraMatrix0;
 
@@ -31,7 +32,6 @@ extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
 extern char MaterialMan[];
 extern char gUtil[];
-extern int gPppCalcDisabled;
 
 extern struct {
     float _224_4_;

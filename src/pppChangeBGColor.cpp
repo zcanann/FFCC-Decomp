@@ -1,7 +1,7 @@
 #include "ffcc/pppChangeBGColor.h"
+extern int gPppCalcDisabled;
 
 // External global variables 
-extern int gPppCalcDisabled;
 extern unsigned char MapMng[];
 
 /*

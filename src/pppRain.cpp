@@ -4,13 +4,13 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/util.h"
 #include "dolphin/gx.h"
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 const float FLOAT_8033101c = 1.0f;
 const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
-extern int gPppCalcDisabled;
-extern char gPppInConstructor;
-extern void* gUtil;
 
 extern struct {
     float _212_4_, _216_4_, _220_4_;

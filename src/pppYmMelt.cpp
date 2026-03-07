@@ -6,8 +6,8 @@
 #include "ffcc/maphit.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
-
 extern int gPppCalcDisabled;
+
 const float FLOAT_80330af4 = 1.0f;
 const float FLOAT_80330b08 = 0.5f;
 const float FLOAT_80330b0c = 0.017453292f;

@@ -1,6 +1,6 @@
 #include "ffcc/pppAngAccele.h"
-
 extern int gPppCalcDisabled;
+
 
 /*
  * --INFO--

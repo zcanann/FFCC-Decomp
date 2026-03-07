@@ -5,9 +5,9 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
-extern u8 gPppInConstructor;
+extern unsigned char gPppInConstructor;
+
 
 extern float FLOAT_80330dac;
 

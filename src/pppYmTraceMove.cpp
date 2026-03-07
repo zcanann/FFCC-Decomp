@@ -2,8 +2,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
-
 extern int gPppCalcDisabled;
+
 
 extern "C" {
 	void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);

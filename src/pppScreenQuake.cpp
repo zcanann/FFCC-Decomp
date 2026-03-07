@@ -3,8 +3,8 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
-
 extern int gPppCalcDisabled;
+
 
 extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
     void*,

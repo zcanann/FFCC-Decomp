@@ -2,8 +2,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
+
 
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 

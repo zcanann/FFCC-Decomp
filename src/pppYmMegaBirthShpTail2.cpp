@@ -4,6 +4,7 @@
 #include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+extern int gPppCalcDisabled;
 
 class CMath;
 extern CMath Math;
@@ -18,7 +19,6 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern pppFMATRIX g_matUnit2;
-extern int gPppCalcDisabled;
 
 static char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
 

@@ -3,6 +3,7 @@
 #include "ffcc/partMng.h"
 
 #include <dolphin/types.h>
+extern int gPppCalcDisabled;
 
 struct VertexApAtEntry
 {
@@ -44,7 +45,6 @@ struct VertexApAtState
 struct _pppPDataVal;
 
 extern CMath math;
-extern int gPppCalcDisabled;
 extern "C" f32 RandF__5CMathFv(CMath*);
 extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 

@@ -5,6 +5,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+extern int gPppCalcDisabled;
 
 static int GetGraphFrameFromId(u32 graphId)
 {
@@ -23,8 +24,7 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
 extern void pppSetBlendMode__FUc(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
-extern int gPppCalcDisabled;
-extern const float FLOAT_80330ee0 = 0.0f;
+const float FLOAT_80330ee0 = 0.0f;
 extern "C" int rand(void);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 

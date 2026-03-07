@@ -25,7 +25,6 @@ extern void* gUtil;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
-extern CGraphic Graphic;
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);

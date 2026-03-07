@@ -51,7 +51,6 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* PTR_PTR_s_CMaterialMan_801e9bec;
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
-extern CGraphic Graphic;
 extern unsigned char Game[];
 class CMapMng;
 extern CMapMng MapMng;

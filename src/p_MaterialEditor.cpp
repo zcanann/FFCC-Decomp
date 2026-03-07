@@ -14,8 +14,6 @@ extern "C" void* __ct__14CUSBStreamDataFv(void* self);
 extern "C" void* __ct__5ZLISTFv(void* self);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 
-extern CUSBPcs USBPcs;
-extern CGraphic Graphic;
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;

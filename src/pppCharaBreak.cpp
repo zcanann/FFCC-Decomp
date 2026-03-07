@@ -21,7 +21,6 @@ extern int gPppCalcDisabled;
 extern u8 gPppInConstructor;
 extern char gUtil[];
 extern char MaterialMan[];
-extern CGraphic Graphic;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;

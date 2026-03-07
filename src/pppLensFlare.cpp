@@ -3,16 +3,13 @@
 #include "ffcc/pppColum.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/symbols_shared.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
-extern float FLOAT_80331060;
-extern float FLOAT_80331064;
-extern float FLOAT_80331068;
-extern float FLOAT_8033106c;
-extern double DOUBLE_80331070;
 
 extern struct {
 	float _212_4_;
@@ -25,7 +22,6 @@ extern struct {
 } CameraPcs;
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
-extern "C" void GXPeekZ(unsigned short, unsigned short, unsigned int*);
 
 /*
  * --INFO--
@@ -36,7 +32,7 @@ void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
 	char* work = (char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80;
 
-	float initValue = FLOAT_80331060;
+	float initValue = kPppLensFlareZero;
 
 	*((float*)(work + 0x18)) = initValue;
 	*((float*)(work + 0x14)) = initValue;
@@ -78,8 +74,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* alphaPtr = (u8*)((u8*)obj + shapeOffset + 0xb2);
 		u8 sourceAlpha = ((u8*)obj)[colorOffset + 0x88];
-		double alphaScale = (double)((float)sourceAlpha * FLOAT_80331064);
-		unsigned int zAtPixel = 0;
+		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
+		u32 zAtPixel = 0;
 		float viewport[6];
 		float projection[7];
 		Mtx cameraMtx;
@@ -110,7 +106,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		objectPos.y = pppMngStPtr->m_matrix.value[1][3];
 		objectPos.z = pppMngStPtr->m_matrix.value[2][3];
 		PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
-		PSVECScale(&cameraToObject, &cameraToObject, FLOAT_80331068);
+		PSVECScale(&cameraToObject, &cameraToObject, kPppLensFlareCameraToObjectScale);
 		PSVECNormalize(&lookDir, &lookDir);
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		*(float*)((u8*)obj + shapeOffset + 0xb4) = PSVECDotProduct(&cameraToObject, &lookDir);
@@ -119,7 +115,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		float yProjected = *(float*)((u8*)obj + shapeOffset + 0x94);
 		u8 argA = (u8)unkB->m_arg3;
 		u32 halfWidth = (u32)(argA >> 1);
-		u32 z0 = __cvt_fp2unsigned((double)(FLOAT_8033106c * *(float*)((u8*)obj + shapeOffset + 0x98)));
+		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * *(float*)((u8*)obj + shapeOffset + 0x98)));
 		u32 x0 = (u32)((int)xProjected & 0xFFFF);
 		u32 y0 = (u32)((int)yProjected & 0xFFFF);
 		int step = (short)((u16)argA / (u16)*((u8*)(&unkB->m_arg3) + 1));
@@ -222,7 +218,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_70.rgba[2] = colorBytes[0x8a];
 		local_70.rgba[3] = shapeBytes[0xb2];
 
-		pppSetDrawEnv(&local_70, (pppFMATRIX*)0, FLOAT_80331060, (u8)unkB->m_payload[0], arg3Bytes[3],
+		pppSetDrawEnv(&local_70, (pppFMATRIX*)0, kPppLensFlareZero, (u8)unkB->m_payload[0], arg3Bytes[3],
 					  arg3Bytes[2], (u8)0, (u8)1, (u8)1, (u8)0);
 
 		pppSetBlendMode(arg3Bytes[2]);

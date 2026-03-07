@@ -4,7 +4,7 @@
 #include "ffcc/symbols_shared.h"
 
 extern "C" {
-unsigned int gMcPcsSingletonPtr = 0;
+unsigned int gMcPcsSingletonPtr_addr = 0;
 }
 
 class McCtrl;
@@ -179,7 +179,7 @@ extern "C" void __sinit_p_mc_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    gMcPcsSingletonPtr = (unsigned int)sMcPcsSingletonData;
+    gMcPcsSingletonPtr_addr = (unsigned int)sMcPcsSingletonData;
     table = (unsigned int*)m_table__6CMcPcs;
     table0 = m_table_desc0__6CMcPcs;
     table1 = m_table_desc1__6CMcPcs;

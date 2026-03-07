@@ -140,6 +140,7 @@ Data opportunities (3)
 WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. `configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.
 
 Important rules:
+- Consider extern as forbidden going forward. Try to actually link things.
 - Real member access rather than hard coded pointer offsets.
 - Do not do retarded hacks to get things to match that will be resolved automatically (ie hard coding an address, or changing a variable name to lbl_{xyz} to force a temporary output match).
 - Update `config/GCCP01/symbols.txt` rather than trying to conform to incoherent symbols like `lbl_{ADDRESS}`, or `fn_{ADDRESS}`. Addresses do NOT belong in symbol names (especially when we go cross-version to JP/EN).

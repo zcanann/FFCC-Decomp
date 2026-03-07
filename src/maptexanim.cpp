@@ -17,7 +17,7 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 extern "C" void* PTR_PTR_s_CMapTexAnim_801ea9a4;
-extern "C" char s_maptexanim_cpp_801d7ec4[];
+extern "C" char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);

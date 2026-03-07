@@ -38,7 +38,7 @@ extern float FLOAT_803311e4;
 extern float FLOAT_803311f8;
 extern double DOUBLE_803311e8;
 extern double DOUBLE_803311f0;
-extern char s_pppEmission_cpp_801db7e8[];
+char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

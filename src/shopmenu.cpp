@@ -46,7 +46,7 @@ char* strcpy(char*, const char*);
 char* strcat(char*, const char*);
 }
 
-extern char s_shopmenu_cpp_801ded8c[];
+char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";
 extern char DAT_80332e54[];
 unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];

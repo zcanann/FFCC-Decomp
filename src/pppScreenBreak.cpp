@@ -67,7 +67,7 @@ extern float DAT_801dd4b8;
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
 extern char s_f999_root_801dd4c8[];
-extern char s_pppScreenBreak_cpp_801dd4d4[];
+char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 extern CGraphic GraphicsPcs;
 extern float FLOAT_80331cf4;
 

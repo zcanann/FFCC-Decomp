@@ -2123,7 +2123,7 @@ void CCaravanWork::SearchCombiTop(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::GetNumCombi(int cmdListIdx)
+void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 {
 	unsigned short nextCmdIdx = 0;
 	if (static_cast<short>(m_currentCmdListIndex) == cmdListIdx) {
@@ -2134,11 +2134,15 @@ void CCaravanWork::GetNumCombi(int cmdListIdx)
 	if (m_inventoryItems[static_cast<short>(inventorySlot)] != 0xFFFF) {
 		m_inventoryItems[static_cast<short>(inventorySlot)] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
-		DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<char>(inventorySlot));
+		if (updateJoybus != 0) {
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<char>(inventorySlot));
+		}
 	}
 
 	m_commandListInventorySlotRef[cmdListIdx] = 0xFFFF;
-	Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
+	if (updateJoybus != 0) {
+		Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
+	}
 
 	if (static_cast<short>(m_currentCmdListIndex) == cmdListIdx) {
 		m_currentCmdListIndex = nextCmdIdx;
@@ -2643,4 +2647,3 @@ void CCaravanWork::GetEvtFlag(int)
 {
 	// TODO
 }
-

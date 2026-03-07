@@ -116,7 +116,7 @@ public:
     int GetCmdListItem(int);
     int DelCmdListAndItem(int, int);
     void SearchCombiTop(int);
-    void GetNumCombi(int);
+    void GetNumCombi(int, int);
     int GetNextCmdListIdx(int, int);
     int CanPlayerPutItem();
     void GetCurrentWeaponItem(int&, int&);

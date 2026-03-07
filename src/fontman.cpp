@@ -10,7 +10,12 @@ extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__5CFont[];
-extern unsigned char CameraPcs[];
+extern struct {
+    unsigned char _0x0[0x4];
+    Mtx m_cameraMatrix;
+    unsigned char _0x34[0x60];
+    Mtx44 m_screenMatrix;
+} CameraPcs;
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
@@ -530,7 +535,7 @@ void CFont::DrawQuit()
 {
     Mtx44 screenMtx;
 
-    PSMTX44Copy((float(*)[4])(CameraPcs + 0x94), screenMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 

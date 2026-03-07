@@ -30,19 +30,21 @@ extern const char s_WinMessTable[];
 
 const char* s_NoTextByLanguage[] = {
     "No",
+    "No",
     "Nein",
     "No",
-    "Non",
     "No",
+    "Non",
 };
 
 const char* s_SlotBTextByLanguage[] = {
+    "Slot B",
     "Slot B",
     "Steckplatz B",
     "Slot B",
     "Slot B",
     "Ranura B",
-    0,
+    "Slot B",
 };
 
 /*
@@ -183,7 +185,7 @@ int CMenuPcs::GetYesNoXPos(int right)
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
+        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId]);
         x += yesWidth - noWidth;
     }
     return x - 0x1e;
@@ -230,7 +232,7 @@ int CMenuPcs::GetSlotABXPos(int right)
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
+        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId]);
         x += slotAWidth - slotBWidth;
     }
     return x - 0x1e;

@@ -144,6 +144,7 @@ static void cbForStateReadingFST(u32 intType) {
     DVDCommandBlock* finished;
 
     if (intType == 16) {
+        executing->state = DVD_STATE_FATAL_ERROR;
         stateTimeout();
         return;
     }

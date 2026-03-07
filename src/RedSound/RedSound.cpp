@@ -767,6 +767,7 @@ void CRedSound::StreamStop(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 {
 	int id = 0;
@@ -785,6 +786,7 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 
 	return id;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -826,6 +828,7 @@ void CRedSound::StreamPause(int streamID, int pause)
  * JP Size: TODO
  */
 #pragma dont_inline on
+#pragma optimization_level 0
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
 	unsigned int id = GetAutoID();
@@ -835,6 +838,7 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 	}
 	return id;
 }
+#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*

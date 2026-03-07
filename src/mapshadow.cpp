@@ -1,9 +1,16 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapocttree.h"
-#include "ffcc/CPtrArray.h"
 #include "ffcc/materialman.h"
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
+
+template <class T>
+class CPtrArray
+{
+public:
+	int GetSize();
+	T operator[](unsigned long index);
+};
 
 // External constants referenced in decompilation
 extern double DOUBLE_8032fce8;
@@ -24,7 +31,7 @@ extern CMapMng MapMng;
  */
 void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
-	CPtrArray<CMapShadow>* mapShadowArray;
+	CPtrArray<CMapShadow*>* mapShadowArray;
 	CMapShadow* shadow;
 	u32 i;
 	u32 octTreeMask;
@@ -33,7 +40,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 
 	octTree.ClearShadow();
 	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
-		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow>*>((char*)&MapMng + 0x21434);
+		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>((char*)&MapMng + 0x21434);
 		for (i = 0; i < mapShadowArray->GetSize(); i++) {
 			octTreeMask = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);
 			if ((octTreeMask & (1U << i)) == 0) {
@@ -63,20 +70,20 @@ void CMapShadow::Init()
 {
 	float width;
 	float height;
-	int material;
-	int materialArray;
+	CMaterial* material;
+	int materialSet;
 	u32 materialWidth;
 	u32 materialHeight;
 	u32 materialMode;
 	u32 materialIndex;
 
-	materialArray = *(int*)((char*)&MapMng + 0x213d4);
+	materialSet = *(int*)((char*)&MapMng + 0x213d4);
 	materialIndex = m_materialIndex;
-	material = (int)(((CPtrArray<CMaterial*>*)(materialArray + 8))->operator[](materialIndex));
-	material = *(int*)(material + 0x3c);
-	materialWidth = *(u32*)(material + 0x64);
-	materialHeight = *(u32*)(material + 0x68);
-	materialMode = *(u32*)(material + 0x6c);
+	material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[materialIndex];
+	material = *reinterpret_cast<CMaterial**>(reinterpret_cast<int>(material) + 0x3c);
+	materialWidth = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x64);
+	materialHeight = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x68);
+	materialMode = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x6c);
 	m_materialMode = (u8)materialMode;
 	width = (float)materialWidth;
 	height = (float)materialHeight;
@@ -104,7 +111,7 @@ void CMapShadow::Calc()
 	
 	fVar1 = FLOAT_8032fce0;
 	m_lightMtx[0][3] = m_lightMtx[0][3] + m_scrollStepX;
-	if (fVar1 < m_lightMtx[0][3]) {
+	if (m_lightMtx[0][3] > fVar1) {
 		m_lightMtx[0][3] = m_lightMtx[0][3] - fVar1;
 	}
 	fVar1 = FLOAT_8032fce0;

@@ -1,5 +1,6 @@
 #include "ffcc/pppCrystal2.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
@@ -10,7 +11,6 @@
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
-extern void* DAT_80238030;
 extern CUtil gUtil;
 extern float DAT_801dd60c;
 extern float DAT_801dd610;

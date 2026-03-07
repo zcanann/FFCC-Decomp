@@ -4,6 +4,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
@@ -18,8 +19,6 @@
 
 extern CFontMan FontMan;
 extern CUtil gUtil;
-extern void* DAT_8023802c;
-extern void* DAT_80238030;
 
 static char s_fileCpp[] = "file.cpp";
 static char s_cFile[] = "CFile";
@@ -681,3 +680,4 @@ extern "C" void __sinit_file_cpp(void)
     *(void**)&File = __vt__8CManager;
     *(void**)&File = __vt__5CFile;
 }
+

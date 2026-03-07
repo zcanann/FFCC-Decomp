@@ -1,5 +1,6 @@
 #include "ffcc/pppYmDeformationScreen.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
@@ -60,7 +61,6 @@ struct _pppEnvStYmDeformationScreen {
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern CMath Math;
-extern char DAT_80238030[];
 extern CUtil gUtil;
 extern "C" float ppvCameraMatrix02[3][4];
 extern float ppvScreenMatrix[4][4];
@@ -377,3 +377,4 @@ void SetUpIndWarp(VYmDeformationScreen*)
 {
 	// TODO
 }
+

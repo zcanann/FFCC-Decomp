@@ -1,4 +1,5 @@
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -17,7 +18,6 @@
 extern "C" char PTR_PTR_s_CGraphic_801e8408[];
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
-extern char DAT_80238030[];
 extern CUtil gUtil;
 extern "C" u8 DAT_8032ec48;
 extern "C" u8 DAT_8032ec4c;
@@ -2061,3 +2061,4 @@ void CGraphic::DestroyTempBuffer()
 		PtrAt(this, 0x71E8) = nullptr;
 	}
 }
+

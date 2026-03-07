@@ -1,5 +1,6 @@
 #include "ffcc/pppMiasma.h"
 #include "ffcc/graphic.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/util.h"
@@ -14,7 +15,6 @@ extern float FLOAT_80331934;
 extern float FLOAT_80331938;
 extern float FLOAT_8033193c;
 extern float FLOAT_80331940;
-extern void* DAT_80238030;
 extern CUtil gUtil;
 
 extern struct {
@@ -579,3 +579,4 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
+

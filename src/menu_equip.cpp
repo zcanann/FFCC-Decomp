@@ -47,23 +47,23 @@ extern "C" void SetPosX__5CFontFf(float, void*);
 extern "C" void SetPosY__5CFontFf(float, void*);
 extern "C" void Draw__5CFontFPc(void*, int);
 
-extern float FLOAT_80332eb8;
-extern float FLOAT_80332ee0;
-extern float FLOAT_80332ee4;
-extern float FLOAT_80332ee8;
-extern float FLOAT_80332eec;
-extern float FLOAT_80332ef0;
-extern float FLOAT_80332ef4;
-extern float FLOAT_80332ef8;
-extern float FLOAT_80332efc;
-extern float FLOAT_80332f00;
-extern float FLOAT_80332f10;
-extern float FLOAT_80332f14;
-extern float FLOAT_80332f18;
-extern double DOUBLE_80332ec0;
-extern double DOUBLE_80332ec8;
-extern double DOUBLE_80332ed0;
-extern double DOUBLE_80332ed8;
+static const float FLOAT_80332eb8 = 0.0f;
+static const float FLOAT_80332ee0 = 1.0f;
+static const float FLOAT_80332ee4 = 255.0f;
+static const float FLOAT_80332ee8 = 0.8999999761581421f;
+static const float FLOAT_80332eec = 4.0f;
+static const float FLOAT_80332ef0 = 12.0f;
+static const float FLOAT_80332ef4 = 24.0f;
+static const float FLOAT_80332ef8 = 320.0f;
+static const float FLOAT_80332efc = 0.5f;
+static const float FLOAT_80332f00 = 352.0f;
+static const float FLOAT_80332f10 = 128.0f;
+static const float FLOAT_80332f14 = 8.0f;
+static const float FLOAT_80332f18 = 0.75f;
+static const double DOUBLE_80332ec0 = 1.0;
+static const double DOUBLE_80332ec8 = 216.0;
+static const double DOUBLE_80332ed0 = 0.5;
+static const double DOUBLE_80332ed8 = 4503601774854144.0;
 
 namespace {
 struct MenuEquipMembers {

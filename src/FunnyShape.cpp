@@ -13,25 +13,25 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" s32 rand();
 
-extern "C" u32 DAT_8032fd58;
-extern "C" u32 DAT_8032fd5c;
-extern "C" u32 DAT_8032fd60;
-extern "C" double DOUBLE_8032fd88;
-extern "C" float FLOAT_8032fd64;
-extern "C" float FLOAT_8032fd68;
-extern "C" float FLOAT_8032fd6c;
-extern "C" float FLOAT_8032fd70;
-extern "C" float FLOAT_8032fd74;
-extern "C" float FLOAT_8032fd78;
-extern "C" float FLOAT_8032fd7c;
-extern "C" float FLOAT_8032fd80;
-extern "C" float FLOAT_8032fd90;
-extern "C" float FLOAT_8032fd94;
-extern "C" float FLOAT_8032fd98;
-extern "C" float FLOAT_8032fd9c;
-extern "C" float FLOAT_8032fda0;
-extern "C" float FLOAT_8032fda4;
-extern "C" float FLOAT_8032fda8;
+static const u32 DAT_8032fd58 = 2155905152u;
+static const u32 DAT_8032fd5c = 2155905152u;
+static const u32 DAT_8032fd60 = 2155905152u;
+static const double DOUBLE_8032fd88 = 4503601774854144.0;
+static const float FLOAT_8032fd64 = 1000.0f;
+static const float FLOAT_8032fd68 = -1000.0f;
+static const float FLOAT_8032fd6c = 0.0f;
+static const float FLOAT_8032fd70 = 2.0f;
+static const float FLOAT_8032fd74 = 1.0f;
+static const float FLOAT_8032fd78 = 4096.0f;
+static const float FLOAT_8032fd7c = 0.5f;
+static const float FLOAT_8032fd80 = -1.0f;
+static const float FLOAT_8032fd90 = 480.0f;
+static const float FLOAT_8032fd94 = 336.0f;
+static const float FLOAT_8032fd98 = 20.0f;
+static const float FLOAT_8032fd9c = 320.0f;
+static const float FLOAT_8032fda0 = 224.0f;
+static const float FLOAT_8032fda4 = 3.140000104904175f;
+static const float FLOAT_8032fda8 = 180.0f;
 
 namespace {
 static inline u8* Ptr(CFunnyShape* self, u32 offset)

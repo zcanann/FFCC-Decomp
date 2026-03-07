@@ -47,6 +47,10 @@ extern "C" char sGraphicMemoryStageName[];
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
+u8 gGraphicDrawDoneRequest = 0;
+u8 gGraphicDrawDoneRequestInit = 0;
+u8 gGraphicDrawDonePartControlRequest = 0;
+u8 gGraphicDrawDonePartControlInit = 0;
 }
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {

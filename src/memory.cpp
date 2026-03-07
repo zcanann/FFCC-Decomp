@@ -654,7 +654,7 @@ void CMemory::Draw()
 void CMemory::SetGroup(void* ptr, int group)
 {
     unsigned char* header = reinterpret_cast<unsigned char*>(ptr) - 0x3e;
-    *header = (*header & 0x0F) | (static_cast<unsigned char>(group) << 4);
+    *header = static_cast<unsigned char>((*header & 0x0F) | (group << 4));
 }
 
 /*

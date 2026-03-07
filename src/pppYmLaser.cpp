@@ -83,7 +83,8 @@ struct CMapCylinderRaw {
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 one = kPppYmLaserOne;
-	f64 randArg = (f64)FLOAT_80330df0;
+	f32 zero = 0.0f;
+	f64 randArg;
 	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
 	*work = one;
@@ -93,7 +94,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	work[3] = one;
 	work[2] = one;
 	work[1] = one;
-	work[7] = 0.0f;
+	work[7] = zero;
 	work[10] = one;
 	work[9] = one;
 	work[8] = one;
@@ -101,9 +102,9 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	*((u8*)work + 0x2d) = 0;
 	*((u8*)work + 0x2e) = 0;
 	*((u16*)((u8*)work + 0x30)) = 0;
-	*((u16*)((u8*)work + 0x32)) = 0;
 	*((u16*)((u8*)work + 0x34)) = 0;
-	randArg = (f64)RandF__5CMathFf(randArg, &Math);
+	*((u16*)((u8*)work + 0x32)) = 0;
+	randArg = (f64)RandF__5CMathFf(FLOAT_80330df0, &Math);
 	work[14] = (f32)randArg;
 }
 

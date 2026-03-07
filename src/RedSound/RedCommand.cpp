@@ -1,25 +1,16 @@
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedDriver.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include <dolphin/os.h>
 #include <string.h>
 
-extern CRedEntry DAT_8032e154;
 extern int DAT_8032e12c[];
-extern void* DAT_8032f3f0;
-extern void* DAT_8032f3fc;
-extern unsigned int* DAT_8032f444;
-extern int gRedMemoryDebugEnabled;
 extern int DAT_8032f440;
-extern int DAT_8021d1a8;
-extern void* DAT_8032f474;
-extern int DAT_8032f410;
-extern int DAT_8032f414;
 extern int DAT_8032f42c;
 extern OSSemaphore DAT_8032e120;
-extern int DAT_8021ec10[];
 extern char DAT_801e7e3e;
 extern char DAT_8021dcab;
 extern char DAT_80333d68;
@@ -32,7 +23,6 @@ extern char s__s_sMusic_Start___Couldn_t_Creat_801e7e86[];
 extern char s__s_s___music_3_3u_bgm___need_0x__801e7eb2[];
 
 extern "C" {
-int fflush(void*);
 int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
 int SearchWaveBase__9CRedEntryFi(void*, int);
 int SearchSeSepBank__9CRedEntryFi(CRedEntry*, int);

@@ -1,15 +1,12 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedDriver.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include <dolphin/os.h>
 #include <string.h>
 
-extern CRedMemory DAT_8032f480;
-extern int gRedMemoryDebugEnabled;
-extern void* DAT_8032f3f0;
 extern int DAT_8032e12c;
-extern int DAT_8021d1a8;
 extern char DAT_801e7905;
 extern char DAT_80333d30;
 extern char DAT_80333d38;
@@ -44,7 +41,6 @@ extern char s__s_Entry_Items____d_801e7dfd[];
 
 extern "C" {
 	void* RedNew__Fi(int);
-	int fflush(void*);
 }
 
 /*

@@ -20,6 +20,12 @@ extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
 }
+static char s_tinaSourceName[] = "p_tina.cpp";
+static char s_tinaPrioTimeFmt[] = "prioTime:%d prio:%d pdtID:%2d fp:%08x\n";
+static char s_tinaTitleFmt[] = "Tina :%c\n";
+static char s_tinaCalcFmt[] = "clc :%f / max :%f\n";
+static char s_tinaDrawFmt[] = "drw :%f / max :%f\n";
+static char s_tinaHeapFmt[] = "hpm :%f / max :%f\n";
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
@@ -68,7 +74,6 @@ extern CMenuPcs MenuPcs;
 extern void* CAMemCacheSet;
 
 extern char DAT_801ead4c[];
-extern char s_prioTime__d_prio__d_pdtID__2d_fp_801d81a0[];
 extern char DAT_801d81d4[];
 extern char s_CPartPcs_801d7f54[];
 extern char s_CPartPcs_dat_801d810c[];
@@ -79,11 +84,6 @@ extern char s_dvd_tina_chobit_1_801d8150[];
 extern char s_dvd_tina_chobit_2_801d8164[];
 extern char s_dvd_tina_chobit_3_801d8178[];
 extern char s_dvd_tina_chobit_4_801d818c[];
-extern char s_p_tina_cpp_801d8008[];
-extern char s_Tina___c__801d8014[];
-extern char s_clc___3f___max___3f___801d8020[];
-extern char s_drw___3f___max___3f___801d8038[];
-extern char s_hpm___3f___max___3f___801d8050[];
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern char DAT_801d8068[];
@@ -540,7 +540,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(
-			s_prioTime__d_prio__d_pdtID__2d_fp_801d81a0,
+			s_tinaPrioTimeFmt,
 			(unsigned int)GetMngStPrioTime(pppMngSt),
 			(unsigned int)GetMngStPrio(pppMngSt),
 			(int)GetMngStKind(pppMngSt),
@@ -554,7 +554,7 @@ unsigned int pppFreeMngStPrioForData()
 		System.Printf(DAT_801ead4c);
 	}
 
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0xfc);
+	Graphic._WaitDrawDone(s_tinaSourceName, 0xfc);
 	_pppAllFreePObject(pppMngSt);
 	return 1;
 }
@@ -966,14 +966,14 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x308);
+    Graphic._WaitDrawDone(s_tinaSourceName, 0x308);
     OSStartStopwatch(&g_par_draw_prof);
     OSStartStopwatch(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
     OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x30f);
+    Graphic._WaitDrawDone(s_tinaSourceName, 0x30f);
     OSStopStopwatch(&g_par_draw_prof);
     pppClearDrawEnv();
 }
@@ -989,14 +989,14 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x31a);
+    Graphic._WaitDrawDone(s_tinaSourceName, 0x31a);
     OSStartStopwatch(&g_par_draw_prof);
     OSStartStopwatch(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
     OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x322);
+    Graphic._WaitDrawDone(s_tinaSourceName, 0x322);
     OSStopStopwatch(&g_par_draw_prof);
     pppClearDrawEnv();
 }
@@ -1210,14 +1210,14 @@ void CPartPcs::drawAfterViewer()
 {
 	int frameSign;
 
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
+	Graphic._WaitDrawDone(s_tinaSourceName, 0x3f1);
 	OSStartStopwatch(&g_par_draw_prof);
 	OSStartStopwatch(&g_par_calc_prof);
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	OSStopStopwatch(&g_par_calc_prof);
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
+	Graphic._WaitDrawDone(s_tinaSourceName, 0x3fb);
 	OSStopStopwatch(&g_par_draw_prof);
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
@@ -1234,7 +1234,7 @@ void CPartPcs::drawAfterViewer()
 	gDebugSpinnerFrame++;
 	frameSign = gDebugSpinnerFrame >> 0x1f;
 	Graphic.Printf(
-		s_Tina___c__801d8014,
+		s_tinaTitleFmt,
 		(int)(char)gDebugSpinnerText[(frameSign * 4 |
 								 (unsigned int)((gDebugSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
@@ -1242,11 +1242,11 @@ void CPartPcs::drawAfterViewer()
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		s_clc___3f___max___3f___801d8020, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
+		s_tinaCalcFmt, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		s_drw___3f___max___3f___801d8038, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
+		s_tinaDrawFmt, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		s_hpm___3f___max___3f___801d8050,
+		s_tinaHeapFmt,
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }
@@ -1577,3 +1577,4 @@ void CPartPcs::SetUSBData()
 {
 	// TODO
 }
+

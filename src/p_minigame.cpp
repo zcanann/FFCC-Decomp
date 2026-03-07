@@ -13,7 +13,7 @@
 CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
 extern "C" void* __vt__12CMiniGamePcs[];
-extern char DAT_80331bf0[];
+static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int sprintf(char* buffer, const char* format, ...);
@@ -389,7 +389,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x135C) + 200) =
         *reinterpret_cast<unsigned int*>(self + 0x1364);
 
-    strncpy(reinterpret_cast<char*>(self + 0x1344), DAT_80331bf0, 4);
+    strncpy(reinterpret_cast<char*>(self + 0x1344), s_miniGameDefaultTag, 4);
 
     void* managerImage = *reinterpret_cast<void**>(self + 0x1354);
     CFile::CHandle* fileHandle = File.Open(managerFilePath, 0, CFile::PRI_LOW);

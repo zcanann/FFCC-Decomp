@@ -563,7 +563,7 @@ unsigned int pppFreeMngStPrioForData()
  * Address:	TODO
  * Size:	TODO
  */
-unsigned int pppAmemDeletePmng(unsigned long)
+unsigned char pppAmemDeletePmng(unsigned long)
 {
 	return pppFreeMngStPrioForData();
 }

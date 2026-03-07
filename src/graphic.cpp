@@ -1,4 +1,5 @@
 #include "ffcc/graphic.h"
+#include "ffcc/graphic_symbols.h"
 #include "ffcc/render_buffers.h"
 
 #include <math.h>
@@ -19,24 +20,11 @@ extern "C" char PTR_PTR_s_CGraphic_801e8408[];
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
 extern CUtil gUtil;
-extern "C" u8 DAT_8032ec48;
-extern "C" u8 DAT_8032ec4c;
-extern "C" u8 DAT_8032ec50;
-extern "C" u8 DAT_8032ec54;
 extern "C" char __vt__8CManager[];
-extern "C" _GXColor DAT_8032e3e8;
 extern "C" char DAT_801d637c[];
 extern "C" char DAT_801d63c0[];
 extern "C" char DAT_801d6400[];
 extern "C" char DAT_801d643c[];
-extern "C" char DAT_8032f714[];
-extern "C" u8 DAT_801fd480[];
-extern "C" float FLOAT_8032f6c0;
-extern "C" float FLOAT_8032f6c4;
-extern "C" double DOUBLE_8032f6d8;
-extern "C" float FLOAT_8032f708;
-extern "C" float FLOAT_8032f70c;
-extern "C" float FLOAT_8032f710;
 extern "C" int __cntlzw(unsigned int);
 
 extern struct {
@@ -384,7 +372,7 @@ void CGraphic::SetViewport()
     register u16 width = U16At(renderMode, 4);
     register u16 height = U16At(renderMode, 6);
 
-    GXSetViewport(FLOAT_8032f6c0, FLOAT_8032f6c0, (f32)width, (f32)height, FLOAT_8032f6c0, FLOAT_8032f6c4);
+    GXSetViewport(kGraphicZeroF, kGraphicZeroF, (f32)width, (f32)height, kGraphicZeroF, kGraphicOneF);
     GXSetScissor(0, 0, width, height);
 }
 
@@ -545,12 +533,12 @@ void CGraphic::Thread()
                     } else if (drawSyncPart == 0x7FFE) {
                         System.Printf(DAT_801d63c0, PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else {
-                        System.Printf(DAT_801d6400, PtrAt(this, 0x7368), S32At(this, 0x736C), DAT_8032f714);
+                        System.Printf(DAT_801d6400, PtrAt(this, 0x7368), S32At(this, 0x736C), sGraphicUnknownOrderName);
                     }
                 }
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
-                void* orderName = DAT_8032f714;
+                void* orderName = sGraphicUnknownOrderName;
                 int orderIndex = -1;
                 if (order != nullptr) {
                     orderName = order->m_debugName;
@@ -561,24 +549,24 @@ void CGraphic::Thread()
             }
         }
 
-        if (DAT_8032ec4c == 0) {
-            DAT_8032ec48 = 0;
-            DAT_8032ec4c = 1;
+        if (gGraphicDrawDoneRequestInit == 0) {
+            gGraphicDrawDoneRequest = 0;
+            gGraphicDrawDoneRequestInit = 1;
         }
-        if (DAT_8032ec54 == 0) {
-            DAT_8032ec50 = 0;
-            DAT_8032ec54 = 1;
+        if (gGraphicDrawDonePartControlInit == 0) {
+            gGraphicDrawDonePartControlRequest = 0;
+            gGraphicDrawDonePartControlInit = 1;
         }
 
         if (OSGetResetButtonState() == 0) {
-            if (DAT_8032ec48 != 0) {
-                DAT_8032ec50 = 1;
+            if (gGraphicDrawDoneRequest != 0) {
+                gGraphicDrawDonePartControlRequest = 1;
             }
         } else {
-            DAT_8032ec48 = 1;
+            gGraphicDrawDoneRequest = 1;
         }
 
-        if ((DAT_8032ec50 != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == 0xFF)) {
+        if ((gGraphicDrawDonePartControlRequest != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == 0xFF)) {
             break;
         }
 
@@ -753,12 +741,12 @@ void CGraphic::DrawDebugString()
 
     void* renderMode = PtrAt(this, 0x71E0);
     C_MTXOrtho(proj,
-               FLOAT_8032f6c0,
+               kGraphicZeroF,
                static_cast<float>(U16At(renderMode, 6)),
-               FLOAT_8032f6c0,
+               kGraphicZeroF,
                static_cast<float>(U16At(renderMode, 4)),
-               FLOAT_8032f6c0,
-               FLOAT_8032f708);
+               kGraphicZeroF,
+               kGraphicBlurAlphaScale);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
 
     PSMTXIdentity(model);
@@ -778,11 +766,11 @@ void CGraphic::DrawDebugString()
     GXSetCullMode(GX_CULL_NONE);
     GXSetCurrentMtx(0);
 
-    GXInitTexObj(&texObj, DAT_801fd480, 0x40, 0x60, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObj(&texObj, gGraphicNoiseTextureI8_64x96, 0x40, 0x60, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
 
-    PSMTXScale(texMtx, FLOAT_8032f70c, FLOAT_8032f710, FLOAT_8032f6c4);
+    PSMTXScale(texMtx, kGraphicNoiseTexScaleU, kGraphicNoiseTexScaleV, kGraphicOneF);
     GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
@@ -822,12 +810,12 @@ void CGraphic::InitDebugString()
 
     void* renderMode = PtrAt(this, 0x71E0);
     C_MTXOrtho(proj,
-               FLOAT_8032f6c0,
+               kGraphicZeroF,
                static_cast<float>(U16At(renderMode, 6)),
-               FLOAT_8032f6c0,
+               kGraphicZeroF,
                static_cast<float>(U16At(renderMode, 4)),
-               FLOAT_8032f6c0,
-               FLOAT_8032f708);
+               kGraphicZeroF,
+               kGraphicBlurAlphaScale);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
 
     PSMTXIdentity(model);
@@ -845,11 +833,11 @@ void CGraphic::InitDebugString()
     GXLoadPosMtxImm(model, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetCurrentMtx(0);
-    GXInitTexObj(&texObj, DAT_801fd480, 0x40, 0x60, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObj(&texObj, gGraphicNoiseTextureI8_64x96, 0x40, 0x60, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
 
-    PSMTXScale(texMtx, FLOAT_8032f70c, FLOAT_8032f710, FLOAT_8032f6c4);
+    PSMTXScale(texMtx, kGraphicNoiseTexScaleU, kGraphicNoiseTexScaleV, kGraphicOneF);
     GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
@@ -1325,7 +1313,7 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
 {
     float nearZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
     float farZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
-    _GXColor color = useGlobalColor == 0 ? *reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200) : DAT_8032e3e8;
+    _GXColor color = useGlobalColor == 0 ? *reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200) : gGraphicDefaultClearColor;
     GXFogType fogType = useFog == 0 ? GX_FOG_NONE : GX_FOG_LIN;
 
     GXSetFog(fogType,
@@ -1352,7 +1340,7 @@ void CGraphic::CopySaveFrameBuffer()
     GXInitTexObj(reinterpret_cast<GXTexObj*>(reinterpret_cast<u8*>(this) + 0x722C),
                  PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(reinterpret_cast<u8*>(this) + 0x722C),
-                    GX_NEAR, GX_NEAR, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0,
+                    GX_NEAR, GX_NEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
@@ -1438,8 +1426,8 @@ void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int do
     GXInvalidateTexAll();
     GXInitTexObj(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), PtrAt(this, 0x71E8), width & 0xFFFF,
                  height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), GX_LINEAR, GX_LINEAR, FLOAT_8032f6c0,
-                    FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), GX_LINEAR, GX_LINEAR, kGraphicZeroF,
+                    kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
 /*
@@ -1503,7 +1491,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     if (texObj != nullptr) {
         GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(initFormat), GX_CLAMP,
                      GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(texObj, filter, filter, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE,
+        GXInitTexObjLOD(texObj, filter, filter, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE,
                         GX_ANISO_1);
     }
 }
@@ -1525,29 +1513,29 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	GXWGFifo.f32 = pos1.y;
 	GXWGFifo.f32 = pos1.z;
 	GXWGFifo.u32 = *(u32*)&color1;
-	GXWGFifo.f32 = FLOAT_8032f6c0;
-	GXWGFifo.f32 = FLOAT_8032f6c0;
+	GXWGFifo.f32 = kGraphicZeroF;
+	GXWGFifo.f32 = kGraphicZeroF;
 
 	GXWGFifo.f32 = pos2.x;
 	GXWGFifo.f32 = pos1.y;
 	GXWGFifo.f32 = pos1.z;
 	GXWGFifo.u32 = *(u32*)&color2;
-	GXWGFifo.f32 = FLOAT_8032f6c4;
-	GXWGFifo.f32 = FLOAT_8032f6c0;
+	GXWGFifo.f32 = kGraphicOneF;
+	GXWGFifo.f32 = kGraphicZeroF;
 
 	GXWGFifo.f32 = pos2.x;
 	GXWGFifo.f32 = pos2.y;
 	GXWGFifo.f32 = pos1.z;
 	GXWGFifo.u32 = *(u32*)&color4;
-	GXWGFifo.f32 = FLOAT_8032f6c4;
-	GXWGFifo.f32 = FLOAT_8032f6c4;
+	GXWGFifo.f32 = kGraphicOneF;
+	GXWGFifo.f32 = kGraphicOneF;
 
 	GXWGFifo.f32 = pos1.x;
 	GXWGFifo.f32 = pos2.y;
 	GXWGFifo.f32 = pos1.z;
 	GXWGFifo.u32 = *(u32*)&color3;
-	GXWGFifo.f32 = FLOAT_8032f6c0;
-	GXWGFifo.f32 = FLOAT_8032f6c4;
+	GXWGFifo.f32 = kGraphicZeroF;
+	GXWGFifo.f32 = kGraphicOneF;
 }
 
 /*
@@ -1698,8 +1686,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	CreateSmallBackTexture(DAT_80238030, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_I8, 0);
-	GetBackBufferRect2(DAT_80238030, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR, (_GXTexFmt)0x11, 0);
+	CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_I8, 0);
+	GetBackBufferRect2(gRenderScratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR, (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();
 

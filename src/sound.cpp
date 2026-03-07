@@ -6,6 +6,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "ffcc/line_constants.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
 #include "dolphin/ar.h"
@@ -15,14 +16,10 @@
 #include <string.h>
 
 extern float FLOAT_80330ce8;
-extern float FLOAT_80330cec;
-extern float FLOAT_80330cf0;
 extern float FLOAT_80330cf4;
 extern float FLOAT_80330cf8;
 extern float FLOAT_80330cfc;
 extern float FLOAT_80330d00;
-extern float FLOAT_80330d10;
-extern float FLOAT_80330d30;
 extern double DOUBLE_80330d08;
 extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
@@ -176,12 +173,12 @@ extern "C" void __ct__9CLine(CLine* line)
 extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float* outDistance, u32* outIndex,
                              float* outT, const Vec* queryPos)
 {
-    const bool infiniteRange = ((float)maxDistance == FLOAT_80330cec);
-    float bestDistance = infiniteRange ? FLOAT_80330d10 : (float)maxDistance;
+    const bool infiniteRange = ((float)maxDistance == kLineSegmentMinT);
+    float bestDistance = infiniteRange ? kLineBoundsInitMin : (float)maxDistance;
     const float maxDistanceSq = (float)(maxDistance * maxDistance);
     int found = 0;
     u32 bestIndex = 0;
-    float bestT = FLOAT_80330cec;
+    float bestT = kLineSegmentMinT;
     Vec bestPos;
 
     for (u32 i = 0; i + 1 < line->pointCount; i++) {
@@ -189,7 +186,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
         float distanceSq = PSVECSquareDistance(&candidate, queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             float distance = distanceSq;
-            if (distanceSq <= FLOAT_80330cec) {
+            if (distanceSq <= kLineSegmentMinT) {
                 distance = DAT_8032ec20;
             } else {
                 distance = (float)sqrt(distanceSq);
@@ -198,7 +195,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
                 bestDistance = distance;
                 bestPos = candidate;
                 bestIndex = i;
-                bestT = FLOAT_80330cec;
+                bestT = kLineSegmentMinT;
                 found = 1;
             }
         }
@@ -208,7 +205,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
             distanceSq = PSVECSquareDistance(&candidate, queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 float distance = distanceSq;
-                if (distanceSq <= FLOAT_80330cec) {
+                if (distanceSq <= kLineSegmentMinT) {
                     distance = DAT_8032ec20;
                 } else {
                     distance = (float)sqrt(distanceSq);
@@ -217,7 +214,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
                     bestDistance = distance;
                     bestPos = candidate;
                     bestIndex = i;
-                    bestT = FLOAT_80330cf0;
+                    bestT = kLineSegmentMaxT;
                     found = 1;
                 }
             }
@@ -227,7 +224,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
         const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
         const float dotStart = PSVECDotProduct(&line->points[i], &segment.delta);
         const float t = (dotQuery - dotStart) / (segment.length * segment.length);
-        if (((FLOAT_80330cec <= t) && (t <= FLOAT_80330cf0)) || infiniteRange) {
+        if (((kLineSegmentMinT <= t) && (t <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
             PSVECScale(&segment.delta, &scaled, t);
@@ -306,13 +303,13 @@ extern "C" void Draw__9CLine(CLine* line)
 
 extern "C" void CalcBound__9CLine2(CLine* line)
 {
-    line->min.x = FLOAT_80330d10;
-    line->min.y = FLOAT_80330d10;
-    line->min.z = FLOAT_80330d10;
-    line->max.x = FLOAT_80330d30;
-    line->max.y = FLOAT_80330d30;
-    line->max.z = FLOAT_80330d30;
-    line->totalLength = FLOAT_80330cec;
+    line->min.x = kLineBoundsInitMin;
+    line->min.y = kLineBoundsInitMin;
+    line->min.z = kLineBoundsInitMin;
+    line->max.x = kLineBoundsInitMax;
+    line->max.y = kLineBoundsInitMax;
+    line->max.z = kLineBoundsInitMax;
+    line->totalLength = kLineSegmentMinT;
 
     for (u32 i = 0; i < line->pointCount; i++) {
         const Vec& point = line->points[i];
@@ -343,7 +340,7 @@ extern "C" void CalcBound__9CLine2(CLine* line)
             segment.length = PSVECMag(&segment.delta);
             segment.startLength = line->totalLength;
             line->totalLength += segment.length;
-            if (segment.length != FLOAT_80330cec) {
+            if (segment.length != kLineSegmentMinT) {
                 PSVECNormalize(&segment.delta, &segment.normal);
             }
         }
@@ -1641,12 +1638,12 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
             outPan = iVar5 + 0x40;
         }
-    } else if ((FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x10)) &&
-               (FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x14))) {
+    } else if ((kLineSegmentMinT == *reinterpret_cast<float*>(se + 0x10)) &&
+               (kLineSegmentMinT == *reinterpret_cast<float*>(se + 0x14))) {
         outVolume = 0x7F;
         outPan = 0x40;
     } else {
-        fVar1 = FLOAT_80330cf0;
+        fVar1 = kLineSegmentMaxT;
         if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
             const short stageId = *reinterpret_cast<short*>(Game + 0x13E0);
             if (stageId == 0xE) {
@@ -2438,3 +2435,4 @@ void CSound::WaitASync()
 {
 	// TODO
 }
+

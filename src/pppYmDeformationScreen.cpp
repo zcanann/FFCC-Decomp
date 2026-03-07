@@ -320,7 +320,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	texU = 640.0f / (float)*(unsigned int*)(textureBase + 100);
 	texV = 448.0f / (float)*(unsigned int*)(textureBase + 0x68);
 
-	Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+	Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
@@ -341,7 +341,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXTexCoord2f32(0.0f, texV);
 	GXTexCoord2f32(0.0f, 1.0f);
 
-	Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+	Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	depth = work[0];
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);

@@ -484,7 +484,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
     PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
-    Graphic.GetBackBufferRect2(DAT_80238030, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = (CGObject*)work[0];
     if (gObject == NULL) {
@@ -512,7 +512,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     sourceTexObjs = work[0x1D];
 
     if (*(u8*)((char*)param_3 + 0x38) != 0) {
-        Graphic.GetBackBufferRect2(DAT_80238030, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, FLOAT_80331898, FLOAT_803318a0);
         C_MTXPerspective(projectionMtx, FLOAT_803318cc, FLOAT_803318a0, FLOAT_803318a0, FLOAT_803318d0);

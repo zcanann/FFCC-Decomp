@@ -1,4 +1,5 @@
 #include "ffcc/cflat_r2system.h"
+#include "ffcc/line_constants.h"
 #include "ffcc/color.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
@@ -47,10 +48,6 @@ void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
-extern float FLOAT_80330cec;
-extern float FLOAT_80330cf0;
-extern float FLOAT_80330d10;
-extern float FLOAT_80330d30;
 extern float DAT_8032ec20;
 extern CMenuPcs MenuPcs;
 extern CPartPcs PartPcs;
@@ -1585,12 +1582,12 @@ public:
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
-    const bool infiniteRange = (maxDistance == FLOAT_80330cec);
-    float bestDistance = infiniteRange ? FLOAT_80330d10 : maxDistance;
+    const bool infiniteRange = (maxDistance == kLineSegmentMinT);
+    float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;
     unsigned int bestIndex = 0;
-    float bestT = FLOAT_80330cec;
+    float bestT = kLineSegmentMinT;
     Vec bestPosition;
 
     for (unsigned int i = 0; i + 1 < m_numPoints; i++) {
@@ -1598,7 +1595,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
         float distanceSq = PSVECSquareDistance(&candidate, targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             float distance = distanceSq;
-            if (distanceSq <= FLOAT_80330cec) {
+            if (distanceSq <= kLineSegmentMinT) {
                 distance = DAT_8032ec20;
             } else {
                 distance = (float)sqrt(distanceSq);
@@ -1608,7 +1605,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
                 bestDistance = distance;
                 bestPosition = candidate;
                 bestIndex = i;
-                bestT = FLOAT_80330cec;
+                bestT = kLineSegmentMinT;
                 found = 1;
             }
         }
@@ -1618,7 +1615,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
             distanceSq = PSVECSquareDistance(&candidate, targetPosition);
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 float distance = distanceSq;
-                if (distanceSq <= FLOAT_80330cec) {
+                if (distanceSq <= kLineSegmentMinT) {
                     distance = DAT_8032ec20;
                 } else {
                     distance = (float)sqrt(distanceSq);
@@ -1628,7 +1625,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
                     bestDistance = distance;
                     bestPosition = candidate;
                     bestIndex = i;
-                    bestT = FLOAT_80330cf0;
+                    bestT = kLineSegmentMaxT;
                     found = 1;
                 }
             }
@@ -1638,7 +1635,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
         float dotTarget = PSVECDotProduct(targetPosition, &segment.delta);
         float dotPoint = PSVECDotProduct(&m_points[i], &segment.delta);
         float segmentT = (dotTarget - dotPoint) / (segment.length * segment.length);
-        if (((FLOAT_80330cec <= segmentT) && (segmentT <= FLOAT_80330cf0)) || infiniteRange) {
+        if (((kLineSegmentMinT <= segmentT) && (segmentT <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
             PSVECScale(&segment.delta, &scaled, segmentT);
@@ -1690,13 +1687,13 @@ int CLine<64>::IsInner(Vec* position, float margin)
 
 extern "C" void CalcBound__9CLine(CLine<64>* line)
 {
-    line->m_min.x = FLOAT_80330d10;
-    line->m_min.y = FLOAT_80330d10;
-    line->m_min.z = FLOAT_80330d10;
-    line->m_max.x = FLOAT_80330d30;
-    line->m_max.y = FLOAT_80330d30;
-    line->m_max.z = FLOAT_80330d30;
-    line->m_totalLength = FLOAT_80330cec;
+    line->m_min.x = kLineBoundsInitMin;
+    line->m_min.y = kLineBoundsInitMin;
+    line->m_min.z = kLineBoundsInitMin;
+    line->m_max.x = kLineBoundsInitMax;
+    line->m_max.y = kLineBoundsInitMax;
+    line->m_max.z = kLineBoundsInitMax;
+    line->m_totalLength = kLineSegmentMinT;
 
     for (unsigned int i = 0; i < line->m_numPoints; i++) {
         const Vec& point = line->m_points[i];
@@ -1727,7 +1724,7 @@ extern "C" void CalcBound__9CLine(CLine<64>* line)
             segment.length = PSVECMag(&segment.delta);
             segment.startLength = line->m_totalLength;
             line->m_totalLength += segment.length;
-            if (segment.length != FLOAT_80330cec) {
+            if (segment.length != kLineSegmentMinT) {
                 PSVECNormalize(&segment.delta, &segment.normal);
             }
         }
@@ -2097,3 +2094,4 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         }
     }
 }
+

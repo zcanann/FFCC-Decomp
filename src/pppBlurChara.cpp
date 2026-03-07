@@ -136,7 +136,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     width = (unsigned int)FLOAT_80331050;
     height = (unsigned int)FLOAT_80331054;
 
-    Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
     gUtil.BeginQuadEnv();
@@ -350,7 +350,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
                                                                pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
         unsigned int div = *((unsigned char*)&param_2->m_dataValIndex + 2);
-        Graphic.CreateSmallBackTexture(DAT_80238030, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);
+        Graphic.CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);
     }
 
     pppInitBlendMode__Fv();

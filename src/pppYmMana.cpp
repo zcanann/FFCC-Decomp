@@ -796,7 +796,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     Graphic.SetViewport();
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
     PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
-    Graphic.GetBackBufferRect2(DAT_80238030, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = (CGObject*)work[0];
     if (gObject == NULL) {
@@ -822,7 +822,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     sourceTexObjs = work[8];
 
     if (*(u8*)((u8*)step + 0x38) != 0) {
-        Graphic.GetBackBufferRect2(DAT_80238030, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
         C_MTXPerspective(projectionMtx, FLOAT_80330eb8, FLOAT_80330e58, FLOAT_80330e58, FLOAT_80330ec0);
@@ -882,7 +882,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 *(u32*)(ownerModel + 0x100) = 0;
             }
 
-            Graphic.GetBackBufferRect2(DAT_80238030, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
+            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
                                        GX_NEAR, GX_TF_RGBA8, 0);
             depthTexSize += GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
             sourceTexObjs += 0x20;

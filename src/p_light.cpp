@@ -1349,7 +1349,7 @@ void CLightPcs::MakeLightMap()
     GXSetAlphaUpdate(GX_FALSE);
     GXSetTexCopySrc(0, 0, 0x40, 0x40);
     GXSetTexCopyDst((u16)0x40, (u16)0x40, GX_TF_I8, GX_FALSE);
-    GXCopyTex(DAT_80238030, GX_TRUE);
+    GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
 }
 
 /*

@@ -1000,7 +1000,7 @@ void CGraphicPcs::drawScreenFade()
                     const float t0 = ((tile & 2) ? 1.0f : 0.0f) * 0.5f;
                     const float t1 = t0 + 0.5f;
 
-                    Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, x, y, 0x140, 0xE0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+                    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
                     GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 
                     _GXColor topColor;

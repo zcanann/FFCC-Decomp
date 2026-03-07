@@ -1392,17 +1392,15 @@ int CRedDriver::GetProgramTime()
 {
     int sum;
     int* p;
-    int* end;
     int value;
 
     sum = 0;
     p = DAT_8032f3cc;
-    end = DAT_8032f3cc + 100;
     do {
         value = *p;
         p = p + 1;
         sum = sum + value;
-    } while (p < end);
+    } while (p < DAT_8032f3cc + 100);
     return sum;
 }
 

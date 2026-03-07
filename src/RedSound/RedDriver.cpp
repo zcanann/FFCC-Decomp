@@ -11,8 +11,8 @@
 #include "dolphin/os.h"
 
 // Global objects that need initialization
-extern void* DAT_8032e13c;
-extern void* DAT_8032e148;
+void* DAT_8032e13c;
+void* DAT_8032e148;
 
 extern "C" {
     void __register_global_object(void*, void (*)(void*), void*);
@@ -96,16 +96,16 @@ int DAT_8032f448[2];
 int DAT_8032f478[2];
 int DAT_8032f3bc;
 int DAT_8032f3b8;
-extern int DAT_8032e12c[];
 RedWaveSettingState DAT_8032daac;
 void* DAT_8032f3e0[2];
 void* DAT_8032f3e8[2];
-extern void* DAT_8032b860;
+u8 DAT_8032b860[0x1F18];
+int DAT_8032e12c[10];
+OSSemaphore DAT_8032ddd8;
+OSSemaphore DAT_8032daa0;
+OSSemaphore DAT_8032e120;
 extern void* DAT_8032c660;
 extern int DAT_8021ec10[];
-extern OSSemaphore DAT_8032ddd8;
-extern OSSemaphore DAT_8032daa0;
-extern OSSemaphore DAT_8032e120;
 extern OSSemaphore DAT_8032d778;
 extern OSThread DAT_8032dac0;
 extern OSThread DAT_8032d788;

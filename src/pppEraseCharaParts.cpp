@@ -149,10 +149,10 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
         *(u8**)(model + 0xE4) = dstColor;
         *(pppEraseCharaPartsUnkB**)(model + 0xE8) = param_2;
 
-        dstColor[0] = srcColor[0];
-        dstColor[1] = srcColor[1];
-        dstColor[2] = srcColor[2];
-        dstColor[3] = srcColor[3];
+        dstColor[0] = srcColor[8];
+        dstColor[1] = srcColor[9];
+        dstColor[2] = srcColor[10];
+        dstColor[3] = srcColor[11];
 
         DCFlushRange(dstColor, 4);
     }

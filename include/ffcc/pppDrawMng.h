@@ -27,4 +27,6 @@ public:
     float m_depthScale;                       // 0x2204
 }; // Size 0x2208
 
+extern pppDrawMng ppvDrawMng;
+
 #endif // _FFCC_PPPDRAWMNG_H_

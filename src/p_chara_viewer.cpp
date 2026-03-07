@@ -6,7 +6,6 @@
 #include "dolphin/mtx.h"
 #include <string.h>
 
-extern "C" int DAT_8032edc0;
 extern "C" unsigned char Chara[];
 extern "C" unsigned char LightPcs[];
 extern "C" unsigned char Memory[];
@@ -541,8 +540,8 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(unsigned char*)(bumpLight + 0x6B) = 0xFF;
     *(float*)(bumpLight + 0x2C) = kCharaViewerZero;
     *(float*)(bumpLight + 0x30) = kCharaViewerZero;
-    DAT_8032edc0 = AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
-        LightPcs, bumpLight, 0, *(void**)(Chara + 0x2058), 4);
+    gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
+        LightPcs, bumpLight, 0, *(void**)(Chara + 0x2058), 4));
 
     Create__6CCharaFv(Chara);
 }
@@ -565,7 +564,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
 
     Destroy__6CCharaFv(Chara);
     DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(LightPcs, 0);
-    DAT_8032edc0 = 0;
+    gCharaPartWorkPtr = 0;
 
     ref = *(int**)(p + 0x1A0);
     if (ref != 0) {

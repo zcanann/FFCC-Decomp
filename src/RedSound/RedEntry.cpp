@@ -6,7 +6,6 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-extern int DAT_8032e12c;
 extern char DAT_801e7905;
 extern char DAT_80333d30;
 extern char DAT_80333d38;
@@ -1203,7 +1202,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	memoryBank = DAT_8032f480.GetMainBankAddress();
 	bufferTop = nextAddress + DAT_8032f480.GetMainBufferSize();
 	bankEntry = memoryBank;
-	seBlockBase = &DAT_8032e12c;
+	seBlockBase = DAT_8032e12c;
 
 	do {
 		if (bankEntry[1] != 0) {

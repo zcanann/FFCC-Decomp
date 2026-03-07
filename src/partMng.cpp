@@ -15,6 +15,8 @@
 
 #include <string.h>
 
+class CPartPcs;
+
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
@@ -49,14 +51,6 @@ extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
 extern "C" float FLOAT_8032fe58;
 extern "C" float FLOAT_8032fe18;
-extern "C" unsigned char DAT_8032ed68;
-extern "C" int DAT_8032ed6c;
-extern "C" int DAT_8032ed74;
-extern "C" unsigned char gPppInConstructor;
-extern "C" unsigned char gPppInSubFrameCalc;
-extern "C" int DAT_8032ed7c;
-extern "C" unsigned char DAT_8032ed90;
-extern "C" unsigned char DAT_8032ed91;
 extern unsigned char CameraPcs[];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
@@ -77,12 +71,20 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern int gPppCalcDisabled;
 extern CProfile g_par_calc_prof;
-extern unsigned char PartPcs[];
+extern CPartPcs PartPcs;
 extern unsigned char MapPcs[];
 extern void* CAMemCacheSet;
 extern PPPCREATEPARAM g_dcp;
+extern "C" unsigned char DAT_8032ed68 = 0;
+extern "C" int DAT_8032ed6c = 0;
+extern "C" int DAT_8032ed74 = 0;
+extern "C" unsigned char gPppInConstructor = 0;
+extern "C" unsigned char gPppInSubFrameCalc = 0;
+extern "C" int DAT_8032ed7c = 0;
+extern "C" unsigned char DAT_8032ed90 = 0;
+extern "C" unsigned char DAT_8032ed91 = 0;
+extern "C" int gPppCalcDisabled = 0;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
@@ -1022,7 +1024,8 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+        CMemory::CStage* stageLoad =
+            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         *editorObj = static_cast<CGObject*>(__nw__FUlPQ27CMemory6CStagePci(0x518, stageLoad, s_partMng_cpp_801d8230, 0x7b5));
         if (*editorObj != 0) {
             Create__9CGBaseObjFv(*editorObj);
@@ -1789,7 +1792,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
     pppModelSt** modelArrayPtr = reinterpret_cast<pppModelSt**>(reinterpret_cast<unsigned char*>(this) + 0x7ec);
     if (*modelArrayPtr == 0) {
-        CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+        CMemory::CStage* stageLoad =
+            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
             __nw__FUlPQ27CMemory6CStagePci(0x6c00, stageLoad, s_partMng_cpp_801d8230, 0xca9));
         if (modelArray != 0) {
@@ -1907,7 +1911,8 @@ void CPartMng::pppLoadPan(const char* baseName)
 
     pppShapeSt** shapeArrayPtr = reinterpret_cast<pppShapeSt**>(reinterpret_cast<unsigned char*>(this) + 0x7f0);
     if (*shapeArrayPtr == 0) {
-        CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+        CMemory::CStage* stageLoad =
+            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
             __nw__FUlPQ27CMemory6CStagePci(0x2c00, stageLoad, s_partMng_cpp_801d8230, 0xd0b));
         if (shapeArray != 0) {
@@ -1991,7 +1996,8 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
         char m_name[0x20];
     };
 
-    CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+    CMemory::CStage* stageLoad =
+        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(this) + 0x22e18);
     PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
 
@@ -2254,7 +2260,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_envColorG = 0;
     mng->m_envColorB = 0x13;
     mng->m_envColorA = 0x33;
-    if (PartPcs[0x5b145] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
+    if (reinterpret_cast<unsigned char*>(&PartPcs)[0x5b145] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
         mng->m_envColorR = 0;
         mng->m_envColorG = 0;
         mng->m_envColorB = 0x10;

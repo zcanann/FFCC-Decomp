@@ -35,7 +35,7 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 		local_50.x = local_68.z;
 		local_50.y = gPppParMoveMatrixZero;
 		local_50.z = -local_68.x;
-		if (!((local_68.z != gPppParMoveMatrixZero) || (gPppParMoveMatrixZero != local_50.z))) {
+		if ((local_68.z == gPppParMoveMatrixZero) && (gPppParMoveMatrixZero == local_50.z)) {
 			local_50.y = gPppParMoveMatrixZero;
 			local_50.x = gPppParMoveMatrixOne;
 			local_50.z = gPppParMoveMatrixZero;

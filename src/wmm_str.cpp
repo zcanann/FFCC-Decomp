@@ -156,20 +156,22 @@ int CMenuPcs::GetYesNoXPos(int right)
 {
     const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* yesText;
-    if (languageId == 3) {
+    switch (languageId) {
+    case 2:
+        yesText = s_McWinMessGroup0_de[13];
+        break;
+    case 3:
         yesText = s_McWinMessGroup0_it[13];
-    } else if (languageId < 3) {
-        if ((languageId == 1) || (languageId == 0)) {
-            yesText = s_McWinMessGroup0_en[13];
-        } else {
-            yesText = s_McWinMessGroup0_de[13];
-        }
-    } else if (languageId == 5) {
-        yesText = s_McWinMessGroup0_fr[13];
-    } else if (languageId < 5) {
+        break;
+    case 4:
         yesText = s_McWinMessGroup0_es[13];
-    } else {
+        break;
+    case 5:
+        yesText = s_McWinMessGroup0_fr[13];
+        break;
+    default:
         yesText = s_McWinMessGroup0_en[13];
+        break;
     }
 
     CFont* font = menuFont;
@@ -200,20 +202,22 @@ int CMenuPcs::GetSlotABXPos(int right)
 {
     const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* slotAText;
-    if (languageId == 3) {
+    switch (languageId) {
+    case 2:
+        slotAText = s_McWinMessGroup0_de[2];
+        break;
+    case 3:
         slotAText = s_McWinMessGroup0_it[2];
-    } else if (languageId < 3) {
-        if ((languageId == 1) || (languageId == 0)) {
-            slotAText = s_McWinMessGroup0_en[2];
-        } else {
-            slotAText = s_McWinMessGroup0_de[2];
-        }
-    } else if (languageId == 5) {
-        slotAText = s_McWinMessGroup0_fr[2];
-    } else if (languageId < 5) {
+        break;
+    case 4:
         slotAText = s_McWinMessGroup0_es[2];
-    } else {
+        break;
+    case 5:
+        slotAText = s_McWinMessGroup0_fr[2];
+        break;
+    default:
         slotAText = s_McWinMessGroup0_en[2];
+        break;
     }
 
     CFont* font = menuFont;

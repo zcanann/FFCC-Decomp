@@ -6,7 +6,7 @@
 
 extern "C" {
     extern unsigned char MaterialMan[];
-    extern void* CAMemCacheSet;
+    extern unsigned char ppvAmemCacheSet[];
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);
     void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int textureIndex,
@@ -214,7 +214,7 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, CAMemCacheSet);
+            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;
@@ -279,7 +279,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, CAMemCacheSet);
+            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;

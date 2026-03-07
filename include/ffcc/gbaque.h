@@ -60,9 +60,9 @@ public:
     int GetPlayerHP(int, unsigned char*);
     void MakeLetterList(int, char*);
     int MakeLetterData(int, char*, int);
-    void GetLetterLstFlg(int);
+    unsigned int GetLetterLstFlg(int);
     void ClrLetterLstFlg(int);
-    void GetLetterDatFlg(int);
+    unsigned int GetLetterDatFlg(int);
     void ClrLetterDatFlg(int);
     void MoveLetterItem(int, unsigned int);
     void ReplyLetter(int);

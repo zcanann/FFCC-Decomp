@@ -12,6 +12,11 @@
 #include "ffcc/USBStreamData.h"
 #include <string.h>
 
+extern "C" char* gDebugSpinnerText = 0;
+extern "C" unsigned char gDebugSpinnerTextInitialized = 0;
+extern "C" int gDebugSpinnerFrame = 0;
+extern "C" unsigned char gDebugSpinnerFrameInitialized = 0;
+
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);

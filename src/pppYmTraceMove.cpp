@@ -24,15 +24,12 @@ extern "C" {
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
 {
 	Vec* dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	Vec savedPosition = *(Vec*)&pppMngStPtr->m_savedPosition.z;
+	Vec savedPosition = pppMngStPtr->m_savedPosition;
 	Vec paramVec = pppMngStPtr->m_paramVec0;
-	Vec dir;
 	f32 zero;
 
-	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &savedPosition, &paramVec);
-	*(u32*)&dir.x = *(u32*)&dest[1].y;
-	*(u32*)&dir.y = *(u32*)&dest[1].z;
-	*(u32*)&dir.z = *(u32*)&dest[2].x;
+	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &paramVec, &savedPosition);
+	Vec dir = *(Vec*)&dest[1].y;
 	pppCopyVector__FR3Vec3Vec(dest, &dir);
 	zero = kPppYmTraceMoveZero;
 	dest[3].x = zero;

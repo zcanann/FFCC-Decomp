@@ -55,7 +55,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     int iVar7 = serializedDataOffsets[3];
     int iVar5 = serializedDataOffsets[2];
 
-    if (param_2->m_dataValIndex != 0xffff) {
+    if ((s32)param_2->m_dataValIndex != -1) {
         pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
         int textureIndex = 0;
         void* texture;

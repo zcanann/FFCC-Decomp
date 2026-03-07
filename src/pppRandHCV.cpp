@@ -38,6 +38,7 @@ void pppRandHCV(void* p1, void* p2, void* p3)
     u8* base = (u8*)p1;
     RandHCVParams* params = (RandHCVParams*)p2;
     RandHCVCtx* ctx = (RandHCVCtx*)p3;
+    s16* target;
     f32* randomValue;
 
     if (gPppCalcDisabled != 0) {
@@ -54,35 +55,20 @@ void pppRandHCV(void* p1, void* p2, void* p3)
 
         randomValue = (f32*)(base + *ctx->fieldC + 0x80);
         *randomValue = value;
+    } else if (params->field0 != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (params->field0 != *(s32*)(base + 0xC)) {
-            return;
-        }
         randomValue = (f32*)(base + *ctx->fieldC + 0x80);
     }
 
-    s16* target = (params->field4 == -1) ? gPppDefaultValueBuffer : (s16*)(base + params->field4 + 0x80);
+    target = (params->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + params->field4 + 0x80);
 
     {
         f32 scale = *randomValue;
-        s16 baseValue;
-        f32 delta;
-
-        baseValue = params->field8;
-        delta = (f32)baseValue * scale - (f32)baseValue;
-        target[0] = (s16)(target[0] + (s32)delta);
-
-        baseValue = params->fieldA;
-        delta = (f32)baseValue * scale - (f32)baseValue;
-        target[1] = (s16)(target[1] + (s32)delta);
-
-        baseValue = params->fieldC;
-        delta = (f32)baseValue * scale - (f32)baseValue;
-        target[2] = (s16)(target[2] + (s32)delta);
-
-        baseValue = params->fieldE;
-        delta = (f32)baseValue * scale - (f32)baseValue;
-        target[3] = (s16)(target[3] + (s32)delta);
+        target[0] += (s16)((f32)params->field8 * scale - (f32)params->field8);
+        target[1] += (s16)((f32)params->fieldA * scale - (f32)params->fieldA);
+        target[2] += (s16)((f32)params->fieldC * scale - (f32)params->fieldC);
+        target[3] += (s16)((f32)params->fieldE * scale - (f32)params->fieldE);
     }
 }
 

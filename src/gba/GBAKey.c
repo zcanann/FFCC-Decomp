@@ -45,30 +45,31 @@ static void F25(void* task)
     __GBAX01(chan, 0);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A8D9C
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static void F232(void* task)
 {
     s32 chan;
+    s32 result;
 
-    if (&__GBA[0].task == task) {
-        chan = 0;
-    } else if (&__GBA[1].task == task) {
-        chan = 1;
-    } else if (&__GBA[2].task == task) {
-        chan = 2;
-    } else if (&__GBA[3].task == task) {
-        chan = 3;
-    } else {
-        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
-        chan = -1;
-    }
+    chan = F152(task);
 
     DSPSendMailToDSP(0xabba0000);
-    while (DSPCheckMailToDSP() != 0) {
-    }
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 
-    DSPSendMailToDSP((u32)((u8*)__GBA + (chan << 8) + 0xf8));
-    while (DSPCheckMailToDSP() != 0) {
-    }
+    DSPSendMailToDSP((u32)&__GBA[chan].param);
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 }
 
 static void F252(void* task)

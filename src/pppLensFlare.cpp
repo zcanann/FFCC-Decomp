@@ -22,6 +22,7 @@ extern struct {
 } CameraPcs;
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
+extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 /*
  * --INFO--
@@ -168,6 +169,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	int shapeOffset;
 	int colorOffset;
 	long* shape;
+	s16 dataValIndex;
 	u8* lensBytes;
 	u8* shapeBytes;
 	u8* colorBytes;
@@ -208,7 +210,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_6c.y = local_60.y;
 		local_6c.z = local_60.z;
 
-		pppCopyVector(*(Vec*)(shapeBytes + 0xa0), local_6c);
+		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBytes + 0xa0), &local_6c);
 
 		GXLoadPosMtxImm(local_54, 0);
 

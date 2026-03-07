@@ -308,18 +308,19 @@ int PADReset(u32 mask) {
 
     enabled = OSDisableInterrupts();
     mask |= PendingBits;
-    mask &= ~(WaitingBits | CheckingBits);
     PendingBits = 0;
-    ResettingBits = ResettingBits | mask;
+    mask &= ~(WaitingBits | CheckingBits);
+    ResettingBits |= mask;
     disableBits = ResettingBits & EnabledBits;
+    EnabledBits &= ~mask;
+    BarrelBits &= ~mask;
+
     if (Spec == PAD_SPEC_4) {
-        RecalibrateBits = RecalibrateBits | mask;
+        RecalibrateBits |= mask;
     }
 
-    EnabledBits = EnabledBits & ~mask;
     SIDisablePolling(disableBits);
-
-    if (ResettingChan == 0x20) {
+    if (ResettingChan == 32) {
         DoReset();
     }
 
@@ -333,16 +334,18 @@ BOOL PADRecalibrate(u32 mask) {
 
     ASSERTMSGLINE(939, !(mask & 0x0FFFFFFF), "PADReset(): invalid mask");
     enabled = OSDisableInterrupts();
-
-    mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
-    ResettingBits |= mask;
+    mask |= PendingBits;
     PendingBits = 0;
+    mask &= ~(WaitingBits | CheckingBits);
+    ResettingBits |= mask;
     disableBits = ResettingBits & EnabledBits;
+    EnabledBits &= ~mask;
+    BarrelBits &= ~mask;
+
     if (!(__gUnknown800030E3 & 0x40)) {
         RecalibrateBits |= mask;
     }
 
-    EnabledBits &= ~mask;
     SIDisablePolling(disableBits);
     if (ResettingChan == 32)
         DoReset();

@@ -90,7 +90,7 @@ extern int DAT_8032f44c;
 extern int DAT_8032f448;
 extern int DAT_8032f47c;
 extern int DAT_8032f478;
-extern int DAT_8032f3bc;
+int DAT_8032f3bc;
 extern int DAT_8032f3b8;
 extern int DAT_8032e12c[];
 extern int DAT_8032daac;

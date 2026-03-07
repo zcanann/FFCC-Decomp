@@ -65,7 +65,7 @@ extern "C" unsigned char LightPcs[];
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 
-extern float FLOAT_8032ee18;
+float FLOAT_8032ee18;
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;

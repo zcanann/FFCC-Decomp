@@ -76,14 +76,6 @@ extern CPartPcs PartPcs;
 extern unsigned char MapPcs[];
 extern void* CAMemCacheSet;
 extern PPPCREATEPARAM g_dcp;
-extern "C" unsigned char DAT_8032ed68;
-extern "C" int DAT_8032ed6c;
-extern "C" int DAT_8032ed74;
-extern "C" unsigned char gPppInSubFrameCalc;
-extern "C" int DAT_8032ed7c;
-extern "C" unsigned char DAT_8032ed90;
-extern "C" unsigned char DAT_8032ed91;
-
 extern "C" {
 unsigned char DAT_8032ed68 = 0;
 int DAT_8032ed6c = 0;

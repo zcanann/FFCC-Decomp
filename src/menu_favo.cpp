@@ -6,7 +6,7 @@
 #include "ffcc/sound.h"
 #include <string.h>
 
-static unsigned char s_rank[0x20];
+unsigned char s_rank[0x20];
 
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int __cntlzw(unsigned int);

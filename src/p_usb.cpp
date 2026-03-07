@@ -9,6 +9,10 @@
 CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
+u32 m_table_desc0__7CUSBPcs[3];
+u32 m_table_desc1__7CUSBPcs[3];
+u32 m_table_desc2__7CUSBPcs[3];
+u32 m_table__7CUSBPcs[0x15C / sizeof(u32)];
 extern "C" const char s_CUSBPcs_8032f810[];
 extern "C" const char s_plot_kmitsuru__801d6d14[];
 extern "C" {

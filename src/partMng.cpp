@@ -80,6 +80,9 @@ extern "C" {
 unsigned char DAT_8032ed68 = 0;
 int DAT_8032ed6c = 0;
 int DAT_8032ed74 = 0;
+float gPartScreenMatrixRow2X = 0.0f;
+float gPartScreenMatrixRow2Y = 0.0f;
+float gPartScreenMatrixRow2W = 0.0f;
 unsigned char gPppInConstructor = 0;
 unsigned char gPppInSubFrameCalc = 0;
 int DAT_8032ed7c = 0;

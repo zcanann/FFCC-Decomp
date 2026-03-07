@@ -4,6 +4,10 @@
 
 CSystemPcs SystemPcs;
 extern unsigned int PTR_PTR_s_CSystemPcs_801ea270[];
+unsigned int m_table_desc0__10CSystemPcs[3];
+unsigned int m_table_desc1__10CSystemPcs[3];
+unsigned int m_table_desc2__10CSystemPcs[3];
+unsigned char m_table__10CSystemPcs[0x15C];
 
 /*
  * --INFO--

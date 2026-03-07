@@ -6,7 +6,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-extern void* ARRAY_802ea170;
+u8 ARRAY_802ea170[0xC];
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);

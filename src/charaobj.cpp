@@ -27,6 +27,10 @@ extern "C" char sCharaObjDebugStatFormat[];
 
 int gCGCharaObjCreateSerial = 0;
 unsigned char gCGCharaObjCreateSerialInit = 0;
+extern "C" {
+float kOneF32 = 1.0f;
+float kHalfF32 = 0.5f;
+}
 
 /*
  * --INFO--

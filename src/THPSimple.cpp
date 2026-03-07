@@ -51,6 +51,13 @@ THPSimpleControl SimpleControl;
 static THPVideoInfo sVideoInfoWork;
 static THPAudioInfo sAudioInfoWork;
 static u8 sReadBuffer[0x40];
+s32 gTHPSimpleInitialized;
+s32 gTHPSimpleSoundBufferIndex;
+void (*gTHPSimpleOldAIDCallback)(void);
+s16* gTHPSimpleCurAudioBuffer;
+s16* gTHPSimpleLastAudioBuffer;
+s32 gTHPSimpleAudioSystem;
+s16 WorkBuffer_32_[0x280];
 
 /*
  * --INFO--

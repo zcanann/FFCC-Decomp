@@ -1,4 +1,5 @@
 #include "ffcc/pppBreathModel.h"
+#include "ffcc/linkage.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
@@ -7,7 +8,6 @@
 
 extern CMath math;
 const float FLOAT_80330F80 = -1.0f;
-extern u32 CFlatFlags;
 extern Mtx ppvCameraMatrix0;
 extern unsigned char* pppMngStPtr;
 extern unsigned char* pppEnvStPtr;

@@ -16,7 +16,7 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
-extern unsigned char ARRAY_8026D338[];
+unsigned char ARRAY_8026D338[0xC];
 static char s_MaterialEditor[] = "MaterialEditor=%c";
 extern class CCameraPcs {
 public:

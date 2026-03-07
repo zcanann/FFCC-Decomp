@@ -1,6 +1,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/materialman.h"
 #include "ffcc/maplight.h"
@@ -50,7 +51,6 @@ unsigned int s_loadedMapNo__7CMapPcs;
 extern float DrawRangeDefault;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
-extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" const char s_p_map_cpp_801d7728[];

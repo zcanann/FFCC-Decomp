@@ -19,7 +19,9 @@ CPad Pad;
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 extern "C" char __vt__8CManager[];
 extern "C" char PTR_PTR_DAT_801e8864[];
-extern "C" unsigned char BYTE_ARRAY_8024430c[];
+extern "C" {
+unsigned char BYTE_ARRAY_8024430c[0x34] = {};
+}
 extern "C" float FLOAT_8032f820;
 extern "C" float FLOAT_8032f824;
 extern "C" float FLOAT_8032f828;

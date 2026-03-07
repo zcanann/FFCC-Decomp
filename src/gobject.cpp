@@ -19,8 +19,6 @@
 #include <math.h>
 #include <string.h>
 
-extern u32 CFlatFlags;
-extern Mtx gFlatPosMtx;
 extern "C" int __cntlzw(unsigned int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);

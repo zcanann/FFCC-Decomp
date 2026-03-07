@@ -32,7 +32,7 @@ struct Vec4d
     float z;
     float w;
 };
-extern u8 ARRAY_802ea1a0[];
+u8 ARRAY_802ea1a0[0x20];
 extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
 extern u32 DAT_8020edf8;
 extern u32 DAT_8020edfc;

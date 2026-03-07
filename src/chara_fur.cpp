@@ -18,8 +18,10 @@ public:
 
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
 extern "C" unsigned char Game[];
-extern "C" unsigned char m_mogWork[];
-extern "C" void* gMogFurTexBuffer;
+extern "C" {
+unsigned char m_mogWork[0x30];
+void* gMogFurTexBuffer;
+}
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
 /*

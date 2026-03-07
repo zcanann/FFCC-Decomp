@@ -44,8 +44,10 @@ extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, 
 extern "C" char s_graphic_cpp_801d6348[];
 extern "C" char s_CGraphic_801d6330[];
 extern "C" char sGraphicMemoryStageName[];
-extern "C" OSThread m_thread;
-extern "C" u8 m_threadStack[];
+extern "C" {
+OSThread m_thread;
+u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
+}
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {
     return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);

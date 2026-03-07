@@ -500,7 +500,7 @@ int CCharaPcs::GetNumTexShadow()
     CHandle* head = *(CHandle**)((char*)this + 0x4C);
     CHandle* current = head->m_next;
 
-    while (current != head) {
+    while (head != current) {
         if (((current->m_flags & 0x200) != 0) && (current->m_shadowTexturePtr != 0)) {
             count++;
         }

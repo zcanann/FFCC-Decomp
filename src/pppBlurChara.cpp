@@ -29,7 +29,7 @@ struct pppBlurCharaWork {
 };
 
 struct pppMngStBlurCharaRaw {
-    char _padding0[0xD8];
+    char _padding0[0xDC];
     void* m_charaObj;
 };
 
@@ -220,7 +220,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = *(void**)((u8*)pppMngStPtr + 0xD8);
+    void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
     void* handle;
     int model;
 
@@ -286,7 +286,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     *(pppBlurCharaWork**)(model + 0xE4) = work;

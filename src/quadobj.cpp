@@ -1,8 +1,6 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/color.h"
 
-#include "ffcc/color.h"
-
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
@@ -47,7 +45,7 @@ void CGQuadObj::onDraw()
         CColor color(0xff, 0xff, 0xff, 0xff);
         GXSetChanMatColor(GX_COLOR0A0, color.color);
         GXLoadPosMtxImm(*(Mtx*)(CameraPcs + 0x4), GX_PNMTX0);
-        GXBegin(GX_LINES, GX_VTXFMT0, (u32)m_vertexCount * 6);
+        GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
         int i = 0;
         QuadVertex* vert = m_vertices;

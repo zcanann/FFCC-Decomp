@@ -1059,7 +1059,7 @@ void CGItemObj::onNewFinished()
 {
 	unsigned char* self = (unsigned char*)this;
 
-	*(int*)(self + 0x568) = *(int*)(self + 0x144);
+	*(float*)(self + 0x568) = *(float*)(self + 0x144);
 	*(unsigned short*)(self + 0x560) = (unsigned short)((DAT_8032ee90 >> 3) & 1);
 	loadModel();
 }

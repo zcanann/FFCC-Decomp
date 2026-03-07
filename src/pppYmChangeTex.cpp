@@ -14,6 +14,28 @@ struct _pppEnvStYmChangeTex {
 	CMaterialSet* m_materialSetPtr;
 	CMapMesh** m_mapMeshPtr;
 };
+
+struct ChangeTexDisplayList {
+	u32 m_size;
+	void* m_data;
+	u16 m_material;
+	u16 _pad;
+};
+
+struct ChangeTexMeshData {
+	u8 _pad0[0x20];
+	void* m_normals;
+	u8 _pad1[0x28];
+	s32 m_displayListCount;
+	ChangeTexDisplayList* m_displayLists;
+};
+
+struct ChangeTexMeshRef {
+	u8 _pad0[0x8];
+	ChangeTexMeshData* m_data;
+	u8 _padC[0x14 - 0xC];
+};
+
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
@@ -53,8 +75,8 @@ extern "C" {
  */
 void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, int displayListIdx, float (*) [4])
 {
-	char* mesh = (char*)model + 0xac + meshIdx * 0x14;
-	void* displayList = (char*)(*(void**)(*(int*)(mesh + 8) + 0x50)) + displayListIdx * 0xc;
+	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
+	ChangeTexDisplayList* displayList = meshes[meshIdx].m_data->m_displayLists + displayListIdx;
 
 	if (*(char*)((char*)param_3 + 0x14) == 0) {
 		*(int*)(MaterialManRaw() + 0xd0) = (int)param_2 + 0x1c + 0x28;
@@ -75,12 +97,11 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 		*(int*)(MaterialManRaw() + 0x40) = 0xade0f;
 	}
 
-	void* materialSet = *(void**)(*(int*)((char*)model + 0xa4) + 0x24);
-	unsigned int material = *(unsigned short*)((char*)displayList + 8);
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, material, 0, 0);
+	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+	    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
 
 	if ((*(char*)((char*)param_3 + 0x14) == 1) || (*(char*)((char*)param_3 + 0x14) == 0)) {
-		GXCallDisplayList(*(void**)displayList, *(unsigned int*)((char*)displayList + 4));
+		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
 }
 
@@ -452,4 +473,3 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChange
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	}
 }
-

@@ -2411,4 +2411,3 @@ void CMemory::CStage::GetTop()
 {
 	// TODO
 }
-

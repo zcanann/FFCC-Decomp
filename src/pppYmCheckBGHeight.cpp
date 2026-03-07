@@ -57,18 +57,20 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cyl[2] = pppMngSt->m_matrix.value[2][3];
         cyl[6] = kPppYmCheckBGHeightAxisZero;
         cyl[7] = kPppYmCheckBGHeightProbeDirY;
-        cyl[8] = kPppYmCheckBGHeightCylinderScale;
-        cyl[9] = kPppYmCheckBGHeightCylinderScale;
+        cyl[8] = kPppYmCheckBGHeightAxisZero;
+        cyl[9] = kPppYmCheckBGHeightAxisZero;
         cyl[10] = kPppYmCheckBGHeightCylinderScale;
-        cyl[11] = kPppYmCheckBGHeightCylinderOffset;
-        cyl[12] = kPppYmCheckBGHeightCylinderOffset;
+        cyl[11] = kPppYmCheckBGHeightCylinderScale;
+        cyl[12] = kPppYmCheckBGHeightCylinderScale;
         cyl[13] = kPppYmCheckBGHeightCylinderOffset;
-        cyl[14] = kPppYmCheckBGHeightAxisZero;
-        cyl[15] = kPppYmCheckBGHeightAxisZero;
+        cyl[14] = kPppYmCheckBGHeightCylinderOffset;
+        cyl[15] = kPppYmCheckBGHeightCylinderOffset;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)cyl, &direction, -1) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if (currentY - param_2->m_unk0xC <= hitPos.y) {
+            if (currentY - param_2->m_unk0xC > hitPos.y) {
+                updatedY = currentY;
+            } else {
                 updatedY = hitPos.y + param_2->m_unk0x8;
             }
         }
@@ -87,4 +89,3 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
     return pppYmCheckBGHeight;
 }
-

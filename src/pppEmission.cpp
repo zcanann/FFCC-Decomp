@@ -10,7 +10,7 @@
 #include <string.h>
 
 struct _pppMngStEmission {
-    u8 _pad0[8];
+    u8 _pad0[0xD8];
     void* m_charaObj;
 };
 
@@ -42,6 +42,7 @@ extern double DOUBLE_803311f0;
 extern char s_pppEmission_cpp_801db7e8[];
 
 extern "C" {
+void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
@@ -87,6 +88,7 @@ struct EmissionMeshData {
 struct EmissionMeshRef {
     u8 _pad0[8];
     EmissionMeshData* m_data;
+    u8 _pad1[8];
 };
 
 struct EmissionModelData {
@@ -104,7 +106,7 @@ struct EmissionModelData {
  * JP Size: TODO
  */
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
-    Graphic.SetDrawDoneDebugData(0x64);
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x64);
 
     EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
     EmissionMeshData* meshData = meshList[meshIndex].m_data;
@@ -120,7 +122,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
             MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);
-        Graphic.SetDrawDoneDebugData(0x65);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
     }
 }
 
@@ -134,7 +136,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
  * JP Size: TODO
  */
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
-    Graphic.SetDrawDoneDebugData(0x66);
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
 
     char* meshData = *(char**)((char*)model + 0xAC + (meshIndex * 0x14) + 8);
     if ((strcmp(meshData, DAT_803311fc) == 0) && (*(u8*)((u8*)param_2 + 0xB) != 0)) {
@@ -256,7 +258,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         }
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-        Graphic.SetDrawDoneDebugData(0x67);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x67);
     }
 }
 

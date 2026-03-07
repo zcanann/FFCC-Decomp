@@ -1134,8 +1134,8 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
  */
 u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
-    int* voiceData = (int*)voice;
     u32 changed = 0;
+    int* voiceData = (int*)voice;
 
     if (voiceData[0x17] < 4) {
         if (((voiceData[0x24] & 4U) != 0) || (voiceData[0x17] < 3)) {

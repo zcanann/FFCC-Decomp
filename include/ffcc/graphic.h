@@ -86,6 +86,9 @@ public:
 
     void CreateTempBuffer();
     void DestroyTempBuffer();
+
+    u8 _pad_0x0_to_0x71EB[0x71EC];
+    void* m_scratchTextureBuffer;
 };
 
 extern CGraphic Graphic;

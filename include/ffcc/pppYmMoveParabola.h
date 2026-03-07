@@ -12,7 +12,7 @@ struct pppYmMoveParabola {
 struct pppYmMoveParabolaUnkB {
     u32 m_graphId;
     f32 m_dataValIndex;
-    s32 m_initWOrk;
+    f32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
     f32 m_payload;

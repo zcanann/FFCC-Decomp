@@ -18,6 +18,7 @@ extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 
 extern const f32 FLOAT_80330df0;
+extern const f32 FLOAT_80330dc0;
 extern f32 FLOAT_80330de0;
 extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
@@ -82,8 +83,7 @@ struct CMapCylinderRaw {
  */
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 zero = 0.0f;
-	f32 one = kPppYmLaserOne;
+	f32 one = FLOAT_80330dc0;
 	f32 randArg = FLOAT_80330df0;
 	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
@@ -94,16 +94,16 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	work[3] = one;
 	work[2] = one;
 	work[1] = one;
-	work[7] = zero;
+	*(void**)(work + 7) = 0;
 	work[10] = one;
 	work[9] = one;
 	work[8] = one;
-	*((u8*)work + 0x2c) = 0;
+	*(u8*)(work + 0xb) = 0;
 	*((u8*)work + 0x2d) = 0;
 	*((u8*)work + 0x2e) = 0;
-	*((u16*)((u8*)work + 0x30)) = 0;
-	*((u16*)((u8*)work + 0x32)) = 0;
-	*((u16*)((u8*)work + 0x34)) = 0;
+	*(u16*)(work + 0xc) = 0;
+	*(u16*)(work + 0xd) = 0;
+	*(u16*)((u8*)work + 0x32) = 0;
 	work[14] = RandF__5CMathFf(randArg, &Math);
 }
 

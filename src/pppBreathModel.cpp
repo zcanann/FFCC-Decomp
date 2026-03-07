@@ -61,8 +61,8 @@ void get_rand()
  * JP Size: TODO
  */
 void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, 
-                   VColor* vColor, PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, 
-                   PARTICLE_COLOR* particleColor)
+                   VColor* vColor, _PARTICLE_DATA* particleData, Mtx* particleWmat, 
+                   _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
@@ -248,7 +248,7 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
  * Address:	TODO
  * Size:	TODO
  */
-void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
+void SetParticleMatrix(_pppPObject*, VBreathModel*, _PARTICLE_DATA*, Mtx*, _pppMngSt*)
 {
 	// TODO
 }
@@ -258,7 +258,8 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMA
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateParticle(VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
+extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+    VBreathModel*, PBreathModel* pBreathModel, _PARTICLE_DATA* particleData, VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
@@ -399,8 +400,8 @@ found_search_index:
 
             if (*(unsigned short*)((unsigned char*)pBreathModel + 0x1E) <= *(unsigned short*)(work + 0x44) &&
                 spawnCount < (int)*(unsigned short*)((unsigned char*)pBreathModel + 0x1C)) {
-                BirthParticle(pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
-                              (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
+                BirthParticle(pppObject, vBreathModel, pBreathModel, vColor, (_PARTICLE_DATA*)particleData,
+                              (Mtx*)particleWmat, (_PARTICLE_COLOR*)particleColor);
                 spawnCount++;
 
                 found = false;
@@ -421,7 +422,8 @@ found_search_index:
                 }
             }
         } else {
-            UpdateParticle(vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
+            UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+                vBreathModel, pBreathModel, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
         }
 
         particleData += 0x98;
@@ -891,6 +893,4 @@ void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
-
-
 

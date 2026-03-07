@@ -483,12 +483,27 @@ void CCharaPcs::InitEnv(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079590
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCharaPcs::GetNumTexShadow()
+int CCharaPcs::GetNumTexShadow()
 {
-	// TODO
+    int count = 0;
+    CHandle* head = *(CHandle**)((char*)this + 0x4C);
+    CHandle* current = head->m_next;
+
+    while (current != head) {
+        if (((current->m_flags & 0x200) != 0) && (current->m_shadowTexturePtr != 0)) {
+            count++;
+        }
+        current = current->m_next;
+    }
+
+    return count;
 }
 
 /*

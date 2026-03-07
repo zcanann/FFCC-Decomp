@@ -17,6 +17,8 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
 
+CFontMan FontMan;
+
 namespace {
 typedef void (*VirtualDtorFn)(void*, int);
 
@@ -813,4 +815,3 @@ extern "C" void __sinit_fontman_cpp(void)
 {
 	__register_global_object(&FontMan, __dt__8CFontManFv, &ARRAY_802ea170);
 }
-

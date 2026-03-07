@@ -285,10 +285,12 @@ void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::DMACheck(int id)
 {
 	RedDmaSearchID(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

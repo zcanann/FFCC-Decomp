@@ -3,6 +3,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/p_usb.h"
@@ -54,9 +55,7 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     void*,
     unsigned long);
 
-extern unsigned char PartPcs[];
-extern unsigned char MenuPcs[];
-extern unsigned char ppvDrawMng[];
+extern CMenuPcs MenuPcs;
 extern void* CAMemCacheSet;
 
 extern char DAT_801ead4c[];
@@ -205,9 +204,11 @@ extern unsigned int DAT_801eac78;
 extern unsigned int DAT_801eac84;
 extern unsigned int DAT_801eac88;
 extern unsigned int DAT_801eac8c;
-extern int DAT_8032ed38;
-extern int DAT_8032ed3c;
 extern PPPCREATEPARAM g_dcp;
+int DAT_8032ed38;
+int DAT_8032ed3c;
+CPartPcs PartPcs;
+pppDrawMng ppvDrawMng;
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {
@@ -309,10 +310,11 @@ struct CUSBStreamDataRaw {
 extern "C" void __sinit_p_tina_cpp(void)
 {
     void* object;
+    unsigned char* partPcsRaw = reinterpret_cast<unsigned char*>(&PartPcs);
 
-    *reinterpret_cast<void**>(PartPcs) = &PTR_PTR_s_CPartPcs_801eada4;
-    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(PartPcs + 0x8));
-    __register_global_object(PartPcs, reinterpret_cast<void*>(__dt__8CPartPcsFv), ARRAY_80273928);
+    *reinterpret_cast<void**>(partPcsRaw) = &PTR_PTR_s_CPartPcs_801eada4;
+    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(partPcsRaw + 0x8));
+    __register_global_object(partPcsRaw, reinterpret_cast<void*>(__dt__8CPartPcsFv), ARRAY_80273928);
 
     DAT_801eab18 = DAT_801eaa08;
     DAT_801eab28 = DAT_801eaa10;
@@ -612,8 +614,8 @@ void CPartPcs::create()
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         CAMemCacheSet,
         s_CPartPcs_801d7f54,
-        reinterpret_cast<CUSBStreamDataRaw*>(PartPcs + 8)->m_stageLoad,
-        reinterpret_cast<CUSBStreamDataRaw*>(PartPcs + 8)->m_stageAmem,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_stageLoad,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -857,7 +859,7 @@ void CPartPcs::calcDead()
  */
 void CPartPcs::ClearOt()
 {
-    reinterpret_cast<pppDrawMng*>(ppvDrawMng)->ClearOt();
+    ppvDrawMng.ClearOt();
 }
 
 /*
@@ -923,13 +925,13 @@ void CPartPcs::draw()
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
     if (Game.game.m_gameWork.m_gamePaused != 0) {
-        DrawOt__10pppDrawMngFv(ppvDrawMng);
+        DrawOt__10pppDrawMngFv(&ppvDrawMng);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
         return;
     }
 
     if (usb->m_disableShokiDraw != 0) {
-        DrawOt__10pppDrawMngFv(ppvDrawMng);
+        DrawOt__10pppDrawMngFv(&ppvDrawMng);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
         return;
     }
@@ -1296,7 +1298,7 @@ void LoadFieldPdt0(int mapId, int floorId)
         reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->RefCnt0Compare();
     }
 
-    reinterpret_cast<CUSBStreamDataRaw*>(PartPcs + 8)->m_fieldLoadReq = 1;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_fieldLoadReq = 1;
 
     sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
     pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
@@ -1398,7 +1400,7 @@ void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdt
             pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
             pdtSlotIndex = -1;
         } else {
-            PartPcs[0x2d] = 1;
+            reinterpret_cast<unsigned char*>(&PartPcs)[0x2d] = 1;
         }
     }
 }
@@ -1452,7 +1454,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
                 pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
                 pdtSlotIndex = -1;
             } else {
-                PartPcs[0x2d] = 1;
+                reinterpret_cast<unsigned char*>(&PartPcs)[0x2d] = 1;
             }
         }
     }

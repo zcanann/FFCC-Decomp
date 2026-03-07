@@ -48,8 +48,6 @@ void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
-extern CMenuPcs MenuPcs;
-extern CPartPcs PartPcs;
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {

@@ -19,7 +19,6 @@ extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
-extern CPartPcs PartPcs;
 extern "C" {
 int gBonusMenuWork0 = 0;
 float* gBonusCheckMarkPosBuffer = 0;

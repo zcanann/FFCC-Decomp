@@ -81,7 +81,6 @@ extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
 extern char DAT_8032f984[];
 extern CMath Math;
-extern CPartPcs PartPcs;
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);

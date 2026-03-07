@@ -78,4 +78,6 @@ public:
     void SetUSBData();
 };
 
+extern CPartPcs PartPcs;
+
 #endif

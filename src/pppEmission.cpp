@@ -287,7 +287,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
     state[0] = 0;
-    state[6] = *(int*)(model + 0x9C);
+    *(float*)(state + 6) = *(float*)(model + 0x9C);
     *(u8*)(state + 7) = 0;
 }
 

@@ -49,7 +49,7 @@ extern double DOUBLE_80332030;
 extern double DOUBLE_80332038;
 extern char DAT_80332024[];
 extern char gUtil[];
-extern char s_pppChangeTex_cpp_801dd660[];
+char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

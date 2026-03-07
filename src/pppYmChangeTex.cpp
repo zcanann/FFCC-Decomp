@@ -43,7 +43,7 @@ class CMaterialMan;
 extern CMaterialMan MaterialMan;
 extern float DAT_80330e10;
 extern char gUtil[];
-extern char s_pppYmChangeTex_cpp_801db4c0[];
+char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
 extern float FLOAT_80330e00;

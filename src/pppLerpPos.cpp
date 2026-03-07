@@ -26,7 +26,7 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt* pppMngSt);
 }
 extern float FLOAT_80331bf8;
 extern float FLOAT_80331bfc;
-extern char s_pppLerpPos_cpp_801dd418[];
+char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
 
 /*
  * --INFO--

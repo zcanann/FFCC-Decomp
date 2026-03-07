@@ -42,7 +42,7 @@ extern "C" void* PTR_PTR_s_CTexAnimSet_801e9c6c;
 extern "C" void* PTR_PTR_s_CTexAnim_801e9c54;
 extern "C" void* PTR_PTR_s_CTexAnimSeq_801e9c24;
 extern "C" void* PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
-extern "C" char s_texanim_cpp_801d7adc[];
+extern "C" char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 extern "C" char DAT_8032fb48[];
 const float FLOAT_8032fb38 = 0.0f;
 extern "C" int __cntlzw(unsigned int);

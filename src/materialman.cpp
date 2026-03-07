@@ -50,6 +50,7 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
+extern "C" void* PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc[];
 extern unsigned char Game[];
 class CMapMng;
 extern CMapMng MapMng;
@@ -116,7 +117,7 @@ public:
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
-    m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+    m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;
@@ -240,7 +241,7 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
-    m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+    m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
     RemoveAll();
 }
 
@@ -256,7 +257,7 @@ CPtrArray<CMaterial*>::~CPtrArray()
 extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+        ptrArray->m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
         ptrArray->RemoveAll();
         if (shouldDelete > 0) {
             __dl__FPv(ptrArray);

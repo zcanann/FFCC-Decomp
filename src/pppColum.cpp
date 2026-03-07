@@ -52,12 +52,15 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
     int iVar7 = serializedDataOffsets[3];
     int iVar5 = serializedDataOffsets[2];
+    int textureIndex = 0;
 
-    if ((s32)param_2->m_dataValIndex != -1) {
-        pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        int textureIndex = 0;
+    u32 dataValIndex = param_2->m_dataValIndex;
+    if ((dataValIndex + 0x10000U) != 0xFFFFU) {
+        pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         void* texture;
         u8 alpha = *((u8*)column + 0xb2 + iVar5);
+        pppCVector color;
+        GXColor quadColor;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (alpha != 0) {
@@ -95,7 +98,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 Vec shapePosB;
                 Vec2d uvA;
                 Vec2d uvB;
-                pppCVector color;
                 float dist;
                 float fadeAmount;
 
@@ -140,7 +142,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     PSVECAdd(&shapePosA, &center, &shapePosA);
                     PSVECAdd(&shapePosB, &center, &shapePosB);
 
-                    GXColor quadColor;
                     quadColor.r = color.m_rgba[0];
                     quadColor.g = color.m_rgba[1];
                     quadColor.b = color.m_rgba[2];

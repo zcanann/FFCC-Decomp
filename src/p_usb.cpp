@@ -24,7 +24,6 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 
-extern "C" char __vt__8CManager[];
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
 
 
@@ -258,9 +257,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    *(void**)&USBPcs = __vt__8CManager;
-    *(void**)&USBPcs = &__vt__8CProcess;
-    *(void**)&USBPcs = PTR_PTR_s_CUSBPcs_801e8830;
+    *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
 
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
     m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];

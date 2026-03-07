@@ -150,17 +150,24 @@ static void F27(s32 chan, s32 ret) {
     gba->ret = ret;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A7C74
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __GBAX01(s32 chan, s32 ret) {
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
+    GBASecParam* param = gba->param;
     int val200;
     
     if (ret == GBA_READY) {
-        bootInfo->keyA =
-            (bootInfo->readbuf[3] ^ D54[28]) << 24 |
-            (bootInfo->readbuf[2] ^ D54[14]) << 16 |
-            (bootInfo->readbuf[1] ^ D54[15]) << 8 |
-            (bootInfo->readbuf[0] ^ D54[25]);
+        bootInfo->keyA = param->keyA;
+        bootInfo->keyB = param->keyB;
         
         if (
             bootInfo->readbuf[3] == 0 ||
@@ -172,24 +179,6 @@ void __GBAX01(s32 chan, s32 ret) {
         ) {
             ret = GBA_JOYBOOT_UNKNOWN_STATE;
         } else {
-            switch (bootInfo->paletteSpeed) {
-            case -4:
-            case -3:
-            case -2:
-            case -1:
-                bootInfo->keyB = (bootInfo->paletteColor << 4 | (3 - bootInfo->paletteSpeed)*2) << 16;
-                break;
-            case 0:
-                bootInfo->keyB = (bootInfo->paletteColor << 1 | 0x70) << 16;
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                bootInfo->keyB = (bootInfo->paletteColor << 4 | (bootInfo->paletteSpeed - 1)*2) << 16;
-                break;
-            }
-            
             bootInfo->i = ~D54[36] & bootInfo->length + D54[36];
             val200 = D54[20] << D54[33];
             
@@ -200,29 +189,10 @@ void __GBAX01(s32 chan, s32 ret) {
             bootInfo->realLength = bootInfo->i;
             bootInfo->i -= val200;
             bootInfo->i >>= D54[32];
-            bootInfo->keyB |=
-                ((bootInfo->i & (D54[3] << D54[36])) << D54[31]) |
-                ((bootInfo->i & (D54[3] | (D54[6] << D54[37]))) << D54[7]) |
-                bootInfo->i & D54[4];
-            
-            bootInfo->keyB |=
-                ((bootInfo->keyB + (bootInfo->keyB >> 8) + (bootInfo->keyB >> 16))) << 24 |
-                D54[3] << 24 |
-                D54[5] << 17 |
-                D54[17] << 10 |
-                D54[3];
-            
-            if ((bootInfo->keyB & val200) != 0) {
-                bootInfo->writebuf[3] = (bootInfo->keyB >> 24) ^ D54[13];
-                bootInfo->writebuf[2] = (bootInfo->keyB >> 16) ^ D54[16];
-                bootInfo->writebuf[0] = bootInfo->keyB ^ D54[25];
-                bootInfo->writebuf[1] = (bootInfo->keyB >> 8) ^ D54[26];
-            } else {
-                bootInfo->writebuf[0] = bootInfo->keyB ^ D54[21];
-                bootInfo->writebuf[1] = (bootInfo->keyB >> 8) ^ D54[22];
-                bootInfo->writebuf[3] = (bootInfo->keyB >> 24) ^ D54[22];
-                bootInfo->writebuf[2] = (bootInfo->keyB >> 16) ^ D54[23];
-            }
+            bootInfo->writebuf[0] = (u8)bootInfo->keyB;
+            bootInfo->writebuf[1] = (u8)(bootInfo->keyB >> 8);
+            bootInfo->writebuf[2] = (u8)(bootInfo->keyB >> 0x10);
+            bootInfo->writebuf[3] = (u8)(bootInfo->keyB >> 0x18);
             bootInfo->crc = (D54[38] + 1) << D54[34];
             bootInfo->curOffset = D54[8];
             bootInfo->begin = OSGetTime();

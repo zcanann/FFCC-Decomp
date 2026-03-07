@@ -104,7 +104,7 @@ void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char,
 void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphic*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
@@ -666,8 +666,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     color[3] = colorSource[11];
     DCFlushRange(value + 10, 4);
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param_2->m_stepValue, &pppScreenBreak->field0_0x0, param_2->m_graphId,
-                                                 value, value + 1, value + 2, &param_2->m_arg3, (float*)param_2->m_payload);
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
+                                                 param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
     u32 pieceCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
     if (*(void**)&value[3] == NULL) {

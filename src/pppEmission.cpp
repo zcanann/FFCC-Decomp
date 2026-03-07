@@ -334,9 +334,10 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         state[0] = 0;
     }
 
-    *(float*)(state + 3) = FLOAT_803311f8;
-    *(float*)(state + 4) = FLOAT_803311f8;
+    float baseScale = FLOAT_803311f8;
     *(float*)(state + 5) = FLOAT_803311f8;
+    *(float*)(state + 4) = baseScale;
+    *(float*)(state + 3) = baseScale;
 }
 
 /*

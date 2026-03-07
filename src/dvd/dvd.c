@@ -391,16 +391,18 @@ static void stateGoToRetry() {
 
 static void cbForStateGoToRetry(u32 intType) {
 	if (intType == 16) {
+		((volatile DVDCommandBlock*)executing)->state = -1;
 		stateTimeout();
 		return;
 	}
 
 	if (intType & 2) {
+		((volatile DVDCommandBlock*)executing)->state = -1;
 		stateError(0x1234567);
 		return;
 	}
 
-    ASSERTLINE(1104, intType == DVD_INTTYPE_TC);
+	ASSERTLINE(1104, intType == DVD_INTTYPE_TC);
 	NumInternalRetry = 0;
 
 	if (CurrCommand == 4 || CurrCommand == 5 || CurrCommand == 13 || CurrCommand == 15) {

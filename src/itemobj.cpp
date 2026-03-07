@@ -93,7 +93,7 @@ extern float FLOAT_80331b9c;
 extern float FLOAT_80331bbc;
 extern float FLOAT_80331b68;
 extern double DOUBLE_80331ba0;
-long long DAT_8032ee90;
+extern u32 DAT_8032ee90;
 extern char SoundBuffer[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];

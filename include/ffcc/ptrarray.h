@@ -26,8 +26,8 @@ private:
     unsigned long m_size;
     unsigned long m_numItems;
     unsigned long m_defaultSize;
-    T* m_items;
     CMemory::CStage* m_stage;
+    T* m_items;
     int m_growCapacity;
 };
 

@@ -15,7 +15,6 @@ extern "C" void* __ct__5ZLISTFv(void* self);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
-extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
 extern unsigned char ARRAY_8026D338[];
 static char s_MaterialEditor[] = "MaterialEditor=%c";
@@ -55,8 +54,6 @@ static void WriteF32(void* base, unsigned int offset, float value) {
 extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     volatile void** base = reinterpret_cast<volatile void**>(&MaterialEditorPcs);
-    *base = &__vt__8CManager;
-    *base = &__vt__8CProcess;
     *base = &PTR_PTR_s_CMaterialEditorPcs_801ea644;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
@@ -570,4 +567,3 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
         }
     }
 }
-

@@ -677,15 +677,16 @@ extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*
 	unsigned long heapTotal;
 	unsigned long heapUseRate;
 	unsigned long heapUnused;
+	unsigned long result;
 
 	stage->heapInfo(heapTotal, heapUseRate, heapUnused);
 	if (heapTotal == 0) {
-		heapTotal = 10000;
+		result = 10000;
 	} else {
-		heapTotal = (heapUseRate * 10000) / heapTotal;
+		result = (heapUseRate * 10000) / heapTotal;
 	}
 
-	return heapTotal;
+	return result;
 }
 
 /*

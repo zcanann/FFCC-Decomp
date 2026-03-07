@@ -18,6 +18,9 @@ static u8 gRecvBuf[DDH_BUF_SIZE];
 /* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
 BOOL gIsInitialized;
 
+static char ddh_cc_initialize_calling_exi2_init[] = "CALLING EXI2_Init\n";
+static char ddh_cc_initialize_done_calling_exi2_init[] = "DONE CALLING EXI2_Init\n";
+
 /*
  * --INFO--
  * JP Address: 
@@ -249,9 +252,9 @@ int ddh_cc_shutdown()
  */
 int ddh_cc_initialize(void* inputPendingPtrRef, EXICallback monitorCallback)
 {
-    MWTRACE(1, "CALLING EXI2_Init\n");
+    MWTRACE(1, ddh_cc_initialize_calling_exi2_init);
     EXI2_Init(inputPendingPtrRef, monitorCallback);
-    MWTRACE(1, "DONE CALLING EXI2_Init\n");
+    MWTRACE(1, ddh_cc_initialize_done_calling_exi2_init);
     CircleBufferInitialize(&gRecvCB, gRecvBuf, DDH_BUF_SIZE);
     return 0;
 }

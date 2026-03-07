@@ -25,7 +25,6 @@ extern float kOptionAnimMin;
 extern float kOptionAnimMax;
 extern float kMenuCenteringOffset;
 extern float kOptionRowAnimStep;
-extern double lbl_80333640;
 extern float kOptionOpenAnimStep;
 extern float kOptionColumnAnimStep;
 extern float kOptionVolumeScale;

@@ -6,6 +6,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/stopwatch.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/USBStreamData.h"
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
@@ -74,15 +75,6 @@ extern char s_Tina___c__801d8014[];
 extern char s_clc___3f___max___3f___801d8020[];
 extern char s_drw___3f___max___3f___801d8038[];
 extern char s_hpm___3f___max___3f___801d8050[];
-extern int lbl_801EAE08[3];
-extern char* lbl_8032ED40;
-extern unsigned char lbl_8032ED44;
-extern int lbl_8032ED48;
-extern unsigned char lbl_8032ED4C;
-extern char lbl_8032FDB0[];
-extern float lbl_8032FDB8;
-extern double lbl_8032FDC0;
-extern float lbl_8032FDC8;
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern char DAT_801d8068[];
@@ -1154,7 +1146,7 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 {
 	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
 	float* colorValues = reinterpret_cast<float*>(&color);
-	float one = lbl_8032FDC8;
+	float one = kPartColorIdentityOne;
 
 	GetMngStUserFloat0(pppMngSt) = colorValues[0];
 	GetMngStUserFloat1(pppMngSt) = colorValues[1];
@@ -1215,21 +1207,21 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (lbl_8032ED44 == 0) {
-		lbl_8032ED40 = lbl_8032FDB0;
-		lbl_8032ED44 = 1;
+	if (gDebugSpinnerTextInitialized == 0) {
+		gDebugSpinnerText = sDebugSpinnerText;
+		gDebugSpinnerTextInitialized = 1;
 	}
-	if (lbl_8032ED4C == 0) {
-		lbl_8032ED48 = 0;
-		lbl_8032ED4C = 1;
+	if (gDebugSpinnerFrameInitialized == 0) {
+		gDebugSpinnerFrame = 0;
+		gDebugSpinnerFrameInitialized = 1;
 	}
 
-	lbl_8032ED48++;
-	frameSign = lbl_8032ED48 >> 0x1f;
+	gDebugSpinnerFrame++;
+	frameSign = gDebugSpinnerFrame >> 0x1f;
 	Graphic.Printf(
 		s_Tina___c__801d8014,
-		(int)(char)lbl_8032ED40[(frameSign * 4 |
-								 (unsigned int)((lbl_8032ED48 >> 4) * 0x40000000 + frameSign) >> 0x1e) -
+		(int)(char)gDebugSpinnerText[(frameSign * 4 |
+								 (unsigned int)((gDebugSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
 
 	g_par_calc_prof.ProfEnd();
@@ -1240,8 +1232,8 @@ void CPartPcs::drawAfterViewer()
 		s_drw___3f___max___3f___801d8038, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
 		s_hpm___3f___max___3f___801d8050,
-		(double)((float)lbl_801EAE08[0] / lbl_8032FDB8),
-		(double)((float)lbl_801EAE08[1] / lbl_8032FDB8));
+		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
+		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }
 
 /*

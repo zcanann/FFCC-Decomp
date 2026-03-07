@@ -17,8 +17,6 @@ extern unsigned char DAT_8032ecd8;
 extern unsigned char CharaPcs[];
 extern unsigned char PartPcs[];
 extern unsigned char Sound[];
-extern char s_Debug_80331c90[];
-extern u32 PTR_DAT_80212524;
 extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
 extern u32 DAT_80212398;
 extern u32 DAT_8021239c;
@@ -53,6 +51,24 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
 extern "C" void CheckDriver__6CSoundFi(void*, int);
 extern "C" void pppDumpMngSt__8CPartMngFv(void*);
 extern "C" void DumpLoad__9CCharaPcsFv(void*);
+
+struct DbgMenuDef {
+    const char* text;
+    u32 id;
+    u32 actionType;
+    u32 actionFlags;
+};
+
+char s_Debug_80331c90[] = "Debug";
+
+DbgMenuDef PTR_DAT_80212524[] = {
+    { "MENU", 100, 2, 1 }, { "SHOUKI", 101, 2, 1 },      { "MARK", 102, 2, 1 },       { "BAR", 103, 2, 1 },
+    { "SPEED", 104, 2, 1 }, { "MUTEKI", 105, 2, 1 },      { "FOLLOW", 106, 2, 1 },     { "DISPPRINT", 107, 2, 1 },
+    { "COMBO", 108, 2, 1 }, { "PAUSE", 109, 2, 1 },       { "BATTLE", 110, 2, 1 },     { "ANALOG", 111, 2, 1 },
+    { "COLCHECK", 112, 2, 1 }, { "A*", 113, 2, 1 },       { "PARTICLE", 114, 2, 1 },   { "PRINTF", 115, 2, 1 },
+    { "SOUND_INFO", 116, 3, 1 }, { "SHADOW", 117, 2, 1 }, { "PART_HEAP", 118, 2, 1 },  { "CHARA_INFO", 119, 3, 1 },
+    { "ITEM_WEAPON", 120, 2, 1 }, { "SMITH_MASTER", 121, 2, 1 }, { "CHARA", 122, 2, 1 },
+};
 
 /*
  * --INFO--
@@ -761,7 +777,7 @@ void CDbgMenuPcs::Add()
 	u32 rootParam[13];
 	u32 nodeParam[13];
 	u32 actionParam[13];
-	u32* menuDefs = &PTR_DAT_80212524;
+	u32* menuDefs = (u32*)PTR_DAT_80212524;
 
 	memset(rootParam, 0, sizeof(rootParam));
 	memset(nodeParam, 0, sizeof(nodeParam));

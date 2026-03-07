@@ -27,8 +27,23 @@ extern const char* s_McWinMessGroup1_es[];
 extern const char* s_McWinMessGroup1_fr[];
 
 extern const char s_WinMessTable[];
-extern const char* s_NoTextByLanguage[];
-extern const char* s_SlotBTextByLanguage[];
+
+const char* s_NoTextByLanguage[] = {
+    "No",
+    "Nein",
+    "No",
+    "Non",
+    "No",
+};
+
+const char* s_SlotBTextByLanguage[] = {
+    "Slot B",
+    "Steckplatz B",
+    "Slot B",
+    "Slot B",
+    "Ranura B",
+    0,
+};
 
 /*
  * --INFO--

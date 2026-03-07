@@ -25,6 +25,9 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern unsigned char CFlat[];
 extern "C" char sCharaObjDebugStatFormat[];
 
+int gCGCharaObjCreateSerial = 0;
+unsigned char gCGCharaObjCreateSerialInit = 0;
+
 /*
  * --INFO--
  * PAL Address: 0x8010b67c

@@ -307,10 +307,12 @@ void CRedSound::DMACheck(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SetSoundMode(int mode)
 {
 	CRedDriver_8032f4c0.SetSoundMode(mode);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -523,30 +525,36 @@ void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::ReentrySeSepData(int id)
 {
 	CRedDriver_8032f4c0.ReentrySeSepData(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::SePlayState(int id)
 {
 	CRedDriver_8032f4c0.SePlayState(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::SeStop(int id)
 {
 	CRedDriver_8032f4c0.SeStop(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -591,10 +599,12 @@ int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SeMasterVolume(int volume)
 {
 	CRedDriver_8032f4c0.SeMasterVolume(volume);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -605,10 +615,12 @@ void CRedSound::SeMasterVolume(int volume)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SeFadeOut(int seID, int frameCount)
 {
 	CRedDriver_8032f4c0.SeFadeOut(seID, frameCount);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -667,10 +679,12 @@ void CRedSound::SePitch(int seID, int pitch, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SePause(int seID, int pause)
 {
 	CRedDriver_8032f4c0.SePause(seID, pause);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -681,10 +695,12 @@ void CRedSound::SePause(int seID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int CRedSound::GetSeVolume(int seID, int outVolume)
 {
 	return CRedDriver_8032f4c0.GetSeVolume(seID, outVolume);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -695,10 +711,12 @@ int CRedSound::GetSeVolume(int seID, int outVolume)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::ReportSeLoop(int mode)
 {
 	CRedDriver_8032f4c0.ReportSeLoop(mode);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -723,10 +741,12 @@ void CRedSound::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::StreamPlayState(int streamID)
 {
 	CRedDriver_8032f4c0.StreamPlayState(streamID);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -753,10 +773,12 @@ void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::StreamStop(int streamID)
 {
 	CRedDriver_8032f4c0.StreamStop(streamID);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -813,10 +835,12 @@ void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::StreamPause(int streamID, int pause)
 {
 	CRedDriver_8032f4c0.StreamPause(streamID, pause);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -874,20 +898,24 @@ void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::ClearWaveBank(int id)
 {
 	CRedDriver_8032f4c0.ClearWaveBank(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::ReentryWaveData(int id)
 {
 	CRedDriver_8032f4c0.ReentryWaveData(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -904,10 +932,12 @@ void CRedSound::DisplayWaveInfo()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::TestProcess(int mode)
 {
 	CRedDriver_8032f4c0.TestProcess(mode);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

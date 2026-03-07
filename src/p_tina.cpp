@@ -5,6 +5,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppDrawMng.h"
+#include "ffcc/p_usb.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/USBStreamData.h"
@@ -54,7 +55,6 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 
 extern unsigned char PartPcs[];
 extern unsigned char MenuPcs[];
-extern unsigned char USBPcs[];
 extern unsigned char ppvDrawMng[];
 extern void* CAMemCacheSet;
 
@@ -666,7 +666,7 @@ void CPartPcs::createViewer()
     void* stage;
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
 
-    IsBigAlloc__7CUSBPcsFi(USBPcs, 1);
+    IsBigAlloc__7CUSBPcsFi(&USBPcs, 1);
     usb->m_freePtr = 0;
     usb->m_stageExtra = 0;
     usb->m_blockOnFrame = 0;
@@ -717,7 +717,7 @@ void CPartPcs::destroy()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
 
-    IsBigAlloc__7CUSBPcsFi(USBPcs, 0);
+    IsBigAlloc__7CUSBPcsFi(&USBPcs, 0);
     Destroy__8CPartMngFv(&PartMng);
 
     if (usb->m_stageAmem != 0) {
@@ -821,7 +821,7 @@ void CPartPcs::calcViewer()
     PartMng.pppEditPartCalc();
     OSStopStopwatch(&g_par_calc_prof);
 
-    mccReadData__7CUSBPcsFv(USBPcs);
+    mccReadData__7CUSBPcsFv(&USBPcs);
     if (usbStream->IsUSBStreamDataDone()) {
         if (usbStream->m_packetCode != 0) {
             PartMng.pppDataRcv(usbStream->m_packetCode, reinterpret_cast<char*>(usbStream->m_data), usbStream->m_sizeBytes);

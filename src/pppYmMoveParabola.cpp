@@ -7,7 +7,7 @@
 #include "dolphin/mtx.h"
 
 extern _pppMngSt* pppMngStPtr;
-extern int ppvSinTbl;
+extern float ppvSinTbl[];
 
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -70,22 +70,23 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
  */
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
+    _pppMngSt* pppMngSt = pppMngStPtr;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    _pppMngSt* pppMngSt = pppMngStPtr;
     f32* work = (f32*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
 
     work[1] = work[1] + work[2];
     work[0] = work[0] + work[1];
-    if (stepData->m_graphId == basePtr->field0_0x0.m_graphId) {
+    if (stepData->m_graphId == basePtr->m_graphId) {
         work[0] = work[0] + stepData->m_stepValue;
         work[1] = work[1] + stepData->m_arg3;
         work[2] = work[2] + stepData->m_payload;
     }
 
-    double frameCount = (double)(f32)*(u16*)(work + 3);
+    double frameCount = (double)*(u16*)(work + 3);
     Vec direction;
     if (Game.game.m_currentSceneId == 7) {
         direction.y = gPppYmMoveParabolaZero;
@@ -99,8 +100,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     pppNormalize__FR3Vec3Vec(&direction, &normalizedSource);
 
     u32 sinIndex = (u32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
-    f32 parabolaScale =
-        (f32)(frameCount * (double)(work[0] * *(f32*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC))));
+    f32 parabolaScale = (f32)(frameCount * (double)(work[0] * *(f32*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC))));
     f32 posX = direction.x * parabolaScale;
     f32 posZ = direction.z * parabolaScale;
     f32 posY = (f32)(

@@ -2095,12 +2095,33 @@ void CCaravanWork::SearchCombiTop(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f384
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetNumCombi(int)
+void CCaravanWork::GetNumCombi(int cmdListIdx)
 {
-	// TODO
+	unsigned short nextCmdIdx = 0;
+	if (static_cast<short>(m_currentCmdListIndex) == cmdListIdx) {
+		nextCmdIdx = static_cast<unsigned short>(GetNextCmdListIdx(cmdListIdx, 1));
+	}
+
+	unsigned short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
+	if (m_inventoryItems[static_cast<short>(inventorySlot)] != 0xFFFF) {
+		m_inventoryItems[static_cast<short>(inventorySlot)] = 0xFFFF;
+		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
+		DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<char>(inventorySlot));
+	}
+
+	m_commandListInventorySlotRef[cmdListIdx] = 0xFFFF;
+	Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
+
+	if (static_cast<short>(m_currentCmdListIndex) == cmdListIdx) {
+		m_currentCmdListIndex = nextCmdIdx;
+	}
 }
 
 /*

@@ -1829,9 +1829,12 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetLetterLstFlg(int)
+unsigned int GbaQueue::GetLetterLstFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned int value = (unsigned char)reinterpret_cast<char*>(this)[0x2C89] & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return value != 0;
 }
 
 /*
@@ -1849,9 +1852,12 @@ void GbaQueue::ClrLetterLstFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetLetterDatFlg(int)
+unsigned int GbaQueue::GetLetterDatFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned int value = (unsigned char)reinterpret_cast<char*>(this)[0x2C89] & (0x10U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return value != 0;
 }
 
 /*
@@ -3308,9 +3314,12 @@ void GbaQueue::GetHitEInfo(int)
  * Address:	TODO
  * Size:	TODO
  */
-bool GbaQueue::IsSingleMode(int)
+bool GbaQueue::IsSingleMode(int channel)
 {
-	return false;
+	OSWaitSemaphore(accessSemaphores + channel);
+	bool isSingle = reinterpret_cast<signed char*>(this)[0x2D56] == 1;
+	OSSignalSemaphore(accessSemaphores + channel);
+	return isSingle;
 }
 
 /*

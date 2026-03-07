@@ -4,7 +4,10 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/graphic.h"
 #include "ffcc/menu.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_light.h"
 #include "ffcc/THPSimple.h"
 
 #include <dolphin/mtx.h>
@@ -59,9 +62,6 @@ extern "C" void pppDestroyAll__8CPartMngFv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
-extern "C" unsigned char CameraPcs[];
-extern "C" unsigned char CharaPcs[];
-extern "C" unsigned char LightPcs[];
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 
@@ -1767,7 +1767,7 @@ void CMenuPcs::SetProjection(int mode)
 	Mtx44 projectionMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	PSMTX44Copy(projectionMtx, *reinterpret_cast<Mtx44*>(CameraPcs + 0x48));
+	PSMTX44Copy(projectionMtx, *reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48));
 
 	Vec target;
 	target.x = FLOAT_803313dc;
@@ -1780,9 +1780,9 @@ void CMenuPcs::SetProjection(int mode)
 
 	Mtx lookAtMtx;
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-	PSMTXCopy(lookAtMtx, *reinterpret_cast<Mtx*>(CameraPcs + 0x4));
+	PSMTXCopy(lookAtMtx, *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4));
 
-	InitEnv__9CCharaPcsFi(CharaPcs, 5);
+	InitEnv__9CCharaPcsFi(&CharaPcs, 5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
 	_GXColor clearColor = {0, 0, 0, 0};
@@ -1818,7 +1818,7 @@ void CMenuPcs::RestoreProjection()
 	Mtx44 projectionMtx;
 	_GXColor clearColor = {0, 0, 0, 0};
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), projectionMtx);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48), projectionMtx);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	SetViewport__8CGraphicFv(&Graphic);
 	GXSetScissor(0, 0, 0x280, 0x1C0);
@@ -3234,15 +3234,15 @@ void CMenuPcs::SetLight(int mode)
 	int* const lightTable = DAT_8021082c + mode * 0xE;
 
 	SetFog__8CGraphicFii(&Graphic, 1, 0);
-	SetAmbient__9CLightPcsF8_GXColor(LightPcs, &DAT_80210830[mode * 0xE]);
-	SetNumDiffuse__9CLightPcsFUl(LightPcs, static_cast<unsigned long>(lightTable[0]));
+	SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &DAT_80210830[mode * 0xE]);
+	SetNumDiffuse__9CLightPcsFUl(&LightPcs, static_cast<unsigned long>(lightTable[0]));
 
 	for (int i = 0; i < lightTable[0]; i++) {
 		localColor = lightTable[2 + i];
-		SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(LightPcs, static_cast<unsigned long>(i), &localColor, lightTable + 5 + i * 3, 0);
+		SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, static_cast<unsigned long>(i), &localColor, lightTable + 5 + i * 3, 0);
 	}
 
-	SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(LightPcs, 0, 0, 0xFFFFFFFF);
+	SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
 }
 
 /*

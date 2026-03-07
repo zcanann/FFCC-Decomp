@@ -1,16 +1,17 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
+#include "ffcc/memory.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_light.h"
+#include "ffcc/p_usb.h"
+#include "ffcc/system.h"
 #include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
 #include <string.h>
 
 extern "C" unsigned char Chara[];
-extern "C" unsigned char LightPcs[];
-extern "C" unsigned char Memory[];
-extern "C" unsigned char USBPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -50,7 +51,6 @@ extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, uns
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char s_no_texture____801da7e8[];
-extern "C" void* System;
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double fmod(double, double);
 class CCameraPcs;
@@ -147,10 +147,10 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 Printf__8CGraphicFPce(&Graphic, s_no_texture____801da7e8);
             } else {
                 SetFog__8CGraphicFii(&Graphic, 0, 0);
-                SetAmbient__9CLightPcsF8_GXColor(LightPcs, p + 0xE8);
-                SetNumDiffuse__9CLightPcsFUl(LightPcs, 3);
+                SetAmbient__9CLightPcsF8_GXColor(&LightPcs, p + 0xE8);
+                SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
                 for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
-                    SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(LightPcs, lightIndex, p + 0xF0 + lightIndex * 4,
+                    SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, lightIndex, p + 0xF0 + lightIndex * 4,
                                                              p + 0x108 + lightIndex * 12,
                                                              (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
                 }
@@ -160,7 +160,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 lightPos.x = scratchMtx[0][3];
                 lightPos.y = scratchMtx[1][3];
                 lightPos.z = scratchMtx[2][3];
-                SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(LightPcs, 0, &lightPos, 0xFFFFFFFF);
+                SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, &lightPos, 0xFFFFFFFF);
 
                 Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
                 DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
@@ -196,7 +196,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
     if ((*(int*)(p + 0x2BC) != 0) || (*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x4C4) != 0) || (*(int*)(p + 0x710) != 0)) {
         if (*(int*)(p + 0x2BC) != 0) {
-            Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x2C0);
+            Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x2C0);
             fileHandle = File.Open((char*)(p + 0x2C0), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x194);
@@ -224,7 +224,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         if ((*(int*)(p + 0x5F0) != 0) && (*(void**)(p + 0x190) != 0)) {
-            Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x5F4);
+            Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x5F4);
             fileHandle = File.Open((char*)(p + 0x5F4), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
@@ -248,7 +248,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 for (i = 0; i < *(unsigned int*)(p + 0x1A8); i++) {
                     unsigned int idx = *(unsigned int*)(p + 0x1A4);
                     sprintf(pathBuf, s_no_texture____801da7e8 + 0x64, p + 0x3C4, idx);
-                    Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, pathBuf);
+                    Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         releaseRef(p, 0x1B0 + idx * 4);
@@ -269,7 +269,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 }
                 *(int*)(p + 0x710) = 0;
             } else {
-                Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x3C4);
+                Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x3C4);
                 fileHandle = File.Open((char*)(p + 0x3C4), 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
@@ -286,7 +286,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         if (*(int*)(p + 0x4C4) != 0) {
-            Printf__7CSystemFPce(System, s_no_texture____801da7e8 + 0x48, p + 0x4C8);
+            Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x4C8);
             fileHandle = File.Open((char*)(p + 0x4C8), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x2B0);
@@ -436,9 +436,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     Vec lightDir;
 
     memset(p + 0xCC, 0, 0x18);
-    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(Memory, 0x177000, s_no_texture____801da7e8 + 0xDC, 0);
-    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(Memory, 0x200000, s_no_texture____801da7e8 + 0xF0, 0);
-    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(Memory, 0x190000, s_no_texture____801da7e8 + 0x108, 0);
+    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_no_texture____801da7e8 + 0xDC, 0);
+    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_no_texture____801da7e8 + 0xF0, 0);
+    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_no_texture____801da7e8 + 0x108, 0);
 
     p[0xE8] = 0x3F;
     p[0xE9] = 0x3F;
@@ -515,7 +515,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(int*)(p + 0x5EC) = -1;
     *(int*)(p + 0x5C8) = 1;
 
-    sprintf(pathBuf, s_no_texture____801da7e8 + 0x17C, *(unsigned int*)(USBPcs + 4));
+    sprintf(pathBuf, s_no_texture____801da7e8 + 0x17C, *reinterpret_cast<unsigned int*>(USBPcs.m_rootPath));
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
         File.Read(fileHandle);
@@ -541,7 +541,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(bumpLight + 0x2C) = kCharaViewerZero;
     *(float*)(bumpLight + 0x30) = kCharaViewerZero;
     gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
-        LightPcs, bumpLight, 0, *(void**)(Chara + 0x2058), 4));
+        &LightPcs, bumpLight, 0, *(void**)(Chara + 0x2058), 4));
 
     Create__6CCharaFv(Chara);
 }
@@ -563,7 +563,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     unsigned int i;
 
     Destroy__6CCharaFv(Chara);
-    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(LightPcs, 0);
+    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
     gCharaPartWorkPtr = 0;
 
     ref = *(int**)(p + 0x1A0);
@@ -632,9 +632,9 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
         i++;
     } while (i < 0x40);
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(Memory, *(void**)(p + 0xCC));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(Memory, *(void**)(p + 0xD0));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(Memory, *(void**)(p + 0xD4));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xCC));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD0));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD4));
 }
 
 

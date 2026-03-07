@@ -1,4 +1,5 @@
 #include "ffcc/pppLight.h"
+#include "ffcc/p_light.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 extern unsigned char gPppDefaultValueBuffer[];
@@ -9,7 +10,6 @@ extern unsigned char* pppMngStPtr;
 extern "C" {
 void __ct__Q29CLightPcs6CLightFv(void*);
 void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
-unsigned char LightPcs[];
 }
 
 /*
@@ -202,7 +202,7 @@ void pppLight(void* param1, void* param2, void* param3)
 				*(float*)(lightData + 0x44) = kPppLightZero;
 				*(float*)(lightData + 0x48) = kPppLightOne;
 				*(float*)(lightData + 0x4c) = kPppLightDefaultCosAtten;
-				Add__9CLightPcsFPQ29CLightPcs6CLight(LightPcs, lightData);
+				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, lightData);
 			} else {
 				unsigned char* obj;
 				Vec* direction;
@@ -229,7 +229,7 @@ void pppLight(void* param1, void* param2, void* param3)
 					lightData[0x57] = 1;
 				}
 
-				Add__9CLightPcsFPQ29CLightPcs6CLight(LightPcs, lightData);
+				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, lightData);
 			}
 		}
 	}

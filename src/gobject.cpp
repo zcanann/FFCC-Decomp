@@ -37,7 +37,6 @@ extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
-extern unsigned char DAT_8032ec90[];
 extern float FLOAT_8033033c;
 extern float FLOAT_80330354;
 extern float FLOAT_80330340;
@@ -884,7 +883,7 @@ void CGObject::bgNormalCollision()
         return;
     }
 
-    const unsigned char mapGroup = DAT_8032ec90[0x47];
+    const unsigned char mapGroup = reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
     u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
     if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
@@ -998,7 +997,7 @@ void CGObject::bgWorldCollision()
     CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &radial);
     PSVECSubtract(&radial, &m_worldPosition, &m_groundHitOffset);
 
-    const unsigned char mapGroup = DAT_8032ec90[0x47];
+    const unsigned char mapGroup = reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
     u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
     if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
@@ -1088,7 +1087,7 @@ void CGObject::bgAttribCollision()
             if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &attrCylinder, &probeMove, 0x78000000) == 0) {
                 m_bgAttrValue = sAnimFrameOffset;
             } else {
-                switch (DAT_8032ec90[0x47]) {
+                switch (reinterpret_cast<unsigned char*>(gMapHitFace)[0x47]) {
                 case 0x28:
                     m_bgAttrValue = FLOAT_80330364;
                     break;

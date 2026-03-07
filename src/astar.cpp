@@ -4,6 +4,7 @@
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
 #include "ffcc/math.h"
+#include "ffcc/maphit.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
@@ -35,7 +36,6 @@ struct CMapCylinderRaw
 };
 
 extern Mtx gFlatPosMtx;
-extern unsigned char gMapHitFace[];
 extern CMath Math;
 extern "C" int __cntlzw(unsigned int);
 
@@ -927,7 +927,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 	                                reinterpret_cast<Vec*>(&base), mask) != 0)
 	{
-		return gMapHitFace[0x47];
+		return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
 	}
 
 	return 0;
@@ -967,7 +967,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                reinterpret_cast<Vec*>(&base), hitAttributeMask) != 0)
 		{
-			return gMapHitFace[0x47];
+			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
 		}
 	}
 	else
@@ -993,7 +993,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                reinterpret_cast<Vec*>(&base), m_hitAttributeMask) != 0)
 		{
-			return gMapHitFace[0x47];
+			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
 		}
 	}
 

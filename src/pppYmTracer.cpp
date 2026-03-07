@@ -1,6 +1,7 @@
 #include "ffcc/pppYmTracer.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 
@@ -13,7 +14,6 @@ extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
 extern f64 DOUBLE_803306f8;
 extern int gPppCalcDisabled;
-extern s32 DAT_801eadc8;
 extern CUtil gUtil;
 
 extern "C" {
@@ -186,13 +186,13 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
     if (param_2->m_graphId == ((s32*)pppYmTracer)[0]) {
         if (param_2->m_initWOrk == -1) {
-            work[8] = (f32)(u32)&DAT_801eadc8;
+            work[8] = (f32)(u32)gPppDefaultValueBuffer;
         } else {
             work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue);
         }
 
         if (param_2->m_arg3 == -1) {
-            work[9] = (f32)(u32)&DAT_801eadc8;
+            work[9] = (f32)(u32)gPppDefaultValueBuffer;
         } else {
             work[9] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload);
         }

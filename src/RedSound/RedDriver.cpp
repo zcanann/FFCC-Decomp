@@ -47,7 +47,7 @@ extern "C" {
 extern int DAT_8032f3c4;
 extern int DAT_8032f3c0;
 extern int DAT_8032f3c8;
-extern int DAT_8032f408;
+extern int gRedMemoryDebugEnabled;
 extern int DAT_8032f400;
 extern int DAT_8032f414;
 extern int DAT_8032f404;
@@ -911,7 +911,7 @@ void _DMACheckProcess()
     int semCount;
     int* dmaInfo;
 
-    if (DAT_8032f408 != 0) {
+    if (gRedMemoryDebugEnabled != 0) {
         OSReport("[%s]------DMA_CHECK_PROCESS------\n", "RedDriver");
         fflush(&DAT_8021d1a8);
 
@@ -922,7 +922,7 @@ void _DMACheckProcess()
 
     dmaInfo = (int*)&DAT_8032b860;
     do {
-        if ((*dmaInfo != 0) && (DAT_8032f408 != 0)) {
+        if ((*dmaInfo != 0) && (gRedMemoryDebugEnabled != 0)) {
             OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
             fflush(&DAT_8021d1a8);
         }
@@ -1235,7 +1235,7 @@ void CRedDriver::Init()
 
     DAT_8032f3c4 = 0;
     DAT_8032f3c0 = 1;
-    DAT_8032f408 = 1;
+    gRedMemoryDebugEnabled = 1;
     DAT_8032f3c8 = 0;
     GetSoundMode();
     if (DAT_8032f400 == 2) {
@@ -1462,7 +1462,7 @@ void CRedDriver::SetMusicData(void* param_1)
             return;
         }
     }
-    if (DAT_8032f408 != 0) {
+    if (gRedMemoryDebugEnabled != 0) {
         OSReport("Music Header was broken.\n");
         fflush(&DAT_8021d1a8);
     }
@@ -1656,7 +1656,7 @@ void CRedDriver::SetSeSepData(void* param_1)
         }
         return;
     }
-    if (DAT_8032f408 != 0) {
+    if (gRedMemoryDebugEnabled != 0) {
         OSReport("SE Sep Header was broken.\n");
     }
 }

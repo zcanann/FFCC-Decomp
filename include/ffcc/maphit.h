@@ -66,4 +66,7 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
+extern CMapHitFace* gMapHitFace;
+extern unsigned char gMapHitDrawMode;
+
 #endif // _FFCC_MAPHIT_H_

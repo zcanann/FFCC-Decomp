@@ -315,7 +315,7 @@ void StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_
 			if (streamData[0x4b] != 0) {
 				RedDeleteA(streamData[0x4b]);
 			}
-			if (DAT_8032f408 != 0) {
+			if (gRedMemoryDebugEnabled != 0) {
 				fflush(&DAT_8021d1a8);
 			}
 			return;
@@ -468,7 +468,7 @@ void StreamPause(int param_1, int param_2)
 	unsigned int streamData;
 
 	streamData = (unsigned int)DAT_8032f438;
-	if (DAT_8032f408 != 0) {
+	if (gRedMemoryDebugEnabled != 0) {
 		if (param_2 == 1) {
 			OSReport(s__sPause___Stream___ON__d_801e7fb0, &DAT_801e7f44, param_1);
 		} else {

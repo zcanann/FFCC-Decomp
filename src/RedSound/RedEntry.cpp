@@ -6,7 +6,7 @@
 #include <string.h>
 
 extern CRedMemory DAT_8032f480;
-extern int DAT_8032f408;
+extern int gRedMemoryDebugEnabled;
 extern void* DAT_8032f3f0;
 extern int DAT_8032e12c;
 extern int DAT_8021d1a8;
@@ -385,12 +385,12 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			}
 		} while (WaveOldClear(minOffset, maxOffset) != 0);
 
-		if (DAT_8032f408 != 0) {
+		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, &DAT_801e7905, &DAT_80333d30, (int)*(short*)(head + 2),
 			         *(int*)(head + 4), &DAT_80333d38);
 			fflush(&DAT_8021d1a8);
 		}
-	} else if (DAT_8032f408 != 0) {
+	} else if (gRedMemoryDebugEnabled != 0) {
 		OSReport(s__s_sWave_Header_was_broken__s_801e7972, &DAT_801e7905, &DAT_80333d3d, &DAT_80333d38);
 		fflush(&DAT_8021d1a8);
 	}
@@ -477,7 +477,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		if (entry[4] < 1) {
-			if (DAT_8032f408 != 0) {
+			if (gRedMemoryDebugEnabled != 0) {
 				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, &DAT_801e7905, &DAT_80333d45, entry[3], &DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 			}
@@ -643,7 +643,7 @@ void CRedEntry::DisplayWaveInfo()
 {
 	int* entry = (int*)this;
 
-	if (DAT_8032f408 != 0) {
+	if (gRedMemoryDebugEnabled != 0) {
 		OSReport(&DAT_80333d4d);
 		fflush(&DAT_8021d1a8);
 		OSReport(s__s_____AMemory_Information______801e79ed, &DAT_801e7905);
@@ -943,7 +943,7 @@ void CRedEntry::SeSepHistoryManager(int, int)
  */
 void CRedEntry::DisplaySePlayInfo()
 {
-	if (DAT_8032f408 != 0) {
+	if (gRedMemoryDebugEnabled != 0) {
 		OSReport(&DAT_80333d4d);
 		fflush(&DAT_8021d1a8);
 		OSReport(s__s_____SE_Play_Information______801e7b71, &DAT_801e7905);
@@ -1189,7 +1189,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	int* seBlockBase;
 	int* entry = (int*)this;
 
-	if (DAT_8032f408 == 0) {
+	if (gRedMemoryDebugEnabled == 0) {
 		return;
 	}
 

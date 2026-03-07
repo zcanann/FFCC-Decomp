@@ -6,7 +6,7 @@
 
 extern "C" {
     extern unsigned char MaterialMan[];
-    extern void* CAMemCacheSet;
+    extern unsigned char ppvAmemCacheSet[];
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);
     void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int textureIndex,
@@ -79,13 +79,13 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    iVar1 = shapePtr;
-    for (iVar2 = 0; iVar2 < *(short*)(shapePtr + 2); iVar2 = iVar2 + 1) {
+    iVar2 = shapePtr;
+    for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(iVar1 + 8));
+            pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
         }
-        GXCallDisplayList(*(void**)(iVar1 + 0xc), 0x60);
-        iVar1 = iVar1 + 8;
+        GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
+        iVar2 = iVar2 + 8;
     }
 }
 
@@ -103,24 +103,22 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     int iVar1;
     int iVar2;
 
-    int shapePtr = (int)shape;
-
     *(int*)(MaterialMan + 296) = *(int*)(MaterialMan + 284);
     *(int*)(MaterialMan + 300) = *(int*)(MaterialMan + 288);
     *(int*)(MaterialMan + 304) = *(int*)(MaterialMan + 292);
     *(int*)(MaterialMan + 64) = *(int*)(MaterialMan + 72);
 
     SetMaterialPart__12CMaterialManFP12CMaterialSetii((CMaterialMan*)MaterialMan, materialSet,
-                                                      *(unsigned char*)(shapePtr + 10), 0);
+                                                      *(unsigned char*)((int)shape + 10), 0);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, GX_DIRECT);
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    iVar2 = shapePtr;
-    for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
-        if (blendMode == 0xFF) {
+    iVar2 = (int)shape;
+    for (iVar1 = 0; iVar1 < *(short*)((int)shape + 2); iVar1 = iVar1 + 1) {
+        if ((char)blendMode == -1) {
             pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
         }
         GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
@@ -153,13 +151,15 @@ void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** 
     void* currentFrame = animData;
 
     for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
-        int shapeEntry = (int)animData + *(short*)((int)currentFrame + 0x10);
+        int shapeBase = (int)animData + *(short*)((int)currentFrame + 0x10);
+        int shapeEntry = shapeBase;
 
-        for (int shapeIndex = 0; shapeIndex < *(short*)(shapeEntry + 2); shapeIndex++) {
-            *(unsigned char*)(shapeEntry + 10) =
+        for (int shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex++) {
+            unsigned char textureIndex =
                 FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
+            *(unsigned char*)(shapeEntry + 10) = textureIndex;
             *(int*)(shapeEntry + 0xc) = (int)shapeSt->m_displayListData + *(int*)(shapeEntry + 0xc);
-            shapeEntry += 8;
+            shapeEntry = shapeEntry + 8;
         }
 
         currentFrame = (void*)((int)currentFrame + 8);
@@ -214,7 +214,7 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, CAMemCacheSet);
+            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;
@@ -279,7 +279,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, CAMemCacheSet);
+            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;

@@ -101,9 +101,9 @@ void CFile::Init()
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
     m_readBuffer = new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2b) unsigned char[0x100000];
-    m_handlePoolHead.m_nextOffset = (u32)(new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2e) CHandle[kHandleCount]);
+    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2e) CHandle[kHandleCount]);
 
-    CHandle* pool = (CHandle*)m_handlePoolHead.m_nextOffset;
+    CHandle* pool = (CHandle*)m_handlePoolHead.m_currentOffset;
 
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
@@ -134,10 +134,10 @@ void CFile::Quit()
         m_readBuffer = 0;
     }
 
-    u32 nextOffset = m_handlePoolHead.m_nextOffset;
+    u32 nextOffset = m_handlePoolHead.m_currentOffset;
     if (nextOffset != 0) {
         delete[] (CHandle*)nextOffset;
-        m_handlePoolHead.m_nextOffset = 0;
+        m_handlePoolHead.m_currentOffset = 0;
     }
 
     Memory.DestroyStage((CMemory::CStage*)m_stage);
@@ -679,4 +679,3 @@ extern "C" void __sinit_file_cpp(void)
     *(void**)&File = __vt__8CManager;
     *(void**)&File = __vt__5CFile;
 }
-

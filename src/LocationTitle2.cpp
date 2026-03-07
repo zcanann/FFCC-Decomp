@@ -72,24 +72,16 @@ static char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
  */
 extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC)
 {
-    struct LocationTitle2Work {
-        void* data;
-        u16 count;
-        u16 pad;
-        float scaleX;
-        float scaleY;
-        float scaleZ;
-    };
-    float value;
     LocationTitle2Work* work;
+    f32 value;
 
-    value = 0.0f;
+    value = FLOAT_80330f48;
     work = (LocationTitle2Work*)((char*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
-    work->data = 0;
-    work->count = 0;
-    work->scaleZ = value;
-    work->scaleY = value;
-    work->scaleX = value;
+    work->m_particles = 0;
+    work->m_count = 0;
+    work->m_acc = value;
+    work->m_vel = value;
+    work->m_cur = value;
 }
 
 /*
@@ -384,4 +376,3 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     }
 }
-

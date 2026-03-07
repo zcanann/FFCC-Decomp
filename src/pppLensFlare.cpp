@@ -22,6 +22,7 @@ extern struct {
 } CameraPcs;
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
+extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 /*
  * --INFO--
@@ -165,22 +166,22 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
  */
 void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
-	int iVar1;
-	int iVar2;
+	int shapeOffset;
+	int colorOffset;
 	long* shape;
+	s16 dataValIndex;
 	u8* lensBytes;
 	u8* shapeBytes;
 	u8* colorBytes;
 	u8* arg3Bytes;
-	float stepValue;
 
-	iVar2 = ctrlTable->m_serializedDataOffsets[2];
-	iVar1 = ctrlTable->m_serializedDataOffsets[1];
+	shapeOffset = ctrlTable->m_serializedDataOffsets[2];
+	colorOffset = ctrlTable->m_serializedDataOffsets[1];
 	lensBytes = (u8*)obj;
-	shapeBytes = lensBytes + iVar2;
-	colorBytes = lensBytes + iVar1;
+	shapeBytes = lensBytes + shapeOffset;
+	colorBytes = lensBytes + colorOffset;
 	arg3Bytes = (u8*)&unkB->m_arg3;
-	stepValue = *(float*)&unkB->m_stepValue;
+
 	if ((unkB->m_dataValIndex != 0xffff) &&
 		(shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4),
 		 shapeBytes[0xb2] != 0)) {
@@ -190,7 +191,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		Mtx local_54;
 
 		PSMTXIdentity(local_54);
-		local_54[2][2] = stepValue;
+		local_54[2][2] = *(float*)&unkB->m_stepValue;
 		local_54[0][0] = local_54[2][2] * pppMngStPtr->m_scale.x * *(float*)(lensBytes + 0x40);
 		local_54[1][1] = local_54[2][2] * pppMngStPtr->m_scale.y * *(float*)(lensBytes + 0x54);
 		local_54[2][2] = local_54[2][2] * pppMngStPtr->m_scale.z * *(float*)(lensBytes + 0x68);
@@ -209,7 +210,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_6c.y = local_60.y;
 		local_6c.z = local_60.z;
 
-		pppCopyVector(*(Vec*)(shapeBytes + 0xa0), local_6c);
+		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBytes + 0xa0), &local_6c);
 
 		GXLoadPosMtxImm(local_54, 0);
 
@@ -226,5 +227,3 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		pppSetBlendMode(3);
 	}
 }
-
-

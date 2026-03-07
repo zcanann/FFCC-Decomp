@@ -18,9 +18,6 @@ static int DLcreateDpl2(AXFX_REVHI_DELAYLINE* dl, s32 max_length) {
     dl->length = (max_length * 4);
     dl->inputs = __AXFXAlloc(max_length << 2);
     ASSERTMSGLINE(62, dl->inputs, "Can't allocate the memory.");
-    if (dl->inputs == NULL) {
-        return 0;
-    }
 
     memset(dl->inputs, 0, max_length << 2);
     dl->lastOutput = 0.0f;
@@ -37,6 +34,8 @@ static void DLdeleteDpl2(AXFX_REVHI_DELAYLINE* dl) {
 static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay) {
     u8 i;
     u8 k;
+    s32 idx;
+    f32 timeScale;
 
     static s32 lens[9] = {
         0x000006FD,
@@ -66,33 +65,22 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     }
 
     memset(rv, 0, sizeof(AXFX_REVHI_WORK_DPL2));
+    timeScale = 32000.0f * time;
 
-    for (k = 0; k < 4; k++) {
+    for (k = 0, idx = 0; k < 4; k++, idx += 3) {
         for (i = 0; i < 3; i++) {
-            if (DLcreateDpl2(&rv->C[i + (k * 3)], lens[i] + 2) == 0) {
-                ReverbHIDpl2Free(rv);
-                return 0;
-            }
-
-            DLsetdelayDpl2(&rv->C[i + (k * 3)], lens[i]);
-            rv->combCoef[i + (k * 3)] = powf(10.0f, (lens[i] * -3) / (32000.0f * time));
+            DLcreateDpl2(&rv->C[idx + i], lens[i] + 2);
+            DLsetdelayDpl2(&rv->C[idx + i], lens[i]);
+            rv->combCoef[idx + i] = powf(10.0f, ((f32)(lens[i] * -3)) / timeScale);
         }
 
         for (i = 0; i < 2; i++) {
-            if (DLcreateDpl2(&rv->AP[i + (k * 3)], lens[i + 3] + 2) == 0) {
-                ReverbHIDpl2Free(rv);
-                return 0;
-            }
-
-            DLsetdelayDpl2(&rv->AP[i + (k * 3)], lens[i + 3]);
+            DLcreateDpl2(&rv->AP[idx + i], lens[i + 3] + 2);
+            DLsetdelayDpl2(&rv->AP[idx + i], lens[i + 3]);
         }
 
-        if (DLcreateDpl2(&rv->AP[2 + (k * 3)], lens[k + 5] + 2) == 0) {
-            ReverbHIDpl2Free(rv);
-            return 0;
-        }
-
-        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], lens[k + 5]);
+        DLcreateDpl2(&rv->AP[idx + 2], lens[k + 5] + 2);
+        DLsetdelayDpl2(&rv->AP[idx + 2], lens[k + 5]);
         rv->lpLastout[k] = 0.0f;
     }
 
@@ -105,18 +93,14 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
 
     {
         f32 damp = 0.8f * rv->damping;
-        damp += 0.05f;
+        damp = 0.05f + damp;
         rv->damping = 1.0f - damp;
     }
-    if (0.0f != preDelay) {
+    if (preDelay != 0.0f) {
         rv->preDelayTime = (32000.0f * preDelay);
         for (i = 0; i < 4; i++) {
             rv->preDelayLine[i] = __AXFXAlloc(rv->preDelayTime * 4);
             ASSERTMSGLINE(188, rv->preDelayLine[i], "Can't allocate the memory.");
-            if (rv->preDelayLine[i] == NULL) {
-                ReverbHIDpl2Free(rv);
-                return 0;
-            }
 
             memset(rv->preDelayLine[i], 0, rv->preDelayTime * 4);
             rv->preDelayPtr[i] = rv->preDelayLine[i];

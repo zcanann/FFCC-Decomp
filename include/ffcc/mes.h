@@ -31,6 +31,7 @@ public:
     void addFlag(class CFlag&);
     void MakeAgbString(char*, char*, int, int);
     static unsigned long drawTagString(CFont*, char*, int, int, int);
+    static int m_tempVar[0x14];
 
 private:
     char* mText;
@@ -42,3 +43,4 @@ private:
 };
 
 #endif // _FFCC_MES_H_
+

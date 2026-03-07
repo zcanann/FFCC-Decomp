@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern u8 gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandCVParam2 {
     s32 field0;
@@ -49,9 +48,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -60,9 +59,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -71,9 +70,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -82,9 +81,9 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->fieldC;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -104,3 +103,4 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
     targetColor[2] = (u8)(targetColor[2] + (s8)((float)in->fieldA * target[2] - (float)in->fieldA));
     targetColor[3] = (u8)(targetColor[3] + (s8)((float)in->fieldB * target[3] - (float)in->fieldB));
 }
+

@@ -1,7 +1,9 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
+#include "ffcc/linkage.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/mes.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/system.h"
@@ -40,13 +42,11 @@ extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, char);
 extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
-extern "C" int m_tempVar__4CMes[];
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
 extern float FLOAT_803309a8;
 extern char DAT_801d9ff0[];
-extern unsigned char CFlat[];
 
 /*
  * --INFO--
@@ -483,29 +483,29 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	m_tempVar__4CMes[0] = words16[2];
-	m_tempVar__4CMes[1] = words16[3];
-	m_tempVar__4CMes[2] = words16[4];
-	m_tempVar__4CMes[3] = words16[5];
-	m_tempVar__4CMes[4] = (words16[0] >> 2) & 0x1FF;
-	m_tempVar__4CMes[5] = (*(unsigned int*)letter >> 9) & 0x1FF;
+	CMes::m_tempVar[0] = words16[2];
+	CMes::m_tempVar[1] = words16[3];
+	CMes::m_tempVar[2] = words16[4];
+	CMes::m_tempVar[3] = words16[5];
+	CMes::m_tempVar[4] = (words16[0] >> 2) & 0x1FF;
+	CMes::m_tempVar[5] = (*(unsigned int*)letter >> 9) & 0x1FF;
 
 	if (((letter[0] >> 3) & 1) == 0) {
-		m_tempVar__4CMes[6] = words16[1] & 0x1FF;
+		CMes::m_tempVar[6] = words16[1] & 0x1FF;
 	} else {
-		m_tempVar__4CMes[6] = 0;
+		CMes::m_tempVar[6] = 0;
 	}
 
 	if (((letter[0] >> 3) & 1) == 0) {
-		m_tempVar__4CMes[7] = 0;
+		CMes::m_tempVar[7] = 0;
 	} else {
-		m_tempVar__4CMes[7] = (words16[1] & 0x1FF) * 100;
+		CMes::m_tempVar[7] = (words16[1] & 0x1FF) * 100;
 	}
 
-	m_tempVar__4CMes[0x20] = m_saveSlot;
-	m_tempVar__4CMes[0x21] = m_partyIndex;
-	m_tempVar__4CMes[0x22] = m_isLoadingFlag;
-	m_tempVar__4CMes[0x23] = m_miscFlags;
+	CMes::m_tempVar[0x20] = m_saveSlot;
+	CMes::m_tempVar[0x21] = m_partyIndex;
+	CMes::m_tempVar[0x22] = m_isLoadingFlag;
+	CMes::m_tempVar[0x23] = m_miscFlags;
 	letter[0] = (letter[0] & 0x7F) | 0x80;
 }
 
@@ -2643,3 +2643,4 @@ void CCaravanWork::GetEvtFlag(int)
 {
 	// TODO
 }
+

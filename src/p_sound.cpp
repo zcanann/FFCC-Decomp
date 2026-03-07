@@ -1,8 +1,8 @@
 #include "ffcc/p_sound.h"
+#include "ffcc/linkage.h"
 
 CSoundPcs SoundPcs;
 extern unsigned char Sound[];
-extern unsigned char CFlat[];
 extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
 extern "C" {
 void LoadBlock__6CSoundFv(void*);

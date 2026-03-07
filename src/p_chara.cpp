@@ -7,7 +7,6 @@
 
 #include <string.h>
 
-extern "C" u8* gCharaPartWorkPtr;
 extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }

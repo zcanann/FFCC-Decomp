@@ -1,5 +1,5 @@
 #include "ffcc/main.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/system.h"
 
@@ -12,6 +12,8 @@ static const char kLanguageArgGr[] = "gr";
 static const char kLanguageArgIt[] = "it";
 static const char kLanguageArgFr[] = "fr";
 static const char kLanguageArgSp[] = "sp";
+
+extern CGame Game;
 
 /*
  * --INFO--
@@ -27,65 +29,62 @@ void game(int argc, char** argv)
     char c;
     int cmp;
     int i;
-    int copyScriptName;
-    int parseLanguage;
+    bool copyScriptName;
+    bool parseLanguage;
     char** argument;
 
-    Game.game.Init();
-    strcpy(Game.game.m_currentScriptName, kDefaultScriptName);
+    Game.Init();
+    strcpy(Game.m_currentScriptName, kDefaultScriptName);
 
     if (argc != 0) {
         argument = argv + 1;
-        copyScriptName = 0;
-        parseLanguage = 0;
+        copyScriptName = false;
+        parseLanguage = false;
         for (i = 1; i < argc; i++) {
             if (copyScriptName) {
-                strcpy(Game.game.m_currentScriptName, *argument);
-                copyScriptName = 0;
+                strcpy(Game.m_currentScriptName, *argument);
+                copyScriptName = false;
             } else if (parseLanguage) {
                 cmp = strcmp(*argument, kLanguageArgUs);
                 if (cmp == 0) {
-                    Game.game.m_gameWork.m_languageId = 1;
+                    Game.m_gameWork.m_languageId = 1;
                 } else {
                     cmp = strcmp(*argument, kLanguageArgUk);
                     if (cmp == 0) {
-                        Game.game.m_gameWork.m_languageId = 1;
+                        Game.m_gameWork.m_languageId = 1;
                     } else {
                         cmp = strcmp(*argument, kLanguageArgGr);
                         if (cmp == 0) {
-                            Game.game.m_gameWork.m_languageId = 2;
+                            Game.m_gameWork.m_languageId = 2;
                         } else {
                             cmp = strcmp(*argument, kLanguageArgFr);
                             if (cmp == 0) {
-                                Game.game.m_gameWork.m_languageId = 3;
+                                Game.m_gameWork.m_languageId = 3;
                             } else {
                                 cmp = strcmp(*argument, kLanguageArgSp);
                                 if (cmp == 0) {
-                                    Game.game.m_gameWork.m_languageId = 4;
+                                    Game.m_gameWork.m_languageId = 4;
                                 } else {
                                     cmp = strcmp(*argument, kLanguageArgIt);
                                     if (cmp == 0) {
-                                        Game.game.m_gameWork.m_languageId = 5;
+                                        Game.m_gameWork.m_languageId = 5;
                                     } else {
-                                        Game.game.m_gameWork.m_languageId = 0;
+                                        Game.m_gameWork.m_languageId = 0;
                                     }
                                 }
                             }
                         }
                     }
                 }
-                parseLanguage = 0;
+                parseLanguage = false;
             } else {
                 c = (*argument)[0];
                 if ((c == '-') || (c == '/')) {
                     c = (*argument)[1];
-                    switch (c) {
-                    case 'l':
-                        parseLanguage = 1;
-                        break;
-                    case 'f':
-                        copyScriptName = 1;
-                        break;
+                    if (c == 'l') {
+                        parseLanguage = true;
+                    } else if ((c < 'l') && (c == 'f')) {
+                        copyScriptName = true;
                     }
                 }
             }
@@ -94,8 +93,8 @@ void game(int argc, char** argv)
         }
     }
 
-    Game.game.Exec();
-    Game.game.Quit();
+    Game.Exec();
+    Game.Quit();
 }
 
 /*

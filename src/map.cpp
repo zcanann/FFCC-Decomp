@@ -411,8 +411,8 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_size = 0;
-    m_numItems = 0;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
 }
 
 /*
@@ -524,8 +524,8 @@ void CPtrArray<CMapAnim*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_size = 0;
-    m_numItems = 0;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
 }
 
 /*
@@ -666,8 +666,8 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_size = 0;
-    m_numItems = 0;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
 }
 
 /*
@@ -1047,8 +1047,8 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_size = 0;
-    m_numItems = 0;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
 }
 
 /*
@@ -1128,8 +1128,8 @@ void CPtrArray<CMapShadow*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_size = 0;
-    m_numItems = 0;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
 }
 
 /*

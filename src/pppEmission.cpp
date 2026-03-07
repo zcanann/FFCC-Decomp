@@ -395,7 +395,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         textureIndex);
 
     u8* payload = param_2->m_payload;
-    u8 particleCount = (u8)param_2->m_initWOrk;
+    u8 particleCount = *(u8*)&param_2->m_initWOrk;
 
     if (payload[9] != 0) {
         if (state[0] == 0) {
@@ -403,7 +403,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             state[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)particleCount << 4,
                 pppEnvStPtr->m_stagePtr,
-                (char*)"pppEmission.cpp",
+                s_pppEmission_cpp_801db7e8,
                 0x16F);
 
             float* particle = (float*)state[0];

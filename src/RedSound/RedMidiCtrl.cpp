@@ -605,18 +605,19 @@ void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDAT
  */
 void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned int delta[3];
-    int* controlData = (int*)control;
+    u32 local_18[3];
+    int* trackData = (int*)track;
+    u8* command = (u8*)*trackData;
 
-    if (*(char*)*(int*)track == '\0') {
-        delta[0] = 0x100;
+    if (*(char*)command == '\0') {
+        local_18[0] = 0x100;
     } else {
-        delta[0] = *(unsigned char*)*(int*)track;
+        local_18[0] = *command;
     }
 
-    controlData[0x113] = DataAddCompute(controlData + 0x112, *(unsigned char*)(*(int*)track + 1), (int*)delta);
-    controlData[0x114] = delta[0];
-    *(int*)track += 2;
+    *(u32*)((u8*)control + 0x44c) = DataAddCompute((int*)((u8*)control + 0x448), command[1], (int*)local_18);
+    *(u32*)((u8*)control + 0x450) = local_18[0];
+    *trackData = *trackData + 2;
 }
 
 /*

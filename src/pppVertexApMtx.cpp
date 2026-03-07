@@ -57,8 +57,8 @@ extern int gPppCalcDisabled;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
-_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 }
+_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -127,16 +127,16 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			points = src->points;
 		}
 
-		u8 count = data->spawnCount;
+		s32 count = data->spawnCount;
 		switch (data->mode) {
 		case 0:
-			while (count-- != 0) {
-				if ((s16)state->index >= entry->maxValue) {
+			do {
+				if (state->index >= entry->maxValue) {
 					state->index = 0;
 				}
 
-				u16 vertexIndex = entry->vertexIndices[state->index];
-				state->index++;
+				u16 index = state->index++;
+				u16 vertexIndex = entry->vertexIndices[index];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
@@ -176,11 +176,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[2][3] = worldPos.z;
 					}
 				}
-			}
+			} while (count-- != 0);
 			break;
 		case 1:
-			while (count-- != 0) {
-				u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+			do {
+				u16 vertexIndex = entry->vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&math))];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
@@ -220,7 +220,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[2][3] = worldPos.z;
 					}
 				}
-			}
+			} while (count-- != 0);
 			break;
 		}
 		state->countdown = data->spawnDelay;
@@ -228,5 +228,3 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 	state->countdown--;
 }
-
-

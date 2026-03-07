@@ -125,8 +125,20 @@ extern const char DAT_8032f6a0[];
 extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
 extern const s16 DAT_8032e3d0[];
-extern const char* s_localLangDirs[];
-extern const char* PTR_s_dvd__scft_param_cfd_801e8344[];
+const char* s_localLangDirs[] = {
+    "jp/",
+    "uk/",
+    "gr/",
+    "it/",
+    "fr/",
+    "sp/",
+};
+const char* PTR_s_dvd__scft_param_cfd_801e8344[] = {
+    "dvd/%scft/param.cfd",
+    "dvd/%scft/c_system.cfd",
+    "dvd/%scft/mail_tbl.cfd",
+    "dvd/%scft/newbattle.cfd",
+};
 int sprintf(char*, const char*, ...);
 int rand(void);
 void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);
@@ -966,37 +978,19 @@ void CGame::loadCfd()
         FlatDataEntry m_data[5];
     };
 
-    static const char* const sLangDirs[] =
-    {
-        "jp/",
-        "uk/",
-        "gr/",
-        "it/",
-        "fr/",
-        "sp/"
-    };
-
-    static const char* const sCfdPathFormats[] =
-    {
-        "dvd/%scft/param.cfd",
-        "dvd/%scft/c_system.cfd",
-        "dvd/%scft/mail_tbl.cfd",
-        "dvd/%scft/newbattle.cfd"
-    };
-
     char path[0x10C];
 
     for (int i = 0; i < 4; i++)
     {
         const char* localLangDirs[6];
-        localLangDirs[0] = sLangDirs[0];
-        localLangDirs[1] = sLangDirs[1];
-        localLangDirs[2] = sLangDirs[2];
-        localLangDirs[3] = sLangDirs[3];
-        localLangDirs[4] = sLangDirs[4];
-        localLangDirs[5] = sLangDirs[5];
+        localLangDirs[0] = s_localLangDirs[0];
+        localLangDirs[1] = s_localLangDirs[1];
+        localLangDirs[2] = s_localLangDirs[2];
+        localLangDirs[3] = s_localLangDirs[3];
+        localLangDirs[4] = s_localLangDirs[4];
+        localLangDirs[5] = s_localLangDirs[5];
 
-        sprintf(path, sCfdPathFormats[i], localLangDirs[m_gameWork.m_languageId]);
+        sprintf(path, PTR_s_dvd__scft_param_cfd_801e8344[i], localLangDirs[m_gameWork.m_languageId]);
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 
         if (handle != nullptr)

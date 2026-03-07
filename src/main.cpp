@@ -5,13 +5,13 @@
 
 #include <string.h>
 
-extern const char kDefaultScriptName[] = "ffcc_0";
-extern const char kLanguageArgUs[] = "us";
-extern const char kLanguageArgUk[] = "uk";
-extern const char kLanguageArgGr[] = "gr";
-extern const char kLanguageArgIt[] = "it";
-extern const char kLanguageArgFr[] = "fr";
-extern const char kLanguageArgSp[] = "sp";
+static const char kDefaultScriptName[] = "ffcc_0";
+static const char kLanguageArgUs[] = "us";
+static const char kLanguageArgUk[] = "uk";
+static const char kLanguageArgGr[] = "gr";
+static const char kLanguageArgIt[] = "it";
+static const char kLanguageArgFr[] = "fr";
+static const char kLanguageArgSp[] = "sp";
 
 void game(int argc, char** argv);
 

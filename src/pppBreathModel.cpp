@@ -6,7 +6,7 @@
 #include <string.h>
 
 extern CMath math;
-extern float FLOAT_80330F80;
+extern const float FLOAT_80330F80 = -1.0f;
 extern int gPppCalcDisabled;
 extern u32 CFlatFlags;
 extern Mtx ppvCameraMatrix0;

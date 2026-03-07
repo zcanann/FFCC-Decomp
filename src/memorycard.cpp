@@ -11,7 +11,8 @@
 #include "string.h"
 
 extern CMath Math;
-extern char* PTR_DAT_8032e854;
+char sMcSaveFileName[] = "FFCC";
+char* PTR_DAT_8032e854 = sMcSaveFileName;
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void SaveScript__5CGameFPc(void* game, char* scriptData);
@@ -347,7 +348,7 @@ void CMemoryCardMan::McCreate(int chan)
 
     int result = CARDCreateAsync(
         chan,
-        (const char*)nullptr, // PTR_DAT_8032e854, // file name string
+        PTR_DAT_8032e854,
         0x2C000, // size
         &m_fileInfo,
         &Attach
@@ -703,7 +704,7 @@ void CMemoryCardMan::McDelFile(int chan)
 	
     int result = CARDDeleteAsync(
         chan,
-        "FFCC", // PTR_DAT_8032e854, // file name
+        PTR_DAT_8032e854,
         &Attach
     );
 
@@ -1226,7 +1227,7 @@ int CMemoryCardMan::DummySave()
         return m_result;
     }
 
-    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &m_fileInfo);
+    result = CARDOpen(0, PTR_DAT_8032e854, &m_fileInfo);
     m_result = result;
     m_opDoneFlag = 1;
     m_state = 3;
@@ -1238,7 +1239,7 @@ int CMemoryCardMan::DummySave()
 
         result = CARDCreateAsync(
             0,
-            /* PTR_DAT_8032e854 */ (const char*)0,
+            PTR_DAT_8032e854,
             0x2C000,
             &m_fileInfo,
             &Attach
@@ -1531,7 +1532,7 @@ int CMemoryCardMan::DummyLoad()
         return m_result;
     }
 
-    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &m_fileInfo);
+    result = CARDOpen(0, PTR_DAT_8032e854, &m_fileInfo);
     m_result = result;
     m_opDoneFlag = 1;
     m_state = 3;

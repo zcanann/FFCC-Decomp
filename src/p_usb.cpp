@@ -9,8 +9,12 @@
 CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
-extern "C" const char s_CUSBPcs_8032f810[] = "CUSBPcs";
-extern "C" const char s_plot_kmitsuru__801d6d14[] = "plot.kmitsuru/";
+extern "C" const char s_CUSBPcs_8032f810[];
+extern "C" const char s_plot_kmitsuru__801d6d14[];
+extern "C" {
+const char s_CUSBPcs_8032f810[] = "CUSBPcs";
+const char s_plot_kmitsuru__801d6d14[] = "plot.kmitsuru/";
+}
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);

@@ -16,7 +16,10 @@ char* gDebugSpinnerText = 0;
 unsigned char gDebugSpinnerTextInitialized = 0;
 int gDebugSpinnerFrame = 0;
 unsigned char gDebugSpinnerFrameInitialized = 0;
-extern "C" const char s_no_name_8032fdcc[] = "no_name";
+extern "C" const char s_no_name_8032fdcc[];
+extern "C" {
+const char s_no_name_8032fdcc[] = "no_name";
+}
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);

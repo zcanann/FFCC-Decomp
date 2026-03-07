@@ -7,7 +7,10 @@
 
 #include <string.h>
 
-extern "C" u8* gCharaPartWorkPtr = 0;
+extern "C" u8* gCharaPartWorkPtr;
+extern "C" {
+u8* gCharaPartWorkPtr = 0;
+}
 
 extern CMemory Memory;
 extern unsigned char PartPcs[];

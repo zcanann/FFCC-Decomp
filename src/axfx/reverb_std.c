@@ -98,7 +98,11 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
+    }
 
     if (0.0f != predelay) {
         rv->preDelayTime = (32000.0f * predelay);
@@ -144,7 +148,11 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
+    }
 
     for (i = 0; i < 6; i++) {
         DLdelete(&rv->AP[i]);

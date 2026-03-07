@@ -2682,7 +2682,7 @@ void CGMonObj::damagedFuncLastBoss()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1272);
-	if (timer > 99 && *reinterpret_cast<int*>(mon + 0x6B4) == 0) {
+	if (timer >= 100 && *reinterpret_cast<int*>(mon + 0x6B4) == 0) {
 		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
 		*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 		changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);

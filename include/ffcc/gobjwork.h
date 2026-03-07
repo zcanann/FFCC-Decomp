@@ -88,7 +88,7 @@ public:
     int AddItem(int, int*);
     void SetArtifact(int, int);
     void FGAddItemIdx(int, int);
-    void ChkNumItem(char*, int);
+    int ChkNumItem(char*, int);
     void CanAddTmpArtifact(int);
     int FindItem(int);
     void DeleteItemIdx(int, int);

@@ -743,9 +743,24 @@ void CCaravanWork::FGAddItemIdx(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::ChkNumItem(char*, int)
+int CCaravanWork::ChkNumItem(char*, int numItems)
 {
-	// TODO
+	int emptySlots = 0;
+
+	if (m_treasures[0] == 0xFFFF) {
+		emptySlots++;
+	}
+	if (m_treasures[1] == 0xFFFF) {
+		emptySlots++;
+	}
+	if (m_treasures[2] == 0xFFFF) {
+		emptySlots++;
+	}
+	if (m_treasures[3] == 0xFFFF) {
+		emptySlots++;
+	}
+
+	return (numItems <= emptySlots);
 }
 
 /*

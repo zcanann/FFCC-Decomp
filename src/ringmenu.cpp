@@ -969,8 +969,9 @@ void CRingMenu::SetFade(int)
 void CRingMenu::SetBattleButton(int buttonIndex, int newValue)
 {
 	int* battleButtons = reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x18);
+	int current = battleButtons[buttonIndex];
 
-	if (battleButtons[buttonIndex] == newValue) {
+	if (current == newValue) {
 		return;
 	}
 

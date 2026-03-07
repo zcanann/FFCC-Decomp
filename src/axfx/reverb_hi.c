@@ -98,7 +98,7 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     }
     {
         f32 damp = 0.8f * rv->damping;
-        damp = 0.05f + damp;
+        damp += 0.05f;
         rv->damping = 1.0f - damp;
     }
 
@@ -150,7 +150,7 @@ static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     }
     {
         f32 damp = 0.8f * rv->damping;
-        damp = 0.05f + damp;
+        damp += 0.05f;
         rv->damping = 1.0f - damp;
     }
 

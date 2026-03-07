@@ -2211,22 +2211,30 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801458e4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SingSetLetterAttachflg(int)
+void CMenuPcs::SingSetLetterAttachflg(int flag)
 {
-	// TODO
+    DAT_8032eec4 = flag;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801458dc
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SingGetLetterAttachflg()
+int CMenuPcs::SingGetLetterAttachflg()
 {
-	// TODO
+    return DAT_8032eec4;
 }
 
 /*

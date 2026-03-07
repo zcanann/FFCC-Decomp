@@ -26,7 +26,7 @@ struct pppCrystal2UnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
     s32 m_initWOrk;
-    f32 _unk0C;
+    f32 m_arg3;
     f32 m_stepValue;
     u8 m_payload[8];
     f32 m_perspectiveScale;
@@ -54,4 +54,3 @@ void pppRenderCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, pppCrysta
 #endif
 
 #endif // _FFCC_PPPCRYSTAL2_H_
-

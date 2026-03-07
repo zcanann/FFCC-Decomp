@@ -9,8 +9,12 @@
 CGbaPcs GbaPcs;
 extern char __vt__8CManager[];
 extern char PTR_PTR_s_CGbaPcs_8020f4a4[];
-extern char s_CGbaPcs_80330870[];
+extern const char s_CGbaPcs_80330870[];
 extern char s_JoyBus__LoadBin___error_801d9de0[];
+extern char __vt_CProcess[];
+extern char gMemory[];
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 
 /*
  * --INFO--
@@ -24,7 +28,7 @@ extern char s_JoyBus__LoadBin___error_801d9de0[];
 extern "C" void __sinit_p_gba_cpp(void)
 {
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
-	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CProcess;
+	*reinterpret_cast<void**>(&GbaPcs) = __vt_CProcess;
 	*reinterpret_cast<void**>(&GbaPcs) = PTR_PTR_s_CGbaPcs_8020f4a4;
 
 	unsigned int* table = gGbaStatusWordTable;
@@ -103,7 +107,8 @@ void* CGbaPcs::GetTable(unsigned long tableIndex)
  */
 void CGbaPcs::create()
 {
-	m_stage = Memory.CreateStage(0x56000, s_CGbaPcs_80330870, 0);
+	m_stage = static_cast<CMemory::CStage*>(
+		CreateStage__7CMemoryFUlPci(reinterpret_cast<CMemory*>(gMemory), 0x56000, s_CGbaPcs_80330870, 0));
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
 	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
@@ -124,7 +129,7 @@ void CGbaPcs::create()
 void CGbaPcs::destroy()
 {
 	Joybus.Destroy();
-	Memory.DestroyStage(m_stage);
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<CMemory*>(gMemory), m_stage);
 }
 
 /*
@@ -207,4 +212,3 @@ void CGbaPcs::SetFirstZone()
 {
 	GbaQue.ClrRadarTypeFlg();
 }
-

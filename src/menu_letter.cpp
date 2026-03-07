@@ -4,6 +4,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
+#include "ffcc/mes.h"
 
 #include <string.h>
 
@@ -53,7 +54,6 @@ extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
-extern "C" int m_tempVar__4CMes[];
 extern u8 CFlat[];
 
 extern float FLOAT_80333088;
@@ -1836,10 +1836,10 @@ int CMenuPcs::LetterCtrlCur()
 	*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 	DAT_8032eee8 = *reinterpret_cast<s16*>(state + 0x34) + *reinterpret_cast<s16*>(state + 0x26);
 	int entry = caravanWork + DAT_8032eee8 * 0xC;
-	m_tempVar__4CMes[0] = *reinterpret_cast<u16*>(entry + 0x3F0);
-	m_tempVar__4CMes[1] = *reinterpret_cast<u16*>(entry + 0x3F2);
-	m_tempVar__4CMes[2] = *reinterpret_cast<u16*>(entry + 0x3F4);
-	m_tempVar__4CMes[3] = *reinterpret_cast<u16*>(entry + 0x3F6);
+	CMes::m_tempVar[0] = *reinterpret_cast<u16*>(entry + 0x3F0);
+	CMes::m_tempVar[1] = *reinterpret_cast<u16*>(entry + 0x3F2);
+	CMes::m_tempVar[2] = *reinterpret_cast<u16*>(entry + 0x3F4);
+	CMes::m_tempVar[3] = *reinterpret_cast<u16*>(entry + 0x3F6);
 
 	int openAnim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
 	*reinterpret_cast<int*>(openAnim + 0x24) = 0;
@@ -2032,3 +2032,4 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 	}
 	DAT_8032eef4 = flag;
 }
+

@@ -477,8 +477,6 @@ extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFl
     return (evtFlags[byteIndex] & mask) != 0;
 }
 
-extern "C" int m_tempVar__4CMes[];
-
 /*
  * --INFO--
  * PAL Address: 0x800B931C
@@ -490,7 +488,7 @@ extern "C" int m_tempVar__4CMes[];
  */
 extern "C" void SetTempValue__4CMesFii(int index, int value)
 {
-    m_tempVar__4CMes[index] = value;
+    CMes::m_tempVar[index] = value;
 }
 
 /*
@@ -2091,4 +2089,5 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         }
     }
 }
+
 

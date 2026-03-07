@@ -5,6 +5,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/joybus.h"
+#include "ffcc/mes.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"
@@ -30,7 +31,6 @@ extern "C" int AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
-extern "C" int m_tempVar__4CMes[];
 
 struct GbaFlatDataTableEntryView
 {
@@ -1794,10 +1794,10 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 
     unsigned int scriptFood = Game.game.m_scriptFoodBase[channel];
     int entry = scriptFood + letterIndex * 0xC;
-    m_tempVar__4CMes[0] = *reinterpret_cast<unsigned short*>(entry + 0x3F0);
-    m_tempVar__4CMes[1] = *reinterpret_cast<unsigned short*>(entry + 0x3F2);
-    m_tempVar__4CMes[2] = *reinterpret_cast<unsigned short*>(entry + 0x3F4);
-    m_tempVar__4CMes[3] = *reinterpret_cast<unsigned short*>(entry + 0x3F6);
+    CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(entry + 0x3F0);
+    CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(entry + 0x3F2);
+    CMes::m_tempVar[2] = *reinterpret_cast<unsigned short*>(entry + 0x3F4);
+    CMes::m_tempVar[3] = *reinterpret_cast<unsigned short*>(entry + 0x3F6);
 
     unsigned short msgIndex = *reinterpret_cast<unsigned short*>(entry + 0x3EC);
     int mesIndex = (msgIndex & 0x7FC) >> 1;
@@ -3777,3 +3777,4 @@ extern "C" void __sinit_gbaque_cpp(void)
 	GbaQue.Init();
 	__register_global_object(&GbaQue, __dt__8GbaQueueFv, ARRAY_802f49b0);
 }
+

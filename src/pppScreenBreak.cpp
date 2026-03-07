@@ -11,7 +11,6 @@
 #include "dolphin/os/OSCache.h"
 
 #include <string.h>
-extern int gPppCalcDisabled;
 
 struct PScreenBreak {
     float field0_0x0;

@@ -1,6 +1,5 @@
 #include "ffcc/pppAngMove.h"
 #include "ffcc/partMng.h"
-extern int gPppCalcDisabled;
 
 
 struct PppAngMoveObj {

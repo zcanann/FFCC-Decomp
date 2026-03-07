@@ -6,7 +6,6 @@
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
-extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 const float FLOAT_8033101c = 1.0f;
 const float FLOAT_80331020 = 3.0518509e-05f;

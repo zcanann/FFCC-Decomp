@@ -1,7 +1,6 @@
 #include "ffcc/pppVertexApLc.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
-extern int gPppCalcDisabled;
 
 struct VertexApLcEntry
 {

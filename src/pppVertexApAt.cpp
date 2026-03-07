@@ -3,7 +3,6 @@
 #include "ffcc/partMng.h"
 
 #include <dolphin/types.h>
-extern int gPppCalcDisabled;
 
 struct VertexApAtEntry
 {

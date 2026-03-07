@@ -10,7 +10,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 
 struct pppYmDeformationScreen;

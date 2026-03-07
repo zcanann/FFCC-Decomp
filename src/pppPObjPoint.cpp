@@ -1,7 +1,6 @@
 #include "ffcc/pppPObjPoint.h"
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
-extern int gPppCalcDisabled;
 
 extern u8 gPppDefaultValueBuffer[32];
 

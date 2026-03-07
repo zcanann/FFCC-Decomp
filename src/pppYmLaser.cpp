@@ -8,7 +8,6 @@
 #include "ffcc/util.h"
 
 #include <string.h>
-extern int gPppCalcDisabled;
 
 extern CMath Math;
 extern "C" float RandF__5CMathFf(float param, CMath* math);

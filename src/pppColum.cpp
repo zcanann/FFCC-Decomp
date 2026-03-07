@@ -5,7 +5,6 @@
 #include "ffcc/util.h"
 
 #include <math.h>
-extern int gPppCalcDisabled;
 
 struct Vec2d {
     float x;

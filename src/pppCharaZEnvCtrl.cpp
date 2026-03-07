@@ -1,7 +1,6 @@
 #include "ffcc/pppCharaZEnvCtrl.h"
 #include "ffcc/partMng.h"
 #include "dolphin/gx/GXPixel.h"
-extern int gPppCalcDisabled;
 
 
 extern "C" {

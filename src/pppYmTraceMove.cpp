@@ -2,7 +2,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
-extern int gPppCalcDisabled;
 
 
 extern "C" {

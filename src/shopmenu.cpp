@@ -48,7 +48,7 @@ char* strcat(char*, const char*);
 
 extern char s_shopmenu_cpp_801ded8c[];
 extern char DAT_80332e54[];
-extern unsigned short DAT_8032eed0;
+unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];
 extern unsigned char PartPcs[];
 extern void* Graphic;

@@ -6,7 +6,6 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
-extern int gPppCalcDisabled;
 
 extern "C" int rand(void);
 

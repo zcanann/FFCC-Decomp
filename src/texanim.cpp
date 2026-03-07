@@ -44,13 +44,13 @@ extern "C" void* PTR_PTR_s_CTexAnimSeq_801e9c24;
 extern "C" void* PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
 extern "C" char s_texanim_cpp_801d7adc[];
 extern "C" char DAT_8032fb48[];
-extern "C" float FLOAT_8032fb38;
+extern "C" const float FLOAT_8032fb38 = 0.0f;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" int __cntlzw(unsigned int);
 
-extern float FLOAT_8032fb3c;
-extern float FLOAT_8032fb4c;
-extern double DOUBLE_8032fb40;
+extern const float FLOAT_8032fb3c = 1.0f;
+extern const float FLOAT_8032fb4c = 1.25f;
+extern const double DOUBLE_8032fb40 = 4503599627370496.0;
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";

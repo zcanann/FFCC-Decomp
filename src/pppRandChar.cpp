@@ -3,8 +3,8 @@
 #include "types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
+#include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-extern u8 gPppDefaultValueBuffer[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 struct RandCharParam {

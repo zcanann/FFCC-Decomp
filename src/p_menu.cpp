@@ -18,6 +18,7 @@
 
 #include <dolphin/mtx.h>
 #include <math.h>
+#include <string.h>
 
 extern CTextureMan TextureMan;
 extern CMath Math;
@@ -85,7 +86,6 @@ extern "C" void* __register_global_object(void* object, void* destructor, void* 
 extern "C" void __dt__8CMenuPcsFv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" int sprintf(char*, const char*, ...);
-extern "C" void* memset(void*, int, unsigned long);
 extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, char*, int);
 extern "C" void Calc__5CMenuFv(CMenu*);

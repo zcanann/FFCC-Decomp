@@ -9,11 +9,11 @@
 #include "ffcc/pad.h"
 #include "types.h"
 #include <dolphin/mtx.h>
+#include <string.h>
 
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
 extern "C" double cos(double);
-extern "C" void* memset(void*, int, unsigned long);
 extern "C" int GetPadType__6JoyBusFi(void*, int);
 
 extern void* __vt__8CManager;

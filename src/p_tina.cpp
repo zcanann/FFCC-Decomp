@@ -8,6 +8,7 @@
 #include "ffcc/stopwatch.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/USBStreamData.h"
+#include <string.h>
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
@@ -15,7 +16,6 @@ extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CPartPcs* __dt__8CPartPcsFv(CPartPcs*, short);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
 extern "C" int sprintf(char*, const char*, ...);
-extern "C" void* memset(void*, int, unsigned long);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" void pppLoadPmd__8CPartMngFPCc(CPartMng*, const char*);

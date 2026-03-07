@@ -7,6 +7,7 @@
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
+#include <string.h>
 
 struct _pppMngStEmission {
     u8 _pad0[8];
@@ -26,7 +27,6 @@ struct CameraPcsForEmission {
 };
 
 extern "C" int rand(void);
-extern "C" int strcmp(const char*, const char*);
 
 extern CGraphic Graphic;
 extern CMath Math;

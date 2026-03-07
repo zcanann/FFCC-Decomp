@@ -363,11 +363,10 @@ void CMaterialEditorPcs::destroyViewer()
  */
 void CMaterialEditorPcs::ClearTextureData()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned char* cursor = self;
+    unsigned char* cursor = reinterpret_cast<unsigned char*>(this);
     unsigned int i = 0;
 
-    WriteU32(self, 0x3BC, 0);
+    reinterpret_cast<unsigned int*>(this)[0x3BC / sizeof(unsigned int)] = 0;
 
     do {
         MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2BC)));

@@ -352,8 +352,8 @@ void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex
  * JP Size: TODO
  */
 void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorChan green, GXTevColorChan blue, GXTevColorChan alpha) {
-    u32* reg0;
     u32* reg1;
+    u32* reg0;
     u32 idx;
 
     CHECK_GXBEGIN(978, "GXSetTevSwapModeTable");

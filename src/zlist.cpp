@@ -2,7 +2,7 @@
 
 #include "ffcc/p_MaterialEditor.h"
 
-extern char s_zlist_cpp_801d7dc0[];
+char s_zlist_cpp_801d7dc0[] = "zlist.cpp";
 
 /*
  * --INFO--

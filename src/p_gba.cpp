@@ -9,8 +9,8 @@
 CGbaPcs GbaPcs;
 extern char __vt__8CManager[];
 extern char PTR_PTR_s_CGbaPcs_8020f4a4[];
-extern const char s_CGbaPcs_80330870[];
-extern char s_JoyBus__LoadBin___error_801d9de0[];
+const char s_CGbaPcs_80330870[] = "CGbaPcs";
+char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
 extern char __vt_CProcess[];
 extern char gMemory[];
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);

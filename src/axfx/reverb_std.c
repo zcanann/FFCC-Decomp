@@ -26,9 +26,6 @@ static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length) {
     dl->length = (max_length * 4);
     dl->inputs = __AXFXAlloc(max_length * 4);
 	ASSERTMSGLINE(49, dl->inputs, "Can't allocate the memory.");
-	if (dl->inputs == NULL) {
-		return 0;
-	}
 
     memset(dl->inputs, 0, max_length * 4);
     dl->lastOutput = 0.0f;

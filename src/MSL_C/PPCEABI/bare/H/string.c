@@ -4,9 +4,8 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
-// Static variables for strtok
-static char* strtok_null = NULL;
-static char* strtok_ptr  = NULL;
+char* strtok_null = NULL;
+char* strtok_ptr  = NULL;
 
 size_t strlen(const char* str)
 {
@@ -313,9 +312,9 @@ char* strstr(const char* str, const char* pat)
 char* strtok(char* str, const char* delim)
 {
 	unsigned char delimiter_table[32] = { 0 };
-	unsigned char ch;
+	unsigned int ch;
 	unsigned char* p;
-	unsigned char* token;
+	char* token;
 	unsigned long mask;
 
 	if (str != NULL) {
@@ -323,41 +322,41 @@ char* strtok(char* str, const char* delim)
 	}
 
 	p = (unsigned char*)delim - 1;
-	while ((ch = *++p) != 0) {
+	while ((ch = *++p) != 0U) {
 		mask = 1 << (ch & 7);
-		delimiter_table[ch >> 3] |= (unsigned char)mask;
+		delimiter_table[ch / 8] |= (unsigned char)mask;
 	}
 
-	if (strtok_ptr == NULL) {
+	token = strtok_ptr;
+	if (token == NULL) {
 		return NULL;
 	}
-	p = (unsigned char*)strtok_ptr;
 
-	p--;
-	while ((ch = *++p) != 0) {
-		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) == 0) {
+	p = (unsigned char*)token - 1;
+	while ((ch = *++p) != 0U) {
+		if ((delimiter_table[ch / 8] & (1 << (ch & 7))) == 0) {
 			break;
 		}
 	}
 
-	token = p;
-	if (ch == 0) {
+	if (ch == 0U) {
 		strtok_ptr = strtok_null;
 		return NULL;
 	}
+	token = (char*)p;
 
-	while ((ch = *++p) != 0) {
-		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
+	while ((ch = *++p) != 0U) {
+		if ((delimiter_table[ch / 8] & (1 << (ch & 7))) != 0) {
 			break;
 		}
 	}
 
-	if (ch == 0) {
+	if (ch == 0U) {
 		strtok_ptr = strtok_null;
-	} else {
-		strtok_ptr = (char*)(p + 1);
-		*p = 0;
+		return token;
 	}
 
-	return (char*)token;
+	strtok_ptr = (char*)(p + 1);
+	*p = 0;
+	return token;
 }

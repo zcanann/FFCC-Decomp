@@ -288,7 +288,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
     state[0] = 0;
-    state[6] = *(int*)(model + 0x9C);
+    *(float*)(state + 6) = *(float*)(model + 0x9C);
     *(u8*)(state + 7) = 0;
 }
 
@@ -320,6 +320,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) 
  * JP Size: TODO
  */
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+    float baseScale;
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);

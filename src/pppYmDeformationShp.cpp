@@ -253,7 +253,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		s16 step = (s16)(int)state->m_values[3];
 
 		state->m_angle = state->m_angle + step;
-		if (param_2->m_payload3 < state->m_angle) {
+		if (state->m_angle > param_2->m_payload3) {
 			state->m_direction = 0;
 		}
 	} else {

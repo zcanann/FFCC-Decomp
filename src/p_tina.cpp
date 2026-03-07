@@ -24,6 +24,7 @@ extern "C" void pppLoadPan__8CPartMngFPCc(CPartMng*, const char*);
 extern "C" int pppGetFreeDataMng__8CPartMngFv(CPartMng*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
+extern "C" int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void AssertCache__13CAmemCacheSetFv(void*);
@@ -206,6 +207,7 @@ extern unsigned int DAT_801eac88;
 extern unsigned int DAT_801eac8c;
 extern int DAT_8032ed38;
 extern int DAT_8032ed3c;
+extern PPPCREATEPARAM g_dcp;
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {
@@ -1301,7 +1303,19 @@ void LoadFieldPdt0(int mapId, int floorId)
     if (pdtSlot != 0) {
         pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
         if ((pdtSlot != 0) && (partLoadMode != 2) && (partLoadMode != 3)) {
+            _pppDataHead* pppDataHead;
+            int checkOff;
+            int i;
+
             PartMng.pppGetDefaultCreateParam();
+            pppDataHead = *reinterpret_cast<_pppDataHead**>(partMng + 0x22E18);
+            checkOff = 0;
+            for (i = 0; i < static_cast<int>(pppDataHead->m_partCount); i++) {
+                if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(pppDataHead) + 0x4C + checkOff) != -0x1000) {
+                    pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, &g_dcp, 0);
+                }
+                checkOff += 0x60;
+            }
         }
     }
 }

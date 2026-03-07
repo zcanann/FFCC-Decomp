@@ -4,10 +4,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-#undef __GXData
-#define __GXData gx
-
 void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     u32 fogclr;
     u32 fog0;

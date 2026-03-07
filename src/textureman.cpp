@@ -5,8 +5,6 @@
 #include <string.h>
 
 CTextureMan TextureMan;
-extern CMemory Memory;
-extern CSystem System;
 
 template <class T>
 class CPtrArray

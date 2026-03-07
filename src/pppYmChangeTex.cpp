@@ -2,6 +2,7 @@
 #include "ffcc/mapmesh.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
+extern int gPppCalcDisabled;
 
 struct _pppMngStYmChangeTex {
 	char _pad0[0xd8];
@@ -18,7 +19,6 @@ extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern char MaterialMan[];
 extern float DAT_80330e10;
-extern int gPppCalcDisabled;
 extern char gUtil[];
 extern char s_pppYmChangeTex_cpp_801db4c0[];
 extern float FLOAT_80330df8;

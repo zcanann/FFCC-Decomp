@@ -1,5 +1,6 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
 #include "dolphin/os.h"
+extern int gPppCalcDisabled;
 
 struct pppYmDrawMdlTexAnmWork {
     u32 m_frame;
@@ -17,7 +18,6 @@ struct CMapMeshUVLayout {
     s16* m_uvPairs;
 };
 
-extern int gPppCalcDisabled;
 extern f32 FLOAT_80330548;
 extern f32 FLOAT_8033054c;
 extern char DAT_801d9c54[];

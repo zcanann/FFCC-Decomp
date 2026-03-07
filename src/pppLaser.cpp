@@ -5,8 +5,10 @@
 #include "ffcc/partMng.h"
 #include "ffcc/graphic.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/util.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern CMath Math;
 extern const f32 FLOAT_80333448;
@@ -19,8 +21,6 @@ extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 extern const f64 DOUBLE_80333440;
 extern const f64 DOUBLE_80333438;
-extern int gPppCalcDisabled;
-extern void* gUtil;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;

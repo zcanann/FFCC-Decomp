@@ -4,6 +4,7 @@
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 #include <string.h>
+extern int gPppCalcDisabled;
 
 class CMath;
 extern CMath Math;
@@ -19,7 +20,6 @@ extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern int rand();
 extern pppFMATRIX g_matUnit3;
-extern int gPppCalcDisabled;
 
 static char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 

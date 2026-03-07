@@ -2,8 +2,8 @@
 #include "ffcc/partMng.h"
 
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
+
 
 extern class CCameraPcs {
 public:

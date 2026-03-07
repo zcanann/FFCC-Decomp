@@ -1,6 +1,6 @@
 #include "ffcc/pppColMove.h"
-
 extern int gPppCalcDisabled;
+
 
 typedef struct {
     short x;

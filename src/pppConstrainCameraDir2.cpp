@@ -1,10 +1,11 @@
 #include "ffcc/pppConstrainCameraDir2.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppConstrainCameraDir.h"
+#include "ffcc/util.h"
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
+
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
@@ -12,7 +13,6 @@ extern struct {
 extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
-extern int gUtil;
 
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);

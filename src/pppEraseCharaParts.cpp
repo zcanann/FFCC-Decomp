@@ -3,9 +3,9 @@
 #include "ffcc/partMng.h"
 
 #include <dolphin/gx.h>
+extern int gPppCalcDisabled;
 
 extern CMaterialMan MaterialMan;
-extern int gPppCalcDisabled;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

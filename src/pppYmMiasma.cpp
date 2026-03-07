@@ -5,6 +5,7 @@
 #include <dolphin/mtx.h>
 #include <dolphin/gx.h>
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern int rand();
 extern float ppvSinTbl[];
@@ -17,7 +18,6 @@ extern float FLOAT_80330660;
 extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
-extern int gPppCalcDisabled;
 extern double DOUBLE_80330648;
 extern float RandF__5CMathFf(float, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);

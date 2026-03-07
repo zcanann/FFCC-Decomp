@@ -8,8 +8,8 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
-
 extern int gPppCalcDisabled;
+
 extern float DAT_801db5b8;
 extern float DAT_801db5bc;
 extern float DAT_801db5c0;

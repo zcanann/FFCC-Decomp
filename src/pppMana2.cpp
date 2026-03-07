@@ -10,6 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <dolphin/os/OSCache.h>
+extern int gPppCalcDisabled;
 
 struct Vec2d {
     float x;
@@ -49,7 +50,6 @@ extern char DAT_803318dc[];
 extern char DAT_803318e4[];
 extern char DAT_803318ec[];
 extern char DAT_803318f4[];
-extern int gPppCalcDisabled;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

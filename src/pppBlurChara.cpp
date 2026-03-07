@@ -8,6 +8,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+extern int gPppCalcDisabled;
 
 struct Vec2d {
     float x;
@@ -33,7 +34,6 @@ struct pppMngStBlurCharaRaw {
     void* m_charaObj;
 };
 
-extern int gPppCalcDisabled;
 extern CUtil gUtil;
 extern char MaterialMan[];
 

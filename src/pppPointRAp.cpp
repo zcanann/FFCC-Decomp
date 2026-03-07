@@ -4,9 +4,9 @@
 #include "ffcc/ppp_constants.h"
 #include "ffcc/math.h"
 #include <dolphin/types.h>
+extern int gPppCalcDisabled;
 
 extern CMath Math;
-extern int gPppCalcDisabled;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct pppPointRApStep {

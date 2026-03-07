@@ -4,10 +4,10 @@
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern CMath math;
 const float FLOAT_80330F80 = -1.0f;
-extern int gPppCalcDisabled;
 extern u32 CFlatFlags;
 extern Mtx ppvCameraMatrix0;
 extern unsigned char* pppMngStPtr;

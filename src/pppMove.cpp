@@ -1,8 +1,8 @@
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
+extern int gPppCalcDisabled;
 
-extern int gPppCalcDisabled;   // Global enable flag
 
 struct PppMoveObj {
     f32 x;           // 0x0

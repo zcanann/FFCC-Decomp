@@ -9,8 +9,8 @@
 #include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
+
 extern CUtil gUtil;
 extern float DAT_801dd60c;
 extern float DAT_801dd610;

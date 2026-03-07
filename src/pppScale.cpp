@@ -1,6 +1,6 @@
 #include "ffcc/pppScale.h"
-
 extern int gPppCalcDisabled;
+
 
 /*
  * --INFO--

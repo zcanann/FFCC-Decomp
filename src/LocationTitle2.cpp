@@ -7,6 +7,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+extern int gPppCalcDisabled;
 
 // External function declarations
 extern "C" int rand(void);
@@ -17,7 +18,6 @@ extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 // External data references
-extern int gPppCalcDisabled;
 extern float FLOAT_80330f48;
 extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;

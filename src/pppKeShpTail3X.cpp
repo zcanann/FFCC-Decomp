@@ -6,9 +6,9 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern "C" int rand(void);
-extern int gPppCalcDisabled;
 
 struct KeShpTail3XStep {
     s32 m_graphId;

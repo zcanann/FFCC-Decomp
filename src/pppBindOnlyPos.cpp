@@ -1,6 +1,6 @@
 #include "ffcc/pppBindOnlyPos.h"
-
 extern int gPppCalcDisabled;
+
 
 /*
  * --INFO--

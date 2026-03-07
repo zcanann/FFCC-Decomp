@@ -11,6 +11,7 @@
 #include "dolphin/os/OSCache.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
 
 struct PScreenBreak {
     float field0_0x0;
@@ -47,7 +48,6 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
-extern int gPppCalcDisabled;
 extern int DAT_802381a0;
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;

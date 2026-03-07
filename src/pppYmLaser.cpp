@@ -5,14 +5,14 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/util.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern CMath Math;
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-extern int gPppCalcDisabled;
-extern void* gUtil;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;

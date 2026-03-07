@@ -4,13 +4,13 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/util.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
-extern u8 gPppInConstructor;
-extern void* gUtil;
+extern unsigned char gPppInConstructor;
+
 extern float FLOAT_803305f0;
 extern float FLOAT_803305f8;
 extern float FLOAT_80330610;

@@ -49,4 +49,6 @@ public:
     void Quit();
 };
 
+extern CUtil gUtil;
+
 #endif // _FFCC_PPP_UTIL_H_

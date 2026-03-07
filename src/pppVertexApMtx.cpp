@@ -4,6 +4,7 @@
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
+extern int gPppCalcDisabled;
 
 struct VertexApMtxEntry
 {
@@ -53,7 +54,6 @@ struct VertexApMtxSource
 struct _pppPDataVal;
 
 extern CMath math;
-extern int gPppCalcDisabled;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);

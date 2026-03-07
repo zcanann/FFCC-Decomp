@@ -2,8 +2,8 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "dolphin/types.h"
-
 extern int gPppCalcDisabled;
+
 
 typedef struct ShapeRuntimeData {
     u32 shapeDataOffset;

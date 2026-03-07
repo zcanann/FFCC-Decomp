@@ -5,8 +5,8 @@
 #include "ffcc/symbols_shared.h"
 
 #include <dolphin/types.h>
-
 extern int gPppCalcDisabled;
+
 
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);

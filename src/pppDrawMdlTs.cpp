@@ -2,9 +2,9 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/types.h"
+extern int gPppCalcDisabled;
 
 extern "C" {
-extern int gPppCalcDisabled;
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 void pppSetBlendMode__FUc(unsigned char);

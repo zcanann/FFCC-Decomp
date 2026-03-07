@@ -2,6 +2,7 @@
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
+extern int gPppCalcDisabled;
 
 struct KeShpTailOffsets {
     u8 _pad0[0xc];
@@ -33,7 +34,6 @@ struct KeShpTailObject {
  */
 void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets)
 {
-	extern int gPppCalcDisabled;
 	KeShpTailObject* tailObj = (KeShpTailObject*)obj;
 	KeShpTailWork* work;
 	if (gPppCalcDisabled != 0) {

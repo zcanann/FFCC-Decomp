@@ -7,13 +7,13 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+extern int gPppCalcDisabled;
 
 extern f32 FLOAT_803306e8;
 extern f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
 extern f64 DOUBLE_803306f8;
-extern int gPppCalcDisabled;
 extern CUtil gUtil;
 
 extern "C" {

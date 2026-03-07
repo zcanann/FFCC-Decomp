@@ -10,6 +10,8 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 
 struct pppYmDeformationScreen;
 struct YmDeformationScreenOffsetData {
@@ -58,8 +60,6 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 extern CMath Math;
 extern CUtil gUtil;
 extern "C" float ppvCameraMatrix02[3][4];

@@ -2,8 +2,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
-
 extern int gPppCalcDisabled;
+
 
 struct pppPointApMtxStep {
 	u32 m_unknown0;

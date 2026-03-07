@@ -7,8 +7,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 #include <string.h>
-
 extern int gPppCalcDisabled;
+
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvCameraMatrix02;
 

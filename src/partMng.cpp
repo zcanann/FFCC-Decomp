@@ -14,6 +14,8 @@
 #include "ffcc/stopwatch.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 
 class CPartPcs;
 

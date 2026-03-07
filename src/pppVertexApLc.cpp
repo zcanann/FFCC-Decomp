@@ -1,6 +1,7 @@
 #include "ffcc/pppVertexApLc.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
+extern int gPppCalcDisabled;
 
 struct VertexApLcEntry
 {
@@ -51,7 +52,6 @@ struct VertexApLcSource
 struct _pppPDataVal;
 
 extern CMath math;
-extern int gPppCalcDisabled;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);

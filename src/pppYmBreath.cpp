@@ -4,6 +4,7 @@
 #include "dolphin/mtx.h"
 
 #include <string.h>
+extern int gPppCalcDisabled;
 
 struct pppFMATRIX;
 
@@ -21,7 +22,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern int gPppCalcDisabled;
 extern Mtx ppvCameraMatrix0;
 extern unsigned int CFlatFlags;
 extern CMath math;

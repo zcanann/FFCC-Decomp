@@ -3,6 +3,7 @@
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 #include <stddef.h>
+extern int gPppCalcDisabled;
 
 class CMaterialSet;
 struct _pppEnvStLite {
@@ -12,7 +13,6 @@ struct _pppEnvStLite {
 };
 
 extern CUtil gUtil;
-extern int gPppCalcDisabled;
 
 struct _pppFilterSerializedData {
     unsigned int m_unk80;

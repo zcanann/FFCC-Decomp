@@ -2,13 +2,13 @@
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include <string.h>
+extern int gPppCalcDisabled;
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" float RandF__5CMathFv(CMath*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 
-extern int gPppCalcDisabled;
 extern float FLOAT_80330498;
 extern float FLOAT_8033049c;
 extern float FLOAT_803304a0;

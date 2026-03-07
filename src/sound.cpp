@@ -4,6 +4,7 @@
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
@@ -102,7 +103,6 @@ extern char DAT_801db190[];
 extern char DAT_801db1d8[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
-extern unsigned char CFlat[];
 
 struct CLineSegment {
     Vec delta;

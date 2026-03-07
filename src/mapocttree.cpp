@@ -31,9 +31,9 @@ struct CMapCylinderRaw
     float m_radius2;
     float m_height2;
 };
-static CBoundRaw s_bound;
-static CMapCylinderRaw s_cyl;
-static Vec s_mvec;
+CBoundRaw s_bound;
+CMapCylinderRaw s_cyl;
+Vec s_mvec;
 static unsigned long s_checkHitCylinderMask;
 static unsigned long s_insertShadowBitIndex;
 static int s_insertShadowDepth;

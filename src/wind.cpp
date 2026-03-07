@@ -6,13 +6,12 @@
 #include "ffcc/color.h"
 #include "ffcc/vector.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/goout.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
-
-extern unsigned char CFlat[];
 
 static inline MtxPtr GetCameraMatrix()
 {

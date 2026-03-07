@@ -49,7 +49,6 @@ struct pppScreenBreakUnkC {
 
 extern int gPppCalcDisabled;
 extern int DAT_802381a0;
-extern void* DAT_80238034;
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
 extern float FLOAT_80331cc8;
@@ -653,8 +652,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    s32 index = param_3->m_serializedDataOffsets[0];
-    float* value = (float*)((u8*)pppScreenBreak + param_3->m_serializedDataOffsets[2] + 0x80);
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
+    float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(float**)(model + 0xE4) = value;
@@ -663,10 +663,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
     u8* color = (u8*)(value + 10);
-    color[0] = (&pppScreenBreak->field_0x88)[index];
-    color[1] = (&pppScreenBreak->field_0x89)[index];
-    color[2] = (&pppScreenBreak->field_0x8a)[index];
-    color[3] = (&pppScreenBreak->field_0x8b)[index];
+    color[0] = colorSource[8];
+    color[1] = colorSource[9];
+    color[2] = colorSource[10];
+    color[3] = colorSource[11];
     DCFlushRange(value + 10, 4);
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param_2->m_stepValue, &pppScreenBreak->field0_0x0, param_2->m_graphId,
@@ -755,8 +755,8 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
 
     if (value[0x24] == 0) {
-        Graphic.GetBackBufferRect2(DAT_80238034, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1,
-                                   (_GXTexFmt)4, 0);
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR,
+                                   GX_TF_RGBA8, 0);
         value[0x24] = 1;
     }
 }

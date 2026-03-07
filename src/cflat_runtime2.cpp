@@ -1,9 +1,15 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/monobj.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_graphic.h"
+#include "ffcc/p_minigame.h"
+#include "ffcc/pad.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
@@ -66,18 +72,11 @@ extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
-extern unsigned char Pad[];
-extern unsigned char MenuPcs[];
 extern unsigned char Chara[];
-extern unsigned char GraphicsPcs[];
-extern unsigned char CameraPcs[];
-extern unsigned char DbgMenuPcs[];
-extern unsigned char MiniGamePcs[];
 extern unsigned char CFlat[];
 extern unsigned char m_objItem[];
 extern unsigned char m_objParty[];
 extern unsigned char m_objMon[];
-extern CTextureMan TextureMan;
 extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
@@ -186,6 +185,36 @@ void CLine<64>::Draw()
 namespace {
 
 typedef unsigned char u8;
+
+static inline u8* PadRaw()
+{
+	return reinterpret_cast<u8*>(&Pad);
+}
+
+static inline u8* MenuPcsRaw()
+{
+	return reinterpret_cast<u8*>(&MenuPcs);
+}
+
+static inline u8* GraphicsPcsRaw()
+{
+	return reinterpret_cast<u8*>(&GraphicsPcs);
+}
+
+static inline u8* CameraPcsRaw()
+{
+	return reinterpret_cast<u8*>(&CameraPcs);
+}
+
+static inline u8* DbgMenuPcsRaw()
+{
+	return reinterpret_cast<u8*>(&DbgMenuPcs);
+}
+
+static inline u8* MiniGamePcsRaw()
+{
+	return reinterpret_cast<u8*>(&MiniGamePcs);
+}
 
 static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
 {
@@ -1045,7 +1074,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	drawAStar__6CAStarFv(DbgMenuPcs + 0x2A5C);
+	drawAStar__6CAStarFv(DbgMenuPcsRaw() + 0x2A5C);
 
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
@@ -1473,7 +1502,7 @@ void CFlatRuntime2::Calc()
  */
 void CFlatRuntime2::Draw()
 {
-	CFont* font = *reinterpret_cast<CFont**>(MenuPcs + 0x248);
+	CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
 	SetScale__5CFontFf(1.0f, font);
 	SetShadow__5CFontFi(font, 1);
 	SetMargin__5CFontFf(0.0f, font);
@@ -1496,7 +1525,7 @@ void CFlatRuntime2::Draw()
 	SetZMode__5CFontFii(font, 0, 0);
 	SetPosZ__5CFontFf(1.0f, font);
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	SetScale__5CFontFf(0.875f, font);
@@ -1515,11 +1544,11 @@ void CFlatRuntime2::Draw()
 
 	SetZMode__5CFontFii(font, 0, 0);
 	SetPosZ__5CFontFf(1.0f, font);
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
-	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x10), cameraMtx);
+	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x10), cameraMtx);
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetZCompLoc(GX_FALSE);
@@ -1551,7 +1580,8 @@ void CFlatRuntime2::Draw()
 	}
 
 	const bool showDebugCC =
-		((*reinterpret_cast<u32*>(runtime + 0x129C) & 0x200000) != 0) || ((MiniGamePcs[0x25732] & 0x80) != 0);
+		((*reinterpret_cast<u32*>(runtime + 0x129C) & 0x200000) != 0) ||
+		((MiniGamePcsRaw()[0x25732] & 0x80) != 0);
 	const int debugCount = *reinterpret_cast<int*>(runtime + 0xCD1C);
 	if (showDebugCC && debugCount != 0) {
 		GXColor greenColor = {0x80, 0xFF, 0x80, 0xFF};
@@ -2037,7 +2067,7 @@ void CFlatRuntime2::drawLayer(
 	}
 
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), projection);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 }
 
@@ -2500,7 +2530,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	}
 
 	case 9:
-		ClrBattleItem__8CMenuPcsFv(MenuPcs);
+		ClrBattleItem__8CMenuPcsFv(&MenuPcs);
 		break;
 
 	case 0xA:
@@ -2535,7 +2565,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x17:
-		*reinterpret_cast<unsigned int*>(Pad + 0x1C8) = static_cast<unsigned int>(controlValue);
+	*reinterpret_cast<unsigned int*>(PadRaw() + 0x1C8) = static_cast<unsigned int>(controlValue);
 		break;
 
 	case 0x18:
@@ -2659,10 +2689,10 @@ void CFlatRuntime2::resetChangeScript()
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;
 
-	*reinterpret_cast<u32*>(Pad + 0x1C8) = 1;
-	*reinterpret_cast<u32*>(GraphicsPcs + 0x44) = 0;
-	*reinterpret_cast<u32*>(CameraPcs + 0x434) = 1;
-	reset__6CAStarFv(DbgMenuPcs + 0x2A5C);
+	*reinterpret_cast<u32*>(PadRaw() + 0x1C8) = 1;
+	*reinterpret_cast<u32*>(GraphicsPcsRaw() + 0x44) = 0;
+	*reinterpret_cast<u32*>(CameraPcsRaw() + 0x434) = 1;
+	reset__6CAStarFv(DbgMenuPcsRaw() + 0x2A5C);
 }
 
 /*

@@ -89,7 +89,7 @@ bool CPtrArray<T>::Add(T item)
 template <class T>
 int CPtrArray<T>::GetSize()
 {
-    return m_numItems;
+    return m_size;
 }
 
 template <class T>

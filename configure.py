@@ -683,6 +683,7 @@ config.libs = [
                 NonMatching,
                 "dolphin/os/__ppc_eabi_init.cpp",
                 source="os/__ppc_eabi_init.cpp",
+                cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
             ),
             Object(NonMatching, "os/OS.c"),
             Object(NonMatching, "os/OSAddress.c"),

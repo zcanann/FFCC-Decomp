@@ -1,6 +1,6 @@
 #include "ffcc/pppColor.h"
 #include "types.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 /*
  * --INFO--

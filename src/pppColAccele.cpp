@@ -1,5 +1,5 @@
 #include "ffcc/pppColAccele.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 
 /*

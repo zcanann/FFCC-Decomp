@@ -3,7 +3,7 @@
 #include "ffcc/pppPart.h"
 #include "global.h"
 #include <dolphin/gx.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 extern "C" {
 void InitBlurParameter__8CGraphicFv(void* graphic);

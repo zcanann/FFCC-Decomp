@@ -5,8 +5,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
+#include "ffcc/ppp_linkage.h"
 
 
 extern float FLOAT_80330dac;

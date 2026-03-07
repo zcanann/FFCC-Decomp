@@ -7,7 +7,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 // External function declarations
 extern "C" int rand(void);

@@ -8,7 +8,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern unsigned char gPppInConstructor;
 
 extern float FLOAT_803305f0;
 extern float FLOAT_803305f8;

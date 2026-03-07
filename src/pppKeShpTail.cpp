@@ -2,7 +2,7 @@
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 struct KeShpTailOffsets {
     u8 _pad0[0xc];

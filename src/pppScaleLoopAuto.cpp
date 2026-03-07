@@ -1,7 +1,7 @@
 #include "ffcc/pppScaleLoopAuto.h"
 #include "ffcc/ppp_constants.h"
 #include <dolphin/types.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 
 struct pppScaleLoopAutoWork {

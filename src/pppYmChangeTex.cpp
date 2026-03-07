@@ -2,7 +2,7 @@
 #include "ffcc/mapmesh.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 struct _pppMngStYmChangeTex {
 	char _pad0[0xd8];

@@ -2,7 +2,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
-extern unsigned char gPppInConstructor;
 
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;

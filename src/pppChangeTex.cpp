@@ -4,8 +4,6 @@
 #include "dolphin/gx.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 
 struct _pppMngStChangeTex {
 	char _pad0[0xd8];

@@ -10,7 +10,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern unsigned char gPppInConstructor;
+#include "ffcc/ppp_linkage.h"
 
 struct pppYmDeformationScreen;
 struct YmDeformationScreenOffsetData {

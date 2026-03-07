@@ -1,11 +1,9 @@
 #include "ffcc/pppLight.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
+extern unsigned char gPppDefaultValueBuffer[];
 
 extern unsigned char gPppInSubFrameCalc;
-extern unsigned char gPppDefaultValueBuffer[];
 extern unsigned char* pppMngStPtr;
 
 extern "C" {

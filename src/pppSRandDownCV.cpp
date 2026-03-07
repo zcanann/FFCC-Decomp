@@ -3,7 +3,7 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 extern u8 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 

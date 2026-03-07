@@ -5,7 +5,6 @@
 #include "ffcc/symbols_shared.h"
 
 #include <dolphin/types.h>
-extern int gPppCalcDisabled;
 
 
 extern "C" {

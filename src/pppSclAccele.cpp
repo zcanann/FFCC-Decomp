@@ -1,6 +1,6 @@
 #include "ffcc/pppSclAccele.h"
 #include "ffcc/ppp_constants.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 typedef struct {
     int m_graphId;

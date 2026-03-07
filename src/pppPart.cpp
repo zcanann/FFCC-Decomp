@@ -22,8 +22,6 @@
 #include "ffcc/gxfunc.h"
 
 #include <string.h>
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 
 static const float kPppZero = 0.0; // FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
@@ -45,8 +43,6 @@ extern "C" unsigned char DAT_8032ed88;
 extern "C" unsigned char DAT_8032ed89;
 extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
-extern "C" unsigned char gPppInConstructor;
-extern "C" int gPppCalcDisabled;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned char PartPcs[];

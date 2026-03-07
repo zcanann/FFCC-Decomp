@@ -5,7 +5,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 static int GetGraphFrameFromId(u32 graphId)
 {

@@ -4,7 +4,6 @@
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 #include <string.h>
-extern int gPppCalcDisabled;
 
 class CMath;
 extern CMath Math;

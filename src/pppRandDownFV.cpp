@@ -3,7 +3,7 @@
 #include "types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 extern f32 gPppDefaultValueBuffer[];
 
 extern "C" {

@@ -3,7 +3,7 @@
 #include "types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 extern s16 gPppDefaultValueBuffer[];
 static f64 const sPppRandDownHCVConvertBias = 4503601774854144.0;
 

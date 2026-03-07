@@ -2,7 +2,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "dolphin/types.h"
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 
 extern "C" {

@@ -95,6 +95,8 @@ extern float kPppConstrainCameraDirDistanceBase;
 extern float kPppConstrainCameraDirScaleMul;
 extern float kPppConstrainCameraDirInitScale;
 extern float kPppConstrainCameraForLocZero;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 extern u8 gPppDefaultValueBuffer[];
 extern float gPartScreenMatrixRow2X;
 extern float gPartScreenMatrixRow2Y;

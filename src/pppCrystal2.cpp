@@ -9,7 +9,7 @@
 #include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern int gPppCalcDisabled;
+#include "ffcc/ppp_linkage.h"
 
 extern CUtil gUtil;
 extern float DAT_801dd60c;

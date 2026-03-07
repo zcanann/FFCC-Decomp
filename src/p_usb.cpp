@@ -9,6 +9,8 @@
 CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
+extern "C" const char s_CUSBPcs_8032f810[] = "CUSBPcs";
+extern "C" const char s_plot_kmitsuru__801d6d14[] = "plot.kmitsuru/";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
@@ -16,8 +18,6 @@ extern "C" int IsConnected__4CUSBFv(void*);
 
 extern "C" char __vt__8CManager[];
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
-extern char s_CUSBPcs_8032f810;
-extern char s_plot_kmitsuru__801d6d14[];
 
 
 /*
@@ -80,7 +80,7 @@ void* CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, &s_CUSBPcs_8032f810, 0);
+        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;

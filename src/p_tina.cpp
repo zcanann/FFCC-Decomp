@@ -12,10 +12,11 @@
 #include "ffcc/USBStreamData.h"
 #include <string.h>
 
-extern "C" char* gDebugSpinnerText = 0;
-extern "C" unsigned char gDebugSpinnerTextInitialized = 0;
-extern "C" int gDebugSpinnerFrame = 0;
-extern "C" unsigned char gDebugSpinnerFrameInitialized = 0;
+char* gDebugSpinnerText = 0;
+unsigned char gDebugSpinnerTextInitialized = 0;
+int gDebugSpinnerFrame = 0;
+unsigned char gDebugSpinnerFrameInitialized = 0;
+extern "C" const char s_no_name_8032fdcc[] = "no_name";
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
@@ -83,7 +84,6 @@ extern char s_hpm___3f___max___3f___801d8050[];
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern char DAT_801d8068[];
-extern char s_no_name_8032fdcc[];
 extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
 extern char s_dvd_tina_stage_03d_title_801d7f94[];
 extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
@@ -379,9 +379,9 @@ extern "C" void __sinit_p_tina_cpp(void)
     DAT_801eac88 = DAT_801eaa8c;
     DAT_801eac8c = PTR_drawAfterViewer__8CPartPcsFv_801eaa90;
 
-    object = __ct__8CProfileFPc(&g_par_calc_prof, s_no_name_8032fdcc);
+    object = __ct__8CProfileFPc(&g_par_calc_prof, const_cast<char*>(s_no_name_8032fdcc));
     __register_global_object(object, reinterpret_cast<void*>(__dt__8CProfileFv), ARRAY_80273968);
-    object = __ct__8CProfileFPc(&g_par_draw_prof, s_no_name_8032fdcc);
+    object = __ct__8CProfileFPc(&g_par_draw_prof, const_cast<char*>(s_no_name_8032fdcc));
     __register_global_object(object, reinterpret_cast<void*>(__dt__8CProfileFv), ARRAY_802739e8);
 }
 

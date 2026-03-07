@@ -30,7 +30,8 @@ extern char DAT_80330e98[];
 extern char DAT_80330ea0[];
 extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
-extern char MaterialMan[];
+class CMaterialMan;
+extern CMaterialMan MaterialMan;
 extern char gUtil[];
 
 extern struct {
@@ -45,6 +46,8 @@ struct Vec2d {
     float x;
     float y;
 };
+
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 extern "C" {
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -240,7 +243,7 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
 
     u32* dl = (u32*)(*(s32*)(*(s32*)(meshData + meshIndex * 0x14 + 8) + 0x50) + dlIndex * 0xC);
     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-        MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+        &MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
     GXCallDisplayList((void*)dl[1], dl[0]);
 }
 
@@ -315,28 +318,28 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
             GXSetArray((GXAttr)0xB, *(void**)((u8*)work + 0x68), 4);
             GXSetArray((GXAttr)0xD, *(void**)((u8*)work + 0x6C), 4);
             GXSetArray((GXAttr)0xE, *(void**)((u8*)work + 0x70), 4);
-            *(u32*)(MaterialMan + 0x08) = *(u32*)((u8*)work + 0x64);
-            *(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
-            *(u8*)(MaterialMan + 0x4C) = 0xFF;
-            *(u32*)(MaterialMan + 0x11C) = 0;
-            *(u32*)(MaterialMan + 0x120) = 0x1E;
-            *(u32*)(MaterialMan + 0x124) = 0;
-            *(u8*)(MaterialMan + 0x205) = 0xFF;
-            *(u8*)(MaterialMan + 0x206) = 0xFF;
-            *(u32*)(MaterialMan + 0x58) = 0;
-            *(u32*)(MaterialMan + 0x5C) = 0;
-            *(u8*)(MaterialMan + 0x208) = 0;
-            *(u32*)(MaterialMan + 0x48) = 0xAEE0F;
-            *(u32*)(MaterialMan + 0x128) = 0;
-            *(u32*)(MaterialMan + 0x12C) = 0x1E;
-            *(u32*)(MaterialMan + 0x130) = 0;
-            *(u32*)(MaterialMan + 0x40) = 0xAEE0F;
-            *(u32*)(MaterialMan + 0xD0) = *(u32*)((u8*)work + 0x28);
-            *(u32*)(MaterialMan + 0xDC) = *(u32*)((u8*)work + 0x2C);
+            *(u32*)(MaterialManRaw() + 0x08) = *(u32*)((u8*)work + 0x64);
+            *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
+            *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+            *(u32*)(MaterialManRaw() + 0x11C) = 0;
+            *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
+            *(u32*)(MaterialManRaw() + 0x124) = 0;
+            *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+            *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+            *(u32*)(MaterialManRaw() + 0x58) = 0;
+            *(u32*)(MaterialManRaw() + 0x5C) = 0;
+            *(u8*)(MaterialManRaw() + 0x208) = 0;
+            *(u32*)(MaterialManRaw() + 0x48) = 0xAEE0F;
+            *(u32*)(MaterialManRaw() + 0x128) = 0;
+            *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
+            *(u32*)(MaterialManRaw() + 0x130) = 0;
+            *(u32*)(MaterialManRaw() + 0x40) = 0xAEE0F;
+            *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((u8*)work + 0x28);
+            *(u32*)(MaterialManRaw() + 0xDC) = *(u32*)((u8*)work + 0x2C);
             GXSetCullMode((GXCullMode)1);
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+                &MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
             SetEnvMap((PYmMana*)step, (VYmMana*)work);
             GXCallDisplayList(*(void**)(*(int*)((u8*)work + 0x60) + dlIndex * 4), dl[0]);
             for (int i = 0; i < 16; i++) {
@@ -374,7 +377,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     DCFlushRange((u8*)work + 0x100, 4);
     GXSetArray((GXAttr)0xB, (u8*)work + 0x100, 4);
     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-        MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+        &MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 1, 0xF);
     GXCallDisplayList((void*)dl[1], dl[0]);
 }
@@ -490,8 +493,8 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
     _WaitDrawDone__8CGraphicFPci(&Graphic, (char*)"pppYmMana.cpp", 0x2CE);
-    *(u32*)(MaterialMan + 0x208) = 0;
-    *(u32*)(MaterialMan + 0x220) = 0;
+    *(u32*)(MaterialManRaw() + 0x208) = 0;
+    *(u32*)(MaterialManRaw() + 0x220) = 0;
 
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
@@ -671,8 +674,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
 
-    MaterialMan[0x228] = (u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer);
-    *((u8*)work + 0xE8) = MaterialMan[0x228];
+    MaterialManRaw()[0x228] = (u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer);
+    *((u8*)work + 0xE8) = MaterialManRaw()[0x228];
 
     if (*(s32*)pppYmMana != 0) {
         return;

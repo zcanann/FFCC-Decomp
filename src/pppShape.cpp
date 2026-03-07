@@ -5,13 +5,15 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
-    extern unsigned char MaterialMan[];
+    extern CMaterialMan MaterialMan;
     extern unsigned char ppvAmemCacheSet[];
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);
     void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int textureIndex,
                                                              void* amemCacheSet);
 }
+
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 class CMaterial;
 
@@ -66,12 +68,12 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     int shapePtr = (int)animData;
     shapePtr = shapePtr + *(short*)(shapePtr + frameIndex * 8 + 0x10);
 
-    *(int*)(MaterialMan + 296) = *(int*)(MaterialMan + 284);
-    *(int*)(MaterialMan + 300) = *(int*)(MaterialMan + 288);
-    *(int*)(MaterialMan + 304) = *(int*)(MaterialMan + 292);
-    *(int*)(MaterialMan + 64) = *(int*)(MaterialMan + 72);
+    *(int*)(MaterialManRaw() + 296) = *(int*)(MaterialManRaw() + 284);
+    *(int*)(MaterialManRaw() + 300) = *(int*)(MaterialManRaw() + 288);
+    *(int*)(MaterialManRaw() + 304) = *(int*)(MaterialManRaw() + 292);
+    *(int*)(MaterialManRaw() + 64) = *(int*)(MaterialManRaw() + 72);
 
-    SetMaterialPart__12CMaterialManFP12CMaterialSetii((CMaterialMan*)MaterialMan, materialSet,
+    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
                                                       *(unsigned char*)(shapePtr + 10), 0);
 
     GXClearVtxDesc();
@@ -103,12 +105,12 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     int iVar1;
     int iVar2;
 
-    *(int*)(MaterialMan + 296) = *(int*)(MaterialMan + 284);
-    *(int*)(MaterialMan + 300) = *(int*)(MaterialMan + 288);
-    *(int*)(MaterialMan + 304) = *(int*)(MaterialMan + 292);
-    *(int*)(MaterialMan + 64) = *(int*)(MaterialMan + 72);
+    *(int*)(MaterialManRaw() + 296) = *(int*)(MaterialManRaw() + 284);
+    *(int*)(MaterialManRaw() + 300) = *(int*)(MaterialManRaw() + 288);
+    *(int*)(MaterialManRaw() + 304) = *(int*)(MaterialManRaw() + 292);
+    *(int*)(MaterialManRaw() + 64) = *(int*)(MaterialManRaw() + 72);
 
-    SetMaterialPart__12CMaterialManFP12CMaterialSetii((CMaterialMan*)MaterialMan, materialSet,
+    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
                                                       *(unsigned char*)((int)shape + 10), 0);
 
     GXClearVtxDesc();

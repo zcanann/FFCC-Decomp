@@ -4,7 +4,7 @@
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
-extern char gPppInConstructor;
+extern unsigned char gPppInConstructor;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
@@ -127,5 +127,4 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 		}
 	}
 }
-
 

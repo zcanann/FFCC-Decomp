@@ -12,8 +12,6 @@ extern char PTR_PTR_s_CGbaPcs_8020f4a4[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
 extern char __vt_CProcess[];
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 
 /*
  * --INFO--
@@ -30,19 +28,19 @@ extern "C" void __sinit_p_gba_cpp(void)
 	*reinterpret_cast<void**>(&GbaPcs) = __vt_CProcess;
 	*reinterpret_cast<void**>(&GbaPcs) = PTR_PTR_s_CGbaPcs_8020f4a4;
 
-	unsigned int* table = gGbaStatusWordTable;
-	table[1] = gGbaStatusWordTriplet0[0];
-	table[2] = gGbaStatusWordTriplet0[1];
-	table[3] = gGbaStatusWordTriplet0[2];
-	table[4] = gGbaStatusWordTriplet1[0];
-	table[5] = gGbaStatusWordTriplet1[1];
-	table[6] = gGbaStatusWordTriplet1[2];
-	table[7] = gGbaStatusWordTriplet2[0];
-	table[8] = gGbaStatusWordTriplet2[1];
-	table[9] = gGbaStatusWordTriplet2[2];
-	table[12] = gGbaStatusWordTriplet3[0];
-	table[13] = gGbaStatusWordTriplet3[1];
-	table[14] = gGbaStatusWordTriplet3[2];
+	unsigned int* table = &gGbaStatusWordTable[1];
+	table[0] = gGbaStatusWordTriplet0[0];
+	table[1] = gGbaStatusWordTriplet0[1];
+	table[2] = gGbaStatusWordTriplet0[2];
+	table[3] = gGbaStatusWordTriplet1[0];
+	table[4] = gGbaStatusWordTriplet1[1];
+	table[5] = gGbaStatusWordTriplet1[2];
+	table[6] = gGbaStatusWordTriplet2[0];
+	table[7] = gGbaStatusWordTriplet2[1];
+	table[8] = gGbaStatusWordTriplet2[2];
+	table[11] = gGbaStatusWordTriplet3[0];
+	table[12] = gGbaStatusWordTriplet3[1];
+	table[13] = gGbaStatusWordTriplet3[2];
 }
 
 /*
@@ -106,7 +104,7 @@ void* CGbaPcs::GetTable(unsigned long tableIndex)
  */
 void CGbaPcs::create()
 {
-	m_stage = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x56000, s_CGbaPcs_80330870, 0));
+	m_stage = Memory.CreateStage(0x56000, const_cast<char*>(s_CGbaPcs_80330870), 0);
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
 	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
@@ -127,7 +125,7 @@ void CGbaPcs::create()
 void CGbaPcs::destroy()
 {
 	Joybus.Destroy();
-	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_stage);
+	Memory.DestroyStage(m_stage);
 }
 
 /*

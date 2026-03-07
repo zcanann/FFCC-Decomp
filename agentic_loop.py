@@ -1,6 +1,6 @@
 import subprocess
 
-CMD = 'codex exec --yolo "Follow the instructions in AGENTS.MD. NEVER ask the user for input. Simply follow the instructions and make a PR if there is an improvement."'
+CMD = 'codex exec --yolo "Follow the instructions in AGENTS.MD. NEVER ask the user for input. Simply follow the instructions and make a PR if there is an improvement. Pay careful attention to any important rules."'
 TIMEOUT_SECONDS = 25 * 60
 
 while True:

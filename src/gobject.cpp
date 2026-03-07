@@ -1842,9 +1842,9 @@ void CGObject::LoadShield(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::LoadAnim(char*, int, int, int, unsigned long)
+void CGObject::LoadAnim(char* animName, int animIndex, int loopMode, int blendMode, unsigned long modelBase)
 {
-	// TODO
+    m_charaModelHandle->LoadAnim(animName, animIndex, loopMode, blendMode, (int)modelBase, -1, 0);
 }
 
 /*

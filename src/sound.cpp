@@ -12,6 +12,7 @@
 #include "dolphin/ar.h"
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
+#include "dolphin/os.h"
 #include <math.h>
 #include <string.h>
 
@@ -24,7 +25,6 @@ extern double DOUBLE_80330d08;
 extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
-extern unsigned int DAT_800000f8;
 extern "C" void* PTR_PTR_s_CSound_8021056c;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
@@ -728,7 +728,7 @@ float CSound::GetPerformance()
 {
     unsigned int programTime = GetProgramTime__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
     float numer = (float)(programTime / 0xF);
-    float denom = (float)(((DAT_800000f8 / 500000) * 0x8235) >> 3);
+    float denom = (float)(((OS_BUS_CLOCK / 500000) * 0x8235) >> 3);
     return FLOAT_80330d00 * (numer / denom);
 }
 

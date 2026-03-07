@@ -66,8 +66,6 @@ extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_G
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void SetOffsetZBuff__10CCameraPcsFf(double, void*);
 extern unsigned char CameraPcs[];
-extern int DAT_8032ec78;
-extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
@@ -83,7 +81,6 @@ extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
 extern char DAT_8032f984[];
 extern CMath Math;
-extern unsigned char DAT_8032ecb9;
 extern CPartPcs PartPcs;
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
@@ -1384,7 +1381,7 @@ void CMapMng::Create()
         reinterpret_cast<CPtrArray<CMapLightHolder*>*>(Ptr(this, 0x21450 + (i * 0x1C)))->SetStage(stage);
     }
 
-    DAT_8032ecb9 = 0;
+    gMapHitFaceFlag = 0;
 }
 
 /*
@@ -2706,8 +2703,8 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         }
     }
 
-    DAT_8032ec78 = -2;
-    FLOAT_8032ec80 = FLOAT_8032f9ac;
+    g_hit_edge_idx_min = -2;
+    g_hit_t_min = FLOAT_8032f9ac;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
@@ -2759,8 +2756,8 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         }
     }
 
-    DAT_8032ec78 = -2;
-    FLOAT_8032ec80 = FLOAT_8032f9ac;
+    g_hit_edge_idx_min = -2;
+    g_hit_t_min = FLOAT_8032f9ac;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {

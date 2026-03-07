@@ -11,7 +11,6 @@
 
 #include "string.h"
 
-extern int DAT_800000f8 = 0;
 extern int DAT_8032edb8 = 0;
 extern "C" void __dt__6JoyBusFv(void*);
 extern unsigned char ARRAY_802eaab0[];
@@ -545,7 +544,7 @@ void JoyBus::ThreadMain(void* arg)
     threadParam->m_gbaStatus = 0;
     // TODO: threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
-    ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+    ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
     stateStartTime = OSGetTime();
 
     for (;;)
@@ -558,7 +557,7 @@ void JoyBus::ThreadMain(void* arg)
             ResetQueue(threadParam);
             ClrRecvBuffer(threadParam->m_portIndex);
 
-            ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+            ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
             stateStartTime = OSGetTime();
             continue;
         }
@@ -598,19 +597,19 @@ void JoyBus::ThreadMain(void* arg)
 
             if (s == 5 || s == 900)
             {
-                stateTimeoutTicks = (DAT_800000f8 / 4000) * 500;
+                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 500;
             }
             else if (s > 2 && s < 5)
             {
-                stateTimeoutTicks = (DAT_800000f8 / 4000) * 500;
+                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 500;
             }
             else if (s == 2)
             {
-                stateTimeoutTicks = (DAT_800000f8 / 4000) * 2000;
+                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 2000;
             }
             else
             {
-                stateTimeoutTicks = (DAT_800000f8 / 4000) * 1000;
+                stateTimeoutTicks = (OS_BUS_CLOCK / 4000) * 1000;
             }
         }
 
@@ -633,7 +632,7 @@ void JoyBus::ThreadMain(void* arg)
                 }
 
                 stateStartTime = OSGetTime();
-                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
                 continue;
             }
         }
@@ -731,7 +730,7 @@ void JoyBus::ThreadMain(void* arg)
 
                 threadParam->m_timestamp = OSGetTick();
 
-                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
                 stateStartTime = OSGetTime();
             }
             else if (threadParam->m_gbaStatus == 3)
@@ -741,7 +740,7 @@ void JoyBus::ThreadMain(void* arg)
                 {
                     threadParam->m_state    = 2;
                     threadParam->m_subState = 0;
-                    ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                    ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
                     stateStartTime = OSGetTime();
                 }
                 else
@@ -770,7 +769,7 @@ void JoyBus::ThreadMain(void* arg)
             }
             else if (result == 2)
             {
-                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
             }
 
             break;
@@ -790,7 +789,7 @@ void JoyBus::ThreadMain(void* arg)
                 threadParam->m_state    = 2;
                 threadParam->m_subState = 0;
 
-                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
                 stateStartTime = OSGetTime();
             }
 
@@ -885,7 +884,7 @@ void JoyBus::ThreadMain(void* arg)
         }
         }
 
-        ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+        ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
         stateStartTime = OSGetTime();
     }
 }

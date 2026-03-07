@@ -48,7 +48,6 @@ void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
-extern float DAT_8032ec20;
 extern CMenuPcs MenuPcs;
 extern CPartPcs PartPcs;
 
@@ -1596,7 +1595,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
         if (distanceSq < maxDistanceSq || infiniteRange) {
             float distance = distanceSq;
             if (distanceSq <= kLineSegmentMinT) {
-                distance = DAT_8032ec20;
+                distance = NAN;
             } else {
                 distance = (float)sqrt(distanceSq);
             }
@@ -1616,7 +1615,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 float distance = distanceSq;
                 if (distanceSq <= kLineSegmentMinT) {
-                    distance = DAT_8032ec20;
+                    distance = NAN;
                 } else {
                     distance = (float)sqrt(distanceSq);
                 }

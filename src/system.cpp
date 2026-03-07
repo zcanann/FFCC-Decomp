@@ -26,7 +26,6 @@ extern "C" {
 }
 
 extern CMath Math;
-extern CTextureMan TextureMan;
 extern CMaterialMan MaterialMan;
 extern CFontMan FontMan;
 extern "C" int __cntlzw(unsigned int);

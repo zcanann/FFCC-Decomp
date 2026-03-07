@@ -49,7 +49,6 @@ extern float FLOAT_80331db4;
 extern float FLOAT_80331dd8;
 extern float FLOAT_80331d60;
 extern float FLOAT_80331db8;
-extern float DAT_8032ec20;
 extern double DOUBLE_80331d00;
 extern double DOUBLE_80331d08;
 extern double DOUBLE_80331d10;
@@ -3038,10 +3037,10 @@ void CGMonObj::suikomiSub(CGObject*, float)
 				fpClass = 4;
 			}
 			if (fpClass == 1) {
-				dist = (double)DAT_8032ec20;
+				dist = NAN;
 			}
 		} else {
-			dist = (double)DAT_8032ec20;
+			dist = NAN;
 		}
 	} else {
 		double inv = 1.0 / sqrt(dist);
@@ -3108,10 +3107,10 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 							fpClass = 4;
 						}
 						if (fpClass == 1) {
-							dist = (double)DAT_8032ec20;
+							dist = NAN;
 						}
 					} else {
-						dist = (double)DAT_8032ec20;
+						dist = NAN;
 					}
 				} else {
 					double inv = 1.0 / sqrt(dist);
@@ -3149,10 +3148,10 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 						fpClass = 4;
 					}
 					if (fpClass == 1) {
-						dist = (double)DAT_8032ec20;
+						dist = NAN;
 					}
 				} else {
-					dist = (double)DAT_8032ec20;
+					dist = NAN;
 				}
 			} else {
 				double inv = 1.0 / sqrt(dist);

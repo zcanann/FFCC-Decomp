@@ -20,6 +20,7 @@ void SAFE_CAST_WORK(CGObjWork*);
 
 extern int gCGCharaObjCreateSerial;
 extern unsigned char gCGCharaObjCreateSerialInit;
+extern "C" float kOneF32;
 extern "C" float kHalfF32;
 
 class CGCharaObj : public CGPrgObj

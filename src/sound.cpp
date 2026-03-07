@@ -24,7 +24,6 @@ extern double DOUBLE_80330d08;
 extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
-extern float DAT_8032ec20;
 extern unsigned int DAT_800000f8;
 extern "C" void* PTR_PTR_s_CSound_8021056c;
 extern "C" void __ct__9CRedSoundFv(void*);
@@ -187,7 +186,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
         if (distanceSq < maxDistanceSq || infiniteRange) {
             float distance = distanceSq;
             if (distanceSq <= kLineSegmentMinT) {
-                distance = DAT_8032ec20;
+                distance = NAN;
             } else {
                 distance = (float)sqrt(distanceSq);
             }
@@ -206,7 +205,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 float distance = distanceSq;
                 if (distanceSq <= kLineSegmentMinT) {
-                    distance = DAT_8032ec20;
+                    distance = NAN;
                 } else {
                     distance = (float)sqrt(distanceSq);
                 }

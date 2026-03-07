@@ -39,6 +39,7 @@ extern float FLOAT_803311e4;
 extern float FLOAT_803311f8;
 extern double DOUBLE_803311e8;
 extern double DOUBLE_803311f0;
+extern char s_pppEmission_cpp_801db7e8[];
 
 extern "C" {
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
@@ -319,6 +320,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) 
  * JP Size: TODO
  */
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+    float baseScale;
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -328,15 +330,16 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     *(u32*)(model + 0xFC) = 0;
     *(u32*)(model + 0x104) = 0;
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, (char*)"pppEmission.cpp", 0x118);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_pppEmission_cpp_801db7e8, 0x118);
     if (state[0] != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)state[0]);
         state[0] = 0;
     }
 
-    *(float*)(state + 3) = FLOAT_803311f8;
-    *(float*)(state + 4) = FLOAT_803311f8;
+    baseScale = FLOAT_803311f8;
     *(float*)(state + 5) = FLOAT_803311f8;
+    *(float*)(state + 4) = baseScale;
+    *(float*)(state + 3) = baseScale;
 }
 
 /*
@@ -490,4 +493,3 @@ void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
 void GXSetTexCoordGen(void) {
     // TODO
 }
-

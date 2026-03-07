@@ -64,7 +64,7 @@ extern u32 DAT_801EA7CC;
 extern u32 DAT_801EA7D8;
 extern u32 DAT_801EA7DC;
 extern u32 DAT_801EA7E0;
-extern unsigned char ARRAY_8026D728[];
+unsigned char ARRAY_8026D728[0xC];
 extern unsigned char FunnyShapePcs[];
 extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);

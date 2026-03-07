@@ -14,7 +14,7 @@
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
 
-extern void* ARRAY_802f49b0;
+u8 ARRAY_802f49b0[0xC];
 extern "C" void __dt__8GbaQueueFv(void*);
 extern "C" int rand(void);
 extern unsigned char CFlat[];

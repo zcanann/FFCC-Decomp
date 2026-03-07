@@ -13,7 +13,7 @@
 
 int DAT_8032edb8 = 0;
 extern "C" void __dt__6JoyBusFv(void*);
-extern unsigned char ARRAY_802eaab0[];
+unsigned char ARRAY_802eaab0[0x10];
 
 const unsigned short JoyBusCrcTable[256] =
 {

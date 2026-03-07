@@ -30,7 +30,8 @@ struct CameraPcsForEmission {
 extern "C" int rand(void);
 
 extern CameraPcsForEmission CameraPcs;
-extern char MaterialMan[];
+class CMaterialMan;
+extern CMaterialMan MaterialMan;
 extern char DAT_803311fc[];
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;
@@ -38,6 +39,8 @@ extern float FLOAT_803311f8;
 extern double DOUBLE_803311e8;
 extern double DOUBLE_803311f0;
 extern char s_pppEmission_cpp_801db7e8[];
+
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 extern "C" {
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
@@ -118,7 +121,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     } else {
         EmissionModelData* modelData = *(EmissionModelData**)((u8*)model + 0xA4);
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-            MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
+            &MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
     }
@@ -141,7 +144,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         int textureInfo = *(int*)((u8*)param_2 + 4);
         pppInitBlendMode__Fv();
         pppSetBlendMode__FUc(*(u8*)((u8*)param_3 + 0x1C));
-        *(int*)(MaterialMan + 0xD0) = textureInfo + 0x28;
+        *(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
 
         u8 mode = *(u8*)((u8*)param_3 + 0x1D);
         if (mode == 0) {
@@ -152,37 +155,37 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXScale(objMtx, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx, objMtx);
                 PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
-                SetObjMatrix__12CMaterialManFPA4_fPA4_f(MaterialMan, viewMtx, objMtx);
+                SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
 
                 int remaining = *(int*)(meshData + 0x4C);
                 char* displayList = *(char**)(meshData + 0x50);
                 while (--remaining >= 0) {
-                    *(int*)(MaterialMan + 0x44) = -1;
-                    *(u8*)(MaterialMan + 0x4C) = 0xFF;
-                    *(int*)(MaterialMan + 0x11C) = 0;
-                    *(int*)(MaterialMan + 0x120) = 0x1E;
-                    *(int*)(MaterialMan + 0x124) = 0;
-                    *(u8*)(MaterialMan + 0x205) = 0xFF;
-                    *(u8*)(MaterialMan + 0x206) = 0xFF;
-                    *(int*)(MaterialMan + 0x58) = 0;
-                    *(int*)(MaterialMan + 0x5C) = 0;
-                    *(u8*)(MaterialMan + 0x208) = 0;
-                    *(int*)(MaterialMan + 0x48) = 0xECE0F;
-                    *(int*)(MaterialMan + 0x128) = 0;
-                    *(int*)(MaterialMan + 0x12C) = 0x1E;
-                    *(int*)(MaterialMan + 0x130) = 0;
-                    *(int*)(MaterialMan + 0x40) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x44) = -1;
+                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x11C) = 0;
+                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x124) = 0;
+                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x58) = 0;
+                    *(int*)(MaterialManRaw() + 0x5C) = 0;
+                    *(u8*)(MaterialManRaw() + 0x208) = 0;
+                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x128) = 0;
+                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x130) = 0;
+                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
                     void* modelData = *(void**)((char*)model + 0xA4);
                     void* materialSet = *(void**)((char*)modelData + 0x24);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
+                        &MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
 
                     u8 texMode = *(u8*)((u8*)param_3 + 0x1E);
                     if (texMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialMan + 0xE8), texMtx);
+                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
                         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
                         if (texMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
@@ -212,32 +215,32 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = *(int*)(meshData + 0x4C);
                 char* displayList = *(char**)(meshData + 0x50);
                 while (--remaining >= 0) {
-                    *(int*)(MaterialMan + 0x44) = -1;
-                    *(u8*)(MaterialMan + 0x4C) = 0xFF;
-                    *(int*)(MaterialMan + 0x11C) = 0;
-                    *(int*)(MaterialMan + 0x120) = 0x1E;
-                    *(int*)(MaterialMan + 0x124) = 0;
-                    *(u8*)(MaterialMan + 0x205) = 0xFF;
-                    *(u8*)(MaterialMan + 0x206) = 0xFF;
-                    *(int*)(MaterialMan + 0x58) = 0;
-                    *(int*)(MaterialMan + 0x5C) = 0;
-                    *(u8*)(MaterialMan + 0x208) = 0;
-                    *(int*)(MaterialMan + 0x48) = 0xECE0F;
-                    *(int*)(MaterialMan + 0x128) = 0;
-                    *(int*)(MaterialMan + 0x12C) = 0x1E;
-                    *(int*)(MaterialMan + 0x130) = 0;
-                    *(int*)(MaterialMan + 0x40) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x44) = -1;
+                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x11C) = 0;
+                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x124) = 0;
+                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x58) = 0;
+                    *(int*)(MaterialManRaw() + 0x5C) = 0;
+                    *(u8*)(MaterialManRaw() + 0x208) = 0;
+                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x128) = 0;
+                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x130) = 0;
+                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
                     void* modelData = *(void**)((char*)model + 0xA4);
                     void* materialSet = *(void**)((char*)modelData + 0x24);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
+                        &MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
 
                     u8 texMode = *(u8*)((u8*)param_3 + 0x1E);
                     if (texMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialMan + 0xE8), texMtx);
+                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
                         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
                         if (texMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);

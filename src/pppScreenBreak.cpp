@@ -64,7 +64,8 @@ extern float DAT_801dd4c4;
 extern float DAT_801dd4b0;
 extern float DAT_801dd4b4;
 extern float DAT_801dd4b8;
-extern char MaterialMan[];
+class CMaterialMan;
+extern CMaterialMan MaterialMan;
 extern char s_f999_root_801dd4c8[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
 extern CGraphic GraphicsPcs;
@@ -85,6 +86,8 @@ struct ScreenBreakCameraPcs {
 };
 
 extern ScreenBreakCameraPcs CameraPcs;
+
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 extern "C" {
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
@@ -301,7 +304,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         unsigned short materialIdx = *(unsigned short*)(displayList + 8);
         material = (*(void***)((u8*)materialSet + 0x18))[materialIdx];
 
-        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, materialSet, materialIdx, 1, 0);
+        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, materialIdx, 1, 0);
         GXSetArray((GXAttr)0xB, (void*)((u8*)param_2 + 0x28), 4);
 
         if (*(short*)((u8*)material + 0x18) == 1) {

@@ -11,7 +11,6 @@ extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }
 
-extern CMemory Memory;
 extern unsigned char PartPcs[];
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);

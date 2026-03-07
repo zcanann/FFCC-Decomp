@@ -18,6 +18,18 @@ extern "C" {
 	void* RedNew__Fi(int);
 }
 
+// RedSound global linkage that is shared across Red* units.
+u32 DAT_8032e170[3];
+int DAT_8032e17c[0x40];
+int DAT_8032f3f8;
+u8 DAT_8032f4a8;
+int DAT_8032f4ac;
+u32* DAT_8032f4b0;
+u32 DAT_8032f4b4;
+int* DAT_8032f4b8;
+volatile unsigned int DAT_8032f4c4;
+void* DAT_8032f4c8;
+
 /*
  * --INFO--
  * Address:	TODO

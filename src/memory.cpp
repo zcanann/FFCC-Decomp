@@ -18,7 +18,6 @@ static char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
 static char s_drawHeapTitleFmt[] = "%4d %4d %4d";
 extern char PTR_PTR_s_CMemory_801e8488[];
 extern "C" char __vt__8CManager[];
-extern CMemory Memory;
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];

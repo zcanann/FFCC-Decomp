@@ -69,7 +69,6 @@ extern unsigned char FunnyShapePcs[];
 extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 
-extern CMemory Memory;
 extern unsigned char m_table__14CFunnyShapePcs[];
 
 namespace {

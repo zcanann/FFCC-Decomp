@@ -6,7 +6,6 @@
 #include <math.h>
 
 extern CFontMan FontMan;
-extern CTextureMan TextureMan;
 extern void* ARRAY_802ea170;
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);

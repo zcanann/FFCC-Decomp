@@ -77,7 +77,6 @@ extern unsigned char CFlat[];
 extern unsigned char m_objItem[];
 extern unsigned char m_objParty[];
 extern unsigned char m_objMon[];
-extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];

@@ -20,7 +20,6 @@
 #include <math.h>
 #include <string.h>
 
-extern CTextureMan TextureMan;
 extern CMath Math;
 extern CMenuPcs MenuPcs;
 extern CGame Game;

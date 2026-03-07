@@ -86,4 +86,6 @@ private:
     CMemory::CStage* m_memoryStage;
 };
 
+extern CTextureMan TextureMan;
+
 #endif // _FFCC_PPP_TEXTUREMAN_H_

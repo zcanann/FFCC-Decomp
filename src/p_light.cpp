@@ -49,7 +49,6 @@ extern double DOUBLE_8032fc48;
 extern double DOUBLE_8032fc50;
 extern double DOUBLE_8032fc58;
 extern double DOUBLE_8032fc68;
-extern double DAT_8032ec20;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
 extern unsigned char MaterialMan[];
@@ -1209,10 +1208,10 @@ void CLightPcs::CBumpLight::MakeLightMap()
                                 classify = 4;
                             }
                             if (classify == 1) {
-                                dist0 = DAT_8032ec20;
+                                dist0 = NAN;
                             }
                         } else {
-                            dist0 = DAT_8032ec20;
+                            dist0 = NAN;
                         }
                     } else {
                         double inv = 1.0 / sqrt(dist0);
@@ -1256,10 +1255,10 @@ void CLightPcs::CBumpLight::MakeLightMap()
                                 classify = 4;
                             }
                             if (classify == 1) {
-                                dist1 = DAT_8032ec20;
+                                dist1 = NAN;
                             }
                         } else {
-                            dist1 = DAT_8032ec20;
+                            dist1 = NAN;
                         }
                     } else {
                         double inv = 1.0 / sqrt(dist1);
@@ -1349,7 +1348,7 @@ void CLightPcs::MakeLightMap()
     GXSetAlphaUpdate(GX_FALSE);
     GXSetTexCopySrc(0, 0, 0x40, 0x40);
     GXSetTexCopyDst((u16)0x40, (u16)0x40, GX_TF_I8, GX_FALSE);
-    GXCopyTex(DAT_80238030, GX_TRUE);
+    GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
 }
 
 /*

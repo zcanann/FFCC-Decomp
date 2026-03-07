@@ -23,8 +23,7 @@ extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern unsigned char CFlat[];
-extern float FLOAT_80331964;
-extern "C" char s__d__d__d__d__d_801dc5ac[];
+extern "C" char sCharaObjDebugStatFormat[];
 
 /*
  * --INFO--
@@ -136,8 +135,8 @@ void CGCharaObj::onCreate()
 	m_comboState = 0;
 	m_damageParticle = -1;
 	m_unk688 = 0;
-	m_pushScale = FLOAT_80331964;
-	m_alpha = FLOAT_80331964;
+	m_pushScale = kOneF32;
+	m_alpha = kOneF32;
 	m_aStarGroupId = 0;
 	m_stateTick = 0;
 	m_castTimeTick = 0;
@@ -1435,7 +1434,7 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		double posYDouble;
 		double widthDouble;
 
-		sprintf(text, s__d__d__d__d__d_801dc5ac,
+		sprintf(text, sCharaObjDebugStatFormat,
 		        *reinterpret_cast<short*>(script + 0x1C),
 		        *reinterpret_cast<short*>(script + 0x1A),
 		        *reinterpret_cast<short*>(script + 0x1E),

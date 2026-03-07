@@ -38,7 +38,6 @@ extern double DOUBLE_80330f00;
 extern double DOUBLE_80330f08;
 extern double DOUBLE_80330f10;
 extern double DOUBLE_80330f40;
-extern double DAT_8032ec20;
 extern char DAT_801db528[];
 extern char DAT_801db548[];
 extern char DAT_801db568[];
@@ -261,7 +260,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                             yRand = (double)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio);
                             d = (double)sqrtf((float)d);
                             if (d <= DOUBLE_80330f10) {
-                                d = DAT_8032ec20;
+                                d = NAN;
                             }
 
                             inv = (double)(float)(yRand / d);

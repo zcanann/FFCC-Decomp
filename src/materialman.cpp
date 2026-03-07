@@ -2948,13 +2948,13 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
  */
 void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
 {
-    *reinterpret_cast<unsigned long*>(Ptr(this, 0x24)) = tag;
+    *reinterpret_cast<unsigned long*>(Ptr(this, 0x24)) = static_cast<unsigned long>(tevBit);
     *reinterpret_cast<void**>(Ptr(this, 0x28)) = 0;
     *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = 0;
     *reinterpret_cast<float*>(Ptr(this, 0x30)) = 1.0f;
     *reinterpret_cast<float*>(Ptr(this, 0x2C)) = 1.0f;
     *Ptr(this, 0xA7) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = static_cast<unsigned short>(tevBit);
+    *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = static_cast<unsigned short>(tag);
 }
 
 /*

@@ -153,13 +153,15 @@ void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** 
     void* currentFrame = animData;
 
     for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
-        int shapeEntry = (int)animData + *(short*)((int)currentFrame + 0x10);
+        int shapeBase = (int)animData + *(short*)((int)currentFrame + 0x10);
+        int shapeEntry = shapeBase;
 
-        for (int shapeIndex = 0; shapeIndex < *(short*)(shapeEntry + 2); shapeIndex++) {
-            *(unsigned char*)(shapeEntry + 10) =
+        for (int shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex++) {
+            unsigned char textureIndex =
                 FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
+            *(unsigned char*)(shapeEntry + 10) = textureIndex;
             *(int*)(shapeEntry + 0xc) = (int)shapeSt->m_displayListData + *(int*)(shapeEntry + 0xc);
-            shapeEntry += 8;
+            shapeEntry = shapeEntry + 8;
         }
 
         currentFrame = (void*)((int)currentFrame + 8);

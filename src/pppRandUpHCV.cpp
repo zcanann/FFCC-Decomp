@@ -2,8 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/ppp_constants.h"
-extern CMath Math;
-extern int gPppCalcDisabled;
+#include "ffcc/pppColor.h"
 extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;

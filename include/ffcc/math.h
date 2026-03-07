@@ -57,4 +57,6 @@ private:
     unsigned char m_scratch[0x30]; // 0x34
 };
 
+extern CMath Math;
+
 #endif // _FFCC_CMATH_H_

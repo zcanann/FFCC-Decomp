@@ -20,10 +20,8 @@
 #include <math.h>
 #include <string.h>
 
-extern CMath Math;
 extern CMenuPcs MenuPcs;
 extern CGame Game;
-extern CFontMan FontMan;
 
 struct Vec4d
 {

@@ -1,8 +1,7 @@
 #include "ffcc/pppSRandFV.h"
 #include "ffcc/math.h"
 #include "ffcc/ppp_constants.h"
-extern CMath Math;
-extern int gPppCalcDisabled;
+#include "ffcc/pppColor.h"
 extern float gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath*);
 

@@ -25,9 +25,7 @@ extern "C" {
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
 }
 
-extern CMath Math;
 extern CMaterialMan MaterialMan;
-extern CFontMan FontMan;
 extern "C" int __cntlzw(unsigned int);
 extern unsigned char CFlat[];
 extern void* __vt__7CSystem[];

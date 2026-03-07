@@ -2,8 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/ppp_constants.h"
-extern int gPppCalcDisabled;
-extern CMath Math;
+#include "ffcc/pppColor.h"
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {

@@ -2,8 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/ppp_constants.h"
-extern CMath Math;
-extern int gPppCalcDisabled;
+#include "ffcc/pppColor.h"
 extern u8 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 

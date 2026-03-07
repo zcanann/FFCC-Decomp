@@ -2,8 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/ppp_constants.h"
-extern CMath Math;
-extern int gPppCalcDisabled;
+#include "ffcc/pppColor.h"
 extern s32 gPppDefaultValueBuffer[];
 extern "C" {
 f32 RandF__5CMathFv(CMath*);

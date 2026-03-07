@@ -5,6 +5,8 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_game.h"
 #include "ffcc/system.h"
 #include "ffcc/line_constants.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
@@ -25,7 +27,7 @@ extern double DOUBLE_80330d08;
 extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
-extern "C" void* PTR_PTR_s_CSound_8021056c;
+extern "C" void* __vt__6CSound[];
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
@@ -100,8 +102,6 @@ extern char s_CSound_80330ce0[];
 extern char s_Sound___1_n_B_801db130[];
 extern char s_sound_cpp_801db2d4[];
 extern unsigned char CFlat[];
-extern unsigned char CameraPcs[];
-extern unsigned char Game[];
 
 struct CLineSegment {
     Vec delta;
@@ -359,7 +359,7 @@ extern "C" void __sinit_sound_cpp(void)
 {
     unsigned char* sound = reinterpret_cast<unsigned char*>(&Sound);
 
-    *reinterpret_cast<void**>(sound) = &PTR_PTR_s_CSound_8021056c;
+    *reinterpret_cast<void**>(sound) = __vt__6CSound;
     __ct__9CRedSoundFv(sound + 8);
     __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
     __register_global_object(&Sound, __dt__6CSoundFv, &ARRAY_802f26c8);
@@ -873,7 +873,7 @@ next:
 void CSound::Draw()
 {
     Mtx cameraMatrix;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), cameraMatrix);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMatrix);
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     GXSetZCompLoc((u8)0);
@@ -1615,12 +1615,14 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     if (static_cast<s8>(se[3]) >= 0) {
         iVar4 = Calc__9CLine((double)*reinterpret_cast<float*>(se + 0x14),
                              reinterpret_cast<CLine*>(SoundData(this).m_lineWork + ((int)static_cast<s8>(se[3]) * 0x1CC)),
-                             &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<const Vec*>(CameraPcs + 0xE0));
+                             &nearestPoint, &nearestDistance, (u32*)0, &nearestT,
+                             reinterpret_cast<const Vec*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0));
         if (iVar4 == 0) {
             outVolume = 0;
             outPan = 0x40;
         } else {
-            PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), &nearestPoint, &nearestPoint);
+            PSMTXMultVec(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), &nearestPoint,
+                         &nearestPoint);
             fVar3 = *reinterpret_cast<float*>(se + 0x10);
             if (fVar3 <= nearestDistance) {
                 outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (*reinterpret_cast<float*>(se + 0x14) - fVar3)));
@@ -1645,8 +1647,8 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         outPan = 0x40;
     } else {
         fVar1 = kLineSegmentMaxT;
-        if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
-            const short stageId = *reinterpret_cast<short*>(Game + 0x13E0);
+        if (*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&Game) + 0x13E4) != '\0') {
+            const short stageId = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(&Game) + 0x13E0);
             if (stageId == 0xE) {
                 fVar1 = FLOAT_80330cf4;
             } else if (stageId == 8) {
@@ -1656,8 +1658,10 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
-        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(CameraPcs + 0xD4), reinterpret_cast<Vec*>(se + 0x18));
+        PSMTXMultVec(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4),
+                     reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xD4),
+                                            reinterpret_cast<Vec*>(se + 0x18));
         fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar1;
         fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar2;
         fVar2 = fVar1 * fVar2;
@@ -1673,7 +1677,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
         }
 
-        if (*reinterpret_cast<unsigned int*>(Game + 0xC7F4) == 0x21) {
+        if (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F4) == 0x21) {
             iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
         } else {
             iVar4 = (int)nearestPoint.x;

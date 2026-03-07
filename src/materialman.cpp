@@ -48,13 +48,13 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
-extern "C" void* PTR_PTR_s_CMaterialMan_801e9bec;
-extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
+extern "C" void* __vt__12CMaterialMan[];
+extern "C" void* __vt__12CMaterialSet[];
 extern unsigned char Game[];
 class CMapMng;
 extern CMapMng MapMng;
+extern CMaterialMan MaterialMan;
 extern unsigned char CameraPcs[];
-extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -79,7 +79,7 @@ static const char s_materialStageName[] = "material";
  */
 extern "C" void __sinit_materialman_cpp(void)
 {
-    *reinterpret_cast<void**>(MaterialMan) = &PTR_PTR_s_CMaterialMan_801e9bec;
+    *reinterpret_cast<void**>(&MaterialMan) = __vt__12CMaterialMan;
     __ct__6CColorFv(reinterpret_cast<void*>(0x80268E83));
 }
 
@@ -178,7 +178,7 @@ static CMaterial* AllocMaterial()
         _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory,
             0xA8,
-            *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
             s_materialman_cpp,
             0xCFF,
             0));
@@ -218,7 +218,7 @@ static CMapKeyFrame* AllocMapKeyFrame(int line)
 {
     CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(__nw__FUlPQ27CMemory6CStagePci(
         0x28,
-        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
         s_materialman_cpp,
         line));
     if (keyFrame != 0) {
@@ -2905,7 +2905,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
                 _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                     &Memory,
                     0xA8,
-                    *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+                    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
                     s_materialman_cpp,
                     0xEE4,
                     0));
@@ -3065,7 +3065,7 @@ void* CMaterial::operator new(unsigned long size, CMemory::CStage*, char* file, 
     return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
         &Memory,
         size,
-        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
         file,
         line,
         0);
@@ -3085,7 +3085,7 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
     return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
         &Memory,
         size,
-        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
         file,
         line,
         0);
@@ -3103,7 +3103,7 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
 CMaterialSet::~CMaterialSet()
 {
     CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CMaterialSet_801e9bbc;
+    *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
 
     for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
         CMaterial* const material = (*materials)[i];
@@ -3130,14 +3130,14 @@ CMaterialSet::~CMaterialSet()
 CMaterialSet::CMaterialSet()
 {
     __ct__4CRefFv(this);
-    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CMaterialSet_801e9bbc;
+    *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
 
     *reinterpret_cast<unsigned long*>(Ptr(this, 0x0C)) = 0;
     *reinterpret_cast<unsigned long*>(Ptr(this, 0x10)) = 0;
     *reinterpret_cast<unsigned long*>(Ptr(this, 0x14)) = 0x10;
     *reinterpret_cast<void**>(Ptr(this, 0x18)) = 0;
     *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x1C)) =
-        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218);
+        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218);
     *reinterpret_cast<int*>(Ptr(this, 0x20)) = 1;
 }
 
@@ -3350,15 +3350,17 @@ int CMaterial::Set(_GXTexMapID texMapId)
             float scrollU = *reinterpret_cast<float*>(scrollData + 4);
             float scrollV = *reinterpret_cast<float*>(scrollData + 8);
             if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
-                unsigned int& texMtxCur = *reinterpret_cast<unsigned int*>(MaterialMan + 0x120);
-                unsigned int& texCoordCur = *reinterpret_cast<unsigned int*>(MaterialMan + 0x124);
+                unsigned int& texMtxCur =
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x120);
+                unsigned int& texCoordCur =
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x124);
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
 
                 if (i == 0) {
-                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x48) |= 0x20;
-                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x144) = texMtxCur;
-                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x148) = texCoordCur;
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x48) |= 0x20;
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x144) = texMtxCur;
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x148) = texCoordCur;
                     GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
                         static_cast<GXTexCoordID>(texCoordCur),
@@ -3368,9 +3370,9 @@ int CMaterial::Set(_GXTexMapID texMapId)
                         GX_FALSE,
                         0x7D);
                 } else {
-                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x48) |= 0x40;
-                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x150) = texMtxCur;
-                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x154) = texCoordCur;
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x48) |= 0x40;
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x150) = texMtxCur;
+                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x154) = texCoordCur;
                     GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
                         static_cast<GXTexCoordID>(texCoordCur),
@@ -3432,3 +3434,4 @@ void CMaterial::AddTextureIdx(int, int)
 {
 	// TODO
 }
+

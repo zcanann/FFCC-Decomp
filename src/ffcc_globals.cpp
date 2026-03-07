@@ -8,6 +8,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/joybus.h"
 #include "ffcc/map.h"
+#include "ffcc/materialman.h"
 #include "ffcc/memory.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/p_camera.h"
@@ -23,6 +24,7 @@ GbaQueue GbaQue;
 CGraphic Graphic;
 JoyBus Joybus;
 CMapMng MapMng;
+CMaterialMan MaterialMan;
 CMemory Memory;
 CMemoryCardMan MemoryCardMan;
 CCameraPcs CameraPcs;

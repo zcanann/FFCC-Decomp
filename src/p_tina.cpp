@@ -1035,9 +1035,7 @@ void CPartPcs::drawAfter()
  */
 void CPartPcs::DrawMenu(int fpNo)
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
-
-    if (usb->m_disableShokiDraw == 0) {
+    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x30) == 0) {
         Graphic.SetFog(1, 0);
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(0);
@@ -1087,9 +1085,7 @@ void CPartPcs::DrawShoki()
  */
 void CPartPcs::DrawMenuIdx(int index)
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
-
-    if (usb->m_disableShokiDraw == 0) {
+    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x30) == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -1576,4 +1572,3 @@ void CPartPcs::SetUSBData()
 {
 	// TODO
 }
-

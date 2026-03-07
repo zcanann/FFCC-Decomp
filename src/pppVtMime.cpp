@@ -149,8 +149,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     float* outputVerts = (float*)*memPtr;
     if (vertCount != 0) {
         int remaining = (int)vertCount;
-        int pairCount = remaining >> 1;
-        while (pairCount != 0) {
+        for (int pairCount = remaining >> 1; pairCount != 0; pairCount--) {
             outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
             outputVerts[1] = vert1Pos[1] + state->value * (vert2Pos[1] - vert1Pos[1]);
             outputVerts[2] = vert1Pos[2] + state->value * (vert2Pos[2] - vert1Pos[2]);
@@ -160,7 +159,6 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
             vert1Pos += 6;
             vert2Pos += 6;
             outputVerts += 6;
-            pairCount--;
         }
         if ((remaining & 1) != 0) {
             outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
@@ -200,5 +198,3 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
         state->accel += data->addZ;
     }
 }
-
-

@@ -18,6 +18,7 @@ static inline int* GetColumSerializedDataOffsets(void* param) {
 extern int gPppCalcDisabled;
 extern CMath Math;
 extern void* gUtil;
+extern char s_pppColum_cpp_801DB638[];
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -180,7 +181,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 
             *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
-                (char*)"pppColum.cpp", 0x7d);
+                s_pppColum_cpp_801DB638, 0x7d);
 
             values = *(float**)(work + 8);
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {

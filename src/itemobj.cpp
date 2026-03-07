@@ -222,7 +222,7 @@ void CGItemObj::onChangeStat(int state)
 {
 	unsigned char* self = (unsigned char*)this;
 
-	if (state >= 0x26 && state <= 0x27) {
+	if (state < 0x28 && state >= 0x26) {
 		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) & 0xfff7fffe;
 	}
 }

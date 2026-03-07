@@ -87,7 +87,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 
     serializedDataOffsets = param_2->m_serializedDataOffsets;
     colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
-    gObject = pppMngStPtr->m_programControlArray;
+    gObject = pppMngStPtr->m_programInfoTable;
     colorPtr[0] = 0x80;
     colorPtr[1] = 0x80;
     colorPtr[2] = 0x80;
@@ -113,7 +113,7 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
     void* handle;
     int model;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programControlArray, 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programInfoTable, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(void**)(model + 0xE4) = 0;
     *(void**)(model + 0xE8) = 0;
@@ -143,7 +143,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
         colorIndex = offsets[0];
         dstColor = (u8*)((char*)pppEraseCharaParts + 0x80 + offsets[1]);
         srcColor = (u8*)((char*)pppEraseCharaParts + 0x80 + colorIndex);
-        handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programControlArray, 0);
+        handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programInfoTable, 0);
         model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
         *(u8**)(model + 0xE4) = dstColor;

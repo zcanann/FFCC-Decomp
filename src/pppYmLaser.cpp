@@ -82,6 +82,7 @@ struct CMapCylinderRaw {
  */
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
+	f32 zero = 0.0f;
 	f32 one = kPppYmLaserOne;
 	f32 zero = 0.0f;
 	f64 randArg;

@@ -58,7 +58,7 @@ public:
     void GetRaceStr(int, char*);
     void DrawSingBar(int, int, int, float);
     void SingSetLetterAttachflg(int);
-    void SingGetLetterAttachflg();
+    int SingGetLetterAttachflg();
     void CalcSingLife();
     void DrawSingLife();
     void SingLifeInit(int);

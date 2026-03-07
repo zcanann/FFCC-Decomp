@@ -877,7 +877,19 @@ found_slot:
 	memset(&menu->m_status, 0, 0x20);
 	menu->m_status = (menu->m_status & 0x7F) | 0x80;
 
-	memcpy(menu, &param, sizeof(CDMParam));
+	menu->m_type = param.m_type;
+	menu->m_flags = param.m_flags;
+	menu->m_x = param.m_x;
+	menu->m_y = param.m_y;
+	menu->m_width = param.m_width;
+	menu->m_height = param.m_height;
+	menu->m_unk18 = param.m_unk18;
+	menu->m_unk1C = param.m_unk1C;
+	menu->m_unk20 = param.m_unk20;
+	menu->m_text = param.m_text;
+	menu->m_unk28 = param.m_unk28;
+	menu->m_unk2C = param.m_unk2C;
+	menu->m_state = static_cast<s32>(param.m_unk30);
 
 	CDM* parentMenu = (CDM*)parent;
 	menu->m_parent = parentMenu;
@@ -976,4 +988,3 @@ void CDbgMenuPcs::CDM::Clear()
 {
 	// TODO
 }
-

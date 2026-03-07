@@ -220,7 +220,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = *(void**)(pppMngStPtr + 0xDC);
+    void* ownerObj = pppMngStPtr->m_owner;
     void* handle;
     int model;
 

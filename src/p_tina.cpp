@@ -797,16 +797,17 @@ void CPartPcs::calcInit()
  */
 void CPartPcs::calc()
 {
-	CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+	unsigned char* raw = reinterpret_cast<unsigned char*>(this);
 
 	PartMng.pppPartCalc();
-	if (usbStream->m_printFreeOnNext != 0) {
-		unsigned int freeSize;
+	if (raw[0x25] != 0) {
+		int freeSize;
+		unsigned char roundAdjust;
 
-		usbStream->m_printFreeOnNext = 0;
+		raw[0x25] = 0;
 		freeSize = reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->AmemGetFreeSize();
-		System.Printf(
-			DAT_801d8068, ((int)freeSize >> 10) + (unsigned int)((int)freeSize < 0 && (freeSize & 0x3ff) != 0));
+		roundAdjust = (freeSize < 0 && (freeSize & 0x3ff) != 0);
+		System.Printf(DAT_801d8068, (freeSize >> 10) + roundAdjust);
 	}
 	reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->CalcPrio();
 	PartMng.pppDumpCacheIdx();

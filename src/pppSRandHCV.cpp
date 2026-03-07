@@ -94,12 +94,7 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
 
-	s32 colorOffset = in->field4;
-	if (colorOffset == -1) {
-		targetColor = gPppDefaultValueBuffer;
-	} else {
-		targetColor = (s16*)(base + colorOffset + 0x80);
-	}
+	targetColor = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + in->field4 + 0x80);
 
 	s16 baseValue = in->field8;
 	targetColor[0] = (s16)(targetColor[0] + (s8)((float)baseValue * target[0] - (float)baseValue));

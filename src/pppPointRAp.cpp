@@ -5,7 +5,6 @@
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
-extern CMath Math;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct pppPointRApStep {

@@ -9,7 +9,6 @@
 
 #include <string.h>
 
-extern CMath Math;
 extern const f32 FLOAT_80333448;
 extern const f32 FLOAT_8033344c;
 extern const f32 FLOAT_80333450;

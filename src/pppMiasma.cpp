@@ -14,7 +14,6 @@ extern float FLOAT_80331934;
 extern float FLOAT_80331938;
 extern float FLOAT_8033193c;
 extern float FLOAT_80331940;
-extern CUtil gUtil;
 
 extern struct {
     float _212_4_, _216_4_, _220_4_;

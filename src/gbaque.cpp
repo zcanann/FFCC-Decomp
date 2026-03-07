@@ -18,7 +18,6 @@ extern void* ARRAY_802f49b0;
 extern "C" void __dt__8GbaQueueFv(void*);
 extern "C" int rand(void);
 extern unsigned char CFlat[];
-extern CMenuPcs MenuPcs;
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);

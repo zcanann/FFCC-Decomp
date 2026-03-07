@@ -9,7 +9,6 @@
 
 #include <string.h>
 
-extern CMath Math;
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern u32 CFlatFlags;

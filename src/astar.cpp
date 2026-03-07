@@ -36,7 +36,6 @@ struct CMapCylinderRaw
 };
 
 extern Mtx gFlatPosMtx;
-extern CMath Math;
 extern "C" int __cntlzw(unsigned int);
 
 static inline int GetDbgFlags()

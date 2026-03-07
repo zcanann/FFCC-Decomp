@@ -18,7 +18,6 @@ extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
-extern CMath Math;
 extern Mtx ppvCameraMatrix0;
 
 static char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";

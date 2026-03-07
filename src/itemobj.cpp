@@ -68,7 +68,6 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, unsigned int);
 
 extern CMapMng MapMng;
-extern CMath Math;
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
 extern float FLOAT_80331b24;

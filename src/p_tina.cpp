@@ -70,7 +70,6 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     void*,
     unsigned long);
 
-extern CMenuPcs MenuPcs;
 extern void* CAMemCacheSet;
 
 extern char DAT_801ead4c[];

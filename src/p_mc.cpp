@@ -9,7 +9,6 @@ unsigned int gMcPcsSingletonPtr = 0;
 
 class McCtrl;
 
-extern CMath Math;
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);

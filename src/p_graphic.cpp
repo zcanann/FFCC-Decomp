@@ -31,7 +31,6 @@ extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
-extern CMath Math;
 
 static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
 

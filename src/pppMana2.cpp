@@ -42,7 +42,6 @@ extern struct {
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
-extern CUtil gUtil;
 extern char MaterialMan[];
 extern char DAT_80331900[];
 extern char DAT_803318d4[];

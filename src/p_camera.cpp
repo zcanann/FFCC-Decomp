@@ -62,7 +62,6 @@ extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
 extern CMaterialMan MaterialMan;
-extern CMath Math;
 extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
 extern unsigned char DAT_8032ecd8;

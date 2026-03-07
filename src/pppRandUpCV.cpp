@@ -43,7 +43,9 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = RandF__5CMathFv(&Math);
         if (in->randomTwice != 0) {
-            value = (value + RandF__5CMathFv(&Math)) * kPppRandUpCVDualSampleScale;
+            f32 random = RandF__5CMathFv(&Math);
+            f32 blend = value + random;
+            value = blend * kPppRandUpCVDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

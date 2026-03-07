@@ -1,6 +1,8 @@
 #ifndef _FFCC_MENU_FAVO_H_
 #define _FFCC_MENU_FAVO_H_
 
+#include <dolphin/gx.h>
+
 class CFont;
 
 class FoodRank
@@ -25,6 +27,24 @@ struct SingMenuState
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void DrawInit();
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void DrawRect(unsigned long, float, float, float, float, float, float, _GXColor*, float, float, float);
+    void DrawSingBar(int, int, int, float);
+    void DrawSingleIcon(int, int, int, float, int, float);
+
     void FavoInit();
     void FavoInit0();
     bool FavoOpen();

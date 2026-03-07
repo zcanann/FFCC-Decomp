@@ -42,6 +42,15 @@ static void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80194F34
+ * PAL Size: 1036b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 // NONMATCHING RELEASE - regalloc
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
@@ -96,19 +105,23 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
+    }
 
     if (0.0f != predelay) {
-        rv->preDelayTime = (32000.0f * predelay);
+        rv->preDelayTime = 32000.0f * predelay;
         for (i = 0; i < 3; i++) {
-            rv->preDelayLine[i] = __AXFXAlloc(rv->preDelayTime * 4);
+            rv->preDelayLine[i] = __AXFXAlloc(rv->preDelayTime << 2);
             ASSERTMSGLINE(162, rv->preDelayLine[i], "Can't allocate the memory.");
 			if (rv->preDelayLine[i] == NULL) {
 				ReverbSTDFree(rv);
 				return 0;
 			}
 			
-			memset(rv->preDelayLine[i], 0, rv->preDelayTime * 4);
+			memset(rv->preDelayLine[i], 0, rv->preDelayTime << 2);
             rv->preDelayPtr[i] = rv->preDelayLine[i];
         }
     } else {
@@ -122,6 +135,15 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     return 1;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80195340
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
 
@@ -147,7 +169,11 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
+    }
 
     for (i = 0; i < 6; i++) {
         DLdelete(&rv->AP[i]);

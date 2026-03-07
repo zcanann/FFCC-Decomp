@@ -1,13 +1,13 @@
 #include "ffcc/pppScreenQuake.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
 
 extern int gPppCalcDisabled;
+extern "C" unsigned char CameraPcs[];
 
 extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
-    void*,
+    unsigned char*,
     int,
     int,
     short,
@@ -52,7 +52,7 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
         CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[6], value[7], value[8], param2->m_arg4, param2->m_initWOrk3, param2->m_stepValue3);
 
         SetQuakeParameter__10CCameraPcsFiissffffffi(
-            &CameraPcs,
+            CameraPcs,
             1,
             0,
             0,
@@ -80,7 +80,7 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
 void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
 {
     SetQuakeParameter__10CCameraPcsFiissffffffi(
-        &CameraPcs,
+        CameraPcs,
         0,
         0,
         0,

@@ -75,7 +75,6 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma scheduling off
 void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
 {
     SetQuakeParameter__10CCameraPcsFiissffffffi(
@@ -92,7 +91,6 @@ void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
         kPppScreenQuakeZero,
         1);
 }
-#pragma scheduling reset
 
 /*
  * --INFO--
@@ -143,4 +141,3 @@ void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
     data[7] = val;
     data[6] = val;
 }
-

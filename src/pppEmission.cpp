@@ -69,6 +69,30 @@ void SetTexGenMode(pppEmission*) {
     // TODO
 }
 
+struct EmissionDisplayList {
+    void* m_data;
+    u32 m_size;
+    u16 m_material;
+};
+
+struct EmissionMeshData {
+    u8 _pad0[0x28];
+    u8* m_colors;
+    u8 _pad1[0x20];
+    u32 m_displayListCount;
+    EmissionDisplayList* m_displayLists;
+};
+
+struct EmissionMeshRef {
+    u8 _pad0[8];
+    EmissionMeshData* m_data;
+};
+
+struct EmissionModelData {
+    u8 _pad0[0x24];
+    void* m_materialSet;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800E6AB4
@@ -81,22 +105,20 @@ void SetTexGenMode(pppEmission*) {
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
     Graphic.SetDrawDoneDebugData(0x64);
 
-    char* meshList = *(char**)((char*)model + 0xAC);
-    char* meshData = *(char**)(meshList + (meshIndex * 0x14) + 8);
-    char* displayList = *(char**)(meshData + 0x50) + (displayListIndex * 0xC);
+    EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
+    EmissionMeshData* meshData = meshList[meshIndex].m_data;
+    EmissionDisplayList* displayList = meshData->m_displayLists + displayListIndex;
 
-    if (strcmp(meshData, DAT_803311fc) == 0) {
-        u8* color = *(u8**)(meshData + 0x28);
-        color[0] = 0;
-        color[1] = 0;
-        color[2] = 0;
-        color[3] = 0;
+    if (strcmp((char*)meshData, DAT_803311fc) == 0) {
+        meshData->m_colors[0] = 0;
+        meshData->m_colors[1] = 0;
+        meshData->m_colors[2] = 0;
+        meshData->m_colors[3] = 0;
     } else {
-        void* modelData = *(void**)((char*)model + 0xA4);
-        void* materialSet = *(void**)((char*)modelData + 0x24);
+        EmissionModelData* modelData = *(EmissionModelData**)((u8*)model + 0xA4);
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-            MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
-        GXCallDisplayList(*(void**)displayList, *(u32*)(displayList + 4));
+            MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
+        GXCallDisplayList(displayList->m_data, displayList->m_size);
         Graphic.SetDrawDoneDebugData(0x65);
     }
 }
@@ -468,5 +490,4 @@ void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
 void GXSetTexCoordGen(void) {
     // TODO
 }
-
 

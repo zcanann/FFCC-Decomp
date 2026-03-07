@@ -79,13 +79,13 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    iVar1 = shapePtr;
-    for (iVar2 = 0; iVar2 < *(short*)(shapePtr + 2); iVar2 = iVar2 + 1) {
+    iVar2 = shapePtr;
+    for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(iVar1 + 8));
+            pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
         }
-        GXCallDisplayList(*(void**)(iVar1 + 0xc), 0x60);
-        iVar1 = iVar1 + 8;
+        GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
+        iVar2 = iVar2 + 8;
     }
 }
 

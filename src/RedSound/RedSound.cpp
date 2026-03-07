@@ -842,10 +842,12 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CRedSound::ClearWaveData(int id)
 {
 	CRedDriver_8032f4c0.ClearWaveData(id);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

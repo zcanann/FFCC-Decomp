@@ -4,12 +4,6 @@
 #include "dolphin/os/__os.h"
 #include <dolphin/dvd/__dvd.h>
 
-extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
-extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
-extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
-extern volatile u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
-extern volatile u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
-
 static int Prepared;
 
 static void* SaveStart;
@@ -61,8 +55,6 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     DVDCommandBlock appLoaderReadBlock;
     DVDCommandBlock rebootReadBlock;
     u32 rebootSize;
-    u32 regionStart;
-    u32 regionEnd;
 #if SDK_REVISION < 1
     OSTime start;
 #endif
@@ -72,13 +64,11 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     OSDisableInterrupts();
 
-    regionStart = (u32)__OSRebootParams.regionStart;
-    regionEnd = (u32)__OSRebootParams.regionEnd;
-    g_unk_817FFFFC = 0;
-    g_unk_817FFFF8 = 0;
-    g_unk_800030E2 = 1;
-    BOOT_REGION_START = regionStart;
-    BOOT_REGION_END = regionEnd;
+    *(volatile u32*)0x817FFFFC = 0;
+    *(volatile u32*)0x817FFFF8 = 0;
+    *(volatile u8*)0x800030E2 = 1;
+    *(volatile u32*)0x812FDFF0 = (u32)SaveStart;
+    *(volatile u32*)0x812FDFEC = (u32)SaveEnd;
 
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(&exceptionContext);
@@ -104,7 +94,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         if (!DVDCheckDisk())
 #endif
         {
-            __OSDoHotReset(g_unk_817FFFFC);
+            __OSDoHotReset(*(volatile u32*)0x817FFFFC);
         }
     }
 
@@ -124,7 +114,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
             if (!DVDCheckDisk())
 #endif
             {
-                __OSDoHotReset(g_unk_817FFFFC);
+                __OSDoHotReset(*(volatile u32*)0x817FFFFC);
             }
         }
 
@@ -144,7 +134,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         if (!DVDCheckDisk())
 #endif
         {
-            __OSDoHotReset(g_unk_817FFFFC);
+            __OSDoHotReset(*(volatile u32*)0x817FFFFC);
         }
     }
 
@@ -162,7 +152,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         if (!DVDCheckDisk())
 #endif
         {
-            __OSDoHotReset(g_unk_817FFFFC);
+            __OSDoHotReset(*(volatile u32*)0x817FFFFC);
         }
     }
 

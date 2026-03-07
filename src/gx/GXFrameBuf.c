@@ -3,10 +3,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-#undef __GXData
-#define __GXData gx
-
 GXRenderModeObj GXNtsc240Ds = {
     1,
     640, 240, 240,

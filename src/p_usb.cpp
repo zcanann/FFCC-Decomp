@@ -43,7 +43,7 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x2000, s_CUSBPcs_8032f810, 0));
+	m_smallStage = Memory.CreateStage(0x2000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
@@ -62,10 +62,10 @@ void CUSBPcs::Quit()
 { 
 	if (m_bigStage != (CMemory::CStage*)nullptr)
 	{
-		DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
+		Memory.DestroyStage(m_bigStage);
 	}
 	
-	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_smallStage);
+	Memory.DestroyStage(m_smallStage);
 	USB.Disconnect();
 }
 
@@ -87,9 +87,9 @@ void* CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x100000, s_CUSBPcs_8032f810, 0));
+        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
+        Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
     }
 }

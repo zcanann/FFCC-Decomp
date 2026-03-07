@@ -486,7 +486,7 @@ void __AXVPBInit(void) {
         }                              \
     }
 
-    BUFFER_MEMSET(__AXPB, 0xF40);
+    BUFFER_MEMSET(__AXPB, 0xEC0);
     BUFFER_MEMSET(__AXITD, 0x400);
     BUFFER_MEMSET(__AXVPB, 0x22C0);
 

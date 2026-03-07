@@ -1,7 +1,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"
-#include "ffcc/game.h"
+#include "ffcc/graphic.h"
 #include "ffcc/map.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
@@ -9,6 +9,7 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_game.h"
 #include "ffcc/pad.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
@@ -21,7 +22,6 @@
 #include <string.h>
 
 CMenuPcs MenuPcs;
-extern CGame Game;
 
 struct Vec4d
 {
@@ -103,7 +103,6 @@ extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
-extern "C" unsigned char Graphic[];
 extern "C" unsigned char CFlat[];
 
 static inline void ReleaseRefObject(void* object)
@@ -334,11 +333,11 @@ void CMenuPcs::create()
     memset(self + 0x14C, 0, 0x40);
     memset(self + 0x18C, 0, 0x1A4);
 
-    sprintf(fontPath, s_dvd__smenu_gc22_fnt_801d9db4, Game.GetLangString());
+    sprintf(fontPath, s_dvd__smenu_gc22_fnt_801d9db4, Game.game.GetLangString());
     loadFont(0, fontPath, 0, 0);
 
     for (int i = 0; i < 2; i++) {
-        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), PTR_s_common_8032e7a0[i]);
+        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.game.GetLangString(), PTR_s_common_8032e7a0[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -348,7 +347,7 @@ void CMenuPcs::create()
             void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
                                                                      : *reinterpret_cast<void**>(self + 0xEC);
 
-            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            CTextureSet* textureSet = new (Game.game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
             if (textureSet != 0) {
                 textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
@@ -438,7 +437,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        CFont* font = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0xF8) CFont;
+        CFont* font = new (Game.game.m_mainStage, s_p_menu_cpp_801d9d80, 0xF8) CFont;
         *fontSlot = font;
         if (font != 0) {
             font->Create(File.m_readBuffer, stage);
@@ -476,7 +475,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureSetCount; i++) {
-        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), *paths);
+        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.game.GetLangString(), *paths);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -485,7 +484,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
             CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(&MapMng);
             if ((*reinterpret_cast<int*>(self + 0x740) != 1) && (stageSelect != 3)) {
-                if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
+                if ((Game.game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
                 } else if (stageSelect == 1) {
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
@@ -494,7 +493,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                 }
             }
 
-            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            CTextureSet* textureSet = new (Game.game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) = textureSet;
 
             if (textureSet != 0) {
@@ -562,7 +561,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         return;
     }
 
-    _WaitDrawDone__8CGraphicFPci(Graphic, s_p_menu_cpp_801d9d80, 0x1B0);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_menu_cpp_801d9d80, 0x1B0);
 
     if (currentMode == 1) {
         destroyWorld();
@@ -965,8 +964,8 @@ void CMenuPcs::onScriptChanging(char* script)
  */
 void CMenuPcs::onMapChanging(int, int mapNo)
 {
-    if (((mapNo == 0x21) && (Game.m_currentMapId != 0x21)) ||
-        ((mapNo != 0x21) && (Game.m_currentMapId == 0x21))) {
+    if (((mapNo == 0x21) && (Game.game.m_currentMapId != 0x21)) ||
+        ((mapNo != 0x21) && (Game.game.m_currentMapId == 0x21))) {
         changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
     }
 }
@@ -983,7 +982,7 @@ void CMenuPcs::onMapChanging(int, int mapNo)
 void CMenuPcs::onMapChanged(int, int, int)
 {
     changeMode(static_cast<CMenuPcs::MENUMODE>(
-        (u32)__cntlzw((u32)(0x21 - Game.m_currentMapId)) >> 5));
+        (u32)__cntlzw((u32)(0x21 - Game.game.m_currentMapId)) >> 5));
 }
 
 /*
@@ -1322,7 +1321,7 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
     ReleaseRefObject(*fontSlot);
     *fontSlot = 0;
 
-    sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.GetLangString(), fileName);
+    sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.game.GetLangString(), fileName);
     loadFont(2, path, fontNo + 2, -1);
 }
 
@@ -1388,7 +1387,7 @@ void CMenuPcs::createBattle()
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < 2; i++) {
-        const char* language = Game.GetLangString();
+        const char* language = Game.game.GetLangString();
         sprintf(path, s_dvd__smenu__s_tex_801d9d6c, language, PTR_s_shibuya_8020f23c[i]);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
@@ -1399,7 +1398,7 @@ void CMenuPcs::createBattle()
             void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
                                                                      : *reinterpret_cast<void**>(self + 0xEC);
 
-            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            CTextureSet* textureSet = new (Game.game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
             if (textureSet != 0) {
                 textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
@@ -1420,7 +1419,7 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 12; i++) {
-        CMesMenu* menu = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x48B) CMesMenu;
+        CMesMenu* menu = new (Game.game.m_mainStage, s_p_menu_cpp_801d9d80, 0x48B) CMesMenu;
         *reinterpret_cast<CMesMenu**>(self + 0x10C + i * 4) = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
@@ -1428,13 +1427,13 @@ void CMenuPcs::createBattle()
     }
 
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x492) CRingMenu;
+        CRingMenu* menu = new (Game.game.m_mainStage, s_p_menu_cpp_801d9d80, 0x492) CRingMenu;
         *reinterpret_cast<CRingMenu**>(self + 0x13C + i * 4) = menu;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
         menu->Create();
     }
 
-    sprintf(fontPath, s_dvd__smenu_gc23_fnt_801d9d8c, Game.GetLangString());
+    sprintf(fontPath, s_dvd__smenu_gc23_fnt_801d9d8c, Game.game.GetLangString());
     loadFont(0, fontPath, 1, 1);
 
     CTexture* fontTexture = *reinterpret_cast<CTexture**>(self + 0x1EC);
@@ -1636,7 +1635,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
         destroySingleMenu__8CMenuPcsFv(this);
     }
 
-    Game.m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);
+    Game.game.m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);
 }
 
 /*

@@ -1,10 +1,8 @@
 #include "ffcc/pppYmCallBack.h"
 #include "ffcc/partMng.h"
-#include "ffcc/game.h"
+#include "ffcc/p_game.h"
 
 #include <dolphin/mtx.h>
-
-extern CGame Game;
 
 /*
  * --INFO--
@@ -51,9 +49,9 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
         mngStIndex = ((s32)(mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
-        Game.ParticleFrameCallback(mngStIndex, (s32)*(s16*)(mngSt + 0x74),
-                                   (s32)*(s16*)(mngSt + 0x76), (s32)frameParam->m_initWOrk,
-                                   (s32)frameParam->m_graphId, &position);
+        Game.game.ParticleFrameCallback(mngStIndex, (s32)*(s16*)(mngSt + 0x74),
+                                        (s32)*(s16*)(mngSt + 0x76), (s32)frameParam->m_initWOrk,
+                                        (s32)frameParam->m_graphId, &position);
     }
 }
 

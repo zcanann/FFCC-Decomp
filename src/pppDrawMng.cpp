@@ -1,13 +1,11 @@
 #include "ffcc/pppDrawMng.h"
 
-#include "ffcc/game.h"
+#include "ffcc/graphic.h"
+#include "ffcc/p_game.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/symbols_shared.h"
-
-extern CGame Game;
-extern unsigned char Graphic[];
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
@@ -137,7 +135,7 @@ void pppDrawMng::DrawOt()
 					_pppDrawPart((_pppMngSt*)prim->m_handle);
 					break;
 				case 1:
-					SetDrawDoneDebugDataPartControl__8CGraphicFi(Graphic, 0x7ffe);
+					SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7ffe);
 
 					if (lastType != prim->m_type)
 					{
@@ -147,7 +145,7 @@ void pppDrawMng::DrawOt()
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);
 
-					SetDrawDoneDebugDataPartControl__8CGraphicFi(Graphic, 0x7fff);
+					SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
 					break;
 				default:
 					break;
@@ -175,7 +173,7 @@ void pppDrawMng::ClearOt()
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
 
-	if (Game.m_currentMapId == 0x21)
+	if (Game.game.m_currentMapId == 0x21)
 	{
 		m_depthScale = kPppDrawDepthScaleNear;
 	}

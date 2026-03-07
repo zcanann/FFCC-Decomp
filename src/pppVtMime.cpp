@@ -1,4 +1,5 @@
 #include "ffcc/pppVtMime.h"
+#include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
 struct VtMimeCtrl
@@ -40,7 +41,6 @@ struct VtMimeEnv
 };
 
 extern int gPppCalcDisabled;
-extern char Graphic[];
 static char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
 extern "C" {

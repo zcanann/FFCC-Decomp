@@ -1,4 +1,5 @@
 #include "ffcc/pppParHitSphMat.h"
+#include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/symbols_shared.h"
@@ -6,7 +7,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 extern unsigned char CFlat[];
-extern unsigned char Graphic[];
 extern Mtx ppvCameraMatrix02;
 extern "C" void DrawSphere__8CGraphicFPA4_f8_GXColor(void* graphic, MtxPtr mtx, _GXColor color);
 
@@ -71,7 +71,7 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         sphereMtx[0][3] = local_a0.x;
         sphereMtx[1][3] = local_a0.y;
         sphereMtx[2][3] = local_a0.z;
-        DrawSphere__8CGraphicFPA4_f8_GXColor(Graphic, sphereMtx, local_a8);
+        DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, local_a8);
     }
 }
 

@@ -36,6 +36,7 @@ static void __GXXfVtxSpecs(void) {
     u32 nTex5;
     u32 nTex6;
     u32 nTex7;
+    u32 nTexSum;
     u32 reg;
     u32 vcdHi;
     u32 vcdLo;
@@ -112,8 +113,15 @@ static void __GXXfVtxSpecs(void) {
         nTex7 = 0;
     }
 
+    nTexSum = nTex1 + nTex2;
+    nTexSum = nTexSum + nTex3;
+    nTexSum = nTexSum + nTex4;
+    nTexSum = nTexSum + nTex5;
+    nTexSum = nTexSum + nTex6;
+    nTexSum = nTexSum + nTex7;
+
     reg = (nCol0 + nCol1) | (nNrm << 2);
-    reg |= (nTex0 + nTex1 + nTex2 + nTex3 + nTex4 + nTex5 + nTex6 + nTex7) << 4;
+    reg |= (nTex0 + nTexSum) << 4;
     GX_WRITE_XF_REG(8, reg);
     __GXData->bpSentNot = 1;
 }

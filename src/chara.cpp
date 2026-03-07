@@ -895,7 +895,17 @@ void CChara::CModel::CalcFurColor()
  */
 int CChara::CModel::GetDispIndex(CChara::CNode* node)
 {
-	return (int)*(s8*)((u8*)*(void**)node + 4);
+	struct CNodeRefDataDisplay {
+		u8 _pad[0x8D];
+		s8 m_displayIndex;
+	};
+
+	struct CNodeDisplayView {
+		CNodeRefDataDisplay* m_refData;
+	};
+
+	CNodeDisplayView* nodeView = (CNodeDisplayView*)node;
+	return (int)nodeView->m_refData->m_displayIndex;
 }
 
 /*

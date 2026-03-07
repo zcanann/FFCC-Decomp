@@ -7,7 +7,7 @@
 extern "C" int rand(void);
 extern "C" int __cntlzw(unsigned int);
 
-CMath math;
+CMath Math;
 extern "C" char __vt__8CManager[];
 extern "C" char __vt__5CMath[];
 static Vec s_f_vpos;
@@ -28,8 +28,8 @@ extern "C" void __sinit_math_cpp(void)
     void* const managerVtable = __vt__8CManager;
     void* const mathVtable = __vt__5CMath;
 
-    *reinterpret_cast<volatile void**>(&math) = managerVtable;
-    *reinterpret_cast<volatile void**>(&math) = mathVtable;
+    *reinterpret_cast<volatile void**>(&Math) = managerVtable;
+    *reinterpret_cast<volatile void**>(&Math) = mathVtable;
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/fontman.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/symbols_shared.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include <dolphin/mtx.h>
@@ -10,7 +11,6 @@ extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__5CFont[];
-extern unsigned char CameraPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
@@ -19,6 +19,11 @@ static const char s_CFontMan[] = "CFontMan";
 
 namespace {
 typedef void (*VirtualDtorFn)(void*, int);
+
+Mtx44Ptr GetScreenMatrix()
+{
+    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+}
 }
 
 /*
@@ -530,7 +535,7 @@ void CFont::DrawQuit()
 {
     Mtx44 screenMtx;
 
-    PSMTX44Copy((float(*)[4])(CameraPcs + 0x94), screenMtx);
+    PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 

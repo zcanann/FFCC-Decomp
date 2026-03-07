@@ -2,6 +2,7 @@
 #include "ffcc/file.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 
@@ -9,7 +10,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "string.h"
 
-extern unsigned char Game[];
 extern CMath Math;
 extern char* PTR_DAT_8032e854;
 CMemoryCardMan MemoryCardMan;
@@ -762,7 +762,7 @@ void CMemoryCardMan::MakeSaveData()
     memset(m_saveBuffer, 0, 0xA000);
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = Game + 0x10;
+    u8* game = reinterpret_cast<u8*>(&Game.game);
     u8* gameWork = game + 0x08;
 
     const u64 now = OSGetTime();
@@ -882,7 +882,7 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<int*>(dst + 0x1DA4) = *reinterpret_cast<int*>(cv + 0x10);
     }
 
-    SaveScript__5CGameFPc(Game, reinterpret_cast<char*>(save + 0x62D0));
+    SaveScript__5CGameFPc(&Game.game, reinterpret_cast<char*>(save + 0x62D0));
     SaveFurTexBuffer__6CCharaFPUs(&Chara, reinterpret_cast<unsigned short*>(save + 0x6AD0));
 }
 
@@ -908,7 +908,7 @@ void CMemoryCardMan::SetLoadData()
     }
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = Game + 0x10;
+    u8* game = reinterpret_cast<u8*>(&Game.game);
     u8* gameWork = game + 0x08;
 
     if (save[0x00] != s_magic0[0] || save[0x01] != s_magic0[1] || save[0x02] != s_magic0[2] || save[0x03] != s_magic0[3])
@@ -1040,7 +1040,7 @@ void CMemoryCardMan::SetLoadData()
         }
     }
 
-    LoadScript__5CGameFPc(Game, reinterpret_cast<char*>(save + 0x62D0));
+    LoadScript__5CGameFPc(&Game.game, reinterpret_cast<char*>(save + 0x62D0));
     LoadFurTexBuffer__6CCharaFPUs(&Chara, reinterpret_cast<unsigned short*>(save + 0x6AD0));
 
 }
@@ -1832,7 +1832,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
             
             // Calculate total HP bonus from equipped accessories
             unsigned int totalHpBonus = 0;
-            unsigned int itemData = *(unsigned int*)(Game + 0xC5B8);
+            unsigned int itemData = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game.game) + 0xC5B8);
             
             if (equippedItems[0] >= 0) {
                 totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);

@@ -44,13 +44,12 @@ extern "C" void* PTR_PTR_s_CTexAnimSeq_801e9c24;
 extern "C" void* PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
 extern "C" char s_texanim_cpp_801d7adc[];
 extern "C" char DAT_8032fb48[];
-extern "C" const float FLOAT_8032fb38 = 0.0f;
-extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
+const float FLOAT_8032fb38 = 0.0f;
 extern "C" int __cntlzw(unsigned int);
 
-extern const float FLOAT_8032fb3c = 1.0f;
-extern const float FLOAT_8032fb4c = 1.25f;
-extern const double DOUBLE_8032fb40 = 4503599627370496.0;
+const float FLOAT_8032fb3c = 1.0f;
+const float FLOAT_8032fb4c = 1.25f;
+const double DOUBLE_8032fb40 = 4503599627370496.0;
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -777,7 +776,7 @@ void CTexAnimSet::AddFrame()
             frameStep = FLOAT_8032fb4c;
         }
 
-        if (((flags & 0x40) == 0) || (FLOAT_8032fb3c != F32At(texAnim, 0x10)) || (Rand__5CMathFUl(&Math, 0x1E) == 0)) {
+        if (((flags & 0x40) == 0) || (FLOAT_8032fb3c != F32At(texAnim, 0x10)) || (Math.Rand(0x1E) == 0)) {
             float currentFrame = (float)fmod((double)F32At(texAnim, 0x10), (double)(float)U32At(seq, 0x108));
             int keyCount = S32At(seq, 0x10C);
             unsigned int* keyData = reinterpret_cast<unsigned int*>(Ptr(seq, 0x114));

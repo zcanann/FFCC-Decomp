@@ -5,9 +5,9 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/gx.h"
-extern const float FLOAT_8033101c = 1.0f;
-extern const float FLOAT_80331020 = 3.0518509e-05f;
-extern const double DOUBLE_80331028 = 4503601774854144.0;
+const float FLOAT_8033101c = 1.0f;
+const float FLOAT_80331020 = 3.0518509e-05f;
+const double DOUBLE_80331028 = 4503601774854144.0;
 extern int gPppCalcDisabled;
 extern char gPppInConstructor;
 extern void* gUtil;

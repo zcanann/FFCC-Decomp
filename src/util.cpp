@@ -2,14 +2,14 @@
 #include "ffcc/gxfunc.h"
 #include <string.h>
 
-extern const float kUtilZero = 0.0f;
-extern const float kUtilOne = 1.0f;
-extern const float kUtilOrthoBottom = 448.0f;
-extern const float kUtilOrthoRight = 640.0f;
-extern const float kUtilQuadDepth = -0.99999988f;
-extern const float kUtilHermiteCoeff2 = 2.0f;
-extern const float kUtilHermiteCoeff3 = 3.0f;
-extern const float kUtilHermiteCoeffNeg2 = -2.0f;
+const float kUtilZero = 0.0f;
+const float kUtilOne = 1.0f;
+const float kUtilOrthoBottom = 448.0f;
+const float kUtilOrthoRight = 640.0f;
+const float kUtilQuadDepth = -0.99999988f;
+const float kUtilHermiteCoeff2 = 2.0f;
+const float kUtilHermiteCoeff3 = 3.0f;
+const float kUtilHermiteCoeffNeg2 = -2.0f;
 
 extern struct {
     u8 _0x0[0x4];

@@ -17,25 +17,22 @@ extern struct {
 } CameraPcs;
 extern unsigned char CFlat[];
 
-extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
-extern "C" float RandF__5CMathFv(CMath*);
-
-extern const float FLOAT_80330ef0 = 0.0f;
-extern const float FLOAT_80330ef4 = 0.0001f;
-extern const float FLOAT_80330ef8 = 1.0f;
-extern const float FLOAT_80330f20 = 0.5f;
-extern const float FLOAT_80330f24 = -0.25f;
-extern const float FLOAT_80330f28 = 0.1f;
-extern const float FLOAT_80330f2c = 0.2f;
-extern const float FLOAT_80330f30 = -0.1f;
-extern const float FLOAT_80330f34 = 0.25f;
-extern const float FLOAT_80330f38 = 0.05f;
-extern const float FLOAT_80330f18 = -0.5f;
-extern const float FLOAT_80330f1c = 255.0f;
-extern const double DOUBLE_80330f00 = 0.5;
-extern const double DOUBLE_80330f08 = 3.0;
-extern const double DOUBLE_80330f10 = 0.0;
-extern const double DOUBLE_80330f40 = 4503601774854144.0;
+const float FLOAT_80330ef0 = 0.0f;
+const float FLOAT_80330ef4 = 0.0001f;
+const float FLOAT_80330ef8 = 1.0f;
+const float FLOAT_80330f20 = 0.5f;
+const float FLOAT_80330f24 = -0.25f;
+const float FLOAT_80330f28 = 0.1f;
+const float FLOAT_80330f2c = 0.2f;
+const float FLOAT_80330f30 = -0.1f;
+const float FLOAT_80330f34 = 0.25f;
+const float FLOAT_80330f38 = 0.05f;
+const float FLOAT_80330f18 = -0.5f;
+const float FLOAT_80330f1c = 255.0f;
+const double DOUBLE_80330f00 = 0.5;
+const double DOUBLE_80330f08 = 3.0;
+const double DOUBLE_80330f10 = 0.0;
+const double DOUBLE_80330f40 = 4503601774854144.0;
 extern char DAT_801db528[];
 extern char DAT_801db548[];
 extern char DAT_801db568[];
@@ -77,9 +74,9 @@ void CWind::Frame()
 
     while (true) {
         if ((obj->flags & 0x80) != 0) {
-            rnd = Rand__5CMathFUl(&Math, 10);
+            rnd = Math.Rand(10);
             if (rnd == 0) {
-                rnd = Rand__5CMathFUl(&Math, 3);
+                rnd = Math.Rand(3);
                 f1 = FLOAT_80330ef0;
                 f0 = FLOAT_80330f24;
                 if (rnd == 0) {
@@ -94,10 +91,9 @@ void CWind::Frame()
                 obj->targetPower = f1;
             }
 
-            if ((((obj->type == 0) || (obj->type == 1)) &&
-                 ((rnd = Rand__5CMathFUl(&Math, 0x1E)), rnd == 0)) &&
+            if ((((obj->type == 0) || (obj->type == 1)) && ((rnd = Math.Rand(0x1E)), rnd == 0)) &&
                 (obj->curPower < FLOAT_80330f28 * obj->basePower)) {
-                rnd = Rand__5CMathFUl(&Math, 3);
+                rnd = Math.Rand(3);
                 f0 = FLOAT_80330f30;
                 if (rnd == 0) {
                     f0 = FLOAT_80330f2c;
@@ -130,7 +126,7 @@ void CWind::Frame()
             }
 
             obj->curPower = FLOAT_80330f38 * (obj->targetPower - obj->curPower) + obj->curPower;
-            d0 = (double)RandF__5CMathFv(&Math);
+            d0 = (double)Math.RandF();
             obj->curDir = obj->curDir +
                           (float)((double)FLOAT_80330f2c * d0 +
                                   (double)(FLOAT_80330f38 * (obj->targetDir - obj->curDir) - FLOAT_80330f28));
@@ -138,7 +134,7 @@ void CWind::Frame()
             if ((obj->type == 0) || (obj->type == 1)) {
                 d0 = (double)sin((double)obj->curDir);
                 obj->force.x = obj->curPower * (float)d0;
-                d0 = (double)RandF__5CMathFv(&Math);
+                d0 = (double)Math.RandF();
                 obj->force.y = obj->curPower * (float)((double)FLOAT_80330f20 * d0 + (double)FLOAT_80330f24);
                 d0 = (double)cos((double)obj->curDir);
                 obj->force.z = obj->curPower * (float)d0;
@@ -241,7 +237,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 if (randomize == 0) {
                     PSVECAdd(out, &obj->force, out);
                 } else {
-                    PSVECScale(&obj->force, &tmp, (float)RandF__5CMathFv(&Math));
+                    PSVECScale(&obj->force, &tmp, (float)Math.RandF());
                     PSVECAdd(out, &tmp, out);
                 }
             } else {
@@ -263,7 +259,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 
                             inv = (double)(float)(yRand / d);
                             out->x = (float)(nx * inv + (double)out->x);
-                            yRand = (double)RandF__5CMathFv(&Math);
+                            yRand = (double)Math.RandF();
                             out->y = (float)((double)(float)(FLOAT_80330f18 + yRand) *
                                                  (double)(float)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio) +
                                              (double)out->y);

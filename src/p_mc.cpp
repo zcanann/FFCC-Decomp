@@ -9,7 +9,6 @@ extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
-extern unsigned char PTR_PTR_s_CMcPcs_80211f28[];
 
 struct MenuPcsMcLayout
 {
@@ -157,7 +156,7 @@ extern "C" void __sinit_p_mc_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    gMcPcsSingletonPtr = (unsigned int)PTR_PTR_s_CMcPcs_80211f28;
+    gMcPcsSingletonPtr = (unsigned int)sMcPcsSingletonData;
     table = (unsigned int*)m_table__6CMcPcs;
     table0 = m_table_desc0__6CMcPcs;
     table1 = m_table_desc1__6CMcPcs;

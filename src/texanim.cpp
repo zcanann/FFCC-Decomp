@@ -12,13 +12,6 @@ template <class T>
 class CPtrArray
 {
 public:
-    int m_size;
-    int m_numItems;
-    int m_defaultSize;
-    int m_growCapacity;
-    T* m_items;
-    CMemory::CStage* m_stage;
-
     CPtrArray();
     virtual ~CPtrArray();
 
@@ -30,6 +23,13 @@ public:
     void SetStage(CMemory::CStage* stage);
     int setSize(unsigned long newSize);
     T GetAt(unsigned long index);
+
+    int m_size;
+    int m_numItems;
+    int m_defaultSize;
+    int m_growCapacity;
+    T* m_items;
+    CMemory::CStage* m_stage;
 };
 
 extern "C" void __dl__FPv(void*);

@@ -83,14 +83,16 @@ void CMcPcs::calc()
 {
     int result;
     int worldParam;
+    MenuPcsMcLayout* menu;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
+    menu = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs);
 
-    if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field14 != 1)
+    if (menu->field14 != 1)
     {
-        if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 == 0x13)
+        if (menu->field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&menu->m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -107,11 +109,10 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
-                reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 = 0;
+                menu->field18 = 0;
             }
         }
-        else if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 == 0x12 &&
-                 (result = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (menu->field18 == 0x12 && (result = menu->m_mcCtrl.ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {
@@ -135,7 +136,7 @@ void CMcPcs::calc()
             }
 
             CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
-            reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 = 0;
+            menu->field18 = 0;
         }
     }
 }

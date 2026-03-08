@@ -1,5 +1,6 @@
 #include "ffcc/itemobj.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/math.h"
 #include "ffcc/prgobj.h"
@@ -8,8 +9,6 @@
 
 #include <math.h>
 #include <string.h>
-
-class CMapMng;
 
 extern "C" void onCreate__8CGPrgObjFv(void*);
 extern "C" void onDestroy__8CGPrgObjFv(void*);
@@ -66,8 +65,6 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, unsigned int);
-
-extern CMapMng MapMng;
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
 extern float FLOAT_80331b24;

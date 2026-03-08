@@ -91,6 +91,7 @@ unsigned char DAT_8032ed90 = 0;
 unsigned char DAT_8032ed91 = 0;
 int gPppCalcDisabled = 0;
 }
+CPartMng PartMng;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";

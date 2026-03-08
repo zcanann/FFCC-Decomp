@@ -8,14 +8,12 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/partMng.h"
 #include "ffcc/THPSimple.h"
 
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
-
-class CPartMng;
-extern CPartMng PartMng;
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__8CGBaseObj[];

@@ -243,6 +243,8 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         basePos.y = pppMngStPtr->m_matrix.value[1][3];
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
+    } else {
+        pppCopyVector__FR3Vec3Vec(&basePos, &worldPos);
     }
 
     pppSubVector__FR3Vec3Vec3Vec(&delta, &basePos, &worldPos);

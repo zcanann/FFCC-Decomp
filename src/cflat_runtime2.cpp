@@ -80,6 +80,7 @@ unsigned char CFlat[0x10440];
 unsigned char m_objItem[0xAF80];
 unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
+unsigned char m_boss__8CGMonObj_field108_0x6c[0x90];
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];
@@ -2499,7 +2500,7 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::initAllFinished()
 {
-	memset(reinterpret_cast<void*>(0x803001D8), 0, 0x90);
+	memset(m_boss__8CGMonObj_field108_0x6c, 0, sizeof(m_boss__8CGMonObj_field108_0x6c));
 }
 
 /*

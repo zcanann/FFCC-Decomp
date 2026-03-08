@@ -731,7 +731,9 @@ void CMapAnimRun::Calc(long frame)
     }
 
 runFrame:
-    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC, run->mapAnimIndex);
+    CPtrArray<CMapAnim*>* mapAnimArray =
+        reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
+    CMapAnim* mapAnim = (*mapAnimArray)[run->mapAnimIndex];
     Calc__8CMapAnimFl(mapAnim, run->currentFrame);
     if (++run->currentFrame > run->endFrame) {
         if (run->loop != 0) {

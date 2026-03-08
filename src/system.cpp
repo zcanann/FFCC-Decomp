@@ -14,6 +14,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/textureman.h"
 #include "ffcc/usb.h"
+#include "ffcc/p_dbgmenu.h"
 
 #include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"
@@ -179,7 +180,7 @@ void CSystem::Quit()
  */
 void CSystem::Printf(char* fmt, ...)
 {
-    if (((int)this /* MiniGamePcs._25732_4_ */ &  0x1000) == 0)
+    if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x1000) == 0)
 	{
         return;
 	}

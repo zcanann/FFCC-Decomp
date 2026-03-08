@@ -2,17 +2,15 @@
 #include "dolphin/os.h"
 #include <dolphin/hw_regs.h>
 
-typedef void (*MTRCallbackType)(int);
+static __OSInterruptHandler MTRCallback;
 
-static MTRCallbackType MTRCallback;
-
-static void (*DBGCallback)(s16);
+static __OSInterruptHandler DBGCallback;
 
 static u32 SendMailData;
 
 static s32 RecvDataLeng;
 
-static u8* pEXIInputFlag;
+static volatile u8* pEXIInputFlag;
 
 static u8 EXIInputFlag;
 
@@ -239,21 +237,21 @@ static BOOL DBGReadStatus(u32* p1) {
 }
 #pragma dont_inline reset
 
-static void MWCallback(s16 a) {
+static void MWCallback(s16 a, OSContext* b) {
     EXIInputFlag = TRUE;
     if (MTRCallback) {
-        MTRCallback(0);
+        MTRCallback(0, b);
     }
 }
 
 static void DBGHandler(s16 a, OSContext* b) {
     *__PIRegs = 0x1000;
     if (DBGCallback) {
-        DBGCallback(a);
+        DBGCallback(a, b);
     }
 }
 
-void DBInitComm(u8** a, MTRCallbackType b) {
+void DBInitComm(volatile u8** a, __OSInterruptHandler b) {
     BOOL interrupts = OSDisableInterrupts();
     pEXIInputFlag = &EXIInputFlag;
     *a = pEXIInputFlag;
@@ -295,7 +293,7 @@ u32 DBQueryData(void) {
     return RecvDataLeng;
 }
 
-BOOL DBRead(u32* buffer, s32 count) {
+int DBRead(void* buffer, u32 count) {
     BOOL interrupts;
     s32 value;
 
@@ -307,7 +305,7 @@ BOOL DBRead(u32* buffer, s32 count) {
         value = 0x1000;
     }
 
-    DBGRead(value + 0x1e000, buffer, (count + 3U) & 0xfffffffc);
+    DBGRead(value + 0x1e000, (u32*)buffer, (count + 3U) & 0xfffffffc);
 
     RecvDataLeng = 0;
     EXIInputFlag = 0;
@@ -317,7 +315,7 @@ BOOL DBRead(u32* buffer, s32 count) {
     return 0;
 }
 
-BOOL DBWrite(void* src, u32 size) {
+int DBWrite(const void* src, u32 size) {
     u32 v;
     u32 busyFlag;
     BOOL interrupts = OSDisableInterrupts();
@@ -329,7 +327,7 @@ BOOL DBWrite(void* src, u32 size) {
     SendCount++;
     v = ((SendCount & 1) ? 0x1000 : 0);
 
-    while (!DBGWrite(v | 0x1c000, src, ROUND_UP(size, 4)))
+    while (!DBGWrite(v | 0x1c000, (u32*)src, ROUND_UP(size, 4)))
         ;
 
     do {

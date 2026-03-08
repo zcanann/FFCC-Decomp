@@ -1228,17 +1228,17 @@ void* __StringWrite(void* pCtrl, const char* pBuffer, size_t char_num)
 
 int printf(const char* format, ...)
 {
+    va_list args;
     int res;
 
     if (fwide(stdout, -1) >= 0) {
         return -1;
     }
 
-    {
-        va_list args;
-        va_start(args, format);
-        res = __pformatter(&__FileWrite, (void*)stdout, format, args);
-    }
+    __begin_critical_region(2);
+    va_start(args, format);
+    res = __pformatter(&__FileWrite, (void*)stdout, format, args);
+    __end_critical_region(2);
 
     return res;
 }

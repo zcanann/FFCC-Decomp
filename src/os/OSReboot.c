@@ -7,6 +7,7 @@
 extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
 extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
+extern volatile u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
 extern volatile u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
 
 static int Prepared;

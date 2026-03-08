@@ -4,6 +4,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
+#include "ffcc/p_camera.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
@@ -23,13 +24,7 @@ struct _pppEnvStEmission {
 extern _pppMngStEmission* pppMngStPtr;
 extern _pppEnvStEmission* pppEnvStPtr;
 
-struct CameraPcsForEmission {
-    Mtx m_cameraMatrix;
-};
-
 extern "C" int rand(void);
-
-extern CameraPcsForEmission CameraPcs;
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
 extern char DAT_803311fc[];
@@ -41,6 +36,7 @@ extern double DOUBLE_803311f0;
 char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
 extern "C" {
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
@@ -154,7 +150,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 Mtx viewMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
+                PSMTXCopy(CameraMatrix(), viewMtx);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
 
                 int remaining = *(int*)(meshData + 0x4C);
@@ -208,7 +204,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 Mtx viewMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
+                PSMTXCopy(CameraMatrix(), viewMtx);
                 PSMTXConcat(viewMtx, objMtx, objMtx);
                 GXLoadPosMtxImm(objMtx, 0);
 

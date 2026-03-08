@@ -8,6 +8,7 @@
 #include "ffcc/map.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/symbols_shared.h"
@@ -51,8 +52,6 @@ extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
 extern "C" float FLOAT_8032fe58;
 extern "C" float FLOAT_8032fe18;
-class CCameraPcs;
-extern CCameraPcs CameraPcs;
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
@@ -92,6 +91,7 @@ unsigned char DAT_8032ed90 = 0;
 unsigned char DAT_8032ed91 = 0;
 int gPppCalcDisabled = 0;
 }
+CPartMng PartMng;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";

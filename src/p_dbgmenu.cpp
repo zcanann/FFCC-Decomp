@@ -4,13 +4,12 @@
 #include "ffcc/linkage.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/partMng.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
 #include <string.h>
 
 CDbgMenuPcs DbgMenuPcs;
-class CPartMng;
-extern CPartMng PartMng;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;

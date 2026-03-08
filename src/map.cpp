@@ -8,6 +8,7 @@
 #include "ffcc/mapanim.h"
 #include "ffcc/maptexanim.h"
 #include "ffcc/materialman.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
@@ -65,8 +66,6 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void SetOffsetZBuff__10CCameraPcsFf(double, void*);
-class CCameraPcs;
-extern CCameraPcs CameraPcs;
 unsigned char DAT_8032ec88;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;

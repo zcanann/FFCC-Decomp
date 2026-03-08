@@ -1,5 +1,6 @@
 #include "ffcc/pppConstrainCameraForLoc.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
@@ -7,17 +8,13 @@
 
 // External references
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
-extern struct {
-    int field0_0x0;
-    Mtx m_cameraMatrix;
-    unsigned char field34_0xe0[0xAC];
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    float _236_4_;
-    float _240_4_;
-    float _244_4_;
-} CameraPcs;
+static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
+static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
+static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
+static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
+static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
+static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
+static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
 // Function signatures from Ghidra decomp
 extern "C" int GetModelPtr__FP8CGObject(CGObject*);
@@ -67,13 +64,13 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     Mtx local_98;
     Mtx local_68;
 
-    local_f8 = CameraPcs._236_4_;
-    local_f4 = CameraPcs._240_4_;
-    local_f0 = CameraPcs._244_4_;
-    local_bc.x = CameraPcs._224_4_;
-    local_bc.y = CameraPcs._228_4_;
-    local_bc.z = CameraPcs._232_4_;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, local_68);
+    local_f8 = CameraDirX();
+    local_f4 = CameraDirY();
+    local_f0 = CameraDirZ();
+    local_bc.x = CameraPosX();
+    local_bc.y = CameraPosY();
+    local_bc.z = CameraPosZ();
+    PSMTXCopy(CameraMatrix(), local_68);
 
     local_a4.z = work->field0_0x0;
     local_a4.x = local_a4.z * local_f8;

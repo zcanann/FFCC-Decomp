@@ -1,14 +1,19 @@
 #include "ffcc/pppConstrainCameraDir2.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppConstrainCameraDir.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern struct {
-    float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
-    Mtx m_cameraMatrix;
-} CameraPcs;
+static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
+static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
+static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
+static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
+static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
+static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
+static inline float CameraDistance() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xFC); }
+static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
@@ -39,17 +44,17 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                                                      param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
 
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
-            float cameraDirX = CameraPcs._236_4_;
-            float cameraDirY = CameraPcs._240_4_;
-            float cameraDirZ = CameraPcs._244_4_;
+            float cameraDirX = CameraDirX();
+            float cameraDirY = CameraDirY();
+            float cameraDirZ = CameraDirZ();
 
             Mtx cameraMtx;
-            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+            PSMTXCopy(CameraMatrix(), cameraMtx);
 
-            float cameraPosX = CameraPcs._224_4_;
-            float cameraPosY = CameraPcs._228_4_;
-            float cameraPosZ = CameraPcs._232_4_;
-            float scale = FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4);
+            float cameraPosX = CameraPosX();
+            float cameraPosY = CameraPosY();
+            float cameraPosZ = CameraPosZ();
+            float scale = FLOAT_803331e0 + ((CameraDistance() - FLOAT_803331e4) / FLOAT_803331e4);
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
             pppMngSt->m_scale.x = FLOAT_803331e8 * scale;

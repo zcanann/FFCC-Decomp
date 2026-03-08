@@ -21,7 +21,8 @@ extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, uns
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 
 extern "C" unsigned char Chara[];
-extern unsigned char CharaPcs[];
+class CCharaPcs;
+extern CCharaPcs CharaPcs;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -390,7 +391,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 			if (S32At(anim, 0x20) != 0) {
 				continue;
 			}
-			if (TryReleaseAnimBank__9CCharaPcsFi(CharaPcs, S32At(anim, 0x1C)) == 0) {
+			if (TryReleaseAnimBank__9CCharaPcsFi(&CharaPcs, S32At(anim, 0x1C)) == 0) {
 				return;
 			}
 		}

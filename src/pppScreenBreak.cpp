@@ -4,6 +4,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
@@ -70,22 +71,14 @@ static char s_f999_root_801dd4c8[] = "f999_root";
 char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 extern CGraphic GraphicsPcs;
 static const float FLOAT_80331cf4 = 0.5f;
-
-struct ScreenBreakCameraPcs {
-    u8 _pad0[4];
-    Mtx m_cameraMatrix;
-    u8 _pad34[0x14];
-    Mtx44 m_screenMatrix;
-    u8 _pad88[0x58];
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    float _236_4_;
-    float _240_4_;
-    float _244_4_;
-};
-
-extern ScreenBreakCameraPcs CameraPcs;
+static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
+static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
+static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
+static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
+static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
+static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
+static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
+static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48); }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
@@ -155,15 +148,15 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     basis.y = DAT_801dd4b4;
     basis.z = DAT_801dd4b8;
 
-    cameraForward.x = CameraPcs._236_4_;
-    cameraForward.y = CameraPcs._240_4_;
-    cameraForward.z = CameraPcs._244_4_;
-    cameraRefPos.x = CameraPcs._224_4_;
-    cameraRefPos.y = CameraPcs._228_4_;
-    cameraRefPos.z = CameraPcs._232_4_;
+    cameraForward.x = CameraDirX();
+    cameraForward.y = CameraDirY();
+    cameraForward.z = CameraDirZ();
+    cameraRefPos.x = CameraPosX();
+    cameraRefPos.y = CameraPosY();
+    cameraRefPos.z = CameraPosZ();
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(CameraMatrix(), cameraMtx);
+    PSMTX44Copy(CameraScreenMatrix(), screenMtx);
 
     PSVECCrossProduct(&cameraForward, &basis, &cameraPos);
     PSVECNormalize(&cameraPos, &cameraPos);
@@ -262,9 +255,9 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     unsigned char colorStorage[4];
     unsigned int colorPacked;
 
-    local_50.x = CameraPcs._236_4_ - (FLOAT_80331ce8 + CameraPcs._224_4_);
-    local_50.y = CameraPcs._240_4_ - (FLOAT_80331ce8 + CameraPcs._228_4_);
-    local_50.z = CameraPcs._244_4_ - (FLOAT_80331ce8 + CameraPcs._232_4_);
+    local_50.x = CameraDirX() - (FLOAT_80331ce8 + CameraPosX());
+    local_50.y = CameraDirY() - (FLOAT_80331ce8 + CameraPosY());
+    local_50.z = CameraDirZ() - (FLOAT_80331ce8 + CameraPosZ());
     PSVECNormalize(&local_50, &local_50);
 
     GXInitSpecularDirHA(&local_44, local_50.x, local_50.y, local_50.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);

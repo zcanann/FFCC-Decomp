@@ -5,6 +5,7 @@
 #include "ffcc/math.h"
 #include "ffcc/astar.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/vector.h"
@@ -13,7 +14,6 @@
 #include <math.h>
 #include <string.h>
 
-extern unsigned char DbgMenuPcs[];
 extern unsigned char ARRAY_8030918c[];
 extern unsigned char CFlat[];
 extern "C" char DAT_803319ec[];
@@ -1314,7 +1314,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 	if ((((int)((unsigned int)object->m_weaponNodeFlags << 0x18) < 0) &&
 			(*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
-		((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 0x6484) & 0x80) != 0)) {
+		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
 		char text[0x100];
 		unsigned short aiState = *reinterpret_cast<unsigned short*>(mon + 0x6E4);
 		int targetIndex = *reinterpret_cast<int*>(mon + 0x6C4);
@@ -2418,7 +2418,8 @@ void CGMonObj::moveFrame()
 		in_f29 = PSVECDistance(&local_68, &object->m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) != 0)) {
-			int polygonGroup = calcPolygonGroup__6CAStarFP3Veci(DbgMenuPcs + 0x2A5C, &local_68, (int)object->m_moveVec.x);
+			int polygonGroup = calcPolygonGroup__6CAStarFP3Veci(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C, &local_68,
+			                                                   (int)object->m_moveVec.x);
 			moveAStar(aStarGroupId, polygonGroup, local_68);
 		}
 	} else if ((moveFlags & 0x2000) != 0) {

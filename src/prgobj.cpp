@@ -2,6 +2,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/math.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include "ffcc/vector.h"
 
@@ -15,7 +16,6 @@ extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern unsigned char CFlat[];
-extern unsigned char PartPcs[];
 
 /*
  * --INFO--
@@ -67,7 +67,8 @@ void CGPrgObj::onFrame()
     onFrameAlways();
 
 	if ((m_weaponNodeFlags & 0x8000) != 0) {
-		if ((GetCID() & 0x2d) == 0x2d && PartPcs[0x2d] != 0) {
+		if ((GetCID() & 0x2d) == 0x2d &&
+		    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x2d) != 0) {
 			return;
 		}
 

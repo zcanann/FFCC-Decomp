@@ -1,6 +1,5 @@
 #include "ffcc/p_sound.h"
 #include "ffcc/linkage.h"
-#include "ffcc/sound.h"
 
 CSoundPcs SoundPcs;
 extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
@@ -9,6 +8,7 @@ unsigned int m_table_desc1__9CSoundPcs[3];
 unsigned int m_table_desc2__9CSoundPcs[3];
 unsigned int m_table_desc3__9CSoundPcs[3];
 unsigned char m_table__9CSoundPcs[0x15C];
+extern unsigned char Sound[];
 extern "C" {
 void LoadBlock__6CSoundFv(void*);
 void CancelLoadWaveASync__6CSoundFv(void*);

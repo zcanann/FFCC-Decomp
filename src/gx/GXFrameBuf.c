@@ -175,13 +175,14 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
 
     __GXData->cpTexZ = (u8)((u32)__cntlzw((fmt & _GX_TF_ZTF) - _GX_TF_ZTF) >> 5);
     __GXData->cpTex = (__GXData->cpTex & 0xFFFFFFF7) | (peTexFmt & 8);
+    peTexFmt &= 7;
     __GetImageTileCount(fmt, wd, ht, &rowTiles, &colTiles, &cmpTiles);
 
     __GXData->cpTexStride = 0;
     __GXData->cpTexStride = (__GXData->cpTexStride & 0xFFFFFC00) | (rowTiles * cmpTiles);
     __GXData->cpTexStride = (__GXData->cpTexStride & 0x00FFFFFF) | 0x4D000000;
     __GXData->cpTex = (__GXData->cpTex & 0xFFFFFDFF) | ((u32)mipmap << 9);
-    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFF8F) | ((peTexFmt & 7) << 4);
+    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFF8F) | (peTexFmt << 4);
 }
 
 /*

@@ -127,13 +127,13 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
-    if (param_2->m_graphId == *(u32*)pppLocationTitle) {
+    if (param_2->m_graphId == pppLocationTitle->m_graphId) {
         work->m_cur += param_2->m_arg3;
-        work->m_vel += *(float*)param_2->m_payload;
-        work->m_acc += *(float*)((u8*)param_2->m_payload + 4);
+        work->m_vel += param_2->m_payload0;
+        work->m_acc += param_2->m_payload1;
     }
 
-    maxCount = param_2->m_pad;
+    maxCount = param_2->m_maxCount;
     if (work->m_particles == NULL) {
         LocationTitleParticle* particle;
 
@@ -161,9 +161,9 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         return;
     }
 
-    graphId = *(u32*)pppLocationTitle;
+    graphId = pppLocationTitle->m_graphId;
     graphFrame = GetGraphFrameFromId(graphId);
-    if (graphFrame < *(u16*)(param_2->m_payload + 8)) {
+    if (graphFrame < (int)param_2->m_spawnFrame) {
         return;
     }
 
@@ -249,15 +249,14 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         return;
     }
 
-    u32 graphId = *(u32*)pppLocationTitle;
+    u32 graphId = pppLocationTitle->m_graphId;
     int fadeDivisor = -1;
     int graphFrame = GetGraphFrameFromId(graphId);
     LocationTitleParticle* particle = (LocationTitleParticle*)work->m_particles;
-    long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+    long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
 
-    if ((int)(u16)*(u16*)(param_2->m_payload + 10) <= graphFrame) {
-        fadeDivisor = (int)(u16)*(u16*)(param_2->m_payload + 12)
-                      + (graphFrame - (int)(u16)*(u16*)(param_2->m_payload + 10));
+    if ((int)param_2->m_fadeStartFrame <= graphFrame) {
+        fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
     }
 
     for (int i = 0; i < work->m_count; i++, particle++) {
@@ -286,7 +285,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         GXLoadPosMtxImm(model, 0);
 
         pppSetBlendMode(*(((u8*)&param_2->m_stepValue) + 1));
-        pppDrawShp(shapeTable, particle->m_shapeA, pppEnvStPtr->m_materialSetPtr,
+        pppDrawShp(*shapeTable, particle->m_shapeA, pppEnvStPtr->m_materialSetPtr,
                    *(((u8*)&param_2->m_stepValue) + 1));
     }
 }

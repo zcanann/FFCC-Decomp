@@ -7,6 +7,9 @@
 #include <Dolphin/mtx.h>
 
 struct Vec;
+struct ZLIST;
+struct RSDLISTITEM;
+struct ZCANMGRP;
 
 struct pppFMATRIX {
     float value[3][4];
@@ -32,6 +35,14 @@ public:
 
     void CreateBoundaryBox(Vec&, Vec&, long, const Vec*);
     void SetUSBData();
+    void ResetRsdList(ZLIST*);
+    void DeleteRsdItem(RSDLISTITEM*);
+    void DeleteColAnmData(ZCANMGRP**, int);
+    int AddRsdList(ZLIST*);
+    int SetRsdFlag();
+    void GetRsdItemR();
+    int SetRsdIndex();
+    void GetRsdItem();
 
     CMemory::CStage* m_stage; // 0x04
     CUSBStreamData m_usbStream; // USB stream data for processing

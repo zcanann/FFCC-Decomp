@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
@@ -64,13 +65,25 @@ extern float ppvScreenMatrix[4][4];
 extern float FLOAT_80330670;
 extern float FLOAT_8033067C;
 
-extern struct {
-	char pad[0x94];
-	Mtx44 m_screenMatrix;
-	float _212_4_;
-	float _216_4_;
-	float _220_4_;
-} CameraPcs;
+static inline Mtx44& CameraScreenMatrix()
+{
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+}
+
+static inline float CameraLookAtX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD4);
+}
+
+static inline float CameraLookAtY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD8);
+}
+
+static inline float CameraLookAtZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
+}
 
 extern "C" {
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
@@ -191,7 +204,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 			}
 
 			if (*(s32*)((u8*)param1 + 0xC) == 0) {
-				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+				PSMTX44Copy(CameraScreenMatrix(), screenMtx);
 				inVec.x = FLOAT_80330670;
 				inVec.y = FLOAT_80330670;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
@@ -212,9 +225,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				cameraY = ppvCameraMatrix02[1][3];
 				cameraZ = ppvCameraMatrix02[2][3];
 			} else {
-				cameraX = CameraPcs._212_4_;
-				cameraY = CameraPcs._216_4_;
-				cameraZ = CameraPcs._220_4_;
+				cameraX = CameraLookAtX();
+				cameraY = CameraLookAtY();
+				cameraZ = CameraLookAtZ();
 			}
 			pppMngStPtr->m_matrix.value[0][3] = cameraX;
 			pppMngStPtr->m_matrix.value[1][3] = cameraY;

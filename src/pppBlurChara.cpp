@@ -3,6 +3,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
@@ -45,18 +46,37 @@ extern float FLOAT_8033104c;
 extern float FLOAT_80331050;
 extern float FLOAT_80331054;
 
-extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-    Mtx44 m_screenMatrix;
-} CameraPcs;
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
+static inline float CameraLookAtX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
+}
+
+static inline float CameraLookAtZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
+}
+
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+}
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+}
+
+static inline Mtx44& CameraScreenMatrix()
+{
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
+}
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -357,18 +377,18 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.x = CameraWorldX();
     cameraPos.y = FLOAT_80331030;
-    cameraPos.z = CameraPcs._232_4_;
-    cameraTarget.x = CameraPcs._212_4_;
+    cameraPos.z = CameraWorldZ();
+    cameraTarget.x = CameraLookAtX();
     cameraTarget.y = FLOAT_80331030;
-    cameraTarget.z = CameraPcs._220_4_;
+    cameraTarget.z = CameraLookAtZ();
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = FLOAT_80331030;
 
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(CameraMatrix(), cameraMtx);
 
     objPos.x = *(float*)(objPosBase + 0x15C);
     objPos.y = *(float*)(objPosBase + 0x160);
@@ -431,7 +451,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTX44Copy(CameraScreenMatrix(), screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
     inVec.z = -(PSVECDistance(&cameraPos, &objPos) - param_2->m_stepValue);

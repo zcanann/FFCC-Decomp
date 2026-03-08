@@ -10,6 +10,7 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
@@ -27,16 +28,6 @@ extern "C" char DAT_801d63c0[];
 extern "C" char DAT_801d6400[];
 extern "C" char DAT_801d643c[];
 extern "C" int __cntlzw(unsigned int);
-
-extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-} CameraPcs;
 
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -69,6 +60,31 @@ static inline int& S32At(CGraphic* self, u32 offset) {
 
 static inline u8& U8At(CGraphic* self, u32 offset) {
     return *reinterpret_cast<u8*>(reinterpret_cast<u8*>(self) + offset);
+}
+
+static inline float CameraNearZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
+}
+
+static inline float CameraFarZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
+}
+
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+}
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
 }
 
 extern "C" {
@@ -1191,7 +1207,7 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(CameraMatrix(), cameraMtx);
     GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
     GXSetChanMatColor(GX_COLOR0A0, materialColor);
     GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
@@ -1324,10 +1340,10 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
     float farZ;
 
     if (&nearZ != 0) {
-        nearZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
+        nearZ = CameraNearZ();
     }
     if (&farZ != 0) {
-        farZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
+        farZ = CameraFarZ();
     }
 
     if (useGlobalColor != 0) {
@@ -1653,16 +1669,16 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	hasFarAlpha = false;
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
-	cameraPos.x = CameraPcs._224_4_;
+	cameraPos.x = CameraWorldX();
 	cameraPos.y = 0.0f;
-	cameraPos.z = CameraPcs._232_4_;
+	cameraPos.z = CameraWorldZ();
 
 	targetPos.y = 0.0f;
 	PSVECSubtract(&targetPos, &cameraPos, &cameraToTarget);
 
 	GXGetProjectionv(gxProjection);
 	GXGetViewportv(gxViewport);
-	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+	PSMTXCopy(CameraMatrix(), cameraMtx);
 
 	if (mode != 2) {
 		PSVECScale(&cameraToTarget, &scaledDir, nearDist);
@@ -1924,7 +1940,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.z = 0.0f;
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(CameraMatrix(), cameraMtx);
     GXGetProjectionv(projection);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjectionv(projection);

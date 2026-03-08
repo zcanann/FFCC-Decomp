@@ -6,6 +6,7 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
 #include <string.h>
@@ -14,8 +15,6 @@ CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
-class CPartPcs;
-extern CPartPcs PartPcs;
 extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
 extern u32 DAT_80212398;
 extern u32 DAT_8021239c;

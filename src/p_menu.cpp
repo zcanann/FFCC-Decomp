@@ -46,7 +46,6 @@ extern "C" void __dt__8CMenuPcsFv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, char*, int);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
@@ -61,7 +60,6 @@ extern "C" void destroyBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void destroySingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
@@ -289,8 +287,7 @@ void CMenuPcs::create()
     }
 
     *reinterpret_cast<CMemory::CStage**>(self + 0xEC) =
-        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
-            &Memory, menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0));
+        Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
     *reinterpret_cast<int*>(self + 0x740) = -1;
 
     memset(self + 0x14C, 0, 0x40);
@@ -362,7 +359,7 @@ void CMenuPcs::destroy()
     ReleaseRefObject(*reinterpret_cast<void**>(self + 0xf8));
     *reinterpret_cast<void**>(self + 0xf8) = nullptr;
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(self + 0xec));
+    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(self + 0xec));
     if (*(self + 0x859) != 0) {
         *reinterpret_cast<void**>(self + 0xf0) = nullptr;
         *(self + 0x859) = 0;

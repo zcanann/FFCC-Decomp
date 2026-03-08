@@ -1,6 +1,7 @@
 #include "ffcc/pppCrystal.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 
@@ -36,15 +37,10 @@ static const float FLOAT_80330fc0 = 0.5f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-extern struct {
-	float _224_4_;
-	float _228_4_;
-	float _232_4_;
-	float _236_4_;
-	float _240_4_;
-	float _244_4_;
-	float _252_4_;
-} CameraPcs;
+static inline float CameraPerspectiveFov()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+}
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -311,7 +307,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	} else {
 		C_MTXLightPerspective(
-			lightMtx, CameraPcs._252_4_, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
+			lightMtx, CameraPerspectiveFov(), FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	}
 
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);

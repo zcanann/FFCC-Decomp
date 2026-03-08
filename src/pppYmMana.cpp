@@ -3,6 +3,7 @@
 #include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
@@ -33,13 +34,30 @@ extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
 extern char gUtil[];
 
-extern struct {
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-    Mtx44 m_screenMatrix;
-} CameraPcs;
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
+}
+
+static inline float CameraWorldY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
+}
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline Mtx44& CameraScreenMatrix()
+{
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x3C);
+}
 
 struct Vec2d {
     float x;
@@ -796,8 +814,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     }
 
     Graphic.SetViewport();
-    PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
+    PSMTXCopy(CameraMatrix(), savedCameraMtx);
+    PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = (CGObject*)work[0];
@@ -865,7 +883,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
             GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
             GXSetScissor(0, 0, 0x80, 0x80);
-            PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+            PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
             if (((gObject->m_weaponNodeFlags & 1) != 0 || gObject->m_attachOwner != NULL) &&
@@ -890,7 +908,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             sourceTexObjs += 0x20;
         }
 
-        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        PSMTXCopy(savedCameraMtx, CameraMatrix());
         Graphic.SetViewport();
         GXSetScissor(0, 0, 0x280, 0x1C0);
         for (i = 0; i < 0x10; i++) {
@@ -926,7 +944,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                           (GXTexObj*)(targetTexObjs + 0x28), 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
-        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        PSMTXCopy(savedCameraMtx, CameraMatrix());
         RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
             gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
             (_GXBlendFactor)4, (_GXBlendFactor)5);
@@ -1319,9 +1337,9 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
         cameraPos.y = ppvCameraMatrix0[1][3];
         cameraPos.z = ppvCameraMatrix0[2][3];
     } else {
-        cameraPos.x = CameraPcs._224_4_;
-        cameraPos.y = CameraPcs._228_4_;
-        cameraPos.z = CameraPcs._232_4_;
+        cameraPos.x = CameraWorldX();
+        cameraPos.y = CameraWorldY();
+        cameraPos.z = CameraWorldZ();
     }
 
     transformedCameraPos.x = FLOAT_80330e4c;
@@ -1431,9 +1449,9 @@ void CalcReflectionVector2(
     const double scale = (double)FLOAT_80330e64;
     char* compareName = (char*)&Game + 0xC7F4;
 
-    cameraPos.x = CameraPcs._224_4_;
-    cameraPos.y = CameraPcs._228_4_;
-    cameraPos.z = CameraPcs._232_4_;
+    cameraPos.x = CameraWorldX();
+    cameraPos.y = CameraWorldY();
+    cameraPos.z = CameraWorldZ();
 
     PSMTXCopy(matrix, matrixCopy);
     PSMTXCopy((float (*)[4])((u8*)node + 0x14), nodeOffsetMtx);

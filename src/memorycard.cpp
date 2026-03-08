@@ -1,5 +1,6 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_game.h"
@@ -17,10 +18,14 @@ CMemoryCardMan MemoryCardMan;
 extern "C" void SaveScript__5CGameFPc(void* game, char* scriptData);
 extern "C" void LoadScript__5CGameFPc(void* game, char* scriptData);
 class CChara;
-extern CChara Chara;
 extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* outTexels);
 extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels);
 extern "C" unsigned short GetArtifactIncludeHpMax__12CCaravanWorkFv(void*);
+
+static inline CChara* GetCharaGlobal()
+{
+    return reinterpret_cast<CChara*>(Chara);
+}
 
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {
@@ -883,7 +888,7 @@ void CMemoryCardMan::MakeSaveData()
     }
 
     SaveScript__5CGameFPc(&Game.game, reinterpret_cast<char*>(save + 0x62D0));
-    SaveFurTexBuffer__6CCharaFPUs(&Chara, reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    SaveFurTexBuffer__6CCharaFPUs(GetCharaGlobal(), reinterpret_cast<unsigned short*>(save + 0x6AD0));
 }
 
 /*
@@ -1041,7 +1046,7 @@ void CMemoryCardMan::SetLoadData()
     }
 
     LoadScript__5CGameFPc(&Game.game, reinterpret_cast<char*>(save + 0x62D0));
-    LoadFurTexBuffer__6CCharaFPUs(&Chara, reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    LoadFurTexBuffer__6CCharaFPUs(GetCharaGlobal(), reinterpret_cast<unsigned short*>(save + 0x6AD0));
 
 }
 

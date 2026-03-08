@@ -1,5 +1,6 @@
 #include "ffcc/pppRain.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
@@ -10,9 +11,20 @@ const float FLOAT_8033101c = 1.0f;
 const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
 
-extern struct {
-    float _212_4_, _216_4_, _220_4_;
-} CameraPcs;
+static inline float CameraLookAtX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
+}
+
+static inline float CameraLookAtY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+}
+
+static inline float CameraLookAtZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
+}
 
 extern "C" {
 int rand(void);
@@ -214,9 +226,9 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     }
 
     if (gPppInConstructor == 0) {
-        float posX = CameraPcs._212_4_;
-        float posY = CameraPcs._216_4_;
-        float posZ = CameraPcs._220_4_;
+        float posX = CameraLookAtX();
+        float posY = CameraLookAtY();
+        float posZ = CameraLookAtZ();
         if (Game.game.m_currentSceneId == 7) {
             posX = ppvCameraMatrix0[0][3];
             posY = ppvCameraMatrix0[1][3];

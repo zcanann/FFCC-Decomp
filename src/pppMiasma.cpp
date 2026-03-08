@@ -1,5 +1,6 @@
 #include "ffcc/pppMiasma.h"
 #include "ffcc/graphic.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
@@ -15,12 +16,25 @@ extern float FLOAT_80331938;
 extern float FLOAT_8033193c;
 extern float FLOAT_80331940;
 
-extern struct {
-    float _212_4_, _216_4_, _220_4_;
-    float _224_4_, _228_4_, _232_4_;
-    Mtx m_cameraMatrix;
-    Mtx44 m_screenMatrix;
-} CameraPcs;
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline float CameraWorldY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+}
+
+static inline Mtx44& CameraScreenMatrix()
+{
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
+}
 
 extern "C" {
 void GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
@@ -163,9 +177,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             }
         }
     } else {
-        cameraPos.x = CameraPcs._224_4_;
-        cameraPos.y = CameraPcs._228_4_;
-        cameraPos.z = CameraPcs._232_4_;
+        cameraPos.x = CameraWorldX();
+        cameraPos.y = CameraWorldY();
+        cameraPos.z = CameraWorldZ();
         maxRadius = FLOAT_80331934;
     }
 
@@ -217,7 +231,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         GXLoadPosMtxImm(*(Mtx*)((u8*)pppMiasma + 0x40), 0);
         GXSetNumTevStages(1);
         GXSetNumTexGens(0);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        PSMTX44Copy(CameraScreenMatrix(), screenMtx);
         GXSetProjection(screenMtx, GX_ORTHOGRAPHIC);
         PSMTXScale(scaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
         PSMTXConcat(scaleMtx, *(Mtx*)((u8*)pppMiasma + 4), localMtx);

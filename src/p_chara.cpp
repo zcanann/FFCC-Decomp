@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/symbols_shared.h"
 
 #include <string.h>
@@ -22,8 +23,6 @@ extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
-class CPartPcs;
-extern CPartPcs PartPcs;
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";

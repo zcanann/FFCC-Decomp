@@ -1,5 +1,6 @@
 #include "ffcc/LocationTitle2.h"
 #include "ffcc/chara.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/p_game.h"
@@ -23,15 +24,20 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
-extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-} CameraPcs;
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline float CameraWorldY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+}
 
 static int GetGraphFrameFromId(u32 graphId)
 {
@@ -299,9 +305,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
             matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
 
-            cameraPos.x = CameraPcs._224_4_;
-            cameraPos.y = CameraPcs._228_4_;
-            cameraPos.z = CameraPcs._232_4_;
+            cameraPos.x = CameraWorldX();
+            cameraPos.y = CameraWorldY();
+            cameraPos.z = CameraWorldZ();
 
             PSVECSubtract(&cameraPos, &matrixPos, &look);
             if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {

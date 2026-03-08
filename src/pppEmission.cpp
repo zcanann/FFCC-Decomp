@@ -1,6 +1,7 @@
 #include "ffcc/pppEmission.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
@@ -25,8 +26,6 @@ extern _pppMngStEmission* pppMngStPtr;
 extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 extern const char DAT_803311fc[];
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;

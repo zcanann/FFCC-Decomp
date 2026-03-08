@@ -1,5 +1,6 @@
 #include "ffcc/pppBlurChara.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
@@ -32,9 +33,6 @@ struct pppMngStBlurCharaRaw {
     char _padding0[0xDC];
     void* m_charaObj;
 };
-
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 
 extern float FLOAT_80331030;
 extern float FLOAT_80331034;

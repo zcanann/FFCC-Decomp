@@ -2,6 +2,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
@@ -17,8 +18,6 @@ public:
 };
 
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
-class CGamePcs;
-extern CGamePcs Game;
 extern "C" {
 unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;

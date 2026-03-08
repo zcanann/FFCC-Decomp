@@ -1,4 +1,5 @@
 #include "ffcc/pppDrawMdlTs.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/types.h"
@@ -11,8 +12,6 @@ void pppSetBlendMode__FUc(unsigned char);
 void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
 }
-
-extern CMaterialMan MaterialMan;
 
 // Use simple forward declarations and casting approach
 

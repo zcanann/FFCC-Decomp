@@ -10,6 +10,12 @@ extern unsigned char CFlat[];
 extern unsigned char Chara[];
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
+class CMapMng;
+extern CMapMng MapMng;
+class CGamePcs;
+extern CGamePcs Game;
+class CSound;
+extern CSound Sound;
 extern u32 CFlatFlags;
 extern Mtx gFlatPosMtx;
 

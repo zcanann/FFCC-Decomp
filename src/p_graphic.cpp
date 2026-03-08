@@ -1,5 +1,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/gxfunc.h"
@@ -21,7 +22,6 @@ extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
 extern int DAT_802381a0;
-extern CMaterialMan MaterialMan;
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];

@@ -1,4 +1,5 @@
 #include "ffcc/mapshadow.h"
+#include "ffcc/linkage.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/materialman.h"
 #include "ffcc/vector.h"
@@ -15,9 +16,6 @@ public:
 extern const float FLOAT_8032fce0 = 1.0f;
 extern const double DOUBLE_8032fce8 = 0.5;
 extern const float FLOAT_8032fcf0 = 0.5f;
-
-class CMapMng;
-extern CMapMng MapMng;
 
 /*
  * --INFO--

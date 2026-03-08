@@ -4,6 +4,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/memory.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
@@ -14,7 +15,6 @@
 float kOctTreeBoundMinInit = 10000000000.0f;
 float kOctTreeBoundMaxInit = -10000000000.0f;
 float kOctTreeCylinderPad = 1.0f;
-extern CMaterialMan MaterialMan;
 static unsigned long s_clearFlagMask;
 struct CBoundRaw
 {

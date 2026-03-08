@@ -1,5 +1,6 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/linkage.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
@@ -7,14 +8,10 @@
 #include <string.h>
 
 class CMaterial;
-class CMaterialMan;
-class CMapMng;
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
-extern CMaterialMan MaterialMan;
-extern CMapMng MapMng;
 
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);

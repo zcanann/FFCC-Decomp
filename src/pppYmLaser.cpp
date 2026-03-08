@@ -12,7 +12,6 @@
 
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 
 extern const f32 FLOAT_80330df0;

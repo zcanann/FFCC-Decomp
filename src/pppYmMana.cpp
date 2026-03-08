@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
@@ -30,8 +31,6 @@ extern char DAT_80330e98[];
 extern char DAT_80330ea0[];
 extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 extern char gUtil[];
 
 extern struct {

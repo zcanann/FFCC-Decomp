@@ -1,5 +1,6 @@
 #include "ffcc/mapanim.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
@@ -46,8 +47,6 @@ extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
 extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
 extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
 extern "C" int Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(CPtrArray<CMapAnimKeyDt*>*, CMapAnimKeyDt*);
-class CMapMng;
-extern CMapMng MapMng;
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";

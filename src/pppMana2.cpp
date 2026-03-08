@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
@@ -42,8 +43,6 @@ extern struct {
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 extern char DAT_80331900[];
 extern char DAT_803318d4[];
 extern char DAT_803318dc[];

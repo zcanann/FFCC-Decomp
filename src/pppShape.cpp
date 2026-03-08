@@ -1,11 +1,11 @@
 #include "ffcc/pppShape.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/partMng.h"
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
-    extern CMaterialMan MaterialMan;
     extern unsigned char ppvAmemCacheSet[];
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);

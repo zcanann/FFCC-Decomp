@@ -3,6 +3,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
@@ -20,7 +21,6 @@ const float kMapObjInitNegOne = 1000000000000000.0f;
 float kMapObjDegToRad = 0.017453292f;
 const float kMapObjInitValue50 = -1.0f;
 unsigned int DAT_8032e498 = 0xFFFFFFFF;
-extern CMaterialMan MaterialMan;
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);

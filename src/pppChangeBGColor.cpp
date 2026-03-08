@@ -1,8 +1,6 @@
 #include "ffcc/pppChangeBGColor.h"
+#include "ffcc/linkage.h"
 #include "ffcc/ppp_linkage.h"
-
-class CMapMng;
-extern CMapMng MapMng;
 
 /*
  * --INFO--

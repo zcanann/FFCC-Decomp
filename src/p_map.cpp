@@ -51,7 +51,6 @@ unsigned int s_loadedMapNo__7CMapPcs;
 extern float DrawRangeDefault;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
-extern CMaterialMan MaterialMan;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
 extern "C" const char s__________________________________801d7734[];

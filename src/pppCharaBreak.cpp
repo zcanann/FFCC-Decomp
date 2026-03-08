@@ -1,6 +1,7 @@
 #include "ffcc/pppCharaBreak.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 
 #include "dolphin/gx.h"
@@ -20,7 +21,6 @@ extern struct _pppEnvSt {
 } *pppEnvStPtr;
 extern char gUtil[];
 class CMaterialMan;
-extern CMaterialMan MaterialMan;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;

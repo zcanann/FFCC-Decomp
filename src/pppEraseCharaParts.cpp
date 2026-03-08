@@ -1,10 +1,9 @@
 #include "ffcc/pppEraseCharaParts.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/partMng.h"
 
 #include <dolphin/gx.h>
-
-extern CMaterialMan MaterialMan;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

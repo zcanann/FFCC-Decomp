@@ -559,16 +559,17 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
  */
 void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
 {
-    MeshDrawEntry* entry = DrawEntries(this);
     unsigned int remaining = U16At(this, 0xA);
+    MeshDrawEntry* entry = DrawEntries(this);
 
-    while (remaining-- != 0) {
+    while (remaining != 0) {
         if (entry->size != 0) {
             if (drawMaterialPart != 0) {
                 SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet, entry->materialIdx, 1);
             }
             GXCallDisplayList(entry->displayList, entry->size);
         }
+        remaining--;
         entry++;
     }
 }

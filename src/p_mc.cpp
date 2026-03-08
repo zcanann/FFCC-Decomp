@@ -1,6 +1,5 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/math.h"
-#include "ffcc/p_menu.h"
 #include "ffcc/symbols_shared.h"
 
 extern "C" {
@@ -40,6 +39,8 @@ struct MenuPcsMcLayout
     unsigned char unk19[7];
     McCtrl m_mcCtrl;
 };
+
+extern MenuPcsMcLayout MenuPcs;
 
 /*
  * --INFO--
@@ -104,16 +105,14 @@ void CMcPcs::calc()
 {
     int result;
     int worldParam;
-    MenuPcsMcLayout* menuPcs;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
-    menuPcs = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs);
 
-    if (menuPcs->field14 != 1)
+    if (MenuPcs.field14 != 1)
     {
-        if (menuPcs->field18 == 0x13)
+        if (MenuPcs.field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&menuPcs->m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&MenuPcs.m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -130,11 +129,11 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
-                menuPcs->field18 = 0;
+                MenuPcs.field18 = 0;
             }
         }
-        else if (menuPcs->field18 == 0x12 &&
-                 (result = menuPcs->m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (MenuPcs.field18 == 0x12 &&
+                 (result = MenuPcs.m_mcCtrl.ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {
@@ -158,7 +157,7 @@ void CMcPcs::calc()
             }
 
             CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
-            menuPcs->field18 = 0;
+            MenuPcs.field18 = 0;
         }
     }
 }

@@ -1,5 +1,6 @@
 #include "ffcc/pppChangeTex.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/gx.h"
 #include <string.h>
@@ -39,8 +40,6 @@ struct ChangeTexMeshRef {
 	u8 _padC[0x14 - 0xC];
 };
 
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 extern void GXCallDisplayList(void*, unsigned int);
 extern float FLOAT_80332020;

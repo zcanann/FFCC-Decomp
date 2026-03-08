@@ -1,6 +1,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/linkage.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
@@ -54,11 +55,6 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
 extern "C" void* PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc[];
-class CGamePcs;
-extern CGamePcs Game;
-class CMapMng;
-extern CMapMng MapMng;
-extern CMaterialMan MaterialMan;
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;

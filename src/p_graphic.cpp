@@ -1,11 +1,13 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
 #include "types.h"
@@ -21,7 +23,6 @@ extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
 extern int DAT_802381a0;
-extern CMaterialMan MaterialMan;
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
@@ -736,8 +737,6 @@ void CGraphicPcs::drawScreenFade()
         float z;
     };
 
-    extern CameraForFade CameraPcs;
-
     Mtx44 orthoMtx;
     Mtx cameraMtx;
     Mtx44 screenMtx;
@@ -747,13 +746,14 @@ void CGraphicPcs::drawScreenFade()
     C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    CameraForFade& cameraPcs = *reinterpret_cast<CameraForFade*>(&CameraPcs);
+    PSMTXCopy(cameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, screenMtx);
     screenMtx[3][0] = 0.0f;
     screenMtx[3][1] = 0.0f;
     screenMtx[3][2] = 0.0f;
     screenMtx[3][3] = 1.0f;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
+    PSMTX44Copy(cameraPcs.m_screenMatrix, worldScreenMtx);
     PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
 
     GXClearVtxDesc();
@@ -1035,6 +1035,6 @@ void CGraphicPcs::drawScreenFade()
         GXTexCoord2u16(0, 2);
     }
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
+    PSMTX44Copy(cameraPcs.m_screenMatrix, orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }

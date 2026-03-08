@@ -1,4 +1,5 @@
 #include "ffcc/pppYmChangeTex.h"
+#include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -39,8 +40,6 @@ struct ChangeTexMeshRef {
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 extern float DAT_80330e10;
 extern char gUtil[];
 char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";

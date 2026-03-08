@@ -1,4 +1,5 @@
 #include "ffcc/pppYmMelt.h"
+#include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/pppYmEnv.h"
@@ -15,7 +16,6 @@ const double DOUBLE_80330b00 = 4503601774854144.0;
 const float FLOAT_80330b10 = -2000.0f;
 const float FLOAT_80330b14 = 10000000000.0f;
 const float FLOAT_80330b18 = -10000000000.0f;
-extern CMapMng MapMng;
 
 extern "C" {
 int rand(void);

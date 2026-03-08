@@ -1,5 +1,6 @@
 #include "ffcc/p_camera.h"
 
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/map.h"
 #include "ffcc/math.h"
@@ -63,7 +64,6 @@ extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
-extern CMaterialMan MaterialMan;
 extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
 extern unsigned char DAT_8032ecd8;

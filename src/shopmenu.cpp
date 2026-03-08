@@ -1,4 +1,5 @@
 #include "ffcc/shopmenu.h"
+#include "ffcc/graphic.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
@@ -51,7 +52,6 @@ extern char DAT_80332e54[];
 unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];
 extern unsigned char PartPcs[];
-extern void* Graphic;
 extern void* ppvAmemCacheSet;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;

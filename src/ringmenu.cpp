@@ -5,6 +5,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pad.h"
 
@@ -55,7 +56,6 @@ extern "C" int GetGBAStart__6JoyBusFi(void*, int);
 extern "C" int IsInitSend__6JoyBusFi(void*, int);
 
 extern unsigned char Chara[];
-extern unsigned char CameraPcs[];
 extern unsigned char DAT_8020fab8[];
 extern unsigned char MenuPcs[];
 extern char DAT_801da01c[];
@@ -1050,7 +1050,7 @@ void CRingMenu::DrawIcon()
 
 	unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
 	Mtx cameraMtx;
-	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), cameraMtx);
+	PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMtx);
 
 	Vec offset;
 	offset.x = FLOAT_803309c0;
@@ -1067,7 +1067,7 @@ void CRingMenu::DrawIcon()
 	}
 
 	Mtx44 screenMtx;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), screenMtx);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48), screenMtx);
 	Vec4d clipPos;
 	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(0, screenMtx, &viewPos, &clipPos);
 

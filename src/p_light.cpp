@@ -1,6 +1,7 @@
 #include "ffcc/p_light.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_camera.h"
@@ -54,7 +55,6 @@ extern double DOUBLE_8032fc58;
 extern double DOUBLE_8032fc68;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
-extern CMaterialMan MaterialMan;
 
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 

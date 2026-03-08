@@ -82,21 +82,7 @@ const char* CMenuPcs::GetMcStr(int index)
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
     int languageId = Game.game.m_gameWork.m_languageId;
-    switch (group) {
-    case 0:
-        switch (languageId) {
-        case 2:
-            return s_McWinMessGroup0_de;
-        case 3:
-            return s_McWinMessGroup0_it;
-        case 4:
-            return s_McWinMessGroup0_es;
-        case 5:
-            return s_McWinMessGroup0_fr;
-        default:
-            return s_McWinMessGroup0_en;
-        }
-    case 1:
+    if (group == 1) {
         switch (languageId) {
         case 2:
             return s_McWinMessGroup1_de;
@@ -109,19 +95,34 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         default:
             return s_McWinMessGroup1_en;
         }
-    default:
+    }
+
+    if (group == 0) {
         switch (languageId) {
         case 2:
-            return s_McWinMessGroup2_de;
+            return s_McWinMessGroup0_de;
         case 3:
-            return s_McWinMessGroup2_it;
+            return s_McWinMessGroup0_it;
         case 4:
-            return s_McWinMessGroup2_es;
+            return s_McWinMessGroup0_es;
         case 5:
-            return s_McWinMessGroup2_fr;
+            return s_McWinMessGroup0_fr;
         default:
-            return s_McWinMessGroup2_en;
+            return s_McWinMessGroup0_en;
         }
+    }
+
+    switch (languageId) {
+    case 2:
+        return s_McWinMessGroup2_de;
+    case 3:
+        return s_McWinMessGroup2_it;
+    case 4:
+        return s_McWinMessGroup2_es;
+    case 5:
+        return s_McWinMessGroup2_fr;
+    default:
+        return s_McWinMessGroup2_en;
     }
 }
 

@@ -16,12 +16,16 @@ extern "C" {
 struct CMapCylinderRaw {
     Vec m_bottom;
     Vec m_direction;
-    f32 m_radius;
-    f32 m_height;
-    Vec m_top;
-    Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
+    f32 m_field_18;
+    f32 m_field_1C;
+    f32 m_field_20;
+    f32 m_field_24;
+    f32 m_field_28;
+    f32 m_field_2C;
+    f32 m_field_30;
+    f32 m_field_34;
+    f32 m_field_38;
+    f32 m_field_3C;
 };
 
 /*
@@ -68,16 +72,16 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cyl.m_direction.x = kPppYmCheckBGHeightAxisZero;
         cyl.m_direction.y = kPppYmCheckBGHeightProbeDirY;
         cyl.m_direction.z = kPppYmCheckBGHeightAxisZero;
-        cyl.m_radius = kPppYmCheckBGHeightAxisZero;
-        cyl.m_height = kPppYmCheckBGHeightCylinderScale;
-        cyl.m_top.x = kPppYmCheckBGHeightAxisZero;
-        cyl.m_top.y = kPppYmCheckBGHeightAxisZero;
-        cyl.m_top.z = kPppYmCheckBGHeightCylinderScale;
-        cyl.m_direction2.x = kPppYmCheckBGHeightCylinderScale;
-        cyl.m_direction2.y = kPppYmCheckBGHeightCylinderScale;
-        cyl.m_direction2.z = kPppYmCheckBGHeightCylinderOffset;
-        cyl.m_radius2 = kPppYmCheckBGHeightCylinderOffset;
-        cyl.m_height2 = kPppYmCheckBGHeightCylinderOffset;
+        cyl.m_field_18 = kPppYmCheckBGHeightAxisZero;
+        cyl.m_field_1C = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_field_20 = kPppYmCheckBGHeightAxisZero;
+        cyl.m_field_24 = kPppYmCheckBGHeightAxisZero;
+        cyl.m_field_28 = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_field_2C = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_field_30 = kPppYmCheckBGHeightCylinderScale;
+        cyl.m_field_34 = kPppYmCheckBGHeightCylinderOffset;
+        cyl.m_field_38 = kPppYmCheckBGHeightCylinderOffset;
+        cyl.m_field_3C = kPppYmCheckBGHeightCylinderOffset;
 
         if ((CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &direction, 0xFFFFFFFF) != 0) &&
             (CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos),

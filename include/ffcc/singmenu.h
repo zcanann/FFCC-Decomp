@@ -38,7 +38,7 @@ public:
     void DrawSingleIcon(int, int, int, float, int, float);
     void DrawShadowFont(CFont*, char*, float, float, int, int);
     void DrawNoShadowFont(CFont*, char*, float, float, int, int);
-    void GetItemType(int, int);
+    int GetItemType(int, int);
     void CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
     int EquipChk(int);

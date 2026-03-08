@@ -7,7 +7,6 @@
 
 #include <math.h>
 
-extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
@@ -317,8 +316,8 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 		pos = &m_worldPosition;
 	}
 
-	handle = PlaySe3D__6CSoundFiP3Vecffi(
-		&Sound, seNo, pos,
+	handle = Sound.PlaySe3D(
+		seNo, pos,
 		static_cast<float>(static_cast<unsigned int>(volume)),
 		static_cast<float>(static_cast<unsigned int>(dist)),
 		0
@@ -458,20 +457,15 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	float targetRot;
-	Vec* basePosVec;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
 	Vec deltaPos;
 
-	basePosVec = reinterpret_cast<Vec*>(&basePos);
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	targetRot = 0.0f;
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	m_rotTargetY = 0.0f;
 	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		m_rotTargetY = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
-
-	m_rotTargetY = targetRot;
 }
 
 /*

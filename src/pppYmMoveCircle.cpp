@@ -41,14 +41,14 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
-    tempUp.y = 1.0f;
-    tempUp.x = 0.0f;
+    tempUp.x = 1.0f;
+    tempUp.y = 0.0f;
     tempUp.z = 0.0f;
 
     PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = gPppYmMoveCircleRadToAngleScale * acosf(PSVECDotProduct(&tempUp, &temp1));
+    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
 
     if ((temp1.x <= 0.0f && temp1.z >= 0.0f) || (temp1.x >= 0.0f && temp1.z >= 0.0f)) {
         work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;

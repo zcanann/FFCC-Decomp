@@ -2658,42 +2658,81 @@ void CFlatRuntime2::resetSpawnBit(int spawnBit)
  */
 void CFlatRuntime2::resetChangeScript()
 {
-	static const int clearDwordOffsets[] = {
-		0x10404, 0x12A8, 0x12AC, 0x1BF4, 0x2708, 0x321C, 0x3D30, 0x4844, 0x5358, 0x5E6C,
-		0x6980,  0x7494, 0x7FA8, 0x8ABC, 0x95D0, 0xA0E4, 0xABF8, 0xB70C, 0xC220,
-	};
-
 	u8* runtime = reinterpret_cast<u8*>(this);
-	for (u32 i = 0; i < sizeof(clearDwordOffsets) / sizeof(clearDwordOffsets[0]); i++) {
-		*reinterpret_cast<u32*>(runtime + clearDwordOffsets[i]) = 0;
-	}
 
-	for (int i = 0; i < 2; i++) {
-		u8* block = runtime + i * 0xF8;
-		for (int j = 0; j < 16; j++) {
-			block[0x134C + j * 0x14] = 0xFF;
-			block[0x134D + j * 0x14] = 0;
-		}
-	}
+	*reinterpret_cast<u32*>(runtime + 0x10404) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x12A8) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x12AC) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x1BF4) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x2708) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x321C) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x3D30) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x4844) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x5358) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x5E6C) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x6980) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x7494) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x7FA8) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x8ABC) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x95D0) = 0;
+	*reinterpret_cast<u32*>(runtime + 0xA0E4) = 0;
+	*reinterpret_cast<u32*>(runtime + 0xABF8) = 0;
+	*reinterpret_cast<u32*>(runtime + 0xB70C) = 0;
+	*reinterpret_cast<u32*>(runtime + 0xC220) = 0;
+
+	int count = 2;
+	u8* block = runtime;
+	do {
+		block[0x134D] = 0;
+		block[0x134C] = 0xFF;
+		block[0x1361] = 0;
+		block[0x1360] = 0xFF;
+		block[0x1375] = 0;
+		block[0x1374] = 0xFF;
+		block[0x1389] = 0;
+		block[0x1388] = 0xFF;
+		block[0x139D] = 0;
+		block[0x139C] = 0xFF;
+		block[0x13B1] = 0;
+		block[0x13B0] = 0xFF;
+		block[0x13C5] = 0;
+		block[0x13C4] = 0xFF;
+		block[0x13D9] = 0;
+		block[0x13D8] = 0xFF;
+		block[0x13ED] = 0;
+		block[0x13EC] = 0xFF;
+		block[0x1401] = 0;
+		block[0x1400] = 0xFF;
+		block[0x1415] = 0;
+		block[0x1414] = 0xFF;
+		block[0x1429] = 0;
+		block[0x1428] = 0xFF;
+		block[0x143D] = 0;
+		block[0x143C] = 0xFF;
+		block[0x1451] = 0;
+		block[0x1450] = 0xFF;
+		block[0x1465] = 0;
+		block[0x1464] = 0xFF;
+		block[0x1479] = 0;
+		block[0x1478] = 0xFF;
+
+		block += 0xF8;
+		count--;
+	} while (count != 0);
 
 	*reinterpret_cast<u32*>(runtime + 0x1040C) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x10410) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x10414) = 0;
-
-	runtime[0x12E4] |= 0x80;
+	runtime[0x12E4] = (runtime[0x12E4] & 0x7F) | 0x80;
 	runtime[0x12E4] &= 0xDF;
 	runtime[0x12E4] &= 0xEF;
-
 	*reinterpret_cast<u32*>(runtime + 0x12E8) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x12EC) = 0;
-
 	memset(runtime + 0x1041C, 0, 0x14);
 	memset(reinterpret_cast<void*>(0x8030014C), 0, 0x8C);
-
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;
-
 	*reinterpret_cast<u32*>(PadRaw() + 0x1C8) = 1;
 	*reinterpret_cast<u32*>(GraphicsPcsRaw() + 0x44) = 0;
 	*reinterpret_cast<u32*>(CameraPcsRaw() + 0x434) = 1;

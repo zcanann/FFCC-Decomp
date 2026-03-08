@@ -26,7 +26,7 @@ extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*, int, char*, char*, char*, char*, char*, char*, char*, char*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" void PlaySe__6CSoundFiiii(void*, int, int, int, int);
+
 extern "C" void AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" void AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
@@ -1500,7 +1500,7 @@ int CMenuPcs::LetterCtrlCur()
 						}
 					}
 					*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-					PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
 					return 0;
 				}
 
@@ -1509,10 +1509,10 @@ int CMenuPcs::LetterCtrlCur()
 				    (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 5) & 1) == 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 2;
 					*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-					PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
 					return 0;
 				}
-				PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 				return 0;
 			}
 
@@ -1538,14 +1538,14 @@ int CMenuPcs::LetterCtrlCur()
 			}
 
 			*reinterpret_cast<s16*>(state + 0x22) = 0;
-			PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
 			return 0;
 		}
 
 		if (menuMode == 2) {
 			if ((hold & 0xC) != 0) {
 				*reinterpret_cast<u16*>(state + 0x28) ^= 1;
-				PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
 				return 0;
 			}
 			if ((press & 0x100) == 0) {
@@ -1561,7 +1561,7 @@ int CMenuPcs::LetterCtrlCur()
 				}
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-				PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 0;
 			}
 
@@ -1587,11 +1587,11 @@ int CMenuPcs::LetterCtrlCur()
 				}
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-				PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				return 0;
 			}
 
-			PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
 			return 0;
 		}
 
@@ -1604,7 +1604,7 @@ int CMenuPcs::LetterCtrlCur()
 					} else {
 						*reinterpret_cast<s16*>(state + 0x28) = 0;
 					}
-					PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			} else {
 				if (*reinterpret_cast<s16*>(state + 0x28) == 0) {
@@ -1612,7 +1612,7 @@ int CMenuPcs::LetterCtrlCur()
 				} else {
 					*reinterpret_cast<s16*>(state + 0x28) = *reinterpret_cast<s16*>(state + 0x28) - 1;
 				}
-				PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 
 			if ((hold & 0xC) != 0) {
@@ -1625,7 +1625,7 @@ int CMenuPcs::LetterCtrlCur()
 				*reinterpret_cast<u8*>(state + 8) = 0xFF;
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-				PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 0;
 			}
 
@@ -1672,7 +1672,7 @@ int CMenuPcs::LetterCtrlCur()
 
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-			PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
 			return 0;
 		}
 
@@ -1684,7 +1684,7 @@ int CMenuPcs::LetterCtrlCur()
 					} else {
 						*reinterpret_cast<s16*>(state + 0x28) = 0;
 					}
-					PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			} else {
 				if (*reinterpret_cast<s16*>(state + 0x28) == 0) {
@@ -1692,7 +1692,7 @@ int CMenuPcs::LetterCtrlCur()
 				} else {
 					*reinterpret_cast<s16*>(state + 0x28) = *reinterpret_cast<s16*>(state + 0x28) - 1;
 				}
-				PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 
 			if ((hold & 0xC) != 0) {
@@ -1711,7 +1711,7 @@ int CMenuPcs::LetterCtrlCur()
 				DAT_8032eef4 = 0;
 				DAT_8032eef0 = 0;
 				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-				PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				return 0;
 			}
 			if ((press & 0x200) == 0) {
@@ -1720,7 +1720,7 @@ int CMenuPcs::LetterCtrlCur()
 			*reinterpret_cast<u8*>(state + 8) = 0xFF;
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-			PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
 			return 0;
 		}
 
@@ -1730,7 +1730,7 @@ int CMenuPcs::LetterCtrlCur()
 
 		if ((hold & 0xC) != 0) {
 			*reinterpret_cast<u16*>(state + 0x28) ^= 1;
-			PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
 			return 0;
 		}
 		if ((press & 0x100) != 0) {
@@ -1762,7 +1762,7 @@ int CMenuPcs::LetterCtrlCur()
 
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-			PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
 			return 0;
 		}
 		if ((press & 0x200) == 0) {
@@ -1771,13 +1771,13 @@ int CMenuPcs::LetterCtrlCur()
 		*reinterpret_cast<u8*>(state + 8) = 0xFF;
 		*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 2;
-		PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+		Sound.PlaySe(3, 0x40, 0x7F, 0);
 		return 0;
 	}
 
 	int letterCount = *reinterpret_cast<int*>(caravanWork + 1000);
 	if ((letterCount == 0) && ((hold & 0xC) != 0)) {
-		PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+		Sound.PlaySe(4, 0x40, 0x7F, 0);
 		return 0;
 	}
 
@@ -1786,24 +1786,24 @@ int CMenuPcs::LetterCtrlCur()
 			int cursor = static_cast<int>(*reinterpret_cast<s16*>(state + 0x26));
 			if ((cursor < 8) && (cursor < letterCount - 1)) {
 				*reinterpret_cast<s16*>(state + 0x26) = *reinterpret_cast<s16*>(state + 0x26) + 1;
-				PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if (*reinterpret_cast<s16*>(state + 0x34) + cursor < letterCount - 1) {
 				*reinterpret_cast<s16*>(state + 0x34) = *reinterpret_cast<s16*>(state + 0x34) + 1;
-				PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
-				PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 	} else if (*reinterpret_cast<s16*>(state + 0x26) == 0) {
 		if (*reinterpret_cast<s16*>(state + 0x34) == 0) {
-			PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		} else {
 			*reinterpret_cast<s16*>(state + 0x34) = *reinterpret_cast<s16*>(state + 0x34) - 1;
-			PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 	} else {
 		*reinterpret_cast<s16*>(state + 0x26) = *reinterpret_cast<s16*>(state + 0x26) - 1;
-		PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
 	if ((hold & 0xC) != 0) {
@@ -1811,12 +1811,12 @@ int CMenuPcs::LetterCtrlCur()
 	}
 	if ((press & 0x20) != 0) {
 		*reinterpret_cast<s16*>(state + 0x1E) = 1;
-		PlaySe__6CSoundFiiii(&Sound, 0x5A, 0x40, 0x7F, 0);
+		Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 		return 1;
 	}
 	if ((press & 0x40) != 0) {
 		*reinterpret_cast<s16*>(state + 0x1E) = -1;
-		PlaySe__6CSoundFiiii(&Sound, 0x5A, 0x40, 0x7F, 0);
+		Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 		return 1;
 	}
 	if ((press & 0x100) == 0) {
@@ -1824,12 +1824,12 @@ int CMenuPcs::LetterCtrlCur()
 			return 0;
 		}
 		*reinterpret_cast<u8*>(state + 0xD) = 1;
-		PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+		Sound.PlaySe(3, 0x40, 0x7F, 0);
 		return 1;
 	}
 
 	if (letterCount == 0) {
-		PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+		Sound.PlaySe(4, 0x40, 0x7F, 0);
 		return 0;
 	}
 
@@ -1858,7 +1858,7 @@ int CMenuPcs::LetterCtrlCur()
 	}
 
 	*reinterpret_cast<s16*>(state + 0x22) = 0;
-	PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+	Sound.PlaySe(2, 0x40, 0x7F, 0);
 	return 0;
 }
 

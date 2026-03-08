@@ -9,15 +9,6 @@ unsigned int m_table_desc1__9CSoundPcs[3];
 unsigned int m_table_desc2__9CSoundPcs[3];
 unsigned int m_table_desc3__9CSoundPcs[3];
 unsigned char m_table__9CSoundPcs[0x15C];
-extern "C" {
-void LoadBlock__6CSoundFv(void*);
-void CancelLoadWaveASync__6CSoundFv(void*);
-void StopStream__6CSoundFv(void*);
-void StopAndFreeAllSe__6CSoundFi(void*, int);
-void FreeBlock__6CSoundFv(void*);
-void Frame__6CSoundFv(void*);
-void Draw__6CSoundFv(void*);
-}
 
 /*
  * --INFO--
@@ -112,7 +103,7 @@ void CSoundPcs::create()
  */
 void CSoundPcs::createLoad()
 {
-    LoadBlock__6CSoundFv(&Sound);
+    Sound.LoadBlock();
 }
 
 /*
@@ -126,10 +117,10 @@ void CSoundPcs::createLoad()
  */
 void CSoundPcs::destroy()
 {
-    CancelLoadWaveASync__6CSoundFv(&Sound);
-    StopStream__6CSoundFv(&Sound);
-    StopAndFreeAllSe__6CSoundFi(&Sound, 1);
-    FreeBlock__6CSoundFv(&Sound);
+    Sound.CancelLoadWaveASync();
+    Sound.StopStream();
+    Sound.StopAndFreeAllSe(1);
+    Sound.FreeBlock();
 }
 
 /*
@@ -143,7 +134,7 @@ void CSoundPcs::destroy()
  */
 void CSoundPcs::calc()
 {
-    Frame__6CSoundFv(&Sound);
+    Sound.Frame();
 }
 
 /*
@@ -158,6 +149,6 @@ void CSoundPcs::calc()
 void CSoundPcs::draw()
 {
     if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
-        Draw__6CSoundFv(&Sound);
+        Sound.Draw();
     }
 }

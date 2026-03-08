@@ -58,7 +58,6 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
 
 Mtx ppvCameraMatrix0;
@@ -2372,8 +2371,8 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 			if (se->m_soundEffectStartedOnce == 0)
 			{
 				u32 soundTableIndex = (u32)se->m_soundEffectKind - 3;
-				se->m_soundEffectHandle = PlaySe3D__6CSoundFiP3Vecffi(
-					&Sound, se->m_soundEffectSlot, &soundPos,
+				se->m_soundEffectHandle = Sound.PlaySe3D(
+					se->m_soundEffectSlot, &soundPos,
 					pppEnvStPtr->m_soundVolumeTable[soundTableIndex],
 					pppEnvStPtr->m_soundPitchTable[soundTableIndex], 0);
 				se->m_soundEffectStartedOnce = 1;

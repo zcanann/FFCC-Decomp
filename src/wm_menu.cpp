@@ -8,6 +8,7 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/p_game.h"
 #include "ffcc/linkage.h"
+#include "ffcc/sound.h"
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
 #include "ffcc/THPSimple.h"
@@ -23,7 +24,7 @@ extern "C" int rand(void);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
-extern "C" void PlaySe__6CSoundFiiii(void*, int, int, int, int);
+
 extern "C" void SetAnim__Q29CCharaPcs7CHandleFiiiii(void*, int, int, int, int, int);
 extern "C" void LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(void*, char*, int, int, int, int, int, int);
 extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned long, unsigned long);
@@ -659,7 +660,7 @@ void CMenuPcs::calcWorld()
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
 	if (worldState[8] == 0) {
-		PlaySe__6CSoundFiiii(&Sound, 0x138B, 0x40, 0x7F, 0);
+		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
 		SetAnim__Q29CCharaPcs7CHandleFiiiii(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x778)[0]), 0, -1, -1, -1, 0);
 		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
 		worldState[8] = 1;
@@ -703,10 +704,10 @@ void CMenuPcs::calcWorld()
 			}
 		} else {
 			if (nextAnim >= 1 && nextAnim <= 4) {
-				PlaySe__6CSoundFiiii(&Sound, 0x138C, 0x40, 0x7F, 0);
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
 				nextAnim++;
 			} else if (nextAnim == 5) {
-				PlaySe__6CSoundFiiii(&Sound, 0x138D, 0x40, 0x7F, 0);
+				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
 				nextAnim = 6;
 				reinterpret_cast<short*>(worldState + 0x10)[0] = 3;
 				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
@@ -729,7 +730,7 @@ void CMenuPcs::calcWorld()
 			reinterpret_cast<short*>(worldState + 0x18)[0] = 10;
 			reinterpret_cast<short*>(worldState + 0x1E)[0] = -1;
 			reinterpret_cast<short*>(worldState + 0x10)[0] = 4;
-			PlaySe__6CSoundFiiii(&Sound, 0x32, 0x40, 0x7F, 0);
+			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		} else {
 			AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
 		}
@@ -1145,11 +1146,11 @@ void CMenuPcs::CalcTitleMenu()
 				*reinterpret_cast<short*>(worldState + 0x24) = 0;
 				*reinterpret_cast<short*>(worldState + 0x12) = 0;
 				worldState[9] = 0;
-				PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if ((repeat & 0x100) != 0) {
 				*reinterpret_cast<short*>(worldState + 0x18) = 0x14;
 				*reinterpret_cast<short*>(worldState + 0x0E) = 1;
-				PlaySe__6CSoundFiiii(&Sound, 0x0B, 0x40, 0x7F, 0);
+				Sound.PlaySe(0x0B, 0x40, 0x7F, 0);
 			}
 
 			if (repeat == 0) {
@@ -2802,7 +2803,7 @@ void CMenuPcs::CalcMainMenuSub()
 				} else {
 					*reinterpret_cast<short*>(world + 0x26) = 0;
 				}
-				PlaySe__6CSoundFiiii(&Sound, 0x37, 0x40, 0x7F, 0);
+				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
 				*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_8033151c;
 				if (*reinterpret_cast<float*>(bytes + 0x78) > FLOAT_80331528) {
@@ -2815,7 +2816,7 @@ void CMenuPcs::CalcMainMenuSub()
 				} else {
 					(*reinterpret_cast<short*>(world + 0x26))--;
 				}
-				PlaySe__6CSoundFiiii(&Sound, 0x37, 0x40, 0x7F, 0);
+				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			}
 
 			const float selA = *reinterpret_cast<float*>(bytes + 0x78);
@@ -2838,7 +2839,7 @@ void CMenuPcs::CalcMainMenuSub()
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
 					*reinterpret_cast<short*>(world + 0x18) = 0x14;
 					*reinterpret_cast<short*>(world + 0x1E) = 1;
-					PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else if ((btn & 0x200) != 0) {
 					int valid = 0;
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
@@ -2851,11 +2852,11 @@ void CMenuPcs::CalcMainMenuSub()
 						}
 					}
 					if (valid == 0) {
-						PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {
 						*reinterpret_cast<short*>(world + 0x18) = 1;
 						*reinterpret_cast<short*>(world + 0x1E) = -1;
-						PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
 			}

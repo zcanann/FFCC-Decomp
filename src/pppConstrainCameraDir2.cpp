@@ -13,7 +13,7 @@ extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
 
-extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
@@ -29,104 +29,80 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
                                  _pppCtrlTable* param_3)
 {
-	_pppMngSt* pppMngSt;
-	float fVar1;
-	float* value;
-	float fVar2;
-	float fVar3;
-	float fVar4;
-	float fVar5;
-	unsigned char* flags;
-	float local_108;
-	float local_104;
-	float local_100;
-	Vec local_fc;
-	Vec local_f0;
-	float local_e4;
-	float local_e0;
-	float local_dc;
-	float local_d8;
-	float local_d4;
-	float local_d0;
-	float local_cc;
-	float local_c8;
-	float local_c4;
-	Vec local_c0;
-	Mtx MStack_b4;
-	Mtx MStack_84;
+    _pppMngSt* pppMngSt = pppMngStPtr;
 
-	pppMngSt = pppMngStPtr;
-	if (gPppCalcDisabled == 0) {
-		value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
-		flags = (unsigned char*)&param_2->m_arg3;
-		
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param_2->m_dataValIndex,
-			(void*)param_1,
-			param_2->m_graphId,
-			value,
-			value + 1,
-			value + 2,
-			&param_2->m_initWOrk,
-			&param_2->m_stepValue);
+    if (gPppCalcDisabled == 0) {
+        float* value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
+        unsigned char* flags = (unsigned char*)&param_2->m_arg3;
 
-		if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
-			
-			local_cc = CameraPcs._236_4_;
-			local_c8 = CameraPcs._240_4_;
-			local_c4 = CameraPcs._244_4_;
-			
-			PSMTXCopy(CameraPcs.m_cameraMatrix, MStack_84);
-			
-			fVar5 = CameraPcs._224_4_;
-			fVar4 = CameraPcs._228_4_;
-			fVar3 = CameraPcs._232_4_;
-			fVar2 = FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4);
-			
-			PSMTXIdentity(pppMngStPtr->m_matrix.value);
-			fVar1 = FLOAT_803331e0;
-			pppMngSt->m_scale.x = FLOAT_803331e8 * fVar2;
-			pppMngSt->m_scale.y = fVar2;
-			pppMngSt->m_scale.z = fVar1;
-			
-			PSMTXScale(MStack_b4, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
-			
-			if (flags[1] != 0) {
-				PSMTXInverse(MStack_84, pppMngStPtr->m_matrix.value);
-			}
-			
-			PSMTXConcat(MStack_b4, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-			
-			if (flags[0] != 0) {
-				fVar2 = *value;
-				local_c0.x = local_cc * fVar2 + fVar5;
-				local_c0.y = local_c8 * fVar2 + fVar4;
-				local_c0.z = local_c4 * fVar2 + fVar3;
-			}
-			
-			fVar2 = ((_pppPObject*)param_1)->m_localMatrix.value[0][3];
-			fVar3 = ((_pppPObject*)param_1)->m_localMatrix.value[1][3];
-			local_108 = local_cc;
-			local_104 = local_c8;
-			local_100 = local_c4;
-			
-			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, (Vec*)&local_d8, (Vec*)&local_e4, *(Vec*)&local_108);
-			
-			local_f0.x = fVar2 * local_d8;
-			local_f0.y = fVar2 * local_d4;
-			local_f0.z = fVar2 * local_d0;
-			local_fc.x = fVar3 * local_e4;
-			local_fc.y = fVar3 * local_e0;
-			local_fc.z = fVar3 * local_dc;
-			
-			PSVECAdd(&local_c0, &local_f0, &local_c0);
-			PSVECAdd(&local_c0, &local_fc, &local_c0);
-			
-			pppMngStPtr->m_matrix.value[0][3] = local_c0.x;
-			pppMngStPtr->m_matrix.value[1][3] = local_c0.y;
-			pppMngStPtr->m_matrix.value[2][3] = local_c0.z;
-			
-			pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
-		}
-	}
+        CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param_1, param_2->m_graphId, value[0], value[1], value[2],
+                                                     param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
+
+        if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
+            float cameraDirX = CameraPcs._236_4_;
+            float cameraDirY = CameraPcs._240_4_;
+            float cameraDirZ = CameraPcs._244_4_;
+
+            Mtx cameraMtx;
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
+            float cameraPosX = CameraPcs._224_4_;
+            float cameraPosY = CameraPcs._228_4_;
+            float cameraPosZ = CameraPcs._232_4_;
+            float scale = FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4);
+
+            PSMTXIdentity(pppMngStPtr->m_matrix.value);
+            pppMngSt->m_scale.x = FLOAT_803331e8 * scale;
+            pppMngSt->m_scale.y = scale;
+            pppMngSt->m_scale.z = FLOAT_803331e0;
+
+            Mtx scaleMtx;
+            PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
+
+            if (flags[1] != 0) {
+                PSMTXInverse(cameraMtx, pppMngStPtr->m_matrix.value);
+            }
+
+            PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+
+            Vec resultPos;
+            if (flags[0] != 0) {
+                float distance = value[0];
+                resultPos.x = cameraDirX * distance + cameraPosX;
+                resultPos.y = cameraDirY * distance + cameraPosY;
+                resultPos.z = cameraDirZ * distance + cameraPosZ;
+            }
+
+            float localX = ((_pppPObject*)param_1)->m_localMatrix.value[0][3];
+            float localY = ((_pppPObject*)param_1)->m_localMatrix.value[1][3];
+
+            Vec cameraDir;
+            cameraDir.x = cameraDirX;
+            cameraDir.y = cameraDirY;
+            cameraDir.z = cameraDirZ;
+
+            Vec direct0;
+            Vec direct1;
+            GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &direct0, &direct1, cameraDir);
+
+            Vec localOffset0;
+            localOffset0.x = localX * direct0.x;
+            localOffset0.y = localX * direct0.y;
+            localOffset0.z = localX * direct0.z;
+
+            Vec localOffset1;
+            localOffset1.x = localY * direct1.x;
+            localOffset1.y = localY * direct1.y;
+            localOffset1.z = localY * direct1.z;
+
+            PSVECAdd(&resultPos, &localOffset0, &resultPos);
+            PSVECAdd(&resultPos, &localOffset1, &resultPos);
+
+            pppMngStPtr->m_matrix.value[0][3] = resultPos.x;
+            pppMngStPtr->m_matrix.value[1][3] = resultPos.y;
+            pppMngStPtr->m_matrix.value[2][3] = resultPos.z;
+
+            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+        }
+    }
 }

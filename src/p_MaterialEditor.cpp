@@ -20,6 +20,7 @@ extern "C" char __vt_CProcess[];
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
 unsigned char ARRAY_8026D338[0xC];
+CMaterialEditorPcs MaterialEditorPcs;
 static char s_MaterialEditor[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);

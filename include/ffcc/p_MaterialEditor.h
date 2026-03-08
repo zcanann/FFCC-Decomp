@@ -66,7 +66,7 @@ public:
     char field_0x158[4];
 };
 
-extern __declspec(section ".data") CMaterialEditorPcs MaterialEditorPcs;
+extern CMaterialEditorPcs MaterialEditorPcs;
 extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc2__18CMaterialEditorPcs[];

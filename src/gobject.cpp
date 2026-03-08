@@ -2026,7 +2026,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::SetDispItemName(int showName)
+void CGObject::SetDispItemName(signed char showName)
 {
     *((u8*)&m_shieldNodeFlags) = (((showName << 4) & 0x10) | (*((u8*)&m_shieldNodeFlags) & 0xEF));
     m_dispItemTimer = 13;

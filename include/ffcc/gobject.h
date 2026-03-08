@@ -67,7 +67,7 @@ public:
     void IsAnimFinished(int);
     void CancelAnim(int);
     void PlayAnim(int, int, int, int, int, signed char*);
-    void SetDispItemName(int);
+    void SetDispItemName(signed char);
     void DrawDebug(CFont*);
     void SetPosBG(Vec*, int);
     void ResetDynamics();

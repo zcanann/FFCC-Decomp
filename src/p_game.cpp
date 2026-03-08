@@ -38,37 +38,46 @@ unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
  * JP Size: TODO
  */
 extern "C" void __sinit_p_game_cpp() {
-    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
+    unsigned int* desc0 = m_table_desc0__8CGamePcs;
+    unsigned int* desc1 = desc0 + 3;
+    unsigned int* desc2 = desc1 + 3;
+    unsigned int* desc3 = desc2 + 3;
+    unsigned int* desc4 = desc3 + 3;
+    unsigned int* desc5 = desc4 + 3;
+    unsigned int* desc6 = desc5 + 3;
+    unsigned int* desc7 = desc6 + 3;
+    unsigned int* desc8 = desc7 + 3;
+    unsigned int* table = desc0 + 30;
 
     GamePcs = PTR_PTR_s_CGamePcs_801ea0a8;
 
-    dst[1] = m_table_desc0__8CGamePcs[0];
-    dst[2] = m_table_desc0__8CGamePcs[1];
-    dst[3] = m_table_desc0__8CGamePcs[2];
-    dst[4] = m_table_desc1__8CGamePcs[0];
-    dst[5] = m_table_desc1__8CGamePcs[1];
-    dst[6] = m_table_desc1__8CGamePcs[2];
-    dst[7] = m_table_desc2__8CGamePcs[0];
-    dst[8] = m_table_desc2__8CGamePcs[1];
-    dst[9] = m_table_desc2__8CGamePcs[2];
-    dst[12] = m_table_desc3__8CGamePcs[0];
-    dst[13] = m_table_desc3__8CGamePcs[1];
-    dst[14] = m_table_desc3__8CGamePcs[2];
-    dst[17] = m_table_desc4__8CGamePcs[0];
-    dst[18] = m_table_desc4__8CGamePcs[1];
-    dst[19] = m_table_desc4__8CGamePcs[2];
-    dst[22] = m_table_desc5__8CGamePcs[0];
-    dst[23] = m_table_desc5__8CGamePcs[1];
-    dst[24] = m_table_desc5__8CGamePcs[2];
-    dst[27] = m_table_desc6__8CGamePcs[0];
-    dst[28] = m_table_desc6__8CGamePcs[1];
-    dst[29] = m_table_desc6__8CGamePcs[2];
-    dst[32] = m_table_desc7__8CGamePcs[0];
-    dst[33] = m_table_desc7__8CGamePcs[1];
-    dst[34] = m_table_desc7__8CGamePcs[2];
-    dst[37] = m_table_desc8__8CGamePcs[0];
-    dst[38] = m_table_desc8__8CGamePcs[1];
-    dst[39] = m_table_desc8__8CGamePcs[2];
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
+    table[12] = desc3[0];
+    table[13] = desc3[1];
+    table[14] = desc3[2];
+    table[17] = desc4[0];
+    table[18] = desc4[1];
+    table[19] = desc4[2];
+    table[22] = desc5[0];
+    table[23] = desc5[1];
+    table[24] = desc5[2];
+    table[27] = desc6[0];
+    table[28] = desc6[1];
+    table[29] = desc6[2];
+    table[32] = desc7[0];
+    table[33] = desc7[1];
+    table[34] = desc7[2];
+    table[37] = desc8[0];
+    table[38] = desc8[1];
+    table[39] = desc8[2];
 }
 
 /*
@@ -76,10 +85,7 @@ extern "C" void __sinit_p_game_cpp() {
  * Address:	TODO
  * Size:	TODO
  */
-CGamePcs::CGamePcs()
-{
-	// TODO
-}
+CGamePcs::CGamePcs() : CProcess(), game() {}
 
 /*
  * --INFO--

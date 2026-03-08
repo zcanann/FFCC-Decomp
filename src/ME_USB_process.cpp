@@ -42,7 +42,7 @@ static inline u32& U32At(CMaterialEditorPcs* self, u32 offset)
 
 static inline CMemory::CStage* MaterialEditorStage()
 {
-    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<u8*>(&MaterialEditorPcs) + 4);
+    return MaterialEditorPcs.m_stage;
 }
 }
 

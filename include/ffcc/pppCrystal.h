@@ -24,15 +24,14 @@ struct pppCrystal {
 };
 
 struct pppCrystalUnkB {
-    u32 m_dataValIndex;
+    s32 m_graphId;
+    u16 m_dataValIndex;
+    u16 m_pad06;
     u16 m_initWOrk;
-    
-    // Extended fields from decompilation
-    char pad[2];
+    u16 m_pad0A;
     float m_stepValue;
-    u8 m_arg3;
-    u8 m_payload[6]; // Array of payload bytes
-    char pad2[1];
+    float m_arg3;
+    u8 m_payload[6];
 };
 
 struct pppCrystalUnkC {
@@ -55,4 +54,3 @@ void pppRenderCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct pppCrys
 #endif
 
 #endif // _FFCC_PPPCRYSTAL_H_
-

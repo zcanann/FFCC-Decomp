@@ -1317,17 +1317,22 @@ void CGraphic::SetFogParam(float startZ, float endZ)
 void CGraphic::SetFog(int useFog, int useGlobalColor)
 {
     _GXColor* colorPtr;
-    u32 colorWord;
     GXFogType fogType;
-    float nearZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
-    float farZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
+    float nearZ;
+    float farZ;
 
-    if (useGlobalColor == 0) {
-        colorPtr = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200);
-    } else {
-        colorPtr = &gGraphicDefaultClearColor;
+    if (&nearZ != 0) {
+        nearZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
     }
-    colorWord = *reinterpret_cast<u32*>(colorPtr);
+    if (&farZ != 0) {
+        farZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
+    }
+
+    if (useGlobalColor != 0) {
+        colorPtr = &gGraphicDefaultClearColor;
+    } else {
+        colorPtr = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200);
+    }
 
     fogType = GX_FOG_NONE;
     if (useFog != 0) {
@@ -1335,8 +1340,7 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
     }
 
     GXSetFog(fogType, *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204),
-             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208), nearZ, farZ,
-             *reinterpret_cast<_GXColor*>(&colorWord));
+             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208), nearZ, farZ, *colorPtr);
 }
 
 /*

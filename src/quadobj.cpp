@@ -1,5 +1,6 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/color.h"
+#include "ffcc/p_camera.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -9,7 +10,6 @@ static const float MinBounds = -10000000.0;
 static const float EPS = 0.0;
 
 extern unsigned char CFlat[];
-extern unsigned char CameraPcs[];
 
 /*
  * --INFO--
@@ -44,7 +44,7 @@ void CGQuadObj::onDraw()
     if (m_vertexCount != 0 && (*(u32*)(CFlat + 0x129C) & 0x10000) != 0) {
         CColor color(0xff, 0xff, 0xff, 0xff);
         GXSetChanMatColor(GX_COLOR0A0, color.color);
-        GXLoadPosMtxImm(*(Mtx*)(CameraPcs + 0x4), GX_PNMTX0);
+        GXLoadPosMtxImm(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
         int i = 0;

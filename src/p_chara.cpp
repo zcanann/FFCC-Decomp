@@ -11,8 +11,6 @@ extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }
 
-extern unsigned char PartPcs[];
-extern unsigned char MapMng[];
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int sprintf(char*, const char*, ...);
@@ -21,6 +19,10 @@ extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
+class CMapMng;
+class CPartPcs;
+extern CMapMng MapMng;
+extern CPartPcs PartPcs;
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -306,10 +308,10 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
 
     if (stageIndex < 3) {
         if (stageIndex == 1) {
-            return *reinterpret_cast<CMemory::CStage**>(MapMng);
+            return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
         }
         if (stageIndex > 0) {
-            return *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x20);
+            return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x20);
         }
     } else if (stageIndex < 5) {
         return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&CharaPcs) + 0xd4);
@@ -1222,7 +1224,7 @@ CCharaPcs::CLoadPdt::~CLoadPdt()
 {
     int& pdtSlot = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14);
     if (pdtSlot >= 0) {
-        ReleasePdt__8CPartPcsFi(PartPcs, pdtSlot);
+        ReleasePdt__8CPartPcsFi(&PartPcs, pdtSlot);
         pdtSlot = -1;
     }
 

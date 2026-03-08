@@ -250,10 +250,6 @@ extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, Constru
 	size_t count       = n;
 	char* current      = (char*)ptr;
 
-	if (ctor == nullptr) {
-		return;
-	}
-
 	__partial_array_destructor pdestructor(ptr, elementSize, count, dtor);
 	pdestructor.i = 0;
 	for (; pdestructor.i < count; pdestructor.i = pdestructor.i + 1) {

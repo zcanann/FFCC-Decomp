@@ -203,7 +203,7 @@ void CMapMesh::Destroy()
  */
 void CMapMesh::Ptr2Off()
 {
-    if (S32At(this, 0x24) == 0) {
+    if (PtrAt(this, 0x24) == 0) {
         return;
     }
 

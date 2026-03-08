@@ -1325,7 +1325,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     }
 
     usb->m_stageLoad = stage;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(CAMemCacheSet, stage);
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(ppvAmemCacheSet, stage);
 
     *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
     *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
@@ -1352,7 +1352,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     }
 
     usb->m_stageLoad = usb->m_stageDefault;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(CAMemCacheSet, usb->m_stageDefault);
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(ppvAmemCacheSet, usb->m_stageDefault);
 
     return pdtSlotIndex;
 }

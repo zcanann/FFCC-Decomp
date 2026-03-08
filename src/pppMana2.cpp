@@ -3,6 +3,7 @@
 #include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
@@ -33,22 +34,37 @@ extern float FLOAT_803318cc;
 extern float FLOAT_803318d0;
 extern float FLOAT_80331904;
 extern Mtx ppvCameraMatrix0;
-extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-    Mtx44 m_screenMatrix;
-} CameraPcs;
 extern char DAT_80331900[];
 extern char DAT_803318d4[];
 extern char DAT_803318dc[];
 extern char DAT_803318e4[];
 extern char DAT_803318ec[];
 extern char DAT_803318f4[];
+
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline float CameraWorldY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+}
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+}
+
+static inline Mtx44& CameraScreenMatrix()
+{
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
+}
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
@@ -483,8 +499,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     }
 
     PSMTXIdentity(identityMtx);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
+    PSMTXCopy(CameraMatrix(), savedCameraMtx);
+    PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = (CGObject*)work[0];
@@ -557,7 +573,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             baseParaboloidTexObjs += 0x20;
         }
 
-        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        PSMTXCopy(savedCameraMtx, CameraMatrix());
         Graphic.SetViewport();
         GXSetScissor(0, 0, 0x280, 0x1C0);
         GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
@@ -623,7 +639,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                           (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
-        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        PSMTXCopy(savedCameraMtx, CameraMatrix());
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -681,9 +697,9 @@ void CalcReflectionVector2(
     u8* dlEnd;
     const double half = (double)FLOAT_803318a4;
 
-    cameraPos.x = CameraPcs._224_4_;
-    cameraPos.y = CameraPcs._228_4_;
-    cameraPos.z = CameraPcs._232_4_;
+    cameraPos.x = CameraWorldX();
+    cameraPos.y = CameraWorldY();
+    cameraPos.z = CameraWorldZ();
 
     PSMTXCopy(matrix, nodeMtx);
     nodeOffset.x = *(float*)((char*)node + 0x78);
@@ -1197,9 +1213,9 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
         cameraPos.y = ppvCameraMatrix0[1][3];
         cameraPos.z = ppvCameraMatrix0[2][3];
     } else {
-        cameraPos.x = CameraPcs._224_4_;
-        cameraPos.y = CameraPcs._228_4_;
-        cameraPos.z = CameraPcs._232_4_;
+        cameraPos.x = CameraWorldX();
+        cameraPos.y = CameraWorldY();
+        cameraPos.z = CameraWorldZ();
     }
 
     transformedCameraPos.x = FLOAT_80331898;

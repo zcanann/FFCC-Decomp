@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
@@ -35,16 +36,15 @@ extern float ppvScreenMatrix[4][4];
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-extern struct {
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    float _236_4_;
-    float _240_4_;
-    float _244_4_;
-    float _252_4_;
-    Mtx m_cameraMatrix;
-} CameraPcs;
+static inline float CameraPerspectiveFov()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+}
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x1C);
+}
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -305,9 +305,9 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
                                   FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(ppvCameraMatrix0, cameraMtx, tmpMtx);
         } else {
-            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
+            C_MTXLightPerspective(lightMtx, CameraPerspectiveFov(), FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
                                   FLOAT_80331fdc, FLOAT_80331fdc);
-            PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
+            PSMTXConcat(CameraMatrix(), cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);
         PSMTXInverse(tmpMtx, normalMtx);

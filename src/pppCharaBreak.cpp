@@ -3,6 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
+#include "ffcc/p_camera.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
@@ -21,10 +22,6 @@ extern struct _pppEnvSt {
 } *pppEnvStPtr;
 extern char gUtil[];
 class CMaterialMan;
-extern struct {
-    float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
-    Mtx m_cameraMatrix;
-} CameraPcs;
 char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
@@ -43,6 +40,11 @@ extern int ppvSinTbl;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x1C);
+}
 
 extern "C" {
 int rand(void);
@@ -106,7 +108,7 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
     drawListIndex = *(s32*)((u8*)meshArrayBase + 8);
     materialData = *(s32*)((u8*)drawListIndex + 0x50);
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(CameraMatrix(), cameraMtx);
 
     for (materialIndex = *(s32*)((u8*)drawListIndex + 0x4C) - 1; materialIndex >= 0; materialIndex--) {
         s32 meshTable = *(s32*)((u8*)*(s32*)((u8*)modelData + 0x1C) + (meshIndex * 4));

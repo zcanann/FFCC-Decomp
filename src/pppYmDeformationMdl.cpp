@@ -1,6 +1,7 @@
 #include "ffcc/pppYmDeformationMdl.h"
 #include "ffcc/graphic.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 
 #include <dolphin/gx.h>
@@ -28,16 +29,15 @@ struct _pppEnvStYmDeformationMdl {
 };
 extern _pppEnvStYmDeformationMdl* pppEnvStPtr;
 
-extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    Mtx m_cameraMatrix;
-    Mtx44 m_screenMatrix;
-} CameraPcs;
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+}
+
+static inline Mtx44& CameraScreenMatrix()
+{
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
+}
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -253,8 +253,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
     if (backTexture != 0) {
         PSMTXIdentity(texMtx);
-        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        PSMTX44Copy(CameraScreenMatrix(), screenMtx);
+        PSMTXCopy(CameraMatrix(), cameraMtx);
 
         texMtx[0][0] = screenMtx[0][0] * (2.0f / (float)width);
         texMtx[1][1] = screenMtx[1][1] * -(2.0f / (float)height);

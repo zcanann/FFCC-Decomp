@@ -3,6 +3,7 @@
 #include "ffcc/pppColum.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/symbols_shared.h"
 
 #include <dolphin/gx.h>
@@ -10,15 +11,40 @@
 #include <dolphin/mtx.h>
 
 
-extern struct {
-	float _212_4_;
-	float _216_4_;
-	float _220_4_;
-	float _224_4_;
-	float _228_4_;
-	float _232_4_;
-	Mtx m_cameraMatrix;
-} CameraPcs;
+static inline float CameraLookAtX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
+}
+
+static inline float CameraLookAtY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+}
+
+static inline float CameraLookAtZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
+}
+
+static inline float CameraWorldX()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+}
+
+static inline float CameraWorldY()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
+}
+
+static inline float CameraWorldZ()
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+}
+
+static inline Mtx& CameraMatrix()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+}
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -90,18 +116,18 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+		PSMTXCopy(CameraMatrix(), cameraMtx);
 		GXProject((double)pppMngStPtr->m_matrix.value[0][3], (double)pppMngStPtr->m_matrix.value[1][3],
 				  (double)pppMngStPtr->m_matrix.value[2][3], cameraMtx, projection, viewport,
 				  (float*)(shapeBase + 0x10), (float*)(shapeBase + 0x14), (float*)(shapeBase + 0x18));
 
 		*alphaPtr = 0;
-		cameraPos.x = CameraPcs._224_4_;
-		cameraPos.y = CameraPcs._228_4_;
-		cameraPos.z = CameraPcs._232_4_;
-		cameraLookAt.x = CameraPcs._212_4_;
-		cameraLookAt.y = CameraPcs._216_4_;
-		cameraLookAt.z = CameraPcs._220_4_;
+		cameraPos.x = CameraWorldX();
+		cameraPos.y = CameraWorldY();
+		cameraPos.z = CameraWorldZ();
+		cameraLookAt.x = CameraLookAtX();
+		cameraLookAt.y = CameraLookAtY();
+		cameraLookAt.z = CameraLookAtZ();
 		PSVECSubtract(&cameraLookAt, &cameraPos, &lookDir);
 
 		objectPos.x = pppMngStPtr->m_matrix.value[0][3];

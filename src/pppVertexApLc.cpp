@@ -50,7 +50,7 @@ struct VertexApLcSource
 
 struct _pppPDataVal;
 
-extern CMath math;
+extern CMath Math;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -146,7 +146,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                f32 randValue = RandF__5CMathFv(&math);
+                f32 randValue = RandF__5CMathFv(&Math);
                 f32 maxValue = (f32)entry->maxValue;
                 s32 index = (s32)(randValue * maxValue);
                 u16 vertexIndex = entry->vertexIndices[index];
@@ -181,5 +181,4 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
-
 

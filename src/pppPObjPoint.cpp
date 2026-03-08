@@ -36,8 +36,10 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
             vecPtr = (u8*)gPppDefaultValueBuffer;
         } else {
             PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
-            vecPtr = (u8*)objData->data + 0x80;
-            vecPtr += table[objData->field_4].vecOffset;
+            u8* data = (u8*)objData->data;
+            u32 vecOffset = table[objData->field_4].vecOffset;
+            vecPtr = data + 0x80;
+            vecPtr += vecOffset;
         }
 
         objPtr->vecPtr = vecPtr;
@@ -47,5 +49,4 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     objPtr->y = ((f32*)objPtr->vecPtr)[1];
     objPtr->z = ((f32*)objPtr->vecPtr)[2];
 }
-
 

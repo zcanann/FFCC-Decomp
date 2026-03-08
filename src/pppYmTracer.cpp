@@ -322,7 +322,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     CMapMesh* mapMesh;
     CTexture* texture;
     f32* work;
-    u32 i;
+    s32 i;
     u16 count;
     s32 serializedOffset0;
     s32 serializedOffset1;
@@ -338,8 +338,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     work = (f32*)((u8*)pppYmTracer + 0x10 + serializedOffset0);
     count = *(u16*)(work + 0xB);
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
     if (param_2->m_dataValIndex != 0xFFFF) {
+        mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
         pppSetBlendMode__FUc(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix0, FLOAT_803306e8,
@@ -367,7 +367,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             GXSetCullMode(GX_CULL_NONE);
             poly = (f32*)(u32)work[10];
 
-            for (i = 0; (s32)i < (s32)(count - 1); i++) {
+            for (i = 0; i < (s32)(count - 1); i++) {
                 if ((((*(s16*)(poly + 8) > 0) && (FLOAT_803306e8 != poly[4]) && (FLOAT_803306e8 != poly[5]) &&
                       (FLOAT_803306e8 != poly[6]) && (FLOAT_803306e8 != poly[0]) && (FLOAT_803306e8 != poly[1]) &&
                       (FLOAT_803306e8 != poly[2]) && (FLOAT_803306e8 != poly[14]) && (FLOAT_803306e8 != poly[15]) &&

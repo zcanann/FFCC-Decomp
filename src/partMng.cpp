@@ -58,6 +58,9 @@ extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
 extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
+extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
+extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -290,12 +293,112 @@ void CPartMng::Create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005ee7c
+ * PAL Size: 640b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::Destroy()
 {
-	// TODO
+    struct PartMngResRaw {
+        unsigned char m_unk0[0x7e4];
+        CMaterialSet* m_materialSet;
+        CTextureSet* m_textureSet;
+        pppModelSt* m_pppModelStArr;
+        pppShapeSt* m_pppShapeStArr;
+        unsigned char m_unk7f4[0x18];
+        void* m_editorObj;
+    };
+
+    struct CRefRaw {
+        void** m_vtable;
+        int m_refCount;
+    };
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
+
+    for (int i = 0; i < 0x20; i++) {
+        pppReleasePdt(i);
+    }
+
+    if (res->m_pppModelStArr != 0) {
+        for (unsigned int i = 0; i < 0x100; i++) {
+            pppModelSt* model = &res->m_pppModelStArr[i];
+            if (model->m_isUsed != 0) {
+                model->m_refCount--;
+                if (model->m_refCount < 1) {
+                    if (model->m_cacheId != -1) {
+                        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->DestroyCache(model->m_cacheId);
+                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&model->m_mapMesh) + 0x24) = 0;
+                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&model->m_mapMesh) + 0x28) = 0;
+                    }
+                    model->m_mapMesh.Destroy();
+                    model->m_refCount = 0;
+                    model->m_isUsed = 0;
+                }
+            }
+        }
+        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<void*>(__dt__10pppModelStFv), 0x6c, 0x100);
+        __dl__FPv(res->m_pppModelStArr);
+        res->m_pppModelStArr = 0;
+    }
+
+    if (res->m_pppShapeStArr != 0) {
+        for (unsigned int i = 0; i < 0x100; i++) {
+            pppShapeSt* shape = &res->m_pppShapeStArr[i];
+            if (shape->m_inUse != 0) {
+                shape->m_refCount--;
+                if (shape->m_refCount < 1) {
+                    if (shape->m_animData != 0) {
+                        __dl__FPv(shape->m_animData);
+                        shape->m_animData = 0;
+                    }
+                    if (shape->m_displayListData != 0) {
+                        __dl__FPv(shape->m_displayListData);
+                        shape->m_displayListData = 0;
+                    }
+                    shape->m_refCount = 0;
+                    shape->m_inUse = 0;
+                }
+            }
+        }
+        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<void*>(__dt__10pppShapeStFv), 0x2c, 0x100);
+        __dl__FPv(res->m_pppShapeStArr);
+        res->m_pppShapeStArr = 0;
+    }
+
+    if (res->m_textureSet != 0) {
+        CRefRaw* textureSet = reinterpret_cast<CRefRaw*>(res->m_textureSet);
+        textureSet->m_refCount--;
+        if (textureSet->m_refCount == 0) {
+            reinterpret_cast<void (*)(void*, int)>(textureSet->m_vtable[2])(textureSet, 1);
+        }
+        res->m_textureSet = 0;
+    }
+
+    if (res->m_materialSet != 0) {
+        CRefRaw* materialSet = reinterpret_cast<CRefRaw*>(res->m_materialSet);
+        materialSet->m_refCount--;
+        if (materialSet->m_refCount == 0) {
+            reinterpret_cast<void (*)(void*, int)>(materialSet->m_vtable[2])(materialSet, 1);
+        }
+        res->m_materialSet = 0;
+    }
+
+    if (res->m_editorObj != 0) {
+        void* handle = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8);
+        if (handle != 0) {
+            __dt__Q29CCharaPcs7CHandleFv(handle, 1);
+            *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8) = 0;
+        }
+        __dl__FPv(res->m_editorObj);
+        res->m_editorObj = 0;
+    }
+
+    pppDestroyHeap__FP9_pppEnvSt(reinterpret_cast<_pppEnvSt*>(self + 0x2351c));
 }
 
 /*

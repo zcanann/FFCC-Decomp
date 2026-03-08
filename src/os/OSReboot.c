@@ -70,9 +70,9 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     OSDisableInterrupts();
 
     g_unk_817FFFFC = 0;
-    g_unk_800030E2 = 1;
     BOOT_REGION_START = (u32)SaveStart;
     BOOT_REGION_END = (u32)SaveEnd;
+    g_unk_800030E2 = TRUE;
 
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(&exceptionContext);
@@ -143,7 +143,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     }
 
     rebootSize = OSRoundUp32B(FatalParam.rebootSize);
-    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, FatalParam.size + 0x2460, NULL, 0);
+    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, (s32)FatalParam.size + 0x2460, NULL, 0);
 
 #if SDK_REVISION < 1
     start = OSGetTime();

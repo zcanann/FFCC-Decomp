@@ -273,26 +273,40 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
  * JP Size: TODO
  */
 void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+    struct EmissionState {
+        int field0;
+        int field4;
+        u8 field8;
+        u8 field9;
+        u8 fieldA;
+        u8 fieldB;
+        float fieldC;
+        float field10;
+        float field14;
+        float field18;
+        u8 field1C;
+    };
+
     float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
-    int* state = (int*)((u8*)pppEmission_ + 0x80 + offset);
+    EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
 
-    state[1] = 0;
-    *(u8*)(state + 2) = 0x80;
-    *((u8*)state + 9) = 0x80;
-    *((u8*)state + 10) = 0x80;
-    *((u8*)state + 11) = 0x80;
-    *(float*)(state + 5) = baseScale;
-    *(float*)(state + 4) = baseScale;
-    *(float*)(state + 3) = baseScale;
+    state->field4 = 0;
+    state->field8 = 0x80;
+    state->field9 = 0x80;
+    state->fieldA = 0x80;
+    state->fieldB = 0x80;
+    state->field14 = baseScale;
+    state->field10 = baseScale;
+    state->fieldC = baseScale;
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
-    state[0] = 0;
-    *(float*)(state + 6) = *(float*)(model + 0x9C);
-    *(u8*)(state + 7) = 0;
+    state->field0 = 0;
+    state->field18 = *(float*)(model + 0x9C);
+    state->field1C = 0;
 }
 
 /*

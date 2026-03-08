@@ -9,7 +9,7 @@ class CGMonObj
 public:
     void damagedFuncGiantCrab();
     void logicFuncGiantCrab();
-    void calcBranchFuncGiantCrab(int);
+    int calcBranchFuncGiantCrab(int);
     void frameStatFuncGiantCrab();
 
     void damagedFuncGolem();

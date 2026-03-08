@@ -61,17 +61,15 @@ struct _pppEnvStYmDeformationScreen {
 
 extern "C" float ppvCameraMatrix02[3][4];
 extern float ppvScreenMatrix[4][4];
+extern float FLOAT_80330670;
+extern float FLOAT_8033067C;
 
 extern struct {
-	char pad[0xd4];
+	char pad[0x94];
+	Mtx44 m_screenMatrix;
 	float _212_4_;
 	float _216_4_;
 	float _220_4_;
-	float _224_4_;
-	float _228_4_;
-	float _232_4_;
-	Mtx m_cameraMatrix;
-	Mtx44 m_screenMatrix;
 } CameraPcs;
 
 extern "C" {
@@ -192,23 +190,24 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				}
 			}
 
-			if (((_pppPObject*)param1)->m_graphId == 0) {
+			if (*(s32*)((u8*)param1 + 0xC) == 0) {
 				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-				inVec.x = 0.0f;
-				inVec.y = 0.0f;
+				inVec.x = FLOAT_80330670;
+				inVec.y = FLOAT_80330670;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
-				inVec.w = 1.0f;
+				inVec.w = FLOAT_8033067C;
 				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 				{
 					float outW = outVec.w;
-					if (outW != 0.0f) {
+					if (outW != FLOAT_80330670) {
 						outVec.z /= outW;
 					}
 				}
 				work[0] = outVec.z;
 			}
 
-			if ((u32)Game.game.m_currentSceneId == 7) {
+			CGame* game = &Game.game;
+			if ((s32)game->m_currentSceneId == 7) {
 				cameraX = ppvCameraMatrix02[0][3];
 				cameraY = ppvCameraMatrix02[1][3];
 				cameraZ = ppvCameraMatrix02[2][3];

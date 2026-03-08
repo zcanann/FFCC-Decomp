@@ -9,36 +9,33 @@ char s_zlist_cpp_801d7dc0[] = "zlist.cpp";
  * Address:	TODO
  * Size:	TODO
  */
-ZLIST::ZLIST()
-{
-	m_root.m_previous = (_ZLISTITEM*)nullptr;
-	m_root.m_next = (_ZLISTITEM*)nullptr;
-	m_root.m_data = (void*)nullptr;
-	m_count = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-ZLIST::~ZLIST()
+void* ZLIST::GetDataIdx(int index)
 {
     _ZLISTITEM* it = m_root.m_previous;
 
-    if (it != (_ZLISTITEM*)nullptr)
+    if (it == nullptr)
     {
-        while (it->m_next != (_ZLISTITEM*)nullptr)
-        {
-            _ZLISTITEM* next = it->m_next;
-            delete it;
-            it = next;
-        }
-
-        m_root.m_previous = (_ZLISTITEM*)nullptr;
-        m_root.m_next = (_ZLISTITEM*)nullptr;
-        m_count = 0;
+        it = (_ZLISTITEM*)nullptr;
     }
+    else
+    {
+        while (index-- > 0)
+        {
+            it = it->m_next;
+
+            if (it == nullptr)
+            {
+                break;
+            }
+        }
+    }
+
+    if (it == nullptr)
+    {
+        return nullptr;
+    }
+
+    return it->m_data;
 }
 
 /*
@@ -46,23 +43,23 @@ ZLIST::~ZLIST()
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::DeleteList()
+void* ZLIST::GetDataNext(_ZLISTITEM** it)
 {
-    if (m_root.m_previous != (_ZLISTITEM*)nullptr)
-    {
-        _ZLISTITEM* it = m_root.m_previous;
+	if (it == (_ZLISTITEM**)nullptr)
+	{
+		return (void*)nullptr;
+	}
 
-        while (it->m_next != (_ZLISTITEM*)nullptr)
-        {
-            _ZLISTITEM* next = it->m_next;
-            delete it;
-            it = next;
-        }
+	_ZLISTITEM* state = *it;
 
-        m_root.m_previous = (_ZLISTITEM*)nullptr;
-        m_root.m_next = (_ZLISTITEM*)nullptr;
-        m_count = 0;
-    }
+	if (state == (_ZLISTITEM*)nullptr)
+	{
+		return (void*)nullptr;
+	}
+
+	*it = state->m_next;
+
+	return state->m_data;
 }
 
 /*
@@ -117,23 +114,23 @@ bool ZLIST::AddTail(void* data)
  * Address:	TODO
  * Size:	TODO
  */
-void* ZLIST::GetDataNext(_ZLISTITEM** it)
+void ZLIST::DeleteList()
 {
-	if (it == (_ZLISTITEM**)nullptr)
-	{
-		return (void*)nullptr;
-	}
+    if (m_root.m_previous != (_ZLISTITEM*)nullptr)
+    {
+        _ZLISTITEM* it = m_root.m_previous;
 
-	_ZLISTITEM* state = *it;
+        while (it->m_next != (_ZLISTITEM*)nullptr)
+        {
+            _ZLISTITEM* next = it->m_next;
+            delete it;
+            it = next;
+        }
 
-	if (state == (_ZLISTITEM*)nullptr)
-	{
-		return (void*)nullptr;
-	}
-
-	*it = state->m_next;
-
-	return state->m_data;
+        m_root.m_previous = (_ZLISTITEM*)nullptr;
+        m_root.m_next = (_ZLISTITEM*)nullptr;
+        m_count = 0;
+    }
 }
 
 /*
@@ -141,31 +138,34 @@ void* ZLIST::GetDataNext(_ZLISTITEM** it)
  * Address:	TODO
  * Size:	TODO
  */
-void* ZLIST::GetDataIdx(int index)
+ZLIST::~ZLIST()
 {
     _ZLISTITEM* it = m_root.m_previous;
 
-    if (it == nullptr)
+    if (it != (_ZLISTITEM*)nullptr)
     {
-        it = (_ZLISTITEM*)nullptr;
-    }
-    else
-    {
-        while (index-- > 0)
+        while (it->m_next != (_ZLISTITEM*)nullptr)
         {
-            it = it->m_next;
-
-            if (it == nullptr)
-            {
-                break;
-            }
+            _ZLISTITEM* next = it->m_next;
+            delete it;
+            it = next;
         }
-    }
 
-    if (it == nullptr)
-    {
-        return nullptr;
+        m_root.m_previous = (_ZLISTITEM*)nullptr;
+        m_root.m_next = (_ZLISTITEM*)nullptr;
+        m_count = 0;
     }
+}
 
-    return it->m_data;
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+ZLIST::ZLIST()
+{
+	m_root.m_previous = (_ZLISTITEM*)nullptr;
+	m_root.m_next = (_ZLISTITEM*)nullptr;
+	m_root.m_data = (void*)nullptr;
+	m_count = 0;
 }

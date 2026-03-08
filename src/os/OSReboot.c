@@ -37,7 +37,7 @@ static void Callback(s32, DVDCommandBlock*) {
     Prepared = TRUE;
 }
 
-static int IsStreamEnabled(void) {
+int IsStreamEnabled(void) {
     if (DVDGetCurrentDiskID()->streaming) {
         return TRUE;
     }

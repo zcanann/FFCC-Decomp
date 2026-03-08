@@ -5,6 +5,9 @@
 #include "ffcc/partMng.h"
 
 struct pppLocationTitle {
+    u32 m_unk0;
+    u32 m_unk4;
+    u32 m_unk8;
     u32 m_graphId;
     pppFMATRIX m_localMatrix;
     char m_pad[0x54];
@@ -12,13 +15,18 @@ struct pppLocationTitle {
 };
 
 struct pppLocationTitleUnkB {
+    u32 m_graphId;
     u32 m_dataValIndex;
     u16 m_initWOrk;
-    u16 m_pad;
-    u32 m_graphId;
+    u16 m_maxCount;
     float m_arg3;
-    u8* m_payload;
+    float m_payload0;
+    float m_payload1;
     float m_stepValue;
+    u16 m_spawnFrame;
+    u16 m_fadeStartFrame;
+    u16 m_fadeLength;
+    u16 m_pad;
 };
 
 struct pppLocationTitleUnkC {

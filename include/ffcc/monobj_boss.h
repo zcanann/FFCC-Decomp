@@ -30,7 +30,7 @@ public:
 
     void cancelStatFuncGoblinKing();
     void frameStatFuncGoblinKing();
-    void calcBranchFuncGoblinKing(int);
+    int calcBranchFuncGoblinKing(int);
 
     void cancelStatFuncSaw();
     void frameStatFuncSaw();
@@ -62,7 +62,7 @@ public:
 
     void damagedFuncGigasLoad();
     void tgtFuncGigasLoad(int);
-    void calcBranchFuncGigasLoad(int);
+    int calcBranchFuncGigasLoad(int);
 
     void frameStatFuncWifeLamia();
     void damagedFuncWifeLamia();

@@ -19,6 +19,7 @@ extern "C" void __dl__FPv(void*);
 extern "C" void* PTR_PTR_s_CMapTexAnim_801ea9a4;
 extern "C" {
 char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
+char s_SetMapTexAnim_MaterialIdNotFound[];
 }
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
@@ -361,7 +362,7 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
     }
 
     if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf("SetMapTexAnim: material id (%d) not found\n", materialId);
+        System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
     }
 }
 

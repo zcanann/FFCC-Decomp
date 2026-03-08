@@ -1,5 +1,6 @@
 #include "ffcc/memory.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
@@ -65,7 +66,6 @@ extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
     void*, int, int, int, int, int, void (*)(void*), void*);
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
 extern "C" int __cntlzw(unsigned int);
-extern "C" unsigned char Chara[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);

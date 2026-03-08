@@ -1,5 +1,6 @@
 #include "ffcc/chara_anim.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 
@@ -19,8 +20,6 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
-
-extern "C" unsigned char Chara[];
 class CCharaPcs;
 extern CCharaPcs CharaPcs;
 

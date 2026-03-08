@@ -337,7 +337,6 @@ void CChara::ChangeMogMode(int mogMode)
 	}
 }
 
-extern "C" unsigned char Chara[];
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);

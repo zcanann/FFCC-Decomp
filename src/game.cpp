@@ -16,6 +16,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/maplight.h"
 #include "ffcc/chara.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/p_graphic.h"
@@ -112,10 +113,8 @@ void CheckMenu__10CGPartyObjFv(void);
 void AfterFrame__12CFlatRuntimeFi(void*, int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
-unsigned char CFlat[];
 unsigned char McPcs[];
 unsigned char PartPcs[];
-unsigned char Chara[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
 extern const char DAT_801d60d4[];

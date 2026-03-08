@@ -14,6 +14,8 @@ class CMapMng;
 extern CMapMng MapMng;
 class CGamePcs;
 extern CGamePcs Game;
+class CCharaPcs;
+extern CCharaPcs CharaPcs;
 class CSound;
 extern CSound Sound;
 class CAmemCacheSet;

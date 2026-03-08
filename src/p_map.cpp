@@ -17,31 +17,31 @@ CMapPcs MapPcs;
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMapPcs_801e900c;
 
-extern unsigned int m_table_desc0__7CMapPcs[];
-extern unsigned int m_table_desc1__7CMapPcs[];
-extern unsigned int m_table_desc2__7CMapPcs[];
-extern unsigned int m_table_desc3__7CMapPcs[];
-extern unsigned int m_table_desc4__7CMapPcs[];
-extern unsigned int m_table_desc5__7CMapPcs[];
-extern unsigned int m_table_desc6__7CMapPcs[];
-extern unsigned int m_table_desc7__7CMapPcs[];
-extern unsigned int m_table_desc8__7CMapPcs[];
-extern unsigned int m_table_desc9__7CMapPcs[];
-extern unsigned int m_table_desc10__7CMapPcs[];
-extern unsigned int m_table_desc11__7CMapPcs[];
-extern unsigned int m_table_desc12__7CMapPcs[];
-extern unsigned int m_table_desc13__7CMapPcs[];
-extern unsigned int m_table_desc14__7CMapPcs[];
-extern unsigned int m_table_desc15__7CMapPcs[];
-extern unsigned int m_table_desc16__7CMapPcs[];
-extern unsigned int m_table_desc17__7CMapPcs[];
-extern unsigned int m_table_desc18__7CMapPcs[];
-extern unsigned int m_table_desc19__7CMapPcs[];
-extern unsigned int m_table_desc20__7CMapPcs[];
-extern unsigned int m_table_desc21__7CMapPcs[];
-extern unsigned int m_table_desc22__7CMapPcs[];
-extern unsigned int m_table_desc23__7CMapPcs[];
-extern unsigned int PTR_s_CMapPcs_GAME__801e8ad8[];
+unsigned int m_table_desc0__7CMapPcs[3];
+unsigned int m_table_desc1__7CMapPcs[3];
+unsigned int m_table_desc2__7CMapPcs[3];
+unsigned int m_table_desc3__7CMapPcs[3];
+unsigned int m_table_desc4__7CMapPcs[3];
+unsigned int m_table_desc5__7CMapPcs[3];
+unsigned int m_table_desc6__7CMapPcs[3];
+unsigned int m_table_desc7__7CMapPcs[3];
+unsigned int m_table_desc8__7CMapPcs[3];
+unsigned int m_table_desc9__7CMapPcs[3];
+unsigned int m_table_desc10__7CMapPcs[3];
+unsigned int m_table_desc11__7CMapPcs[3];
+unsigned int m_table_desc12__7CMapPcs[3];
+unsigned int m_table_desc13__7CMapPcs[3];
+unsigned int m_table_desc14__7CMapPcs[3];
+unsigned int m_table_desc15__7CMapPcs[3];
+unsigned int m_table_desc16__7CMapPcs[3];
+unsigned int m_table_desc17__7CMapPcs[3];
+unsigned int m_table_desc18__7CMapPcs[3];
+unsigned int m_table_desc19__7CMapPcs[3];
+unsigned int m_table_desc20__7CMapPcs[3];
+unsigned int m_table_desc21__7CMapPcs[3];
+unsigned int m_table_desc22__7CMapPcs[3];
+unsigned int m_table_desc23__7CMapPcs[3];
+unsigned int m_table__7CMapPcs[0x414 / sizeof(unsigned int)];
 
 unsigned int s_mapRelProfile0__7CMapPcs;
 unsigned int s_mapRelProfile1__7CMapPcs;
@@ -112,7 +112,7 @@ void CMapPcs::Quit()
  */
 void* CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57;
+	return m_table__7CMapPcs + tableIndex * 0x57;
 }
 
 /*
@@ -812,7 +812,7 @@ extern "C" void __sinit_p_map_cpp(void)
 	*base = &__vt__8CProcess;
 	*base = &PTR_PTR_s_CMapPcs_801e900c;
 
-	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;
+	unsigned int* dst = m_table__7CMapPcs;
 
 	dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
 	dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];

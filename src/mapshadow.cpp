@@ -32,6 +32,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
 	CPtrArray<CMapShadow*>* mapShadowArray;
 	CMapShadow* shadow;
+	u32 boundOffset;
 	u32 i;
 	u32 octTreeMask;
 	Vec pos;
@@ -40,6 +41,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 	octTree.ClearShadow();
 	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
 		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>((char*)&MapMng + 0x21434);
+		boundOffset = (u32)mapShadow * 0x18;
 		for (i = 0; i < mapShadowArray->GetSize(); i++) {
 			octTreeMask = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);
 			if ((octTreeMask & (1U << i)) == 0) {
@@ -54,7 +56,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 			pos.y = *(float*)((int)shadow->m_modelA + 0xd4);
 			pos.z = *(float*)((int)shadow->m_modelA + 0xe4);
 
-			bound = reinterpret_cast<CBound*>(shadow->m_targetBounds + (int)mapShadow * 0x18);
+			bound = reinterpret_cast<CBound*>(shadow->m_targetBounds + boundOffset);
 			octTree.InsertShadow(i, pos, *bound);
 		}
 	}

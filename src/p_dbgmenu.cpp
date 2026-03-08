@@ -3,6 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/partMng.h"
 #include "ffcc/system.h"
@@ -13,9 +14,7 @@ CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
-class CCharaPcs;
 class CPartPcs;
-extern CCharaPcs CharaPcs;
 extern CPartPcs PartPcs;
 extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
 extern u32 DAT_80212398;

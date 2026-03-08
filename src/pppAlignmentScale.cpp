@@ -1,9 +1,8 @@
 #include "ffcc/pppAlignmentScale.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_camera.h"
 
 #include <dolphin/mtx.h>
-
-extern unsigned char CameraPcs[];
 
 extern "C" {
 void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
@@ -43,7 +42,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        camera = CameraPcs;
+        camera = reinterpret_cast<unsigned char*>(&CameraPcs);
         cameraPos.x = *reinterpret_cast<float*>(camera + 0xE0);
         cameraPos.y = *reinterpret_cast<float*>(camera + 0xE4);
         cameraPos.z = *reinterpret_cast<float*>(camera + 0xE8);

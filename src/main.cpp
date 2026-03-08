@@ -3,7 +3,10 @@
 #include "ffcc/pad.h"
 #include "ffcc/system.h"
 
-#include <string.h>
+extern "C" {
+char* strcpy(char*, const char*);
+int strcmp(const char*, const char*);
+}
 
 static const char kDefaultScriptName[] = "ffcc_0";
 static const char kLanguageArgUs[] = "us";
@@ -69,7 +72,7 @@ void game(int argc, char** argv)
     char** argument;
 
     Game.game.Init();
-    strcpy(Game.game.m_currentScriptName, kDefaultScriptName);
+    strcpy(Game.game.m_startScriptName, kDefaultScriptName);
 
     if (argc != 0) {
         argument = argv + 1;
@@ -77,7 +80,7 @@ void game(int argc, char** argv)
         parseLanguage = 0;
         for (i = 1; i < argc; i++) {
             if (copyScriptName) {
-                strcpy(Game.game.m_currentScriptName, *argument);
+                strcpy(Game.game.m_startScriptName, *argument);
                 copyScriptName = 0;
             } else if (parseLanguage) {
                 cmp = strcmp(*argument, kLanguageArgUs);

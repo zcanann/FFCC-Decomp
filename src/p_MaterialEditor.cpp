@@ -366,7 +366,7 @@ void CMaterialEditorPcs::ClearTextureData()
     unsigned char* cursor = reinterpret_cast<unsigned char*>(this);
     unsigned int i = 0;
 
-    reinterpret_cast<unsigned int*>(this)[0x3BC / sizeof(unsigned int)] = 0;
+    *reinterpret_cast<volatile unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = 0;
 
     do {
         MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2BC)));

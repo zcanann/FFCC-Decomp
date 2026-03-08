@@ -1,6 +1,6 @@
 #include "ffcc/chunkfile.h"
 
-#include "string.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 /*
  * --INFO--

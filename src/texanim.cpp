@@ -24,12 +24,12 @@ public:
     int setSize(unsigned long newSize);
     T GetAt(unsigned long index);
 
-    int m_size;
     int m_numItems;
+    int m_size;
     int m_defaultSize;
+    CMemory::CStage* m_stage;
     int m_growCapacity;
     T* m_items;
-    CMemory::CStage* m_stage;
 };
 
 extern "C" void __dl__FPv(void*);

@@ -2076,19 +2076,73 @@ void CGPartyObj::setIdleMotion()
  */
 void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	PartyObjOverlay& party = PartyData(this);
+
+	if ((party.partyFlags & 0x04) != 0) {
+		if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
+			addHp(*reinterpret_cast<unsigned short*>(work + 0x1A), static_cast<CGPrgObj*>(0));
+		}
+		party.partyFlags &= 0xFB;
+	}
+
 	enableDamageCol(1);
-	setIdleMotion();
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-		m_bgColMask &= 0xFFFEFFF1;
+
+	if (party.carryObject == 0) {
+		if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
+			SetAnimSlot(0x25, 0);
+			SetAnimSlot(0x24, 1);
+		} else {
+			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
+			} else {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
+			}
+		}
+	} else if (*reinterpret_cast<int*>(CFlat + 0x4780) == 0) {
+		if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+			SetAnimSlot(0x0B, 0);
+			SetAnimSlot(0x0C, 1);
+		} else {
+			SetAnimSlot(0x0B, 0);
+			SetAnimSlot(2, 1);
+		}
 	} else {
-		m_bgColMask |= 0x1000E;
+		SetAnimSlot(0x0B, 0);
+		SetAnimSlot(0x0C, 1);
 	}
 
 	if (restoreDamageCol == 0) {
-		enableDamageCol(0);
+		if (m_currentAnimSlot == 6) {
+			reqAnim(0x26, 0, 0);
+		} else {
+			reqAnim(0x27, 0, 0);
+		}
 	}
-	if (keepTarget == 0) {
-		endTargetParticle();
+
+	if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
+		*reinterpret_cast<float*>(self + 0x694) = 1.0f;
+		m_bgColMask &= 0xFFFEFFF1;
+
+		if (restoreDamageCol == 0 || keepTarget != 0) {
+			endPSlotBit(0x10000);
+			putParticle((reinterpret_cast<int>(m_scriptHandle[0xED]) + 3) | 0x100,
+			            *reinterpret_cast<int*>(self + 0x5A4), this, FLOAT_80331a54, 0);
+		}
+
+		if (restoreDamageCol == 0) {
+			playSe3D(0x2D, 0x32, 0x96, 0, 0);
+		}
+	} else {
+		endPSlotBit(0x10000);
+		*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331a54;
+		m_bgColMask |= 0x1000E;
+		if (restoreDamageCol == 0) {
+			*reinterpret_cast<unsigned short*>(work + 0x12) = 0x5A;
+		}
 	}
 }
 

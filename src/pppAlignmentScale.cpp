@@ -1,24 +1,17 @@
 #include "ffcc/pppAlignmentScale.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_camera.h"
 
 #include <dolphin/mtx.h>
 
+extern struct {
+    unsigned char _pad0[0x224];
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+} CameraPcs;
 
-static inline float CameraPosX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0);
-}
-
-static inline float CameraPosY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4);
-}
-
-static inline float CameraPosZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8);
-}
+extern float FLOAT_80331920;
+extern float FLOAT_80331924;
 
 extern "C" {
 void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
@@ -57,26 +50,27 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        cameraPos.x = CameraPosX();
-        cameraPos.y = CameraPosY();
-        cameraPos.z = CameraPosZ();
+        cameraPos.x = CameraPcs._224_4_;
+        cameraPos.y = CameraPcs._228_4_;
+        cameraPos.z = CameraPcs._232_4_;
 
         objPos.x = pppMngStPtr->m_matrix.value[0][3];
         objPos.y = pppMngStPtr->m_matrix.value[1][3];
         objPos.z = pppMngStPtr->m_matrix.value[2][3];
 
         scale = PSVECDistance(&cameraPos, &objPos) / data->m_unk0x4;
-        if (scale <= 1.0f) {
-            scale = 1.0f;
+        if (FLOAT_80331920 < scale) {
+            scale = (scale - FLOAT_80331920) * data->m_unk0x8 + FLOAT_80331920;
         } else {
-            scale = (scale - 1.0f) * data->m_unk0x8 + 1.0f;
+            scale = FLOAT_80331920;
         }
 
         PSMTXScale(scaleMtx, scale, scale, scale);
 
-        pppMngStPtr->m_matrix.value[0][3] = 0.0f;
-        pppMngStPtr->m_matrix.value[1][3] = 0.0f;
-        pppMngStPtr->m_matrix.value[2][3] = 0.0f;
+        scale = FLOAT_80331924;
+        pppMngStPtr->m_matrix.value[0][3] = FLOAT_80331924;
+        pppMngStPtr->m_matrix.value[1][3] = scale;
+        pppMngStPtr->m_matrix.value[2][3] = scale;
         PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
         pppMngStPtr->m_matrix.value[0][3] = objPos.x;
         pppMngStPtr->m_matrix.value[1][3] = objPos.y;
@@ -87,4 +81,3 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     return alignmentScale;
 }
-

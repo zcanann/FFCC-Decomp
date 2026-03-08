@@ -472,7 +472,7 @@ void CMapMesh::SetRenderArray()
  */
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
-    unsigned int remaining = count;
+    int remaining = count;
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
     MeshDrawEntry* entry = DrawEntries(this) + startIdx;
 

@@ -12,6 +12,9 @@
 #include <string.h>
 
 CMiniGamePcs MiniGamePcs;
+extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
+extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
+extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 unsigned int m_table_desc0__12CMiniGamePcs[3];
 unsigned int m_table_desc1__12CMiniGamePcs[3];
 unsigned int m_table_desc2__12CMiniGamePcs[3];
@@ -63,6 +66,15 @@ extern "C" void __sinit_p_minigame_cpp(void)
     unsigned int* desc2 = m_table_desc2__12CMiniGamePcs;
 
     *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(__vt__12CMiniGamePcs);
+    desc0[0] = 0;
+    desc0[1] = 0xFFFFFFFF;
+    desc0[2] = reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv);
+    desc1[0] = 0;
+    desc1[1] = 0xFFFFFFFF;
+    desc1[2] = reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv);
+    desc2[0] = 0;
+    desc2[1] = 0xFFFFFFFF;
+    desc2[2] = reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv);
 
     table[1] = desc0[0];
     table[2] = desc0[1];

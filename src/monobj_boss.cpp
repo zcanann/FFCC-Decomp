@@ -149,10 +149,10 @@ void CGMonObj::logicFuncGiantCrab()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncGiantCrab(int)
+int CGMonObj::calcBranchFuncGiantCrab(int)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<int*>(mon + 0x6C4) = *reinterpret_cast<int*>(mon + 0x6B4);
+	u8* mon = reinterpret_cast<u8*>(this);
+	return *reinterpret_cast<int*>(mon + 0x6D0);
 }
 
 /*

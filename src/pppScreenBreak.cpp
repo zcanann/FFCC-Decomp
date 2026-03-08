@@ -50,7 +50,6 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
-extern int DAT_802381a0;
 static const float FLOAT_80331cc0 = 2.0f;
 static const float FLOAT_80331cc4 = 0.0f;
 static const float FLOAT_80331cc8 = 0.3f;
@@ -80,6 +79,7 @@ static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpre
 static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48); }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+static inline int GraphicScreenBreakBlurEnabled() { return *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Graphic) + 0x7358); }
 
 extern "C" {
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
@@ -648,7 +648,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         return;
     }
 
-    if (DAT_802381a0 != 0) {
+    if (GraphicScreenBreakBlurEnabled() != 0) {
         SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
     }
 

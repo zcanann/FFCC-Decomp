@@ -17,6 +17,8 @@
 
 #include <string.h>
 
+CMapMng MapMng;
+
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);

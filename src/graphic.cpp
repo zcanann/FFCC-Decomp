@@ -16,6 +16,8 @@
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
+CGraphic Graphic;
+
 extern "C" char PTR_PTR_s_CGraphic_801e8408[];
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];

@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+CCharaPcs CharaPcs;
+
 extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }

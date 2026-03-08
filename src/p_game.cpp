@@ -1,7 +1,7 @@
 #include "ffcc/p_game.h"
 
 extern unsigned int PTR_PTR_s_CGamePcs_801ea0a8[];
-unsigned int GamePcs[2];
+CGamePcs Game;
 
 /*
  * --INFO--
@@ -15,7 +15,7 @@ unsigned int GamePcs[2];
 extern "C" void __sinit_p_game_cpp() {
     unsigned int* dst;
 
-    GamePcs[0] = reinterpret_cast<unsigned int>(PTR_PTR_s_CGamePcs_801ea0a8);
+    *reinterpret_cast<unsigned int*>(&Game) = reinterpret_cast<unsigned int>(PTR_PTR_s_CGamePcs_801ea0a8);
     dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
 
     dst[1] = m_table_desc0__8CGamePcs[0];

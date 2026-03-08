@@ -5,6 +5,8 @@
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/linkage.h"
+#include "ffcc/p_graphic.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
@@ -64,11 +66,8 @@ static const float DAT_801dd4c4 = 0.0f;
 static const float DAT_801dd4b0 = 0.0f;
 static const float DAT_801dd4b4 = 1.0f;
 static const float DAT_801dd4b8 = 0.0f;
-class CMaterialMan;
-extern CMaterialMan MaterialMan;
 static char s_f999_root_801dd4c8[] = "f999_root";
 char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
-extern CGraphic GraphicsPcs;
 static const float FLOAT_80331cf4 = 0.5f;
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
@@ -97,7 +96,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
                                                                                            int scale, int clamp,
                                                                                            int reg);
 void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphic*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
+void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);

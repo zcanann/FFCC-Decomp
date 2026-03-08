@@ -3,6 +3,8 @@
 #include "ffcc/system.h"
 extern "C" char __vt__8CManager[];
 
+CUSB USB;
+
 /*
  * --INFO--
  * PAL Address: 0x80022704

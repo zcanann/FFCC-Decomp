@@ -41,6 +41,7 @@ extern f32 kMenuInitOne;
 extern unsigned char gFontResArchiveData[];
 
 extern float kMapOctTreeDefaultOffsetZ;
+extern unsigned char gMonBossField108Buffer[];
 
 extern f32 kPppConformBgNormalZero;
 extern f32 kPppConformBgNormalOne;

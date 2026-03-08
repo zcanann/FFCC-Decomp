@@ -194,6 +194,8 @@ extern float FLOAT_803329f0;
 extern float FLOAT_803329f4;
 extern float FLOAT_803329f8;
 extern float FLOAT_80332994;
+extern float FLOAT_80332990;
+extern float FLOAT_80332998;
 extern float FLOAT_803329fc;
 extern float FLOAT_80332960;
 extern float FLOAT_80332a00;
@@ -1467,9 +1469,18 @@ void CMenuPcs::CalcListPos(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawListPosMark(float, float, float)
+void CMenuPcs::DrawListPosMark(float x, float y, float z)
 {
-	// TODO
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+
+    _GXColor color = { 0xFF, 0xFF, 0xFF, 0xFF };
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x2E);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        &MenuPcs, 0, FLOAT_80332990 + x, y + z, FLOAT_80332930, FLOAT_80332930, FLOAT_80332994,
+        FLOAT_80332998, FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
 /*

@@ -473,8 +473,8 @@ void CMapMesh::SetRenderArray()
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     unsigned int remaining = count;
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
 
     while (remaining-- != 0) {
         if (entry->size != 0) {

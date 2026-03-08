@@ -1,7 +1,7 @@
 #include "ffcc/p_game.h"
 
 extern unsigned int PTR_PTR_s_CGamePcs_801ea0a8[];
-extern void* GamePcs;
+void* GamePcs;
 CGamePcs Game;
 extern "C" void create__8CGamePcsFv(CGamePcs*);
 extern "C" void destroy__8CGamePcsFv(CGamePcs*);

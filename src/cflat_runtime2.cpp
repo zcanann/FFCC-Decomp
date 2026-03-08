@@ -2337,10 +2337,11 @@ void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
  */
 void CFlatRuntime2::SetParticleWorkScale(float scale)
 {
-	ParticleWorkScaleZ(this) = scale;
-	ParticleWorkScaleY(this) = scale;
-	ParticleWorkScaleX(this) = scale;
-	ParticleWorkScalePtr(this) = &ParticleWorkScaleX(this);
+	u8* self = reinterpret_cast<u8*>(this);
+	*reinterpret_cast<float*>(self + 0x1760) = scale;
+	*reinterpret_cast<float*>(self + 0x175C) = scale;
+	*reinterpret_cast<float*>(self + 0x1758) = scale;
+	*reinterpret_cast<float**>(self + 0x16D4) = reinterpret_cast<float*>(self + 0x1758);
 }
 
 /*

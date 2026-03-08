@@ -54,6 +54,7 @@ static char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
 static char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
 static char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
 static char s_cmake_name_crc_error[] = "%s[%d] Error! ChkCMakeName() crc.\n";
+static char s_cmake_favorite_crc_error[] = "%s[%d] Error! CMakeFavorite() crc.\n";
 
 /*
  * --INFO--
@@ -2292,12 +2293,75 @@ void GbaQueue::CMakeBarthday(int, unsigned int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CBF74
+ * PAL Size: 580b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::CMakeFavorite(int, unsigned int)
+void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	unsigned char byte0 = static_cast<unsigned char>(value);
+	unsigned char byte1 = static_cast<unsigned char>(value >> 8);
+	unsigned char byte2 = static_cast<unsigned char>(value >> 16);
+	unsigned char cmdType = static_cast<unsigned char>(value >> 24);
+	int cmakeOffset = channel * 0x20;
+	OSSemaphore* semaphore = accessSemaphores + channel;
+
+	if ((static_cast<int>(value >> 24) >> 6) == 0) {
+		OSWaitSemaphore(semaphore);
+		obj[0x2CB3 + cmakeOffset] = static_cast<char>(cmdType);
+		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 1;
+		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>(value >> 8);
+		memset(obj + 0x2CCD + cmakeOffset, 0, 4);
+		obj[0x2CCD + cmakeOffset] = static_cast<char>(byte0);
+		OSSignalSemaphore(semaphore);
+		return;
+	}
+
+	unsigned char resultCode = 0;
+	short expectedCrc = 0;
+	unsigned char crcData[4];
+	bool hasData = false;
+
+	OSWaitSemaphore(semaphore);
+	{
+		int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset)) * 3;
+		*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) =
+			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) + 1);
+		obj[0x2CCB + cmakeOffset + writeOffset] = static_cast<char>(byte2);
+		obj[0x2CCC + cmakeOffset + writeOffset] = static_cast<char>(byte1);
+		obj[0x2CCD + cmakeOffset + writeOffset] = static_cast<char>(byte0);
+
+		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 1) {
+			resultCode = static_cast<unsigned char>(obj[0x2CB3 + cmakeOffset]);
+			expectedCrc = *reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset);
+			memcpy(crcData, obj + 0x2CCD + cmakeOffset, sizeof(crcData));
+			hasData = true;
+		}
+	}
+	OSSignalSemaphore(semaphore);
+
+	if (!hasData) {
+		return;
+	}
+
+	unsigned short crc = 0xFFFF;
+	if (Joybus.Crc16(4, crcData, &crc) == expectedCrc) {
+		Joybus.SendResult(channel, 0, resultCode, 0);
+		OSWaitSemaphore(semaphore);
+		obj[0x2CB3 + cmakeOffset] = 0;
+		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
+		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + cmakeOffset) = 0;
+		OSSignalSemaphore(semaphore);
+	} else {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_cmake_favorite_crc_error, s_gbaque_cpp, 0xBDC);
+		}
+		Joybus.SendResult(channel, 1, resultCode, 0);
+	}
 }
 
 /*
@@ -3778,4 +3842,3 @@ extern "C" void __sinit_gbaque_cpp(void)
 	GbaQue.Init();
 	__register_global_object(&GbaQue, __dt__8GbaQueueFv, ARRAY_802f49b0);
 }
-

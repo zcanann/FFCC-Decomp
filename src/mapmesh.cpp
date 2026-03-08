@@ -559,8 +559,8 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
  */
 void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
 {
+    int remaining = static_cast<int>(U16At(this, 0xA));
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
 
     while (remaining-- != 0) {
         if (entry->size != 0) {

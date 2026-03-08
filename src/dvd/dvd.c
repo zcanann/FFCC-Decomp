@@ -791,10 +791,6 @@ static void stateBusy_80189D04(DVDCommandBlock* block) {
         block->currTransferSize = 0x20;
         DVDLowInquiry(block->addr, cbForStateBusy);
         return;
-    case DVD_COMMAND_UNK_16:
-        __DIRegs[1] = __DIRegs[1];
-        DVDLowStopMotor(cbForStateBusy);
-        return;
     default:
         checkOptionalCommand(block, cbForStateBusy);
         return;

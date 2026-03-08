@@ -118,26 +118,25 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        u16* vertexIndices = entry->vertexIndices;
         u8 count = data->spawnCount;
 
         switch (data->mode) {
         case 0:
-            do {
-                if (state->index >= entry->maxValue) {
+            while (count-- != 0) {
+                if ((s16)state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 index = state->index++;
-                u16 vertexIndex = vertexIndices[index];
+                u16 vertexIndex = entry->vertexIndices[state->index];
+                state->index++;
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
+                u16 childId = (u16)data->childId;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
+                if (childId != 0xFFFF) {
                     _pppPObject* child;
-                    s32 childId = data->childId;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -162,19 +161,19 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         case 1:
-            do {
-                u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
+            while (count-- != 0) {
+                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&Math) * (f32)entry->maxValue)];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
+                u16 childId = (u16)data->childId;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
+                if (childId != 0xFFFF) {
                     _pppPObject* child;
-                    s32 childId = data->childId;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -199,7 +198,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
 

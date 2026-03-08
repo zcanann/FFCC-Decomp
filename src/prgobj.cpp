@@ -319,8 +319,8 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 
 	handle = Sound.PlaySe3D(
 		seNo, pos,
-		static_cast<float>(static_cast<unsigned int>(volume)),
-		static_cast<float>(static_cast<unsigned int>(dist)),
+		static_cast<float>(volume),
+		static_cast<float>(dist),
 		0
 	);
 
@@ -460,13 +460,15 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 {
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector deltaPos;
+	float targetRot;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	m_rotTargetY = 0.0f;
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	targetRot = 0.0f;
 	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
-		m_rotTargetY = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
+	m_rotTargetY = targetRot;
 }
 
 /*

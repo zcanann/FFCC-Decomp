@@ -40,7 +40,8 @@ struct MenuPcsMcLayout
     McCtrl m_mcCtrl;
 };
 
-extern MenuPcsMcLayout MenuPcs;
+class CMenuPcs;
+extern CMenuPcs MenuPcs;
 
 /*
  * --INFO--
@@ -108,11 +109,11 @@ void CMcPcs::calc()
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
 
-    if (MenuPcs.field14 != 1)
+    if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field14 != 1)
     {
-        if (MenuPcs.field18 == 0x13)
+        if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&MenuPcs.m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -129,11 +130,11 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
-                MenuPcs.field18 = 0;
+                reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
             }
         }
-        else if (MenuPcs.field18 == 0x12 &&
-                 (result = MenuPcs.m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x12 &&
+                 (result = reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl.ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {
@@ -157,7 +158,7 @@ void CMcPcs::calc()
             }
 
             CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
-            MenuPcs.field18 = 0;
+            reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
         }
     }
 }

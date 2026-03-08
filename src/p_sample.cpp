@@ -1,12 +1,6 @@
 #include "ffcc/p_sample.h"
 
-CSamplePcs SamplePcs;
 extern unsigned int PTR_PTR_s_CSamplePcs_801e8644[];
-unsigned int m_table_desc0__10CSamplePcs[3];
-unsigned int m_table_desc1__10CSamplePcs[3];
-unsigned int m_table_desc2__10CSamplePcs[3];
-unsigned int m_table_desc3__10CSamplePcs[3];
-unsigned char m_table__10CSamplePcs[0x15C];
 
 /*
  * --INFO--
@@ -117,26 +111,19 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	unsigned int* srcA = m_table_desc0__10CSamplePcs;
-	unsigned int* srcB = m_table_desc1__10CSamplePcs;
-	unsigned int* srcC = m_table_desc2__10CSamplePcs;
-	unsigned int* srcD = m_table_desc3__10CSamplePcs;
-	unsigned int* table;
-
 	*reinterpret_cast<unsigned int*>(&SamplePcs) = (unsigned int)&PTR_PTR_s_CSamplePcs_801e8644;
-	table = (unsigned int*)m_table__10CSamplePcs;
-	table[1] = srcA[0];
-	table[2] = srcA[1];
-	table[3] = srcA[2];
-	table[4] = srcB[0];
-	table[5] = srcB[1];
-	table[6] = srcB[2];
-	table[7] = srcC[0];
-	table[8] = srcC[1];
-	table[9] = srcC[2];
-	table[12] = srcD[0];
-	table[13] = srcD[1];
-	table[14] = srcD[2];
+	((unsigned int*)m_table__10CSamplePcs)[1] = m_table_desc0__10CSamplePcs[0];
+	((unsigned int*)m_table__10CSamplePcs)[2] = m_table_desc0__10CSamplePcs[1];
+	((unsigned int*)m_table__10CSamplePcs)[3] = m_table_desc0__10CSamplePcs[2];
+	((unsigned int*)m_table__10CSamplePcs)[4] = m_table_desc1__10CSamplePcs[0];
+	((unsigned int*)m_table__10CSamplePcs)[5] = m_table_desc1__10CSamplePcs[1];
+	((unsigned int*)m_table__10CSamplePcs)[6] = m_table_desc1__10CSamplePcs[2];
+	((unsigned int*)m_table__10CSamplePcs)[7] = m_table_desc2__10CSamplePcs[0];
+	((unsigned int*)m_table__10CSamplePcs)[8] = m_table_desc2__10CSamplePcs[1];
+	((unsigned int*)m_table__10CSamplePcs)[9] = m_table_desc2__10CSamplePcs[2];
+	((unsigned int*)m_table__10CSamplePcs)[12] = m_table_desc3__10CSamplePcs[0];
+	((unsigned int*)m_table__10CSamplePcs)[13] = m_table_desc3__10CSamplePcs[1];
+	((unsigned int*)m_table__10CSamplePcs)[14] = m_table_desc3__10CSamplePcs[2];
 }
 
 /*

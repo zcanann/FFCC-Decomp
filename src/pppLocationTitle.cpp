@@ -24,7 +24,7 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
 extern void pppSetBlendMode__FUc(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
-const float FLOAT_80330ee0 = 0.0f;
+extern float FLOAT_80330ee0;
 extern "C" int rand(void);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
@@ -58,15 +58,16 @@ static char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
  */
 void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkC* param_2)
 {
-    s32* serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
-    u8* base = (u8*)pppLocationTitle + *serializedOffsets + 0x80;
-    float value = FLOAT_80330ee0;
+    LocationTitleWork* work;
+    f32 value;
 
-    *(u32*)(base + 0x0) = 0;
-    *(u16*)(base + 0x4) = 0;
-    *(float*)(base + 0x10) = value;
-    *(float*)(base + 0xC) = value;
-    *(float*)(base + 0x8) = value;
+    value = FLOAT_80330ee0;
+    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + *param_2->m_serializedDataOffsets);
+    work->m_particles = 0;
+    work->m_count = 0;
+    work->m_acc = value;
+    work->m_vel = value;
+    work->m_cur = value;
 }
 
 /*

@@ -90,7 +90,7 @@ extern float FLOAT_80331b9c;
 extern float FLOAT_80331bbc;
 extern float FLOAT_80331b68;
 extern double DOUBLE_80331ba0;
-u32 DAT_8032ee90;
+u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
@@ -589,7 +589,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		ownerParticleId = *(short*)((unsigned char*)owner + 0x30);
 	}
 
-	DAT_8032ee90 = createFlags;
+	gItemObjCreateFlags = createFlags;
 	CFlatRuntime::CStack inStack[3];
 	CFlatRuntime::CStack outStack;
 	inStack[0].m_word = createMode;
@@ -1055,7 +1055,7 @@ void CGItemObj::loadModel()
 void CGItemObj::onNewFinished()
 {
 	*(u32*)((u8*)this + 0x568) = *(u32*)((u8*)this + 0x144);
-	*(u16*)((u8*)this + 0x560) = (u16)((DAT_8032ee90 >> 3) & 1);
+	*(u16*)((u8*)this + 0x560) = (u16)((gItemObjCreateFlags >> 3) & 1);
 	loadModel();
 }
 
@@ -1230,3 +1230,4 @@ int CGItemObj::GetCID()
 {
 	return 0x1d;
 }
+

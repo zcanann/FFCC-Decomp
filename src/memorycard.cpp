@@ -2047,13 +2047,12 @@ void Detach(long currentSlot, long result)
 void Attach(long currentSlot, long result)
 {
     MemoryCardMan.m_result = result;
-    MemoryCardMan.m_opDoneFlag = 1;
+    MemoryCardMan.m_opDoneFlag = '\x01';
 
-    if (MemoryCardMan.m_state == 1)
-    {
-        if (result == 0)
-        {
-            MemoryCardMan.m_currentSlot = currentSlot;
-        }
-    }
+    if (MemoryCardMan.m_state != '\x01')
+        return;
+    if (result != 0)
+        return;
+
+    MemoryCardMan.m_currentSlot = (char)currentSlot;
 }

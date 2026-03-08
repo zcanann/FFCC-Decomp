@@ -17,15 +17,16 @@ extern "C" unsigned int __vt__10CSystemPcs[];
 extern "C" void __sinit_p_system_cpp(void)
 {
     *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(__vt__10CSystemPcs);
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[1] = m_table_desc0__10CSystemPcs[0];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[2] = m_table_desc0__10CSystemPcs[1];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[3] = m_table_desc0__10CSystemPcs[2];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[4] = m_table_desc1__10CSystemPcs[0];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[5] = m_table_desc1__10CSystemPcs[1];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[6] = m_table_desc1__10CSystemPcs[2];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[7] = m_table_desc2__10CSystemPcs[0];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[8] = m_table_desc2__10CSystemPcs[1];
-    reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[9] = m_table_desc2__10CSystemPcs[2];
+    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__10CSystemPcs);
+    dst[1] = m_table_desc0__10CSystemPcs[0];
+    dst[2] = m_table_desc0__10CSystemPcs[1];
+    dst[3] = m_table_desc0__10CSystemPcs[2];
+    dst[4] = m_table_desc1__10CSystemPcs[0];
+    dst[5] = m_table_desc1__10CSystemPcs[1];
+    dst[6] = m_table_desc1__10CSystemPcs[2];
+    dst[7] = m_table_desc2__10CSystemPcs[0];
+    dst[8] = m_table_desc2__10CSystemPcs[1];
+    dst[9] = m_table_desc2__10CSystemPcs[2];
 }
 
 /*

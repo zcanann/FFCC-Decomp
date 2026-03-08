@@ -26,7 +26,7 @@ extern _pppMngStEmission* pppMngStPtr;
 extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
-extern const char DAT_803311fc[];
+extern const char DAT_803311fc;
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;
 extern float FLOAT_803311f8;
@@ -108,7 +108,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     EmissionMeshData* meshData = meshList[meshIndex].m_data;
     EmissionDisplayList* displayList = meshData->m_displayLists + displayListIndex;
 
-    if (strcmp((char*)meshData, DAT_803311fc) == 0) {
+    if (strcmp((char*)meshData, &DAT_803311fc) == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;
@@ -135,7 +135,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
 
     char* meshData = *(char**)((char*)model + 0xAC + (meshIndex * 0x14) + 8);
-    if ((strcmp(meshData, DAT_803311fc) == 0) && (*(u8*)((u8*)param_2 + 0xB) != 0)) {
+    if ((strcmp(meshData, &DAT_803311fc) == 0) && (*(u8*)((u8*)param_2 + 0xB) != 0)) {
         int textureInfo = *(int*)((u8*)param_2 + 4);
         pppInitBlendMode__Fv();
         pppSetBlendMode__FUc(*(u8*)((u8*)param_3 + 0x1C));

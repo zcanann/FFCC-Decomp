@@ -1,9 +1,15 @@
 #include "ffcc/pppChangeBGColor.h"
 #include "ffcc/ppp_linkage.h"
-#include "ffcc/map.h"
 
-// External global variables 
+class CMapMng;
 extern CMapMng MapMng;
+
+namespace {
+static inline unsigned char* Ptr(void* ptr, int offset)
+{
+    return reinterpret_cast<unsigned char*>(ptr) + offset;
+}
+}
 
 /*
  * --INFO--
@@ -17,18 +23,17 @@ extern CMapMng MapMng;
 void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct pppChangeBGColorUnkB* param_2,
                            _pppCtrlTable* param_3)
 {
-	int iVar1;
-	unsigned char* data;
+	int* serializedDataOffsets;
 	unsigned char* mapMng;
+	unsigned char* data;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	iVar1 = param_3->m_serializedDataOffsets[1];
-	mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-	data = (unsigned char*)pppChangeBGColor + iVar1 + 0x80;
-	mapMng += 0x20000;
+	serializedDataOffsets = param_3->m_serializedDataOffsets;
+	mapMng = Ptr(&MapMng, 0x20000);
+	data = reinterpret_cast<unsigned char*>(pppChangeBGColor) + serializedDataOffsets[1] + 0x80;
 	mapMng[0x2989] = 1;
 	mapMng[0x2990] = data[8];
 	mapMng[0x2991] = data[9];
@@ -63,4 +68,3 @@ void pppConChangeBGColor(_pppPObjLink*, _pppCtrlTable*)
 {
 	return;
 }
-

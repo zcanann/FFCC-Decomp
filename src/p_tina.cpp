@@ -71,6 +71,7 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     unsigned long);
 
 extern void* CAMemCacheSet;
+extern unsigned char ppvAmemCacheSet[];
 
 extern char DAT_801ead4c[];
 extern char DAT_801d81d4[];
@@ -690,17 +691,15 @@ void CPartPcs::calc()
 {
 	unsigned char* raw = reinterpret_cast<unsigned char*>(this);
 
-	PartMng.pppPartCalc();
-	if (raw[0x25] != 0) {
+	PartMng.LoadPartNoSyncCalc();
+	if (raw[0x2D] != 0) {
 		int freeSize;
-		unsigned char roundAdjust;
 
-		raw[0x25] = 0;
-		freeSize = reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->AmemGetFreeSize();
-		roundAdjust = (freeSize < 0 && (freeSize & 0x3ff) != 0);
-		System.Printf(DAT_801d8068, (freeSize >> 10) + roundAdjust);
+		raw[0x2D] = 0;
+		freeSize = reinterpret_cast<CAmemCacheSet*>(ppvAmemCacheSet)->AmemGetFreeSize();
+		System.Printf(DAT_801d8068, freeSize / 1024);
 	}
-	reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->CalcPrio();
+	reinterpret_cast<CAmemCacheSet*>(ppvAmemCacheSet)->CalcPrio();
 	PartMng.pppDumpCacheIdx();
 }
 

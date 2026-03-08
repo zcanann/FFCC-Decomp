@@ -2,8 +2,9 @@
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/ppp_constants.h"
-#include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+extern CMath math[];
 extern f32 gPppDefaultValueBuffer[];
 extern "C" f32 RandF__5CMathFv(CMath*);
 
@@ -44,10 +45,9 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
 
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
-        f32 value = RandF__5CMathFv(&Math);
+        f32 value = RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            f32 randomValue = value + RandF__5CMathFv(&Math);
-            value = randomValue * kPppRandUpFVDualSampleScale;
+            value = kPppRandUpFVDualSampleScale * (value + RandF__5CMathFv(math));
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -59,14 +59,11 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s32 sourceOffset = in->field4;
-    f32* target = (sourceOffset == -1) ? gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
+    f32* target = (in->field4 == -1) ? gPppDefaultValueBuffer : (f32*)(base + in->field4 + 0x80);
     f32 scale = *valuePtr;
-    f32 base0 = target[0];
-    f32 delta0 = in->field8 * scale;
-    target[0] = base0 + delta0;
-
-    f32 value = in->fieldC * scale;
+    f32 value = in->field8 * scale;
+    target[0] = target[0] + value;
+    value = in->fieldC * scale;
     target[1] = target[1] + value;
     value = in->field10 * scale;
     target[2] = target[2] + value;

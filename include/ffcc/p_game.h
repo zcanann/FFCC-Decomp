@@ -46,6 +46,6 @@ extern unsigned int m_table_desc5__8CGamePcs[];
 extern unsigned int m_table_desc6__8CGamePcs[];
 extern unsigned int m_table_desc7__8CGamePcs[];
 extern unsigned int m_table_desc8__8CGamePcs[];
-extern unsigned char m_table__8CGamePcs[];
+extern unsigned int m_table__8CGamePcs[];
 
 #endif // _FFCC_P_GAME_H_

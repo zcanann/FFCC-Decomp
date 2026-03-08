@@ -3,6 +3,30 @@
 extern unsigned int PTR_PTR_s_CGamePcs_801ea0a8[];
 extern void* GamePcs;
 CGamePcs Game;
+extern "C" void create__8CGamePcsFv(CGamePcs*);
+extern "C" void destroy__8CGamePcsFv(CGamePcs*);
+extern "C" void calcInit__8CGamePcsFv(CGamePcs*);
+extern "C" void calc0__8CGamePcsFv(CGamePcs*);
+extern "C" void calc1__8CGamePcsFv(CGamePcs*);
+extern "C" void calc2__8CGamePcsFv(CGamePcs*);
+extern "C" void draw0__8CGamePcsFv(CGamePcs*);
+extern "C" void draw1__8CGamePcsFv(CGamePcs*);
+extern "C" void draw2__8CGamePcsFv(CGamePcs*);
+extern "C" char s_CGamePcs_801D7C20[];
+
+unsigned int m_table_desc0__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
+unsigned int m_table_desc1__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};
+unsigned int m_table_desc2__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CGamePcsFv)};
+unsigned int m_table_desc3__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc0__8CGamePcsFv)};
+unsigned int m_table_desc4__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc1__8CGamePcsFv)};
+unsigned int m_table_desc5__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc2__8CGamePcsFv)};
+unsigned int m_table_desc6__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw0__8CGamePcsFv)};
+unsigned int m_table_desc7__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw1__8CGamePcsFv)};
+unsigned int m_table_desc8__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw2__8CGamePcsFv)};
+unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(s_CGamePcs_801D7C20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0, 0, 0x19, 0, 0, 0, 0,
+    0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
+};
 
 /*
  * --INFO--
@@ -88,7 +112,7 @@ void CGamePcs::Quit()
  */
 int CGamePcs::GetTable(unsigned long param)
 {
-    return (int)(m_table__8CGamePcs + param * 0x15c);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__8CGamePcs) + param * 0x15c);
 }
 
 /*

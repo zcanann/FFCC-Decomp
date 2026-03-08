@@ -19,6 +19,32 @@ extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
 extern "C" double cos(double);
 extern "C" int GetPadType__6JoyBusFi(void*, int);
+extern "C" void create__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void destroy__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void calc__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawBegin__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawWait__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawFlip__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawBar__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void setViewport__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" char s_CGraphicPcs_801D7B80[];
+
+u32 m_table_desc0__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
+u32 m_table_desc1__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
+u32 m_table_desc2__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CGraphicPcsFv)};
+u32 m_table_desc3__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawBegin__11CGraphicPcsFv)};
+u32 m_table_desc4__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawWait__11CGraphicPcsFv)};
+u32 m_table_desc5__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawFlip__11CGraphicPcsFv)};
+u32 m_table_desc6__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEnd__11CGraphicPcsFv)};
+u32 m_table_desc7__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawBar__11CGraphicPcsFv)};
+u32 m_table_desc8__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCopy__11CGraphicPcsFv)};
+u32 m_table_desc9__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(setViewport__11CGraphicPcsFv)};
+u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
+    reinterpret_cast<u32>(s_CGraphicPcs_801D7B80), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
+    0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
+};
 
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;

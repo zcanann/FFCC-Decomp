@@ -1,6 +1,7 @@
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ME_USB_process.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/zlist.h"
@@ -18,18 +19,12 @@ static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
 unsigned char ARRAY_8026D338[0xC];
 static char s_MaterialEditor[] = "MaterialEditor=%c";
-extern class CCameraPcs {
-public:
-    Mtx m_cameraMatrix;
-} CameraPcs;
-extern CMemory Memory;
 
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
-extern "C" void SetViewerSRT__10CCameraPcsFPC3SRT(void*, const void*);
+extern "C" void SetViewerSRT__10CCameraPcsFPC3SRT(void* camera, const void* srt);
+extern "C" void GetViewMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix);
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -286,7 +281,7 @@ void CMaterialEditorPcs::createViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_CMaterialEditorPcs, 0));
+        Memory.CreateStage(0x200000, s_CMaterialEditorPcs, 0));
     GXColor clear;
     const float kZero = 0.0f;
 
@@ -351,7 +346,7 @@ void CMaterialEditorPcs::destroyViewer()
         cursor += 4;
     } while (i < 0x10);
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(self + 0x4)));
+    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<unsigned int*>(self + 0x4)));
 }
 
 /*
@@ -425,7 +420,7 @@ void CMaterialEditorPcs::calcViewer()
     SetViewerSRT__10CCameraPcsFPC3SRT(&CameraPcs, &srt);
 
     Mtx cameraMatrix;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
+    GetViewMatrix__10CCameraPcsFPA4_f(&CameraPcs, cameraMatrix);
 
     m_unkMatrix.value[0][0] = *reinterpret_cast<float*>(&field_0x12c);
     m_unkMatrix.value[0][1] = *reinterpret_cast<float*>(&field_0x130);

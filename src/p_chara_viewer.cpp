@@ -2,6 +2,7 @@
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_usb.h"
@@ -53,8 +54,6 @@ extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char s_no_texture____801da7e8[];
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double fmod(double, double);
-class CCameraPcs;
-extern CCameraPcs CameraPcs;
 
 static void releaseRef(unsigned char* p, int offset)
 {

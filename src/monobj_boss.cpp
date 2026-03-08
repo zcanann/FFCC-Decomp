@@ -818,9 +818,9 @@ void CGMonObj::frameStatFuncGoblinKing()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncGoblinKing(int)
+int CGMonObj::calcBranchFuncGoblinKing(int)
 {
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = *reinterpret_cast<int*>(CFlat + 4840);
+	return *reinterpret_cast<int*>(CFlat + 4840);
 }
 
 /*
@@ -1702,10 +1702,14 @@ void CGMonObj::tgtFuncGigasLoad(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncGigasLoad(int)
+int CGMonObj::calcBranchFuncGigasLoad(int)
 {
-	const int flatFlag = *reinterpret_cast<int*>(CFlat + 4840);
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = (flatFlag == 1) ? 0 : 1;
+	if (((Game.game.m_scriptWork[0][0][1] != 0) &&
+	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(Game.game.m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
+	    (*reinterpret_cast<int*>(CFlat + 4840) == 1)) {
+		return 0;
+	}
+	return 1;
 }
 
 /*
@@ -3177,4 +3181,3 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 
 	chara->statAttack();
 }
-

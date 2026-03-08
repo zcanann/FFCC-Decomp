@@ -10,13 +10,13 @@
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_map.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/stopwatch.h"
 
 #include <string.h>
-
-class CPartPcs;
 
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void __dl__FPv(void* ptr);
@@ -74,9 +74,6 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern CPartPcs PartPcs;
-class CMapPcs;
-extern CMapPcs MapPcs;
 extern void* CAMemCacheSet;
 CProfile g_par_calc_prof(0);
 CProfile g_par_draw_prof(0);

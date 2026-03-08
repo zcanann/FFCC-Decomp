@@ -195,7 +195,7 @@ public:
     unsigned int m_bgColMask;         // 0x1C0
     Vec m_moveVec;                    // 0x1C4
     float m_moveSpeed;                // 0x1D0
-    int m_moveTimer;                  // 0x1D4
+    float m_moveTimer;                // 0x1D4
     unsigned int m_turnFrames;        // 0x1D8
     AttackCol m_attackColliders[8];   // 0x1DC
     DamageCol m_damageColliders[8];   // 0x35C

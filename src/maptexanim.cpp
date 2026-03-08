@@ -27,6 +27,7 @@ extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" float FLOAT_8032fd38;
 extern "C" float FLOAT_8032fd48;
 extern "C" float FLOAT_8032fd4c;
+extern "C" double DOUBLE_8032fd30;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -328,40 +329,43 @@ void CMapTexAnimSet::Calc()
  */
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    int found = 0;
-    int i = 0;
-    int setPtr = reinterpret_cast<int>(this);
-    short material = static_cast<short>(materialId);
+    bool found = false;
+    int ptr = reinterpret_cast<int>(this);
+    int i;
 
-    while (i < S16At(this, 8)) {
-        void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
-        if (S16At(animPtr, 0x12) == material) {
-            int end = frameEnd;
-            if (U8At(animPtr, 0x15) != 0) {
-                S32At(animPtr, 0x30) = frameStart;
-                S32At(animPtr, 0x2C) = frameStart;
-                if (frameEnd > S32At(animPtr, 0x38)) {
-                    end = S32At(animPtr, 0x38);
+    for (i = 0; i < *reinterpret_cast<short*>(ptr + 8); i++) {
+        double i2fBias = DOUBLE_8032fd30;
+        int anim = *reinterpret_cast<int*>(ptr + 0xC);
+        if (*reinterpret_cast<short*>(anim + 0x12) == (short)materialId) {
+            if (*reinterpret_cast<char*>(anim + 0x15) == 0) {
+                int end = frameEnd;
+                *reinterpret_cast<short*>(anim + 0xE) = (short)frameStart;
+                *reinterpret_cast<float*>(anim + 0x1C) =
+                    (float)((double)(0x4330000000000000ULL |
+                                     (unsigned long long)((int)(short)frameStart ^ 0x80000000U)) -
+                            i2fBias);
+                if (*reinterpret_cast<short*>(anim + 0xC) < frameEnd) {
+                    end = (int)*reinterpret_cast<short*>(anim + 0xC);
                 }
-                S32At(animPtr, 0x34) = end;
-                U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
-                U8At(animPtr, 0x28) = 1;
+                *reinterpret_cast<short*>(anim + 0x10) = (short)end;
+                *reinterpret_cast<unsigned char*>(anim + 0x16) = (unsigned char)wrapMode;
             } else {
-                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
-                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
-                if (frameEnd > S16At(animPtr, 0xC)) {
-                    end = S16At(animPtr, 0xC);
+                int end = frameEnd;
+                *reinterpret_cast<int*>(anim + 0x30) = frameStart;
+                *reinterpret_cast<int*>(anim + 0x2C) = frameStart;
+                if (*reinterpret_cast<int*>(anim + 0x38) < frameEnd) {
+                    end = *reinterpret_cast<int*>(anim + 0x38);
                 }
-                S16At(animPtr, 0x10) = static_cast<short>(end);
-                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
+                *reinterpret_cast<int*>(anim + 0x34) = end;
+                *reinterpret_cast<unsigned char*>(anim + 0x27) = (unsigned char)wrapMode;
+                *reinterpret_cast<unsigned char*>(anim + 0x28) = 1;
             }
-            found = 1;
+            found = true;
         }
-        setPtr += 4;
-        i += 1;
+        ptr += 4;
     }
 
-    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+    if ((!found) && (System.m_execParam != 0)) {
         System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
     }
 }

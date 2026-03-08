@@ -68,25 +68,25 @@ void CGPrgObj::onFrame()
 
     onFrameAlways();
 
-	if (static_cast<signed char>(m_weaponNodeFlags) < 0) {
+	if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) < 0) {
 		if ((GetCID() & 0x2d) == 0x2d &&
-		    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x2e) != 0) {
+		    reinterpret_cast<unsigned char*>(&PartPcs)[0x2e] != 0) {
 			return;
 		}
 
 		m_animFlags &= 0x7f;
 		onFramePreCalc();
 
-		if (m_stateFrameGate == 0) {
-			m_stateFrame++;
-		} else {
+		if (m_stateFrameGate != 0) {
 			m_stateFrameGate = 0;
+		} else {
+			m_stateFrame++;
 		}
 
-		if (m_subFrameGate == 0) {
-			m_subFrame++;
-		} else {
+		if (m_subFrameGate != 0) {
 			m_subFrameGate = 0;
+		} else {
+			m_subFrame++;
 		}
 
 		onFrameStat();

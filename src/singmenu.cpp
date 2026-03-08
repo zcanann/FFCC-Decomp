@@ -200,6 +200,8 @@ extern float FLOAT_803329f8;
 extern float FLOAT_80332994;
 extern float FLOAT_80332990;
 extern float FLOAT_80332998;
+extern float FLOAT_8033299c;
+extern float FLOAT_803329a0;
 extern float FLOAT_803329fc;
 extern float FLOAT_80332960;
 extern float FLOAT_80332a00;
@@ -1578,12 +1580,34 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014744c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CalcListPos(int, int, int)
+double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
 {
-	// TODO
+    unsigned int denom;
+    float result;
+    float span;
+
+    if (mode == 0) {
+        denom = static_cast<unsigned int>(listSize - 8);
+    } else {
+        denom = static_cast<unsigned int>(listSize - 1);
+    }
+
+    span = static_cast<float>(SingWinUIntToDouble(denom));
+
+    result = FLOAT_8033299c;
+    if ((FLOAT_8033294c < span) && (8 < listSize)) {
+        result = (FLOAT_803329a0 * (static_cast<float>(SingWinUIntToDouble(static_cast<unsigned int>(listPos))) / span)) +
+                 FLOAT_8033292c;
+    }
+
+    return static_cast<double>(result);
 }
 
 /*

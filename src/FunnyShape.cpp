@@ -543,7 +543,7 @@ void CFunnyShape::ClearAnmData()
     }
 
     memset(this, 0, 0x30);
-    memset(Ptr(this, 0x6000), 0, 0x10);
+    memset(Ptr(this, 0x60D8), 0, 0x10);
 }
 
 /*

@@ -29,7 +29,7 @@ extern "C" void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawBar__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void setViewport__11CGraphicPcsFv(CGraphicPcs*);
-extern "C" char s_CGraphicPcs_801D7B80[];
+char s_CGraphicPcs_801D7B80[] = "CGraphicPcs";
 
 u32 m_table_desc0__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
 u32 m_table_desc1__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};

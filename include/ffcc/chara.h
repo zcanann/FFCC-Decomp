@@ -160,6 +160,10 @@ class CChara
     void TimeMogFur();
     void CalcMogScore();
     void ChangeMogMode(int);
+public:
+    void InitFurTexBuffer();
+    void SaveFurTexBuffer(unsigned short* outTexels);
+    void LoadFurTexBuffer(unsigned short* inTexels);
 };
 
 extern "C" char __vt__6CChara[];

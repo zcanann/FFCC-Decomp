@@ -7,7 +7,6 @@
 
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
 extern "C" void freeFurTex__6CCharaFv();
-extern "C" void InitFurTexBuffer__6CCharaFv(CChara*);
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void __dla__FPv(void*);
@@ -104,7 +103,7 @@ void CChara::Quit()
  */
 void CChara::Create()
 {
-	InitFurTexBuffer__6CCharaFv(this);
+	InitFurTexBuffer();
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
+#include "ffcc/chara.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
@@ -14,13 +15,6 @@
 char sMcSaveFileName[] = "FFCC";
 char* PTR_DAT_8032e854 = sMcSaveFileName;
 CMemoryCardMan MemoryCardMan;
-
-extern "C" void SaveScript__5CGameFPc(void* game, char* scriptData);
-extern "C" void LoadScript__5CGameFPc(void* game, char* scriptData);
-class CChara;
-extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* outTexels);
-extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels);
-extern "C" unsigned short GetArtifactIncludeHpMax__12CCaravanWorkFv(void*);
 
 static inline CChara* GetCharaGlobal()
 {
@@ -887,8 +881,8 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<int*>(dst + 0x1DA4) = *reinterpret_cast<int*>(cv + 0x10);
     }
 
-    SaveScript__5CGameFPc(&Game.game, reinterpret_cast<char*>(save + 0x62D0));
-    SaveFurTexBuffer__6CCharaFPUs(GetCharaGlobal(), reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    Game.game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
+    GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
 }
 
 /*
@@ -1026,7 +1020,7 @@ void CMemoryCardMan::SetLoadData()
         *reinterpret_cast<int*>(cv + 0xC2C) = *reinterpret_cast<int*>(src + 0x1D9C);
         *reinterpret_cast<int*>(cv + 0xC28) = *reinterpret_cast<int*>(src + 0x1D98);
         *reinterpret_cast<int*>(cv + 0x10) = *reinterpret_cast<int*>(src + 0x1DA4);
-        *reinterpret_cast<u16*>(cv + 0x1A) = GetArtifactIncludeHpMax__12CCaravanWorkFv(cv);
+        *reinterpret_cast<u16*>(cv + 0x1A) = reinterpret_cast<CCaravanWork*>(cv)->GetArtifactIncludeHpMax();
 
     }
 
@@ -1045,8 +1039,8 @@ void CMemoryCardMan::SetLoadData()
         }
     }
 
-    LoadScript__5CGameFPc(&Game.game, reinterpret_cast<char*>(save + 0x62D0));
-    LoadFurTexBuffer__6CCharaFPUs(GetCharaGlobal(), reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    Game.game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));
+    GetCharaGlobal()->LoadFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
 
 }
 

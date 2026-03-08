@@ -41,7 +41,7 @@ extern float FLOAT_80332f80;
 extern float FLOAT_80332f84;
 
 namespace {
-unsigned int DAT_8032eee0 = 0;
+unsigned int gMenuMoneyTransferAmount = 0;
 signed char s_place[16];
 
 struct MenuMoneyMembers {
@@ -181,7 +181,7 @@ bool CMenuPcs::MoneyOpen()
 		*(int *)(iVar8 + 0x30) = 10;
 		*GetMoneyPanel(this) = 1;
 
-		DAT_8032eee0 = 0;
+		gMenuMoneyTransferAmount = 0;
 		puVar9 = s_place;
 		iVar15 = 0;
 		do {
@@ -536,8 +536,8 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((press & 0x100) != 0) {
 			if (*selectedFlag == 0) {
-				caravanWork->FGPutGil(static_cast<int>(DAT_8032eee0));
-				DAT_8032eee0 = 0;
+				caravanWork->FGPutGil(static_cast<int>(gMenuMoneyTransferAmount));
+				gMenuMoneyTransferAmount = 0;
 				UpdateDigits(static_cast<unsigned int>(caravanWork->m_gil), s_place);
 				UpdateDigits(0, s_place + 8);
 			}
@@ -559,17 +559,17 @@ int CMenuPcs::MoneyCtrlCur()
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
 			unsigned int maxValue = static_cast<unsigned int>(caravanWork->m_gil);
-			unsigned int nextValue = DAT_8032eee0 + placeValue;
-			DAT_8032eee0 = (nextValue < maxValue) ? nextValue : maxValue;
-			UpdateDigits(DAT_8032eee0, s_place + 8);
+			unsigned int nextValue = gMenuMoneyTransferAmount + placeValue;
+			gMenuMoneyTransferAmount = (nextValue < maxValue) ? nextValue : maxValue;
+			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	} else if ((hold & 4) != 0) {
-		if (DAT_8032eee0 == 0) {
+		if (gMenuMoneyTransferAmount == 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
-			DAT_8032eee0 = (DAT_8032eee0 >= placeValue) ? (DAT_8032eee0 - placeValue) : 0;
-			UpdateDigits(DAT_8032eee0, s_place + 8);
+			gMenuMoneyTransferAmount = (gMenuMoneyTransferAmount >= placeValue) ? (gMenuMoneyTransferAmount - placeValue) : 0;
+			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	}
@@ -607,7 +607,7 @@ int CMenuPcs::MoneyCtrlCur()
 			return 0;
 		}
 		if ((press & 0x100) != 0) {
-			if (DAT_8032eee0 < 1) {
+			if (gMenuMoneyTransferAmount < 1) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
 				*reinterpret_cast<char*>(menuState + 9) = 2;
@@ -631,3 +631,4 @@ void CMenuPcs::MoneySetPlace(int)
 {
 	// TODO
 }
+

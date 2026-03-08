@@ -50,7 +50,7 @@ char* strcat(char*, const char*);
 
 char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";
 extern char DAT_80332e54[];
-unsigned short DAT_8032eed0;
+unsigned short gShopMenuInputLatch;
 extern CMenuPcs MenuPcs;
 class CPartPcs;
 extern CPartPcs PartPcs;
@@ -712,7 +712,7 @@ void CShopMenu::Calc()
     }
 
     if ((shopMode == 0) || (shopMode == 1)) {
-        DAT_8032eed0 = 0;
+        gShopMenuInputLatch = 0;
     }
 }
 
@@ -757,7 +757,7 @@ void CShopMenu::SelectItemIdx()
         *reinterpret_cast<int*>(self + 0x28) = listType - 1;
     }
 
-    if (DAT_8032eed0 == 0) {
+    if (gShopMenuInputLatch == 0) {
         if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
             hasInput = true;
         }
@@ -777,8 +777,8 @@ void CShopMenu::SelectItemIdx()
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             buttons = Pad._4_2_;
         }
-        if ((buttons & DAT_8032eed0) == 0) {
-            DAT_8032eed0 = 0;
+        if ((buttons & gShopMenuInputLatch) == 0) {
+            gShopMenuInputLatch = 0;
         }
         hasInput = false;
         if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -793,7 +793,7 @@ void CShopMenu::SelectItemIdx()
     }
 
     if ((buttons & 8) == 0) {
-        if (DAT_8032eed0 == 0) {
+        if (gShopMenuInputLatch == 0) {
             hasInput = false;
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 hasInput = true;
@@ -815,8 +815,8 @@ void CShopMenu::SelectItemIdx()
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
                 buttons = Pad._4_2_;
             }
-            if ((buttons & DAT_8032eed0) == 0) {
-                DAT_8032eed0 = 0;
+            if ((buttons & gShopMenuInputLatch) == 0) {
+                gShopMenuInputLatch = 0;
             }
             hasInput = false;
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -991,7 +991,7 @@ void CShopMenu::SelectItemIdx()
             if (*reinterpret_cast<int*>(self + 0x28) < mode) {
                 PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
             } else {
-                DAT_8032eed0 = 4;
+                gShopMenuInputLatch = 4;
                 mode = *reinterpret_cast<int*>(self + 0x14);
                 if (mode == 0) {
                     mode = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE4);
@@ -1009,7 +1009,7 @@ void CShopMenu::SelectItemIdx()
     } else {
         *reinterpret_cast<int*>(self + 0x28) = *reinterpret_cast<int*>(self + 0x28) - 1;
         if (*reinterpret_cast<int*>(self + 0x28) < 0) {
-            DAT_8032eed0 = 8;
+            gShopMenuInputLatch = 8;
             *reinterpret_cast<int*>(self + 0x28) = 0;
             PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
         } else {
@@ -1120,7 +1120,7 @@ void CShopMenu::SelectFigure()
         }
     }
 
-    if (DAT_8032eed0 == 0) {
+    if (gShopMenuInputLatch == 0) {
         hasInput = false;
         if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
             hasInput = true;
@@ -1142,8 +1142,8 @@ void CShopMenu::SelectFigure()
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             buttons = Pad._4_2_;
         }
-        if ((buttons & DAT_8032eed0) == 0) {
-            DAT_8032eed0 = 0;
+        if ((buttons & gShopMenuInputLatch) == 0) {
+            gShopMenuInputLatch = 0;
         }
 
         hasInput = false;
@@ -1159,7 +1159,7 @@ void CShopMenu::SelectFigure()
     }
 
     if ((buttons & 8) == 0) {
-        if (DAT_8032eed0 == 0) {
+        if (gShopMenuInputLatch == 0) {
             hasInput = false;
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 hasInput = true;
@@ -1181,8 +1181,8 @@ void CShopMenu::SelectFigure()
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
                 buttons = Pad._4_2_;
             }
-            if ((buttons & DAT_8032eed0) == 0) {
-                DAT_8032eed0 = 0;
+            if ((buttons & gShopMenuInputLatch) == 0) {
+                gShopMenuInputLatch = 0;
             }
             hasInput = false;
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -1209,7 +1209,7 @@ void CShopMenu::SelectFigure()
             } else if (mode == 0) {
                 *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) - 1;
                 if (*reinterpret_cast<int*>(self + 0x44) < 1) {
-                    DAT_8032eed0 = 4;
+                    gShopMenuInputLatch = 4;
                     *reinterpret_cast<int*>(self + 0x44) = 1;
                     PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
                 } else {
@@ -1329,7 +1329,7 @@ void CShopMenu::SelectFigure()
                     return;
                 }
             }
-            DAT_8032eed0 = 8;
+            gShopMenuInputLatch = 8;
             *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) - 1;
             PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
         }
@@ -2496,3 +2496,4 @@ void CShopMenu::setFaceAlpha(int, int)
 {
 	// TODO
 }
+

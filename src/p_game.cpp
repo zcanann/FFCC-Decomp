@@ -1,7 +1,7 @@
 #include "ffcc/p_game.h"
 
 extern unsigned int PTR_PTR_s_CGamePcs_801ea0a8[];
-extern void* GamePcs;
+void* GamePcs;
 CGamePcs Game;
 extern "C" void create__8CGamePcsFv(CGamePcs*);
 extern "C" void destroy__8CGamePcsFv(CGamePcs*);
@@ -12,7 +12,7 @@ extern "C" void calc2__8CGamePcsFv(CGamePcs*);
 extern "C" void draw0__8CGamePcsFv(CGamePcs*);
 extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
-extern "C" char s_CGamePcs_801D7C20[];
+char s_CGamePcs_801D7C20[] = "CGamePcs";
 
 unsigned int m_table_desc0__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
 unsigned int m_table_desc1__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};

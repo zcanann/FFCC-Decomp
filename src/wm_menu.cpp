@@ -99,13 +99,13 @@ extern char DAT_80331648[];
 extern char DAT_8033164c[];
 extern char DAT_80331654[];
 extern char DAT_8033165c[];
-unsigned char DAT_8032ee20;
+unsigned char gWmMenuCursorX;
 unsigned char uRam8032ee21;
-unsigned char DAT_8032ee24;
+unsigned char gWmMenuCursorY;
 unsigned char uRam8032ee25;
-int DAT_8032ee28;
-int DAT_8032ee2c;
-unsigned char DAT_8032ee30;
+int gWmMenuWorkA;
+int gWmMenuWorkB;
+unsigned char gWmMenuScriptValueCache;
 char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 extern char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[];
@@ -183,15 +183,15 @@ void CMenuPcs::WmInit()
 	bytes[0x13] = 0;
 	bytes[0xD] = 1;
 	bytes[0x16] = 0;
-	DAT_8032ee20 = 0xFF;
+	gWmMenuCursorX = 0xFF;
 	uRam8032ee21 = 0xFF;
-	DAT_8032ee24 = 0xFF;
+	gWmMenuCursorY = 0xFF;
 	uRam8032ee25 = 0xFF;
-	DAT_8032ee2c = -1;
-	DAT_8032ee28 = -1;
-	DAT_8032ee30 = Game.game.m_gameWork.m_scriptSysVal0;
+	gWmMenuWorkB = -1;
+	gWmMenuWorkA = -1;
+	gWmMenuScriptValueCache = Game.game.m_gameWork.m_scriptSysVal0;
 	if (Game.game.m_gameWork.m_scriptSysVal0 > 99) {
-		DAT_8032ee30 = 100;
+		gWmMenuScriptValueCache = 100;
 	}
 }
 
@@ -244,7 +244,7 @@ void CMenuPcs::ChkNumItemAll()
 	}
 
 	bytes[0x10] = static_cast<unsigned char>(selected != 0);
-	DAT_8032ee28 = total + selected;
+	gWmMenuWorkA = total + selected;
 }
 
 /*
@@ -1686,7 +1686,7 @@ void CMenuPcs::GetWorldParam(int code)
 		break;
 	}
 
-	DAT_8032ee28 = static_cast<int>(result);
+	gWmMenuWorkA = static_cast<int>(result);
 }
 
 /*
@@ -1959,7 +1959,7 @@ void CMenuPcs::DrawFukidashi()
 void CMenuPcs::ChkPlaceLength(char* text)
 {
 	if (text == 0) {
-		DAT_8032ee28 = 0;
+		gWmMenuWorkA = 0;
 		return;
 	}
 
@@ -1971,7 +1971,7 @@ void CMenuPcs::ChkPlaceLength(char* text)
 		}
 		len--;
 	}
-	DAT_8032ee28 = len;
+	gWmMenuWorkA = len;
 }
 
 /*
@@ -2434,7 +2434,7 @@ void CMenuPcs::GetAnimNo(int animNo, int)
 	if (animNo < 0) {
 		animNo = 0;
 	}
-	DAT_8032ee28 = animNo;
+	gWmMenuWorkA = animNo;
 }
 
 /*
@@ -2576,7 +2576,7 @@ void CMenuPcs::SetParty()
 			}
 		}
 	}
-	DAT_8032ee28 = partyCount;
+	gWmMenuWorkA = partyCount;
 	bytes[0x10] = static_cast<unsigned char>(partyCount > 0);
 }
 
@@ -2882,7 +2882,7 @@ void CMenuPcs::ChkSelectParty()
 	int selected = 0;
 
 	if (modelData == 0) {
-		DAT_8032ee28 = 0;
+		gWmMenuWorkA = 0;
 		return;
 	}
 
@@ -2892,7 +2892,7 @@ void CMenuPcs::ChkSelectParty()
 		}
 	}
 
-	DAT_8032ee28 = selected;
+	gWmMenuWorkA = selected;
 	reinterpret_cast<unsigned char*>(this)[0x10] = static_cast<unsigned char>(selected != 0);
 }
 
@@ -2909,8 +2909,8 @@ void CMenuPcs::DrawMainMenuSub()
 {
 	DrawPageMark();
 	DrawWMFrame0(3, 1.0f);
-	if (DAT_8032ee28 > 0) {
-		DrawCursor(DAT_8032ee20, uRam8032ee21, 1.0f);
+	if (gWmMenuWorkA > 0) {
+		DrawCursor(gWmMenuCursorX, uRam8032ee21, 1.0f);
 	}
 }
 
@@ -2925,7 +2925,7 @@ void CMenuPcs::DrawMainMenuSub()
  */
 void CMenuPcs::GetMcAccessPos(int* x, int* y)
 {
-	*x = DAT_8032ee20;
+	*x = gWmMenuCursorX;
 	*y = uRam8032ee21;
 }
 
@@ -2940,7 +2940,7 @@ void CMenuPcs::GetMcAccessPos(int* x, int* y)
  */
 void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 {
-	*x = DAT_8032ee24;
+	*x = gWmMenuCursorY;
 	*y = uRam8032ee25;
 }
 
@@ -2960,7 +2960,7 @@ void CMenuPcs::ChkMcDataCnt()
 	int count = 0;
 
 	if (list == 0) {
-		DAT_8032ee28 = 0;
+		gWmMenuWorkA = 0;
 		return;
 	}
 
@@ -2971,7 +2971,7 @@ void CMenuPcs::ChkMcDataCnt()
 		}
 	}
 
-	DAT_8032ee28 = count;
+	gWmMenuWorkA = count;
 }
 
 /*
@@ -2987,7 +2987,7 @@ void CMenuPcs::DrawMCList()
 {
 	ChkMcDataCnt();
 	DrawPageMark();
-	if (DAT_8032ee28 > 0) {
+	if (gWmMenuWorkA > 0) {
 		DrawMcWin(0, 0);
 	}
 }
@@ -3151,12 +3151,12 @@ void CMenuPcs::ClrMcList()
 	if (list != 0) {
 		memset(list, 0, kMcListEntrySize * kMcListCount);
 	}
-	DAT_8032ee20 = 0xFF;
+	gWmMenuCursorX = 0xFF;
 	uRam8032ee21 = 0xFF;
-	DAT_8032ee24 = 0xFF;
+	gWmMenuCursorY = 0xFF;
 	uRam8032ee25 = 0xFF;
-	DAT_8032ee28 = 0;
-	DAT_8032ee2c = 0;
+	gWmMenuWorkA = 0;
+	gWmMenuWorkB = 0;
 }
 
 /*
@@ -3449,7 +3449,7 @@ void CMenuPcs::DrawRect3d(unsigned long, float x, float y, float z, float w, flo
  */
 void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-	DAT_8032ee20 = static_cast<unsigned char>(x);
+	gWmMenuCursorX = static_cast<unsigned char>(x);
 	uRam8032ee21 = static_cast<unsigned char>(y);
 }
 
@@ -3690,7 +3690,7 @@ void CMenuPcs::SetTextureLoc(int index)
 	}
 	bytes[0x86E] = static_cast<unsigned char>(index);
 	SetTexture(static_cast<CMenuPcs::TEX>(index));
-	DAT_8032ee28 = index;
+	gWmMenuWorkA = index;
 }
 
 /*
@@ -3867,7 +3867,7 @@ void CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int me
 		if (*reinterpret_cast<unsigned int*>(src + 0x13D4) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D4) ||
 		    *reinterpret_cast<unsigned int*>(src + 0x13D0) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D0) ||
 		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D8)) {
-			DAT_8032ee2c = -2;
+			gWmMenuWorkB = -2;
 			return;
 		}
 	}
@@ -3896,7 +3896,7 @@ void CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int me
 		}
 	}
 
-	DAT_8032ee2c = static_cast<int>(result);
+	gWmMenuWorkB = static_cast<int>(result);
 }
 
 /*
@@ -3950,7 +3950,7 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 			}
 		}
 	}
-	DAT_8032ee28 = ready;
+	gWmMenuWorkA = ready;
 }
 /*
  * --INFO--
@@ -5691,7 +5691,7 @@ void McCtrl::EraseDat()
  */
 void McCtrl::GetDno()
 {
-	DAT_8032ee28 = m_cardChannel;
+	gWmMenuWorkA = m_cardChannel;
 }
 
 /*
@@ -5705,8 +5705,8 @@ void McCtrl::GetDno()
  */
 void McCtrl::GetSerial()
 {
-	DAT_8032ee28 = static_cast<int>(m_serialLo);
-	DAT_8032ee2c = static_cast<int>(m_serialHi);
+	gWmMenuWorkA = static_cast<int>(m_serialLo);
+	gWmMenuWorkB = static_cast<int>(m_serialHi);
 }
 
 /*
@@ -5734,7 +5734,7 @@ void McCtrl::SetDataBuff(char* buffer)
  */
 void McCtrl::GetSlot()
 {
-	DAT_8032ee28 = m_saveIndex;
+	gWmMenuWorkA = m_saveIndex;
 }
 
 /*
@@ -5805,5 +5805,6 @@ void CMenuPcs::AlphaAdd()
 void CMenuPcs::GetFontWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	DAT_8032ee28 = static_cast<int>(reinterpret_cast<unsigned int*>(bytes + 0xFC)[0]);
+	gWmMenuWorkA = static_cast<int>(reinterpret_cast<unsigned int*>(bytes + 0xFC)[0]);
 }
+

@@ -180,10 +180,10 @@ extern float FLOAT_803329c0;
 extern float FLOAT_803329c4;
 extern float FLOAT_803329c8;
 extern float FLOAT_803329cc;
-int DAT_8032eeb8;
-int DAT_8032eebc;
-int DAT_8032eec0;
-int DAT_8032eec4;
+CFile::CHandle* gSingMenuAsyncFileHandle;
+int gSingMenuAsyncLoadCompleted;
+int gSingMenuHasScriptFoodBase;
+int gSingMenuForcedSelection;
 extern int DAT_80214b3c[];
 extern float DAT_801dd708[];
 extern float DAT_801dd6f8[];
@@ -267,7 +267,7 @@ void CMenuPcs::createSingleMenu()
     u8* self = reinterpret_cast<u8*>(this);
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
-    DAT_8032eebc = 0;
+    gSingMenuAsyncLoadCompleted = 0;
     if (Game.game.m_gameWork.m_menuStageMode == 0) {
         if (self[0x859] != 0) {
             *reinterpret_cast<int*>(self + 0xF0) = 0;
@@ -298,8 +298,8 @@ void CMenuPcs::createSingleMenu()
         loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
 
         self[0x85A] = 0;
-        DAT_8032eec4 = -1;
-        DAT_8032eeb8 = 0;
+        gSingMenuForcedSelection = -1;
+        gSingMenuAsyncFileHandle = 0;
 
         if (Game.game.m_gameWork.m_menuStageMode != 0) {
             loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
@@ -326,9 +326,9 @@ void CMenuPcs::destroySingleMenu()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    if (DAT_8032eeb8 != 0) {
-        File.Close(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8));
-        DAT_8032eeb8 = 0;
+    if (gSingMenuAsyncFileHandle != 0) {
+        File.Close(gSingMenuAsyncFileHandle);
+        gSingMenuAsyncFileHandle = 0;
     }
 
     void* font = *reinterpret_cast<void**>(self + 0x108);
@@ -348,7 +348,7 @@ void CMenuPcs::destroySingleMenu()
     *reinterpret_cast<int*>(self + 0xF0) = 0;
     self[0x85A] = 0;
     self[0x859] = 0;
-    DAT_8032eec4 = -1;
+    gSingMenuForcedSelection = -1;
 
     void* ptr = *reinterpret_cast<void**>(self + 0x814);
     if (ptr != 0) {
@@ -485,9 +485,9 @@ void CMenuPcs::SingMenuInit()
     memset(*reinterpret_cast<void**>(self + 0x848), 0, 0xC);
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
-    if (DAT_8032eec4 >= 0) {
+    if (gSingMenuForcedSelection >= 0) {
         *reinterpret_cast<s16*>(self + 0x864) = 8;
-        DAT_8032eec4 = -1;
+        gSingMenuForcedSelection = -1;
     }
     FLOAT_8032ea78 = FLOAT_803329b8;
     *reinterpret_cast<int*>(self + 0x874) = -1;
@@ -624,7 +624,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    DAT_8032eec0 = static_cast<int>(*reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0) != 0);
+    gSingMenuHasScriptFoodBase = static_cast<int>(*reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0) != 0);
     if (Game.game.m_gameWork.m_menuStageMode == 0) {
         if (self[0x859] == 0) {
             return;
@@ -653,12 +653,12 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 char path[260];
                 char* language = GetLangString__5CGameFv(&Game.game);
                 sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18[loadIndex]);
-                DAT_8032eeb8 = reinterpret_cast<int>(File.Open(path, 0, CFile::PRI_LOW));
-                File.ReadASync(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8));
+                gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
+                File.ReadASync(gSingMenuAsyncFileHandle);
                 *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
             } else if (*reinterpret_cast<int*>(self + 0x860) == 1) {
-                if (!File.IsCompleted(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8))) {
-                    DAT_8032eebc = 0;
+                if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
+                    gSingMenuAsyncLoadCompleted = 0;
                     goto post_texture_load;
                 }
 
@@ -680,14 +680,14 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 }
 
                 Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(textureSet, File.m_readBuffer, stage, 0, 0, 0, 0);
-                File.Close(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8));
-                DAT_8032eeb8 = 0;
+                File.Close(gSingMenuAsyncFileHandle);
+                gSingMenuAsyncFileHandle = 0;
                 *reinterpret_cast<int*>(self + 0x860) = 0;
                 *reinterpret_cast<int*>(self + 0x85C) = *reinterpret_cast<int*>(self + 0x85C) + 1;
             }
 
             if (*reinterpret_cast<int*>(self + 0x85C) < 2) {
-                DAT_8032eebc = 0;
+                gSingMenuAsyncLoadCompleted = 0;
             } else {
                 int* mapping = DAT_80214b3c;
                 for (int i = 0; i < 0x33; i++) {
@@ -698,10 +698,10 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;
                     mapping += 2;
                 }
-                DAT_8032eebc = 1;
+                gSingMenuAsyncLoadCompleted = 1;
             }
         } else {
-            DAT_8032eebc = 1;
+            gSingMenuAsyncLoadCompleted = 1;
         }
     }
 
@@ -731,7 +731,7 @@ post_texture_load:
         }
     }
 
-    if (DAT_8032eec0 == 0) {
+    if (gSingMenuHasScriptFoodBase == 0) {
         s16 state = *reinterpret_cast<s16*>(self + 0x866);
         if (state == 1) {
             SingleCalcCtrl();
@@ -1231,7 +1231,7 @@ void CMenuPcs::SingleCalcCtrl()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    if (DAT_8032eebc == 0) {
+    if (gSingMenuAsyncLoadCompleted == 0) {
         return;
     }
 
@@ -1381,7 +1381,7 @@ void CMenuPcs::SingleDrawCtrl()
         DrawSingleHelpWim(FLOAT_80332934);
     }
 
-    if (DAT_8032eebc == 0) {
+    if (gSingMenuAsyncLoadCompleted == 0) {
         return;
     }
 
@@ -1436,9 +1436,9 @@ void CMenuPcs::SingleDrawCtrl()
         s16 mode = *reinterpret_cast<s16*>(self + 0x864);
         if (mode == 9) {
             *reinterpret_cast<s16*>(self + 0x864) = *reinterpret_cast<s16*>(statePtr + 0x26);
-        } else if ((mode == 8) && (DAT_8032eec4 >= 0)) {
-            *reinterpret_cast<s16*>(self + 0x864) = static_cast<s16>(DAT_8032eec4);
-        } else if ((mode == 8) || (DAT_8032eec4 < 0)) {
+        } else if ((mode == 8) && (gSingMenuForcedSelection >= 0)) {
+            *reinterpret_cast<s16*>(self + 0x864) = static_cast<s16>(gSingMenuForcedSelection);
+        } else if ((mode == 8) || (gSingMenuForcedSelection < 0)) {
             if (*reinterpret_cast<s16*>(statePtr + 0x1E) < 1) {
                 --(*reinterpret_cast<s16*>(self + 0x864));
                 if (*reinterpret_cast<s16*>(self + 0x864) < 0) {
@@ -2404,7 +2404,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
  */
 void CMenuPcs::SingSetLetterAttachflg(int flag)
 {
-    DAT_8032eec4 = flag;
+    gSingMenuForcedSelection = flag;
 }
 
 /*
@@ -2418,7 +2418,7 @@ void CMenuPcs::SingSetLetterAttachflg(int flag)
  */
 int CMenuPcs::SingGetLetterAttachflg()
 {
-    return DAT_8032eec4;
+    return gSingMenuForcedSelection;
 }
 
 /*

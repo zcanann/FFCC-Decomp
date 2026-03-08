@@ -9,21 +9,19 @@
 CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
-u32 m_table_desc0__7CUSBPcs[3];
-u32 m_table_desc1__7CUSBPcs[3];
-u32 m_table_desc2__7CUSBPcs[3];
-u32 m_table__7CUSBPcs[0x15C / sizeof(u32)];
-extern "C" const char s_CUSBPcs_8032f810[];
-extern "C" const char s_plot_kmitsuru__801d6d14[];
-extern "C" {
-const char s_CUSBPcs_8032f810[] = "CUSBPcs";
-const char s_plot_kmitsuru__801d6d14[] = "plot.kmitsuru/";
-}
+extern "C" void create__7CUSBPcsFv(CUSBPcs*);
+extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
+extern "C" void func__7CUSBPcsFv(CUSBPcs*);
+u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
+u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
+u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
+char s_CUSBPcs_8032f810[] = "CUSBPcs";
+u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
+    reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
+};
+static const char s_usbRootPath[] = "plot.kmitsuru/";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-extern "C" char __vt__8CManager[];
-extern "C" char __vt_CProcess[];
-
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
@@ -50,10 +48,10 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = Memory.CreateStage(0x2000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
+	m_smallStage = Memory.CreateStage(0x2000, s_CUSBPcs_8032f810, 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
-	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
+	strcpy(m_rootPath, s_usbRootPath);
 	m_unk0x104 = 0;
 	m_unk0x108 = 0;
 
@@ -102,7 +100,7 @@ void* CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
+        m_bigStage = Memory.CreateStage(0x100000, s_CUSBPcs_8032f810, 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
@@ -275,6 +273,15 @@ extern "C" void __sinit_p_usb_cpp()
     *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
     *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
     *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
+    m_table_desc0__7CUSBPcs[0] = 0;
+    m_table_desc0__7CUSBPcs[1] = 0xFFFFFFFF;
+    m_table_desc0__7CUSBPcs[2] = reinterpret_cast<u32>(create__7CUSBPcsFv);
+    m_table_desc1__7CUSBPcs[0] = 0;
+    m_table_desc1__7CUSBPcs[1] = 0xFFFFFFFF;
+    m_table_desc1__7CUSBPcs[2] = reinterpret_cast<u32>(destroy__7CUSBPcsFv);
+    m_table_desc2__7CUSBPcs[0] = 0;
+    m_table_desc2__7CUSBPcs[1] = 0xFFFFFFFF;
+    m_table_desc2__7CUSBPcs[2] = reinterpret_cast<u32>(func__7CUSBPcsFv);
 
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
     m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];

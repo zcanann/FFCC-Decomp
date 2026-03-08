@@ -47,12 +47,15 @@ extern "C" CCharaPcs::CHandle* __ct__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*)
 extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __dl__FPv(void*);
+extern "C" void __dla__FPv(void*);
 extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
+extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
@@ -95,6 +98,7 @@ extern "C" char* PTR_s_Masculin_802144c4[];
 extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
+extern "C" int DAT_802381a7;
 extern CMenuPcs MenuPcs;
 extern "C" char* PTR_s_Blacksmith_80214140[];
 extern "C" char* PTR_s_Schmied_80214160[];
@@ -309,12 +313,67 @@ void CMenuPcs::createSingleMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014A67C
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::destroySingleMenu()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    if (DAT_8032eeb8 != 0) {
+        File.Close(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8));
+        DAT_8032eeb8 = 0;
+    }
+
+    void* font = *reinterpret_cast<void**>(self + 0x108);
+    if (font != 0) {
+        int* raw = reinterpret_cast<int*>(font);
+        int refCount = raw[1] - 1;
+        raw[1] = refCount;
+        if (refCount == 0) {
+            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<int*>(raw[0] + 8))(font, 1);
+        }
+        *reinterpret_cast<void**>(self + 0x108) = 0;
+    }
+
+    freeTexture__8CMenuPcsFiiii(this, 4, 1, 0x20, 0xD);
+    freeTexture__8CMenuPcsFiiii(this, 5, 2, 0x2D, 0x33);
+
+    *reinterpret_cast<int*>(self + 0xF0) = 0;
+    self[0x85A] = 0;
+    self[0x859] = 0;
+    DAT_8032eec4 = -1;
+
+    void* ptr = *reinterpret_cast<void**>(self + 0x814);
+    if (ptr != 0) {
+        __dla__FPv(ptr);
+        *reinterpret_cast<void**>(self + 0x814) = 0;
+    }
+
+    ptr = *reinterpret_cast<void**>(self + 0x850);
+    if (ptr != 0) {
+        __dl__FPv(ptr);
+        *reinterpret_cast<void**>(self + 0x850) = 0;
+    }
+
+    ptr = *reinterpret_cast<void**>(self + 0x82C);
+    if (ptr != 0) {
+        __dl__FPv(ptr);
+        *reinterpret_cast<void**>(self + 0x82C) = 0;
+    }
+
+    ptr = *reinterpret_cast<void**>(self + 0x848);
+    if (ptr != 0) {
+        __dl__FPv(ptr);
+        *reinterpret_cast<void**>(self + 0x848) = 0;
+    }
+
+    _GXColor clearColor = *reinterpret_cast<_GXColor*>(&DAT_802381a7);
+    GXSetCopyClear(clearColor, 0xFFFFFF);
 }
 
 /*

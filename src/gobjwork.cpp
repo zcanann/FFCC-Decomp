@@ -1343,55 +1343,61 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
  */
 int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param5, int param6, int, int flags)
 {
-	if (requestType == 3) {
+	switch (requestType) {
+	case 0:
+		m_shopListCount = 0;
+		m_shopRequestState = 0;
+		m_shopList[0] = 0;
+		m_shopList[1] = 0;
+		m_shopList[2] = 0;
+		m_shopList[3] = 0;
+		m_shopList[4] = 0;
+		m_shopList[5] = 0;
+		m_shopList[6] = 0;
+		m_shopList[7] = 0;
+		m_shopList[8] = 0;
+		m_shopList[9] = 0;
+		m_shopList[10] = 0;
+		m_shopList[11] = 0;
+		m_shopList[12] = 0;
+		m_shopList[13] = 0;
+		m_shopList[14] = 0;
+		m_shopList[15] = 0;
+		break;
+	case 1: {
+		short idx = m_shopListCount;
+		m_shopListCount = idx + 1;
+		m_shopList[idx] = (short)param3;
+		break;
+	}
+	case 2:
+		m_shopArg0 = param3;
+		m_shopArg1 = param4;
+		m_shopArg2 = param5;
+		m_shopArg3 = param6;
+		m_shopRequestFlags = (unsigned char)(flags & 1);
+		break;
+	case 3:
 		m_shopParam = (short)param3;
-	} else if (requestType < 3) {
-		if (requestType == 1) {
-			short idx = m_shopListCount;
-			m_shopListCount = idx + 1;
-			m_shopList[idx] = (short)param3;
-		} else if (requestType < 1) {
-			if (requestType >= 0) {
-				m_shopListCount = 0;
-				m_shopRequestState = 0;
-				m_shopList[0] = 0;
-				m_shopList[1] = 0;
-				m_shopList[2] = 0;
-				m_shopList[3] = 0;
-				m_shopList[4] = 0;
-				m_shopList[5] = 0;
-				m_shopList[6] = 0;
-				m_shopList[7] = 0;
-				m_shopList[8] = 0;
-				m_shopList[9] = 0;
-				m_shopList[10] = 0;
-				m_shopList[11] = 0;
-				m_shopList[12] = 0;
-				m_shopList[13] = 0;
-				m_shopList[14] = 0;
-				m_shopList[15] = 0;
-			}
-		} else {
-			m_shopArg0 = param3;
-			m_shopArg1 = param4;
-			m_shopArg2 = param5;
-			m_shopArg3 = param6;
-			m_shopRequestFlags = (unsigned char)(flags & 1);
-		}
-	} else if (requestType == 5) {
-		m_shopRequestState = 2;
-		if (Game.game.m_gameWork.m_menuStageMode == 0) {
-			GbaQue.SetSmithFlg(m_joybusCaravanId);
-		} else {
-			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
-		}
-	} else if (requestType < 5) {
+		break;
+	case 4:
 		m_shopRequestState = 1;
 		if (Game.game.m_gameWork.m_menuStageMode == 0) {
 			GbaQue.SetShopFlg(m_joybusCaravanId);
 		} else {
 			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
 		}
+		break;
+	case 5:
+		m_shopRequestState = 2;
+		if (Game.game.m_gameWork.m_menuStageMode == 0) {
+			GbaQue.SetSmithFlg(m_joybusCaravanId);
+		} else {
+			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		}
+		break;
+	default:
+		break;
 	}
 
 	return 0;

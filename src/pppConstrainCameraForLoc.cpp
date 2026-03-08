@@ -6,7 +6,7 @@
 #include <dolphin/mtx.h>
 
 // External references
-extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
+extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern struct {
     int field0_0x0;
     Mtx m_cameraMatrix;

@@ -862,12 +862,14 @@ static void cbForStateBusy(u32 intType) {
     s32 result;
 
     if (intType == 16) {
+		executing->state = DVD_STATE_FATAL_ERROR;
 		stateTimeout();
 		return;
 	}
 
     if ((CurrCommand == DVD_COMMAND_CHANGE_DISK) || (CurrCommand == DVD_COMMAND_BS_CHANGE_DISK)) {
         if (intType & DVD_INTTYPE_DE) {
+            executing->state = DVD_STATE_FATAL_ERROR;
             stateError(0x01234567);
             return;
         }
@@ -1006,6 +1008,7 @@ static void cbForStateBusy(u32 intType) {
         ASSERTLINE(2063, intType == DVD_INTTYPE_DE);
 
         if (CurrCommand == 14) {
+			executing->state = DVD_STATE_FATAL_ERROR;
 			stateError(0x01234567);
 			return;
 		}

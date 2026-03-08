@@ -475,8 +475,10 @@ void CGMonObj::frameStatFuncGolem()
  */
 void CGMonObj::changeStatFuncArmstrong(int stat)
 {
-	if (stat == 100) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -14);
+		break;
 	}
 }
 
@@ -3175,5 +3177,4 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 
 	chara->statAttack();
 }
-
 

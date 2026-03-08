@@ -1003,9 +1003,26 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawSingleCrescent(float, float)
+void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
 {
-	// TODO
+    DrawInit__8CMenuPcsFv(this);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+
+    _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x21);
+    DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0,
+                                    -(FLOAT_803329ac * scaleX - FLOAT_803329bc), FLOAT_80332948,
+                                    FLOAT_803329ac, FLOAT_803329b0,
+                                    FLOAT_8033294c, FLOAT_8033294c,
+                                    scaleX, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 8,
+                                    FLOAT_803329b4, FLOAT_80332948,
+                                    FLOAT_803329ac, FLOAT_803329b0,
+                                    FLOAT_8033294c, FLOAT_8033294c,
+                                    scaleX, FLOAT_80332934, 0.0f);
 }
 
 /*
@@ -1488,9 +1505,17 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawShadowFont(CFont*, char*, float, float, int, int)
+void CMenuPcs::DrawShadowFont(CFont* font, char* text, float x, float y, int tlut, int shadowTlut)
 {
-	// TODO
+    SetTlut__5CFontFi(font, shadowTlut);
+    SetPosX__5CFontFf(FLOAT_80332934 + x, font);
+    SetPosY__5CFontFf((FLOAT_80332934 + y) - FLOAT_80332954, font);
+    Draw__5CFontFPc(font, text);
+
+    SetTlut__5CFontFi(font, tlut);
+    SetPosX__5CFontFf(x, font);
+    SetPosY__5CFontFf(y - FLOAT_80332954, font);
+    Draw__5CFontFPc(font, text);
 }
 
 /*
@@ -1508,9 +1533,40 @@ void CMenuPcs::DrawNoShadowFont(CFont*, char*, float, float, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetItemType(int, int)
+int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
-	// TODO
+    if (useRawItemId == 0) {
+        itemId = static_cast<int>(*reinterpret_cast<s16*>(Game.game.m_scriptFoodBase[0] + itemId * 2 + 0xB6));
+    }
+
+    if (itemId < 1) {
+        return 0;
+    }
+    if (itemId < 0x9F) {
+        return 1;
+    }
+    if (itemId < 0x100) {
+        return 2;
+    }
+    if (itemId < 0x125) {
+        return 3;
+    }
+    if (itemId == 0x125) {
+        return 4;
+    }
+    if (itemId < 0x12A) {
+        return 5;
+    }
+    if (itemId < 0x17D) {
+        return 6;
+    }
+    if (itemId <= 0x188) {
+        return 7;
+    }
+    if (itemId <= 400) {
+        return 8;
+    }
+    return 9;
 }
 
 /*

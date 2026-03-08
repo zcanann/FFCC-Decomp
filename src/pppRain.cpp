@@ -10,20 +10,21 @@
 const float FLOAT_8033101c = 1.0f;
 const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
+static char s_pppRain_cpp_801db610[] = "pppRain.cpp";
 
 static inline float CameraLookAtX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD4);
 }
 
 static inline float CameraLookAtY()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD8);
 }
 
 static inline float CameraLookAtZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
 }
 
 extern "C" {
@@ -196,7 +197,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         work->drops = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)count * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
-            (char*)"pppRain.cpp",
+            s_pppRain_cpp_801db610,
             0x7f);
         drop = (RainDrop*)work->drops;
         for (i = 0; i < count; i++) {

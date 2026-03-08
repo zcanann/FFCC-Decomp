@@ -70,15 +70,11 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
         offsetPos.z = offsetPosZ;
         pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, offsetPos);
     } else if (mode < 3) {
-        Vec modePos;
         float cameraPosX;
         float cameraPosY;
         float cameraPosZ;
 
-        modePos.x = scaledPosX;
-        modePos.y = scaledPosY;
-        modePos.z = scaledPosZ;
-        pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, modePos);
+        pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
         cameraPosX = *(float*)(param2 + 8) * pppMngStPtr->m_scale.x + zeroVec.x;
         cameraPosY = *(float*)(param2 + 0xc) * pppMngStPtr->m_scale.y + zeroVec.y;
         cameraPosZ = *(float*)(param2 + 0x10) * pppMngStPtr->m_scale.z + zeroVec.z;

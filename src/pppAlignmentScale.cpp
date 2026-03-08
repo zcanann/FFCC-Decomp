@@ -1,24 +1,9 @@
 #include "ffcc/pppAlignmentScale.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_camera.h"
 
 #include <dolphin/mtx.h>
 
-
-static inline float CameraPosX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0);
-}
-
-static inline float CameraPosY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4);
-}
-
-static inline float CameraPosZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8);
-}
+extern unsigned char CameraPcs[];
 
 extern "C" {
 void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
@@ -51,15 +36,17 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 {
     float scale;
     struct _pppMngSt* pppMngSt;
+    unsigned char* camera;
     Vec cameraPos;
     Vec objPos;
     Mtx scaleMtx;
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        cameraPos.x = CameraPosX();
-        cameraPos.y = CameraPosY();
-        cameraPos.z = CameraPosZ();
+        camera = CameraPcs;
+        cameraPos.x = *reinterpret_cast<float*>(camera + 0xE0);
+        cameraPos.y = *reinterpret_cast<float*>(camera + 0xE4);
+        cameraPos.z = *reinterpret_cast<float*>(camera + 0xE8);
 
         objPos.x = pppMngStPtr->m_matrix.value[0][3];
         objPos.y = pppMngStPtr->m_matrix.value[1][3];
@@ -87,4 +74,3 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     return alignmentScale;
 }
-

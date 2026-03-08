@@ -473,8 +473,8 @@ void CMapMesh::SetRenderArray()
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     unsigned int remaining = count;
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
 
     while (remaining-- != 0) {
         if (entry->size != 0) {
@@ -586,11 +586,11 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
  */
 void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
-    int* drawEntry;
+    unsigned int* drawEntry;
 
     if (U16At(this, 0xA) != 0) {
-        drawEntry = reinterpret_cast<int*>(PtrAt(this, 0x40));
-        if ((int)*drawEntry != 0) {
+        drawEntry = reinterpret_cast<unsigned int*>(PtrAt(this, 0x40));
+        if (*drawEntry != 0) {
             textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
             CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
                 reinterpret_cast<unsigned char*>(materialSet) + 8))[*reinterpret_cast<unsigned short*>(drawEntry + 2)];

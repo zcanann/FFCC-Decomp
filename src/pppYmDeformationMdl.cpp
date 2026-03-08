@@ -188,8 +188,8 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
     short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
-    u8* control = (u8*)&param_2->m_payload0;
     int textureIndex = 0;
+    u8* payload = (u8*)&param_2->m_payload0;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
@@ -202,10 +202,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     Mtx texMtx;
     Mtx rotMtx;
     Mtx44 screenMtx;
-    int left = 0;
-    int top = 0;
-    int width = 0x280;
-    int height = 0x1c0;
+    int left;
+    int top;
+    int width;
+    int height;
     int backTexture = 0;
 
     PSMTXIdentity(rotMtx);
@@ -214,8 +214,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + param_3->m_serializedDataOffsets[1]),
-        (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40), *(float*)(control + 0x10), control[0x17], control[0x16], control[0x14],
-        control[0x15], (u8)(control[0x18] == 0), 1, 0);
+        (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40), *(float*)(payload + 0x10), payload[0x17], payload[0x16], payload[0x14],
+        payload[0x15], (u8)(payload[0x18] == 0), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -229,11 +229,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7, 4);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-    pppSetBlendMode__FUc(control[0x14]);
-    if (control[0x14] == 0) {
+    pppSetBlendMode__FUc(payload[0x14]);
+    if (payload[0x14] == 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
     }
-    if (control[0x14] == 3) {
+    if (payload[0x14] == 3) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 1);
         GXSetTevOp((GXTevStageID)0, GX_MODULATE);
     }
@@ -246,6 +246,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
+    width = 0x280;
+    left = 0;
+    top = 0;
+    height = 0x1c0;
     backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
     if (backTexture != 0) {
         PSMTXIdentity(texMtx);
@@ -317,4 +321,3 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
-

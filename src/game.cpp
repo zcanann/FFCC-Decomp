@@ -220,52 +220,52 @@ int CGBaseObj::GetCID()
  */
 extern "C" void __sinit_game_cpp(void)
 {
-    *reinterpret_cast<void**>(&Game.game) = __vt__8CManager;
-    *reinterpret_cast<void**>(&Game.game) = __vt__5CGame;
+    CGame* game = &Game.game;
+    const char* townName;
 
-    memset(reinterpret_cast<unsigned char*>(&Game.game) + 0xF, 0, 0x13E1);
-    memset(reinterpret_cast<unsigned char*>(&Game.game) + 0x20, 0xFF, 0x10);
+    *reinterpret_cast<void**>(game) = __vt__5CGame;
+    memset(reinterpret_cast<unsigned char*>(game) + 0xF, 0, 0x13E1);
+    memset(reinterpret_cast<unsigned char*>(game) + 0x20, 0xFF, 0x10);
 
-    Game.game.m_gameWork.m_scriptSysVal0 = 0;
-    Game.game.m_gameWork.m_scriptSysVal1 = 0;
-    Game.game.m_gameWork.m_scriptSysVal2 = 0;
-    Game.game.m_gameWork.m_scriptSysVal3 = 1;
-    Game.game.m_gameWork.m_chaliceElement = 1;
+    game->m_gameWork.m_scriptSysVal0 = 0;
+    game->m_gameWork.m_scriptSysVal1 = 0;
+    game->m_gameWork.m_scriptSysVal2 = 0;
+    game->m_gameWork.m_scriptSysVal3 = 1;
+    game->m_gameWork.m_chaliceElement = 1;
 
-    if (Game.game.m_gameWork.m_languageId == 3) {
-        strcpy(Game.game.m_gameWork.m_townName, DAT_8032f6a4);
-    } else {
-        strcpy(Game.game.m_gameWork.m_townName, DAT_8032f6ac);
+    townName = DAT_8032f6ac;
+    if (game->m_gameWork.m_languageId == 3) {
+        townName = DAT_8032f6a4;
     }
-
-    Game.game.m_gameWork.m_gameInitFlag = 1;
+    strcpy(game->m_gameWork.m_townName, townName);
+    game->m_gameWork.m_gameInitFlag = 1;
 
     __construct_array(
-        Game.game.m_caravanWorkArr,
+        game->m_caravanWorkArr,
         reinterpret_cast<ConstructorDestructor>(__ct__12CCaravanWorkFv),
-        reinterpret_cast<ConstructorDestructor>(dtor_800A2B9C),
+        reinterpret_cast<ConstructorDestructor>(__dt__12CCaravanWorkFv),
         0xC30,
         9
     );
     __construct_array(
-        Game.game.m_monWorkArr,
+        game->m_monWorkArr,
         reinterpret_cast<ConstructorDestructor>(__ct__8CMonWorkFv),
-        reinterpret_cast<ConstructorDestructor>(dtor_8009E9B4),
+        reinterpret_cast<ConstructorDestructor>(__dt__8CMonWorkFv),
         0x110,
         0x40
     );
 
-    Game.game.m_partyMinZ = FLOAT_8032f688;
-    Game.game.m_partyMinY = FLOAT_8032f688;
-    Game.game.m_partyMinX = FLOAT_8032f688;
-    Game.game.m_partyMaxZ = FLOAT_8032f68c;
-    Game.game.m_partyMaxY = FLOAT_8032f68c;
-    Game.game.m_partyMaxX = FLOAT_8032f68c;
+    game->m_partyMinZ = FLOAT_8032f688;
+    game->m_partyMinY = FLOAT_8032f688;
+    game->m_partyMinX = FLOAT_8032f688;
+    game->m_partyMaxZ = FLOAT_8032f68c;
+    game->m_partyMaxY = FLOAT_8032f68c;
+    game->m_partyMaxX = FLOAT_8032f68c;
 
     __construct_array(
-        Game.game.m_cFlatDataArr,
+        game->m_cFlatDataArr,
         reinterpret_cast<ConstructorDestructor>(__ct__9CFlatDataFv),
-        reinterpret_cast<ConstructorDestructor>(dtor_800980B4),
+        reinterpret_cast<ConstructorDestructor>(__dt__9CFlatDataFv),
         0x14D4,
         4
     );

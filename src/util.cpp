@@ -925,13 +925,18 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
 void CUtil::SetPaletteEnv(CTexture* texture)
 {
     CTextureLite* textureLite = reinterpret_cast<CTextureLite*>(texture);
-    GXColor tevColor2 = {0xFF, 0xFF, 0x00, 0x00};
-    GXColor tevColor3 = {0x00, 0x00, 0xFF, 0xFF};
+    union
+    {
+        GXColor color;
+        u32 value;
+    } tevColor;
 
     GXSetNumTevStages(3);
     GXSetNumTexGens(1);
-    GXSetTevColor(GX_TEVREG1, tevColor2);
-    GXSetTevColor(GX_TEVREG2, tevColor3);
+    tevColor.value = 0xFFFF0000;
+    GXSetTevColor(GX_TEVREG1, tevColor.color);
+    tevColor.value = 0x0000FFFF;
+    GXSetTevColor(GX_TEVREG2, tevColor.color);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
 
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_ALPHA, GX_CH_ALPHA);

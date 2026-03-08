@@ -224,31 +224,12 @@ void CGraphicPcs::destroy()
  */
 void CGraphicPcs::calc()
 {
-    if (m_screenFade[0].m_timer > 0) {
-        m_screenFade[0].m_timer = m_screenFade[0].m_timer - 1;
-        if (m_screenFade[0].m_timer == 0) {
-            m_screenFade[0].m_targetObj = 0;
-        }
-    }
-
-    if (m_screenFade[1].m_timer > 0) {
-        m_screenFade[1].m_timer = m_screenFade[1].m_timer - 1;
-        if (m_screenFade[1].m_timer == 0) {
-            m_screenFade[1].m_targetObj = 0;
-        }
-    }
-
-    if (m_screenFade[2].m_timer > 0) {
-        m_screenFade[2].m_timer = m_screenFade[2].m_timer - 1;
-        if (m_screenFade[2].m_timer == 0) {
-            m_screenFade[2].m_targetObj = 0;
-        }
-    }
-
-    if (m_screenFade[3].m_timer > 0) {
-        m_screenFade[3].m_timer = m_screenFade[3].m_timer - 1;
-        if (m_screenFade[3].m_timer == 0) {
-            m_screenFade[3].m_targetObj = 0;
+    for (int i = 0; i < 4; i++) {
+        if (m_screenFade[i].m_timer > 0) {
+            m_screenFade[i].m_timer--;
+            if (m_screenFade[i].m_timer == 0) {
+                m_screenFade[i].m_targetObj = 0;
+            }
         }
     }
 }
@@ -1057,4 +1038,3 @@ void CGraphicPcs::drawScreenFade()
     PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }
-

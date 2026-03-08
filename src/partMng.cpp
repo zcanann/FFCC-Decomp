@@ -840,12 +840,144 @@ void CPartMng::allFreeFPrim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005dbf8
+ * PAL Size: 632b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::SetFp()
 {
-	// TODO
+    struct PppMngSetFpRaw {
+        void* m_pppResSet;                   // 0x00
+        unsigned char m_pad04[0x14 - 0x04];
+        int m_baseTime;                      // 0x14
+        float m_rotationX;                   // 0x18
+        float m_rotationZ;                   // 0x1C
+        int m_rotationSpeed;                 // 0x20
+        unsigned char m_pad24[0x28 - 0x24];
+        Vec m_scale;                         // 0x28
+        unsigned char m_pad34[0x40 - 0x34];
+        float m_scaleFactor;                 // 0x40
+        float m_ownerScale;                  // 0x44
+        float m_userFloat0;                  // 0x48
+        float m_userFloat1;                  // 0x4C
+        unsigned char m_pad50[0x76 - 0x50];
+        short m_nodeIndex;                   // 0x76
+        unsigned char m_pad78[0xBC - 0x78];
+        unsigned int m_objHitMask;           // 0xBC
+        unsigned int m_cylinderAttribute;    // 0xC0
+        unsigned char m_padC4[0xD8 - 0xC4];
+        void* m_owner;                       // 0xD8
+        void* m_lookTarget;                  // 0xDC
+        void* m_bindNode;                    // 0xE0
+        unsigned char m_padE4[0xEB - 0xE4];
+        unsigned char m_matrixMode;          // 0xEB
+        unsigned char m_drawPass;            // 0xED
+        signed char m_drawSubType;           // 0xEE
+        unsigned char m_drawVariant;         // 0xEF
+        unsigned char m_rotationOrder;       // 0xF0
+        unsigned char m_ownerFlagsInitialized; // 0xF1
+        unsigned char m_fieldF2;             // 0xF2
+        unsigned char m_useOwnerScaleSign;   // 0xF3
+        unsigned char m_ownerFlagA;          // 0xF4
+        unsigned char m_ownerFlagB;          // 0xF5
+        unsigned char m_padF6[0xF9 - 0xF6];
+        unsigned char m_fpBillboard;         // 0xF9
+        unsigned char m_prio;                // 0xFA
+        unsigned char m_padFB[0x100 - 0xFB];
+        unsigned int m_paramA;               // 0x100
+        unsigned int m_paramB;               // 0x104
+        float m_cullRadiusSq;                // 0x108
+        float m_cullRadius;                  // 0x10C
+        float m_cullYOffset;                 // 0x110
+        unsigned char m_pad114[0x11A - 0x114];
+        short m_mapObjIndex;                 // 0x11A
+    };
+
+    static const int kUsbEditOffset = 0x7F0;
+    static const int kResSetOffset = 0x23518;
+    static const int kRecvBuffOffset = 0x23554;
+    static const int kEditCountOffset = 0x2355C;
+    static const int kPppMngOffset = 0x2A18;
+    static const int kPacketStride = 0x60;
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
+    float* recvBuff = *reinterpret_cast<float**>(self + kRecvBuffOffset);
+    PppMngSetFpRaw* mng = reinterpret_cast<PppMngSetFpRaw*>(self + kPppMngOffset);
+    for (int i = 0; i < editCount; i++) {
+        unsigned char* fpBytes = reinterpret_cast<unsigned char*>(recvBuff);
+        mng->m_pppResSet = self + kResSetOffset;
+
+        int fpTime = static_cast<int>(recvBuff[0x0B]);
+        if (mng->m_baseTime < 0) {
+            mng->m_baseTime = fpTime;
+        } else {
+            int scaled = (fpTime * 0x19) / 0x1E + ((fpTime * 0x19) >> 0x1F);
+            mng->m_baseTime = scaled - (scaled >> 0x1F);
+        }
+
+        mng->m_cullRadiusSq = recvBuff[0x0D];
+        if (mng->m_cullRadiusSq > 0.0f) {
+            mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
+        }
+        mng->m_nodeIndex = static_cast<short>(i);
+        mng->m_cullRadius = recvBuff[0x0E];
+        mng->m_cullYOffset = recvBuff[0x0F];
+        mng->m_rotationX = recvBuff[4];
+        mng->m_rotationZ = recvBuff[5];
+        mng->m_rotationSpeed = static_cast<int>(recvBuff[6]);
+        mng->m_scale.x = recvBuff[8];
+        mng->m_scale.y = recvBuff[9];
+        mng->m_scale.z = recvBuff[0x0A];
+        mng->m_ownerScale = FLOAT_8032fe18;
+        mng->m_scaleFactor = FLOAT_8032fe18;
+        mng->m_userFloat1 = FLOAT_8032fe18;
+        mng->m_userFloat0 = FLOAT_8032fe18;
+        mng->m_useOwnerScaleSign = 0;
+        mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpBytes + 0x45);
+        mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpBytes + 0x46);
+        mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpBytes + 0x47);
+        mng->m_drawPass = *reinterpret_cast<unsigned char*>(fpBytes + 0x44);
+        mng->m_drawSubType = *reinterpret_cast<signed char*>(fpBytes + 0x4C);
+        mng->m_ownerFlagA = *reinterpret_cast<unsigned char*>(fpBytes + 0x4D);
+        mng->m_ownerFlagB = *reinterpret_cast<unsigned char*>(fpBytes + 0x4E);
+        mng->m_fieldF2 = 1;
+        mng->m_fpBillboard = *reinterpret_cast<unsigned char*>(fpBytes + 0x4A);
+        mng->m_prio = *reinterpret_cast<unsigned char*>(fpBytes + 0x4B);
+        mng->m_mapObjIndex = *reinterpret_cast<short*>(fpBytes + 0x48);
+        mng->m_owner = 0;
+        mng->m_objHitMask = 0xFFFFFFFF;
+        mng->m_cylinderAttribute = 0xFFFFFFFF;
+        mng->m_paramA = 0;
+        mng->m_ownerFlagsInitialized = 1;
+        mng->m_ownerFlagA = 1;
+
+        unsigned char mode = mng->m_matrixMode;
+        if (mode == 2 || mode == 4) {
+            mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpBytes + 0x48)));
+        } else if (mode >= 3 && mode <= 8) {
+            CGObject* owner = *reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C);
+            mng->m_ownerFlagA = 0;
+            mng->m_owner = owner;
+            mng->m_lookTarget = owner;
+            if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
+                int node = SearchNodeSk__Q26CChara6CModelFPc(owner->m_charaModelHandle->m_model,
+                                                             reinterpret_cast<char*>(fpBytes + 0x50));
+                if (node >= 0) {
+                    mng->m_bindNode = reinterpret_cast<void*>(
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(
+                            reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_model) + 0xA8) +
+                                                node * 0xC0));
+                }
+            }
+        }
+
+        recvBuff = reinterpret_cast<float*>(fpBytes + kPacketStride);
+        mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));
+    }
 }
 
 /*

@@ -4,6 +4,8 @@
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 #include <string.h>
 
+extern char lbl_801E6868[];
+
 /* 8044F288-8044F290 07BFA8 0004+04 4/4 0/0 0/0 .bss             IsTRKConnected */
 BOOL IsTRKConnected;
 
@@ -517,13 +519,14 @@ DSError TRKDoStop(TRKBuffer* b) {
 /* 8036DD14-8036DDBC 368654 00A8+00 0/0 1/1 0/0 .text            TRKDoSetOption */
 DSError TRKDoSetOption(TRKBuffer* message) {
     u8 enable = message->data[0xc];
+    char* optionText = lbl_801E6868;
 
     if (message->data[0x8] == '\1') {
-        usr_puts_serial("\nMetroTRK Option : SerialIO - ");
+        usr_puts_serial(optionText);
         if (enable) {
-            usr_puts_serial("Enable\n");
+            usr_puts_serial(optionText + 0x20);
         } else {
-            usr_puts_serial("Disable\n");
+            usr_puts_serial(optionText + 0x28);
         }
         SetUseSerialIO(enable);
     }

@@ -82,7 +82,7 @@ unsigned int CRedSound::GetAutoID()
 	do {
 		DAT_8032f4c4 = DAT_8032f4c4 + 1;
 		DAT_8032f4c4 = DAT_8032f4c4 & 0x7FFFFFFF;
-	} while (DAT_8032f4c4 == 0);
+	} while ((int)DAT_8032f4c4 == 0);
 
 	return DAT_8032f4c4;
 }

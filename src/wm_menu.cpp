@@ -107,6 +107,7 @@ unsigned char DAT_8032ee30;
 extern unsigned char CFlat[];
 char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
+extern char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[];
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
@@ -2592,6 +2593,10 @@ void CMenuPcs::SetCMakeEnd(int channel)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 	selectData[channel * 0x10 + 0xC] = 1;
+	if ((unsigned int)System.m_execParam > 2) {
+		Printf__7CSystemFPce(&System, s_SetCMakeEnd___chan____d_cur____d_801dc3b4, channel,
+		                     (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
+	}
 }
 
 /*

@@ -27,8 +27,8 @@ public:
     int m_numItems;
     int m_size;
     int m_defaultSize;
-    CMemory::CStage* m_stage;
     int m_growCapacity;
+    CMemory::CStage* m_stage;
     T* m_items;
 };
 

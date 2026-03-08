@@ -208,7 +208,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     int height = 0x1c0;
     int backTexture = 0;
 
-    pppInitBlendMode__Fv();
+    PSMTXIdentity(rotMtx);
+    pppSetBlendMode__FUc(0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -316,5 +317,4 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
-
 

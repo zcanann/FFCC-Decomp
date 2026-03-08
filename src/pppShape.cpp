@@ -201,11 +201,11 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     int frameIndex;
     unsigned int textureIndex;
     void* animData;
-    char* texturePtr;
-    char textureUsed[0x108];
+    unsigned char* texturePtr;
+    unsigned char textureUsed[0x100];
 
     animData = shapeSt->m_animData;
-    memset(textureUsed, 0, 0x100);
+    memset(textureUsed, 0, sizeof(textureUsed));
 
     currentFrame = animData;
     for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
@@ -219,7 +219,7 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         currentFrame = (void*)((int)currentFrame + 8);
     }
 
-    texturePtr = (char*)textureUsed;
+    texturePtr = textureUsed;
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
@@ -269,11 +269,11 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     int frameIndex;
     unsigned int textureIndex;
     void* animData;
-    char* texturePtr;
-    char textureUsed[0x108];
+    unsigned char* texturePtr;
+    unsigned char textureUsed[0x100];
 
     animData = shapeSt->m_animData;
-    memset(textureUsed, 0, 0x100);
+    memset(textureUsed, 0, sizeof(textureUsed));
 
     currentFrame = animData;
     for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
@@ -287,7 +287,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         currentFrame = (void*)((int)currentFrame + 8);
     }
 
-    texturePtr = (char*)textureUsed;
+    texturePtr = textureUsed;
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {

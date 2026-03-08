@@ -253,13 +253,13 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
 		void** dlEntries = (void**)*stageArray;
 		for (j = 0; j < dlCount; j++) {
-			if (dlEntries[0] != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(dlEntries[0]);
-				dlEntries[0] = 0;
-			}
-			if (*(void**)dlEntries != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlEntries);
-				*(void**)dlEntries = 0;
+			if (*dlEntries != 0) {
+				if (*(void**)*dlEntries != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+					*(void**)*dlEntries = 0;
+				}
+				pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
+				*dlEntries = 0;
 			}
 			dlEntries++;
 		}
@@ -278,8 +278,14 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		meshList += 0x14;
 	}
 
-	pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((char*)ymChangeTex + 0x90 + dataOffset));
-	pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((char*)ymChangeTex + 0x8c + dataOffset));
+	void* stageBase = *(void**)((char*)ymChangeTex + 0x90 + dataOffset);
+	void* meshBase = *(void**)((char*)ymChangeTex + 0x8c + dataOffset);
+	if (stageBase != 0) {
+		pppHeapUseRate__FPQ27CMemory6CStage(stageBase);
+	}
+	if (meshBase != 0) {
+		pppHeapUseRate__FPQ27CMemory6CStage(meshBase);
+	}
 }
 
 /*

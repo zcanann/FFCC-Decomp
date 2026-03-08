@@ -432,7 +432,6 @@ int CMenuPcs::ItemCtrl()
     s16 sVar1;
     int iVar2;
     int iVar3;
-    s16* singWindowInfo = this->singWindowInfo;
 
     iVar3 = 0;
     *(s16*)((int)itemMenuState + 0x32) = *(s16*)((int)itemMenuState + 0x30);
@@ -450,8 +449,8 @@ int CMenuPcs::ItemCtrl()
                (*(s16*)((int)singWindowInfo + 10) == 3)) {
         iVar3 = 0;
         *(s16*)(iVar2 + 0x12) = 0;
-        *(s16*)((int)itemMenuState + 0x30) = 0;
-        *(s16*)((int)itemMenuState + 0x22) = 0;
+        *(s16*)(iVar2 + 0x30) = 0;
+        *(s16*)(iVar2 + 0x22) = 0;
     }
 
     if (iVar3 != 0) {

@@ -77,18 +77,22 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
  */
 void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
 {
+    int zero = 0;
+    short zeroShort = 0;
+    float zeroFloat = kPppScreenQuakeZero;
+
     SetQuakeParameter__10CCameraPcsFiissffffffi(
         &CameraPcs,
-        0,
-        0,
-        0,
-        0,
-        kPppScreenQuakeZero,
-        kPppScreenQuakeZero,
-        kPppScreenQuakeZero,
-        kPppScreenQuakeZero,
-        kPppScreenQuakeZero,
-        kPppScreenQuakeZero,
+        zero,
+        zero,
+        zeroShort,
+        zeroShort,
+        zeroFloat,
+        zeroFloat,
+        zeroFloat,
+        zeroFloat,
+        zeroFloat,
+        zeroFloat,
         1);
 }
 

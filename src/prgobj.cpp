@@ -307,18 +307,13 @@ int CGPrgObj::isLoopAnimDirect()
  */
 int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
-	int handle;
-
 	if (seNo == 0 || seNo == 0xFFFF) {
 		return -1;
 	}
 
-	if (pos == nullptr) {
-		pos = &m_worldPosition;
-	}
-
-	handle = Sound.PlaySe3D(
-		seNo, pos,
+	Vec* usePos = (pos != nullptr) ? pos : &m_worldPosition;
+	int handle = Sound.PlaySe3D(
+		seNo, usePos,
 		static_cast<float>(static_cast<unsigned int>(volume)),
 		static_cast<float>(static_cast<unsigned int>(dist)),
 		0
@@ -460,13 +455,15 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 {
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector deltaPos;
+	float targetRot;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	m_rotTargetY = 0.0f;
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	targetRot = 0.0f;
 	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
-		m_rotTargetY = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
+	m_rotTargetY = targetRot;
 }
 
 /*

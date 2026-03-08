@@ -118,6 +118,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	if (state->countdown == 0) {
 		VertexApMtxEnv* env = (VertexApMtxEnv*)pppEnvStPtr;
 		VertexApMtxEntry* entry = &env->entries[data->entryIndex];
+		u16* vertexIndices = entry->vertexIndices;
 		Vec* points = *(Vec**)((u8*)parent + 0x70);
 
 		if (points == 0) {
@@ -129,13 +130,15 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		s32 count = data->spawnCount;
 		switch (data->mode) {
 		case 0:
+		{
+			MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
 			do {
 				if (state->index >= entry->maxValue) {
 					state->index = 0;
 				}
 
 				u16 index = state->index++;
-				u16 vertexIndex = entry->vertexIndices[index];
+				u16 vertexIndex = vertexIndices[index];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
@@ -160,7 +163,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					pos.x = x;
 					pos.y = y;
 					pos.z = z;
-					PSMTXMultVec((MtxPtr)((u8*)parent + 0x10), &pos, &pos);
+					PSMTXMultVec(parentMtx, &pos, &pos);
 					outMtx = (MtxPtr)((u8*)child + data->childMtxOffset + 0x80);
 					if (data->useWorldMtx == 0) {
 						PSMTXIdentity(outMtx);
@@ -177,9 +180,12 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				}
 			} while (count-- != 0);
 			break;
+		}
 		case 1:
+		{
+			MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
 			do {
-				u16 vertexIndex = entry->vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&math))];
+				u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&math))];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
@@ -204,7 +210,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					pos.x = x;
 					pos.y = y;
 					pos.z = z;
-					PSMTXMultVec((MtxPtr)((u8*)parent + 0x10), &pos, &pos);
+					PSMTXMultVec(parentMtx, &pos, &pos);
 					outMtx = (MtxPtr)((u8*)child + data->childMtxOffset + 0x80);
 					if (data->useWorldMtx == 0) {
 						PSMTXIdentity(outMtx);
@@ -221,6 +227,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				}
 			} while (count-- != 0);
 			break;
+		}
 		}
 		state->countdown = data->spawnDelay;
 	}

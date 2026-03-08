@@ -59,9 +59,9 @@ CRedSound::~CRedSound()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, short param_2)
+extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, int param_2)
 {
-    if ((redSound != 0) && (0 < param_2)) {
+    if ((redSound != 0) && ((short)param_2 > 0)) {
         __dl__FPv(redSound);
     }
     return redSound;

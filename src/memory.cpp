@@ -12,6 +12,7 @@
 #include <string.h>
 
 CMemory Memory;
+CAmemCacheSet ppvAmemCacheSet;
 
 static char s_memory_cpp[] = "memory.cpp";
 static char s_heapWalkerTitle[] = "---- Heap Walker ----\n";

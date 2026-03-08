@@ -3,8 +3,8 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
-#include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+extern u8 gPppDefaultValueBuffer[];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 typedef struct RandCVParams {
@@ -55,8 +55,12 @@ void pppRandCV(void* param1, void* param2, void* param3)
         randomValue = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s32 colorOffset = params->colorOffset;
-    u8* target = (colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + colorOffset + 0x80);
+    u8* target;
+    if (params->colorOffset == -1) {
+        target = gPppDefaultValueBuffer;
+    } else {
+        target = base + params->colorOffset + 0x80;
+    }
 
     f32 scale = *randomValue;
     s8 baseValue = params->delta[0];

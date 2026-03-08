@@ -89,7 +89,7 @@ static inline MeshDrawEntry* DrawEntries(CMapMesh* self)
 
 static inline CMaterialSet* DefaultMaterialSet()
 {
-    return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21434);
+    return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
 }
 
 static inline unsigned int Align32(unsigned int value)
@@ -479,9 +479,9 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
     while (remaining-- != 0) {
         if (entry->size != 0) {
             SetBlendMode__12CMaterialManFP12CMaterialSeti(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x21434), entry->materialIdx);
+                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->materialIdx);
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x21434),
+                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4),
                                                                        entry->materialIdx, 0, 1);
             GXCallDisplayList(entry->displayList, entry->size);
         }
@@ -508,7 +508,7 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
         if (entry->size != 0) {
             CMaterial* material =
                 (*reinterpret_cast<CPtrArray<CMaterial*>*>(
-                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x21434)) + 8))[
+                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4)) + 8))[
                     entry->materialIdx];
 
             if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
@@ -536,7 +536,7 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
     int remaining = static_cast<int>(U16At(this, 0xA));
 
     if (materialSet == 0) {
-        materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21434);
+        materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
     }
 
     while (remaining-- != 0) {

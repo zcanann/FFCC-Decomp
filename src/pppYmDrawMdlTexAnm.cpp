@@ -54,10 +54,9 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     OSReport(DAT_801d9c54);
 
+    mapMesh = pppEnvStPtr->m_mapMeshPtr;
     work->m_perU = FLOAT_8033054c;
     work->m_perV = FLOAT_8033054c;
-
-    mapMesh = pppEnvStPtr->m_mapMeshPtr;
     if (mapMesh != NULL) {
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         uvPairs = uvLayout->m_uvPairs;
@@ -242,5 +241,3 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 }
 
 }
-
-

@@ -12,10 +12,9 @@ public:
 	T operator[](unsigned long index);
 };
 
-// External constants referenced in decompilation
-extern double DOUBLE_8032fce8;
-extern float FLOAT_8032fcf0;
-extern float FLOAT_8032fce0;
+extern const float FLOAT_8032fce0 = 1.0f;
+extern const double DOUBLE_8032fce8 = 0.5;
+extern const float FLOAT_8032fcf0 = 0.5f;
 
 class CMapMng;
 extern CMapMng MapMng;

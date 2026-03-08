@@ -1203,7 +1203,7 @@ primitive_bad:
             if ((bVar1 & 7) != 2) {
                 if (uVar7 != 0) {
                     uVar8 = (u32)(uVar2 >> 3);
-                    if (uVar8 != 0) {
+                    if ((uVar2 >> 3) != 0) {
                         do {
                             data = data + 0x40;
                             uVar8 = uVar8 - 1;
@@ -1225,7 +1225,7 @@ primitive_bad:
 
             if (uVar7 != 0) {
                 uVar8 = (u32)(uVar2 >> 3);
-                if (uVar8 != 0) {
+                if ((uVar2 >> 3) != 0) {
                     do {
                         data = data + 0x50;
                         uVar8 = uVar8 - 1;

@@ -24,6 +24,7 @@ extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
+extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -70,7 +71,7 @@ extern float FLOAT_8032fb0c;
 extern float FLOAT_8032fb10;
 extern float FLOAT_8032fb14;
 extern float FLOAT_8032fb20;
-static const char s_materialStageName[] = "material";
+static const char s_CMaterial_material_801D7A48[] = "material";
 
 /*
  * --INFO--
@@ -412,7 +413,8 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	CMemory::CStage* stage = CreateStage__7CMemoryFUlPci(&Memory, 0x20000, s_CMaterial_material_801D7A48, 0);
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) = stage;
 	*Ptr(this, 0x204) = 0x30;
 }
 
@@ -3439,4 +3441,3 @@ void CMaterial::AddTextureIdx(int, int)
 {
 	// TODO
 }
-

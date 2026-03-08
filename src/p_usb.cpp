@@ -23,7 +23,8 @@ const char s_plot_kmitsuru__801d6d14[] = "plot.kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
-extern char gMemory[];
+extern "C" char* strcpy__FPcPCc(char*, const char*);
+extern "C" char gMemory[];
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
@@ -53,11 +54,13 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
+	CMemory* memory = &Memory;
+
 	m_smallStage = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
 	    reinterpret_cast<CMemory*>(gMemory), 0x2000, s_CUSBPcs_8032f810, 0));
 	m_bigStage = (CMemory::CStage*)nullptr;
 
-	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
+	strcpy__FPcPCc(m_rootPath, s_plot_kmitsuru__801d6d14);
 	m_unk0x104 = 0;
 	m_unk0x108 = 0;
 
@@ -75,6 +78,8 @@ void CUSBPcs::Init()
  */
 void CUSBPcs::Quit()
 { 
+	CMemory* memory = &Memory;
+
 	if (m_bigStage != (CMemory::CStage*)nullptr)
 	{
 		DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<CMemory*>(gMemory), m_bigStage);
@@ -105,6 +110,8 @@ void* CUSBPcs::GetTable(unsigned long param)
  */
 void CUSBPcs::IsBigAlloc(int param_2)
 {
+    CMemory* memory = &Memory;
+
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
         m_bigStage = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
             reinterpret_cast<CMemory*>(gMemory), 0x100000, s_CUSBPcs_8032f810, 0));

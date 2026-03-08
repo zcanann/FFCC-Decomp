@@ -248,14 +248,14 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 	}
 
 	if (state->m_direction != 0) {
-		s16 step = (s16)(int)state->m_values[3];
+		int step = (int)state->m_values[3];
 
 		state->m_angle = state->m_angle + step;
 		if (state->m_angle > param_2->m_payload3) {
 			state->m_direction = 0;
 		}
 	} else {
-		s16 step = (s16)(int)state->m_values[3];
+		int step = (int)state->m_values[3];
 
 		state->m_angle = state->m_angle - step;
 		if ((int)state->m_angle < -(int)param_2->m_payload3) {
@@ -742,5 +742,3 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 }
-
-

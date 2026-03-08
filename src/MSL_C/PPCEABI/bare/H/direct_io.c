@@ -9,7 +9,7 @@ typedef enum {
     __load_eof      = 2
 } __load_result;
 
-size_t fread(const void *buffer, size_t size, size_t count, FILE *stream)
+size_t fread(void* buffer, size_t size, size_t count, FILE* stream)
 {
     size_t retval;
 
@@ -20,7 +20,7 @@ size_t fread(const void *buffer, size_t size, size_t count, FILE *stream)
     return retval;
 }
 
-size_t __fread(const void* buffer, size_t size, size_t count, FILE* stream)
+size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
 {
     unsigned char* read_ptr;
     size_t total_bytes;
@@ -54,7 +54,7 @@ size_t __fread(const void* buffer, size_t size, size_t count, FILE* stream)
         stream->buffer_length = 0;
     }
 
-    if (stream->file_state.io_state != __reading)
+    if (stream->file_state.io_state < __reading)
     {
         set_error(stream);
         return 0;

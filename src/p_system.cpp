@@ -4,10 +4,6 @@
 
 CSystemPcs SystemPcs;
 extern "C" unsigned int __vt__10CSystemPcs[];
-unsigned int m_table_desc0__10CSystemPcs[3];
-unsigned int m_table_desc1__10CSystemPcs[3];
-unsigned int m_table_desc2__10CSystemPcs[3];
-unsigned char m_table__10CSystemPcs[0x15C];
 
 /*
  * --INFO--

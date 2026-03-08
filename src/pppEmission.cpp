@@ -27,7 +27,7 @@ extern _pppEnvStEmission* pppEnvStPtr;
 extern "C" int rand(void);
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
-extern char DAT_803311fc[];
+extern const char DAT_803311fc[];
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;
 extern float FLOAT_803311f8;
@@ -69,8 +69,8 @@ void SetTexGenMode(pppEmission*) {
 }
 
 struct EmissionDisplayList {
-    void* m_data;
     u32 m_size;
+    void* m_data;
     u16 m_material;
 };
 
@@ -283,7 +283,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         u8 field1C;
     };
 
-    float baseScale = FLOAT_803311f8;
+    const float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
 

@@ -14,6 +14,8 @@ extern "C" void* __register_global_object(void* object, void* destructor, void* 
 extern "C" void* __ct__14CUSBStreamDataFv(void* self);
 extern "C" void* __ct__5ZLISTFv(void* self);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
+extern "C" char __vt__8CManager[];
+extern "C" char __vt_CProcess[];
 
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
@@ -49,8 +51,9 @@ static void WriteF32(void* base, unsigned int offset, float value) {
  */
 extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
-    volatile void** base = reinterpret_cast<volatile void**>(&MaterialEditorPcs);
-    *base = &PTR_PTR_s_CMaterialEditorPcs_801ea644;
+    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__8CManager;
+    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt_CProcess;
+    *reinterpret_cast<void**>(&MaterialEditorPcs) = &PTR_PTR_s_CMaterialEditorPcs_801ea644;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
     __ct__14CUSBStreamDataFv(self + 0x84);

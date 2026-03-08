@@ -30,6 +30,7 @@ extern "C" {
     void ClearSeSepData__9CRedEntryFi(void*, int);
     void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
     int ReentrySeSepData__9CRedEntryFi(void*, int);
+    int ReentryMusicData__9CRedEntryFi(void*, int);
     int SearchMusicSequence__9CRedEntryFi(void*, int);
     int SearchSeSepSequence__9CRedEntryFi(void*, int);
     int ReentryWaveData__9CRedEntryFi(void*, int);
@@ -1477,13 +1478,15 @@ void CRedDriver::SetMusicData(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ReentryMusicData(int musicID)
+int CRedDriver::ReentryMusicData(int musicID)
 {
     unsigned int interrupt;
+    int result;
 
     interrupt = OSDisableInterrupts();
-    DAT_8032e154.ReentryMusicData(musicID);
+    result = ReentryMusicData__9CRedEntryFi(&DAT_8032e154, musicID);
     OSRestoreInterrupts(interrupt);
+    return result;
 }
 
 /*

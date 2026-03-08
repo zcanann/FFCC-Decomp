@@ -61,7 +61,7 @@ public:
 	void SetSoundMode(int);
 	int GetSoundMode();
 	void SetMusicData(void*);
-	void ReentryMusicData(int);
+	int ReentryMusicData(int);
 	void MusicStop(int);
 	int MusicPlay(int, int, int);
 	int MusicCrossPlay(int, int, int);

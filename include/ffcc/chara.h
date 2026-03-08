@@ -114,6 +114,7 @@ class CChara
         void GetMatrix(float(*)[4]);
 
 	private:
+		u8 _padB4[0xB4];
 		float m_curFrame;
 		CAnim* m_anim;
 		float m_time;

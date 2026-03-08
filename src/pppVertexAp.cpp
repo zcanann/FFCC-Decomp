@@ -119,11 +119,13 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         }
 
         u16* vertexIndices = entry->vertexIndices;
-        u8 count = data->spawnCount;
+        s32 count = data->spawnCount;
 
         switch (data->mode) {
         case 0:
-            do {
+        {
+            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
+            while (count-- != 0) {
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
@@ -153,7 +155,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &pos, &pos);
+                    PSMTXMultVec(parentMtx, &pos, &pos);
                     outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -162,10 +164,13 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
+        }
         case 1:
-            do {
+        {
+            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
+            while (count-- != 0) {
                 u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -190,7 +195,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &pos, &pos);
+                    PSMTXMultVec(parentMtx, &pos, &pos);
                     outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -199,8 +204,9 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
+        }
         }
 
         state->countdown = data->spawnDelay;

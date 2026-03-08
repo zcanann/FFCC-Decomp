@@ -7,6 +7,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/p_system.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_gba.h"
 #include "ffcc/map.h"
 #include "ffcc/p_sound.h"
 #include "ffcc/sound.h"
@@ -115,7 +116,6 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     void*, int, int, int, int, void*, void*);
 unsigned char CFlat[];
 unsigned char McPcs[];
-unsigned char GbaPcs[];
 unsigned char PartPcs[];
 unsigned char Chara[];
 unsigned char Wind[];

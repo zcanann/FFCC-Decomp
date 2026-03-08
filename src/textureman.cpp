@@ -38,9 +38,9 @@ extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* PTR_PTR_s_CPtrArray_P8CTexture_801e9ba0[];
-extern "C" void* PTR_PTR_s_CTextureSet_801e9b34;
-extern "C" void* PTR_PTR_s_CTexture_801e9b78;
+extern "C" void* __vt__8CPtrArrayIP8CTexture[];
+extern "C" void* __vt__8CTexture[];
+extern "C" void* __vt__11CTextureSet[];
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -112,7 +112,7 @@ static inline CTexture* AllocTexture()
         0));
     if (texture != 0) {
         __ct__4CRefFv(texture);
-        *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+        *reinterpret_cast<void**>(texture) = __vt__8CTexture;
         texture->m_maxLod = 0;
         texture->m_imageData = 0;
         texture->m_tlutData = 0;
@@ -138,7 +138,7 @@ static inline CTexture* AllocTexture()
 template <>
 CPtrArray<CTexture*>::CPtrArray()
 {
-    m_vtable = PTR_PTR_s_CPtrArray_P8CTexture_801e9ba0;
+    m_vtable = __vt__8CPtrArrayIP8CTexture;
     m_numItems = 0;
     m_size = 0;
     m_defaultSize = 0x10;
@@ -174,7 +174,7 @@ CPtrArray<CTexture*>::~CPtrArray()
 extern "C" CPtrArray<CTexture*>* dtor_8003BE70(CPtrArray<CTexture*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = PTR_PTR_s_CPtrArray_P8CTexture_801e9ba0;
+        ptrArray->m_vtable = __vt__8CPtrArrayIP8CTexture;
         ptrArray->RemoveAll();
         if (0 < param_2) {
             __dl__FPv(ptrArray);
@@ -551,7 +551,7 @@ int CTextureMan::SetTextureTev(CTexture* texture)
 CTexture::CTexture()
 {
     __ct__4CRefFv(this);
-    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexture_801e9b78;
+    *reinterpret_cast<void**>(this) = __vt__8CTexture;
     m_maxLod = 0;
     m_imageData = 0;
     m_tlutData = 0;
@@ -574,7 +574,7 @@ CTexture::CTexture()
 extern "C" CTexture* __dt__8CTextureFv(CTexture* texture, short shouldDelete)
 {
     if (texture != 0) {
-        *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+        *reinterpret_cast<void**>(texture) = __vt__8CTexture;
         if (texture->m_usesExternalAddress == 0) {
             if (texture->m_imageData != 0) {
                 __dla__FPv(texture->m_imageData);
@@ -1095,7 +1095,7 @@ void CTexture::FlushExternalTlut(void*, int)
 CTextureSet::CTextureSet()
 {
     __ct__4CRefFv(this);
-    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTextureSet_801e9b34;
+    *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
     CPtrArray<CTexture*>* const textures = Textures(this);
     textures->m_size = 0;
     textures->m_numItems = 0;
@@ -1157,7 +1157,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                     0));
                                 if (texture != 0) {
                                     __ct__4CRefFv(texture);
-                                    *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+                                    *reinterpret_cast<void**>(texture) = __vt__8CTexture;
                                     U8At(texture, 0x74) = 0;
                                     PtrAt(texture, 0x78) = 0;
                                     PtrAt(texture, 0x7C) = 0;
@@ -1256,7 +1256,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
             0));
         if (texture != 0) {
             __ct__4CRefFv(texture);
-            *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+            *reinterpret_cast<void**>(texture) = __vt__8CTexture;
             U8At(texture, 0x74) = 0;
             PtrAt(texture, 0x78) = 0;
             PtrAt(texture, 0x7C) = 0;

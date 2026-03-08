@@ -3,7 +3,7 @@
 #include "ffcc/p_dbgmenu.h"
 
 CSystemPcs SystemPcs;
-extern unsigned int PTR_PTR_s_CSystemPcs_801ea270[];
+extern "C" unsigned int __vt__10CSystemPcs[];
 unsigned int m_table_desc0__10CSystemPcs[3];
 unsigned int m_table_desc1__10CSystemPcs[3];
 unsigned int m_table_desc2__10CSystemPcs[3];
@@ -20,7 +20,7 @@ unsigned char m_table__10CSystemPcs[0x15C];
  */
 extern "C" void __sinit_p_system_cpp(void)
 {
-    *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CSystemPcs_801ea270);
+    *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(__vt__10CSystemPcs);
     reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[1] = m_table_desc0__10CSystemPcs[0];
     reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[2] = m_table_desc0__10CSystemPcs[1];
     reinterpret_cast<unsigned int*>(m_table__10CSystemPcs)[3] = m_table_desc0__10CSystemPcs[2];

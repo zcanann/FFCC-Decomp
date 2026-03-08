@@ -9,6 +9,7 @@
 #include "ffcc/p_usb.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/linkage.h"
 #include "ffcc/USBStreamData.h"
 #include <string.h>
 
@@ -70,8 +71,6 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
     void*,
     unsigned long);
 
-extern void* CAMemCacheSet;
-extern unsigned char ppvAmemCacheSet[];
 
 extern char DAT_801ead4c[];
 extern char DAT_801d81d4[];
@@ -506,7 +505,7 @@ void CPartPcs::create()
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
-        CAMemCacheSet,
+        &ppvAmemCacheSet,
         s_CPartPcs_801d7f54,
         reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_stageLoad,
         reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_stageAmem,
@@ -551,7 +550,7 @@ void CPartPcs::createLoad()
     pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
     pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
     pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
-    AmemSetLock__13CAmemCacheSetFv(CAMemCacheSet);
+    AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 
 /*
@@ -585,7 +584,7 @@ void CPartPcs::createViewer()
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
-        CAMemCacheSet,
+        &ppvAmemCacheSet,
         s_CPartPcs_801d7f54,
         usb->m_stageLoad,
         usb->m_stageAmem,
@@ -622,8 +621,8 @@ void CPartPcs::destroy()
         DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageAmem);
     }
 
-    AssertCache__13CAmemCacheSetFv(CAMemCacheSet);
-    Destroy__13CAmemCacheSetFv(CAMemCacheSet);
+    AssertCache__13CAmemCacheSetFv(&ppvAmemCacheSet);
+    Destroy__13CAmemCacheSetFv(&ppvAmemCacheSet);
 
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageDefault);
 
@@ -693,10 +692,10 @@ void CPartPcs::calc()
 		int freeSize;
 
 		raw[0x2D] = 0;
-		freeSize = reinterpret_cast<CAmemCacheSet*>(ppvAmemCacheSet)->AmemGetFreeSize();
+		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
 		System.Printf(DAT_801d8068, freeSize / 1024);
 	}
-	reinterpret_cast<CAmemCacheSet*>(ppvAmemCacheSet)->CalcPrio();
+	ppvAmemCacheSet.CalcPrio();
 	PartMng.pppDumpCacheIdx();
 }
 
@@ -1191,8 +1190,8 @@ void LoadFieldPdt0(int mapId, int floorId)
         pppReleasePdt__8CPartMngFi(&PartMng, 0);
         pppReleasePdt__8CPartMngFi(&PartMng, 6);
         pppReleasePdt__8CPartMngFi(&PartMng, 7);
-        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->AmemGetLock();
-        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->RefCnt0Compare();
+        ppvAmemCacheSet.AmemGetLock();
+        ppvAmemCacheSet.RefCnt0Compare();
     }
 
     reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_fieldLoadReq = 1;
@@ -1330,7 +1329,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     }
 
     usb->m_stageLoad = stage;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(ppvAmemCacheSet, stage);
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(&ppvAmemCacheSet, stage);
 
     *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
     *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
@@ -1357,7 +1356,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     }
 
     usb->m_stageLoad = usb->m_stageDefault;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(ppvAmemCacheSet, usb->m_stageDefault);
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(&ppvAmemCacheSet, usb->m_stageDefault);
 
     return pdtSlotIndex;
 }

@@ -47,7 +47,6 @@ extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned char CFlat[];
-extern "C" void* CAMemCacheSet;
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
@@ -1122,7 +1121,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			s16 cacheIndex = *partResource;
 			if (cacheIndex != -1)
 			{
-				((CAmemCacheSet*)CAMemCacheSet)->Release(cacheIndex);
+				ppvAmemCacheSet.Release(cacheIndex);
 			}
 
 			if (mngRaw->m_mapTexLoaded != 0)
@@ -1136,7 +1135,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + mapMeshIndices[i] * 4);
-					mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, (CAmemCacheSet*)CAMemCacheSet);
+					mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
 				}
 
 				s16 shapeCount = *shapeIndices;
@@ -1921,7 +1920,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		memcpy(chunkData, dataBase + chunkOffset, chunkSize);
 		cacheChunks[(i << 2)] = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
-		    reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet), chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
+		    &ppvAmemCacheSet, chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
 		__dl__FPv(chunkData);
 		chunkOffsets++;
 	}

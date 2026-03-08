@@ -36,7 +36,10 @@ struct RSDLISTITEM {
     int flag;
 };
 
-extern CMaterialEditorPcs MaterialEditorPcs;
+static inline CMemory::CStage* MaterialEditorStage()
+{
+    return MaterialEditorPcs.m_stage;
+}
 
 /*
  * --INFO--
@@ -124,24 +127,24 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP **, int)
  */
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
-    int* tail = (int*)__nw__FUlPQ27CMemory6CStagePci(0x10, MaterialEditorPcs.m_stage, s_ME_AppRequest_cpp_801d7da8, 0x61);
-    if (tail == 0) {
+    RSDLISTITEM* listItem = (RSDLISTITEM*)__nw__FUlPQ27CMemory6CStagePci(0x10, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x61);
+    if (listItem == 0) {
         return 0;
     }
 
-    memset(tail, 0, 0x10);
-    int rsdItem = (int)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorPcs.m_stage, s_ME_AppRequest_cpp_801d7da8, 0x67);
+    memset(listItem, 0, 0x10);
+    RSDITEM* rsdItem = (RSDITEM*)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x67);
     if (rsdItem == 0) {
-        if (tail != 0) {
-            __dl__FPv(tail);
+        if (listItem != 0) {
+            __dl__FPv(listItem);
         }
         return 0;
     }
 
-    memset((void*)rsdItem, 0, 0x1c);
-    *tail = rsdItem;
-    tail[3] = 1;
-    zlist->AddTail(tail);
+    memset(rsdItem, 0, 0x1c);
+    listItem->rsdItem = rsdItem;
+    listItem->flag = 1;
+    zlist->AddTail(listItem);
     return 1;
 }
 

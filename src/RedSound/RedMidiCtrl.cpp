@@ -244,7 +244,7 @@ int SawSwing(int phase)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 int DutySwing(int phase)
 {
     if ((phase & 0x200) == 0) {

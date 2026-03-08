@@ -7,6 +7,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
+#include "ffcc/system.h"
 #include "ffcc/symbols_shared.h"
 
 // Linkage definitions from config/GCCP01/symbols.txt.
@@ -43,6 +44,8 @@ extern "C" void __dla__FPv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __ct__8COctNodeFv(void*);
 extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern "C" const char s_m_node_pctd_m_meshtype_pctd_801D7268[];
 
 static char s_mapocttree_cpp[] = "mapocttree.cpp";
 
@@ -175,6 +178,10 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
         if (chunk.m_id == 'NODN') {
             unsigned short nodeCount = chunkFile.Get2();
             *reinterpret_cast<unsigned short*>(Ptr(this, 2)) = nodeCount;
+            if ((*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0x1E)) != 1) &&
+                (static_cast<unsigned int>(System.m_execParam) > 2U)) {
+                Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, nodeCount);
+            }
             void* rootNode = __nwa__FUlPQ27CMemory6CStagePci(
                 nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapocttree_cpp, 0x59);
             *reinterpret_cast<void**>(Ptr(this, 4)) = __construct_new_array(
@@ -2174,4 +2181,3 @@ extern "C" void __sinit_mapocttree_cpp()
 	s_cyl.m_radius2 = kOctTreeBoundMaxInit;
 	s_cyl.m_direction2.z = kOctTreeBoundMaxInit;
 }
-

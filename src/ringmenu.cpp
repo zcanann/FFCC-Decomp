@@ -55,7 +55,6 @@ extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, regi
 extern "C" int GetGBAStart__6JoyBusFi(void*, int);
 extern "C" int IsInitSend__6JoyBusFi(void*, int);
 
-extern unsigned char Chara[];
 extern unsigned char DAT_8020fab8[];
 extern unsigned char MenuPcs[];
 extern char DAT_801da01c[];

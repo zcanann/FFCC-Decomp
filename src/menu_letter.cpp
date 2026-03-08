@@ -5,6 +5,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/mes.h"
+#include "ffcc/linkage.h"
 
 #include <string.h>
 
@@ -54,7 +55,6 @@ extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
-extern u8 CFlat[];
 
 extern float FLOAT_80333088;
 extern float FLOAT_8033308c;

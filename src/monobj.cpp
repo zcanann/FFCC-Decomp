@@ -8,6 +8,7 @@
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/linkage.h"
 #include "ffcc/vector.h"
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
 
@@ -15,7 +16,6 @@
 #include <string.h>
 
 extern unsigned char ARRAY_8030918c[];
-extern unsigned char CFlat[];
 extern "C" char DAT_803319ec[];
 extern "C" char DAT_80331a4c[];
 

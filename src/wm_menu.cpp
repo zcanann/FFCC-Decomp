@@ -7,6 +7,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/p_game.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
 #include "ffcc/THPSimple.h"
@@ -104,7 +105,6 @@ unsigned char uRam8032ee25;
 int DAT_8032ee28;
 int DAT_8032ee2c;
 unsigned char DAT_8032ee30;
-extern unsigned char CFlat[];
 char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 extern char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[];

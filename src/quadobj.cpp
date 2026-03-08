@@ -1,5 +1,6 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/color.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
 
 #include <dolphin/gx.h>
@@ -9,7 +10,6 @@ static const float MaxBounds = 10000000.0;
 static const float MinBounds = -10000000.0;
 static const float EPS = 0.0;
 
-extern unsigned char CFlat[];
 
 /*
  * --INFO--

@@ -557,7 +557,7 @@ void CFunnyShape::ClearAnmData()
  */
 void CFunnyShape::ClearTextureData()
 {
-    U32At(this, 0x60D4) = 0;
+    Ptr(this, 0x60D4)[0] = 0;
     u8* iter = reinterpret_cast<u8*>(this);
     for (s32 i = 0; i < 0x10; i++) {
         void** texData = reinterpret_cast<void**>(iter + 0x6094);

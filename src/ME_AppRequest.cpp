@@ -36,7 +36,10 @@ struct RSDLISTITEM {
     int flag;
 };
 
-extern __declspec(section ".data") CMaterialEditorPcs MaterialEditorPcs;
+static inline CMemory::CStage* MaterialEditorStage()
+{
+    return MaterialEditorPcs.m_stage;
+}
 
 /*
  * --INFO--
@@ -132,8 +135,8 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
     memset(tail, 0, 0x10);
     RSDITEM* rsdItem = (RSDITEM*)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorPcs.m_stage, s_ME_AppRequest_cpp_801d7da8, 0x67);
     if (rsdItem == 0) {
-        if (tail != 0) {
-            __dl__FPv(tail);
+        if (listItem != 0) {
+            __dl__FPv(listItem);
         }
         return 0;
     }

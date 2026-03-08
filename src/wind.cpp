@@ -311,56 +311,62 @@ int CWind::AddAmbient(float dir, float speed)
 {
     int blocks = 4;
     WindObject* cur = m_objects;
-    WindObject* obj;
+    WindObject* obj = 0;
 
-    do {
-        obj = &cur[0];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+    while (blocks != 0) {
+        WindObject* candidate = &cur[0];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[1];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[1];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[2];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[2];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[3];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[3];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[4];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[4];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[5];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[5];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[6];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[6];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
-        obj = &cur[7];
-        if ((s8)obj->flags >= 0) {
-            goto found;
+        candidate = &cur[7];
+        if ((s8)candidate->flags >= 0) {
+            obj = candidate;
+            break;
         }
 
         cur += 8;
-        blocks--;
-    } while (blocks != 0);
+        blocks = blocks - 1;
+    }
 
-    obj = 0;
-
-found:
     if (obj == 0) {
         System.Printf(DAT_801db568);
         return -1;
     }
 
     obj->type = 0;
-    obj->flags = (obj->flags & 0x7F) | 0x80;
+    obj->flags = obj->flags & 0x7F;
+    obj->flags = obj->flags | 0x80;
 
     int id = m_nextId;
     m_nextId = id + 1;

@@ -165,13 +165,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         particles = (LocationTitle2Particle*)work->m_particles;
 
         ownerData = *(int*)((u8*)pppMngStPtr->m_owner + 0xF8);
+        if (ownerData == 0) {
+            ownerData = 0;
+        }
         model = 0;
         if (*(CChara::CModel**)(ownerData + 0x168) != 0) {
             model = *(CChara::CModel**)(ownerData + 0x168);
-        }
-
-        if (model == 0) {
-            return;
         }
 
         nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);

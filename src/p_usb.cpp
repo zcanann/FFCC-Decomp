@@ -23,6 +23,7 @@ const char s_plot_kmitsuru__801d6d14[] = "plot.kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
+extern "C" char gMemory[];
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
@@ -53,7 +54,7 @@ CUSBPcs::CUSBPcs()
 void CUSBPcs::Init()
 { 
 	m_smallStage = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
-	    &Memory, 0x2000, s_CUSBPcs_8032f810, 0));
+	    reinterpret_cast<void*>(gMemory), 0x2000, s_CUSBPcs_8032f810, 0));
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_plot_kmitsuru__801d6d14);
@@ -76,10 +77,10 @@ void CUSBPcs::Quit()
 { 
 	if (m_bigStage != (CMemory::CStage*)nullptr)
 	{
-		DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
+		DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<void*>(gMemory), m_bigStage);
 	}
 	
-	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_smallStage);
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<void*>(gMemory), m_smallStage);
 	USB.Disconnect();
 }
 
@@ -106,9 +107,9 @@ void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
         m_bigStage = reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
-            &Memory, 0x100000, s_CUSBPcs_8032f810, 0));
+            reinterpret_cast<void*>(gMemory), 0x100000, s_CUSBPcs_8032f810, 0));
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_bigStage);
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<void*>(gMemory), m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
     }
 }

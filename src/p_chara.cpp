@@ -12,6 +12,7 @@ u8* gCharaPartWorkPtr = 0;
 }
 
 extern unsigned char PartPcs[];
+extern unsigned char MapMng[];
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int sprintf(char*, const char*, ...);
@@ -290,12 +291,31 @@ extern "C" CPtrArray<CCharaPcs::CLoadModel*>* dtor_8007BB14(CPtrArray<CCharaPcs:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007a42c
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*)
+CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
 {
-	// TODO
+    if (stageIndex == 3) {
+        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x2351c);
+    }
+
+    if (stageIndex < 3) {
+        if (stageIndex == 1) {
+            return *reinterpret_cast<CMemory::CStage**>(MapMng);
+        }
+        if (stageIndex > 0) {
+            return *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x20);
+        }
+    } else if (stageIndex < 5) {
+        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&CharaPcs) + 0xd4);
+    }
+
+    return stage;
 }
 
 /*

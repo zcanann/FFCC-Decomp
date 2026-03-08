@@ -18,7 +18,7 @@ class CMemory;
 class CRef;
 class CTextureSet;
 
-void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
+CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
 
 class CCharaPcs : public CProcess
 {

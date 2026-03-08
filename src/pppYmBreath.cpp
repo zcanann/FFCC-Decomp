@@ -24,7 +24,6 @@ extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern Mtx ppvCameraMatrix0;
-extern CMath math;
 extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
 extern double DOUBLE_80330c88;
@@ -106,9 +105,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = 0.0f;
     baseDir.z = -1.0f;
 
-    angle.x = (short)((spread + spread) * RandF__5CMathFv(&math) - spread);
-    angle.y = (short)((spread + spread) * RandF__5CMathFv(&math) - spread);
-    angle.z = (short)((spread + spread) * RandF__5CMathFv(&math) - spread);
+    angle.x = (short)((spread + spread) * RandF__5CMathFv(&Math) - spread);
+    angle.y = (short)((spread + spread) * RandF__5CMathFv(&Math) - spread);
+    angle.z = (short)((spread + spread) * RandF__5CMathFv(&Math) - spread);
     angle.w = 0;
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
@@ -139,11 +138,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
 
     if (*(char*)(breath + 0xC2) != 0) {
-        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * RandF__5CMathFv(&math);
+        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * RandF__5CMathFv(&Math);
         flags = *(unsigned char*)(breath + 0xC2);
 
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-            if (RandF__5CMathFv(&math) > 0.5f) {
+            if (RandF__5CMathFv(&Math) > 0.5f) {
                 *(float*)(particle + 0x60) = -*(float*)(particle + 0x60);
             }
         } else if ((flags & 2) != 0) {
@@ -173,14 +172,14 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     if (*(unsigned char*)(breath + 0xC1) != 0) {
         flags = *(unsigned char*)(breath + 0xC1);
         if ((flags & 0x20) == 0) {
-            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&math);
-            *(float*)(particle + 0x78) = *(float*)(breath + 0x84) * RandF__5CMathFv(&math);
+            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&Math);
+            *(float*)(particle + 0x78) = *(float*)(breath + 0x84) * RandF__5CMathFv(&Math);
 
             if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-                if (RandF__5CMathFv(&math) > 0.5f) {
+                if (RandF__5CMathFv(&Math) > 0.5f) {
                     *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
                 }
-                if (RandF__5CMathFv(&math) > 0.5f) {
+                if (RandF__5CMathFv(&Math) > 0.5f) {
                     *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
                 }
             } else if ((flags & 2) != 0) {
@@ -188,11 +187,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
                 *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
             }
         } else {
-            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&math);
+            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&Math);
             *(float*)(particle + 0x78) = *(float*)(particle + 0x74);
 
             if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-                if (RandF__5CMathFv(&math) > 0.5f) {
+                if (RandF__5CMathFv(&Math) > 0.5f) {
                     *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
                     *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
                 }
@@ -215,7 +214,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     *(float*)(particle + 0x80) = *(float*)(breath + 0x18);
     if (*(float*)(breath + 0xA8) != 0.0f) {
         spread = *(float*)(breath + 0xA8);
-        *(float*)(particle + 0x80) += (spread + spread) * RandF__5CMathFv(&math) - spread;
+        *(float*)(particle + 0x80) += (spread + spread) * RandF__5CMathFv(&Math) - spread;
     }
 
     if (*(short*)(breath + 0x24) == 0) {

@@ -6,7 +6,6 @@
 #include "ffcc/symbols_shared.h"
 #include <string.h>
 
-extern CMath math;
 const float FLOAT_80330F80 = -1.0f;
 extern Mtx ppvCameraMatrix0;
 extern unsigned char* pppMngStPtr;
@@ -82,9 +81,9 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
         memset(particleColor, 0, 0x20);
     }
 
-    math.RandF();
-    math.RandF();
-    math.RandF();
+    Math.RandF();
+    Math.RandF();
+    Math.RandF();
 
     if (*(char*)(breath + 0x22) != '\0') {
         *(float*)(particle + 0x68) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
@@ -97,10 +96,10 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     *(float*)(particle + 0x68) = *(float*)(breath + 0x90);
     *(float*)(particle + 0x6C) = *(float*)(breath + 0x94);
     if (*(unsigned char*)(breath + 0xC1) != 0) {
-        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * math.RandF();
+        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
         flags = *(unsigned char*)(breath + 0xC1);
         if ((flags & 1) && (flags & 2)) {
-            if (math.RandF() > 0.5f) {
+            if (Math.RandF() > 0.5f) {
                 *(float*)(particle + 0x60) *= FLOAT_80330F80;
             }
         } else if (flags & 2) {
@@ -133,17 +132,17 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     flags = *(unsigned char*)(breath + 0xC0);
     if (flags != 0) {
         if ((flags & 0x20) == 0) {
-            *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * math.RandF();
-            *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * math.RandF();
-            *(float*)(particle + 0x84) = *(float*)(breath + 0x88) * math.RandF();
+            *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * Math.RandF();
+            *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * Math.RandF();
+            *(float*)(particle + 0x84) = *(float*)(breath + 0x88) * Math.RandF();
             if ((flags & 1) && (flags & 2)) {
-                if (math.RandF() > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x7C) *= FLOAT_80330F80;
                 }
-                if (math.RandF() > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x80) *= FLOAT_80330F80;
                 }
-                if (math.RandF() > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x84) *= FLOAT_80330F80;
                 }
             } else if (flags & 2) {
@@ -152,12 +151,12 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
                 *(float*)(particle + 0x84) *= FLOAT_80330F80;
             }
         } else {
-            f0 = *(float*)(breath + 0x80) * math.RandF();
+            f0 = *(float*)(breath + 0x80) * Math.RandF();
             *(float*)(particle + 0x7C) = f0;
             *(float*)(particle + 0x80) = f0;
             *(float*)(particle + 0x84) = f0;
             if ((flags & 1) && (flags & 2)) {
-                if (math.RandF() > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x7C) *= FLOAT_80330F80;
                     *(float*)(particle + 0x80) *= FLOAT_80330F80;
                     *(float*)(particle + 0x84) *= FLOAT_80330F80;
@@ -183,7 +182,7 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
 
     *(float*)(particle + 0x8C) = *(float*)(breath + 0x14);
     if (*(float*)(breath + 0xA8) != kPppBreathModelZero) {
-        *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * math.RandF() - *(float*)(breath + 0xA8);
+        *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * Math.RandF() - *(float*)(breath + 0xA8);
     }
 
     if (*(short*)(breath + 0x20) == 0) {
@@ -222,9 +221,9 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     f0 = *(float*)(breath + 0xB0);
     f1 = *(float*)(breath + 0xB4);
     f2 = *(float*)(breath + 0xB8);
-    jitter.x = -(f0 * 0.5f - math.RandF(f0));
-    jitter.y = -(f1 * 0.5f - math.RandF(f1));
-    jitter.z = -(f2 * 0.5f - math.RandF(f2));
+    jitter.x = -(f0 * 0.5f - Math.RandF(f0));
+    jitter.y = -(f1 * 0.5f - Math.RandF(f1));
+    jitter.z = -(f2 * 0.5f - Math.RandF(f2));
 
     pos.x = (*(Mtx*)particleWmat)[0][3];
     pos.y = (*(Mtx*)particleWmat)[1][3];

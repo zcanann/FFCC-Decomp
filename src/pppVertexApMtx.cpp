@@ -52,8 +52,6 @@ struct VertexApMtxSource
 
 struct _pppPDataVal;
 
-extern CMath math;
-
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
 }
@@ -185,7 +183,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		{
 			MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
 			do {
-				u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&math))];
+				u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;

@@ -9,9 +9,9 @@ extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
 extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
 char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
-unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
-unsigned int m_table_desc1__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
-unsigned int m_table_desc2__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
+volatile unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
+volatile unsigned int m_table_desc1__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
+volatile unsigned int m_table_desc2__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
 unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(s_CSystemPcs_801D7C48), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
 };
@@ -28,16 +28,15 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
 extern "C" void __sinit_p_system_cpp(void)
 {
     *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(__vt__10CSystemPcs);
-    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__10CSystemPcs);
-    dst[1] = m_table_desc0__10CSystemPcs[0];
-    dst[2] = m_table_desc0__10CSystemPcs[1];
-    dst[3] = m_table_desc0__10CSystemPcs[2];
-    dst[4] = m_table_desc1__10CSystemPcs[0];
-    dst[5] = m_table_desc1__10CSystemPcs[1];
-    dst[6] = m_table_desc1__10CSystemPcs[2];
-    dst[7] = m_table_desc2__10CSystemPcs[0];
-    dst[8] = m_table_desc2__10CSystemPcs[1];
-    dst[9] = m_table_desc2__10CSystemPcs[2];
+    m_table__10CSystemPcs[1] = m_table_desc0__10CSystemPcs[0];
+    m_table__10CSystemPcs[2] = m_table_desc0__10CSystemPcs[1];
+    m_table__10CSystemPcs[3] = m_table_desc0__10CSystemPcs[2];
+    m_table__10CSystemPcs[4] = m_table_desc1__10CSystemPcs[0];
+    m_table__10CSystemPcs[5] = m_table_desc1__10CSystemPcs[1];
+    m_table__10CSystemPcs[6] = m_table_desc1__10CSystemPcs[2];
+    m_table__10CSystemPcs[7] = m_table_desc2__10CSystemPcs[0];
+    m_table__10CSystemPcs[8] = m_table_desc2__10CSystemPcs[1];
+    m_table__10CSystemPcs[9] = m_table_desc2__10CSystemPcs[2];
 }
 
 /*

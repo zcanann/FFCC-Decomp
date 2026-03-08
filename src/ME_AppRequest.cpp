@@ -36,7 +36,7 @@ struct RSDLISTITEM {
     int flag;
 };
 
-extern CMaterialEditorPcs MaterialEditorPcs;
+extern __declspec(section ".data") CMaterialEditorPcs MaterialEditorPcs;
 
 static inline CMemory::CStage* MaterialEditorStage()
 {

@@ -56,14 +56,14 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         Vec direction;
         CMapCylinderRaw cyl;
         Vec hitPos;
-        f64 currentY = pppMngStPtr->m_matrix.value[1][3];
+        float currentY = pppMngStPtr->m_matrix.value[1][3];
 
         direction.x = kPppYmCheckBGHeightAxisZero;
         direction.y = kPppYmCheckBGHeightProbeDirY;
         direction.z = kPppYmCheckBGHeightAxisZero;
 
         cyl.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
-        cyl.m_bottom.y = (f32)(currentY + (f64)param_2->m_unk0x4);
+        cyl.m_bottom.y = currentY + param_2->m_unk0x4;
         cyl.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
         cyl.m_direction.x = kPppYmCheckBGHeightAxisZero;
         cyl.m_direction.y = kPppYmCheckBGHeightProbeDirY;
@@ -81,14 +81,14 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
         if ((CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &direction, 0xFFFFFFFF) != 0) &&
             (CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos),
-             (f32)(currentY - (f64)param_2->m_unk0xC) <= hitPos.y)) {
-            currentY = (f64)(hitPos.y + param_2->m_unk0x8);
+             (currentY - param_2->m_unk0xC) <= hitPos.y)) {
+            currentY = hitPos.y + param_2->m_unk0x8;
         }
 
-        pppMngSt->m_position.y = (f32)currentY;
-        pppMngSt->m_savedPosition.y = (f32)currentY;
-        pppMngSt->m_paramVec0.y = (f32)currentY;
-        pppMngSt->m_previousPosition.y = (f32)currentY;
+        pppMngSt->m_position.y = currentY;
+        pppMngSt->m_savedPosition.y = currentY;
+        pppMngSt->m_paramVec0.y = currentY;
+        pppMngSt->m_previousPosition.y = currentY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

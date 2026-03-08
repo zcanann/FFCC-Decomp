@@ -552,10 +552,14 @@ void CFont::DrawQuit()
  */
 void CFont::Draw(char* text)
 {
-	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
-	for (; *cursor != '\0'; cursor++) {
-		Draw(static_cast<unsigned short>(*cursor));
-	}
+	unsigned char ch;
+	do {
+		ch = static_cast<unsigned char>(*text);
+		if (ch != '\0') {
+			Draw(static_cast<unsigned short>(ch));
+			text++;
+		}
+	} while (ch != '\0');
 }
 
 /*

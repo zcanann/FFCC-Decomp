@@ -19,6 +19,7 @@
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
 #include <string.h>
 
@@ -179,18 +180,16 @@ void CSystem::Quit()
  */
 void CSystem::Printf(char* fmt, ...)
 {
-    if (((int)this /* MiniGamePcs._25732_4_ */ &  0x1000) == 0)
-	{
-        return;
-	}
-
-    char buffer[0x20C];
-    va_list args;
-    va_start(args, fmt);
-    vsprintf(buffer, fmt, args);
-    va_end(args);
-    OSReport(buffer);
-    USB.Printf(buffer);
+    if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 4) & 0x1000) != 0)
+    {
+        char buffer[0x20C];
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(buffer, fmt, args);
+        va_end(args);
+        OSReport(buffer);
+        USB.Printf(buffer);
+    }
 }
 
 /*

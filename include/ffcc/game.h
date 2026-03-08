@@ -61,10 +61,9 @@ public:
         unsigned char m_linkTable[8][8][8][8];           // 0xA0
         char m_townName[20];                             // 0x10A0
         int m_chaliceElement;                            // 0x10B4 // 1=fire,2=water,4=wind,8=earth,16=holy
-        int m_eventHeader[3];                            // 0x10B8
-        signed char m_eventFlags[256];                   // 0x10C4
-        short m_eventWork[256];                          // 0x11C4
-        int m_eventFooter[2];                            // 0x13C4
+        int m_eventHeader[5];                            // 0x10B8
+        signed char m_eventFlags[256];                   // 0x10CC
+        short m_eventWork[256];                          // 0x11CC
         short m_bossArtifactStageIndex;                  // 0x13CC
         unsigned short m_optionValue;                    // 0x13CE
         unsigned char m_soundOptionFlag;                 // 0x13D0

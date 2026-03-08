@@ -208,14 +208,14 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				work[0] = outVec.z;
 			}
 
-			if (Game.game.m_currentSceneId != 7) {
-				cameraX = CameraPcs._212_4_;
-				cameraY = CameraPcs._216_4_;
-				cameraZ = CameraPcs._220_4_;
-			} else {
+			if ((u32)Game.game.m_currentSceneId == 7) {
 				cameraX = ppvCameraMatrix02[0][3];
 				cameraY = ppvCameraMatrix02[1][3];
 				cameraZ = ppvCameraMatrix02[2][3];
+			} else {
+				cameraX = CameraPcs._212_4_;
+				cameraY = CameraPcs._216_4_;
+				cameraZ = CameraPcs._220_4_;
 			}
 			pppMngStPtr->m_matrix.value[0][3] = cameraX;
 			pppMngStPtr->m_matrix.value[1][3] = cameraY;
@@ -374,4 +374,3 @@ void SetUpIndWarp(VYmDeformationScreen*)
 {
 	// TODO
 }
-

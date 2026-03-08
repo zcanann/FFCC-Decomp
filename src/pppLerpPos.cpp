@@ -46,8 +46,8 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     s32 iVar5;
     Vec* pVec;
     s32 iVar7;
-    Vec local_2c;
     Vec local_38;
+    Vec local_2c;
     u32 count;
     Vec** historyPtr;
 

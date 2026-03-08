@@ -1950,9 +1950,9 @@ CFlatRuntime::CClass* CFlatRuntime::intToClass(int)
  * Address:	TODO
  * Size:	TODO
  */
-CFlatRuntime::CVal* CFlatRuntime::onSystemVal(CFlatRuntime::CObject* object, int)
+CFlatRuntime::CVal* CFlatRuntime::onSystemVal(CFlatRuntime::CObject*, int)
 {
-	return reinterpret_cast<CVal*>(reinterpret_cast<u8*>(object) + 0x96C);
+	return reinterpret_cast<CVal*>(reinterpret_cast<u8*>(this) + 0x96C);
 }
 
 /*
@@ -1960,9 +1960,9 @@ CFlatRuntime::CVal* CFlatRuntime::onSystemVal(CFlatRuntime::CObject* object, int
  * Address:	TODO
  * Size:	TODO
  */
-CFlatRuntime::CVal* CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject* object, int)
+CFlatRuntime::CVal* CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject*, int)
 {
-	return reinterpret_cast<CVal*>(reinterpret_cast<u8*>(object) + 0x96C);
+	return reinterpret_cast<CVal*>(reinterpret_cast<u8*>(this) + 0x96C);
 }
 
 /*

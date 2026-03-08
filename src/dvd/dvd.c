@@ -674,7 +674,6 @@ static void stateReady() {
                 stateReady();
                 break;
             default:
-                MotorState = 0;
                 DVDReset();
                 OSCreateAlarm(&ResetAlarm);
                 OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
@@ -682,6 +681,7 @@ static void stateReady() {
             }
             break;
         case 5:
+            executing->state = DVD_STATE_FATAL_ERROR;
             __DVDStoreErrorCode(CancelLastError);
             DVDLowStopMotor(cbForStateError);
             break;
@@ -691,32 +691,8 @@ static void stateReady() {
         return;
     }
 
-    if (MotorState == 0) {
-        executing->state = DVD_STATE_BUSY;
-        stateBusy_80189D04(executing);
-    } else {
-        executing->state = DVD_STATE_COVER_CLOSED;
-        switch (CurrCommand) {
-        case DVD_COMMAND_BSREAD:
-        case DVD_COMMAND_READID:
-        case DVD_COMMAND_AUDIO_BUFFER_CONFIG:
-        case DVD_COMMAND_BS_CHANGE_DISK:
-            __DVDClearWaitingQueue();
-            finished = executing;
-            executing = &DummyCommandBlock;
-            if (finished->callback) {
-                finished->callback(-4, finished);
-            }
-            stateReady();
-            break;
-        default:
-            MotorState = 0;
-            DVDReset();
-            OSCreateAlarm(&ResetAlarm);
-            OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
-            break;
-        }
-    }
+    executing->state = DVD_STATE_BUSY;
+    stateBusy_80189D04(executing);
 }
 
 static void stateBusy_80189D04(DVDCommandBlock* block) {

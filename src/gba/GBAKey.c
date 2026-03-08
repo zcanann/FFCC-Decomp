@@ -80,17 +80,20 @@ static void F252(void* task)
 
 void __GBAX02(s32 chan, u8* readbuf) {
     GBAControl* gba = &__GBA[chan];
-    void* param = gba->param;
-    
+    GBASecParam* param = gba->param;
+    u32 paletteColor = gba->bootInfo.paletteColor;
+    u32 paletteSpeed = gba->bootInfo.paletteSpeed;
+    u32 length = gba->bootInfo.length;
+
     memcpy(param, readbuf, 4);
-    *(u32*)((u8*)param + 4) = gba->bootInfo.paletteColor;
-    *(u32*)((u8*)param + 8) = gba->bootInfo.paletteSpeed;
-    *(u32*)((u8*)param + 12) = gba->bootInfo.length;
+    *(u32*)((u8*)param + 4) = paletteColor;
+    *(u32*)((u8*)param + 8) = paletteSpeed;
+    *(u32*)((u8*)param + 12) = length;
     *(u32*)((u8*)param + 16) = (u32)param + 32;
-    
+
     DCInvalidateRange((u8*)param + 32, 32);
     DCFlushRange(param, 32);
-    
+
     gba->task.state = 0xff;
     gba->task.iram_addr = 0x21cb78;
     gba->task.dram_addr = 0x380;
@@ -100,6 +103,6 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.res_cb = 0;
     gba->task.done_cb = (DSPCallback)F252;
     gba->task.req_cb = 0;
-    
+
     DSPAddTask(&gba->task);
 }

@@ -50,7 +50,11 @@ void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight*, struct pppYmCheckBG
 struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct pppYmCheckBGHeightUnkC* param_2)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
+    Vec direction;
+    CMapCylinderRaw cylinder;
+    Vec hitPos;
+    float baseY;
+    float nextY;
 
     if (gPppCalcDisabled == 0) {
         Vec direction;

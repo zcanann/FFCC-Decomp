@@ -13,38 +13,46 @@ CGamePcs Game;
  * JP Size: TODO
  */
 extern "C" void __sinit_p_game_cpp() {
-    unsigned int* dst;
+    unsigned int* srcA = m_table_desc0__8CGamePcs;
+    unsigned int* srcB = m_table_desc1__8CGamePcs;
+    unsigned int* srcC = m_table_desc2__8CGamePcs;
+    unsigned int* srcD = m_table_desc3__8CGamePcs;
+    unsigned int* srcE = m_table_desc4__8CGamePcs;
+    unsigned int* srcF = m_table_desc5__8CGamePcs;
+    unsigned int* srcG = m_table_desc6__8CGamePcs;
+    unsigned int* srcH = m_table_desc7__8CGamePcs;
+    unsigned int* srcI = m_table_desc8__8CGamePcs;
+    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
 
-    *reinterpret_cast<unsigned int*>(&Game) = reinterpret_cast<unsigned int>(PTR_PTR_s_CGamePcs_801ea0a8);
-    dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
+    *reinterpret_cast<void**>(&Game) = PTR_PTR_s_CGamePcs_801ea0a8;
 
-    dst[1] = m_table_desc0__8CGamePcs[0];
-    dst[2] = m_table_desc0__8CGamePcs[1];
-    dst[3] = m_table_desc0__8CGamePcs[2];
-    dst[4] = m_table_desc1__8CGamePcs[0];
-    dst[5] = m_table_desc1__8CGamePcs[1];
-    dst[6] = m_table_desc1__8CGamePcs[2];
-    dst[7] = m_table_desc2__8CGamePcs[0];
-    dst[8] = m_table_desc2__8CGamePcs[1];
-    dst[9] = m_table_desc2__8CGamePcs[2];
-    dst[12] = m_table_desc3__8CGamePcs[0];
-    dst[13] = m_table_desc3__8CGamePcs[1];
-    dst[14] = m_table_desc3__8CGamePcs[2];
-    dst[17] = m_table_desc4__8CGamePcs[0];
-    dst[18] = m_table_desc4__8CGamePcs[1];
-    dst[19] = m_table_desc4__8CGamePcs[2];
-    dst[22] = m_table_desc5__8CGamePcs[0];
-    dst[23] = m_table_desc5__8CGamePcs[1];
-    dst[24] = m_table_desc5__8CGamePcs[2];
-    dst[27] = m_table_desc6__8CGamePcs[0];
-    dst[28] = m_table_desc6__8CGamePcs[1];
-    dst[29] = m_table_desc6__8CGamePcs[2];
-    dst[32] = m_table_desc7__8CGamePcs[0];
-    dst[33] = m_table_desc7__8CGamePcs[1];
-    dst[34] = m_table_desc7__8CGamePcs[2];
-    dst[37] = m_table_desc8__8CGamePcs[0];
-    dst[38] = m_table_desc8__8CGamePcs[1];
-    dst[39] = m_table_desc8__8CGamePcs[2];
+    dst[1] = srcA[0];
+    dst[2] = srcA[1];
+    dst[3] = srcA[2];
+    dst[4] = srcB[0];
+    dst[5] = srcB[1];
+    dst[6] = srcB[2];
+    dst[7] = srcC[0];
+    dst[8] = srcC[1];
+    dst[9] = srcC[2];
+    dst[12] = srcD[0];
+    dst[13] = srcD[1];
+    dst[14] = srcD[2];
+    dst[17] = srcE[0];
+    dst[18] = srcE[1];
+    dst[19] = srcE[2];
+    dst[22] = srcF[0];
+    dst[23] = srcF[1];
+    dst[24] = srcF[2];
+    dst[27] = srcG[0];
+    dst[28] = srcG[1];
+    dst[29] = srcG[2];
+    dst[32] = srcH[0];
+    dst[33] = srcH[1];
+    dst[34] = srcH[2];
+    dst[37] = srcI[0];
+    dst[38] = srcI[1];
+    dst[39] = srcI[2];
 }
 
 /*

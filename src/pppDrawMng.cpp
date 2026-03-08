@@ -175,7 +175,7 @@ void pppDrawMng::ClearOt()
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
 
-	if (Game.game.m_currentMapId == 0x21)
+	if (((CGame*)&Game)->m_currentMapId == 0x21)
 	{
 		m_depthScale = kPppDrawDepthScaleNear;
 	}

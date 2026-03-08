@@ -48,6 +48,15 @@ u32 __AXGetNumVoices(void) {
     return __AXNumVoices;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80193270
+ * PAL Size: 1800b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __AXServiceVPB(AXVPB* pvpb) {
     AXPB* ppbDsp;
     AXPB* ppbUser;
@@ -354,25 +363,6 @@ void __AXServiceVPB(AXVPB* pvpb) {
         u16* dst;
         dst = (void*)&ppbDsp->adpcmLoop;
         src = (void*)&ppbUser->adpcmLoop;
-        *(dst) = *(src); dst+=1; src+=1;
-        *(dst) = *(src); dst+=1; src+=1;
-        *(dst) = *(src);
-    }
-
-    if (sync & 0x400000) {
-        ppbDsp->lpf.a0 = ppbUser->lpf.a0;
-        ppbDsp->lpf.b0 = ppbUser->lpf.b0;
-        return;
-    }
-
-    if (sync & 0x200000) {
-        // copy AXPBLPF struct
-        u16* src;
-        u16* dst;
-
-        dst = (void*)&ppbDsp->lpf;
-        src = (void*)&ppbUser->lpf;
-        *(dst) = *(src); dst+=1; src+=1;
         *(dst) = *(src); dst+=1; src+=1;
         *(dst) = *(src); dst+=1; src+=1;
         *(dst) = *(src);

@@ -186,8 +186,8 @@ pppShapeSt::~pppShapeSt()
  */
 pppModelSt::pppModelSt()
 {
-    m_refCount = 0;
-    m_isUsed = 0;
+    *(short*)((char*)this + 0x64) = 0;
+    *(unsigned char*)((char*)this + 0x68) = 0;
 }
 
 /*

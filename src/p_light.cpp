@@ -3,6 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_graphic.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapocttree.h"
 
@@ -57,16 +58,13 @@ extern CMaterialMan MaterialMan;
 
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 
-extern class CCameraPcs {
-public:
-    Mtx m_cameraMatrix;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    float _236_4_;
-    float _240_4_;
-    float _244_4_;
-} CameraPcs;
+static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
+static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
+static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
+static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
+static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
+static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
+static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
 CLightPcs LightPcs;
 static char s_p_light_cpp[] = "p_light.cpp";
@@ -334,7 +332,7 @@ void CLightPcs::draw()
     Mtx mtx;
     Vec vec;
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, mtx);
+    PSMTXCopy(CameraMatrix(), mtx);
     for (u32 i = 0; i < m_sceneLightCount; i++) {
         CLight* light = &m_sceneLights[i];
         if (light->m_specularMode == 0) {
@@ -682,14 +680,14 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
     Vec eyeDir;
     Vec transformedPos;
     Vec transformedDir;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
+    PSMTXCopy(CameraMatrix(), cam);
 
-    eyePos.x = CameraPcs._224_4_;
-    eyePos.y = CameraPcs._228_4_;
-    eyePos.z = CameraPcs._232_4_;
-    eyeDir.x = CameraPcs._236_4_;
-    eyeDir.y = CameraPcs._240_4_;
-    eyeDir.z = CameraPcs._244_4_;
+    eyePos.x = CameraPosX();
+    eyePos.y = CameraPosY();
+    eyePos.z = CameraPosZ();
+    eyeDir.x = CameraDirX();
+    eyeDir.y = CameraDirY();
+    eyeDir.z = CameraDirZ();
 
     PSMTXMultVec(cam, &eyePos, &transformedPos);
     GXInitLightPos((GXLightObj*)(self + 0x4370), transformedPos.x, transformedPos.y, transformedPos.z);
@@ -821,9 +819,9 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     Vec tmp;
     Vec lightDir;
 
-    lightDir.x = CameraPcs._236_4_;
-    lightDir.y = CameraPcs._240_4_;
-    lightDir.z = CameraPcs._244_4_;
+    lightDir.x = CameraDirX();
+    lightDir.y = CameraDirY();
+    lightDir.z = CameraDirZ();
 
     if (mode == 0) {
         lightDir.x = dir->x;
@@ -832,7 +830,7 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     }
 
     GXInitLightColor(&light->m_gxLightObj, color);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
+    PSMTXCopy(CameraMatrix(), cam);
 
     tmp.x = FLOAT_8032fc70 * -lightDir.x;
     tmp.y = FLOAT_8032fc70 * -lightDir.y;
@@ -1102,9 +1100,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
         C_MTXLookAt(lookAt, &eye, &up, reinterpret_cast<Vec*>(&m_direction));
 
         Vec camPos;
-        camPos.x = CameraPcs._224_4_;
-        camPos.y = CameraPcs._228_4_;
-        camPos.z = CameraPcs._232_4_;
+        camPos.x = CameraPosX();
+        camPos.y = CameraPosY();
+        camPos.z = CameraPosZ();
 
         Vec lightPos;
         PSVECSubtract(reinterpret_cast<Vec*>(&m_targetPosition), &camPos, &lightPos);
@@ -1367,7 +1365,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     float* scale = (float*)vec;
 
     Mtx cam;
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
+    PSMTXCopy(CameraMatrix(), cam);
     Mtx* out = &m_bumpTexMtx1;
 
     if (mode == 0) {
@@ -1378,9 +1376,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             Mtx tmp;
             PSMTXCopy(*input, tmp);
             Vec camPos;
-            camPos.x = CameraPcs._224_4_;
-            camPos.y = CameraPcs._228_4_;
-            camPos.z = CameraPcs._232_4_;
+            camPos.x = CameraPosX();
+            camPos.y = CameraPosY();
+            camPos.z = CameraPosZ();
             Vec objPos;
             objPos.x = tmp[0][3];
             objPos.y = tmp[1][3];
@@ -1485,8 +1483,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXScale(tmp, FLOAT_8032fc20, FLOAT_8032fc20, FLOAT_8032fc20);
             PSMTXConcat(*bumpMat0, tmp, *bumpMat0);
 
-            double camX = (double)CameraPcs._224_4_;
-            double camZ = (double)CameraPcs._232_4_;
+            double camX = (double)CameraPosX();
+            double camZ = (double)CameraPosZ();
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 

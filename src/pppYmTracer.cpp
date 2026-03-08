@@ -41,6 +41,7 @@ struct TRACE_POLYGON {
     s16 life;
     u8 decay;
     u8 _pad1;
+    u32 _pad2;
 };
 
 /*

@@ -710,8 +710,8 @@ void GXLoadTlut(GXTlutObj* tlut_obj, u32 tlut_name) {
     GX_WRITE_RAS_REG(t->loadTlut0);
     GX_WRITE_RAS_REG(r->loadTlut1);
     __GXFlushTextureState();
-    tlut_offset = r->loadTlut1 & 0x3FF;
-    SET_REG_FIELD(1453, t->tlut, 10, 0, tlut_offset);
+    tlut_offset = r->loadTlut1;
+    t->tlut = (t->tlut & 0xFFFFFC00) | (tlut_offset & 0x3FF);
     r->tlutObj = *t;
 }
 

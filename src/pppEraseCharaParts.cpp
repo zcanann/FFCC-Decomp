@@ -43,28 +43,62 @@ struct EraseCharaPartsModelView {
 
 /*
  * --INFO--
- * PAL Address: 0x8010400C
- * PAL Size: 188b
+ * PAL Address: 0x80103EC0
+ * PAL Size: 168b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
-                                        int meshIndex, int param_5, float (*) [4])
+void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkB* param_2,
+                             pppEraseCharaPartsUnkC* param_3)
 {
-    s8 callbackMeshIndex = ((pppEraseCharaPartsUnkB*)param_3)->m_meshIndex;
-    EraseCharaPartsDisplayList* displayList =
-        ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
+    void* handle;
+    int model;
+    s32* offsets;
+    int colorIndex;
+    u8* dstColor;
+    u8* srcColor;
 
-    MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
-                            displayList->m_material, 0, (_GXTevScale)0);
+    if (gPppCalcDisabled == 0) {
+        offsets = param_3->m_serializedDataOffsets;
+        colorIndex = offsets[0];
+        dstColor = (u8*)((char*)pppEraseCharaParts + 0x80 + offsets[1]);
+        srcColor = (u8*)((char*)pppEraseCharaParts + 0x80 + colorIndex);
+        handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programInfoTable, 0);
+        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
-    if ((callbackMeshIndex != -1) && (meshIndex == callbackMeshIndex)) {
-        GXSetArray((GXAttr)0xB, param_2, 4);
+        *(u8**)(model + 0xE4) = dstColor;
+        *(pppEraseCharaPartsUnkB**)(model + 0xE8) = param_2;
+
+        dstColor[0] = srcColor[8];
+        dstColor[1] = srcColor[9];
+        dstColor[2] = srcColor[10];
+        dstColor[3] = srcColor[11];
+
+        DCFlushRange(dstColor, 4);
     }
+}
 
-    GXCallDisplayList(displayList->m_data, displayList->m_size);
+/*
+ * --INFO--
+ * PAL Address: 0x80103F68
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
+{
+    void* handle;
+    int model;
+
+    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programInfoTable, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(void**)(model + 0xE4) = 0;
+    *(void**)(model + 0xE8) = 0;
+    *(void**)(model + 0xFC) = 0;
 }
 
 /*
@@ -100,59 +134,26 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 
 /*
  * --INFO--
- * PAL Address: 0x80103F68
- * PAL Size: 64b
+ * PAL Address: 0x8010400C
+ * PAL Size: 188b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
+void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
+                                        int meshIndex, int param_5, float (*) [4])
 {
-    void* handle;
-    int model;
+    s8 callbackMeshIndex = ((pppEraseCharaPartsUnkB*)param_3)->m_meshIndex;
+    EraseCharaPartsDisplayList* displayList =
+        ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programInfoTable, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(void**)(model + 0xE4) = 0;
-    *(void**)(model + 0xE8) = 0;
-    *(void**)(model + 0xFC) = 0;
-}
+    MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
+                            displayList->m_material, 0, (_GXTevScale)0);
 
-/*
- * --INFO--
- * PAL Address: 0x80103EC0
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkB* param_2, pppEraseCharaPartsUnkC* param_3)
-{
-    void* handle;
-    int model;
-    s32* offsets;
-    int colorIndex;
-    u8* dstColor;
-    u8* srcColor;
-
-    if (gPppCalcDisabled == 0) {
-        offsets = param_3->m_serializedDataOffsets;
-        colorIndex = offsets[0];
-        dstColor = (u8*)((char*)pppEraseCharaParts + 0x80 + offsets[1]);
-        srcColor = (u8*)((char*)pppEraseCharaParts + 0x80 + colorIndex);
-        handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_programInfoTable, 0);
-        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-
-        *(u8**)(model + 0xE4) = dstColor;
-        *(pppEraseCharaPartsUnkB**)(model + 0xE8) = param_2;
-
-        dstColor[0] = srcColor[8];
-        dstColor[1] = srcColor[9];
-        dstColor[2] = srcColor[10];
-        dstColor[3] = srcColor[11];
-
-        DCFlushRange(dstColor, 4);
+    if ((callbackMeshIndex != -1) && (meshIndex == callbackMeshIndex)) {
+        GXSetArray((GXAttr)0xB, param_2, 4);
     }
+
+    GXCallDisplayList(displayList->m_data, displayList->m_size);
 }

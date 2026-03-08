@@ -900,48 +900,85 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
  */
 CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
-	unsigned char* objects;
-	int stride;
-	int objectCount;
-
 	if (classType == 3) {
-		objects = m_objParty;
-		stride = 0x6F8;
-		objectCount = 4;
+		unsigned char* obj = m_objParty;
+		int i = 0;
+		int count = 4;
+		do {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_objParty + i * 0x6F8);
+			}
+			obj += 0x6F8;
+			i++;
+			count--;
+		} while (count != 0);
 	} else if (classType < 3) {
 		if (classType == 1) {
-			objects = CFlat + 0x110C0;
-			stride = 0xAC;
-			objectCount = 0x18;
+			unsigned char* obj = CFlat + 0x110C0;
+			int i = 0;
+			int count = 0x18;
+			do {
+				if (static_cast<signed char>(obj[0x4C]) >= 0) {
+					return reinterpret_cast<CGObject*>(CFlat + 0x110C0 + i * 0xAC);
+				}
+				obj += 0xAC;
+				i++;
+				count--;
+			} while (count != 0);
 		} else if (classType < 1) {
 			if (classType < 0) {
 				return 0;
 			}
-			objects = CFlat + 0x10440;
-			stride = 0x50;
-			objectCount = 0x28;
+			unsigned char* obj = CFlat + 0x10440;
+			int i = 0;
+			int count = 0x28;
+			do {
+				if (static_cast<signed char>(obj[0x4C]) >= 0) {
+					return reinterpret_cast<CGObject*>(CFlat + 0x10440 + i * 0x50);
+				}
+				obj += 0x50;
+				i++;
+				count--;
+			} while (count != 0);
 		} else {
-			objects = CFlat + 0x120E0;
-			stride = 0x518;
-			objectCount = 0x38;
+			unsigned char* obj = CFlat + 0x120E0;
+			int i = 0;
+			int count = 0x38;
+			do {
+				if (static_cast<signed char>(obj[0x4C]) >= 0) {
+					return reinterpret_cast<CGObject*>(CFlat + 0x120E0 + i * 0x518);
+				}
+				obj += 0x518;
+				i++;
+				count--;
+			} while (count != 0);
 		}
 	} else if (classType == 5) {
-		objects = m_objItem;
-		stride = 0x57C;
-		objectCount = 0x20;
+		unsigned char* obj = m_objItem;
+		int i = 0;
+		int count = 0x20;
+		do {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_objItem + i * 0x57C);
+			}
+			obj += 0x57C;
+			i++;
+			count--;
+		} while (count != 0);
 	} else if (classType < 5) {
-		objects = m_objMon;
-		stride = 0x740;
-		objectCount = 0x40;
+		unsigned char* obj = m_objMon;
+		int i = 0;
+		int count = 0x40;
+		do {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_objMon + i * 0x740);
+			}
+			obj += 0x740;
+			i++;
+			count--;
+		} while (count != 0);
 	} else {
 		return 0;
-	}
-
-	for (int i = 0; i < objectCount; i++) {
-		if (*reinterpret_cast<signed char*>(objects + 0x4C) >= 0) {
-			return reinterpret_cast<CGObject*>(objects);
-		}
-		objects += stride;
 	}
 
 	return 0;

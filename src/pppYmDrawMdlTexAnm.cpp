@@ -217,17 +217,17 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 
     colorOffset = ctrl->m_serializedDataOffsets[0];
 
-    pppUnitMatrix__FR10pppFMATRIX(&matrix4);
-    matrix2 = matrix4;
+    pppUnitMatrix__FR10pppFMATRIX(&matrix0);
+    matrix2 = matrix0;
     matrix2.value[2][2] *= FLOAT_80330548;
 
-    matrix3 = object->m_localMatrix;
-    matrix4.value[2][2] = matrix2.value[2][2];
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&matrix4, &matrix3, &matrix2);
+    matrix1 = object->m_localMatrix;
+    matrix0.value[2][2] = matrix2.value[2][2];
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&matrix0, &matrix1, &matrix2);
 
-    matrix0 = matrix4;
-    matrix1 = *(pppFMATRIX*)&ppvCameraMatrix0;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX((pppFMATRIX*)((u8*)object + 0x40), &matrix1, &matrix0);
+    matrix4 = matrix0;
+    matrix3 = *(pppFMATRIX*)&ppvCameraMatrix0;
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX((pppFMATRIX*)((u8*)object + 0x40), &matrix3, &matrix4);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;

@@ -7,6 +7,12 @@
 char* strtok_null = NULL;
 char* strtok_ptr  = NULL;
 
+typedef struct StrtokDelimiterTable {
+	unsigned char bytes[32];
+} StrtokDelimiterTable;
+
+const StrtokDelimiterTable strtok_delimiter_table_init = { { 0 } };
+
 size_t strlen(const char* str)
 {
 	size_t len       = -1;
@@ -311,7 +317,7 @@ char* strstr(const char* str, const char* pat)
  */
 char* strtok(char* str, const char* delim)
 {
-	unsigned char delimiter_table[32] = { 0 };
+	StrtokDelimiterTable delimiter_table = strtok_delimiter_table_init;
 	unsigned char ch;
 	unsigned char* p;
 	char* token;
@@ -324,7 +330,7 @@ char* strtok(char* str, const char* delim)
 	p = (unsigned char*)delim - 1;
 	while ((ch = *++p) != '\0') {
 		mask = 1 << (ch & 7);
-		delimiter_table[ch >> 3] |= (unsigned char)mask;
+		delimiter_table.bytes[ch >> 3] |= (unsigned char)mask;
 	}
 
 	token = strtok_ptr;
@@ -334,7 +340,7 @@ char* strtok(char* str, const char* delim)
 
 	p = (unsigned char*)token - 1;
 	while ((ch = *++p) != '\0') {
-		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) == 0) {
+		if ((delimiter_table.bytes[ch >> 3] & (1 << (ch & 7))) == 0) {
 			break;
 		}
 	}
@@ -346,7 +352,7 @@ char* strtok(char* str, const char* delim)
 	token = (char*)p;
 
 	while ((ch = *++p) != '\0') {
-		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
+		if ((delimiter_table.bytes[ch >> 3] & (1 << (ch & 7))) != 0) {
 			break;
 		}
 	}

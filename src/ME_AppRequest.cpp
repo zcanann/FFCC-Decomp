@@ -36,11 +36,12 @@ struct RSDLISTITEM {
     int flag;
 };
 
-extern CMaterialEditorPcs MaterialEditorPcs;
+extern __declspec(section ".data") CMaterialEditorPcs MaterialEditorPcs;
 
 static inline CMemory::CStage* MaterialEditorStage()
 {
-    return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialEditorPcs) + 4);
+    unsigned long base = reinterpret_cast<unsigned long>(&MaterialEditorPcs);
+    return *reinterpret_cast<CMemory::CStage**>(base + 4);
 }
 
 /*

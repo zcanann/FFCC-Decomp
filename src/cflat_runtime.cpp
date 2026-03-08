@@ -10,7 +10,7 @@ void __dl__FPv(void*);
 void __dla__FPv(void*);
 void __ct__Q212CFlatRuntime6CClassFv(void*);
 void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
-char s_cflat_runtime_cpp_801d8ef8[];
+char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
 char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];

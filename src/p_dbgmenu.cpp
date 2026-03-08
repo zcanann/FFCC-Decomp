@@ -14,9 +14,12 @@ extern CPartMng PartMng;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
-extern unsigned char CharaPcs[];
-extern unsigned char PartPcs[];
-extern unsigned char Sound[];
+class CCharaPcs;
+class CPartPcs;
+class CSound;
+extern CCharaPcs CharaPcs;
+extern CPartPcs PartPcs;
+extern CSound Sound;
 extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
 extern u32 DAT_80212398;
 extern u32 DAT_8021239c;
@@ -285,13 +288,13 @@ void CDbgMenuPcs::calc()
 		case 0x72:
 			m_dbgFlags ^= 0x800;
 			flags = (unsigned int)__cntlzw(m_dbgFlags & 0x800);
-			PartPcs[0x34] = (unsigned char)(flags >> 5);
+			reinterpret_cast<unsigned char*>(&PartPcs)[0x34] = (unsigned char)(flags >> 5);
 			break;
 		case 0x73:
 			m_dbgFlags ^= 0x1000;
 			break;
 		case 0x74:
-			CheckDriver__6CSoundFi(Sound, 1);
+			CheckDriver__6CSoundFi(&Sound, 1);
 			break;
 		case 0x75:
 			DAT_8032ecd8 = 1 - DAT_8032ecd8;
@@ -301,7 +304,7 @@ void CDbgMenuPcs::calc()
 			pppDumpMngSt__8CPartMngFv(&PartMng);
 			break;
 		case 0x77:
-			DumpLoad__9CCharaPcsFv(CharaPcs);
+			DumpLoad__9CCharaPcsFv(&CharaPcs);
 			break;
 		case 0x78:
 			m_dbgFlags ^= 0x2000;

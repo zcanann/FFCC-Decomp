@@ -107,7 +107,7 @@ int DAT_8032ee28;
 int DAT_8032ee2c;
 unsigned char DAT_8032ee30;
 extern unsigned char CFlat[];
-extern char s_wm_menu_cpp_801dc418[];
+char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 
 static const int kMcListEntrySize = 0x48;

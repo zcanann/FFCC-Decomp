@@ -71,7 +71,7 @@ extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CreateSmithMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" char* s_stand_80332a24;
-extern "C" char* s_singmenu_cpp_801de8d4;
+char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
 extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
 extern "C" char* PTR_s_solo1_80214b18[];

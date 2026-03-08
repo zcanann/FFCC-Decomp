@@ -70,7 +70,6 @@ void ClearAll__5CWindFv(void*);
 void Init__12CFlatRuntimeFv(void*);
 int Load__13CFlatRuntime2FPc(void*, char*);
 void ResetNewGame__13CFlatRuntime2Fv(void*);
-void InitFurTexBuffer__6CCharaFv(void*);
 int intToClass__13CFlatRuntime2Fi(void*, int);
 int sprintf(char*, const char*, ...);
 void Draw__13CFlatRuntime2Fv(void*);
@@ -616,7 +615,7 @@ void CGame::InitNewGame()
     }
 
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
-    InitFurTexBuffer__6CCharaFv(Chara);
+    reinterpret_cast<CChara*>(Chara)->InitFurTexBuffer();
 }
 
 /*
@@ -814,7 +813,7 @@ void CGame::CheckScriptChange()
 
         strcpy(m_gameWork.m_townName, townName);
         ResetNewGame__13CFlatRuntime2Fv(CFlat);
-        InitFurTexBuffer__6CCharaFv(Chara);
+        reinterpret_cast<CChara*>(Chara)->InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }
 

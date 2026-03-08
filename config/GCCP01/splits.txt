@@ -219,6 +219,7 @@ p_FunnyShape.cpp:
 	extabindex  start:0x8000C7A8 end:0x8000C838
 	.text       start:0x8004E210 end:0x8004EB4C
 	.ctors      start:0x801D5400 end:0x801D5404
+	.bss        start:0x8026D728 end:0x80273928
 
 FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8
@@ -1153,6 +1154,7 @@ p_dbgmenu.cpp:
 	extabindex  start:0x80010810 end:0x800108AC
 	.text       start:0x8012B710 end:0x8012D3FC
 	.ctors      start:0x801D5440 end:0x801D5444
+	.bss        start:0x80306708 end:0x80309178
 
 pppChangeBGColor.cpp:
 	.text       start:0x8012D3FC end:0x8012D458

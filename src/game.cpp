@@ -31,9 +31,7 @@
 #include <string.h>
 
 typedef void* ConstructorDestructor;
-class CFunnyShapePcs;
 class CMaterialEditorPcs;
-extern CFunnyShapePcs FunnyShapePcs;
 extern CMaterialEditorPcs MaterialEditorPcs;
 
 extern "C" {

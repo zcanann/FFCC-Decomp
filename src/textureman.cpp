@@ -59,6 +59,8 @@ extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmem
 extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
+extern "C" char gMemory[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -417,7 +419,7 @@ void CTextureMan::Init()
  */
 void CTextureMan::Quit()
 {
-	Memory.DestroyStage(m_memoryStage);
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<CMemory*>(gMemory), m_memoryStage);
 }
 
 /*

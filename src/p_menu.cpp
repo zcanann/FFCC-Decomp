@@ -22,6 +22,8 @@
 #include <string.h>
 
 CMenuPcs MenuPcs;
+u8 gMenuProcessTable[0x15C];
+const f32 kMenuInitOne = 1.0f;
 static const char kMenuPcsStageName[] = "CMenuPcs";
 static const char kPMenuSourceFile[] = "p_menu.cpp";
 
@@ -34,7 +36,6 @@ struct Vec4d
 };
 u8 ARRAY_802ea1a0[0x20];
 extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
-extern char* PTR_s_common_8032e7a0[];
 extern int DAT_8020ef9c[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
 extern char s_dvd__smenu__s_fnt_801d9da0[];
@@ -297,7 +298,7 @@ void CMenuPcs::create()
     loadFont(0, fontPath, 0, 0);
 
     for (int i = 0; i < 2; i++) {
-        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.game.GetLangString(), PTR_s_common_8032e7a0[i]);
+        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.game.GetLangString(), sMenuTextureRegionNameTable[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {

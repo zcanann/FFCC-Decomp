@@ -16,6 +16,8 @@ class CGamePcs;
 extern CGamePcs Game;
 class CSound;
 extern CSound Sound;
+class CAmemCacheSet;
+extern CAmemCacheSet ppvAmemCacheSet;
 extern u32 CFlatFlags;
 extern Mtx gFlatPosMtx;
 

@@ -11,6 +11,8 @@
 
 #include "string.h"
 
+JoyBus Joybus;
+
 int DAT_8032edb8 = 0;
 extern "C" void __dt__6JoyBusFv(void*);
 unsigned char ARRAY_802eaab0[0x10];

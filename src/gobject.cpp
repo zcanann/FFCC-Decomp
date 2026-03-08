@@ -31,7 +31,6 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
-extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
 extern float FLOAT_8033033c;
@@ -940,8 +939,7 @@ void CGObject::bgNormalCollision()
     m_gravityY = m_jumpLandingDampening * -((clampedY - (oldY - move.y)) + (oldY - move.y));
 
     if (((m_displayFlags & 1) != 0) && ((m_weaponNodeFlags & 1) == 0)) {
-        PlaySe3D__6CSoundFiP3Vecffi(
-            &Sound,
+        Sound.PlaySe3D(
             0x26,
             &m_worldPosition,
             FLOAT_80330424 + (FLOAT_80330424 * m_gravityY) / FLOAT_80330360,

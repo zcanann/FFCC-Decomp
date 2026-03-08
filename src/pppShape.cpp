@@ -6,7 +6,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
-    extern unsigned char ppvAmemCacheSet[];
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);
     void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int textureIndex,
@@ -216,7 +215,7 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, ppvAmemCacheSet);
+            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, &ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;
@@ -281,7 +280,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, ppvAmemCacheSet);
+            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, &ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;

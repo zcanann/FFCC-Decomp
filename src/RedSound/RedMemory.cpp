@@ -2,6 +2,19 @@
 #include "ffcc/RedSound/RedGlobals.h"
 #include <dolphin/os.h>
 
+int gRedMainMemoryBase;
+int gRedAMemoryBase;
+int gRedMainMemorySize;
+int gRedAMemorySize;
+int* gRedMainMemoryBlockList;
+int* gRedAMemoryBlockList;
+
+char sRedMemoryLogPrefix;
+char sRedMemoryLogSuffixA;
+char sRedMemoryLogSuffixB;
+char s_redMemoryMainBankFullFmt[] = "%cMain memory bank full%c%c";
+char s_redMemoryAuxBankFullFmt[] = "%cAux memory bank full%c%c";
+
 // Memory functions
 extern "C" {
 	void* memmove(void* dest, const void* src, unsigned int n);

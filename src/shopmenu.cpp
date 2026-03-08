@@ -5,6 +5,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/sound.h"
+#include "ffcc/linkage.h"
 
 extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -52,7 +53,6 @@ extern char DAT_80332e54[];
 unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];
 extern unsigned char PartPcs[];
-extern void* ppvAmemCacheSet;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;
 extern float FLOAT_80332d34;
@@ -148,7 +148,7 @@ void CMenuPcs::CreateShopMenu()
         *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
-        GetData__13CAmemCacheSetFsPci(ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
+        GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
     pppCacheLoadShape__FPsP12_pppDataHead(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
@@ -188,7 +188,7 @@ void CMenuPcs::CreateSmithMenu()
         *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
-        GetData__13CAmemCacheSetFsPci(ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
+        GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
     pppCacheLoadShape__FPsP12_pppDataHead(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);

@@ -47,7 +47,6 @@ extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned char CFlat[];
-extern "C" void* CAMemCacheSet;
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
@@ -58,7 +57,6 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
 
 Mtx ppvCameraMatrix0;
@@ -1123,7 +1121,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			s16 cacheIndex = *partResource;
 			if (cacheIndex != -1)
 			{
-				((CAmemCacheSet*)CAMemCacheSet)->Release(cacheIndex);
+				ppvAmemCacheSet.Release(cacheIndex);
 			}
 
 			if (mngRaw->m_mapTexLoaded != 0)
@@ -1137,7 +1135,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + mapMeshIndices[i] * 4);
-					mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, (CAmemCacheSet*)CAMemCacheSet);
+					mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
 				}
 
 				s16 shapeCount = *shapeIndices;
@@ -1922,7 +1920,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		memcpy(chunkData, dataBase + chunkOffset, chunkSize);
 		cacheChunks[(i << 2)] = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
-		    reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet), chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
+		    &ppvAmemCacheSet, chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
 		__dl__FPv(chunkData);
 		chunkOffsets++;
 	}
@@ -2372,8 +2370,8 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 			if (se->m_soundEffectStartedOnce == 0)
 			{
 				u32 soundTableIndex = (u32)se->m_soundEffectKind - 3;
-				se->m_soundEffectHandle = PlaySe3D__6CSoundFiP3Vecffi(
-					&Sound, se->m_soundEffectSlot, &soundPos,
+				se->m_soundEffectHandle = Sound.PlaySe3D(
+					se->m_soundEffectSlot, &soundPos,
 					pppEnvStPtr->m_soundVolumeTable[soundTableIndex],
 					pppEnvStPtr->m_soundPitchTable[soundTableIndex], 0);
 				se->m_soundEffectStartedOnce = 1;

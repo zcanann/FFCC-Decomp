@@ -13,6 +13,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/pppfunctbl.h"
+#include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/stopwatch.h"
 
@@ -74,7 +75,6 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern void* CAMemCacheSet;
 CProfile g_par_calc_prof(0);
 CProfile g_par_draw_prof(0);
 PPPCREATEPARAM g_dcp;
@@ -329,7 +329,7 @@ void CPartMng::Destroy()
                 model->m_refCount--;
                 if (model->m_refCount < 1) {
                     if (model->m_cacheId != -1) {
-                        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->DestroyCache(model->m_cacheId);
+                        ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&model->m_mapMesh) + 0x24) = 0;
                         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&model->m_mapMesh) + 0x28) = 0;
                     }
@@ -488,7 +488,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
 
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x158);
-    res->m_materialSet->ReleaseTag(res->m_textureSet, pdtSlotIndex, reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet));
+    res->m_materialSet->ReleaseTag(res->m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x13a);
 
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
@@ -507,7 +507,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         model->m_refCount--;
         if (model->m_refCount < 1) {
             if (model->m_cacheId != -1) {
-                reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->DestroyCache(model->m_cacheId);
+                ppvAmemCacheSet.DestroyCache(model->m_cacheId);
                 *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
             }
@@ -562,7 +562,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     unsigned char* cacheChunks = reinterpret_cast<unsigned char*>(pdt->m_cacheChunks);
     for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
         short cacheId = *reinterpret_cast<short*>(cacheChunks + i * 8);
-        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->DestroyCache(cacheId);
+        ppvAmemCacheSet.DestroyCache(cacheId);
     }
 
     if (cacheChunks != 0) {
@@ -1765,7 +1765,7 @@ void CPartMng::pppDumpCacheIdx()
                         reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
                                                               mng->m_partIndex * sizeof(PppPartResourceRaw));
 
-                    CAmemCacheSet* cacheSet = reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet);
+                    CAmemCacheSet* cacheSet = &ppvAmemCacheSet;
                     if (cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
                         partResource->m_pdt = reinterpret_cast<long*>(
                             cacheSet->GetData(partResource->m_cacheIndex, s_partMng_cpp_801d8230, 0x9A9));
@@ -2069,7 +2069,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
                         void** meshDataPtr =
                             reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&targetModel->m_mapMesh) + 0x24);
-                        targetModel->m_cacheId = static_cast<short>(reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->SetData(
+                        targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
                             *meshDataPtr, 0, static_cast<CAmemCache::TYPE>(1), 1));
 
                         if (*meshDataPtr != 0) {
@@ -2243,7 +2243,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(this) + 0x22e18);
     PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
 
-    reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->CacheClear();
+    ppvAmemCacheSet.CacheClear();
     stageLoad->setDefaultParam(pdtSlotIndex);
 
     char pdtPath[256];

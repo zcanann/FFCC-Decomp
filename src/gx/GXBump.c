@@ -43,10 +43,9 @@ void GXSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTe
 #pragma dont_inline reset
 
 void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) {
-    const f32* mtx;
     u32 id;
     u32 scale;
-    u32 reg;
+    const f32* mtx = &offset[0][0];
 
     CHECK_GXBEGIN(186, "GXSetIndTexMtx");
 
@@ -71,23 +70,31 @@ void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) 
         break;
     }
 
-    id *= 3;
+    id *= 3U;
     scale = (u32)(s8)(scale_exp + 17);
-    mtx = &offset[0][0];
 
-    reg = ((s32)(1024.0f * mtx[0]) & 0x7FF) | (((s32)(1024.0f * mtx[3]) & 0x7FF) << 11) |
-          ((scale & 3) << 22) | ((id + 6) << 24);
-    GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
+    GX_WRITE_SOME_REG5(
+        GX_LOAD_BP_REG,
+        ((id + 6) << 24) |
+            ((scale & 3) << 22) |
+            ((((s32)(1024.0f * mtx[3])) & 0x7FF) << 11) |
+            (((s32)(1024.0f * mtx[0])) & 0x7FF));
 
-    reg = ((s32)(1024.0f * mtx[1]) & 0x7FF) | (((s32)(1024.0f * mtx[4]) & 0x7FF) << 11) |
-          ((scale & 0xC) << 20) | ((id + 7) << 24);
-    GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
+    GX_WRITE_SOME_REG5(
+        GX_LOAD_BP_REG,
+        ((id + 7) << 24) |
+            ((scale & 0xC) << 20) |
+            ((((s32)(1024.0f * mtx[4])) & 0x7FF) << 11) |
+            (((s32)(1024.0f * mtx[1])) & 0x7FF));
 
-    reg = ((s32)(1024.0f * mtx[2]) & 0x7FF) | (((s32)(1024.0f * mtx[5]) & 0x7FF) << 11) |
-          ((scale & 0x30) << 18) | ((id + 8) << 24);
-    GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
+    GX_WRITE_SOME_REG5(
+        GX_LOAD_BP_REG,
+        ((id + 8) << 24) |
+            ((scale & 0x30) << 18) |
+            ((((s32)(1024.0f * mtx[5])) & 0x7FF) << 11) |
+            (((s32)(1024.0f * mtx[2])) & 0x7FF));
 
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 void GXSetIndTexCoordScale(GXIndTexStageID ind_state, GXIndTexScale scale_s, GXIndTexScale scale_t) {

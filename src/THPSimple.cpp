@@ -271,21 +271,22 @@ s32 THPSimpleClose(void)
 {
     THPSimpleControl* control = &SimpleControl;
 
-    if ((control->isOpen != 0) && (control->isPreLoaded == 0)) {
-        if (control->hasAudio == 0) {
-            control->isBufferSet = 0;
-        } else if (control->isBufferSet == 1) {
-            return 0;
-        }
-
-        if (control->isReadFrameAsync == 0) {
-            control->isOpen = 0;
-            DVDClose(&control->fileInfo);
-            return 1;
-        }
+    if ((control->isOpen == 0) || (control->isPreLoaded != 0)) {
+        return 0;
     }
 
-    return 0;
+    if ((control->hasAudio != 0) && (control->isBufferSet != 0)) {
+        return 0;
+    }
+
+    control->isBufferSet = 0;
+    if (control->isReadFrameAsync != 0) {
+        return 0;
+    }
+
+    control->isOpen = 0;
+    DVDClose(&control->fileInfo);
+    return 1;
 }
 
 /*

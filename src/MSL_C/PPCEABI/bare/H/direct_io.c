@@ -22,8 +22,7 @@ size_t fread(void* buffer, size_t size, size_t count, FILE* stream)
 
 size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
 {
-    unsigned char* read_ptr;
-    size_t total_bytes;
+    unsigned char* dest_ptr;
     size_t bytes_to_go;
     size_t bytes_read;
     size_t num_bytes;
@@ -35,9 +34,9 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
         fwide(stream, -1);
 #endif
 
-    total_bytes = size * count;
+    bytes_to_go = size * count;
 
-    if (!total_bytes
+    if (!bytes_to_go
 		|| stream->file_state.error
 		|| stream->file_mode.file_kind == __closed_file)
     {
@@ -69,36 +68,30 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
 	
     // Handle ungetc buffer - characters pushed back with ungetc()
     bytes_read = 0;
-    if (total_bytes != 0 && stream->file_state.io_state > __reading) {
+    dest_ptr = (unsigned char*)buffer;
+    if (bytes_to_go != 0 && stream->file_state.io_state > __reading) {
         do {
 #ifndef __NO_WIDE_CHAR
             if (fwide(stream, 0) == 1) {
-                // Wide character mode - read 2 bytes from wide buffer
                 bytes_read += 2;
-                total_bytes -= 2;
-                *(wchar_t*)buffer = stream->ungetc_wide_buffer[stream->file_state.io_state - 3];
-                buffer = (char*)buffer + 2;
+                bytes_to_go -= 2;
+                *(wchar_t*)dest_ptr = stream->ungetc_wide_buffer[stream->file_state.io_state - 3];
+                dest_ptr += 2;
             } else
 #endif
             {
-                // Byte character mode - read 1 byte from byte buffer  
                 bytes_read += 1;
-                total_bytes -= 1;
-                *(char*)buffer = stream->ungetc_buffer[stream->file_state.io_state - 3];
-                buffer = (char*)buffer + 1;
+                bytes_to_go -= 1;
+                *dest_ptr = stream->ungetc_buffer[stream->file_state.io_state - 3];
+                dest_ptr += 1;
             }
-            // Decrement ungetc stack depth in io_state
             stream->file_state.io_state = stream->file_state.io_state - 1;
-        } while (total_bytes != 0 && stream->file_state.io_state > __reading);
-        
-        // Restore buffer length when ungetc buffer is emptied
+        } while (bytes_to_go != 0 && stream->file_state.io_state > __reading);
+
         if (stream->file_state.io_state == __reading) {
             stream->buffer_length = stream->save_buffer_length;
         }
     }
-
-    bytes_to_go = total_bytes;
-    read_ptr    = (unsigned char*)buffer;
 
     if (bytes_to_go && (stream->buffer_length != 0 || always_buffer)) {
         do {
@@ -121,9 +114,9 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
             if (num_bytes > bytes_to_go)
                 num_bytes = bytes_to_go;
 
-            memcpy(read_ptr, stream->buffer_ptr, num_bytes);
+            memcpy(dest_ptr, stream->buffer_ptr, num_bytes);
 
-            read_ptr += num_bytes;
+            dest_ptr += num_bytes;
             bytes_read += num_bytes;
             bytes_to_go -= num_bytes;
             stream->buffer_ptr += num_bytes;
@@ -137,9 +130,9 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
         size_t save_size   = stream->buffer_size;
         size_t direct_read = 0;
 
-        stream->buffer        = read_ptr;
+        stream->buffer        = dest_ptr;
         stream->buffer_size   = bytes_to_go;
-        stream->buffer_ptr    = read_ptr;
+        stream->buffer_ptr    = dest_ptr;
         stream->buffer_length = 0;
 
         ioresult = __load_buffer(stream, &direct_read, 1);

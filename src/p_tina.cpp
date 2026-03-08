@@ -1069,13 +1069,21 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 {
-	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
 	float* colorValues = reinterpret_cast<float*>(&color);
 
-	colorValues[0] = GetMngStUserFloat0(pppMngSt);
-	colorValues[1] = GetMngStUserFloat1(pppMngSt);
-	colorValues[2] = GetMngStScaleFactor(pppMngSt);
-	colorValues[3] = GetMngStOwnerScale(pppMngSt);
+	colorValues[0] = pppMngSt->r;
+	colorValues[1] = pppMngSt->g;
+	colorValues[2] = pppMngSt->b;
+	colorValues[3] = pppMngSt->a;
 }
 
 /*

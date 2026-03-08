@@ -148,21 +148,26 @@ void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **)
  */
 void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** textureNames)
 {
-    void* animData = shapeSt->m_animData;
-    void* currentFrame = animData;
+    unsigned char textureIndex;
+    int shapeBase;
+    int shapeEntry;
+    void* currentFrame;
+    void* animData;
+    int frameIndex;
+    int shapeIndex;
 
-    for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
-        int shapeBase = (int)animData + *(short*)((int)currentFrame + 0x10);
-        int shapeEntry = shapeBase;
-
-        for (int shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex++) {
-            unsigned char textureIndex =
+    animData = shapeSt->m_animData;
+    currentFrame = animData;
+    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
+        shapeBase = (int)animData + (int)*(short*)((int)currentFrame + 0x10);
+        shapeEntry = shapeBase;
+        for (shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex = shapeIndex + 1) {
+            textureIndex =
                 FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
             *(unsigned char*)(shapeEntry + 10) = textureIndex;
             *(int*)(shapeEntry + 0xc) = (int)shapeSt->m_displayListData + *(int*)(shapeEntry + 0xc);
             shapeEntry = shapeEntry + 8;
         }
-
         currentFrame = (void*)((int)currentFrame + 8);
     }
 }

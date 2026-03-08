@@ -74,12 +74,13 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern CProfile g_par_calc_prof;
 extern CPartPcs PartPcs;
 class CMapPcs;
 extern CMapPcs MapPcs;
 extern void* CAMemCacheSet;
-extern PPPCREATEPARAM g_dcp;
+CProfile g_par_calc_prof(0);
+CProfile g_par_draw_prof(0);
+PPPCREATEPARAM g_dcp;
 extern "C" {
 unsigned char DAT_8032ed68 = 0;
 int DAT_8032ed6c = 0;

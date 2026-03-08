@@ -7,6 +7,7 @@
 extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
 extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
+extern volatile u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
 
 static int Prepared;
 
@@ -68,8 +69,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     OSDisableInterrupts();
 
-    *(volatile u32*)0x817FFFFC = 0;
-    *(volatile u32*)0x817FFFF8 = 0;
+    g_unk_817FFFFC = 0;
     g_unk_800030E2 = 1;
     BOOT_REGION_START = (u32)SaveStart;
     BOOT_REGION_END = (u32)SaveEnd;
@@ -98,7 +98,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         if (!DVDCheckDisk())
 #endif
         {
-            __OSDoHotReset(*(volatile u32*)0x817FFFFC);
+            __OSDoHotReset(g_unk_817FFFFC);
         }
     }
 
@@ -118,7 +118,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
             if (!DVDCheckDisk())
 #endif
             {
-                __OSDoHotReset(*(volatile u32*)0x817FFFFC);
+                __OSDoHotReset(g_unk_817FFFFC);
             }
         }
 
@@ -138,7 +138,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         if (!DVDCheckDisk())
 #endif
         {
-            __OSDoHotReset(*(volatile u32*)0x817FFFFC);
+            __OSDoHotReset(g_unk_817FFFFC);
         }
     }
 
@@ -156,7 +156,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         if (!DVDCheckDisk())
 #endif
         {
-            __OSDoHotReset(*(volatile u32*)0x817FFFFC);
+            __OSDoHotReset(g_unk_817FFFFC);
         }
     }
 

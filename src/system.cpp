@@ -496,7 +496,6 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
     typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
     void* descBlock = (*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process, arg);
-    int test;
     COrder* next;
     COrder* current = m_orderSentinel.m_next;
 
@@ -509,13 +508,12 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
             current->m_next->m_previous = current->m_previous;
             current->m_next = m_freeOrderHead.m_next;
             m_freeOrderHead.m_next = current;
-            m_orderCount = m_orderCount - 1;
+            m_orderCount--;
         }
         current = next;
     } while (next != &m_orderSentinel);
 
-    test = __ptmf_test((__ptmf*)((u8*)descBlock + 0x10));
-    if (test != 0)
+    if (__ptmf_test((__ptmf*)((u8*)descBlock + 0x10)) != 0)
     {
         __ptmf_scall(process);
     }

@@ -128,11 +128,11 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     *((u8*)pfVar3 + 0x4c) = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
-        &Game.game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
+        (CGame*)&Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
     if (iVar2 != 0) {
-        GetTargetCursor__5CGameFiR3VecR3Vec(&Game.game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
+        GetTargetCursor__5CGameFiR3VecR3Vec((CGame*)&Game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
 
-        iVar2 = (int)GetPartyObj__5CGameFi(&Game.game, local_28);
+        iVar2 = (int)GetPartyObj__5CGameFi((CGame*)&Game, local_28);
         local_14.x = *(f32*)(iVar2 + 0x15c);
         local_14.y = *(f32*)(iVar2 + 0x160);
         local_14.z = *(f32*)(iVar2 + 0x164);

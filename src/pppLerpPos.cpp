@@ -21,7 +21,7 @@ struct pppLerpPosUnkC {
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-void pppCopyVector__FR3Vec3Vec(void* dst, void* src);
+void pppCopyVector__FR3Vec3Vec(Vec* dst, const Vec* src);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt* pppMngSt);
 }
 extern float FLOAT_80331bf8;
@@ -44,10 +44,10 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     s32 iVar2;
     s32 iVar4;
     s32 iVar5;
-    f32* pfVar6;
+    Vec* pVec;
     s32 iVar7;
-    Vec local_38;
     Vec local_2c;
+    Vec local_38;
     u32 count;
     Vec** historyPtr;
 
@@ -69,18 +69,18 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 *(f32*)((u8*)*historyPtr + iVar1) = pppMngStPtr->m_matrix.value[2][3];
             }
         } else {
-            local_2c.x = FLOAT_80331bf8;
-            local_2c.y = FLOAT_80331bf8;
-            local_2c.z = FLOAT_80331bf8;
+            local_38.x = FLOAT_80331bf8;
+            local_38.y = FLOAT_80331bf8;
+            local_38.z = FLOAT_80331bf8;
 
             iVar7 = (u8)param_2->m_dataValIndex - 1;
             iVar5 = iVar7 * 0xc;
             while (0 < iVar7) {
-                pfVar6 = (f32*)((u8*)*historyPtr + iVar5 - 0xc);
-                local_38.x = pfVar6[0];
-                local_38.y = pfVar6[1];
-                local_38.z = pfVar6[2];
-                pppCopyVector__FR3Vec3Vec((void*)((u8*)*historyPtr + iVar5), &local_38);
+                pVec = (Vec*)((u8*)*historyPtr + iVar5 - 0xc);
+                local_2c.x = pVec->x;
+                local_2c.y = pVec->y;
+                local_2c.z = pVec->z;
+                pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar5), &local_2c);
                 iVar5 = iVar5 - 0xc;
                 iVar7 = iVar7 - 1;
             }
@@ -91,14 +91,14 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
 
             iVar5 = 0;
             for (iVar7 = 0; count = (u32)(u8)param_2->m_dataValIndex, iVar7 < (s32)count; iVar7 = iVar7 + 1) {
-                PSVECAdd((Vec*)((u8*)*historyPtr + iVar5), &local_2c, &local_2c);
+                PSVECAdd((Vec*)((u8*)*historyPtr + iVar5), &local_38, &local_38);
                 iVar5 = iVar5 + 0xc;
             }
 
-            PSVECScale(&local_2c, &local_2c, FLOAT_80331bfc / (f32)count);
-            pppMngStPtr->m_matrix.value[0][3] = local_2c.x;
-            pppMngStPtr->m_matrix.value[1][3] = local_2c.y;
-            pppMngStPtr->m_matrix.value[2][3] = local_2c.z;
+            PSVECScale(&local_38, &local_38, FLOAT_80331bfc / (f32)count);
+            pppMngStPtr->m_matrix.value[0][3] = local_38.x;
+            pppMngStPtr->m_matrix.value[1][3] = local_38.y;
+            pppMngStPtr->m_matrix.value[2][3] = local_38.z;
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         }
     }

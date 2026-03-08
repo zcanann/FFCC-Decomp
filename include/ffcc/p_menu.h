@@ -218,5 +218,13 @@ public:
 };
 
 extern CMenuPcs MenuPcs;
+extern unsigned int m_table_desc0__8CMenuPcs[];
+extern unsigned int m_table_desc1__8CMenuPcs[];
+extern unsigned int m_table_desc2__8CMenuPcs[];
+extern unsigned int m_table_desc3__8CMenuPcs[];
+extern unsigned int m_table_desc4__8CMenuPcs[];
+extern unsigned int m_table_desc5__8CMenuPcs[];
+extern char* sMenuTextureRegionNameTable[];
+extern int sMenuTextureInfoTable[];
 
 #endif // _FFCC_P_MENU_H_

@@ -34,46 +34,8 @@ struct Vec4d
 };
 u8 ARRAY_802ea1a0[0x20];
 extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
-extern u32 DAT_8020edf8;
-extern u32 DAT_8020edfc;
-extern u32 PTR_create__8CMenuPcsFv_8020ee00;
-extern u32 DAT_8020ee04;
-extern u32 DAT_8020ee08;
-extern u32 PTR_destroy__8CMenuPcsFv_8020ee0c;
-extern u32 DAT_8020ee10;
-extern u32 DAT_8020ee14;
-extern u32 PTR_calc__8CMenuPcsFv_8020ee18;
-extern u32 DAT_8020ee1c;
-extern u32 DAT_8020ee20;
-extern u32 PTR_draw__8CMenuPcsFv_8020ee24;
-extern u32 DAT_8020ee28;
-extern u32 DAT_8020ee2c;
-extern u32 PTR_loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii_8020ee30;
-extern u32 DAT_8020ee34;
-extern u32 DAT_8020ee38;
-extern u32 PTR_drawSingleMenu__8CMenuPcsFv_8020ee3c;
-extern u32 DAT_8020ee44;
-extern u32 DAT_8020ee48;
-extern u32 DAT_8020ee4c;
-extern u32 DAT_8020ee50;
-extern u32 DAT_8020ee54;
-extern u32 DAT_8020ee58;
-extern u32 DAT_8020ee5c;
-extern u32 DAT_8020ee60;
-extern u32 DAT_8020ee64;
-extern u32 DAT_8020ee70;
-extern u32 DAT_8020ee74;
-extern u32 DAT_8020ee78;
-extern u32 DAT_8020ee84;
-extern u32 DAT_8020ee88;
-extern u32 DAT_8020ee8c;
-extern u32 DAT_8020ee98;
-extern u32 DAT_8020ee9c;
-extern u32 DAT_8020eea0;
-extern char* PTR_s_shibuya_8020f23c[];
 extern char* PTR_s_common_8032e7a0[];
 extern int DAT_8020ef9c[];
-extern int DAT_8020f260[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
 extern char s_dvd__smenu__s_fnt_801d9da0[];
 extern char s_dvd__smenu_gc22_fnt_801d9db4[];
@@ -131,6 +93,7 @@ static inline void ReleaseRefObject(void* object)
 extern "C" void __sinit_p_menu_cpp()
 {
     u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
+    u32* table = reinterpret_cast<u32*>(gMenuProcessTable);
 
     *(u32*)((u8*)&MenuPcs) = (u32)&PTR_PTR_s_CMenuPcs_8020f2d0;
     mcCtrl[0] = 0;
@@ -143,24 +106,24 @@ extern "C" void __sinit_p_menu_cpp()
     mcCtrl[7] = 0;
     __register_global_object(&MenuPcs, reinterpret_cast<void*>(__dt__8CMenuPcsFv), ARRAY_802ea1a0);
 
-    DAT_8020ee44 = DAT_8020edf8;
-    DAT_8020ee48 = DAT_8020edfc;
-    DAT_8020ee4c = PTR_create__8CMenuPcsFv_8020ee00;
-    DAT_8020ee50 = DAT_8020ee04;
-    DAT_8020ee54 = DAT_8020ee08;
-    DAT_8020ee58 = PTR_destroy__8CMenuPcsFv_8020ee0c;
-    DAT_8020ee5c = DAT_8020ee10;
-    DAT_8020ee60 = DAT_8020ee14;
-    DAT_8020ee64 = PTR_calc__8CMenuPcsFv_8020ee18;
-    DAT_8020ee70 = DAT_8020ee1c;
-    DAT_8020ee74 = DAT_8020ee20;
-    DAT_8020ee78 = PTR_draw__8CMenuPcsFv_8020ee24;
-    DAT_8020ee84 = DAT_8020ee28;
-    DAT_8020ee88 = DAT_8020ee2c;
-    DAT_8020ee8c = PTR_loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii_8020ee30;
-    DAT_8020ee98 = DAT_8020ee34;
-    DAT_8020ee9c = DAT_8020ee38;
-    DAT_8020eea0 = PTR_drawSingleMenu__8CMenuPcsFv_8020ee3c;
+    table[1] = m_table_desc0__8CMenuPcs[0];
+    table[2] = m_table_desc0__8CMenuPcs[1];
+    table[3] = m_table_desc0__8CMenuPcs[2];
+    table[4] = m_table_desc1__8CMenuPcs[0];
+    table[5] = m_table_desc1__8CMenuPcs[1];
+    table[6] = m_table_desc1__8CMenuPcs[2];
+    table[7] = m_table_desc2__8CMenuPcs[0];
+    table[8] = m_table_desc2__8CMenuPcs[1];
+    table[9] = m_table_desc2__8CMenuPcs[2];
+    table[12] = m_table_desc3__8CMenuPcs[0];
+    table[13] = m_table_desc3__8CMenuPcs[1];
+    table[14] = m_table_desc3__8CMenuPcs[2];
+    table[17] = m_table_desc4__8CMenuPcs[0];
+    table[18] = m_table_desc4__8CMenuPcs[1];
+    table[19] = m_table_desc4__8CMenuPcs[2];
+    table[22] = m_table_desc5__8CMenuPcs[0];
+    table[23] = m_table_desc5__8CMenuPcs[1];
+    table[24] = m_table_desc5__8CMenuPcs[2];
 }
 
 /*
@@ -1383,12 +1346,12 @@ void CMenuPcs::createBattle()
 {
     char path[0x104];
     char fontPath[0x80];
-    int* textureInfo = DAT_8020f260;
+    int* textureInfo = sMenuTextureInfoTable;
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < 2; i++) {
         const char* language = Game.game.GetLangString();
-        sprintf(path, s_dvd__smenu__s_tex_801d9d6c, language, PTR_s_shibuya_8020f23c[i]);
+        sprintf(path, s_dvd__smenu__s_tex_801d9d6c, language, sMenuTextureRegionNameTable[i]);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {

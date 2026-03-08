@@ -27,9 +27,9 @@ public:
     int m_numItems;
     int m_size;
     int m_defaultSize;
-    int m_growCapacity;
-    CMemory::CStage* m_stage;
     T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
 };
 
 extern "C" void __dl__FPv(void*);

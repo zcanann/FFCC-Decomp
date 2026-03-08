@@ -153,13 +153,16 @@ void GXInitFifoLimits(GXFifoObj* fifo, u32 hiWatermark, u32 loWatermark) {
 // NONMATCHING DEBUG
 void GXSetCPUFifo(GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
+    u32 writePtr;
     BOOL enabled = OSDisableInterrupts();
 
     CPUFifo = realFifo;
     if (CPUFifo == GPFifo) {
         GX_SET_PI_REG(3, (u32)realFifo->base & 0x3FFFFFFF);
         GX_SET_PI_REG(4, (u32)realFifo->top & 0x3FFFFFFF);
-        GX_SET_PI_REG(5, (u32)OSPhysicalToCached((void*)((u32)realFifo->wrPtr & 0x3FFFFFE0)));
+        writePtr = (u32)realFifo->wrPtr & 0x3FFFFFE0;
+        writePtr &= 0xFBFFFFFF;
+        GX_SET_PI_REG(5, writePtr);
 
         CPGPLinked = GX_TRUE;
         __GXWriteFifoIntReset(1, 1);
@@ -174,7 +177,9 @@ void GXSetCPUFifo(GXFifoObj* fifo) {
         __GXWriteFifoIntEnable(0, 0);
         GX_SET_PI_REG(3, (u32)realFifo->base & 0x3FFFFFFF);
         GX_SET_PI_REG(4, (u32)realFifo->top & 0x3FFFFFFF);
-        GX_SET_PI_REG(5, (u32)OSPhysicalToCached((void*)((u32)realFifo->wrPtr & 0x3FFFFFE0)));
+        writePtr = (u32)realFifo->wrPtr & 0x3FFFFFE0;
+        writePtr &= 0xFBFFFFFF;
+        GX_SET_PI_REG(5, writePtr);
     }
 
     PPCSync();

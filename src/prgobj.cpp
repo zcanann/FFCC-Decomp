@@ -8,6 +8,8 @@
 
 #include <math.h>
 
+extern "C" double atan2(double, double);
+
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
@@ -66,9 +68,9 @@ void CGPrgObj::onFrame()
 
     onFrameAlways();
 
-	if ((m_weaponNodeFlags & 0x8000) != 0) {
+	if (static_cast<signed char>(m_weaponNodeFlags) < 0) {
 		if ((GetCID() & 0x2d) == 0x2d &&
-		    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x2d) != 0) {
+		    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x2e) != 0) {
 			return;
 		}
 
@@ -434,8 +436,9 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	CVector deltaPos;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
-	targetRot = 0.0f;
-	if (deltaPos.x != 0.0f && deltaPos.z != 0.0f) {
+	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
+		targetRot = 0.0f;
+	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
@@ -456,12 +459,15 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
 	CVector deltaPos;
+	Vec* basePosVec;
 	float targetRot;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
-	targetRot = 0.0f;
-	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	basePosVec = reinterpret_cast<Vec*>(&basePos);
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
+		targetRot = 0.0f;
+	} else {
+		targetRot = (float)atan2(-deltaPos.x, -deltaPos.z);
 	}
 	m_rotTargetY = targetRot;
 }
@@ -485,8 +491,9 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 
 	basePosVec = reinterpret_cast<Vec*>(&basePos);
 	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	targetRot = 0.0f;
-	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
+	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
+		targetRot = 0.0f;
+	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 

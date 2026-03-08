@@ -1,17 +1,12 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_camera.h"
 #include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 
-static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
-static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
-static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
-static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
-static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
-static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
-static inline float CameraDistance() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xFC); }
-static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
+extern struct {
+    float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
+    Mtx m_cameraMatrix;
+} CameraPcs;
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 float kPppConstrainCameraDirScaleBase = 1.0f;
@@ -92,18 +87,18 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             value, value + 1, value + 2, &param_2->m_initWOrk, &param_2->m_stepValue);
         
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
-            float cameraDirX = CameraDirX();
-            float cameraDirY = CameraDirY();
-            float cameraDirZ = CameraDirZ();
+            float cameraDirX = CameraPcs._236_4_;
+            float cameraDirY = CameraPcs._240_4_;
+            float cameraDirZ = CameraPcs._244_4_;
             
             Mtx MStack_b8;
-            PSMTXCopy(CameraMatrix(), MStack_b8);
+            PSMTXCopy(CameraPcs.m_cameraMatrix, MStack_b8);
             
-            float cameraPosX = CameraPosX();
-            float cameraPosY = CameraPosY();
-            float cameraPosZ = CameraPosZ();
+            float cameraPosX = CameraPcs._224_4_;
+            float cameraPosY = CameraPcs._228_4_;
+            float cameraPosZ = CameraPcs._232_4_;
             float scale = kPppConstrainCameraDirScaleBase +
-                          ((CameraDistance() - kPppConstrainCameraDirDistanceBase) / kPppConstrainCameraDirDistanceBase);
+                          ((CameraPcs._252_4_ - kPppConstrainCameraDirDistanceBase) / kPppConstrainCameraDirDistanceBase);
             
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
             

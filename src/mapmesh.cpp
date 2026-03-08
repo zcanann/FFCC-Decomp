@@ -500,9 +500,9 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
  */
 void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
 {
-    int remaining = static_cast<int>(count);
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    int remaining = count;
+    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
 
     while (remaining-- != 0) {
         if (entry->size != 0) {
@@ -643,10 +643,10 @@ CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
  */
 void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureNames, CAmemCacheSet*)
 {
+    int remaining = static_cast<int>(U16At(this, 0xA));
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
 
-    while (remaining-- != 0) {
+    while (remaining != 0) {
         if (entry->size != 0) {
             if (entry->materialIdx == 0xFFFF) {
                 entry->materialIdx = 0;
@@ -655,6 +655,7 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
             }
         }
         entry++;
+        remaining--;
     }
 }
 

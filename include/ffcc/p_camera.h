@@ -98,7 +98,9 @@ public:
     void GetWorldMapInverseMatrix(float (*)[4]);
 
     // TODO
+    float _224_4_;
     float _228_4_;
+    float _232_4_;
 };
 
 extern CCameraPcs CameraPcs;

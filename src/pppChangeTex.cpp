@@ -445,14 +445,25 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				unsigned int vertCount = *(unsigned int*)(*(int*)(curMesh + 8) + 0x14);
 				for (unsigned int v = 0; v < vertCount; v++) {
 					short y = *(short*)(*(int*)(curMesh + 0xC) + pointOffset + 2);
+
 					if (step->m_payload[0] == 1) {
-						*(unsigned char*)(colorPtr + 3) = (y < splitY) ? (unsigned char)(int)alphaBase : 0;
+						if (y < splitY) {
+							*(unsigned char*)(colorPtr + 3) = (unsigned char)(int)alphaBase;
+						} else {
+							*(unsigned char*)(colorPtr + 3) = 0;
+						}
 					} else if (step->m_payload[0] == 2) {
-						*(unsigned char*)(colorPtr + 3) = (splitY < y) ? (unsigned char)(int)alphaBase : 0;
+						if (splitY < y) {
+							*(unsigned char*)(colorPtr + 3) = (unsigned char)(int)alphaBase;
+						} else {
+							*(unsigned char*)(colorPtr + 3) = 0;
+						}
 					}
+
 					pointOffset += 6;
 					colorPtr += 4;
 				}
+
 				DCFlushRange(*(void**)(valueInt[3] + meshColorOffset), vertCount << 2);
 				meshColorOffset += 4;
 				curMesh += 0x14;
@@ -484,5 +495,4 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		pppInitBlendMode__Fv();
 	}
 }
-
 

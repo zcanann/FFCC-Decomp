@@ -3,6 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/linkage.h"
@@ -297,10 +298,9 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         u32 colorPacked0;
         u8 colorStorage1[4];
         u32 colorPacked1;
-        void* material;
-        void* materialSet = *(void**)((u8*)*(u8**)((u8*)model + 0xA4) + 0x24);
+        CMaterialSet* materialSet = *(CMaterialSet**)((u8*)*(u8**)((u8*)model + 0xA4) + 0x24);
         unsigned short materialIdx = *(unsigned short*)(displayList + 8);
-        material = (*(void***)((u8*)materialSet + 0x18))[materialIdx];
+        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)materialSet + 8))[materialIdx];
 
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, materialIdx, 1, 0);
         GXSetArray((GXAttr)0xB, (void*)((u8*)param_2 + 0x28), 4);

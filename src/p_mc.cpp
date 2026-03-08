@@ -1,24 +1,12 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/math.h"
-#include "ffcc/p_menu.h"
 #include "ffcc/symbols_shared.h"
 
-extern "C" {
-unsigned int gMcPcsSingletonPtr_addr = 0;
-}
-
 class McCtrl;
-
-extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
-extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
-extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
-extern "C" void __sinit_p_mc_cpp(void);
 
 class McCtrl
 {
 public:
-    int ChkEmpty(int);
-
     int m_previousState;
     int m_state;
     int m_cardChannel;
@@ -40,6 +28,16 @@ struct MenuPcsMcLayout
     unsigned char unk19[7];
     McCtrl m_mcCtrl;
 };
+
+extern "C" {
+unsigned int gMcPcsSingletonPtr_addr = 0;
+extern MenuPcsMcLayout MenuPcs;
+extern int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
+extern int ChkEmpty__6McCtrlFi(McCtrl* mcCtrl, int slot);
+extern int Rand__5CMathFUl(CMath* instance, unsigned long max);
+extern void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
+extern void __sinit_p_mc_cpp(void);
+}
 
 /*
  * --INFO--
@@ -104,16 +102,14 @@ void CMcPcs::calc()
 {
     int result;
     int worldParam;
-    MenuPcsMcLayout* menuPcs;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
-    menuPcs = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs);
 
-    if (menuPcs->field14 != 1)
+    if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field14 != 1)
     {
-        if (menuPcs->field18 == 0x13)
+        if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&menuPcs->m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -130,11 +126,11 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
-                menuPcs->field18 = 0;
+                reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 = 0;
             }
         }
-        else if (menuPcs->field18 == 0x12 &&
-                 (result = menuPcs->m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 == 0x12 &&
+                 (result = ChkEmpty__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->m_mcCtrl, 0), result != 0))
         {
             if (result == 1)
             {
@@ -158,7 +154,7 @@ void CMcPcs::calc()
             }
 
             CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
-            menuPcs->field18 = 0;
+            reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs)->field18 = 0;
         }
     }
 }

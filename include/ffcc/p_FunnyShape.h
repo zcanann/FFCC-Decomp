@@ -26,4 +26,6 @@ public:
     void USBDataCallback(CDataHeader*);
 };
 
+extern CFunnyShapePcs FunnyShapePcs;
+
 #endif // _FFCC_P_FUNNYSHAPE_H_

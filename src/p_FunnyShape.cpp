@@ -70,7 +70,7 @@ extern u32 DAT_801EA7D8;
 extern u32 DAT_801EA7DC;
 extern u32 DAT_801EA7E0;
 unsigned char ARRAY_8026D728[0xC];
-extern unsigned char FunnyShapePcs[];
+CFunnyShapePcs FunnyShapePcs;
 extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 
@@ -106,16 +106,16 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
-    *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CManager;
-    *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CProcess;
-    *reinterpret_cast<void**>(FunnyShapePcs) = &PTR_PTR_s_CFunnyShapePcs_801ea924;
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__8CManager;
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__8CProcess;
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &PTR_PTR_s_CFunnyShapePcs_801ea924;
 
-    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x3C));
-    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x50));
-    new (FunnyShapePcs + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>();
-    new (FunnyShapePcs + 0x61D8) CPtrArray<_GXTexObj*>();
+    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(&FunnyShapePcs) + 0x3C));
+    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(&FunnyShapePcs) + 0x50));
+    new (reinterpret_cast<u8*>(&FunnyShapePcs) + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>();
+    new (reinterpret_cast<u8*>(&FunnyShapePcs) + 0x61D8) CPtrArray<_GXTexObj*>();
 
-    __register_global_object(FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
+    __register_global_object(&FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 
     DAT_801EA7AC = DAT_801EA778;
     DAT_801EA7B0 = DAT_801EA77C;

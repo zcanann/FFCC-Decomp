@@ -1520,12 +1520,19 @@ void CMenuPcs::DrawShadowFont(CFont* font, char* text, float x, float y, int tlu
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801475BC
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawNoShadowFont(CFont*, char*, float, float, int, int)
+void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int tlut, int)
 {
-	// TODO
+    SetTlut__5CFontFi(font, tlut);
+    SetPosX__5CFontFf(x, font);
+    SetPosY__5CFontFf(y - FLOAT_80332954, font);
+    Draw__5CFontFPc(font, text);
 }
 
 /*

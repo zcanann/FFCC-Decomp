@@ -66,9 +66,9 @@ void CGPrgObj::onFrame()
 
     onFrameAlways();
 
-	if ((m_weaponNodeFlags & 0x8000) != 0) {
+	if (static_cast<signed char>(m_weaponNodeFlags) < 0) {
 		if ((GetCID() & 0x2d) == 0x2d &&
-		    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x2d) != 0) {
+		    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x2e) != 0) {
 			return;
 		}
 

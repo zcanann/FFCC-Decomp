@@ -15,6 +15,7 @@ class CChunkFile;
 class CGObject;
 class CTexture;
 class CTextureSet;
+class CProfile;
 
 struct _PARTICLE_WMAT
 {
@@ -80,6 +81,10 @@ struct PPPCREATEPARAM
     int m_hitObjectIds[8];            // 0x4c
     int m_unk;                        // 0x6c
 }; // SIze 0x70
+
+extern CProfile g_par_calc_prof;
+extern CProfile g_par_draw_prof;
+extern PPPCREATEPARAM g_dcp;
 
 struct pppFMATRIX
 {

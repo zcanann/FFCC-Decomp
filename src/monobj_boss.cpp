@@ -1,6 +1,7 @@
 #include "ffcc/monobj_boss.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
 
@@ -52,7 +53,6 @@ extern double DOUBLE_80331d00;
 extern double DOUBLE_80331d08;
 extern double DOUBLE_80331d10;
 extern double DOUBLE_80331dc0;
-extern unsigned char CFlat[];
 extern char SoundBuffer[];
 
 /*

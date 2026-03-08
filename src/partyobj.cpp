@@ -3,6 +3,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_game.h"
 #include "ffcc/itemobj.h"
 
@@ -23,7 +24,6 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
-extern unsigned char CFlat[];
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a54;

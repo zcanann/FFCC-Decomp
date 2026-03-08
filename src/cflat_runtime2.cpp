@@ -4,6 +4,7 @@
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/linkage.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
@@ -72,8 +73,6 @@ extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
-extern unsigned char Chara[];
-
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
 unsigned char CFlat[0x10440];
@@ -81,6 +80,8 @@ unsigned char m_objItem[0xAF80];
 unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
 unsigned char m_boss__8CGMonObj_field108_0x6c[0x90];
+u32 CFlatFlags;
+Mtx gFlatPosMtx;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];
@@ -99,6 +100,7 @@ extern "C" void copy__8CGObjectFv(CGObject*);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
+char sCFlatRuntime2DebugDrawOverflowMsg[] = "CFlatRuntime2::AddDebugDrawCC overflow\n";
 
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {

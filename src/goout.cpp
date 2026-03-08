@@ -3,6 +3,9 @@
 #include <stdarg.h>
 #include <string.h>
 
+CGoOutMenu g_GoOutMenu;
+CGoOutMenu* g_pGoOutMenu;
+
 extern "C" int __cntlzw(unsigned int);
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);

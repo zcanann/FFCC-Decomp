@@ -70,6 +70,7 @@ void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR*, pppF
                                                                  unsigned char, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int tevSwapSel, int red, int green, int blue, int alpha);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap,
@@ -123,7 +124,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 {
     void* handle = GetCharaHandlePtr__FP8CGObjectl(((void**)param_2)[1], 0);
     _GXTexObj backTexObj;
-    _GXColor white;
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     Vec posA;
     Vec posB;
     unsigned int width;
@@ -137,18 +138,13 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     gUtil.SetVtxFmt_POS_CLR();
     gUtil.BeginQuadEnv();
-    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
     posA.z = FLOAT_80331030;
-    posB.x = FLOAT_80331050;
-    posB.y = FLOAT_80331054;
+    posB.x = (float)width;
+    posB.y = (float)height;
     posB.z = FLOAT_80331030;
     gUtil.RenderQuadNoTex(posA, posB, white);
     gUtil.EndQuadEnv();
@@ -177,7 +173,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-        GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_MODULATE);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
         GXLoadTexObj((_GXTexObj*)((void**)param_2)[2], GX_TEXMAP0);
 

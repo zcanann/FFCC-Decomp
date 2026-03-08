@@ -16,18 +16,21 @@ extern CMapMng MapMng;
 void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct pppChangeBGColorUnkB* param_2,
                            _pppCtrlTable* param_3)
 {
-    int* serializedDataOffsets;
     unsigned char* data;
+    unsigned char* mapMngBase;
     unsigned char* mapMng;
+    int dataOffset;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    serializedDataOffsets = param_3->m_serializedDataOffsets;
-    data = reinterpret_cast<unsigned char*>(pppChangeBGColor) + serializedDataOffsets[1] + 0x80;
-    mapMng = reinterpret_cast<unsigned char*>(&MapMng) + 0x20000;
+    dataOffset = param_3->m_serializedDataOffsets[1] + 0x80;
+    mapMngBase = reinterpret_cast<unsigned char*>(&MapMng);
+    mapMng = mapMngBase + 0x20000;
     mapMng[0x2989] = 1;
+    data = reinterpret_cast<unsigned char*>(pppChangeBGColor);
+    data = data + dataOffset;
     mapMng[0x2990] = data[8];
     mapMng[0x2991] = data[9];
     mapMng[0x2992] = data[10];

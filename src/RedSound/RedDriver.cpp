@@ -49,6 +49,12 @@ struct RedWaveSettingState {
     int waveSize;
 };
 
+CRedEntry DAT_8032e154;
+CRedMemory DAT_8032f480;
+CRedDriver CRedDriver_8032f4c0;
+FILE DAT_8021d1a8;
+s16 DAT_8021de4e;
+
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 int DAT_8032f3c4;
 int DAT_8032f3c0;
@@ -112,7 +118,6 @@ extern OSThread DAT_8032d788;
 extern OSThread DAT_8032de08;
 extern OSThread DAT_8032d460;
 extern ARQRequest DAT_8032dde4;
-extern FILE DAT_8021d1a8;
 
 extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);

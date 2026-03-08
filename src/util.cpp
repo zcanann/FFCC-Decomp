@@ -247,12 +247,11 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
  */
 void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
 {
-    unsigned int scale = 1u << shift;
-    float fScale = (float)scale;
+    u32 scale = 1 << shift;
 
-    out.x = (float)in.x / fScale;
-    out.y = (float)in.y / fScale;
-    out.z = (float)in.z / fScale;
+    out.x = (float)((double)in.x / (double)scale);
+    out.y = (float)((double)in.y / (double)scale);
+    out.z = (float)((double)in.z / (double)scale);
 }
 
 /*
@@ -1140,9 +1139,9 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
     bool bVar3;
     bool bVar4;
     int iVar5;
-    u8 bVar6;
-    u32 uVar7;
-    u32 uVar8;
+    int iVar6;
+    int iVar7;
+    int iVar8;
     u8* data;
 
     bVar4 = true;
@@ -1157,35 +1156,35 @@ next_command:
 
         bVar1 = *data;
         uVar2 = *(u16*)(data + 1);
-        uVar7 = (u32)uVar2;
+        iVar7 = (int)uVar2;
         data = data + 3;
-        bVar6 = bVar1 & 0xF8;
+        iVar6 = bVar1 & 0xF8;
 
-        if (bVar6 == 0xA0) {
+        if (iVar6 == 0xA0) {
 primitive_ok:
             bVar3 = true;
         } else {
-            if (0x9F < bVar6) {
-                if (bVar6 != 0xB0) {
-                    if (bVar6 < 0xB0) {
-                        if (bVar6 == 0xA8) {
+            if (0x9F < iVar6) {
+                if (iVar6 != 0xB0) {
+                    if (iVar6 < 0xB0) {
+                        if (iVar6 == 0xA8) {
                             goto primitive_ok;
                         }
-                    } else if (bVar6 == 0xB8) {
+                    } else if (iVar6 == 0xB8) {
                         goto primitive_ok;
                     }
                     goto primitive_bad;
                 }
                 goto primitive_ok;
             }
-            if (bVar6 == 0x90) {
+            if (iVar6 == 0x90) {
                 goto primitive_ok;
             }
-            if (bVar6 < 0x90) {
-                if (bVar6 == 0x80) {
+            if (iVar6 < 0x90) {
+                if (iVar6 == 0x80) {
                     goto primitive_ok;
                 }
-            } else if (bVar6 == 0x98) {
+            } else if (iVar6 == 0x98) {
                 goto primitive_ok;
             }
 
@@ -1194,22 +1193,22 @@ primitive_bad:
         }
 
         if (bVar3) {
-            if (bVar6 == 0x90) {
-                iVar5 = iVar5 + (uVar7 / 3);
-            } else if (bVar6 == 0x98) {
-                iVar5 = uVar7 + iVar5 - 2;
+            if (iVar6 == 0x90) {
+                iVar5 = iVar5 + (iVar7 / 3);
+            } else if (iVar6 == 0x98) {
+                iVar5 = iVar7 + iVar5 - 2;
             }
 
             if ((bVar1 & 7) != 2) {
-                if (uVar7 != 0) {
-                    uVar8 = (u32)(uVar2 >> 3);
-                    if (uVar8 != 0) {
+                if (iVar7 != 0) {
+                    iVar8 = (int)(uVar2 >> 3);
+                    if (iVar8 != 0) {
                         do {
                             data = data + 0x40;
-                            uVar8 = uVar8 - 1;
-                        } while (uVar8 != 0);
+                            iVar8 = iVar8 - 1;
+                        } while (iVar8 != 0);
 
-                        uVar7 = uVar7 & 7;
+                        iVar7 = iVar7 & 7;
                         if ((uVar2 & 7) == 0) {
                             goto next_command;
                         }
@@ -1217,21 +1216,21 @@ primitive_bad:
 
                     do {
                         data = data + 8;
-                        uVar7 = uVar7 - 1;
-                    } while (uVar7 != 0);
+                        iVar7 = iVar7 - 1;
+                    } while (iVar7 != 0);
                 }
                 goto next_command;
             }
 
-            if (uVar7 != 0) {
-                uVar8 = (u32)(uVar2 >> 3);
-                if (uVar8 != 0) {
+            if (iVar7 != 0) {
+                iVar8 = (int)(uVar2 >> 3);
+                if (iVar8 != 0) {
                     do {
                         data = data + 0x50;
-                        uVar8 = uVar8 - 1;
-                    } while (uVar8 != 0);
+                        iVar8 = iVar8 - 1;
+                    } while (iVar8 != 0);
 
-                    uVar7 = uVar7 & 7;
+                    iVar7 = iVar7 & 7;
                     if ((uVar2 & 7) == 0) {
                         goto next_command;
                     }
@@ -1239,8 +1238,8 @@ primitive_bad:
 
                 do {
                     data = data + 10;
-                    uVar7 = uVar7 - 1;
-                } while (uVar7 != 0);
+                    iVar7 = iVar7 - 1;
+                } while (iVar7 != 0);
             }
             goto next_command;
         }

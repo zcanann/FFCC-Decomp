@@ -188,30 +188,33 @@ void pppShapeSetUseTexture(tagOAN3_SHAPE*, unsigned char*)
  */
 void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    unsigned char textureUsed[0x100];
-    unsigned char* animData = (unsigned char*)shapeSt->m_animData;
-    unsigned char* currentFrame;
-    unsigned int textureIndex;
+    short shapeOffset;
+    int shapeIndex;
+    int shapeEntryOffset;
+    int shapeEntry;
+    void* currentFrame;
     int frameIndex;
-    unsigned char* texturePtr;
+    unsigned int textureIndex;
+    void* animData;
+    char* texturePtr;
+    char textureUsed[0x100];
 
     memset(textureUsed, 0, 0x100);
 
+    animData = shapeSt->m_animData;
     currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)(animData + 6); frameIndex++) {
-        short shapeOffset = *(short*)(currentFrame + 0x10);
-        int shapeEntryOffset = 0;
-        unsigned char* shapeBase = animData + shapeOffset;
-        int shapeIndex;
-
-        for (shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex++) {
-            textureUsed[shapeBase[shapeEntryOffset + 10]] = 1;
+    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
+        shapeOffset = *(short*)((int)currentFrame + 0x10);
+        shapeEntryOffset = 0;
+        for (shapeIndex = 0; shapeIndex < *(short*)((int)animData + shapeOffset + 2); shapeIndex = shapeIndex + 1) {
+            shapeEntry = shapeEntryOffset + shapeOffset;
             shapeEntryOffset += 8;
+            textureUsed[*(unsigned char*)((int)animData + shapeEntry + 10)] = 1;
         }
-        currentFrame += 8;
+        currentFrame = (void*)((int)currentFrame + 8);
     }
 
-    texturePtr = textureUsed;
+    texturePtr = (char*)textureUsed;
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
@@ -253,30 +256,33 @@ void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*)
  */
 void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    unsigned char textureUsed[0x100];
-    unsigned char* animData = (unsigned char*)shapeSt->m_animData;
-    unsigned char* currentFrame;
-    unsigned int textureIndex;
+    short shapeOffset;
+    int shapeIndex;
+    int shapeEntryOffset;
+    int shapeEntry;
+    void* currentFrame;
     int frameIndex;
-    unsigned char* texturePtr;
+    unsigned int textureIndex;
+    void* animData;
+    char* texturePtr;
+    char textureUsed[0x100];
 
     memset(textureUsed, 0, 0x100);
 
+    animData = shapeSt->m_animData;
     currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)(animData + 6); frameIndex++) {
-        short shapeOffset = *(short*)(currentFrame + 0x10);
-        int shapeEntryOffset = 0;
-        unsigned char* shapeBase = animData + shapeOffset;
-        int shapeIndex;
-
-        for (shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex++) {
-            textureUsed[shapeBase[shapeEntryOffset + 10]] = 1;
+    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
+        shapeOffset = *(short*)((int)currentFrame + 0x10);
+        shapeEntryOffset = 0;
+        for (shapeIndex = 0; shapeIndex < *(short*)((int)animData + shapeOffset + 2); shapeIndex = shapeIndex + 1) {
+            shapeEntry = shapeEntryOffset + shapeOffset;
             shapeEntryOffset += 8;
+            textureUsed[*(unsigned char*)((int)animData + shapeEntry + 10)] = 1;
         }
-        currentFrame += 8;
+        currentFrame = (void*)((int)currentFrame + 8);
     }
 
-    texturePtr = textureUsed;
+    texturePtr = (char*)textureUsed;
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {

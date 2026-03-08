@@ -149,9 +149,9 @@ CFunnyShape::~CFunnyShape()
         PtrAt(this, 0x6010) = 0;
     }
 
-    if (PtrAt(this, 0x600C) != 0) {
-        __dla__FPv(PtrAt(this, 0x600C));
-        PtrAt(this, 0x600C) = 0;
+    if (PtrAt(this, 0x60E4) != 0) {
+        __dla__FPv(PtrAt(this, 0x60E4));
+        PtrAt(this, 0x60E4) = 0;
     }
 
     for (s32 i = 0; i < 0x10; i++) {
@@ -190,9 +190,9 @@ extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelet
             PtrAt(funnyShape, 0x6010) = 0;
         }
 
-        if (PtrAt(funnyShape, 0x600C) != 0) {
-            __dla__FPv(PtrAt(funnyShape, 0x600C));
-            PtrAt(funnyShape, 0x600C) = 0;
+        if (PtrAt(funnyShape, 0x60E4) != 0) {
+            __dla__FPv(PtrAt(funnyShape, 0x60E4));
+            PtrAt(funnyShape, 0x60E4) = 0;
         }
 
         s32 i = 0;
@@ -537,9 +537,9 @@ void CFunnyShape::RenderShape()
  */
 void CFunnyShape::ClearAnmData()
 {
-    if (PtrAt(this, 0x600C) != 0) {
-        __dla__FPv(PtrAt(this, 0x600C));
-        PtrAt(this, 0x600C) = 0;
+    if (PtrAt(this, 0x60E4) != 0) {
+        __dla__FPv(PtrAt(this, 0x60E4));
+        PtrAt(this, 0x60E4) = 0;
     }
 
     memset(this, 0, 0x30);

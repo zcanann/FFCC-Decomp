@@ -13,10 +13,10 @@ public:
     void onDestroy();
     void onFrame();
     void bonus(int, int, CGPrgObj*);
-    void onFrameAlways();
-    void onFrameAlwaysAfter();
-    void onDamaged(CGPrgObj*);
-    void onAttacked(CGPrgObj*);
+    virtual void onFrameAlways();
+    virtual void onFrameAlwaysAfter();
+    virtual void onDamaged(CGPrgObj*);
+    virtual void onAttacked(CGPrgObj*);
     virtual void onCancelStat(int);
     virtual void onChangeStat(int);
     virtual void onFramePreCalc();

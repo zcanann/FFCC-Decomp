@@ -54,7 +54,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     int textureIndex = 0;
 
     u32 dataValIndex = param_2->m_dataValIndex;
-    if ((dataValIndex + 0x10000U) != 0xFFFFU) {
+    if (dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         void* texture;
         u8 alpha = *((u8*)column + 0xb2 + iVar5);

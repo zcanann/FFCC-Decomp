@@ -255,9 +255,12 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
  */
 void pppCopyVector(Vec& dest, Vec source)
 { 
-	dest.x = source.x;
-	dest.y = source.y;
-	dest.z = source.z;
+	float y = source.y;
+	float x = source.x;
+	dest.x = x;
+	float z = source.z;
+	dest.y = y;
+	dest.z = z;
 }
 
 /*
@@ -2827,4 +2830,3 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		return;
 	}
 }
-

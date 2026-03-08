@@ -229,28 +229,14 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
 {
     int workOffset = param_3->m_serializedDataOffsets[2];
     int colorOffset = param_3->m_serializedDataOffsets[1];
+    u8* workData = (u8*)pppCrystal2 + 0x84 + workOffset;
+    u8* colorData = (u8*)pppCrystal2 + 0x88 + colorOffset;
     int sourceTex = 0;
     pppModelSt* model;
     _GXTexObj backTexObj;
     int textureIndex = 0;
-    float indMtx00;
-    float indMtx01;
-    float indMtx02;
-    float indMtx10;
-    float indMtx11;
-    float indMtx12;
-    float texMtx00;
-    float texMtx01;
-    float texMtx02;
-    float texMtx03;
-    float texMtx10;
-    float texMtx11;
-    float texMtx12;
-    float texMtx13;
-    float texMtx20;
-    float texMtx21;
-    float texMtx22;
-    float texMtx23;
+    float indMtx[2][3];
+    Mtx texMtx;
     Mtx lightMtx;
     Mtx drawMtx;
     Mtx tmpMtx;
@@ -273,30 +259,30 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         pppSetBlendMode__FUc(0);
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (u8*)pppCrystal2 + 0x88 + colorOffset, (u8*)pppCrystal2 + 0x40, param_2->m_arg3,
+            colorData, (u8*)pppCrystal2 + 0x40, param_2->m_arg3,
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 
-        indMtx00 = FLOAT_80331fd0 * param_2->m_stepValue;
-        indMtx01 = DAT_801dd60c;
-        indMtx02 = DAT_801dd610;
-        indMtx10 = DAT_801dd614;
-        indMtx11 = indMtx00;
-        indMtx12 = DAT_801dd61c;
+        indMtx[0][0] = FLOAT_80331fd0 * param_2->m_stepValue;
+        indMtx[0][1] = DAT_801dd60c;
+        indMtx[0][2] = DAT_801dd610;
+        indMtx[1][0] = DAT_801dd614;
+        indMtx[1][1] = indMtx[0][0];
+        indMtx[1][2] = DAT_801dd61c;
 
-        texMtx00 = DAT_801dd620;
-        texMtx01 = DAT_801dd624;
-        texMtx02 = DAT_801dd628;
-        texMtx03 = DAT_801dd62c;
-        texMtx10 = DAT_801dd630;
-        texMtx11 = DAT_801dd634;
-        texMtx12 = DAT_801dd638;
-        texMtx13 = DAT_801dd63c;
-        texMtx20 = DAT_801dd640;
-        texMtx21 = DAT_801dd644;
-        texMtx22 = DAT_801dd648;
-        texMtx23 = DAT_801dd64c;
+        texMtx[0][0] = DAT_801dd620;
+        texMtx[0][1] = DAT_801dd624;
+        texMtx[0][2] = DAT_801dd628;
+        texMtx[0][3] = DAT_801dd62c;
+        texMtx[1][0] = DAT_801dd630;
+        texMtx[1][1] = DAT_801dd634;
+        texMtx[1][2] = DAT_801dd638;
+        texMtx[1][3] = DAT_801dd63c;
+        texMtx[2][0] = DAT_801dd640;
+        texMtx[2][1] = DAT_801dd644;
+        texMtx[2][2] = DAT_801dd648;
+        texMtx[2][3] = DAT_801dd64c;
 
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
@@ -316,17 +302,17 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         if (param_2->m_payload[0] == 0) {
             GXLoadTexObj((_GXTexObj*)(sourceTex + 0x28), GX_TEXMAP1);
         } else {
-            GXLoadTexObj((_GXTexObj*)(*(u32*)((u8*)pppCrystal2 + 0x84 + workOffset)), GX_TEXMAP1);
+            GXLoadTexObj((_GXTexObj*)(*(u32*)workData), GX_TEXMAP1);
         }
 
         GXSetNumIndStages(1);
         GXSetIndTexOrder((GXIndTexStageID)0, GX_TEXCOORD0, GX_TEXMAP1);
         GXSetIndTexCoordScale((GXIndTexStageID)0, GX_ITS_1, GX_ITS_1);
-        GXSetIndTexMtx(GX_ITM_1, (const f32(*)[3])&indMtx00, 1);
+        GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
         GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_NONE, GX_ITM_1, GX_ITW_0, GX_ITW_0,
                          GX_FALSE, GX_FALSE, GX_ITBA_OFF);
 
-        GXLoadTexMtxImm((const f32(*)[4])&texMtx00, 0x40, GX_MTX3x4);
+        GXLoadTexMtxImm(texMtx, 0x40, GX_MTX3x4);
         GXLoadTexMtxImm(normalMtx, 0x21, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_NRM, 0x21, GX_TRUE, 0x40);
         GXLoadTexObj(&backTexObj, GX_TEXMAP0);

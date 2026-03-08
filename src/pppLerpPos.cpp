@@ -21,7 +21,7 @@ struct pppLerpPosUnkC {
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-void pppCopyVector__FR3Vec3Vec(void* dst, void* src);
+void pppCopyVector__FR3Vec3Vec(Vec* dst, const Vec* src);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt* pppMngSt);
 }
 extern float FLOAT_80331bf8;
@@ -39,15 +39,14 @@ char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
  */
 void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param_2, struct pppLerpPosUnkC* param_3)
 {
+    s32 iVar2;
     _pppMngSt* pppMngSt;
     s32 iVar1;
-    s32 iVar2;
     s32 iVar4;
     s32 iVar5;
-    f32* pfVar6;
     s32 iVar7;
-    Vec local_38;
     Vec local_2c;
+    Vec local_38;
     u32 count;
     Vec** historyPtr;
 
@@ -76,11 +75,11 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             iVar7 = (u8)param_2->m_dataValIndex - 1;
             iVar5 = iVar7 * 0xc;
             while (0 < iVar7) {
-                pfVar6 = (f32*)((u8*)*historyPtr + iVar5 - 0xc);
-                local_38.x = pfVar6[0];
-                local_38.y = pfVar6[1];
-                local_38.z = pfVar6[2];
-                pppCopyVector__FR3Vec3Vec((void*)((u8*)*historyPtr + iVar5), &local_38);
+                Vec* prev = (Vec*)((u8*)*historyPtr + iVar5 - 0xc);
+                local_38.x = prev->x;
+                local_38.y = prev->y;
+                local_38.z = prev->z;
+                pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar5), &local_38);
                 iVar5 = iVar5 - 0xc;
                 iVar7 = iVar7 - 1;
             }

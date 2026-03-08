@@ -17,12 +17,14 @@ public:
 };
 
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
-extern "C" unsigned char Game[];
+class CGamePcs;
+extern CGamePcs Game;
 extern "C" {
 unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;
 }
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
 
 /*
  * --INFO--
@@ -274,7 +276,7 @@ void CChara::CalcMogScore()
 			radarType = 3;
 		}
 
-		Game[0x13E9] = radarType;
+		GameRaw()[0x13E9] = radarType;
 	}
 
 	{
@@ -306,7 +308,7 @@ void CChara::CalcMogScore()
 		    *reinterpret_cast<int*>(self + 0x203C),
 		    *reinterpret_cast<int*>(self + 0x2040),
 		    *reinterpret_cast<int*>(self + 0x2044),
-		    radarLabel[Game[0x13E9]]);
+		    radarLabel[GameRaw()[0x13E9]]);
 	}
 }
 
@@ -514,13 +516,13 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void*)
 		mogState[8] = *reinterpret_cast<unsigned int*>(charaBytes + 0x2020);
 	}
 
-	if (Game[0x13E9] == 1) {
+	if (GameRaw()[0x13E9] == 1) {
 		brushColor = CColor(0xF, 4, 4, 2).color;
-	} else if (Game[0x13E9] == 2) {
+	} else if (GameRaw()[0x13E9] == 2) {
 		brushColor = CColor(4, 0xF, 4, 2).color;
-	} else if (Game[0x13E9] == 3) {
+	} else if (GameRaw()[0x13E9] == 3) {
 		brushColor = CColor(4, 8, 0xF, 2).color;
-	} else if (Game[0x13E9] == 4) {
+	} else if (GameRaw()[0x13E9] == 4) {
 		brushColor = CColor(0, 0, 0, 2).color;
 	}
 

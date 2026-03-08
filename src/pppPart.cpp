@@ -2,11 +2,13 @@
 
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/p_light.h"
+#include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/gobject.h"
@@ -29,7 +31,6 @@ static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 extern "C" unsigned char gPppBlendModeState;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" unsigned char MaterialMan[];
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" float FLOAT_8032ed8c;
 extern "C" double DOUBLE_8032fdf0;
@@ -45,7 +46,6 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
-extern "C" unsigned char PartPcs[];
 extern "C" unsigned char CFlat[];
 extern "C" void* CAMemCacheSet;
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -66,6 +66,8 @@ Mtx ppvWorldMatrix;
 Mtx ppvWorldMatrixWood;
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const float FLOAT_8032fddc = 0.0f;
@@ -1907,7 +1909,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
-	CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1C);
+	CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcsRaw() + 0x1C);
 	s16* cacheChunks = reinterpret_cast<s16*>(__nwa__FUlPQ27CMemory6CStagePci(
 	                                          static_cast<u32>(pppDataHead->m_cacheChunkCount) << 3,
 	                                          stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620));
@@ -2429,10 +2431,10 @@ void _pppDrawPart(_pppMngSt* pppMngSt)
  */
 void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 {
-	*(u32*)(MaterialMan + 0x128) = *(u32*)(MaterialMan + 0x11C);
-	*(u32*)(MaterialMan + 0x12C) = *(u32*)(MaterialMan + 0x120);
-	*(u32*)(MaterialMan + 0x130) = *(u32*)(MaterialMan + 0x124);
-	*(u32*)(MaterialMan + 0x40) = *(u32*)(MaterialMan + 0x48);
+	*(u32*)(MaterialManRaw() + 0x128) = *(u32*)(MaterialManRaw() + 0x11C);
+	*(u32*)(MaterialManRaw() + 0x12C) = *(u32*)(MaterialManRaw() + 0x120);
+	*(u32*)(MaterialManRaw() + 0x130) = *(u32*)(MaterialManRaw() + 0x124);
+	*(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
 
 	if (positions == 0)
 	{
@@ -2446,11 +2448,11 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 	GXSetArray((GXAttr)0xB, *(void**)((u8*)&model->m_mapMesh + 0x3C), 4);
 	GXSetArray((GXAttr)0xD, *(void**)((u8*)&model->m_mapMesh + 0x38), 4);
 	GXSetArray((GXAttr)0xE, *(void**)((u8*)&model->m_mapMesh + 0x38), 4);
-	*(void**)(MaterialMan + 4) = *(void**)((u8*)&model->m_mapMesh + 0x30);
+	*(void**)(MaterialManRaw() + 4) = *(void**)((u8*)&model->m_mapMesh + 0x30);
 
 	if (usePartMaterial == 0)
 	{
-		GXSetArray((GXAttr)10, *(void**)(MaterialMan + 4), 6);
+		GXSetArray((GXAttr)10, *(void**)(MaterialManRaw() + 4), 6);
 	}
 
 	model->m_mapMesh.DrawPart(pppEnvStPtr->m_materialSetPtr, usePartMaterial);
@@ -2551,21 +2553,21 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 
-	*(u32*)(MaterialMan + 0x48) = 0x000ACE0F;
-	*(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
-	*(u8*)(MaterialMan + 0x4C) = 0xFF;
-	*(u32*)(MaterialMan + 0x11C) = 0;
-	*(u32*)(MaterialMan + 0x120) = 0x1E;
-	*(u32*)(MaterialMan + 0x124) = 0;
-	*(u8*)(MaterialMan + 0x205) = 0xFF;
-	*(u8*)(MaterialMan + 0x206) = 0xFF;
-	*(u32*)(MaterialMan + 0x58) = 0;
-	*(u32*)(MaterialMan + 0x5C) = 0;
-	*(u8*)(MaterialMan + 0x208) = 0;
-	*(u32*)(MaterialMan + 0x128) = 0;
-	*(u32*)(MaterialMan + 0x12C) = 0x1E;
-	*(u32*)(MaterialMan + 0x130) = 0;
-	*(u32*)(MaterialMan + 0x40) = 0x000ACE0F;
+	*(u32*)(MaterialManRaw() + 0x48) = 0x000ACE0F;
+	*(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
+	*(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+	*(u32*)(MaterialManRaw() + 0x11C) = 0;
+	*(u32*)(MaterialManRaw() + 0x120) = 0x1E;
+	*(u32*)(MaterialManRaw() + 0x124) = 0;
+	*(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+	*(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+	*(u32*)(MaterialManRaw() + 0x58) = 0;
+	*(u32*)(MaterialManRaw() + 0x5C) = 0;
+	*(u8*)(MaterialManRaw() + 0x208) = 0;
+	*(u32*)(MaterialManRaw() + 0x128) = 0;
+	*(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
+	*(u32*)(MaterialManRaw() + 0x130) = 0;
+	*(u32*)(MaterialManRaw() + 0x40) = 0x000ACE0F;
 
 	if (DAT_8032ed84 != lightTarget) {
 		DAT_8032ed84 = lightTarget;
@@ -2641,7 +2643,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 void pppInitDrawEnv(unsigned char useZeroDepth)
 {
 	InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(
-		(CMaterialMan*)MaterialMan,
+		&MaterialMan,
 		-1,
 		(_GXCompType)4,
 		0,

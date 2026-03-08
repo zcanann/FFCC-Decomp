@@ -396,13 +396,32 @@ bool CMenuPcs::ItemOpen()
                 if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
                     *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
                     dVar2 = DOUBLE_80332e68;
-                    *(float*)(psVar4 + 8) = (float)((DOUBLE_80332e68 / (double)*(unsigned int*)(psVar4 + 0x14)) *
-                                                    (double)*(unsigned int*)(psVar4 + 0x10));
+                    *(float*)(psVar4 + 8) =
+                        (float)((DOUBLE_80332e68 /
+                                 ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x14) ^ 0x80000000U) |
+                                           0x4330000000000000ULL) -
+                                  dVar3)) *
+                                ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x10) ^ 0x80000000U) |
+                                          0x4330000000000000ULL) -
+                                 dVar3));
                     if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-                        fVar1 = (float)((dVar2 / (double)*(unsigned int*)(psVar4 + 0x14)) *
-                                        (double)*(unsigned int*)(psVar4 + 0x10));
-                        *(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1C) - (float)psVar4[0]) * fVar1;
-                        *(float*)(psVar4 + 0x1A) = (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
+                        fVar1 = (float)((dVar2 /
+                                         ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x14) ^ 0x80000000U) |
+                                                   0x4330000000000000ULL) -
+                                          dVar3)) *
+                                        ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x10) ^ 0x80000000U) |
+                                                  0x4330000000000000ULL) -
+                                         dVar3));
+                        *(float*)(psVar4 + 0x18) =
+                            (*(float*)(psVar4 + 0x1C) -
+                             (float)((double)(((unsigned int)(int)*psVar4 ^ 0x80000000U) | 0x4330000000000000ULL) -
+                                     dVar3)) *
+                            fVar1;
+                        *(float*)(psVar4 + 0x1A) =
+                            (*(float*)(psVar4 + 0x1E) -
+                             (float)((double)(((unsigned int)(int)psVar4[1] ^ 0x80000000U) | 0x4330000000000000ULL) -
+                                     dVar3)) *
+                            fVar1;
                     }
                 } else {
                     iVar5 = iVar5 + 1;

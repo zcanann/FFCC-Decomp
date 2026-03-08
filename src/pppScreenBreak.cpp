@@ -250,23 +250,29 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
  */
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
-    Vec local_50;
-    GXLightObj local_44;
+    Vec lightDir;
+    GXLightObj lightObj;
     unsigned char colorStorage[4];
     unsigned int colorPacked;
+    const float cameraPosX = CameraPosX();
+    const float cameraPosY = CameraPosY();
+    const float cameraPosZ = CameraPosZ();
+    const float cameraDirX = CameraDirX();
+    const float cameraDirY = CameraDirY();
+    const float cameraDirZ = CameraDirZ();
+    const float zero = FLOAT_80331cc4;
 
-    local_50.x = CameraDirX() - (FLOAT_80331ce8 + CameraPosX());
-    local_50.y = CameraDirY() - (FLOAT_80331ce8 + CameraPosY());
-    local_50.z = CameraDirZ() - (FLOAT_80331ce8 + CameraPosZ());
-    PSVECNormalize(&local_50, &local_50);
+    lightDir.x = cameraDirX - (FLOAT_80331ce8 + cameraPosX);
+    lightDir.y = cameraDirY - (FLOAT_80331ce8 + cameraPosY);
+    lightDir.z = cameraDirZ - (FLOAT_80331ce8 + cameraPosZ);
+    PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&local_44, local_50.x, local_50.y, local_50.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);
-    GXInitLightAttn(&local_44, FLOAT_80331cc4, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cec, FLOAT_80331cc4,
-                    FLOAT_80331cf0);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, FLOAT_80331cd0, zero);
+    GXInitLightAttn(&lightObj, zero, zero, FLOAT_80331cd0, FLOAT_80331cec, zero, FLOAT_80331cf0);
 
-    colorPacked = *(unsigned int*)__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
-    GXInitLightColor(&local_44, *(GXColor*)&colorPacked);
-    GXLoadLightObjImm(&local_44, (GXLightID)1);
+    colorPacked = *reinterpret_cast<unsigned int*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF));
+    GXInitLightColor(&lightObj, *reinterpret_cast<GXColor*>(&colorPacked));
+    GXLoadLightObjImm(&lightObj, (GXLightID)1);
     GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 }

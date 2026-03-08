@@ -1,6 +1,5 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/math.h"
-#include "ffcc/p_menu.h"
 #include "ffcc/symbols_shared.h"
 
 extern "C" {
@@ -8,6 +7,7 @@ unsigned int gMcPcsSingletonPtr_addr = 0;
 }
 
 class McCtrl;
+extern unsigned char MenuPcs[];
 
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
@@ -107,7 +107,7 @@ void CMcPcs::calc()
     MenuPcsMcLayout* menuPcs;
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
-    menuPcs = reinterpret_cast<MenuPcsMcLayout*>(&MenuPcs);
+    menuPcs = reinterpret_cast<MenuPcsMcLayout*>(MenuPcs);
 
     if (menuPcs->field14 != 1)
     {
@@ -129,7 +129,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
+                CallWorldParam__8CMenuPcsFiii(MenuPcs, 6, worldParam, 0);
                 menuPcs->field18 = 0;
             }
         }
@@ -157,7 +157,7 @@ void CMcPcs::calc()
                 worldParam = 6;
             }
 
-            CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
+            CallWorldParam__8CMenuPcsFiii(MenuPcs, 5, worldParam, 0);
             menuPcs->field18 = 0;
         }
     }

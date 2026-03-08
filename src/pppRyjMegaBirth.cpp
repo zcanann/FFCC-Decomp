@@ -282,6 +282,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	_PARTICLE_COLOR* colorData;
 	PARTICLE_WMAT* worldMats;
 	_PARTICLE_DATA* particle;
+	u16* emitTimer;
 	u8* paramPayload;
 	u16 emitRate;
 	u16 emitPerFrame;
@@ -290,14 +291,15 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	particle = (_PARTICLE_DATA*)work->m_particleBlock;
 	worldMats = work->m_worldMatrixBlock;
 	colorData = work->m_colorBlock;
-	maxParticles = work->m_numParticles;
+	maxParticles = *(s32*)((u8*)work + 0x48);
+	emitTimer = (u16*)((u8*)work + 0x4C);
 	paramPayload = (u8*)param;
-	emitRate = *(u16*)(paramPayload + 0xB4);
-	emitPerFrame = *(u16*)(paramPayload + 0xB6);
+	emitRate = *(u16*)(paramPayload + 0x24);
+	emitPerFrame = *(u16*)(paramPayload + 0x22);
 
-	if ((gPppCalcDisabled == 0) && (paramPayload[0x16] != 0))
+	if ((gPppCalcDisabled == 0) && (*(u32*)(paramPayload + 4) != 0xFFFFFFFF))
 	{
-		work->m_emitTimer = work->m_emitTimer + 1;
+		*emitTimer = *emitTimer + 1;
 
 		for (i = 0; i < maxParticles; i = i + 1)
 		{
@@ -335,7 +337,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 					}
 				}
 			}
-			else if ((emitRate <= work->m_emitTimer) && (emitCount < (s32)emitPerFrame))
+			else if ((emitRate <= *emitTimer) && (emitCount < (s32)emitPerFrame))
 			{
 				birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
 				emitCount = emitCount + 1;
@@ -356,7 +358,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 		if (emitCount > 0)
 		{
-			work->m_emitTimer = 0;
+			*emitTimer = 0;
 		}
 	}
 }

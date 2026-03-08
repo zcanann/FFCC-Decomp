@@ -534,13 +534,12 @@ void CPartPcs::createLoad()
 {
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236E8) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236EC) = 0;
     *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x2370C) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
 
     pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
     pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);

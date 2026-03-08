@@ -34,8 +34,8 @@ class CPtrArray
 {
 public:
     void** m_vtable;
-    int m_size;
     int m_numItems;
+    int m_size;
     int m_defaultSize;
     T* m_items;
     CMemory::CStage* m_stage;

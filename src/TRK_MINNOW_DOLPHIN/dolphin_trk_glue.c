@@ -43,6 +43,7 @@ int udp_cc_open(void);
 int udp_cc_close(void);
 int udp_cc_pre_continue(void);
 int udp_cc_post_stop(void);
+extern char s_pcts_801E6BA4[];
 
 DBCommTable gDBCommTable = {};
 
@@ -255,6 +256,6 @@ void InitializeProgramEndTrap(void)
     DCFlushRange(ppcHalt + 4, 4);
 }
 
-void TRK_board_display(char* str) { OSReport("%s", str); }
+void TRK_board_display(char* str) { OSReport(s_pcts_801E6BA4, str); }
 
 void TRKUARTInterruptHandler() { }

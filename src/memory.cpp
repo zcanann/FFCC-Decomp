@@ -10,6 +10,8 @@
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
 
+CMemory Memory;
+
 static char s_memory_cpp[] = "memory.cpp";
 static char s_heapWalkerTitle[] = "---- Heap Walker ----\n";
 static char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";

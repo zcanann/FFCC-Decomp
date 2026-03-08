@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+CFile File;
 
 static char s_fileCpp[] = "file.cpp";
 static char s_cFile[] = "CFile";

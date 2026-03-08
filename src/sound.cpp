@@ -19,6 +19,8 @@
 #include <math.h>
 #include <string.h>
 
+CSound Sound;
+
 static char s_soundStageName[] = "CSound";
 static char s_soundSourceName[] = "sound.cpp";
 static char s_soundErrorFmt[] = "Sound\n";

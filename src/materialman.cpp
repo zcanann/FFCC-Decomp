@@ -11,6 +11,8 @@
 
 #include <string.h>
 
+CMaterialMan MaterialMan;
+
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dla__FPv(void*);

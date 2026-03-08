@@ -17,6 +17,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
 
+CCameraPcs CameraPcs;
+
 extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;

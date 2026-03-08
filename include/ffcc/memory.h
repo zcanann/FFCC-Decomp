@@ -99,6 +99,9 @@ public:
     void RefCnt0Compare();
     void AssertCache();
     void DumpCache();
+
+private:
+    u8 m_storage[0x5C];
 };
 
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line);

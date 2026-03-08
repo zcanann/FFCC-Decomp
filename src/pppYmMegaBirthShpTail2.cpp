@@ -1,12 +1,11 @@
 #include "ffcc/pppYmMegaBirthShpTail2.h"
+#include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 #include <string.h>
 
-class CMath;
-extern CMath Math;
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);

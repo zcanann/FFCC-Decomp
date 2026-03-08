@@ -178,7 +178,7 @@ static CMaterial* AllocMaterial()
         _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory,
             0xA8,
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
+            MaterialMan.GetMemoryStage(),
             s_materialman_cpp,
             0xCFF,
             0));
@@ -218,7 +218,7 @@ static CMapKeyFrame* AllocMapKeyFrame(int line)
 {
     CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(__nw__FUlPQ27CMemory6CStagePci(
         0x28,
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
+        MaterialMan.GetMemoryStage(),
         s_materialman_cpp,
         line));
     if (keyFrame != 0) {
@@ -2477,9 +2477,9 @@ CMaterial::CMaterial()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::GetMemoryStage()
+CMemory::CStage* CMaterialMan::GetMemoryStage()
 {
-	// TODO
+	return m_materialStage;
 }
 
 /*
@@ -2906,7 +2906,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
                 _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                     &Memory,
                     0xA8,
-                    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
+                    MaterialMan.GetMemoryStage(),
                     s_materialman_cpp,
                     0xEE4,
                     0));
@@ -3066,7 +3066,7 @@ void* CMaterial::operator new(unsigned long size, CMemory::CStage*, char* file, 
     return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
         &Memory,
         size,
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
+        MaterialMan.GetMemoryStage(),
         file,
         line,
         0);
@@ -3086,7 +3086,7 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
     return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
         &Memory,
         size,
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218),
+        MaterialMan.GetMemoryStage(),
         file,
         line,
         0);
@@ -3138,7 +3138,7 @@ CMaterialSet::CMaterialSet()
     *reinterpret_cast<unsigned long*>(Ptr(this, 0x14)) = 0x10;
     *reinterpret_cast<void**>(Ptr(this, 0x18)) = 0;
     *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x1C)) =
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x218);
+        MaterialMan.GetMemoryStage();
     *reinterpret_cast<int*>(Ptr(this, 0x20)) = 1;
 }
 

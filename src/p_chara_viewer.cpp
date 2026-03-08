@@ -1,6 +1,7 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pad.h"
@@ -12,7 +13,6 @@
 #include "dolphin/mtx.h"
 #include <string.h>
 
-extern "C" unsigned char Chara[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);

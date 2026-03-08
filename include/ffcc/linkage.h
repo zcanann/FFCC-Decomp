@@ -6,8 +6,8 @@
 
 // Canonical linkage declarations for globals that are still represented as
 // raw storage in decomped units.
-extern unsigned char CFlat[];
-extern unsigned char Chara[];
+extern unsigned char CFlat[0x10440];
+extern unsigned char Chara[0x2078];
 class CMaterialMan;
 extern CMaterialMan MaterialMan;
 class CMapMng;

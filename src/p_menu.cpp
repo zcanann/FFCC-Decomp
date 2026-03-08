@@ -2,6 +2,7 @@
 #include "ffcc/color.h"
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
+#include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
@@ -64,8 +65,6 @@ extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
-extern "C" unsigned char CFlat[];
-
 static inline void ReleaseRefObject(void* object)
 {
     if (object == nullptr) {

@@ -50,8 +50,6 @@ struct VertexApLcSource
 
 struct _pppPDataVal;
 
-extern CMath Math;
-
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
 }

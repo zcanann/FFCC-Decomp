@@ -31,11 +31,14 @@ extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
-extern "C" float ppvScreenMatrix[4][4];
-extern "C" float ppvScreenMatrix0[4][4];
-extern "C" float ppvCameraMatrix02[3][4];
-extern "C" Mtx ppvUnitMatrix;
-extern "C" Vec ppvZeroVector;
+extern "C" {
+float ppvScreenMatrix[10][4];
+float ppvScreenMatrix0[4][4];
+float ppvCameraMatrix02[3][4];
+float ppvChrScl[4];
+Mtx ppvUnitMatrix;
+Vec ppvZeroVector;
+}
 extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;

@@ -1,5 +1,6 @@
 #include "ffcc/chara.h"
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/linkage.h"
 
 #include <math.h>
 #include <string.h>
@@ -10,9 +11,6 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara*);
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void __dla__FPv(void*);
-
-struct CharaGlobal;
-extern CharaGlobal Chara;
 
 /*
  * --INFO--
@@ -1430,10 +1428,7 @@ void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node
 	}
 }
 
-struct CharaGlobal {
-	void* vtable;
-	u8 padding[0x264];
-} Chara;
+unsigned char Chara[0x2078];
 
 extern "C" char __vt__8CManager[];
 

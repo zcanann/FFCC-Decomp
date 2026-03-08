@@ -84,7 +84,7 @@ public:
     void ErrorTexCoordIdCur();
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
-    void GetMemoryStage();
+    CMemory::CStage* GetMemoryStage();
 
 private:
     unsigned char m_pad000[0x40];

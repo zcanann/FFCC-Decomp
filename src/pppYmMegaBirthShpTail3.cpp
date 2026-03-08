@@ -1,12 +1,11 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
+#include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 #include <string.h>
 
-class CMath;
-extern CMath Math;
 extern "C" float RandF__5CMathFv(CMath*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);

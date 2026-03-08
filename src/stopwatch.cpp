@@ -133,7 +133,8 @@ void CProfile::ProfEnd()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	float elapsed = ticks / denom;
-	m_lastTime = elapsed * kStopwatchTickToMilliseconds;
+	elapsed = kStopwatchTickToMilliseconds * elapsed;
+	m_lastTime = elapsed;
 
 	int next = m_frame + 1;
 	m_frame = next;

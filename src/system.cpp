@@ -14,6 +14,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/textureman.h"
 #include "ffcc/usb.h"
+#include "ffcc/p_dbgmenu.h"
 
 #include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"

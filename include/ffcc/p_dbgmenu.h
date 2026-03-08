@@ -81,6 +81,7 @@ public:
     void Add(int, int, CDMParam&);
     void Delete(int);
     int GetDbgFlag();
+    inline u32 GetDbgFlagsRaw() const { return m_dbgFlags; }
 
 private:
     u32 m_dbgFlags;                             // 0x04

@@ -340,7 +340,7 @@ extern "C" unsigned char Chara[];
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" char s_chara_fur_cpp_801db72c[];
+char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
 extern "C" void makeFurTex__6CCharaFv();
 
 static inline unsigned short PackFurTexel(int r, int g, int b, int a)

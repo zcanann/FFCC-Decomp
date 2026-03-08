@@ -99,7 +99,9 @@ extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
-extern "C" char s_cmake_cpp_801e3038[] = "cmake.cpp";
+extern "C" {
+char s_cmake_cpp_801e3038[] = "cmake.cpp";
+}
 extern unsigned char MenuPcs[];
 
 static inline short& MenuS16(CMenuPcs* menu, int offset)

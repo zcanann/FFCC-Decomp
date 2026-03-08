@@ -56,10 +56,17 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
     Mtx scaleMtx;
 
     if (gPppCalcDisabled == 0) {
+        CCameraPcs* camera = &CameraPcs;
+
         pppMngSt = pppMngStPtr;
-        cameraPos.x = CameraPosX();
-        cameraPos.y = CameraPosY();
-        cameraPos.z = CameraPosZ();
+        {
+            float x = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(camera) + 0xE0);
+            float y = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(camera) + 0xE4);
+            float z = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(camera) + 0xE8);
+            cameraPos.x = x;
+            cameraPos.y = y;
+            cameraPos.z = z;
+        }
 
         objPos.x = pppMngStPtr->m_matrix.value[0][3];
         objPos.y = pppMngStPtr->m_matrix.value[1][3];
@@ -87,4 +94,3 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     return alignmentScale;
 }
-

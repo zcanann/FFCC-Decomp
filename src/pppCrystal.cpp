@@ -204,20 +204,18 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 			for (x = 0; x < (u32)textureInfo[2]; ++x) {
 				float magnitude = xx * xx + y2;
-				float normal = 0.0f;
-				if (magnitude < 0.0f) {
-					magnitude = 0.0f;
-				}
+				float normal;
 
-				if (magnitude > 1.0f) {
+				if (magnitude <= 1.0f) {
+					normal = (magnitude > 0.0f) ? sqrtf(magnitude) : 0.0f;
+				} else {
 					normal = 1.0f / sqrtf(magnitude);
-				} else if (magnitude > 0.0f) {
-					normal = sqrtf(magnitude);
 				}
 
 				if (normal > 0.8f) {
 					normal = 0.8f;
 				}
+				normal = 4.0f * (normal * fmodf(normal, 1.0f));
 
 				{
 					const u8 nx =

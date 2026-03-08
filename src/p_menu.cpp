@@ -944,8 +944,9 @@ void CMenuPcs::onMapChanging(int, int mapNo)
  */
 void CMenuPcs::onMapChanged(int, int, int)
 {
-    changeMode(static_cast<CMenuPcs::MENUMODE>(
-        (u32)__cntlzw((u32)(0x21 - Game.game.m_currentMapId)) >> 5));
+    CGame* game = reinterpret_cast<CGame*>(&Game);
+
+    changeMode(static_cast<CMenuPcs::MENUMODE>((u32)__cntlzw((u32)(0x21 - game->m_currentMapId)) >> 5));
 }
 
 /*

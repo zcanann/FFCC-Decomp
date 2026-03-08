@@ -3,13 +3,7 @@
 
 #include <dolphin/mtx.h>
 
-extern class CCameraPcs {
-public:
-    unsigned char _0[0xe0];
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-} CameraPcs;
+extern unsigned char CameraPcs[];
 
 extern "C" {
 void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
@@ -42,6 +36,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 {
     float scale;
     struct _pppMngSt* pppMngSt;
+    unsigned char* camera;
     Vec cameraPos;
     Vec objPos;
     Mtx scaleMtx;

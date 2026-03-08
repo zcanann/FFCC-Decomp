@@ -234,6 +234,11 @@ void CSystem::ExecScenegraph()
         stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
         perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + stepPad * 0x54);
     }
+    else
+    {
+        stepTrigger = 0;
+        perfTrigger = 0;
+    }
 
     if ((stepTrigger & 0xC) != 0)
     {
@@ -268,7 +273,12 @@ void CSystem::ExecScenegraph()
         for (unsigned int port = 0; port < 4; port++)
         {
             unsigned short trigger;
+            bool forceOff = false;
             if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+            {
+                forceOff = true;
+            }
+            if (forceOff)
             {
                 trigger = 0;
             }
@@ -279,7 +289,12 @@ void CSystem::ExecScenegraph()
             }
 
             unsigned short held;
+            forceOff = false;
             if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+            {
+                forceOff = true;
+            }
+            if (forceOff)
             {
                 held = 0;
             }
@@ -308,8 +323,9 @@ void CSystem::ExecScenegraph()
         }
     }
 
+    int scenegraphStepMode = m_scenegraphStepMode;
     unsigned int drawToggle;
-    if (m_scenegraphStepMode == 1)
+    if (scenegraphStepMode == 1)
     {
         drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
     }
@@ -319,22 +335,22 @@ void CSystem::ExecScenegraph()
     }
 
     unsigned int stepGate = 0;
-    if (m_scenegraphStepMode == 4)
+    if (scenegraphStepMode == 4)
     {
         stepGate = ((-(int)(m_frameCounter & 3)) >> 31);
     }
-    else if (m_scenegraphStepMode < 4)
+    else if (scenegraphStepMode < 4)
     {
-        if (m_scenegraphStepMode == 2)
+        if (scenegraphStepMode == 2)
         {
             stepGate = 1;
         }
-        else if (m_scenegraphStepMode > 2)
+        else if (scenegraphStepMode > 2)
         {
             stepGate = ((-(int)(m_frameCounter & 7)) >> 31);
         }
     }
-    else if (m_scenegraphStepMode < 6)
+    else if (scenegraphStepMode < 6)
     {
         stepGate = m_frameCounter & 1;
     }

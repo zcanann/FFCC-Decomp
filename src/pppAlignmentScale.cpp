@@ -1,24 +1,15 @@
 #include "ffcc/pppAlignmentScale.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_camera.h"
 
 #include <dolphin/mtx.h>
 
+extern struct {
+    char pad[0xE0];
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+} CameraPcs;
 
-static inline float CameraPosX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0);
-}
-
-static inline float CameraPosY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4);
-}
-
-static inline float CameraPosZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8);
-}
 
 extern "C" {
 void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);

@@ -15,6 +15,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/stopwatch.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/textureman.h"
 #include <math.h>
 #include <string.h>
@@ -2499,7 +2500,7 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::initAllFinished()
 {
-	memset(reinterpret_cast<void*>(0x803001D8), 0, 0x90);
+	memset(gMonBossField108Buffer, 0, 0x90);
 }
 
 /*

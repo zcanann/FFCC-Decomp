@@ -16,6 +16,7 @@ extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern unsigned char CFlat[];
+extern float FLOAT_80331BD4;
 
 /*
  * --INFO--
@@ -289,7 +290,7 @@ int CGPrgObj::isLoopAnim()
  */
 int CGPrgObj::isLoopAnimDirect()
 {
-	if ((m_animFlags & 0x40) != 0 || !IsLoopAnim(2)) {
+	if (((int)((unsigned int)m_animFlags << 24) < 0) || !IsLoopAnim(2)) {
 		return 0;
 	}
 
@@ -354,7 +355,7 @@ void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
 	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
 	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, 0.0f);
+	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, FLOAT_80331BD4);
 	if (seNo != 0) {
 		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
 	}

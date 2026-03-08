@@ -112,54 +112,29 @@ asm f32 PSVECSquareMag(register const Vec *v) {
 #endif // clang-format on
 }
 
-f32 PSVECMag(const register Vec *v)
+asm f32 PSVECMag(const register Vec *v)
 {
-    register f32 half_c;
-    register f32 square_mag;
-    register f32 zero;
-    register f32 three_c;
-    register f32 recip;
-    register f32 n_0;
-
-    half_c = kVecInvSqrtHalfConst;
 #ifdef __MWERKS__ // clang-format off
-	asm {
-		psq_l       f0, 0(v), 0, 0 /* qr0 */
-		ps_mul      f0, f0, f0
-		lfs         f1, 8(v)
-	}
-
-	zero = half_c - half_c;
-
-	asm {
-		ps_madd     square_mag, f1, f1, f0
-		ps_sum0     square_mag, square_mag, f0, f0
-	}
+	nofralloc
+    lfs         f4, kVecInvSqrtHalfConst(r2)
+    psq_l       f0, 0(v), 0, 0
+    ps_mul      f0, f0, f0
+    lfs         f1, 8(v)
+    fsubs       f2, f4, f4
+    ps_madd     f1, f1, f1, f0
+    ps_sum0     f1, f1, f0, f0
+    fcmpu       cr0, f1, f2
+    beq         lbl_PSVECMag_ret
+    frsqrte     f0, f1
+    lfs         f3, kVecInvSqrtThreeConst(r2)
+    fmuls       f2, f0, f0
+    fmuls       f0, f0, f4
+    fnmsubs     f2, f2, f1, f3
+    fmuls       f0, f2, f0
+    fmuls       f1, f1, f0
+lbl_PSVECMag_ret:
+    blr
 #endif // clang-format on
-
-    if (square_mag == zero) {
-    }
-    else {
-#ifdef __MWERKS__ // clang-format off
-		asm {
-			frsqrte     recip, square_mag
-		}
-#endif // clang-format on
-
-        three_c = kVecInvSqrtThreeConst;
-
-#ifdef __MWERKS__ // clang-format off
-		asm {
-			fmuls       n_0, recip, recip
-			fmuls       recip, recip, half_c
-			fnmsubs     n_0, n_0, square_mag, three_c
-			fmuls       recip, n_0, recip
-			fmuls       square_mag, square_mag, recip
-		}
-#endif // clang-format on
-	}
-
-    return square_mag;
 }
 
 asm f32 PSVECDotProduct(const register Vec *vec1, const register Vec *vec2)
@@ -266,53 +241,31 @@ asm f32 PSVECSquareDistance(register const Vec *a, register const Vec *b) {
 #endif // clang-format on
 }
 
-f32 PSVECDistance(register const Vec *a, register const Vec *b)
+asm f32 PSVECDistance(register const Vec *a, register const Vec *b)
 {
-    register f32 half_c;
-    register f32 square_dist;
-    register f32 zero;
-    register f32 three_c;
-    register f32 recip;
-    register f32 n_0;
-
 #ifdef __MWERKS__ // clang-format off
-	asm {
-		psq_l       f0, 4(a), 0, 0 /* qr0 */
-        psq_l       f1, 4(b), 0, 0 /* qr0 */
-        ps_sub      f2, f0, f1
-        psq_l       f0, 0(a), 0, 0 /* qr0 */
-        psq_l       f1, 0(b), 0, 0 /* qr0 */
-        ps_mul      f2, f2, f2
-        ps_sub      f0, f0, f1    
-	}
-
-    half_c = kVecInvSqrtHalfConst;
-
-    asm {
-        ps_madd     square_dist, f0, f0, f2
-    }
-
-    zero = half_c - half_c;
-
-    asm {
-        ps_sum0     square_dist, square_dist, f2, f2
-    }
-
-    if (zero == square_dist) {
-    }
-    else {
-        three_c = kVecInvSqrtThreeConst;
-
-        asm {
-            frsqrte     recip, square_dist
-            fmuls       n_0, recip, recip
-            fmuls       recip, recip, half_c
-            fnmsubs     n_0, n_0, square_dist, three_c
-            fmuls       recip, n_0, recip
-            fmuls       square_dist, square_dist, recip
-        }
-    }
-
-    return square_dist;
+	nofralloc
+    psq_l       f0, 4(a), 0, 0
+    psq_l       f1, 4(b), 0, 0
+    ps_sub      f2, f0, f1
+    psq_l       f0, 0(a), 0, 0
+    psq_l       f1, 0(b), 0, 0
+    ps_mul      f2, f2, f2
+    ps_sub      f0, f0, f1
+    lfs         f3, kVecInvSqrtHalfConst(r2)
+    ps_madd     f1, f0, f0, f2
+    fsubs       f0, f3, f3
+    ps_sum0     f1, f1, f2, f2
+    fcmpu       cr0, f0, f1
+    beq         lbl_PSVECDistance_ret
+    lfs         f4, kVecInvSqrtThreeConst(r2)
+    frsqrte     f0, f1
+    fmuls       f2, f0, f0
+    fmuls       f0, f0, f3
+    fnmsubs     f2, f2, f1, f4
+    fmuls       f0, f2, f0
+    fmuls       f1, f1, f0
+lbl_PSVECDistance_ret:
+    blr
 #endif // clang-format on
 }

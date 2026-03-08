@@ -19,6 +19,9 @@ CPad Pad;
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 extern "C" char __vt__8CManager[];
 extern "C" char PTR_PTR_DAT_801e8864[];
+extern "C" char gMemory[];
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 extern "C" {
 unsigned char BYTE_ARRAY_8024430c[0x34] = {};
 }
@@ -86,7 +89,7 @@ void CPad::Init()
 
 	if (System.IsGdev() != 0)
 	{
-		_1ac_4_ = Memory.CreateStage(0x800000, (char*)"pad.cpp", 1);
+		_1ac_4_ = CreateStage__7CMemoryFUlPci(reinterpret_cast<CMemory*>(gMemory), 0x800000, "pad.cpp", 1);
 		if (_1ac_4_ != 0)
 		{
 			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), (char*)"pad.cpp", 0x54) unsigned char[0x69780C];
@@ -133,7 +136,7 @@ void CPad::Quit()
 	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(base + 0x1AC);
 	if (stage != nullptr)
 	{
-		Memory.DestroyStage(stage);
+		DestroyStage__7CMemoryFPQ27CMemory6CStage(reinterpret_cast<CMemory*>(gMemory), stage);
 	}
 }
 

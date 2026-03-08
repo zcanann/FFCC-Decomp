@@ -40,6 +40,11 @@ extern "C" void __ct__7CMapHitFv(void*);
 extern "C" void __ct__7CMapObjFv(void*);
 extern "C" void __ct__8CMapMeshFv(void*);
 extern "C" void __ct__9CMapIdGrpFv(void*);
+extern "C" void __ct__25CPtrArray_P11CMapAnimRun_Fv(void*);
+extern "C" void __ct__21CPtrArray_P8CMapAnim_Fv(void*);
+extern "C" void __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(void*);
+extern "C" void __ct__24CPtrArray_P10CMapShadow_Fv(void*);
+extern "C" void __ct__29CPtrArray_P15CMapLightHolder_Fv(void*);
 extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
 extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
@@ -88,6 +93,7 @@ extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void SetLink__7CMapObjFv();
 extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static char s_map_cpp[] = "map.cpp";
 static char s_CMapMng_mapmng[] = "CMapMng.mapmng";
@@ -99,18 +105,6 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
-
-static void InitPtrArrayRaw(void* ptrArray)
-{
-    unsigned char* raw = reinterpret_cast<unsigned char*>(ptrArray);
-    *reinterpret_cast<unsigned int*>(raw + 0x0) = 0;
-    *reinterpret_cast<unsigned int*>(raw + 0x4) = 0;
-    *reinterpret_cast<unsigned int*>(raw + 0x8) = 0x10;
-    *reinterpret_cast<void**>(raw + 0xC) = 0;
-    *reinterpret_cast<void**>(raw + 0x10) = 0;
-    *reinterpret_cast<int*>(raw + 0x14) = 1;
-}
-
 }
 
 /*
@@ -3526,14 +3520,16 @@ extern "C" void __sinit_map_cpp(void)
     __construct_array(Ptr(&MapMng, 0x4D4), __ct__7CMapHitFv, __dt__7CMapHitFv, 0x24, 0x20);
     __construct_array(Ptr(&MapMng, 0x954), __ct__7CMapObjFv, __dt__7CMapObjFv, 0xF0, 0x200);
     __construct_array(Ptr(&MapMng, 0x1E954), __ct__8CMapMeshFv, __dt__8CMapMeshFv, 0x44, 0xA0);
-
-    InitPtrArrayRaw(Ptr(&MapMng, 0x213E0));
-    InitPtrArrayRaw(Ptr(&MapMng, 0x213FC));
-    InitPtrArrayRaw(Ptr(&MapMng, 0x21418));
-    InitPtrArrayRaw(Ptr(&MapMng, 0x21434));
-
-    InitPtrArrayRaw(Ptr(&MapMng, 0x21450));
-    InitPtrArrayRaw(Ptr(&MapMng, 0x2146C));
+    __ct__25CPtrArray_P11CMapAnimRun_Fv(Ptr(&MapMng, 0x213E0));
+    __ct__21CPtrArray_P8CMapAnim_Fv(Ptr(&MapMng, 0x213FC));
+    __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(Ptr(&MapMng, 0x21418));
+    __ct__24CPtrArray_P10CMapShadow_Fv(Ptr(&MapMng, 0x21434));
+    __construct_array(
+        Ptr(&MapMng, 0x21450),
+        __ct__29CPtrArray_P15CMapLightHolder_Fv,
+        reinterpret_cast<void (*)(void*, int)>(dtor_80034414),
+        0x1C,
+        2);
 
     __construct_array(Ptr(&MapMng, 0x214E4), __ct__9CMapIdGrpFv, 0, 0x14, 0x100);
     __register_global_object(&MapMng, reinterpret_cast<void*>(__dt__7CMapMngFv), &Vec_80245758);

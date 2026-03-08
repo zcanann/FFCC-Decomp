@@ -106,13 +106,26 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStep += stepData->m_angleStepStep;
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
-    work->m_angle += work->m_angleStep;
-
-    if (work->m_angle > gPppYmMoveCircleTurnSpan) {
-        work->m_angle -= gPppYmMoveCircleTurnSpan;
+    {
+        f32 angle = work->m_angle;
+        f32 angleStep = work->m_angleStep;
+        angle += angleStep;
+        work->m_angle = angle;
     }
-    if (work->m_angle < gPppYmMoveCircleZero) {
-        work->m_angle += gPppYmMoveCircleTurnSpan;
+
+    {
+        f32 angle = work->m_angle;
+        if (angle > gPppYmMoveCircleTurnSpan) {
+            angle -= gPppYmMoveCircleTurnSpan;
+            work->m_angle = angle;
+        }
+    }
+    {
+        f32 angle = work->m_angle;
+        if (angle < gPppYmMoveCircleZero) {
+            angle += gPppYmMoveCircleTurnSpan;
+            work->m_angle = angle;
+        }
     }
 
     nextPos.y = gPppYmMoveCircleZero;

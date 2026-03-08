@@ -749,9 +749,9 @@ int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
 			return (int)node;
 		}
 		if (node->m_firstChild != 0) {
-			const int found = searchID(id, *node->m_firstChild);
+			CDM* found = reinterpret_cast<CDM*>(searchID(id, *node->m_firstChild));
 			if (found != 0) {
-				return found;
+				return reinterpret_cast<int>(found);
 			}
 		}
 		node = node->m_next;

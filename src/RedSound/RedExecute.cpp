@@ -2048,47 +2048,52 @@ void _SkipMusicEntry()
  */
 void MusicSkipFunction()
 {
-    int i;
-    int status;
-    u32 trackCount;
-    u8* sound;
-    u32* track;
+    int iVar1;
+    int iVar2;
+    int iVar3;
+    int iVar4;
+    int iVar5;
+    u32 uVar6;
+    int iVar7;
+    u32* puVar8;
+    u32* puVar9;
 
     do {
         DAT_8032f4b8 = (int*)RedNew(0x600);
         if (DAT_8032f4b8 == 0) {
             RedSleep(10000);
         }
-        sound = (u8*)DAT_8032f3f0;
+        iVar4 = (int)DAT_8032f3f0;
     } while (DAT_8032f4b8 == 0);
 
+    puVar9 = (u32*)((u8*)DAT_8032f3f0 + 0x928);
     memset(DAT_8032f4b8, 0, 0x600);
-    status = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)((u8*)DAT_8032f3f0 + 0x928), (RedKeyOnDATA*)DAT_8032f4b8, 1);
-
+    iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)DAT_8032f4b8, 1);
     while (true) {
-        if ((status != 0) || ((((u32*)sound)[0x365] & 1) == 0)) {
+        if ((iVar5 != 0) || ((*(u32*)(iVar4 + 0xd94) & 1) == 0)) {
             break;
         }
-
-        *(s16*)(sound + 0xDB6) = *(s16*)(sound + 0xD5C);
-        memcpy(sound + 0x934, sound + 0xD60, 0x10);
-        memcpy(sound + 0xD70, sound + 0xD50, 0xC);
-
-        track = (u32*)*(u32*)(sound + 0x928);
-        trackCount = *(u8*)(sound + 0xDB9);
-        i = 0;
+        *(s16*)(iVar4 + 0xdb6) = *(s16*)(iVar4 + 0xd5c);
+        memcpy((void*)(iVar4 + 0x934), (void*)(iVar4 + 0xd60), 0x10);
+        memcpy((void*)(iVar4 + 0xd70), (void*)(iVar4 + 0xd50), 0xc);
+        puVar8 = (u32*)*puVar9;
+        iVar7 = iVar4 + 0x950;
+        uVar6 = (u32)*(u8*)(iVar4 + 0xdb9);
+        iVar5 = 0;
         do {
-            track[0] = *(u32*)(sound + 0x950 + i * 4);
-            track[0x42] = *(u32*)(sound + 0xA50 + i * 4);
-            track[0x41] = *(u32*)(sound + 0xB50 + i * 4);
-            track[9] = *(u32*)(sound + 0xC50 + i * 4);
-            track += 0x55;
-            i++;
-        } while (--trackCount != 0);
-
-        status = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)((u8*)DAT_8032f3f0 + 0x928), (RedKeyOnDATA*)DAT_8032f4b8, 1);
+            iVar1 = iVar5 * 4;
+            iVar2 = iVar5 * 4;
+            iVar3 = iVar5 * 4;
+            *puVar8 = *(u32*)(iVar7 + iVar5 * 4);
+            uVar6 -= 1;
+            iVar5 += 1;
+            puVar8[0x42] = *(u32*)(iVar7 + iVar1 + 0x100);
+            puVar8[0x41] = *(u32*)(iVar7 + iVar2 + 0x200);
+            puVar8[9] = *(u32*)(iVar7 + iVar3 + 0x300);
+            puVar8 += 0x55;
+        } while (uVar6 != 0);
+        iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)DAT_8032f4b8, 1);
     }
-
     DAT_8032f470 = 1;
 }
 

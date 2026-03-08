@@ -570,7 +570,6 @@ static void stateCoverClosed() {
         stateReady();
         break;
     default:
-        MotorState = 0;
         DVDReset();
         OSCreateAlarm(&ResetAlarm);
         OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
@@ -622,8 +621,8 @@ static void stateReady() {
     }
 
     if (PauseFlag != 0) {
-        PausingFlag = 1;
         executing = NULL;
+        PausingFlag = 1;
         return;
     }
 
@@ -642,13 +641,27 @@ static void stateReady() {
     }
 
     CurrCommand = executing->command;
-    if (ResumeFromHere != 0) {
-        switch (ResumeFromHere) {
-        case 2:
+    if (ResumeFromHere == 0) {
+        executing->state = DVD_STATE_BUSY;
+        stateBusy_80189D04(executing);
+        return;
+    }
+
+    if (ResumeFromHere == 4) {
+        executing->state = DVD_STATE_COVER_OPEN;
+        DVDLowWaitCoverClose(cbForStateMotorStopped);
+        ResumeFromHere = 0;
+        return;
+    }
+
+    if (ResumeFromHere < 4) {
+        if (ResumeFromHere == 2) {
             executing->state = DVD_STATE_RETRY;
             DVDLowWaitCoverClose(cbForStateMotorStopped);
-            break;
-        case 3:
+            ResumeFromHere = 0;
+            return;
+        }
+        if (ResumeFromHere > 2) {
             executing->state = DVD_STATE_NO_DISK;
             DVDLowWaitCoverClose(cbForStateMotorStopped);
             break;
@@ -684,11 +697,9 @@ static void stateReady() {
             executing->state = DVD_STATE_FATAL_ERROR;
             __DVDStoreErrorCode(CancelLastError);
             DVDLowStopMotor(cbForStateError);
-            break;
+            ResumeFromHere = 0;
+            return;
         }
-
-        ResumeFromHere = 0;
-        return;
     }
 
     executing->state = DVD_STATE_BUSY;

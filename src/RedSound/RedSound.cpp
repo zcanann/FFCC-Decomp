@@ -801,17 +801,10 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 	int id = 0;
 	char* streamData = (char*)data;
 
-	if (streamData[0] == 'S') {
-		if (streamData[1] == 'T') {
-			if (streamData[2] == 'R') {
-				id = GetAutoID();
-				CRedDriver_8032f4c0.StreamPlay(id, data, param_3, param_4, param_5);
-				return id;
-			}
-		}
-	}
-
-	if (gRedMemoryDebugEnabled != 0) {
+	if (streamData[0] == 'S' && streamData[1] == 'T' && streamData[2] == 'R') {
+		id = GetAutoID();
+		CRedDriver_8032f4c0.StreamPlay(id, data, param_3, param_4, param_5);
+	} else if (gRedMemoryDebugEnabled != 0) {
 		OSReport("[%s] %s STREAM : This data was not stream data. %s\n", "RedSound", "", "");
 		fflush(&DAT_8021d1a8);
 	}

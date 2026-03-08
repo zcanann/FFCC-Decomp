@@ -27,6 +27,7 @@ extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void onDestroy__10CGCharaObjFv(CGCharaObj*);
 extern "C" void SetHitEnemy__8GbaQueueFii(void*, int, int);
 extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
@@ -113,8 +114,7 @@ void CGMonObj::onCreate()
  */
 void CGMonObj::onDestroy()
 {
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	charaObj->onDestroy();
+	onDestroy__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
 }
 
 /*

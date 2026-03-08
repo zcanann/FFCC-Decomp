@@ -70,9 +70,9 @@ GXTevAlphaOpReg s_GXSetTevAlphaOp_Reg[16];
 GXTevOrderReg s_GXSetTevOrder_Reg[16];
 GXTevSwapModeReg s_GXSetTevSwapMode_Reg[16];
 GXTevSwapModeTableReg s_GXSetTevSwapModeTable_Reg[4];
-static GXAlphaCompareReg s_GXSetAlphaCompare_Reg;
-static unsigned short s_GXSetPixel_Init_Reg;
-static GXBlendModeReg s_GXSetBlendMode_Reg;
+GXAlphaCompareReg s_GXSetAlphaCompare_Reg;
+unsigned short s_GXSetPixel_Init_Reg;
+GXBlendModeReg s_GXSetBlendMode_Reg;
 
 /*
  * --INFO--

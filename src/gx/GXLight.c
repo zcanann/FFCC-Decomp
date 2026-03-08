@@ -246,6 +246,8 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     mag += tmp;
     if (mag != 0.0f) {
         mag = 1.0f / sqrtf(mag);
+    } else {
+        mag = 0.0f;
     }
     
     obj->ldir[0] = vx * mag;

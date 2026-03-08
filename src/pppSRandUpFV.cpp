@@ -50,8 +50,10 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * kPppSRandUpFVDualSampleScale;
+                f32 random = RandF__5CMathFv(&Math);
+                f32 blend = value + random;
+                f32 scale = kPppSRandUpFVDualSampleScale;
+                value = blend * scale;
             }
             randVec[0] = value;
         }
@@ -60,8 +62,10 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * kPppSRandUpFVDualSampleScale;
+                f32 random = RandF__5CMathFv(&Math);
+                f32 blend = value + random;
+                f32 scale = kPppSRandUpFVDualSampleScale;
+                value = blend * scale;
             }
             randVec[1] = value;
         }
@@ -70,8 +74,10 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
-                value = randomPair * kPppSRandUpFVDualSampleScale;
+                f32 random = RandF__5CMathFv(&Math);
+                f32 blend = value + random;
+                f32 scale = kPppSRandUpFVDualSampleScale;
+                value = blend * scale;
             }
             randVec[2] = value;
         }
@@ -85,15 +91,15 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
     f32* target = (cfg->field4 == -1) ? gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
 
     {
-        f32 value = cfg->field8 * randVec[0];
+        f32 value = randVec[0] * cfg->field8;
         target[0] = target[0] + value;
     }
     {
-        f32 value = cfg->fieldC * randVec[1];
+        f32 value = randVec[1] * cfg->fieldC;
         target[1] = target[1] + value;
     }
     {
-        f32 value = cfg->field10 * randVec[2];
+        f32 value = randVec[2] * cfg->field10;
         target[2] = target[2] + value;
     }
 }

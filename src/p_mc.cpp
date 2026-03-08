@@ -1,11 +1,13 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/math.h"
-#include "ffcc/p_menu.h"
 #include "ffcc/symbols_shared.h"
 
 extern "C" {
 unsigned int gMcPcsSingletonPtr_addr = 0;
 }
+
+class CMenuPcs;
+extern CMenuPcs MenuPcs;
 
 class McCtrl;
 

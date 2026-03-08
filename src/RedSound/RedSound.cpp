@@ -28,7 +28,7 @@ u32* DAT_8032f4b0;
 u32 DAT_8032f4b4;
 int* DAT_8032f4b8;
 volatile unsigned int DAT_8032f4c4;
-void* DAT_8032f4c8;
+volatile int DAT_8032f4c8;
 
 /*
  * --INFO--
@@ -185,8 +185,8 @@ void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
  */
 void CRedSound::Start()
 {
-	DAT_8032f4c8 = RedNew__Fi(0x100);
-	memset(DAT_8032f4c8, 0, 0x100);
+	DAT_8032f4c8 = (int)RedNew__Fi(0x100);
+	memset((void*)DAT_8032f4c8, 0, 0x100);
 }
 
 /*

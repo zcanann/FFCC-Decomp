@@ -76,6 +76,6 @@ extern u32 DAT_8032f4b4;
 extern int* DAT_8032f4b8;
 extern CRedDriver CRedDriver_8032f4c0;
 extern volatile unsigned int DAT_8032f4c4;
-extern void* DAT_8032f4c8;
+extern volatile int DAT_8032f4c8;
 
 #endif

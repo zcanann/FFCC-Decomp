@@ -237,7 +237,7 @@ float CMath::RandFPM(float scale)
         return 0.0f;
     }
 
-    return scale * (((float)rand() * (2.0f / 32768.0f)) - 1.0f);
+    return scale * (((float)rand() * (2.0f / 32768.0f)) + -1.0f);
 }
 
 /*

@@ -110,6 +110,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
         VertexApEntry* entry = &env->entries[data->entryIndex];
+        u16* vertexIndices = entry->vertexIndices;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
@@ -118,25 +119,26 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        u8 count = data->spawnCount;
+        s32 count = data->spawnCount;
 
         switch (data->mode) {
-        case 0:
-            while (count-- != 0) {
+        case 0: {
+            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
+            do {
                 if ((s16)state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 vertexIndex = entry->vertexIndices[state->index];
-                state->index++;
+                u16 index = state->index++;
+                u16 vertexIndex = vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
-                u16 childId = (u16)data->childId;
 
-                if (childId != 0xFFFF) {
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -152,7 +154,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &pos, &pos);
+                    PSMTXMultVec(parentMtx, &pos, &pos);
                     outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -161,19 +163,21 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            }
+            } while (count-- != 0);
             break;
-        case 1:
-            while (count-- != 0) {
-                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&Math) * (f32)entry->maxValue)];
+        }
+        case 1: {
+            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
+            do {
+                u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
-                u16 childId = (u16)data->childId;
 
-                if (childId != 0xFFFF) {
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -189,7 +193,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &pos, &pos);
+                    PSMTXMultVec(parentMtx, &pos, &pos);
                     outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -198,8 +202,9 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            }
+            } while (count-- != 0);
             break;
+        }
         }
 
         state->countdown = data->spawnDelay;

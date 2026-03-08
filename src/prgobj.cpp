@@ -307,18 +307,13 @@ int CGPrgObj::isLoopAnimDirect()
  */
 int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
-	int handle;
-
 	if (seNo == 0 || seNo == 0xFFFF) {
 		return -1;
 	}
 
-	if (pos == nullptr) {
-		pos = &m_worldPosition;
-	}
-
-	handle = Sound.PlaySe3D(
-		seNo, pos,
+	Vec* usePos = (pos != nullptr) ? pos : &m_worldPosition;
+	int handle = Sound.PlaySe3D(
+		seNo, usePos,
 		static_cast<float>(static_cast<unsigned int>(volume)),
 		static_cast<float>(static_cast<unsigned int>(dist)),
 		0

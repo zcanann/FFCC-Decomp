@@ -7,6 +7,7 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/pad.h"
 
 #include <dolphin/gx.h>
@@ -56,7 +57,6 @@ extern "C" int GetGBAStart__6JoyBusFi(void*, int);
 extern "C" int IsInitSend__6JoyBusFi(void*, int);
 
 extern unsigned char DAT_8020fab8[];
-extern CMenuPcs MenuPcs;
 extern char DAT_801da01c[];
 extern float FLOAT_803309c0;
 extern float FLOAT_803309c4;

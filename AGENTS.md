@@ -173,6 +173,7 @@ Make a PR only if **both** are true:
 
 **A) Net progress improves meaningfully**
 - objdiff/build output shows real improvement in one or more of: code match, data match, linkage progress
+- Using extern rather than real linkage to artifically inflate match scores is prohibited. This is only acceptable for 1st pass at a function.
 - minor regressions are acceptable when outweighed by larger gains in other categories (for example, small code byte loss for substantial data/linkage gain)
 - improvements should be real, not just formatting/renames
 - The PR should feel like it is a step in the direction of recovering the original code.
@@ -233,9 +234,9 @@ EXCEPTION: If making a first pass at a large function, mangled code is tolerable
 Before creating any FFCC-Decomp PR:
 1. Branched from clean `main`?
 2. All notes written to agent workspace (not project directory)?  
-3. Code is clean (no assembly comments, debug prints, etc.)?
-4. Real net improvement achieved across code/data/linkage (with any regressions justified)?
-5. Build passes with `ninja`?
+3. Code is clean (no assembly comments, debug prints, extern hacks to increase match score, etc.)?
+5. Real net improvement achieved across code/data/linkage (with any regressions justified)?
+6. Build passes with `ninja`?
 
 ### If You Break These Rules
 - **Stop immediately** and fix the issues

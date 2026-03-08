@@ -39,7 +39,7 @@ public:
     void DrawShadowFont(CFont*, char*, float, float, int, int);
     void DrawNoShadowFont(CFont*, char*, float, float, int, int);
     int GetItemType(int, int);
-    void CalcListPos(int, int, int);
+    double CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
     int EquipChk(int);
     void DrawEquipMark(int, int, float);

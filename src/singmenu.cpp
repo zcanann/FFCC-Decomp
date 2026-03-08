@@ -8,6 +8,7 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
+#include "ffcc/linkage.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/sound.h"
 #include "ffcc/symbols_shared.h"
@@ -99,7 +100,6 @@ extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
 extern "C" int DAT_802381a7;
-extern CMenuPcs MenuPcs;
 extern "C" char* PTR_s_Blacksmith_80214140[];
 extern "C" char* PTR_s_Schmied_80214160[];
 extern "C" char* PTR_s_Fabbri_80214180[];

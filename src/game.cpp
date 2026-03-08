@@ -32,8 +32,6 @@
 #include <string.h>
 
 typedef void* ConstructorDestructor;
-class CMaterialEditorPcs;
-extern CMaterialEditorPcs MaterialEditorPcs;
 
 extern "C" {
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);

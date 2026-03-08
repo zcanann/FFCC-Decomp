@@ -492,12 +492,43 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1190
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::ClearWaveData(int)
+void CRedEntry::ClearWaveData(int waveNo)
 {
-	// TODO
+	int* entry = (int*)this;
+
+	if (waveNo < 0) {
+		if (waveNo == -1) {
+			for (int* historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+				if (-1 < historyBank[0]) {
+					WaveDelete((RedHistoryBANK*)historyBank);
+				}
+			}
+		} else if (waveNo == -2) {
+			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+				if (-1 < historyBank[0]) {
+					WaveDelete((RedHistoryBANK*)historyBank);
+				}
+			}
+		} else if (waveNo == -3) {
+			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
+					WaveDelete((RedHistoryBANK*)historyBank);
+				}
+			}
+		}
+	} else {
+		int historyNo = SearchWaveSequence(waveNo);
+		if (-1 < historyNo) {
+			WaveDelete((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+		}
+	}
 }
 
 /*

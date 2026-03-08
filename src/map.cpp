@@ -1768,12 +1768,122 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80032bf0
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::SetLightSource()
 {
-	// TODO
+    int mapLightIndex = 0;
+    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    unsigned char* mapObj = Ptr(this, 0x954);
+    unsigned char* mapObjEnd = mapObj + mapObjCount * 0xF0;
+
+    while (mapObj < mapObjEnd) {
+        unsigned char* atr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
+        if (atr != 0) {
+            const int type = *reinterpret_cast<int*>(atr + 4);
+
+            if (type == 1) {
+                if (*reinterpret_cast<int*>(atr + 0x34) == 0) {
+                    CLightPcs::CLight light;
+                    light.m_type = 1;
+                    light.m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
+                    light.m_position.y = *reinterpret_cast<float*>(mapObj + 0xD4);
+                    light.m_position.z = *reinterpret_cast<float*>(mapObj + 0xE4);
+
+                    light.m_direction.x = 0.0f;
+                    light.m_direction.y = 0.0f;
+                    light.m_direction.z = 1.0f;
+
+                    unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
+                    light.m_targetPosition.x = *reinterpret_cast<float*>(targetObj + 0xC4);
+                    light.m_targetPosition.y = *reinterpret_cast<float*>(targetObj + 0xD4);
+                    light.m_targetPosition.z = *reinterpret_cast<float*>(targetObj + 0xE4);
+
+                    PSVECSubtract(reinterpret_cast<Vec*>(&light.m_targetPosition),
+                                  reinterpret_cast<Vec*>(&light.m_position),
+                                  reinterpret_cast<Vec*>(&light.m_direction));
+                    PSVECNormalize(reinterpret_cast<Vec*>(&light.m_direction), reinterpret_cast<Vec*>(&light.m_direction));
+
+                    light.m_attenRadius = *reinterpret_cast<float*>(atr + 0x14);
+                    light.m_range = *reinterpret_cast<float*>(atr + 0x18);
+                    light.m_attenFalloff = *reinterpret_cast<float*>(atr + 0x1C);
+
+                    light.m_targetColor[0].r = atr[0x8];
+                    light.m_targetColor[0].g = atr[0x9];
+                    light.m_targetColor[0].b = atr[0xA];
+                    light.m_targetColor[0].a = atr[0xB];
+                    light.m_targetColor[1].r = atr[0xC];
+                    light.m_targetColor[1].g = atr[0xD];
+                    light.m_targetColor[1].b = atr[0xE];
+                    light.m_targetColor[1].a = atr[0xF];
+
+                    light.m_spotFn = atr[0x2C];
+                    light.m_unk4D = (atr[0x2D] == 0) ? 4 : 2;
+                    light.m_directionMode = atr[0x30];
+                    light.m_partMask = 1 << mapLightIndex;
+                    light.m_targetEnableMask = 0;
+                    LightPcs.Add(&light);
+                } else {
+                    CLightPcs::CLight* light = *reinterpret_cast<CLightPcs::CLight**>(atr + 0x38);
+                    light->m_type = 1;
+                    light->m_targetColor[1].r = atr[0x8];
+                    light->m_targetColor[1].g = atr[0x9];
+                    light->m_targetColor[1].b = atr[0xA];
+                    light->m_targetColor[1].a = atr[0xB];
+                    light->m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
+                    light->m_position.y = *reinterpret_cast<float*>(mapObj + 0xD4);
+                    light->m_position.z = *reinterpret_cast<float*>(mapObj + 0xE4);
+                    light->m_direction.x = 0.0f;
+                    light->m_direction.y = 0.0f;
+                    light->m_direction.z = 1.0f;
+
+                    unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
+                    light->m_targetPosition.x = *reinterpret_cast<float*>(targetObj + 0xC4);
+                    light->m_targetPosition.y = *reinterpret_cast<float*>(targetObj + 0xD4);
+                    light->m_targetPosition.z = *reinterpret_cast<float*>(targetObj + 0xE4);
+                    PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
+                                  reinterpret_cast<Vec*>(&light->m_position),
+                                  reinterpret_cast<Vec*>(&light->m_direction));
+                    PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
+                }
+                mapLightIndex += 1;
+            } else if (type == 0) {
+                CLightPcs::CLight light;
+                light.m_type = 0;
+                light.m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
+                light.m_position.y = *reinterpret_cast<float*>(mapObj + 0xD4);
+                light.m_position.z = *reinterpret_cast<float*>(mapObj + 0xE4);
+                light.m_direction.x = 0.0f;
+                light.m_direction.y = 0.0f;
+                light.m_direction.z = 1.0f;
+                light.m_partMask = 1 << mapLightIndex;
+                light.m_attenRadius = *reinterpret_cast<float*>(atr + 0x10);
+                light.m_range = *reinterpret_cast<float*>(atr + 0x14);
+                light.m_attenFalloff = 1.0f;
+                light.m_targetColor[0].r = atr[0x8];
+                light.m_targetColor[0].g = atr[0x9];
+                light.m_targetColor[0].b = atr[0xA];
+                light.m_targetColor[0].a = atr[0xB];
+                light.m_targetColor[1].r = atr[0xC];
+                light.m_targetColor[1].g = atr[0xD];
+                light.m_targetColor[1].b = atr[0xE];
+                light.m_targetColor[1].a = atr[0xF];
+                light.m_targetEnableMask = 0;
+                light.m_spotFn = atr[0x1C];
+                light.m_unk4D = 4;
+                light.m_directionMode = atr[0x20];
+                LightPcs.Add(&light);
+                mapLightIndex += 1;
+            }
+        }
+
+        mapObj += 0xF0;
+    }
 }
 
 /*

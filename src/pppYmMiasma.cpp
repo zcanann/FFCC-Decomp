@@ -50,13 +50,16 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     u8* vData = (u8*)vYmMiasma;
     u8* ymData = (u8*)pYmMiasma;
     u8* particle = (u8*)particleData;
-    u32 randomValue;
-    u32 angleIndex;
-    int colorEntry;
-    int randomLifeValue;
-    s16 colorDiv;
-    s16 life;
-    float angleSin;
+    u32 uVar1;
+    float fVar2;
+    u32 uVar3;
+    int iVar4;
+    short sVar5;
+    int iVar6;
+    double dVar7;
+    double dVar8;
+    double dVar9;
+    double dVar10;
     float local_88;
     float local_84;
     float local_80;
@@ -69,47 +72,50 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     float local_64;
     float local_60;
     float local_5c;
-    double randScale;
-    double radialScale;
-    double verticalRand;
-    u32 parityBits;
-    u32 paritySign;
-    float parityScale;
-    unsigned long long randomBits;
+    u32 local_58;
+    u32 uStack_54;
+    long long local_50;
+    union {
+        unsigned long long ull;
+        double d;
+    } temp;
 
     (void)pppPObject;
 
-    randomValue = rand();
-    randomBits = 0x4330000000000000ULL | (unsigned long long)(randomValue ^ 0x80000000U);
-    randScale = (double)(FLOAT_8033065c * (float)((double)randomBits - DOUBLE_80330648));
-
-    colorEntry = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(int*)(ymData + 4) * 4);
-    randomLifeValue = rand();
-    colorDiv = *(s16*)(colorEntry + 6);
-    life = (s16)randomLifeValue - (s16)(randomLifeValue / (int)colorDiv) * colorDiv;
-    *(s16*)(particle + 0x2A) = life;
-    *(s16*)(particle + 0x28) = life;
-
-    angleIndex = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * randScale) -
-                       FLOAT_80330664);
-    *(s16*)(particle + 0x38) = (s16)(randomValue % 0x168);
-
-    radialScale = randScale * (double)*(float*)(ymData + 0x3C);
-    angleSin = ppvSinTbl[((angleIndex + 0x4000) & 0xFFFF) >> 2];
-    *(float*)(particle + 0x00) = angleSin * (float)((double)*(float*)(vData + 0x1C) + radialScale);
-    *(float*)(particle + 0x10) = *(float*)(particle + 0x00);
-    verticalRand = (double)RandF__5CMathFf(*(float*)(ymData + 0x40), &Math);
-    *(float*)(particle + 0x04) = (float)verticalRand;
-    *(float*)(particle + 0x14) = (float)verticalRand;
-    *(float*)(particle + 0x08) = (float)((double)ppvSinTbl[(angleIndex & 0xFFFF) >> 2] *
-                                          (double)(float)((double)*(float*)(vData + 0x1C) + radialScale));
-    *(float*)(particle + 0x18) = *(float*)(particle + 0x08);
-
+    uVar3 = rand();
+    uStack_54 = uVar3 ^ 0x80000000;
+    local_58 = 0x43300000;
+    temp.ull = ((unsigned long long)local_58 << 32) | (unsigned long long)uStack_54;
+    dVar10 = (double)(FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648));
+    iVar6 = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(int*)(ymData + 4) * 4);
+    iVar4 = rand();
+    sVar5 = *(short*)(iVar6 + 6);
+    uVar1 = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * dVar10) - FLOAT_80330664);
+    local_50 = (long long)(int)uVar1;
+    sVar5 = (short)iVar4 - (short)(iVar4 / (int)sVar5) * sVar5;
+    *(short*)(particle + 0x2a) = sVar5;
+    *(short*)(particle + 0x28) = sVar5;
+    fVar2 = ppvSinTbl[(uVar1 + 0x4000 & 0xffff) >> 2];
+    dVar9 = (double)ppvSinTbl[(uVar1 & 0xffff) >> 2];
+    *(short*)(particle + 0x38) =
+        (short)uVar3 +
+        ((short)((unsigned long long)((long long)(int)uVar3 * 0xb60b60b7) >> 0x28) -
+         (short)(((int)uVar3 / 0x168 + ((int)uVar3 >> 0x1f)) >> 0x1f)) *
+            (short)-0x168;
+    dVar8 = (double)(float)(dVar10 * (double)*(float*)(ymData + 0x3c));
+    fVar2 = fVar2 * (float)((double)*(float*)(vData + 0x1c) + dVar8);
+    *(float*)(particle + 0x00) = fVar2;
+    *(float*)(particle + 0x10) = fVar2;
+    dVar7 = (double)RandF__5CMathFf(*(float*)(ymData + 0x40), &Math);
+    *(float*)(particle + 0x04) = (float)dVar7;
+    *(float*)(particle + 0x14) = (float)dVar7;
+    fVar2 = (float)(dVar9 * (double)(float)((double)*(float*)(vData + 0x1c) + dVar8));
+    *(float*)(particle + 0x08) = fVar2;
+    *(float*)(particle + 0x18) = fVar2;
     local_70 = *(float*)(particle + 0x10);
     local_6c = *(float*)(particle + 0x14);
     local_68 = *(float*)(particle + 0x18);
     pppNormalize__FR3Vec3Vec((float*)(particle + 0x10), (Vec*)&local_70);
-
     if (Game.game.m_currentSceneId != 7) {
         local_88 = pppMngStPtr->m_matrix.value[0][3];
         local_84 = pppMngStPtr->m_matrix.value[1][3];
@@ -122,30 +128,34 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         local_5c = local_80;
         pppAddVector__FR3Vec3Vec3Vec((Vec*)particle, (Vec*)&local_7c, (Vec*)&local_88);
     }
-
-    *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x48) +
-                               ((s16)randomValue - (s16)((int)randomValue / (int)(u32)*(u8*)(ymData + 0x49)) *
-                                                        (u16)*(u8*)(ymData + 0x49));
+    *(u16*)(particle + 0x22) =
+        (u16)*(u8*)(ymData + 0x48) +
+        ((short)uVar3 - (short)((int)uVar3 / (int)(u32)*(u8*)(ymData + 0x49)) * (u16)*(u8*)(ymData + 0x49));
     *(u16*)(particle + 0x20) = (u16)*(u8*)(ymData + 0x24);
     *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x25);
     *(u16*)(particle + 0x24) = (u16)*(u8*)(ymData + 0x26);
     *(u16*)(particle + 0x26) = 0;
-
-    *(s16*)(particle + 0x30) = ((*(s16*)(ymData + 0x28) >> 7) - (u16)*(u8*)(ymData + 0x24)) / *(s16*)(ymData + 0x30);
-    *(s16*)(particle + 0x32) = ((*(s16*)(ymData + 0x2A) >> 7) - (u16)*(u8*)(ymData + 0x25)) / *(s16*)(ymData + 0x30);
-    *(s16*)(particle + 0x34) = ((*(s16*)(ymData + 0x2C) >> 7) - (u16)*(u8*)(ymData + 0x26)) / *(s16*)(ymData + 0x30);
-    *(s16*)(particle + 0x36) = ((*(s16*)(ymData + 0x2E) >> 7) - (u16)*(u8*)(ymData + 0x27)) / *(s16*)(ymData + 0x30);
-
-    *(float*)(particle + 0x3C) = *(float*)(ymData + 0x34);
-
-    randScale = randScale * (double)*(float*)(ymData + 0x14);
-    parityScale = (float)randScale;
-    parityBits = (u32)randScale;
-    paritySign = parityBits >> 31;
-    if (((parityBits & 1U) ^ paritySign) != paritySign) {
-        parityScale = parityScale * FLOAT_80330668;
+    *(short*)(particle + 0x30) = *(short*)(ymData + 0x28) >> 7;
+    *(u16*)(particle + 0x30) = *(short*)(particle + 0x30) - (u16)*(u8*)(ymData + 0x24);
+    *(short*)(particle + 0x30) = *(short*)(particle + 0x30) / *(short*)(ymData + 0x30);
+    *(short*)(particle + 0x32) = *(short*)(ymData + 0x2a) >> 7;
+    *(u16*)(particle + 0x32) = *(short*)(particle + 0x32) - (u16)*(u8*)(ymData + 0x25);
+    *(short*)(particle + 0x32) = *(short*)(particle + 0x32) / *(short*)(ymData + 0x30);
+    *(short*)(particle + 0x34) = *(short*)(ymData + 0x2c) >> 7;
+    *(u16*)(particle + 0x34) = *(short*)(particle + 0x34) - (u16)*(u8*)(ymData + 0x26);
+    *(short*)(particle + 0x34) = *(short*)(particle + 0x34) / *(short*)(ymData + 0x30);
+    *(short*)(particle + 0x36) = *(short*)(ymData + 0x2e) >> 7;
+    *(u16*)(particle + 0x36) = *(short*)(particle + 0x36) - (u16)*(u8*)(ymData + 0x27);
+    *(short*)(particle + 0x36) = *(short*)(particle + 0x36) / *(short*)(ymData + 0x30);
+    *(float*)(particle + 0x3c) = *(float*)(ymData + 0x34);
+    dVar10 = dVar10 * (double)*(float*)(ymData + 0x14);
+    fVar2 = (float)dVar10;
+    uVar1 = (u32)dVar10;
+    uVar3 = uVar1 >> 0x1f;
+    if (((uVar1 & 1) ^ uVar3) != uVar3) {
+        fVar2 = fVar2 * FLOAT_80330668;
     }
-    *(float*)(particle + 0x40) = *(float*)(ymData + 0x10) + parityScale;
+    *(float*)(particle + 0x40) = *(float*)(ymData + 0x10) + fVar2;
     *(u16*)(particle + 0x44) = *(u16*)(ymData + 0x50);
     *(u16*)(particle + 0x46) = *(u16*)(ymData + 0x52);
     *(u8*)(particle + 0x48) = 0;

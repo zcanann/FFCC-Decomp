@@ -1,9 +1,11 @@
 #include "ffcc/pppScreenQuake.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
 
+extern struct {
+    char pad[0x4C8];
+} CameraPcs;
 
 extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
     void*,

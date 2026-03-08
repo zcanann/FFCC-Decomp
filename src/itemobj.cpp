@@ -93,7 +93,7 @@ extern float FLOAT_80331b9c;
 extern float FLOAT_80331bbc;
 extern float FLOAT_80331b68;
 extern double DOUBLE_80331ba0;
-long long DAT_8032ee90;
+u32 DAT_8032ee90;
 extern char SoundBuffer[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
@@ -1057,10 +1057,8 @@ void CGItemObj::loadModel()
  */
 void CGItemObj::onNewFinished()
 {
-	unsigned char* self = (unsigned char*)this;
-
-	*(float*)(self + 0x568) = *(float*)(self + 0x144);
-	*(unsigned short*)(self + 0x560) = (unsigned short)((DAT_8032ee90 >> 3) & 1);
+	*(u32*)((u8*)this + 0x568) = *(u32*)((u8*)this + 0x144);
+	*(u16*)((u8*)this + 0x560) = (u16)((DAT_8032ee90 >> 3) & 1);
 	loadModel();
 }
 

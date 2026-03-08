@@ -53,7 +53,7 @@ struct VertexApSource
 
 struct _pppPDataVal;
 
-extern CMath math;
+extern CMath Math;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -118,7 +118,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        s32 count = data->spawnCount;
+        u16* vertexIndices = entry->vertexIndices;
+        u8 count = data->spawnCount;
 
         switch (data->mode) {
         case 0:
@@ -128,7 +129,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 }
 
                 u16 index = state->index++;
-                u16 vertexIndex = entry->vertexIndices[index];
+                u16 vertexIndex = vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -165,7 +166,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             break;
         case 1:
             do {
-                u16 vertexIndex = entry->vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&math))];
+                u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -207,4 +208,3 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
-

@@ -4,6 +4,10 @@
 #include "dolphin/os/__os.h"
 #include <dolphin/dvd/__dvd.h>
 
+extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
+extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
+extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
+
 static int Prepared;
 
 static void* SaveStart;
@@ -32,7 +36,7 @@ static void Callback(s32, DVDCommandBlock*) {
     Prepared = TRUE;
 }
 
-static int IsStreamEnabled(void) {
+int IsStreamEnabled(void) {
     if (DVDGetCurrentDiskID()->streaming) {
         return TRUE;
     }
@@ -66,9 +70,9 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     *(volatile u32*)0x817FFFFC = 0;
     *(volatile u32*)0x817FFFF8 = 0;
-    *(volatile u8*)0x800030E2 = 1;
-    *(volatile u32*)0x812FDFF0 = (u32)SaveStart;
-    *(volatile u32*)0x812FDFEC = (u32)SaveEnd;
+    g_unk_800030E2 = 1;
+    BOOT_REGION_START = (u32)SaveStart;
+    BOOT_REGION_END = (u32)SaveEnd;
 
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(&exceptionContext);

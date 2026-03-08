@@ -41,57 +41,38 @@ void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
 void Quit__12CFlatRuntimeFv(void*);
 void Destroy__13CFlatRuntime2Fv(void*);
-void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
-void DestroyMap__7CMapMngFv(void*);
 void Quit__11CDbgMenuPcsFv(void*);
 void Quit__6CMcPcsFv(void*);
 void Quit__7CGbaPcsFv(void*);
-void Quit__8CMenuPcsFv(void*);
 void Quit__7CUSBPcsFv(void*);
 void Quit__6CCharaFv(void*);
-void Quit__9CCharaPcsFv(void*);
 void Quit__9CLightPcsFv(void*);
 void Quit__7CMapPcsFv(void*);
 void Quit__18CMaterialEditorPcsFv(void*);
 void Quit__14CFunnyShapePcsFv(void*);
 void Quit__11CGraphicPcsFv(void*);
-void Quit__10CCameraPcsFv(void*);
-void createLoad__9CSoundPcsFv(void*);
-void createLoad__9CCharaPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
 void pppDeleteAll__8CPartMngFv(void*);
 void pppDestroyAll__8CPartMngFv(void*);
 int pppGetIfDt__8CPartMngFs(void*, short);
 void pppEndPart__8CPartMngFi(void*, int);
-void Init__10CCameraPcsFv(void*);
 void Init__11CGraphicPcsFv(void*);
 void Init__6CCharaFv(void*);
 void Init__9CLightPcsFv(void*);
-void Init__9CCharaPcsFv(void*);
 void Init__7CMapPcsFv(void*);
 void Init__18CMaterialEditorPcsFv(void*);
 void Init__14CFunnyShapePcsFv(void*);
 void Init__7CUSBPcsFv(void*);
-void Init__8CMenuPcsFv(void*);
 void Init__7CGbaPcsFv(void*);
 void Init__6CMcPcsFv(void*);
 void Init__11CDbgMenuPcsFv(void*);
-void Reset__9CCharaPcsFQ29CCharaPcs5RESET(void*, int);
-void StopAndFreeAllSe__6CSoundFi(void*, int);
 void ClearAll__5CWindFv(void*);
-void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 void Init__12CFlatRuntimeFv(void*);
 int Load__13CFlatRuntime2FPc(void*, char*);
 void ResetNewGame__13CFlatRuntime2Fv(void*);
 void InitFurTexBuffer__6CCharaFv(void*);
-void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
-void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 int intToClass__13CFlatRuntime2Fi(void*, int);
 int sprintf(char*, const char*, ...);
-void ScriptChanging__7CSystemFPc(CSystem*, char*);
-void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
-void MapChanging__7CSystemFii(CSystem*, int, int);
-void MapChanged__7CSystemFiii(CSystem*, int, int, int);
 void Draw__13CFlatRuntime2Fv(void*);
 void Frame__13CFlatRuntime2Fii(void*, int, int);
 void AfterFrame__12CFlatRuntimeFi(void*, int);
@@ -335,23 +316,23 @@ void CGame::Init()
         m_gameWork.m_languageId = 1;
     }
 
-    Init__10CCameraPcsFv(&CameraPcs);
+    CameraPcs.Init();
     Init__11CGraphicPcsFv(&GraphicsPcs);
     Init__6CCharaFv(Chara);
     Init__9CLightPcsFv(&LightPcs);
-    Init__9CCharaPcsFv(&CharaPcs);
+    CharaPcs.Init();
     Init__7CMapPcsFv(&MapPcs);
     Init__18CMaterialEditorPcsFv(&MaterialEditorPcs);
     Init__14CFunnyShapePcsFv(&FunnyShapePcs);
     Init__7CUSBPcsFv(&USBPcs);
-    Init__8CMenuPcsFv(&MenuPcs);
+    MenuPcs.Init();
     Init__7CGbaPcsFv(&GbaPcs);
     Init__6CMcPcsFv(McPcs);
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
 
-    m_mainStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x106000, s_mainStageName, 0);
+    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_mainStageName), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
-        m_debugStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x220000, s_debugStageName, 1);
+        m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(s_debugStageName), 1);
     }
 
     m_sceneId = 4;
@@ -378,23 +359,23 @@ void CGame::Quit()
 	Quit__12CFlatRuntimeFv(CFlat);
 
 	if (m_debugStage != 0) {
-		DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_debugStage);
+		Memory.DestroyStage(m_debugStage);
 	}
 
-	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_mainStage);
+	Memory.DestroyStage(m_mainStage);
 	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
 	Quit__6CMcPcsFv(McPcs);
 	Quit__7CGbaPcsFv(&GbaPcs);
-	Quit__8CMenuPcsFv(&MenuPcs);
+	MenuPcs.Quit();
 	Quit__7CUSBPcsFv(&USBPcs);
 	Quit__6CCharaFv(Chara);
-	Quit__9CCharaPcsFv(&CharaPcs);
+	CharaPcs.Quit();
 	Quit__9CLightPcsFv(&LightPcs);
 	Quit__7CMapPcsFv(&MapPcs);
 	Quit__18CMaterialEditorPcsFv(&MaterialEditorPcs);
 	Quit__14CFunnyShapePcsFv(&FunnyShapePcs);
 	Quit__11CGraphicPcsFv(&GraphicsPcs);
-	Quit__10CCameraPcsFv(&CameraPcs);
+	CameraPcs.Quit();
 }
 
 /*
@@ -405,12 +386,12 @@ void CGame::Quit()
 void CGame::LoadLogoWaitingData()
 {
 	if (m_assetsLoadedFlag == 0) {
-		createLoad__9CSoundPcsFv(&SoundPcs);
-		createLoad__9CCharaPcsFv(&CharaPcs);
+		SoundPcs.createLoad();
+		CharaPcs.createLoad();
 		createLoad__8CPartPcsFv(&PartPcs);
 		m_assetsLoadedFlag = 1;
 		if (System.m_execParam > 2) {
-			Printf__7CSystemFPce(&System, DAT_801d61dc);
+			System.Printf(const_cast<char*>(DAT_801d61dc));
 		}
 	}
 }
@@ -581,8 +562,8 @@ void CGame::Create()
         mapVariant = m_currentMapVariantId;
         mapId = m_currentMapId;
 
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_game_cpp_801d6190, 0x24E);
-        MapChanging__7CSystemFii(&System, mapId, mapVariant);
+        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
+        System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
         m_currentMapVariantId = mapVariant;
@@ -590,7 +571,7 @@ void CGame::Create()
         LoadMap__7CMapPcsFiiPvUlUc(&MapPcs, mapId, mapVariant, 0, 0, 0);
         LoadFieldPdt__8CPartPcsFiiPvUlUc(&PartPcs, mapId, mapVariant, 0, 0, 0);
 
-        MapChanged__7CSystemFiii(&System, mapId, mapVariant, 1);
+        System.MapChanged(mapId, mapVariant, 1);
     }
 }
 
@@ -615,9 +596,9 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
-    Printf__7CSystemFPce(&System, DAT_801d6214);
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    System.Printf(const_cast<char*>(DAT_8032f6a0));
+    System.Printf(const_cast<char*>(DAT_801d6214));
+    System.Printf(const_cast<char*>(DAT_8032f6a0));
 
     memset(reinterpret_cast<u8*>(&Game.game) + 0xF, 0, 0x13E1);
     memset(reinterpret_cast<u8*>(&Game.game) + 0x20, 0xFF, 0x10);
@@ -685,9 +666,9 @@ void CGame::clearWork()
     m_gameWork.m_soundOptionFlag = '\0';
     m_gameWork.m_gameOverFlag = '\0';
 
-    DestroyMap__7CMapMngFv(&MapMng);
-    Reset__9CCharaPcsFQ29CCharaPcs5RESET(&CharaPcs, 0);
-    StopAndFreeAllSe__6CSoundFi(&Sound, 0);
+    MapMng.DestroyMap();
+    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
+    Sound.StopAndFreeAllSe(0);
     ClearAll__5CWindFv(Wind);
 
     *((u8*)&Sound + 0x8892) = 0x7F;
@@ -777,13 +758,13 @@ void CGame::CheckScriptChange()
     }
 
     m_newGameFlag = 0;
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_game_cpp_801d6190, 0x205);
+    Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x205);
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, DAT_801d619c);
+        System.Printf(const_cast<char*>(DAT_801d619c));
     }
 
-    ScriptChanging__7CSystemFPc(&System, m_nextScript.m_name);
+    System.ScriptChanging(m_nextScript.m_name);
 
     if (strcmp(m_nextScript.m_name, DAT_8032f698) != 0) {
         if (m_cfdLoadedFlag == 0) {
@@ -792,18 +773,18 @@ void CGame::CheckScriptChange()
             m_cfdLoadedFlag = 1;
 
             if (System.m_execParam > 2) {
-                Printf__7CSystemFPce(&System, DAT_801d61b8);
+                System.Printf(const_cast<char*>(DAT_801d61b8));
             }
         }
 
         if (m_assetsLoadedFlag == 0) {
-            createLoad__9CSoundPcsFv(&SoundPcs);
-            createLoad__9CCharaPcsFv(&CharaPcs);
+            SoundPcs.createLoad();
+            CharaPcs.createLoad();
             createLoad__8CPartPcsFv(&PartPcs);
             m_assetsLoadedFlag = 1;
 
             if (System.m_execParam > 2) {
-                Printf__7CSystemFPce(&System, DAT_801d61dc);
+                System.Printf(const_cast<char*>(DAT_801d61dc));
             }
         }
     }
@@ -814,9 +795,9 @@ void CGame::CheckScriptChange()
     if (m_nextScript.m_flags != 0) {
         const char* townName = DAT_8032f6ac;
 
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
-        Printf__7CSystemFPce(&System, DAT_801d6214);
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        System.Printf(const_cast<char*>(DAT_801d6214));
+        System.Printf(const_cast<char*>(DAT_8032f6a0));
 
         memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
         memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
@@ -837,10 +818,10 @@ void CGame::CheckScriptChange()
         m_nextScript.m_flags = 0;
     }
 
-    ScriptChanged__7CSystemFPci(&System, m_nextScript.m_name, scriptResult);
+    System.ScriptChanged(m_nextScript.m_name, scriptResult);
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, DAT_801d6234);
+        System.Printf(const_cast<char*>(DAT_801d6234));
     }
 }
 
@@ -858,8 +839,8 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
     u32 hasParamMask;
 
     if (param5 != 0) {
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_game_cpp_801d6190, 0x24E);
-        MapChanging__7CSystemFii(&System, mapId, mapVariant);
+        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
+        System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
         m_currentMapVariantId = mapVariant;
@@ -872,7 +853,7 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
         LoadFieldPdt__8CPartPcsFiiPvUlUc(
             &PartPcs, mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
 
-        MapChanged__7CSystemFiii(&System, mapId, mapVariant, 1);
+        System.MapChanged(mapId, mapVariant, 1);
     } else {
         hasParamMask = (u32)((-param4 | param4) >> 31);
         LoadMap__7CMapPcsFiiPvUlUc(
@@ -932,9 +913,9 @@ void CGame::ScriptChanged(char*, int)
     m_gameWork.m_soundOptionFlag = 0;
     m_gameWork.m_gameOverFlag = 0;
 
-    DestroyMap__7CMapMngFv(&MapMng);
-    Reset__9CCharaPcsFQ29CCharaPcs5RESET(&CharaPcs, 0);
-    StopAndFreeAllSe__6CSoundFi(&Sound, 0);
+    MapMng.DestroyMap();
+    CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
+    Sound.StopAndFreeAllSe(0);
     ClearAll__5CWindFv(Wind);
 
     *((u8*)&Sound + 0x8892) = 0x7F;
@@ -1216,20 +1197,20 @@ void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptSte
 
 	if (callbackType == 0) {
 		if (System.m_execParam > 2) {
-			Printf__7CSystemFPce(&System, DAT_801d60d4, scriptLine, scriptStep, effectIndex, pos);
+			System.Printf(const_cast<char*>(DAT_801d60d4), scriptLine, scriptStep, effectIndex, pos);
 		}
 	} else if (callbackType == 1) {
 		*(u8*)(ifData + 7) &= ~2;
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 
 		if (System.m_execParam > 2) {
-			Printf__7CSystemFPce(&System, DAT_801d6114, scriptLine, scriptStep, effectIndex, pos);
+			System.Printf(const_cast<char*>(DAT_801d6114), scriptLine, scriptStep, effectIndex, pos);
 		}
 	} else if (callbackType == 3) {
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 
 		if (System.m_execParam > 2) {
-			Printf__7CSystemFPce(&System, DAT_801d6154, scriptLine, scriptStep, effectIndex, pos);
+			System.Printf(const_cast<char*>(DAT_801d6154), scriptLine, scriptStep, effectIndex, pos);
 		}
 	}
 }
@@ -1812,3 +1793,4 @@ CGame::CGameWork::CGameWork()
 }
 
 template class CPtrArray<CMapLightHolder*>;
+

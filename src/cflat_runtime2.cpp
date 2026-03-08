@@ -2302,10 +2302,11 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
  */
 void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
 {
-	ParticleWorkTargetX(this) = vec.x;
-	ParticleWorkTargetY(this) = vec.y;
-	ParticleWorkTargetZ(this) = vec.z;
-	ParticleWorkTargetPtr(this) = &ParticleWorkTargetX(this);
+	u8* self = reinterpret_cast<u8*>(this);
+	*reinterpret_cast<float*>(self + 0x1764) = vec.x;
+	*reinterpret_cast<float*>(self + 0x1768) = vec.y;
+	*reinterpret_cast<float*>(self + 0x176C) = vec.z;
+	*reinterpret_cast<float**>(self + 0x16D8) = reinterpret_cast<float*>(self + 0x1764);
 }
 
 /*

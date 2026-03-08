@@ -28,7 +28,7 @@ struct VtMimeData
 
 struct VtMimeSource
 {
-    short vertexCount;
+    unsigned short vertexCount;
     unsigned char pad2[0x2A];
     float* positions;
 };
@@ -138,7 +138,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     VtMimeSource* vert2Data = (VtMimeSource*)sourceTable[vertIdx2];
     float* vert1Pos = vert1Data->positions;
     float* vert2Pos = vert2Data->positions;
-    unsigned short vertCount = (unsigned short)vert1Data->vertexCount;
+    int vertCount = vert1Data->vertexCount;
     void** memPtr = &state->vertexBuffer;
 
     if (*memPtr == 0) {
@@ -147,7 +147,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 
     float* outputVerts = (float*)*memPtr;
     if (vertCount != 0) {
-        int remaining = (int)vertCount;
+        int remaining = vertCount;
         int pairCount = remaining >> 1;
         while (pairCount != 0) {
             outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
@@ -199,5 +199,4 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
         state->accel += data->addZ;
     }
 }
-
 

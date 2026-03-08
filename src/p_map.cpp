@@ -251,9 +251,7 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
 {
     CMapMng* mapMng = &MapMng;
     unsigned int value = 0;
-    int count = 2;
-
-    while (true) {
+    for (int count = 2; count != 0; count--) {
         if (*(int*)((char*)mapMng + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
@@ -276,18 +274,14 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
             return (unsigned long long)value;
         }
         if (*(int*)((char*)mapMng + 0x22A48) != 0) {
-            break;
+            return (unsigned long long)value;
         }
 
         mapMng = (CMapMng*)((char*)mapMng + 0xC);
         value += 7;
-        count--;
-        if (count == 0) {
-            return ((unsigned long long)1 << 32) | value;
-        }
     }
 
-    return (unsigned long long)value;
+    return ((unsigned long long)1 << 32) | value;
 }
 
 /*

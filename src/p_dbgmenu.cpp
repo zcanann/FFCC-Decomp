@@ -772,64 +772,64 @@ void CDbgMenuPcs::Add()
 		return;
 	}
 
-	u32 rootParam[13];
-	u32 nodeParam[13];
-	u32 actionParam[13];
-	u32* menuDefs = (u32*)PTR_DAT_80212524;
+	CDMParam rootParam;
+	CDMParam nodeParam;
+	CDMParam actionParam;
+	DbgMenuDef* menuDefs = PTR_DAT_80212524;
 
-	memset(rootParam, 0, sizeof(rootParam));
-	memset(nodeParam, 0, sizeof(nodeParam));
+	memset(&rootParam, 0, sizeof(rootParam));
+	memset(&nodeParam, 0, sizeof(nodeParam));
 
-	rootParam[0] = 0;
-	rootParam[1] = 0;
-	rootParam[2] = 0;
-	rootParam[3] = 0;
-	rootParam[4] = 100;
-	rootParam[5] = 0x32;
-	rootParam[6] = 0xDC;
-	rootParam[7] = 0x180;
-	rootParam[8] = 0;
-	rootParam[9] = (u32)s_Debug_80331c90;
-	rootParam[10] = 0;
-	rootParam[11] = 0;
-	rootParam[12] = 0;
-	Add(0, 10, *(CDMParam*)rootParam);
+	rootParam.m_type = 0;
+	rootParam.m_flags = 0;
+	rootParam.m_x = 0;
+	rootParam.m_y = 0;
+	rootParam.m_width = 100;
+	rootParam.m_height = 0x32;
+	rootParam.m_unk18 = 0xDC;
+	rootParam.m_unk1C = 0x180;
+	rootParam.m_unk20 = 0;
+	rootParam.m_text = s_Debug_80331c90;
+	rootParam.m_unk28 = 0;
+	rootParam.m_unk2C = 0;
+	rootParam.m_unk30 = 0;
+	Add(0, 10, rootParam);
 
 	int y = 10;
 	for (int i = 0; i < 0x17; i++) {
-		memset(nodeParam, 0, sizeof(nodeParam));
-		nodeParam[0] = 1;
-		nodeParam[1] = 0;
-		nodeParam[2] = 0;
-		nodeParam[3] = 0;
-		nodeParam[4] = 10;
-		nodeParam[5] = y;
-		nodeParam[6] = 0;
-		nodeParam[7] = 0;
-		nodeParam[8] = 0;
-		nodeParam[9] = menuDefs[0];
-		nodeParam[10] = 0;
-		nodeParam[11] = 0;
-		nodeParam[12] = 0;
-		Add(10, 1, *(CDMParam*)nodeParam);
+		memset(&nodeParam, 0, sizeof(nodeParam));
+		nodeParam.m_type = 1;
+		nodeParam.m_flags = 0;
+		nodeParam.m_x = 0;
+		nodeParam.m_y = 0;
+		nodeParam.m_width = 10;
+		nodeParam.m_height = y;
+		nodeParam.m_unk18 = 0;
+		nodeParam.m_unk1C = 0;
+		nodeParam.m_unk20 = 0;
+		nodeParam.m_text = const_cast<char*>(menuDefs->text);
+		nodeParam.m_unk28 = 0;
+		nodeParam.m_unk2C = 0;
+		nodeParam.m_unk30 = 0;
+		Add(10, 1, nodeParam);
 
-		memset(actionParam, 0, sizeof(actionParam));
-		actionParam[0] = menuDefs[2];
-		actionParam[1] = menuDefs[3];
-		actionParam[2] = 0;
-		actionParam[3] = 0;
-		actionParam[4] = 0xB4;
-		actionParam[5] = y;
-		actionParam[6] = 0;
-		actionParam[7] = 0;
-		actionParam[8] = 0;
-		actionParam[9] = 0;
-		actionParam[10] = 0;
-		actionParam[11] = 0;
-		actionParam[12] = 0;
-		Add(10, menuDefs[1], *(CDMParam*)actionParam);
+		memset(&actionParam, 0, sizeof(actionParam));
+		actionParam.m_type = menuDefs->actionType;
+		actionParam.m_flags = menuDefs->actionFlags;
+		actionParam.m_x = 0;
+		actionParam.m_y = 0;
+		actionParam.m_width = 0xB4;
+		actionParam.m_height = y;
+		actionParam.m_unk18 = 0;
+		actionParam.m_unk1C = 0;
+		actionParam.m_unk20 = 0;
+		actionParam.m_text = 0;
+		actionParam.m_unk28 = 0;
+		actionParam.m_unk2C = 0;
+		actionParam.m_unk30 = 0;
+		Add(10, menuDefs->id, actionParam);
 
-		menuDefs += 4;
+		menuDefs++;
 		y += 0x10;
 	}
 }
@@ -855,23 +855,15 @@ void CDbgMenuPcs::CDMParam::operator= (const CDbgMenuPcs::CDMParam&)
  */
 void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 {
-	int parent = searchID(parentID, m_rootMenuNode);
-	int freeIdx = 0;
-	int remaining = 0x80;
-	int cur = (int)this;
-	CDM* menu;
-	do {
-		if ((s8)*(u8*)(cur + 0x90) >= 0) {
-			menu = &m_menuPool[freeIdx];
-			goto found_slot;
+	CDM* parentMenu = reinterpret_cast<CDM*>(searchID(parentID, m_rootMenuNode));
+	CDM* menu = 0;
+	for (int i = 0; i < 0x80; i++) {
+		if ((s8)m_menuPool[i].m_status >= 0) {
+			menu = &m_menuPool[i];
+			break;
 		}
-		cur += 0x54;
-		freeIdx++;
-		remaining--;
-	} while (remaining != 0);
-	menu = 0;
+	}
 
-found_slot:
 	memset(&menu->m_status, 0, 0x20);
 	menu->m_status = (menu->m_status & 0x7F) | 0x80;
 
@@ -889,7 +881,6 @@ found_slot:
 	menu->m_unk2C = param.m_unk2C;
 	menu->m_state = static_cast<s32>(param.m_unk30);
 
-	CDM* parentMenu = (CDM*)parent;
 	menu->m_parent = parentMenu;
 	menu->m_prev = menu;
 	menu->m_next = menu;

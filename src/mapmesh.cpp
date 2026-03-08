@@ -533,11 +533,10 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
         materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
     }
 
-    unsigned int remaining = static_cast<unsigned int>(U16At(this, 0xA));
+    int remaining = static_cast<int>(U16At(this, 0xA));
     MeshDrawEntry* entry = DrawEntries(this);
 
-    while (remaining != 0) {
-        remaining--;
+    while (remaining-- != 0) {
         if (entry->size != 0) {
             SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->materialIdx);
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->materialIdx, 0,

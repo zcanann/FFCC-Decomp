@@ -360,14 +360,14 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 		uVar7 = uVar2;
 		if (uVar6 != 0) {
 			do {
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x20));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x40));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x60));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x80));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xA0));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xC0));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xE0));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x20));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x40));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x60));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x80));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xA0));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xC0));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xE0));
 				iVar5 += 0x100;
 				uVar6--;
 			} while (uVar6 != 0);
@@ -377,7 +377,7 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 			}
 		}
 		do {
-			dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+			dataCacheBlockInvalidate((void*)(param_1 + iVar5));
 			iVar5 += 0x20;
 			uVar7--;
 		} while (uVar7 != 0);

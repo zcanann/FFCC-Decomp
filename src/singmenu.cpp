@@ -2578,7 +2578,24 @@ char* CMenuPcs::GetHairStr(int index)
  */
 char* CMenuPcs::GetMenuStr(int index)
 {
-    return GetLanguageTableString(index, gSingMenuTextTableEn, gSingMenuTextTableDe, gSingMenuTextTableIt, gSingMenuTextTableFr, gSingMenuTextTableEs);
+    u8 languageId = Game.game.m_gameWork.m_languageId;
+
+    if (languageId == 3) {
+        return gSingMenuTextTableIt[index];
+    }
+    if (languageId < 3) {
+        if ((languageId == 0) || (languageId == 1)) {
+            return gSingMenuTextTableEn[index];
+        }
+        return gSingMenuTextTableDe[index];
+    }
+    if (languageId == 5) {
+        return gSingMenuTextTableEs[index];
+    }
+    if (languageId < 5) {
+        return gSingMenuTextTableFr[index];
+    }
+    return gSingMenuTextTableEn[index];
 }
 
 /*

@@ -35,17 +35,15 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 {
     float scale;
     struct _pppMngSt* pppMngSt;
-    unsigned char* camera;
     Vec cameraPos;
     Vec objPos;
     Mtx scaleMtx;
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        camera = reinterpret_cast<unsigned char*>(&CameraPcs);
-        cameraPos.x = *reinterpret_cast<float*>(camera + 0xE0);
-        cameraPos.y = *reinterpret_cast<float*>(camera + 0xE4);
-        cameraPos.z = *reinterpret_cast<float*>(camera + 0xE8);
+        cameraPos.x = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE0);
+        cameraPos.y = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE4);
+        cameraPos.z = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE8);
 
         objPos.x = pppMngStPtr->m_matrix.value[0][3];
         objPos.y = pppMngStPtr->m_matrix.value[1][3];

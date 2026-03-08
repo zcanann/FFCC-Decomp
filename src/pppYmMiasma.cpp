@@ -128,7 +128,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         local_5c = local_80;
         pppAddVector__FR3Vec3Vec3Vec((Vec*)particle, (Vec*)&local_7c, (Vec*)&local_88);
     }
-    *(u16*)(particle + 0x22) =
+    *(u16*)(particle + 0x28) =
         (u16)*(u8*)(ymData + 0x48) +
         ((short)uVar3 - (short)((int)uVar3 / (int)(u32)*(u8*)(ymData + 0x49)) * (u16)*(u8*)(ymData + 0x49));
     *(u16*)(particle + 0x20) = (u16)*(u8*)(ymData + 0x24);

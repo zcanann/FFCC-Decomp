@@ -1589,21 +1589,21 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
  */
 double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
 {
-    unsigned int denom;
+    int denom;
     float result;
     float span;
 
     if (mode == 0) {
-        denom = static_cast<unsigned int>(listSize - 8);
+        denom = listSize - 8;
     } else {
-        denom = static_cast<unsigned int>(listSize - 1);
+        denom = listSize - 1;
     }
 
-    span = static_cast<float>(SingWinUIntToDouble(denom));
+    span = static_cast<float>(static_cast<double>(denom));
 
     result = FLOAT_8033299c;
     if ((FLOAT_8033294c < span) && (8 < listSize)) {
-        result = (FLOAT_803329a0 * (static_cast<float>(SingWinUIntToDouble(static_cast<unsigned int>(listPos))) / span)) +
+        result = (FLOAT_803329a0 * (static_cast<float>(static_cast<double>(listPos)) / span)) +
                  FLOAT_8033292c;
     }
 

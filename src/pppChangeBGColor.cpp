@@ -17,7 +17,6 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
                            _pppCtrlTable* param_3)
 {
     unsigned char* data;
-    unsigned char* mapMngBase;
     unsigned char* mapMng;
     int dataOffset;
 
@@ -25,16 +24,14 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
         return;
     }
 
-    dataOffset = param_3->m_serializedDataOffsets[1] + 0x80;
-    mapMngBase = reinterpret_cast<unsigned char*>(&MapMng);
-    mapMng = mapMngBase + 0x20000;
-    mapMng[0x2989] = 1;
-    data = reinterpret_cast<unsigned char*>(pppChangeBGColor);
-    data = data + dataOffset;
-    mapMng[0x2990] = data[8];
-    mapMng[0x2991] = data[9];
-    mapMng[0x2992] = data[10];
-    mapMng[0x2993] = data[11];
+    dataOffset = param_3->m_serializedDataOffsets[1];
+    data = reinterpret_cast<unsigned char*>(pppChangeBGColor) + dataOffset + 0x88;
+    mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    mapMng[0x22989] = 1;
+    mapMng[0x22990] = data[0];
+    mapMng[0x22991] = data[1];
+    mapMng[0x22992] = data[2];
+    mapMng[0x22993] = data[3];
 }
 
 /*

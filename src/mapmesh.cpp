@@ -643,7 +643,7 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
     int remaining = static_cast<int>(U16At(this, 0xA));
     MeshDrawEntry* entry = DrawEntries(this);
 
-    while (remaining != 0) {
+    while (remaining-- != 0) {
         if (entry->size != 0) {
             if (entry->materialIdx == 0xFFFF) {
                 entry->materialIdx = 0;
@@ -652,7 +652,6 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
             }
         }
         entry++;
-        remaining--;
     }
 }
 

@@ -482,7 +482,7 @@ static void __GXVerifCopy(void* dest, u8 clear) {
  */
 void GXCopyDisp(void* dest, GXBool clear) {
     u32 reg;
-    u32 oldPeCtrl;
+    u32 peCtrl;
     GXBool disablePeCtrl;
 
     CHECK_GXBEGIN(1833, "GXCopyDisp");
@@ -493,7 +493,8 @@ void GXCopyDisp(void* dest, GXBool clear) {
 
     if (clear) {
         reg = __GXData->zmode;
-        reg = (reg & 0xFFFFFFF0) | 0xF;
+        reg = (reg & ~1) | 1;
+        reg = (reg & ~0xE) | 0xE;
         GX_WRITE_RAS_REG(reg);
 
         reg = __GXData->cmode0;
@@ -502,10 +503,12 @@ void GXCopyDisp(void* dest, GXBool clear) {
     }
 
     disablePeCtrl = FALSE;
-    oldPeCtrl = __GXData->peCtrl;
-    if ((clear || ((oldPeCtrl & 7) == 3)) && (((oldPeCtrl >> 6) & 1) == 1)) {
-        disablePeCtrl = TRUE;
-        GX_WRITE_RAS_REG(oldPeCtrl & 0xFFFFFFBF);
+    if (clear || ((__GXData->peCtrl & 7) == 3)) {
+        peCtrl = __GXData->peCtrl;
+        if (((peCtrl >> 6) & 1) == 1) {
+            disablePeCtrl = TRUE;
+            GX_WRITE_RAS_REG(peCtrl & 0xFFFFFFBF);
+        }
     }
 
     GX_WRITE_RAS_REG(__GXData->cpDispSrc);

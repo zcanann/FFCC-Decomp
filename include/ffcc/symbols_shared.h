@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-extern float kPppAcceleZero;
+extern const float kPppAcceleZero;
 extern float kPppMoveZero;
 extern const float kPppKeLnsZero;
 extern const float kKeLnsLineDefaultLength;
@@ -36,7 +36,7 @@ extern char* gSingMenuAttrTableIt[];
 extern char* gSingMenuAttrTableFr[];
 extern char* gSingMenuAttrTableEs[];
 extern unsigned char gMenuProcessTable[];
-extern f32 kMenuInitOne;
+extern const f32 kMenuInitOne;
 
 extern unsigned char gFontResArchiveData[];
 

@@ -31,7 +31,7 @@ extern float gPppYmLookOnOne;
 
 extern float kPppZero;
 extern float kPppOne;
-extern float kPppAcceleZero;
+extern const float kPppAcceleZero;
 extern float kPppBreathModelZero;
 extern float kPppChangeTexInit;
 extern float kPppKeLnsZero;

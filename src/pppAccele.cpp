@@ -1,6 +1,8 @@
 #include "ffcc/pppAccele.h"
 #include "ffcc/symbols_shared.h"
 
+const float kPppAcceleZero = 0.0f;
+
 
 /*
  * --INFO--

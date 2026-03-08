@@ -22,7 +22,7 @@ public:
     void SetOrthoEnv();
     int GetNoise(unsigned char);
     void GetSplinePos(Vec&, Vec, Vec, Vec, Vec, float, float);
-    void ConvI2FVector(Vec&, S16Vec&, long);
+    void ConvI2FVector(Vec&, S16Vec, long);
     void ConvF2IVector(S16Vec&, Vec, long);
     void ConvF2IVector2d(S16Vec2d&, Vec2d, long);
     void RenderQuadNoTex(Vec, Vec, _GXColor);

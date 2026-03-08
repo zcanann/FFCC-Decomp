@@ -334,8 +334,9 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     *(u32*)(model + 0x104) = 0;
 
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_pppEmission_cpp_801db7e8, 0x118);
-    if ((s32)state[0] != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)state[0]);
+    CMemory::CStage* stage = (CMemory::CStage*)state[0];
+    if (stage != (CMemory::CStage*)0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(stage);
         state[0] = 0;
     }
 

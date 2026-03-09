@@ -1145,20 +1145,36 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    unsigned char* busy = reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4;
+    unsigned int* busy = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4);
     int count = 2;
 
     do {
-        if (busy[0] != 0) return 0;
-        if (busy[1] != 0) return 0;
-        if (busy[2] != 0) return 0;
-        if (busy[3] != 0) return 0;
-        if (busy[4] != 0) return 0;
-        if (busy[5] != 0) return 0;
-        if (busy[6] != 0) return 0;
-        if (busy[7] != 0) return 0;
+        if (busy[0] != 0) {
+            return 0;
+        }
+        if (busy[1] != 0) {
+            return 0;
+        }
+        if (busy[2] != 0) {
+            return 0;
+        }
+        if (busy[3] != 0) {
+            return 0;
+        }
+        if (busy[4] != 0) {
+            return 0;
+        }
+        if (busy[5] != 0) {
+            return 0;
+        }
+        if (busy[6] != 0) {
+            return 0;
+        }
+        if (busy[7] != 0) {
+            return 0;
+        }
 
-        busy += 8;
+        busy += 8U;
         count--;
     } while (count != 0);
 

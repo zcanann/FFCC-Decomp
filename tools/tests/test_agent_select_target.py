@@ -2,6 +2,7 @@ import unittest
 import tempfile
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 from tools import agent_select_target
 
@@ -119,6 +120,50 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(candidates[0]["matched_functions"], 0)
         self.assertEqual(candidates[0]["total_code"], 0)
         self.assertEqual(candidates[0]["total_data"], 0)
+
+
+class BlacklistLoadingTests(unittest.TestCase):
+    def _state_path(self, home):
+        return home / ".openclaw/workspace/memory/decomp-state.json"
+
+    def test_load_blacklist_returns_empty_when_state_file_missing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            home = Path(tmpdir)
+            with patch("tools.agent_select_target.Path.home", return_value=home):
+                self.assertEqual(agent_select_target.load_blacklist(), [])
+
+    def test_load_blacklist_returns_empty_for_malformed_json(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            home = Path(tmpdir)
+            state_path = self._state_path(home)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text("{not-json", encoding="utf-8")
+
+            with patch("tools.agent_select_target.Path.home", return_value=home):
+                self.assertEqual(agent_select_target.load_blacklist(), [])
+
+    def test_load_blacklist_returns_empty_for_unreadable_state_path(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            home = Path(tmpdir)
+            state_path = self._state_path(home)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.mkdir(parents=False, exist_ok=True)
+
+            with patch("tools.agent_select_target.Path.home", return_value=home):
+                self.assertEqual(agent_select_target.load_blacklist(), [])
+
+    def test_load_blacklist_returns_recent_failures(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            home = Path(tmpdir)
+            state_path = self._state_path(home)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(
+                json.dumps({"recentFailures": ["unitA", "unitB"]}),
+                encoding="utf-8",
+            )
+
+            with patch("tools.agent_select_target.Path.home", return_value=home):
+                self.assertEqual(agent_select_target.load_blacklist(), ["unitA", "unitB"])
 
 
 if __name__ == "__main__":

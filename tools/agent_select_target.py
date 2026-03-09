@@ -50,7 +50,7 @@ def load_blacklist():
         with open(state_file) as f:
             state = json.load(f)
         return state.get("recentFailures", [])
-    except:
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
         return []
 
 

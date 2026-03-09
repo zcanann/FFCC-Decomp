@@ -7,8 +7,6 @@
 #include "dolphin/mtx.h"
 
 extern _pppMngSt* pppMngStPtr;
-extern float ppvSinTbl[];
-
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
@@ -100,11 +98,11 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     pppNormalize__FR3Vec3Vec((float*)&direction, &normalizedSource);
 
     u32 sinIndex = (u32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
-    f32 parabolaScale = (f32)(frameCount * (double)(work[0] * *(f32*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC))));
+    f32 parabolaScale = (f32)(frameCount * (double)(work[0] * *(f32*)((u8*)gPppTrigTable + ((sinIndex + 0x4000) & 0xFFFC))));
     f32 posX = direction.x * parabolaScale;
     f32 posZ = direction.z * parabolaScale;
     f32 posY = (f32)(
-        frameCount * (double)(work[0] * *(f32*)((u8*)ppvSinTbl + (sinIndex & 0xFFFC))) -
+        frameCount * (double)(work[0] * *(f32*)((u8*)gPppTrigTable + (sinIndex & 0xFFFC))) -
         (double)(f32)(frameCount * (double)(f32)((double)(gPppYmMoveParabolaGravityScale * stepData->m_initWOrk) * frameCount)));
 
     Vec newPosition;

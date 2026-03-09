@@ -1,6 +1,5 @@
 #include "ffcc/p_sound.h"
 #include "ffcc/linkage.h"
-#include "ffcc/sound.h"
 
 CSoundPcs SoundPcs;
 extern "C" void* __vt__9CSoundPcs[];
@@ -8,6 +7,13 @@ extern "C" void create__9CSoundPcsFv(CSoundPcs*);
 extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
+extern "C" void LoadBlock__6CSoundFv(CSound*);
+extern "C" void CancelLoadWaveASync__6CSoundFv(CSound*);
+extern "C" void StopStream__6CSoundFv(CSound*);
+extern "C" void StopAndFreeAllSe__6CSoundFi(CSound*, int);
+extern "C" void FreeBlock__6CSoundFv(CSound*);
+extern "C" void Frame__6CSoundFv(CSound*);
+extern "C" void Draw__6CSoundFv(CSound*);
 char s_CSoundPcs_801DB4E8[] = "CSoundPcs";
 unsigned int m_table_desc0__9CSoundPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)};
 unsigned int m_table_desc1__9CSoundPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)};
@@ -109,7 +115,7 @@ void CSoundPcs::create()
  */
 void CSoundPcs::createLoad()
 {
-    Sound.LoadBlock();
+    LoadBlock__6CSoundFv(&Sound);
 }
 
 /*
@@ -123,10 +129,10 @@ void CSoundPcs::createLoad()
  */
 void CSoundPcs::destroy()
 {
-    Sound.CancelLoadWaveASync();
-    Sound.StopStream();
-    Sound.StopAndFreeAllSe(1);
-    Sound.FreeBlock();
+    CancelLoadWaveASync__6CSoundFv(&Sound);
+    StopStream__6CSoundFv(&Sound);
+    StopAndFreeAllSe__6CSoundFi(&Sound, 1);
+    FreeBlock__6CSoundFv(&Sound);
 }
 
 /*
@@ -140,7 +146,7 @@ void CSoundPcs::destroy()
  */
 void CSoundPcs::calc()
 {
-    Sound.Frame();
+    Frame__6CSoundFv(&Sound);
 }
 
 /*
@@ -155,6 +161,6 @@ void CSoundPcs::calc()
 void CSoundPcs::draw()
 {
     if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
-        Sound.Draw();
+        Draw__6CSoundFv(&Sound);
     }
 }

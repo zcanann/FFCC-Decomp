@@ -66,6 +66,55 @@ class AgentSelectTargetTests(unittest.TestCase):
         self.assertEqual(candidate["total_functions"], 0)
         self.assertEqual(candidate["top_functions"][0]["match"], 88.5)
 
+    def test_extract_candidates_skips_units_without_name(self):
+        report = {
+            "units": [
+                {
+                    "metadata": {"source_path": "src/no_name.cpp"},
+                    "measures": {"fuzzy_match_percent": 10},
+                }
+            ]
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as report_file:
+            json.dump(report, report_file)
+            report_path = Path(report_file.name)
+
+        try:
+            with patch("tools.agent_select_target.load_blacklist", return_value=[]):
+                candidates = agent_select_target.extract_candidates(report_path)
+        finally:
+            report_path.unlink()
+
+        self.assertEqual(candidates, [])
+
+    def test_extract_candidates_handles_function_missing_name(self):
+        report = {
+            "units": [
+                {
+                    "name": "build/foo.o",
+                    "metadata": {"source_path": "src/foo.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": 20,
+                        "matched_code_percent": 20,
+                        "matched_data_percent": 20,
+                    },
+                    "functions": [{"fuzzy_match_percent": "50.0", "size": 16}],
+                }
+            ]
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as report_file:
+            json.dump(report, report_file)
+            report_path = Path(report_file.name)
+
+        try:
+            with patch("tools.agent_select_target.load_blacklist", return_value=[]):
+                candidates = agent_select_target.extract_candidates(report_path)
+        finally:
+            report_path.unlink()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["top_functions"][0]["name"], "unknown")
+
 
 if __name__ == "__main__":
     unittest.main()

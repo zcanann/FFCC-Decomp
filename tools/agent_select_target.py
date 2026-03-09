@@ -60,7 +60,9 @@ def load_blacklist():
 
 def is_viable_target(unit, blacklist):
     """Check if unit is a good target candidate"""
-    name = unit["name"]
+    name = unit.get("name")
+    if not name:
+        return False, "missing name"
     measures = unit.get("measures", {})
 
     # Skip auto-generated units
@@ -158,9 +160,12 @@ def extract_candidates(report_path):
         functions = unit.get("functions", [])
         source_path = unit.get("metadata", {}).get("source_path", "unknown")
         source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
+        unit_name = unit.get("name")
+        if not unit_name:
+            continue
 
         entry = {
-            "name": unit["name"],
+            "name": unit_name,
             "fuzzy_match": _safe_float(measures.get("fuzzy_match_percent", 0) or 0),
             "matched_code_percent": _safe_float(measures.get("matched_code_percent", 0) or 0),
             "matched_data_percent": _safe_float(measures.get("matched_data_percent", 0) or 0),
@@ -177,8 +182,9 @@ def extract_candidates(report_path):
         for func in sorted(functions, key=lambda f: _safe_float(f.get("fuzzy_match_percent", 0), default=100.0))[:3]:
             func_match = _safe_float(func.get("fuzzy_match_percent", 0), default=100.0)
             if func_match < 99:
+                func_name = func.get("name", "unknown")
                 entry["top_functions"].append({
-                    "name": func["name"],
+                    "name": func_name,
                     "match": func_match,
                     "size": func.get("size", "unknown")
                 })

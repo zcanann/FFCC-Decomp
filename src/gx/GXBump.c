@@ -3,10 +3,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-#undef __GXData
-#define __GXData gx
-
 #if DEBUG
 #define GX_WRITE_SOME_REG5(a, b) \
 do { \

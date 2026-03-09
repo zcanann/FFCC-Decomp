@@ -637,13 +637,13 @@ inline void __THPInverseDCTNoYPos(register THPCoeff *in, register u32 xPos)
             ps_merge00  tmp5, tmp5, tmp3
             lwz         itmp1, 4(in)
             ps_sub      tmp6, tmp6, tmp2
-            ps_msub    tmp7, tmp10, cc2c6s, tmp8
+            ps_nmsub    tmp7, tmp10, cc2c6s, tmp8
             lhz         itmp2, 2(in)
             ps_merge11  tmp2, tmp2, tmp6
             ps_msub     tmp8, tmp3, cc4, tmp6
             psq_l       tmp10, 0(in), 0, 5
             ps_add      tmp9, tmp4, tmp2
-            ps_add      tmp7, tmp8, tmp7
+            ps_sub      tmp7, tmp7, tmp8
             psq_l       tmp11, 0(q), 0, 0
             ps_merge11  tmp3, tmp8, tmp7
             ps_sub      tmp4, tmp4, tmp2
@@ -945,13 +945,13 @@ inline void __THPInverseDCTY8(register THPCoeff *in, register u32 xPos)
             ps_merge00  tmp5, tmp5, tmp3
             lwz         itmp1, 4(in)
             ps_sub      tmp6, tmp6, tmp2
-            ps_msub    tmp7, tmp10, cc2c6s, tmp8
+            ps_nmsub    tmp7, tmp10, cc2c6s, tmp8
             lhz         itmp2, 2(in)
             ps_merge11  tmp2, tmp2, tmp6
             ps_msub     tmp8, tmp3, cc4, tmp6
             psq_l       tmp10, 0(in), 0, 5
             ps_add      tmp9, tmp4, tmp2
-            ps_add      tmp7, tmp8, tmp7
+            ps_sub      tmp7, tmp7, tmp8
             psq_l       tmp11, 0(q), 0, 0
             ps_merge11  tmp3, tmp8, tmp7
             ps_sub      tmp4, tmp4, tmp2

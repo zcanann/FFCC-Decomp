@@ -80,6 +80,21 @@ class TransformDepTests(unittest.TestCase):
             "build/file.o: /mnt/c/proj/a.h \\\n\t/mnt/c/proj/b.h\n",
         )
 
+    def test_import_d_file_normalizes_first_line_without_space_after_separator(self):
+        dep_path = self._write_dep("build/file.o:C:\\proj\\a.h \\\n\tC:\\proj\\b.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(
+            output,
+            "build/file.o: /mnt/c/proj/a.h \\\n\t/mnt/c/proj/b.h\n",
+        )
+
+    def test_import_d_file_preserves_escaped_colon_in_target(self):
+        dep_path = self._write_dep("build/file\\:name.o: C:\\proj\\a.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file\\:name.o: /mnt/c/proj/a.h\n")
+
     def test_import_d_file_preserves_target_only_rule_without_extra_space(self):
         dep_path = self._write_dep("build\\file.o:\n")
         output = transform_dep.import_d_file(dep_path)

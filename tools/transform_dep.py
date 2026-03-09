@@ -106,19 +106,23 @@ def _normalize_dependency_fragment(fragment: str) -> str:
 def _split_first_line_target_and_deps(line: str) -> Optional[Tuple[str, str]]:
     """Split first depfile line into target and dependency fragment.
 
-    Uses makefile syntax where the rule separator is ":" followed by
-    whitespace or end-of-line, so Windows drive letters like "C:/" are not
-    treated as separators.
+    Finds the first unescaped rule separator ":" while ignoring Windows
+    drive-letter colons such as "C:/" or "Z:\\".
     """
     for idx, char in enumerate(line):
         if char != ":":
             continue
 
-        next_idx = idx + 1
-        if next_idx >= len(line):
-            return line[:idx], ""
-        if line[next_idx].isspace():
-            return line[:idx], line[next_idx:].lstrip()
+        if _is_escaped(line, idx):
+            continue
+
+        prev_char = line[idx - 1] if idx > 0 else ""
+        next_char = line[idx + 1] if idx + 1 < len(line) else ""
+        if prev_char.isalpha() and next_char in {"/", "\\"}:
+            continue
+
+        deps = line[idx + 1 :].lstrip()
+        return line[:idx], deps
 
     return None
 

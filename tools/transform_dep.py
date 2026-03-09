@@ -22,7 +22,12 @@ winedevices = os.path.join(wineprefix, "dosdevices")
 
 
 def in_wsl() -> bool:
-    return "microsoft-standard" in uname().release
+    release = uname().release.lower()
+    return (
+        "microsoft" in release
+        or "wsl" in release
+        or "WSL_DISTRO_NAME" in os.environ
+    )
 
 
 def _normalize_dep_path(path: str) -> str:

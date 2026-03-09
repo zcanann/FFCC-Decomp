@@ -29,6 +29,23 @@ class TransformDepTests(unittest.TestCase):
             output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/src/file.h\n")
 
+    def test_in_wsl_detects_generic_microsoft_kernel_tag(self):
+        with patch("tools.transform_dep.uname") as mocked_uname:
+            mocked_uname.return_value.release = "5.15.167.4-microsoft"
+            self.assertTrue(transform_dep.in_wsl())
+
+    def test_in_wsl_detects_wsl_env_override(self):
+        with patch("tools.transform_dep.uname") as mocked_uname:
+            mocked_uname.return_value.release = "6.8.0-31-generic"
+            with patch.dict("os.environ", {"WSL_DISTRO_NAME": "Ubuntu"}, clear=False):
+                self.assertTrue(transform_dep.in_wsl())
+
+    def test_in_wsl_false_on_non_wsl_host(self):
+        with patch("tools.transform_dep.uname") as mocked_uname:
+            mocked_uname.return_value.release = "6.8.0-31-generic"
+            with patch.dict("os.environ", {}, clear=True):
+                self.assertFalse(transform_dep.in_wsl())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -217,6 +217,8 @@ def _resolve_runtime_config(
     elif not prompt.strip():
         log("empty prompt for --prompt; using AGENTIC_PROMPT/default prompt")
         prompt = _read_prompt_env("AGENTIC_PROMPT", DEFAULT_PROMPT)
+    else:
+        prompt = prompt.strip()
 
     timeout_seconds = (
         args.timeout_seconds

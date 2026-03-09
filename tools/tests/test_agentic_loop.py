@@ -194,6 +194,22 @@ class TestAgenticLoop(unittest.TestCase):
         _, kwargs = mock_run.call_args
         self.assertEqual(kwargs["prompt"], "env prompt")
 
+    def test_main_trims_cli_prompt(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with patch("agentic_loop.run_agentic_loop") as mock_run:
+                agentic_loop.main(["--prompt", "  cli prompt  "])
+
+        _, kwargs = mock_run.call_args
+        self.assertEqual(kwargs["prompt"], "cli prompt")
+
+    def test_main_trims_env_prompt(self):
+        with patch.dict(os.environ, {"AGENTIC_PROMPT": "  env prompt  "}, clear=True):
+            with patch("agentic_loop.run_agentic_loop") as mock_run:
+                agentic_loop.main()
+
+        _, kwargs = mock_run.call_args
+        self.assertEqual(kwargs["prompt"], "env prompt")
+
     def test_main_cli_numeric_validation_falls_back_to_defaults(self):
         with patch.dict(os.environ, {}, clear=True):
             with patch("agentic_loop.run_agentic_loop") as mock_run:

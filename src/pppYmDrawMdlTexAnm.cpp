@@ -86,16 +86,13 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     u32* workWords;
-    CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
-    s16* uvPairs;
     s32 uvByteOffset;
     s32 i;
 
     workWords = (u32*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
-    if ((workWords[0] != 0) && ((mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0]) != NULL)) {
-        uvLayout = (CMapMeshUVLayout*)mapMesh;
-        uvPairs = uvLayout->m_uvPairs;
+    uvLayout = (CMapMeshUVLayout*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0];
+    if ((workWords[0] != 0) && (uvLayout != NULL)) {
         uvByteOffset = 0;
         for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
             s32 uvByteOffsetV = uvByteOffset + 2;
@@ -108,7 +105,7 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
                 (s16)(int)-(((f32)(s32)frameU * *(f32*)&workWords[5]) - (f32)*(s16*)((u8*)uvPairs + uvByteOffsetV));
         }
 
-        DCFlushRange(uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);
+        DCFlushRange(uvLayout->m_uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);
     }
 
     workWords[0] = 0;

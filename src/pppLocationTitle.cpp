@@ -41,8 +41,10 @@ struct LocationTitleParticle {
     Vec m_pos;
     u32 m_color;
     float m_frame;
+    s16 m_shapeUnk;
     s16 m_shapeA;
     s16 m_shapeB;
+    s16 m_pad;
 };
 
 static char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
@@ -124,7 +126,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         return;
     }
 
-    long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+    long* shapeTable = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
@@ -151,6 +153,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_frame = work->m_cur;
 
             s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
+            particle->m_shapeUnk = 0;
             particle->m_shapeA = shape;
             particle->m_shapeB = shape;
 
@@ -286,7 +289,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         GXLoadPosMtxImm(model, 0);
 
         pppSetBlendMode(*(((u8*)&param_2->m_stepValue) + 1));
-        pppDrawShp(*shapeTable, particle->m_shapeA, pppEnvStPtr->m_materialSetPtr,
+        pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr,
                    *(((u8*)&param_2->m_stepValue) + 1));
     }
 }

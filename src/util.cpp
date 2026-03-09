@@ -1,7 +1,7 @@
 #include "ffcc/util.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/p_camera.h"
-#include <string.h>
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 const float kUtilZero = 0.0f;
 const float kUtilOne = 1.0f;
@@ -1134,115 +1134,103 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
     u8 bVar1;
     u16 uVar2;
-    bool bVar3;
-    bool bVar4;
+    int bVar3;
+    int bVar4;
     int iVar5;
     u8 bVar6;
     u32 uVar7;
     u32 uVar8;
     u8* data;
 
-    bVar4 = true;
+    bVar4 = 1;
     iVar5 = 0;
     data = static_cast<u8*>(dlData);
-
-next_command:
+LAB_80022950:
     do {
-        if (!bVar4) {
+        if (bVar4 == 0) {
             return iVar5;
         }
-
         bVar1 = *data;
         uVar2 = *(u16*)(data + 1);
         uVar7 = (u32)uVar2;
         data = data + 3;
         bVar6 = bVar1 & 0xF8;
-
         if (bVar6 == 0xA0) {
-primitive_ok:
-            bVar3 = true;
+LAB_8002288c:
+            bVar3 = 1;
         } else {
             if (0x9F < bVar6) {
                 if (bVar6 != 0xB0) {
                     if (bVar6 < 0xB0) {
                         if (bVar6 == 0xA8) {
-                            goto primitive_ok;
+                            goto LAB_8002288c;
                         }
                     } else if (bVar6 == 0xB8) {
-                        goto primitive_ok;
+                        goto LAB_8002288c;
                     }
-                    goto primitive_bad;
+                    goto LAB_80022894;
                 }
-                goto primitive_ok;
+                goto LAB_8002288c;
             }
             if (bVar6 == 0x90) {
-                goto primitive_ok;
+                goto LAB_8002288c;
             }
             if (bVar6 < 0x90) {
                 if (bVar6 == 0x80) {
-                    goto primitive_ok;
+                    goto LAB_8002288c;
                 }
             } else if (bVar6 == 0x98) {
-                goto primitive_ok;
+                goto LAB_8002288c;
             }
-
-primitive_bad:
-            bVar3 = false;
+LAB_80022894:
+            bVar3 = 0;
         }
-
-        if (bVar3) {
+        if (bVar3 != 0) {
             if (bVar6 == 0x90) {
-                iVar5 = iVar5 + (uVar7 / 3);
+                iVar5 = iVar5 + uVar7 / 3;
             } else if (bVar6 == 0x98) {
                 iVar5 = uVar7 + iVar5 - 2;
             }
-
             if ((bVar1 & 7) != 2) {
                 if (uVar7 != 0) {
                     uVar8 = (u32)(uVar2 >> 3);
-                    if ((uVar2 >> 3) != 0) {
+                    if (uVar2 >> 3 != 0) {
                         do {
                             data = data + 0x40;
                             uVar8 = uVar8 - 1;
                         } while (uVar8 != 0);
-
                         uVar7 = uVar7 & 7;
                         if ((uVar2 & 7) == 0) {
-                            goto next_command;
+                            goto LAB_80022950;
                         }
                     }
-
                     do {
                         data = data + 8;
                         uVar7 = uVar7 - 1;
                     } while (uVar7 != 0);
                 }
-                goto next_command;
+                goto LAB_80022950;
             }
-
             if (uVar7 != 0) {
                 uVar8 = (u32)(uVar2 >> 3);
-                if ((uVar2 >> 3) != 0) {
+                if (uVar2 >> 3 != 0) {
                     do {
                         data = data + 0x50;
                         uVar8 = uVar8 - 1;
                     } while (uVar8 != 0);
-
                     uVar7 = uVar7 & 7;
                     if ((uVar2 & 7) == 0) {
-                        goto next_command;
+                        goto LAB_80022950;
                     }
                 }
-
                 do {
                     data = data + 10;
                     uVar7 = uVar7 - 1;
                 } while (uVar7 != 0);
             }
-            goto next_command;
+            goto LAB_80022950;
         }
-
-        bVar4 = false;
+        bVar4 = 0;
     } while (true);
 }
 

@@ -23,7 +23,10 @@ include_dirs: List[str] = []  # Set with -I flag
 exclude_globs: List[str] = []  # Set with -x flag
 
 include_pattern = re.compile(r'^#\s*include\s*[<"](.+?)[>"]')
-guard_pattern = re.compile(r"^#\s*ifndef\s+(.*)$")
+guard_pattern = re.compile(r"^#\s*ifndef\s+([A-Za-z_]\w*)\b")
+if_not_defined_pattern = re.compile(
+    r"^#\s*if\s+!defined(?:\s*\(\s*([A-Za-z_]\w*)\s*\)|\s+([A-Za-z_]\w*))"
+)
 once_pattern = re.compile(r"^#\s*pragma\s+once$")
 
 defines = set()
@@ -48,6 +51,10 @@ def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
         guard_match = guard_pattern.match(stripped)
         if guard_match:
             return guard_match[1]
+
+        if_not_defined_match = if_not_defined_pattern.match(stripped)
+        if if_not_defined_match:
+            return if_not_defined_match[1] or if_not_defined_match[2]
 
         once_match = once_pattern.match(stripped)
         if once_match:

@@ -33,6 +33,27 @@ class HeaderGuardKeyTests(unittest.TestCase):
         ]
         self.assertEqual(decompctx.get_header_guard_key("include/example.h", lines), "EXAMPLE_H")
 
+    def test_detects_ifndef_ignoring_trailing_comment(self):
+        lines = [
+            "#ifndef EXAMPLE_H // guard\n",
+            "#define EXAMPLE_H\n",
+        ]
+        self.assertEqual(decompctx.get_header_guard_key("include/example.h", lines), "EXAMPLE_H")
+
+    def test_detects_if_not_defined_with_parentheses(self):
+        lines = [
+            "#if !defined(EXAMPLE_H)\n",
+            "#define EXAMPLE_H\n",
+        ]
+        self.assertEqual(decompctx.get_header_guard_key("include/example.h", lines), "EXAMPLE_H")
+
+    def test_detects_if_not_defined_without_parentheses(self):
+        lines = [
+            "#if !defined EXAMPLE_H\n",
+            "#define EXAMPLE_H\n",
+        ]
+        self.assertEqual(decompctx.get_header_guard_key("include/example.h", lines), "EXAMPLE_H")
+
     def test_detects_pragma_once_after_comments(self):
         lines = [
             "// generated header\n",

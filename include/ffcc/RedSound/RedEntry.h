@@ -28,7 +28,7 @@ public:
 	void ClearWaveBank(int);
 	int GetWaveBank(int);
 	int SearchWaveBase(int);
-	void ReentryWaveData(int);
+	int ReentryWaveData(int);
 	void WaveHistoryManager(int, int);
 	void DisplayWaveInfo();
 
@@ -43,7 +43,7 @@ public:
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);
 	int* SearchSeSepBank(int);
-	void ReentrySeSepData(int);
+	int ReentrySeSepData(int);
 	void SeSepHistoryManager(int, int);
 	void DisplaySePlayInfo();
 
@@ -55,7 +55,7 @@ public:
 	int MusicOldClear();
 	unsigned int MusicOldChoice();
 	int* SearchMusicBank(int);
-	void ReentryMusicData(int);
+	int ReentryMusicData(int);
 	void MusicHistoryManager(int, int);
 	void MusicHeadAdd(RedMusicHEAD*);
 	void SetMusicData(RedMusicHEAD*);

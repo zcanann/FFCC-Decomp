@@ -46,6 +46,18 @@ class TransformDepTests(unittest.TestCase):
             with patch.dict("os.environ", {}, clear=True):
                 self.assertFalse(transform_dep.in_wsl())
 
+    def test_winedevices_path_uses_wineprefix_when_set(self):
+        with patch.dict("os.environ", {"WINEPREFIX": "/tmp/wine"}, clear=True):
+            self.assertEqual(transform_dep._winedevices_path(), "/tmp/wine/dosdevices")
+
+    def test_winedevices_path_falls_back_without_home_env(self):
+        with patch.dict("os.environ", {}, clear=True):
+            with patch("tools.transform_dep.os.path.expanduser", return_value="/users/test"):
+                self.assertEqual(
+                    transform_dep._winedevices_path(),
+                    "/users/test/.wine/dosdevices",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

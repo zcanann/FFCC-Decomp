@@ -15,10 +15,12 @@ import argparse
 import os
 from platform import uname
 
-wineprefix = os.path.join(os.environ["HOME"], ".wine")
-if "WINEPREFIX" in os.environ:
-    wineprefix = os.environ["WINEPREFIX"]
-winedevices = os.path.join(wineprefix, "dosdevices")
+
+def _winedevices_path() -> str:
+    wineprefix = os.environ.get("WINEPREFIX")
+    if not wineprefix:
+        wineprefix = os.path.join(os.path.expanduser("~"), ".wine")
+    return os.path.join(wineprefix, "dosdevices")
 
 
 def in_wsl() -> bool:
@@ -53,6 +55,7 @@ def _normalize_dep_path(path: str) -> str:
         return os.path.join("/mnt", drive, drive_path.lstrip("/"))
 
     # Resolve drive mappings via $WINEPREFIX/dosdevices on non-WSL hosts.
+    winedevices = _winedevices_path()
     return os.path.realpath(os.path.join(winedevices, f"{drive}:{drive_path}"))
 
 

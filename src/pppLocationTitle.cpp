@@ -41,6 +41,7 @@ struct LocationTitleParticle {
     Vec m_pos;
     u32 m_color;
     float m_frame;
+    u16 m_unused;
     s16 m_shapeA;
     s16 m_shapeB;
 };
@@ -149,6 +150,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_pos.z = 0.0f;
             memcpy(&particle->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
             particle->m_frame = work->m_cur;
+            particle->m_unused = 0;
 
             s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
             particle->m_shapeA = shape;

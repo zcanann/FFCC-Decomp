@@ -149,7 +149,7 @@ def derive_source_file(unit):
     if not path_name:
         return "unknown.cpp"
     path = PurePosixPath(path_name)
-    if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
+    if path.suffix.lower() in {".c", ".cc", ".cpp", ".cxx"}:
         return path_name
     stem = path.stem or "unknown"
     return f"{stem}.cpp"

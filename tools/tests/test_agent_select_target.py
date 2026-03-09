@@ -28,6 +28,14 @@ class DeriveFileNameTests(unittest.TestCase):
         unit = {"name": "src/card/CARDOpen.c", "metadata": {"source_path": "unknown"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "CARDOpen.c")
 
+    def test_derive_source_file_fallback_preserves_uppercase_c_extension(self):
+        unit = {"name": "src/card/CARDOpen.C", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "CARDOpen.C")
+
+    def test_derive_source_file_fallback_preserves_mixed_case_cpp_extension(self):
+        unit = {"name": "src/system/player.CpP", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.CpP")
+
     def test_derive_source_file_fallback_defaults_to_cpp_without_extension(self):
         unit = {"name": "src/system/player", "metadata": {"source_path": "unknown"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")

@@ -232,8 +232,8 @@ void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor d
     logic_enable = (type == GX_BM_LOGIC);
     subtract_enable = (type == GX_BM_SUBTRACT);
     reg = (reg & ~0x1) | blend_enable;
-    reg = (reg & ~0x2) | (logic_enable << 1);
     reg = (reg & ~0x800) | (subtract_enable << 11);
+    reg = (reg & ~0x2) | (logic_enable << 1);
     reg = (reg & ~0xF000) | ((u32)op << 12);
     reg = (reg & ~0x0700) | ((u32)src_factor << 8);
     reg = (reg & ~0x00E0) | ((u32)dst_factor << 5);

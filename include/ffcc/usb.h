@@ -50,6 +50,4 @@ public:
 
 extern CUSB USB;
 
-extern "C" char __vt__4CUSB[];
-
 #endif // _FFCC_PPP_USB_H_

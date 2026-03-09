@@ -18,6 +18,9 @@ public:
 };
 
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
+extern "C" char* sMogRadarTypeLabels[];
+extern "C" char sMogRadarDebugFormatBlock[];
+extern "C" char sMogFurTextureName[];
 extern "C" {
 unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;

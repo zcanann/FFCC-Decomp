@@ -166,7 +166,6 @@ public:
     void LoadFurTexBuffer(unsigned short* inTexels);
 };
 
-extern "C" char __vt__6CChara[];
 extern unsigned char Chara[0x2078];
 extern CChara& gChara;
 

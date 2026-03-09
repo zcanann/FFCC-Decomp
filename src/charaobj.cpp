@@ -227,20 +227,20 @@ void CGCharaObj::onCancelStat(int)
 	if (state == 6) {
 		for (int i = 0; i < 0x16; i++) {
 			if (((1U << i) & 0x138U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 0);
+				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
 			}
 		}
 		m_damageParticle = -1;
 	} else if (state == 2) {
 		for (int i = 0; i < 0x16; i++) {
 			if (((1U << i) & 0x18U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 0);
+				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
 			}
 		}
 	} else if (state == 0x12) {
 		for (int i = 0; i < 0x16; i++) {
 			if (((1U << i) & 1U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 0);
+				EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
 			}
 		}
 	}
@@ -394,7 +394,7 @@ void CGCharaObj::endPSlotBit(int slotMask)
 	int* slots = m_particleSlots;
 	for (int i = 0; i < 0x16; i++) {
 		if ((static_cast<unsigned int>(slotMask) & (1U << i)) != 0) {
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 0);
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
 		}
 	}
 }

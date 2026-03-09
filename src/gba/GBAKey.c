@@ -5,6 +5,8 @@
 #include "GBA/GBAPriv.h"
 #include <string.h>
 
+extern u16 lbl_8021CB78[];
+
 static s32 F152(void* task)
 {
     s32 chan;
@@ -57,16 +59,30 @@ static void F25(void* task)
 static void F232(void* task)
 {
     s32 chan;
+    s32 result;
 
-    chan = F152(task);
+    if (&__GBA[0].task == task) {
+        chan = 0;
+    } else if (&__GBA[1].task == task) {
+        chan = 1;
+    } else if (&__GBA[2].task == task) {
+        chan = 2;
+    } else if (&__GBA[3].task == task) {
+        chan = 3;
+    } else {
+        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
+        chan = -1;
+    }
 
     DSPSendMailToDSP(0xabba0000);
-    while (DSPCheckMailToDSP() != 0) {
-    }
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 
     DSPSendMailToDSP((u32)&__GBA[chan].param);
-    while (DSPCheckMailToDSP() != 0) {
-    }
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 }
 
 static void F252(void* task)
@@ -92,7 +108,7 @@ void __GBAX02(s32 chan, u8* readbuf) {
     DCFlushRange(param, 32);
     
     gba->task.state = 0xff;
-    gba->task.iram_addr = 0x21cb78;
+    gba->task.iram_addr = OSCachedToPhysical(lbl_8021CB78);
     gba->task.dram_addr = 0x380;
     gba->task.dram_length = 0;
     gba->task.dsp_init_vector = 0x10;

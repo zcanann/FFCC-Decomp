@@ -2444,24 +2444,24 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 
 	if (positions == 0)
 	{
-		GXSetArray((GXAttr)9, *(void**)((u8*)&model->m_mapMesh + 0x2C), 0xC);
+		GXSetArray((GXAttr)9, *(void**)((u8*)model + 0x2C), 0xC);
 	}
 	else
 	{
 		GXSetArray((GXAttr)9, positions, 0xC);
 	}
 
-	GXSetArray((GXAttr)0xB, *(void**)((u8*)&model->m_mapMesh + 0x3C), 4);
-	GXSetArray((GXAttr)0xD, *(void**)((u8*)&model->m_mapMesh + 0x38), 4);
-	GXSetArray((GXAttr)0xE, *(void**)((u8*)&model->m_mapMesh + 0x38), 4);
-	*(void**)(MaterialManRaw() + 4) = *(void**)((u8*)&model->m_mapMesh + 0x30);
+	GXSetArray((GXAttr)0xB, *(void**)((u8*)model + 0x3C), 4);
+	GXSetArray((GXAttr)0xD, *(void**)((u8*)model + 0x38), 4);
+	GXSetArray((GXAttr)0xE, *(void**)((u8*)model + 0x38), 4);
+	*(void**)(MaterialManRaw() + 4) = *(void**)((u8*)model + 0x30);
 
 	if (usePartMaterial == 0)
 	{
 		GXSetArray((GXAttr)10, *(void**)(MaterialManRaw() + 4), 6);
 	}
 
-	model->m_mapMesh.DrawPart(pppEnvStPtr->m_materialSetPtr, usePartMaterial);
+	model->DrawPart(pppEnvStPtr->m_materialSetPtr, usePartMaterial);
 }
 
 /*

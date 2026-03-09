@@ -450,7 +450,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     PSMTX44Copy(CameraScreenMatrix(), screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
-    inVec.z = -(PSVECDistance(&cameraPos, &objPos) - param_2->m_stepValue);
+    double depth = static_cast<double>(PSVECDistance(&cameraPos, &objPos)) - static_cast<double>(param_2->m_stepValue);
+    inVec.z = -static_cast<float>(depth);
     inVec.w = FLOAT_8033103c;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(0, screenMtx, &inVec, &outVec);
 
@@ -458,10 +459,12 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    uv0.x = -FLOAT_80331044 * param_2->m_arg3;
-    uv0.y = FLOAT_80331048 + FLOAT_80331044 * param_2->m_arg3;
-    uv1.x = -param_2->m_arg3;
-    uv1.y = FLOAT_8033104c + param_2->m_arg3;
+    float arg3 = param_2->m_arg3;
+
+    uv0.x = -FLOAT_80331044 * arg3;
+    uv0.y = FLOAT_80331048 + FLOAT_80331044 * arg3;
+    uv1.x = -arg3;
+    uv1.y = FLOAT_8033104c + arg3;
 
     quadA.x = uv0.x;
     quadA.y = uv0.y;

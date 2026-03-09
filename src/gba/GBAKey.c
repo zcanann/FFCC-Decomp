@@ -1,11 +1,10 @@
-#include "GBA/GBAKey.h"
 #include "dolphin/dsp.h"
-#include "dolphin/os.h"
-#include "GBA/GBA.h"
-#include "GBA/GBAPriv.h"
+#include "dolphin/gba/GBAPriv.h"
+#include "GBA/GBAKey.h"
 #include <string.h>
 
 extern u8 lbl_8021CB78[];
+extern u8 GBAKeyDspTaskIram[];
 
 static s32 F152(void* task)
 {
@@ -95,7 +94,7 @@ void __GBAX02(s32 chan, u8* readbuf) {
     param->length = bootInfo->length;
     *(u32*)((u8*)param + 16) = (u32)param + 32;
     
-    DCInvalidateRange((u8*)param + 32, 32);
+    DCInvalidateRange(param + 1, 32);
     DCFlushRange(param, 32);
     
     gba->task.state = 0xff;

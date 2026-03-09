@@ -52,11 +52,19 @@ static inline CMemory::CStage* MaterialEditorStage()
  */
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
-    _ZLISTITEM* it = zlist->m_root.m_previous;
+    ZLIST* list;
+    _ZLISTITEM* it[1];
+    int i;
+    int colAnmCount;
+    ZCANMGRP* colAnmData;
+    RSDITEM* rsdItem;
+    RSDLISTITEM* listItem;
 
-    while (it != (_ZLISTITEM*)0) {
-        RSDLISTITEM* listItem = (RSDLISTITEM*)zlist->GetDataNext(&it);
-        RSDITEM* rsdItem = listItem->rsdItem;
+    list = zlist;
+    it[0] = list->m_root.m_previous;
+    while (it[0] != (_ZLISTITEM*)0) {
+        listItem = (RSDLISTITEM*)list->GetDataNext(it);
+        rsdItem = listItem->rsdItem;
         if (rsdItem != (RSDITEM*)0) {
             if (rsdItem->ptrC != (void*)0) {
                 __dla__FPv(rsdItem->ptrC);
@@ -78,15 +86,15 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
                 __dl__FPv(rsdItem);
             }
         }
-
-        ZCANMGRP* colAnmData = listItem->colAnmData;
-        int colAnmCount = listItem->colAnmCount;
+        colAnmData = listItem->colAnmData;
+        colAnmCount = listItem->colAnmCount;
         if (colAnmData != (ZCANMGRP*)0) {
-            for (int i = 0; i < colAnmCount; i++, colAnmData++) {
+            for (i = 0; i < colAnmCount; i = i + 1) {
                 if (colAnmData->ptr != (void*)0) {
                     __dla__FPv(colAnmData->ptr);
                     colAnmData->ptr = 0;
                 }
+                colAnmData = colAnmData + 1;
             }
             if (listItem->colAnmData != (ZCANMGRP*)0) {
                 __dla__FPv(listItem->colAnmData);
@@ -96,7 +104,7 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         }
         __dl__FPv(listItem);
     }
-    zlist->DeleteList();
+    list->DeleteList();
 }
 
 /*

@@ -686,7 +686,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     float sy = FLOAT_80331cc0 * value[7];
     u8* piece = (u8*)*(void**)&value[3];
     for (u32 i = 0; i < pieceCount; i++) {
-        switch ((u8)param_2->m_initWOrk) {
+        switch (param_2->m_initWOrk) {
         case 0:
             piece[0x38] = 1;
             break;

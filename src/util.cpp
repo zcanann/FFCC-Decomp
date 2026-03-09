@@ -1,7 +1,7 @@
 #include "ffcc/util.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/p_camera.h"
-#include <string.h>
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 const float kUtilZero = 0.0f;
 const float kUtilOne = 1.0f;

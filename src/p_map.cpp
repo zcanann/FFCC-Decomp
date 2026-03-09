@@ -41,7 +41,7 @@ unsigned int m_table_desc20__7CMapPcs[3];
 unsigned int m_table_desc21__7CMapPcs[3];
 unsigned int m_table_desc22__7CMapPcs[3];
 unsigned int m_table_desc23__7CMapPcs[3];
-unsigned int m_table__7CMapPcs[0x414 / sizeof(unsigned int)];
+unsigned int PTR_s_CMapPcs_GAME__801e8ad8[0x414 / sizeof(unsigned int)];
 
 unsigned int s_mapRelProfile0__7CMapPcs;
 unsigned int s_mapRelProfile1__7CMapPcs;
@@ -112,7 +112,7 @@ void CMapPcs::Quit()
  */
 void* CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return m_table__7CMapPcs + tableIndex * 0x57;
+	return PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57;
 }
 
 /*
@@ -812,7 +812,7 @@ extern "C" void __sinit_p_map_cpp(void)
 	*base = &__vt__8CProcess;
 	*base = __vt__7CMapPcs;
 
-	unsigned int* dst = m_table__7CMapPcs;
+	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;
 
 	dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
 	dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];
@@ -914,4 +914,3 @@ extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDel
 	}
 	return self;
 }
-

@@ -10,12 +10,23 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
 
 GbaQueue GbaQue;
+
+unsigned int gGbaStatusWordTriplet0[] = {0x00000000, 0xFFFFFFFF, 0x80097918};
+unsigned int gGbaStatusWordTriplet1[] = {0x00000000, 0xFFFFFFFF, 0x800978D4};
+unsigned int gGbaStatusWordTriplet2[] = {0x00000000, 0xFFFFFFFF, 0x8009788C};
+unsigned int gGbaStatusWordTriplet3[] = {0x00000000, 0xFFFFFFFF, 0x80097888};
+unsigned int gGbaStatusWordTable[0x57] = {
+    0x80330870, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000023, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000045, 0x00000001,
+};
 
 u8 ARRAY_802f49b0[0xC];
 extern "C" void __dt__8GbaQueueFv(void*);

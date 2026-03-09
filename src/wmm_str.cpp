@@ -159,16 +159,16 @@ int CMenuPcs::GetYesNoXPos(int right)
     const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* yesText;
     switch (languageId) {
-    case 2:
+    case 1:
         yesText = s_McWinMessGroup0_de[13];
         break;
-    case 3:
+    case 2:
         yesText = s_McWinMessGroup0_it[13];
         break;
-    case 4:
+    case 3:
         yesText = s_McWinMessGroup0_es[13];
         break;
-    case 5:
+    case 4:
         yesText = s_McWinMessGroup0_fr[13];
         break;
     default:
@@ -205,16 +205,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* slotAText;
     switch (languageId) {
-    case 2:
+    case 1:
         slotAText = s_McWinMessGroup0_de[2];
         break;
-    case 3:
+    case 2:
         slotAText = s_McWinMessGroup0_it[2];
         break;
-    case 4:
+    case 3:
         slotAText = s_McWinMessGroup0_es[2];
         break;
-    case 5:
+    case 4:
         slotAText = s_McWinMessGroup0_fr[2];
         break;
     default:

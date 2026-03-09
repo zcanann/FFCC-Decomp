@@ -81,49 +81,66 @@ const char* CMenuPcs::GetMcStr(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
+    const char* const* result;
     int languageId = Game.game.m_gameWork.m_languageId;
+
     if (group == 0) {
         switch (languageId) {
         case 1:
-            return s_McWinMessGroup0_de;
+            result = s_McWinMessGroup0_de;
+            break;
         case 2:
-            return s_McWinMessGroup0_it;
+            result = s_McWinMessGroup0_it;
+            break;
         case 3:
-            return s_McWinMessGroup0_es;
+            result = s_McWinMessGroup0_es;
+            break;
         case 4:
-            return s_McWinMessGroup0_fr;
+            result = s_McWinMessGroup0_fr;
+            break;
         default:
-            return s_McWinMessGroup0_en;
+            result = s_McWinMessGroup0_en;
+            break;
         }
-    }
-
-    if (group == 1) {
+    } else if (group == 1) {
         switch (languageId) {
         case 1:
-            return s_McWinMessGroup1_de;
+            result = s_McWinMessGroup1_de;
+            break;
         case 2:
-            return s_McWinMessGroup1_it;
+            result = s_McWinMessGroup1_it;
+            break;
         case 3:
-            return s_McWinMessGroup1_es;
+            result = s_McWinMessGroup1_es;
+            break;
         case 4:
-            return s_McWinMessGroup1_fr;
+            result = s_McWinMessGroup1_fr;
+            break;
         default:
-            return s_McWinMessGroup1_en;
+            result = s_McWinMessGroup1_en;
+            break;
+        }
+    } else {
+        switch (languageId) {
+        case 1:
+            result = s_McWinMessGroup2_de;
+            break;
+        case 2:
+            result = s_McWinMessGroup2_it;
+            break;
+        case 3:
+            result = s_McWinMessGroup2_es;
+            break;
+        case 4:
+            result = s_McWinMessGroup2_fr;
+            break;
+        default:
+            result = s_McWinMessGroup2_en;
+            break;
         }
     }
 
-    switch (languageId) {
-    case 1:
-        return s_McWinMessGroup2_de;
-    case 2:
-        return s_McWinMessGroup2_it;
-    case 3:
-        return s_McWinMessGroup2_es;
-    case 4:
-        return s_McWinMessGroup2_fr;
-    default:
-        return s_McWinMessGroup2_en;
-    }
+    return result;
 }
 
 /*

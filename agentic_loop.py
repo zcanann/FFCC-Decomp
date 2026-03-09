@@ -13,6 +13,7 @@ DEFAULT_PROMPT = (
 )
 
 KILL_SIGNAL = getattr(signal, "SIGKILL", signal.SIGTERM)
+KILL_WAIT_SECONDS = 5
 
 
 def log(message: str) -> None:
@@ -69,7 +70,13 @@ def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:
         proc.wait(timeout=grace_seconds)
     except subprocess.TimeoutExpired:
         _signal_process_tree(proc, KILL_SIGNAL)
-        proc.wait()
+        try:
+            proc.wait(timeout=KILL_WAIT_SECONDS)
+        except subprocess.TimeoutExpired:
+            log(
+                f"process did not exit after forced kill within {KILL_WAIT_SECONDS}s; "
+                "continuing"
+            )
 
 
 def _sleep_interruptible(seconds: int) -> bool:

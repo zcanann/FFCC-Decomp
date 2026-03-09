@@ -30,6 +30,15 @@ class TestAgenticLoop(unittest.TestCase):
                 self.assertEqual(agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500), 1500)
         mock_log.assert_called_once()
 
+    def test_read_int_env_below_minimum_uses_default_and_logs(self):
+        with patch.dict(os.environ, {"AGENTIC_TIMEOUT_SECONDS": "0"}, clear=True):
+            with patch("agentic_loop.log") as mock_log:
+                self.assertEqual(
+                    agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500, minimum=1),
+                    1500,
+                )
+        mock_log.assert_called_once()
+
     def test_main_reads_env_and_calls_run(self):
         env = {
             "AGENTIC_PROMPT": "x",
@@ -46,6 +55,24 @@ class TestAgenticLoop(unittest.TestCase):
             timeout_seconds=1,
             terminate_grace_seconds=2,
             max_backoff_seconds=3,
+        )
+
+    def test_main_uses_defaults_for_out_of_range_numeric_env(self):
+        env = {
+            "AGENTIC_PROMPT": "x",
+            "AGENTIC_TIMEOUT_SECONDS": "0",
+            "AGENTIC_TERMINATE_GRACE_SECONDS": "-1",
+            "AGENTIC_MAX_BACKOFF_SECONDS": "0",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch("agentic_loop.run_agentic_loop") as mock_run:
+                agentic_loop.main()
+
+        mock_run.assert_called_once_with(
+            prompt="x",
+            timeout_seconds=25 * 60,
+            terminate_grace_seconds=10,
+            max_backoff_seconds=300,
         )
 
 

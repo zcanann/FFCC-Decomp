@@ -3,6 +3,7 @@ import signal
 import subprocess
 import time
 from datetime import datetime
+from typing import Optional
 
 DEFAULT_PROMPT = (
     "Follow the instructions in AGENTS.md. NEVER ask the user for input. "
@@ -16,16 +17,25 @@ def log(message: str) -> None:
     print(f"[{timestamp}] {message}", flush=True)
 
 
-def _read_int_env(var_name: str, default: int) -> int:
+def _read_int_env(var_name: str, default: int, minimum: Optional[int] = None) -> int:
     raw_value = os.getenv(var_name)
     if raw_value is None:
         return default
 
     try:
-        return int(raw_value)
+        value = int(raw_value)
     except ValueError:
         log(f"invalid integer for {var_name}={raw_value!r}; using default {default}")
         return default
+
+    if minimum is not None and value < minimum:
+        log(
+            f"invalid integer for {var_name}={raw_value!r}; minimum is {minimum}; "
+            f"using default {default}"
+        )
+        return default
+
+    return value
 
 
 def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
@@ -100,9 +110,11 @@ def run_agentic_loop(
 
 def main() -> None:
     prompt = os.getenv("AGENTIC_PROMPT", DEFAULT_PROMPT)
-    timeout_seconds = _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60)
-    terminate_grace_seconds = _read_int_env("AGENTIC_TERMINATE_GRACE_SECONDS", 10)
-    max_backoff_seconds = _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300)
+    timeout_seconds = _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60, minimum=1)
+    terminate_grace_seconds = _read_int_env(
+        "AGENTIC_TERMINATE_GRACE_SECONDS", 10, minimum=0
+    )
+    max_backoff_seconds = _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300, minimum=1)
     run_agentic_loop(
         prompt=prompt,
         timeout_seconds=timeout_seconds,

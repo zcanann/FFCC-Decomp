@@ -115,7 +115,8 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
  */
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	if (*(char*)((char*)param_3 + 0x14) != 0) {
+	u8 mode = *(u8*)((char*)param_3 + 0x14);
+	if (mode != 0) {
 		int textureInfo = *(int*)((char*)param_2 + 0x1c);
 		void* meshData = *(void**)((char*)model + 0xac + meshIdx * 0x14 + 8);
 		char* displayLists = (char*)*(void**)((char*)meshData + 0x50);
@@ -126,10 +127,10 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				*(void**)(MaterialManRaw() + 0x4) = *(void**)((char*)meshData + 0x20);
 				GXSetArray(0xb, (void*)vertexArray, 4);
 
-				if ((*(char*)((char*)param_3 + 0x14) == 2) || (*(char*)((char*)param_3 + 0x14) == 3)) {
-					*(int*)(MaterialManRaw() + 0x208) = 0;
+				if ((mode == 2) || (mode == 3)) {
+					*(int*)(MaterialManRaw() + 0xD0) = 0;
 				} else {
-					*(int*)(MaterialManRaw() + 0x208) = textureInfo + 0x28;
+					*(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
 				}
 
 				int dlIdx = *(int*)((char*)meshData + 0x4c) - 1;
@@ -460,13 +461,12 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
  */
 void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChangeTexData*)
 {
-	unsigned int local_8[2];
+	int textureIndex;
 	if (step->m_dataValIndex != 0xffff) {
 		_pppEnvStYmChangeTex* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
-		CMaterialSet* materialSet = env->m_materialSetPtr;
-		(int&)local_8[0] = 0;
-		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, materialSet, (int&)local_8[0]);
+		textureIndex = 0;
+		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, env->m_materialSetPtr, textureIndex);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	}
 }

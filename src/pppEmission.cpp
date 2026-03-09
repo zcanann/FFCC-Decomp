@@ -106,9 +106,10 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
 
     EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
     EmissionMeshData* meshData = meshList[meshIndex].m_data;
-    EmissionDisplayList* displayList = meshData->m_displayLists + displayListIndex;
+    EmissionDisplayList* displayList = meshData->m_displayLists;
+    displayList += displayListIndex;
 
-    if (strcmp((char*)meshData, &DAT_803311fc) == 0) {
+    if (strcmp((const char*)meshData, &DAT_803311fc) == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;

@@ -8,6 +8,13 @@
 extern unsigned char gPppInSubFrameCalc;
 extern unsigned char* pppMngStPtr;
 
+struct pppLightTarget {
+	int unk0;
+	unsigned char* obj;
+	int unk8;
+	int unkC;
+};
+
 extern "C" {
 void __ct__Q29CLightPcs6CLightFv(void*);
 void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
@@ -212,7 +219,8 @@ void pppLight(void* param1, void* param2, void* param3)
 				if (*(int*)(lightParam + 0x44) == -1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
-					obj = *(unsigned char**)(*(unsigned char**)(pppMngStPtr + 0xd4) + (*(int*)(lightParam + 0x44) << 4) + 0x4);
+					pppLightTarget* targetTable = *(pppLightTarget**)(pppMngStPtr + 0xd4);
+					obj = targetTable[*(int*)(lightParam + 0x44)].obj;
 				}
 
 				direction = (Vec*)(lightData + 0x40);
@@ -235,5 +243,4 @@ void pppLight(void* param1, void* param2, void* param3)
 		}
 	}
 }
-
 

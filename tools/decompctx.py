@@ -14,7 +14,7 @@ import argparse
 import fnmatch
 import os
 import re
-from typing import List
+from typing import List, Optional
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 root_dir = os.path.abspath(os.path.join(script_dir, ".."))
@@ -23,11 +23,70 @@ include_dirs: List[str] = []  # Set with -I flag
 exclude_globs: List[str] = []  # Set with -x flag
 
 include_pattern = re.compile(r'^#\s*include\s*[<"](.+?)[>"]')
-guard_pattern = re.compile(r"^#\s*ifndef\s+(.*)$")
+guard_pattern = re.compile(r"^#\s*ifndef\s+([A-Za-z_]\w*)\b")
+if_not_defined_pattern = re.compile(
+    r"^#\s*if\s+!defined(?:\s*\(\s*([A-Za-z_]\w*)\s*\)|\s+([A-Za-z_]\w*))"
+)
 once_pattern = re.compile(r"^#\s*pragma\s+once$")
 
 defines = set()
 deps = []
+active_imports = set()
+
+
+def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
+    """Return a stable de-duplication key for include guards / pragma once."""
+    for line in lines[:64]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if (
+            stripped.startswith("//")
+            or stripped.startswith("/*")
+            or stripped.startswith("*/")
+            or stripped.startswith("*")
+        ):
+            continue
+
+        guard_match = guard_pattern.match(stripped)
+        if guard_match:
+            return guard_match[1]
+
+        if_not_defined_match = if_not_defined_pattern.match(stripped)
+        if if_not_defined_match:
+            return if_not_defined_match[1] or if_not_defined_match[2]
+
+        once_match = once_pattern.match(stripped)
+        if once_match:
+            return in_file
+
+        # Stop scanning once we hit non-comment, non-guard content.
+        break
+
+    return None
+
+
+def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
+    """Return a stable de-duplication key for include guards / pragma once."""
+    for line in lines[:64]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("//") or stripped in {"/*", "*/"} or stripped.startswith("*"):
+            continue
+
+        guard_match = guard_pattern.match(stripped)
+        if guard_match:
+            return guard_match[1]
+
+        once_match = once_pattern.match(stripped)
+        if once_match:
+            return in_file
+
+        # Stop scanning once we hit non-comment, non-guard content.
+        break
+
+    return None
 
 
 def generate_prelude(defines) -> str:
@@ -61,34 +120,37 @@ def import_h_file(in_file: str, r_path: str) -> str:
 
 
 def import_c_file(in_file: str) -> str:
-    in_file = os.path.relpath(in_file, root_dir)
+    in_file = os.path.normpath(os.path.relpath(in_file, root_dir))
+    if in_file in active_imports:
+        print("Skipping recursive include", in_file)
+        return f"/* Skipped recursive include: {in_file} */\n"
+
+    active_imports.add(in_file)
     deps.append(in_file)
     out_text = ""
+    full_path = os.path.join(root_dir, in_file)
 
     try:
-        with open(in_file, encoding="utf-8") as file:
+        with open(full_path, encoding="utf-8") as file:
             out_text += process_file(in_file, list(file))
     except Exception:
-        with open(in_file) as file:
+        with open(full_path) as file:
             out_text += process_file(in_file, list(file))
+    finally:
+        active_imports.discard(in_file)
     return out_text
 
 
 def process_file(in_file: str, lines: List[str]) -> str:
+    guard_key = get_header_guard_key(in_file, lines)
+    if guard_key is not None:
+        if guard_key in defines:
+            return ""
+        defines.add(guard_key)
+
     out_text = ""
     for idx, line in enumerate(lines):
         if idx == 0:
-            guard_match = guard_pattern.match(line.strip())
-            if guard_match:
-                if guard_match[1] in defines:
-                    break
-                defines.add(guard_match[1])
-            else:
-                once_match = once_pattern.match(line.strip())
-                if once_match:
-                    if in_file in defines:
-                        break
-                    defines.add(in_file)
             print("Processing file", in_file)
         include_match = include_pattern.match(line.strip())
         if include_match and not include_match[1].endswith(".s"):
@@ -155,6 +217,9 @@ def main():
 
     if args.include is None:
         exit("No include directories specified")
+    defines.clear()
+    deps.clear()
+    active_imports.clear()
     global include_dirs
     include_dirs = args.include
     global exclude_globs

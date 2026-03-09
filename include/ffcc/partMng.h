@@ -47,9 +47,8 @@ struct pppShapeSt
     void* GetTexture(long*, CMaterialSet*, int&);
 }; // Size 0x2c
 
-struct pppModelSt
+struct pppModelSt : public CMapMesh
 {
-    CMapMesh m_mapMesh;     // 0x0
     char m_name[32];        // 0x44
     short m_refCount;       // 0x64
     short m_cacheId;        // 0x66

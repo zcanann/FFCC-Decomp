@@ -339,7 +339,7 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	u32 uVar2;
 	u16 sVar3;
 	u16 sVar4;
-	int iVar5;
+	u32 iVar5;
 	u32 uVar6;
 	u32 uVar7;
 	u32 uVar8;
@@ -347,7 +347,7 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	if (param_2 < 0x4000) {
 		return;
 	}
-	if (param_2 + *param_3 > 0x8000000) {
+	if (0x8000000 < param_2 + *param_3) {
 		return;
 	}
 
@@ -361,14 +361,21 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 		if (uVar6 != 0) {
 			do {
 				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x20));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x40));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x60));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x80));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xA0));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xC0));
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xE0));
-				iVar5 += 0x100;
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				iVar5 += 0x20;
 				uVar6--;
 			} while (uVar6 != 0);
 			uVar7 = uVar2 & 7;

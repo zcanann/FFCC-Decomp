@@ -85,30 +85,36 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
  */
 void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    pppYmDrawMdlTexAnmWork* work;
+    u32* workWords;
     CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
     s16* uvPairs;
+    s32 uvByteOffset;
     s32 i;
 
-    work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
-    if ((work->m_frame != 0) && ((mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0]) != NULL)) {
+    workWords = (u32*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
+    if ((workWords[0] != 0) && ((mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0]) != NULL)) {
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         uvPairs = uvLayout->m_uvPairs;
-        for (i = 0; i < (s32)(u32)uvLayout->m_uvCount; i++) {
-            u32 frameU = work->m_frame / work->m_tilesU;
-            uvPairs[0] = (s16)-(((f32)(work->m_frame - frameU * work->m_tilesU) * work->m_perU) - (f32)uvPairs[0]);
-            uvPairs[1] = (s16)-(((f32)frameU * work->m_perV) - (f32)uvPairs[1]);
-            uvPairs += 2;
+        uvByteOffset = 0;
+        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+            s32 uvByteOffsetV = uvByteOffset + 2;
+            u32 frameU = workWords[0] / workWords[2];
+
+            *(s16*)((u8*)uvPairs + uvByteOffset) = (s16)(int)-(((f32)(workWords[0] - frameU * workWords[2]) * *(f32*)&workWords[4]) -
+                                                                (f32)*(s16*)((u8*)uvPairs + uvByteOffset));
+            uvByteOffset += 4;
+            *(s16*)((u8*)uvPairs + uvByteOffsetV) =
+                (s16)(int)-(((f32)frameU * *(f32*)&workWords[5]) - (f32)*(s16*)((u8*)uvPairs + uvByteOffsetV));
         }
 
-        DCFlushRange(uvLayout->m_uvPairs, (u32)uvLayout->m_uvCount << 2);
+        DCFlushRange(uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);
     }
 
-    work->m_frame = 0;
-    work->m_tilesV = 0;
-    work->m_tilesU = 0;
-    work->m_wait = 0x200;
+    workWords[0] = 0;
+    workWords[3] = 0;
+    workWords[2] = 0;
+    workWords[1] = 0x200;
 }
 
 /*

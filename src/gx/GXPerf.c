@@ -83,7 +83,7 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1) {
     case GX_PERF1_VC_STREAMBUF_LOW:
     case GX_PERF1_VC_ALL_STALLS:
     case GX_PERF1_VERTICES:
-        __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (0 << 4);
+        __GXData->perfSel = __GXData->perfSel & 0xFFFFFF0F;
         GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12);
         break;
     case GX_PERF1_FIFO_REQ:
@@ -159,14 +159,14 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1) {
     case GX_PERF1_TC_CHECK3_4: reg = 0x6700018D; GX_WRITE_RAS_REG(reg); break;
     case GX_PERF1_TC_CHECK5_6: reg = 0x670001CF; GX_WRITE_RAS_REG(reg); break;
     case GX_PERF1_TC_CHECK7_8: reg = 0x67000211; GX_WRITE_RAS_REG(reg); break;
-    case GX_PERF1_VC_ELEMQ_FULL:    __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (2 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VC_MISSQ_FULL:    __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (3 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VC_MEMREQ_FULL:   __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (4 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VC_STATUS7:       __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (5 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VC_MISSREP_FULL:  __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (6 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VC_STREAMBUF_LOW: __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (7 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VC_ALL_STALLS:    __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (9 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
-    case GX_PERF1_VERTICES:         __GXData->perfSel = (__GXData->perfSel & ~0xF0) | (8 << 4); GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_ELEMQ_FULL:    __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x20; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_MISSQ_FULL:    __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x30; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_MEMREQ_FULL:   __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x40; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_STATUS7:       __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x50; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_MISSREP_FULL:  __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x60; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_STREAMBUF_LOW: __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x70; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VC_ALL_STALLS:    __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x90; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
+    case GX_PERF1_VERTICES:         __GXData->perfSel = (__GXData->perfSel & 0xFFFFFF0F) | 0x80; GX_WRITE_SOME_REG4(8, 0x20, __GXData->perfSel, -12); break;
     case GX_PERF1_FIFO_REQ:    reg = 2; GX_SET_CP_REG(3, reg); break;
     case GX_PERF1_CALL_REQ:    reg = 3; GX_SET_CP_REG(3, reg); break;
     case GX_PERF1_VC_MISS_REQ: reg = 4; GX_SET_CP_REG(3, reg); break;

@@ -25,10 +25,8 @@ struct pppCrystal {
 
 struct pppCrystalUnkB {
     s32 m_graphId;
-    u16 m_dataValIndex;
-    u16 m_pad06;
-    u16 m_initWOrk;
-    u16 m_pad0A;
+    s32 m_dataValIndex;
+    s32 m_initWOrk;
     float m_stepValue;
     float m_arg3;
     u8 m_payload[6];

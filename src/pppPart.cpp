@@ -215,10 +215,11 @@ void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
  */
 void pppNormalize(Vec& dest, Vec source)
 { 
-	if ((source.x != kPppZero || source.y != kPppZero) || source.z != kPppZero)
-	{
-		PSVECNormalize(&source, &dest);
+	float zero = FLOAT_8032fddc;
+	if ((source.x == zero) && (source.y == zero) && (source.z == zero)) {
+		return;
 	}
+	PSVECNormalize(&source, &dest);
 }
 
 /*

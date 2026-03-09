@@ -38,7 +38,7 @@ extern "C" int sprintf(char*, const char*, ...);
 extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
-extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, char);
+extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, unsigned char);
 extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
@@ -848,12 +848,12 @@ int CCaravanWork::FindItem(int itemId)
  */
 void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
-	unsigned short* item = &m_inventoryItems[itemSlot];
-	if (*item != 0xFFFFu) {
-		unsigned int deletedValue = 0xFFFF;
-		short count = m_inventoryItemCount;
-		*item = static_cast<unsigned short>(deletedValue);
-		m_inventoryItemCount = count - 1;
+	unsigned short item = m_inventoryItems[itemSlot];
+
+	if (item != 0xFFFF) {
+		short itemCount = m_inventoryItemCount;
+		m_inventoryItems[itemSlot] = 0xFFFF;
+		m_inventoryItemCount = itemCount - 1;
 		if (updateJoybus != 0) {
 			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<signed char>(itemSlot));
 		}

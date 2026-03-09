@@ -212,21 +212,20 @@ int SineSwing(int phase)
  */
 int TriangleSwing(int phase)
 {
-    unsigned int mode = static_cast<unsigned int>(phase) >> 8 & 3;
-    unsigned int step = static_cast<unsigned int>(phase) & 0xFF;
-    int result = static_cast<int>(step) * 0x100;
-
-    if (mode == 2) {
-        result = static_cast<int>(step) * -0x100;
-    } else if (mode < 2) {
-        if (mode != 0) {
-            result = static_cast<int>(step) * -0x100 + 0x10000;
+    u32 mode = ((u32)phase >> 8) & 3;
+    int result = ((u32)phase & 0xFF) << 8;
+    if (mode != 2) {
+        if (mode >= 2) {
+            if (mode < 4) {
+                result -= 0x10000;
+            }
+        } else if (mode != 0) {
+            result = -result + 0x10000;
         }
-    } else if (mode < 4) {
-        result -= 0x10000;
+    } else {
+        result = -result;
     }
-
-    return (result & ~0xFF) | (phase & 0xFF);
+    return (phase & 0xFF) | result;
 }
 
 /*
@@ -291,19 +290,21 @@ int SineSwingR(int phase)
 #pragma optimization_level 4
 int TriangleSwingR(int phase)
 {
-    u32 mode = ((u32)phase ^ 0x200) >> 8 & 3;
-    u32 step = ((u32)phase ^ 0x200) & 0xFF;
-    int result = (int)(step * 0x100);
-    if (mode == 2) {
-        result = (int)(step * -0x100);
-    } else if (mode < 2) {
-        if (mode != 0) {
-            result = (int)(step * -0x100 + 0x10000);
+    u32 modifiedPhase = (u32)phase ^ 0x200;
+    u32 mode = (modifiedPhase >> 8) & 3;
+    int result = (modifiedPhase & 0xFF) << 8;
+    if (mode != 2) {
+        if (mode >= 2) {
+            if (mode < 4) {
+                result -= 0x10000;
+            }
+        } else if (mode != 0) {
+            result = -result + 0x10000;
         }
-    } else if (mode < 4) {
-        result = result + -0x10000;
+    } else {
+        result = -result;
     }
-    return (result & 0xFFFFFF00) | (phase & 0xFF);
+    return (phase & 0xFF) | result;
 }
 #pragma optimization_level 0
 

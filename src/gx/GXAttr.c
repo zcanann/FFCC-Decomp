@@ -25,104 +25,97 @@
  * JP Size: TODO
  */
 static void __GXXfVtxSpecs(void) {
-    u32 nCol0;
-    u32 nCol1;
-    s32 nNrm;
-    u32 nTex0;
-    u32 nTex1;
-    u32 nTex2;
-    u32 nTex3;
-    u32 nTex4;
-    u32 nTex5;
-    u32 nTex6;
-    u32 nTex7;
-    u32 nTexSum;
-    u32 reg;
+    u32 colCount;
+    u32 nrmCount;
+    u32 texCount;
+    u32 value;
     u32 vcdHi;
     u32 vcdLo;
 
     vcdLo = __GXData->vcdLo;
 
     if (((vcdLo >> 13) & 3) != 0) {
-        nCol0 = 1;
+        colCount = 1;
     } else {
-        nCol0 = 0;
+        colCount = 0;
     }
 
     if (((vcdLo >> 15) & 3) != 0) {
-        nCol1 = 1;
+        value = 1;
     } else {
-        nCol1 = 0;
+        value = 0;
     }
+    colCount += value;
 
     if (__GXData->hasBiNrms != 0) {
-        nNrm = 2;
+        nrmCount = 2;
     } else if (__GXData->hasNrms != 0) {
-        nNrm = 1;
+        nrmCount = 1;
     } else {
-        nNrm = 0;
+        nrmCount = 0;
     }
 
     vcdHi = __GXData->vcdHi;
 
     if ((vcdHi & 3) != 0) {
-        nTex0 = 1;
+        texCount = 1;
     } else {
-        nTex0 = 0;
+        texCount = 0;
     }
 
     if (((vcdHi >> 2) & 3) != 0) {
-        nTex1 = 1;
+        value = 1;
     } else {
-        nTex1 = 0;
+        value = 0;
     }
+    texCount += value;
 
     if (((vcdHi >> 4) & 3) != 0) {
-        nTex2 = 1;
+        value = 1;
     } else {
-        nTex2 = 0;
+        value = 0;
     }
+    texCount += value;
 
     if (((vcdHi >> 6) & 3) != 0) {
-        nTex3 = 1;
+        value = 1;
     } else {
-        nTex3 = 0;
+        value = 0;
     }
+    texCount += value;
 
     if (((vcdHi >> 8) & 3) != 0) {
-        nTex4 = 1;
+        value = 1;
     } else {
-        nTex4 = 0;
+        value = 0;
     }
+    texCount += value;
 
     if (((vcdHi >> 10) & 3) != 0) {
-        nTex5 = 1;
+        value = 1;
     } else {
-        nTex5 = 0;
+        value = 0;
     }
+    texCount += value;
 
     if (((vcdHi >> 12) & 3) != 0) {
-        nTex6 = 1;
+        value = 1;
     } else {
-        nTex6 = 0;
+        value = 0;
     }
+    texCount += value;
 
     if (((vcdHi >> 14) & 3) != 0) {
-        nTex7 = 1;
+        value = 1;
     } else {
-        nTex7 = 0;
+        value = 0;
     }
+    texCount += value;
 
-    nTexSum = nTex1 + nTex2;
-    nTexSum = nTexSum + nTex3;
-    nTexSum = nTexSum + nTex4;
-    nTexSum = nTexSum + nTex5;
-    nTexSum = nTexSum + nTex6;
-    nTexSum = nTexSum + nTex7;
-
-    reg = (nCol0 + nCol1) | (nNrm << 2);
-    reg |= (nTex0 + nTexSum) << 4;
-    GX_WRITE_XF_REG(8, reg);
+    GX_WRITE_U8(0x10);
+    GX_WRITE_U32(0x1008);
+    GX_WRITE_U32((nrmCount << 2) | colCount | (texCount << 4));
+    VERIF_XF_REG(8, (nrmCount << 2) | colCount | (texCount << 4));
     __GXData->bpSentNot = 1;
 }
 

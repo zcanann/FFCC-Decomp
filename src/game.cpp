@@ -290,7 +290,7 @@ CGame::~CGame()
  */
 void CGame::Init()
 {
-    u32 progressiveMode = OSSetProgressiveMode();
+    int progressiveMode = OSSetProgressiveMode();
 
     if (progressiveMode == 3) {
         m_gameWork.m_languageId = 5;
@@ -1430,7 +1430,7 @@ CGPartyObj* CGame::GetPartyObj(int index)
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
     char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
-    if (count >= 2) {
+    if (count > 1) {
         sprintf(out, s_numNameFmt, count, itemTable[itemIndex * 5 + 3]);
         return out;
     }
@@ -1514,7 +1514,7 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
     char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
-    if (count >= 2) {
+    if (count > 1) {
         sprintf(out, s_numNameFmt, count, monTable[monIndex * 5 + 3]);
         return out;
     }

@@ -2063,13 +2063,23 @@ float CMenuPcs::GetSingWinScl()
  */
 int CMenuPcs::SingWinMessHeight()
 {
-    unsigned int lineHeight = static_cast<unsigned int>(FLOAT_80332960 * FLOAT_8032ea78);
+    float scaled = FLOAT_80332960 * FLOAT_8032ea78;
+    int lineHeight = static_cast<int>(scaled);
+    union {
+        struct {
+            u32 hi;
+            u32 lo;
+        } words;
+        double d;
+    } conv;
+
+    conv.words.hi = 0x43300000;
+    conv.words.lo = static_cast<u32>(lineHeight ^ 0x80000000U);
     if (FLOAT_8033294c <
-        (FLOAT_80332960 * FLOAT_8032ea78) -
-            static_cast<float>(SingWinUIntToDouble(lineHeight))) {
+        scaled - static_cast<float>(conv.d - DOUBLE_80332938)) {
         lineHeight += 1;
     }
-    return static_cast<int>(lineHeight + 3);
+    return lineHeight + 3;
 }
 
 /*

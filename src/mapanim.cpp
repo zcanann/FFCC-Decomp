@@ -5,7 +5,7 @@
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
 
-#include <string.h>
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 // TODO: This should be using CPtrArray.h surely?
 template <class T>
@@ -596,14 +596,7 @@ CMapAnim::~CMapAnim()
         }
     }
 
-    if (nodeArray != 0) {
-        if (nodeArray->m_items != 0) {
-            __dla__FPv(nodeArray->m_items);
-        }
-        nodeArray->m_items = 0;
-        nodeArray->m_size = 0;
-        nodeArray->m_numItems = 0;
-    }
+    nodeArray->RemoveAll();
 }
 
 /*

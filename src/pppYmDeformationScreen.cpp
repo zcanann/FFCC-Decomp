@@ -219,8 +219,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				work[0] = outVec.z;
 			}
 
-			CGame* game = &Game.game;
-			if ((s32)game->m_currentSceneId == 7) {
+			if ((s32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
 				cameraX = ppvCameraMatrix02[0][3];
 				cameraY = ppvCameraMatrix02[1][3];
 				cameraZ = ppvCameraMatrix02[2][3];

@@ -71,33 +71,6 @@ struct RainParam {
     float lengthRand;
 };
 
-static void InitDrop(const PRain* step, const RainParam* rain, RainDrop* drop) {
-    u32 randA = (u32)rand();
-    u32 randB = (u32)rand();
-    float unitA = FLOAT_80331020 * (float)randA;
-    float unitB = FLOAT_80331020 * (float)randB;
-    u32 signBit = randA >> 31;
-    u32 flip = (randA & 1U) ^ signBit;
-    float lengthDelta = unitA * rain->lengthRand;
-    s16 lifeJitter = (s16)(randA % rain->lifeRange);
-
-    drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
-    drop->posY = rain->maxY;
-    drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
-
-    drop->dirX = -step->m_initWOrk;
-    drop->dirY = rain->driftY;
-    drop->dirZ = -step->m_arg3;
-    PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
-
-    if (flip != signBit) {
-        lengthDelta = -lengthDelta;
-        lifeJitter = -lifeJitter;
-    }
-    drop->length = rain->lengthBase + lengthDelta;
-    drop->life = (s16)(rain->lifeBase + lifeJitter);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -172,10 +145,20 @@ void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DATA* param_3)
 {
     int i;
+    u32 randA;
+    u32 randB;
+    u16 lifeBase;
+    u16 lifeRange;
     u16 count;
     RainWork* work;
     RainDrop* drop;
     RainParam* rain;
+    float unitA;
+    float unitB;
+    float lengthDelta;
+    s16 lifeJitter;
+    u32 signBit;
+    u32 flip;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -186,13 +169,40 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
         work->drops = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (u32)count * sizeof(RainDrop),
+            (u32)param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
             s_pppRain_cpp_801db610,
             0x7f);
         drop = (RainDrop*)work->drops;
-        for (i = 0; i < count; i++) {
-            InitDrop(param_2, rain, drop);
+        for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++) {
+            randA = (u32)rand();
+            randB = (u32)rand();
+            unitA = FLOAT_80331020 * (float)randA;
+            unitB = FLOAT_80331020 * (float)randB;
+            drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
+            drop->posY = rain->maxY;
+            drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
+            drop->dirX = -param_2->m_initWOrk;
+            drop->dirY = rain->driftY;
+            drop->dirZ = -param_2->m_arg3;
+            PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
+
+            signBit = randA >> 31;
+            flip = (randA & 1U) ^ signBit;
+            lengthDelta = unitA * rain->lengthRand;
+            drop->length = rain->lengthBase;
+            if (flip != signBit) {
+                lengthDelta = -lengthDelta;
+            }
+            drop->length += lengthDelta;
+
+            lifeBase = rain->lifeBase;
+            lifeRange = rain->lifeRange;
+            lifeJitter = (s16)(randA % lifeRange);
+            if (flip != signBit) {
+                lifeJitter = -lifeJitter;
+            }
+            drop->life = (s16)(lifeBase + lifeJitter);
             drop++;
         }
     }
@@ -212,7 +222,34 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         drop->posZ = -(drop->dirZ * work->moveY - drop->posZ);
         drop->life--;
         if (drop->life < 1) {
-            InitDrop(param_2, rain, drop);
+            randA = (u32)rand();
+            randB = (u32)rand();
+            unitA = FLOAT_80331020 * (float)randA;
+            unitB = FLOAT_80331020 * (float)randB;
+            drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
+            drop->posY = rain->maxY;
+            drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
+            drop->dirX = -param_2->m_initWOrk;
+            drop->dirY = rain->driftY;
+            drop->dirZ = -param_2->m_arg3;
+            PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
+
+            signBit = randA >> 31;
+            flip = (randA & 1U) ^ signBit;
+            lengthDelta = unitA * rain->lengthRand;
+            drop->length = rain->lengthBase;
+            if (flip != signBit) {
+                lengthDelta = -lengthDelta;
+            }
+            drop->length += lengthDelta;
+
+            lifeBase = rain->lifeBase;
+            lifeRange = rain->lifeRange;
+            lifeJitter = (s16)(randA % lifeRange);
+            if (flip != signBit) {
+                lifeJitter = -lifeJitter;
+            }
+            drop->life = (s16)(lifeBase + lifeJitter);
         }
         drop++;
     }

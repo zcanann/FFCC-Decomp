@@ -32,6 +32,11 @@ public:
     void DeleteAndRemoveAll();
 };
 
+template <class T>
+inline void SetPtrArrayDtorVtable(CPtrArray<T>*)
+{
+}
+
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" int __cntlzw(unsigned int);
@@ -173,7 +178,20 @@ CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 template <class T>
 CPtrArray<T>::~CPtrArray()
 {
+    SetPtrArrayDtorVtable(this);
     RemoveAll();
+}
+
+template <>
+inline void SetPtrArrayDtorVtable(CPtrArray<_GXTexObj*>* ptrArray)
+{
+    ptrArray->vtable = gVtable_CPtrArray_GXTexObj;
+}
+
+template <>
+inline void SetPtrArrayDtorVtable(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray)
+{
+    ptrArray->vtable = gVtable_CPtrArray_OSFSTexture;
 }
 
 /*

@@ -465,6 +465,30 @@ class TestAgenticLoop(unittest.TestCase):
 
         self.assertEqual(rc, 124)
 
+    def test_run_agentic_loop_stops_when_timeout_cleanup_cannot_stop_process(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=0,
+            wait=Mock(side_effect=subprocess.TimeoutExpired(cmd="codex", timeout=1)),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc) as mock_popen:
+            with patch("agentic_loop._stop_process_tree", return_value=False) as mock_stop:
+                with patch("agentic_loop._sleep_interruptible") as mock_sleep:
+                    rc = agentic_loop.run_agentic_loop(
+                        prompt="x",
+                        timeout_seconds=1,
+                        terminate_grace_seconds=2,
+                        max_backoff_seconds=300,
+                        max_runs=None,
+                    )
+
+        self.assertEqual(rc, 124)
+        mock_popen.assert_called_once()
+        mock_stop.assert_called_once_with(fake_proc, 2)
+        mock_sleep.assert_not_called()
+
     def test_run_agentic_loop_returns_127_on_missing_codex_binary(self):
         launch_error = OSError(errno.ENOENT, "No such file or directory")
         with patch("agentic_loop.subprocess.Popen", side_effect=launch_error):
@@ -551,12 +575,24 @@ class TestAgenticLoop(unittest.TestCase):
         )
         with patch("agentic_loop._signal_process_tree") as mock_signal:
             with patch("agentic_loop.log") as mock_log:
-                agentic_loop._stop_process_tree(fake_proc, grace_seconds=1)
+                stopped = agentic_loop._stop_process_tree(fake_proc, grace_seconds=1)
 
+        self.assertFalse(stopped)
         self.assertEqual(fake_proc.wait.call_count, 2)
         mock_signal.assert_any_call(fake_proc, agentic_loop.signal.SIGTERM)
         mock_signal.assert_any_call(fake_proc, agentic_loop.KILL_SIGNAL)
         mock_log.assert_called_once()
+
+    def test_stop_process_tree_returns_true_when_process_exits_after_sigterm(self):
+        fake_proc = SimpleNamespace(
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=0),
+        )
+
+        with patch("agentic_loop._signal_process_tree"):
+            stopped = agentic_loop._stop_process_tree(fake_proc, grace_seconds=1)
+
+        self.assertTrue(stopped)
 
     def test_signal_process_tree_falls_back_to_direct_signal_when_killpg_fails(self):
         fake_proc = SimpleNamespace(

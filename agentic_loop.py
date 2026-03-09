@@ -153,19 +153,22 @@ def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
             pass
 
 
-def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:
+def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> bool:
     _signal_process_tree(proc, signal.SIGTERM)
     try:
         proc.wait(timeout=grace_seconds)
+        return True
     except subprocess.TimeoutExpired:
         _signal_process_tree(proc, KILL_SIGNAL)
         try:
             proc.wait(timeout=KILL_WAIT_SECONDS)
+            return True
         except subprocess.TimeoutExpired:
             log(
                 f"process did not exit after forced kill within {KILL_WAIT_SECONDS}s; "
                 "continuing"
             )
+            return proc.poll() is not None
 
 
 def _sleep_interruptible(seconds: int) -> bool:
@@ -397,10 +400,13 @@ def run_agentic_loop(
                     break
         except subprocess.TimeoutExpired:
             log(f"codex exceeded timeout ({timeout_seconds}s); terminating process")
-            _stop_process_tree(proc, terminate_grace_seconds)
-            log("codex process stopped after timeout")
+            process_stopped = _stop_process_tree(proc, terminate_grace_seconds)
             consecutive_failures += 1
             exit_code = 124
+            if not process_stopped:
+                log("codex process is still running after timeout handling; stopping loop")
+                break
+            log("codex process stopped after timeout")
             if not _can_retry(run_count, max_runs):
                 log("reached max runs after timeout; stopping loop")
                 break
@@ -411,7 +417,8 @@ def run_agentic_loop(
                 break
         except KeyboardInterrupt:
             log("keyboard interrupt received; stopping loop")
-            _stop_process_tree(proc, terminate_grace_seconds)
+            if not _stop_process_tree(proc, terminate_grace_seconds):
+                log("codex process is still running after interrupt handling")
             exit_code = 130
             break
 

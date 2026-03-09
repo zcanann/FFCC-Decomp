@@ -184,10 +184,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             state->m_normal.y = local_1ac.y;
             state->m_normal.z = local_1ac.z;
 
-            local_164.x = state->m_normal.x;
-            local_164.y = state->m_normal.y;
-            local_164.z = state->m_normal.z;
-            PSVECNormalize(&local_164, &local_158);
+            PSVECNormalize(&state->m_normal, &local_158);
 
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
                 trigValue = sin((f64)*(f32*)(owner + 0x1a8));
@@ -291,7 +288,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         }
     }
 }
-
 
 
 

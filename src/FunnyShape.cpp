@@ -195,8 +195,8 @@ extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelet
             PtrAt(funnyShape, 0x60E4) = 0;
         }
 
-        s32 i = 0;
         CFunnyShape* iter = funnyShape;
+        s32 i = 0;
         do {
             if (PtrAt(iter, 0x6094) != 0) {
                 __dla__FPv(PtrAt(iter, 0x6094));

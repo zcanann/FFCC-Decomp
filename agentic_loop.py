@@ -1,4 +1,5 @@
 import os
+import signal
 import subprocess
 import time
 from datetime import datetime
@@ -22,10 +23,44 @@ def log(message: str) -> None:
     print(f"[{timestamp}] {message}", flush=True)
 
 
+def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
+    """Signal the full process tree when possible."""
+    if proc.poll() is not None:
+        return
+
+    try:
+        if os.name == "posix":
+            os.killpg(proc.pid, sig)
+        else:
+            proc.send_signal(sig)
+    except ProcessLookupError:
+        pass
+
+
+def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:
+    _signal_process_tree(proc, signal.SIGTERM)
+    try:
+        proc.wait(timeout=grace_seconds)
+    except subprocess.TimeoutExpired:
+        _signal_process_tree(proc, signal.SIGKILL)
+        proc.wait()
+
+
 consecutive_failures = 0
 while True:
     log("starting codex run")
-    proc = subprocess.Popen(CMD)
+    try:
+        proc = subprocess.Popen(
+            CMD,
+            start_new_session=(os.name == "posix"),
+        )
+    except OSError as exc:
+        consecutive_failures += 1
+        backoff = min(2 ** min(consecutive_failures, 8), MAX_BACKOFF_SECONDS)
+        log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
+        time.sleep(backoff)
+        continue
+
     try:
         proc.wait(timeout=TIMEOUT_SECONDS)
         if proc.returncode == 0:
@@ -41,21 +76,10 @@ while True:
             time.sleep(backoff)
     except subprocess.TimeoutExpired:
         log(f"codex exceeded timeout ({TIMEOUT_SECONDS}s); terminating process")
-        proc.terminate()
-        try:
-            proc.wait(timeout=TERMINATE_GRACE_SECONDS)
-            log("codex process terminated after timeout")
-        except subprocess.TimeoutExpired:
-            log("codex process did not terminate gracefully; killing process")
-            proc.kill()
-            proc.wait()
+        _stop_process_tree(proc, TERMINATE_GRACE_SECONDS)
+        log("codex process stopped after timeout")
         consecutive_failures = 0
     except KeyboardInterrupt:
         log("keyboard interrupt received; stopping loop")
-        proc.terminate()
-        try:
-            proc.wait(timeout=TERMINATE_GRACE_SECONDS)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait()
+        _stop_process_tree(proc, TERMINATE_GRACE_SECONDS)
         break

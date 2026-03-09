@@ -653,7 +653,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
+    s32 colorDataOffset = serializedDataOffsets[0];
+    u8* colorSource = (u8*)&pppScreenBreak->field_0x88 + colorDataOffset;
     float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -663,18 +664,17 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
     u8* color = (u8*)(value + 10);
-    color[0] = colorSource[8];
-    color[1] = colorSource[9];
-    color[2] = colorSource[10];
-    color[3] = colorSource[11];
+    color[0] = colorSource[0];
+    color[1] = colorSource[1];
+    color[2] = colorSource[2];
+    color[3] = colorSource[3];
     DCFlushRange(value + 10, 4);
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
                                                  param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
-    u32 pieceCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
-    if (*(void**)&value[3] == NULL) {
-        *(void**)&value[3] = pppMemAlloc__FUlPQ27CMemory6CStagePci(pieceCount * 0x3C, pppEnvStPtr->m_stagePtr,
+    if (value[3] == FLOAT_80331cc4) {
+        *(void**)&value[3] = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25E);
         *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25F);
@@ -685,7 +685,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     float sx = FLOAT_80331cc0 * value[6];
     float sy = FLOAT_80331cc0 * value[7];
     u8* piece = (u8*)*(void**)&value[3];
-    for (u32 i = 0; i < pieceCount; i++) {
+    for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
         switch (param_2->m_initWOrk) {
         case 0:
             piece[0x38] = 1;
@@ -701,7 +701,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 3:
-            if (-*(float*)(piece + 0x24) < (*value * sx) - value[6]) {
+            if (-*(float*)(piece + 0x24) < (*value * sx) + -value[6]) {
                 piece[0x38] = 1;
             }
             break;
@@ -722,8 +722,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         case 6: {
             float x = *value * value[6];
             float y = *value * value[7];
-            if (((value[6] - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -value[6] + x) ||
-                 (value[7] - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -value[7] + y))) {
+            if ((value[6] - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -value[6] + x) ||
+                (value[7] - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -value[7] + y)) {
                 piece[0x38] = 1;
             }
             break;

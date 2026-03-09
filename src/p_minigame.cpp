@@ -15,9 +15,9 @@ CMiniGamePcs MiniGamePcs;
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
-unsigned int m_table_desc0__12CMiniGamePcs[3];
-unsigned int m_table_desc1__12CMiniGamePcs[3];
-unsigned int m_table_desc2__12CMiniGamePcs[3];
+unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
+unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
+unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 unsigned char m_table__12CMiniGamePcs[0x15C];
 extern "C" void* __vt__12CMiniGamePcs[];
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
@@ -61,30 +61,17 @@ static bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
 extern "C" void __sinit_p_minigame_cpp(void)
 {
     unsigned int* table = reinterpret_cast<unsigned int*>(m_table__12CMiniGamePcs);
-    unsigned int* desc0 = m_table_desc0__12CMiniGamePcs;
-    unsigned int* desc1 = m_table_desc1__12CMiniGamePcs;
-    unsigned int* desc2 = m_table_desc2__12CMiniGamePcs;
 
     *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(__vt__12CMiniGamePcs);
-    desc0[0] = 0;
-    desc0[1] = 0xFFFFFFFF;
-    desc0[2] = reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv);
-    desc1[0] = 0;
-    desc1[1] = 0xFFFFFFFF;
-    desc1[2] = reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv);
-    desc2[0] = 0;
-    desc2[1] = 0xFFFFFFFF;
-    desc2[2] = reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv);
-
-    table[1] = desc0[0];
-    table[2] = desc0[1];
-    table[3] = desc0[2];
-    table[4] = desc1[0];
-    table[5] = desc1[1];
-    table[6] = desc1[2];
-    table[7] = desc2[0];
-    table[8] = desc2[1];
-    table[9] = desc2[2];
+    table[1] = m_table_desc0__12CMiniGamePcs[0];
+    table[2] = m_table_desc0__12CMiniGamePcs[1];
+    table[3] = m_table_desc0__12CMiniGamePcs[2];
+    table[4] = m_table_desc1__12CMiniGamePcs[0];
+    table[5] = m_table_desc1__12CMiniGamePcs[1];
+    table[6] = m_table_desc1__12CMiniGamePcs[2];
+    table[7] = m_table_desc2__12CMiniGamePcs[0];
+    table[8] = m_table_desc2__12CMiniGamePcs[1];
+    table[9] = m_table_desc2__12CMiniGamePcs[2];
 }
 
 /*

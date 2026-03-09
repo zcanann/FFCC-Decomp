@@ -715,7 +715,7 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
     PSVECNormalize(&zAxis, &zAxis);
 
     PSVECCrossProduct(&yAxis, &zAxis, &temp);
-    if (PSVECDotProduct(&xAxis, &temp) < 0.0f) {
+    if (PSVECDotProduct(&xAxis, &temp) < 0.0) {
         PSVECScale(outScale, outScale, -1.0f);
     }
 }

@@ -848,11 +848,14 @@ int CCaravanWork::FindItem(int itemId)
  */
 void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
-	if (m_inventoryItems[itemSlot] != 0xFFFF) {
-		m_inventoryItems[itemSlot] = 0xFFFF;
-		m_inventoryItemCount = m_inventoryItemCount - 1;
+	unsigned short* item = &m_inventoryItems[itemSlot];
+	if (*item != 0xFFFFu) {
+		unsigned int deletedValue = 0xFFFF;
+		short count = m_inventoryItemCount;
+		*item = static_cast<unsigned short>(deletedValue);
+		m_inventoryItemCount = count - 1;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemSlot);
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<signed char>(itemSlot));
 		}
 	}
 }

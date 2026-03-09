@@ -619,10 +619,9 @@ void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-
-    trackData[0] = trackData[*(short*)(trackData + 0x4f) + 2];
-    *(short*)(trackData + 0x51) = *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130);
+    *(int*)track = ((int*)track)[*(short*)((char*)track + 0x13c) + 2];
+    *(short*)((char*)track + 0x144) =
+        *(short*)((char*)track + *(short*)((char*)track + 0x13c) * 2 + 0x130);
 }
 
 /*

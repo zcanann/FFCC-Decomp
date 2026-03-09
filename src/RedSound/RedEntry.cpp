@@ -667,13 +667,23 @@ int CRedEntry::SearchWaveBase(int waveNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c153c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::ReentryWaveData(int)
+#pragma dont_inline on
+int CRedEntry::ReentryWaveData(int waveNo)
 {
-	// TODO
+	int sequenceNo = SearchWaveSequence(waveNo);
+	if (-1 < sequenceNo) {
+		WaveHistoryChoice((RedHistoryBANK*)(((int*)this)[0] + sequenceNo * 0x10));
+	}
+	return sequenceNo;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1012,13 +1022,23 @@ int* CRedEntry::SearchSeSepBank(int seNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c211c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::ReentrySeSepData(int)
+#pragma dont_inline on
+int CRedEntry::ReentrySeSepData(int seNo)
 {
-	// TODO
+	int sequenceNo = SearchSeSepSequence(seNo);
+	if (-1 < sequenceNo) {
+		SeSepHistoryChoice((RedHistoryBANK*)(((int*)this)[1] + sequenceNo * 0x10));
+	}
+	return sequenceNo;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1258,13 +1278,23 @@ int* CRedEntry::SearchMusicBank(int musicNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c281c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::ReentryMusicData(int)
+#pragma dont_inline on
+int CRedEntry::ReentryMusicData(int musicNo)
 {
-	// TODO
+	int sequenceNo = SearchMusicSequence(musicNo);
+	if (-1 < sequenceNo) {
+		MusicHistoryChoice((RedHistoryBANK*)(((int*)this)[2] + sequenceNo * 0x10));
+	}
+	return sequenceNo;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

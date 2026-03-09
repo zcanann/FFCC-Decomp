@@ -468,10 +468,11 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     float* particle = (float*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
     u8* step = (u8*)param_2;
     u16 count = *(u16*)(step + 0x10);
+    int i;
 
     GXSetTevSwapMode((GXTevStageID)0, (GXTevSwapSel)0, (GXTevSwapSel)0);
 
-    for (int i = 0; i < (int)count; i++) {
+    for (i = 0; i < (int)count; i++) {
         u16 dataValIndex = *(u16*)(step + 4);
         if (dataValIndex != 0xffff) {
             long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
@@ -479,7 +480,8 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
             Mtx rotMtx;
-            Vec pos;
+            Vec srcPos;
+            Vec worldPos;
             GXColor amb;
             u8 blend = step[0x18 + 0x1e];
 
@@ -494,19 +496,19 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             memcpy(rotMatrix.value, rotMtx, sizeof(Mtx));
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&model, &rotMatrix, &scaleMatrix);
 
-            pos.x = particle[0];
-            pos.y = particle[1];
-            pos.z = particle[2];
-            pppCopyVector__FR3Vec3Vec(&pos, &pos);
+            srcPos.x = particle[0];
+            srcPos.y = particle[1];
+            srcPos.z = particle[2];
+            pppCopyVector__FR3Vec3Vec(&worldPos, &srcPos);
             if (Game.game.m_currentSceneId == 7) {
-                PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
+                PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {
-                PSMTXMultVec(ppvCameraMatrix0, &pos, &pos);
+                PSMTXMultVec(ppvCameraMatrix0, &worldPos, &worldPos);
             }
 
-            model.value[0][3] = pos.x;
-            model.value[1][3] = pos.y;
-            model.value[2][3] = pos.z;
+            model.value[0][3] = worldPos.x;
+            model.value[1][3] = worldPos.y;
+            model.value[2][3] = worldPos.z;
 
             pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
                 0, &model, FLOAT_80330644, step[0x18 + 0x61], step[0x18 + 0x60], blend, 0, 1, 1, 0);

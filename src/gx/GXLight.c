@@ -558,16 +558,16 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorS
 #endif
 
     reg = (((u32)enable & 0xFF) << 1) | (u32)mat_src;
-    reg |= (u32)amb_src << 6;
+    reg = (reg & ~0x40) | ((u32)amb_src << 6);
 
     if (attn_fn == GX_AF_SPEC) {
         diff_fn = GX_DF_NONE;
     }
 
-    reg |= (u32)diff_fn << 7;
+    reg = (reg & ~0x180) | ((u32)diff_fn << 7);
     reg |= (light_mask & 0x0F) << 2;
     reg |= (light_mask & 0xF0) << 7;
-    reg |= ((u32)(attn_fn != GX_AF_NONE) << 9) | ((u32)(attn_fn != GX_AF_SPEC) << 10);
+    reg = (reg & ~0x600) | ((u32)(attn_fn != GX_AF_NONE) << 9) | ((u32)(attn_fn != GX_AF_SPEC) << 10);
 
     GX_WRITE_XF_REG(idx + 14, reg);
     

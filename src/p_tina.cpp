@@ -1145,7 +1145,7 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    unsigned char* busy = reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4;
+    unsigned int* busy = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4);
     int count = 2;
 
     do {

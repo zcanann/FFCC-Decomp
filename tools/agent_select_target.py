@@ -11,7 +11,10 @@ import sys
 import random
 from pathlib import Path
 
-import extract_symbols
+try:
+    from . import extract_symbols
+except ImportError:
+    import extract_symbols
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
 WARNING_BUILD_MISMATCH = (
@@ -24,20 +27,44 @@ def warn_build_mismatch():
     print(WARNING_BUILD_MISMATCH)
 
 
+def safe_float(value, default=0.0):
+    """Parse a float from mixed report values without throwing."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_int(value, default=0):
+    """Parse an int from mixed report values without throwing."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def load_blacklist():
     """Load recently failed units to avoid"""
     state_file = Path.home() / ".openclaw/workspace/memory/decomp-state.json"
     try:
         with open(state_file) as f:
             state = json.load(f)
-        return state.get("recentFailures", [])
-    except:
+
+        failures = state.get("recentFailures", [])
+        if not isinstance(failures, list):
+            return []
+
+        # Keep only string unit names to avoid type errors and accidental substring matches.
+        return [failure for failure in failures if isinstance(failure, str)]
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
         return []
 
 
 def is_viable_target(unit, blacklist):
     """Check if unit is a good target candidate"""
-    name = unit["name"]
+    name = unit.get("name")
+    if not isinstance(name, str) or not name:
+        return False, "missing name"
     measures = unit.get("measures", {})
 
     # Skip auto-generated units
@@ -49,9 +76,9 @@ def is_viable_target(unit, blacklist):
         return False, "recently failed"
 
     # Skip units that are already effectively complete.
-    fuzzy = float(measures.get("fuzzy_match_percent", 0) or 0)
-    matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
-    matched_data_percent = float(measures.get("matched_data_percent", 0) or 0)
+    fuzzy = safe_float(measures.get("fuzzy_match_percent", 0))
+    matched_code_percent = safe_float(measures.get("matched_code_percent", 0))
+    matched_data_percent = safe_float(measures.get("matched_data_percent", 0))
 
     if (
         fuzzy >= COMPLETE_THRESHOLD_PERCENT
@@ -68,7 +95,7 @@ def derive_object_file(unit):
         base = Path(source_path).stem
         return f"{base}.o"
     name = unit.get("name", "")
-    base = Path(name).name
+    base = Path(name).stem
     return f"{base}.o"
 
 def derive_source_file(unit):
@@ -76,8 +103,10 @@ def derive_source_file(unit):
     if source_path and source_path != "unknown":
         return Path(source_path).name
     name = unit.get("name", "")
-    base = Path(name).name
-    return f"{base}.cpp"
+    path = Path(name)
+    if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
+        return path.name
+    return f"{path.stem}.cpp"
 
 def summarize_symbols(label, all_info):
     """Return formatted lines for symbol summary (no printing inside)."""
@@ -96,14 +125,17 @@ def summarize_symbols(label, all_info):
         size_raw = p.get("size", "unknown")
         addr = p.get("virtual_addr", "unknown")
 
-        if size_raw not in ["unknown", "UNUSED"]:
+        if size_raw in ["unknown", "UNUSED"]:
+            size = size_raw
+        elif isinstance(size_raw, int):
+            size = f"0x{size_raw:x}"
+        elif isinstance(size_raw, str):
             try:
-                size_val = int(size_raw, 16)
-                size = f"0x{size_val:x}"
+                size = f"0x{int(size_raw, 16):x}"
             except ValueError:
                 size = size_raw
         else:
-            size = size_raw
+            size = str(size_raw)
 
         lines.append(f"    - {symbol} ({size}b at {addr})")
 
@@ -132,24 +164,25 @@ def extract_candidates(report_path):
 
         entry = {
             "name": unit["name"],
-            "fuzzy_match": float(measures.get("fuzzy_match_percent", 0) or 0),
-            "matched_code_percent": float(measures.get("matched_code_percent", 0) or 0),
-            "matched_data_percent": float(measures.get("matched_data_percent", 0) or 0),
-            "total_functions": int(measures.get("total_functions", 0) or 0),
-            "matched_functions": int(measures.get("matched_functions", 0) or 0),
-            "func_match_percent": float(measures.get("matched_functions_percent", 0) or 0),
-            "total_code": int(measures.get("total_code", 0) or 0),
-            "total_data": int(measures.get("total_data", 0) or 0),
+            "fuzzy_match": safe_float(measures.get("fuzzy_match_percent", 0)),
+            "matched_code_percent": safe_float(measures.get("matched_code_percent", 0)),
+            "matched_data_percent": safe_float(measures.get("matched_data_percent", 0)),
+            "total_functions": safe_int(measures.get("total_functions", 0), 0),
+            "matched_functions": safe_int(measures.get("matched_functions", 0), 0),
+            "func_match_percent": safe_float(measures.get("matched_functions_percent", 0)),
+            "total_code": safe_int(measures.get("total_code", 0), 0),
+            "total_data": safe_int(measures.get("total_data", 0), 0),
             "source_path": source_path,
             "source_file": source_file,
             "top_functions": []
         }
 
-        for func in sorted(functions, key=lambda f: f.get("fuzzy_match_percent", 0))[:3]:
-            if func.get("fuzzy_match_percent", 0) < 99:
+        for func in sorted(functions, key=lambda f: safe_float(f.get("fuzzy_match_percent", 0)))[:3]:
+            func_match = safe_float(func.get("fuzzy_match_percent", 0))
+            if func_match < 99:
                 entry["top_functions"].append({
-                    "name": func["name"],
-                    "match": func.get("fuzzy_match_percent", 0),
+                    "name": func.get("name", "unknown"),
+                    "match": func_match,
                     "size": func.get("size", "unknown")
                 })
 

@@ -4,6 +4,8 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
+#include "ffcc/util.h"
 #include <string.h>
 
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
@@ -19,10 +21,12 @@ extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" {
 int gBonusMenuWork0 = 0;
 float* gBonusCheckMarkPosBuffer = 0;
 }
+static const char s_drawBonusFmt[] = "draw Bonus[%d]\n";
 
 namespace {
 
@@ -328,8 +332,10 @@ void CMenuPcs::calcBonus()
 void CMenuPcs::drawBonus()
 {
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	if (statePtr == 0) {
-		return;
+	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 480.0f);
+
+	if (System.m_execParam != 0) {
+		Printf__7CSystemFPce(&System, s_drawBonusFmt, (int)*(short*)(statePtr + 0x1c));
 	}
 
 	switch (*(short*)(statePtr + 0x1c)) {
@@ -346,12 +352,10 @@ void CMenuPcs::drawBonus()
 		DrawSelectOpenAnim();
 		break;
 	case 4:
-		DrawSelectWait();
+		DrawSelectOpenAnim();
 		break;
 	case 5:
-		DrawSelectCloseAnim();
-		break;
-	default:
+		DrawSelectOpenAnim();
 		break;
 	}
 }
@@ -1399,4 +1403,3 @@ void CMenuPcs::ClrBattleItem()
 		}
 	}
 }
-

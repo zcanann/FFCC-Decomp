@@ -1494,12 +1494,93 @@ void GbaQueue::GetPlayerPos(int, unsigned int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE76C
+ * PAL Size: 576b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetEnemyPos(int, unsigned int*, int*)
+void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 {
-	// TODO
+    char localEnemyData[0x508];
+    char* obj;
+    char radarMode;
+    short baseX;
+    short baseZ;
+    int count;
+    int i;
+    char* localEntry;
+    char* prevEntry;
+    unsigned char* outPtr;
+
+    obj = reinterpret_cast<char*>(this);
+
+    OSWaitSemaphore(accessSemaphores + channel);
+    if (((unsigned int)__cntlzw(1 - static_cast<int>(obj[0x2D56])) >> 5 & 0xFFU) != 0U) {
+        channel = 0;
+    }
+    OSSignalSemaphore(accessSemaphores + channel);
+
+    OSWaitSemaphore(accessSemaphores + channel);
+
+    baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x32);
+    baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x34);
+    memcpy(localEnemyData, obj + 0xB34, 0x500);
+
+    radarMode = obj[channel + 0x2D32];
+    localEntry = localEnemyData;
+    for (i = 0; i < 0x40; i++) {
+        int enemyX = *reinterpret_cast<short*>(localEntry + 8) - baseX;
+        int enemyZ = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
+
+        *reinterpret_cast<short*>(localEntry + 8) = static_cast<short>(enemyX);
+        *reinterpret_cast<short*>(localEntry + 10) = static_cast<short>(enemyZ);
+
+        if ((enemyX < 0 ? -enemyX : enemyX) < 0x50 && (enemyZ < 0 ? -enemyZ : enemyZ) < 0x40) {
+            localEntry[0] = 1;
+        } else {
+            localEntry[8] = -1;
+            localEntry[9] = -1;
+            localEntry[10] = -1;
+            localEntry[11] = -1;
+            localEntry[0] = 0;
+        }
+
+        if (*reinterpret_cast<short*>(localEntry + 4) == 0 || localEntry[2] == 0) {
+            localEntry[0] = 0;
+        }
+
+        if (radarMode == 2 || radarMode == 0) {
+            localEntry[0] = 0;
+        } else if (radarMode == 3 && localEntry[1] == 1) {
+            localEntry[0] = 0;
+        }
+
+        localEntry += 0x14;
+    }
+
+    count = 0;
+    localEntry = localEnemyData;
+    prevEntry = obj + channel * 0x500 + 0x1034;
+    outPtr = reinterpret_cast<unsigned char*>(outData);
+    for (i = 0; i < 0x40; i++) {
+        if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
+            count++;
+            outPtr[0] = 0x12;
+            outPtr[1] = static_cast<unsigned char>(i) | (static_cast<unsigned char>(localEntry[0]) << 7);
+            outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
+            outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
+            outPtr += 4;
+        }
+
+        localEntry += 0x14;
+        prevEntry += 0x14;
+    }
+
+    *outCount = count;
+    memcpy(obj + channel * 0x500 + 0x1034, localEnemyData, 0x500);
+    OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*

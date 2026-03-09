@@ -101,6 +101,16 @@ static void DisableWriteGatherPipe(void) {
     PPCMthid2(hid2);
 }
 
+typedef struct GXTexRegion16 {
+    u32 dummy[4];
+} GXTexRegion16;
+
+typedef struct GXTexRegionState {
+    u8 pad[0x208];
+    GXTexRegion16 texRegions0[8];
+    GXTexRegion16 texRegions1[8];
+} GXTexRegionState;
+
 /*
  * --INFO--
  * PAL Address: 0x8019EF44
@@ -111,6 +121,7 @@ static void DisableWriteGatherPipe(void) {
  * JP Size: TODO
  */
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
+    GXTexRegionState* texState = (GXTexRegionState*)__GXData;
     u32 count;
     s32 format = GXGetTexObjFmt(t_obj);
 
@@ -119,16 +130,16 @@ static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMap
     if (format != 8) {
         if (format != 9) {
             if (format != 10) {
-                count = __GXData->TexRegions1[4].dummy[0];
-                __GXData->TexRegions1[4].dummy[0] = count + 1;
-                return &__GXData->TexRegions0[count & 7];
+                count = texState->texRegions1[4].dummy[0];
+                texState->texRegions1[4].dummy[0] = count + 1;
+                return (GXTexRegion*)&texState->texRegions0[count & 7];
             }
         }
     }
 
-    count = __GXData->TexRegions1[4].dummy[1];
-    __GXData->TexRegions1[4].dummy[1] = count + 1;
-    return &__GXData->TexRegions1[count & 3];
+    count = texState->texRegions1[4].dummy[1];
+    texState->texRegions1[4].dummy[1] = count + 1;
+    return (GXTexRegion*)&texState->texRegions1[count & 3];
 }
 
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {

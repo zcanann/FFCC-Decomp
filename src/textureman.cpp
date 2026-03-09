@@ -1000,17 +1000,19 @@ void CTexture::SetTlutColor(int index, _GXColor color)
 {
     int offset = 0;
 
-    if (m_format == 9) {
+    if ((int)m_format == 9) {
         offset = 0x100;
-    } else if (m_format == 8) {
+    } else if ((int)m_format == 8) {
         offset = 0x10;
     }
 
-    unsigned short color0 = static_cast<unsigned short>(color.r | (color.g << 8));
-    unsigned short color1 = static_cast<unsigned short>(color.b | (color.a << 8));
     unsigned short* tlut = reinterpret_cast<unsigned short*>(m_tlutData);
-    tlut[index] = color0;
-    tlut[index + offset] = color1;
+    unsigned short rg = static_cast<unsigned short>(color.g) << 8;
+    unsigned short ba = static_cast<unsigned short>(color.a) << 8;
+    rg = static_cast<unsigned short>(rg | color.r);
+    ba = static_cast<unsigned short>(ba | color.b);
+    tlut[index] = rg;
+    tlut[index + offset] = ba;
 }
 
 /*

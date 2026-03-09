@@ -168,8 +168,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         cameraPos.z = ppvCameraMatrix0[2][3];
         maxRadius = FLOAT_80331930;
 
-        meshCount = *(u16*)((u8*)&model->m_mapMesh + 0x0);
-        radiusArray = *(float**)((u8*)&model->m_mapMesh + 0x2c);
+        meshCount = *(u16*)((u8*)model + 0x0);
+        radiusArray = *(float**)((u8*)model + 0x2c);
         for (i = 0; i < meshCount; i++) {
             radius = radiusArray[i * 3];
             if (maxRadius < radius) {
@@ -218,7 +218,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         GXSetVtxDesc((GXAttr)0xB, GX_INDEX8);
         GXSetVtxDesc((GXAttr)0xD, GX_INDEX8);
 
-        meshColor = *(u8**)((u8*)&model->m_mapMesh + 0x3C);
+        meshColor = *(u8**)((u8*)model + 0x3C);
         meshColor[0] = 0xFF;
         meshColor[1] = 0xFF;
         meshColor[2] = 0xFF;
@@ -591,4 +591,3 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
-

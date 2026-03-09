@@ -53,6 +53,10 @@ public:
     void CopyToAMemorySync(void*, void*, unsigned long);
     void CopyFromAMemorySync(void*, void*, unsigned long);
     void IsCopyCompleted(int);
+
+private:
+    // Backing storage for the recovered CMemory instance; methods access fields via known offsets.
+    u8 m_storage[0x77A0];
 };
 
 class CAmemCache

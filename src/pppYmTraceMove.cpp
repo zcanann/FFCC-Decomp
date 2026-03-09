@@ -23,7 +23,7 @@ extern "C" {
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
 {
 	Vec* dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	Vec savedPosition = pppMngStPtr->m_savedPosition;
+	Vec savedPosition = *(Vec*)&pppMngStPtr->m_savedPosition.z;
 	Vec paramVec = pppMngStPtr->m_paramVec0;
 	f32 zero;
 

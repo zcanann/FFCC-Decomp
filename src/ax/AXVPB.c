@@ -474,7 +474,7 @@ void __AXVPBInit(void) {
 
     BUFFER_MEMSET(__AXPB, 0xEC0);
     BUFFER_MEMSET(__AXITD, 0x400);
-    BUFFER_MEMSET(__AXVPB, 0x22C0);
+    BUFFER_MEMSET(__AXVPB, 0x2240);
 
     for (i = 0; i < AX_MAX_VOICES; i++) {
         ppb = &__AXPB[i];

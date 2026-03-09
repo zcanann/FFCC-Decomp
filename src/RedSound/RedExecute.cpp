@@ -2037,6 +2037,8 @@ void _SkipMusicEntry()
     DAT_8032f470 = 0;
 }
 
+#pragma dont_inline on
+
 /*
  * --INFO--
  * PAL Address: 0x801c6980
@@ -2096,6 +2098,8 @@ void MusicSkipFunction()
     }
     DAT_8032f470 = 1;
 }
+
+#pragma dont_inline reset
 
 /*
  * --INFO--

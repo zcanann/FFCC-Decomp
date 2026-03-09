@@ -10,6 +10,8 @@ class CFlatRuntime2
 	void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	void onSetSystemVal(int, CFlatRuntime::CStack*, int);
+	int GetSysControl(int);
+	void resetSpawnBit(int);
 };
 
 #endif // _FFCC_CFLAT_R2SYSTEM_H_

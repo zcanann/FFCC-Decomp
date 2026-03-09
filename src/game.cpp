@@ -17,6 +17,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/maplight.h"
 #include "ffcc/chara.h"
+#include "ffcc/cflat_runtime.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_FunnyShape.h"
@@ -39,12 +41,9 @@ extern "C" {
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
-void Quit__12CFlatRuntimeFv(void*);
-void Destroy__13CFlatRuntime2Fv(void*);
 void Quit__11CDbgMenuPcsFv(void*);
 void Quit__7CGbaPcsFv(void*);
 void Quit__7CUSBPcsFv(void*);
-void Quit__6CCharaFv(void*);
 void Quit__9CLightPcsFv(void*);
 void Quit__7CMapPcsFv(void*);
 void Quit__18CMaterialEditorPcsFv(void*);
@@ -56,7 +55,6 @@ void pppDestroyAll__8CPartMngFv(void*);
 int pppGetIfDt__8CPartMngFs(void*, short);
 void pppEndPart__8CPartMngFi(void*, int);
 void Init__11CGraphicPcsFv(void*);
-void Init__6CCharaFv(void*);
 void Init__9CLightPcsFv(void*);
 void Init__7CMapPcsFv(void*);
 void Init__18CMaterialEditorPcsFv(void*);
@@ -64,16 +62,7 @@ void Init__14CFunnyShapePcsFv(void*);
 void Init__7CUSBPcsFv(void*);
 void Init__7CGbaPcsFv(void*);
 void Init__11CDbgMenuPcsFv(void*);
-void Init__12CFlatRuntimeFv(void*);
-int Load__13CFlatRuntime2FPc(void*, char*);
-void ResetNewGame__13CFlatRuntime2Fv(void*);
-int intToClass__13CFlatRuntime2Fi(void*, int);
 int sprintf(char*, const char*, ...);
-void Draw__13CFlatRuntime2Fv(void*);
-void Frame__13CFlatRuntime2Fii(void*, int, int);
-void AfterFrame__12CFlatRuntimeFi(void*, int);
-void Calc__13CFlatRuntime2Fv(void*);
-void ResetPerformance__12CFlatRuntimeFv(void*);
 int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
 void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
@@ -82,10 +71,7 @@ void Draw__5CWindFv(void*);
 void CheckMenu__10CGPartyObjFv();
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
-void Draw__13CFlatRuntime2Fv(void*);
-void Frame__13CFlatRuntime2Fii(void*, int, int);
 void CheckMenu__10CGPartyObjFv(void);
-void AfterFrame__12CFlatRuntimeFi(void*, int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 unsigned char PartPcs[];
@@ -310,7 +296,7 @@ void CGame::Init()
 
     CameraPcs.Init();
     Init__11CGraphicPcsFv(&GraphicsPcs);
-    Init__6CCharaFv(&gChara);
+    gChara.Init();
     Init__9CLightPcsFv(&LightPcs);
     CharaPcs.Init();
     Init__7CMapPcsFv(&MapPcs);
@@ -333,7 +319,7 @@ void CGame::Init()
     memset(m_currentScriptName, 0, sizeof(m_currentScriptName));
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
-    Init__12CFlatRuntimeFv(CFlat);
+    reinterpret_cast<CFlatRuntime*>(CFlat)->Init();
     unkFloat_0xca10 = FLOAT_8032f694;
 }
 
@@ -348,7 +334,7 @@ void CGame::Init()
  */
 void CGame::Quit()
 {
-	Quit__12CFlatRuntimeFv(CFlat);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->Quit();
 
 	if (m_debugStage != 0) {
 		Memory.DestroyStage(m_debugStage);
@@ -360,7 +346,7 @@ void CGame::Quit()
 	Quit__7CGbaPcsFv(&GbaPcs);
 	MenuPcs.Quit();
 	Quit__7CUSBPcsFv(&USBPcs);
-	Quit__6CCharaFv(&gChara);
+	gChara.Quit();
 	CharaPcs.Quit();
 	Quit__9CLightPcsFv(&LightPcs);
 	Quit__7CMapPcsFv(&MapPcs);
@@ -609,7 +595,7 @@ void CGame::InitNewGame()
     }
 
     strcpy(Game.game.m_gameWork.m_townName, townName);
-    ResetNewGame__13CFlatRuntime2Fv(CFlat);
+    gCFlatRuntime2.ResetNewGame();
     gChara.InitFurTexBuffer();
 }
 
@@ -627,7 +613,7 @@ void CGame::clearWork()
     int i;
     int j;
 
-    Destroy__13CFlatRuntime2Fv(CFlat);
+    gCFlatRuntime2.Destroy();
 
     for (i = 0; i < 4; i++) {
         m_cFlatDataArr[i].Destroy();
@@ -762,7 +748,7 @@ void CGame::CheckScriptChange()
 
     if (strcmp(m_nextScript.m_name, DAT_8032f698) != 0) {
         if (m_cfdLoadedFlag == 0) {
-            Destroy__13CFlatRuntime2Fv(CFlat);
+            gCFlatRuntime2.Destroy();
             loadCfd();
             m_cfdLoadedFlag = 1;
 
@@ -783,7 +769,7 @@ void CGame::CheckScriptChange()
         }
     }
 
-    int scriptResult = Load__13CFlatRuntime2FPc(CFlat, m_nextScript.m_name);
+    int scriptResult = gCFlatRuntime2.Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if (m_nextScript.m_flags != 0) {
@@ -807,7 +793,7 @@ void CGame::CheckScriptChange()
         }
 
         strcpy(m_gameWork.m_townName, townName);
-        ResetNewGame__13CFlatRuntime2Fv(CFlat);
+        gCFlatRuntime2.ResetNewGame();
         gChara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }
@@ -1060,9 +1046,9 @@ void CGame::Calc()
     }
 
     Wind.Frame();
-    Calc__13CFlatRuntime2Fv(CFlat);
-    ResetPerformance__12CFlatRuntimeFv(CFlat);
-    Frame__13CFlatRuntime2Fii(CFlat, 1, 0);
+    gCFlatRuntime2.Calc();
+    reinterpret_cast<CFlatRuntime*>(CFlat)->ResetPerformance();
+    gCFlatRuntime2.Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = GetMapObjIdx__7CMapMngFUs(&MapMng, 0)) >= 0)) {
             if (!BOOL_8032ec44) {
@@ -1087,7 +1073,7 @@ void CGame::Calc()
  */
 void CGame::Calc2()
 {
-	Frame__13CFlatRuntime2Fii(CFlat, 0, 1);
+	gCFlatRuntime2.Frame(0, 1);
 }
 
 /*
@@ -1102,7 +1088,7 @@ void CGame::Calc2()
 void CGame::Calc3()
 { 
 	CheckMenu__10CGPartyObjFv();
-	AfterFrame__12CFlatRuntimeFi(CFlat, 0);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->AfterFrame(0);
 }
 
 /*
@@ -1131,7 +1117,7 @@ void CGame::Draw()
  */
 void CGame::Draw2()
 {
-	Draw__13CFlatRuntime2Fv(CFlat);
+	gCFlatRuntime2.Draw();
 	Wind.Draw();
 }
 
@@ -1146,7 +1132,7 @@ void CGame::Draw2()
  */
 void CGame::Draw3()
 {
-	Frame__13CFlatRuntime2Fii(CFlat, 0, 2);
+	gCFlatRuntime2.Frame(0, 2);
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	    CFlat, 0, 1, 5, 0, 0, 0);
 }
@@ -1392,7 +1378,7 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
         return 0;
     }
 
-    char* classObj = reinterpret_cast<char*>(intToClass__13CFlatRuntime2Fi(CFlat, (int)ifParam.m_classId));
+    char* classObj = reinterpret_cast<char*>(gCFlatRuntime2.intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {
         return 0;

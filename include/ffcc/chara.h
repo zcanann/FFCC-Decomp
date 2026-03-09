@@ -16,6 +16,7 @@ void VECLerp(Vec*, Vec*, Vec*, float);
 
 class CChara
 {
+public:
 	class CModel;
 
 	class CSkin

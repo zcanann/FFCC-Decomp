@@ -347,16 +347,16 @@ extern "C" void SetTexShadowRadius__9CCharaPcsFf(void* charaPcs, float texShadow
 extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const unsigned char* color)
 {
     unsigned char* self = (unsigned char*)charaPcs;
-    unsigned char v;
+    unsigned char c1;
+    unsigned char c2;
 
-    v = color[0];
-    self[0x18C] = v;
-    v = color[1];
-    self[0x18D] = v;
-    v = color[2];
-    self[0x18E] = v;
-    v = color[3];
-    self[0x18F] = v;
+    c1 = color[1];
+    self[0x18C] = color[0];
+    c2 = color[2];
+    self[0x18D] = c1;
+    c1 = color[3];
+    self[0x18E] = c2;
+    self[0x18F] = c1;
 }
 
 /*

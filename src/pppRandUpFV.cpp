@@ -61,12 +61,13 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
 
     s32 sourceOffset = in->field4;
     f32* target = (sourceOffset == -1) ? gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
-    f32 scale = *valuePtr;
     f32 base0 = target[0];
-    f32 delta0 = in->field8 * scale;
+    f32 value = in->field8;
+    f32 scale = *valuePtr;
+    f32 delta0 = value * scale;
     target[0] = base0 + delta0;
 
-    f32 value = in->fieldC * scale;
+    value = in->fieldC * scale;
     target[1] = target[1] + value;
     value = in->field10 * scale;
     target[2] = target[2] + value;

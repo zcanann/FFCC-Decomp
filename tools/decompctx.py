@@ -36,7 +36,12 @@ def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
         stripped = line.strip()
         if not stripped:
             continue
-        if stripped.startswith("//") or stripped in {"/*", "*/"} or stripped.startswith("*"):
+        if (
+            stripped.startswith("//")
+            or stripped.startswith("/*")
+            or stripped.startswith("*/")
+            or stripped.startswith("*")
+        ):
             continue
 
         guard_match = guard_pattern.match(stripped)

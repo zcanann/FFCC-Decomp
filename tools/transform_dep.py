@@ -25,6 +25,32 @@ def in_wsl() -> bool:
     return "microsoft-standard" in uname().release
 
 
+def _normalize_dep_path(path: str) -> str:
+    """Normalize a single dependency path from Wine format to host format."""
+    if not path:
+        return path
+
+    # Normalize slash style first for non-drive paths.
+    normalized = path.replace("\\", "/")
+
+    # Only perform drive-letter mapping for absolute Windows paths (e.g. Z:/..., C:/...).
+    if len(normalized) < 2 or normalized[1] != ":":
+        return normalized
+
+    drive = normalized[0].lower()
+    drive_path = normalized[2:]
+
+    if drive == "z":
+        # Shortcut for Wine's Z: mapping to host root.
+        return drive_path
+
+    if in_wsl():
+        return os.path.join("/mnt", drive, drive_path.lstrip("/"))
+
+    # Resolve drive mappings via $WINEPREFIX/dosdevices on non-WSL hosts.
+    return os.path.realpath(os.path.join(winedevices, f"{drive}:{drive_path}"))
+
+
 def import_d_file(in_file: str) -> str:
     out_text = ""
 
@@ -42,20 +68,11 @@ def import_d_file(in_file: str) -> str:
                     path = line.lstrip()[:-3]
                 else:
                     path = line.strip()
-                # lowercase drive letter
-                path = path[0].lower() + path[1:]
-                if path[0] == "z":
-                    # shortcut for z:
-                    path = path[2:].replace("\\", "/")
-                elif in_wsl():
-                    path = path[0:1] + path[2:]
-                    path = os.path.join("/mnt", path.replace("\\", "/"))
+                if path:
+                    path = _normalize_dep_path(path)
+                    out_text += "\t" + path + suffix + "\n"
                 else:
-                    # use $WINEPREFIX/dosdevices to resolve path
-                    path = os.path.realpath(
-                        os.path.join(winedevices, path.replace("\\", "/"))
-                    )
-                out_text += "\t" + path + suffix + "\n"
+                    out_text += suffix + "\n"
 
     return out_text
 

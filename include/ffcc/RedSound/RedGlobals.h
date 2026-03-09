@@ -40,6 +40,7 @@ extern int DAT_8032f3f8;
 extern void* DAT_8032f3fc;
 extern int DAT_8032f400;
 extern int DAT_8032f404;
+extern int DAT_8032f408;
 extern int gRedMemoryDebugEnabled;
 extern int DAT_8032f40c;
 extern int DAT_8032f410;

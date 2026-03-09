@@ -165,6 +165,32 @@ class BlacklistLoadingTests(unittest.TestCase):
             with patch("tools.agent_select_target.Path.home", return_value=home):
                 self.assertEqual(agent_select_target.load_blacklist(), ["unitA", "unitB"])
 
+    def test_load_blacklist_returns_empty_for_non_list_recent_failures(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            home = Path(tmpdir)
+            state_path = self._state_path(home)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(
+                json.dumps({"recentFailures": "unitA"}),
+                encoding="utf-8",
+            )
+
+            with patch("tools.agent_select_target.Path.home", return_value=home):
+                self.assertEqual(agent_select_target.load_blacklist(), [])
+
+    def test_load_blacklist_filters_non_string_recent_failures(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            home = Path(tmpdir)
+            state_path = self._state_path(home)
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(
+                json.dumps({"recentFailures": ["unitA", 42, None, "unitB"]}),
+                encoding="utf-8",
+            )
+
+            with patch("tools.agent_select_target.Path.home", return_value=home):
+                self.assertEqual(agent_select_target.load_blacklist(), ["unitA", "unitB"])
+
 
 if __name__ == "__main__":
     unittest.main()

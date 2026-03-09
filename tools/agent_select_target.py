@@ -49,7 +49,13 @@ def load_blacklist():
     try:
         with open(state_file) as f:
             state = json.load(f)
-        return state.get("recentFailures", [])
+
+        failures = state.get("recentFailures", [])
+        if not isinstance(failures, list):
+            return []
+
+        # Keep only string unit names to avoid type errors and accidental substring matches.
+        return [failure for failure in failures if isinstance(failure, str)]
     except (FileNotFoundError, OSError, json.JSONDecodeError):
         return []
 

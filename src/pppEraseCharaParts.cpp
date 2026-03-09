@@ -150,7 +150,7 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
     MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
                             displayList->m_material, 0, (_GXTevScale)0);
 
-    if ((callbackMeshIndex != -1) && (meshIndex == callbackMeshIndex)) {
+    if ((callbackMeshIndex != 0xFF) && (meshIndex == callbackMeshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 

@@ -29,10 +29,11 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
     f32* work = (f32*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
+    f32 zero = gPppYmMoveParabolaZero;
 
-    work[2] = gPppYmMoveParabolaZero;
-    work[1] = gPppYmMoveParabolaZero;
-    work[0] = gPppYmMoveParabolaZero;
+    work[2] = zero;
+    work[1] = zero;
+    work[0] = zero;
     *(u16*)(work + 3) = 1;
 
     if (Game.game.m_currentSceneId == 7) {

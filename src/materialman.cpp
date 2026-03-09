@@ -52,6 +52,7 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
+extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
 extern "C" void* PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc[];
@@ -79,8 +80,9 @@ static const char s_materialStageName[] = "material";
  */
 extern "C" void __sinit_materialman_cpp(void)
 {
+    *reinterpret_cast<void**>(&MaterialMan) = __vt__8CManager;
     *reinterpret_cast<void**>(&MaterialMan) = __vt__12CMaterialMan;
-    __ct__6CColorFv(reinterpret_cast<void*>(0x80268E83));
+    __ct__6CColorFv(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x213);
 }
 
 class CMapKeyFrame

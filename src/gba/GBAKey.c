@@ -1,9 +1,9 @@
-#include "GBA/GBAKey.h"
 #include "dolphin/dsp.h"
-#include "dolphin/os.h"
-#include "GBA/GBA.h"
-#include "GBA/GBAPriv.h"
+#include "dolphin/gba/GBAPriv.h"
+#include "GBA/GBAKey.h"
 #include <string.h>
+
+extern u8 GBAKeyDspTaskIram[];
 
 static s32 F152(void* task)
 {
@@ -80,26 +80,27 @@ static void F252(void* task)
 
 void __GBAX02(s32 chan, u8* readbuf) {
     GBAControl* gba = &__GBA[chan];
-    void* param = gba->param;
+    GBABootInfo* bootInfo = &gba->bootInfo;
+    GBASecParam* param = gba->param;
     
     memcpy(param, readbuf, 4);
-    *(u32*)((u8*)param + 4) = gba->bootInfo.paletteColor;
-    *(u32*)((u8*)param + 8) = gba->bootInfo.paletteSpeed;
-    *(u32*)((u8*)param + 12) = gba->bootInfo.length;
-    *(u32*)((u8*)param + 16) = (u32)param + 32;
+    param->paletteColor = bootInfo->paletteColor;
+    param->paletteSpeed = bootInfo->paletteSpeed;
+    param->length = bootInfo->length;
+    param->out = (u32*)(param + 1);
     
-    DCInvalidateRange((u8*)param + 32, 32);
+    DCInvalidateRange(param + 1, 32);
     DCFlushRange(param, 32);
     
-    gba->task.state = 0xff;
-    gba->task.iram_addr = 0x21cb78;
-    gba->task.dram_addr = 0x380;
-    gba->task.dram_length = 0;
+    gba->task.priority = 0xff;
+    gba->task.iram_mmem_addr = (u16*)OSCachedToPhysical(GBAKeyDspTaskIram);
+    gba->task.iram_length = 0x380;
+    gba->task.iram_addr = 0;
     gba->task.dsp_init_vector = 0x10;
     gba->task.init_cb = F232;
-    gba->task.res_cb = 0;
-    gba->task.done_cb = (DSPCallback)F252;
-    gba->task.req_cb = 0;
+    gba->task.res_cb = NULL;
+    gba->task.done_cb = F252;
+    gba->task.req_cb = NULL;
     
     DSPAddTask(&gba->task);
 }

@@ -1,6 +1,7 @@
 #include "ffcc/vector.h"
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
+#include "ffcc/symbols_shared.h"
 
 /*
  * --INFO--
@@ -35,7 +36,7 @@ void CVector::Normalize()
  */
 void CVector::Identity()
 {
-	const float zero = 0.0f;
+	const float zero = kVectorZero;
 	this->z = zero;
 	this->y = zero;
 	this->x = zero;

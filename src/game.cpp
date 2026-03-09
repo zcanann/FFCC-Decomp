@@ -11,6 +11,7 @@
 #include "ffcc/map.h"
 #include "ffcc/p_sound.h"
 #include "ffcc/sound.h"
+#include "ffcc/wind.h"
 #include "ffcc/graphic.h"
 #include "ffcc/file.h"
 #include "ffcc/partMng.h"
@@ -22,6 +23,7 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_map.h"
+#include "ffcc/p_mc.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_usb.h"
 
@@ -40,7 +42,6 @@ void ExecScenegraph__7CSystemFv(CSystem*);
 void Quit__12CFlatRuntimeFv(void*);
 void Destroy__13CFlatRuntime2Fv(void*);
 void Quit__11CDbgMenuPcsFv(void*);
-void Quit__6CMcPcsFv(void*);
 void Quit__7CGbaPcsFv(void*);
 void Quit__7CUSBPcsFv(void*);
 void Quit__6CCharaFv(void*);
@@ -62,9 +63,7 @@ void Init__18CMaterialEditorPcsFv(void*);
 void Init__14CFunnyShapePcsFv(void*);
 void Init__7CUSBPcsFv(void*);
 void Init__7CGbaPcsFv(void*);
-void Init__6CMcPcsFv(void*);
 void Init__11CDbgMenuPcsFv(void*);
-void ClearAll__5CWindFv(void*);
 void Init__12CFlatRuntimeFv(void*);
 int Load__13CFlatRuntime2FPc(void*, char*);
 void ResetNewGame__13CFlatRuntime2Fv(void*);
@@ -75,7 +74,6 @@ void Frame__13CFlatRuntime2Fii(void*, int, int);
 void AfterFrame__12CFlatRuntimeFi(void*, int);
 void Calc__13CFlatRuntime2Fv(void*);
 void ResetPerformance__12CFlatRuntimeFv(void*);
-void Frame__5CWindFv(void*);
 int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
 void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
@@ -85,15 +83,12 @@ void CheckMenu__10CGPartyObjFv();
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void Draw__13CFlatRuntime2Fv(void*);
-void Draw__5CWindFv(void*);
 void Frame__13CFlatRuntime2Fii(void*, int, int);
 void CheckMenu__10CGPartyObjFv(void);
 void AfterFrame__12CFlatRuntimeFi(void*, int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
-unsigned char McPcs[];
 unsigned char PartPcs[];
-unsigned char Wind[];
 extern const char DAT_801d61dc[];
 extern const char DAT_801d60d4[];
 extern const char DAT_801d6114[];
@@ -324,7 +319,7 @@ void CGame::Init()
     Init__7CUSBPcsFv(&USBPcs);
     MenuPcs.Init();
     Init__7CGbaPcsFv(&GbaPcs);
-    Init__6CMcPcsFv(McPcs);
+    GetMcPcsSingleton()->Init();
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_mainStageName), 0);
@@ -361,7 +356,7 @@ void CGame::Quit()
 
 	Memory.DestroyStage(m_mainStage);
 	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
-	Quit__6CMcPcsFv(McPcs);
+	GetMcPcsSingleton()->Quit();
 	Quit__7CGbaPcsFv(&GbaPcs);
 	MenuPcs.Quit();
 	Quit__7CUSBPcsFv(&USBPcs);
@@ -440,7 +435,7 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, GetMcPcsSingleton(), 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			break;
 		case 5:
@@ -476,7 +471,7 @@ void CGame::Exec()
 			break;
 		case 4:
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, GetMcPcsSingleton(), 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);
@@ -666,7 +661,7 @@ void CGame::clearWork()
     MapMng.DestroyMap();
     CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
     Sound.StopAndFreeAllSe(0);
-    ClearAll__5CWindFv(Wind);
+    Wind.ClearAll();
 
     *((u8*)&Sound + 0x8892) = 0x7F;
 
@@ -913,7 +908,7 @@ void CGame::ScriptChanged(char*, int)
     MapMng.DestroyMap();
     CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
     Sound.StopAndFreeAllSe(0);
-    ClearAll__5CWindFv(Wind);
+    Wind.ClearAll();
 
     *((u8*)&Sound + 0x8892) = 0x7F;
 }
@@ -1062,7 +1057,7 @@ void CGame::Calc()
         }
     }
 
-    Frame__5CWindFv(Wind);
+    Wind.Frame();
     Calc__13CFlatRuntime2Fv(CFlat);
     ResetPerformance__12CFlatRuntimeFv(CFlat);
     Frame__13CFlatRuntime2Fii(CFlat, 1, 0);
@@ -1135,7 +1130,7 @@ void CGame::Draw()
 void CGame::Draw2()
 {
 	Draw__13CFlatRuntime2Fv(CFlat);
-	Draw__5CWindFv(Wind);
+	Wind.Draw();
 }
 
 /*

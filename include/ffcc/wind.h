@@ -53,4 +53,6 @@ private:
     u32 m_unk7C84;
 };
 
+extern CWind Wind;
+
 #endif // _FFCC_PPP_WIND_H_

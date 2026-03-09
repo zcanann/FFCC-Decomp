@@ -21,5 +21,16 @@ extern unsigned int m_table_desc1__6CMcPcs[];
 extern unsigned int m_table_desc2__6CMcPcs[];
 extern unsigned char m_table__6CMcPcs[];
 extern unsigned char sMcPcsSingletonData[];
+extern unsigned char* gMcPcsSingletonPtr;
+
+static inline CMcPcs* GetMcPcsSingleton()
+{
+    if (gMcPcsSingletonPtr != 0)
+    {
+        return reinterpret_cast<CMcPcs*>(gMcPcsSingletonPtr);
+    }
+
+    return reinterpret_cast<CMcPcs*>(sMcPcsSingletonData);
+}
 
 #endif // _FFCC_P_MC_H_

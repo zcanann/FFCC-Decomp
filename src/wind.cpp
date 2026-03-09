@@ -13,6 +13,8 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
 
+CWind Wind;
+
 static inline MtxPtr GetCameraMatrix()
 {
     return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);

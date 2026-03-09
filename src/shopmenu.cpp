@@ -6,6 +6,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/sound.h"
 #include "ffcc/linkage.h"
+#include "ffcc/p_tina.h"
 
 extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -51,8 +52,6 @@ char* strcat(char*, const char*);
 char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";
 extern char DAT_80332e54[];
 unsigned short gShopMenuInputLatch;
-class CPartPcs;
-extern CPartPcs PartPcs;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;
 extern float FLOAT_80332d34;

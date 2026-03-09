@@ -101,11 +101,11 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
             s32 uvByteOffsetV = uvByteOffset + 2;
             u32 frameU = workWords[0] / workWords[2];
 
-            *(s16*)((u8*)uvPairs + uvByteOffset) = (s16)(int)-(((f32)(workWords[0] - frameU * workWords[2]) * *(f32*)&workWords[4]) -
+            *(s16*)((u8*)uvPairs + uvByteOffset) = (s16)(int)-(((f32)(s32)(workWords[0] - frameU * workWords[2]) * *(f32*)&workWords[4]) -
                                                                 (f32)*(s16*)((u8*)uvPairs + uvByteOffset));
             uvByteOffset += 4;
             *(s16*)((u8*)uvPairs + uvByteOffsetV) =
-                (s16)(int)-(((f32)frameU * *(f32*)&workWords[5]) - (f32)*(s16*)((u8*)uvPairs + uvByteOffsetV));
+                (s16)(int)-(((f32)(s32)frameU * *(f32*)&workWords[5]) - (f32)*(s16*)((u8*)uvPairs + uvByteOffsetV));
         }
 
         DCFlushRange(uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);

@@ -806,7 +806,7 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 		CRedDriver_8032f4c0.StreamPlay(id, data, param_3, param_4, param_5);
 	} else if (gRedMemoryDebugEnabled != 0) {
 		OSReport("[%s] %s STREAM : This data was not stream data. %s\n", "RedSound", "", "");
-		fflush(&DAT_8021d1a8);
+		fflush(__files + 2);
 	}
 
 	return id;

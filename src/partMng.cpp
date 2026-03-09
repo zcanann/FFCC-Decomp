@@ -335,10 +335,10 @@ void CPartMng::Destroy()
                 if (model->m_refCount < 1) {
                     if (model->m_cacheId != -1) {
                         ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&model->m_mapMesh) + 0x24) = 0;
-                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&model->m_mapMesh) + 0x28) = 0;
+                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
+                        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
                     }
-                    model->m_mapMesh.Destroy();
+                    model->Destroy();
                     model->m_refCount = 0;
                     model->m_isUsed = 0;
                 }
@@ -516,7 +516,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
                 *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
             }
-            model->m_mapMesh.Destroy();
+            model->Destroy();
             model->m_refCount = 0;
             model->m_isUsed = 0;
         }
@@ -2270,10 +2270,10 @@ void CPartMng::pppLoadPmd(const char* baseName)
                         CChunkFile rsdFile;
                         rsdFile.SetBuf(chunkFile.GetAddress());
                         pppReadRsd(rsdFile, targetModel);
-                        targetModel->m_mapMesh.Ptr2Off();
+                        targetModel->Ptr2Off();
 
                         void** meshDataPtr =
-                            reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&targetModel->m_mapMesh) + 0x24);
+                            reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
                         targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
                             *meshDataPtr, 0, static_cast<CAmemCache::TYPE>(1), 1));
 

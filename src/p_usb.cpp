@@ -12,9 +12,9 @@ int s_usbReadPollFrameCounter;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
-u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
-u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
-u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
+volatile u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
+volatile u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
+volatile u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
 char s_CUSBPcs_8032f810[] = "CUSBPcs";
 u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
@@ -272,15 +272,20 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
+    *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
+    *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
     *reinterpret_cast<void**>(&USBPcs) = __vt__7CUSBPcs;
-
-    m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
-    m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
-    m_table__7CUSBPcs[3] = m_table_desc0__7CUSBPcs[2];
-    m_table__7CUSBPcs[4] = m_table_desc1__7CUSBPcs[0];
-    m_table__7CUSBPcs[5] = m_table_desc1__7CUSBPcs[1];
-    m_table__7CUSBPcs[6] = m_table_desc1__7CUSBPcs[2];
-    m_table__7CUSBPcs[7] = m_table_desc2__7CUSBPcs[0];
-    m_table__7CUSBPcs[8] = m_table_desc2__7CUSBPcs[1];
-    m_table__7CUSBPcs[9] = m_table_desc2__7CUSBPcs[2];
+    u32* table = &m_table__7CUSBPcs[1];
+    volatile u32* desc0 = m_table_desc0__7CUSBPcs;
+    volatile u32* desc1 = m_table_desc1__7CUSBPcs;
+    volatile u32* desc2 = m_table_desc2__7CUSBPcs;
+    table[0] = desc0[0];
+    table[1] = desc0[1];
+    table[2] = desc0[2];
+    table[3] = desc1[0];
+    table[4] = desc1[1];
+    table[5] = desc1[2];
+    table[6] = desc2[0];
+    table[7] = desc2[1];
+    table[8] = desc2[2];
 }

@@ -30,9 +30,9 @@ public:
 };
 
 extern CUSBPcs USBPcs;
-extern u32 m_table_desc0__7CUSBPcs[];
-extern u32 m_table_desc1__7CUSBPcs[];
-extern u32 m_table_desc2__7CUSBPcs[];
+extern volatile u32 m_table_desc0__7CUSBPcs[];
+extern volatile u32 m_table_desc1__7CUSBPcs[];
+extern volatile u32 m_table_desc2__7CUSBPcs[];
 extern u32 m_table__7CUSBPcs[];
 extern int s_usbReadPollFrameCounter;
 extern char s_usbReadPollInitialized;

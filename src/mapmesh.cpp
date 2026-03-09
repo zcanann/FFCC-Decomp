@@ -223,7 +223,9 @@ void CMapMesh::Ptr2Off()
  */
 void CMapMesh::Off2Ptr()
 {
-    int iterOffset = 0;
+    int iVar1;
+    int iVar2;
+    int iVar3;
 
     S32At(this, 0x2C) += S32At(this, 0x24);
     S32At(this, 0x30) += S32At(this, 0x24);
@@ -232,10 +234,11 @@ void CMapMesh::Off2Ptr()
     S32At(this, 0x3C) += S32At(this, 0x24);
     S32At(this, 0x40) += S32At(this, 0x24);
 
-    for (int i = 0; i < static_cast<int>(U16At(this, 0xA)); i++) {
-        int entry = S32At(this, 0x40) + iterOffset;
-        iterOffset += 0x10;
-        *reinterpret_cast<int*>(entry + 4) = S32At(this, 0x24) + *reinterpret_cast<int*>(entry + 0xC);
+    iVar1 = 0;
+    for (iVar3 = 0; iVar3 < (int)(unsigned int)U16At(this, 0xA); iVar3++) {
+        iVar2 = S32At(this, 0x40) + iVar1;
+        iVar1 = iVar1 + 0x10;
+        *reinterpret_cast<int*>(iVar2 + 4) = S32At(this, 0x24) + *reinterpret_cast<int*>(iVar2 + 0xC);
     }
 }
 

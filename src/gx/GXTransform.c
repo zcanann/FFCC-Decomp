@@ -514,7 +514,7 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     __GXData->vpFarz = farz;
 
     if (__GXData->zOffset != 0.0f) {
-        __GXSetRange(nearz, zScale);
+        __GXSetRange(nearz, __GXData->zOffset);
     }
 
     GX_WRITE_U8(0x10);
@@ -640,7 +640,7 @@ void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
     ASSERTMSGLINE(1122, (u32)(x_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid X offset");
     ASSERTMSGLINE(1124, (u32)(y_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid Y offset");
 
-    reg = ((u32)(x_off + 0x156U) >> 1) | ((((u32)(y_off + 0x156U) << 9) & 0x00FFF800));
+    reg = ((u32)(x_off + 0x156U) >> 1) | ((u32)(y_off + 0x156) << 9);
     reg = (reg << 8) >> 8;
     reg |= 0x59000000;
     GX_WRITE_RAS_REG(reg);

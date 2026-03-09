@@ -217,6 +217,21 @@ class AgentSelectTargetTests(unittest.TestCase):
         self.assertEqual(len(candidates[0]["top_functions"]), 1)
         self.assertEqual(candidates[0]["top_functions"][0]["name"], "f_ok")
 
+    def test_summarize_symbols_handles_non_dict_payload(self):
+        lines = agent_select_target.summarize_symbols("PAL symbols", ["bad-payload"])
+        self.assertEqual(lines, ["  PAL symbols: error: unknown error"])
+
+    def test_summarize_symbols_handles_non_string_size_without_crashing(self):
+        all_info = {
+            "functions": [
+                {"parsed": {"symbol": "func_a", "size": 16, "virtual_addr": "0x80000000"}},
+            ],
+            "globals": [],
+        }
+        lines = agent_select_target.summarize_symbols("PAL symbols", all_info)
+        self.assertEqual(lines[0], "  PAL symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - func_a (16b at 0x80000000)")
+
 
 if __name__ == "__main__":
     unittest.main()

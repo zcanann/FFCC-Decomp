@@ -133,17 +133,28 @@ def derive_source_file(unit):
 
 def summarize_symbols(label, all_info):
     """Return formatted lines for symbol summary (no printing inside)."""
+    if not isinstance(all_info, dict):
+        return [f"  {label}: error: unknown error"]
+
     if not all_info or "error" in all_info:
-        err = all_info.get("error") if isinstance(all_info, dict) else "unknown error"
+        err = all_info.get("error", "unknown error")
         return [f"  {label}: error: {err}"]
 
     lines = []
     functions = all_info.get("functions", [])
     globals_data = all_info.get("globals", [])
+    if not isinstance(functions, list):
+        functions = []
+    if not isinstance(globals_data, list):
+        globals_data = []
     lines.append(f"  {label}: {len(functions)} funcs, {len(globals_data)} globals (showing up to 5 funcs)")
 
     for func in functions[:5]:
+        if not isinstance(func, dict):
+            continue
         p = func.get("parsed", {})
+        if not isinstance(p, dict):
+            p = {}
         symbol = p.get("symbol", "unknown")
         size_raw = p.get("size", "unknown")
         addr = p.get("virtual_addr", "unknown")
@@ -152,7 +163,7 @@ def summarize_symbols(label, all_info):
             try:
                 size_val = int(size_raw, 16)
                 size = f"0x{size_val:x}"
-            except ValueError:
+            except (TypeError, ValueError):
                 size = size_raw
         else:
             size = size_raw

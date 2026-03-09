@@ -198,7 +198,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	int shapeOffset;
 	int colorOffset;
 	long** shapeTable;
-	s16 dataValIndex;
+	u16 dataValIndex;
 	u8* objBytes;
 	u8* shapeBase;
 	u8* colorBase;
@@ -210,9 +210,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	shapeBase = objBytes + shapeOffset + 0x80;
 	colorBase = objBytes + colorOffset + 0x80;
 	arg3Bytes = (u8*)&unkB->m_arg3;
-	dataValIndex = (s16)unkB->m_dataValIndex;
+	dataValIndex = (u16)unkB->m_dataValIndex;
 
-	if ((dataValIndex != -1) &&
+	if ((dataValIndex != 0xFFFF) &&
 		(shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
 		 shapeBase[0x32] != 0)) {
 		pppCVECTOR local_70;

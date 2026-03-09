@@ -256,10 +256,6 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                         if (d < (double)obj->radiusSq) {
                             yRand = (double)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio);
                             d = (double)sqrtf((float)d);
-                            if (d <= DOUBLE_80330f10) {
-                                d = NAN;
-                            }
-
                             inv = (double)(float)(yRand / d);
                             out->x = (float)(nx * inv + (double)out->x);
                             yRand = (double)Math.RandF();
@@ -367,8 +363,7 @@ int CWind::AddAmbient(float dir, float speed)
     }
 
     obj->type = 0;
-    obj->flags = obj->flags & 0x7F;
-    obj->flags = obj->flags | 0x80;
+    obj->flags = (obj->flags & 0x7F) | 0x80;
 
     int id = m_nextId;
     m_nextId = id + 1;

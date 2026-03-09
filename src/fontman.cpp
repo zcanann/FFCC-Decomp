@@ -380,7 +380,8 @@ void CFont::SetScaleY(float value)
  */
 void CFont::SetShadow(int enabled)
 {
-	renderFlags = static_cast<unsigned char>(static_cast<char>(enabled) << 7) | (renderFlags & 0x7F);
+	int shadow = static_cast<signed char>(enabled) << 7;
+	renderFlags = static_cast<unsigned char>(shadow | (renderFlags & 0x7F));
 }
 
 /*

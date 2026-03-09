@@ -29,6 +29,12 @@ class TransformDepTests(unittest.TestCase):
             output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/src/file.h\n")
 
+    def test_import_d_file_keeps_drive_relative_paths(self):
+        dep_path = self._write_dep("build/file.o: \\\n\tC:proj\\src\\file.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\tC:proj/src/file.h\n")
+
     def test_import_d_file_handles_crlf_continuation_lines(self):
         dep_path = self._write_dep("build\\file.o: \\\r\n\tinclude\\header.h \\\r\n\tmore\\dep.h\r\n")
         output = transform_dep.import_d_file(dep_path)

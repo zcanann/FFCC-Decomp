@@ -41,7 +41,8 @@ def _normalize_dep_path(path: str) -> str:
     normalized = path.replace("\\", "/")
 
     # Only perform drive-letter mapping for absolute Windows paths (e.g. Z:/..., C:/...).
-    if len(normalized) < 2 or normalized[1] != ":":
+    # Drive-relative paths like C:foo/bar should remain drive-relative.
+    if len(normalized) < 3 or normalized[1] != ":" or normalized[2] != "/":
         return normalized
 
     drive = normalized[0].lower()

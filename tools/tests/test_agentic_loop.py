@@ -281,6 +281,50 @@ class TestAgenticLoop(unittest.TestCase):
         mock_popen.assert_called_once()
         mock_sleep.assert_not_called()
 
+    def test_run_agentic_loop_stops_at_max_runs_after_nonzero_exit_without_sleep(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=1,
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc) as mock_popen:
+            with patch("agentic_loop._sleep_interruptible") as mock_sleep:
+                agentic_loop.run_agentic_loop(
+                    prompt="x",
+                    timeout_seconds=1,
+                    terminate_grace_seconds=2,
+                    max_backoff_seconds=300,
+                    max_runs=1,
+                )
+
+        mock_popen.assert_called_once()
+        mock_sleep.assert_not_called()
+
+    def test_run_agentic_loop_stops_at_max_runs_after_timeout_without_sleep(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=0,
+            wait=Mock(side_effect=subprocess.TimeoutExpired(cmd="codex", timeout=1)),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc) as mock_popen:
+            with patch("agentic_loop._stop_process_tree") as mock_stop:
+                with patch("agentic_loop._sleep_interruptible") as mock_sleep:
+                    agentic_loop.run_agentic_loop(
+                        prompt="x",
+                        timeout_seconds=1,
+                        terminate_grace_seconds=2,
+                        max_backoff_seconds=300,
+                        max_runs=1,
+                    )
+
+        mock_popen.assert_called_once()
+        mock_stop.assert_called_once_with(fake_proc, 2)
+        mock_sleep.assert_not_called()
+
     def test_stop_process_tree_uses_kill_signal_constant_after_timeout(self):
         fake_proc = SimpleNamespace(
             wait=Mock(side_effect=[subprocess.TimeoutExpired(cmd="codex", timeout=1), None]),

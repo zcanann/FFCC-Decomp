@@ -165,6 +165,11 @@ def _backoff_seconds(consecutive_failures: int, max_backoff_seconds: int) -> int
     return min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
 
 
+def _can_retry(run_count: int, max_runs: Optional[int]) -> bool:
+    """Return whether another retry attempt is allowed."""
+    return max_runs is None or run_count < max_runs
+
+
 def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -290,6 +295,9 @@ def run_agentic_loop(
                 log(f"failed to launch codex ({exc}); unrecoverable error, stopping loop")
                 break
             consecutive_failures += 1
+            if not _can_retry(run_count, max_runs):
+                log(f"failed to launch codex ({exc}); reached max runs, stopping loop")
+                break
             backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
             log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
             if not _sleep_interruptible(backoff):
@@ -303,6 +311,9 @@ def run_agentic_loop(
                 log("codex run completed successfully")
             else:
                 consecutive_failures += 1
+                if not _can_retry(run_count, max_runs):
+                    log(f"codex exited with code {proc.returncode}; reached max runs, stopping loop")
+                    break
                 backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
                 log(
                     f"codex exited with code {proc.returncode}; "
@@ -315,6 +326,9 @@ def run_agentic_loop(
             _stop_process_tree(proc, terminate_grace_seconds)
             log("codex process stopped after timeout")
             consecutive_failures += 1
+            if not _can_retry(run_count, max_runs):
+                log("reached max runs after timeout; stopping loop")
+                break
             backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
             log(f"sleeping {backoff}s before retry")
             if not _sleep_interruptible(backoff):

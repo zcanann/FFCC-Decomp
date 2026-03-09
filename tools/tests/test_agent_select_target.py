@@ -457,8 +457,19 @@ class SymbolSummaryTests(unittest.TestCase):
 
         lines = agent_select_target.summarize_symbols("EN symbols", info)
 
-        self.assertEqual(lines[0], "  EN symbols: 2 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
         self.assertEqual(lines[1], "    - fnE (0x8b at 0x80005000)")
+
+    def test_summarize_symbols_skips_non_dict_global_entries(self):
+        info = {
+            "functions": [],
+            "globals": ["bad-global", {"parsed": {"symbol": "globA"}}],
+        }
+
+        lines = agent_select_target.summarize_symbols("PAL symbols", info)
+
+        self.assertEqual(lines[0], "  PAL symbols: 0 funcs, 1 globals (showing up to 5 funcs)")
+        self.assertEqual(len(lines), 1)
 
 
 if __name__ == "__main__":

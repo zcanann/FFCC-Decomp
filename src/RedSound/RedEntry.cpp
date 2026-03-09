@@ -1065,9 +1065,17 @@ void CRedEntry::MusicHistoryAdd()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicHistoryDelete(int)
+void CRedEntry::MusicHistoryDelete(int historyNo)
 {
-	// TODO
+	if (historyNo != 0) {
+		unsigned int history = (unsigned int)*(int*)((int)this + 8);
+		do {
+			if (historyNo < *(int*)(history + 4)) {
+				*(int*)(history + 4) = *(int*)(history + 4) - 1;
+			}
+			history += 0x10;
+		} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+	}
 }
 
 /*
@@ -1075,9 +1083,19 @@ void CRedEntry::MusicHistoryDelete(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicHistoryChoice(RedHistoryBANK*)
+void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
 {
-	// TODO
+	int* bankData = (int*)bank;
+	if (bankData[1] != 0) {
+		unsigned int history = (unsigned int)*(int*)((int)this + 8);
+		do {
+			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < bankData[1])) {
+				*(int*)(history + 4) = *(int*)(history + 4) + 1;
+			}
+			history += 0x10;
+		} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+		bankData[1] = 1;
+	}
 }
 
 /*
@@ -1110,9 +1128,18 @@ int CRedEntry::SearchMusicSequence(int musicNo)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicMemoryFree(RedHistoryBANK*)
+int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 {
-	// TODO
+	int* bankData = (int*)bank;
+
+	WaveHistoryManager(0, (int)*(short*)(bankData[2] + 6));
+	RedDelete(bankData[2]);
+	int freedSize = bankData[3];
+	bankData[3] = 0;
+	bankData[2] = 0;
+	bankData[1] = 0;
+	bankData[0] = -1;
+	return freedSize;
 }
 
 /*
@@ -1120,9 +1147,25 @@ void CRedEntry::MusicMemoryFree(RedHistoryBANK*)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicOldClear()
+int CRedEntry::MusicOldClear()
 {
-	// TODO
+	int historyNo = 0;
+	unsigned int selected = 0;
+	unsigned int history = (unsigned int)*(int*)((int)this + 8);
+
+	do {
+		if (historyNo < *(int*)(history + 4)) {
+			historyNo = *(int*)(history + 4);
+			selected = history;
+		}
+		history += 0x10;
+	} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+
+	if (historyNo != 0) {
+		MusicMemoryFree((RedHistoryBANK*)selected);
+	}
+
+	return historyNo;
 }
 
 /*
@@ -1130,9 +1173,24 @@ void CRedEntry::MusicOldClear()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicOldChoice()
+unsigned int CRedEntry::MusicOldChoice()
 {
-	// TODO
+	unsigned int selected = 0;
+	int historyNo = 0;
+	unsigned int history = (unsigned int)*(int*)((int)this + 8);
+
+	do {
+		if (*(int*)(history + 0xc) == 0) {
+			return history;
+		}
+		if (historyNo < *(int*)(history + 4)) {
+			historyNo = *(int*)(history + 4);
+			selected = history;
+		}
+		history += 0x10;
+	} while (history < (unsigned int)*(int*)((int)this + 8) + 0x40);
+
+	return selected;
 }
 
 /*

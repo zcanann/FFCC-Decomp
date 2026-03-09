@@ -2,13 +2,13 @@
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
+#include "ffcc/ppp_constants.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/gx.h>
 #include <string.h>
 
 extern int rand();
-extern float ppvSinTbl[];
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
 extern float FLOAT_80330650;
@@ -92,16 +92,13 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     sVar5 = *(short*)(iVar6 + 6);
     uVar1 = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * dVar10) - FLOAT_80330664);
     local_50 = (long long)(int)uVar1;
-    sVar5 = (short)iVar4 - (short)(iVar4 / (int)sVar5) * sVar5;
+    sVar5 = (short)(iVar4 - (iVar4 / (int)sVar5) * sVar5);
     *(short*)(particle + 0x2a) = sVar5;
     *(short*)(particle + 0x28) = sVar5;
-    fVar2 = ppvSinTbl[(uVar1 + 0x4000 & 0xffff) >> 2];
-    dVar9 = (double)ppvSinTbl[(uVar1 & 0xffff) >> 2];
-    *(short*)(particle + 0x38) =
-        (short)uVar3 +
-        ((short)((unsigned long long)((long long)(int)uVar3 * 0xb60b60b7) >> 0x28) -
-         (short)(((int)uVar3 / 0x168 + ((int)uVar3 >> 0x1f)) >> 0x1f)) *
-            (short)-0x168;
+    fVar2 = *(float*)((u8*)gPppTrigTable + ((uVar1 + 0x4000) & 0xfffc));
+    dVar9 = (double)*(float*)((u8*)gPppTrigTable + (uVar1 & 0xfffc));
+    iVar4 = (int)uVar3 / 0x168 + ((int)uVar3 >> 0x1f);
+    *(short*)(particle + 0x38) = (short)((int)uVar3 + (iVar4 - (iVar4 >> 0x1f)) * -0x168);
     dVar8 = (double)(float)(dVar10 * (double)*(float*)(ymData + 0x3c));
     fVar2 = fVar2 * (float)((double)*(float*)(vData + 0x1c) + dVar8);
     *(float*)(particle + 0x00) = fVar2;
@@ -427,9 +424,9 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
         angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(s16)(angleDelta + *(s16*)(step + 0x66))) /
                          FLOAT_80330654);
-        work[4] = *(float*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
+        work[4] = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
         work[5] = FLOAT_80330644;
-        work[6] = *(float*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
+        work[6] = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
     }
 
     work[8] = work[8] + work[9];

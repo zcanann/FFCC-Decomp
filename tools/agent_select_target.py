@@ -27,6 +27,14 @@ def warn_build_mismatch():
     print(WARNING_BUILD_MISMATCH)
 
 
+def safe_float(value, default=0.0):
+    """Parse a float from mixed report values without throwing."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def load_blacklist():
     """Load recently failed units to avoid"""
     state_file = Path.home() / ".openclaw/workspace/memory/decomp-state.json"
@@ -52,9 +60,9 @@ def is_viable_target(unit, blacklist):
         return False, "recently failed"
 
     # Skip units that are already effectively complete.
-    fuzzy = float(measures.get("fuzzy_match_percent", 0) or 0)
-    matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
-    matched_data_percent = float(measures.get("matched_data_percent", 0) or 0)
+    fuzzy = safe_float(measures.get("fuzzy_match_percent", 0))
+    matched_code_percent = safe_float(measures.get("matched_code_percent", 0))
+    matched_data_percent = safe_float(measures.get("matched_data_percent", 0))
 
     if (
         fuzzy >= COMPLETE_THRESHOLD_PERCENT
@@ -135,12 +143,12 @@ def extract_candidates(report_path):
 
         entry = {
             "name": unit["name"],
-            "fuzzy_match": float(measures.get("fuzzy_match_percent", 0) or 0),
-            "matched_code_percent": float(measures.get("matched_code_percent", 0) or 0),
-            "matched_data_percent": float(measures.get("matched_data_percent", 0) or 0),
+            "fuzzy_match": safe_float(measures.get("fuzzy_match_percent", 0)),
+            "matched_code_percent": safe_float(measures.get("matched_code_percent", 0)),
+            "matched_data_percent": safe_float(measures.get("matched_data_percent", 0)),
             "total_functions": int(measures.get("total_functions", 0) or 0),
             "matched_functions": int(measures.get("matched_functions", 0) or 0),
-            "func_match_percent": float(measures.get("matched_functions_percent", 0) or 0),
+            "func_match_percent": safe_float(measures.get("matched_functions_percent", 0)),
             "total_code": int(measures.get("total_code", 0) or 0),
             "total_data": int(measures.get("total_data", 0) or 0),
             "source_path": source_path,
@@ -148,11 +156,12 @@ def extract_candidates(report_path):
             "top_functions": []
         }
 
-        for func in sorted(functions, key=lambda f: f.get("fuzzy_match_percent", 0))[:3]:
-            if func.get("fuzzy_match_percent", 0) < 99:
+        for func in sorted(functions, key=lambda f: safe_float(f.get("fuzzy_match_percent", 0)))[:3]:
+            func_match = safe_float(func.get("fuzzy_match_percent", 0))
+            if func_match < 99:
                 entry["top_functions"].append({
                     "name": func["name"],
-                    "match": func.get("fuzzy_match_percent", 0),
+                    "match": func_match,
                     "size": func.get("size", "unknown")
                 })
 

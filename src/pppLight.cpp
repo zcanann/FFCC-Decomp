@@ -70,18 +70,18 @@ void pppLightCon(void* param1, void* param2)
 	*(int*)((char*)base + 0x14) = 0;
 	
 	// Clear float values
-	*(float*)((char*)base + 0x20) = zero;
-	*(float*)((char*)base + 0x1c) = zero;
 	*(float*)((char*)base + 0x18) = zero;
-	*(float*)((char*)base + 0x2c) = zero;
-	*(float*)((char*)base + 0x28) = zero;
+	*(float*)((char*)base + 0x1c) = zero;
+	*(float*)((char*)base + 0x20) = zero;
 	*(float*)((char*)base + 0x24) = zero;
-	*(float*)((char*)base + 0x38) = zero;
-	*(float*)((char*)base + 0x34) = zero;
+	*(float*)((char*)base + 0x28) = zero;
+	*(float*)((char*)base + 0x2c) = zero;
 	*(float*)((char*)base + 0x30) = zero;
-	*(float*)((char*)base + 0x44) = zero;
-	*(float*)((char*)base + 0x40) = zero;
+	*(float*)((char*)base + 0x34) = zero;
+	*(float*)((char*)base + 0x38) = zero;
 	*(float*)((char*)base + 0x3c) = zero;
+	*(float*)((char*)base + 0x40) = zero;
+	*(float*)((char*)base + 0x44) = zero;
 }
 
 /*

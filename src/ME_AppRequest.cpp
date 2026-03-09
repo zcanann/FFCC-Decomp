@@ -3,13 +3,13 @@
 #include "ffcc/zlist.h"
 
 extern "C" {
-void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
+void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void __dl__FPv(void*);
 void __dla__FPv(void*);
 void* memset(void*, int, unsigned int);
 }
 
-static const char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
+static char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
 
 struct RSDITEM {
     int unk0;
@@ -54,11 +54,10 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
     ZLIST* list;
     _ZLISTITEM* it[1];
-    RSDITEM* rsdItem;
     int i;
-    int zero;
-    ZCANMGRP* colAnmData;
     int colAnmCount;
+    ZCANMGRP* colAnmData;
+    RSDITEM* rsdItem;
     RSDLISTITEM* listItem;
 
     list = zlist;
@@ -87,18 +86,15 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
                 __dl__FPv(rsdItem);
             }
         }
-        colAnmCount = listItem->colAnmCount;
         colAnmData = listItem->colAnmData;
+        colAnmCount = listItem->colAnmCount;
         if (colAnmData != (ZCANMGRP*)0) {
-            i = 0;
-            zero = 0;
-            while (i < colAnmCount) {
+            for (i = 0; i < colAnmCount; i = i + 1) {
                 if (colAnmData->ptr != (void*)0) {
                     __dla__FPv(colAnmData->ptr);
-                    colAnmData->ptr = (void*)zero;
+                    colAnmData->ptr = 0;
                 }
                 colAnmData = colAnmData + 1;
-                i = i + 1;
             }
             if (listItem->colAnmData != (ZCANMGRP*)0) {
                 __dla__FPv(listItem->colAnmData);

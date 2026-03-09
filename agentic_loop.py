@@ -61,6 +61,16 @@ def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:
         proc.wait()
 
 
+def _sleep_interruptible(seconds: int) -> bool:
+    """Sleep and return False if interrupted by Ctrl+C."""
+    try:
+        time.sleep(seconds)
+        return True
+    except KeyboardInterrupt:
+        log("keyboard interrupt received; stopping loop")
+        return False
+
+
 def run_agentic_loop(
     prompt: str,
     timeout_seconds: int,
@@ -81,7 +91,8 @@ def run_agentic_loop(
             consecutive_failures += 1
             backoff = min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
             log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
-            time.sleep(backoff)
+            if not _sleep_interruptible(backoff):
+                break
             continue
 
         try:
@@ -96,7 +107,8 @@ def run_agentic_loop(
                     f"codex exited with code {proc.returncode}; "
                     f"sleeping {backoff}s before retry"
                 )
-                time.sleep(backoff)
+                if not _sleep_interruptible(backoff):
+                    break
         except subprocess.TimeoutExpired:
             log(f"codex exceeded timeout ({timeout_seconds}s); terminating process")
             _stop_process_tree(proc, terminate_grace_seconds)

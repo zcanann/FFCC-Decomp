@@ -295,7 +295,7 @@ CGame::~CGame()
  */
 void CGame::Init()
 {
-    u32 progressiveMode = OSSetProgressiveMode();
+    int progressiveMode = OSSetProgressiveMode();
 
     if (progressiveMode == 3) {
         m_gameWork.m_languageId = 5;

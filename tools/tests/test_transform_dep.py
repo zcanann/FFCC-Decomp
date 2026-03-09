@@ -29,6 +29,16 @@ class TransformDepTests(unittest.TestCase):
             output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/src/file.h\n")
 
+    def test_import_d_file_handles_crlf_continuation_lines(self):
+        dep_path = self._write_dep("build\\file.o: \\\r\n\tinclude\\header.h \\\r\n\tmore\\dep.h\r\n")
+        output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\tinclude/header.h \\\n\tmore/dep.h\n")
+
+    def test_import_d_file_handles_crlf_blank_dependency_line(self):
+        dep_path = self._write_dep("build/file.o: \\\r\n \\\r\n")
+        output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n \\\n")
+
     def test_in_wsl_detects_generic_microsoft_kernel_tag(self):
         with patch("tools.transform_dep.uname") as mocked_uname:
             mocked_uname.return_value.release = "5.15.167.4-microsoft"

@@ -64,18 +64,20 @@ def import_d_file(in_file: str) -> str:
 
     with open(in_file) as file:
         for idx, line in enumerate(file):
+            line_noeol = line.rstrip("\r\n")
+            has_continuation = line_noeol.endswith(" \\")
             if idx == 0:
-                if line.endswith(" \\\n"):
-                    out_text += line[:-3].replace("\\", "/") + " \\\n"
+                if has_continuation:
+                    out_text += line_noeol[:-2].replace("\\", "/") + " \\\n"
                 else:
-                    out_text += line.replace("\\", "/")
+                    out_text += line_noeol.replace("\\", "/") + "\n"
             else:
                 suffix = ""
-                if line.endswith(" \\\n"):
+                if has_continuation:
                     suffix = " \\"
-                    path = line.lstrip()[:-3]
+                    path = line_noeol.lstrip()[:-2]
                 else:
-                    path = line.strip()
+                    path = line_noeol.strip()
                 if path:
                     path = _normalize_dep_path(path)
                     out_text += "\t" + path + suffix + "\n"

@@ -5,7 +5,7 @@
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
 
-#include <string.h>
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 // TODO: This should be using CPtrArray.h surely?
 template <class T>

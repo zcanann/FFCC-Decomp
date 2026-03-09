@@ -483,7 +483,7 @@ void CPartPcs::create0()
  */
 void CPartPcs::create()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
     void* stage;
 
     usb->m_freePtr = 0;
@@ -507,8 +507,8 @@ void CPartPcs::create()
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         &ppvAmemCacheSet,
         s_CPartPcs_801d7f54,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_stageLoad,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_stageAmem,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageLoad,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -560,33 +560,32 @@ void CPartPcs::createLoad()
 void CPartPcs::createViewer()
 {
     void* stage;
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
 
     IsBigAlloc__7CUSBPcsFi(&USBPcs, 1);
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_freePtr = 0;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageExtra = 0;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_blockOnFrame = 0;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_miruraEventActive = 0;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_disableShokiDraw = 0;
 
     if (Game.game.m_currentSceneId == 7) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageLoad = stage;
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageDefault = stage;
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageAmem = 0;
     } else {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageLoad = stage;
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageDefault = stage;
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, s_CPartPcs_amem_801d811c, 2);
-        usb->m_stageAmem = stage;
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageAmem = stage;
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         &ppvAmemCacheSet,
         s_CPartPcs_801d7f54,
-        usb->m_stageLoad,
-        usb->m_stageAmem,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageLoad,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -597,7 +596,7 @@ void CPartPcs::createViewer()
 
     memset(&PartMng, 0, 0x23FD8);
     PartMng.Create();
-    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8)->CreateBuffer();
+    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4)->CreateBuffer();
 }
 
 /*
@@ -611,7 +610,7 @@ void CPartPcs::createViewer()
  */
 void CPartPcs::destroy()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
     IsBigAlloc__7CUSBPcsFi(&USBPcs, 0);
     Destroy__8CPartMngFv(&PartMng);
@@ -709,7 +708,7 @@ void CPartPcs::calc()
  */
 void CPartPcs::calcViewer()
 {
-    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4);
 
     OSStartStopwatch(&g_par_calc_prof);
     PartMng.pppEditBeforeCalc();
@@ -764,7 +763,7 @@ void CPartPcs::ClearOt()
  */
 void CPartPcs::drawShadow()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
     if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
         *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x1028) != 0) {
@@ -788,7 +787,7 @@ void CPartPcs::drawShadow()
  */
 void CPartPcs::drawCharaBefore()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
     if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
@@ -812,7 +811,7 @@ void CPartPcs::drawCharaBefore()
  */
 void CPartPcs::draw()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
     if (Game.game.m_gameWork.m_gamePaused != 0) {
@@ -938,7 +937,7 @@ void CPartPcs::DrawMenu(int fpNo)
  */
 void CPartPcs::DrawShoki()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
     if (usb->m_disableShokiDraw == 0 && Game.game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
@@ -1186,7 +1185,7 @@ void LoadFieldPdt0(int mapId, int floorId)
         ppvAmemCacheSet.RefCnt0Compare();
     }
 
-    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 8)->m_fieldLoadReq = 1;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_fieldLoadReq = 1;
 
     sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
     pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
@@ -1309,7 +1308,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     int loaded;
     void* stage;
     char path[256];
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
 
     language = GetLangString__5CGameFv(&Game.game);

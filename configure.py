@@ -297,12 +297,6 @@ cflags_odenotstub = [
 
 cflags_thp = [
     *cflags_base,
-    "-Cpp_exceptions off",
-    "-use_lmw_stmw on",
-    "-str reuse,pool,readonly",
-    "-common off",
-    "-inline auto",
-    "-str noreadonly",
 ]
 
 def replace_flag_prefix(flags: List[str], prefix: str, new_flag: str) -> List[str]:

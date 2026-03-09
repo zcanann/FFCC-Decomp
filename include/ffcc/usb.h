@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPP_USB_H_
 #define _FFCC_PPP_USB_H_
 
+#include "ffcc/manager.h"
+
 enum MCCChannel
 {
     Channel0,
@@ -22,7 +24,7 @@ struct CUSBCallbackEntry
     void* m_callerContext; // 0x8
 };
 
-class CUSB
+class CUSB : public CManager
 {
 public:
     void Init();
@@ -37,7 +39,6 @@ public:
     void RemoveMessageCallback(MessageCallback);
     void Printf(char*, ...);
     
-    void* m_managerStringTable;       // 0x0
     unsigned int m_unk_0x4;           // 0x4
     unsigned int m_unk_0x8;           // 0x8
     unsigned int m_unk_0xc;           // 0xc

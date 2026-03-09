@@ -229,9 +229,9 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 {
 	float texW;
 	float texH;
-	s32* serializedDataOffsets = *(s32**)((u8*)param_3 + 0xC);
-	int offsetWork = serializedDataOffsets[2];
-	int offsetColor = serializedDataOffsets[1];
+	s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+	u8* workData = (u8*)pppCrystal + serializedDataOffsets[2] + 0x84;
+	u8* colorData = (u8*)pppCrystal + serializedDataOffsets[1] + 0x88;
 
 	if (param_2->m_dataValIndex == 0xFFFF) {
 		return;
@@ -260,22 +260,14 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	pppSetBlendMode__FUc(param_2->m_payload[1]);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-		(u8*)pppCrystal + 0x88 + offsetColor, (u8*)pppCrystal + 0x40, param_2->m_arg3,
+		colorData, (u8*)pppCrystal + 0x40, param_2->m_arg3,
 		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
 
-	Mtx texMtx;
-	texMtx[0][0] = DAT_801db5b8;
-	texMtx[0][1] = DAT_801db5bc;
-	texMtx[0][2] = DAT_801db5c0;
-	texMtx[0][3] = DAT_801db5c4;
-	texMtx[1][0] = DAT_801db5c8;
-	texMtx[1][1] = DAT_801db5cc;
-	texMtx[1][2] = DAT_801db5d0;
-	texMtx[1][3] = DAT_801db5d4;
-	texMtx[2][0] = DAT_801db5d8;
-	texMtx[2][1] = DAT_801db5dc;
-	texMtx[2][2] = DAT_801db5e0;
-	texMtx[2][3] = DAT_801db5e4;
+	Mtx texMtx = {
+		{ DAT_801db5b8, DAT_801db5bc, DAT_801db5c0, DAT_801db5c4 },
+		{ DAT_801db5c8, DAT_801db5cc, DAT_801db5d0, DAT_801db5d4 },
+		{ DAT_801db5d8, DAT_801db5dc, DAT_801db5e0, DAT_801db5e4 },
+	};
 
 	texW = FLOAT_80330fa8;
 	texH = FLOAT_80330fa8;
@@ -326,7 +318,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 0);
 	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
 	if (param_2->m_payload[0] == 1) {
-		GXLoadTexObj((_GXTexObj*)(*(u32*)((u8*)pppCrystal + 0x84 + offsetWork)), GX_TEXMAP1);
+		GXLoadTexObj((_GXTexObj*)(*(u32*)workData), GX_TEXMAP1);
 	} else {
 		GXLoadTexObj((_GXTexObj*)(indirectTex + 0x28), GX_TEXMAP1);
 	}

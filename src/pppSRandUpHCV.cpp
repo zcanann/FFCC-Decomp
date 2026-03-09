@@ -94,16 +94,14 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 			target[3] = value;
 		}
 	} else {
+		if (in->field0 != *(s32*)(base + 0xC)) {
+			return;
+		}
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
 
-	s16* target_colors;
 	s32 color_offset = in->field4;
-	if (color_offset == -1) {
-		target_colors = gPppDefaultValueBuffer;
-	} else {
-		target_colors = (s16*)(base + color_offset + 0x80);
-	}
+	s16* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
 
 	target_colors[0] += (s8)((f32)in->field8 * target[0]);
 	target_colors[1] += (s8)((f32)in->fieldA * target[1]);

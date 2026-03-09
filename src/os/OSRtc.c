@@ -288,6 +288,7 @@ u32 OSSetSoundMode(void) {
 
 void OSGetSoundMode(u32 mode) {
     OSSram* sram;
+    int unused;
 
     ASSERTLINE(617, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
     mode = (mode & 1) << 2;

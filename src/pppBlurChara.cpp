@@ -7,6 +7,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
+#include "ffcc/math.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -107,7 +108,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
                                                                                            int reg);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst,
                                                                                     int op);
-void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
+void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
 char s_pppBlurChara_cpp_801DB620[] = "pppBlurChara.cpp";
@@ -453,7 +454,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     double depth = static_cast<double>(PSVECDistance(&cameraPos, &objPos)) - static_cast<double>(param_2->m_stepValue);
     inVec.z = -static_cast<float>(depth);
     inVec.w = FLOAT_8033103c;
-    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(0, screenMtx, &inVec, &outVec);
+    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 
     if (outVec.w != FLOAT_80331030) {
         outVec.z = outVec.z / outVec.w;

@@ -98,7 +98,7 @@ extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, 
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void __dla__FPv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
+extern "C" int Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -1883,32 +1883,35 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
  */
 int CSound::SetSe3DGroup(int se3dHandle, int group)
 {
+    int index;
+
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        index = Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else {
         char* se = reinterpret_cast<char*>(this) + 0x2C;
         char* found;
-        int count = 0x20;
-        do {
-            if ((*se < 0 &&
-                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 (se[0x28] < 0 &&
-                  (found = se + 0x28, *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
-                 (se[0x50] < 0 &&
-                  (found = se + 0x50, *reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                 (se[0x78] < 0 &&
-                  (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+        index = 0;
+
+        for (int count = 0x20; count != 0; count--) {
+            if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 ((found = se + 0x28, *found < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle)))) ||
+                ((found = se + 0x50, *found < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
+                (se[0x78] < 0 &&
+                 (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
                 goto found_se;
             }
+            index += 3;
             se += 0xA0;
-            count--;
-        } while (count != 0);
+        }
+
         found = 0;
 found_se:
         if (found != 0) {
             *reinterpret_cast<int*>(found + 0x24) = group;
         }
     }
+
+    return index;
 }
 
 /*

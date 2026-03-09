@@ -93,13 +93,13 @@ void __GBAX02(s32 chan, u8* readbuf) {
     DCFlushRange(param, 32);
     
     gba->task.priority = 0xff;
-    gba->task.iram_mmem_addr = (u16*)OSCachedToPhysical(GBAKeyDspTaskIram);
+    gba->task.iram_mmem_addr = (u16*)GBAKeyDspTaskIram;
     gba->task.iram_length = 0x380;
     gba->task.iram_addr = 0;
     gba->task.dsp_init_vector = 0x10;
-    gba->task.init_cb = F232;
+    gba->task.init_cb = F23;
     gba->task.res_cb = NULL;
-    gba->task.done_cb = F252;
+    gba->task.done_cb = F25;
     gba->task.req_cb = NULL;
     
     DSPAddTask(&gba->task);

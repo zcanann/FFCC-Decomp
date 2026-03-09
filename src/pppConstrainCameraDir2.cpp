@@ -45,16 +45,18 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             &param_2->m_initWOrk, &param_2->m_stepValue);
 
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
-            float cameraDirX = CameraDirX();
-            float cameraDirY = CameraDirY();
-            float cameraDirZ = CameraDirZ();
+            Vec cameraDir;
+            cameraDir.x = CameraDirX();
+            cameraDir.y = CameraDirY();
+            cameraDir.z = CameraDirZ();
 
             Mtx cameraMtx;
             PSMTXCopy(CameraMatrix(), cameraMtx);
 
-            float cameraPosX = CameraPosX();
-            float cameraPosY = CameraPosY();
-            float cameraPosZ = CameraPosZ();
+            Vec cameraPos;
+            cameraPos.x = CameraPosX();
+            cameraPos.y = CameraPosY();
+            cameraPos.z = CameraPosZ();
             float scale = FLOAT_803331e0 + ((CameraDistance() - FLOAT_803331e4) / FLOAT_803331e4);
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
@@ -74,18 +76,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             Vec resultPos;
             if (flags[0] != 0) {
                 float distance = value[0];
-                resultPos.x = cameraDirX * distance + cameraPosX;
-                resultPos.y = cameraDirY * distance + cameraPosY;
-                resultPos.z = cameraDirZ * distance + cameraPosZ;
+                resultPos.x = cameraDir.x * distance + cameraPos.x;
+                resultPos.y = cameraDir.y * distance + cameraPos.y;
+                resultPos.z = cameraDir.z * distance + cameraPos.z;
             }
 
             float localX = ((_pppPObject*)param_1)->m_localMatrix.value[0][3];
             float localY = ((_pppPObject*)param_1)->m_localMatrix.value[1][3];
-
-            Vec cameraDir;
-            cameraDir.x = cameraDirX;
-            cameraDir.y = cameraDirY;
-            cameraDir.z = cameraDirZ;
 
             Vec direct0;
             Vec direct1;

@@ -64,6 +64,7 @@ f64 ZeroF;
 f32 ZeroPS[2];
 BOOL AreWeInitialized;
 void (**OSExceptionTable)(u8, OSContext*);
+static const char sOSRegisterVersionFmt[] = "%s\n";
 static void* __OSSavedRegionEnd;
 static void* __OSSavedRegionStart;
 BOOL __OSInIPL;
@@ -643,5 +644,5 @@ u32 __OSGetDIConfig(void) {
 }
 
 void OSRegisterVersion(const char* id) {
-    OSReport("%s\n", id);
+    OSReport(sOSRegisterVersionFmt, id);
 }

@@ -54,6 +54,7 @@ extern double DOUBLE_80331d08;
 extern double DOUBLE_80331d10;
 extern double DOUBLE_80331dc0;
 extern char SoundBuffer[];
+extern "C" unsigned char m_boss__8CGMonObj[];
 
 /*
  * --INFO--
@@ -2082,8 +2083,86 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	
 	#endif
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId >= 100) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	u8* mon = reinterpret_cast<u8*>(this);
+	int* bossIndex = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x58);
+	u8* bossFlags = m_boss__8CGMonObj + 0x5C;
+	int* bossMode = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x60);
+	int* bossWait = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x64);
+	CGPrgObj** bossObjArr = reinterpret_cast<CGPrgObj**>(m_boss__8CGMonObj + 0x48);
+
+	int state = prgObj->m_lastStateId;
+	if (state == 0x67) {
+		int subState = prgObj->m_subState;
+		if (subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				charaObj->damageDelete();
+				prgObj->reqAnim(*bossIndex * 3 + 0x1C, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->changeSubStat(1);
+			}
+		} else if (subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				*bossFlags = (*bossFlags & 0x7F) | 0x80;
+				*bossMode = 1;
+				prgObj->reqAnim(*bossIndex * 3 + 0x1D, 1, 0);
+			} else if (((*bossFlags & 0x80) == 0)) {
+				prgObj->changeSubStat(2);
+			}
+		} else if (subState == 2) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(*bossIndex * 3 + 0x1E, 0, 0);
+				prgObj->playSe3D(*bossIndex * 2 + 0x11D34, 0x32, 0x96, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				object->SetAnimSlot(0, 0);
+				prgObj->changeStat(0, 0, 0);
+				*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+				*bossWait = 0x177;
+				*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+			}
+		}
+	} else if (state < 0x67) {
+		if (state == 0x65) {
+			if (prgObj->m_subState == 0) {
+				if (prgObj->m_subFrame == 0) {
+					*bossFlags = (*bossFlags & 0x7F) | 0x80;
+					*bossMode = 0;
+				} else if (((*bossFlags & 0x80) == 0)) {
+					prgObj->addSubStat();
+				}
+			} else if (prgObj->m_subState == 1) {
+				if (prgObj->m_subFrame == 0) {
+					prgObj->reqAnim(*bossIndex + 0x16, 0, 0);
+					prgObj->playSe3D(*bossIndex * 2 + 0x11D35, 0x32, 0x96, 0, 0);
+				} else if (prgObj->isLoopAnim() != 0) {
+					object->SetAnimSlot(*bossIndex + 0x19, 0);
+					prgObj->changeStat(0, 0, 0);
+					*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+					object->m_bgColMask |= 0x80000;
+				}
+			}
+		} else if (state > 100) {
+			if (prgObj->m_stateFrame == 0) {
+				charaObj->damageDelete();
+				bossObjArr[*bossIndex]->changeStat(0x65, 0, 0);
+				prgObj->reqAnim(*bossIndex + 0x25, 0, 0);
+				CFlat[4836] = static_cast<u8>((CFlat[4836] & 0xDF) | 0x20);
+				*reinterpret_cast<int*>(CFlat + 4840) = *reinterpret_cast<int*>(CFlat + 4840) + 1;
+			} else if (prgObj->isLoopAnim() != 0) {
+				object->SetAnimSlot(0, 0);
+				prgObj->changeStat(0, 0, 0);
+				*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+				*bossWait = 0x177;
+				*bossIndex = *bossIndex + 1;
+				if (2 < *bossIndex) {
+					*bossIndex = 0;
+				}
+				*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+			}
+		}
+	} else if (state < 0x69 && prgObj->m_stateFrame == 0) {
+		prgObj->reqAnim(0x35, 1, 0);
 	}
 }
 

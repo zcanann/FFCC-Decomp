@@ -16,6 +16,9 @@ import os
 from platform import uname
 
 
+_MAKE_ESCAPE_CHARS = {" ", "#", "$", ":"}
+
+
 def _winedevices_path() -> str:
     wineprefix = os.environ.get("WINEPREFIX")
     if not wineprefix:
@@ -37,8 +40,8 @@ def _normalize_dep_path(path: str) -> str:
     if not path:
         return path
 
-    # Normalize slash style first for non-drive paths.
-    normalized = path.replace("\\", "/")
+    # Normalize slash style while preserving Makefile escape sequences.
+    normalized = _normalize_slashes(path)
 
     # Only perform drive-letter mapping for absolute Windows paths (e.g. Z:/..., C:/...).
     # Drive-relative paths like C:foo/bar should remain drive-relative.
@@ -60,6 +63,27 @@ def _normalize_dep_path(path: str) -> str:
     return os.path.realpath(os.path.join(winedevices, f"{drive}:{drive_path}"))
 
 
+def _normalize_slashes(path: str) -> str:
+    """Convert Windows path separators while preserving Makefile escapes."""
+    out = []
+    idx = 0
+    while idx < len(path):
+        char = path[idx]
+        if char == "\\" and idx + 1 < len(path):
+            next_char = path[idx + 1]
+            if next_char in _MAKE_ESCAPE_CHARS:
+                out.append(char)
+                out.append(next_char)
+                idx += 2
+                continue
+            out.append("/")
+            idx += 1
+            continue
+        out.append(char)
+        idx += 1
+    return "".join(out)
+
+
 def import_d_file(in_file: str) -> str:
     out_text = ""
 
@@ -69,9 +93,9 @@ def import_d_file(in_file: str) -> str:
             has_continuation = line_noeol.endswith(" \\")
             if idx == 0:
                 if has_continuation:
-                    out_text += line_noeol[:-2].replace("\\", "/") + " \\\n"
+                    out_text += _normalize_slashes(line_noeol[:-2]) + " \\\n"
                 else:
-                    out_text += line_noeol.replace("\\", "/") + "\n"
+                    out_text += _normalize_slashes(line_noeol) + "\n"
             else:
                 suffix = ""
                 if has_continuation:

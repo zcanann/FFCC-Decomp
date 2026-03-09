@@ -45,6 +45,17 @@ class TransformDepTests(unittest.TestCase):
         output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n \\\n")
 
+    def test_import_d_file_preserves_escaped_spaces(self):
+        dep_path = self._write_dep("build/file.o: \\\n\tinclude\\my\\ file.h\n")
+        output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\tinclude/my\\ file.h\n")
+
+    def test_import_d_file_preserves_make_escapes_in_windows_path(self):
+        dep_path = self._write_dep("build/file.o: \\\n\tC:\\my\\ path\\include\\header.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/my\\ path/include/header.h\n")
+
     def test_in_wsl_detects_generic_microsoft_kernel_tag(self):
         with patch("tools.transform_dep.uname") as mocked_uname:
             mocked_uname.return_value.release = "5.15.167.4-microsoft"

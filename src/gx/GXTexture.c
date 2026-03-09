@@ -282,8 +282,12 @@ void GXInitTexObjCI(GXTexObj* obj, void* image_ptr, u16 width, u16 height, GXCIT
 
 void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt, f32 min_lod, f32 max_lod, f32 lod_bias, u8 bias_clamp, u8 do_edge_lod, GXAnisotropy max_aniso) {
     u8 lbias;
+    u8 edgeLod;
+    u8 magFilt;
     u8 lmin;
     u8 lmax;
+    u32 mode0;
+    u32 mode1;
     __GXTexObjInt* t = (__GXTexObjInt*)obj;
 
     ASSERTMSGLINE(776, obj, "Texture Object Pointer is null");
@@ -296,16 +300,49 @@ void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt, 
     }
 
     lbias = 32.0f * lod_bias;
-    SET_REG_FIELD(788, t->mode0, 8, 9, lbias);
+    mode0 = t->mode0;
+    mode0 = (mode0 & 0xFFFE01FF) | ((lbias & 0xFF) << 9);
+    t->mode0 = mode0;
+
     ASSERTMSG1LINE(791, (u32)mag_filt <= 1, "%s: invalid mag_filt value", "GXInitTexObjLOD");
-    SET_REG_FIELD(792, t->mode0, 1, 4, (mag_filt == GX_LINEAR) ? 1 : 0);
+    if (mag_filt == GX_LINEAR) {
+        magFilt = 1;
+    } else {
+        magFilt = 0;
+    }
+    mode0 = t->mode0;
+    mode0 = (mode0 & 0xFFFFFFEF) | (magFilt << 4);
+    t->mode0 = mode0;
+
     ASSERTMSG1LINE(795, (u32)min_filt <= 5, "%s: invalid min_filt value", "GXInitTexObjLOD");
-    SET_REG_FIELD(796, t->mode0, 3, 5, GX2HWFiltConv[min_filt]);
-    SET_REG_FIELD(798, t->mode0, 1, 8, do_edge_lod ? 0 : 1);
-    SET_REG_FIELD(801, t->mode0, 1, 17, 0);
-    SET_REG_FIELD(801, t->mode0, 1, 18, 0);
-    SET_REG_FIELD(801, t->mode0, 2, 19, max_aniso);
-    SET_REG_FIELD(802, t->mode0, 1, 21, bias_clamp);
+    mode0 = t->mode0;
+    mode0 = (mode0 & 0xFFFFFF1F) | (GX2HWFiltConv[min_filt] << 5);
+    t->mode0 = mode0;
+
+    if (do_edge_lod != 0) {
+        edgeLod = 0;
+    } else {
+        edgeLod = 1;
+    }
+    mode0 = t->mode0;
+    mode0 = (mode0 & 0xFFFFFEFF) | (edgeLod << 8);
+    t->mode0 = mode0;
+
+    mode0 = t->mode0;
+    mode0 &= 0xFFFDFFFF;
+    t->mode0 = mode0;
+
+    mode0 = t->mode0;
+    mode0 &= 0xFFFBFFFF;
+    t->mode0 = mode0;
+
+    mode0 = t->mode0;
+    mode0 = (mode0 & 0xFFE7FFFF) | (max_aniso << 19);
+    t->mode0 = mode0;
+
+    mode0 = t->mode0;
+    mode0 = (mode0 & 0xFFDFFFFF) | ((bias_clamp & 0xFF) << 21);
+    t->mode0 = mode0;
 
     if (min_lod < 0.0f) {
         min_lod = 0.0f;
@@ -319,8 +356,14 @@ void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt, 
         max_lod = 10.0f;
     }
     lmax = 16.0f * max_lod;
-    SET_REG_FIELD(816, t->mode1, 8, 0, lmin);
-    SET_REG_FIELD(817, t->mode1, 8, 8, lmax);
+
+    mode1 = t->mode1;
+    mode1 = (mode1 & 0xFFFFFF00) | lmin;
+    t->mode1 = mode1;
+
+    mode1 = t->mode1;
+    mode1 = (mode1 & 0xFFFF00FF) | (lmax << 8);
+    t->mode1 = mode1;
 }
 
 void GXInitTexObjData(GXTexObj* obj, void* image_ptr) {

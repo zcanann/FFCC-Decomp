@@ -38,6 +38,7 @@ public:
 
 		void SyncCompleted();
 		void Read();
+		void Close();
 	};
 
 	CFile();

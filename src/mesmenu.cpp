@@ -16,7 +16,6 @@ void Create__5CMenuFv(void* menu);
 void Destroy__5CMenuFv(void* menu);
 void Set__4CMesFPci(void* mes, char* script, int flags);
 void SetPosition__4CMesFff(void* mes, float x, float y);
-void PlaySe__6CSoundFiiii(void* sound, int id, int volume, int pan, int unk);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
@@ -319,7 +318,7 @@ void CMesMenu::onCalc()
                         cursor = *(int*)((char*)this + 0x3D30) - 1;
                     }
                     if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                        PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                        Sound.PlaySe(1, 0x40, 0x7F, 0);
                     }
                 } else if ((repeatMask & 4) != 0) {
                     cursor++;
@@ -327,17 +326,17 @@ void CMesMenu::onCalc()
                         cursor = 0;
                     }
                     if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                        PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                        Sound.PlaySe(1, 0x40, 0x7F, 0);
                     }
                 } else if ((downMask & 0x200) != 0) {
                     if (altCursor < 0) {
                         if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                            PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                            Sound.PlaySe(1, 0x40, 0x7F, 0);
                         }
                     } else {
                         cursor = altCursor;
                         if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
-                            PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+                            Sound.PlaySe(3, 0x40, 0x7F, 0);
                         }
                     }
                 }
@@ -368,12 +367,12 @@ void CMesMenu::onCalc()
                 } else {
                     int wait3 = GetWait__4CMesFv((char*)this + 0x1C);
                     if ((wait3 == 3) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                        PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
                     }
                     int wait4 = GetWait__4CMesFv((char*)this + 0x1C);
                     if ((wait4 != 1) && (GetWait__4CMesFv((char*)this + 0x1C) != 5) &&
                         (*(int*)((char*)this + 0x3C90) == 0) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                        PlaySe__6CSoundFiiii(&Sound, 0xC, 0x40, 0x7F, 0);
+                        Sound.PlaySe(0xC, 0x40, 0x7F, 0);
                     }
                 }
 
@@ -398,7 +397,7 @@ void CMesMenu::onCalc()
                             *(int*)((char*)this + 0x14) = 4;
                             if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
                                 ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                                PlaySe__6CSoundFiiii(&Sound, 6, 0x40, 0x7F, 0);
+                                Sound.PlaySe(6, 0x40, 0x7F, 0);
                             }
                         } else {
                             int stack[2];
@@ -848,7 +847,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(int*)((char*)this + 0x10) = 0;
     *(int*)((char*)this + 0x14) = 8;
     if ((flags & 0x11) == 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-        PlaySe__6CSoundFiiii(&Sound, 5, 0x40, 0x7F, 0);
+        Sound.PlaySe(5, 0x40, 0x7F, 0);
     }
 }
 
@@ -884,7 +883,7 @@ void CMesMenu::CloseRequest(int closeReason)
             *(int*)((char*)this + 0x14) = 4;
             if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
                 ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                PlaySe__6CSoundFiiii(&Sound, 6, 0x40, 0x7F, 0);
+                Sound.PlaySe(6, 0x40, 0x7F, 0);
             }
         }
     }

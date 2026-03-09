@@ -46,6 +46,8 @@ public:
     void Free(void*);
     void IncHeapWalkerLevel();
     void DecHeapWalkerLevel();
+    void ResetDefaultGroup();
+    void SetDefaultGroup(int);
     void CopyToAMemory(void*, void*, unsigned long);
     void CopyFromAMemory(void*, void*, unsigned long);
     void CopyToAMemorySync(void*, void*, unsigned long);

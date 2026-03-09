@@ -94,10 +94,6 @@ extern "C" void SetReverb__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetSeBlockData__9CRedSoundFiPv(CRedSound*, int, void*);
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -412,10 +408,11 @@ void CSound::Init()
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
     CSoundLayout& sound = SoundData(this);
 
-    sound.m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_soundStageName, 0);
+    CMemory::CStage* stage = Memory.CreateStage(0xA4000, s_soundStageName, 0);
+    sound.m_stage = stage;
 
-    sound.m_aramBuffer = __nwa__FUlPQ27CMemory6CStagePci(0x80000, sound.m_stage, s_soundSourceName, 0x2E);
-    sound.m_streamBuffer = __nwa__FUlPQ27CMemory6CStagePci(0x20000, sound.m_stage, s_soundSourceName, 0x2F);
+    sound.m_aramBuffer = new (stage, s_soundSourceName, 0x2E) u8[0x80000];
+    sound.m_streamBuffer = new (stage, s_soundSourceName, 0x2F) u8[0x20000];
 
     sound.m_bgmMasterVolume = 0x7F;
     sound.m_seMasterVolume = 0x7F;
@@ -510,17 +507,17 @@ void CSound::Quit()
 
     void*& streamBuffer = sound.m_streamBuffer;
     if (streamBuffer != 0) {
-        __dla__FPv(streamBuffer);
+        delete[] reinterpret_cast<u8*>(streamBuffer);
         streamBuffer = 0;
     }
 
     void*& aramBuffer = sound.m_aramBuffer;
     if (aramBuffer != 0) {
-        __dla__FPv(aramBuffer);
+        delete[] reinterpret_cast<u8*>(aramBuffer);
         aramBuffer = 0;
     }
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, sound.m_stage);
+    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(sound.m_stage));
 }
 
 /*

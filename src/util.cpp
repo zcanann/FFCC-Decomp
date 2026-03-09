@@ -11,10 +11,7 @@ const float kUtilQuadDepth = -0.99999988f;
 const float kUtilHermiteCoeff2 = 2.0f;
 const float kUtilHermiteCoeff3 = 3.0f;
 const float kUtilHermiteCoeffNeg2 = -2.0f;
-extern "C" const Vec gUtilUpVector;
-extern "C" {
-const Vec gUtilUpVector = {0.0f, 1.0f, 0.0f};
-}
+extern "C" const Vec gUtilUpVector = {0.0f, 1.0f, 0.0f};
 
 static inline MtxPtr GetCameraMatrix()
 {

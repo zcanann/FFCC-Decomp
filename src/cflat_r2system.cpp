@@ -316,9 +316,9 @@ void CGame::CGameWork::ClearEvtWork()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetShadowAuto__10CCameraPcsFi(void* camera, int enable)
+void CCameraPcs::SetShadowAuto(int enable)
 {
-    *(int*)((char*)camera + 0x434) = enable;
+    *(int*)((char*)this + 0x434) = enable;
 }
 
 /*
@@ -796,9 +796,9 @@ extern "C" void SetNoFreeMergeMask__9CCharaPcsFi(void* charaPcs, int mask)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ResetDefaultGroup__7CMemoryFv(void* memory)
+void CMemory::ResetDefaultGroup()
 {
-    *(int*)((char*)memory + 0x779C) = 0;
+    *(int*)((char*)this + 0x779C) = 0;
 }
 
 /*
@@ -810,9 +810,9 @@ extern "C" void ResetDefaultGroup__7CMemoryFv(void* memory)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetDefaultGroup__7CMemoryFi(void* memory, int group)
+void CMemory::SetDefaultGroup(int group)
 {
-    *(int*)((char*)memory + 0x779C) = group;
+    *(int*)((char*)this + 0x779C) = group;
 }
 
 /*
@@ -852,9 +852,9 @@ extern "C" void SetUseDOF__11CGraphicPcsFi(void* graphicPcs, int enabled)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void Close__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
+void CFile::CHandle::Close()
 {
-    File.Close(fileHandle);
+    File.Close(this);
 }
 
 /*
@@ -1076,10 +1076,10 @@ extern "C" void __opR3Vec__7CVectorFv(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
+void CCameraPcs::SetWorldMapMatrix(float (*matrix)[4])
 {
-    PSMTXCopy(matrix, (MtxPtr)((char*)camera + 0x34));
-    PSMTXInverse(matrix, (MtxPtr)((char*)camera + 0x64));
+    PSMTXCopy(matrix, (MtxPtr)((char*)this + 0x34));
+    PSMTXInverse(matrix, (MtxPtr)((char*)this + 0x64));
 }
 
 /*
@@ -1091,9 +1091,9 @@ extern "C" void SetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void GetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
+void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
 {
-    PSMTXCopy((MtxPtr)((char*)camera + 0x34), matrix);
+    PSMTXCopy((MtxPtr)((char*)this + 0x34), matrix);
 }
 
 /*
@@ -1358,9 +1358,9 @@ extern "C" float fmodf__3stdFff(float x, float y)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetFov__10CCameraPcsFf(CCameraPcs* camera, float fov)
+void CCameraPcs::SetFov(float fov)
 {
-    *(float*)((char*)camera + 0xFC) = fov;
+    *(float*)((char*)this + 0xFC) = fov;
 }
 
 /*
@@ -1470,9 +1470,9 @@ extern "C" float sinf__3stdFf(float x)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetFromScript__10CCameraPcsFv(CCameraPcs* camera)
+void CCameraPcs::SetFromScript()
 {
-    *(int*)((char*)camera + 0x438) = 1;
+    *(int*)((char*)this + 0x438) = 1;
 }
 
 /*
@@ -1535,9 +1535,9 @@ extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int IsAbsolute__10CCameraPcsFv(CCameraPcs* camera)
+int CCameraPcs::IsAbsolute()
 {
-    return *(int*)((char*)camera + 0x444);
+    return *(int*)((char*)this + 0x444);
 }
 
 /*

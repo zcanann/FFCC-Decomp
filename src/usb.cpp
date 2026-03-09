@@ -2,6 +2,7 @@
 
 #include "ffcc/system.h"
 extern "C" char __vt__8CManager[];
+extern "C" char __vt__4CUSB[];
 
 CUSB USB;
 

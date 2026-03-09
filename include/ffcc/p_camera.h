@@ -89,13 +89,18 @@ public:
     void calcPart();
 
     // Misc
+    void SetShadowAuto(int);
+    void SetFov(float);
+    void SetFromScript();
     void SetOffsetZBuff(float);
     void SetZRotate(float);
     void SetPosition(Vec*);
     void SetRefPosition(Vec*);
+    int IsAbsolute();
     void addWorldMap();
     void SetIsAbsolute(int);
     void SetWorldMapMatrix(float (*)[4]);
+    void GetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
 
     // TODO

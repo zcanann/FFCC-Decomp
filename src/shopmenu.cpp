@@ -6,6 +6,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/sound.h"
 #include "ffcc/linkage.h"
+#include "ffcc/p_tina.h"
 
 extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -23,7 +24,6 @@ int CanAddGil__12CCaravanWorkFi(void*, int);
 void AddItem__12CCaravanWorkFiPi(void*, int, int*);
 void AddGil__12CCaravanWorkFi(void*, int);
 void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
-void PlaySe__6CSoundFiiii(void*, int, int, int, int);
 char EquipChk__8CMenuPcsFi(void*, int);
 int GetSmithItem__8CMenuPcsFi(void*, int);
 int __cntlzw(unsigned int);
@@ -51,8 +51,6 @@ char* strcat(char*, const char*);
 char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";
 extern char DAT_80332e54[];
 unsigned short gShopMenuInputLatch;
-class CPartPcs;
-extern CPartPcs PartPcs;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;
 extern float FLOAT_80332d34;
@@ -582,7 +580,7 @@ void CShopMenu::Calc()
     switch (mode) {
     case 0:
         if (timer == 1) {
-            PlaySe__6CSoundFiiii((void*)&Sound, 5, 0x40, 0x7F, 0);
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
         ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
@@ -595,20 +593,20 @@ void CShopMenu::Calc()
             if (choice > 2) {
                 choice = 0;
             }
-            PlaySe__6CSoundFiiii((void*)&Sound, 1, 0x40, 0x7F, 0);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((buttons & 8) != 0) {
             --choice;
             if (choice > 2) {
                 choice = 2;
             }
-            PlaySe__6CSoundFiiii((void*)&Sound, 1, 0x40, 0x7F, 0);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((buttons & 0x100) != 0) {
-            PlaySe__6CSoundFiiii((void*)&Sound, 2, 0x40, 0x7F, 0);
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
             this->SetMode(2);
         }
 
         if ((buttons & 0x200) != 0) {
-            PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
+            Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(2);
             choice = 2;
         }
@@ -632,7 +630,7 @@ void CShopMenu::Calc()
         break;
     case 3:
         if (timer == 0) {
-            PlaySe__6CSoundFiiii((void*)&Sound, 5, 0x40, 0x7F, 0);
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
         ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
@@ -643,19 +641,19 @@ void CShopMenu::Calc()
         if (subMode == 0) {
             this->SelectItemIdx();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
                 this->SetMode(5);
             }
         } else if (subMode == 1) {
             this->SelectFigure();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
         } else if (subMode == 2) {
             this->SelectYesNo();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
         }
@@ -669,7 +667,7 @@ void CShopMenu::Calc()
         break;
     case 6:
         if (timer == 0) {
-            PlaySe__6CSoundFiiii((void*)&Sound, 5, 0x40, 0x7F, 0);
+            Sound.PlaySe(5, 0x40, 0x7F, 0);
         }
         ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
@@ -680,13 +678,13 @@ void CShopMenu::Calc()
         if (subMode == 0) {
             this->SelectItemIdx();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
                 this->SetMode(8);
             }
         } else if (subMode == 2) {
             this->SelectYesNo();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
         }
@@ -904,12 +902,12 @@ void CShopMenu::SelectItemIdx()
                             int canAdd = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -itemNo);
                             if (canAdd != 0) {
                                 *reinterpret_cast<int*>(self + 0x10) = 1;
-                                PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+                                Sound.PlaySe(2, 0x40, 0x7F, 0);
                                 goto update_window;
                             }
                         }
                     }
-                    PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (listType == 1) {
                     int itemIdx = *reinterpret_cast<int*>(self + 0x28);
                     if (itemIdx != -1) {
@@ -924,9 +922,9 @@ void CShopMenu::SelectItemIdx()
 
                     if (canSelect) {
                         *reinterpret_cast<int*>(self + 0x10) = 2;
-                        PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
                     } else {
-                        PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                     }
                 } else if (listType == 2) {
                     int itemNo = -1;
@@ -968,9 +966,9 @@ void CShopMenu::SelectItemIdx()
 
                         *reinterpret_cast<int*>(self + 0x150) = GetSmithItem__8CMenuPcsFi(MenuPcsVoid(), smithItem);
                         SetMode__9CShopMenuFi(self, 0xB);
-                        PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
                     } else {
-                        PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
                     }
                 }
             }
@@ -988,7 +986,7 @@ void CShopMenu::SelectItemIdx()
             }
 
             if (*reinterpret_cast<int*>(self + 0x28) < mode) {
-                PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
                 gShopMenuInputLatch = 4;
                 mode = *reinterpret_cast<int*>(self + 0x14);
@@ -1002,7 +1000,7 @@ void CShopMenu::SelectItemIdx()
                     mode = -1;
                 }
                 *reinterpret_cast<int*>(self + 0x28) = mode - 1;
-                PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         }
     } else {
@@ -1010,9 +1008,9 @@ void CShopMenu::SelectItemIdx()
         if (*reinterpret_cast<int*>(self + 0x28) < 0) {
             gShopMenuInputLatch = 8;
             *reinterpret_cast<int*>(self + 0x28) = 0;
-            PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
-            PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
     }
 
@@ -1097,25 +1095,25 @@ void CShopMenu::SelectFigure()
             }
 
             if ((buttons & 0x100) != 0) {
-                PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+                Sound.PlaySe(2, 0x40, 0x7F, 0);
                 *reinterpret_cast<int*>(self + 0x10) = 2;
             }
         } else {
             *reinterpret_cast<int*>(self + 0x38) = *reinterpret_cast<int*>(self + 0x38) - 1;
             if (*reinterpret_cast<int*>(self + 0x38) < 0) {
                 *reinterpret_cast<int*>(self + 0x38) = 0;
-                PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else {
-                PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
         }
     } else {
         *reinterpret_cast<int*>(self + 0x38) = *reinterpret_cast<int*>(self + 0x38) + 1;
         if (*reinterpret_cast<int*>(self + 0x38) < 2) {
-            PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else {
             *reinterpret_cast<int*>(self + 0x38) = 1;
-            PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
     }
 
@@ -1201,18 +1199,18 @@ void CShopMenu::SelectFigure()
                 *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) - 10;
                 if (*reinterpret_cast<int*>(self + 0x44) < 1) {
                     *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) + 10;
-                    PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else {
-                    PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
             } else if (mode == 0) {
                 *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) - 1;
                 if (*reinterpret_cast<int*>(self + 0x44) < 1) {
                     gShopMenuInputLatch = 4;
                     *reinterpret_cast<int*>(self + 0x44) = 1;
-                    PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else {
-                    PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
             }
         }
@@ -1268,12 +1266,12 @@ void CShopMenu::SelectFigure()
                 }
 
                 if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -itemNo) != 0) {
-                    PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                     return;
                 }
             }
             *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) - 10;
-            PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if (mode == 0) {
             *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) + 1;
             int caravan = *reinterpret_cast<int*>(self + 0x20);
@@ -1324,13 +1322,13 @@ void CShopMenu::SelectFigure()
                 }
 
                 if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -itemNo) != 0) {
-                    PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                     return;
                 }
             }
             gShopMenuInputLatch = 8;
             *reinterpret_cast<int*>(self + 0x44) = *reinterpret_cast<int*>(self + 0x44) - 1;
-            PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
     }
 }
@@ -1361,7 +1359,7 @@ void CShopMenu::SelectYesNo()
     buttons = GetPadButtons();
     if ((buttons & 0xC) != 0) {
         *reinterpret_cast<unsigned int*>(self + 0x3C) ^= 1;
-        PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+        Sound.PlaySe(1, 0x40, 0x7F, 0);
         return;
     }
 
@@ -1371,7 +1369,7 @@ void CShopMenu::SelectYesNo()
     }
 
     if (*reinterpret_cast<int*>(self + 0x3C) == 1) {
-        PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+        Sound.PlaySe(3, 0x40, 0x7F, 0);
         if (*reinterpret_cast<int*>(self + 0x14) == 0) {
             *reinterpret_cast<int*>(self + 0x10) = 1;
         } else {
@@ -1384,7 +1382,7 @@ void CShopMenu::SelectYesNo()
     listType = *reinterpret_cast<int*>(self + 0x14);
 
     if (listType == 0) {
-        PlaySe__6CSoundFiiii(&Sound, 0x50, 0x40, 0x7F, 0);
+        Sound.PlaySe(0x50, 0x40, 0x7F, 0);
         itemIndex = *reinterpret_cast<int*>(self + 0x28);
         if (listType == 0) {
             itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
@@ -1501,11 +1499,11 @@ void CShopMenu::SelectYesNo()
     }
 
     if (!canExecute) {
-        PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+        Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
-    PlaySe__6CSoundFiiii(&Sound, 0x50, 0x40, 0x7F, 0);
+    Sound.PlaySe(0x50, 0x40, 0x7F, 0);
     listType = *reinterpret_cast<int*>(self + 0x14);
     itemIndex = *reinterpret_cast<int*>(self + 0x28);
     if (listType == 0) {
@@ -1767,24 +1765,24 @@ void CShopMenu::SelectMake()
 
                 int canAdd = CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*reinterpret_cast<int*>(self + 0x20)), -itemIdx);
                 if (canAdd != 0) {
-                    PlaySe__6CSoundFiiii(&Sound, 0x52, 0x40, 0x7F, 0);
+                    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
                     *reinterpret_cast<int*>(self + 0x8) = 0xF;
                     SetMode__9CShopMenuFi(self, 0xE);
                     return;
                 }
             }
 
-            PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
             *reinterpret_cast<int*>(self + 0x8) = 9;
             SetMode__9CShopMenuFi(self, 0xE);
         }
     } else {
         *reinterpret_cast<unsigned int*>(self + 0x3C) ^= 1;
         if (canSelect == 1) {
-            PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else {
             *reinterpret_cast<int*>(self + 0x3C) = 1;
-            PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
     }
 }

@@ -1603,14 +1603,19 @@ void pppCacheLoadModel(short*, _pppDataHead*)
  */
 void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	short shapeCount = shapeList[0];
-	short* shapeIndices = shapeList + 1;
+	short shapeCount;
+	short shapeIndex;
+	short* shapeIndices;
+	short i;
+	CMaterialSet* materialSet =
+	    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
 
-	for (short i = 0; i < shapeCount; i++) {
-		short shapeIndex = *shapeIndices;
-		shapeIndices++;
-		pppShapeSt* shape = *(pppShapeSt**)(pppDataHead->m_shapeNames + (shapeIndex * sizeof(pppShapeSt*)));
-		pppCacheLoadShapeTexture(shape, pppEnvStPtr->m_materialSetPtr);
+	shapeIndices = shapeList + 1;
+	shapeCount = *shapeList;
+	for (i = 0; i < shapeCount; i = i + 1) {
+		shapeIndex = *shapeIndices;
+		shapeIndices = shapeIndices + 1;
+		pppCacheLoadShapeTexture(*(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4), materialSet);
 	}
 }
 

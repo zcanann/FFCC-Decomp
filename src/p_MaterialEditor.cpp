@@ -50,16 +50,16 @@ static void WriteF32(void* base, unsigned int offset, float value) {
  */
 extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
-    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__8CManager;
-    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt_CProcess;
-    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__18CMaterialEditorPcs;
-
     unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt_CProcess;
+    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
+
     __ct__14CUSBStreamDataFv(self + 0x84);
     __ct__5ZLISTFv(self + 0xC8);
     __ct__5ZLISTFv(self + 0xD8);
     __register_global_object(
-        &MaterialEditorPcs, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), ARRAY_8026D338);
+        self, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), ARRAY_8026D338);
 
     unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
     dst[1] = m_table_desc0__18CMaterialEditorPcs[0];

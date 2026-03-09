@@ -75,12 +75,12 @@ def _is_escaped(text: str, idx: int) -> bool:
 
 
 def _split_makefile_words(fragment: str) -> list[str]:
-    """Split Makefile words by unescaped spaces."""
+    """Split Makefile words by unescaped space or tab."""
     words = []
     cur = []
 
     for idx, char in enumerate(fragment):
-        if char == " " and not _is_escaped(fragment, idx):
+        if char in {" ", "\t"} and not _is_escaped(fragment, idx):
             if cur:
                 words.append("".join(cur))
                 cur = []

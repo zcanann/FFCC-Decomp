@@ -71,6 +71,12 @@ class TransformDepTests(unittest.TestCase):
             output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/a.h /mnt/c/proj/b.h\n")
 
+    def test_import_d_file_normalizes_tab_separated_dependencies_on_single_line(self):
+        dep_path = self._write_dep("build/file.o: \\\n\tC:\\proj\\a.h\tC:\\proj\\b.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/a.h /mnt/c/proj/b.h\n")
+
     def test_import_d_file_normalizes_first_line_with_tab_separator(self):
         dep_path = self._write_dep("build/file.o:\tC:\\proj\\a.h \\\n\tC:\\proj\\b.h\n")
         with patch("tools.transform_dep.in_wsl", return_value=True):
@@ -79,6 +85,12 @@ class TransformDepTests(unittest.TestCase):
             output,
             "build/file.o: /mnt/c/proj/a.h \\\n\t/mnt/c/proj/b.h\n",
         )
+
+    def test_import_d_file_normalizes_first_line_tab_separated_inline_dependencies(self):
+        dep_path = self._write_dep("build/file.o: C:\\proj\\a.h\tC:\\proj\\b.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: /mnt/c/proj/a.h /mnt/c/proj/b.h\n")
 
     def test_import_d_file_normalizes_first_line_without_space_after_separator(self):
         dep_path = self._write_dep("build/file.o:C:\\proj\\a.h \\\n\tC:\\proj\\b.h\n")

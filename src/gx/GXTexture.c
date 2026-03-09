@@ -4,10 +4,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-#undef __GXData
-#define __GXData gx
-
 // GXTexObj internal data
 typedef struct __GXTexObjInt_struct {
     u32 mode0;

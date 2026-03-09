@@ -71,6 +71,20 @@ class TransformDepTests(unittest.TestCase):
             output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/a.h /mnt/c/proj/b.h\n")
 
+    def test_import_d_file_normalizes_first_line_with_tab_separator(self):
+        dep_path = self._write_dep("build/file.o:\tC:\\proj\\a.h \\\n\tC:\\proj\\b.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=True):
+            output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(
+            output,
+            "build/file.o: /mnt/c/proj/a.h \\\n\t/mnt/c/proj/b.h\n",
+        )
+
+    def test_import_d_file_preserves_target_only_rule_without_extra_space(self):
+        dep_path = self._write_dep("build\\file.o:\n")
+        output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o:\n")
+
     def test_in_wsl_detects_generic_microsoft_kernel_tag(self):
         with patch("tools.transform_dep.uname") as mocked_uname:
             mocked_uname.return_value.release = "5.15.167.4-microsoft"

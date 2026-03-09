@@ -14,6 +14,7 @@
 import argparse
 import os
 from platform import uname
+from typing import Optional, Tuple
 
 
 _MAKE_ESCAPE_CHARS = {" ", "#", "$", ":"}
@@ -102,16 +103,38 @@ def _normalize_dependency_fragment(fragment: str) -> str:
     return " ".join(normalized_words)
 
 
+def _split_first_line_target_and_deps(line: str) -> Optional[Tuple[str, str]]:
+    """Split first depfile line into target and dependency fragment.
+
+    Uses makefile syntax where the rule separator is ":" followed by
+    whitespace or end-of-line, so Windows drive letters like "C:/" are not
+    treated as separators.
+    """
+    for idx, char in enumerate(line):
+        if char != ":":
+            continue
+
+        next_idx = idx + 1
+        if next_idx >= len(line):
+            return line[:idx], ""
+        if line[next_idx].isspace():
+            return line[:idx], line[next_idx:].lstrip()
+
+    return None
+
+
 def _normalize_first_line(line: str) -> str:
     """Normalize target and inline dependencies on the first .d line."""
-    delimiter = ": "
-    if delimiter not in line:
+    parts = _split_first_line_target_and_deps(line)
+    if parts is None:
         return _normalize_slashes(line)
 
-    target, deps = line.split(delimiter, 1)
+    target, deps = parts
     normalized_target = _normalize_slashes(target)
     normalized_deps = _normalize_dependency_fragment(deps)
-    return f"{normalized_target}{delimiter}{normalized_deps}"
+    if normalized_deps:
+        return f"{normalized_target}: {normalized_deps}"
+    return f"{normalized_target}:"
 
 
 def _normalize_slashes(path: str) -> str:

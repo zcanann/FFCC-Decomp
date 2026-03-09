@@ -47,6 +47,16 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(agent_select_target.safe_int("-0x10"), -16)
         self.assertEqual(agent_select_target.safe_int("12.0"), 12)
 
+    def test_safe_float_returns_default_for_non_finite_values(self):
+        self.assertEqual(agent_select_target.safe_float("nan", 1.25), 1.25)
+        self.assertEqual(agent_select_target.safe_float("inf", 3.5), 3.5)
+        self.assertEqual(agent_select_target.safe_float("-inf", 4.75), 4.75)
+
+    def test_safe_int_returns_default_for_non_finite_values(self):
+        self.assertEqual(agent_select_target.safe_int("nan", 11), 11)
+        self.assertEqual(agent_select_target.safe_int("inf", 22), 22)
+        self.assertEqual(agent_select_target.safe_int("-inf", 33), 33)
+
     def test_is_viable_target_handles_non_numeric_measures(self):
         unit = {
             "name": "bad-measures",

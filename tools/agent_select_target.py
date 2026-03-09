@@ -9,6 +9,7 @@ Selects random viable targets across multiple opportunity buckets:
 import json
 import sys
 import random
+import math
 from pathlib import Path
 
 try:
@@ -30,8 +31,9 @@ def warn_build_mismatch():
 def safe_float(value, default=0.0):
     """Parse a float from mixed report values without throwing."""
     try:
-        return float(value)
-    except (TypeError, ValueError):
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else default
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
@@ -47,9 +49,12 @@ def safe_int(value, default=0):
                 return int(value, 0 if value.lower().startswith(("+0x", "-0x", "0x")) else 10)
             except ValueError:
                 # Some reports may serialize integral values as float-like strings (e.g. "12.0").
-                return int(float(value))
+                parsed = float(value)
+                if not math.isfinite(parsed):
+                    return default
+                return int(parsed)
         return int(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return default
 
 

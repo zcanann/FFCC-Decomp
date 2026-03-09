@@ -55,8 +55,8 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
     ZLIST* list;
     _ZLISTITEM* it[1];
     int i;
-    int colAnmCount;
     ZCANMGRP* colAnmData;
+    int colAnmCount;
     RSDITEM* rsdItem;
     RSDLISTITEM* listItem;
 
@@ -86,8 +86,8 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
                 __dl__FPv(rsdItem);
             }
         }
-        colAnmData = listItem->colAnmData;
         colAnmCount = listItem->colAnmCount;
+        colAnmData = listItem->colAnmData;
         if (colAnmData != (ZCANMGRP*)0) {
             for (i = 0; i < colAnmCount; i = i + 1) {
                 if (colAnmData->ptr != (void*)0) {

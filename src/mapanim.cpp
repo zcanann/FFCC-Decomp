@@ -613,12 +613,13 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     unsigned int chunkData[4];
     unsigned int& chunkId = chunkData[0];
     unsigned int& chunkSize = chunkData[3];
+    int hasChunk;
     int* item;
-    int keyData;
+    unsigned int keyData;
     int nodeIdx;
 
     chunkFile.PushChunk();
-    while (chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData)) != 0) {
+    while ((hasChunk = chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData))) != 0) {
         if (chunkId == 0x4652414D) {
             reinterpret_cast<int*>(this)[7] = static_cast<int>(chunkFile.Get4());
             reinterpret_cast<int*>(this)[8] = static_cast<int>(chunkFile.Get4());
@@ -631,7 +632,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             item[1] = reinterpret_cast<int>(this);
 
             chunkFile.PushChunk();
-            while (chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData)) != 0) {
+            while ((hasChunk = chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData))) != 0) {
                 if (chunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
                     item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0));

@@ -56,7 +56,7 @@ public:
     void GetPlayerStat(int, GbaPInfo*);
     void GetCaravanName(char*);
     int GetItemAll(int, unsigned char*);
-    void GetScrFlg();
+    unsigned int GetScrFlg();
     int GetPlayerHP(int, unsigned char*);
     void MakeLetterList(int, char*);
     int MakeLetterData(int, char*, int);

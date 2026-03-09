@@ -1513,12 +1513,18 @@ int GbaQueue::GetMapObjInfo(int, unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE394
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetPlayerStat(int, GbaPInfo*)
+void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(outInfo, reinterpret_cast<char*>(this) + 0x454, 0x370);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -1566,12 +1572,38 @@ int GbaQueue::GetItemAll(int, unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CDF38
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetScrFlg()
+unsigned int GbaQueue::GetScrFlg()
 {
-	// TODO
+	int i;
+	OSSemaphore* semaphoreIter;
+	unsigned int flag;
+
+	i = 0;
+	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
+	do {
+		OSWaitSemaphore(semaphoreIter);
+		i++;
+		semaphoreIter++;
+	} while (i < 4);
+
+	flag = *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0x2AF8);
+
+	i = 0;
+	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
+	do {
+		OSSignalSemaphore(semaphoreIter);
+		i++;
+		semaphoreIter++;
+	} while (i < 4);
+
+	return (-flag | flag) >> 31;
 }
 
 /*

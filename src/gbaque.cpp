@@ -3265,9 +3265,13 @@ int GbaQueue::GetStrengthData(int, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetArtiDatFlg(int)
+unsigned int GbaQueue::GetArtiDatFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D59])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return (-value | value) >> 31U;
 }
 
 /*
@@ -3275,9 +3279,13 @@ void GbaQueue::GetArtiDatFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrArtiDatFlg(int)
+void GbaQueue::ClrArtiDatFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2D59] = static_cast<char>(static_cast<unsigned char>(obj[0x2D59]) & ~(1U << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*
@@ -3415,9 +3423,17 @@ int GbaQueue::GetScouterInfo(int, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetChgHitFlg(int)
+unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
-	// TODO
+	unsigned int actualChannel = static_cast<unsigned int>(channel) &
+	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
+	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
+	                                                       31);
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + actualChannel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2CE8])) & (1U << actualChannel);
+	OSSignalSemaphore(accessSemaphores + actualChannel);
+	return (-value | value) >> 31U;
 }
 
 /*
@@ -3425,9 +3441,16 @@ void GbaQueue::GetChgHitFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrChgHitFlg(int)
+void GbaQueue::ClrChgHitFlg(int channel)
 {
-	// TODO
+	unsigned int actualChannel = static_cast<unsigned int>(channel) &
+	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
+	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
+	                                                       31);
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + actualChannel);
+	obj[0x2CE8] = static_cast<char>(static_cast<unsigned char>(obj[0x2CE8]) & ~(1U << actualChannel));
+	OSSignalSemaphore(accessSemaphores + actualChannel);
 }
 
 /*
@@ -3493,9 +3516,17 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetHitEInfo(int)
+int GbaQueue::GetHitEInfo(int channel)
 {
-	// TODO
+	unsigned int actualChannel = static_cast<unsigned int>(channel) &
+	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
+	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
+	                                                       31);
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + actualChannel);
+	int hitInfo = *reinterpret_cast<int*>(obj + 0x2CDE + (actualChannel * 4));
+	OSSignalSemaphore(accessSemaphores + actualChannel);
+	return hitInfo;
 }
 
 /*

@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -17,6 +18,36 @@ class TestAgenticLoop(unittest.TestCase):
     def test_default_prompt_uses_agents_md(self):
         self.assertIn("AGENTS.md", agentic_loop.DEFAULT_PROMPT)
         self.assertNotIn("AGENTS.MD", agentic_loop.DEFAULT_PROMPT)
+
+    def test_resolve_agents_filename_prefers_lowercase_when_both_exist(self):
+        prev_cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            os.chdir(tmp_dir)
+            Path("AGENTS.md").write_text("", encoding="utf-8")
+            Path("AGENTS.MD").write_text("", encoding="utf-8")
+            try:
+                self.assertEqual(agentic_loop._resolve_agents_filename(), "AGENTS.md")
+            finally:
+                os.chdir(prev_cwd)
+
+    def test_resolve_agents_filename_falls_back_to_uppercase_variant(self):
+        prev_cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            os.chdir(tmp_dir)
+            Path("AGENTS.MD").write_text("", encoding="utf-8")
+            try:
+                self.assertEqual(agentic_loop._resolve_agents_filename(), "AGENTS.MD")
+            finally:
+                os.chdir(prev_cwd)
+
+    def test_resolve_agents_filename_defaults_when_missing(self):
+        prev_cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            os.chdir(tmp_dir)
+            try:
+                self.assertEqual(agentic_loop._resolve_agents_filename(), "AGENTS.md")
+            finally:
+                os.chdir(prev_cwd)
 
     def test_read_int_env_returns_default_when_missing(self):
         with patch.dict(os.environ, {}, clear=True):

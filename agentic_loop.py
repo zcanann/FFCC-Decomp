@@ -4,13 +4,36 @@ import signal
 import subprocess
 import time
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
-DEFAULT_PROMPT = (
-    "Follow the instructions in AGENTS.md. NEVER ask the user for input. "
-    "Simply follow the instructions and make a PR if there is an improvement. "
-    "Pay careful attention to any important rules."
-)
+AGENTS_FILE_CANDIDATES = ("AGENTS.md", "AGENTS.MD")
+
+
+def _resolve_agents_filename() -> str:
+    # Match exact directory entries first so case-variant names are handled
+    # predictably even on case-insensitive filesystems.
+    try:
+        cwd_entries = set(os.listdir("."))
+    except OSError:
+        cwd_entries = set()
+
+    for filename in AGENTS_FILE_CANDIDATES:
+        if filename in cwd_entries and Path(filename).is_file():
+            return filename
+    return AGENTS_FILE_CANDIDATES[0]
+
+
+def _default_prompt() -> str:
+    agents_file = _resolve_agents_filename()
+    return (
+        f"Follow the instructions in {agents_file}. NEVER ask the user for input. "
+        "Simply follow the instructions and make a PR if there is an improvement. "
+        "Pay careful attention to any important rules."
+    )
+
+
+DEFAULT_PROMPT = _default_prompt()
 
 KILL_SIGNAL = getattr(signal, "SIGKILL", signal.SIGTERM)
 KILL_WAIT_SECONDS = 5
@@ -161,7 +184,7 @@ def run_agentic_loop(
 
 
 def main() -> None:
-    prompt = _read_prompt_env("AGENTIC_PROMPT", DEFAULT_PROMPT)
+    prompt = _read_prompt_env("AGENTIC_PROMPT", _default_prompt())
     timeout_seconds = _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60, minimum=1)
     terminate_grace_seconds = _read_int_env(
         "AGENTIC_TERMINATE_GRACE_SECONDS", 10, minimum=0

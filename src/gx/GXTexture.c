@@ -1167,8 +1167,8 @@ static void __SetSURegs(int tmap, int tcoord) {
     su1 = (su1 & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
 
     mode0 = __GXData->tMode0[tmap];
-    su0 = (su0 & 0xFFFEFFFF) | ((__cntlzw(1 - (mode0 & 3)) & 0x1FE0) << 11);
-    su1 = (su1 & 0xFFFEFFFF) | ((__cntlzw(1 - ((mode0 >> 2) & 3)) & 0x1FE0) << 11);
+    su0 = (su0 & 0xFFFEFFFF) | ((__cntlzw(1 - (mode0 & 3)) & 0x20) << 11);
+    su1 = (su1 & 0xFFFEFFFF) | ((__cntlzw(1 - ((mode0 >> 2) & 3)) & 0x20) << 11);
     __GXData->suTs0[tcoord] = su0;
     __GXData->suTs1[tcoord] = su1;
     GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);

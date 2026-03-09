@@ -551,10 +551,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 		if (firstAllocFailure)
 		{
 			firstAllocFailure = false;
-			for (s32 i = 0; i < (s32)sizeof(denied); i++)
-			{
-				denied[i] = 0;
-			}
+			memset(denied, 0, sizeof(denied));
 
 			s32 currentIdx = ((s32)((u8*)pppMngStPtr - ((u8*)&PartMng + 0x1D4))) / 0x158;
 			denied[currentIdx] = 1;
@@ -867,10 +864,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		if (firstFailure)
 		{
 			firstFailure = false;
-			for (s32 i = 0; i < (s32)sizeof(denied); i++)
-			{
-				denied[i] = 0;
-			}
+			memset(denied, 0, sizeof(denied));
 			denied[(pppMngStRaw*)pppMngSt - allMngSt] = 1;
 		}
 

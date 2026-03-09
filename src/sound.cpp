@@ -46,7 +46,7 @@ extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
 extern "C" void SetSoundMode__9CRedSoundFi(CRedSound*, int);
-extern "C" void Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
+extern "C" int Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
 extern "C" void End__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);

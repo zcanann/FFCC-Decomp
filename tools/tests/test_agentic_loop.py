@@ -141,6 +141,64 @@ class TestAgenticLoop(unittest.TestCase):
             max_backoff_seconds=300,
         )
 
+    def test_main_cli_arguments_override_environment(self):
+        env = {
+            "AGENTIC_PROMPT": "env prompt",
+            "AGENTIC_TIMEOUT_SECONDS": "11",
+            "AGENTIC_TERMINATE_GRACE_SECONDS": "12",
+            "AGENTIC_MAX_BACKOFF_SECONDS": "13",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch("agentic_loop.run_agentic_loop") as mock_run:
+                agentic_loop.main(
+                    [
+                        "--prompt",
+                        "cli prompt",
+                        "--timeout-seconds",
+                        "1",
+                        "--terminate-grace-seconds",
+                        "2",
+                        "--max-backoff-seconds",
+                        "3",
+                    ]
+                )
+
+        mock_run.assert_called_once_with(
+            prompt="cli prompt",
+            timeout_seconds=1,
+            terminate_grace_seconds=2,
+            max_backoff_seconds=3,
+        )
+
+    def test_main_blank_cli_prompt_uses_default(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with patch("agentic_loop.run_agentic_loop") as mock_run:
+                agentic_loop.main(["--prompt", "   "])
+
+        _, kwargs = mock_run.call_args
+        self.assertEqual(kwargs["prompt"], agentic_loop.DEFAULT_PROMPT)
+
+    def test_main_cli_numeric_validation_falls_back_to_defaults(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with patch("agentic_loop.run_agentic_loop") as mock_run:
+                agentic_loop.main(
+                    [
+                        "--timeout-seconds",
+                        "0",
+                        "--terminate-grace-seconds",
+                        "-1",
+                        "--max-backoff-seconds",
+                        "0",
+                    ]
+                )
+
+        mock_run.assert_called_once_with(
+            prompt=agentic_loop.DEFAULT_PROMPT,
+            timeout_seconds=25 * 60,
+            terminate_grace_seconds=10,
+            max_backoff_seconds=300,
+        )
+
     def test_run_agentic_loop_timeout_applies_backoff_sleep(self):
         fake_proc = SimpleNamespace(
             pid=123,

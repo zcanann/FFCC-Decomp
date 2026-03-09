@@ -1,7 +1,9 @@
+import argparse
 import errno
 import os
 import signal
 import subprocess
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -138,6 +140,82 @@ def _backoff_seconds(consecutive_failures: int, max_backoff_seconds: int) -> int
     return min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
 
 
+def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Run codex in a supervised retry loop with timeout, "
+            "graceful termination, and exponential backoff."
+        )
+    )
+    parser.add_argument(
+        "--prompt",
+        help="Prompt to pass to `codex exec --yolo` (defaults to AGENTIC_PROMPT/env).",
+    )
+    parser.add_argument(
+        "--timeout-seconds",
+        type=int,
+        help="Timeout for each codex run in seconds.",
+    )
+    parser.add_argument(
+        "--terminate-grace-seconds",
+        type=int,
+        help="Seconds to wait after SIGTERM before force-killing.",
+    )
+    parser.add_argument(
+        "--max-backoff-seconds",
+        type=int,
+        help="Maximum exponential backoff delay in seconds between retries.",
+    )
+    return parser.parse_args([] if argv is None else argv)
+
+
+def _resolve_runtime_config(argv: Optional[list[str]] = None) -> tuple[str, int, int, int]:
+    args = _parse_args(argv)
+    prompt = args.prompt
+    if prompt is None:
+        prompt = _read_prompt_env("AGENTIC_PROMPT", DEFAULT_PROMPT)
+    elif not prompt.strip():
+        log("empty prompt for --prompt; using default prompt")
+        prompt = DEFAULT_PROMPT
+
+    timeout_seconds = (
+        args.timeout_seconds
+        if args.timeout_seconds is not None
+        else _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60, minimum=1)
+    )
+    terminate_grace_seconds = (
+        args.terminate_grace_seconds
+        if args.terminate_grace_seconds is not None
+        else _read_int_env("AGENTIC_TERMINATE_GRACE_SECONDS", 10, minimum=0)
+    )
+    max_backoff_seconds = (
+        args.max_backoff_seconds
+        if args.max_backoff_seconds is not None
+        else _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300, minimum=1)
+    )
+
+    if timeout_seconds < 1:
+        log(
+            f"invalid value for --timeout-seconds={timeout_seconds!r}; minimum is 1; "
+            "using default 1500"
+        )
+        timeout_seconds = 25 * 60
+    if terminate_grace_seconds < 0:
+        log(
+            "invalid value for --terminate-grace-seconds="
+            f"{terminate_grace_seconds!r}; minimum is 0; using default 10"
+        )
+        terminate_grace_seconds = 10
+    if max_backoff_seconds < 1:
+        log(
+            f"invalid value for --max-backoff-seconds={max_backoff_seconds!r}; "
+            "minimum is 1; using default 300"
+        )
+        max_backoff_seconds = 300
+
+    return prompt, timeout_seconds, terminate_grace_seconds, max_backoff_seconds
+
+
 def run_agentic_loop(
     prompt: str,
     timeout_seconds: int,
@@ -194,13 +272,13 @@ def run_agentic_loop(
             break
 
 
-def main() -> None:
-    prompt = _read_prompt_env("AGENTIC_PROMPT", _default_prompt())
-    timeout_seconds = _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60, minimum=1)
-    terminate_grace_seconds = _read_int_env(
-        "AGENTIC_TERMINATE_GRACE_SECONDS", 10, minimum=0
-    )
-    max_backoff_seconds = _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300, minimum=1)
+def main(argv: Optional[list[str]] = None) -> None:
+    (
+        prompt,
+        timeout_seconds,
+        terminate_grace_seconds,
+        max_backoff_seconds,
+    ) = _resolve_runtime_config(argv)
     run_agentic_loop(
         prompt=prompt,
         timeout_seconds=timeout_seconds,
@@ -210,4 +288,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

@@ -237,11 +237,15 @@ void CMaterialEditorPcs::Init()
  */
 void CMaterialEditorPcs::Quit()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned char* cursor = self;
-    unsigned int i = 0;
+    struct QuitOverlay {
+        unsigned char pad[0x3BC];
+        unsigned int textureBlock;
+    };
 
-    WriteU32(self, 0x3BC, 0);
+    unsigned int i = 0;
+    unsigned char* cursor = reinterpret_cast<unsigned char*>(this);
+
+    reinterpret_cast<QuitOverlay*>(this)->textureBlock = 0;
 
     do {
         MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2BC)));
@@ -254,7 +258,7 @@ void CMaterialEditorPcs::Quit()
         cursor += 4;
     } while (i < 0x10);
 
-    unsigned int textureBlock = *reinterpret_cast<unsigned int*>(self + 0xBC);
+    unsigned int textureBlock = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xBC);
     if (textureBlock != 0) {
         MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(textureBlock));
     }

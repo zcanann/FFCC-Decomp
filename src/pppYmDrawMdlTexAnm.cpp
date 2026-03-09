@@ -45,7 +45,8 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     pppYmDrawMdlTexAnmWork* work;
     CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
-    s16* uvPairs;
+    s32 uvByteOffset;
+    s16 uvValue;
     int i;
 
     work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
@@ -56,20 +57,26 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0];
     work->m_perU = FLOAT_8033054c;
-    work->m_perV = FLOAT_8033054c;
+    work->m_perV = work->m_perU;
 
     if (mapMesh != NULL) {
         uvLayout = (CMapMeshUVLayout*)mapMesh;
-        uvPairs = uvLayout->m_uvPairs;
-        for (i = 0; i < (int)uvLayout->m_uvCount; i++) {
-            if (work->m_perU < (f32)uvPairs[0]) {
-                work->m_perU = (f32)uvPairs[0];
+        uvByteOffset = 0;
+
+        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+            uvValue = *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
+            if (work->m_perU < (f32)uvValue) {
+                work->m_perU = (f32)uvValue;
             }
-            if (work->m_perV < (f32)uvPairs[1]) {
-                work->m_perV = (f32)uvPairs[1];
+
+            uvValue = *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
+            if (work->m_perV < (f32)uvValue) {
+                work->m_perV = (f32)uvValue;
             }
-            uvPairs += 2;
+
+            uvByteOffset += 4;
         }
+
         OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, work->m_perU, work->m_perV);
     }
 }

@@ -71,6 +71,21 @@ def _sleep_interruptible(seconds: int) -> bool:
         return False
 
 
+def _read_prompt_env(var_name: str, default: str) -> str:
+    raw_value = os.getenv(var_name)
+    if raw_value is None:
+        return default
+    prompt = raw_value.strip()
+    if not prompt:
+        log(f"empty prompt for {var_name}; using default prompt")
+        return default
+    return prompt
+
+
+def _backoff_seconds(consecutive_failures: int, max_backoff_seconds: int) -> int:
+    return min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
+
+
 def run_agentic_loop(
     prompt: str,
     timeout_seconds: int,
@@ -89,7 +104,7 @@ def run_agentic_loop(
             )
         except OSError as exc:
             consecutive_failures += 1
-            backoff = min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
+            backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
             log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
             if not _sleep_interruptible(backoff):
                 break
@@ -102,7 +117,7 @@ def run_agentic_loop(
                 log("codex run completed successfully")
             else:
                 consecutive_failures += 1
-                backoff = min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
+                backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
                 log(
                     f"codex exited with code {proc.returncode}; "
                     f"sleeping {backoff}s before retry"
@@ -113,7 +128,11 @@ def run_agentic_loop(
             log(f"codex exceeded timeout ({timeout_seconds}s); terminating process")
             _stop_process_tree(proc, terminate_grace_seconds)
             log("codex process stopped after timeout")
-            consecutive_failures = 0
+            consecutive_failures += 1
+            backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
+            log(f"sleeping {backoff}s before retry")
+            if not _sleep_interruptible(backoff):
+                break
         except KeyboardInterrupt:
             log("keyboard interrupt received; stopping loop")
             _stop_process_tree(proc, terminate_grace_seconds)
@@ -121,7 +140,7 @@ def run_agentic_loop(
 
 
 def main() -> None:
-    prompt = os.getenv("AGENTIC_PROMPT", DEFAULT_PROMPT)
+    prompt = _read_prompt_env("AGENTIC_PROMPT", DEFAULT_PROMPT)
     timeout_seconds = _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60, minimum=1)
     terminate_grace_seconds = _read_int_env(
         "AGENTIC_TERMINATE_GRACE_SECONDS", 10, minimum=0

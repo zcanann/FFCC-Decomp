@@ -2289,24 +2289,21 @@ void CSound::PlayStreamASync()
     sprintf(streamPath, "dvd/sound/stream/str_%04d.str", sound.m_streamWaveID);
 
     CFile::CHandle* handle = File.Open(streamPath, 0, CFile::PRI_LOW);
-    sound.m_streamFile = handle;
     if (handle == 0) {
         return;
     }
+    sound.m_streamFile = handle;
 
     int streamId = sound.m_streamWaveID;
     int volume;
-    if (streamId == 5) {
+    if (streamId == 5 || streamId == 1) {
         volume = sound.m_bgmMasterVolume;
-    } else if (streamId == 1) {
-        int bgmVol = sound.m_bgmMasterVolume;
-        int adjust = (bgmVol * 0x19) / 0x7f + ((bgmVol * 0x19) >> 0x1f);
-        volume = bgmVol - (adjust - (adjust >> 0x1f));
-    } else if (streamId > 0 && streamId < 7) {
-        volume = 0x7f;
-        if (streamId == 6) {
-            volume = 0x70;
+        if (streamId == 1) {
+            int adjust = (volume * 0x19) / 0x7f + ((volume * 0x19) >> 0x1f);
+            volume -= adjust - (adjust >> 0x1f);
         }
+    } else if (streamId > 0 && streamId < 7) {
+        volume = (streamId == 6) ? 0x70 : 0x7f;
     } else {
         volume = sound.m_seMasterVolume;
     }

@@ -436,7 +436,7 @@ void CFunnyShape::Render()
  */
 void CFunnyShape::RenderTexture()
 {
-    if (Ptr(this, 0x60D4)[0] == 0) {
+    if (*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) {
         return;
     }
 
@@ -444,8 +444,11 @@ void CFunnyShape::RenderTexture()
     GXSetNumTevStages(1);
     GXSetNumChans(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-    GXSetChanAmbColor(GX_COLOR0A0, ToGXColor(DAT_8032fd58));
-    GXSetChanMatColor(GX_COLOR0A0, ToGXColor(DAT_8032fd58));
+    u32 chanColor = DAT_8032fd58;
+    GXColor ambColor = ToGXColor(chanColor);
+    GXSetChanAmbColor(GX_COLOR0A0, ambColor);
+    GXColor matColor = ambColor;
+    GXSetChanMatColor(GX_COLOR0A0, matColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
@@ -458,6 +461,7 @@ void CFunnyShape::RenderTexture()
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
 
+    u32 color = DAT_8032fd5c;
     const u8* texData = reinterpret_cast<const u8*>(PtrAt(this, 0x6054));
     const float width = static_cast<float>(*reinterpret_cast<const s16*>(texData + 4));
     const float height = static_cast<float>(*reinterpret_cast<const s16*>(texData + 6));
@@ -472,10 +476,30 @@ void CFunnyShape::RenderTexture()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-    WriteVertex(FLOAT_8032fd80, FLOAT_8032fd74, FLOAT_8032fd6c, DAT_8032fd5c, FLOAT_8032fd6c, FLOAT_8032fd74);
-    WriteVertex(FLOAT_8032fd74, FLOAT_8032fd74, FLOAT_8032fd6c, DAT_8032fd5c, FLOAT_8032fd74, FLOAT_8032fd74);
-    WriteVertex(FLOAT_8032fd74, FLOAT_8032fd80, FLOAT_8032fd6c, DAT_8032fd5c, FLOAT_8032fd74, FLOAT_8032fd6c);
-    WriteVertex(FLOAT_8032fd80, FLOAT_8032fd80, FLOAT_8032fd6c, DAT_8032fd5c, FLOAT_8032fd6c, FLOAT_8032fd6c);
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = color;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = color;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = color;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.u32 = color;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
 }
 
 /*

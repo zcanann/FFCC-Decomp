@@ -15,7 +15,7 @@
 #include <string.h>
 CMapPcs MapPcs;
 extern void* __vt__8CManager;
-extern void* PTR_PTR_s_CMapPcs_801e900c;
+extern "C" void* __vt__7CMapPcs[];
 
 unsigned int m_table_desc0__7CMapPcs[3];
 unsigned int m_table_desc1__7CMapPcs[3];
@@ -810,7 +810,7 @@ extern "C" void __sinit_p_map_cpp(void)
 	volatile void** base = reinterpret_cast<volatile void**>(&MapPcs);
 	*base = &__vt__8CManager;
 	*base = &__vt__8CProcess;
-	*base = &PTR_PTR_s_CMapPcs_801e900c;
+	*base = __vt__7CMapPcs;
 
 	unsigned int* dst = m_table__7CMapPcs;
 

@@ -1,7 +1,7 @@
 #include "ffcc/p_sample.h"
 
 CSamplePcs SamplePcs;
-extern unsigned int PTR_PTR_s_CSamplePcs_801e8644[];
+extern "C" void* __vt__10CSamplePcs[];
 unsigned int m_table_desc0__10CSamplePcs[3];
 unsigned int m_table_desc1__10CSamplePcs[3];
 unsigned int m_table_desc2__10CSamplePcs[3];
@@ -123,7 +123,7 @@ extern "C" void __sinit_p_sample_cpp(void)
 	unsigned int* srcD = m_table_desc3__10CSamplePcs;
 	unsigned int* table;
 
-	*reinterpret_cast<unsigned int*>(&SamplePcs) = (unsigned int)&PTR_PTR_s_CSamplePcs_801e8644;
+	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
 	table = (unsigned int*)m_table__10CSamplePcs;
 	table[1] = srcA[0];
 	table[2] = srcA[1];

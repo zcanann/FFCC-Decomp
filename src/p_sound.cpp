@@ -3,7 +3,7 @@
 #include "ffcc/sound.h"
 
 CSoundPcs SoundPcs;
-extern unsigned int PTR_PTR_s_CSoundPcs_8021072c[];
+extern "C" void* __vt__9CSoundPcs[];
 extern "C" void create__9CSoundPcsFv(CSoundPcs*);
 extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
@@ -28,7 +28,7 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    *reinterpret_cast<unsigned int*>(&SoundPcs) = (unsigned int)&PTR_PTR_s_CSoundPcs_8021072c;
+    *reinterpret_cast<void**>(&SoundPcs) = __vt__9CSoundPcs;
     unsigned int* table = (unsigned int*)m_table__9CSoundPcs;
 
     table[1] = m_table_desc0__9CSoundPcs[0];

@@ -47,7 +47,7 @@ u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
 };
 
 extern void* __vt__8CManager;
-extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
+extern "C" void* __vt__11CGraphicPcs[];
 extern int DAT_802381a0;
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
@@ -75,7 +75,7 @@ extern "C" void __sinit_p_graphic_cpp(void)
     volatile void** base = (volatile void**)&GraphicsPcs;
     *base = &__vt__8CManager;
     *base = &__vt__8CProcess;
-    *base = &PTR_PTR_s_CGraphicPcs_801e9e9c;
+    *base = __vt__11CGraphicPcs;
 
     u32* dst = m_table__11CGraphicPcs;
     dst[1] = m_table_desc0__11CGraphicPcs[0];

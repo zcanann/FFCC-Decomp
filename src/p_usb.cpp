@@ -22,7 +22,7 @@ u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
 static const char s_usbRootPath[] = "plot.kmitsuru/";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
+extern "C" void* __vt__7CUSBPcs[];
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
@@ -272,7 +272,7 @@ extern "C" void __sinit_p_usb_cpp()
 {
     *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
     *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
-    *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
+    *reinterpret_cast<void**>(&USBPcs) = __vt__7CUSBPcs;
 
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
     m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];

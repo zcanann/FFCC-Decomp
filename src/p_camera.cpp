@@ -93,7 +93,7 @@ unsigned int m_table_desc21__10CCameraPcs[3];
 unsigned int m_table_desc22__10CCameraPcs[3];
 unsigned int m_table_desc23__10CCameraPcs[3];
 unsigned int m_table_desc24__10CCameraPcs[3];
-extern unsigned int PTR_PTR_s_CCameraPcs_801e9b00[];
+extern "C" void* __vt__10CCameraPcs[];
 extern Vec g_shadow_pos;
 extern Vec g_shadow_refpos;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
@@ -135,7 +135,7 @@ extern "C" void __sinit_p_camera_cpp(void)
 {
     unsigned int* dst = PTR_s_CCameraPcs_GAME__801e915c;
 
-    *reinterpret_cast<unsigned int*>(&CameraPcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CCameraPcs_801e9b00);
+    *reinterpret_cast<void**>(&CameraPcs) = __vt__10CCameraPcs;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x414) = FLOAT_8032fa78;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x418) = FLOAT_8032fa78;
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x41C) = FLOAT_8032fa78;

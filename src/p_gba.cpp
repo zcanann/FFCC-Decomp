@@ -8,7 +8,7 @@
 
 CGbaPcs GbaPcs;
 extern char __vt__8CManager[];
-extern char PTR_PTR_s_CGbaPcs_8020f4a4[];
+extern "C" void* __vt__7CGbaPcs[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
 extern char __vt_CProcess[];
@@ -26,7 +26,7 @@ extern "C" void __sinit_p_gba_cpp(void)
 {
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
 	*reinterpret_cast<void**>(&GbaPcs) = __vt_CProcess;
-	*reinterpret_cast<void**>(&GbaPcs) = PTR_PTR_s_CGbaPcs_8020f4a4;
+	*reinterpret_cast<void**>(&GbaPcs) = __vt__7CGbaPcs;
 
 	unsigned int* table = &gGbaStatusWordTable[1];
 	table[0] = gGbaStatusWordTriplet0[0];

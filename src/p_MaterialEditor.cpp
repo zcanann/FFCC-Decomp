@@ -18,7 +18,7 @@ extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
-extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
+extern "C" void* __vt__18CMaterialEditorPcs[];
 unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 static char s_MaterialEditor[] = "MaterialEditor=%c";
@@ -54,7 +54,7 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__8CManager;
     *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt_CProcess;
-    *reinterpret_cast<void**>(&MaterialEditorPcs) = &PTR_PTR_s_CMaterialEditorPcs_801ea644;
+    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__18CMaterialEditorPcs;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
     __ct__14CUSBStreamDataFv(self + 0x84);

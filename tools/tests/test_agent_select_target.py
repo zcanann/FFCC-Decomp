@@ -121,6 +121,68 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(candidates[0]["total_code"], 0)
         self.assertEqual(candidates[0]["total_data"], 0)
 
+    def test_extract_candidates_skips_units_without_name(self):
+        report = {
+            "units": [
+                {
+                    "metadata": {"source_path": "src/nameless.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": "10.0",
+                        "matched_code_percent": "0.0",
+                        "matched_data_percent": "0.0",
+                    },
+                    "functions": [],
+                },
+                {
+                    "name": "unitC",
+                    "metadata": {"source_path": "src/unitC.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": "20.0",
+                        "matched_code_percent": "0.0",
+                        "matched_data_percent": "0.0",
+                    },
+                    "functions": [],
+                },
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["name"], "unitC")
+
+    def test_extract_candidates_defaults_missing_function_name(self):
+        report = {
+            "units": [
+                {
+                    "name": "unitD",
+                    "metadata": {"source_path": "src/unitD.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": "50.0",
+                        "matched_code_percent": "10.0",
+                        "matched_data_percent": "0.0",
+                        "total_functions": 1,
+                        "matched_functions": 0,
+                        "matched_functions_percent": "0.0",
+                        "total_code": 100,
+                        "total_data": 0,
+                    },
+                    "functions": [
+                        {"fuzzy_match_percent": "12.0", "size": 8},
+                    ],
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["top_functions"][0]["name"], "unknown")
+
 
 class BlacklistLoadingTests(unittest.TestCase):
     def _state_path(self, home):

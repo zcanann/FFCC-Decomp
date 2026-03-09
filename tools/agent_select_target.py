@@ -62,7 +62,9 @@ def load_blacklist():
 
 def is_viable_target(unit, blacklist):
     """Check if unit is a good target candidate"""
-    name = unit["name"]
+    name = unit.get("name")
+    if not isinstance(name, str) or not name:
+        return False, "missing name"
     measures = unit.get("measures", {})
 
     # Skip auto-generated units
@@ -179,7 +181,7 @@ def extract_candidates(report_path):
             func_match = safe_float(func.get("fuzzy_match_percent", 0))
             if func_match < 99:
                 entry["top_functions"].append({
-                    "name": func["name"],
+                    "name": func.get("name", "unknown"),
                     "match": func_match,
                     "size": func.get("size", "unknown")
                 })

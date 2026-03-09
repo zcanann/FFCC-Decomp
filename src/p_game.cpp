@@ -88,7 +88,7 @@ void CGamePcs::Quit()
  */
 int CGamePcs::GetTable(unsigned long param)
 {
-    return (int)(m_table__8CGamePcs + param * 0x15c);
+    return (int)m_table__8CGamePcs + (int)param * 0x15C;
 }
 
 /*

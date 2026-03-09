@@ -232,6 +232,48 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0]["top_functions"][0]["name"], "unknown")
 
+    def test_extract_candidates_returns_empty_when_units_is_not_a_list(self):
+        report = {"units": "not-a-list"}
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(candidates, [])
+
+    def test_extract_candidates_skips_non_dict_units_and_non_dict_functions(self):
+        report = {
+            "units": [
+                "invalid-unit",
+                {
+                    "name": "unitE",
+                    "metadata": {"source_path": "src/unitE.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": "25.0",
+                        "matched_code_percent": "10.0",
+                        "matched_data_percent": "5.0",
+                        "total_functions": 1,
+                        "matched_functions": 0,
+                        "matched_functions_percent": "0.0",
+                        "total_code": 64,
+                        "total_data": 0,
+                    },
+                    "functions": [
+                        "invalid-func",
+                        {"name": "fn_valid", "fuzzy_match_percent": 20.0, "size": 16},
+                    ],
+                },
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(len(candidates[0]["top_functions"]), 1)
+        self.assertEqual(candidates[0]["top_functions"][0]["name"], "fn_valid")
+
 
 class BlacklistLoadingTests(unittest.TestCase):
     def _state_path(self, home):
@@ -355,6 +397,28 @@ class SymbolSummaryTests(unittest.TestCase):
 
         self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
         self.assertEqual(lines[1], "    - fnD (0x20b at 0x80004000)")
+
+    def test_summarize_symbols_treats_non_list_collections_as_empty(self):
+        info = {"functions": "bad", "globals": None}
+
+        lines = agent_select_target.summarize_symbols("PAL symbols", info)
+
+        self.assertEqual(lines[0], "  PAL symbols: 0 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(len(lines), 1)
+
+    def test_summarize_symbols_skips_non_dict_function_entries(self):
+        info = {
+            "functions": [
+                "bad-entry",
+                {"parsed": {"symbol": "fnE", "size": 8, "virtual_addr": "0x80005000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("EN symbols", info)
+
+        self.assertEqual(lines[0], "  EN symbols: 2 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnE (0x8b at 0x80005000)")
 
 
 if __name__ == "__main__":

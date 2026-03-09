@@ -162,11 +162,19 @@ def summarize_symbols(label, all_info):
 
     lines = []
     functions = all_info.get("functions", [])
+    if not isinstance(functions, list):
+        functions = []
     globals_data = all_info.get("globals", [])
+    if not isinstance(globals_data, list):
+        globals_data = []
     lines.append(f"  {label}: {len(functions)} funcs, {len(globals_data)} globals (showing up to 5 funcs)")
 
     for func in functions[:5]:
+        if not isinstance(func, dict):
+            continue
         p = func.get("parsed", {})
+        if not isinstance(p, dict):
+            p = {}
         symbol = p.get("symbol", "unknown")
         size_raw = p.get("size", "unknown")
         addr = p.get("virtual_addr", "unknown")
@@ -200,15 +208,28 @@ def extract_candidates(report_path):
     candidates = []
 
     units = data.get("units", [])
+    if not isinstance(units, list):
+        return []
 
     for unit in units:
+        if not isinstance(unit, dict):
+            continue
         viable, _reason = is_viable_target(unit, blacklist)
         if not viable:
             continue
 
         measures = unit.get("measures", {})
+        if not isinstance(measures, dict):
+            measures = {}
         functions = unit.get("functions", [])
-        source_path = unit.get("metadata", {}).get("source_path", "unknown")
+        if not isinstance(functions, list):
+            functions = []
+        metadata = unit.get("metadata", {})
+        if not isinstance(metadata, dict):
+            metadata = {}
+        source_path = metadata.get("source_path", "unknown")
+        if not isinstance(source_path, str) or not source_path:
+            source_path = "unknown"
         source_file = _path_name(source_path) if source_path and source_path != "unknown" else "unknown"
 
         entry = {
@@ -226,11 +247,15 @@ def extract_candidates(report_path):
             "top_functions": []
         }
 
-        for func in sorted(functions, key=lambda f: safe_float(f.get("fuzzy_match_percent", 0)))[:3]:
+        function_dicts = [func for func in functions if isinstance(func, dict)]
+        for func in sorted(function_dicts, key=lambda f: safe_float(f.get("fuzzy_match_percent", 0)))[:3]:
             func_match = safe_float(func.get("fuzzy_match_percent", 0))
             if func_match < 99:
+                func_name = func.get("name")
+                if not isinstance(func_name, str) or not func_name:
+                    func_name = "unknown"
                 entry["top_functions"].append({
-                    "name": func.get("name", "unknown"),
+                    "name": func_name,
                     "match": func_match,
                     "size": func.get("size", "unknown")
                 })

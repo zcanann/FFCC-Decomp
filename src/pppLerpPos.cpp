@@ -69,30 +69,30 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 *(f32*)((u8*)*historyPtr + iVar1) = pppMngStPtr->m_matrix.value[2][3];
             }
         } else {
-            local_2c.x = FLOAT_80331bf8;
-            local_2c.y = FLOAT_80331bf8;
             local_2c.z = FLOAT_80331bf8;
+            local_2c.y = FLOAT_80331bf8;
+            local_2c.x = FLOAT_80331bf8;
 
-            iVar7 = (u8)param_2->m_dataValIndex - 1;
-            iVar5 = iVar7 * 0xc;
-            while (0 < iVar7) {
-                pVecData = (f32*)((u8*)*historyPtr + iVar5 - 0xc);
+            iVar5 = (u8)param_2->m_dataValIndex - 1;
+            iVar7 = iVar5 * 0xc;
+            while (0 < iVar5) {
+                pVecData = (f32*)((u8*)*historyPtr + iVar7 - 0xc);
                 local_38.x = pVecData[0];
                 local_38.y = pVecData[1];
                 local_38.z = pVecData[2];
-                pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar5), &local_38);
-                iVar5 = iVar5 - 0xc;
-                iVar7 = iVar7 - 1;
+                pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar7), &local_38);
+                iVar7 = iVar7 - 0xc;
+                iVar5 = iVar5 - 1;
             }
 
+            iVar7 = 0;
             (*historyPtr)->x = pppMngStPtr->m_matrix.value[0][3];
             *(f32*)((u8*)*historyPtr + 4) = pppMngStPtr->m_matrix.value[1][3];
             *(f32*)((u8*)*historyPtr + 8) = pppMngStPtr->m_matrix.value[2][3];
 
-            iVar5 = 0;
-            for (iVar7 = 0; count = (u32)(u8)param_2->m_dataValIndex, iVar7 < (s32)count; iVar7 = iVar7 + 1) {
-                PSVECAdd((Vec*)((u8*)*historyPtr + iVar5), &local_2c, &local_2c);
-                iVar5 = iVar5 + 0xc;
+            for (iVar5 = 0; count = (u32)(u8)param_2->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
+                PSVECAdd((Vec*)((u8*)*historyPtr + iVar7), &local_2c, &local_2c);
+                iVar7 = iVar7 + 0xc;
             }
 
             PSVECScale(&local_2c, &local_2c, FLOAT_80331bfc / (f32)count);

@@ -252,12 +252,13 @@ def _resolve_runtime_config(
     argv: Optional[list[str]] = None,
 ) -> tuple[str, int, int, int, Optional[int]]:
     args = _parse_args(argv)
+    runtime_default_prompt = _default_prompt()
     prompt = args.prompt
     if prompt is None:
-        prompt = _read_prompt_env("AGENTIC_PROMPT", DEFAULT_PROMPT)
+        prompt = _read_prompt_env("AGENTIC_PROMPT", runtime_default_prompt)
     elif not prompt.strip():
         log("empty prompt for --prompt; using AGENTIC_PROMPT/default prompt")
-        prompt = _read_prompt_env("AGENTIC_PROMPT", DEFAULT_PROMPT)
+        prompt = _read_prompt_env("AGENTIC_PROMPT", runtime_default_prompt)
     else:
         prompt = prompt.strip()
 

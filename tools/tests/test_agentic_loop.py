@@ -142,6 +142,13 @@ class TestAgenticLoop(unittest.TestCase):
             max_runs=None,
         )
 
+    def test_resolve_runtime_config_uses_runtime_default_prompt(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with patch.object(agentic_loop, "DEFAULT_PROMPT", "stale-default"):
+                with patch("agentic_loop._default_prompt", return_value="fresh-default"):
+                    prompt, *_ = agentic_loop._resolve_runtime_config([])
+        self.assertEqual(prompt, "fresh-default")
+
     def test_main_uses_defaults_for_out_of_range_numeric_env(self):
         env = {
             "AGENTIC_PROMPT": "x",

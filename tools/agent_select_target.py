@@ -64,11 +64,15 @@ def _safe_int(value, default=0):
 
 
 def _state_file_candidates():
+    env_candidate = None
     for env_var in STATE_FILE_ENV_VARS:
         raw_path = os.getenv(env_var)
         if raw_path and raw_path.strip():
-            yield Path(raw_path.strip()).expanduser()
-            return
+            env_candidate = Path(raw_path.strip()).expanduser()
+            break
+
+    if env_candidate is not None:
+        yield env_candidate
 
     home = Path.home()
     for candidate in DEFAULT_STATE_FILE_CANDIDATES:

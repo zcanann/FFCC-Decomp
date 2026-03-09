@@ -76,6 +76,39 @@ class AgentSelectTargetTests(unittest.TestCase):
             ):
                 self.assertEqual(agent_select_target.load_blacklist(), ["build/from_env.o"])
 
+    def test_load_blacklist_falls_back_when_env_state_file_missing(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            default_state_dir = Path(tmp_dir) / ".openclaw/workspace/memory"
+            default_state_dir.mkdir(parents=True)
+            with open(default_state_dir / "decomp-state.json", "w", encoding="utf-8") as f:
+                json.dump({"recentFailures": ["build/from_default.o"]}, f)
+
+            missing_state_file = Path(tmp_dir) / "missing-state.json"
+            with patch.dict(
+                "os.environ",
+                {"AGENT_SELECT_TARGET_STATE_FILE": str(missing_state_file)},
+                clear=False,
+            ):
+                with patch("tools.agent_select_target.Path.home", return_value=Path(tmp_dir)):
+                    self.assertEqual(agent_select_target.load_blacklist(), ["build/from_default.o"])
+
+    def test_load_blacklist_falls_back_when_env_state_file_is_invalid_json(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            default_state_dir = Path(tmp_dir) / ".openclaw/workspace/memory"
+            default_state_dir.mkdir(parents=True)
+            with open(default_state_dir / "decomp-state.json", "w", encoding="utf-8") as f:
+                json.dump({"recentFailures": ["build/from_default.o"]}, f)
+
+            invalid_state_file = Path(tmp_dir) / "invalid-state.json"
+            invalid_state_file.write_text("{not-json", encoding="utf-8")
+            with patch.dict(
+                "os.environ",
+                {"AGENT_SELECT_TARGET_STATE_FILE": str(invalid_state_file)},
+                clear=False,
+            ):
+                with patch("tools.agent_select_target.Path.home", return_value=Path(tmp_dir)):
+                    self.assertEqual(agent_select_target.load_blacklist(), ["build/from_default.o"])
+
     def test_extract_candidates_handles_malformed_measure_values(self):
         report = {
             "units": [

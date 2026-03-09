@@ -63,6 +63,57 @@ def _normalize_dep_path(path: str) -> str:
     return os.path.realpath(os.path.join(winedevices, f"{drive}:{drive_path}"))
 
 
+def _is_escaped(text: str, idx: int) -> bool:
+    """Return True when text[idx] is escaped by an odd run of backslashes."""
+    backslashes = 0
+    cur = idx - 1
+    while cur >= 0 and text[cur] == "\\":
+        backslashes += 1
+        cur -= 1
+    return (backslashes % 2) == 1
+
+
+def _split_makefile_words(fragment: str) -> list[str]:
+    """Split Makefile words by unescaped spaces."""
+    words = []
+    cur = []
+
+    for idx, char in enumerate(fragment):
+        if char == " " and not _is_escaped(fragment, idx):
+            if cur:
+                words.append("".join(cur))
+                cur = []
+            continue
+        cur.append(char)
+
+    if cur:
+        words.append("".join(cur))
+
+    return words
+
+
+def _normalize_dependency_fragment(fragment: str) -> str:
+    """Normalize all dependency words in a fragment."""
+    if not fragment:
+        return fragment
+
+    words = _split_makefile_words(fragment)
+    normalized_words = [_normalize_dep_path(word) for word in words if word]
+    return " ".join(normalized_words)
+
+
+def _normalize_first_line(line: str) -> str:
+    """Normalize target and inline dependencies on the first .d line."""
+    delimiter = ": "
+    if delimiter not in line:
+        return _normalize_slashes(line)
+
+    target, deps = line.split(delimiter, 1)
+    normalized_target = _normalize_slashes(target)
+    normalized_deps = _normalize_dependency_fragment(deps)
+    return f"{normalized_target}{delimiter}{normalized_deps}"
+
+
 def _normalize_slashes(path: str) -> str:
     """Convert Windows path separators while preserving Makefile escapes."""
     out = []
@@ -92,10 +143,11 @@ def import_d_file(in_file: str) -> str:
             line_noeol = line.rstrip("\r\n")
             has_continuation = line_noeol.endswith(" \\")
             if idx == 0:
+                normalized_line = _normalize_first_line(line_noeol[:-2] if has_continuation else line_noeol)
                 if has_continuation:
-                    out_text += _normalize_slashes(line_noeol[:-2]) + " \\\n"
+                    out_text += normalized_line + " \\\n"
                 else:
-                    out_text += _normalize_slashes(line_noeol) + "\n"
+                    out_text += normalized_line + "\n"
             else:
                 suffix = ""
                 if has_continuation:
@@ -104,7 +156,7 @@ def import_d_file(in_file: str) -> str:
                 else:
                     path = line_noeol.strip()
                 if path:
-                    path = _normalize_dep_path(path)
+                    path = _normalize_dependency_fragment(path)
                     out_text += "\t" + path + suffix + "\n"
                 else:
                     out_text += suffix + "\n"

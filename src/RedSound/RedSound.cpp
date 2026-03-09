@@ -60,7 +60,7 @@ CRedSound::~CRedSound()
  * JP Size: TODO
  */
 #pragma optimization_level 0
-extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, int shouldDelete)
+extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, short shouldDelete)
 {
 	if ((redSound != 0) && (0 < shouldDelete)) {
 		__dl__FPv(redSound);

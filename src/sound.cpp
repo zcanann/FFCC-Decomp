@@ -172,6 +172,11 @@ static inline const CSoundLayout& SoundData(const CSound* self)
     return *reinterpret_cast<const CSoundLayout*>(self);
 }
 
+static inline CRedSound* RedSound(CSound* self)
+{
+    return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(self) + 8);
+}
+
 extern "C" void __ct__9CLine(CLine* line)
 {
     line->pointCount = 0;
@@ -529,7 +534,7 @@ void CSound::Quit()
  */
 void CSound::SetStereo(int stereo)
 {
-    reinterpret_cast<CRedSound*>(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
+    RedSound(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*
@@ -544,7 +549,7 @@ void CSound::SetStereo(int stereo)
 void CSound::SetBgmMasterVolume(int volume)
 {
     SoundData(this).m_bgmMasterVolume = volume;
-    reinterpret_cast<CRedSound*>(this)->MusicMasterVolume(volume);
+    RedSound(this)->MusicMasterVolume(volume);
 }
 
 /*
@@ -559,7 +564,7 @@ void CSound::SetBgmMasterVolume(int volume)
 void CSound::SetSeMasterVolume(int volume)
 {
     SoundData(this).m_seMasterVolume = volume;
-    reinterpret_cast<CRedSound*>(this)->SeMasterVolume(volume);
+    RedSound(this)->SeMasterVolume(volume);
 }
 
 /*
@@ -1213,7 +1218,7 @@ void CSound::PlayNextBgm(int bgmId)
  */
 void CSound::StopBgm()
 {
-    MusicStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
+    MusicStop__9CRedSoundFi(RedSound(this), -1);
 }
 
 /*
@@ -1227,7 +1232,7 @@ void CSound::StopBgm()
  */
 void CSound::FadeOutBgm(int fadeFrames)
 {
-    MusicFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, fadeFrames);
+    MusicFadeOut__9CRedSoundFii(RedSound(this), -1, fadeFrames);
 }
 
 /*
@@ -2453,4 +2458,3 @@ void CSound::WaitASync()
 {
 	// TODO
 }
-

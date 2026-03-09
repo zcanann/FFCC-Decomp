@@ -74,32 +74,32 @@ extern "C" {
  */
 void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, int displayListIdx, float (*) [4])
 {
-	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
-	ChangeTexDisplayList* displayList = meshes[meshIdx].m_data->m_displayLists + displayListIdx;
+	ChangeTexDisplayList* displayList;
 
-	if (*(char*)((char*)param_3 + 0x14) == 0) {
+	displayList = ((*(ChangeTexMeshRef**)((char*)model + 0xAC))[meshIdx].m_data)->m_displayLists + displayListIdx;
+	if (*(char*)((char*)param_3 + 0x14) == '\0') {
 		*(int*)(MaterialManRaw() + 0xd0) = (int)param_2 + 0x1c + 0x28;
-		*(int*)(MaterialManRaw() + 0x44) = -1;
-		*(char*)(MaterialManRaw() + 0x4c) = (char)0xff;
+		*(int*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
+		*(char*)(MaterialManRaw() + 0x4c) = 0xFF;
 		*(int*)(MaterialManRaw() + 0x11c) = 0;
-		*(int*)(MaterialManRaw() + 0x120) = 0x1e;
+		*(int*)(MaterialManRaw() + 0x120) = 0x1E;
 		*(int*)(MaterialManRaw() + 0x124) = 0;
-		*(char*)(MaterialManRaw() + 0x205) = (char)0xff;
-		*(char*)(MaterialManRaw() + 0x206) = (char)0xff;
+		*(char*)(MaterialManRaw() + 0x205) = 0xFF;
+		*(char*)(MaterialManRaw() + 0x206) = 0xFF;
 		*(int*)(MaterialManRaw() + 0x58) = 0;
 		*(int*)(MaterialManRaw() + 0x5c) = 0;
 		*(char*)(MaterialManRaw() + 0x208) = 0;
-		*(int*)(MaterialManRaw() + 0x48) = 0xade0f;
+		*(int*)(MaterialManRaw() + 0x48) = 0xADE0F;
 		*(int*)(MaterialManRaw() + 0x128) = 0;
-		*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
+		*(int*)(MaterialManRaw() + 0x12c) = 0x1E;
 		*(int*)(MaterialManRaw() + 0x130) = 0;
-		*(int*)(MaterialManRaw() + 0x40) = 0xade0f;
+		*(int*)(MaterialManRaw() + 0x40) = 0xADE0F;
 	}
 
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
 	    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
 
-	if ((*(char*)((char*)param_3 + 0x14) == 1) || (*(char*)((char*)param_3 + 0x14) == 0)) {
+	if ((*(char*)((char*)param_3 + 0x14) == '\x01') || (*(char*)((char*)param_3 + 0x14) == '\0')) {
 		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
 }
@@ -115,28 +115,32 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
  */
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	if (*(char*)((char*)param_3 + 0x14) != 0) {
-		int textureInfo = *(int*)((char*)param_2 + 0x1c);
-		void* meshData = *(void**)((char*)model + 0xac + meshIdx * 0x14 + 8);
-		char* displayLists = (char*)*(void**)((char*)meshData + 0x50);
-		int colorArrayBase = *(int*)((char*)param_2 + 0xc);
-		if (colorArrayBase != 0) {
-			int vertexArray = *(int*)(colorArrayBase + meshIdx * 4);
-			if (vertexArray != 0) {
-				*(void**)(MaterialManRaw() + 0x4) = *(void**)((char*)meshData + 0x20);
-				GXSetArray(0xb, (void*)vertexArray, 4);
+	int iVar1;
+	int* puVar2;
+	int iVar3;
+	int iVar4;
+	ChangeTexMeshData* meshData;
+	ChangeTexDisplayList* displayList;
 
-				if ((*(char*)((char*)param_3 + 0x14) == 2) || (*(char*)((char*)param_3 + 0x14) == 3)) {
+	if (*(char*)((char*)param_3 + 0x14) != 0) {
+		iVar4 = *(int*)((char*)param_2 + 0x1c);
+		meshData = (*(ChangeTexMeshRef**)((char*)model + 0xAC))[meshIdx].m_data;
+		displayList = meshData->m_displayLists;
+		if (*(int*)((char*)param_2 + 0xc) != 0) {
+			iVar1 = *(int*)(*(int*)((char*)param_2 + 0xc) + meshIdx * 4);
+			if (iVar1 != 0) {
+				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
+				GXSetArray(0xb, (void*)iVar1, 4);
+				if ((*(char*)((char*)param_3 + 0x14) == '\x02') || (*(char*)((char*)param_3 + 0x14) == '\x03')) {
 					*(int*)(MaterialManRaw() + 0x208) = 0;
 				} else {
-					*(int*)(MaterialManRaw() + 0x208) = textureInfo + 0x28;
+					*(int*)(MaterialManRaw() + 0x208) = iVar4 + 0x28;
 				}
-
-				int dlIdx = *(int*)((char*)meshData + 0x4c) - 1;
-				int dlOffset = dlIdx * 4;
-				for (; dlIdx >= 0; dlIdx--) {
-					int dlArrayBase = *(int*)(*(int*)((char*)param_2 + 0x10) + meshIdx * 4);
-					*(int*)(MaterialManRaw() + 0x44) = -1;
+				iVar1 = meshData->m_displayListCount - 1;
+				iVar4 = iVar1 * 4;
+				for (; -1 < iVar1; iVar1 = iVar1 - 1) {
+					iVar3 = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
+					*(int*)(MaterialManRaw() + 0x44) = 0xffffffff;
 					*(char*)(MaterialManRaw() + 0x4c) = (char)0xff;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
 					*(int*)(MaterialManRaw() + 0x120) = 0x1e;
@@ -151,16 +155,12 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x40) = 0xade0f;
-
-					void* modelData = *(void**)((char*)model + 0xa4);
-					void* materialSet = *(void**)((char*)modelData + 0x24);
-					unsigned short material = *(unsigned short*)(displayLists + 8);
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, material, 0, 0);
-
-					void** dl = *(void***)(dlArrayBase + dlOffset);
-					GXCallDisplayList(dl[0], (unsigned int)dl[1]);
-					dlOffset -= 4;
-					displayLists += 0xc;
+					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
+					puVar2 = *(int**)(iVar3 + iVar4);
+					GXCallDisplayList((void*)puVar2[0], (unsigned int)puVar2[1]);
+					iVar4 = iVar4 + -4;
+					displayList = displayList + 1;
 				}
 			}
 		}

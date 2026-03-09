@@ -57,13 +57,13 @@ const char* s_SlotBTextByLanguage[] = {
 const char* CMenuPcs::GetMcStr(int index)
 {
     switch (Game.game.m_gameWork.m_languageId) {
-    case 2:
+    case 1:
         return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
-    case 3:
+    case 2:
         return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
-    case 4:
+    case 3:
         return s_McStr_es[index];
-    case 5:
+    case 4:
         return s_McStr_fr[index];
     default:
         return PTR_s_The_data_is_corrupt__80215bd8[index];
@@ -82,44 +82,44 @@ const char* CMenuPcs::GetMcStr(int index)
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
     int languageId = Game.game.m_gameWork.m_languageId;
-    if (group == 1) {
-        switch (languageId) {
-        case 2:
-            return s_McWinMessGroup1_de;
-        case 3:
-            return s_McWinMessGroup1_it;
-        case 4:
-            return s_McWinMessGroup1_es;
-        case 5:
-            return s_McWinMessGroup1_fr;
-        default:
-            return s_McWinMessGroup1_en;
-        }
-    }
-
     if (group == 0) {
         switch (languageId) {
-        case 2:
+        case 1:
             return s_McWinMessGroup0_de;
-        case 3:
+        case 2:
             return s_McWinMessGroup0_it;
-        case 4:
+        case 3:
             return s_McWinMessGroup0_es;
-        case 5:
+        case 4:
             return s_McWinMessGroup0_fr;
         default:
             return s_McWinMessGroup0_en;
         }
     }
 
+    if (group == 1) {
+        switch (languageId) {
+        case 1:
+            return s_McWinMessGroup1_de;
+        case 2:
+            return s_McWinMessGroup1_it;
+        case 3:
+            return s_McWinMessGroup1_es;
+        case 4:
+            return s_McWinMessGroup1_fr;
+        default:
+            return s_McWinMessGroup1_en;
+        }
+    }
+
     switch (languageId) {
-    case 2:
+    case 1:
         return s_McWinMessGroup2_de;
-    case 3:
+    case 2:
         return s_McWinMessGroup2_it;
-    case 4:
+    case 3:
         return s_McWinMessGroup2_es;
-    case 5:
+    case 4:
         return s_McWinMessGroup2_fr;
     default:
         return s_McWinMessGroup2_en;

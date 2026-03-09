@@ -569,10 +569,17 @@ class TestAgenticLoop(unittest.TestCase):
     def test_normalize_process_return_code_keeps_positive_and_maps_negative(self):
         self.assertEqual(agentic_loop._normalize_process_return_code(7), 7)
         self.assertEqual(agentic_loop._normalize_process_return_code(-15), 143)
+        self.assertEqual(
+            agentic_loop._normalize_process_return_code(agentic_loop.WINDOWS_CTRL_C_EXIT_CODE),
+            130,
+        )
 
     def test_is_interrupt_return_code(self):
         self.assertTrue(agentic_loop._is_interrupt_return_code(130))
         self.assertTrue(agentic_loop._is_interrupt_return_code(-agentic_loop.signal.SIGINT))
+        self.assertTrue(
+            agentic_loop._is_interrupt_return_code(agentic_loop.WINDOWS_CTRL_C_EXIT_CODE)
+        )
         self.assertFalse(agentic_loop._is_interrupt_return_code(1))
         self.assertFalse(agentic_loop._is_interrupt_return_code(None))
 

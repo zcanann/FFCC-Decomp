@@ -731,62 +731,78 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
  */
 int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* p0, Vec* p1, Vec* ellipseScale, float scale)
 {
-    const float sumA = scale + p0->x;
-    const float yScale = sumA / (p1->x + p0->x);
-    const float radiusSq = sumA * sumA;
+    float fVar1;
+    bool hit;
+    double dVar6;
+    double dVar7;
+    double dVar8;
+    double dVar9;
+    double dVar10;
+    Vec local_84;
+    Vec local_78;
+    Vec local_6c;
+    Vec local_60;
 
-    Vec rel;
-    PSVECSubtract(p1, ellipseScale, &rel);
-
-    Vec relScaled = rel;
-    relScaled.y *= yScale;
-
-    Vec dir;
-    dir.x = p0->y;
-    dir.y = p0->z * yScale;
-    dir.z = p1->z;
-
-    if (PSVECDotProduct(&relScaled, &relScaled) < radiusSq) {
+    dVar8 = (double)(float)(scale + p0->x);
+    dVar10 = (double)(float)(dVar8 / (double)(float)(p1->x + p0->x));
+    PSVECSubtract(p1, ellipseScale, &local_60);
+    dVar9 = (double)(float)(dVar8 * dVar8);
+    local_78.y = (float)((double)local_60.y * dVar10);
+    local_6c.x = p0->y;
+    local_6c.y = (float)((double)p0->z * dVar10);
+    local_6c.z = p1->z;
+    local_78.x = local_60.x;
+    local_78.z = local_60.z;
+    local_60.y = local_78.y;
+    dVar8 = (double)PSVECDotProduct(&local_78, &local_78);
+    if (dVar8 < dVar9) {
         if (outT != NULL) {
             *outT = 0.0f;
         }
         if (outPos != NULL) {
-            *outPos = rel;
+            outPos->x = local_60.x;
+            outPos->y = local_60.y;
+            outPos->z = local_60.z;
+        }
+        hit = true;
+    } else {
+        dVar6 = (double)PSVECDotProduct(&local_6c, &local_78);
+        if (0.0 < dVar6) {
+            hit = false;
+        } else {
+            dVar7 = (double)PSVECDotProduct(&local_6c, &local_6c);
+            fVar1 = (float)(dVar6 * dVar6 - (double)(float)(dVar7 * (double)(float)(dVar8 - dVar9)));
+            dVar8 = (double)fVar1;
+            if (dVar8 < 0.0) {
+                hit = false;
+            } else {
+                dVar8 = (double)(float)(-dVar6 - (double)sqrtf(fVar1));
+                if ((dVar8 <= 0.0) || (dVar7 < dVar8)) {
+                    hit = false;
+                } else {
+                    if (outT != NULL) {
+                        *outT = (float)(dVar8 / dVar7);
+                    }
+                    if (outPos != NULL) {
+                        PSVECScale(&local_6c, &local_84, (float)(dVar8 / dVar7));
+                        PSVECAdd(&local_60, &local_84, outPos);
+                    }
+                    hit = true;
+                }
+            }
         }
     }
-    else {
-        const float proj = PSVECDotProduct(&dir, &relScaled);
-        if (proj > 0.0f) {
-            return 0;
-        }
 
-        const float dirLenSq = PSVECDotProduct(&dir, &dir);
-        const float det = proj * proj - dirLenSq * (PSVECDotProduct(&relScaled, &relScaled) - radiusSq);
-        if (det < 0.0f) {
-            return 0;
-        }
-
-        const float dist = -proj - sqrtf(det);
-        if (dist <= 0.0f || dirLenSq < dist) {
-            return 0;
-        }
-
-        if (outT != NULL) {
-            *outT = dist / dirLenSq;
-        }
+    if (hit) {
         if (outPos != NULL) {
-            Vec offset;
-            PSVECScale(&dir, &offset, dist / dirLenSq);
-            PSVECAdd(&rel, &offset, outPos);
+            PSVECSubtract(outPos, &local_60, outPos);
+            outPos->y = (float)((double)outPos->y / dVar10);
+            PSVECAdd(outPos, p1, outPos);
         }
+        return 1;
     }
 
-    if (outPos != NULL) {
-        PSVECSubtract(outPos, &rel, outPos);
-        outPos->y /= yScale;
-        PSVECAdd(outPos, p1, outPos);
-    }
-    return 1;
+    return 0;
 }
 
 /*

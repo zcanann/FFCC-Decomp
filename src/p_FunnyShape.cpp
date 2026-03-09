@@ -17,12 +17,13 @@ template <class T>
 class CPtrArray
 {
 public:
+    void** vtable;
     unsigned long size;
     unsigned long numItems;
     unsigned long defaultSize;
-    int growCapacity;
     T* items;
     CMemory::CStage* stage;
+    int growCapacity;
 
     CPtrArray();
     ~CPtrArray();
@@ -37,6 +38,8 @@ extern "C" int __cntlzw(unsigned int);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
+extern "C" void* gVtable_CPtrArray_OSFSTexture[];
+extern "C" void* gVtable_CPtrArray_GXTexObj[];
 
 inline void* operator new(unsigned long, void* p)
 {
@@ -134,8 +137,33 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
-    size = 0;
+    vtable = 0;
     numItems = 0;
+    size = 0;
+    defaultSize = 0x10;
+    items = 0;
+    stage = 0;
+    growCapacity = 1;
+}
+
+template <>
+CPtrArray<_GXTexObj*>::CPtrArray()
+{
+    vtable = gVtable_CPtrArray_GXTexObj;
+    numItems = 0;
+    size = 0;
+    defaultSize = 0x10;
+    items = 0;
+    stage = 0;
+    growCapacity = 1;
+}
+
+template <>
+CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
+{
+    vtable = gVtable_CPtrArray_OSFSTexture;
+    numItems = 0;
+    size = 0;
     defaultSize = 0x10;
     items = 0;
     stage = 0;
@@ -405,8 +433,8 @@ void CPtrArray<_GXTexObj*>::RemoveAll()
         __dla__FPv(items);
         items = 0;
     }
-    defaultSize = 0;
     numItems = 0;
+    size = 0;
 }
 
 /*
@@ -421,8 +449,8 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
         __dla__FPv(items);
         items = 0;
     }
-    defaultSize = 0;
     numItems = 0;
+    size = 0;
 }
 
 /*

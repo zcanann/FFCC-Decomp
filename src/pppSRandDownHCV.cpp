@@ -3,8 +3,8 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
-#include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandDownHCVParam2 {
@@ -93,19 +93,15 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			}
 			target[3] = value;
 		}
-	} else if (in->field0 != *(s32*)(base + 0xC)) {
-		return;
 	} else {
+		if (in->field0 != *(s32*)(base + 0xC)) {
+			return;
+		}
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
 
-	s16* target_colors;
 	s32 color_offset = in->field4;
-	if (color_offset == -1) {
-		target_colors = (s16*)gPppDefaultValueBuffer;
-	} else {
-		target_colors = (s16*)(base + color_offset + 0x80);
-	}
+	s16* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
 
 	target_colors[0] += (s8)((f32)in->field8 * target[0]);
 	target_colors[1] += (s8)((f32)in->fieldA * target[1]);

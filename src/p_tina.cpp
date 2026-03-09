@@ -893,7 +893,7 @@ void CPartPcs::drawViewer()
 void CPartPcs::drawAfter()
 {
     if (Game.game.m_gameWork.m_gamePaused == 0 &&
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x2C) == 0) {
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this)      + 0x30) == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);

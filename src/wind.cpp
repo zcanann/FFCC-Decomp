@@ -363,8 +363,7 @@ int CWind::AddAmbient(float dir, float speed)
     }
 
     obj->type = 0;
-    obj->flags = obj->flags & 0x7F;
-    obj->flags = obj->flags | 0x80;
+    obj->flags = (obj->flags & 0x7F) | 0x80;
 
     int id = m_nextId;
     m_nextId = id + 1;

@@ -59,6 +59,29 @@ def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
     return None
 
 
+def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
+    """Return a stable de-duplication key for include guards / pragma once."""
+    for line in lines[:64]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("//") or stripped in {"/*", "*/"} or stripped.startswith("*"):
+            continue
+
+        guard_match = guard_pattern.match(stripped)
+        if guard_match:
+            return guard_match[1]
+
+        once_match = once_pattern.match(stripped)
+        if once_match:
+            return in_file
+
+        # Stop scanning once we hit non-comment, non-guard content.
+        break
+
+    return None
+
+
 def generate_prelude(defines) -> str:
     if len(defines) == 0:
         return ""

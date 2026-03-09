@@ -612,6 +612,15 @@ static void cbForStateMotorStopped(u32 intType) {
     stateCoverClosed();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80189AD4
+ * PAL Size: 560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static void stateReady() {
     DVDCommandBlock* finished;
 
@@ -621,8 +630,8 @@ static void stateReady() {
     }
 
     if (PauseFlag != 0) {
-        PausingFlag = 1;
         executing = NULL;
+        PausingFlag = 1;
         return;
     }
 
@@ -659,26 +668,7 @@ static void stateReady() {
         case 6:
         case 7:
             executing->state = DVD_STATE_WRONG_DISK;
-            switch (CurrCommand) {
-            case DVD_COMMAND_BSREAD:
-            case DVD_COMMAND_READID:
-            case DVD_COMMAND_AUDIO_BUFFER_CONFIG:
-            case DVD_COMMAND_BS_CHANGE_DISK:
-                __DVDClearWaitingQueue();
-                finished = executing;
-                executing = &DummyCommandBlock;
-                if (finished->callback) {
-                    finished->callback(-4, finished);
-                }
-                stateReady();
-                break;
-            default:
-                MotorState = 0;
-                DVDReset();
-                OSCreateAlarm(&ResetAlarm);
-                OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
-                break;
-            }
+            goto wrongDisk;
             break;
         case 5:
             __DVDStoreErrorCode(CancelLastError);
@@ -693,28 +683,30 @@ static void stateReady() {
     if (MotorState == 0) {
         executing->state = DVD_STATE_BUSY;
         stateBusy_80189D04(executing);
-    } else {
-        executing->state = DVD_STATE_COVER_CLOSED;
-        switch (CurrCommand) {
-        case DVD_COMMAND_BSREAD:
-        case DVD_COMMAND_READID:
-        case DVD_COMMAND_AUDIO_BUFFER_CONFIG:
-        case DVD_COMMAND_BS_CHANGE_DISK:
-            __DVDClearWaitingQueue();
-            finished = executing;
-            executing = &DummyCommandBlock;
-            if (finished->callback) {
-                finished->callback(-4, finished);
-            }
-            stateReady();
-            break;
-        default:
-            MotorState = 0;
-            DVDReset();
-            OSCreateAlarm(&ResetAlarm);
-            OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
-            break;
+        return;
+    }
+
+    executing->state = DVD_STATE_COVER_CLOSED;
+wrongDisk:
+    switch (CurrCommand) {
+    case DVD_COMMAND_BSREAD:
+    case DVD_COMMAND_READID:
+    case DVD_COMMAND_AUDIO_BUFFER_CONFIG:
+    case DVD_COMMAND_BS_CHANGE_DISK:
+        __DVDClearWaitingQueue();
+        finished = executing;
+        executing = &DummyCommandBlock;
+        if (finished->callback) {
+            finished->callback(-4, finished);
         }
+        stateReady();
+        break;
+    default:
+        MotorState = 0;
+        DVDReset();
+        OSCreateAlarm(&ResetAlarm);
+        OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
+        break;
     }
 }
 

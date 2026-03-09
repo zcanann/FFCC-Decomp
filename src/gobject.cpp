@@ -14,6 +14,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/quadobj.h"
 #include "ffcc/sound.h"
+#include "ffcc/texanim.h"
 
 #include <dolphin/gx.h>
 #include <math.h>
@@ -1781,9 +1782,24 @@ void CGObject::SetClassWork(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetTexAnim(char*)
+void CGObject::SetTexAnim(char* name)
 {
-	// TODO
+    CCharaPcs::CHandle* handle;
+    bool hasModel;
+    CTexAnimSet* texAnimSet;
+
+    handle = m_charaModelHandle;
+    hasModel = false;
+    if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+        hasModel = true;
+    }
+
+    if (hasModel) {
+        texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
+        if (texAnimSet != (CTexAnimSet*)0) {
+            texAnimSet->Change(name, sZeroFloat, (CTexAnimSet::ANIM_TYPE)-2);
+        }
+    }
 }
 
 /*

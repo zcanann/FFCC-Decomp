@@ -59,6 +59,7 @@ CRedSound::~CRedSound()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, int shouldDelete)
 {
 	if ((redSound != 0) && (0 < shouldDelete)) {
@@ -66,6 +67,7 @@ extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, int shouldDelete)
 	}
 	return redSound;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

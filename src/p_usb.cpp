@@ -270,8 +270,6 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
-    *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
     *reinterpret_cast<void**>(&USBPcs) = __vt__7CUSBPcs;
 
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];

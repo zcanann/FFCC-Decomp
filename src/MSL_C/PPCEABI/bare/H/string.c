@@ -4,6 +4,8 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
+const unsigned int strtok_delimiter_table_init[8] = { 0 };
+
 char* strtok_null = NULL;
 char* strtok_ptr  = NULL;
 
@@ -311,11 +313,21 @@ char* strstr(const char* str, const char* pat)
  */
 char* strtok(char* str, const char* delim)
 {
-	unsigned char delimiter_table[32] = { 0 };
+	unsigned char delimiter_table[32];
 	unsigned char ch;
 	unsigned char* p;
 	unsigned char* tokenStart;
 	unsigned char* tokenEnd;
+	unsigned int* tableWords = (unsigned int*)delimiter_table;
+
+	tableWords[0] = strtok_delimiter_table_init[0];
+	tableWords[1] = strtok_delimiter_table_init[1];
+	tableWords[2] = strtok_delimiter_table_init[2];
+	tableWords[3] = strtok_delimiter_table_init[3];
+	tableWords[4] = strtok_delimiter_table_init[4];
+	tableWords[5] = strtok_delimiter_table_init[5];
+	tableWords[6] = strtok_delimiter_table_init[6];
+	tableWords[7] = strtok_delimiter_table_init[7];
 
 	if (str != NULL) {
 		strtok_ptr = str;

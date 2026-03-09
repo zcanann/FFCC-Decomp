@@ -10,7 +10,13 @@ struct pppRain {
 struct VRain;
 
 struct PRain {
-    u8 payload[0x60];
+    s32 m_graphId;
+    u16 m_dataValIndex;
+    u8 _pad0[2];
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    u8 m_payload[0x4C];
 };
 
 struct RAIN_DATA {

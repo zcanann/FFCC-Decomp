@@ -1,3 +1,4 @@
+import errno
 import os
 import signal
 import subprocess
@@ -103,6 +104,9 @@ def run_agentic_loop(
                 start_new_session=(os.name == "posix"),
             )
         except OSError as exc:
+            if exc.errno in (errno.ENOENT, errno.EACCES):
+                log(f"failed to launch codex ({exc}); unrecoverable error, stopping loop")
+                break
             consecutive_failures += 1
             backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
             log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")

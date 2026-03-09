@@ -51,9 +51,9 @@ public:
 	void MusicHistoryDelete(int);
 	void MusicHistoryChoice(RedHistoryBANK*);
 	int SearchMusicSequence(int);
-	void MusicMemoryFree(RedHistoryBANK*);
-	void MusicOldClear();
-	void MusicOldChoice();
+	int MusicMemoryFree(RedHistoryBANK*);
+	int MusicOldClear();
+	unsigned int MusicOldChoice();
 	int* SearchMusicBank(int);
 	void ReentryMusicData(int);
 	void MusicHistoryManager(int, int);

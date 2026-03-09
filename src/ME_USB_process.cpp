@@ -14,7 +14,6 @@ extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* mat
 extern "C" void* GetRsdItem__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory* memory, unsigned long size, CMemory::CStage* stage, char* file, int line, int align);
-extern "C" CMaterialEditorPcs* Free__7CMemoryFPv(CMemory* memory, void* ptr);
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void ResetRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
 extern "C" int AddRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
@@ -55,12 +54,11 @@ static inline CMemory::CStage* MaterialEditorStage()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
+extern "C" void MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
 {
-    if (ptr == nullptr) {
-        return materialEditorPcs;
+    if (ptr != nullptr) {
+        Memory.Free(ptr);
     }
-    return Free__7CMemoryFPv(&Memory, ptr);
 }
 
 /*

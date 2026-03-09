@@ -55,11 +55,11 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             float cameraPosX = CameraPosX();
             float cameraPosY = CameraPosY();
             float cameraPosZ = CameraPosZ();
-            float scale = FLOAT_803331e0 + ((CameraDistance() - FLOAT_803331e4) / FLOAT_803331e4);
+            double scale = (double)(FLOAT_803331e0 + ((CameraDistance() - FLOAT_803331e4) / FLOAT_803331e4));
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
-            pppMngSt->m_scale.x = FLOAT_803331e8 * scale;
-            pppMngSt->m_scale.y = scale;
+            pppMngSt->m_scale.x = (float)((double)FLOAT_803331e8 * scale);
+            pppMngSt->m_scale.y = (float)scale;
             pppMngSt->m_scale.z = FLOAT_803331e0;
 
             Mtx scaleMtx;
@@ -73,33 +73,32 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 
             Vec resultPos;
             if (flags[0] != 0) {
-                float distance = value[0];
-                resultPos.x = cameraDirX * distance + cameraPosX;
-                resultPos.y = cameraDirY * distance + cameraPosY;
-                resultPos.z = cameraDirZ * distance + cameraPosZ;
+                double distance = (double)value[0];
+                resultPos.x = (float)((double)cameraDirX * distance + (double)cameraPosX);
+                resultPos.y = (float)((double)cameraDirY * distance + (double)cameraPosY);
+                resultPos.z = (float)((double)cameraDirZ * distance + (double)cameraPosZ);
             }
 
-            float localX = ((_pppPObject*)param_1)->m_localMatrix.value[0][3];
-            float localY = ((_pppPObject*)param_1)->m_localMatrix.value[1][3];
+            double localX = (double)((_pppPObject*)param_1)->m_localMatrix.value[0][3];
+            double localY = (double)((_pppPObject*)param_1)->m_localMatrix.value[1][3];
 
-            Vec cameraDir;
-            cameraDir.x = cameraDirX;
-            cameraDir.y = cameraDirY;
-            cameraDir.z = cameraDirZ;
+            float local_108 = cameraDirX;
+            float local_104 = cameraDirY;
+            float local_100 = cameraDirZ;
 
             Vec direct0;
             Vec direct1;
-            GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &direct0, &direct1, cameraDir);
+            GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &direct0, &direct1, *(Vec*)&local_108);
 
             Vec localOffset0;
-            localOffset0.x = localX * direct0.x;
-            localOffset0.y = localX * direct0.y;
-            localOffset0.z = localX * direct0.z;
+            localOffset0.x = (float)(localX * (double)direct0.x);
+            localOffset0.y = (float)(localX * (double)direct0.y);
+            localOffset0.z = (float)(localX * (double)direct0.z);
 
             Vec localOffset1;
-            localOffset1.x = localY * direct1.x;
-            localOffset1.y = localY * direct1.y;
-            localOffset1.z = localY * direct1.z;
+            localOffset1.x = (float)(localY * (double)direct1.x);
+            localOffset1.y = (float)(localY * (double)direct1.y);
+            localOffset1.z = (float)(localY * (double)direct1.z);
 
             PSVECAdd(&resultPos, &localOffset0, &resultPos);
             PSVECAdd(&resultPos, &localOffset1, &resultPos);

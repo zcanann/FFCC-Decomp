@@ -18,7 +18,7 @@ extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
-extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
+extern "C" void* __vt__18CMaterialEditorPcs[];
 unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 static char s_MaterialEditor[] = "MaterialEditor=%c";
@@ -26,8 +26,6 @@ static char s_MaterialEditor[] = "MaterialEditor=%c";
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
-extern "C" void SetViewerSRT__10CCameraPcsFPC3SRT(void* camera, const void* srt);
-extern "C" void GetViewMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix);
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -54,7 +52,7 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__8CManager;
     *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt_CProcess;
-    *reinterpret_cast<void**>(&MaterialEditorPcs) = &PTR_PTR_s_CMaterialEditorPcs_801ea644;
+    *reinterpret_cast<void**>(&MaterialEditorPcs) = __vt__18CMaterialEditorPcs;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
     __ct__14CUSBStreamDataFv(self + 0x84);
@@ -421,10 +419,10 @@ void CMaterialEditorPcs::calcViewer()
     srt.transX = field268_0x15c.x;
     srt.transY = field268_0x15c.y;
     srt.transZ = -field268_0x15c.z;
-    SetViewerSRT__10CCameraPcsFPC3SRT(&CameraPcs, &srt);
+    CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
 
     Mtx cameraMatrix;
-    GetViewMatrix__10CCameraPcsFPA4_f(&CameraPcs, cameraMatrix);
+    CameraPcs.GetViewMatrix(cameraMatrix);
 
     m_unkMatrix.value[0][0] = *reinterpret_cast<float*>(&field_0x12c);
     m_unkMatrix.value[0][1] = *reinterpret_cast<float*>(&field_0x130);

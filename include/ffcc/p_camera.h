@@ -46,6 +46,7 @@ public:
 
     void calcViewerCameraMatrix(float (*)[4], const SRT*);
     void SetViewerSRT(const SRT*);
+    void GetViewMatrix(float (*)[4]);
 
     // Chara
     void createChara();

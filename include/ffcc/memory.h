@@ -108,5 +108,6 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line);
 
 extern CMemory Memory;
+extern CAmemCacheSet ppvAmemCacheSet;
 
 #endif // _FFCC_MEMORY_H_

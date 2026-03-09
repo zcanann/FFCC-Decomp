@@ -36,7 +36,7 @@ struct Vec4d
     float w;
 };
 u8 ARRAY_802ea1a0[0x20];
-extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
+extern "C" void* __vt__8CMenuPcs[];
 extern int DAT_8020ef9c[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
 extern char s_dvd__smenu__s_fnt_801d9da0[];
@@ -93,7 +93,7 @@ extern "C" void __sinit_p_menu_cpp()
     u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
     u32* table = reinterpret_cast<u32*>(gMenuProcessTable);
 
-    *(u32*)((u8*)&MenuPcs) = (u32)&PTR_PTR_s_CMenuPcs_8020f2d0;
+    *(u32*)((u8*)&MenuPcs) = reinterpret_cast<u32>(__vt__8CMenuPcs);
     mcCtrl[0] = 0;
     mcCtrl[1] = 0;
     mcCtrl[2] = 0;
@@ -143,7 +143,7 @@ CMenuPcs::~CMenuPcs()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    *reinterpret_cast<u32*>(self) = reinterpret_cast<u32>(&PTR_PTR_s_CMenuPcs_8020f2d0);
+    *reinterpret_cast<u32*>(self) = reinterpret_cast<u32>(__vt__8CMenuPcs);
 
     if (self + 0x20 != nullptr) {
         *reinterpret_cast<u32*>(self + 0x20) = 0;

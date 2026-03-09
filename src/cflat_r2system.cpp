@@ -1165,9 +1165,9 @@ void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void GetViewMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
+void CCameraPcs::GetViewMatrix(float (*matrix)[4])
 {
-    PSMTXCopy((MtxPtr)((char*)camera + 4), matrix);
+    PSMTXCopy((MtxPtr)((char*)this + 4), matrix);
 }
 
 /*

@@ -19,7 +19,7 @@
 
 CGraphic Graphic;
 
-extern "C" char PTR_PTR_s_CGraphic_801e8408[];
+extern "C" void* __vt__8CGraphic[];
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
 extern "C" char __vt__8CManager[];
@@ -118,7 +118,7 @@ extern "C" void __sinit_graphic_cpp(void)
 {
     void* vtbl = __vt__8CManager;
     *reinterpret_cast<void**>(&Graphic) = vtbl;
-    *reinterpret_cast<void**>(&Graphic) = PTR_PTR_s_CGraphic_801e8408;
+    *reinterpret_cast<void**>(&Graphic) = __vt__8CGraphic;
 }
 
 /*

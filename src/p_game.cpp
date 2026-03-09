@@ -1,6 +1,6 @@
 #include "ffcc/p_game.h"
 
-extern unsigned int PTR_PTR_s_CGamePcs_801ea0a8[];
+extern "C" void* __vt__8CGamePcs[];
 void* GamePcs;
 CGamePcs Game;
 extern "C" void create__8CGamePcsFv(CGamePcs*);
@@ -40,7 +40,7 @@ unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
 extern "C" void __sinit_p_game_cpp() {
     unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
 
-    GamePcs = PTR_PTR_s_CGamePcs_801ea0a8;
+    GamePcs = __vt__8CGamePcs;
 
     dst[1] = m_table_desc0__8CGamePcs[0];
     dst[2] = m_table_desc0__8CGamePcs[1];

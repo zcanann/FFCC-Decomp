@@ -72,7 +72,6 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void SetOffsetZBuff__10CCameraPcsFf(double, void*);
 unsigned char DAT_8032ec88;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
@@ -2709,7 +2708,7 @@ void CMapMng::Draw()
         wireColor.a = 0x80;
         GXSetChanMatColor(GX_COLOR0A0, wireColor);
 
-        SetOffsetZBuff__10CCameraPcsFf(static_cast<double>(FLOAT_8032f9bc), &CameraPcs);
+        CameraPcs.SetOffsetZBuff(FLOAT_8032f9bc);
 
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
         for (int i = 0; i < mapObjCount; i++) {
@@ -2723,7 +2722,7 @@ void CMapMng::Draw()
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
-        SetOffsetZBuff__10CCameraPcsFf(static_cast<double>(FLOAT_8032f9a0), &CameraPcs);
+        CameraPcs.SetOffsetZBuff(FLOAT_8032f9a0);
     }
 }
 

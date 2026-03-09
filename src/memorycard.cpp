@@ -1,7 +1,6 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
 #include "ffcc/chara.h"
-#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_game.h"

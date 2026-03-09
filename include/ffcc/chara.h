@@ -167,5 +167,7 @@ public:
 };
 
 extern "C" char __vt__6CChara[];
+extern unsigned char Chara[0x2078];
+extern CChara& gChara;
 
 #endif // _FFCC_CHARA_H_

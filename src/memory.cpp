@@ -1,6 +1,6 @@
 #include "ffcc/memory.h"
+#include "ffcc/chara.h"
 #include "ffcc/graphic.h"
-#include "ffcc/linkage.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
@@ -20,8 +20,8 @@ static char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
 static char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
 static char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
 static char s_drawHeapTitleFmt[] = "%4d %4d %4d";
-extern char PTR_PTR_s_CMemory_801e8488[];
 extern "C" char __vt__8CManager[];
+extern "C" void* __vt__7CMemory[];
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
@@ -173,7 +173,7 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
 extern "C" void __sinit_memory_cpp(void)
 {
     *reinterpret_cast<void**>(&Memory) = __vt__8CManager;
-    *reinterpret_cast<void**>(&Memory) = PTR_PTR_s_CMemory_801e8488;
+    *reinterpret_cast<void**>(&Memory) = __vt__7CMemory;
 }
 
 /*

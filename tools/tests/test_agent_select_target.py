@@ -471,6 +471,24 @@ class SymbolSummaryTests(unittest.TestCase):
         self.assertEqual(lines[0], "  PAL symbols: 0 funcs, 1 globals (showing up to 5 funcs)")
         self.assertEqual(len(lines), 1)
 
+    def test_summarize_symbols_skips_entries_with_non_dict_parsed_payload(self):
+        info = {
+            "functions": [
+                {"parsed": "bad-payload"},
+                {"parsed": {"symbol": "fnF", "size": 16, "virtual_addr": "0x80006000"}},
+            ],
+            "globals": [
+                {"parsed": None},
+                {"parsed": {"symbol": "globB"}},
+            ],
+        }
+
+        lines = agent_select_target.summarize_symbols("EN symbols", info)
+
+        self.assertEqual(lines[0], "  EN symbols: 1 funcs, 1 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnF (0x10b at 0x80006000)")
+        self.assertEqual(len(lines), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

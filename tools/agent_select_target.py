@@ -173,21 +173,25 @@ def summarize_symbols(label, all_info):
     functions = all_info.get("functions", [])
     if not isinstance(functions, list):
         functions = []
-    function_dicts = [func for func in functions if isinstance(func, dict)]
+    function_dicts = [
+        func for func in functions
+        if isinstance(func, dict) and isinstance(func.get("parsed"), dict)
+    ]
 
     globals_data = all_info.get("globals", [])
     if not isinstance(globals_data, list):
         globals_data = []
-    global_dicts = [glob for glob in globals_data if isinstance(glob, dict)]
+    global_dicts = [
+        glob for glob in globals_data
+        if isinstance(glob, dict) and isinstance(glob.get("parsed"), dict)
+    ]
 
     lines.append(
         f"  {label}: {len(function_dicts)} funcs, {len(global_dicts)} globals (showing up to 5 funcs)"
     )
 
     for func in function_dicts[:5]:
-        p = func.get("parsed", {})
-        if not isinstance(p, dict):
-            p = {}
+        p = func["parsed"]
         symbol = p.get("symbol", "unknown")
         size_raw = p.get("size", "unknown")
         addr = p.get("virtual_addr", "unknown")

@@ -1,3 +1,4 @@
+#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppYmBreath.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"

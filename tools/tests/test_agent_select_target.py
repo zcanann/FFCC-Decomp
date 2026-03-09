@@ -49,6 +49,10 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(agent_select_target.safe_int("-0b101"), -5)
         self.assertEqual(agent_select_target.safe_int("12.0"), 12)
 
+    def test_safe_int_rejects_non_integral_float_inputs(self):
+        self.assertEqual(agent_select_target.safe_int("12.9", 9), 9)
+        self.assertEqual(agent_select_target.safe_int(-7.25, 5), 5)
+
     def test_safe_float_returns_default_for_non_finite_values(self):
         self.assertEqual(agent_select_target.safe_float("nan", 1.25), 1.25)
         self.assertEqual(agent_select_target.safe_float("inf", 3.5), 3.5)

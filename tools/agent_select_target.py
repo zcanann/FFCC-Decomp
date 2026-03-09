@@ -55,7 +55,12 @@ def safe_int(value, default=0):
                 parsed = float(value)
                 if not math.isfinite(parsed):
                     return default
+                if not parsed.is_integer():
+                    return default
                 return int(parsed)
+        if isinstance(value, float):
+            if not math.isfinite(value) or not value.is_integer():
+                return default
         return int(value)
     except (TypeError, ValueError, OverflowError):
         return default

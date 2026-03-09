@@ -33,6 +33,9 @@ void pppConstructAlignmentScale(pppAlignmentScale*, pppAlignmentScaleData*)
  */
 struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* alignmentScale, struct pppAlignmentScaleData* data)
 {
+    float cameraPosX;
+    float cameraPosY;
+    float cameraPosZ;
     float scale;
     struct _pppMngSt* pppMngSt;
     Vec cameraPos;
@@ -41,9 +44,12 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        cameraPos.x = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE0);
-        cameraPos.y = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE4);
-        cameraPos.z = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE8);
+        cameraPosX = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE0);
+        cameraPosY = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE4);
+        cameraPosZ = *reinterpret_cast<float*>((u8*)&CameraPcs + 0xE8);
+        cameraPos.x = cameraPosX;
+        cameraPos.y = cameraPosY;
+        cameraPos.z = cameraPosZ;
 
         objPos.x = pppMngStPtr->m_matrix.value[0][3];
         objPos.y = pppMngStPtr->m_matrix.value[1][3];

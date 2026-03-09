@@ -1,6 +1,5 @@
 #include "ffcc/chara.h"
 #include "ffcc/cflat_runtime.h"
-#include "ffcc/linkage.h"
 
 #include <math.h>
 #include <string.h>

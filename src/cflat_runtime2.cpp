@@ -4,7 +4,6 @@
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
-#include "ffcc/linkage.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"

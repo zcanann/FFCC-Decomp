@@ -1,6 +1,6 @@
 #include "ffcc/memory.h"
+#include "ffcc/chara.h"
 #include "ffcc/graphic.h"
-#include "ffcc/linkage.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"

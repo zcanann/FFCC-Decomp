@@ -1,5 +1,5 @@
 #include "ffcc/baseobj.h"
-#include "ffcc/linkage.h"
+#include "ffcc/cflat_runtime2.h"
 
 void CGBaseObj::onCreate()
 {

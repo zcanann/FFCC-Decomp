@@ -6,6 +6,7 @@
 #include "ffcc/p_chara.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 class CGObject;
 class CFlatRuntime;
@@ -18,6 +19,9 @@ struct Vec;
 extern int gCFlatRuntime2DebugDrawOverflowFrame;
 extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
 extern char sCFlatRuntime2DebugDrawOverflowMsg[];
+extern unsigned char CFlat[0x10440];
+extern u32 CFlatFlags;
+extern Mtx gFlatPosMtx;
 
 class CFlatRuntime2
 {
@@ -101,5 +105,7 @@ class CFlatRuntime2
 	void resetChangeScript();
 	void ResetNewGame();
 };
+
+extern CFlatRuntime2& gCFlatRuntime2;
 
 #endif // _FFCC_CFLAT_RUNTIME2_H_

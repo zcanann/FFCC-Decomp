@@ -154,4 +154,6 @@ public:
     void AddMaterial(CMaterial*, int);
 };
 
+extern CMaterialMan MaterialMan;
+
 #endif // _FFCC_MATERIALMAN_H_

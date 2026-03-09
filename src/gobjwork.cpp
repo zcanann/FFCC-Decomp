@@ -1,7 +1,7 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
-#include "ffcc/linkage.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/mes.h"
 #include "ffcc/p_game.h"

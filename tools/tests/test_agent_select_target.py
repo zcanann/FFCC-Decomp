@@ -314,6 +314,32 @@ class SymbolSummaryTests(unittest.TestCase):
         self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
         self.assertEqual(lines[1], "    - fnB (Noneb at 0x80002000)")
 
+    def test_summarize_symbols_parses_decimal_size_string_as_decimal(self):
+        info = {
+            "functions": [
+                {"parsed": {"symbol": "fnC", "size": "32", "virtual_addr": "0x80003000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("PAL symbols", info)
+
+        self.assertEqual(lines[0], "  PAL symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnC (0x20b at 0x80003000)")
+
+    def test_summarize_symbols_parses_prefixed_hex_size_string(self):
+        info = {
+            "functions": [
+                {"parsed": {"symbol": "fnD", "size": "0x20", "virtual_addr": "0x80004000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("EN symbols", info)
+
+        self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnD (0x20b at 0x80004000)")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -168,9 +168,12 @@ def summarize_symbols(label, all_info):
         elif isinstance(size_raw, int):
             size = f"0x{size_raw:x}"
         elif isinstance(size_raw, str):
-            try:
-                size = f"0x{int(size_raw, 16):x}"
-            except ValueError:
+            # Sizes are usually hex-ish strings from MAP output, but some paths
+            # may provide decimal or base-prefixed values.
+            parsed_size = safe_int(size_raw, None)
+            if parsed_size is not None:
+                size = f"0x{parsed_size:x}"
+            else:
                 size = size_raw
         else:
             size = str(size_raw)

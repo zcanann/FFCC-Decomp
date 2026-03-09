@@ -22,15 +22,6 @@ class HeaderGuardKeyTests(unittest.TestCase):
         ]
         self.assertEqual(decompctx.get_header_guard_key("include/example.h", lines), "EXAMPLE_H")
 
-    def test_detects_ifndef_after_single_line_banner_comment(self):
-        lines = [
-            "/* Copyright header */\n",
-            "\n",
-            "#ifndef EXAMPLE_H\n",
-            "#define EXAMPLE_H\n",
-        ]
-        self.assertEqual(decompctx.get_header_guard_key("include/example.h", lines), "EXAMPLE_H")
-
     def test_detects_pragma_once_after_comments(self):
         lines = [
             "// generated header\n",

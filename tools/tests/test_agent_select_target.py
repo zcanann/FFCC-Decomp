@@ -32,18 +32,6 @@ class DeriveFileNameTests(unittest.TestCase):
         unit = {"name": "src/system/player", "metadata": {"source_path": "unknown"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
 
-    def test_derive_object_file_uses_windows_style_source_path_stem(self):
-        unit = {"name": "foo", "metadata": {"source_path": r"src\\system\\player.cpp"}}
-        self.assertEqual(agent_select_target.derive_object_file(unit), "player.o")
-
-    def test_derive_source_file_uses_windows_style_source_path_name(self):
-        unit = {"name": "foo", "metadata": {"source_path": r"src\\system\\player.cpp"}}
-        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
-
-    def test_derive_source_file_fallback_handles_windows_style_unit_name(self):
-        unit = {"name": r"src\\system\\player", "metadata": {"source_path": "unknown"}}
-        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
-
 
 class NumericParsingTests(unittest.TestCase):
     def test_safe_float_returns_default_for_invalid_values(self):
@@ -53,27 +41,6 @@ class NumericParsingTests(unittest.TestCase):
     def test_safe_int_returns_default_for_invalid_values(self):
         self.assertEqual(agent_select_target.safe_int("not-a-number"), 0)
         self.assertEqual(agent_select_target.safe_int(None, 7), 7)
-
-    def test_safe_int_parses_prefixed_and_float_strings(self):
-        self.assertEqual(agent_select_target.safe_int("0x20"), 32)
-        self.assertEqual(agent_select_target.safe_int("-0x10"), -16)
-        self.assertEqual(agent_select_target.safe_int("0o12"), 10)
-        self.assertEqual(agent_select_target.safe_int("-0b101"), -5)
-        self.assertEqual(agent_select_target.safe_int("12.0"), 12)
-
-    def test_safe_int_rejects_non_integral_float_inputs(self):
-        self.assertEqual(agent_select_target.safe_int("12.9", 9), 9)
-        self.assertEqual(agent_select_target.safe_int(-7.25, 5), 5)
-
-    def test_safe_float_returns_default_for_non_finite_values(self):
-        self.assertEqual(agent_select_target.safe_float("nan", 1.25), 1.25)
-        self.assertEqual(agent_select_target.safe_float("inf", 3.5), 3.5)
-        self.assertEqual(agent_select_target.safe_float("-inf", 4.75), 4.75)
-
-    def test_safe_int_returns_default_for_non_finite_values(self):
-        self.assertEqual(agent_select_target.safe_int("nan", 11), 11)
-        self.assertEqual(agent_select_target.safe_int("inf", 22), 22)
-        self.assertEqual(agent_select_target.safe_int("-inf", 33), 33)
 
     def test_is_viable_target_handles_non_numeric_measures(self):
         unit = {

@@ -112,7 +112,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.z = outMatrix.value[2][3];
         }
 
-        int count = work->m_count;
+        u8 count = work->m_count;
         Vec* history = work->m_posHistory;
         while (count != 0) {
             pppCopyVector__FR3Vec3Vec(history, &pos);
@@ -450,8 +450,5 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }
-
-
-
 
 

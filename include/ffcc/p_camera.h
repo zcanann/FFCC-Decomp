@@ -103,7 +103,7 @@ public:
     void GetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
 
-    // TODO
+    u8 _pad04[0xE0 - 0x4];
     float _224_4_;
     float _228_4_;
     float _232_4_;

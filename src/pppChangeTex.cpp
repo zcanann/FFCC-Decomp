@@ -334,7 +334,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-	    (float)step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, value, value + 1, value + 2,
+	    step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, value, value + 1, value + 2,
 	    &step->m_stepValue, (float*)&step->m_arg3);
 
 	valueInt[6] = (int)pppMngStPtr->m_charaObj;
@@ -495,4 +495,3 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		pppInitBlendMode__Fv();
 	}
 }
-

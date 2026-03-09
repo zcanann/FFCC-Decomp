@@ -31,6 +31,7 @@ extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
+extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
 float ppvScreenMatrix[10][4];
 float ppvScreenMatrix0[4][4];
@@ -811,12 +812,21 @@ void CPartMng::setProcSpeed(ProcSpdSt*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005DE70
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::drawEnd()
 {
-	// TODO
+    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(pppEnvStPtr->m_stagePtr);
+    if ((gPppHeapUseRateWords[2] == 0)
+        || ((gPppHeapUseRateWords[2] = gPppHeapUseRateWords[2] - 1), gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
+        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
+        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+    }
 }
 
 /*

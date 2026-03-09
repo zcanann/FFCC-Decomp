@@ -34,13 +34,13 @@ public:
     static int m_tempVar[0x14];
 
 private:
+    int mUnknown0;
     char* mText;
     int mCounter;
     int mFlags;
     
     // Large data structure to account for high memory offsets seen in objdiff
-    char mData[0x3D50];  // Provides space up to offset 0x3D50
+    char mData[0x3D4C];  // Provides space up to offset 0x3D50
 };
 
 #endif // _FFCC_MES_H_
-

@@ -44,6 +44,7 @@ extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;
 extern "C" float FLOAT_8032fe68;
+extern "C" float FLOAT_8032fe70;
 extern "C" float FLOAT_8032fe8c;
 extern "C" float FLOAT_8032fe90;
 extern "C" float FLOAT_8032fe94;
@@ -762,12 +763,80 @@ void CPartMng::drawCursor()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005e078
+ * PAL Size: 784b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::render3Dcursor()
 {
-	// TODO
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
+
+    Mtx44 orthoProjection;
+    C_MTXOrtho(orthoProjection, FLOAT_8032fe5c, FLOAT_8032fe60, FLOAT_8032fe5c, FLOAT_8032fe64, FLOAT_8032fe5c,
+               FLOAT_8032fe68);
+    GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
+
+    Mtx identity;
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, 0);
+    GXSetZCompLoc(0);
+    GXSetCurrentMtx(0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetZMode(0, GX_ALWAYS, 0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xff, 0xff, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
+    GXLoadPosMtxImm(ppvCameraMatrix0, 0);
+    pppSetBlendMode__FUc(3);
+
+    float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x23780);
+    float x = cursorPos[0];
+    float y = cursorPos[1];
+    float z = cursorPos[2];
+
+    _GXColor colorX;
+    colorX.r = 0xff;
+    colorX.g = 0x80;
+    colorX.b = 0x80;
+    colorX.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, colorX);
+    GXSetChanMatColor((GXChannelID)4, colorX);
+    GXBegin(GX_LINES, GX_VTXFMT5, 2);
+    GXPosition3f32(x - FLOAT_8032fe70, y, z);
+    GXPosition3f32(x + FLOAT_8032fe70, y, z);
+
+    _GXColor colorY;
+    colorY.r = 0x80;
+    colorY.g = 0xff;
+    colorY.b = 0x80;
+    colorY.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, colorY);
+    GXSetChanMatColor((GXChannelID)4, colorY);
+    GXBegin(GX_LINES, GX_VTXFMT5, 2);
+    GXPosition3f32(x, y - FLOAT_8032fe70, z);
+    GXPosition3f32(x, y + FLOAT_8032fe70, z);
+
+    _GXColor colorZ;
+    colorZ.r = 0xff;
+    colorZ.g = 0xff;
+    colorZ.b = 0x80;
+    colorZ.a = 0xff;
+    GXSetChanAmbColor((GXChannelID)4, colorZ);
+    GXSetChanMatColor((GXChannelID)4, colorZ);
+    GXBegin(GX_LINES, GX_VTXFMT5, 2);
+    GXPosition3f32(x, y, z - FLOAT_8032fe70);
+    GXPosition3f32(x, y, z + FLOAT_8032fe70);
 }
 
 /*
@@ -2501,12 +2570,11 @@ void CPartMng::pppGetDefaultCreateParam()
     g_dcp.m_extraPositionPtr = 0;
     g_dcp.m_paramA = 0;
     g_dcp.m_paramB = 0;
-    g_dcp.m_lookTargetPtr = 0;
     g_dcp.m_objectHitMask = 0;
     g_dcp.m_cylinderAttribute = 0;
     g_dcp.m_paramC = FLOAT_8032fe18;
     g_dcp.m_paramD = FLOAT_8032fe18;
-    g_dcp.m_owner = 0;
+    *reinterpret_cast<unsigned char*>(&g_dcp.m_owner) = 0;
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
     g_dcp.m_soundEffectParams.m_soundEffectStopFlag = 0;

@@ -52,44 +52,42 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     float fVar1;
     float fVar2;
     float fVar3;
-    float local_f8;
-    float local_f4;
-    float local_f0;
     Vec local_ec;
     Vec local_e0;
     Vec local_d4;
     Vec local_c8;
     Vec local_bc;
+    Vec local_b0;
     Vec local_a4;
-    Mtx local_98;
     Mtx local_68;
+    Mtx local_98;
 
-    local_f8 = CameraDirX();
-    local_f4 = CameraDirY();
-    local_f0 = CameraDirZ();
+    local_b0.x = CameraDirX();
+    local_b0.y = CameraDirY();
+    local_b0.z = CameraDirZ();
     local_bc.x = CameraPosX();
     local_bc.y = CameraPosY();
     local_bc.z = CameraPosZ();
-    PSMTXCopy(CameraMatrix(), local_68);
+    PSMTXCopy(CameraMatrix(), local_98);
 
-    local_a4.z = work->field0_0x0;
-    local_a4.x = local_a4.z * local_f8;
-    local_a4.y = local_a4.z * local_f4;
-    local_a4.z = local_a4.z * local_f0;
-    if (Game.game.m_currentSceneId == 7) {
-        PSMTXInverse(ppvCameraMatrix0, local_98);
+    fVar3 = work->field0_0x0;
+    local_a4.x = fVar3 * local_b0.x;
+    local_a4.y = fVar3 * local_b0.y;
+    local_a4.z = fVar3 * local_b0.z;
+    if ((s32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+        PSMTXInverse(ppvCameraMatrix02, local_68);
     } else {
-        PSMTXInverse(local_68, local_98);
+        PSMTXInverse(local_98, local_68);
     }
 
     PSMTXIdentity(constrainModel->m_drawMtx);
     PSMTXIdentity(constrainModel->m_worldBaseMtx);
-    PSMTXConcat(local_98, constrainModel->m_worldBaseMtx, constrainModel->m_worldBaseMtx);
+    PSMTXConcat(local_68, constrainModel->m_worldBaseMtx, constrainModel->m_worldBaseMtx);
     PSVECAdd(&local_bc, &local_a4, &local_a4);
 
     fVar3 = *(float*)(owner + 0x1c);
     fVar2 = *(float*)(owner + 0x2c);
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, *(Vec*)&local_f8);
+    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, local_b0);
 
     local_e0.x = fVar3 * local_c8.x;
     local_e0.y = fVar3 * local_c8.y;
@@ -104,7 +102,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     constrainModel->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero;
     constrainModel->m_worldBaseMtx[1][3] = fVar1;
     constrainModel->m_worldBaseMtx[2][3] = fVar1;
-    if (Game.game.m_currentSceneId == 7) {
+    if ((s32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
         constrainModel->m_drawMtx[0][3] = fVar1;
         constrainModel->m_drawMtx[1][3] = fVar1;
         constrainModel->m_drawMtx[2][3] = fVar1;

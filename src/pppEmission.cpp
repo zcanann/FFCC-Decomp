@@ -26,6 +26,7 @@ extern _pppMngStEmission* pppMngStPtr;
 extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
+extern "C" int strcmp__FPCcPCc(const char*, const char*);
 extern const char DAT_803311fc;
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;
@@ -106,9 +107,10 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
 
     EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
     EmissionMeshData* meshData = meshList[meshIndex].m_data;
-    EmissionDisplayList* displayList = meshData->m_displayLists + displayListIndex;
+    EmissionDisplayList* displayList = meshData->m_displayLists;
+    displayList = displayList + displayListIndex;
 
-    if (strcmp((char*)meshData, &DAT_803311fc) == 0) {
+    if (strcmp__FPCcPCc((char*)meshData, &DAT_803311fc) == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;

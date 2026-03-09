@@ -76,6 +76,7 @@ extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
 unsigned char CFlat[0x10440];
+CFlatRuntime2& gCFlatRuntime2 = *reinterpret_cast<CFlatRuntime2*>(CFlat);
 unsigned char m_objItem[0xAF80];
 unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
@@ -2590,7 +2591,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 	case 0xE:
 		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xFD) | ((value8 & 1) << 1));
-		ChangeMogMode__6CCharaFi(Chara, controlValue);
+		ChangeMogMode__6CCharaFi(&gChara, controlValue);
 		break;
 
 	case 0x12:
@@ -2608,7 +2609,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	}
 
 	case 0x14:
-		TimeMogFur__6CCharaFv(Chara);
+		TimeMogFur__6CCharaFv(&gChara);
 		break;
 
 	case 0x17:

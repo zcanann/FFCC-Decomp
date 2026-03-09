@@ -315,7 +315,7 @@ void CGame::Init()
 
     CameraPcs.Init();
     Init__11CGraphicPcsFv(&GraphicsPcs);
-    Init__6CCharaFv(Chara);
+    Init__6CCharaFv(&gChara);
     Init__9CLightPcsFv(&LightPcs);
     CharaPcs.Init();
     Init__7CMapPcsFv(&MapPcs);
@@ -365,7 +365,7 @@ void CGame::Quit()
 	Quit__7CGbaPcsFv(&GbaPcs);
 	MenuPcs.Quit();
 	Quit__7CUSBPcsFv(&USBPcs);
-	Quit__6CCharaFv(Chara);
+	Quit__6CCharaFv(&gChara);
 	CharaPcs.Quit();
 	Quit__9CLightPcsFv(&LightPcs);
 	Quit__7CMapPcsFv(&MapPcs);
@@ -613,7 +613,7 @@ void CGame::InitNewGame()
     }
 
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
-    reinterpret_cast<CChara*>(Chara)->InitFurTexBuffer();
+    gChara.InitFurTexBuffer();
 }
 
 /*
@@ -811,7 +811,7 @@ void CGame::CheckScriptChange()
 
         strcpy(m_gameWork.m_townName, townName);
         ResetNewGame__13CFlatRuntime2Fv(CFlat);
-        reinterpret_cast<CChara*>(Chara)->InitFurTexBuffer();
+        gChara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }
 

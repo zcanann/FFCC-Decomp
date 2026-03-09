@@ -18,7 +18,7 @@ CMemoryCardMan MemoryCardMan;
 
 static inline CChara* GetCharaGlobal()
 {
-    return reinterpret_cast<CChara*>(Chara);
+    return &gChara;
 }
 
 // CRC32 lookup table

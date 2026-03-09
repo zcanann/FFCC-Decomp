@@ -1,4 +1,5 @@
 #include "ffcc/p_mc.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 
@@ -39,9 +40,6 @@ struct MenuPcsMcLayout
     unsigned char unk19[7];
     McCtrl m_mcCtrl;
 };
-
-class CMenuPcs;
-extern CMenuPcs MenuPcs;
 
 /*
  * --INFO--

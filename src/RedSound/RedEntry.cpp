@@ -1050,7 +1050,14 @@ void CRedEntry::DisplaySePlayInfo()
  */
 void CRedEntry::MusicHistoryAdd()
 {
-	// TODO
+	unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+
+	do {
+		if (*reinterpret_cast<int*>(history + 4) != 0) {
+			*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
+		}
+		history += 0x10;
+	} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8)) + 0x40);
 }
 
 /*

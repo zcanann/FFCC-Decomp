@@ -28,6 +28,7 @@ once_pattern = re.compile(r"^#\s*pragma\s+once$")
 
 defines = set()
 deps = []
+active_imports = set()
 
 
 def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
@@ -89,16 +90,24 @@ def import_h_file(in_file: str, r_path: str) -> str:
 
 
 def import_c_file(in_file: str) -> str:
-    in_file = os.path.relpath(in_file, root_dir)
+    in_file = os.path.normpath(os.path.relpath(in_file, root_dir))
+    if in_file in active_imports:
+        print("Skipping recursive include", in_file)
+        return f"/* Skipped recursive include: {in_file} */\n"
+
+    active_imports.add(in_file)
     deps.append(in_file)
     out_text = ""
+    full_path = os.path.join(root_dir, in_file)
 
     try:
-        with open(in_file, encoding="utf-8") as file:
+        with open(full_path, encoding="utf-8") as file:
             out_text += process_file(in_file, list(file))
     except Exception:
-        with open(in_file) as file:
+        with open(full_path) as file:
             out_text += process_file(in_file, list(file))
+    finally:
+        active_imports.discard(in_file)
     return out_text
 
 
@@ -178,6 +187,9 @@ def main():
 
     if args.include is None:
         exit("No include directories specified")
+    defines.clear()
+    deps.clear()
+    active_imports.clear()
     global include_dirs
     include_dirs = args.include
     global exclude_globs

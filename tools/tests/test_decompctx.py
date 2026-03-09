@@ -1,4 +1,6 @@
 import unittest
+import tempfile
+from pathlib import Path
 
 from tools import decompctx
 
@@ -49,6 +51,32 @@ class HeaderGuardKeyTests(unittest.TestCase):
             "#ifndef EXAMPLE_H\n",
         ]
         self.assertIsNone(decompctx.get_header_guard_key("include/example.h", lines))
+
+
+class ImportBehaviorTests(unittest.TestCase):
+    def setUp(self):
+        decompctx.defines.clear()
+        decompctx.deps.clear()
+        decompctx.active_imports.clear()
+
+    def test_import_c_file_skips_recursive_include_cycle(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / "a.h").write_text('#include "b.h"\n', encoding="utf-8")
+            (root / "b.h").write_text('#include "a.h"\n', encoding="utf-8")
+
+            old_root = decompctx.root_dir
+            old_include_dirs = decompctx.include_dirs
+            try:
+                decompctx.root_dir = str(root)
+                decompctx.include_dirs = [str(root)]
+                output = decompctx.import_c_file(str(root / "a.h"))
+            finally:
+                decompctx.root_dir = old_root
+                decompctx.include_dirs = old_include_dirs
+
+            self.assertIn("Skipped recursive include", output)
+            self.assertEqual(decompctx.active_imports, set())
 
 
 if __name__ == "__main__":

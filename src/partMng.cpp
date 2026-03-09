@@ -1092,7 +1092,130 @@ void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
  */
 void CPartMng::pppEditAllReleaseResource()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(self + 0x7E4);
+    CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x7E8);
+    int iVar3;
+    CMapMesh* mapMesh;
+    int* piVar4;
+    int iVar5;
+    unsigned char* iter;
+
+    if (materialSet != 0) {
+        if (materialSet != 0) {
+            reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(materialSet))[2])(materialSet, 1);
+        }
+        *reinterpret_cast<CMaterialSet**>(self + 0x7E4) = 0;
+    }
+    if (textureSet != 0) {
+        if (textureSet != 0) {
+            reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(textureSet))[2])(textureSet, 1);
+        }
+        *reinterpret_cast<CTextureSet**>(self + 0x7E8) = 0;
+    }
+
+    iVar3 = 0;
+    iter = self;
+    do {
+        if (*reinterpret_cast<void**>(iter + 0x1D4) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D4));
+            *reinterpret_cast<void**>(iter + 0x1D4) = 0;
+        }
+        iVar3 = iVar3 + 1;
+        iter = iter + 0xC;
+    } while (iVar3 < 0x80);
+
+    iVar3 = 0;
+    iter = self;
+    do {
+        if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D8));
+            *reinterpret_cast<void**>(iter + 0x1D8) = 0;
+        }
+        iVar3 = iVar3 + 1;
+        iter = iter + 0xC;
+    } while (iVar3 < 0x80);
+
+    iVar3 = 0;
+    iter = self;
+    do {
+        if (*reinterpret_cast<long**>(iter + 0x1DC) != 0) {
+            __dl__FPv(*reinterpret_cast<long**>(iter + 0x1DC));
+            *reinterpret_cast<long**>(iter + 0x1DC) = 0;
+        }
+        iVar3 = iVar3 + 1;
+        iter = iter + 0xC;
+    } while (iVar3 < 0x80);
+
+    if (*reinterpret_cast<void**>(self + 0x23554) != 0) {
+        __dla__FPv(*reinterpret_cast<void**>(self + 0x23554));
+        *reinterpret_cast<void**>(self + 0x23554) = 0;
+    }
+
+    if (*reinterpret_cast<int*>(self + 0x7F4) != 0) {
+        iVar5 = 0;
+        iVar3 = 0;
+        do {
+            mapMesh = *reinterpret_cast<CMapMesh**>(*reinterpret_cast<int*>(self + 0x7F4) + iVar5);
+            if (mapMesh != 0) {
+                mapMesh->~CMapMesh();
+                __dl__FPv(mapMesh);
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x7F4) + iVar5) = 0;
+            }
+            iVar3 = iVar3 + 1;
+            iVar5 = iVar5 + 4;
+        } while (iVar3 < 0x88);
+
+        if (*reinterpret_cast<int*>(self + 0x7F4) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(self + 0x7F4));
+            *reinterpret_cast<int*>(self + 0x7F4) = 0;
+        }
+    }
+
+    if (*reinterpret_cast<int*>(self + 0x7F8) != 0) {
+        iVar3 = 0;
+        iVar5 = 0;
+        do {
+            piVar4 = *reinterpret_cast<int**>(*reinterpret_cast<int*>(self + 0x7F8) + iVar5);
+            if (piVar4 != 0) {
+                if (piVar4 != 0) {
+                    if (*piVar4 != 0) {
+                        __dl__FPv(reinterpret_cast<void*>(*piVar4));
+                        *piVar4 = 0;
+                    }
+                    if (piVar4[1] != 0) {
+                        __dl__FPv(reinterpret_cast<void*>(piVar4[1]));
+                        piVar4[1] = 0;
+                    }
+                    __dl__FPv(piVar4);
+                }
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x7F8) + iVar5) = 0;
+            }
+            iVar3 = iVar3 + 1;
+            iVar5 = iVar5 + 4;
+        } while (iVar3 < 0x80);
+
+        if (*reinterpret_cast<int*>(self + 0x7F8) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(self + 0x7F8));
+            *reinterpret_cast<int*>(self + 0x7F8) = 0;
+        }
+    }
+
+    iVar3 = 0;
+    iter = self;
+    do {
+        if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D8));
+            *reinterpret_cast<void**>(iter + 0x1D8) = 0;
+        }
+        iVar3 = iVar3 + 1;
+        iter = iter + 0xC;
+    } while (iVar3 < 0x80);
+
+    if (*reinterpret_cast<int*>(self + 0x7FC) != 0) {
+        __dl__FPv(*reinterpret_cast<void**>(self + 0x7FC));
+        *reinterpret_cast<int*>(self + 0x7FC) = 0;
+    }
 }
 
 /*

@@ -49,6 +49,10 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.version }}-${{ github.sha }}
         restore-keys: ${{ runner.os }}-${{ matrix.version }}-
 
+    # Run Python unit tests for automation scripts
+    - name: Run unit tests
+      run: python3 -m unittest -q
+
     # Build the project
     - name: Build
       run: |

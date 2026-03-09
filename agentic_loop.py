@@ -44,7 +44,11 @@ def _resolve_agents_file_in_dir(directory: Path) -> Optional[Path]:
 
 
 def _resolve_agents_filename() -> str:
-    cwd = Path.cwd()
+    try:
+        cwd = Path.cwd()
+    except OSError:
+        return AGENTS_FILE_CANDIDATES[0]
+
     for directory in [cwd, *cwd.parents]:
         agents_file = _resolve_agents_file_in_dir(directory)
         if agents_file is None:

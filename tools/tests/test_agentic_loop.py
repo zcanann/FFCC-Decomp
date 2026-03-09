@@ -65,6 +65,10 @@ class TestAgenticLoop(unittest.TestCase):
             finally:
                 os.chdir(prev_cwd)
 
+    def test_resolve_agents_filename_defaults_when_cwd_unavailable(self):
+        with patch("agentic_loop.Path.cwd", side_effect=FileNotFoundError):
+            self.assertEqual(agentic_loop._resolve_agents_filename(), "AGENTS.md")
+
     def test_resolve_agents_filename_checks_candidates_when_listdir_fails(self):
         with patch("agentic_loop.os.listdir", side_effect=OSError("no listdir")):
             with patch("agentic_loop.Path.is_file", side_effect=[False, True]):

@@ -1,3 +1,4 @@
+#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppYmBreath.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
@@ -997,6 +998,5 @@ void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short part
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
-
 
 

@@ -11,9 +11,16 @@ struct PYmBreath;
 struct VColor;
 struct _PARTICLE_DATA;
 struct _PARTICLE_COLOR;
+
+#ifdef PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
+struct PARTICLE_DATA;
+struct PARTICLE_WMAT;
+struct PARTICLE_COLOR;
+#else
 typedef _PARTICLE_DATA PARTICLE_DATA;
 typedef Mtx PARTICLE_WMAT;
 typedef _PARTICLE_COLOR PARTICLE_COLOR;
+#endif
 
 void get_rand(void);
 void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
@@ -40,4 +47,3 @@ void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short);
 void IsExistGroupParticle(PYmBreath*, VYmBreath*, short);
 
 #endif // _PPP_YMBREATH_H_
-

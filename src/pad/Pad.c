@@ -186,13 +186,23 @@ static void PADOriginCallback(s32 chan, u32 error, OSContext* context) {
 }
 
 static void PADOriginUpdateCallback(s32 chan, u32 error, OSContext* context) {
+    BOOL enabled;
+    u32 mask;
     ASSERTLINE(671, 0 <= chan && chan < SI_MAX_CHAN);
     if (!(EnabledBits & (PAD_CHAN0_BIT >> chan)))
         return;
     if (!(error & (SI_ERROR_UNDER_RUN | SI_ERROR_OVER_RUN | SI_ERROR_NO_RESPONSE | SI_ERROR_COLLISION)))
         UpdateOrigin(chan);
     if (error & SI_ERROR_NO_RESPONSE) {
-        PADDisable(chan);
+        enabled = OSDisableInterrupts();
+        SIDisablePolling(PAD_CHAN0_BIT >> chan);
+        mask = ~(PAD_CHAN0_BIT >> chan);
+        EnabledBits &= mask;
+        WaitingBits &= mask;
+        CheckingBits &= mask;
+        PendingBits &= mask;
+        OSSetWirelessID(chan, 0);
+        OSRestoreInterrupts(enabled);
     }
 }
 
@@ -309,8 +319,8 @@ int PADReset(u32 mask) {
     enabled = OSDisableInterrupts();
     mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
     ResettingBits |= mask;
-    disableBits = ResettingBits & EnabledBits;
     PendingBits = 0;
+    disableBits = ResettingBits & EnabledBits;
     if (Spec == PAD_SPEC_4) {
         RecalibrateBits |= mask;
     }

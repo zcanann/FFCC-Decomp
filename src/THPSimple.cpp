@@ -293,7 +293,7 @@ s32 THPSimpleClose(void)
         return 0;
     }
 
-    if ((control->hasAudio != 0) && (control->isBufferSet != 0)) {
+    if ((control->hasAudio != 0) && (control->isBufferSet == 1)) {
         return 0;
     }
 

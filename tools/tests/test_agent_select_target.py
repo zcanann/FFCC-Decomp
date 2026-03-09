@@ -167,6 +167,56 @@ class AgentSelectTargetTests(unittest.TestCase):
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0]["source_file"], "unknown")
 
+    def test_extract_candidates_ignores_non_dict_unit_rows(self):
+        report = {
+            "units": [
+                "not-a-unit",
+                {
+                    "name": "build/foo.o",
+                    "metadata": {"source_path": "src/foo.cpp"},
+                    "measures": {"fuzzy_match_percent": 10, "matched_code_percent": 10, "matched_data_percent": 10},
+                    "functions": [],
+                },
+            ]
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as report_file:
+            json.dump(report, report_file)
+            report_path = Path(report_file.name)
+
+        try:
+            with patch("tools.agent_select_target.load_blacklist", return_value=[]):
+                candidates = agent_select_target.extract_candidates(report_path)
+        finally:
+            report_path.unlink()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["name"], "build/foo.o")
+
+    def test_extract_candidates_ignores_non_dict_function_rows(self):
+        report = {
+            "units": [
+                {
+                    "name": "build/foo.o",
+                    "metadata": {"source_path": "src/foo.cpp"},
+                    "measures": {"fuzzy_match_percent": 10, "matched_code_percent": 10, "matched_data_percent": 10},
+                    "functions": ["bad-func-row", {"name": "f_ok", "fuzzy_match_percent": 50, "size": 8}],
+                }
+            ]
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as report_file:
+            json.dump(report, report_file)
+            report_path = Path(report_file.name)
+
+        try:
+            with patch("tools.agent_select_target.load_blacklist", return_value=[]):
+                candidates = agent_select_target.extract_candidates(report_path)
+        finally:
+            report_path.unlink()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(len(candidates[0]["top_functions"]), 1)
+        self.assertEqual(candidates[0]["top_functions"][0]["name"], "f_ok")
+
 
 if __name__ == "__main__":
     unittest.main()

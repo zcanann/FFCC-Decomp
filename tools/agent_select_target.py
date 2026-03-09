@@ -30,6 +30,16 @@ def _metadata_dict(unit):
     return metadata if isinstance(metadata, dict) else {}
 
 
+def _dict_or_empty(value):
+    """Return dict value when valid; otherwise an empty dict."""
+    return value if isinstance(value, dict) else {}
+
+
+def _list_or_empty(value):
+    """Return list value when valid; otherwise an empty list."""
+    return value if isinstance(value, list) else []
+
+
 def _safe_float(value, default=0.0):
     """Convert mixed report values to float without raising on malformed data."""
     try:
@@ -68,10 +78,13 @@ def load_blacklist():
 
 def is_viable_target(unit, blacklist):
     """Check if unit is a good target candidate"""
+    if not isinstance(unit, dict):
+        return False, "invalid unit row"
+
     name = unit.get("name")
     if not name:
         return False, "missing name"
-    measures = unit.get("measures", {})
+    measures = _dict_or_empty(unit.get("measures"))
 
     # Skip auto-generated units
     if _metadata_dict(unit).get("auto_generated", False):
@@ -157,15 +170,15 @@ def extract_candidates(report_path):
     blacklist = load_blacklist()
     candidates = []
 
-    units = data.get("units", [])
+    units = _list_or_empty(data.get("units")) if isinstance(data, dict) else []
 
     for unit in units:
         viable, _reason = is_viable_target(unit, blacklist)
         if not viable:
             continue
 
-        measures = unit.get("measures", {})
-        functions = unit.get("functions", [])
+        measures = _dict_or_empty(unit.get("measures"))
+        functions = _list_or_empty(unit.get("functions"))
         source_path = _metadata_dict(unit).get("source_path", "unknown")
         source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
         unit_name = unit.get("name")
@@ -187,7 +200,8 @@ def extract_candidates(report_path):
             "top_functions": []
         }
 
-        for func in sorted(functions, key=lambda f: _safe_float(f.get("fuzzy_match_percent", 0), default=100.0))[:3]:
+        dict_functions = [func for func in functions if isinstance(func, dict)]
+        for func in sorted(dict_functions, key=lambda f: _safe_float(f.get("fuzzy_match_percent", 0), default=100.0))[:3]:
             func_match = _safe_float(func.get("fuzzy_match_percent", 0), default=100.0)
             if func_match < 99:
                 func_name = func.get("name", "unknown")

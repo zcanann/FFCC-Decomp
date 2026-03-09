@@ -97,11 +97,11 @@ void CFile::Init()
 
     const int kHandleCount = 0x80;
 
-    m_stage = Memory.CreateStage(0x10ac00, s_cFile, 0);
+    m_0x08 = Memory.CreateStage(0x10ac00, s_cFile, 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
-    m_readBuffer = new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2b) unsigned char[0x100000];
-    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2e) CHandle[kHandleCount]);
+    m_readBuffer = new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2b) unsigned char[0x100000];
+    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2e) CHandle[kHandleCount]);
 
     CHandle* pool = (CHandle*)m_handlePoolHead.m_currentOffset;
 
@@ -140,7 +140,7 @@ void CFile::Quit()
         m_handlePoolHead.m_currentOffset = 0;
     }
 
-    Memory.DestroyStage((CMemory::CStage*)m_stage);
+    Memory.DestroyStage((CMemory::CStage*)m_0x08);
 }
 
 /*

@@ -461,13 +461,12 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
  */
 void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChangeTexData*)
 {
-	unsigned int local_8[2];
+	int textureIndex;
 	if (step->m_dataValIndex != 0xffff) {
 		_pppEnvStYmChangeTex* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
-		CMaterialSet* materialSet = env->m_materialSetPtr;
-		(int&)local_8[0] = 0;
-		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, materialSet, (int&)local_8[0]);
+		textureIndex = 0;
+		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, env->m_materialSetPtr, textureIndex);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	}
 }

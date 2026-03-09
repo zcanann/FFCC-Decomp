@@ -78,6 +78,27 @@ def _read_int_env(var_name: str, default: int, minimum: Optional[int] = None) ->
     return value
 
 
+def _read_optional_int_env(var_name: str, minimum: Optional[int] = None) -> Optional[int]:
+    raw_value = os.getenv(var_name)
+    if raw_value is None:
+        return None
+
+    try:
+        value = int(raw_value)
+    except ValueError:
+        log(f"invalid integer for {var_name}={raw_value!r}; ignoring value")
+        return None
+
+    if minimum is not None and value < minimum:
+        log(
+            f"invalid integer for {var_name}={raw_value!r}; minimum is {minimum}; "
+            "ignoring value"
+        )
+        return None
+
+    return value
+
+
 def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
     """Signal the full process tree when possible."""
     if proc.poll() is not None:
@@ -166,10 +187,20 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         type=int,
         help="Maximum exponential backoff delay in seconds between retries.",
     )
+    parser.add_argument(
+        "--max-runs",
+        type=int,
+        help=(
+            "Maximum number of codex runs before exiting. "
+            "By default, the loop runs indefinitely."
+        ),
+    )
     return parser.parse_args([] if argv is None else argv)
 
 
-def _resolve_runtime_config(argv: Optional[list[str]] = None) -> tuple[str, int, int, int]:
+def _resolve_runtime_config(
+    argv: Optional[list[str]] = None,
+) -> tuple[str, int, int, int, Optional[int]]:
     args = _parse_args(argv)
     prompt = args.prompt
     if prompt is None:
@@ -193,6 +224,11 @@ def _resolve_runtime_config(argv: Optional[list[str]] = None) -> tuple[str, int,
         if args.max_backoff_seconds is not None
         else _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300, minimum=1)
     )
+    max_runs = (
+        args.max_runs
+        if args.max_runs is not None
+        else _read_optional_int_env("AGENTIC_MAX_RUNS", minimum=1)
+    )
 
     if timeout_seconds < 1:
         log(
@@ -212,8 +248,14 @@ def _resolve_runtime_config(argv: Optional[list[str]] = None) -> tuple[str, int,
             "minimum is 1; using default 300"
         )
         max_backoff_seconds = 300
+    if max_runs is not None and max_runs < 1:
+        log(
+            f"invalid value for --max-runs={max_runs!r}; minimum is 1; "
+            "running indefinitely"
+        )
+        max_runs = None
 
-    return prompt, timeout_seconds, terminate_grace_seconds, max_backoff_seconds
+    return prompt, timeout_seconds, terminate_grace_seconds, max_backoff_seconds, max_runs
 
 
 def run_agentic_loop(
@@ -221,12 +263,19 @@ def run_agentic_loop(
     timeout_seconds: int,
     terminate_grace_seconds: int,
     max_backoff_seconds: int,
+    max_runs: Optional[int] = None,
 ) -> None:
     cmd = ["codex", "exec", "--yolo", prompt]
     consecutive_failures = 0
+    run_count = 0
 
     while True:
-        log("starting codex run")
+        if max_runs is not None and run_count >= max_runs:
+            log(f"reached max runs ({max_runs}); stopping loop")
+            break
+
+        run_count += 1
+        log(f"starting codex run #{run_count}")
         try:
             proc = subprocess.Popen(
                 cmd,
@@ -278,12 +327,14 @@ def main(argv: Optional[list[str]] = None) -> None:
         timeout_seconds,
         terminate_grace_seconds,
         max_backoff_seconds,
+        max_runs,
     ) = _resolve_runtime_config(argv)
     run_agentic_loop(
         prompt=prompt,
         timeout_seconds=timeout_seconds,
         terminate_grace_seconds=terminate_grace_seconds,
         max_backoff_seconds=max_backoff_seconds,
+        max_runs=max_runs,
     )
 
 

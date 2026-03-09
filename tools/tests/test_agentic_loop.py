@@ -93,6 +93,7 @@ class TestAgenticLoop(unittest.TestCase):
             "AGENTIC_TIMEOUT_SECONDS": "1",
             "AGENTIC_TERMINATE_GRACE_SECONDS": "2",
             "AGENTIC_MAX_BACKOFF_SECONDS": "3",
+            "AGENTIC_MAX_RUNS": "4",
         }
         with patch.dict(os.environ, env, clear=True):
             with patch("agentic_loop.run_agentic_loop") as mock_run:
@@ -103,6 +104,7 @@ class TestAgenticLoop(unittest.TestCase):
             timeout_seconds=1,
             terminate_grace_seconds=2,
             max_backoff_seconds=3,
+            max_runs=4,
         )
 
     def test_main_uses_default_prompt_when_env_prompt_is_blank(self):
@@ -121,6 +123,7 @@ class TestAgenticLoop(unittest.TestCase):
             timeout_seconds=1,
             terminate_grace_seconds=2,
             max_backoff_seconds=3,
+            max_runs=None,
         )
 
     def test_main_uses_defaults_for_out_of_range_numeric_env(self):
@@ -139,6 +142,7 @@ class TestAgenticLoop(unittest.TestCase):
             timeout_seconds=25 * 60,
             terminate_grace_seconds=10,
             max_backoff_seconds=300,
+            max_runs=None,
         )
 
     def test_main_cli_arguments_override_environment(self):
@@ -147,6 +151,7 @@ class TestAgenticLoop(unittest.TestCase):
             "AGENTIC_TIMEOUT_SECONDS": "11",
             "AGENTIC_TERMINATE_GRACE_SECONDS": "12",
             "AGENTIC_MAX_BACKOFF_SECONDS": "13",
+            "AGENTIC_MAX_RUNS": "14",
         }
         with patch.dict(os.environ, env, clear=True):
             with patch("agentic_loop.run_agentic_loop") as mock_run:
@@ -160,6 +165,8 @@ class TestAgenticLoop(unittest.TestCase):
                         "2",
                         "--max-backoff-seconds",
                         "3",
+                        "--max-runs",
+                        "5",
                     ]
                 )
 
@@ -168,6 +175,7 @@ class TestAgenticLoop(unittest.TestCase):
             timeout_seconds=1,
             terminate_grace_seconds=2,
             max_backoff_seconds=3,
+            max_runs=5,
         )
 
     def test_main_blank_cli_prompt_uses_default(self):
@@ -197,6 +205,29 @@ class TestAgenticLoop(unittest.TestCase):
             timeout_seconds=25 * 60,
             terminate_grace_seconds=10,
             max_backoff_seconds=300,
+            max_runs=None,
+        )
+
+    def test_main_ignores_invalid_max_runs_env(self):
+        env = {
+            "AGENTIC_PROMPT": "x",
+            "AGENTIC_TIMEOUT_SECONDS": "1",
+            "AGENTIC_TERMINATE_GRACE_SECONDS": "2",
+            "AGENTIC_MAX_BACKOFF_SECONDS": "3",
+            "AGENTIC_MAX_RUNS": "0",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch("agentic_loop.log") as mock_log:
+                with patch("agentic_loop.run_agentic_loop") as mock_run:
+                    agentic_loop.main()
+
+        mock_log.assert_called_once()
+        mock_run.assert_called_once_with(
+            prompt="x",
+            timeout_seconds=1,
+            terminate_grace_seconds=2,
+            max_backoff_seconds=3,
+            max_runs=None,
         )
 
     def test_run_agentic_loop_timeout_applies_backoff_sleep(self):
@@ -215,10 +246,32 @@ class TestAgenticLoop(unittest.TestCase):
                         timeout_seconds=1,
                         terminate_grace_seconds=2,
                         max_backoff_seconds=300,
+                        max_runs=None,
                     )
 
         mock_stop.assert_called_once_with(fake_proc, 2)
         mock_sleep.assert_called_once_with(2)
+
+    def test_run_agentic_loop_stops_at_max_runs_after_success(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=0,
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc) as mock_popen:
+            with patch("agentic_loop._sleep_interruptible") as mock_sleep:
+                agentic_loop.run_agentic_loop(
+                    prompt="x",
+                    timeout_seconds=1,
+                    terminate_grace_seconds=2,
+                    max_backoff_seconds=300,
+                    max_runs=1,
+                )
+
+        mock_popen.assert_called_once()
+        mock_sleep.assert_not_called()
 
     def test_stop_process_tree_uses_kill_signal_constant_after_timeout(self):
         fake_proc = SimpleNamespace(

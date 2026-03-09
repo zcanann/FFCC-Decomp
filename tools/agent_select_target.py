@@ -24,6 +24,12 @@ WARNING_BUILD_MISMATCH = (
 COMPLETE_THRESHOLD_PERCENT = 100
 
 
+def _metadata_dict(unit):
+    """Return metadata as a dict even when report rows use null/invalid types."""
+    metadata = unit.get("metadata")
+    return metadata if isinstance(metadata, dict) else {}
+
+
 def _safe_float(value, default=0.0):
     """Convert mixed report values to float without raising on malformed data."""
     try:
@@ -68,7 +74,7 @@ def is_viable_target(unit, blacklist):
     measures = unit.get("measures", {})
 
     # Skip auto-generated units
-    if unit.get("metadata", {}).get("auto_generated", False):
+    if _metadata_dict(unit).get("auto_generated", False):
         return False, "auto-generated"
 
     # Skip recently failed units
@@ -90,7 +96,7 @@ def is_viable_target(unit, blacklist):
     return True, "viable"
 
 def derive_object_file(unit):
-    source_path = unit.get("metadata", {}).get("source_path")
+    source_path = _metadata_dict(unit).get("source_path")
     if source_path and source_path != "unknown":
         base = Path(source_path).stem
         return f"{base}.o"
@@ -102,7 +108,7 @@ def derive_object_file(unit):
     return f"{base}.o"
 
 def derive_source_file(unit):
-    source_path = unit.get("metadata", {}).get("source_path")
+    source_path = _metadata_dict(unit).get("source_path")
     if source_path and source_path != "unknown":
         return Path(source_path).name
     name = unit.get("name", "")
@@ -160,7 +166,7 @@ def extract_candidates(report_path):
 
         measures = unit.get("measures", {})
         functions = unit.get("functions", [])
-        source_path = unit.get("metadata", {}).get("source_path", "unknown")
+        source_path = _metadata_dict(unit).get("source_path", "unknown")
         source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
         unit_name = unit.get("name")
         if not unit_name:

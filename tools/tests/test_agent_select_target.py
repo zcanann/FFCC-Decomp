@@ -125,6 +125,48 @@ class AgentSelectTargetTests(unittest.TestCase):
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0]["top_functions"][0]["name"], "unknown")
 
+    def test_is_viable_target_handles_null_metadata(self):
+        unit = {
+            "name": "main/foo",
+            "metadata": None,
+            "measures": {
+                "fuzzy_match_percent": 10,
+                "matched_code_percent": 10,
+                "matched_data_percent": 10,
+            },
+        }
+        viable, reason = agent_select_target.is_viable_target(unit, [])
+        self.assertTrue(viable)
+        self.assertEqual(reason, "viable")
+
+    def test_extract_candidates_handles_null_metadata(self):
+        report = {
+            "units": [
+                {
+                    "name": "main/foo",
+                    "metadata": None,
+                    "measures": {
+                        "fuzzy_match_percent": 20,
+                        "matched_code_percent": 20,
+                        "matched_data_percent": 20,
+                    },
+                    "functions": [],
+                }
+            ]
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as report_file:
+            json.dump(report, report_file)
+            report_path = Path(report_file.name)
+
+        try:
+            with patch("tools.agent_select_target.load_blacklist", return_value=[]):
+                candidates = agent_select_target.extract_candidates(report_path)
+        finally:
+            report_path.unlink()
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["source_file"], "unknown")
+
 
 if __name__ == "__main__":
     unittest.main()

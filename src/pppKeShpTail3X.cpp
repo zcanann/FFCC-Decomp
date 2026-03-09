@@ -79,7 +79,12 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         Vec* history = (Vec*)(work + 0x18);
         s32 i = 0x1c;
         do {
-            pppCopyVector__FR3Vec3Vec(history, &temp);
+            Vec historyPos;
+
+            historyPos.x = temp.x;
+            historyPos.y = temp.y;
+            historyPos.z = temp.z;
+            pppCopyVector__FR3Vec3Vec(history, &historyPos);
             history++;
             i--;
         } while (i > 0);
@@ -107,7 +112,10 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         pos.z = outMatrix.value[2][3];
     }
 
-    pppCopyVector__FR3Vec3Vec((Vec*)(work + ((u8*)work)[0x1c2] * 6 + 0x18), &pos);
+    temp.x = pos.x;
+    temp.y = pos.y;
+    temp.z = pos.z;
+    pppCopyVector__FR3Vec3Vec((Vec*)(work + ((u8*)work)[0x1c2] * 6 + 0x18), &temp);
 
     work[8] += work[0xc];
     work[0] += work[8];
@@ -482,7 +490,6 @@ void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }
-
 
 
 

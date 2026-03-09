@@ -42,9 +42,11 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(agent_select_target.safe_int("not-a-number"), 0)
         self.assertEqual(agent_select_target.safe_int(None, 7), 7)
 
-    def test_safe_int_parses_hex_and_float_strings(self):
+    def test_safe_int_parses_prefixed_and_float_strings(self):
         self.assertEqual(agent_select_target.safe_int("0x20"), 32)
         self.assertEqual(agent_select_target.safe_int("-0x10"), -16)
+        self.assertEqual(agent_select_target.safe_int("0o12"), 10)
+        self.assertEqual(agent_select_target.safe_int("-0b101"), -5)
         self.assertEqual(agent_select_target.safe_int("12.0"), 12)
 
     def test_safe_float_returns_default_for_non_finite_values(self):

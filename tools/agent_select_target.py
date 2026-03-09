@@ -44,9 +44,12 @@ def safe_int(value, default=0):
             value = value.strip()
             if not value:
                 return default
-            # Accept explicit integer bases like 0x.. while keeping decimal strings stable.
+            # Accept explicit integer bases while keeping plain decimal strings stable.
+            # (e.g. "010" should stay decimal, not octal)
+            lower_value = value.lower()
+            has_explicit_base = lower_value.startswith(("+0x", "-0x", "0x", "+0o", "-0o", "0o", "+0b", "-0b", "0b"))
             try:
-                return int(value, 0 if value.lower().startswith(("+0x", "-0x", "0x")) else 10)
+                return int(value, 0 if has_explicit_base else 10)
             except ValueError:
                 # Some reports may serialize integral values as float-like strings (e.g. "12.0").
                 parsed = float(value)

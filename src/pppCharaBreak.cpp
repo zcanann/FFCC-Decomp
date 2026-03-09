@@ -632,15 +632,16 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     float fVar1 = FLOAT_80332048;
     int dataOffset = data->m_serializedDataOffsets[2];
+    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
 
-    *(u32*)((u8*)charaBreak + 0x9C + dataOffset) = 0;
-    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = fVar1;
-    *(u32*)((u8*)charaBreak + 0xC4 + dataOffset) = 1;
+    *(u32*)(work + 0x1C) = 0;
+    *(float*)(work + 0xC) = fVar1;
+    *(float*)(work + 8) = fVar1;
+    *(float*)(work + 4) = fVar1;
+    *(float*)(work + 0x18) = fVar1;
+    *(float*)(work + 0x14) = fVar1;
+    *(float*)(work + 0x10) = fVar1;
+    *(u32*)(work + 0x44) = 1;
 }
 
 /*
@@ -656,13 +657,14 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     float fVar1 = FLOAT_80332048;
     int dataOffset = data->m_serializedDataOffsets[2];
+    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
 
-    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = fVar1;
-    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = fVar1;
+    *(float*)(work + 0xC) = FLOAT_80332048;
+    *(float*)(work + 8) = fVar1;
+    *(float*)(work + 4) = fVar1;
+    *(float*)(work + 0x18) = fVar1;
+    *(float*)(work + 0x14) = fVar1;
+    *(float*)(work + 0x10) = fVar1;
 }
 
 /*
@@ -915,13 +917,14 @@ fail:
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
+    u8* colorWork = (u8*)charaBreak + 0x80 + colorOffset;
     u8* work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
 
     if (*(u32*)(work + 0x44) != 0) {
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         pppInitBlendMode__Fv();
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (u8*)charaBreak + 0x88 + colorOffset,
+            colorWork + 8,
             (u8*)charaBreak + 0x40,
             FLOAT_80332048,
             0,
@@ -935,7 +938,6 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
         work[0] = 0xFF;
         work[1] = 0xFF;
         work[2] = 0xFF;
-        work[3] = *((u8*)charaBreak + 0x8B + colorOffset);
+        work[3] = colorWork[0xB];
     }
 }
-

@@ -140,7 +140,7 @@ def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
             subprocess.run(cmd, check=False, capture_output=True)
     except ProcessLookupError:
         pass
-    except OSError:
+    except (OSError, ValueError):
         # Fall back to the direct process if group/tree signaling is unavailable.
         try:
             proc.send_signal(sig)

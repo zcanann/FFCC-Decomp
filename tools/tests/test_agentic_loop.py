@@ -516,6 +516,19 @@ class TestAgenticLoop(unittest.TestCase):
 
         fake_proc.send_signal.assert_called_once_with(agentic_loop.signal.SIGTERM)
 
+    def test_signal_process_tree_falls_back_to_direct_signal_when_killpg_raises_value_error(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            poll=Mock(return_value=None),
+            send_signal=Mock(),
+        )
+
+        with patch("agentic_loop.os.name", "posix"):
+            with patch("agentic_loop.os.killpg", side_effect=ValueError("bad pid")):
+                agentic_loop._signal_process_tree(fake_proc, agentic_loop.signal.SIGTERM)
+
+        fake_proc.send_signal.assert_called_once_with(agentic_loop.signal.SIGTERM)
+
     def test_signal_process_tree_returns_when_process_already_exited(self):
         fake_proc = SimpleNamespace(
             pid=123,

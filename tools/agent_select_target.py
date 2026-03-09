@@ -11,7 +11,10 @@ import sys
 import random
 from pathlib import Path
 
-import extract_symbols
+try:
+    from . import extract_symbols
+except ImportError:
+    import extract_symbols
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
 WARNING_BUILD_MISMATCH = (
@@ -68,7 +71,7 @@ def derive_object_file(unit):
         base = Path(source_path).stem
         return f"{base}.o"
     name = unit.get("name", "")
-    base = Path(name).name
+    base = Path(name).stem
     return f"{base}.o"
 
 def derive_source_file(unit):
@@ -76,7 +79,7 @@ def derive_source_file(unit):
     if source_path and source_path != "unknown":
         return Path(source_path).name
     name = unit.get("name", "")
-    base = Path(name).name
+    base = Path(name).stem
     return f"{base}.cpp"
 
 def summarize_symbols(label, all_info):

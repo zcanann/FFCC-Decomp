@@ -51,19 +51,23 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
     int iVar7 = serializedDataOffsets[3];
     int iVar5 = serializedDataOffsets[2];
+    int frameOffset = iVar7 + 0x80;
+    int posOffset = iVar5 + 0x80;
+    u8* workFrame = (u8*)column + frameOffset;
+    u8* workPos = (u8*)column + posOffset;
     int textureIndex = 0;
 
     u32 dataValIndex = param_2->m_dataValIndex;
     if (dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         void* texture;
-        u8 alpha = *((u8*)column + 0xb2 + iVar5);
+        u8 alpha = *(u8*)(workPos + 0x32);
         pppCVector color;
         GXColor quadColor;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (alpha != 0) {
-            float* values = *(float**)((u8*)column + 0x88 + iVar7);
+            float* values = *(float**)(workFrame + 8);
             u8 count = param_2->m_count;
             Mtx identityMtx;
             Vec basePos;
@@ -75,9 +79,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             double drawScale = 0.0;
 
             PSMTXIdentity(identityMtx);
-            basePos.x = *(float*)((u8*)column + 0x90 + iVar5);
-            basePos.y = *(float*)((u8*)column + 0x94 + iVar5);
-            basePos.z = *(float*)((u8*)column + 0x98 + iVar5);
+            basePos.x = *(float*)(workPos + 0x10);
+            basePos.y = *(float*)(workPos + 0x14);
+            basePos.z = *(float*)(workPos + 0x18);
 
             cameraDelta.x = ppvCameraMatrix0[0][3] - basePos.x;
             cameraDelta.y = ppvCameraMatrix0[1][3] - basePos.y;
@@ -129,12 +133,12 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 pppSetBlendMode__FUc(param_2->m_arg3);
 
                 drawScale += values[0];
-                shapeFrame = *(short*)((u8*)shapeSt->m_animData + (*(u16*)((u8*)column + 0x82 + iVar7) * 8) + 0x10);
+                shapeFrame = *(short*)((u8*)shapeSt->m_animData + (*(u16*)(workFrame + 2) * 8) + 0x10);
                 for (int j = 0; j < *(short*)((u8*)shapeSt->m_animData + shapeFrame + 2); j++) {
                     pppGetShapePos__FPlsR3VecR3Veci((long*)shapeSt->m_animData,
-                                                    *(short*)((u8*)column + 0x82 + iVar7), shapePosA, shapePosB, j);
+                                                    *(short*)(workFrame + 2), shapePosA, shapePosB, j);
                     pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shapeSt->m_animData,
-                                                       *(short*)((u8*)column + 0x82 + iVar7), uvA, uvB, j);
+                                                       *(short*)(workFrame + 2), uvA, uvB, j);
 
                     PSVECScale(&shapePosA, &shapePosA, (float)drawScale);
                     PSVECScale(&shapePosB, &shapePosB, (float)drawScale);
@@ -195,7 +199,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         }
 
         u32 dataValIndex = param_2->m_dataValIndex;
-        if ((dataValIndex + 0x10000U) != 0xFFFFU) {
+        if (dataValIndex != 0xFFFFU) {
             long* animData = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
             pppCalcFrameShape__FPlRsRsRss(
                 animData,

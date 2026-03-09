@@ -42,6 +42,11 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(agent_select_target.safe_int("not-a-number"), 0)
         self.assertEqual(agent_select_target.safe_int(None, 7), 7)
 
+    def test_safe_int_parses_hex_and_float_strings(self):
+        self.assertEqual(agent_select_target.safe_int("0x20"), 32)
+        self.assertEqual(agent_select_target.safe_int("-0x10"), -16)
+        self.assertEqual(agent_select_target.safe_int("12.0"), 12)
+
     def test_is_viable_target_handles_non_numeric_measures(self):
         unit = {
             "name": "bad-measures",

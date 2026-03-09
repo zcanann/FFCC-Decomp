@@ -38,6 +38,16 @@ def safe_float(value, default=0.0):
 def safe_int(value, default=0):
     """Parse an int from mixed report values without throwing."""
     try:
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return default
+            # Accept explicit integer bases like 0x.. while keeping decimal strings stable.
+            try:
+                return int(value, 0 if value.lower().startswith(("+0x", "-0x", "0x")) else 10)
+            except ValueError:
+                # Some reports may serialize integral values as float-like strings (e.g. "12.0").
+                return int(float(value))
         return int(value)
     except (TypeError, ValueError):
         return default

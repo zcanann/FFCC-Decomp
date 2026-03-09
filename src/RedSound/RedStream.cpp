@@ -55,7 +55,7 @@ done:
 #pragma dont_inline on
 void _StreamStop(RedStreamDATA* streamData)
 {
-	fflush(&DAT_8021d1a8);
+	fflush(__files + 1);
 	if (*(int*)((int)streamData + 0x10c) != 0) {
 		*(int*)((int)streamData + 0x10c) = 0;
 		*(int*)((int)streamData + 0x110) = 0;
@@ -68,13 +68,13 @@ void _StreamStop(RedStreamDATA* streamData)
 			*(int*)((int)streamData + 0x12c) = 0;
 		}
 		*(unsigned int*)(*(int*)((int)streamData + 4) + 0x90) |= 2;
-		*(unsigned char*)(*(int*)((int)streamData + 0) + 0x26) &= 0xfd;
-		*(unsigned char*)(*(int*)((int)streamData + 4) + 0x1a) &= 0xfd;
+		*(unsigned char*)(*(int*)((int)streamData + 0) + 0x26) &= (unsigned char)~2;
+		*(unsigned char*)(*(int*)((int)streamData + 4) + 0x1a) &= (unsigned char)~2;
 		*(int*)(*(int*)((int)streamData + 4) + 0x8c) = 0;
 		if (*(short*)((int)streamData + 0x2a) == 2) {
 			*(unsigned int*)(*(int*)((int)streamData + 4) + 0x150) |= 2;
-			*(unsigned char*)(*(int*)((int)streamData + 0) + 0x17a) &= 0xfd;
-			*(unsigned char*)(*(int*)((int)streamData + 4) + 0xda) &= 0xfd;
+			*(unsigned char*)(*(int*)((int)streamData + 0) + 0x17a) &= (unsigned char)~2;
+			*(unsigned char*)(*(int*)((int)streamData + 4) + 0xda) &= (unsigned char)~2;
 			*(int*)(*(int*)((int)streamData + 4) + 0x14c) = 0;
 		}
 	}

@@ -9,7 +9,7 @@ public:
 
 	unsigned int GetAutoID();
 	int* EntryStandbyID(int);
-	void Init(void*, int, int, int);
+	int Init(void*, int, int, int);
 	void Start();
 	void End();
 	void GetProgramTime();

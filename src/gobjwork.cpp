@@ -855,7 +855,7 @@ void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 		m_inventoryItems[itemSlot] = 0xFFFF;
 		m_inventoryItemCount = itemCount - 1;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemSlot);
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<signed char>(itemSlot));
 		}
 	}
 }

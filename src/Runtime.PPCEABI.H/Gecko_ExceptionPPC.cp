@@ -90,6 +90,9 @@ public:
 	virtual const char* what() const;
 };
 
+void unexpected();
+void terminate();
+
 /*
  * --INFO--
  * PAL Address: 0x801b0f08
@@ -692,27 +695,26 @@ static inline int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 extern void __unexpected(CatchInfo* catchinfo)
 {
 	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
-	const char* badExceptionType = "!bad_exception!!";
-	const char* stdBadExceptionType = "!std::bad_exception!!";
-	
+	char* badExceptionType = (char*)"!bad_exception!!";
+	char* stdBadExceptionType = (char*)"!std::bad_exception!!";
 
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 
 	try {
-		unexpected();
+		std::unexpected();
 	} catch (...) {
 		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
-		if (ExPPC_IsInSpecification((char*)badExceptionType, unexp)) {
+		if (ExPPC_IsInSpecification(badExceptionType, unexp)) {
 			throw std::bad_exception();
 		}
-		if (ExPPC_IsInSpecification((char*)stdBadExceptionType, unexp)) {
+		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
 			throw std::bad_exception();
 		}
 	}
-	unexpected();
-	terminate();
+	std::unexpected();
+	std::terminate();
 }
 
 /**

@@ -11,7 +11,7 @@ class CMaterialEditorPcs;
 extern "C" {
 #endif
 void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
-CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr);
+void MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr);
 #ifdef __cplusplus
 }
 #endif

@@ -51,7 +51,6 @@ char* strcat(char*, const char*);
 char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";
 extern char DAT_80332e54[];
 unsigned short gShopMenuInputLatch;
-extern CMenuPcs MenuPcs;
 class CPartPcs;
 extern CPartPcs PartPcs;
 extern float FLOAT_80332d28;

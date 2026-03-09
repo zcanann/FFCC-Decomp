@@ -6,7 +6,6 @@
 #include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-extern Mtx ppvCameraMatrix02;
 extern "C" void DrawSphere__8CGraphicFPA4_f8_GXColor(void* graphic, MtxPtr mtx, _GXColor color);
 
 /*

@@ -483,7 +483,7 @@ void CChara::CModel::CalcSkin()
 	u16 meshCount = *(u16*)((u8*)refData + 0xA);
 	u32 i = 0;
 
-	gqrInit__6CCharaFUlUlUl(&Chara, (posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
+	gqrInit__6CCharaFUlUlUl(&gChara, (posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
 	                        (normQuant << 24) | 0x70000 | (normQuant << 8) | 7, 0x0C070C07);
 
 	while (i < meshCount) {
@@ -1428,6 +1428,7 @@ void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node
 }
 
 unsigned char Chara[0x2078];
+CChara& gChara = *reinterpret_cast<CChara*>(Chara);
 
 extern "C" char __vt__8CManager[];
 

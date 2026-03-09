@@ -4,7 +4,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-extern Mtx ppvCameraMatrix02;
 #endif
 
 /*

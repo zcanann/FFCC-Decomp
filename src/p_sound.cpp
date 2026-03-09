@@ -29,19 +29,6 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
 extern "C" void __sinit_p_sound_cpp(void)
 {
     *reinterpret_cast<unsigned int*>(&SoundPcs) = (unsigned int)&PTR_PTR_s_CSoundPcs_8021072c;
-    m_table_desc0__9CSoundPcs[0] = 0;
-    m_table_desc0__9CSoundPcs[1] = 0xFFFFFFFF;
-    m_table_desc0__9CSoundPcs[2] = reinterpret_cast<unsigned int>(create__9CSoundPcsFv);
-    m_table_desc1__9CSoundPcs[0] = 0;
-    m_table_desc1__9CSoundPcs[1] = 0xFFFFFFFF;
-    m_table_desc1__9CSoundPcs[2] = reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv);
-    m_table_desc2__9CSoundPcs[0] = 0;
-    m_table_desc2__9CSoundPcs[1] = 0xFFFFFFFF;
-    m_table_desc2__9CSoundPcs[2] = reinterpret_cast<unsigned int>(calc__9CSoundPcsFv);
-    m_table_desc3__9CSoundPcs[0] = 0;
-    m_table_desc3__9CSoundPcs[1] = 0xFFFFFFFF;
-    m_table_desc3__9CSoundPcs[2] = reinterpret_cast<unsigned int>(draw__9CSoundPcsFv);
-
     unsigned int* table = (unsigned int*)m_table__9CSoundPcs;
 
     table[1] = m_table_desc0__9CSoundPcs[0];

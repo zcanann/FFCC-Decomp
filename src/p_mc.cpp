@@ -1,9 +1,10 @@
 #include "ffcc/p_mc.h"
+#include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 
 extern "C" {
-unsigned int gMcPcsSingletonPtr_addr = 0;
+unsigned char* gMcPcsSingletonPtr = 0;
 }
 
 class McCtrl;
@@ -39,8 +40,6 @@ struct MenuPcsMcLayout
     unsigned char unk19[7];
     McCtrl m_mcCtrl;
 };
-
-extern MenuPcsMcLayout MenuPcs;
 
 /*
  * --INFO--
@@ -108,11 +107,11 @@ void CMcPcs::calc()
 
     Rand__5CMathFUl(&Math, 0x7FFFFFFF);
 
-    if (MenuPcs.field14 != 1)
+    if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field14 != 1)
     {
-        if (MenuPcs.field18 == 0x13)
+        if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&MenuPcs.m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -129,11 +128,11 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
-                MenuPcs.field18 = 0;
+                reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
             }
         }
-        else if (MenuPcs.field18 == 0x12 &&
-                 (result = MenuPcs.m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x12 &&
+                 (result = reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl.ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {
@@ -157,7 +156,7 @@ void CMcPcs::calc()
             }
 
             CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
-            MenuPcs.field18 = 0;
+            reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
         }
     }
 }
@@ -178,7 +177,7 @@ extern "C" void __sinit_p_mc_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    gMcPcsSingletonPtr_addr = (unsigned int)sMcPcsSingletonData;
+    gMcPcsSingletonPtr = sMcPcsSingletonData;
     table = (unsigned int*)m_table__6CMcPcs;
     table0 = m_table_desc0__6CMcPcs;
     table1 = m_table_desc1__6CMcPcs;

@@ -2,6 +2,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
+#include "ffcc/linkage.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
@@ -102,7 +103,6 @@ extern "C" int DAT_802159c8;
 extern "C" {
 char s_cmake_cpp_801e3038[] = "cmake.cpp";
 }
-extern CMenuPcs MenuPcs;
 
 static inline void* MenuPcsVoid()
 {

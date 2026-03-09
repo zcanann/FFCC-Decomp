@@ -20,7 +20,6 @@ extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 extern const f64 DOUBLE_80333440;
 extern const f64 DOUBLE_80333438;
-extern Mtx ppvCameraMatrix0;
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);

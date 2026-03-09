@@ -431,6 +431,7 @@ public:
 };
 
 extern Mtx ppvCameraMatrix0;
+extern Mtx ppvCameraMatrix02;
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvWorldMatrixWood;
 extern CPartMng PartMng;

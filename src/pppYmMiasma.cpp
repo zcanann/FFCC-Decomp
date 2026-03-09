@@ -1,4 +1,5 @@
 #include "ffcc/pppYmMiasma.h"
+#include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 
@@ -23,7 +24,6 @@ extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
 extern void pppCalcFrameShape__FPlRsRsRss(long*, short*, short*, short*, short);
-extern char Math;
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 extern "C" void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);

@@ -107,7 +107,7 @@ extern unsigned char gDebugSpinnerTextInitialized;
 extern int gDebugSpinnerFrame;
 extern unsigned char gDebugSpinnerFrameInitialized;
 extern u8* gCharaPartWorkPtr;
-extern unsigned int gMcPcsSingletonPtr_addr;
+extern unsigned char* gMcPcsSingletonPtr;
 extern float kMaterialEditorControlMaxInit;
 extern float kMaterialEditorControlMinInit;
 extern unsigned int kMaterialEditorDefaultColorRgba;

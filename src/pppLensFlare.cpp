@@ -48,7 +48,6 @@ static inline Mtx& CameraMatrix()
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-extern Mtx ppvCameraMatrix02;
 
 /*
  * --INFO--

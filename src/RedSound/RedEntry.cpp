@@ -48,6 +48,7 @@ static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 
 extern "C" {
 	void* RedNew__Fi(int);
+	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
 }
 
 /*
@@ -312,13 +313,15 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	int maxBankSize = 0;
 	int* entry = (int*)this;
 	int aBase = DAT_8032f480.GetABufferAddress();
+	offset += aBase;
+	maxSize += aBase;
 	unsigned int history = (unsigned int)entry[0] + 0x100;
 
 	do {
 		int bankSize = *(int*)(history + 4);
 		if (maxBankSize < bankSize) {
 			int arAddress = *(int*)(*(int*)(history + 8) + 0x10);
-			if ((offset + aBase <= arAddress) && (arAddress < maxSize + aBase)) {
+			if ((offset <= arAddress) && (arAddress < maxSize)) {
 				maxBankSize = bankSize;
 				selected = history;
 			}
@@ -327,7 +330,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	} while (history < (unsigned int)entry[0] + 0x400);
 
 	if (maxBankSize != 0) {
-		WaveDelete((RedHistoryBANK*)selected);
+		WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)selected);
 	}
 
 	return maxBankSize;

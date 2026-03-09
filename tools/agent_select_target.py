@@ -6,9 +6,10 @@ Selects random viable targets across multiple opportunity buckets:
 - Data matching opportunities
 """
 
+import argparse
 import json
-import sys
 import random
+import sys
 from pathlib import Path
 from json import JSONDecodeError
 
@@ -314,7 +315,26 @@ def print_bucket(name, targets, pal_map, en_map):
         print()
 
 
-def main():
+def _parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Select random viable decomp targets grouped by opportunity buckets.",
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="Show a longer list of candidates per bucket (default is 6).",
+    )
+    parser.add_argument(
+        "--per-bucket",
+        type=int,
+        default=None,
+        help="Explicit number of targets per bucket (overrides --list).",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = _parse_args(argv)
     repo_root = Path(__file__).resolve().parent.parent
     report_path = repo_root / "build/GCCP01/report.json"
     pal_map = repo_root / "orig/GCCP01/game.MAP"
@@ -324,7 +344,12 @@ def main():
         print(f"ERROR: {report_path} not found. Run 'ninja' first.")
         return 1
 
-    per_bucket = 6 if (len(sys.argv) > 1 and sys.argv[1] == "--list") else 3
+    per_bucket = 6 if args.list else 3
+    if args.per_bucket is not None:
+        if args.per_bucket < 1:
+            print("ERROR: --per-bucket must be >= 1.")
+            return 1
+        per_bucket = args.per_bucket
 
     candidates = extract_candidates(report_path)
 
@@ -342,4 +367,4 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    exit(main())
+    exit(main(sys.argv[1:]))

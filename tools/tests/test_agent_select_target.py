@@ -232,6 +232,33 @@ class AgentSelectTargetTests(unittest.TestCase):
         self.assertEqual(lines[0], "  PAL symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
         self.assertEqual(lines[1], "    - func_a (16b at 0x80000000)")
 
+    def test_parse_args_list_and_per_bucket(self):
+        args = agent_select_target._parse_args(["--list", "--per-bucket", "9"])
+        self.assertTrue(args.list)
+        self.assertEqual(args.per_bucket, 9)
+
+    def test_main_per_bucket_validation(self):
+        with patch("builtins.print"):
+            with patch("tools.agent_select_target.Path.exists", return_value=True):
+                rc = agent_select_target.main(["--per-bucket", "0"])
+        self.assertEqual(rc, 1)
+
+    def test_main_per_bucket_overrides_list(self):
+        with patch("builtins.print"):
+            with patch("tools.agent_select_target.Path.exists", return_value=True):
+                with patch(
+                    "tools.agent_select_target.extract_candidates", return_value=[{"name": "build/foo.o"}]
+                ):
+                    with patch(
+                        "tools.agent_select_target.build_buckets",
+                        return_value={"code": [{"name": "build/foo.o"}], "data": [{"name": "build/foo.o"}]},
+                    ) as mock_build:
+                        with patch("tools.agent_select_target.print_bucket"):
+                            rc = agent_select_target.main(["--list", "--per-bucket", "4"])
+        self.assertEqual(rc, 0)
+        _, kwargs = mock_build.call_args
+        self.assertEqual(kwargs["per_bucket"], 4)
+
 
 if __name__ == "__main__":
     unittest.main()

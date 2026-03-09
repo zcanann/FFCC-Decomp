@@ -363,6 +363,50 @@ class TestAgenticLoop(unittest.TestCase):
 
         self.assertEqual(rc, 137)
 
+    def test_run_agentic_loop_stops_immediately_on_exit_code_130(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=130,
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc) as mock_popen:
+            with patch("agentic_loop._sleep_interruptible") as mock_sleep:
+                rc = agentic_loop.run_agentic_loop(
+                    prompt="x",
+                    timeout_seconds=1,
+                    terminate_grace_seconds=2,
+                    max_backoff_seconds=300,
+                    max_runs=None,
+                )
+
+        self.assertEqual(rc, 130)
+        mock_popen.assert_called_once()
+        mock_sleep.assert_not_called()
+
+    def test_run_agentic_loop_stops_immediately_on_sigint_return_code(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=-agentic_loop.signal.SIGINT,
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc) as mock_popen:
+            with patch("agentic_loop._sleep_interruptible") as mock_sleep:
+                rc = agentic_loop.run_agentic_loop(
+                    prompt="x",
+                    timeout_seconds=1,
+                    terminate_grace_seconds=2,
+                    max_backoff_seconds=300,
+                    max_runs=None,
+                )
+
+        self.assertEqual(rc, 130)
+        mock_popen.assert_called_once()
+        mock_sleep.assert_not_called()
+
     def test_run_agentic_loop_returns_124_when_timeout_reaches_max_runs(self):
         fake_proc = SimpleNamespace(
             pid=123,
@@ -483,6 +527,12 @@ class TestAgenticLoop(unittest.TestCase):
     def test_normalize_process_return_code_keeps_positive_and_maps_negative(self):
         self.assertEqual(agentic_loop._normalize_process_return_code(7), 7)
         self.assertEqual(agentic_loop._normalize_process_return_code(-15), 143)
+
+    def test_is_interrupt_return_code(self):
+        self.assertTrue(agentic_loop._is_interrupt_return_code(130))
+        self.assertTrue(agentic_loop._is_interrupt_return_code(-agentic_loop.signal.SIGINT))
+        self.assertFalse(agentic_loop._is_interrupt_return_code(1))
+        self.assertFalse(agentic_loop._is_interrupt_return_code(None))
 
 
 if __name__ == "__main__":

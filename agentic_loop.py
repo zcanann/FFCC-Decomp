@@ -180,6 +180,13 @@ def _normalize_process_return_code(returncode: Optional[int]) -> int:
     return returncode
 
 
+def _is_interrupt_return_code(returncode: Optional[int]) -> bool:
+    """Return whether a process exit code indicates user interrupt."""
+    if returncode is None:
+        return False
+    return returncode == 130 or returncode == -getattr(signal, "SIGINT", 2)
+
+
 def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -325,6 +332,10 @@ def run_agentic_loop(
                 consecutive_failures = 0
                 exit_code = 0
                 log("codex run completed successfully")
+            elif _is_interrupt_return_code(proc.returncode):
+                exit_code = 130
+                log("codex run interrupted; stopping loop")
+                break
             else:
                 consecutive_failures += 1
                 exit_code = _normalize_process_return_code(proc.returncode)

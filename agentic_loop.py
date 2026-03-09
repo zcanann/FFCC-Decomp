@@ -344,7 +344,7 @@ def run_agentic_loop(
                 start_new_session=(os.name == "posix"),
             )
         except OSError as exc:
-            if exc.errno in (errno.ENOENT, errno.EACCES, errno.EPERM):
+            if exc.errno in (errno.ENOENT, errno.EACCES, errno.EPERM, errno.ENOEXEC):
                 log(f"failed to launch codex ({exc}); unrecoverable error, stopping loop")
                 return 127 if exc.errno == errno.ENOENT else 126
             consecutive_failures += 1

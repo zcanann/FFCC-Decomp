@@ -469,6 +469,19 @@ class TestAgenticLoop(unittest.TestCase):
 
         self.assertEqual(rc, 126)
 
+    def test_run_agentic_loop_returns_126_on_exec_format_error(self):
+        launch_error = OSError(errno.ENOEXEC, "Exec format error")
+        with patch("agentic_loop.subprocess.Popen", side_effect=launch_error):
+            rc = agentic_loop.run_agentic_loop(
+                prompt="x",
+                timeout_seconds=1,
+                terminate_grace_seconds=2,
+                max_backoff_seconds=300,
+                max_runs=1,
+            )
+
+        self.assertEqual(rc, 126)
+
     def test_run_agentic_loop_stops_at_max_runs_after_timeout_without_sleep(self):
         fake_proc = SimpleNamespace(
             pid=123,

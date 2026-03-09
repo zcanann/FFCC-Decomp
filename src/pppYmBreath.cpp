@@ -395,8 +395,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 
             if ((*(unsigned short*)((unsigned char*)pYmBreath + 0x1E) <= *(unsigned short*)((unsigned char*)vYmBreath + 0x44)) &&
                 (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1C))) {
-                BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (PARTICLE_DATA*)particleData, (PARTICLE_WMAT*)particleWmat,
-                              (PARTICLE_COLOR*)particleColor);
+                BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (_PARTICLE_DATA*)particleData, (Mtx*)particleWmat,
+                              (_PARTICLE_COLOR*)particleColor);
                 spawnCount += 1;
                 found = true;
 
@@ -420,7 +420,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 }
             }
         } else {
-            UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
+            UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
             pppCalcFrameShape__FPlRsRsRss(
                 *(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)&particleData[7].y,
                 *(short*)((unsigned char*)&particleData[7].y + 2), *(short*)((unsigned char*)&particleData[7].x + 2),

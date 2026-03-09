@@ -2459,51 +2459,37 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	int totalHpBonus = 0;
+	CGObjWork* baseObj = this;
+	CCaravanWork* work = this;
+	int hpMax = 0;
 	int artifactIndex = 0;
-	
-	// Iterate through artifacts in pairs (50 iterations, 2 artifacts each = 100 artifacts total)
-	for (int i = 0; i < 50; i++)
-	{
-		// Check first artifact in pair
-		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0)
-		{
-			unsigned short* artifactData = (unsigned short*)(Game.game.unkCFlatData0[2] + m_artifacts[artifactIndex] * 0x48);
+
+	for (int i = 0; i < 0x32; i++) {
+		if ((artifactIndex < 0x60) && ((short)work->m_artifacts[0] > 0)) {
+			unsigned short* artifactData = GetItemDataPtr((short)work->m_artifacts[0]);
 			unsigned short artifactType = artifactData[0];
-			
-			// Check if this is an HP-boosting artifact (type 0xe4, excluding 0xdb)
-			if (artifactType != 0xdb && artifactType > 0xda && artifactType == 0xe4)
-			{
-				totalHpBonus += artifactData[3]; // Add HP bonus value
+			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
+				hpMax += artifactData[3];
 			}
 		}
-		
-		// Check second artifact in pair
-		if ((artifactIndex + 1) < 96 && m_artifacts[artifactIndex + 1] > 0)
-		{
-			unsigned short* artifactData = (unsigned short*)(Game.game.unkCFlatData0[2] + m_artifacts[artifactIndex + 1] * 0x48);
+
+		if ((artifactIndex + 1 < 0x60) && ((short)work->m_artifacts[1] > 0)) {
+			unsigned short* artifactData = GetItemDataPtr((short)work->m_artifacts[1]);
 			unsigned short artifactType = artifactData[0];
-			
-			// Check if this is an HP-boosting artifact (type 0xe4, excluding 0xdb)
-			if (artifactType != 0xdb && artifactType > 0xda && artifactType == 0xe4)
-			{
-				totalHpBonus += artifactData[3]; // Add HP bonus value
+			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
+				hpMax += artifactData[3];
 			}
 		}
-		
+
+		work = (CCaravanWork*)&work->m_objType;
 		artifactIndex += 2;
 	}
-	
-	// Add base HP value from character data
-	totalHpBonus += *(unsigned short*)(Game.game.unkCFlatData0[0] + m_baseDataIndex * 0x1d0 + 6);
-	
-	// Cap at 16 (0x10)
-	if (totalHpBonus > 15)
-	{
-		return 16;
+
+	hpMax += *(unsigned short*)(Game.game.unkCFlatData0[0] + baseObj->m_baseDataIndex * 0x1D0 + 6);
+	if (hpMax > 0xF) {
+		return 0x10;
 	}
-	
-	return totalHpBonus;
+	return hpMax;
 }
 
 /*

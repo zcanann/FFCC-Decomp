@@ -273,15 +273,6 @@ extern "C" void __sinit_p_usb_cpp()
     *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
     *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
     *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
-    m_table_desc0__7CUSBPcs[0] = 0;
-    m_table_desc0__7CUSBPcs[1] = 0xFFFFFFFF;
-    m_table_desc0__7CUSBPcs[2] = reinterpret_cast<u32>(create__7CUSBPcsFv);
-    m_table_desc1__7CUSBPcs[0] = 0;
-    m_table_desc1__7CUSBPcs[1] = 0xFFFFFFFF;
-    m_table_desc1__7CUSBPcs[2] = reinterpret_cast<u32>(destroy__7CUSBPcsFv);
-    m_table_desc2__7CUSBPcs[0] = 0;
-    m_table_desc2__7CUSBPcs[1] = 0xFFFFFFFF;
-    m_table_desc2__7CUSBPcs[2] = reinterpret_cast<u32>(func__7CUSBPcsFv);
 
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
     m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];

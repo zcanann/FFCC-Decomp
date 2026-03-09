@@ -37,6 +37,10 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(agent_select_target.safe_float("not-a-number"), 0.0)
         self.assertEqual(agent_select_target.safe_float(None, 2.5), 2.5)
 
+    def test_safe_int_returns_default_for_invalid_values(self):
+        self.assertEqual(agent_select_target.safe_int("not-a-number"), 0)
+        self.assertEqual(agent_select_target.safe_int(None, 7), 7)
+
     def test_is_viable_target_handles_non_numeric_measures(self):
         unit = {
             "name": "bad-measures",
@@ -84,6 +88,37 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(len(candidates[0]["top_functions"]), 2)
         self.assertEqual(candidates[0]["top_functions"][0]["name"], "fn_bad")
         self.assertEqual(candidates[0]["top_functions"][0]["match"], 0.0)
+
+    def test_extract_candidates_handles_non_numeric_unit_totals(self):
+        report = {
+            "units": [
+                {
+                    "name": "unitB",
+                    "metadata": {"source_path": "src/unitB.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": "40.0",
+                        "matched_code_percent": "10.0",
+                        "matched_data_percent": "5.0",
+                        "total_functions": "N/A",
+                        "matched_functions": None,
+                        "matched_functions_percent": "0.0",
+                        "total_code": "unknown",
+                        "total_data": "missing",
+                    },
+                    "functions": [],
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["total_functions"], 0)
+        self.assertEqual(candidates[0]["matched_functions"], 0)
+        self.assertEqual(candidates[0]["total_code"], 0)
+        self.assertEqual(candidates[0]["total_data"], 0)
 
 
 if __name__ == "__main__":

@@ -35,6 +35,14 @@ def safe_float(value, default=0.0):
         return default
 
 
+def safe_int(value, default=0):
+    """Parse an int from mixed report values without throwing."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def load_blacklist():
     """Load recently failed units to avoid"""
     state_file = Path.home() / ".openclaw/workspace/memory/decomp-state.json"
@@ -148,11 +156,11 @@ def extract_candidates(report_path):
             "fuzzy_match": safe_float(measures.get("fuzzy_match_percent", 0)),
             "matched_code_percent": safe_float(measures.get("matched_code_percent", 0)),
             "matched_data_percent": safe_float(measures.get("matched_data_percent", 0)),
-            "total_functions": int(measures.get("total_functions", 0) or 0),
-            "matched_functions": int(measures.get("matched_functions", 0) or 0),
+            "total_functions": safe_int(measures.get("total_functions", 0), 0),
+            "matched_functions": safe_int(measures.get("matched_functions", 0), 0),
             "func_match_percent": safe_float(measures.get("matched_functions_percent", 0)),
-            "total_code": int(measures.get("total_code", 0) or 0),
-            "total_data": int(measures.get("total_data", 0) or 0),
+            "total_code": safe_int(measures.get("total_code", 0), 0),
+            "total_data": safe_int(measures.get("total_data", 0), 0),
             "source_path": source_path,
             "source_file": source_file,
             "top_functions": []

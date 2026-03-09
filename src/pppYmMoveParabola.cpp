@@ -12,7 +12,7 @@ extern float ppvSinTbl[];
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-void pppNormalize__FR3Vec3Vec(Vec*, Vec*);
+void pppNormalize__FR3Vec3Vec(float*, Vec*);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 }
 
@@ -70,12 +70,11 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
  */
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
-
     if (gPppCalcDisabled != 0) {
         return;
     }
 
+    _pppMngSt* pppMngSt = pppMngStPtr;
     f32* work = (f32*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
 
     work[1] = work[1] + work[2];
@@ -97,7 +96,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     }
 
     Vec normalizedSource = direction;
-    pppNormalize__FR3Vec3Vec(&direction, &normalizedSource);
+    pppNormalize__FR3Vec3Vec((float*)&direction, &normalizedSource);
 
     u32 sinIndex = (u32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
     f32 parabolaScale = (f32)(frameCount * (double)(work[0] * *(f32*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC))));

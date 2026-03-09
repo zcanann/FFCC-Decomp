@@ -37,6 +37,15 @@ def _path_stem(path_str):
     name = _path_name(path_str)
     return PurePosixPath(name).stem if name else ""
 
+
+def _has_real_source_path(source_path):
+    """Return True when source_path contains a usable path, not an unknown marker."""
+    if not isinstance(source_path, str):
+        return False
+    normalized = source_path.strip().lower()
+    return normalized not in {"", "unknown", "<unknown>", "n/a", "none", "null"}
+
+
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
     print(WARNING_BUILD_MISMATCH)
@@ -128,7 +137,7 @@ def is_viable_target(unit, blacklist):
 
 def derive_object_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
-    if source_path and source_path != "unknown":
+    if _has_real_source_path(source_path):
         base = _path_stem(source_path)
         if base:
             return f"{base}.o"
@@ -140,7 +149,7 @@ def derive_object_file(unit):
 
 def derive_source_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
-    if source_path and source_path != "unknown":
+    if _has_real_source_path(source_path):
         source_name = _path_name(source_path)
         if source_name:
             return source_name
@@ -228,7 +237,7 @@ def extract_candidates(report_path):
         if not isinstance(metadata, dict):
             metadata = {}
         source_path = metadata.get("source_path", "unknown")
-        if not isinstance(source_path, str) or not source_path:
+        if not _has_real_source_path(source_path):
             source_path = "unknown"
         source_file = _path_name(source_path) if source_path and source_path != "unknown" else "unknown"
 

@@ -60,6 +60,10 @@ class DeriveFileNameTests(unittest.TestCase):
         unit = {"name": "", "metadata": {"source_path": "/"}}
         self.assertEqual(agent_select_target.derive_object_file(unit), "unknown.o")
 
+    def test_derive_object_file_fallback_treats_unknown_markers_case_insensitively(self):
+        unit = {"name": "src/system/player.cpp", "metadata": {"source_path": " Unknown "}}
+        self.assertEqual(agent_select_target.derive_object_file(unit), "player.o")
+
     def test_derive_source_file_falls_back_to_unit_name_when_source_path_has_no_name(self):
         unit = {"name": "src/system/player.cpp", "metadata": {"source_path": "/"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
@@ -67,6 +71,10 @@ class DeriveFileNameTests(unittest.TestCase):
     def test_derive_source_file_defaults_to_unknown_when_all_names_missing(self):
         unit = {"name": "", "metadata": {"source_path": "/"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "unknown.cpp")
+
+    def test_derive_source_file_fallback_treats_unknown_markers_case_insensitively(self):
+        unit = {"name": "src/system/player.cpp", "metadata": {"source_path": "<UNKNOWN>"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
 
 
 class NumericParsingTests(unittest.TestCase):
@@ -239,6 +247,30 @@ class NumericParsingTests(unittest.TestCase):
 
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0]["top_functions"][0]["name"], "unknown")
+
+    def test_extract_candidates_normalizes_unknown_source_path_markers(self):
+        report = {
+            "units": [
+                {
+                    "name": "unitE",
+                    "metadata": {"source_path": " N/A "},
+                    "measures": {
+                        "fuzzy_match_percent": "50.0",
+                        "matched_code_percent": "10.0",
+                        "matched_data_percent": "0.0",
+                    },
+                    "functions": [],
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["source_path"], "unknown")
+        self.assertEqual(candidates[0]["source_file"], "unknown")
 
     def test_extract_candidates_returns_empty_when_units_is_not_a_list(self):
         report = {"units": "not-a-list"}

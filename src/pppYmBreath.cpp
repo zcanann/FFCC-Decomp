@@ -80,8 +80,8 @@ void get_rand()
  * JP Address: TODO
  * JP Size: TODO
  */
-void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor, PARTICLE_DATA* particleData,
-                   PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
+void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor, _PARTICLE_DATA* particleData,
+                   Mtx* particleWmat, _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pYmBreath;
     unsigned char* particle = (unsigned char*)particleData;
@@ -244,8 +244,8 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
  * JP Address: TODO
  * JP Size: TODO
  */
-void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* particleData, VColor* vColor,
-                    PARTICLE_COLOR* particleColor)
+void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* particleData, VColor* vColor,
+                    _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pYmBreath;
     unsigned char* particle = (unsigned char*)particleData;
@@ -469,7 +469,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
  * Address:	TODO
  * Size:	TODO
  */
-void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
+void SetParticleMatrix(_pppPObject*, VYmBreath*, _PARTICLE_DATA*, Mtx*)
 {
 	// TODO
 }
@@ -997,6 +997,5 @@ void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short part
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
-
 
 

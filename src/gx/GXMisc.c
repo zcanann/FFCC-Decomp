@@ -220,8 +220,8 @@ void GXPokeAlphaUpdate(GXBool update_enable) {
 
 void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
     u32 blend_enable;
-    u32 logic_enable;
     u32 subtract_enable;
+    u32 logic_enable;
     u32 reg;
     volatile u16* pe_reg_1;
 
@@ -229,15 +229,15 @@ void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor d
     reg = *pe_reg_1;
 
     blend_enable = (type == GX_BM_BLEND) || (type == GX_BM_SUBTRACT);
-    logic_enable = (type == GX_BM_LOGIC);
     subtract_enable = (type == GX_BM_SUBTRACT);
+    logic_enable = (type == GX_BM_LOGIC);
     reg = (reg & ~0x1) | blend_enable;
-    reg = (reg & ~0x2) | (logic_enable << 1);
     reg = (reg & ~0x800) | (subtract_enable << 11);
+    reg = (reg & ~0x2) | (logic_enable << 1);
     reg = (reg & ~0xF000) | ((u32)op << 12);
     reg = (reg & ~0x0700) | ((u32)src_factor << 8);
     reg = (reg & ~0x00E0) | ((u32)dst_factor << 5);
-    *pe_reg_1 = (u16)reg;
+    *pe_reg_1 = reg;
 }
 
 void GXPokeColorUpdate(GXBool update_enable) {

@@ -172,7 +172,7 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
  */
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
-    f32* work;
+    u8* work;
     TRACE_POLYGON* entries;
     u16 maxCount;
 
@@ -180,15 +180,15 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         return;
     }
 
-    work = (f32*)((u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets);
-    entries = (TRACE_POLYGON*)(u32)work[10];
+    work = (u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets;
+    entries = *(TRACE_POLYGON**)(work + 0x28);
     maxCount = *(u16*)(param_2->m_payload + 4);
 
     if (entries == nullptr) {
         entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * sizeof(TRACE_POLYGON),
                                                                          pppEnvStPtr->m_stagePtr,
                                                                          s_pppYmTracer_cpp_801d9ce0, 0xEB);
-        work[10] = (f32)(u32)entries;
+        *(TRACE_POLYGON**)(work + 0x28) = entries;
 
         for (s32 i = 0; i < (s32)maxCount; i++) {
             initTracePolygon(pppYmTracer, &entries[i]);
@@ -199,19 +199,19 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
     if (param_2->m_graphId == ((s32*)pppYmTracer)[0]) {
         if (param_2->m_initWOrk == -1) {
-            work[8] = (f32)(u32)gPppDefaultValueBuffer;
+            *(f32**)(work + 0x20) = (f32*)gPppDefaultValueBuffer;
         } else {
-            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue);
+            *(u8**)(work + 0x20) = (u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue;
         }
 
         if (param_2->m_arg3 == -1) {
-            work[9] = (f32)(u32)gPppDefaultValueBuffer;
+            *(f32**)(work + 0x24) = (f32*)gPppDefaultValueBuffer;
         } else {
-            work[9] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload);
+            *(u8**)(work + 0x24) = (u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload;
         }
     }
 
-    if (*(u16*)(work + 0xB) + 1 < maxCount) {
+    if (*(u16*)(work + 0x2C) + 1 < maxCount) {
         for (s32 i = maxCount - 2; i >= 0; i--) {
             copyPolygonData(&entries[i + 1], &entries[i]);
         }
@@ -221,19 +221,19 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         entries[0].decay = (u8)((u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6));
 
         {
-            f32* from = (f32*)(u32)work[8];
-            f32* to = (f32*)(u32)work[9];
+            f32* from = *(f32**)(work + 0x20);
+            f32* to = *(f32**)(work + 0x24);
 
-            work[0] = from[0];
-            work[1] = from[1];
-            work[2] = from[2];
+            *(f32*)(work + 0x0) = from[0];
+            *(f32*)(work + 0x4) = from[1];
+            *(f32*)(work + 0x8) = from[2];
             entries[0].from.x = from[0];
             entries[0].from.y = from[1];
             entries[0].from.z = from[2];
 
-            work[4] = to[0];
-            work[5] = to[1];
-            work[6] = to[2];
+            *(f32*)(work + 0x10) = to[0];
+            *(f32*)(work + 0x14) = to[1];
+            *(f32*)(work + 0x18) = to[2];
             entries[0].to.x = to[0];
             entries[0].to.y = to[1];
             entries[0].to.z = to[2];
@@ -249,13 +249,11 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }
 
-        *(u16*)(work + 0xB) = *(u16*)(work + 0xB) + 1;
+        *(u16*)(work + 0x2C) = *(u16*)(work + 0x2C) + 1;
 
-        if (*(u16*)(work + 0xB) > 3) {
-            f32 splineFromRaw[0x24];
-            f32 splineToRaw[0x24];
-            Vec* splineFrom = (Vec*)splineFromRaw;
-            Vec* splineTo = (Vec*)splineToRaw;
+        if (*(u16*)(work + 0x2C) > 3) {
+            Vec splineFrom[12];
+            Vec splineTo[12];
             s16 splineCount = 0;
             f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
 
@@ -268,8 +266,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
                                           entries[2].from, entries[0].to, t, FLOAT_803306ec);
 
                 splineCount++;
-                *(u16*)(work + 0xB) = *(u16*)(work + 0xB) + 1;
-                if (maxCount <= *(u16*)(work + 0xB) + 1) {
+                *(u16*)(work + 0x2C) = *(u16*)(work + 0x2C) + 1;
+                if (maxCount <= *(u16*)(work + 0x2C) + 1) {
                     break;
                 }
             }
@@ -289,8 +287,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         }
     }
 
-    entries = (TRACE_POLYGON*)(u32)work[10];
-    for (s32 i = 0; i < (s32)(u32)*(u16*)(work + 0xB); i++) {
+    entries = *(TRACE_POLYGON**)(work + 0x28);
+    for (s32 i = 0; i < (s32)(u32)*(u16*)(work + 0x2C); i++) {
         if (entries[i].life > 0) {
             if ((s32)((u32)entries[i].alpha - (u32)entries[i].decay) < 1) {
                 entries[i].alpha = 0;
@@ -300,7 +298,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
             entries[i].life--;
             if (entries[i].life < 1) {
-                *(u16*)(work + 0xB) = *(u16*)(work + 0xB) - 1;
+                *(u16*)(work + 0x2C) = *(u16*)(work + 0x2C) - 1;
                 entries[i].life = 0;
             }
         }

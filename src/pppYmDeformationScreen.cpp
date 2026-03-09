@@ -63,7 +63,14 @@ struct _pppEnvStYmDeformationScreen {
 extern "C" float ppvCameraMatrix02[3][4];
 extern float ppvScreenMatrix[4][4];
 extern float FLOAT_80330670;
+extern float FLOAT_80330674;
+extern float FLOAT_80330678;
 extern float FLOAT_8033067C;
+extern float FLOAT_80330680;
+extern float FLOAT_80330684;
+extern float FLOAT_80330688;
+extern float FLOAT_8033068C;
+extern float FLOAT_80330690;
 
 static inline Mtx44& CameraScreenMatrix()
 {
@@ -295,11 +302,12 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXSetCurrentMtx(0);
 
 	PSMTX44Identity(orthoMtx);
-	orthoMtx[0][0] = 2.0f / 640.0f;
-	orthoMtx[1][1] = -2.0f / 480.0f;
-	orthoMtx[2][2] = 1.0f;
-	orthoMtx[0][3] = -1.0f;
-	orthoMtx[1][3] = 1.0f;
+	orthoMtx[0][0] = FLOAT_80330674;
+	orthoMtx[1][1] = FLOAT_80330678;
+	orthoMtx[2][2] = FLOAT_8033067C;
+	orthoMtx[0][3] = FLOAT_80330680;
+	orthoMtx[1][3] = FLOAT_8033067C;
+	orthoMtx[2][3] = FLOAT_80330670;
 	GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
@@ -316,7 +324,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		*(short*)(work + 1) = 1;
 	}
 
-	PSMTXRotRad(rot, 'z', 0.017453292f * (float)(*(short*)(work + 1)));
+	PSMTXRotRad(rot, 'z', FLOAT_80330684 * (float)(*(short*)(work + 1)));
 	indMtx[0][0] = rot[0][0] * work[2];
 	indMtx[0][1] = rot[0][1] * work[2];
 	indMtx[0][2] = 0.0f;
@@ -325,50 +333,50 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	indMtx[1][2] = 0.0f;
 	GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
 
-	texU = 640.0f / (float)*(unsigned int*)(textureBase + 100);
-	texV = 448.0f / (float)*(unsigned int*)(textureBase + 0x68);
+	texU = (float)(0x280 / *(unsigned int*)(textureBase + 100));
+	texV = (float)(0x1C0 / *(unsigned int*)(textureBase + 0x68));
 
 	Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	GXPosition3f32(0.0f, 0.0f, depth);
+	GXPosition3f32(FLOAT_80330670, FLOAT_80330670, depth);
 	GXColor1u32(color.m_rgba);
-	GXTexCoord2f32(0.0f, 0.0f);
-	GXTexCoord2f32(0.0f, 0.0f);
-	GXPosition3f32(640.0f, 0.0f, depth);
+	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
+	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
+	GXPosition3f32(FLOAT_80330688, FLOAT_80330670, depth);
 	GXColor1u32(color.m_rgba);
-	GXTexCoord2f32(texU, 0.0f);
-	GXTexCoord2f32(1.0f, 0.0f);
-	GXPosition3f32(640.0f, 224.0f, depth);
+	GXTexCoord2f32(texU, FLOAT_80330670);
+	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
+	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
 	GXColor1u32(color.m_rgba);
 	GXTexCoord2f32(texU, texV);
-	GXTexCoord2f32(1.0f, 1.0f);
-	GXPosition3f32(0.0f, 224.0f, depth);
+	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
+	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
 	GXColor1u32(color.m_rgba);
-	GXTexCoord2f32(0.0f, texV);
-	GXTexCoord2f32(0.0f, 1.0f);
+	GXTexCoord2f32(FLOAT_80330670, texV);
+	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
 
 	Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	depth = work[0];
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	GXPosition3f32(0.0f, 224.0f, depth);
+	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
 	GXColor1u32(color.m_rgba);
-	GXTexCoord2f32(0.0f, 0.0f);
-	GXTexCoord2f32(0.0f, 0.0f);
-	GXPosition3f32(640.0f, 224.0f, depth);
+	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
+	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
+	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
 	GXColor1u32(color.m_rgba);
-	GXTexCoord2f32(texU, 0.0f);
-	GXTexCoord2f32(1.0f, 0.0f);
-	GXPosition3f32(640.0f, 448.0f, depth);
+	GXTexCoord2f32(texU, FLOAT_80330670);
+	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
+	GXPosition3f32(FLOAT_80330688, FLOAT_80330690, depth);
 	GXColor1u32(color.m_rgba);
 	GXTexCoord2f32(texU, texV);
-	GXTexCoord2f32(1.0f, 1.0f);
-	GXPosition3f32(0.0f, 448.0f, depth);
+	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
+	GXPosition3f32(FLOAT_80330670, FLOAT_80330690, depth);
 	GXColor1u32(color.m_rgba);
-	GXTexCoord2f32(0.0f, texV);
-	GXTexCoord2f32(0.0f, 1.0f);
+	GXTexCoord2f32(FLOAT_80330670, texV);
+	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);

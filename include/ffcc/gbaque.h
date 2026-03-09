@@ -118,7 +118,7 @@ public:
     unsigned int GetStrengthFlg(int);
     void ClrStrengthFlg(int);
     int GetStrengthData(int, unsigned char*);
-    void GetArtiDatFlg(int);
+    unsigned int GetArtiDatFlg(int);
     void ClrArtiDatFlg(int);
     void MakeArtiData(int, char*);
     int GetTmpArtifactData(int, unsigned char*);
@@ -129,12 +129,12 @@ public:
     unsigned int GetChgRadarMode(int);
     void ClrChgRadarMode(int);
     int GetScouterInfo(int, unsigned char*);
-    void GetChgHitFlg(int);
+    unsigned int GetChgHitFlg(int);
     void ClrChgHitFlg(int);
     unsigned int GetChgScouFlg(int);
     void ClrChgScouFlg(int);
     void SetHitEnemy(int, int);
-    void GetHitEInfo(int);
+    int GetHitEInfo(int);
     bool IsSingleMode(int);
     void SetControllerMode(int);
     unsigned int GetControllerMode();

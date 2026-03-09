@@ -644,12 +644,21 @@ class TestAgenticLoop(unittest.TestCase):
             agentic_loop._normalize_process_return_code(agentic_loop.WINDOWS_CTRL_C_EXIT_CODE),
             130,
         )
+        self.assertEqual(
+            agentic_loop._normalize_process_return_code(
+                agentic_loop.WINDOWS_CTRL_C_EXIT_CODE_SIGNED
+            ),
+            130,
+        )
 
     def test_is_interrupt_return_code(self):
         self.assertTrue(agentic_loop._is_interrupt_return_code(130))
         self.assertTrue(agentic_loop._is_interrupt_return_code(-agentic_loop.signal.SIGINT))
         self.assertTrue(
             agentic_loop._is_interrupt_return_code(agentic_loop.WINDOWS_CTRL_C_EXIT_CODE)
+        )
+        self.assertTrue(
+            agentic_loop._is_interrupt_return_code(agentic_loop.WINDOWS_CTRL_C_EXIT_CODE_SIGNED)
         )
         self.assertFalse(agentic_loop._is_interrupt_return_code(1))
         self.assertFalse(agentic_loop._is_interrupt_return_code(None))

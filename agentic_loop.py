@@ -75,6 +75,7 @@ DEFAULT_PROMPT = _default_prompt()
 KILL_SIGNAL = getattr(signal, "SIGKILL", signal.SIGTERM)
 KILL_WAIT_SECONDS = 5
 WINDOWS_CTRL_C_EXIT_CODE = 0xC000013A
+WINDOWS_CTRL_C_EXIT_CODE_SIGNED = -1073741510
 DEFAULT_TIMEOUT_SECONDS = 25 * 60
 DEFAULT_TERMINATE_GRACE_SECONDS = 10
 DEFAULT_MAX_BACKOFF_SECONDS = 300
@@ -205,7 +206,7 @@ def _normalize_process_return_code(returncode: Optional[int]) -> int:
     """Map subprocess return codes to conventional shell exit statuses."""
     if returncode is None or returncode == 0:
         return 1
-    if returncode == WINDOWS_CTRL_C_EXIT_CODE:
+    if returncode in (WINDOWS_CTRL_C_EXIT_CODE, WINDOWS_CTRL_C_EXIT_CODE_SIGNED):
         # Windows uses NTSTATUS 0xC000013A when a process is interrupted by Ctrl+C.
         return 130
     if returncode < 0:
@@ -222,6 +223,7 @@ def _is_interrupt_return_code(returncode: Optional[int]) -> bool:
         130,
         -getattr(signal, "SIGINT", 2),
         WINDOWS_CTRL_C_EXIT_CODE,
+        WINDOWS_CTRL_C_EXIT_CODE_SIGNED,
     )
 
 

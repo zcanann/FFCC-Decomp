@@ -16,7 +16,7 @@ extern "C" float RandF__5CMathFv(CMath* instance);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownHCV(void* param1, void* param2, void* param3)
+extern "C" void pppSRandDownHCV(void* param1, void* param2, void* param3)
 {
 	if (gPppCalcDisabled != 0) {
 		return;

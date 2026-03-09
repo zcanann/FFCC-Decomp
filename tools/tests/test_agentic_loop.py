@@ -312,6 +312,32 @@ class TestAgenticLoop(unittest.TestCase):
         mock_signal.assert_any_call(fake_proc, agentic_loop.KILL_SIGNAL)
         mock_log.assert_called_once()
 
+    def test_signal_process_tree_falls_back_to_direct_signal_when_killpg_fails(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            poll=Mock(return_value=None),
+            send_signal=Mock(),
+        )
+
+        with patch("agentic_loop.os.name", "posix"):
+            with patch("agentic_loop.os.killpg", side_effect=OSError("no pg")):
+                agentic_loop._signal_process_tree(fake_proc, agentic_loop.signal.SIGTERM)
+
+        fake_proc.send_signal.assert_called_once_with(agentic_loop.signal.SIGTERM)
+
+    def test_signal_process_tree_returns_when_process_already_exited(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            poll=Mock(return_value=0),
+            send_signal=Mock(),
+        )
+
+        with patch("agentic_loop.os.killpg") as mock_killpg:
+            agentic_loop._signal_process_tree(fake_proc, agentic_loop.signal.SIGTERM)
+
+        mock_killpg.assert_not_called()
+        fake_proc.send_signal.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

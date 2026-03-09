@@ -117,8 +117,12 @@ def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
     except ProcessLookupError:
         pass
     except OSError:
-        # Best-effort signaling; ignore errors for already-exited processes.
-        pass
+        # Fall back to the direct process if group/tree signaling is unavailable.
+        try:
+            proc.send_signal(sig)
+        except (ProcessLookupError, OSError, ValueError):
+            # Best-effort signaling; ignore errors for already-exited processes.
+            pass
 
 
 def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:

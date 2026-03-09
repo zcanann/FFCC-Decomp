@@ -1,4 +1,5 @@
 import os
+import errno
 import subprocess
 import sys
 import tempfile
@@ -106,6 +107,12 @@ class TestAgenticLoop(unittest.TestCase):
             max_backoff_seconds=3,
             max_runs=4,
         )
+
+    def test_main_returns_run_agentic_loop_exit_code(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with patch("agentic_loop.run_agentic_loop", return_value=7):
+                rc = agentic_loop.main()
+        self.assertEqual(rc, 7)
 
     def test_main_uses_default_prompt_when_env_prompt_is_blank(self):
         env = {
@@ -317,6 +324,58 @@ class TestAgenticLoop(unittest.TestCase):
 
         mock_popen.assert_called_once()
         mock_sleep.assert_not_called()
+
+    def test_run_agentic_loop_returns_nonzero_exit_code_on_final_failure(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=3,
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc):
+            rc = agentic_loop.run_agentic_loop(
+                prompt="x",
+                timeout_seconds=1,
+                terminate_grace_seconds=2,
+                max_backoff_seconds=300,
+                max_runs=1,
+            )
+
+        self.assertEqual(rc, 3)
+
+    def test_run_agentic_loop_returns_124_when_timeout_reaches_max_runs(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=0,
+            wait=Mock(side_effect=subprocess.TimeoutExpired(cmd="codex", timeout=1)),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc):
+            with patch("agentic_loop._stop_process_tree"):
+                rc = agentic_loop.run_agentic_loop(
+                    prompt="x",
+                    timeout_seconds=1,
+                    terminate_grace_seconds=2,
+                    max_backoff_seconds=300,
+                    max_runs=1,
+                )
+
+        self.assertEqual(rc, 124)
+
+    def test_run_agentic_loop_returns_127_on_missing_codex_binary(self):
+        launch_error = OSError(errno.ENOENT, "No such file or directory")
+        with patch("agentic_loop.subprocess.Popen", side_effect=launch_error):
+            rc = agentic_loop.run_agentic_loop(
+                prompt="x",
+                timeout_seconds=1,
+                terminate_grace_seconds=2,
+                max_backoff_seconds=300,
+                max_runs=1,
+            )
+
+        self.assertEqual(rc, 127)
 
     def test_run_agentic_loop_stops_at_max_runs_after_timeout_without_sleep(self):
         fake_proc = SimpleNamespace(

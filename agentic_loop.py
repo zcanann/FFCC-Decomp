@@ -275,10 +275,11 @@ def run_agentic_loop(
     terminate_grace_seconds: int,
     max_backoff_seconds: int,
     max_runs: Optional[int] = None,
-) -> None:
+) -> int:
     cmd = ["codex", "exec", "--yolo", prompt]
     consecutive_failures = 0
     run_count = 0
+    exit_code = 0
 
     while True:
         if max_runs is not None and run_count >= max_runs:
@@ -295,14 +296,16 @@ def run_agentic_loop(
         except OSError as exc:
             if exc.errno in (errno.ENOENT, errno.EACCES):
                 log(f"failed to launch codex ({exc}); unrecoverable error, stopping loop")
-                break
+                return 127 if exc.errno == errno.ENOENT else 126
             consecutive_failures += 1
+            exit_code = 1
             if not _can_retry(run_count, max_runs):
                 log(f"failed to launch codex ({exc}); reached max runs, stopping loop")
                 break
             backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
             log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
             if not _sleep_interruptible(backoff):
+                exit_code = 130
                 break
             continue
 
@@ -310,9 +313,11 @@ def run_agentic_loop(
             proc.wait(timeout=timeout_seconds)
             if proc.returncode == 0:
                 consecutive_failures = 0
+                exit_code = 0
                 log("codex run completed successfully")
             else:
                 consecutive_failures += 1
+                exit_code = proc.returncode or 1
                 if not _can_retry(run_count, max_runs):
                     log(f"codex exited with code {proc.returncode}; reached max runs, stopping loop")
                     break
@@ -322,26 +327,31 @@ def run_agentic_loop(
                     f"sleeping {backoff}s before retry"
                 )
                 if not _sleep_interruptible(backoff):
+                    exit_code = 130
                     break
         except subprocess.TimeoutExpired:
             log(f"codex exceeded timeout ({timeout_seconds}s); terminating process")
             _stop_process_tree(proc, terminate_grace_seconds)
             log("codex process stopped after timeout")
             consecutive_failures += 1
+            exit_code = 124
             if not _can_retry(run_count, max_runs):
                 log("reached max runs after timeout; stopping loop")
                 break
             backoff = _backoff_seconds(consecutive_failures, max_backoff_seconds)
             log(f"sleeping {backoff}s before retry")
             if not _sleep_interruptible(backoff):
+                exit_code = 130
                 break
         except KeyboardInterrupt:
             log("keyboard interrupt received; stopping loop")
             _stop_process_tree(proc, terminate_grace_seconds)
+            exit_code = 130
             break
 
+    return exit_code
 
-def main(argv: Optional[list[str]] = None) -> None:
+def main(argv: Optional[list[str]] = None) -> int:
     (
         prompt,
         timeout_seconds,
@@ -349,7 +359,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         max_backoff_seconds,
         max_runs,
     ) = _resolve_runtime_config(argv)
-    run_agentic_loop(
+    return run_agentic_loop(
         prompt=prompt,
         timeout_seconds=timeout_seconds,
         terminate_grace_seconds=terminate_grace_seconds,
@@ -359,4 +369,4 @@ def main(argv: Optional[list[str]] = None) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    sys.exit(main(sys.argv[1:]))

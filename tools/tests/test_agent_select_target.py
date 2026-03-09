@@ -29,6 +29,16 @@ class AgentSelectTargetTests(unittest.TestCase):
             with patch("tools.agent_select_target.Path.home", return_value=Path(tmp_dir)):
                 self.assertEqual(agent_select_target.load_blacklist(), [])
 
+    def test_load_blacklist_returns_empty_for_non_object_json_root(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            state_path = Path(tmp_dir) / ".openclaw/workspace/memory"
+            state_path.mkdir(parents=True)
+            with open(state_path / "decomp-state.json", "w", encoding="utf-8") as f:
+                json.dump(["bad-root"], f)
+
+            with patch("tools.agent_select_target.Path.home", return_value=Path(tmp_dir)):
+                self.assertEqual(agent_select_target.load_blacklist(), [])
+
     def test_extract_candidates_handles_malformed_measure_values(self):
         report = {
             "units": [

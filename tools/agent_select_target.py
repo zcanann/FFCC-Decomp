@@ -50,6 +50,8 @@ def load_blacklist():
     try:
         with open(state_file) as f:
             state = json.load(f)
+        if not isinstance(state, dict):
+            return []
         recent_failures = state.get("recentFailures", [])
         if isinstance(recent_failures, list):
             return recent_failures

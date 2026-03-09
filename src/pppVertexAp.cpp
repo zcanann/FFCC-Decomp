@@ -117,13 +117,13 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        s32 count = data->spawnCount;
+        u8 count = data->spawnCount;
 
         switch (data->mode) {
         case 0: {
             MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-            do {
-                if ((s16)state->index >= entry->maxValue) {
+            while (count-- != 0) {
+                if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
@@ -161,12 +161,12 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
         case 1: {
             MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-            do {
+            while (count-- != 0) {
                 u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -200,7 +200,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
         }

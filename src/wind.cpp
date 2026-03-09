@@ -1,6 +1,5 @@
 #include "ffcc/wind.h"
 
-#include <string.h>
 #include <math.h>
 #include "ffcc/graphic.h"
 #include "ffcc/color.h"
@@ -12,6 +11,8 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
+
+extern "C" void* memset(void* dest, int ch, unsigned long count);
 
 CWind Wind;
 

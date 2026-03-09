@@ -324,42 +324,35 @@ static VITiming* getTiming(VITVMode mode) {
 }
 #pragma dont_inline reset
 
+/*
+ * --INFO--
+ * PAL Address: 0x8018BB34
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __VIInit(VITVMode mode) {
     VITiming* tm;
-    u32 nonInter;
     u32 tv;
-    u32 tvForReg;
     volatile u32 a;
     u16 hct;
     u16 vct;
-    u32 encoderType;
 
-    encoderType = getEncoderType();
-    if (encoderType == 0) {
-        __VIInitPhilips();
-    }
-
-    nonInter = mode & 3;
     tv = (u32)mode >> 2;
     *(u32*)OSPhysicalToCached(0xCC) = tv;
-    if (encoderType == 0) {
-        tv = 3;
-    }
+
     tm = getTiming(mode);
     __VIRegs[1] = 2;
 
-    // why?
-    for (a = 0; a < 1000; a++) {}
+    for (a = 0; a < 1000; a += 8) {}
 
     __VIRegs[1] = 0;
     __VIRegs[3] = (u32)tm->hlw;
     __VIRegs[2] = tm->hce | (tm->hcs << 8);
     __VIRegs[5] = tm->hsy | ((tm->hbe640 & 0x1FF) << 7);
     __VIRegs[4] = (tm->hbe640 >> 9) | ((tm->hbs640 & 0xFFFF) << 1);
-    if (encoderType == 0) {
-        __VIRegs[0x39] = tm->hbeCCIR656 | 0x8000;
-        __VIRegs[0x3A] = (u32)tm->hbsCCIR656;
-    }
     __VIRegs[0] = (u32)tm->equ;
     __VIRegs[7] = (u32)(tm->prbOdd + (tm->acv * 2) - 2);
     __VIRegs[6] = (u32)(tm->psbOdd + 2);
@@ -377,24 +370,13 @@ void __VIInit(VITVMode mode) {
     __VIRegs[25] = (u16)(u32)hct;
     __VIRegs[24] = vct | 0x1000;
 
-    switch (tv) {
-    case 1:
-    case 2:
-    case 3:
-        tvForReg = tv;
-        break;
-    default:
-        tvForReg = 0;
-    }
-
-    if (nonInter == 0 || nonInter == 1) {
-        __VIRegs[1] = ((nonInter << 2) & 4) | 1 | (tvForReg << 8);
+    if (((u32)mode == 2) || ((u32)mode == 3) || ((u32)mode == 0x1A)) {
+        __VIRegs[1] = (tv << 8) | 5;
+        __VIRegs[54] = 1;
+    } else {
+        __VIRegs[1] = (((u32)mode & 2) << 2) | 1 | (tv << 8);
         __VIRegs[54] = 0;
-        return;
     }
-
-    __VIRegs[1] = (tvForReg << 8) | 5;
-    __VIRegs[54] = 1;
 }
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

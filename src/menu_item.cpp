@@ -367,14 +367,11 @@ void CMenuPcs::ItemInit1()
  */
 bool CMenuPcs::ItemOpen()
 {
-    float fVar1;
-    double dVar2;
-    double dVar3;
-    s16* psVar4;
-    int iVar5;
-    int iVar6;
-    int iVar7;
-    int iVar8;
+    int count;
+    int finished;
+    int step;
+    int remaining;
+    MenuItemOpenAnim* anim;
     s16* itemState = reinterpret_cast<s16*>(itemMenuState);
     s16* itemList = this->itemList;
 
@@ -382,40 +379,41 @@ bool CMenuPcs::ItemOpen()
         SingLifeInit(-1);
         ItemInit();
     }
-    iVar5 = 0;
-    *(s16*)((int)itemState + 0x22) = *(s16*)((int)itemState + 0x22) + 1;
-    iVar6 = (int)*itemList;
-    psVar4 = itemList + 4;
-    iVar7 = (int)*(s16*)((int)itemState + 0x22);
-    iVar8 = iVar6;
-    if (0 < iVar6) {
+
+    finished = 0;
+    itemState[0x11] = itemState[0x11] + 1;
+    count = (int)*itemList;
+    anim = (MenuItemOpenAnim*)(itemList + 4);
+    step = (int)itemState[0x11];
+    remaining = count;
+
+    if (0 < count) {
         do {
-            dVar3 = DOUBLE_80332ea0;
-            fVar1 = FLOAT_80332e60;
-            if (*(int*)(psVar4 + 0x12) <= iVar7) {
-                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
-                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-                    dVar2 = DOUBLE_80332e68;
-                    *(float*)(psVar4 + 8) = (float)((DOUBLE_80332e68 / (double)*(unsigned int*)(psVar4 + 0x14)) *
-                                                    (double)*(unsigned int*)(psVar4 + 0x10));
-                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-                        fVar1 = (float)((dVar2 / (double)*(unsigned int*)(psVar4 + 0x14)) *
-                                        (double)*(unsigned int*)(psVar4 + 0x10));
-                        *(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1C) - (float)psVar4[0]) * fVar1;
-                        *(float*)(psVar4 + 0x1A) = (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
+            float t = FLOAT_80332e60;
+            if (anim->startFrame <= step) {
+                if (step < anim->startFrame + anim->duration) {
+                    double scale = DOUBLE_80332e68;
+
+                    anim->frame = anim->frame + 1;
+                    anim->progress = (float)((scale / (double)anim->duration) * (double)anim->frame);
+
+                    if ((anim->flags & 2) == 0) {
+                        t = (float)((scale / (double)anim->duration) * (double)anim->frame);
+                        anim->dx = (anim->targetX - (float)anim->x) * t;
+                        anim->dy = (anim->targetY - (float)anim->y) * t;
                     }
                 } else {
-                    iVar5 = iVar5 + 1;
-                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
-                    *(float*)(psVar4 + 0x18) = fVar1;
-                    *(float*)(psVar4 + 0x1A) = fVar1;
+                    finished = finished + 1;
+                    anim->progress = FLOAT_80332e64;
+                    anim->dx = t;
+                    anim->dy = t;
                 }
             }
-            psVar4 = psVar4 + 0x20;
-            iVar8 = iVar8 + -1;
-        } while (iVar8 != 0);
+            anim = anim + 1;
+            remaining = remaining - 1;
+        } while (remaining != 0);
     }
-    return iVar6 == iVar5;
+    return count == finished;
 }
 
 /*

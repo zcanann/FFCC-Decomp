@@ -15,7 +15,7 @@ CUSB USB;
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_usb_cpp()
+extern "C" void __sinit_usb_cpp(void)
 {
 	void* vtbl = __vt__8CManager;
 	*reinterpret_cast<void**>(&USB) = vtbl;

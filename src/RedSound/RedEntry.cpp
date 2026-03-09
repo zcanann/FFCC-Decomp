@@ -16,6 +16,9 @@ static const char DAT_80333d4f[] = "%s\n";
 static const char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[] =
     "%s%sNOT HAVE A-MEMORY FREE AREA (WAVE%4.4u:0x%6.6X need).%s\n";
 static const char s__s_sWave_Header_was_broken__s_801e7972[] = "%s%sWave-Header was broken.%s\n";
+static const char s__s_s__s_801e78d8[] = "%s%s%s\n";
+static const char s__s_s__________ERROR___________s_801e7917[] = "%s%s----------ERROR-----------%s\n";
+static const char s__s_s_Erase_Using_Wave_Data_____W_801e7944[] = "%s%s Erase Using Wave Data.  (WAVE%4.4u)%s\n";
 static const char s__s_____SE_Play_Information______801e7b71[] = "%s==== SE Play Information ====\n";
 static const char s__s_Track___Name___Wave_801e7b92[] = "%s Track : Name         : Wave\n";
 static const char s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2[] = "%s    %2d : %3.3u:%3.3u      : WAVE%4.4u\n";
@@ -248,12 +251,50 @@ int CRedEntry::SearchUseWave(int waveNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0970
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::WaveDelete(RedHistoryBANK*)
+int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 {
-	// TODO
+	int iVar1;
+	int iVar2;
+	int sequenceNo = -1;
+	int* bankEntry = reinterpret_cast<int*>(bank);
+
+	if (-1 < bankEntry[0]) {
+		WaveHistoryDelete(bankEntry[1]);
+		iVar2 = bankEntry[0];
+
+		bankEntry[0] = -1;
+		bankEntry[3] = 0;
+
+		sequenceNo = SearchWaveSequence(iVar2);
+		if (sequenceNo < 0) {
+			iVar1 = SearchUseWave(iVar2);
+			if ((iVar1 != 0) && (DAT_8032f408 != 0)) {
+				OSReport(s__s_s__s_801e78d8, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				fflush(&DAT_8021d1a8);
+				OSReport(s__s_s__________ERROR___________s_801e7917, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				fflush(&DAT_8021d1a8);
+				OSReport(s__s_s_Erase_Using_Wave_Data_____W_801e7944, DAT_801e7905, DAT_80333d30, iVar2,
+				         DAT_80333d38);
+				fflush(&DAT_8021d1a8);
+				OSReport(s__s_s__s_801e78d8, DAT_801e7905, DAT_80333d30, DAT_80333d38);
+				fflush(&DAT_8021d1a8);
+			}
+			RedDeleteA(*reinterpret_cast<int*>(bankEntry[2] + 0x10));
+			RedDelete(bankEntry[2]);
+		}
+
+		bankEntry[2] = 0;
+		bankEntry[1] = 0;
+	}
+
+	return sequenceNo;
 }
 
 /*

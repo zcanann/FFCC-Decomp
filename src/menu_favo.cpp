@@ -11,6 +11,11 @@ unsigned char s_rank[0x20];
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int __cntlzw(unsigned int);
 
+extern float FLOAT_80333040;
+extern float FLOAT_80333048;
+extern double DOUBLE_80333050;
+extern double DOUBLE_80333078;
+
 struct FavoFlatTableEntry
 {
 	int count;
@@ -386,6 +391,9 @@ void CMenuPcs::FavoInit0()
  */
 bool CMenuPcs::FavoOpen()
 {
+	float fVar1;
+	double dVar2;
+	double dVar3;
 	short* psVar4;
 	int iVar5;
 	int iVar6;
@@ -404,20 +412,24 @@ bool CMenuPcs::FavoOpen()
 	iVar8 = iVar6;
 	if (0 < iVar6) {
 		do {
+			dVar3 = DOUBLE_80333078;
+			fVar1 = FLOAT_80333040;
 			if (*(int*)(psVar4 + 0x12) <= iVar7) {
 				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
 					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-					*(float*)(psVar4 + 8) = (float)*(int*)(psVar4 + 0x10) / (float)*(int*)(psVar4 + 0x14);
+					dVar2 = DOUBLE_80333050;
+					*(float*)(psVar4 + 8) = (float)((DOUBLE_80333050 / (double)*(int*)(psVar4 + 0x14)) *
+					                                (double)*(int*)(psVar4 + 0x10));
 					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-						float fVar1 = (float)*(int*)(psVar4 + 0x10) / (float)*(int*)(psVar4 + 0x14);
+						fVar1 = (float)((dVar2 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10));
 						*(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1c) - (float)psVar4[0]) * fVar1;
 						*(float*)(psVar4 + 0x1a) = (*(float*)(psVar4 + 0x1e) - (float)psVar4[1]) * fVar1;
 					}
 				} else {
 					iVar5 = iVar5 + 1;
-					*(float*)(psVar4 + 8) = 1.0f;
-					*(float*)(psVar4 + 0x18) = 0.0f;
-					*(float*)(psVar4 + 0x1a) = 0.0f;
+					*(float*)(psVar4 + 8) = FLOAT_80333048;
+					*(float*)(psVar4 + 0x18) = fVar1;
+					*(float*)(psVar4 + 0x1a) = fVar1;
 				}
 			}
 			psVar4 = psVar4 + 0x20;
@@ -736,4 +748,3 @@ void CMenuPcs::FavoCtrlCur()
 {
 	// TODO
 }
-

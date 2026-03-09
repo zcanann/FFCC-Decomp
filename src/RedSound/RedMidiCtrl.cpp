@@ -246,10 +246,14 @@ int SawSwing(int phase)
 #pragma optimization_level 0
 int DutySwing(int phase)
 {
+    int value;
+
     if ((phase & 0x200) == 0) {
-        return 0x10000;
+        value = 0x10000;
+    } else {
+        value = 0xFFFF0000;
     }
-    return 0xFFFF0000;
+    return value;
 }
 #pragma optimization_level 0
 

@@ -87,8 +87,10 @@ def derive_source_file(unit):
     if source_path and source_path != "unknown":
         return Path(source_path).name
     name = unit.get("name", "")
-    base = Path(name).stem
-    return f"{base}.cpp"
+    path = Path(name)
+    if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
+        return path.name
+    return f"{path.stem}.cpp"
 
 def summarize_symbols(label, all_info):
     """Return formatted lines for symbol summary (no printing inside)."""

@@ -23,6 +23,14 @@ class DeriveFileNameTests(unittest.TestCase):
         unit = {"name": "src/system/player.cpp", "metadata": {"source_path": "unknown"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
 
+    def test_derive_source_file_fallback_preserves_c_extension(self):
+        unit = {"name": "src/card/CARDOpen.c", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "CARDOpen.c")
+
+    def test_derive_source_file_fallback_defaults_to_cpp_without_extension(self):
+        unit = {"name": "src/system/player", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
 
 class NumericParsingTests(unittest.TestCase):
     def test_safe_float_returns_default_for_invalid_values(self):

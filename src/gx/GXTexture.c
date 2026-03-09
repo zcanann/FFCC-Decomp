@@ -936,6 +936,7 @@ void GXInvalidateTexAll(void) {
     __GXFlushTextureState();
 }
 
+#undef __GXData
 GXTexRegionCallback GXSetTexRegionCallback(GXTexRegionCallback f) {
     GXTexRegionCallback oldcb = __GXData->texRegionCallback;
 
@@ -949,6 +950,8 @@ GXTlutRegionCallback GXSetTlutRegionCallback(GXTlutRegionCallback f) {
     __GXData->tlutRegionCallback = f;
     return oldcb;
 }
+
+#define __GXData gx
 
 void GXPreLoadEntireTexture(GXTexObj* tex_obj, GXTexRegion* region) {
     GXBool isMipMap;

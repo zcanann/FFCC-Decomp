@@ -140,7 +140,7 @@ void GXSetDispCopyDst(u16 wd, u16 ht) {
     ASSERTMSGLINE(1293, (wd & 0xF) == 0, "GXSetDispCopyDst: Width must be a multiple of 16");
     CHECK_GXBEGIN(1294, "GXSetDispCopyDst");
     __GXData->cpDispStride = 0;
-    __GXData->cpDispStride = (__GXData->cpDispStride & 0xFFFFFC00) | ((u32)(wd & 0x7FF0) >> 4);
+    __GXData->cpDispStride = (__GXData->cpDispStride & 0xFFFFFC00) | ((int)((wd & 0x7FFF) << 1) >> 5);
     __GXData->cpDispStride = (__GXData->cpDispStride & 0x00FFFFFF) | 0x4D000000;
 }
 

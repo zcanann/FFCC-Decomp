@@ -12,6 +12,8 @@ DEFAULT_PROMPT = (
     "Pay careful attention to any important rules."
 )
 
+KILL_SIGNAL = getattr(signal, "SIGKILL", signal.SIGTERM)
+
 
 def log(message: str) -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -49,7 +51,7 @@ def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
             os.killpg(proc.pid, sig)
         else:
             # Use taskkill so child processes are also terminated on Windows.
-            force = sig == signal.SIGKILL
+            force = sig == KILL_SIGNAL
             cmd = ["taskkill", "/PID", str(proc.pid), "/T"]
             if force:
                 cmd.append("/F")
@@ -66,7 +68,7 @@ def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:
     try:
         proc.wait(timeout=grace_seconds)
     except subprocess.TimeoutExpired:
-        _signal_process_tree(proc, signal.SIGKILL)
+        _signal_process_tree(proc, KILL_SIGNAL)
         proc.wait()
 
 

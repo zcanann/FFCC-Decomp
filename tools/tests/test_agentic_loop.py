@@ -116,6 +116,18 @@ class TestAgenticLoop(unittest.TestCase):
         mock_stop.assert_called_once_with(fake_proc, 2)
         mock_sleep.assert_called_once_with(2)
 
+    def test_stop_process_tree_uses_kill_signal_constant_after_timeout(self):
+        fake_proc = SimpleNamespace(
+            wait=Mock(side_effect=[subprocess.TimeoutExpired(cmd="codex", timeout=1), None]),
+            poll=Mock(return_value=None),
+        )
+        with patch("agentic_loop._signal_process_tree") as mock_signal:
+            with patch.object(agentic_loop, "KILL_SIGNAL", 12345):
+                agentic_loop._stop_process_tree(fake_proc, grace_seconds=1)
+
+        mock_signal.assert_any_call(fake_proc, agentic_loop.signal.SIGTERM)
+        mock_signal.assert_any_call(fake_proc, 12345)
+
 
 if __name__ == "__main__":
     unittest.main()

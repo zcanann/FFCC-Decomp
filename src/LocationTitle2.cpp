@@ -41,7 +41,14 @@ static inline float CameraWorldZ()
 
 static int GetGraphFrameFromId(u32 graphId)
 {
-    return ((int)graphId >> 12) + (int)((graphId & 0x80000000) != 0 && (graphId & 0xFFF) != 0);
+    int frame;
+
+    frame = (int)graphId >> 12;
+    if (((int)graphId < 0) && ((graphId & 0xFFF) != 0)) {
+        frame++;
+    }
+
+    return frame;
 }
 
 struct LocationTitle2Work {
@@ -191,7 +198,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             u16 count;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(modelNodes + nodeIndex * 0xC0, model);
-            SetFrame__Q26CChara6CModelFf((float)frameIndex, model);
+            SetFrame__Q26CChara6CModelFf((float)((double)(int)frameIndex - DOUBLE_80330f58), model);
             CalcMatrix__Q26CChara6CModelFv(model);
             PSMTXCopy((float(*)[4])(modelNodes + nodeIndex * 0xC0 + 0xC), nodeMtx);
 
@@ -227,14 +234,14 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
-                stepScale = (double)(FLOAT_80330f4c / (float)(stepCount + 1));
+                stepScale = (double)(FLOAT_80330f4c / (float)((double)(int)(stepCount + 1) - DOUBLE_80330f58));
                 PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &stepDir);
 
                 for (int i = 0; i < stepCount; i++) {
                     Vec scaled;
                     float t;
 
-                    t = (float)(stepScale * (double)(i + 1));
+                    t = (float)(stepScale * (double)(float)((double)(int)(i + 1) - DOUBLE_80330f58));
                     PSVECScale(&stepDir, &scaled, t);
                     PSVECAdd(&startParticle->m_pos, &scaled, &interp[i]);
                     inserted++;

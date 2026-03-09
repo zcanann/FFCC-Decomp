@@ -393,55 +393,61 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
 	int checked = 0;
 	int blocks = 4;
-	WindObject* cur = m_objects;
-	WindObject* obj;
+	u8* cur = (u8*)m_objects;
+	u8* foundObj;
 
 	do {
-		obj = &cur[0];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[1];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0x64;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[2];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0xC8;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[3];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0x12C;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[4];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0x190;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[5];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0x1F4;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[6];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0x258;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
-		obj = &cur[7];
-		if ((s8)obj->flags >= 0) {
+		foundObj = cur + 0x2BC;
+		if ((s8)foundObj[0] >= 0) {
 			goto found;
 		}
 
 		checked += 7;
-		cur += 8;
+		cur += 0x320;
 		blocks--;
 	} while (blocks != 0);
 
-	obj = 0;
+	foundObj = 0;
 
 found:
+	WindObject* obj = (WindObject*)foundObj;
 	if (obj == 0) {
 		System.Printf(DAT_801db548, checked);
 		return -1;
 	}
+
+	float centerX = pos->x;
+	double centerXD = (double)centerX;
+	float centerZ = pos->z;
+	double centerZD = (double)centerZ;
 
 	obj->type = 1;
 	obj->flags = (obj->flags & 0x7F) | 0x80;
@@ -461,12 +467,12 @@ found:
 	obj->radius = radius;
 	obj->radiusSq = radius * radius;
 
-	obj->centerX = pos->x;
-	obj->centerZ = pos->z;
-	obj->minX = pos->x - radius;
-	obj->minZ = pos->z - radius;
-	obj->maxX = pos->x + radius;
-	obj->maxZ = pos->z + radius;
+	obj->centerX = centerX;
+	obj->centerZ = centerZ;
+	obj->minX = (float)(centerXD - (double)radius);
+	obj->minZ = (float)(centerZD - (double)radius);
+	obj->maxX = (float)(centerXD + (double)radius);
+	obj->maxZ = (float)(centerZD + (double)radius);
 
 	return obj->id;
 }

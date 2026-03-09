@@ -407,18 +407,27 @@ def load_build_config(
     f = open(build_config_path, "r", encoding="utf-8")
     build_config: BuildConfig = json.load(f)
     config_version = build_config.get("version")
-    if config_version is None:
+    if not isinstance(config_version, str):
         print("Invalid config.json, regenerating...")
         f.close()
         os.remove(build_config_path)
         return None
 
-    dtk_version = str(config.dtk_tag)[1:]  # Strip v
-    if versiontuple(config_version) < versiontuple(dtk_version):
-        print("Outdated config.json, regenerating...")
-        f.close()
-        os.remove(build_config_path)
-        return None
+    # If dtk_tag is configured, compare versions and regenerate old configs.
+    # dtk_tag is optional when building with a local dtk_path, so this check
+    # must not assume the tag always exists.
+    if config.dtk_tag is not None:
+        dtk_version = str(config.dtk_tag)
+        if dtk_version.startswith("v"):
+            dtk_version = dtk_version[1:]
+        try:
+            if versiontuple(config_version) < versiontuple(dtk_version):
+                print("Outdated config.json, regenerating...")
+                f.close()
+                os.remove(build_config_path)
+                return None
+        except ValueError:
+            print("Warning: unable to parse config or DTK version, skipping version check")
 
     f.close()
 

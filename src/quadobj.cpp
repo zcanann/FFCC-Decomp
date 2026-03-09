@@ -94,35 +94,41 @@ int CGQuadObj::GetCID()
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
-    u32 count = (u32)m_vertexCount;
+	int count = (int)(u32)m_vertexCount;
 
-    if ((count != 0) && (m_bboxMinX <= vec->x) && (m_bboxMinZ <= vec->z) && (vec->x <= m_bboxMaxX) &&
-        (vec->z <= m_bboxMaxZ)) {
-        if ((m_yBase <= vec->y) && (vec->y <= m_yBase + m_yHeight)) {
-            u32 i = 0;
-            u32 remaining = count;
-            QuadVertex* vert = m_vertices;
+	if (count != 0) {
+		float x = vec->x;
+		if (m_bboxMinX <= x) {
+			float z = vec->z;
+			if ((m_bboxMinZ <= z) && ((x <= m_bboxMaxX) && (z <= m_bboxMaxZ))) {
+				if ((m_yBase <= vec->y) && (vec->y <= m_yBase + m_yHeight)) {
+					int i = 0;
+					int remaining = count;
+					QuadVertex* vert = m_vertices;
 
-            while (remaining != 0) {
-                float z0 = vert->z;
-                float x0 = vert->x;
-                int next = (i + 1) - ((int)(i + 1) / (int)count) * count;
-                float cross =
-                    (m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0);
-                if (cross < EPS) {
-                    break;
-                }
-                vert++;
-                i++;
-                remaining--;
-            }
-            if (i == count) {
-                return true;
-            }
-        }
-    }
+					while (remaining != 0) {
+						float z0 = vert->z;
+						float x0 = vert->x;
+						int next = (i + 1) - ((i + 1) / count) * count;
+						float cross = (m_vertices[next].x - x0) * (z - z0) - (m_vertices[next].z - z0) * (x - x0);
+						if (cross < EPS) {
+							break;
+						}
 
-    return false;
+						vert++;
+						i++;
+						remaining--;
+					}
+
+					if (i == count) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 /*

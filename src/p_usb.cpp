@@ -48,7 +48,9 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = Memory.CreateStage(0x2000, s_CUSBPcs_8032f810, 0);
+    CMemory* memory = &Memory;
+
+	m_smallStage = memory->CreateStage(0x2000, s_CUSBPcs_8032f810, 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_usbRootPath);

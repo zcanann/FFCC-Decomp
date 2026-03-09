@@ -10,8 +10,12 @@ import json
 import sys
 import random
 from pathlib import Path
+from json import JSONDecodeError
 
-import extract_symbols
+try:
+    from . import extract_symbols
+except ImportError:
+    import extract_symbols
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
 WARNING_BUILD_MISMATCH = (
@@ -30,9 +34,12 @@ def load_blacklist():
     try:
         with open(state_file) as f:
             state = json.load(f)
-        return state.get("recentFailures", [])
-    except:
+        recent_failures = state.get("recentFailures", [])
+        if isinstance(recent_failures, list):
+            return recent_failures
+    except (OSError, JSONDecodeError):
         return []
+    return []
 
 
 def is_viable_target(unit, blacklist):
@@ -68,7 +75,10 @@ def derive_object_file(unit):
         base = Path(source_path).stem
         return f"{base}.o"
     name = unit.get("name", "")
-    base = Path(name).name
+    parsed_name = Path(name)
+    if parsed_name.suffix == ".o":
+        return parsed_name.name
+    base = parsed_name.stem
     return f"{base}.o"
 
 def derive_source_file(unit):
@@ -76,7 +86,10 @@ def derive_source_file(unit):
     if source_path and source_path != "unknown":
         return Path(source_path).name
     name = unit.get("name", "")
-    base = Path(name).name
+    parsed_name = Path(name)
+    if parsed_name.suffix in {".c", ".cc", ".cpp", ".cxx", ".s", ".asm"}:
+        return parsed_name.name
+    base = parsed_name.stem
     return f"{base}.cpp"
 
 def summarize_symbols(label, all_info):

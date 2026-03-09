@@ -9,7 +9,8 @@ Selects random viable targets across multiple opportunity buckets:
 import json
 import sys
 import random
-from pathlib import Path
+import math
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 try:
     from . import extract_symbols
@@ -22,6 +23,20 @@ WARNING_BUILD_MISMATCH = (
 )
 COMPLETE_THRESHOLD_PERCENT = 100
 
+
+def _path_name(path_str):
+    """Return basename for paths that may use POSIX or Windows separators."""
+    if not isinstance(path_str, str) or not path_str:
+        return ""
+    path_obj = PureWindowsPath(path_str) if "\\" in path_str else PurePosixPath(path_str)
+    return path_obj.name
+
+
+def _path_stem(path_str):
+    """Return stem for paths that may use POSIX or Windows separators."""
+    name = _path_name(path_str)
+    return PurePosixPath(name).stem if name else ""
+
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
     print(WARNING_BUILD_MISMATCH)
@@ -30,16 +45,38 @@ def warn_build_mismatch():
 def safe_float(value, default=0.0):
     """Parse a float from mixed report values without throwing."""
     try:
-        return float(value)
-    except (TypeError, ValueError):
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else default
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
 def safe_int(value, default=0):
     """Parse an int from mixed report values without throwing."""
     try:
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return default
+            # Accept explicit integer bases while keeping plain decimal strings stable.
+            # (e.g. "010" should stay decimal, not octal)
+            lower_value = value.lower()
+            has_explicit_base = lower_value.startswith(("+0x", "-0x", "0x", "+0o", "-0o", "0o", "+0b", "-0b", "0b"))
+            try:
+                return int(value, 0 if has_explicit_base else 10)
+            except ValueError:
+                # Some reports may serialize integral values as float-like strings (e.g. "12.0").
+                parsed = float(value)
+                if not math.isfinite(parsed):
+                    return default
+                if not parsed.is_integer():
+                    return default
+                return int(parsed)
+        if isinstance(value, float):
+            if not math.isfinite(value) or not value.is_integer():
+                return default
         return int(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
@@ -92,20 +129,21 @@ def is_viable_target(unit, blacklist):
 def derive_object_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
     if source_path and source_path != "unknown":
-        base = Path(source_path).stem
+        base = _path_stem(source_path)
         return f"{base}.o"
     name = unit.get("name", "")
-    base = Path(name).stem
+    base = _path_stem(name)
     return f"{base}.o"
 
 def derive_source_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
     if source_path and source_path != "unknown":
-        return Path(source_path).name
+        return _path_name(source_path)
     name = unit.get("name", "")
-    path = Path(name)
+    path_name = _path_name(name)
+    path = PurePosixPath(path_name)
     if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
-        return path.name
+        return path_name
     return f"{path.stem}.cpp"
 
 def summarize_symbols(label, all_info):
@@ -160,7 +198,7 @@ def extract_candidates(report_path):
         measures = unit.get("measures", {})
         functions = unit.get("functions", [])
         source_path = unit.get("metadata", {}).get("source_path", "unknown")
-        source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
+        source_file = _path_name(source_path) if source_path and source_path != "unknown" else "unknown"
 
         entry = {
             "name": unit["name"],

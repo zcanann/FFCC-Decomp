@@ -22,10 +22,18 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+}
 
 template <class T>
 class CPtrArray
@@ -384,12 +392,19 @@ void CCharaPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007a0a4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::createLoad()
 {
-	// TODO
+    *reinterpret_cast<int*>(Ptr(this, 0x714)) = 0;
+    *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 2;
+    LoadMergeFile(0, 0x10000000, 1);
+    *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 0;
 }
 
 /*
@@ -434,12 +449,24 @@ void CCharaPcs::onScriptChanging(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079938
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::calc()
 {
-	// TODO
+    CHandle* head = *reinterpret_cast<CHandle**>(Ptr(this, 0x4c));
+    CHandle* handle = head->m_next;
+
+    while (head != handle) {
+        CHandle* next = handle->m_next;
+        handle->m_shadowTexturePtr = 0;
+        loadModelASyncFrame__Q29CCharaPcs7CHandleFv(handle);
+        handle = next;
+    }
 }
 
 /*

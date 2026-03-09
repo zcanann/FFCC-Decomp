@@ -12,31 +12,47 @@ from typing import Optional
 AGENTS_FILE_CANDIDATES = ("AGENTS.md", "AGENTS.MD")
 
 
-def _resolve_agents_filename() -> str:
+def _resolve_agents_file_in_dir(directory: Path) -> Optional[Path]:
     # Match exact directory entries first so case-variant names are handled
     # predictably even on case-insensitive filesystems.
     try:
-        cwd_entries = set(os.listdir("."))
+        dir_entries = set(os.listdir(directory))
     except OSError:
         # If listing fails, still check canonical candidates directly.
         for filename in AGENTS_FILE_CANDIDATES:
-            if Path(filename).is_file():
-                return filename
-        cwd_entries = set()
+            candidate = directory / filename
+            if candidate.is_file():
+                return candidate
+        return None
 
     for filename in AGENTS_FILE_CANDIDATES:
-        if filename in cwd_entries and Path(filename).is_file():
-            return filename
+        candidate = directory / filename
+        if filename in dir_entries and candidate.is_file():
+            return candidate
 
     # Fall back to any case variant like "Agents.md" on case-sensitive filesystems.
     canonical_name = AGENTS_FILE_CANDIDATES[0].casefold()
     case_insensitive_matches = sorted(
-        entry
-        for entry in cwd_entries
-        if entry.casefold() == canonical_name and Path(entry).is_file()
+        directory / entry
+        for entry in dir_entries
+        if entry.casefold() == canonical_name and (directory / entry).is_file()
     )
     if case_insensitive_matches:
         return case_insensitive_matches[0]
+
+    return None
+
+
+def _resolve_agents_filename() -> str:
+    cwd = Path.cwd()
+    for directory in [cwd, *cwd.parents]:
+        agents_file = _resolve_agents_file_in_dir(directory)
+        if agents_file is None:
+            continue
+        try:
+            return os.path.relpath(agents_file, cwd)
+        except ValueError:
+            return str(agents_file)
 
     return AGENTS_FILE_CANDIDATES[0]
 

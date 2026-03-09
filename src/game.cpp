@@ -588,13 +588,16 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
+    const char* townName;
+
     System.Printf(const_cast<char*>(DAT_8032f6a0));
     System.Printf(const_cast<char*>(DAT_801d6214));
     System.Printf(const_cast<char*>(DAT_8032f6a0));
 
-    memset(reinterpret_cast<u8*>(&Game.game) + 0xF, 0, 0x13E1);
-    memset(reinterpret_cast<u8*>(&Game.game) + 0x20, 0xFF, 0x10);
+    memset(&Game.game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(Game.game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.game.m_gameWork.m_wmBackupParams));
 
+    townName = DAT_8032f6ac;
     Game.game.m_gameWork.m_scriptSysVal0 = 0;
     Game.game.m_gameWork.m_scriptSysVal1 = 0;
     Game.game.m_gameWork.m_scriptSysVal2 = 0;
@@ -602,11 +605,10 @@ void CGame::InitNewGame()
     Game.game.m_gameWork.m_chaliceElement = 1;
 
     if (Game.game.m_gameWork.m_languageId == 3) {
-        strcpy(Game.game.m_gameWork.m_townName, DAT_8032f6a4);
-    } else {
-        strcpy(Game.game.m_gameWork.m_townName, DAT_8032f6ac);
+        townName = DAT_8032f6a4;
     }
 
+    strcpy(Game.game.m_gameWork.m_townName, townName);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
     gChara.InitFurTexBuffer();
 }

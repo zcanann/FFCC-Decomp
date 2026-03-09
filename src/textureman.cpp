@@ -1320,13 +1320,22 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
  */
 int CTextureSet::Find(char* name)
 {
-    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
+    unsigned long i;
+
+    i = 0;
+    while (1) {
+        if (static_cast<unsigned long>(Textures(this)->GetSize()) <= i) {
+            return -1;
+        }
+
         CTexture* texture = (*Textures(this))[i];
         if ((texture != 0) && (strcmp(reinterpret_cast<char*>(Ptr(texture, 8)), name) == 0)) {
-            return static_cast<int>(i);
+            break;
         }
+        i++;
     }
-    return -1;
+
+    return static_cast<int>(i);
 }
 
 /*

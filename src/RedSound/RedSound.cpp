@@ -124,41 +124,42 @@ int* CRedSound::EntryStandbyID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
+int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
+	CRedSound* self = this;
+
 	memset(DAT_8032e17c, 0, 0x100);
 
-	if (param_3 < 1 || param_5 < 1) {
+	if (param_3 <= 0 || param_5 <= 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] Sound Driver Initialize ERROR! %s %s\n", "RedSound", "Invalid parameters", "");
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 2);
 		}
-		return;
+		return 0;
 	}
 	
 	if (((unsigned)param_2 & 0x1f) != 0 || ((unsigned)param_3 & 0x1f) != 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] %s Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", (unsigned)param_2, param_3, "");
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 2);
 		}
-		return;
+		return 0;
 	}
 	
 	if (((unsigned)param_4 & 0x1f) != 0 || ((unsigned)param_5 & 0x1f) != 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] A Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", param_4, param_5, "");
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 2);
 		}
-		return;
+		return 0;
 	}
 	
-	int initResult = ARCheckInit();
-	if (initResult == 0) {
+	if (ARCheckInit() == 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] AR was not initialized %s\n", "RedSound", "");
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 2);
 		}
-		return;
+		return 0;
 	}
 	
 	AIReset();
@@ -167,13 +168,15 @@ void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	AXARTInit();
 	DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
 	DAT_8032e154.Init();
-	Start();
+	self->Start();
 	CRedDriver_8032f4c0.Init();
 	
 	if (gRedMemoryDebugEnabled != 0) {
 		OSReport("[%s] Sound Driver Initialize OK! %s\n", "RedSound", "");
-		fflush(&DAT_8021d1a8);
+		fflush(__files + 2);
 	}
+
+	return 1;
 }
 
 /*

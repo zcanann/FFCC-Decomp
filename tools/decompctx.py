@@ -14,7 +14,7 @@ import argparse
 import fnmatch
 import os
 import re
-from typing import List
+from typing import List, Optional
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 root_dir = os.path.abspath(os.path.join(script_dir, ".."))
@@ -28,6 +28,29 @@ once_pattern = re.compile(r"^#\s*pragma\s+once$")
 
 defines = set()
 deps = []
+
+
+def get_header_guard_key(in_file: str, lines: List[str]) -> Optional[str]:
+    """Return a stable de-duplication key for include guards / pragma once."""
+    for line in lines[:64]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("//") or stripped in {"/*", "*/"} or stripped.startswith("*"):
+            continue
+
+        guard_match = guard_pattern.match(stripped)
+        if guard_match:
+            return guard_match[1]
+
+        once_match = once_pattern.match(stripped)
+        if once_match:
+            return in_file
+
+        # Stop scanning once we hit non-comment, non-guard content.
+        break
+
+    return None
 
 
 def generate_prelude(defines) -> str:
@@ -75,20 +98,15 @@ def import_c_file(in_file: str) -> str:
 
 
 def process_file(in_file: str, lines: List[str]) -> str:
+    guard_key = get_header_guard_key(in_file, lines)
+    if guard_key is not None:
+        if guard_key in defines:
+            return ""
+        defines.add(guard_key)
+
     out_text = ""
     for idx, line in enumerate(lines):
         if idx == 0:
-            guard_match = guard_pattern.match(line.strip())
-            if guard_match:
-                if guard_match[1] in defines:
-                    break
-                defines.add(guard_match[1])
-            else:
-                once_match = once_pattern.match(line.strip())
-                if once_match:
-                    if in_file in defines:
-                        break
-                    defines.add(in_file)
             print("Processing file", in_file)
         include_match = include_pattern.match(line.strip())
         if include_match and not include_match[1].endswith(".s"):

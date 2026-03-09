@@ -25,6 +25,7 @@ extern Mtx gFlatPosMtx;
 
 class CFlatRuntime2
 {
+public:
 	class CParticleWork
 	{
 		CParticleWork();

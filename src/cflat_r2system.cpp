@@ -43,8 +43,6 @@ extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
-int GetSysControl__13CFlatRuntime2Fi(CFlatRuntime2*, int);
-void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
@@ -1786,7 +1784,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xF3:
-        runtime->push(object, GetSysControl__13CFlatRuntime2Fi(this, *object->m_localBase));
+        runtime->push(object, this->GetSysControl(*object->m_localBase));
         outResult = 0;
         return;
     case -0xF2:
@@ -1796,7 +1794,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xF1:
-        resetSpawnBit__13CFlatRuntime2Fi(this, *object->m_localBase);
+        this->resetSpawnBit(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;

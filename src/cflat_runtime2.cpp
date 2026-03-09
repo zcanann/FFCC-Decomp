@@ -59,9 +59,6 @@ extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, P
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
-extern "C" void ChangeMogMode__6CCharaFi(void*, int);
-extern "C" void TimeMogFur__6CCharaFv(void*);
-extern "C" void LoadLogoWaitingData__5CGameFv(void*);
 extern "C" void SetScale__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
@@ -2590,7 +2587,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 	case 0xE:
 		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xFD) | ((value8 & 1) << 1));
-		ChangeMogMode__6CCharaFi(&gChara, controlValue);
+		gChara.ChangeMogMode(controlValue);
 		break;
 
 	case 0x12:
@@ -2608,7 +2605,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	}
 
 	case 0x14:
-		TimeMogFur__6CCharaFv(&gChara);
+		gChara.TimeMogFur();
 		break;
 
 	case 0x17:
@@ -2616,7 +2613,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x18:
-		LoadLogoWaitingData__5CGameFv(&Game.game);
+		Game.game.LoadLogoWaitingData();
 		break;
 
 	case 0x19: {

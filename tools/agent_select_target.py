@@ -23,6 +23,22 @@ WARNING_BUILD_MISMATCH = (
 )
 COMPLETE_THRESHOLD_PERCENT = 100
 
+
+def _safe_float(value, default=0.0):
+    """Convert mixed report values to float without raising on malformed data."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _safe_int(value, default=0):
+    """Convert mixed report values to int while tolerating malformed strings."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
     print(WARNING_BUILD_MISMATCH)
@@ -56,9 +72,9 @@ def is_viable_target(unit, blacklist):
         return False, "recently failed"
 
     # Skip units that are already effectively complete.
-    fuzzy = float(measures.get("fuzzy_match_percent", 0) or 0)
-    matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
-    matched_data_percent = float(measures.get("matched_data_percent", 0) or 0)
+    fuzzy = _safe_float(measures.get("fuzzy_match_percent", 0) or 0)
+    matched_code_percent = _safe_float(measures.get("matched_code_percent", 0) or 0)
+    matched_data_percent = _safe_float(measures.get("matched_data_percent", 0) or 0)
 
     if (
         fuzzy >= COMPLETE_THRESHOLD_PERCENT
@@ -145,24 +161,25 @@ def extract_candidates(report_path):
 
         entry = {
             "name": unit["name"],
-            "fuzzy_match": float(measures.get("fuzzy_match_percent", 0) or 0),
-            "matched_code_percent": float(measures.get("matched_code_percent", 0) or 0),
-            "matched_data_percent": float(measures.get("matched_data_percent", 0) or 0),
-            "total_functions": int(measures.get("total_functions", 0) or 0),
-            "matched_functions": int(measures.get("matched_functions", 0) or 0),
-            "func_match_percent": float(measures.get("matched_functions_percent", 0) or 0),
-            "total_code": int(measures.get("total_code", 0) or 0),
-            "total_data": int(measures.get("total_data", 0) or 0),
+            "fuzzy_match": _safe_float(measures.get("fuzzy_match_percent", 0) or 0),
+            "matched_code_percent": _safe_float(measures.get("matched_code_percent", 0) or 0),
+            "matched_data_percent": _safe_float(measures.get("matched_data_percent", 0) or 0),
+            "total_functions": _safe_int(measures.get("total_functions", 0) or 0),
+            "matched_functions": _safe_int(measures.get("matched_functions", 0) or 0),
+            "func_match_percent": _safe_float(measures.get("matched_functions_percent", 0) or 0),
+            "total_code": _safe_int(measures.get("total_code", 0) or 0),
+            "total_data": _safe_int(measures.get("total_data", 0) or 0),
             "source_path": source_path,
             "source_file": source_file,
             "top_functions": []
         }
 
-        for func in sorted(functions, key=lambda f: f.get("fuzzy_match_percent", 0))[:3]:
-            if func.get("fuzzy_match_percent", 0) < 99:
+        for func in sorted(functions, key=lambda f: _safe_float(f.get("fuzzy_match_percent", 0), default=100.0))[:3]:
+            func_match = _safe_float(func.get("fuzzy_match_percent", 0), default=100.0)
+            if func_match < 99:
                 entry["top_functions"].append({
                     "name": func["name"],
-                    "match": func.get("fuzzy_match_percent", 0),
+                    "match": func_match,
                     "size": func.get("size", "unknown")
                 })
 

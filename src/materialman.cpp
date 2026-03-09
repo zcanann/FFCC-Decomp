@@ -1710,12 +1710,27 @@ void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003e904
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetFullScreenShadow(CFullScreenShadow&, float (*) [4], long)
+void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMtx)[4], long flags)
 {
-	// TODO
+    if (*(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404) != 0) {
+        *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x80;
+
+        unsigned char* shadowPtr = reinterpret_cast<unsigned char*>(&shadow);
+        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x58), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x64)));
+
+        int frameDataBase = reinterpret_cast<int>(shadowPtr) + flags * 0x20;
+        *reinterpret_cast<int*>(Ptr(this, 0xC4)) = frameDataBase + 8;
+
+        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x88), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x94)));
+        *reinterpret_cast<int*>(Ptr(this, 0xC8)) = frameDataBase + 0x28;
+    }
 }
 
 /*
@@ -3437,4 +3452,3 @@ void CMaterial::AddTextureIdx(int, int)
 {
 	// TODO
 }
-

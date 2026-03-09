@@ -2056,58 +2056,85 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
  */
 int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 {
+	int result;
+	short* cmdListSlot = reinterpret_cast<short*>(m_commandListInventorySlotRef) + cmdListIdx;
+
 	if (cmdListIdx == 0) {
 		if (m_equipment[0] < 0) {
-			return 0;
+			result = 0;
+		} else {
+			result = (short)m_inventoryItems[m_equipment[0]];
 		}
-		return (short)m_inventoryItems[m_equipment[0]];
-	}
-
-	if (cmdListIdx == 1) {
+	} else if (cmdListIdx == 1) {
 		if (m_equipment[2] < 0) {
-			return 0;
+			result = 0;
+		} else {
+			result = (short)m_inventoryItems[m_equipment[2]];
 		}
-		return (short)m_inventoryItems[m_equipment[2]];
-	}
+	} else {
+		int numGrouped;
+		if (Game.game.m_gameWork.m_menuStageMode == 0 || cmdListSlot[0] == 0) {
+			numGrouped = 1;
+		} else {
+			int scanCount = cmdListIdx + 1;
+			int topIdx = cmdListIdx;
+			if (cmdListIdx >= 0) {
+				do {
+					if (cmdListSlot[0] != -1) {
+						break;
+					}
+					cmdListSlot--;
+					topIdx--;
+					scanCount--;
+				} while (scanCount != 0);
+			}
 
-	int numGrouped = 1;
-	unsigned short* cmdListSlot = m_commandListInventorySlotRef + cmdListIdx;
-	if (Game.game.m_gameWork.m_menuStageMode != 0 && cmdListSlot[0] != 0) {
-		int searchIdx = cmdListIdx;
-		while (searchIdx >= 0 && cmdListSlot[0] == 0xFFFF) {
-			cmdListSlot--;
-			searchIdx--;
+			numGrouped = 1;
+			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
+			cmdListSlot = reinterpret_cast<short*>(m_commandListInventorySlotRef) + topIdx + 1;
+			if ((topIdx + 1) < (short)m_numCmdListSlots) {
+				do {
+					if (cmdListSlot[0] != -1) {
+						break;
+					}
+					numGrouped++;
+					cmdListSlot++;
+					scanCount--;
+				} while (scanCount != 0);
+			}
 		}
-		searchIdx++;
-		cmdListSlot++;
 
-		while (searchIdx < (short)m_numCmdListSlots && cmdListSlot[0] == 0xFFFF) {
-			numGrouped++;
-			cmdListSlot++;
-			searchIdx++;
+		if (numGrouped < 2) {
+			if (*cmdListSlot < 0) {
+				result = 0;
+			} else {
+				result = (short)m_inventoryItems[*cmdListSlot];
+			}
+		} else {
+			int scanCount = cmdListIdx + 1;
+			cmdListSlot = reinterpret_cast<short*>(m_commandListInventorySlotRef) + cmdListIdx;
+			if (cmdListIdx >= 0) {
+				do {
+					if (cmdListSlot[0] != -1) {
+						break;
+					}
+					cmdListSlot--;
+					cmdListIdx--;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+
+			short cmdResult = *reinterpret_cast<short*>(m_commandListExtra + cmdListIdx * 2);
+			int cmdTopIdx;
+			int itemCmdListIdx;
+			if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+				cmdResult = (short)m_inventoryItems[(short)m_commandListInventorySlotRef[itemCmdListIdx]];
+			}
+			result = cmdResult;
 		}
 	}
 
-	if (numGrouped < 2) {
-		short invIdx = m_commandListInventorySlotRef[cmdListIdx];
-		if (invIdx < 0) {
-			return 0;
-		}
-		return (short)m_inventoryItems[invIdx];
-	}
-
-	while (cmdListIdx >= 0 && m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF) {
-		cmdListIdx--;
-	}
-	cmdListIdx++;
-
-	unsigned short result = *(short*)(m_commandListExtra + cmdListIdx * 2);
-	int cmdTopIdx;
-	int itemCmdListIdx;
-	if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
-		result = m_inventoryItems[m_commandListInventorySlotRef[itemCmdListIdx]];
-	}
-	return (short)result;
+	return result;
 }
 
 /*

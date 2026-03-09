@@ -335,71 +335,80 @@ LAB_801adc44:
 
 void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 {
-	u32 uVar1;
-	u32 uVar2;
-	u16 sVar3;
-	u16 sVar4;
-	u32 iVar5;
-	u32 uVar6;
-	u32 uVar7;
-	u32 uVar8;
+	u32 transferSize;
+	u32 dmaStatus;
+	u16 intrBefore;
+	u16 intrStatus;
+	u32 cacheOffset;
+	u32 fullBlocks;
+	u32 blockCount;
+	u32 aramAligned;
+	void* cacheAddr;
 
 	if (param_2 < 0x4000) {
 		return;
 	}
-	if (0x8000000 < param_2 + *param_3) {
+	if (param_2 + *param_3 > 0x8000000) {
 		return;
 	}
 
-	iVar5 = 0;
-	uVar8 = param_2 & 0xFFFFFFE0;
-	uVar1 = (*param_3 + (param_2 & 0x1F) + 0x1F) & 0xFFFFFFE0;
-	uVar2 = (uVar1 + 0x1F) >> 5;
-	if (uVar1 != 0) {
-		uVar6 = (uVar1 + 0x1F) >> 8;
-		uVar7 = uVar2;
-		if (uVar6 != 0) {
+	cacheOffset = 0;
+	aramAligned = param_2 & 0xFFFFFFE0;
+	transferSize = (*param_3 + (param_2 & 0x1F) + 0x1F) & 0xFFFFFFE0;
+	blockCount = (transferSize + 0x1F) >> 5;
+	if (transferSize != 0) {
+		fullBlocks = (transferSize + 0x1F) >> 8;
+		if (fullBlocks != 0) {
 			do {
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-				iVar5 += 0x20;
-				uVar6--;
-			} while (uVar6 != 0);
-			uVar7 = uVar2 & 7;
-			if (uVar7 == 0) {
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				cacheOffset += 0x20;
+				cacheAddr = (void*)(param_1 + cacheOffset);
+				dataCacheBlockInvalidateInline(cacheAddr);
+				fullBlocks--;
+				cacheOffset += 0x20;
+			} while (fullBlocks != 0);
+			blockCount &= 7;
+			if (blockCount == 0) {
 				goto LAB_801ade28;
 			}
 		}
 		do {
-			dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
-			iVar5 += 0x20;
-			uVar7--;
-		} while (uVar7 != 0);
+			cacheAddr = (void*)(param_1 + cacheOffset);
+			dataCacheBlockInvalidateInline(cacheAddr);
+			cacheOffset += 0x20;
+			blockCount--;
+		} while (blockCount != 0);
 	}
 LAB_801ade28:
 	do {
-		uVar2 = ARGetDMAStatus();
-	} while (uVar2 != 0);
-	sVar3 = __ARGetInterruptStatus();
+		dmaStatus = ARGetDMAStatus();
+	} while (dmaStatus != 0);
+	intrBefore = __ARGetInterruptStatus();
 	__ARClearInterrupt();
-	ARStartDMA(1, param_1, uVar8, uVar1);
+	ARStartDMA(1, param_1, aramAligned, transferSize);
 	do {
-		sVar4 = __ARGetInterruptStatus();
-	} while (sVar4 == 0);
-	if (sVar3 == 0) {
+		intrStatus = __ARGetInterruptStatus();
+	} while (intrStatus == 0);
+	if (intrBefore == 0) {
 		__ARClearInterrupt();
 	}
 }

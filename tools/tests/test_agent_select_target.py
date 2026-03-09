@@ -39,6 +39,43 @@ class AgentSelectTargetTests(unittest.TestCase):
             with patch("tools.agent_select_target.Path.home", return_value=Path(tmp_dir)):
                 self.assertEqual(agent_select_target.load_blacklist(), [])
 
+    def test_load_blacklist_supports_dict_entries_and_deduplicates(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            state_path = Path(tmp_dir) / ".openclaw/workspace/memory"
+            state_path.mkdir(parents=True)
+            with open(state_path / "decomp-state.json", "w", encoding="utf-8") as f:
+                json.dump(
+                    {
+                        "recentFailures": [
+                            "build/foo.o",
+                            {"name": "build/bar.o"},
+                            "build/foo.o",
+                            {"name": ""},
+                            123,
+                        ]
+                    },
+                    f,
+                )
+
+            with patch("tools.agent_select_target.Path.home", return_value=Path(tmp_dir)):
+                self.assertEqual(
+                    agent_select_target.load_blacklist(),
+                    ["build/foo.o", "build/bar.o"],
+                )
+
+    def test_load_blacklist_prefers_env_configured_state_file(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            state_path = Path(tmp_dir) / "custom-state.json"
+            with open(state_path, "w", encoding="utf-8") as f:
+                json.dump({"recentFailures": ["build/from_env.o"]}, f)
+
+            with patch.dict(
+                "os.environ",
+                {"AGENT_SELECT_TARGET_STATE_FILE": str(state_path)},
+                clear=False,
+            ):
+                self.assertEqual(agent_select_target.load_blacklist(), ["build/from_env.o"])
+
     def test_extract_candidates_handles_malformed_measure_values(self):
         report = {
             "units": [

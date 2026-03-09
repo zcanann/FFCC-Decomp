@@ -8,6 +8,7 @@ Selects random viable targets across multiple opportunity buckets:
 
 import argparse
 import json
+import os
 import random
 import sys
 from pathlib import Path
@@ -23,6 +24,11 @@ WARNING_BUILD_MISMATCH = (
     "WARNING: ADDRESS AND SIZES ARE FOR A DIFFERENT BUILD AND COULD BE WRONG. ALWAYS CHECK GHIDRA."
 )
 COMPLETE_THRESHOLD_PERCENT = 100
+STATE_FILE_ENV_VARS = ("AGENT_SELECT_TARGET_STATE_FILE", "DECOMP_STATE_FILE")
+DEFAULT_STATE_FILE_CANDIDATES = (
+    Path(".openclaw/workspace/memory/decomp-state.json"),
+    Path(".codex/workspace/memory/decomp-state.json"),
+)
 
 
 def _metadata_dict(unit):
@@ -56,6 +62,38 @@ def _safe_int(value, default=0):
     except (TypeError, ValueError):
         return default
 
+
+def _state_file_candidates():
+    for env_var in STATE_FILE_ENV_VARS:
+        raw_path = os.getenv(env_var)
+        if raw_path and raw_path.strip():
+            yield Path(raw_path.strip()).expanduser()
+            return
+
+    home = Path.home()
+    for candidate in DEFAULT_STATE_FILE_CANDIDATES:
+        yield home / candidate
+
+
+def _normalize_recent_failures(recent_failures):
+    if not isinstance(recent_failures, list):
+        return []
+
+    normalized = []
+    for item in recent_failures:
+        if isinstance(item, str):
+            name = item
+        elif isinstance(item, dict):
+            name = item.get("name")
+        else:
+            continue
+
+        if isinstance(name, str) and name and name not in normalized:
+            normalized.append(name)
+
+    return normalized
+
+
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
     print(WARNING_BUILD_MISMATCH)
@@ -63,17 +101,15 @@ def warn_build_mismatch():
 
 def load_blacklist():
     """Load recently failed units to avoid"""
-    state_file = Path.home() / ".openclaw/workspace/memory/decomp-state.json"
-    try:
-        with open(state_file) as f:
-            state = json.load(f)
-        if not isinstance(state, dict):
-            return []
-        recent_failures = state.get("recentFailures", [])
-        if isinstance(recent_failures, list):
-            return recent_failures
-    except (OSError, JSONDecodeError):
-        return []
+    for state_file in _state_file_candidates():
+        try:
+            with open(state_file, encoding="utf-8") as f:
+                state = json.load(f)
+            if not isinstance(state, dict):
+                continue
+            return _normalize_recent_failures(state.get("recentFailures", []))
+        except (OSError, JSONDecodeError):
+            continue
     return []
 
 

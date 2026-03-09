@@ -8,9 +8,6 @@
 #include <dolphin/types.h>
 #include <string.h>
 
-extern Mtx ppvWorldMatrix;
-extern Mtx ppvCameraMatrix02;
-
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);

@@ -31,8 +31,6 @@ void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRI
 void memset__FPviUl(void*, int, unsigned long);
 int __cntlzw(unsigned int);
 }
-extern Mtx ppvWorldMatrix;
-extern Mtx ppvCameraMatrix0;
 
 /*
  * --INFO--

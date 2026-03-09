@@ -2,10 +2,6 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-extern "C" {
-extern Mtx ppvCameraMatrix02;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800c4dd8

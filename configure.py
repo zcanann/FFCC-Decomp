@@ -905,7 +905,11 @@ config.libs = [
             Object(NonMatching, "Runtime.PPCEABI.H/__va_arg.c"),
             Object(NonMatching, "Runtime.PPCEABI.H/CPlusLibPPC.cp"),
             Object(NonMatching, "Runtime.PPCEABI.H/GCN_mem_alloc.c"),
-            Object(NonMatching, "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp"),
+            Object(
+                NonMatching,
+                "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
+                extra_cflags=["-inline auto,deferred", "-char signed"],
+            ),
             Object(NonMatching, "Runtime.PPCEABI.H/global_destructor_chain.c"),
             Object(NonMatching, "Runtime.PPCEABI.H/New.cp"),
             Object(NonMatching, "Runtime.PPCEABI.H/NMWException.cp"),

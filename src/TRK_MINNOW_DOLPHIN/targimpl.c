@@ -374,7 +374,7 @@ DSError TRKTargetAccessMemory(void* data, u32 start, size_t* length,
     return error;
 }
 #pragma dont_inline reset
-
+#pragma dont_inline on
 DSError TRKTargetReadInstruction(void* data, u32 start)
 {
     DSError error;
@@ -389,6 +389,7 @@ DSError TRKTargetReadInstruction(void* data, u32 start)
 
     return error;
 }
+#pragma dont_inline reset
 
 DSError TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister,
                                TRKBuffer* b, size_t* registersLengthPtr,
@@ -988,38 +989,34 @@ DSError TRKTargetInterrupt(TRKEvent* event)
 
 DSError TRKTargetAddStopInfo(TRKBuffer* buffer)
 {
-    size_t length = 4;
     u32 instruction;
     u8 stopInfo[0x40];
 
     memset(stopInfo, 0, sizeof(stopInfo));
     *(u32*)&stopInfo[0x0] = sizeof(stopInfo);
     stopInfo[0x4]         = DSMSG_NotifyStopped;
-    *(u32*)&stopInfo[0xC] = gTRKCPUState.Default.PC;
+    *(u32*)&stopInfo[0x8] = gTRKCPUState.Default.PC;
 
-    TRKTargetAccessMemory(&instruction, gTRKCPUState.Default.PC, &length,
-                          MEMACCESS_UserMemory, TRUE);
-    *(u32*)&stopInfo[0x10] = instruction;
-    *(u32*)&stopInfo[0x14] = (u16)gTRKCPUState.Extended1.exceptionID;
+    TRKTargetReadInstruction(&instruction, gTRKCPUState.Default.PC);
+    *(u32*)&stopInfo[0xC]  = instruction;
+    *(u32*)&stopInfo[0x10] = (u16)gTRKCPUState.Extended1.exceptionID;
 
     return TRKAppendBuffer_ui8(buffer, stopInfo, sizeof(stopInfo));
 }
 
 DSError TRKTargetAddExceptionInfo(TRKBuffer* buffer)
 {
-    size_t length = 4;
     u32 instruction;
     u8 exceptionInfo[0x40];
 
     memset(exceptionInfo, 0, sizeof(exceptionInfo));
     *(u32*)&exceptionInfo[0x0] = sizeof(exceptionInfo);
     exceptionInfo[0x4]         = DSMSG_NotifyException;
-    *(u32*)&exceptionInfo[0xC] = gTRKExceptionStatus.exceptionInfo.PC;
+    *(u32*)&exceptionInfo[0x8] = gTRKExceptionStatus.exceptionInfo.PC;
 
-    TRKTargetAccessMemory(&instruction, gTRKExceptionStatus.exceptionInfo.PC, &length,
-                          MEMACCESS_UserMemory, TRUE);
-    *(u32*)&exceptionInfo[0x10] = instruction;
-    *(u32*)&exceptionInfo[0x14] = (u16)gTRKExceptionStatus.exceptionInfo.exceptionID;
+    TRKTargetReadInstruction(&instruction, gTRKExceptionStatus.exceptionInfo.PC);
+    *(u32*)&exceptionInfo[0xC]  = instruction;
+    *(u32*)&exceptionInfo[0x10] = (u16)gTRKExceptionStatus.exceptionInfo.exceptionID;
 
     return TRKAppendBuffer_ui8(buffer, exceptionInfo, sizeof(exceptionInfo));
 }

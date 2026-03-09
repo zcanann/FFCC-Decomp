@@ -65,6 +65,11 @@ class TestAgenticLoop(unittest.TestCase):
             finally:
                 os.chdir(prev_cwd)
 
+    def test_resolve_agents_filename_checks_candidates_when_listdir_fails(self):
+        with patch("agentic_loop.os.listdir", side_effect=OSError("no listdir")):
+            with patch("agentic_loop.Path.is_file", side_effect=[False, True]):
+                self.assertEqual(agentic_loop._resolve_agents_filename(), "AGENTS.MD")
+
     def test_read_int_env_returns_default_when_missing(self):
         with patch.dict(os.environ, {}, clear=True):
             self.assertEqual(agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500), 1500)

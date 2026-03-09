@@ -18,6 +18,10 @@ def _resolve_agents_filename() -> str:
     try:
         cwd_entries = set(os.listdir("."))
     except OSError:
+        # If listing fails, still check canonical candidates directly.
+        for filename in AGENTS_FILE_CANDIDATES:
+            if Path(filename).is_file():
+                return filename
         cwd_entries = set()
 
     for filename in AGENTS_FILE_CANDIDATES:

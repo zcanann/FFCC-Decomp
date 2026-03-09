@@ -141,6 +141,18 @@ class TransformDepTests(unittest.TestCase):
             with patch.dict("os.environ", {"WSL_DISTRO_NAME": "Ubuntu"}, clear=False):
                 self.assertTrue(transform_dep.in_wsl())
 
+    def test_in_wsl_ignores_empty_wsl_distro_name(self):
+        with patch("tools.transform_dep.uname") as mocked_uname:
+            mocked_uname.return_value.release = "6.8.0-31-generic"
+            with patch.dict("os.environ", {"WSL_DISTRO_NAME": ""}, clear=True):
+                self.assertFalse(transform_dep.in_wsl())
+
+    def test_in_wsl_detects_wsl_interop_env(self):
+        with patch("tools.transform_dep.uname") as mocked_uname:
+            mocked_uname.return_value.release = "6.8.0-31-generic"
+            with patch.dict("os.environ", {"WSL_INTEROP": "/run/WSL/123_interop"}, clear=True):
+                self.assertTrue(transform_dep.in_wsl())
+
     def test_in_wsl_false_on_non_wsl_host(self):
         with patch("tools.transform_dep.uname") as mocked_uname:
             mocked_uname.return_value.release = "6.8.0-31-generic"

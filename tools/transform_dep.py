@@ -32,7 +32,8 @@ def in_wsl() -> bool:
     return (
         "microsoft" in release
         or "wsl" in release
-        or "WSL_DISTRO_NAME" in os.environ
+        or bool(os.getenv("WSL_DISTRO_NAME"))
+        or bool(os.getenv("WSL_INTEROP"))
     )
 
 

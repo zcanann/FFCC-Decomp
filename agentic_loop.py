@@ -21,6 +21,17 @@ def _resolve_agents_filename() -> str:
     for filename in AGENTS_FILE_CANDIDATES:
         if filename in cwd_entries and Path(filename).is_file():
             return filename
+
+    # Fall back to any case variant like "Agents.md" on case-sensitive filesystems.
+    canonical_name = AGENTS_FILE_CANDIDATES[0].casefold()
+    case_insensitive_matches = sorted(
+        entry
+        for entry in cwd_entries
+        if entry.casefold() == canonical_name and Path(entry).is_file()
+    )
+    if case_insensitive_matches:
+        return case_insensitive_matches[0]
+
     return AGENTS_FILE_CANDIDATES[0]
 
 

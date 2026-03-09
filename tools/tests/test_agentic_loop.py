@@ -40,6 +40,21 @@ class TestAgenticLoop(unittest.TestCase):
             finally:
                 os.chdir(prev_cwd)
 
+    def test_resolve_agents_filename_accepts_mixed_case_variant(self):
+        prev_cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            os.chdir(tmp_dir)
+            Path("Agents.md").write_text("", encoding="utf-8")
+            try:
+                self.assertEqual(agentic_loop._resolve_agents_filename(), "Agents.md")
+            finally:
+                os.chdir(prev_cwd)
+
+    def test_resolve_agents_filename_prefers_exact_match_over_mixed_case(self):
+        with patch("agentic_loop.os.listdir", return_value=["Agents.md", "AGENTS.MD"]):
+            with patch("agentic_loop.Path.is_file", return_value=True):
+                self.assertEqual(agentic_loop._resolve_agents_filename(), "AGENTS.MD")
+
     def test_resolve_agents_filename_defaults_when_missing(self):
         prev_cwd = os.getcwd()
         with tempfile.TemporaryDirectory() as tmp_dir:

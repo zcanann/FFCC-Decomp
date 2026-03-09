@@ -82,12 +82,11 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         ZCANMGRP* colAnmData = listItem->colAnmData;
         int colAnmCount = listItem->colAnmCount;
         if (colAnmData != (ZCANMGRP*)0) {
-            for (int i = 0; i < colAnmCount; i++) {
+            for (int i = 0; i < colAnmCount; i++, colAnmData++) {
                 if (colAnmData->ptr != (void*)0) {
                     __dla__FPv(colAnmData->ptr);
                     colAnmData->ptr = 0;
                 }
-                colAnmData++;
             }
             if (listItem->colAnmData != (ZCANMGRP*)0) {
                 __dla__FPv(listItem->colAnmData);

@@ -56,7 +56,6 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
     if (stream->file_state.io_state < __reading)
     {
         set_error(stream);
-        stream->buffer_length = 0;
         return 0;
     }
 
@@ -64,7 +63,6 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
 		&& __flush_line_buffered_output_files() != 0)
     {
         set_error(stream);
-        stream->buffer_length = 0;
         return 0;
     }
 	
@@ -140,7 +138,6 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
         if (ioresult != __load_ok) {
             if (ioresult == __load_error) {
                 set_error(stream);
-                stream->buffer_length = 0;
             } else if (ioresult == __load_eof) {
                 stream->file_state.io_state = __neutral;
                 stream->file_state.eof = 1;

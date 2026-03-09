@@ -121,7 +121,6 @@ typedef struct GXTexRegionState {
  * JP Size: TODO
  */
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
-    GXTexRegionState* texState = (GXTexRegionState*)__GXData;
     u32 count;
     s32 format = GXGetTexObjFmt(t_obj);
 
@@ -130,16 +129,16 @@ static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMap
     if (format != 8) {
         if (format != 9) {
             if (format != 10) {
-                count = texState->texRegions1[4].dummy[0];
-                texState->texRegions1[4].dummy[0] = count + 1;
-                return (GXTexRegion*)&texState->texRegions0[count & 7];
+                count = ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[0];
+                ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[0] = count + 1;
+                return (GXTexRegion*)&((GXTexRegionState*)__GXData)->texRegions0[count & 7];
             }
         }
     }
 
-    count = texState->texRegions1[4].dummy[1];
-    texState->texRegions1[4].dummy[1] = count + 1;
-    return (GXTexRegion*)&texState->texRegions1[count & 3];
+    count = ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[1];
+    ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[1] = count + 1;
+    return (GXTexRegion*)&((GXTexRegionState*)__GXData)->texRegions1[count & 3];
 }
 
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {

@@ -29,6 +29,24 @@ class TransformDepTests(unittest.TestCase):
             output = transform_dep.import_d_file(dep_path)
         self.assertEqual(output, "build/file.o: \\\n\t/mnt/c/proj/src/file.h\n")
 
+    def test_import_d_file_keeps_windows_drive_path_when_mapping_missing(self):
+        dep_path = self._write_dep("build/file.o: \\\n\tC:\\proj\\src\\file.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=False):
+            with patch("tools.transform_dep.os.path.exists", return_value=False):
+                output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\tC:/proj/src/file.h\n")
+
+    def test_import_d_file_resolves_windows_drive_path_when_mapping_exists(self):
+        dep_path = self._write_dep("build/file.o: \\\n\tC:\\proj\\src\\file.h\n")
+        with patch("tools.transform_dep.in_wsl", return_value=False):
+            with patch("tools.transform_dep.os.path.exists", return_value=True):
+                with patch(
+                    "tools.transform_dep.os.path.realpath",
+                    return_value="/wine/c/proj/src/file.h",
+                ):
+                    output = transform_dep.import_d_file(dep_path)
+        self.assertEqual(output, "build/file.o: \\\n\t/wine/c/proj/src/file.h\n")
+
     def test_import_d_file_keeps_drive_relative_paths(self):
         dep_path = self._write_dep("build/file.o: \\\n\tC:proj\\src\\file.h\n")
         with patch("tools.transform_dep.in_wsl", return_value=True):

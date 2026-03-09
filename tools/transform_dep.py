@@ -61,7 +61,11 @@ def _normalize_dep_path(path: str) -> str:
 
     # Resolve drive mappings via $WINEPREFIX/dosdevices on non-WSL hosts.
     winedevices = _winedevices_path()
-    return os.path.realpath(os.path.join(winedevices, f"{drive}:{drive_path}"))
+    drive_link = os.path.join(winedevices, f"{drive}:")
+    if not os.path.exists(drive_link):
+        # Keep the normalized Windows path when no Wine drive mapping exists.
+        return normalized
+    return os.path.realpath(os.path.join(drive_link, drive_path.lstrip("/")))
 
 
 def _is_escaped(text: str, idx: int) -> bool:

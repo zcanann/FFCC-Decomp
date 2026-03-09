@@ -11,7 +11,7 @@ const char* __AIVersion = "<< Dolphin SDK - AI\tdebug build: Apr  5 2004 03:56:1
 const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Apr  5 2004 04:15:02 (0x2301) >>";
 #endif
 
-static AISCallback __AIS_Callback;
+static AISCallback SamplingCallback;
 static AIDCallback __AID_Callback;
 static u8* __CallbackStack;
 static u8* __OldStack;
@@ -100,9 +100,9 @@ AISCallback AIRegisterStreamCallback(AISCallback callback) {
     AISCallback old_callback;
     BOOL old;
 
-    old_callback = __AIS_Callback;
+    old_callback = SamplingCallback;
     old = OSDisableInterrupts();
-    __AIS_Callback = callback;
+    SamplingCallback = callback;
     OSRestoreInterrupts(old);
     return old_callback;
 }
@@ -264,7 +264,7 @@ void AIInit(u8* stack) {
 #if DEBUG
         OSReport("AIInit(): DSP is 32KHz\n");
 #endif
-        __AIS_Callback = NULL;
+        SamplingCallback = NULL;
         __AID_Callback = NULL;
         __CallbackStack = stack;
         if (stack) {
@@ -288,8 +288,8 @@ static void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     __AIRegs[0] |= 8;
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(&exceptionContext);
-    if (__AIS_Callback) {
-        __AIS_Callback(__AIRegs[2]);
+    if (SamplingCallback) {
+        SamplingCallback(__AIRegs[2]);
     }
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(context);

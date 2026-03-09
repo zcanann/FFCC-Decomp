@@ -89,18 +89,16 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
     s16* uvPairs;
-    u32 frameIndex;
-    u32 i;
+    s32 i;
 
     work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
-    frameIndex = work->m_frame;
-    if ((frameIndex != 0) && ((mapMesh = pppEnvStPtr->m_mapMeshPtr) != NULL)) {
+    if ((work->m_frame != 0) && ((mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0]) != NULL)) {
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         uvPairs = uvLayout->m_uvPairs;
-        for (i = 0; i < (u32)uvLayout->m_uvCount; i++) {
-            u32 frameU = frameIndex / work->m_tilesU;
-            uvPairs[0] = (s16)((f32)uvPairs[0] - ((f32)(frameIndex - frameU * work->m_tilesU) * work->m_perU));
-            uvPairs[1] = (s16)((f32)uvPairs[1] - ((f32)frameU * work->m_perV));
+        for (i = 0; i < (s32)(u32)uvLayout->m_uvCount; i++) {
+            u32 frameU = work->m_frame / work->m_tilesU;
+            uvPairs[0] = (s16)-(((f32)(work->m_frame - frameU * work->m_tilesU) * work->m_perU) - (f32)uvPairs[0]);
+            uvPairs[1] = (s16)-(((f32)frameU * work->m_perV) - (f32)uvPairs[1]);
             uvPairs += 2;
         }
 

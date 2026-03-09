@@ -105,27 +105,8 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 		target_colors = (s16*)(base + color_offset + 0x80);
 	}
 
-	{
-		s16 base = in->field8;
-		s8 delta = (s8)((f32)base * target[0]);
-		target_colors[0] = (s16)(target_colors[0] + delta);
-	}
-
-	{
-		s16 base = in->fieldA;
-		s8 delta = (s8)((f32)base * target[1]);
-		target_colors[1] = (s16)(target_colors[1] + delta);
-	}
-
-	{
-		s16 base = in->fieldC;
-		s8 delta = (s8)((f32)base * target[2]);
-		target_colors[2] = (s16)(target_colors[2] + delta);
-	}
-
-	{
-		s16 base = in->fieldE;
-		s8 delta = (s8)((f32)base * target[3]);
-		target_colors[3] = (s16)(target_colors[3] + delta);
-	}
+	target_colors[0] += (s8)((f32)in->field8 * target[0]);
+	target_colors[1] += (s8)((f32)in->fieldA * target[1]);
+	target_colors[2] += (s8)((f32)in->fieldC * target[2]);
+	target_colors[3] += (s8)((f32)in->fieldE * target[3]);
 }

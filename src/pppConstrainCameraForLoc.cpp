@@ -52,13 +52,13 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     float fVar1;
     float fVar2;
     float fVar3;
-    Vec local_ec;
-    Vec local_e0;
-    Vec local_d4;
-    Vec local_c8;
-    Vec local_bc;
-    Vec local_b0;
     Vec local_a4;
+    Vec local_b0;
+    Vec local_bc;
+    Vec local_c8;
+    Vec local_d4;
+    Vec local_e0;
+    Vec local_ec;
     Mtx local_68;
     Mtx local_98;
 
@@ -68,21 +68,21 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     local_bc.x = CameraPosX();
     local_bc.y = CameraPosY();
     local_bc.z = CameraPosZ();
-    PSMTXCopy(CameraMatrix(), local_98);
+    PSMTXCopy(CameraMatrix(), local_68);
 
     fVar3 = work->field0_0x0;
     local_a4.x = fVar3 * local_b0.x;
     local_a4.y = fVar3 * local_b0.y;
     local_a4.z = fVar3 * local_b0.z;
     if ((s32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
-        PSMTXInverse(ppvCameraMatrix02, local_68);
+        PSMTXInverse(ppvCameraMatrix02, local_98);
     } else {
-        PSMTXInverse(local_98, local_68);
+        PSMTXInverse(local_68, local_98);
     }
 
     PSMTXIdentity(constrainModel->m_drawMtx);
     PSMTXIdentity(constrainModel->m_worldBaseMtx);
-    PSMTXConcat(local_68, constrainModel->m_worldBaseMtx, constrainModel->m_worldBaseMtx);
+    PSMTXConcat(local_98, constrainModel->m_worldBaseMtx, constrainModel->m_worldBaseMtx);
     PSVECAdd(&local_bc, &local_a4, &local_a4);
 
     fVar3 = *(float*)(owner + 0x1c);

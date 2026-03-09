@@ -25,7 +25,7 @@ public:
     CMemory::CStage* stage;
 
     CPtrArray();
-    virtual ~CPtrArray();
+    ~CPtrArray();
 
     void RemoveAll();
     void DeleteAndRemoveAll();
@@ -405,7 +405,7 @@ void CPtrArray<_GXTexObj*>::RemoveAll()
         __dla__FPv(items);
         items = 0;
     }
-    size = 0;
+    defaultSize = 0;
     numItems = 0;
 }
 
@@ -421,7 +421,7 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
         __dla__FPv(items);
         items = 0;
     }
-    size = 0;
+    defaultSize = 0;
     numItems = 0;
 }
 

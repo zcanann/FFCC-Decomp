@@ -312,7 +312,7 @@ char* strstr(const char* str, const char* pat)
 char* strtok(char* str, const char* delim)
 {
 	unsigned char delimiter_table[32] = { 0 };
-	unsigned char ch;
+	int ch;
 	unsigned char* p;
 	unsigned char* tokenStart;
 	unsigned char* tokenEnd;

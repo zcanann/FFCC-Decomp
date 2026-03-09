@@ -170,6 +170,16 @@ def _can_retry(run_count: int, max_runs: Optional[int]) -> bool:
     return max_runs is None or run_count < max_runs
 
 
+def _normalize_process_return_code(returncode: Optional[int]) -> int:
+    """Map subprocess return codes to conventional shell exit statuses."""
+    if returncode is None or returncode == 0:
+        return 1
+    if returncode < 0:
+        # Python uses negative values for signal termination; shells use 128+signal.
+        return 128 + abs(returncode)
+    return returncode
+
+
 def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -317,7 +327,7 @@ def run_agentic_loop(
                 log("codex run completed successfully")
             else:
                 consecutive_failures += 1
-                exit_code = proc.returncode or 1
+                exit_code = _normalize_process_return_code(proc.returncode)
                 if not _can_retry(run_count, max_runs):
                     log(f"codex exited with code {proc.returncode}; reached max runs, stopping loop")
                     break

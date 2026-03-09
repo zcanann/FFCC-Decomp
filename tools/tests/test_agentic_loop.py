@@ -344,6 +344,25 @@ class TestAgenticLoop(unittest.TestCase):
 
         self.assertEqual(rc, 3)
 
+    def test_run_agentic_loop_maps_signal_termination_to_shell_exit_code(self):
+        fake_proc = SimpleNamespace(
+            pid=123,
+            returncode=-9,
+            wait=Mock(return_value=None),
+            poll=Mock(return_value=None),
+        )
+
+        with patch("agentic_loop.subprocess.Popen", return_value=fake_proc):
+            rc = agentic_loop.run_agentic_loop(
+                prompt="x",
+                timeout_seconds=1,
+                terminate_grace_seconds=2,
+                max_backoff_seconds=300,
+                max_runs=1,
+            )
+
+        self.assertEqual(rc, 137)
+
     def test_run_agentic_loop_returns_124_when_timeout_reaches_max_runs(self):
         fake_proc = SimpleNamespace(
             pid=123,
@@ -456,6 +475,14 @@ class TestAgenticLoop(unittest.TestCase):
 
         mock_killpg.assert_not_called()
         fake_proc.send_signal.assert_not_called()
+
+    def test_normalize_process_return_code_maps_none_or_zero_to_one(self):
+        self.assertEqual(agentic_loop._normalize_process_return_code(None), 1)
+        self.assertEqual(agentic_loop._normalize_process_return_code(0), 1)
+
+    def test_normalize_process_return_code_keeps_positive_and_maps_negative(self):
+        self.assertEqual(agentic_loop._normalize_process_return_code(7), 7)
+        self.assertEqual(agentic_loop._normalize_process_return_code(-15), 143)
 
 
 if __name__ == "__main__":

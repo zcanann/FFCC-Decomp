@@ -48,8 +48,16 @@ def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
         if os.name == "posix":
             os.killpg(proc.pid, sig)
         else:
-            proc.send_signal(sig)
+            # Use taskkill so child processes are also terminated on Windows.
+            force = sig == signal.SIGKILL
+            cmd = ["taskkill", "/PID", str(proc.pid), "/T"]
+            if force:
+                cmd.append("/F")
+            subprocess.run(cmd, check=False, capture_output=True)
     except ProcessLookupError:
+        pass
+    except OSError:
+        # Best-effort signaling; ignore errors for already-exited processes.
         pass
 
 

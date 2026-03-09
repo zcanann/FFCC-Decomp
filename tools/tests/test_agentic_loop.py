@@ -76,24 +76,46 @@ class TestAgenticLoop(unittest.TestCase):
 
     def test_read_int_env_returns_default_when_missing(self):
         with patch.dict(os.environ, {}, clear=True):
-            self.assertEqual(agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500), 1500)
+            self.assertEqual(
+                agentic_loop._read_int_env(
+                    "AGENTIC_TIMEOUT_SECONDS",
+                    agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+                ),
+                agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+            )
 
     def test_read_int_env_parses_integer(self):
         with patch.dict(os.environ, {"AGENTIC_TIMEOUT_SECONDS": "42"}, clear=True):
-            self.assertEqual(agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500), 42)
+            self.assertEqual(
+                agentic_loop._read_int_env(
+                    "AGENTIC_TIMEOUT_SECONDS",
+                    agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+                ),
+                42,
+            )
 
     def test_read_int_env_invalid_uses_default_and_logs(self):
         with patch.dict(os.environ, {"AGENTIC_TIMEOUT_SECONDS": "oops"}, clear=True):
             with patch("agentic_loop.log") as mock_log:
-                self.assertEqual(agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500), 1500)
+                self.assertEqual(
+                    agentic_loop._read_int_env(
+                        "AGENTIC_TIMEOUT_SECONDS",
+                        agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+                    ),
+                    agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+                )
         mock_log.assert_called_once()
 
     def test_read_int_env_below_minimum_uses_default_and_logs(self):
         with patch.dict(os.environ, {"AGENTIC_TIMEOUT_SECONDS": "0"}, clear=True):
             with patch("agentic_loop.log") as mock_log:
                 self.assertEqual(
-                    agentic_loop._read_int_env("AGENTIC_TIMEOUT_SECONDS", 1500, minimum=1),
-                    1500,
+                    agentic_loop._read_int_env(
+                        "AGENTIC_TIMEOUT_SECONDS",
+                        agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+                        minimum=1,
+                    ),
+                    agentic_loop.DEFAULT_TIMEOUT_SECONDS,
                 )
         mock_log.assert_called_once()
 
@@ -162,9 +184,9 @@ class TestAgenticLoop(unittest.TestCase):
 
         mock_run.assert_called_once_with(
             prompt="x",
-            timeout_seconds=25 * 60,
-            terminate_grace_seconds=10,
-            max_backoff_seconds=300,
+            timeout_seconds=agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+            terminate_grace_seconds=agentic_loop.DEFAULT_TERMINATE_GRACE_SECONDS,
+            max_backoff_seconds=agentic_loop.DEFAULT_MAX_BACKOFF_SECONDS,
             max_runs=None,
         )
 
@@ -249,9 +271,9 @@ class TestAgenticLoop(unittest.TestCase):
 
         mock_run.assert_called_once_with(
             prompt=agentic_loop.DEFAULT_PROMPT,
-            timeout_seconds=25 * 60,
-            terminate_grace_seconds=10,
-            max_backoff_seconds=300,
+            timeout_seconds=agentic_loop.DEFAULT_TIMEOUT_SECONDS,
+            terminate_grace_seconds=agentic_loop.DEFAULT_TERMINATE_GRACE_SECONDS,
+            max_backoff_seconds=agentic_loop.DEFAULT_MAX_BACKOFF_SECONDS,
             max_runs=None,
         )
 

@@ -75,6 +75,9 @@ DEFAULT_PROMPT = _default_prompt()
 KILL_SIGNAL = getattr(signal, "SIGKILL", signal.SIGTERM)
 KILL_WAIT_SECONDS = 5
 WINDOWS_CTRL_C_EXIT_CODE = 0xC000013A
+DEFAULT_TIMEOUT_SECONDS = 25 * 60
+DEFAULT_TERMINATE_GRACE_SECONDS = 10
+DEFAULT_MAX_BACKOFF_SECONDS = 300
 
 
 def log(message: str) -> None:
@@ -273,17 +276,25 @@ def _resolve_runtime_config(
     timeout_seconds = (
         args.timeout_seconds
         if args.timeout_seconds is not None
-        else _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60, minimum=1)
+        else _read_int_env("AGENTIC_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_SECONDS, minimum=1)
     )
     terminate_grace_seconds = (
         args.terminate_grace_seconds
         if args.terminate_grace_seconds is not None
-        else _read_int_env("AGENTIC_TERMINATE_GRACE_SECONDS", 10, minimum=0)
+        else _read_int_env(
+            "AGENTIC_TERMINATE_GRACE_SECONDS",
+            DEFAULT_TERMINATE_GRACE_SECONDS,
+            minimum=0,
+        )
     )
     max_backoff_seconds = (
         args.max_backoff_seconds
         if args.max_backoff_seconds is not None
-        else _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300, minimum=1)
+        else _read_int_env(
+            "AGENTIC_MAX_BACKOFF_SECONDS",
+            DEFAULT_MAX_BACKOFF_SECONDS,
+            minimum=1,
+        )
     )
     max_runs = (
         args.max_runs
@@ -294,21 +305,22 @@ def _resolve_runtime_config(
     if timeout_seconds < 1:
         log(
             f"invalid value for --timeout-seconds={timeout_seconds!r}; minimum is 1; "
-            "using default 1500"
+            f"using default {DEFAULT_TIMEOUT_SECONDS}"
         )
-        timeout_seconds = 25 * 60
+        timeout_seconds = DEFAULT_TIMEOUT_SECONDS
     if terminate_grace_seconds < 0:
         log(
             "invalid value for --terminate-grace-seconds="
-            f"{terminate_grace_seconds!r}; minimum is 0; using default 10"
+            f"{terminate_grace_seconds!r}; minimum is 0; using default "
+            f"{DEFAULT_TERMINATE_GRACE_SECONDS}"
         )
-        terminate_grace_seconds = 10
+        terminate_grace_seconds = DEFAULT_TERMINATE_GRACE_SECONDS
     if max_backoff_seconds < 1:
         log(
             f"invalid value for --max-backoff-seconds={max_backoff_seconds!r}; "
-            "minimum is 1; using default 300"
+            f"minimum is 1; using default {DEFAULT_MAX_BACKOFF_SECONDS}"
         )
-        max_backoff_seconds = 300
+        max_backoff_seconds = DEFAULT_MAX_BACKOFF_SECONDS
     if max_runs is not None and max_runs < 1:
         log(
             f"invalid value for --max-runs={max_runs!r}; minimum is 1; "
@@ -404,6 +416,7 @@ def run_agentic_loop(
             break
 
     return exit_code
+
 
 def main(argv: Optional[list[str]] = None) -> int:
     (

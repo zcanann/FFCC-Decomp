@@ -130,21 +130,29 @@ def derive_object_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
     if source_path and source_path != "unknown":
         base = _path_stem(source_path)
-        return f"{base}.o"
+        if base:
+            return f"{base}.o"
     name = unit.get("name", "")
     base = _path_stem(name)
+    if not base:
+        base = "unknown"
     return f"{base}.o"
 
 def derive_source_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
     if source_path and source_path != "unknown":
-        return _path_name(source_path)
+        source_name = _path_name(source_path)
+        if source_name:
+            return source_name
     name = unit.get("name", "")
     path_name = _path_name(name)
+    if not path_name:
+        return "unknown.cpp"
     path = PurePosixPath(path_name)
     if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
         return path_name
-    return f"{path.stem}.cpp"
+    stem = path.stem or "unknown"
+    return f"{stem}.cpp"
 
 def summarize_symbols(label, all_info):
     """Return formatted lines for symbol summary (no printing inside)."""

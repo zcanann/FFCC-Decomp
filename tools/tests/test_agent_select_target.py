@@ -28,8 +28,52 @@ class DeriveFileNameTests(unittest.TestCase):
         unit = {"name": "src/card/CARDOpen.c", "metadata": {"source_path": "unknown"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "CARDOpen.c")
 
+    def test_derive_source_file_fallback_preserves_uppercase_c_extension(self):
+        unit = {"name": "src/card/CARDOpen.C", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "CARDOpen.C")
+
+    def test_derive_source_file_fallback_preserves_mixed_case_cpp_extension(self):
+        unit = {"name": "src/system/player.CpP", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.CpP")
+
     def test_derive_source_file_fallback_defaults_to_cpp_without_extension(self):
         unit = {"name": "src/system/player", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
+    def test_derive_object_file_uses_windows_style_source_path_stem(self):
+        unit = {"name": "foo", "metadata": {"source_path": r"src\\system\\player.cpp"}}
+        self.assertEqual(agent_select_target.derive_object_file(unit), "player.o")
+
+    def test_derive_source_file_uses_windows_style_source_path_name(self):
+        unit = {"name": "foo", "metadata": {"source_path": r"src\\system\\player.cpp"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
+    def test_derive_source_file_fallback_handles_windows_style_unit_name(self):
+        unit = {"name": r"src\\system\\player", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
+    def test_derive_object_file_falls_back_to_unit_name_when_source_path_has_no_stem(self):
+        unit = {"name": "src/system/player.cpp", "metadata": {"source_path": "/"}}
+        self.assertEqual(agent_select_target.derive_object_file(unit), "player.o")
+
+    def test_derive_object_file_defaults_to_unknown_when_all_names_missing(self):
+        unit = {"name": "", "metadata": {"source_path": "/"}}
+        self.assertEqual(agent_select_target.derive_object_file(unit), "unknown.o")
+
+    def test_derive_object_file_fallback_treats_unknown_markers_case_insensitively(self):
+        unit = {"name": "src/system/player.cpp", "metadata": {"source_path": " Unknown "}}
+        self.assertEqual(agent_select_target.derive_object_file(unit), "player.o")
+
+    def test_derive_source_file_falls_back_to_unit_name_when_source_path_has_no_name(self):
+        unit = {"name": "src/system/player.cpp", "metadata": {"source_path": "/"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
+    def test_derive_source_file_defaults_to_unknown_when_all_names_missing(self):
+        unit = {"name": "", "metadata": {"source_path": "/"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "unknown.cpp")
+
+    def test_derive_source_file_fallback_treats_unknown_markers_case_insensitively(self):
+        unit = {"name": "src/system/player.cpp", "metadata": {"source_path": "<UNKNOWN>"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
 
 
@@ -41,6 +85,27 @@ class NumericParsingTests(unittest.TestCase):
     def test_safe_int_returns_default_for_invalid_values(self):
         self.assertEqual(agent_select_target.safe_int("not-a-number"), 0)
         self.assertEqual(agent_select_target.safe_int(None, 7), 7)
+
+    def test_safe_int_parses_prefixed_and_float_strings(self):
+        self.assertEqual(agent_select_target.safe_int("0x20"), 32)
+        self.assertEqual(agent_select_target.safe_int("-0x10"), -16)
+        self.assertEqual(agent_select_target.safe_int("0o12"), 10)
+        self.assertEqual(agent_select_target.safe_int("-0b101"), -5)
+        self.assertEqual(agent_select_target.safe_int("12.0"), 12)
+
+    def test_safe_int_rejects_non_integral_float_inputs(self):
+        self.assertEqual(agent_select_target.safe_int("12.9", 9), 9)
+        self.assertEqual(agent_select_target.safe_int(-7.25, 5), 5)
+
+    def test_safe_float_returns_default_for_non_finite_values(self):
+        self.assertEqual(agent_select_target.safe_float("nan", 1.25), 1.25)
+        self.assertEqual(agent_select_target.safe_float("inf", 3.5), 3.5)
+        self.assertEqual(agent_select_target.safe_float("-inf", 4.75), 4.75)
+
+    def test_safe_int_returns_default_for_non_finite_values(self):
+        self.assertEqual(agent_select_target.safe_int("nan", 11), 11)
+        self.assertEqual(agent_select_target.safe_int("inf", 22), 22)
+        self.assertEqual(agent_select_target.safe_int("-inf", 33), 33)
 
     def test_is_viable_target_handles_non_numeric_measures(self):
         unit = {
@@ -183,6 +248,72 @@ class NumericParsingTests(unittest.TestCase):
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0]["top_functions"][0]["name"], "unknown")
 
+    def test_extract_candidates_normalizes_unknown_source_path_markers(self):
+        report = {
+            "units": [
+                {
+                    "name": "unitE",
+                    "metadata": {"source_path": " N/A "},
+                    "measures": {
+                        "fuzzy_match_percent": "50.0",
+                        "matched_code_percent": "10.0",
+                        "matched_data_percent": "0.0",
+                    },
+                    "functions": [],
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]["source_path"], "unknown")
+        self.assertEqual(candidates[0]["source_file"], "unknown")
+
+    def test_extract_candidates_returns_empty_when_units_is_not_a_list(self):
+        report = {"units": "not-a-list"}
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(candidates, [])
+
+    def test_extract_candidates_skips_non_dict_units_and_non_dict_functions(self):
+        report = {
+            "units": [
+                "invalid-unit",
+                {
+                    "name": "unitE",
+                    "metadata": {"source_path": "src/unitE.cpp"},
+                    "measures": {
+                        "fuzzy_match_percent": "25.0",
+                        "matched_code_percent": "10.0",
+                        "matched_data_percent": "5.0",
+                        "total_functions": 1,
+                        "matched_functions": 0,
+                        "matched_functions_percent": "0.0",
+                        "total_code": 64,
+                        "total_data": 0,
+                    },
+                    "functions": [
+                        "invalid-func",
+                        {"name": "fn_valid", "fuzzy_match_percent": 20.0, "size": 16},
+                    ],
+                },
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            candidates = agent_select_target.extract_candidates(report_path)
+
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(len(candidates[0]["top_functions"]), 1)
+        self.assertEqual(candidates[0]["top_functions"][0]["name"], "fn_valid")
+
 
 class BlacklistLoadingTests(unittest.TestCase):
     def _state_path(self, home):
@@ -280,6 +411,54 @@ class SymbolSummaryTests(unittest.TestCase):
 
         self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
         self.assertEqual(lines[1], "    - fnB (Noneb at 0x80002000)")
+
+    def test_summarize_symbols_parses_decimal_size_string_as_decimal(self):
+        info = {
+            "functions": [
+                {"parsed": {"symbol": "fnC", "size": "32", "virtual_addr": "0x80003000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("PAL symbols", info)
+
+        self.assertEqual(lines[0], "  PAL symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnC (0x20b at 0x80003000)")
+
+    def test_summarize_symbols_parses_prefixed_hex_size_string(self):
+        info = {
+            "functions": [
+                {"parsed": {"symbol": "fnD", "size": "0x20", "virtual_addr": "0x80004000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("EN symbols", info)
+
+        self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnD (0x20b at 0x80004000)")
+
+    def test_summarize_symbols_treats_non_list_collections_as_empty(self):
+        info = {"functions": "bad", "globals": None}
+
+        lines = agent_select_target.summarize_symbols("PAL symbols", info)
+
+        self.assertEqual(lines[0], "  PAL symbols: 0 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(len(lines), 1)
+
+    def test_summarize_symbols_skips_non_dict_function_entries(self):
+        info = {
+            "functions": [
+                "bad-entry",
+                {"parsed": {"symbol": "fnE", "size": 8, "virtual_addr": "0x80005000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("EN symbols", info)
+
+        self.assertEqual(lines[0], "  EN symbols: 2 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnE (0x8b at 0x80005000)")
 
 
 if __name__ == "__main__":

@@ -9,7 +9,8 @@ Selects random viable targets across multiple opportunity buckets:
 import json
 import sys
 import random
-from pathlib import Path
+import math
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 try:
     from . import extract_symbols
@@ -22,6 +23,29 @@ WARNING_BUILD_MISMATCH = (
 )
 COMPLETE_THRESHOLD_PERCENT = 100
 
+
+def _path_name(path_str):
+    """Return basename for paths that may use POSIX or Windows separators."""
+    if not isinstance(path_str, str) or not path_str:
+        return ""
+    path_obj = PureWindowsPath(path_str) if "\\" in path_str else PurePosixPath(path_str)
+    return path_obj.name
+
+
+def _path_stem(path_str):
+    """Return stem for paths that may use POSIX or Windows separators."""
+    name = _path_name(path_str)
+    return PurePosixPath(name).stem if name else ""
+
+
+def _has_real_source_path(source_path):
+    """Return True when source_path contains a usable path, not an unknown marker."""
+    if not isinstance(source_path, str):
+        return False
+    normalized = source_path.strip().lower()
+    return normalized not in {"", "unknown", "<unknown>", "n/a", "none", "null"}
+
+
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
     print(WARNING_BUILD_MISMATCH)
@@ -30,16 +54,38 @@ def warn_build_mismatch():
 def safe_float(value, default=0.0):
     """Parse a float from mixed report values without throwing."""
     try:
-        return float(value)
-    except (TypeError, ValueError):
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else default
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
 def safe_int(value, default=0):
     """Parse an int from mixed report values without throwing."""
     try:
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return default
+            # Accept explicit integer bases while keeping plain decimal strings stable.
+            # (e.g. "010" should stay decimal, not octal)
+            lower_value = value.lower()
+            has_explicit_base = lower_value.startswith(("+0x", "-0x", "0x", "+0o", "-0o", "0o", "+0b", "-0b", "0b"))
+            try:
+                return int(value, 0 if has_explicit_base else 10)
+            except ValueError:
+                # Some reports may serialize integral values as float-like strings (e.g. "12.0").
+                parsed = float(value)
+                if not math.isfinite(parsed):
+                    return default
+                if not parsed.is_integer():
+                    return default
+                return int(parsed)
+        if isinstance(value, float):
+            if not math.isfinite(value) or not value.is_integer():
+                return default
         return int(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
@@ -91,22 +137,31 @@ def is_viable_target(unit, blacklist):
 
 def derive_object_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
-    if source_path and source_path != "unknown":
-        base = Path(source_path).stem
-        return f"{base}.o"
+    if _has_real_source_path(source_path):
+        base = _path_stem(source_path)
+        if base:
+            return f"{base}.o"
     name = unit.get("name", "")
-    base = Path(name).stem
+    base = _path_stem(name)
+    if not base:
+        base = "unknown"
     return f"{base}.o"
 
 def derive_source_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
-    if source_path and source_path != "unknown":
-        return Path(source_path).name
+    if _has_real_source_path(source_path):
+        source_name = _path_name(source_path)
+        if source_name:
+            return source_name
     name = unit.get("name", "")
-    path = Path(name)
-    if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
-        return path.name
-    return f"{path.stem}.cpp"
+    path_name = _path_name(name)
+    if not path_name:
+        return "unknown.cpp"
+    path = PurePosixPath(path_name)
+    if path.suffix.lower() in {".c", ".cc", ".cpp", ".cxx"}:
+        return path_name
+    stem = path.stem or "unknown"
+    return f"{stem}.cpp"
 
 def summarize_symbols(label, all_info):
     """Return formatted lines for symbol summary (no printing inside)."""
@@ -116,11 +171,19 @@ def summarize_symbols(label, all_info):
 
     lines = []
     functions = all_info.get("functions", [])
+    if not isinstance(functions, list):
+        functions = []
     globals_data = all_info.get("globals", [])
+    if not isinstance(globals_data, list):
+        globals_data = []
     lines.append(f"  {label}: {len(functions)} funcs, {len(globals_data)} globals (showing up to 5 funcs)")
 
     for func in functions[:5]:
+        if not isinstance(func, dict):
+            continue
         p = func.get("parsed", {})
+        if not isinstance(p, dict):
+            p = {}
         symbol = p.get("symbol", "unknown")
         size_raw = p.get("size", "unknown")
         addr = p.get("virtual_addr", "unknown")
@@ -130,9 +193,12 @@ def summarize_symbols(label, all_info):
         elif isinstance(size_raw, int):
             size = f"0x{size_raw:x}"
         elif isinstance(size_raw, str):
-            try:
-                size = f"0x{int(size_raw, 16):x}"
-            except ValueError:
+            # Sizes are usually hex-ish strings from MAP output, but some paths
+            # may provide decimal or base-prefixed values.
+            parsed_size = safe_int(size_raw, None)
+            if parsed_size is not None:
+                size = f"0x{parsed_size:x}"
+            else:
                 size = size_raw
         else:
             size = str(size_raw)
@@ -151,16 +217,29 @@ def extract_candidates(report_path):
     candidates = []
 
     units = data.get("units", [])
+    if not isinstance(units, list):
+        return []
 
     for unit in units:
+        if not isinstance(unit, dict):
+            continue
         viable, _reason = is_viable_target(unit, blacklist)
         if not viable:
             continue
 
         measures = unit.get("measures", {})
+        if not isinstance(measures, dict):
+            measures = {}
         functions = unit.get("functions", [])
-        source_path = unit.get("metadata", {}).get("source_path", "unknown")
-        source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
+        if not isinstance(functions, list):
+            functions = []
+        metadata = unit.get("metadata", {})
+        if not isinstance(metadata, dict):
+            metadata = {}
+        source_path = metadata.get("source_path", "unknown")
+        if not _has_real_source_path(source_path):
+            source_path = "unknown"
+        source_file = _path_name(source_path) if source_path and source_path != "unknown" else "unknown"
 
         entry = {
             "name": unit["name"],
@@ -177,11 +256,15 @@ def extract_candidates(report_path):
             "top_functions": []
         }
 
-        for func in sorted(functions, key=lambda f: safe_float(f.get("fuzzy_match_percent", 0)))[:3]:
+        function_dicts = [func for func in functions if isinstance(func, dict)]
+        for func in sorted(function_dicts, key=lambda f: safe_float(f.get("fuzzy_match_percent", 0)))[:3]:
             func_match = safe_float(func.get("fuzzy_match_percent", 0))
             if func_match < 99:
+                func_name = func.get("name")
+                if not isinstance(func_name, str) or not func_name:
+                    func_name = "unknown"
                 entry["top_functions"].append({
-                    "name": func.get("name", "unknown"),
+                    "name": func_name,
                     "match": func_match,
                     "size": func.get("size", "unknown")
                 })

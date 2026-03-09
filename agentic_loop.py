@@ -4,23 +4,28 @@ import subprocess
 import time
 from datetime import datetime
 
-PROMPT = os.getenv(
-    "AGENTIC_PROMPT",
-    (
-        "Follow the instructions in AGENTS.MD. NEVER ask the user for input. "
-        "Simply follow the instructions and make a PR if there is an improvement. "
-        "Pay careful attention to any important rules."
-    ),
+DEFAULT_PROMPT = (
+    "Follow the instructions in AGENTS.md. NEVER ask the user for input. "
+    "Simply follow the instructions and make a PR if there is an improvement. "
+    "Pay careful attention to any important rules."
 )
-TIMEOUT_SECONDS = int(os.getenv("AGENTIC_TIMEOUT_SECONDS", str(25 * 60)))
-TERMINATE_GRACE_SECONDS = int(os.getenv("AGENTIC_TERMINATE_GRACE_SECONDS", "10"))
-MAX_BACKOFF_SECONDS = int(os.getenv("AGENTIC_MAX_BACKOFF_SECONDS", "300"))
-CMD = ["codex", "exec", "--yolo", PROMPT]
 
 
 def log(message: str) -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] {message}", flush=True)
+
+
+def _read_int_env(var_name: str, default: int) -> int:
+    raw_value = os.getenv(var_name)
+    if raw_value is None:
+        return default
+
+    try:
+        return int(raw_value)
+    except ValueError:
+        log(f"invalid integer for {var_name}={raw_value!r}; using default {default}")
+        return default
 
 
 def _signal_process_tree(proc: subprocess.Popen, sig: int) -> None:
@@ -46,40 +51,65 @@ def _stop_process_tree(proc: subprocess.Popen, grace_seconds: int) -> None:
         proc.wait()
 
 
-consecutive_failures = 0
-while True:
-    log("starting codex run")
-    try:
-        proc = subprocess.Popen(
-            CMD,
-            start_new_session=(os.name == "posix"),
-        )
-    except OSError as exc:
-        consecutive_failures += 1
-        backoff = min(2 ** min(consecutive_failures, 8), MAX_BACKOFF_SECONDS)
-        log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
-        time.sleep(backoff)
-        continue
+def run_agentic_loop(
+    prompt: str,
+    timeout_seconds: int,
+    terminate_grace_seconds: int,
+    max_backoff_seconds: int,
+) -> None:
+    cmd = ["codex", "exec", "--yolo", prompt]
+    consecutive_failures = 0
 
-    try:
-        proc.wait(timeout=TIMEOUT_SECONDS)
-        if proc.returncode == 0:
-            consecutive_failures = 0
-            log("codex run completed successfully")
-        else:
-            consecutive_failures += 1
-            backoff = min(2 ** min(consecutive_failures, 8), MAX_BACKOFF_SECONDS)
-            log(
-                f"codex exited with code {proc.returncode}; "
-                f"sleeping {backoff}s before retry"
+    while True:
+        log("starting codex run")
+        try:
+            proc = subprocess.Popen(
+                cmd,
+                start_new_session=(os.name == "posix"),
             )
+        except OSError as exc:
+            consecutive_failures += 1
+            backoff = min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
+            log(f"failed to launch codex ({exc}); sleeping {backoff}s before retry")
             time.sleep(backoff)
-    except subprocess.TimeoutExpired:
-        log(f"codex exceeded timeout ({TIMEOUT_SECONDS}s); terminating process")
-        _stop_process_tree(proc, TERMINATE_GRACE_SECONDS)
-        log("codex process stopped after timeout")
-        consecutive_failures = 0
-    except KeyboardInterrupt:
-        log("keyboard interrupt received; stopping loop")
-        _stop_process_tree(proc, TERMINATE_GRACE_SECONDS)
-        break
+            continue
+
+        try:
+            proc.wait(timeout=timeout_seconds)
+            if proc.returncode == 0:
+                consecutive_failures = 0
+                log("codex run completed successfully")
+            else:
+                consecutive_failures += 1
+                backoff = min(2 ** min(consecutive_failures, 8), max_backoff_seconds)
+                log(
+                    f"codex exited with code {proc.returncode}; "
+                    f"sleeping {backoff}s before retry"
+                )
+                time.sleep(backoff)
+        except subprocess.TimeoutExpired:
+            log(f"codex exceeded timeout ({timeout_seconds}s); terminating process")
+            _stop_process_tree(proc, terminate_grace_seconds)
+            log("codex process stopped after timeout")
+            consecutive_failures = 0
+        except KeyboardInterrupt:
+            log("keyboard interrupt received; stopping loop")
+            _stop_process_tree(proc, terminate_grace_seconds)
+            break
+
+
+def main() -> None:
+    prompt = os.getenv("AGENTIC_PROMPT", DEFAULT_PROMPT)
+    timeout_seconds = _read_int_env("AGENTIC_TIMEOUT_SECONDS", 25 * 60)
+    terminate_grace_seconds = _read_int_env("AGENTIC_TERMINATE_GRACE_SECONDS", 10)
+    max_backoff_seconds = _read_int_env("AGENTIC_MAX_BACKOFF_SECONDS", 300)
+    run_agentic_loop(
+        prompt=prompt,
+        timeout_seconds=timeout_seconds,
+        terminate_grace_seconds=terminate_grace_seconds,
+        max_backoff_seconds=max_backoff_seconds,
+    )
+
+
+if __name__ == "__main__":
+    main()

@@ -123,14 +123,17 @@ def summarize_symbols(label, all_info):
         size_raw = p.get("size", "unknown")
         addr = p.get("virtual_addr", "unknown")
 
-        if size_raw not in ["unknown", "UNUSED"]:
+        if size_raw in ["unknown", "UNUSED"]:
+            size = size_raw
+        elif isinstance(size_raw, int):
+            size = f"0x{size_raw:x}"
+        elif isinstance(size_raw, str):
             try:
-                size_val = int(size_raw, 16)
-                size = f"0x{size_val:x}"
+                size = f"0x{int(size_raw, 16):x}"
             except ValueError:
                 size = size_raw
         else:
-            size = size_raw
+            size = str(size_raw)
 
         lines.append(f"    - {symbol} ({size}b at {addr})")
 

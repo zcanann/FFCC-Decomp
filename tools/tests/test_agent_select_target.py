@@ -192,5 +192,33 @@ class BlacklistLoadingTests(unittest.TestCase):
                 self.assertEqual(agent_select_target.load_blacklist(), ["unitA", "unitB"])
 
 
+class SymbolSummaryTests(unittest.TestCase):
+    def test_summarize_symbols_accepts_integer_size(self):
+        info = {
+            "functions": [
+                {"parsed": {"symbol": "fnA", "size": 32, "virtual_addr": "0x80001000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("PAL symbols", info)
+
+        self.assertEqual(lines[0], "  PAL symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnA (0x20b at 0x80001000)")
+
+    def test_summarize_symbols_stringifies_unexpected_size_type(self):
+        info = {
+            "functions": [
+                {"parsed": {"symbol": "fnB", "size": None, "virtual_addr": "0x80002000"}},
+            ],
+            "globals": [],
+        }
+
+        lines = agent_select_target.summarize_symbols("EN symbols", info)
+
+        self.assertEqual(lines[0], "  EN symbols: 1 funcs, 0 globals (showing up to 5 funcs)")
+        self.assertEqual(lines[1], "    - fnB (Noneb at 0x80002000)")
+
+
 if __name__ == "__main__":
     unittest.main()

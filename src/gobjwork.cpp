@@ -381,24 +381,21 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
  */
 int CCaravanWork::IsOutOfShouki()
 {
-	unsigned char* ownerBytes = reinterpret_cast<unsigned char*>(m_ownerObj);
-	float ownerValue = *reinterpret_cast<float*>(ownerBytes + 0x5BC);
-	float threshold = FLOAT_803309a8 * Game.game.unkFloat_0xca10;
+    int result = 0;
+    unsigned char* ownerBytes = reinterpret_cast<unsigned char*>(m_ownerObj);
+    unsigned char flags = CFlat[4836];
 
-	if (!(threshold < ownerValue)) {
-		return 0;
-	}
-	if (m_hp == 0) {
-		return 0;
-	}
-	if (((CFlat[4836] & 0x80) == 0) && ((CFlat[4836] & 0x10) == 0)) {
-		return 0;
-	}
-	if ((ownerBytes[0x9B] & 0x80) == 0) {
-		return 0;
-	}
+    if (FLOAT_803309a8 * Game.game.unkFloat_0xca10 < *reinterpret_cast<float*>(ownerBytes + 0x5BC)) {
+        if (m_hp != 0) {
+            if ((((int)((unsigned int)flags << 24) < 0) ||
+                 ((int)(((unsigned int)flags << 27) | ((unsigned int)flags >> 5)) < 0)) &&
+                ((int)((unsigned int)ownerBytes[0x9B] << 24) < 0)) {
+                result = 1;
+            }
+        }
+    }
 
-	return 1;
+    return result;
 }
 
 /*

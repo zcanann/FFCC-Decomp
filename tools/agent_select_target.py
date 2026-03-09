@@ -10,7 +10,7 @@ import json
 import sys
 import random
 import math
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 try:
     from . import extract_symbols
@@ -22,6 +22,20 @@ WARNING_BUILD_MISMATCH = (
     "WARNING: ADDRESS AND SIZES ARE FOR A DIFFERENT BUILD AND COULD BE WRONG. ALWAYS CHECK GHIDRA."
 )
 COMPLETE_THRESHOLD_PERCENT = 100
+
+
+def _path_name(path_str):
+    """Return basename for paths that may use POSIX or Windows separators."""
+    if not isinstance(path_str, str) or not path_str:
+        return ""
+    path_obj = PureWindowsPath(path_str) if "\\" in path_str else PurePosixPath(path_str)
+    return path_obj.name
+
+
+def _path_stem(path_str):
+    """Return stem for paths that may use POSIX or Windows separators."""
+    name = _path_name(path_str)
+    return PurePosixPath(name).stem if name else ""
 
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
@@ -115,20 +129,21 @@ def is_viable_target(unit, blacklist):
 def derive_object_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
     if source_path and source_path != "unknown":
-        base = Path(source_path).stem
+        base = _path_stem(source_path)
         return f"{base}.o"
     name = unit.get("name", "")
-    base = Path(name).stem
+    base = _path_stem(name)
     return f"{base}.o"
 
 def derive_source_file(unit):
     source_path = unit.get("metadata", {}).get("source_path")
     if source_path and source_path != "unknown":
-        return Path(source_path).name
+        return _path_name(source_path)
     name = unit.get("name", "")
-    path = Path(name)
+    path_name = _path_name(name)
+    path = PurePosixPath(path_name)
     if path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
-        return path.name
+        return path_name
     return f"{path.stem}.cpp"
 
 def summarize_symbols(label, all_info):
@@ -183,7 +198,7 @@ def extract_candidates(report_path):
         measures = unit.get("measures", {})
         functions = unit.get("functions", [])
         source_path = unit.get("metadata", {}).get("source_path", "unknown")
-        source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
+        source_file = _path_name(source_path) if source_path and source_path != "unknown" else "unknown"
 
         entry = {
             "name": unit["name"],

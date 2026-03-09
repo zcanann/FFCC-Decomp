@@ -32,6 +32,18 @@ class DeriveFileNameTests(unittest.TestCase):
         unit = {"name": "src/system/player", "metadata": {"source_path": "unknown"}}
         self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
 
+    def test_derive_object_file_uses_windows_style_source_path_stem(self):
+        unit = {"name": "foo", "metadata": {"source_path": r"src\\system\\player.cpp"}}
+        self.assertEqual(agent_select_target.derive_object_file(unit), "player.o")
+
+    def test_derive_source_file_uses_windows_style_source_path_name(self):
+        unit = {"name": "foo", "metadata": {"source_path": r"src\\system\\player.cpp"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
+    def test_derive_source_file_fallback_handles_windows_style_unit_name(self):
+        unit = {"name": r"src\\system\\player", "metadata": {"source_path": "unknown"}}
+        self.assertEqual(agent_select_target.derive_source_file(unit), "player.cpp")
+
 
 class NumericParsingTests(unittest.TestCase):
     def test_safe_float_returns_default_for_invalid_values(self):

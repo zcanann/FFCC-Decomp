@@ -2535,12 +2535,21 @@ int GbaQueue::GetCompatibility(int, unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cbc4c
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetCMakeInfo(int, GbaCMakeInfo*)
+void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 {
-	// TODO
+	OSSemaphore* sem = accessSemaphores + channel;
+	void* src = &cmakeInfo[channel];
+
+	OSWaitSemaphore(sem);
+	memcpy(outInfo, src, 0x20);
+	OSSignalSemaphore(sem);
 }
 
 /*

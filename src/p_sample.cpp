@@ -121,10 +121,10 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	struct DescBlock {
-		unsigned int d[12];
-	};
-	DescBlock* src;
+	unsigned int* desc0;
+	unsigned int* desc1;
+	unsigned int* desc2;
+	unsigned int* desc3;
 	unsigned int* table;
 	unsigned int d0;
 	unsigned int d1;
@@ -140,24 +140,27 @@ extern "C" void __sinit_p_sample_cpp(void)
 	unsigned int d11;
 
 	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
-	src = reinterpret_cast<DescBlock*>(m_table_desc0__10CSamplePcs);
+	desc0 = m_table_desc0__10CSamplePcs;
+	desc1 = m_table_desc1__10CSamplePcs;
+	desc2 = m_table_desc2__10CSamplePcs;
+	desc3 = m_table_desc3__10CSamplePcs;
 	table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
 
-	d0 = src->d[0];
-	d1 = src->d[1];
-	d2 = src->d[2];
-	d3 = src->d[3];
-	d4 = src->d[4];
-	d5 = src->d[5];
-	d6 = src->d[6];
-	d7 = src->d[7];
-	d8 = src->d[8];
-	d9 = src->d[9];
-	d10 = src->d[10];
-	d11 = src->d[11];
+	d1 = desc0[1];
+	d2 = desc0[2];
+	d3 = desc1[0];
+	d4 = desc1[1];
+	d5 = desc1[2];
+	d6 = desc2[0];
+	d7 = desc2[1];
+	d8 = desc2[2];
+	d9 = desc3[0];
+	d10 = desc3[1];
+	d11 = desc3[2];
+	d0 = desc0[0];
 
-	table[1] = d0;
 	table[2] = d1;
+	table[1] = d0;
 	table[3] = d2;
 	table[4] = d3;
 	table[5] = d4;

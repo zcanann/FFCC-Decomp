@@ -14,6 +14,13 @@ unsigned char m_table__10CSamplePcs[0x15C];
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CSamplePcs::CSamplePcs() {}
+
+/*
+ * --INFO--
  * PAL Address: 0x8001FEAC
  * PAL Size: 4b
  * EN Address: TODO
@@ -121,53 +128,56 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	struct DescBlock {
-		unsigned int d[12];
-	};
-	DescBlock* src;
+	unsigned int* desc0;
+	unsigned int* desc1;
+	unsigned int* desc2;
+	unsigned int* desc3;
 	unsigned int* table;
+	unsigned int a0;
+	unsigned int a1;
+	unsigned int a2;
+	unsigned int b0;
+	unsigned int b1;
+	unsigned int b2;
+	unsigned int c0;
+	unsigned int c1;
+	unsigned int c2;
 	unsigned int d0;
 	unsigned int d1;
 	unsigned int d2;
-	unsigned int d3;
-	unsigned int d4;
-	unsigned int d5;
-	unsigned int d6;
-	unsigned int d7;
-	unsigned int d8;
-	unsigned int d9;
-	unsigned int d10;
-	unsigned int d11;
 
 	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
-	src = reinterpret_cast<DescBlock*>(m_table_desc0__10CSamplePcs);
+	desc0 = m_table_desc0__10CSamplePcs;
+	desc1 = m_table_desc1__10CSamplePcs;
+	desc2 = m_table_desc2__10CSamplePcs;
+	desc3 = m_table_desc3__10CSamplePcs;
 	table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
 
-	d0 = src->d[0];
-	d1 = src->d[1];
-	d2 = src->d[2];
-	d3 = src->d[3];
-	d4 = src->d[4];
-	d5 = src->d[5];
-	d6 = src->d[6];
-	d7 = src->d[7];
-	d8 = src->d[8];
-	d9 = src->d[9];
-	d10 = src->d[10];
-	d11 = src->d[11];
+	a0 = desc0[0];
+	a1 = desc0[1];
+	a2 = desc0[2];
+	b0 = desc1[0];
+	b1 = desc1[1];
+	b2 = desc1[2];
+	c0 = desc2[0];
+	c1 = desc2[1];
+	c2 = desc2[2];
+	d0 = desc3[0];
+	d1 = desc3[1];
+	d2 = desc3[2];
 
-	table[1] = d0;
-	table[2] = d1;
-	table[3] = d2;
-	table[4] = d3;
-	table[5] = d4;
-	table[6] = d5;
-	table[7] = d6;
-	table[8] = d7;
-	table[9] = d8;
-	table[12] = d9;
-	table[13] = d10;
-	table[14] = d11;
+	table[1] = a0;
+	table[2] = a1;
+	table[3] = a2;
+	table[4] = b0;
+	table[5] = b1;
+	table[6] = b2;
+	table[7] = c0;
+	table[8] = c1;
+	table[9] = c2;
+	table[12] = d0;
+	table[13] = d1;
+	table[14] = d2;
 }
 
 /*

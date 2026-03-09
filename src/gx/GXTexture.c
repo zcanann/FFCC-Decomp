@@ -1157,20 +1157,20 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
 static void __SetSURegs(int tmap, int tcoord) {
     u32 image0;
     u32 mode0;
-    u32 bias0;
-    u32 bias1;
+    u32 su0;
+    u32 su1;
 
     image0 = __GXData->tImage0[tmap];
-    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFF0000) | (image0 & 0x3FF);
-    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
+    su0 = __GXData->suTs0[tcoord];
+    su1 = __GXData->suTs1[tcoord];
+    su0 = (su0 & 0xFFFF0000) | (image0 & 0x3FF);
+    su1 = (su1 & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
 
     mode0 = __GXData->tMode0[tmap];
-    bias1 = 1 - ((mode0 >> 2) & 3);
-    bias0 = 1 - (mode0 & 3);
-    bias0 = __cntlzw(bias0);
-    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFEFFFF) | ((bias0 & 0x1FE0) << 11);
-    bias1 = __cntlzw(bias1);
-    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFEFFFF) | ((bias1 & 0x1FE0) << 11);
+    su0 = (su0 & 0xFFFEFFFF) | ((__cntlzw(1 - (mode0 & 3)) & 0x1FE0) << 11);
+    su1 = (su1 & 0xFFFEFFFF) | ((__cntlzw(1 - ((mode0 >> 2) & 3)) & 0x1FE0) << 11);
+    __GXData->suTs0[tcoord] = su0;
+    __GXData->suTs1[tcoord] = su1;
     GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
     GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
     __GXData->bpSentNot = 0;

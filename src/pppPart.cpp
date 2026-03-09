@@ -48,6 +48,8 @@ extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
                                                                             int);
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
@@ -67,6 +69,7 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
 static const char s_pppPart_cpp[] = "pppPart.cpp";
+static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
 static const float FLOAT_8032fddc = 0.0f;
 extern "C" float FLOAT_8032fde0;
 extern "C" float FLOAT_8032fde4;
@@ -296,7 +299,7 @@ float pppVectorLength(Vec vec)
  */
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
 { 
-	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, "CPartPcs.heap", 0);
+	pppEnvSt->m_stagePtr = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, param_2, s_CPartPcs_heap_801D821C, 0));
 }
 
 /*
@@ -306,7 +309,7 @@ void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
  */
 void pppDestroyHeap(_pppEnvSt* pppEnvSt)
 { 
-	Memory.DestroyStage(pppEnvSt->m_stagePtr);
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, pppEnvSt->m_stagePtr);
 }
 
 /*

@@ -148,12 +148,12 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     Vec posA;
     Vec posB;
-    unsigned int width;
-    unsigned int height;
+    int width;
+    int height;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (unsigned int)FLOAT_80331050;
-    height = (unsigned int)FLOAT_80331054;
+    width = (int)FLOAT_80331050;
+    height = (int)FLOAT_80331054;
 
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
@@ -185,11 +185,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
                                GX_NEAR, GX_TF_I8, 0);
 
     if (*((unsigned char*)param_3 + 4) == 1) {
-        float blur = *(float*)((char*)param_3 + 0x14);
-        float blurX = FLOAT_80331044 * blur;
+        posA.y = *(float*)((char*)param_3 + 0x14);
+        posA.x = FLOAT_80331044 * posA.y;
 
-        gUtil.RenderTextureQuad(-blurX, -blur, FLOAT_80331050 + blurX, FLOAT_80331054 + blur,
-                                       (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+        gUtil.RenderTextureQuad(-posA.x, -posA.y, FLOAT_80331050 + posA.x, FLOAT_80331054 + posA.y,
+                                (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -198,11 +198,9 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
         GXLoadTexObj((_GXTexObj*)((void**)param_2)[2], GX_TEXMAP0);
 
-        posA.x = blurX;
-        posA.y = blur;
         posA.z = FLOAT_80331030;
-        posB.x = FLOAT_80331050 - blurX;
-        posB.y = FLOAT_80331054 - blur;
+        posB.x = FLOAT_80331050 - posA.x;
+        posB.y = FLOAT_80331054 - posA.y;
         posB.z = FLOAT_80331030;
 
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);

@@ -339,14 +339,8 @@ void CChara::CAnim::InitQuantize()
  */
 CChara::CAnimNode::CAnimNode()
 {
-	unsigned char* const p = (unsigned char*)this;
-	unsigned char flags = p[0x14];
-	flags = (unsigned char)((flags << 25) >> 25);
-	p[0x14] = flags;
-
-	unsigned int mode = *(unsigned int*)(p + 0x14);
-	mode = (((mode >> 0xD) & 0x3FFFF) << 0xD) | (mode & 0x80001FFFU);
-	*(unsigned int*)(p + 0x14) = mode;
+	U8At(this, 0x14) = (unsigned char)(U8At(this, 0x14) & 0x7F);
+	U32At(this, 0x14) &= 0x80001FFFU;
 }
 
 /*

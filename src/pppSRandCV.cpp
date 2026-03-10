@@ -5,20 +5,18 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+extern "C" float RandF__5CMathFv(CMath* instance);
 
-struct PppSRandCVParam2 {
-    s32 field0;
-    s32 field4;
-    s8 field8;
-    s8 field9;
-    s8 fieldA;
-    s8 fieldB;
-    u8 fieldC;
+struct SRandCVParam {
+    s32 targetId;
+    s32 sourceOffset;
+    s8 delta[4];
+    u8 randomTwice;
 };
 
-struct PppSRandCVParam3 {
-    u8 field0[0xC];
-    s32* fieldC;
+struct SRandCVCtx {
+    u8 _pad[0xC];
+    s32* outputOffset;
 };
 
 /*
@@ -30,25 +28,25 @@ struct PppSRandCVParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
+void pppSRandCV(void* param1, void* param2, void* param3)
 {
     u8* base = (u8*)param1;
-    PppSRandCVParam2* in = (PppSRandCVParam2*)param2;
-    PppSRandCVParam3* out = (PppSRandCVParam3*)param3;
+    SRandCVParam* in = (SRandCVParam*)param2;
+    SRandCVCtx* ctx = (SRandCVCtx*)param3;
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     float* target;
 
-    if (in->field0 == *(s32*)(base + 0xC)) {
-        target = (float*)(base + *out->fieldC + 0x80);
+    if (in->targetId == *(s32*)(base + 0xC)) {
+        target = (float*)(base + *ctx->outputOffset + 0x80);
 
         {
-            u8 flag = in->fieldC;
-            float value = Math.RandF();
+            u8 flag = in->randomTwice;
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + Math.RandF();
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -56,10 +54,10 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = in->fieldC;
-            float value = Math.RandF();
+            u8 flag = in->randomTwice;
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + Math.RandF();
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -67,10 +65,10 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = in->fieldC;
-            float value = Math.RandF();
+            u8 flag = in->randomTwice;
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + Math.RandF();
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -78,31 +76,27 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         }
 
         {
-            u8 flag = in->fieldC;
-            float value = Math.RandF();
+            u8 flag = in->randomTwice;
+            float value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                value = value + Math.RandF();
+                value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
             target[3] = value;
         }
     } else {
-        if (in->field0 != *(s32*)(base + 0xC)) {
+        if (in->targetId != *(s32*)(base + 0xC)) {
             return;
         }
-        target = (float*)(base + *out->fieldC + 0x80);
-    }
-    // Note to agent: Stop fucking trashing on this. Yes you can ternary this for extab gains, but then you lose code match. Then the next agent comes in and undoes that. Infinite loop. Fucking figure out how to get to 100% code before touching extab.
-    u8* target_colors;
-    if (in->field4 == -1) {
-        target_colors = &gPppDefaultValueBuffer[0];
-    } else {
-        target_colors = base + in->field4 + 0x80;
+        target = (float*)(base + *ctx->outputOffset + 0x80);
     }
 
-    target_colors[0] = (u8)(target_colors[0] + (s8)((float)in->field8 * target[0] - (float)in->field8));
-    target_colors[1] = (u8)(target_colors[1] + (s8)((float)in->field9 * target[1] - (float)in->field9));
-    target_colors[2] = (u8)(target_colors[2] + (s8)((float)in->fieldA * target[2] - (float)in->fieldA));
-    target_colors[3] = (u8)(target_colors[3] + (s8)((float)in->fieldB * target[3] - (float)in->fieldB));
+    s32 color_offset = in->sourceOffset;
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
+
+    target_colors[0] = (u8)(target_colors[0] + (s8)((float)in->delta[0] * target[0] - (float)in->delta[0]));
+    target_colors[1] = (u8)(target_colors[1] + (s8)((float)in->delta[1] * target[1] - (float)in->delta[1]));
+    target_colors[2] = (u8)(target_colors[2] + (s8)((float)in->delta[2] * target[2] - (float)in->delta[2]));
+    target_colors[3] = (u8)(target_colors[3] + (s8)((float)in->delta[3] * target[3] - (float)in->delta[3]));
 }

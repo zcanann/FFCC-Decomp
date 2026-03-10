@@ -307,8 +307,11 @@ void CMenuPcs::TmpArtiCtrl()
 	if (hasInput) {
 		uVar3 = 0;
 	} else {
-		__cntlzw((unsigned int)Pad._448_4_);
-		uVar3 = Pad._8_2_;
+		u8* padPtr = reinterpret_cast<u8*>(&Pad);
+		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
+			padPtr += 0x54;
+		}
+		uVar3 = *(u16*)(padPtr + 8);
 	}
 
 	if (uVar3 == 0) {

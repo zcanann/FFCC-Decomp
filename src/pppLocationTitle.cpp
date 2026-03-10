@@ -112,7 +112,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     LocationTitleWork* work;
     u16 maxCount;
     u32 graphId;
-    u32 dataValIndex;
+    u16 dataValIndex;
     int graphFrame;
 
     if (gPppCalcDisabled != 0) {
@@ -148,14 +148,19 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         particle = (LocationTitleParticle*)work->m_particles;
 
         for (u16 i = 0; i < maxCount; i++) {
+            int randomValue;
+            s16 shapeCount;
+            s16 shape;
+
             particle->m_pos.x = 0.0f;
             particle->m_pos.y = 0.0f;
             particle->m_pos.z = 0.0f;
             memcpy(&particle->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
-            particle->m_frame = work->m_cur;
-
-            s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
             particle->m_shapeUnk = 0;
+            particle->m_frame = work->m_cur;
+            randomValue = rand();
+            shapeCount = *(s16*)((u8*)shapeTable + 6);
+            shape = (s16)randomValue - (s16)(randomValue / (int)shapeCount) * shapeCount;
             particle->m_shapeA = shape;
             particle->m_shapeB = shape;
 
@@ -226,11 +231,15 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             }
         }
 
-        pppCopyVector(particles[startIndex + inserted + 1].m_pos, particles[startIndex + 1].m_pos);
+        {
+            Vec tailPos = particles[startIndex + 1].m_pos;
+            pppCopyVector(particles[startIndex + inserted + 1].m_pos, tailPos);
+        }
 
         for (int i = 0; i < inserted; i++) {
             LocationTitleParticle* dst = &particles[startIndex + i + 1];
-            pppCopyVector(dst->m_pos, interp[i]);
+            Vec interpPos = interp[i];
+            pppCopyVector(dst->m_pos, interpPos);
             memcpy(&dst->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
             dst->m_frame = work->m_cur;
         }
@@ -250,7 +259,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 {
     int serializedOffset = *param_3->m_serializedDataOffsets;
     LocationTitleWork* work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
-    u32 dataValIndex = param_2->m_dataValIndex;
+    u16 dataValIndex = (u16)param_2->m_dataValIndex;
 
     if (dataValIndex == 0xFFFF) {
         return;

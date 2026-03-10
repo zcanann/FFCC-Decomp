@@ -275,8 +275,8 @@ void StreamStop(int param_1)
 
 	streamData = (unsigned int)DAT_8032f438;
 	do {
-		if ((*(int*)(streamData + 0x10c) != 0) &&
-		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
+		volatile int* streamID = (int*)(streamData + 0x10c);
+		if ((*streamID != 0) && ((param_1 == -1) || (param_1 == *streamID))) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData += 0x130;

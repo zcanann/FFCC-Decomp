@@ -486,13 +486,13 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
 
     switch (chan) {
     case GX_COLOR0:
-        reg = __GXData->matColor[GX_COLOR0];
-        reg = (reg & 0xFF) | (GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00);
+        reg = __GXData->matColor[GX_COLOR0] & 0xFF;
+        reg |= GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00;
         colIdx = 0;
         break;
     case GX_COLOR1:
-        reg = __GXData->matColor[GX_COLOR1];
-        reg = (reg & 0xFF) | (GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00);
+        reg = __GXData->matColor[GX_COLOR1] & 0xFF;
+        reg |= GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00;
         colIdx = 1;
         break;
     case GX_ALPHA0:

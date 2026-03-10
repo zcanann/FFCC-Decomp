@@ -298,10 +298,10 @@ typedef struct __GXData_struct {
     u32 tImage0[8];
     u32 tMode0[8];
     u32 texmapId[16];
-    u32 tcsManEnab;
-    u32 tevTcEnab;
-    u8 perf0;
-    u8 perf1;
+    u16 tcsManEnab;
+    u16 tevTcEnab;
+    GXPerf0 perf0;
+    GXPerf1 perf1;
     u32 perfSel;
     u8 inDispList;
     u8 dlSaveContext;

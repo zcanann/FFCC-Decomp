@@ -834,10 +834,7 @@ void nearColor(CColor, CColor)
  * Size:	TODO
  */
 CHairSet::CHairSet()
-    : m_vec0(), m_vec1()
 {
-	m_colors[0] = CColor(0x80, 0x80, 0x80, 0xFF);
-	m_colors[1] = CColor(0xF0, 0xF0, 0xF0, 0);
 }
 
 /*

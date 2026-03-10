@@ -118,7 +118,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
                 u16 outValue = state->index;
                 state->index++;
-                u16 vertexIndex = entry->vertexIndices[outValue];
+                s32 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -148,7 +148,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 f32 randValue = RandF__5CMathFv(&Math);
                 f32 maxValue = (f32)entry->maxValue;
                 int outValue = (int)(randValue * maxValue);
-                u16 vertexIndex = entry->vertexIndices[outValue];
+                s32 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;

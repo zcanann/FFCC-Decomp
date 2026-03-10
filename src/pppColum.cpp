@@ -76,7 +76,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float lengthXY;
             float fadeRange = *(float*)(param_2->m_payload + 0x10);
             float segmentStep;
-            double drawScale = 0.0;
+            float drawScale = 0.0f;
 
             PSMTXIdentity(identityMtx);
             basePos.x = *(float*)(workPos + 0x10);
@@ -140,8 +140,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shapeSt->m_animData,
                                                        *(short*)(workFrame + 2), uvA, uvB, j);
 
-                    PSVECScale(&shapePosA, &shapePosA, (float)drawScale);
-                    PSVECScale(&shapePosB, &shapePosB, (float)drawScale);
+                    PSVECScale(&shapePosA, &shapePosA, drawScale);
+                    PSVECScale(&shapePosB, &shapePosB, drawScale);
                     PSVECAdd(&shapePosA, &center, &shapePosA);
                     PSVECAdd(&shapePosB, &center, &shapePosB);
 
@@ -198,9 +198,9 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
             }
         }
 
-        u32 dataValIndex = param_2->m_dataValIndex;
-        if (dataValIndex != 0xFFFFU) {
-            long* animData = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+        if (param_2->m_dataValIndex != 0xFFFFU) {
+            long* animData =
+                **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
             pppCalcFrameShape__FPlRsRsRss(
                 animData,
                 *(short*)(work + 0), *(short*)(work + 2), *(short*)(work + 4), param_2->m_initWOrk);

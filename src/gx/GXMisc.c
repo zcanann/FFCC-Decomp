@@ -237,6 +237,7 @@ void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor d
     reg = (reg & ~0xF000) | ((u32)op << 12);
     reg = (reg & ~0x0700) | ((u32)src_factor << 8);
     reg = (reg & ~0x00E0) | ((u32)dst_factor << 5);
+    reg = (reg & 0x00FFFFFF) | 0x41000000;
     *pe_reg_1 = reg;
 }
 

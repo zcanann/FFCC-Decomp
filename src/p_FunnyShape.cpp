@@ -534,8 +534,8 @@ extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*
             __dla__FPv(ptrArray->items);
             ptrArray->items = 0;
         }
-        ptrArray->size = 0;
         ptrArray->numItems = 0;
+        ptrArray->size = 0;
         if (shouldDelete > 0) {
             __dl__FPv(ptrArray);
         }

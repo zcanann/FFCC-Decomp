@@ -13,17 +13,17 @@
 
 static inline float CameraLookAtX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD4);
 }
 
 static inline float CameraLookAtY()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD8);
 }
 
 static inline float CameraLookAtZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
+    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
 }
 
 static inline float CameraWorldX()
@@ -43,7 +43,7 @@ static inline float CameraWorldZ()
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
 }
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
@@ -101,7 +101,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		u8* objBytes = (u8*)obj;
 		u8* shapeBase = objBytes + shapeOffset + 0x80;
 		u8* alphaPtr = shapeBase + 0x32;
-		u8 sourceAlpha = objBytes[colorOffset + 0x88];
+		u8 sourceAlpha = objBytes[colorOffset + 0x8B];
 		double projX = (double)pppMngStPtr->m_matrix.value[0][3];
 		double projY = (double)pppMngStPtr->m_matrix.value[1][3];
 		double projZ = (double)pppMngStPtr->m_matrix.value[2][3];

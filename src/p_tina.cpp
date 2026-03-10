@@ -1223,25 +1223,25 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
 {
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
     *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
+    *reinterpret_cast<unsigned long*>(partMng + 0x236FC) = loadCacheParam;
 
     if (loadCacheParam == 0) {
-        *reinterpret_cast<int*>(partMng + 0x236FC) = 0;
+        *reinterpret_cast<int*>(partMng + 0x23708) = 0;
     } else if (mode == 1) {
-        *reinterpret_cast<int*>(partMng + 0x236FC) = 2;
+        *reinterpret_cast<int*>(partMng + 0x23708) = 2;
     } else if (mode == 2) {
-        *reinterpret_cast<int*>(partMng + 0x236FC) = 3;
+        *reinterpret_cast<int*>(partMng + 0x23708) = 3;
         for (int i = 0; i < 0x10; i++) {
-            *reinterpret_cast<int*>(partMng + 0x2370C + (i * 4)) = 0;
+            *reinterpret_cast<int*>(partMng + 0x2378C + (i * 4)) = 0;
         }
     } else {
-        *reinterpret_cast<int*>(partMng + 0x236FC) = 1;
+        *reinterpret_cast<int*>(partMng + 0x23708) = 1;
     }
 
-    *reinterpret_cast<void**>(partMng + 0x236E8) = amemBase;
-    *reinterpret_cast<void**>(partMng + 0x236EC) = amemBase;
-    *reinterpret_cast<unsigned long*>(partMng + 0x23704) = loadCacheParam;
+    *reinterpret_cast<void**>(partMng + 0x236F4) = amemBase;
+    *reinterpret_cast<void**>(partMng + 0x236F8) = amemBase;
     LoadFieldPdt0(mapId, floorId);
 }
 

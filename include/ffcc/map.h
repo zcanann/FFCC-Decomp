@@ -40,6 +40,12 @@ public:
 class CMapIdGrp
 {
 public:
+    unsigned long mMask;
+    _GXColor mPrimaryColor;
+    _GXColor mSecondaryColor;
+    _GXColor mTertiaryColor;
+    _GXColor mQuaternaryColor;
+
     CMapIdGrp();
 };
 

@@ -24,16 +24,25 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
  */
 extern "C" void __sinit_p_system_cpp(void)
 {
+    unsigned int* table;
+    const unsigned int* desc0;
+    const unsigned int* desc1;
+    const unsigned int* desc2;
+
     *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(__vt__10CSystemPcs);
-    m_table__10CSystemPcs[1] = m_table_desc0__10CSystemPcs[0];
-    m_table__10CSystemPcs[2] = m_table_desc0__10CSystemPcs[1];
-    m_table__10CSystemPcs[3] = m_table_desc0__10CSystemPcs[2];
-    m_table__10CSystemPcs[4] = m_table_desc1__10CSystemPcs[0];
-    m_table__10CSystemPcs[5] = m_table_desc1__10CSystemPcs[1];
-    m_table__10CSystemPcs[6] = m_table_desc1__10CSystemPcs[2];
-    m_table__10CSystemPcs[7] = m_table_desc2__10CSystemPcs[0];
-    m_table__10CSystemPcs[8] = m_table_desc2__10CSystemPcs[1];
-    m_table__10CSystemPcs[9] = m_table_desc2__10CSystemPcs[2];
+    table = &m_table__10CSystemPcs[1];
+    desc0 = m_table_desc0__10CSystemPcs;
+    desc1 = m_table_desc1__10CSystemPcs;
+    desc2 = m_table_desc2__10CSystemPcs;
+    table[0] = desc0[0];
+    table[1] = desc0[1];
+    table[2] = desc0[2];
+    table[3] = desc1[0];
+    table[4] = desc1[1];
+    table[5] = desc1[2];
+    table[6] = desc2[0];
+    table[7] = desc2[1];
+    table[8] = desc2[2];
 }
 
 /*

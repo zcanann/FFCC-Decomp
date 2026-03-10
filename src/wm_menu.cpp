@@ -2465,7 +2465,7 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 {
 	int result = modelNo * 200 + 100;
 	if (baseType != 0) {
-		result = modelNo * 200 + 200;
+		result += 100;
 	}
 	return result + offset;
 }
@@ -5807,4 +5807,3 @@ void CMenuPcs::GetFontWorld()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	gWmMenuWorkA = static_cast<int>(reinterpret_cast<unsigned int*>(bytes + 0xFC)[0]);
 }
-

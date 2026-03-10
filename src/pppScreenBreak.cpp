@@ -9,6 +9,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"
@@ -83,6 +84,8 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 static inline int GraphicScreenBreakBlurEnabled() { return *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Graphic) + 0x7358); }
 
 extern "C" {
+int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
+    CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap,
                                                                                  int colorChannel);
@@ -755,8 +758,8 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
 
     if (value[0x24] == 0) {
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR,
-                                   GX_TF_RGBA8, 0);
+        GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
+            &Graphic, gRenderScratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
         value[0x24] = 1;
     }
 }

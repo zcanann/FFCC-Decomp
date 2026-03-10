@@ -24,7 +24,7 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
  */
 extern "C" void __sinit_p_system_cpp(void)
 {
-    static const unsigned int tableDescriptors[9] = {
+    static unsigned int tableDescriptors[9] = {
         0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv),
         0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv),
         0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv),

@@ -103,14 +103,9 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
  * Address:\tTODO
  * Size:\tTODO
  */
-bool CUSB::IsConnected()
+int CUSB::IsConnected()
 {
-	if (m_connectionState == 8)
-	{
-		return true;
-	}
-
-	return false;
+	return m_connectionState == 8;
 }
 
 /*

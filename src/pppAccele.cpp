@@ -1,8 +1,6 @@
 #include "ffcc/pppAccele.h"
 #include "ffcc/symbols_shared.h"
 
-const float kPppAcceleZero = 0.0f;
-
 
 /*
  * --INFO--
@@ -51,4 +49,3 @@ void pppAccele(pppAcceleObj* obj, pppAcceleUnkB* param_2, pppAcceleUnkC* param_3
 	pfVar1[1] = pfVar1[1] + pfVar2[1];
 	pfVar1[2] = pfVar1[2] + pfVar2[2];
 }
-

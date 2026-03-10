@@ -336,17 +336,16 @@ static VITiming* getTiming(VITVMode mode) {
 void __VIInit(VITVMode mode) {
     VITiming* tm;
     u32 tv;
-    volatile u32 a;
-    u16 hct;
-    u16 vct;
+    u32 ds;
+    volatile u32 delay;
 
     tv = (u32)mode >> 2;
     *(u32*)OSPhysicalToCached(0xCC) = tv;
-
+    ds = (u32)mode & 2;
     tm = getTiming(mode);
     __VIRegs[1] = 2;
 
-    for (a = 0; a < 1000; a += 8) {}
+    for (delay = 0; delay < 1000; delay += 8) {}
 
     __VIRegs[1] = 0;
     __VIRegs[3] = (u32)tm->hlw;
@@ -365,17 +364,15 @@ void __VIInit(VITVMode mode) {
     __VIRegs[36] = 0x2828;
     __VIRegs[27] = 1;
     __VIRegs[26] = 0x1001;
-    hct = tm->hlw + 1;
-    vct = (tm->nhlines / 2) + 1;
-    __VIRegs[25] = (u16)(u32)hct;
-    __VIRegs[24] = vct | 0x1000;
+    __VIRegs[25] = tm->hlw + 1;
+    __VIRegs[24] = ((tm->nhlines + 1) >> 1) | 0x1000;
 
-    if (((u32)mode == 2) || ((u32)mode == 3) || ((u32)mode == 0x1A)) {
+    if ((u32)mode != 2 && (u32)mode != 3 && (u32)mode != 0x1A) {
+        __VIRegs[1] = (ds << 2) | 1 | (tv << 8);
+        __VIRegs[54] = 0;
+    } else {
         __VIRegs[1] = (tv << 8) | 5;
         __VIRegs[54] = 1;
-    } else {
-        __VIRegs[1] = (((u32)mode & 2) << 2) | 1 | (tv << 8);
-        __VIRegs[54] = 0;
     }
 }
 

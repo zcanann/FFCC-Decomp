@@ -634,7 +634,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
  */
 int CRedEntry::GetWaveBank(int waveNo)
 {
-	if ((0 < waveNo) && (waveNo < 0x10))
+	if ((waveNo >= 0) && (waveNo < 0x10))
 	{
 		return *(int*)this + (waveNo * 0x10);
 	}

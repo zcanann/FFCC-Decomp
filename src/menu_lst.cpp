@@ -24,6 +24,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
+extern CMenuPcs MenuPcs;
 
 namespace {
 
@@ -489,8 +490,9 @@ void CMenuPcs::MLstClose()
 void CMenuPcs::MLstDraw()
 {
 	MenuLstMembers& members = GetMenuLstMembers(this);
+	CMenuPcs* menu = &MenuPcs;
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(menu, 0);
 
 	int menuState = members.m_lstStatePtr;
 	int listBase = members.m_lstDataPtr;
@@ -508,7 +510,7 @@ void CMenuPcs::MLstDraw()
 			float h = (float)item[3];
 			float alpha = *(float*)(item + 8);
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, tex);
 			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(255.0f * alpha)};
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
@@ -518,14 +520,14 @@ void CMenuPcs::MLstDraw()
 				v += h;
 			}
 
-			DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, w, h, 0.0f, v, *(float*)(item + 10), *(float*)(item + 10), 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(menu, 0, x, y, w, h, 0.0f, v, *(float*)(item + 10), *(float*)(item + 10), 0.0f);
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x5c);
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, 0x5c);
 			v = 0.0f;
 			if ((menuMode == 1) && (i == cursor)) {
 				v += h;
 			}
-			DrawRect__8CMenuPcsFUlfffffffff(this, 0, -((48.0f * 1.5f) - (float)item[0]), (float)item[1] - 6.0f, 48.0f, 48.0f, 0.0f, v, *(float*)(item + 10), *(float*)(item + 10), 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(menu, 0, -((48.0f * 1.5f) - (float)item[0]), (float)item[1] - 6.0f, 48.0f, 48.0f, 0.0f, v, *(float*)(item + 10), *(float*)(item + 10), 0.0f);
 		}
 		item += 0x20;
 	}
@@ -545,7 +547,7 @@ void CMenuPcs::MLstDraw()
 		GetWidth__5CFontFPc(font, text);
 
 		float textX = (float)(item[0] + 0x28);
-		float textY = (float)(item[1] + 3);
+		float textY = (float)(item[1] - 3);
 		if ((menuMode == 1) && (i == cursor)) {
 			textX += 6.0f;
 		}

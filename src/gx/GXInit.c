@@ -412,7 +412,6 @@ GXFifoObj* GXInit(void* base, u32 size) {
 
 void __GXInitGX(void) {
     GXRenderModeObj* rmode;
-    GXTexObj tex_obj;
     float identity_mtx[3][4];
     GXColor clear = {64, 64, 64, 255};
     GXColor black = {0, 0, 0, 0};
@@ -497,16 +496,6 @@ void __GXInitGX(void) {
     *(u32*)((u8*)__GXData + 0x2CC) = 0;
     GXSetTexRegionCallback((GXTexRegionCallback)__GXDefaultTexRegionCallback);
     GXSetTlutRegionCallback(__GXDefaultTlutRegionCallback);
-
-    GXInitTexObj(&tex_obj, DefaultTexData, 4, 4, GX_TF_IA8, GX_CLAMP, GX_CLAMP, 0);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP0);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP1);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP2);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP3);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP4);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP5);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP6);
-    GXLoadTexObj(&tex_obj, GX_TEXMAP7);
 
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);

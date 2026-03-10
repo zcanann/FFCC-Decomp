@@ -474,7 +474,7 @@ void StreamPause(int param_1, int param_2)
 		} else {
 			OSReport(s__sPause___Stream___OFF__d_801e7fcb, &DAT_801e7f44, param_1);
 		}
-		fflush(&DAT_8021d1a8);
+		fflush(__files + 1);
 		streamData = (unsigned int)DAT_8032f438;
 	}
 	do {

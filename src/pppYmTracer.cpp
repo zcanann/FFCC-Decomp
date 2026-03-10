@@ -180,7 +180,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         return;
     }
 
-    work = (u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets;
+    work = (u8*)pppYmTracer + 0x80 + *param_3->m_serializedDataOffsets;
     entries = *(TRACE_POLYGON**)(work + 0x28);
     maxCount = *(u16*)(param_2->m_payload + 4);
 
@@ -201,13 +201,15 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         if (param_2->m_initWOrk == -1) {
             *(f32**)(work + 0x20) = (f32*)gPppDefaultValueBuffer;
         } else {
-            *(u8**)(work + 0x20) = (u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue;
+            *(f32**)(work + 0x20) =
+                (f32*)((u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue);
         }
 
         if (param_2->m_arg3 == -1) {
             *(f32**)(work + 0x24) = (f32*)gPppDefaultValueBuffer;
         } else {
-            *(u8**)(work + 0x24) = (u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload;
+            *(f32**)(work + 0x24) =
+                (f32*)((u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload);
         }
     }
 
@@ -334,7 +336,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     serializedOffset0 = *param_3->m_serializedDataOffsets;
     serializedOffset1 = param_3->m_serializedDataOffsets[1];
 
-    work = (u8*)pppYmTracer + 0x10 + serializedOffset0;
+    work = (u8*)pppYmTracer + 0x80 + serializedOffset0;
     count = *(u16*)(work + 0x2C);
     if (param_2->m_dataValIndex != 0xFFFF) {
         mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];

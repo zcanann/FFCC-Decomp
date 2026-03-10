@@ -3,14 +3,16 @@
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
 
-unsigned char* gMcPcsSingletonPtr = 0;
-
 class McCtrl;
 
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
+
+#pragma section ".ctors$10"
+__declspec(section ".ctors$10")
+void* const __sinit_p_mc_cpp_reference = __sinit_p_mc_cpp;
 
 class McCtrl
 {

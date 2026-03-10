@@ -3,7 +3,7 @@
 
 #include "ffcc/system.h"
 
-class CMcPcs : public CProcess
+class CMcPcs
 {
 public:
     void Init();

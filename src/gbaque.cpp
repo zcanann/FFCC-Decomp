@@ -1965,12 +1965,20 @@ unsigned int GbaQueue::GetLetterLstFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cd50c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrLetterLstFlg(int)
+void GbaQueue::ClrLetterLstFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2C89] = static_cast<char>(obj[0x2C89] & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*
@@ -1988,12 +1996,20 @@ unsigned int GbaQueue::GetLetterDatFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cd418
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrLetterDatFlg(int)
+void GbaQueue::ClrLetterDatFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2C89] = static_cast<char>(obj[0x2C89] & ~(0x10 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*

@@ -951,8 +951,8 @@ void CMes::Draw()
  */
 void CMes::SetPosition(float x, float y)
 {
-	*(float*)&mData[0x3c90] = x;
-	*(float*)&mData[0x3c94] = y;
+	*(float*)&mData[0x3c8c] = x;
+	*(float*)&mData[0x3c90] = y;
 }
 
 /*

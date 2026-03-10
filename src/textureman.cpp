@@ -195,12 +195,15 @@ extern "C" CPtrArray<CTexture*>* dtor_8003BE70(CPtrArray<CTexture*>* ptrArray, s
 template <>
 bool CPtrArray<CTexture*>::Add(CTexture* item)
 {
-    if (setSize(m_numItems + 1) == 0) {
+    int* numItems = reinterpret_cast<int*>(Ptr(this, 4));
+    CTexture*** items = reinterpret_cast<CTexture***>(Ptr(this, 0x10));
+
+    if (setSize(*numItems + 1) == 0) {
         return false;
     }
 
-    m_items[m_numItems] = item;
-    m_numItems = m_numItems + 1;
+    (*items)[*numItems] = item;
+    *numItems = *numItems + 1;
     return true;
 }
 

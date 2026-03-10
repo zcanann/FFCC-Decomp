@@ -497,9 +497,7 @@ static void cbForStateCheckID1(u32 intType) {
 static void cbForStateCheckID2(u32 intType) {
     if (intType == 16) {
         executing->state = -1;
-        __DVDStoreErrorCode(0x01234568);
-        DVDReset();
-        cbForStateError(0);
+		stateTimeout();
 		return;
 	}
 
@@ -507,18 +505,13 @@ static void cbForStateCheckID2(u32 intType) {
 
     if (intType & DVD_INTTYPE_TC) {
         ASSERTLINE(1305, (intType & DVD_INTTYPE_DE) == 0);
-        LastState = stateReadingFST;
         NumInternalRetry = 0;
-        ASSERTLINE(652, ((u32)(bootInfo->FSTLocation) & (32 - 1)) == 0);
-        DVD_ASSERTMSGLINE(647, bootInfo->FSTMaxLength >= BB2.FSTLength,
-                          "DVDChangeDisk(): FST in the new disc is too big.   ");
-        DVDLowRead(bootInfo->FSTLocation, (u32)(BB2.FSTLength + 0x1F) & 0xFFFFFFE0, BB2.FSTPosition,
-                   cbForStateReadingFST);
+        stateReadingFST();
         return;
     }
 
     ASSERTLINE(1321, intType == DVD_INTTYPE_DE);
-    DVDLowRequestError(cbForStateGettingError);
+    stateGettingError();
 }
 
 static void cbForStateCheckID3(u32 intType) {

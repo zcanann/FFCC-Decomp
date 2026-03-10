@@ -1,7 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include "dolphin/fake_tgmath.h"
+#include <math.h>
 
 #include "dolphin/axfx/__axfx.h"
 
@@ -31,6 +31,15 @@ static void DLdeleteDpl2(AXFX_REVHI_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80196A20
+ * PAL Size: 1236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay) {
     u8 i;
     u8 k;

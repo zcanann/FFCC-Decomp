@@ -312,52 +312,41 @@ char* strstr(const char* str, const char* pat)
 char* strtok(char* str, const char* delim)
 {
 	unsigned char delimiter_table[32] = { 0 };
-	int ch;
 	unsigned char* p;
 	unsigned char* tokenStart;
-	unsigned char* tokenEnd;
+	unsigned char ch;
 
 	if (str != NULL) {
 		strtok_ptr = str;
 	}
 
 	p = (unsigned char*)delim - 1;
-	while ((ch = *++p) != '\0') {
-		unsigned int index = ch >> 3;
-		unsigned int bit = 1u << (ch & 7);
-		delimiter_table[index] = (unsigned char)(delimiter_table[index] | bit);
-	}
+	do {
+		ch = *++p;
+		if (ch != '\0') {
+			delimiter_table[ch >> 3] |= 1 << (ch & 7);
+		}
+	} while (ch != '\0');
 
 	p = (unsigned char*)strtok_ptr - 1;
-	while ((ch = *++p) != '\0') {
-		unsigned int index = ch >> 3;
-		unsigned int bit = 1u << (ch & 7);
-		if ((delimiter_table[index] & bit) == 0) {
-			break;
-		}
-	}
-
-	tokenStart = p;
-	if (ch == '\0') {
-		strtok_ptr = strtok_null;
-		tokenStart = NULL;
-	} else {
-		tokenEnd = tokenStart;
-		while ((ch = *++tokenEnd) != '\0') {
-			unsigned int index = ch >> 3;
-			unsigned int bit = 1u << (ch & 7);
-			if ((delimiter_table[index] & bit) != 0) {
-				break;
-			}
-		}
-
+	do {
+		ch = *++p;
 		if (ch == '\0') {
 			strtok_ptr = strtok_null;
-		} else {
-			strtok_ptr = (char*)(tokenEnd + 1);
-			*tokenEnd = '\0';
+			return NULL;
 		}
-	}
+	} while ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0);
 
+	tokenStart = p;
+	do {
+		ch = *++p;
+		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
+			strtok_ptr = (char*)(p + 1);
+			*p = '\0';
+			return (char*)tokenStart;
+		}
+	} while (ch != '\0');
+
+	strtok_ptr = strtok_null;
 	return (char*)tokenStart;
 }

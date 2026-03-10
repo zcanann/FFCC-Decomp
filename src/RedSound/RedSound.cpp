@@ -125,10 +125,9 @@ int* CRedSound::EntryStandbyID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
-	CRedSound* self = this;
-
 	memset(DAT_8032e17c, 0, 0x100);
 
 	if (param_3 <= 0 || param_5 <= 0) {
@@ -136,49 +135,44 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 			OSReport("[%s] Sound Driver Initialize ERROR! %s %s\n", "RedSound", "Invalid parameters", "");
 			fflush(__files + 2);
 		}
-		return 0;
-	}
-	
-	if (((unsigned)param_2 & 0x1f) != 0 || ((unsigned)param_3 & 0x1f) != 0) {
+		param_3 = 0;
+	} else if (((unsigned)param_2 & 0x1f) != 0 || ((unsigned)param_3 & 0x1f) != 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] %s Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", (unsigned)param_2, param_3, "");
 			fflush(__files + 2);
 		}
-		return 0;
-	}
-	
-	if (((unsigned)param_4 & 0x1f) != 0 || ((unsigned)param_5 & 0x1f) != 0) {
+		param_3 = 0;
+	} else if (((unsigned)param_4 & 0x1f) != 0 || ((unsigned)param_5 & 0x1f) != 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] A Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", param_4, param_5, "");
 			fflush(__files + 2);
 		}
-		return 0;
-	}
-	
-	if (ARCheckInit() == 0) {
+		param_3 = 0;
+	} else if (ARCheckInit() == 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] AR was not initialized %s\n", "RedSound", "");
 			fflush(__files + 2);
 		}
-		return 0;
-	}
-	
-	AIReset();
-	AIInit(0);
-	AXInit();
-	AXARTInit();
-	DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
-	DAT_8032e154.Init();
-	self->Start();
-	CRedDriver_8032f4c0.Init();
-	
-	if (gRedMemoryDebugEnabled != 0) {
-		OSReport("[%s] Sound Driver Initialize OK! %s\n", "RedSound", "");
-		fflush(__files + 2);
+		param_3 = 0;
+	} else {
+		AIReset();
+		AIInit(0);
+		AXInit();
+		AXARTInit();
+		DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
+		DAT_8032e154.Init();
+		Start();
+		CRedDriver_8032f4c0.Init();
+
+		if (gRedMemoryDebugEnabled != 0) {
+			OSReport("[%s] Sound Driver Initialize OK! %s\n", "RedSound", "");
+			fflush(__files + 2);
+		}
 	}
 
-	return 1;
+	return param_3;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

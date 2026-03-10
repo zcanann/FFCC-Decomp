@@ -951,8 +951,8 @@ void CMes::Draw()
  */
 void CMes::SetPosition(float x, float y)
 {
-	*(float*)&mData[0x3c90] = x;
-	*(float*)&mData[0x3c94] = y;
+	*(float*)((char*)this + 0x3c9c) = x;
+	*(float*)((char*)this + 0x3ca0) = y;
 }
 
 /*
@@ -1376,4 +1376,3 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 
 	return width;
 }
-

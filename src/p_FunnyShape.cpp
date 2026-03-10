@@ -529,6 +529,7 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete)
 {
     if (ptrArray != 0) {
+        SetPtrArrayDtorVtable(ptrArray);
         if (ptrArray->items != 0) {
             __dla__FPv(ptrArray->items);
             ptrArray->items = 0;

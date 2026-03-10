@@ -304,17 +304,25 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
 
-    GXPosition3f32(pos1.x, pos1.y, pos1.z);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXWGFifo.f32 = pos1.x;
+    GXWGFifo.f32 = pos1.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
 
-    GXPosition3f32(pos2.x, pos1.y, pos1.z);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXWGFifo.f32 = pos2.x;
+    GXWGFifo.f32 = pos1.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
 
-    GXPosition3f32(pos2.x, pos2.y, pos1.z);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXWGFifo.f32 = pos2.x;
+    GXWGFifo.f32 = pos2.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
 
-    GXPosition3f32(pos1.x, pos2.y, pos1.z);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXWGFifo.f32 = pos1.x;
+    GXWGFifo.f32 = pos2.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
 }
 
 /*

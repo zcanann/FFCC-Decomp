@@ -197,18 +197,16 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchWaveSequence(int waveNo)
 {
-	int* entry = (int*)this;
-	int* const waveBankBase = (int*)entry[0];
-	int* waveBank = waveBankBase;
-	int i;
+	register int* waveBank = *(int**)this;
+	int* end = (int*)(*(int*)this + 0x400);
 
-	for (i = 0x40; i > 0; i--) {
-		if ((waveBank[3] != 0) && (waveBank[0] == waveNo)) {
-			int offset = (int)waveBank - (int)waveBankBase;
-			return (offset >> 4) + (int)((offset < 0) && ((offset & 0xF) != 0));
+	do {
+		if ((waveBank[3] != 0) && (*waveBank == waveNo)) {
+			int offset = (int)waveBank - *(int*)this;
+			return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
 		}
 		waveBank += 4;
-	}
+	} while (waveBank < end);
 
 	return -1;
 }

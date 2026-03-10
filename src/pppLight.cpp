@@ -172,9 +172,6 @@ void pppLight(void* param1, void* param2, void* param3)
 		*(float*)(lightData + 0x14) = sourcePos.z;
 		*(float*)(lightData + 0x24) = *(float*)(work + 0x24);
 		*(float*)(lightData + 0x28) = *(float*)(work + 0x18);
-		*(float*)(lightData + 0x30) = kPppLightOne;
-		*(unsigned char**)(lightData + 0x6c) = pppMngStPtr;
-		*(int*)(lightData + 0x70) = 0;
 
 		lightData[0x58] = (unsigned char)(*(short*)(work + 0x0) >> 7);
 		lightData[0x59] = (unsigned char)(*(short*)(work + 0x2) >> 7);
@@ -243,4 +240,3 @@ void pppLight(void* param1, void* param2, void* param3)
 		}
 	}
 }
-

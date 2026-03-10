@@ -595,38 +595,36 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
                 }
             }
 
-            if (firstParticle >= 0) {
-                Mtx* particleMtx = (Mtx*)(particleWMat + firstParticle * 0x30);
+            Mtx* particleMtx = (Mtx*)(particleWMat + firstParticle * 0x30);
 
-                PSMTXIdentity(scaleMtx);
-                scaleMtx[0][0] = scaleValue;
-                scaleMtx[1][1] = scaleValue;
-                scaleMtx[2][2] = scaleValue;
+            PSMTXIdentity(scaleMtx);
+            scaleMtx[0][0] = scaleValue;
+            scaleMtx[1][1] = scaleValue;
+            scaleMtx[2][2] = scaleValue;
 
-                PSMTXConcat(*particleMtx, *(Mtx*)((unsigned char*)breathModel + 4), worldMtx);
-                PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0xC), &origin);
+            PSMTXConcat(*particleMtx, *(Mtx*)((unsigned char*)breathModel + 4), worldMtx);
+            PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0xC), &origin);
 
-                PSMTXCopy(*particleMtx, rotMtx.value);
-                rotMtx.value[0][3] = kPppBreathModelZero;
-                rotMtx.value[1][3] = kPppBreathModelZero;
-                rotMtx.value[2][3] = kPppBreathModelZero;
+            PSMTXCopy(*particleMtx, rotMtx.value);
+            rotMtx.value[0][3] = kPppBreathModelZero;
+            rotMtx.value[1][3] = kPppBreathModelZero;
+            rotMtx.value[2][3] = kPppBreathModelZero;
 
-                dir = *(Vec*)(groupPtr + 0x18);
-                PSMTXMultVec(rotMtx.value, &dir, &dir);
-                if ((dir.x != 0.0f) || (dir.y != 0.0f) || (dir.z != 0.0f)) {
-                    PSVECNormalize(&dir, &dirNorm);
-                } else {
-                    dirNorm.x = 0.0f;
-                    dirNorm.y = 0.0f;
-                    dirNorm.z = 0.0f;
-                }
-                PSVECScale(&dirNorm, &target, *(float*)(groupPtr + 0x24));
-                PSVECAdd(&origin, &target, &target);
-                PSVECSubtract(&target, &origin, &hitVector);
-
-                pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaleValue,
-                                                                    *(float*)((unsigned char*)pBreathModel + 4));
+            dir = *(Vec*)(groupPtr + 0x18);
+            PSMTXMultVec(rotMtx.value, &dir, &dir);
+            if ((dir.x != 0.0f) || (dir.y != 0.0f) || (dir.z != 0.0f)) {
+                PSVECNormalize(&dir, &dirNorm);
+            } else {
+                dirNorm.x = 0.0f;
+                dirNorm.y = 0.0f;
+                dirNorm.z = 0.0f;
             }
+            PSVECScale(&dirNorm, &target, *(float*)(groupPtr + 0x24));
+            PSVECAdd(&origin, &target, &target);
+            PSVECSubtract(&target, &origin, &hitVector);
+
+            pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaleValue,
+                                                                *(float*)((unsigned char*)pBreathModel + 4));
         }
 
         groupPtr += 0x5C;

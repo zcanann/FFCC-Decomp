@@ -211,6 +211,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
  */
 void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
+    pppYmDrawMdlTexAnm* ymDrawMdlTexAnm;
     pppModelSt* model;
     pppFMATRIX matrix0;
     pppFMATRIX matrix1;
@@ -221,6 +222,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     u8* stepBytes;
     s32 colorOffset;
 
+    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnm*)object;
     model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
     if (model == NULL) {
         return;
@@ -237,18 +239,18 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&matrix0, &matrix1, &matrix2);
 
     matrix4 = matrix0;
-    matrix3 = *(pppFMATRIX*)&ppvCameraMatrix0;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX((pppFMATRIX*)((u8*)object + 0x40), &matrix3, &matrix4);
+    matrix3 = *(pppFMATRIX*)&ppvCameraMatrix02;
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX((pppFMATRIX*)((u8*)ymDrawMdlTexAnm + 0x40), &matrix3, &matrix4);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((u8*)object + 0x88 + colorOffset, (u8*)object + 0x40,
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((u8*)ymDrawMdlTexAnm + 0x88 + colorOffset, (u8*)ymDrawMdlTexAnm + 0x40,
                                                                step->m_arg3, step->m_payload[0xC], initBytes[2],
                                                                initBytes[1], initBytes[3], stepBytes[0], stepBytes[1],
                                                                stepBytes[2]);
 
     pppSetBlendMode__FUc(initBytes[1]);
-    pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)object + 0x70), 1);
+    pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)ymDrawMdlTexAnm + 0x70), 1);
 }
 
 }

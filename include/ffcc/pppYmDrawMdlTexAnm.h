@@ -10,11 +10,10 @@ struct pppYmDrawMdlTexAnm {
 struct pppYmDrawMdlTexAnmStep {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s16 m_initWOrk;
-    u16 _pad0;
-    f32 m_stepValue;
+    s32 m_initWOrk;
+    s32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[8];
+    u8 m_payload[0x10];
 };
 
 #ifdef __cplusplus

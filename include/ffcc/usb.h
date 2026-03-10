@@ -34,7 +34,7 @@ public:
     void Frame();
     bool Write(void*, int);
     bool SendMessage(unsigned long, MCCChannel);
-    bool IsConnected();
+    int IsConnected();
     void AddMessageCallback(MessageCallback, void*);
     void RemoveMessageCallback(MessageCallback);
     void Printf(char*, ...);

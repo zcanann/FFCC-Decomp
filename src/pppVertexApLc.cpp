@@ -100,6 +100,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
         VertexApLcEntry* entry = &env->entries[data->entryIndex];
+        u16* vertexIndices = entry->vertexIndices;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
@@ -108,17 +109,16 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        int count = data->spawnCount;
+        s32 count = data->spawnCount;
         switch (data->mode) {
-        case 0:
-            while (count-- != 0) {
-                if (state->index >= entry->maxValue) {
+        case 0: {
+            do {
+                if ((s16)state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 outValue = state->index;
-                state->index++;
-                u16 vertexIndex = entry->vertexIndices[outValue];
+                u16 index = state->index++;
+                u16 vertexIndex = vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -126,8 +126,10 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     s32 childId = data->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData =
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
+                    Vec* outPos;
 
                     if (childData == 0) {
                         child = 0;
@@ -136,19 +138,17 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
+                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    outPos->x = x;
+                    outPos->y = y;
+                    outPos->z = z;
                 }
-            }
+            } while (count-- != 0);
             break;
-        case 1:
-            while (count-- != 0) {
-                f32 randValue = RandF__5CMathFv(&Math);
-                f32 maxValue = (f32)entry->maxValue;
-                int outValue = (int)(randValue * maxValue);
-                u16 vertexIndex = entry->vertexIndices[outValue];
+        }
+        case 1: {
+            do {
+                u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -156,8 +156,10 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     s32 childId = data->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData =
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
+                    Vec* outPos;
 
                     if (childData == 0) {
                         child = 0;
@@ -166,13 +168,14 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
+                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    outPos->x = x;
+                    outPos->y = y;
+                    outPos->z = z;
                 }
-            }
+            } while (count-- != 0);
             break;
+        }
         }
 
         state->countdown = data->spawnDelay;

@@ -6,6 +6,7 @@
 
 char* strtok_null = NULL;
 char* strtok_ptr  = NULL;
+static const unsigned char strtok_delimiter_table_init[32] = { 0 };
 
 size_t strlen(const char* str)
 {
@@ -311,11 +312,20 @@ char* strstr(const char* str, const char* pat)
  */
 char* strtok(char* str, const char* delim)
 {
-	unsigned char delimiter_table[32] = { 0 };
+	unsigned char delimiter_table[32];
 	int ch;
 	unsigned char* p;
 	unsigned char* tokenStart;
 	unsigned char* tokenEnd;
+
+	((unsigned int*)delimiter_table)[0] = ((const unsigned int*)strtok_delimiter_table_init)[0];
+	((unsigned int*)delimiter_table)[1] = ((const unsigned int*)strtok_delimiter_table_init)[1];
+	((unsigned int*)delimiter_table)[2] = ((const unsigned int*)strtok_delimiter_table_init)[2];
+	((unsigned int*)delimiter_table)[3] = ((const unsigned int*)strtok_delimiter_table_init)[3];
+	((unsigned int*)delimiter_table)[4] = ((const unsigned int*)strtok_delimiter_table_init)[4];
+	((unsigned int*)delimiter_table)[5] = ((const unsigned int*)strtok_delimiter_table_init)[5];
+	((unsigned int*)delimiter_table)[6] = ((const unsigned int*)strtok_delimiter_table_init)[6];
+	((unsigned int*)delimiter_table)[7] = ((const unsigned int*)strtok_delimiter_table_init)[7];
 
 	if (str != NULL) {
 		strtok_ptr = str;

@@ -6,7 +6,6 @@
 class CSamplePcs : public CProcess
 {
 public:
-    CSamplePcs();
     void Init();
     void Quit();
     int GetTable(unsigned long);
@@ -18,7 +17,7 @@ public:
     void func1();
 };
 
-extern CSamplePcs SamplePcs;
+extern unsigned int SamplePcs[];
 extern unsigned int m_table_desc0__10CSamplePcs[];
 extern unsigned int m_table_desc1__10CSamplePcs[];
 extern unsigned int m_table_desc2__10CSamplePcs[];

@@ -1,6 +1,6 @@
 #include "ffcc/p_sample.h"
 
-CSamplePcs SamplePcs;
+unsigned int SamplePcs[1];
 extern "C" void* __vt__10CSamplePcs[];
 extern "C" void create__10CSamplePcsFv(CSamplePcs*);
 extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
@@ -11,13 +11,6 @@ unsigned int m_table_desc1__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u
 unsigned int m_table_desc2__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
 unsigned int m_table_desc3__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
 unsigned char m_table__10CSamplePcs[0x15C];
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CSamplePcs::CSamplePcs() {}
 
 /*
  * --INFO--
@@ -128,56 +121,21 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	unsigned int* desc0;
-	unsigned int* desc1;
-	unsigned int* desc2;
-	unsigned int* desc3;
-	unsigned int* table;
-	unsigned int a0;
-	unsigned int a1;
-	unsigned int a2;
-	unsigned int b0;
-	unsigned int b1;
-	unsigned int b2;
-	unsigned int c0;
-	unsigned int c1;
-	unsigned int c2;
-	unsigned int d0;
-	unsigned int d1;
-	unsigned int d2;
+	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
 
-	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
-	desc0 = m_table_desc0__10CSamplePcs;
-	desc1 = m_table_desc1__10CSamplePcs;
-	desc2 = m_table_desc2__10CSamplePcs;
-	desc3 = m_table_desc3__10CSamplePcs;
-	table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
-
-	a0 = desc0[0];
-	a1 = desc0[1];
-	a2 = desc0[2];
-	b0 = desc1[0];
-	b1 = desc1[1];
-	b2 = desc1[2];
-	c0 = desc2[0];
-	c1 = desc2[1];
-	c2 = desc2[2];
-	d0 = desc3[0];
-	d1 = desc3[1];
-	d2 = desc3[2];
-
-	table[1] = a0;
-	table[2] = a1;
-	table[3] = a2;
-	table[4] = b0;
-	table[5] = b1;
-	table[6] = b2;
-	table[7] = c0;
-	table[8] = c1;
-	table[9] = c2;
-	table[12] = d0;
-	table[13] = d1;
-	table[14] = d2;
+	SamplePcs[0] = reinterpret_cast<unsigned int>(__vt__10CSamplePcs);
+	table[1] = m_table_desc0__10CSamplePcs[0];
+	table[2] = m_table_desc0__10CSamplePcs[1];
+	table[3] = m_table_desc0__10CSamplePcs[2];
+	table[4] = m_table_desc1__10CSamplePcs[0];
+	table[5] = m_table_desc1__10CSamplePcs[1];
+	table[6] = m_table_desc1__10CSamplePcs[2];
+	table[7] = m_table_desc2__10CSamplePcs[0];
+	table[8] = m_table_desc2__10CSamplePcs[1];
+	table[9] = m_table_desc2__10CSamplePcs[2];
+	table[12] = m_table_desc3__10CSamplePcs[0];
+	table[13] = m_table_desc3__10CSamplePcs[1];
+	table[14] = m_table_desc3__10CSamplePcs[2];
 }
 
 /*

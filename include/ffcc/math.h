@@ -13,7 +13,7 @@ class CBound
 {
 public:
     CBound();
-    void SetFrustum(Vec&, float(*)[4]);
+    static void SetFrustum(Vec&, float(*)[4]);
     int CheckFrustum0(CBound&);
     int CheckFrustum0(float);
     int CheckFrustum(Vec&, float(*)[4], float);

@@ -2285,42 +2285,41 @@ void CSound::LoadStream(int streamID)
  */
 void CSound::PlayStreamASync()
 {
-    char streamPath[260];
+    char streamPath[268];
     CSoundLayout& sound = SoundData(this);
     sprintf(streamPath, "dvd/sound/stream/str_%04d.str", sound.m_streamWaveID);
 
-    CFile::CHandle* handle = File.Open(streamPath, 0, CFile::PRI_LOW);
-    if (handle == 0) {
+    sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
+    if (sound.m_streamFile == 0) {
         return;
     }
-    sound.m_streamFile = handle;
 
     int streamId = sound.m_streamWaveID;
     int volume;
     if (streamId == 5 || streamId == 1) {
         volume = sound.m_bgmMasterVolume;
         if (streamId == 1) {
-            int adjust = (volume * 0x19) / 0x7f + ((volume * 0x19) >> 0x1f);
-            volume -= adjust - (adjust >> 0x1f);
+            volume -= (volume * 0x19) / 0x7f;
         }
     } else if (streamId > 0 && streamId < 7) {
-        volume = (streamId == 6) ? 0x70 : 0x7f;
+        volume = 0x7f;
+        if (streamId == 6) {
+            volume = 0x70;
+        }
     } else {
         volume = sound.m_seMasterVolume;
     }
-
     int clampedVolume;
     if (volume < 0) {
         clampedVolume = 0;
-    } else {
+    } else if (volume > 0x7f) {
         clampedVolume = 0x7f;
-        if (volume < 0x80) {
-            clampedVolume = volume;
-        }
+    } else {
+        clampedVolume = volume;
     }
 
-    int streamNo =
-        StreamPlay__9CRedSoundFPviii(reinterpret_cast<CRedSound*>(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
+    int streamNo = StreamPlay__9CRedSoundFPviii(
+        reinterpret_cast<CRedSound*>(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }

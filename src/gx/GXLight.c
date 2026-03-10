@@ -74,7 +74,6 @@ void GXGetLightAttnK(const GXLightObj* lt_obj, f32* k0, f32* k1, f32* k2) {
 
 void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     f32 a0, a1, a2;
-    f32 r;
     f32 d;
     f32 cr;
     __GXLightObjInt_struct* obj;
@@ -86,48 +85,50 @@ void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     if (cutoff <= 0.0f || cutoff > 90.0f)
         spot_func = GX_SP_OFF;
 
-    r = (3.1415927f * cutoff) / 180.0f;
-    cr = cosf(r);
+    cr = cosf((3.1415927f * cutoff) / 180.0f);
 
     switch (spot_func) {
     case GX_SP_FLAT:
-        a0 = -1000.0f * cr;
         a1 = 1000.0f;
         a2 = 0.0f;
+        a0 = -1000.0f * cr;
         break;
     case GX_SP_COS:
+        a2 = 0.0f;
         a1 = 1.0f / (1.0f - cr);
         a0 = -cr * a1;
-        a2 = 0.0f;
         break;
     case GX_SP_COS2:
         a2 = 1.0f / (1.0f - cr);
-        a0 = 0.0f;
         a1 = -cr * a2;
+        a0 = 0.0f;
         break;
     case GX_SP_SHARP:
-        d = 1.0f / ((1.0f - cr) * (1.0f - cr));
-        a0 = (cr * (cr - 2.0f)) * d;
+        a0 = 1.0f - cr;
+        d = 1.0f / (a0 * a0);
+        a0 = d * (cr * (cr - 2.0f));
         a1 = 2.0f * d;
         a2 = -d;
         break;
     case GX_SP_RING1:
-        d = 1.0f / ((1.0f - cr) * (1.0f - cr));
+        a1 = 1.0f;
+        d = 1.0f / ((a1 - cr) * (a1 - cr));
         a2 = -4.0f * d;
-        a0 = a2 * cr;
         a1 = (4.0f * (1.0f + cr)) * d;
+        a0 = a2 * cr;
         break;
     case GX_SP_RING2:
-        d = 1.0f / ((1.0f - cr) * (1.0f - cr));
-        a0 = 1.0f - ((2.0f * cr * cr) * d);
+        a0 = 1.0f;
+        d = 1.0f / ((a0 - cr) * (a0 - cr));
         a1 = (4.0f * cr) * d;
         a2 = -2.0f * d;
+        a0 -= d * ((2.0f * cr) * cr);
         break;
     case GX_SP_OFF:
     default:
-        a0 = 1.0f;
         a1 = 0.0f;
         a2 = 0.0f;
+        a0 = 1.0f;
         break;
     }
     obj->a[0] = a0;

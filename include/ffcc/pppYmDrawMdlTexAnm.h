@@ -14,7 +14,7 @@ struct pppYmDrawMdlTexAnmStep {
     u16 _pad0;
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[8];
+    u8 m_payload[0x10];
 };
 
 #ifdef __cplusplus

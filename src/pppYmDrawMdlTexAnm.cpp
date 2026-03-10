@@ -92,35 +92,33 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
  */
 void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    u32* workWords;
+    pppYmDrawMdlTexAnmWork* work;
     CMapMeshUVLayout* uvLayout;
-    s32 uvByteOffset;
-    s32 i;
+    u32 uvByteOffset;
+    u32 i;
 
-    workWords = (u32*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
+    work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
     uvLayout = (CMapMeshUVLayout*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0];
-    if ((workWords[0] != 0) && (uvLayout != NULL)) {
+    if ((work->m_frame != 0) && (uvLayout != NULL)) {
         uvByteOffset = 0;
-        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            s32 uvByteOffsetV = uvByteOffset + 2;
-            u32 frameU = workWords[0] / workWords[2];
+        for (i = 0; i < (u32)(u16)uvLayout->m_uvCount; i++) {
+            u32 frameU = work->m_frame / work->m_tilesU;
 
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
-                (s16)(int)-(((f32)(workWords[0] - frameU * workWords[2]) * *(f32*)&workWords[4]) -
+                (s16)(int)-(((f32)(work->m_frame - frameU * work->m_tilesU) * work->m_perU) -
                             (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset));
+            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) =
+                (s16)(int)-(((f32)frameU * work->m_perV) - (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2));
             uvByteOffset += 4;
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV) =
-                (s16)(int)-(((f32)frameU * *(f32*)&workWords[5]) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV));
         }
 
         DCFlushRange(uvLayout->m_uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);
     }
 
-    workWords[0] = 0;
-    workWords[3] = 0;
-    workWords[2] = 0;
-    workWords[1] = 0x200;
+    work->m_frame = 0;
+    work->m_tilesV = 0;
+    work->m_tilesU = 0;
+    work->m_wait = 0x200;
 }
 
 /*

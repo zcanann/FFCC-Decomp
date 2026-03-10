@@ -4,7 +4,10 @@
 #include "ffcc/partMng.h"
 
 typedef struct pppConstrainCameraDir {
-    float field0_0x0;
+    union {
+        _pppPObject m_pppPObject;
+        float field0_0x0;
+    };
 } pppConstrainCameraDir;
 
 typedef struct pppConstrainCameraDirUnkB {
@@ -30,4 +33,3 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCamer
 #endif
 
 #endif // _FFCC_PPPCONSTRAINCAMERADIR_H_
-

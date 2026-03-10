@@ -166,18 +166,18 @@ extern "C" void __sinit_p_sample_cpp(void)
 	d1 = desc3[1];
 	d2 = desc3[2];
 
-	table[1] = a0;
-	table[2] = a1;
-	table[3] = a2;
-	table[4] = b0;
-	table[5] = b1;
-	table[6] = b2;
-	table[7] = c0;
-	table[8] = c1;
-	table[9] = c2;
-	table[12] = d0;
-	table[13] = d1;
-	table[14] = d2;
+	table[17] = a0;
+	table[18] = a1;
+	table[19] = a2;
+	table[20] = b0;
+	table[21] = b1;
+	table[22] = b2;
+	table[23] = c0;
+	table[24] = c1;
+	table[25] = c2;
+	table[30] = d0;
+	table[31] = d1;
+	table[32] = d2;
 }
 
 /*

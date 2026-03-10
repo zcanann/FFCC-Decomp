@@ -251,7 +251,6 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
 {
 	YmDeformationScreenStep* step = (YmDeformationScreenStep*)param2;
-	_pppEnvStYmDeformationScreen* env = (_pppEnvStYmDeformationScreen*)pppEnvStPtr;
 	float* work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
@@ -270,7 +269,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	}
 
 	textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
-		env->m_mapMeshPtr[step->m_dataValIndex], env->m_materialSetPtr, textureIndex);
+		((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
 
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);

@@ -48,7 +48,7 @@ private:
     unsigned char *m_headerPtr;  // 0x10
     unsigned char *m_cursor;     // 0x14
     int m_stackDepth;            // 0x18
-    ChunkScope m_chunkScopes[1]; // 0x1C (Possibly larger?)
+    ChunkScope m_chunkScopes[20]; // 0x1C
 };
 
 #endif // _FFCC_CHUNKFILE_H_

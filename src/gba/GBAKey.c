@@ -59,18 +59,18 @@ static void F25(void* task)
 static void F232(void* task)
 {
     s32 chan;
-    GBAControl* gba;
+    s32 result;
 
     chan = F152(task);
-    gba = &__GBA[chan];
-
     DSPSendMailToDSP(0xabba0000);
-    while (DSPCheckMailToDSP() != 0U) {
-    }
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 
-    DSPSendMailToDSP((u32)&gba->param);
-    while (DSPCheckMailToDSP() != 0U) {
-    }
+    DSPSendMailToDSP((u32)&__GBA[chan].param);
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
 }
 
 static void F252(void* task)

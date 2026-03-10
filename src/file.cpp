@@ -87,35 +87,65 @@ void CFile::CHandle::Reset()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013bb8
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 
 void CFile::Init()
 {
     DVDInit();
-
-    const int kHandleCount = 0x80;
-
     m_0x08 = Memory.CreateStage(0x10ac00, s_cFile, 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
     m_readBuffer = new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2b) unsigned char[0x100000];
-    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2e) CHandle[kHandleCount]);
-
-    CHandle* pool = (CHandle*)m_handlePoolHead.m_currentOffset;
-
+    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2e) CHandle[0x80]);
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
-    m_handlePoolHead.m_next = pool;
-    m_freeList = pool;
+    m_handlePoolHead.m_next = (CHandle*)m_handlePoolHead.m_currentOffset;
+    m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    CHandle* freeSentinel = (CHandle*)&m_freeListSentinelDummy;
+    int handleIndex = 0;
+    int byteOffset = 0;
+    int blockCount = 0x20;
+    do {
+        CHandle* nextHandle;
+        if (handleIndex == 0x7F) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
 
-    for (int i = 0; i < kHandleCount; i++) {
-        pool[i].m_previous = (i == kHandleCount - 1) ? freeSentinel : &pool[i + 1];
-    }
+        if (handleIndex == 0x7E) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 2) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
+
+        if (handleIndex == 0x7D) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 3) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
+
+        if (handleIndex == 0x7C) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 4) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
+
+        byteOffset += 0x2B0;
+        handleIndex += 4;
+        blockCount--;
+    } while (blockCount != 0);
 }
 
 /*

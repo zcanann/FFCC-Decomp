@@ -983,16 +983,18 @@ void GXInvalidateTexAll(void) {
 }
 
 GXTexRegionCallback GXSetTexRegionCallback(GXTexRegionCallback f) {
-    GXTexRegionCallback oldcb = __GXData->texRegionCallback;
+    GXTexRegionCallback* callback = (GXTexRegionCallback*)((u8*)__GXData + 0x410);
+    GXTexRegionCallback oldcb = *callback;
 
-    __GXData->texRegionCallback = f;
+    *callback = f;
     return oldcb;
 }
 
 GXTlutRegionCallback GXSetTlutRegionCallback(GXTlutRegionCallback f) {
-    GXTlutRegionCallback oldcb = __GXData->tlutRegionCallback;
+    GXTlutRegionCallback* callback = (GXTlutRegionCallback*)((u8*)__GXData + 0x414);
+    GXTlutRegionCallback oldcb = *callback;
 
-    __GXData->tlutRegionCallback = f;
+    *callback = f;
     return oldcb;
 }
 

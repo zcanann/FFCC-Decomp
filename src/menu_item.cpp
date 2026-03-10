@@ -73,6 +73,7 @@ struct MenuItemOpenAnim {
     float scale;
     float progress;
     float uvScale;
+    int m_unk18;
     int tex;
     int frame;
     int startFrame;

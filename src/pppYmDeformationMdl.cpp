@@ -59,6 +59,7 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
 
 /*
@@ -188,6 +189,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
     short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
+    int colorOffset = param_3->m_serializedDataOffsets[1];
     int textureIndex = 0;
     u8* payload = (u8*)&param_2->m_payload0;
 
@@ -213,7 +215,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + param_3->m_serializedDataOffsets[1]),
+        (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + colorOffset),
         (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40), *(float*)(payload + 0x10), payload[0x17], payload[0x16], payload[0x14],
         payload[0x15], (u8)(payload[0x18] == 0), 1, 0);
 
@@ -235,20 +237,20 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     }
     if (payload[0x14] == 3) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 1);
-        GXSetTevOp((GXTevStageID)0, GX_MODULATE);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
     }
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 1, 0xFF);
-    GXSetTevOp((GXTevStageID)1, GX_MODULATE);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(1, 3);
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, GX_DIRECT);
     GXSetVtxDesc((GXAttr)10, GX_DIRECT);
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    width = 0x280;
     left = 0;
     top = 0;
+    width = 0x280;
     height = 0x1c0;
     backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
     if (backTexture != 0) {
@@ -265,8 +267,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = 0.0f;
         texMtx[1][2] = 0.0f;
         texMtx[2][2] = 1.0f;
-        Mtx* objectMtx = (Mtx*)((u8*)pppYmDeformationMdl + 0x40);
-        PSMTXConcat(texMtx, *objectMtx, texMtx);
+        PSMTXConcat(texMtx, *(Mtx*)((u8*)pppYmDeformationMdl + 0x40), texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);

@@ -316,10 +316,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
  */
 void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
-    f32* poly;
+    TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
     CTexture* texture;
-    f32* work;
+    u8* work;
     s32 i;
     u16 count;
     s32 serializedOffset0;
@@ -334,8 +334,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     serializedOffset0 = *param_3->m_serializedDataOffsets;
     serializedOffset1 = param_3->m_serializedDataOffsets[1];
 
-    work = (f32*)((u8*)pppYmTracer + 0x10 + serializedOffset0);
-    count = *(u16*)(work + 0xB);
+    work = (u8*)pppYmTracer + 0x10 + serializedOffset0;
+    count = *(u16*)(work + 0x2C);
     if (param_2->m_dataValIndex != 0xFFFF) {
         mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
         pppSetBlendMode__FUc(param_2->m_payload[10]);
@@ -363,37 +363,38 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
             uvStep = FLOAT_803306ec / (f32)((f64)count - DOUBLE_803306f8);
             GXSetCullMode(GX_CULL_NONE);
-            poly = (f32*)(u32)work[10];
+            poly = *(TRACE_POLYGON**)(work + 0x28);
 
             for (i = 0; i < (s32)(count - 1); i++) {
-                if ((((*(s16*)(poly + 8) > 0) && (FLOAT_803306e8 != poly[4]) && (FLOAT_803306e8 != poly[5]) &&
-                      (FLOAT_803306e8 != poly[6]) && (FLOAT_803306e8 != poly[0]) && (FLOAT_803306e8 != poly[1]) &&
-                      (FLOAT_803306e8 != poly[2]) && (FLOAT_803306e8 != poly[14]) && (FLOAT_803306e8 != poly[15]) &&
-                      (FLOAT_803306e8 != poly[16]) && (FLOAT_803306e8 != poly[10]) && (FLOAT_803306e8 != poly[11]) &&
-                      (FLOAT_803306e8 != poly[12])))) {
+                if (((poly->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
+                     (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
+                     (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
+                     (FLOAT_803306e8 != (poly + 1)->to.x) && (FLOAT_803306e8 != (poly + 1)->to.y) &&
+                     (FLOAT_803306e8 != (poly + 1)->to.z) && (FLOAT_803306e8 != (poly + 1)->from.x) &&
+                     (FLOAT_803306e8 != (poly + 1)->from.y) && (FLOAT_803306e8 != (poly + 1)->from.z))) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
-                    colorTop = (DAT_803306e0 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x1F);
-                    colorBottom = (DAT_803306e4 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x47);
+                    colorTop = (DAT_803306e0 & 0xFFFFFF00) | poly->alpha;
+                    colorBottom = (DAT_803306e4 & 0xFFFFFF00) | (poly + 1)->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
-                    GXPosition3f32(poly[4], poly[5], poly[6]);
+                    GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
                     GXColor1u32(colorTop);
                     GXTexCoord2f32(uTop, FLOAT_803306ec);
 
-                    GXPosition3f32(poly[0], poly[1], poly[2]);
+                    GXPosition3f32(poly->from.x, poly->from.y, poly->from.z);
                     GXColor1u32(colorTop);
                     GXTexCoord2f32(uTop, FLOAT_803306e8);
 
-                    GXPosition3f32(poly[14], poly[15], poly[16]);
+                    GXPosition3f32((poly + 1)->to.x, (poly + 1)->to.y, (poly + 1)->to.z);
                     GXColor1u32(colorBottom);
                     GXTexCoord2f32(uBottom, FLOAT_803306ec);
 
-                    GXPosition3f32(poly[10], poly[11], poly[12]);
+                    GXPosition3f32((poly + 1)->from.x, (poly + 1)->from.y, (poly + 1)->from.z);
                     GXColor1u32(colorBottom);
                     GXTexCoord2f32(uBottom, FLOAT_803306e8);
                 }
-                poly += 10;
+                poly++;
             }
         }
     }

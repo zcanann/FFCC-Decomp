@@ -747,7 +747,7 @@ static void SPEC2_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     status->triggerLeft = ClampU8(status->triggerLeft, origin->triggerLeft);
     status->triggerRight = ClampU8(status->triggerRight, origin->triggerRight);
 
-    if (((Type[chan] & (0xFFFF0000)) == SI_GC_CONTROLLER) && ((status->button & 0x80) ^ 0x80)) {
+    if (((Type[chan] & 0xFFFF0000) == SI_GC_CONTROLLER) && !(status->button & 0x80)) {
         BarrelBits |= (PAD_CHAN0_BIT >> chan);
         status->stickX = 0;
         status->stickY = 0;

@@ -23,6 +23,86 @@ extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraFo
 
 /*
  * --INFO--
+ * PAL Address: 0x80167DD4
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
+                                      pppConstrainCameraForLocParams* params,
+                                      _pppCtrlTable* data)
+{
+	float* value;
+	int modelPtr;
+
+	if (gPppCalcDisabled == 0) {
+		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+		CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
+		modelPtr = GetModelPtr__FP8CGObject(obj);
+		*(float**)(modelPtr + 0xe4) = value;
+		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
+		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
+
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(constrainCameraForLoc, params->m_graphId, value,
+		                                             value + 1, value + 2, params->m_dataValIndex,
+		                                             &params->m_initWork, &params->m_stepValue);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80167E70
+ * PAL Size: 48b
+ */
+void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
+{
+	CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
+	int modelPtr = GetModelPtr__FP8CGObject(obj);
+	*(int*)(modelPtr + 0xec) = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80167EA0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
+                                        _pppCtrlTable* data)
+{
+    float fVar1 = kPppConstrainCameraForLocZero;
+    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+    value[2] = fVar1;
+    value[1] = fVar1;
+    value[0] = fVar1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80167ec4  
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
+{
+    float fVar1 = kPppConstrainCameraForLocZero;
+    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+    value[2] = fVar1;
+    value[1] = fVar1;
+    value[0] = fVar1;
+    *(pppConstrainCameraForLoc**)((char*)value + 0x40) = constrainCameraForLoc;
+}
+
+/*
+ * --INFO--
  * PAL Address: 80167eec
  * PAL Size: 580b
  * EN Address: TODO
@@ -117,86 +197,6 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     work->m_worldBaseMtx[1][3] = local_a4.y;
     work->m_worldBaseMtx[2][3] = local_a4.z;
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80167E70
- * PAL Size: 48b
- */
-void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
-{
-	CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-	int modelPtr = GetModelPtr__FP8CGObject(obj);
-	*(int*)(modelPtr + 0xec) = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80167EA0
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
-                                        _pppCtrlTable* data)
-{
-    float fVar1 = kPppConstrainCameraForLocZero;
-    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-    value[2] = fVar1;
-    value[1] = fVar1;
-    value[0] = fVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80167DD4
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
-                                      pppConstrainCameraForLocParams* params,
-                                      _pppCtrlTable* data)
-{
-	float* value;
-	int modelPtr;
-
-	if (gPppCalcDisabled == 0) {
-		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-		CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-		modelPtr = GetModelPtr__FP8CGObject(obj);
-		*(float**)(modelPtr + 0xe4) = value;
-		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
-		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
-
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(constrainCameraForLoc, params->m_graphId, value,
-		                                             value + 1, value + 2, params->m_dataValIndex,
-		                                             &params->m_initWork, &params->m_stepValue);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 80167ec4  
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
-{
-    float fVar1 = kPppConstrainCameraForLocZero;
-    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-    value[2] = fVar1;
-    value[1] = fVar1;
-    value[0] = fVar1;
-    *(pppConstrainCameraForLoc**)((char*)value + 0x40) = constrainCameraForLoc;
 }
 
 /*

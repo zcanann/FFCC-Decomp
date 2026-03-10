@@ -47,39 +47,6 @@ static void F25(void* task)
     __GBAX01(chan, 0);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x801A8D9C
- * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static void F232(void* task)
-{
-    s32 chan;
-
-    chan = F152(task);
-
-    DSPSendMailToDSP(0xabba0000);
-    while (DSPCheckMailToDSP() != 0) {
-    }
-
-    DSPSendMailToDSP((u32)&__GBA[chan].param);
-    while (DSPCheckMailToDSP() != 0) {
-    }
-}
-
-static void F252(void* task)
-{
-    s32 chan;
-
-    chan = F152(task);
-
-    __GBAX01(chan, 0);
-}
-
 void __GBAX02(s32 chan, u8* readbuf) {
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &gba->bootInfo;
@@ -99,9 +66,9 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.iram_length = 0x380;
     gba->task.iram_addr = 0;
     gba->task.dsp_init_vector = 0x10;
-    gba->task.init_cb = F232;
+    gba->task.init_cb = F23;
     gba->task.res_cb = NULL;
-    gba->task.done_cb = F252;
+    gba->task.done_cb = F25;
     gba->task.req_cb = NULL;
     
     DSPAddTask(&gba->task);

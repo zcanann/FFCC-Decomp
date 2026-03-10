@@ -68,7 +68,7 @@ static void F232(void* task)
     while (DSPCheckMailToDSP() != 0U) {
     }
 
-    DSPSendMailToDSP((u32)&gba->param);
+    DSPSendMailToDSP((u32)gba->param);
     while (DSPCheckMailToDSP() != 0U) {
     }
 }

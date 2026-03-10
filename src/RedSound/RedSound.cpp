@@ -29,6 +29,7 @@ u32 DAT_8032f4b4;
 int* DAT_8032f4b8;
 volatile unsigned int DAT_8032f4c4;
 volatile int DAT_8032f4c8;
+static const char kRedSoundEmpty[] = "";
 
 /*
  * --INFO--
@@ -810,8 +811,8 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 		id = GetAutoID();
 		CRedDriver_8032f4c0.StreamPlay(id, data, param_3, param_4, param_5);
 	} else if (gRedMemoryDebugEnabled != 0) {
-		OSReport("[%s] %s STREAM : This data was not stream data. %s\n", "RedSound", "", "");
-		fflush(__files + 2);
+		OSReport("[%s] %s STREAM : This data was not stream data. %s\n", "RedSound", kRedSoundEmpty, kRedSoundEmpty);
+		fflush(__files + 1);
 	}
 
 	return id;

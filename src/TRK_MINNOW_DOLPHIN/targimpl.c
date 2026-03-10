@@ -1140,7 +1140,7 @@ DSError TRKTargetSupportRequest(void) {
     size_t* length;
     MessageCommandID commandId;
     TRKEvent event;
-    u8 ioResult;
+    DSIOResult ioResult;
 
     commandId = (u8) gTRKCPUState.Default.GPR[3];
     if (commandId != DSMSG_ReadFile && commandId != DSMSG_WriteFile && commandId != DSMSG_OpenFile && commandId != DSMSG_CloseFile && commandId != DSMSG_PositionFile) {
@@ -1170,7 +1170,10 @@ DSError TRKTargetSupportRequest(void) {
         *((u32*) gTRKCPUState.Default.GPR[5]) = spC;
     } else {
         length = (size_t*) gTRKCPUState.Default.GPR[5];
-        error = TRKSuppAccessFile((u8) gTRKCPUState.Default.GPR[4], (u8*) gTRKCPUState.Default.GPR[6], length, (DSIOResult*) &ioResult, TRUE, commandId == DSMSG_ReadFile);
+        error = TRKSuppAccessFile((u8) gTRKCPUState.Default.GPR[4],
+                                  (u8*) gTRKCPUState.Default.GPR[6], length,
+                                  &ioResult, TRUE,
+                                  commandId == DSMSG_ReadFile);
         if (ioResult == DS_IONoError && error != DS_NoError) {
             ioResult = DS_IOError;
         }

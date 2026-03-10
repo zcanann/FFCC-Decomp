@@ -59,11 +59,11 @@ const char* CMenuPcs::GetMcStr(int index)
     switch (Game.game.m_gameWork.m_languageId) {
     case 1:
         return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
-    case 2:
-        return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
     case 3:
-        return s_McStr_es[index];
+        return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
     case 4:
+        return s_McStr_es[index];
+    case 5:
         return s_McStr_fr[index];
     default:
         return PTR_s_The_data_is_corrupt__80215bd8[index];

@@ -753,8 +753,9 @@ void CSound::PauseDiscError(int pause)
 {
     if (SoundData(this).m_pauseAllSe == 0) {
         int paused = (-pause | pause) >> 0x1F;
-        SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, paused);
-        StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, paused);
+        CRedSound* redSound = reinterpret_cast<CRedSound*>(reinterpret_cast<char*>(this) + 8);
+        SePause__9CRedSoundFii(redSound, -1, paused);
+        StreamPause__9CRedSoundFii(redSound, -1, paused);
     }
 }
 

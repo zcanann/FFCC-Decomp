@@ -740,32 +740,28 @@ void _PitchExecute(RedVoiceDATA* param_1)
  */
 void _WaveSplitSelect(RedWaveDATA* param_1, RedNoteDATA* param_2)
 {
-    int* waveData = (int*)param_1;
-    s8* noteData = (s8*)param_2;
+    u32* waveData = (u32*)param_1;
+    char* noteData = (char*)param_2;
 
-    if ((waveData != 0) && ((waveData[0] & 0x30000) != 0)) {
-        s8 splitKey;
+    if ((waveData != nullptr) && ((*waveData & 0x30000) != 0)) {
+        char* splitKeyPtr;
 
-        while (((waveData[0] & 0x200) == 0) && (*(s8*)(waveData + 6) < noteData[0])) {
-            waveData += 0x18;
-            if ((waveData[0] & 1) != 0) {
+        for (; ((*waveData & 0x200) == 0) && (*(char*)(waveData + 6) < *noteData); waveData += 0x18) {
+            if ((*waveData & 1) != 0) {
                 waveData += 0x18;
             }
         }
 
-        splitKey = *(s8*)(waveData + 6);
-        while (((waveData[0] & 0x200) == 0) && (((u8*)waveData)[0x19] < (u8)noteData[1])) {
-            if (splitKey != *(s8*)(waveData + 6)) {
+        splitKeyPtr = (char*)(waveData + 6);
+        for (; ((*waveData & 0x200) == 0) && ((u8)*((char*)waveData + 0x19) < (u8)noteData[1]); waveData += 0x18) {
+            if (*splitKeyPtr != *(char*)(waveData + 6)) {
                 return;
             }
-
-            waveData += 0x18;
-            if ((waveData[0] & 1) != 0) {
+            if ((*waveData & 1) != 0) {
                 waveData += 0x18;
             }
         }
     }
-    return;
 }
 
 /*

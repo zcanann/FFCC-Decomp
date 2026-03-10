@@ -174,7 +174,7 @@ void pppDrawMng::ClearOt()
 {
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
-	CGame* game = (CGame*)&Game;
+	CGame* game = &Game.game;
 
 	if (game->m_currentMapId == 0x21)
 	{

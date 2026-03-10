@@ -119,7 +119,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
                 PSMTXInverse(MStack_b8, pppMngStPtr->m_matrix.value);
             }
             
-            PSMTXConcat((MtxPtr)MStack_e8, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+            PSMTXConcat(MStack_e8, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
             
             if (flags[0] != 0) {
                 float value0 = *value;

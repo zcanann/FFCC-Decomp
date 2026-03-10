@@ -323,16 +323,12 @@ char* strtok(char* str, const char* delim)
 
 	p = (unsigned char*)delim - 1;
 	while ((ch = *++p) != '\0') {
-		unsigned int index = ch >> 3;
-		unsigned int bit = 1u << (ch & 7);
-		delimiter_table[index] = (unsigned char)(delimiter_table[index] | bit);
+		delimiter_table[ch >> 3] |= 1 << (ch & 7);
 	}
 
 	p = (unsigned char*)strtok_ptr - 1;
 	while ((ch = *++p) != '\0') {
-		unsigned int index = ch >> 3;
-		unsigned int bit = 1u << (ch & 7);
-		if ((delimiter_table[index] & bit) == 0) {
+		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) == 0) {
 			break;
 		}
 	}
@@ -344,9 +340,7 @@ char* strtok(char* str, const char* delim)
 	} else {
 		tokenEnd = tokenStart;
 		while ((ch = *++tokenEnd) != '\0') {
-			unsigned int index = ch >> 3;
-			unsigned int bit = 1u << (ch & 7);
-			if ((delimiter_table[index] & bit) != 0) {
+			if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
 				break;
 			}
 		}

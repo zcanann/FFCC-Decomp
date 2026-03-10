@@ -635,7 +635,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             while ((hasChunk = chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData))) != 0) {
                 if (chunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
-                    item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0));
+                    item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
                 } else if (chunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
                         __nw__FUlPQ27CMemory6CStagePci(0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x4C));

@@ -32,7 +32,7 @@ struct pppColum {
 
 struct pppColumUnkB {
     u32 m_unk0;            // 0x00
-    u32 m_dataValIndex;    // 0x04
+    s32 m_dataValIndex;    // 0x04
     s16 m_initWOrk;        // 0x08
     u16 m_unkA;            // 0x0A
     u32 m_stepValue;       // 0x0C

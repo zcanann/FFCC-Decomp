@@ -302,7 +302,7 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
  */
 void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 
     GXWGFifo.f32 = pos1.x;
     GXWGFifo.f32 = pos1.y;

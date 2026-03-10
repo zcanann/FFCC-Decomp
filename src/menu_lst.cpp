@@ -75,29 +75,32 @@ void CMenuPcs::MLstInit1()
 int CMenuPcs::MLstOpen()
 {
 	MenuLstMembers& members = GetMenuLstMembers(this);
+	float one;
 	int completedItems;
-	unsigned int itemCount;
 	short* itemPtr;
+	unsigned int itemCount;
+	int currentFrame;
+	unsigned int count;
 
 	if (*(char*)(members.m_lstStatePtr + 0xb) == 0) {
 		int offset;
 		int i;
-		short yPos;
 		short initializedCount;
+		short yPos;
 
 		memset((void*)members.m_lstDataPtr, 0, 0x1008);
-
+		one = 1.0f;
 		offset = members.m_lstDataPtr + 8;
 		i = 8;
 		do {
-			*(float*)(offset + 0x14) = 1.0f;
-			*(float*)(offset + 0x54) = 1.0f;
-			*(float*)(offset + 0x94) = 1.0f;
-			*(float*)(offset + 0xd4) = 1.0f;
-			*(float*)(offset + 0x114) = 1.0f;
-			*(float*)(offset + 0x154) = 1.0f;
-			*(float*)(offset + 0x194) = 1.0f;
-			*(float*)(offset + 0x1d4) = 1.0f;
+			*(float*)(offset + 0x14) = one;
+			*(float*)(offset + 0x54) = one;
+			*(float*)(offset + 0x94) = one;
+			*(float*)(offset + 0xd4) = one;
+			*(float*)(offset + 0x114) = one;
+			*(float*)(offset + 0x154) = one;
+			*(float*)(offset + 0x194) = one;
+			*(float*)(offset + 0x1d4) = one;
 			offset += 0x200;
 			i--;
 		} while (i != 0);
@@ -118,13 +121,12 @@ int CMenuPcs::MLstOpen()
 			*entry = (short)(int)(320.0 - ((double)entry[2] * 0.5));
 			entry[1] = yPos;
 			yPos += 0x20;
-			*(float*)(entry + 4) = 1.0f;
-			*(float*)(entry + 6) = 1.0f;
+			*(float*)(entry + 4) = one;
+			*(float*)(entry + 6) = one;
 			*(int*)(entry + 0x12) = i;
 			i++;
 			*(int*)(entry + 0x14) = 4;
 		} while (i < 9);
-
 		*(short*)members.m_lstDataPtr = initializedCount;
 		*(char*)(members.m_lstStatePtr + 0xb) = 1;
 	}
@@ -133,78 +135,74 @@ int CMenuPcs::MLstOpen()
 	*(short*)(members.m_lstStatePtr + 0x22) = *(short*)(members.m_lstStatePtr + 0x22) + 1;
 	itemCount = (unsigned int)*(short*)members.m_lstDataPtr;
 	itemPtr = (short*)members.m_lstDataPtr + 4;
+	currentFrame = (int)*(short*)(members.m_lstStatePtr + 0x22);
+	count = itemCount;
 	if ((int)itemCount > 0) {
-		unsigned int i = itemCount;
-		int currentFrame = (int)*(short*)(members.m_lstStatePtr + 0x22);
 		do {
 			if (*(int*)(itemPtr + 0x12) <= currentFrame) {
 				if (currentFrame < *(int*)(itemPtr + 0x12) + *(int*)(itemPtr + 0x14)) {
 					*(int*)(itemPtr + 0x10) = *(int*)(itemPtr + 0x10) + 1;
-					{
-						double duration = (double)*(int*)(itemPtr + 0x14);
-						double progress = (double)*(int*)(itemPtr + 0x10);
-						*(float*)(itemPtr + 8) = (float)((1.0 / duration) * progress);
-					}
+					*(float*)(itemPtr + 8) = (float)((1.0 / (double)*(int*)(itemPtr + 0x14)) * (double)*(int*)(itemPtr + 0x10));
 				} else {
 					completedItems++;
 					*(float*)(itemPtr + 8) = 1.0f;
 				}
 			}
 			itemPtr += 0x20;
-			i--;
-		} while (i != 0);
+			count--;
+		} while (count != 0);
 	}
 
+	one = 1.0f;
 	if (*(short*)members.m_lstDataPtr == completedItems) {
 		itemPtr = (short*)members.m_lstDataPtr + 4;
 		if ((int)itemCount > 0) {
-			unsigned int blocks = itemCount >> 3;
-			if (blocks != 0) {
+			count = itemCount >> 3;
+			if (count != 0) {
 				do {
 					itemPtr[0x12] = 0;
 					itemPtr[0x13] = 0;
 					itemPtr[0x14] = 0;
 					itemPtr[0x15] = 1;
-					*(float*)(itemPtr + 8) = 1.0f;
+					*(float*)(itemPtr + 8) = one;
 					itemPtr[0x32] = 0;
 					itemPtr[0x33] = 0;
 					itemPtr[0x34] = 0;
 					itemPtr[0x35] = 1;
-					*(float*)(itemPtr + 0x28) = 1.0f;
+					*(float*)(itemPtr + 0x28) = one;
 					itemPtr[0x52] = 0;
 					itemPtr[0x53] = 0;
 					itemPtr[0x54] = 0;
 					itemPtr[0x55] = 1;
-					*(float*)(itemPtr + 0x48) = 1.0f;
+					*(float*)(itemPtr + 0x48) = one;
 					itemPtr[0x72] = 0;
 					itemPtr[0x73] = 0;
 					itemPtr[0x74] = 0;
 					itemPtr[0x75] = 1;
-					*(float*)(itemPtr + 0x68) = 1.0f;
+					*(float*)(itemPtr + 0x68) = one;
 					itemPtr[0x92] = 0;
 					itemPtr[0x93] = 0;
 					itemPtr[0x94] = 0;
 					itemPtr[0x95] = 1;
-					*(float*)(itemPtr + 0x88) = 1.0f;
+					*(float*)(itemPtr + 0x88) = one;
 					itemPtr[0xb2] = 0;
 					itemPtr[0xb3] = 0;
 					itemPtr[0xb4] = 0;
 					itemPtr[0xb5] = 1;
-					*(float*)(itemPtr + 0xa8) = 1.0f;
+					*(float*)(itemPtr + 0xa8) = one;
 					itemPtr[0xd2] = 0;
 					itemPtr[0xd3] = 0;
 					itemPtr[0xd4] = 0;
 					itemPtr[0xd5] = 1;
-					*(float*)(itemPtr + 0xc8) = 1.0f;
+					*(float*)(itemPtr + 0xc8) = one;
 					itemPtr[0xf2] = 0;
 					itemPtr[0xf3] = 0;
 					itemPtr[0xf4] = 0;
 					itemPtr[0xf5] = 1;
-					*(float*)(itemPtr + 0xe8) = 1.0f;
+					*(float*)(itemPtr + 0xe8) = one;
 					itemPtr += 0x100;
-					blocks--;
-				} while (blocks != 0);
-
+					count--;
+				} while (count != 0);
 				itemCount &= 7;
 				if (itemCount == 0) {
 					return 1;
@@ -216,14 +214,13 @@ int CMenuPcs::MLstOpen()
 				itemPtr[0x13] = 0;
 				itemPtr[0x14] = 0;
 				itemPtr[0x15] = 1;
-				*(float*)(itemPtr + 8) = 1.0f;
+				*(float*)(itemPtr + 8) = one;
 				itemPtr += 0x20;
 				itemCount--;
 			} while (itemCount != 0);
 		}
 		return 1;
 	}
-
 	return 0;
 }
 

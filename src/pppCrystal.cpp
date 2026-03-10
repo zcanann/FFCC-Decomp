@@ -123,8 +123,12 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* pa
 
 /*
  * --INFO--
- * Address:	800dcf44
- * Size:	1080b
+ * PAL Address: 0x800dcf44
+ * PAL Size: 1080b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
@@ -136,7 +140,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	u32 x;
 
 	if (gPppCalcDisabled == 0) {
-		refractionData = (int*)((u8*)pppCrystal + (*(s32**)((u8*)param_3 + 0xC))[2] + 0x80);
+		refractionData = (int*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 		if (param_2->m_dataValIndex != 0xFFFF) {
 			textureIndex = 0;
 			GetTexture__8CMapMeshFP12CMaterialSetRi(

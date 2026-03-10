@@ -238,19 +238,25 @@ void CMaterialEditorPcs::Init()
 void CMaterialEditorPcs::Quit()
 {
     unsigned int i = 0;
-    unsigned char* cursor = reinterpret_cast<unsigned char*>(this);
+    CMaterialEditorPcs* cursor = this;
 
-    cursor[0x3BC] = 0;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = 0;
 
     do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2BC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2FC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x23C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x33C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x37C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x27C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2BC)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2FC)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x23C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x33C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x37C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x27C)));
         i += 1;
-        cursor += 4;
+        cursor = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(cursor) + 4);
     } while (i < 0x10);
 
     unsigned int textureBlock = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xBC);

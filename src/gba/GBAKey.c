@@ -91,9 +91,9 @@ void __GBAX02(s32 chan, u8* readbuf) {
     param->paletteColor = bootInfo->paletteColor;
     param->paletteSpeed = bootInfo->paletteSpeed;
     param->length = bootInfo->length;
-    param->out = (u32*)(param + 1);
-    
-    DCInvalidateRange(param + 1, 32);
+    param->out = &param->keyA;
+
+    DCInvalidateRange(&param->keyA, 32);
     DCFlushRange(param, 32);
     
     gba->task.priority = 0xff;
@@ -105,6 +105,6 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.res_cb = NULL;
     gba->task.done_cb = F252;
     gba->task.req_cb = NULL;
-    
+
     DSPAddTask(&gba->task);
 }

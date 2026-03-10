@@ -2044,8 +2044,12 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  */
 void CGObject::SetDispItemName(int showName)
 {
-    *((u8*)&m_shieldNodeFlags) = (((showName << 4) & 0x10) | (*((u8*)&m_shieldNodeFlags) & 0xEF));
-    m_dispItemTimer = 13;
+    signed char showName8 = static_cast<signed char>(showName);
+    u8 flags = *((u8*)&m_shieldNodeFlags);
+    u8 timer = 13;
+
+    *((u8*)&m_shieldNodeFlags) = ((showName8 << 4) & 0x10) | (flags & 0xEF);
+    m_dispItemTimer = timer;
 }
 
 /*

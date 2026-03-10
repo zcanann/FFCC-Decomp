@@ -442,12 +442,22 @@ extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWo
  */
 extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evtFlagIndex, int value)
 {
-    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
     int sign = evtFlagIndex >> 31;
-    int byteIndex = (evtFlagIndex >> 3) + (int)(evtFlagIndex < 0 && (evtFlagIndex & 7) != 0);
+    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
+    int byteIndex = evtFlagIndex >> 3;
+    int byteAdjust = 0;
+
+    if (evtFlagIndex < 0) {
+        if ((evtFlagIndex & 7) != 0) {
+            byteAdjust = 1;
+        }
+    }
+
+    byteIndex += static_cast<unsigned char>(byteAdjust);
+
     int bitIndex =
-        ((sign * 8) | ((int)(((unsigned int)evtFlagIndex * 0x20000000u + (unsigned int)sign) >> 29))) - sign;
-    unsigned char mask = (unsigned char)(1u << bitIndex);
+        ((sign * 8) | (int)(((unsigned int)evtFlagIndex * 0x20000000u + (unsigned int)sign) >> 29)) - sign;
+    unsigned char mask = (unsigned char)(1 << bitIndex);
 
     if (value != 0) {
         evtFlags[byteIndex] |= mask;
@@ -2091,5 +2101,4 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         }
     }
 }
-
 

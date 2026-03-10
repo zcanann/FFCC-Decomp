@@ -6114,7 +6114,7 @@ int JoyBus::SetMType(int portIndex, int mtype)
  * Address:	TODO
  * Size:	TODO
  */
-char JoyBus::GetMType(int portIndex)
+unsigned char JoyBus::GetMType(int portIndex)
 {
     OSWaitSemaphore(&m_accessSemaphores[portIndex]);
 	

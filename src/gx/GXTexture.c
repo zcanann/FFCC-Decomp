@@ -690,8 +690,8 @@ void GXLoadTexObj(GXTexObj* obj, GXTexMapID id) {
 
     CHECK_GXBEGIN(1318, "GXLoadTexObj");
     ASSERTMSGLINEV(1319, id < 8, "%s: invalid texture map ID", "GXLoadTexObj");
-    ASSERTMSGLINEV(1324, __GXData->texRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj");
-    r = __GXData->texRegionCallback(obj, id);
+    ASSERTMSGLINEV(1324, ((GXDataCallbacksView*)__GXData)->texRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj");
+    r = ((GXDataCallbacksView*)__GXData)->texRegionCallback(obj, id);
     ASSERTMSGLINEV(1326, r, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTexObj");
     GXLoadTexObjPreLoaded(obj, r, id);
 }

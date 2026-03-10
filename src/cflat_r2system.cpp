@@ -442,27 +442,17 @@ extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWo
  */
 extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evtFlagIndex, int value)
 {
-    int sign = evtFlagIndex >> 31;
-    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
-    int byteIndex = evtFlagIndex >> 3;
-    int byteAdjust = 0;
-
-    if (evtFlagIndex < 0) {
-        if ((evtFlagIndex & 7) != 0) {
-            byteAdjust = 1;
-        }
+    if (value != 0) {
+        int byteIndex = evtFlagIndex / 8;
+        unsigned char bit = (unsigned char)(1 << (evtFlagIndex % 8));
+        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] |= bit;
+        return;
     }
 
-    byteIndex += static_cast<unsigned char>(byteAdjust);
-
-    int bitIndex =
-        ((sign * 8) | (int)(((unsigned int)evtFlagIndex * 0x20000000u + (unsigned int)sign) >> 29)) - sign;
-    unsigned char mask = (unsigned char)(1 << bitIndex);
-
-    if (value != 0) {
-        evtFlags[byteIndex] |= mask;
-    } else {
-        evtFlags[byteIndex] &= (unsigned char)~mask;
+    {
+        int byteIndex = evtFlagIndex / 8;
+        unsigned char bit = (unsigned char)(1 << (evtFlagIndex % 8));
+        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] &= (unsigned char)~bit;
     }
 }
 

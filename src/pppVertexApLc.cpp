@@ -108,7 +108,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        u8 count = data->spawnCount;
+        int count = data->spawnCount;
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
@@ -116,17 +116,18 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 vertexIndex = entry->vertexIndices[state->index];
+                u16 outValue = state->index;
                 state->index++;
+                u16 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
                     s32 childId = data->childId;
                     _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                    _pppPObject* child;
 
                     if (childData == 0) {
                         child = 0;
@@ -146,17 +147,17 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             while (count-- != 0) {
                 f32 randValue = RandF__5CMathFv(&Math);
                 f32 maxValue = (f32)entry->maxValue;
-                s32 index = (s32)(randValue * maxValue);
-                u16 vertexIndex = entry->vertexIndices[index];
+                int outValue = (int)(randValue * maxValue);
+                u16 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
                     s32 childId = data->childId;
                     _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                    _pppPObject* child;
 
                     if (childData == 0) {
                         child = 0;
@@ -179,4 +180,3 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
-

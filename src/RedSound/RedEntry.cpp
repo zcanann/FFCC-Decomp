@@ -577,12 +577,30 @@ void CRedEntry::ClearWaveData(int waveNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c12cc
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::ClearWaveDataM(int, int, int, int)
+extern "C" void ClearWaveDataM__9CRedEntryFiiii(CRedEntry* self, int waveNo0, int waveNo1, int waveNo2,
+                                                  int waveNo3)
 {
-	// TODO
+	int* entry = (int*)self;
+	int* historyBank;
+
+	if (((waveNo0 == -1) && (waveNo1 == -1) && (waveNo2 == -1)) && (waveNo3 == -1)) {
+		return;
+	}
+
+	for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+		if (((-1 < historyBank[0]) && (0 < historyBank[1])) &&
+		    (historyBank[0] != waveNo0) && (historyBank[0] != waveNo1) &&
+		    (historyBank[0] != waveNo2) && (historyBank[0] != waveNo3)) {
+			WaveDelete__9CRedEntryFP14RedHistoryBANK(self, (RedHistoryBANK*)historyBank);
+		}
+	}
 }
 
 /*

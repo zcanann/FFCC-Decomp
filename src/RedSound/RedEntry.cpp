@@ -197,18 +197,16 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchWaveSequence(int waveNo)
 {
-	int* entry = (int*)this;
-	int* const waveBankBase = (int*)entry[0];
-	int* waveBank = waveBankBase;
-	int i;
+	register int* waveBank = *(int**)this;
+	int* end = (int*)(*(int*)this + 0x400);
 
-	for (i = 0x40; i > 0; i--) {
-		if ((waveBank[3] != 0) && (waveBank[0] == waveNo)) {
-			int offset = (int)waveBank - (int)waveBankBase;
-			return (offset >> 4) + (int)((offset < 0) && ((offset & 0xF) != 0));
+	do {
+		if ((waveBank[3] != 0) && (*waveBank == waveNo)) {
+			int offset = (int)waveBank - *(int*)this;
+			return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
 		}
 		waveBank += 4;
-	}
+	} while (waveBank < end);
 
 	return -1;
 }
@@ -577,12 +575,30 @@ void CRedEntry::ClearWaveData(int waveNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c12cc
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::ClearWaveDataM(int, int, int, int)
+extern "C" void ClearWaveDataM__9CRedEntryFiiii(CRedEntry* self, int waveNo0, int waveNo1, int waveNo2,
+                                                  int waveNo3)
 {
-	// TODO
+	int* entry = (int*)self;
+	int* historyBank;
+
+	if (((waveNo0 == -1) && (waveNo1 == -1) && (waveNo2 == -1)) && (waveNo3 == -1)) {
+		return;
+	}
+
+	for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+		if (((-1 < historyBank[0]) && (0 < historyBank[1])) &&
+		    (historyBank[0] != waveNo0) && (historyBank[0] != waveNo1) &&
+		    (historyBank[0] != waveNo2) && (historyBank[0] != waveNo3)) {
+			WaveDelete__9CRedEntryFP14RedHistoryBANK(self, (RedHistoryBANK*)historyBank);
+		}
+	}
 }
 
 /*
@@ -634,7 +650,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
  */
 int CRedEntry::GetWaveBank(int waveNo)
 {
-	if ((0 < waveNo) && (waveNo < 0x10))
+	if ((waveNo >= 0) && (waveNo < 0x10))
 	{
 		return *(int*)this + (waveNo * 0x10);
 	}

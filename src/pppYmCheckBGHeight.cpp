@@ -56,9 +56,8 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     Vec hitPos;
     float nextY;
 
-    pppMngSt = pppMngStPtr;
-
     if (gPppCalcDisabled == 0) {
+        pppMngSt = pppMngStPtr;
         direction.x = kPppYmCheckBGHeightAxisZero;
         direction.y = kPppYmCheckBGHeightProbeDirY;
         direction.z = kPppYmCheckBGHeightAxisZero;

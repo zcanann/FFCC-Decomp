@@ -41,6 +41,12 @@ typedef struct __GXTlutRegionInt_struct {
     __GXTlutObjInt tlutObj;
 } __GXTlutRegionInt;
 
+typedef struct GXDataCallbacksView {
+    u8 _pad[0x410];
+    GXTexRegionCallback texRegionCallback;
+    GXTlutRegionCallback tlutRegionCallback;
+} GXDataCallbacksView;
+
 u8 GXTexMode0Ids[8] = { 0x80, 0x81, 0x82, 0x83, 0xA0, 0xA1, 0xA2, 0xA3 };
 u8 GXTexMode1Ids[8] = { 0x84, 0x85, 0x86, 0x87, 0xA4, 0xA5, 0xA6, 0xA7 };
 u8 GXTexImage0Ids[8] = { 0x88, 0x89, 0x8A, 0x8B, 0xA8, 0xA9, 0xAA, 0xAB };
@@ -738,11 +744,12 @@ void GXLoadTlut(GXTlutObj* tlut_obj, u32 tlut_name) {
     __GXTlutRegionInt* r;
     u32 tlut_offset;
     __GXTlutObjInt* t = (__GXTlutObjInt*)tlut_obj;
+    GXDataCallbacksView* callbacks = (GXDataCallbacksView*)__GXData;
 
     ASSERTMSGLINE(1432, tlut_obj, "TLut Object Pointer is null");
     CHECK_GXBEGIN(1434, "GXLoadTlut");
-    ASSERTMSGLINEV(1435, __GXData->tlutRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTlut");
-    r = (__GXTlutRegionInt*)__GXData->tlutRegionCallback(tlut_name);
+    ASSERTMSGLINEV(1435, callbacks->tlutRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTlut");
+    r = (__GXTlutRegionInt*)callbacks->tlutRegionCallback(tlut_name);
     ASSERTMSGLINEV(1437, r, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTlut");
 
     __GXFlushTextureState();
@@ -1194,25 +1201,36 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
  * JP Size: TODO
  */
 static void __SetSURegs(int tmap, int tcoord) {
+    GXData* gx;
     u32 image0;
     u32 mode0;
+    u32 wrapS;
+    u32 wrapT;
+    u32* su0Ptr;
+    u32* su1Ptr;
     u32 su0;
     u32 su1;
 
-    image0 = __GXData->tImage0[tmap];
-    su0 = __GXData->suTs0[tcoord];
-    su1 = __GXData->suTs1[tcoord];
-    su0 = (su0 & 0xFFFF0000) | (image0 & 0x3FF);
-    su1 = (su1 & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
+    gx = __GXData;
+    image0 = gx->tImage0[tmap];
+    mode0 = gx->tMode0[tmap];
+    su0Ptr = &gx->suTs0[tcoord];
+    su1Ptr = &gx->suTs1[tcoord];
+    su0 = *su0Ptr;
+    su1 = *su1Ptr;
+    wrapS = __cntlzw(1 - (mode0 & 3));
+    wrapT = __cntlzw(1 - ((mode0 >> 2) & 3));
 
-    mode0 = __GXData->tMode0[tmap];
-    su0 = (su0 & 0xFFFEFFFF) | ((__cntlzw(1 - (mode0 & 3)) & 0x20) << 11);
-    su1 = (su1 & 0xFFFEFFFF) | ((__cntlzw(1 - ((mode0 >> 2) & 3)) & 0x20) << 11);
-    __GXData->suTs0[tcoord] = su0;
-    __GXData->suTs1[tcoord] = su1;
-    GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
-    GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
-    __GXData->bpSentNot = 0;
+    su0 = (image0 & 0x3FF) | (su0 & 0xFFFF0000);
+    su1 = ((image0 >> 10) & 0x3FF) | (su1 & 0xFFFF0000);
+    su0 = (su0 & 0xFFFEFFFF) | ((wrapS << 11) & 0x10000);
+    su1 = (su1 & 0xFFFEFFFF) | ((wrapT << 11) & 0x10000);
+
+    *su0Ptr = su0;
+    *su1Ptr = su1;
+    GX_WRITE_RAS_REG(*su0Ptr);
+    GX_WRITE_RAS_REG(*su1Ptr);
+    gx->bpSentNot = 0;
 }
 
 void __GXSetSUTexRegs(void) {

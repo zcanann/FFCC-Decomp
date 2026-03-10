@@ -101,7 +101,7 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
                 if (ioresult != __load_ok || stream->buffer_length == 0) {
                     if (ioresult == __load_error) {
                         set_error(stream);
-                    } else if (ioresult == __load_eof) {
+                    } else {
                         stream->file_state.io_state = __neutral;
                         stream->file_state.eof = 1;
                     }
@@ -138,11 +138,11 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
         if (ioresult != __load_ok) {
             if (ioresult == __load_error) {
                 set_error(stream);
-            } else if (ioresult == __load_eof) {
+            } else {
                 stream->file_state.io_state = __neutral;
                 stream->file_state.eof = 1;
-                stream->buffer_length = 0;
             }
+            stream->buffer_length = 0;
         }
 
         bytes_read += direct_read;

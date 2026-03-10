@@ -232,17 +232,20 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
     if (languageId == 3) {
         return gSingMenuTextTableIt[staticText];
     }
-    if (languageId < 3) {
-        if ((languageId == 0) || (languageId == 1)) {
+    if (languageId >= 3) {
+        if (languageId == 5) {
+            return gSingMenuTextTableEs[staticText];
+        }
+        if (languageId >= 5) {
             return gSingMenuTextTableEn[staticText];
         }
-        return gSingMenuTextTableDe[staticText];
-    }
-    if (languageId == 5) {
-        return gSingMenuTextTableEs[staticText];
-    }
-    if (languageId < 5) {
         return gSingMenuTextTableFr[staticText];
+    }
+    if (languageId == 1) {
+        return gSingMenuTextTableEn[staticText];
+    }
+    if (languageId >= 1) {
+        return gSingMenuTextTableDe[staticText];
     }
     return gSingMenuTextTableEn[staticText];
 }
@@ -2519,17 +2522,20 @@ static inline char* GetLanguageTableString(int index, char** englishTable, char*
     if (languageId == 3) {
         return italianTable[index];
     }
-    if (languageId < 3) {
-        if ((languageId != 1) && (languageId != 0)) {
-            return germanTable[index];
-        }
-    } else {
+    if (languageId >= 3) {
         if (languageId == 5) {
             return spanishTable[index];
         }
-        if (languageId < 5) {
-            return frenchTable[index];
+        if (languageId >= 5) {
+            return englishTable[index];
         }
+        return frenchTable[index];
+    }
+    if (languageId == 1) {
+        return englishTable[index];
+    }
+    if (languageId >= 1) {
+        return germanTable[index];
     }
     return englishTable[index];
 }
@@ -2593,17 +2599,20 @@ char* CMenuPcs::GetMenuStr(int index)
     if (languageId == 3) {
         return gSingMenuTextTableIt[index];
     }
-    if (languageId < 3) {
-        if ((languageId == 0) || (languageId == 1)) {
+    if (languageId >= 3) {
+        if (languageId == 5) {
+            return gSingMenuTextTableEs[index];
+        }
+        if (languageId >= 5) {
             return gSingMenuTextTableEn[index];
         }
-        return gSingMenuTextTableDe[index];
-    }
-    if (languageId == 5) {
-        return gSingMenuTextTableEs[index];
-    }
-    if (languageId < 5) {
         return gSingMenuTextTableFr[index];
+    }
+    if (languageId == 1) {
+        return gSingMenuTextTableEn[index];
+    }
+    if (languageId >= 1) {
+        return gSingMenuTextTableDe[index];
     }
     return gSingMenuTextTableEn[index];
 }

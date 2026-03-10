@@ -477,23 +477,22 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
  */
 int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 {
-	unsigned int maskedBank = (unsigned int)bank & 3;
-	unsigned int maskedNo = (unsigned int)no & 0x1ff;
+	bank &= 3;
+	no &= 0x1FF;
 
-	if (DAT_8032e12c[maskedBank] != 0) {
-		int bankData = DAT_8032e12c[maskedBank];
-		if ((int)maskedNo < (int)*(short*)(bankData + 10)) {
+	if (DAT_8032e12c[bank] != 0) {
+		int bankData = DAT_8032e12c[bank];
+		if (no < (int)*(short*)(bankData + 10)) {
 			int dataBase = bankData + 0x10;
-			if (*(int*)(dataBase + maskedNo * 4) != -1) {
-				unsigned char* seInfo = (unsigned char*)(dataBase + *(short*)(bankData + 10) * 4 +
-				                                         (*(unsigned int*)(dataBase + maskedNo * 4) & 0x7fffffff));
-				if ((*(unsigned int*)(dataBase + maskedNo * 4) & 0x80000000) != 0) {
+			int offset = *(int*)(dataBase + no * 4);
+			if (offset != -1) {
+				unsigned char* seInfo =
+				    (unsigned char*)(dataBase + *(short*)(bankData + 10) * 4 + ((unsigned int)offset & 0x7FFFFFFF));
+				if (((unsigned int)offset & 0x80000000) != 0) {
 					*seInfo |= 0x80;
 				}
-				bankData = _SePlayStart(
-				    (RedSeINFO*)seInfo, seId, ((int)(maskedNo + maskedBank * 0x200) | 0x80000000), pan, volume);
-				if (bankData != 0) {
-					return (int)maskedNo;
+				if (_SePlayStart((RedSeINFO*)seInfo, seId, (no + bank * 0x200) | 0x80000000, pan, volume) != 0) {
+					return no;
 				}
 			}
 		}

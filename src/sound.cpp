@@ -106,6 +106,8 @@ extern char DAT_801db190[];
 extern char DAT_801db1d8[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
+extern char s_soundNoFreeWaveWarn_801DB0BC[];
+extern char s_soundNoFreeSeGroupWarn_801DB0E4[];
 
 struct CLineSegment {
     Vec delta;
@@ -2419,19 +2421,23 @@ void CSound::PauseAllSe(int pause)
  */
 void CSound::AddNoFreeSeGroup(int group)
 {
-    s16* groupList = SoundData(this).m_noFreeSeGroups;
+    CSoundLayout& sound = SoundData(this);
+    s16* groupEntry = sound.m_noFreeSeGroups;
     int i = 0;
+    int remaining = 4;
 
-    while (i < 4) {
-        if (groupList[i] == -1) {
-            groupList[i] = static_cast<s16>(group);
+    do {
+        if (*groupEntry == -1) {
+            sound.m_noFreeSeGroups[i] = static_cast<s16>(group);
             return;
         }
+        groupEntry++;
         i++;
-    }
+        remaining--;
+    } while (remaining != 0);
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, "%s", 0);
+        Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
     }
 }
 
@@ -2446,19 +2452,23 @@ void CSound::AddNoFreeSeGroup(int group)
  */
 void CSound::AddNoFreeWave(int wave)
 {
-    s16* waveList = SoundData(this).m_noFreeWaves;
+    CSoundLayout& sound = SoundData(this);
+    s16* waveEntry = sound.m_noFreeWaves;
     int i = 0;
+    int remaining = 4;
 
-    while (i < 4) {
-        if (waveList[i] == -1) {
-            waveList[i] = static_cast<s16>(wave);
+    do {
+        if (*waveEntry == -1) {
+            sound.m_noFreeWaves[i] = static_cast<s16>(wave);
             return;
         }
+        waveEntry++;
         i++;
-    }
+        remaining--;
+    } while (remaining != 0);
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, "%s", 0);
+        Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
     }
 }
 

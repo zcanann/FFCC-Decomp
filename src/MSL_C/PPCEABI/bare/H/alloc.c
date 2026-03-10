@@ -517,22 +517,22 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
  * JP Size: TODO
  */
 static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
-    SubBlock* result;
-    unsigned long aligned_size;
     Block* current_block;
 
-    aligned_size = (size + 0xFU) & 0xFFFFFFF8;
-    if (aligned_size < 0x50) {
-        aligned_size = 0x50;
+    size = (size + 0xFU) & 0xFFFFFFF8;
+    if (size < 0x50) {
+        size = 0x50;
     }
     *available_size = 0;
     current_block = pool_obj->start_;
     if (current_block != 0) {
         do {
-            if ((aligned_size <= current_block->max_size) &&
-                ((result = Block_subBlock(current_block, aligned_size)) != 0)) {
-                pool_obj->start_ = current_block;
-                return (char*)result + 8;
+            if (size <= current_block->max_size) {
+                SubBlock* result = Block_subBlock(current_block, size);
+                if (result != 0) {
+                    pool_obj->start_ = current_block;
+                    return (char*)result + 8;
+                }
             }
             if ((8 < current_block->max_size) && (*available_size < current_block->max_size - 8)) {
                 *available_size = current_block->max_size - 8;
@@ -545,23 +545,23 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
 
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     const unsigned long* pool_size_ptr;
-    unsigned long available[4];
-    unsigned long i;
-    unsigned long pool_index;
-    unsigned long client_size;
-    unsigned long entry_size;
-    unsigned long max_count;
-    unsigned long count;
-    unsigned long available_size;
     FixStart* fix_start;
     FixBlock* block;
     FixBlock* head_block;
     FixSubBlock* sub;
     FixSubBlock* result_sub;
+    unsigned long pool_index;
+    unsigned long entry_size;
+    unsigned long client_size;
+    unsigned long max_count;
+    unsigned long count;
+    unsigned long available_size;
+    unsigned long available[4];
+    unsigned long i;
     void* mem;
 
     pool_index = 0;
-    for (pool_size_ptr = fix_pool_sizes; *pool_size_ptr < size; ++pool_size_ptr) {
+    for (pool_size_ptr = fix_pool_sizes; size > *pool_size_ptr; ++pool_size_ptr) {
         ++pool_index;
     }
 

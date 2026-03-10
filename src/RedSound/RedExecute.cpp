@@ -1098,6 +1098,7 @@ void _AdsrStart(RedVoiceDATA* voice)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _AdsrDataCompute(RedVoiceDATA* voice)
 {
     u32 prevValue = 0;
@@ -1128,6 +1129,7 @@ void _AdsrDataCompute(RedVoiceDATA* voice)
         *(int*)((int)voice + 100) = (int)((level | 0x800) - prevValue) / (int)stepCount;
     }
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

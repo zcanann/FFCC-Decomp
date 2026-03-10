@@ -35,12 +35,11 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     PppSRandCVParam2* in = (PppSRandCVParam2*)param2;
     PppSRandCVParam3* out = (PppSRandCVParam3*)param3;
-    float* target;
-    u8* color;
-
     if (gPppCalcDisabled != 0) {
         return;
     }
+
+    float* target;
 
     if (in->field0 == *(s32*)(base + 0xC)) {
         target = (float*)(base + *out->fieldC + 0x80);
@@ -95,11 +94,15 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
-    s32 colorOffset = in->field4;
-    color = (colorOffset == -1) ? gPppDefaultValueBuffer : (base + colorOffset + 0x80);
+    u8* target_colors;
+    if (in->field4 == -1) {
+        target_colors = &gPppDefaultValueBuffer[0];
+    } else {
+        target_colors = base + in->field4 + 0x80;
+    }
 
-    color[0] = (u8)(color[0] + (s8)((float)in->field8 * target[0] - (float)in->field8));
-    color[1] = (u8)(color[1] + (s8)((float)in->field9 * target[1] - (float)in->field9));
-    color[2] = (u8)(color[2] + (s8)((float)in->fieldA * target[2] - (float)in->fieldA));
-    color[3] = (u8)(color[3] + (s8)((float)in->fieldB * target[3] - (float)in->fieldB));
+    target_colors[0] = (u8)(target_colors[0] + (s8)((float)in->field8 * target[0] - (float)in->field8));
+    target_colors[1] = (u8)(target_colors[1] + (s8)((float)in->field9 * target[1] - (float)in->field9));
+    target_colors[2] = (u8)(target_colors[2] + (s8)((float)in->fieldA * target[2] - (float)in->fieldA));
+    target_colors[3] = (u8)(target_colors[3] + (s8)((float)in->fieldB * target[3] - (float)in->fieldB));
 }

@@ -365,9 +365,9 @@ void __VIInit(VITVMode mode) {
     __VIRegs[27] = 1;
     __VIRegs[26] = 0x1001;
     __VIRegs[25] = tm->hlw + 1;
-    __VIRegs[24] = ((tm->nhlines + 1) >> 1) | 0x1000;
+    __VIRegs[24] = ((tm->nhlines >> 1) + 1) | 0x1000;
 
-    if ((u32)mode != 2 && (u32)mode != 3 && (u32)mode != 0x1A) {
+    if (mode != 2 && mode != 3 && mode != 0x1A) {
         __VIRegs[1] = (ds << 2) | 1 | (tv << 8);
         __VIRegs[54] = 0;
     } else {

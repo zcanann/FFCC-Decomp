@@ -123,8 +123,12 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* pa
 
 /*
  * --INFO--
- * Address:	800dcf44
- * Size:	1080b
+ * PAL Address: 0x800dcf44
+ * PAL Size: 1080b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
@@ -136,7 +140,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	u32 x;
 
 	if (gPppCalcDisabled == 0) {
-		refractionData = (int*)((u8*)pppCrystal + (*(s32**)((u8*)param_3 + 0xC))[2] + 0x80);
+		refractionData = (int*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 		if (param_2->m_dataValIndex != 0xFFFF) {
 			textureIndex = 0;
 			GetTexture__8CMapMeshFP12CMaterialSetRi(
@@ -230,8 +234,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	float texW;
 	float texH;
 	s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-	u8* workData = (u8*)pppCrystal + serializedDataOffsets[2] + 0x84;
-	u8* colorData = (u8*)pppCrystal + serializedDataOffsets[1] + 0x88;
+	u8* workDataBase = (u8*)pppCrystal + serializedDataOffsets[2] + 0x80;
+	u8* colorDataBase = (u8*)pppCrystal + serializedDataOffsets[1] + 0x80;
 
 	if (param_2->m_dataValIndex == 0xFFFF) {
 		return;
@@ -260,7 +264,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	pppSetBlendMode__FUc(param_2->m_payload[1]);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-		colorData, (u8*)pppCrystal + 0x40, param_2->m_arg3,
+		colorDataBase + 8, (u8*)pppCrystal + 0x40, param_2->m_arg3,
 		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
 
 	Mtx texMtx = {
@@ -318,7 +322,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 0);
 	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
 	if (param_2->m_payload[0] == 1) {
-		GXLoadTexObj((_GXTexObj*)(*(u32*)workData), GX_TEXMAP1);
+		GXLoadTexObj((_GXTexObj*)(*(u32*)(workDataBase + 4)), GX_TEXMAP1);
 	} else {
 		GXLoadTexObj((_GXTexObj*)(indirectTex + 0x28), GX_TEXMAP1);
 	}

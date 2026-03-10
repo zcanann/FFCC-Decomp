@@ -1140,7 +1140,7 @@ DSError TRKTargetSupportRequest(void) {
     size_t* length;
     MessageCommandID commandId;
     TRKEvent event;
-    u8 ioResult;
+    DSIOResult ioResult;
 
     commandId = (u8) gTRKCPUState.Default.GPR[3];
     if (commandId != DSMSG_ReadFile && commandId != DSMSG_WriteFile && commandId != DSMSG_OpenFile && commandId != DSMSG_CloseFile && commandId != DSMSG_PositionFile) {
@@ -1149,7 +1149,9 @@ DSError TRKTargetSupportRequest(void) {
         return DS_NoError;
     }
     if (commandId == DSMSG_OpenFile) {
-        error = HandleOpenFileSupportRequest((char*) gTRKCPUState.Default.GPR[4], gTRKCPUState.Default.GPR[5], (u32*) gTRKCPUState.Default.GPR[6], &ioResult);
+        error = HandleOpenFileSupportRequest(
+            (char*)gTRKCPUState.Default.GPR[4], (u8)gTRKCPUState.Default.GPR[5],
+            (u32*)gTRKCPUState.Default.GPR[6], &ioResult);
         if (ioResult == DS_IONoError && error != DS_NoError) {
             ioResult = DS_IOError;
         }
@@ -1162,7 +1164,9 @@ DSError TRKTargetSupportRequest(void) {
         gTRKCPUState.Default.GPR[3] = ioResult;
     } else if (commandId == DSMSG_PositionFile) {
         spC = *((u32*) gTRKCPUState.Default.GPR[5]);
-        error = HandlePositionFileSupportRequest(gTRKCPUState.Default.GPR[4], &spC, gTRKCPUState.Default.GPR[6], &ioResult);
+        error = HandlePositionFileSupportRequest(
+            gTRKCPUState.Default.GPR[4], &spC, (u8)gTRKCPUState.Default.GPR[6],
+            &ioResult);
         if (ioResult == DS_IONoError && error != DS_NoError) {
             ioResult = DS_IOError;
         }
@@ -1170,7 +1174,9 @@ DSError TRKTargetSupportRequest(void) {
         *((u32*) gTRKCPUState.Default.GPR[5]) = spC;
     } else {
         length = (size_t*) gTRKCPUState.Default.GPR[5];
-        error = TRKSuppAccessFile((u8) gTRKCPUState.Default.GPR[4], (u8*) gTRKCPUState.Default.GPR[6], length, (DSIOResult*) &ioResult, TRUE, commandId == DSMSG_ReadFile);
+        error = TRKSuppAccessFile(
+            gTRKCPUState.Default.GPR[4], (u8*)gTRKCPUState.Default.GPR[6], length,
+            (DSIOResult*)&ioResult, TRUE, commandId == DSMSG_ReadFile);
         if (ioResult == DS_IONoError && error != DS_NoError) {
             ioResult = DS_IOError;
         }

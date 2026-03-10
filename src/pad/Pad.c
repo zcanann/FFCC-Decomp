@@ -747,7 +747,7 @@ static void SPEC2_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     status->triggerLeft = ClampU8(status->triggerLeft, origin->triggerLeft);
     status->triggerRight = ClampU8(status->triggerRight, origin->triggerRight);
 
-    if (((Type[chan] & (0xFFFF0000)) == SI_GC_CONTROLLER) && ((status->button & 0x80) ^ 0x80)) {
+    if (((Type[chan] & 0xFFFF0000) == SI_GC_CONTROLLER) && !(status->button & 0x80)) {
         BarrelBits |= (PAD_CHAN0_BIT >> chan);
         status->stickX = 0;
         status->stickY = 0;
@@ -846,12 +846,14 @@ PADSamplingCallback PADSetSamplingCallback(PADSamplingCallback callback) {
 BOOL __PADDisableRecalibration(BOOL disable) {
     BOOL enabled;
     BOOL prev;
+    u8 bits;
 
     enabled = OSDisableInterrupts();
     prev = (__gUnknown800030E3 & 0x40) ? TRUE : FALSE;
-    __gUnknown800030E3 &= ~0x40;
+    bits = __gUnknown800030E3 & (u8)~0x40;
+    __gUnknown800030E3 = bits;
     if (disable) {
-        __gUnknown800030E3 |= 0x40;
+        __gUnknown800030E3 = bits | 0x40;
     }
 
     OSRestoreInterrupts(enabled);
@@ -861,12 +863,14 @@ BOOL __PADDisableRecalibration(BOOL disable) {
 BOOL __PADDisableRumble(BOOL disable) {
     BOOL enabled;
     BOOL prev;
+    u8 bits;
 
     enabled = OSDisableInterrupts();
     prev = (__gUnknown800030E3 & 0x20) ? TRUE : FALSE;
-    __gUnknown800030E3 &= ~0x20;
+    bits = __gUnknown800030E3 & (u8)~0x20;
+    __gUnknown800030E3 = bits;
     if (disable) {
-        __gUnknown800030E3 |= 0x20;
+        __gUnknown800030E3 = bits | 0x20;
     }
     OSRestoreInterrupts(enabled);
     return prev;

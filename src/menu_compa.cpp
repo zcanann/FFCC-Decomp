@@ -30,6 +30,29 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 
+extern float FLOAT_80332ff8;
+extern double DOUBLE_80333008;
+
+struct CompaOpenAnim {
+	s16 x;
+	s16 y;
+	s16 w;
+	s16 h;
+	float alpha;
+	float scale;
+	float progress;
+	float uvScale;
+	int tex;
+	int frame;
+	int startFrame;
+	int duration;
+	unsigned int flags;
+	float dx;
+	float dy;
+	float targetX;
+	float targetY;
+};
+
 struct CompaFlatTableEntry
 {
 	int count;
@@ -182,49 +205,51 @@ void CMenuPcs::CompaInit0()
  */
 bool CMenuPcs::CompaOpen()
 {
-	float zero;
-	double one;
-	s16* anim;
-	int finished;
 	int count;
+	int finished;
 	int currentTime;
 	int remaining;
-	int compaState = (int)this->compaMenuState;
+	CompaOpenAnim* anim;
+	short* compaState = reinterpret_cast<short*>(this->compaMenuState);
 	short* compaList = this->compaList;
 
-	if (*reinterpret_cast<char*>(compaState + 0xB) == 0) {
+	if (*(char*)((int)compaState + 0xB) == '\0') {
 		CompaInit();
 	}
+
 	finished = 0;
-	*reinterpret_cast<s16*>(compaState + 0x22) = *reinterpret_cast<s16*>(compaState + 0x22) + 1;
+	compaState[0x11] = compaState[0x11] + 1;
 	count = (int)*compaList;
-	anim = compaList + 4;
-	currentTime = (int)*reinterpret_cast<s16*>(compaState + 0x22);
+	anim = (CompaOpenAnim*)(compaList + 4);
+	currentTime = (int)compaState[0x11];
 	remaining = count;
+
 	if (0 < count) {
 		do {
-			zero = 0.0f;
-			if (*(int*)(anim + 0x12) <= currentTime) {
-				if (currentTime < *(int*)(anim + 0x12) + *(int*)(anim + 0x14)) {
-					*(int*)(anim + 0x10) = *(int*)(anim + 0x10) + 1;
-					one = 1.0;
-					*(float*)(anim + 8) = (float)((1.0 / (double)*(unsigned int*)(anim + 0x14)) * (double)*(unsigned int*)(anim + 0x10));
-					if ((*(unsigned int*)(anim + 0x16) & 2) == 0) {
-						float t = (float)((one / (double)*(unsigned int*)(anim + 0x14)) * (double)*(unsigned int*)(anim + 0x10));
-						*(float*)(anim + 0x18) = (*(float*)(anim + 0x1C) - (float)anim[0]) * t;
-						*(float*)(anim + 0x1A) = (*(float*)(anim + 0x1E) - (float)anim[1]) * t;
+			float zero = FLOAT_80332ff8;
+			if (anim->startFrame <= currentTime) {
+				if (currentTime < anim->startFrame + anim->duration) {
+					double one = DOUBLE_80333008;
+
+					anim->frame = anim->frame + 1;
+					anim->progress = (float)((one / (double)anim->duration) * (double)anim->frame);
+					if ((anim->flags & 2) == 0) {
+						float t = (float)((one / (double)anim->duration) * (double)anim->frame);
+						anim->dx = (anim->targetX - (float)anim->x) * t;
+						anim->dy = (anim->targetY - (float)anim->y) * t;
 					}
 				} else {
 					finished = finished + 1;
-					*(float*)(anim + 8) = 1.0f;
-					*(float*)(anim + 0x18) = zero;
-					*(float*)(anim + 0x1A) = zero;
+					anim->progress = (float)DOUBLE_80333008;
+					anim->dx = zero;
+					anim->dy = zero;
 				}
 			}
-			anim = anim + 0x20;
+			anim = anim + 1;
 			remaining = remaining - 1;
 		} while (remaining != 0);
 	}
+
 	return count == finished;
 }
 

@@ -64,44 +64,6 @@ void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
 
 /*
  * --INFO--
- * PAL Address: 0x800df4f0
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3)
-{
-    CoronaWork* work;
-    long** shape;
-    s32 shapeId;
-
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
-
-    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
-    work->m_scaleY = work->m_scaleY + work->m_scaleZ;
-    work->m_scaleX = work->m_scaleX + work->m_scaleY;
-
-    shapeId = param2->m_dataValIndex;
-    if (shapeId == 0xFFFF) {
-        return;
-    }
-
-    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
-    pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
-
-    if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
-        work->m_scaleX += param2->m_addX;
-        work->m_scaleY += param2->m_addY;
-        work->m_scaleZ += param2->m_addZ;
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800df320
  * PAL Size: 464b
  * EN Address: TODO
@@ -166,4 +128,42 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800df4f0
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3)
+{
+    CoronaWork* work;
+    long** shape;
+    s32 shapeId;
+
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
+
+    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
+    work->m_scaleY = work->m_scaleY + work->m_scaleZ;
+    work->m_scaleX = work->m_scaleX + work->m_scaleY;
+
+    shapeId = param2->m_dataValIndex;
+    if (shapeId == 0xFFFF) {
+        return;
+    }
+
+    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
+
+    if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
+        work->m_scaleX += param2->m_addX;
+        work->m_scaleY += param2->m_addY;
+        work->m_scaleZ += param2->m_addZ;
+    }
 }

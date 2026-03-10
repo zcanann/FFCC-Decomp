@@ -343,24 +343,24 @@ char* strtok(char* str, const char* delim)
 		}
 	}
 
-	tokenStart = p;
 	if (ch == '\0') {
 		strtok_ptr = strtok_null;
-		tokenStart = NULL;
-	} else {
-		tokenEnd = tokenStart;
-		while ((ch = *++tokenEnd) != '\0') {
-			if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
-				break;
-			}
-		}
+		return NULL;
+	}
 
-		if (ch == '\0') {
-			strtok_ptr = strtok_null;
-		} else {
-			strtok_ptr = (char*)(tokenEnd + 1);
-			*tokenEnd = '\0';
+	tokenStart = p;
+	tokenEnd = tokenStart;
+	while ((ch = *++tokenEnd) != '\0') {
+		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
+			break;
 		}
+	}
+
+	if (ch == '\0') {
+		strtok_ptr = strtok_null;
+	} else {
+		strtok_ptr = (char*)(tokenEnd + 1);
+		*tokenEnd = '\0';
 	}
 
 	return (char*)tokenStart;

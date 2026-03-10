@@ -48,6 +48,7 @@ extern float kPppRandDownCVDualSampleScale;
 extern float kPppRandDownFloatDualSampleScale;
 extern float kPppRandDownFVDualSampleScale;
 extern float kPppRandDownHCVDualSampleScale;
+extern double kPppRandDownHCVIntToFloatBias;
 extern float kPppRandDownIntDualSampleScale;
 extern float kPppRandDownIVDualSampleScale;
 extern float kPppRandDownShortDualSampleScale;

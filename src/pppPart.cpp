@@ -1164,62 +1164,6 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	pppMngStPtr = oldMngSt;
 }
 
-static void InitOwnerFlagsAndScale(_pppMngSt* pppMngSt)
-{
-	u8* ownerBytes = (u8*)pppMngSt->m_owner;
-
-	// Owner-facing
-	if (!pppMngSt->m_ownerFacing) {
-		u8 facing = ownerBytes[0x9A];
-		pppMngSt->m_ownerFacing =
-			(u8)(((u32)facing << 25) >> 31);
-	}
-
-	// Slot visible flags
-	if (!pppMngSt->m_ownerFlagsInitialized) {
-		u8 visible = 0;
-		u32 flags = *(u32*)(ownerBytes + 0x60);
-
-		if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
-			visible = 1;
-		}
-		pppMngSt->m_slotVisible = visible;
-		// Original code sets m_ownerFlagsInitialized somewhere else.
-	}
-
-	// Node scale
-	if (!pppMngSt->m_nodeScaleInitialized) {
-		bool useModelScale = false;
-
-		int ownerData = *(int*)(ownerBytes + 0xF8);
-		if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
-			useModelScale = true;
-		}
-
-		float scale;
-		if (useModelScale) {
-			int modelPtr = *(int*)(ownerData + 0x168);
-			scale = *(float*)(modelPtr + 0x9C);
-		} else {
-			scale = *(float*)(ownerBytes + 0x4B0);
-		}
-
-		pppMngSt->m_ownerScale = scale;
-
-		// kScaleConstB *
-
-		if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (DOUBLE_8032fe00 == (double)pppMngSt->m_ownerScale) {
-			pppMngSt->m_useOwnerScaleSign = 0;
-		} else {
-			pppMngSt->m_useOwnerScaleSign = 1;
-		}
-
-		// m_nodeScaleInitialized likely set somewhere else in original code
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 80055b80
@@ -1268,7 +1212,43 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			goto LocalOnly;
 		}
 
-		InitOwnerFlagsAndScale(pppMngSt);
+		{
+			u8* ownerBytes = (u8*)pppMngSt->m_owner;
+			if (!pppMngSt->m_ownerFacing) {
+				u8 facing = ownerBytes[0x9A];
+				pppMngSt->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
+			}
+			if (!pppMngSt->m_ownerFlagsInitialized) {
+				u8 visible = 0;
+				u32 flags = *(u32*)(ownerBytes + 0x60);
+				if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
+					visible = 1;
+				}
+				pppMngSt->m_slotVisible = visible;
+			}
+			if (!pppMngSt->m_nodeScaleInitialized) {
+				bool useModelScale = false;
+				int ownerData = *(int*)(ownerBytes + 0xF8);
+				if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
+					useModelScale = true;
+				}
+				float scale;
+				if (useModelScale) {
+					int modelPtr = *(int*)(ownerData + 0x168);
+					scale = *(float*)(modelPtr + 0x9C);
+				} else {
+					scale = *(float*)(ownerBytes + 0x4B0);
+				}
+				pppMngSt->m_ownerScale = scale;
+				if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
+					pppMngSt->m_useOwnerScaleSign = 1;
+				} else if (DOUBLE_8032fe00 == (double)pppMngSt->m_ownerScale) {
+					pppMngSt->m_useOwnerScaleSign = 0;
+				} else {
+					pppMngSt->m_useOwnerScaleSign = 1;
+				}
+			}
+		}
 
 		u8* ownerBytes = (u8*)pppMngSt->m_owner;
 		CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
@@ -1290,7 +1270,43 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 				goto LocalOnly;
 			}
 
-			InitOwnerFlagsAndScale(pppMngSt);
+			{
+				u8* ownerBytes = (u8*)pppMngSt->m_owner;
+				if (!pppMngSt->m_ownerFacing) {
+					u8 facing = ownerBytes[0x9A];
+					pppMngSt->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
+				}
+				if (!pppMngSt->m_ownerFlagsInitialized) {
+					u8 visible = 0;
+					u32 flags = *(u32*)(ownerBytes + 0x60);
+					if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
+						visible = 1;
+					}
+					pppMngSt->m_slotVisible = visible;
+				}
+				if (!pppMngSt->m_nodeScaleInitialized) {
+					bool useModelScale = false;
+					int ownerData = *(int*)(ownerBytes + 0xF8);
+					if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
+						useModelScale = true;
+					}
+					float scale;
+					if (useModelScale) {
+						int modelPtr = *(int*)(ownerData + 0x168);
+						scale = *(float*)(modelPtr + 0x9C);
+					} else {
+						scale = *(float*)(ownerBytes + 0x4B0);
+					}
+					pppMngSt->m_ownerScale = scale;
+					if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
+						pppMngSt->m_useOwnerScaleSign = 1;
+					} else if (DOUBLE_8032fe00 == (double)pppMngSt->m_ownerScale) {
+						pppMngSt->m_useOwnerScaleSign = 0;
+					} else {
+						pppMngSt->m_useOwnerScaleSign = 1;
+					}
+				}
+			}
 
 			u8* ownerBytes = (u8*)pppMngSt->m_owner;
 			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
@@ -1347,7 +1363,43 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 				goto LocalOnly;
 			}
 
-			InitOwnerFlagsAndScale(pppMngSt);
+			{
+				u8* ownerBytes = (u8*)pppMngSt->m_owner;
+				if (!pppMngSt->m_ownerFacing) {
+					u8 facing = ownerBytes[0x9A];
+					pppMngSt->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
+				}
+				if (!pppMngSt->m_ownerFlagsInitialized) {
+					u8 visible = 0;
+					u32 flags = *(u32*)(ownerBytes + 0x60);
+					if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
+						visible = 1;
+					}
+					pppMngSt->m_slotVisible = visible;
+				}
+				if (!pppMngSt->m_nodeScaleInitialized) {
+					bool useModelScale = false;
+					int ownerData = *(int*)(ownerBytes + 0xF8);
+					if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
+						useModelScale = true;
+					}
+					float scale;
+					if (useModelScale) {
+						int modelPtr = *(int*)(ownerData + 0x168);
+						scale = *(float*)(modelPtr + 0x9C);
+					} else {
+						scale = *(float*)(ownerBytes + 0x4B0);
+					}
+					pppMngSt->m_ownerScale = scale;
+					if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
+						pppMngSt->m_useOwnerScaleSign = 1;
+					} else if (DOUBLE_8032fe00 == (double)pppMngSt->m_ownerScale) {
+						pppMngSt->m_useOwnerScaleSign = 0;
+					} else {
+						pppMngSt->m_useOwnerScaleSign = 1;
+					}
+				}
+			}
 
 			u8* ownerBytes = (u8*)pppMngSt->m_owner;
 			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
@@ -1368,7 +1420,43 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 				goto LocalOnly;
 			}
 
-			InitOwnerFlagsAndScale(pppMngSt);
+			{
+				u8* ownerBytes = (u8*)pppMngSt->m_owner;
+				if (!pppMngSt->m_ownerFacing) {
+					u8 facing = ownerBytes[0x9A];
+					pppMngSt->m_ownerFacing = (u8)(((u32)facing << 25) >> 31);
+				}
+				if (!pppMngSt->m_ownerFlagsInitialized) {
+					u8 visible = 0;
+					u32 flags = *(u32*)(ownerBytes + 0x60);
+					if ((flags & 0x00000001) != 0 && (flags & 0x00400000) == 0) {
+						visible = 1;
+					}
+					pppMngSt->m_slotVisible = visible;
+				}
+				if (!pppMngSt->m_nodeScaleInitialized) {
+					bool useModelScale = false;
+					int ownerData = *(int*)(ownerBytes + 0xF8);
+					if (ownerData != 0 && *(int*)(ownerData + 0x168) != 0) {
+						useModelScale = true;
+					}
+					float scale;
+					if (useModelScale) {
+						int modelPtr = *(int*)(ownerData + 0x168);
+						scale = *(float*)(modelPtr + 0x9C);
+					} else {
+						scale = *(float*)(ownerBytes + 0x4B0);
+					}
+					pppMngSt->m_ownerScale = scale;
+					if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
+						pppMngSt->m_useOwnerScaleSign = 1;
+					} else if (DOUBLE_8032fe00 == (double)pppMngSt->m_ownerScale) {
+						pppMngSt->m_useOwnerScaleSign = 0;
+					} else {
+						pppMngSt->m_useOwnerScaleSign = 1;
+					}
+				}
+			}
 
 			u8* ownerBytes = (u8*)pppMngSt->m_owner;
 			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(

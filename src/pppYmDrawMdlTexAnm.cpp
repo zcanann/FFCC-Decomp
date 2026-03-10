@@ -118,9 +118,9 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     }
 
     work->m_frame = 0;
-    work->m_wait = 0x200;
-    work->m_tilesU = 0;
     work->m_tilesV = 0;
+    work->m_tilesU = 0;
+    work->m_wait = 0x200;
 }
 
 /*

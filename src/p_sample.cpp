@@ -6,10 +6,20 @@ extern "C" void create__10CSamplePcsFv(CSamplePcs*);
 extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func0__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func1__10CSamplePcsFv(CSamplePcs*);
-unsigned int m_table_desc0__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
-unsigned int m_table_desc1__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
-unsigned int m_table_desc2__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
-unsigned int m_table_desc3__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
+static unsigned int m_table_desc__10CSamplePcs[12] = {
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(create__10CSamplePcsFv),
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv),
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(func0__10CSamplePcsFv),
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(func1__10CSamplePcsFv),
+};
 unsigned char m_table__10CSamplePcs[0x15C];
 
 /*
@@ -128,10 +138,11 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	unsigned int* desc0;
-	unsigned int* desc1;
-	unsigned int* desc2;
-	unsigned int* desc3;
+	unsigned int* desc;
+	unsigned int* d0;
+	unsigned int* d1;
+	unsigned int* d2;
+	unsigned int* d3;
 	unsigned int* table;
 	unsigned int a0;
 	unsigned int a1;
@@ -142,29 +153,30 @@ extern "C" void __sinit_p_sample_cpp(void)
 	unsigned int c0;
 	unsigned int c1;
 	unsigned int c2;
-	unsigned int d0;
-	unsigned int d1;
-	unsigned int d2;
+	unsigned int d0v;
+	unsigned int d1v;
+	unsigned int d2v;
 
 	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
-	desc0 = m_table_desc0__10CSamplePcs;
-	desc1 = m_table_desc1__10CSamplePcs;
-	desc2 = m_table_desc2__10CSamplePcs;
-	desc3 = m_table_desc3__10CSamplePcs;
+	desc = m_table_desc__10CSamplePcs;
+	d0 = desc;
+	d1 = desc + 3;
+	d2 = desc + 6;
+	d3 = desc + 9;
 	table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
 
-	a0 = desc0[0];
-	a1 = desc0[1];
-	a2 = desc0[2];
-	b0 = desc1[0];
-	b1 = desc1[1];
-	b2 = desc1[2];
-	c0 = desc2[0];
-	c1 = desc2[1];
-	c2 = desc2[2];
-	d0 = desc3[0];
-	d1 = desc3[1];
-	d2 = desc3[2];
+	a0 = d0[0];
+	a1 = d0[1];
+	a2 = d0[2];
+	b0 = d1[0];
+	b1 = d1[1];
+	b2 = d1[2];
+	c0 = d2[0];
+	c1 = d2[1];
+	c2 = d2[2];
+	d0v = d3[0];
+	d1v = d3[1];
+	d2v = d3[2];
 
 	table[1] = a0;
 	table[2] = a1;
@@ -175,9 +187,9 @@ extern "C" void __sinit_p_sample_cpp(void)
 	table[7] = c0;
 	table[8] = c1;
 	table[9] = c2;
-	table[12] = d0;
-	table[13] = d1;
-	table[14] = d2;
+	table[12] = d0v;
+	table[13] = d1v;
+	table[14] = d2v;
 }
 
 /*

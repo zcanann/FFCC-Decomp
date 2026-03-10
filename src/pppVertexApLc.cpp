@@ -145,7 +145,10 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                s32 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
+                f32 randValue = RandF__5CMathFv(&Math);
+                f32 maxValue = (f32)entry->maxValue;
+                s32 outValue = (s32)(randValue * maxValue);
+                s32 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;

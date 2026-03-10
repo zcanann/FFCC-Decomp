@@ -530,7 +530,7 @@ config.libs = [
             Object(
                 NonMatching,
                 "pppKeDMat.cpp",
-                cflags=[*cflags_game, "-use_lmw_stmw on"],
+                cflags=[*cflags_game, "-Cpp_exceptions on", "-use_lmw_stmw on"],
             ),
             Object(NonMatching, "pppKeLns.cpp"),
             Object(NonMatching, "pppKeShpTail.cpp"),

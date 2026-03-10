@@ -2155,14 +2155,14 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
+void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* arg4)
 {
 	int args[5];
-	args[0] = 0;
-	args[1] = 0;
-	args[2] = 0;
-	args[3] = 0;
-	args[4] = 0;
+	args[0] = arg0;
+	args[1] = arg1;
+	args[2] = arg2;
+	args[3] = arg3;
+	args[4] = reinterpret_cast<int>(arg4);
 	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, args);
 }
 

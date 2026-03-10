@@ -77,7 +77,7 @@ static void cbForStateCoverClosed(u32 intType);
 static void stateMotorStopped();
 static void cbForStateMotorStopped(u32 intType);
 static void stateReady();
-static void stateBusy_80189D04(DVDCommandBlock* block);
+static void stateBusy(DVDCommandBlock* block);
 static BOOL IsImmCommandWithResult(u32 command);
 static int IsDmaCommand(u32 command);
 static void cbForStateBusy(u32 intType);
@@ -537,7 +537,7 @@ static void cbForStateCheckID3(u32 intType) {
         NumInternalRetry = 0;
         if (CheckCancel(0) == FALSE) {
             executing->state = DVD_STATE_BUSY;
-            stateBusy_80189D04(executing);
+            stateBusy(executing);
         }
         return;
     }
@@ -630,8 +630,8 @@ static void stateReady() {
     }
 
     if (PauseFlag != 0) {
-        executing = NULL;
         PausingFlag = 1;
+        executing = NULL;
         return;
     }
 
@@ -677,16 +677,15 @@ static void stateReady() {
         }
 
         ResumeFromHere = 0;
-        return;
+    } else {
+        executing->state = DVD_STATE_BUSY;
+        stateBusy(executing);
     }
-
-    executing->state = DVD_STATE_BUSY;
-    stateBusy_80189D04(executing);
 }
 
-static void stateBusy_80189D04(DVDCommandBlock* block) {
+static void stateBusy(DVDCommandBlock* block) {
     DVDCommandBlock* finished;
-    LastState = stateBusy_80189D04;
+    LastState = stateBusy;
 
     switch(block->command) {
     case DVD_COMMAND_READID:
@@ -883,7 +882,7 @@ static void cbForStateBusy(u32 intType) {
 
         if (IsDmaCommand(CurrCommand)) {
             if (executing->transferredSize != executing->length) {
-                stateBusy_80189D04(executing);
+                stateBusy(executing);
                 return;
             }
 

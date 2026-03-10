@@ -142,7 +142,7 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
  */
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
-	float zero = 0.0f;
+	float zero = FLOAT_80330670;
 	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
 	char* basePtr = (char*)obj + offset + 0x80;
 

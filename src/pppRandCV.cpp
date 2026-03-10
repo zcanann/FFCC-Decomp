@@ -56,11 +56,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = params->colorOffset;
-    if (colorOffset == -1) {
-        targetColor = &gPppDefaultValueBuffer[0];
-    } else {
-        targetColor = base + colorOffset + 0x80;
-    }
+    targetColor = (colorOffset == -1) ? gPppDefaultValueBuffer : (base + colorOffset + 0x80);
 
     f32 scale = *randomValue;
     targetColor[0] = (u8)(targetColor[0] + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]));

@@ -2940,9 +2940,7 @@ void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
  */
 void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
 {
-    int offset = mapIdGrpIndex * 0x14;
-    offset += 0x214E8;
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + offset) = mask;
+    reinterpret_cast<CMapIdGrp*>(Ptr(this, 0x214E8))[mapIdGrpIndex].mMask = mask;
 }
 
 /*

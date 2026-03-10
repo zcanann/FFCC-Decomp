@@ -13,6 +13,8 @@
 
 CDbgMenuPcs DbgMenuPcs;
 
+extern char __vt__8CManager[];
+extern char __vt_CProcess[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
 extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
@@ -28,18 +30,6 @@ extern u32 PTR_calc__11CDbgMenuPcsFv_802123b8;
 extern u32 DAT_802123bc;
 extern u32 DAT_802123c0;
 extern u32 PTR_draw__11CDbgMenuPcsFv_802123c4;
-extern u32 DAT_802123cc;
-extern u32 DAT_802123d0;
-extern u32 DAT_802123d4;
-extern u32 DAT_802123d8;
-extern u32 DAT_802123dc;
-extern u32 DAT_802123e0;
-extern u32 DAT_802123e4;
-extern u32 DAT_802123e8;
-extern u32 DAT_802123ec;
-extern u32 DAT_802123f8;
-extern u32 DAT_802123fc;
-extern u32 DAT_80212400;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -79,23 +69,28 @@ DbgMenuDef PTR_DAT_80212524[] = {
  */
 extern "C" void __sinit_p_dbgmenu_cpp()
 {
+	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__11CDbgMenuPcs);
+
+	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt__8CManager;
+	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt_CProcess;
 	*(u32*)((u8*)&MiniGamePcs + 0x6480) = (u32)&PTR_PTR_s_CDbgMenuPcs_802126c4;
-	memset((u8*)&DbgMenuPcs, 0, 0x34);
-	memset((u8*)&DbgMenuPcs + 0x34, 0, 0x20);
+	*reinterpret_cast<u32*>(&DbgMenuPcs) = reinterpret_cast<u32>(&PTR_PTR_s_CDbgMenuPcs_802126c4);
+	memset((u8*)&DbgMenuPcs + 8, 0, 0x34);
+	memset((u8*)&DbgMenuPcs + 0x3C, 0, 0x20);
 	__construct_array((u8*)&DbgMenuPcs + 0x54, __ct__Q211CDbgMenuPcs3CDMFv, 0, 0x54, 0x80);
 
-	DAT_802123cc = DAT_80212398;
-	DAT_802123d0 = DAT_8021239c;
-	DAT_802123d4 = PTR_create__11CDbgMenuPcsFv_802123a0;
-	DAT_802123d8 = DAT_802123a4;
-	DAT_802123dc = DAT_802123a8;
-	DAT_802123e0 = PTR_destroy__11CDbgMenuPcsFv_802123ac;
-	DAT_802123e4 = DAT_802123b0;
-	DAT_802123e8 = DAT_802123b4;
-	DAT_802123ec = PTR_calc__11CDbgMenuPcsFv_802123b8;
-	DAT_802123f8 = DAT_802123bc;
-	DAT_802123fc = DAT_802123c0;
-	DAT_80212400 = PTR_draw__11CDbgMenuPcsFv_802123c4;
+	table[1] = DAT_80212398;
+	table[2] = DAT_8021239c;
+	table[3] = PTR_create__11CDbgMenuPcsFv_802123a0;
+	table[4] = DAT_802123a4;
+	table[5] = DAT_802123a8;
+	table[6] = PTR_destroy__11CDbgMenuPcsFv_802123ac;
+	table[7] = DAT_802123b0;
+	table[8] = DAT_802123b4;
+	table[9] = PTR_calc__11CDbgMenuPcsFv_802123b8;
+	table[12] = DAT_802123bc;
+	table[13] = DAT_802123c0;
+	table[14] = PTR_draw__11CDbgMenuPcsFv_802123c4;
 }
 
 /*

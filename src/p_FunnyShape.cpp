@@ -52,7 +52,7 @@ inline void* operator new(unsigned long, void* p)
 }
 
 extern void* __vt__8CManager;
-extern void* PTR_PTR_s_CFunnyShapePcs_801ea924;
+extern void* __vt__14CFunnyShapePcs;
 extern u32 DAT_801EA778;
 extern u32 DAT_801EA77C;
 extern u32 PTR_createViewer__14CFunnyShapePcsFv_801EA780;
@@ -118,7 +118,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__8CManager;
     *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__8CProcess;
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &PTR_PTR_s_CFunnyShapePcs_801ea924;
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(&FunnyShapePcs) + 0x3C));
     __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(&FunnyShapePcs) + 0x50));

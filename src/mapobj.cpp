@@ -13,8 +13,8 @@
 #include <string.h>
 
 // Linkage definitions from config/GCCP01/symbols.txt.
-float kMapObjBoundMinInit = 10000000000.0f;
-float kMapObjBoundMaxInit = -10000000000.0f;
+const float kMapObjBoundMinInit = 10000000000.0f;
+const float kMapObjBoundMaxInit = -10000000000.0f;
 const float kMapObjZero = 1.0f;
 const float kMapObjOne = 0.0f;
 const float kMapObjInitNegOne = 1000000000000000.0f;

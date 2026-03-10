@@ -1664,69 +1664,55 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
     unsigned short codeType = padCode & 0x7F00;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (codeType == 0x1200)
-    {
-        if (System.m_execParam != 0)
-        {
+    switch (codeType) {
+    case 0x1000:
+        if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
-        if (System.m_execParam != 0)
-        {
-            Printf__7CSystemFPce(&System, "GBA PADCODE MGR END\n");
-        }
-        if (System.m_execParam != 0)
-        {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
-        }
-        self[0x6495] = 1;
-    }
-    else if (codeType == 0x1100)
-    {
-        if (System.m_execParam != 0)
-        {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
-        }
-        if (System.m_execParam != 0)
-        {
-            Printf__7CSystemFPce(&System, "GBA PADCODE RACE END\n");
-        }
-        if (System.m_execParam != 0)
-        {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
-        }
-        self[0x6496] = 1;
-    }
-    else if (codeType == 0x1000)
-    {
-        if (System.m_execParam != 0)
-        {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
-        }
-        if (System.m_execParam != 0)
-        {
+        if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, "GBA PADCODE RACE RESULT play=%d r=%d\n", player, padCode & 0xFF);
         }
-        if (System.m_execParam != 0)
-        {
+        if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
         self[0x6498 + player] = static_cast<unsigned char>(padCode);
-    }
-    else if (codeType == 0x1300)
-    {
-        if (System.m_execParam != 0)
-        {
+        break;
+    case 0x1100:
+        if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
-        if (System.m_execParam != 0)
-        {
+        if (1 <= (unsigned int)System.m_execParam) {
+            Printf__7CSystemFPce(&System, "GBA PADCODE RACE END\n");
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        self[0x6496] = 1;
+        break;
+    case 0x1200:
+        if (1 <= (unsigned int)System.m_execParam) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            Printf__7CSystemFPce(&System, "GBA PADCODE MGR END\n");
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        self[0x6495] = 1;
+        break;
+    case 0x1300:
+        if (1 <= (unsigned int)System.m_execParam) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, "GBA PADCODE MGR CONTINUE\n");
         }
-        if (System.m_execParam != 0)
-        {
+        if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
         self[0x6497] = 1;
+        break;
     }
 }
 

@@ -1136,11 +1136,11 @@ u32 TRKTargetGetPC() { return gTRKCPUState.Default.PC; }
 
 DSError TRKTargetSupportRequest(void) {
     DSError error;
+    DSIOResult ioResult;
     u32 spC;
     size_t* length;
     MessageCommandID commandId;
     TRKEvent event;
-    DSIOResult ioResult;
 
     commandId = (u8) gTRKCPUState.Default.GPR[3];
     if (commandId != DSMSG_ReadFile && commandId != DSMSG_WriteFile && commandId != DSMSG_OpenFile && commandId != DSMSG_CloseFile && commandId != DSMSG_PositionFile) {

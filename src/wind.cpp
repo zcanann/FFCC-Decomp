@@ -392,50 +392,54 @@ int CWind::AddAmbient(float dir, float speed)
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
 	int checked = 0;
-	int blocks = 4;
+	u8* foundObj = 0;
 	u8* cur = (u8*)m_objects;
-	u8* foundObj;
 
-	do {
-		foundObj = cur;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+	for (int blocks = 4; blocks != 0; blocks--) {
+		u8* obj = cur;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0x64;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0x64;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0xC8;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0xC8;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0x12C;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0x12C;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0x190;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0x190;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0x1F4;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0x1F4;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0x258;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0x258;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
-		foundObj = cur + 0x2BC;
-		if ((s8)foundObj[0] >= 0) {
-			goto found;
+		obj = cur + 0x2BC;
+		if ((s8)obj[0] >= 0) {
+			foundObj = obj;
+			break;
 		}
 
 		checked += 7;
 		cur += 0x320;
-		blocks--;
-	} while (blocks != 0);
-
-	foundObj = 0;
+	}
 
 found:
 	WindObject* obj = (WindObject*)foundObj;

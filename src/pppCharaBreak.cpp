@@ -248,13 +248,13 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
         if (IsHasDrawFmtDL__5CUtilFUc((void*)gUtil, drawCmd) == 0) {
             hasCommand = false;
         } else {
-            s16 triCount = drawCount - 2;
+            s16 triCount = (s16)(drawCount - 2);
             bool building = true;
             int outVertex = 0;
             u16* stripRestart = 0;
 
             if (primitive == 0x90) {
-                triCount = (s16)(((u64)((s64)(int)drawCount * 0x55555556LL)) >> 32);
+                triCount = (s16)((int)drawCount / 3);
             }
 
             while (building) {
@@ -263,7 +263,6 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 u16 nrmIndex = stream[1];
                 u16 texIndex = stream[3];
                 u16* nextStream = stream + 4;
-
                 if ((drawCmd & 7) == 2) {
                     nextStream = stream + 5;
                 }
@@ -271,24 +270,22 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
                 if (isSkinned) {
                     S16Vec* sourcePos = workPositions + posIndex;
-                    s32 vertexOffset = outVertex * 6;
-
-                    *(s16*)((u8*)polygonData + vertexOffset + 0x10) = sourcePos->x;
-                    *(s16*)((u8*)polygonData + vertexOffset + 0x12) = sourcePos->y;
-                    *(s16*)((u8*)polygonData + vertexOffset + 0x14) = sourcePos->z;
+                    *(s16*)((u8*)polygonData + (outVertex * 6) + 0x10) = sourcePos->x;
+                    *(s16*)((u8*)polygonData + (outVertex * 6) + 0x12) = sourcePos->y;
+                    *(s16*)((u8*)polygonData + (outVertex * 6) + 0x14) = sourcePos->z;
                 } else {
                     S16Vec* sourcePos = workPositions + posIndex;
-                    S16Vec src;
-                    Vec worldPos;
+                    S16Vec posQuantized;
+                    Vec posFloat;
 
-                    src.x = sourcePos->x;
-                    src.y = sourcePos->y;
-                    src.z = sourcePos->z;
-                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &worldPos, &src,
+                    posQuantized.x = sourcePos->x;
+                    posQuantized.y = sourcePos->y;
+                    posQuantized.z = sourcePos->z;
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &posFloat, &posQuantized,
                                                         *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
-                    PSMTXMultVec(meshMtx, &worldPos, &worldPos);
+                    PSMTXMultVec(meshMtx, &posFloat, &posFloat);
                     ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil,
-                                                        (S16Vec*)((u8*)polygonData + (outVertex * 6) + 0x10), &worldPos,
+                                                        (S16Vec*)((u8*)polygonData + (outVertex * 6) + 0x10), &posFloat,
                                                         *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
                 }
 

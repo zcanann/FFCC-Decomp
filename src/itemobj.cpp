@@ -1186,9 +1186,10 @@ void CGItemObj::DeleteAllFieldItem()
 {
 	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-		if (*(int*)(itemObj + 0x550) == 0 &&
-		    (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
-			itemObj[0x38] = (itemObj[0x38] & 0x7f) | 0x80;
+		int owner = *(int*)(itemObj + 0x550);
+
+		if (owner == 0 && (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
+			itemObj[0x38] |= 0x80;
 		}
 	}
 }
@@ -1206,12 +1207,13 @@ void CGItemObj::DispAllFieldItem(int show)
 {
 	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
 	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-		if (*(int*)(itemObj + 0x550) == 0 &&
-		    (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
-			if (show == 0) {
-				*(unsigned int*)(itemObj + 0x60) |= 0x400000;
-			} else {
+		int owner = *(int*)(itemObj + 0x550);
+
+		if (owner == 0 && (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
+			if (show != 0) {
 				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
+			} else {
+				*(unsigned int*)(itemObj + 0x60) |= 0x400000;
 			}
 		}
 	}
@@ -1230,4 +1232,3 @@ int CGItemObj::GetCID()
 {
 	return 0x1d;
 }
-

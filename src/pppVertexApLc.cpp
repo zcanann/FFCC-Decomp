@@ -108,7 +108,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        u8 count = data->spawnCount;
+        int count = data->spawnCount;
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
@@ -116,12 +116,9 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 vertexIndex = entry->vertexIndices[state->index];
-                state->index++;
+                u16 index = state->index++;
+                u16 vertexIndex = entry->vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
@@ -136,9 +133,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     }
 
                     Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
+                    *dst = *vertex;
                 }
             }
             break;
@@ -149,9 +144,6 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 s32 index = (s32)(randValue * maxValue);
                 u16 vertexIndex = entry->vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
@@ -166,9 +158,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     }
 
                     Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-                    dst->x = x;
-                    dst->y = y;
-                    dst->z = z;
+                    *dst = *vertex;
                 }
             }
             break;
@@ -179,4 +169,3 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
-

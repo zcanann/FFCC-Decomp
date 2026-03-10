@@ -40,9 +40,9 @@ class CPtrArray
 {
 public:
     void** m_vtable;
-    int m_numItems;
-    int m_size;
-    int m_defaultSize;
+    unsigned long m_numItems;
+    unsigned long m_size;
+    unsigned long m_defaultSize;
     T* m_items;
     CMemory::CStage* m_stage;
     int m_growCapacity;

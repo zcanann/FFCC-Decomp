@@ -26,6 +26,7 @@ extern _pppMngStEmission* pppMngStPtr;
 extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
+extern "C" int strcmp(const char* lhs, const char* rhs);
 extern const char DAT_803311fc;
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;

@@ -4,6 +4,8 @@
 #include <string.h>
 
 extern u8 GBAKeyDspTaskIram[];
+extern char s_GBAKey_c_8021cef8[];
+extern char s_GBA___unexpected_dsp_call_8021cf04[];
 
 static s32 F152(void* task)
 {
@@ -15,7 +17,7 @@ static s32 F152(void* task)
         }
     }
 
-    OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
+    OSPanic(s_GBAKey_c_8021cef8, 169, s_GBA___unexpected_dsp_call_8021cf04);
     return -1;
 }
 

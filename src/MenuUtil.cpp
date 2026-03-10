@@ -116,15 +116,17 @@ void CMenuPcs::GetLongHelpString(CFont*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-float CMenuPcs::CalcCenteringPos2(char* text, float margin, float scale)
+float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
 	CFont* font = menuFont;
+	float width;
 
 	SetShadow__5CFontFi(font, 1);
 	SetMargin__5CFontFf(margin, font);
 	SetScaleX__5CFontFf(scale, font);
 	SetScaleY__5CFontFf(kOptionAnimMax, font);
-	return -(GetWidth__5CFontFPc(font, text) * kMenuCenteringHalfWidth - kMenuCenteringOffset);
+	width = GetWidth__5CFontFPc(font, text);
+	return kMenuCenteringOffset - width * kMenuCenteringHalfWidth;
 }
 
 /*

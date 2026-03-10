@@ -676,6 +676,7 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _PitchExecute(RedVoiceDATA* param_1)
 {
     int pitchDelta = 0;
@@ -730,6 +731,7 @@ void _PitchExecute(RedVoiceDATA* param_1)
     voiceData[0x27] = pitchDelta + voiceData[0x26] + voiceData[0xF];
     voiceData[0x24] |= 0x10;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

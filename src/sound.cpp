@@ -2370,7 +2370,7 @@ void CSound::StopStream()
  */
 void CSound::SetStreamVolume(int volume, int frames)
 {
-    StreamVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, volume, frames);
+    StreamVolume__9CRedSoundFiii(RedSound(this), -1, volume, frames);
 }
 
 /*

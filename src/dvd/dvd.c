@@ -77,7 +77,7 @@ static void cbForStateCoverClosed(u32 intType);
 static void stateMotorStopped();
 static void cbForStateMotorStopped(u32 intType);
 static void stateReady();
-static void stateBusy_80189D04(DVDCommandBlock* block);
+static void stateBusy(DVDCommandBlock* block);
 static BOOL IsImmCommandWithResult(u32 command);
 static int IsDmaCommand(u32 command);
 static void cbForStateBusy(u32 intType);
@@ -497,9 +497,7 @@ static void cbForStateCheckID1(u32 intType) {
 static void cbForStateCheckID2(u32 intType) {
     if (intType == 16) {
         executing->state = -1;
-        __DVDStoreErrorCode(0x01234568);
-        DVDReset();
-        cbForStateError(0);
+		stateTimeout();
 		return;
 	}
 
@@ -507,18 +505,13 @@ static void cbForStateCheckID2(u32 intType) {
 
     if (intType & DVD_INTTYPE_TC) {
         ASSERTLINE(1305, (intType & DVD_INTTYPE_DE) == 0);
-        LastState = stateReadingFST;
         NumInternalRetry = 0;
-        ASSERTLINE(652, ((u32)(bootInfo->FSTLocation) & (32 - 1)) == 0);
-        DVD_ASSERTMSGLINE(647, bootInfo->FSTMaxLength >= BB2.FSTLength,
-                          "DVDChangeDisk(): FST in the new disc is too big.   ");
-        DVDLowRead(bootInfo->FSTLocation, (u32)(BB2.FSTLength + 0x1F) & 0xFFFFFFE0, BB2.FSTPosition,
-                   cbForStateReadingFST);
+        stateReadingFST();
         return;
     }
 
     ASSERTLINE(1321, intType == DVD_INTTYPE_DE);
-    DVDLowRequestError(cbForStateGettingError);
+    stateGettingError();
 }
 
 static void cbForStateCheckID3(u32 intType) {
@@ -537,7 +530,7 @@ static void cbForStateCheckID3(u32 intType) {
         NumInternalRetry = 0;
         if (CheckCancel(0) == FALSE) {
             executing->state = DVD_STATE_BUSY;
-            stateBusy_80189D04(executing);
+            stateBusy(executing);
         }
         return;
     }
@@ -630,8 +623,8 @@ static void stateReady() {
     }
 
     if (PauseFlag != 0) {
-        executing = NULL;
         PausingFlag = 1;
+        executing = NULL;
         return;
     }
 
@@ -654,65 +647,38 @@ static void stateReady() {
         switch (ResumeFromHere) {
         case 2:
             executing->state = DVD_STATE_RETRY;
-            DVDLowWaitCoverClose(cbForStateMotorStopped);
+            stateMotorStopped();
             break;
         case 3:
             executing->state = DVD_STATE_NO_DISK;
-            DVDLowWaitCoverClose(cbForStateMotorStopped);
+            stateMotorStopped();
             break;
         case 4:
             executing->state = DVD_STATE_COVER_OPEN;
-            DVDLowWaitCoverClose(cbForStateMotorStopped);
+            stateMotorStopped();
             break;
         case 1:
-        case 6:
         case 7:
-            executing->state = DVD_STATE_WRONG_DISK;
-            goto wrongDisk;
+        case 6:
+            executing->state = DVD_STATE_COVER_CLOSED;
+            stateCoverClosed();
             break;
         case 5:
-            __DVDStoreErrorCode(CancelLastError);
-            DVDLowStopMotor(cbForStateError);
+            executing->state = DVD_STATE_FATAL_ERROR;
+            stateError(CancelLastError);
             break;
         }
 
         ResumeFromHere = 0;
-        return;
-    }
-
-    if (MotorState == 0) {
+    } else {
         executing->state = DVD_STATE_BUSY;
-        stateBusy_80189D04(executing);
-        return;
-    }
-
-    executing->state = DVD_STATE_COVER_CLOSED;
-wrongDisk:
-    switch (CurrCommand) {
-    case DVD_COMMAND_BSREAD:
-    case DVD_COMMAND_READID:
-    case DVD_COMMAND_AUDIO_BUFFER_CONFIG:
-    case DVD_COMMAND_BS_CHANGE_DISK:
-        __DVDClearWaitingQueue();
-        finished = executing;
-        executing = &DummyCommandBlock;
-        if (finished->callback) {
-            finished->callback(-4, finished);
-        }
-        stateReady();
-        break;
-    default:
-        MotorState = 0;
-        DVDReset();
-        OSCreateAlarm(&ResetAlarm);
-        OSSetAlarm(&ResetAlarm, OSMillisecondsToTicks(1150), &AlarmHandler);
-        break;
+        stateBusy(executing);
     }
 }
 
-static void stateBusy_80189D04(DVDCommandBlock* block) {
+static void stateBusy(DVDCommandBlock* block) {
     DVDCommandBlock* finished;
-    LastState = stateBusy_80189D04;
+    LastState = stateBusy;
 
     switch(block->command) {
     case DVD_COMMAND_READID:
@@ -903,27 +869,13 @@ static void cbForStateBusy(u32 intType) {
         ASSERTLINE(1915, (intType & DVD_INTTYPE_DE) == 0);
         NumInternalRetry = 0;
 
-        if (CurrCommand == 0x10) {
-            MotorState = 1;
-            finished = executing;
-            executing = &DummyCommandBlock;
-            finished->state = 0;
-
-            if (finished->callback != 0) {
-                (*finished->callback)(0, finished);
-            }
-
-            stateReady();
-            return;
-        }
-
         if (CheckCancel(0) != FALSE) {
             return;
         }
 
         if (IsDmaCommand(CurrCommand)) {
             if (executing->transferredSize != executing->length) {
-                stateBusy_80189D04(executing);
+                stateBusy(executing);
                 return;
             }
 

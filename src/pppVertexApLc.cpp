@@ -100,6 +100,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
         VertexApLcEntry* entry = &env->entries[data->entryIndex];
+        u16* vertexIndices = entry->vertexIndices;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
@@ -108,7 +109,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        int count = data->spawnCount;
+        s32 count = data->spawnCount;
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
@@ -116,9 +117,8 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 outValue = state->index;
-                state->index++;
-                s32 vertexIndex = entry->vertexIndices[outValue];
+                u16 outValue = state->index++;
+                s32 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -145,10 +145,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                f32 randValue = RandF__5CMathFv(&Math);
-                f32 maxValue = (f32)entry->maxValue;
-                int outValue = (int)(randValue * maxValue);
-                s32 vertexIndex = entry->vertexIndices[outValue];
+                s32 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;

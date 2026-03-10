@@ -260,45 +260,58 @@ CFunnyShapePcs::~CFunnyShapePcs()
 void CFunnyShapePcs::Init()
 {
     u8* self = Ptr(this, 0);
-    u32 clz0;
-    u32 clz1;
-    u32 bits;
-    f32 value24;
-    f32 value14;
+    u32 clz;
+    u32 bit;
+    u32 negBit;
+    const u32 mask = 0x3F;
+    f32 origin;
+    f32 ndcMin;
 
     self[0x8] = 0x7F;
-    clz0 = __cntlzw(0);
+    clz = __cntlzw(0);
+    bit = (clz >> 5) & 1;
+
     self[0x9] = 0x7F;
+    clz = __cntlzw(1);
+    negBit = -bit;
+
     self[0xA] = 0x7F;
-    clz1 = __cntlzw(1);
-    bits = (-((clz0 >> 5) & 1)) & 0x3F;
+    bit = (clz >> 5) & 1;
     self[0xB] = 0xFF;
-    value24 = kFunnyShapeViewportOrigin;
-    self[0xC] = bits;
-    value14 = kFunnyShapeNdcMin;
-    clz0 = __cntlzw(2);
-    self[0xD] = bits;
-    self[0xE] = bits;
-    bits = (-((clz1 >> 5) & 1)) & 0x3F;
+
+    origin = kFunnyShapeViewportOrigin;
+    self[0xC] = mask & negBit;
+
+    clz = __cntlzw(2);
+    ndcMin = kFunnyShapeNdcMin;
+
+    self[0xD] = mask & negBit;
+    self[0xE] = mask & negBit;
+
+    negBit = -((clz >> 5) & 1);
     self[0xF] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x18) = value24;
-    *reinterpret_cast<f32*>(self + 0x1C) = value24;
-    *reinterpret_cast<f32*>(self + 0x20) = value14;
-    self[0x10] = bits;
-    self[0x11] = bits;
-    self[0x12] = bits;
-    bits = (-((clz0 >> 5) & 1)) & 0x3F;
+
+    *reinterpret_cast<f32*>(self + 0x18) = origin;
+    *reinterpret_cast<f32*>(self + 0x1C) = origin;
+    *reinterpret_cast<f32*>(self + 0x20) = ndcMin;
+
+    self[0x10] = mask & -bit;
+    self[0x11] = mask & -bit;
+    self[0x12] = mask & -bit;
     self[0x13] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x24) = value24;
-    *reinterpret_cast<f32*>(self + 0x28) = value24;
-    *reinterpret_cast<f32*>(self + 0x2C) = value14;
-    self[0x14] = bits;
-    self[0x15] = bits;
-    self[0x16] = bits;
+
+    *reinterpret_cast<f32*>(self + 0x24) = origin;
+    *reinterpret_cast<f32*>(self + 0x28) = origin;
+    *reinterpret_cast<f32*>(self + 0x2C) = ndcMin;
+
+    self[0x14] = mask & negBit;
+    self[0x15] = mask & negBit;
+    self[0x16] = mask & negBit;
     self[0x17] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x30) = value24;
-    *reinterpret_cast<f32*>(self + 0x34) = value24;
-    *reinterpret_cast<f32*>(self + 0x38) = value14;
+
+    *reinterpret_cast<f32*>(self + 0x30) = origin;
+    *reinterpret_cast<f32*>(self + 0x34) = origin;
+    *reinterpret_cast<f32*>(self + 0x38) = ndcMin;
 }
 
 /*

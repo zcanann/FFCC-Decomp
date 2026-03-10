@@ -198,9 +198,9 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
             }
         }
 
-        u32 dataValIndex = param_2->m_dataValIndex;
-        if (dataValIndex != 0xFFFFU) {
-            long* animData = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+        if (param_2->m_dataValIndex != 0xFFFF) {
+            long* animData =
+                **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
             pppCalcFrameShape__FPlRsRsRss(
                 animData,
                 *(short*)(work + 0), *(short*)(work + 2), *(short*)(work + 4), param_2->m_initWOrk);

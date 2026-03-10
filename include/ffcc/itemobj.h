@@ -38,9 +38,9 @@ public:
 	void loadModel();
 	void onNewFinished();
 	void DrawOmoideName(CFont*);
-	void ItemJump(int, float);
-	void DeleteAllFieldItem();
-	void DispAllFieldItem(int);
+	static void ItemJump(int, float);
+	static void DeleteAllFieldItem();
+	static void DispAllFieldItem(int);
 	int GetCID();
 };
 

@@ -713,7 +713,6 @@ extern void __unexpected(CatchInfo* catchinfo)
 			throw std::bad_exception();
 		}
 	}
-	std::unexpected();
 	std::terminate();
 }
 

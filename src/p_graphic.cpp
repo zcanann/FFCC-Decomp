@@ -46,8 +46,9 @@ u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
     0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
 };
 
-extern void* __vt__8CManager;
 extern "C" void* __vt__11CGraphicPcs[];
+extern "C" char __vt__8CManager[];
+extern "C" char __vt_CProcess[];
 extern int DAT_802381a0;
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
@@ -72,42 +73,41 @@ static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
  */
 extern "C" void __sinit_p_graphic_cpp(void)
 {
-    volatile void** base = (volatile void**)&GraphicsPcs;
-    *base = &__vt__8CManager;
-    *base = &__vt__8CProcess;
-    *base = __vt__11CGraphicPcs;
+    *reinterpret_cast<void**>(&GraphicsPcs) = __vt__8CManager;
+    *reinterpret_cast<void**>(&GraphicsPcs) = __vt_CProcess;
+    *reinterpret_cast<void**>(&GraphicsPcs) = __vt__11CGraphicPcs;
 
-    u32* dst = m_table__11CGraphicPcs;
-    dst[1] = m_table_desc0__11CGraphicPcs[0];
-    dst[2] = m_table_desc0__11CGraphicPcs[1];
-    dst[3] = m_table_desc0__11CGraphicPcs[2];
-    dst[4] = m_table_desc1__11CGraphicPcs[0];
-    dst[5] = m_table_desc1__11CGraphicPcs[1];
-    dst[6] = m_table_desc1__11CGraphicPcs[2];
-    dst[7] = m_table_desc2__11CGraphicPcs[0];
-    dst[8] = m_table_desc2__11CGraphicPcs[1];
-    dst[9] = m_table_desc2__11CGraphicPcs[2];
-    dst[12] = m_table_desc3__11CGraphicPcs[0];
-    dst[13] = m_table_desc3__11CGraphicPcs[1];
-    dst[14] = m_table_desc3__11CGraphicPcs[2];
-    dst[17] = m_table_desc4__11CGraphicPcs[0];
-    dst[18] = m_table_desc4__11CGraphicPcs[1];
-    dst[19] = m_table_desc4__11CGraphicPcs[2];
-    dst[22] = m_table_desc5__11CGraphicPcs[0];
-    dst[23] = m_table_desc5__11CGraphicPcs[1];
-    dst[24] = m_table_desc5__11CGraphicPcs[2];
-    dst[27] = m_table_desc6__11CGraphicPcs[0];
-    dst[28] = m_table_desc6__11CGraphicPcs[1];
-    dst[29] = m_table_desc6__11CGraphicPcs[2];
-    dst[32] = m_table_desc7__11CGraphicPcs[0];
-    dst[33] = m_table_desc7__11CGraphicPcs[1];
-    dst[34] = m_table_desc7__11CGraphicPcs[2];
-    dst[37] = m_table_desc8__11CGraphicPcs[0];
-    dst[38] = m_table_desc8__11CGraphicPcs[1];
-    dst[39] = m_table_desc8__11CGraphicPcs[2];
-    dst[42] = m_table_desc9__11CGraphicPcs[0];
-    dst[43] = m_table_desc9__11CGraphicPcs[1];
-    dst[44] = m_table_desc9__11CGraphicPcs[2];
+    u32* table = &m_table__11CGraphicPcs[1];
+    table[0] = m_table_desc0__11CGraphicPcs[0];
+    table[1] = m_table_desc0__11CGraphicPcs[1];
+    table[2] = m_table_desc0__11CGraphicPcs[2];
+    table[3] = m_table_desc1__11CGraphicPcs[0];
+    table[4] = m_table_desc1__11CGraphicPcs[1];
+    table[5] = m_table_desc1__11CGraphicPcs[2];
+    table[6] = m_table_desc2__11CGraphicPcs[0];
+    table[7] = m_table_desc2__11CGraphicPcs[1];
+    table[8] = m_table_desc2__11CGraphicPcs[2];
+    table[11] = m_table_desc3__11CGraphicPcs[0];
+    table[12] = m_table_desc3__11CGraphicPcs[1];
+    table[13] = m_table_desc3__11CGraphicPcs[2];
+    table[16] = m_table_desc4__11CGraphicPcs[0];
+    table[17] = m_table_desc4__11CGraphicPcs[1];
+    table[18] = m_table_desc4__11CGraphicPcs[2];
+    table[21] = m_table_desc5__11CGraphicPcs[0];
+    table[22] = m_table_desc5__11CGraphicPcs[1];
+    table[23] = m_table_desc5__11CGraphicPcs[2];
+    table[26] = m_table_desc6__11CGraphicPcs[0];
+    table[27] = m_table_desc6__11CGraphicPcs[1];
+    table[28] = m_table_desc6__11CGraphicPcs[2];
+    table[31] = m_table_desc7__11CGraphicPcs[0];
+    table[32] = m_table_desc7__11CGraphicPcs[1];
+    table[33] = m_table_desc7__11CGraphicPcs[2];
+    table[36] = m_table_desc8__11CGraphicPcs[0];
+    table[37] = m_table_desc8__11CGraphicPcs[1];
+    table[38] = m_table_desc8__11CGraphicPcs[2];
+    table[41] = m_table_desc9__11CGraphicPcs[0];
+    table[42] = m_table_desc9__11CGraphicPcs[1];
+    table[43] = m_table_desc9__11CGraphicPcs[2];
 }
 
 /*

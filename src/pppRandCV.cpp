@@ -56,12 +56,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = params->colorOffset;
-    // Note to agent: Stop fucking trashing on this. Yes you can ternary this for extab gains, but then you lose code match. Then the next agent comes in and undoes that. Infinite loop. Fucking figure out how to get to 100% code before touching extab.
-    if (colorOffset == -1) {
-        targetColor = &gPppDefaultValueBuffer[0];
-    } else {
-        targetColor = base + colorOffset + 0x80;
-    }
+    targetColor = (colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + colorOffset + 0x80);
 
     f32 scale = *randomValue;
     targetColor[0] = (u8)(targetColor[0] + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]));

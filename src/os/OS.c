@@ -15,6 +15,7 @@
 // external functions
 extern void EnableMetroTRKInterrupts(void);
 extern void __OSInitMemoryProtection(void);
+extern BOOL __DBIsExceptionMarked(__OSException exception);
 
 #define DB_EXCEPTIONRET_OFFSET 0xC
 #define DB_EXCEPTIONDEST_OFFSET 0x8
@@ -53,8 +54,8 @@ extern u32 __PADSpec;
 extern u8 __ArenaLo[];
 extern char _stack_addr[];
 extern u8 __ArenaHi[];
-extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
-extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
+extern u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
+extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 
 static OSBootInfo* BootInfo;
 static u32* BI2DebugFlag;
@@ -197,9 +198,6 @@ u32 OSGetConsoleType(void) {
 #define NULL 0
 
 static void ClearArena(void) {
-    void* savedRegionStart;
-    void* savedRegionEnd;
-
     if ((OSGetResetCode() + 0x80000000) != 0) {
         __OSSavedRegionStart = NULL;
         __OSSavedRegionEnd = NULL;
@@ -207,13 +205,9 @@ static void ClearArena(void) {
         return;
     }
 
-    savedRegionStart = (void*)BOOT_REGION_START;
-    savedRegionEnd = (void*)BOOT_REGION_END;
-
-    __OSSavedRegionStart = savedRegionStart;
-    __OSSavedRegionEnd = savedRegionEnd;
-
-    if (savedRegionStart == NULL) {
+    __OSSavedRegionStart = (void*)BOOT_REGION_START;
+    __OSSavedRegionEnd = (void*)BOOT_REGION_END;
+    if (*(u32*)&BOOT_REGION_START == 0U) {
         memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
         return;
     }
@@ -433,21 +427,19 @@ static void OSExceptionInit(void) {
     
     // Copy the right vector into the table
     for (exception = 0; exception < __OS_EXCEPTION_MAX; exception++) {
-        __OSException exceptionNumber = exception;
-
-        if (BI2DebugFlag && (*BI2DebugFlag >= 2) && __DBIsExceptionMarked(exceptionNumber)) {
+        if (BI2DebugFlag && (*BI2DebugFlag >= 2) && __DBIsExceptionMarked(exception)) {
             // this DBPrintf is suspicious.
-            DBPrintf(">>> OSINIT: exception %d commandeered by TRK\n", exceptionNumber);
+            DBPrintf(">>> OSINIT: exception %d commandeered by TRK\n", exception);
             continue;
         }
         
         // Modify the copy of code in text before transferring
         // to the exception table.
-        *opCodeAddr = oldOpCode | exceptionNumber;
+        *opCodeAddr = oldOpCode | exception;
         
         // Modify opcodes at __DBVECTOR if necessary
-        if (__DBIsExceptionMarked(exceptionNumber)) {
-            DBPrintf(">>> OSINIT: exception %d vectored to debugger\n", exceptionNumber);
+        if (__DBIsExceptionMarked(exception)) {
+            DBPrintf(">>> OSINIT: exception %d vectored to debugger\n", exception);
             memcpy((void*)__DBVECTOR, (void*)__OSDBJUMPSTART, (u32)__OSDBJUMPEND - (u32)__OSDBJUMPSTART);
         } else {
             // make sure the opcodes are still nop

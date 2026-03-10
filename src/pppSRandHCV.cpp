@@ -94,7 +94,6 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		}
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
-	// Note to agent: Stop fucking trashing on this. Yes you can ternary this for extab gains, but then you lose code match. Then the next agent comes in and undoes that. Infinite loop. Fucking figure out how to get to 100% code before touching extab.
 	s16* target_colors;
 	if (in->field4 == -1) {
 		target_colors = &gPppDefaultValueBuffer[0];

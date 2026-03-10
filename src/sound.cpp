@@ -2431,7 +2431,7 @@ void CSound::AddNoFreeSeGroup(int group)
     }
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, "%s", 0);
+        Printf__7CSystemFPce(&System, "%s");
     }
 }
 
@@ -2458,7 +2458,7 @@ void CSound::AddNoFreeWave(int wave)
     }
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, "%s", 0);
+        Printf__7CSystemFPce(&System, "%s");
     }
 }
 

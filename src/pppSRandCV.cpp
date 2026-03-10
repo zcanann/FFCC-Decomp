@@ -94,12 +94,8 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
-    u8* target_colors;
-    if (in->field4 == -1) {
-        target_colors = &gPppDefaultValueBuffer[0];
-    } else {
-        target_colors = base + in->field4 + 0x80;
-    }
+    s32 color_offset = in->field4;
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
 
     target_colors[0] = (u8)(target_colors[0] + (s8)((float)in->field8 * target[0] - (float)in->field8));
     target_colors[1] = (u8)(target_colors[1] + (s8)((float)in->field9 * target[1] - (float)in->field9));

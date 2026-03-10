@@ -135,30 +135,20 @@ void oddToEven(float&)
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
-	struct WorkState {
-		u32 m_data0;
-		u32 m_data1;
-		u32 m_data2;
-		u16 m_angle;
-		u8 m_direction;
-		u8 m_pad;
-		float m_values[6];
-	};
-
 	float value = kPppYmDeformationShpZero;
-	WorkState* state = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	u32* state = (u32*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	state->m_data0 = 0;
-	state->m_data1 = 0;
-	state->m_data2 = 0;
-	state->m_angle = 0;
-	state->m_direction = 1;
-	state->m_values[2] = value;
-	state->m_values[1] = value;
-	state->m_values[0] = value;
-	state->m_values[5] = value;
-	state->m_values[4] = value;
-	state->m_values[3] = value;
+	state[0] = 0;
+	state[1] = 0;
+	state[2] = 0;
+	*(u16*)(state + 3) = 0;
+	*(u8*)((u8*)state + 0xe) = 1;
+	((f32*)state)[6] = value;
+	((f32*)state)[5] = value;
+	((f32*)state)[4] = value;
+	((f32*)state)[9] = value;
+	((f32*)state)[8] = value;
+	((f32*)state)[7] = value;
 }
 
 /*

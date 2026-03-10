@@ -71,10 +71,7 @@ extern "C" void __sinit_p_dbgmenu_cpp()
 {
 	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__11CDbgMenuPcs);
 
-	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt__8CManager;
-	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt_CProcess;
 	*(u32*)((u8*)&MiniGamePcs + 0x6480) = (u32)&PTR_PTR_s_CDbgMenuPcs_802126c4;
-	*reinterpret_cast<u32*>(&DbgMenuPcs) = reinterpret_cast<u32>(&PTR_PTR_s_CDbgMenuPcs_802126c4);
 	memset((u8*)&DbgMenuPcs + 8, 0, 0x34);
 	memset((u8*)&DbgMenuPcs + 0x3C, 0, 0x20);
 	__construct_array((u8*)&DbgMenuPcs + 0x54, __ct__Q211CDbgMenuPcs3CDMFv, 0, 0x54, 0x80);

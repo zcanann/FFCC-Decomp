@@ -30,6 +30,7 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 
+extern float FLOAT_80333000;
 extern float FLOAT_80332ff8;
 extern double DOUBLE_80333008;
 
@@ -205,48 +206,54 @@ void CMenuPcs::CompaInit0()
  */
 bool CMenuPcs::CompaOpen()
 {
-	int count;
+	float zero;
+	double one;
+	short* anim;
 	int finished;
+	int count;
 	int currentTime;
 	int remaining;
-	CompaOpenAnim* anim;
-	short* compaState = reinterpret_cast<short*>(this->compaMenuState);
+	CompaMenuState* compaState = this->compaMenuState;
 	short* compaList = this->compaList;
 
-	if (*(char*)((int)compaState + 0xB) == '\0') {
+	if (compaState->initialized == '\0') {
 		CompaInit();
 	}
 
 	finished = 0;
-	compaState[0x11] = compaState[0x11] + 1;
+	compaState->frame = compaState->frame + 1;
 	count = (int)*compaList;
-	anim = (CompaOpenAnim*)(compaList + 4);
-	currentTime = (int)compaState[0x11];
+	anim = compaList + 4;
+	currentTime = (int)compaState->frame;
 	remaining = count;
 
 	if (0 < count) {
 		do {
-			float zero = FLOAT_80332ff8;
-			if (anim->startFrame <= currentTime) {
-				if (currentTime < anim->startFrame + anim->duration) {
-					double one = DOUBLE_80333008;
-
-					anim->frame = anim->frame + 1;
-					anim->progress = (float)((one / (double)anim->duration) * (double)anim->frame);
-					if ((anim->flags & 2) == 0) {
-						float t = (float)((one / (double)anim->duration) * (double)anim->frame);
-						anim->dx = (anim->targetX - (float)anim->x) * t;
-						anim->dy = (anim->targetY - (float)anim->y) * t;
+			zero = FLOAT_80332ff8;
+			if (*reinterpret_cast<int*>(anim + 0x12) <= currentTime) {
+				if (currentTime < *reinterpret_cast<int*>(anim + 0x12) + *reinterpret_cast<int*>(anim + 0x14)) {
+					*reinterpret_cast<int*>(anim + 0x10) = *reinterpret_cast<int*>(anim + 0x10) + 1;
+					one = DOUBLE_80333008;
+					*reinterpret_cast<float*>(anim + 8) =
+						(float)((DOUBLE_80333008 / (double)*reinterpret_cast<int*>(anim + 0x14)) *
+							(double)*reinterpret_cast<int*>(anim + 0x10));
+					if ((*reinterpret_cast<unsigned int*>(anim + 0x16) & 2) == 0) {
+						zero = (float)((one / (double)*reinterpret_cast<int*>(anim + 0x14)) *
+							(double)*reinterpret_cast<int*>(anim + 0x10));
+						*reinterpret_cast<float*>(anim + 0x18) =
+							(*reinterpret_cast<float*>(anim + 0x1c) - (float)*anim) * zero;
+						*reinterpret_cast<float*>(anim + 0x1a) =
+							(*reinterpret_cast<float*>(anim + 0x1e) - (float)anim[1]) * zero;
 					}
 				} else {
-					finished = finished + 1;
-					anim->progress = (float)DOUBLE_80333008;
-					anim->dx = zero;
-					anim->dy = zero;
+					finished += 1;
+					*reinterpret_cast<float*>(anim + 8) = FLOAT_80333000;
+					*reinterpret_cast<float*>(anim + 0x18) = zero;
+					*reinterpret_cast<float*>(anim + 0x1a) = zero;
 				}
 			}
-			anim = anim + 1;
-			remaining = remaining - 1;
+			anim += 0x20;
+			remaining += -1;
 		} while (remaining != 0);
 	}
 

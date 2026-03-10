@@ -74,6 +74,7 @@ int gRedCommandHandlerTable[] = {
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 int DataAddCompute(int* current, int target, int* delta)
 {
     int value = *current;

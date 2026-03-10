@@ -248,11 +248,10 @@ void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
     int y = in.y;
     int z = in.z;
     int scale = 1 << shift;
-    float fScale = (float)scale;
 
-    out.x = (float)x / fScale;
-    out.y = (float)y / fScale;
-    out.z = (float)z / fScale;
+    out.x = (float)x / (float)scale;
+    out.y = (float)y / (float)scale;
+    out.z = (float)z / (float)scale;
 }
 
 /*

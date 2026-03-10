@@ -441,17 +441,20 @@ void CMapAnimNode::Interp(int frame)
     if (track->count == 1) {
         *reinterpret_cast<Vec*>(target + 0x64) = keys[0].value;
     } else {
+        unsigned int trackCount = track->count;
         CMapAnimNodeTrackKey* current = keys;
-        for (unsigned int i = 0; i < track->count; i++, current++) {
+        for (unsigned int i = 0, remaining = trackCount; remaining != 0; remaining--) {
             unsigned int nextIndex = i + 1;
-            if (nextIndex >= track->count) {
+            if (trackCount <= nextIndex) {
                 nextIndex = 0;
             }
 
             CMapAnimNodeTrackKey* next = keys + nextIndex;
-            unsigned int endFrame = next->frame;
+            unsigned int endFrame;
             if (nextIndex == 0) {
-                endFrame += loopFrameCount;
+                endFrame = next->frame + loopFrameCount;
+            } else {
+                endFrame = next->frame;
             }
 
             if ((current->frame <= frameInLoop) && (frameInLoop < endFrame)) {
@@ -469,6 +472,8 @@ void CMapAnimNode::Interp(int frame)
                 PSVECAdd(&currentScaled, &nextScaled, reinterpret_cast<Vec*>(target + 0x64));
                 break;
             }
+            current++;
+            i++;
         }
     }
 
@@ -477,17 +482,20 @@ void CMapAnimNode::Interp(int frame)
     if (track->count == 1) {
         *reinterpret_cast<Vec*>(target + 0x70) = keys[0].value;
     } else {
+        unsigned int trackCount = track->count;
         CMapAnimNodeTrackKey* current = keys;
-        for (unsigned int i = 0; i < track->count; i++, current++) {
+        for (unsigned int i = 0, remaining = trackCount; remaining != 0; remaining--) {
             unsigned int nextIndex = i + 1;
-            if (nextIndex >= track->count) {
+            if (trackCount <= nextIndex) {
                 nextIndex = 0;
             }
 
             CMapAnimNodeTrackKey* next = keys + nextIndex;
-            unsigned int endFrame = next->frame;
+            unsigned int endFrame;
             if (nextIndex == 0) {
-                endFrame += loopFrameCount;
+                endFrame = ((*reinterpret_cast<int*>(run + 0x20)) - (*reinterpret_cast<int*>(run + 0x1C))) + next->frame + 1;
+            } else {
+                endFrame = next->frame;
             }
 
             if ((current->frame <= frameInLoop) && (frameInLoop < endFrame)) {
@@ -505,6 +513,8 @@ void CMapAnimNode::Interp(int frame)
                 PSVECAdd(&currentScaled, &nextScaled, reinterpret_cast<Vec*>(target + 0x70));
                 break;
             }
+            current++;
+            i++;
         }
     }
 
@@ -513,17 +523,20 @@ void CMapAnimNode::Interp(int frame)
     if (track->count == 1) {
         *reinterpret_cast<Vec*>(target + 0x7C) = keys[0].value;
     } else {
+        unsigned int trackCount = track->count;
         CMapAnimNodeTrackKey* current = keys;
-        for (unsigned int i = 0; i < track->count; i++, current++) {
+        for (unsigned int i = 0, remaining = trackCount; remaining != 0; remaining--) {
             unsigned int nextIndex = i + 1;
-            if (nextIndex >= track->count) {
+            if (trackCount <= nextIndex) {
                 nextIndex = 0;
             }
 
             CMapAnimNodeTrackKey* next = keys + nextIndex;
-            unsigned int endFrame = next->frame;
+            unsigned int endFrame;
             if (nextIndex == 0) {
-                endFrame += loopFrameCount;
+                endFrame = ((*reinterpret_cast<int*>(run + 0x20)) - (*reinterpret_cast<int*>(run + 0x1C))) + next->frame + 1;
+            } else {
+                endFrame = next->frame;
             }
 
             if ((current->frame <= frameInLoop) && (frameInLoop < endFrame)) {
@@ -541,6 +554,8 @@ void CMapAnimNode::Interp(int frame)
                 PSVECAdd(&currentScaled, &nextScaled, reinterpret_cast<Vec*>(target + 0x7C));
                 break;
             }
+            current++;
+            i++;
         }
     }
 

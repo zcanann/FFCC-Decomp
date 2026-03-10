@@ -312,7 +312,7 @@ void CMenuPcs::FavoInit0()
 	*(int *)(iVar2 + 0x230) = 5;
 	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x274) = 2;
-	fVar1 = 0.0f;
+	fVar1 = FLOAT_80333048;
 	*(int *)(iVar2 + 0x26c) = 0;
 	*(int *)(iVar2 + 0x270) = 5;
 	iVar2 = (int)favoList;

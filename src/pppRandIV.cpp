@@ -36,17 +36,17 @@ struct PppRandIVParam3 {
  */
 void pppRandIV(void* param1, void* param2, void* param3)
 {
-    u8* base = (u8*)param1;
-    PppRandIVParam2* in = (PppRandIVParam2*)param2;
-    PppRandIVParam3* out = (PppRandIVParam3*)param3;
-    s32* target;
-    f32* valuePtr;
-
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    if (in->field0 == *(s32*)(base + 0xC)) {
+    u8* base = (u8*)param1;
+    PppRandIVParam3* out = (PppRandIVParam3*)param3;
+    PppRandIVParam2* in = (PppRandIVParam2*)param2;
+    f32* valuePtr;
+
+    s32 state = *(s32*)(base + 0xC);
+    if (in->field0 == state) {
         f32 value = RandF__5CMathFv(&Math);
         if (in->field18 != 0) {
             value += RandF__5CMathFv(&Math);
@@ -56,18 +56,18 @@ void pppRandIV(void* param1, void* param2, void* param3)
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
-    } else if (in->field0 != *(s32*)(base + 0xC)) {
+    } else if (in->field0 != state) {
         return;
     } else {
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
-    
-    target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s32*)(base + in->field4 + 0x80);
 
-    {
-        f32 randValue = *valuePtr;
-        target[0] += (s32)((f32)in->field8 * randValue - (f32)in->field8);
-        target[1] += (s32)((f32)in->fieldC * randValue - (f32)in->fieldC);
-        target[2] += (s32)((f32)in->field10 * randValue - (f32)in->field10);
-    }
+    s32* target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s32*)(base + in->field4 + 0x80);
+    f32 scale = *valuePtr;
+    f32 value = (f32)in->field8;
+    target[0] = target[0] + (s32)(value * scale - value);
+    value = (f32)in->fieldC;
+    target[1] = target[1] + (s32)(value * scale - value);
+    value = (f32)in->field10;
+    target[2] = target[2] + (s32)(value * scale - value);
 }

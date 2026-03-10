@@ -81,6 +81,8 @@ struct POLYGON_DATA {
     u16 m_texIndices[3];
 };
 
+static const Vec kCharaBreakUp = {0.0f, 1.0f, 0.0f};
+
 /*
  * --INFO--
  * PAL Address: 0x80140F18
@@ -343,14 +345,13 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     S16Vec* workNormals = *(S16Vec**)((u8*)mesh + 4);
     u8* modelData = *(u8**)((u8*)model + 0xA4);
     u32 normQuant = *(u32*)(modelData + 0x38);
-    Vec up;
-    up.x = FLOAT_80332048;
-    up.y = FLOAT_8033204c;
-    up.z = FLOAT_80332048;
+    double zero = (double)FLOAT_80332048;
 
     for (u32 i = 0; i < polygonCount; i++) {
+        Vec up = kCharaBreakUp;
         Vec normal;
         Vec tangent;
+        Vec normalVec;
 
         int alpha = (int)breakData[0x34] + rand() % breakData[0x35];
         if (alpha > 0xFF) {
@@ -366,22 +367,47 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         }
 
         if (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x54) == 0) {
+            u32 randValue;
+            float scale;
+
             normal.x = RandF__5CMathFf(FLOAT_8033204c, &Math);
             normal.y = RandF__5CMathFf(FLOAT_8033204c, &Math);
             normal.z = RandF__5CMathFf(FLOAT_8033204c, &Math);
-            normal.x *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.y *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.z *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
+
+            scale = FLOAT_80332078;
+            randValue = rand();
+            if (((randValue & 1) ^ (randValue >> 31)) != (randValue >> 31)) {
+                scale = FLOAT_8033204c;
+            }
+            normal.x *= scale;
+
+            scale = FLOAT_80332078;
+            randValue = rand();
+            if (((randValue & 1) ^ (randValue >> 31)) != (randValue >> 31)) {
+                scale = FLOAT_8033204c;
+            }
+            normal.y *= scale;
+
+            scale = FLOAT_80332078;
+            randValue = rand();
+            if (((randValue & 1) ^ (randValue >> 31)) != (randValue >> 31)) {
+                scale = FLOAT_8033204c;
+            }
+            normal.z *= scale;
+
             PSVECNormalize(&normal, &normal);
-            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, &polygonData->m_normalA, &normal, normQuant);
+            normalVec = normal;
+            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, &polygonData->m_normalA, &normalVec, normQuant);
         } else {
-            polygonData->m_normalA = workNormals[polygonData->m_nrmIndices[0]];
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normal, &polygonData->m_normalA, normQuant);
+            S16Vec* workNormal = workNormals + polygonData->m_nrmIndices[0];
+
+            polygonData->m_normalA = *workNormal;
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normalVec, &polygonData->m_normalA, normQuant);
         }
 
-        PSVECCrossProduct(&up, &normal, &tangent);
+        PSVECCrossProduct(&up, &normalVec, &tangent);
         float tangentMag = PSVECMag(&tangent);
-        if (tangentMag == FLOAT_80332048) {
+        if ((double)tangentMag == zero) {
             tangent.x = FLOAT_80332048;
             tangent.y = FLOAT_80332048;
             tangent.z = FLOAT_80332048;
@@ -389,16 +415,17 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
         }
 
-        if (tangent.x == FLOAT_80332048 && tangent.y == FLOAT_80332048 && tangent.z == FLOAT_80332048) {
+        if ((double)tangent.x == zero && (double)tangent.y == zero && (double)tangent.z == zero) {
             tangent.x = FLOAT_8033204c;
             tangent.y = FLOAT_80332048;
             tangent.z = FLOAT_80332048;
         }
 
-        if (breakData[0x40] == 1) {
-            polygonData->m_normalA.x = 0;
-            polygonData->m_normalA.y = (rand() & 1);
+        if (breakData[0x40] != 0 && breakData[0x40] == 1) {
             polygonData->m_normalA.z = 0;
+            polygonData->m_normalA.y = 0;
+            polygonData->m_normalA.x = 0;
+            polygonData->m_normalA.y = rand() & 1;
         }
 
         ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, &polygonData->m_normalB, &tangent, normQuant);

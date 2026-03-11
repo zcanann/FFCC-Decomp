@@ -225,9 +225,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_54[1][3] = local_60.y;
 		local_54[2][3] = local_60.z;
 
-		local_6c.x = local_60.x;
-		local_6c.y = local_60.y;
-		local_6c.z = local_60.z;
+		local_6c = local_60;
 
 		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBase + 0x20), &local_6c);
 

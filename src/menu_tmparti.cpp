@@ -4,6 +4,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/color.h"
+#include "ffcc/linkage.h"
 #include <string.h>
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -516,7 +517,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 void CMenuPcs::TmpArtiDraw()
 {
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
 	short* entry = (short*)(GetTmpArtiListBase(this) + 8);
@@ -539,12 +540,12 @@ void CMenuPcs::TmpArtiDraw()
 				alpha = 0.5f * alpha;
 			}
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
 			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(255.0f * alpha));
 			GXSetChanMatColor(GX_COLOR0A0, color.color);
 
-			DrawRect__8CMenuPcsFUlfffffffff(this, 0, left, top, width, height, s, t, z, z, 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, 0.0f);
 		}
 		foodPtr += 2;
 		entry += 0x20;
@@ -604,4 +605,3 @@ void CMenuPcs::TmpArtiCtrlCur()
 {
 	// TODO
 }
-

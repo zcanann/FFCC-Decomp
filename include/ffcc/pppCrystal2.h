@@ -1,25 +1,33 @@
 #ifndef _FFCC_PPPCRYSTAL2_H_
 #define _FFCC_PPPCRYSTAL2_H_
 
+#include "ffcc/partMng.h"
+
+#include <dolphin/gx.h>
 #include <dolphin/types.h>
 
 struct HSD_ImageBuffer;
 
+struct Crystal2RefractionMap {
+    void* m_imageData;
+    GXTexFmt m_format;
+    s32 m_width;
+    s32 m_height;
+    s32 m_imageCount;
+    s32 m_bufferSize;
+};
+
+struct Crystal2Work {
+    Crystal2RefractionMap* m_refractionMap;
+    GXTexObj* m_refractionTexObj;
+};
+
 // Forward declarations
 struct pppCrystal2 {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
-    
-    // Add padding/fields up to the offsets we need
-    char pad[0x3C];      // 0x40 - 0x4 = 0x3C bytes
-    void* field_0x40;    // pppFMATRIX
-    char pad2[0x40];     // 0x84 - 0x40 - 4 = 0x40 bytes
-    void* field_0x84;    // texture object area
-    void* field_0x88;    // vector area (immediately after field_0x84)
+    _pppPObject m_object; // 0x0
+    u8 m_pad34[0x50];
+    u8 m_workData[4];
+    u8 m_color[4];
 };
 
 struct pppCrystal2UnkB {

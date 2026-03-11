@@ -12,7 +12,7 @@ struct RedNoteDATA;
 struct RedSoundCONTROL;
 struct RedKeyOnDATA;
 
-u8 GetRandomData();
+u32 GetRandomData();
 int PitchCompute(int, int, int, int);
 void _ReverbNullCallback(AXFX_BUFFERUPDATE*, void*);
 void ReverbAreaAlloc(unsigned long);

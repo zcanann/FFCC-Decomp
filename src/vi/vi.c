@@ -213,16 +213,6 @@ static void __VIRetraceHandler(__OSInterrupt unused, OSContext* context) {
     reg = __VIRegs[0x1E];
 
     if ((inter & 4) || (inter & 8)) {
-        OSClearContext(&exceptionContext);
-        OSSetCurrentContext(&exceptionContext);
-
-        if (PositionCallback != 0) {
-            s16 x, y;
-            __VIGetCurrentPosition(&x, &y);
-            (*PositionCallback)(x, y);
-        }
-
-        OSClearContext(&exceptionContext);
         OSSetCurrentContext(context);
         return;
     }

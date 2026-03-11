@@ -325,7 +325,6 @@ int PADReset(u32 mask) {
     ResettingBits |= mask;
     disableBits = ResettingBits & EnabledBits;
     EnabledBits &= ~mask;
-    BarrelBits &= ~mask;
     if (Spec == PAD_SPEC_4) {
         RecalibrateBits |= mask;
     }

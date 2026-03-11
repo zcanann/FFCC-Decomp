@@ -296,8 +296,9 @@ void CCaravanWork::LoadFinished()
 		return;
 	}
 
+	CGame* game = (CGame*)&Game;
 	m_baseDataIndex = (m_id / 100) - 1;
-	m_romWorkPtr = reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
+	m_romWorkPtr = reinterpret_cast<unsigned short*>(game->unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
 }
 
 /*

@@ -36,12 +36,12 @@ public:
 	void SeSepHistoryDelete(int);
 	void SeSepHistoryChoice(RedHistoryBANK*);
 	int SearchSeSepSequence(int);
-	void SeSepMemoryFree(RedHistoryBANK*);
-	void SeSepOldDelete();
-	void SeSepHeadAdd(RedSeSepHEAD*);
-	void SetSeSepData(RedSeSepHEAD*);
-	void ClearSeSepData(int);
-	void ClearSeSepDataMG(int, int, int, int);
+	int SeSepMemoryFree(RedHistoryBANK*);
+	unsigned int SeSepOldDelete();
+	int SeSepHeadAdd(RedSeSepHEAD*);
+	int SetSeSepData(RedSeSepHEAD*);
+	int ClearSeSepData(int);
+	int ClearSeSepDataMG(int, int, int, int);
 	int* SearchSeSepBank(int);
 	int ReentrySeSepData(int);
 	void SeSepHistoryManager(int, int);
@@ -57,9 +57,14 @@ public:
 	int* SearchMusicBank(int);
 	int ReentryMusicData(int);
 	void MusicHistoryManager(int, int);
-	void MusicHeadAdd(RedMusicHEAD*);
-	void SetMusicData(RedMusicHEAD*);
+	int MusicHeadAdd(RedMusicHEAD*);
+	int SetMusicData(RedMusicHEAD*);
 	void DisplayMMemoryInfo();
+
+	int m_waveBankBase;
+	int m_seSepBankBase;
+	int m_musicBankBase;
+	int m_waveHistoryIndex;
 };
 
 #endif // _FFCC_REDSOUND_REDENTRY_H

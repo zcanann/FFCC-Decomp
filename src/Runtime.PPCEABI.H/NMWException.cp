@@ -228,7 +228,6 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
 				CTORCALL_COMPLETE(ctor, current);
 				current = current + elementSize;
 			}
-			pdestructor.i = count;
 		}
 	}
 
@@ -256,7 +255,6 @@ extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, Constru
 		CTORCALL_COMPLETE(ctor, current);
 		current = current + elementSize;
 	}
-	pdestructor.i = count;
 }
 
 /**

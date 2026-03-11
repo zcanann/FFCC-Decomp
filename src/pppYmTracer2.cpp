@@ -35,8 +35,22 @@ struct TraceEntry {
     Vec pos;
     float pad0;
     Vec targetPos;
-    float pad1;
-    u8 flags[8];
+    u8 color[4];
+    u8 active;
+    u8 pad1[7];
+};
+
+struct TracerWork {
+    Vec pos;
+    float pad0;
+    Vec targetPos;
+    float* initWork;
+    float* arg3Work;
+    TraceEntry* entries;
+    u16 visibleCount;
+    u16 pad2e;
+    u16 alphaStep;
+    u16 pad32;
 };
 
 /*
@@ -138,7 +152,8 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    s32 useFallback;
+    _pppPObject* baseObj;
+    bool useFallback;
     float fVar2;
     s16 alpha;
     s32 iVar4;
@@ -146,11 +161,11 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     void* pWorkPtr;
     s32 iVar8;
     s16 visibleCount;
-    Vec* dest;
-    Vec* pVVar10;
     u32 i;
-    Vec* source;
-    u8* work;
+    TraceEntry* entries;
+    TraceEntry* entry;
+    TraceEntry* dest;
+    TracerWork* work;
     Vec local_a8;
     Vec local_9c;
     Vec local_90;
@@ -163,32 +178,33 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         return;
     }
 
-    useFallback = 0;
+    baseObj = (_pppPObject*)pppYmTracer2;
+    useFallback = false;
     iVar4 = param_3->m_serializedDataOffsets[1];
-    work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
+    work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
 
     if (param_2->m_initWOrk == -1) {
         pWorkPtr = gPppDefaultValueBuffer;
     } else {
         pWorkPtr = (u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue;
     }
-    *(void**)(work + 0x20) = pWorkPtr;
+    work->initWork = (float*)pWorkPtr;
 
     if (param_2->m_arg3 == -1) {
         pWorkPtr = gPppDefaultValueBuffer;
     } else {
         pWorkPtr = (u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload;
     }
-    *(void**)(work + 0x24) = pWorkPtr;
+    work->arg3Work = (float*)pWorkPtr;
 
-    if (*(u32*)(work + 0x28) == 0) {
-        useFallback = 1;
-        *(u16*)(work + 0x30) = (u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6);
-        *(void**)(work + 0x28) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+    if (work->entries == nullptr) {
+        useFallback = true;
+        work->alphaStep = (u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6);
+        work->entries = (TraceEntry*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
 
         fVar2 = FLOAT_80331840;
-        pfVar6 = *(float**)(work + 0x28);
+        pfVar6 = (float*)work->entries;
         for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar8++) {
             *(u8*)(pfVar6 + 8) = 0;
             *(u8*)((u8*)pfVar6 + 0x1f) = 0;
@@ -202,25 +218,25 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         }
     }
 
-    source = *(Vec**)(work + 0x28);
-    *(u8*)&source[2].z = 1;
-    pVVar10 = source;
+    entries = work->entries;
+    entries[0].active = 1;
+    entry = entries;
 
     for (i = 0; (s32)i < (s32)(param_2->m_payload[9] + 1); i++) {
         iVar8 = *(u16*)(param_2->m_payload + 4) - 2;
-        pfVar6 = (float*)((u8*)source + iVar8 * 0x28);
+        pfVar6 = (float*)(entries + iVar8);
 
         for (; (s32)i <= iVar8; iVar8--) {
             *(u8*)(pfVar6 + 0x12) = *(u8*)(pfVar6 + 8);
             local_a8.x = *pfVar6;
-            dest = (Vec*)((u8*)source + (iVar8 + 1) * 0x28);
+            dest = entries + (iVar8 + 1);
             local_a8.y = pfVar6[1];
             local_a8.z = pfVar6[2];
-            pppCopyVector__FR3Vec3Vec(dest, &local_a8);
+            pppCopyVector__FR3Vec3Vec(&dest->pos, &local_a8);
             local_9c.x = pfVar6[4];
             local_9c.y = pfVar6[5];
             local_9c.z = pfVar6[6];
-            pppCopyVector__FR3Vec3Vec((Vec*)&dest[1].y, &local_9c);
+            pppCopyVector__FR3Vec3Vec(&dest->targetPos, &local_9c);
             *(u8*)(pfVar6 + 0x11) = *(u8*)(pfVar6 + 7);
             *(u8*)((u8*)pfVar6 + 0x45) = *(u8*)((u8*)pfVar6 + 0x1d);
             *(u8*)((u8*)pfVar6 + 0x46) = *(u8*)((u8*)pfVar6 + 0x1e);
@@ -228,78 +244,78 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             pfVar6 -= 10;
         }
 
-        fVar2 = **(float**)(work + 0x20);
-        *(float*)work = fVar2;
-        pVVar10->x = fVar2;
-        fVar2 = *(float*)(*(s32*)(work + 0x20) + 4);
-        *(float*)(work + 4) = fVar2;
-        pVVar10->y = fVar2;
-        fVar2 = *(float*)(*(s32*)(work + 0x20) + 8);
-        *(float*)(work + 8) = fVar2;
-        pVVar10->z = fVar2;
-        fVar2 = **(float**)(work + 0x24);
-        *(float*)(work + 0x10) = fVar2;
-        pVVar10[1].y = fVar2;
-        fVar2 = *(float*)(*(s32*)(work + 0x24) + 4);
-        *(float*)(work + 0x14) = fVar2;
-        pVVar10[1].z = fVar2;
-        fVar2 = *(float*)(*(s32*)(work + 0x24) + 8);
-        *(float*)(work + 0x18) = fVar2;
-        pVVar10[2].x = fVar2;
-        *(u8*)&pVVar10[2].y = ((u8*)pppYmTracer2)[iVar4 + 0x88];
-        *((u8*)&pVVar10[2].y + 1) = ((u8*)pppYmTracer2)[iVar4 + 0x89];
-        *((u8*)&pVVar10[2].y + 2) = ((u8*)pppYmTracer2)[iVar4 + 0x8A];
+        fVar2 = work->initWork[0];
+        work->pos.x = fVar2;
+        entry->pos.x = fVar2;
+        fVar2 = work->initWork[1];
+        work->pos.y = fVar2;
+        entry->pos.y = fVar2;
+        fVar2 = work->initWork[2];
+        work->pos.z = fVar2;
+        entry->pos.z = fVar2;
+        fVar2 = work->arg3Work[0];
+        work->targetPos.x = fVar2;
+        entry->targetPos.x = fVar2;
+        fVar2 = work->arg3Work[1];
+        work->targetPos.y = fVar2;
+        entry->targetPos.y = fVar2;
+        fVar2 = work->arg3Work[2];
+        work->targetPos.z = fVar2;
+        entry->targetPos.z = fVar2;
+        entry->color[0] = ((u8*)pppYmTracer2)[iVar4 + 0x88];
+        entry->color[1] = ((u8*)pppYmTracer2)[iVar4 + 0x89];
+        entry->color[2] = ((u8*)pppYmTracer2)[iVar4 + 0x8A];
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
-            PSMTXMultVec(MStack_78, source, source);
-            PSMTXMultVec(MStack_78, (Vec*)&source[1].y, (Vec*)&source[1].y);
-        } else if (useFallback == 0) {
+            PSMTXConcat(pppMngStPtr->m_matrix.value, baseObj->m_localMatrix.value, MStack_78);
+            PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
+            PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
+        } else if (!useFallback) {
             uStack_3c = i ^ 0x80000000;
             uStack_44 = (param_2->m_payload[9] + 1) ^ 0x80000000;
             if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(
                     (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
                         (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858),
                     pppMngStPtr, MStack_78) == 0) {
-                useFallback = 1;
+                useFallback = true;
             } else {
-                PSMTXConcat(MStack_78, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
-                PSMTXMultVec(MStack_78, pVVar10, pVVar10);
-                PSMTXMultVec(MStack_78, (Vec*)&pVVar10[1].y, (Vec*)&pVVar10[1].y);
+                PSMTXConcat(MStack_78, baseObj->m_localMatrix.value, MStack_78);
+                PSMTXMultVec(MStack_78, &entry->pos, &entry->pos);
+                PSMTXMultVec(MStack_78, &entry->targetPos, &entry->targetPos);
             }
         }
 
-        pVVar10 = (Vec*)&pVVar10[3].y;
+        entry++;
     }
 
-    if (useFallback != 0) {
-        Vec* pFallback = source;
+    if (useFallback) {
+        TraceEntry* pFallback = entries;
 
         for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
-            local_84.x = source->x;
-            local_84.y = source->y;
-            local_84.z = source->z;
-            pppCopyVector__FR3Vec3Vec(pFallback, &local_84);
-            local_90.x = source[1].y;
-            local_90.y = source[1].z;
-            local_90.z = source[2].x;
-            pppCopyVector__FR3Vec3Vec((Vec*)&pFallback[1].y, &local_90);
-            pFallback = (Vec*)&pFallback[3].y;
+            local_84.x = entries->pos.x;
+            local_84.y = entries->pos.y;
+            local_84.z = entries->pos.z;
+            pppCopyVector__FR3Vec3Vec(&pFallback->pos, &local_84);
+            local_90.x = entries->targetPos.x;
+            local_90.y = entries->targetPos.y;
+            local_90.z = entries->targetPos.z;
+            pppCopyVector__FR3Vec3Vec(&pFallback->targetPos, &local_90);
+            pFallback++;
         }
     }
 
     visibleCount = 0;
     for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
-        alpha = (u16)param_2->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
-        if ((alpha < 0) || ((useFallback = *(char*)&source[2].z == '\0'), useFallback != 0)) {
-            *(u8*)((u8*)&source[2].y + 3) = 0;
-        } else if (useFallback == 0) {
-            *(u8*)((u8*)&source[2].y + 3) = (u8)alpha;
+        alpha = (u16)param_2->m_payload[8] - (s16)iVar4 * work->alphaStep;
+        if ((alpha < 0) || ((useFallback = entries->active == 0), useFallback)) {
+            entries->color[3] = 0;
+        } else if (!useFallback) {
+            entries->color[3] = (u8)alpha;
             visibleCount++;
         }
-        source = (Vec*)&source[3].y;
+        entries++;
     }
-    *(s16*)(work + 0x2c) = visibleCount;
+    work->visibleCount = visibleCount;
 }
 
 /*
@@ -370,6 +386,13 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
         GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (u16)(visibleCount - 1) * 4);
         for (u16 i = 0; i < (u16)(visibleCount - 1); i++) {
+            float u0 = (float)i * uvStep;
+            float u1 = (float)(i + 1) * uvStep;
+            u32 currentColor;
+            u32 nextColor;
+            u8* current = (u8*)&entries[i];
+            u8* next = (u8*)&entries[i + 1];
+
             if (alphaScale < FLOAT_80331840) {
                 alphaScale = FLOAT_80331840;
             }
@@ -377,30 +400,24 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 alphaScale = FLOAT_80331844;
             }
 
-            float u0 = (float)i * uvStep;
-            float u1 = (float)(i + 1) * uvStep;
-            TraceEntry* current = &entries[i];
-            TraceEntry* next = &entries[i + 1];
-            u8 currentAlpha = (u8)(alphaScale * current->flags[7]);
-            u8 nextAlpha = (u8)(alphaScale * next->flags[7]);
-            u32 currentColor = ((u32)current->flags[1] << 24) | ((u32)current->flags[2] << 16) |
-                               ((u32)current->flags[3] << 8) | currentAlpha;
-            u32 nextColor =
-                ((u32)next->flags[1] << 24) | ((u32)next->flags[2] << 16) | ((u32)next->flags[3] << 8) | nextAlpha;
+            currentColor = ((u32)current[0x1C] << 24) | ((u32)current[0x1D] << 16) | ((u32)current[0x1E] << 8) |
+                           (u8)(alphaScale * current[0x1F]);
+            nextColor = ((u32)next[0x1C] << 24) | ((u32)next[0x1D] << 16) | ((u32)next[0x1E] << 8) |
+                        (u8)(alphaScale * next[0x1F]);
 
-            GXPosition3f32(current->targetPos.x, current->targetPos.y, current->targetPos.z);
+            GXPosition3f32(entries[i].targetPos.x, entries[i].targetPos.y, entries[i].targetPos.z);
             GXColor1u32(currentColor);
             GXTexCoord2f32(u0, FLOAT_80331844);
 
-            GXPosition3f32(current->pos.x, current->pos.y, current->pos.z);
+            GXPosition3f32(entries[i].pos.x, entries[i].pos.y, entries[i].pos.z);
             GXColor1u32(currentColor);
             GXTexCoord2f32(u0, FLOAT_80331840);
 
-            GXPosition3f32(next->targetPos.x, next->targetPos.y, next->targetPos.z);
+            GXPosition3f32(entries[i + 1].targetPos.x, entries[i + 1].targetPos.y, entries[i + 1].targetPos.z);
             GXColor1u32(nextColor);
             GXTexCoord2f32(u1, FLOAT_80331844);
 
-            GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
+            GXPosition3f32(entries[i + 1].pos.x, entries[i + 1].pos.y, entries[i + 1].pos.z);
             GXColor1u32(nextColor);
             GXTexCoord2f32(u1, FLOAT_80331840);
         }

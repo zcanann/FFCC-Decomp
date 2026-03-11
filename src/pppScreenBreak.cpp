@@ -37,6 +37,35 @@ struct Vec4d {
     float w;
 };
 
+struct ScreenBreakDisplayList {
+    u32 m_size;
+    void* m_data;
+    u16 m_material;
+};
+
+struct ScreenBreakMeshData {
+    u8 _pad0[0x50];
+    ScreenBreakDisplayList* m_displayLists;
+};
+
+struct ScreenBreakMeshRef {
+    u8 _pad0[0x8];
+    ScreenBreakMeshData* m_data;
+    u8 _padC[0x8];
+};
+
+struct ScreenBreakModelData {
+    u8 _pad0[0x24];
+    CMaterialSet* m_materialSet;
+};
+
+struct ScreenBreakModelView {
+    u8 _pad0[0xA4];
+    ScreenBreakModelData* m_data;
+    u8 _padA8[0x4];
+    ScreenBreakMeshRef* m_meshes;
+};
+
 struct pppScreenBreakUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -291,9 +320,8 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
  */
 void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
-    u8* meshData = *(u8**)((u8*)model + 0xAC) + (meshIndex * 0x14);
-    u8* refData = *(u8**)(meshData + 8);
-    u8* displayList = *(u8**)(refData + 0x50) + (drawListIndex * 0xC);
+    ScreenBreakDisplayList* displayList =
+        ((ScreenBreakModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + drawListIndex;
 
     if (*(char*)((u8*)param_2 + 0x24) != '\0') {
         void* colorPtr;
@@ -301,8 +329,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         u32 colorPacked0;
         u8 colorStorage1[4];
         u32 colorPacked1;
-        CMaterialSet* materialSet = *(CMaterialSet**)((u8*)*(u8**)((u8*)model + 0xA4) + 0x24);
-        unsigned short materialIdx = *(unsigned short*)(displayList + 8);
+        CMaterialSet* materialSet = ((ScreenBreakModelView*)model)->m_data->m_materialSet;
+        u16 materialIdx = displayList->m_material;
         CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)materialSet + 8))[materialIdx];
 
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, materialIdx, 1, 0);
@@ -344,7 +372,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             GXLoadTexObj((_GXTexObj*)*(void**)((u8*)param_2 + 0x10), (GXTexMapID)0);
         }
 
-        GXCallDisplayList(*(void**)(displayList + 4), *(unsigned int*)displayList);
+        GXCallDisplayList(displayList->m_data, displayList->m_size);
     }
 }
 

@@ -1142,21 +1142,20 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-    u8* data;
-    bool running;
-    int polygonCount;
+    u8* data = static_cast<u8*>(dlData);
+    bool running = true;
+    int polygonCount = 0;
 
-    data = static_cast<u8*>(dlData);
-    running = true;
-    polygonCount = 0;
+    do {
+        if (!running) {
+            return polygonCount;
+        }
 
-    while (running) {
         u8 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
-        int count = vertexCount;
-        u8 format = opcode & 7;
+        u32 count = vertexCount;
         u8 primitive = opcode & 0xF8;
-        u8 isPrimitive;
+        bool isPrimitive;
 
         data += 3;
 
@@ -1176,49 +1175,60 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
             break;
         }
 
-        if (!isPrimitive) {
-            running = false;
-            continue;
-        }
+        if (isPrimitive) {
+            if (primitive == 0x90) {
+                polygonCount += count / 3;
+            } else if (primitive == 0x98) {
+                polygonCount += count - 2;
+            }
 
-        if (primitive == 0x90) {
-            polygonCount += count / 3;
-        } else if (primitive == 0x98) {
-            polygonCount += count - 2;
-        }
+            if ((opcode & 7) != 2) {
+                if (count != 0) {
+                    u32 blocks = vertexCount >> 3;
 
-        if (format == 2) {
-            if (count > 0) {
-                int blocks = count >> 3;
+                    if (blocks != 0) {
+                        do {
+                            data += 0x40;
+                            blocks--;
+                        } while (blocks != 0);
+                        count &= 7;
+                        if ((vertexCount & 7) == 0) {
+                            continue;
+                        }
+                    }
 
-                while (blocks != 0) {
-                    data += 0x50;
-                    blocks--;
+                    do {
+                        data += 8;
+                        count--;
+                    } while (count != 0);
+                }
+                continue;
+            }
+
+            if (count != 0) {
+                u32 blocks = vertexCount >> 3;
+
+                if (blocks != 0) {
+                    do {
+                        data += 0x50;
+                        blocks--;
+                    } while (blocks != 0);
+                    count &= 7;
+                    if ((vertexCount & 7) == 0) {
+                        continue;
+                    }
                 }
 
-                count &= 7;
-                while (count != 0) {
+                do {
                     data += 10;
                     count--;
-                }
+                } while (count != 0);
             }
-        } else if (count > 0) {
-            int blocks = count >> 3;
-
-            while (blocks != 0) {
-                data += 0x40;
-                blocks--;
-            }
-
-            count &= 7;
-            while (count != 0) {
-                data += 8;
-                count--;
-            }
+            continue;
+        } else {
+            running = false;
         }
-    }
-
-    return polygonCount;
+    } while (true);
 }
 
 /*

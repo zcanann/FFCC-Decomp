@@ -78,11 +78,6 @@ void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-/*
- * --INFO--
  * PAL Address: 0x800647e0
  * PAL Size: 776b
  * EN Address: TODO
@@ -122,25 +117,24 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         switch (data->mode) {
         case 0: {
             MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-            do {
-                if ((s16)state->index >= entry->maxValue) {
+            while (count-- != 0) {
+                if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 index = state->index++;
-                u16 vertexIndex = vertexIndices[index];
+                u16 outValue = state->index++;
+                s32 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
-                    s32 childId = data->childId;
                     _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
+                    _pppPObject* child;
                     Vec pos;
-                    Vec* outPos;
+                    Vec* dst;
 
                     if (childData == 0) {
                         child = 0;
@@ -153,33 +147,33 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.y = y;
                     pos.z = z;
                     PSMTXMultVec(parentMtx, &pos, &pos);
-                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
-                        *outPos = pos;
+                        *dst = pos;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
+                        PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, dst);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
         case 1: {
             MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-            do {
-                u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
+            while (count-- != 0) {
+                s32 outValue = (s32)(RandF__5CMathFv(&Math) * (f32)entry->maxValue);
+                s32 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
-                    s32 childId = data->childId;
                     _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
+                    _pppPObject* child;
                     Vec pos;
-                    Vec* outPos;
+                    Vec* dst;
 
                     if (childData == 0) {
                         child = 0;
@@ -192,15 +186,15 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.y = y;
                     pos.z = z;
                     PSMTXMultVec(parentMtx, &pos, &pos);
-                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
-                        *outPos = pos;
+                        *dst = pos;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, outPos);
+                        PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, dst);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
         }

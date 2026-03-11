@@ -108,7 +108,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        s32 count = data->spawnCount;
+        int count = data->spawnCount;
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
@@ -116,7 +116,8 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 outValue = state->index++;
+                u16 outValue = state->index;
+                state->index++;
                 s32 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -124,7 +125,8 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
+                    s32 childId = data->childId;
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
 
                     if (childData == 0) {
@@ -143,7 +145,9 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                s32 outValue = (s32)(RandF__5CMathFv(&Math) * (f32)entry->maxValue);
+                f32 randValue = RandF__5CMathFv(&Math);
+                f32 maxValue = (f32)entry->maxValue;
+                int outValue = (int)(randValue * maxValue);
                 s32 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -151,7 +155,8 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
+                    s32 childId = data->childId;
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
 
                     if (childData == 0) {

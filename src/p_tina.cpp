@@ -813,9 +813,10 @@ void CPartPcs::drawCharaBefore()
 void CPartPcs::draw()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CGame* game = reinterpret_cast<CGame*>(&Game);
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
-    if (Game.game.m_gameWork.m_gamePaused != 0) {
+    if (game->m_gameWork.m_gamePaused != 0) {
         DrawOt__10pppDrawMngFv(&ppvDrawMng);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
         return;
@@ -1379,7 +1380,7 @@ void CPartPcs::ReleasePdt(int pdtSlot)
 void CPartPcs::StartLocationTitle()
 {
     int loaded;
-    char path[1028];
+    char path[1024];
     CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, Game.game.m_currentMapId);
@@ -1418,7 +1419,7 @@ void CPartPcs::EndLocationTitle()
 void CPartPcs::StartMiruraEvent()
 {
     int loaded;
-    char path[1028];
+    char path[1024];
     CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, Game.game.m_currentMapId);

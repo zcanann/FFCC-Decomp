@@ -2885,19 +2885,23 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
 int CPartMng::pppGetFreeDataMng()
 {
     char* self = reinterpret_cast<char*>(this);
-    char* pdtSlot = self + 0x22FD8;
     char* freeSlot = 0;
+    int slotIndex = 8;
+    int count = 0x18;
 
-    for (int i = 0; i < 0x18; i++) {
-        if (*reinterpret_cast<_pppDataHead**>(pdtSlot) == 0) {
-            freeSlot = pdtSlot;
+    while (count != 0) {
+        char* slot = self + 0x22E18 + slotIndex * 0x38;
+        if (*reinterpret_cast<_pppDataHead**>(slot) == 0) {
+            freeSlot = self + 0x22E18 + slotIndex * 0x38;
             break;
         }
-        pdtSlot += 0x38;
+
+        slotIndex++;
+        count--;
     }
 
     if (freeSlot == 0) {
-        if (System.m_execParam != 0) {
+        if ((unsigned int)System.m_execParam >= 1) {
             System.Printf(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC);
         }
         OSPanic(s_partMng_cpp_801d8230, 0xD74, "");

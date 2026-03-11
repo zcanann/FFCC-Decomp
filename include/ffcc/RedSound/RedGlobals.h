@@ -49,7 +49,7 @@ extern void* DAT_8032f418;
 extern int* DAT_8032f41c;
 extern int* DAT_8032f420;
 extern int DAT_8032f424;
-extern void** DAT_8032f428;
+extern int* DAT_8032f428;
 extern int DAT_8032f42c;
 extern int DAT_8032f430;
 extern int DAT_8032f434;

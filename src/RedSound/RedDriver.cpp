@@ -91,7 +91,7 @@ void* DAT_8032f3fc;
 unsigned int* DAT_8032f444;
 void* DAT_8032f450;
 void* DAT_8032f474;
-void** DAT_8032f428;
+int* DAT_8032f428;
 void* DAT_8032f438;
 void* DAT_8032f464;
 void* DAT_8032f45c;
@@ -231,10 +231,10 @@ void _SetMusicData(int* param_1)
 void _MusicStop(int* param_1)
 {
     MusicStop__Fi(*param_1);
-    if ((*param_1 == -1) || (*(int*)DAT_8032f428 == *param_1)) {
-        *(int*)DAT_8032f428 = -1;
+    if ((*param_1 == -1) || (DAT_8032f428[0] == *param_1)) {
+        DAT_8032f428[0] = -1;
     }
-    if (*(int*)DAT_8032f428 < 0) {
+    if (DAT_8032f428[0] < 0) {
         DAT_8032f424 = 0;
     }
 }
@@ -248,6 +248,7 @@ void _MusicStop(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _MusicPlaySequence(int* param_1)
 {
     int iVar1;
@@ -275,6 +276,7 @@ void _MusicPlaySequence(int* param_1)
         MusicPlay__Fiii(*param_1, param_1[1], iVar1);
     }
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -349,9 +351,9 @@ void _MusicNextPlaySequence(int* param_1)
           (*param_1 != *(int*)((int)DAT_8032f3f0 + 0x904))) &&
          (*param_1 != *(int*)((int)DAT_8032f3f0 + 0xd98))) &&
         ((iVar1 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, *param_1)), -1 < iVar1)) {
-        *(int*)DAT_8032f428 = *param_1;
-        ((int*)DAT_8032f428)[1] = param_1[1];
-        ((int*)DAT_8032f428)[2] = param_1[2];
+        DAT_8032f428[0] = *param_1;
+        DAT_8032f428[1] = param_1[1];
+        DAT_8032f428[2] = param_1[2];
     }
 }
 
@@ -383,7 +385,7 @@ void _MusicMasterVolume(int* param_1)
 void _MusicVolume(int* param_1)
 {
     if (param_1[3] == 1) {
-        *(int*)DAT_8032f428 = -1;
+        DAT_8032f428[0] = -1;
         DAT_8032f424 = 0;
     }
     SetMusicVolume(param_1[0], param_1[1], param_1[2], param_1[3]);
@@ -681,6 +683,7 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _ExecuteCommand()
 {
 	int* executePos = (int*)DAT_8032f3d8;
@@ -698,6 +701,7 @@ void _ExecuteCommand()
 
 	DAT_8032f3dc = readPos;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -797,10 +801,6 @@ int _MainThread(void*)
     int iVar2;
     int iVar3;
     unsigned int uVar4;
-    int* executePos;
-    int* readPos;
-    int* musicPlayInfo;
-    int playParam;
 
     DAT_8032f3c4 = DAT_8032f3c4 | 1;
     while (DAT_8032f3c0 != 0) {
@@ -819,46 +819,10 @@ int _MainThread(void*)
             }
             MainControl(uVar4);
             StreamControl();
-
-            executePos = (int*)DAT_8032f3d8;
-            readPos = (int*)DAT_8032f3dc;
-            while (executePos != readPos) {
-                if (*readPos != 0) {
-                    ((void (*)(int*))*readPos)(readPos + 1);
-                }
-                readPos += 8;
-                if (readPos == (int*)DAT_8032f3d4 + 0x800) {
-                    readPos = (int*)DAT_8032f3d4;
-                }
-            }
-            DAT_8032f3dc = readPos;
-
-            musicPlayInfo = (int*)DAT_8032f428;
-            if ((-1 < musicPlayInfo[0]) && (*(int*)(iVar1 + 0x470) < 0)) {
-                if ((musicPlayInfo[0] != *(int*)(iVar1 + 0x470)) &&
-                    (musicPlayInfo[0] != *(int*)(iVar1 + 0x904)) &&
-                    (musicPlayInfo[0] != *(int*)(iVar1 + 0xd98))) {
-                    iVar3 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, musicPlayInfo[0]);
-                    if (-1 < iVar3) {
-                        iVar1 = (int)DAT_8032f3f0;
-                        playParam = musicPlayInfo[2];
-                        if (*(int*)(iVar1 + 0x470) != -1) {
-                            if (*(int*)(iVar1 + 0x904) != -1) {
-                                MusicStop__Fi(*(int*)(iVar1 + 0x904));
-                            }
-                            if (playParam == 0) {
-                                playParam = *(int*)((int)DAT_8032f418 + musicPlayInfo[0] * 4);
-                                *(int*)((int)DAT_8032f418 + musicPlayInfo[0] * 4) = 0;
-                            }
-                            if (playParam == 0) {
-                                memcpy((void*)(iVar1 + 0x494), (void*)iVar1, 0x494);
-                                *(int*)(iVar1 + 0x470) = -1;
-                            }
-                        }
-                        MusicPlay__Fiii(musicPlayInfo[0], musicPlayInfo[1], playParam);
-                    }
-                }
-                musicPlayInfo[0] = -1;
+            _ExecuteCommand();
+            if ((-1 < DAT_8032f428[0]) && (*(int*)(iVar1 + 0x470) < 0)) {
+                _MusicPlaySequence(DAT_8032f428);
+                DAT_8032f428[0] = -1;
                 DAT_8032f424 = 0;
             }
             do {
@@ -1329,8 +1293,8 @@ void CRedDriver::Init()
     memset(DAT_8032f474, 0, 0x18);
     DAT_8032f478[1] = 0;
     DAT_8032f478[0] = 0;
-    DAT_8032f428 = (void**)RedNew__Fi(0x10);
-    *DAT_8032f428 = (void*)-1;
+    DAT_8032f428 = (int*)RedNew__Fi(0x10);
+    DAT_8032f428[0] = -1;
     DAT_8032f424 = 0;
     DAT_8032f438 = RedNew__Fi(0x4c0);
     memset(DAT_8032f438, 0, 0x4c0);

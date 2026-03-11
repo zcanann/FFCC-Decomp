@@ -77,20 +77,23 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             iVar7 = iVar5 * 0xc;
             while (0 < iVar5) {
                 pWordData = (u32*)((u8*)*historyPtr + iVar7 - 0xc);
-                *(u32*)&local_38.x = pWordData[0];
-                *(u32*)&local_38.y = pWordData[1];
-                *(u32*)&local_38.z = pWordData[2];
+                *(u32*)&local_38.x = *pWordData;
+                pWordData++;
+                *(u32*)&local_38.y = *pWordData;
+                pWordData++;
+                *(u32*)&local_38.z = *pWordData;
                 pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar7), &local_38);
                 iVar7 = iVar7 - 0xc;
                 iVar5 = iVar5 - 1;
             }
 
-            iVar7 = 0;
+            iVar5 = 0;
+            iVar7 = iVar5;
             (*historyPtr)->x = pppMngStPtr->m_matrix.value[0][3];
             *(f32*)((u8*)*historyPtr + 4) = pppMngStPtr->m_matrix.value[1][3];
             *(f32*)((u8*)*historyPtr + 8) = pppMngStPtr->m_matrix.value[2][3];
 
-            for (iVar5 = 0; count = (u32)(u8)param_2->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
+            for (; count = (u32)(u8)param_2->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
                 PSVECAdd((Vec*)((u8*)*historyPtr + iVar7), &local_2c, &local_2c);
                 iVar7 = iVar7 + 0xc;
             }

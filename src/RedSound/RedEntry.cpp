@@ -935,25 +935,25 @@ void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchSeSepSequence(int seNo)
 {
-	int* const base = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4));
-	int* seSepBank = base;
+	unsigned int offset;
+	int* seSepBank = *(int**)((int)this + 4);
 
 	if (seNo == -1) {
 		do {
 			if (seSepBank[3] != 0) {
-				int offset = reinterpret_cast<int>(seSepBank) - reinterpret_cast<int>(base);
-				return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
+				offset = (int)seSepBank - *(int*)((int)this + 4);
+				return ((int)offset >> 4) + ((int)offset < 0 && (offset & 0xF) != 0);
 			}
 			seSepBank += 4;
-		} while ((unsigned int)seSepBank < (unsigned int)base + 0x1000);
+		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
 	} else {
 		do {
 			if ((seSepBank[3] != 0) && (seSepBank[0] == seNo)) {
-				int offset = reinterpret_cast<int>(seSepBank) - reinterpret_cast<int>(base);
-				return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
+				offset = (int)seSepBank - *(int*)((int)this + 4);
+				return ((int)offset >> 4) + ((int)offset < 0 && (offset & 0xF) != 0);
 			}
 			seSepBank += 4;
-		} while ((unsigned int)seSepBank < (unsigned int)base + 0x1000);
+		} while (seSepBank < (int*)(*(int*)((int)this + 4) + 0x1000));
 	}
 
 	return -1;

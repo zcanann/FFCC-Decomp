@@ -458,14 +458,19 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800907c4
+ * PAL Size: 736b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
-    float* particle = (float*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
+    float* particle = (float*)(u32) * (u32*)workBytes;
     u8* step = (u8*)param_2;
-    u16 count = *(u16*)(step + 0x10);
+    u16 count = *(u16*)(step + 0xc);
     int i;
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);

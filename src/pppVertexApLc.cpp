@@ -100,6 +100,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
         VertexApLcEntry* entry = &env->entries[data->entryIndex];
+        u16* vertexIndices = entry->vertexIndices;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
@@ -116,8 +117,8 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 outValue = state->index++;
-                s32 vertexIndex = entry->vertexIndices[outValue];
+                u16 index = state->index++;
+                u16 vertexIndex = vertexIndices[index];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -143,8 +144,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                s32 outValue = (s32)(RandF__5CMathFv(&Math) * (f32)entry->maxValue);
-                s32 vertexIndex = entry->vertexIndices[outValue];
+                u16 vertexIndex = vertexIndices[(s32)(RandF__5CMathFv(&Math) * (f32)entry->maxValue)];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;

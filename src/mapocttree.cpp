@@ -12,9 +12,9 @@
 #include "ffcc/symbols_shared.h"
 
 // Linkage definitions from config/GCCP01/symbols.txt.
-float kOctTreeBoundMinInit = 10000000000.0f;
-float kOctTreeBoundMaxInit = -10000000000.0f;
-float kOctTreeCylinderPad = 1.0f;
+const float kOctTreeBoundMinInit = 10000000000.0f;
+const float kOctTreeBoundMaxInit = -10000000000.0f;
+const float kOctTreeCylinderPad = 1.0f;
 static unsigned long s_clearFlagMask;
 struct CBoundRaw
 {

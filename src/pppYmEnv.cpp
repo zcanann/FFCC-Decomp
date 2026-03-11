@@ -57,6 +57,23 @@ struct GraphValueState {
     s32 graphId;
 };
 
+struct PppYmEnvMngStRaw {
+    void* m_pppResSet;
+    u8 m_pad04[0x76 - 0x04];
+    s16 m_nodeIndex;
+    u8 m_pad78[0xD8 - 0x78];
+    CGObject* m_owner;
+    void* m_lookTarget;
+    CChara::CNode* m_bindNode;
+    u8 m_padE4[0xE7 - 0xE4];
+    u8 m_matrixMode;
+    u8 m_hitBgFlag;
+    u8 m_slotVisible;
+    u8 m_ownerFacing;
+    u8 m_drawVariant;
+    u8 m_rotationOrder;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800e602c
@@ -90,8 +107,9 @@ CChara::CModel* GetModelPtr(CGObject* gObject)
  */
 int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)[4])
 {
+    PppYmEnvMngStRaw* raw = reinterpret_cast<PppYmEnvMngStRaw*>(mngSt);
     float one = 1.0f;
-    s16 nodeIndex = *(s16*)((u8*)mngSt + 0x76);
+    s16 nodeIndex = raw->m_nodeIndex;
     char* nodeNameBase;
 
     if (Game.game.m_currentSceneId == 7) {
@@ -100,12 +118,17 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         nodeNameBase = (char*)(*(u32*)((u8*)mngSt + 0x0) + nodeIndex * 0x60 + 0x20);
     }
 
-    CGObject* owner = *(CGObject**)((u8*)mngSt + 0xD8);
+    CGObject* owner = raw->m_owner;
     if (owner == 0) {
         return 0;
     }
 
-    CChara::CModel* model = GetModelPtr(owner);
+    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
+    if (handle == 0) {
+        return 0;
+    }
+
+    CChara::CModel* model = handle->m_model;
     if (model == 0) {
         return 0;
     }
@@ -140,32 +163,32 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                                                               outMatrix);
 
     pppFMATRIX localMatrix;
-    switch (*(u8*)((u8*)mngSt + 0xEC)) {
+    switch (raw->m_rotationOrder) {
     case 0:
-        pppGetRotMatrixXYZ(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        pppGetRotMatrixXYZ(localMatrix, &mngSt->m_rotation);
         break;
     case 1:
-        pppGetRotMatrixXZY(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        pppGetRotMatrixXZY(localMatrix, &mngSt->m_rotation);
         break;
     case 2:
-        pppGetRotMatrixYXZ(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        pppGetRotMatrixYXZ(localMatrix, &mngSt->m_rotation);
         break;
     case 3:
-        pppGetRotMatrixYZX(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        pppGetRotMatrixYZX(localMatrix, &mngSt->m_rotation);
         break;
     case 4:
-        pppGetRotMatrixZXY(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        pppGetRotMatrixZXY(localMatrix, &mngSt->m_rotation);
         break;
     case 5:
-        pppGetRotMatrixZYX(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        pppGetRotMatrixZYX(localMatrix, &mngSt->m_rotation);
         break;
     default:
         break;
     }
 
-    u8 matrixMode = *(u8*)((u8*)mngSt + 0xE7);
+    u8 matrixMode = raw->m_matrixMode;
     if (matrixMode == 5) {
-        if (*(void**)((u8*)mngSt + 0xE0) != 0) {
+        if (raw->m_lookTarget != 0) {
             outMatrix[0][3] += pppMngStPtr->m_position.x;
             outMatrix[1][3] += pppMngStPtr->m_position.y;
             outMatrix[2][3] += pppMngStPtr->m_position.z;
@@ -205,7 +228,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             return 1;
         }
     } else if (matrixMode < 5) {
-        if (matrixMode == 3 && *(void**)((u8*)mngSt + 0xE0) != 0) {
+        if (matrixMode == 3 && raw->m_lookTarget != 0) {
             Vec pos;
             PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &pos);
             outMatrix[0][3] += pos.x;
@@ -242,7 +265,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             PSMTXCopy(localMatrix.value, outMatrix);
             return 1;
         }
-    } else if (matrixMode < 7 && *(void**)((u8*)mngSt + 0xE0) != 0) {
+    } else if (matrixMode < 7 && raw->m_lookTarget != 0) {
         Vec col0;
         Vec col1;
         Vec col2;

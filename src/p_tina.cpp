@@ -813,9 +813,10 @@ void CPartPcs::drawCharaBefore()
 void CPartPcs::draw()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CGame* game = reinterpret_cast<CGame*>(&Game);
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
-    if (Game.game.m_gameWork.m_gamePaused != 0) {
+    if (game->m_gameWork.m_gamePaused != 0) {
         DrawOt__10pppDrawMngFv(&ppvDrawMng);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
         return;

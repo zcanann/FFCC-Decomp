@@ -97,12 +97,15 @@ void TRKEXICallBack(__OSInterrupt param_0, OSContext* ctx)
 
 int InitMetroTRKCommTable(int hwId)
 {
+    int result = 1;
+
     OSReport("Devkit set to : %ld\n", hwId);
     TRK_Use_BBA = 0;
 
     if (hwId == HARDWARE_BBA) {
         OSReport("MetroTRK : Set to BBA\n");
         TRK_Use_BBA = 1;
+        result = 0;
 
         gDBCommTable.initialize_func      = (DBCommInitFunc)udp_cc_initialize;
         gDBCommTable.open_func            = (DBCommFunc)udp_cc_open;
@@ -114,10 +117,7 @@ int InitMetroTRKCommTable(int hwId)
         gDBCommTable.pre_continue_func    = (DBCommFunc)udp_cc_pre_continue;
         gDBCommTable.post_stop_func       = (DBCommFunc)udp_cc_post_stop;
         gDBCommTable.init_interrupts_func = NULL;
-        return 0;
     } else if (hwId == HARDWARE_GDEV) {
-        int result;
-
         OSReport("MetroTRK : Set to GDEV hardware\n");
         result = Hu_IsStub();
 
@@ -131,10 +131,7 @@ int InitMetroTRKCommTable(int hwId)
         gDBCommTable.pre_continue_func    = (DBCommFunc)gdev_cc_pre_continue;
         gDBCommTable.post_stop_func       = (DBCommFunc)gdev_cc_post_stop;
         gDBCommTable.init_interrupts_func = (DBCommFunc)gdev_cc_initinterrupts;
-        return result;
     } else if (hwId == HARDWARE_AMC_DDH) {
-        int result;
-
         OSReport("MetroTRK : Set to AMC DDH hardware\n");
         result = AMC_IsStub();
 
@@ -148,13 +145,13 @@ int InitMetroTRKCommTable(int hwId)
         gDBCommTable.pre_continue_func    = (DBCommFunc)ddh_cc_pre_continue;
         gDBCommTable.post_stop_func       = (DBCommFunc)ddh_cc_post_stop;
         gDBCommTable.init_interrupts_func = (DBCommFunc)ddh_cc_initinterrupts;
-        return result;
     } else {
         OSReport("MetroTRK : Set to UNKNOWN hardware. (%ld)\n", hwId);
         OSReport("MetroTRK : Invalid hardware ID passed from OS\n");
         OSReport("MetroTRK : Defaulting to GDEV Hardware\n");
-        return 1;
     }
+
+    return result;
 }
 
 DSError TRKInitializeIntDrivenUART(u32 param_0, u32 param_1, u32 param_2,

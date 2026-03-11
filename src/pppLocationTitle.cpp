@@ -112,7 +112,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     LocationTitleWork* work;
     u16 maxCount;
     u32 graphId;
-    u16 dataValIndex;
+    u32 dataValIndex;
     int graphFrame;
 
     if (gPppCalcDisabled != 0) {
@@ -124,11 +124,11 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     rand();
 
     dataValIndex = param_2->m_dataValIndex;
-    if (dataValIndex == 0xFFFF) {
+    if ((u16)dataValIndex == 0xFFFF) {
         return;
     }
 
-    long* shapeTable = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    long* shapeTable = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + ((u16)dataValIndex * 4));
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
@@ -259,9 +259,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 {
     int serializedOffset = *param_3->m_serializedDataOffsets;
     LocationTitleWork* work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
-    u16 dataValIndex = (u16)param_2->m_dataValIndex;
+    u32 dataValIndex = param_2->m_dataValIndex;
 
-    if (dataValIndex == 0xFFFF) {
+    if ((u16)dataValIndex == 0xFFFF) {
         return;
     }
 
@@ -269,7 +269,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     int fadeDivisor = -1;
     int graphFrame = GetGraphFrameFromId(graphId);
     LocationTitleParticle* particle = (LocationTitleParticle*)work->m_particles;
-    long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + ((u16)dataValIndex * 4));
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);

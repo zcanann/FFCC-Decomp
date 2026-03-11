@@ -765,8 +765,9 @@ void CPartPcs::ClearOt()
 void CPartPcs::drawShadow()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CGame* game = reinterpret_cast<CGame*>(&Game);
 
-    if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
+    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
         *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(1);
@@ -789,8 +790,9 @@ void CPartPcs::drawShadow()
 void CPartPcs::drawCharaBefore()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CGame* game = reinterpret_cast<CGame*>(&Game);
 
-    if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
+    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -893,7 +895,9 @@ void CPartPcs::drawViewer()
  */
 void CPartPcs::drawAfter()
 {
-    if (Game.game.m_gameWork.m_gamePaused == 0 &&
+    CGame* game = reinterpret_cast<CGame*>(&Game);
+
+    if (game->m_gameWork.m_gamePaused == 0 &&
         *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this)      + 0x30) == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);

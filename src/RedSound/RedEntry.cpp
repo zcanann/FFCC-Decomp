@@ -16,6 +16,8 @@ static const char DAT_80333d4f[] = "%s\n";
 static const char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[] =
     "%s%sNOT HAVE A-MEMORY FREE AREA (WAVE%4.4u:0x%6.6X need).%s\n";
 static const char s__s_sWave_Header_was_broken__s_801e7972[] = "%s%sWave-Header was broken.%s\n";
+static const char s__s_sSE_Sep_Header_was_broken__s_801e7b50[] = "%s%sSE-Sep-Header was broken.%s\n";
+static const char s__s_sMusic_Header_was_broken__s_801e7c1d[] = "%s%sMusic-Header was broken.%s\n";
 static const char s__s_s__s_801e78d8[] = "%s%s%s\n";
 static const char s__s_s__________ERROR___________s_801e7917[] = "%s%s----------ERROR-----------%s\n";
 static const char s__s_s_Erase_Using_Wave_Data_____W_801e7944[] = "%s%s Erase Using Wave Data.  (WAVE%4.4u)%s\n";
@@ -962,9 +964,23 @@ int CRedEntry::SearchSeSepSequence(int seNo)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepMemoryFree(RedHistoryBANK*)
+#pragma dont_inline on
+int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
-	// TODO
+	int* bankData = reinterpret_cast<int*>(bank);
+	int waveNo = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(bankData[2] + 0x11)) +
+	             static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(bankData[2] + 0x12)) * 0x100;
+
+	RedDelete(bankData[2]);
+	SeSepHistoryDelete(bankData[1]);
+
+	int freedSize = bankData[3];
+	bankData[3] = 0;
+	bankData[2] = 0;
+	bankData[0] = -1;
+
+	WaveHistoryManager(0, waveNo);
+	return freedSize;
 }
 
 /*
@@ -972,9 +988,25 @@ void CRedEntry::SeSepMemoryFree(RedHistoryBANK*)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepOldDelete()
+unsigned int CRedEntry::SeSepOldDelete()
 {
-	// TODO
+	int historyNo = 0;
+	unsigned int selected = 0;
+	unsigned int history = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4);
+
+	do {
+		if ((*reinterpret_cast<int*>(history + 0xC) != 0) && (historyNo < *reinterpret_cast<int*>(history + 4))) {
+			historyNo = *reinterpret_cast<int*>(history + 4);
+			selected = history;
+		}
+		history += 0x10;
+	} while (history < *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4) + 0x1000);
+
+	if (selected != 0) {
+		SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(selected));
+	}
+
+	return selected;
 }
 
 /*
@@ -982,9 +1014,29 @@ void CRedEntry::SeSepOldDelete()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepHeadAdd(RedSeSepHEAD*)
+int CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 {
-	// TODO
+	unsigned int base = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4);
+	int* bank = reinterpret_cast<int*>(base);
+
+	while ((bank[3] != 0) && (reinterpret_cast<unsigned int>(bank) < base + 0x1000)) {
+		bank += 4;
+	}
+	if (base + 0x1000 <= reinterpret_cast<unsigned int>(bank)) {
+		bank = reinterpret_cast<int*>(SeSepOldDelete());
+	}
+
+	int result = 0;
+	if ((bank != 0) && (reinterpret_cast<unsigned int>(bank) < base + 0x1000)) {
+		bank[2] = reinterpret_cast<int>(seSepHead);
+		bank[3] = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(seSepHead) + 0xC) & 0x7FFFFFFF;
+		bank[0] = *reinterpret_cast<int*>(reinterpret_cast<int>(seSepHead) + 8);
+		SeSepHistoryAdd();
+		bank[1] = 1;
+		result = reinterpret_cast<int>(seSepHead);
+	}
+
+	return result;
 }
 
 /*
@@ -992,9 +1044,34 @@ void CRedEntry::SeSepHeadAdd(RedSeSepHEAD*)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SetSeSepData(RedSeSepHEAD*)
+int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
-	// TODO
+	int result;
+	char* data = reinterpret_cast<char*>(seSepHead);
+
+	if ((data[0] == 'S') && (data[1] == 'e') && (data[2] == 'S') && (data[3] == 'e') && (data[4] == 'p')) {
+		result = SearchSeSepSequence(*reinterpret_cast<int*>(data + 8));
+		if (result < 0) {
+			result = SeSepHeadAdd(seSepHead);
+			if (result == 0) {
+				RedDelete(seSepHead);
+			}
+		} else {
+			RedDelete(seSepHead);
+			SeSepHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) +
+			                                                   result * 0x10));
+			result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10 + 8);
+		}
+	} else {
+		RedDelete(seSepHead);
+		if (DAT_8032f408 != 0) {
+			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
+			fflush(&DAT_8021d1a8);
+		}
+		result = 0;
+	}
+
+	return result;
 }
 
 /*
@@ -1002,9 +1079,27 @@ void CRedEntry::SetSeSepData(RedSeSepHEAD*)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::ClearSeSepData(int)
+int CRedEntry::ClearSeSepData(int seNo)
 {
-	// TODO
+	int result = 0;
+
+	if (seNo == -1) {
+		unsigned int history = *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4);
+		do {
+			if (*reinterpret_cast<int*>(history + 0xC) != 0) {
+				SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(history));
+			}
+			history += 0x10;
+		} while (history < *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(this) + 4) + 0x1000);
+	} else {
+		result = SearchSeSepSequence(seNo);
+		if (result >= 0) {
+			result = SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(
+			    *reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + result * 0x10));
+		}
+	}
+
+	return result;
 }
 
 /*
@@ -1012,9 +1107,22 @@ void CRedEntry::ClearSeSepData(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::ClearSeSepDataMG(int, int, int, int)
+int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 {
-	// TODO
+	int* bank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4));
+
+	do {
+		if (bank[3] != 0) {
+			int seNo = bank[0] / 1000 + (bank[0] >> 31);
+			seNo = seNo - (seNo >> 31);
+			if ((bankNo != seNo) && (sepNo != seNo) && (groupNo != seNo) && (kindNo != seNo)) {
+				SeSepMemoryFree(reinterpret_cast<RedHistoryBANK*>(bank));
+			}
+		}
+		bank += 4;
+	} while (bank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4) + 0x1000));
+
+	return 0;
 }
 
 /*
@@ -1362,9 +1470,25 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicHeadAdd(RedMusicHEAD*)
+int CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
-	// TODO
+	int* bank = reinterpret_cast<int*>(MusicOldChoice());
+	if ((bank != 0) && (bank[3] != 0)) {
+		MusicOldClear();
+		bank = reinterpret_cast<int*>(MusicOldChoice());
+	}
+
+	int result = 0;
+	if (bank != 0) {
+		bank[2] = reinterpret_cast<int>(musicHead);
+		bank[3] = *reinterpret_cast<int*>(reinterpret_cast<int>(musicHead) + 0x10);
+		bank[0] = static_cast<int>(*reinterpret_cast<short*>(reinterpret_cast<int>(musicHead) + 4));
+		MusicHistoryAdd();
+		bank[1] = 1;
+		result = reinterpret_cast<int>(musicHead);
+	}
+
+	return result;
 }
 
 /*
@@ -1372,10 +1496,36 @@ void CRedEntry::MusicHeadAdd(RedMusicHEAD*)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SetMusicData(RedMusicHEAD*)
+int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
-	// TODO
+	int result;
+	char* data = reinterpret_cast<char*>(musicHead);
+
+	if ((data[0] == 'B') && (data[1] == 'G') && (data[2] == 'M')) {
+		result = SearchMusicSequence(static_cast<int>(*reinterpret_cast<short*>(data + 4)));
+		if (result < 0) {
+			result = MusicHeadAdd(musicHead);
+			if (result == 0) {
+				RedDelete(musicHead);
+			}
+		} else {
+			RedDelete(musicHead);
+			MusicHistoryChoice(reinterpret_cast<RedHistoryBANK*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) +
+			                                                    result * 0x10));
+			result = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + result * 0x10 + 8);
+		}
+	} else {
+		RedDelete(musicHead);
+		if (DAT_8032f408 != 0) {
+			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
+			fflush(&DAT_8021d1a8);
+		}
+		result = 0;
+	}
+
+	return result;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

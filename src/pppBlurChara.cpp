@@ -340,8 +340,6 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Vec cameraTarget;
     Vec cameraDir;
     Vec objPos;
-    Vec2d uv0;
-    Vec2d uv1;
     Vec4d inVec;
     Vec4d outVec;
     float viewport[6];
@@ -397,7 +395,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXSetNumTexGens(2);
     gUtil.SetVtxFmt_POS_CLR_TEX();
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
     _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
@@ -460,19 +458,14 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     float arg3 = param_2->m_arg3;
 
-    uv0.x = -FLOAT_80331044 * arg3;
-    uv0.y = FLOAT_80331048 + FLOAT_80331044 * arg3;
-    uv1.x = -arg3;
-    uv1.y = FLOAT_8033104c + arg3;
-
-    quadA.x = uv0.x;
-    quadA.y = uv0.y;
+    quadA.x = -FLOAT_80331044 * arg3;
+    quadA.y = FLOAT_80331048 + FLOAT_80331044 * arg3;
     quadA.z = outVec.z;
-    quadB.x = uv1.x;
-    quadB.y = uv1.y;
+    quadB.x = -arg3;
+    quadB.y = FLOAT_8033104c + arg3;
     quadB.z = outVec.z;
 
-    gUtil.RenderQuad(quadA, quadB, drawColor, &uv0, &uv1);
+    gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);

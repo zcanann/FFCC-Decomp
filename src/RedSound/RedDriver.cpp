@@ -1425,7 +1425,9 @@ int CRedDriver::GetProgramTime()
  */
 void CRedDriver::SetSoundMode(int soundMode)
 {
-    _EntryExecCommand(_SetSoundMode, soundMode, 0, 0, 0, 0, 0, 0);
+    volatile int mode = soundMode;
+
+    _EntryExecCommand(_SetSoundMode, mode, 0, 0, 0, 0, 0, 0);
 }
 
 /*

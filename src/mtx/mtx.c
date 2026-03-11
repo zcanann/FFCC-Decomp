@@ -1287,17 +1287,23 @@ void C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* 
 void C_MTXLightFrustum(Mtx m, float t, float b, float l, float r, float n, float scaleS, float scaleT, float transS, float transT)
 {
     f32 tmp;
+    f32 add;
+    f32 proj;
 
     tmp = 1.0f / (r - l);
     m[0][0] = ((2 * n) * tmp) * scaleS;
     m[0][1] = 0.0f;
-    m[0][2] = (((r + l) * tmp) * scaleS) - transS;
+    add = r + l;
+    proj = (add * tmp) * scaleS;
+    m[0][2] = proj - transS;
     m[0][3] = 0.0f;
 
     tmp = 1.0f / (t - b);
     m[1][0] = 0.0f;
     m[1][1] = ((2 * n) * tmp) * scaleT;
-    m[1][2] = (((t + b) * tmp) * scaleT) - transT;
+    add = t + b;
+    proj = (add * tmp) * scaleT;
+    m[1][2] = proj - transT;
     m[1][3] = 0.0f;
 
     m[2][0] = 0.0f;

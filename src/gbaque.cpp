@@ -4020,7 +4020,7 @@ unsigned int GbaQueue::GetPlayModeFlg(int channel)
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * sizeof(OSSemaphore));
 	OSWaitSemaphore(semaphore);
-	char value = obj[0x2C88];
+	char value = obj[0x2D60];
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = static_cast<unsigned int>(value) & (1U << channel);
 	return (-mask | mask) >> 31;
@@ -4040,7 +4040,7 @@ void GbaQueue::ClrPlayModeFlg(int channel)
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * sizeof(OSSemaphore));
 	OSWaitSemaphore(semaphore);
-	obj[0x2C88] = obj[0x2C88] & ~(1 << channel);
+	obj[0x2D60] = obj[0x2D60] & ~(1 << channel);
 	OSSignalSemaphore(semaphore);
 }
 

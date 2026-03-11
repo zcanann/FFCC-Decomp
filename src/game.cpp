@@ -1456,13 +1456,22 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
     CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
     char** itemTable = flatData->m_tabl[0].m_strings;
+    unsigned char hasSeparator = 0;
     char* prefix = itemTable[itemIndex * 5 + 2];
     char* itemName = itemTable[itemIndex * 5 + 3];
 
+    if (strlen(prefix) != 0) {
+        unsigned char languageId = m_gameWork.m_languageId;
+        if ((languageId != 3) && (languageId != 4)) {
+            hasSeparator = 1;
+        }
+    }
+
     const char* separator = s_nameNoSep;
-    if ((strlen(prefix) != 0) && (m_gameWork.m_languageId != 3) && (m_gameWork.m_languageId != 4)) {
+    if (hasSeparator != 0) {
         separator = s_nameSep;
     }
+
     sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
     return out;
 }
@@ -1540,13 +1549,22 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
     CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
     char** monTable = flatData->m_tabl[1].m_strings;
+    unsigned char hasSeparator = 0;
     char* prefix = monTable[monIndex * 5 + 2];
     char* monName = monTable[monIndex * 5 + 3];
 
+    if (strlen(prefix) != 0) {
+        unsigned char languageId = m_gameWork.m_languageId;
+        if ((languageId != 3) && (languageId != 4)) {
+            hasSeparator = 1;
+        }
+    }
+
     const char* separator = s_nameNoSep;
-    if ((strlen(prefix) != 0) && (m_gameWork.m_languageId != 3) && (m_gameWork.m_languageId != 4)) {
+    if (hasSeparator != 0) {
         separator = s_nameSep;
     }
+
     sprintf(out, s_nameJoinFmt, prefix, separator, monName);
     return out;
 }
@@ -1773,4 +1791,3 @@ CGame::CGameWork::CGameWork()
 }
 
 template class CPtrArray<CMapLightHolder*>;
-

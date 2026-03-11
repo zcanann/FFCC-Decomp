@@ -652,7 +652,7 @@ int CRedEntry::GetWaveBank(int waveNo)
 {
 	if ((waveNo >= 0) && (waveNo < 0x10))
 	{
-		return *(int*)this + (waveNo * 0x10);
+		return m_waveBankBase + (waveNo * 0x10);
 	}
 
 	return 0;

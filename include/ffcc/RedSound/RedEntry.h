@@ -60,6 +60,11 @@ public:
 	void MusicHeadAdd(RedMusicHEAD*);
 	void SetMusicData(RedMusicHEAD*);
 	void DisplayMMemoryInfo();
+
+	int m_waveBankBase;
+	int m_seSepBankBase;
+	int m_musicBankBase;
+	int m_waveHistoryIndex;
 };
 
 #endif // _FFCC_REDSOUND_REDENTRY_H

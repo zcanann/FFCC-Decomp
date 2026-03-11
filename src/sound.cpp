@@ -2340,17 +2340,17 @@ void CSound::PlayStreamASync()
 void CSound::StopStream()
 {
     CSoundLayout& sound = SoundData(this);
-    int shouldStop = 0;
+    bool shouldStop = false;
 
     if (sound.m_streamPlaying != 0) {
-        int state = StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID);
+        int state = StreamPlayState__9CRedSoundFi(RedSound(this), sound.m_streamID);
         if (state != 0) {
-            shouldStop = 1;
+            shouldStop = true;
         }
     }
 
-    if (shouldStop != 0) {
-        StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID);
+    if (shouldStop) {
+        StreamStop__9CRedSoundFi(RedSound(this), sound.m_streamID);
     }
 
     CFile::CHandle* handle = sound.m_streamFile;

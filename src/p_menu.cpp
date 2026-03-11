@@ -1596,7 +1596,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
         destroySingleMenu__8CMenuPcsFv(this);
     }
 
-    Game.game.m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);
+    reinterpret_cast<CGame&>(Game).m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);
 }
 
 /*

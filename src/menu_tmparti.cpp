@@ -35,6 +35,45 @@ extern double DOUBLE_80332f50;
 extern double DOUBLE_80332f58;
 
 namespace {
+struct TmpArtiState {
+    unsigned char pad_0000[0xB];
+    unsigned char initialized;
+    unsigned char pad_000C;
+    unsigned char closeRequested;
+    unsigned char pad_000E[0x10];
+    short moveDirection;
+    unsigned char pad_0020[2];
+    short frame;
+    unsigned char pad_0024[2];
+    short unk_26;
+    unsigned char pad_0028[8];
+    short prevSelection;
+    short selection;
+};
+
+struct TmpArtiEntry {
+    short x;
+    short y;
+    short width;
+    short height;
+    float s;
+    float t;
+    float alpha;
+    float z;
+    int tex;
+    int timer;
+    int startFrame;
+    int duration;
+    unsigned char pad_002C[0x14];
+};
+
+struct TmpArtiList {
+    unsigned short count;
+    unsigned short pad_0002;
+    unsigned int pad_0004;
+    TmpArtiEntry entries[64];
+};
+
 struct MenuTmpArtiMembers {
     unsigned char pad_0000[0x108];
     CFont* m_tmpArtiFont;
@@ -47,6 +86,13 @@ struct MenuTmpArtiMembers {
 STATIC_ASSERT(offsetof(MenuTmpArtiMembers, m_tmpArtiFont) == 0x108);
 STATIC_ASSERT(offsetof(MenuTmpArtiMembers, m_tmpArtiState) == 0x82C);
 STATIC_ASSERT(offsetof(MenuTmpArtiMembers, m_tmpArtiList) == 0x850);
+STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
+STATIC_ASSERT(offsetof(TmpArtiState, closeRequested) == 0xD);
+STATIC_ASSERT(offsetof(TmpArtiState, moveDirection) == 0x1E);
+STATIC_ASSERT(offsetof(TmpArtiState, frame) == 0x22);
+STATIC_ASSERT(offsetof(TmpArtiState, unk_26) == 0x26);
+STATIC_ASSERT(offsetof(TmpArtiState, prevSelection) == 0x30);
+STATIC_ASSERT(offsetof(TmpArtiState, selection) == 0x32);
 
 static inline MenuTmpArtiMembers& GetMenuTmpArtiMembers(CMenuPcs* menu)
 {
@@ -58,9 +104,19 @@ static inline short* GetTmpArtiState(CMenuPcs* menu)
     return GetMenuTmpArtiMembers(menu).m_tmpArtiState;
 }
 
+static inline TmpArtiList* GetTmpArtiListStruct(CMenuPcs* menu)
+{
+    return reinterpret_cast<TmpArtiList*>(GetMenuTmpArtiMembers(menu).m_tmpArtiList);
+}
+
 static inline short* GetTmpArtiList(CMenuPcs* menu)
 {
     return GetMenuTmpArtiMembers(menu).m_tmpArtiList;
+}
+
+static inline TmpArtiState* GetTmpArtiStateStruct(CMenuPcs* menu)
+{
+    return reinterpret_cast<TmpArtiState*>(GetMenuTmpArtiMembers(menu).m_tmpArtiState);
 }
 
 static inline int GetTmpArtiStateBase(CMenuPcs* menu)
@@ -126,136 +182,121 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	float fVar3;
 	double dVar4;
 	double dVar5;
+	TmpArtiEntry* entry;
 	int iVar6;
-	short *psVar7;
 	unsigned int uVar8;
-	unsigned short *puVar9;
 	int iVar10;
 	unsigned int uVar11;
+	TmpArtiState* state = GetTmpArtiStateStruct(this);
+	TmpArtiList* list = GetTmpArtiListStruct(this);
 
-	if (*(char *)(GetTmpArtiStateBase(this) + 0xb) == '\0') {
-		memset((void*)GetTmpArtiList(this), 0, 0x1008);
+	if (state->initialized == '\0') {
+		memset(list, 0, sizeof(TmpArtiList));
 		fVar3 = FLOAT_80332f30;
-		iVar6 = GetTmpArtiListBase(this) + 8;
+		entry = list->entries;
 		iVar10 = 8;
 		do {
-			*(float *)(iVar6 + 0x14) = fVar3;
-			*(float *)(iVar6 + 0x54) = fVar3;
-			*(float *)(iVar6 + 0x94) = fVar3;
-			*(float *)(iVar6 + 0xd4) = fVar3;
-			*(float *)(iVar6 + 0x114) = fVar3;
-			*(float *)(iVar6 + 0x154) = fVar3;
-			*(float *)(iVar6 + 0x194) = fVar3;
-			*(float *)(iVar6 + 0x1d4) = fVar3;
+			entry[0].alpha = fVar3;
+			entry[1].alpha = fVar3;
+			entry[2].alpha = fVar3;
+			entry[3].alpha = fVar3;
+			entry[4].alpha = fVar3;
+			entry[5].alpha = fVar3;
+			entry[6].alpha = fVar3;
+			entry[7].alpha = fVar3;
 			dVar5 = DOUBLE_80332f58;
 			dVar4 = DOUBLE_80332f40;
 			fVar2 = FLOAT_80332f2c;
 			dVar1 = DOUBLE_80332f20;
-			iVar6 = iVar6 + 0x200;
+			entry = entry + 8;
 			iVar10 = iVar10 - 1;
 		} while (iVar10 != 0);
 		iVar6 = 0;
-		puVar9 = (unsigned short *)(GetTmpArtiListBase(this) + 8);
+		entry = list->entries;
 		iVar10 = 2;
 		do {
-			*(unsigned int *)(puVar9 + 0xe) = 0x37;
-			puVar9[2] = 200;
-			puVar9[3] = 0x28;
-			*puVar9 = (short)(int)-(((double)(short)puVar9[2] - dVar4) * dVar1 - dVar5);
-			puVar9[1] = (short)iVar6 * (puVar9[3] + -8) + 0x60;
-			*(float *)(puVar9 + 4) = fVar2;
-			*(float *)(puVar9 + 6) = fVar2;
-			*(int *)(puVar9 + 0x12) = iVar6;
-			*(unsigned int *)(puVar9 + 0x14) = 3;
-			*(unsigned int *)(puVar9 + 0x2e) = 0x37;
-			puVar9[0x22] = 200;
-			puVar9[0x23] = 0x28;
-			puVar9[0x20] = (short)(int)-(((double)(short)puVar9[0x22] - dVar4) * dVar1 - dVar5);
-			puVar9[0x21] = (short)(iVar6 + 1) * (puVar9[0x23] + -8) + 0x60;
-			*(float *)(puVar9 + 0x24) = fVar2;
-			*(float *)(puVar9 + 0x26) = fVar2;
-			*(int *)(puVar9 + 0x32) = iVar6 + 1;
+			entry[0].tex = 0x37;
+			entry[0].width = 200;
+			entry[0].height = 0x28;
+			entry[0].x = (short)(int)-(((double)entry[0].width - dVar4) * dVar1 - dVar5);
+			entry[0].y = (short)iVar6 * (entry[0].height + -8) + 0x60;
+			entry[0].s = fVar2;
+			entry[0].t = fVar2;
+			entry[0].startFrame = iVar6;
+			entry[0].duration = 3;
+			entry[1].tex = 0x37;
+			entry[1].width = 200;
+			entry[1].height = 0x28;
+			entry[1].x = (short)(int)-(((double)entry[1].width - dVar4) * dVar1 - dVar5);
+			entry[1].y = (short)(iVar6 + 1) * (entry[1].height + -8) + 0x60;
+			entry[1].s = fVar2;
+			entry[1].t = fVar2;
+			entry[1].startFrame = iVar6 + 1;
 			iVar6 = iVar6 + 2;
-			*(unsigned int *)(puVar9 + 0x34) = 3;
-			puVar9 = puVar9 + 0x40;
+			entry[1].duration = 3;
+			entry = entry + 2;
 			iVar10 = iVar10 - 1;
 		} while (iVar10 != 0);
-		*(unsigned short*)GetTmpArtiList(this) = 4;
-		*(unsigned short *)(GetTmpArtiStateBase(this) + 0x26) = 0;
-		*(unsigned char *)(GetTmpArtiStateBase(this) + 0xb) = 1;
+		list->count = 4;
+		state->unk_26 = 0;
+		state->initialized = 1;
 	}
 	iVar6 = 0;
-	*(short *)(GetTmpArtiStateBase(this) + 0x22) = *(short *)(GetTmpArtiStateBase(this) + 0x22) + 1;
-	uVar8 = (unsigned int)*GetTmpArtiList(this);
-	psVar7 = GetTmpArtiList(this) + 4;
-	iVar10 = (int)*(short *)(GetTmpArtiStateBase(this) + 0x22);
+	state->frame = state->frame + 1;
+	uVar8 = (unsigned int)list->count;
+	entry = list->entries;
+	iVar10 = (int)state->frame;
 	uVar11 = uVar8;
 	if (0 < (int)uVar8) {
 		do {
 			dVar1 = DOUBLE_80332f40;
-			if (*(int *)(psVar7 + 0x12) <= iVar10) {
-				if (iVar10 < *(int *)(psVar7 + 0x12) + *(int *)(psVar7 + 0x14)) {
-					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
-					*(float *)(psVar7 + 8) = (float)((DOUBLE_80332f48 /
-						((double)*(unsigned int *)(psVar7 + 0x14) - dVar1)) *
-						((double)*(unsigned int *)(psVar7 + 0x10) - dVar1));
+			if (entry->startFrame <= iVar10) {
+				if (iVar10 < entry->startFrame + entry->duration) {
+					entry->timer = entry->timer + 1;
+					entry->alpha = (float)((DOUBLE_80332f48 /
+						((double)(unsigned int)entry->duration - dVar1)) *
+						((double)(unsigned int)entry->timer - dVar1));
 				} else {
 					iVar6 = iVar6 + 1;
-					*(float *)(psVar7 + 8) = FLOAT_80332f30;
+					entry->alpha = FLOAT_80332f30;
 				}
 			}
-			psVar7 = psVar7 + 0x20;
+			entry = entry + 1;
 			uVar11 = uVar11 - 1;
 		} while (uVar11 != 0);
 	}
 	fVar3 = FLOAT_80332f30;
-	if (*GetTmpArtiList(this) == iVar6) {
-		psVar7 = GetTmpArtiList(this) + 4;
+	if (list->count == iVar6) {
+		entry = list->entries;
 		if (0 < (int)uVar8) {
 			uVar11 = uVar8 >> 3;
 			if (uVar11 != 0) {
 				do {
-					psVar7[0x12] = 0;
-					psVar7[0x13] = 0;
-					psVar7[0x14] = 0;
-					psVar7[0x15] = 1;
-					*(float *)(psVar7 + 8) = fVar3;
-					psVar7[0x32] = 0;
-					psVar7[0x33] = 0;
-					psVar7[0x34] = 0;
-					psVar7[0x35] = 1;
-					*(float *)(psVar7 + 0x28) = fVar3;
-					psVar7[0x52] = 0;
-					psVar7[0x53] = 0;
-					psVar7[0x54] = 0;
-					psVar7[0x55] = 1;
-					*(float *)(psVar7 + 0x48) = fVar3;
-					psVar7[0x72] = 0;
-					psVar7[0x73] = 0;
-					psVar7[0x74] = 0;
-					psVar7[0x75] = 1;
-					*(float *)(psVar7 + 0x68) = fVar3;
-					psVar7[0x92] = 0;
-					psVar7[0x93] = 0;
-					psVar7[0x94] = 0;
-					psVar7[0x95] = 1;
-					*(float *)(psVar7 + 0x88) = fVar3;
-					psVar7[0xb2] = 0;
-					psVar7[0xb3] = 0;
-					psVar7[0xb4] = 0;
-					psVar7[0xb5] = 1;
-					*(float *)(psVar7 + 0xa8) = fVar3;
-					psVar7[0xd2] = 0;
-					psVar7[0xd3] = 0;
-					psVar7[0xd4] = 0;
-					psVar7[0xd5] = 1;
-					*(float *)(psVar7 + 200) = fVar3;
-					psVar7[0xf2] = 0;
-					psVar7[0xf3] = 0;
-					psVar7[0xf4] = 0;
-					psVar7[0xf5] = 1;
-					*(float *)(psVar7 + 0xe8) = fVar3;
-					psVar7 = psVar7 + 0x100;
+					entry[0].startFrame = 0;
+					entry[0].duration = 1;
+					entry[0].alpha = fVar3;
+					entry[1].startFrame = 0;
+					entry[1].duration = 1;
+					entry[1].alpha = fVar3;
+					entry[2].startFrame = 0;
+					entry[2].duration = 1;
+					entry[2].alpha = fVar3;
+					entry[3].startFrame = 0;
+					entry[3].duration = 1;
+					entry[3].alpha = fVar3;
+					entry[4].startFrame = 0;
+					entry[4].duration = 1;
+					entry[4].alpha = fVar3;
+					entry[5].startFrame = 0;
+					entry[5].duration = 1;
+					entry[5].alpha = fVar3;
+					entry[6].startFrame = 0;
+					entry[6].duration = 1;
+					entry[6].alpha = fVar3;
+					entry[7].startFrame = 0;
+					entry[7].duration = 1;
+					entry[7].alpha = fVar3;
+					entry = entry + 8;
 					uVar11 = uVar11 - 1;
 				} while (uVar11 != 0);
 				uVar8 = uVar8 & 7;
@@ -264,12 +305,10 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				}
 			}
 			do {
-				psVar7[0x12] = 0;
-				psVar7[0x13] = 0;
-				psVar7[0x14] = 0;
-				psVar7[0x15] = 1;
-				*(float *)(psVar7 + 8) = fVar3;
-				psVar7 = psVar7 + 0x20;
+				entry->startFrame = 0;
+				entry->duration = 1;
+				entry->alpha = fVar3;
+				entry = entry + 1;
 				uVar8 = uVar8 - 1;
 			} while (uVar8 != 0);
 		}

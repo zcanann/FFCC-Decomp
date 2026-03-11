@@ -1346,7 +1346,7 @@ CChara::CMesh::CDisplayList::CDisplayList()
  */
 CChara::CMesh::CDisplayList::~CDisplayList()
 {
-	void** data = (void**)this;
+	void** data = (void**)((u8*)this + 4);
 	if (data[0] != 0) {
 		__dla__FPv(data[0]);
 		data[0] = 0;

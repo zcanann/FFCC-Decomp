@@ -1208,30 +1208,20 @@ static void __SetSURegs(int tmap, int tcoord) {
     u32 mode0;
     u32 wrapS;
     u32 wrapT;
-    u32* su0Ptr;
-    u32* su1Ptr;
-    u32 su0;
-    u32 su1;
 
     gx = __GXData;
     image0 = gx->tImage0[tmap];
     mode0 = gx->tMode0[tmap];
-    su0Ptr = &gx->suTs0[tcoord];
-    su1Ptr = &gx->suTs1[tcoord];
-    su0 = *su0Ptr;
-    su1 = *su1Ptr;
     wrapS = __cntlzw(1 - (mode0 & 3));
     wrapT = __cntlzw(1 - ((mode0 >> 2) & 3));
 
-    su0 = (image0 & 0x3FF) | (su0 & 0xFFFF0000);
-    su1 = ((image0 >> 10) & 0x3FF) | (su1 & 0xFFFF0000);
-    su0 = (su0 & 0xFFFEFFFF) | ((wrapS << 11) & 0x10000);
-    su1 = (su1 & 0xFFFEFFFF) | ((wrapT << 11) & 0x10000);
+    gx->suTs0[tcoord] = (gx->suTs0[tcoord] & 0xFFFF0000) | (image0 & 0x3FF);
+    gx->suTs1[tcoord] = (gx->suTs1[tcoord] & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
+    gx->suTs0[tcoord] = (gx->suTs0[tcoord] & 0xFFFEFFFF) | ((wrapS << 11) & 0x10000);
+    gx->suTs1[tcoord] = (gx->suTs1[tcoord] & 0xFFFEFFFF) | ((wrapT << 11) & 0x10000);
 
-    *su0Ptr = su0;
-    *su1Ptr = su1;
-    GX_WRITE_RAS_REG(*su0Ptr);
-    GX_WRITE_RAS_REG(*su1Ptr);
+    GX_WRITE_RAS_REG(gx->suTs0[tcoord]);
+    GX_WRITE_RAS_REG(gx->suTs1[tcoord]);
     gx->bpSentNot = 0;
 }
 

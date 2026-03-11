@@ -136,7 +136,7 @@ static int WriteSram(void* buffer, u32 offset, u32 size) {
 
 void __OSInitSram(void) {
     Scb.locked = Scb.enabled = FALSE;
-    Scb.sync = ReadSram(&Scb);
+    Scb.sync = ReadSram(Scb.sram);
     ASSERTLINE(318, Scb.sync);
     Scb.offset = SRAM_SIZE;
 }
@@ -175,7 +175,7 @@ static int UnlockSram(int commit, u32 offset) {
             }
 
             sram->checkSum = sram->checkSumInv = 0;
-            for(p = (u16*)&sram->counterBias; p < ((u16*)&Scb.sram[0x14]); p++) {
+            for (p = (u16*)&sram->counterBias; p < ((u16*)&Scb.sram[sizeof(OSSram)]); p++) {
                 sram->checkSum += *p;
                 sram->checkSumInv += ~(*p);
             }
@@ -230,10 +230,7 @@ int __OSCheckSram(void) {
 int __OSReadROM(void * buffer, s32 length, s32 offset) {
     OSSram* sram;
     int mode;
-
-    (void)buffer;
-    (void)length;
-    (void)offset;
+    (void)buffer, (void)length, (void)offset;
 
     sram = __OSLockSram();
     mode = (sram->flags & 4) ? 1 : 0;
@@ -281,7 +278,7 @@ u32 OSSetSoundMode(void) {
     u32 mode;
 
     sram = __OSLockSram();
-    mode = (sram->flags & 4) >> 2;
+    mode = (sram->flags & 0x80) >> 7;
     __OSUnlockSram(FALSE);
     return mode;
 }

@@ -4062,7 +4062,7 @@ void GbaQueue::SetStartBonusFlg()
 	}
 
 	char* obj = reinterpret_cast<char*>(this);
-	obj[0x2D14] = 0xF;
+	obj[0x2D61] = 0xF;
 
 	semaphoreIter = this;
 	for (int i = 0; i < 4; i++) {
@@ -4085,7 +4085,7 @@ unsigned int GbaQueue::GetStartBonusFlg(int channel)
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * sizeof(OSSemaphore));
 	OSWaitSemaphore(semaphore);
-	char value = obj[0x2D14];
+	char value = obj[0x2D61];
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = static_cast<unsigned int>(value) & (1U << channel);
 	return (-mask | mask) >> 31;
@@ -4105,7 +4105,7 @@ void GbaQueue::ClrStartBonusFlg(int channel)
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * sizeof(OSSemaphore));
 	OSWaitSemaphore(semaphore);
-	obj[0x2D14] = obj[0x2D14] & ~(1 << channel);
+	obj[0x2D61] = obj[0x2D61] & ~(1 << channel);
 	OSSignalSemaphore(semaphore);
 }
 

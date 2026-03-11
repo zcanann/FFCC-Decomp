@@ -284,20 +284,25 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int i;
     int colorOffset;
     int workOffset;
-    float* dropData;
+    RainWork* work;
+    RainDrop* drop;
+    u8* colorPtr;
+    u32 color;
     double baseX;
     double baseY;
     double baseZ;
-    double tex0;
-    double tex1;
+    float tex0;
+    float tex1;
     Vec segment[2];
 
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
+    colorPtr = (u8*)pppRain + 0x88 + colorOffset;
+    work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     pppSetBlendMode__FUc(param_2->m_payload[0x48]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)pppRain + 0x88 + colorOffset,
-        &ppvCameraMatrix0,
+        colorPtr,
+        ppvCameraMatrix0,
         kPppRainTexCoordBase,
         param_2->m_payload[0x4a],
         param_2->m_payload[0x49],
@@ -315,31 +320,32 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_payload[0x3c], GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    dropData = *(float**)((u8*)pppRain + 0x80 + workOffset);
+    drop = (RainDrop*)work->drops;
+    color = *(u32*)colorPtr;
     baseX = (double)pppMngStPtr->m_matrix.value[0][3];
     baseY = (double)pppMngStPtr->m_matrix.value[1][3];
     baseZ = (double)pppMngStPtr->m_matrix.value[2][3];
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
-    tex0 = (double)kPppRainTexCoordBase;
-    tex1 = (double)FLOAT_8033101c;
+    tex0 = kPppRainTexCoordBase;
+    tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {
-        double x = (double)(float)(baseX + (double)dropData[0]);
-        double y = (double)(float)(baseY + (double)dropData[1]);
-        double z = (double)(float)(baseZ + (double)dropData[2]);
+        double x = baseX + (double)drop->posX;
+        double y = baseY + (double)drop->posY;
+        double z = baseZ + (double)drop->posZ;
 
-        PSVECScale((Vec*)(dropData + 3), &segment[0], dropData[6]);
+        PSVECScale((Vec*)&drop->dirX, &segment[0], drop->length);
         GXPosition3f32((float)x, (float)y, (float)z);
-        GXColor1u32(*(u32*)((u8*)pppRain + 0x88 + colorOffset));
-        GXTexCoord2f32((float)tex0, (float)tex0);
+        GXColor1u32(color);
+        GXTexCoord2f32(tex0, tex0);
 
         GXPosition3f32(
             (float)(x + (double)segment[0].x),
             (float)(y + (double)segment[0].y),
             (float)(z + (double)segment[0].z));
-        GXColor1u32(*(u32*)((u8*)pppRain + 0x88 + colorOffset));
-        GXTexCoord2f32((float)tex1, (float)tex1);
-        dropData += 8;
+        GXColor1u32(color);
+        GXTexCoord2f32(tex1, tex1);
+        drop++;
         i++;
     }
     GXSetLineWidth(8, GX_TO_ZERO);

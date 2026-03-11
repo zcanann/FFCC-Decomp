@@ -285,7 +285,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int colorOffset;
     int workOffset;
     RainWork* work;
-    RainDrop* drop;
+    float* drop;
     u8* colorPtr;
     u32 color;
     double baseX;
@@ -320,7 +320,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_payload[0x3c], GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    drop = (RainDrop*)work->drops;
+    drop = work->drops;
     color = *(u32*)colorPtr;
     baseX = (double)pppMngStPtr->m_matrix.value[0][3];
     baseY = (double)pppMngStPtr->m_matrix.value[1][3];
@@ -330,11 +330,11 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {
-        double x = baseX + (double)drop->posX;
-        double y = baseY + (double)drop->posY;
-        double z = baseZ + (double)drop->posZ;
+        double x = (double)(float)(baseX + (double)drop[0]);
+        double y = (double)(float)(baseY + (double)drop[1]);
+        double z = (double)(float)(baseZ + (double)drop[2]);
 
-        PSVECScale((Vec*)&drop->dirX, &segment[0], drop->length);
+        PSVECScale((Vec*)(drop + 3), &segment[0], drop[6]);
         GXPosition3f32((float)x, (float)y, (float)z);
         GXColor1u32(color);
         GXTexCoord2f32(tex0, tex0);
@@ -345,7 +345,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
             (float)(z + (double)segment[0].z));
         GXColor1u32(color);
         GXTexCoord2f32(tex1, tex1);
-        drop++;
+        drop += sizeof(RainDrop) / sizeof(float);
         i++;
     }
     GXSetLineWidth(8, GX_TO_ZERO);

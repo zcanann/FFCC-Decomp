@@ -326,7 +326,6 @@ int PADReset(u32 mask) {
     disableBits = ResettingBits & EnabledBits;
     EnabledBits &= ~mask;
     BarrelBits &= ~mask;
-
     if (Spec == PAD_SPEC_4) {
         RecalibrateBits |= mask;
     }
@@ -487,7 +486,7 @@ u32 PADRead(PADStatus* status) {
                     motor |= chanBit;
                 }
     
-                if (!SIGetResponse(chan, &data)) {
+                if (!SIGetResponse(chan, data)) {
                     status->err = PAD_ERR_TRANSFER;
                     memset(status, 0, offsetof(PADStatus, err));
                 } else if (data[0] & 0x80000000) {
@@ -750,15 +749,6 @@ static void SPEC2_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     status->triggerLeft = ClampU8(status->triggerLeft, origin->triggerLeft);
     status->triggerRight = ClampU8(status->triggerRight, origin->triggerRight);
 
-    if (((Type[chan] & 0xFFFF0000) == SI_GC_CONTROLLER) && !(status->button & 0x80)) {
-        BarrelBits |= (PAD_CHAN0_BIT >> chan);
-        status->stickX = 0;
-        status->stickY = 0;
-        status->substickX = 0;
-        status->substickY = 0;
-    } else {
-        BarrelBits &= ~(PAD_CHAN0_BIT >> chan);
-    }
 }
 
 int PADGetType(s32 chan, u32* type) {

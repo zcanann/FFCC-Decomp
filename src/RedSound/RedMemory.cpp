@@ -46,15 +46,15 @@ CRedMemory::CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, int shouldDelete)
+#pragma optimization_level 0
+extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldDelete)
 {
-	volatile short deleteFlag = shouldDelete;
-
-	if ((redMemory != 0) && (0 < deleteFlag)) {
+	if ((redMemory != 0) && (0 < shouldDelete)) {
 		__dl__FPv(redMemory);
 	}
 	return redMemory;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

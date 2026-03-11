@@ -655,10 +655,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    s32 colorDataOffset = serializedDataOffsets[0];
-    u8* colorSource = (u8*)&pppScreenBreak->field_0x88 + colorDataOffset;
-    float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
+    s32 colorDataOffset = *param_3->m_serializedDataOffsets;
+    float* value = (float*)((u8*)pppScreenBreak + param_3->m_serializedDataOffsets[2] + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(float**)(model + 0xE4) = value;
@@ -666,11 +664,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    u8* color = (u8*)(value + 10);
-    color[0] = colorSource[0];
-    color[1] = colorSource[1];
-    color[2] = colorSource[2];
-    color[3] = colorSource[3];
+    *(u8*)(value + 10) = (&pppScreenBreak->field_0x88)[colorDataOffset];
+    *((u8*)value + 0x29) = (&pppScreenBreak->field_0x89)[colorDataOffset];
+    *((u8*)value + 0x2A) = (&pppScreenBreak->field_0x8a)[colorDataOffset];
+    *((u8*)value + 0x2B) = (&pppScreenBreak->field_0x8b)[colorDataOffset];
     DCFlushRange(value + 10, 4);
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],

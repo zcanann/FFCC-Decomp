@@ -5,6 +5,8 @@
 
 #include "dolphin/axfx/__axfx.h"
 
+extern int powf(float, float);
+
 // prototypes
 static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
 static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length);

@@ -268,40 +268,43 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     u32 graphId = pppLocationTitle->m_graphId;
     int fadeDivisor = -1;
     int graphFrame = GetGraphFrameFromId(graphId);
-    LocationTitleParticle* particle = (LocationTitleParticle*)work->m_particles;
-    long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + ((u16)dataValIndex * 4));
+    Vec* source = (Vec*)work->m_particles;
+    long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (dataValIndex * 4));
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
     }
 
-    for (int i = 0; i < work->m_count; i++, particle++) {
+    for (int i = 0; i < work->m_count; i++) {
         Mtx model;
         Vec worldPos;
+        float colorValue;
 
         PSMTXIdentity(model);
-        model[2][2] = particle->m_frame;
+        model[2][2] = source[1].y;
         model[0][0] = pppMngStPtr->m_scale.x * model[2][2];
         model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
         model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
 
-        PSMTXMultVec(ppvCameraMatrix0, &particle->m_pos, &worldPos);
+        PSMTXMultVec(ppvCameraMatrix0, source, &worldPos);
         model[0][3] = worldPos.x;
         model[1][3] = worldPos.y;
         model[2][3] = worldPos.z;
 
-        pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
+        pppSetDrawEnv((pppCVECTOR*)(source + 1), (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
 
         if (fadeDivisor >= 0) {
-            u8 alpha = ((u8*)&particle->m_color)[3];
-            ((u8*)&particle->m_color)[3] = (u8)(alpha - (u8)(alpha / fadeDivisor));
+            u8 alpha = ((u8*)&source[1].x)[3];
+            ((u8*)&source[1].x)[3] = (u8)(alpha - (u8)(alpha / fadeDivisor));
         }
 
-        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
+        colorValue = source[1].x;
+        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorValue);
         GXLoadPosMtxImm(model, 0);
 
         pppSetBlendMode(*(((u8*)&param_2->m_stepValue) + 1));
-        pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr,
+        pppDrawShp(*shapeTable, *(s16*)&source[2].x, pppEnvStPtr->m_materialSetPtr,
                    *(((u8*)&param_2->m_stepValue) + 1));
+        source = (Vec*)&source[2].y;
     }
 }

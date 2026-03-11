@@ -1295,14 +1295,13 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
  */
 void CGraphic::SetFogColor(_GXColor color)
 {
-    u8 r = color.r;
-    u8 g = color.g;
-    U8At(this, 0x7200) = r;
-    u8 b = color.b;
-    U8At(this, 0x7201) = g;
-    u8 a = color.a;
-    U8At(this, 0x7202) = b;
-    U8At(this, 0x7203) = a;
+    u8 c0 = color.g;
+    U8At(this, 0x7200) = color.r;
+    u8 c1 = color.b;
+    U8At(this, 0x7201) = c0;
+    c0 = color.a;
+    U8At(this, 0x7202) = c1;
+    U8At(this, 0x7203) = c0;
 }
 
 /*

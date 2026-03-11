@@ -2,17 +2,36 @@
 #include "ffcc/p_light.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
 extern unsigned char gPppInSubFrameCalc;
-extern unsigned char* pppMngStPtr;
 
 struct pppLightTarget {
 	int unk0;
 	unsigned char* obj;
 	int unk8;
 	int unkC;
+};
+
+struct PppLightState {
+	u8 unk0[0x8];
+	s32 type;
+	Vec position;
+	u8 unk18[0xC];
+	f32 field24;
+	f32 field28;
+	u8 unk2C[0x14];
+	Vec direction;
+	f32 field4C;
+	f32 field50;
+	u8 unk54[3];
+	u8 field57;
+	_GXColor color0;
+	_GXColor color1;
+	_GXColor color2;
+	u8 unk64[0xB0 - 0x64];
 };
 
 extern "C" {
@@ -103,16 +122,17 @@ void pppLightCon(void* param1, void* param2)
 void pppLight(void* param1, void* param2, void* param3)
 {
 	unsigned char* lightParam = (unsigned char*)param2;
-	unsigned char* pppMng = (unsigned char*)param1;
+	_pppMngSt* pppMng = (_pppMngSt*)param1;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
 	{
-		unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
-		Vec sourcePos;
-		unsigned char lightData[0xb0];
+		unsigned char* pppMngBytes = (unsigned char*)pppMng;
+		unsigned char* work = (unsigned char*)pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
+		PppLightState lightData;
+		Vec* sourcePos = &lightData.position;
 
 		*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(work + 0x20);
 		*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(work + 0x1c);
@@ -160,59 +180,50 @@ void pppLight(void* param1, void* param2, void* param3)
 			*(float*)(work + 0x44) = *(float*)(work + 0x44) + *(float*)(lightParam + 0x54);
 		}
 
-		__ct__Q29CLightPcs6CLightFv(lightData);
+		__ct__Q29CLightPcs6CLightFv(&lightData);
 
-		sourcePos.x = *(float*)(pppMng + 0x1c);
-		sourcePos.y = *(float*)(pppMng + 0x2c);
-		sourcePos.z = *(float*)(pppMng + 0x3c);
-		PSMTXMultVec((MtxPtr)(pppMngStPtr + 0x78), &sourcePos, &sourcePos);
+		sourcePos->x = *(float*)(pppMngBytes + 0x1c);
+		sourcePos->y = *(float*)(pppMngBytes + 0x2c);
+		sourcePos->z = *(float*)(pppMngBytes + 0x3c);
+		PSMTXMultVec(pppMngStPtr->m_matrix.value, sourcePos, sourcePos);
 
-		*(float*)(lightData + 0xc) = sourcePos.x;
-		*(float*)(lightData + 0x10) = sourcePos.y;
-		*(float*)(lightData + 0x14) = sourcePos.z;
-		*(float*)(lightData + 0x24) = *(float*)(work + 0x24);
-		*(float*)(lightData + 0x28) = *(float*)(work + 0x18);
+		lightData.field24 = *(float*)(work + 0x24);
+		lightData.field28 = *(float*)(work + 0x18);
 
-		lightData[0x58] = (unsigned char)(*(short*)(work + 0x0) >> 7);
-		lightData[0x59] = (unsigned char)(*(short*)(work + 0x2) >> 7);
-		lightData[0x5a] = (unsigned char)(*(short*)(work + 0x4) >> 7);
-		lightData[0x5b] = (unsigned char)(*(short*)(work + 0x6) >> 7);
+		lightData.color0.r = (unsigned char)(*(short*)(work + 0x0) >> 7);
+		lightData.color0.g = (unsigned char)(*(short*)(work + 0x2) >> 7);
+		lightData.color0.b = (unsigned char)(*(short*)(work + 0x4) >> 7);
+		lightData.color0.a = (unsigned char)(*(short*)(work + 0x6) >> 7);
 
 		if (lightParam[0x5a] != 0) {
-			lightData[0x5c] = lightData[0x58];
-			lightData[0x5d] = lightData[0x59];
-			lightData[0x5e] = lightData[0x5a];
-			lightData[0x5f] = lightData[0x5b];
+			lightData.color1 = lightData.color0;
 		} else {
-			*(int*)(lightData + 0x5c) = 0;
+			*(u32*)&lightData.color1 = 0;
 		}
 
 		if (lightParam[0x5b] != 0) {
-			lightData[0x60] = lightData[0x58];
-			lightData[0x61] = lightData[0x59];
-			lightData[0x62] = lightData[0x5a];
-			lightData[0x63] = lightData[0x5b];
+			lightData.color2 = lightData.color0;
 		} else {
-			*(int*)(lightData + 0x60) = 0;
+			*(u32*)&lightData.color2 = 0;
 		}
 
 		if (lightParam[0x59] == 0) {
-			*(int*)(lightData + 0x58) = 0;
+			*(u32*)&lightData.color0 = 0;
 		}
 
 		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
 			if (lightParam[0x58] == 0) {
-				*(int*)(lightData + 0x8) = 0;
-				*(float*)(lightData + 0x40) = kPppLightZero;
-				*(float*)(lightData + 0x44) = kPppLightZero;
-				*(float*)(lightData + 0x48) = kPppLightOne;
-				*(float*)(lightData + 0x4c) = kPppLightDefaultCosAtten;
-				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, lightData);
+				lightData.type = 0;
+				lightData.direction.x = kPppLightZero;
+				lightData.direction.y = kPppLightZero;
+				lightData.direction.z = kPppLightOne;
+				lightData.field4C = kPppLightDefaultCosAtten;
+				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &lightData);
 			} else {
 				unsigned char* obj;
 				Vec* direction;
 
-				*(int*)(lightData + 0x8) = 1;
+				lightData.type = 1;
 				if (*(int*)(lightParam + 0x44) == -1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
@@ -220,22 +231,22 @@ void pppLight(void* param1, void* param2, void* param3)
 					obj = targetTable[*(int*)(lightParam + 0x44)].obj;
 				}
 
-				direction = (Vec*)(lightData + 0x40);
+				direction = &lightData.direction;
 				direction->x = *(float*)(obj + 0x1c);
 				direction->y = *(float*)(obj + 0x2c);
 				direction->z = *(float*)(obj + 0x3c);
-				PSMTXMultVec((MtxPtr)(pppMngStPtr + 0x78), direction, direction);
+				PSMTXMultVec(pppMngStPtr->m_matrix.value, direction, direction);
 
-				PSVECSubtract(direction, &sourcePos, direction);
+				PSVECSubtract(direction, sourcePos, direction);
 				PSVECNormalize(direction, direction);
-				*(float*)(lightData + 0x4c) = kPppLightSpotScale * *(float*)(work + 0x30);
+				lightData.field4C = kPppLightSpotScale * *(float*)(work + 0x30);
 
 				if (lightParam[0x58] == 2) {
-					*(float*)(lightData + 0x50) = *(float*)(work + 0x3c);
-					lightData[0x57] = 1;
+					lightData.field50 = *(float*)(work + 0x3c);
+					lightData.field57 = 1;
 				}
 
-				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, lightData);
+				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &lightData);
 			}
 		}
 	}

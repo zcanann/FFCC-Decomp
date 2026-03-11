@@ -52,31 +52,11 @@ inline void* operator new(unsigned long, void* p)
 }
 
 extern void* __vt__8CManager;
-extern void* __vt__14CFunnyShapePcs;
-extern u32 DAT_801EA778;
-extern u32 DAT_801EA77C;
-extern u32 PTR_createViewer__14CFunnyShapePcsFv_801EA780;
-extern u32 DAT_801EA784;
-extern u32 DAT_801EA788;
-extern u32 PTR_destroyViewer__14CFunnyShapePcsFv_801EA78C;
-extern u32 DAT_801EA790;
-extern u32 DAT_801EA794;
-extern u32 PTR_calcViewer__14CFunnyShapePcsFv_801EA798;
-extern u32 DAT_801EA79C;
-extern u32 DAT_801EA7A0;
-extern u32 PTR_drawViewer__14CFunnyShapePcsFv_801EA7A4;
-extern u32 DAT_801EA7AC;
-extern u32 DAT_801EA7B0;
-extern u32 DAT_801EA7B4;
-extern u32 DAT_801EA7B8;
-extern u32 DAT_801EA7BC;
-extern u32 DAT_801EA7C0;
-extern u32 DAT_801EA7C4;
-extern u32 DAT_801EA7C8;
-extern u32 DAT_801EA7CC;
-extern u32 DAT_801EA7D8;
-extern u32 DAT_801EA7DC;
-extern u32 DAT_801EA7E0;
+extern "C" char __vt__14CFunnyShapePcs[];
+extern u32 m_table_desc0__14CFunnyShapePcs[];
+extern u32 m_table_desc1__14CFunnyShapePcs[];
+extern u32 m_table_desc2__14CFunnyShapePcs[];
+extern u32 m_table_desc3__14CFunnyShapePcs[];
 unsigned char ARRAY_8026D728[0xC];
 CFunnyShapePcs FunnyShapePcs;
 extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
@@ -116,29 +96,32 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__8CManager;
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__8CProcess;
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(&FunnyShapePcs)) = &__vt__14CFunnyShapePcs;
+    u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
+    u32* dst = reinterpret_cast<u32*>(m_table__14CFunnyShapePcs);
 
-    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(&FunnyShapePcs) + 0x3C));
-    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(&FunnyShapePcs) + 0x50));
-    new (reinterpret_cast<u8*>(&FunnyShapePcs) + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>();
-    new (reinterpret_cast<u8*>(&FunnyShapePcs) + 0x61D8) CPtrArray<_GXTexObj*>();
+    *reinterpret_cast<void**>(self) = &__vt__8CManager;
+    *reinterpret_cast<void**>(self) = &__vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
+
+    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(self + 0x3C));
+    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(self + 0x50));
+    new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>();
+    new (self + 0x61D8) CPtrArray<_GXTexObj*>();
 
     __register_global_object(&FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 
-    DAT_801EA7AC = DAT_801EA778;
-    DAT_801EA7B0 = DAT_801EA77C;
-    DAT_801EA7B4 = PTR_createViewer__14CFunnyShapePcsFv_801EA780;
-    DAT_801EA7B8 = DAT_801EA784;
-    DAT_801EA7BC = DAT_801EA788;
-    DAT_801EA7C0 = PTR_destroyViewer__14CFunnyShapePcsFv_801EA78C;
-    DAT_801EA7C4 = DAT_801EA790;
-    DAT_801EA7C8 = DAT_801EA794;
-    DAT_801EA7CC = PTR_calcViewer__14CFunnyShapePcsFv_801EA798;
-    DAT_801EA7D8 = DAT_801EA79C;
-    DAT_801EA7DC = DAT_801EA7A0;
-    DAT_801EA7E0 = PTR_drawViewer__14CFunnyShapePcsFv_801EA7A4;
+    dst[0x004 / 4] = m_table_desc0__14CFunnyShapePcs[0];
+    dst[0x008 / 4] = m_table_desc0__14CFunnyShapePcs[1];
+    dst[0x00C / 4] = m_table_desc0__14CFunnyShapePcs[2];
+    dst[0x010 / 4] = m_table_desc1__14CFunnyShapePcs[0];
+    dst[0x014 / 4] = m_table_desc1__14CFunnyShapePcs[1];
+    dst[0x018 / 4] = m_table_desc1__14CFunnyShapePcs[2];
+    dst[0x01C / 4] = m_table_desc2__14CFunnyShapePcs[0];
+    dst[0x020 / 4] = m_table_desc2__14CFunnyShapePcs[1];
+    dst[0x024 / 4] = m_table_desc2__14CFunnyShapePcs[2];
+    dst[0x030 / 4] = m_table_desc3__14CFunnyShapePcs[0];
+    dst[0x034 / 4] = m_table_desc3__14CFunnyShapePcs[1];
+    dst[0x038 / 4] = m_table_desc3__14CFunnyShapePcs[2];
 }
 
 template <class T>

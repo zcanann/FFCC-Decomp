@@ -43,6 +43,7 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void* __vt__6CSound[];
 extern "C" void __ct__9CRedSoundFv(void*);
+extern "C" void __dt__9CRedSoundFv(void*, short);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
 extern "C" void SetSoundMode__9CRedSoundFi(CRedSound*, int);
@@ -393,7 +394,8 @@ CSound::CSound()
  */
 CSound::~CSound()
 {
-	// TODO
+    *reinterpret_cast<void**>(this) = __vt__6CSound;
+    __dt__9CRedSoundFv(RedSound(this), -1);
 }
 
 /*

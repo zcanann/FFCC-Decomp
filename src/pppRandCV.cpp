@@ -5,6 +5,7 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+extern "C" f32 RandF__5CMathFv(CMath*);
 
 typedef struct RandCVParams {
     s32 index;
@@ -41,9 +42,10 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     if (params->index == *(s32*)(base + 0xC)) {
-        f32 value = Math.RandF();
+        f32 value = RandF__5CMathFv(&Math);
         if (params->flag != 0) {
-            value += Math.RandF();
+            f32 random = RandF__5CMathFv(&Math);
+            value += random;
         } else {
             value *= kPppRandCVSingleSampleScale;
         }
@@ -56,16 +58,23 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = params->colorOffset;
-    // Note to agent: Stop fucking trashing on this. Yes you can ternary this for extab gains, but then you lose code match. Then the next agent comes in and undoes that. Infinite loop. Fucking figure out how to get to 100% code before touching extab.
-    if (colorOffset == -1) {
-        targetColor = &gPppDefaultValueBuffer[0];
-    } else {
-        targetColor = base + colorOffset + 0x80;
-    }
+    targetColor = (colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + colorOffset + 0x80);
 
     f32 scale = *randomValue;
-    targetColor[0] = (u8)(targetColor[0] + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]));
-    targetColor[1] = (u8)(targetColor[1] + (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]));
-    targetColor[2] = (u8)(targetColor[2] + (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]));
-    targetColor[3] = (u8)(targetColor[3] + (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]));
+    {
+        s8 baseValue = params->delta[0];
+        targetColor[0] = (u8)(targetColor[0] + (s8)((f32)baseValue * scale - (f32)baseValue));
+    }
+    {
+        s8 baseValue = params->delta[1];
+        targetColor[1] = (u8)(targetColor[1] + (s8)((f32)baseValue * scale - (f32)baseValue));
+    }
+    {
+        s8 baseValue = params->delta[2];
+        targetColor[2] = (u8)(targetColor[2] + (s8)((f32)baseValue * scale - (f32)baseValue));
+    }
+    {
+        s8 baseValue = params->delta[3];
+        targetColor[3] = (u8)(targetColor[3] + (s8)((f32)baseValue * scale - (f32)baseValue));
+    }
 }

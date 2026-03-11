@@ -4,6 +4,7 @@
 #include "ffcc/system.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 class SRT;
 class CBound;
@@ -103,7 +104,11 @@ public:
     void GetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
 
-    u8 _pad04[0xE0 - 0x4];
+    Mtx m_cameraMatrix;
+    u8 _pad34[0xD4 - 0x34];
+    float _212_4_;
+    float _216_4_;
+    float _220_4_;
     float _224_4_;
     float _228_4_;
     float _232_4_;

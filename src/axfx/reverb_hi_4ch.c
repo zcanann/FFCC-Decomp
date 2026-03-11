@@ -1,7 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include <math.h>
+#include "dolphin/fake_tgmath.h"
 
 #include "dolphin/axfx/__axfx.h"
 

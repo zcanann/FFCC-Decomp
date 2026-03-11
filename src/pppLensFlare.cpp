@@ -28,17 +28,17 @@ static inline float CameraLookAtZ()
 
 static inline float CameraWorldX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+    return CameraPcs._224_4_;
 }
 
 static inline float CameraWorldY()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
+    return CameraPcs._228_4_;
 }
 
 static inline float CameraWorldZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
+    return CameraPcs._232_4_;
 }
 
 static inline Mtx& CameraMatrix()

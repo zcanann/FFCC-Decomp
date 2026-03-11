@@ -335,7 +335,7 @@ void __VIInit(VITVMode mode) {
     tm = getTiming(mode);
     __VIRegs[1] = 2;
 
-    for (delay = 0; delay < 1000; delay += 8) {}
+    for (delay = 0; delay < 1000; delay++) {}
 
     __VIRegs[1] = 0;
     __VIRegs[3] = (u32)tm->hlw;
@@ -354,13 +354,8 @@ void __VIInit(VITVMode mode) {
     __VIRegs[36] = 0x2828;
     __VIRegs[27] = 1;
     __VIRegs[26] = 0x1001;
-    {
-        u16 hlw = tm->hlw;
-        s16 halfNhlines = (s16)tm->nhlines;
-
-        __VIRegs[25] = hlw + 1;
-        __VIRegs[24] = ((halfNhlines >> 1) + 1) | 0x1000;
-    }
+    __VIRegs[25] = tm->hlw + 1;
+    __VIRegs[24] = ((tm->nhlines >> 1) + 1) | 0x1000;
 
     if (mode != 2 && mode != 3 && mode != 0x1A) {
         __VIRegs[1] = (ds << 2) | 1 | (tv << 8);

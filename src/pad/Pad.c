@@ -853,7 +853,7 @@ BOOL __PADDisableRecalibration(BOOL disable) {
     bits = __gUnknown800030E3 & (u8)~0x40;
     __gUnknown800030E3 = bits;
     if (disable) {
-        __gUnknown800030E3 = bits | 0x40;
+        __gUnknown800030E3 |= 0x40;
     }
 
     OSRestoreInterrupts(enabled);

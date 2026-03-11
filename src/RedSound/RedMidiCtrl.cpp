@@ -214,7 +214,8 @@ int SineSwing(int phase)
 int TriangleSwing(int phase)
 {
     u32 mode = ((u32)phase >> 8) & 3;
-    int result = ((u32)phase & 0xFF) << 8;
+    u32 low = (u32)phase & 0xFF;
+    int result = low * 0x100;
     if (mode != 2) {
         if (mode >= 2) {
             if (mode < 4) {
@@ -226,7 +227,7 @@ int TriangleSwing(int phase)
     } else {
         result = -result;
     }
-    return (phase & 0xFF) | result;
+    return low | result;
 }
 
 /*

@@ -1310,8 +1310,6 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     int loaded;
     void* stage;
     char path[256];
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
 
     language = GetLangString__5CGameFv(&Game.game);
     sprintf(path, s_dvd__smenu__s_801d7fb0, language, fileName);
@@ -1321,15 +1319,15 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xF4);
     }
 
-    usb->m_stageLoad = stage;
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageLoad = stage;
     SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(&ppvAmemCacheSet, stage);
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F8) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236FC) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23704) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23708) = 0;
 
     pdtSlotIndex = pppGetFreeDataMng__8CPartMngFv(&PartMng);
     if (pdtSlotIndex != -1) {
@@ -1348,8 +1346,11 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         }
     }
 
-    usb->m_stageLoad = usb->m_stageDefault;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(&ppvAmemCacheSet, usb->m_stageDefault);
+    reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageLoad =
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageDefault;
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(
+        &ppvAmemCacheSet,
+        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4)->m_stageDefault);
 
     return pdtSlotIndex;
 }

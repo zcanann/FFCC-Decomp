@@ -7,7 +7,7 @@
 static const GXColorS10 sTevColor = {-90, 0, -114, 135};
 static const GXColor sKColor0 = {0, 0, 226, 88};
 static const GXColor sKColor1 = {179, 0, 0, 182};
-static const GXColor sKColor2 = {0, 135, 0, 0};
+static const GXColor sKColor2 = {255, 0, 255, 128};
 
 void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 texWidth, s16 texHeight, s16 polyWidth, s16 polyHeight) {
     GXTexObj yTexObj;

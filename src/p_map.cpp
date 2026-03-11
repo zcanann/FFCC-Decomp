@@ -230,6 +230,13 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = unusedVec.x;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = unusedVec.z;
         }
+
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr =
+            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
+        if (mapLightHolderArr[1].GetSize() != 0) {
+            mapLightHolderArr[1][0]->GetLightHolder(
+                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&CameraPcs) + 0x1E0), static_cast<Vec*>(0));
+        }
     }
 
     if (mode == 2) {

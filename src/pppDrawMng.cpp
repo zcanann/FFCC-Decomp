@@ -9,6 +9,7 @@
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
+void InitEnv__9CCharaPcsFi(void* charaPcs, int envIndex);
 float kPppDrawDepthScaleNear = 0.0512f;
 float kPppDrawDepthScaleFar = 0.512f;
 }
@@ -105,8 +106,12 @@ void pppDrawMng::AddPrimOt(unsigned long otIndex, _pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007BCC8
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDrawMng::DrawOt()
 {
@@ -142,7 +147,7 @@ void pppDrawMng::DrawOt()
 					if (lastType != prim->m_type)
 					{
 						pppInitDrawEnv(0);
-						CharaPcs.InitEnv(4);
+						InitEnv__9CCharaPcsFi(&CharaPcs, 4);
 					}
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);

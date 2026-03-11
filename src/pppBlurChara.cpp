@@ -145,21 +145,23 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 {
     void* handle = GetCharaHandlePtr__FP8CGObjectl(((void**)param_2)[1], 0);
     _GXTexObj backTexObj;
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     Vec posA;
     Vec posB;
-    int width;
-    int height;
+    _GXColor white;
+    unsigned int width;
+    unsigned int height;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (int)FLOAT_80331050;
-    height = (int)FLOAT_80331054;
+    width = (unsigned int)FLOAT_80331050;
+    height = (unsigned int)FLOAT_80331054;
 
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
-    gUtil.BeginQuadEnv();
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
@@ -167,6 +169,9 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     posB.x = (float)width;
     posB.y = (float)height;
     posB.z = FLOAT_80331030;
+
+    gUtil.BeginQuadEnv();
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
     gUtil.RenderQuadNoTex(posA, posB, white);
     gUtil.EndQuadEnv();
 
@@ -185,8 +190,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
                                GX_NEAR, GX_TF_I8, 0);
 
     if (*((unsigned char*)param_3 + 4) == 1) {
-        posA.y = *(float*)((char*)param_3 + 0x14);
-        posA.x = FLOAT_80331044 * posA.y;
+        double y = (double)*(float*)((char*)param_3 + 0x14);
+        double x = (double)FLOAT_80331044 * y;
+
+        posA.y = (float)y;
+        posA.x = (float)x;
 
         gUtil.RenderTextureQuad(-posA.x, -posA.y, FLOAT_80331050 + posA.x, FLOAT_80331054 + posA.y,
                                 (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

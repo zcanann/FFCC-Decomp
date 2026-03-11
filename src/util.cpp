@@ -1175,27 +1175,55 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
             break;
         }
 
-        if (!isPrimitive) {
-            running = false;
-            continue;
-        }
+        if (isPrimitive) {
+            if (primitive == 0x90) {
+                polygonCount += count / 3;
+            } else if (primitive == 0x98) {
+                polygonCount += count - 2;
+            }
 
-        if (primitive == 0x90) {
-            polygonCount += count / 3;
-        } else if (primitive == 0x98) {
-            polygonCount += count - 2;
-        }
-
+<<<<<<< pr/main/util/1773236604
         if ((opcode & 7) == 2) {
             if (count != 0) {
                 u32 blocks = vertexCount >> 3;
 
+=======
+            if ((opcode & 7) != 2) {
+                if (count != 0) {
+                    u32 blocks = vertexCount >> 3;
+
+                    if (blocks != 0) {
+                        do {
+                            data += 0x40;
+                            blocks--;
+                        } while (blocks != 0);
+                        count &= 7;
+                        if ((vertexCount & 7) == 0) {
+                            continue;
+                        }
+                    }
+
+                    do {
+                        data += 8;
+                        count--;
+                    } while (count != 0);
+                }
+                continue;
+            }
+
+            if (count != 0) {
+                u32 blocks = vertexCount >> 3;
+
+>>>>>>> main
                 if (blocks != 0) {
                     do {
                         data += 0x50;
                         blocks--;
                     } while (blocks != 0);
+<<<<<<< pr/main/util/1773236604
 
+=======
+>>>>>>> main
                     count &= 7;
                     if ((vertexCount & 7) == 0) {
                         continue;
@@ -1207,6 +1235,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
                     count--;
                 } while (count != 0);
             }
+<<<<<<< pr/main/util/1773236604
         } else if (count != 0) {
             u32 blocks = vertexCount >> 3;
 
@@ -1226,6 +1255,11 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
                 data += 8;
                 count--;
             } while (count != 0);
+=======
+            continue;
+        } else {
+            running = false;
+>>>>>>> main
         }
     } while (true);
 }

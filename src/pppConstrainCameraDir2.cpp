@@ -59,12 +59,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             cameraPos.y = CameraPosY();
             cameraPos.z = CameraPosZ();
             float baseDistance = FLOAT_803331e4;
-            float scale = FLOAT_803331e0 + ((CameraDistance() - baseDistance) / baseDistance);
+            float one = FLOAT_803331e0;
+            float scale = one + ((CameraDistance() - baseDistance) / baseDistance);
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
             pppMngSt->m_scale.x = FLOAT_803331e8 * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = FLOAT_803331e0;
+            pppMngSt->m_scale.z = one;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);

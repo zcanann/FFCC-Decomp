@@ -388,7 +388,7 @@ public:
     void pppInitEnv(_pppEnvSt*, _pppDataHead*, unsigned int);
     void pppFileRead(char*, unsigned long&, void*, int);
     void LoadPartNoSyncCalc();
-    void pppLoadPtx(const char*, int, int, void*, int);
+    int pppLoadPtx(const char*, int, int, void*, int);
 
     void pppLoadPmd(CChunkFile&);
     void pppLoadPmd(const char*);

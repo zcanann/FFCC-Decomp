@@ -81,6 +81,18 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
+extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
+    CTextureSet*, void*, CMemory::CStage*, int, CAmemCacheSet*, int, int);
+extern "C" void* __nw__12CMaterialSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" CMaterialSet* __ct__12CMaterialSetFv(CMaterialSet*);
+extern "C" void SetPartFromTextureSet__12CMaterialSetFP11CTextureSeti(CMaterialSet*, CTextureSet*, int);
+extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
+extern "C" void* __nw__9CMaterialFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" CMaterial* __ct__9CMaterialFv(CMaterial*);
+extern "C" void Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(CMaterial*, unsigned long, unsigned long);
+extern "C" void AddMaterial__12CMaterialSetFP9CMateriali(CMaterialSet*, CMaterial*, int);
 CProfile g_par_calc_prof(0);
 CProfile g_par_draw_prof(0);
 PPPCREATEPARAM g_dcp;
@@ -2451,12 +2463,97 @@ void CPartMng::LoadPartNoSyncCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80059658
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppLoadPtx(const char*, int, int, void*, int)
+int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
-	// TODO
+    struct PartMngResRaw {
+        unsigned char m_unk0[0x7e4];
+        CMaterialSet* m_materialSet;
+        CTextureSet* m_textureSet;
+    };
+
+    static const unsigned int kChunkTSET = 0x54534554;
+    static const int kEnvOffset = 0x2351c;
+
+    CMemory::CStage* stageLoad =
+        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(this);
+
+    ppvAmemCacheSet.CacheClear();
+    stageLoad->setDefaultParam(pdtSlotIndex);
+
+    char path[256];
+    sprintf(path, "%s.ptx", baseName);
+    if (System.m_execParam > 2) {
+        System.Printf("ReadPtx fn=[%s]\n", path);
+    }
+
+    unsigned long fileSize = 0;
+    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, readBuffer, readBufferSize);
+    if (fileData == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf("CAN NOT READ[%s]!!\n", path);
+        }
+        stageLoad->resDefaultParam();
+        return 0;
+    }
+
+    if (fileData == reinterpret_cast<void*>(1)) {
+        stageLoad->resDefaultParam();
+        return 1;
+    }
+
+    if (res->m_textureSet == 0) {
+        CTextureSet* textureSet = static_cast<CTextureSet*>(
+            __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stageLoad, s_partMng_cpp_801d8230, 0xC10));
+        if (textureSet != 0) {
+            textureSet = __ct__11CTextureSetFv(textureSet);
+        }
+        res->m_textureSet = textureSet;
+    }
+
+    if (res->m_materialSet == 0) {
+        CMaterialSet* materialSet = static_cast<CMaterialSet*>(
+            __nw__12CMaterialSetFUlPQ27CMemory6CStagePci(0x24, stageLoad, s_partMng_cpp_801d8230, 0xC14));
+        if (materialSet != 0) {
+            materialSet = __ct__12CMaterialSetFv(materialSet);
+        }
+        res->m_materialSet = materialSet;
+        reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(this) + kEnvOffset)->m_materialSetPtr =
+            res->m_materialSet;
+
+        CMaterial* defaultMaterial = static_cast<CMaterial*>(
+            __nw__9CMaterialFUlPQ27CMemory6CStagePci(0xA8, stageLoad, s_partMng_cpp_801d8230, 0xC17));
+        if (defaultMaterial != 0) {
+            defaultMaterial = __ct__9CMaterialFv(defaultMaterial);
+        }
+        if (defaultMaterial != 0) {
+            Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(defaultMaterial, 0, 0xFFF531F0);
+            AddMaterial__12CMaterialSetFP9CMateriali(res->m_materialSet, defaultMaterial, 0);
+        }
+    }
+
+    CChunkFile chunkFile;
+    chunkFile.SetBuf(fileData);
+
+    CChunkFile::CChunk chunk;
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == kChunkTSET) {
+            Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
+                res->m_textureSet, &chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+        }
+    }
+
+    SetPartFromTextureSet__12CMaterialSetFP11CTextureSeti(res->m_materialSet, res->m_textureSet, pdtSlotIndex);
+    SetTextureSet__12CMaterialSetFP11CTextureSet(res->m_materialSet, res->m_textureSet);
+    stageLoad->resDefaultParam();
+    return 1;
 }
 
 /*

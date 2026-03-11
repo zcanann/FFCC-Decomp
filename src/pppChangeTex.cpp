@@ -132,7 +132,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 			if (iVar1 != 0) {
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, (void*)iVar1, 4);
-				*(int*)(MaterialManRaw() + 0x208) = iVar4 + 0x28;
+				*(int*)(MaterialManRaw() + 0xd0) = iVar4 + 0x28;
 				iVar1 = meshData->m_displayListCount - 1;
 				iVar4 = iVar1 * 4;
 				for (; -1 < iVar1; iVar1 = iVar1 - 1) {

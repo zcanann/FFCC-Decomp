@@ -284,9 +284,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int i;
     int colorOffset;
     int workOffset;
-    RainWork* work;
     RainDrop* drop;
-    u8* colorPtr;
+    u8* colorBase;
     u32 color;
     double baseX;
     double baseY;
@@ -297,11 +296,10 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
-    colorPtr = (u8*)pppRain + 0x88 + colorOffset;
-    work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
+    colorBase = (u8*)pppRain + 0x80 + colorOffset;
     pppSetBlendMode__FUc(param_2->m_payload[0x48]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        colorPtr,
+        colorBase + 8,
         ppvCameraMatrix0,
         kPppRainTexCoordBase,
         param_2->m_payload[0x4a],
@@ -320,8 +318,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_payload[0x3c], GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    drop = (RainDrop*)work->drops;
-    color = *(u32*)colorPtr;
+    drop = *(RainDrop**)((u8*)pppRain + 0x80 + workOffset);
+    color = *(u32*)(colorBase + 8);
     baseX = (double)pppMngStPtr->m_matrix.value[0][3];
     baseY = (double)pppMngStPtr->m_matrix.value[1][3];
     baseZ = (double)pppMngStPtr->m_matrix.value[2][3];

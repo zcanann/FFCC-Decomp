@@ -16,8 +16,7 @@ struct pppYmChangeTex {
 struct pppYmChangeTexStep {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u8 _pad0[2];
+    float m_initWOrk;
     float m_stepValue;
     u8 m_arg3;
     u8 m_payload[6];

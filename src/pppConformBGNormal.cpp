@@ -112,7 +112,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             mode = param2->m_stepValue;
 
             if (mode == 0) {
-                if (((s32)((u32)*(u8*)(owner + 0x50) << 24) < 0)) {
+                if (*(s8*)(owner + 0x50) < 0) {
                     local_164.x = *(f32*)(owner + 0x4ec);
                     local_164.y = *(f32*)(owner + 0x4f0);
                     local_164.z = *(f32*)(owner + 0x4f4);
@@ -223,7 +223,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
             mode = param2->m_stepValue;
             if (mode == 0) {
-                if ((s32)((u32)*(u8*)((u8*)owner + 0x50) << 24) < 0) {
+                if (*(s8*)(owner + 0x50) < 0) {
                     pppMngStPtr->m_matrix.value[0][3] = *(f32*)((u8*)owner + 0x15c);
                     pppMngStPtr->m_matrix.value[1][3] = *(f32*)((u8*)owner + 0x160);
                     pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
@@ -288,7 +288,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         }
     }
 }
-
 
 
 

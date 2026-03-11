@@ -146,6 +146,7 @@ void C_QUATRotAxisRad(Quaternion *q, const Vec *axis, f32 rad)
     q->w = tmp3;
 }
 
+#pragma fp_contract off
 void C_QUATMtx(Quaternion *r, const Mtx m)
 {
     f32 vv0, vv1;
@@ -181,6 +182,7 @@ void C_QUATMtx(Quaternion *r, const Mtx m)
         r->z = vec[2];
     }
 }
+#pragma fp_contract on
 
 void C_QUATLerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
 {

@@ -2651,12 +2651,28 @@ int GbaQueue::GetEquipData(int, unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cb8c0
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetShopFlg(int)
+void GbaQueue::SetShopFlg(int channel)
 {
-	// TODO
+	u8 mask = static_cast<u8>(1 << channel);
+	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(this) + channel * 0xC + 0x80);
+	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
+
+	OSWaitSemaphore(semaphore);
+	*flags = static_cast<u8>(*flags | mask);
+	OSSignalSemaphore(semaphore);
+
+	if (Joybus.SetMType(channel, 2) != 0) {
+		flags[1] = static_cast<u8>(flags[1] | mask);
+	} else {
+		flags[1] = static_cast<u8>(flags[1] & ~mask);
+	}
 }
 
 /*
@@ -2671,12 +2687,28 @@ void GbaQueue::ClrShopFlg(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cb818
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetSmithFlg(int)
+void GbaQueue::SetSmithFlg(int channel)
 {
-	// TODO
+	u8 mask = static_cast<u8>(0x10 << channel);
+	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(this) + channel * 0xC + 0x80);
+	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
+
+	OSWaitSemaphore(semaphore);
+	*flags = static_cast<u8>(*flags | mask);
+	OSSignalSemaphore(semaphore);
+
+	if (Joybus.SetMType(channel, 3) != 0) {
+		flags[1] = static_cast<u8>(flags[1] | mask);
+	} else {
+		flags[1] = static_cast<u8>(flags[1] & ~mask);
+	}
 }
 
 /*

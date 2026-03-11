@@ -2902,41 +2902,29 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
 {
     CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-    unsigned long textureIndex = 0;
+    u32 textureIndex = 0;
 
-    while (true) {
-        unsigned long textureCount = static_cast<unsigned long>(textureArray->GetSize());
+    do {
+        u32 textureCount = static_cast<u32>(textureArray->GetSize());
         if (textureCount <= textureIndex) {
             return;
         }
 
         if ((*textureArray)[textureIndex] != 0) {
-            unsigned long materialIndex = textureIndex + 1;
-            unsigned long materialCount = static_cast<unsigned long>(materialArray->GetSize());
-            if ((materialIndex < materialCount) &&
-                ((*materialArray)[materialIndex] != 0)) {
-                textureIndex++;
-                continue;
+            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            u32 materialIndex = textureIndex + 1;
+            if ((materialIndex < materialCount) && ((*materialArray)[materialIndex] != 0)) {
+                goto next;
             }
 
             unsigned char* material = reinterpret_cast<unsigned char*>(
                 _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                    &Memory,
-                    0xA8,
-                    MaterialMan.GetMemoryStage(),
-                    s_materialman_cpp,
-                    0xEE4,
-                    0));
-
+                    &Memory, 0xA8, *reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
+                    s_materialman_cpp, 0xEE4, 0));
             if (material != 0) {
                 __ct__4CRefFv(material);
                 *reinterpret_cast<void**>(material) = __vt__9CMaterial;
-                __construct_array(
-                    material + 0x4C,
-                    __ct__10CTexScrollFv,
-                    __dt__10CTexScrollFv,
-                    0x14,
-                    4);
+                __construct_array(material + 0x4C, __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
                 memset(material + 8, 0, 0x10);
                 *reinterpret_cast<int*>(material + 0x9C) = -1;
                 material[0xA0] = 4;
@@ -2962,16 +2950,16 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
-            materialCount = static_cast<unsigned long>(materialArray->GetSize());
+            materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             if (materialIndex < materialCount) {
                 materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
             } else {
                 materialArray->Add(reinterpret_cast<CMaterial*>(material));
             }
         }
-
-        textureIndex++;
-    }
+next:
+        textureIndex = textureIndex + 1;
+    } while (true);
 }
 
 /*

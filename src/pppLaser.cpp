@@ -100,8 +100,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     int local_24;
     int local_28;
     int iVar2;
-    Vec local_20;
     Vec local_14;
+    Vec local_20;
 
     *pfVar3 = kPppLaserZero;
     pfVar3[6] = fVar1;
@@ -588,4 +588,3 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
         }
     }
 }
-

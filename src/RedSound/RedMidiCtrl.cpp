@@ -197,7 +197,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
+#pragma optimization_level 4
 int SineSwing(int phase)
 {
     int value = DAT_8021e1d0[phase & 0x1FF];

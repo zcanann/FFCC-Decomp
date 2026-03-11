@@ -2463,33 +2463,56 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	CGObjWork* baseObj = this;
-	CCaravanWork* work = this;
+	CGObjWork* gObjWork = this;
+	CCaravanWork* artifactWork = this;
 	int hpMax = 0;
 	int artifactIndex = 0;
+	int count = 0x32;
 
-	for (int i = 0; i < 0x32; i++) {
-		if ((artifactIndex < 0x60) && ((short)work->m_artifacts[0] > 0)) {
-			unsigned short* artifactData = GetItemDataPtr((short)work->m_artifacts[0]);
+	do {
+		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[0] > 0)) {
+			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[0]);
 			unsigned short artifactType = artifactData[0];
-			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
+
+			if (artifactType == 0xDB) {
+			} else if (artifactType < 0xDB) {
+				if (artifactType == 0xB6) {
+				} else if (artifactType < 0xB6) {
+					if (artifactType == 0x9F) {
+					}
+				} else if (artifactType == 0xCC) {
+				}
+			} else if (artifactType == 0xE4) {
 				hpMax += artifactData[3];
+			} else if ((artifactType < 0xE4) && (artifactType == 0xDF)) {
 			}
 		}
 
-		if ((artifactIndex + 1 < 0x60) && ((short)work->m_artifacts[1] > 0)) {
-			unsigned short* artifactData = GetItemDataPtr((short)work->m_artifacts[1]);
+		artifactIndex++;
+		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[1] > 0)) {
+			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[1]);
 			unsigned short artifactType = artifactData[0];
-			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
+
+			if (artifactType == 0xDB) {
+			} else if (artifactType < 0xDB) {
+				if (artifactType == 0xB6) {
+				} else if (artifactType < 0xB6) {
+					if (artifactType == 0x9F) {
+					}
+				} else if (artifactType == 0xCC) {
+				}
+			} else if (artifactType == 0xE4) {
 				hpMax += artifactData[3];
+			} else if ((artifactType < 0xE4) && (artifactType == 0xDF)) {
 			}
 		}
 
-		work = (CCaravanWork*)&work->m_objType;
-		artifactIndex += 2;
-	}
+		artifactWork = (CCaravanWork*)&artifactWork->m_objType;
+		artifactIndex++;
+		count--;
+	} while (count != 0);
 
-	hpMax += *(unsigned short*)(Game.game.unkCFlatData0[0] + baseObj->m_baseDataIndex * 0x1D0 + 6);
+	hpMax += *(unsigned short*)(Game.game.unkCFlatData0[0] + gObjWork->m_baseDataIndex * 0x1D0 + 6);
 	if (hpMax > 0xF) {
 		return 0x10;
 	}

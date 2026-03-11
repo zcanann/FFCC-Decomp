@@ -25,7 +25,7 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
     unsigned char* dest_ptr;
     size_t bytes_to_go;
     size_t bytes_read;
-    size_t num_bytes;
+    size_t transfer_count[3];
     int    ioresult;
     int    always_buffer;
 
@@ -110,17 +110,17 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
                 }
             }
 
-            num_bytes = stream->buffer_length;
-            if (num_bytes > bytes_to_go)
-                num_bytes = bytes_to_go;
+            transfer_count[0] = stream->buffer_length;
+            if (transfer_count[0] > bytes_to_go)
+                transfer_count[0] = bytes_to_go;
 
-            memcpy(dest_ptr, stream->buffer_ptr, num_bytes);
+            memcpy(dest_ptr, stream->buffer_ptr, transfer_count[0]);
 
-            dest_ptr += num_bytes;
-            bytes_read += num_bytes;
-            bytes_to_go -= num_bytes;
-            stream->buffer_ptr += num_bytes;
-            stream->buffer_length -= num_bytes;
+            dest_ptr += transfer_count[0];
+            bytes_read += transfer_count[0];
+            bytes_to_go -= transfer_count[0];
+            stream->buffer_ptr += transfer_count[0];
+            stream->buffer_length -= transfer_count[0];
 
         } while (bytes_to_go && always_buffer);
     }
@@ -128,12 +128,10 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
     if (bytes_to_go && !always_buffer) {
         unsigned char* save_buffer = stream->buffer;
         size_t save_size   = stream->buffer_size;
-        size_t direct_read = 0;
-
         stream->buffer        = dest_ptr;
         stream->buffer_size   = bytes_to_go;
 
-        ioresult = __load_buffer(stream, &direct_read, 1);
+        ioresult = __load_buffer(stream, transfer_count, 1);
 
         if (ioresult != __load_ok) {
             if (ioresult == __load_error) {
@@ -145,10 +143,9 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
             stream->buffer_length = 0;
         }
 
-        bytes_read += direct_read;
-
         stream->buffer      = save_buffer;
         stream->buffer_size = save_size;
+        bytes_read += transfer_count[0];
 
         __prep_buffer(stream);
         stream->buffer_length = 0;

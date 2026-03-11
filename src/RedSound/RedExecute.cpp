@@ -25,11 +25,9 @@ struct RedReverbDATA {
  * JP Address: TODO
  * JP Size: TODO
  */
-u8 GetRandomData()
+u32 GetRandomData()
 {
-    u8 uVar1 = (u8)DAT_8032f4a8;
-    DAT_8032f4a8 = DAT_8032f4a8 + 1;
-    return DAT_8021dcce[uVar1];
+    return DAT_8021dcce[DAT_8032f4a8++];
 }
 
 /*

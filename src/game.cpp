@@ -936,6 +936,9 @@ void CGame::loadCfd()
     {
         unsigned int m_size;
         void* m_data;
+        int m_numStrings;
+        char** m_strings;
+        char* m_stringBuf;
     };
 
     struct FlatDataLayout

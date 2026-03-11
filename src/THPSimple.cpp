@@ -796,7 +796,7 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 void MixAudio(short* output, short* input, unsigned long samples)
 {
     u16 volume;
-    f32 volumeIndex;
+    f32 curVolume;
     s32 mixedSample;
     s16* audioPtr;
     u32 availableSamples;
@@ -818,13 +818,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
                 audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
                 for (i = availableSamples; i != 0; i--) {
-                    volumeIndex = SimpleControl.unk_C8;
+                    curVolume = SimpleControl.unk_C8;
                     if (SimpleControl.unk_D0 != 0) {
                         SimpleControl.unk_D0 -= 1;
-                        volumeIndex = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                        curVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
                     }
-                    SimpleControl.unk_C4 = volumeIndex;
-                    volume = gTHPSimpleVolumeTable[static_cast<s32>(volumeIndex)];
+                    SimpleControl.unk_C4 = curVolume;
+                    volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                     mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
                     if (mixedSample < -0x8000) {
@@ -874,13 +874,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
             audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
             for (i = availableSamples; i != 0; i--) {
-                volumeIndex = SimpleControl.unk_C8;
+                curVolume = SimpleControl.unk_C8;
                 if (SimpleControl.unk_D0 != 0) {
                     SimpleControl.unk_D0 -= 1;
-                    volumeIndex = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    curVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
                 }
-                SimpleControl.unk_C4 = volumeIndex;
-                volume = gTHPSimpleVolumeTable[static_cast<s32>(volumeIndex)];
+                SimpleControl.unk_C4 = curVolume;
+                volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                 mixedSample = static_cast<s32>(*input) +
                               static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);

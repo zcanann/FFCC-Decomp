@@ -48,7 +48,9 @@ CRedMemory::CRedMemory()
  */
 extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, int shouldDelete)
 {
-	if ((redMemory != 0) && (0 < shouldDelete)) {
+	volatile short deleteFlag = shouldDelete;
+
+	if ((redMemory != 0) && (0 < deleteFlag)) {
 		__dl__FPv(redMemory);
 	}
 	return redMemory;

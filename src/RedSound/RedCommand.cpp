@@ -553,8 +553,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 
 	do {
 		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x14] = ((volume << 0xc) | 0x800) - track[0x13];
-			track[0x14] /= step;
+			track[0x14] = (int)(((volume << 0xc) | 0x800U) - track[0x13]) / step;
 			track[0x15] = step;
 			track[0x16] = mode;
 		}
@@ -586,7 +585,7 @@ void SetSePan(int seId, int pan, int frameCount)
 
 	do {
 		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x11] = (((pan << 0xc) | 0x800) - track[0x10]) / step;
+			track[0x11] = (int)(((pan << 0xc) | 0x800U) - track[0x10]) / step;
 			track[0x12] = step;
 		}
 		track += 0x55;
@@ -617,7 +616,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 
 	do {
 		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
-			track[0x18] = (((pitch << 0xc) | 0x800) - track[0x17]) / step;
+			track[0x18] = (int)(((pitch << 0xc) | 0x800U) - track[0x17]) / step;
 			track[0x19] = step;
 		}
 		track += 0x55;

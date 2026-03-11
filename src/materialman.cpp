@@ -1719,7 +1719,8 @@ void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
  */
 void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMtx)[4], long flags)
 {
-    if (*(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404) != 0) {
+    int cameraEnable = *(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404);
+    if (cameraEnable != 0) {
         *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x80;
 
         unsigned char* shadowPtr = reinterpret_cast<unsigned char*>(&shadow);

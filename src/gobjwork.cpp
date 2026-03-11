@@ -206,8 +206,7 @@ void CCaravanWork::clearCaravanWork()
 {
 	m_letterCount = 0;
 	m_gil = 0;
-	unk_0x3c8 = 0;
-	unk_0x3c9 = 0;
+	*reinterpret_cast<unsigned short*>(&unk_0x3c8) = 0;
 	m_equipment[0] = -1;
 	m_equipment[1] = -1;
 	m_equipment[2] = -1;

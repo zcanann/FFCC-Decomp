@@ -51,7 +51,7 @@ struct YmDeformationScreenStep {
 };
 
 struct pppCVECTOR {
-	unsigned int m_rgba;
+	unsigned char m_rgba[4];
 };
 
 struct _pppEnvStYmDeformationScreen {
@@ -274,7 +274,10 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-	color.m_rgba = 0x40404040;
+	color.m_rgba[0] = 0x40;
+	color.m_rgba[1] = 0x40;
+	color.m_rgba[2] = 0x40;
+	color.m_rgba[3] = 0x40;
 	pppSetBlendMode__FUc(0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 		&color, (pppFMATRIX*)0, 0.0f, (unsigned char)0, (unsigned char)0, (unsigned char)0, (unsigned char)0,
@@ -340,19 +343,19 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	GXPosition3f32(FLOAT_80330670, FLOAT_80330670, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_80330670, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(texU, FLOAT_80330670);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(texU, texV);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
 	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(FLOAT_80330670, texV);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
 
@@ -361,19 +364,19 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	depth = work[0];
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(texU, FLOAT_80330670);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_80330690, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(texU, texV);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
 	GXPosition3f32(FLOAT_80330670, FLOAT_80330690, depth);
-	GXColor1u32(color.m_rgba);
+	GXColor1u32(*(u32*)color.m_rgba);
 	GXTexCoord2f32(FLOAT_80330670, texV);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
 

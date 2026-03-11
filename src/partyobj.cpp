@@ -2561,8 +2561,10 @@ void CGPartyObj::gpmMove()
  */
 void CGPartyObj::sysControl(int controlType, int controlValue)
 {
-	if (controlType == 0x13) {
+	switch (controlType) {
+	case 0x13:
 		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->BackupTutorialItem(controlValue);
+		break;
 	}
 }
 

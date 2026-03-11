@@ -199,11 +199,11 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  */
 int SineSwing(int phase)
 {
-    int result = DAT_8021e1d0[phase & 0x1FF];
+    int value = DAT_8021e1d0[phase & 0x1FF];
     if ((phase & 0x200) != 0) {
-        result = -result;
+        value = -value;
     }
-    return result;
+    return value;
 }
 
 /*
@@ -276,12 +276,12 @@ int RandomSwing(int phase)
  */
 int SineSwingR(int phase)
 {
-    unsigned int flipped = static_cast<unsigned int>(phase) ^ 0x200;
-    int result = DAT_8021e1d0[flipped & 0x1FF];
-    if ((flipped & 0x200) != 0) {
-        result = -result;
+    phase ^= 0x200;
+    int value = DAT_8021e1d0[phase & 0x1FF];
+    if ((phase & 0x200) != 0) {
+        value = -value;
     }
-    return result;
+    return value;
 }
 
 /*

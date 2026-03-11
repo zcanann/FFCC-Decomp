@@ -1142,7 +1142,7 @@ DSError TRKTargetSupportRequest(void) {
     MessageCommandID commandId;
     TRKEvent event;
 
-    commandId = (u8) gTRKCPUState.Default.GPR[3];
+    commandId = gTRKCPUState.Default.GPR[3];
     if (commandId != DSMSG_ReadFile && commandId != DSMSG_WriteFile && commandId != DSMSG_OpenFile && commandId != DSMSG_CloseFile && commandId != DSMSG_PositionFile) {
         TRKConstructEvent(&event, NUBEVENT_Exception);
         TRKPostEvent(&event);

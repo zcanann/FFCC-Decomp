@@ -9,7 +9,6 @@
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
-#include <string.h>
 #include "ffcc/ppp_linkage.h"
 
 struct _pppMngStEmission {
@@ -38,6 +37,7 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
 extern "C" {
+int strcmp(const char* lhs, const char* rhs);
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

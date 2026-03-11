@@ -437,42 +437,36 @@ void CFile::SyncCompleted(CFile::CHandle* fileHandle)
  */
 void CFile::kick()
 {
-	do
-	{
-		CHandle* sentinel = &m_fileHandle;
-		CHandle* cur = sentinel->m_previous;
+    CHandle* cur = CheckQueue();
+    if (cur == 0)
+    {
+        CHandle* sentinel = &m_fileHandle;
+        cur = sentinel->m_previous;
+        while (cur != sentinel)
+        {
+            if ((Game.game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
+                && (cur->m_completionStatus == 1 || cur->m_completionStatus == 4))
+            {
+                u32 readSize = (cur->m_chunkSize + 0x1F) & ~0x1F;
 
-		while (cur != sentinel)
-		{
-			if ((Game.game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
-			    && (cur->m_completionStatus == 1 || cur->m_completionStatus == 4))
-			{
-				u32 readSize;
+                cur->m_completionStatus = 2;
+                if (readSize > 0x100000U && System.m_execParam != 0)
+                {
+                    System.Printf(s_readWarnFmt, cur->m_name, readSize);
+                }
 
-				cur->m_completionStatus = 2;
-				readSize = (cur->m_chunkSize + 0x1F) & ~0x1F;
-
-				if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
-				{
-					System.Printf("", cur->m_name, readSize);
-				}
-
-				DVDReadAsyncPrio(&cur->m_dvdFileInfo, m_readBuffer, readSize, cur->m_currentOffset, 0, 2);
-				cur->m_nextOffset = cur->m_currentOffset + readSize;
-				if (cur->m_completionStatus != 3)
-				{
-					return;
-				}
-				break;
-			}
-			cur = cur->m_previous;
-		}
-
-		if (cur == sentinel)
-		{
-			return;
-		}
-	} while (CheckQueue() == 0);
+                DVDReadAsyncPrio(&cur->m_dvdFileInfo, m_readBuffer, readSize, cur->m_currentOffset, 0, 2);
+                cur->m_nextOffset = cur->m_currentOffset + readSize;
+                if (cur->m_completionStatus != 3)
+                {
+                    return;
+                }
+                kick();
+                return;
+            }
+            cur = cur->m_previous;
+        }
+    }
 }
 
 /*

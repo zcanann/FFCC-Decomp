@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern s16 gPppDefaultValueBuffer[];
-static f64 const sPppRandDownHCVConvertBias = 4503601774854144.0;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);

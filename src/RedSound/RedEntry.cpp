@@ -1297,18 +1297,18 @@ void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
  */
 int CRedEntry::SearchMusicSequence(int musicNo)
 {
-	int* const base = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
-	int* musicBank = base;
+	register int* musicBank = *(int**)((int)this + 8);
+	int* end = (int*)(*(int*)((int)this + 8) + 0x40);
 
-	while ((musicBank[3] == 0) || (musicBank[0] != musicNo)) {
-		musicBank += 4;
-		if (musicBank >= reinterpret_cast<int*>(reinterpret_cast<int>(base) + 0x40)) {
-			return -1;
+	do {
+		if ((musicBank[3] != 0) && (*musicBank == musicNo)) {
+			int offset = (int)musicBank - *(int*)((int)this + 8);
+			return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
 		}
-	}
+		musicBank += 4;
+	} while (musicBank < end);
 
-	int offset = reinterpret_cast<int>(musicBank) - reinterpret_cast<int>(base);
-	return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
+	return -1;
 }
 
 /*

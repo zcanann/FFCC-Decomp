@@ -26,10 +26,10 @@ public:
     void changeStat(int, int, int);
     void changeSubStat(int subState);
     void addSubStat();
-    void reqAnim(int, int, int);
+    void reqAnim(int, char, char);
     int isLoopAnim();
     int isLoopAnimDirect();
-    int playSe3D(int, int, int, int, Vec*);
+    int playSe3D(int, unsigned int, unsigned int, int, Vec*);
     void changePrg(int);
     void putParticle(int, int, Vec*, float, int);
     void putParticle(int, int, CGObject*, float, int);

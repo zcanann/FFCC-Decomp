@@ -250,12 +250,12 @@ void CGPrgObj::addSubStat()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPrgObj::reqAnim(int animId, int loop, int direct)
+void CGPrgObj::reqAnim(int animId, char loop, char direct)
 {
 	m_animFlags = (m_animFlags & 0x7f) | 0x80;
 	m_reqAnimId = animId;
-	m_animFlags = (m_animFlags & ~0x40) | ((loop & 1) << 6);
-	m_animFlags = (m_animFlags & ~0x20) | ((direct & 1) << 5);
+	m_animFlags = ((loop << 6) & 0x40) | (m_animFlags & 0xbf);
+	m_animFlags = ((direct << 5) & 0x20) | (m_animFlags & 0xdf);
 }
 
 /*
@@ -269,10 +269,9 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
  */
 int CGPrgObj::isLoopAnim()
 {
-	int flags = m_animFlags;
+	signed char flags = m_animFlags;
 
-	if ((((flags << 25) | (flags >> 7)) < 0) || ((flags << 24) < 0) ||
-	    !static_cast<unsigned char>(IsLoopAnim(2))) {
+	if ((flags << 1) < 0 || flags < 0 || IsLoopAnim(2) == 0) {
 		return 0;
 	}
 
@@ -306,19 +305,17 @@ int CGPrgObj::isLoopAnimDirect()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
+int CGPrgObj::playSe3D(int seNo, unsigned int volume, unsigned int dist, int pitch, Vec* pos)
 {
 	if (seNo == 0 || seNo == 0xFFFF) {
 		return -1;
 	}
 
-	Vec* usePos = (pos != nullptr) ? pos : &m_worldPosition;
-	int handle = Sound.PlaySe3D(
-		seNo, usePos,
-		static_cast<float>(static_cast<unsigned int>(volume)),
-		static_cast<float>(static_cast<unsigned int>(dist)),
-		0
-	);
+	if (pos == 0) {
+		pos = &m_worldPosition;
+	}
+
+	int handle = Sound.PlaySe3D(seNo, pos, static_cast<float>(volume), static_cast<float>(dist), 0);
 
 	if (pitch != 0) {
 		Sound.ChangeSe3DPitch(handle, pitch, 0);

@@ -353,11 +353,10 @@ BOOL PADRecalibrate(u32 mask) {
     mask &= ~(WaitingBits | CheckingBits);
     ResettingBits |= mask;
     disableBits = ResettingBits & EnabledBits;
+    EnabledBits &= ~mask;
     if (!(__gUnknown800030E3 & 0x40)) {
         RecalibrateBits |= mask;
     }
-
-    EnabledBits &= ~mask;
     SIDisablePolling(disableBits);
     if (ResettingChan == 32)
         DoReset();

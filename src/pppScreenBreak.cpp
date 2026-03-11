@@ -40,8 +40,8 @@ struct Vec4d {
 struct pppScreenBreakUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u16 _pad6;
+    u8 m_initWOrk;
+    u8 _pad9[3];
     float m_stepValue;
     float m_arg3;
     u8 m_payload[0x20];
@@ -344,7 +344,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             GXLoadTexObj((_GXTexObj*)*(void**)((u8*)param_2 + 0x10), (GXTexMapID)0);
         }
 
-        GXCallDisplayList(*(void**)displayList, *(unsigned int*)(displayList + 4));
+        GXCallDisplayList(*(void**)(displayList + 4), *(unsigned int*)displayList);
     }
 }
 

@@ -922,7 +922,7 @@ void CMenuPcs::onScriptChanging(char* script)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::onMapChanging(int, int mapNo)
+void CMenuPcs::onMapChanging(int mapNo, int)
 {
     if (((mapNo == 0x21) && (Game.game.m_currentMapId != 0x21)) ||
         ((mapNo != 0x21) && (Game.game.m_currentMapId == 0x21))) {

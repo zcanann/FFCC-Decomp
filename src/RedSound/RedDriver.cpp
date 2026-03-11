@@ -41,6 +41,7 @@ extern "C" {
     void MusicPlay__Fiii(int, int, int);
     void AXSetCompressor(int);
     void AXFXSetHooks(void (*)(unsigned long), void (*)(void*));
+    int __OSReadROM();
 }
 
 struct RedWaveSettingState {
@@ -1437,7 +1438,7 @@ void CRedDriver::SetSoundMode(int soundMode)
  */
 int CRedDriver::GetSoundMode()
 {
-    if (OSSetSoundMode() == 0) {
+    if (__OSReadROM() == 0) {
         DAT_8032f400 = 1;
     } else {
         DAT_8032f400 = DAT_8032f3c8;

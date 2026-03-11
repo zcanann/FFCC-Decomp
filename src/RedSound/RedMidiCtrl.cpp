@@ -2560,30 +2560,26 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	unsigned char* data = *(unsigned char**)track;
-	unsigned int* trackWords = (unsigned int*)track;
-	*(unsigned char**)track = data + 1;
-	unsigned char mode = *data;
+    char* command = *(char**)track;
+    int* trackData = (int*)track;
+    char mode;
 
-	if (mode == 3) {
-		trackWords[0x3F] &= 0xFFFDFFFF;
-		return;
-	}
+    *(char**)track = command + 1;
+    mode = *command;
 
-	if (mode < 3) {
-		if (mode == 1) {
-			trackWords[0x3F] &= 0xFFFF7FFF;
-			return;
-		}
-
-		if (mode != 0) {
-			trackWords[0x3F] &= 0xFFFEFFFF;
-			return;
-		}
-	} else if (mode < 5) {
-		trackWords[0x3F] &= 0xFFFBFFFF;
-		return;
-	}
-
-	trackWords[0x3F] &= 0xFFFFBFFF;
+    if (mode == 3) {
+        trackData[0x3f] &= 0xFFFDFFFF;
+    } else if (mode < 3) {
+        if (mode == 1) {
+            trackData[0x3f] &= 0xFFFF7FFF;
+        } else if (mode != 0) {
+            trackData[0x3f] &= 0xFFFEFFFF;
+        } else {
+            trackData[0x3f] &= 0xFFFFBFFF;
+        }
+    } else if (mode < 5) {
+        trackData[0x3f] &= 0xFFFBFFFF;
+    } else {
+        trackData[0x3f] &= 0xFFFFBFFF;
+    }
 }

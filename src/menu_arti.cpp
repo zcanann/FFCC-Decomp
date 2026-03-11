@@ -417,37 +417,51 @@ void CMenuPcs::ArtiInit1()
  */
 unsigned int CMenuPcs::ArtiOpen()
 {
-	s16* artiState = GetArtiState(this);
-	s16* artiList = GetArtiList(this);
-	int finished = 0;
-	int count = artiList[0];
-	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
-	int frame = artiState[0x11];
+	float ratio;
+	double stepF64;
+	double durationF64;
+	short* entry;
+	int finished;
+	int count;
+	int frame;
+	int remaining;
 
-	if (*((char*)artiState + 0x0B) == '\0') {
+	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
 		ArtiInit();
 	}
 
-	artiState[0x11]++;
-	frame = artiState[0x11];
-
-	for (int i = 0; i < count; i++, anim++) {
-		if (anim->startFrame <= frame) {
-			if (frame < anim->startFrame + anim->duration) {
-				anim->step++;
-				anim->alpha = (float)anim->step / (float)anim->duration;
-				if ((anim->flags & 2) == 0) {
-					float t = (float)anim->step / (float)anim->duration;
-					anim->dx = (anim->targetX - (float)anim->x) * t;
-					anim->dy = (anim->targetY - (float)anim->y) * t;
+	finished = 0;
+	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
+	count = (int)*GetArtiList(this);
+	entry = GetArtiList(this) + 4;
+	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);
+	remaining = count;
+	if (0 < count) {
+		do {
+			durationF64 = DOUBLE_80332fe0;
+			ratio = FLOAT_80332fa8;
+			if (*(int*)(entry + 0x12) <= frame) {
+				if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
+					*(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
+					stepF64 = DOUBLE_80332fb0;
+					*(float*)(entry + 8) = (float)((DOUBLE_80332fb0 / ((double)*(unsigned int*)(entry + 0x14) - durationF64)) *
+					                               ((double)*(unsigned int*)(entry + 0x10) - durationF64));
+					if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
+						ratio = (float)((stepF64 / ((double)*(unsigned int*)(entry + 0x14) - durationF64)) *
+						                ((double)*(unsigned int*)(entry + 0x10) - durationF64));
+						*(float*)(entry + 0x18) = (*(float*)(entry + 0x1c) - (float)((double)(int)*entry - durationF64)) * ratio;
+						*(float*)(entry + 0x1a) = (*(float*)(entry + 0x1e) - (float)((double)(int)entry[1] - durationF64)) * ratio;
+					}
+				} else {
+					finished = finished + 1;
+					*(float*)(entry + 8) = FLOAT_80332fac;
+					*(float*)(entry + 0x18) = ratio;
+					*(float*)(entry + 0x1a) = ratio;
 				}
-			} else {
-				finished++;
-				anim->alpha = 1.0f;
-				anim->dx = 0.0f;
-				anim->dy = 0.0f;
 			}
-		}
+			entry = entry + 0x20;
+			remaining = remaining - 1;
+		} while (remaining != 0);
 	}
 
 	return (unsigned int)(count == finished);
@@ -818,5 +832,3 @@ int CMenuPcs::ArtiCtrlCur()
 
 	return 0;
 }
-
-

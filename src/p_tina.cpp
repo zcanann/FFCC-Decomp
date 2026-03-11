@@ -1380,7 +1380,7 @@ void CPartPcs::ReleasePdt(int pdtSlot)
 void CPartPcs::StartLocationTitle()
 {
     int loaded;
-    char path[1028];
+    char path[1024];
     CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, Game.game.m_currentMapId);
@@ -1419,7 +1419,7 @@ void CPartPcs::EndLocationTitle()
 void CPartPcs::StartMiruraEvent()
 {
     int loaded;
-    char path[1028];
+    char path[1024];
     CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, Game.game.m_currentMapId);

@@ -1484,12 +1484,73 @@ void GbaQueue::LoadMapItemStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE9AC
+ * PAL Size: 568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetPlayerPos(int, unsigned int*)
+void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 {
-	// TODO
+	unsigned char localPlayerData[0x370];
+	unsigned char packet[0xC];
+	short xPos[4];
+	short zPos[4];
+	int i;
+	short baseX;
+	short baseZ;
+	unsigned char nearbyMask;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + 0x454, sizeof(localPlayerData));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	memset(packet, 0, sizeof(packet));
+
+	if (reinterpret_cast<unsigned char*>(this)[0x2D56] != 0) {
+		channel = 0;
+	}
+
+	packet[0] = 0x11;
+	packet[4] = 0x51;
+	packet[8] = 0x91;
+
+	baseX = *reinterpret_cast<short*>(localPlayerData + (channel * 0xDC) + 0x36);
+	baseZ = *reinterpret_cast<short*>(localPlayerData + (channel * 0xDC) + 0x38);
+
+	nearbyMask = 0;
+	for (i = 0; i < 4; i++) {
+		const unsigned char* player = localPlayerData + (i * 0xDC);
+		const short px = *reinterpret_cast<const short*>(player + 0x36);
+		const short pz = *reinterpret_cast<const short*>(player + 0x38);
+
+		xPos[i] = px;
+		zPos[i] = pz;
+
+		if (i == channel) {
+			nearbyMask |= static_cast<unsigned char>(1 << i);
+		} else if (player[3] != 0) {
+			const int dx = static_cast<int>(px) - static_cast<int>(baseX);
+			const int dz = static_cast<int>(pz) - static_cast<int>(baseZ);
+
+			if ((dx > -0x51 && dx < 0x51) && (dz > -0x41 && dz < 0x41)) {
+				nearbyMask |= static_cast<unsigned char>(1 << i);
+			}
+		}
+	}
+
+	packet[1] = nearbyMask;
+	packet[2] = static_cast<unsigned char>(static_cast<char>(xPos[0]) - static_cast<char>(baseX));
+	packet[3] = static_cast<unsigned char>(static_cast<char>(zPos[0]) - static_cast<char>(baseZ));
+	packet[5] = static_cast<unsigned char>(static_cast<char>(xPos[1]) - static_cast<char>(baseX));
+	packet[6] = static_cast<unsigned char>(static_cast<char>(zPos[1]) - static_cast<char>(baseZ));
+	packet[7] = static_cast<unsigned char>(static_cast<char>(xPos[2]) - static_cast<char>(baseX));
+	packet[9] = static_cast<unsigned char>(static_cast<char>(zPos[2]) - static_cast<char>(baseZ));
+	packet[10] = static_cast<unsigned char>(static_cast<char>(xPos[3]) - static_cast<char>(baseX));
+	packet[11] = static_cast<unsigned char>(static_cast<char>(zPos[3]) - static_cast<char>(baseZ));
+
+	memcpy(outData, packet, sizeof(packet));
 }
 
 /*

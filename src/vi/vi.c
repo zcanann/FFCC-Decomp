@@ -304,10 +304,6 @@ static VITiming* getTiming(VITVMode mode) {
     case VI_TVMODE_DEBUG_PAL_DS:    return &timing[3];
     case 24:                        return &timing[8];
     case 26:                        return &timing[9];
-    case 29:
-    case 30:
-    case 28:
-        return timingExtra;
     default:
         return NULL;
     }

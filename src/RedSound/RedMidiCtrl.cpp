@@ -238,7 +238,8 @@ int TriangleSwing(int phase)
  */
 int SawSwing(int phase)
 {
-    return (int)(char)(phase >> 2) << 8;
+    signed char value = (signed char)(phase >> 2);
+    return (int)value << 8;
 }
 
 /*

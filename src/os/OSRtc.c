@@ -231,7 +231,7 @@ int __OSReadROM(void * buffer, s32 length, s32 offset) {
     OSSram* sram;
     (void)buffer, (void)length, (void)offset;
 
-    sram = __OSLockSram();
+    sram = (OSSram*)LockSram(0);
     offset = (sram->flags & 4) ? 1 : 0;
     __OSUnlockSram(0);
     return offset;

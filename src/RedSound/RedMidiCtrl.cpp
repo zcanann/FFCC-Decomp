@@ -197,6 +197,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 int SineSwing(int phase)
 {
     int value = DAT_8021e1d0[phase & 0x1FF];
@@ -237,7 +238,7 @@ int TriangleSwing(int phase)
  */
 int SawSwing(int phase)
 {
-    return static_cast<int>(static_cast<signed char>(phase >> 2)) << 8;
+    return (int)(char)(phase >> 2) << 8;
 }
 
 /*
@@ -245,7 +246,6 @@ int SawSwing(int phase)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 int DutySwing(int phase)
 {
     int value;

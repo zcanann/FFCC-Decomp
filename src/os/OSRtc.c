@@ -229,13 +229,12 @@ int __OSCheckSram(void) {
 
 int __OSReadROM(void * buffer, s32 length, s32 offset) {
     OSSram* sram;
-    int mode;
     (void)buffer, (void)length, (void)offset;
 
     sram = __OSLockSram();
-    mode = (sram->flags & 4) ? 1 : 0;
+    offset = (sram->flags & 4) ? 1 : 0;
     __OSUnlockSram(0);
-    return mode;
+    return offset;
 }
 
 static void __OSReadROMCallback(s32 chan) {
@@ -311,6 +310,9 @@ u32 OSSetProgressiveMode(void) {
 
 void OSGetProgressiveMode(u32 on) {
     OSSram* sram;
+#ifndef DEBUG
+    u16 padding;
+#endif
 
     ASSERTLINE(670, on == OS_PROGRESSIVE_MODE_OFF || on == OS_PROGRESSIVE_MODE_ON);
     on = (on & 1) << 7;

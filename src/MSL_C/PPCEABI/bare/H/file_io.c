@@ -19,7 +19,7 @@ inline FILE* freopen(const char* name, const char* mode, FILE* file)
 	if (!__get_file_modes(mode, &modes))
 		return(NULL);
 	
-	__init_file(file, modes, 0, 0x400);
+	__init_file(file, *(unsigned int*)&modes, 0, 0x400);
 	
 	if (__open_file(name, modes, &file->handle))
 	{

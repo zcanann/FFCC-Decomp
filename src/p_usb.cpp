@@ -210,10 +210,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 
     count = (unsigned int)(elemSize * elemCount);
     value = (count + 0x5F) & ~0x1F;
-    stage = m_bigStage;
-    if (stage == (CMemory::CStage*)nullptr) {
-        stage = m_smallStage;
-    }
+    stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
     ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(value, stage, s_p_usb_cpp_801D6D08, 0x1ca);
     ptr[1] = value;
@@ -228,10 +225,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     if (USB.IsConnected() == 0) {
         result = 0;
     } else {
-        stage = m_bigStage;
-        if (stage == (CMemory::CStage*)nullptr) {
-            stage = m_smallStage;
-        }
+        stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
         dstBuffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
             (ptr[1] + 0x1F) & ~0x1F, stage, s_p_usb_cpp_801D6D08, 0x19e);

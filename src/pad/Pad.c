@@ -364,6 +364,8 @@ BOOL PADRecalibrate(u32 mask) {
 }
 
 BOOL PADInit() {
+    s32 chan;
+
     if (Initialized) {
         return 1;
     }
@@ -384,37 +386,13 @@ BOOL PADInit() {
         RecalibrateBits = PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT;
     }
 
-    CmdProbeDevice[0] = 0x4D000000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
-    CmdProbeDevice[1] = 0x4D400000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
-    CmdProbeDevice[2] = 0x4D800000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
-    CmdProbeDevice[3] = 0x4DC00000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
+    for (chan = 0; chan < SI_MAX_CHAN; chan++) {
+        CmdProbeDevice[chan] = (0x4D << 24) | (chan << 22) | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
+    }
 
     SIRefreshSamplingRate();
     OSRegisterResetFunction(&ResetFunctionInfo);
-
-    {
-        BOOL enabled;
-        u32 mask;
-        u32 disableBits;
-
-        enabled = OSDisableInterrupts();
-        mask = (PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT);
-        mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
-        ResettingBits |= mask;
-        PendingBits = 0;
-        disableBits = ResettingBits & EnabledBits;
-        if (Spec == PAD_SPEC_4) {
-            RecalibrateBits |= mask;
-        }
-        EnabledBits &= ~mask;
-        SIDisablePolling(disableBits);
-        if (ResettingChan == 0x20) {
-            DoReset();
-        }
-        OSRestoreInterrupts(enabled);
-    }
-
-    return 1;
+    return PADReset(PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT);
 }
 
 u32 PADRead(PADStatus* status) {

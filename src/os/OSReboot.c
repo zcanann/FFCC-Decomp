@@ -145,7 +145,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     }
 
     rebootSize = OSRoundUp32B(FatalParam.rebootSize);
-    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, FatalParam.size + 0x2460, NULL, 0);
+    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, FatalParam.size + 0x2440, NULL, 0);
 
 #if SDK_REVISION < 1
     start = OSGetTime();

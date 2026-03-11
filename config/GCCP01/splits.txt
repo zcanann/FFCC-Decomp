@@ -1770,6 +1770,12 @@ Runtime.PPCEABI.H/ptmf.c:
 Runtime.PPCEABI.H/runtime.c:
 	.text       start:0x801AFF44 end:0x801B063C
 
+Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
+	.text       start:0x801B063C end:0x801B06B8
+	.ctors      start:0x801D53A0 end:0x801D53A4
+	.dtors      start:0x801D5460 end:0x801D5468
+	.sdata      start:0x8032EBF0 end:0x8032EBF4
+
 Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	extab       start:0x8000A26C end:0x8000A2E0
 	extabindex  start:0x8001180C end:0x80011860

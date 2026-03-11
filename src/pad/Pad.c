@@ -69,7 +69,9 @@ static u8 ClampU8(u8 var, u8 org);
 static void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static BOOL OnReset2(BOOL f);
 void __PADDisableXPatch(void);
+#ifndef VERSION_GCCP01
 BOOL __PADDisableRumble(BOOL disable);
+#endif
 
 typedef void (*SPECCallback)(s32, PADStatus*, u32*);
 static SPECCallback MakeStatus = SPEC2_MakeStatus;
@@ -365,6 +367,9 @@ BOOL PADRecalibrate(u32 mask) {
 
 BOOL PADInit() {
     s32 chan;
+    BOOL enabled;
+    u32 mask;
+    u32 disableBits;
 
     if (Initialized) {
         return 1;
@@ -392,7 +397,23 @@ BOOL PADInit() {
 
     SIRefreshSamplingRate();
     OSRegisterResetFunction(&ResetFunctionInfo);
-    return PADReset(PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT);
+
+    enabled = OSDisableInterrupts();
+    mask = (PendingBits | (PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT)) &
+           ~(WaitingBits | CheckingBits);
+    ResettingBits |= mask;
+    PendingBits = 0;
+    disableBits = ResettingBits & EnabledBits;
+    if (Spec == PAD_SPEC_4) {
+        RecalibrateBits |= mask;
+    }
+    EnabledBits &= ~mask;
+    SIDisablePolling(disableBits);
+    if (ResettingChan == 0x20) {
+        DoReset();
+    }
+    OSRestoreInterrupts(enabled);
+    return 1;
 }
 
 u32 PADRead(PADStatus* status) {
@@ -841,6 +862,7 @@ BOOL __PADDisableRecalibration(BOOL disable) {
     return prev;
 }
 
+#ifndef VERSION_GCCP01
 BOOL __PADDisableRumble(BOOL disable) {
     BOOL enabled;
     BOOL prev;
@@ -868,3 +890,4 @@ BOOL PADIsBarrel(s32 chan) {
     
     return FALSE;
 }
+#endif

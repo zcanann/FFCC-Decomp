@@ -6,14 +6,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
-static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
-static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
-static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
-static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
-static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
-static inline float CameraDistance() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xFC); }
-static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
@@ -34,8 +26,6 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
                                  _pppCtrlTable* param_3)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
-
     if (gPppCalcDisabled == 0) {
         float* value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
         unsigned char* flags = (unsigned char*)&param_2->m_arg3;
@@ -45,26 +35,27 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             &param_2->m_initWOrk, &param_2->m_stepValue);
 
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
+            _pppMngSt* pppMngSt = pppMngStPtr;
             Vec resultPos;
             Vec cameraDir;
-            cameraDir.x = CameraDirX();
-            cameraDir.y = CameraDirY();
-            cameraDir.z = CameraDirZ();
+            cameraDir.x = CameraPcs._236_4_;
+            cameraDir.y = CameraPcs._240_4_;
+            cameraDir.z = CameraPcs._244_4_;
 
             Mtx cameraMtx;
-            PSMTXCopy(CameraMatrix(), cameraMtx);
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
             Vec cameraPos;
-            cameraPos.x = CameraPosX();
-            cameraPos.y = CameraPosY();
-            cameraPos.z = CameraPosZ();
-            float baseDistance = FLOAT_803331e4;
-            float scale = FLOAT_803331e0 + ((CameraDistance() - baseDistance) / baseDistance);
+            cameraPos.x = CameraPcs._224_4_;
+            cameraPos.y = CameraPcs._228_4_;
+            cameraPos.z = CameraPcs._232_4_;
+            float scale = FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4);
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
+            float baseScale = FLOAT_803331e0;
             pppMngSt->m_scale.x = FLOAT_803331e8 * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = FLOAT_803331e0;
+            pppMngSt->m_scale.z = baseScale;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -76,15 +67,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 
             if (flags[0] != 0) {
-                float distance = value[0];
-                resultPos.x = cameraDir.x * distance + cameraPos.x;
-                resultPos.y = cameraDir.y * distance + cameraPos.y;
-                resultPos.z = cameraDir.z * distance + cameraPos.z;
+                resultPos.x = cameraDir.x * *value + cameraPos.x;
+                resultPos.y = cameraDir.y * *value + cameraPos.y;
+                resultPos.z = cameraDir.z * *value + cameraPos.z;
             }
 
-            float (*localMtx)[4] = reinterpret_cast<float (*)[4]>(&param_1->m_pppPObject.m_localMatrix);
-            float localY = localMtx[1][3];
-            float localX = localMtx[0][3];
+            float localX = param_1->m_pppPObject.m_localMatrix.value[0][3];
+            float localY = param_1->m_pppPObject.m_localMatrix.value[1][3];
 
             Vec direct0;
             Vec direct1;

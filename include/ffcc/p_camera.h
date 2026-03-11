@@ -112,6 +112,11 @@ public:
     float _224_4_;
     float _228_4_;
     float _232_4_;
+    float _236_4_;
+    float _240_4_;
+    float _244_4_;
+    float _248_4_;
+    float _252_4_;
 };
 
 extern CCameraPcs CameraPcs;

@@ -104,10 +104,11 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
         for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
             s32 uvByteOffsetV = uvByteOffset + 2;
             frameU = work->m_frame / work->m_tilesU;
+            u32 frameModU = work->m_frame - frameU * work->m_tilesU;
 
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
-                (s16)(int)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) -
-                           ((f32)(work->m_frame - frameU * work->m_tilesU) * work->m_perU));
+                (s16)(int)-(((f32)frameModU * work->m_perU) -
+                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset));
             uvByteOffset += 4;
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV) =
                 (s16)(int)-(((f32)frameU * work->m_perV) -

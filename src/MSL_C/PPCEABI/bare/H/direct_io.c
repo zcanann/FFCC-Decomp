@@ -43,8 +43,10 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
         return 0;
     }
 
-    always_buffer = !stream->file_mode.binary_io
-		|| stream->file_mode.buffer_mode == _IOFBF;
+    always_buffer = 1;
+    if (stream->file_mode.binary_io && stream->file_mode.buffer_mode != _IOFBF) {
+        always_buffer = 0;
+    }
 
     if (stream->file_state.io_state == __neutral
 		&& (stream->file_mode.io_mode & __read))
@@ -94,37 +96,36 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
     }
 
     if (bytes_to_go && (stream->buffer_length != 0 || always_buffer)) {
-        do {
-            if (stream->buffer_length == 0) {
-                ioresult = __load_buffer(stream, NULL, 0);
-
-                if (ioresult != __load_ok || stream->buffer_length == 0) {
-                    if (ioresult == __load_error) {
-                        set_error(stream);
-                    } else {
-                        stream->file_state.io_state = __neutral;
-                        stream->file_state.eof = 1;
-                    }
-                    stream->buffer_length = 0;
-                    break;
-                }
+        while (stream->buffer_length != 0 || (ioresult = __load_buffer(stream, NULL, 0), ioresult == __load_ok)) {
+            transfer_count[0] = stream->buffer_length;
+            if (transfer_count[0] > bytes_to_go) {
+                transfer_count[0] = bytes_to_go;
             }
 
-            transfer_count[0] = stream->buffer_length;
-            if (transfer_count[0] > bytes_to_go)
-                transfer_count[0] = bytes_to_go;
-
             memcpy(dest_ptr, stream->buffer_ptr, transfer_count[0]);
-
+            bytes_to_go -= transfer_count[0];
             dest_ptr += transfer_count[0];
             bytes_read += transfer_count[0];
-            bytes_to_go -= transfer_count[0];
             stream->buffer_ptr += transfer_count[0];
             stream->buffer_length -= transfer_count[0];
 
-        } while (bytes_to_go && always_buffer);
+            if (bytes_to_go == 0 || !always_buffer) {
+                goto buffered_done;
+            }
+        }
+
+        if (ioresult == __load_error) {
+            set_error(stream);
+            stream->buffer_length = 0;
+        } else {
+            stream->file_state.io_state = __neutral;
+            stream->file_state.eof = 1;
+            stream->buffer_length = 0;
+        }
+        bytes_to_go = 0;
     }
 
+buffered_done:
     if (bytes_to_go && !always_buffer) {
         unsigned char* save_buffer = stream->buffer;
         size_t save_size   = stream->buffer_size;

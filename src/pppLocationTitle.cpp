@@ -9,11 +9,7 @@
 
 static int GetGraphFrameFromId(u32 graphId)
 {
-    int frame = (int)graphId >> 12;
-    if (((int)graphId < 0) && ((graphId & 0xFFF) != 0)) {
-        frame++;
-    }
-    return frame;
+    return (int)graphId / 0x1000;
 }
 
 extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float,
@@ -278,12 +274,12 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     for (int i = 0; i < work->m_count; i++, particle++) {
         Mtx model;
         Vec worldPos;
+        float frameScale = particle->m_frame;
 
         PSMTXIdentity(model);
-        model[2][2] = particle->m_frame;
-        model[0][0] = pppMngStPtr->m_scale.x * model[2][2];
-        model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
-        model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
+        model[0][0] = pppMngStPtr->m_scale.x * frameScale;
+        model[1][1] = pppMngStPtr->m_scale.y * frameScale;
+        model[2][2] = pppMngStPtr->m_scale.z * frameScale;
 
         PSMTXMultVec(ppvCameraMatrix0, &particle->m_pos, &worldPos);
         model[0][3] = worldPos.x;

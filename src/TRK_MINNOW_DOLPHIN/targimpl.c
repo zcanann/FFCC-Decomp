@@ -977,7 +977,7 @@ DSError TRKTargetInterrupt(TRKEvent* event)
     DSError error = DS_NoError;
 
     if ((event->eventType < NUBEVENT_Support)
-        && (NUBEVENT_Request < event->eventType)) {
+        && (NUBEVENT_Breakpoint <= event->eventType)) {
         if (!TRKTargetCheckStep()) {
             TRKTargetSetStopped(TRUE);
             error = TRKDoNotifyStopped(DSMSG_NotifyStopped);

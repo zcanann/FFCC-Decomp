@@ -1067,6 +1067,7 @@ THPDraw.cpp:
 	extab       start:0x80009114 end:0x8000912C
 	extabindex  start:0x8000FE68 end:0x8000FE8C
 	.text       start:0x8010597C end:0x8010617C
+	.sdata2     start:0x80331870 end:0x80331898
 
 pppMana2.cpp:
 	extab       start:0x8000912C end:0x8000918C

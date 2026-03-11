@@ -1073,7 +1073,7 @@ void CGame::Calc()
  */
 void CGame::Calc2()
 {
-	gCFlatRuntime2.Frame(0, 1);
+	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 1);
 }
 
 /*
@@ -1773,4 +1773,3 @@ CGame::CGameWork::CGameWork()
 }
 
 template class CPtrArray<CMapLightHolder*>;
-

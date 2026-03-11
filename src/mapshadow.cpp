@@ -62,6 +62,58 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 
 /*
  * --INFO--
+ * PAL Address: 0x8004c808
+ * PAL Size: 192b
+ */
+void CMapShadow::Draw()
+{
+	int iVar1;
+	Vec local_14;
+	Vec local_20;
+	Vec local_2c;
+	Vec VStack_38;
+	
+	iVar1 = (int)m_modelA;
+	local_14.x = *(float*)(iVar1 + 0xc4);
+	local_14.y = *(float*)(iVar1 + 0xd4);
+	local_14.z = *(float*)(iVar1 + 0xe4);
+	iVar1 = (int)m_modelC;
+	local_20.x = *(float*)(iVar1 + 0xc4);
+	local_20.y = *(float*)(iVar1 + 0xd4);
+	local_20.z = *(float*)(iVar1 + 0xe4);
+	iVar1 = (int)m_modelB;
+	local_2c.x = *(float*)(iVar1 + 0xc4);
+	local_2c.y = *(float*)(iVar1 + 0xd4);
+	local_2c.z = *(float*)(iVar1 + 0xe4);
+	PSVECSubtract(&local_20, &local_14, &local_20);
+	PSVECSubtract(&local_2c, &local_14, &VStack_38);
+	C_MTXLookAt(m_viewMtx, (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
+	PSMTXConcat(m_lightMtx, m_viewMtx, m_shadowMtx);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004c8c8
+ * PAL Size: 84b
+ */
+void CMapShadow::Calc()
+{
+	float fVar1;
+	
+	fVar1 = FLOAT_8032fce0;
+	m_lightMtx[0][3] = m_lightMtx[0][3] + m_scrollStepX;
+	if (m_lightMtx[0][3] > fVar1) {
+		m_lightMtx[0][3] = m_lightMtx[0][3] - fVar1;
+	}
+	fVar1 = FLOAT_8032fce0;
+	m_lightMtx[1][3] = m_lightMtx[1][3] + m_scrollStepY;
+	if (m_lightMtx[1][3] > fVar1) {
+		m_lightMtx[1][3] = m_lightMtx[1][3] - fVar1;
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004c91c
  * PAL Size: 236b
  */
@@ -97,56 +149,4 @@ void CMapShadow::Init()
 		                (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
 		                FLOAT_8032fcf0);
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004c8c8
- * PAL Size: 84b
- */
-void CMapShadow::Calc()
-{
-	float fVar1;
-	
-	fVar1 = FLOAT_8032fce0;
-	m_lightMtx[0][3] = m_lightMtx[0][3] + m_scrollStepX;
-	if (m_lightMtx[0][3] > fVar1) {
-		m_lightMtx[0][3] = m_lightMtx[0][3] - fVar1;
-	}
-	fVar1 = FLOAT_8032fce0;
-	m_lightMtx[1][3] = m_lightMtx[1][3] + m_scrollStepY;
-	if (m_lightMtx[1][3] > fVar1) {
-		m_lightMtx[1][3] = m_lightMtx[1][3] - fVar1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004c808
- * PAL Size: 192b
- */
-void CMapShadow::Draw()
-{
-	int iVar1;
-	Vec local_14;
-	Vec local_20;
-	Vec local_2c;
-	Vec VStack_38;
-	
-	iVar1 = (int)m_modelA;
-	local_14.x = *(float*)(iVar1 + 0xc4);
-	local_14.y = *(float*)(iVar1 + 0xd4);
-	local_14.z = *(float*)(iVar1 + 0xe4);
-	iVar1 = (int)m_modelC;
-	local_20.x = *(float*)(iVar1 + 0xc4);
-	local_20.y = *(float*)(iVar1 + 0xd4);
-	local_20.z = *(float*)(iVar1 + 0xe4);
-	iVar1 = (int)m_modelB;
-	local_2c.x = *(float*)(iVar1 + 0xc4);
-	local_2c.y = *(float*)(iVar1 + 0xd4);
-	local_2c.z = *(float*)(iVar1 + 0xe4);
-	PSVECSubtract(&local_20, &local_14, &local_20);
-	PSVECSubtract(&local_2c, &local_14, &VStack_38);
-	C_MTXLookAt(m_viewMtx, (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
-	PSMTXConcat(m_lightMtx, m_viewMtx, m_shadowMtx);
 }

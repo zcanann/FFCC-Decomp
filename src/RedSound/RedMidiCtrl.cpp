@@ -341,7 +341,8 @@ int DutySwingR(int phase)
  */
 int SawSwingR(int phase)
 {
-    return (int)(char)((int)((u32)phase ^ 0xFFFFFFFF) >> 2) << 8;
+    signed char value = static_cast<signed char>((~phase) >> 2);
+    return static_cast<int>(value) << 8;
 }
 
 /*

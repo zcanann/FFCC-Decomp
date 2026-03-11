@@ -518,6 +518,7 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
  */
 static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
     Block* current_block;
+    SubBlock* result;
 
     size = (size + 0xFU) & 0xFFFFFFF8;
     if (size < 0x50) {
@@ -525,21 +526,24 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
     }
     *available_size = 0;
     current_block = pool_obj->start_;
-    if (current_block != 0) {
-        do {
-            if (size <= current_block->max_size) {
-                SubBlock* result = Block_subBlock(current_block, size);
-                if (result != 0) {
-                    pool_obj->start_ = current_block;
-                    return (char*)result + 8;
-                }
-            }
-            if ((8 < current_block->max_size) && (*available_size < current_block->max_size - 8)) {
-                *available_size = current_block->max_size - 8;
-            }
-            current_block = current_block->next;
-        } while (current_block != pool_obj->start_);
+    if (current_block == 0) {
+        return 0;
     }
+
+    do {
+        if (size <= current_block->max_size) {
+            result = Block_subBlock(current_block, size);
+            if (result != 0) {
+                pool_obj->start_ = current_block;
+                return (char*)result + 8;
+            }
+        }
+        if ((8 < current_block->max_size) && (*available_size < current_block->max_size - 8)) {
+            *available_size = current_block->max_size - 8;
+        }
+        current_block = current_block->next;
+    } while (current_block != pool_obj->start_);
+
     return 0;
 }
 

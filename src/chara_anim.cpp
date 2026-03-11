@@ -164,24 +164,22 @@ void i2f_5(float*, unsigned short*)
  */
 CChara::CAnim::CAnim()
 {
-	CAnimFields& anim = Anim(this);
-
 	__ct__4CRefFv(this);
-	anim.m_vtable = __vt__Q26CChara5CAnim;
-	anim.m_nodeCount = 0;
-	anim.m_nodes = 0;
-	anim.m_bank = 0;
-	anim.m_flags = static_cast<unsigned char>((anim.m_flags & 0x7F) | 0x80);
-	anim.m_flags = static_cast<unsigned char>(anim.m_flags & 0xBF);
-	anim.m_quantizeX = 5;
-	anim.m_quantizeY = 0xB;
-	anim.m_quantizeZ = 10;
-	anim.m_interp = 0;
-	anim.m_interpOffset = 0;
-	anim.m_bankAddress = 0;
-	anim.m_bankSize = 0;
-	anim.m_stage = 0;
-	anim.m_lastFrame = 0;
+	Anim(this).m_vtable = __vt__Q26CChara5CAnim;
+	U16At(this, 0xE) = 0;
+	U32At(this, 0x14) = 0;
+	U32At(this, 0x20) = 0;
+	U8At(this, 8) = static_cast<unsigned char>(U8At(this, 8) | 0x80);
+	U8At(this, 8) = static_cast<unsigned char>(U8At(this, 8) & 0xBF);
+	U8At(this, 0xA) = 5;
+	U8At(this, 0xB) = 0xB;
+	U8At(this, 0xC) = 10;
+	U8At(this, 9) = 0;
+	U32At(this, 0x18) = 0;
+	U32At(this, 0x28) = 0;
+	U32At(this, 0x1C) = 0;
+	U32At(this, 0x2C) = 0;
+	U32At(this, 0x24) = 0;
 }
 
 /*

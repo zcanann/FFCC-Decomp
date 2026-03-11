@@ -674,11 +674,16 @@ float CFont::GetWidth(char* text)
 	float width = 0.0f;
 	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
 
-	while (*cursor != '\0') {
-		unsigned char ch = *cursor++;
+	for (;;) {
+		unsigned char ch = *cursor;
+		if (ch == '\0') {
+			return width;
+		}
+		cursor++;
 		unsigned short* glyphBucket = m_glyphBuckets[ch];
 		unsigned short* glyph = glyphBucket + 1;
 		unsigned int count = static_cast<unsigned int>(glyphBucket[0]);
+		float charWidth = 0.0f;
 
 		for (; count != 0; count--) {
 			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
@@ -697,27 +702,28 @@ float CFont::GetWidth(char* text)
 				}
 				fallback += 4;
 			}
-			if (fallbackCount == 0) {
-				continue;
+			if (fallbackCount != 0) {
+				goto found_glyph;
 			}
-		}
-
-		unsigned int drawWidth;
-		if ((renderFlags & 0x10) != 0) {
-			drawWidth = m_glyphWidth;
 		} else {
-			drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4 +
-			             ((static_cast<signed char>(renderFlags) >> 7) & 2));
-		}
+found_glyph:
+			unsigned char flags = renderFlags;
+			unsigned int drawWidth;
+			if ((static_cast<unsigned int>(flags) << 27 | static_cast<unsigned int>(flags >> 5)) & 0x80000000) {
+				drawWidth = static_cast<unsigned int>(m_glyphWidth);
+			} else {
+				signed char sign = static_cast<signed char>(flags) >> 7;
+				unsigned int extra = static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
+				drawWidth = static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
+			}
 
-		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));
-		if ((renderFlags & 0x08) != 0) {
-			charWidth = floorf(charWidth);
+			charWidth = scaleX * (margin + static_cast<float>(drawWidth));
+			if ((flags & 0x08) != 0) {
+				charWidth = floorf(charWidth);
+			}
 		}
 		width += charWidth;
 	}
-
-	return width;
 }
 
 /*

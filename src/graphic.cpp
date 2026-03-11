@@ -288,10 +288,13 @@ void CGraphic::Quit()
  */
 int CGraphic::GetProgressive()
 {
-    if (VIGetDTVStatus() == 0) {
+    int mode = VIGetDTVStatus();
+    if (mode == 0) {
         return 0;
     }
-    return OSSetProgressiveMode() == 0 ? 1 : 2;
+
+    mode = OSSetProgressiveMode();
+    return (static_cast<unsigned int>(__cntlzw(1 - mode)) >> 5) + 1;
 }
 
 /*

@@ -80,8 +80,13 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 {
 	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
 	ChangeTexDisplayList* displayList = meshes[param_4].m_data->m_displayLists + param_5;
+	int textureInfo = *(int*)((char*)param_2 + 0x1C);
 
 	if (*(u8*)((char*)param_3 + 0x14) == 0) {
+		*(int*)(MaterialManRaw() + 0x128) = 0;
+		*(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+		*(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+		*(int*)(MaterialManRaw() + 0x130) = 0;
 		*(int*)(MaterialManRaw() + 0xd0) = (int)param_2 + 0x1c + 0x28;
 		*(int*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
 		*(char*)(MaterialManRaw() + 0x4c) = 0xFF;
@@ -94,6 +99,7 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 		*(int*)(MaterialManRaw() + 0x5c) = 0;
 		*(char*)(MaterialManRaw() + 0x208) = 0;
 		*(int*)(MaterialManRaw() + 0x48) = 0xADE0F;
+		*(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
 		*(int*)(MaterialManRaw() + 0x128) = 0;
 		*(int*)(MaterialManRaw() + 0x12c) = 0x1E;
 		*(int*)(MaterialManRaw() + 0x130) = 0;

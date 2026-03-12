@@ -204,19 +204,18 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 
     currentFrame = animData;
     for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        int shapeCount;
+        int shapeIndex;
         int shapeStep;
         char* shapeBase;
 
         shapeOffset = *(short*)((int)currentFrame + 0x10);
         shapeBase = animData + shapeOffset;
-        shapeCount = 0;
+        shapeIndex = 0;
         shapeStep = 0;
-        while (shapeCount < *(short*)(shapeBase + 2)) {
-            u8 textureId = *(u8*)(shapeBase + shapeStep + 0xA);
+        while (shapeIndex < *(short*)(shapeBase + 2)) {
+            textureUsed[*(u8*)(shapeBase + shapeStep + 0xA)] = 1;
             shapeStep += 8;
-            shapeCount += 1;
-            textureUsed[textureId] = 1;
+            shapeIndex += 1;
         }
         currentFrame += 8;
     }
@@ -276,19 +275,18 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 
     currentFrame = animData;
     for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        int shapeCount;
+        int shapeIndex;
         int shapeStep;
         char* shapeBase;
 
         shapeOffset = *(short*)((int)currentFrame + 0x10);
         shapeBase = animData + shapeOffset;
-        shapeCount = 0;
+        shapeIndex = 0;
         shapeStep = 0;
-        while (shapeCount < *(short*)(shapeBase + 2)) {
-            u8 textureId = *(u8*)(shapeBase + shapeStep + 0xA);
+        while (shapeIndex < *(short*)(shapeBase + 2)) {
+            textureUsed[*(u8*)(shapeBase + shapeStep + 0xA)] = 1;
             shapeStep += 8;
-            shapeCount += 1;
-            textureUsed[textureId] = 1;
+            shapeIndex += 1;
         }
         currentFrame += 8;
     }

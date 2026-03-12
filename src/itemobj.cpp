@@ -13,7 +13,7 @@
 extern "C" void onCreate__8CGPrgObjFv(void*);
 extern "C" void onDestroy__8CGPrgObjFv(void*);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
-extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int);
+extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void Attach__8CGObjectFP8CGObjectPcP3Vec(void*, void*, char*, Vec*);
@@ -167,12 +167,13 @@ void CGItemObj::onCreate()
 void CGItemObj::onDestroy()
 {
 	unsigned char* self = (unsigned char*)this;
+	void* handle = *(void**)(self + 0x564);
 
-	if (*(int*)(self + 0x564) != 0) {
-		__dt__Q29CCharaPcs7CHandleFv(*(void**)(self + 0x564), 1);
+	if (handle != 0) {
+		__dt__Q29CCharaPcs7CHandleFv(handle, 1);
 	}
 
-	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c));
+	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c), 0);
 	onDestroy__8CGPrgObjFv(self);
 }
 

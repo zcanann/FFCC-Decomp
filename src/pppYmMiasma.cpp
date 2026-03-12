@@ -304,8 +304,8 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330658;
-    float fVar2 = FLOAT_80330644;
     float* work = (float*)workBytes;
+    float fVar2 = FLOAT_80330644;
 
     *(u32*)workBytes = 0;
     work[7] = fVar2;

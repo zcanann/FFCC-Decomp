@@ -403,8 +403,7 @@ GXFifoObj* GXInit(void* base, u32 size) {
         GX_WRITE_RAS_REG(reg);
     }
 
-    __GXSetIndirectMask(0);
-    __GXSetTmemConfig(2);
+    __GXSetTmemConfig(0);
     __GXInitGX();
 
     return &FifoObj;

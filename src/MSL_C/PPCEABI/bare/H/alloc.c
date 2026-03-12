@@ -382,16 +382,13 @@ static void Block_construct(Block* block, unsigned long size) {
  * JP Size: TODO
  */
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
-    unsigned long block_size;
     unsigned long current_size;
     unsigned long* start;
     unsigned long* current;
     unsigned long max_size;
-    unsigned long** start_ptr;
+    int start_offset;
 
-    block_size = block->size & 0xFFFFFFF8UL;
-    start_ptr = (unsigned long**)((char*)block + block_size - 4);
-    start = *start_ptr;
+    start = *(unsigned long**)((char*)block + ((block->size & 0xFFFFFFF8UL) - 4));
     if (start == 0) {
         block->max_size = 0;
         return 0;
@@ -449,15 +446,16 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
                 }
             }
 
-            *start_ptr = (unsigned long*)current[3];
+            *(unsigned long**)((char*)block + ((block->size & 0xFFFFFFF8UL) - 4)) = (unsigned long*)current[3];
             current_size = *current & 0xFFFFFFF8UL;
             *current |= 2;
             *(unsigned long*)((char*)current + current_size) |= 4;
-            if (*start_ptr == current) {
-                *start_ptr = (unsigned long*)current[3];
+            start_offset = (block->size & 0xFFFFFFF8UL) - 4;
+            if (*(unsigned long**)((char*)block + start_offset) == current) {
+                *(unsigned long**)((char*)block + start_offset) = (unsigned long*)current[3];
             }
-            if (*start_ptr == current) {
-                *start_ptr = 0;
+            if (*(unsigned long**)((char*)block + start_offset) == current) {
+                *(unsigned long**)((char*)block + start_offset) = 0;
                 block->max_size = 0;
             } else {
                 *(unsigned long*)(current[3] + 8) = current[2];
@@ -552,7 +550,6 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
 
     return 0;
 }
-
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     const unsigned long* pool_size_ptr;
     FixStart* fix_start;

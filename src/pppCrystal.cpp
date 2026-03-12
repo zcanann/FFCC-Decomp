@@ -132,21 +132,18 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* pa
  */
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
-	int* refractionData;
-	int* textureInfo;
-	int textureIndex;
-	int textureSize;
+	CrystalWork* work;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	refractionData = (int*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
+	work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 	if (param_2->m_dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	textureIndex = 0;
+	int textureIndex = 0;
 	GetTexture__8CMapMeshFP12CMaterialSetRi(
 		&pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr,
 		textureIndex);
@@ -160,37 +157,40 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 			textureIndex);
 	}
 
-	if ((param_2->m_payload[0] != 1) || (refractionData[0] != 0)) {
+	if ((param_2->m_payload[0] != 1) || (work->m_refractionMap != 0)) {
 		return;
 	}
 
-	refractionData[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		0x18, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
-	textureInfo = (int*)refractionData[0];
-	textureSize = (int)GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
-	textureInfo[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+	work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		sizeof(CrystalRefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
+
+	CrystalRefractionMap* textureInfo = work->m_refractionMap;
+	const int textureSize = (int)GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+	textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xAC);
-	textureInfo[1] = GX_TF_IA8;
-	textureInfo[2] = 0x20;
-	textureInfo[3] = 0x20;
-	textureInfo[4] = 0x100;
-	textureInfo[5] = textureSize;
+	textureInfo->m_format = GX_TF_IA8;
+	textureInfo->m_width = 0x20;
+	textureInfo->m_height = 0x20;
+	textureInfo->m_imageCount = 0x100;
+	textureInfo->m_bufferSize = textureSize;
 
 	{
-		const float stepX = 2.0f / (float)(textureInfo[2] - 1);
-		const float stepY = 2.0f / (float)(textureInfo[3] - 1);
-		float yCoord = -1.0f;
+		const float start = -1.0f;
+		const float stepX = 2.0f / (float)(textureInfo->m_width - 1);
+		const float stepY = 2.0f / (float)(textureInfo->m_height - 1);
+		float yCoord = start;
 
-		for (u32 y = 0; y < (u32)textureInfo[3]; y++) {
+		for (u32 y = 0; y < (u32)textureInfo->m_height; y++) {
 			const float ySq = yCoord * yCoord;
-			float xCoord = -1.0f;
+			float xCoord = start;
 
-			for (u32 x = 0; x < (u32)textureInfo[2]; x++) {
+			for (u32 x = 0; x < (u32)textureInfo->m_width; x++) {
 				float magnitude = xCoord * xCoord + ySq;
 
 				if (magnitude < 0.0f) {
 					magnitude = 0.0f;
-				} else if (magnitude > 1.0f) {
+				}
+				else if (magnitude > 1.0f) {
 					magnitude = sqrtf(magnitude);
 				}
 
@@ -200,17 +200,15 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 				magnitude = 4.0f * (magnitude * (float)fmod(magnitude, 1.0));
 
-				{
-					const u8 nx = (u8)__cvt_fp2unsigned((double)(127.0f * (xCoord * magnitude) + 128.0f));
-					const u8 ny = (u8)__cvt_fp2unsigned((double)(127.0f * (yCoord * magnitude) + 128.0f));
-					u8* pixel = (u8*)(textureInfo[0] +
-						(y >> 2) * (textureInfo[2] & 0x1FFFFFFCU) * 8 +
-						(x & 0x1FFFFFFC) * 8 +
-						((x & 3) + (y & 3) * 4) * 2);
+				const u8 nx = (u8)__cvt_fp2unsigned((double)(127.0f * (xCoord * magnitude) + 128.0f));
+				const u8 ny = (u8)__cvt_fp2unsigned((double)(127.0f * (yCoord * magnitude) + 128.0f));
+				u8* pixel = (u8*)((u32)textureInfo->m_imageData +
+					(y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
+					(x & 0x1FFFFFFC) * 8 +
+					((x & 3) + (y & 3) * 4) * 2);
 
-					pixel[0] = nx;
-					pixel[1] = ny;
-				}
+				pixel[0] = nx;
+				pixel[1] = ny;
 
 				xCoord += stepX;
 			}
@@ -219,11 +217,12 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		}
 	}
 
-	DCFlushRange((void*)textureInfo[0], textureInfo[5]);
-	refractionData[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+	DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
+	work->m_refractionTexObj = pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		0x20, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xB4);
-	GXInitTexObj((GXTexObj*)refractionData[1], (void*)textureInfo[0], (u16)textureInfo[2],
-		(u16)textureInfo[3], GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+	GXInitTexObj((GXTexObj*)work->m_refractionTexObj, textureInfo->m_imageData,
+		(u16)textureInfo->m_width, (u16)textureInfo->m_height, GX_TF_IA8, GX_CLAMP, GX_CLAMP,
+		GX_FALSE);
 }
 
 /*

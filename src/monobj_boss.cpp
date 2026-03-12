@@ -2179,7 +2179,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
  */
 int CGMonObj::calcBranchFuncMeteoParasiteC(int)
 {
-	return *reinterpret_cast<int*>(SoundBuffer_1260_ + 56);
+	return *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78);
 }
 
 /*

@@ -2169,12 +2169,29 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccdac
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMapObjDrawFlg(unsigned int*)
+void GbaQueue::GetMapObjDrawFlg(unsigned int* drawFlags)
 {
-	// TODO
+	GbaQueue* semaphoreQueue = this;
+
+	for (int i = 0; i < 4; i++) {
+		OSWaitSemaphore(semaphoreQueue->accessSemaphores);
+		semaphoreQueue = reinterpret_cast<GbaQueue*>(semaphoreQueue->accessSemaphores + 1);
+	}
+
+	*drawFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0x2B04);
+
+	semaphoreQueue = this;
+	for (int i = 0; i < 4; i++) {
+		OSSignalSemaphore(semaphoreQueue->accessSemaphores);
+		semaphoreQueue = reinterpret_cast<GbaQueue*>(semaphoreQueue->accessSemaphores + 1);
+	}
 }
 
 /*
@@ -2228,8 +2245,12 @@ void GbaQueue::ClrFavoriteFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccc38
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::GetFavorite(int channel, char* out)
 {
@@ -2311,8 +2332,12 @@ void GbaQueue::ClrScrInitEnd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cca58
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::InitCmakeInfo(int channel, int menuType)
 {
@@ -3386,11 +3411,23 @@ void GbaQueue::ClrStrengthFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca2bc
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetStrengthData(int, unsigned char*)
+int GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 {
+	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	strengthData[0] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1C]);
+	strengthData[1] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1D]);
+	strengthData[2] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1E]);
+	OSSignalSemaphore(accessSemaphores + channel);
+
 	return 0;
 }
 

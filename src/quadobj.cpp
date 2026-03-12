@@ -48,27 +48,21 @@ void CGQuadObj::onDraw()
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
         int i = 0;
-        QuadVertex* vert = m_vertices;
-        while (i < (int)m_vertexCount) {
+        CGQuadObj* self = this;
+        while (i < (int)(u32)m_vertexCount) {
             int next = i + 1;
-            i++;
+            i = i + 1;
 
-            GXPosition3f32(vert->x, m_yBase, vert->z);
-            GXPosition3f32(
-                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].x,
-                m_yBase,
-                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].z
-            );
-            GXPosition3f32(vert->x, m_yBase + m_yHeight, vert->z);
-            GXPosition3f32(
-                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].x,
-                m_yBase + m_yHeight,
-                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].z
-            );
-            GXPosition3f32(vert->x, m_yBase, vert->z);
-            GXPosition3f32(vert->x, m_yBase + m_yHeight, vert->z);
+            GXPosition3f32(self->m_vertices[0].x, m_yBase, self->m_vertices[0].z);
+            int wrapped = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            GXPosition3f32(m_vertices[wrapped].x, m_yBase, m_vertices[wrapped].z);
+            GXPosition3f32(self->m_vertices[0].x, m_yBase + m_yHeight, self->m_vertices[0].z);
+            wrapped = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            GXPosition3f32(m_vertices[wrapped].x, m_yBase + m_yHeight, m_vertices[wrapped].z);
+            GXPosition3f32(self->m_vertices[0].x, m_yBase, self->m_vertices[0].z);
+            GXPosition3f32(self->m_vertices[0].x, m_yBase + m_yHeight, self->m_vertices[0].z);
 
-            vert++;
+            self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
         }
     }
 }
@@ -94,40 +88,31 @@ int CGQuadObj::GetCID()
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
-	int count = (int)(u32)m_vertexCount;
-
-	if (count != 0) {
-		float x = vec->x;
-		if (m_bboxMinX <= x) {
-			float z = vec->z;
-			if ((m_bboxMinZ <= z) && ((x <= m_bboxMaxX) && (z <= m_bboxMaxZ))) {
-				if ((m_yBase <= vec->y) && (vec->y <= m_yBase + m_yHeight)) {
-					int i = 0;
-					int remaining = count;
-					QuadVertex* vert = m_vertices;
-
-					while (remaining != 0) {
-						float z0 = vert->z;
-						float x0 = vert->x;
-						int next = (i + 1) - ((i + 1) / count) * count;
-						float cross = (m_vertices[next].x - x0) * (z - z0) - (m_vertices[next].z - z0) * (x - x0);
-						if (cross < EPS) {
-							break;
-						}
-
-						vert++;
-						i++;
-						remaining--;
-					}
-
-					if (i == count) {
-						return true;
-					}
+	u32 count = (u32)m_vertexCount;
+	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) &&
+		((vec->x <= m_bboxMaxX) && (vec->z <= m_bboxMaxZ))) {
+		if ((m_yBase <= vec->y) && (vec->y <= m_yBase + m_yHeight)) {
+			u32 i = 0;
+			u32 remaining = count;
+			CGQuadObj* self = this;
+			while (remaining != 0) {
+				float z0 = self->m_vertices[0].z;
+				float x0 = self->m_vertices[0].x;
+				int next = (i + 1) - ((int)(i + 1) / (int)count) * count;
+				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < EPS) {
+					break;
 				}
+
+				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
+				i = i + 1;
+				remaining = remaining - 1;
+			}
+
+			if (i == count) {
+				return true;
 			}
 		}
 	}
-
 	return false;
 }
 

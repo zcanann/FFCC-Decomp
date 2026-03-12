@@ -1,7 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include "dolphin/fake_tgmath.h"
+#include <math.h>
 
 #include "dolphin/axfx/__axfx.h"
 
@@ -76,7 +76,7 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
         for (i = 0; i < 3; i++) {
             DLcreate(&rv->C[i + (k * 3)], lens[i] + 2);
             DLsetdelay(&rv->C[i + (k * 3)], lens[i]);
-            rv->combCoef[i + (k * 3)] = powf(10.0f, (lens[i] * -3) / (32000.0f * time));
+            rv->combCoef[i + (k * 3)] = pow((double)10.0, (double)((lens[i] * -3) / (32000.0f * time)));
         }
 
         for (i = 0; i < 2; i++) {

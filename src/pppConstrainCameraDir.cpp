@@ -1,6 +1,7 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 
@@ -12,7 +13,6 @@ static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline float CameraDistance() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xFC); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
-extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 float kPppConstrainCameraDirScaleBase = 1.0f;
 float kPppConstrainCameraDirDistanceBase = 25.0f;
@@ -81,15 +81,13 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
 void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2,
                                 _pppCtrlTable* param_3)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
-
     if (gPppCalcDisabled == 0) {
+        _pppMngSt* pppMngSt = pppMngStPtr;
         float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
         unsigned char* flags = (unsigned char*)&param_2->m_arg3;
 
-        CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            param_2->m_dataValIndex, pppConstrainCameraDir, param_2->m_graphId,
-            value, value + 1, value + 2, &param_2->m_initWOrk, &param_2->m_stepValue);
+        CalcGraphValue(&pppConstrainCameraDir->m_pppPObject, param_2->m_graphId, value[0], value[1], value[2],
+                       param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
         
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
             float cameraDirX = CameraDirX();

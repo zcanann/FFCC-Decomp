@@ -247,10 +247,10 @@ int SawSwing(int phase)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 int DutySwing(int phase)
 {
     int value;
-
     if ((phase & 0x200) == 0) {
         value = 0x10000;
     } else {
@@ -258,6 +258,7 @@ int DutySwing(int phase)
     }
     return value;
 }
+#pragma optimization_level 4
 #pragma optimization_level 0
 
 /*

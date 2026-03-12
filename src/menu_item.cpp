@@ -63,6 +63,9 @@ extern float FLOAT_80332e88;
 extern float FLOAT_80332e8c;
 extern float FLOAT_80332e90;
 extern float FLOAT_80332e94;
+extern float FLOAT_80332EA8;
+extern float FLOAT_80332EAC;
+extern float FLOAT_80332EB0;
 
 struct MenuItemOpenAnim {
     s16 x;
@@ -141,16 +144,16 @@ void CMenuPcs::ItemInit()
     *(s16*)(iVar5 + 8) = 0x68;
     *(s16*)(iVar5 + 0xA) = 0x28;
     *(s16*)(iVar5 + 0xC) = 0x78;
-    fVar2 = FLOAT_80332e60;
+    fVar2 = FLOAT_80332EA8;
     *(s16*)(iVar5 + 0xE) = 0x108;
-    fVar4 = FLOAT_80332e60;
+    fVar4 = FLOAT_80332EAC;
     *(float*)(iVar5 + 0x10) = fVar2;
     fVar3 = FLOAT_80332e64;
     *(float*)(iVar5 + 0x14) = fVar4;
     fVar2 = FLOAT_80332e60;
     sVar6 = 0;
     *(float*)(iVar5 + 0x1C) = fVar3;
-    fVar4 = FLOAT_80332e64;
+    fVar4 = FLOAT_80332EB0;
     sVar7 = 4;
     *(int*)(iVar5 + 0x2C) = 5;
     *(int*)(iVar5 + 0x30) = 5;

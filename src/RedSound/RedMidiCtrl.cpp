@@ -222,26 +222,26 @@ int SineSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 int TriangleSwing(int phase)
 {
     u32 mode = ((u32)phase >> 8) & 3;
-    u32 value = (u32)phase & 0xFF;
-    int result = value * 0x100;
+    int result = ((u32)phase & 0xFF) << 8;
 
-    if (mode == 2) {
-        result = value * -0x100;
-    } else if (mode < 2) {
-        if (mode != 0) {
-            result = value * -0x100 + 0x10000;
+    if (mode != 2) {
+        if (mode >= 2) {
+            if (mode < 4) {
+                result -= 0x10000;
+            }
+        } else if (mode != 0) {
+            result = -result + 0x10000;
         }
-    } else if (mode < 4) {
-        result -= 0x10000;
+    } else {
+        result = -result;
     }
 
-    return value | result;
+    return (phase & 0xFF) | result;
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--

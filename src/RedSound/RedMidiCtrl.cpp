@@ -194,14 +194,20 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C76D0
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 int SineSwing(int phase)
 {
-    int value = DAT_8021e1d0[phase & 0x1FF];
-    if ((phase & 0x200) != 0) {
+    u32 index = (u32)phase & 0x1FF;
+    int value = DAT_8021e1d0[index];
+
+    if (((u32)phase & 0x200) != 0) {
         value = -value;
     }
     return value;
@@ -233,8 +239,12 @@ int TriangleSwing(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7768
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int SawSwing(int phase)
 {
@@ -244,19 +254,25 @@ int SawSwing(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C778C
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int DutySwing(int phase)
 {
     int value;
+    int result;
 
     if ((phase & 0x200) == 0) {
         value = 0x10000;
     } else {
         value = 0xFFFF0000;
     }
-    return value;
+    result = value;
+    return result;
 }
 #pragma optimization_level 0
 

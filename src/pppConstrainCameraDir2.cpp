@@ -26,6 +26,8 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
                                  _pppCtrlTable* param_3)
 {
+    _pppMngSt* pppMngSt = pppMngStPtr;
+
     if (gPppCalcDisabled == 0) {
         float* value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
         unsigned char* flags = (unsigned char*)&param_2->m_arg3;
@@ -35,7 +37,6 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             &param_2->m_initWOrk, &param_2->m_stepValue);
 
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
-            _pppMngSt* pppMngSt = pppMngStPtr;
             Vec resultPos;
             Vec cameraDir;
             cameraDir.x = CameraPcs._236_4_;

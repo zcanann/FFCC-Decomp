@@ -34,6 +34,7 @@ public:
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* memcpy(void*, const void*, unsigned long);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -271,7 +272,7 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
     CTexAnimSeq** newItems;
 
     if ((unsigned long)m_size < newSize) {
-        if (m_size == 0) {
+        if ((unsigned long)m_size == 0) {
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
@@ -484,7 +485,7 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
     CTexAnim** newItems;
 
     if ((unsigned long)m_size < newSize) {
-        if (m_size == 0) {
+        if ((unsigned long)m_size == 0) {
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {

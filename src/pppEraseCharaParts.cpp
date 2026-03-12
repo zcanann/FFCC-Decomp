@@ -143,14 +143,16 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
                                         int meshIndex, int param_5, float (*) [4])
 {
-    s8 callbackMeshIndex = ((pppEraseCharaPartsUnkB*)param_3)->m_meshIndex;
-    EraseCharaPartsDisplayList* displayList =
-        ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
+    EraseCharaPartsDisplayList* displayList;
+    s8 callbackMeshIndex;
+
+    displayList = ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
 
     MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
-                            displayList->m_material, 0, (_GXTevScale)0);
+                            (u16)displayList->m_material, 0, (_GXTevScale)0);
 
-    if ((callbackMeshIndex != 0xFF) && (meshIndex == callbackMeshIndex)) {
+    callbackMeshIndex = ((pppEraseCharaPartsUnkB*)param_3)->m_meshIndex;
+    if ((callbackMeshIndex != -1) && (meshIndex == callbackMeshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 

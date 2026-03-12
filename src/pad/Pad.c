@@ -387,99 +387,99 @@ BOOL PADInit() {
 u32 PADRead(PADStatus* status) {
     BOOL enabled;
     s32 chan;
-    u32 data[3];
+    u32 data[2];
     u32 chanBit;
     u32 sr;
+    s32 chanShift;
     u32 motor;
 
     enabled = OSDisableInterrupts();
     motor = 0;
 
-    for (chan = 0; chan < 4; chan++, status++) {
+    for (chan = 0; chan < SI_MAX_CHAN; chan++, status++) {
         chanBit = PAD_CHAN0_BIT >> chan;
+        chanShift = 8 * (SI_MAX_CHAN - 1 - chan);
 
         if (PendingBits & chanBit) {
-            BOOL enabled2;
-            u32 mask;
-            u32 disableBits;
-
-            enabled2 = OSDisableInterrupts();
-            mask = PendingBits;
-            PendingBits = 0;
-            mask &= ~(WaitingBits | CheckingBits);
-            ResettingBits |= mask;
-            disableBits = ResettingBits & EnabledBits;
-            if (Spec == PAD_SPEC_4) {
-                RecalibrateBits |= mask;
-            }
-            EnabledBits &= ~mask;
-            SIDisablePolling(disableBits);
-            if (ResettingChan == 0x20) {
-                DoReset();
-            }
-            OSRestoreInterrupts(enabled2);
-
+            PADReset(0);
             status->err = PAD_ERR_NOT_READY;
             memset(status, 0, offsetof(PADStatus, err));
-        } else if ((ResettingBits & chanBit) || ResettingChan == chan) {
+            continue;
+        }
+
+        if ((ResettingBits & chanBit) || ResettingChan == chan) {
             status->err = PAD_ERR_NOT_READY;
             memset(status, 0, offsetof(PADStatus, err));
-        } else if (!(EnabledBits & chanBit)) {
-            status->err = PAD_ERR_NO_CONTROLLER;
+            continue;
+        }
+
+        if (!(EnabledBits & chanBit)) {
+            status->err = (s8)PAD_ERR_NO_CONTROLLER;
             memset(status, 0, offsetof(PADStatus, err));
-        } else if (SIIsChanBusy(chan)) {
+            continue;
+        }
+
+        if (SIIsChanBusy(chan)) {
             status->err = PAD_ERR_TRANSFER;
             memset(status, 0, offsetof(PADStatus, err));
-        } else {
-            sr = SIGetStatus(chan);
-            if (sr & SI_ERROR_NO_RESPONSE) {
-                SIGetResponse(chan, data);
-
-                if (WaitingBits & chanBit) {
-                    status->err = PAD_ERR_NONE;
-                    memset(status, 0, offsetof(PADStatus, err));
-
-                    if (!(CheckingBits & chanBit)) {
-                        CheckingBits |= chanBit;
-                        SIGetTypeAsync(chan, PADReceiveCheckCallback);
-                    }
-                } else {
-                    PADDisable(chan);
-                    status->err = PAD_ERR_NO_CONTROLLER;
-                    memset(status, 0, offsetof(PADStatus, err));
-                }
-            } else {
-                if (!(SIGetType(chan) & SI_GC_NOMOTOR)) {
-                    motor |= chanBit;
-                }
-    
-                if (!SIGetResponse(chan, data)) {
-                    status->err = PAD_ERR_TRANSFER;
-                    memset(status, 0, offsetof(PADStatus, err));
-                } else if (data[0] & 0x80000000) {
-                    status->err = PAD_ERR_TRANSFER;
-                    memset(status, 0, offsetof(PADStatus, err));
-                } else {
-                    MakeStatus(chan, status, data);
-    
-                    // Check and clear PAD_ORIGIN bit
-                    if (status->button & 0x2000) {
-                        status->err = PAD_ERR_TRANSFER;
-                        memset(status, 0, offsetof(PADStatus, err));
-        
-                        // Get origin. It is okay if the following transfer fails
-                        // since the PAD_ORIGIN bit remains until the read origin
-                        // command complete.
-                        SITransfer(chan, &CmdReadOrigin, 1, &Origin[chan], 10, PADOriginUpdateCallback, 0);
-                    } else {
-                        status->err = PAD_ERR_NONE;
-        
-                        // Clear PAD_INTERFERE bit
-                        status->button &= ~0x0080;
-                    }
-                }
-            }
+            continue;
         }
+
+        sr = SIGetStatus(chan);
+        if (sr & SI_ERROR_NO_RESPONSE) {
+            SIGetResponse(chan, data);
+
+            if (WaitingBits & chanBit) {
+                status->err = (s8)PAD_ERR_NONE;
+                memset(status, 0, offsetof(PADStatus, err));
+
+                if (!(CheckingBits & chanBit)) {
+                    CheckingBits |= chanBit;
+                    SIGetTypeAsync(chan, PADReceiveCheckCallback);
+                }
+                continue;
+            }
+
+            PADDisable(chan);
+            status->err = (s8)PAD_ERR_NO_CONTROLLER;
+            memset(status, 0, offsetof(PADStatus, err));
+            continue;
+        }
+
+        if (!(SIGetType(chan) & SI_GC_NOMOTOR)) {
+            motor |= chanBit;
+        }
+
+        if (!SIGetResponse(chan, data)) {
+            status->err = PAD_ERR_TRANSFER;
+            memset(status, 0, offsetof(PADStatus, err));
+            continue;
+        }
+
+        if (data[0] & 0x80000000) {
+            status->err = PAD_ERR_TRANSFER;
+            memset(status, 0, offsetof(PADStatus, err));
+            continue;
+        }
+
+        MakeStatus(chan, status, data);
+
+        // Check and clear PAD_ORIGIN bit
+        if (status->button & 0x2000) {
+            status->err = PAD_ERR_TRANSFER;
+            memset(status, 0, offsetof(PADStatus, err));
+
+            // Get origin. It is okay if the following transfer fails
+            // since the PAD_ORIGIN bit remains until the read origin
+            // command complete.
+            SITransfer(chan, &CmdReadOrigin, 1, &Origin[chan], 10, PADOriginUpdateCallback, 0);
+            continue;
+        }
+
+        status->err = PAD_ERR_NONE;
+
+        // Clear PAD_INTERFERE bit
+        status->button &= ~0x0080;
     }
 
     OSRestoreInterrupts(enabled);

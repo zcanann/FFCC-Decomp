@@ -304,7 +304,8 @@ int RandomSwing(int phase)
 int SineSwingR(int phase)
 {
     phase ^= 0x200;
-    int value = DAT_8021e1d0[phase & 0x1FF];
+    int value = phase & 0x1FF;
+    value = DAT_8021e1d0[value];
     if ((phase & 0x200) != 0) {
         value = -value;
     }

@@ -2429,19 +2429,21 @@ void CSound::AddNoFreeSeGroup(int group)
     int i = 0;
     int remaining = 4;
 
-    do {
+    while (remaining != 0) {
         if (*groupEntry == -1) {
             sound.m_noFreeSeGroups[i] = static_cast<s16>(group);
             return;
         }
+        remaining--;
         groupEntry++;
         i++;
-        remaining--;
-    } while (remaining != 0);
-
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
     }
+
+    if (System.m_execParam == 0) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
 }
 
 /*
@@ -2460,19 +2462,21 @@ void CSound::AddNoFreeWave(int wave)
     int i = 0;
     int remaining = 4;
 
-    do {
+    while (remaining != 0) {
         if (*waveEntry == -1) {
             sound.m_noFreeWaves[i] = static_cast<s16>(wave);
             return;
         }
+        remaining--;
         waveEntry++;
         i++;
-        remaining--;
-    } while (remaining != 0);
-
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
     }
+
+    if (System.m_execParam == 0) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
 }
 
 /*

@@ -1706,8 +1706,9 @@ void CGMonObj::tgtFuncGigasLoad(int)
  */
 int CGMonObj::calcBranchFuncGigasLoad(int)
 {
-	if (((Game.game.m_scriptWork[0][0][1] != 0) &&
-	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(Game.game.m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
+	CGame* game = (CGame*)&Game;
+	if (((game->m_scriptWork[0][0][1] != 0) &&
+	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(game->m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
 	    (*reinterpret_cast<int*>(CFlat + 4840) == 1)) {
 		return 0;
 	}

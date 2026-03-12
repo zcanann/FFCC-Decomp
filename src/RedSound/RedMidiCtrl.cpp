@@ -215,9 +215,14 @@ int SineSwing(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C770C
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#pragma optimization_level 4
 int TriangleSwing(int phase)
 {
     u32 mode = ((u32)phase >> 8) & 3;
@@ -234,8 +239,9 @@ int TriangleSwing(int phase)
     } else {
         result = -result;
     }
-    return low | result;
+    return result;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--

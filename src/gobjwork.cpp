@@ -50,22 +50,31 @@ extern char DAT_801d9ff0[];
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2dd4
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CGObjWork::CGObjWork()
 {
-	// TODO
+	m_objType = -1;
+	*reinterpret_cast<unsigned int*>(&m_saveSlot) = 0xFFFFFFFF;
+	m_ownerObj = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2db8
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CGObjWork::~CGObjWork()
 {
-	// TODO
 }
 
 /*
@@ -139,9 +148,6 @@ void CGObjWork::CalcStatus()
  */
 CCaravanWork::CCaravanWork()
 {
-	m_objType = -1;
-	*reinterpret_cast<unsigned int*>(&m_saveSlot) = 0xFFFFFFFF;
-	m_ownerObj = 0;
 	m_shopState = 0;
 	unk_0x3a8 = 0;
 	unk_0x3ac = 0;
@@ -161,12 +167,15 @@ CCaravanWork::CCaravanWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2bf0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CCaravanWork::~CCaravanWork()
 {
-	// TODO
 }
 
 /*
@@ -2526,9 +2535,6 @@ int CCaravanWork::GetArtifactIncludeHpMax()
  */
 CMonWork::CMonWork()
 { 
-	m_objType = -1;
-	m_saveSlot = 0xff;
-	m_partyIndex = 0xff;
 	m_objType = 1;
 }
 

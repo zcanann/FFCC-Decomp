@@ -313,21 +313,19 @@ int SineSwingR(int phase)
 #pragma optimization_level 4
 int TriangleSwingR(int phase)
 {
-    u32 modifiedPhase = (u32)phase ^ 0x200;
-    u32 mode = (modifiedPhase >> 8) & 3;
-    int result = (modifiedPhase & 0xFF) << 8;
-    if (mode != 2) {
-        if (mode >= 2) {
-            if (mode < 4) {
-                result -= 0x10000;
-            }
-        } else if (mode != 0) {
-            result = -result + 0x10000;
+    u32 mode = ((u32)phase ^ 0x200) >> 8 & 3;
+    u32 low = ((u32)phase ^ 0x200) & 0xFF;
+    int result = low * 0x100;
+    if (mode == 2) {
+        result = low * -0x100;
+    } else if (mode < 2) {
+        if (mode != 0) {
+            result = low * -0x100 + 0x10000;
         }
-    } else {
-        result = -result;
+    } else if (mode < 4) {
+        result -= 0x10000;
     }
-    return (phase & 0xFF) | result;
+    return ((u32)phase & 0xFF) | result;
 }
 #pragma optimization_level 0
 

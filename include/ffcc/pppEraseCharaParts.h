@@ -20,7 +20,7 @@ struct pppEraseCharaPartsUnkC {
     s32* m_serializedDataOffsets;
 };
 
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, pppEraseCharaPartsUnkB*, int, int, float (*)[4]);
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,3 @@ void pppFrameEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkB*, pppEr
 #endif
 
 #endif // _PPP_ERASECHARAPARTS_H_
-

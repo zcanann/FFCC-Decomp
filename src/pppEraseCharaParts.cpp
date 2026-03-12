@@ -9,6 +9,7 @@ extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void DCFlushRange(void* ptr, unsigned long size);
+void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 }
 
 struct EraseCharaPartsDisplayList {
@@ -128,7 +129,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(void (**)(CChara::CModel*, void*, void*, int, int, float (*)[4]))(model + 0xFC) =
-        EraseCharaParts_DrawMeshDLCallback;
+        (void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]))EraseCharaParts_DrawMeshDLCallback;
 }
 
 /*
@@ -140,19 +141,18 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
  * JP Address: TODO
  * JP Size: TODO
  */
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
+void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, pppEraseCharaPartsUnkB* param_3,
                                         int meshIndex, int param_5, float (*) [4])
 {
-    s8 callbackMeshIndex = ((pppEraseCharaPartsUnkB*)param_3)->m_meshIndex;
-    EraseCharaPartsDisplayList* displayList =
-        ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
+    u32* displayList =
+        (u32*)(*(s32*)(*(s32*)((u8*)model + 0xAC) + meshIndex * 0x14 + 8) + 0x50) + param_5 * 3;
 
-    MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
-                            displayList->m_material, 0, (_GXTevScale)0);
+    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+        &MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)displayList + 8), 0, 0);
 
-    if ((callbackMeshIndex != 0xFF) && (meshIndex == callbackMeshIndex)) {
+    if ((param_3->m_meshIndex != -1) && (meshIndex == param_3->m_meshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 
-    GXCallDisplayList(displayList->m_data, displayList->m_size);
+    GXCallDisplayList((void*)displayList[1], displayList[0]);
 }

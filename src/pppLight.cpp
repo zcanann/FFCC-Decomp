@@ -15,6 +15,25 @@ struct pppLightTarget {
 	int unkC;
 };
 
+struct PppLightState {
+	u8 unk0[0x8];
+	s32 type;
+	Vec position;
+	u8 unk18[0xC];
+	f32 attenRadius;
+	f32 attenFalloff;
+	u8 unk2C[0x14];
+	Vec direction;
+	f32 spotScale;
+	f32 specularScale;
+	u8 unk54[3];
+	u8 specularMode;
+	_GXColor color0;
+	_GXColor color1;
+	_GXColor color2;
+	u8 unk64[0xB0 - 0x64];
+};
+
 extern "C" {
 void __ct__Q29CLightPcs6CLightFv(void*);
 void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
@@ -102,18 +121,17 @@ void pppLightCon(void* param1, void* param2)
  */
 void pppLight(void* param1, void* param2, void* param3)
 {
+	unsigned char* pppMng = (unsigned char*)param1;
 	unsigned char* lightParam = (unsigned char*)param2;
-	_pppMngSt* pppMng = (_pppMngSt*)param1;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
 	{
-		unsigned char* pppMngBytes = (unsigned char*)pppMng;
-		unsigned char* work = (unsigned char*)pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
-		CLightPcs::CLight lightData;
-		Vec* sourcePos = (Vec*)&lightData.m_position;
+		unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
+		PppLightState lightData;
+		Vec* sourcePos = &lightData.position;
 
 		*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(work + 0x20);
 		*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(work + 0x1c);
@@ -134,7 +152,7 @@ void pppLight(void* param1, void* param2, void* param3)
 		*(short*)(work + 0x4) = *(short*)(work + 0x4) + *(short*)(work + 0xc);
 		*(short*)(work + 0x6) = *(short*)(work + 0x6) + *(short*)(work + 0xe);
 
-		if (*(int*)lightParam == *(int*)(pppMngBytes + 0xc)) {
+		if (*(int*)lightParam == *(int*)(pppMng + 0xc)) {
 			*(short*)(work + 0x0) = *(short*)(work + 0x0) + *(short*)(lightParam + 0x8);
 			*(short*)(work + 0x2) = *(short*)(work + 0x2) + *(short*)(lightParam + 0xa);
 			*(short*)(work + 0x4) = *(short*)(work + 0x4) + *(short*)(lightParam + 0xc);
@@ -163,48 +181,48 @@ void pppLight(void* param1, void* param2, void* param3)
 
 		__ct__Q29CLightPcs6CLightFv(&lightData);
 
-		sourcePos->x = *(float*)(pppMngBytes + 0x1c);
-		sourcePos->y = *(float*)(pppMngBytes + 0x2c);
-		sourcePos->z = *(float*)(pppMngBytes + 0x3c);
+		sourcePos->x = *(float*)(pppMng + 0x1c);
+		sourcePos->y = *(float*)(pppMng + 0x2c);
+		sourcePos->z = *(float*)(pppMng + 0x3c);
 		PSMTXMultVec(pppMngStPtr->m_matrix.value, sourcePos, sourcePos);
 
-		lightData.m_attenRadius = *(float*)(work + 0x24);
-		lightData.m_attenFalloff = *(float*)(work + 0x18);
+		lightData.attenRadius = *(float*)(work + 0x24);
+		lightData.attenFalloff = *(float*)(work + 0x18);
 
-		lightData.m_targetColor[0].r = (unsigned char)(*(short*)(work + 0x0) >> 7);
-		lightData.m_targetColor[0].g = (unsigned char)(*(short*)(work + 0x2) >> 7);
-		lightData.m_targetColor[0].b = (unsigned char)(*(short*)(work + 0x4) >> 7);
-		lightData.m_targetColor[0].a = (unsigned char)(*(short*)(work + 0x6) >> 7);
+		lightData.color0.r = (unsigned char)(*(short*)(work + 0x0) >> 7);
+		lightData.color0.g = (unsigned char)(*(short*)(work + 0x2) >> 7);
+		lightData.color0.b = (unsigned char)(*(short*)(work + 0x4) >> 7);
+		lightData.color0.a = (unsigned char)(*(short*)(work + 0x6) >> 7);
 
 		if (lightParam[0x5a] != 0) {
-			lightData.m_targetColor[1] = lightData.m_targetColor[0];
+			lightData.color1 = lightData.color0;
 		} else {
-			*(u32*)&lightData.m_targetColor[1] = 0;
+			*(u32*)&lightData.color1 = 0;
 		}
 
 		if (lightParam[0x5b] != 0) {
-			lightData.m_targetColor[2] = lightData.m_targetColor[0];
+			lightData.color2 = lightData.color0;
 		} else {
-			*(u32*)&lightData.m_targetColor[2] = 0;
+			*(u32*)&lightData.color2 = 0;
 		}
 
 		if (lightParam[0x59] == 0) {
-			*(u32*)&lightData.m_targetColor[0] = 0;
+			*(u32*)&lightData.color0 = 0;
 		}
 
 		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
 			if (lightParam[0x58] == 0) {
-				lightData.m_type = 0;
-				lightData.m_direction.x = kPppLightZero;
-				lightData.m_direction.y = kPppLightZero;
-				lightData.m_direction.z = kPppLightOne;
-				lightData.m_spotScale = kPppLightDefaultCosAtten;
+				lightData.type = 0;
+				lightData.direction.x = kPppLightZero;
+				lightData.direction.y = kPppLightZero;
+				lightData.direction.z = kPppLightOne;
+				lightData.spotScale = kPppLightDefaultCosAtten;
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &lightData);
 			} else {
 				unsigned char* obj;
 				Vec* direction;
 
-				lightData.m_type = 1;
+				lightData.type = 1;
 				if (*(int*)(lightParam + 0x44) == -1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
@@ -212,7 +230,7 @@ void pppLight(void* param1, void* param2, void* param3)
 					obj = targetTable[*(int*)(lightParam + 0x44)].obj;
 				}
 
-				direction = (Vec*)&lightData.m_direction;
+				direction = &lightData.direction;
 				direction->x = *(float*)(obj + 0x1c);
 				direction->y = *(float*)(obj + 0x2c);
 				direction->z = *(float*)(obj + 0x3c);
@@ -220,11 +238,11 @@ void pppLight(void* param1, void* param2, void* param3)
 
 				PSVECSubtract(direction, sourcePos, direction);
 				PSVECNormalize(direction, direction);
-				lightData.m_spotScale = kPppLightSpotScale * *(float*)(work + 0x30);
+				lightData.spotScale = kPppLightSpotScale * *(float*)(work + 0x30);
 
 				if (lightParam[0x58] == 2) {
-					lightData.m_specularScale = *(float*)(work + 0x3c);
-					lightData.m_specularMode = 1;
+					lightData.specularScale = *(float*)(work + 0x3c);
+					lightData.specularMode = 1;
 				}
 
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &lightData);

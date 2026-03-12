@@ -2241,13 +2241,13 @@ void CSound::LoadStream(int streamID)
         bool isPlaying = false;
 
         if (sound.m_streamPlaying != 0) {
-            if (StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID) != 0) {
+            if (StreamPlayState__9CRedSoundFi(RedSound(this), sound.m_streamID) != 0) {
                 isPlaying = true;
             }
         }
 
         if (isPlaying) {
-            StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID);
+            StreamStop__9CRedSoundFi(RedSound(this), sound.m_streamID);
         }
 
         CFile::CHandle*& streamFile = sound.m_streamFile;

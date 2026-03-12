@@ -116,6 +116,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	if (state->countdown == 0) {
 		VertexApMtxEnv* env = (VertexApMtxEnv*)pppEnvStPtr;
 		VertexApMtxEntry* entry = &env->entries[data->entryIndex];
+		u16* vertexIndices = entry->vertexIndices;
 		Vec* points = *(Vec**)((u8*)parent + 0x70);
 
 		if (points == 0) {
@@ -135,8 +136,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				}
 
 				u16 index = state->index++;
-				u16 vertexIndex = entry->vertexIndices[index];
+				u16 vertexIndex = vertexIndices[index];
 				Vec* vertex = &points[vertexIndex];
+				f32 x = vertex->x;
+				f32 y = vertex->y;
+				f32 z = vertex->z;
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					_pppPObject* child;
@@ -154,9 +158,9 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						*(void**)((u8*)child + 0x4) = parent;
 					}
 
-					pos.x = vertex->x;
-					pos.y = vertex->y;
-					pos.z = vertex->z;
+					pos.x = x;
+					pos.y = y;
+					pos.z = z;
 					PSMTXMultVec(parentMtx, &pos, &pos);
 					outMtx = (MtxPtr)((u8*)child + data->childMtxOffset + 0x80);
 					if (data->useWorldMtx == 0) {
@@ -179,9 +183,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		{
 			MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
 			do {
-				u16 vertexIndex =
-					entry->vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
+				u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
 				Vec* vertex = &points[vertexIndex];
+				f32 x = vertex->x;
+				f32 y = vertex->y;
+				f32 z = vertex->z;
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					_pppPObject* child;
@@ -199,9 +205,9 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						*(void**)((u8*)child + 0x4) = parent;
 					}
 
-					pos.x = vertex->x;
-					pos.y = vertex->y;
-					pos.z = vertex->z;
+					pos.x = x;
+					pos.y = y;
+					pos.z = z;
 					PSMTXMultVec(parentMtx, &pos, &pos);
 					outMtx = (MtxPtr)((u8*)child + data->childMtxOffset + 0x80);
 					if (data->useWorldMtx == 0) {

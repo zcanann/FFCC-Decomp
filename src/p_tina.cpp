@@ -187,6 +187,19 @@ struct CUSBStreamDataRaw {
     unsigned char m_disableShokiDraw;
 };
 
+struct CPartPcsViewerState {
+    unsigned char unk0[0x18];
+    void* m_stageDefault;
+    void* m_stageLoad;
+    void* m_stageAmem;
+    void* m_stageExtra;
+    void* m_freePtr;
+    unsigned char unk2C[2];
+    unsigned char m_blockOnFrame;
+    unsigned char m_miruraEventActive;
+    unsigned char m_disableShokiDraw;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80053960
@@ -559,34 +572,35 @@ void CPartPcs::createLoad()
  */
 void CPartPcs::createViewer()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
+    CPartPcsViewerState* viewer = reinterpret_cast<CPartPcsViewerState*>(this);
+    char* stringBase = DAT_801d8068;
     void* stage;
 
     IsBigAlloc__7CUSBPcsFi(&USBPcs, 1);
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
+    viewer->m_freePtr = 0;
+    viewer->m_stageExtra = 0;
+    viewer->m_blockOnFrame = 0;
+    viewer->m_miruraEventActive = 0;
+    viewer->m_disableShokiDraw = 0;
 
-    if (Game.game.m_currentSceneId == 7) {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
+    if ((int)Game.game.m_currentSceneId == 7) {
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        viewer->m_stageLoad = stage;
+        viewer->m_stageDefault = stage;
+        viewer->m_stageAmem = 0;
     } else {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, s_CPartPcs_amem_801d811c, 2);
-        usb->m_stageAmem = stage;
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        viewer->m_stageLoad = stage;
+        viewer->m_stageDefault = stage;
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        viewer->m_stageAmem = stage;
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         &ppvAmemCacheSet,
-        s_CPartPcs_801d7f54,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageLoad,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageAmem,
+        stringBase + 0x74,
+        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
+        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -595,9 +609,9 @@ void CPartPcs::createViewer()
         reinterpret_cast<void*>(pppAmemRefCntError),
         0);
 
-    memset(&PartMng, 0, 0x23FD8);
+    ::memset(&PartMng, 0, 0x23FD8);
     PartMng.Create();
-    reinterpret_cast<CUSBStreamData*>(usb)->CreateBuffer();
+    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4)->CreateBuffer();
 }
 
 /*

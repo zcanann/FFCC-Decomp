@@ -243,10 +243,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 1, 0xFF);
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(1, 3);
     GXClearVtxDesc();
-    GXSetVtxDesc((GXAttr)9, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)10, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)11, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)13, GX_DIRECT);
+    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
+    GXSetVtxDesc((GXAttr)10, (GXAttrType)1);
+    GXSetVtxDesc((GXAttr)11, (GXAttrType)1);
+    GXSetVtxDesc((GXAttr)13, (GXAttrType)1);
 
     left = 0;
     top = 0;

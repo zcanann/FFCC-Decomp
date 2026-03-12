@@ -603,11 +603,6 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         }
 
         unsigned int language = Game.game.m_gameWork.m_languageId;
-        if (language >= 6)
-        {
-            language = 0;
-        }
-
         const char* const* lines = s_diskErrorText[msgIndex][language];
         unsigned int baseY = compactLayout ? 0x20 : 200;
 

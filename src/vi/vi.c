@@ -323,6 +323,8 @@ void __VIInit(VITVMode mode) {
     VITiming* tm;
     u32 tv;
     u32 ds;
+    u16 hlw;
+    s32 halfNhlines;
     volatile u32 delay;
 
     tv = (u32)mode >> 2;
@@ -350,8 +352,10 @@ void __VIInit(VITVMode mode) {
     __VIRegs[36] = 0x2828;
     __VIRegs[27] = 1;
     __VIRegs[26] = 0x1001;
-    __VIRegs[25] = tm->hlw + 1;
-    __VIRegs[24] = ((tm->nhlines >> 1) + 1) | 0x1000;
+    hlw = tm->hlw;
+    halfNhlines = (s32)tm->nhlines >> 1;
+    __VIRegs[25] = hlw + 1;
+    __VIRegs[24] = (halfNhlines + 1) | 0x1000;
 
     if (mode != 2 && mode != 3 && mode != 0x1A) {
         __VIRegs[1] = (ds << 2) | 1 | (tv << 8);

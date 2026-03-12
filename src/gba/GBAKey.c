@@ -82,10 +82,12 @@ static void F252(void* task)
     __GBAX01(chan, 0);
 }
 
-void __GBAX02(s32 chan, u8* readbuf) {
+void __GBAX02(s32 chan, u8* readbuf)
+{
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &gba->bootInfo;
     GBASecParam* param = gba->param;
+    DSPTaskInfo* task;
     
     memcpy(param, readbuf, 4);
     param->paletteColor = bootInfo->paletteColor;
@@ -95,16 +97,18 @@ void __GBAX02(s32 chan, u8* readbuf) {
 
     DCInvalidateRange(&param->keyA, 32);
     DCFlushRange(param, 32);
-    
-    gba->task.priority = 0xff;
-    gba->task.iram_mmem_addr = (u16*)OSCachedToPhysical(GBAKeyDspTaskIram);
-    gba->task.iram_length = 0x380;
-    gba->task.iram_addr = 0;
-    gba->task.dsp_init_vector = 0x10;
-    gba->task.init_cb = F232;
-    gba->task.res_cb = NULL;
-    gba->task.done_cb = F252;
-    gba->task.req_cb = NULL;
 
-    DSPAddTask(&gba->task);
+    task = &gba->task;
+
+    task->priority = 0xff;
+    task->iram_mmem_addr = (u16*)OSCachedToPhysical(GBAKeyDspTaskIram);
+    task->iram_length = 0x380;
+    task->iram_addr = 0;
+    task->dsp_init_vector = 0x10;
+    task->init_cb = F232;
+    task->res_cb = NULL;
+    task->done_cb = F252;
+    task->req_cb = NULL;
+
+    DSPAddTask(task);
 }

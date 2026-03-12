@@ -367,10 +367,12 @@ void CChara::CAnim::InitQuantize()
  */
 CChara::CAnimNode::CAnimNode()
 {
+	int zero = 0;
 	CAnimNodeFields& node = AnimNode(this);
 
-	*reinterpret_cast<unsigned char*>(&node.m_flags) &= 0x7F;
-	node.m_flags = static_cast<unsigned int>(__rlwimi(static_cast<int>(node.m_flags), 0, 13, 1, 18));
+	*reinterpret_cast<unsigned char*>(&node.m_flags) =
+	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&node.m_flags), zero, 7, 24, 24));
+	node.m_flags = static_cast<unsigned int>(__rlwimi(static_cast<int>(node.m_flags), zero, 13, 1, 18));
 }
 
 /*

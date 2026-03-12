@@ -546,22 +546,23 @@ void CPartPcs::create()
 void CPartPcs::createLoad()
 {
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+    char* stringBase = DAT_801d8068;
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x236E8) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236EC) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
     *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
     *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
+    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x24C, 1, 1, 0, 0);
+    pppLoadPmd__8CPartMngFPCc(&PartMng, stringBase + 0x24C);
+    pppLoadPan__8CPartMngFPCc(&PartMng, stringBase + 0x24C);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x25C, 1, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x270, 2, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x284, 3, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x298, 4, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x2AC, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 
@@ -1165,17 +1166,38 @@ void CPartPcs::drawAfterViewer()
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
     unsigned int* busy = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4);
-
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 8; j++) {
-            if (busy[j] != 0) {
-                return 0;
-            }
+    int blockCount = 2;
+    while (true) {
+        if (busy[0] != 0) {
+            return 0;
+        }
+        if (busy[1] != 0) {
+            return 0;
+        }
+        if (busy[2] != 0) {
+            return 0;
+        }
+        if (busy[3] != 0) {
+            return 0;
+        }
+        if (busy[4] != 0) {
+            return 0;
+        }
+        if (busy[5] != 0) {
+            return 0;
+        }
+        if (busy[6] != 0) {
+            return 0;
+        }
+        if (busy[7] != 0) {
+            return 0;
         }
         busy += 8;
+        blockCount--;
+        if (blockCount == 0) {
+            return 1;
+        }
     }
-
-    return 1;
 }
 
 /*

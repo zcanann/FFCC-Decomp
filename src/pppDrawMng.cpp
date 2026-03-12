@@ -9,7 +9,6 @@
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
-void InitEnv__9CCharaPcsFi(void* charaPcs, int envIndex);
 float kPppDrawDepthScaleNear = 0.0512f;
 float kPppDrawDepthScaleFar = 0.512f;
 }
@@ -147,7 +146,7 @@ void pppDrawMng::DrawOt()
 					if (lastType != prim->m_type)
 					{
 						pppInitDrawEnv(0);
-						InitEnv__9CCharaPcsFi(&CharaPcs, 4);
+						CharaPcs.InitEnv(4);
 					}
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);
@@ -179,9 +178,8 @@ void pppDrawMng::ClearOt()
 {
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
-	CGame* game = (CGame*)&Game;
 
-	if (game->m_currentMapId == 0x21)
+	if (Game.game.m_currentMapId == 0x21)
 	{
 		m_depthScale = kPppDrawDepthScaleNear;
 	}

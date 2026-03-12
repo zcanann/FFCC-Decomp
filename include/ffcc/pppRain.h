@@ -24,9 +24,6 @@ struct RAIN_DATA {
     s32* m_serializedDataOffsets;
 };
 
-void InitRainData(VRain*, PRain*, RAIN_DATA*);
-void UpdateRain(VRain*, PRain*, RAIN_DATA*);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

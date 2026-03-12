@@ -261,20 +261,20 @@ int SawSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int DutySwing(int phase)
 {
     int value;
     int result;
 
-    if ((phase & 0x200) == 0) {
-        value = 0x10000;
+    if ((phase & 0x200) != 0) {
+        value = -0x10000;
     } else {
-        value = 0xFFFF0000;
+        value = 0x10000;
     }
     result = value;
     return result;
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--

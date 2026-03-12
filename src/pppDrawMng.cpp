@@ -8,8 +8,8 @@
 #include "ffcc/symbols_shared.h"
 
 extern "C" {
-void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
-void InitEnv__9CCharaPcsFi(void* charaPcs, int envIndex);
+void SetDrawDoneDebugDataPartControl__8CGraphicFi(CGraphic* graphic, int partControl);
+void InitEnv__9CCharaPcsFi(CCharaPcs* charaPcs, int envIndex);
 float kPppDrawDepthScaleNear = 0.0512f;
 float kPppDrawDepthScaleFar = 0.512f;
 }
@@ -179,9 +179,8 @@ void pppDrawMng::ClearOt()
 {
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
-	CGame* game = (CGame*)&Game;
 
-	if (game->m_currentMapId == 0x21)
+	if (Game.game.m_currentMapId == 0x21)
 	{
 		m_depthScale = kPppDrawDepthScaleNear;
 	}

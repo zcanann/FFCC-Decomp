@@ -914,15 +914,18 @@ fail:
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
-    u8* colorWork = (u8*)charaBreak + 0x80 + colorOffset;
     u8* work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
+    u8* colorWork = (u8*)charaBreak + 0x80 + colorOffset;
 
     if (*(u32*)(work + 0x44) != 0) {
+        void* envColor = colorWork + 8;
+        void* envMtx = (u8*)charaBreak + 0x40;
+
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         pppInitBlendMode__Fv();
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorWork + 8,
-            (u8*)charaBreak + 0x40,
+            envColor,
+            envMtx,
             FLOAT_80332048,
             0,
             0,

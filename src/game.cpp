@@ -1120,7 +1120,7 @@ void CGame::Draw()
  */
 void CGame::Draw2()
 {
-	gCFlatRuntime2.Draw();
+	reinterpret_cast<CFlatRuntime2*>(CFlat)->Draw();
 	Wind.Draw();
 }
 
@@ -1377,11 +1377,15 @@ void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
  */
 int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& specialInfo)
 {
+    CFlatRuntime2* runtime;
+    int classObj;
+
     if (ifParam.m_classId == 0) {
         return 0;
     }
 
-    char* classObj = reinterpret_cast<char*>(gCFlatRuntime2.intToClass((int)ifParam.m_classId));
+    runtime = reinterpret_cast<CFlatRuntime2*>(CFlat);
+    classObj = reinterpret_cast<int>(runtime->intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {
         return 0;

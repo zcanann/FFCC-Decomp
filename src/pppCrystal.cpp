@@ -177,34 +177,32 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	textureInfo[5] = textureSize;
 
 	{
-		const double stepX = 2.0 / (double)(textureInfo[2] - 1);
-		const double stepY = 2.0 / (double)(textureInfo[3] - 1);
-		double yCoord = -1.0;
+		const float stepX = 2.0f / (float)(textureInfo[2] - 1);
+		const float stepY = 2.0f / (float)(textureInfo[3] - 1);
+		float yCoord = -1.0f;
 
 		for (u32 y = 0; y < (u32)textureInfo[3]; y++) {
-			const double ySq = yCoord * yCoord;
-			double xCoord = -1.0;
+			const float ySq = yCoord * yCoord;
+			float xCoord = -1.0f;
 
 			for (u32 x = 0; x < (u32)textureInfo[2]; x++) {
-				double magnitude = (double)(float)(xCoord * xCoord + ySq);
+				float magnitude = xCoord * xCoord + ySq;
 
-				if (magnitude < 0.0) {
-					magnitude = 0.0;
-				} else if (magnitude > 1.0) {
-					magnitude = sqrt(magnitude);
+				if (magnitude < 0.0f) {
+					magnitude = 0.0f;
+				} else if (magnitude > 1.0f) {
+					magnitude = sqrtf(magnitude);
 				}
 
-				if (magnitude > 0.8) {
-					magnitude = 0.8;
+				if (magnitude > 0.8f) {
+					magnitude = 0.8f;
 				}
 
-				magnitude = (double)(float)(4.0 * (double)(float)(magnitude * fmod(magnitude, 1.0)));
+				magnitude = 4.0f * (magnitude * (float)fmod(magnitude, 1.0));
 
 				{
-					const u8 nx = (u8)__cvt_fp2unsigned(
-						(double)(float)(127.0 * (double)(float)(xCoord * magnitude) + 128.0));
-					const u8 ny = (u8)__cvt_fp2unsigned(
-						(double)(float)(127.0 * (double)(float)(yCoord * magnitude) + 128.0));
+					const u8 nx = (u8)__cvt_fp2unsigned((double)(127.0f * (xCoord * magnitude) + 128.0f));
+					const u8 ny = (u8)__cvt_fp2unsigned((double)(127.0f * (yCoord * magnitude) + 128.0f));
 					u8* pixel = (u8*)(textureInfo[0] +
 						(y >> 2) * (textureInfo[2] & 0x1FFFFFFCU) * 8 +
 						(x & 0x1FFFFFFC) * 8 +

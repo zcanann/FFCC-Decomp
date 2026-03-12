@@ -164,24 +164,22 @@ void i2f_5(float*, unsigned short*)
  */
 CChara::CAnim::CAnim()
 {
-	CAnimFields& anim = Anim(this);
-
 	__ct__4CRefFv(this);
-	anim.m_vtable = __vt__Q26CChara5CAnim;
-	anim.m_nodeCount = 0;
-	anim.m_nodes = 0;
-	anim.m_bank = 0;
-	anim.m_flags = static_cast<unsigned char>((anim.m_flags & 0x7F) | 0x80);
-	anim.m_flags = static_cast<unsigned char>(anim.m_flags & 0xBF);
-	anim.m_quantizeX = 5;
-	anim.m_quantizeY = 0xB;
-	anim.m_quantizeZ = 10;
-	anim.m_interp = 0;
-	anim.m_interpOffset = 0;
-	anim.m_bankAddress = 0;
-	anim.m_bankSize = 0;
-	anim.m_stage = 0;
-	anim.m_lastFrame = 0;
+	Anim(this).m_vtable = __vt__Q26CChara5CAnim;
+	Anim(this).m_nodeCount = 0;
+	Anim(this).m_nodes = 0;
+	Anim(this).m_bank = 0;
+	Anim(this).m_flags |= 0x80;
+	Anim(this).m_flags &= 0xBF;
+	Anim(this).m_quantizeX = 5;
+	Anim(this).m_quantizeY = 0xB;
+	Anim(this).m_quantizeZ = 10;
+	Anim(this).m_interp = 0;
+	Anim(this).m_interpOffset = 0;
+	Anim(this).m_stage = 0;
+	Anim(this).m_bankSize = 0;
+	Anim(this).m_bankAddress = 0;
+	Anim(this).m_lastFrame = 0;
 }
 
 /*

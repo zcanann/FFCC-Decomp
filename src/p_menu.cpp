@@ -924,8 +924,8 @@ void CMenuPcs::onScriptChanging(char* script)
  */
 void CMenuPcs::onMapChanging(int mapNo, int)
 {
-    if (((mapNo == 0x21) && (Game.game.m_currentMapId != 0x21)) ||
-        ((mapNo != 0x21) && (Game.game.m_currentMapId == 0x21))) {
+    if (((mapNo == 0x21) && (reinterpret_cast<CGame*>(&Game)->m_currentMapId != 0x21)) ||
+        ((mapNo != 0x21) && (reinterpret_cast<CGame*>(&Game)->m_currentMapId == 0x21))) {
         changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
     }
 }

@@ -243,58 +243,45 @@ CFunnyShapePcs::~CFunnyShapePcs()
 void CFunnyShapePcs::Init()
 {
     u8* self = Ptr(this, 0);
-    u32 clz;
-    u32 bit;
-    u32 negBit;
-    const u32 mask = 0x3F;
-    f32 origin;
-    f32 ndcMin;
+    u8 bVar3;
+    u32 uVar4;
+    u32 uVar5;
+    f32 fVar1;
+    f32 fVar2;
 
     self[0x8] = 0x7F;
-    clz = __cntlzw(0);
-    bit = (clz >> 5) & 1;
-
+    uVar4 = __cntlzw(0);
     self[0x9] = 0x7F;
-    clz = __cntlzw(1);
-    negBit = -bit;
-
     self[0xA] = 0x7F;
-    bit = (clz >> 5) & 1;
+    uVar5 = __cntlzw(1);
+    bVar3 = -((uVar4 >> 5) & 1) & 0x3F;
     self[0xB] = 0xFF;
-
-    origin = kFunnyShapeViewportOrigin;
-    self[0xC] = mask & negBit;
-
-    clz = __cntlzw(2);
-    ndcMin = kFunnyShapeNdcMin;
-
-    self[0xD] = mask & negBit;
-    self[0xE] = mask & negBit;
-
-    negBit = -((clz >> 5) & 1);
+    fVar2 = kFunnyShapeViewportOrigin;
+    self[0xC] = bVar3;
+    fVar1 = kFunnyShapeNdcMin;
+    uVar4 = __cntlzw(2);
+    self[0xD] = bVar3;
+    self[0xE] = bVar3;
+    bVar3 = -((uVar5 >> 5) & 1) & 0x3F;
     self[0xF] = 0xFF;
-
-    *reinterpret_cast<f32*>(self + 0x18) = origin;
-    *reinterpret_cast<f32*>(self + 0x1C) = origin;
-    *reinterpret_cast<f32*>(self + 0x20) = ndcMin;
-
-    self[0x10] = mask & -bit;
-    self[0x11] = mask & -bit;
-    self[0x12] = mask & -bit;
+    *reinterpret_cast<f32*>(self + 0x18) = fVar2;
+    *reinterpret_cast<f32*>(self + 0x1C) = fVar2;
+    *reinterpret_cast<f32*>(self + 0x20) = fVar1;
+    self[0x10] = bVar3;
+    self[0x11] = bVar3;
+    self[0x12] = bVar3;
+    bVar3 = -((uVar4 >> 5) & 1) & 0x3F;
     self[0x13] = 0xFF;
-
-    *reinterpret_cast<f32*>(self + 0x24) = origin;
-    *reinterpret_cast<f32*>(self + 0x28) = origin;
-    *reinterpret_cast<f32*>(self + 0x2C) = ndcMin;
-
-    self[0x14] = mask & negBit;
-    self[0x15] = mask & negBit;
-    self[0x16] = mask & negBit;
+    *reinterpret_cast<f32*>(self + 0x24) = fVar2;
+    *reinterpret_cast<f32*>(self + 0x28) = fVar2;
+    *reinterpret_cast<f32*>(self + 0x2C) = fVar1;
+    self[0x14] = bVar3;
+    self[0x15] = bVar3;
+    self[0x16] = bVar3;
     self[0x17] = 0xFF;
-
-    *reinterpret_cast<f32*>(self + 0x30) = origin;
-    *reinterpret_cast<f32*>(self + 0x34) = origin;
-    *reinterpret_cast<f32*>(self + 0x38) = ndcMin;
+    *reinterpret_cast<f32*>(self + 0x30) = fVar2;
+    *reinterpret_cast<f32*>(self + 0x34) = fVar2;
+    *reinterpret_cast<f32*>(self + 0x38) = fVar1;
 }
 
 /*

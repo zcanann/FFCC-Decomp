@@ -99,8 +99,6 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
     u32* dst = reinterpret_cast<u32*>(m_table__14CFunnyShapePcs);
 
-    *reinterpret_cast<void**>(self) = &__vt__8CManager;
-    *reinterpret_cast<void**>(self) = &__vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(self + 0x3C));
@@ -108,7 +106,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>();
     new (self + 0x61D8) CPtrArray<_GXTexObj*>();
 
-    __register_global_object(&FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
+    __register_global_object(self, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 
     dst[0x004 / 4] = m_table_desc0__14CFunnyShapePcs[0];
     dst[0x008 / 4] = m_table_desc0__14CFunnyShapePcs[1];

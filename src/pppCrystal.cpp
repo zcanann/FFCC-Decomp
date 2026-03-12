@@ -190,7 +190,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				if (magnitude < 0.0f) {
 					magnitude = 0.0f;
 				}
-				else if (magnitude > 1.0f) {
+				else if (magnitude > 0.0f) {
 					magnitude = sqrtf(magnitude);
 				}
 
@@ -198,10 +198,11 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 					magnitude = 0.8f;
 				}
 
-				magnitude = 4.0f * (magnitude * (float)fmod(magnitude, 1.0));
+				const float modulation = (float)fmod(magnitude, 1.0);
+				const float normal = 4.0f * (magnitude * modulation);
 
-				const u8 nx = (u8)__cvt_fp2unsigned((double)(127.0f * (xCoord * magnitude) + 128.0f));
-				const u8 ny = (u8)__cvt_fp2unsigned((double)(127.0f * (yCoord * magnitude) + 128.0f));
+				const u8 nx = (u8)__cvt_fp2unsigned((double)(127.0f * (xCoord * normal) + 128.0f));
+				const u8 ny = (u8)__cvt_fp2unsigned((double)(127.0f * (yCoord * normal) + 128.0f));
 				u8* pixel = (u8*)((u32)textureInfo->m_imageData +
 					(y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
 					(x & 0x1FFFFFFC) * 8 +

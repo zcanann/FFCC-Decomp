@@ -60,26 +60,6 @@ struct RainParam {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void InitRainData(VRain*, PRain*, RAIN_DATA*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void UpdateRain(VRain*, PRain*, RAIN_DATA*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800ddacc
  * PAL Size: 44b
  * EN Address: TODO

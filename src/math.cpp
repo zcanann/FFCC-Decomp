@@ -486,93 +486,93 @@ int CBound::CheckFrustum0(float farPlane)
     Vec local_48;
     Vec local_3c;
 
-    if ((((param_1[3] < s_f_vpos.x) || (param_1[4] < s_f_vpos.y)) || (param_1[5] < s_f_vpos.z)) ||
-        ((s_f_vpos.x < *param_1 || (s_f_vpos.y < param_1[1])) || (s_f_vpos.z < param_1[2]))) {
-        dVar8 = (double)-3.40282347e38f;
-        dVar9 = (double)0.0f;
-        uVar3 = 0xF;
-        uVar5 = 0;
-        iVar6 = 0;
+    if ((param_1[3] >= s_f_vpos.x) && (param_1[4] >= s_f_vpos.y) && (param_1[5] >= s_f_vpos.z) &&
+        (s_f_vpos.x >= *param_1) && (s_f_vpos.y >= param_1[1]) && (s_f_vpos.z >= param_1[2])) {
+        return 1;
+    }
+
+    dVar8 = (double)-3.40282347e38f;
+    dVar9 = (double)0.0f;
+    uVar3 = 0xF;
+    uVar5 = 0;
+    iVar6 = 0;
+    do {
+        if (iVar6 == 0) {
+            local_3c.x = *param_1;
+        } else {
+            local_3c.x = param_1[3];
+        }
+        iVar4 = 0;
         do {
-            if (iVar6 == 0) {
-                local_3c.x = *param_1;
+            if (iVar4 == 0) {
+                local_3c.y = param_1[1];
             } else {
-                local_3c.x = param_1[3];
+                local_3c.y = param_1[4];
             }
-            iVar4 = 0;
+            iVar2 = 0;
             do {
-                if (iVar4 == 0) {
-                    local_3c.y = param_1[1];
+                if (iVar2 == 0) {
+                    local_3c.z = param_1[2];
                 } else {
-                    local_3c.y = param_1[4];
+                    local_3c.z = param_1[5];
                 }
-                iVar2 = 0;
-                do {
-                    if (iVar2 == 0) {
-                        local_3c.z = param_1[2];
-                    } else {
-                        local_3c.z = param_1[5];
-                    }
-                    PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
-                    dVar7 = (double)local_48.z;
-                    if (dVar8 < dVar7) {
-                        dVar8 = dVar7;
-                    }
-                    if (dVar7 <= dVar9) {
-                        if ((double)local_48.x <= -dVar7) {
-                            if (dVar7 <= (double)local_48.x) {
-                                uVar1 = 0;
-                            } else {
-                                uVar1 = 2;
-                            }
+                PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
+                dVar7 = (double)local_48.z;
+                if (dVar8 < dVar7) {
+                    dVar8 = dVar7;
+                }
+                if (dVar7 <= dVar9) {
+                    if ((double)local_48.x <= -dVar7) {
+                        if (dVar7 <= (double)local_48.x) {
+                            uVar1 = 0;
                         } else {
-                            uVar1 = 1;
-                        }
-                        if ((double)local_48.y <= -dVar7) {
-                            if ((double)local_48.y < dVar7) {
-                                uVar1 = uVar1 | 8;
-                            }
-                        } else {
-                            uVar1 = uVar1 | 4;
+                            uVar1 = 2;
                         }
                     } else {
-                        if ((double)local_48.x <= -dVar7) {
-                            if (dVar7 <= (double)local_48.x) {
-                                uVar1 = 0x10;
-                            } else {
-                                uVar1 = 0x12;
-                            }
-                        } else {
-                            uVar1 = 0x11;
-                        }
-                        if ((double)local_48.y <= -dVar7) {
-                            if ((double)local_48.y < dVar7) {
-                                uVar1 = uVar1 | 0x18;
-                            }
-                        } else {
-                            uVar1 = uVar1 | 0x14;
-                        }
+                        uVar1 = 1;
                     }
-                    iVar2 = iVar2 + 1;
-                    uVar3 = uVar3 & uVar1;
-                    uVar5 = uVar5 | uVar1;
-                } while (iVar2 < 2);
-                iVar4 = iVar4 + 1;
-            } while (iVar4 < 2);
-            iVar6 = iVar6 + 1;
-        } while (iVar6 < 2);
-        if ((double)farPlane <= dVar8) {
-            if (uVar3 == 0) {
-                uVar3 = (unsigned int)__cntlzw(uVar5);
-                iVar6 = (int)(uVar3 >> 5) + 1;
-            } else {
-                iVar6 = 0;
-            }
+                    if ((double)local_48.y <= -dVar7) {
+                        if ((double)local_48.y < dVar7) {
+                            uVar1 = uVar1 | 8;
+                        }
+                    } else {
+                        uVar1 = uVar1 | 4;
+                    }
+                } else {
+                    if ((double)local_48.x <= -dVar7) {
+                        if (dVar7 <= (double)local_48.x) {
+                            uVar1 = 0x10;
+                        } else {
+                            uVar1 = 0x12;
+                        }
+                    } else {
+                        uVar1 = 0x11;
+                    }
+                    if ((double)local_48.y <= -dVar7) {
+                        if ((double)local_48.y < dVar7) {
+                            uVar1 = uVar1 | 0x18;
+                        }
+                    } else {
+                        uVar1 = uVar1 | 0x14;
+                    }
+                }
+                iVar2 = iVar2 + 1;
+                uVar3 = uVar3 & uVar1;
+                uVar5 = uVar5 | uVar1;
+            } while (iVar2 < 2);
+            iVar4 = iVar4 + 1;
+        } while (iVar4 < 2);
+        iVar6 = iVar6 + 1;
+    } while (iVar6 < 2);
+    if ((double)farPlane <= dVar8) {
+        if (uVar3 == 0) {
+            uVar3 = (unsigned int)__cntlzw(uVar5);
+            iVar6 = (int)(uVar3 >> 5) + 1;
         } else {
             iVar6 = 0;
         }
     } else {
-        iVar6 = 1;
+        iVar6 = 0;
     }
     return iVar6;
 }

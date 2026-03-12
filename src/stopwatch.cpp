@@ -3,6 +3,10 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 extern "C" void __dl__FPv(void* ptr);
 
+const float kStopwatchTickToMilliseconds = 100.0f;
+const float kStopwatchZeroFloat = 0.0f;
+char s_stopwatchDefaultName[] = "no name";
+
 /*
  * --INFO--
  * Address:	TODO
@@ -88,7 +92,7 @@ float CStopWatch::Get()
  */
 CProfile::CProfile(char* name)
 {
-	OSInitStopwatch(this, &s_stopwatchDefaultName);
+	OSInitStopwatch(this, s_stopwatchDefaultName);
 	OSResetStopwatch(this);
 
 	OSStopwatch tmp;

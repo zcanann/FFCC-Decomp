@@ -75,6 +75,7 @@ stopwatch.cpp:
 	extab       start:0x80005C44 end:0x80005CA0
 	extabindex  start:0x8000B4D0 end:0x8000B53C
 	.text       start:0x800211D4 end:0x8002147C
+	.sdata2     start:0x8032F850 end:0x8032F868
 
 system.cpp:
 	extab       start:0x80005CA0 end:0x80005D18

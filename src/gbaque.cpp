@@ -2169,12 +2169,33 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccdac
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMapObjDrawFlg(unsigned int*)
+void GbaQueue::GetMapObjDrawFlg(unsigned int* outFlags)
 {
-	// TODO
+	int i = 0;
+	GbaQueue* semaphoreIter = this;
+
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	*outFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0x2B04);
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
 }
 
 /*
@@ -2228,12 +2249,20 @@ void GbaQueue::ClrFavoriteFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccc38
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetFavorite(int, char*)
+int GbaQueue::GetFavorite(int channel, char* outData)
 {
-	return 0;
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(outData, obj + channel * 0xDC + 0x94, 8);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return 8;
 }
 
 /*
@@ -2307,12 +2336,26 @@ void GbaQueue::ClrScrInitEnd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cca58
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::InitCmakeInfo(int, int)
+void GbaQueue::InitCmakeInfo(int channel, int type)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	int offset = channel * 0x20;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memset(obj + offset + 0x2CB8, 0, 0x20);
+	obj[offset + 0x2CB8] = static_cast<char>(1);
+	obj[offset + 0x2CCA] = static_cast<char>(0xFF);
+	obj[offset + 0x2CD1] = static_cast<char>(0xFF);
+	obj[offset + 0x2CB8] = static_cast<char>(type);
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetMType(channel, 1);
 }
 
 /*
@@ -3370,12 +3413,22 @@ void GbaQueue::ClrStrengthFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca2bc
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetStrengthData(int, unsigned char*)
+int GbaQueue::GetStrengthData(int channel, unsigned char* outData)
 {
-	return 0;
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	outData[0] = static_cast<unsigned char>(obj[channel * 0xDC + 0x1C]);
+	outData[1] = static_cast<unsigned char>(obj[channel * 0xDC + 0x1D]);
+	outData[2] = static_cast<unsigned char>(obj[channel * 0xDC + 0x1E]);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return 3;
 }
 
 /*

@@ -12,21 +12,6 @@ const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
 static char s_pppRain_cpp_801db610[] = "pppRain.cpp";
 
-static inline float CameraLookAtX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD4);
-}
-
-static inline float CameraLookAtY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xD8);
-}
-
-static inline float CameraLookAtZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
-}
-
 extern "C" {
 int rand(void);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -36,8 +21,10 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 }
 
+struct RainDrop;
+
 struct RainWork {
-    float* drops;
+    RainDrop* drops;
     float moveY;
     float accelY;
     float accelZ;
@@ -149,7 +136,6 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     u32 randB;
     u16 lifeBase;
     u16 lifeRange;
-    u16 count;
     RainWork* work;
     RainDrop* drop;
     RainParam* rain;
@@ -165,15 +151,14 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     }
 
     rain = (RainParam*)param_2->m_payload;
-    count = param_2->m_dataValIndex;
     work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
-        work->drops = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->drops = (RainDrop*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
             s_pppRain_cpp_801db610,
             0x7f);
-        drop = (RainDrop*)work->drops;
+        drop = work->drops;
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++) {
             randA = (u32)rand();
             randB = (u32)rand();
@@ -198,11 +183,12 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
             lifeBase = rain->lifeBase;
             lifeRange = rain->lifeRange;
-            lifeJitter = (s16)(randA % lifeRange);
-            if (flip != signBit) {
-                lifeJitter = -lifeJitter;
+            lifeJitter = (s16)randA - (s16)(((s32)randA / (s32)(u32)lifeRange) * (s32)(u32)lifeRange);
+            if (flip == signBit) {
+                drop->life = (s16)(lifeBase + lifeJitter);
+            } else {
+                drop->life = (s16)(lifeBase - lifeJitter);
             }
-            drop->life = (s16)(lifeBase + lifeJitter);
             drop++;
         }
     }
@@ -215,8 +201,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         work->accelZ += *(float*)&param_2->m_payload[0xc];
     }
 
-    drop = (RainDrop*)work->drops;
-    for (i = 0; i < count; i++) {
+    drop = work->drops;
+    for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++) {
         drop->posX = -(drop->dirX * work->moveY - drop->posX);
         drop->posY -= rain->driftY;
         drop->posZ = -(drop->dirZ * work->moveY - drop->posZ);
@@ -245,19 +231,20 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
             lifeBase = rain->lifeBase;
             lifeRange = rain->lifeRange;
-            lifeJitter = (s16)(randA % lifeRange);
-            if (flip != signBit) {
-                lifeJitter = -lifeJitter;
+            lifeJitter = (s16)randA - (s16)(((s32)randA / (s32)(u32)lifeRange) * (s32)(u32)lifeRange);
+            if (flip == signBit) {
+                drop->life = (s16)(lifeBase + lifeJitter);
+            } else {
+                drop->life = (s16)(lifeBase - lifeJitter);
             }
-            drop->life = (s16)(lifeBase + lifeJitter);
         }
         drop++;
     }
 
     if (gPppInConstructor == 0) {
-        float posX = CameraLookAtX();
-        float posY = CameraLookAtY();
-        float posZ = CameraLookAtZ();
+        float posX = CameraPcs._212_4_;
+        float posY = CameraPcs._216_4_;
+        float posZ = CameraPcs._220_4_;
         if (Game.game.m_currentSceneId == 7) {
             posX = ppvCameraMatrix0[0][3];
             posY = ppvCameraMatrix0[1][3];
@@ -320,7 +307,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_payload[0x3c], GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    drop = work->drops;
+    drop = (float*)work->drops;
     color = *(u32*)colorPtr;
     baseX = (double)pppMngStPtr->m_matrix.value[0][3];
     baseY = (double)pppMngStPtr->m_matrix.value[1][3];

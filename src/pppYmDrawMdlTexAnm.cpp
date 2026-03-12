@@ -183,7 +183,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     uvByteOffset = 0;
     for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
         *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) + work->m_perU);
-        if (work->m_frame == (work->m_frame / (u32)payload[1]) * (u32)payload[1]) {
+        if ((work->m_frame % (u32)payload[1]) == 0) {
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)(-((work->m_perU * (f32)(u32)payload[1]) -
                                                                          (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)));
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) =

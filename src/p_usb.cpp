@@ -3,7 +3,6 @@
 #include "ffcc/usb.h"
 
 #include <dolphin/os.h>
-#include "string.h"
 #include "types.h"
 
 CUSBPcs USBPcs;
@@ -26,8 +25,8 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 extern "C" void* __vt__7CUSBPcs[];
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
-
-
+extern "C" void* memcpy(void*, const void*, unsigned long);
+extern "C" char* strcpy(char*, const char*);
 /*
  * --INFO--
  * Address:	TODO

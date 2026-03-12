@@ -282,21 +282,17 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
  */
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
+    unsigned char colorStorage[4];
     Vec lightDir;
     GXLightObj lightObj;
-    unsigned char colorStorage[4];
     unsigned int colorPacked;
-    const float cameraPosX = CameraPosX();
-    const float cameraPosY = CameraPosY();
-    const float cameraPosZ = CameraPosZ();
-    const float cameraDirX = CameraDirX();
-    const float cameraDirY = CameraDirY();
-    const float cameraDirZ = CameraDirZ();
+    u8* camera = reinterpret_cast<u8*>(&CameraPcs);
+    const float cameraOffset = FLOAT_80331ce8;
     const float zero = FLOAT_80331cc4;
 
-    lightDir.x = cameraDirX - (FLOAT_80331ce8 + cameraPosX);
-    lightDir.y = cameraDirY - (FLOAT_80331ce8 + cameraPosY);
-    lightDir.z = cameraDirZ - (FLOAT_80331ce8 + cameraPosZ);
+    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
+    lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
+    lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, FLOAT_80331cd0, zero);

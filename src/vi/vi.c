@@ -1016,6 +1016,9 @@ u32 VIGetCurrentLine(void) {
     u32 halfLine;
     VITiming* tm;
     BOOL enabled;
+#if !DEBUG
+    u8 unused[4];
+#endif
 
     tm = CurrTiming;
     enabled = OSDisableInterrupts();

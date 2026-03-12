@@ -1401,7 +1401,7 @@ void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, i
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CTextureSet::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
+void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, stage, file, line, 0);
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, TextureMan.m_memoryStage, file, line, 0);
 }

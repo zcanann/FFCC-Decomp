@@ -50,6 +50,7 @@ extern "C" void __sinit_p_sound_cpp(void)
 	src = reinterpret_cast<DescBlock*>(m_table_desc0__9CSoundPcs);
 	table = reinterpret_cast<unsigned int*>(m_table__9CSoundPcs);
 
+	d0 = src->d[0];
 	d1 = src->d[1];
 	d2 = src->d[2];
 	d3 = src->d[3];
@@ -61,10 +62,9 @@ extern "C" void __sinit_p_sound_cpp(void)
 	d9 = src->d[9];
 	d10 = src->d[10];
 	d11 = src->d[11];
-	d0 = src->d[0];
 
-	table[2] = d1;
 	table[1] = d0;
+	table[2] = d1;
 	table[3] = d2;
 	table[4] = d3;
 	table[5] = d4;

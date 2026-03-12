@@ -1,7 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include "dolphin/fake_tgmath.h"
+#include <math.h>
 
 #include "dolphin/axfx/__axfx.h"
 
@@ -51,6 +51,7 @@ static void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
     u8 k;
+    f32 timeFactor;
     static s32 lens[4] = {
         0x000006FD,
         0x000007CF,
@@ -74,12 +75,13 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     }
 
     memset(rv, 0, sizeof(AXFX_REVSTD_WORK));
+    timeFactor = 32000.0f * time;
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 2; i++) {
             DLcreate(&rv->C[i + (k * 2)], lens[i] + 2);
             DLsetdelay(&rv->C[i + (k * 2)], lens[i]);
-            rv->combCoef[i + (k * 2)] = powf(10.0f, (lens[i] * -3) / (32000.0f * time));
+            rv->combCoef[i + (k * 2)] = pow(10.0, (double)((lens[i] * -3) / timeFactor));
         }
 
         for (i = 0; i < 2; i++) {

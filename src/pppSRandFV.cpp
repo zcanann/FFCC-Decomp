@@ -3,8 +3,9 @@
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
-extern float gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath*);
+#include "dolphin/types.h"
+extern f32 gPppDefaultValueBuffer[];
+extern "C" f32 RandF__5CMathFv(CMath*);
 
 void randfloat(float, float);
 void randf(unsigned char);
@@ -19,85 +20,86 @@ void randf(unsigned char);
  * JP Size: TODO
  */
 struct PppSRandFVParam2 {
-    int field0;
-    int field4;
-    float field8;
-    float fieldC;
-    float field10;
-    unsigned char _pad14[0x18 - 0x14];
-    unsigned char field18;
+    s32 field0;
+    s32 field4;
+    f32 field8;
+    f32 fieldC;
+    f32 field10;
+    u8 _pad14[0x18 - 0x14];
+    u8 field18;
 };
 
 struct PppSRandFVParam3 {
-    unsigned char _pad0[0xC];
-    int* fieldC;
+    u8 _pad0[0xC];
+    s32* fieldC;
 };
 
 void pppSRandFV(void* param1, void* param2, void* param3)
 {
+    u8* self = (u8*)param2;
+    PppSRandFVParam2* cfg = (PppSRandFVParam2*)param1;
+    PppSRandFVParam3* info = (PppSRandFVParam3*)param3;
+    f32* randVec;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    unsigned char* base = (unsigned char*)param1;
-    PppSRandFVParam2* in = (PppSRandFVParam2*)param2;
-    float* valuePtr;
-
-    int state = *(int*)(base + 0xC);
-    if (state == 0) {
-        valuePtr = (float*)(base + ((PppSRandFVParam3*)param3)->fieldC[0] + 0x80);
+    s32 currentIndex = *(s32*)(self + 0xC);
+    if (currentIndex == 0) {
+        randVec = (f32*)(self + *info->fieldC + 0x80);
 
         {
-            unsigned char flag = in->field18;
-            float value = RandF__5CMathFv(&Math);
+            u8 flag = cfg->field18;
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandFVSingleSampleScale;
             }
-            valuePtr[0] = value;
+            randVec[0] = value;
         }
 
         {
-            unsigned char flag = in->field18;
-            float value = RandF__5CMathFv(&Math);
+            u8 flag = cfg->field18;
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandFVSingleSampleScale;
             }
-            valuePtr[1] = value;
+            randVec[1] = value;
         }
 
         {
-            unsigned char flag = in->field18;
-            float value = RandF__5CMathFv(&Math);
+            u8 flag = cfg->field18;
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
                 value = value + RandF__5CMathFv(&Math);
             } else {
                 value = value * kPppSRandFVSingleSampleScale;
             }
-            valuePtr[2] = value;
+            randVec[2] = value;
         }
     } else {
-        if (in->field0 != state) {
+        if (cfg->field0 != currentIndex) {
             return;
         }
-        valuePtr = (float*)(base + ((PppSRandFVParam3*)param3)->fieldC[0] + 0x80);
+        randVec = (f32*)(self + *info->fieldC + 0x80);
     }
 
-    float* target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (float*)(base + in->field4 + 0x80);
+    f32* target = (cfg->field4 == -1) ? gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
 
     {
-        float value = in->field8 * valuePtr[0] - in->field8;
+        f32 value = cfg->field8 * randVec[0] - cfg->field8;
         target[0] = target[0] + value;
     }
     {
-        float value = in->fieldC * valuePtr[1] - in->fieldC;
+        f32 value = cfg->fieldC * randVec[1] - cfg->fieldC;
         target[1] = target[1] + value;
     }
     {
-        float value = in->field10 * valuePtr[2] - in->field10;
+        f32 value = cfg->field10 * randVec[2] - cfg->field10;
         target[2] = target[2] + value;
     }
 }

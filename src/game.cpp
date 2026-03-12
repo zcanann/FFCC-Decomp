@@ -1379,6 +1379,7 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
 {
     CFlatRuntime2* runtime;
     int classObj;
+    typedef u16 (*BehaviorFn)(int);
 
     if (ifParam.m_classId == 0) {
         return 0;
@@ -1391,9 +1392,7 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
         return 0;
     }
 
-    void* behavior = *reinterpret_cast<void**>(classObj + 0x48);
-    void** behaviorVtable = *reinterpret_cast<void***>(behavior);
-    u32 behaviorFlags = reinterpret_cast<u32 (*)(void*)>(behaviorVtable[3])(behavior);
+    u16 behaviorFlags = reinterpret_cast<BehaviorFn*>(*reinterpret_cast<int*>(classObj + 0x48))[3](classObj);
     if ((behaviorFlags & 0x6D) != 0x6D) {
         return 0;
     }

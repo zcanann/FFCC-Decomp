@@ -818,7 +818,8 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    *(int*)track += 1;
+    int* trackData = (int*)track;
+    *trackData = *trackData + 1;
 }
 
 /*

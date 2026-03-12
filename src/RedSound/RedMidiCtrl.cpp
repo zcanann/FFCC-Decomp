@@ -225,17 +225,21 @@ int SineSwing(int phase)
 #pragma optimization_level 4
 int TriangleSwing(int phase)
 {
-    int mode = (phase >> 8) & 3;
-    int result = (phase & 0xFF) << 8;
+    u32 mode = ((u32)phase >> 8) & 3;
+    u32 value = (u32)phase & 0xFF;
+    int result = value * 0x100;
 
-    if (mode == 1) {
-        result = 0x10000 - result;
-    } else if (mode == 2) {
-        result = -result;
-    } else if (mode == 3) {
+    if (mode == 2) {
+        result = value * -0x100;
+    } else if (mode < 2) {
+        if (mode != 0) {
+            result = value * -0x100 + 0x10000;
+        }
+    } else if (mode < 4) {
         result -= 0x10000;
     }
-    return result;
+
+    return value | result;
 }
 #pragma optimization_level 0
 

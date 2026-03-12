@@ -45,7 +45,8 @@ public:
     void GetRsdItem();
 
     CMemory::CStage* m_stage; // 0x04
-    CUSBStreamData m_usbStream; // USB stream data for processing
+    unsigned char _pad08[0x7C];
+    CUSBStreamData m_usbStream; // 0x84
     
     // Additional fields based on Ghidra decomp
     Vec field268_0x15c; // Position vector

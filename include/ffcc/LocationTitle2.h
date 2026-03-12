@@ -14,8 +14,11 @@ struct pppLocationTitle2UnkB {
     u16 m_pad;
     u32 m_graphId;
     float m_arg3;
-    u8* m_payload;
+    float* m_payload;
     float m_stepValue;
+    u8 _pad0x18[0xA];
+    u8 m_enableColorUpdate;
+    u8 _pad0x23;
 };
 
 struct pppLocationTitle2UnkC {
@@ -37,4 +40,3 @@ void pppRenderLocationTitle2(struct pppLocationTitle2*, struct pppLocationTitle2
 #endif
 
 #endif // _FFCC_LOCATIONTITLE2_H_
-

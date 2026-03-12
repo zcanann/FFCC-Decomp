@@ -306,41 +306,32 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
  */
 void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
-    f32 pos;
-    u32 rgba = *reinterpret_cast<u32*>(&color);
-
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    f32 z1 = pos1.z;
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
 
-    pos = pos1.x;
-    GXWGFifo.f32 = pos;
-    pos = pos1.y;
-    GXWGFifo.f32 = pos;
-    pos = pos1.z;
-    GXWGFifo.f32 = pos;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y1;
+    u32 rgba = *reinterpret_cast<u32*>(&color);
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
 
-    pos = pos2.x;
-    GXWGFifo.f32 = pos;
-    pos = pos1.y;
-    GXWGFifo.f32 = pos;
-    pos = pos1.z;
-    GXWGFifo.f32 = pos;
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
 
-    pos = pos2.x;
-    GXWGFifo.f32 = pos;
-    pos = pos2.y;
-    GXWGFifo.f32 = pos;
-    pos = pos1.z;
-    GXWGFifo.f32 = pos;
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
 
-    pos = pos1.x;
-    GXWGFifo.f32 = pos;
-    pos = pos2.y;
-    GXWGFifo.f32 = pos;
-    pos = pos1.z;
-    GXWGFifo.f32 = pos;
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
 }
 

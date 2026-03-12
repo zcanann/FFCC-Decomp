@@ -320,12 +320,12 @@ static VITiming* getTiming(VITVMode mode) {
  * JP Size: TODO
  */
 void __VIInit(VITVMode mode) {
+    volatile u32 delay;
     VITiming* tm;
     u32 tv;
     u32 ds;
     u16 hlw;
     s32 halfNhlines;
-    volatile u32 delay;
 
     tv = (u32)mode >> 2;
     *(u32*)OSPhysicalToCached(0xCC) = tv;
@@ -353,7 +353,7 @@ void __VIInit(VITVMode mode) {
     __VIRegs[27] = 1;
     __VIRegs[26] = 0x1001;
     hlw = tm->hlw;
-    halfNhlines = (s32)tm->nhlines >> 1;
+    halfNhlines = (s32)tm->nhlines / 2;
     __VIRegs[25] = hlw + 1;
     __VIRegs[24] = (halfNhlines + 1) | 0x1000;
 
@@ -1016,6 +1016,9 @@ u32 VIGetCurrentLine(void) {
     u32 halfLine;
     VITiming* tm;
     BOOL enabled;
+#if !DEBUG
+    u8 unused[4];
+#endif
 
     tm = CurrTiming;
     enabled = OSDisableInterrupts();

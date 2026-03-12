@@ -323,12 +323,11 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
     ScreenBreakDisplayList* displayList =
         ((ScreenBreakModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + drawListIndex;
 
-    if (*(char*)((u8*)param_2 + 0x24) != '\0') {
-        void* colorPtr;
-        u8 colorStorage0[4];
-        u32 colorPacked0;
+    if (*(u8*)((u8*)param_2 + 0x24) != 0) {
         u8 colorStorage1[4];
         u32 colorPacked1;
+        u8 colorStorage0[4];
+        u32 colorPacked0;
         CMaterialSet* materialSet = ((ScreenBreakModelView*)model)->m_data->m_materialSet;
         u16 materialIdx = displayList->m_material;
         CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)materialSet + 8))[materialIdx];
@@ -336,11 +335,10 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, materialIdx, 1, 0);
         GXSetArray((GXAttr)0xB, (void*)((u8*)param_2 + 0x28), 4);
 
-        if (*(short*)((u8*)material + 0x18) == 1) {
+        if (*(u16*)((u8*)material + 0x18) == 1) {
             GXSetNumChans(1);
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            colorPtr = __ct__6CColorFUcUcUcUc(colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0);
-            colorPacked0 = *(u32*)colorPtr;
+            colorPacked0 = *(u32*)__ct__6CColorFUcUcUcUc(colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0);
             GXSetTevKColor((GXTevKColorID)0, *(GXColor*)&colorPacked0);
             GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
             GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
@@ -350,8 +348,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 0, 4);
-            colorPtr = __ct__6CColorFUcUcUcUc(colorStorage1, 0x60, 0x60, 0x60, *(u8*)((u8*)param_2 + 0x2B));
-            colorPacked1 = *(u32*)colorPtr;
+            colorPacked1 = *(u32*)__ct__6CColorFUcUcUcUc(colorStorage1, 0x60, 0x60, 0x60, *(u8*)((u8*)param_2 + 0x2B));
             GXSetTevKColor((GXTevKColorID)1, *(GXColor*)&colorPacked1);
             GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
             GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);

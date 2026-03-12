@@ -1165,7 +1165,7 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    unsigned int* busy = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4);
+    unsigned int* busy = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x2378C);
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 8; j++) {

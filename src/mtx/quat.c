@@ -218,7 +218,8 @@ void C_QUATSlerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
     prodX = p->x * q->x;
     prodY = p->y * q->y;
     prodZ = p->z * q->z;
-    cosHalfTheta = prodX + prodY + prodZ + (p->w * q->w);
+    cosHalfTheta = prodX + prodY + prodZ;
+    cosHalfTheta += p->w * q->w;
 
     if (cosHalfTheta < 0.0f) {
         cosHalfTheta = -cosHalfTheta;

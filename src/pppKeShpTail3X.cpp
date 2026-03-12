@@ -23,6 +23,17 @@ struct KeShpTail3XOffsets {
     s32* m_serializedDataOffsets;
 };
 
+struct KeShpTail3XWork {
+    s16 m_values[24];
+    Vec m_posHistory[28];
+    s16 m_angles[28];
+    u32 m_shapeData;
+    u16 m_shapeFrame;
+    u16 m_rand;
+    u8 m_head;
+    u8 m_initialized;
+};
+
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
@@ -44,25 +55,31 @@ int __cntlzw(unsigned int);
 void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
 {
     KeShpTail3XStep* step;
-    s16* work;
+    KeShpTail3XWork* work;
+    s16* stepWork;
+    u8* stepBytes;
     Vec pos;
     Vec temp;
+    u8 worldSpaceMode;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     step = (KeShpTail3XStep*)param_2;
-    work = (s16*)((u8*)&obj->pppPObject + 8 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
+    stepWork = (s16*)&step->m_stepValue;
+    stepBytes = (u8*)&step->m_stepValue;
+    worldSpaceMode = stepBytes[0x47];
 
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
-        ((u8*)work)[0x1c3] = 1;
+        work->m_initialized = 1;
 
-        if (step->m_payload[0x3f] == 0) {
+        if (worldSpaceMode == 0) {
             pos.x = obj->pppPObject.m_localMatrix.value[0][3];
             pos.y = obj->pppPObject.m_localMatrix.value[1][3];
             pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-        } else if (step->m_payload[0x3f] == 1) {
+        } else if (worldSpaceMode == 1) {
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
@@ -76,7 +93,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         }
 
         pppCopyVector__FR3Vec3Vec(&temp, &pos);
-        Vec* history = (Vec*)(work + 0x18);
+        Vec* history = work->m_posHistory;
         s32 i = 0x1c;
         do {
             Vec historyPos;
@@ -90,16 +107,16 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         } while (i > 0);
     }
 
-    if (((u8*)work)[0x1c2] == 0) {
-        ((u8*)work)[0x1c2] = 0x1c;
+    if (work->m_head == 0) {
+        work->m_head = 0x1c;
     }
-    ((u8*)work)[0x1c2]--;
+    work->m_head--;
 
-    if (step->m_payload[0x3f] == 0) {
+    if (worldSpaceMode == 0) {
         pos.x = obj->pppPObject.m_localMatrix.value[0][3];
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-    } else if (step->m_payload[0x3f] == 1) {
+    } else if (worldSpaceMode == 1) {
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;
@@ -115,53 +132,53 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     temp.x = pos.x;
     temp.y = pos.y;
     temp.z = pos.z;
-    pppCopyVector__FR3Vec3Vec((Vec*)(work + ((u8*)work)[0x1c2] * 6 + 0x18), &temp);
+    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
 
-    work[8] += work[0xc];
-    work[0] += work[8];
-    work[9] += work[0xd];
-    work[1] += work[9];
-    work[10] += work[0xe];
-    work[2] += work[10];
-    work[0xb] += work[0xf];
-    work[3] += work[0xb];
-    work[0x10] += work[0x14];
-    work[4] += work[0x10];
-    work[0x11] += work[0x15];
-    work[5] += work[0x11];
-    work[0x12] += work[0x16];
-    work[6] += work[0x12];
-    work[0x13] += work[0x17];
-    work[7] += work[0x13];
+    work->m_values[8] += work->m_values[0xc];
+    work->m_values[0] += work->m_values[8];
+    work->m_values[9] += work->m_values[0xd];
+    work->m_values[1] += work->m_values[9];
+    work->m_values[10] += work->m_values[0xe];
+    work->m_values[2] += work->m_values[10];
+    work->m_values[0xb] += work->m_values[0xf];
+    work->m_values[3] += work->m_values[0xb];
+    work->m_values[0x10] += work->m_values[0x14];
+    work->m_values[4] += work->m_values[0x10];
+    work->m_values[0x11] += work->m_values[0x15];
+    work->m_values[5] += work->m_values[0x11];
+    work->m_values[0x12] += work->m_values[0x16];
+    work->m_values[6] += work->m_values[0x12];
+    work->m_values[0x13] += work->m_values[0x17];
+    work->m_values[7] += work->m_values[0x13];
 
     if (obj->pppPObject.m_graphId == step->m_graphId) {
-        work[0] += *(s16*)(step->m_payload + 0xc);
-        work[1] += *(s16*)(step->m_payload + 0xe);
-        work[2] += *(s16*)(step->m_payload + 0x10);
-        work[3] += *(s16*)(step->m_payload + 0x12);
-        work[8] += *(s16*)(step->m_payload + 0x1c);
-        work[9] += *(s16*)(step->m_payload + 0x1e);
-        work[10] += *(s16*)(step->m_payload + 0x20);
-        work[0xb] += *(s16*)(step->m_payload + 0x22);
-        work[0xc] += *(s16*)(step->m_payload + 0x24);
-        work[0xd] += *(s16*)(step->m_payload + 0x26);
-        work[0xe] += *(s16*)(step->m_payload + 0x28);
-        work[0xf] += *(s16*)(step->m_payload + 0x2a);
-        work[4] += *(s16*)(step->m_payload + 0x14);
-        work[5] += *(s16*)(step->m_payload + 0x16);
-        work[6] += *(s16*)(step->m_payload + 0x18);
-        work[7] += *(s16*)(step->m_payload + 0x1a);
-        work[0x10] += *(s16*)(step->m_payload + 0x2c);
-        work[0x11] += *(s16*)(step->m_payload + 0x2e);
-        work[0x12] += *(s16*)(step->m_payload + 0x30);
-        work[0x13] += *(s16*)(step->m_payload + 0x32);
-        work[0x14] += *(s16*)(step->m_payload + 0x34);
-        work[0x15] += *(s16*)(step->m_payload + 0x36);
-        work[0x16] += *(s16*)(step->m_payload + 0x38);
-        work[0x17] += *(s16*)(step->m_payload + 0x3a);
+        work->m_values[0] += stepWork[0];
+        work->m_values[1] += stepWork[1];
+        work->m_values[2] += stepWork[2];
+        work->m_values[3] += stepWork[3];
+        work->m_values[8] += stepWork[8];
+        work->m_values[9] += stepWork[9];
+        work->m_values[10] += stepWork[10];
+        work->m_values[0xb] += stepWork[11];
+        work->m_values[0xc] += stepWork[12];
+        work->m_values[0xd] += stepWork[13];
+        work->m_values[0xe] += stepWork[14];
+        work->m_values[0xf] += stepWork[15];
+        work->m_values[4] += stepWork[4];
+        work->m_values[5] += stepWork[5];
+        work->m_values[6] += stepWork[6];
+        work->m_values[7] += stepWork[7];
+        work->m_values[0x10] += stepWork[16];
+        work->m_values[0x11] += stepWork[17];
+        work->m_values[0x12] += stepWork[18];
+        work->m_values[0x13] += stepWork[19];
+        work->m_values[0x14] += stepWork[20];
+        work->m_values[0x15] += stepWork[21];
+        work->m_values[0x16] += stepWork[22];
+        work->m_values[0x17] += stepWork[23];
     }
 
-    *(u32*)(work + 0xdc) += step->m_initWOrk;
+    work->m_shapeData += step->m_initWOrk;
 }
 
 /*
@@ -490,6 +507,3 @@ void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }
-
-
-

@@ -335,11 +335,10 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     serializedOffset0 = *param_3->m_serializedDataOffsets;
     serializedOffset1 = param_3->m_serializedDataOffsets[1];
-
     work = (u8*)pppYmTracer + 0x80 + serializedOffset0;
-    count = *(u16*)(work + 0x2C);
+    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+
     if (param_2->m_dataValIndex != 0xFFFF) {
-        mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
         pppSetBlendMode__FUc(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix0, FLOAT_803306e8,
@@ -363,6 +362,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                 SetUpPaletteEnv(texture);
             }
 
+            count = *(u16*)(work + 0x2C);
             uvStep = FLOAT_803306ec / (f32)((f64)count - DOUBLE_803306f8);
             GXSetCullMode(GX_CULL_NONE);
             poly = *(TRACE_POLYGON**)(work + 0x28);

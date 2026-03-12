@@ -74,10 +74,19 @@ void CSystem::Init()
     m_orderSentinel.m_next = &m_orderSentinel;
     m_orderSentinel.m_previous = &m_orderSentinel;
     m_freeOrderHead.m_next = &m_orderPool[0];
-    for (int i = 0; i < 128; i++)
+    int i = 0;
+    int count = 0x20;
+    COrder* order = m_orderPool;
+    do
     {
-        m_orderPool[i].m_next = (i == 127) ? &m_freeOrderHead : &m_orderPool[i + 1];
-    }
+        order[0].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
+        order[1].m_next = (i == 0x7E) ? &m_freeOrderHead : &m_orderPool[i + 2];
+        order[2].m_next = (i == 0x7D) ? &m_freeOrderHead : &m_orderPool[i + 3];
+        order[3].m_next = (i == 0x7C) ? &m_freeOrderHead : &m_orderPool[i + 4];
+        order += 4;
+        i += 4;
+        count--;
+    } while (count != 0);
 
     m_ownerThread = OSGetCurrentThread();
     m_scenegraphStepMode = 0;
@@ -86,16 +95,15 @@ void CSystem::Init()
     m_mapBuffer = (void*)0;
     m_mapSize = 0;
 
-    OSErrorHandler handler = (OSErrorHandler)errorHandler;
-    OSSetErrorHandler(0, handler);
-    OSSetErrorHandler(1, handler);
-    OSSetErrorHandler(2, handler);
-    OSSetErrorHandler(3, handler);
-    OSSetErrorHandler(5, handler);
-    OSSetErrorHandler(0xb, handler);
-    OSSetErrorHandler(0xd, handler);
-    OSSetErrorHandler(0xe, handler);
-    OSSetErrorHandler(0xf, handler);
+    OSSetErrorHandler(0, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(1, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(2, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(3, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(5, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xb, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xd, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xe, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xf, (OSErrorHandler)errorHandler);
 
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
@@ -105,26 +113,23 @@ void CSystem::Init()
         {
             m_mapSize = File.GetLength(fileHandle);
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[m_mapSize];
-            if (m_mapBuffer != (void*)0)
+            unsigned int offset = 0;
+            for (unsigned int remaining = m_mapSize; remaining != 0;)
             {
-                unsigned int offset = 0;
-                for (unsigned int remaining = m_mapSize; remaining != 0;)
+                unsigned int chunkSize = 0x100000;
+                if (remaining < chunkSize)
                 {
-                    unsigned int chunkSize = 0x100000;
-                    if (remaining < chunkSize)
-                    {
-                        chunkSize = remaining;
-                    }
-
-                    fileHandle->m_length = chunkSize;
-                    fileHandle->m_currentOffset = offset;
-                    File.Read(fileHandle);
-                    File.SyncCompleted(fileHandle);
-                    memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, chunkSize);
-
-                    offset += chunkSize;
-                    remaining -= chunkSize;
+                    chunkSize = remaining;
                 }
+
+                fileHandle->m_length = chunkSize;
+                fileHandle->m_currentOffset = offset;
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, chunkSize);
+
+                offset += chunkSize;
+                remaining -= chunkSize;
             }
             File.Close(fileHandle);
             Printf((char*)"%s", (char*)"");
@@ -487,9 +492,8 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    (void)arg;
-    typedef void* (*GetScenegraphBlockFn)(CProcess*);
-    u32* descBlock = (u32*)(*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process);
+    typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
+    u32* descBlock = (u32*)(*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process, arg);
     COrder* current = m_orderSentinel.m_next;
 
     do
@@ -508,7 +512,7 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
 
     if (__ptmf_test((__ptmf*)(descBlock + 4)) != 0)
     {
-        __ptmf_scall(process, descBlock + 4);
+        __ptmf_scall(process);
     }
 }
 

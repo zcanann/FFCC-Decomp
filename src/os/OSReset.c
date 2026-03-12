@@ -196,6 +196,7 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     OSThread* thread;
     OSThread* next;
     BOOL disableRecalibration;
+    u8 stackPad[16];
 
     OSDisableScheduler();
     __OSStopAudioSystem();

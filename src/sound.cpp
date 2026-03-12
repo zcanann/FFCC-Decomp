@@ -2406,9 +2406,11 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    u32 paused = (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 31;
-    SePause__9CRedSoundFii(RedSound(this), -1, paused);
-    StreamPause__9CRedSoundFii(RedSound(this), -1, paused);
+    CRedSound* redSound = RedSound(this);
+    int paused = (pause != 0);
+
+    SePause__9CRedSoundFii(redSound, -1, paused);
+    StreamPause__9CRedSoundFii(redSound, -1, paused);
     SoundData(this).m_pauseAllSe = pause;
 }
 
@@ -2428,19 +2430,21 @@ void CSound::AddNoFreeSeGroup(int group)
     int i = 0;
     int remaining = 4;
 
-    do {
+    while (remaining != 0) {
         if (*groupEntry == -1) {
             sound.m_noFreeSeGroups[i] = static_cast<s16>(group);
             return;
         }
+        remaining--;
         groupEntry++;
         i++;
-        remaining--;
-    } while (remaining != 0);
-
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
     }
+
+    if (System.m_execParam == 0) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
 }
 
 /*
@@ -2459,19 +2463,21 @@ void CSound::AddNoFreeWave(int wave)
     int i = 0;
     int remaining = 4;
 
-    do {
+    while (remaining != 0) {
         if (*waveEntry == -1) {
             sound.m_noFreeWaves[i] = static_cast<s16>(wave);
             return;
         }
+        remaining--;
         waveEntry++;
         i++;
-        remaining--;
-    } while (remaining != 0);
-
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
     }
+
+    if (System.m_execParam == 0) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
 }
 
 /*

@@ -1238,8 +1238,10 @@ void CGMonObj::calcBranchFuncDragonZombie(int)
  */
 void CGMonObj::changeStatFuncCaveWorm(int stat)
 {
-	if (stat == 100) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -8);
+		break;
 	}
 }
 
@@ -2665,8 +2667,10 @@ void CGMonObj::logicFuncRamoe()
  */
 void CGMonObj::changeStatFuncRamoe(int stat)
 {
-	if (stat == 100) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -9);
+		break;
 	}
 }
 
@@ -2789,8 +2793,10 @@ void CGMonObj::damagedFuncLastBoss()
  */
 void CGMonObj::changeStatFuncLastBoss(int stat)
 {
-	if (stat == 0x66) {
+	switch (stat) {
+	case 0x66:
 		setActionParam__8CGMonObjFi(this, -7);
+		break;
 	}
 }
 

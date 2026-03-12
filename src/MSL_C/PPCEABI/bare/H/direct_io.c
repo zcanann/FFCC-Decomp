@@ -22,12 +22,9 @@ size_t fread(void* buffer, size_t size, size_t count, FILE* stream)
 
 size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
 {
-    unsigned char* dest_ptr;
-    size_t bytes_to_go;
-    size_t bytes_read;
-    size_t transfer_count[3];
-    int    ioresult;
-    int    always_buffer;
+    int always_buffer, ioresult;
+    unsigned char* read_ptr;
+    size_t num_bytes, bytes_to_go, bytes_read;
 
 #ifndef __NO_WIDE_CHAR
     if (fwide(stream, 0) == 0)
@@ -36,116 +33,127 @@ size_t __fread(void* buffer, size_t size, size_t count, FILE* stream)
 
     bytes_to_go = size * count;
 
-    if (!bytes_to_go
-		|| stream->file_state.error
-		|| stream->file_mode.file_kind == __closed_file)
-    {
+    if (!bytes_to_go || stream->file_state.error || stream->file_mode.file_kind == __closed_file) {
         return 0;
     }
 
-    always_buffer = !stream->file_mode.binary_io
-		|| stream->file_mode.buffer_mode == _IOFBF;
-
-    if (stream->file_state.io_state == __neutral
-		&& (stream->file_mode.io_mode & __read))
-    {
-        stream->file_state.io_state = __reading;
-        stream->buffer_length = 0;
+    always_buffer = 1;
+    if (stream->file_mode.binary_io) {
+        if (stream->file_mode.buffer_mode != _IOFBF) {
+            always_buffer = 0;
+        }
     }
 
-    if (stream->file_state.io_state < __reading)
-    {
+    if (stream->file_state.io_state == __neutral) {
+        if (stream->file_mode.io_mode & __read) {
+            stream->file_state.io_state = __reading;
+            stream->buffer_length = 0;
+        }
+    }
+
+    if (stream->file_state.io_state < __reading) {
         set_error(stream);
         return 0;
     }
 
-    if ((stream->file_mode.io_mode & __write)
-		&& __flush_line_buffered_output_files() != 0)
-    {
-        set_error(stream);
-        return 0;
+    if (stream->file_mode.buffer_mode & _IOLBF) {
+        if (__flush_line_buffered_output_files()) {
+            set_error(stream);
+            return 0;
+        }
     }
-	
-    // Handle ungetc buffer - characters pushed back with ungetc()
+
+    read_ptr = (unsigned char*)buffer;
     bytes_read = 0;
-    dest_ptr = (unsigned char*)buffer;
-    if (bytes_to_go != 0 && stream->file_state.io_state > __reading) {
+
+    if (bytes_to_go && stream->file_state.io_state >= __rereading) {
         do {
 #ifndef __NO_WIDE_CHAR
             if (fwide(stream, 0) == 1) {
                 bytes_read += 2;
                 bytes_to_go -= 2;
-                *(wchar_t*)dest_ptr = stream->ungetc_wide_buffer[stream->file_state.io_state - 3];
-                dest_ptr += 2;
+                *(wchar_t*)read_ptr = stream->ungetc_wide_buffer[stream->file_state.io_state - __rereading];
+                read_ptr += 2;
             } else
 #endif
             {
                 bytes_read += 1;
                 bytes_to_go -= 1;
-                *dest_ptr = stream->ungetc_buffer[stream->file_state.io_state - 3];
-                dest_ptr += 1;
+                *read_ptr = stream->ungetc_buffer[stream->file_state.io_state - __rereading];
+                read_ptr += 1;
             }
             stream->file_state.io_state = stream->file_state.io_state - 1;
-        } while (bytes_to_go != 0 && stream->file_state.io_state > __reading);
+            if (!bytes_to_go) {
+                break;
+            }
+        } while (stream->file_state.io_state >= __rereading);
 
         if (stream->file_state.io_state == __reading) {
             stream->buffer_length = stream->save_buffer_length;
         }
     }
 
-    if (bytes_to_go && (stream->buffer_length != 0 || always_buffer)) {
-        do {
-            if (stream->buffer_length == 0) {
-                ioresult = __load_buffer(stream, NULL, 0);
-
-                if (ioresult != __load_ok || stream->buffer_length == 0) {
-                    if (ioresult == __load_error) {
-                        set_error(stream);
-                    } else {
-                        stream->file_state.io_state = __neutral;
-                        stream->file_state.eof = 1;
+    if (bytes_to_go) {
+        if (stream->buffer_length || always_buffer) {
+            do {
+                if (!stream->buffer_length) {
+                    ioresult = __load_buffer(stream, 0, 0);
+                    if (ioresult) {
+                        if (ioresult == __io_error) {
+                            stream->file_state.error = 1;
+                            stream->buffer_length = 0;
+                        } else {
+                            stream->file_state.io_state = __neutral;
+                            stream->file_state.eof = 1;
+                            stream->buffer_length = 0;
+                        }
+                        bytes_to_go = 0;
+                        break;
                     }
-                    stream->buffer_length = 0;
+                }
+
+                num_bytes = stream->buffer_length;
+                if (num_bytes > bytes_to_go) {
+                    num_bytes = bytes_to_go;
+                }
+
+                memcpy(read_ptr, stream->buffer_ptr, num_bytes);
+
+                bytes_to_go -= num_bytes;
+                read_ptr += num_bytes;
+                bytes_read += num_bytes;
+                stream->buffer_ptr += num_bytes;
+                stream->buffer_length -= num_bytes;
+
+                if (!bytes_to_go) {
                     break;
                 }
-            }
-
-            transfer_count[0] = stream->buffer_length;
-            if (transfer_count[0] > bytes_to_go)
-                transfer_count[0] = bytes_to_go;
-
-            memcpy(dest_ptr, stream->buffer_ptr, transfer_count[0]);
-
-            dest_ptr += transfer_count[0];
-            bytes_read += transfer_count[0];
-            bytes_to_go -= transfer_count[0];
-            stream->buffer_ptr += transfer_count[0];
-            stream->buffer_length -= transfer_count[0];
-
-        } while (bytes_to_go && always_buffer);
+            } while (always_buffer);
+        }
     }
 
     if (bytes_to_go && !always_buffer) {
         unsigned char* save_buffer = stream->buffer;
-        size_t save_size   = stream->buffer_size;
-        stream->buffer        = dest_ptr;
-        stream->buffer_size   = bytes_to_go;
+        unsigned long save_size = stream->buffer_size;
 
-        ioresult = __load_buffer(stream, transfer_count, 1);
+        stream->buffer = read_ptr;
+        stream->buffer_size = bytes_to_go;
 
-        if (ioresult != __load_ok) {
-            if (ioresult == __load_error) {
-                set_error(stream);
+        ioresult = __load_buffer(stream, &num_bytes, 1);
+        if (ioresult) {
+            if (ioresult == __io_error) {
+                stream->file_state.error = 1;
+                stream->buffer_length = 0;
             } else {
                 stream->file_state.io_state = __neutral;
                 stream->file_state.eof = 1;
+                stream->buffer_length = 0;
             }
-            stream->buffer_length = 0;
         }
 
-        stream->buffer      = save_buffer;
+        bytes_read += num_bytes;
+        stream->buffer = save_buffer;
         stream->buffer_size = save_size;
-        bytes_read += transfer_count[0];
 
         __prep_buffer(stream);
         stream->buffer_length = 0;

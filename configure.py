@@ -282,7 +282,8 @@ cflags_trk = [
 
 cflags_odemuexi = [
     *cflags_base,
-    "-inline deferred"
+    "-inline deferred",
+    "-use_lmw_stmw on",
 ]
 
 cflags_amcstub = [

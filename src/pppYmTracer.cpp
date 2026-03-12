@@ -321,9 +321,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
     CTexture* texture;
-    u8* work;
     s32 i;
     u16 count;
+    u16 dataValIndex;
     s32 serializedOffset0;
     s32 serializedOffset1;
     u32 colorTop;
@@ -335,11 +335,11 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     serializedOffset0 = *param_3->m_serializedDataOffsets;
     serializedOffset1 = param_3->m_serializedDataOffsets[1];
+    dataValIndex = (u16)param_2->m_dataValIndex;
+    poly = *(TRACE_POLYGON**)((u8*)pppYmTracer + 0xA8 + serializedOffset0);
+    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
 
-    work = (u8*)pppYmTracer + 0x80 + serializedOffset0;
-    count = *(u16*)(work + 0x2C);
-    if (param_2->m_dataValIndex != 0xFFFF) {
-        mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+    if (dataValIndex != 0xFFFF) {
         pppSetBlendMode__FUc(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix0, FLOAT_803306e8,
@@ -363,9 +363,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                 SetUpPaletteEnv(texture);
             }
 
+            count = *(u16*)((u8*)pppYmTracer + 0xAC + serializedOffset0);
             uvStep = FLOAT_803306ec / (f32)((f64)count - DOUBLE_803306f8);
             GXSetCullMode(GX_CULL_NONE);
-            poly = *(TRACE_POLYGON**)(work + 0x28);
 
             for (i = 0; i < (s32)(count - 1); i++) {
                 if (((poly->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
@@ -374,8 +374,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                      (FLOAT_803306e8 != (poly + 1)->to.x) && (FLOAT_803306e8 != (poly + 1)->to.y) &&
                      (FLOAT_803306e8 != (poly + 1)->to.z) && (FLOAT_803306e8 != (poly + 1)->from.x) &&
                      (FLOAT_803306e8 != (poly + 1)->from.y) && (FLOAT_803306e8 != (poly + 1)->from.z))) {
-                    uTop = (f32)i * uvStep;
-                    uBottom = (f32)(i + 1) * uvStep;
+                    uTop = (f32)((f64)i * (f64)uvStep);
+                    uBottom = (f32)((f64)(i + 1) * (f64)uvStep);
                     colorTop = (DAT_803306e0 & 0xFFFFFF00) | poly->alpha;
                     colorBottom = (DAT_803306e4 & 0xFFFFFF00) | (poly + 1)->alpha;
 

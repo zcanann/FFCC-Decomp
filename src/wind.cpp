@@ -498,35 +498,35 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 	WindObject* obj;
 
 	do {
-		obj = &cur[0];
+		obj = cur;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[1];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[2];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[3];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[4];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[5];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[6];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}
-		obj = &cur[7];
+		obj++;
 		if ((s8)obj->flags >= 0) {
 			goto found;
 		}

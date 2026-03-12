@@ -1401,47 +1401,65 @@ checkHeapNode:
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
-    unsigned int totalUnuse = 0;
-    unsigned int maxUnuse = 0;
-    int prev = *reinterpret_cast<int*>(node + 4);
+    int node;
+    int maxUnuse = 0;
+    int totalUnuse = 0;
+    int yPos = static_cast<unsigned short>(y);
+    int prev = 0;
     char line[264];
-    char* sourceName = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10);
+
+    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x10C) == 2) {
+        node = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x110);
+    } else {
+        node = *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x110) + 8);
+    }
+    prev = *reinterpret_cast<int*>(node + 4);
 
     do {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 2) != 0) {
+        unsigned char flags = *reinterpret_cast<unsigned char*>(node + 2);
+
+        if ((flags & 2) != 0) {
+            char* sourceName = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10);
             int srcLen = strlen(sourceName);
             strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
-            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
-            int maxRound = 0;
-            if ((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3ff) != 0)) {
-                maxRound = 1;
-            }
+            Graphic.DrawDebugStringDirect(0x10, yPos, line, 8);
+
             int totalRound = 0;
-            if ((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3ff) != 0)) {
+            if ((totalUnuse < 0) && ((totalUnuse & 0x3FF) != 0)) {
                 totalRound = 1;
+            }
+            int maxRound = 0;
+            if ((maxUnuse < 0) && ((maxUnuse & 0x3FF) != 0)) {
+                maxRound = 1;
             }
 
             sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    (static_cast<int>(totalUnuse) >> 10) + totalRound, (static_cast<int>(maxUnuse) >> 10) + maxRound);
-            Graphic.DrawDebugStringDirect(0x208, y, line, 8);
+                    (totalUnuse >> 10) + totalRound, (maxUnuse >> 10) + maxRound);
+            Graphic.DrawDebugStringDirect(0x208, yPos, line, 8);
             return;
         }
 
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
+        if ((flags & 4) == 0) {
             int blockSize = *reinterpret_cast<int*>(node + 8) - (node + 0x40);
             totalUnuse += blockSize;
-            if (static_cast<int>(maxUnuse) < blockSize) {
+            if (maxUnuse < blockSize) {
                 maxUnuse = blockSize;
             }
         }
-    } while ((*reinterpret_cast<int*>(node + 0x10) == *reinterpret_cast<int*>(node + 8) - (node + 0x40)) &&
-             ((*reinterpret_cast<int*>(node + 4) == prev) &&
-              ((prev = node), (node = *reinterpret_cast<int*>(node + 8)), true)));
 
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, DAT_801d67d8);
-    }
+        int next = *reinterpret_cast<int*>(node + 8);
+        if ((*reinterpret_cast<int*>(node + 0x10) != (next - (node + 0x40))) ||
+            (*reinterpret_cast<int*>(node + 4) != prev)) {
+            if (System.m_execParam != 0) {
+                Printf__7CSystemFPce(&System, DAT_801d67d8);
+            }
+            return;
+        }
+
+        prev = node;
+        node = next;
+    } while (true);
+
 }
 
 /*

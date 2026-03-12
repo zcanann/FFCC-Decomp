@@ -130,8 +130,8 @@ extern "C" void __sinit_p_sample_cpp(void)
 {
 	unsigned int* desc0;
 	unsigned int* desc1;
-	unsigned int* desc2;
 	unsigned int* desc3;
+	unsigned int* desc2;
 	unsigned int* table;
 	unsigned int a0;
 	unsigned int a1;
@@ -149,8 +149,8 @@ extern "C" void __sinit_p_sample_cpp(void)
 	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
 	desc0 = m_table_desc0__10CSamplePcs;
 	desc1 = m_table_desc1__10CSamplePcs;
-	desc2 = m_table_desc2__10CSamplePcs;
 	desc3 = m_table_desc3__10CSamplePcs;
+	desc2 = m_table_desc2__10CSamplePcs;
 	table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
 
 	a0 = desc0[0];
@@ -159,12 +159,12 @@ extern "C" void __sinit_p_sample_cpp(void)
 	b0 = desc1[0];
 	b1 = desc1[1];
 	b2 = desc1[2];
-	c0 = desc2[0];
-	c1 = desc2[1];
-	c2 = desc2[2];
 	d0 = desc3[0];
 	d1 = desc3[1];
 	d2 = desc3[2];
+	c0 = desc2[0];
+	c1 = desc2[1];
+	c2 = desc2[2];
 
 	table[1] = a0;
 	table[2] = a1;

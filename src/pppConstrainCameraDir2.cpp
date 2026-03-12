@@ -14,6 +14,14 @@ extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, f
 extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
+struct pppConstrainCameraDirObject {
+    int m_graphId;
+    int m_unknown04;
+    int m_unknown08;
+    int m_unknown0C;
+    pppFMATRIX m_localMatrix;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8016ca80
@@ -73,8 +81,9 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                 resultPos.z = cameraDir.z * *value + cameraPos.z;
             }
 
-            float localX = param_1->m_pppPObject.m_localMatrix.value[0][3];
-            float localY = param_1->m_pppPObject.m_localMatrix.value[1][3];
+            pppConstrainCameraDirObject* obj = reinterpret_cast<pppConstrainCameraDirObject*>(param_1);
+            float localX = obj->m_localMatrix.value[0][3];
+            float localY = obj->m_localMatrix.value[1][3];
 
             Vec direct0;
             Vec direct1;

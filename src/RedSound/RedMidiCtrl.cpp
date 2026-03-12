@@ -215,9 +215,14 @@ int SineSwing(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C770C
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#pragma optimization_level 4
 int TriangleSwing(int phase)
 {
     u32 mode = ((u32)phase >> 8) & 3;
@@ -236,6 +241,7 @@ int TriangleSwing(int phase)
     }
     return low | result;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -278,8 +284,12 @@ int DutySwing(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C77C4
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int RandomSwing(int phase)
 {
@@ -365,8 +375,12 @@ int SawSwingR(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7904
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int RandomSwingR(int phase)
 {

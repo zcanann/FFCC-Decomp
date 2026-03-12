@@ -3698,7 +3698,7 @@ void CPartMng::pppDestroyAll()
 extern "C" void __sinit_partMng_cpp(void)
 {
     __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18, (void (*)(void*))__ct__9_pppMngStFv, 0,
-                      sizeof(_pppMngSt), 0x180);
+                      0x158, 0x180);
 
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
@@ -3722,7 +3722,7 @@ extern "C" void __sinit_partMng_cpp(void)
     g_dcp.m_cylinderAttribute = 0;
     g_dcp.m_paramC = 1.0f;
     g_dcp.m_paramD = 1.0f;
-    g_dcp.m_owner = 0;
+    *reinterpret_cast<unsigned char*>(&g_dcp.m_owner) = 0;
 }
 
 /*

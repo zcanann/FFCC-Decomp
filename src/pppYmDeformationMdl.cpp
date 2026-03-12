@@ -203,6 +203,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     Mtx cameraMtx;
     Mtx texMtx;
     Mtx rotMtx;
+    Mtx resetRotMtx;
     Mtx44 screenMtx;
     int left;
     int top;
@@ -282,10 +283,12 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
         PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)*state);
         float indMtx[2][3];
-        indMtx[0][0] = rotMtx[0][0] * *(float*)(state + 2);
-        indMtx[0][1] = rotMtx[0][1] * *(float*)(state + 2);
-        indMtx[1][0] = rotMtx[1][0] * *(float*)(state + 2);
-        indMtx[1][1] = rotMtx[1][1] * *(float*)(state + 2);
+        float resetIndMtx[2][3];
+        float indScale = *(float*)(state + 2);
+        indMtx[0][0] = rotMtx[0][0] * indScale;
+        indMtx[0][1] = rotMtx[0][1] * indScale;
+        indMtx[1][0] = rotMtx[1][0] * indScale;
+        indMtx[1][1] = rotMtx[1][1] * indScale;
         indMtx[0][2] = FLOAT_80330dac;
         indMtx[1][2] = FLOAT_80330dac;
         GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
@@ -298,14 +301,14 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetNumIndStages(0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-        PSMTXRotRad(rotMtx, 'z', FLOAT_80330dac);
-        indMtx[0][0] = FLOAT_80330dac;
-        indMtx[0][1] = FLOAT_80330dac;
-        indMtx[0][2] = FLOAT_80330dac;
-        indMtx[1][0] = FLOAT_80330dac;
-        indMtx[1][1] = FLOAT_80330dac;
-        indMtx[1][2] = FLOAT_80330dac;
-        GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+        PSMTXRotRad(resetRotMtx, 'z', FLOAT_80330dac);
+        resetIndMtx[0][0] = FLOAT_80330dac;
+        resetIndMtx[0][1] = FLOAT_80330dac;
+        resetIndMtx[0][2] = FLOAT_80330dac;
+        resetIndMtx[1][0] = FLOAT_80330dac;
+        resetIndMtx[1][1] = FLOAT_80330dac;
+        resetIndMtx[1][2] = FLOAT_80330dac;
+        GXSetIndTexMtx(GX_ITM_1, resetIndMtx, 1);
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);

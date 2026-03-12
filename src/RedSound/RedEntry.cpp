@@ -51,6 +51,7 @@ static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 extern "C" {
 	void* RedNew__Fi(int);
 	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
+	int SearchWaveSequence__9CRedEntryFi(CRedEntry*, int);
 }
 
 /*
@@ -545,32 +546,34 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
  */
 void CRedEntry::ClearWaveData(int waveNo)
 {
+	int historyNo;
+	int* historyBank;
 	int* entry = (int*)this;
 
 	if (waveNo < 0) {
 		if (waveNo == -1) {
-			for (int* historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete((RedHistoryBANK*)historyBank);
+					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -2) {
-			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete((RedHistoryBANK*)historyBank);
+					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveNo == -3) {
-			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
+			for (historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
-					WaveDelete((RedHistoryBANK*)historyBank);
+					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
 				}
 			}
 		}
 	} else {
-		int historyNo = SearchWaveSequence(waveNo);
+		historyNo = SearchWaveSequence__9CRedEntryFi(this, waveNo);
 		if (-1 < historyNo) {
-			WaveDelete((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+			WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)(entry[0] + historyNo * 0x10));
 		}
 	}
 }

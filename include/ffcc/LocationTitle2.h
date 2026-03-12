@@ -1,18 +1,24 @@
 #ifndef _FFCC_LOCATIONTITLE2_H_
 #define _FFCC_LOCATIONTITLE2_H_
 
+#include "ffcc/partMng.h"
 #include <dolphin/types.h>
 
 struct pppLocationTitle2 {
-    // Fields based on similar ppp* patterns
-    char pad[0x80];  // Placeholder size, adjust based on actual usage
+    u32 m_unk0;
+    u32 m_unk4;
+    u32 m_unk8;
+    u32 m_graphId;
+    pppFMATRIX m_localMatrix;
+    char m_pad[0x54];
+    void* field_0x88;
 };
 
 struct pppLocationTitle2UnkB {
+    u32 m_graphId;
     u32 m_dataValIndex;
     u16 m_initWOrk;
-    u16 m_pad;
-    u32 m_graphId;
+    u16 m_maxCount;
     float m_arg3;
     float* m_payload;
     float m_stepValue;

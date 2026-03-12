@@ -133,7 +133,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     }
 
     colorOffset = unkC->m_serializedDataOffsets[1];
-    graphId = *(u32*)locationTitle;
+    graphId = locationTitle->m_graphId;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     rand();
 
@@ -162,8 +162,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         u8* modelNodes;
         u16 animFrameCount;
 
-        localMatrix = (pppFMATRIX*)((u8*)locationTitle + 4);
-        maxCount = unkB->m_pad;
+        localMatrix = &locationTitle->m_localMatrix;
+        maxCount = unkB->m_maxCount;
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
@@ -285,7 +285,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     u32 dataValIndex = unkB->m_dataValIndex;
 
     if (dataValIndex != 0xFFFF) {
-        u32 graphId = *(u32*)locationTitle;
+        u32 graphId = locationTitle->m_graphId;
         int graphFrame = GetGraphFrameFromId(graphId);
         LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;

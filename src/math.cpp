@@ -88,27 +88,37 @@ void CMath::rotateToMatrix(float (*) [4], Vec*)
  */
 void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
 {
-    float* const s = reinterpret_cast<float*>(srt);
+    float* s = reinterpret_cast<float*>(srt);
     Mtx rot;
+    double dVar1;
+    double dVar2;
+    double dVar3;
+    double dVar4;
+    double dVar5;
+    double dVar6;
 
     PSMTXScale(out, s[6], s[7], s[8]);
+    dVar1 = (double)(float)sin((double)s[3]);
+    dVar6 = dVar1;
+    dVar1 = (double)(float)cos((double)s[3]);
+    dVar5 = dVar1;
+    dVar1 = (double)(float)sin((double)s[4]);
+    dVar4 = dVar1;
+    dVar1 = (double)(float)cos((double)s[4]);
+    dVar3 = dVar1;
+    dVar1 = (double)(float)sin((double)s[5]);
+    dVar2 = dVar1;
+    dVar1 = (double)(float)cos((double)s[5]);
 
-    const double sx = (double)(float)sin((double)s[3]);
-    const double cx = (double)(float)cos((double)s[3]);
-    const double sy = (double)(float)sin((double)s[4]);
-    const double cy = (double)(float)cos((double)s[4]);
-    const double sz = (double)(float)sin((double)s[5]);
-    const double cz = (double)(float)cos((double)s[5]);
-
-    rot[1][0] = (float)(cy * sz);
-    rot[2][0] = (float)-sy;
-    rot[0][0] = (float)(cy * cz);
-    rot[0][1] = (float)(cz * (double)(float)(sx * sy) - (double)(float)(cx * sz));
-    rot[1][1] = (float)(sz * (double)(float)(sx * sy) + (double)(float)(cx * cz));
-    rot[2][1] = (float)(sx * cy);
-    rot[2][2] = (float)(cx * cy);
-    rot[0][2] = (float)(cz * (double)(float)(cx * sy) + (double)(float)(sx * sz));
-    rot[1][2] = (float)(sz * (double)(float)(cx * sy) - (double)(float)(sx * cz));
+    rot[1][0] = (float)(dVar3 * dVar2);
+    rot[2][0] = (float)-dVar4;
+    rot[0][0] = (float)(dVar3 * dVar1);
+    rot[0][1] = (float)(dVar1 * (double)(float)(dVar6 * dVar4) - (double)(float)(dVar5 * dVar2));
+    rot[1][1] = (float)(dVar2 * (double)(float)(dVar6 * dVar4) + (double)(float)(dVar5 * dVar1));
+    rot[2][1] = (float)(dVar6 * dVar3);
+    rot[2][2] = (float)(dVar5 * dVar3);
+    rot[0][2] = (float)(dVar1 * (double)(float)(dVar5 * dVar4) + (double)(float)(dVar6 * dVar2));
+    rot[1][2] = (float)(dVar2 * (double)(float)(dVar5 * dVar4) - (double)(float)(dVar6 * dVar1));
     rot[0][3] = s[0];
     rot[1][3] = s[1];
     rot[2][3] = s[2];

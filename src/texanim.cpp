@@ -34,6 +34,7 @@ public:
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* memcpy(void*, const void*, unsigned long);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -42,6 +43,7 @@ extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
 extern "C" void* __vt__Q28CTexAnim8CRefData[];
+extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
@@ -271,7 +273,7 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
     CTexAnimSeq** newItems;
 
     if ((unsigned long)m_size < newSize) {
-        if (m_size == 0) {
+        if ((unsigned long)m_size == 0) {
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
@@ -484,7 +486,7 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
     CTexAnim** newItems;
 
     if ((unsigned long)m_size < newSize) {
-        if (m_size == 0) {
+        if ((unsigned long)m_size == 0) {
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
@@ -539,14 +541,8 @@ CTexAnimSet::CTexAnimSet()
 {
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTexAnimSet;
-    CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
-    arr->m_size = 0;
-    arr->m_numItems = 0;
-    arr->m_defaultSize = 0x10;
-    arr->m_items = 0;
-    arr->m_stage = 0;
-    arr->m_growCapacity = 1;
-    F32At(this, 0x24) = FLOAT_8032fb38;
+    __ct__21CPtrArray_P8CTexAnim_Fv(Ptr(this, 8));
+    F32At(this, 0x24) = 0.0f;
 }
 
 /*

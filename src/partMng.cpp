@@ -11,6 +11,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_map.h"
+#include "ffcc/p_usb.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/pppfunctbl.h"
@@ -59,6 +60,12 @@ extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
 extern "C" float FLOAT_8032fe58;
 extern "C" float FLOAT_8032fe18;
+extern "C" float FLOAT_8032fe74;
+extern "C" float FLOAT_8032fe78;
+extern "C" float FLOAT_8032fe7c;
+extern "C" double DOUBLE_8032fe80;
+extern "C" void SendDataCode__7CUSBPcsFiPvii(CUSBPcs*, int, void*, int, int);
+extern "C" void GXPeekZ(u16, u16, u32*);
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
@@ -869,7 +876,39 @@ void Screen2world(Vec&, Vec&)
  */
 void CPartMng::pppGet2Dpos()
 {
-	// TODO
+    struct PartMngMouseRaw {
+        unsigned char pad00[0x10];
+        int requestFlag;
+        unsigned char pad14[0x14];
+        int cursorX;
+        int cursorY;
+    };
+
+    int zAtPixel;
+    Vec viewPos;
+    Vec worldPos;
+    Mtx invCamera;
+    PartMngMouseRaw* raw = reinterpret_cast<PartMngMouseRaw*>(this);
+
+    if (raw->requestFlag != 0) {
+        unsigned int x = raw->cursorX + 0x140;
+        unsigned int y = raw->cursorY + 0xE0;
+        if ((-1 < (int)x) && ((int)x < 0x27E) && (-1 < (int)y) && ((int)y < 0x1BE)) {
+            _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x2A2);
+            GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
+
+            viewPos.z = ppvScreenMatrix0[2][3]
+                        / ((float)((double)(zAtPixel - 0xFFFFFF) / FLOAT_8032fe78) + ppvScreenMatrix0[2][2]);
+            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / FLOAT_8032fe7c)) / ppvScreenMatrix0[0][0]);
+            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / FLOAT_8032fe74)) / ppvScreenMatrix0[1][1]);
+            viewPos.z = -viewPos.z;
+
+            PSMTXInverse(ppvCameraMatrix0, invCamera);
+            PSMTXMultVec(invCamera, &viewPos, &worldPos);
+            SendDataCode__7CUSBPcsFiPvii(&USBPcs, 0x60, &worldPos, 1, 0xC);
+        }
+        raw->requestFlag = 0;
+    }
 }
 
 /*

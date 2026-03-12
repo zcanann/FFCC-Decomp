@@ -755,11 +755,11 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    if (SoundData(this).m_pauseAllSe == 0) {
-        int paused = (-pause | pause) >> 0x1F;
-        CRedSound* redSound = reinterpret_cast<CRedSound*>(reinterpret_cast<char*>(this) + 8);
-        SePause__9CRedSoundFii(redSound, -1, paused);
-        StreamPause__9CRedSoundFii(redSound, -1, paused);
+    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) == 0) {
+        CRedSound* redSound = reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8);
+        pause = static_cast<int>((static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 0x1F);
+        SePause__9CRedSoundFii(redSound, -1, pause);
+        StreamPause__9CRedSoundFii(redSound, -1, pause);
     }
 }
 
@@ -2406,10 +2406,11 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    u32 paused = (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 31;
-    SePause__9CRedSoundFii(RedSound(this), -1, paused);
-    StreamPause__9CRedSoundFii(RedSound(this), -1, paused);
-    SoundData(this).m_pauseAllSe = pause;
+    int pauseState = pause;
+    pause = static_cast<int>((static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 31);
+    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8), -1, pause);
+    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8), -1, pause);
+    *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x22D0) = static_cast<u32>(pauseState);
 }
 
 /*
@@ -2428,19 +2429,21 @@ void CSound::AddNoFreeSeGroup(int group)
     int i = 0;
     int remaining = 4;
 
-    do {
+    while (remaining != 0) {
         if (*groupEntry == -1) {
             sound.m_noFreeSeGroups[i] = static_cast<s16>(group);
             return;
         }
+        remaining--;
         groupEntry++;
         i++;
-        remaining--;
-    } while (remaining != 0);
-
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
     }
+
+    if (System.m_execParam == 0) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
 }
 
 /*
@@ -2459,19 +2462,21 @@ void CSound::AddNoFreeWave(int wave)
     int i = 0;
     int remaining = 4;
 
-    do {
+    while (remaining != 0) {
         if (*waveEntry == -1) {
             sound.m_noFreeWaves[i] = static_cast<s16>(wave);
             return;
         }
+        remaining--;
         waveEntry++;
         i++;
-        remaining--;
-    } while (remaining != 0);
-
-    if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
     }
+
+    if (System.m_execParam == 0) {
+        return;
+    }
+
+    Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
 }
 
 /*

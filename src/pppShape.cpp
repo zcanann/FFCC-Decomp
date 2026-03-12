@@ -101,8 +101,8 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
  */
 void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    int iVar1;
-    int iVar2;
+    int shapePtr;
+    int shapeCount;
 
     *(int*)(MaterialManRaw() + 296) = *(int*)(MaterialManRaw() + 284);
     *(int*)(MaterialManRaw() + 300) = *(int*)(MaterialManRaw() + 288);
@@ -117,13 +117,13 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    iVar2 = (int)shape;
-    for (iVar1 = 0; iVar1 < *(short*)((int)shape + 2); iVar1 = iVar1 + 1) {
+    shapePtr = (int)shape;
+    for (shapeCount = 0; shapeCount < *(short*)((int)shape + 2); shapeCount = shapeCount + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
+            pppSetBlendMode__FUc(*(unsigned char*)(shapePtr + 8));
         }
-        GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
-        iVar2 = iVar2 + 8;
+        GXCallDisplayList(*(void**)(shapePtr + 0xc), 0x60);
+        shapePtr = shapePtr + 8;
     }
 }
 

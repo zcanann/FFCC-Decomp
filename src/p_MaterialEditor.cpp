@@ -95,7 +95,6 @@ CMaterialEditorPcs::~CMaterialEditorPcs()
 {
     reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xD8)->~ZLIST();
     reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xC8)->~ZLIST();
-    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84)->~CUSBStreamData();
 }
 
 /*

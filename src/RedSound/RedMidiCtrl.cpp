@@ -215,8 +215,12 @@ int SineSwing(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C770C
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int TriangleSwing(int phase)
 {
@@ -234,7 +238,7 @@ int TriangleSwing(int phase)
     } else {
         result = -result;
     }
-    return low | result;
+    return result;
 }
 
 /*

@@ -54,6 +54,7 @@ extern double DOUBLE_80331d08;
 extern double DOUBLE_80331d10;
 extern double DOUBLE_80331dc0;
 extern char SoundBuffer[];
+extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
 
 /*
@@ -2175,9 +2176,9 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncMeteoParasiteC(int)
+int CGMonObj::calcBranchFuncMeteoParasiteC(int)
 {
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = *reinterpret_cast<int*>(SoundBuffer + 1348);
+	return *reinterpret_cast<int*>(SoundBuffer_1260_ + 56);
 }
 
 /*

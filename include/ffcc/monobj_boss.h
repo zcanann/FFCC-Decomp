@@ -74,7 +74,7 @@ public:
     void initFinishedFuncMeteoParasiteC();
     void damagedFuncMeteoParasiteC();
     void frameStatFuncMeteoParasiteC();
-    void calcBranchFuncMeteoParasiteC(int);
+    int calcBranchFuncMeteoParasiteC(int);
     void logicFuncMeteoParasiteC();
     void attackCheckFuncMeteoParasiteC(int);
 

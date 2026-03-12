@@ -2231,9 +2231,13 @@ void GbaQueue::ClrFavoriteFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-int GbaQueue::GetFavorite(int, char*)
+int GbaQueue::GetFavorite(int channel, char* out)
 {
-	return 0;
+	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(out, compatibilityStr + channel * 0xDC + 0x14, 8);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return 8;
 }
 
 /*
@@ -2310,9 +2314,21 @@ void GbaQueue::ClrScrInitEnd()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::InitCmakeInfo(int, int)
+void GbaQueue::InitCmakeInfo(int channel, int menuType)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	char* cmake = reinterpret_cast<char*>(cmakeInfo);
+	int offset = channel * 0x20;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memset(cmake + offset, 0, 0x20);
+	cmake[offset] = 1;
+	obj[0x2CCA + offset] = static_cast<char>(0xFF);
+	obj[0x2CD1 + offset] = static_cast<char>(0xFF);
+	obj[0x2CB8 + offset] = static_cast<char>(menuType);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	Joybus.SetMType(channel, 1);
 }
 
 /*

@@ -268,10 +268,10 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
         }
 
+        u8 blendMode = *(((u8*)&param_2->m_stepValue) + 1);
         for (int i = 0; i < work->m_count; i++, particle++) {
             Mtx model;
             Vec worldPos;
-            u8 blendMode = *(((u8*)&param_2->m_stepValue) + 1);
 
             PSMTXIdentity(model);
             model[2][2] = particle->m_frame;

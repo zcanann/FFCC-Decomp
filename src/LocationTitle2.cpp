@@ -290,7 +290,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
         long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-        u8 blendMode = *((u8*)unkB + 0xD);
+        u8 blendMode = *((u8*)&unkB->m_stepValue + 1);
 
         pppSetBlendMode(blendMode);
 
@@ -365,7 +365,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 GXSetColorUpdate(GX_FALSE);
                 GXLoadPosMtxImm(model, 0);
 
-                if (*((u8*)unkB + 0x22) != 0) {
+                if (unkB->m_enableColorUpdate != 0) {
                     GXSetColorUpdate(GX_TRUE);
                 }
 

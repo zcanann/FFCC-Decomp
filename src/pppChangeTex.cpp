@@ -225,24 +225,13 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
  */
 void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
-	unsigned int i;
-	unsigned int j;
-	int model;
-	int dataOffset;
-	void* handle0;
-	void* handle1;
-	void* handle2;
-	void* stage;
-	void* mesh;
-
 	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppChangeTex_cpp_801dd660, 0x9d);
-	dataOffset = data->m_serializedDataOffsets[2];
+	int dataOffset = data->m_serializedDataOffsets[2];
+	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 0);
+	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 1);
+	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 2);
+	int model = 0;
 
-	handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 0);
-	handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 1);
-	handle2 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 2);
-
-	model = 0;
 	if (handle0 != 0) {
 		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
 		*(void**)(model + 0xe4) = 0;
@@ -251,68 +240,64 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 		*(void**)(model + 0xfc) = 0;
 		*(void**)(model + 0x104) = 0;
 	}
-	if (handle1 != 0) {
-		int model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1);
-		if (model1 != 0) {
-			*(void**)(model1 + 0xe4) = 0;
-			*(void**)(model1 + 0xe8) = 0;
-			*(void**)(model1 + 0xf4) = 0;
-			*(void**)(model1 + 0xfc) = 0;
-			*(void**)(model1 + 0x104) = 0;
-		}
+	int model1;
+	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
+		*(void**)(model1 + 0xe4) = 0;
+		*(void**)(model1 + 0xe8) = 0;
+		*(void**)(model1 + 0xf4) = 0;
+		*(void**)(model1 + 0xfc) = 0;
+		*(void**)(model1 + 0x104) = 0;
 	}
-	if (handle2 != 0) {
-		int model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2);
-		if (model2 != 0) {
-			*(void**)(model2 + 0xe4) = 0;
-			*(void**)(model2 + 0xe8) = 0;
-			*(void**)(model2 + 0xf4) = 0;
-			*(void**)(model2 + 0xfc) = 0;
-			*(void**)(model2 + 0x104) = 0;
-		}
+	int model2;
+	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
+		*(void**)(model2 + 0xe4) = 0;
+		*(void**)(model2 + 0xe8) = 0;
+		*(void**)(model2 + 0xf4) = 0;
+		*(void**)(model2 + 0xfc) = 0;
+		*(void**)(model2 + 0x104) = 0;
 	}
 
-	stage = *(void**)((char*)changeTex + 0x90 + dataOffset);
-	if ((stage != 0) && ((mesh = *(void**)((char*)changeTex + 0x8c + dataOffset)) != 0)) {
+	void** stageArray = *(void***)((char*)changeTex + 0x90 + dataOffset);
+	void** meshArray = *(void***)((char*)changeTex + 0x8c + dataOffset);
+	if ((stageArray != 0) && (meshArray != 0)) {
 		int meshList = *(int*)(model + 0xac);
-		void** stageArray = (void**)stage;
-		void** meshArray = (void**)mesh;
-
-		for (i = 0; i < *(unsigned int*)(*(int*)(model + 0xa4) + 0xc); i++) {
-			unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
-			void** dlEntries = (void**)*stageArray;
-			for (j = 0; j < dlCount; j++) {
-				int* dlPair = (int*)*dlEntries;
-				if (*(void**)dlPair != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlPair);
-					*(void**)dlPair = 0;
+		void** curStageArray = stageArray;
+		void** curMeshArray = meshArray;
+		unsigned int meshCount = *(unsigned int*)(*(int*)(model + 0xa4) + 0xc);
+		for (unsigned int i = 0; i < meshCount; i++) {
+			int meshData = *(int*)(meshList + 8);
+			void** dlEntries = (void**)*curStageArray;
+			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
+				if (*(void**)*dlEntries != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+					*(void**)*dlEntries = 0;
 				}
-				if ((void*)dlPair != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage((void*)dlPair);
+				if (*dlEntries != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
 					*dlEntries = 0;
 				}
 				dlEntries++;
 			}
 
-			if (*stageArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
-				*stageArray = 0;
+			if (*curStageArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*curStageArray);
+				*curStageArray = 0;
 			}
-			if (*meshArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
-				*meshArray = 0;
+			if (*curMeshArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*curMeshArray);
+				*curMeshArray = 0;
 			}
 
-			stageArray++;
-			meshArray++;
+			curStageArray++;
+			curMeshArray++;
 			meshList += 0x14;
 		}
 
-		if (stage != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(stage);
+		if (stageArray != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(stageArray);
 		}
-		if (mesh != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(mesh);
+		if (meshArray != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(meshArray);
 		}
 	}
 }

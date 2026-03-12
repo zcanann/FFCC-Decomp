@@ -114,7 +114,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angle -= turnSpan;
     }
     if (work->m_angle < gPppYmMoveCircleZero) {
-        work->m_angle += turnSpan;
+        work->m_angle += gPppYmMoveCircleTurnSpan;
     }
 
     nextPos.y = gPppYmMoveCircleZero;

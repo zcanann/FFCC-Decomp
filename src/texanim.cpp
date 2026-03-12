@@ -42,6 +42,7 @@ extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
 extern "C" void* __vt__Q28CTexAnim8CRefData[];
+extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
@@ -539,14 +540,8 @@ CTexAnimSet::CTexAnimSet()
 {
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTexAnimSet;
-    CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
-    arr->m_size = 0;
-    arr->m_numItems = 0;
-    arr->m_defaultSize = 0x10;
-    arr->m_items = 0;
-    arr->m_stage = 0;
-    arr->m_growCapacity = 1;
-    F32At(this, 0x24) = FLOAT_8032fb38;
+    __ct__21CPtrArray_P8CTexAnim_Fv(Ptr(this, 8));
+    F32At(this, 0x24) = 0.0f;
 }
 
 /*

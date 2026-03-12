@@ -733,6 +733,7 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 unsigned int GetMyEntryID()
 {
     DAT_8032f3bc = (DAT_8032f3bc + 1) & 0x7fffffff;
@@ -741,6 +742,7 @@ unsigned int GetMyEntryID()
     }
     return DAT_8032f3bc;
 }
+#pragma dont_inline reset
 
 struct RedSleepAlarm {
     OSAlarm alarm;

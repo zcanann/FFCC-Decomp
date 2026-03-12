@@ -349,32 +349,24 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl((void*)valueInt[6], 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl((void*)valueInt[6], 2);
 
-	if (handle1 != 0) {
-		int model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1);
-		if (model1 != 0) {
-			*(float**)(model1 + 0xE4) = value;
-			*(pppChangeTexUnkB**)(model1 + 0xE8) = step;
-			*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
-			*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
-		}
+	int model1;
+	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
+		*(float**)(model1 + 0xE4) = value;
+		*(pppChangeTexUnkB**)(model1 + 0xE8) = step;
+		*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+		*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 	}
 
-	if (handle2 != 0) {
-		int model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2);
-		if (model2 != 0) {
-			*(float**)(model2 + 0xE4) = value;
-			*(pppChangeTexUnkB**)(model2 + 0xE8) = step;
-			*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
-			*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
-		}
+	int model2;
+	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
+		*(float**)(model2 + 0xE4) = value;
+		*(pppChangeTexUnkB**)(model2 + 0xE8) = step;
+		*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+		*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 	}
 
-	if (step->m_payload[0] == 0) {
-		return;
-	}
-
-	int texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
-	if (texObj == 0) {
+	int texObj;
+	if ((step->m_payload[0] == 0) || ((texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr)), texObj == 0)) {
 		return;
 	}
 	valueInt[7] = texObj;

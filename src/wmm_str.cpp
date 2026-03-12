@@ -89,13 +89,13 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         case 1:
             result = s_McWinMessGroup0_de;
             break;
-        case 2:
+        case 3:
             result = s_McWinMessGroup0_it;
             break;
-        case 3:
+        case 4:
             result = s_McWinMessGroup0_es;
             break;
-        case 4:
+        case 5:
             result = s_McWinMessGroup0_fr;
             break;
         default:
@@ -107,13 +107,13 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         case 1:
             result = s_McWinMessGroup1_de;
             break;
-        case 2:
+        case 3:
             result = s_McWinMessGroup1_it;
             break;
-        case 3:
+        case 4:
             result = s_McWinMessGroup1_es;
             break;
-        case 4:
+        case 5:
             result = s_McWinMessGroup1_fr;
             break;
         default:
@@ -125,13 +125,13 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         case 1:
             result = s_McWinMessGroup2_de;
             break;
-        case 2:
+        case 3:
             result = s_McWinMessGroup2_it;
             break;
-        case 3:
+        case 4:
             result = s_McWinMessGroup2_es;
             break;
-        case 4:
+        case 5:
             result = s_McWinMessGroup2_fr;
             break;
         default:

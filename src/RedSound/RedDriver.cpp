@@ -14,20 +14,24 @@
 void* DAT_8032e13c;
 void* DAT_8032e148;
 
+struct RedMusicHEAD;
+struct RedSeSepHEAD;
+
 extern "C" {
     void __register_global_object(void*, void (*)(void*), void*);
     void* __ct__10CRedMemoryFv(void*);
     void* __ct__9CRedEntryFv(void*);
     void __dt__10CRedMemoryFv(void*);
     void __dt__9CRedEntryFv(void*);
+    void __dl__FPv(void*);
     void* RedNew__Fi(int);
     void RedDelete__FPv(void*);
     void* memcpy(void*, const void*, unsigned long);
     void* memmove(void*, const void*, unsigned long);
     void* memset(void*, int, unsigned long);
-    void SetMusicData__9CRedEntryFP12RedMusicHEAD(void*, void*);
-    int SetSeSepData__9CRedEntryFP12RedSeSepHEAD(void*, void*);
-    void ClearSeSepData__9CRedEntryFi(void*, int);
+    void SetMusicData__9CRedEntryFP12RedMusicHEAD(CRedEntry*, RedMusicHEAD*);
+    int SetSeSepData__9CRedEntryFP12RedSeSepHEAD(CRedEntry*, RedSeSepHEAD*);
+    void ClearSeSepData__9CRedEntryFi(CRedEntry*, int);
     void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
     int ReentrySeSepData__9CRedEntryFi(void*, int);
     int ReentryMusicData__9CRedEntryFi(void*, int);
@@ -220,7 +224,7 @@ void _SetReverbDepth(int* param_1)
  */
 void _SetMusicData(int* param_1)
 {
-    SetMusicData__9CRedEntryFP12RedMusicHEAD(&DAT_8032e154, (void*)*param_1);
+    SetMusicData__9CRedEntryFP12RedMusicHEAD(&DAT_8032e154, (RedMusicHEAD*)*param_1);
 }
 
 /*
@@ -436,7 +440,7 @@ void _SetSeBlockData(int* param_1)
  */
 void _SetSeSepData(int* param_1)
 {
-    SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (void*)*param_1);
+    SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (RedSeSepHEAD*)*param_1);
 }
 
 /*
@@ -499,7 +503,7 @@ void _SeSepPlay(int* param_1)
 {
     int iVar1;
 
-    iVar1 = SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (void*)param_1[1]);
+    iVar1 = SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (RedSeSepHEAD*)param_1[1]);
     if (iVar1 != 0) {
         DAT_8032f440 = param_1[4];
         SeSepPlay(param_1[0], *(int*)(iVar1 + 8), param_1[2], param_1[3]);
@@ -733,6 +737,7 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 unsigned int GetMyEntryID()
 {
     DAT_8032f3bc = (DAT_8032f3bc + 1) & 0x7fffffff;
@@ -741,6 +746,7 @@ unsigned int GetMyEntryID()
     }
     return DAT_8032f3bc;
 }
+#pragma dont_inline reset
 
 struct RedSleepAlarm {
     OSAlarm alarm;
@@ -1182,13 +1188,22 @@ CRedDriver::CRedDriver()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be60c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CRedDriver::~CRedDriver()
+#pragma optimization_level 0
+extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldDelete)
 {
-	// TODO
+    if ((redDriver != 0) && (0 < shouldDelete)) {
+        __dl__FPv(redDriver);
+    }
+    return redDriver;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

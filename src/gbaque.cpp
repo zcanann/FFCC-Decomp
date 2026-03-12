@@ -3492,9 +3492,10 @@ char GbaQueue::GetRadarType(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * 0xC);
+	int radarType;
 
 	OSWaitSemaphore(semaphore);
-	char radarType = obj[channel + 0x2D32];
+	radarType = static_cast<signed char>(obj[channel + 0x2D32]);
 	OSSignalSemaphore(semaphore);
 
 	return radarType;

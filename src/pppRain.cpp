@@ -142,8 +142,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++) {
             randA = (u32)rand();
             randB = (u32)rand();
-            unitA = FLOAT_80331020 * (float)randA;
-            unitB = FLOAT_80331020 * (float)randB;
+            unitA = (float)((double)(u32)randA * (double)FLOAT_80331020);
+            unitB = (float)((double)(u32)randB * (double)FLOAT_80331020);
             drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
             drop->posY = rain->maxY;
             drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
@@ -163,12 +163,12 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
             lifeBase = rain->lifeBase;
             lifeRange = rain->lifeRange;
+            drop->life = (s16)lifeBase;
             lifeJitter = (s16)randA - (s16)(((s32)randA / (s32)(u32)lifeRange) * (s32)(u32)lifeRange);
-            if (flip == signBit) {
-                drop->life = (s16)(lifeBase + lifeJitter);
-            } else {
-                drop->life = (s16)(lifeBase - lifeJitter);
+            if (flip != signBit) {
+                lifeJitter = -lifeJitter;
             }
+            drop->life = (s16)(drop->life + lifeJitter);
             drop++;
         }
     }
@@ -190,8 +190,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         if (drop->life < 1) {
             randA = (u32)rand();
             randB = (u32)rand();
-            unitA = FLOAT_80331020 * (float)randA;
-            unitB = FLOAT_80331020 * (float)randB;
+            unitA = (float)((double)(u32)randA * (double)FLOAT_80331020);
+            unitB = (float)((double)(u32)randB * (double)FLOAT_80331020);
             drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
             drop->posY = rain->maxY;
             drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
@@ -211,12 +211,12 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
             lifeBase = rain->lifeBase;
             lifeRange = rain->lifeRange;
+            drop->life = (s16)lifeBase;
             lifeJitter = (s16)randA - (s16)(((s32)randA / (s32)(u32)lifeRange) * (s32)(u32)lifeRange);
-            if (flip == signBit) {
-                drop->life = (s16)(lifeBase + lifeJitter);
-            } else {
-                drop->life = (s16)(lifeBase - lifeJitter);
+            if (flip != signBit) {
+                lifeJitter = -lifeJitter;
             }
+            drop->life = (s16)(drop->life + lifeJitter);
         }
         drop++;
     }

@@ -27,6 +27,7 @@ extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" float FLOAT_8032fd38;
 extern "C" float FLOAT_8032fd48;
 extern "C" float FLOAT_8032fd4c;
+extern "C" double DOUBLE_8032fd30;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -328,39 +329,38 @@ void CMapTexAnimSet::Calc()
  */
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    int found = 0;
-    int i = 0;
     int setPtr = reinterpret_cast<int>(this);
+    bool found = false;
 
-    while (i < S16At(this, 8)) {
+    for (int i = 0; i < S16At(this, 8); i++) {
         void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
         if (static_cast<short>(materialId) == S16At(animPtr, 0x12)) {
-            int end = frameEnd;
-            if (U8At(animPtr, 0x15) != 0) {
+            if (U8At(animPtr, 0x15) == 0) {
+                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
+                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<double>(static_cast<short>(frameStart)));
+                int end = frameEnd;
+                if (S16At(animPtr, 0xC) < frameEnd) {
+                    end = S16At(animPtr, 0xC);
+                }
+                S16At(animPtr, 0x10) = static_cast<short>(end);
+                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
+            } else {
+                int end = frameEnd;
                 S32At(animPtr, 0x30) = frameStart;
                 S32At(animPtr, 0x2C) = frameStart;
-                if (frameEnd > S32At(animPtr, 0x38)) {
+                if (S32At(animPtr, 0x38) < frameEnd) {
                     end = S32At(animPtr, 0x38);
                 }
                 S32At(animPtr, 0x34) = end;
                 U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
                 U8At(animPtr, 0x28) = 1;
-            } else {
-                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
-                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
-                if (frameEnd > S16At(animPtr, 0xC)) {
-                    end = S16At(animPtr, 0xC);
-                }
-                S16At(animPtr, 0x10) = static_cast<short>(end);
-                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
             }
-            found = 1;
+            found = true;
         }
         setPtr += 4;
-        i += 1;
     }
 
-    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+    if ((!found) && (System.m_execParam != 0)) {
         System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
     }
 }

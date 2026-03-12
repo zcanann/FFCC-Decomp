@@ -623,24 +623,24 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 		if (waveBankNo == -1) {
 			for (int* historyBank = (int*)entry[0]; historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete((RedHistoryBANK*)historyBank);
+					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -2) {
 			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if (-1 < historyBank[0]) {
-					WaveDelete((RedHistoryBANK*)historyBank);
+					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
 				}
 			}
 		} else if (waveBankNo == -3) {
 			for (int* historyBank = (int*)(entry[0] + 0x100); historyBank < (int*)(entry[0] + 0x400); historyBank += 4) {
 				if ((-1 < historyBank[0]) && (0 < historyBank[1])) {
-					WaveDelete((RedHistoryBANK*)historyBank);
+					WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)historyBank);
 				}
 			}
 		}
 	} else if (waveBankNo < 0x10) {
-		WaveDelete((RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
+		WaveDelete__9CRedEntryFP14RedHistoryBANK(this, (RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
 	}
 }
 

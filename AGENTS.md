@@ -141,6 +141,7 @@ WARNING: If function parameters or linkage do not match, the score can stay stuc
 
 Important rules:
 - Consider extern as forbidden going forward. Try to actually link things.
+- EXTAB IS NOT IMPORTANT RIGHT NOW. MATCHING EXTAB AT THE COST OF CODE IS NOT PERMITTED.
 - Real member access rather than hard coded pointer offsets.
 - Do not do retarded hacks to get things to match that will be resolved automatically (ie hard coding an address, or changing a variable name to lbl_{xyz} to force a temporary output match).
 - Update `config/GCCP01/symbols.txt` rather than trying to conform to incoherent symbols like `lbl_{ADDRESS}`, or `fn_{ADDRESS}`. Addresses do NOT belong in symbol names (especially when we go cross-version to JP/EN).
@@ -164,7 +165,7 @@ build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol> > diff_result.json
 Parse JSON to assess real assembly improvements vs formatting changes.
 
 ### Step 6 - Check overall progress with `ninja` output
-Treat code, data, and linked progress as first-class outcomes.
+Treat code, data, and linked progress as first-class outcomes. Extab progress at the cost of code matching should not be considered success, and these PRs will be declined.
 
 ### Step 7 - Decide whether to create PR (net progress + plausibility)
 Net improvement is **necessary but not sufficient**.

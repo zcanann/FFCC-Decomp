@@ -472,18 +472,26 @@ void CMemory::Quit()
  */
 void CMemory::Frame()
 {
-    bool activeInput = false;
+    bool activeInput;
     unsigned short trigger;
 
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-        activeInput = true;
+    activeInput = false;
+    if (Pad._452_4_ == 0) {
+        if (Pad._448_4_ == -1) {
+            goto frame_input_done;
+        }
     }
+    activeInput = true;
+
+frame_input_done:
 
     if (activeInput) {
         trigger = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        trigger = Pad._8_2_;
+        int port = 1;
+        unsigned int clamped = (unsigned int)port & ~((int)~(Pad._448_4_ - port | port - Pad._448_4_) >> 0x1f);
+        trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x36 + clamped * 0x54);
     }
 
     if ((trigger & 0x200) != 0) {

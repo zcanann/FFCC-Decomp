@@ -9,10 +9,10 @@
 void __copy_longs_aligned(void* dst, const void* src, size_t n)
 {
 	unsigned long i, v1, v2;
-	unsigned char* d;
-	unsigned char* s;
 	unsigned long* ls;
 	unsigned long* ld;
+	unsigned char* s;
+	unsigned char* d;
 
 	i = (-(unsigned long)dst) & 3;
 

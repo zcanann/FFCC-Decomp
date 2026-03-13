@@ -974,8 +974,8 @@ config.libs = [
     },
     {
         "lib": "OdemuExi2",
-        "mw_version": "GC/1.3",
-        "cflags": cflags_odemuexi,
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_base,
         "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "OdemuExi2/DebuggerDriver.c"),

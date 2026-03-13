@@ -231,6 +231,21 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = unusedVec.z;
         }
 
+        if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+            CMemory::CStage* mapStage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
+            int heapUnuse = mapStage->GetHeapUnuse();
+            int heapUnuseKB =
+                (heapUnuse >> 10) + static_cast<int>((heapUnuse < 0) && ((heapUnuse & 0x3FF) != 0));
+
+            Printf__7CSystemFPce(
+                &System,
+                s__________________________________801d7734,
+                mapPath,
+                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0xC),
+                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x8),
+                heapUnuseKB);
+        }
+
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
         if (mapLightHolderArr[1].GetSize() != 0) {

@@ -160,8 +160,8 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
             outputVerts += 6;
         }
 
-        pairCount = vertCount & 1;
-        if (pairCount != 0) {
+        int tailCount = vertCount & 1;
+        if (tailCount != 0) {
             do {
                 outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
                 outputVerts[1] = vert1Pos[1] + state->value * (vert2Pos[1] - vert1Pos[1]);
@@ -169,8 +169,8 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
                 vert1Pos += 3;
                 vert2Pos += 3;
                 outputVerts += 3;
-                pairCount--;
-            } while (pairCount != 0);
+                tailCount--;
+            } while (tailCount != 0);
         }
     }
 

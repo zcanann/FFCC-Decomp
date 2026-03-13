@@ -1524,9 +1524,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 CLightPcs::CLight::CLight()
 {
     float f2 = FLOAT_8032fc14;
-    float f1 = FLOAT_8032fc10;
 
     m_radius = FLOAT_8032fc1c;
+    float f1 = FLOAT_8032fc10;
     m_offsetZ = f2;
     m_offsetX = f2;
     m_attenFalloff = f1;

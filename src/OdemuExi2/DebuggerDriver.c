@@ -3,8 +3,7 @@
 #include <dolphin/hw_regs.h>
 
 static __OSInterruptHandler MTRCallback;
-
-static __OSInterruptHandler DBGCallback;
+static void (*DBGCallback)(u32, OSContext*);
 
 static u32 SendMailData;
 
@@ -84,75 +83,70 @@ static BOOL DBGEXIImm(void* buffer, s32 bytecounter, u32 write) {
 }
 
 static BOOL DBGWriteMailbox(u32 p1) {
-    u32 cmd = 0xC0000000;
+    BOOL error = FALSE;
     u32 value;
-    BOOL result = FALSE;
 
-    DBGEXISelect(4);
-    value = (p1 & 0x1FFFFFFF) | cmd;
-    result |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
-    result |= !DBGEXISync();
-    result |= !DBGEXIDeselect();
+    if (!DBGEXISelect(4)) {
+        return FALSE;
+    }
 
-    return !result;
+    value = (p1 & 0x1FFFFFFF) | 0xC0000000;
+    error |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
+    error |= !DBGEXISync();
+    error |= !DBGEXIDeselect();
+
+    return !error;
 }
 
 #pragma dont_inline on
 static BOOL DBGReadMailbox(u32* p1) {
-    u32 total;
+    BOOL error;
     u32 v;
-    volatile u32* exi;
 
-    total = 0;
+    error = FALSE;
+    if (!DBGEXISelect(4)) {
+        return FALSE;
+    }
+
     v = 0x60000000;
-    exi = &__EXIRegs[10];
-    *exi = (*exi & 0x405) | 0xC0;
-    total |= !(DBGEXIImm((u8*)&v, 2, TRUE) != 0);
-    while (__EXIRegs[13] & 1) {
-    }
+    error |= !DBGEXIImm((u8*)&v, 2, TRUE);
+    error |= !DBGEXISync();
+    error |= !DBGEXIImm((u8*)p1, sizeof(*p1), FALSE);
+    error |= !DBGEXISync();
+    error |= !DBGEXIDeselect();
 
-    total |= !(DBGEXIImm((u8*)p1, 4, FALSE) != 0);
-    while (__EXIRegs[13] & 1) {
-    }
-
-    total = (u32)__cntlzw(total) >> 5;
-    *exi &= 0x405;
-    return total;
+    return !error;
 }
 #pragma dont_inline reset
 
 static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
-    u32 regs;
-    u32 result;
+    BOOL error;
+    u32* dataPtr;
     u32 value;
+    u32 readValue;
+
+    error = FALSE;
+    dataPtr = (u32*)buffer;
+    if (!DBGEXISelect(4)) {
+        return FALSE;
+    }
 
     value = ((count & 0x1FFFC) << 8) | 0x20000000;
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xC0;
-    result = (u32)__cntlzw(DBGEXIImm(&value, 4, TRUE));
-    result >>= 5;
-    do {
-        regs = __EXIRegs[13];
-    } while (regs & 1);
+    error |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
+    error |= !DBGEXISync();
 
     while (param3 != 0) {
-        regs = (u32)__cntlzw(DBGEXIImm(&value, 4, FALSE));
-        result |= regs >> 5;
-        do {
-            regs = __EXIRegs[13];
-        } while (regs & 1);
+        error |= !DBGEXIImm((u8*)&readValue, sizeof(readValue), FALSE);
+        error |= !DBGEXISync();
+        *dataPtr++ = readValue;
         param3 -= 4;
-        *buffer = value;
-        buffer++;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    regs = __EXIRegs[10];
-    result = (u32)__cntlzw(result);
-    __EXIRegs[10] = regs & 0x405;
-    return result >> 5;
+    error |= !DBGEXIDeselect();
+    return !error;
 }
 
 /*
@@ -165,64 +159,52 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
-    u32 regs;
-    u32 result;
+    BOOL error;
     u32 value;
     u32* bufferWords;
 
+    error = FALSE;
     bufferWords = (u32*)buffer;
+    if (!DBGEXISelect(4)) {
+        return FALSE;
+    }
+
     value = ((count & 0x1FFFC) << 8) | 0xA0000000;
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xC0;
-    result = (u32)__cntlzw(DBGEXIImm(&value, 4, TRUE));
-    result >>= 5;
-    do {
-        regs = __EXIRegs[13];
-    } while (regs & 1);
+    error |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
+    error |= !DBGEXISync();
 
     while (param3 != 0) {
         value = *bufferWords;
         bufferWords++;
-        regs = (u32)__cntlzw(DBGEXIImm(&value, 4, TRUE));
-        result |= regs >> 5;
-        do {
-            regs = __EXIRegs[13];
-        } while (regs & 1);
+        error |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
+        error |= !DBGEXISync();
         param3 -= 4;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    regs = __EXIRegs[10];
-    result = (u32)__cntlzw(result);
-    __EXIRegs[10] = regs & 0x405;
-    return result >> 5;
+    error |= !DBGEXIDeselect();
+    return !error;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {
-    u32 busyFlag;
-    u32 regs;
-    u32 result;
+    BOOL error;
     u32 cmd;
 
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xc0;
+    error = FALSE;
+    if (!DBGEXISelect(4)) {
+        return FALSE;
+    }
 
     cmd = 0x40000000;
-    result = ((u32)__cntlzw(DBGEXIImm((u8*)&cmd, 2, TRUE))) >> 5;
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
+    error |= !DBGEXIImm((u8*)&cmd, 2, TRUE);
+    error |= !DBGEXISync();
+    error |= !DBGEXIImm((u8*)p1, sizeof(*p1), FALSE);
+    error |= !DBGEXISync();
+    error |= !DBGEXIDeselect();
 
-    result |= ((u32)__cntlzw(DBGEXIImm((u8*)p1, 4, FALSE))) >> 5;
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
-
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = regs & 0x405;
-    return ((u32)__cntlzw(result)) >> 5;
+    return !error;
 }
 #pragma dont_inline on
 static BOOL DBGReadStatus(u32* p1) {
@@ -230,7 +212,7 @@ static BOOL DBGReadStatus(u32* p1) {
 }
 #pragma dont_inline reset
 
-static void MWCallback(s16 a, OSContext* b) {
+static void MWCallback(u32 a, OSContext* b) {
     EXIInputFlag = TRUE;
     if (MTRCallback) {
         MTRCallback(0, b);
@@ -257,7 +239,7 @@ void DBInitComm(volatile u8** a, __OSInterruptHandler b) {
 void DBInitInterrupts(void) {
     __OSMaskInterrupts(0x18000);
     __OSMaskInterrupts(0x40);
-    DBGCallback = &MWCallback;
+    DBGCallback = MWCallback;
     __OSSetInterruptHandler(0x19, DBGHandler);
     __OSUnmaskInterrupts(0x40);
 }
@@ -289,12 +271,7 @@ int DBRead(void* buffer, u32 count) {
     s32 value;
 
     interrupts = OSDisableInterrupts();
-
-    if ((SendMailData & 0x10000) == 0) {
-        value = 0;
-    } else {
-        value = 0x1000;
-    }
+    value = (SendMailData & 0x10000) ? 0x1000 : 0;
 
     DBGRead(value + 0x1e000, (u32*)buffer, (count + 3U) & 0xfffffffc);
 

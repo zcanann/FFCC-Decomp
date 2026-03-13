@@ -1256,6 +1256,7 @@ void C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* 
 {
     Vec vLook, vRight, vUp;
     f32 dot;
+    f32 prodX, prodY, prodZ;
 
     vLook.x = camPos->x - target->x;
     vLook.y = camPos->y - target->y;
@@ -1268,19 +1269,28 @@ void C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* 
     m[0][0] = vRight.x;
     m[0][1] = vRight.y;
     m[0][2] = vRight.z;
-    dot = camPos->z * vRight.z + camPos->x * vRight.x + camPos->y * vRight.y;
+    prodX = camPos->x * vRight.x;
+    prodY = camPos->y * vRight.y;
+    prodZ = camPos->z * vRight.z;
+    dot = prodZ + prodX + prodY;
     m[0][3] = -dot;
 
     m[1][0] = vUp.x;
     m[1][1] = vUp.y;
     m[1][2] = vUp.z;
-    dot = camPos->z * vUp.z + camPos->x * vUp.x + camPos->y * vUp.y;
+    prodX = camPos->x * vUp.x;
+    prodY = camPos->y * vUp.y;
+    prodZ = camPos->z * vUp.z;
+    dot = prodZ + prodX + prodY;
     m[1][3] = -dot;
 
     m[2][0] = vLook.x;
     m[2][1] = vLook.y;
     m[2][2] = vLook.z;
-    dot = camPos->z * vLook.z + camPos->x * vLook.x + camPos->y * vLook.y;
+    prodX = camPos->x * vLook.x;
+    prodY = camPos->y * vLook.y;
+    prodZ = camPos->z * vLook.z;
+    dot = prodZ + prodX + prodY;
     m[2][3] = -dot;
 }
 

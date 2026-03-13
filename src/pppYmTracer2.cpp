@@ -329,15 +329,27 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  */
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    s32 dataOffset = *param_3->m_serializedDataOffsets;
-    s32 colorOffset = param_3->m_serializedDataOffsets[1];
-    TraceEntry* entries = *(TraceEntry**)((u8*)pppYmTracer2 + 0x80 + dataOffset + 0x28);
-    CMapMesh* mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+    TraceEntry* entry;
+    TraceEntry* next;
+    CMapMesh* mapMesh;
     CTexture* texture;
+    u8* work;
+    s32 dataOffset;
+    s32 colorOffset;
     int textureIndex;
-    u16 visibleCount;
+    u32 visibleCount;
+    s32 i;
+    u32 colorTop;
+    u32 colorBottom;
+    float uTop;
+    float uBottom;
     float uvStep;
-    float alphaScale;
+    double alphaScale;
+
+    dataOffset = *param_3->m_serializedDataOffsets;
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    work = (u8*)pppYmTracer2 + 0x80 + dataOffset;
+    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
@@ -375,24 +387,19 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
     }
 
-    visibleCount = *(u16*)((u8*)pppYmTracer2 + 0x80 + dataOffset + 0x2C);
-    uvStep = FLOAT_80331844 / (float)visibleCount;
+    visibleCount = *(u16*)(work + 0x2C);
+    uvStep = FLOAT_80331844 / (float)((double)visibleCount - DOUBLE_80331850);
     GXSetCullMode(GX_CULL_NONE);
 
     if (visibleCount > 1) {
-        alphaScale = ((float)((double)((u64)0x4330000000000000ULL | (u32)((u8*)pppYmTracer2)[colorOffset + 0x8B]) -
-                               DOUBLE_80331850)) /
-                     FLOAT_80331848;
+        entry = *(TraceEntry**)(work + 0x28);
+        alphaScale =
+            (double)((float)((double)(u32)((u8*)pppYmTracer2)[colorOffset + 0x8B] - DOUBLE_80331850) / FLOAT_80331848);
 
         GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (u16)(visibleCount - 1) * 4);
-        for (u16 i = 0; i < (u16)(visibleCount - 1); i++) {
-            float u0 = (float)i * uvStep;
-            float u1 = (float)(i + 1) * uvStep;
-            u32 currentColor;
-            u32 nextColor;
-            u8* current = (u8*)&entries[i];
-            u8* next = (u8*)&entries[i + 1];
-
+        for (i = 0; i < (s32)(visibleCount - 1); i++) {
+            uTop = (float)i * uvStep;
+            uBottom = (float)(i + 1) * uvStep;
             if (alphaScale < FLOAT_80331840) {
                 alphaScale = FLOAT_80331840;
             }
@@ -400,26 +407,28 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 alphaScale = FLOAT_80331844;
             }
 
-            currentColor = ((u32)current[0x1C] << 24) | ((u32)current[0x1D] << 16) | ((u32)current[0x1E] << 8) |
-                           (u8)(alphaScale * current[0x1F]);
-            nextColor = ((u32)next[0x1C] << 24) | ((u32)next[0x1D] << 16) | ((u32)next[0x1E] << 8) |
-                        (u8)(alphaScale * next[0x1F]);
+            next = entry + 1;
+            colorTop = ((u32)entry->color[0] << 0x18) | ((u32)entry->color[1] << 0x10) | ((u32)entry->color[2] << 8) |
+                       (u8)(alphaScale * (double)((float)((double)entry->color[3] - DOUBLE_80331850)));
+            colorBottom = ((u32)next->color[0] << 0x18) | ((u32)next->color[1] << 0x10) | ((u32)next->color[2] << 8) |
+                          (u8)(alphaScale * (double)((float)((double)next->color[3] - DOUBLE_80331850)));
 
-            GXPosition3f32(entries[i].targetPos.x, entries[i].targetPos.y, entries[i].targetPos.z);
-            GXColor1u32(currentColor);
-            GXTexCoord2f32(u0, FLOAT_80331844);
+            GXPosition3f32(entry->targetPos.x, entry->targetPos.y, entry->targetPos.z);
+            GXColor1u32(colorTop);
+            GXTexCoord2f32(uTop, FLOAT_80331844);
 
-            GXPosition3f32(entries[i].pos.x, entries[i].pos.y, entries[i].pos.z);
-            GXColor1u32(currentColor);
-            GXTexCoord2f32(u0, FLOAT_80331840);
+            GXPosition3f32(entry->pos.x, entry->pos.y, entry->pos.z);
+            GXColor1u32(colorTop);
+            GXTexCoord2f32(uTop, FLOAT_80331840);
 
-            GXPosition3f32(entries[i + 1].targetPos.x, entries[i + 1].targetPos.y, entries[i + 1].targetPos.z);
-            GXColor1u32(nextColor);
-            GXTexCoord2f32(u1, FLOAT_80331844);
+            GXPosition3f32(next->targetPos.x, next->targetPos.y, next->targetPos.z);
+            GXColor1u32(colorBottom);
+            GXTexCoord2f32(uBottom, FLOAT_80331844);
 
-            GXPosition3f32(entries[i + 1].pos.x, entries[i + 1].pos.y, entries[i + 1].pos.z);
-            GXColor1u32(nextColor);
-            GXTexCoord2f32(u1, FLOAT_80331840);
+            GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
+            GXColor1u32(colorBottom);
+            GXTexCoord2f32(uBottom, FLOAT_80331840);
+            entry++;
         }
     }
 }

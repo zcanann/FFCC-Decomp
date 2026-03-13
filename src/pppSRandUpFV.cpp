@@ -33,15 +33,15 @@ struct PppSRandUpFVParam3 {
  */
 void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
-    u8* self = (u8*)param2;
     PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param1;
+    u8* self = (u8*)param2;
     PppSRandUpFVParam3* info = (PppSRandUpFVParam3*)param3;
-    f32* randVec;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
+    f32* randVec;
     s32 currentIndex = *(s32*)(self + 0xC);
     if (currentIndex == 0) {
         randVec = (f32*)(self + *info->fieldC + 0x80);
@@ -91,15 +91,15 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
     f32* target = (cfg->field4 == -1) ? gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
 
     {
-        f32 value = randVec[0] * cfg->field8;
+        f32 value = cfg->field8 * randVec[0];
         target[0] = target[0] + value;
     }
     {
-        f32 value = randVec[1] * cfg->fieldC;
+        f32 value = cfg->fieldC * randVec[1];
         target[1] = target[1] + value;
     }
     {
-        f32 value = randVec[2] * cfg->field10;
+        f32 value = cfg->field10 * randVec[2];
         target[2] = target[2] + value;
     }
 }

@@ -2046,12 +2046,11 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  */
 void CGObject::SetDispItemName(int showName)
 {
-    signed char showName8 = static_cast<signed char>(showName);
     u8 flags = *((u8*)&m_shieldNodeFlags);
-    u8 timer = 13;
-
-    *((u8*)&m_shieldNodeFlags) = ((showName8 << 4) & 0x10) | (flags & 0xEF);
-    m_dispItemTimer = timer;
+    u8 masked = flags;
+    masked = (u8)__rlwimi(masked, (signed char)showName, 4, 27, 27);
+    *((u8*)&m_shieldNodeFlags) = masked;
+    m_dispItemTimer = 13;
 }
 
 /*

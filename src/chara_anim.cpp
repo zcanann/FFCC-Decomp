@@ -167,6 +167,7 @@ CChara::CAnim::CAnim()
 	int zero = 0;
 	int one = 1;
 	CAnimFields& anim = Anim(this);
+	unsigned char flags;
 
 	__ct__4CRefFv(this);
 	anim.m_vtable = __vt__Q26CChara5CAnim;
@@ -174,18 +175,22 @@ CChara::CAnim::CAnim()
 	anim.m_frameCount = zero;
 	anim.m_nodes = 0;
 	anim.m_bank = 0;
-	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), one, 7, 24, 24));
-	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), zero, 6, 25, 25));
+
+	flags = anim.m_flags;
+	flags = static_cast<unsigned char>(__rlwimi(flags, one, 7, 24, 24));
+	anim.m_flags = flags;
+	flags = anim.m_flags;
+	flags = static_cast<unsigned char>(__rlwimi(flags, zero, 6, 25, 25));
+	anim.m_flags = flags;
+
 	anim.m_quantizeX = 5;
 	anim.m_quantizeY = 0xB;
 	anim.m_quantizeZ = 10;
 	anim.m_interp = zero;
 	anim.m_interpOffset = zero;
-	anim.m_stage = 0;
-	anim.m_bankSize = zero;
 	anim.m_bankAddress = zero;
+	anim.m_bankSize = zero;
+	anim.m_stage = 0;
 	anim.m_lastFrame = zero;
 }
 

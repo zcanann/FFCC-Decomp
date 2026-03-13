@@ -19,6 +19,8 @@ void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, flo
 void pppSetBlendMode__FUc(u8);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
 
 struct RainDrop;
@@ -43,7 +45,10 @@ struct RainDrop {
 };
 
 struct RainParam {
-    u8 pad0[0x10];
+    float pad0;
+    float moveYDelta;
+    float accelYDelta;
+    float accelZDelta;
     float driftY;
     u16 lifeBase;
     u16 lifeRange;
@@ -53,9 +58,23 @@ struct RainParam {
     float maxX;
     float maxY;
     float maxZ;
-    u8 pad2[0x40 - 0x38];
+    u8 pad2[0x3c - 0x30];
+    u8 lineWidth;
+    u8 pad3[3];
     float lengthBase;
     float lengthRand;
+    u8 blendMode;
+    u8 fogIndex;
+    u8 lightTarget;
+    u8 pad4;
+};
+
+struct RainSegment {
+    Vec position;
+    Vec direction;
+    float length;
+    s16 life;
+    s16 pad;
 };
 
 /*
@@ -251,8 +270,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int i;
     int colorOffset;
     int workOffset;
+    RainParam* step;
     RainWork* work;
-    float* drop;
+    RainSegment* drop;
     u8* colorPtr;
     u32 color;
     double baseX;
@@ -262,18 +282,19 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     float tex1;
     Vec segment[2];
 
+    step = (RainParam*)param_2->m_payload;
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
     colorPtr = (u8*)pppRain + 0x88 + colorOffset;
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
-    pppSetBlendMode__FUc(param_2->m_payload[0x48]);
+    pppSetBlendMode__FUc(step->blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         colorPtr,
         ppvCameraMatrix0,
         kPppRainTexCoordBase,
-        param_2->m_payload[0x4a],
-        param_2->m_payload[0x49],
-        param_2->m_payload[0x48],
+        step->lightTarget,
+        step->fogIndex,
+        step->blendMode,
         0,
         1,
         1,
@@ -282,12 +303,12 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetNumChans(1);
     GXSetNumTevStages(1);
     GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetLineWidth(param_2->m_payload[0x3c], GX_TO_ZERO);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    GXSetLineWidth(step->lineWidth, GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    drop = (float*)work->drops;
+    drop = (RainSegment*)work->drops;
     color = *(u32*)colorPtr;
     baseX = (double)pppMngStPtr->m_matrix.value[0][3];
     baseY = (double)pppMngStPtr->m_matrix.value[1][3];
@@ -297,22 +318,25 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {
-        double x = (double)(float)(baseX + (double)drop[0]);
-        double y = (double)(float)(baseY + (double)drop[1]);
-        double z = (double)(float)(baseZ + (double)drop[2]);
+        double x = (double)(float)(baseX + (double)drop->position.x);
+        double y = (double)(float)(baseY + (double)drop->position.y);
+        double z = (double)(float)(baseZ + (double)drop->position.z);
 
-        PSVECScale((Vec*)(drop + 3), &segment[0], drop[6]);
-        GXPosition3f32((float)x, (float)y, (float)z);
-        GXColor1u32(color);
-        GXTexCoord2f32(tex0, tex0);
+        PSVECScale(&drop->direction, &segment[0], drop->length);
+        GXWGFifo.f32 = (float)x;
+        GXWGFifo.f32 = (float)y;
+        GXWGFifo.f32 = (float)z;
+        GXWGFifo.u32 = color;
+        GXWGFifo.f32 = tex0;
+        GXWGFifo.f32 = tex0;
 
-        GXPosition3f32(
-            (float)(x + (double)segment[0].x),
-            (float)(y + (double)segment[0].y),
-            (float)(z + (double)segment[0].z));
-        GXColor1u32(color);
-        GXTexCoord2f32(tex1, tex1);
-        drop += sizeof(RainDrop) / sizeof(float);
+        GXWGFifo.f32 = (float)(x + (double)segment[0].x);
+        GXWGFifo.f32 = (float)(y + (double)segment[0].y);
+        GXWGFifo.f32 = (float)(z + (double)segment[0].z);
+        GXWGFifo.u32 = color;
+        GXWGFifo.f32 = tex1;
+        GXWGFifo.f32 = tex1;
+        drop++;
         i++;
     }
     GXSetLineWidth(8, GX_TO_ZERO);

@@ -78,8 +78,8 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
             DLcreateDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i] + 2);
             DLsetdelayDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i]);
             rv->combCoef[i + (k * 3)] =
-                powf(axfx_reverb_hi_dpl2_f32_10,
-                     (axfx_reverb_hi_dpl2_lens[i] * -3) / (axfx_reverb_hi_dpl2_f32_32000 * time));
+                (f32)pow(axfx_reverb_hi_dpl2_f32_10,
+                         (axfx_reverb_hi_dpl2_lens[i] * -3) / (axfx_reverb_hi_dpl2_f32_32000 * time));
         }
 
         for (i = 0; i < 2; i++) {

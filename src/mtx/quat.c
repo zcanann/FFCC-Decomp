@@ -226,7 +226,7 @@ void C_QUATSlerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
         value = -value;
     }
 
-    if (cosHalfTheta <= 0.9999899864196777f) {
+    if (cosHalfTheta < 0.9999899864196777f) {
         f32 halfTheta = acosf(cosHalfTheta);
         f32 sinHalfTheta = sinf(halfTheta);
 

@@ -22,7 +22,7 @@ public:
 	void SetBuf(void* filePtr);
 	void PushChunk();
 	void PopChunk();
-	bool GetNextChunk(CChunkFile::CChunk& outChunk);
+	int GetNextChunk(CChunkFile::CChunk& outChunk);
 	unsigned char* GetAddress();
 	void Get(void*, long);
 	unsigned char Get1();

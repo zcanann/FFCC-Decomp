@@ -911,7 +911,11 @@ config.libs = [
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
                 extra_cflags=["-inline auto,deferred", "-char signed"],
             ),
-            Object(NonMatching, "Runtime.PPCEABI.H/global_destructor_chain.c"),
+            Object(
+                NonMatching,
+                "Runtime.PPCEABI.H/global_destructor_chain.c",
+                cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
+            ),
             Object(NonMatching, "Runtime.PPCEABI.H/New.cp"),
             Object(NonMatching, "Runtime.PPCEABI.H/NMWException.cp"),
             Object(NonMatching, "Runtime.PPCEABI.H/ptmf.c"),

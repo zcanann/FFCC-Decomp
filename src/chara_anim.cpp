@@ -41,8 +41,8 @@ struct CAnimFields {
 	unsigned int m_bankSize;
 	void* m_bank;
 	int m_lastFrame;
-	int m_bankAddress;
 	CMemory::CStage* m_stage;
+	int m_bankAddress;
 };
 
 struct CAnimNodeFields {

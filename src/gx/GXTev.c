@@ -456,15 +456,15 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXCha
     }
 
     if (stage & 1) {
-        SET_REG_FIELD(1158, *ptref, 3, 12, tmap);
-        SET_REG_FIELD(1159, *ptref, 3, 15, tcoord);
-        SET_REG_FIELD(1161, *ptref, 3, 19, (color == GX_COLOR_NULL) ? 7 : c2r[color]);
-        SET_REG_FIELD(1163, *ptref, 1, 18, (map != GX_TEXMAP_NULL && !(map & GX_TEX_DISABLE)));
+        *ptref = (*ptref & 0xFFFF8FFF) | ((u32)tmap << 12);
+        *ptref = (*ptref & 0xFFFC7FFF) | ((u32)tcoord << 15);
+        *ptref = (*ptref & 0xFFC7FFFF) | ((u32)((color == GX_COLOR_NULL) ? 7 : c2r[color]) << 19);
+        *ptref = (*ptref & 0xFFFBFFFF) | ((u32)(map != GX_TEXMAP_NULL && !(map & GX_TEX_DISABLE)) << 18);
     } else {
-        SET_REG_FIELD(1166, *ptref, 3, 0, tmap);
-        SET_REG_FIELD(1167, *ptref, 3, 3, tcoord);
-        SET_REG_FIELD(1169, *ptref, 3, 7, (color == GX_COLOR_NULL) ? 7 : c2r[color]);
-        SET_REG_FIELD(1171, *ptref, 1, 6, (map != GX_TEXMAP_NULL && !(map & GX_TEX_DISABLE)));
+        *ptref = (*ptref & 0xFFFFFFF8) | (u32)tmap;
+        *ptref = (*ptref & 0xFFFFFFC7) | ((u32)tcoord << 3);
+        *ptref = (*ptref & 0xFFFFFC7F) | ((u32)((color == GX_COLOR_NULL) ? 7 : c2r[color]) << 7);
+        *ptref = (*ptref & 0xFFFFFFBF) | ((u32)(map != GX_TEXMAP_NULL && !(map & GX_TEX_DISABLE)) << 6);
     }
 
     GX_WRITE_RAS_REG(*ptref);

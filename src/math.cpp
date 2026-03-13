@@ -6,6 +6,8 @@
 
 extern "C" int rand(void);
 extern "C" int __cntlzw(unsigned int);
+extern "C" float FLOAT_8032F740;
+extern "C" float FLOAT_8032F788;
 
 CMath Math;
 extern "C" char __vt__8CManager[];
@@ -496,8 +498,8 @@ int CBound::CheckFrustum0(float farPlane)
         return 1;
     }
 
-    dVar8 = (double)-3.40282347e38f;
-    dVar9 = (double)0.0f;
+    dVar8 = (double)FLOAT_8032F788;
+    dVar9 = (double)FLOAT_8032F740;
     uVar3 = 0xF;
     uVar5 = 0;
     iVar6 = 0;

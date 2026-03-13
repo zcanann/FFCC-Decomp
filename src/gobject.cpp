@@ -43,6 +43,8 @@ extern float FLOAT_80330368;
 extern float FLOAT_80330364;
 extern float FLOAT_8033036c;
 extern float FLOAT_80330360;
+extern float FLOAT_80330370;
+extern float FLOAT_80330374;
 extern double DOUBLE_80330348;
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
@@ -2054,12 +2056,32 @@ void CGObject::SetDispItemName(int showName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c65c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::DrawDebug(CFont*)
+void CGObject::DrawDebug(CFont* font)
 {
-	// TODO
+    if ((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1A)
+                          | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 6))
+         < 0)
+        && (sZeroFloat < m_screenDepth)) {
+        float invDepth = sAnimFrameOffset / m_screenDepth;
+        float screenX[2];
+        screenX[0] = -(FLOAT_80330374 * m_projection.z * invDepth - FLOAT_80330374);
+
+        typedef void (*OnDrawDebugFn)(CGObject*, CFont*, float, float&, float);
+        void** vtable = *reinterpret_cast<void***>(this);
+        OnDrawDebugFn fn = reinterpret_cast<OnDrawDebugFn>(vtable[16]);
+        fn(this,
+           font,
+           FLOAT_80330370 * m_projection.y * invDepth + FLOAT_80330370,
+           screenX[0],
+           m_projection.w * invDepth);
+    }
 }
 
 /*

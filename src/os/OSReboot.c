@@ -4,11 +4,11 @@
 #include "dolphin/os/__os.h"
 #include <dolphin/dvd/__dvd.h>
 
-extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
-extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
-extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
-extern volatile u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
-extern volatile u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
+extern u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
+extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
+extern u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
+extern u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
+extern u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
 
 static int Prepared;
 
@@ -23,7 +23,7 @@ typedef struct {
     u32 reserved2;
 } AppLoaderStruct;
 
-static AppLoaderStruct FatalParam;
+static AppLoaderStruct FatalParam ATTRIBUTE_ALIGN(32);
 
 asm void Run(register void* entryPoint) {
     nofralloc
@@ -61,6 +61,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     DVDCommandBlock appLoaderReadBlock;
     DVDCommandBlock rebootReadBlock;
     u32 rebootSize;
+    u32 offset;
 #if SDK_REVISION < 1
     OSTime start;
 #endif
@@ -144,8 +145,9 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
         }
     }
 
+    offset = FatalParam.size + 0x20;
     rebootSize = OSRoundUp32B(FatalParam.rebootSize);
-    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, FatalParam.size + 0x2440, NULL, 0);
+    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, offset + 0x2440, NULL, 0);
 
 #if SDK_REVISION < 1
     start = OSGetTime();

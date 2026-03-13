@@ -10,7 +10,7 @@ static u32 SendMailData;
 
 static s32 RecvDataLeng;
 
-static volatile u8* pEXIInputFlag;
+static u8* pEXIInputFlag;
 
 static u8 EXIInputFlag;
 
@@ -250,8 +250,7 @@ void DBInitComm(volatile u8** a, __OSInterruptHandler b) {
     pEXIInputFlag = &EXIInputFlag;
     *a = pEXIInputFlag;
     MTRCallback = b;
-    __OSMaskInterrupts(0x18000);
-    __EXIRegs[10] = 0;
+    DBGEXIInit();
     OSRestoreInterrupts(interrupts);
 }
 
@@ -264,7 +263,6 @@ void DBInitInterrupts(void) {
 }
 
 u32 DBQueryData(void) {
-    u32 value;
     u32 interrupts;
     u32 mailbox[3];
 
@@ -272,17 +270,14 @@ u32 DBQueryData(void) {
     if (RecvDataLeng == 0) {
         interrupts = OSDisableInterrupts();
         DBGReadStatus(mailbox);
-        value = mailbox[0];
         if ((mailbox[0] & 1) != 0) {
             DBGReadMailbox(mailbox);
-            value = mailbox[0] & 0x1fffffff;
             if ((mailbox[0] & 0x1f000000) == 0x1f000000) {
+                SendMailData = mailbox[0];
                 RecvDataLeng = mailbox[0] & 0x7fff;
                 EXIInputFlag = 1;
-                SendMailData = value;
             }
         }
-        mailbox[0] = value;
         OSRestoreInterrupts(interrupts);
     }
     return RecvDataLeng;

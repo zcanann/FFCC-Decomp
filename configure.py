@@ -282,7 +282,7 @@ cflags_trk = [
 
 cflags_odemuexi = [
     *cflags_base,
-    "-inline deferred",
+    "-inline auto,deferred",
     "-use_lmw_stmw on",
 ]
 
@@ -975,7 +975,7 @@ config.libs = [
     {
         "lib": "OdemuExi2",
         "mw_version": "GC/1.2.5n",
-        "cflags": cflags_base,
+        "cflags": cflags_odemuexi,
         "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "OdemuExi2/DebuggerDriver.c"),

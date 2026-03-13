@@ -3495,10 +3495,10 @@ char GbaQueue::GetRadarType(int channel)
 	int radarType;
 
 	OSWaitSemaphore(semaphore);
-	radarType = static_cast<signed char>(obj[channel + 0x2D32]);
+	radarType = obj[channel + 0x2D32];
 	OSSignalSemaphore(semaphore);
 
-	return radarType;
+	return static_cast<signed char>(radarType);
 }
 
 /*

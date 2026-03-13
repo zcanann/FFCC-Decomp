@@ -260,12 +260,14 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    bool isSkinned = *(u32*)(*(u8**)((u8*)mesh + 8) + 0x54) != 0;
+    u8* meshData = *(u8**)((u8*)mesh + 8);
+    s32 isSkinned = *(u32*)(meshData + 0x54) != 0;
     S16Vec* workPositions = *(S16Vec**)mesh;
     u16* stream = (u16*)displayList;
+    u8* polygonBytes = (u8*)polygonData;
     Mtx meshMtx;
 
-    if (!isSkinned) {
+    if (isSkinned == 0) {
         PSMTXConcat(*(Mtx*)((u8*)model + 0x38),
                     *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x58) * 0xC0) + 0xC),
                     meshMtx);
@@ -274,18 +276,22 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
     for (;;) {
         u8 drawCmd = *(u8*)stream;
         u16 drawCount = *(u16*)((u8*)stream + 1);
-        stream = (u16*)((u8*)stream + 3);
-
         u8 primitive = drawCmd & 0xF8;
+        s16 triCount;
+        s32 outVertex;
+        u16* stripRestart;
+
+        stream = (u16*)((u8*)stream + 3);
         if (IsHasDrawFmtDL__5CUtilFUc((void*)gUtil, drawCmd) == 0) {
             break;
         }
 
-        s16 triCount = (s16)(drawCount - 2);
-        int outVertex = 0;
-        u16* stripRestart = 0;
+        triCount = (s16)(drawCount - 2);
+        outVertex = 0;
+        stripRestart = 0;
+
         if (primitive == 0x90) {
-            triCount = (s16)((u64)((s64)(int)(u32)drawCount * 0x55555556ULL) >> 32);
+            triCount = (s16)(((u64)((s64)(s32)(u32)drawCount * 0x55555556ULL)) >> 32);
         }
 
         for (;;) {
@@ -300,11 +306,12 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
             }
             stream = stripRestart;
 
-            if (isSkinned) {
+            if (isSkinned != 0) {
                 S16Vec* sourcePos = workPositions + posIndex;
-                *(s16*)((u8*)polygonData + (outVertex * 6) + 0x10) = sourcePos->x;
-                *(s16*)((u8*)polygonData + (outVertex * 6) + 0x12) = sourcePos->y;
-                *(s16*)((u8*)polygonData + (outVertex * 6) + 0x14) = sourcePos->z;
+                s32 positionOffset = outVertex * 6;
+                *(s16*)(polygonBytes + positionOffset + 0x10) = sourcePos->x;
+                *(s16*)(polygonBytes + positionOffset + 0x12) = sourcePos->y;
+                *(s16*)(polygonBytes + positionOffset + 0x14) = sourcePos->z;
             } else {
                 S16Vec* sourcePos = workPositions + posIndex;
                 S16Vec posQuantized;
@@ -316,14 +323,13 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &posFloat, &posQuantized,
                                                     *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
                 PSMTXMultVec(meshMtx, &posFloat, &posFloat);
-                ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil,
-                                                    (S16Vec*)((u8*)polygonData + (outVertex * 6) + 0x10), &posFloat,
+                ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, (S16Vec*)(polygonBytes + (outVertex * 6) + 0x10), &posFloat,
                                                     *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
             }
 
-            *(u16*)((u8*)polygonData + (outVertex * 2) + 0x22) = posIndex;
-            *(u16*)((u8*)polygonData + (outVertex * 2) + 0x2E) = texIndex;
-            *(u16*)((u8*)polygonData + (outVertex * 2) + 0x28) = nrmIndex;
+            *(u16*)(polygonBytes + (outVertex * 2) + 0x22) = posIndex;
+            *(u16*)(polygonBytes + (outVertex * 2) + 0x2E) = texIndex;
+            *(u16*)(polygonBytes + (outVertex * 2) + 0x28) = nrmIndex;
             outVertex++;
             stripRestart = previousRestart;
 
@@ -334,7 +340,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                         break;
                     }
                     outVertex = 0;
-                    polygonData++;
+                    polygonBytes += 0x34;
                 }
             } else if (primitive == 0x98) {
                 if (outVertex == 1) {
@@ -348,7 +354,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                         stream = previousRestart;
                     }
                     outVertex = 0;
-                    polygonData++;
+                    polygonBytes += 0x34;
                 }
             }
         }

@@ -11,6 +11,30 @@ struct Vec2d {
     float y;
 };
 
+struct pppColumValue {
+    float m_scaleStep;
+    float m_positionScale;
+    u8 m_colorR;
+    u8 m_colorG;
+    u8 m_colorB;
+    u8 _padB;
+};
+
+struct pppColumFrameWork {
+    s16 m_shapeA;
+    s16 m_shapeB;
+    s16 m_shapeC;
+    s16 _pad6;
+    pppColumValue* m_values;
+};
+
+struct pppColumPositionWork {
+    u8 _pad0[0x10];
+    Vec m_position;
+    u8 _pad1[0x1A];
+    u8 m_alpha;
+};
+
 static inline int* GetColumSerializedDataOffsets(void* param) {
     return *(int**)((char*)param + 0xc);
 }
@@ -49,25 +73,21 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
 void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
-    int iVar7 = serializedDataOffsets[3];
-    int iVar5 = serializedDataOffsets[2];
-    int frameOffset = iVar7 + 0x80;
-    int posOffset = iVar5 + 0x80;
-    u8* workFrame = (u8*)column + frameOffset;
-    u8* workPos = (u8*)column + posOffset;
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)((u8*)column + serializedDataOffsets[3] + 0x80);
+    pppColumPositionWork* positionWork = (pppColumPositionWork*)((u8*)column + serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
     u32 dataValIndex = param_2->m_dataValIndex;
     if (dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         void* texture;
-        u8 alpha = *(u8*)(workPos + 0x32);
+        u8 alpha = positionWork->m_alpha;
         pppCVector color;
         GXColor quadColor;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (alpha != 0) {
-            float* values = *(float**)(workFrame + 8);
+            pppColumValue* values = frameWork->m_values;
             u8 count = param_2->m_count;
             Mtx identityMtx;
             Vec basePos;
@@ -79,9 +99,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             float drawScale = 0.0f;
 
             PSMTXIdentity(identityMtx);
-            basePos.x = *(float*)(workPos + 0x10);
-            basePos.y = *(float*)(workPos + 0x14);
-            basePos.z = *(float*)(workPos + 0x18);
+            basePos = positionWork->m_position;
 
             cameraDelta.x = ppvCameraMatrix0[0][3] - basePos.x;
             cameraDelta.y = ppvCameraMatrix0[1][3] - basePos.y;
@@ -104,8 +122,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 float dist;
                 float fadeAmount;
 
-                center.x = basePos.x + ((cameraDelta.x * (float)(i + 1)) * segmentStep) * values[1];
-                center.y = basePos.y + ((cameraDelta.y * (float)(i + 1)) * segmentStep) * values[1];
+                center.x =
+                    basePos.x + ((cameraDelta.x * (float)(i + 1)) * segmentStep) * values->m_positionScale;
+                center.y =
+                    basePos.y + ((cameraDelta.y * (float)(i + 1)) * segmentStep) * values->m_positionScale;
                 center.z = 0.0f;
 
                 PSVECSubtract(&center, &basePos, &offset);
@@ -116,9 +136,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 if (dist < fadeRange && fadeAmount > 0.0f) {
                     color.m_rgba[3] = (u8)((float)color.m_rgba[3] * fadeAmount);
                 }
-                color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + *((u8*)values + 8);
-                color.m_rgba[1] = *((u8*)&param_2->m_stepValue + 1) + *((u8*)values + 9);
-                color.m_rgba[2] = *((u8*)&param_2->m_stepValue + 2) + *((u8*)values + 10);
+                color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
+                color.m_rgba[1] = *((u8*)&param_2->m_stepValue + 1) + values->m_colorG;
+                color.m_rgba[2] = *((u8*)&param_2->m_stepValue + 2) + values->m_colorB;
 
                 pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
                     &color, NULL, 0.0f, (u8)param_2->m_payload[0x15], (u8)param_2->m_payload[0x14],
@@ -132,13 +152,14 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 GXLoadTexObj((GXTexObj*)((char*)texture + 0x28), GX_TEXMAP0);
                 pppSetBlendMode__FUc(param_2->m_arg3);
 
-                drawScale += values[0];
-                shapeFrame = *(short*)((u8*)shapeSt->m_animData + (*(u16*)(workFrame + 2) * 8) + 0x10);
+                drawScale += values->m_scaleStep;
+                shapeFrame =
+                    *(short*)((u8*)shapeSt->m_animData + ((u16)frameWork->m_shapeB * 8) + 0x10);
                 for (int j = 0; j < *(short*)((u8*)shapeSt->m_animData + shapeFrame + 2); j++) {
-                    pppGetShapePos__FPlsR3VecR3Veci((long*)shapeSt->m_animData,
-                                                    *(short*)(workFrame + 2), shapePosA, shapePosB, j);
-                    pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shapeSt->m_animData,
-                                                       *(short*)(workFrame + 2), uvA, uvB, j);
+                    pppGetShapePos__FPlsR3VecR3Veci(
+                        (long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);
+                    pppGetShapeUV__FPlsR5Vec2dR5Vec2di(
+                        (long*)shapeSt->m_animData, frameWork->m_shapeB, uvA, uvB, j);
 
                     PSVECScale(&shapePosA, &shapePosA, drawScale);
                     PSVECScale(&shapePosB, &shapePosB, drawScale);
@@ -156,7 +177,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
                 EndQuadEnv__5CUtilFv(&gUtil);
                 pppSetBlendMode__FUc(0);
-                values += 3;
+                values++;
             }
         }
     }
@@ -175,26 +196,25 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 {
     if (gPppCalcDisabled == 0) {
         int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
-        float* values;
-        unsigned char* work = (unsigned char*)((char*)column + 0x80 + serializedDataOffsets[3]);
-        if (*(void**)(work + 8) == 0) {
+        pppColumFrameWork* work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
+        if (work->m_values == 0) {
             char* payload = param_2->m_payload;
             int i;
 
-            *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_values = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
                 s_pppColum_cpp_801DB638, 0x7d);
 
-            values = *(float**)(work + 8);
+            pppColumValue* values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values[0] = RandF__5CMathFf(*(float*)(payload + 4), &Math);
-                values[0] = values[0] + *(float*)(payload + 0);
-                values[1] = RandF__5CMathFf(*(float*)(payload + 0xc), &Math);
-                values[1] = values[1] + *(float*)(payload + 8);
-                *(unsigned char*)(values + 2) = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x16));
-                *(unsigned char*)((char*)values + 9) = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x17));
-                *(unsigned char*)((char*)values + 10) = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x18));
-                values += 3;
+                values->m_scaleStep = RandF__5CMathFf(*(float*)(payload + 4), &Math);
+                values->m_scaleStep = values->m_scaleStep + *(float*)(payload + 0);
+                values->m_positionScale = RandF__5CMathFf(*(float*)(payload + 0xc), &Math);
+                values->m_positionScale = values->m_positionScale + *(float*)(payload + 8);
+                values->m_colorR = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x16));
+                values->m_colorG = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x17));
+                values->m_colorB = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x18));
+                values++;
             }
         }
 
@@ -203,7 +223,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
                 **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
             pppCalcFrameShape__FPlRsRsRss(
                 animData,
-                *(short*)(work + 0), *(short*)(work + 2), *(short*)(work + 4), param_2->m_initWOrk);
+                work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);
         }
     }
 }

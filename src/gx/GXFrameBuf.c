@@ -145,9 +145,9 @@ void GXSetDispCopyDst(u16 wd, u16 ht) {
 }
 
 void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
-    u32 rowTiles;
-    u32 colTiles;
     u32 cmpTiles;
+    u32 colTiles;
+    u32 rowTiles;
     u32 peTexFmt;
 
     CHECK_GXBEGIN(1327, "GXSetTexCopyDst");

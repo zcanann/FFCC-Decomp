@@ -290,8 +290,8 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     const float cameraOffset = FLOAT_80331ce8;
     const float zero = FLOAT_80331cc4;
 
-    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
+    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
@@ -317,18 +317,18 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
     ScreenBreakDisplayList* displayList =
-        ((ScreenBreakModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + drawListIndex;
+        (((ScreenBreakModelView*)model)->m_meshes[meshIndex].m_data)->m_displayLists + drawListIndex;
 
-    if (*(u8*)((u8*)param_2 + 0x24) != 0) {
+    if (*(char*)((u8*)param_2 + 0x24) != '\0') {
         u8 colorStorage1[4];
         u32 colorPacked1;
         u8 colorStorage0[4];
         u32 colorPacked0;
-        CMaterialSet* materialSet = ((ScreenBreakModelView*)model)->m_data->m_materialSet;
-        u16 materialIdx = displayList->m_material;
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)materialSet + 8))[materialIdx];
+        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
+            (u8*)((ScreenBreakModelView*)model)->m_data->m_materialSet + 8))[displayList->m_material];
 
-        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, materialIdx, 1, 0);
+        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+            &MaterialMan, ((ScreenBreakModelView*)model)->m_data->m_materialSet, displayList->m_material, 1, 0);
         GXSetArray((GXAttr)0xB, (void*)((u8*)param_2 + 0x28), 4);
 
         if (*(u16*)((u8*)material + 0x18) == 1) {
@@ -779,8 +779,8 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
 
     if (value[0x24] == 0) {
-        GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
-            &Graphic, gRenderScratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
+        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8,
+                                   0);
         value[0x24] = 1;
     }
 }

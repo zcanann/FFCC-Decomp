@@ -273,7 +273,7 @@ int CGPrgObj::isLoopAnim()
 	signed char loopFlag = static_cast<unsigned char>(m_animFlags << 2);
 	signed char directFlag = static_cast<unsigned char>(m_animFlags << 1);
 
-	if ((loopFlag < 0) || (directFlag < 0) || (IsLoopAnim(2) == 0)) {
+	if ((loopFlag != 0) || (directFlag != 0) || ((int)IsLoopAnim(2) == 0)) {
 		return 0;
 	}
 

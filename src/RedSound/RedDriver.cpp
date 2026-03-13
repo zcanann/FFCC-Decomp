@@ -1491,7 +1491,9 @@ int CRedDriver::ReentryMusicData(int musicID)
  */
 void CRedDriver::MusicStop(int musicID)
 {
-    _EntryExecCommand(_MusicStop, musicID, 0, 0, 0, 0, 0, 0);
+    volatile int id = musicID;
+
+    _EntryExecCommand(_MusicStop, id, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1550,7 +1552,9 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
  */
 void CRedDriver::MusicMasterVolume(int volume)
 {
-    _EntryExecCommand(_MusicMasterVolume, volume, 0, 0, 0, 0, 0, 0);
+    volatile int value = volume;
+
+    _EntryExecCommand(_MusicMasterVolume, value, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1588,7 +1592,9 @@ void CRedDriver::MusicVolume(int param_1, int param_2, int param_3)
  */
 void CRedDriver::SetMusicPhraseStop(int stop)
 {
-    _EntryExecCommand(_SetMusicPhraseStop, stop, 0, 0, 0, 0, 0, 0);
+    volatile int flag = stop;
+
+    _EntryExecCommand(_SetMusicPhraseStop, flag, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1666,7 +1672,9 @@ void CRedDriver::SetSeSepData(void* param_1)
  */
 void CRedDriver::ClearSeSepData(int id)
 {
-    _EntryExecCommand(_ClearSeSepData, id, 0, 0, 0, 0, 0, 0);
+    volatile int seID = id;
+
+    _EntryExecCommand(_ClearSeSepData, seID, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1758,7 +1766,9 @@ int CRedDriver::SePlayState(int param_1)
  */
 void CRedDriver::SeStop(int id)
 {
-    _EntryExecCommand(_SeStop, id, 0, 0, 0, 0, 0, 0);
+    volatile int seID = id;
+
+    _EntryExecCommand(_SeStop, seID, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1807,7 +1817,9 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int p
  */
 void CRedDriver::SeMasterVolume(int volume)
 {
-    _EntryExecCommand(_SeMasterVolume, volume, 0, 0, 0, 0, 0, 0);
+    volatile int value = volume;
+
+    _EntryExecCommand(_SeMasterVolume, value, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -2035,8 +2047,9 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
  */
 void CRedDriver::StreamStop(int param_1)
 {
-	int streamID = param_1;
-	_EntryExecCommand(_StreamStop, streamID, 0, 0, 0, 0, 0, 0);
+    volatile int streamID = param_1;
+
+    _EntryExecCommand(_StreamStop, streamID, 0, 0, 0, 0, 0, 0);
 }
 
 /*

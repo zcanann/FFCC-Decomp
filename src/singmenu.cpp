@@ -1693,23 +1693,35 @@ int CMenuPcs::EquipChk(int itemNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801470b8
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
 {
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
-    int alphaInt = static_cast<int>(FLOAT_80332940 * alpha);
-    _GXColor color = { 0xFF, 0xFF, 0xFF, static_cast<u8>(alphaInt) };
+    _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(static_cast<int>(FLOAT_80332940 * alpha))};
     GXSetChanMatColor(GX_COLOR0A0, color);
+
+    union {
+        double value;
+        u32 words[2];
+    } xPos, yPos;
+
+    xPos.words[0] = 0x43300000;
+    xPos.words[1] = static_cast<u32>(x) ^ 0x80000000U;
+    yPos.words[0] = 0x43300000;
+    yPos.words[1] = static_cast<u32>(y) ^ 0x80000000U;
 
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x2C);
     DrawRect__8CMenuPcsFUlfffffffff(
-        &MenuPcs, 0, static_cast<float>(SingWinUIntToDouble(static_cast<unsigned int>(x))),
-        static_cast<float>(SingWinUIntToDouble(static_cast<unsigned int>(y))),
-        FLOAT_80332948, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+        &MenuPcs, 0, static_cast<float>(xPos.value - DOUBLE_80332938),
+        static_cast<float>(yPos.value - DOUBLE_80332938), FLOAT_80332948, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
         FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 

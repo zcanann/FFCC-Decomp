@@ -625,16 +625,18 @@ CMapAnim::~CMapAnim()
  */
 void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
 {
-    unsigned int chunkData[4];
-    unsigned int& chunkId = chunkData[0];
-    unsigned int& chunkSize = chunkData[3];
+    unsigned int outerChunkData[4];
+    unsigned int& chunkId = outerChunkData[0];
+    unsigned int innerChunkData[4];
+    unsigned int& innerChunkId = innerChunkData[0];
+    unsigned int& innerChunkSize = innerChunkData[3];
     int hasChunk;
     int* item;
     unsigned int keyData;
     int nodeIdx;
 
     chunkFile.PushChunk();
-    while ((hasChunk = chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData))) != 0) {
+    while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)))) != 0) {
         if (chunkId == 0x4652414D) {
             reinterpret_cast<int*>(this)[7] = static_cast<int>(chunkFile.Get4());
             reinterpret_cast<int*>(this)[8] = static_cast<int>(chunkFile.Get4());
@@ -647,11 +649,11 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             item[1] = reinterpret_cast<int>(this);
 
             chunkFile.PushChunk();
-            while ((hasChunk = chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData))) != 0) {
-                if (chunkId == 0x4E494458) {
+            while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
+                if (innerChunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
                     item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
-                } else if (chunkId == 0x5452414E) {
+                } else if (innerChunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
                         __nw__FUlPQ27CMemory6CStagePci(0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x4C));
                     if (keyData != 0) {
@@ -664,23 +666,23 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(
                         reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418),
                         reinterpret_cast<CMapAnimKeyDt*>(item[2]));
-                    *reinterpret_cast<unsigned int*>(item[2]) = chunkSize >> 4;
+                    *reinterpret_cast<unsigned int*>(item[2]) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x4) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
                             *reinterpret_cast<int*>(item[2]) << 4, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x4F));
-                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x4)), chunkFile.GetAddress(), chunkSize);
-                } else if (chunkId == 0x524F5420) {
-                    *reinterpret_cast<unsigned int*>(item[2] + 0x8) = chunkSize >> 4;
+                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x4)), chunkFile.GetAddress(), innerChunkSize);
+                } else if (innerChunkId == 0x524F5420) {
+                    *reinterpret_cast<unsigned int*>(item[2] + 0x8) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0xC) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
                             *reinterpret_cast<int*>(item[2] + 0x8) << 4, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x55));
-                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0xC)), chunkFile.GetAddress(), chunkSize);
-                } else if (chunkId == 0x5343414C) {
-                    *reinterpret_cast<unsigned int*>(item[2] + 0x10) = chunkSize >> 4;
+                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0xC)), chunkFile.GetAddress(), innerChunkSize);
+                } else if (innerChunkId == 0x5343414C) {
+                    *reinterpret_cast<unsigned int*>(item[2] + 0x10) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x14) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
                             *reinterpret_cast<int*>(item[2] + 0x10) << 4, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x5B));
-                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x14)), chunkFile.GetAddress(), chunkSize);
+                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x14)), chunkFile.GetAddress(), innerChunkSize);
                 }
             }
             chunkFile.PopChunk();

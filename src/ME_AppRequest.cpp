@@ -54,10 +54,10 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
     ZLIST* list;
     _ZLISTITEM* it[1];
-    int i;
-    ZCANMGRP* colAnmData;
-    int colAnmCount;
     RSDITEM* rsdItem;
+    int colAnmCount;
+    ZCANMGRP* colAnmData;
+    int i;
     RSDLISTITEM* listItem;
 
     list = zlist;

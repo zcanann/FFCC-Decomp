@@ -315,6 +315,7 @@ void RedDeleteA(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
 	int* bankA = (int*)(param1 + 0x2000);
@@ -328,6 +329,7 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	gRedAMemoryBase = param3;
 	gRedAMemorySize = param4;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

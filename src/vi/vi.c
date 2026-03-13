@@ -823,24 +823,30 @@ void VIConfigure(const GXRenderModeObj* rm) {
     setInterruptRegs(tm);
 
     regDspCfg = regs[1];
-    regClksel = regs[54];
     if (HorVer.nonInter == VI_PROGRESSIVE || HorVer.nonInter == 3) {
         regDspCfg = (((u32)(regDspCfg)) & ~0x00000004) | (((u32)(1)) << 2);
-        regClksel = (((u32)(regClksel)) & ~0x00000001) | (((u32)(1)) << 0);
     } else {
         OLD_SET_REG_FIELD(2052, regDspCfg, 1, 2, HorVer.nonInter & 1);
-        regClksel = (((u32)(regClksel)) & ~0x00000001);
     }
 
     OLD_SET_REG_FIELD(2056, regDspCfg, 1, 3, HorVer.threeD);
 
-    if ((HorVer.tv == VI_PAL) || (HorVer.tv == VI_MPAL) || (HorVer.tv == 3)) {
-        OLD_SET_REG_FIELD(2060, regDspCfg, 2, 8, HorVer.tv);
-    } else {
+    if ((HorVer.tv == VI_DEBUG_PAL) || (HorVer.tv == VI_EURGB60) || (HorVer.tv == VI_GCA)) {
         regDspCfg = (((u32)(regDspCfg)) & ~0x00000300);
+    } else {
+        OLD_SET_REG_FIELD(2060, regDspCfg, 2, 8, HorVer.tv);
     }
 
     regs[1] = regDspCfg;
+
+    regClksel = regs[54];
+    if (rm->viTVmode == VI_TVMODE_NTSC_PROG ||
+        rm->viTVmode == VI_TVMODE_NTSC_3D ||
+        rm->viTVmode == VI_TVMODE_GCA_PROG) {
+        regClksel = (((u32)(regClksel)) & ~0x00000001) | (((u32)(1)) << 0);
+    } else {
+        regClksel = (((u32)(regClksel)) & ~0x00000001);
+    }
     regs[54] = (u16)regClksel;
 
     MARK_CHANGED(1);    

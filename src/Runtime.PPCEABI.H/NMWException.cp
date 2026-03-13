@@ -245,15 +245,13 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
  */
 extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
 {
-	size_t elementSize = size;
-	size_t count       = n;
-	char* current      = (char*)ptr;
+	char* current = (char*)ptr;
 
-	__partial_array_destructor pdestructor(ptr, elementSize, count, dtor);
+	__partial_array_destructor pdestructor(ptr, size, n, dtor);
 	pdestructor.i = 0;
-	for (; pdestructor.i < count; pdestructor.i = pdestructor.i + 1) {
+	for (; pdestructor.i < n; pdestructor.i = pdestructor.i + 1) {
 		CTORCALL_COMPLETE(ctor, current);
-		current = current + elementSize;
+		current = current + size;
 	}
 }
 

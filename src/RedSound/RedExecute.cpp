@@ -386,15 +386,15 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
     int* bestVoice = 0;
     int* voice;
-    int* voiceEnd;
     int bestEnvelope;
+    int* voiceEnd;
     int* selectedVoice;
     int trackAddr = (int)track;
 
     if ((((u8*)track)[0x26] & 5) == 0) {
         voice = (int*)DAT_8032f444;
         if ((((u8*)track)[0x26] & 8) == 0) {
-            voice = (int*)DAT_8032f444 + (s8)*((u8*)DAT_8032f3f4 + 0x490) * 0x30;
+            voice = (int*)DAT_8032f444 + *(s8*)((u8*)DAT_8032f3f4 + 0x490) * 0x30;
         }
 
         bestEnvelope = 0x8000;
@@ -407,6 +407,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
                     }
                     break;
                 }
+
                 if (voice[0x2C] < bestEnvelope) {
                     bestEnvelope = voice[0x2C];
                     bestVoice = voice;
@@ -415,26 +416,26 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             voice += 0x30;
         } while (voice < voiceEnd);
 
-        selectedVoice = voice;
         if (voice == voiceEnd) {
-            *(u32*)((u8*)DAT_8032f3f4 + 0x488) |= 2;
-            selectedVoice = bestVoice;
+            *(u32*)((u8*)DAT_8032f3f4 + 0x488) = *(u32*)((u8*)DAT_8032f3f4 + 0x488) | 2;
+            voice = bestVoice;
             if (bestEnvelope == 0x8000) {
-                selectedVoice = 0;
+                voice = 0;
             }
         }
-    } else if (((((u8*)track)[0x26] & 1) == 0) &&
-               (((int*)DAT_8032f444)[(s8)((u8*)track)[0x14E] * 0x30] != 0) &&
-               (((int*)DAT_8032f444)[(s8)((u8*)track)[0x14E] * 0x30] != trackAddr)) {
+        selectedVoice = voice;
+    } else if (((((u8*)track)[0x26] & 1) == 0) && (DAT_8032f444[(s8)((u8*)track)[0x14E] * 0x30] != 0) &&
+               (DAT_8032f444[(s8)((u8*)track)[0x14E] * 0x30] != (u32)trackAddr)) {
         selectedVoice = 0;
     } else {
         selectedVoice = (int*)DAT_8032f444 + (s8)((u8*)track)[0x14E] * 0x30;
     }
 
     if (selectedVoice != 0) {
-        selectedVoice[0x24] &= 0xFFFFFFFD;
+        selectedVoice[0x24] = selectedVoice[0x24] & 0xFFFFFFFD;
         selectedVoice[0x2C] = 0x8000;
     }
+
     return (RedVoiceDATA*)selectedVoice;
 }
 

@@ -113,11 +113,11 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         }
 
         s32 count = data->spawnCount;
+        MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
 
         switch (data->mode) {
-        case 0: {
-            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-            do {
+        case 0:
+            while (count-- != 0) {
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
@@ -131,8 +131,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
                     s32 childId = data->childId;
+                    _pppPObject* child;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -159,7 +159,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, dst);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
         case 1: {
@@ -175,8 +175,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    _pppPObject* child;
                     s32 childId = data->childId;
+                    _pppPObject* child;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -203,9 +203,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, dst);
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
-        }
         default:
             break;
         }

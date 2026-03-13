@@ -43,6 +43,8 @@ extern float FLOAT_80330368;
 extern float FLOAT_80330364;
 extern float FLOAT_8033036c;
 extern float FLOAT_80330360;
+extern float FLOAT_80330370;
+extern float FLOAT_80330374;
 extern double DOUBLE_80330348;
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
@@ -2044,22 +2046,41 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  */
 void CGObject::SetDispItemName(int showName)
 {
-    signed char showName8 = static_cast<signed char>(showName);
     u8 flags = *((u8*)&m_shieldNodeFlags);
-    u8 timer = 13;
-
-    *((u8*)&m_shieldNodeFlags) = ((showName8 << 4) & 0x10) | (flags & 0xEF);
-    m_dispItemTimer = timer;
+    u8 masked = flags;
+    masked = (u8)__rlwimi(masked, (signed char)showName, 4, 27, 27);
+    *((u8*)&m_shieldNodeFlags) = masked;
+    m_dispItemTimer = 13;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c65c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::DrawDebug(CFont*)
+void CGObject::DrawDebug(CFont* font)
 {
-	// TODO
+    if ((static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1A)
+                          | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 6))
+         < 0)
+        && (sZeroFloat < m_screenDepth)) {
+        float invDepth = sAnimFrameOffset / m_screenDepth;
+        float screenX[2];
+        screenX[0] = -(FLOAT_80330374 * m_projection.z * invDepth - FLOAT_80330374);
+
+        typedef void (*OnDrawDebugFn)(CGObject*, CFont*, float, float&, float);
+        void** vtable = *reinterpret_cast<void***>(this);
+        OnDrawDebugFn fn = reinterpret_cast<OnDrawDebugFn>(vtable[16]);
+        fn(this,
+           font,
+           FLOAT_80330370 * m_projection.y * invDepth + FLOAT_80330370,
+           screenX[0],
+           m_projection.w * invDepth);
+    }
 }
 
 /*

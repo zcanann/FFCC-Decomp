@@ -424,6 +424,42 @@ void CFunnyShapePcs::drawViewer()
 
 /*
  * --INFO--
+ * PAL Address: 0x8004e69c
+ * PAL Size: 136b
+ */
+template <>
+void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
+{
+    for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
+        void* item = items[i];
+        if (item != 0) {
+            __dl__FPv(item);
+            items[i] = 0;
+        }
+    }
+    RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004e724
+ * PAL Size: 136b
+ */
+template <>
+void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
+{
+    for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
+        void* item = items[i];
+        if (item != 0) {
+            __dl__FPv(item);
+            items[i] = 0;
+        }
+    }
+    RemoveAll();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004e7ac
  * PAL Size: 76b
  */
@@ -452,52 +488,6 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
     }
     numItems = 0;
     size = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e69c
- * PAL Size: 136b
- */
-template <>
-void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
-{
-    for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
-        void* item = items[i];
-        if (item != 0) {
-            __dl__FPv(item);
-            items[i] = 0;
-        }
-    }
-    if (items != 0) {
-        __dla__FPv(items);
-        items = 0;
-    }
-    size = 0;
-    numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e724
- * PAL Size: 136b
- */
-template <>
-void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
-{
-    for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
-        void* item = items[i];
-        if (item != 0) {
-            __dl__FPv(item);
-            items[i] = 0;
-        }
-    }
-    if (items != 0) {
-        __dla__FPv(items);
-        items = 0;
-    }
-    size = 0;
-    numItems = 0;
 }
 
 /*

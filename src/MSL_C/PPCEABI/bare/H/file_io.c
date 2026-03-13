@@ -6,7 +6,10 @@
 
 inline FILE* freopen(const char* name, const char* mode, FILE* file)
 {
-	file_modes	modes;
+	union {
+		file_modes bits;
+		unsigned int raw;
+	} modes;
 	
 	__stdio_atexit();
 	
@@ -16,19 +19,19 @@ inline FILE* freopen(const char* name, const char* mode, FILE* file)
 	fclose(file);
 	clearerr(file);
 	
-	if (!__get_file_modes(mode, &modes))
+	if (!__get_file_modes(mode, &modes.bits))
 		return(NULL);
 	
-	__init_file(file, modes, 0, 0x400);
+	__init_file(file, modes.raw, 0, 0x400);
 	
-	if (__open_file(name, modes, &file->handle))
+	if (__open_file(name, modes.bits, &file->handle))
 	{
 		file->file_mode.file_kind = __closed_file;
 	    if (file->file_state.free_buffer)
 	    	free(file->buffer);
 		return(NULL);
 	}
-	if (modes.io_mode & __append)
+	if (modes.bits.io_mode & __append)
 		fseek(file, 0, SEEK_END);
 	
 	return(file);

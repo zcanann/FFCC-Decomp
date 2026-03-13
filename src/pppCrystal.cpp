@@ -37,11 +37,6 @@ static const float FLOAT_80330fc0 = 0.5f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-static inline float CameraPerspectiveFov()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
-}
-
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 void pppSetBlendMode__FUc(unsigned char);
@@ -300,7 +295,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	} else {
 		C_MTXLightPerspective(
-			lightMtx, CameraPerspectiveFov(), FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
+			lightMtx, CameraPcs._252_4_, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	}
 
 	GXLoadTexMtxImm(texMtx, 0x40, GX_MTX3x4);

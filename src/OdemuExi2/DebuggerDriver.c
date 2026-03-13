@@ -272,6 +272,7 @@ u32 DBQueryData(void) {
         DBGReadStatus(mailbox);
         if ((mailbox[0] & 1) != 0) {
             DBGReadMailbox(mailbox);
+            mailbox[0] &= ~7;
             if ((mailbox[0] & 0x1f000000) == 0x1f000000) {
                 SendMailData = mailbox[0];
                 RecvDataLeng = mailbox[0] & 0x7fff;

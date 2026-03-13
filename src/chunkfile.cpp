@@ -121,7 +121,7 @@ unsigned char* CChunkFile::GetAddress()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CChunkFile::GetNextChunk(CChunk& outChunk)
+int CChunkFile::GetNextChunk(CChunk& outChunk)
 {
     int skip;
 

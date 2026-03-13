@@ -70,7 +70,7 @@ u16 __OSWirelessPadFixMode AT_ADDRESS(OS_BASE_CACHED | 0x30E0);
 
 // unknowns
 OSThread* __gUnkThread1 AT_ADDRESS(OS_BASE_CACHED | 0x00D8);
-int __gUnknown800030C0[2] AT_ADDRESS(OS_BASE_CACHED | 0x30C0);
+int __EXIProbeStartTime[2] AT_ADDRESS(OS_BASE_CACHED | 0x30C0);
 u8 __gUnknown800030E3 AT_ADDRESS(OS_BASE_CACHED | 0x30E3);
 #else
 #define __OSBusClock  (*(u32*)(OS_BASE_CACHED | 0x00F8))

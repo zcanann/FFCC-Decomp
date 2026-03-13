@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include "dolphin/exi.h"
 
+#pragma scheduling off
+
 #define REG_MAX 5
 #define REG(chan, idx) (__EXIRegs[((chan) * REG_MAX) + (idx)])
 
@@ -38,9 +40,7 @@ u32 EXIClearInterrupts(s32 chan, int exi, int tc, int ext);
 static int __EXIProbe(s32 chan);
 
 static void SetExiInterruptMask(s32 chan, EXIControl* exi) {
-    EXIControl* exi2;
-    exi2 = Ecb;
-    exi2 += 2;
+    EXIControl* exi2 = &Ecb[2];
 
     switch (chan) {
     case 0:
@@ -103,42 +103,38 @@ static void CompleteTransfer(s32 chan) {
 int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     BOOL enabled;
     EXIControl* exi;
+    u32 data;
+    int i;
 
-    ASSERTLINE(404, Ecb[chan].state & STATE_SELECTED);
+    exi = &Ecb[chan];
+    ASSERTLINE(404, exi->state & STATE_SELECTED);
     ASSERTLINE(405, 0 <= chan && chan < MAX_CHAN);
     ASSERTLINE(406, 0 < len && len <= MAX_IMM);
     ASSERTLINE(407, type < MAX_TYPE);
 
     enabled = OSDisableInterrupts();
-    if ((Ecb[chan].state & STATE_BUSY) || !(Ecb[chan].state & STATE_SELECTED)) {
+    if ((exi->state & STATE_BUSY) || !(exi->state & STATE_SELECTED)) {
         OSRestoreInterrupts(enabled);
         return 0;
     }
-    exi = &Ecb[chan];
 
     exi->tcCallback = callback;
-    if (exi->tcCallback != 0) {
+    if (exi->tcCallback) {
         EXIClearInterrupts(chan, 0, 1, 0);
         __OSUnmaskInterrupts(0x200000U >> (chan * 3));
     }
 
     exi->state |= STATE_IMM;
-    if (type != 0) {
-        u32 data = 0;
-        u8* immBuf = buf;
-        s32 i;
-
+    if (type != EXI_READ) {
+        data = 0;
         for (i = 0; i < len; i++) {
-            data |= *immBuf++ << ((3 - i) * 8);
+            data |= ((u8*)buf)[i] << ((3 - i) * 8);
         }
         __EXIRegs[(chan * 5) + 4] = data;
     }
 
     exi->immBuf = buf;
-    exi->immLen = len;
-    if (type == EXI_WRITE) {
-        exi->immLen = 0;
-    }
+    exi->immLen = (type != EXI_WRITE) ? len : 0;
     __EXIRegs[(chan * 5) + 3] = (type << 2) | 1 | ((len - 1) << 4);
     OSRestoreInterrupts(enabled);
     return 1;
@@ -269,7 +265,7 @@ EXICallback EXISetExiCallback(s32 chan, EXICallback exiCallback) {
 }
 
 void EXIProbeReset() {
-    __gUnknown800030C0[0] = __gUnknown800030C0[1] = 0;
+    __EXIProbeStartTime[0] = __EXIProbeStartTime[1] = 0;
     Ecb[0].idTime = Ecb[1].idTime = 0;
     __EXIProbe(0);
     __EXIProbe(1);
@@ -295,25 +291,25 @@ static int __EXIProbe(s32 chan) {
     if (!(exi->state & STATE_ATTACHED)) {
         if (cpr & 0x800) {
             EXIClearInterrupts(chan, 0, 0, 1);
-            __gUnknown800030C0[chan] = exi->idTime = 0;
+            __EXIProbeStartTime[chan] = exi->idTime = 0;
         }
 
         if (cpr & 0x1000) {
             t = ((s32)(OSTicksToMilliseconds(OSGetTime()) / 100) + 1);
 
-            if (__gUnknown800030C0[chan] == 0) {
-                __gUnknown800030C0[chan] = t;
+            if (__EXIProbeStartTime[chan] == 0) {
+                __EXIProbeStartTime[chan] = t;
             }
 
-            if (t - (s32)__gUnknown800030C0[chan] < 3) {
+            if (t - (s32)__EXIProbeStartTime[chan] < 3) {
                 rc = 0;
             }
         } else {
-            __gUnknown800030C0[chan] = exi->idTime = 0;
+            __EXIProbeStartTime[chan] = exi->idTime = 0;
             rc = 0;
         }
     } else if(!(cpr & 0x1000) || (cpr & 0x800)) {
-        __gUnknown800030C0[chan] = exi->idTime = 0;
+        __EXIProbeStartTime[chan] = exi->idTime = 0;
         rc = 0;
     }
 
@@ -339,7 +335,7 @@ s32 EXIProbeEx(s32 chan) {
         return 1;
     }
 
-    if (__gUnknown800030C0[chan]) {
+    if (__EXIProbeStartTime[chan]) {
         return 0;
     }
 
@@ -533,25 +529,23 @@ int EXIDeselect(s32 chan) {
 }
 
 static void EXIIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
-    EXIControl* exi;
-    OSContext* savedContext;
     s32 chan;
+    EXIControl* exi;
+    EXICallback callback;
 
-    savedContext = context;
-    chan = (u32)(interrupt - __OS_INTERRUPT_EXI_0_EXI) / 3;
-
+    chan = (interrupt - __OS_INTERRUPT_EXI_0_EXI) / 3;
     ASSERTLINE(1071, 0 <= chan && chan < MAX_CHAN);
-    REG(chan, 0) = (REG(chan, 0) & 0x7F5) | 2;
-
     exi = &Ecb[chan];
-    if (exi->exiCallback) {
+    EXIClearInterrupts(chan, 1, 0, 0);
+    callback = exi->exiCallback;
+    if (callback) {
         OSContext exceptionContext;
 
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
-        exi->exiCallback(chan, savedContext);
+        callback(chan, context);
         OSClearContext(&exceptionContext);
-        OSSetCurrentContext(savedContext);
+        OSSetCurrentContext(context);
     }
 }
 
@@ -584,10 +578,10 @@ static void TCIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
 
 static void EXTIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     s32 chan;
-    EXICallback callback;
     EXIControl* exi;
+    EXICallback callback;
 
-    chan = (u32)(interrupt - __OS_INTERRUPT_EXI_0_EXT) / 3;
+    chan = (interrupt - __OS_INTERRUPT_EXI_0_EXT) / 3;
 
     ASSERTLINE(1147, 0 <= chan && chan < 2);
     __OSMaskInterrupts(0x500000U >> (chan * 3));
@@ -702,11 +696,8 @@ int EXIUnlock(s32 chan) {
 }
 
 u32 EXIGetState(s32 chan) {
-    EXIControl* exi;
-
-    exi = &Ecb[chan];
-    ASSERTLINE(1343, 0 <= chan && chan < MAX_CHAN);
-    return exi->state;
+    EXIControl* exi = &Ecb[chan];
+    return (u32)exi->state;
 }
 
 static void UnlockedHandler(s32 chan, OSContext* context) {
@@ -732,7 +723,7 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
             return 0;
         }
 
-        if (exi->idTime == __gUnknown800030C0[chan]) {
+        if (exi->idTime == __EXIProbeStartTime[chan]) {
             *id = exi->id;
             return exi->idTime;
         }
@@ -741,7 +732,7 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
             return 0;
         }
 
-        startTime = __gUnknown800030C0[chan];
+        startTime = __EXIProbeStartTime[chan];
     }
 
     enabled = OSDisableInterrupts();
@@ -766,7 +757,7 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
     if ((chan < 2) && (dev == 0)) {
         EXIDetach(chan);
         enabled = OSDisableInterrupts();
-        err |= __gUnknown800030C0[chan] != startTime;
+        err |= __EXIProbeStartTime[chan] != startTime;
         
         if (!err) {
             exi->id = *id;
@@ -882,3 +873,5 @@ char* EXIGetTypeString(u32 type) {
         return "Unknown";
     }
 }
+
+#pragma scheduling reset

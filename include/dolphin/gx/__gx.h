@@ -400,7 +400,7 @@ void __GXSetRange(f32 nearz, f32 fgSideX);
 void __GetImageTileCount(GXTexFmt fmt, u16 wd, u16 ht, u32* rowTiles, u32* colTiles, u32* cmpTiles);
 void __GXSetSUTexRegs(void);
 void __GXGetSUTexSize(GXTexCoordID coord, u16* width, u16* height);
-void __GXSetTmemConfig(u32 config);
+void __GXSetTmemConfig(int config);
 
 /* GXTransform */
 void __GXSetMatrixIndex(GXAttr matIdxAttr);

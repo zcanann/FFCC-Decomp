@@ -697,17 +697,18 @@ void GXLoadTexObj(GXTexObj* obj, GXTexMapID id) {
 }
 
 void GXInitTlutObj(GXTlutObj* tlut_obj, void* lut, GXTlutFmt fmt, u16 n_entries) {
-    __GXTlutObjInt* t = (__GXTlutObjInt*)tlut_obj;
-
     ASSERTMSGLINE(1350, tlut_obj, "TLut Object Pointer is null");
     CHECK_GXBEGIN(1351, "GXInitTlutObj");
     ASSERTMSGLINEV(1354, n_entries <= 0x4000, "%s: number of entries exceeds maximum", "GXInitTlutObj");
     ASSERTMSGLINEV(1356, ((u32)lut & 0x1F) == 0, "%s: %s pointer not aligned to 32B", "GXInitTlutObj", "Tlut");
-    t->tlut = 0;
-    t->tlut = (t->tlut & 0xFFFFF3FF) | ((u32)fmt << 10);
-    t->loadTlut0 = (t->loadTlut0 & 0xFFE00000) | (((u32)lut >> 5) & 0x1FFFFFF);
-    t->loadTlut0 = (t->loadTlut0 & 0x00FFFFFF) | 0x64000000;
-    t->numEntries = n_entries;
+    ((__GXTlutObjInt*)tlut_obj)->tlut = 0;
+    ((__GXTlutObjInt*)tlut_obj)->tlut =
+        (((__GXTlutObjInt*)tlut_obj)->tlut & 0xFFFFF3FF) | ((u32)fmt << 10);
+    ((__GXTlutObjInt*)tlut_obj)->loadTlut0 =
+        (((__GXTlutObjInt*)tlut_obj)->loadTlut0 & 0xFFE00000) | (((u32)lut >> 5) & 0x1FFFFFF);
+    ((__GXTlutObjInt*)tlut_obj)->loadTlut0 =
+        (((__GXTlutObjInt*)tlut_obj)->loadTlut0 & 0x00FFFFFF) | 0x64000000;
+    ((__GXTlutObjInt*)tlut_obj)->numEntries = n_entries;
 }
 
 void GXGetTlutObjAll(const GXTlutObj* tlut_obj, void **data, GXTlutFmt* format, u16* numEntries) {

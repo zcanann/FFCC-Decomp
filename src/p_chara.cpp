@@ -23,6 +23,7 @@ extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
+extern "C" unsigned char MiniGamePcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
@@ -1003,9 +1004,15 @@ void CCharaPcs::CHandle::Calc()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::Draw(int)
+void CCharaPcs::CHandle::Draw(int drawPass)
 {
-	// TODO
+	unsigned int miniGameFlags = *reinterpret_cast<unsigned int*>(MiniGamePcs + 0x25732);
+	if ((miniGameFlags & 0x8000) != 0) {
+		if ((drawPass == 4) && ((m_flags & 0x10000) != 0)) {
+			draw(3, 0);
+		}
+		draw(drawPass, (4U - drawPass | drawPass - 4U) >> 0x1F);
+	}
 }
 
 /*

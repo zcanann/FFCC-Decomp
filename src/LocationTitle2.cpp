@@ -298,6 +298,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             Vec matrixPos;
             Vec cameraPos;
             Vec look;
+            Vec lookNorm;
             Vec side;
             Vec up;
 
@@ -314,12 +315,12 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 return;
             }
 
-            PSVECNormalize(&look, &look);
-            side.x = look.z;
+            PSVECNormalize(&look, &lookNorm);
+            side.x = lookNorm.z;
             side.y = 0.0f;
-            side.z = -look.x;
+            side.z = -lookNorm.x;
 
-            if ((look.z == 0.0f) && (side.z == 0.0f)) {
+            if ((lookNorm.z == 0.0f) && (side.z == 0.0f)) {
                 side.x = 1.0f;
                 side.z = 0.0f;
                 up.x = 0.0f;
@@ -327,7 +328,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 up.z = 1.0f;
             } else {
                 PSVECNormalize(&side, &side);
-                PSVECCrossProduct(&look, &side, &up);
+                PSVECCrossProduct(&lookNorm, &side, &up);
                 PSVECNormalize(&up, &up);
             }
 
@@ -337,9 +338,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             pppMngStPtr->m_matrix.value[0][1] = up.x;
             pppMngStPtr->m_matrix.value[1][1] = up.y;
             pppMngStPtr->m_matrix.value[2][1] = up.z;
-            pppMngStPtr->m_matrix.value[0][2] = look.x;
-            pppMngStPtr->m_matrix.value[1][2] = look.y;
-            pppMngStPtr->m_matrix.value[2][2] = look.z;
+            pppMngStPtr->m_matrix.value[0][2] = lookNorm.x;
+            pppMngStPtr->m_matrix.value[1][2] = lookNorm.y;
+            pppMngStPtr->m_matrix.value[2][2] = lookNorm.z;
         }
 
         for (u16 i = 0; i < work->m_count; i++) {

@@ -290,8 +290,8 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     const float cameraOffset = FLOAT_80331ce8;
     const float zero = FLOAT_80331cc4;
 
-    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
+    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
     lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 

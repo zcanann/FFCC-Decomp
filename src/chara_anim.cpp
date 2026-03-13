@@ -169,19 +169,16 @@ CChara::CAnim::CAnim()
 	__ct__4CRefFv(this);
 	anim.m_vtable = __vt__Q26CChara5CAnim;
 	anim.m_nodeCount = 0;
-	anim.m_frameCount = 0;
 	anim.m_nodes = 0;
 	anim.m_bank = 0;
-	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), 1, 7, 24, 24));
-	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), 0, 6, 25, 25));
+	anim.m_flags = static_cast<unsigned char>(__rlwimi(anim.m_flags, 1, 7, 24, 24));
+	anim.m_flags = static_cast<unsigned char>(__rlwimi(anim.m_flags, 0, 6, 25, 25));
 	anim.m_quantizeX = 5;
 	anim.m_quantizeY = 0xB;
 	anim.m_quantizeZ = 10;
 	anim.m_interp = 0;
 	anim.m_interpOffset = 0;
-	anim.m_stage = 0;
+	anim.m_stage = reinterpret_cast<CMemory::CStage*>(0);
 	anim.m_bankSize = 0;
 	anim.m_bankAddress = 0;
 	anim.m_lastFrame = 0;

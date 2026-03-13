@@ -14,7 +14,7 @@ public:
     void onFrame();
     void bonus(int, int, CGPrgObj*);
     virtual void onFrameAlways();
-    void onFrameAlwaysAfter();
+    virtual void onFrameAlwaysAfter();
     virtual void onDamaged(CGPrgObj*);
     virtual void onAttacked(CGPrgObj*);
     virtual void onCancelStat(int);

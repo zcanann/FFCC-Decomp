@@ -122,36 +122,37 @@ static BOOL DBGReadMailbox(u32* p1) {
 #pragma dont_inline reset
 
 static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
+    u32 regs;
     u32 result;
     u32 value;
-    volatile u32* exi;
 
-    value = ((count & 0x1fffc) << 8) | 0x20000000;
-    exi = &__EXIRegs[10];
-    *exi = (*exi & 0x405) | 0xC0;
+    value = ((count & 0x1FFFC) << 8) | 0x20000000;
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xC0;
+    result = (u32)__cntlzw(DBGEXIImm(&value, 4, TRUE));
+    result >>= 5;
+    do {
+        regs = __EXIRegs[13];
+    } while (regs & 1);
 
-    result = ((u32)__cntlzw(DBGEXIImm((u8*)&value, 4, TRUE))) >> 5;
-    while (__EXIRegs[13] & 1) {
-    }
-
-    while (TRUE) {
-        if (param3 == 0) {
-            break;
-        }
-        result |= ((u32)__cntlzw(DBGEXIImm((u8*)&value, 4, FALSE))) >> 5;
-        while (__EXIRegs[13] & 1) {
-        }
-
-        *buffer++ = value;
+    while (param3 != 0) {
+        regs = (u32)__cntlzw(DBGEXIImm(&value, 4, FALSE));
+        result |= regs >> 5;
+        do {
+            regs = __EXIRegs[13];
+        } while (regs & 1);
         param3 -= 4;
+        *buffer = value;
+        buffer++;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    result = (u32)__cntlzw(result) >> 5;
-    *exi &= 0x405;
-    return result;
+    regs = __EXIRegs[10];
+    result = (u32)__cntlzw(result);
+    __EXIRegs[10] = regs & 0x405;
+    return result >> 5;
 }
 
 /*
@@ -164,38 +165,39 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
+    u32 regs;
     u32 result;
-    u32 word;
+    u32 value;
     u32* bufferWords;
-    volatile u32* exi;
 
     bufferWords = (u32*)buffer;
-    word = ((count & 0x1FFFC) << 8) | 0xA0000000;
-    exi = &__EXIRegs[10];
-    *exi = (*exi & 0x405) | 0xC0;
+    value = ((count & 0x1FFFC) << 8) | 0xA0000000;
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xC0;
+    result = (u32)__cntlzw(DBGEXIImm(&value, 4, TRUE));
+    result >>= 5;
+    do {
+        regs = __EXIRegs[13];
+    } while (regs & 1);
 
-    result = (u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE)) >> 5;
-    while (__EXIRegs[13] & 1) {
-    }
-
-    while (TRUE) {
-        if (param3 == 0) {
-            break;
-        }
-        word = *bufferWords++;
-        result |= ((u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE))) >> 5;
-        while (__EXIRegs[13] & 1) {
-        }
-
+    while (param3 != 0) {
+        value = *bufferWords;
+        bufferWords++;
+        regs = (u32)__cntlzw(DBGEXIImm(&value, 4, TRUE));
+        result |= regs >> 5;
+        do {
+            regs = __EXIRegs[13];
+        } while (regs & 1);
         param3 -= 4;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    result = (u32)__cntlzw(result) >> 5;
-    *exi &= 0x405;
-    return result;
+    regs = __EXIRegs[10];
+    result = (u32)__cntlzw(result);
+    __EXIRegs[10] = regs & 0x405;
+    return result >> 5;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {

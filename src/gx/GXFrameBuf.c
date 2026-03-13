@@ -320,22 +320,19 @@ f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
 }
 
 u32 GXSetDispCopyYScale(f32 vscale) {
-    GXData* gxData;
     u32 iScale;
-    u32 copyYScaleEnable;
+    GXBool copyYScaleEnable;
 
     CHECK_GXBEGIN(1557, "GXSetDispCopyYScale");
 
     ASSERTMSGLINE(1559, vscale >= 1.0f, "GXSetDispCopyYScale: Vertical scale must be >= 1.0");
 
     iScale = (u32)(256.0f / vscale) & 0x1FF;
-    gxData = __GXData;
-
     GX_WRITE_RAS_REG((iScale & 0x1FF) | 0x4E000000);
     copyYScaleEnable = (iScale != 0x100);
-    gxData->bpSentNot = 0;
-    gxData->cpDisp = (gxData->cpDisp & ~0x400) | (copyYScaleEnable << 10);
-    return __GXGetNumXfbLines((((u32)gxData->cpDispSize >> 10) & 0x3FF) + 1, iScale);
+    __GXData->bpSentNot = 0;
+    __GXData->cpDisp = (__GXData->cpDisp & ~0x400) | ((u32)copyYScaleEnable << 10);
+    return __GXGetNumXfbLines((((u32)__GXData->cpDispSize >> 10) & 0x3FF) + 1, iScale);
 }
 
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {

@@ -16,8 +16,6 @@ static u8 EXIInputFlag;
 
 static u8 SendCount = 0x80;
 
-#define IS_TRUE(x) ((x) != FALSE)
-#define IS_FALSE(x) !IS_TRUE(x)
 #define ROUND_UP(x, align) (((x) + (align)-1) & (-(align)))
 
 void DBGEXIInit() {
@@ -89,78 +87,73 @@ static BOOL DBGEXIImm(u8* buffer, s32 bytecounter, s32 write) {
 }
 
 static BOOL DBGWriteMailbox(u32 p1) {
-    u32 cmd = 0xc0000000;
-    u32 v;
-    u32 base = p1;
-    BOOL total = FALSE;
+    u32 cmd = 0xC0000000;
+    u32 value;
+    BOOL result = FALSE;
 
     DBGEXISelect(4);
-    v = (base & 0x1fffffff) | (cmd);
-    total |= IS_FALSE(DBGEXIImm((u8*)&v, sizeof(v), 1));
-    total |= IS_FALSE(DBGEXISync());
-    total |= IS_FALSE(DBGEXIDeselect());
+    value = (p1 & 0x1FFFFFFF) | cmd;
+    result |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
+    result |= !DBGEXISync();
+    result |= !DBGEXIDeselect();
 
-    return IS_FALSE(total);
+    return !result;
 }
 
 #pragma dont_inline on
 static BOOL DBGReadMailbox(u32* p1) {
-    u32 busyFlag;
-    u32 regs;
     u32 result;
-    u32 cmd;
+    u32 regs;
+    volatile u32* exi;
 
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xc0;
+    regs = 0x60000000;
+    exi = &__EXIRegs[10];
+    *exi = (*exi & 0x405) | 0xC0;
+    result = (u32)__cntlzw(DBGEXIImm((u8*)&regs, 2, TRUE)) >> 5;
+    while (__EXIRegs[13] & 1) {
+    }
 
-    cmd = 0x60000000;
-    result = ((u32)__cntlzw(DBGEXIImm((u8*)&cmd, 2, TRUE))) >> 5;
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
+    result |= (u32)__cntlzw(DBGEXIImm((u8*)p1, 4, FALSE)) >> 5;
+    while (__EXIRegs[13] & 1) {
+    }
 
-    result |= ((u32)__cntlzw(DBGEXIImm((u8*)p1, 4, FALSE))) >> 5;
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
-
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = regs & 0x405;
-    return ((u32)__cntlzw(result)) >> 5;
+    result = (u32)__cntlzw(result) >> 5;
+    *exi &= 0x405;
+    return result;
 }
 #pragma dont_inline reset
 
 static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
-    u32 busyFlag;
-    u32 regs;
     u32 result;
     u32 value;
+    volatile u32* exi;
 
     value = ((count & 0x1fffc) << 8) | 0x20000000;
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xc0;
+    exi = &__EXIRegs[10];
+    *exi = (*exi & 0x405) | 0xC0;
 
     result = ((u32)__cntlzw(DBGEXIImm((u8*)&value, 4, TRUE))) >> 5;
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
+    while (__EXIRegs[13] & 1) {
+    }
 
-    while (param3 != 0) {
+    while (TRUE) {
+        if (param3 == 0) {
+            break;
+        }
         result |= ((u32)__cntlzw(DBGEXIImm((u8*)&value, 4, FALSE))) >> 5;
-        do {
-            busyFlag = __EXIRegs[13];
-        } while (busyFlag & 1);
+        while (__EXIRegs[13] & 1) {
+        }
 
-        param3 -= 4;
         *buffer++ = value;
+        param3 -= 4;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = regs & 0x405;
-    return ((u32)__cntlzw(result)) >> 5;
+    result = (u32)__cntlzw(result) >> 5;
+    *exi &= 0x405;
+    return result;
 }
 
 /*
@@ -173,27 +166,26 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
-    u32 busyFlag;
-    u32 regs;
     u32 result;
-    u32 cmd;
     u32 word;
+    volatile u32* exi;
 
-    cmd = ((count & 0x1fffc) << 8) | 0xa0000000;
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xc0;
+    word = ((count & 0x1FFFC) << 8) | 0xA0000000;
+    exi = &__EXIRegs[10];
+    *exi = (*exi & 0x405) | 0xC0;
 
-    result = (u32)__cntlzw(DBGEXIImm((u8*)&cmd, 4, TRUE));
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
+    result = (u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE)) >> 5;
+    while (__EXIRegs[13] & 1) {
+    }
 
-    while (param3 != 0) {
+    while (TRUE) {
+        if (param3 == 0) {
+            break;
+        }
         word = *buffer++;
         result |= ((u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE))) >> 5;
-        do {
-            busyFlag = __EXIRegs[13];
-        } while (busyFlag & 1);
+        while (__EXIRegs[13] & 1) {
+        }
 
         param3 -= 4;
         if (param3 < 0) {
@@ -201,10 +193,9 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
         }
     }
 
-    regs = __EXIRegs[10];
-    result = (u32)__cntlzw(result);
-    __EXIRegs[10] = regs & 0x405;
-    return result >> 5;
+    result = (u32)__cntlzw(result) >> 5;
+    *exi &= 0x405;
+    return result;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {
@@ -253,10 +244,12 @@ static void DBGHandler(s16 a, OSContext* b) {
 
 void DBInitComm(volatile u8** a, __OSInterruptHandler b) {
     BOOL interrupts = OSDisableInterrupts();
+
     pEXIInputFlag = &EXIInputFlag;
     *a = pEXIInputFlag;
     MTRCallback = b;
-    DBGEXIInit();
+    __OSMaskInterrupts(0x18000);
+    __EXIRegs[10] = 0;
     OSRestoreInterrupts(interrupts);
 }
 
@@ -316,8 +309,8 @@ int DBRead(void* buffer, u32 count) {
 }
 
 int DBWrite(const void* src, u32 size) {
-    u32 v;
     u32 busyFlag;
+    u32 v;
     BOOL interrupts = OSDisableInterrupts();
 
     do {

@@ -2406,11 +2406,9 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    int pauseFlag = (-pause | pause) >> 31;
-
-    SePause__9CRedSoundFii(RedSound(this), -1, pauseFlag);
-    StreamPause__9CRedSoundFii(RedSound(this), -1, pauseFlag);
-    SoundData(this).m_pauseAllSe = pause;
+    SePause__9CRedSoundFii(RedSound(this), -1, ((0u - (u32)pause) | (u32)pause) >> 31);
+    StreamPause__9CRedSoundFii(RedSound(this), -1, ((0u - (u32)pause) | (u32)pause) >> 31);
+    reinterpret_cast<CSoundLayout*>(this)->m_pauseAllSe = pause;
 }
 
 /*

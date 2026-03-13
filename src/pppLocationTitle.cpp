@@ -7,9 +7,9 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-static int GetGraphFrameFromId(int graphId)
+static int GetGraphFrameFromId(u32 graphId)
 {
-    return graphId / 0x1000;
+    return (int)graphId / 0x1000;
 }
 
 extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float,

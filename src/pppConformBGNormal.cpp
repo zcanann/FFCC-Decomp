@@ -101,7 +101,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
     pppMngSt = pppMngStPtr;
     if (gPppCalcDisabled == 0) {
-        owner = *(u8**)((u8*)pppMngStPtr + 0xd8);
+        owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
         hitFound = 0;
         matrixX = pppMngStPtr->m_matrix.value[0][3];
         matrixY = pppMngStPtr->m_matrix.value[1][3];
@@ -288,7 +288,4 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         }
     }
 }
-
-
-
 

@@ -600,18 +600,18 @@ CMapAnim::CMapAnim()
  */
 CMapAnim::~CMapAnim()
 {
-    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
-    unsigned int i;
+    unsigned int i = 0;
 
-    for (i = 0; i < static_cast<unsigned int>(nodeArray->GetSize()); i++) {
+    while (static_cast<unsigned int>(GetSize__26CPtrArray_P12CMapAnimNode_Fv(this)) > i) {
         CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
         if (node != 0 && (node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i), node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }
+        i++;
     }
 
-    nodeArray->RemoveAll();
+    reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->RemoveAll();
 }
 
 /*

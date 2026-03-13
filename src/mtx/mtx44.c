@@ -375,8 +375,6 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     f32 max;
     s32 swp;
     f32 absVal;
-    s32 rem;
-    s32 probe;
 
     ASSERTMSGLINE(734, src, "MTX44Inverse():  NULL Mtx44Ptr 'src' ");
     ASSERTMSGLINE(735, inv, "MTX44Inverse():  NULL Mtx44Ptr 'inv' ");
@@ -388,18 +386,15 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     rowOfs = 0;
     colOfs = 0;
     while (i < 4) {
-        rem = 4 - i;
-        probe = rowOfs;
         max = 0.0f;
         swp = i;
         j = i;
-        while (rem-- > 0) {
-            absVal = fabsf(*(f32*)((u8*)gjm + probe + colOfs));
+        while (j < 4) {
+            absVal = fabsf(*(f32*)((u8*)gjm + (j << 4) + colOfs));
             if (absVal > max) {
                 max = absVal;
                 swp = j;
             }
-            probe += 0x10;
             j++;
         }
 
@@ -417,38 +412,38 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
         }
 
         w = 1.0f / *(f32*)((u8*)gjm + rowOfs + colOfs);
-        gjm[i][0] *= w;
-        inv[i][0] *= w;
-        gjm[i][1] *= w;
-        inv[i][1] *= w;
-        gjm[i][2] *= w;
-        inv[i][2] *= w;
-        gjm[i][3] *= w;
-        inv[i][3] *= w;
+        *(f32*)((u8*)gjm + rowOfs + 0x0) *= w;
+        *(f32*)((u8*)inv + rowOfs + 0x0) *= w;
+        *(f32*)((u8*)gjm + rowOfs + 0x4) *= w;
+        *(f32*)((u8*)inv + rowOfs + 0x4) *= w;
+        *(f32*)((u8*)gjm + rowOfs + 0x8) *= w;
+        *(f32*)((u8*)inv + rowOfs + 0x8) *= w;
+        *(f32*)((u8*)gjm + rowOfs + 0xc) *= w;
+        *(f32*)((u8*)inv + rowOfs + 0xc) *= w;
 
         for (k = 0, j = 0; k < 4; k += 2, j += 0x20) {
             if (k != i) {
                 w = *(f32*)((u8*)gjm + j + colOfs);
-                *(f32*)((u8*)gjm + j + 0x0) -= gjm[i][0] * w;
-                *(f32*)((u8*)inv + j + 0x0) -= inv[i][0] * w;
-                *(f32*)((u8*)gjm + j + 0x4) -= gjm[i][1] * w;
-                *(f32*)((u8*)inv + j + 0x4) -= inv[i][1] * w;
-                *(f32*)((u8*)gjm + j + 0x8) -= gjm[i][2] * w;
-                *(f32*)((u8*)inv + j + 0x8) -= inv[i][2] * w;
-                *(f32*)((u8*)gjm + j + 0xc) -= gjm[i][3] * w;
-                *(f32*)((u8*)inv + j + 0xc) -= inv[i][3] * w;
+                *(f32*)((u8*)gjm + j + 0x0) -= *(f32*)((u8*)gjm + rowOfs + 0x0) * w;
+                *(f32*)((u8*)inv + j + 0x0) -= *(f32*)((u8*)inv + rowOfs + 0x0) * w;
+                *(f32*)((u8*)gjm + j + 0x4) -= *(f32*)((u8*)gjm + rowOfs + 0x4) * w;
+                *(f32*)((u8*)inv + j + 0x4) -= *(f32*)((u8*)inv + rowOfs + 0x4) * w;
+                *(f32*)((u8*)gjm + j + 0x8) -= *(f32*)((u8*)gjm + rowOfs + 0x8) * w;
+                *(f32*)((u8*)inv + j + 0x8) -= *(f32*)((u8*)inv + rowOfs + 0x8) * w;
+                *(f32*)((u8*)gjm + j + 0xc) -= *(f32*)((u8*)gjm + rowOfs + 0xc) * w;
+                *(f32*)((u8*)inv + j + 0xc) -= *(f32*)((u8*)inv + rowOfs + 0xc) * w;
             }
 
             if (k + 1 != i) {
                 w = *(f32*)((u8*)gjm + j + 0x10 + colOfs);
-                *(f32*)((u8*)gjm + j + 0x10) -= gjm[i][0] * w;
-                *(f32*)((u8*)inv + j + 0x10) -= inv[i][0] * w;
-                *(f32*)((u8*)gjm + j + 0x14) -= gjm[i][1] * w;
-                *(f32*)((u8*)inv + j + 0x14) -= inv[i][1] * w;
-                *(f32*)((u8*)gjm + j + 0x18) -= gjm[i][2] * w;
-                *(f32*)((u8*)inv + j + 0x18) -= inv[i][2] * w;
-                *(f32*)((u8*)gjm + j + 0x1c) -= gjm[i][3] * w;
-                *(f32*)((u8*)inv + j + 0x1c) -= inv[i][3] * w;
+                *(f32*)((u8*)gjm + j + 0x10) -= *(f32*)((u8*)gjm + rowOfs + 0x0) * w;
+                *(f32*)((u8*)inv + j + 0x10) -= *(f32*)((u8*)inv + rowOfs + 0x0) * w;
+                *(f32*)((u8*)gjm + j + 0x14) -= *(f32*)((u8*)gjm + rowOfs + 0x4) * w;
+                *(f32*)((u8*)inv + j + 0x14) -= *(f32*)((u8*)inv + rowOfs + 0x4) * w;
+                *(f32*)((u8*)gjm + j + 0x18) -= *(f32*)((u8*)gjm + rowOfs + 0x8) * w;
+                *(f32*)((u8*)inv + j + 0x18) -= *(f32*)((u8*)inv + rowOfs + 0x8) * w;
+                *(f32*)((u8*)gjm + j + 0x1c) -= *(f32*)((u8*)gjm + rowOfs + 0xc) * w;
+                *(f32*)((u8*)inv + j + 0x1c) -= *(f32*)((u8*)inv + rowOfs + 0xc) * w;
             }
         }
 

@@ -332,12 +332,12 @@ char* strtok(char* str, const char* delim)
 
 	p = (unsigned char*)delim - 1;
 	while ((ch = *++p) != '\0') {
-		delimiter_table[ch >> 3] |= 1 << (ch & 7);
+		delimiter_table[(ch & 0xFF) >> 3] |= 1 << (ch & 7);
 	}
 
 	p = (unsigned char*)strtok_ptr - 1;
 	while ((ch = *++p) != '\0') {
-		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) == 0) {
+		if ((delimiter_table[(ch & 0xFF) >> 3] & (1 << (ch & 7))) == 0) {
 			break;
 		}
 	}
@@ -349,7 +349,7 @@ char* strtok(char* str, const char* delim)
 
 	tokenStart = (char*)p;
 	while ((ch = *++p) != '\0') {
-		if ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0) {
+		if ((delimiter_table[(ch & 0xFF) >> 3] & (1 << (ch & 7))) != 0) {
 			break;
 		}
 	}

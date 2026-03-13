@@ -38,7 +38,7 @@ static void Callback(s32, DVDCommandBlock*) {
     Prepared = TRUE;
 }
 
-int IsStreamEnabled(void) {
+static inline int IsStreamEnabled(void) {
     if (DVDGetCurrentDiskID()->streaming) {
         return TRUE;
     }
@@ -169,17 +169,3 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     Run((void*)0x81300000);
 }
 
-void OSSetSaveRegion(void* start, void* end) {
-    SaveStart = start;
-    SaveEnd = end;
-}
-
-void OSGetSaveRegion(void** start, void** end) {
-    *start = SaveStart;
-    *end = SaveEnd;
-}
-
-void OSGetSavedRegion(void** start, void** end) {
-    *start = __OSRebootParams.regionStart;
-    *end = __OSRebootParams.regionEnd;
-}

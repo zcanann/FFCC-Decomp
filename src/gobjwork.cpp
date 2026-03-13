@@ -749,11 +749,11 @@ int CCaravanWork::AddItem(int itemId, int* inventorySlotOut)
  */
 void CCaravanWork::SetArtifact(int artifactIndex, int enabled)
 {
-	unsigned short artifact = 0xFFFF;
+	int artifact = -1;
 	if (enabled != 0) {
-		artifact = (short)artifactIndex + 0x9F;
+		artifact = artifactIndex + 0x9F;
 	}
-	m_artifacts[artifactIndex] = artifact;
+	m_artifacts[artifactIndex] = (unsigned short)artifact;
 }
 
 /*

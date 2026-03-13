@@ -1,6 +1,8 @@
 #include <dolphin.h>
 #include "dolphin/exi.h"
 
+#pragma scheduling off
+
 #define REG_MAX 5
 #define REG(chan, idx) (__EXIRegs[((chan) * REG_MAX) + (idx)])
 
@@ -49,21 +51,21 @@ static void SetExiInterruptMask(s32 chan, EXIControl* exi) {
         } else {
             __OSUnmaskInterrupts(OS_INTERRUPTMASK_EXI_0_EXI | OS_INTERRUPTMASK_EXI_2_EXI);
         }
-        break;
+        return;
     case 1:
         if (exi->exiCallback == 0 || (exi->state & STATE_LOCKED)) {
             __OSMaskInterrupts(OS_INTERRUPTMASK_EXI_1_EXI);
         } else {
             __OSUnmaskInterrupts(OS_INTERRUPTMASK_EXI_1_EXI);
         }
-        break;
+        return;
     case 2:
         if (__OSGetInterruptHandler(__OS_INTERRUPT_PI_DEBUG) == 0 || (exi->state & STATE_LOCKED)) {
             __OSMaskInterrupts(OS_INTERRUPTMASK_PI_DEBUG);
         } else {
             __OSUnmaskInterrupts(OS_INTERRUPTMASK_PI_DEBUG);
         }
-        break;
+        return;
     }
 }
 
@@ -103,18 +105,20 @@ static void CompleteTransfer(s32 chan) {
 int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     BOOL enabled;
     EXIControl* exi;
+    u32 data;
+    s32 i;
 
+    exi = &Ecb[chan];
     ASSERTLINE(404, Ecb[chan].state & STATE_SELECTED);
     ASSERTLINE(405, 0 <= chan && chan < MAX_CHAN);
     ASSERTLINE(406, 0 < len && len <= MAX_IMM);
     ASSERTLINE(407, type < MAX_TYPE);
 
     enabled = OSDisableInterrupts();
-    if ((Ecb[chan].state & STATE_BUSY) || !(Ecb[chan].state & STATE_SELECTED)) {
+    if ((exi->state & STATE_BUSY) || !(exi->state & STATE_SELECTED)) {
         OSRestoreInterrupts(enabled);
         return 0;
     }
-    exi = &Ecb[chan];
 
     exi->tcCallback = callback;
     if (exi->tcCallback != 0) {
@@ -124,21 +128,15 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
 
     exi->state |= STATE_IMM;
     if (type != 0) {
-        u32 data = 0;
-        u8* immBuf = buf;
-        s32 i;
-
+        data = 0;
         for (i = 0; i < len; i++) {
-            data |= *immBuf++ << ((3 - i) * 8);
+            data |= ((u8*)buf)[i] << ((3 - i) * 8);
         }
         __EXIRegs[(chan * 5) + 4] = data;
     }
 
     exi->immBuf = buf;
-    exi->immLen = len;
-    if (type == EXI_WRITE) {
-        exi->immLen = 0;
-    }
+    exi->immLen = (type != EXI_WRITE) ? len : 0;
     __EXIRegs[(chan * 5) + 3] = (type << 2) | 1 | ((len - 1) << 4);
     OSRestoreInterrupts(enabled);
     return 1;
@@ -533,25 +531,23 @@ int EXIDeselect(s32 chan) {
 }
 
 static void EXIIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
-    EXIControl* exi;
-    OSContext* savedContext;
     s32 chan;
+    EXIControl* exi;
+    EXICallback callback;
 
-    savedContext = context;
-    chan = (u32)(interrupt - __OS_INTERRUPT_EXI_0_EXI) / 3;
-
+    chan = (interrupt - __OS_INTERRUPT_EXI_0_EXI) / 3;
     ASSERTLINE(1071, 0 <= chan && chan < MAX_CHAN);
-    REG(chan, 0) = (REG(chan, 0) & 0x7F5) | 2;
-
     exi = &Ecb[chan];
-    if (exi->exiCallback) {
+    EXIClearInterrupts(chan, 1, 0, 0);
+    callback = exi->exiCallback;
+    if (callback) {
         OSContext exceptionContext;
 
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
-        exi->exiCallback(chan, savedContext);
+        callback(chan, context);
         OSClearContext(&exceptionContext);
-        OSSetCurrentContext(savedContext);
+        OSSetCurrentContext(context);
     }
 }
 
@@ -584,10 +580,10 @@ static void TCIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
 
 static void EXTIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     s32 chan;
-    EXICallback callback;
     EXIControl* exi;
+    EXICallback callback;
 
-    chan = (u32)(interrupt - __OS_INTERRUPT_EXI_0_EXT) / 3;
+    chan = (interrupt - __OS_INTERRUPT_EXI_0_EXT) / 3;
 
     ASSERTLINE(1147, 0 <= chan && chan < 2);
     __OSMaskInterrupts(0x500000U >> (chan * 3));
@@ -882,3 +878,5 @@ char* EXIGetTypeString(u32 type) {
         return "Unknown";
     }
 }
+
+#pragma scheduling reset

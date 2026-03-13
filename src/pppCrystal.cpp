@@ -290,6 +290,10 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	indMtx[1][1] = ((FLOAT_80330fac * texH) / FLOAT_80330fb4) * param_2->m_stepValue;
 	indMtx[1][2] = DAT_801db5fc;
 
+	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+	GXSetNumTexGens(3);
+	GXSetNumTevStages(3);
+
 	Mtx lightMtx;
 	if (Game.game.m_currentSceneId == 7) {
 		C_MTXLightPerspective(
@@ -299,9 +303,6 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 			lightMtx, CameraPerspectiveFov(), FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	}
 
-	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-	GXSetNumTexGens(3);
-	GXSetNumTevStages(3);
 	GXLoadTexMtxImm(texMtx, 0x40, GX_MTX3x4);
 	GXLoadTexMtxImm(lightMtx, 0x43, GX_MTX3x4);
 	GXSetTexCoordGen2((GXTexCoordID)0, GX_TG_MTX3x4, GX_TG_POS, 0x3C, GX_TRUE, 0x40);

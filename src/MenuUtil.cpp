@@ -422,7 +422,8 @@ void CMenuPcs::SetCrystalCageAttr()
 {
 	struct CrystalState {
 		unsigned char _pad0[0x80];
-		int m_effectTimer;
+		unsigned char m_effectTimer;
+		unsigned char _pad1[3];
 		int m_crystalElem;
 		short m_crystalPart;
 		short m_crystalAttr;
@@ -453,7 +454,7 @@ void CMenuPcs::SetCrystalCageAttr()
 	}
 
 	state->m_crystalPart = BindEffect__8CMenuPcsFiii(this, 5, state->m_crystalAttr, -1);
-	*reinterpret_cast<volatile int*>(&state->m_effectTimer) = 0;
+	state->m_effectTimer = 0;
 }
 
 /*

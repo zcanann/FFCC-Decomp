@@ -539,7 +539,7 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
             result = Block_subBlock(current_block, size);
             if (result != 0) {
                 pool_obj->start_ = current_block;
-                return (char*)result + 8;
+                goto found;
             }
         }
         if ((8 < current_block->max_size) && (*available_size < current_block->max_size - 8)) {
@@ -549,6 +549,8 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
     } while (current_block != pool_obj->start_);
 
     return 0;
+found:
+    return (char*)result + 8;
 }
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     const unsigned long* pool_size_ptr;

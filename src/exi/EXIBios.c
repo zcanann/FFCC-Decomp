@@ -40,9 +40,7 @@ u32 EXIClearInterrupts(s32 chan, int exi, int tc, int ext);
 static int __EXIProbe(s32 chan);
 
 static void SetExiInterruptMask(s32 chan, EXIControl* exi) {
-    EXIControl* exi2;
-    exi2 = Ecb;
-    exi2 += 2;
+    EXIControl* exi2 = &Ecb[2];
 
     switch (chan) {
     case 0:
@@ -51,21 +49,21 @@ static void SetExiInterruptMask(s32 chan, EXIControl* exi) {
         } else {
             __OSUnmaskInterrupts(OS_INTERRUPTMASK_EXI_0_EXI | OS_INTERRUPTMASK_EXI_2_EXI);
         }
-        return;
+        break;
     case 1:
         if (exi->exiCallback == 0 || (exi->state & STATE_LOCKED)) {
             __OSMaskInterrupts(OS_INTERRUPTMASK_EXI_1_EXI);
         } else {
             __OSUnmaskInterrupts(OS_INTERRUPTMASK_EXI_1_EXI);
         }
-        return;
+        break;
     case 2:
         if (__OSGetInterruptHandler(__OS_INTERRUPT_PI_DEBUG) == 0 || (exi->state & STATE_LOCKED)) {
             __OSMaskInterrupts(OS_INTERRUPTMASK_PI_DEBUG);
         } else {
             __OSUnmaskInterrupts(OS_INTERRUPTMASK_PI_DEBUG);
         }
-        return;
+        break;
     }
 }
 
@@ -106,10 +104,10 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     BOOL enabled;
     EXIControl* exi;
     u32 data;
-    s32 i;
+    int i;
 
     exi = &Ecb[chan];
-    ASSERTLINE(404, Ecb[chan].state & STATE_SELECTED);
+    ASSERTLINE(404, exi->state & STATE_SELECTED);
     ASSERTLINE(405, 0 <= chan && chan < MAX_CHAN);
     ASSERTLINE(406, 0 < len && len <= MAX_IMM);
     ASSERTLINE(407, type < MAX_TYPE);
@@ -121,13 +119,13 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     }
 
     exi->tcCallback = callback;
-    if (exi->tcCallback != 0) {
+    if (exi->tcCallback) {
         EXIClearInterrupts(chan, 0, 1, 0);
         __OSUnmaskInterrupts(0x200000U >> (chan * 3));
     }
 
     exi->state |= STATE_IMM;
-    if (type != 0) {
+    if (type != EXI_READ) {
         data = 0;
         for (i = 0; i < len; i++) {
             data |= ((u8*)buf)[i] << ((3 - i) * 8);
@@ -267,7 +265,7 @@ EXICallback EXISetExiCallback(s32 chan, EXICallback exiCallback) {
 }
 
 void EXIProbeReset() {
-    __gUnknown800030C0[0] = __gUnknown800030C0[1] = 0;
+    __EXIProbeStartTime[0] = __EXIProbeStartTime[1] = 0;
     Ecb[0].idTime = Ecb[1].idTime = 0;
     __EXIProbe(0);
     __EXIProbe(1);
@@ -293,25 +291,25 @@ static int __EXIProbe(s32 chan) {
     if (!(exi->state & STATE_ATTACHED)) {
         if (cpr & 0x800) {
             EXIClearInterrupts(chan, 0, 0, 1);
-            __gUnknown800030C0[chan] = exi->idTime = 0;
+            __EXIProbeStartTime[chan] = exi->idTime = 0;
         }
 
         if (cpr & 0x1000) {
             t = ((s32)(OSTicksToMilliseconds(OSGetTime()) / 100) + 1);
 
-            if (__gUnknown800030C0[chan] == 0) {
-                __gUnknown800030C0[chan] = t;
+            if (__EXIProbeStartTime[chan] == 0) {
+                __EXIProbeStartTime[chan] = t;
             }
 
-            if (t - (s32)__gUnknown800030C0[chan] < 3) {
+            if (t - (s32)__EXIProbeStartTime[chan] < 3) {
                 rc = 0;
             }
         } else {
-            __gUnknown800030C0[chan] = exi->idTime = 0;
+            __EXIProbeStartTime[chan] = exi->idTime = 0;
             rc = 0;
         }
     } else if(!(cpr & 0x1000) || (cpr & 0x800)) {
-        __gUnknown800030C0[chan] = exi->idTime = 0;
+        __EXIProbeStartTime[chan] = exi->idTime = 0;
         rc = 0;
     }
 
@@ -337,7 +335,7 @@ s32 EXIProbeEx(s32 chan) {
         return 1;
     }
 
-    if (__gUnknown800030C0[chan]) {
+    if (__EXIProbeStartTime[chan]) {
         return 0;
     }
 
@@ -698,11 +696,8 @@ int EXIUnlock(s32 chan) {
 }
 
 u32 EXIGetState(s32 chan) {
-    EXIControl* exi;
-
-    exi = &Ecb[chan];
-    ASSERTLINE(1343, 0 <= chan && chan < MAX_CHAN);
-    return exi->state;
+    EXIControl* exi = &Ecb[chan];
+    return (u32)exi->state;
 }
 
 static void UnlockedHandler(s32 chan, OSContext* context) {
@@ -728,7 +723,7 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
             return 0;
         }
 
-        if (exi->idTime == __gUnknown800030C0[chan]) {
+        if (exi->idTime == __EXIProbeStartTime[chan]) {
             *id = exi->id;
             return exi->idTime;
         }
@@ -737,7 +732,7 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
             return 0;
         }
 
-        startTime = __gUnknown800030C0[chan];
+        startTime = __EXIProbeStartTime[chan];
     }
 
     enabled = OSDisableInterrupts();
@@ -762,7 +757,7 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
     if ((chan < 2) && (dev == 0)) {
         EXIDetach(chan);
         enabled = OSDisableInterrupts();
-        err |= __gUnknown800030C0[chan] != startTime;
+        err |= __EXIProbeStartTime[chan] != startTime;
         
         if (!err) {
             exi->id = *id;

@@ -51,23 +51,21 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct pppYmCheckBGHeightUnkC* param_2)
 {
     _pppMngSt* pppMngSt;
+    Vec hitPos;
     Vec direction;
     CMapCylinderRaw cylinder;
-    Vec hitPos;
-    float nextY;
-    float finalY;
+    double finalY;
 
+    pppMngSt = pppMngStPtr;
     if (gPppCalcDisabled == 0) {
-        pppMngSt = pppMngStPtr;
         direction.x = kPppYmCheckBGHeightAxisZero;
         direction.y = kPppYmCheckBGHeightProbeDirY;
         direction.z = kPppYmCheckBGHeightAxisZero;
 
-        nextY = pppMngStPtr->m_matrix.value[1][3];
-        finalY = nextY;
+        finalY = pppMngStPtr->m_matrix.value[1][3];
         cylinder.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
+        cylinder.m_bottom.y = (float)(finalY + param_2->m_unk0x4);
         cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
-        cylinder.m_bottom.y = nextY + param_2->m_unk0x4;
         cylinder.m_direction.x = kPppYmCheckBGHeightAxisZero;
         cylinder.m_direction.y = kPppYmCheckBGHeightProbeDirY;
         cylinder.m_direction.z = kPppYmCheckBGHeightAxisZero;
@@ -85,15 +83,15 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if (!((nextY - param_2->m_unk0xC) > hitPos.y)) {
+            if ((float)(finalY - param_2->m_unk0xC) <= hitPos.y) {
                 finalY = hitPos.y + param_2->m_unk0x8;
             }
         }
 
-        pppMngSt->m_position.y = finalY;
-        pppMngSt->m_savedPosition.y = finalY;
-        pppMngSt->m_paramVec0.y = finalY;
-        pppMngSt->m_previousPosition.y = finalY;
+        pppMngSt->m_position.y = (float)finalY;
+        pppMngSt->m_savedPosition.y = (float)finalY;
+        pppMngSt->m_paramVec0.y = (float)finalY;
+        pppMngSt->m_previousPosition.y = (float)finalY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

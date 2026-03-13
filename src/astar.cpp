@@ -38,11 +38,6 @@ struct CMapCylinderRaw
 
 extern "C" int __cntlzw(unsigned int);
 
-static inline int GetDbgFlags()
-{
-	return *reinterpret_cast<int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x2A5C);
-}
-
 CAStar AStar;
 
 /*
@@ -524,7 +519,7 @@ void CAStar::calcAStar()
  */
 void CAStar::drawAStar()
 {
-	if ((GetDbgFlags() & 0x400) != 0)
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x400) != 0)
 	{
 		int frameGroup = System.m_frameCounter / 0x1e + (System.m_frameCounter >> 31);
 
@@ -564,9 +559,10 @@ void CAStar::drawAStar()
 			CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
 			Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
 
-			for (int side = 0; side < 2; ++side)
+			unsigned char* groupPtr = &portal.m_groupA;
+			for (int side = 0; side < 2; ++side, ++groupPtr)
 			{
-				unsigned char group = (side == 0) ? portal.m_groupA : portal.m_groupB;
+				unsigned char group = *groupPtr;
 
 				if (group == 0)
 				{
@@ -943,7 +939,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	if ((GetDbgFlags() & 1) == 0)
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) == 0)
 	{
 		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);

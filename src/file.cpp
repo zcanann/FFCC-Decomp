@@ -274,35 +274,29 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 {
     CHandle* inFlight;
 
-    while (true)
-	{
-        inFlight = CheckQueue();
-        if (inFlight == 0)
-		{
-            break;
-        }
-
+    while ((inFlight = CheckQueue()) != 0)
+    {
         SyncCompleted(inFlight);
 
-        if (fileHandle == 0 || inFlight != fileHandle)
-		{
+        if (fileHandle != 0 && inFlight == fileHandle)
+        {
+            inFlight->m_completionStatus = 0;
+        }
+        else
+        {
             if (fileHandle == 0)
-			{
+            {
                 if (2 < (unsigned int)System.m_execParam)
-				{
+                {
                     System.Printf(s_queueWarnAnyFmt, inFlight->m_name);
                 }
             }
-			else if (1 < (unsigned int)System.m_execParam)
-			{
+            else if (1 < (unsigned int)System.m_execParam)
+            {
                 System.Printf(s_queueWarnTargetFmt, inFlight->m_name, fileHandle->m_name);
             }
 
             inFlight->m_completionStatus = 1;
-        }
-		else
-		{
-            inFlight->m_completionStatus = 0;
         }
     }
 }

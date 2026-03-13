@@ -288,8 +288,8 @@ void GXInitTexObjCI(GXTexObj* obj, void* image_ptr, u16 width, u16 height, GXCIT
 
 void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt, f32 min_lod, f32 max_lod, f32 lod_bias, u8 bias_clamp, u8 do_edge_lod, GXAnisotropy max_aniso) {
     u8 lbias;
-    u8 edgeLod;
-    u8 magFilt;
+    u32 edgeLod;
+    u32 magFilt;
     u8 lmin;
     u8 lmax;
     u32 mode0;

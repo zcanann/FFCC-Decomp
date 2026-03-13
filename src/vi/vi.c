@@ -721,6 +721,15 @@ static void PrintDebugPalCaution(void) {
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8018C6AC
+ * PAL Size: 2088b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void VIConfigure(const GXRenderModeObj* rm) {
     VITiming* tm;
     u32 regDspCfg;
@@ -766,9 +775,8 @@ void VIConfigure(const GXRenderModeObj* rm) {
     switch (tvInBootrom) {
     case VI_MPAL:
     case VI_NTSC:
-    case 6:
-    case 7:
-        if (tvInGame == VI_NTSC || tvInGame == VI_MPAL || tvInGame == 6 || tvInGame == 7) {
+    case VI_GCA:
+        if (tvInGame == VI_NTSC || tvInGame == VI_MPAL || tvInGame == VI_GCA) {
             break;
         }
         goto panic;

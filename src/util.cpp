@@ -1,6 +1,7 @@
 #include "ffcc/util.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/textureman.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
 const float kUtilZero = 0.0f;
@@ -26,13 +27,6 @@ static inline Mtx44Ptr GetScreenMatrix()
 // Vec2d definition 
 struct Vec2d {
 	float x, y;
-};
-
-struct CTextureLite {
-    u8 pad_0x0[0x28];
-    GXTexObj m_texObj;
-    GXTlutObj m_tlutObj0;
-    GXTlutObj m_tlutObj1;
 };
 
 extern void* __vt__5CUtil[];
@@ -828,8 +822,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
 void CUtil::RenderTextureQuad(float x, float y, float width, float height, CTexture* texture, Vec2d* uv1, Vec2d* uv2,
                               _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
-    CTextureLite* textureLite = reinterpret_cast<CTextureLite*>(texture);
-
     Mtx modelMtx;
     Mtx cameraMtx;
     Mtx44 orthoMtx;
@@ -873,59 +865,87 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP0);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
     _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_SET);
 
-    u8 textureFormat = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(texture) + 0x60);
+    int textureFormat = texture->m_format;
     if (textureFormat == 1) {
         _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
-    } else if (textureFormat == 8 || textureFormat == 9) {
+    } else if (textureFormat == 9 || textureFormat == 8) {
         SetPaletteEnv(texture);
     }
 
-    float u1 = kUtilZero;
-    float v1 = kUtilZero;
-    float u2 = kUtilOne;
-    float v2 = kUtilOne;
-    if (uv1 != 0 && uv2 != 0) {
-        u1 = uv1->x;
-        v1 = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
+    if (color == 0) {
+        float u1 = kUtilZero;
+        float v1 = kUtilZero;
+        float u2 = kUtilOne;
+        float v2 = kUtilOne;
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v1 = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXPosition3f32(x, y, kUtilZero);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u1, v1);
+
+        GXPosition3f32(x2, y, kUtilZero);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u2, v1);
+
+        GXPosition3f32(x2, y2, kUtilZero);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u2, v2);
+
+        GXPosition3f32(x, y2, kUtilZero);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u1, v2);
+    } else {
+        float u1 = kUtilZero;
+        float v1 = kUtilZero;
+        float u2 = kUtilOne;
+        float v2 = kUtilOne;
+        u32 colorValue = *reinterpret_cast<u32*>(color);
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v1 = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXPosition3f32(x, y, kUtilZero);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u1, v1);
+
+        GXPosition3f32(x2, y, kUtilZero);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u2, v1);
+
+        GXPosition3f32(x2, y2, kUtilZero);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u2, v2);
+
+        GXPosition3f32(x, y2, kUtilZero);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u1, v2);
     }
-
-    u32 colorValue = 0xFFFFFFFF;
-    if (color != 0) {
-        colorValue = *reinterpret_cast<u32*>(color);
-    }
-
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, kUtilZero);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u1, v1);
-
-    GXPosition3f32(x2, y, kUtilZero);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u2, v1);
-
-    GXPosition3f32(x2, y2, kUtilZero);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u2, v2);
-
-    GXPosition3f32(x, y2, kUtilZero);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u1, v2);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 
-    if (GXGetTexObjFmt(&textureLite->m_texObj) == GX_TF_I8) {
+    if (GXGetTexObjFmt(&texture->m_texObj) == GX_TF_I8) {
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     }
 }
@@ -941,7 +961,6 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
  */
 void CUtil::SetPaletteEnv(CTexture* texture)
 {
-    CTextureLite* textureLite = reinterpret_cast<CTextureLite*>(texture);
     union
     {
         GXColor color;
@@ -981,12 +1000,12 @@ void CUtil::SetPaletteEnv(CTexture* texture)
     _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 
-    GXInitTexObjTlut(&textureLite->m_texObj, GX_TLUT0);
-    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP0);
-    GXInitTexObjTlut(&textureLite->m_texObj, GX_TLUT1);
-    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP1);
-    GXLoadTlut(&textureLite->m_tlutObj0, GX_TLUT0);
-    GXLoadTlut(&textureLite->m_tlutObj1, GX_TLUT1);
+    GXInitTexObjTlut(&texture->m_texObj, GX_TLUT0);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+    GXInitTexObjTlut(&texture->m_texObj, GX_TLUT1);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
+    GXLoadTlut(&texture->m_tlutObj0, GX_TLUT0);
+    GXLoadTlut(&texture->m_tlutObj1, GX_TLUT1);
 }
 
 /*

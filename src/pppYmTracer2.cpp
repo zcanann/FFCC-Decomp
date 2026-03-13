@@ -2,6 +2,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
+#include "ffcc/textureman.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"

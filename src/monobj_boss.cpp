@@ -2772,9 +2772,9 @@ void CGMonObj::damagedFuncLastBoss()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1272);
-	if (timer >= 100 && *reinterpret_cast<int*>(mon + 0x6B4) == 0) {
-		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+	int& timer = *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x24);
+	if (timer >= 100 && *reinterpret_cast<int*>(mon + 0x6D0) == 0) {
+		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 		changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
 		object->m_bgColMask &= 0xFFF7FFFF;

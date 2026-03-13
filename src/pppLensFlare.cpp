@@ -163,7 +163,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		}
 
 		work->m_alpha = (u8)(int)((double)(float)work->m_alpha * alphaScale);
-		if (step->m_dataValIndex != 0xffff) {
+		if (step->m_dataValIndex != -1) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,
 							  step->m_initWOrk);
@@ -186,7 +186,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	int shapeOffset;
 	int colorOffset;
 	long** shapeTable;
-	u32 dataValIndex;
+	s32 dataValIndex;
 	u8* objBytes;
 	u8* shapeBase;
 	u8* colorBase;
@@ -199,9 +199,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	shapeBase = objBytes + shapeOffset + 0x80;
 	colorBase = objBytes + colorOffset + 0x80;
 	stepArgBytes = (u8*)&step->m_arg3;
-	dataValIndex = (u32)step->m_dataValIndex & 0xFFFF;
+	dataValIndex = step->m_dataValIndex;
 
-	if ((dataValIndex != 0xFFFF) &&
+	if ((dataValIndex != -1) &&
 		(shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
 		 shapeBase[0x32] != 0)) {
 		pppCVECTOR local_70;

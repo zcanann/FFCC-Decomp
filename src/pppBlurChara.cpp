@@ -337,7 +337,6 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     int colorOffset = param_3->m_serializedDataOffsets[1];
     int texOffset = param_3->m_serializedDataOffsets[2];
     int objPosBase = *(int*)((char*)blurChara + 0x84 + texOffset);
-    pppBlurCharaWork* work = GetBlurWork(blurChara, param_3);
     _GXTexObj smallBackTex;
     _GXColor drawColor;
     Mtx identityMtx;
@@ -363,8 +362,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         if (param_2->m_initWOrk == -1) {
             return;
         }
-        textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(&pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk],
-                                                               pppEnvStPtr->m_materialSetPtr, textureIndex);
+        textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
+            ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
         unsigned int div = *((unsigned char*)&param_2->m_dataValIndex + 2);
         Graphic.CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);

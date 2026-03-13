@@ -111,6 +111,7 @@ static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline int GraphicScreenBreakBlurEnabled() { return *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Graphic) + 0x7358); }
+static inline void* GraphicBackBufferScratch() { return *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 0x71EC); }
 
 extern "C" {
 int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
@@ -779,8 +780,18 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
 
     if (value[0x24] == 0) {
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8,
-                                   0);
+        GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
+            &Graphic,
+            GraphicBackBufferScratch(),
+            *(_GXTexObj**)(value + 0x10),
+            0,
+            0,
+            0x280,
+            0x1C0,
+            0,
+            1,
+            4,
+            0);
         value[0x24] = 1;
     }
 }

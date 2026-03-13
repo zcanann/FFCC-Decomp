@@ -288,7 +288,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 
             if (fadeDivisor >= 0) {
                 u8 alpha = ((u8*)&particle->m_color)[3];
-                u8 fadeStep = (u8)(alpha / fadeDivisor);
+                int fadeStep = alpha / fadeDivisor;
                 ((u8*)&particle->m_color)[3] = (u8)(alpha - fadeStep);
             }
 

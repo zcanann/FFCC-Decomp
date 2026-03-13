@@ -28,12 +28,9 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-	struct DescBlock {
-		unsigned int d[12];
-	};
-	DescBlock* src;
-	unsigned int* table;
-	unsigned int d0;
+	volatile void** soundPcs = reinterpret_cast<volatile void**>(&SoundPcs);
+	volatile unsigned int* src = m_table_desc0__9CSoundPcs;
+	volatile unsigned int* table = m_table__9CSoundPcs;
 	unsigned int d1;
 	unsigned int d2;
 	unsigned int d3;
@@ -45,26 +42,25 @@ extern "C" void __sinit_p_sound_cpp(void)
 	unsigned int d9;
 	unsigned int d10;
 	unsigned int d11;
+	unsigned int d0;
 
-	*reinterpret_cast<void**>(&SoundPcs) = __vt__9CSoundPcs;
-	src = reinterpret_cast<DescBlock*>(m_table_desc0__9CSoundPcs);
-	table = reinterpret_cast<unsigned int*>(m_table__9CSoundPcs);
+	*soundPcs = __vt__9CSoundPcs;
 
-	d0 = src->d[0];
-	d1 = src->d[1];
-	d2 = src->d[2];
-	d3 = src->d[3];
-	d4 = src->d[4];
-	d5 = src->d[5];
-	d6 = src->d[6];
-	d7 = src->d[7];
-	d8 = src->d[8];
-	d9 = src->d[9];
-	d10 = src->d[10];
-	d11 = src->d[11];
+	d1 = src[1];
+	d2 = src[2];
+	d3 = src[3];
+	d4 = src[4];
+	d5 = src[5];
+	d6 = src[6];
+	d7 = src[7];
+	d8 = src[8];
+	d9 = src[9];
+	d10 = src[10];
+	d11 = src[11];
+	d0 = src[0];
 
-	table[1] = d0;
 	table[2] = d1;
+	table[1] = d0;
 	table[3] = d2;
 	table[4] = d3;
 	table[5] = d4;

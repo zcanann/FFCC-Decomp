@@ -222,7 +222,7 @@ void CMaterialEditorPcs::Init()
         remaining -= 1;
     } while (remaining != 0);
 
-    WriteU32(self, 0x3BC, 0);
+    WriteU8(self, 0x3BC, 0);
 }
 
 /*

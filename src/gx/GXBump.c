@@ -293,10 +293,10 @@ void GXSetTevIndRepeat(GXTevStageID tev_stage) {
 }
 
 void __GXUpdateBPMask(void) {
-    u32 mask;
     int i;
-    u32 numStages;
     u32 texMap;
+    u32 mask;
+    u32 numStages;
 
     mask = 0;
     numStages = (__GXData->genMode >> 16) & 7;

@@ -436,20 +436,24 @@ void CRingMenu::onCalc()
  */
 void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.game.m_cFlatDataArr[1]);
-	const int* cmdNameTable = reinterpret_cast<const int*>(flatData->table[4].strings);
+	const int* index =
+		reinterpret_cast<const int*>(reinterpret_cast<const RingMenuFlatData*>(&Game.game.m_cFlatDataArr[1])->table[4].strings);
 
 	int commandLabel;
 	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		commandLabel = cmdNameTable[cmdIndex + 0x1E];
+		commandLabel = index[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
-		commandLabel = cmdNameTable[(cmdIndex == 0) ? 1 : 9];
+		int indexOffset = 9;
+		if (cmdIndex == 0) {
+			indexOffset = 1;
+		}
+		commandLabel = index[indexOffset];
 	} else {
 		commandLabel = _GetWeaponAttrib__12CCaravanWorkFi(caravanWork, cmdIndex);
 	}
 
-	int tlut = 7;
 	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		int tlut = 7;
 		if (cmdIndex == 2) {
 			tlut = 4;
 		} else if (cmdIndex < 2) {
@@ -458,45 +462,60 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 			} else if (cmdIndex >= 0) {
 				tlut = 1;
 			}
-		} else if ((cmdIndex < 4) && (cmdIndex != 4)) {
+		} else if (cmdIndex == 4) {
+			tlut = 7;
+		} else if (cmdIndex < 4) {
 			tlut = 6;
 		}
-	} else if (cmdIndex != 0) {
-		tlut = 4;
+		SetTlut__5CFontFi(font, tlut);
+	} else if (cmdIndex == 0) {
+		SetTlut__5CFontFi(font, 7);
+	} else {
+		SetTlut__5CFontFi(font, 4);
 	}
-	SetTlut__5CFontFi(font, tlut);
 
-	const double angleSin = sin(static_cast<double>(angle));
-	const double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(angleSin));
+	double sinAngle = sin(static_cast<double>(angle));
+	double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sinAngle));
+	sinAngle = sin(static_cast<double>(angle));
 
-	const bool reverseDir = (state == 0) || (state == 3);
-	double waveY = static_cast<double>((reverseDir ? -FLOAT_80330a40 : FLOAT_80330a40) * static_cast<float>(angleSin));
+	bool reverseDir = false;
+	if ((state == 0) || (state == 3)) {
+		reverseDir = true;
+	}
+
+	int sign = 1;
+	if (reverseDir) {
+		sign = -1;
+	}
+
+	double waveY = static_cast<double>(static_cast<float>(sign) * FLOAT_80330a40 * static_cast<float>(sinAngle));
 	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		waveY += static_cast<double>(FLOAT_80330a28);
+		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
 	}
 
 	SetScale__5CFontFf(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)), font);
 
-	const int textWidth = GetWidth__5CFontFPc(font, commandLabel);
-	const float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	double textWidth = static_cast<double>(GetWidth__5CFontFPc(font, commandLabel));
+	float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	double textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
 	float clampedAlpha = FLOAT_803309c0;
-	if (alphaRange >= FLOAT_803309c0) {
-		clampedAlpha = alphaRange;
-		if (alphaRange > FLOAT_803309cc) {
-			clampedAlpha = FLOAT_803309cc;
-		}
+	if ((FLOAT_803309c0 <= alphaRange) && ((clampedAlpha = alphaRange), (FLOAT_803309cc < alphaRange))) {
+		clampedAlpha = FLOAT_803309cc;
 	}
 
-	const int alpha = static_cast<int>(FLOAT_80330a34 * alphaScale * clampedAlpha);
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
-	SetColor__5CFontF8_GXColor(font, &color);
+	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
+	unsigned char colorStorage[4];
+	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
+	SetColor__5CFontF8_GXColor(font, color);
 
-	const float textX = static_cast<float>(waveX + static_cast<double>(posX + FLOAT_80330aa8) - static_cast<double>(textWidth) * DOUBLE_80330ae0);
-	const double textHeight = static_cast<double>(font->m_glyphWidth) * font->scaleY;
-	const float textY = static_cast<float>(FLOAT_80330a40 + waveY + static_cast<double>(posY + FLOAT_803309ec) - textHeight * DOUBLE_80330ae0);
-
-	SetPosX__5CFontFf(textX, font);
-	SetPosY__5CFontFf(textY, font);
+	SetPosX__5CFontFf(
+		static_cast<float>(waveX + -(double)(float)(textWidth * (double)FLOAT_803309c4 - (double)(float)((double)FLOAT_80330aa8 + posX))),
+		font);
+	SetPosY__5CFontFf(
+		FLOAT_80330a40 +
+			static_cast<float>(
+				waveY + -(double)(float)(textHeight * (double)FLOAT_803309c4 - (double)(float)((double)FLOAT_803309ec + posY))),
+		font);
 	SetPosZ__5CFontFf(FLOAT_803309c0, font);
 	Draw__5CFontFPc(font, commandLabel);
 }

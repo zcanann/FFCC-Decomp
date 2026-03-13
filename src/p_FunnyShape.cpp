@@ -430,7 +430,7 @@ void CFunnyShapePcs::drawViewer()
 template <>
 void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
 {
-    for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
+    for (unsigned int i = 0; i < static_cast<unsigned int>(size); i++) {
         void* item = items[i];
         if (item != 0) {
             __dl__FPv(item);
@@ -448,7 +448,7 @@ void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
 template <>
 void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
 {
-    for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
+    for (unsigned int i = 0; i < static_cast<unsigned int>(size); i++) {
         void* item = items[i];
         if (item != 0) {
             __dl__FPv(item);

@@ -974,7 +974,7 @@ config.libs = [
     },
     {
         "lib": "OdemuExi2",
-        "mw_version": "GC/1.3",
+        "mw_version": "GC/1.2.5n",
         "cflags": cflags_odemuexi,
         "progress_category": "sdk",
         "objects": [

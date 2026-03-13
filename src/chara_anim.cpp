@@ -172,8 +172,10 @@ CChara::CAnim::CAnim()
 	anim.m_frameCount = 0;
 	anim.m_nodes = 0;
 	anim.m_bank = 0;
-	anim.m_flags |= 0x80;
-	anim.m_flags &= ~0x40;
+	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
+	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), 1, 7, 24, 24));
+	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
+	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), 0, 6, 25, 25));
 	anim.m_quantizeX = 5;
 	anim.m_quantizeY = 0xB;
 	anim.m_quantizeZ = 10;

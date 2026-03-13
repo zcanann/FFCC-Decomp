@@ -697,9 +697,11 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
                                                  param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
-    if (value[3] == FLOAT_80331cc4) {
-        *(void**)&value[3] = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
-                                                                    s_pppScreenBreak_cpp_801dd4d4, 0x25E);
+    void* pieceStorage = *(void**)&value[3];
+    if (pieceStorage == NULL) {
+        pieceStorage = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
+                                                             s_pppScreenBreak_cpp_801dd4d4, 0x25E);
+        *(void**)&value[3] = pieceStorage;
         *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25F);
         InitPieceData((CChara::CModel*)model, pppScreenBreak, (VScreenBreak*)value);
@@ -735,8 +737,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 5: {
-            float x = *value * value[6];
-            float y = *value * value[7];
+            sx = value[6];
+            sy = value[7];
+            float x = *value * sx;
+            float y = *value * sy;
             if ((*(float*)(piece + 0x24) <= x) && (-*(float*)(piece + 0x24) <= x) &&
                 (*(float*)(piece + 0x28) <= y) && (-*(float*)(piece + 0x28) <= y)) {
                 piece[0x38] = 1;
@@ -744,10 +748,12 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             break;
         }
         case 6: {
-            float x = *value * value[6];
-            float y = *value * value[7];
-            if ((value[6] - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -value[6] + x) ||
-                (value[7] - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -value[7] + y)) {
+            sx = value[6];
+            float x = *value * sx;
+            sy = value[7];
+            float y = *value * sy;
+            if ((sx - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -sx + x) ||
+                (sy - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -sy + y)) {
                 piece[0x38] = 1;
             }
             break;

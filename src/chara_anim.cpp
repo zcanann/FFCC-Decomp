@@ -171,7 +171,6 @@ CChara::CAnim::CAnim()
 	__ct__4CRefFv(this);
 	anim.m_vtable = __vt__Q26CChara5CAnim;
 	anim.m_nodeCount = zero;
-	anim.m_frameCount = zero;
 	anim.m_nodes = 0;
 	anim.m_bank = 0;
 	*reinterpret_cast<unsigned char*>(&anim.m_flags) =

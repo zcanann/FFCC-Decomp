@@ -376,6 +376,10 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
     Vec matrixPos;
     Vec oldPos;
     Vec delta;
+    union {
+        unsigned long long ull;
+        double d;
+    } temp;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -412,6 +416,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         s16 angleDelta;
         u32 signBit;
         u32 angleIdx;
+        u32 local_28;
+        u32 uStack_24;
 
         workBytes[8] = 0;
         work[1] = *(float*)(step + 0x18);
@@ -423,8 +429,10 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
             angleDelta = -angleDelta;
         }
 
-        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(s16)(angleDelta + *(s16*)(step + 0x66))) /
-                         FLOAT_80330654);
+        local_28 = 0x43300000;
+        uStack_24 = (u32)(s16)(angleDelta + *(s16*)(step + 0x66)) ^ 0x80000000;
+        temp.ull = ((unsigned long long)local_28 << 32) | (unsigned long long)uStack_24;
+        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(temp.d - DOUBLE_80330648)) / FLOAT_80330654);
         work[4] = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
         work[5] = FLOAT_80330644;
         work[6] = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));

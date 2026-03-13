@@ -159,33 +159,33 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
-    BOOL error;
-    u32 value;
-    u32* bufferWords;
+    BOOL total;
+    u32* buf_p;
+    u32 v1;
+    u32 v;
 
-    error = FALSE;
-    bufferWords = (u32*)buffer;
+    total = FALSE;
+    buf_p = (u32*)buffer;
     if (!DBGEXISelect(4)) {
         return FALSE;
     }
 
-    value = ((count & 0x1FFFC) << 8) | 0xA0000000;
-    error |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
-    error |= !DBGEXISync();
+    v1 = ((count & 0x1FFFC) << 8) | 0xA0000000;
+    total |= !DBGEXIImm((u8*)&v1, sizeof(v1), TRUE);
+    total |= !DBGEXISync();
 
     while (param3 != 0) {
-        value = *bufferWords;
-        bufferWords++;
-        error |= !DBGEXIImm((u8*)&value, sizeof(value), TRUE);
-        error |= !DBGEXISync();
+        v = *buf_p++;
+        total |= !DBGEXIImm((u8*)&v, sizeof(v), TRUE);
+        total |= !DBGEXISync();
         param3 -= 4;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    error |= !DBGEXIDeselect();
-    return !error;
+    total |= !DBGEXIDeselect();
+    return !total;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {
@@ -226,6 +226,22 @@ static void DBGHandler(s16 a, OSContext* b) {
     }
 }
 
+inline static void CheckMailBox(void) {
+    u32 value;
+
+    DBGReadStatus(&value);
+    if (value & 1) {
+        DBGReadMailbox(&value);
+        value &= 0x1fffffff;
+
+        if ((value & 0x1f000000) == 0x1f000000) {
+            SendMailData = value;
+            RecvDataLeng = value & 0x7fff;
+            EXIInputFlag = 1;
+        }
+    }
+}
+
 void DBInitComm(volatile u8** a, __OSInterruptHandler b) {
     BOOL interrupts = OSDisableInterrupts();
 
@@ -245,22 +261,12 @@ void DBInitInterrupts(void) {
 }
 
 u32 DBQueryData(void) {
-    u32 interrupts;
-    u32 mailbox[3];
+    BOOL interrupts;
 
     EXIInputFlag = 0;
-    if (RecvDataLeng == 0) {
+    if (!RecvDataLeng) {
         interrupts = OSDisableInterrupts();
-        DBGReadStatus(mailbox);
-        if ((mailbox[0] & 1) != 0) {
-            DBGReadMailbox(mailbox);
-            mailbox[0] &= ~7;
-            if ((mailbox[0] & 0x1f000000) == 0x1f000000) {
-                SendMailData = mailbox[0];
-                RecvDataLeng = mailbox[0] & 0x7fff;
-                EXIInputFlag = 1;
-            }
-        }
+        CheckMailBox();
         OSRestoreInterrupts(interrupts);
     }
     return RecvDataLeng;

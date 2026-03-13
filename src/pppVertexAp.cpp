@@ -28,7 +28,7 @@ struct VertexApData
     u8 spawnDelay;
     u8 mode;
     u8 useWorldMtx;
-    u8 unkA[0x2];
+    u16 unkA;
     u32 childId;
     u32 childPosOffset;
 };
@@ -122,8 +122,9 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 index = state->index++;
-                u16 vertexIndex = vertexIndices[index];
+                u16 outValue = state->index;
+                state->index++;
+                u16 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -164,7 +165,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         case 1: {
             MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
             do {
-                u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
+                f32 randValue = RandF__5CMathFv(&Math);
+                f32 maxValue = (f32)entry->maxValue;
+                int outValue = (int)(randValue * maxValue);
+                u16 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;

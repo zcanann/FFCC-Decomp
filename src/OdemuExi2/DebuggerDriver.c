@@ -52,34 +52,31 @@ static BOOL DBGEXISync() {
  * JP Address: TODO
  * JP Size: TODO
  */
-static BOOL DBGEXIImm(u8* buffer, s32 bytecounter, s32 write) {
-    s32 i;
-    u32 value;
-    u8* ptr;
+static BOOL DBGEXIImm(void* buffer, s32 bytecounter, u32 write) {
+    u8* tempPointer;
+    u32 writeOutValue;
+    int i;
 
-    if (write != 0) {
-        i = 0;
-        value = 0U;
-        ptr = buffer;
-        while (i < bytecounter) {
-            value |= (u32)*ptr++ << ((3 - i) * 8);
-            i++;
+    if (write) {
+        tempPointer = buffer;
+        writeOutValue = 0;
+        for (i = 0; i < bytecounter; i++) {
+            u8* temp = ((u8*)buffer) + i;
+            writeOutValue |= *temp << ((3 - i) << 3);
         }
-        __EXIRegs[14] = value;
+        __EXIRegs[14] = writeOutValue;
     }
 
-    __EXIRegs[13] = (write << 2) | 1U | ((bytecounter - 1) << 4);
+    __EXIRegs[13] = 1 | write << 2 | (bytecounter - 1) << 4;
     do {
-        value = __EXIRegs[13];
-    } while (value & 1);
+        writeOutValue = __EXIRegs[13];
+    } while (writeOutValue & 1);
 
-    if (write == 0) {
-        i = 0;
-        ptr = buffer;
-        value = __EXIRegs[14];
-        while (i < bytecounter) {
-            *ptr++ = (u8)(value >> ((3 - i) * 8));
-            i++;
+    if (!write) {
+        writeOutValue = __EXIRegs[14];
+        tempPointer = buffer;
+        for (i = 0; i < bytecounter; i++) {
+            *tempPointer++ = writeOutValue >> ((3 - i) << 3);
         }
     }
 
@@ -102,24 +99,25 @@ static BOOL DBGWriteMailbox(u32 p1) {
 
 #pragma dont_inline on
 static BOOL DBGReadMailbox(u32* p1) {
-    u32 result;
-    u32 regs;
+    u32 total;
+    u32 v;
     volatile u32* exi;
 
-    regs = 0x60000000;
+    total = 0;
+    v = 0x60000000;
     exi = &__EXIRegs[10];
     *exi = (*exi & 0x405) | 0xC0;
-    result = (u32)__cntlzw(DBGEXIImm((u8*)&regs, 2, TRUE)) >> 5;
+    total |= !(DBGEXIImm((u8*)&v, 2, TRUE) != 0);
     while (__EXIRegs[13] & 1) {
     }
 
-    result |= (u32)__cntlzw(DBGEXIImm((u8*)p1, 4, FALSE)) >> 5;
+    total |= !(DBGEXIImm((u8*)p1, 4, FALSE) != 0);
     while (__EXIRegs[13] & 1) {
     }
 
-    result = (u32)__cntlzw(result) >> 5;
+    total = (u32)__cntlzw(total) >> 5;
     *exi &= 0x405;
-    return result;
+    return total;
 }
 #pragma dont_inline reset
 

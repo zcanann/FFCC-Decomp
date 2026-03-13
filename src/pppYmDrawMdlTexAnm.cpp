@@ -95,24 +95,21 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     pppYmDrawMdlTexAnmWork* work;
     CMapMeshUVLayout* uvLayout;
     s32 uvByteOffset;
-    u32 frameU;
+    u32 frameDiv;
+    u32 frameMod;
     s32 i;
 
     work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
     if ((work->m_frame != 0) && ((uvLayout = (CMapMeshUVLayout*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0]) != NULL)) {
-        uvByteOffset = 0;
-        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            s32 uvByteOffsetV = uvByteOffset + 2;
-            frameU = work->m_frame / work->m_tilesU;
-            u32 frameModU = work->m_frame - frameU * work->m_tilesU;
+        for (i = 0, uvByteOffset = 0; i < (s32)(u16)uvLayout->m_uvCount; i++, uvByteOffset += 4) {
+            s16* uvU = (s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
+            s16* uvV = (s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
 
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
-                (s16)(int)-(((f32)frameModU * work->m_perU) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset));
-            uvByteOffset += 4;
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV) =
-                (s16)(int)-(((f32)frameU * work->m_perV) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV));
+            frameDiv = work->m_frame / work->m_tilesU;
+            frameMod = work->m_frame % work->m_tilesU;
+
+            *uvU = (s16)(int)-(((f32)frameMod * work->m_perU) - (f32)*uvU);
+            *uvV = (s16)(int)-(((f32)frameDiv * work->m_perV) - (f32)*uvV);
         }
 
         DCFlushRange(uvLayout->m_uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);

@@ -24,6 +24,7 @@ void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void pppSetBlendMode__FUc(u8);
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
+void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppInitBlendMode__Fv(void);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 }
@@ -412,7 +413,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 BirthParticle(pppObject, vBreathModel, pBreathModel, vColor, (_PARTICLE_DATA*)particleData,
                               (Mtx*)particleWmat, (_PARTICLE_COLOR*)particleColor);
                 spawnCount += 1;
-                found = false;
+                found = true;
                 for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); j++) {
                     int* group = groupTable + j * 0x17;
                     int k;
@@ -455,12 +456,12 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
             unitVelocity.x = kPppBreathModelZero;
             unitVelocity.y = kPppBreathModelZero;
-            unitVelocity.z = 1.0f;
+            unitVelocity.z = FLOAT_80330F80;
             group[9] = *(int*)((unsigned char*)pBreathModel + 0x14);
             group[5] = 0;
             group[4] = 0;
             group[3] = 0;
-            *(Vec*)(group + 6) = unitVelocity;
+            pppCopyVector__FR3Vec3Vec((Vec*)(group + 6), &unitVelocity);
             PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }

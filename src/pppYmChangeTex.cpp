@@ -353,7 +353,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	if (step->m_graphId == *(u32*)&ymChangeTex->field0_0x0) {
 		state[0] += step->m_initWOrk;
 		state[1] += step->m_stepValue;
-		state[2] += (float)step->m_arg3;
+		state[2] += step->m_arg3;
 	}
 
 	int texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);

@@ -293,7 +293,12 @@ int DutySwing(int phase)
  */
 int RandomSwing(int phase)
 {
-    return static_cast<int>(DAT_8021dcce[(phase >> 8) & 0xFF]) << 8;
+    int index = phase >> 8;
+    char value;
+
+    index &= 0xFF;
+    value = DAT_8021dcce[index];
+    return (int)value << 8;
 }
 
 /*

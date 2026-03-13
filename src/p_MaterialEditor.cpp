@@ -427,7 +427,7 @@ void CMaterialEditorPcs::calcViewer()
     CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
 
     Mtx cameraMatrix;
-    CameraPcs.GetViewMatrix(cameraMatrix);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
     m_unkMatrix.value[0][0] = *reinterpret_cast<float*>(&field_0x12c);
     m_unkMatrix.value[0][1] = *reinterpret_cast<float*>(&field_0x130);

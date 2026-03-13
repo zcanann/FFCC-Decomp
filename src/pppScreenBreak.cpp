@@ -779,8 +779,8 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
 
     if (value[0x24] == 0) {
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8,
-                                   0);
+        Graphic.GetBackBufferRect2(
+            Graphic.m_scratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
         value[0x24] = 1;
     }
 }

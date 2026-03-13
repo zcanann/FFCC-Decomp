@@ -57,7 +57,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
 
     u8* targetColor;
     if (params->colorOffset == -1) {
-        targetColor = &gPppDefaultValueBuffer[0];
+        targetColor = gPppDefaultValueBuffer;
     } else {
         targetColor = base + params->colorOffset + 0x80;
     }

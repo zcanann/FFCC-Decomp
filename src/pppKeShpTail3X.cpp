@@ -15,7 +15,7 @@ struct KeShpTail3XStep {
     s32 m_initWOrk;
     s32 m_stepValue;
     s32 m_arg3;
-    u8* m_payload;
+    u8 m_payload[0x40];
 };
 
 struct KeShpTail3XOffsets {
@@ -57,7 +57,6 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     KeShpTail3XStep* step;
     KeShpTail3XWork* work;
     s16* stepWork;
-    u8* stepBytes;
     Vec pos;
     Vec temp;
     u8 worldSpaceMode;
@@ -68,9 +67,8 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
 
     step = (KeShpTail3XStep*)param_2;
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
-    stepWork = (s16*)&step->m_stepValue;
-    stepBytes = (u8*)&step->m_stepValue;
-    worldSpaceMode = stepBytes[0x47];
+    stepWork = (s16*)&step->m_payload[0xc];
+    worldSpaceMode = step->m_payload[0x3f];
 
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
         work->m_initialized = 1;

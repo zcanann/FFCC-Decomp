@@ -1,6 +1,8 @@
 #include "ffcc/wmm_str.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/fontman.h"
+
+extern CGame Game;
 
 extern const char* PTR_s_The_data_is_corrupt__80215bd8[];
 extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[];
@@ -56,7 +58,7 @@ const char* s_SlotBTextByLanguage[] = {
  */
 const char* CMenuPcs::GetMcStr(int index)
 {
-    switch (Game.game.m_gameWork.m_languageId) {
+    switch (Game.m_gameWork.m_languageId) {
     case 1:
         return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
     case 3:
@@ -82,7 +84,7 @@ const char* CMenuPcs::GetMcStr(int index)
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
     const char* const* result;
-    int languageId = Game.game.m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
 
     if (group == 0) {
         switch (languageId) {
@@ -154,8 +156,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
  */
 const char* CMenuPcs::GetWinMess(int index)
 {
-    CGame* game = (CGame*)&Game;
-    int languageId = game->m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
     if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
         return &s_WinMessTable[index * 0x14];
     }
@@ -173,19 +174,19 @@ const char* CMenuPcs::GetWinMess(int index)
  */
 int CMenuPcs::GetYesNoXPos(int right)
 {
-    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
+    const unsigned char languageId = Game.m_gameWork.m_languageId;
     const char* yesText;
     switch (languageId) {
     case 1:
         yesText = s_McWinMessGroup0_de[13];
         break;
-    case 2:
+    case 3:
         yesText = s_McWinMessGroup0_it[13];
         break;
-    case 3:
+    case 4:
         yesText = s_McWinMessGroup0_es[13];
         break;
-    case 4:
+    case 5:
         yesText = s_McWinMessGroup0_fr[13];
         break;
     default:
@@ -219,19 +220,19 @@ int CMenuPcs::GetYesNoXPos(int right)
  */
 int CMenuPcs::GetSlotABXPos(int right)
 {
-    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
+    const unsigned char languageId = Game.m_gameWork.m_languageId;
     const char* slotAText;
     switch (languageId) {
     case 1:
         slotAText = s_McWinMessGroup0_de[2];
         break;
-    case 2:
+    case 3:
         slotAText = s_McWinMessGroup0_it[2];
         break;
-    case 3:
+    case 4:
         slotAText = s_McWinMessGroup0_es[2];
         break;
-    case 4:
+    case 5:
         slotAText = s_McWinMessGroup0_fr[2];
         break;
     default:

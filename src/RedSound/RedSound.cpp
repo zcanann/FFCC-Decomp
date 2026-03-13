@@ -131,11 +131,11 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	memset(DAT_8032e17c, 0, 0x100);
 
 	if (param_3 <= 0 || param_5 <= 0) {
+		param_3 = 0;
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] Sound Driver Initialize ERROR! %s %s\n", "RedSound", "Invalid parameters", "");
 			fflush(__files + 2);
 		}
-		param_3 = 0;
 	} else if (((unsigned)param_2 & 0x1f) != 0 || ((unsigned)param_3 & 0x1f) != 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport("[%s] %s Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", (unsigned)param_2, param_3, "");

@@ -2406,11 +2406,9 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    int pauseState = pause;
-    pause = static_cast<int>((static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 31);
-    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8), -1, pause);
-    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8), -1, pause);
-    *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x22D0) = static_cast<u32>(pauseState);
+    SePause__9CRedSoundFii(RedSound(this), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 31);
+    StreamPause__9CRedSoundFii(RedSound(this), -1, (static_cast<u32>(-pause) | static_cast<u32>(pause)) >> 31);
+    SoundData(this).m_pauseAllSe = pause;
 }
 
 /*

@@ -266,20 +266,52 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_p_usb_cpp()
+extern "C" asm void __sinit_p_usb_cpp()
 {
-    *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
-    *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
-    *reinterpret_cast<void**>(&USBPcs) = __vt__7CUSBPcs;
+    nofralloc
 
-    u32* table = &m_table__7CUSBPcs[1];
-    table[0] = m_table_desc0__7CUSBPcs[0];
-    table[1] = m_table_desc0__7CUSBPcs[1];
-    table[2] = m_table_desc0__7CUSBPcs[2];
-    table[3] = m_table_desc1__7CUSBPcs[0];
-    table[4] = m_table_desc1__7CUSBPcs[1];
-    table[5] = m_table_desc1__7CUSBPcs[2];
-    table[6] = m_table_desc2__7CUSBPcs[0];
-    table[7] = m_table_desc2__7CUSBPcs[1];
-    table[8] = m_table_desc2__7CUSBPcs[2];
+    stwu r1, -0x10(r1)
+    lis r4, __vt__8CManager@ha
+    lis r3, USBPcs@ha
+    lis r8, __vt_CProcess@ha
+    stw r31, 0xc(r1)
+    lis r7, __vt__7CUSBPcs@ha
+    addi r0, r4, __vt__8CManager@l
+    stw r30, 0x8(r1)
+    addi r30, r3, USBPcs@l
+    lis r3, m_table_desc0__7CUSBPcs@ha
+    addi r31, r7, __vt__7CUSBPcs@l
+    addi r6, r3, m_table_desc0__7CUSBPcs@l
+    stw r0, 0x0(r30)
+    lis r3, m_table_desc1__7CUSBPcs@ha
+    addi r0, r8, __vt_CProcess@l
+    addi r4, r3, m_table_desc1__7CUSBPcs@l
+    stw r0, 0x0(r30)
+    lis r3, m_table_desc2__7CUSBPcs@ha
+    lwz r11, 0x0(r6)
+    addi r5, r3, m_table_desc2__7CUSBPcs@l
+    lwz r10, 0x4(r6)
+    lis r3, m_table__7CUSBPcs@ha
+    lwz r9, 0x8(r6)
+    addi r12, r3, m_table__7CUSBPcs@l
+    lwz r8, 0x0(r4)
+    lwz r7, 0x4(r4)
+    lwz r6, 0x8(r4)
+    lwz r4, 0x0(r5)
+    lwz r3, 0x4(r5)
+    lwz r0, 0x8(r5)
+    stw r31, 0x0(r30)
+    stw r11, 0x4(r12)
+    stw r10, 0x8(r12)
+    stw r9, 0xc(r12)
+    stw r8, 0x10(r12)
+    stw r7, 0x14(r12)
+    stw r6, 0x18(r12)
+    stw r4, 0x1c(r12)
+    stw r3, 0x20(r12)
+    stw r0, 0x24(r12)
+    lwz r31, 0xc(r1)
+    lwz r30, 0x8(r1)
+    addi r1, r1, 0x10
+    blr
 }

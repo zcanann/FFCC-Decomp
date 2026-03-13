@@ -386,6 +386,10 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     rowOfs = 0;
     colOfs = 0;
     while (i < 4) {
+        s32 rowOfs4;
+        s32 rowOfs8;
+        s32 rowOfsC;
+
         max = 0.0f;
         swp = i;
         j = i;
@@ -411,39 +415,42 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
             }
         }
 
+        rowOfs4 = rowOfs + 0x4;
+        rowOfs8 = rowOfs + 0x8;
+        rowOfsC = rowOfs + 0xc;
         w = 1.0f / *(f32*)((u8*)gjm + rowOfs + colOfs);
         *(f32*)((u8*)gjm + rowOfs + 0x0) *= w;
         *(f32*)((u8*)inv + rowOfs + 0x0) *= w;
-        *(f32*)((u8*)gjm + rowOfs + 0x4) *= w;
-        *(f32*)((u8*)inv + rowOfs + 0x4) *= w;
-        *(f32*)((u8*)gjm + rowOfs + 0x8) *= w;
-        *(f32*)((u8*)inv + rowOfs + 0x8) *= w;
-        *(f32*)((u8*)gjm + rowOfs + 0xc) *= w;
-        *(f32*)((u8*)inv + rowOfs + 0xc) *= w;
+        *(f32*)((u8*)gjm + rowOfs4) *= w;
+        *(f32*)((u8*)inv + rowOfs4) *= w;
+        *(f32*)((u8*)gjm + rowOfs8) *= w;
+        *(f32*)((u8*)inv + rowOfs8) *= w;
+        *(f32*)((u8*)gjm + rowOfsC) *= w;
+        *(f32*)((u8*)inv + rowOfsC) *= w;
 
         for (k = 0, j = 0; k < 4; k += 2, j += 0x20) {
             if (k != i) {
                 w = *(f32*)((u8*)gjm + j + colOfs);
                 *(f32*)((u8*)gjm + j + 0x0) -= *(f32*)((u8*)gjm + rowOfs + 0x0) * w;
                 *(f32*)((u8*)inv + j + 0x0) -= *(f32*)((u8*)inv + rowOfs + 0x0) * w;
-                *(f32*)((u8*)gjm + j + 0x4) -= *(f32*)((u8*)gjm + rowOfs + 0x4) * w;
-                *(f32*)((u8*)inv + j + 0x4) -= *(f32*)((u8*)inv + rowOfs + 0x4) * w;
-                *(f32*)((u8*)gjm + j + 0x8) -= *(f32*)((u8*)gjm + rowOfs + 0x8) * w;
-                *(f32*)((u8*)inv + j + 0x8) -= *(f32*)((u8*)inv + rowOfs + 0x8) * w;
-                *(f32*)((u8*)gjm + j + 0xc) -= *(f32*)((u8*)gjm + rowOfs + 0xc) * w;
-                *(f32*)((u8*)inv + j + 0xc) -= *(f32*)((u8*)inv + rowOfs + 0xc) * w;
+                *(f32*)((u8*)gjm + j + 0x4) -= *(f32*)((u8*)gjm + rowOfs4) * w;
+                *(f32*)((u8*)inv + j + 0x4) -= *(f32*)((u8*)inv + rowOfs4) * w;
+                *(f32*)((u8*)gjm + j + 0x8) -= *(f32*)((u8*)gjm + rowOfs8) * w;
+                *(f32*)((u8*)inv + j + 0x8) -= *(f32*)((u8*)inv + rowOfs8) * w;
+                *(f32*)((u8*)gjm + j + 0xc) -= *(f32*)((u8*)gjm + rowOfsC) * w;
+                *(f32*)((u8*)inv + j + 0xc) -= *(f32*)((u8*)inv + rowOfsC) * w;
             }
 
             if (k + 1 != i) {
                 w = *(f32*)((u8*)gjm + j + 0x10 + colOfs);
                 *(f32*)((u8*)gjm + j + 0x10) -= *(f32*)((u8*)gjm + rowOfs + 0x0) * w;
                 *(f32*)((u8*)inv + j + 0x10) -= *(f32*)((u8*)inv + rowOfs + 0x0) * w;
-                *(f32*)((u8*)gjm + j + 0x14) -= *(f32*)((u8*)gjm + rowOfs + 0x4) * w;
-                *(f32*)((u8*)inv + j + 0x14) -= *(f32*)((u8*)inv + rowOfs + 0x4) * w;
-                *(f32*)((u8*)gjm + j + 0x18) -= *(f32*)((u8*)gjm + rowOfs + 0x8) * w;
-                *(f32*)((u8*)inv + j + 0x18) -= *(f32*)((u8*)inv + rowOfs + 0x8) * w;
-                *(f32*)((u8*)gjm + j + 0x1c) -= *(f32*)((u8*)gjm + rowOfs + 0xc) * w;
-                *(f32*)((u8*)inv + j + 0x1c) -= *(f32*)((u8*)inv + rowOfs + 0xc) * w;
+                *(f32*)((u8*)gjm + j + 0x14) -= *(f32*)((u8*)gjm + rowOfs4) * w;
+                *(f32*)((u8*)inv + j + 0x14) -= *(f32*)((u8*)inv + rowOfs4) * w;
+                *(f32*)((u8*)gjm + j + 0x18) -= *(f32*)((u8*)gjm + rowOfs8) * w;
+                *(f32*)((u8*)inv + j + 0x18) -= *(f32*)((u8*)inv + rowOfs8) * w;
+                *(f32*)((u8*)gjm + j + 0x1c) -= *(f32*)((u8*)gjm + rowOfsC) * w;
+                *(f32*)((u8*)inv + j + 0x1c) -= *(f32*)((u8*)inv + rowOfsC) * w;
             }
         }
 

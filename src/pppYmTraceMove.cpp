@@ -47,23 +47,16 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
  */
 void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3)
 {
-	u8* pppMngSt;
+	_pppMngSt* pppMngSt;
 	u8* owner;
 	Vec* dest;
 	Vec local_128;
 	Vec local_11c;
 	Vec local_110;
 	Vec local_104;
-	Vec local_f8;
 	Vec local_ec;
-	Vec local_e0;
-	Vec local_d4;
-	Vec local_c8;
-	Quaternion local_bc;
-	Quaternion local_ac;
-	Quaternion local_9c;
+	Vec local_98;
 	Vec local_8c;
-	Vec local_80;
 	Vec local_74;
 	Vec local_68;
 	Vec local_5c;
@@ -72,14 +65,17 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	Vec local_38;
 	Vec local_2c;
 	Vec local_20;
+	Quaternion local_80;
+	Quaternion local_70;
+	Quaternion local_60;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	pppMngSt = (u8*)pppMngStPtr;
+	pppMngSt = pppMngStPtr;
 	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
-	owner = *(u8**)(pppMngSt + 0xdc);
+	owner = (u8*)pppMngSt->m_owner;
 
 	dest[2].z = dest[2].z + dest[3].x;
 	dest[2].y = dest[2].y + dest[2].z;
@@ -96,18 +92,18 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_8c.z = dest->z;
 		pppCopyVector__FR3Vec3Vec(&local_20, &local_8c);
 
-		local_80.x = dest[1].y;
-		local_80.y = dest[1].z;
-		local_80.z = dest[2].x;
-		pppCopyVector__FR3Vec3Vec(&local_2c, &local_80);
+		local_98.x = dest[1].y;
+		local_98.y = dest[1].z;
+		local_98.z = dest[2].x;
+		pppCopyVector__FR3Vec3Vec(&local_2c, &local_98);
 	} else {
 		local_74.x = *(f32*)(owner + 0x15c);
 		local_74.y = *(f32*)(owner + 0x160);
 		local_74.z = *(f32*)(owner + 0x164);
 
-		local_68.x = *(f32*)(pppMngSt + 0x8);
-		local_68.y = *(f32*)(pppMngSt + 0xc);
-		local_68.z = *(f32*)(pppMngSt + 0x10);
+		local_68.x = pppMngSt->m_position.x;
+		local_68.y = pppMngSt->m_position.y;
+		local_68.z = pppMngSt->m_position.z;
 		pppSubVector__FR3Vec3Vec3Vec(&local_20, &local_74, &local_68);
 
 		local_20.y = local_20.y + param_2->m_payload;
@@ -121,62 +117,61 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_50.z = local_20.z;
 		pppCopyVector__FR3Vec3Vec(dest, &local_50);
 
-		local_44.x = *(f32*)(pppMngSt + 0x48);
-		local_44.y = *(f32*)(pppMngSt + 0x4c);
-		local_44.z = *(f32*)(pppMngSt + 0x50);
-		local_38.x = *(f32*)(pppMngSt + 0x8);
-		local_38.y = *(f32*)(pppMngSt + 0xc);
-		local_38.z = *(f32*)(pppMngSt + 0x10);
+		local_44.x = pppMngSt->m_userFloat0;
+		local_44.y = pppMngSt->m_userFloat1;
+		local_44.z = pppMngSt->m_savedPosition.x;
+		local_38.x = pppMngSt->m_position.x;
+		local_38.y = pppMngSt->m_position.y;
+		local_38.z = pppMngSt->m_position.z;
 		pppSubVector__FR3Vec3Vec3Vec(&local_2c, &local_38, &local_44);
 
 		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {
-			local_e0.x = dest[1].y;
-			local_e0.y = dest[1].z;
-			local_e0.z = dest[2].x;
-			pppCopyVector__FR3Vec3Vec(&local_2c, &local_e0);
+			local_ec.x = dest[1].y;
+			local_ec.y = dest[1].z;
+			local_ec.z = dest[2].x;
+			pppCopyVector__FR3Vec3Vec(&local_2c, &local_ec);
 		}
-
-		local_d4.x = local_2c.x;
-		local_d4.y = local_2c.y;
-		local_d4.z = local_2c.z;
-		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_d4);
+		local_44.x = local_2c.x;
+		local_44.y = local_2c.y;
+		local_44.z = local_2c.z;
+		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_44);
 	}
 
-	local_ac.x = local_20.x;
-	local_ac.y = local_20.y;
-	local_ac.z = local_20.z;
-	local_ac.w = 1.0f;
-	local_bc.x = local_2c.x;
-	local_bc.y = local_2c.y;
-	local_bc.z = local_2c.z;
-	local_bc.w = 1.0f;
-	C_QUATLerp(&local_bc, &local_ac, &local_9c, param_2->m_dataValIndex);
-	PSQUATNormalize(&local_9c, &local_9c);
+	local_60.x = local_20.x;
+	local_60.y = local_20.y;
+	local_60.z = local_20.z;
+	local_60.w = 1.0f;
+	local_70.x = local_2c.x;
+	local_70.y = local_2c.y;
+	local_70.z = local_2c.z;
+	local_70.w = 1.0f;
+	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
+	PSQUATNormalize(&local_80, &local_80);
 
-	local_8c.x = local_9c.x;
-	local_8c.y = local_9c.y;
-	local_8c.z = local_9c.z;
-	PSVECScale(&local_8c, &local_8c, dest[2].y * *(f32*)(pppMngSt + 0x24));
+	local_8c.x = local_80.x;
+	local_8c.y = local_80.y;
+	local_8c.z = local_80.z;
+	PSVECScale(&local_8c, &local_8c, dest[2].y * *(f32*)((u8*)pppMngSt + 0x54));
 
-	local_110.x = *(f32*)(pppMngSt + 0x8);
-	local_110.y = *(f32*)(pppMngSt + 0xc);
-	local_110.z = *(f32*)(pppMngSt + 0x10);
+	local_110.x = pppMngSt->m_position.x;
+	local_110.y = pppMngSt->m_position.y;
+	local_110.z = pppMngSt->m_position.z;
 	local_104.x = local_8c.x;
 	local_104.y = local_8c.y;
 	local_104.z = local_8c.z;
 	pppAddVector__FR3Vec3Vec3Vec(&local_ec, &local_104, &local_110);
 
-	local_11c.x = *(f32*)(pppMngSt + 0x8);
-	local_11c.y = *(f32*)(pppMngSt + 0xc);
-	local_11c.z = *(f32*)(pppMngSt + 0x10);
-	pppCopyVector__FR3Vec3Vec((Vec*)(pppMngSt + 0x48), &local_11c);
+	local_11c.x = pppMngSt->m_position.x;
+	local_11c.y = pppMngSt->m_position.y;
+	local_11c.z = pppMngSt->m_position.z;
+	pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), &local_11c);
 
 	local_128.x = local_ec.x;
 	local_128.y = local_ec.y;
 	local_128.z = local_ec.z;
-	pppCopyVector__FR3Vec3Vec((Vec*)(pppMngSt + 0x8), &local_128);
+	pppCopyVector__FR3Vec3Vec(&pppMngSt->m_position, &local_128);
 
-	((_pppMngSt*)pppMngSt)->m_matrix.value[0][3] = local_ec.x;
-	((_pppMngSt*)pppMngSt)->m_matrix.value[1][3] = local_ec.y;
-	((_pppMngSt*)pppMngSt)->m_matrix.value[2][3] = local_ec.z;
+	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
+	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
+	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
 }

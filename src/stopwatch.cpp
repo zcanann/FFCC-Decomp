@@ -5,7 +5,7 @@ extern "C" void __dl__FPv(void* ptr);
 
 const float kStopwatchTickToMilliseconds = 100.0f;
 const float kStopwatchZeroFloat = 0.0f;
-char s_stopwatchDefaultName[] = "no name";
+const char s_stopwatchDefaultName[] = "no name";
 
 /*
  * --INFO--
@@ -92,7 +92,7 @@ float CStopWatch::Get()
  */
 CProfile::CProfile(char* name)
 {
-	OSInitStopwatch(this, s_stopwatchDefaultName);
+	OSInitStopwatch(this, (char*)s_stopwatchDefaultName);
 	OSResetStopwatch(this);
 
 	OSStopwatch tmp;

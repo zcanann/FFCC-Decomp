@@ -6,7 +6,7 @@
 
 #include "ffcc/manager.h"
 
-extern char s_stopwatchDefaultName[];
+extern const char s_stopwatchDefaultName[];
 extern const float kStopwatchTickToMilliseconds;
 extern const float kStopwatchZeroFloat;
 

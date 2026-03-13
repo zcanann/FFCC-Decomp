@@ -157,7 +157,7 @@ void calc(
 	float particleAngle;
 	Vec step;
 
-	alpha = (u8)((u8*)vColor)[0xB];
+	alpha = vColor->m_alpha;
 	paramPayload = (u8*)param;
 	particlePayload = (u8*)particle;
 
@@ -186,7 +186,7 @@ void calc(
 	else
 	{
 		*(float*)(particlePayload + 0x2C) = *(float*)(particlePayload + 0x2C) +
-			*(float*)(paramPayload + 0x98) + *(float*)(particlePayload + 0x3C);
+				*(float*)(paramPayload + 0x98) + *(float*)(particlePayload + 0x3C);
 	}
 
 	particleAngle = *(float*)(particlePayload + 0x28);

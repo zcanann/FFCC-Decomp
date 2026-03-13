@@ -518,14 +518,10 @@ done_check:
         result = 0;
     } else {
         int activePad = *(int*)((char*)pad + 0x1C0);
-        int idx;
-        char* slot;
-
-        padIndex = padIndex &
-                   ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
-        idx = (int)padIndex * 0x54;
-        slot = (char*)pad + idx;
-        result = *(unsigned short*)(slot + 0xA);
+        int validMask = ~((activePad - padIndex) | (padIndex - activePad));
+        int slot = padIndex & ~(validMask >> 31);
+        unsigned int offset = static_cast<unsigned int>(slot) * 0x54 + 0xA;
+        result = *(unsigned short*)((char*)pad + offset);
     }
 
     return (unsigned short)result;
@@ -699,11 +695,11 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        result = *(unsigned short*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
-                                                               padIndex - *(int*)((char*)pad + 0x1C0)) >>
-                                                 31)) *
-                                                  0x54 +
-                                    0x14);
+        int activePad = *(int*)((char*)pad + 0x1C0);
+        int validMask = ~((activePad - padIndex) | (padIndex - activePad));
+        int slot = padIndex & ~(validMask >> 31);
+        unsigned int offset = static_cast<unsigned int>(slot) * 0x54 + 0x14;
+        result = *(unsigned short*)((char*)pad + offset);
     }
 
     return (unsigned short)result;
@@ -737,11 +733,11 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        result = *(unsigned short*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
-                                                               padIndex - *(int*)((char*)pad + 0x1C0)) >>
-                                                 31)) *
-                                                  0x54 +
-                                    4);
+        int activePad = *(int*)((char*)pad + 0x1C0);
+        int validMask = ~((activePad - padIndex) | (padIndex - activePad));
+        int slot = padIndex & ~(validMask >> 31);
+        unsigned int offset = static_cast<unsigned int>(slot) * 0x54 + 4;
+        result = *(unsigned short*)((char*)pad + offset);
     }
 
     return (unsigned short)result;
@@ -2091,4 +2087,3 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         }
     }
 }
-

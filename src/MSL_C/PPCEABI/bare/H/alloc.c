@@ -382,13 +382,16 @@ static void Block_construct(Block* block, unsigned long size) {
  * JP Size: TODO
  */
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
+    unsigned long block_size;
     unsigned long current_size;
     unsigned long* start;
     unsigned long* current;
     unsigned long max_size;
-    int start_offset;
+    unsigned long** start_ptr;
 
-    start = *(unsigned long**)((char*)block + ((block->size & 0xFFFFFFF8UL) - 4));
+    block_size = block->size & 0xFFFFFFF8UL;
+    start_ptr = (unsigned long**)((char*)block + block_size - 4);
+    start = *start_ptr;
     if (start == 0) {
         block->max_size = 0;
         return 0;
@@ -446,16 +449,15 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
                 }
             }
 
-            *(unsigned long**)((char*)block + ((block->size & 0xFFFFFFF8UL) - 4)) = (unsigned long*)current[3];
+            *start_ptr = (unsigned long*)current[3];
             current_size = *current & 0xFFFFFFF8UL;
             *current |= 2;
             *(unsigned long*)((char*)current + current_size) |= 4;
-            start_offset = (block->size & 0xFFFFFFF8UL) - 4;
-            if (*(unsigned long**)((char*)block + start_offset) == current) {
-                *(unsigned long**)((char*)block + start_offset) = (unsigned long*)current[3];
+            if (*start_ptr == current) {
+                *start_ptr = (unsigned long*)current[3];
             }
-            if (*(unsigned long**)((char*)block + start_offset) == current) {
-                *(unsigned long**)((char*)block + start_offset) = 0;
+            if (*start_ptr == current) {
+                *start_ptr = 0;
                 block->max_size = 0;
             } else {
                 *(unsigned long*)(current[3] + 8) = current[2];
@@ -470,7 +472,6 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
 }
 
 static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
-    Block* start_block;
     Block* current_block;
     SubBlock* result;
     unsigned long aligned_size;
@@ -480,23 +481,19 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
         aligned_size = 0x50;
     }
 
-    start_block = pool_obj->start_;
-    if (start_block == 0) {
-        start_block = link_new_block(pool_obj, aligned_size);
+    current_block = pool_obj->start_;
+    if (current_block == 0) {
+        current_block = link_new_block(pool_obj, aligned_size);
     }
-    if (start_block != 0) {
-        current_block = start_block;
-    } else {
+    if (current_block == 0) {
         return 0;
     }
 
     do {
-        if (aligned_size <= current_block->max_size) {
-            result = Block_subBlock(current_block, aligned_size);
-            if (result != 0) {
-                pool_obj->start_ = current_block;
-                goto done;
-            }
+        if ((aligned_size <= current_block->max_size) &&
+            ((result = Block_subBlock(current_block, aligned_size)) != 0)) {
+            pool_obj->start_ = current_block;
+            return (SubBlock*)((char*)result + 8);
         }
         current_block = current_block->next;
     } while (current_block != pool_obj->start_);
@@ -507,7 +504,6 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
     }
 
     result = Block_subBlock(current_block, aligned_size);
-done:
     return (SubBlock*)((char*)result + 8);
 }
 

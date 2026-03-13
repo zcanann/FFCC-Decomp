@@ -195,40 +195,40 @@ void GXInitTexObj(GXTexObj* obj, void* image_ptr, u16 width, u16 height, GXTexFm
 #endif
 
     memset(t, 0, 0x20);
-    SET_REG_FIELD(600, t->mode0, 2, 0, wrap_s);
-    SET_REG_FIELD(601, t->mode0, 2, 2, wrap_t);
-    SET_REG_FIELD(602, t->mode0, 1, 4, 1);
+    t->mode0 = (t->mode0 & 0xFFFFFFFC) | wrap_s;
+    t->mode0 = (t->mode0 & 0xFFFFFFF3) | (wrap_t << 2);
+    t->mode0 = (t->mode0 & 0xFFFFFFEF) | 0x10;
 
     if (mipmap) {
         u8 lmax;
+
         t->flags |= 1;
 
-        if (format == 8 || format == 9 || format == 10) {
-            SOME_SET_REG_MACRO(t->mode0, 3, 5, 5);
+        if ((u32)(format - GX_TF_C4) < 3) {
+            t->mode0 = (t->mode0 & 0xFFFFFF1F) | 0xA0;
         } else {
-            SOME_SET_REG_MACRO(t->mode0, 3, 5, 6);
+            t->mode0 = (t->mode0 & 0xFFFFFF1F) | 0xC0;
         }
-
 
         if (width > height) {
             maxLOD = 31 - __cntlzw(width);
         } else {
             maxLOD = 31 - __cntlzw(height);
         }
-    
+
         lmax = 16.0f * maxLOD;
-        SET_REG_FIELD(632, t->mode1, 8, 8, lmax);
+        t->mode1 = (t->mode1 & 0xFFFF00FF) | (lmax << 8);
     } else {
-        SOME_SET_REG_MACRO(t->mode0, 3, 5, 4);
+        t->mode0 = (t->mode0 & 0xFFFFFF1F) | 0x80;
     }
 
     t->fmt = format;
-    SET_REG_FIELD(646, t->image0, 10, 0, width - 1);
-    SET_REG_FIELD(647, t->image0, 10, 10, height - 1);
-    SET_REG_FIELD(648, t->image0, 4, 20, format & 0xF);
+    t->image0 = (t->image0 & 0xFFFFFC00) | (width - 1);
+    t->image0 = (t->image0 & 0xFFF003FF) | ((height - 1) << 10);
+    t->image0 = (t->image0 & 0xFF0FFFFF) | ((format & 0xF) << 20);
     ASSERTMSGLINEV(654, ((u32)image_ptr & 0x1F) == 0, "%s: %s pointer not aligned to 32B", "GXInitTexObj", "image");
-    imageBase = (u32)((u32)image_ptr >> 5) & 0x01FFFFFF;
-    SET_REG_FIELD(656, t->image3, 21, 0, imageBase);
+    imageBase = ((u32)image_ptr >> 5) & 0x01FFFFFF;
+    t->image3 = (t->image3 & 0xFFE00000) | imageBase;
 
     switch (format & 0xF) {
     case GX_TF_I4:

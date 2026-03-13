@@ -120,28 +120,33 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
  */
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	u8 mode = *(u8*)((char*)param_3 + 0x14);
-	if (mode != 0) {
-		int textureInfo = *(int*)((char*)param_2 + 0x1c);
-		void* meshData = *(void**)((char*)model + 0xac + meshIdx * 0x14 + 8);
-		char* displayLists = (char*)*(void**)((char*)meshData + 0x50);
-		int colorArrayBase = *(int*)((char*)param_2 + 0xc);
-		if (colorArrayBase != 0) {
-			int vertexArray = *(int*)(colorArrayBase + meshIdx * 4);
+	int vertexArray;
+	int* displayListPtr;
+	int dlArrayBase;
+	int dlOffset;
+	ChangeTexMeshData* meshData;
+	ChangeTexDisplayList* displayList;
+
+	if (*(u8*)((char*)param_3 + 0x14) != 0) {
+		dlOffset = *(int*)((char*)param_2 + 0x1c);
+		meshData = (*(ChangeTexMeshRef**)((char*)model + 0xAC))[meshIdx].m_data;
+		displayList = meshData->m_displayLists;
+		if (*(int*)((char*)param_2 + 0xc) != 0) {
+			vertexArray = *(int*)(*(int*)((char*)param_2 + 0xc) + meshIdx * 4);
 			if (vertexArray != 0) {
-				*(void**)(MaterialManRaw() + 0x4) = *(void**)((char*)meshData + 0x20);
+				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray(0xb, (void*)vertexArray, 4);
 
-				if ((mode == 2) || (mode == 3)) {
-					*(int*)(MaterialManRaw() + 0xD0) = 0;
+				if ((*(u8*)((char*)param_3 + 0x14) == 2) || (*(u8*)((char*)param_3 + 0x14) == 3)) {
+					*(int*)(MaterialManRaw() + 0xd0) = 0;
 				} else {
-					*(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
+					*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
 				}
 
-				int dlIdx = *(int*)((char*)meshData + 0x4c) - 1;
-				int dlOffset = dlIdx * 4;
-				for (; dlIdx >= 0; dlIdx--) {
-					int dlArrayBase = *(int*)(*(int*)((char*)param_2 + 0x10) + meshIdx * 4);
+				vertexArray = meshData->m_displayListCount - 1;
+				dlOffset = vertexArray * 4;
+				for (; -1 < vertexArray; vertexArray = vertexArray - 1) {
+					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
 					*(int*)(MaterialManRaw() + 0x44) = -1;
 					*(char*)(MaterialManRaw() + 0x4c) = (char)0xff;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
@@ -158,15 +163,13 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x40) = 0xade0f;
 
-					void* modelData = *(void**)((char*)model + 0xa4);
-					void* materialSet = *(void**)((char*)modelData + 0x24);
-					unsigned short material = *(unsigned short*)(displayLists + 8);
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, material, 0, 0);
+					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
 
-					void** dl = *(void***)(dlArrayBase + dlOffset);
-					GXCallDisplayList(dl[0], (unsigned int)dl[1]);
-					dlOffset -= 4;
-					displayLists += 0xc;
+					displayListPtr = *(int**)(dlArrayBase + dlOffset);
+					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
+					dlOffset = dlOffset - 4;
+					displayList = displayList + 1;
 				}
 			}
 		}

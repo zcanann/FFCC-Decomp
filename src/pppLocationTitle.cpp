@@ -268,7 +268,6 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
         }
 
-        u8 blendMode = *(((u8*)&param_2->m_stepValue) + 1);
         for (int i = 0; i < work->m_count; i++, particle++) {
             Mtx model;
             Vec worldPos;
@@ -279,7 +278,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
             model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
 
-            PSMTXMultVec(ppvCameraMatrix02, &particle->m_pos, &worldPos);
+            PSMTXMultVec(ppvCameraMatrix0, &particle->m_pos, &worldPos);
             model[0][3] = worldPos.x;
             model[1][3] = worldPos.y;
             model[2][3] = worldPos.z;
@@ -295,8 +294,8 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
             GXLoadPosMtxImm(model, 0);
 
-            pppSetBlendMode(blendMode);
-            pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, blendMode);
+            pppSetBlendMode(*(((u8*)&param_2->m_stepValue) + 1));
+            pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, *(((u8*)&param_2->m_stepValue) + 1));
         }
     }
 }

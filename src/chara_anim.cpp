@@ -41,8 +41,8 @@ struct CAnimFields {
 	unsigned int m_bankSize;
 	void* m_bank;
 	int m_lastFrame;
-	int m_bankAddress;
 	CMemory::CStage* m_stage;
+	int m_bankAddress;
 };
 
 struct CAnimNodeFields {
@@ -164,29 +164,25 @@ void i2f_5(float*, unsigned short*)
  */
 CChara::CAnim::CAnim()
 {
-	int zero = 0;
-	int one = 1;
 	CAnimFields& anim = Anim(this);
 
 	__ct__4CRefFv(this);
 	anim.m_vtable = __vt__Q26CChara5CAnim;
-	anim.m_nodeCount = zero;
-	anim.m_frameCount = zero;
+	anim.m_nodeCount = 0;
+	anim.m_frameCount = 0;
 	anim.m_nodes = 0;
 	anim.m_bank = 0;
-	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), one, 7, 24, 24));
-	*reinterpret_cast<unsigned char*>(&anim.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&anim.m_flags), zero, 6, 25, 25));
+	anim.m_flags |= 0x80;
+	anim.m_flags &= ~0x40;
 	anim.m_quantizeX = 5;
 	anim.m_quantizeY = 0xB;
 	anim.m_quantizeZ = 10;
-	anim.m_interp = zero;
-	anim.m_interpOffset = zero;
+	anim.m_interp = 0;
+	anim.m_interpOffset = 0;
 	anim.m_stage = 0;
-	anim.m_bankSize = zero;
-	anim.m_bankAddress = zero;
-	anim.m_lastFrame = zero;
+	anim.m_bankSize = 0;
+	anim.m_bankAddress = 0;
+	anim.m_lastFrame = 0;
 }
 
 /*

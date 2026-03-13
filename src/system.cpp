@@ -513,7 +513,7 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
 
     if (__ptmf_test((__ptmf*)(descBlock + 4)) != 0)
     {
-        __ptmf_scall(process, descBlock + 4);
+        __ptmf_scall(process, (__ptmf*)(descBlock + 4));
     }
 }
 

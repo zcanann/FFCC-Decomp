@@ -154,10 +154,12 @@ void RedDelete(int address)
  * JP Size: TODO
  */
 #pragma dont_inline on
+#pragma optimization_level 0
 void RedDelete(void* param_1)
 {
 	RedDelete((int)param_1);
 }
+#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*
@@ -296,10 +298,12 @@ void RedDeleteA(int address)
  * JP Size: TODO
  */
 #pragma dont_inline on
+#pragma optimization_level 0
 void RedDeleteA(void* param_1)
 {
 	RedDeleteA((int)param_1);
 }
+#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*

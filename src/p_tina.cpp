@@ -200,6 +200,16 @@ struct CPartPcsViewerState {
     unsigned char m_disableShokiDraw;
 };
 
+struct CPartMngLoadState {
+    unsigned char unk0[0x23708];
+    int m_partLoadMode;
+};
+
+static CPartMngLoadState* GetPartMngLoadState()
+{
+    return reinterpret_cast<CPartMngLoadState*>(&PartMng);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80053960
@@ -1187,8 +1197,9 @@ unsigned int CPartPcs::IsLoadPartCompleted()
  */
 void LoadFieldPdt0(int mapId, int floorId)
 {
+    CPartMngLoadState* loadState = GetPartMngLoadState();
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
-    int partLoadMode = *reinterpret_cast<int*>(partMng + 0x236FC);
+    int partLoadMode = loadState->m_partLoadMode;
     int pdtSlot;
     char path[1024];
 

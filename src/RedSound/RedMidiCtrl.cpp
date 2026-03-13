@@ -80,7 +80,7 @@ int DataAddCompute(int* current, int target, int* delta)
     int value = *current;
 
     if (target != (value >> 0xc)) {
-        return (((target << 0xc) + 0x800) - value) / *delta;
+        return (((target << 0xc) | 0x800) - value) / *delta;
     }
 
     *delta = 0;

@@ -63,7 +63,7 @@ struct PppYmEnvMngStRaw {
     s16 m_nodeIndex;
     u8 m_pad78[0xD8 - 0x78];
     CGObject* m_owner;
-    void* m_lookTarget;
+    void* m_unkDC;
     CChara::CNode* m_bindNode;
     u8 m_padE4[0xE7 - 0xE4];
     u8 m_matrixMode;
@@ -144,9 +144,6 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     if (anim != 0) {
         animFrameMax = *(u16*)((u8*)anim + 0x10);
     }
-    if (animFrameMax == 0) {
-        return 0;
-    }
 
     int frameInt = (int)*(float*)(modelBytes + 0xD4);
     int frameMod = frameInt % (int)animFrameMax;
@@ -188,7 +185,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 
     u8 matrixMode = raw->m_matrixMode;
     if (matrixMode == 5) {
-        if (raw->m_lookTarget != 0) {
+        if (raw->m_bindNode != 0) {
             outMatrix[0][3] += pppMngStPtr->m_position.x;
             outMatrix[1][3] += pppMngStPtr->m_position.y;
             outMatrix[2][3] += pppMngStPtr->m_position.z;
@@ -228,7 +225,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             return 1;
         }
     } else if (matrixMode < 5) {
-        if (matrixMode == 3 && raw->m_lookTarget != 0) {
+        if (matrixMode == 3 && raw->m_bindNode != 0) {
             Vec pos;
             PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &pos);
             outMatrix[0][3] += pos.x;
@@ -265,7 +262,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             PSMTXCopy(localMatrix.value, outMatrix);
             return 1;
         }
-    } else if (matrixMode < 7 && raw->m_lookTarget != 0) {
+    } else if (matrixMode < 7 && raw->m_bindNode != 0) {
         Vec col0;
         Vec col1;
         Vec col2;

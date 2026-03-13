@@ -356,20 +356,18 @@ void CFunnyShapePcs::destroyViewer()
  */
 void CFunnyShapePcs::calcViewer()
 {
-    if (reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C)->IsUSBStreamDataDone() != 0) {
+    CUSBStreamData* usb = UsbStream(this);
+
+    if (usb->IsUSBStreamDataDone() != 0) {
         SetUSBData();
-        reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C)->SetUSBStreamDataDone();
+        usb->SetUSBStreamDataDone();
     }
 
-    if (static_cast<s8>(reinterpret_cast<u8*>(this)[0x6124]) == 0) {
-        return;
+    if (static_cast<s8>(Ptr(this, 0x6124)[0]) != 0) {
+        if (*reinterpret_cast<u32*>(Ptr(this, 0x6134)) != 0) {
+            FunnyShape(this)->Update();
+        }
     }
-
-    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6134) == 0) {
-        return;
-    }
-
-    reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(this) + 0x50)->Update();
 }
 
 /*

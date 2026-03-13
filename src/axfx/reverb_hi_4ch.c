@@ -7,6 +7,19 @@
 
 static void ReverbHIDpl2Free(AXFX_REVHI_WORK_DPL2* rv);
 
+static const s32 axfx_reverb_hi_dpl2_lens[9] = {
+    0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1, 0x00000095,
+    0x0000002F, 0x00000049, 0x00000043, 0x00000047,
+};
+
+static const f32 axfx_reverb_hi_dpl2_f32_0 = 0.0f;
+static const f32 axfx_reverb_hi_dpl2_f32_0p01 = 0.01f;
+static const f32 axfx_reverb_hi_dpl2_f32_0p05 = 0.05f;
+static const f32 axfx_reverb_hi_dpl2_f32_0p8 = 0.8f;
+static const f32 axfx_reverb_hi_dpl2_f32_1 = 1.0f;
+static const f32 axfx_reverb_hi_dpl2_f32_10 = 10.0f;
+static const f32 axfx_reverb_hi_dpl2_f32_32000 = 32000.0f;
+
 static void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
     while (dl->outPoint < 0) {
@@ -44,66 +57,56 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     u8 i;
     u8 k;
 
-    static s32 lens[9] = {
-        0x000006FD,
-        0x000007CF,
-        0x0000091D,
-        0x000001B1,
-        0x00000095,
-        0x0000002F,
-        0x00000049,
-        0x00000043,
-        0x00000047
-    };
-
-    ASSERTMSGLINE(117, coloration >= 0.0f && coloration <= 1.0f &&
-                           time >= 0.01f && time <= 10.0f &&
-                           mix >= 0.0f && mix <= 1.0f &&
-                           damping >= 0.0f && damping <= 1.0f &&
-                           preDelay >= 0.0f && preDelay <= 0.1f,
+    ASSERTMSGLINE(117, coloration >= axfx_reverb_hi_dpl2_f32_0 && coloration <= axfx_reverb_hi_dpl2_f32_1 &&
+                           time >= axfx_reverb_hi_dpl2_f32_0p01 && time <= axfx_reverb_hi_dpl2_f32_10 &&
+                           mix >= axfx_reverb_hi_dpl2_f32_0 && mix <= axfx_reverb_hi_dpl2_f32_1 &&
+                           damping >= axfx_reverb_hi_dpl2_f32_0 && damping <= axfx_reverb_hi_dpl2_f32_1 &&
+                           preDelay >= axfx_reverb_hi_dpl2_f32_0 && preDelay <= 0.1f,
                            "The value of specified parameter is out of range.");
 
-    if ((coloration < 0.0f ) || (coloration > 1.0f )
-     || (time       < 0.01f) || (time       > 10.0f)
-     || (mix        < 0.0f ) || (mix        > 1.0f )
-     || (damping    < 0.0f ) || (damping    > 1.0f )
-     || (preDelay   < 0.0f ) || (preDelay   > 0.1f )) {
+    if ((coloration < axfx_reverb_hi_dpl2_f32_0) || (coloration > axfx_reverb_hi_dpl2_f32_1)
+     || (time < axfx_reverb_hi_dpl2_f32_0p01) || (time > axfx_reverb_hi_dpl2_f32_10)
+     || (mix < axfx_reverb_hi_dpl2_f32_0) || (mix > axfx_reverb_hi_dpl2_f32_1)
+     || (damping < axfx_reverb_hi_dpl2_f32_0) || (damping > axfx_reverb_hi_dpl2_f32_1)
+     || (preDelay < axfx_reverb_hi_dpl2_f32_0) || (preDelay > 0.1f)) {
         return 0;
     }
 
     memset(rv, 0, sizeof(AXFX_REVHI_WORK_DPL2));
     for (k = 0; k < 4; k++) {
         for (i = 0; i < 3; i++) {
-            DLcreateDpl2(&rv->C[i + (k * 3)], lens[i] + 2);
-            DLsetdelayDpl2(&rv->C[i + (k * 3)], lens[i]);
-            rv->combCoef[i + (k * 3)] = powf(10.0f, (lens[i] * -3) / (32000.0f * time));
+            DLcreateDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i] + 2);
+            DLsetdelayDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i]);
+            rv->combCoef[i + (k * 3)] =
+                powf(axfx_reverb_hi_dpl2_f32_10,
+                     (axfx_reverb_hi_dpl2_lens[i] * -3) / (axfx_reverb_hi_dpl2_f32_32000 * time));
         }
 
         for (i = 0; i < 2; i++) {
-            DLcreateDpl2(&rv->AP[i + (k * 3)], lens[i + 3] + 2);
-            DLsetdelayDpl2(&rv->AP[i + (k * 3)], lens[i + 3]);
+            DLcreateDpl2(&rv->AP[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i + 3] + 2);
+            DLsetdelayDpl2(&rv->AP[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i + 3]);
         }
 
-        DLcreateDpl2(&rv->AP[2 + (k * 3)], lens[k + 5] + 2);
-        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], lens[k + 5]);
-        rv->lpLastout[k] = 0.0f;
+        DLcreateDpl2(&rv->AP[2 + (k * 3)], axfx_reverb_hi_dpl2_lens[k + 5] + 2);
+        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], axfx_reverb_hi_dpl2_lens[k + 5]);
+        rv->lpLastout[k] = axfx_reverb_hi_dpl2_f32_0;
     }
 
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p05) {
+        rv->damping = axfx_reverb_hi_dpl2_f32_0p05;
     }
 
     {
-        f32 damp = 0.8f * rv->damping;
-        damp += 0.05f;
-        rv->damping = 1.0f - damp;
+        f32 damp = axfx_reverb_hi_dpl2_f32_0p8 * rv->damping;
+        damp += axfx_reverb_hi_dpl2_f32_0p05;
+        rv->damping = axfx_reverb_hi_dpl2_f32_1 - damp;
     }
 
-    if (0.0f != preDelay) {
-        rv->preDelayTime = (32000.0f * preDelay);
+    if (axfx_reverb_hi_dpl2_f32_0 != preDelay) {
+        rv->preDelayTime = (axfx_reverb_hi_dpl2_f32_32000 * preDelay);
         for (i = 0; i < 4; i++) {
             rv->preDelayLine[i] = __AXFXAlloc(rv->preDelayTime * 4);
             ASSERTMSGLINE(188, rv->preDelayLine[i], "Can't allocate the memory.");

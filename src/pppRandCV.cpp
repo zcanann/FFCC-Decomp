@@ -55,12 +55,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
         target = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    u8* targetColor;
-    if (params->colorOffset == -1) {
-        targetColor = gPppDefaultValueBuffer;
-    } else {
-        targetColor = base + params->colorOffset + 0x80;
-    }
+    u8* targetColor = (params->colorOffset == -1) ? &gPppDefaultValueBuffer[0] : base + params->colorOffset + 0x80;
 
     f32 scale = target[0];
     targetColor[0] += (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]);

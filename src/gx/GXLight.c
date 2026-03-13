@@ -439,11 +439,13 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
 
     switch (chan) {
     case GX_COLOR0:
-        reg = (GXCOLOR_AS_U32(amb_color) & ~0xFF) | (__GXData->ambColor[GX_COLOR0] & 0xFF);
+        reg = __GXData->ambColor[GX_COLOR0] & 0xFF;
+        reg |= GXCOLOR_AS_U32(amb_color) & 0xFFFFFF00;
         colIdx = 0;
         break;
     case GX_COLOR1:
-        reg = (GXCOLOR_AS_U32(amb_color) & ~0xFF) | (__GXData->ambColor[GX_COLOR1] & 0xFF);
+        reg = __GXData->ambColor[GX_COLOR1] & 0xFF;
+        reg |= GXCOLOR_AS_U32(amb_color) & 0xFFFFFF00;
         colIdx = 1;
         break;
     case GX_ALPHA0:
@@ -480,11 +482,13 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
 
     switch (chan) {
     case GX_COLOR0:
-        reg = (GXCOLOR_AS_U32(mat_color) & ~0xFF) | (__GXData->matColor[GX_COLOR0] & 0xFF);
+        reg = __GXData->matColor[GX_COLOR0] & 0xFF;
+        reg |= GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00;
         colIdx = 0;
         break;
     case GX_COLOR1:
-        reg = (GXCOLOR_AS_U32(mat_color) & ~0xFF) | (__GXData->matColor[GX_COLOR1] & 0xFF);
+        reg = __GXData->matColor[GX_COLOR1] & 0xFF;
+        reg |= GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00;
         colIdx = 1;
         break;
     case GX_ALPHA0:

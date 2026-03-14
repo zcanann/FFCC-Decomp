@@ -1,6 +1,7 @@
 #include "ffcc/gobject.h"
 
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
@@ -45,6 +46,7 @@ extern float FLOAT_8033036c;
 extern float FLOAT_80330360;
 extern float FLOAT_80330370;
 extern float FLOAT_80330374;
+extern float FLOAT_80330394;
 extern double DOUBLE_80330348;
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
@@ -1671,9 +1673,70 @@ void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnF
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::CCClass(int, int, float, Vec*, float)
+/*
+ * --INFO--
+ * PAL Address: 0x8007d730
+ * PAL Size: 636b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec* targetPos, float radius)
 {
-	// TODO
+    Vec origin;
+    Vec toTarget;
+    Vec targetDir;
+    Vec toOther;
+    CGObject* best;
+
+    origin.x = m_worldPosition.x;
+    origin.y = m_worldPosition.y + yOffset;
+    origin.z = m_worldPosition.z;
+
+    PSVECSubtract(targetPos, &origin, &toTarget);
+    const double maxDist = static_cast<double>(PSVECMag(&toTarget));
+    if (maxDist == static_cast<double>(sZeroFloat)) {
+        return 0;
+    }
+
+    PSVECNormalize(&toTarget, &targetDir);
+    const double maxAngle = static_cast<double>(static_cast<float>(atan2(static_cast<double>(radius), maxDist)));
+    double bestDist = static_cast<double>(FLOAT_80330394);
+    best = 0;
+
+    for (CGObject* other = FindGObjFirst__13CFlatRuntime2Fv(CFlat); other != 0;
+         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+        if (other == this) {
+            continue;
+        }
+        if ((other->m_attrFlags & static_cast<unsigned int>(classMask)) == 0) {
+            continue;
+        }
+        if ((other->m_worldPosition.x - maxDist > origin.x) || (other->m_worldPosition.y - maxDist > origin.y)
+            || (other->m_worldPosition.z - maxDist > origin.z) || (origin.x > other->m_worldPosition.x + maxDist)
+            || (origin.y > other->m_worldPosition.y + maxDist) || (origin.z > other->m_worldPosition.z + maxDist)) {
+            continue;
+        }
+
+        PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
+        const double dist = static_cast<double>(PSVECMag(&toOther));
+        if ((static_cast<double>(sZeroFloat) < dist) && (dist < maxDist)) {
+            double extraAngle = static_cast<double>(sZeroFloat);
+            if (useBodyRadius != 0) {
+                extraAngle = static_cast<double>(static_cast<float>(atan(static_cast<double>(other->m_bodyEllipsoidRadius) / maxDist)));
+            }
+            PSVECScale(&toOther, &toOther, static_cast<float>(sAnimFrameOffset / dist));
+            const double angle = static_cast<double>(static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir)))));
+            if ((angle < maxAngle + extraAngle) && (dist < bestDist)) {
+                best = other;
+                bestDist = dist;
+            }
+        }
+    }
+
+    gCFlatRuntime2.AddDebugDrawCC(&origin, &toTarget, radius, 0, 0);
+    return best;
 }
 
 /*

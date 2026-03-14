@@ -769,9 +769,10 @@ static char* float2str(long double num, char *buff, print_format format) {
             return p;
     }
 
-    dec.exp += dec.sig.length - 1;
-    p = buff;
-    *--p = 0;
+    dec.exp += dec.sig.length;
+    --dec.exp;
+    p = buff - 1;
+    *p = 0;
 
     switch (format.conversion_char)
     {
@@ -887,8 +888,13 @@ static char* float2str(long double num, char *buff, print_format format) {
 
             q = (char*) dec.sig.text + dec.sig.length;
 
-            for (digits = 0; digits < (format.precision - frac_digits); ++digits)
-                *--p = '0';
+            digits = 0;
+            if (digits < (format.precision - frac_digits)) {
+                do {
+                    *--p = '0';
+                    ++digits;
+                } while (digits < (format.precision - frac_digits));
+            }
 
             for (digits = 0; digits < frac_digits && digits < dec.sig.length; ++digits)
                 *--p = *--q;

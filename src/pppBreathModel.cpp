@@ -27,6 +27,8 @@ void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppInitBlendMode__Fv(void);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
 static char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
@@ -644,21 +646,29 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
     int i;
+    int j;
     int dataOffset;
     int colorOffset;
     int maxParticleCount;
     int graphId;
+    int groupCount;
+    int slotCount;
+    int firstParticle;
     unsigned char* base;
     unsigned char* work;
     unsigned char* particleData;
     unsigned char* particleWMat;
+    unsigned char* groupPtr;
     float* particleColor;
+    float groupScale;
     pppModelSt* model;
     GXColor baseColor;
     GXColor drawColor;
+    GXColor debugColor;
     Mtx scaledMtx;
     Mtx drawMtx;
     Mtx worldMtx;
+    Mtx sphereMtx;
     Vec pos;
 
     dataOffset = offsets->m_serializedDataOffsets[0];
@@ -690,7 +700,11 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 
     for (i = 0; i < maxParticleCount; i++) {
         if (*(short*)(particleData + 0x50) > 0) {
-            drawColor = baseColor;
+            int r = (int)baseColor.r;
+            int g = (int)baseColor.g;
+            int b = (int)baseColor.b;
+            int a = (int)baseColor.a - (int)*(float*)(particleData + 0x88);
+
             PSMTXScale(scaledMtx,
                        *(float*)(pppMngStPtr + 0x28) * *(float*)(particleData + 0x64),
                        *(float*)(pppMngStPtr + 0x2C) * *(float*)(particleData + 0x68),
@@ -704,25 +718,23 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             drawMtx[2][3] = pos.z;
 
             if (particleColor != NULL) {
-                int r = (int)baseColor.r + (int)particleColor[0];
-                int g = (int)baseColor.g + (int)particleColor[1];
-                int b = (int)baseColor.b + (int)particleColor[2];
-                int a = (int)baseColor.a + (int)particleColor[3];
-
-                if (r < 0) r = 0;
-                if (r > 255) r = 255;
-                if (g < 0) g = 0;
-                if (g > 255) g = 255;
-                if (b < 0) b = 0;
-                if (b > 255) b = 255;
-                if (a < 0) a = 0;
-                if (a > 127) a = 127;
-
-                drawColor.r = (u8)r;
-                drawColor.g = (u8)g;
-                drawColor.b = (u8)b;
-                drawColor.a = (u8)a;
+                r += (int)particleColor[0];
+                g += (int)particleColor[1];
+                b += (int)particleColor[2];
+                a += (int)particleColor[3];
             }
+            if (r < 0) r = 0;
+            if (r > 255) r = 255;
+            if (g < 0) g = 0;
+            if (g > 255) g = 255;
+            if (b < 0) b = 0;
+            if (b > 255) b = 255;
+            if (a < 0) a = 0;
+            if (a > 127) a = 127;
+            drawColor.r = (u8)r;
+            drawColor.g = (u8)g;
+            drawColor.b = (u8)b;
+            drawColor.a = (u8)a;
 
             GXLoadPosMtxImm(drawMtx, 0);
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
@@ -739,8 +751,67 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     }
 
     if ((CFlatFlags & 0x200000) != 0) {
+        groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
+        slotCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+        groupPtr = *(unsigned char**)(work + 0x3C);
+
+        for (i = 0; i < groupCount; i++) {
+            if (*(int*)groupPtr == 1) {
+                if (i == 0) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
+                    debugColor.a = 0xFF;
+                } else if (i == 1) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                } else if (i == 2) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
+                    debugColor.a = 0xFF;
+                } else if (i == 3) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                } else {
+                    debugColor.r = 0x00;
+                    debugColor.g = 0x60;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                }
+
+                firstParticle = -1;
+                for (j = 0; j < slotCount; j++) {
+                    if (*(signed char*)(*(int*)(groupPtr + 8) + j) != -1) {
+                        firstParticle = (int)*(signed char*)(*(int*)(groupPtr + 4) + j);
+                        break;
+                    }
+                }
+
+                PSMTXIdentity(sphereMtx);
+                groupScale = *(float*)(groupPtr + 0x28);
+                sphereMtx[0][0] = groupScale;
+                sphereMtx[1][1] = groupScale;
+                sphereMtx[2][2] = groupScale;
+                PSMTXConcat(*(Mtx*)(particleWMat + firstParticle * 0x30), *(Mtx*)((unsigned char*)breathModel + 4), worldMtx);
+                PSMTXConcat(ppvCameraMatrix0, worldMtx, worldMtx);
+                PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0x0C), &pos);
+                sphereMtx[0][3] = pos.x;
+                sphereMtx[1][3] = pos.y;
+                sphereMtx[2][3] = pos.z;
+
+                pppSetBlendMode__FUc(1);
+                DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
+            }
+            groupPtr += 0x5C;
+        }
+
         pppInitBlendMode__Fv();
-        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
     }
 }
 

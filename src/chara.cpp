@@ -9,6 +9,7 @@ extern "C" void freeFurTex__6CCharaFv();
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void __ct__7CVectorFv(void*);
 extern "C" char __vt__6CChara[];
 
 /*
@@ -916,8 +917,13 @@ int CChara::CModel::GetDispIndex(CChara::CNode* node)
  */
 CChara::CNode::CNode()
 {
-	memset(this, 0, 0xC0);
-	*(u8*)((u8*)this + 0x80) = (*(u8*)((u8*)this + 0x80) & 0x7F) | 0x80;
+	__ct__7CVectorFv((u8*)this + 0xA4);
+	__ct__7CVectorFv((u8*)this + 0xB0);
+	*(u32*)((u8*)this + 0x0) = 0;
+	*(u32*)((u8*)this + 0x4) = 0;
+	*(u32*)((u8*)this + 0x9C) = 0;
+	*(u32*)((u8*)this + 0xA0) = 0;
+	*(u8*)((u8*)this + 0xBC) = (*(u8*)((u8*)this + 0xBC) & 0x7F) | 0x80;
 }
 
 /*

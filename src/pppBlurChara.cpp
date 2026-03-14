@@ -332,11 +332,12 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
+    u8* dataValBytes = reinterpret_cast<u8*>(&param_2->m_dataValIndex);
     int textureBase = 0;
     int textureIndex;
     int colorOffset = param_3->m_serializedDataOffsets[1];
     int texOffset = param_3->m_serializedDataOffsets[2];
-    int objPosBase = *(int*)((char*)blurChara + 0x84 + texOffset);
+    int objPosBase;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
     Mtx identityMtx;
@@ -357,7 +358,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Vec quadA;
     Vec quadB;
 
-    if (*((unsigned char*)&param_2->m_dataValIndex + 1) == 1) {
+    if (dataValBytes[1] == 1) {
         textureIndex = 0;
         if (param_2->m_initWOrk == -1) {
             return;
@@ -365,7 +366,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
             ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
-        unsigned int div = *((unsigned char*)&param_2->m_dataValIndex + 2);
+        unsigned int div = dataValBytes[2];
         Graphic.CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);
     }
 
@@ -374,6 +375,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((pppCVECTOR*)((char*)blurChara + 0x88 + colorOffset),
                                                                0, FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1,
                                                                1, 0);
+    objPosBase = *(int*)((char*)blurChara + 0x84 + texOffset);
 
     PSMTXIdentity(identityMtx);
 
@@ -389,6 +391,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
     PSMTXCopy(CameraMatrix(), cameraMtx);
+    PSMTXIdentity(identityMtx);
 
     objPos.x = *(float*)(objPosBase + 0x15C);
     objPos.y = *(float*)(objPosBase + 0x160);
@@ -424,7 +427,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-    if (*((unsigned char*)&param_2->m_dataValIndex + 1) == 1) {
+    if (dataValBytes[1] == 1) {
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
     } else {
         GXLoadTexObj(&smallBackTex, GX_TEXMAP1);
@@ -454,8 +457,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     PSMTX44Copy(CameraScreenMatrix(), screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
-    double depth = static_cast<double>(PSVECDistance(&cameraPos, &objPos)) - static_cast<double>(param_2->m_stepValue);
-    inVec.z = -static_cast<float>(depth);
+    double depth = (double)PSVECDistance(&cameraPos, &objPos);
+    depth = (double)(float)(depth - (double)param_2->m_stepValue);
+    inVec.z = (float)-depth;
     inVec.w = FLOAT_8033103c;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 
@@ -463,13 +467,17 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    float arg3 = param_2->m_arg3;
+    float arg3 = (float)param_2->m_arg3;
+    float negArg3 = -arg3;
+    float quadLeft = -(FLOAT_80331044 * arg3);
+    float quadTop = FLOAT_80331048 + (FLOAT_80331044 * arg3);
+    float quadBottom = FLOAT_8033104c + arg3;
 
-    quadA.x = -FLOAT_80331044 * arg3;
-    quadA.y = FLOAT_80331048 + FLOAT_80331044 * arg3;
+    quadA.x = quadLeft;
+    quadA.y = quadTop;
     quadA.z = outVec.z;
-    quadB.x = -arg3;
-    quadB.y = FLOAT_8033104c + arg3;
+    quadB.x = negArg3;
+    quadB.y = quadBottom;
     quadB.z = outVec.z;
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);

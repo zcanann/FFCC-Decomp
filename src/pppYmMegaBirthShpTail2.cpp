@@ -268,7 +268,7 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA*, VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     u8* color = (u8*)vColor;
-    u32 alpha = 0;
+    u32 alpha = ((u8*)particleColor)[0xb];
     float* blend = (float*)(color + 0x30);
     float* velocityScale = (float*)(color + 0x28);
     float* tailScale = (float*)(color + 0x2c);
@@ -283,29 +283,18 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     Vec local;
     Vec scaled;
 
-    if (particleColor != 0) {
-        alpha = ((u8*)particleColor)[0xb];
-    }
-
     *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail2->m_sizeVal;
 
     local.x = *(float*)(color + 0x10);
     local.y = *(float*)(color + 0x14);
     local.z = *(float*)(color + 0x18);
-    scaled.x = local.x * *velocityScale;
-    scaled.y = local.y * *velocityScale;
-    scaled.z = local.z * *velocityScale;
-    *(float*)(color + 0x00) = *(float*)(color + 0x00) + scaled.x;
-    *(float*)(color + 0x04) = *(float*)(color + 0x04) + scaled.y;
-    *(float*)(color + 0x08) = *(float*)(color + 0x08) + scaled.z;
+    pppScaleVectorXYZ(scaled, local, *velocityScale);
+    pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 
-    scaled.x = vYmMegaBirthShpTail2->m_tailScaleDirection.x * *tailScale;
-    scaled.y = vYmMegaBirthShpTail2->m_tailScaleDirection.y * *tailScale;
-    scaled.z = vYmMegaBirthShpTail2->m_tailScaleDirection.z * *tailScale;
-    *(float*)(color + 0x00) = *(float*)(color + 0x00) + scaled.x;
-    *(float*)(color + 0x04) = *(float*)(color + 0x04) + scaled.y;
-    *(float*)(color + 0x08) = *(float*)(color + 0x08) + scaled.z;
+    local = vYmMegaBirthShpTail2->m_tailScaleDirection;
+    pppScaleVectorXYZ(scaled, local, *tailScale);
+    pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
 
     if (*(s16*)((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 0x4) != 0) {
         *(s16*)(color + 0x22) = *(s16*)(color + 0x22) - 1;
@@ -672,5 +661,4 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         }
     }
 }
-
 

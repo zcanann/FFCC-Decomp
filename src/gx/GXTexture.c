@@ -1285,7 +1285,8 @@ void __GXGetSUTexSize(GXTexCoordID coord, u16* width, u16* height) {
 }
 
 void __GXSetTmemConfig(int config) {
-    if (config == 1) {
+    switch (config) {
+    case 1:
         GX_WRITE_RAS_REG(0x8c0d8000);
         GX_WRITE_RAS_REG(0x900dc000);
 
@@ -1309,7 +1310,8 @@ void __GXSetTmemConfig(int config) {
 
         GX_WRITE_RAS_REG(0xaf0db800);
         GX_WRITE_RAS_REG(0xb30df800);
-    } else {
+        break;
+    default:
         GX_WRITE_RAS_REG(0x8c0d8000);
         GX_WRITE_RAS_REG(0x900dc000);
 
@@ -1333,5 +1335,6 @@ void __GXSetTmemConfig(int config) {
 
         GX_WRITE_RAS_REG(0xaf0d9c00);
         GX_WRITE_RAS_REG(0xb30ddc00);
+        break;
     }
 }

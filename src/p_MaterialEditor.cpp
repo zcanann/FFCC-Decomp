@@ -211,7 +211,7 @@ void CMaterialEditorPcs::Init()
         remaining += -1;
     } while (remaining != 0);
 
-    reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
+    WriteU8(self, 0x3BC, 0);
 }
 
 /*

@@ -308,9 +308,9 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     visibleCount = 0;
     for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
         alpha = (u16)param_2->m_payload[8] - (s16)iVar4 * work->alphaStep;
-        if ((alpha < 0) || ((useFallback = entries->active == 0), useFallback)) {
+        if ((alpha < 0) || (entries->active == 0)) {
             entries->color[3] = 0;
-        } else if (!useFallback) {
+        } else {
             entries->color[3] = (u8)alpha;
             visibleCount++;
         }

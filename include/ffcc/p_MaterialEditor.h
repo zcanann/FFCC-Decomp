@@ -47,14 +47,13 @@ public:
     CMemory::CStage* m_stage; // 0x04
     unsigned char _pad08[0x7C];
     CUSBStreamData m_usbStream; // 0x84
-    
-    // Additional fields based on Ghidra decomp
-    Vec field268_0x15c; // Position vector
-    pppFMATRIX m_unkMatrix; // Matrix for transformations
-    
-    // Fields for matrix data (0x12c - 0x158 range)
+
+    pppFMATRIX m_unkMatrix; // 0xB4
+    unsigned char _padE4[0x48];
+
+    // Raw float words consumed by calcViewer (0x12C - 0x158)
     char field_0x12c[4];
-    char field_0x130[4]; 
+    char field_0x130[4];
     char field_0x134[4];
     char field_0x138[4];
     char field_0x13c[4];
@@ -65,6 +64,8 @@ public:
     char field_0x150[4];
     char field_0x154[4];
     char field_0x158[4];
+
+    Vec field268_0x15c; // 0x15C
 };
 
 extern CMaterialEditorPcs MaterialEditorPcs;

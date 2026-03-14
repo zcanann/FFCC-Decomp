@@ -28,49 +28,33 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-	volatile void** soundPcs = reinterpret_cast<volatile void**>(&SoundPcs);
-	volatile unsigned int* src = m_table_desc0__9CSoundPcs;
-	volatile unsigned int* table = m_table__9CSoundPcs;
-	unsigned int d1;
-	unsigned int d2;
-	unsigned int d3;
-	unsigned int d4;
-	unsigned int d5;
-	unsigned int d6;
-	unsigned int d7;
-	unsigned int d8;
-	unsigned int d9;
-	unsigned int d10;
-	unsigned int d11;
-	unsigned int d0;
+    unsigned int* table = m_table__9CSoundPcs;
+    unsigned int desc00 = m_table_desc0__9CSoundPcs[0];
+    unsigned int desc01 = m_table_desc0__9CSoundPcs[1];
+    unsigned int desc02 = m_table_desc0__9CSoundPcs[2];
+    unsigned int desc10 = m_table_desc1__9CSoundPcs[0];
+    unsigned int desc11 = m_table_desc1__9CSoundPcs[1];
+    unsigned int desc12 = m_table_desc1__9CSoundPcs[2];
+    unsigned int desc20 = m_table_desc2__9CSoundPcs[0];
+    unsigned int desc21 = m_table_desc2__9CSoundPcs[1];
+    unsigned int desc22 = m_table_desc2__9CSoundPcs[2];
+    unsigned int desc30 = m_table_desc3__9CSoundPcs[0];
+    unsigned int desc31 = m_table_desc3__9CSoundPcs[1];
+    unsigned int desc32 = m_table_desc3__9CSoundPcs[2];
 
-	*soundPcs = __vt__9CSoundPcs;
-
-	d1 = src[1];
-	d2 = src[2];
-	d3 = src[3];
-	d4 = src[4];
-	d5 = src[5];
-	d6 = src[6];
-	d7 = src[7];
-	d8 = src[8];
-	d9 = src[9];
-	d10 = src[10];
-	d11 = src[11];
-	d0 = src[0];
-
-	table[2] = d1;
-	table[1] = d0;
-	table[3] = d2;
-	table[4] = d3;
-	table[5] = d4;
-	table[6] = d5;
-	table[7] = d6;
-	table[8] = d7;
-	table[9] = d8;
-	table[12] = d9;
-	table[13] = d10;
-	table[14] = d11;
+    *reinterpret_cast<unsigned int*>(&SoundPcs) = reinterpret_cast<unsigned int>(__vt__9CSoundPcs);
+    table[1] = desc00;
+    table[2] = desc01;
+    table[3] = desc02;
+    table[4] = desc10;
+    table[5] = desc11;
+    table[6] = desc12;
+    table[7] = desc20;
+    table[8] = desc21;
+    table[9] = desc22;
+    table[12] = desc30;
+    table[13] = desc31;
+    table[14] = desc32;
 }
 
 /*

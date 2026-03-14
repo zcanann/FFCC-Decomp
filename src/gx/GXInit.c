@@ -23,9 +23,8 @@ const char* __GXVersion = "<< Dolphin SDK - GX\tdebug build: "BUILD_DATE" "DBUIL
 const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: "BUILD_DATE" "RBUILD_TIME" (0x2301) >>";
 #endif
 
-static GXFifoObj FifoObj;
-
 static GXData gxData;
+static GXFifoObj FifoObj;
 GXData* const gx = &gxData;
 GXData* const __GXData = &gxData;
 
@@ -211,53 +210,45 @@ static int __GXShutdown(BOOL final) {
     return 1;
 }
 
-#define SOME_SET_REG_MACRO(reg, size, shift, val)                                                   \
-	do {                                                                                            \
-		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
-	} while (0);
+#define GX_INIT_REVISION_BITS()                             \
+    do {                                                    \
+        for (i = 0; i < 8; i++) {                           \
+            s32 regAddr;                                    \
+            SET_REG_FIELD(0, __GXData->vatA[i], 1, 30, 1); \
+            SET_REG_FIELD(0, __GXData->vatB[i], 1, 31, 1); \
+            GX_WRITE_U8(0x8);                               \
+            GX_WRITE_U8(i | 0x80);                          \
+            GX_WRITE_U32(__GXData->vatB[i]);                \
+            regAddr = i - 12;                               \
+        }                                                   \
+        {                                                   \
+            u32 reg1 = 0;                                   \
+            u32 reg2 = 0;                                   \
+            SET_REG_FIELD(0, reg1, 1, 0, 1);               \
+            SET_REG_FIELD(0, reg1, 1, 1, 1);               \
+            SET_REG_FIELD(0, reg1, 1, 2, 1);               \
+            SET_REG_FIELD(0, reg1, 1, 3, 1);               \
+            SET_REG_FIELD(0, reg1, 1, 4, 1);               \
+            SET_REG_FIELD(0, reg1, 1, 5, 1);               \
+            GX_WRITE_XF_REG(0, reg1);                       \
+            SET_REG_FIELD(0, reg2, 1, 0, 1);               \
+            GX_WRITE_XF_REG(0x12, reg2);                    \
+        }                                                   \
+        {                                                   \
+            u32 reg = 0;                                    \
+            SET_REG_FIELD(0, reg, 1, 0, 1);                \
+            SET_REG_FIELD(0, reg, 1, 1, 1);                \
+            SET_REG_FIELD(0, reg, 1, 2, 1);                \
+            SET_REG_FIELD(0, reg, 1, 3, 1);                \
+            SET_REG_FIELD(0, reg, 8, 24, 0x58);            \
+            GX_WRITE_RAS_REG(reg);                          \
+        }                                                   \
+    } while (0)
 
 void __GXInitRevisionBits(void) {
     u32 i;
 
-    for (i = 0; i < 8; i++) {
-        s32 regAddr;
-        SOME_SET_REG_MACRO(__GXData->vatA[i], 1, 30, 1);
-        SOME_SET_REG_MACRO(__GXData->vatB[i], 1, 31, 1);
-
-        GX_WRITE_U8(0x8);
-        GX_WRITE_U8(i | 0x80);
-        GX_WRITE_U32(__GXData->vatB[i]);
-        regAddr = i - 12;
-    }
-
-    {
-        u32 reg1 = 0;
-        u32 reg2 = 0;
-
-        SOME_SET_REG_MACRO(reg1, 1, 0, 1);
-        SOME_SET_REG_MACRO(reg1, 1, 1, 1);
-        SOME_SET_REG_MACRO(reg1, 1, 2, 1);
-        SOME_SET_REG_MACRO(reg1, 1, 3, 1);
-        SOME_SET_REG_MACRO(reg1, 1, 4, 1);
-        SOME_SET_REG_MACRO(reg1, 1, 5, 1);
-        GX_WRITE_XF_REG(0, reg1);
-
-        SOME_SET_REG_MACRO(reg2, 1, 0, 1);
-        GX_WRITE_XF_REG(0x12, reg2);
-#if DEBUG
-        __gxVerif->xfRegsDirty[0] = 0;
-#endif
-    }
-
-    {
-        u32 reg = 0;
-        SOME_SET_REG_MACRO(reg, 1, 0, 1);
-        SOME_SET_REG_MACRO(reg, 1, 1, 1);
-        SOME_SET_REG_MACRO(reg, 1, 2, 1);
-        SOME_SET_REG_MACRO(reg, 1, 3, 1);
-        SOME_SET_REG_MACRO(reg, 8, 24, 0x58);
-        GX_WRITE_RAS_REG(reg);
-    }
+    GX_INIT_REVISION_BITS();
 }
 
 GXFifoObj* GXInit(void* base, u32 size) {
@@ -293,7 +284,13 @@ GXFifoObj* GXInit(void* base, u32 size) {
     }
 
     __GXPEInit();
-    EnableWriteGatherPipe();
+    {
+        u32 hid2 = PPCMfhid2();
+
+        PPCMtwpar(OSUncachedToPhysical((void*)GXFIFO_ADDR));
+        hid2 |= 0x40000000;
+        PPCMthid2(hid2);
+    }
 
     __GXData->genMode = 0;
     SET_REG_FIELD(0, __GXData->genMode, 8, 24, 0);
@@ -357,15 +354,16 @@ GXFifoObj* GXInit(void* base, u32 size) {
     reg = (freqBase / 0x1080) | 0x200 | 0x46000000;
     GX_WRITE_RAS_REG(reg);
 
-    __GXInitRevisionBits();
+    GX_INIT_REVISION_BITS();
 
     for (i = 0; i < 8; i++) {
-        GXInitTexCacheRegion(&__GXData->TexRegions0[i], GX_FALSE, GXTexRegionAddrTable[i],
-                             GX_TEXCACHE_32K, GXTexRegionAddrTable[i + 8], GX_TEXCACHE_32K);
-        GXInitTexCacheRegion(&__GXData->TexRegions1[i], GX_FALSE, GXTexRegionAddrTable[i + 16],
-                             GX_TEXCACHE_32K, GXTexRegionAddrTable[i + 24], GX_TEXCACHE_32K);
-        GXInitTexCacheRegion(&__GXData->TexRegions2[i], GX_TRUE, GXTexRegionAddrTable[i + 32],
-                             GX_TEXCACHE_32K, GXTexRegionAddrTable[i + 40], GX_TEXCACHE_32K);
+        GXInitTexCacheRegion(&__GXData->TexRegions0[i], GX_FALSE, i * 0x8000, GX_TEXCACHE_32K,
+                             0x80000 + i * 0x8000, GX_TEXCACHE_32K);
+    }
+
+    for (i = 0; i < 4; i++) {
+        GXInitTexCacheRegion(&__GXData->TexRegions1[i], GX_FALSE, (i * 2 + 8) * 0x8000,
+                             GX_TEXCACHE_32K, (i * 2 + 9) * 0x8000, GX_TEXCACHE_32K);
     }
 
     for (i = 0; i < 16; i++) {

@@ -52,6 +52,7 @@ extern "C" {
 	void* RedNew__Fi(int);
 	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
 	int SearchWaveSequence__9CRedEntryFi(CRedEntry*, int);
+	void __dl__FPv(void*);
 }
 
 /*
@@ -69,10 +70,16 @@ CRedEntry::CRedEntry()
  * Address:	TODO
  * Size:	TODO
  */
-CRedEntry::~CRedEntry()
+// Matches deleting-destructor codegen used by MetroWerks in this module.
+#pragma optimization_level 0
+extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete)
 {
-	// TODO
+	if ((redEntry != 0) && (0 < shouldDelete)) {
+		__dl__FPv(redEntry);
+	}
+	return redEntry;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

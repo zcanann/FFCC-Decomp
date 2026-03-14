@@ -69,17 +69,6 @@ struct Vec2d {
     f32 y;
 };
 
-static u32 floatBits(f32 value)
-{
-    union {
-        f32 f;
-        u32 u;
-    } cast;
-
-    cast.f = value;
-    return cast.u;
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -114,7 +103,7 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
 
     pointCount = param_2->m_gridSize + 1;
     pointCount *= pointCount;
-    savedY = ((Vec*)((u8*)pppMngStPtr + 0x58))->y;
+    savedY = pppMngStPtr->m_savedPosition.y;
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
@@ -442,16 +431,16 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             }
 
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);
-            GXColor1u32(floatBits(c0));
+            GXColor1u32(*(u32*)&c0);
             GXTexCoord2f32(u0, v1);
             GXPosition3f32(vtx1.x, vtx1.y, vtx1.z);
-            GXColor1u32(floatBits(c1));
+            GXColor1u32(*(u32*)&c1);
             GXTexCoord2f32(u0, v0);
             GXPosition3f32(vtx2.x, vtx2.y, vtx2.z);
-            GXColor1u32(floatBits(c2));
+            GXColor1u32(*(u32*)&c2);
             GXTexCoord2f32(u1, v0);
             GXPosition3f32(vtx3.x, vtx3.y, vtx3.z);
-            GXColor1u32(floatBits(c3));
+            GXColor1u32(*(u32*)&c3);
             GXTexCoord2f32(u1, v1);
             x++;
         }

@@ -82,6 +82,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
         VertexApLcEntry* entry = &env->entries[data->entryIndex];
+        u16* vertexIndices = entry->vertexIndices;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
@@ -90,7 +91,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        int count = data->spawnCount;
+        s32 count = data->spawnCount;
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
@@ -98,18 +99,18 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 outValue = state->index;
-                state->index++;
-                s32 vertexIndex = entry->vertexIndices[outValue];
+                u16 outValue = state->index++;
+                u16 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
+                    s32 childId = data->childId;
+                    _pppPDataVal* childData =
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
 
                     if (childData == 0) {
                         child = 0;
@@ -130,16 +131,17 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 f32 randValue = RandF__5CMathFv(&Math);
                 f32 maxValue = (f32)entry->maxValue;
                 int outValue = (int)(randValue * maxValue);
-                s32 vertexIndex = entry->vertexIndices[outValue];
+                u16 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     _pppPObject* child;
+                    s32 childId = data->childId;
+                    _pppPDataVal* childData =
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
 
                     if (childData == 0) {
                         child = 0;

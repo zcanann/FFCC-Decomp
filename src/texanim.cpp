@@ -44,6 +44,7 @@ extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
 extern "C" void* __vt__Q28CTexAnim8CRefData[];
 extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
+extern "C" void __ct__25CPtrArray_P11CTexAnimSeq_Fv(void*);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
@@ -580,7 +581,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 
     texAnims->SetStage(stage);
     chunkFile.PushChunk();
-    while (chunkFile.GetNextChunk(chunk)) {
+    while ((int)chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == 0x54414E4D) {
             CTexAnim* texAnim =
                 static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0x3F));
@@ -608,7 +609,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             if (refData != 0) {
                 __ct__4CRefFv(refData);
                 *reinterpret_cast<void**>(refData) = __vt__Q28CTexAnim8CRefData;
-                new ((void*)((int)refData + 0x110)) CPtrArray<CTexAnimSeq*>();
+                __ct__25CPtrArray_P11CTexAnimSeq_Fv((void*)((int)refData + 0x110));
                 *reinterpret_cast<void**>((int)refData + 0x108) = 0;
                 *reinterpret_cast<int*>((int)refData + 0x10C) = 0;
             }
@@ -617,7 +618,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 ->SetStage(stage);
 
             chunkFile.PushChunk();
-            while (chunkFile.GetNextChunk(chunk)) {
+            while ((int)chunkFile.GetNextChunk(chunk) != 0) {
                 if (chunk.m_id == 0x53455120) {
                     CTexAnimSeq* seq = static_cast<CTexAnimSeq*>(
                         __nw__FUlPQ27CMemory6CStagePci(0x118, stage, s_texanim_cpp_801d7adc, 0xE2));
@@ -628,7 +629,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         *reinterpret_cast<int*>((int)seq + 0x114) = 0;
                     }
                     chunkFile.PushChunk();
-                    while (chunkFile.GetNextChunk(chunk)) {
+                    while ((int)chunkFile.GetNextChunk(chunk) != 0) {
                         if (chunk.m_id == 0x4B455920) {
                             *reinterpret_cast<unsigned int*>((int)seq + 0x10C) = chunk.m_size / 0x30;
                             int keys = (int)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
@@ -639,16 +640,16 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                             if (chunk.m_id == 0x494E464F) {
                                 *reinterpret_cast<void**>((int)seq + 0x108) = (void*)chunkFile.Get4();
                                 chunkFile.Get4();
-                                unsigned char flag = *reinterpret_cast<unsigned char*>((int)seq + 0x110);
-                                char bit7 = (char)chunkFile.Get4();
-                                flag = (unsigned char)(((int)bit7 << 7) | (flag & 0x7F));
-                                char bit6 = (char)chunkFile.Get4();
-                                flag = (unsigned char)(((int)bit6 << 6) & 0x40) | (unsigned char)(flag & 0xBF);
-                                unsigned int isEq =
-                                    (unsigned int)__cntlzw((unsigned int)strcmp((char*)((int)seq + 8), DAT_8032fb48));
-                                flag =
-                                    (unsigned char)((unsigned char)((int)(char)(isEq >> 5) << 5) & 0x20) | (flag & 0xDF);
-                                *reinterpret_cast<unsigned char*>((int)seq + 0x110) = flag;
+                                char b7 = (char)chunkFile.Get4();
+                                *reinterpret_cast<unsigned char*>((int)seq + 0x110) =
+                                    (unsigned char)(((int)b7 << 7) | (*reinterpret_cast<unsigned char*>((int)seq + 0x110) & 0x7F));
+                                char b6 = (char)chunkFile.Get4();
+                                *reinterpret_cast<unsigned char*>((int)seq + 0x110) =
+                                    (unsigned char)((((int)b6 << 6) & 0x40) | (*reinterpret_cast<unsigned char*>((int)seq + 0x110) & 0xBF));
+                                unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp((char*)((int)seq + 8), DAT_8032fb48));
+                                *reinterpret_cast<unsigned char*>((int)seq + 0x110) =
+                                    (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) |
+                                                    (*reinterpret_cast<unsigned char*>((int)seq + 0x110) & 0xDF));
                             }
                         } else if (chunk.m_id == 0x4E414D45) {
                             strcpy((char*)((int)seq + 8), chunkFile.GetString());

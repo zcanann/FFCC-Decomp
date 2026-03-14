@@ -1380,6 +1380,7 @@ void CRedDriver::End()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 4
 int CRedDriver::GetProgramTime()
 {
     volatile int sum;
@@ -1393,6 +1394,7 @@ int CRedDriver::GetProgramTime()
     } while (p < DAT_8032f3cc + 100);
     return sum;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--

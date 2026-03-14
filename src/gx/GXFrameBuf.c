@@ -222,31 +222,29 @@ void GXSetDispCopyFrame2Field(GXCopyMode mode) {
  * JP Size: TODO
  */
 void GXSetCopyClamp(GXFBClamp clamp) {
-    u32 clmpT;
-    u32 clmpB;
     u32 reg;
+    u32 clmpB;
     GXData* gxData;
 
     CHECK_GXBEGIN(1431, "GXSetCopyClamp");
     gxData = __GXData;
 
-    clmpT = (u32)__cntlzw((clamp & GX_CLAMP_TOP) - GX_CLAMP_TOP);
-    clamp &= GX_CLAMP_BOTTOM;
     reg = gxData->cpDisp;
-    reg = (reg & 0xFFFFFFFE) | ((clmpT >> 5) & 0xFF);
+    reg = (reg & 0xFFFFFFFE) | ((((u32)__cntlzw((clamp & GX_CLAMP_TOP) - GX_CLAMP_TOP)) >> 5) & 0xFF);
     gxData->cpDisp = reg;
 
-    clmpB = (u32)__cntlzw(clamp - GX_CLAMP_BOTTOM);
+    clmpB = (u32)__cntlzw((clamp & GX_CLAMP_BOTTOM) - GX_CLAMP_BOTTOM);
     reg = gxData->cpDisp;
-    reg = (reg & 0xFFFFFFFD) | ((clmpB >> 4) & 0x1FE);
-    gxData->cpDisp = reg;
+    clmpB = (clmpB >> 4) & 0x1FE;
+    reg &= 0xFFFFFFFD;
+    gxData->cpDisp = reg | clmpB;
 
     reg = gxData->cpTex;
-    reg = (reg & 0xFFFFFFFE) | ((clmpT >> 5) & 0xFF);
+    reg = (reg & 0xFFFFFFFE) | ((((u32)__cntlzw((clamp & GX_CLAMP_TOP) - GX_CLAMP_TOP)) >> 5) & 0xFF);
     gxData->cpTex = reg;
 
     reg = gxData->cpTex;
-    reg = (reg & 0xFFFFFFFD) | ((clmpB >> 4) & 0x1FE);
+    reg = (reg & 0xFFFFFFFD) | clmpB;
     gxData->cpTex = reg;
 }
 

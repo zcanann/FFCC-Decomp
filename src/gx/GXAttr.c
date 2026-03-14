@@ -315,8 +315,8 @@ void GXClearVtxDesc(void) {
     __GXData->vcdLo = 0;
     __GXData->vcdLo = (__GXData->vcdLo & ~0x600) | 0x200;
     __GXData->vcdHi = 0;
-    __GXData->hasNrms = 0;
-    __GXData->hasBiNrms = 0;
+    *((u8*)__GXData + 0x41C) = 0;
+    *((u8*)__GXData + 0x41D) = 0;
     __GXData->dirtyState |= 8;
 }
 

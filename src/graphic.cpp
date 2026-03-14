@@ -288,9 +288,9 @@ void CGraphic::Quit()
  */
 int CGraphic::GetProgressive()
 {
-    int mode = VIGetDTVStatus();
+    u32 mode = VIGetDTVStatus();
     if (mode != 0) {
-        mode = OSSetProgressiveMode();
+        mode = OSSetSoundMode();
         mode = (static_cast<unsigned int>(__cntlzw(1 - mode)) >> 5) + 1;
     } else {
         mode = 0;

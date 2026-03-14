@@ -326,7 +326,7 @@ int SineSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 int TriangleSwingR(int phase)
 {
     u32 modifiedPhase = (u32)phase ^ 0x200;

@@ -40,7 +40,7 @@ typedef struct TRKStepStatus {
 
 ProcessorRestoreFlags_PPC gTRKRestoreFlags = { FALSE, FALSE };
 
-static TRKExceptionStatus gTRKExceptionStatus = { { 0, 0, 0 }, TRUE, 0 };
+TRKExceptionStatus gTRKExceptionStatus = { { 0, 0, 0 }, TRUE, 0 };
 
 TRKStepStatus gTRKStepStatus = { FALSE, DSSTEP_IntoCount, 0, 0 };
 

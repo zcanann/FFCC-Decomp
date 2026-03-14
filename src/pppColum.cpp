@@ -194,8 +194,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     int* serializedDataOffsets;
-    pppColumFrameWork* work;
     pppColumValue* values;
+    pppColumFrameWork* work;
     int i;
 
     if (gPppCalcDisabled == 0) {

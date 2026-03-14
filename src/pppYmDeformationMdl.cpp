@@ -31,7 +31,7 @@ extern _pppEnvStYmDeformationMdl* pppEnvStPtr;
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
 }
 
 static inline Mtx44& CameraScreenMatrix()

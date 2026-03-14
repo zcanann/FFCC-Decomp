@@ -1669,14 +1669,16 @@ void __MidiCtrl_ChannelAlloc(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    u8* trackData = (u8*)track;
-    u8* command = *(u8**)trackData;
+    int* trackData;
+    u8* command;
 
-    *(u8**)trackData = command + 1;
+    trackData = (int*)track;
+    command = (u8*)trackData[0];
+    trackData[0] = (int)(command + 1);
     if (*command != 0) {
-        trackData[0x26] |= 8;
+        *(u8*)((char*)trackData + 0x26) |= 8;
     } else {
-        trackData[0x26] &= 0xF7;
+        *(u8*)((char*)trackData + 0x26) &= 0xF7;
     }
 }
 
@@ -1691,14 +1693,16 @@ void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
  */
 void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    u8* trackData = (u8*)track;
-    u8* command = *(u8**)trackData;
+    int* trackData;
+    u8* command;
 
-    *(u8**)trackData = command + 1;
+    trackData = (int*)track;
+    command = (u8*)trackData[0];
+    trackData[0] = (int)(command + 1);
     if (*command != 0) {
-        trackData[0x26] |= 4;
+        *(u8*)((char*)trackData + 0x26) |= 4;
     } else {
-        trackData[0x26] &= 0xFB;
+        *(u8*)((char*)trackData + 0x26) &= 0xFB;
     }
 }
 

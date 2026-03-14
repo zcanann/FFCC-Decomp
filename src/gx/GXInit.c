@@ -7,6 +7,9 @@
 
 #include "dolphin/gx/__gx.h"
 
+#undef SET_REG_FIELD
+#define SET_REG_FIELD OLD_SET_REG_FIELD
+
 #if SDK_REVISION < 2
 #define BUILD_DATE  "Apr  5 2004"
 #define DBUILD_TIME "03:55:13"
@@ -28,11 +31,11 @@ static GXFifoObj FifoObj;
 GXData* const gx = &gxData;
 GXData* const __GXData = &gxData;
 
-// these are supposed to be in-function static, but it messed up sbss order
-u32 resetFuncRegistered;
+// these remain file-scope in the target object
 u32 calledOnce;
 OSTime time;
 u32 peCount;
+u32 resetFuncRegistered;
 
 void* __memReg;
 void* __peReg;
@@ -79,37 +82,6 @@ static int __GXShutdown(int final);
 
 static OSResetFunctionInfo GXResetFuncInfo = {__GXShutdown, 0x7F, NULL, NULL};
 
-asm BOOL IsWriteGatherBufferEmpty(void) {
-    sync
-    mfspr r3, WPAR
-    andi. r3, r3, 1
-}
-
-static void EnableWriteGatherPipe(void) {
-    u32 hid2 = PPCMfhid2();
-
-    PPCMtwpar(OSUncachedToPhysical((void*)GXFIFO_ADDR));
-    hid2 |= 0x40000000;
-    PPCMthid2(hid2);
-}
-
-static void DisableWriteGatherPipe(void) {
-    u32 hid2 = PPCMfhid2();
-
-    hid2 &= ~0x40000000;
-    PPCMthid2(hid2);
-}
-
-typedef struct GXTexRegion16 {
-    u32 dummy[4];
-} GXTexRegion16;
-
-typedef struct GXTexRegionState {
-    u8 pad[0x208];
-    GXTexRegion16 texRegions0[8];
-    GXTexRegion16 texRegions1[8];
-} GXTexRegionState;
-
 /*
  * --INFO--
  * PAL Address: 0x8019EF44
@@ -120,32 +92,26 @@ typedef struct GXTexRegionState {
  * JP Size: TODO
  */
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
-    u32 count;
-    u32* countReg;
-    s32 format = GXGetTexObjFmt(t_obj);
+    GXTexFmt format = GXGetTexObjFmt(t_obj);
 
     (void)id;
 
     if (format != 8) {
         if (format != 9) {
             if (format != 10) {
-                countReg = &((GXTexRegionState*)__GXData)->texRegions1[4].dummy[0];
-                count = (*countReg)++;
-                return (GXTexRegion*)&((GXTexRegionState*)__GXData)->texRegions0[count & 7];
+                return &__GXData->TexRegions0[__GXData->nextTexRgn++ & 7];
             }
         }
     }
 
-    countReg = &((GXTexRegionState*)__GXData)->texRegions1[4].dummy[1];
-    count = (*countReg)++;
-    return (GXTexRegion*)&((GXTexRegionState*)__GXData)->texRegions1[count & 3];
+    return &__GXData->TexRegions1[__GXData->nextTexRgnCI++ & 3];
 }
 
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {
     if (idx >= 20) {
         return NULL;
     }
-    return (GXTlutRegion*)((u32)__GXData + idx * 0x10 + 0x2D0);
+    return &__GXData->TlutRegions[idx];
 }
 
 #if DEBUG
@@ -208,47 +174,6 @@ static int __GXShutdown(BOOL final) {
     }
 
     return 1;
-}
-
-#define GX_INIT_REVISION_BITS()                             \
-    do {                                                    \
-        for (i = 0; i < 8; i++) {                           \
-            s32 regAddr;                                    \
-            SET_REG_FIELD(0, __GXData->vatA[i], 1, 30, 1); \
-            SET_REG_FIELD(0, __GXData->vatB[i], 1, 31, 1); \
-            GX_WRITE_U8(0x8);                               \
-            GX_WRITE_U8(i | 0x80);                          \
-            GX_WRITE_U32(__GXData->vatB[i]);                \
-            regAddr = i - 12;                               \
-        }                                                   \
-        {                                                   \
-            u32 reg1 = 0;                                   \
-            u32 reg2 = 0;                                   \
-            SET_REG_FIELD(0, reg1, 1, 0, 1);               \
-            SET_REG_FIELD(0, reg1, 1, 1, 1);               \
-            SET_REG_FIELD(0, reg1, 1, 2, 1);               \
-            SET_REG_FIELD(0, reg1, 1, 3, 1);               \
-            SET_REG_FIELD(0, reg1, 1, 4, 1);               \
-            SET_REG_FIELD(0, reg1, 1, 5, 1);               \
-            GX_WRITE_XF_REG(0, reg1);                       \
-            SET_REG_FIELD(0, reg2, 1, 0, 1);               \
-            GX_WRITE_XF_REG(0x12, reg2);                    \
-        }                                                   \
-        {                                                   \
-            u32 reg = 0;                                    \
-            SET_REG_FIELD(0, reg, 1, 0, 1);                \
-            SET_REG_FIELD(0, reg, 1, 1, 1);                \
-            SET_REG_FIELD(0, reg, 1, 2, 1);                \
-            SET_REG_FIELD(0, reg, 1, 3, 1);                \
-            SET_REG_FIELD(0, reg, 8, 24, 0x58);            \
-            GX_WRITE_RAS_REG(reg);                          \
-        }                                                   \
-    } while (0)
-
-void __GXInitRevisionBits(void) {
-    u32 i;
-
-    GX_INIT_REVISION_BITS();
 }
 
 GXFifoObj* GXInit(void* base, u32 size) {
@@ -352,7 +277,7 @@ GXFifoObj* GXInit(void* base, u32 size) {
     reg = (freqBase / 0x1080) | 0x200 | 0x46000000;
     GX_WRITE_RAS_REG(reg);
 
-    GX_INIT_REVISION_BITS();
+    __GXInitRevisionBits();
 
     for (i = 0; i < 8; i++) {
         GXInitTexCacheRegion(&__GXData->TexRegions0[i], GX_FALSE, i * 0x8000, GX_TEXCACHE_32K,
@@ -488,8 +413,8 @@ void __GXInitGX(void) {
     GXSetChanAmbColor(GX_COLOR1A1, black);
     GXSetChanMatColor(GX_COLOR1A1, white);
     GXInvalidateTexAll();
-    *(u32*)((u8*)__GXData + 0x2C8) = 0;
-    *(u32*)((u8*)__GXData + 0x2CC) = 0;
+    __GXData->nextTexRgn = 0;
+    __GXData->nextTexRgnCI = 0;
     GXSetTexRegionCallback((GXTexRegionCallback)__GXDefaultTexRegionCallback);
     GXSetTlutRegionCallback(__GXDefaultTlutRegionCallback);
 

@@ -229,7 +229,42 @@ void __GXSetGenMode(void);
 
 /* GXInit */
 void __GXInitGX();
-void __GXInitRevisionBits(void);
+
+#define __GXInitRevisionBits()                               \
+do {                                                         \
+    u32 gxInitRevIdx;                                        \
+    for (gxInitRevIdx = 0; gxInitRevIdx < 8; gxInitRevIdx++) { \
+        s32 regAddr;                                         \
+        SET_REG_FIELD(0, __GXData->vatA[gxInitRevIdx], 1, 30, 1); \
+        SET_REG_FIELD(0, __GXData->vatB[gxInitRevIdx], 1, 31, 1); \
+        GX_WRITE_U8(0x8);                                    \
+        GX_WRITE_U8(gxInitRevIdx | 0x80);                    \
+        GX_WRITE_U32(__GXData->vatB[gxInitRevIdx]);          \
+        regAddr = gxInitRevIdx - 12;                         \
+    }                                                        \
+    {                                                        \
+        u32 reg1 = 0;                                        \
+        u32 reg2 = 0;                                        \
+        SET_REG_FIELD(0, reg1, 1, 0, 1);                    \
+        SET_REG_FIELD(0, reg1, 1, 1, 1);                    \
+        SET_REG_FIELD(0, reg1, 1, 2, 1);                    \
+        SET_REG_FIELD(0, reg1, 1, 3, 1);                    \
+        SET_REG_FIELD(0, reg1, 1, 4, 1);                    \
+        SET_REG_FIELD(0, reg1, 1, 5, 1);                    \
+        GX_WRITE_XF_REG(0, reg1);                            \
+        SET_REG_FIELD(0, reg2, 1, 0, 1);                    \
+        GX_WRITE_XF_REG(0x12, reg2);                         \
+    }                                                        \
+    {                                                        \
+        u32 reg = 0;                                         \
+        SET_REG_FIELD(0, reg, 1, 0, 1);                     \
+        SET_REG_FIELD(0, reg, 1, 1, 1);                     \
+        SET_REG_FIELD(0, reg, 1, 2, 1);                     \
+        SET_REG_FIELD(0, reg, 1, 3, 1);                     \
+        SET_REG_FIELD(0, reg, 8, 24, 0x58);                 \
+        GX_WRITE_RAS_REG(reg);                               \
+    }                                                        \
+} while (0)
 
 typedef struct __GXData_struct {
     u16 vNumNot;
@@ -278,15 +313,16 @@ typedef struct __GXData_struct {
     u8 cpTexZ;
     u32 genMode;
     GXTexRegion TexRegions0[8];
-    GXTexRegion TexRegions1[8];
-    GXTexRegion TexRegions2[8];
+    GXTexRegion TexRegions1[4];
+    u32 nextTexRgn;
+    u32 nextTexRgnCI;
     GXTlutRegion TlutRegions[20];
     GXTexRegion* (*texRegionCallback)(GXTexObj*, GXTexMapID);
     GXTlutRegion* (*tlutRegionCallback)(u32);
-    u32 projType;
-    u8 nrmType;
+    GXAttrType nrmType;
     u8 hasNrms;
     u8 hasBiNrms;
+    u32 projType;
     f32 projMtx[6];
     f32 vpLeft;
     f32 vpTop;
@@ -299,8 +335,8 @@ typedef struct __GXData_struct {
     u32 tImage0[8];
     u32 tMode0[8];
     u32 texmapId[16];
-    u16 tcsManEnab;
-    u16 tevTcEnab;
+    u32 tcsManEnab;
+    u32 tevTcEnab;
     GXPerf0 perf0;
     GXPerf1 perf1;
     u32 perfSel;

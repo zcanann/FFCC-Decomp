@@ -674,17 +674,13 @@ int CRedEntry::GetWaveBank(int waveNo)
  */
 int CRedEntry::SearchWaveBase(int waveNo)
 {
-	int* entry = (int*)this;
-	int* waveBank = (int*)*entry;
-
-	do
-	{
-		if (*waveBank == waveNo)
-		{
+	int* waveBank = (int*)*(int*)this;
+	do {
+		if (waveNo == *waveBank) {
 			return waveBank[2];
 		}
 		waveBank += 4;
-	} while (waveBank < (int*)(*entry + 0x400));
+	} while (waveBank < (int*)(*(int*)this + 0x400));
 
 	return 0;
 }

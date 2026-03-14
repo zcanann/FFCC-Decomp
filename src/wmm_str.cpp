@@ -157,7 +157,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 const char* CMenuPcs::GetWinMess(int index)
 {
     int languageId = Game.m_gameWork.m_languageId;
-    if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
+    if ((languageId != 1) && (languageId != 0) && (languageId < 6)) {
         return &s_WinMessTable[index * 0x14];
     }
     return &s_WinMessTable[index * 0x14];

@@ -66,6 +66,8 @@ static char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
 static char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
 static char s_cmake_name_crc_error[] = "%s[%d] Error! ChkCMakeName() crc.\n";
 static char s_cmake_favorite_crc_error[] = "%s[%d] Error! CMakeFavorite() crc.\n";
+static char s_unknown_mapobj_type_error[] = "Error! Unknown mapobj type = %d.\n";
+extern float FLOAT_80330D54;
 
 /*
  * --INFO--
@@ -2100,7 +2102,87 @@ void GbaQueue::ReplyLetter(int)
  */
 void GbaQueue::LoadMapObj()
 {
-	// TODO
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	GbaQueue* semaphoreIter;
+	int i;
+
+	if (*reinterpret_cast<unsigned int*>(obj + 0x2AF8) == 0) {
+		i = 0;
+		semaphoreIter = this;
+		do {
+			OSWaitSemaphore(semaphoreIter->accessSemaphores);
+			i++;
+			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		} while (i < 4);
+
+		if (obj[0x2B00] != 0) {
+			memset(obj + 0x2B00, 0, 0x188);
+		}
+
+		i = 0;
+		semaphoreIter = this;
+		do {
+			OSSignalSemaphore(semaphoreIter->accessSemaphores);
+			i++;
+			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		} while (i < 4);
+	} else {
+		unsigned char mapObjWork[0x188];
+		memset(mapObjWork, 0, sizeof(mapObjWork));
+
+		char* mapObjBase = reinterpret_cast<char*>(&CFlat) + 0x134C;
+		for (i = 0; i < 0x20; i++) {
+			char objType = mapObjBase[0];
+			if (objType != -1) {
+				unsigned int count = mapObjWork[0];
+				if (objType < 0x19) {
+					float x = *reinterpret_cast<float*>(mapObjBase + 4);
+					float y = *reinterpret_cast<float*>(mapObjBase + 8);
+					float z = *reinterpret_cast<float*>(mapObjBase + 0xC);
+					float r = *reinterpret_cast<float*>(mapObjBase + 0x10);
+					unsigned int entryBase = count * 0xC;
+
+					mapObjWork[8 + entryBase] = static_cast<unsigned char>(objType);
+					*reinterpret_cast<short*>(mapObjWork + 0xC + entryBase) = static_cast<short>((int)(x / FLOAT_80330D54));
+					*reinterpret_cast<short*>(mapObjWork + 0xE + entryBase) = static_cast<short>((int)(y / FLOAT_80330D54));
+					*reinterpret_cast<short*>(mapObjWork + 0x10 + entryBase) = static_cast<short>((int)(z / FLOAT_80330D54));
+					*reinterpret_cast<short*>(mapObjWork + 0x12 + entryBase) = static_cast<short>((int)(r / FLOAT_80330D54));
+
+					unsigned int mask = 1U << count;
+					unsigned int drawMask = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
+					if (mapObjBase[1] != 0) {
+						drawMask |= mask;
+					} else {
+						drawMask &= ~mask;
+					}
+					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
+					mapObjWork[0] = static_cast<unsigned char>(count + 1);
+				} else if (System.m_execParam > 1) {
+					Printf__7CSystemFPce(&System, s_unknown_mapobj_type_error, objType);
+				}
+			}
+
+			mapObjBase += 0x14;
+		}
+
+		i = 0;
+		semaphoreIter = this;
+		do {
+			OSWaitSemaphore(semaphoreIter->accessSemaphores);
+			i++;
+			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		} while (i < 4);
+
+		memcpy(obj + 0x2B00, mapObjWork, sizeof(mapObjWork));
+
+		i = 0;
+		semaphoreIter = this;
+		do {
+			OSSignalSemaphore(semaphoreIter->accessSemaphores);
+			i++;
+			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		} while (i < 4);
+	}
 }
 
 /*

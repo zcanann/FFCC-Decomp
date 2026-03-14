@@ -241,13 +241,12 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 	}
 
 	void** stageArray = *(void***)((char*)ymChangeTex + 0x90 + dataOffset);
-	void** meshArray = *(void***)((char*)ymChangeTex + 0x8c + dataOffset);
-	if ((stageArray != 0) && (meshArray != 0)) {
+	void** meshArray;
+	if ((stageArray != 0) && ((meshArray = *(void***)((char*)ymChangeTex + 0x8C + dataOffset)), meshArray != 0)) {
 		int meshList = *(int*)(model + 0xac);
 		void** curStageArray = stageArray;
 		void** curMeshArray = meshArray;
-		unsigned int meshCount = *(unsigned int*)(*(int*)(model + 0xa4) + 0xc);
-		for (unsigned int i = 0; i < meshCount; i++) {
+		for (unsigned int i = 0; i < *(unsigned int*)(*(int*)(model + 0xA4) + 0xC); i++) {
 			int meshData = *(int*)(meshList + 8);
 			void** dlEntries = (void**)*curStageArray;
 			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {

@@ -1,8 +1,6 @@
 #include "ffcc/wmm_str.h"
-#include "ffcc/game.h"
 #include "ffcc/fontman.h"
-
-extern CGame Game;
+#include "ffcc/p_game.h"
 
 extern const char* PTR_s_The_data_is_corrupt__80215bd8[];
 extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[];
@@ -58,7 +56,9 @@ const char* s_SlotBTextByLanguage[] = {
  */
 const char* CMenuPcs::GetMcStr(int index)
 {
-    switch (Game.m_gameWork.m_languageId) {
+    CGame* game = &Game.game;
+
+    switch (game->m_gameWork.m_languageId) {
     case 1:
         return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
     case 3:
@@ -83,8 +83,9 @@ const char* CMenuPcs::GetMcStr(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
+    CGame* game = &Game.game;
     const char* const* result;
-    int languageId = Game.m_gameWork.m_languageId;
+    int languageId = game->m_gameWork.m_languageId;
 
     if (group == 0) {
         switch (languageId) {
@@ -156,7 +157,8 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
  */
 const char* CMenuPcs::GetWinMess(int index)
 {
-    int languageId = Game.m_gameWork.m_languageId;
+    CGame* game = &Game.game;
+    int languageId = game->m_gameWork.m_languageId;
     if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
         return &s_WinMessTable[index * 0x14];
     }
@@ -174,7 +176,8 @@ const char* CMenuPcs::GetWinMess(int index)
  */
 int CMenuPcs::GetYesNoXPos(int right)
 {
-    const unsigned char languageId = Game.m_gameWork.m_languageId;
+    CGame* game = &Game.game;
+    const unsigned char languageId = game->m_gameWork.m_languageId;
     const char* yesText;
     switch (languageId) {
     case 1:
@@ -220,7 +223,8 @@ int CMenuPcs::GetYesNoXPos(int right)
  */
 int CMenuPcs::GetSlotABXPos(int right)
 {
-    const unsigned char languageId = Game.m_gameWork.m_languageId;
+    CGame* game = &Game.game;
+    const unsigned char languageId = game->m_gameWork.m_languageId;
     const char* slotAText;
     switch (languageId) {
     case 1:

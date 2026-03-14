@@ -39,6 +39,7 @@ extern float FLOAT_80332f78;
 extern float FLOAT_80332f7c;
 extern float FLOAT_80332f80;
 extern float FLOAT_80332f84;
+extern double DOUBLE_80332F90;
 
 namespace {
 unsigned int gMenuMoneyTransferAmount = 0;
@@ -308,6 +309,7 @@ void CMenuPcs::MoneyCtrl()
 void CMenuPcs::MoneyClose()
 {
 	float fVar1;
+	double dVar3;
 	int iVar4;
 	short* psVar5;
 	int iVar6;
@@ -326,9 +328,10 @@ void CMenuPcs::MoneyClose()
 			if (*(int *)(psVar5 + 0x12) <= iVar7) {
 				if (iVar7 < *(int *)(psVar5 + 0x12) + *(int *)(psVar5 + 0x14)) {
 					*(int *)(psVar5 + 0x10) = *(int *)(psVar5 + 0x10) + 1;
-					*(float *)(psVar5 + 8) = FLOAT_80332f70 - (float)*(int *)(psVar5 + 0x10) / (float)*(int *)(psVar5 + 0x14);
+					dVar3 = DOUBLE_80332F90;
+					*(float *)(psVar5 + 8) = (float)-((dVar3 / (double)*(int *)(psVar5 + 0x14)) * (double)*(int *)(psVar5 + 0x10) - dVar3);
 					if ((*(unsigned int *)(psVar5 + 0x16) & 2) == 0) {
-						fVar1 = FLOAT_80332f70 - (float)*(int *)(psVar5 + 0x10) / (float)*(int *)(psVar5 + 0x14);
+						fVar1 = (float)-((dVar3 / (double)*(int *)(psVar5 + 0x14)) * (double)*(int *)(psVar5 + 0x10) - dVar3);
 						*(float *)(psVar5 + 0x18) = (*(float *)(psVar5 + 0x1c) - (float)*psVar5) * fVar1;
 						*(float *)(psVar5 + 0x1a) = (*(float *)(psVar5 + 0x1e) - (float)psVar5[1]) * fVar1;
 					}
@@ -631,4 +634,3 @@ void CMenuPcs::MoneySetPlace(int)
 {
 	// TODO
 }
-

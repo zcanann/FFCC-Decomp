@@ -195,19 +195,19 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     int* serializedDataOffsets;
-    pppColumFrameWork* work;
     pppColumValue* values;
+    char* work;
     int i;
 
     if (gPppCalcDisabled == 0) {
         serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
-        work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
-        if (work->m_values == 0) {
-            work->m_values = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work = (char*)column + 0x80 + serializedDataOffsets[3];
+        if (*(pppColumValue**)(work + 8) == 0) {
+            *(pppColumValue**)(work + 8) = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
                 s_pppColum_cpp_801DB638, 0x7d);
 
-            values = work->m_values;
+            values = *(pppColumValue**)(work + 8);
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
                 values->m_scaleStep = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
                 values->m_scaleStep = values->m_scaleStep + *(float*)(param_2->m_payload + 0);
@@ -226,9 +226,8 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         if (param_2->m_dataValIndex != 0xFFFF) {
             long* animData =
                 **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-            pppCalcFrameShape__FPlRsRsRss(
-                animData,
-                work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);
+            pppCalcFrameShape__FPlRsRsRss(animData, *(s16*)(work + 0), *(s16*)(work + 2),
+                                          *(s16*)(work + 4), param_2->m_initWOrk);
         }
     }
 }

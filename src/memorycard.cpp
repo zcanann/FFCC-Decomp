@@ -15,6 +15,8 @@ char sMcSaveFileName[] = "FFCC";
 char* PTR_DAT_8032e854 = sMcSaveFileName;
 CMemoryCardMan MemoryCardMan;
 
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+
 static inline CChara* GetCharaGlobal()
 {
     return &gChara;
@@ -408,7 +410,8 @@ void CMemoryCardMan::CreateMcBuff()
 {
     if (m_saveBuffer == 0)
     {
-        m_saveBuffer = (char*)nullptr; // (char*)__nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>("memorycard.cpp"), 0x2AB));
 
         if (m_saveBuffer == 0 && System.m_execParam != 0)
         {

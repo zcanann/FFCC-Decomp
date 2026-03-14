@@ -24,21 +24,6 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
-static inline float CameraWorldX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
-}
-
-static inline float CameraWorldY()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x10);
-}
-
-static inline float CameraWorldZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
-}
-
 static int GetGraphFrameFromId(u32 graphId)
 {
     return ((int)graphId >> 12) + (int)((graphId & 0x80000000) != 0 && (graphId & 0xFFF) != 0);
@@ -306,9 +291,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
             matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
 
-            cameraPos.x = CameraWorldX();
-            cameraPos.y = CameraWorldY();
-            cameraPos.z = CameraWorldZ();
+            cameraPos.x = CameraPcs._224_4_;
+            cameraPos.y = CameraPcs._228_4_;
+            cameraPos.z = CameraPcs._232_4_;
 
             PSVECSubtract(&cameraPos, &matrixPos, &look);
             if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {

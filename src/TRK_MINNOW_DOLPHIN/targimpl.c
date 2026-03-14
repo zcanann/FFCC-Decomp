@@ -42,7 +42,7 @@ ProcessorRestoreFlags_PPC gTRKRestoreFlags = { FALSE, FALSE };
 
 static TRKExceptionStatus gTRKExceptionStatus = { { 0, 0, 0 }, TRUE, 0 };
 
-static TRKStepStatus gTRKStepStatus = { FALSE, DSSTEP_IntoCount, 0, 0 };
+TRKStepStatus gTRKStepStatus = { FALSE, DSSTEP_IntoCount, 0, 0 };
 
 static u16 TRK_saved_exceptionID = 0;
 ProcessorState_PPC gTRKCPUState;

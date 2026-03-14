@@ -412,24 +412,26 @@ void _SetMusicPhraseStop(int* param_1)
  */
 void _SetSeBlockData(int* param_1)
 {
-    unsigned int uVar1;
-    unsigned char* puVar2;
+    u32 index;
+    u8* seBlockData;
+    void** seBlockSlots = (void**)DAT_8032e12c;
 
-    uVar1 = (unsigned int)*param_1 & 3;
-    if (DAT_8032e12c[uVar1] != 0) {
-        RedDelete__FPv((void*)DAT_8032e12c[uVar1]);
-        DAT_8032e12c[uVar1] = 0;
+    index = (u32)*param_1 & 3;
+    if (seBlockSlots[index] != 0) {
+        RedDelete__FPv(seBlockSlots[index]);
+        seBlockSlots[index] = 0;
     }
+
     if (param_1[1] != 0) {
-        puVar2 = (unsigned char*)param_1[1];
-        puVar2[0] = 'S';
-        puVar2[1] = 'e';
-        puVar2[2] = 'B';
-        puVar2[3] = 'l';
-        puVar2[4] = 'o';
-        puVar2[5] = 'c';
-        puVar2[6] = 'k';
-        DAT_8032e12c[uVar1] = param_1[1];
+        seBlockData = (u8*)param_1[1];
+        seBlockData[0] = 'S';
+        seBlockData[1] = 'e';
+        seBlockData[2] = 'B';
+        seBlockData[3] = 'l';
+        seBlockData[4] = 'o';
+        seBlockData[5] = 'c';
+        seBlockData[6] = 'k';
+        seBlockSlots[index] = seBlockData;
     }
 }
 

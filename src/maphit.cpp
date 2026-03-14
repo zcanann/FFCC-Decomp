@@ -749,6 +749,7 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     while (faceIndex < endFace) {
         m_faces = reinterpret_cast<CMapHitFace*>(Ptr(savedFaces, faceOffset));
         m_faceCount = 1;
+        gMapHitFace = m_faces;
         CheckHitFaceCylinder(mask);
         faceOffset += 0x50;
         faceIndex++;

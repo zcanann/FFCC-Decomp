@@ -17,7 +17,7 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
-static char s_CMaterialEditorPcs_801d7d34[] = "CMaterialEditorPcs";
+static char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
 unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
@@ -26,6 +26,7 @@ static char s_MaterialEditor[] = "MaterialEditor=%c";
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
+extern "C" float FLOAT_8032FCC8;
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -287,7 +288,7 @@ void CMaterialEditorPcs::createViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, s_CMaterialEditorPcs_801d7d34, 0));
+        Memory.CreateStage(0x200000, s_CMaterialEditorPcs_801D7D34, 0));
     GXColor clear;
     float fVar1;
 
@@ -304,13 +305,13 @@ void CMaterialEditorPcs::createViewer()
     WriteU32(self, 0xe8, 0);
     memset(self + 0xec, 0, 0x120);
 
-    fVar1 = 0.0f;
-    WriteF32(self, 0x128, 0.0f);
+    fVar1 = FLOAT_8032FCC8;
+    WriteF32(self, 0x128, fVar1);
     WriteF32(self, 0x114, fVar1);
     WriteF32(self, 0x100, fVar1);
     WriteF32(self, 0xec, fVar1);
 
-    PSMTXIdentity(m_unkMatrix.value);
+    PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x20C));
     m_usbStream.CreateBuffer();
 }
 

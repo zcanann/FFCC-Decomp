@@ -139,7 +139,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
             if (ref != 0) {
                 __ct__4CRefFv(ref);
-                *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim_801ea9a4;
+                *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim_801ea9a4;
                 *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x2C) = 0;
                 *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x30) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x40) = 0;

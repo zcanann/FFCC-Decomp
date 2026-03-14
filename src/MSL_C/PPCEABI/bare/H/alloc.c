@@ -361,13 +361,20 @@ static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
  */
 static void Block_construct(Block* block, unsigned long size) {
     SubBlock* sb;
+    unsigned long block_size;
+    unsigned long sb_size;
+    int start_offset;
 
-    block->size = size | 3;
+    block_size = size | 3;
+    block->size = block_size;
+    *(unsigned long*)((char*)block + size - 8) = block_size;
     sb = (SubBlock*)((char*)block + 16);
-    sb->size = size - 24;
+    sb_size = size - 24;
     sb->block = (Block*)((unsigned long)block | 1);
-    block->max_size = size - 24;
-    Block_start(block) = 0;
+    sb->size = sb_size;
+    block->max_size = sb_size;
+    start_offset = (block->size & 0xFFFFFFF8UL) - 4;
+    *(SubBlock**)((char*)block + start_offset) = 0;
     Block_link(block, sb);
 }
 

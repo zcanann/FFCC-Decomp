@@ -410,8 +410,9 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  */
 void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
-    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xDC);
-    u32* work = (u32*)((u8*)ymMana + 8 + param_2->m_serializedDataOffsets[2]);
+    s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
+    u32* work = (u32*)((u8*)ymMana + 0x80 + serializedDataOffsets[2]);
     void* handle;
     u32 model;
 
@@ -1547,4 +1548,3 @@ void CalcReflectionVector2(
     DCFlushRange(color, count << 2);
     DCFlushRange(reflectionVec, count * 0xC);
 }
-

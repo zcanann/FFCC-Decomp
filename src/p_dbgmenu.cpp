@@ -653,63 +653,101 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
  */
 void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
-	// Reset GX state if needed
 	if (m_currentVtxFmt != 0) {
 		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-		GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		m_currentVtxFmt = 0;
 	}
 
-	// Draw drop shadow if flag is set
-	if ((flags & 4) != 0) {
-		changeVtxFmt(0);
-		GXColor shadowColor = {0, 0, 0, 255};
-		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+	GXColor mainColor = { 0xFF, 0xFF, 0xFF, 0xFF };
+	if ((flags & 2) != 0) {
+		mainColor.r = 0;
+		mainColor.g = 0;
+		mainColor.b = 0;
+	}
 
-		int fontSize = 10;
-		if ((flags & 1) != 0) {
+	if ((flags & 4) != 0) {
+		u32 smallFont = flags & 1;
+		u32 centered = flags & 8;
+		short drawX;
+		short drawY;
+		int fontSize;
+		GXColor shadowColor = { 0, 0, 0, 0xFF };
+
+		drawX = (short)(x - 1);
+		changeVtxFmt(0);
+		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		fontSize = 10;
+		if (smallFont != 0) {
 			fontSize = 8;
 		}
-
-		short shadowX = x - 1;
-		short shadowY = y;
-		if ((flags & 8) != 0) {
-			// Center text
+		drawY = (short)y;
+		if (centered != 0) {
 			int textLen = strlen(text);
-			shadowX = x - (short)((fontSize * textLen) >> 1);
-			shadowY = y - (short)(fontSize >> 1);
+			drawX = (short)(drawX - (short)((u32)(fontSize * textLen) >> 1));
+			drawY = (short)(y - (short)(fontSize >> 1));
 		}
+		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
 
-		// Draw shadow in 4 directions
-		Graphic.DrawDebugStringDirect(shadowX, shadowY, text, fontSize);
-		Graphic.DrawDebugStringDirect(x, shadowY + 1, text, fontSize);
-		Graphic.DrawDebugStringDirect(x + 1, shadowY, text, fontSize);
-		Graphic.DrawDebugStringDirect(x, shadowY - 1, text, fontSize);
+		drawY = (short)(y + 1);
+		changeVtxFmt(0);
+		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		fontSize = 10;
+		if (smallFont != 0) {
+			fontSize = 8;
+		}
+		drawX = (short)x;
+		if (centered != 0) {
+			int textLen = strlen(text);
+			drawX = (short)(x - (short)((u32)(fontSize * textLen) >> 1));
+			drawY = (short)(drawY - (short)(fontSize >> 1));
+		}
+		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
+
+		drawX = (short)(x + 1);
+		changeVtxFmt(0);
+		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		fontSize = 10;
+		if (smallFont != 0) {
+			fontSize = 8;
+		}
+		drawY = (short)y;
+		if (centered != 0) {
+			int textLen = strlen(text);
+			drawX = (short)(drawX - (short)((u32)(fontSize * textLen) >> 1));
+			drawY = (short)(y - (short)(fontSize >> 1));
+		}
+		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
+
+		drawY = (short)(y - 1);
+		changeVtxFmt(0);
+		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		fontSize = 10;
+		if (smallFont != 0) {
+			fontSize = 8;
+		}
+		drawX = (short)x;
+		if (centered != 0) {
+			int textLen = strlen(text);
+			drawX = (short)(x - (short)((u32)(fontSize * textLen) >> 1));
+			drawY = (short)(drawY - (short)(fontSize >> 1));
+		}
+		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
 	}
 
-	// Draw main text
-	GXColor mainColor = {255, 255, 255, 255}; // Default white
-	if ((flags & 2) != 0) {
-		mainColor.r = mainColor.g = mainColor.b = 0; // Black text
-	}
 	GXSetChanMatColor(GX_COLOR0A0, mainColor);
 
 	int fontSize = 10;
 	if ((flags & 1) != 0) {
 		fontSize = 8;
 	}
-
-	short finalX = x;
-	short finalY = y;
 	if ((flags & 8) != 0) {
-		// Center text
 		int textLen = strlen(text);
-		finalX = x - (short)((fontSize * textLen) >> 1);
-		finalY = y - (short)(fontSize >> 1);
+		x = (short)(x - (short)((u32)(fontSize * textLen) >> 1));
+		y = (short)(y - (short)(fontSize >> 1));
 	}
-
-	Graphic.DrawDebugStringDirect(finalX, finalY, text, fontSize);
+	Graphic.DrawDebugStringDirect((short)x, (short)y, text, (short)fontSize);
 }
 
 /*

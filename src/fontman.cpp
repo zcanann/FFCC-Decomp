@@ -409,8 +409,10 @@ void CFont::SetColor(_GXColor color)
  */
 void CFont::SetTlut(int index)
 {
-	unsigned char* tlut = 0;
-	if (index >= 0) {
+	unsigned char* tlut;
+	if (index < 0) {
+		tlut = 0;
+	} else {
 		tlut = &m_tlutData[index * 0x40];
 	}
 	texturePtr->SetExternalTlut(tlut, 1);

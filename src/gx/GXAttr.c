@@ -576,14 +576,13 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
 }
 
 void __GXSetVAT(void) {
-    s32 i;
-    u8 b;
+    u8 i;
 
-    for (b = 0, i = 0; b < 8; i++, b++) {
-        if ((__GXData->dirtyVAT & (1 << b)) != 0) {
-            GX_WRITE_SOME_REG4(8, b | 0x70, __GXData->vatA[i], i - 12);
-            GX_WRITE_SOME_REG4(8, b | 0x80, __GXData->vatB[i], i - 12);
-            GX_WRITE_SOME_REG4(8, b | 0x90, __GXData->vatC[i], i - 12);
+    for (i = 0; i < 8; i++) {
+        if (__GXData->dirtyVAT & (1 << (u8)i)) {
+            GX_WRITE_SOME_REG4(8, i | 0x70, __GXData->vatA[i], i - 12);
+            GX_WRITE_SOME_REG4(8, i | 0x80, __GXData->vatB[i], i - 12);
+            GX_WRITE_SOME_REG4(8, i | 0x90, __GXData->vatC[i], i - 12);
         }
     }
 

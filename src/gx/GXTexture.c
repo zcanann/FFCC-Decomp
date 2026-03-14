@@ -1206,20 +1206,31 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
 static void __SetSURegs(int tmap, int tcoord) {
     GXData* gx;
     u32 image0;
-    u32 mode0;
-    u32 wrapS;
-    u32 wrapT;
+    u32 reg;
+    GXBool wrapS;
+    GXBool wrapT;
 
     gx = __GXData;
     image0 = gx->tImage0[tmap];
-    mode0 = gx->tMode0[tmap];
-    wrapS = __cntlzw(1 - (mode0 & 3));
-    wrapT = __cntlzw(1 - ((mode0 >> 2) & 3));
 
-    gx->suTs0[tcoord] = (gx->suTs0[tcoord] & 0xFFFF0000) | (image0 & 0x3FF);
-    gx->suTs1[tcoord] = (gx->suTs1[tcoord] & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
-    gx->suTs0[tcoord] = (gx->suTs0[tcoord] & 0xFFFEFFFF) | ((wrapS << 11) & 0x10000);
-    gx->suTs1[tcoord] = (gx->suTs1[tcoord] & 0xFFFEFFFF) | ((wrapT << 11) & 0x10000);
+    reg = gx->suTs0[tcoord];
+    reg = (reg & 0xFFFF0000) | (image0 & 0x3FF);
+    gx->suTs0[tcoord] = reg;
+
+    wrapS = (gx->tMode0[tmap] & 3) == 1;
+    wrapT = ((gx->tMode0[tmap] >> 2) & 3) == 1;
+
+    reg = gx->suTs1[tcoord];
+    reg = (reg & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
+    gx->suTs1[tcoord] = reg;
+
+    reg = gx->suTs0[tcoord];
+    reg = (reg & 0xFFFEFFFF) | (wrapS << 16);
+    gx->suTs0[tcoord] = reg;
+
+    reg = gx->suTs1[tcoord];
+    reg = (reg & 0xFFFEFFFF) | (wrapT << 16);
+    gx->suTs1[tcoord] = reg;
 
     GX_WRITE_RAS_REG(gx->suTs0[tcoord]);
     GX_WRITE_RAS_REG(gx->suTs1[tcoord]);

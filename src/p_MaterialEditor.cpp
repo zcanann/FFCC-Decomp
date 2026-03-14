@@ -17,7 +17,7 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
-static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
+static char s_CMaterialEditorPcs_801d7d34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
 unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
@@ -287,9 +287,9 @@ void CMaterialEditorPcs::createViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, s_CMaterialEditorPcs, 0));
+        Memory.CreateStage(0x200000, s_CMaterialEditorPcs_801d7d34, 0));
     GXColor clear;
-    const float kZero = 0.0f;
+    float fVar1;
 
     WriteU32(self, 0x4, reinterpret_cast<unsigned int>(stage));
     USBPcs.IsBigAlloc(1);
@@ -300,14 +300,15 @@ void CMaterialEditorPcs::createViewer()
     clear.a = 0xff;
     GXSetCopyClear(clear, 0xffffff);
 
-    WriteU32(self, 0x1c, 1);
+    WriteU32(self, 0x98, 1);
     WriteU32(self, 0xe8, 0);
     memset(self + 0xec, 0, 0x120);
 
-    WriteF32(self, 0xec, kZero);
-    WriteF32(self, 0x100, kZero);
-    WriteF32(self, 0x114, kZero);
-    WriteF32(self, 0x128, kZero);
+    fVar1 = 0.0f;
+    WriteF32(self, 0x128, 0.0f);
+    WriteF32(self, 0x114, fVar1);
+    WriteF32(self, 0x100, fVar1);
+    WriteF32(self, 0xec, fVar1);
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();

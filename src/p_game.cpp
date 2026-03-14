@@ -1,6 +1,7 @@
 #include "ffcc/p_game.h"
 
 extern "C" void* __vt__8CGamePcs[];
+CGamePcs Game;
 unsigned int GamePcs[2];
 
 /*

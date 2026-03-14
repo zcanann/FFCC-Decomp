@@ -77,7 +77,7 @@ extern "C" void __dt__10CAmemCacheFv(void*, int);
 
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x10C);
+    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x11C);
 }
 
 static int stageGetHeapHead(CMemory::CStage* stage)

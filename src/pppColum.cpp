@@ -88,7 +88,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (alpha != 0) {
             pppColumValue* values = frameWork->m_values;
-            u8 count = param_2->m_count;
             Mtx identityMtx;
             Vec basePos;
             Vec cameraDelta;
@@ -109,10 +108,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             if (lengthXY > 0.0f) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
-            segmentStep = (150.0f * lengthXY) / ((float)count - 1.0f);
+            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
 
             pppInitBlendMode__Fv();
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < param_2->m_count; i++) {
                 Vec center;
                 Vec offset;
                 Vec shapePosA;

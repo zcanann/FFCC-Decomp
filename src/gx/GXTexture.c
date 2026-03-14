@@ -1284,7 +1284,7 @@ void __GXGetSUTexSize(GXTexCoordID coord, u16* width, u16* height) {
     *height = (u16)__GXData->suTs1[coord] + 1;
 }
 
-void __GXSetTmemConfig(int config) {
+void __GXSetTmemConfig(u32 config) {
     switch (config) {
     case 1:
         GX_WRITE_RAS_REG(0x8c0d8000);
@@ -1311,6 +1311,7 @@ void __GXSetTmemConfig(int config) {
         GX_WRITE_RAS_REG(0xaf0db800);
         GX_WRITE_RAS_REG(0xb30df800);
         break;
+    case 0:
     default:
         GX_WRITE_RAS_REG(0x8c0d8000);
         GX_WRITE_RAS_REG(0x900dc000);

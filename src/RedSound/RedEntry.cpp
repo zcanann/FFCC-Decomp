@@ -1175,9 +1175,33 @@ int CRedEntry::ReentrySeSepData(int seNo)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepHistoryManager(int, int)
+void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 {
-	// TODO
+	if (mode == 0) {
+		bool inUse = false;
+		int* track = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+
+		do {
+			if ((*track != 0) && (track[0x3D] == seNo)) {
+				inUse = true;
+				break;
+			}
+			track += 0x55;
+		} while (track < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+
+		int sequenceNo = SearchSeSepSequence(seNo);
+		if ((!inUse) && (-1 < sequenceNo) &&
+		    (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) == 0)) {
+			SeSepHistoryAdd();
+			*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 1;
+		}
+	} else {
+		int sequenceNo = SearchSeSepSequence(seNo);
+		if (*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) != 0) {
+			SeSepHistoryDelete(*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4));
+			*reinterpret_cast<int*>(*reinterpret_cast<int*>((int)this + 4) + sequenceNo * 0x10 + 4) = 0;
+		}
+	}
 }
 
 /*

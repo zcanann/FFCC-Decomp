@@ -253,10 +253,10 @@ void CGPrgObj::addSubStat()
  */
 void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
-	m_animFlags |= 0x80;
+	m_animFlags = (m_animFlags & 0x7F) | 0x80;
 	m_reqAnimId = animId;
-	m_animFlags = (m_animFlags & 0xBF) | (static_cast<unsigned char>(loop) << 6);
-	m_animFlags = (m_animFlags & 0xDF) | (static_cast<unsigned char>(direct) << 5);
+	m_animFlags = (static_cast<unsigned char>(loop << 6) & 0x40) | (m_animFlags & 0xBF);
+	m_animFlags = (static_cast<unsigned char>(direct << 5) & 0x20) | (m_animFlags & 0xDF);
 }
 
 /*

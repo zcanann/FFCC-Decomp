@@ -314,7 +314,7 @@ static exaction_type ExPPC_NextAction(ActionIterator* iter)
 			ExPPC_FindExceptionRecord(return_addr, &iter->info);
 
 			if (iter->info.exception_record == 0) {
-				terminate();
+				std::terminate();
 			}
 
 			iter->current_SP = callers_SP;
@@ -366,7 +366,7 @@ static exaction_type ExPPC_NextAction(ActionIterator* iter)
 				    += sizeof(ex_specification) + ((ex_specification*)iter->info.action_pointer)->specs * sizeof(void*);
 				break;
 			default:
-				terminate();
+				std::terminate();
 			}
 		}
 

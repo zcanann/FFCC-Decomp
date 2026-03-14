@@ -290,6 +290,10 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     CGObject* gObject;
     void* handle;
     s32 model;
+    s32 meshEntry;
+    s32 step;
+    u32 i;
+    u32 j;
 
     work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
     gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
@@ -326,9 +330,121 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[13]);
         work[13] = 0;
     }
+    if (work[15] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[15]);
+        work[15] = 0;
+    }
+    if (work[16] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[16]);
+        work[16] = 0;
+    }
+    if (work[18] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[18]);
+        work[18] = 0;
+    }
+    if (work[19] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[19]);
+        work[19] = 0;
+    }
+    if (work[20] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[20]);
+        work[20] = 0;
+    }
+    if (work[21] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[21]);
+        work[21] = 0;
+    }
+    if (work[22] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[22]);
+        work[22] = 0;
+    }
+    if (work[23] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[23]);
+        work[23] = 0;
+    }
+    if (work[17] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[17]);
+        work[17] = 0;
+    }
+    if (work[25] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[25]);
+        work[25] = 0;
+    }
+    if (work[26] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[26]);
+        work[26] = 0;
+    }
+    if (work[27] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[27]);
+        work[27] = 0;
+    }
+    if (work[28] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[28]);
+        work[28] = 0;
+    }
+    if (work[29] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[29]);
+        work[29] = 0;
+    }
+    if (work[30] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[30]);
+        work[30] = 0;
+    }
+    if (work[31] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[31]);
+        work[31] = 0;
+    }
     if (work[0x1D] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[0x1D]);
         work[0x1D] = 0;
+    }
+
+    meshEntry = *(s32*)(model + 0xAC);
+    step = work[0x1C];
+    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++) {
+        char stepType = *(char*)(step + 0x1C);
+        s32 shape = *(s32*)(meshEntry + 8);
+
+        if (stepType == 1) {
+            if (strcmp((char*)shape, DAT_803318d4) == 0) {
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                        *(u32*)(work[0x18] + j * 4) = 0;
+                    }
+                }
+                if (work[0x18] != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                    work[0x18] = 0;
+                }
+            }
+        } else if (stepType == 2) {
+            if (strcmp((char*)shape, DAT_803318dc) == 0) {
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                        *(u32*)(work[0x18] + j * 4) = 0;
+                    }
+                }
+                if (work[0x18] != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                    work[0x18] = 0;
+                }
+            }
+        } else if (stepType == 3 && strcmp((char*)shape, DAT_803318e4) == 0) {
+            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                    *(u32*)(work[0x18] + j * 4) = 0;
+                }
+            }
+            if (work[0x18] != 0) {
+                pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                work[0x18] = 0;
+            }
+        }
+
+        meshEntry += 0x14;
     }
 }
 
@@ -1276,4 +1392,3 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
     DCFlushRange(reflectionVec - count, count * sizeof(Vec));
     DCFlushRange(texCoord, count << 3);
 }
-

@@ -1279,8 +1279,11 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
     char path[0x108];
     u8* self = reinterpret_cast<u8*>(this);
     CFont** fontSlot = reinterpret_cast<CFont**>(self + 0x100 + fontNo * 4);
-    ReleaseRefObject(*fontSlot);
-    *fontSlot = 0;
+    CFont* font = *fontSlot;
+    if (font != 0) {
+        ReleaseRefObject(font);
+        *fontSlot = 0;
+    }
 
     sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.game.GetLangString(), fileName);
     loadFont(2, path, fontNo + 2, -1);

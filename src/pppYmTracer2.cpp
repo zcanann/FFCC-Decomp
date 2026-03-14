@@ -45,6 +45,7 @@ struct TracerWork {
     Vec pos;
     float pad0;
     Vec targetPos;
+    float pad1c;
     float* initWork;
     float* arg3Work;
     TraceEntry* entries;

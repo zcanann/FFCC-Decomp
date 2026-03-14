@@ -23,6 +23,7 @@
 #include <string.h>
 
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -122,6 +123,11 @@ CPartMng PartMng;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
+static char s__________________________________801d8358[] = "----------------------------------\n";
+static char s_prioTime__d_prio__d_heapSize__d_p_801d8454[] =
+    "  prioTime=%d  prio=%d  heapSize=%d  pdtID=%2d  fpno=%3d   mngNo=%d  %s\n";
+static char s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0[] =
+    "HEAP TOTAL=%dKbyte  USE=%dKbyte  FREE=%dKbyte\n";
 
 struct CPtrArrayBare {
     void* m_vtable;
@@ -432,7 +438,60 @@ void CPartMng::Destroy()
  */
 void CPartMng::pppDumpMngSt()
 {
-	// TODO
+    struct PppPdtSlotRaw {
+        _pppDataHead* m_pdt;
+        unsigned int m_envFields[5];
+        char m_name[0x20];
+    };
+
+    struct PppMngStDumpRaw {
+        void* m_pppResSet;                 // 0x00
+        unsigned char m_pad04[0x74 - 0x4];
+        short m_kind;                      // 0x74
+        short m_nodeIndex;                 // 0x76
+        unsigned char m_pad78[0xAC - 0x78];
+        int m_prioTime;                    // 0xAC
+        unsigned char m_padB0[0xF8 - 0xB0];
+        unsigned char m_prio;              // 0xF8
+        unsigned char m_padF9[0x12C - 0xF9];
+        int m_heapGroupRef;                // 0x12C
+    };
+
+    unsigned long heapTotal;
+    unsigned long heapUse;
+    unsigned long heapFree;
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22E18);
+
+    if (System.m_execParam != 0) {
+        Printf__7CSystemFPce(&System, s__________________________________801d8358);
+    }
+
+    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x1D4);
+    for (int i = 0; i < 0x180; i++) {
+        if (mng->m_prioTime != -0x1000 && System.m_execParam != 0) {
+            int kind = static_cast<int>(mng->m_kind);
+            int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
+            int heapSize = pppEnvStPtr->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
+
+            Printf__7CSystemFPce(
+                &System, s_prioTime__d_prio__d_heapSize__d_p_801d8454, mng->m_prioTime,
+                mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
+                pdtSlots[kind].m_name);
+        }
+
+        mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
+    }
+
+    pppEnvStPtr->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
+
+    if (System.m_execParam != 0) {
+        Printf__7CSystemFPce(
+            &System, s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0,
+            static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
+            static_cast<int>(heapFree >> 10));
+        Printf__7CSystemFPce(&System, s__________________________________801d8358);
+    }
 }
 
 /*

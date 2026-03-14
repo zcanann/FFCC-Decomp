@@ -282,10 +282,10 @@ typedef struct __GXData_struct {
     GXTlutRegion TlutRegions[20];
     GXTexRegion* (*texRegionCallback)(GXTexObj*, GXTexMapID);
     GXTlutRegion* (*tlutRegionCallback)(u32);
+    u32 projType;
     u8 nrmType;
     u8 hasNrms;
     u8 hasBiNrms;
-    u32 projType;
     f32 projMtx[6];
     f32 vpLeft;
     f32 vpTop;

@@ -77,9 +77,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     pppColumPositionWork* positionWork = (pppColumPositionWork*)((u8*)column + serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
-    u32 dataValIndex = param_2->m_dataValIndex;
-    if (dataValIndex != 0xFFFF) {
-        pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    if (param_2->m_dataValIndex != 0xFFFF) {
+        pppShapeSt* shapeSt =
+            *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
         void* texture;
         u8 alpha = positionWork->m_alpha;
         pppCVector color;

@@ -256,7 +256,7 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	if (param_2 < 0x4000) {
 		return;
 	}
-	if (0x8000000 < param_2 + *param_3) {
+	if (param_2 + *param_3 >= 0x8000000) {
 		return;
 	}
 	uVar1 = param_2 & 0xFFFFFFE0;
@@ -346,7 +346,7 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	if (param_2 < 0x4000) {
 		return;
 	}
-	if (0x8000000 < param_2 + *param_3) {
+	if (param_2 + *param_3 >= 0x8000000) {
 		return;
 	}
 

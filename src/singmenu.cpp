@@ -2142,20 +2142,27 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
 int CMenuPcs::GetEquipType(int itemNo)
 {
     u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int equipType = 0;
 
-    if ((flags & 0x100) != 0) {
-        return 0;
+    if ((flags & 0x100) == 0) {
+        if ((flags & 0x400) == 0) {
+            if ((flags & 0xA00) == 0) {
+                if ((flags & 0x3000) == 0) {
+                    if (System.m_execParam != 0) {
+                        System.Printf((char*)"%s(%d): item = %d m_equip = %08x", s_singmenu_cpp_801de8d4, 0xD3D, itemNo, flags);
+                    }
+                } else {
+                    equipType = 3;
+                }
+            } else {
+                equipType = 2;
+            }
+        } else {
+            equipType = 1;
+        }
     }
-    if ((flags & 0x400) != 0) {
-        return 1;
-    }
-    if ((flags & 0xA00) != 0) {
-        return 2;
-    }
-    if ((flags & 0x3000) != 0) {
-        return 3;
-    }
-    return 0;
+
+    return equipType;
 }
 
 /*

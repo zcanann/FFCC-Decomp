@@ -779,20 +779,20 @@ void CGame::CheckScriptChange()
         System.Printf(const_cast<char*>(DAT_801d6214));
         System.Printf(const_cast<char*>(DAT_8032f6a0));
 
-        memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
-        memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
+        memset(&Game.game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+        memset(Game.game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.game.m_gameWork.m_wmBackupParams));
 
-        m_gameWork.m_scriptSysVal0 = 0;
-        m_gameWork.m_scriptSysVal1 = 0;
-        m_gameWork.m_scriptSysVal2 = 0;
-        m_gameWork.m_scriptSysVal3 = 1;
-        m_gameWork.m_chaliceElement = 1;
+        Game.game.m_gameWork.m_scriptSysVal0 = 0;
+        Game.game.m_gameWork.m_scriptSysVal1 = 0;
+        Game.game.m_gameWork.m_scriptSysVal2 = 0;
+        Game.game.m_gameWork.m_scriptSysVal3 = 1;
+        Game.game.m_gameWork.m_chaliceElement = 1;
 
-        if (m_gameWork.m_languageId == 3) {
+        if (Game.game.m_gameWork.m_languageId == 3) {
             townName = DAT_8032f6a4;
         }
 
-        strcpy(m_gameWork.m_townName, townName);
+        strcpy(Game.game.m_gameWork.m_townName, townName);
         gCFlatRuntime2.ResetNewGame();
         gChara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;

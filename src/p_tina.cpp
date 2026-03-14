@@ -200,14 +200,21 @@ struct CPartPcsViewerState {
     unsigned char m_disableShokiDraw;
 };
 
-struct CPartMngLoadState {
+struct CPartMngState {
     unsigned char unk0[0x23708];
+    unsigned int m_partAMemBase;
+    unsigned int m_partAMemCursor;
+    unsigned int m_partLoadCacheParam;
+    unsigned int m_partChunkIndex;
+    unsigned int m_asyncHandleCount;
     int m_partLoadMode;
+    unsigned char unk2370C[0x80];
+    unsigned int m_partAsyncBusy[16];
 };
 
-static CPartMngLoadState* GetPartMngLoadState()
+static CPartMngState* GetPartMngState()
 {
-    return reinterpret_cast<CPartMngLoadState*>(&PartMng);
+    return reinterpret_cast<CPartMngState*>(&PartMng);
 }
 
 /*
@@ -555,12 +562,14 @@ void CPartPcs::create()
  */
 void CPartPcs::createLoad()
 {
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F8) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236FC) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23700) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23704) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23708) = 0;
+    CPartMngState* state = GetPartMngState();
+
+    state->m_partAMemBase = 0;
+    state->m_partAMemCursor = 0;
+    state->m_partLoadCacheParam = 0;
+    state->m_partChunkIndex = 0;
+    state->m_asyncHandleCount = 0;
+    state->m_partLoadMode = 0;
 
     pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
     pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
@@ -1172,15 +1181,12 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    unsigned int* busy = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x2378C);
+    CPartMngState* state = GetPartMngState();
 
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 8; j++) {
-            if (busy[j] != 0) {
-                return 0;
-            }
+    for (int i = 0; i < 16; i++) {
+        if (state->m_partAsyncBusy[i] != 0) {
+            return 0;
         }
-        busy += 8;
     }
 
     return 1;
@@ -1197,7 +1203,7 @@ unsigned int CPartPcs::IsLoadPartCompleted()
  */
 void LoadFieldPdt0(int mapId, int floorId)
 {
-    CPartMngLoadState* loadState = GetPartMngLoadState();
+    CPartMngState* loadState = GetPartMngState();
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
     int partLoadMode = loadState->m_partLoadMode;
     int pdtSlot;

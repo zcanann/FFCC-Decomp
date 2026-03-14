@@ -2495,12 +2495,77 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CC394
+ * PAL Size: 560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ChkCMakeCharaType(int, unsigned int)
+void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	unsigned char charaType = static_cast<unsigned char>(value >> 8);
+	unsigned char resultCode = static_cast<unsigned char>(value >> 16);
+	int cmakeOffset = channel * 0x20;
+	OSSemaphore* semaphore = accessSemaphores + channel;
+
+	if (charaType == 0xFF) {
+		OSWaitSemaphore(semaphore);
+		obj[0x2CCA + cmakeOffset] = static_cast<char>(0xFF);
+		obj[0x2CD1 + cmakeOffset] = static_cast<char>(0xFF);
+		OSSignalSemaphore(semaphore);
+		return;
+	}
+
+	bool foundDuplicate = false;
+	for (int i = 0; i < 4; i++) {
+		OSWaitSemaphore(accessSemaphores + i);
+	}
+
+	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
+	for (int i = 0; i < 4; i++) {
+		int otherOffset = i * 0x20;
+		if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
+		    (static_cast<unsigned char>(obj[0x2CCA + otherOffset]) == charaType)) {
+			Joybus.SendResult(channel, 1, resultCode, 0);
+			foundDuplicate = true;
+			break;
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		OSSignalSemaphore(accessSemaphores + i);
+	}
+
+	if (foundDuplicate) {
+		return;
+	}
+
+	for (int i = 0; i < 8; i++) {
+		CCaravanWork* caravanWork = &Game.game.m_caravanWorkArr[i];
+		char* caravanObj = reinterpret_cast<char*>(caravanWork);
+		if ((i != playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
+		    (caravanObj[0xBA6] == '\0')) {
+			unsigned short existingCharaType = *reinterpret_cast<unsigned short*>(caravanObj + 0x3E0) & 0xFF;
+			existingCharaType |= static_cast<unsigned short>(
+			    static_cast<unsigned char>(static_cast<char>(*reinterpret_cast<unsigned short*>(caravanObj + 0x3E4)) << 2));
+			if (*reinterpret_cast<short*>(caravanObj + 0x3E2) != 0) {
+				existingCharaType = static_cast<unsigned short>(existingCharaType | 0x80);
+			}
+
+			if (existingCharaType == charaType) {
+				Joybus.SendResult(channel, 1, resultCode, 0);
+				return;
+			}
+		}
+	}
+
+	Joybus.SendResult(channel, 0, resultCode, 0);
+	OSWaitSemaphore(semaphore);
+	obj[0x2CCA + cmakeOffset] = static_cast<char>(charaType);
+	OSSignalSemaphore(semaphore);
+	MenuPcs.ChgModel(static_cast<int>(playerSlot), charaType & 3, (charaType >> 2) & 3, static_cast<int>(charaType >> 7));
 }
 
 /*

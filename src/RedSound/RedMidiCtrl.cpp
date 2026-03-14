@@ -608,14 +608,12 @@ void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
  */
 void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-
-    *(short*)(trackData + 0x4f) = *(short*)(trackData + 0x4f) + 1;
-    *(unsigned short*)(trackData + 0x4f) &= 3;
-
-    trackData[*(short*)(trackData + 0x4f) + 2] = trackData[0];
-    *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130) = *(short*)(trackData + 0x51);
-    *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x128) = 0;
+    *(short*)((char*)track + 0x13C) = *(short*)((char*)track + 0x13C) + 1;
+    *(unsigned short*)((char*)track + 0x13C) &= 3;
+    ((int*)track)[*(short*)((char*)track + 0x13C) + 2] = *(int*)track;
+    *(unsigned short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x130) =
+        *(unsigned short*)((char*)track + 0x144);
+    *(unsigned short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x128) = 0;
 }
 
 /*

@@ -328,8 +328,6 @@ GXFifoObj* GXInit(void* base, u32 size) {
     SET_REG_FIELD(0, __GXData->peCtrl, 8, 24, 0x43);
     SET_REG_FIELD(0, __GXData->cpTex, 2, 7, 0);
 
-    __GXData->zScale = 1.6777216E7f;
-    __GXData->zOffset = 0.0f;
     __GXData->dirtyState = 0;
     __GXData->dirtyVAT = FALSE;
 

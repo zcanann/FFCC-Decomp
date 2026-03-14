@@ -720,15 +720,20 @@ void C_MTXRotTrig(Mtx m, char axis, f32 sinA, f32 cosA)
 void PSMTXRotTrig(register Mtx m, register char axis, register f32 sinA, register f32 cosA)
 {
     register f32 fc0, fc1, nsinA;
+    register f32 sinB, cosB;
     register f32 fw0, fw1, fw2, fw3;
     // clang-format off
 
+  asm {
+    frsp sinB, sinA
+    frsp cosB, cosA
+  }
   fc0 = 0.0F;
   fc1 = 1.0F;
   asm
   {
     ori         axis, axis, 0x20
-    ps_neg      nsinA, sinA
+    ps_neg      nsinA, sinB
     cmplwi      axis, 'x'
     beq         _case_x
     cmplwi      axis, 'y'
@@ -740,9 +745,9 @@ void PSMTXRotTrig(register Mtx m, register char axis, register f32 sinA, registe
 _case_x:
     psq_st      fc1,  0(m), 1, 0
     psq_st      fc0,  4(m), 0, 0
-    ps_merge00  fw0, sinA, cosA
+    ps_merge00  fw0, sinB, cosB
     psq_st      fc0, 12(m), 0, 0
-    ps_merge00  fw1, cosA, nsinA
+    ps_merge00  fw1, cosB, nsinA
     psq_st      fc0, 28(m), 0, 0
     psq_st      fc0, 44(m), 1, 0
     psq_st      fw0, 36(m), 0, 0
@@ -750,12 +755,12 @@ _case_x:
     b           _end;
 
 _case_y:
-    ps_merge00  fw0, cosA, fc0
+    ps_merge00  fw0, cosB, fc0
     ps_merge00  fw1, fc0, fc1
     psq_st      fc0, 24(m), 0, 0
     psq_st      fw0,  0(m), 0, 0
     ps_merge00  fw2, nsinA, fc0
-    ps_merge00  fw3, sinA, fc0
+    ps_merge00  fw3, sinB, fc0
     psq_st      fw0, 40(m), 0, 0;
     psq_st      fw1, 16(m), 0, 0;
     psq_st      fw3,  8(m), 0, 0;
@@ -764,8 +769,8 @@ _case_y:
 
 _case_z:
     psq_st      fc0,  8(m), 0, 0
-    ps_merge00  fw0, sinA, cosA
-    ps_merge00  fw2, cosA, nsinA
+    ps_merge00  fw0, sinB, cosB
+    ps_merge00  fw2, cosB, nsinA
     psq_st      fc0, 24(m), 0, 0
     psq_st      fc0, 32(m), 0, 0
     ps_merge00  fw1, fc1, fc0

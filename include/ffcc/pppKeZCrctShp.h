@@ -10,7 +10,7 @@ struct pppKeZCrctShpStep
     char m_pad14[4];
     Vec m_positionScale;  // +0x18
     char m_pad24[4];
-    u8 m_mode;            // +0x28
+    s8 m_mode;            // +0x28
 };
 
 #ifdef __cplusplus

@@ -1,9 +1,10 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include <math.h>
 
 #include "dolphin/axfx/__axfx.h"
+
+extern f32 powf(f32 x, f32 y);
 
 // prototypes
 static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
@@ -81,7 +82,7 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
         for (i = 0; i < 2; i++) {
             DLcreate(&rv->C[i + (k * 2)], lens[i] + 2);
             DLsetdelay(&rv->C[i + (k * 2)], lens[i]);
-            rv->combCoef[i + (k * 2)] = pow(10.0, (double)((lens[i] * -3) / timeFactor));
+            rv->combCoef[i + (k * 2)] = powf(10.0f, (lens[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {

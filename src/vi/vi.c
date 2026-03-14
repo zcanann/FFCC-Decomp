@@ -857,8 +857,7 @@ void VIConfigure(const GXRenderModeObj* rm) {
     }
     regs[54] = (u16)regClksel;
 
-    MARK_CHANGED(1);    
-    MARK_CHANGED(54);
+    changed |= ((u64)1 << (63 - 1)) | ((u64)1 << (63 - 54));
 
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
     setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);

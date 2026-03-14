@@ -28,9 +28,8 @@ unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-	volatile void** soundPcs = reinterpret_cast<volatile void**>(&SoundPcs);
-	volatile unsigned int* src = m_table_desc0__9CSoundPcs;
-	volatile unsigned int* table = m_table__9CSoundPcs;
+	unsigned int* src = m_table_desc0__9CSoundPcs;
+	unsigned int* table = m_table__9CSoundPcs;
 	unsigned int d1;
 	unsigned int d2;
 	unsigned int d3;
@@ -44,8 +43,7 @@ extern "C" void __sinit_p_sound_cpp(void)
 	unsigned int d11;
 	unsigned int d0;
 
-	*soundPcs = __vt__9CSoundPcs;
-
+	d0 = src[0];
 	d1 = src[1];
 	d2 = src[2];
 	d3 = src[3];
@@ -57,7 +55,8 @@ extern "C" void __sinit_p_sound_cpp(void)
 	d9 = src[9];
 	d10 = src[10];
 	d11 = src[11];
-	d0 = src[0];
+
+	*reinterpret_cast<void**>(&SoundPcs) = __vt__9CSoundPcs;
 
 	table[2] = d1;
 	table[1] = d0;

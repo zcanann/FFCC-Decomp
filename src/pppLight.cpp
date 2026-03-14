@@ -3,6 +3,7 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
@@ -15,23 +16,42 @@ struct pppLightTarget {
 	int unkC;
 };
 
-struct PppLightState {
-	u8 unk0[0x8];
-	s32 type;
-	Vec position;
-	u8 unk18[0xC];
-	f32 attenRadius;
+struct PppLightWork {
+	s16 color0R;
+	s16 color0G;
+	s16 color0B;
+	s16 color0A;
+	s16 color1R;
+	s16 color1G;
+	s16 color1B;
+	s16 color1A;
+	s16 color2R;
+	s16 color2G;
+	s16 color2B;
+	s16 color2A;
 	f32 attenFalloff;
-	u8 unk2C[0x14];
-	Vec direction;
+	f32 attenFalloffVelocity;
+	f32 attenFalloffAccel;
+	f32 attenRadius;
+	f32 attenRadiusVelocity;
+	f32 attenRadiusAccel;
 	f32 spotScale;
+	f32 spotScaleVelocity;
+	f32 spotScaleAccel;
 	f32 specularScale;
-	u8 unk54[3];
-	u8 specularMode;
-	_GXColor color0;
-	_GXColor color1;
-	_GXColor color2;
-	u8 unk64[0xB0 - 0x64];
+	f32 specularScaleVelocity;
+	f32 specularScaleAccel;
+};
+
+struct PppLightStep {
+	s32 sourceId;
+	u8 unk4[0x40];
+	s32 targetIndex;
+	u8 unk48[0x10];
+	u8 type;
+	u8 color0Enabled;
+	u8 color1Enabled;
+	u8 color2Enabled;
 };
 
 extern "C" {
@@ -121,131 +141,133 @@ void pppLightCon(void* param1, void* param2)
  */
 void pppLight(void* param1, void* param2, void* param3)
 {
-	unsigned char* pppMng = (unsigned char*)param1;
-	unsigned char* lightParam = (unsigned char*)param2;
+	u8* pObject = (u8*)param1;
+	PppLightStep* step = (PppLightStep*)param2;
+	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
 	{
-		unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
-		PppLightState lightData;
-		Vec* sourcePos = &lightData.position;
+		PppLightWork* work = (PppLightWork*)(pObject + ctrlTable->m_serializedDataOffsets[0] + 0x80);
+		CLightPcs::CLight light;
+		Vec targetPos;
 
-		*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(work + 0x20);
-		*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(work + 0x1c);
-		*(float*)(work + 0x28) = *(float*)(work + 0x28) + *(float*)(work + 0x2c);
-		*(float*)(work + 0x24) = *(float*)(work + 0x24) + *(float*)(work + 0x28);
-		*(float*)(work + 0x34) = *(float*)(work + 0x34) + *(float*)(work + 0x38);
-		*(float*)(work + 0x30) = *(float*)(work + 0x30) + *(float*)(work + 0x34);
-		*(float*)(work + 0x40) = *(float*)(work + 0x40) + *(float*)(work + 0x44);
-		*(float*)(work + 0x3c) = *(float*)(work + 0x3c) + *(float*)(work + 0x40);
+		work->attenFalloffVelocity += work->attenFalloffAccel;
+		work->attenFalloff += work->attenFalloffVelocity;
+		work->attenRadiusVelocity += work->attenRadiusAccel;
+		work->attenRadius += work->attenRadiusVelocity;
+		work->spotScaleVelocity += work->spotScaleAccel;
+		work->spotScale += work->spotScaleVelocity;
+		work->specularScaleVelocity += work->specularScaleAccel;
+		work->specularScale += work->specularScaleVelocity;
 
-		*(short*)(work + 0x8) = *(short*)(work + 0x8) + *(short*)(work + 0x10);
-		*(short*)(work + 0xa) = *(short*)(work + 0xa) + *(short*)(work + 0x12);
-		*(short*)(work + 0xc) = *(short*)(work + 0xc) + *(short*)(work + 0x14);
-		*(short*)(work + 0xe) = *(short*)(work + 0xe) + *(short*)(work + 0x16);
+		work->color1R += work->color2R;
+		work->color1G += work->color2G;
+		work->color1B += work->color2B;
+		work->color1A += work->color2A;
 
-		*(short*)(work + 0x0) = *(short*)(work + 0x0) + *(short*)(work + 0x8);
-		*(short*)(work + 0x2) = *(short*)(work + 0x2) + *(short*)(work + 0xa);
-		*(short*)(work + 0x4) = *(short*)(work + 0x4) + *(short*)(work + 0xc);
-		*(short*)(work + 0x6) = *(short*)(work + 0x6) + *(short*)(work + 0xe);
+		work->color0R += work->color1R;
+		work->color0G += work->color1G;
+		work->color0B += work->color1B;
+		work->color0A += work->color1A;
 
-		if (*(int*)lightParam == *(int*)(pppMng + 0xc)) {
-			*(short*)(work + 0x0) = *(short*)(work + 0x0) + *(short*)(lightParam + 0x8);
-			*(short*)(work + 0x2) = *(short*)(work + 0x2) + *(short*)(lightParam + 0xa);
-			*(short*)(work + 0x4) = *(short*)(work + 0x4) + *(short*)(lightParam + 0xc);
-			*(short*)(work + 0x6) = *(short*)(work + 0x6) + *(short*)(lightParam + 0xe);
-			*(short*)(work + 0x8) = *(short*)(work + 0x8) + *(short*)(lightParam + 0x10);
-			*(short*)(work + 0xa) = *(short*)(work + 0xa) + *(short*)(lightParam + 0x12);
-			*(short*)(work + 0xc) = *(short*)(work + 0xc) + *(short*)(lightParam + 0x14);
-			*(short*)(work + 0xe) = *(short*)(work + 0xe) + *(short*)(lightParam + 0x16);
-			*(short*)(work + 0x10) = *(short*)(work + 0x10) + *(short*)(lightParam + 0x18);
-			*(short*)(work + 0x12) = *(short*)(work + 0x12) + *(short*)(lightParam + 0x1a);
-			*(short*)(work + 0x14) = *(short*)(work + 0x14) + *(short*)(lightParam + 0x1c);
-			*(short*)(work + 0x16) = *(short*)(work + 0x16) + *(short*)(lightParam + 0x1e);
-			*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(lightParam + 0x20);
-			*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(lightParam + 0x24);
-			*(float*)(work + 0x20) = *(float*)(work + 0x20) + *(float*)(lightParam + 0x28);
-			*(float*)(work + 0x24) = *(float*)(work + 0x24) + *(float*)(lightParam + 0x2c);
-			*(float*)(work + 0x28) = *(float*)(work + 0x28) + *(float*)(lightParam + 0x30);
-			*(float*)(work + 0x2c) = *(float*)(work + 0x2c) + *(float*)(lightParam + 0x34);
-			*(float*)(work + 0x30) = *(float*)(work + 0x30) + *(float*)(lightParam + 0x38);
-			*(float*)(work + 0x34) = *(float*)(work + 0x34) + *(float*)(lightParam + 0x3c);
-			*(float*)(work + 0x38) = *(float*)(work + 0x38) + *(float*)(lightParam + 0x40);
-			*(float*)(work + 0x3c) = *(float*)(work + 0x3c) + *(float*)(lightParam + 0x4c);
-			*(float*)(work + 0x40) = *(float*)(work + 0x40) + *(float*)(lightParam + 0x50);
-			*(float*)(work + 0x44) = *(float*)(work + 0x44) + *(float*)(lightParam + 0x54);
+		if (step->sourceId == *(s32*)(pObject + 0xc)) {
+			const s16* stepColor = (const s16*)((u8*)step + 0x8);
+			const f32* stepFloat = (const f32*)((u8*)step + 0x20);
+
+			work->color0R += stepColor[0];
+			work->color0G += stepColor[1];
+			work->color0B += stepColor[2];
+			work->color0A += stepColor[3];
+			work->color1R += stepColor[4];
+			work->color1G += stepColor[5];
+			work->color1B += stepColor[6];
+			work->color1A += stepColor[7];
+			work->color2R += stepColor[8];
+			work->color2G += stepColor[9];
+			work->color2B += stepColor[10];
+			work->color2A += stepColor[11];
+			work->attenFalloff += stepFloat[0];
+			work->attenFalloffVelocity += stepFloat[1];
+			work->attenFalloffAccel += stepFloat[2];
+			work->attenRadius += stepFloat[3];
+			work->attenRadiusVelocity += stepFloat[4];
+			work->attenRadiusAccel += stepFloat[5];
+			work->spotScale += stepFloat[6];
+			work->spotScaleVelocity += stepFloat[7];
+			work->spotScaleAccel += stepFloat[8];
+			work->specularScale += *(f32*)((u8*)step + 0x4c);
+			work->specularScaleVelocity += *(f32*)((u8*)step + 0x50);
+			work->specularScaleAccel += *(f32*)((u8*)step + 0x54);
 		}
 
-		__ct__Q29CLightPcs6CLightFv(&lightData);
+		__ct__Q29CLightPcs6CLightFv(&light);
 
-		sourcePos->x = *(float*)(pppMng + 0x1c);
-		sourcePos->y = *(float*)(pppMng + 0x2c);
-		sourcePos->z = *(float*)(pppMng + 0x3c);
-		PSMTXMultVec(pppMngStPtr->m_matrix.value, sourcePos, sourcePos);
+		light.m_position.x = *(f32*)(pObject + 0x1c);
+		light.m_position.y = *(f32*)(pObject + 0x2c);
+		light.m_position.z = *(f32*)(pObject + 0x3c);
+		PSMTXMultVec(pppMngStPtr->m_matrix.value, (Vec*)&light.m_position, (Vec*)&light.m_position);
 
-		lightData.attenRadius = *(float*)(work + 0x24);
-		lightData.attenFalloff = *(float*)(work + 0x18);
+		light.m_attenRadius = work->attenRadius;
+		light.m_attenFalloff = work->attenFalloff;
 
-		lightData.color0.r = (unsigned char)(*(short*)(work + 0x0) >> 7);
-		lightData.color0.g = (unsigned char)(*(short*)(work + 0x2) >> 7);
-		lightData.color0.b = (unsigned char)(*(short*)(work + 0x4) >> 7);
-		lightData.color0.a = (unsigned char)(*(short*)(work + 0x6) >> 7);
+		light.m_targetColor[0].r = (u8)(work->color0R >> 7);
+		light.m_targetColor[0].g = (u8)(work->color0G >> 7);
+		light.m_targetColor[0].b = (u8)(work->color0B >> 7);
+		light.m_targetColor[0].a = (u8)(work->color0A >> 7);
 
-		if (lightParam[0x5a] != 0) {
-			lightData.color1 = lightData.color0;
+		if (step->color1Enabled != 0) {
+			light.m_targetColor[1] = light.m_targetColor[0];
 		} else {
-			*(u32*)&lightData.color1 = 0;
+			*(u32*)&light.m_targetColor[1] = 0;
 		}
 
-		if (lightParam[0x5b] != 0) {
-			lightData.color2 = lightData.color0;
+		if (step->color2Enabled != 0) {
+			light.m_targetColor[2] = light.m_targetColor[0];
 		} else {
-			*(u32*)&lightData.color2 = 0;
+			*(u32*)&light.m_targetColor[2] = 0;
 		}
 
-		if (lightParam[0x59] == 0) {
-			*(u32*)&lightData.color0 = 0;
+		if (step->color0Enabled == 0) {
+			*(u32*)&light.m_targetColor[0] = 0;
 		}
 
 		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
-			if (lightParam[0x58] == 0) {
-				lightData.type = 0;
-				lightData.direction.x = kPppLightZero;
-				lightData.direction.y = kPppLightZero;
-				lightData.direction.z = kPppLightOne;
-				lightData.spotScale = kPppLightDefaultCosAtten;
-				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &lightData);
+			if (step->type == 0) {
+				light.m_type = 0;
+				light.m_direction.x = kPppLightZero;
+				light.m_direction.y = kPppLightZero;
+				light.m_direction.z = kPppLightOne;
+				light.m_spotScale = kPppLightDefaultCosAtten;
+				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
 				unsigned char* obj;
-				Vec* direction;
 
-				lightData.type = 1;
-				if (*(int*)(lightParam + 0x44) == -1) {
+				light.m_type = 1;
+				if (step->targetIndex == -1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
 					pppLightTarget* targetTable = (pppLightTarget*)pppMngStPtr->m_programInfoTable;
-					obj = targetTable[*(int*)(lightParam + 0x44)].obj;
+					obj = targetTable[step->targetIndex].obj;
 				}
 
-				direction = &lightData.direction;
-				direction->x = *(float*)(obj + 0x1c);
-				direction->y = *(float*)(obj + 0x2c);
-				direction->z = *(float*)(obj + 0x3c);
-				PSMTXMultVec(pppMngStPtr->m_matrix.value, direction, direction);
+				targetPos.x = *(f32*)(obj + 0x1c);
+				targetPos.y = *(f32*)(obj + 0x2c);
+				targetPos.z = *(f32*)(obj + 0x3c);
+				PSMTXMultVec(pppMngStPtr->m_matrix.value, &targetPos, &targetPos);
 
-				PSVECSubtract(direction, sourcePos, direction);
-				PSVECNormalize(direction, direction);
-				lightData.spotScale = kPppLightSpotScale * *(float*)(work + 0x30);
+				PSVECSubtract(&targetPos, (Vec*)&light.m_position, (Vec*)&light.m_direction);
+				PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);
+				light.m_spotScale = kPppLightSpotScale * work->spotScale;
 
-				if (lightParam[0x58] == 2) {
-					lightData.specularScale = *(float*)(work + 0x3c);
-					lightData.specularMode = 1;
+				if (step->type == 2) {
+					light.m_specularScale = work->specularScale;
+					light.m_specularMode = 1;
 				}
 
-				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &lightData);
+				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			}
 		}
 	}

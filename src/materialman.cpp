@@ -67,7 +67,7 @@ extern float FLOAT_8032fb0c;
 extern float FLOAT_8032fb10;
 extern float FLOAT_8032fb14;
 extern float FLOAT_8032fb20;
-static const char s_materialStageName[] = "material";
+static const char s_CMaterial_material_801D7A48[] = "material";
 
 /*
  * --INFO--
@@ -410,7 +410,7 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_CMaterial_material_801D7A48), 0);
 	*Ptr(this, 0x204) = 0x30;
 }
 

@@ -375,15 +375,14 @@ static char* long2str_801B83B4(long num, char* buff, print_format format)
         return (0);
 
     while (digits + 8 <= format.precision) {
-        p -= 8;
-        p[0] = '0';
-        p[1] = '0';
-        p[2] = '0';
-        p[3] = '0';
-        p[4] = '0';
-        p[5] = '0';
-        p[6] = '0';
-        p[7] = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
         digits += 8;
     }
 
@@ -491,15 +490,14 @@ static char* longlong2str_801B80A0(long long num, char* pBuf, print_format fmt)
     }
 
     while (digits + 8 <= fmt.precision) {
-        p -= 8;
-        p[0] = '0';
-        p[1] = '0';
-        p[2] = '0';
-        p[3] = '0';
-        p[4] = '0';
-        p[5] = '0';
-        p[6] = '0';
-        p[7] = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
         digits += 8;
     }
 
@@ -771,9 +769,10 @@ static char* float2str(long double num, char *buff, print_format format) {
             return p;
     }
 
-    dec.exp += dec.sig.length - 1;
-    p = buff;
-    *--p = 0;
+    dec.exp += dec.sig.length;
+    --dec.exp;
+    p = buff - 1;
+    *p = 0;
 
     switch (format.conversion_char)
     {
@@ -889,8 +888,13 @@ static char* float2str(long double num, char *buff, print_format format) {
 
             q = (char*) dec.sig.text + dec.sig.length;
 
-            for (digits = 0; digits < (format.precision - frac_digits); ++digits)
-                *--p = '0';
+            digits = 0;
+            if (digits < (format.precision - frac_digits)) {
+                do {
+                    *--p = '0';
+                    ++digits;
+                } while (digits < (format.precision - frac_digits));
+            }
 
             for (digits = 0; digits < frac_digits && digits < dec.sig.length; ++digits)
                 *--p = *--q;

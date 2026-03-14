@@ -171,8 +171,8 @@ FILE* __find_unopened_file(void) {
  * JP Size: TODO
  */
 void __init_file(FILE* file, file_modes mode, unsigned char* buffer, unsigned long buffer_size) {
-    file->handle = 0;
     file->file_mode = mode;
+    file->handle = 0;
 
     file->file_state.io_state = __neutral;
     file->file_state.free_buffer = 0;

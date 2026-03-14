@@ -2367,12 +2367,64 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char, short, short)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005a18c
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppDrawIdx(int)
+void CPartMng::pppDrawIdx(int partIndex)
 {
-	// TODO
+    Mtx invCamera;
+    Vec cameraPos;
+    Vec partPos;
+    Vec cameraDelta;
+    Vec viewPos;
+
+    PSMTXInverse(ppvCameraMatrix02, invCamera);
+    cameraPos.x = invCamera[0][3];
+    cameraPos.y = invCamera[1][3];
+    cameraPos.z = invCamera[2][3];
+
+    _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(reinterpret_cast<unsigned char*>(this) + 0x2A18) + partIndex;
+    if (mng->m_mode != 0) {
+        return;
+    }
+    if (mng->m_baseTime == -0x1000) {
+        return;
+    }
+    if (mng->m_baseTime >= 0) {
+        return;
+    }
+
+    partPos.x = mng->m_matrix.value[0][3];
+    partPos.y = mng->m_matrix.value[1][3];
+    partPos.z = mng->m_matrix.value[2][3];
+    pppMngStPtr = mng;
+
+    if ((double)mng->m_cullRadiusSq != 0.0) {
+        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+        if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+            return;
+        }
+
+        CBound bound;
+        Vec min;
+        min.x = partPos.x - mng->m_cullRadius;
+        min.y = partPos.y;
+        min.z = partPos.z - mng->m_cullRadius;
+        if (bound.CheckFrustum(min, ppvCameraMatrix02, partPos.y + mng->m_cullYOffset) == 0) {
+            return;
+        }
+    }
+
+    PSMTXMultVec(ppvCameraMatrix02, &partPos, &viewPos);
+    mng->m_sortDepth = viewPos.z;
+    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+    pppMngStPtr = mng;
+    pppSetFpMatrix__FP9_pppMngSt(mng);
+    _pppDrawPart__FP9_pppMngSt(mng);
 }
 
 /*

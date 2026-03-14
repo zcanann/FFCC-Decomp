@@ -44,7 +44,7 @@ typedef struct _GXLightObj {
 } GXLightObj;
 
 typedef struct _GXTexRegion {
-    u32 dummy[3];
+    u32 dummy[4];
 } GXTexRegion;
 
 typedef struct _GXTlutObj {
@@ -52,7 +52,7 @@ typedef struct _GXTlutObj {
 } GXTlutObj;
 
 typedef struct _GXTlutRegion {
-    u32 dummy[3];
+    u32 dummy[4];
 } GXTlutRegion;
 
 typedef struct _GXFogAdjTable {

@@ -864,7 +864,7 @@ config.libs = [
             Object(NonMatching, "gx/GXFifo.c"),
             Object(NonMatching, "gx/GXFrameBuf.c"),
             Object(NonMatching, "gx/GXGeometry.c"),
-            Object(NonMatching, "gx/GXInit.c"),
+            Object(NonMatching, "gx/GXInit.c", extra_cflags=["-opt nopeephole"]),
             Object(NonMatching, "gx/GXLight.c"),
             Object(NonMatching, "gx/GXMisc.c"),
             Object(NonMatching, "gx/GXPerf.c"),

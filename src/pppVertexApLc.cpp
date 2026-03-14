@@ -57,24 +57,6 @@ _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
- * PAL Address: 0x80064f4c
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
-{
-    s32 offset = **(s32**)((u8*)apLc + 0xC);
-    u16* state = (u16*)((u8*)obj + offset + 0x80);
-
-    state[0] = 0;
-    state[1] = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80064ce8  
  * PAL Size: 612b
  * EN Address: TODO
@@ -100,7 +82,6 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
         VertexApLcEntry* entry = &env->entries[data->entryIndex];
-        u16* vertexIndices = entry->vertexIndices;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
 
         if (points == 0) {
@@ -119,7 +100,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
                 u16 outValue = state->index;
                 state->index++;
-                s32 vertexIndex = vertexIndices[outValue];
+                s32 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -149,7 +130,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 f32 randValue = RandF__5CMathFv(&Math);
                 f32 maxValue = (f32)entry->maxValue;
                 int outValue = (int)(randValue * maxValue);
-                s32 vertexIndex = vertexIndices[outValue];
+                s32 vertexIndex = entry->vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -180,4 +161,22 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     }
 
     state->countdown--;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80064f4c
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
+{
+    s32 offset = **(s32**)((u8*)apLc + 0xC);
+    u16* state = (u16*)((u8*)obj + offset + 0x80);
+
+    state[0] = 0;
+    state[1] = 0;
 }

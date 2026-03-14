@@ -994,70 +994,78 @@ void MakeWave(Vec*, unsigned short*, float*, Vec&, float, float)
  */
 int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size)
 {
-    float* pPos = (float*)positionsInOut;
-    float* pNormal = (float*)normalsOut;
-    float* pUv = (float*)uvOut;
-    float radius = size * FLOAT_80330e5c;
-    float step = size * FLOAT_80330e6c;
-    u32 rowCounter = 0;
-    double stepScale = (double)FLOAT_80330e6c;
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    int iVar7;
+    short sVar8;
+    short sVar10;
+    float* pfVar11;
+    int iVar12;
+    float* pfVar13;
+    float* pfVar14;
+    unsigned int uVar15;
+    unsigned int uVar16;
+    int iVar17;
+    double dVar18;
 
-    for (float zPos = radius; -radius <= zPos; zPos -= step) {
-        u32 colCounter = 0;
-        float* pos = pPos;
-        float* normal = pNormal;
-        float* uv = pUv;
-
-        for (float xPos = -radius; xPos <= radius; xPos += step) {
-            *pos = xPos;
-            pos[1] = FLOAT_80330e4c;
-            pos[2] = zPos;
-            pPos += 3;
-            pos += 3;
-
-            *normal = FLOAT_80330e4c;
-            normal[1] = FLOAT_80330e58;
-            normal[2] = FLOAT_80330e4c;
-            pNormal += 3;
-            normal += 3;
-
-            *uv = (float)((double)colCounter * stepScale);
-            uv[1] = (float)((double)rowCounter * stepScale);
-            pUv += 2;
-            uv += 2;
-
-            colCounter++;
+    fVar5 = FLOAT_80330e58;
+    fVar4 = FLOAT_80330e4c;
+    uVar16 = 0;
+    dVar18 = (double)FLOAT_80330e6c;
+    fVar1 = (float)((double)size * (double)FLOAT_80330e5c);
+    for (fVar3 = fVar1; -fVar1 <= fVar3; fVar3 = fVar3 - (float)((double)size * dVar18)) {
+        uVar15 = 0;
+        pfVar11 = reinterpret_cast<float*>(positionsInOut);
+        pfVar13 = reinterpret_cast<float*>(normalsOut);
+        pfVar14 = reinterpret_cast<float*>(uvOut);
+        for (fVar2 = -fVar1; fVar2 <= fVar1; fVar2 = fVar2 + (float)((double)size * dVar18)) {
+            *pfVar11 = fVar2;
+            positionsInOut = reinterpret_cast<Vec*>(pfVar11 + 3);
+            pfVar11[1] = fVar4;
+            uVar15 = uVar15 + 1;
+            normalsOut = reinterpret_cast<Vec*>(pfVar13 + 3);
+            uvOut = reinterpret_cast<Vec2d*>(pfVar14 + 2);
+            pfVar11[2] = fVar3;
+            pfVar11 = pfVar11 + 3;
+            *pfVar13 = fVar4;
+            pfVar13[1] = fVar5;
+            pfVar13[2] = fVar4;
+            pfVar13 = pfVar13 + 3;
+            *pfVar14 = (float)((double)(int)(uVar15 - 1) * dVar18);
+            pfVar14[1] = (float)((double)(int)uVar16 * dVar18);
+            pfVar14 = pfVar14 + 2;
         }
-        rowCounter++;
+        uVar16 = uVar16 + 1;
     }
-
-    int idxOffset = 0;
-    int row = 0;
-    short rowBase = 0;
+    iVar7 = 0;
+    iVar12 = 0;
+    sVar10 = 0;
     do {
-        int pair = 8;
-        short rowCounter2 = rowBase;
+        iVar17 = 8;
+        sVar8 = sVar10;
         do {
-            *(short*)((char*)indicesOut + idxOffset) = rowCounter2;
-            *(short*)((char*)indicesOut + idxOffset + 2) = rowCounter2 + 1;
-            *(short*)((char*)indicesOut + idxOffset + 4) = rowCounter2 + 0x12;
-            *(short*)((char*)indicesOut + idxOffset + 6) = rowCounter2 + 0x12;
-            *(short*)((char*)indicesOut + idxOffset + 8) = rowCounter2 + 0x11;
-            *(short*)((char*)indicesOut + idxOffset + 10) = rowCounter2;
-            *(short*)((char*)indicesOut + idxOffset + 12) = rowCounter2 + 1;
-            *(short*)((char*)indicesOut + idxOffset + 14) = rowCounter2 + 2;
-            *(short*)((char*)indicesOut + idxOffset + 16) = rowCounter2 + 0x13;
-            *(short*)((char*)indicesOut + idxOffset + 18) = rowCounter2 + 0x13;
-            *(short*)((char*)indicesOut + idxOffset + 20) = rowCounter2 + 0x12;
-            *(short*)((char*)indicesOut + idxOffset + 22) = rowCounter2 + 1;
-            idxOffset += 0x18;
-            pair--;
-            rowCounter2 += 2;
-        } while (pair != 0);
-        row++;
-        rowBase += 0x11;
-    } while (row < 0x10);
-
+            *(short*)((char*)indicesOut + iVar7) = sVar8;
+            *(short*)((char*)indicesOut + iVar7 + 2) = sVar8 + 1;
+            *(short*)((char*)indicesOut + iVar7 + 4) = sVar8 + 0x12;
+            *(short*)((char*)indicesOut + iVar7 + 6) = sVar8 + 0x12;
+            *(short*)((char*)indicesOut + iVar7 + 8) = sVar8 + 0x11;
+            *(short*)((char*)indicesOut + iVar7 + 10) = sVar8;
+            *(short*)((char*)indicesOut + iVar7 + 0xC) = sVar8 + 1;
+            *(short*)((char*)indicesOut + iVar7 + 0xE) = sVar8 + 2;
+            *(short*)((char*)indicesOut + iVar7 + 0x10) = sVar8 + 0x13;
+            *(short*)((char*)indicesOut + iVar7 + 0x12) = sVar8 + 0x13;
+            *(short*)((char*)indicesOut + iVar7 + 0x14) = sVar8 + 0x12;
+            *(short*)((char*)indicesOut + iVar7 + 0x16) = sVar8 + 1;
+            sVar8 = sVar8 + 2;
+            iVar7 = iVar7 + 0x18;
+            iVar17 = iVar17 + -1;
+        } while (iVar17 != 0);
+        iVar12 = iVar12 + 1;
+        sVar10 = sVar10 + 0x11;
+    } while (iVar12 < 0x10);
     return 1;
 }
 

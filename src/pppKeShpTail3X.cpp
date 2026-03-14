@@ -29,6 +29,7 @@ struct KeShpTail3XWork {
     s16 m_angles[28];
     u32 m_shapeData;
     u16 m_shapeFrame;
+    u16 m_unk1be;
     u16 m_rand;
     u8 m_head;
     u8 m_initialized;
@@ -59,7 +60,6 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     s16* stepWork;
     Vec pos;
     Vec temp;
-    u8 worldSpaceMode;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -68,16 +68,15 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     step = (KeShpTail3XStep*)param_2;
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
     stepWork = (s16*)&step->m_payload[0xc];
-    worldSpaceMode = step->m_payload[0x3f];
 
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
         work->m_initialized = 1;
 
-        if (worldSpaceMode == 0) {
+        if (step->m_payload[0x3f] == 0) {
             pos.x = obj->pppPObject.m_localMatrix.value[0][3];
             pos.y = obj->pppPObject.m_localMatrix.value[1][3];
             pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-        } else if (worldSpaceMode == 1) {
+        } else if (step->m_payload[0x3f] == 1) {
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
@@ -110,11 +109,11 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     }
     work->m_head--;
 
-    if (worldSpaceMode == 0) {
+    if (step->m_payload[0x3f] == 0) {
         pos.x = obj->pppPObject.m_localMatrix.value[0][3];
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-    } else if (worldSpaceMode == 1) {
+    } else if (step->m_payload[0x3f] == 1) {
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;

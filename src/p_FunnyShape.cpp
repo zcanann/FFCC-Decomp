@@ -41,6 +41,7 @@ extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void* __ct__8CProcessFv(void* self);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
@@ -52,6 +53,7 @@ inline void* operator new(unsigned long, void* p)
 }
 
 extern void* __vt__8CManager;
+extern "C" char __vt_CProcess[];
 extern "C" char __vt__14CFunnyShapePcs[];
 extern u32 m_table_desc0__14CFunnyShapePcs[];
 extern u32 m_table_desc1__14CFunnyShapePcs[];
@@ -99,6 +101,9 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
     u32* dst = reinterpret_cast<u32*>(m_table__14CFunnyShapePcs);
 
+    __ct__8CProcessFv(self);
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt_CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(self + 0x3C));

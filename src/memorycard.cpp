@@ -1193,7 +1193,7 @@ int CMemoryCardMan::DummySave()
             if (System.m_execParam != 0)
             {
                 // "%s(%d) McFormat(%d) error(%d)"
-                System.Printf("%s", /* s_McFormat(%d)_error(%d)_801daef8 */ 0);
+                System.Printf("%s", "McFormat(%d) error(%d)");
             }
 
             result = CARDUnmount(0);
@@ -1212,7 +1212,7 @@ int CMemoryCardMan::DummySave()
         if (System.m_execParam != 0)
         {
             // "%s(%d) McMount(%d) error(%d)"
-            System.Printf("%s", /* s_McMount(%d)_error(%d)_801dae78 */ 0);
+            System.Printf("%s", "McMount(%d) error(%d)");
         }
 
         result = CARDUnmount(0);
@@ -1257,7 +1257,7 @@ int CMemoryCardMan::DummySave()
             if (System.m_execParam != 0)
             {
                 // "McCreate(%d) error(%d)"
-                System.Printf("%s", /* s_McCreate(%d)_error(%d)_801daf10 */ 0);
+                System.Printf("%s", "McCreate(%d) error(%d)");
             }
 
             result = CARDUnmount(0);
@@ -1279,7 +1279,7 @@ int CMemoryCardMan::DummySave()
             if (System.m_execParam != 0)
             {
                 // "McGetStat(%d) error(%d)"
-                System.Printf("%s", /* s_McGetStat(%d)_error(%d)_801daf28 */ 0);
+                System.Printf("%s", "McGetStat(%d) error(%d)");
             }
 
             result = CARDUnmount(0);
@@ -1299,7 +1299,7 @@ int CMemoryCardMan::DummySave()
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
                 // "%s(%d): Error: memory allocation"
-                System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
+                System.Printf("%s", "%s(%d): Error: memory allocation");
             }
         }
 
@@ -1332,7 +1332,7 @@ int CMemoryCardMan::DummySave()
         {
             if (System.m_execParam != 0)
             {
-                System.Printf("%s", /* s_McWrite(%d)_error(%d)_801daf44 */ 0);
+                System.Printf("%s", "McWrite(%d) error(%d)");
             }
 
             result = CARDUnmount(0);
@@ -1359,7 +1359,7 @@ int CMemoryCardMan::DummySave()
         {
             if (System.m_execParam != 0)
             {
-                System.Printf("%s", /* s_McSetStat(%d)_error(%d)_801daf5c */ 0);
+                System.Printf("%s", "McSetStat(%d) error(%d)");
             }
 
             result = CARDUnmount(0);
@@ -1386,7 +1386,7 @@ int CMemoryCardMan::DummySave()
 
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
-                System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
+                System.Printf("%s", "%s(%d): Error: memory allocation");
             }
         }
 
@@ -1452,7 +1452,7 @@ int CMemoryCardMan::DummySave()
 
     if (System.m_execParam != 0)
     {
-        System.Printf("%s", /* s_McWrite(%d)_error(%d)_801daf44 */ 0);
+        System.Printf("%s", "McWrite(%d) error(%d)");
     }
 
     int chan = m_fileInfo.chan;
@@ -1517,7 +1517,7 @@ int CMemoryCardMan::DummyLoad()
         if (System.m_execParam != 0)
         {
             // "McMount(%d) error(%d)"
-            System.Printf("%s", /* s_McMount(%d)_error(%d)_801dae78 */ 0);
+            System.Printf("%s", "McMount(%d) error(%d)");
         }
 
         result = CARDUnmount(0);
@@ -1540,7 +1540,7 @@ int CMemoryCardMan::DummyLoad()
         if (System.m_execParam != 0)
         {
             // "McOpen(%d) error(%d)"
-            System.Printf("%s", /* s_McOpen(%d)_error(%d)_801dae90 */ 0);
+            System.Printf("%s", "McOpen(%d) error(%d)");
         }
 
         result = CARDUnmount(0);
@@ -1559,7 +1559,7 @@ int CMemoryCardMan::DummyLoad()
 
         if (m_saveBuffer == 0 && System.m_execParam != 0)
         {
-            System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
+            System.Printf("%s", "%s(%d): Error: memory allocation");
         }
     }
 
@@ -1627,7 +1627,7 @@ int CMemoryCardMan::DummyLoad()
     if (System.m_execParam != 0)
     {
         // "McRead(%d) error(%d)"
-        System.Printf("%s", /* s_McRead(%d)_error(%d)_801daee0 */ 0);
+        System.Printf("%s", "McRead(%d) error(%d)");
     }
 
     int chan = m_fileInfo.chan;

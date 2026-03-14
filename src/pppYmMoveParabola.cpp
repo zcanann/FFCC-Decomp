@@ -16,50 +16,6 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
 /*
  * --INFO--
- * PAL Address: 0x800d4558
- * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
-{
-    _pppMngSt* pppMngSt = pppMngStPtr;
-    f32* work = (f32*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
-    f32 zero = gPppYmMoveParabolaZero;
-
-    work[2] = zero;
-    work[1] = zero;
-    work[0] = zero;
-    *(u16*)(work + 3) = 1;
-
-    if (Game.game.m_currentSceneId == 7) {
-        Vec basePos = pppMngSt->m_savedPosition;
-        Vec worldOffset;
-        Vec outPos;
-
-        pppCopyVector__FR3Vec3Vec((Vec*)(work + 4), &basePos);
-
-        worldOffset.x = pppMngStPtr->m_matrix.value[0][3];
-        worldOffset.y = pppMngStPtr->m_matrix.value[1][3];
-        worldOffset.z = pppMngStPtr->m_matrix.value[2][3];
-
-        outPos.x = work[4];
-        outPos.y = work[5];
-        outPos.z = work[6];
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)(work + 4), &outPos, &worldOffset);
-
-        outPos.x = work[4];
-        outPos.y = work[5];
-        outPos.z = work[6];
-        pppCopyVector__FR3Vec3Vec(&pppMngSt->m_paramVec0, &outPos);
-        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d4278
  * PAL Size: 736b
  * EN Address: TODO
@@ -136,4 +92,48 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
     pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     *(u16*)(work + 3) = *(u16*)(work + 3) + 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d4558
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
+{
+    _pppMngSt* pppMngSt = pppMngStPtr;
+    f32* work = (f32*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
+    f32 zero = gPppYmMoveParabolaZero;
+
+    work[2] = zero;
+    work[1] = zero;
+    work[0] = zero;
+    *(u16*)(work + 3) = 1;
+
+    if (Game.game.m_currentSceneId == 7) {
+        Vec basePos = pppMngSt->m_savedPosition;
+        Vec worldOffset;
+        Vec outPos;
+
+        pppCopyVector__FR3Vec3Vec((Vec*)(work + 4), &basePos);
+
+        worldOffset.x = pppMngStPtr->m_matrix.value[0][3];
+        worldOffset.y = pppMngStPtr->m_matrix.value[1][3];
+        worldOffset.z = pppMngStPtr->m_matrix.value[2][3];
+
+        outPos.x = work[4];
+        outPos.y = work[5];
+        outPos.z = work[6];
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)(work + 4), &outPos, &worldOffset);
+
+        outPos.x = work[4];
+        outPos.y = work[5];
+        outPos.z = work[6];
+        pppCopyVector__FR3Vec3Vec(&pppMngSt->m_paramVec0, &outPos);
+        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
+    }
 }

@@ -475,8 +475,8 @@ void CMenuPcs::SetManaWaterEffect()
 		pppDeletePart__8CPartMngFi(&PartMng, partNo);
 	}
 
-	BindEffect__8CMenuPcsFiii(this, 5, Game.game.m_gameWork.m_timerA + 0x13, -1);
-	*reinterpret_cast<int*>(self + 0x70) = Game.game.m_gameWork.m_timerA;
+	BindEffect__8CMenuPcsFiii(this, 5, reinterpret_cast<CGame&>(Game).m_gameWork.m_timerA + 0x13, -1);
+	*reinterpret_cast<int*>(self + 0x70) = reinterpret_cast<CGame&>(Game).m_gameWork.m_timerA;
 }
 
 /*

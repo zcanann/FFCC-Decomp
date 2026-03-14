@@ -760,70 +760,67 @@ int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
  */
 void CDbgMenuPcs::Add()
 {
-	if (m_rootMenuNode.m_firstChild != 0) {
-		return;
-	}
+    CDMParam rootParam;
+    CDMParam nodeParam;
+    CDMParam actionParam;
+    DbgMenuDef* menuDefs;
+    int index;
+    int y;
 
-	CDMParam rootParam;
-	CDMParam nodeParam;
-	CDMParam actionParam;
-	DbgMenuDef* menuDefs = PTR_DAT_80212524;
+    if (m_rootMenuNode.m_firstChild != 0) {
+        return;
+    }
 
-	memset(&rootParam, 0, sizeof(rootParam));
-	memset(&nodeParam, 0, sizeof(nodeParam));
+    memset(&rootParam, 0, sizeof(rootParam));
+    memset(&nodeParam, 0, sizeof(nodeParam));
+    rootParam.m_type = 0;
+    rootParam.m_flags = 0;
+    rootParam.m_width = 100;
+    rootParam.m_height = 0x32;
+    rootParam.m_unk18 = 0xDC;
+    rootParam.m_unk1C = 0x180;
+    rootParam.m_unk20 = 0;
+    rootParam.m_unk28 = 0;
+    rootParam.m_unk2C = 0;
+    rootParam.m_unk30 = 0;
+    rootParam.m_text = s_Debug_80331c90;
+    Add(0, 10, rootParam);
 
-	rootParam.m_type = 0;
-	rootParam.m_flags = 0;
-	rootParam.m_x = 0;
-	rootParam.m_y = 0;
-	rootParam.m_width = 100;
-	rootParam.m_height = 0x32;
-	rootParam.m_unk18 = 0xDC;
-	rootParam.m_unk1C = 0x180;
-	rootParam.m_unk20 = 0;
-	rootParam.m_text = s_Debug_80331c90;
-	rootParam.m_unk28 = 0;
-	rootParam.m_unk2C = 0;
-	rootParam.m_unk30 = 0;
-	Add(0, 10, rootParam);
+    y = 10;
+    menuDefs = PTR_DAT_80212524;
+    index = 0;
+    do {
+        memset(&nodeParam, 0, sizeof(nodeParam));
+        nodeParam.m_type = 1;
+        nodeParam.m_flags = 0;
+        nodeParam.m_width = 10;
+        nodeParam.m_height = y;
+        nodeParam.m_unk18 = 0;
+        nodeParam.m_unk1C = 0;
+        nodeParam.m_unk20 = 0;
+        nodeParam.m_unk28 = 0;
+        nodeParam.m_unk2C = 0;
+        nodeParam.m_unk30 = 0;
+        nodeParam.m_text = const_cast<char*>(menuDefs->text);
+        Add(10, 1, nodeParam);
 
-	int y = 10;
-	for (int i = 0; i < 0x17; i++) {
-		memset(&nodeParam, 0, sizeof(nodeParam));
-		nodeParam.m_type = 1;
-		nodeParam.m_flags = 0;
-		nodeParam.m_x = 0;
-		nodeParam.m_y = 0;
-		nodeParam.m_width = 10;
-		nodeParam.m_height = y;
-		nodeParam.m_unk18 = 0;
-		nodeParam.m_unk1C = 0;
-		nodeParam.m_unk20 = 0;
-		nodeParam.m_text = const_cast<char*>(menuDefs->text);
-		nodeParam.m_unk28 = 0;
-		nodeParam.m_unk2C = 0;
-		nodeParam.m_unk30 = 0;
-		Add(10, 1, nodeParam);
+        memset(&actionParam, 0, sizeof(actionParam));
+        actionParam.m_type = (int)menuDefs->actionType;
+        actionParam.m_flags = menuDefs->actionFlags;
+        actionParam.m_width = 0xB4;
+        actionParam.m_height = y;
+        actionParam.m_unk18 = 0;
+        actionParam.m_unk1C = 0;
+        actionParam.m_unk20 = 0;
+        actionParam.m_unk28 = 0;
+        actionParam.m_unk2C = 0;
+        actionParam.m_unk30 = 0;
+        Add(10, (int)menuDefs->id, actionParam);
 
-		memset(&actionParam, 0, sizeof(actionParam));
-		actionParam.m_type = menuDefs->actionType;
-		actionParam.m_flags = menuDefs->actionFlags;
-		actionParam.m_x = 0;
-		actionParam.m_y = 0;
-		actionParam.m_width = 0xB4;
-		actionParam.m_height = y;
-		actionParam.m_unk18 = 0;
-		actionParam.m_unk1C = 0;
-		actionParam.m_unk20 = 0;
-		actionParam.m_text = 0;
-		actionParam.m_unk28 = 0;
-		actionParam.m_unk2C = 0;
-		actionParam.m_unk30 = 0;
-		Add(10, menuDefs->id, actionParam);
-
-		menuDefs++;
-		y += 0x10;
-	}
+        index++;
+        menuDefs++;
+        y += 0x10;
+    } while (index < 0x17);
 }
 
 /*

@@ -122,6 +122,7 @@ typedef struct GXTexRegionState {
  */
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
     u32 count;
+    u32* countReg;
     s32 format = GXGetTexObjFmt(t_obj);
 
     (void)id;
@@ -129,15 +130,15 @@ static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMap
     if (format != 8) {
         if (format != 9) {
             if (format != 10) {
-                count = ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[0];
-                ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[0] = count + 1;
+                countReg = &((GXTexRegionState*)__GXData)->texRegions1[4].dummy[0];
+                count = (*countReg)++;
                 return (GXTexRegion*)&((GXTexRegionState*)__GXData)->texRegions0[count & 7];
             }
         }
     }
 
-    count = ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[1];
-    ((GXTexRegionState*)__GXData)->texRegions1[4].dummy[1] = count + 1;
+    countReg = &((GXTexRegionState*)__GXData)->texRegions1[4].dummy[1];
+    count = (*countReg)++;
     return (GXTexRegion*)&((GXTexRegionState*)__GXData)->texRegions1[count & 3];
 }
 

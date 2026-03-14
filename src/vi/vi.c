@@ -81,7 +81,6 @@ static volatile u32 flushFlag;
 static OSThreadQueue retraceQueue;
 static void (*PreCB)(u32);
 static void (*PostCB)(u32);
-static void (*PositionCallback)(s16, s16);
 static u32 encoderType;
 static s16 displayOffsetH;
 static s16 displayOffsetV;
@@ -129,11 +128,9 @@ static u16 taps[25] = {
 
 static SomeVIStruct HorVer;
 static u32 FBSet;
-static VITiming* timingExtra;
 
 // prototypes
 static u32 getCurrentFieldEvenOdd(void);
-VITiming* __VISetExtraTiming(VITiming* t);
 void __VIEnableRawPositionInterrupt(s16 x, s16 y, void (*callback)(s16, s16));
 void (*__VIDisableRawPositionInterrupt())(s16, s16);
 void __VIDisplayPositionToXY(u32 hct, u32 vct, s16* x, s16* y);
@@ -280,13 +277,6 @@ VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb) {
     return oldcb;
 }
 
-VITiming* __VISetExtraTiming(VITiming* t) {
-    VITiming* old = timingExtra;
-
-    timingExtra = t;
-    return old;
-}
-
 #pragma dont_inline on
 static VITiming* getTiming(VITVMode mode) {
     switch (mode) {
@@ -320,16 +310,16 @@ static VITiming* getTiming(VITVMode mode) {
  * JP Size: TODO
  */
 void __VIInit(VITVMode mode) {
-    volatile u32 delay;
     VITiming* tm;
-    u32 tv;
     u32 ds;
-    u16 hlw;
-    s32 halfNhlines;
+    volatile u32 delay;
+    u32 tv;
+    u16 hct;
+    u16 vct;
 
+    ds = mode & 2;
     tv = (u32)mode >> 2;
     *(u32*)OSPhysicalToCached(0xCC) = tv;
-    ds = (u32)mode & 2;
     tm = getTiming(mode);
     __VIRegs[1] = 2;
 
@@ -352,18 +342,19 @@ void __VIInit(VITVMode mode) {
     __VIRegs[36] = 0x2828;
     __VIRegs[27] = 1;
     __VIRegs[26] = 0x1001;
-    hlw = tm->hlw;
-    halfNhlines = (s32)tm->nhlines / 2;
-    __VIRegs[25] = hlw + 1;
-    __VIRegs[24] = (halfNhlines + 1) | 0x1000;
+    hct = tm->hlw + 1;
+    vct = (tm->nhlines / 2) + 1;
+    __VIRegs[25] = (u16)(u32)hct;
+    __VIRegs[24] = vct | 0x1000;
 
-    if (mode != 2 && mode != 3 && mode != 0x1A) {
+    if (mode != VI_TVMODE_NTSC_PROG && mode != VI_TVMODE_NTSC_3D && mode != VI_TVMODE_GCA_PROG) {
         __VIRegs[1] = (ds << 2) | 1 | (tv << 8);
         __VIRegs[54] = 0;
-    } else {
-        __VIRegs[1] = (tv << 8) | 5;
-        __VIRegs[54] = 1;
+        return;
     }
+
+    __VIRegs[1] = (tv << 8) | 5;
+    __VIRegs[54] = 1;
 }
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -733,11 +724,8 @@ static void PrintDebugPalCaution(void) {
 void VIConfigure(const GXRenderModeObj* rm) {
     VITiming* tm;
     u32 regDspCfg;
-    u32 regClksel;
     BOOL enabled;
-    u32 newNonInter;
-    u32 tvInBootrom;
-    u32 tvInGame;
+    u32 newNonInter, tvInBootrom, tvInGame;
 
     enabled = OSDisableInterrupts();
     newNonInter = rm->viTVmode & 3;
@@ -787,7 +775,7 @@ void VIConfigure(const GXRenderModeObj* rm) {
         }
     default:
     panic:
-        OSPanic(__FILE__, 1979,
+        OSPanic(__FILE__, 1884,
                 "VIConfigure(): Tried to change mode from (%d) to (%d), which is forbidden\n",
                 tvInBootrom, tvInGame);
     }
@@ -831,33 +819,33 @@ void VIConfigure(const GXRenderModeObj* rm) {
     setInterruptRegs(tm);
 
     regDspCfg = regs[1];
-    if (HorVer.nonInter == VI_PROGRESSIVE || HorVer.nonInter == 3) {
+    if ((HorVer.nonInter == VI_PROGRESSIVE) || (HorVer.nonInter == VI_TVMODE_NTSC_3D)) {
         regDspCfg = (((u32)(regDspCfg)) & ~0x00000004) | (((u32)(1)) << 2);
     } else {
-        OLD_SET_REG_FIELD(2052, regDspCfg, 1, 2, HorVer.nonInter & 1);
+        regDspCfg = (((u32)(regDspCfg)) & ~0x00000004) | (((u32)(HorVer.nonInter & 1)) << 2);
     }
 
-    OLD_SET_REG_FIELD(2056, regDspCfg, 1, 3, HorVer.threeD);
+    regDspCfg = (((u32)(regDspCfg)) & ~0x00000008) | (((u32)(HorVer.threeD)) << 3);
 
     if ((HorVer.tv == VI_DEBUG_PAL) || (HorVer.tv == VI_EURGB60) || (HorVer.tv == VI_GCA)) {
         regDspCfg = (((u32)(regDspCfg)) & ~0x00000300);
     } else {
-        OLD_SET_REG_FIELD(2060, regDspCfg, 2, 8, HorVer.tv);
+        regDspCfg = (((u32)(regDspCfg)) & ~0x00000300) | (((u32)(HorVer.tv)) << 8);
     }
 
-    regs[1] = regDspCfg;
+    regs[1] = (u16)regDspCfg;
+    MARK_CHANGED(1);
 
-    regClksel = regs[54];
+    regDspCfg = regs[54];
     if (rm->viTVmode == VI_TVMODE_NTSC_PROG ||
         rm->viTVmode == VI_TVMODE_NTSC_3D ||
         rm->viTVmode == VI_TVMODE_GCA_PROG) {
-        regClksel = (((u32)(regClksel)) & ~0x00000001) | (((u32)(1)) << 0);
+        regDspCfg = (u32)(regDspCfg & ~0x1) | 1;
     } else {
-        regClksel = (((u32)(regClksel)) & ~0x00000001);
+        regDspCfg = (u32)(regDspCfg & ~0x1);
     }
-    regs[54] = (u16)regClksel;
-
-    changed |= ((u64)1 << (63 - 1)) | ((u64)1 << (63 - 54));
+    regs[54] = (u16)regDspCfg;
+    changed |= 0x200;
 
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
     setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);
@@ -1094,6 +1082,16 @@ u32 VIGetDTVStatus(void) {
     dtvStatus = __VIRegs[55] & 3;
     OSRestoreInterrupts(enabled);
     return dtvStatus & 1;
+}
+
+static void (*PositionCallback)(s16, s16);
+static VITiming* timingExtra;
+
+VITiming* __VISetExtraTiming(VITiming* t) {
+    VITiming* old = timingExtra;
+
+    timingExtra = t;
+    return old;
 }
 
 void __VISetAdjustingValues(s16 x, s16 y) {

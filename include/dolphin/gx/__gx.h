@@ -330,8 +330,17 @@ typedef struct __GXData_struct {
     f32 vpHt;
     f32 vpNearz;
     f32 vpFarz;
-    f32 zOffset;
-    f32 zScale;
+    union {
+        struct {
+            u8 fgRange;
+            u8 _pad_vp[3];
+            f32 fgSideX;
+        };
+        struct {
+            f32 zOffset;
+            f32 zScale;
+        };
+    };
     u32 tImage0[8];
     u32 tMode0[8];
     u32 texmapId[16];

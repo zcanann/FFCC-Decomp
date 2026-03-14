@@ -94,7 +94,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		double projY = (double)pppMngStPtr->m_matrix.value[1][3];
 		double projZ = (double)pppMngStPtr->m_matrix.value[2][3];
 		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
-		u32 zAtPixel = 0;
+		u32 zAtPixel;
 		float viewport[6];
 		float projection[7];
 		Mtx cameraMtx;

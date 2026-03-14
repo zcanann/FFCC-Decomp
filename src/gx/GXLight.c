@@ -536,8 +536,6 @@ void GXSetNumChans(u8 nChans) {
 void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn) {
     u32 reg;
     u32 idx;
-    u32 bit9;
-    u32 bit10;
 
     CHECK_GXBEGIN(892, "GXSetChanCtrl");
 
@@ -562,13 +560,10 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorS
     }
 
     reg = (reg & 0xFFFFFE7F) | ((u32)diff_fn << 7);
-    bit9 = (u32)(attn_fn != GX_AF_NONE);
-    bit10 = (u32)(attn_fn != GX_AF_SPEC);
-    reg = (reg & 0xFFFFFDFF) | (bit9 << 9);
-    reg = (reg & 0xFFFFFBFF) | (bit10 << 10);
-    reg &= 0xFFFF83C3;
-    reg |= (light_mask & 0x0F) << 2;
-    reg |= (light_mask & 0xF0) << 7;
+    reg = (reg & 0xFFFFFDFF) | ((u32)(attn_fn != GX_AF_NONE) << 9);
+    reg = (reg & 0xFFFFFBFF) | ((u32)(attn_fn != GX_AF_SPEC) << 10);
+    reg = (reg & 0xFFFFFFC3) | ((light_mask & 0x0F) << 2);
+    reg = (reg & 0xFFFF87FF) | ((light_mask & 0xF0) << 7);
 
     GX_WRITE_XF_REG(idx + 14, reg);
     

@@ -207,7 +207,6 @@ void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
 }
 
 void GXSetTevColor(GXTevRegID id, GXColor color) {
-    u8* c;
     u8 a;
     u8 r;
     u8 g;
@@ -217,14 +216,17 @@ void GXSetTevColor(GXTevRegID id, GXColor color) {
     u32 regBG;
 
     CHECK_GXBEGIN(740, "GXSetTevColor");
-    c = (u8*)&color;
-    a = c[3];
-    r = c[0];
-    b = c[2];
-    g = c[1];
+    a = color.a;
     id2 = id * 2;
-    regRA = (a << 12) | r | ((id2 + 0xE0) << 24);
-    regBG = (g << 12) | b | ((id2 + 0xE1) << 24);
+    r = color.r;
+    regRA = r;
+    regRA = (regRA & ~0x000FF000) | ((u32)a << 12);
+    g = color.g;
+    b = color.b;
+    regRA = (regRA & ~0xFF000000) | ((id2 + 0xE0) << 24);
+    regBG = b;
+    regBG = (regBG & ~0x000FF000) | ((u32)g << 12);
+    regBG = (regBG & ~0xFF000000) | ((id2 + 0xE1) << 24);
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);

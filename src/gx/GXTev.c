@@ -401,9 +401,8 @@ void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias) {
 
     CHECK_GXBEGIN(1077, "GXSetZTexture");
 
-    zenv0 = 0;
-    SET_REG_FIELD(1080, zenv0, 24, 0, bias);
-    SET_REG_FIELD(1081, zenv0, 8, 24, 0xF4);
+    zenv0 = bias & 0x00FFFFFF;
+    zenv0 = (zenv0 & ~0xFF000000) | (0xF4 << 24);
 
     zenv1 = 0;
     switch (fmt) {
@@ -422,9 +421,10 @@ void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias) {
         break;
     }
 
-    SET_REG_FIELD(1092, zenv1, 2, 0, type);
-    SET_REG_FIELD(1093, zenv1, 2, 2, op);
-    SET_REG_FIELD(1094, zenv1, 8, 24, 0xF5);
+    zenv1 = 0;
+    zenv1 = (zenv1 & ~0x00000003) | type;
+    zenv1 = (zenv1 & ~0x0000000C) | ((u32)op << 2);
+    zenv1 = (zenv1 & ~0xFF000000) | (0xF5 << 24);
 
     GX_WRITE_RAS_REG(zenv0);
     GX_WRITE_RAS_REG(zenv1);

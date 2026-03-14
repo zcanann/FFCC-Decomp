@@ -739,22 +739,29 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
  */
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>((int)this + 8);
 
-    for (unsigned long i = 0; i < static_cast<unsigned long>(texAnims->GetSize()); i++) {
+    for (unsigned int i = 0; i < (unsigned int)texAnims->GetSize(); i++) {
         CTexAnim* texAnim = (*texAnims)[i];
-        void* refData = *reinterpret_cast<void**>(Ptr(texAnim, 8));
-        void** materialRef = reinterpret_cast<void**>(Ptr(refData, 0x108));
-        ReleaseRef(materialRef);
+        int refData = *reinterpret_cast<int*>((int)texAnim + 8);
+        int* material = *reinterpret_cast<int**>(refData + 0x108);
 
-        if (materialSet != 0) {
-            const long materialIdx = static_cast<long>(materialSet->Find(reinterpret_cast<char*>(Ptr(refData, 8))));
-            if (materialIdx >= 0) {
-                CMaterial* material =
-                    (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<unsigned long>(materialIdx)];
-                *materialRef = material;
-                S32At(material, 4) = S32At(material, 4) + 1;
+        if (material != 0) {
+            int refCount = material[1];
+            material[1] = refCount - 1;
+            if ((refCount - 1 == 0) && (material != 0)) {
+                (*reinterpret_cast<void (**)(int*, int)>(*material + 8))(material, 1);
             }
+            *reinterpret_cast<void**>(refData + 0x108) = 0;
+        }
+
+        int materialIndex;
+        if ((materialSet != 0) &&
+            ((materialIndex = (int)materialSet->Find((char*)(refData + 8))), (materialIndex >= 0))) {
+            CMaterial* found =
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>((int)materialSet + 8))[(unsigned long)materialIndex];
+            *reinterpret_cast<CMaterial**>(refData + 0x108) = found;
+            *reinterpret_cast<int*>((int)found + 4) = *reinterpret_cast<int*>((int)found + 4) + 1;
         }
     }
 }

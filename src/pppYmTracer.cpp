@@ -254,8 +254,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         *(u16*)(work + 0x2C) = *(u16*)(work + 0x2C) + 1;
 
         if (*(u16*)(work + 0x2C) > 3) {
-            Vec splineFrom[12];
-            Vec splineTo[12];
+            Vec splineFrom[4];
+            Vec splineTo[4];
             s16 splineCount = 0;
             f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
 

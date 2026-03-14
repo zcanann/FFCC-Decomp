@@ -253,10 +253,13 @@ void CGPrgObj::addSubStat()
  */
 void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
-	m_animFlags = (m_animFlags & 0x7f) | 0x80;
+	signed char loopFlag = loop;
+	signed char directFlag = direct;
+
+	m_animFlags |= 0x80;
 	m_reqAnimId = animId;
-	m_animFlags = (m_animFlags & ~0x40) | ((loop & 1) << 6);
-	m_animFlags = (m_animFlags & ~0x20) | ((direct & 1) << 5);
+	m_animFlags = (m_animFlags & 0xBF) | (loopFlag << 6);
+	m_animFlags = (m_animFlags & 0xDF) | (directFlag << 5);
 }
 
 /*
@@ -311,17 +314,12 @@ int CGPrgObj::isLoopAnimDirect()
  */
 int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
-	if (seNo == 0 || seNo == 0xFFFF) {
+	if (seNo == 0 || seNo == -1) {
 		return -1;
 	}
 
-	Vec* usePos = (pos != nullptr) ? pos : &m_worldPosition;
-	int handle = Sound.PlaySe3D(
-		seNo, usePos,
-		static_cast<float>(static_cast<unsigned int>(volume)),
-		static_cast<float>(static_cast<unsigned int>(dist)),
-		0
-	);
+	int handle = Sound.PlaySe3D(seNo, pos != nullptr ? pos : &m_worldPosition,
+	                            static_cast<float>(volume), static_cast<float>(dist), 0);
 
 	if (pitch != 0) {
 		Sound.ChangeSe3DPitch(handle, pitch, 0);

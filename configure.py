@@ -917,7 +917,11 @@ config.libs = [
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
             Object(NonMatching, "Runtime.PPCEABI.H/New.cp"),
-            Object(NonMatching, "Runtime.PPCEABI.H/NMWException.cp"),
+            Object(
+                NonMatching,
+                "Runtime.PPCEABI.H/NMWException.cp",
+                extra_cflags=["-char signed"],
+            ),
             Object(NonMatching, "Runtime.PPCEABI.H/ptmf.c"),
             Object(NonMatching, "Runtime.PPCEABI.H/runtime.c"),
         ],

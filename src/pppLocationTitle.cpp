@@ -104,7 +104,10 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTit
  */
 void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
+    s32* serializedOffsets;
+    int serializedOffset;
     int colorOffset;
+    u8* colorSrc;
     LocationTitleWork* work;
     u16 maxCount;
     u32 graphId;
@@ -115,8 +118,11 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         return;
     }
 
-    colorOffset = param_3->m_serializedDataOffsets[1];
-    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + *param_3->m_serializedDataOffsets);
+    serializedOffsets = param_3->m_serializedDataOffsets;
+    serializedOffset = serializedOffsets[0];
+    colorOffset = serializedOffsets[1];
+    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
+    colorSrc = (u8*)pppLocationTitle + 0x88 + colorOffset;
     rand();
 
     dataValIndex = param_2->m_dataValIndex;
@@ -151,7 +157,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_pos.x = 0.0f;
             particle->m_pos.y = 0.0f;
             particle->m_pos.z = 0.0f;
-            memcpy(&particle->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+            memcpy(&particle->m_color, colorSrc, 4);
             particle->m_shapeUnk = 0;
             particle->m_frame = work->m_cur;
             randomValue = rand();
@@ -191,10 +197,10 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
         if (count == 0) {
             particles[count].m_frame = work->m_cur;
-            memcpy(&particles[count].m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+            memcpy(&particles[count].m_color, colorSrc, 4);
         } else {
             particles[count - 1].m_frame = work->m_cur;
-            memcpy(&particles[count - 1].m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+            memcpy(&particles[count - 1].m_color, colorSrc, 4);
         }
 
         work->m_count = count + 1;
@@ -236,7 +242,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             LocationTitleParticle* dst = &particles[startIndex + i + 1];
             Vec interpPos = interp[i];
             pppCopyVector(dst->m_pos, interpPos);
-            memcpy(&dst->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+            memcpy(&dst->m_color, colorSrc, 4);
             dst->m_frame = work->m_cur;
         }
     }
@@ -278,7 +284,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
             model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
 
-            PSMTXMultVec(ppvCameraMatrix0, &particle->m_pos, &worldPos);
+            PSMTXMultVec(ppvCameraMatrix02, &particle->m_pos, &worldPos);
             model[0][3] = worldPos.x;
             model[1][3] = worldPos.y;
             model[2][3] = worldPos.z;

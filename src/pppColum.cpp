@@ -194,26 +194,31 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
  */
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
-    if (gPppCalcDisabled == 0) {
-        int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
-        pppColumFrameWork* work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
-        if (work->m_values == 0) {
-            char* payload = param_2->m_payload;
-            int i;
+    int* serializedDataOffsets;
+    pppColumFrameWork* work;
+    pppColumValue* values;
+    int i;
 
+    if (gPppCalcDisabled == 0) {
+        serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+        work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
+        if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
                 s_pppColum_cpp_801DB638, 0x7d);
 
-            pppColumValue* values = work->m_values;
+            values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values->m_scaleStep = RandF__5CMathFf(*(float*)(payload + 4), &Math);
-                values->m_scaleStep = values->m_scaleStep + *(float*)(payload + 0);
-                values->m_positionScale = RandF__5CMathFf(*(float*)(payload + 0xc), &Math);
-                values->m_positionScale = values->m_positionScale + *(float*)(payload + 8);
-                values->m_colorR = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x16));
-                values->m_colorG = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x17));
-                values->m_colorB = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x18));
+                values->m_scaleStep = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
+                values->m_scaleStep = values->m_scaleStep + *(float*)(param_2->m_payload + 0);
+                values->m_positionScale = RandF__5CMathFf(*(float*)(param_2->m_payload + 0xc), &Math);
+                values->m_positionScale = values->m_positionScale + *(float*)(param_2->m_payload + 8);
+                values->m_colorR =
+                    GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x16));
+                values->m_colorG =
+                    GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x17));
+                values->m_colorB =
+                    GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x18));
                 values++;
             }
         }

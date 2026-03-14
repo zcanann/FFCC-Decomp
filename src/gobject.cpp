@@ -1698,12 +1698,31 @@ void CGObject::Attach(CGObject*, char*, Vec*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007d4bc
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::Detach()
 {
-	// TODO
+    if ((m_weaponNodeFlags & 1) != 0) {
+        u8* modelBytes = reinterpret_cast<u8*>(m_attachOwner->m_charaModelHandle->m_model);
+        u8* modelNodes = *reinterpret_cast<u8**>(modelBytes + 0xA8);
+        float (*nodeMtx)[4] = reinterpret_cast<float (*)[4]>(modelNodes + m_attachNode * 0xC0 + 0xC);
+
+        m_worldPosition.x = nodeMtx[0][3];
+        m_worldPosition.y = nodeMtx[1][3];
+        m_worldPosition.z = nodeMtx[2][3];
+        PSVECAdd(&m_worldPosition, &m_attachOwner->m_worldPosition, &m_worldPosition);
+
+        float rotY = m_rotBaseY + m_attachOwner->m_rotBaseY;
+        m_rotTargetY = rotY;
+        m_rotBaseY = rotY;
+    }
+
+    m_weaponNodeFlags &= 0xFFFE;
 }
 
 /*

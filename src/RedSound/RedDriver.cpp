@@ -414,24 +414,23 @@ void _SetSeBlockData(int* param_1)
 {
     u32 index;
     u8* seBlockData;
-    void** seBlockSlots = (void**)DAT_8032e12c;
 
     index = (u32)*param_1 & 3;
-    if (seBlockSlots[index] != 0) {
-        RedDelete__FPv(seBlockSlots[index]);
-        seBlockSlots[index] = 0;
+    if (((void**)DAT_8032e12c)[*param_1 & 3] != 0) {
+        RedDelete__FPv(((void**)DAT_8032e12c)[index]);
+        ((void**)DAT_8032e12c)[index] = 0;
     }
 
     if (param_1[1] != 0) {
         seBlockData = (u8*)param_1[1];
-        seBlockData[0] = 'S';
-        seBlockData[1] = 'e';
-        seBlockData[2] = 'B';
-        seBlockData[3] = 'l';
-        seBlockData[4] = 'o';
-        seBlockData[5] = 'c';
-        seBlockData[6] = 'k';
-        seBlockSlots[index] = seBlockData;
+        seBlockData[0] = 0x53;
+        seBlockData[1] = 0x65;
+        seBlockData[2] = 0x42;
+        seBlockData[3] = 0x6c;
+        seBlockData[4] = 0x6f;
+        seBlockData[5] = 0x63;
+        seBlockData[6] = 0x6b;
+        ((u8**)DAT_8032e12c)[index] = seBlockData;
     }
 }
 

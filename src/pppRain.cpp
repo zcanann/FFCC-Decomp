@@ -10,7 +10,7 @@
 const float FLOAT_8033101c = 1.0f;
 const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
-static char s_pppRain_cpp_801db610[] = "pppRain.cpp";
+static char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {
 int rand(void);
@@ -155,7 +155,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         work->drops = (RainDrop*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
-            s_pppRain_cpp_801db610,
+            s_pppRain_cpp_801DB610,
             0x7f);
         drop = work->drops;
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++) {
@@ -175,7 +175,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             flip = (randA & 1U) ^ signBit;
             lengthDelta = unitA * rain->lengthRand;
             drop->length = rain->lengthBase;
-            if (flip != signBit) {
+            if ((flip - signBit) != 0) {
                 lengthDelta = -lengthDelta;
             }
             drop->length += lengthDelta;
@@ -184,7 +184,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lifeRange = rain->lifeRange;
             drop->life = (s16)lifeBase;
             lifeJitter = (s16)randA - (s16)(((s32)randA / (s32)(u32)lifeRange) * (s32)(u32)lifeRange);
-            if (flip != signBit) {
+            if ((flip - signBit) != 0) {
                 lifeJitter = -lifeJitter;
             }
             drop->life = (s16)(drop->life + lifeJitter);
@@ -223,7 +223,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             flip = (randA & 1U) ^ signBit;
             lengthDelta = unitA * rain->lengthRand;
             drop->length = rain->lengthBase;
-            if (flip != signBit) {
+            if ((flip - signBit) != 0) {
                 lengthDelta = -lengthDelta;
             }
             drop->length += lengthDelta;
@@ -232,7 +232,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lifeRange = rain->lifeRange;
             drop->life = (s16)lifeBase;
             lifeJitter = (s16)randA - (s16)(((s32)randA / (s32)(u32)lifeRange) * (s32)(u32)lifeRange);
-            if (flip != signBit) {
+            if ((flip - signBit) != 0) {
                 lifeJitter = -lifeJitter;
             }
             drop->life = (s16)(drop->life + lifeJitter);
@@ -273,11 +273,10 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     RainParam* step;
     RainWork* work;
     RainSegment* drop;
-    u8* colorPtr;
-    u32 color;
-    double baseX;
-    double baseY;
-    double baseZ;
+    u8* colorBase;
+    float baseX;
+    float baseY;
+    float baseZ;
     float tex0;
     float tex1;
     Vec segment[2];
@@ -285,11 +284,11 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     step = (RainParam*)param_2->m_payload;
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
-    colorPtr = (u8*)pppRain + 0x88 + colorOffset;
+    colorBase = (u8*)pppRain + 0x80 + colorOffset;
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     pppSetBlendMode__FUc(step->blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        colorPtr,
+        colorBase + 8,
         ppvCameraMatrix0,
         kPppRainTexCoordBase,
         step->lightTarget,
@@ -309,31 +308,30 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
     drop = (RainSegment*)work->drops;
-    color = *(u32*)colorPtr;
-    baseX = (double)pppMngStPtr->m_matrix.value[0][3];
-    baseY = (double)pppMngStPtr->m_matrix.value[1][3];
-    baseZ = (double)pppMngStPtr->m_matrix.value[2][3];
+    baseX = pppMngStPtr->m_matrix.value[0][3];
+    baseY = pppMngStPtr->m_matrix.value[1][3];
+    baseZ = pppMngStPtr->m_matrix.value[2][3];
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
     tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {
-        double x = (double)(float)(baseX + (double)drop->position.x);
-        double y = (double)(float)(baseY + (double)drop->position.y);
-        double z = (double)(float)(baseZ + (double)drop->position.z);
+        float x = baseX + drop->position.x;
+        float y = baseY + drop->position.y;
+        float z = baseZ + drop->position.z;
 
         PSVECScale(&drop->direction, &segment[0], drop->length);
-        GXWGFifo.f32 = (float)x;
-        GXWGFifo.f32 = (float)y;
-        GXWGFifo.f32 = (float)z;
-        GXWGFifo.u32 = color;
+        GXWGFifo.f32 = x;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = z;
+        GXWGFifo.u32 = *(u32*)(colorBase + 8);
         GXWGFifo.f32 = tex0;
         GXWGFifo.f32 = tex0;
 
-        GXWGFifo.f32 = (float)(x + (double)segment[0].x);
-        GXWGFifo.f32 = (float)(y + (double)segment[0].y);
-        GXWGFifo.f32 = (float)(z + (double)segment[0].z);
-        GXWGFifo.u32 = color;
+        GXWGFifo.f32 = x + segment[0].x;
+        GXWGFifo.f32 = y + segment[0].y;
+        GXWGFifo.f32 = z + segment[0].z;
+        GXWGFifo.u32 = *(u32*)(colorBase + 8);
         GXWGFifo.f32 = tex1;
         GXWGFifo.f32 = tex1;
         drop++;

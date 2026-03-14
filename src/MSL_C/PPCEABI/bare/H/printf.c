@@ -375,15 +375,14 @@ static char* long2str_801B83B4(long num, char* buff, print_format format)
         return (0);
 
     while (digits + 8 <= format.precision) {
-        p -= 8;
-        p[0] = '0';
-        p[1] = '0';
-        p[2] = '0';
-        p[3] = '0';
-        p[4] = '0';
-        p[5] = '0';
-        p[6] = '0';
-        p[7] = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
         digits += 8;
     }
 
@@ -491,15 +490,14 @@ static char* longlong2str_801B80A0(long long num, char* pBuf, print_format fmt)
     }
 
     while (digits + 8 <= fmt.precision) {
-        p -= 8;
-        p[0] = '0';
-        p[1] = '0';
-        p[2] = '0';
-        p[3] = '0';
-        p[4] = '0';
-        p[5] = '0';
-        p[6] = '0';
-        p[7] = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
+        *--p = '0';
         digits += 8;
     }
 

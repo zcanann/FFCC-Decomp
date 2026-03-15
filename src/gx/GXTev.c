@@ -237,7 +237,11 @@ void GXSetTevColor(GXTevRegID id, GXColor color) {
 }
 
 void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
-    s16* c;
+    s16 r;
+    s16 g;
+    s16 b;
+    s16 a;
+    u32 id2;
     u32 regRA;
     u32 regBG;
 
@@ -247,9 +251,19 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     ASSERTMSGLINE(780, color.a >= -1024 && color.a < 1024, "GXSetTevColorS10: Color not in range -1024 to +1023");
 
     CHECK_GXBEGIN(782, "GXSetTevColorS10");
-    c = (s16*)&color;
-    regRA = ((c[0] & 0x7FF) | ((c[3] & 0x7FF) << 12) | ((0xE0 + id * 2) << 24));
-    regBG = ((c[2] & 0x7FF) | ((c[1] & 0x7FF) << 12) | ((0xE1 + id * 2) << 24));
+    a = color.a;
+    g = color.g;
+    r = color.r;
+    b = color.b;
+    id2 = id * 2;
+
+    regRA = (u32)(a & 0x7FF) << 12;
+    regRA = (regRA & ~0x7FF) | (r & 0x7FF);
+    regRA = (regRA & ~0xFF000000) | ((id2 + 0xE0) << 24);
+
+    regBG = (u32)(g & 0x7FF) << 12;
+    regBG = (regBG & ~0x7FF) | (b & 0x7FF);
+    regBG = (regBG & ~0xFF000000) | ((id2 + 0xE1) << 24);
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);

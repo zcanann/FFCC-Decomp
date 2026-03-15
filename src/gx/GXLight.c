@@ -124,9 +124,9 @@ void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
         break;
     case GX_SP_OFF:
     default:
+        a0 = 1.0f;
         a1 = 0.0f;
         a2 = 0.0f;
-        a0 = 1.0f;
         break;
     }
     obj->a[0] = a0;
@@ -224,7 +224,6 @@ void GXGetLightDir(const GXLightObj* lt_obj, f32* nx, f32* ny, f32* nz) {
 
 void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     f32 mag;
-    f32 tmp;
     f32 vx;
     f32 vy;
     f32 vz;
@@ -238,17 +237,11 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     vy = -ny;
     vz = 1.0f - nz;
 
-    mag = vx * vx;
-    tmp = vy * vy;
-    mag += tmp;
-    tmp = vz * vz;
-    mag += tmp;
+    mag = (vx * vx) + (vy * vy) + (vz * vz);
     if (mag != 0.0f) {
         mag = 1.0f / sqrtf(mag);
-    } else {
-        mag = 0.0f;
     }
-    
+
     obj->ldir[0] = vx * mag;
     obj->ldir[1] = vy * mag;
     obj->ldir[2] = vz * mag;

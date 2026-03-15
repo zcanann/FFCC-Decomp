@@ -1,8 +1,10 @@
-#include <stdio.h>
+#include <stdarg.h>
 #include <dolphin.h>
 #include <dolphin/os.h>
 
 #include "dolphin/os/__os.h"
+
+int vprintf(const char* format, va_list arg);
 
 OSErrorHandler __OSErrorTable[17];
 

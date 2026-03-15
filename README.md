@@ -44,9 +44,6 @@ These I have not entirely figured out the boundaries for:
 
 TRK_MINNOW_DOLPHIN/main.c:
 	.text       start:0x801af2b0 end:0x801af5fc
-
-Runtime/PPCEABI/H/__init_cpp_exceptions.p:
-	.text       start:0x801b063c end:0x801b06b8
 	
 os/OSError.c:
 	.text       start:0x8017dd68 end:0x80000000

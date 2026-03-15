@@ -1369,6 +1369,12 @@ os/OSCache.c:
 os/OSContext.c:
 	.text       start:0x8017D4F8 end:0x8017DD68
 
+os/OSError.c:
+	.text       start:0x8017DD68 end:0x8017E2E8
+
+os/OSFont.c:
+	.text       start:0x8017E2E8 end:0x8017E340
+
 os/OSInterrupt.c:
 	.text       start:0x8017E340 end:0x8017EBAC
 
@@ -1739,6 +1745,9 @@ TRK_MINNOW_DOLPHIN/main.c:
 
 TRK_MINNOW_DOLPHIN/CircleBuffer.c:
 	.text       start:0x801AF048 end:0x801AF2B0
+
+TRK_MINNOW_DOLPHIN/main_gdev.c:
+	.text       start:0x801AF2B0 end:0x801AF5FC
 
 TRK_MINNOW_DOLPHIN/MWTrace.c:
 	.text       start:0x801AF5FC end:0x801AF64C

@@ -19,10 +19,13 @@ struct pppLocationTitleUnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
     u16 m_maxCount;
+    u8 m_stepCount;
+    u8 m_blendMode;
+    u8 m_pad0E;
+    u8 m_pad0F;
     float m_arg3;
     float m_payload0;
     float m_payload1;
-    float m_stepValue;
     u16 m_spawnFrame;
     u16 m_fadeStartFrame;
     u16 m_fadeLength;

@@ -251,18 +251,18 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     ASSERTMSGLINE(780, color.a >= -1024 && color.a < 1024, "GXSetTevColorS10: Color not in range -1024 to +1023");
 
     CHECK_GXBEGIN(782, "GXSetTevColorS10");
-    a = color.a;
-    g = color.g;
     r = color.r;
+    a = color.a;
     b = color.b;
+    g = color.g;
     id2 = id * 2;
 
-    regRA = (u32)(a & 0x7FF) << 12;
-    regRA = (regRA & ~0x7FF) | (r & 0x7FF);
+    regRA = r & 0x7FF;
+    regRA = (regRA & ~0x7FF000) | ((u32)(a & 0x7FF) << 12);
     regRA = (regRA & ~0xFF000000) | ((id2 + 0xE0) << 24);
 
-    regBG = (u32)(g & 0x7FF) << 12;
-    regBG = (regBG & ~0x7FF) | (b & 0x7FF);
+    regBG = b & 0x7FF;
+    regBG = (regBG & ~0x7FF000) | ((u32)(g & 0x7FF) << 12);
     regBG = (regBG & ~0xFF000000) | ((id2 + 0xE1) << 24);
 
     GX_WRITE_RAS_REG(regRA);

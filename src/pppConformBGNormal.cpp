@@ -98,17 +98,22 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     Vec rayDirection;
     Mtx scaleMtx;
     Mtx basisMtx;
+    s32 dataOffset;
+
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
     pppMngSt = pppMngStPtr;
-    if (gPppCalcDisabled == 0) {
-        owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
-        hitFound = 0;
-        matrixX = pppMngStPtr->m_matrix.value[0][3];
-        matrixY = pppMngStPtr->m_matrix.value[1][3];
-        matrixZ = pppMngStPtr->m_matrix.value[2][3];
-        state = (ConformState*)((u8*)pppConformBGNormal + 0x80 + *param3->m_serializedDataOffsets);
+    owner = (u8*)pppMngSt->m_owner;
+    hitFound = 0;
+    matrixX = pppMngSt->m_matrix.value[0][3];
+    matrixY = pppMngSt->m_matrix.value[1][3];
+    matrixZ = pppMngSt->m_matrix.value[2][3];
+    dataOffset = *param3->m_serializedDataOffsets;
+    state = (ConformState*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
 
-        if ((Game.game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
+    if ((Game.game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
 
             if (mode == 0) {
@@ -285,7 +290,5 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
             pppMngStPtr->m_matrix.value[1][3] += param2->m_dataValIndex;
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
-        }
     }
 }
-

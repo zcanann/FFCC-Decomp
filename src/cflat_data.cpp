@@ -143,6 +143,13 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
  */
 void CFlatData::Create(void* filePtr)
 {
+	struct ChunkLayout {
+		unsigned int m_id;
+		unsigned int m_arg0;
+		unsigned int m_version;
+		unsigned int m_size;
+	};
+
 	CFlatData* flatData;
 	char* charPtr;
 	char** stringIndex;
@@ -200,13 +207,13 @@ void CFlatData::Create(void* filePtr)
 	m_mesCount = 0;
 
 	CChunkFile chunkFile(filePtr);
-	CChunkFile::CChunk chunk;
-	while (chunkFile.GetNextChunk(chunk))
+	ChunkLayout chunk;
+	while (chunkFile.GetNextChunk((CChunkFile::CChunk&)chunk))
 	{
 		if (chunk.m_id == 0x43464C44) // 'CFLD'
 		{
 			chunkFile.PushChunk();
-			while (chunkFile.GetNextChunk(chunk))
+			while (chunkFile.GetNextChunk((CChunkFile::CChunk&)chunk))
 			{
 				if (chunk.m_id == 0x4D455320) // 'MES '
 				{

@@ -1128,12 +1128,14 @@ void _DmaExecute()
 int _DmaExecuteThread(void*)
 {
     DAT_8032f3c4 |= 2;
+    DAT_8032f484 = 0;
     DAT_8032f488[0] = 0;
-    while ((DAT_8032f484 = 0, DAT_8032f3c0 != 0)) {
+    while (DAT_8032f3c0 != 0) {
         OSWaitSemaphore(&DAT_8032ddd8);
         DAT_8032f484 = 1;
         if (DAT_8032f3c0 != 0) {
             _DmaExecute();
+            DAT_8032f484 = 0;
         }
     }
     DAT_8032f3c4 &= ~2;

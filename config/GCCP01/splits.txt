@@ -1405,6 +1405,12 @@ os/OSRtc.c:
 os/OSSemaphore.c:
 	.text       start:0x80180690 end:0x80180814
 
+os/OSStopwatch.c:
+	.text       start:0x80180814 end:0x80180948
+
+os/OSSync.c:
+	.text       start:0x80180948 end:0x801809F4
+
 os/OSThread.c:
 	.text       start:0x801809F4 end:0x80181BF8
 

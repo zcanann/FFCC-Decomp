@@ -25,97 +25,25 @@
  * JP Size: TODO
  */
 static void __GXXfVtxSpecs(void) {
-    u32 colCount;
-    u32 nrmCount;
-    u32 texCount;
-    u32 value;
-    u32 vcdHi;
-    u32 vcdLo;
+    u32 nCols = 0;
+    u32 nNrm;
+    u32 nTex;
+    u32 reg;
 
-    vcdLo = __GXData->vcdLo;
-
-    if (((vcdLo >> 13) & 3) != 0) {
-        colCount = 1;
-    } else {
-        colCount = 0;
-    }
-
-    if (((vcdLo >> 15) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    colCount += value;
-
-    if (__GXData->hasBiNrms != 0) {
-        nrmCount = 2;
-    } else if (__GXData->hasNrms != 0) {
-        nrmCount = 1;
-    } else {
-        nrmCount = 0;
-    }
-
-    vcdHi = __GXData->vcdHi;
-
-    if ((vcdHi & 3) != 0) {
-        texCount = 1;
-    } else {
-        texCount = 0;
-    }
-
-    if (((vcdHi >> 2) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    if (((vcdHi >> 4) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    if (((vcdHi >> 6) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    if (((vcdHi >> 8) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    if (((vcdHi >> 10) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    if (((vcdHi >> 12) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    if (((vcdHi >> 14) & 3) != 0) {
-        value = 1;
-    } else {
-        value = 0;
-    }
-    texCount += value;
-
-    GX_WRITE_U8(0x10);
-    GX_WRITE_U32(0x1008);
-    GX_WRITE_U32((nrmCount << 2) | colCount | (texCount << 4));
-    VERIF_XF_REG(8, (nrmCount << 2) | colCount | (texCount << 4));
+    nCols = GET_REG_FIELD(__GXData->vcdLo, 2, 13) ? 1 : 0;
+    nCols += GET_REG_FIELD(__GXData->vcdLo, 2, 15) ? 1 : 0;
+    nNrm = __GXData->hasBiNrms ? 2 : __GXData->hasNrms ? 1 : 0;
+    nTex = 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 0) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 2) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 4) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 6) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 8) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 10) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 12) ? 1 : 0;
+    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 14) ? 1 : 0;
+    reg = nCols | (nNrm << 2) | (nTex << 4);
+    GX_WRITE_XF_REG(8, reg);
     __GXData->bpSentNot = 1;
 }
 

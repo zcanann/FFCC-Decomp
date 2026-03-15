@@ -33,6 +33,15 @@ For experienced reverse-engineers, there are still quite a few harder tasks rema
 ### Unmapped Splits
 There are several splits that are still unmapped, even though we have access to the PAL game.MAP symbols from a stale build. There are only a few remaining, so this is a pretty small effort, but it requires reverse-engineering precision.
 
+The stale PAL MAP and the current PAL symbol/split state do not perfectly agree anymore. At the moment:
+
+- `TRK_MINNOW_DOLPHIN/main_gdev.c` is already mapped at `0x801AF2B0..0x801AF5FC`.
+- `os/OSError.c` is already mapped at `0x8017DD68..0x8017E2E8`.
+- `os/OSFont.c` is already mapped at `0x8017E2E8..0x8017E340`.
+- `ax/AXProf.c` is already mapped at `0x80193E28..0x80193E70`.
+
+Those are no longer open split-boundary issues in `config/GCCP01/splits.txt`.
+
 These two seem to cause the DTK template configuration to completely hang:
 os/OSStopwatch.c:
 	.text       start:0x80180814 end:0x80180970
@@ -40,22 +49,14 @@ os/OSStopwatch.c:
 os/OSSync.c:
 	.text       start:0x80180970 end:0x801809F4
 
-These I have not entirely figured out the boundaries for:
+The current repo pins decomp-toolkit to `v1.7.4`. Upstream decomp-toolkit has since added analysis controls that are likely relevant here:
 
-TRK_MINNOW_DOLPHIN/main.c:
-	.text       start:0x801af2b0 end:0x801af5fc
-	
-os/OSError.c:
-	.text       start:0x8017dd68 end:0x80000000
+- `v1.8.0` added `skip_cfa_ranges` to `config.yml` for problematic ranges that prevent analysis from finishing.
+- `v1.8.3` is the current latest release and includes additional extab handling fixes.
 
-os/OSFatal.c:
-	.text       start:0x80000000 end:0x80000000
+If the framework/tooling gets updated later, this `0x80180814..0x801809F4` range is the first place to retry.
 
-os/OSFont.c:
-	.text       start:0x80000000 end:0x80000000
-
-ax/AXProf.c:
-	.text       start:0x80193E28 end:0x80193E70
+`os/OSFatal.c` is still unresolved in the current PAL split state, but the old PAL MAP range from the stale build should not be trusted as-is. The current PAL symbol set does not currently expose a verified text boundary for it, and `configure.py` still lists the source even though no corresponding unit is generated in `build/GCCP01/config.json`.
 
 ### EN & JPN Versions
 

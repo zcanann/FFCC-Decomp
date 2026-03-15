@@ -266,6 +266,7 @@ void GXSetZCompLoc(GXBool before_tex) {
 
 void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
     u32 oldPeCtrl;
+    u8 aa;
     static u32 p2f[8] = { 0, 1, 2, 3, 4, 4, 4, 5 };
 
     CHECK_GXBEGIN(511, "GXSetPixelFmt");
@@ -276,8 +277,12 @@ void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
 
     if (oldPeCtrl != __GXData->peCtrl) {
         GX_WRITE_RAS_REG(__GXData->peCtrl);
-        __GXData->genMode =
-            (__GXData->genMode & ~0x200) | ((pix_fmt == GX_PF_RGB565_Z16) ? 0x200 : 0);
+        if (pix_fmt == GX_PF_RGB565_Z16) {
+            aa = 1;
+        } else {
+            aa = 0;
+        }
+        __GXData->genMode = (__GXData->genMode & ~0x200) | ((u32)aa << 9);
         __GXData->dirtyState |= 4;
     }
 

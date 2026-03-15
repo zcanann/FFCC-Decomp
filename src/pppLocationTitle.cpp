@@ -126,7 +126,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     rand();
 
     dataValIndex = param_2->m_dataValIndex;
-    if ((u16)dataValIndex == 0xFFFF) {
+    if ((dataValIndex + 0x10000) == 0xFFFF) {
         return;
     }
 
@@ -211,7 +211,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         Vec subVec;
         Vec interp[50];
         LocationTitleParticle* startParticle;
-        u8 stepCount = *(u8*)&param_2->m_stepValue;
+        u8 stepCount = param_2->m_stepCount;
         int startIndex = (int)work->m_count - 2;
         int inserted = 0;
         double stepScale = (double)(1.0f / (float)(stepCount + 1));
@@ -263,7 +263,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     LocationTitleWork* work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
     u32 dataValIndex = param_2->m_dataValIndex;
 
-    if ((u16)dataValIndex != 0xFFFF) {
+    if ((dataValIndex + 0x10000) != 0xFFFF) {
         u32 graphId = pppLocationTitle->m_graphId;
         int fadeDivisor = -1;
         int graphFrame = GetGraphFrameFromId(graphId);
@@ -300,8 +300,8 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
             GXLoadPosMtxImm(model, 0);
 
-            pppSetBlendMode(*(((u8*)&param_2->m_stepValue) + 1));
-            pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, *(((u8*)&param_2->m_stepValue) + 1));
+            pppSetBlendMode(param_2->m_blendMode);
+            pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, param_2->m_blendMode);
         }
     }
 }

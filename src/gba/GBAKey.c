@@ -7,44 +7,20 @@ extern u8 GBAKeyDspTaskIram[];
 extern char s_GBAKey_c[];
 extern char s_GBA___unexpected_dsp_call[];
 
-static s32 F152(void* task)
+static s32 F152(DSPTaskInfo* task)
 {
     s32 chan;
+    GBAControl* gba;
 
     for (chan = 0; chan < 4; chan++) {
-        if (&__GBA[chan].task == task) {
+        gba = &__GBA[chan];
+        if (&gba->task == task) {
             return chan;
         }
     }
 
     OSPanic(s_GBAKey_c, 169, s_GBA___unexpected_dsp_call);
     return -1;
-}
-
-static void F23(void* task)
-{
-    s32 chan;
-    s32 result;
-
-    chan = F152(task);
-
-    DSPSendMailToDSP(0xabba0000);
-    do {
-        result = DSPCheckMailToDSP();
-    } while (result != 0);
-
-    DSPSendMailToDSP((u32)&__GBA[chan].param);
-    do {
-        result = DSPCheckMailToDSP();
-    } while (result != 0);
-}
-
-static void F25(void* task)
-{
-    s32 chan;
-
-    chan = F152(task);
-    __GBAX01(chan, 0);
 }
 
 /*
@@ -65,12 +41,12 @@ static void F232(void* task)
     gba = &__GBA[chan];
 
     DSPSendMailToDSP(0xabba0000);
-    while (DSPCheckMailToDSP() != 0U) {
-    }
+    while (DSPCheckMailToDSP())
+        ;
 
     DSPSendMailToDSP((u32)gba->param);
-    while (DSPCheckMailToDSP() != 0U) {
-    }
+    while (DSPCheckMailToDSP())
+        ;
 }
 
 static void F252(void* task)

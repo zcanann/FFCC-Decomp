@@ -150,7 +150,7 @@ extern "C" char __throw_catch_compare(const char* throwtype, const char* catchty
 class __partial_array_destructor {
 private:
 	void* p;
-	size_t size;
+	volatile size_t size;
 	size_t n;
 	ConstructorDestructor dtor;
 
@@ -221,18 +221,14 @@ extern "C" void* __construct_new_array(void* block, ConstructorDestructor ctor, 
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void __construct_array_loop(char* ptr, ConstructorDestructor ctor, size_t size, size_t n, size_t* i)
-{
-	for (*i = 0; *i < n; (*i)++, ptr += size) {
-		CTORCALL_COMPLETE(ctor, ptr);
-	}
-}
-
 extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
 {
 	__partial_array_destructor pad(ptr, size, n, dtor);
+	char* p;
 
-	__construct_array_loop((char*)ptr, ctor, size, n, &pad.i);
+	for (pad.i = 0, p = (char*)ptr; pad.i < n; pad.i++, p += size) {
+		CTORCALL_COMPLETE(ctor, p);
+	}
 }
 
 /**

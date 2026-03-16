@@ -4,8 +4,8 @@
 #include <string.h>
 
 extern u8 GBAKeyDspTaskIram[];
-extern char s_GBAKey_c_8021cef8[];
-extern char s_GBA___unexpected_dsp_call_8021cf04[];
+extern char s_GBAKey_c[];
+extern char s_GBA___unexpected_dsp_call[];
 
 static s32 F152(void* task)
 {
@@ -17,7 +17,7 @@ static s32 F152(void* task)
         }
     }
 
-    OSPanic(s_GBAKey_c_8021cef8, 169, s_GBA___unexpected_dsp_call_8021cf04);
+    OSPanic(s_GBAKey_c, 169, s_GBA___unexpected_dsp_call);
     return -1;
 }
 
@@ -25,14 +25,14 @@ static void F23(void* task)
 {
     s32 chan;
     s32 result;
-    
+
     chan = F152(task);
-    
+
     DSPSendMailToDSP(0xabba0000);
     do {
         result = DSPCheckMailToDSP();
     } while (result != 0);
-    
+
     DSPSendMailToDSP((u32)&__GBA[chan].param);
     do {
         result = DSPCheckMailToDSP();

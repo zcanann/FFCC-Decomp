@@ -41,10 +41,6 @@ OSTime OSCheckStopwatch(OSStopwatch* sw) {
     return currTotal;
 }
 
-void OSResetStopwatch(OSStopwatch* sw) {
-    OSInitStopwatch(sw, sw->name);
-}
-
 void OSDumpStopwatch(OSStopwatch* sw) {
     OSReport("Stopwatch [%s]	:\n", sw->name);
     OSReport("\tTotal= %lld us\n",    OSTicksToMicroseconds(sw->total));

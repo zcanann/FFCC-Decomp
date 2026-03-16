@@ -719,10 +719,10 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
 
     switch (func) {
     case GX_TG_MTX2x4:
-        reg = (form << 2) | 2U | (row << 7);
+        reg = (form << 2) | (row << 7);
         break;
     case GX_TG_MTX3x4:
-        reg = (form << 2) | (row << 7);
+        reg = (form << 2) | 2U | (row << 7);
         break;
     case GX_TG_BUMP0:
     case GX_TG_BUMP1:

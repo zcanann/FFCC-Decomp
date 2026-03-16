@@ -669,15 +669,26 @@ void GXInvalidateVtxCache(void) {
     GX_WRITE_U8(0x48);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A1970
+ * PAL Size: 720b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx) {
     u32 reg = 0;
-    u32 row = 5;
+    u32 row;
     u32 bumprow;
-    u32 form = 0;
+    u32 form;
     GXAttr mtxIdAttr;
 
     CHECK_GXBEGIN(1030, "GXSetTexCoordGen");
     ASSERTMSGLINE(1031, dst_coord < GX_MAX_TEXCOORD, "GXSetTexCoordGen: Invalid coordinate Id");
+    form = 0;
+    row = 5;
 
     switch (src_param) {
     case GX_TG_POS:     row = 0; form = 1; break;

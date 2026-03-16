@@ -1,11 +1,12 @@
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 
+#pragma exceptions on
+
 #define ARRAY_HEADER_SIZE 16
 
 extern "C" {
 extern void abort();
-extern void __dl__FPv(void*);
 extern void __dla__FPv(void*);
 }
 
@@ -49,7 +50,6 @@ extern void unexpected() { uhandler(); }
  * JP Size: TODO
  */
 class __partial_array_destructor;
-extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor* self, short shouldDelete);
 
 /**
  * @note Address: 801afc28
@@ -57,104 +57,104 @@ extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor*
  */
 extern "C" char __throw_catch_compare(const char* throwtype, const char* catchtype, int* offset_result)
 {
+	const char *cptr1, *cptr2;
+
 	*offset_result = 0;
-	if (catchtype == nullptr) {
-		return 1;
+
+	if ((cptr2 = catchtype) == 0) {
+		return true;
 	}
 
-	if (*catchtype == 'P') {
-		const char* catchptr = catchtype + 1;
-		if (*catchptr == 'C') {
-			catchptr = catchtype + 2;
-		}
-		if (*catchptr == 'V') {
-			catchptr++;
-		}
-		if ((*catchptr == 'v') && ((*throwtype == 'P') || (*throwtype == '*'))) {
-			return 1;
-		}
-	}
+	cptr1 = throwtype;
 
-	{
-		char ch = *throwtype;
-		if ((ch == '*') || ((ch < '*') && (ch == '!'))) {
-			const char* throwptr = throwtype + 1;
-			const char* catchptr = catchtype + 1;
-			if (*throwtype != *catchtype) {
-				return 0;
+	if (*cptr2 == 'P') {
+		cptr2++;
+		if (*cptr2 == 'C') {
+			cptr2++;
+		}
+		if (*cptr2 == 'V') {
+			cptr2++;
+		}
+		if (*cptr2 == 'v') {
+			if (*cptr1 == 'P' || *cptr1 == '*') {
+				return true;
 			}
+		}
+		cptr2 = catchtype;
+	}
 
-			while (true) {
-				while (true) {
-					char throwch = *throwptr;
-					char catchch = *catchptr;
-					catchptr++;
-					if (throwch != catchch) {
-						break;
+	switch (*cptr1) {
+	case '*':
+	case '!':
+		if (*cptr1++ != *cptr2++) {
+			return false;
+		}
+		for (;;) {
+			if (*cptr1 == *cptr2++) {
+				if (*cptr1++ == '!') {
+					s32 offset;
+
+					for (offset = 0; *cptr1 != '!';) {
+						offset = offset * 10 + *cptr1++ - '0';
 					}
-					throwptr++;
-					if (throwch == '!') {
-						int offset = 0;
-						while (*throwptr != '!') {
-							offset = ((offset * 10) + *throwptr) - '0';
-							throwptr++;
-						}
-						*offset_result = offset;
-						return 1;
-					}
+					*offset_result = offset;
+					return true;
 				}
-				while (*throwptr++ != '!') {}
-				while (*throwptr++ != '!') {}
-				if (*throwptr == '\0') {
-					return 0;
+			} else {
+				while (*cptr1++ != '!') {}
+				while (*cptr1++ != '!') {}
+				if (*cptr1 == 0) {
+					return false;
 				}
-				catchptr = catchtype + 1;
+
+				cptr2 = catchtype + 1;
 			}
+		}
+		return false;
+	}
+
+	while ((*cptr1 == 'P' || *cptr1 == 'R') && *cptr1 == *cptr2) {
+		cptr1++;
+		cptr2++;
+
+		if (*cptr2 == 'C') {
+			if (*cptr1 == 'C') {
+				cptr1++;
+			}
+			cptr2++;
+		}
+		if (*cptr1 == 'C') {
+			return false;
+		}
+
+		if (*cptr2 == 'V') {
+			if (*cptr1 == 'V') {
+				cptr1++;
+			}
+			cptr2++;
+		}
+		if (*cptr1 == 'V') {
+			return false;
 		}
 	}
 
-	while (true) {
-		char ch = *throwtype;
-		if (((ch != 'P') && (ch != 'R')) || (ch != *catchtype)) {
-			while (*throwtype == *catchtype) {
-				if (*throwtype == '\0') {
-					return 1;
-				}
-				throwtype++;
-				catchtype++;
-			}
-			return 0;
-		}
-		const char* throwptr = throwtype + 1;
-		const char* catchptr = catchtype + 1;
-		if (catchtype[1] == 'C') {
-			if (*throwptr == 'C') {
-				throwptr = throwtype + 2;
-			}
-			catchptr = catchtype + 2;
-		}
-		catchtype = catchptr;
-		throwtype = throwptr;
-		if (*throwtype == 'C') break;
-		if (*catchtype == 'V') {
-			if (*throwtype == 'V') {
-				throwtype++;
-			}
-			catchtype++;
-		}
-		if (*throwtype == 'V') {
-			return 0;
+	for (; *cptr1 == *cptr2; cptr1++, cptr2++) {
+		if (*cptr1 == 0) {
+			return true;
 		}
 	}
-	return 0;
+
+	return false;
 }
 
 class __partial_array_destructor {
-public:
+private:
 	void* p;
 	size_t size;
 	size_t n;
 	ConstructorDestructor dtor;
+
+public:
 	size_t i;
 
 	__partial_array_destructor(void* array, size_t elementsize, size_t nelements, ConstructorDestructor destructor)
@@ -179,28 +179,6 @@ public:
 	}
 };
 
-extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor* self, short shouldDelete)
-{
-	char* ptr;
-
-	if (self != nullptr) {
-		if ((self->i < self->n) && (self->dtor != nullptr)) {
-			ptr = (char*)self->p + self->size * self->i;
-			while (self->i != 0) {
-				ptr -= self->size;
-				DTORCALL_COMPLETE(self->dtor, ptr);
-				self->i = self->i - 1;
-			}
-		}
-
-		if (0 < shouldDelete) {
-			__dl__FPv(self);
-		}
-	}
-
-	return self;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801AFB24
@@ -210,23 +188,23 @@ extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor*
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t elementSize, size_t count)
+extern "C" void* __construct_new_array(void* block, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
 {
-	char* current;
+	char* ptr;
 
-	if (ptr != nullptr) {
-		((size_t*)ptr)[0] = elementSize;
-		((size_t*)ptr)[1] = count;
-		ptr = (char*)ptr + ARRAY_HEADER_SIZE;
+	if ((ptr = (char*)block) != 0L) {
+		size_t* p = (size_t*)ptr;
 
-		if (ctor != nullptr) {
-			__partial_array_destructor pdestructor(ptr, elementSize, count, dtor);
+		p[0] = size;
+		p[1] = n;
+		ptr += ARRAY_HEADER_SIZE;
 
-			current = (char*)ptr;
-			pdestructor.i = 0;
-			for (; pdestructor.i < count; pdestructor.i = pdestructor.i + 1) {
-				CTORCALL_COMPLETE(ctor, current);
-				current = current + elementSize;
+		if (ctor) {
+			__partial_array_destructor pad(ptr, size, n, dtor);
+			char* p;
+
+			for (pad.i = 0, p = (char*)ptr; pad.i < n; pad.i++, p += size) {
+				CTORCALL_COMPLETE(ctor, p);
 			}
 		}
 	}
@@ -243,16 +221,18 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline void __construct_array_loop(char* ptr, ConstructorDestructor ctor, size_t size, size_t n, size_t* i)
+{
+	for (*i = 0; *i < n; (*i)++, ptr += size) {
+		CTORCALL_COMPLETE(ctor, ptr);
+	}
+}
+
 extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
 {
-	char* current = (char*)ptr;
+	__partial_array_destructor pad(ptr, size, n, dtor);
 
-	__partial_array_destructor pdestructor(ptr, size, n, dtor);
-	pdestructor.i = 0;
-	for (; pdestructor.i < n; pdestructor.i = pdestructor.i + 1) {
-		CTORCALL_COMPLETE(ctor, current);
-		current = current + size;
-	}
+	__construct_array_loop((char*)ptr, ctor, size, n, &pad.i);
 }
 
 /**

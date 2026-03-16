@@ -14,7 +14,6 @@ void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp,
     f32 yc;
     f32 zc;
     f32 wc;
-    f32 half;
 
     ASSERTMSGLINE(168, pm && vp && sx && sy && sz, "GXGet*: invalid null pointer");
 
@@ -34,9 +33,8 @@ void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp,
         wc = 1.0f;
     }
 
-    half = 0.5f;
-    *sx = (vp[2] * half) + vp[0] + ((wc * xc) * (vp[2] * half));
-    *sy = (vp[3] * half) + vp[1] + ((wc * -yc) * (vp[3] * half));
+    *sx = (vp[2] / 2.0f) + (vp[0] + (wc * (xc * vp[2] / 2.0f)));
+    *sy = (vp[3] / 2.0f) + (vp[1] + (wc * (-yc * vp[3] / 2.0f)));
     *sz = vp[5] + (wc * (zc * (vp[5] - vp[4])));
 }
 

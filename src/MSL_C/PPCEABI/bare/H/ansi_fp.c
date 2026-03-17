@@ -137,7 +137,7 @@ void __timesdec(decimal* result, const decimal* x, const decimal* y) {
     int x_length = x->sig.length;
     unsigned long accumulator = 0;
     unsigned char mantissa[SIGDIGLEN * 2];
-    int i = x_length + y_length - 1;
+    int i = (y_length - 1) + x_length;
     unsigned char* ip = mantissa + i + 1;
     unsigned char* ep = ip;
 

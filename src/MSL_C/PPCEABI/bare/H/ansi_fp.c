@@ -133,15 +133,16 @@ void __ull2dec(decimal* result, unsigned long long val) {
 }
 
 void __timesdec(decimal* result, const decimal* x, const decimal* y) {
-    int y_length = y->sig.length;
-    int x_length = x->sig.length;
     unsigned long accumulator = 0;
     unsigned char mantissa[SIGDIGLEN * 2];
-    int i = (y_length - 1) + x_length;
-    unsigned char* ip = mantissa + i + 1;
+    int i = x->sig.length + y->sig.length;
+    unsigned char* ip = mantissa + i;
     unsigned char* ep = ip;
+    int y_length = y->sig.length;
+    int x_length = x->sig.length;
 
     result->sign = 0;
+    i--;
 
     for (; i > 0; i--) {
         int k = y_length - 1;

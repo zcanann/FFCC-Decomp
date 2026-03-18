@@ -467,7 +467,7 @@ config.libs = [
             Object(NonMatching, "p_gba.cpp"),
             Object(NonMatching, "p_graphic.cpp"),
             Object(NonMatching, "p_light.cpp"),
-            Object(NonMatching, "p_map.cpp"),
+            Object(NonMatching, "p_map.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"]),
             Object(NonMatching, "p_MaterialEditor.cpp"),
             Object(NonMatching, "p_mc.cpp"),
             Object(NonMatching, "p_menu.cpp"),

@@ -1035,7 +1035,11 @@ config.libs = [
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/serpoll.c"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/support.c"),
+            Object(
+                NonMatching,
+                "TRK_MINNOW_DOLPHIN/support.c",
+                mw_version="GC/1.3.2",
+            ),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/targcont.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/target_options.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/targimpl.c"),

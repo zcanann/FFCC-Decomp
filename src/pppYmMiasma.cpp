@@ -37,6 +37,47 @@ extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
+struct VYmMiasma {
+    void* m_particles;
+    float m_unknown4;
+    float m_unknown8;
+    float m_unknownC;
+    Vec m_impulse;
+    float m_radius;
+    Vec m_prevPosition;
+    u8 m_emitTimer;
+    u8 m_pad35[3];
+};
+
+struct PYmMiasma {
+    u32 m_flags;
+    s32 m_dataValIndex;
+    s32 m_shapeFrameStep;
+    float m_baseSpeed;
+    float m_speedVariance;
+    float m_spawnInterval;
+    float m_minDistance;
+    u8 m_colorStartR;
+    u8 m_colorStartG;
+    u8 m_colorStartB;
+    u8 m_colorStartA;
+    s16 m_colorEndR;
+    s16 m_colorEndG;
+    s16 m_colorEndB;
+    s16 m_colorEndA;
+    s16 m_colorStepFrames;
+    float m_speedDecay;
+    float m_radiusJitter;
+    float m_heightJitter;
+    float m_gravity;
+    u8 m_lifeBase;
+    u8 m_lifeRange;
+    u8 m_pad4A[2];
+    float m_minSpeed;
+    s16 m_fadeFrames;
+    s16 m_colorDecayFrames;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80091234
@@ -48,9 +89,6 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
  */
 void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    u8* vData = (u8*)vYmMiasma;
-    u8* ymData = (u8*)pYmMiasma;
-    u8* particle = (u8*)particleData;
     u32 uVar1;
     float fVar2;
     u32 uVar3;
@@ -88,75 +126,74 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     local_58 = 0x43300000;
     temp.ull = ((unsigned long long)local_58 << 32) | (unsigned long long)uStack_54;
     dVar10 = (double)(FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648));
-    iVar6 = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(int*)(ymData + 4) * 4);
+    iVar6 = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
     iVar4 = rand();
     sVar5 = *(short*)(iVar6 + 6);
     uVar1 = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * dVar10) - FLOAT_80330664);
     local_50 = (long long)(int)uVar1;
     sVar5 = (short)(iVar4 - (iVar4 / (int)sVar5) * sVar5);
-    *(short*)(particle + 0x2a) = sVar5;
-    *(short*)(particle + 0x28) = sVar5;
+    *(short*)((u8*)&particleData->m_matrix[2][2] + 2) = sVar5;
+    *(short*)&particleData->m_matrix[2][2] = sVar5;
     fVar2 = *(float*)((u8*)gPppTrigTable + ((uVar1 + 0x4000) & 0xfffc));
     dVar9 = (double)*(float*)((u8*)gPppTrigTable + (uVar1 & 0xfffc));
     iVar4 = (int)uVar3 / 0x168 + ((int)uVar3 >> 0x1f);
-    *(short*)(particle + 0x38) = (short)((int)uVar3 + (iVar4 - (iVar4 >> 0x1f)) * -0x168);
-    dVar8 = (double)(float)(dVar10 * (double)*(float*)(ymData + 0x3c));
-    fVar2 = fVar2 * (float)((double)*(float*)(vData + 0x1c) + dVar8);
-    *(float*)(particle + 0x00) = fVar2;
-    *(float*)(particle + 0x10) = fVar2;
-    dVar7 = (double)RandF__5CMathFf(*(float*)(ymData + 0x40), &Math);
-    *(float*)(particle + 0x04) = (float)dVar7;
-    *(float*)(particle + 0x14) = (float)dVar7;
-    fVar2 = (float)(dVar9 * (double)(float)((double)*(float*)(vData + 0x1c) + dVar8));
-    *(float*)(particle + 0x08) = fVar2;
-    *(float*)(particle + 0x18) = fVar2;
-    local_70 = *(float*)(particle + 0x10);
-    local_6c = *(float*)(particle + 0x14);
-    local_68 = *(float*)(particle + 0x18);
-    pppNormalize__FR3Vec3Vec((float*)(particle + 0x10), (Vec*)&local_70);
+    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)((int)uVar3 + (iVar4 - (iVar4 >> 0x1f)) * -0x168);
+    dVar8 = (double)(float)(dVar10 * (double)pYmMiasma->m_radiusJitter);
+    fVar2 = fVar2 * (float)((double)vYmMiasma->m_radius + dVar8);
+    particleData->m_matrix[0][0] = fVar2;
+    particleData->m_matrix[1][0] = fVar2;
+    dVar7 = (double)RandF__5CMathFf(pYmMiasma->m_heightJitter, &Math);
+    particleData->m_matrix[0][1] = (float)dVar7;
+    particleData->m_matrix[1][1] = (float)dVar7;
+    fVar2 = (float)(dVar9 * (double)(float)((double)vYmMiasma->m_radius + dVar8));
+    particleData->m_matrix[0][2] = fVar2;
+    particleData->m_matrix[1][2] = fVar2;
+    local_70 = particleData->m_matrix[1][0];
+    local_6c = particleData->m_matrix[1][1];
+    local_68 = particleData->m_matrix[1][2];
+    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], (Vec*)&local_70);
     if (Game.game.m_currentSceneId != 7) {
         local_88 = pppMngStPtr->m_matrix.value[0][3];
         local_84 = pppMngStPtr->m_matrix.value[1][3];
         local_80 = pppMngStPtr->m_matrix.value[2][3];
-        local_7c = *(float*)(particle + 0x00);
-        local_78 = *(float*)(particle + 0x04);
-        local_74 = *(float*)(particle + 0x08);
+        local_7c = particleData->m_matrix[0][0];
+        local_78 = particleData->m_matrix[0][1];
+        local_74 = particleData->m_matrix[0][2];
         local_64 = local_88;
         local_60 = local_84;
         local_5c = local_80;
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)particle, (Vec*)&local_7c, (Vec*)&local_88);
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, (Vec*)&local_7c, (Vec*)&local_88);
     }
-    *(u16*)(particle + 0x28) =
-        (u16)*(u8*)(ymData + 0x48) +
-        ((short)uVar3 - (short)((int)uVar3 / (int)(u32)*(u8*)(ymData + 0x49)) * (u16)*(u8*)(ymData + 0x49));
-    *(u16*)(particle + 0x20) = (u16)*(u8*)(ymData + 0x24);
-    *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x25);
-    *(u16*)(particle + 0x24) = (u16)*(u8*)(ymData + 0x26);
-    *(u16*)(particle + 0x26) = 0;
-    *(short*)(particle + 0x30) = *(short*)(ymData + 0x28) >> 7;
-    *(u16*)(particle + 0x30) = *(short*)(particle + 0x30) - (u16)*(u8*)(ymData + 0x24);
-    *(short*)(particle + 0x30) = *(short*)(particle + 0x30) / *(short*)(ymData + 0x30);
-    *(short*)(particle + 0x32) = *(short*)(ymData + 0x2a) >> 7;
-    *(u16*)(particle + 0x32) = *(short*)(particle + 0x32) - (u16)*(u8*)(ymData + 0x25);
-    *(short*)(particle + 0x32) = *(short*)(particle + 0x32) / *(short*)(ymData + 0x30);
-    *(short*)(particle + 0x34) = *(short*)(ymData + 0x2c) >> 7;
-    *(u16*)(particle + 0x34) = *(short*)(particle + 0x34) - (u16)*(u8*)(ymData + 0x26);
-    *(short*)(particle + 0x34) = *(short*)(particle + 0x34) / *(short*)(ymData + 0x30);
-    *(short*)(particle + 0x36) = *(short*)(ymData + 0x2e) >> 7;
-    *(u16*)(particle + 0x36) = *(short*)(particle + 0x36) - (u16)*(u8*)(ymData + 0x27);
-    *(short*)(particle + 0x36) = *(short*)(particle + 0x36) / *(short*)(ymData + 0x30);
-    *(float*)(particle + 0x3c) = *(float*)(ymData + 0x34);
-    dVar10 = dVar10 * (double)*(float*)(ymData + 0x14);
+    *(u16*)&particleData->m_matrix[2][2] =
+        (u16)pYmMiasma->m_lifeBase + ((short)uVar3 - (short)((int)uVar3 / (int)(u32)pYmMiasma->m_lifeRange) * (u16)pYmMiasma->m_lifeRange);
+    *(u16*)&particleData->m_matrix[2][0] = (u16)pYmMiasma->m_colorStartR;
+    *(u16*)((u8*)particleData->m_matrix[2] + 2) = (u16)pYmMiasma->m_colorStartG;
+    *(u16*)&particleData->m_matrix[2][1] = (u16)pYmMiasma->m_colorStartB;
+    *(u16*)((u8*)particleData->m_matrix[2] + 6) = 0;
+    *(short*)&particleData->m_velocity.x = pYmMiasma->m_colorEndR >> 7;
+    *(u16*)&particleData->m_velocity.x = *(short*)&particleData->m_velocity.x - (u16)pYmMiasma->m_colorStartR;
+    *(short*)&particleData->m_velocity.x = *(short*)&particleData->m_velocity.x / pYmMiasma->m_colorStepFrames;
+    *(short*)&particleData->m_velocity.y = pYmMiasma->m_colorEndG >> 7;
+    *(u16*)&particleData->m_velocity.y = *(short*)&particleData->m_velocity.y - (u16)pYmMiasma->m_colorStartG;
+    *(short*)&particleData->m_velocity.y = *(short*)&particleData->m_velocity.y / pYmMiasma->m_colorStepFrames;
+    *(short*)&particleData->m_velocity.z = pYmMiasma->m_colorEndB >> 7;
+    *(u16*)&particleData->m_velocity.z = *(short*)&particleData->m_velocity.z - (u16)pYmMiasma->m_colorStartB;
+    *(short*)&particleData->m_velocity.z = *(short*)&particleData->m_velocity.z / pYmMiasma->m_colorStepFrames;
+    *(short*)((u8*)&particleData->m_velocity.z + 2) = pYmMiasma->m_colorEndA >> 7;
+    *(u16*)((u8*)&particleData->m_velocity.z + 2) = *(short*)((u8*)&particleData->m_velocity.z + 2) - (u16)pYmMiasma->m_colorEndA;
+    *(short*)((u8*)&particleData->m_velocity.z + 2) = *(short*)((u8*)&particleData->m_velocity.z + 2) / pYmMiasma->m_colorStepFrames;
+    particleData->m_directionTail.x = pYmMiasma->m_speedDecay;
+    dVar10 = dVar10 * (double)pYmMiasma->m_speedVariance;
     fVar2 = (float)dVar10;
     uVar1 = (u32)dVar10;
     uVar3 = uVar1 >> 0x1f;
     if (((uVar1 & 1) ^ uVar3) != uVar3) {
         fVar2 = fVar2 * FLOAT_80330668;
     }
-    *(float*)(particle + 0x40) = *(float*)(ymData + 0x10) + fVar2;
-    *(u16*)(particle + 0x44) = *(u16*)(ymData + 0x50);
-    *(u16*)(particle + 0x46) = *(u16*)(ymData + 0x52);
-    *(u8*)(particle + 0x48) = 0;
+    particleData->m_directionTail.y = pYmMiasma->m_baseSpeed + fVar2;
+    *(u16*)((u8*)&particleData->m_directionTail.y + 4) = (u16)pYmMiasma->m_fadeFrames;
+    *(u16*)((u8*)&particleData->m_directionTail.y + 6) = (u16)pYmMiasma->m_colorDecayFrames;
+    *(u8*)&particleData->m_colorDeltaAdd[0] = 0;
 }
 
 /*
@@ -166,9 +203,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    u8* vData = (u8*)pppPObject + ((pppYmMiasmaUnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80;
-    u8* particle = (u8*)particleData;
-    u8* ymData = (u8*)pYmMiasma;
+    VYmMiasma* vData = (VYmMiasma*)((u8*)pppPObject + ((pppYmMiasmaUnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80);
     s16 fadeFrames;
     s16 colorDecayFrames;
     Vec worldPos;
@@ -178,61 +213,62 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     long* shapeTable;
     float minDist;
 
-    fadeFrames = *(s16*)(particle + 0x44);
+    fadeFrames = *(s16*)((u8*)&particleData->m_directionTail.y + 4);
     if (fadeFrames > 0) {
-        *(s16*)(particle + 0x26) =
-            *(s16*)(particle + 0x26) + (u8)(*(u8*)(ymData + 0x27) - *(s16*)(particle + 0x26)) / fadeFrames;
-        *(s16*)(particle + 0x44) = fadeFrames - 1;
+        *(s16*)((u8*)particleData->m_matrix[2] + 6) =
+            *(s16*)((u8*)particleData->m_matrix[2] + 6) + (u8)(pYmMiasma->m_colorStartA - *(s16*)((u8*)particleData->m_matrix[2] + 6)) / fadeFrames;
+        *(s16*)((u8*)&particleData->m_directionTail.y + 4) = fadeFrames - 1;
     }
 
-    colorDecayFrames = *(s16*)(particle + 0x46);
-    if (*(s16*)(particle + 0x28) <= colorDecayFrames && *(u8*)(particle + 0x48) == 0) {
-        *(s16*)(particle + 0x26) = *(s16*)(particle + 0x26) - (*(s16*)(particle + 0x26) / colorDecayFrames);
-        *(s16*)(particle + 0x46) = colorDecayFrames - 1;
+    colorDecayFrames = *(s16*)((u8*)&particleData->m_directionTail.y + 6);
+    if (*(s16*)&particleData->m_matrix[2][2] <= colorDecayFrames && *(u8*)&particleData->m_colorDeltaAdd[0] == 0) {
+        *(s16*)((u8*)particleData->m_matrix[2] + 6) =
+            *(s16*)((u8*)particleData->m_matrix[2] + 6) - (*(s16*)((u8*)particleData->m_matrix[2] + 6) / colorDecayFrames);
+        *(s16*)((u8*)&particleData->m_directionTail.y + 6) = colorDecayFrames - 1;
     }
 
-    if (*(u8*)(particle + 0x48) != 0) {
-        *(s16*)(particle + 0x20) = *(s16*)(particle + 0x20) + *(s16*)(particle + 0x30);
-        *(s16*)(particle + 0x22) = *(s16*)(particle + 0x22) + *(s16*)(particle + 0x32);
-        *(s16*)(particle + 0x24) = *(s16*)(particle + 0x24) + *(s16*)(particle + 0x34);
-        *(s16*)(particle + 0x26) = *(s16*)(particle + 0x26) + *(s16*)(particle + 0x36);
+    if (*(u8*)&particleData->m_colorDeltaAdd[0] != 0) {
+        *(s16*)&particleData->m_matrix[2][0] = *(s16*)&particleData->m_matrix[2][0] + *(s16*)&particleData->m_velocity.x;
+        *(s16*)((u8*)particleData->m_matrix[2] + 2) = *(s16*)((u8*)particleData->m_matrix[2] + 2) + *(s16*)&particleData->m_velocity.y;
+        *(s16*)&particleData->m_matrix[2][1] = *(s16*)&particleData->m_matrix[2][1] + *(s16*)&particleData->m_velocity.z;
+        *(s16*)((u8*)particleData->m_matrix[2] + 6) = *(s16*)((u8*)particleData->m_matrix[2] + 6) + *(short*)((u8*)&particleData->m_velocity.z + 2);
 
-        if (*(s16*)(particle + 0x20) > 0xff) {
-            *(s16*)(particle + 0x20) = 0xff;
+        if (*(s16*)&particleData->m_matrix[2][0] > 0xff) {
+            *(s16*)&particleData->m_matrix[2][0] = 0xff;
         }
-        if (*(s16*)(particle + 0x22) > 0xff) {
-            *(s16*)(particle + 0x22) = 0xff;
+        if (*(s16*)((u8*)particleData->m_matrix[2] + 2) > 0xff) {
+            *(s16*)((u8*)particleData->m_matrix[2] + 2) = 0xff;
         }
-        if (*(s16*)(particle + 0x24) > 0xff) {
-            *(s16*)(particle + 0x24) = 0xff;
+        if (*(s16*)&particleData->m_matrix[2][1] > 0xff) {
+            *(s16*)&particleData->m_matrix[2][1] = 0xff;
         }
-        if (*(s16*)(particle + 0x26) > 0xff) {
-            *(s16*)(particle + 0x26) = 0xff;
+        if (*(s16*)((u8*)particleData->m_matrix[2] + 6) > 0xff) {
+            *(s16*)((u8*)particleData->m_matrix[2] + 6) = 0xff;
         }
 
-        if (*(s16*)(particle + 0x20) < 0) {
-            *(s16*)(particle + 0x20) = 0;
+        if (*(s16*)&particleData->m_matrix[2][0] < 0) {
+            *(s16*)&particleData->m_matrix[2][0] = 0;
         }
-        if (*(s16*)(particle + 0x22) < 0) {
-            *(s16*)(particle + 0x22) = 0;
+        if (*(s16*)((u8*)particleData->m_matrix[2] + 2) < 0) {
+            *(s16*)((u8*)particleData->m_matrix[2] + 2) = 0;
         }
-        if (*(s16*)(particle + 0x24) < 0) {
-            *(s16*)(particle + 0x24) = 0;
+        if (*(s16*)&particleData->m_matrix[2][1] < 0) {
+            *(s16*)&particleData->m_matrix[2][1] = 0;
         }
-        if (*(s16*)(particle + 0x26) < 0) {
-            *(s16*)(particle + 0x26) = 0;
-            *(s16*)(particle + 0x28) = 0;
+        if (*(s16*)((u8*)particleData->m_matrix[2] + 6) < 0) {
+            *(s16*)((u8*)particleData->m_matrix[2] + 6) = 0;
+            *(s16*)&particleData->m_matrix[2][2] = 0;
         }
     }
 
-    *(s16*)(particle + 0x28) = *(s16*)(particle + 0x28) - 1;
-    if (*(s16*)(particle + 0x28) < 0) {
-        InitParticleData((VYmMiasma*)vData, pppPObject, pYmMiasma, particleData);
+    *(s16*)&particleData->m_matrix[2][2] = *(s16*)&particleData->m_matrix[2][2] - 1;
+    if (*(s16*)&particleData->m_matrix[2][2] < 0) {
+        InitParticleData(vData, pppPObject, pYmMiasma, particleData);
     }
 
-    worldPos.x = *(float*)(particle + 0x00);
-    worldPos.y = *(float*)(particle + 0x04);
-    worldPos.z = *(float*)(particle + 0x08);
+    worldPos.x = particleData->m_matrix[0][0];
+    worldPos.y = particleData->m_matrix[0][1];
+    worldPos.z = particleData->m_matrix[0][2];
     pppCopyVector__FR3Vec3Vec(&worldPos, &worldPos);
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
@@ -246,37 +282,35 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     pppSubVector__FR3Vec3Vec3Vec(&delta, &basePos, &worldPos);
-    minDist = *(float*)(vData + 0x1c) - *(float*)(ymData + 0x1c);
+    minDist = vData->m_radius - pYmMiasma->m_minDistance;
     if (pppVectorLength__F3Vec(&delta) < minDist) {
-        *(float*)(particle + 0x3c) = *(float*)(particle + 0x3c) + *(float*)(ymData + 0x20);
-        *(u8*)(particle + 0x48) = 1;
+        particleData->m_directionTail.x = particleData->m_directionTail.x + pYmMiasma->m_gravity;
+        *(u8*)&particleData->m_colorDeltaAdd[0] = 1;
     }
 
-    if (*(float*)(particle + 0x3c) < *(float*)(ymData + 0x4c)) {
-        *(float*)(particle + 0x3c) = *(float*)(ymData + 0x4c);
+    if (particleData->m_directionTail.x < pYmMiasma->m_minSpeed) {
+        particleData->m_directionTail.x = pYmMiasma->m_minSpeed;
     }
 
-    *(float*)(particle + 0x00) = *(float*)(particle + 0x00) + *(float*)(particle + 0x3c) * *(float*)(particle + 0x10);
-    *(float*)(particle + 0x04) = *(float*)(particle + 0x04) + *(float*)(ymData + 0x44);
-    *(float*)(particle + 0x08) = *(float*)(particle + 0x08) + *(float*)(particle + 0x3c) * *(float*)(particle + 0x18);
-    *(float*)(particle + 0x3c) = *(float*)(particle + 0x3c) - *(float*)(ymData + 0x38);
+    particleData->m_matrix[0][0] = particleData->m_matrix[0][0] + particleData->m_directionTail.x * particleData->m_matrix[1][0];
+    particleData->m_matrix[0][1] = particleData->m_matrix[0][1] + pYmMiasma->m_heightJitter;
+    particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + particleData->m_directionTail.x * particleData->m_matrix[1][2];
+    particleData->m_directionTail.x = particleData->m_directionTail.x - pYmMiasma->m_speedDecay;
 
-    if (*(float*)(vData + 0x04) != FLOAT_80330644 && *(u8*)(particle + 0x48) == 0) {
-        impulse.x = *(float*)(vData + 0x10);
-        impulse.y = *(float*)(vData + 0x14);
-        impulse.z = *(float*)(vData + 0x18);
-        PSVECScale(&impulse, &impulse, *(float*)(particle + 0x3c));
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)particle, (Vec*)particle, &impulse);
+    if (vData->m_unknown4 != FLOAT_80330644 && *(u8*)&particleData->m_colorDeltaAdd[0] == 0) {
+        impulse = vData->m_impulse;
+        PSVECScale(&impulse, &impulse, particleData->m_directionTail.x);
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, (Vec*)particleData, &impulse);
     }
 
-    if ((u16)*(u32*)(ymData + 0x04) != 0xffff) {
-        shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + *(u32*)(ymData + 0x04) * 4);
+    if ((u16)pYmMiasma->m_dataValIndex != 0xffff) {
+        shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)pYmMiasma->m_dataValIndex * 4);
         pppCalcFrameShape__FPlRsRsRss(
             shapeTable,
-            (short*)(particle + 0x4c),
-            (short*)(particle + 0x4e),
-            (short*)(particle + 0x4a),
-            (short)*(u32*)(ymData + 0x08));
+            (short*)((u8*)&particleData->m_colorDeltaAdd[1] + 4),
+            (short*)((u8*)&particleData->m_colorDeltaAdd[1] + 6),
+            (short*)((u8*)&particleData->m_colorDeltaAdd[1] + 2),
+            (short)pYmMiasma->m_shapeFrameStep);
     }
 }
 

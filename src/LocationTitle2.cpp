@@ -274,7 +274,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         int graphFrame = GetGraphFrameFromId(graphId);
         LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
-        long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+        long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         u8 blendMode = *((u8*)&unkB->m_stepValue + 1);
 
         pppSetBlendMode(blendMode);
@@ -331,7 +331,6 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         for (u16 i = 0; i < work->m_count; i++) {
             Mtx model;
             Vec transformedPos;
-            GXColor color;
 
             if (graphFrame <= particle->m_frame) {
                 PSMTXIdentity(model);
@@ -340,7 +339,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 model[2][2] = pppMngStPtr->m_scale.z * particle->m_scaleZ;
 
                 PSMTXMultVec(pppMngStPtr->m_matrix.value, &particle->m_pos, &transformedPos);
-                PSMTXMultVec(ppvCameraMatrix0, &transformedPos, &transformedPos);
+                PSMTXMultVec(ppvCameraMatrix02, &transformedPos, &transformedPos);
 
                 model[0][3] = transformedPos.x;
                 model[1][3] = transformedPos.y;
@@ -355,9 +354,8 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                     GXSetColorUpdate(GX_TRUE);
                 }
 
-                *(u32*)&color = particle->m_color;
-                GXSetChanMatColor(GX_COLOR0A0, color);
-                pppDrawShp(shapeTable, particle->m_shape, pppEnvStPtr->m_materialSetPtr, blendMode);
+                GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
+                pppDrawShp(*shapeTable, particle->m_shape, pppEnvStPtr->m_materialSetPtr, blendMode);
             }
 
             particle++;

@@ -9,17 +9,16 @@
 extern "C" {
 #endif
 
-typedef void (*DBCommFunc)(void);
-typedef u32 (*DBPollFunc)(void);
-typedef void (*DBCommInitFunc)(volatile u8**, __OSInterruptHandler);
-typedef int (*DBCommReadFunc)(void*, size_t);
-typedef int (*DBCommWriteFunc)(const void*, size_t);
+typedef int (*DBCommFunc)();
+typedef int (*DBCommInitFunc)(void*, __OSInterruptHandler);
+typedef int (*DBCommReadFunc)(u8*, int);
+typedef int (*DBCommWriteFunc)(const u8*, int);
 
 typedef struct DBCommTable {
 	DBCommInitFunc initialize_func;
 	DBCommFunc init_interrupts_func;
 	DBCommFunc shutdown_func;
-	DBPollFunc peek_func;
+	DBCommFunc peek_func;
 	DBCommReadFunc read_func;
 	DBCommWriteFunc write_func;
 	DBCommFunc open_func;

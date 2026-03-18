@@ -113,7 +113,7 @@ int gdev_cc_write(const u8* bytes, int length)
     n_copy = length;
 
     if (gIsInitialized == FALSE) {
-        MWTRACE(8, (char*)(gdev_cc_write_not_initialized + 0));
+        MWTRACE(8, (char*)gdev_cc_write_not_initialized);
         return GDEV_ERR_NOT_INITIALIZED;
     }
 

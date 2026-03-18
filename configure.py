@@ -968,7 +968,15 @@ config.libs = [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/math_ppc.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/mbstring.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/mem.c"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/mem_funcs.c"),
+            Object(
+                NonMatching,
+                "MSL_C/PPCEABI/bare/H/mem_funcs.c",
+                cflags=replace_flag_prefix(
+                    cflags_msl,
+                    "-inline ",
+                    "-inline deferred,auto",
+                ),
+            ),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/misc_io.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/printf.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/rand.c"),

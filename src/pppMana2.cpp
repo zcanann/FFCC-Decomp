@@ -25,6 +25,7 @@ extern float FLOAT_80331898;
 extern float FLOAT_8033189c;
 extern float FLOAT_803318a0;
 extern float FLOAT_803318a4;
+extern float FLOAT_803318A8;
 extern float FLOAT_803318b8;
 extern float FLOAT_803318bc;
 extern float FLOAT_803318c0;
@@ -964,69 +965,78 @@ void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
 extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
     Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5, float)
 {
-    float* pPos = (float*)param_1;
-    float* pNormal = (float*)param_2;
-    float* pUv = (float*)param_3;
-    float radius = param_5 * FLOAT_803318a4;
-    float step = param_5 * 0.125f;
-    u32 rowCounter = 0;
-    double stepScale = 0.125;
+    float radius;
+    float x;
+    float z;
+    float zero;
+    float normalY;
+    int indexOffset;
+    short quadIndex;
+    short rowBase;
+    float* pos;
+    int rowCount;
+    float* normal;
+    float* uv;
+    unsigned int colCount;
+    unsigned int row;
+    int pairCount;
+    double uvStep;
 
-    for (float zPos = radius; -radius <= zPos; zPos -= step) {
-        u32 colCounter = 0;
-        float* pos = pPos;
-        float* normal = pNormal;
-        float* uv = pUv;
-
-        for (float xPos = -radius; xPos <= radius; xPos += step) {
-            *pos = xPos;
-            pos[1] = FLOAT_80331898;
-            pos[2] = zPos;
-            pPos += 3;
-            pos += 3;
-
-            *normal = FLOAT_80331898;
-            normal[1] = FLOAT_803318a0;
-            normal[2] = FLOAT_80331898;
-            pNormal += 3;
-            normal += 3;
-
-            *uv = (float)((double)colCounter * stepScale);
-            uv[1] = (float)((double)rowCounter * stepScale);
-            pUv += 2;
-            uv += 2;
-
-            colCounter++;
+    normalY = FLOAT_803318a0;
+    zero = FLOAT_80331898;
+    row = 0;
+    uvStep = (double)FLOAT_803318A8;
+    radius = (float)((double)param_5 * (double)FLOAT_803318a4);
+    for (z = radius; -radius <= z; z = z - (float)((double)param_5 * uvStep)) {
+        colCount = 0;
+        pos = reinterpret_cast<float*>(param_1);
+        normal = reinterpret_cast<float*>(param_2);
+        uv = reinterpret_cast<float*>(param_3);
+        for (x = -radius; x <= radius; x = x + (float)((double)param_5 * uvStep)) {
+            *pos = x;
+            param_1 = reinterpret_cast<Vec*>(pos + 3);
+            pos[1] = zero;
+            colCount = colCount + 1;
+            param_2 = reinterpret_cast<Vec*>(normal + 3);
+            param_3 = reinterpret_cast<Vec2d*>(uv + 2);
+            pos[2] = z;
+            pos = pos + 3;
+            *normal = zero;
+            normal[1] = normalY;
+            normal[2] = zero;
+            normal = normal + 3;
+            *uv = (float)((double)(int)(colCount - 1) * uvStep);
+            uv[1] = (float)((double)(int)row * uvStep);
+            uv = uv + 2;
         }
-        rowCounter++;
+        row = row + 1;
     }
-
-    int idxOffset = 0;
-    int row = 0;
-    short rowBase = 0;
+    indexOffset = 0;
+    rowCount = 0;
+    rowBase = 0;
     do {
-        int pair = 8;
-        short rowCounter2 = rowBase;
+        pairCount = 8;
+        quadIndex = rowBase;
         do {
-            *(short*)((char*)param_4 + idxOffset) = rowCounter2;
-            *(short*)((char*)param_4 + idxOffset + 2) = rowCounter2 + 1;
-            *(short*)((char*)param_4 + idxOffset + 4) = rowCounter2 + 0x12;
-            *(short*)((char*)param_4 + idxOffset + 6) = rowCounter2 + 0x12;
-            *(short*)((char*)param_4 + idxOffset + 8) = rowCounter2 + 0x11;
-            *(short*)((char*)param_4 + idxOffset + 10) = rowCounter2;
-            *(short*)((char*)param_4 + idxOffset + 12) = rowCounter2 + 1;
-            *(short*)((char*)param_4 + idxOffset + 14) = rowCounter2 + 2;
-            *(short*)((char*)param_4 + idxOffset + 16) = rowCounter2 + 0x13;
-            *(short*)((char*)param_4 + idxOffset + 18) = rowCounter2 + 0x13;
-            *(short*)((char*)param_4 + idxOffset + 20) = rowCounter2 + 0x12;
-            *(short*)((char*)param_4 + idxOffset + 22) = rowCounter2 + 1;
-            idxOffset += 0x18;
-            pair--;
-            rowCounter2 += 2;
-        } while (pair != 0);
-        row++;
-        rowBase += 0x11;
-    } while (row < 0x10);
+            *(short*)((char*)param_4 + indexOffset) = quadIndex;
+            *(short*)((char*)param_4 + indexOffset + 2) = quadIndex + 1;
+            *(short*)((char*)param_4 + indexOffset + 4) = quadIndex + 0x12;
+            *(short*)((char*)param_4 + indexOffset + 6) = quadIndex + 0x12;
+            *(short*)((char*)param_4 + indexOffset + 8) = quadIndex + 0x11;
+            *(short*)((char*)param_4 + indexOffset + 10) = quadIndex;
+            *(short*)((char*)param_4 + indexOffset + 0xC) = quadIndex + 1;
+            *(short*)((char*)param_4 + indexOffset + 0xE) = quadIndex + 2;
+            *(short*)((char*)param_4 + indexOffset + 0x10) = quadIndex + 0x13;
+            *(short*)((char*)param_4 + indexOffset + 0x12) = quadIndex + 0x13;
+            *(short*)((char*)param_4 + indexOffset + 0x14) = quadIndex + 0x12;
+            *(short*)((char*)param_4 + indexOffset + 0x16) = quadIndex + 1;
+            quadIndex = quadIndex + 2;
+            indexOffset = indexOffset + 0x18;
+            pairCount = pairCount + -1;
+        } while (pairCount != 0);
+        rowCount = rowCount + 1;
+        rowBase = rowBase + 0x11;
+    } while (rowCount < 0x10);
 
     return 1;
 }

@@ -28,6 +28,7 @@ struct VertexApMtxData
 	u8 spawnDelay;
 	u8 mode;
 	u8 useWorldMtx;
+	u8 unkA[0x2];
 	u32 childId;
 	u32 childMtxOffset;
 };
@@ -126,30 +127,31 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		}
 
 		s32 count = data->spawnCount;
+		MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
+
 		switch (data->mode) {
 		case 0:
-		{
-			MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-			do {
+			while (count-- != 0) {
 				if (state->index >= entry->maxValue) {
 					state->index = 0;
 				}
 
-				u16 index = state->index++;
-				u16 vertexIndex = vertexIndices[index];
+				u16 outValue = state->index;
+				state->index++;
+				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
 				f32 z = vertex->z;
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
-					_pppPObject* child;
 					s32 childId = data->childId;
+					_pppPObject* child;
 					_pppPDataVal* childData =
 						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
-					MtxPtr outMtx;
 					Vec pos;
 					Vec worldPos;
+					Mtx* outMtx;
 
 					if (childData == 0) {
 						child = 0;
@@ -162,41 +164,41 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					pos.y = y;
 					pos.z = z;
 					PSMTXMultVec(parentMtx, &pos, &pos);
-					outMtx = (MtxPtr)((u8*)child + data->childMtxOffset + 0x80);
+					outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
 					if (data->useWorldMtx == 0) {
-						PSMTXIdentity(outMtx);
-						outMtx[0][3] = pos.x;
-						outMtx[1][3] = pos.y;
-						outMtx[2][3] = pos.z;
+						PSMTXIdentity(*outMtx);
+						(*outMtx)[0][3] = pos.x;
+						(*outMtx)[1][3] = pos.y;
+						(*outMtx)[2][3] = pos.z;
 					} else {
-						PSMTXCopy((MtxPtr)((u8*)pppMngStPtr + 0x78), outMtx);
-						PSMTXMultVec((MtxPtr)((u8*)pppMngStPtr + 0x78), &pos, &worldPos);
-						outMtx[0][3] = worldPos.x;
-						outMtx[1][3] = worldPos.y;
-						outMtx[2][3] = worldPos.z;
+						PSMTXCopy(*(Mtx*)((u8*)pppMngStPtr + 0x78), *outMtx);
+						PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, &worldPos);
+						(*outMtx)[0][3] = worldPos.x;
+						(*outMtx)[1][3] = worldPos.y;
+						(*outMtx)[2][3] = worldPos.z;
 					}
 				}
-			} while (count-- != 0);
+			}
 			break;
-		}
 		case 1:
-		{
-			MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-			do {
-				u16 vertexIndex = vertexIndices[(s32)((f32)entry->maxValue * RandF__5CMathFv(&Math))];
+			while (count-- != 0) {
+				f32 randValue = RandF__5CMathFv(&Math);
+				f32 maxValue = (f32)entry->maxValue;
+				int outValue = (int)(randValue * maxValue);
+				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
 				f32 y = vertex->y;
 				f32 z = vertex->z;
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
-					_pppPObject* child;
 					s32 childId = data->childId;
+					_pppPObject* child;
 					_pppPDataVal* childData =
 						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
-					MtxPtr outMtx;
 					Vec pos;
 					Vec worldPos;
+					Mtx* outMtx;
 
 					if (childData == 0) {
 						child = 0;
@@ -209,23 +211,22 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					pos.y = y;
 					pos.z = z;
 					PSMTXMultVec(parentMtx, &pos, &pos);
-					outMtx = (MtxPtr)((u8*)child + data->childMtxOffset + 0x80);
+					outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
 					if (data->useWorldMtx == 0) {
-						PSMTXIdentity(outMtx);
-						outMtx[0][3] = pos.x;
-						outMtx[1][3] = pos.y;
-						outMtx[2][3] = pos.z;
+						PSMTXIdentity(*outMtx);
+						(*outMtx)[0][3] = pos.x;
+						(*outMtx)[1][3] = pos.y;
+						(*outMtx)[2][3] = pos.z;
 					} else {
-						PSMTXCopy((MtxPtr)((u8*)pppMngStPtr + 0x78), outMtx);
-						PSMTXMultVec((MtxPtr)((u8*)pppMngStPtr + 0x78), &pos, &worldPos);
-						outMtx[0][3] = worldPos.x;
-						outMtx[1][3] = worldPos.y;
-						outMtx[2][3] = worldPos.z;
+						PSMTXCopy(*(Mtx*)((u8*)pppMngStPtr + 0x78), *outMtx);
+						PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, &worldPos);
+						(*outMtx)[0][3] = worldPos.x;
+						(*outMtx)[1][3] = worldPos.y;
+						(*outMtx)[2][3] = worldPos.z;
 					}
 				}
-			} while (count-- != 0);
+			}
 			break;
-		}
 		}
 		state->countdown = data->spawnDelay;
 	}

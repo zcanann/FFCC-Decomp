@@ -313,6 +313,7 @@ void __VIInit(VITVMode mode) {
     VITiming* tm;
     u32 ds;
     volatile u32 delay;
+    u32 unused;
     u32 tv;
     u16 hct;
     u16 vct;

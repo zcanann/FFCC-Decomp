@@ -1,11 +1,13 @@
 #include "ffcc/pppDrawMng.h"
 
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
-#include "ffcc/p_game.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/symbols_shared.h"
+
+extern CGame Game;
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
@@ -179,9 +181,8 @@ void pppDrawMng::ClearOt()
 {
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
-	CGame* game = (CGame*)&Game;
 
-	if (game->m_currentMapId == 0x21)
+	if (Game.m_currentMapId == 0x21)
 	{
 		m_depthScale = kPppDrawDepthScaleNear;
 	}

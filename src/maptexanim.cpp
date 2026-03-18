@@ -8,7 +8,7 @@ class CMaterial;
 
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
 extern "C" void ReadJun__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
-extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
+extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
@@ -132,7 +132,8 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                     static_cast<char>(chunk.m_arg0));
             } else if (((int)chunk.m_id < 0x4A554E20) && (chunk.m_id == 0x4652414D)) {
                 ReadFrame__12CMapKeyFrameFR10CChunkFilei(
-                    reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile);
+                    reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
+                    static_cast<char>(chunk.m_arg0));
             }
         } else if (chunk.m_id == 0x54414E4D) {
             ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(

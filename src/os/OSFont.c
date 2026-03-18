@@ -339,7 +339,6 @@ u16 OSGetFontEncode(void) {
         FontEncode = OS_FONT_ENCODE_ANSI;
     }
 
-    ParseString = ParseStringS;
     return FontEncode;
 }
 
@@ -649,6 +648,7 @@ int OSInitFont(OSFontHeader* fontData) {
     case 0:
         tmp = (void*)((u8*)fontData + 0x1D120);
         FontDataAnsi = fontData;
+        ParseString = ParseStringS;
         size = ReadFont(tmp, 0, FontDataAnsi);
         if (size == 0) {
             return 0;
@@ -661,6 +661,7 @@ int OSInitFont(OSFontHeader* fontData) {
     case 1:
         tmp = (void*)((u8*)fontData + 0xD3F00);
         FontDataSjis = fontData;
+        ParseString = ParseStringS;
         size = ReadFont(tmp, 1, FontDataSjis);
         if (size == 0) {
             return 0;
@@ -675,6 +676,7 @@ int OSInitFont(OSFontHeader* fontData) {
     case 5:
         tmp = (void*)((u8*)fontData + 0xF4020);
         FontDataAnsi = fontData;
+        ParseString = ParseStringW;
         size = ReadFont(tmp, 0, FontDataAnsi);
         if (size == 0) {
             return 0;

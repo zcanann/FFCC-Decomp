@@ -152,7 +152,6 @@ void pppLight(void* param1, void* param2, void* param3)
 	{
 		PppLightWork* work = (PppLightWork*)(pObject + ctrlTable->m_serializedDataOffsets[0] + 0x80);
 		CLightPcs::CLight light;
-		Vec targetPos;
 
 		work->attenFalloffVelocity += work->attenFalloffAccel;
 		work->attenFalloff += work->attenFalloffVelocity;
@@ -253,12 +252,12 @@ void pppLight(void* param1, void* param2, void* param3)
 					obj = targetTable[step->targetIndex].obj;
 				}
 
-				targetPos.x = *(f32*)(obj + 0x1c);
-				targetPos.y = *(f32*)(obj + 0x2c);
-				targetPos.z = *(f32*)(obj + 0x3c);
-				PSMTXMultVec(pppMngStPtr->m_matrix.value, &targetPos, &targetPos);
+				light.m_targetPosition.x = *(f32*)(obj + 0x1c);
+				light.m_targetPosition.y = *(f32*)(obj + 0x2c);
+				light.m_targetPosition.z = *(f32*)(obj + 0x3c);
+				PSMTXMultVec(pppMngStPtr->m_matrix.value, (Vec*)&light.m_targetPosition, (Vec*)&light.m_targetPosition);
 
-				PSVECSubtract(&targetPos, (Vec*)&light.m_position, (Vec*)&light.m_direction);
+				PSVECSubtract((Vec*)&light.m_targetPosition, (Vec*)&light.m_position, (Vec*)&light.m_direction);
 				PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);
 				light.m_spotScale = kPppLightSpotScale * work->spotScale;
 

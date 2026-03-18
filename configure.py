@@ -941,7 +941,11 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/abort_exit.c"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/alloc.c"),
+            Object(
+                NonMatching,
+                "MSL_C/PPCEABI/bare/H/alloc.c",
+                extra_cflags=["-inline noauto"],
+            ),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_fp.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/buffer_io.c"),

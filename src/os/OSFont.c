@@ -3,7 +3,7 @@
 
 #include "dolphin/os/__os.h"
 
-typedef char* (*ParseStringCallback)(u16, char*, OSFontHeader**, int*);
+typedef char* (*ParseStringCallback)(u16, const char*, OSFontHeader**, int*);
 
 static OSFontHeader* FontDataAnsi;
 static OSFontHeader* FontDataSjis;
@@ -322,7 +322,7 @@ static u32 GetFontSize(u8* buf) {
 }
 
 u16 OSGetFontEncode(void) {
-    if (FontEncode != 0xFFFF) {
+    if (FontEncode <= OS_FONT_ENCODE_SJIS) {
         return FontEncode;
     }
 
@@ -339,7 +339,7 @@ u16 OSGetFontEncode(void) {
         FontEncode = OS_FONT_ENCODE_ANSI;
     }
 
-    ParseString = (ParseStringCallback)ParseStringS;
+    ParseString = ParseStringS;
     return FontEncode;
 }
 

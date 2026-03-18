@@ -67,47 +67,54 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
  */
 int RedNew(int param_1)
 {
+	unsigned int interrupts;
+	int alignedSize;
+	int address;
+	int entryCount;
+	unsigned int moveCount;
+	int* blockList;
+	int* slot;
+
 	if ((param_1 < 1) || (gRedMainMemoryBlockList == (int*)0) || (gRedMainMemoryBase == 0)) {
 		return 0;
 	}
 
-	BOOL interrupts = OSDisableInterrupts();
-	unsigned int alignedSize = (param_1 + 0x1FU) & 0xFFFFFFE0;
-	int address = gRedMainMemoryBase;
-	int* slot = gRedMainMemoryBlockList;
+	interrupts = OSDisableInterrupts();
+	alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
+	blockList = gRedMainMemoryBlockList;
+	address = gRedMainMemoryBase;
+	slot = blockList;
 
 	do {
-		if ((slot[1] != 0) && ((unsigned int)(address + alignedSize) > (unsigned int)*slot)) {
-			int* entry = slot + 1;
-			address = *slot + *entry;
-			slot = slot + 2;
-			continue;
-		}
-
-		if (gRedMainMemoryBlockList[0x7FF] >= 1) {
-			if (gRedMemoryDebugEnabled != 0) {
-				OSReport(s_redMemoryMainBankFullFmt, &sRedMemoryLogPrefix, &sRedMemoryLogSuffixA, &sRedMemoryLogSuffixB);
-				fflush(&DAT_8021d1a8);
+		if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
+			if (blockList[0x7FF] > 0) {
+				if (gRedMemoryDebugEnabled != 0) {
+					OSReport(s_redMemoryMainBankFullFmt, &sRedMemoryLogPrefix, &sRedMemoryLogSuffixA, &sRedMemoryLogSuffixB);
+					fflush(&DAT_8021d1a8);
+				}
+				break;
 			}
+
+			if ((unsigned int)(address + alignedSize) <= (unsigned int)(gRedMainMemoryBase + gRedMainMemorySize)) {
+				if (slot[1] > 0) {
+					moveCount = (int)blockList + (0x2000 - (int)(slot + 2));
+					entryCount = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
+					if (entryCount > 0) {
+						memmove(slot + 2, slot, entryCount * 8);
+					}
+				}
+
+				*slot = address;
+				slot[1] = alignedSize;
+				OSRestoreInterrupts(interrupts);
+				return address;
+			}
+
 			break;
 		}
 
-		if ((unsigned int)(address + alignedSize) > (unsigned int)(gRedMainMemoryBase + gRedMainMemorySize)) {
-			break;
-		}
-
-		if (0 < slot[1]) {
-			unsigned int moveCount = (int)gRedMainMemoryBlockList + (0x2000 - (int)(slot + 2));
-			int entryCount = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
-			if (0 < entryCount) {
-				memmove(slot + 2, slot, entryCount * 8);
-			}
-		}
-
-		*slot = address;
-		slot[1] = alignedSize;
-		OSRestoreInterrupts(interrupts);
-		return address;
+		address = *slot + slot[1];
+		slot += 2;
 	} while (slot < gRedMainMemoryBlockList + 0x800);
 
 	OSRestoreInterrupts(interrupts);

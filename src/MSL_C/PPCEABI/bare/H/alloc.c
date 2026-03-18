@@ -557,20 +557,19 @@ found:
 }
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     const unsigned long* pool_size_ptr;
+    unsigned long pool_index;
+    unsigned long max_count;
+    unsigned long count;
+    void* mem;
+    unsigned long available[4];
+    unsigned long available_size;
     FixStart* fix_start;
     FixBlock* block;
     FixBlock* head_block;
     FixSubBlock* sub;
     FixSubBlock* result_sub;
-    unsigned long pool_index;
-    unsigned long entry_size;
-    unsigned long client_size;
-    unsigned long max_count;
-    unsigned long count;
-    unsigned long available_size;
-    unsigned long available[4];
     unsigned long i;
-    void* mem;
+    unsigned long entry_size;
 
     pool_index = 0;
     for (pool_size_ptr = fix_pool_sizes; size > *pool_size_ptr; ++pool_size_ptr) {
@@ -579,8 +578,7 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
 
     fix_start = &pool_obj->fix_start[pool_index];
     if ((fix_start->head_ == 0) || (fix_start->head_->start_ == 0)) {
-        client_size = fix_pool_sizes[pool_index];
-        entry_size = client_size + 4;
+        entry_size = fix_pool_sizes[pool_index] + 4;
         count = 0xFEC / entry_size;
         max_count = count;
         if (0x100 < count) {
@@ -603,13 +601,13 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
             return 0;
         }
 
-        block = (FixBlock*)((char*)mem - 8);
         if ((*(unsigned long*)((char*)mem - 4) & 1) == 0) {
             available_size = *(unsigned long*)(*(unsigned long*)((char*)mem - 4) + 8);
         } else {
             available_size = (*(unsigned long*)((char*)mem - 8) & 0xFFFFFFF8) - 8;
         }
 
+        block = (FixBlock*)mem;
         if (fix_start->head_ == 0) {
             fix_start->head_ = block;
             fix_start->tail_ = block;
@@ -621,7 +619,7 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
         block->next_ = head_block;
         fix_start->tail_->next_ = block;
         head_block->prev_ = block;
-        block->client_size_ = client_size;
+        block->client_size_ = fix_pool_sizes[pool_index];
 
         sub = (FixSubBlock*)((char*)block + 0x14);
         block->start_ = sub;

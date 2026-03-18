@@ -999,7 +999,7 @@ config.libs = [
     },
     {
         "lib": "TRK_MINNOW_DOLPHIN",
-        "mw_version": "GC/1.3",
+        "mw_version": "GC/1.3.2",
         "cflags": cflags_trk,
         "progress_category": "sdk",
         "objects": [

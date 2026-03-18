@@ -23,21 +23,18 @@ extern int __register_fragment(struct __eti_init_info* info, char* TOC);
 /* 80450AD0-80450AD8 000550 0004+04 2/2 0/0 0/0 .sdata           fragmentID */
 static int fragmentID = -2;
 
-extern void GetR2(char** R2) {
-	register char* temp;
-	asm {
-		mr temp, r2
-	}
-	*R2 = temp;
+extern char* GetR2(void) {
+    register char* temp;
+    asm {
+        mr temp, r2
+    }
+    return temp;
 }
 
 /* 80362870-803628AC 35D1B0 003C+00 1/0 1/0 0/0 .text            __init_cpp_exceptions */
 void __init_cpp_exceptions(void) {
-    char* R2;
-
     if (fragmentID == -2) {
-        GetR2(&R2);
-        fragmentID = __register_fragment(_eti_init_info, R2);
+        fragmentID = __register_fragment(_eti_init_info, GetR2());
     }
 }
 

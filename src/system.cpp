@@ -35,7 +35,22 @@ class CScenegraphProcessProxy {
 public:
     virtual void create();
     virtual void destroy();
-    virtual int GetTable(unsigned long);
+    virtual void* GetTable(unsigned long);
+};
+
+typedef void (CProcess::*ScenegraphCallback)();
+
+struct CScenegraphEntry {
+    ScenegraphCallback m_callback;
+    u32 m_priority;
+    u32 m_flags;
+};
+
+struct CScenegraphDesc {
+    const char* m_debugName;
+    ScenegraphCallback m_createCallback;
+    ScenegraphCallback m_destroyCallback;
+    CScenegraphEntry m_entries[1];
 };
 
 /*
@@ -445,22 +460,22 @@ void CSystem::ExecScenegraph()
  */
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
-    u32* description = (u32*)((CScenegraphProcessProxy*)process)->GetTable(arg);
+    CScenegraphDesc* description = (CScenegraphDesc*)((CScenegraphProcessProxy*)process)->GetTable(arg);
 
-    if (__ptmf_test((__ptmf*)(description + 1)) != 0)
+    if (description->m_createCallback)
     {
-        __ptmf_scall(process);
+        (process->*description->m_createCallback)();
     }
 
-    u32* entry = description + 7;
+    CScenegraphEntry* entry = description->m_entries;
     int insertIndex = 0;
-    while (__ptmf_test((__ptmf*)entry) != 0)
+    while (entry->m_callback)
     {
         COrder* first = m_orderSentinel.m_next;
         COrder* current = first;
         do
         {
-            if ((u32)entry[3] < current->m_priority)
+            if (entry->m_priority < current->m_priority)
             {
                 COrder* order = m_freeOrderHead.m_next;
                 m_freeOrderHead.m_next = order->m_next;
@@ -473,15 +488,15 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
                 insertIndex++;
                 order->m_descBlock = description;
                 order->m_owner = process;
-                order->m_priority = entry[3];
-                order->m_debugName = (void*)description[0];
+                order->m_priority = entry->m_priority;
+                order->m_debugName = (void*)description->m_debugName;
                 m_orderCount++;
                 break;
             }
             current = current->m_next;
         } while (current != first);
 
-        entry += 5;
+        entry++;
     }
 
     return 1;
@@ -498,7 +513,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    u32* descBlock = (u32*)((CScenegraphProcessProxy*)process)->GetTable(arg);
+    CScenegraphDesc* descBlock = (CScenegraphDesc*)((CScenegraphProcessProxy*)process)->GetTable(arg);
     COrder* current = m_orderSentinel.m_next;
 
     do
@@ -515,9 +530,9 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
         current = next;
     } while (current != &m_orderSentinel);
 
-    if (__ptmf_test((__ptmf*)(descBlock + 4)) != 0)
+    if (descBlock->m_destroyCallback)
     {
-        __ptmf_scall(process, (__ptmf*)(descBlock + 4));
+        (process->*descBlock->m_destroyCallback)();
     }
 }
 

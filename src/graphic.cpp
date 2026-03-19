@@ -2068,12 +2068,13 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
  */
 void CGraphic::CreateTempBuffer()
 {
-	u32 bufferSize = ((U16At(PtrAt(this, 0x71E0), 4) + 0xF) & 0xFFF0) * U16At(PtrAt(this, 0x71E0), 6) * 2 + 0x46000;
 	u8* tempBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-	    &Memory, bufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), s_graphic_cpp_801d6348, 0xB53, 0));
+	    &Memory,
+	    ((U16At(PtrAt(this, 0x71E0), 4) + 0xF) & 0xFFF0) * (u32)U16At(PtrAt(this, 0x71E0), 6) * 2 + 0x46000,
+	    (CMemory::CStage*)PtrAt(this, 0x8), s_graphic_cpp_801d6348, 0xB53, 0));
 
 	PtrAt(this, 0x71E8) = tempBuffer;
-	memset(tempBuffer, 0, 0x46004);
+	memset(PtrAt(this, 0x71E8), 0, 0x46004);
 }
 
 /*

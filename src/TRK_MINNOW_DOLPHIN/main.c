@@ -16,7 +16,11 @@ static CircleBuffer gRecvCB;
 static u8 gRecvBuf[DDH_BUF_SIZE];
 
 /* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
-BOOL gIsInitialized;
+static BOOL gIsInitialized;
+
+static const char ddh_cc_write_not_initialized[] = "cc not initialized\n";
+static const char ddh_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
+static const char ddh_cc_write_sending[] = "cc_write sending %ld bytes\n";
 
 /*
  * --INFO--
@@ -114,15 +118,15 @@ int ddh_cc_write(const u8* bytes, int length)
 
     if (gIsInitialized == FALSE)
 	{
-        MWTRACE(8, "cc not initialized\n");
+        MWTRACE(8, (char*)ddh_cc_write_not_initialized);
         return DDH_ERR_NOT_INITIALIZED;
     }
 
-    MWTRACE(8, "cc_write : Output data 0x%08x %ld bytes\n", bytes, length);
+    MWTRACE(8, (char*)ddh_cc_write_output_data, bytes, length);
 
     while (n_copy > 0)
 	{
-        MWTRACE(1, "cc_write sending %ld bytes\n", n_copy);
+        MWTRACE(1, (char*)ddh_cc_write_sending, n_copy);
         exi2Len = EXI2_WriteN((const void*)hexCopy, n_copy);
 		
         if (exi2Len == AMC_EXI_NO_ERROR)

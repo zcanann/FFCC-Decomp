@@ -82,6 +82,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XWork* work;
     KeShpTail2XObject* tailObj;
     Vec pos;
+    Vec temp;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -110,9 +111,15 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         }
 
         u8 count = work->m_count;
+        pppCopyVector__FR3Vec3Vec(&temp, &pos);
         Vec* history = work->m_posHistory;
         while (count != 0) {
-            pppCopyVector__FR3Vec3Vec(history, &pos);
+            Vec historyPos;
+
+            historyPos.x = temp.x;
+            historyPos.y = temp.y;
+            historyPos.z = temp.z;
+            pppCopyVector__FR3Vec3Vec(history, &historyPos);
             history++;
             count--;
         }
@@ -140,7 +147,10 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.z = outMatrix.value[2][3];
     }
 
-    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &pos);
+    temp.x = pos.x;
+    temp.y = pos.y;
+    temp.z = pos.z;
+    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
 
     {
         long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
@@ -447,5 +457,4 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }
-
 

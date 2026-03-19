@@ -294,8 +294,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	GXLoadTexMtxImm(texMtx, 0x40, GX_MTX3x4);
 	GXLoadTexMtxImm(lightMtx, 0x43, GX_MTX3x4);
-	GXSetTexCoordGen2((GXTexCoordID)0, GX_TG_MTX3x4, GX_TG_POS, 0x3C, GX_TRUE, 0x40);
-	GXSetTexCoordGen2((GXTexCoordID)1, GX_TG_MTX3x4, GX_TG_NRM, GX_IDENTITY, GX_FALSE, 0x43);
+	GXSetTexCoordGen2((GXTexCoordID)0, GX_TG_MTX3x4, GX_TG_NRM, 0x3C, GX_TRUE, 0x40);
+	GXSetTexCoordGen2((GXTexCoordID)1, GX_TG_MTX3x4, GX_TG_POS, GX_PNMTX0, GX_FALSE, 0x43);
 	GXLoadTexObj((_GXTexObj*)backBufferTex, GX_TEXMAP0);
 	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 1, 0, 0xFF);
 	_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
@@ -322,13 +322,13 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetIndTexOrder((GXIndTexStageID)0, (GXTexCoordID)0, (GXTexMapID)1);
 	GXSetIndTexCoordScale((GXIndTexStageID)0, GX_ITS_1, GX_ITS_1);
 	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx, 1);
-	GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_NONE, GX_ITM_1, GX_ITW_0, GX_ITW_0, GX_FALSE, GX_FALSE,
+	GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_ST, GX_ITM_0, GX_ITW_OFF, GX_ITW_OFF, GX_FALSE, GX_FALSE,
 		GX_ITBA_OFF);
 	GXClearVtxDesc();
-	GXSetVtxDesc((GXAttr)9, GX_DIRECT);
-	GXSetVtxDesc((GXAttr)10, GX_DIRECT);
-	GXSetVtxDesc((GXAttr)0xB, GX_DIRECT);
-	GXSetVtxDesc((GXAttr)0xD, GX_DIRECT);
+	GXSetVtxDesc((GXAttr)9, GX_INDEX16);
+	GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+	GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
+	GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 	pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)pppCrystal + 0x70), 0);
 	GXSetNumIndStages(0);
 	GXSetTevDirect((GXTevStageID)0);

@@ -34,9 +34,9 @@ void CGPrgObj::onCreate()
 	CGObject::onCreate();
 	m_lastStateId = 0;
 	m_stateArg = 0;
-	m_animFlags &= 0x7F;
-	m_animFlags &= 0xBF;
-	m_animFlags &= 0xDF;
+	m_animFlagBits.bits.m_animRequested = 0;
+	m_animFlagBits.bits.m_animLoop = 0;
+	m_animFlagBits.bits.m_animDirect = 0;
 	m_reqAnimId = -1;
 }
 
@@ -75,7 +75,7 @@ void CGPrgObj::onFrame()
 			return;
 		}
 
-		m_animFlags &= 0x7f;
+		m_animFlagBits.m_animFlags &= 0x7f;
 		onFramePreCalc();
 
 		if (m_stateFrameGate != 0) {
@@ -93,7 +93,7 @@ void CGPrgObj::onFrame()
 		onFrameStat();
 		onFramePostCalc();
 
-		animFlags = m_animFlags;
+		animFlags = m_animFlagBits.m_animFlags;
 		if ((animFlags & 0x80) != 0) {
 			if (m_reqAnimId == -1) {
 				if (m_currentAnimSlot > -1) {
@@ -102,13 +102,13 @@ void CGPrgObj::onFrame()
 				}
 			} else if ((animFlags & 0x20) != 0) {
 				*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
-				PlayAnim(m_reqAnimId, (m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			} else {
 				*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
-				PlayAnim(m_reqAnimId, (m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+				PlayAnim(m_reqAnimId, (m_animFlagBits.m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			}
 
-			m_animFlags &= 0x7f;
+			m_animFlagBits.m_animFlags &= 0x7f;
 		}
 	}
 
@@ -253,10 +253,13 @@ void CGPrgObj::addSubStat()
  */
 void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
-	m_animFlags = (m_animFlags & 0x7F) | 0x80;
+	signed char loopFlag = loop;
+	signed char directFlag = direct;
+
+	m_animFlagBits.bits.m_animRequested = 1;
 	m_reqAnimId = animId;
-	m_animFlags = (static_cast<unsigned char>(loop << 6) & 0x40) | (m_animFlags & 0xBF);
-	m_animFlags = (static_cast<unsigned char>(direct << 5) & 0x20) | (m_animFlags & 0xDF);
+	m_animFlagBits.bits.m_animLoop = loopFlag;
+	m_animFlagBits.bits.m_animDirect = directFlag;
 }
 
 /*
@@ -270,8 +273,8 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
  */
 int CGPrgObj::isLoopAnim()
 {
-	signed char loopFlag = static_cast<unsigned char>(m_animFlags << 2);
-	signed char directFlag = static_cast<unsigned char>(m_animFlags << 1);
+	signed char loopFlag = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 2);
+	signed char directFlag = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 1);
 
 	if ((loopFlag != 0) || (directFlag != 0) || ((int)IsLoopAnim(2) == 0)) {
 		return 0;
@@ -291,7 +294,7 @@ int CGPrgObj::isLoopAnim()
  */
 int CGPrgObj::isLoopAnimDirect()
 {
-	signed char flags = static_cast<unsigned char>(m_animFlags << 1);
+	signed char flags = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 1);
 
 	if ((flags < 0) || (IsLoopAnim(2) == 0)) {
 		return 0;

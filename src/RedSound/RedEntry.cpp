@@ -697,11 +697,11 @@ int CRedEntry::SearchWaveBase(int waveNo)
 #pragma dont_inline on
 int CRedEntry::ReentryWaveData(int waveNo)
 {
-	int sequenceNo = SearchWaveSequence(waveNo);
-	if (-1 < sequenceNo) {
-		WaveHistoryChoice((RedHistoryBANK*)(((int*)this)[0] + sequenceNo * 0x10));
+	waveNo = SearchWaveSequence(waveNo);
+	if (waveNo >= 0) {
+		WaveHistoryChoice((RedHistoryBANK*)(((int*)this)[0] + waveNo * 0x10));
 	}
-	return sequenceNo;
+	return waveNo;
 }
 #pragma dont_inline reset
 
@@ -1158,11 +1158,11 @@ int* CRedEntry::SearchSeSepBank(int seNo)
 #pragma dont_inline on
 int CRedEntry::ReentrySeSepData(int seNo)
 {
-	int sequenceNo = SearchSeSepSequence(seNo);
-	if (-1 < sequenceNo) {
-		SeSepHistoryChoice((RedHistoryBANK*)(((int*)this)[1] + sequenceNo * 0x10));
+	seNo = SearchSeSepSequence(seNo);
+	if (seNo >= 0) {
+		SeSepHistoryChoice((RedHistoryBANK*)(((int*)this)[1] + seNo * 0x10));
 	}
-	return sequenceNo;
+	return seNo;
 }
 #pragma dont_inline reset
 
@@ -1438,11 +1438,11 @@ int* CRedEntry::SearchMusicBank(int musicNo)
 #pragma dont_inline on
 int CRedEntry::ReentryMusicData(int musicNo)
 {
-	int sequenceNo = SearchMusicSequence(musicNo);
-	if (-1 < sequenceNo) {
-		MusicHistoryChoice((RedHistoryBANK*)(((int*)this)[2] + sequenceNo * 0x10));
+	musicNo = SearchMusicSequence(musicNo);
+	if (musicNo >= 0) {
+		MusicHistoryChoice((RedHistoryBANK*)(((int*)this)[2] + musicNo * 0x10));
 	}
-	return sequenceNo;
+	return musicNo;
 }
 #pragma dont_inline reset
 

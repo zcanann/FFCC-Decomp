@@ -201,10 +201,10 @@ struct CPartPcsViewerState {
 };
 
 struct CPartMngState {
-    unsigned char unk0[0x23708];
-    unsigned int m_partAMemBase;
-    unsigned int m_partAMemCursor;
-    unsigned int m_partLoadCacheParam;
+    unsigned char unk0[0x236F4];
+    void* m_partAMemBase;
+    void* m_partAMemCursor;
+    unsigned long m_partLoadCacheParam;
     unsigned int m_partChunkIndex;
     unsigned int m_asyncHandleCount;
     int m_partLoadMode;
@@ -1295,11 +1295,12 @@ void loadPdtPtx(char*, void*, int, void*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
+int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
 {
+    CPartMngState* state = GetPartMngState();
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(&PartPcs) + 4);
     int pdtSlotIndex;
     char path[260];
-    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
 
     if (variant == 0) {
         sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);
@@ -1307,12 +1308,12 @@ void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdt
         sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
     }
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
+    state->m_partAMemBase = 0;
+    state->m_partAMemCursor = 0;
+    state->m_partLoadCacheParam = 0;
+    state->m_partChunkIndex = 0;
+    state->m_asyncHandleCount = 0;
+    state->m_partLoadMode = 0;
 
     pdtSlotIndex = pppGetFreeDataMng__8CPartMngFv(&PartMng);
     if (pdtSlotIndex != -1) {
@@ -1323,9 +1324,11 @@ void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdt
             pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
             pdtSlotIndex = -1;
         } else {
-            reinterpret_cast<unsigned char*>(&PartPcs)[0x2d] = 1;
+            usb->m_printFreeOnNext = 1;
         }
     }
+
+    return pdtSlotIndex;
 }
 
 /*

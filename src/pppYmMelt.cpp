@@ -229,25 +229,28 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
-        work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        YmMeltVertex* vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp, 0xA9);
+        work->m_vertexData = vertexData;
 
-        YmMeltVertex* vtx = work->m_vertexData;
+        YmMeltVertex* vtx = vertexData;
         int angleSeed = rand();
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
+        s16 phaseOffset = work->m_phaseOffset;
 
         double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
         double step = (double)(ctrl->m_stepValue / (float)((double)gridSize - DOUBLE_80330af8));
-        double rot = (double)(FLOAT_80330b0c * (float)((double)work->m_phaseOffset - DOUBLE_80330b00));
+        double rot = (double)(FLOAT_80330b0c * (float)((double)phaseOffset - DOUBLE_80330b00));
+        Mtx rotMtx;
+
         for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
             for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
                 vtx->m_position.x = (float)x;
                 vtx->m_position.y = kPppYmMeltZero;
                 vtx->m_position.z = (float)z;
 
-                if (phaseDiv != 0) {
-                    Mtx rotMtx;
+                if (phaseOffset != 0) {
                     PSMTXRotRad(rotMtx, 'y', (float)rot);
                     PSMTXMultVec(rotMtx, &vtx->m_position, &vtx->m_position);
                 }
@@ -256,7 +259,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
             }
         }
 
-        CalcPolygonHeight(ymMelt, (VERTEX_DATA*)ctrl, (_GXColor*)work->m_vertexData, matrixY);
+        CalcPolygonHeight(ymMelt, (VERTEX_DATA*)ctrl, (_GXColor*)vertexData, matrixY);
     }
 
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;

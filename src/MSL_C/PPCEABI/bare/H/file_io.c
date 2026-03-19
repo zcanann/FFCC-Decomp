@@ -104,19 +104,34 @@ int fflush(FILE* file) {
     return 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b5a18
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int __get_file_modes(const char* mode, file_modes* modes)
 {
+	const char* mode_ptr = mode;
 	int mode_str;
 	unsigned char open_mode;
-	unsigned char io_mode = 0;
-
-	modes->file_kind = __disk_file;
+	unsigned char io_mode;
+	unsigned char file_kind = __disk_file;
 #ifndef __NO_WIDE_CHAR
-	modes->file_orientation = UNORIENTED;
+	unsigned char file_orientation = UNORIENTED;
 #endif
-	modes->binary_io = 0;
+	unsigned char binary_io = 0;
+
+	modes->file_kind = file_kind;
+#ifndef __NO_WIDE_CHAR
+	modes->file_orientation = file_orientation;
+#endif
+	modes->binary_io = binary_io;
 	
-	mode_str = mode[0];
+	mode_str = *mode_ptr++;
 	
 	switch (mode_str)
 	{
@@ -138,12 +153,13 @@ int __get_file_modes(const char* mode, file_modes* modes)
 	
 	modes->open_mode = open_mode;
 	
-	switch (mode[1])
+	switch (*mode_ptr++)
 	{
 		case 'b':
-			modes->binary_io = 1;
+			binary_io = 1;
+			modes->binary_io = binary_io;
 			
-			if (mode[2] == '+')
+			if (*mode_ptr == '+')
 				mode_str = (mode_str << 8) | '+';
 			
 			break;
@@ -151,8 +167,10 @@ int __get_file_modes(const char* mode, file_modes* modes)
 		case '+':
 			mode_str = (mode_str << 8) | '+';
 			
-			if (mode[2] == 'b')
-				modes->binary_io = 1;
+			if (*mode_ptr == 'b') {
+				binary_io = 1;
+				modes->binary_io = binary_io;
+			}
 			
 			break;
 	}

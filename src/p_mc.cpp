@@ -191,3 +191,5 @@ extern "C" void __sinit_p_mc_cpp(void)
     table[8] = table2[1];
     table[9] = table2[2];
 }
+
+__declspec(section ".ctors") extern void* const __sinit_p_mc_cpp_reference = __sinit_p_mc_cpp;

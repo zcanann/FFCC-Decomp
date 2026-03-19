@@ -544,14 +544,10 @@ void CMaterialEditorPcs::drawViewer()
  */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-    f32 maxInit = kMaterialEditorControlMaxInit;
     f32 minInit = kMaterialEditorControlMinInit;
-    minPos.x = maxInit;
-    minPos.y = maxInit;
-    minPos.z = maxInit;
-    maxPos.x = minInit;
-    maxPos.y = minInit;
-    maxPos.z = minInit;
+    f32 maxInit = kMaterialEditorControlMaxInit;
+    minPos.x = minPos.y = minPos.z = maxInit;
+    maxPos.x = maxPos.y = maxPos.z = minInit;
 
     for (; count > 0; count--, points++) {
         const Vec& point = *points;

@@ -146,8 +146,9 @@ void pppDrawMng::DrawOt()
 
 					if (lastType != prim->m_type)
 					{
+						CCharaPcs* charaPcs = &CharaPcs;
 						pppInitDrawEnv(0);
-						CharaPcs.InitEnv(4);
+						charaPcs->InitEnv(4);
 					}
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);

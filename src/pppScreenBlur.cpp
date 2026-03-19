@@ -10,7 +10,6 @@ void InitBlurParameter__8CGraphicFv(void* graphic);
 void RenderBlur__8CGraphicFiUcUcUcUcs(void* graphic, int enable, u8 r, u8 g, u8 b, u8 strength, s16 work);
 }
 
-extern float ppvScreenMatrix[4][4];
 
 /*
  * --INFO--

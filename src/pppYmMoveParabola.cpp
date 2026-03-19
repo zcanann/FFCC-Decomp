@@ -6,8 +6,6 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-extern _pppMngSt* pppMngStPtr;
-
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);

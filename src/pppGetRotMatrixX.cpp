@@ -1,7 +1,5 @@
 #include "ffcc/pppGetRotMatrixX.h"
 
-extern float ppvSinTbl[];
-
 /*
  * --INFO--
  * PAL Address: 0x8005f794

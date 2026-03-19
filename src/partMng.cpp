@@ -3733,7 +3733,9 @@ void CPartMng::pppFieldEndFpNo(short fieldNo)
  */
 void CPartMng::pppSetDeltaIdx(short index, long color)
 {
-    *reinterpret_cast<long*>(reinterpret_cast<char*>(this) + (index * 0x158) + 0x2ac0) = color;
+    char* delta = reinterpret_cast<char*>(this);
+    delta += index * 0x158;
+    *reinterpret_cast<long*>(delta + 0x2ac0) = color;
 }
 
 /*

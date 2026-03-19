@@ -613,13 +613,8 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     Mtx cameraMtx;
     Mtx44 orthoMtx;
     Mtx44 screenMtx;
-    float indMtx[2][3] = {
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-    };
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    float x2 = x + width;
-    float y2 = y + height;
+    float indMtx[2][3];
+    GXColor white;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -640,6 +635,7 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
 
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
@@ -653,19 +649,34 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetNumTexGens(0);
+    *reinterpret_cast<u32*>(&white) = 0xFFFFFFFF;
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetNumChans(1);
 
+    float x1 = x;
+    float y1 = y;
+    float z1 = kUtilZero;
+    float x2 = x + width;
+    float y2 = y + height;
+    float z2 = kUtilZero;
+    float x3 = x2;
+    float y3 = y2;
+    float z3 = kUtilZero;
+    float x4 = x1;
+    float y4 = y2;
+    float z4 = kUtilZero;
+    u32 colorValue = *reinterpret_cast<u32*>(&color);
+
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, kUtilZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
-    GXPosition3f32(x2, y, kUtilZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
-    GXPosition3f32(x2, y2, kUtilZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
-    GXPosition3f32(x, y2, kUtilZero);
-    GXColor1u32(*reinterpret_cast<u32*>(&color));
+    GXPosition3f32(x1, y1, z1);
+    GXColor1u32(colorValue);
+    GXPosition3f32(x2, y1, z2);
+    GXColor1u32(colorValue);
+    GXPosition3f32(x3, y3, z3);
+    GXColor1u32(colorValue);
+    GXPosition3f32(x4, y4, z4);
+    GXColor1u32(colorValue);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);

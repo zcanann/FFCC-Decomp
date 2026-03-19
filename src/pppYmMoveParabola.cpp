@@ -26,11 +26,12 @@ void pppNormalize__FR3Vec3Vec(float*, Vec*);
  */
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
+    _pppMngSt* pppMngSt = pppMngStPtr;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    _pppMngSt* pppMngSt = pppMngStPtr;
     f32* work = (f32*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
 
     work[1] = work[1] + work[2];
@@ -43,7 +44,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
 
     double frameCount = (double)*(u16*)(work + 3);
     Vec direction;
-    if ((u32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if (Game.game.m_currentSceneId == 7) {
         direction.y = gPppYmMoveParabolaZero;
         direction.x = gPppYmMoveParabolaYOffsetStep;
         direction.z = gPppYmMoveParabolaZero;
@@ -63,7 +64,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         (double)(f32)(frameCount * (double)(f32)((double)(gPppYmMoveParabolaGravityScale * stepData->m_initWOrk) * frameCount)));
 
     Vec newPosition;
-    if ((u32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if (Game.game.m_currentSceneId == 7) {
         Vec offset;
         Vec basePosition;
 
@@ -115,7 +116,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     work[0] = zero;
     *(u16*)(work + 3) = 1;
 
-    if ((u32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if (Game.game.m_currentSceneId == 7) {
         Vec basePos = pppMngSt->m_savedPosition;
         Vec worldOffset;
         Vec addPos;

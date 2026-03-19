@@ -360,14 +360,18 @@ void CFunnyShapePcs::destroyViewer()
 void CFunnyShapePcs::calcViewer()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(self + 0x3C);
+    int usbDone = reinterpret_cast<CUSBStreamData*>(self + 0x3C)->IsUSBStreamDataDone();
 
-    if (usbStream->IsUSBStreamDataDone() != 0) {
+    if (usbDone != 0) {
         SetUSBData();
-        usbStream->SetUSBStreamDataDone();
+        reinterpret_cast<CUSBStreamData*>(self + 0x3C)->SetUSBStreamDataDone();
     }
 
-    if ((static_cast<s8>(self[0x6124]) != 0) && (*reinterpret_cast<u32*>(self + 0x6134) != 0)) {
+    if (static_cast<s8>(self[0x6124]) != 0) {
+        if (*reinterpret_cast<u32*>(self + 0x6134) == 0) {
+            return;
+        }
+
         reinterpret_cast<CFunnyShape*>(self + 0x50)->Update();
     }
 }

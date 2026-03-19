@@ -396,13 +396,13 @@ void CMenuPcs::ArtiInit1()
 unsigned int CMenuPcs::ArtiOpen()
 {
 	float ratio;
-	double stepF64;
-	double durationF64;
+	double dVar2;
+	double dVar3;
 	short* entry;
 	int finished;
-	int count;
+	unsigned int count;
 	int frame;
-	int remaining;
+	unsigned int remaining;
 
 	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
 		ArtiInit();
@@ -410,25 +410,29 @@ unsigned int CMenuPcs::ArtiOpen()
 
 	finished = 0;
 	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
-	count = (int)*GetArtiList(this);
+	count = (unsigned int)*GetArtiList(this);
 	entry = GetArtiList(this) + 4;
 	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);
 	remaining = count;
-	if (0 < count) {
+	if (0 < (int)count) {
 		do {
-			durationF64 = DOUBLE_80332fe0;
+			dVar3 = DOUBLE_80332fe0;
 			ratio = FLOAT_80332fa8;
 			if (*(int*)(entry + 0x12) <= frame) {
 				if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
 					*(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
-					stepF64 = DOUBLE_80332fb0;
-					*(float*)(entry + 8) = (float)((DOUBLE_80332fb0 / ((double)*(unsigned int*)(entry + 0x14) - durationF64)) *
-					                               ((double)*(unsigned int*)(entry + 0x10) - durationF64));
+					dVar2 = DOUBLE_80332fb0;
+					*(float*)(entry + 8) = (float)((DOUBLE_80332fb0 /
+					                               ((double)(int)*(unsigned int*)(entry + 0x14) - dVar3)) *
+					                              ((double)(int)*(unsigned int*)(entry + 0x10) - dVar3));
 					if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
-						ratio = (float)((stepF64 / ((double)*(unsigned int*)(entry + 0x14) - durationF64)) *
-						                ((double)*(unsigned int*)(entry + 0x10) - durationF64));
-						*(float*)(entry + 0x18) = (*(float*)(entry + 0x1c) - (float)((double)(int)*entry - durationF64)) * ratio;
-						*(float*)(entry + 0x1a) = (*(float*)(entry + 0x1e) - (float)((double)(int)entry[1] - durationF64)) * ratio;
+						ratio = (float)((dVar2 /
+						                ((double)(int)*(unsigned int*)(entry + 0x14) - dVar3)) *
+						               ((double)(int)*(unsigned int*)(entry + 0x10) - dVar3));
+						*(float*)(entry + 0x18) =
+						    (*(float*)(entry + 0x1c) - (float)((double)(int)*entry - dVar3)) * ratio;
+						*(float*)(entry + 0x1a) =
+						    (*(float*)(entry + 0x1e) - (float)((double)(int)entry[1] - dVar3)) * ratio;
 					}
 				} else {
 					finished = finished + 1;

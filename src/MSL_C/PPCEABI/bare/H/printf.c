@@ -769,10 +769,9 @@ static char* float2str(long double num, char *buff, print_format format) {
             return p;
     }
 
-    dec.exp += dec.sig.length;
-    --dec.exp;
-    p = buff - 1;
-    *p = 0;
+    dec.exp += dec.sig.length - 1;
+    p = buff;
+    *--p = 0;
 
     switch (format.conversion_char)
     {

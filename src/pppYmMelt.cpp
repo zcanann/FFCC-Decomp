@@ -92,12 +92,13 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
 {
     int i;
     int pointCount;
-    double savedY;
-    double zero;
-    double rayY;
-    double top;
-    double expand;
+    float savedY;
+    float zero;
+    float rayY;
+    float top;
+    float expand;
     Vec worldBase;
+    Vec rayDirection;
     CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
 
@@ -121,24 +122,25 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
         worldBase.z = pppMngStPtr->m_matrix.value[2][3];
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
+        rayDirection.x = zero;
+        rayDirection.y = rayY;
+        rayDirection.z = zero;
         cylinder.m_bottom = vertex->m_position;
-        cylinder.m_direction.x = (float)zero;
-        cylinder.m_direction.y = (float)rayY;
-        cylinder.m_direction.z = (float)zero;
-        cylinder.m_radius = (float)zero;
-        cylinder.m_height = (float)zero;
-        cylinder.m_top.x = (float)top;
-        cylinder.m_top.y = (float)top;
-        cylinder.m_top.z = (float)top;
-        cylinder.m_direction2.x = (float)expand;
-        cylinder.m_direction2.y = (float)expand;
-        cylinder.m_direction2.z = (float)expand;
-        cylinder.m_radius2 = (float)expand;
-        cylinder.m_height2 = (float)expand;
+        cylinder.m_direction = rayDirection;
+        cylinder.m_radius = zero;
+        cylinder.m_height = zero;
+        cylinder.m_top.x = top;
+        cylinder.m_top.y = top;
+        cylinder.m_top.z = top;
+        cylinder.m_direction2.x = expand;
+        cylinder.m_direction2.y = expand;
+        cylinder.m_direction2.z = expand;
+        cylinder.m_radius2 = expand;
+        cylinder.m_height2 = expand;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cylinder,
-                                                                   &cylinder.m_direction, 0xFFFFFFFF) == 0) {
-            vertex->m_position.y = (float)savedY;
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) == 0) {
+            vertex->m_position.y = savedY;
             if (param_2->m_hideWhenNoGround != 0) {
                 vertex->m_color[0] = 0;
                 vertex->m_color[1] = 0;
@@ -147,8 +149,8 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
             }
         } else {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &vertex->m_position);
-            if (((float)vertex->m_position.y < (float)(savedY - (double)param_2->m_maxDropDistance)) &&
-                ((vertex->m_position.y = (float)savedY), param_2->m_hideWhenNoGround != 0)) {
+            if ((vertex->m_position.y < (savedY - param_2->m_maxDropDistance)) &&
+                ((vertex->m_position.y = savedY), param_2->m_hideWhenNoGround != 0)) {
                 vertex->m_color[0] = 0;
                 vertex->m_color[1] = 0;
                 vertex->m_color[2] = 0;
@@ -156,8 +158,8 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
             }
         }
 
-        vertex->m_position.y = vertex->m_position.y + param_2->m_heightBias;
-        vertex->m_position.y = (float)((double)vertex->m_position.y - param_4);
+        vertex->m_position.y += param_2->m_heightBias;
+        vertex->m_position.y -= param_4;
     }
 
     DCFlushRange(param_3, pointCount * 0x10);

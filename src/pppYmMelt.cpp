@@ -267,7 +267,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;
     work->m_phase = work->m_phase + work->m_phaseVelocity;
 
-    if (ctrl->m_graphId == *(s32*)ymMelt) {
+    if (ctrl->m_graphId == ymMelt->m_graphId) {
         work->m_phase += *(float*)&ctrl->m_payload[0];
         work->m_phaseVelocity += *(float*)&ctrl->m_payload[4];
         work->m_phaseAccel += *(float*)&ctrl->m_payload[8];

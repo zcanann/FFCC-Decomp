@@ -1427,14 +1427,16 @@ CGPartyObj* CGame::GetPartyObj(int index)
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
     char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
+    char** itemEntry = &itemTable[itemIndex * 5];
+
     if (count > 1) {
-        sprintf(out, s_numNameFmt, count, itemTable[itemIndex * 5 + 3]);
+        sprintf(out, s_numNameFmt, count, itemEntry[3]);
         return out;
     }
 
     unsigned char hasSeparator = 0;
-    char* prefix = itemTable[itemIndex * 5];
-    char* itemName = itemTable[itemIndex * 5 + 1];
+    char* prefix = itemEntry[0];
+    char* itemName = itemEntry[1];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;
@@ -1520,14 +1522,16 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
     char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
+    char** monEntry = &monTable[monIndex * 5];
+
     if (count > 1) {
-        sprintf(out, s_numNameFmt, count, monTable[monIndex * 5 + 3]);
+        sprintf(out, s_numNameFmt, count, monEntry[3]);
         return out;
     }
 
     unsigned char hasSeparator = 0;
-    char* prefix = monTable[monIndex * 5];
-    char* monName = monTable[monIndex * 5 + 1];
+    char* prefix = monEntry[0];
+    char* monName = monEntry[1];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;

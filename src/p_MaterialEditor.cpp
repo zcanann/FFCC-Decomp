@@ -27,6 +27,8 @@ extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
 extern "C" float FLOAT_8032FCC8;
+extern "C" float FLOAT_8032FCD8;
+extern "C" float FLOAT_8032FCDC;
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -398,51 +400,57 @@ void CMaterialEditorPcs::ClearTextureData()
 void CMaterialEditorPcs::calcViewer()
 {
     struct ViewerSRT {
+        float transX;
+        float transY;
+        float transZ;
         float scaleX;
         float scaleY;
         float scaleZ;
         float rotX;
         float rotY;
         float rotZ;
-        float transX;
-        float transY;
-        float transZ;
     };
+
+    Mtx cameraMatrix;
+    ViewerSRT srt;
+    Mtx scaleMatrix;
 
     USBPcs.mccReadData();
 
-    if (m_usbStream.IsUSBStreamDataDone()) {
+    int usbDone = m_usbStream.IsUSBStreamDataDone();
+    if (usbDone != 0) {
         SetUSBData();
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    ViewerSRT srt;
-    srt.scaleX = 4.0f;
-    srt.scaleY = 4.0f;
-    srt.scaleZ = 4.0f;
-    srt.rotX = 1.0f;
-    srt.rotY = 1.0f;
-    srt.rotZ = 1.0f;
+    srt.transX = FLOAT_8032FCD8;
+    srt.transY = FLOAT_8032FCD8;
+    srt.transZ = FLOAT_8032FCD8;
+    srt.scaleX = FLOAT_8032FCD8;
+    srt.scaleY = FLOAT_8032FCD8;
+    srt.scaleZ = FLOAT_8032FCD8;
+    srt.rotX = FLOAT_8032FCC8;
+    srt.rotY = FLOAT_8032FCC8;
+    srt.rotZ = FLOAT_8032FCC8;
     srt.transX = field268_0x15c.x;
     srt.transY = field268_0x15c.y;
     srt.transZ = -field268_0x15c.z;
     CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
 
-    Mtx cameraMatrix;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
-    m_unkMatrix.value[0][0] = *reinterpret_cast<float*>(&field_0x12c);
-    m_unkMatrix.value[0][1] = *reinterpret_cast<float*>(&field_0x130);
-    m_unkMatrix.value[0][2] = *reinterpret_cast<float*>(&field_0x134);
-    m_unkMatrix.value[0][3] = *reinterpret_cast<float*>(&field_0x138);
-    m_unkMatrix.value[1][0] = *reinterpret_cast<float*>(&field_0x13c);
-    m_unkMatrix.value[1][1] = *reinterpret_cast<float*>(&field_0x140);
-    m_unkMatrix.value[1][2] = *reinterpret_cast<float*>(&field_0x144);
-    m_unkMatrix.value[1][3] = *reinterpret_cast<float*>(&field_0x148);
-    m_unkMatrix.value[2][0] = *reinterpret_cast<float*>(&field_0x14c);
-    m_unkMatrix.value[2][1] = *reinterpret_cast<float*>(&field_0x150);
-    m_unkMatrix.value[2][2] = *reinterpret_cast<float*>(&field_0x154);
-    m_unkMatrix.value[2][3] = *reinterpret_cast<float*>(&field_0x158);
+    m_unkMatrix.value[0][0] = field_0x12c;
+    m_unkMatrix.value[0][1] = field_0x130;
+    m_unkMatrix.value[0][2] = field_0x134;
+    m_unkMatrix.value[0][3] = field_0x138;
+    m_unkMatrix.value[1][0] = field_0x13c;
+    m_unkMatrix.value[1][1] = field_0x140;
+    m_unkMatrix.value[1][2] = field_0x144;
+    m_unkMatrix.value[1][3] = field_0x148;
+    m_unkMatrix.value[2][0] = field_0x14c;
+    m_unkMatrix.value[2][1] = field_0x150;
+    m_unkMatrix.value[2][2] = field_0x154;
+    m_unkMatrix.value[2][3] = field_0x158;
 
     PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
 
@@ -453,13 +461,12 @@ void CMaterialEditorPcs::calcViewer()
     m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
     m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
 
-    Mtx scaleMatrix;
     PSMTXIdentity(scaleMatrix);
-    scaleMatrix[1][1] = -1.0f;
+    scaleMatrix[1][1] = FLOAT_8032FCDC;
     PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
 
     PSMTXIdentity(scaleMatrix);
-    scaleMatrix[2][2] = -1.0f;
+    scaleMatrix[2][2] = FLOAT_8032FCDC;
     PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
 
     PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);

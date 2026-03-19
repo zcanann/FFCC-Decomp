@@ -48,24 +48,25 @@ public:
     unsigned char _pad08[0x7C];
     CUSBStreamData m_usbStream; // 0x84
 
-    pppFMATRIX m_unkMatrix; // 0xB4
-    unsigned char _padE4[0x48];
+    unsigned char _padA8[0x84];
 
     // Raw float words consumed by calcViewer (0x12C - 0x158)
-    char field_0x12c[4];
-    char field_0x130[4];
-    char field_0x134[4];
-    char field_0x138[4];
-    char field_0x13c[4];
-    char field_0x140[4];
-    char field_0x144[4];
-    char field_0x148[4];
-    char field_0x14c[4];
-    char field_0x150[4];
-    char field_0x154[4];
-    char field_0x158[4];
+    float field_0x12c;
+    float field_0x130;
+    float field_0x134;
+    float field_0x138;
+    float field_0x13c;
+    float field_0x140;
+    float field_0x144;
+    float field_0x148;
+    float field_0x14c;
+    float field_0x150;
+    float field_0x154;
+    float field_0x158;
 
     Vec field268_0x15c; // 0x15C
+    unsigned char _pad168[0xA4];
+    pppFMATRIX m_unkMatrix; // 0x20C
 };
 
 extern CMaterialEditorPcs MaterialEditorPcs;

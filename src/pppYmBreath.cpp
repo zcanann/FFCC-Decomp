@@ -836,24 +836,26 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
  */
 extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
 {
-    Mtx* work = (Mtx*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
-    unsigned char* state = (unsigned char*)work;
+    unsigned char* state = (unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets;
+    float zero;
 
-    PSMTXIdentity(*work);
+    PSMTXIdentity(*(Mtx*)state);
+    zero = FLOAT_80330c80;
 
-    work[1][2][0] = 0.0f;
-    work[1][1][3] = 0.0f;
-    work[1][1][2] = 0.0f;
-    work[1][0][0] = 0.0f;
-    work[1][0][1] = 0.0f;
-    work[1][0][2] = 0.0f;
-    work[1][0][3] = 0.0f;
-    work[1][1][0] = 0.0f;
+    *(float*)(state + 0x50) = FLOAT_80330c80;
+    *(float*)(state + 0x4C) = zero;
+    *(float*)(state + 0x48) = zero;
 
-    *(short*)(state + 0x46) = 10000;
-    *(short*)(state + 0x4A) = 0;
-    *(short*)(state + 0x4E) = 0;
-    *(unsigned char*)(state + 0x50) = 0;
+    *(int*)(state + 0x30) = 0;
+    *(int*)(state + 0x34) = 0;
+    *(int*)(state + 0x38) = 0;
+    *(int*)(state + 0x3C) = 0;
+    *(int*)(state + 0x40) = 0;
+
+    *(short*)(state + 0x44) = 10000;
+    *(short*)(state + 0x54) = 0;
+    *(short*)(state + 0x56) = 0;
+    *(unsigned char*)(state + 0x58) = 0;
 }
 
 /*
@@ -998,5 +1000,3 @@ void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short part
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
-
-

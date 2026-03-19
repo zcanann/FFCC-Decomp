@@ -209,20 +209,33 @@ void pppLight(void* param1, void* param2, void* param3)
 
 		light.m_attenRadius = work->attenRadius;
 		light.m_attenFalloff = work->attenFalloff;
+		light.m_radius = kPppLightOne;
+		light.m_part = pppMngStPtr;
+		*(u32*)light.m_bumpShade = 0;
 
-		light.m_targetColor[0].r = (u8)(work->color0R >> 7);
-		light.m_targetColor[0].g = (u8)(work->color0G >> 7);
-		light.m_targetColor[0].b = (u8)(work->color0B >> 7);
-		light.m_targetColor[0].a = (u8)(work->color0A >> 7);
+		u8 colorR = (u8)(work->color0R >> 7);
+		u8 colorG = (u8)(work->color0G >> 7);
+		u8 colorB = (u8)(work->color0B >> 7);
+		u8 colorA = (u8)(work->color0A >> 7);
+		light.m_targetColor[0].r = colorR;
+		light.m_targetColor[0].g = colorG;
+		light.m_targetColor[0].b = colorB;
+		light.m_targetColor[0].a = colorA;
 
 		if (step->color1Enabled != 0) {
-			light.m_targetColor[1] = light.m_targetColor[0];
+			light.m_targetColor[1].r = colorR;
+			light.m_targetColor[1].g = colorG;
+			light.m_targetColor[1].b = colorB;
+			light.m_targetColor[1].a = colorA;
 		} else {
 			*(u32*)&light.m_targetColor[1] = 0;
 		}
 
 		if (step->color2Enabled != 0) {
-			light.m_targetColor[2] = light.m_targetColor[0];
+			light.m_targetColor[2].r = colorR;
+			light.m_targetColor[2].g = colorG;
+			light.m_targetColor[2].b = colorB;
+			light.m_targetColor[2].a = colorA;
 		} else {
 			*(u32*)&light.m_targetColor[2] = 0;
 		}

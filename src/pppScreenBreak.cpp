@@ -387,7 +387,7 @@ void GXSetTexCoordGen(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenBreak* work)
+void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
 {
     s16 sVar2;
     s16 sVar3;
@@ -533,15 +533,15 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
         local_c8.z = DAT_801dd4c4;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
-        dVar17 = (double)Math.RandF(*(float*)((u8*)pppScreenBreak + 0x3C));
-        PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)pppScreenBreak + 0x38) + dVar17));
+        dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));
+        PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)step + 0x38) + dVar17));
 
         inVec[1].x = (float)dVar22;
         inVec[1].y = (float)dVar22;
         inVec[1].z = (float)dVar22;
         inVec[4].x = (float)dVar22;
 
-        uStack_b4 = (u32)*(u8*)((u8*)pppScreenBreak + 0x34);
+        uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);
         dVar17 = (double)Math.RandF((float)uStack_b4);
         iVar16 += 0x14;
         inVec[4].y = (float)(dVar25 * (double)(float)(dVar24 + dVar17));
@@ -675,8 +675,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    float* value = (float*)((u8*)pppScreenBreak + param_3->m_serializedDataOffsets[2] + 0x80);
-    u8* colorSource = (u8*)pppScreenBreak + param_3->m_serializedDataOffsets[0];
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
+    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(float**)(model + 0xE4) = value;
@@ -701,7 +702,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         *(void**)&value[3] = pieceStorage;
         *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25F);
-        InitPieceData((CChara::CModel*)model, pppScreenBreak, (VScreenBreak*)value);
+        InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 

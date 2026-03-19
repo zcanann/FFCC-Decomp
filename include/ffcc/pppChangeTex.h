@@ -22,7 +22,7 @@ struct pppChangeTexUnkB {
     s32 m_dataValIndex;
     float m_initWOrk;
     float m_stepValue;
-    u8 m_arg3;
+    float m_arg3;
     u8 m_payload[6];
     u8 _pad1[1];
 };

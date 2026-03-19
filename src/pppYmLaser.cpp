@@ -10,7 +10,6 @@
 
 #include <string.h>
 
-extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
 extern const f32 FLOAT_80330df0;
@@ -121,7 +120,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	work->m_shapeA = 0;
 	work->m_shapeC = 0;
 	work->m_shapeB = 0;
-	work->m_shapeRotZ = RandF__5CMathFf(randArg, &Math);
+	work->m_shapeRotZ = Math.RandF(randArg);
 }
 
 /*

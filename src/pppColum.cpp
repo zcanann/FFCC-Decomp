@@ -43,7 +43,6 @@ static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-float RandF__5CMathFf(float, CMath*);
 unsigned char GetNoise__5CUtilFUc(void*, unsigned int);
 void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 void pppInitBlendMode__Fv(void);
@@ -208,9 +207,9 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 
             values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values->m_scaleStep = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
+                values->m_scaleStep = Math.RandF(*(float*)(param_2->m_payload + 4));
                 values->m_scaleStep = values->m_scaleStep + *(float*)(param_2->m_payload + 0);
-                values->m_positionScale = RandF__5CMathFf(*(float*)(param_2->m_payload + 0xc), &Math);
+                values->m_positionScale = Math.RandF(*(float*)(param_2->m_payload + 0xc));
                 values->m_positionScale = values->m_positionScale + *(float*)(param_2->m_payload + 8);
                 values->m_colorR =
                     GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x16));

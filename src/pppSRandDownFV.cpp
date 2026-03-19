@@ -6,7 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 extern f32 gPppDefaultValueBuffer[];
 
-extern "C" f32 RandF__5CMathFv(CMath*);
 
 struct PppSRandDownFVParam2 {
     s32 field0;
@@ -49,9 +48,9 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = -RandF__5CMathFv(&Math);
+            f32 value = -Math.RandF();
             if (flag != 0) {
-                f32 random = RandF__5CMathFv(&Math);
+                f32 random = Math.RandF();
                 f32 blend = value - random;
                 f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
@@ -61,9 +60,9 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = -RandF__5CMathFv(&Math);
+            f32 value = -Math.RandF();
             if (flag != 0) {
-                f32 random = RandF__5CMathFv(&Math);
+                f32 random = Math.RandF();
                 f32 blend = value - random;
                 f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
@@ -73,9 +72,9 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = -RandF__5CMathFv(&Math);
+            f32 value = -Math.RandF();
             if (flag != 0) {
-                f32 random = RandF__5CMathFv(&Math);
+                f32 random = Math.RandF();
                 f32 blend = value - random;
                 f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;

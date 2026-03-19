@@ -23,7 +23,6 @@ extern const f64 DOUBLE_80333438;
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-f32 RandF__5CMathFf(f32, CMath*);
 int GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(CGame*, PPPIFPARAM*, int*, int*);
 void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);
 void* GetPartyObj__5CGameFi(CGame*, int);
@@ -146,7 +145,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     *((u16*)((u8*)pfVar3 + 0x34)) = 0;
     *((u16*)((u8*)pfVar3 + 0x32)) = 0;
 
-    pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, &Math);
+    pfVar3[14] = Math.RandF(FLOAT_8033345c);
     *((u8*)pfVar3 + 0x4c) = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(

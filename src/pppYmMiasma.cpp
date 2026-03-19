@@ -19,7 +19,6 @@ extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
-extern float RandF__5CMathFf(float, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
@@ -142,7 +141,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     fVar2 = fVar2 * (float)((double)vYmMiasma->m_radius + dVar8);
     particleData->m_matrix[0][0] = fVar2;
     particleData->m_matrix[1][0] = fVar2;
-    dVar7 = (double)RandF__5CMathFf(pYmMiasma->m_heightJitter, &Math);
+    dVar7 = (double)Math.RandF(pYmMiasma->m_heightJitter);
     particleData->m_matrix[0][1] = (float)dVar7;
     particleData->m_matrix[1][1] = (float)dVar7;
     fVar2 = (float)(dVar9 * (double)(float)((double)vYmMiasma->m_radius + dVar8));

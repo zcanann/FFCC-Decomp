@@ -2,8 +2,6 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-extern "C" {
-}
 
 /*
  * --INFO--

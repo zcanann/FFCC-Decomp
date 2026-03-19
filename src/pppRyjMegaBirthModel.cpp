@@ -6,7 +6,6 @@
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern "C" float RandF__5CMathFv(CMath*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 
 extern float FLOAT_80330498;
@@ -44,7 +43,7 @@ static inline u8* u8_at(void* base, s32 off)
  */
 void get_rand(void)
 {
-    (void)RandF__5CMathFv(&Math);
+    (void)Math.RandF();
 }
 
 /*
@@ -55,7 +54,7 @@ void get_rand(void)
 void get_noise(unsigned char count)
 {
     while (count > 0) {
-        (void)RandF__5CMathFv(&Math);
+        (void)Math.RandF();
         count--;
     }
 }
@@ -261,9 +260,9 @@ void birth(
         float baseDirectionX = *(float*)(payload + 0x48);
         float baseDirectionY = *(float*)(payload + 0x4C);
         float baseDirectionZ = *(float*)(payload + 0x50);
-        float randX = (FLOAT_803304a4 * (float)(randomRange * RandF__5CMathFv(&Math) - halfSpread)) / FLOAT_803304c4;
-        float randY = (FLOAT_803304a4 * (float)(randomRange * RandF__5CMathFv(&Math) - halfSpread)) / FLOAT_803304c4;
-        float randZ = (FLOAT_803304a4 * (float)(randomRange * RandF__5CMathFv(&Math) - halfSpread)) / FLOAT_803304c4;
+        float randX = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
+        float randY = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
+        float randZ = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
 
         if ((mode == 2) || (mode == 3)) {
             randX = FLOAT_80330498;
@@ -284,9 +283,9 @@ void birth(
 
     if (speedMag != FLOAT_80330498) {
         float halfSpeed = speedMag * 0.5f;
-        particleData->m_velocity.x = RandF__5CMathFv(&Math) * speedMag - halfSpeed;
-        particleData->m_velocity.y = RandF__5CMathFv(&Math) * speedMag - halfSpeed;
-        particleData->m_velocity.z = RandF__5CMathFv(&Math) * speedMag - halfSpeed;
+        particleData->m_velocity.x = Math.RandF() * speedMag - halfSpeed;
+        particleData->m_velocity.y = Math.RandF() * speedMag - halfSpeed;
+        particleData->m_velocity.z = Math.RandF() * speedMag - halfSpeed;
     }
 
     particleData->m_sizeStart = *(float*)(payload + 0x84);

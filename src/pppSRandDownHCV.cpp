@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern s16 gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandDownHCVParam2 {
     s32 field0;
@@ -48,9 +47,9 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 
 		{
 			u8 flag = in->field10;
-			float value = -RandF__5CMathFv(&Math);
+			float value = -Math.RandF();
 			if (flag != 0) {
-				float random = RandF__5CMathFv(&Math);
+				float random = Math.RandF();
 				float blend = value - random;
 				float scale = kPppSRandDownHCVDualSampleScale;
 				value = blend * scale;
@@ -60,9 +59,9 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 
 		{
 			u8 flag = in->field10;
-			float value = -RandF__5CMathFv(&Math);
+			float value = -Math.RandF();
 			if (flag != 0) {
-				float random = RandF__5CMathFv(&Math);
+				float random = Math.RandF();
 				float blend = value - random;
 				float scale = kPppSRandDownHCVDualSampleScale;
 				value = blend * scale;
@@ -72,9 +71,9 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 
 		{
 			u8 flag = in->field10;
-			float value = -RandF__5CMathFv(&Math);
+			float value = -Math.RandF();
 			if (flag != 0) {
-				float random = RandF__5CMathFv(&Math);
+				float random = Math.RandF();
 				float blend = value - random;
 				float scale = kPppSRandDownHCVDualSampleScale;
 				value = blend * scale;
@@ -84,9 +83,9 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 
 		{
 			u8 flag = in->field10;
-			float value = -RandF__5CMathFv(&Math);
+			float value = -Math.RandF();
 			if (flag != 0) {
-				float random = RandF__5CMathFv(&Math);
+				float random = Math.RandF();
 				float blend = value - random;
 				float scale = kPppSRandDownHCVDualSampleScale;
 				value = blend * scale;

@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
@@ -31,9 +30,9 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = *((u8*)param2 + 0xC);
-            float value = -RandF__5CMathFv(&Math);
+            float value = -Math.RandF();
             if (flag != 0) {
-                float random = RandF__5CMathFv(&Math);
+                float random = Math.RandF();
                 float blend = value - random;
                 float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
@@ -43,9 +42,9 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = *((u8*)param2 + 0xC);
-            float value = -RandF__5CMathFv(&Math);
+            float value = -Math.RandF();
             if (flag != 0) {
-                float random = RandF__5CMathFv(&Math);
+                float random = Math.RandF();
                 float blend = value - random;
                 float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
@@ -55,9 +54,9 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = *((u8*)param2 + 0xC);
-            float value = -RandF__5CMathFv(&Math);
+            float value = -Math.RandF();
             if (flag != 0) {
-                float random = RandF__5CMathFv(&Math);
+                float random = Math.RandF();
                 float blend = value - random;
                 float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
@@ -67,9 +66,9 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = *((u8*)param2 + 0xC);
-            float value = -RandF__5CMathFv(&Math);
+            float value = -Math.RandF();
             if (flag != 0) {
-                float random = RandF__5CMathFv(&Math);
+                float random = Math.RandF();
                 float blend = value - random;
                 float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;

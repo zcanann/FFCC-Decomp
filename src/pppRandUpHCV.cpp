@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern s16 gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath* instance);
 static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;
 
 typedef struct RandUpHCVParams {
@@ -41,9 +40,9 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
     RandUpHCVCtx* ctx = (RandUpHCVCtx*)p3;
     f32* valuePtr;
     if (params->index == *(int*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(&Math);
+        f32 value = Math.RandF();
         if (params->flag != 0) {
-            f32 random = RandF__5CMathFv(&Math);
+            f32 random = Math.RandF();
             f32 blend = value + random;
             value = blend * kPppRandUpHCVDualSampleScale;
         }

@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern f32 gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath*);
 
 struct RandDownFloatParam {
     s32 targetId;
@@ -43,9 +42,9 @@ void pppRandDownFloat(void* param1, void* param2, void* param3)
 
     s32 id = *(s32*)(base + 0xC);
     if (id == 0) {
-        f32 value = -RandF__5CMathFv(&Math);
+        f32 value = -Math.RandF();
         if (p2->randomTwice != 0) {
-            f32 randomValue = value - RandF__5CMathFv(&Math);
+            f32 randomValue = value - Math.RandF();
             value = randomValue * kPppRandDownFloatDualSampleScale;
         }
 

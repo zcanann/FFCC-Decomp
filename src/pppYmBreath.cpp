@@ -11,7 +11,6 @@
 struct pppFMATRIX;
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-extern "C" float RandF__5CMathFv(CMath* instance);
 extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
@@ -106,9 +105,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.y = 0.0f;
     baseDir.z = -1.0f;
 
-    angle.x = (short)((spread + spread) * RandF__5CMathFv(&Math) - spread);
-    angle.y = (short)((spread + spread) * RandF__5CMathFv(&Math) - spread);
-    angle.z = (short)((spread + spread) * RandF__5CMathFv(&Math) - spread);
+    angle.x = (short)((spread + spread) * Math.RandF() - spread);
+    angle.y = (short)((spread + spread) * Math.RandF() - spread);
+    angle.z = (short)((spread + spread) * Math.RandF() - spread);
     angle.w = 0;
 
     pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
@@ -139,11 +138,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
 
     if (*(char*)(breath + 0xC2) != 0) {
-        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * RandF__5CMathFv(&Math);
+        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
         flags = *(unsigned char*)(breath + 0xC2);
 
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-            if (RandF__5CMathFv(&Math) > 0.5f) {
+            if (Math.RandF() > 0.5f) {
                 *(float*)(particle + 0x60) = -*(float*)(particle + 0x60);
             }
         } else if ((flags & 2) != 0) {
@@ -173,14 +172,14 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     if (*(unsigned char*)(breath + 0xC1) != 0) {
         flags = *(unsigned char*)(breath + 0xC1);
         if ((flags & 0x20) == 0) {
-            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&Math);
-            *(float*)(particle + 0x78) = *(float*)(breath + 0x84) * RandF__5CMathFv(&Math);
+            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * Math.RandF();
+            *(float*)(particle + 0x78) = *(float*)(breath + 0x84) * Math.RandF();
 
             if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-                if (RandF__5CMathFv(&Math) > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
                 }
-                if (RandF__5CMathFv(&Math) > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
                 }
             } else if ((flags & 2) != 0) {
@@ -188,11 +187,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
                 *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
             }
         } else {
-            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&Math);
+            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * Math.RandF();
             *(float*)(particle + 0x78) = *(float*)(particle + 0x74);
 
             if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-                if (RandF__5CMathFv(&Math) > 0.5f) {
+                if (Math.RandF() > 0.5f) {
                     *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
                     *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
                 }
@@ -215,7 +214,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     *(float*)(particle + 0x80) = *(float*)(breath + 0x18);
     if (*(float*)(breath + 0xA8) != 0.0f) {
         spread = *(float*)(breath + 0xA8);
-        *(float*)(particle + 0x80) += (spread + spread) * RandF__5CMathFv(&Math) - spread;
+        *(float*)(particle + 0x80) += (spread + spread) * Math.RandF() - spread;
     }
 
     if (*(short*)(breath + 0x24) == 0) {

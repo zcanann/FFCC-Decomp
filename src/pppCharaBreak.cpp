@@ -64,7 +64,6 @@ void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int,
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
 void ConvF2IVector__5CUtilFR6S16Vec3Vecl(void*, S16Vec*, Vec*, unsigned long);
-float RandF__5CMathFf(float, CMath*);
 }
 
 struct POLYGON_DATA {
@@ -400,9 +399,9 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         }
 
         if (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x54) == 0) {
-            normal.x = RandF__5CMathFf(FLOAT_8033204c, &Math);
-            normal.y = RandF__5CMathFf(FLOAT_8033204c, &Math);
-            normal.z = RandF__5CMathFf(FLOAT_8033204c, &Math);
+            normal.x = Math.RandF(FLOAT_8033204c);
+            normal.y = Math.RandF(FLOAT_8033204c);
+            normal.z = Math.RandF(FLOAT_8033204c);
             normal.x *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
             normal.y *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
             normal.z *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
@@ -588,7 +587,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         normalA.y = *(short*)(polygon + 6);
                         normalA.z = *(short*)(polygon + 8);
                         ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &velocity, &normalA, normQuant);
-                        PSVECScale(&velocity, &velocity, *(float*)(stepData + 0x38) + RandF__5CMathFf(*(float*)(stepData + 0x3C), &Math));
+                        PSVECScale(&velocity, &velocity, *(float*)(stepData + 0x38) + Math.RandF(*(float*)(stepData + 0x3C)));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
                         PSMTXQuat(rotMtx, &rotQuat);
@@ -627,10 +626,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 verts[i].y += -(*(float*)(stepData + 0x10) * (float)*(u16*)(polygon + 2) - velocity.y);
                                 verts[i].z += velocity.z;
                             } else if (stepData[0x40] == 1) {
-                                wobbleScale = FLOAT_8033204c + RandF__5CMathFf(FLOAT_80332064, &Math);
+                                wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].x += cosValue * wobbleScale;
                                 verts[i].y += -(*(float*)(stepData + 0x10) * (float)*(u16*)(polygon + 2) - velocity.y);
-                                wobbleScale = FLOAT_8033204c + RandF__5CMathFf(FLOAT_80332064, &Math);
+                                wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].z += sinValue * wobbleScale;
                             }
 

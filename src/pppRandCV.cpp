@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-extern "C" f32 RandF__5CMathFv(CMath*);
 
 typedef struct RandCVParams {
     s32 index;
@@ -41,9 +40,9 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     if (params->index == *(s32*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(&Math);
+        f32 value = Math.RandF();
         if (params->flag != 0) {
-            value = value + RandF__5CMathFv(&Math);
+            value = value + Math.RandF();
         } else {
             value = value * kPppRandCVSingleSampleScale;
         }

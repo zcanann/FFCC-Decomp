@@ -50,9 +50,6 @@ struct VertexApLcSource
 
 struct _pppPDataVal;
 
-extern "C" {
-f32 RandF__5CMathFv(CMath*);
-}
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
@@ -128,7 +125,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                f32 randValue = RandF__5CMathFv(&Math);
+                f32 randValue = Math.RandF();
                 f32 maxValue = (f32)entry->maxValue;
                 int outValue = (int)(randValue * maxValue);
                 u16 vertexIndex = vertexIndices[outValue];

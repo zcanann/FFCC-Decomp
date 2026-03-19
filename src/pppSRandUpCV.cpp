@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct SRandUpCVParam {
     s32 targetId;
@@ -44,9 +43,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
+                f32 randomPair = value + Math.RandF();
                 value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[0] = value;
@@ -54,9 +53,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
+                f32 randomPair = value + Math.RandF();
                 value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[1] = value;
@@ -64,9 +63,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
+                f32 randomPair = value + Math.RandF();
                 value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[2] = value;
@@ -74,9 +73,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(&Math);
+                f32 randomPair = value + Math.RandF();
                 value = randomPair * kPppSRandUpCVDualSampleScale;
             }
             target[3] = value;

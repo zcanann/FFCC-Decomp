@@ -49,7 +49,6 @@ void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, un
 void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-float RandF__5CMathFf(float, CMath*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
@@ -421,7 +420,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
             float* particle = (float*)state[0];
             for (u32 i = 0; i < particleCount; i++) {
-                RandF__5CMathFf(FLOAT_803311e4, &Math);
+                Math.RandF(FLOAT_803311e4);
 
                 int r = rand();
                 s16 lifeJitter = (s16)(r % payload[0xD]);
@@ -431,7 +430,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 s16 fade = (u16)payload[0xC] + safeJitter;
                 *(s16*)((u8*)particle + 10) = *(s16*)(particle + 3) + safeJitter + fade;
 
-                float randOffset = RandF__5CMathFf(*(float*)(payload + 4), &Math);
+                float randOffset = Math.RandF(*(float*)(payload + 4));
                 particle[0] = ((float)i * randOffset) + FLOAT_803311e4;
                 *(u16*)(particle + 1) = 0;
                 *((u8*)particle + 0xE) = (u8)((int)payload[0xB] / (int)fade);
@@ -441,7 +440,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
         float* particle = (float*)state[0];
         for (int i = 0; i < particleCount; i++) {
-            float randOffset = RandF__5CMathFf(*(float*)(payload + 4), &Math);
+            float randOffset = Math.RandF(*(float*)(payload + 4));
             particle[0] = particle[0] + *(float*)(state + 3) + randOffset;
 
             if (*(s16*)(particle + 3) < 1) {
@@ -466,7 +465,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
                 *(u16*)(particle + 3) = payload[0xF];
                 *(u16*)((u8*)particle + 10) = (u16)(payload[0xF] + payload[0xE] + jitter + payload[0xC]);
-                particle[0] = FLOAT_803311e4 + RandF__5CMathFf(*(float*)(payload + 4), &Math);
+                particle[0] = FLOAT_803311e4 + Math.RandF(*(float*)(payload + 4));
                 *(u16*)(particle + 1) = 0;
                 *((u8*)particle + 0xE) = payload[0xB] / payload[0xC];
             }

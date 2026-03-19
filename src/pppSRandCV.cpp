@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct SRandCVParam {
     s32 targetId;
@@ -45,9 +44,9 @@ void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -56,9 +55,9 @@ void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -67,9 +66,9 @@ void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }
@@ -78,9 +77,9 @@ void pppSRandCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            float value = RandF__5CMathFv(&Math);
+            float value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandCVSingleSampleScale;
             }

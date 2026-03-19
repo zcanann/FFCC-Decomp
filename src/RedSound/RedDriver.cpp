@@ -55,6 +55,17 @@ struct RedWaveSettingState {
     int waveSize;
 };
 
+struct RedDriverSyncState {
+    u8 m_work[0x1F18];
+    OSSemaphore m_mainSemaphore;
+    u8 m_pad2240[0x2240 - 0x1F18 - sizeof(OSSemaphore)];
+    OSSemaphore m_waveSemaphore;
+    u8 m_pad2578[0x2578 - 0x2240 - sizeof(OSSemaphore)];
+    OSSemaphore m_dmaSemaphore;
+    u8 m_pad28c0[0x28C0 - 0x2578 - sizeof(OSSemaphore)];
+    OSSemaphore m_musicSemaphore;
+};
+
 CRedEntry DAT_8032e154;
 CRedMemory DAT_8032f480;
 CRedDriver CRedDriver_8032f4c0;
@@ -123,6 +134,11 @@ OSSemaphore DAT_8032ddd8;
 ARQRequest DAT_8032dde4;
 OSThread DAT_8032de08;
 OSSemaphore DAT_8032e120;
+
+static inline RedDriverSyncState& RedDriverSync()
+{
+    return *reinterpret_cast<RedDriverSyncState*>(DAT_8032b860);
+}
 
 extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);
@@ -1359,12 +1375,14 @@ void CRedDriver::Init()
  */
 void CRedDriver::End()
 {
+    RedDriverSyncState& sync = RedDriverSync();
+
     AXRegisterCallback(0);
     DAT_8032f3c0 = 0;
-    OSSignalSemaphore(&DAT_8032d778);
-    OSSignalSemaphore(&DAT_8032daa0);
-    OSSignalSemaphore(&DAT_8032ddd8);
-    OSSignalSemaphore(&DAT_8032e120);
+    OSSignalSemaphore(&sync.m_mainSemaphore);
+    OSSignalSemaphore(&sync.m_waveSemaphore);
+    OSSignalSemaphore(&sync.m_dmaSemaphore);
+    OSSignalSemaphore(&sync.m_musicSemaphore);
     while (DAT_8032f3c4 != 0) {
         RedSleep(0);
     }

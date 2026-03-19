@@ -19,31 +19,19 @@ extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    unsigned int* table;
-    const unsigned int* desc0;
-    const unsigned int* desc1;
-    const unsigned int* desc2;
-    const unsigned int* desc3;
-
     *reinterpret_cast<void**>(&SoundPcs) = __vt__9CSoundPcs;
-    table = m_table__9CSoundPcs;
-    desc0 = m_table_desc0__9CSoundPcs;
-    desc1 = m_table_desc1__9CSoundPcs;
-    desc2 = m_table_desc2__9CSoundPcs;
-    desc3 = m_table_desc3__9CSoundPcs;
-
-    table[1] = desc0[0];
-    table[2] = desc0[1];
-    table[3] = desc0[2];
-    table[4] = desc1[0];
-    table[5] = desc1[1];
-    table[6] = desc1[2];
-    table[7] = desc2[0];
-    table[8] = desc2[1];
-    table[9] = desc2[2];
-    table[12] = desc3[0];
-    table[13] = desc3[1];
-    table[14] = desc3[2];
+    m_table__9CSoundPcs[1] = m_table_desc0__9CSoundPcs[0];
+    m_table__9CSoundPcs[2] = m_table_desc0__9CSoundPcs[1];
+    m_table__9CSoundPcs[3] = m_table_desc0__9CSoundPcs[2];
+    m_table__9CSoundPcs[4] = m_table_desc1__9CSoundPcs[0];
+    m_table__9CSoundPcs[5] = m_table_desc1__9CSoundPcs[1];
+    m_table__9CSoundPcs[6] = m_table_desc1__9CSoundPcs[2];
+    m_table__9CSoundPcs[7] = m_table_desc2__9CSoundPcs[0];
+    m_table__9CSoundPcs[8] = m_table_desc2__9CSoundPcs[1];
+    m_table__9CSoundPcs[9] = m_table_desc2__9CSoundPcs[2];
+    m_table__9CSoundPcs[12] = m_table_desc3__9CSoundPcs[0];
+    m_table__9CSoundPcs[13] = m_table_desc3__9CSoundPcs[1];
+    m_table__9CSoundPcs[14] = m_table_desc3__9CSoundPcs[2];
 }
 
 /*

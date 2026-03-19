@@ -60,6 +60,27 @@ extern float FLOAT_80330428;
 extern float FLOAT_8033042c;
 extern float FLOAT_80330430;
 
+struct Vec4d {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+struct CModelAnimState {
+    u8 _padB4[0xB4];
+    float m_curFrame;
+    CChara::CAnim* m_anim;
+    float m_time;
+    float m_animStart;
+    float m_animEnd;
+};
+
+static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
+{
+    return *reinterpret_cast<CModelAnimState*>(model);
+}
+
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
     typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
@@ -1823,12 +1844,74 @@ void CGObject::SetDamageCol(int, char*, float, float, Vec*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007d0e4
+ * PAL Size: 556b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::boundCheck()
 {
-	// TODO
+    Vec clipCorner;
+    Vec4d clipPos;
+    Mtx cameraMtx;
+    Mtx44 clipMtx;
+    Mtx44 screenMtx;
+    u32 clipMask = 0x1F;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(cameraMtx, clipMtx);
+    clipMtx[3][0] = sZeroFloat;
+    clipMtx[3][1] = sZeroFloat;
+    clipMtx[3][2] = sZeroFloat;
+    clipMtx[3][3] = sAnimFrameOffset;
+
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTX44Concat(screenMtx, clipMtx, screenMtx);
+
+    if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
+        const double zero = static_cast<double>(sZeroFloat);
+        const double one = static_cast<double>(sAnimFrameOffset);
+        const double clipLimit = 2.0;
+
+        for (u32 i = 0; (clipMask != 0) && (i < 8); i++) {
+            clipCorner.x = m_worldPosition.x + (((i & 1) == 0) ? m_nearColRadius : -m_nearColRadius);
+            clipCorner.y = m_worldPosition.y + (((i & 4) == 0) ? m_nearColRadius : -m_nearColRadius);
+            clipCorner.z = m_worldPosition.z + (((i & 2) == 0) ? m_nearColRadius : -m_nearColRadius);
+
+            Math.MTX44MultVec4(screenMtx, &clipCorner, &clipPos);
+            if (zero < static_cast<double>(clipPos.w)) {
+                clipMask &= 0xFFFFFFEF;
+            }
+            if (clipMask == 0) {
+                break;
+            }
+
+            const float invW = static_cast<float>(one / static_cast<double>(clipPos.w));
+            clipPos.x *= invW;
+            clipPos.y *= invW;
+
+            if (clipLimit < static_cast<double>(clipPos.x)) {
+                clipMask &= 0xFFFFFFFE;
+            }
+            if (clipLimit < static_cast<double>(clipPos.y)) {
+                clipMask &= 0xFFFFFFFD;
+            }
+            if (static_cast<double>(clipPos.x) < one) {
+                clipMask &= 0xFFFFFFFB;
+            }
+            if (static_cast<double>(clipPos.y) < one) {
+                clipMask &= 0xFFFFFFF7;
+            }
+        }
+
+        *reinterpret_cast<u8*>(&m_weaponNodeFlags) =
+            (static_cast<u8>((static_cast<u32>(__cntlzw(clipMask)) >> 5) << 5) & 0x20)
+            | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) & 0xDF);
+    }
+
+    Math.MTX44MultVec4(screenMtx, &m_worldPosition, reinterpret_cast<Vec4d*>(&m_projection.y));
 }
 
 /*
@@ -2051,12 +2134,90 @@ int CGObject::IsLoopAnim(int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c808
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::IsAnimFinished(int)
+int CGObject::IsAnimFinished(int mode)
 {
-	// TODO
+    float frame;
+    float animSpan;
+    bool hasModel = false;
+    u32 result;
+    u32 shieldFlagClz;
+    signed char shieldFlag;
+    CCharaPcs::CHandle* handle;
+    double threshold;
+
+    handle = m_charaModelHandle;
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (hasModel) {
+        if (m_currentAnimSlot != -1) {
+            shieldFlag = static_cast<signed char>(
+                static_cast<int>((static_cast<u32>(*reinterpret_cast<u8*>(&m_shieldNodeFlags)) << 0x1C) >> 0x1F));
+            shieldFlagClz = static_cast<u32>(__cntlzw(static_cast<u32>(shieldFlag)));
+            result = shieldFlagClz >> 5;
+
+            if (((shieldFlagClz >> 5) & 0xFF) != 0) {
+                hasModel = false;
+                if ((handle != 0) && (handle->m_model != 0)) {
+                    hasModel = true;
+                }
+
+                if (hasModel && (m_currentAnimSlot != -1)) {
+                    CModelAnimState& model = ModelAnimState(handle->m_model);
+                    if (model.m_anim == 0) {
+                        result = 1;
+                    } else {
+                        animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
+                        if (sAnimFrameOffset == animSpan) {
+                            result = 1;
+                        } else {
+                            if (mode == 0) {
+                                frame = model.m_time;
+                            } else {
+                                frame = m_turnSpeed;
+                            }
+
+                            threshold = static_cast<double>(frame);
+                            if (mode == 2) {
+                                threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
+                            }
+
+                            if (static_cast<double>(sZeroFloat)
+                                <= static_cast<double>(*reinterpret_cast<float*>(m_lastBgAttr))) {
+                                result =
+                                    (static_cast<u32>(static_cast<u8>(
+                                         (static_cast<double>(animSpan - sAnimFrameOffset) < threshold) << 3))
+                                     << 0x1C)
+                                    >> 0x1F;
+                            } else {
+                                result =
+                                    (static_cast<u32>(static_cast<u8>(
+                                         (threshold <= static_cast<double>(sZeroFloat)) << 1))
+                                     << 0x1C)
+                                    >> 0x1D;
+                            }
+                        }
+                    }
+                } else {
+                    result = 1;
+                }
+
+                result = static_cast<u32>(-static_cast<int>(result)) >> 0x1F;
+            }
+
+            return result & 0xFF;
+        }
+    }
+
+    return 1;
 }
 
 /*

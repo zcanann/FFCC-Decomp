@@ -209,6 +209,7 @@ void pppLight(void* param1, void* param2, void* param3)
 
 		light.m_attenRadius = work->attenRadius;
 		light.m_attenFalloff = work->attenFalloff;
+		light.m_radius = kPppLightOne;
 
 		light.m_targetColor[0].r = (u8)(work->color0R >> 7);
 		light.m_targetColor[0].g = (u8)(work->color0G >> 7);
@@ -241,13 +242,15 @@ void pppLight(void* param1, void* param2, void* param3)
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
 				unsigned char* obj;
+				u32 targetIndex;
 
 				light.m_type = 1;
-				if (step->targetIndex == -1) {
+				targetIndex = (u32)step->targetIndex;
+				if (targetIndex == (u32)-1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
 					pppLightTarget* targetTable = (pppLightTarget*)pppMngStPtr->m_programInfoTable;
-					obj = targetTable[step->targetIndex].obj;
+					obj = targetTable[targetIndex].obj;
 				}
 
 				light.m_targetPosition.x = *(f32*)(obj + 0x1c);

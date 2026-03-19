@@ -217,19 +217,19 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_54[1][1] = stepValue * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
 		local_54[2][2] = stepValue * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
 
-		local_6c.x = pppMngStPtr->m_matrix.value[0][3];
-		local_6c.y = pppMngStPtr->m_matrix.value[1][3];
-		local_6c.z = pppMngStPtr->m_matrix.value[2][3];
+		local_60.x = pppMngStPtr->m_matrix.value[0][3];
+		local_60.y = pppMngStPtr->m_matrix.value[1][3];
+		local_60.z = pppMngStPtr->m_matrix.value[2][3];
 
-		PSMTXMultVec(ppvCameraMatrix02, &local_6c, &local_6c);
+		PSMTXMultVec(ppvCameraMatrix02, &local_60, &local_60);
 
-		local_54[0][3] = local_6c.x;
-		local_54[1][3] = local_6c.y;
-		local_54[2][3] = local_6c.z;
+		local_54[0][3] = local_60.x;
+		local_54[1][3] = local_60.y;
+		local_54[2][3] = local_60.z;
 
-		local_60 = local_6c;
+		local_6c = local_60;
 
-		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBase + 0x20), &local_60);
+		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBase + 0x20), &local_6c);
 
 		GXLoadPosMtxImm(local_54, 0);
 

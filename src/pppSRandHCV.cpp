@@ -4,7 +4,7 @@
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
-#include "ffcc/ppp_default_buffer.h"
+extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandHCVParam2 {
@@ -94,10 +94,8 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		}
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
-	s16* target_colors;
-	if (in->field4 == -1) {
-		target_colors = (s16*)gPppDefaultValueBuffer;
-	} else {
+	s16* target_colors = gPppDefaultValueBuffer;
+	if (in->field4 != -1) {
 		target_colors = (s16*)(base + in->field4 + 0x80);
 	}
 

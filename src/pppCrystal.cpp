@@ -264,27 +264,25 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 		{ DAT_801db5d8, DAT_801db5dc, DAT_801db5e0, DAT_801db5e4 },
 	};
 
-	texW = FLOAT_80330fa8;
-	texH = FLOAT_80330fa8;
-	if (param_2->m_payload[0] != 1) {
+	if (param_2->m_payload[0] == 1) {
+		texW = FLOAT_80330fa8;
+		texH = FLOAT_80330fa8;
+	}
+	else {
 		texW = (float)*(u32*)(indirectTex + 0x64);
 		texH = (float)*(u32*)(indirectTex + 0x68);
 	}
 
-	float indMtx[2][3];
+	float indMtx[2][3] = {};
 	indMtx[0][0] = ((FLOAT_80330fac * texW) / FLOAT_80330fb0) * param_2->m_stepValue;
-	indMtx[0][1] = DAT_801db5ec;
-	indMtx[0][2] = DAT_801db5f0;
-	indMtx[1][0] = DAT_801db5f4;
 	indMtx[1][1] = ((FLOAT_80330fac * texH) / FLOAT_80330fb4) * param_2->m_stepValue;
-	indMtx[1][2] = DAT_801db5fc;
 
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	GXSetNumTexGens(3);
 	GXSetNumTevStages(3);
 
 	Mtx lightMtx;
-	if (Game.game.m_currentSceneId == 7) {
+	if ((int)Game.game.m_currentSceneId == 7) {
 		C_MTXLightPerspective(
 			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	} else {

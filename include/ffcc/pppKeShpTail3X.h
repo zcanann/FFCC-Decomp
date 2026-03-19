@@ -7,9 +7,11 @@ struct pppFVECTOR4;
 
 struct pppKeShpTail3X
 {
+    u8 _pad0[0xc];
     _pppPObject pppPObject;
-    char field_0x34[0x48];
-    char field_0x7d;
+    pppFMATRIX field_0x40;
+    u8 field_0x70[0xd];
+    u8 field_0x7d;
 };
 
 struct pppKeShpTail3XUnkB;
@@ -30,4 +32,3 @@ void S4ToF32(pppFVECTOR4*, short*);
 #endif
 
 #endif // _PPP_KESHPTAIL3X_H_
-

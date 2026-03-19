@@ -334,15 +334,15 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         pos.z = segBaseZ;
 
         if (step->m_payload[0x3f] == 0) {
-            PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)obj + 0x40), drawScale * pppMngStPtr->m_scale.x,
+            PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
                             drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
             if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
-                pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&tmpMtx, (pppFMATRIX*)((u8*)obj + 0x40));
-                pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX((pppFMATRIX*)((u8*)obj + 0x40), &rotMtx, &tmpMtx);
+                pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&tmpMtx, &obj->field_0x40);
+                pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&obj->field_0x40, &rotMtx, &tmpMtx);
             }
             PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
-            PSMTXCopy(*(Mtx*)((u8*)obj + 0x40), drawMtx.value);
+            PSMTXCopy(obj->field_0x40.value, drawMtx.value);
         } else if (step->m_payload[0x3f] == 1) {
             pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
             drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);

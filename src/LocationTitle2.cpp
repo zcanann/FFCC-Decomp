@@ -24,6 +24,11 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
+static int GetGraphFrameFromId(u32 graphId)
+{
+    return (int)graphId / 0x1000;
+}
+
 struct LocationTitle2Work {
     void* m_particles;
     u16 m_count;
@@ -124,8 +129,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
     if (unkB->m_graphId == locationTitle->m_graphId) {
         work->m_cur += unkB->m_arg3;
-        work->m_vel += *(float*)unkB->m_payload;
-        work->m_acc += *(float*)((u8*)unkB->m_payload + 4);
+        work->m_vel += unkB->m_payload0;
+        work->m_acc += unkB->m_payload1;
     }
 
     if (work->m_particles == 0) {
@@ -192,7 +197,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 double stepScale;
                 LocationTitle2Particle* startParticle;
 
-                stepCount = *(u8*)&unkB->m_stepValue;
+                stepCount = unkB->m_stepCount;
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
@@ -256,14 +261,10 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
     if (dataValIndex != 0xFFFF) {
         u32 graphId = locationTitle->m_graphId;
-        int graphFrame = (int)graphId >> 12;
+        int graphFrame = GetGraphFrameFromId(graphId);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
         long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-        u8 blendMode = *((u8*)&unkB->m_stepValue + 1);
-
-        if ((int)graphId < 0 && (graphId & 0xFFF) != 0) {
-            graphFrame++;
-        }
+        u8 blendMode = unkB->m_blendMode;
 
         pppSetBlendMode(blendMode);
 

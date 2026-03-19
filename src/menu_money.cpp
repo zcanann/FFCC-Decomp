@@ -268,7 +268,7 @@ void CMenuPcs::MoneyCtrl()
 {
 	int iVar2 = 0;
 	int iVar3;
-	short sVar1;
+	int sVar1;
 
 	*reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x32) = *reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x30);
 	iVar3 = GetMoneyStateBase(this);
@@ -278,7 +278,7 @@ void CMenuPcs::MoneyCtrl()
 	} else if ((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 0)) {
 		if (*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) == 1) {
 			iVar2 = 0;
-			*reinterpret_cast<short*>(iVar3 + 0x12) = 1;
+			*reinterpret_cast<short*>(iVar3 + 0x12) = *reinterpret_cast<short*>(iVar3 + 0x12) + 1;
 		}
 	} else if (((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 2)) &&
 		       (*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) == 3)) {

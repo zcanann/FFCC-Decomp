@@ -3592,9 +3592,9 @@ void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
     char* pppMngSt = reinterpret_cast<char*>(this);
 
     for (int i = 0; i < 0x180; i++) {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000
-            && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9) = isVisible;
+        if (*reinterpret_cast<int*>(pppMngSt + 0x2A2C) != -0x1000
+            && *reinterpret_cast<int*>(pppMngSt + 0x2B18) == slot) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0x2B01) = isVisible;
         }
         pppMngSt += 0x158;
     }

@@ -426,6 +426,7 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 
+    unsigned char m_unk0[0x2A18];
     _pppMngSt m_pppMng[0x60];
 };
 

@@ -3971,6 +3971,10 @@ void CPartMng::pppDestroyAll()
  */
 extern "C" void __sinit_partMng_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated from global variable initialization.
+    // To match, replace with proper constructors or initializer expressions, then
+    // delete this function so the compiler auto-generates it.
+
     __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18, (void (*)(void*))__ct__9_pppMngStFv, 0,
                       0x158, 0x180);
 

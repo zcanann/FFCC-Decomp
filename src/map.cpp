@@ -3513,6 +3513,10 @@ void CMapMng::GetFogEnable()
  */
 extern "C" void __sinit_map_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     __construct_array(Ptr(&MapMng, 0x14), __ct__8COctTreeFv, __dt__8COctTreeFv, 0x4C, 0x10);
     __construct_array(Ptr(&MapMng, 0x4D4), __ct__7CMapHitFv, __dt__7CMapHitFv, 0x24, 0x20);
     __construct_array(Ptr(&MapMng, 0x954), __ct__7CMapObjFv, __dt__7CMapObjFv, 0xF0, 0x200);

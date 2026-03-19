@@ -2189,6 +2189,10 @@ COctNode::COctNode()
  */
 extern "C" void __sinit_mapocttree_cpp()
 {
+    // NOTE: This __sinit is compiler-generated from global variable initialization.
+    // To match, replace with proper constructors or initializer expressions, then
+    // delete this function so the compiler auto-generates it.
+
 	float* bound = reinterpret_cast<float*>(Ptr(&s_bound, 0x0));
 
 	bound[2] = kOctTreeBoundMinInit;

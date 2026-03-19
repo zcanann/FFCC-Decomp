@@ -24,6 +24,10 @@ extern char __vt_CProcess[];
  */
 extern "C" void __sinit_p_gba_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
 	*reinterpret_cast<void**>(&GbaPcs) = __vt_CProcess;
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__7CGbaPcs;

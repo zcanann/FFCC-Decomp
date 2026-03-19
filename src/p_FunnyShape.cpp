@@ -100,6 +100,10 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
     u32* dst = reinterpret_cast<u32*>(m_table__14CFunnyShapePcs);
 

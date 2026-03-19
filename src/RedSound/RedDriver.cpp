@@ -155,6 +155,10 @@ extern void InitReverb();
  */
 extern "C" void __sinit_RedDriver_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     void* uVar1;
     
     uVar1 = __ct__10CRedMemoryFv(&DAT_8032f480);

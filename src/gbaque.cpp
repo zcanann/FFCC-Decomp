@@ -4327,6 +4327,10 @@ void GbaQueue::ClrStartBonusFlg(int channel)
  */
 extern "C" void __sinit_gbaque_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated from global variable initialization.
+    // To match, replace with proper constructors or initializer expressions, then
+    // delete this function so the compiler auto-generates it.
+
 	GbaQue.Init();
 	__register_global_object(&GbaQue, __dt__8GbaQueueFv, ARRAY_802f49b0);
 }

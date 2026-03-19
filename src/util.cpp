@@ -44,6 +44,10 @@ CUtil gUtil;
  */
 extern "C" void __sinit_util_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     *reinterpret_cast<void**>(&gUtil) = __vt__5CUtil;
 }
 

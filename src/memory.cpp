@@ -172,6 +172,10 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 extern "C" void __sinit_memory_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     *reinterpret_cast<void**>(&Memory) = __vt__8CManager;
     *reinterpret_cast<void**>(&Memory) = __vt__7CMemory;
 }

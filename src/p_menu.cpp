@@ -90,6 +90,10 @@ static inline void ReleaseRefObject(void* object)
  */
 extern "C" void __sinit_p_menu_cpp()
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
     u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
     u32* table = reinterpret_cast<u32*>(gMenuProcessTable);
 

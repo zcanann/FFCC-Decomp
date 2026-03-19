@@ -133,6 +133,10 @@ void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
  */
 extern "C" void __sinit_p_camera_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
     unsigned int* dst = PTR_s_CCameraPcs_GAME__801e915c;
 
     *reinterpret_cast<void**>(&CameraPcs) = __vt__10CCameraPcs;

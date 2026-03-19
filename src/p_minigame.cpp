@@ -65,6 +65,10 @@ static bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
  */
 extern "C" void __sinit_p_minigame_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
     unsigned int* table = reinterpret_cast<unsigned int*>(m_table__12CMiniGamePcs);
 
     *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(__vt__12CMiniGamePcs);

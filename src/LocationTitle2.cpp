@@ -106,14 +106,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 {
     int colorOffset;
     LocationTitle2Work* work;
-    u32 graphId;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     colorOffset = unkC->m_serializedDataOffsets[1];
-    graphId = locationTitle->m_graphId;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     rand();
 
@@ -124,38 +122,30 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
-    if (unkB->m_graphId == graphId) {
+    if (unkB->m_graphId == locationTitle->m_graphId) {
         work->m_cur += unkB->m_arg3;
         work->m_vel += *(float*)unkB->m_payload;
         work->m_acc += *(float*)((u8*)unkB->m_payload + 4);
     }
 
     if (work->m_particles == 0) {
-        u16 maxCount;
         LocationTitle2Particle* particles;
-        pppFMATRIX* localMatrix;
         int ownerData;
         CChara::CModel* model;
         int nodeIndex;
         u8* modelBytes;
         u8* modelAnim;
         u8* modelNodes;
-        u16 animFrameCount;
 
-        localMatrix = &locationTitle->m_localMatrix;
-        maxCount = unkB->m_maxCount;
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
+            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
-        memset(work->m_particles, 0, maxCount * sizeof(LocationTitle2Particle));
+        memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
 
         ownerData = *(int*)((u8*)pppMngStPtr->m_owner + 0xF8);
-        if (ownerData == 0) {
-            ownerData = 0;
-        }
         model = 0;
-        if (*(CChara::CModel**)(ownerData + 0x168) != 0) {
+        if (ownerData != 0 && *(CChara::CModel**)(ownerData + 0x168) != 0) {
             model = *(CChara::CModel**)(ownerData + 0x168);
         }
 
@@ -163,9 +153,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         modelBytes = (u8*)model;
         modelAnim = *(u8**)(modelBytes + 0xA4);
         modelNodes = *(u8**)(modelBytes + 0xA8);
-        animFrameCount = *(u16*)(modelAnim + 0x10);
 
-        for (u32 frameIndex = 0; frameIndex < animFrameCount; frameIndex++) {
+        for (u32 frameIndex = 0; frameIndex < *(u16*)(modelAnim + 0x10); frameIndex++) {
             Mtx nodeMtx;
             LocationTitle2Particle* particle;
             u16 count;
@@ -185,12 +174,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             particle->m_shape = 0;
             particle->m_pad1 = 0;
             particle->m_frame = (s16)frameIndex;
-            particle->m_scaleX = localMatrix->value[0][0];
-            particle->m_scaleY = localMatrix->value[1][1];
-            particle->m_scaleZ = localMatrix->value[2][2];
+            particle->m_scaleX = locationTitle->m_localMatrix.value[0][0];
+            particle->m_scaleY = locationTitle->m_localMatrix.value[1][1];
+            particle->m_scaleZ = locationTitle->m_localMatrix.value[2][2];
             work->m_count = count + 1;
 
-            if (maxCount <= (u16)(work->m_count + 1)) {
+            if (unkB->m_maxCount <= (u16)(work->m_count + 1)) {
                 return;
             }
 
@@ -220,7 +209,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     inserted++;
                     work->m_count++;
 
-                    if (maxCount <= (u16)(work->m_count + 1)) {
+                    if (unkB->m_maxCount <= (u16)(work->m_count + 1)) {
                         break;
                     }
                 }
@@ -238,9 +227,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     dst->m_pad0 = 0;
                     dst->m_shape = 0;
                     dst->m_pad1 = 0;
-                    dst->m_scaleX = localMatrix->value[0][0];
-                    dst->m_scaleY = localMatrix->value[1][1];
-                    dst->m_scaleZ = localMatrix->value[2][2];
+                    dst->m_scaleX = locationTitle->m_localMatrix.value[0][0];
+                    dst->m_scaleY = locationTitle->m_localMatrix.value[1][1];
+                    dst->m_scaleZ = locationTitle->m_localMatrix.value[2][2];
                     dst->m_frame = (s16)frameIndex;
                 }
             }

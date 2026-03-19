@@ -30,7 +30,7 @@ public:
     };
     
     CMapObjAtr();
-    ~CMapObjAtr();
+    virtual ~CMapObjAtr();
 };
 
 class CMapObjAtrPlaySta : public CMapObjAtr

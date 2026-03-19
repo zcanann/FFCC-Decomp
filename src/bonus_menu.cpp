@@ -22,10 +22,16 @@ extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+#pragma force_active on
 extern "C" {
 int gBonusMenuWork0 = 0;
-float* gBonusCheckMarkPosBuffer = 0;
+unsigned char gBonusMenuFlag0 = 0;
+unsigned char gBonusMenuFlag1 = 0;
+unsigned char gBonusMenuFlag2 = 0;
+unsigned char gBonusMenuFlagPad = 0;
+float* gBonusCheckMarkPosBuffer[2];
 }
+#pragma force_active reset
 static const char s_drawBonusFmt[] = "draw Bonus[%d]\n";
 
 namespace {
@@ -166,7 +172,7 @@ void CMenuPcs::BonusInit()
 {
 	gBonusMenuWork0 = 0;
 	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
-	gBonusCheckMarkPosBuffer = 0;
+	gBonusCheckMarkPosBuffer[0] = 0;
 }
 
 /*
@@ -927,7 +933,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(artiAlpha * 255.0f)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
-		float* markPos = gBonusCheckMarkPosBuffer;
+		float* markPos = gBonusCheckMarkPosBuffer[0];
 		if (markPos != 0) {
 			for (int i = 0; i < 8; i++) {
 				if ((activeMask & (1 << i)) != 0) {

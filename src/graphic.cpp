@@ -455,7 +455,8 @@ void CGraphic::EndFrame()
  */
 void CGraphic::SetDrawDoneDebugData(signed char drawDoneId)
 {
-    u16 token = (u16)((System.m_currentOrderIndex << 8) | (u8)drawDoneId);
+    unsigned int token = (unsigned int)System.m_currentOrderIndex << 8;
+    token = (token & 0xFFFFFF00) | (u8)drawDoneId;
     GXSetDrawSync(token);
 }
 

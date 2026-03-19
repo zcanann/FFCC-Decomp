@@ -435,7 +435,7 @@ void CMenuPcs::SetCrystalCageAttr()
 		pppDeletePart__8CPartMngFi(&PartMng, state->m_crystalPart);
 	}
 
-	unsigned int chaliceElement = reinterpret_cast<CGame*>(&Game)->m_gameWork.m_chaliceElement;
+	unsigned int chaliceElement = Game.game.m_gameWork.m_chaliceElement;
 	if ((chaliceElement & 1U) != 0) {
 		state->m_crystalAttr = 0xE;
 		state->m_crystalElem = 1;

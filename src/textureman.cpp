@@ -664,23 +664,23 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             strcpy(reinterpret_cast<char*>(texture + 0x08), chunkFile.GetString());
             break;
         case 0x494D4147:
-            if (amemCacheSet == 0) {
-                if (texture[0x75] == 0) {
-                    *reinterpret_cast<void**>(texture + 0x78) =
-                        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x15C, 0);
-                    chunkFile.Get(*reinterpret_cast<void**>(texture + 0x78), chunk.m_size);
-                } else {
-                    *reinterpret_cast<void**>(texture + 0x78) = chunkFile.GetAddress();
-                }
-                DCFlushRange(*reinterpret_cast<void**>(texture + 0x78), chunk.m_size);
-                *reinterpret_cast<short*>(texture + 0x72) = -1;
-            } else {
+            if (amemCacheSet != 0) {
                 void* data = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x150, 0);
                 chunkFile.Get(data, chunk.m_size);
                 *reinterpret_cast<short*>(texture + 0x72) = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
                     amemCacheSet, data, chunk.m_size, static_cast<CAmemCache::TYPE>(0), cacheTag);
                 __dl__FPv(data);
                 *reinterpret_cast<void**>(texture + 0x78) = 0;
+            } else {
+                if (texture[0x75] != 0) {
+                    *reinterpret_cast<void**>(texture + 0x78) = chunkFile.GetAddress();
+                } else {
+                    *reinterpret_cast<void**>(texture + 0x78) =
+                        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x15C, 0);
+                    chunkFile.Get(*reinterpret_cast<void**>(texture + 0x78), chunk.m_size);
+                }
+                DCFlushRange(*reinterpret_cast<void**>(texture + 0x78), chunk.m_size);
+                *reinterpret_cast<short*>(texture + 0x72) = -1;
             }
             break;
         case 0x464D5420: {
@@ -739,12 +739,12 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             }
             break;
         case 0x50414C54:
-            if (texture[0x75] == 0) {
+            if (texture[0x75] != 0) {
+                *reinterpret_cast<void**>(texture + 0x7C) = chunkFile.GetAddress();
+            } else {
                 *reinterpret_cast<void**>(texture + 0x7C) =
                     _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x178, 0);
                 chunkFile.Get(*reinterpret_cast<void**>(texture + 0x7C), chunk.m_size);
-            } else {
-                *reinterpret_cast<void**>(texture + 0x7C) = chunkFile.GetAddress();
             }
             DCFlushRange(*reinterpret_cast<void**>(texture + 0x7C), chunk.m_size);
             break;

@@ -55,7 +55,6 @@ struct PppLightStep {
 };
 
 extern "C" {
-void __ct__Q29CLightPcs6CLightFv(void*);
 void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
 }
 
@@ -151,7 +150,6 @@ void pppLight(void* param1, void* param2, void* param3)
 
 	{
 		PppLightWork* work = (PppLightWork*)(pObject + ctrlTable->m_serializedDataOffsets[0] + 0x80);
-		CLightPcs::CLight light;
 
 		work->attenFalloffVelocity += work->attenFalloffAccel;
 		work->attenFalloff += work->attenFalloffVelocity;
@@ -202,7 +200,7 @@ void pppLight(void* param1, void* param2, void* param3)
 			work->specularScaleAccel += *(f32*)((u8*)step + 0x54);
 		}
 
-		__ct__Q29CLightPcs6CLightFv(&light);
+		CLightPcs::CLight light;
 
 		light.m_position.x = *(f32*)(pObject + 0x1c);
 		light.m_position.y = *(f32*)(pObject + 0x2c);

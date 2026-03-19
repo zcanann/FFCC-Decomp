@@ -371,8 +371,9 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         return;
     }
 
-    int dataSet = param_3->m_serializedDataOffsets[1];
-    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -381,10 +382,10 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
-    u8 baseAlpha = *((u8*)pppEmission_ + 0x8B + dataSet);
-    *(u8*)(state + 2) = *((u8*)pppEmission_ + 0x88 + dataSet);
-    *((u8*)state + 9) = *((u8*)pppEmission_ + 0x89 + dataSet);
-    *((u8*)state + 10) = *((u8*)pppEmission_ + 0x8A + dataSet);
+    u8 baseAlpha = dataSet[0xB];
+    *(u8*)(state + 2) = dataSet[8];
+    *((u8*)state + 9) = dataSet[9];
+    *((u8*)state + 10) = dataSet[0xA];
     *((u8*)state + 11) = baseAlpha;
 
     double alphaScale = (double)baseAlpha / FLOAT_803311e0;
@@ -472,9 +473,9 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 *((u8*)particle + 0xE) = payload[0xB] / payload[0xC];
             }
 
-            *((u8*)particle + 6) = *((u8*)pppEmission_ + 0x88 + dataSet);
-            *((u8*)particle + 7) = *((u8*)pppEmission_ + 0x89 + dataSet);
-            *((u8*)particle + 8) = *((u8*)pppEmission_ + 0x8A + dataSet);
+            *((u8*)particle + 6) = dataSet[8];
+            *((u8*)particle + 7) = dataSet[9];
+            *((u8*)particle + 8) = dataSet[0xA];
             *((u8*)particle + 9) = (u8)alpha;
             particle += 4;
         }

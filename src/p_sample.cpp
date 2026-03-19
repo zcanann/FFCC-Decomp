@@ -138,6 +138,8 @@ extern "C" void __sinit_p_sample_cpp(void)
 	table[14] = desc3[2];
 }
 
+__declspec(section ".ctors") extern void* const __sinit_p_sample_cpp_reference = __sinit_p_sample_cpp;
+
 /*
  * --INFO--
  * PAL Address: 0x8001fe74

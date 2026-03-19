@@ -33,6 +33,7 @@ extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 extern float FLOAT_80333000;
 extern float FLOAT_80332ff8;
 extern double DOUBLE_80333008;
+extern double DOUBLE_80333030;
 
 struct CompaOpenAnim {
 	s16 x;
@@ -355,8 +356,11 @@ void CMenuPcs::CompaCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CompaClose()
+bool CMenuPcs::CompaClose()
 {
+	int finished;
+	double one;
+	double base;
 	int compaState = (int)this->compaMenuState;
 	short* compaList = this->compaList;
 	short time = static_cast<short>(*reinterpret_cast<short*>(compaState + 0x22) + 1);
@@ -365,28 +369,37 @@ void CMenuPcs::CompaClose()
 	short* entry = compaList;
 	int entryCount = static_cast<int>(*entry);
 	short currentTime = *reinterpret_cast<short*>(compaState + 0x22);
+	finished = 0;
 	entry += 4;
 	for (int i = 0; i < entryCount; ++i) {
+		float zero = FLOAT_80332ff8;
 		if (*reinterpret_cast<int*>(entry + 0x12) <= currentTime) {
 			if (currentTime < *reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14)) {
 				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				float fade = 1.0f - static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) /
-					static_cast<float>(*reinterpret_cast<int*>(entry + 0x14));
-				*reinterpret_cast<float*>(entry + 8) = fade;
+				base = DOUBLE_80333030;
+				one = DOUBLE_80333008;
+				*reinterpret_cast<float*>(entry + 8) = (float)-((DOUBLE_80333008 /
+					(double)*reinterpret_cast<int*>(entry + 0x14)) *
+					(double)*reinterpret_cast<int*>(entry + 0x10) - DOUBLE_80333008);
 				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
+					zero = (float)-((one / (double)*reinterpret_cast<int*>(entry + 0x14)) *
+						(double)*reinterpret_cast<int*>(entry + 0x10) - one);
 					*reinterpret_cast<float*>(entry + 0x18) =
-						(*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * fade;
+						(*reinterpret_cast<float*>(entry + 0x1c) - (float)((double)(int)*entry - base)) * zero;
 					*reinterpret_cast<float*>(entry + 0x1a) =
-						(*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * fade;
+						(*reinterpret_cast<float*>(entry + 0x1e) - (float)((double)(int)entry[1] - base)) * zero;
 				}
 			} else {
+				finished += 1;
 				*reinterpret_cast<float*>(entry + 8) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
+				*reinterpret_cast<float*>(entry + 0x18) = zero;
+				*reinterpret_cast<float*>(entry + 0x1a) = zero;
 			}
 		}
 		entry += 0x20;
 	}
+
+	return entryCount == finished;
 }
 
 /*

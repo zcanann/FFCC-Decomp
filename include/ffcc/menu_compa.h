@@ -24,7 +24,7 @@ public:
     void CompaInit0();
     bool CompaOpen();
     void CompaCtrl();
-    void CompaClose();
+    bool CompaClose();
     void CompaDraw();
     void CompaCtrlCur();
 

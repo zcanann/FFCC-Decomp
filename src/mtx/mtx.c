@@ -717,11 +717,20 @@ void C_MTXRotTrig(Mtx m, char axis, f32 sinA, f32 cosA)
 }
 
 #ifdef GEKKO
+/*
+ * --INFO--
+ * PAL Address: 0x80185c9c
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void PSMTXRotTrig(register Mtx m, register char axis, register f32 sinA, register f32 cosA)
 {
     register f32 fc0, fc1, nsinA;
     register f32 fw0, fw1, fw2, fw3;
-    register f32 sinB, cosB;
+    register f32 cosB, sinB;
     // clang-format off
 
   asm {

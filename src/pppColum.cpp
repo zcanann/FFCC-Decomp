@@ -31,7 +31,7 @@ struct pppColumFrameWork {
 struct pppColumPositionWork {
     u8 _pad0[0x10];
     Vec m_position;
-    u8 _pad1[0x1A];
+    u8 _pad1[0x16];
     u8 m_alpha;
 };
 
@@ -81,11 +81,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         pppShapeSt* shapeSt =
             *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
         void* texture;
-        u8 alpha = positionWork->m_alpha;
         pppCVector color;
         GXColor quadColor;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        u8 alpha = positionWork->m_alpha;
         if (alpha != 0) {
             pppColumValue* values = frameWork->m_values;
             Mtx identityMtx;

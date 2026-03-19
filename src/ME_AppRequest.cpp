@@ -3,13 +3,13 @@
 #include "ffcc/zlist.h"
 
 extern "C" {
-void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 void __dl__FPv(void*);
 void __dla__FPv(void*);
 void* memset(void*, int, unsigned int);
 }
 
-static char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
+static const char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
 
 struct RSDITEM {
     int unk0;
@@ -138,13 +138,15 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP **, int)
  */
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
-    RSDLISTITEM* listItem = (RSDLISTITEM*)__nw__FUlPQ27CMemory6CStagePci(0x10, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x61);
+    RSDLISTITEM* listItem =
+        (RSDLISTITEM*)__nw__FUlPQ27CMemory6CStagePci(0x10, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x61);
     if (listItem == 0) {
         return 0;
     }
 
     memset(listItem, 0, 0x10);
-    RSDITEM* rsdItem = (RSDITEM*)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x67);
+    RSDITEM* rsdItem =
+        (RSDITEM*)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x67);
     if (rsdItem == 0) {
         if (listItem != 0) {
             __dl__FPv(listItem);

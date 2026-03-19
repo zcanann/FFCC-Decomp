@@ -79,6 +79,7 @@ extern float FLOAT_803314c0;
 extern float FLOAT_803314c4;
 extern float FLOAT_803314c8;
 extern float FLOAT_803314cc;
+extern float FLOAT_80331430;
 extern float FLOAT_8033151c;
 extern float FLOAT_80331528;
 extern float FLOAT_803315cc;
@@ -3449,8 +3450,14 @@ void CMenuPcs::DrawRect3d(unsigned long, float x, float y, float z, float w, flo
  */
 void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-	gWmMenuCursorX = static_cast<unsigned char>(x);
-	uRam8032ee21 = static_cast<unsigned char>(y);
+    short* const win = *reinterpret_cast<short**>(reinterpret_cast<unsigned char*>(this) + 0x848);
+
+    win[0] = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - x) * 0.5f));
+    win[1] = static_cast<short>(static_cast<int>((FLOAT_80331430 - static_cast<float>(y)) * 0.5f));
+    win[2] = static_cast<short>(x);
+    win[3] = static_cast<short>(y);
+    win[4] = 0;
+    win[5] = 3;
 }
 
 /*

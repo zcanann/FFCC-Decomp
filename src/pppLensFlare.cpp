@@ -25,12 +25,13 @@ struct LensFlareWork {
     f32 m_projectedX;
     f32 m_projectedY;
     f32 m_projectedZ;
+    f32 _pad1C;
     Vec m_viewPosition;
     s16 m_shapeFrame0;
     s16 m_shapeFrame1;
     s16 m_shapeFrame2;
-    u8 _pad32;
     u8 m_alpha;
+    u8 _pad33;
     f32 m_dot;
 };
 
@@ -205,15 +206,17 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		(shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
 		 shapeBase[0x32] != 0)) {
 		pppCVECTOR local_70;
-		Vec local_6c;
 		Vec local_60;
+		Vec local_6c;
 		Mtx local_54;
+		float stepValue;
 
 		PSMTXIdentity(local_54);
-		local_54[2][2] = *(float*)&step->m_stepValue;
-		local_54[0][0] = local_54[2][2] * pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40);
-		local_54[1][1] = local_54[2][2] * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
-		local_54[2][2] = local_54[2][2] * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
+		stepValue = *(float*)&step->m_stepValue;
+		local_54[2][2] = stepValue;
+		local_54[0][0] = stepValue * pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40);
+		local_54[1][1] = stepValue * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
+		local_54[2][2] = stepValue * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
 
 		local_60.x = pppMngStPtr->m_matrix.value[0][3];
 		local_60.y = pppMngStPtr->m_matrix.value[1][3];

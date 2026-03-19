@@ -359,17 +359,16 @@ void CFunnyShapePcs::destroyViewer()
  */
 void CFunnyShapePcs::calcViewer()
 {
-    CUSBStreamData* usb = UsbStream(this);
+    u8* self = reinterpret_cast<u8*>(this);
+    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(self + 0x3C);
 
-    if (usb->IsUSBStreamDataDone() != 0) {
+    if (usbStream->IsUSBStreamDataDone() != 0) {
         SetUSBData();
-        usb->SetUSBStreamDataDone();
+        usbStream->SetUSBStreamDataDone();
     }
 
-    if (static_cast<s8>(Ptr(this, 0x6124)[0]) != 0) {
-        if (*reinterpret_cast<u32*>(Ptr(this, 0x6134)) != 0) {
-            FunnyShape(this)->Update();
-        }
+    if ((static_cast<s8>(self[0x6124]) != 0) && (*reinterpret_cast<u32*>(self + 0x6134) != 0)) {
+        reinterpret_cast<CFunnyShape*>(self + 0x50)->Update();
     }
 }
 
@@ -386,6 +385,8 @@ void CFunnyShapePcs::drawViewer()
 {
     Mtx44 ortho;
     Mtx view;
+    u8* self = reinterpret_cast<u8*>(this);
+    CFunnyShape* funnyShape = reinterpret_cast<CFunnyShape*>(self + 0x50);
     Vec eye = {0.0f, 0.0f, 0.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
@@ -404,14 +405,14 @@ void CFunnyShapePcs::drawViewer()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    if ((Ptr(this, 0x6178)[0] & 1) != 0) {
-        FunnyShape(this)->RenderTexture();
+    if ((self[0x6178] & 1) != 0) {
+        funnyShape->RenderTexture();
     }
-    if ((Ptr(this, 0x6178)[0] & 4) != 0) {
-        FunnyShape(this)->RenderShape();
+    if ((self[0x6178] & 4) != 0) {
+        funnyShape->RenderShape();
     }
-    if ((Ptr(this, 0x6178)[0] & 8) != 0) {
-        FunnyShape(this)->Render();
+    if ((self[0x6178] & 8) != 0) {
+        funnyShape->Render();
     }
 
     frameCount++;

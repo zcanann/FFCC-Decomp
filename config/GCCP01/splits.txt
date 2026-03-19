@@ -547,6 +547,7 @@ pppSRandHCV.cpp:
 	extab       start:0x80007198 end:0x800071A0
 	extabindex  start:0x8000D114 end:0x8000D120
 	.text       start:0x80063E34 end:0x80064114
+	.sdata2     start:0x803300A0 end:0x803300B0
 
 pppSRandUpCV.cpp:
 	extab       start:0x800071A0 end:0x800071A8

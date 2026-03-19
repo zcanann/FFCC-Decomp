@@ -284,7 +284,6 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     unsigned char colorStorage[4];
     Vec lightDir;
     GXLightObj lightObj;
-    unsigned int colorPacked;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
     const float cameraOffset = FLOAT_80331ce8;
     const float zero = FLOAT_80331cc4;
@@ -297,8 +296,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, FLOAT_80331cd0, zero);
     GXInitLightAttn(&lightObj, zero, zero, FLOAT_80331cd0, FLOAT_80331cec, zero, FLOAT_80331cf0);
 
-    colorPacked = *reinterpret_cast<unsigned int*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF));
-    GXInitLightColor(&lightObj, *reinterpret_cast<GXColor*>(&colorPacked));
+    GXInitLightColor(&lightObj, *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));
     GXLoadLightObjImm(&lightObj, (GXLightID)1);
     GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);

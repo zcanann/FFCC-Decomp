@@ -9,7 +9,7 @@ class CPtrArray
 {
 public:
     CPtrArray();
-    ~CPtrArray();
+    virtual ~CPtrArray();
     
     int GetSize();
     bool Add(T item);
@@ -22,20 +22,20 @@ public:
     
 private:
     bool setSize(unsigned long newSize);
-            
-    unsigned long m_size;
+
     unsigned long m_numItems;
+    unsigned long m_size;
     unsigned long m_defaultSize;
-    CMemory::CStage* m_stage;
     T* m_items;
+    CMemory::CStage* m_stage;
     int m_growCapacity;
 };
 
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
-    m_size = 0;
     m_numItems = 0;
+    m_size = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -102,8 +102,8 @@ void CPtrArray<T>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    m_size = 0;
     m_numItems = 0;
+    m_size = 0;
 }
 
 template <class T>

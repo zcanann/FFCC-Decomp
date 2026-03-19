@@ -18,11 +18,13 @@ struct pppLerpPosUnkC {
     s32* m_serializedDataOffsets;
 };
 
+void pppSetFpMatrix(_pppMngSt*);
+
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 void pppCopyVector__FR3Vec3Vec(Vec* dst, const Vec* src);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt* pppMngSt);
+
 }
 extern float FLOAT_80331bf8;
 extern float FLOAT_80331bfc;
@@ -102,7 +104,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             pppMngStPtr->m_matrix.value[0][3] = local_2c.x;
             pppMngStPtr->m_matrix.value[1][3] = local_2c.y;
             pppMngStPtr->m_matrix.value[2][3] = local_2c.z;
-            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+            pppSetFpMatrix(pppMngSt);
         }
     }
 }

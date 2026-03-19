@@ -4,10 +4,9 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
 
-
 extern "C" {
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 }
 
@@ -155,5 +154,4 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     pppSetBlendMode(controlData->blendMode);
     pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), controlData->blendMode);
 }
-
 

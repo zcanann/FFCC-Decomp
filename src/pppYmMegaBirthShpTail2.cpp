@@ -13,7 +13,7 @@ extern "C" int __cntlzw(unsigned int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
-extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern pppFMATRIX g_matUnit2;
 
@@ -513,7 +513,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (void*)(payload + 0x74), &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x10],
         payload[0x5A], 0, zEnable, 1, 0);
-    pppSetBlendMode__FUc(payload[0x5A]);
+    pppSetBlendMode(payload[0x5A]);
 
     for (u32 i = 0; i < maxParticles; i++) {
         u8* particle = (u8*)particles + i * 0x1B8;

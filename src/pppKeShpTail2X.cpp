@@ -17,7 +17,7 @@ int __cntlzw(unsigned int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 }
 
@@ -340,7 +340,7 @@ draw_loop:
         GXSetChanAmbColor(GX_COLOR0A0, amb);
     }
 
-    pppSetBlendMode__FUc(step->m_blendMode);
+    pppSetBlendMode(step->m_blendMode);
     pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
     count--;

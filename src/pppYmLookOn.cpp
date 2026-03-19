@@ -3,8 +3,9 @@
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
+void pppSetFpMatrix(_pppMngSt*);
 
-extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
+extern "C" void pppSetFpMatrix(struct _pppMngSt*);
 
 /*
  * --INFO--
@@ -97,6 +98,6 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
         *(f32*)((u8*)pppMngStPtr + 0x80) = local_40.x;
         *(f32*)((u8*)pppMngStPtr + 0x90) = local_40.y;
         *(f32*)((u8*)pppMngStPtr + 0xa0) = local_40.z;
-        pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+        pppSetFpMatrix(pppMngSt);
     }
 }

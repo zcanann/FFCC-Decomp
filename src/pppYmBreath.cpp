@@ -15,7 +15,7 @@ extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
 extern "C" void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
-extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -668,7 +668,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     }
 
     shape = *(long**)(*(unsigned int*)(pppEnvStPtr + 0xC) + step->m_stepValue * 4);
-    pppSetBlendMode__FUc(step->m_payload[8]);
+    pppSetBlendMode(step->m_payload[8]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         step->m_payload + 0xB0, 0, 0.0f, step->m_payload[0xB6], step->m_payload[0xB5], step->m_payload[8], 0, 1, 1, 0);
@@ -818,8 +818,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             groupData += 0x17;
         }
 
-        pppSetBlendMode__FUc(1);
-        pppSetBlendMode__FUc(0);
+        pppSetBlendMode(1);
+        pppSetBlendMode(0);
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
     }
 }

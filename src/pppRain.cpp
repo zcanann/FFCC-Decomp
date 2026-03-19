@@ -16,8 +16,7 @@ extern "C" {
 int rand(void);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-void pppSetBlendMode__FUc(u8);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -252,7 +251,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         pppMngStPtr->m_matrix.value[0][3] = posX;
         pppMngStPtr->m_matrix.value[1][3] = posY;
         pppMngStPtr->m_matrix.value[2][3] = posZ;
-        pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
+        pppSetFpMatrix(pppMngStPtr);
     }
 }
 
@@ -286,7 +285,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     workOffset = param_3->m_serializedDataOffsets[2];
     colorBase = (u8*)pppRain + 0x80 + colorOffset;
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
-    pppSetBlendMode__FUc(step->blendMode);
+    pppSetBlendMode(step->blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         colorBase + 8,
         ppvCameraMatrix0,

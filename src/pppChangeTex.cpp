@@ -69,10 +69,12 @@ char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
+void pppInitBlendMode(void);
+
 extern "C" {
 		int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 		void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
-		void pppInitBlendMode__Fv(void);
+
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
@@ -484,6 +486,6 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		GetTexture__8CMapMeshFP12CMaterialSetRi(
 		    mapMesh, env->m_materialSetPtr, textureIndex);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-		pppInitBlendMode__Fv();
+		pppInitBlendMode();
 	}
 }

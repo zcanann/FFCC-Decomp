@@ -23,12 +23,14 @@ extern f32 FLOAT_8033054c;
 extern char DAT_801d9c54[];
 extern char s_PerU___0_2f_PerV___0_2f_801d9c38[];
 
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
 void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX* matrix);
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX* out, pppFMATRIX* a, pppFMATRIX* b);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void* color, void* matrix, f32 z, u8 a3, u8 a4, u8 a5,
                                                                  u8 a6, u8 a7, u8 a8, u8 a9);
-void pppSetBlendMode__FUc(u8 mode);
+
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 flag);
 
 /*
@@ -253,7 +255,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
                                                                initBytes[1], initBytes[3], stepBytes[0], stepBytes[1],
                                                                stepBytes[2]);
 
-    pppSetBlendMode__FUc(initBytes[1]);
+    pppSetBlendMode(initBytes[1]);
     pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)ymDrawMdlTexAnm + 0x70), 1);
 }
 

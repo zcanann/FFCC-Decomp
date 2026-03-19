@@ -46,6 +46,8 @@ static inline Mtx& CameraMatrix()
     return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x1C);
 }
 
+void pppInitBlendMode(void);
+
 extern "C" {
 int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
@@ -59,7 +61,7 @@ int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-void pppInitBlendMode__Fv(void);
+
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
@@ -957,7 +959,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
         void* envMtx = (u8*)charaBreak + 0x40;
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-        pppInitBlendMode__Fv();
+        pppInitBlendMode();
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             envColor,
             envMtx,

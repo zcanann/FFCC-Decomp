@@ -37,10 +37,11 @@ struct _pppEnvStYmDeformationShp {
 	CMapMesh** m_mapMeshPtr;
 };
 
+void pppSetBlendMode(unsigned char);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-void pppSetBlendMode__FUc(unsigned char mode);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 	void* color, void* matrix, float z, unsigned char a3, unsigned char a4, unsigned char a5, unsigned char a6,
 	unsigned char a7, unsigned char a8, unsigned char a9);
@@ -341,7 +342,7 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
 	width = (int)maxX - left;
 	height = (int)maxY - top;
 
-	pppSetBlendMode__FUc(3);
+	pppSetBlendMode(3);
 	*(int*)work = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
 	if (*(int*)work == 0) {
 		return;
@@ -486,7 +487,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
 		env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
-	pppSetBlendMode__FUc(1);
+	pppSetBlendMode(1);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 		(u8*)pppYmDeformationShp_ + 0x88 + colorOffset, (u8*)pppYmDeformationShp_ + 0x40, *(float*)(params + 0x2c), params[0x31], 0, 0, 0, 1,

@@ -7,6 +7,8 @@
 
 extern float FLOAT_80330108;
 
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);
@@ -85,7 +87,7 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     iVar2 = shapePtr;
     for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
+            pppSetBlendMode(*(unsigned char*)(iVar2 + 8));
         }
         GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
         iVar2 = iVar2 + 8;
@@ -122,7 +124,7 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     shapePtr = (int)shape;
     for (shapeCount = 0; shapeCount < *(short*)((int)shape + 2); shapeCount = shapeCount + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(shapePtr + 8));
+            pppSetBlendMode(*(unsigned char*)(shapePtr + 8));
         }
         GXCallDisplayList(*(void**)(shapePtr + 0xc), 0x60);
         shapePtr = shapePtr + 8;

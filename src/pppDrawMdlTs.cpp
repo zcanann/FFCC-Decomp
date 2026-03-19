@@ -8,7 +8,7 @@
 extern "C" {
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
 }
@@ -125,10 +125,9 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
     f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
     SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], 0.0f, 0.0f);
 
-    pppSetBlendMode__FUc(*(u8*)((u8*)data + 0x9));
+    pppSetBlendMode(*(u8*)((u8*)data + 0x9));
 
     void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
     pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], *(void**)((u8*)obj + 0x70), 1);
 }
-
 

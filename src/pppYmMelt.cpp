@@ -24,7 +24,7 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void DCFlushRange(void*, unsigned long);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
@@ -318,7 +318,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (u8*)ymMelt + 0x88 + colorOffset, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
         ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
-    pppSetBlendMode__FUc(*(u8*)&ctrl->m_arg3);
+    pppSetBlendMode(*(u8*)&ctrl->m_arg3);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, (GXAttrType)1);

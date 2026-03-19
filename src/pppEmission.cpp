@@ -37,14 +37,16 @@ char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-void pppInitBlendMode__Fv(void);
-void pppSetBlendMode__FUc(unsigned char mode);
+
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -137,8 +139,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     char* meshData = *(char**)((char*)model + 0xAC + (meshIndex * 0x14) + 8);
     if ((strcmp(meshData, &DAT_803311fc) == 0) && (*(u8*)((u8*)param_2 + 0xB) != 0)) {
         int textureInfo = *(int*)((u8*)param_2 + 4);
-        pppInitBlendMode__Fv();
-        pppSetBlendMode__FUc(*(u8*)((u8*)param_3 + 0x1C));
+        pppInitBlendMode();
+        pppSetBlendMode(*(u8*)((u8*)param_3 + 0x1C));
         *(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
 
         u8 mode = *(u8*)((u8*)param_3 + 0x1D);
@@ -491,7 +493,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
  * JP Size: TODO
  */
 void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
-    pppInitBlendMode__Fv();
+    pppInitBlendMode();
 }
 
 /*

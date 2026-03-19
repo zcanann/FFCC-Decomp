@@ -17,7 +17,7 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
                                                                        unsigned char, unsigned char,
                                                                        unsigned char, unsigned char,
                                                                        unsigned char);
-extern void pppSetBlendMode__FUc(unsigned char);
+extern void pppSetBlendMode(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 extern float FLOAT_80330ee0;

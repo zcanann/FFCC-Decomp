@@ -38,12 +38,12 @@ extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::C
 
 static inline float CameraPerspectiveFov()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+    return CameraPcs._252_4_;
 }
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x1C);
+    return CameraPcs.m_cameraMatrix;
 }
 
 extern "C" {
@@ -232,7 +232,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
 {
     int workOffset = param_3->m_serializedDataOffsets[2];
     int colorOffset = param_3->m_serializedDataOffsets[1];
-    int sourceTex = 0;
+    int sourceTex;
     pppModelSt* model;
     _GXTexObj backTexObj;
     int textureIndex = 0;
@@ -259,7 +259,6 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
     Mtx tmpMtx;
     Mtx cameraMtx;
     Mtx normalMtx;
-    const float perspectiveScale = param_2->m_perspectiveScale;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
         model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
@@ -304,11 +303,13 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
         if (Game.game.m_currentSceneId == 7) {
-            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
+            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, param_2->m_perspectiveScale,
+                                  -param_2->m_perspectiveScale,
                                   FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(ppvCameraMatrix0, cameraMtx, tmpMtx);
         } else {
-            C_MTXLightPerspective(lightMtx, CameraPerspectiveFov(), FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
+            C_MTXLightPerspective(lightMtx, CameraPerspectiveFov(), FLOAT_80331fd8, param_2->m_perspectiveScale,
+                                  -param_2->m_perspectiveScale,
                                   FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(CameraMatrix(), cameraMtx, tmpMtx);
         }

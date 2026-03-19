@@ -296,7 +296,7 @@ int CGPrgObj::isLoopAnimDirect()
 {
 	signed char flags = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 1);
 
-	if ((flags < 0) || (IsLoopAnim(2) == 0)) {
+	if ((flags != 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}
 

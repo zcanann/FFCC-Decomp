@@ -9,143 +9,55 @@
 
 #define DDH_BUF_SIZE (0x800)
 
-/* 80450030-80450050 07CD50 001C+04 3/3 0/0 0/0 .bss             gRecvCB */
+typedef struct DdhCcWriteStrings {
+    char not_initialized[0x14];
+    char output_data[0x2C];
+    char sending[0x1C];
+} DdhCcWriteStrings;
+
 static CircleBuffer gRecvCB;
-
-/* 8044F830-80450030 07C550 0800+00 1/1 0/0 0/0 .bss             gRecvBuf */
 static u8 gRecvBuf[DDH_BUF_SIZE];
-
-/* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
 BOOL gIsInitialized;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_initinterrupts()
+static const DdhCcWriteStrings ddh_cc_write_strings = {
+    "cc not initialized\n",
+    "cc_write : Output data 0x%08x %ld bytes\n",
+    "cc_write sending %ld bytes\n",
+};
+static const char ddh_cc_read_expected_packet_size[] = "Expected packet size : 0x%08x (%ld)\n";
+static const char ddh_cc_read_error[] = "cc_read : error reading bytes from EXI2 %ld\n";
+static const char ddh_cc_initialize_calling_exi2_init[] = "CALLING EXI2_Init\n";
+static const char ddh_cc_initialize_done_calling_exi2_init[] = "DONE CALLING EXI2_Init\n";
+
+int ddh_cc_initialize(void* inputPendingPtrRef, EXICallback monitorCallback)
 {
-    EXI2_EnableInterrupts();
+    MWTRACE(1, (char*)ddh_cc_initialize_calling_exi2_init);
+    EXI2_Init(inputPendingPtrRef, monitorCallback);
+    MWTRACE(1, (char*)ddh_cc_initialize_done_calling_exi2_init);
+    CircleBufferInitialize(&gRecvCB, gRecvBuf, DDH_BUF_SIZE);
     return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_peek()
+int ddh_cc_shutdown()
 {
-    int poll;
-    u8 buff[DDH_BUF_SIZE];
-
-    poll = EXI2_Poll();
-    if (poll <= 0)
-	{
-        return 0;
-    }
-
-    if (EXI2_ReadN(buff, poll) == 0)
-	{
-        CircleBufferWriteBytes(&gRecvCB, buff, poll);
-    } else
-	{
-        return DDH_ERR_READ_ERROR;
-    }
-
-    return poll;
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_post_stop()
-{
-    EXI2_Reserve();
     return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_pre_continue()
+int ddh_cc_open()
 {
-    EXI2_Unreserve();
+    if (gIsInitialized != 0) {
+        return DDH_ERR_ALREADY_INITIALIZED;
+    }
+
+    gIsInitialized = TRUE;
     return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_write(const u8* bytes, int length)
+int ddh_cc_close()
 {
-    int exi2Len;
-    int n_copy;
-    u32 hexCopy;
-
-    hexCopy = (u32)bytes;
-    n_copy = length;
-
-    if (gIsInitialized == FALSE)
-	{
-        MWTRACE(8, "cc not initialized\n");
-        return DDH_ERR_NOT_INITIALIZED;
-    }
-
-    MWTRACE(8, "cc_write : Output data 0x%08x %ld bytes\n", bytes, length);
-
-    while (n_copy > 0)
-	{
-        MWTRACE(1, "cc_write sending %ld bytes\n", n_copy);
-        exi2Len = EXI2_WriteN((const void*)hexCopy, n_copy);
-		
-        if (exi2Len == AMC_EXI_NO_ERROR)
-		{
-            break;
-        }
-		
-        hexCopy += exi2Len;
-        n_copy -= exi2Len;
-    }
-
     return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
 int ddh_cc_read(u8* data, int size)
 {
     u8 buff[DDH_BUF_SIZE];
@@ -155,22 +67,18 @@ int ddh_cc_read(u8* data, int size)
     int poll;
 
     result = 0;
-	
-    if (!gIsInitialized)
-	{
+    if (!gIsInitialized) {
         return DDH_ERR_NOT_INITIALIZED;
     }
 
-    MWTRACE(1, "Expected packet size : 0x%08x (%ld)\n", size, size);
+    MWTRACE(1, (char*)ddh_cc_read_expected_packet_size, size, size);
+
     originalDataSize = expectedDataSize = size;
-	
-    while ((u32)CBGetBytesAvailableForRead(&gRecvCB) < expectedDataSize)
-	{
+    while ((u32)CBGetBytesAvailableForRead(&gRecvCB) < expectedDataSize) {
         result = 0;
+
         poll = EXI2_Poll();
-		
-        if (poll != 0)
-		{
+        if (poll != 0) {
             result = EXI2_ReadN(buff, poll);
             if (result == 0) {
                 CircleBufferWriteBytes(&gRecvCB, buff, poll);
@@ -178,80 +86,78 @@ int ddh_cc_read(u8* data, int size)
         }
     }
 
-    if (result == 0)
-	{
+    if (result == 0) {
         CircleBufferReadBytes(&gRecvCB, data, originalDataSize);
-    }
-	else
-	{
-        MWTRACE(8, "cc_read : error reading bytes from EXI2 %ld\n", result);
+    } else {
+        MWTRACE(8, (char*)ddh_cc_read_error, result);
     }
 
     return result;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_close()
+int ddh_cc_write(const u8* bytes, int length)
 {
-    return 0;
-}
+    const DdhCcWriteStrings* strings = &ddh_cc_write_strings;
+    int exi2Len;
+    int n_copy;
+    u32 hexCopy;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_open()
-{
-    if (gIsInitialized != 0)
-	{
-        return DDH_ERR_ALREADY_INITIALIZED;
+    hexCopy = (u32)bytes;
+    n_copy = length;
+
+    if (gIsInitialized == FALSE) {
+        MWTRACE(8, (char*)strings->not_initialized);
+        return DDH_ERR_NOT_INITIALIZED;
     }
 
-    gIsInitialized = TRUE;
+    MWTRACE(8, (char*)strings->output_data, bytes, length);
+
+    while (n_copy > 0) {
+        MWTRACE(1, (char*)strings->sending, n_copy);
+        exi2Len = EXI2_WriteN((const void*)hexCopy, n_copy);
+        if (exi2Len == AMC_EXI_NO_ERROR) {
+            break;
+        }
+        hexCopy += exi2Len;
+        n_copy -= exi2Len;
+    }
+
     return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_shutdown()
+int ddh_cc_pre_continue()
 {
+    EXI2_Unreserve();
     return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-int ddh_cc_initialize(void* inputPendingPtrRef, EXICallback monitorCallback)
+int ddh_cc_post_stop()
 {
-    MWTRACE(1, "CALLING EXI2_Init\n");
-    EXI2_Init(inputPendingPtrRef, monitorCallback);
-    MWTRACE(1, "DONE CALLING EXI2_Init\n");
-    CircleBufferInitialize(&gRecvCB, gRecvBuf, DDH_BUF_SIZE);
+    EXI2_Reserve();
+    return 0;
+}
+
+int ddh_cc_peek()
+{
+    int poll;
+    u8 buff[DDH_BUF_SIZE];
+
+    poll = EXI2_Poll();
+    if (poll <= 0) {
+        return 0;
+    }
+
+    if (EXI2_ReadN(buff, poll) == 0) {
+        CircleBufferWriteBytes(&gRecvCB, buff, poll);
+    } else {
+        return DDH_ERR_READ_ERROR;
+    }
+
+    return poll;
+}
+
+int ddh_cc_initinterrupts()
+{
+    EXI2_EnableInterrupts();
     return 0;
 }

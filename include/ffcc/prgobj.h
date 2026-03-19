@@ -51,9 +51,17 @@ public:
     int m_subState;            // 0x52C
     int m_subFrame;            // 0x530
     char unk_534[16];          // 0x534
-    unsigned char m_animFlags; // 0x544-0x548
-    int m_reqAnimId;           // 0x548
-    unsigned char m_flags;     // 0x54D-0x550
+    union AnimFlags {
+        unsigned char m_animFlags; // 0x544-0x548
+        struct Bits {
+            unsigned char m_animRequested : 1;
+            unsigned char m_animLoop : 1;
+            unsigned char m_animDirect : 1;
+            unsigned char m_animFlagsUnused : 5;
+        } bits;
+    } m_animFlagBits;
+    int m_reqAnimId;       // 0x548
+    unsigned char m_flags; // 0x54D-0x550
 };
 
 #endif // _FFCC_PPP_PRGOBJ_H_

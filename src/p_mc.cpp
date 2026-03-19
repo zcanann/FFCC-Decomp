@@ -11,6 +11,7 @@ extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
+__declspec(section ".ctors") extern void* const __sinit_p_mc_cpp_reference = __sinit_p_mc_cpp;
 
 class McCtrl
 {

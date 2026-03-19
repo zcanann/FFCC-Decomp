@@ -88,22 +88,22 @@ int CGQuadObj::GetCID()
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
-	int count = m_vertexCount;
-	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((vec->x <= m_bboxMaxX) && (vec->z <= m_bboxMaxZ))) {
-		if ((m_yBase <= vec->y) && (vec->y <= (m_yBase + m_yHeight))) {
+	u32 count = m_vertexCount;
+	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
+		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
 			int i = 0;
 			CGQuadObj* self = this;
-			for (; i < count; i++) {
+			for (; i < (int)count; i++) {
 				float z0 = self->m_vertices[0].z;
 				float x0 = self->m_vertices[0].x;
-				int next = (i + 1) - ((i + 1) / count) * count;
+				int next = (i + 1) - ((i + 1) / (int)count) * count;
 				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < EPS) {
 					break;
 				}
 				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
 			}
 
-			if (i == count) {
+			if (i == (int)count) {
 				return true;
 			}
 		}

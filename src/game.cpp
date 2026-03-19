@@ -740,7 +740,7 @@ void CGame::CheckScriptChange()
     m_newGameFlag = 0;
     Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x205);
 
-    if (System.m_execParam > 2) {
+    if ((u32)System.m_execParam > 2) {
         System.Printf(const_cast<char*>(DAT_801d619c));
     }
 
@@ -752,7 +752,7 @@ void CGame::CheckScriptChange()
             loadCfd();
             m_cfdLoadedFlag = 1;
 
-            if (System.m_execParam > 2) {
+            if ((u32)System.m_execParam > 2) {
                 System.Printf(const_cast<char*>(DAT_801d61b8));
             }
         }
@@ -763,7 +763,7 @@ void CGame::CheckScriptChange()
             createLoad__8CPartPcsFv(&PartPcs);
             m_assetsLoadedFlag = 1;
 
-            if (System.m_execParam > 2) {
+            if ((u32)System.m_execParam > 2) {
                 System.Printf(const_cast<char*>(DAT_801d61dc));
             }
         }
@@ -773,26 +773,29 @@ void CGame::CheckScriptChange()
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if (m_nextScript.m_flags != 0) {
+        CGame::CGameWork* gameWork;
         const char* townName = DAT_8032f6ac;
+
+        gameWork = &Game.game.m_gameWork;
 
         System.Printf(const_cast<char*>(DAT_8032f6a0));
         System.Printf(const_cast<char*>(DAT_801d6214));
         System.Printf(const_cast<char*>(DAT_8032f6a0));
 
-        memset(&Game.game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
-        memset(Game.game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.game.m_gameWork.m_wmBackupParams));
+        memset(&gameWork->m_gameDataStartMarker, 0, 0x13E1);
+        memset(gameWork->m_wmBackupParams, 0xFF, sizeof(gameWork->m_wmBackupParams));
 
-        Game.game.m_gameWork.m_scriptSysVal0 = 0;
-        Game.game.m_gameWork.m_scriptSysVal1 = 0;
-        Game.game.m_gameWork.m_scriptSysVal2 = 0;
-        Game.game.m_gameWork.m_scriptSysVal3 = 1;
-        Game.game.m_gameWork.m_chaliceElement = 1;
+        gameWork->m_scriptSysVal0 = 0;
+        gameWork->m_scriptSysVal1 = 0;
+        gameWork->m_scriptSysVal2 = 0;
+        gameWork->m_scriptSysVal3 = 1;
+        gameWork->m_chaliceElement = 1;
 
-        if (Game.game.m_gameWork.m_languageId == 3) {
+        if (gameWork->m_languageId == 3) {
             townName = DAT_8032f6a4;
         }
 
-        strcpy(Game.game.m_gameWork.m_townName, townName);
+        strcpy(gameWork->m_townName, townName);
         gCFlatRuntime2.ResetNewGame();
         gChara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
@@ -800,7 +803,7 @@ void CGame::CheckScriptChange()
 
     System.ScriptChanged(m_nextScript.m_name, scriptResult);
 
-    if (System.m_execParam > 2) {
+    if ((u32)System.m_execParam > 2) {
         System.Printf(const_cast<char*>(DAT_801d6234));
     }
 }

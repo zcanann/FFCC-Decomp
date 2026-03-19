@@ -37,6 +37,19 @@ struct ChangeTexMeshRef {
 	u8 _padC[0x14 - 0xC];
 };
 
+struct pppYmChangeTexState {
+	float m_value0;
+	float m_value1;
+	float m_value2;
+	void** m_meshColorArrays;
+	void** m_displayListArrays;
+	u8 _pad14[4];
+	void* m_charaObj;
+	int m_texture;
+	u8 _pad20[4];
+	_pppEnvStYmChangeTex* m_env;
+};
+
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
@@ -209,10 +222,11 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* da
  */
 void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
-	int dataOffset = data->m_serializedDataOffsets[2];
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)ymChangeTex + 0x98 + dataOffset), 0);
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)ymChangeTex + 0x98 + dataOffset), 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)ymChangeTex + 0x98 + dataOffset), 2);
+	pppYmChangeTexState* state =
+	    (pppYmChangeTexState*)((char*)ymChangeTex + 0x80 + data->m_serializedDataOffsets[2]);
+	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 0);
+	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 1);
+	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 2);
 	int model = 0;
 
 	if (handle0 != 0) {
@@ -240,9 +254,9 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		*(void**)(model2 + 0x104) = 0;
 	}
 
-	void** stageArray = *(void***)((char*)ymChangeTex + 0x90 + dataOffset);
+	void** stageArray = state->m_displayListArrays;
 	void** meshArray;
-	if ((stageArray != 0) && ((meshArray = *(void***)((char*)ymChangeTex + 0x8C + dataOffset)), meshArray != 0)) {
+	if ((stageArray != 0) && ((meshArray = state->m_meshColorArrays), meshArray != 0)) {
 		int meshList = *(int*)(model + 0xac);
 		void** curStageArray = stageArray;
 		void** curMeshArray = meshArray;

@@ -42,7 +42,10 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
+extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
+extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
+extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 
@@ -335,14 +338,14 @@ void CFunnyShapePcs::destroyViewer()
 {
     USBPcs.IsBigAlloc(0);
 
-    GXColor clearColor = {0, 0, 0, 0};
-    GXSetCopyClear(clearColor, 0xFFFFFF);
+    u32 clearColor = 0;
+    GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
 
     reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(Ptr(this, 0x61BC))->DeleteAndRemoveAll();
     reinterpret_cast<CPtrArray<_GXTexObj*>*>(Ptr(this, 0x61D8))->DeleteAndRemoveAll();
 
-    UsbStream(this)->DeleteBuffer();
-    FunnyShape(this)->~CFunnyShape();
+    DeleteBuffer__14CUSBStreamDataFv(UsbStream(this));
+    __dt__11CFunnyShapeFv(FunnyShape(this), -1);
     Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4)));
 }
 

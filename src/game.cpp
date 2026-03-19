@@ -19,6 +19,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/cflat_runtime2.h"
+#include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_FunnyShape.h"
@@ -1381,26 +1382,25 @@ void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& specialInfo)
 {
     CFlatRuntime2* runtime;
-    int classObj;
-    typedef u16 (*BehaviorFn)(int);
+    CGObject* classObj;
 
     if (ifParam.m_classId == 0) {
         return 0;
     }
 
     runtime = reinterpret_cast<CFlatRuntime2*>(CFlat);
-    classObj = reinterpret_cast<int>(runtime->intToClass((int)ifParam.m_classId));
+    classObj = reinterpret_cast<CGObject*>(runtime->intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {
         return 0;
     }
 
-    u16 behaviorFlags = reinterpret_cast<BehaviorFn*>(*reinterpret_cast<int*>(classObj + 0x48))[3](classObj);
+    u16 behaviorFlags = (u16)classObj->GetCID();
     if ((behaviorFlags & 0x6D) != 0x6D) {
         return 0;
     }
 
-    char* objWork = *reinterpret_cast<char**>(classObj + 0x58);
+    char* objWork = (char*)classObj->m_scriptHandle;
     specialInfo = *reinterpret_cast<int*>(objWork + 0x3B4);
     return 1;
 }

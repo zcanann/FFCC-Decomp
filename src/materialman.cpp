@@ -80,6 +80,10 @@ static const char s_materialStageName[] = "material";
  */
 extern "C" void __sinit_materialman_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     *reinterpret_cast<void**>(&MaterialMan) = __vt__8CManager;
     *reinterpret_cast<void**>(&MaterialMan) = __vt__12CMaterialMan;
     __ct__6CColorFv(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x213);

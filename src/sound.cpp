@@ -369,6 +369,10 @@ extern "C" void CalcBound__9CLine2(CLine* line)
  */
 extern "C" void __sinit_sound_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     unsigned char* sound = reinterpret_cast<unsigned char*>(&Sound);
 
     *reinterpret_cast<void**>(sound) = __vt__6CSound;

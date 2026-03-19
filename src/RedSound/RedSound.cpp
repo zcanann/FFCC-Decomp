@@ -957,5 +957,9 @@ extern "C" void __dt__10CRedDriverFv(void*);
 
 extern "C" void __sinit_RedSound_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
 	__register_global_object(__ct__10CRedDriverFv(&CRedDriver_8032f4c0), __dt__10CRedDriverFv, &DAT_8032e170);
 }

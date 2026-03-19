@@ -112,6 +112,10 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
  */
 extern "C" void __sinit_graphic_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
     void* vtbl = __vt__8CManager;
     *reinterpret_cast<void**>(&Graphic) = vtbl;
     *reinterpret_cast<void**>(&Graphic) = __vt__8CGraphic;

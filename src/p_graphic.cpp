@@ -73,6 +73,10 @@ static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
  */
 extern "C" void __sinit_p_graphic_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
     *reinterpret_cast<void**>(&GraphicsPcs) = __vt__8CManager;
     *reinterpret_cast<void**>(&GraphicsPcs) = __vt_CProcess;
     *reinterpret_cast<void**>(&GraphicsPcs) = __vt__11CGraphicPcs;

@@ -69,6 +69,10 @@ DbgMenuDef PTR_DAT_80212524[] = {
  */
 extern "C" void __sinit_p_dbgmenu_cpp()
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
 	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__11CDbgMenuPcs[4]);
 
 	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt__8CManager;

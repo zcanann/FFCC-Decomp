@@ -19,6 +19,10 @@ extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
+    // m_table_desc copying into the class constructor, then delete this function.
+    // The compiler will auto-generate __sinit from the global object declaration.
+
     unsigned int* table;
     const unsigned int* desc0;
     const unsigned int* desc1;

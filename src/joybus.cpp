@@ -6597,6 +6597,10 @@ int CFile::IsDiskError()
  */
 extern "C" void __sinit_joybus_cpp()
 {
+    // NOTE: This __sinit is compiler-generated from global variable initialization.
+    // To match, replace with proper constructors or initializer expressions, then
+    // delete this function so the compiler auto-generates it.
+
     JoyBus* threadParamBase;
     JoyBus* cmdCountBase;
     JoyBus* semBase;

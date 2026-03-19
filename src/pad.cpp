@@ -39,6 +39,10 @@ extern "C" double DOUBLE_8032f838;
  */
 extern "C" void __sinit_pad_cpp()
 {
+    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
+    // (and any sub-construction) into the class constructor, then delete this
+    // function. The compiler will auto-generate __sinit from the global object.
+
 	void* vtbl = __vt__8CManager;
 	*reinterpret_cast<void**>(&Pad) = vtbl;
 	*reinterpret_cast<void**>(&Pad) = PTR_PTR_DAT_801e8864;

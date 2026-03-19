@@ -946,6 +946,10 @@ CMapHitFace::CMapHitFace()
  */
 extern "C" void __sinit_maphit_cpp()
 {
+    // NOTE: This __sinit is compiler-generated from global variable initialization.
+    // To match, replace with proper constructors or initializer expressions, then
+    // delete this function so the compiler auto-generates it.
+
     g_hit_cyl.m_direction2.y = 0.0f;
     g_hit_cyl.m_direction2.x = 0.0f;
     g_hit_cyl.m_top.z = 0.0f;

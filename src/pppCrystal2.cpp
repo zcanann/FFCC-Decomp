@@ -32,7 +32,6 @@ extern float FLOAT_80331fd0;
 extern float FLOAT_80331fd4;
 extern float FLOAT_80331fd8;
 extern float FLOAT_80331fdc;
-extern float ppvScreenMatrix[4][4];
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 

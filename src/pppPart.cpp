@@ -31,7 +31,6 @@ static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 extern "C" unsigned char gPppBlendModeState;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" float ppvScreenMatrix[4][4];
 extern "C" float FLOAT_8032ed8c;
 extern "C" double DOUBLE_8032fdf0;
 extern "C" double DOUBLE_8032fe00;

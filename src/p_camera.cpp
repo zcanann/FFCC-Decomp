@@ -10,6 +10,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_game.h"
+#include "ffcc/partMng.h"
 #include "ffcc/math.h"
 
 #include <math.h>
@@ -20,7 +21,6 @@
 
 CCameraPcs CameraPcs;
 
-extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
@@ -2222,4 +2222,3 @@ void CCameraPcs::GetWorldMapInverseMatrix(float (*) [4])
 {
 	// TODO
 }
-

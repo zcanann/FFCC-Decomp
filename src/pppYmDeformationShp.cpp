@@ -17,7 +17,6 @@ extern float FLOAT_80330618;
 extern float FLOAT_8033061c;
 extern float FLOAT_8033062c;
 extern float FLOAT_80330630;
-extern float ppvScreenMatrix[4][4];
 
 struct Vec2d {
 	float x;

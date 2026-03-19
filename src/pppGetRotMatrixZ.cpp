@@ -1,7 +1,5 @@
 #include "ffcc/pppGetRotMatrixZ.h"
 
-extern float ppvSinTbl[];
-
 /*
  * --INFO--
  * Address:	TODO

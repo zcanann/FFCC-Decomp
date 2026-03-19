@@ -12,7 +12,7 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-extern Mtx ppvCameraMatrix0;
+
 
 extern float FLOAT_80330e48;
 extern float FLOAT_80330e4c;

@@ -34,7 +34,6 @@ extern float FLOAT_803318c8;
 extern float FLOAT_803318cc;
 extern float FLOAT_803318d0;
 extern float FLOAT_80331904;
-extern Mtx ppvCameraMatrix0;
 extern char DAT_80331900[];
 extern char DAT_803318d4[];
 extern char DAT_803318dc[];

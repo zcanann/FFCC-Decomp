@@ -9,20 +9,15 @@
 
 #define DDH_BUF_SIZE (0x800)
 
-/* 80450030-80450050 07CD50 001C+04 3/3 0/0 0/0 .bss             gRecvCB */
-static CircleBuffer gRecvCB;
+extern CircleBuffer gRecvCB_8032AEC0;
+extern u8 gRecvBuf_8032A6C0[DDH_BUF_SIZE];
+extern BOOL gIsInitialized_8032F360;
+extern const char ddh_cc_initialize_calling_exi2_init[];
+extern const char ddh_cc_initialize_done_calling_exi2_init[];
 
-/* 8044F830-80450030 07C550 0800+00 1/1 0/0 0/0 .bss             gRecvBuf */
-static u8 gRecvBuf[DDH_BUF_SIZE];
-
-/* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
-BOOL gIsInitialized;
-
-static const char ddh_cc_initialize_calling_exi2_init[] = "CALLING EXI2_Init\n";
-static const char ddh_cc_initialize_done_calling_exi2_init[] = "DONE CALLING EXI2_Init\n";
-static const char ddh_cc_write_not_initialized[] = "cc not initialized\n";
-static const char ddh_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
-static const char ddh_cc_write_sending[] = "cc_write sending %ld bytes\n";
+#define gRecvCB gRecvCB_8032AEC0
+#define gRecvBuf gRecvBuf_8032A6C0
+#define gIsInitialized gIsInitialized_8032F360
 
 /*
  * --INFO--
@@ -120,15 +115,15 @@ int ddh_cc_write(const u8* bytes, int length)
 
     if (gIsInitialized == FALSE)
 	{
-        MWTRACE(8, (char*)ddh_cc_write_not_initialized);
+        MWTRACE(8, "cc not initialized\n");
         return DDH_ERR_NOT_INITIALIZED;
     }
 
-    MWTRACE(8, (char*)ddh_cc_write_output_data, bytes, length);
+    MWTRACE(8, "cc_write : Output data 0x%08x %ld bytes\n", bytes, length);
 
     while (n_copy > 0)
 	{
-        MWTRACE(1, (char*)ddh_cc_write_sending, n_copy);
+        MWTRACE(1, "cc_write sending %ld bytes\n", n_copy);
         exi2Len = EXI2_WriteN((const void*)hexCopy, n_copy);
 		
         if (exi2Len == AMC_EXI_NO_ERROR)

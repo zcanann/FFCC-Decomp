@@ -177,26 +177,6 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
 
 /*
  * --INFO--
- * PAL Address: 0x8004af2c
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-void CPtrArray<CMapAnimNode*>::RemoveAll()
-{
-    if (m_items != 0) {
-        __dla__FPv(m_items);
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8004af78
  * PAL Size: 8b
  * EN Address: TODO
@@ -612,6 +592,26 @@ CMapAnim::~CMapAnim()
     }
 
     reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004af2c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnimNode*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*

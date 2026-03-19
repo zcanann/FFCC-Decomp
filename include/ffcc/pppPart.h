@@ -14,15 +14,6 @@ class CMapPcs;
 struct _pppPDataVal;
 struct _pppProgSetDef;
 
-// Note: Not officially part of the decomp .MAP file, so this is speculative,
-// but it seems to work.
-struct _pppPObjLink
-{
-    _pppPObjLink* m_next;     // 0x0
-    _pppPObjLink* m_previous; // 0x4
-    _pppPDataVal* m_owner;    // 0x8
-}; // Size 0xc
-
 struct _pppPDataVal
 {
     _pppProgSetDef* m_programSetDef; // 0x0

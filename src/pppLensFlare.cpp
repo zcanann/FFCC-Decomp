@@ -206,17 +206,15 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		(shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
 		 shapeBase[0x32] != 0)) {
 		pppCVECTOR local_70;
-		Vec local_60;
 		Vec local_6c;
+		Vec local_60;
 		Mtx local_54;
-		float stepValue;
 
 		PSMTXIdentity(local_54);
-		stepValue = *(float*)&step->m_stepValue;
-		local_54[2][2] = stepValue;
-		local_54[0][0] = stepValue * pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40);
-		local_54[1][1] = stepValue * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
-		local_54[2][2] = stepValue * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
+		local_54[2][2] = step->m_stepValue;
+		local_54[0][0] = local_54[2][2] * pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40);
+		local_54[1][1] = local_54[2][2] * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
+		local_54[2][2] = local_54[2][2] * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
 
 		local_60.x = pppMngStPtr->m_matrix.value[0][3];
 		local_60.y = pppMngStPtr->m_matrix.value[1][3];
@@ -228,7 +226,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_54[1][3] = local_60.y;
 		local_54[2][3] = local_60.z;
 
-		local_6c = local_60;
+		local_6c.x = local_60.x;
+		local_6c.y = local_60.y;
+		local_6c.z = local_60.z;
 
 		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBase + 0x20), &local_6c);
 

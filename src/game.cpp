@@ -1382,25 +1382,25 @@ void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& specialInfo)
 {
     CFlatRuntime2* runtime;
-    CGObject* classObj;
+    CGBaseObj* baseObj;
 
     if (ifParam.m_classId == 0) {
         return 0;
     }
 
     runtime = reinterpret_cast<CFlatRuntime2*>(CFlat);
-    classObj = reinterpret_cast<CGObject*>(runtime->intToClass((int)ifParam.m_classId));
+    baseObj = reinterpret_cast<CGBaseObj*>(runtime->intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {
         return 0;
     }
 
-    u16 behaviorFlags = (u16)classObj->GetCID();
+    u16 behaviorFlags = (u16)baseObj->GetCID();
     if ((behaviorFlags & 0x6D) != 0x6D) {
         return 0;
     }
 
-    char* objWork = (char*)classObj->m_scriptHandle;
+    char* objWork = (char*)reinterpret_cast<CGObject*>(baseObj)->m_scriptHandle;
     specialInfo = *reinterpret_cast<int*>(objWork + 0x3B4);
     return 1;
 }

@@ -413,7 +413,7 @@ void CMemoryCardMan::CreateMcBuff()
         m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
             0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>("memorycard.cpp"), 0x2AB));
 
-        if (m_saveBuffer == 0 && System.m_execParam != 0)
+        if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf("%s(%d): Error: memory allocation", "memorycard.cpp", 0x2AD);
         }

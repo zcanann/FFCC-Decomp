@@ -31,6 +31,13 @@ extern "C" int __cntlzw(unsigned int);
 extern void* __vt__7CSystem[];
 CSystem System;
 
+class CScenegraphProcessProxy {
+public:
+    virtual void create();
+    virtual void destroy();
+    virtual int GetTable(unsigned long);
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -438,8 +445,7 @@ void CSystem::ExecScenegraph()
  */
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
-    typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
-    u32* description = (u32*)(*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process, arg);
+    u32* description = (u32*)((CScenegraphProcessProxy*)process)->GetTable(arg);
 
     if (__ptmf_test((__ptmf*)(description + 1)) != 0)
     {
@@ -492,9 +498,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    (void)arg;
-    typedef void* (*GetScenegraphBlockFn)(CProcess*);
-    u32* descBlock = (u32*)(*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process);
+    u32* descBlock = (u32*)((CScenegraphProcessProxy*)process)->GetTable(arg);
     COrder* current = m_orderSentinel.m_next;
 
     do

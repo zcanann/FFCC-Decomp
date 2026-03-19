@@ -63,7 +63,7 @@ When updating functions, include version-specific address and size information:
 
 **Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. For large functions, even small incremental gains in match score can be considered valuable progress.
 
-**Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet. For this reason, high matches like 97% are sometimes acceptable and not worth dealing with because it could be build system related.
+**Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet.
 
 **Key relationships:** Unit -> Object file -> Source file. Use symbols for context, Ghidra decomp for low match score functions.
 

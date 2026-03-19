@@ -60,6 +60,7 @@ struct TmpArtiEntry {
     float t;
     float alpha;
     float z;
+    int unk_18;
     int tex;
     int timer;
     int startFrame;
@@ -93,6 +94,13 @@ STATIC_ASSERT(offsetof(TmpArtiState, frame) == 0x22);
 STATIC_ASSERT(offsetof(TmpArtiState, unk_26) == 0x26);
 STATIC_ASSERT(offsetof(TmpArtiState, prevSelection) == 0x30);
 STATIC_ASSERT(offsetof(TmpArtiState, selection) == 0x32);
+STATIC_ASSERT(offsetof(TmpArtiEntry, alpha) == 0x10);
+STATIC_ASSERT(offsetof(TmpArtiEntry, z) == 0x14);
+STATIC_ASSERT(offsetof(TmpArtiEntry, tex) == 0x1C);
+STATIC_ASSERT(offsetof(TmpArtiEntry, timer) == 0x20);
+STATIC_ASSERT(offsetof(TmpArtiEntry, startFrame) == 0x24);
+STATIC_ASSERT(offsetof(TmpArtiEntry, duration) == 0x28);
+STATIC_ASSERT(sizeof(TmpArtiEntry) == 0x40);
 
 static inline MenuTmpArtiMembers& GetMenuTmpArtiMembers(CMenuPcs* menu)
 {

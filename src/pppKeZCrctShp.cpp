@@ -26,7 +26,7 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
 
     (void)ctrlTable;
 
-    pppGetRowVector(*(pppFMATRIX*)((char*)object + 0x10), rowX, rowY, rowZ, rowPos);
+    pppGetRowVector(object->m_localMatrix, rowX, rowY, rowZ, rowPos);
     pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
@@ -41,14 +41,14 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     transformedPos.y *= stepData->m_positionScale.y;
     transformedPos.z *= stepData->m_positionScale.z;
 
-    if (stepData->m_mode == 1) {
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
-    } else if (stepData->m_mode == 0) {
+    if (stepData->m_mode == 0) {
         transformedPos.x += stepData->m_offset.x;
         transformedPos.y += stepData->m_offset.y;
         transformedPos.z += stepData->m_offset.z;
         pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
-    } else if (stepData->m_mode < 3) {
+    } else if (stepData->m_mode == 1) {
+        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
+    } else if (stepData->m_mode == 2) {
         pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
         zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
         zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;

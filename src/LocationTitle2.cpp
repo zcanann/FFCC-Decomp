@@ -24,11 +24,6 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
-static int GetGraphFrameFromId(u32 graphId)
-{
-    return ((int)graphId >> 12) + (int)((graphId & 0x80000000) != 0 && (graphId & 0xFFF) != 0);
-}
-
 struct LocationTitle2Work {
     void* m_particles;
     u16 m_count;
@@ -272,10 +267,14 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
     if (dataValIndex != 0xFFFF) {
         u32 graphId = locationTitle->m_graphId;
-        int graphFrame = GetGraphFrameFromId(graphId);
+        int graphFrame = (int)graphId >> 12;
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
         long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         u8 blendMode = *((u8*)&unkB->m_stepValue + 1);
+
+        if ((int)graphId < 0 && (graphId & 0xFFF) != 0) {
+            graphFrame++;
+        }
 
         pppSetBlendMode(blendMode);
 
@@ -334,9 +333,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
             if (graphFrame <= particle->m_frame) {
                 PSMTXIdentity(model);
-                model[0][0] = pppMngStPtr->m_scale.x * particle->m_scaleX;
-                model[1][1] = pppMngStPtr->m_scale.y * particle->m_scaleY;
-                model[2][2] = pppMngStPtr->m_scale.z * particle->m_scaleZ;
+                model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];
+                model[1][1] = pppMngStPtr->m_scale.y * locationTitle->m_localMatrix.value[1][1];
+                model[2][2] = pppMngStPtr->m_scale.z * locationTitle->m_localMatrix.value[2][2];
 
                 PSMTXMultVec(pppMngStPtr->m_matrix.value, &particle->m_pos, &transformedPos);
                 PSMTXMultVec(ppvCameraMatrix02, &transformedPos, &transformedPos);

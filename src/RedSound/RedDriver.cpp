@@ -1800,10 +1800,10 @@ void CRedDriver::SeStopMG(int id1, int id2, int id3, int id4)
 int CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int pitch)
 {
 	if (bank == -1) {
-		if (sep > -1) {
+		if (sep >= 0) {
 			_EntryExecCommand(_SeSepPlaySequence, autoID, sep, unk, volume, pitch, 0, 0);
 		}
-	} else if ((bank > -1) && (bank < 4) && (sep > -1) && (sep < 0x200)) {
+	} else if ((bank >= 0) && (bank < 4) && (sep >= 0) && (sep < 0x200)) {
 		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, unk, volume, pitch, 0);
 	}
     return autoID;

@@ -328,8 +328,6 @@ void CMaterialEditorPcs::createViewer()
  */
 void CMaterialEditorPcs::destroyViewer()
 {
-    CMaterialEditorPcs* pCVar1;
-    unsigned int uVar2;
     GXColor clear;
 
     USBPcs.IsBigAlloc(0);
@@ -342,20 +340,23 @@ void CMaterialEditorPcs::destroyViewer()
 
     reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84)->DeleteBuffer();
     MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xbc)));
-    uVar2 = 0;
     reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
-    pCVar1 = this;
 
-    do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
-        uVar2 += 1;
-        pCVar1 = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(pCVar1) + 4);
-    } while (uVar2 < 0x10);
+    {
+        unsigned int uVar2 = 0;
+        CMaterialEditorPcs* pCVar1 = this;
+
+        do {
+            MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
+            MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
+            MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
+            MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
+            MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
+            MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
+            uVar2 += 1;
+            pCVar1 = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(pCVar1) + 4);
+        } while (uVar2 < 0x10);
+    }
 
     Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x4)));
 }

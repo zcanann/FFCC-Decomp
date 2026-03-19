@@ -1913,9 +1913,19 @@ void CGObject::LookAt(CGObject* target, char* nodeName)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::InitWork(int)
+void CGObject::InitWork(int index)
 {
-	// TODO
+    typedef void (*InitWorkFn)(void**, int, unsigned int, int);
+    char ownerType;
+
+    ownerType = m_ownerType;
+    if (ownerType == 1) {
+        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
+        initWork(m_scriptHandle, index, Game.game.unkCFlatData0[1] + index * 0x1D0, 0);
+    } else if ((ownerType < 1) && (ownerType > -1)) {
+        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
+        initWork(m_scriptHandle, index, Game.game.unkCFlatData0[0] + index * 0x1D0, 0);
+    }
 }
 
 /*

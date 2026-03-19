@@ -63,7 +63,7 @@ public:
     void LoadShield(int);
     void LoadAnim(char*, int, int, int, unsigned long);
     void FreeAnim(int);
-    bool IsLoopAnim(int mode);
+    int IsLoopAnim(int mode);
     void IsAnimFinished(int);
     void CancelAnim(int);
     void PlayAnim(int, int, int, int, int, signed char*);

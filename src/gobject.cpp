@@ -1977,7 +1977,7 @@ void CGObject::FreeAnim(int animSlot)
  * Address:	TODO
  * Size:	TODO
  */
-bool CGObject::IsLoopAnim(int mode)
+int CGObject::IsLoopAnim(int mode)
 {
     // m_charaModelHandle is treated as an array; element 0x5A holds an animation controller.
     CCharaPcs::CHandle* handles = m_charaModelHandle;

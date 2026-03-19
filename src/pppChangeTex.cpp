@@ -241,9 +241,10 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppChangeTex_cpp_801dd660, 0x9d);
 	int dataOffset = data->m_serializedDataOffsets[2];
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 0);
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 2);
+	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + dataOffset + 0x80);
+	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);
+	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
+	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
 	int model = 0;
 
 	if (handle0 != 0) {
@@ -271,8 +272,8 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 		*(void**)(model2 + 0x104) = 0;
 	}
 
-	void** stageArray = *(void***)((char*)changeTex + 0x90 + dataOffset);
-	void** meshArray = *(void***)((char*)changeTex + 0x8c + dataOffset);
+	void** stageArray = (void**)work->m_displayListArrays;
+	void** meshArray = (void**)work->m_meshColorArrays;
 	if ((stageArray != 0) && (meshArray != 0)) {
 		int meshList = *(int*)(model + 0xac);
 		void** curStageArray = stageArray;
@@ -339,7 +340,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 	    step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, &work->m_value0, &work->m_value1, &work->m_value2,
-	    &step->m_stepValue, (float*)&step->m_arg3);
+	    &step->m_stepValue, &step->m_arg3);
 
 	work->m_charaObj = pppMngStPtr->m_charaObj;
 	work->m_context = pppEnvStPtr;

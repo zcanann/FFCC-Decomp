@@ -137,7 +137,6 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, cha
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec*, unsigned long);
-float RandF__5CMathFf(float, CMath*);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 }
 
@@ -520,10 +519,10 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
 
         dVar17 = (double)inVec[3].x;
         if (dVar19 < dVar17) {
-            dVar17 = (double)RandF__5CMathFf(FLOAT_80331cc8, &Math);
+            dVar17 = (double)Math.RandF(FLOAT_80331cc8);
         }
         if ((double)inVec[3].x < dVar18) {
-            dVar17 = -(double)RandF__5CMathFf(FLOAT_80331cc8, &Math);
+            dVar17 = -(double)Math.RandF(FLOAT_80331cc8);
         }
 
         inVec->x = (float)dVar17;
@@ -536,7 +535,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
         local_c8.z = DAT_801dd4c4;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
-        dVar17 = (double)RandF__5CMathFf(*(float*)((u8*)pppScreenBreak + 0x3C), &Math);
+        dVar17 = (double)Math.RandF(*(float*)((u8*)pppScreenBreak + 0x3C));
         PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)pppScreenBreak + 0x38) + dVar17));
 
         inVec[1].x = (float)dVar22;
@@ -545,7 +544,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenB
         inVec[4].x = (float)dVar22;
 
         uStack_b4 = (u32)*(u8*)((u8*)pppScreenBreak + 0x34);
-        dVar17 = (double)RandF__5CMathFf((float)uStack_b4, &Math);
+        dVar17 = (double)Math.RandF((float)uStack_b4);
         iVar16 += 0x14;
         inVec[4].y = (float)(dVar25 * (double)(float)(dVar24 + dVar17));
         *(u8*)&inVec[4].z = 0;

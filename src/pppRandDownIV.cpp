@@ -6,9 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 extern s32 gPppDefaultValueBuffer[];
 
-extern "C" {
-f32 RandF__5CMathFv(CMath*);
-}
 
 struct PppRandDownIVParam2 {
     s32 field0;
@@ -47,9 +44,9 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     f32* valuePtr;
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        value = -RandF__5CMathFv(&Math);
+        value = -Math.RandF();
         if (in->field18 != 0) {
-            f32 randValue = value - RandF__5CMathFv(&Math);
+            f32 randValue = value - Math.RandF();
             value = randValue * kPppRandDownIVDualSampleScale;
         }
 

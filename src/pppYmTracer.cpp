@@ -16,7 +16,7 @@ extern f64 DOUBLE_803306f8;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
@@ -339,7 +339,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
 
     if (param_2->m_dataValIndex != 0xFFFF) {
-        pppSetBlendMode__FUc(param_2->m_payload[10]);
+        pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix0, FLOAT_803306e8,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);

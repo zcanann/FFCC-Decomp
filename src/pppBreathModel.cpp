@@ -17,15 +17,18 @@ struct pppFMATRIX {
 
 struct pppModelSt;
 
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-void pppSetBlendMode__FUc(u8);
+
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppInitBlendMode__Fv(void);
+
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
@@ -686,8 +689,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     }
 
     model = (pppModelSt*)(*(void***)(pppEnvStPtr + 8))[graphId];
-    pppInitBlendMode__Fv();
-    pppSetBlendMode__FUc(*(unsigned char*)((unsigned char*)pBreathModel + 4));
+    pppInitBlendMode();
+    pppSetBlendMode(*(unsigned char*)((unsigned char*)pBreathModel + 4));
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(base + colorOffset, NULL, 0.0f, 0xFF, 0xFF,
                                                                *(unsigned char*)((unsigned char*)pBreathModel + 4), 0xFF, 0xFF,
@@ -804,13 +807,13 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[1][3] = pos.y;
                 sphereMtx[2][3] = pos.z;
 
-                pppSetBlendMode__FUc(1);
+                pppSetBlendMode(1);
                 DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
             }
             groupPtr += 0x5C;
         }
 
-        pppInitBlendMode__Fv();
+        pppInitBlendMode();
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
     }
 }

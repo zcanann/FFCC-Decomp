@@ -21,9 +21,11 @@ extern const f32 FLOAT_80333430;
 extern const f64 DOUBLE_80333440;
 extern const f64 DOUBLE_80333438;
 
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-f32 RandF__5CMathFf(f32, CMath*);
 int GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(CGame*, PPPIFPARAM*, int*, int*);
 void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);
 void* GetPartyObj__5CGameFi(CGame*, int);
@@ -40,7 +42,7 @@ int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
 int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-void pppSetBlendMode__FUc(u8);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 void SetVtxFmt_POS_CLR__5CUtilFv(void*);
@@ -59,7 +61,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
-void pppInitBlendMode__Fv(void);
+
 }
 
 static char s_pppLaser_cpp[] = "pppLaser.cpp";
@@ -146,7 +148,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     *((u16*)((u8*)pfVar3 + 0x34)) = 0;
     *((u16*)((u8*)pfVar3 + 0x32)) = 0;
 
-    pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, &Math);
+    pfVar3[14] = Math.RandF(FLOAT_8033345c);
     *((u8*)pfVar3 + 0x4c) = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
@@ -411,7 +413,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
     }
 
     tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
-    pppSetBlendMode__FUc(step->m_payload[0x1c]);
+    pppSetBlendMode(step->m_payload[0x1c]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (u8*)&pppLaser->field_0x88 + colorOffset, &baseObj->m_localMatrix, kPppLaserZero, step->m_payload[0x39],
@@ -528,7 +530,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
             GXSetNumTexGens(0);
-            pppSetBlendMode__FUc(1);
+            pppSetBlendMode(1);
 
             debugColor.r = 0x80;
             debugColor.g = 0xFF;
@@ -608,7 +610,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
             tempMtx[2][3] = work->m_origin.z;
             PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
             Graphic.DrawSphere(tempMtx, debugColor);
-            pppInitBlendMode__Fv();
+            pppInitBlendMode();
         }
     }
 }

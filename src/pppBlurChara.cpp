@@ -86,7 +86,7 @@ int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* mat
 int pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 void Draw__Q29CCharaPcs7CHandleFi(void* handle, int drawType);
-void pppInitBlendMode__Fv(void);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR*, pppFMATRIX*, float, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char);
@@ -370,7 +370,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         Graphic.CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);
     }
 
-    pppInitBlendMode__Fv();
+    pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((pppCVECTOR*)((char*)blurChara + 0x88 + colorOffset),
                                                                0, FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1,
@@ -484,5 +484,5 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-    pppInitBlendMode__Fv();
+    pppInitBlendMode();
 }

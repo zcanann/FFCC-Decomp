@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-extern "C" f32 RandF__5CMathFv(CMath*);
 
 struct PppRandDownCVParam2 {
     s32 field0;
@@ -44,9 +43,9 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        f32 value = -RandF__5CMathFv(&Math);
+        f32 value = -Math.RandF();
         if (in->fieldC != 0) {
-            f32 random = RandF__5CMathFv(&Math);
+            f32 random = Math.RandF();
             f32 blend = value - random;
             value = blend * kPppRandDownCVDualSampleScale;
         }

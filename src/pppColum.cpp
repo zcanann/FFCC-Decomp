@@ -43,11 +43,9 @@ static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-float RandF__5CMathFf(float, CMath*);
 unsigned char GetNoise__5CUtilFUc(void*, unsigned int);
 void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
-void pppInitBlendMode__Fv(void);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char,
                                                                 unsigned char, unsigned char, unsigned char,
                                                                 unsigned char, unsigned char, unsigned char);
@@ -110,7 +108,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             }
             segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
 
-            pppInitBlendMode__Fv();
+            pppInitBlendMode();
             for (int i = 0; i < param_2->m_count; i++) {
                 Vec center;
                 Vec offset;
@@ -149,7 +147,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 GXLoadTexObj((GXTexObj*)((char*)texture + 0x28), GX_TEXMAP0);
-                pppSetBlendMode__FUc(param_2->m_arg3);
+                pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;
                 shapeFrame =
@@ -175,7 +173,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 }
 
                 EndQuadEnv__5CUtilFv(&gUtil);
-                pppSetBlendMode__FUc(0);
+                pppSetBlendMode(0);
                 values++;
             }
         }
@@ -208,9 +206,9 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 
             values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values->m_scaleStep = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
+                values->m_scaleStep = Math.RandF(*(float*)(param_2->m_payload + 4));
                 values->m_scaleStep = values->m_scaleStep + *(float*)(param_2->m_payload + 0);
-                values->m_positionScale = RandF__5CMathFf(*(float*)(param_2->m_payload + 0xc), &Math);
+                values->m_positionScale = Math.RandF(*(float*)(param_2->m_payload + 0xc));
                 values->m_positionScale = values->m_positionScale + *(float*)(param_2->m_payload + 8);
                 values->m_colorR =
                     GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x16));

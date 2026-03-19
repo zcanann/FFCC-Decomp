@@ -7,7 +7,6 @@
 const float kPppSRandHCVSingleSampleScale = 2.0f;
 
 extern s16 gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandHCVParam2 {
     s32 field0;
@@ -49,9 +48,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&Math);
+			float value = Math.RandF();
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&Math);
+				value = value + Math.RandF();
 			} else {
 				value = value * kPppSRandHCVSingleSampleScale;
 			}
@@ -60,9 +59,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&Math);
+			float value = Math.RandF();
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&Math);
+				value = value + Math.RandF();
 			} else {
 				value = value * kPppSRandHCVSingleSampleScale;
 			}
@@ -71,9 +70,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&Math);
+			float value = Math.RandF();
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&Math);
+				value = value + Math.RandF();
 			} else {
 				value = value * kPppSRandHCVSingleSampleScale;
 			}
@@ -82,9 +81,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&Math);
+			float value = Math.RandF();
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&Math);
+				value = value + Math.RandF();
 			} else {
 				value = value * kPppSRandHCVSingleSampleScale;
 			}

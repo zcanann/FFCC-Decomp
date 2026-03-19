@@ -7,11 +7,12 @@
 #include "dolphin/mtx.h"
 
 extern _pppMngSt* pppMngStPtr;
+
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 void pppNormalize__FR3Vec3Vec(float*, Vec*);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+
 }
 
 /*
@@ -90,7 +91,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
     pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
     pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
-    pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+    pppSetFpMatrix(pppMngSt);
     *(u16*)(work + 3) = *(u16*)(work + 3) + 1;
 }
 

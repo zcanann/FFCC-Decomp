@@ -5,7 +5,6 @@
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern "C" float RandF__5CMathFv(CMath*);
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
@@ -79,9 +78,9 @@ void birth(
 
     directionSpeed = *(float*)(payload + 0x94);
     halfSpeed = directionSpeed * 0.5f;
-    randomYaw = RandF__5CMathFv(&Math) * directionSpeed - halfSpeed;
-    randomPitch = RandF__5CMathFv(&Math) * directionSpeed - halfSpeed;
-    randomRoll = RandF__5CMathFv(&Math) * directionSpeed - halfSpeed;
+    randomYaw = Math.RandF() * directionSpeed - halfSpeed;
+    randomPitch = Math.RandF() * directionSpeed - halfSpeed;
+    randomRoll = Math.RandF() * directionSpeed - halfSpeed;
 
     particle->m_velocity.x = randomYaw * *(float*)(payload + 0xA0);
     particle->m_velocity.y = randomPitch * *(float*)(payload + 0xA4);

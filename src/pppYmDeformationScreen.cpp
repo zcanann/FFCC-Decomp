@@ -92,17 +92,21 @@ static inline float CameraLookAtZ()
     return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xDC);
 }
 
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
+void pppSetFpMatrix(_pppMngSt*);
+
 extern "C" {
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, int, float*, float*, float*, float, float*, float*);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
-void pppInitBlendMode__Fv(void);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 	pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
 	unsigned char, unsigned char);
-void pppSetBlendMode__FUc(unsigned char);
+
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(int, int, int, int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -238,7 +242,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 			pppMngStPtr->m_matrix.value[0][3] = cameraX;
 			pppMngStPtr->m_matrix.value[1][3] = cameraY;
 			pppMngStPtr->m_matrix.value[2][3] = cameraZ;
-			pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
+			pppSetFpMatrix(pppMngStPtr);
 		}
 	}
 }
@@ -278,7 +282,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	color.m_rgba[1] = 0x40;
 	color.m_rgba[2] = 0x40;
 	color.m_rgba[3] = 0x40;
-	pppSetBlendMode__FUc(0);
+	pppSetBlendMode(0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 		&color, (pppFMATRIX*)0, 0.0f, (unsigned char)0, (unsigned char)0, (unsigned char)0, (unsigned char)0,
 		(unsigned char)1, (unsigned char)1, (unsigned char)0);
@@ -383,7 +387,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
 	GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
-	pppInitBlendMode__Fv();
+	pppInitBlendMode();
 }
 
 /*

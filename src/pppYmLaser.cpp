@@ -10,7 +10,6 @@
 
 #include <string.h>
 
-extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
 extern const f32 FLOAT_80330df0;
@@ -20,6 +19,9 @@ extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
 extern f32 FLOAT_80330dec;
 extern f64 DOUBLE_80330dd8;
+
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -33,7 +35,7 @@ int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
 int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-void pppSetBlendMode__FUc(u8);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 void SetVtxFmt_POS_CLR__5CUtilFv(void*);
@@ -52,7 +54,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
-void pppInitBlendMode__Fv(void);
+
 }
 
 static char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
@@ -121,7 +123,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	work->m_shapeA = 0;
 	work->m_shapeC = 0;
 	work->m_shapeB = 0;
-	work->m_shapeRotZ = RandF__5CMathFf(randArg, &Math);
+	work->m_shapeRotZ = Math.RandF(randArg);
 }
 
 /*
@@ -348,7 +350,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 
 	tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
-	pppSetBlendMode__FUc(step->m_payload[0x1c]);
+	pppSetBlendMode(step->m_payload[0x1c]);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 		(u8*)laser + 0x88 + colorOffset, &baseObj->m_localMatrix, kPppYmLaserOne, step->m_payload[0x39],
@@ -466,7 +468,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
 			_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
 			GXSetNumTexGens(0);
-			pppSetBlendMode__FUc(1);
+			pppSetBlendMode(1);
 
 			debugColor.r = 0x80;
 			debugColor.g = 0xFF;
@@ -547,7 +549,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			tempMtx[2][3] = work[10];
 			PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
 			Graphic.DrawSphere(tempMtx, debugColor);
-			pppInitBlendMode__Fv();
+			pppInitBlendMode();
 		}
 	}
 }

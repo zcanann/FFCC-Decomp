@@ -16,9 +16,6 @@ extern s32 gPppDefaultValueBuffer[];
  */
 
 
-extern "C" {
-f32 RandF__5CMathFv(CMath*);
-}
 
 struct PppRandIntParam2 {
     s32 field0;
@@ -45,9 +42,9 @@ void pppRandInt(void* param1, void* param2, void* param3)
 
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
-        f32 value = RandF__5CMathFv(&Math);
+        f32 value = Math.RandF();
         if (in->fieldC != 0) {
-            value += RandF__5CMathFv(&Math);
+            value += Math.RandF();
         } else {
             value *= kPppRandIntSingleSampleScale;
         }

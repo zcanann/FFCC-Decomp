@@ -8,7 +8,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-
 extern float FLOAT_80330dac;
 
 struct pppCVECTOR {
@@ -39,13 +38,16 @@ static inline Mtx44& CameraScreenMatrix()
     return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
 }
 
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-void pppInitBlendMode__Fv(void);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(int, int,
@@ -212,7 +214,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     int backTexture = 0;
 
     PSMTXIdentity(rotMtx);
-    pppSetBlendMode__FUc(0);
+    pppSetBlendMode(0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -232,7 +234,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7, 4);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-    pppSetBlendMode__FUc(payload[0x14]);
+    pppSetBlendMode(payload[0x14]);
     if (payload[0x14] == 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
     }
@@ -312,7 +314,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-        pppInitBlendMode__Fv();
+        pppInitBlendMode();
     }
 }
 

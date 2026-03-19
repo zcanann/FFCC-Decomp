@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern s16 gPppDefaultValueBuffer[];
-extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 struct RandUpShortParam {
     s32 targetId;
@@ -42,9 +41,9 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
 
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
-        f32 value = RandF__5CMathFv(&Math);
+        f32 value = Math.RandF();
         if (in->randomTwice != 0) {
-            f32 mixed = value + RandF__5CMathFv(&Math);
+            f32 mixed = value + Math.RandF();
             value = mixed * kPppRandUpShortDualSampleScale;
         }
 

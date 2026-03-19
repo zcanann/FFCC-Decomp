@@ -43,7 +43,6 @@ struct VertexApAtState
 
 struct _pppPDataVal;
 
-extern "C" f32 RandF__5CMathFv(CMath*);
 extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
@@ -134,7 +133,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
             break;
         case 1:
             while (count-- != 0) {
-                f32 randValue = RandF__5CMathFv(&Math);
+                f32 randValue = Math.RandF();
                 f32 maxValue = (f32)entry->maxValue;
                 int outValue = (int)(randValue * maxValue);
                 u16 outValue16 = (u16)outValue;

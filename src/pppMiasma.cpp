@@ -36,10 +36,12 @@ static inline Mtx44& CameraScreenMatrix()
     return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
 }
 
+void pppInitBlendMode(void);
+void pppSetBlendMode(unsigned char);
+
 extern "C" {
 void GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
-void pppInitBlendMode__Fv(void);
-void pppSetBlendMode__FUc(u8);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, s32);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -239,8 +241,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         GXLoadPosMtxImm(*(Mtx*)((u8*)pppMiasma + 0x40), 0);
 
         GXSetTevDirect(GX_TEVSTAGE0);
-        pppInitBlendMode__Fv();
-        pppSetBlendMode__FUc(1);
+        pppInitBlendMode();
+        pppSetBlendMode(1);
         GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
         _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -256,8 +258,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             Graphic.SetDrawDoneDebugData(0x33);
         }
 
-        pppInitBlendMode__Fv();
-        pppSetBlendMode__FUc(2);
+        pppInitBlendMode();
+        pppSetBlendMode(2);
         GXSetTevDirect(GX_TEVSTAGE0);
         GXSetCullMode(GX_CULL_BACK);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -301,7 +303,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             stepColor.b = tevAlphaScale;
             stepColor.a = tevAlphaScale;
             GXSetTevKColor((GXTevKColorID)0, stepColor);
-            pppSetBlendMode__FUc(0);
+            pppSetBlendMode(0);
             GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&packedColor);
             GXSetNumTexGens(2);
             _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -365,8 +367,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             quadB.y = (float)yOffset + FLOAT_8033192c;
             quadB.z = FLOAT_8033193c;
 
-            pppInitBlendMode__Fv();
-            pppSetBlendMode__FUc(0);
+            pppInitBlendMode();
+            pppSetBlendMode(0);
             if ((u8)step->m_arg3 != 2) {
                 gUtil.RenderQuadTex2(quadA, quadB, *(GXColor*)&packedColor, 0, 0);
             }
@@ -384,8 +386,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
                 2, tevSwapChannel, tevSwapChannel, tevSwapChannel, tevSwapChannel);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 2);
 
-            pppInitBlendMode__Fv();
-            pppSetBlendMode__FUc(1);
+            pppInitBlendMode();
+            pppSetBlendMode(1);
             drawColor.r = 0xFF;
             drawColor.g = 0xFF;
             drawColor.b = 0xFF;
@@ -479,7 +481,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     }
 
     gUtil.EndQuadEnv();
-    pppInitBlendMode__Fv();
+    pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     Graphic.SetViewport();
     gUtil.InitConstantRegister();

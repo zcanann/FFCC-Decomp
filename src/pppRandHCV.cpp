@@ -5,7 +5,6 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 extern s16 gPppDefaultValueBuffer[];
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 typedef struct RandHCVParams {
     s32 field0;
@@ -47,9 +46,9 @@ void pppRandHCV(void* p1, void* p2, void* p3)
     }
 
     if (params->field0 == *(s32*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(&Math);
+        f32 value = Math.RandF();
         if (params->field10 != 0) {
-            value += RandF__5CMathFv(&Math);
+            value += Math.RandF();
         } else {
             value *= kPppRandHCVSingleSampleScale;
         }

@@ -8,7 +8,6 @@
 #include "dolphin/gx.h"
 #include <math.h>
 
-
 struct ConformState {
     Vec m_normal;
     u8 m_initialized;
@@ -23,11 +22,13 @@ struct ConformCylinderQuery {
     f32 m_field30;
 };
 
+void pppSetFpMatrix(_pppMngSt*);
+
 extern "C" {
 s32 CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+
 }
 
 struct CMapCylinderRaw {
@@ -289,6 +290,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             }
 
             pppMngStPtr->m_matrix.value[1][3] += param2->m_dataValIndex;
-            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+            pppSetFpMatrix(pppMngSt);
     }
 }

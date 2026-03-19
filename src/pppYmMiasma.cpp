@@ -19,7 +19,6 @@ extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
-extern float RandF__5CMathFf(float, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
@@ -33,7 +32,7 @@ extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
-extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
@@ -142,7 +141,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     fVar2 = fVar2 * (float)((double)vYmMiasma->m_radius + dVar8);
     particleData->m_matrix[0][0] = fVar2;
     particleData->m_matrix[1][0] = fVar2;
-    dVar7 = (double)RandF__5CMathFf(pYmMiasma->m_heightJitter, &Math);
+    dVar7 = (double)Math.RandF(pYmMiasma->m_heightJitter);
     particleData->m_matrix[0][1] = (float)dVar7;
     particleData->m_matrix[1][1] = (float)dVar7;
     fVar2 = (float)(dVar9 * (double)(float)((double)vYmMiasma->m_radius + dVar8));
@@ -563,7 +562,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             amb.b = *(u8*)((u8*)particle + 0x24);
             amb.a = *(u8*)((u8*)particle + 0x26);
             GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppSetBlendMode__FUc(blend);
+            pppSetBlendMode(blend);
             pppDrawShp__FPlsP12CMaterialSetUc(
                 shapeTable, *(s16*)((u8*)particle + 0x4e), pppEnvStPtr->m_materialSetPtr, blend);
         }

@@ -5,7 +5,7 @@
 extern "C" {
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-void pppSetBlendMode__FUc(unsigned char);
+
 void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 }
 
@@ -49,10 +49,9 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
         *(u8*)((u8*)mdl + 0xD),
         *(u8*)((u8*)mdl + 0xE));
 
-    pppSetBlendMode__FUc(*(u8*)((u8*)mdl + 0x9));
+    pppSetBlendMode(*(u8*)((u8*)mdl + 0x9));
 
     void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
     pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)mdl + 0x4)], *(void**)((u8*)obj + 0x70), 1);
 }
-
 

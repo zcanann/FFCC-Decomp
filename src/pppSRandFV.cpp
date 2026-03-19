@@ -5,7 +5,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "dolphin/types.h"
 extern f32 gPppDefaultValueBuffer[];
-extern "C" f32 RandF__5CMathFv(CMath*);
 
 void randfloat(float, float);
 void randf(unsigned char);
@@ -51,9 +50,9 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandFVSingleSampleScale;
             }
@@ -62,9 +61,9 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandFVSingleSampleScale;
             }
@@ -73,9 +72,9 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = cfg->field18;
-            f32 value = RandF__5CMathFv(&Math);
+            f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + RandF__5CMathFv(&Math);
+                value = value + Math.RandF();
             } else {
                 value = value * kPppSRandFVSingleSampleScale;
             }

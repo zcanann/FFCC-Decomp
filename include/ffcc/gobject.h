@@ -64,7 +64,7 @@ public:
     void LoadAnim(char*, int, int, int, unsigned long);
     void FreeAnim(int);
     int IsLoopAnim(int mode);
-    void IsAnimFinished(int);
+    int IsAnimFinished(int);
     void CancelAnim(int);
     void PlayAnim(int, int, int, int, int, signed char*);
     void SetDispItemName(int);

@@ -12,7 +12,7 @@
 
 // External function declarations
 extern "C" int rand(void);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, CChara::CModel*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
@@ -50,7 +50,7 @@ struct LocationTitle2Particle {
     s16 m_pad1;
 };
 
-static char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 
 /*
  * --INFO--
@@ -268,11 +268,11 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 {
     int serializedOffset = *unkC->m_serializedDataOffsets;
     u32 dataValIndex = unkB->m_dataValIndex;
+    LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
 
     if (dataValIndex != 0xFFFF) {
         u32 graphId = locationTitle->m_graphId;
         int graphFrame = GetGraphFrameFromId(graphId);
-        LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
         long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         u8 blendMode = *((u8*)&unkB->m_stepValue + 1);

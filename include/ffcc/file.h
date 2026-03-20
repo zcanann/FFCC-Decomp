@@ -64,14 +64,14 @@ public:
 	void DrawError(DVDFileInfo& info, int errorCode);
 	
 	// void* m_vtable;             // 0x0
-    void* m_stage;                 // 0x4
+    void* m_allocStage;            // 0x4
     void* m_readBuffer;            // 0x8
-    void* m_allocStage;            // 0xC
-    CHandle m_fileHandle;          // 0x10-0xbb
-    CHandle* m_freeList;           // 0xC0
-    CHandle m_handlePoolHead;      // 0xC4
-    int m_fatalDiskErrorFlag;      // 0x174
-    int m_isDiskError;             // 0x178
+    CHandle m_fileHandle;          // 0x0c-0xb7
+    void* m_freeListSentinelDummy; // 0xb8
+    CHandle* m_freeList;           // 0xbc
+    CHandle m_handlePoolHead;      // 0xc0-0x16b
+    int m_fatalDiskErrorFlag;      // 0x16c
+    int m_isDiskError;             // 0x170
 };
 
 extern CFile File;

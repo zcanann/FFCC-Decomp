@@ -4030,14 +4030,15 @@ unsigned int GbaQueue::GetPauseMode()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char GbaQueue::GetItemUse(int channel)
+int GbaQueue::GetItemUse(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(this) + channel;
 	OSWaitSemaphore(semaphore);
-	unsigned char value = static_cast<unsigned char>(obj[channel * 0xDC + 0x52A]);
+	char value = obj[channel * 0xDC + 0x52A];
+	int result = (int)value;
 	OSSignalSemaphore(semaphore);
-	return value;
+	return result;
 }
 
 /*
@@ -4201,14 +4202,15 @@ void GbaQueue::ClrCmdNumFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char GbaQueue::GetCmdNum(int channel)
+int GbaQueue::GetCmdNum(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(this) + channel;
 	OSWaitSemaphore(semaphore);
 	char value = obj[channel * 0xDC + 0x527];
+	int result = (int)value;
 	OSSignalSemaphore(semaphore);
-	return static_cast<unsigned char>(value);
+	return result;
 }
 
 /*

@@ -141,7 +141,7 @@ public:
     void OpenMenu(int, int, int);
     void SetPauseMode(int);
     unsigned int GetPauseMode();
-    unsigned char GetItemUse(int);
+    int GetItemUse(int);
     unsigned int GetSPModeFlg(int);
     void ClrSPModeFlg(int);
     unsigned int GetSPMode(int);
@@ -150,7 +150,7 @@ public:
     unsigned char GetMemorys(int);
     unsigned int GetCmdNumFlg(int);
     void ClrCmdNumFlg(int);
-    unsigned char GetCmdNum(int);
+    int GetCmdNum(int);
     unsigned int GetPlayModeFlg(int);
     void ClrPlayModeFlg(int);
     void SetStartBonusFlg();

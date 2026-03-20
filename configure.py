@@ -473,7 +473,7 @@ config.libs = [
             Object(NonMatching, "p_menu.cpp"),
             Object(NonMatching, "p_minigame.cpp"),
             Object(NonMatching, "p_sample.cpp"),
-            Object(NonMatching, "p_sound.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"]),
+            Object(NonMatching, "p_sound.cpp"),
             Object(NonMatching, "p_system.cpp"),
             Object(NonMatching, "p_tina.cpp"),
             Object(NonMatching, "p_usb.cpp"),

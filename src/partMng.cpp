@@ -13,6 +13,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/USBStreamData.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/pppShape.h"
@@ -1212,12 +1213,46 @@ void CPartMng::ReadTex(CChunkFile&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005dad0
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppReadRsd(CChunkFile&, pppModelSt*)
+void CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 {
-	// TODO
+    struct PartMngResRaw {
+        unsigned char m_unk0[0x7e4];
+        CMaterialSet* m_materialSet;
+    };
+
+    struct PartPcsRaw {
+        unsigned char m_unk0[4];
+        CUSBStreamData m_usbStreamData;
+    };
+
+    char* textureNames[0x101];
+    CChunkFile::CChunk chunk;
+    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(this);
+    PartPcsRaw* partPcs = reinterpret_cast<PartPcsRaw*>(&PartPcs);
+
+    while (chunkFile.GetNextChunk(chunk)) {
+        chunkFile.PushChunk();
+        if (chunk.m_id == 'RSD ') {
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 'TXNM') {
+                    for (unsigned int i = 0; i < chunk.m_arg0; i++) {
+                        textureNames[i] = chunkFile.GetString();
+                    }
+                } else if (chunk.m_id == 'MESH') {
+                    modelSt->ReadOtmMesh(chunkFile, &partPcs->m_usbStreamData.m_stageLoad, 0, 0);
+                    modelSt->SetDisplayListMaterial(res->m_materialSet, textureNames, 0);
+                }
+            }
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*

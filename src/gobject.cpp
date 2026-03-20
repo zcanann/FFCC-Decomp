@@ -1980,7 +1980,7 @@ void CGObject::SetTexAnim(char* name)
  */
 void CGObject::LookAt(CGObject* target, char* nodeName)
 {
-    short nodeIndex;
+    int nodeIndex;
 
     m_lookAtTarget = target;
     if (nodeName == 0) {

@@ -23,10 +23,6 @@ static const char s_usbRootPath[] = "plot/kmitsuru/";
 static char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-extern "C" char __vt__8CManager[];
-extern "C" char __vt_CProcess[];
-extern "C" void* __vt__7CUSBPcs[];
-
 
 /*
  * --INFO--
@@ -34,7 +30,6 @@ extern "C" void* __vt__7CUSBPcs[];
  * Size:	TODO
  */
 CUSBPcs::CUSBPcs()
-    : CProcess()
 {
     u32* table = m_table__7CUSBPcs;
 
@@ -267,13 +262,3 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     }
     return result;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x800203e4
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */

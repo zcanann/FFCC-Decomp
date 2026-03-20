@@ -394,11 +394,10 @@ void CFunnyShape::Render()
         _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-        const u32 color = DAT_8032fd60;
-        GXColor ambColor = ToGXColor(color);
-        GXSetChanAmbColor(GX_COLOR0A0, ambColor);
-        GXColor matColor = ToGXColor(color);
-        GXSetChanMatColor(GX_COLOR0A0, matColor);
+        u32 chanColor = DAT_8032fd60;
+        GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&chanColor));
+        u32 matColor = chanColor;
+        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&matColor));
 
         s32 count;
         if ((U32At(this, 0) & 0x80) == 0) {
@@ -445,10 +444,9 @@ void CFunnyShape::RenderTexture()
     GXSetNumChans(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
     u32 chanColor = DAT_8032fd58;
-    GXColor ambColor = ToGXColor(chanColor);
-    GXSetChanAmbColor(GX_COLOR0A0, ambColor);
-    GXColor matColor = ambColor;
-    GXSetChanMatColor(GX_COLOR0A0, matColor);
+    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&chanColor));
+    u32 matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&matColor));
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

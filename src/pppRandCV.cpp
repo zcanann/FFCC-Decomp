@@ -49,30 +49,23 @@ void pppRandCV(void* param1, void* param2, void* param3)
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
         *valuePtr = value;
-    } else if (params->index != *(s32*)(base + 0xC)) {
-        return;
     } else {
+        if (params->index != *(s32*)(base + 0xC)) {
+            return;
+        }
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    u8* targetColor =
-        (params->colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + params->colorOffset + 0x80);
+    u8* targetColor;
+    if (params->colorOffset == -1) {
+        targetColor = &gPppDefaultValueBuffer[0];
+    } else {
+        targetColor = (u8*)(base + params->colorOffset + 0x80);
+    }
 
     f32 scale = *valuePtr;
-    {
-        s8 baseValue = params->delta[0];
-        targetColor[0] += (s8)((f32)baseValue * scale - (f32)baseValue);
-    }
-    {
-        s8 baseValue = params->delta[1];
-        targetColor[1] += (s8)((f32)baseValue * scale - (f32)baseValue);
-    }
-    {
-        s8 baseValue = params->delta[2];
-        targetColor[2] += (s8)((f32)baseValue * scale - (f32)baseValue);
-    }
-    {
-        s8 baseValue = params->delta[3];
-        targetColor[3] += (s8)((f32)baseValue * scale - (f32)baseValue);
-    }
+    targetColor[0] += (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]);
+    targetColor[1] += (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]);
+    targetColor[2] += (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]);
+    targetColor[3] += (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]);
 }

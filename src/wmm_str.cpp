@@ -30,19 +30,20 @@ extern const char s_WinMessTable[];
 
 const char* s_NoTextByLanguage[] = {
     "No",
+    "No",
     "Nein",
     "No",
-    "Non",
     "No",
+    "Non",
 };
 
 const char* s_SlotBTextByLanguage[] = {
     "Slot B",
+    "Slot B",
     "Steckplatz B",
     "Slot B",
-    "Slot B",
     "Ranura B",
-    0,
+    "Slot B",
 };
 
 /*
@@ -59,7 +60,7 @@ const char* CMenuPcs::GetMcStr(int index)
     CGame& game = Game;
 
     switch (game.m_gameWork.m_languageId) {
-    case 1:
+    case 2:
         return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
     case 3:
         return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
@@ -89,7 +90,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 
     if (group == 0) {
         switch (languageId) {
-        case 1:
+        case 2:
             result = s_McWinMessGroup0_de;
             break;
         case 3:
@@ -107,7 +108,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         }
     } else if (group == 1) {
         switch (languageId) {
-        case 1:
+        case 2:
             result = s_McWinMessGroup1_de;
             break;
         case 3:
@@ -125,7 +126,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         }
     } else {
         switch (languageId) {
-        case 1:
+        case 2:
             result = s_McWinMessGroup2_de;
             break;
         case 3:
@@ -178,7 +179,7 @@ int CMenuPcs::GetYesNoXPos(int right)
     const unsigned char languageId = game.m_gameWork.m_languageId;
     const char* yesText;
     switch (languageId) {
-    case 1:
+    case 2:
         yesText = s_McWinMessGroup0_de[13];
         break;
     case 3:
@@ -204,7 +205,7 @@ int CMenuPcs::GetYesNoXPos(int right)
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
+        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId]);
         x += yesWidth - noWidth;
     }
     return x - 0x1e;
@@ -225,7 +226,7 @@ int CMenuPcs::GetSlotABXPos(int right)
     const unsigned char languageId = game.m_gameWork.m_languageId;
     const char* slotAText;
     switch (languageId) {
-    case 1:
+    case 2:
         slotAText = s_McWinMessGroup0_de[2];
         break;
     case 3:
@@ -252,7 +253,7 @@ int CMenuPcs::GetSlotABXPos(int right)
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
+        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId]);
         x += slotAWidth - slotBWidth;
     }
     return x - 0x1e;

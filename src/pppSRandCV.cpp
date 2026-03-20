@@ -92,10 +92,8 @@ void pppSRandCV(void* param1, void* param2, void* param3)
         target = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    u8* target_colors;
-    if (in->sourceOffset == -1) {
-        target_colors = gPppDefaultValueBuffer;
-    } else {
+    u8* target_colors = &gPppDefaultValueBuffer[0];
+    if (in->sourceOffset != -1) {
         target_colors = base + in->sourceOffset + 0x80;
     }
 

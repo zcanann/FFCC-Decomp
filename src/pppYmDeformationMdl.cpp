@@ -198,7 +198,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     }
 
     int colorOffset = param_3->m_serializedDataOffsets[1];
-    u8* payload = (u8*)&param_2->m_payload0;
+    pppCVECTOR* color = (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + colorOffset);
+    pppFMATRIX* modelMatrix = (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40);
     Mtx texMtx;
     Mtx cameraMtx;
     Mtx44 screenMtx;
@@ -217,9 +218,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + colorOffset),
-        (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40), *(float*)(payload + 0x10), payload[0x17], payload[0x16], payload[0x14],
-        payload[0x15], (u8)(payload[0x18] == 0), 1, 0);
+        color, modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A, param_2->m_payloadByte28,
+        param_2->m_payloadByte29, (u8)(param_2->m_payloadByte2C == 0), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -233,11 +233,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7, 4);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-    pppSetBlendMode(payload[0x14]);
-    if (payload[0x14] == 0) {
+    pppSetBlendMode(param_2->m_payloadByte28);
+    if (param_2->m_payloadByte28 == 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
     }
-    if (payload[0x14] == 3) {
+    if (param_2->m_payloadByte28 == 3) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 1);
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
     }

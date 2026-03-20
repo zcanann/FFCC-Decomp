@@ -224,6 +224,13 @@ static inline void dataCacheBlockInvalidateInline(register void* param_1)
 #endif
 }
 
+static inline void dataCacheBlockInvalidateIndexed(register u32 offset, register void* base)
+{
+#ifdef __MWERKS__
+	asm { dcbi offset, base }
+#endif
+}
+
 static asm void dataCacheBlockFlush(register void* param_1)
 {
 #ifdef __MWERKS__ // clang-format off
@@ -335,6 +342,7 @@ LAB_801adc44:
 
 void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 {
+	u32 alignedAddress;
 	u32 uVar1;
 	u32 uVar2;
 	u16 sVar3;
@@ -346,11 +354,12 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	if (param_2 < 0x4000) {
 		return;
 	}
-	if (param_2 + *param_3 >= 0x8000000) {
+	if (0x8000000 < param_2 + *param_3) {
 		return;
 	}
 
 	iVar5 = 0;
+	alignedAddress = param_2 & 0xFFFFFFE0;
 	uVar1 = (*param_3 + (param_2 & 0x1F) + 0x1F) & 0xFFFFFFE0;
 	uVar2 = (uVar1 + 0x1F) >> 5;
 	if (uVar1 != 0) {
@@ -358,15 +367,22 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 		uVar7 = uVar2;
 		if (uVar6 != 0) {
 			do {
-				dataCacheBlockInvalidateInline((void*)(iVar5 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0x20 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0x40 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0x60 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0x80 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0xA0 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0xC0 + param_1));
-				dataCacheBlockInvalidateInline((void*)(iVar5 + 0xE0 + param_1));
-				iVar5 += 0x100;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
 				uVar6--;
 			} while (uVar6 != 0);
 			uVar7 = uVar2 & 7;
@@ -376,7 +392,7 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 			}
 		}
 		do {
-			dataCacheBlockInvalidateInline((void*)(iVar5 + param_1));
+			dataCacheBlockInvalidateIndexed(iVar5, (void*)param_1);
 			iVar5 += 0x20;
 			uVar7--;
 		} while (uVar7 != 0);
@@ -387,7 +403,7 @@ LAB_801ade28:
 	} while (uVar2 != 0);
 	sVar3 = __ARGetInterruptStatus();
 	__ARClearInterrupt();
-	ARStartDMA(1, param_1, param_2 & 0xFFFFFFE0, uVar1);
+	ARStartDMA(1, param_1, alignedAddress, uVar1);
 	do {
 		sVar4 = __ARGetInterruptStatus();
 	} while (sVar4 == 0);

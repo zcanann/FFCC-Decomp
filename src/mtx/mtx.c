@@ -1366,6 +1366,7 @@ void C_MTXLightOrtho(Mtx m, f32 t, f32 b, f32 l, f32 r, float scaleS, float scal
 {
     f32 tmp;
     f32 add;
+    f32 negAdd;
     f32 proj;
 
     tmp = 1.0f / (r - l);
@@ -1373,7 +1374,8 @@ void C_MTXLightOrtho(Mtx m, f32 t, f32 b, f32 l, f32 r, float scaleS, float scal
     m[0][1] = 0.0f;
     m[0][2] = 0.0f;
     add = r + l;
-    proj = (-add * tmp) * scaleS;
+    negAdd = -add;
+    proj = (tmp * negAdd) * scaleS;
     m[0][3] = transS + proj;
 
     tmp = 1.0f / (t - b);
@@ -1381,7 +1383,8 @@ void C_MTXLightOrtho(Mtx m, f32 t, f32 b, f32 l, f32 r, float scaleS, float scal
     m[1][1] = (2.0f * tmp) * scaleT;
     m[1][2] = 0.0f;
     add = t + b;
-    proj = (-add * tmp) * scaleT;
+    negAdd = -add;
+    proj = (tmp * negAdd) * scaleT;
     m[1][3] = transT + proj;
 
     m[2][0] = 0.0f;

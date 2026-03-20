@@ -186,7 +186,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	LensFlareStep* step;
 	int shapeOffset;
 	int colorOffset;
-	long** shapeTable;
+	long* shape;
 	s32 dataValIndex;
 	u8* objBytes;
 	u8* shapeBase;
@@ -203,7 +203,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	dataValIndex = step->m_dataValIndex;
 
 	if ((dataValIndex != 0xFFFF) &&
-		(shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
+		(shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
 		 shapeBase[0x32] != 0)) {
 		pppCVECTOR local_70;
 		Vec local_60;
@@ -243,7 +243,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 					  stepArgBytes[2], (u8)0, (u8)1, (u8)1, (u8)0);
 
 		pppSetBlendMode(stepArgBytes[2]);
-		pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, stepArgBytes[2]);
+		pppDrawShp(shape, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, stepArgBytes[2]);
 		pppSetBlendMode(3);
 	}
 }

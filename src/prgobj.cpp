@@ -19,6 +19,7 @@ extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" float FLOAT_80331BD4;
+extern "C" float FLOAT_80331BD8;
 
 /*
  * --INFO--
@@ -497,7 +498,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
-	Math.DstRot(m_rotBaseY, 3.1415927f + targetRot);
+	Math.DstRot(m_rotBaseY, FLOAT_80331BD8 + targetRot);
 }
 
 /*

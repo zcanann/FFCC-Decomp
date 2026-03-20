@@ -349,8 +349,12 @@ void CFunnyShapePcs::destroyViewer()
 {
     USBPcs.IsBigAlloc(0);
 
-    u32 clearColor = 0;
-    GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+    GXColor clearColor;
+    clearColor.r = 0;
+    clearColor.g = 0;
+    clearColor.b = 0;
+    clearColor.a = 0;
+    GXSetCopyClear(clearColor, 0xFFFFFF);
 
     reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(Ptr(this, 0x61BC))->DeleteAndRemoveAll();
     reinterpret_cast<CPtrArray<_GXTexObj*>*>(Ptr(this, 0x61D8))->DeleteAndRemoveAll();

@@ -28,8 +28,6 @@ unsigned int gGbaStatusWordTable[0x57] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000045, 0x00000001,
 };
 
-u8 ARRAY_802f49b0[0xC];
-extern "C" void __dt__8GbaQueueFv(void*);
 extern "C" int rand(void);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
@@ -76,7 +74,7 @@ extern float FLOAT_80330D54;
  */
 GbaQueue::GbaQueue()
 {
-	// TODO
+	Init();
 }
 
 /*
@@ -4314,23 +4312,4 @@ void GbaQueue::ClrStartBonusFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	obj[0x2D61] = obj[0x2D61] & ~(1 << channel);
 	OSSignalSemaphore(semaphore);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d15c8
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_gbaque_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated from global variable initialization.
-    // To match, replace with proper constructors or initializer expressions, then
-    // delete this function so the compiler auto-generates it.
-
-	GbaQue.Init();
-	__register_global_object(&GbaQue, __dt__8GbaQueueFv, ARRAY_802f49b0);
 }

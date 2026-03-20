@@ -152,7 +152,12 @@ void CheckLineCylinder(const Vec& start, const Vec& end, const CMapCylinder& cyl
  */
 CMapCylinder::CMapCylinder()
 {
-	// TODO
+	m_direction2.y = 0.0f;
+	m_direction2.x = 0.0f;
+	m_top.z = 0.0f;
+	m_height2 = 1.0f;
+	m_radius2 = 1.0f;
+	m_direction2.z = 1.0f;
 }
 
 /*
@@ -933,34 +938,4 @@ CMapHitFace::CMapHitFace()
     m_boundsMax.z = 1.0f;
     m_boundsMax.y = 1.0f;
     m_boundsMax.x = 1.0f;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80027728
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_maphit_cpp()
-{
-    // NOTE: This __sinit is compiler-generated from global variable initialization.
-    // To match, replace with proper constructors or initializer expressions, then
-    // delete this function so the compiler auto-generates it.
-
-    g_hit_cyl.m_direction2.y = 0.0f;
-    g_hit_cyl.m_direction2.x = 0.0f;
-    g_hit_cyl.m_top.z = 0.0f;
-    g_hit_cyl.m_height2 = 1.0f;
-    g_hit_cyl.m_radius2 = 1.0f;
-    g_hit_cyl.m_direction2.z = 1.0f;
-
-    g_hit_cyl_min.m_direction2.y = 0.0f;
-    g_hit_cyl_min.m_direction2.x = 0.0f;
-    g_hit_cyl_min.m_top.z = 0.0f;
-    g_hit_cyl_min.m_height2 = 1.0f;
-    g_hit_cyl_min.m_radius2 = 1.0f;
-    g_hit_cyl_min.m_direction2.z = 1.0f;
 }

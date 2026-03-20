@@ -3,8 +3,9 @@
 #define _FFCC_PAD_H_
 
 #include "dolphin/pad.h"
+#include "ffcc/manager.h"
 
-class CPad
+class CPad : public CManager
 {
 public:
     struct Gba
@@ -18,8 +19,6 @@ public:
     void Frame();
     void SaveReplayData();
     unsigned short GetButtonDown(long);
-
-    void* _0_4_;
     short _4_2_;
     short _6_2_;
     short _8_2_;

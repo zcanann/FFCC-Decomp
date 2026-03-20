@@ -18,11 +18,34 @@ const float kOctTreeCylinderPad = 1.0f;
 static unsigned long s_clearFlagMask;
 struct CBoundRaw
 {
+    CBoundRaw()
+    {
+        float min = kOctTreeBoundMinInit;
+        float max = kOctTreeBoundMaxInit;
+        float* bound = (float*)this;
+        bound[2] = min;
+        bound[1] = min;
+        bound[0] = min;
+        bound[5] = max;
+        bound[4] = max;
+        bound[3] = max;
+    }
+
     Vec m_min;
     Vec m_max;
 };
 struct CMapCylinderRaw
 {
+    CMapCylinderRaw()
+    {
+        m_direction2.y = kOctTreeBoundMinInit;
+        m_direction2.x = kOctTreeBoundMinInit;
+        m_top.z = kOctTreeBoundMinInit;
+        m_height2 = kOctTreeBoundMaxInit;
+        m_radius2 = kOctTreeBoundMaxInit;
+        m_direction2.z = kOctTreeBoundMaxInit;
+    }
+
     Vec m_bottom;
     Vec m_direction;
     float m_radius;
@@ -2176,36 +2199,4 @@ COctNode::COctNode()
 	bounds[3] = max;
 	m_unk44 = 0;
 	m_unk48 = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002f410
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_mapocttree_cpp()
-{
-    // NOTE: This __sinit is compiler-generated from global variable initialization.
-    // To match, replace with proper constructors or initializer expressions, then
-    // delete this function so the compiler auto-generates it.
-
-	float* bound = reinterpret_cast<float*>(Ptr(&s_bound, 0x0));
-
-	bound[2] = kOctTreeBoundMinInit;
-	bound[1] = kOctTreeBoundMinInit;
-	bound[0] = kOctTreeBoundMinInit;
-	bound[5] = kOctTreeBoundMaxInit;
-	bound[4] = kOctTreeBoundMaxInit;
-	bound[3] = kOctTreeBoundMaxInit;
-
-	s_cyl.m_direction2.y = kOctTreeBoundMinInit;
-	s_cyl.m_direction2.x = kOctTreeBoundMinInit;
-	s_cyl.m_top.z = kOctTreeBoundMinInit;
-	s_cyl.m_height2 = kOctTreeBoundMaxInit;
-	s_cyl.m_radius2 = kOctTreeBoundMaxInit;
-	s_cyl.m_direction2.z = kOctTreeBoundMaxInit;
 }

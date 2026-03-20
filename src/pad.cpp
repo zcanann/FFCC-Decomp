@@ -17,8 +17,7 @@
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
-extern "C" char __vt__8CManager[];
-extern "C" char PTR_PTR_DAT_801e8864[];
+
 extern "C" {
 unsigned char BYTE_ARRAY_8024430c[0x34] = {};
 }
@@ -28,40 +27,10 @@ extern "C" float FLOAT_8032f828;
 extern "C" double DOUBLE_8032f830;
 extern "C" double DOUBLE_8032f838;
 
-/*
- * --INFO--
- * PAL Address: 0x800211a8
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_pad_cpp()
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-	void* vtbl = __vt__8CManager;
-	*reinterpret_cast<void**>(&Pad) = vtbl;
-	*reinterpret_cast<void**>(&Pad) = PTR_PTR_DAT_801e8864;
-	Pad._1b4_4_ = 0;
-	Pad._1b8_4_ = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 CPad::CPad()
 {
-	// TODO
+	_1b4_4_ = 0;
+	_1b8_4_ = 0;
 }
 
 /*

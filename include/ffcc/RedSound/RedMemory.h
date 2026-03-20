@@ -9,11 +9,11 @@ extern int gRedAMemorySize;
 extern int* gRedMainMemoryBlockList;
 extern int* gRedAMemoryBlockList;
 
-extern char sRedMemoryLogPrefix;
-extern char sRedMemoryLogSuffixA;
-extern char sRedMemoryLogSuffixB;
-extern char s_redMemoryMainBankFullFmt[];
-extern char s_redMemoryAuxBankFullFmt[];
+extern const char sRedMemoryLogPrefix[];
+extern const char sRedMemoryLogSuffixA[];
+extern const char sRedMemoryLogSuffixB[];
+extern const char s_redMemoryMainBankFullFmt[];
+extern const char s_redMemoryAuxBankFullFmt[];
 
 int RedNew(int);
 void RedDelete(int);

@@ -23,10 +23,6 @@ static const char s_usbRootPath[] = "plot/kmitsuru/";
 static char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-extern "C" char __vt__8CManager[];
-extern "C" char __vt_CProcess[];
-extern "C" void* __vt__7CUSBPcs[];
-
 
 /*
  * --INFO--
@@ -34,8 +30,21 @@ extern "C" void* __vt__7CUSBPcs[];
  * Size:	TODO
  */
 CUSBPcs::CUSBPcs()
-    : CProcess()
 {
+    u32* table = m_table__7CUSBPcs;
+    const u32* desc0 = m_table_desc0__7CUSBPcs;
+    const u32* desc1 = m_table_desc1__7CUSBPcs;
+    const u32* desc2 = m_table_desc2__7CUSBPcs;
+
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
 }
 
 /*
@@ -255,35 +264,4 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         delete[] ptr;
     }
     return result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800203e4
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_usb_cpp()
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-    *reinterpret_cast<void**>(&USBPcs) = __vt__8CManager;
-    *reinterpret_cast<void**>(&USBPcs) = __vt_CProcess;
-    *reinterpret_cast<void**>(&USBPcs) = __vt__7CUSBPcs;
-
-    u32* table = &m_table__7CUSBPcs[1];
-    table[0] = m_table_desc0__7CUSBPcs[0];
-    table[1] = m_table_desc0__7CUSBPcs[1];
-    table[2] = m_table_desc0__7CUSBPcs[2];
-    table[3] = m_table_desc1__7CUSBPcs[0];
-    table[4] = m_table_desc1__7CUSBPcs[1];
-    table[5] = m_table_desc1__7CUSBPcs[2];
-    table[6] = m_table_desc2__7CUSBPcs[0];
-    table[7] = m_table_desc2__7CUSBPcs[1];
-    table[8] = m_table_desc2__7CUSBPcs[2];
 }

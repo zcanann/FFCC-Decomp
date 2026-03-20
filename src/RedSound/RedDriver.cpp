@@ -739,16 +739,19 @@ void _ExecuteCommand()
  */
 unsigned int DeltaTimeSumup(unsigned char** buffer)
 {
-	unsigned int deltaTime = 0;
-
-	if (buffer != 0) {
-		deltaTime = **buffer & 0x7f;
-		while ((**buffer & 0x80) != 0) {
-			*buffer += 1;
-			deltaTime = (deltaTime << 7) | (**buffer & 0x7f);
-		}
-		*buffer += 1;
+	if (buffer == 0) {
+		return 0;
 	}
+
+	unsigned int deltaTime;
+
+	deltaTime = **buffer & 0x7f;
+	while ((**buffer & 0x80) != 0) {
+		*buffer += 1;
+		deltaTime <<= 7;
+		deltaTime |= **buffer & 0x7f;
+	}
+	*buffer += 1;
 
 	return deltaTime;
 }

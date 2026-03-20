@@ -68,11 +68,10 @@ public:
     void* m_readBuffer;            // 0x8
     void* m_allocStage;            // 0xC
     CHandle m_fileHandle;          // 0x10-0xbb
-    void* m_freeListSentinelDummy; // 0xb8-0x167
-    CHandle* m_freeList;           // Mismatch from ghidra from here on out?
-    CHandle m_handlePoolHead;
-    int m_fatalDiskErrorFlag;
-    int m_isDiskError;
+    CHandle* m_freeList;           // 0xC0
+    CHandle m_handlePoolHead;      // 0xC4
+    int m_fatalDiskErrorFlag;      // 0x174
+    int m_isDiskError;             // 0x178
 };
 
 extern CFile File;

@@ -2,11 +2,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/sound.h"
 
-extern "C" void* __vt__9CSoundPcs[];
-extern "C" void create__9CSoundPcsFv(CSoundPcs*);
-extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
-extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
-extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
+CSoundPcs SoundPcs;
 
 /*
  * --INFO--
@@ -17,24 +13,13 @@ extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_p_sound_cpp(void)
+CSoundPcs::CSoundPcs()
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-    unsigned int* table;
-    const unsigned int* desc0;
-    const unsigned int* desc1;
-    const unsigned int* desc2;
-    const unsigned int* desc3;
-
-    *reinterpret_cast<unsigned int*>(&SoundPcs) = reinterpret_cast<unsigned int>(__vt__9CSoundPcs);
-    table = &m_table__9CSoundPcs[1];
-    desc0 = m_table_desc0__9CSoundPcs;
-    desc1 = m_table_desc1__9CSoundPcs;
-    desc2 = m_table_desc2__9CSoundPcs;
-    desc3 = m_table_desc3__9CSoundPcs;
+    unsigned int* table = &m_table__9CSoundPcs[1];
+    const unsigned int* desc0 = m_table_desc0__9CSoundPcs;
+    const unsigned int* desc1 = m_table_desc1__9CSoundPcs;
+    const unsigned int* desc2 = m_table_desc2__9CSoundPcs;
+    const unsigned int* desc3 = m_table_desc3__9CSoundPcs;
     table[0] = desc0[0];
     table[1] = desc0[1];
     table[2] = desc0[2];

@@ -74,6 +74,9 @@ public:
     void AddNoFreeSeGroup(int);
     void AddNoFreeWave(int);
     void WaitASync();
+
+private:
+    unsigned char m_storage[0x22D4];
 };
 
 extern CSound Sound;

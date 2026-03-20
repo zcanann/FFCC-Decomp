@@ -20,8 +20,6 @@ static char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
 static char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
 static char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
 static char s_drawHeapTitleFmt[] = "%4d %4d %4d";
-extern "C" char __vt__8CManager[];
-extern "C" void* __vt__7CMemory[];
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
@@ -159,25 +157,6 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
         file = s_memory_cpp;
     }
     return stage->alloc(size, file, line, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001FE54
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_memory_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    *reinterpret_cast<void**>(&Memory) = __vt__8CManager;
-    *reinterpret_cast<void**>(&Memory) = __vt__7CMemory;
 }
 
 /*
@@ -322,16 +301,6 @@ unsigned int CheckSum(void* data, int size)
     }
 
     return checksum;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMemory::CMemory()
-{
-	// TODO
 }
 
 /*

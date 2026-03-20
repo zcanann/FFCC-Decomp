@@ -1,6 +1,7 @@
 #ifndef _FFCC_MEMORY_H_
 #define _FFCC_MEMORY_H_
 
+#include "ffcc/manager.h"
 #include <dolphin/types.h>
 
 class CMemory;
@@ -10,7 +11,7 @@ class CChara;
 
 unsigned int CheckSum(void*, int);
 
-class CMemory
+class CMemory : public CManager
 {
 public:
     class CStage
@@ -31,8 +32,6 @@ public:
         void GetTail();
         void GetTop();
     };
-
-    CMemory();
 
     void Init();
     void Quit();

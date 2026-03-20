@@ -64,19 +64,6 @@ static const char* s_diskErrorText[4][6][3] = {
 
 /*
  * --INFO--
- * PAL Address: 0x80013968
- * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFile::CFile()
-{
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -683,25 +670,4 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
     Sound.PauseDiscError(0);
     m_isDiskError = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80013d50
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_file_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    extern void* __vt__8CManager[];
-    extern void* __vt__5CFile[];
-    *(void**)&File = __vt__8CManager;
-    *(void**)&File = __vt__5CFile;
 }

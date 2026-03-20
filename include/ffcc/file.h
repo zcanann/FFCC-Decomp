@@ -1,9 +1,10 @@
 #ifndef _FFCC_FILE_H
 #define _FFCC_FILE_H
 
+#include "ffcc/manager.h"
 #include <Dolphin/dvd.h>
 
-class CFile
+class CFile : public CManager
 {
 public:
 	enum PRI
@@ -18,7 +19,6 @@ public:
 	class CHandle
 	{
 	public:
-		CHandle();
 		void Reset();
 		
 		CHandle* m_next;
@@ -40,8 +40,6 @@ public:
 		void Read();
 		void Close();
 	};
-
-	CFile();
 
 	void Init();
 	void Quit();

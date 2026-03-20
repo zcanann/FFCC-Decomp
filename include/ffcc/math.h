@@ -29,7 +29,6 @@ public:
 class CMath : public CManager
 {
 public:
-    CMath();
     void Init();
     void Quit();
     void rotateToMatrix(float(*)[4], Vec*);

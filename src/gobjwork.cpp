@@ -623,10 +623,9 @@ void CCaravanWork::FGPutGil(int gilToRemove)
  */
 void CCaravanWork::ChgCmdLst(int commandListIndex, int itemSlot)
 {
-	m_commandListInventorySlotRef[commandListIndex] = static_cast<unsigned short>(itemSlot);
-	if ((itemSlot < 0) && (static_cast<short>(m_currentCmdListIndex) == commandListIndex)) {
-		m_currentCmdListIndex =
-			static_cast<unsigned short>(GetNextCmdListIdx(static_cast<short>(m_currentCmdListIndex), -1));
+	m_commandListInventorySlotRef[commandListIndex] = itemSlot;
+	if ((itemSlot < 0) && (m_currentCmdListIndex == commandListIndex)) {
+		m_currentCmdListIndex = GetNextCmdListIdx(m_currentCmdListIndex, -1);
 	}
 	CheckAndResetCurrentWeaponIdx(0);
 }
@@ -649,7 +648,7 @@ void CCaravanWork::ChgEquipPos(int idx, int equip)
 int CCaravanWork::CanAddComList(int count)
 {
 	int slotCount = m_numCmdListSlots;
-	unsigned short* slot = m_commandListInventorySlotRef;
+	short* slot = m_commandListInventorySlotRef;
 
 	if (slotCount > 2) {
 		for (int i = slotCount - 2; i != 0; i--) {
@@ -675,9 +674,9 @@ int CCaravanWork::CanAddComList(int count)
 int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
 {
 	if (m_numCmdListSlots > 2) {
-		for (int i = 2; i < (short)m_numCmdListSlots; i++) {
-			if ((short)m_commandListInventorySlotRef[i] == -1) {
-				m_commandListInventorySlotRef[i] = (unsigned short)itemSlot;
+		for (int i = 2; i < m_numCmdListSlots; i++) {
+			if (m_commandListInventorySlotRef[i] == -1) {
+				m_commandListInventorySlotRef[i] = itemSlot;
 				Joybus.SetCmdLst(m_joybusCaravanId, i, itemSlot);
 				if (cmdListSlotOut != 0) {
 					*cmdListSlotOut = i;
@@ -1811,7 +1810,7 @@ void CCaravanWork::ValidCmdList(int)
  */
 int CCaravanWork::GetIdxCmdList()
 {
-	return *(short*)&m_currentCmdListIndex;
+	return m_currentCmdListIndex;
 }
 
 /*
@@ -1835,7 +1834,7 @@ void CCaravanWork::SetIdxCmdList(int)
  */
 void CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
-	m_currentCmdListIndex = (unsigned short)cmdListIdx;
+	m_currentCmdListIndex = cmdListIdx;
 }
 
 /*
@@ -1881,7 +1880,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 
 	groupedCount = 1;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+		short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
 		if (slotRef[0] != 0) {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
@@ -1897,9 +1896,9 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 			}
 
 			groupedCount = 1;
-			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
+			scanCount = m_numCmdListSlots - (topIdx + 1);
 			slotRef = m_commandListInventorySlotRef + topIdx + 1;
-			if ((topIdx + 1) < (short)m_numCmdListSlots) {
+			if ((topIdx + 1) < m_numCmdListSlots) {
 				do {
 					if (slotRef[0] != 0xFFFF) {
 						break;
@@ -1913,12 +1912,12 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	if (groupedCount == 1) {
-		isSelected = (((unsigned int)__cntlzw(cmdListIdx - (short)m_currentCmdListIndex)) >> 5) & 0xFF;
+		isSelected = (((unsigned int)__cntlzw(cmdListIdx - m_currentCmdListIndex)) >> 5) & 0xFF;
 		return;
 	}
 
 	int scanCount = cmdListIdx + 1;
-	unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+	short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
 	if (cmdListIdx >= 0) {
 		do {
 			if (slotRef[0] != 0xFFFF) {
@@ -1931,8 +1930,8 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	unsigned int selected = 0;
-	if ((cmdListIdx <= (short)m_currentCmdListIndex) &&
-		((short)m_currentCmdListIndex <= (cmdListIdx + groupedCount - 1))) {
+	if ((cmdListIdx <= m_currentCmdListIndex) &&
+		(m_currentCmdListIndex <= (cmdListIdx + groupedCount - 1))) {
 		selected = 1;
 	}
 	isSelected = selected;
@@ -1943,7 +1942,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 	int groupedCount = 1;
 
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		unsigned short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+		short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
 		if (slotRef[0] != 0) {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
@@ -1959,9 +1958,9 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			}
 
 			groupedCount = 1;
-			scanCount = (short)caravanWork->m_numCmdListSlots - (topIdx + 1);
+			scanCount = caravanWork->m_numCmdListSlots - (topIdx + 1);
 			slotRef = caravanWork->m_commandListInventorySlotRef + topIdx + 1;
-			if ((topIdx + 1) < (short)caravanWork->m_numCmdListSlots) {
+			if ((topIdx + 1) < caravanWork->m_numCmdListSlots) {
 				do {
 					if (slotRef[0] != 0xFFFF) {
 						break;
@@ -1976,7 +1975,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 
 	if (groupedCount > 1) {
 		int scanCount = cmdListIdx + 1;
-		unsigned short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+		short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
 		if (cmdListIdx >= 0) {
 			do {
 				if (slotRef[0] != 0xFFFF) {
@@ -2168,14 +2167,14 @@ void CCaravanWork::SearchCombiTop(int)
  */
 void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 {
-	unsigned short nextCmdIdx = 0;
-	if (static_cast<short>(m_currentCmdListIndex) == cmdListIdx) {
-		nextCmdIdx = static_cast<unsigned short>(GetNextCmdListIdx(cmdListIdx, 1));
+	short nextCmdIdx = 0;
+	if (m_currentCmdListIndex == cmdListIdx) {
+		nextCmdIdx = GetNextCmdListIdx(cmdListIdx, 1);
 	}
 
-	unsigned short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
-	if (m_inventoryItems[static_cast<short>(inventorySlot)] != 0xFFFF) {
-		m_inventoryItems[static_cast<short>(inventorySlot)] = 0xFFFF;
+	short inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
+	if (m_inventoryItems[inventorySlot] != 0xFFFF) {
+		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
 		if (updateJoybus != 0) {
 			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<char>(inventorySlot));
@@ -2187,7 +2186,7 @@ void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 		Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
 	}
 
-	if (static_cast<short>(m_currentCmdListIndex) == cmdListIdx) {
+	if (m_currentCmdListIndex == cmdListIdx) {
 		m_currentCmdListIndex = nextCmdIdx;
 	}
 }
@@ -2208,9 +2207,9 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 		cmdListIdx = prev + dir;
 
 		if (cmdListIdx < 0) {
-			cmdListIdx += static_cast<short>(m_numCmdListSlots);
-		} else if (cmdListIdx > static_cast<short>(m_numCmdListSlots) - 1) {
-			cmdListIdx -= static_cast<short>(m_numCmdListSlots);
+			cmdListIdx += m_numCmdListSlots;
+		} else if (cmdListIdx > m_numCmdListSlots - 1) {
+			cmdListIdx -= m_numCmdListSlots;
 		}
 
 		if (Game.m_gameWork.m_menuStageMode != 0) {

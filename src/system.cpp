@@ -669,7 +669,7 @@ CSystem::COrder* CSystem::GetOrder(int index)
  * Address:	TODO
  * Size:	TODO
  */
-bool CSystem::IsGdev()
+int CSystem::IsGdev()
 {
 	return OSGetConsoleType() >> 0x1C & 1;
 }

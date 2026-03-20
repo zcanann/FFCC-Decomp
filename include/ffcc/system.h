@@ -61,7 +61,7 @@ public:
     COrder* GetNextOrder(COrder*);
     COrder* GetOrder(int);
     unsigned int GetCounter();
-    bool IsGdev();
+    int IsGdev();
     CSystem* DumpMapFile(void*);
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
 

@@ -31,6 +31,21 @@ struct pppBlurCharaWork {
     float m_savedModelField;
 };
 
+struct BlurCharaModelRaw {
+    u8 _pad0[0x9C];
+    float m_savedField; // 0x9C
+    u8 _padA0[0xE4 - 0xA0];
+    pppBlurCharaWork* m_work;        // 0xE4
+    pppBlurCharaUnkB* m_renderData;  // 0xE8
+    u8 _padEC[0xF4 - 0xEC];
+    void (*m_beforeMeshLockCallback)(CChara::CModel*, void*, void*, int); // 0xF4
+    u8 _padF8[0x108 - 0xF8];
+    void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*); // 0x108
+};
+STATIC_ASSERT(offsetof(BlurCharaModelRaw, m_work) == 0xE4);
+STATIC_ASSERT(offsetof(BlurCharaModelRaw, m_beforeMeshLockCallback) == 0xF4);
+STATIC_ASSERT(offsetof(BlurCharaModelRaw, m_afterDrawModelCallback) == 0x108);
+
 struct pppMngStBlurCharaRaw {
     char _padding0[0xDC];
     void* m_charaObj;
@@ -117,6 +132,11 @@ static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBl
     return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
 }
 
+static inline BlurCharaModelRaw* GetBlurCharaModelRaw(CChara::CModel* model)
+{
+    return reinterpret_cast<BlurCharaModelRaw*>(model);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800de6d8
@@ -143,11 +163,12 @@ void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  */
 void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
+    BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(((void**)param_2)[1], 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
-    _GXColor white;
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     unsigned int width;
     unsigned int height;
 
@@ -158,10 +179,6 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
@@ -178,11 +195,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
     GXSetScissor(0, 0, width, height);
 
-    *(void**)((char*)model + 0xF4) = (void*)BlurChara_SetBeforeMeshLockEnvCallback;
-    *(void**)((char*)model + 0x108) = 0;
+    rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+    rawModel->m_afterDrawModelCallback = 0;
     Draw__Q29CCharaPcs7CHandleFi(handle, 0);
-    *(void**)((char*)model + 0xF4) = 0;
-    *(void**)((char*)model + 0x108) = (void*)BlurChara_AfterDrawModelCallback;
+    rawModel->m_beforeMeshLockCallback = 0;
+    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
 
     Graphic.SetViewport();
     GXSetScissor(0, 0, 0x280, 0x1C0);
@@ -190,13 +207,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
                                GX_NEAR, GX_TF_I8, 0);
 
     if (*((unsigned char*)param_3 + 4) == 1) {
-        float y = *(float*)((char*)param_3 + 0x14);
-        float x = FLOAT_80331044 * y;
+        float offsetY = *(float*)((char*)param_3 + 0x14);
+        float offsetX = FLOAT_80331044 * offsetY;
 
-        posA.y = y;
-        posA.x = x;
-
-        gUtil.RenderTextureQuad(-posA.x, -posA.y, FLOAT_80331050 + posA.x, FLOAT_80331054 + posA.y,
+        gUtil.RenderTextureQuad(-offsetX, -offsetY, FLOAT_80331050 + offsetX, FLOAT_80331054 + offsetY,
                                 (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
         gUtil.BeginQuadEnv();
@@ -206,9 +220,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
         GXLoadTexObj((_GXTexObj*)((void**)param_2)[2], GX_TEXMAP0);
 
+        posA.x = offsetX;
+        posA.y = offsetY;
         posA.z = FLOAT_80331030;
-        posB.x = FLOAT_80331050 - posA.x;
-        posB.y = FLOAT_80331054 - posA.y;
+        posB.x = FLOAT_80331050 - offsetX;
+        posB.y = FLOAT_80331054 - offsetY;
         posB.z = FLOAT_80331030;
 
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
@@ -219,8 +235,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
                                    GX_NEAR, GX_TF_I8, 0);
     }
 
-    gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0,
-                                   0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+    gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0, 0,
+                            GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
 /*
@@ -454,12 +470,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
+    float depth = (float)PSVECDistance(&cameraPos, &objPos);
+    depth -= param_2->m_stepValue;
+
     PSMTX44Copy(CameraScreenMatrix(), screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
-    double depth = (double)PSVECDistance(&cameraPos, &objPos);
-    depth = (double)(float)(depth - (double)param_2->m_stepValue);
-    inVec.z = (float)-depth;
+    inVec.z = -depth;
     inVec.w = FLOAT_8033103c;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 
@@ -467,17 +484,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    float arg3 = (float)param_2->m_arg3;
-    float negArg3 = -arg3;
-    float quadLeft = -(FLOAT_80331044 * arg3);
-    float quadTop = FLOAT_80331048 + (FLOAT_80331044 * arg3);
-    float quadBottom = FLOAT_8033104c + arg3;
+    float arg3 = param_2->m_arg3;
 
-    quadA.x = quadLeft;
-    quadA.y = quadTop;
+    quadB.x = -arg3;
+    quadA.x = -(FLOAT_80331044 * arg3);
+    quadA.y = FLOAT_80331048 + (FLOAT_80331044 * arg3);
     quadA.z = outVec.z;
-    quadB.x = negArg3;
-    quadB.y = quadBottom;
+    quadB.y = FLOAT_8033104c + arg3;
     quadB.z = outVec.z;
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);

@@ -136,10 +136,12 @@ void CSystem::Init()
             m_mapSize = File.GetLength(fileHandle);
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[m_mapSize];
             unsigned int offset = 0;
-            for (unsigned int remaining = m_mapSize; remaining != 0;)
+            unsigned int remaining = m_mapSize;
+            unsigned int chunkSize;
+            for (; remaining != 0; remaining -= chunkSize)
             {
-                unsigned int chunkSize = 0x100000;
-                if (remaining < chunkSize)
+                chunkSize = 0x100000;
+                if (remaining < 0x100000)
                 {
                     chunkSize = remaining;
                 }
@@ -151,10 +153,9 @@ void CSystem::Init()
                 memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, chunkSize);
 
                 offset += chunkSize;
-                remaining -= chunkSize;
             }
             File.Close(fileHandle);
-            Printf((char*)"%s", (char*)"");
+            Printf((char*)"");
         }
     }
 }

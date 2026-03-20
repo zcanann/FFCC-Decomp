@@ -1,6 +1,7 @@
 #ifndef _GRAPHIC_H_
 #define _GRAPHIC_H_
 
+#include "ffcc/manager.h"
 #include <dolphin/gx.h>
 
 // Forward declarations
@@ -23,10 +24,9 @@ void sleep();
 void std_sinf(float);
 void std_cosf(float);
 
-class CGraphic
+class CGraphic : public CManager
 {
 public:
-    CGraphic();
 
     void Init();
     void Quit();

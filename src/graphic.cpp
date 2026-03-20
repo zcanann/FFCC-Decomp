@@ -19,10 +19,8 @@
 
 CGraphic Graphic;
 
-extern "C" void* __vt__8CGraphic[];
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
-extern "C" char __vt__8CManager[];
 extern "C" char DAT_801d637c[];
 extern "C" char DAT_801d63c0[];
 extern "C" char DAT_801d6400[];
@@ -101,25 +99,7 @@ void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80019f68
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_graphic_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
 
-    void* vtbl = __vt__8CManager;
-    *reinterpret_cast<void**>(&Graphic) = vtbl;
-    *reinterpret_cast<void**>(&Graphic) = __vt__8CGraphic;
-}
 
 /*
  * --INFO--
@@ -132,15 +112,6 @@ int checkThread(void*)
 	return 0;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CGraphic::CGraphic()
-{
-	// TODO
-}
 
 /*
  * --INFO--

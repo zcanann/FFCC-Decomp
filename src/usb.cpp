@@ -1,30 +1,8 @@
 #include "ffcc/usb.h"
 
 #include "ffcc/system.h"
-extern "C" char __vt__8CManager[];
-extern "C" char __vt__4CUSB[];
 
 CUSB USB;
-
-/*
- * --INFO--
- * PAL Address: 0x80022704
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_usb_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-	void* vtbl = __vt__8CManager;
-	*reinterpret_cast<void**>(&USB) = vtbl;
-	*reinterpret_cast<void**>(&USB) = __vt__4CUSB;
-}
 
 /*
  * --INFO--

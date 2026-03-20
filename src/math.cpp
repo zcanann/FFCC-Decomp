@@ -10,8 +10,6 @@ extern "C" float FLOAT_8032F740;
 extern "C" float FLOAT_8032F788;
 
 CMath Math;
-extern "C" char __vt__8CManager[];
-extern "C" char __vt__5CMath[];
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
 static float s_hSpline[128];
@@ -24,29 +22,6 @@ struct Vec4d {
     float z;
     float w;
 };
-
-extern "C" void __sinit_math_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    void* const managerVtable = __vt__8CManager;
-    void* const mathVtable = __vt__5CMath;
-
-    *reinterpret_cast<volatile void**>(&Math) = managerVtable;
-    *reinterpret_cast<volatile void**>(&Math) = mathVtable;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMath::CMath()
-{
-	// TODO
-}
 
 /*
  * --INFO--

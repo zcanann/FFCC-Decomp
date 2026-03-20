@@ -36,6 +36,9 @@ public:
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
+extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
+extern "C" void SetDefaultSize__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
+extern "C" void SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(void*, CMemory::CStage*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__8CPtrArrayIP8CTexture[];
@@ -1110,9 +1113,9 @@ CTextureSet::CTextureSet()
 {
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
-    CPtrArray<CTexture*>* const textures = Textures(this);
-    textures->SetDefaultSize(0x10);
-    textures->SetStage(TextureMan.m_memoryStage);
+    __ct__21CPtrArray_P8CTexture_Fv(Ptr(this, 8));
+    SetDefaultSize__21CPtrArray_P8CTexture_FUl(Ptr(this, 8), 0x10);
+    SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(Ptr(this, 8), TextureMan.m_memoryStage);
 }
 
 /*

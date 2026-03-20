@@ -149,10 +149,10 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         worldOffset.y = pppMngStPtr->m_matrix.value[1][3];
         worldOffset.z = pppMngStPtr->m_matrix.value[2][3];
 
-        addPos = work->m_basePosition;
+        pppCopyVector__FR3Vec3Vec(&addPos, &work->m_basePosition);
         pppAddVector__FR3Vec3Vec3Vec(&work->m_basePosition, &addPos, &worldOffset);
 
-        paramPos = work->m_basePosition;
+        pppCopyVector__FR3Vec3Vec(&paramPos, &work->m_basePosition);
         pppCopyVector__FR3Vec3Vec(&pppMngSt->m_paramVec0, &paramPos);
         pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
     }

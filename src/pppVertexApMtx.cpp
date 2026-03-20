@@ -152,8 +152,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					_pppPObject* child;
 					_pppPDataVal* childData =
 						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
-					Vec pos;
 					Vec worldPos;
+					Vec pos;
 					Mtx* outMtx;
 
 					if (childData == 0) {
@@ -201,8 +201,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					_pppPObject* child;
 					_pppPDataVal* childData =
 						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
-					Vec pos;
 					Vec worldPos;
+					Vec pos;
 					Mtx* outMtx;
 
 					if (childData == 0) {

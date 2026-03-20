@@ -374,21 +374,23 @@ static char* long2str_801B83B4(long num, char* buff, print_format format)
     if (buff - p + format.precision > 509)
         return (0);
 
-    while (digits + 8 <= format.precision) {
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        digits += 8;
-    }
+    if (digits < format.precision) {
+        while (digits + 8 <= format.precision) {
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            digits += 8;
+        }
 
-    while (digits < format.precision) {
-        *--p = '0';
-        ++digits;
+        while (digits < format.precision) {
+            *--p = '0';
+            ++digits;
+        }
     }
 
     if (base == 16 && format.alternate_form) {
@@ -489,21 +491,23 @@ static char* longlong2str_801B80A0(long long num, char* pBuf, print_format fmt)
         return 0;
     }
 
-    while (digits + 8 <= fmt.precision) {
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        *--p = '0';
-        digits += 8;
-    }
+    if (digits < fmt.precision) {
+        while (digits + 8 <= fmt.precision) {
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            *--p = '0';
+            digits += 8;
+        }
 
-    while (digits < fmt.precision) {
-        *--p = '0';
-        ++digits;
+        while (digits < fmt.precision) {
+            *--p = '0';
+            ++digits;
+        }
     }
 
     if (base == 16 && fmt.alternate_form) {

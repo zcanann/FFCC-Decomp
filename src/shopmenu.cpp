@@ -140,7 +140,7 @@ void CMenuPcs::CreateShopMenu()
 {
     unsigned char* menuPcs = reinterpret_cast<unsigned char*>(this);
     void* stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xF4);
     }
 
@@ -151,7 +151,7 @@ void CMenuPcs::CreateShopMenu()
 
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.game.m_scriptFoodBase[0];
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 0);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
         LoadMenuPdt__8CPartPcsFPc(PartPcsVoid(), DAT_80332e54);
@@ -180,7 +180,7 @@ void CMenuPcs::CreateSmithMenu()
 {
     unsigned char* menuPcs = reinterpret_cast<unsigned char*>(this);
     void* stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xF4);
     }
 
@@ -191,7 +191,7 @@ void CMenuPcs::CreateSmithMenu()
 
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.game.m_scriptFoodBase[0];
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 9);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
         LoadMenuPdt__8CPartPcsFPc(PartPcsVoid(), DAT_80332e54);
@@ -620,7 +620,7 @@ void CShopMenu::Calc()
                 this->SetMode(6);
             } else if (choice == 2) {
                 ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
-                reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
+                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
                 __dl__FPv(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
                 *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
@@ -879,7 +879,7 @@ void CShopMenu::SelectItemIdx()
                                         itemNo = 0;
                                     } else {
                                         itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                                 *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                                                 *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                                         itemNo = itemNo / 100 + (itemNo >> 0x1F);
                                         itemNo = itemNo - (itemNo >> 0x1F);
                                     }
@@ -888,7 +888,7 @@ void CShopMenu::SelectItemIdx()
                                         itemNo = 0;
                                     } else {
                                         itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                                 *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                                                 *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                                         itemNo = itemNo / 100 + (itemNo >> 0x1F);
                                         itemNo = itemNo - (itemNo >> 0x1F);
                                         itemNo = (itemNo * 3) / 4;
@@ -1245,7 +1245,7 @@ void CShopMenu::SelectFigure()
                             itemNo = 0;
                         } else {
                             itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                             itemNo = itemNo / 100 + (itemNo >> 0x1F);
                             itemNo = itemNo - (itemNo >> 0x1F);
                         }
@@ -1254,7 +1254,7 @@ void CShopMenu::SelectFigure()
                             itemNo = 0;
                         } else {
                             itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                             itemNo = itemNo / 100 + (itemNo >> 0x1F);
                             itemNo = itemNo - (itemNo >> 0x1F);
                             itemNo = (itemNo * 3) / 4;
@@ -1301,7 +1301,7 @@ void CShopMenu::SelectFigure()
                             itemNo = 0;
                         } else {
                             itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                             itemNo = itemNo / 100 + (itemNo >> 0x1F);
                             itemNo = itemNo - (itemNo >> 0x1F);
                         }
@@ -1310,7 +1310,7 @@ void CShopMenu::SelectFigure()
                             itemNo = 0;
                         } else {
                             itemNo = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                             itemNo = itemNo / 100 + (itemNo >> 0x1F);
                             itemNo = itemNo - (itemNo >> 0x1F);
                             itemNo = (itemNo * 3) / 4;
@@ -1408,7 +1408,7 @@ void CShopMenu::SelectYesNo()
                     gilValue = 0;
                 } else {
                     gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
                     gilValue = gilValue / 100 + (gilValue >> 0x1F);
                     gilValue = gilValue - (gilValue >> 0x1F);
                 }
@@ -1417,7 +1417,7 @@ void CShopMenu::SelectYesNo()
                     gilValue = 0;
                 } else {
                     gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
                     gilValue = gilValue / 100 + (gilValue >> 0x1F);
                     gilValue = gilValue - (gilValue >> 0x1F);
                     gilValue = (gilValue * 3) / 4;
@@ -1437,7 +1437,7 @@ void CShopMenu::SelectYesNo()
                     gilValue = 0;
                 } else {
                     gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
                     gilValue = gilValue / 100 + (gilValue >> 0x1F);
                     gilValue = gilValue - (gilValue >> 0x1F);
                 }
@@ -1446,7 +1446,7 @@ void CShopMenu::SelectYesNo()
                     gilValue = 0;
                 } else {
                     gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                               *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemBits + 0x20);
                     gilValue = gilValue / 100 + (gilValue >> 0x1F);
                     gilValue = gilValue - (gilValue >> 0x1F);
                     gilValue = (gilValue * 3) / 4;
@@ -1526,7 +1526,7 @@ void CShopMenu::SelectYesNo()
             gilValue = 0;
         } else {
             gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                       *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
             gilValue = gilValue / 100 + (gilValue >> 0x1F);
             gilValue = gilValue - (gilValue >> 0x1F);
         }
@@ -1535,7 +1535,7 @@ void CShopMenu::SelectYesNo()
             gilValue = 0;
         } else {
             gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                       *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
             gilValue = gilValue / 100 + (gilValue >> 0x1F);
             gilValue = gilValue - (gilValue >> 0x1F);
             gilValue = (gilValue * 3) / 4;
@@ -1555,7 +1555,7 @@ void CShopMenu::SelectYesNo()
             itemId = 0;
         } else {
             itemId = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
             itemId = itemId / 100 + (itemId >> 0x1F);
             itemId = itemId - (itemId >> 0x1F);
         }
@@ -1564,7 +1564,7 @@ void CShopMenu::SelectYesNo()
             itemId = 0;
         } else {
             itemId = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                     *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
             itemId = itemId / 100 + (itemId >> 0x1F);
             itemId = itemId - (itemId >> 0x1F);
             itemId = (itemId * 3) / 4;
@@ -1616,7 +1616,7 @@ void CShopMenu::SelectMake()
             craftGil = 0;
         } else {
             int gil = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE2) *
-                      *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + selected * 0x48 + 0x24);
+                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selected * 0x48 + 0x24);
             gil = gil / 100 + (gil >> 0x1F);
             craftGil = gil - (gil >> 0x1F);
         }
@@ -1758,7 +1758,7 @@ void CShopMenu::SelectMake()
                     itemIdx = 0;
                 } else {
                     int gil = *reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x20) + 0xBE2) *
-                              *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemIdx * 0x48 + 0x24);
+                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48 + 0x24);
                     gil = gil / 100 + (gil >> 0x1F);
                     itemIdx = gil - (gil >> 0x1F);
                 }
@@ -1852,7 +1852,7 @@ void CShopMenu::DrawSmith0()
     SetColor__5CFontF8_GXColor(font, &white);
     DrawInit__5CFontFv(font);
 
-    int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int caravan = ShopMenuInt(this, 0x20);
     const char* title = PTR_s_Blacksmith_80214da0[languageId];
     if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
@@ -2014,7 +2014,7 @@ void CShopMenu::DrawBuySellInfo()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
-    int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
 
     DrawInit__5CFontFv(font);
     SetMargin__5CFontFf(FLOAT_80332d28, font);
@@ -2091,12 +2091,12 @@ void CShopMenu::DrawBuySellInfo()
         int caravan = *reinterpret_cast<int*>(self + 0x20);
         if (listType == 0) {
             unitGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                      *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
             unitGil = unitGil / 100 + (unitGil >> 0x1F);
             unitGil = unitGil - (unitGil >> 0x1F);
         } else if (listType == 1) {
             unitGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                      *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
             unitGil = unitGil / 100 + (unitGil >> 0x1F);
             unitGil = unitGil - (unitGil >> 0x1F);
             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(unitGil));
@@ -2187,7 +2187,7 @@ void CShopMenu::DrawItemInfo0()
         }
     }
 
-    int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     if (itemNo > 0) {
         DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), itemNo, 0x40, 100, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
@@ -2206,7 +2206,7 @@ void CShopMenu::DrawItemInfo0()
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         char* itemName = (char*)0;
         if (itemNo >= 1) {
-            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.game.unkCFlatData0[1])[itemNo * 5 + 4]);
+            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]);
         }
         DrawInit__5CFontFv(font);
         DrawShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
@@ -2240,7 +2240,7 @@ void CShopMenu::DrawItemInfo0()
         if (listType == 0) {
             if (itemNo > 0) {
                 unitGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                          *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                 unitGil = unitGil / 100 + (unitGil >> 0x1F);
                 unitGil = unitGil - (unitGil >> 0x1F);
             } else {
@@ -2249,7 +2249,7 @@ void CShopMenu::DrawItemInfo0()
         } else if (listType == 1) {
             if (itemNo > 0) {
                 unitGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                          *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
                 unitGil = unitGil / 100 + (unitGil >> 0x1F);
                 unitGil = unitGil - (unitGil >> 0x1F);
                 unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(unitGil));
@@ -2351,7 +2351,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     SetColor__5CFontF8_GXColor(font, &white);
     DrawInit__5CFontFv(font);
 
-    int languageId = static_cast<unsigned int>(Game.game.m_gameWork.m_languageId);
+    int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
     int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), itemNo);
     int statType;
     char* label = 0;
@@ -2368,7 +2368,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         }
     }
 
-    int itemData = Game.game.unkCFlatData0[2] + itemNo * 0x48;
+    int itemData = Game.unkCFlatData0[2] + itemNo * 0x48;
     unsigned short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
     unsigned int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
     char textBuffer[256];

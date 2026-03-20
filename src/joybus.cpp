@@ -673,7 +673,7 @@ void JoyBus::ThreadMain(void* arg)
         int gamePadState = 0;
         bool single = GbaQue.IsSingleMode(threadParam->m_portIndex);
         // TODO: unsigned int statusIndex = (single != 0 && threadParam->m_portIndex != 1) ? 0 : (unsigned int)threadParam->m_portIndex;
-        // TODO: int* padPtr = (int*)(&Game.game.field_0xc5c0 + statusIndex * 4);
+        // TODO: int* padPtr = (int*)(&Game.field_0xc5c0 + statusIndex * 4);
         // TODO: gamePadState = *padPtr;
 
         unsigned int state = (unsigned int)threadParam->m_state;
@@ -2067,7 +2067,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         }
 
         unsigned int cmdGame = 0;
-        // TODO: cmdGame = (build from Game.game.gameWork._6_1_ and DAT_80330b24, like local_38).
+        // TODO: cmdGame = (build from Game.gameWork._6_1_ and DAT_80330b24, like local_38).
 
         err = 0;
 
@@ -6450,7 +6450,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     if (playerIndex == 0 /* && IsSingleMode__8GbaQueueFi(&GbaQue, 0) */ && menuId != 0)
     {
         // MenuPcs._2148_2_ = menuId - 1; // TODO: restore when MenuPcs exists
-        // Game.game.gameWork._5075_1_ = 1; // TODO: restore when Game exists
+        // Game.gameWork._5075_1_ = 1; // TODO: restore when Game exists
         m_ctrlModeArr[0] = 1;
 		
         return 0;

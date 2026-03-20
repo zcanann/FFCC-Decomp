@@ -114,7 +114,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     dataOffset = *param3->m_serializedDataOffsets;
     state = (ConformState*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
 
-    if ((Game.game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
+    if ((Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
 
             if (mode == 0) {
@@ -129,7 +129,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             } else if (mode == 1) {
                 hitFound = 1;
-                Game.game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
+                Game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
             } else if (mode == 2) {
                 rayDirection.x = kPppConformBgNormalZero;
                 rayDirection.y = kPppConformBgNormalDownRayY;

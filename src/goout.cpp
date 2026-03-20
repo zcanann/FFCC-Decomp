@@ -290,7 +290,7 @@ int CGoOutMenu::SetMemCardError()
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
-            int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 5,
                        sSlotAErrorLine1[languageId],
                        sSlotAErrorLine2[languageId],
@@ -375,7 +375,7 @@ int CGoOutMenu::SetMemCardError()
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
-            int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 5,
                        sSlotAErrorLine1[languageId],
                        sSlotAErrorLine2[languageId],
@@ -507,7 +507,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     field_0x2c = mode;
     field_0x30 = 0;
     if (mode == '\x02') {
-        if (Game.game.m_gameWork.m_mcHasSerial != 1) {
+        if (Game.m_gameWork.m_mcHasSerial != 1) {
             SetMenuStr(0, 4, "This game has not been saved.", "", "You must save your game before",
                        "you can import a character.");
             field_0x19 = (char)0xff;
@@ -515,8 +515,8 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         }
         i = 0;
         do {
-            if (Game.game.m_caravanWorkArr[i].m_objType != 0 &&
-                Game.game.m_caravanWorkArr[i].m_caravanLocalFlags != 1) {
+            if (Game.m_caravanWorkArr[i].m_objType != 0 &&
+                Game.m_caravanWorkArr[i].m_caravanLocalFlags != 1) {
                 SetMenuStr(0, 5, "This game contains character data", "that has not yet been saved.", "",
                            "You must save your game before",
                            "you can import a character.");
@@ -1104,10 +1104,10 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         initSelChar = 1;
         break;
     case 3: {
-        if (Game.game.m_caravanWorkArr[selectedChara].m_caravanLocalFlags == 0) {
+        if (Game.m_caravanWorkArr[selectedChara].m_caravanLocalFlags == 0) {
             int activeMainCharacterCount = 0;
             for (int i = 0; i < 8; i++) {
-                const CCaravanWork& caravanWork = Game.game.m_caravanWorkArr[i];
+                const CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
                 if (caravanWork.m_objType != 0 && caravanWork.m_caravanLocalFlags == 0) {
                     activeMainCharacterCount++;
                 }
@@ -1138,7 +1138,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         field_0x46 = 1;
         break;
     case 5:
-        if (Game.game.m_caravanWorkArr[selectedChara].m_caravanLocalFlags == 0) {
+        if (Game.m_caravanWorkArr[selectedChara].m_caravanLocalFlags == 0) {
             SetMenuStr(0, 1, "The character has been deleted.");
         } else {
             SetMenuStr(0, 8,
@@ -1222,7 +1222,7 @@ void CGoOutMenu::CalcDel()
         if (selectedChara == -2) {
             SetDelMode(1);
         } else if (selectedChara != -1) {
-            if (Game.game.m_caravanWorkArr[selectedChara].m_shopBusyFlag == 0) {
+            if (Game.m_caravanWorkArr[selectedChara].m_shopBusyFlag == 0) {
                 SetDelMode(3);
             } else {
                 SetDelMode(6);
@@ -1316,7 +1316,7 @@ void CGoOutMenu::CalcDel()
             input = GetGoOutInputMask();
             if ((input & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7f, 0);
-                CCaravanWork& caravanWork = Game.game.m_caravanWorkArr[selectedChara];
+                CCaravanWork& caravanWork = Game.m_caravanWorkArr[selectedChara];
                 caravanWork.m_shopState = 0;
                 memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x9A4, 0, 0x100);
                 memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0xAA4, 0, 0x200);
@@ -1403,7 +1403,7 @@ void CGoOutMenu::CalcDel()
         if (next == 2) {
             SetDelMode(2);
         } else if (next == 1) {
-            Game.game.m_caravanWorkArr[selectedChara].m_shopBusyFlag = 0;
+            Game.m_caravanWorkArr[selectedChara].m_shopBusyFlag = 0;
             SetDelMode(8);
         }
         break;

@@ -377,7 +377,7 @@ void CMenuPcs::drawBonus()
  */
 void CMenuPcs::CalcResultOpenAnim()
 {
-	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
@@ -711,7 +711,7 @@ void CMenuPcs::DrawResultCloseAnim()
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
@@ -836,7 +836,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		return;
 	}
 
-	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
@@ -1376,7 +1376,7 @@ void CMenuPcs::GetAllPadOn()
 	}
 
 	for (int i = 0; i < 4; i++) {
-		if (Game.game.m_scriptFoodBase[i] != 0) {
+		if (Game.m_scriptFoodBase[i] != 0) {
 			activeMask = (unsigned char)(activeMask | (1 << i));
 			activePartyCount++;
 			anyReady = 1;
@@ -1402,7 +1402,7 @@ void CMenuPcs::GetAllPadOn()
 void CMenuPcs::ClrBattleItem()
 {
 	for (int i = 0; i < 4; i++) {
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[i]);
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
 		if (caravanWork != 0) {
 			caravanWork->SafeDeleteTempItem();
 			caravanWork->SortBeforeReturnWorldMap();

@@ -12,7 +12,7 @@
 namespace {
 static inline unsigned short* GetItemDataPtr(int itemIdx)
 {
-	return (unsigned short*)(Game.game.unkCFlatData0[2] + (itemIdx * 0x48));
+	return (unsigned short*)(Game.unkCFlatData0[2] + (itemIdx * 0x48));
 }
 
 struct GobjworkFlatTableEntry {
@@ -28,7 +28,7 @@ struct GobjworkFlatData {
 
 static inline float GetStatusMultiplier(int offset)
 {
-	return ((float)(*(unsigned short*)(Game.game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;
+	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;
 }
 }
 
@@ -305,7 +305,7 @@ void CCaravanWork::LoadFinished()
 		return;
 	}
 
-	CGame* game = (CGame*)&Game;
+	CGame* game = &Game;
 	m_baseDataIndex = (m_id / 100) - 1;
 	m_romWorkPtr = reinterpret_cast<unsigned short*>(game->unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
 }
@@ -350,10 +350,10 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	clearCaravanWork();
 	m_bonusCondition = 0;
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	m_artifactRelated[3] = *(unsigned short*)(Game.game.m_bossArtifactBase +
-											  (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 0x62);
-	m_artifactRelated[4] = *(unsigned short*)(Game.game.m_bossArtifactBase +
-											  (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 100);
+	m_artifactRelated[3] = *(unsigned short*)(Game.m_bossArtifactBase +
+											  (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 0x62);
+	m_artifactRelated[4] = *(unsigned short*)(Game.m_bossArtifactBase +
+											  (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 100);
 }
 
 /*
@@ -370,12 +370,12 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 	m_bonusCondition = static_cast<unsigned char>(bonusCondition);
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
 	m_artifactRelated[3] =
-		*(unsigned short*)(Game.game.m_bossArtifactBase +
-						   (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
+		*(unsigned short*)(Game.m_bossArtifactBase +
+						   (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
 						   (bonusCondition * 8) + 0x62);
 	m_artifactRelated[4] =
-		*(unsigned short*)(Game.game.m_bossArtifactBase +
-						   (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
+		*(unsigned short*)(Game.m_bossArtifactBase +
+						   (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
 						   (bonusCondition * 8) + 100);
 }
 
@@ -392,7 +392,7 @@ int CCaravanWork::IsOutOfShouki()
 {
 	int result = 0;
 
-	if (FLOAT_803309a8 * Game.game.unkFloat_0xca10 <
+	if (FLOAT_803309a8 * Game.unkFloat_0xca10 <
 		*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x5BC)) {
 		if (m_hp != 0) {
 			if ((((int)((unsigned int)(unsigned char)CFlat[4836] << 24) < 0) ||
@@ -488,7 +488,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	stack[0] = (words16[0] >> 2) & 0x1FF;
 	stack[1] = (*(unsigned int*)letter >> 9) & 0x1FF;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		CFlat, Game.game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
+		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	CMes::m_tempVar[0] = words16[2];
 	CMes::m_tempVar[1] = words16[3];
@@ -539,7 +539,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	stack[4] = param5;
 
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		CFlat, Game.game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
+		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
 	letter[0] = (letter[0] & 0xDF) | 0x20;
 }
@@ -1017,8 +1017,8 @@ int CCaravanWork::GetFoodRank(int playerIdx)
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
 	int foundCount = 0;
-	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[3]);
-	unsigned char* linkBase = &Game.game.m_gameWork.m_linkTable[m_saveSlot][0][0][0];
+	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[3]);
+	unsigned char* linkBase = &Game.m_gameWork.m_linkTable[m_saveSlot][0][0][0];
 
 	if (maxResults > 0) {
 		for (int i = 0; i < maxResults; i++) {
@@ -1198,16 +1198,16 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 			if (sourceType != 3) {
 				if (sourceType == 1) {
-					cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_eventWork[sourceIdx + 4]);
+					cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_eventWork[sourceIdx + 4]);
 				} else if (sourceType == 0) {
 					if (sourceIdx == 0) {
-						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_scriptSysVal0);
+						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_scriptSysVal0);
 					} else if (sourceIdx == 1) {
-						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_timerA);
+						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_timerA);
 					} else if (sourceIdx == 2) {
-						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_scriptGlobalTime);
+						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_scriptGlobalTime);
 					} else if (sourceIdx == 3) {
-						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_frameCounter);
+						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_frameCounter);
 					}
 				} else if (sourceType == 2) {
 					cmpValue = static_cast<unsigned int>(m_evtWordArr[sourceIdx]);
@@ -1264,11 +1264,11 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					bit1 = ((evtWorkBytes[(sourceIdx + 1) >> 3] & (1 << ((sourceIdx + 1) & 7))) != 0);
 					bit2 = ((evtWorkBytes[(sourceIdx + 2) >> 3] & (1 << ((sourceIdx + 2) & 7))) != 0);
 				} else if (sourceType == 1) {
-					bit0 = ((static_cast<unsigned char>(Game.game.m_gameWork.m_eventFlags[(sourceIdx >> 3) + 8]) &
+					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx >> 3) + 8]) &
 							 (1 << (sourceIdx & 7))) != 0);
-					bit1 = ((static_cast<unsigned char>(Game.game.m_gameWork.m_eventFlags[((sourceIdx + 1) >> 3) + 8]) &
+					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[((sourceIdx + 1) >> 3) + 8]) &
 							 (1 << ((sourceIdx + 1) & 7))) != 0);
-					bit2 = ((static_cast<unsigned char>(Game.game.m_gameWork.m_eventFlags[((sourceIdx + 2) >> 3) + 8]) &
+					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[((sourceIdx + 2) >> 3) + 8]) &
 							 (1 << ((sourceIdx + 2) & 7))) != 0);
 				}
 
@@ -1392,18 +1392,18 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
 		break;
 	case 4:
 		m_shopRequestState = 1;
-		if (Game.game.m_gameWork.m_menuStageMode == 0) {
+		if (Game.m_gameWork.m_menuStageMode == 0) {
 			GbaQue.SetShopFlg(m_joybusCaravanId);
 		} else {
-			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
 		}
 		break;
 	case 5:
 		m_shopRequestState = 2;
-		if (Game.game.m_gameWork.m_menuStageMode == 0) {
+		if (Game.m_gameWork.m_menuStageMode == 0) {
 			GbaQue.SetSmithFlg(m_joybusCaravanId);
 		} else {
-			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
 		}
 		break;
 	default:
@@ -1459,14 +1459,14 @@ void CCaravanWork::SafeDeleteTempItem()
 	for (int i = 0; i < 50; i++) {
 		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
 			unsigned short* artifactData =
-				(unsigned short*)(Game.game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
+				(unsigned short*)(Game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
 			if (artifactData[0] == 0xDB) {
 				totalSlots += artifactData[3];
 			}
 		}
 
 		if ((artifactIndex + 1) < 96 && (short)m_artifacts[artifactIndex + 1] > 0) {
-			unsigned short* artifactData = (unsigned short*)(Game.game.unkCFlatData0[2] +
+			unsigned short* artifactData = (unsigned short*)(Game.unkCFlatData0[2] +
 															 (short)m_artifacts[artifactIndex + 1] * 0x48);
 			if (artifactData[0] == 0xDB) {
 				totalSlots += artifactData[3];
@@ -1560,7 +1560,7 @@ void CCaravanWork::CalcArtifactStatus(int, int, int&, int&, int&, int&, int&)
  */
 void CCaravanWork::CalcStatus()
 {
-	unsigned short* baseData = (unsigned short*)(Game.game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	unsigned short* baseData = (unsigned short*)(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 
@@ -1578,24 +1578,24 @@ void CCaravanWork::CalcStatus()
 
 	if (m_tempStatBuffTimer != 0) {
 		if (m_tempStatBuffId >= 0x185) {
-			m_strength += *(short*)(Game.game.unk_flat3_field_8_0xc7dc + 0x6A);
+			m_strength += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
 		} else if (m_tempStatBuffId >= 0x180) {
-			m_defense += *(short*)(Game.game.unk_flat3_field_8_0xc7dc + 0x6C);
+			m_defense += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
 		} else if (m_tempStatBuffId > 0x17C) {
-			m_magic += *(short*)(Game.game.unk_flat3_field_8_0xc7dc + 0x6E);
+			m_magic += *(short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
 		}
 		m_tempStatBuffTimer--;
 	}
 
-	if (Game.game.m_gameWork.m_chaliceElement == 4) {
+	if (Game.m_gameWork.m_chaliceElement == 4) {
 		m_elementResistances[3]++;
-	} else if (Game.game.m_gameWork.m_chaliceElement < 4) {
-		if (Game.game.m_gameWork.m_chaliceElement == 2) {
+	} else if (Game.m_gameWork.m_chaliceElement < 4) {
+		if (Game.m_gameWork.m_chaliceElement == 2) {
 			m_elementResistances[2]++;
-		} else if ((Game.game.m_gameWork.m_chaliceElement < 2) && (Game.game.m_gameWork.m_chaliceElement > 0)) {
+		} else if ((Game.m_gameWork.m_chaliceElement < 2) && (Game.m_gameWork.m_chaliceElement > 0)) {
 			m_elementResistances[1]++;
 		}
-	} else if (Game.game.m_gameWork.m_chaliceElement == 8) {
+	} else if (Game.m_gameWork.m_chaliceElement == 8) {
 		m_statusTimers[0]++;
 		m_statusTimers[2]++;
 	}
@@ -1880,7 +1880,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	groupedCount = 1;
-	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+	if (Game.m_gameWork.m_menuStageMode != 0) {
 		unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
 		if (slotRef[0] != 0) {
 			int scanCount = cmdListIdx + 1;
@@ -1942,7 +1942,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 {
 	int groupedCount = 1;
 
-	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+	if (Game.m_gameWork.m_menuStageMode != 0) {
 		unsigned short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
 		if (slotRef[0] != 0) {
 			int scanCount = cmdListIdx + 1;
@@ -1994,7 +1994,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			for (int i = 0; i < groupedCount; i++) {
 				short invSlot = (short)caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)caravanWork->m_inventoryItems[invSlot];
-				if (*(short*)(Game.game.unkCFlatData0[2] + itemId * 0x48) == 1) {
+				if (*(short*)(Game.unkCFlatData0[2] + itemId * 0x48) == 1) {
 					*itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}
@@ -2019,7 +2019,7 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 	int weaponType = GetCmdListItem(cmdListIdx);
 	if (weaponType < 0 || weaponType > 2) {
 		int itemId = DelCmdListAndItem(cmdListIdx, 0);
-		const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.game.m_cFlatDataArr[1]);
+		const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
 		return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
 	}
 
@@ -2083,7 +2083,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 		}
 	} else {
 		int numGrouped;
-		if (Game.game.m_gameWork.m_menuStageMode == 0 || cmdListSlot[0] == 0) {
+		if (Game.m_gameWork.m_menuStageMode == 0 || cmdListSlot[0] == 0) {
 			numGrouped = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
@@ -2213,7 +2213,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 			cmdListIdx -= static_cast<short>(m_numCmdListSlots);
 		}
 
-		if (Game.game.m_gameWork.m_menuStageMode != 0) {
+		if (Game.m_gameWork.m_menuStageMode != 0) {
 			if (*(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
 				continue;
 			}
@@ -2521,7 +2521,7 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 		count--;
 	} while (count != 0);
 
-	hpMax += *(unsigned short*)(Game.game.unkCFlatData0[0] + gObjWork->m_baseDataIndex * 0x1D0 + 6);
+	hpMax += *(unsigned short*)(Game.unkCFlatData0[0] + gObjWork->m_baseDataIndex * 0x1D0 + 6);
 	if (hpMax > 0xF) {
 		return 0x10;
 	}
@@ -2597,8 +2597,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	memset(unk_0xd0, 0, 0x20);
 	memset(unk_0xf0, 0, 0x20);
 
-	if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		stageRank = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 		if (stageRank > 2) {
 			stageRank = 2;
 		}
@@ -2610,18 +2610,18 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(stageRank * 2 + 0x44));
 	}
 
-	memberCount = (unsigned int)(Game.game.m_gameWork.m_wmBackupParams[0] >= 0);
-	if (Game.game.m_gameWork.m_wmBackupParams[1] >= 0) {
+	memberCount = (unsigned int)(Game.m_gameWork.m_wmBackupParams[0] >= 0);
+	if (Game.m_gameWork.m_wmBackupParams[1] >= 0) {
 		memberCount++;
 	}
-	if (Game.game.m_gameWork.m_wmBackupParams[2] >= 0) {
+	if (Game.m_gameWork.m_wmBackupParams[2] >= 0) {
 		memberCount++;
 	}
-	if (Game.game.m_gameWork.m_wmBackupParams[3] >= 0) {
+	if (Game.m_gameWork.m_wmBackupParams[3] >= 0) {
 		memberCount++;
 	}
 
-	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+	if (Game.m_gameWork.m_menuStageMode != 0) {
 		memberCount = 1;
 	}
 
@@ -2629,9 +2629,9 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier((int)(memberCount * 2 + 0x5E)));
 	}
 
-	if ((Game.game.m_gameWork.m_scriptSysVal0 == 1) && (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)(*(unsigned short*)(Game.game.m_bossArtifactBase +
-			Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168 + 0x60))) * 0.01f) + 1.0f));
+	if ((Game.m_gameWork.m_scriptSysVal0 == 1) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)(*(unsigned short*)(Game.m_bossArtifactBase +
+			Game.m_gameWork.m_bossArtifactStageIndex * 0x168 + 0x60))) * 0.01f) + 1.0f));
 	}
 
 	m_hp = m_maxHp;
@@ -2648,7 +2648,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
  */
 void CMonWork::CalcStatus()
 {
-	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
+	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 
@@ -2657,8 +2657,8 @@ void CMonWork::CalcStatus()
 	m_defense = baseData[6];
 
 	int stageRank = 0;
-	if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		stageRank = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 		if (stageRank > 2) {
 			stageRank = 2;
 		}

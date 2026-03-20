@@ -416,7 +416,7 @@ void CMenuPcs::CompaDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-	int scriptFood = Game.game.m_scriptFoodBase[0];
+	int scriptFood = Game.m_scriptFoodBase[0];
 	short* compaList = this->compaList;
 	short* entry = reinterpret_cast<short*>((int)compaList + 8);
 	int count = *compaList;
@@ -578,7 +578,7 @@ void CMenuPcs::CompaDraw()
 	GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * globalAlpha)};
 	SetColor__5CFontF8_GXColor(font, &textColor);
 
-	const CompaFlatData* flatData = reinterpret_cast<const CompaFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	const CompaFlatData* flatData = reinterpret_cast<const CompaFlatData*>(&Game.m_cFlatDataArr[1]);
 	memberIndex = 0;
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {

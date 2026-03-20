@@ -269,7 +269,7 @@ void CPartMng::Create()
     gPppCalcDisabled = 0;
     DAT_8032ed74 = 0;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         pppCreateHeap__FP9_pppEnvStUl(env, 0x100000);
     } else {
         pppCreateHeap__FP9_pppEnvStUl(env, 0xC0000);
@@ -2206,7 +2206,7 @@ void CPartMng::pppDumpCacheIdx()
 
     PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(this) + 0x1D4);
     for (int i = 0; i < 0x180; i++) {
-        if ((Game.game.m_gameWork.m_gamePaused == 0 || (mng->m_drawVariant > 5 && mng->m_drawVariant < 8)) &&
+        if ((Game.m_gameWork.m_gamePaused == 0 || (mng->m_drawVariant > 5 && mng->m_drawVariant < 8)) &&
             mng->m_baseTime != -0x1000 && mng->m_endRequested == 0) {
             pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
             pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);

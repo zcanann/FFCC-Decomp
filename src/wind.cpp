@@ -229,7 +229,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     out->y = zero;
     out->x = zero;
 
-    if ((*(s32*)((u8*)&MenuPcs + 0x740) == 2) || (Game.game.m_gameWork.m_gamePaused != 0)) {
+    if ((*(s32*)((u8*)&MenuPcs + 0x740) == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
         return;
     }
 

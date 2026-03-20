@@ -505,7 +505,7 @@ void CMemoryCardMan::SetMcIconImage()
 	
     char path[136];
 
-    const char* lang = (const char*) nullptr; // Game.game.GetLangString();
+    const char* lang = (const char*) nullptr; // Game.GetLangString();
     sprintf(path, "dvd/%smenu/%s", lang, "" /*PTR_s_icon_dat_8032e850*/);
     CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
 
@@ -763,7 +763,7 @@ void CMemoryCardMan::MakeSaveData()
     memset(m_saveBuffer, 0, 0xA000);
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = reinterpret_cast<u8*>(&Game.game);
+    u8* game = reinterpret_cast<u8*>(&Game);
     u8* gameWork = game + 0x08;
 
     const u64 now = OSGetTime();
@@ -883,7 +883,7 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<int*>(dst + 0x1DA4) = *reinterpret_cast<int*>(cv + 0x10);
     }
 
-    Game.game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
+    Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
     GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
 }
 
@@ -909,7 +909,7 @@ void CMemoryCardMan::SetLoadData()
     }
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = reinterpret_cast<u8*>(&Game.game);
+    u8* game = reinterpret_cast<u8*>(&Game);
     u8* gameWork = game + 0x08;
 
     if (save[0x00] != s_magic0[0] || save[0x01] != s_magic0[1] || save[0x02] != s_magic0[2] || save[0x03] != s_magic0[3])
@@ -1041,7 +1041,7 @@ void CMemoryCardMan::SetLoadData()
         }
     }
 
-    Game.game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));
+    Game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));
     GetCharaGlobal()->LoadFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
 
 }
@@ -1833,7 +1833,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
             
             // Calculate total HP bonus from equipped accessories
             unsigned int totalHpBonus = 0;
-            unsigned int itemData = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game.game) + 0xC5B8);
+            unsigned int itemData = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC5B8);
             
             if (equippedItems[0] >= 0) {
                 totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);

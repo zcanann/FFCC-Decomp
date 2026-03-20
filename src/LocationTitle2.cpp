@@ -268,7 +268,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
         pppSetBlendMode(blendMode);
 
-        if (Game.game.m_currentSceneId != 7) {
+        if (Game.m_currentSceneId != 7) {
             Vec matrixPos;
             Vec cameraPos;
             Vec look;

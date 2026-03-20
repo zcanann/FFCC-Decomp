@@ -183,7 +183,7 @@ extern "C" void __sinit_game_cpp(void)
     // (and any sub-construction) into the class constructor, then delete this
     // function. The compiler will auto-generate __sinit from the global object.
 
-    CGame* game = &Game.game;
+    CGame* game = &Game;
     const char* townName;
 
     *reinterpret_cast<void**>(game) = __vt__5CGame;
@@ -233,7 +233,7 @@ extern "C" void __sinit_game_cpp(void)
         4
     );
 
-    __register_global_object(&Game.game, reinterpret_cast<void*>(__dt__5CGameFv), &Game);
+    __register_global_object(&Game, reinterpret_cast<void*>(__dt__5CGameFv), &Game);
 }
 
 /*
@@ -585,21 +585,21 @@ void CGame::InitNewGame()
     System.Printf(const_cast<char*>(DAT_801d6214));
     System.Printf(const_cast<char*>(DAT_8032f6a0));
 
-    memset(&Game.game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
-    memset(Game.game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.game.m_gameWork.m_wmBackupParams));
+    memset(&Game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(Game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.m_gameWork.m_wmBackupParams));
 
     townName = DAT_8032f6ac;
-    Game.game.m_gameWork.m_scriptSysVal0 = 0;
-    Game.game.m_gameWork.m_scriptSysVal1 = 0;
-    Game.game.m_gameWork.m_scriptSysVal2 = 0;
-    Game.game.m_gameWork.m_scriptSysVal3 = 1;
-    Game.game.m_gameWork.m_chaliceElement = 1;
+    Game.m_gameWork.m_scriptSysVal0 = 0;
+    Game.m_gameWork.m_scriptSysVal1 = 0;
+    Game.m_gameWork.m_scriptSysVal2 = 0;
+    Game.m_gameWork.m_scriptSysVal3 = 1;
+    Game.m_gameWork.m_chaliceElement = 1;
 
-    if (Game.game.m_gameWork.m_languageId == 3) {
+    if (Game.m_gameWork.m_languageId == 3) {
         townName = DAT_8032f6a4;
     }
 
-    strcpy(Game.game.m_gameWork.m_townName, townName);
+    strcpy(Game.m_gameWork.m_townName, townName);
     gCFlatRuntime2.ResetNewGame();
     gChara.InitFurTexBuffer();
 }
@@ -781,7 +781,7 @@ void CGame::CheckScriptChange()
         CGame::CGameWork* gameWork;
         const char* townName = DAT_8032f6ac;
 
-        gameWork = &Game.game.m_gameWork;
+        gameWork = &Game.m_gameWork;
 
         System.Printf(const_cast<char*>(DAT_8032f6a0));
         System.Printf(const_cast<char*>(DAT_801d6214));
@@ -1307,7 +1307,7 @@ void CGame::LoadFinished()
 int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
     int iVar5 =
-        Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+        Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
     if (2 < iVar5) {
         iVar5 = 2;
     }
@@ -1318,10 +1318,10 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     s16 local_38[4];
     memset(local_38, 0, 8);
 
-    u32 uVar2 = Game.game.m_bossArtifactBase;
-    int stageIndex = (int)Game.game.m_gameWork.m_bossArtifactStageIndex;
+    u32 uVar2 = Game.m_bossArtifactBase;
+    int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
     int iVar6 = 3;
-    int iVar4 = Game.game.m_bossArtifactBase + stageIndex * 0x168;
+    int iVar4 = Game.m_bossArtifactBase + stageIndex * 0x168;
 
     local_38[1] = *(s16*)(iVar4 + 0x162);
     local_38[2] = *(s16*)(iVar4 + 0x164);

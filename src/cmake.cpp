@@ -1684,7 +1684,7 @@ void CMenuPcs::createVillageMenu()
 void CMenuPcs::destroyVillageMenu()
 {
     if (MenuS16(this, 0x86C) != 0) {
-        if (Game.game.m_gameWork.m_menuStageMode == 0) {
+        if (Game.m_gameWork.m_menuStageMode == 0) {
             void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
             ReleaseRefObject(font);
             font = nullptr;
@@ -1714,9 +1714,9 @@ void CMenuPcs::destroyVillageMenu()
 void CMenuPcs::calcVillageMenu()
 {
     if (MenuU8(this, 0x16) != 0 && MenuS16(this, 0x86C) == 0) {
-        if (Game.game.m_gameWork.m_menuStageMode == 0) {
+        if (Game.m_gameWork.m_menuStageMode == 0) {
             char path[128];
-            char* language = GetLangString__5CGameFv(&Game.game);
+            char* language = GetLangString__5CGameFv(&Game);
             sprintf(path, s_dvd__smenu_subfont_fnt_801e3020, language);
             loadFont__8CMenuPcsFiPcii(this, 2, path, 4, -1);
         }
@@ -1737,7 +1737,7 @@ void CMenuPcs::calcVillageMenu()
     }
 
     if (MenuU8(this, 0x16) == 0) {
-        if (Game.game.m_gameWork.m_menuStageMode == 0) {
+        if (Game.m_gameWork.m_menuStageMode == 0) {
             void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
             ReleaseRefObject(font);
             font = nullptr;

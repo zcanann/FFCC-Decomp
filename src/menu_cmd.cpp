@@ -239,7 +239,7 @@ bool IsMagicArti(int)
 void CMenuPcs::CmdInit()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	u32 caravanWork = Game.game.m_scriptFoodBase[0];
+	u32 caravanWork = Game.m_scriptFoodBase[0];
 	memset(GetCmdList(this), 0, 0x1008);
 
 	float fVar2 = FLOAT_80332a70;
@@ -772,7 +772,7 @@ void CMenuPcs::CmdCtrl()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	u32 actionHandled = 0;
-	s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s32 caravanWork = Game.m_scriptFoodBase[0];
 	s32 cmd = GetCmdStateBase(this);
 
 	CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
@@ -1038,7 +1038,7 @@ void CMenuPcs::CmdDraw()
 	u8* self = reinterpret_cast<u8*>(this);
 	s16* cmdState = GetCmdState(this);
 	s16* drawList = GetCmdList(this);
-	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	s32 caravanIter = caravanWork;
 	s16* entry = drawList + 4;
 	const s16 cmdMode = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x30);
@@ -1121,7 +1121,7 @@ void CMenuPcs::CmdDraw()
 				}
 				const s16 skillId = *reinterpret_cast<s16*>(caravanWork + cmdId * 2 + 0xB6);
 				const char** flatText = *reinterpret_cast<const char***>(
-				    reinterpret_cast<u8*>(&Game.game.m_cFlatDataArr[1]) + 0x70);
+				    reinterpret_cast<u8*>(&Game.m_cFlatDataArr[1]) + 0x70);
 				text = flatText[skillId * 5 + 4];
 				if ((cmdMode == 0) && (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
 					hasItemHelp = true;
@@ -1280,7 +1280,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	bool blocked = false;
 	u16 press;
 	u16 hold;
-	int caravanWork = Game.game.m_scriptFoodBase[0];
+	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
@@ -1721,7 +1721,7 @@ unsigned int CMenuPcs::CmdClose0()
  */
 void CMenuPcs::GetCmdItem()
 {
-	u32 scriptFood = Game.game.m_scriptFoodBase[0];
+	u32 scriptFood = Game.m_scriptFoodBase[0];
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	s16* write = list;
 	s32 count = 0;
@@ -1797,7 +1797,7 @@ void CMenuPcs::ChkCmdActive(int)
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	s16* const cmd = GetCmdState(this);
 
 	int candidates[10];
@@ -2020,7 +2020,7 @@ void CMenuPcs::CmdDismantle(int)
  */
 void CMenuPcs::DrawUniteList()
 {
-	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	s16* const list = GetCmdList(this);
 	const s16* const cmd = GetCmdState(this);
 	const s16 selected = cmd[0x26 / 2];
@@ -2109,7 +2109,7 @@ void CMenuPcs::DrawUniteList()
 			}
 			const s16 skillId = *reinterpret_cast<const s16*>(caravanWork + itemIdx * 2 + 0xB6);
 			const char** flatText = *reinterpret_cast<const char***>(
-				reinterpret_cast<u8*>(&Game.game.m_cFlatDataArr[1]) + 0x70);
+				reinterpret_cast<u8*>(&Game.m_cFlatDataArr[1]) + 0x70);
 			text = flatText[skillId * 5 + 4];
 		}
 
@@ -2172,7 +2172,7 @@ void CMenuPcs::DrawUniteList()
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
 	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
-	int caravanWork = Game.game.m_scriptFoodBase[0];
+	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (DAT_8032eec8 == 0) {
 		return 1;
@@ -2252,7 +2252,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
 	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
-	int caravanWork = Game.game.m_scriptFoodBase[0];
+	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (DAT_8032eec8 == 0) {
 		return 1;
@@ -2331,7 +2331,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 unsigned int CMenuPcs::CmdOpen1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	const s32 cmd = GetCmdStateBase(this);
 	const s32 list = GetCmdListBase(this);
 
@@ -2409,7 +2409,7 @@ unsigned int CMenuPcs::CmdOpen1()
 unsigned int CMenuPcs::CmdClose1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s32 caravanWork = Game.m_scriptFoodBase[0];
 	s32 cmd = GetCmdStateBase(this);
 	s16* list = GetCmdList(this);
 
@@ -2542,7 +2542,7 @@ unsigned int CMenuPcs::CmdClose2()
 	u8* self = reinterpret_cast<u8*>(this);
 	s16* const cmd = GetCmdState(this);
 	s16* const list = GetCmdList(this);
-	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const s32 caravanWork = Game.m_scriptFoodBase[0];
 
 	const s32 selected = static_cast<s32>(cmd[0x13]);
 	const s32 modeSel = static_cast<s32>(cmd[0x13 + cmd[0x18]]);
@@ -2635,7 +2635,7 @@ unsigned int CMenuPcs::CmdClose2()
  */
 const char* CMenuPcs::GetSkillStr(int index)
 {
-	const s8 languageId = Game.game.m_gameWork.m_languageId;
+	const s8 languageId = Game.m_gameWork.m_languageId;
 
 	if (languageId == '\x03') {
 		return s_ItalianStrikeNames[index];

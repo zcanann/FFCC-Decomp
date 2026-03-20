@@ -224,7 +224,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx > -1) {
-				u8* target = (u8*)Game.game.m_partyObjArr[targetIdx];
+				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
 				if (target != 0) {
 					*(float*)(self + 0x1b4) = (float)atan2(
 					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
@@ -258,7 +258,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx > -1) {
-				u8* target = (u8*)Game.game.m_partyObjArr[targetIdx];
+				u8* target = (u8*)Game.m_partyObjArr[targetIdx];
 				if (target != 0) {
 					*(float*)(self + 0x1b4) = (float)atan2(
 					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
@@ -423,7 +423,7 @@ void CGMonObj::frameStatFuncGolem()
 	              FLOAT_80331d58 * (gMonObj->gObject).m_bodyEllipsoidRadius)))) {
 	    dVar3 = (double)getTargetRot__8CGPrgObjFP8CGPrgObj
 	                              ((CGPrgObj *)gMonObj,
-	                               Game.game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
+	                               Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
 	    (gMonObj->gObject).m_rotTargetY = (float)dVar3;
 	    setAttackAfter__8CGMonObjFi(gMonObj,*(undefined4 *)&gMonObj->field_0x560);
 	  }
@@ -442,7 +442,7 @@ void CGMonObj::frameStatFuncGolem()
 	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,1,1,0);
 	      dVar3 = (double)getTargetRot__8CGPrgObjFP8CGPrgObj
 	                                ((CGPrgObj *)gMonObj,
-	                                 Game.game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
+	                                 Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
 	      (gMonObj->gObject).m_rotTargetY = (float)dVar3;
 	      SoundBuffer._1276_4_ = (undefined4)((double)(gMonObj->gObject).m_rotTargetY + in_f31);
 	    }
@@ -698,7 +698,7 @@ void CGMonObj::alwaysFuncOrcKing()
 			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 		}
 		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object, FLOAT_80331d18, 0);
-	} else if (timer == 300 && Game.game.m_gameWork.m_gameOverFlag == 0) {
+	} else if (timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x8CBF, 0x32, 0x96, 0, 0);
 		active = 0;
 		*reinterpret_cast<int*>(CFlat + 4840) = 1;
@@ -1541,7 +1541,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	      if (*(int *)&gMonObj->field_0x528 == 0) {
 	        __ct__7CVectorFRC3Vec
 	                  (&local_50,
-	                   &(Game.game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]->gCharaObj).gPrgObj.
+	                   &(Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]->gCharaObj).gPrgObj.
 	                    object.m_worldPosition);
 	        __ct__7CVectorFfff(-local_50.x,-local_50.y,-local_50.z,&local_5c);
 	        local_38.x = local_5c.x;
@@ -1708,7 +1708,7 @@ void CGMonObj::tgtFuncGigasLoad(int)
  */
 int CGMonObj::calcBranchFuncGigasLoad(int)
 {
-	CGame* game = (CGame*)&Game;
+	CGame* game = &Game;
 	if (((game->m_scriptWork[0][0][1] != 0) &&
 	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(game->m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
 	    (*reinterpret_cast<int*>(CFlat + 4840) == 1)) {
@@ -1882,7 +1882,7 @@ void CGMonObj::frameStatFuncMolbol()
 	    if (((iVar1 == 0) || (iVar1 == 5)) || (iVar1 == 10)) {
 	      __ct__7CVectorFRC3Vec
 	                (&local_28,
-	                 &(Game.game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]->gCharaObj).gPrgObj.object
+	                 &(Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]->gCharaObj).gPrgObj.object
 	                  .m_worldPosition);
 	      local_18 = 0x43300000;
 	      uVar2 = countLeadingZeros(*(undefined4 *)&gMonObj->field_0x528);
@@ -2814,7 +2814,7 @@ void CGMonObj::cancelStatFuncLastBoss()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	if (prgObj->m_lastStateId == 0x66) {
 		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = Game.game.m_partyObjArr[i];
+			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
 				CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 				if (partyPrg->m_lastStateId == 0x25) {
@@ -2901,7 +2901,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			prgObj->putParticle((pdtNo << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
 		} else if (stateFrame == 0x4B) {
 			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = Game.game.m_partyObjArr[i];
+				CGPartyObj* party = Game.m_partyObjArr[i];
 				if (party != 0) {
 					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 					if (partyPrg->m_lastStateId == 0x24) {
@@ -2913,7 +2913,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			}
 		} else if (stateFrame == 200) {
 			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = Game.game.m_partyObjArr[i];
+				CGPartyObj* party = Game.m_partyObjArr[i];
 				if (party != 0) {
 					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 					if (partyPrg->m_lastStateId == 0x25) {
@@ -3107,7 +3107,7 @@ void CGMonObj::teleport(
 void CGMonObj::suikomiSub(CGObject*, float)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* target = reinterpret_cast<unsigned char*>(Game.game.unk_flat3_0xc7d0);
+	unsigned char* target = reinterpret_cast<unsigned char*>(Game.unk_flat3_0xc7d0);
 	if (target == 0) {
 		return;
 	}
@@ -3167,7 +3167,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 	if (prgObj->m_stateFrame == 0) {
 		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0xdec0, 0x32, 0x1c2, 0, 0);
 		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = Game.game.m_partyObjArr[i];
+			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
 				ResetParticleWork__13CFlatRuntime2Fii(CFlat, 0x26, *(int*)(self + 0x58c));
 				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
@@ -3179,7 +3179,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 
 	if (prgObj->m_stateFrame <= endFrame) {
 		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = Game.game.m_partyObjArr[i];
+			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
 				float dx = *(float*)(self + 0x15c) - *(float*)((unsigned char*)party + 0x15c);
 				float dz =
@@ -3221,8 +3221,8 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			}
 		}
 
-		if ((Game.game.unk_flat3_0xc7d0 != 0) && (*(int*)(Game.game.unk_flat3_0xc7d0 + 0x550) == 0)) {
-			unsigned int target = Game.game.unk_flat3_0xc7d0;
+		if ((Game.unk_flat3_0xc7d0 != 0) && (*(int*)(Game.unk_flat3_0xc7d0 + 0x550) == 0)) {
+			unsigned int target = Game.unk_flat3_0xc7d0;
 			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
 			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
 			float distSq = dx * dx + dz * dz;

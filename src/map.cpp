@@ -1353,7 +1353,7 @@ void CMapMng::Create()
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298E)) = 0xFF;
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298F)) = 0xFF;
 
-    if (Game.game.m_currentSceneId == 3) {
+    if (Game.m_currentSceneId == 3) {
         *reinterpret_cast<unsigned char*>(Ptr(this, 0x22988)) = 0;
     } else {
         *reinterpret_cast<unsigned char*>(Ptr(this, 0x22988)) = 1;

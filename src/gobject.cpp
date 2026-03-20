@@ -342,7 +342,7 @@ void CGObject::move()
     }
 
     u8 weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         if (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1D) | (weaponFlags >> 3)) < 0) {
             m_groundHitOffset.y = sZeroFloat;
         }
@@ -377,7 +377,7 @@ void CGObject::move()
             PSVECSubtract(reinterpret_cast<Vec*>(&m_moveVec.y), &m_worldPosition, &moveVec);
         }
 
-        if ((Game.game.m_currentMapId != 0x21)
+        if ((Game.m_currentMapId != 0x21)
             && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1E) | (weaponFlagsHi >> 2)) >= 0)) {
             moveVec.y = sZeroFloat;
         }
@@ -421,7 +421,7 @@ void CGObject::move()
             && (static_cast<char>(player) <= 3)
             && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x18) | (weaponFlagsHi >> 8)) < 0)
             && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x19) | (weaponFlagsHi >> 7)) < 0)
-            && ((Game.game.m_gameWork.m_menuStageMode == 0) || (player == 0));
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
 
         if (canReadPad) {
             const bool useDebugPad = (Pad._452_4_ != 0) || ((player == 0) && (Pad._448_4_ != -1));
@@ -484,7 +484,7 @@ void CGObject::move()
                 }
             }
 
-            if (Game.game.m_currentMapId == 0x21) {
+            if (Game.m_currentMapId == 0x21) {
                 Mtx cameraWorldMtx;
                 PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x64), cameraWorldMtx);
                 moveVec.x = -moveVec.x;
@@ -506,7 +506,7 @@ void CGObject::move()
 
         const double sinYaw = sin(static_cast<double>(cameraYaw));
         const double cosYaw = cos(static_cast<double>(cameraYaw));
-        if (Game.game.m_currentMapId != 0x21) {
+        if (Game.m_currentMapId != 0x21) {
             const double mz = static_cast<double>(moveVec.z);
             const float oldX = moveVec.x;
             moveVec.z = static_cast<float>(static_cast<double>(oldX) * static_cast<float>(sinYaw)
@@ -535,9 +535,9 @@ void CGObject::move()
                 const u32 cflatCenterState = *reinterpret_cast<u32*>(CFlat + 0x12AC);
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
-                    partyCenter.x = (Game.game.m_partyMinX + Game.game.m_partyMaxX) * FLOAT_80330368;
-                    partyCenter.y = (Game.game.m_partyMinY + Game.game.m_partyMaxY) * FLOAT_80330368;
-                    partyCenter.z = (Game.game.m_partyMinZ + Game.game.m_partyMaxZ) * FLOAT_80330368;
+                    partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * FLOAT_80330368;
+                    partyCenter.y = (Game.m_partyMinY + Game.m_partyMaxY) * FLOAT_80330368;
+                    partyCenter.z = (Game.m_partyMinZ + Game.m_partyMaxZ) * FLOAT_80330368;
 
                     Vec centerDelta;
                     PSVECSubtract(&m_worldPosition, &partyCenter, &centerDelta);
@@ -571,7 +571,7 @@ void CGObject::move()
             || (static_cast<int>((static_cast<u32>(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1)) << 0x1C)
                                      | (*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) >> 4))
                 < 0)) {
-            if (Game.game.m_currentMapId == 0x21) {
+            if (Game.m_currentMapId == 0x21) {
                 const double slideSq = static_cast<double>(PSVECSquareMag(&m_groundHitOffset));
                 if (static_cast<double>(FLOAT_80330430) < slideSq) {
                     Mtx yawMtx;
@@ -794,7 +794,7 @@ void CGObject::bgCollision()
     {
         sBgCollisionActive = true;
 
-        if (Game.game.m_currentMapId == 0x21)
+        if (Game.m_currentMapId == 0x21)
         {
             bgWorldCollision();
         }
@@ -2004,10 +2004,10 @@ void CGObject::InitWork(int index)
     ownerType = m_ownerType;
     if (ownerType == 1) {
         InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.game.unkCFlatData0[1] + index * 0x1D0, 0);
+        initWork(m_scriptHandle, index, Game.unkCFlatData0[1] + index * 0x1D0, 0);
     } else if ((ownerType < 1) && (ownerType > -1)) {
         InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.game.unkCFlatData0[0] + index * 0x1D0, 0);
+        initWork(m_scriptHandle, index, Game.unkCFlatData0[0] + index * 0x1D0, 0);
     }
 }
 
@@ -2349,7 +2349,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;
 
-    if (((m_weaponNodeFlags & 0x10) != 0) && (Game.game.m_currentMapId != 0x21)) {
+    if (((m_weaponNodeFlags & 0x10) != 0) && (Game.m_currentMapId != 0x21)) {
         CMapCylinder bodyCylinder;
         bodyCylinder.m_bottom = m_worldPosition;
         bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : 0.5f;

@@ -537,7 +537,7 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x22] = 0xFF;
     gbaContext[0x23] = 0xFF;
 
-    if (Game.game.m_partyObjArr[0] == 0)
+    if (Game.m_partyObjArr[0] == 0)
     {
         gbaContext[0x14] = 5;
         gbaContext[0x15] = 0x11;
@@ -553,13 +553,13 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode == 0)
             {
-                foodLevel = Game.game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
             else
             {
-                foodLevel = Game.game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
 
             if (foodLevel < 1)
@@ -592,7 +592,7 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x32] = 0xFF;
     gbaContext[0x33] = 0xFF;
 
-    if (Game.game.m_partyObjArr[1] == 0)
+    if (Game.m_partyObjArr[1] == 0)
     {
         gbaContext[0x24] = 5;
         gbaContext[0x25] = 0x11;
@@ -608,13 +608,13 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode == 0)
             {
-                foodLevel = Game.game.GetFoodLevel(1, i);
+                foodLevel = Game.GetFoodLevel(1, i);
             }
             else
             {
-                foodLevel = Game.game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
 
             if (foodLevel < 1)
@@ -647,7 +647,7 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x42] = 0xFF;
     gbaContext[0x43] = 0xFF;
 
-    if (Game.game.m_partyObjArr[2] == 0)
+    if (Game.m_partyObjArr[2] == 0)
     {
         gbaContext[0x34] = 5;
         gbaContext[0x35] = 0x11;
@@ -663,13 +663,13 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode == 0)
             {
-                foodLevel = Game.game.GetFoodLevel(2, i);
+                foodLevel = Game.GetFoodLevel(2, i);
             }
             else
             {
-                foodLevel = Game.game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
 
             if (foodLevel < 1)
@@ -702,7 +702,7 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[0x52] = 0xFF;
     gbaContext[0x53] = 0xFF;
 
-    if (Game.game.m_partyObjArr[3] == 0)
+    if (Game.m_partyObjArr[3] == 0)
     {
         gbaContext[0x44] = 5;
         gbaContext[0x45] = 0x11;
@@ -718,13 +718,13 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
         for (int i = 0; i < 8; i++)
         {
             int foodLevel = 0;
-            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            if (Game.m_gameWork.m_menuStageMode == 0)
             {
-                foodLevel = Game.game.GetFoodLevel(3, i);
+                foodLevel = Game.GetFoodLevel(3, i);
             }
             else
             {
-                foodLevel = Game.game.GetFoodLevel(0, i);
+                foodLevel = Game.GetFoodLevel(0, i);
             }
 
             if (foodLevel < 1)

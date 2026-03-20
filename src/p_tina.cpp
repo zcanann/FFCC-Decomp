@@ -528,7 +528,7 @@ void CPartPcs::create()
     usb->m_miruraEventActive = 0;
     usb->m_disableShokiDraw = 0;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
@@ -607,7 +607,7 @@ void CPartPcs::createViewer()
     viewer->m_miruraEventActive = 0;
     viewer->m_disableShokiDraw = 0;
 
-    if ((int)Game.game.m_currentSceneId == 7) {
+    if ((int)Game.m_currentSceneId == 7) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
         viewer->m_stageLoad = stage;
         viewer->m_stageDefault = stage;
@@ -704,7 +704,7 @@ void CPartPcs::ResetDataStage()
 void CPartPcs::calcInit()
 {
 	PartMng.pppRefCnt0Up();
-	if (Game.game.m_currentSceneId == 7) {
+	if (Game.m_currentSceneId == 7) {
 		g_par_calc_prof.ProfStart();
 		g_par_draw_prof.ProfStart();
 	}
@@ -803,7 +803,7 @@ void CPartPcs::ClearOt()
 void CPartPcs::drawShadow()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-    CGame* game = reinterpret_cast<CGame*>(&Game);
+    CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
         *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
@@ -828,7 +828,7 @@ void CPartPcs::drawShadow()
 void CPartPcs::drawCharaBefore()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-    CGame* game = reinterpret_cast<CGame*>(&Game);
+    CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
@@ -853,7 +853,7 @@ void CPartPcs::drawCharaBefore()
 void CPartPcs::draw()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-    CGame* game = reinterpret_cast<CGame*>(&Game);
+    CGame* game = &Game;
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
     if (game->m_gameWork.m_gamePaused != 0) {
@@ -933,7 +933,7 @@ void CPartPcs::drawViewer()
  */
 void CPartPcs::drawAfter()
 {
-    CGame* game = reinterpret_cast<CGame*>(&Game);
+    CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 &&
         *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this)      + 0x30) == 0) {
@@ -983,9 +983,9 @@ void CPartPcs::DrawShoki()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
-    if (usb->m_disableShokiDraw == 0 && Game.game.m_currentSceneId == 4) {
+    if (usb->m_disableShokiDraw == 0 && Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
-        if (Game.game.m_gameWork.m_gamePaused == 0 &&
+        if (Game.m_gameWork.m_gamePaused == 0 &&
             *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
             Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
             pppInitDrawEnv(1);
@@ -1351,10 +1351,10 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     void* stage;
     char path[256];
 
-    language = GetLangString__5CGameFv(&Game.game);
+    language = GetLangString__5CGameFv(&Game);
     sprintf(path, s_dvd__smenu__s_801d7fb0, language, fileName);
 
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xF4);
     } else {
         stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xEC);
@@ -1424,7 +1424,7 @@ void CPartPcs::StartLocationTitle()
     int loaded;
     char path[1024];
     CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
-    CGame* game = reinterpret_cast<CGame*>(&Game);
+    CGame* game = &Game;
 
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
     loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0);
@@ -1464,7 +1464,7 @@ void CPartPcs::StartMiruraEvent()
     int loaded;
     char path[1024];
     CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
-    CGame* game = reinterpret_cast<CGame*>(&Game);
+    CGame* game = &Game;
 
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
     loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0);

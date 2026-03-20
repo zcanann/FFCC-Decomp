@@ -151,7 +151,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     local_6c = particleData->m_matrix[1][1];
     local_68 = particleData->m_matrix[1][2];
     pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], (Vec*)&local_70);
-    if (Game.game.m_currentSceneId != 7) {
+    if (Game.m_currentSceneId != 7) {
         local_88 = pppMngStPtr->m_matrix.value[0][3];
         local_84 = pppMngStPtr->m_matrix.value[1][3];
         local_80 = pppMngStPtr->m_matrix.value[2][3];
@@ -271,7 +271,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     pppCopyVector__FR3Vec3Vec(&worldPos, &worldPos);
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
-    if (Game.game.m_currentSceneId != 7) {
+    if (Game.m_currentSceneId != 7) {
         basePos.x = pppMngStPtr->m_matrix.value[0][3];
         basePos.y = pppMngStPtr->m_matrix.value[1][3];
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
@@ -544,7 +544,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             srcPos.y = particle[1];
             srcPos.z = particle[2];
             pppCopyVector__FR3Vec3Vec(&worldPos, &srcPos);
-            if (Game.game.m_currentSceneId == 7) {
+            if (Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {
                 PSMTXMultVec(ppvCameraMatrix0, &worldPos, &worldPos);

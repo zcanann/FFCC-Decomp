@@ -653,7 +653,7 @@ extern "C" void __ct__9CGBaseObjFv(CGBaseObj* obj)
  */
 CMemory::CStage* CFlatRuntime2::getStage()
 {
-	return reinterpret_cast<CGame*>(&Game)->m_mainStage;
+	return Game.m_mainStage;
 }
 
 /*
@@ -667,7 +667,7 @@ CMemory::CStage* CFlatRuntime2::getStage()
  */
 CMemory::CStage* CFlatRuntime2::getDebugStage()
 {
-	return reinterpret_cast<CGame*>(&Game)->m_debugStage;
+	return Game.m_debugStage;
 }
 
 /*
@@ -1522,10 +1522,10 @@ void CFlatRuntime2::Calc()
 				*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
 			}
 
-			textureSet = new (Game.game.m_mainStage, "cflat_runtime2.cpp", 0x335) CTextureSet;
+			textureSet = new (Game.m_mainStage, "cflat_runtime2.cpp", 0x335) CTextureSet;
 			*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
 			if (textureSet != 0) {
-				textureSet->Create(File.m_readBuffer, Game.game.m_mainStage, 0, 0, 0, 0);
+				textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
 			}
 
 			File.Close(fileHandle);
@@ -1867,17 +1867,17 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game.game), fileName);
+	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game), fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 
-		textureSet = new (Game.game.m_mainStage, "cflat_runtime2.cpp", 0x4F4) CTextureSet;
+		textureSet = new (Game.m_mainStage, "cflat_runtime2.cpp", 0x4F4) CTextureSet;
 		*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
 		if (textureSet != 0) {
-			textureSet->Create(File.m_readBuffer, Game.game.m_mainStage, 0, 0, 0, 0);
+			textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
 		}
 
 		File.Close(fileHandle);
@@ -1922,7 +1922,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game.game), fileName);
+	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	*reinterpret_cast<CFile::CHandle**>(layer + 8) = fileHandle;
@@ -2568,7 +2568,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 4:
-		Game.game.m_gameWork.m_radarType = value8;
+		Game.m_gameWork.m_radarType = value8;
 		break;
 
 	case 5:
@@ -2635,7 +2635,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x18:
-		Game.game.LoadLogoWaitingData();
+		Game.LoadLogoWaitingData();
 		break;
 
 	case 0x19: {

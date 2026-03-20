@@ -161,7 +161,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     managerPos.y = pppMngStPtr->m_matrix.value[1][3];
     managerPos.z = pppMngStPtr->m_matrix.value[2][3];
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         float* radiusArray;
         u16 meshCount;
 
@@ -186,8 +186,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     }
 
     maxRadius = maxRadius * radiusScale;
-    if (Game.game.m_currentSceneId != 7) {
-        Game.game.unkFloat_0xca10 = maxRadius;
+    if (Game.m_currentSceneId != 7) {
+        Game.unkFloat_0xca10 = maxRadius;
     }
 
     inFarZone = (FLOAT_80331938 + maxRadius) <= PSVECDistance(&cameraPos, &managerPos);

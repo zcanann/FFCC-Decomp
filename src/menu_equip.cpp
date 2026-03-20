@@ -552,7 +552,7 @@ void CMenuPcs::EquipCtrl()
 			item += 0x40;
 		}
 
-		u32 caravanWork = Game.game.m_scriptFoodBase[0];
+		u32 caravanWork = Game.m_scriptFoodBase[0];
 		u32 equipCount = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
 		int index = 0;
 		int offset = static_cast<int>(equipCount - 1) * 0x40;
@@ -635,7 +635,7 @@ void CMenuPcs::EquipDraw()
 	int menuState = GetEquipStateBase(this);
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int listState = (int)*(s16*)(menuState + 0x10);
-	u32 caravanWork = Game.game.m_scriptFoodBase[0];
+	u32 caravanWork = Game.m_scriptFoodBase[0];
 	s16* menuData = GetEquipList(this);
 	s16* item = menuData + 4;
 	int helpItem = -1;
@@ -767,7 +767,7 @@ int CMenuPcs::EquipCtrlCur()
 	bool blocked = false;
 	u16 press;
 	u16 hold;
-	u32 caravanWork = Game.game.m_scriptFoodBase[0];
+	u32 caravanWork = Game.m_scriptFoodBase[0];
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
@@ -1098,7 +1098,7 @@ int CMenuPcs::ChkEquipActive(int index)
 	int equipIndex;
 	int item;
 
-	caravanWork = Game.game.m_scriptFoodBase[0];
+	caravanWork = Game.m_scriptFoodBase[0];
 	entries = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
 	equipIndex = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26));
 	if ((index < 0) || (entries[0] <= index)) {

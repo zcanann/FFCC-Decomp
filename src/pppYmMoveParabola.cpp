@@ -50,7 +50,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
 
     double frameCount = (double)*(u16*)(work + 3);
     Vec direction;
-    if ((u32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if ((u32)Game.m_currentSceneId == 7) {
         direction.y = gPppYmMoveParabolaZero;
         direction.x = gPppYmMoveParabolaYOffsetStep;
         direction.z = gPppYmMoveParabolaZero;
@@ -70,7 +70,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         (double)(f32)(frameCount * (double)(f32)((double)(gPppYmMoveParabolaGravityScale * stepData->m_initWOrk) * frameCount)));
 
     Vec newPosition;
-    if ((u32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if ((u32)Game.m_currentSceneId == 7) {
         Vec offset;
         Vec basePosition;
 
@@ -123,7 +123,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     work->m_distance = zero;
     work->m_frame = 1;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         Vec basePos = pppMngSt->m_savedPosition;
         Vec worldOffset;
         Vec addPos;

@@ -1118,7 +1118,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	DAT_8032ed7c = 0;
 	mngRaw->m_baseTime = -0x1000;
 
-	if (Game.game.m_currentSceneId != 7)
+	if (Game.m_currentSceneId != 7)
 	{
 		if (mngRaw->m_hasMapRef != 0)
 		{
@@ -1805,7 +1805,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	short* modelList = (short*)((unsigned char*)pdt + pdt[4]);
 	short* shapeList = (short*)((unsigned char*)pdt + pdt[5]);
 
-	if (Game.game.m_currentSceneId != 7) {
+	if (Game.m_currentSceneId != 7) {
 		pppCacheLoadModel(modelList, (_pppDataHead*)pdt);
 		pppCacheLoadShape(shapeList, (_pppDataHead*)pdt);
 		*(unsigned char*)(mngBytes + 0xF5) = 1;
@@ -2828,7 +2828,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 
 		if (MapMng.CheckHitCylinder((CMapCylinder*)&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
 		{
-			if (Game.game.m_currentSceneId == 7)
+			if (Game.m_currentSceneId == 7)
 			{
 				hitRaw->m_endRequested = 1;
 				if ((hitRaw->m_soundEffectData.m_soundEffectSlot >= 0) &&
@@ -2844,13 +2844,13 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 				Vec hitPos;
 				CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &hitPos);
 				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-				Game.game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
+				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
 			}
 			hadHit = true;
 		}
 	}
 
-	if (Game.game.m_currentSceneId != 7 && hitRaw->m_hitParams.m_hitObjectCount < 0x10)
+	if (Game.m_currentSceneId != 7 && hitRaw->m_hitParams.m_hitObjectCount < 0x10)
 	{
 		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 
@@ -2892,7 +2892,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 
 					hadHit = true;
 
-					if (Game.game.m_currentSceneId == 7)
+					if (Game.m_currentSceneId == 7)
 					{
 						_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0xADB);
 						_pppAllFreePObject(pppMngSt);

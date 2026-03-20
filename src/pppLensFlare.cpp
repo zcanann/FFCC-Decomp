@@ -37,6 +37,8 @@ struct LensFlareWork {
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
+extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppCVECTOR*, pppFMATRIX*, float, u8, u8, u8, u8, u8, u8, u8);
 
 /*
  * --INFO--
@@ -189,31 +191,29 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	long** shapeTable;
 	s32 dataValIndex;
 	u8* objBytes;
-	u8* shapeBase;
-	u8* colorBase;
+	LensFlareWork* work;
+	pppCVECTOR* color;
 	u8* stepArgBytes;
 
 	step = (LensFlareStep*)unkB;
 	shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 	colorOffset = ctrlTable->m_serializedDataOffsets[1];
 	objBytes = (u8*)obj;
-	shapeBase = objBytes + shapeOffset + 0x80;
-	colorBase = objBytes + colorOffset + 0x80;
+	work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
+	color = (pppCVECTOR*)(objBytes + colorOffset + 0x80);
 	stepArgBytes = (u8*)&step->m_arg3;
 	dataValIndex = step->m_dataValIndex;
 
 	if ((dataValIndex != 0xFFFF) &&
 		(shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4),
-		 shapeBase[0x32] != 0)) {
+		 work->m_alpha != 0)) {
 		pppCVECTOR local_70;
 		Vec local_60;
-		Vec local_6c;
 		Mtx local_54;
 		float stepValue;
 
 		PSMTXIdentity(local_54);
-		stepValue = *(float*)&step->m_stepValue;
-		local_54[2][2] = stepValue;
+		stepValue = step->m_stepValue;
 		local_54[0][0] = stepValue * pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40);
 		local_54[1][1] = stepValue * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
 		local_54[2][2] = stepValue * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
@@ -227,23 +227,21 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		local_54[0][3] = local_60.x;
 		local_54[1][3] = local_60.y;
 		local_54[2][3] = local_60.z;
-
-		local_6c = local_60;
-
-		pppCopyVector__FR3Vec3Vec((Vec*)(shapeBase + 0x20), &local_6c);
+		pppCopyVector__FR3Vec3Vec(&work->m_viewPosition, &local_60);
 
 		GXLoadPosMtxImm(local_54, 0);
 
-		local_70.rgba[0] = colorBase[8];
-		local_70.rgba[1] = colorBase[9];
-		local_70.rgba[2] = colorBase[10];
-		local_70.rgba[3] = shapeBase[0x32];
+		local_70.rgba[0] = color->rgba[0];
+		local_70.rgba[1] = color->rgba[1];
+		local_70.rgba[2] = color->rgba[2];
+		local_70.rgba[3] = work->m_alpha;
 
-		pppSetDrawEnv(&local_70, (pppFMATRIX*)0, kPppLensFlareZero, step->m_payload[0], stepArgBytes[3],
-					  stepArgBytes[2], (u8)0, (u8)1, (u8)1, (u8)0);
+		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+			&local_70, (pppFMATRIX*)0, kPppLensFlareZero, step->m_payload[0], stepArgBytes[3], stepArgBytes[2], 0, 1, 1,
+			0);
 
 		pppSetBlendMode(stepArgBytes[2]);
-		pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, stepArgBytes[2]);
+		pppDrawShp(*shapeTable, work->m_shapeFrame1, pppEnvStPtr->m_materialSetPtr, stepArgBytes[2]);
 		pppSetBlendMode(3);
 	}
 }

@@ -6,7 +6,6 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-u8 ARRAY_802ea170[0xC];
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -810,22 +809,4 @@ void CFont::getNextChar(char **, unsigned short*)
 void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
 	return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, FontMan.m_stage, file, line, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800930e0
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_fontman_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-	__register_global_object(&FontMan, __dt__8CFontManFv, &ARRAY_802ea170);
 }

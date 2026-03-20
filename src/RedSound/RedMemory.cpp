@@ -331,7 +331,9 @@ void RedDeleteA(void* param_1)
 #pragma optimization_level 0
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	unsigned int bankSize = (0x2000U + 0x1FU) & 0xFFFFFFE0;
+	unsigned int bankSize = 0x2000U;
+	bankSize += 0x1FU;
+	bankSize &= 0xFFFFFFE0;
 
 	gRedMainMemoryBlockList = (int*)param1;
 	gRedMainMemorySize = param2 - (bankSize * 2);

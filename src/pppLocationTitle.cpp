@@ -111,7 +111,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     LocationTitleWork* work;
     u16 maxCount;
     u32 graphId;
-    u32 dataValIndex;
+    s32 dataValIndex;
     int graphFrame;
 
     if (gPppCalcDisabled != 0) {
@@ -126,11 +126,11 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     rand();
 
     dataValIndex = param_2->m_dataValIndex;
-    if ((dataValIndex + 0x10000) == 0xFFFF) {
+    if (dataValIndex == 0xFFFF) {
         return;
     }
 
-    long* shapeTable = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + ((u16)dataValIndex * 4));
+    long* shapeTable = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (dataValIndex * 4));
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
@@ -261,14 +261,14 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 {
     int serializedOffset = *param_3->m_serializedDataOffsets;
     LocationTitleWork* work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
-    u32 dataValIndex = param_2->m_dataValIndex;
+    s32 dataValIndex = param_2->m_dataValIndex;
 
-    if ((dataValIndex + 0x10000) != 0xFFFF) {
+    if (dataValIndex != 0xFFFF) {
         u32 graphId = pppLocationTitle->m_graphId;
         int fadeDivisor = -1;
         int graphFrame = GetGraphFrameFromId(graphId);
         LocationTitleParticle* particle = (LocationTitleParticle*)work->m_particles;
-        long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + ((u16)dataValIndex * 4));
+        long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (dataValIndex * 4));
 
         if ((int)param_2->m_fadeStartFrame <= graphFrame) {
             fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
@@ -279,10 +279,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             Vec worldPos;
 
             PSMTXIdentity(model);
-            model[2][2] = particle->m_frame;
-            model[0][0] = pppMngStPtr->m_scale.x * model[2][2];
-            model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
-            model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
+            model[0][0] = pppMngStPtr->m_scale.x * particle->m_frame;
+            model[1][1] = pppMngStPtr->m_scale.y * particle->m_frame;
+            model[2][2] = pppMngStPtr->m_scale.z * particle->m_frame;
 
             PSMTXMultVec(ppvCameraMatrix02, &particle->m_pos, &worldPos);
             model[0][3] = worldPos.x;

@@ -2445,25 +2445,30 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)((int*)track)[0];
     int* trackData = (int*)track;
+    unsigned char value;
 
     trackData[0x3f] &= 0xFFFFC3FF;
+    value = *(unsigned char*)trackData[0];
 
-    if (command[0] == 1 || command[0] == 2) {
+    if (value == 2) {
         trackData[0x3f] |= 0x1000;
-    }
-    if (command[0] == 0 || command[0] >= 2) {
+        trackData[0x3f] |= 0x400;
+    } else if ((value < 2) && (value != 0)) {
+        trackData[0x3f] |= 0x1000;
+    } else {
         trackData[0x3f] |= 0x400;
     }
 
-    if (command[1] == 1 || command[1] == 2) {
+    value = *(unsigned char*)(trackData[0] + 1);
+    if (value == 2) {
         trackData[0x3f] |= 0x2000;
-    }
-    if (command[1] == 0 || command[1] >= 2) {
+        trackData[0x3f] |= 0x800;
+    } else if ((value < 2) && (value != 0)) {
+        trackData[0x3f] |= 0x2000;
+    } else {
         trackData[0x3f] |= 0x800;
     }
-
     trackData[0] += 2;
     SetVoiceSwitch(track, trackData[0x3f]);
     DAT_8032f4b4 |= 2;

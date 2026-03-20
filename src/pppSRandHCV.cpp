@@ -1,12 +1,10 @@
 #include "ffcc/pppSRandHCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
+#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
+#include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-
-const float kPppSRandHCVSingleSampleScale = 2.0f;
-
-extern s16 gPppDefaultValueBuffer[];
 
 struct PppSRandHCVParam2 {
     s32 field0;
@@ -99,11 +97,16 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		}
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
-	s32 color_offset = in->field4;
-	s16* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
+	u8* target_colors;
 
-	target_colors[0] += (s8)((f32)in->field8 * target[0] - (f32)in->field8);
-	target_colors[1] += (s8)((f32)in->fieldA * target[1] - (f32)in->fieldA);
-	target_colors[2] += (s8)((f32)in->fieldC * target[2] - (f32)in->fieldC);
-	target_colors[3] += (s8)((f32)in->fieldE * target[3] - (f32)in->fieldE);
+	if (in->field4 == -1) {
+		target_colors = gPppDefaultValueBuffer;
+	} else {
+		target_colors = base + in->field4 + 0x80;
+	}
+
+	((s16*)target_colors)[0] += (s8)((f32)in->field8 * target[0] - (f32)in->field8);
+	((s16*)target_colors)[1] += (s8)((f32)in->fieldA * target[1] - (f32)in->fieldA);
+	((s16*)target_colors)[2] += (s8)((f32)in->fieldC * target[2] - (f32)in->fieldC);
+	((s16*)target_colors)[3] += (s8)((f32)in->fieldE * target[3] - (f32)in->fieldE);
 }

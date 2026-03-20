@@ -105,7 +105,6 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     // The compiler will auto-generate __sinit from the global object declaration.
 
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
-    u32* dst = reinterpret_cast<u32*>(m_table__14CFunnyShapePcs);
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
     *reinterpret_cast<void**>(self) = __vt_CProcess;
@@ -118,18 +117,19 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 
     __register_global_object(self, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 
-    dst[0x004 / 4] = m_table_desc0__14CFunnyShapePcs[0];
-    dst[0x008 / 4] = m_table_desc0__14CFunnyShapePcs[1];
-    dst[0x00C / 4] = m_table_desc0__14CFunnyShapePcs[2];
-    dst[0x010 / 4] = m_table_desc1__14CFunnyShapePcs[0];
-    dst[0x014 / 4] = m_table_desc1__14CFunnyShapePcs[1];
-    dst[0x018 / 4] = m_table_desc1__14CFunnyShapePcs[2];
-    dst[0x01C / 4] = m_table_desc2__14CFunnyShapePcs[0];
-    dst[0x020 / 4] = m_table_desc2__14CFunnyShapePcs[1];
-    dst[0x024 / 4] = m_table_desc2__14CFunnyShapePcs[2];
-    dst[0x030 / 4] = m_table_desc3__14CFunnyShapePcs[0];
-    dst[0x034 / 4] = m_table_desc3__14CFunnyShapePcs[1];
-    dst[0x038 / 4] = m_table_desc3__14CFunnyShapePcs[2];
+    u32* dst = reinterpret_cast<u32*>(m_table__14CFunnyShapePcs);
+    dst[1] = m_table_desc0__14CFunnyShapePcs[0];
+    dst[2] = m_table_desc0__14CFunnyShapePcs[1];
+    dst[3] = m_table_desc0__14CFunnyShapePcs[2];
+    dst[4] = m_table_desc1__14CFunnyShapePcs[0];
+    dst[5] = m_table_desc1__14CFunnyShapePcs[1];
+    dst[6] = m_table_desc1__14CFunnyShapePcs[2];
+    dst[7] = m_table_desc2__14CFunnyShapePcs[0];
+    dst[8] = m_table_desc2__14CFunnyShapePcs[1];
+    dst[9] = m_table_desc2__14CFunnyShapePcs[2];
+    dst[12] = m_table_desc3__14CFunnyShapePcs[0];
+    dst[13] = m_table_desc3__14CFunnyShapePcs[1];
+    dst[14] = m_table_desc3__14CFunnyShapePcs[2];
 }
 
 template <class T>

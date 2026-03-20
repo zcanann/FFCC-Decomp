@@ -137,9 +137,9 @@ public:
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
-    unsigned short m_commandListInventorySlotRef[8]; // 0x0204
+    short m_commandListInventorySlotRef[8];     // 0x0204
     unsigned char m_commandListExtra[16];       // 0x0214
-    unsigned short m_currentCmdListIndex;       // 0x0224
+    short m_currentCmdListIndex;                // 0x0224
     short m_weaponIdx;                          // 0x0226
     short m_backupEquipment[4];                 // 0x0228
     short m_backupInventoryItemCount;           // 0x0230
@@ -147,9 +147,9 @@ public:
     unsigned char m_backupTreasureFlags;        // 0x037A
     unsigned char m_backupMoneyFlags;           // 0x037B
     int m_backupGil;                            // 0x037C
-    unsigned short m_backupCommandListInventorySlotRef[8]; // 0x0380
+    short m_backupCommandListInventorySlotRef[8]; // 0x0380
     unsigned char m_backupCmdlistExtra[16];     // 0x0390
-    unsigned short m_backupCurrentCmdListIndex; // 0x03A0
+    short m_backupCurrentCmdListIndex;          // 0x03A0
     short m_backupWeaponIdx;                    // 0x03A2
     int m_shopState;                            // 0x03A4
     int unk_0x3a8;                              // 0x03A8
@@ -176,8 +176,8 @@ public:
     unsigned char m_shopBusyFlag;               // 0x0BA5
     unsigned char m_caravanLocalFlags;          // 0x0BA6
     unsigned char m_cmdListFlags;               // 0x0BA7
-    unsigned short m_baseCmdListSlots;          // 0x0BA8
-    unsigned short m_numCmdListSlots;           // 0x0BAA
+    short m_baseCmdListSlots;                   // 0x0BA8
+    short m_numCmdListSlots;                    // 0x0BAA
     int m_timedBuffCounter;                     // 0x0BAC
     int m_timedBuffItemId;                      // 0x0BB0
     char m_bonusFire;                           // 0x0BB4

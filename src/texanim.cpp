@@ -874,18 +874,16 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
         CTexAnim* texAnim = (*texAnims)[i];
         CPtrArray<CTexAnimSeq*>* seqs =
             reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(*reinterpret_cast<void**>(Ptr(texAnim, 8)), 0x110));
+        unsigned int seqIdx = 0;
 
-        int seqIdx = -1;
-        for (unsigned int j = 0; j < static_cast<unsigned int>(seqs->GetSize()); j++) {
-            CTexAnimSeq* seq = (*seqs)[j];
-            if (strcmp(name, reinterpret_cast<char*>(Ptr(seq, 8))) == 0) {
-                seqIdx = static_cast<int>(j);
+        for (; seqIdx < static_cast<unsigned int>(seqs->GetSize()); seqIdx++) {
+            if (strcmp(name, reinterpret_cast<char*>(Ptr((*seqs)[seqIdx], 8))) == 0) {
                 break;
             }
         }
 
-        if (seqIdx >= 0) {
-            S32At(texAnim, 0x0C) = seqIdx;
+        if (seqIdx < static_cast<unsigned int>(seqs->GetSize())) {
+            S32At(texAnim, 0x0C) = static_cast<int>(seqIdx);
             F32At(texAnim, 0x10) = frame;
             S32At(texAnim, 0x14) = static_cast<int>(mode);
             return;

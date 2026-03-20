@@ -541,12 +541,12 @@ void CFunnyShape::RenderShape()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXSetChanAmbColor(GX_COLOR0A0, ToGXColor(DAT_8032fd60));
-    GXSetChanMatColor(GX_COLOR0A0, ToGXColor(DAT_8032fd60));
+    u32 chanColor = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&chanColor));
+    u32 matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&matColor));
 
-    Vec2d offset;
-    offset.x = FLOAT_8032fd90;
-    offset.y = FLOAT_8032fd94;
+    Vec2d offset = {FLOAT_8032fd90, FLOAT_8032fd94};
     RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010)), offset, FLOAT_8032fd6c);
 }
 

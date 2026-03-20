@@ -453,7 +453,7 @@ void CMenuPcs::SetCrystalCageAttr()
 		state->m_crystalElem = 0x10;
 	}
 
-	state->m_crystalPart = BindEffect__8CMenuPcsFiii(this, 5, state->m_crystalAttr, -1);
+	state->m_crystalPart = BindEffect(5, state->m_crystalAttr, -1);
 	state->m_effectTimer = 0;
 }
 

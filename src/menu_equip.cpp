@@ -30,7 +30,7 @@ extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" s16* GetLetterBuffer__6JoyBusFi(void*, int);
-extern "C" int CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" double CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void DrawListPosMark__8CMenuPcsFfff(double, double, double, CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(double, CMenuPcs*, int, int);
@@ -706,7 +706,7 @@ void CMenuPcs::EquipDraw()
 	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
 		s16* listStart = menuData + menuData[0] * 0x20 + 4;
 		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
-		double pos = (double)CalcListPos__8CMenuPcsFiii(this, (int)*(s16*)(menuState + 0x34), (int)letter[0], 0);
+		double pos = CalcListPos__8CMenuPcsFiii(this, (int)*(s16*)(menuState + 0x34), (int)letter[0], 0);
 		if (pos > (double)FLOAT_80332eb8) {
 			DrawListPosMark__8CMenuPcsFfff((double)listStart[0], (double)listStart[1], pos, this);
 		}
@@ -1118,5 +1118,4 @@ int CMenuPcs::ChkEquipActive(int index)
 	}
 	return active;
 }
-
 

@@ -3,6 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
+#include "ffcc/color.h"
 #include "ffcc/materialman.h"
 #include "ffcc/maplight.h"
 #include "ffcc/p_camera.h"
@@ -67,12 +68,12 @@ struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);
 
 struct CBoundHack {
-    float p0;
-    float p1;
-    float p2;
-    float p3;
-    float p4;
-    float p5;
+    u32 p0;
+    u32 p1;
+    u32 p2;
+    u32 p3;
+    u32 p4;
+    u32 p5;
 };
 
 /*
@@ -737,12 +738,7 @@ void CMapPcs::drawAfter()
                 debugColor.b = 0x80;
                 debugColor.a = 0xFF;
 
-                bound.p0 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
-                bound.p1 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x418);
-                bound.p2 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x41C);
-                bound.p3 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x420);
-                bound.p4 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x424);
-                bound.p5 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x428);
+                bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
                 DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor);
             }
         }
@@ -763,7 +759,8 @@ void CMapPcs::drawAfterViewer()
     if (m_mapCalcReady == 0) {
         if (m_drawEnabled != 0) {
             CBoundHack bound;
-            _GXColor debugColor;
+            Mtx cameraMtx;
+            Mtx44 screenMtx;
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
 
@@ -773,6 +770,9 @@ void CMapPcs::drawAfterViewer()
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
             GXSetColorUpdate(GX_TRUE);
             GXSetAlphaUpdate(GX_FALSE);
@@ -791,18 +791,9 @@ void CMapPcs::drawAfterViewer()
             MapMng.DrawAfter();
 
             if ((CFlatFlags & 0x02000000) != 0) {
-                debugColor.r = 0xFF;
-                debugColor.g = 0xFF;
-                debugColor.b = 0x80;
-                debugColor.a = 0xFF;
-
-                bound.p0 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
-                bound.p1 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x418);
-                bound.p2 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x41C);
-                bound.p3 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x420);
-                bound.p4 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x424);
-                bound.p5 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x428);
-                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor);
+                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
+                bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
+                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor.color);
             }
         }
     }

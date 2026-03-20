@@ -547,16 +547,18 @@ void GXCopyDisp(void* dest, GXBool clear) {
 void GXCopyTex(void* dest, GXBool clear) {
     u32 reg;
     u32 tempPeCtrl;
-    GXBool changePeCtrl;
+    u32 phyAddr;
+    u8 changePeCtrl;
 
     CHECK_GXBEGIN(1916, "GXCopyTex");
 
 #if DEBUG
     __GXVerifCopy(dest, clear);
 #endif
-    if (clear) {
+    if (clear != 0) {
         reg = __GXData->zmode;
-        reg = (reg & 0xFFFFFFF0) | 0xF;
+        reg = (reg & ~1) | 1;
+        reg = (reg & ~0xE) | 0xE;
         GX_WRITE_RAS_REG(reg);
 
         reg = __GXData->cmode0;
@@ -564,16 +566,16 @@ void GXCopyTex(void* dest, GXBool clear) {
         GX_WRITE_RAS_REG(reg);
     }
 
-    changePeCtrl = FALSE;
+    changePeCtrl = 0;
     tempPeCtrl = __GXData->peCtrl;
 
-    if (__GXData->cpTexZ && ((tempPeCtrl & 7) != 3)) {
-        changePeCtrl = TRUE;
+    if (((u8)__GXData->cpTexZ != 0) && ((u32)(tempPeCtrl & 7) != 3)) {
+        changePeCtrl = 1;
         tempPeCtrl = (tempPeCtrl & 0xFFFFFFF8) | 3;
     }
 
-    if ((clear || ((tempPeCtrl & 7) == 3)) && (((tempPeCtrl >> 6) & 1) == 1)) {
-        changePeCtrl = TRUE;
+    if (((clear != 0) || ((u32)(tempPeCtrl & 7) == 3)) && ((u32)((tempPeCtrl >> 6U) & 1) == 1)) {
+        changePeCtrl = 1;
         tempPeCtrl &= 0xFFFFFFBF;
     }
 
@@ -585,7 +587,8 @@ void GXCopyTex(void* dest, GXBool clear) {
     GX_WRITE_RAS_REG(__GXData->cpTexSize);
     GX_WRITE_RAS_REG(__GXData->cpTexStride);
 
-    reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
+    phyAddr = (u32)dest & 0x3FFFFFFF;
+    reg = ((phyAddr >> 5) & 0x1FFFFF) | 0x4B000000;
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cpTex = (__GXData->cpTex & 0xFFFFF7FF) | ((u32)clear << 11);
@@ -593,7 +596,7 @@ void GXCopyTex(void* dest, GXBool clear) {
     __GXData->cpTex = (__GXData->cpTex & 0x00FFFFFF) | 0x52000000;
     GX_WRITE_RAS_REG(__GXData->cpTex);
 
-    if (clear) {
+    if (clear != 0) {
         GX_WRITE_RAS_REG(__GXData->zmode);
         GX_WRITE_RAS_REG(__GXData->cmode0);
     }

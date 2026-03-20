@@ -178,9 +178,9 @@ CChara::CAnim::CAnim()
 	anim.m_quantizeZ = 10;
 	anim.m_interp = 0;
 	anim.m_interpOffset = 0;
-	anim.m_stage = reinterpret_cast<CMemory::CStage*>(0);
-	anim.m_bankSize = 0;
 	anim.m_bankAddress = 0;
+	anim.m_bankSize = 0;
+	anim.m_stage = reinterpret_cast<CMemory::CStage*>(0);
 	anim.m_lastFrame = 0;
 }
 

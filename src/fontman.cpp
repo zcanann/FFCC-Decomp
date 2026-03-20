@@ -120,9 +120,9 @@ void CFontMan::Quit()
 {
 	int* font = reinterpret_cast<int*>(m_font);
 	if (font != 0) {
-		int refCount = font[1];
-		font[1] = refCount - 1;
-		if ((refCount - 1 == 0) && (font != 0)) {
+		int nextRefCount = font[1] - 1;
+		font[1] = nextRefCount;
+		if ((nextRefCount == 0) && (font != 0)) {
 			(*(void (**)(int*, int))(*font + 8))(font, 1);
 		}
 		m_font = 0;

@@ -352,8 +352,10 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, stru
                         pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
                     if (created != 0) {
                         *(struct pppLaser**)(created + 4) = pppLaser;
-                        *(Vec*)(created + *(int*)step->m_payload + 0x80) = points[i];
-                        *(float*)(created + *(int*)step->m_payload + 0x84) += *(float*)(step->m_payload + 0x34);
+                        Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
+                        createdPos->x = points[i].x;
+                        createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+                        createdPos->z = points[i].z;
                     }
                 }
             } else {

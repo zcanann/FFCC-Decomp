@@ -59,7 +59,7 @@ struct MenuLstEntry {
 };
 
 struct MenuLstList {
-	unsigned short count;
+	short count;
 	unsigned short pad_0002;
 	unsigned int pad_0004;
 	MenuLstEntry entries[64];

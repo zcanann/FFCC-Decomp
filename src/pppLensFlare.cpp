@@ -210,7 +210,6 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 		pppCVECTOR local_70;
 		Vec local_60;
 		Mtx local_54;
-		float stepValue;
 
 		PSMTXIdentity(local_54);
 		stepValue = step->m_stepValue;

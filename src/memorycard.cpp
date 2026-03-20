@@ -1782,19 +1782,35 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-    const int rotAmount = 0x20 - (static_cast<signed char>(m_saveBuffer[0x11]) % 0x20);
+    const u32 rotAmount = 0x20 - (m_saveBuffer[0x11] & 0x1F);
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
     int count = 0x5B6;
+    u32 temp;
+    u32 value;
 
     do
     {
-        ptr[0] = (ptr[0] << (rotAmount & 0x1F)) | (ptr[0] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[1] = (ptr[1] << (rotAmount & 0x1F)) | (ptr[1] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[2] = (ptr[2] << (rotAmount & 0x1F)) | (ptr[2] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[3] = (ptr[3] << (rotAmount & 0x1F)) | (ptr[3] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[4] = (ptr[4] << (rotAmount & 0x1F)) | (ptr[4] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[5] = (ptr[5] << (rotAmount & 0x1F)) | (ptr[5] >> (0x20 - (rotAmount & 0x1F)));
-        ptr[6] = (ptr[6] << (rotAmount & 0x1F)) | (ptr[6] >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[0];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[0] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[1];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[1] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[2];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[2] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[3];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[3] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[4];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[4] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[5];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[5] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
+        temp = ptr[6];
+        value = __lwbrx((void*)&temp, 4);
+        ptr[6] = (value << (rotAmount & 0x1F)) | (value >> (0x20 - (rotAmount & 0x1F)));
         ptr += 7;
         count--;
     }

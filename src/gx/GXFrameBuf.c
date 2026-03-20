@@ -367,10 +367,10 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
  * JP Size: TODO
  */
 void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const u8 vfilter[7]) {
-    u32 msLoc0 = 0;
-    u32 msLoc1 = 0;
-    u32 msLoc2 = 0;
-    u32 msLoc3 = 0;
+    u32 msLoc0;
+    u32 msLoc1;
+    u32 msLoc2;
+    u32 msLoc3;
     u32 coeff0 = 0x53595000;
     u32 coeff1 = 0x54000015;
 

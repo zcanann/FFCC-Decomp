@@ -25,6 +25,16 @@
 
 #include <string.h>
 
+extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
+
+static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
+                                     float scale, float innerRadius, float outerRadius)
+{
+    return CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(&Math, outPos, outT, origin, vector, ellipseScale,
+                                                                  scale, innerRadius, outerRadius);
+}
+
 static const float kPppZero = 0.0; // FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
@@ -2884,8 +2894,8 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 					}
 
 					Vec hitPos;
-					if (Math.CrossCheckSphereVector(
-							&hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y, damageCol->m_innerRadius) == 0)
+					if (CrossCheckSphereVectorRaw(&hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y,
+												radius, damageCol->m_innerRadius, damageCol->m_outerRadius) == 0)
 					{
 						continue;
 					}

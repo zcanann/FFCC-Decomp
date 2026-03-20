@@ -2650,29 +2650,6 @@ void CPartMng::pppPartDead()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void LoadPartNoSyncCalc__8CPartMngFv(CPartMng* partMng)
-{
-    char* base = reinterpret_cast<char*>(partMng);
-    for (int i = 0; i < 0x10; i++) {
-        CFile::CHandle** handleSlot = reinterpret_cast<CFile::CHandle**>(base + 0x2378c + (i * 4));
-        CFile::CHandle* handle = *handleSlot;
-        if (handle != 0 && File.IsCompleted(handle)) {
-            int len = File.GetLength(handle);
-            void* readBuffer = File.m_readBuffer;
-            void* amemCursor = *reinterpret_cast<void**>(base + 0x236f8);
-
-            Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);
-            *reinterpret_cast<int*>(base + 0x2370c + (i * 4)) = len;
-            *reinterpret_cast<unsigned int*>(base + 0x2374c + (i * 4)) = CheckSum__FPvi(readBuffer, len);
-            (*reinterpret_cast<int*>(base + 0x23700))++;
-            *reinterpret_cast<char**>(base + 0x236f8) += len;
-
-            File.Close(handle);
-            *handleSlot = 0;
-        }
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80059c44
@@ -2730,7 +2707,29 @@ void CPartMng::pppFileRead(char*, unsigned long&, void*, int)
  */
 void CPartMng::LoadPartNoSyncCalc()
 {
-	// TODO
+    char* base = reinterpret_cast<char*>(this);
+    char* slotBase = base;
+    for (int i = 0; i < 0x10; i++) {
+        CFile::CHandle** handleSlot = reinterpret_cast<CFile::CHandle**>(slotBase + 0x2378c);
+        CFile::CHandle* handle = *handleSlot;
+        if (handle != 0) {
+            if (File.IsCompleted(handle)) {
+                void* readBuffer = File.m_readBuffer;
+                int len = File.GetLength(handle);
+                void* amemCursor = *reinterpret_cast<void**>(base + 0x236f8);
+
+                Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);
+                *reinterpret_cast<int*>(slotBase + 0x2370c) = len;
+                *reinterpret_cast<unsigned int*>(slotBase + 0x2374c) = CheckSum__FPvi(readBuffer, len);
+                (*reinterpret_cast<int*>(base + 0x23700))++;
+                *reinterpret_cast<char**>(base + 0x236f8) += len;
+
+                File.Close(handle);
+                *handleSlot = 0;
+            }
+        }
+        slotBase += 4;
+    }
 }
 
 /*

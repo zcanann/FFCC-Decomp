@@ -410,13 +410,14 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  */
 void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
-    s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
-    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-    u32* work = (u32*)((u8*)ymMana + 0x80 + serializedDataOffsets[2]);
+    _pppMngSt* mng = pppMngStPtr;
+    s32 workOffset = param_2->m_serializedDataOffsets[2];
+    CGObject* gObject = *(CGObject**)((u8*)mng + 0xD8);
+    u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
     void* handle;
     u32 model;
 
-    if (Game.m_currentSceneId == 7) {
+    if ((s32)Game.m_currentSceneId == 7) {
         gObject->m_lookAtTimer = FLOAT_80330e58;
     }
 

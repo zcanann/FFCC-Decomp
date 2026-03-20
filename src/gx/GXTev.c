@@ -288,14 +288,14 @@ void GXSetTevKColor(GXTevKColorID id, GXColor color) {
     regRA = r;
     a = color.a;
     regRA = (regRA & ~0x000FF000) | ((u32)a << 12);
-    regRA |= 8 << 20;
+    regRA = (regRA & ~0x00F00000) | (8 << 20);
     regRA = (regRA & ~0xFF000000) | ((id2 + 0xE0) << 24);
 
     b = color.b;
     regBG = b;
     g = color.g;
     regBG = (regBG & ~0x000FF000) | ((u32)g << 12);
-    regBG |= 8 << 20;
+    regBG = (regBG & ~0x00F00000) | (8 << 20);
     regBG = (regBG & ~0xFF000000) | ((id2 + 0xE1) << 24);
 
     GX_WRITE_RAS_REG(regRA);

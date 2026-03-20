@@ -256,17 +256,19 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset = *unkC->m_serializedDataOffsets;
-    u32 dataValIndex = unkB->m_dataValIndex;
-    LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
 
-    if (dataValIndex != 0xFFFF) {
-        u32 graphId = locationTitle->m_graphId;
-        int graphFrame = GetGraphFrameFromId(graphId);
-        LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
-        long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-        u8 blendMode = unkB->m_blendMode;
+    if (unkB->m_dataValIndex != 0xFFFF) {
+        int graphFrame;
+        LocationTitle2Work* work;
+        LocationTitle2Particle* particle;
+        long** shapeTable;
 
-        pppSetBlendMode(blendMode);
+        work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
+        graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
+        particle = (LocationTitle2Particle*)work->m_particles;
+        shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+
+        pppSetBlendMode(unkB->m_blendMode);
 
         if (Game.m_currentSceneId != 7) {
             Vec matrixPos;
@@ -317,7 +319,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             pppMngStPtr->m_matrix.value[2][2] = lookNorm.z;
         }
 
-        for (u16 i = 0; i < work->m_count; i++) {
+        for (int i = 0; i < work->m_count; i++) {
             Mtx model;
             Vec transformedPos;
 
@@ -344,7 +346,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 }
 
                 GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
-                pppDrawShp(*shapeTable, particle->m_shape, pppEnvStPtr->m_materialSetPtr, blendMode);
+                pppDrawShp(*shapeTable, particle->m_shape, pppEnvStPtr->m_materialSetPtr, unkB->m_blendMode);
             }
 
             particle++;

@@ -191,27 +191,26 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
     short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
-    int colorOffset = param_3->m_serializedDataOffsets[1];
     int textureIndex = 0;
-    u8* payload = (u8*)&param_2->m_payload0;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    _pppEnvStYmDeformationMdl* env = (_pppEnvStYmDeformationMdl*)pppEnvStPtr;
-    pppModelSt* model = (pppModelSt*)env->m_mapMeshPtr[param_2->m_dataValIndex];
-    int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, env->m_materialSetPtr, textureIndex);
-    Mtx cameraMtx;
+    int colorOffset = param_3->m_serializedDataOffsets[1];
+    u8* payload = (u8*)&param_2->m_payload0;
     Mtx texMtx;
+    Mtx cameraMtx;
+    Mtx44 screenMtx;
     Mtx rotMtx;
     Mtx resetRotMtx;
-    Mtx44 screenMtx;
     int left;
     int top;
     int width;
     int height;
-    int backTexture = 0;
+    int backTexture;
+    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
+    int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
 
     PSMTXIdentity(rotMtx);
     pppSetBlendMode(0);

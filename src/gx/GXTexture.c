@@ -1205,16 +1205,20 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
  */
 static void __SetSURegs(int tmap, int tcoord) {
     GXData* gx;
+    u8* coordBase;
+    u8* mapBase;
     u32 image0;
     u32 mode0;
     u32* suTs0;
     u32* suTs1;
 
     gx = __GXData;
-    suTs0 = &gx->suTs0[tcoord];
-    suTs1 = &gx->suTs1[tcoord];
-    image0 = gx->tImage0[tmap];
-    mode0 = gx->tMode0[tmap];
+    coordBase = (u8*)gx + ((u32)tcoord << 2);
+    mapBase = (u8*)gx + ((u32)tmap << 2);
+    suTs0 = (u32*)(coordBase + 0xB8);
+    suTs1 = (u32*)(coordBase + 0xD8);
+    image0 = *(u32*)(mapBase + 0x45C);
+    mode0 = *(u32*)(mapBase + 0x47C);
     *suTs0 = (*suTs0 & 0xFFFF0000) | (image0 & 0x3FF);
     *suTs1 = (*suTs1 & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
 

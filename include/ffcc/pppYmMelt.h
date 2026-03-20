@@ -12,13 +12,13 @@ struct PYmMelt
 
 struct VERTEX_DATA
 {
-    u8 _pad0[0xA];
+    s16 m_shapeFrame;
     u16 m_gridSize;
     u8 _padC[0x14];
     float m_heightBias;
     float m_collisionYOffset;
     float m_maxDropDistance;
-    u8 _pad2C[2];
+    s16 _pad2C;
     u8 m_hideWhenNoGround;
 };
 
@@ -30,9 +30,12 @@ struct PYmMeltDataOffsets {
 struct YmMeltCtrl {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_initWOrk;
+    s16 m_shapeFrame;
+    u16 m_gridSize;
     f32 m_stepValue;
-    s32 m_arg3;
+    u8 m_blendMode;
+    u8 _pad11;
+    s16 m_phaseDivisor;
     u8 m_payload[0x20];
 };
 

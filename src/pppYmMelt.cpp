@@ -220,34 +220,47 @@ void pppDestructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
     static char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
+    YmMeltWork* work;
+    YmMeltVertex* vertexData;
+    YmMeltVertex* vtx;
+    long** shapeTable;
+    int grid;
+    int angleSeed;
+    s16 phaseDiv;
+    s16 phaseOffset;
+    double halfWidth;
+    double step;
+    double rot;
+    double z;
+    double x;
+    float matrixY;
+    Mtx rotMtx;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    u16 gridSize = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
-    int grid = (int)gridSize + 1;
-    float matrixY = pppMngStPtr->m_matrix.value[1][3];
+    work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
+    grid = (int)ctrl->m_gridSize + 1;
+    matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
-        YmMeltVertex* vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp, 0xA9);
         work->m_vertexData = vertexData;
 
-        YmMeltVertex* vtx = vertexData;
-        int angleSeed = rand();
-        s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
+        vtx = vertexData;
+        angleSeed = rand();
+        phaseDiv = ctrl->m_phaseDivisor;
         work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
-        s16 phaseOffset = work->m_phaseOffset;
+        phaseOffset = work->m_phaseOffset;
 
-        double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
-        double step = (double)(ctrl->m_stepValue / (float)((double)gridSize - DOUBLE_80330af8));
-        double rot = (double)(FLOAT_80330b0c * (float)((double)phaseOffset - DOUBLE_80330b00));
-        Mtx rotMtx;
+        halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
+        step = (double)(ctrl->m_stepValue / (float)((double)ctrl->m_gridSize - DOUBLE_80330af8));
+        rot = (double)(FLOAT_80330b0c * (float)((double)phaseOffset - DOUBLE_80330b00));
 
-        for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
-            for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
+        for (z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
+            for (x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
                 vtx->m_position.x = (float)x;
                 vtx->m_position.y = kPppYmMeltZero;
                 vtx->m_position.z = (float)z;
@@ -274,9 +287,9 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
-        long** shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
+        shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
         pppCalcFrameShape__FPlRsRsRss(shapeTable[ctrl->m_dataValIndex], work->m_shapeFrame, work->m_shapeAge,
-                                      work->m_shapeNext, *(s16*)&ctrl->m_initWOrk);
+                                      work->m_shapeNext, ctrl->m_shapeFrame);
     }
 }
 
@@ -317,8 +330,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (u8*)ymMelt + 0x88 + colorOffset, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
-        ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
-    pppSetBlendMode(*(u8*)&ctrl->m_arg3);
+        ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
+    pppSetBlendMode(ctrl->m_blendMode);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
@@ -356,7 +369,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     worldZ = pppMngStPtr->m_matrix.value[2][3];
     pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shape->m_animData, work->m_shapeNext, uvMin, uvMax, 0);
 
-    grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
+    grid = ctrl->m_gridSize;
     uStep = (uvMax.x - uvMin.x) / (f32)((double)grid - DOUBLE_80330af8);
     vStep = (uvMax.y - uvMin.y) / (f32)((double)grid - DOUBLE_80330af8);
     GXBegin((GXPrimitive)0x80, GX_VTXFMT7, (u16)((grid * grid * 4) & 0xFFFC));

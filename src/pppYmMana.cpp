@@ -64,6 +64,11 @@ struct Vec2d {
     float y;
 };
 
+struct pppYmManaOffsetsRaw {
+    u8 _pad0[0xc];
+    s32* m_serializedDataOffsets;
+};
+
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 extern "C" {
@@ -410,9 +415,9 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  */
 void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
-    _pppMngSt* mng = pppMngStPtr;
-    s32 workOffset = param_2->m_serializedDataOffsets[2];
-    CGObject* gObject = *(CGObject**)((u8*)mng + 0xD8);
+    s32* offsets = ((pppYmManaOffsetsRaw*)param_2)->m_serializedDataOffsets;
+    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
+    s32 workOffset = offsets[2];
     u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
     void* handle;
     u32 model;

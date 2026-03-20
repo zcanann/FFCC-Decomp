@@ -998,7 +998,8 @@ void CDbgMenuPcs::CDMParam::Clear()
  */
 CDbgMenuPcs::CDM::CDM()
 {
-	memset(this, 0, sizeof(CDM));
+	memset(this, 0, 0x34);
+	memset(reinterpret_cast<unsigned char*>(this) + 0x34, 0, 0x20);
 }
 
 /*

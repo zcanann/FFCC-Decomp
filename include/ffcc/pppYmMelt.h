@@ -6,7 +6,8 @@
 
 struct PYmMelt
 {
-
+    u8 _pad0[0xC];
+    s32 m_graphId;
 };
 
 struct VERTEX_DATA

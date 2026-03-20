@@ -7,9 +7,9 @@
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
-#include <string.h>
 
 extern "C" int __cntlzw(unsigned int);
+extern "C" void* memset(void* dst, int val, unsigned long n);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void* __ct__14CUSBStreamDataFv(void* self);
 extern "C" void* __ct__5ZLISTFv(void* self);

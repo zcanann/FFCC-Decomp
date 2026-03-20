@@ -419,45 +419,46 @@ void CFile::SyncCompleted(CFile::CHandle* fileHandle)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void CFile::kick()
 {
-	do
-	{
-		CHandle* sentinel = &m_fileHandle;
-		CHandle* cur = sentinel->m_previous;
+    CHandle* handle = CheckQueue();
+    if (handle != 0)
+    {
+        return;
+    }
 
-		while (cur != sentinel)
-		{
-			if ((Game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
-			    && (cur->m_completionStatus == 1 || cur->m_completionStatus == 4))
-			{
-				u32 readSize;
+    handle = m_fileHandle.m_previous;
+    do
+    {
+        if ((Game.m_gameWork.m_gamePaused == 0 || handle->m_priority == PRI_CRITICAL)
+            && (handle->m_completionStatus == 1 || handle->m_completionStatus == 4))
+        {
+            u32 readSize;
 
-				cur->m_completionStatus = 2;
-				readSize = (cur->m_chunkSize + 0x1F) & ~0x1F;
+            handle->m_completionStatus = 2;
+            readSize = (handle->m_chunkSize + 0x1F) & ~0x1F;
 
-				if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
-				{
-					System.Printf("", cur->m_name, readSize);
-				}
+            if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
+            {
+                System.Printf(s_readWarnFmt, handle->m_name, readSize);
+            }
 
-				DVDReadAsyncPrio(&cur->m_dvdFileInfo, m_readBuffer, readSize, cur->m_currentOffset, 0, 2);
-				cur->m_nextOffset = cur->m_currentOffset + readSize;
-				if (cur->m_completionStatus != 3)
-				{
-					return;
-				}
-				break;
-			}
-			cur = cur->m_previous;
-		}
+            DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
+            handle->m_nextOffset = handle->m_currentOffset + readSize;
+            if (handle->m_completionStatus != 3)
+            {
+                return;
+            }
 
-		if (cur == sentinel)
-		{
-			return;
-		}
-	} while (CheckQueue() == 0);
+            kick();
+            return;
+        }
+
+        handle = handle->m_previous;
+    } while (handle != &m_fileHandle);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -2302,11 +2302,15 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
  */
 void CCaravanWork::CheckAndResetCurrentWeaponIdx(int)
 {
-	int weaponItem = DelCmdListAndItem(static_cast<short>(m_weaponIdx), 0);
-	if ((weaponItem < 1) || (*GetItemDataPtr(weaponItem) != 1)) {
-		m_currentCmdListIndex = 0;
-		m_weaponIdx = 0;
+	short weaponIdx = m_weaponIdx;
+	int reset = 0;
+	int weaponItem = DelCmdListAndItem(weaponIdx, reset);
+	if ((0 < weaponItem) && (*GetItemDataPtr(weaponItem) == 1)) {
+		return;
 	}
+
+	m_currentCmdListIndex = 0;
+	m_weaponIdx = 0;
 }
 
 /*

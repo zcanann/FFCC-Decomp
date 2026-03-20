@@ -44,10 +44,10 @@ struct YmMeltVertex
 
 struct YmMeltWork {
     YmMeltVertex* m_vertexData;
-    s16 m_shapeFrame;
-    s16 m_shapeAge;
-    s16 m_shapeNext;
     s16 m_phaseOffset;
+    s16 m_shapeCurrentFrame;
+    s16 m_shapeDrawFrame;
+    s16 m_shapeFrameTime;
     f32 m_phase;
     f32 m_phaseVelocity;
     f32 m_phaseAccel;
@@ -275,8 +275,9 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
         long** shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
-        pppCalcFrameShape__FPlRsRsRss(shapeTable[ctrl->m_dataValIndex], work->m_shapeFrame, work->m_shapeAge,
-                                      work->m_shapeNext, *(s16*)&ctrl->m_initWOrk);
+        pppCalcFrameShape__FPlRsRsRss(shapeTable[ctrl->m_dataValIndex], work->m_shapeCurrentFrame,
+                                      work->m_shapeDrawFrame, work->m_shapeFrameTime,
+                                      *(s16*)&ctrl->m_initWOrk);
     }
 }
 
@@ -354,7 +355,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     worldX = pppMngStPtr->m_matrix.value[0][3];
     worldY = pppMngStPtr->m_matrix.value[1][3];
     worldZ = pppMngStPtr->m_matrix.value[2][3];
-    pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shape->m_animData, work->m_shapeNext, uvMin, uvMax, 0);
+    pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shape->m_animData, work->m_shapeDrawFrame, uvMin, uvMax, 0);
 
     grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
     uStep = (uvMax.x - uvMin.x) / (f32)((double)grid - DOUBLE_80330af8);

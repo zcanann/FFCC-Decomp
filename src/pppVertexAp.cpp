@@ -51,6 +51,12 @@ struct VertexApSource
     Vec* points;
 };
 
+struct VertexApObject
+{
+    u8 unk0[0x10];
+    Mtx localMatrix;
+};
+
 struct _pppPDataVal;
 
 
@@ -86,6 +92,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 {
     VertexApData* data = (VertexApData*)dataRaw;
     VertexApCtrl* ctrl = (VertexApCtrl*)ctrlRaw;
+    VertexApObject* parentObj = (VertexApObject*)parent;
     s32 stateOffset = *ctrl->stateOffset;
     VertexApState* state = (VertexApState*)((u8*)parent + stateOffset + 0x80);
 
@@ -144,7 +151,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+                    PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
                     dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -188,7 +195,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+                    PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
                     dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {

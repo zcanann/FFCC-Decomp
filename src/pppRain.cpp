@@ -68,14 +68,6 @@ struct RainParam {
     u8 pad4;
 };
 
-struct RainSegment {
-    Vec position;
-    Vec direction;
-    float length;
-    s16 life;
-    s16 pad;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800ddacc
@@ -269,10 +261,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int i;
     int colorOffset;
     int workOffset;
-    RainParam* step;
+    u32* color;
     RainWork* work;
-    RainSegment* drop;
-    u8* colorBase;
+    RainDrop* drop;
     float baseX;
     float baseY;
     float baseZ;
@@ -280,19 +271,18 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     float tex1;
     Vec segment[2];
 
-    step = (RainParam*)param_2->m_payload;
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
-    colorBase = (u8*)pppRain + 0x80 + colorOffset;
+    color = (u32*)((u8*)pppRain + 0x88 + colorOffset);
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
-    pppSetBlendMode(step->blendMode);
+    pppSetBlendMode(param_2->m_payload[0x48]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        colorBase + 8,
+        color,
         ppvCameraMatrix0,
         kPppRainTexCoordBase,
-        step->lightTarget,
-        step->fogIndex,
-        step->blendMode,
+        param_2->m_payload[0x4A],
+        param_2->m_payload[0x49],
+        param_2->m_payload[0x48],
         0,
         1,
         1,
@@ -303,10 +293,10 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    GXSetLineWidth(step->lineWidth, GX_TO_ZERO);
+    GXSetLineWidth(param_2->m_payload[0x3C], GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    drop = (RainSegment*)work->drops;
+    drop = work->drops;
     baseX = pppMngStPtr->m_matrix.value[0][3];
     baseY = pppMngStPtr->m_matrix.value[1][3];
     baseZ = pppMngStPtr->m_matrix.value[2][3];
@@ -315,22 +305,22 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {
-        float x = baseX + drop->position.x;
-        float y = baseY + drop->position.y;
-        float z = baseZ + drop->position.z;
+        float x = baseX + drop->posX;
+        float y = baseY + drop->posY;
+        float z = baseZ + drop->posZ;
 
-        PSVECScale(&drop->direction, &segment[0], drop->length);
+        PSVECScale((Vec*)&drop->dirX, &segment[0], drop->length);
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
-        GXWGFifo.u32 = *(u32*)(colorBase + 8);
+        GXWGFifo.u32 = *color;
         GXWGFifo.f32 = tex0;
         GXWGFifo.f32 = tex0;
 
         GXWGFifo.f32 = x + segment[0].x;
         GXWGFifo.f32 = y + segment[0].y;
         GXWGFifo.f32 = z + segment[0].z;
-        GXWGFifo.u32 = *(u32*)(colorBase + 8);
+        GXWGFifo.u32 = *color;
         GXWGFifo.f32 = tex1;
         GXWGFifo.f32 = tex1;
         drop++;

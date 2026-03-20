@@ -178,16 +178,11 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             const float y2 = yy * yy;
 
             for (x = 0; x < (u32)textureInfo->m_width; ++x) {
-                float magnitude = xx * xx + y2;
-                if (magnitude < 0.0f) {
-                    magnitude = 0.0f;
-                }
-
-                float normal = 0.0f;
-                if (magnitude > 1.0f) {
-                    normal = 1.0f / sqrtf(magnitude);
-                } else if (magnitude > 0.0f) {
-                    normal = sqrtf(magnitude);
+                float normal = xx * xx + y2;
+                if (normal > 1.0f) {
+                    normal = sqrtf(normal);
+                } else if (normal < 0.0f) {
+                    normal = 0.0f;
                 }
 
                 if (normal > 0.8f) {

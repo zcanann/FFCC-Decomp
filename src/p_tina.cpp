@@ -707,7 +707,7 @@ void CPartPcs::drawShadow()
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
+        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404)) != 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(1);
         PartMng.pppSetRendMatrix();

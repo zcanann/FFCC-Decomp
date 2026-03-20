@@ -1,5 +1,6 @@
 #include "ffcc/pppBreathModel.h"
 #include "ffcc/linkage.h"
+#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
@@ -7,13 +8,6 @@
 #include <string.h>
 
 const float FLOAT_80330F80 = -1.0f;
-extern Mtx ppvCameraMatrix0;
-extern unsigned char* pppMngStPtr;
-extern unsigned char* pppEnvStPtr;
-
-struct pppFMATRIX {
-    Mtx value;
-};
 
 struct pppModelSt;
 
@@ -488,6 +482,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
  */
 extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
+    _pppPObject* object;
     int i;
     int j;
     int firstParticle;
@@ -513,8 +508,9 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         return;
     }
 
+    object = (_pppPObject*)breathModel;
     dataOffsets = offsets->m_serializedDataOffsets;
-    base = (unsigned char*)breathModel + 8;
+    base = (unsigned char*)breathModel + 0x80;
     work = base + dataOffsets[0];
 
     if (*(void**)(work + 0x30) == NULL) {
@@ -524,8 +520,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         int* groupTable;
 
         *(int*)(work + 0x40) = maxParticleCount;
-        *(short*)(work + 0x54) = *(short*)((unsigned char*)pBreathModel + 0x10);
-        *(short*)(work + 0x56) = *(short*)((unsigned char*)pBreathModel + 0x12);
+        *(short*)(work + 0x54) = *(short*)((unsigned char*)pBreathModel + 0x12);
+        *(short*)(work + 0x56) = *(short*)((unsigned char*)pBreathModel + 0x10);
 
         *(void**)(work + 0x30) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)pppEnvStPtr,
@@ -608,7 +604,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             scaleMtx[1][1] = scaleValue;
             scaleMtx[2][2] = scaleValue;
 
-            PSMTXConcat(*particleMtx, *(Mtx*)((unsigned char*)breathModel + 4), worldMtx);
+            PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0xC), &origin);
 
             PSMTXCopy(*particleMtx, rotMtx.value);
@@ -648,6 +644,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
+    _pppPObject* object;
     int i;
     int j;
     int dataOffset;
@@ -676,7 +673,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 
     dataOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    base = (unsigned char*)breathModel + 8;
+    object = (_pppPObject*)breathModel;
+    base = (unsigned char*)breathModel + 0x80;
     work = base + dataOffset;
     particleData = *(unsigned char**)(work + 0x30);
     particleWMat = *(unsigned char**)(work + 0x34);
@@ -800,7 +798,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
-                PSMTXConcat(*(Mtx*)(particleWMat + firstParticle * 0x30), *(Mtx*)((unsigned char*)breathModel + 4), worldMtx);
+                PSMTXConcat(*(Mtx*)(particleWMat + firstParticle * 0x30), object->m_localMatrix.value, worldMtx);
                 PSMTXConcat(ppvCameraMatrix0, worldMtx, worldMtx);
                 PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0x0C), &pos);
                 sphereMtx[0][3] = pos.x;

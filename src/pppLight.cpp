@@ -54,6 +54,11 @@ struct PppLightStep {
 	u8 color2Enabled;
 };
 
+struct PppLightMngProgramInfo {
+	u8 unk0[0xD4];
+	u32 programInfoTable;
+};
+
 extern "C" {
 void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
 }
@@ -249,7 +254,8 @@ void pppLight(void* param1, void* param2, void* param3)
 				if (targetIndex == (u32)-1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
-					pppLightTarget* targetTable = (pppLightTarget*)pppMngStPtr->m_programInfoTable;
+					pppLightTarget* targetTable =
+						(pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable;
 					obj = targetTable[targetIndex].obj;
 				}
 

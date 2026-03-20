@@ -45,8 +45,8 @@ public:
     void InitConstantRegister();
     void SSepa(char*);
     void SNl();
-    void Init();
-    void Quit();
+    virtual void Init();
+    virtual void Quit();
 };
 
 extern CUtil gUtil;

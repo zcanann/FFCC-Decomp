@@ -102,28 +102,28 @@ void CFile::Init()
     do {
         CHandle* nextHandle;
         if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
 
         if (handleIndex == 0x7E) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 2) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
 
         if (handleIndex == 0x7D) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 3) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
 
         if (handleIndex == 0x7C) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 4) * sizeof(CHandle));
         }

@@ -131,11 +131,10 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 
 		if (param_2->m_dataValIndex != 0xFFFF) {
-			CMapMesh** mapMeshTable = (CMapMesh**)pppEnvStPtr->m_mapMeshPtr;
 			int textureIndex = 0;
 
 			GetTexture__8CMapMeshFP12CMaterialSetRi(
-				mapMeshTable[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+				((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
 
 			if (param_2->m_payload[0] == 0) {
 				if (param_2->m_initWOrk == 0xFFFF) {
@@ -143,7 +142,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				}
 
 				GetTexture__8CMapMeshFP12CMaterialSetRi(
-					mapMeshTable[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
+					((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
 			}
 
 			if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {

@@ -278,7 +278,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     pppSetBlendMode(param_2->m_payload[0x48]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         color,
-        ppvCameraMatrix0,
+        ppvCameraMatrix02,
         kPppRainTexCoordBase,
         param_2->m_payload[0x4A],
         param_2->m_payload[0x49],

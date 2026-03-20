@@ -80,12 +80,12 @@ static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
 
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CUSBStreamData*>(Ptr(self, 0x8));
+    return reinterpret_cast<CUSBStreamData*>(Ptr(self, 0x3C));
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x1C));
+    return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x50));
 }
 } // namespace
 
@@ -324,7 +324,11 @@ void CFunnyShapePcs::createViewer()
     *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4)) = Memory.CreateStage(0x200000, s_CFunnyShapePcs, 0);
     USBPcs.IsBigAlloc(1);
 
-    GXColor clearColor = {0x40, 0x40, 0x40, 0xFF};
+    GXColor clearColor;
+    clearColor.r = 0x40;
+    clearColor.g = 0x40;
+    clearColor.b = 0x40;
+    clearColor.a = 0xFF;
     GXSetCopyClear(clearColor, 0xFFFFFF);
 
     memset(Ptr(this, 0x6178), 0, 0x40);

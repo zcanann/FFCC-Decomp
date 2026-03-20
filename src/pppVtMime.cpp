@@ -139,16 +139,17 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     float* vert1Pos = vert1Data->positions;
     float* vert2Pos = vert2Data->positions;
     int vertCount = vert1Data->vertexCount;
-    void** memPtr = &state->vertexBuffer;
 
-    if (*memPtr == 0) {
-        *memPtr = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(vertCount * 0xC), env->stage, s_pppVtMime_cpp, 0x2B);
+    if (state->vertexBuffer == 0) {
+        state->vertexBuffer =
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(vertCount * 0xC), env->stage, s_pppVtMime_cpp, 0x2B);
     }
 
-    float* outputVerts = (float*)*memPtr;
+    float* outputVerts = (float*)state->vertexBuffer;
     if (vertCount != 0) {
         int pairCount = (unsigned int)vertCount >> 1;
-        for (int i = 0; i < pairCount; i++) {
+        if (pairCount > 0) {
+            do {
             outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
             outputVerts[1] = vert1Pos[1] + state->value * (vert2Pos[1] - vert1Pos[1]);
             outputVerts[2] = vert1Pos[2] + state->value * (vert2Pos[2] - vert1Pos[2]);
@@ -158,6 +159,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
             vert1Pos += 6;
             vert2Pos += 6;
             outputVerts += 6;
+            } while (--pairCount != 0);
         }
 
         pairCount = vertCount & 1;
@@ -169,14 +171,13 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
                 vert1Pos += 3;
                 vert2Pos += 3;
                 outputVerts += 3;
-                pairCount--;
-            } while (pairCount != 0);
+            } while (--pairCount != 0);
         }
     }
 
-    DCFlushRange(*memPtr, (unsigned long)(vertCount * 0xC));
+    DCFlushRange(state->vertexBuffer, (unsigned long)(vertCount * 0xC));
 
-    *(void**)((char*)object + 0x70) = *memPtr;
+    *(void**)((char*)object + 0x70) = state->vertexBuffer;
 }
 
 /*

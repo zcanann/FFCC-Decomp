@@ -1,9 +1,10 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include <math.h>
 
 #include "dolphin/axfx/__axfx.h"
+
+extern f32 powf(f32 x, f32 y);
 
 // prototypes
 static void DLsetdelay(AXFX_REVHI_DELAYLINE* dl, s32 lag);
@@ -19,14 +20,6 @@ static const s32 axfx_reverb_hi_lens[8] = {
     0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1,
     0x00000095, 0x0000002F, 0x00000049, 0x00000043,
 };
-
-static const f32 axfx_reverb_hi_f32_0 = 0.0f;
-static const f32 axfx_reverb_hi_f32_0p01 = 0.01f;
-static const f32 axfx_reverb_hi_f32_0p05 = 0.05f;
-static const f32 axfx_reverb_hi_f32_0p8 = 0.8f;
-static const f32 axfx_reverb_hi_f32_1 = 1.0f;
-static const f32 axfx_reverb_hi_f32_10 = 10.0f;
-static const f32 axfx_reverb_hi_f32_32000 = 32000.0f;
 
 static void DLsetdelay(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
@@ -64,33 +57,33 @@ static void DLdelete(AXFX_REVHI_DELAYLINE* dl) {
 static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay, f32 crosstalk) {
     u8 i;
     u8 k;
+    f32 timeFactor;
 
-	ASSERTMSGLINE(105, coloration >= axfx_reverb_hi_f32_0 && coloration <= axfx_reverb_hi_f32_1 &&
-				  time >= axfx_reverb_hi_f32_0p01 && time <= axfx_reverb_hi_f32_10 &&
-				  mix >= axfx_reverb_hi_f32_0 && mix <= axfx_reverb_hi_f32_1 &&
-				  crosstalk >= axfx_reverb_hi_f32_0 && crosstalk <= axfx_reverb_hi_f32_1 &&
-				  damping >= axfx_reverb_hi_f32_0 && damping <= axfx_reverb_hi_f32_1 &&
-				  preDelay >= axfx_reverb_hi_f32_0 && preDelay <= 0.1f,
+	ASSERTMSGLINE(105, coloration >= 0.0f && coloration <= 1.0f &&
+				  time >= 0.01f && time <= 10.0f &&
+				  mix >= 0.0f && mix <= 1.0f &&
+				  crosstalk >= 0.0f && crosstalk <= 1.0f &&
+				  damping >= 0.0f && damping <= 1.0f &&
+				  preDelay >= 0.0f && preDelay <= 0.1f,
 				  "The value of specified parameter is out of range.");
 
-    if ((coloration < axfx_reverb_hi_f32_0) || (coloration > axfx_reverb_hi_f32_1)
-     || (time < axfx_reverb_hi_f32_0p01) || (time > axfx_reverb_hi_f32_10)
-     || (mix < axfx_reverb_hi_f32_0) || (mix > axfx_reverb_hi_f32_1)
-     || (crosstalk < axfx_reverb_hi_f32_0) || (crosstalk > axfx_reverb_hi_f32_1)
-     || (damping < axfx_reverb_hi_f32_0) || (damping > axfx_reverb_hi_f32_1)
-     || (preDelay < axfx_reverb_hi_f32_0) || (preDelay > 0.1f)) {
+    if ((coloration < 0.0f) || (coloration > 1.0f)
+     || (time < 0.01f) || (time > 10.0f)
+     || (mix < 0.0f) || (mix > 1.0f)
+     || (crosstalk < 0.0f) || (crosstalk > 1.0f)
+     || (damping < 0.0f) || (damping > 1.0f)
+     || (preDelay < 0.0f) || (preDelay > 0.1f)) {
         return 0;
     }
 
     memset(rv, 0, sizeof(AXFX_REVHI_WORK));
+    timeFactor = 32000.0f * time;
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 3; i++) {
             DLcreate(&rv->C[i + (k * 3)], axfx_reverb_hi_lens[i] + 2);
             DLsetdelay(&rv->C[i + (k * 3)], axfx_reverb_hi_lens[i]);
-            rv->combCoef[i + (k * 3)] =
-                (f32)pow(axfx_reverb_hi_f32_10,
-                         (axfx_reverb_hi_lens[i] * -3) / (axfx_reverb_hi_f32_32000 * time));
+            rv->combCoef[i + (k * 3)] = powf(10.0f, (axfx_reverb_hi_lens[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {
@@ -100,24 +93,24 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
 
         DLcreate(&rv->AP[2 + (k * 3)], axfx_reverb_hi_lens[k + 5] + 2);
         DLsetdelay(&rv->AP[2 + (k * 3)], axfx_reverb_hi_lens[k + 5]);
-        rv->lpLastout[k] = axfx_reverb_hi_f32_0;
+        rv->lpLastout[k] = 0.0f;
     }
 
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->crosstalk = crosstalk;
     rv->damping = damping;
-    if (rv->damping < axfx_reverb_hi_f32_0p05) {
-        rv->damping = axfx_reverb_hi_f32_0p05;
+    if (rv->damping < 0.05f) {
+        rv->damping = 0.05f;
     }
     {
-        f32 damp = axfx_reverb_hi_f32_0p8 * rv->damping;
-        damp += axfx_reverb_hi_f32_0p05;
-        rv->damping = axfx_reverb_hi_f32_1 - damp;
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
     }
 
-    if (axfx_reverb_hi_f32_0 != preDelay) {
-        rv->preDelayTime = (axfx_reverb_hi_f32_32000 * preDelay);
+    if (0.0f != preDelay) {
+        rv->preDelayTime = (32000.0f * preDelay);
         for(i = 0; i < 3; i++) {
             rv->preDelayLine[i] = __AXFXAlloc(rv->preDelayTime * 4);
 			ASSERTMSGLINE(173, rv->preDelayLine[i], "Can't allocate the memory.");

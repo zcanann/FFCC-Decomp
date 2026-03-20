@@ -28,9 +28,18 @@ extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
+
+static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
+                                     float scale, float innerRadius, float outerRadius)
+{
+    return CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(&Math, outPos, outT, origin, vector, ellipseScale,
+                                                                  scale, innerRadius, outerRadius);
+}
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
@@ -1211,9 +1220,10 @@ void CGObject::hit()
                 Vec attackVec;
                 Vec hitPos;
                 PSVECSubtract(&attack->m_worldPosition, &attack->m_localEnd, &attackVec);
-                if (Math.CrossCheckSphereVector(&hitPos, 0, &attack->m_localEnd, &attackVec,
-                                                reinterpret_cast<Vec*>(&damage->m_worldPosition.y),
-                                                damage->m_innerRadius) == 0) {
+                if (CrossCheckSphereVectorRaw(&hitPos, 0, &attack->m_localEnd, &attackVec,
+                                              reinterpret_cast<Vec*>(&damage->m_worldPosition.y),
+                                              attack->m_radius2, damage->m_innerRadius,
+                                              damage->m_outerRadius) == 0) {
                     continue;
                 }
 

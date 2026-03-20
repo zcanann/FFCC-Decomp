@@ -715,33 +715,33 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* p0, Vec* p1, Vec* ellipseScale, float scale)
+static int CrossCheckSphereVectorImpl(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
+                                      float scale, float innerRadius, float outerRadius)
 {
-    float fVar1;
     bool hit;
-    double dVar6;
-    double dVar7;
-    double dVar8;
-    double dVar9;
-    double dVar10;
-    Vec local_84;
-    Vec local_78;
-    Vec local_6c;
     Vec local_60;
+    Vec local_6c;
+    Vec local_78;
+    Vec local_84;
+    float scaledInner = innerRadius + scale;
+    float scaleY = scaledInner / (outerRadius + scale);
+    float scaleSq = scaledInner * scaledInner;
+    float dot;
+    float proj;
+    float lenSq;
+    float discriminant;
+    float root;
 
-    dVar8 = (double)(float)(scale + p0->x);
-    dVar10 = (double)(float)(dVar8 / (double)(float)(p1->x + p0->x));
-    PSVECSubtract(p1, ellipseScale, &local_60);
-    dVar9 = (double)(float)(dVar8 * dVar8);
-    local_78.y = (float)((double)local_60.y * dVar10);
-    local_6c.x = p0->y;
-    local_6c.y = (float)((double)p0->z * dVar10);
-    local_6c.z = p1->z;
+    PSVECSubtract(origin, ellipseScale, &local_60);
+    local_78.y = local_60.y * scaleY;
+    local_6c.x = vector->x;
+    local_6c.y = vector->y * scaleY;
+    local_6c.z = vector->z;
     local_78.x = local_60.x;
     local_78.z = local_60.z;
     local_60.y = local_78.y;
-    dVar8 = (double)PSVECDotProduct(&local_78, &local_78);
-    if (dVar8 < dVar9) {
+    dot = PSVECDotProduct(&local_78, &local_78);
+    if (dot < scaleSq) {
         if (outT != NULL) {
             *outT = 0.0f;
         }
@@ -752,25 +752,24 @@ int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* p0, Vec* p1, Ve
         }
         hit = true;
     } else {
-        dVar6 = (double)PSVECDotProduct(&local_6c, &local_78);
-        if (0.0 < dVar6) {
+        proj = PSVECDotProduct(&local_6c, &local_78);
+        if (0.0f < proj) {
             hit = false;
         } else {
-            dVar7 = (double)PSVECDotProduct(&local_6c, &local_6c);
-            fVar1 = (float)(dVar6 * dVar6 - (double)(float)(dVar7 * (double)(float)(dVar8 - dVar9)));
-            dVar8 = (double)fVar1;
-            if (dVar8 < 0.0) {
+            lenSq = PSVECDotProduct(&local_6c, &local_6c);
+            discriminant = proj * proj - lenSq * (dot - scaleSq);
+            if (discriminant < 0.0f) {
                 hit = false;
             } else {
-                dVar8 = (double)(float)(-dVar6 - (double)sqrtf(fVar1));
-                if ((dVar8 <= 0.0) || (dVar7 < dVar8)) {
+                root = -proj - sqrtf(discriminant);
+                if ((root <= 0.0f) || (lenSq < root)) {
                     hit = false;
                 } else {
                     if (outT != NULL) {
-                        *outT = (float)(dVar8 / dVar7);
+                        *outT = root / lenSq;
                     }
                     if (outPos != NULL) {
-                        PSVECScale(&local_6c, &local_84, (float)(dVar8 / dVar7));
+                        PSVECScale(&local_6c, &local_84, root / lenSq);
                         PSVECAdd(&local_60, &local_84, outPos);
                     }
                     hit = true;
@@ -782,13 +781,22 @@ int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* p0, Vec* p1, Ve
     if (hit) {
         if (outPos != NULL) {
             PSVECSubtract(outPos, &local_60, outPos);
-            outPos->y = (float)((double)outPos->y / dVar10);
-            PSVECAdd(outPos, p1, outPos);
+            outPos->y = outPos->y / scaleY;
+            PSVECAdd(outPos, origin, outPos);
         }
         return 1;
     }
 
     return 0;
+}
+
+extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
+    float innerRadius, float outerRadius)
+{
+    (void)math;
+    return CrossCheckSphereVectorImpl(outPos, outT, origin, vector, ellipseScale, scale, innerRadius,
+                                      outerRadius);
 }
 
 /*

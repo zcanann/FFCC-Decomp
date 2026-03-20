@@ -99,8 +99,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
     if (state->countdown == 0) {
         VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
-        VertexApEntry* entry = &env->entries[data->entryIndex];
         Vec* points = *(Vec**)((u8*)parent + 0x70);
+        VertexApEntry* entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
             u32* srcTable = *(u32**)((u8*)env + 0x8);

@@ -52,7 +52,8 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				value = value * kPppSRandHCVSingleSampleScale;
+				float scale = kPppSRandHCVSingleSampleScale;
+				value = value * scale;
 			}
 			target[0] = value;
 		}
@@ -63,7 +64,8 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				value = value * kPppSRandHCVSingleSampleScale;
+				float scale = kPppSRandHCVSingleSampleScale;
+				value = value * scale;
 			}
 			target[1] = value;
 		}
@@ -74,7 +76,8 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				value = value * kPppSRandHCVSingleSampleScale;
+				float scale = kPppSRandHCVSingleSampleScale;
+				value = value * scale;
 			}
 			target[2] = value;
 		}
@@ -85,7 +88,8 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 			if (flag != 0) {
 				value = value + Math.RandF();
 			} else {
-				value = value * kPppSRandHCVSingleSampleScale;
+				float scale = kPppSRandHCVSingleSampleScale;
+				value = value * scale;
 			}
 			target[3] = value;
 		}

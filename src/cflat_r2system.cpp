@@ -1755,7 +1755,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xFB:
-        Game.game.SetNextScriptNewGame();
+        Game.SetNextScriptNewGame();
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -1765,7 +1765,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xF6:
-        Game.game.m_caravanWorkArr[*object->m_localBase].m_gil = object->m_localBase[1];
+        Game.m_caravanWorkArr[*object->m_localBase].m_gil = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -1810,7 +1810,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
  */
 CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
 {
-    u8* game = reinterpret_cast<u8*>(&Game.game);
+    u8* game = reinterpret_cast<u8*>(&Game);
     int result = 0;
 
     if (systemValue < -0xFFF) {
@@ -1955,8 +1955,8 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
  */
 void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack, int setMode)
 {
-    u8* game = reinterpret_cast<u8*>(&Game.game);
-    CGame::CGameWork& gameWork = Game.game.m_gameWork;
+    u8* game = reinterpret_cast<u8*>(&Game);
+    CGame::CGameWork& gameWork = Game.m_gameWork;
 
     if (systemValue > -0x1000) {
         if (systemValue < -499) {

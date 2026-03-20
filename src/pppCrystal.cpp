@@ -278,7 +278,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetNumTevStages(3);
 
 	Mtx lightMtx;
-	if ((int)Game.game.m_currentSceneId == 7) {
+	if ((int)Game.m_currentSceneId == 7) {
 		C_MTXLightPerspective(
 			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	} else {

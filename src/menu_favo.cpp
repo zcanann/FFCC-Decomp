@@ -57,7 +57,7 @@ void CMenuPcs::FavoInit()
 	int iVar16;
 	int iVar17;
 
-	uVar3 = Game.game.m_scriptFoodBase[0];
+	uVar3 = Game.m_scriptFoodBase[0];
 	memset(favoList, 0, 0x1008);
 	fVar4 = 1.0f;
 	iVar8 = (int)favoList + 8;
@@ -713,7 +713,7 @@ void CMenuPcs::FavoDraw()
 	nameFont->SetMargin(1.0f);
 	nameFont->DrawInit();
 
-	const FavoFlatData* flatData = (const FavoFlatData*)&Game.game.m_cFlatDataArr[1];
+	const FavoFlatData* flatData = (const FavoFlatData*)&Game.m_cFlatDataArr[1];
 	rank = s_rank;
 	rankEntry = (short*)((int)favoList + 8);
 	tmpCount = *favoList;

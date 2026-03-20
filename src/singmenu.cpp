@@ -228,7 +228,7 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
         return dynamicText;
     }
 
-    u8 languageId = Game.game.m_gameWork.m_languageId;
+    u8 languageId = Game.m_gameWork.m_languageId;
     if (languageId == 3) {
         return gSingMenuTextTableIt[staticText];
     }
@@ -271,7 +271,7 @@ void CMenuPcs::createSingleMenu()
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
     gSingMenuAsyncLoadCompleted = 0;
-    if (Game.game.m_gameWork.m_menuStageMode == 0) {
+    if (Game.m_gameWork.m_menuStageMode == 0) {
         if (self[0x859] != 0) {
             *reinterpret_cast<int*>(self + 0xF0) = 0;
 
@@ -296,7 +296,7 @@ void CMenuPcs::createSingleMenu()
         }
 
         char path[128];
-        char* language = GetLangString__5CGameFv(&Game.game);
+        char* language = GetLangString__5CGameFv(&Game);
         sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, language);
         loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
 
@@ -304,7 +304,7 @@ void CMenuPcs::createSingleMenu()
         gSingMenuForcedSelection = -1;
         gSingMenuAsyncFileHandle = 0;
 
-        if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
                 this, PTR_s_solo2_80214a8c, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
@@ -402,7 +402,7 @@ void CMenuPcs::SingMenuInit()
     *reinterpret_cast<void**>(self + 0x774) = 0;
 
     CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
 
@@ -417,16 +417,16 @@ void CMenuPcs::SingMenuInit()
     handle->Add();
     int modelNo = GetModelNo__8CMenuPcsFiii(
         this,
-        static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E0)),
-        static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E4)),
-        static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E2)));
+        static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0)),
+        static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E4)),
+        static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E2)));
     handle->LoadModel(0, static_cast<unsigned long>(modelNo), 0, 0, -1, 0, 0);
     handle->m_flags |= 0x300141;
     handle->LoadAnim(s_stand_80332a24, 0, 1, 0, (handle->m_charaNo / 100) * 100, -1, 0);
     handle->SetAnim(0, -1, -1, -1, 0);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x814) = __nwa__FUlPQ27CMemory6CStagePci(0x50, stage, s_singmenu_cpp_801de8d4, 0x5DD);
@@ -467,21 +467,21 @@ void CMenuPcs::SingMenuInit()
     *reinterpret_cast<int*>(state + 0x4C) = 0x58;
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x850) = __nw__FUlPQ27CMemory6CStagePci(0x1008, stage, s_singmenu_cpp_801de8d4, 0x605);
     memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x82C) = __nw__FUlPQ27CMemory6CStagePci(0x48, stage, s_singmenu_cpp_801de8d4, 0x609);
     memset(*reinterpret_cast<void**>(self + 0x82C), 0, 0x48);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+    if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x848) = __nw__FUlPQ27CMemory6CStagePci(0xC, stage, s_singmenu_cpp_801de8d4, 0x60D);
@@ -531,14 +531,14 @@ void CMenuPcs::drawSingleMenu()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    if ((Game.game.m_gameWork.m_menuStageMode != 0) &&
-        (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
+    if ((Game.m_gameWork.m_menuStageMode != 0) &&
+        (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
         DrawInit__8CMenuPcsFv(this);
         DrawFilter__8CMenuPcsFUcUcUcUc(this, 0, 0, 0, 0xFF);
         gUtil.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_803329a4);
         DrawInit__8CMenuPcsFv(this);
 
-        unsigned int scriptFoodBase = Game.game.m_scriptFoodBase[0];
+        unsigned int scriptFoodBase = Game.m_scriptFoodBase[0];
         if (scriptFoodBase != 0) {
             u8 menuType = *reinterpret_cast<u8*>(scriptFoodBase + 0xBE0);
             void* shopMenu = *reinterpret_cast<void**>(self + 0x868);
@@ -627,8 +627,8 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    gSingMenuHasScriptFoodBase = static_cast<int>(*reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0) != 0);
-    if (Game.game.m_gameWork.m_menuStageMode == 0) {
+    gSingMenuHasScriptFoodBase = static_cast<int>(*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) != 0);
+    if (Game.m_gameWork.m_menuStageMode == 0) {
         if (self[0x859] == 0) {
             return;
         }
@@ -642,19 +642,19 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     if (self[0x859] == 0) {
         createSingleMenu__8CMenuPcsFv(this);
     }
-    if (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
+    if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
         return;
     }
     if (self[0x85A] == 0) {
         SingMenuInit__8CMenuPcsFv(this);
     }
 
-    if (*reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0) == 0) {
+    if (*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) == 0) {
         int loadIndex = *reinterpret_cast<int*>(self + 0x85C);
         if (loadIndex < 2) {
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
-                char* language = GetLangString__5CGameFv(&Game.game);
+                char* language = GetLangString__5CGameFv(&Game);
                 sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
@@ -666,7 +666,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 }
 
                 CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-                if (Game.game.m_gameWork.m_menuStageMode != 0) {
+                if (Game.m_gameWork.m_menuStageMode != 0) {
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
@@ -678,7 +678,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
 
                 stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-                if (Game.game.m_gameWork.m_menuStageMode != 0) {
+                if (Game.m_gameWork.m_menuStageMode != 0) {
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
@@ -719,7 +719,7 @@ post_texture_load:
         *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = 0;
     }
 
-    char menuKind = *reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0);
+    char menuKind = *reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0);
     if (menuKind == 1) {
         if (*reinterpret_cast<void**>(self + 0x868) == 0) {
             CreateShopMenu__8CMenuPcsFv(this);
@@ -808,7 +808,7 @@ void CMenuPcs::DrawSingleBase(float alpha)
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    u8 languageId = Game.game.m_gameWork.m_languageId;
+    u8 languageId = Game.m_gameWork.m_languageId;
 
     DrawInit__8CMenuPcsFv(this);
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
@@ -837,7 +837,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     GXSetChanMatColor(GX_COLOR0A0, color);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x22);
 
-    unsigned short charaNo = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short charaNo = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
     float iconStep = FLOAT_803329e8;
     float texU = static_cast<float>(charaNo & 1) * iconStep;
     float texV = static_cast<float>(charaNo >> 1) * iconStep;
@@ -876,7 +876,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     SetColor__5CFontF8_GXColor(font, &fontColor);
     DrawInit__5CFontFv(font);
 
-    char* charaName = reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0x3CA);
+    char* charaName = reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0x3CA);
     float titleWidth = static_cast<float>(GetWidth__5CFontFPc(font, charaName));
     float titleX = FLOAT_803329d4 + (FLOAT_803329d8 - titleWidth) * static_cast<float>(DOUBLE_80332968);
     SetTlut__5CFontFi(font, 0x12);
@@ -932,13 +932,13 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         unsigned short stat;
         if (i == 0) {
-            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x1E);
+            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x1E);
         } else if (i == 1) {
-            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x22);
+            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x22);
         } else if (i == 2) {
-            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x20);
+            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x20);
         } else {
-            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3DE);
+            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3DE);
         }
 
         char valueText[36];
@@ -1095,7 +1095,7 @@ void CMenuPcs::SingleCalcFadeIn()
         AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
     float modelScale = DAT_801dd708[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -1192,7 +1192,7 @@ void CMenuPcs::SingleCalcFadeOut()
         AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
     float modelScale = DAT_801dd708[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -1252,7 +1252,7 @@ void CMenuPcs::SingleCalcCtrl()
         AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
     float modelScale = DAT_801dd708[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -1548,7 +1548,7 @@ void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int t
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
     if (useRawItemId == 0) {
-        itemId = static_cast<int>(*reinterpret_cast<s16*>(Game.game.m_scriptFoodBase[0] + itemId * 2 + 0xB6));
+        itemId = static_cast<int>(*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + itemId * 2 + 0xB6));
     }
 
     if (itemId < 1) {
@@ -1643,7 +1643,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    int script = Game.game.m_scriptFoodBase[0];
+    int script = Game.m_scriptFoodBase[0];
 
     if (*reinterpret_cast<s16*>(script + 0xbaa) > 2) {
         if (*reinterpret_cast<s16*>(script + 0x208) >= 0 && *reinterpret_cast<s16*>(script + 0x208) == itemNo) {
@@ -2108,11 +2108,11 @@ int CMenuPcs::SingWinMessHeight()
  */
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
-    u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
-    unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E0) & 3);
+    u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0) & 3);
     unsigned int genderMask = 0x10;
 
-    if (*reinterpret_cast<s16*>(Game.game.m_scriptFoodBase[0] + 0x3E2) != 0) {
+    if (*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + 0x3E2) != 0) {
         genderMask = 0x20;
     }
 
@@ -2141,7 +2141,7 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
  */
 int CMenuPcs::GetEquipType(int itemNo)
 {
-    u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     int equipType = 0;
 
     if ((flags & 0x100) == 0) {
@@ -2176,16 +2176,16 @@ int CMenuPcs::GetEquipType(int itemNo)
  */
 int CMenuPcs::GetSmithItem(int itemNo)
 {
-    int script = Game.game.m_scriptFoodBase[0];
+    int script = Game.m_scriptFoodBase[0];
 
     GetItemType__8CMenuPcsFii(this, itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(script + 0x3E0);
     u16 raceType = race & 3;
-    int itemBase = Game.game.unkCFlatData0[2] + itemNo * 0x48;
+    int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
     int smithItem = *reinterpret_cast<u16*>(itemBase + raceType * 2 + 0x38);
     if (smithItem != 0) {
-        u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(script + 0x3E0) & 3);
         unsigned int genderMask = 0x10;
         if (*reinterpret_cast<s16*>(script + 0x3E2) != 0) {
@@ -2249,7 +2249,7 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
 {
     GetItemType__8CMenuPcsFii(this, itemNo, 1);
 
-    u8* itemBase = reinterpret_cast<u8*>(Game.game.unkCFlatData0[2]) + (itemNo * 0x48);
+    u8* itemBase = reinterpret_cast<u8*>(Game.unkCFlatData0[2]) + (itemNo * 0x48);
     u16* out = reinterpret_cast<u16*>(materialInfo);
 
     out[0] = *reinterpret_cast<u16*>(itemBase + 0x26);
@@ -2278,10 +2278,10 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     unsigned char languageId;
 
     GetItemType__8CMenuPcsFii(this, itemNo, 1);
-    raceBits = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     outText[0] = '\0';
 
-    languageId = static_cast<unsigned char>(Game.game.m_gameWork.m_languageId);
+    languageId = static_cast<unsigned char>(Game.m_gameWork.m_languageId);
     if ((raceBits & 0xF) == 0xF) {
         text = PTR_s_Tutti_802143ec;
         if (languageId != 3) {
@@ -2474,7 +2474,7 @@ void CMenuPcs::CalcSingLife()
  */
 void CMenuPcs::DrawSingLife()
 {
-    unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
+    unsigned int scriptFood = Game.m_scriptFoodBase[0];
     int lifeTimer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
     if (lifeTimer < 0) {
         return;
@@ -2537,7 +2537,7 @@ void CMenuPcs::SingLifeResetWait()
 static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
                                            char** frenchTable, char** spanishTable)
 {
-    u8 languageId = Game.game.m_gameWork.m_languageId;
+    u8 languageId = Game.m_gameWork.m_languageId;
     if (languageId == 3) {
         return italianTable[index];
     }
@@ -2613,7 +2613,7 @@ char* CMenuPcs::GetHairStr(int index)
  */
 char* CMenuPcs::GetMenuStr(int index)
 {
-    u8 languageId = Game.game.m_gameWork.m_languageId;
+    u8 languageId = Game.m_gameWork.m_languageId;
 
     if (languageId == 3) {
         return gSingMenuTextTableIt[index];

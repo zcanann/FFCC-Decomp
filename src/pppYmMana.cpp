@@ -367,7 +367,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         return;
     }
 
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         float alphaScale = FLOAT_80330ec0 * *(float*)(*(int*)work + 0x4B0);
         int alpha = (int)alphaScale;
         *(u8*)((u8*)work + 0x100) = 0xFF;
@@ -416,11 +416,11 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     void* handle;
     u32 model;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         gObject->m_lookAtTimer = FLOAT_80330e58;
     }
 
-    if (Game.game.m_currentMapId != 0x21) {
+    if (Game.m_currentMapId != 0x21) {
         gObject->m_stepSlopeLimit = FLOAT_80330eb8;
     }
 
@@ -679,7 +679,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     work[0x1D] = (u32)param_2;
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         *((u8*)param_2 + 0x24) = 0;
     }
 
@@ -810,7 +810,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         return;
     }
 
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         GXGetViewportv(savedViewport);
     }
 
@@ -829,7 +829,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         centerPos.x = FLOAT_80330e4c;
         centerPos.y = FLOAT_80330e4c;
         centerPos.z = FLOAT_80330e4c;
@@ -957,7 +957,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
 
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         GXSetViewport(savedViewport[0], savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4],
                       savedViewport[5]);
     }
@@ -1341,7 +1341,7 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
 
     (void)waterOrigin;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         cameraPos.x = ppvCameraMatrix0[0][3];
         cameraPos.y = ppvCameraMatrix0[1][3];
         cameraPos.z = ppvCameraMatrix0[2][3];

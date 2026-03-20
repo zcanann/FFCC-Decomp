@@ -368,7 +368,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
             }
 
-            if (((Game.game.m_currentSceneId == 4) || (Game.game.m_currentSceneId == 7)) &&
+            if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
                 (static_cast<signed char>(U8At(this, 0x1E)) > 7) && (static_cast<signed char>(U8At(this, 0x1E)) < 10)) {
                 F32At(this, 0x58) = kMapObjZero;
                 F32At(this, 0x5C) = kMapObjOne;

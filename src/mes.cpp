@@ -122,7 +122,7 @@ static void ApplyCaseMode(char* text, int& caseMode)
 
 static char* GetFlatName(int tableIdx, int entryIdx)
 {
-	CMesFlatDataView* flat = (CMesFlatDataView*)&Game.game.m_cFlatDataArr[1];
+	CMesFlatDataView* flat = (CMesFlatDataView*)&Game.m_cFlatDataArr[1];
 	if ((unsigned int)tableIdx >= 8U)
 	{
 		return (char*)s_mesEmpty;
@@ -809,7 +809,7 @@ void CMes::Draw()
 					if (ch == 7)
 					{
 						unsigned int mode;
-						if ((Game.game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
 						{
 							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -818,14 +818,14 @@ void CMes::Draw()
 						}
 						else
 						{
-							mode = (unsigned int)Game.game.m_gameWork.m_menuStageMode;
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 7 : 0x0B;
 					}
 					else if (ch == 8)
 					{
 						unsigned int mode;
-						if ((Game.game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
 						{
 							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -834,14 +834,14 @@ void CMes::Draw()
 						}
 						else
 						{
-							mode = (unsigned int)Game.game.m_gameWork.m_menuStageMode;
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 8 : 0x0C;
 					}
 					else if (ch == 0x0A)
 					{
 						unsigned int mode;
-						if ((Game.game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
 						{
 							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -850,14 +850,14 @@ void CMes::Draw()
 						}
 						else
 						{
-							mode = (unsigned int)Game.game.m_gameWork.m_menuStageMode;
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 9 : 0x0D;
 					}
 					else if (ch == 0x0B)
 					{
 						unsigned int mode;
-						if ((Game.game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
 						{
 							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -866,7 +866,7 @@ void CMes::Draw()
 						}
 						else
 						{
-							mode = (unsigned int)Game.game.m_gameWork.m_menuStageMode;
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 0x0A : 0x0E;
 					}
@@ -1127,19 +1127,19 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			}
 			else if (tag == 0x3B)
 			{
-				Game.game.MakeArtItemName(dst, value, 1);
+				Game.MakeArtItemName(dst, value, 1);
 			}
 			else if (tag == 0x3D)
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.game.MakeArtItemName(dst, value, count);
+				Game.MakeArtItemName(dst, value, count);
 			}
 			else
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.game.MakeNumItemName(dst, value, count);
+				Game.MakeNumItemName(dst, value, count);
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
@@ -1170,19 +1170,19 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			}
 			else if (tag == 0x3C)
 			{
-				Game.game.MakeArtMonName(dst, value, 1);
+				Game.MakeArtMonName(dst, value, 1);
 			}
 			else if (tag == 0x3E)
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.game.MakeArtMonName(dst, value, count);
+				Game.MakeArtMonName(dst, value, count);
 			}
 			else
 			{
 				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
 				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.game.MakeNumMonName(dst, value, count);
+				Game.MakeNumMonName(dst, value, count);
 			}
 			ApplyCaseMode(dst, caseMode);
 			dst += strlen(dst);
@@ -1265,7 +1265,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
 			int caravanIdx = CMes::m_tempVar[varIndex];
-			branchMode = (Game.game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
+			branchMode = (Game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
 			next = in + 4;
 			break;
 		}

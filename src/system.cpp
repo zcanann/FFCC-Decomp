@@ -229,11 +229,11 @@ void CSystem::ExecScenegraph()
     unsigned short perfTrigger = 0;
     CStopWatch watch((char*)-1);
 
-    if (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.game.m_gameWork.m_gamePaused)
+    if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
     {
         Graphic._WaitDrawDone((char*)"system.cpp", 0x219);
-        Game.game.m_gameWork.m_gamePaused = Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
-        if (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)
+        Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
+        if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)
         {
             Sound.PauseAllSe(1);
             File.BackAllFilesToQueue((CFile::CHandle*)0);
@@ -288,7 +288,7 @@ void CSystem::ExecScenegraph()
     }
 
     if (((*(unsigned int*)((unsigned char*)&MiniGamePcs + 0x6484) & 0x40) != 0) &&
-        (Game.game.m_gameWork.m_gamePaused == 0))
+        (Game.m_gameWork.m_gamePaused == 0))
     {
         for (unsigned int port = 0; port < 4; port++)
         {
@@ -398,7 +398,7 @@ void CSystem::ExecScenegraph()
             skip = (drawToggle == 0);
         }
 
-        if (Game.game.m_gameWork.m_gamePaused == 0)
+        if (Game.m_gameWork.m_gamePaused == 0)
         {
             if ((flags & 0x10) != 0)
             {

@@ -269,7 +269,7 @@ void CGCharaObj::onFramePostCalc()
 	if (script != 0) {
 		if (*reinterpret_cast<short*>(self + 0x42) != 0) {
 			int healTick = m_stateTick;
-			unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.game.unk_flat3_field_8_0xc7dc + 0x3A);
+			unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
 			if (healTick != 0 && tickDiv != 0 && (healTick % static_cast<int>(tickDiv)) == 0) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
 				addHp(-1, 0);
@@ -312,14 +312,14 @@ void CGCharaObj::onFramePreCalc()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-	if (Game.game.unk_flat3_0xc7d0 != 0) {
-		PSVECSubtract(reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition,
+	if (Game.unk_flat3_0xc7d0 != 0) {
+		PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition,
 			&m_targetDelta);
 		m_targetDist = PSVECMag(&m_targetDelta);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		int partyObj = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game.game.m_partyObjArr[0]) + (i * 4));
+		int partyObj = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game.m_partyObjArr[0]) + (i * 4));
 		float* dist = &m_partyDistance[i];
 		float* ang = &m_partyAngle[i];
 		int* rank = &m_partyRank[i];
@@ -558,7 +558,7 @@ void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos
 
 	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x0C);
 	unsigned int sourceCid = cidFn(sourceObj);
-	if ((sourceCid & 0x6D) == 0x6D && Game.game.m_gameWork.m_menuStageMode != 0 && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		sourceCid = cidFn(sourceObj);
 		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
 			return;
@@ -576,7 +576,7 @@ void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos
 
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
 			unsigned short particleLife =
-				*reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
 			slotData.m_timer = (particleLife >= 3) ? 0x1E : 0;
 			break;
 		}
@@ -619,7 +619,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	unsigned int cid = cidFn(this);
 
 	bool skip = false;
-	if ((cid & 0x6D) == 0x6D && Game.game.m_gameWork.m_menuStageMode != 0 && Game.game.m_gameWork.m_bossArtifactStageIndex <= 0xE) {
+	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex <= 0xE) {
 		cid = cidFn(this);
 		if ((cid & 0x6D) == 0x6D && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
 			skip = true;
@@ -645,7 +645,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	}
 
 	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, static_cast<short>(effectIndex), this);
-	if ((*reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
+	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 	}
 }
@@ -818,7 +818,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			changeStat(0x19, 0, 0);
 			break;
 		case 100:
-			if (Game.game.m_gameWork.m_gameOverFlag == 0) {
+			if (Game.m_gameWork.m_gameOverFlag == 0) {
 				if (amount == 0x225) {
 					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
 				} else {
@@ -894,7 +894,7 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned int base = 0;
-	unsigned char* gameFlat = reinterpret_cast<unsigned char*>(Game.game.unk_flat3_field_8_0xc7dc);
+	unsigned char* gameFlat = reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc);
 	switch (staIndex) {
 		case 0: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x10); break;
 		case 1: base = *reinterpret_cast<unsigned short*>(gameFlat + 0x0E); break;
@@ -911,17 +911,17 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		default: break;
 	}
 
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) + (amount * 0x48);
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (amount * 0x48);
 	short itemType = (amount < 0x1F5) ? 1 : *reinterpret_cast<short*>(itemData + 2);
 
 	unsigned int sourceCid = source->GetCID();
 	unsigned int power = 0;
 	if ((sourceCid & 0x2D) == 0x2D) {
 		CGObject* statSource = source;
-		if (Game.game.m_gameWork.m_menuStageMode != 0 && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 			(sourceCid & 0x6D) == 0x6D &&
 			source->m_scriptHandle != 0 && source->m_scriptHandle[0xED] != 0) {
-			statSource = reinterpret_cast<CGObject*>(Game.game.m_partyObjArr[0]);
+			statSource = reinterpret_cast<CGObject*>(Game.m_partyObjArr[0]);
 		}
 		if (statSource != 0 && statSource->m_scriptHandle != 0 && statSource->m_scriptHandle[9] != 0) {
 			power = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(statSource->m_scriptHandle[9]) + 0x198);
@@ -932,8 +932,8 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	if ((sourceCid & 0xAD) == 0xAD) {
 		int stageLevel = 0;
-		if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			stageLevel = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			stageLevel = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 			if (stageLevel > 2) {
 				stageLevel = 2;
 			}
@@ -1017,7 +1017,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj*)
 void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int& outC, int forceNormal)
 {
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) + (itemId * 0x48);
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (itemId * 0x48);
 
 	int isNormal = 0;
 	if ((*reinterpret_cast<unsigned short*>(itemData + 0x32) & 1) != 0 || forceNormal != 0) {
@@ -1097,7 +1097,7 @@ void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
 
 	int itemId = m_itemId;
 	int itemOffset = itemId * 0x48;
-	unsigned short staType = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemOffset + 8);
+	unsigned short staType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset + 8);
 
 	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
 	unsigned int cid = cidFn(this);
@@ -1394,7 +1394,7 @@ void CGCharaObj::calcCastTime(int)
 
 	int itemId = m_itemId;
 	int itemOffset = itemId * 0x48;
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) + itemOffset;
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
 
 	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
@@ -1402,13 +1402,13 @@ void CGCharaObj::calcCastTime(int)
 
 	if (itemType == 2) {
 		unsigned int cid = GetCID();
-		if ((cid & 0xAD) == 0xAD && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			int stage = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+		if ((cid & 0xAD) == 0xAD && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 			if (stage > 2) {
 				stage = 2;
 			}
 			if (stage > 0) {
-				unsigned short bonus = *reinterpret_cast<unsigned short*>(Game.game.unk_flat3_field_8_0xc7dc + 0x58 + (stage * 2));
+				unsigned short bonus = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stage * 2));
 				if (cast > bonus) {
 					cast -= bonus;
 				} else {
@@ -1471,7 +1471,7 @@ void CGCharaObj::addSe(int)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	int particle = m_itemId;
-	unsigned short se = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (particle * 0x48) + 0x38);
+	unsigned short se = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particle * 0x48) + 0x38);
 	if (se == 0 || se == 0xFFFF) {
 		return;
 	}
@@ -1522,7 +1522,7 @@ void CGCharaObj::combi2()
 	CGPartyObj* candidates[4];
 	int candidateCount = 0;
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party == 0) {
 			continue;
 		}
@@ -1563,8 +1563,8 @@ void CGCharaObj::combi2()
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	CGame* linkCursor = &Game.game;
-	int linkCount = *reinterpret_cast<int*>(&Game.game.m_gameWork.m_linkTable[3][0][0]);
+	CGame* linkCursor = &Game;
+	int linkCount = *reinterpret_cast<int*>(&Game.m_gameWork.m_linkTable[3][0][0]);
 
 	while (entry < linkCount) {
 		int linkHead = *reinterpret_cast<int*>(&linkCursor->m_gameWork.m_linkTable[3][0][0]);
@@ -1572,7 +1572,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 		bool skip = (obj == 0);
 
 		if (!skip) {
-			if (Game.game.m_gameWork.m_menuStageMode != 0 && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 				(obj->GetCID() & 0x6D) == 0x6D &&
 				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0) {
 				skip = true;
@@ -1640,8 +1640,8 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 	int found = -1;
 	outFallback = 0;
 
-	unsigned short* combiCursor = reinterpret_cast<unsigned short*>(Game.game.unk_flat3_field_1C_0xc7d8);
-	for (int combiIndex = 0; combiIndex < Game.game.unk_flat3_count_0xc7d4; combiIndex++, combiCursor += 0xD) {
+	unsigned short* combiCursor = reinterpret_cast<unsigned short*>(Game.unk_flat3_field_1C_0xc7d8);
+	for (int combiIndex = 0; combiIndex < Game.unk_flat3_count_0xc7d4; combiIndex++, combiCursor += 0xD) {
 		int reqCount = 0;
 		if (combiCursor[0] != 0) {
 			reqCount = 1;
@@ -1675,7 +1675,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			bool itemMatch = false;
 			if (slot == count - 1) {
 				unsigned short itemCode =
-					*reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (objParticle * 0x48));
+					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48));
 				if (itemCode == 0x1F8 && reqParticle == 0x1F8) {
 					itemMatch = true;
 				}

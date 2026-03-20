@@ -1318,7 +1318,7 @@ void C_MTXLightFrustum(Mtx m, float t, float b, float l, float r, float n, float
     m[0][0] = ((2 * n) * tmp) * scaleS;
     m[0][1] = 0.0f;
     add = r + l;
-    proj = (add * tmp) * scaleS;
+    proj = (tmp * add) * scaleS;
     m[0][2] = proj - transS;
     m[0][3] = 0.0f;
 
@@ -1326,7 +1326,7 @@ void C_MTXLightFrustum(Mtx m, float t, float b, float l, float r, float n, float
     m[1][0] = 0.0f;
     m[1][1] = ((2 * n) * tmp) * scaleT;
     add = t + b;
-    proj = (add * tmp) * scaleT;
+    proj = (tmp * add) * scaleT;
     m[1][2] = proj - transT;
     m[1][3] = 0.0f;
 

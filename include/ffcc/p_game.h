@@ -28,15 +28,10 @@ public:
     virtual void onScriptChanged(char*, int);
     virtual void onMapChanging(int, int);
     virtual void onMapChanged(int, int, int);
+};
 
-    // void* vtable; // 0x00
-    int unknown[3];  // 0x4-0xC
-    CGame game;      // 0xC
-}; // Size 0x11F98
-
-STATIC_ASSERT(sizeof(CGamePcs) == 0x11F98);
-
-extern CGamePcs Game;
+extern CGame Game;
+extern CGamePcs GamePcs;
 extern unsigned int m_table_desc0__8CGamePcs[];
 extern unsigned int m_table_desc1__8CGamePcs[];
 extern unsigned int m_table_desc2__8CGamePcs[];

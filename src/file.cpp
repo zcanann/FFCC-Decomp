@@ -102,28 +102,28 @@ void CFile::Init()
     do {
         CHandle* nextHandle;
         if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
 
         if (handleIndex == 0x7E) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 2) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
 
         if (handleIndex == 0x7D) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 3) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
 
         if (handleIndex == 0x7C) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 4) * sizeof(CHandle));
         }
@@ -192,7 +192,7 @@ DVDDiskID* CFile::GetCurrentDiskID()
 
 CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 {
-    if (Game.game.m_gameWork.m_gamePaused != 0)
+    if (Game.m_gameWork.m_gamePaused != 0)
     {
         pri = CFile::PRI_CRITICAL;
     }
@@ -428,7 +428,7 @@ void CFile::kick()
 
 		while (cur != sentinel)
 		{
-			if ((Game.game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
+			if ((Game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
 			    && (cur->m_completionStatus == 1 || cur->m_completionStatus == 4))
 			{
 				u32 readSize;
@@ -583,7 +583,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             break;
         }
 
-        unsigned int language = Game.game.m_gameWork.m_languageId;
+        unsigned int language = Game.m_gameWork.m_languageId;
         const char* const* lines = s_diskErrorText[msgIndex][language];
         unsigned int baseY = compactLayout ? 0x20 : 200;
 

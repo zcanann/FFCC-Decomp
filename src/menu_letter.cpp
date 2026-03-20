@@ -427,9 +427,9 @@ int CMenuPcs::LetterCtrl()
 			}
 		} else if (mode == 1) {
 			int letterOffs = DAT_8032eee8 * 0xC + 0x3EC;
-			signed char letterFlags = *reinterpret_cast<signed char*>(Game.game.m_scriptFoodBase[0] + letterOffs);
+			signed char letterFlags = *reinterpret_cast<signed char*>(Game.m_scriptFoodBase[0] + letterOffs);
 			if (letterFlags >= 0) {
-				*reinterpret_cast<unsigned char*>(Game.game.m_scriptFoodBase[0] + letterOffs) =
+				*reinterpret_cast<unsigned char*>(Game.m_scriptFoodBase[0] + letterOffs) =
 					(static_cast<unsigned char>(letterFlags) & 0x7F) | 0x80;
 			}
 
@@ -484,12 +484,12 @@ int CMenuPcs::LetterCtrl()
 				s16 winW;
 				s16 winH;
 
-				int letter = Game.game.m_scriptFoodBase[0] + DAT_8032eee8 * 0xC;
+				int letter = Game.m_scriptFoodBase[0] + DAT_8032eee8 * 0xC;
 				if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
-					FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+					FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 					int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
 					int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
-					if (Game.game.m_gameWork.m_languageId == 2) {
+					if (Game.m_gameWork.m_languageId == 2) {
 						sprintf(info, "%s%d%s%s",
 							GetMenuStr__8CMenuPcsFi(this, 0x23),
 							value,
@@ -502,7 +502,7 @@ int CMenuPcs::LetterCtrl()
 					}
 				} else {
 					int gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
-					if (Game.game.m_gameWork.m_languageId == 2) {
+					if (Game.m_gameWork.m_languageId == 2) {
 						sprintf(info, "%d%s%s",
 							gil,
 							GetMenuStr__8CMenuPcsFi(this, 4),
@@ -914,8 +914,8 @@ void CMenuPcs::LetterItemWinClose()
  */
 bool CMenuPcs::LetterReplyWinOpen()
 {
-	unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
-	unsigned char languageId = Game.game.m_gameWork.m_languageId;
+	unsigned int caravanWork = Game.m_scriptFoodBase[0];
+	unsigned char languageId = Game.m_gameWork.m_languageId;
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		char lines[8][0x80];
@@ -929,11 +929,11 @@ bool CMenuPcs::LetterReplyWinOpen()
 		memset(lines, 0, 0x400);
 
 		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
-			reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 		char* srcText = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 			0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x323));
 		stage = *reinterpret_cast<CMemory::CStage**>(
-			reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 		char* workText = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 			0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x325));
 
@@ -942,7 +942,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
 			caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
-		char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+		char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 		strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 		MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
@@ -1037,15 +1037,15 @@ void CMenuPcs::LetterAttachWinClose()
  */
 bool CMenuPcs::LetterConfirmOpen()
 {
-	unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
-	unsigned char languageId = Game.game.m_gameWork.m_languageId;
+	unsigned int caravanWork = Game.m_scriptFoodBase[0];
+	unsigned char languageId = Game.m_gameWork.m_languageId;
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
-		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 		unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
 		char** subjectTable = flatData->m_tabl[2].m_strings;
 		char** itemTable = flatData->m_tabl[0].m_strings;
@@ -1193,9 +1193,9 @@ void CMenuPcs::LetterListDraw()
 	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	SetColor__5CFontF8_GXColor(font, &textColor);
 
-	const unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
+	const unsigned int caravanWork = Game.m_scriptFoodBase[0];
 	const int topRow = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34));
-	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 
 	int y = 0x60;
 	for (int row = 0; row < 9; ++row) {
@@ -1307,7 +1307,7 @@ void CMenuPcs::LetterMessDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-	int caravanWork = Game.game.m_scriptFoodBase[0];
+	int caravanWork = Game.m_scriptFoodBase[0];
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
 	s16* animBase = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
@@ -1347,11 +1347,11 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
-	    reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 	char* srcText =
 	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x535));
 	stage = *reinterpret_cast<CMemory::CStage**>(
-	    reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 	char* workText =
 	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x537));
 
@@ -1359,7 +1359,7 @@ void CMenuPcs::LetterMessDraw()
 	memset(workText, 0, 0x400);
 
 	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
-	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 	MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
@@ -1452,7 +1452,7 @@ int CMenuPcs::LetterCtrlCur()
 	bool blocked = false;
 	u16 press;
 	u16 hold;
-	int caravanWork = Game.game.m_scriptFoodBase[0];
+	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
@@ -1633,18 +1633,18 @@ int CMenuPcs::LetterCtrlCur()
 			if (static_cast<int>(curReply) < maxReply - 1) {
 				DAT_8032eeec = static_cast<u8>(curReply);
 				CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
-				    reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 				char* srcText = reinterpret_cast<char*>(
 				    __nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x65E));
 				stage = *reinterpret_cast<CMemory::CStage**>(
-				    reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 				char* workText = reinterpret_cast<char*>(
 				    __nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x660));
 				memset(srcText, 0, 0x400);
 				memset(workText, 0, 0x400);
 
 				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
-				char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+				char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 				strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
 				MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
@@ -2028,7 +2028,7 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 	DAT_8032eef0 = itemIndex;
 	if (DAT_8032eeed == 0) {
 		DAT_8032eeee = static_cast<unsigned char>(itemIndex);
-		DAT_8032eef0 = *reinterpret_cast<short*>(Game.game.m_scriptFoodBase[0] + itemIndex * 2 + 0xB6);
+		DAT_8032eef0 = *reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + itemIndex * 2 + 0xB6);
 	}
 	DAT_8032eef4 = flag;
 }

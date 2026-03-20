@@ -281,7 +281,7 @@ void CGItemObj::onFrame()
 			}
 
 			int ownerAttr = *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4);
-			int itemDataEntry = Game.game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
+			int itemDataEntry = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
 			float particleScale =
 			    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(itemDataEntry + 0x10) + FLOAT_80331b4c;
 
@@ -324,17 +324,17 @@ void CGItemObj::onFrameStat()
 		if (!hasOwner && isActive) {
 			double distance = (double)FLOAT_80331b20;
 
-			if (Game.game.unk_flat3_0xc7d0 == 0) {
+			if (Game.unk_flat3_0xc7d0 == 0) {
 				if (*(int*)(CFlat + 0x4780) == 1) {
 					Vec partyCenter;
 
-					partyCenter.x = (Game.game.m_partyMinX + Game.game.m_partyMaxX) * FLOAT_80331b3c;
-					partyCenter.y = (Game.game.m_partyMinY + Game.game.m_partyMaxY) * FLOAT_80331b3c;
-					partyCenter.z = (Game.game.m_partyMinZ + Game.game.m_partyMaxZ) * FLOAT_80331b3c;
+					partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * FLOAT_80331b3c;
+					partyCenter.y = (Game.m_partyMinY + Game.m_partyMaxY) * FLOAT_80331b3c;
+					partyCenter.z = (Game.m_partyMinZ + Game.m_partyMaxZ) * FLOAT_80331b3c;
 					distance = (double)PSVECDistance((Vec*)(self + 0x15c), &partyCenter);
 				}
 			} else {
-				distance = (double)PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.game.unk_flat3_0xc7d0 + 0x15c));
+				distance = (double)PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.unk_flat3_0xc7d0 + 0x15c));
 			}
 
 			if (*(int*)(self + 0x94) < 1 || DOUBLE_80331ba0 < distance) {
@@ -358,12 +358,12 @@ void CGItemObj::onFrameStat()
 			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			bool useBossAttachName = false;
 
-			if (Game.game.m_gameWork.m_menuStageMode != 0) {
+			if (Game.m_gameWork.m_menuStageMode != 0) {
 				bool condA = false;
 				bool condB = false;
 				bool condC = false;
 
-				if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+				if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 					condC = true;
 				}
 				if (condC) {
@@ -654,7 +654,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
 
 		void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-		    0x194, Game.game.m_mainStage, DAT_801dcf58, 0x28E);
+		    0x194, Game.m_mainStage, DAT_801dcf58, 0x28E);
 		if (handle != 0) {
 			handle = __ct__Q29CCharaPcs7CHandleFv(handle);
 		}
@@ -706,8 +706,8 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		bool isStageCarry = false;
 		bool isMenuBossStage = false;
 
-		if (Game.game.m_gameWork.m_menuStageMode != 0 &&
-			Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		if (Game.m_gameWork.m_menuStageMode != 0 &&
+			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			isMenuBossStage = true;
 		}
 		if (isMenuBossStage) {
@@ -730,13 +730,13 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			bool useBossAttachName = false;
 
-			if (Game.game.m_gameWork.m_menuStageMode != 0) {
+			if (Game.m_gameWork.m_menuStageMode != 0) {
 				bool condA = false;
 				bool condB = false;
 				bool condC = false;
 
-				if (Game.game.m_gameWork.m_menuStageMode != 0 &&
-					Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+				if (Game.m_gameWork.m_menuStageMode != 0 &&
+					Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 					condC = true;
 				}
 				if (condC) {
@@ -770,8 +770,8 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		bool isStageCarry = false;
 		bool isMenuBossStage = false;
 
-		if (Game.game.m_gameWork.m_menuStageMode != 0 &&
-			Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		if (Game.m_gameWork.m_menuStageMode != 0 &&
+			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			isMenuBossStage = true;
 		}
 		if (isMenuBossStage) {
@@ -868,7 +868,7 @@ void CGItemObj::onFrameAlways()
 		unsigned char flatFlags = *(unsigned char*)(CFlat + 4836);
 		int* traceParticleSlot = (int*)(CFlat + 66604);
 		bool canUseTrace =
-		    Game.game.m_gameWork.m_gameInitFlag != 0 &&
+		    Game.m_gameWork.m_gameInitFlag != 0 &&
 		    (int)(((unsigned int)flatFlags << 0x1C) | ((unsigned int)flatFlags >> 4)) < 0 &&
 		    (int)(((unsigned int)flatFlags << 0x1D) | ((unsigned int)flatFlags >> 3)) < 0 &&
 		    (int)((unsigned int)*(unsigned char*)(self + 0x9A) << 0x18) < 0 &&
@@ -898,7 +898,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 {
 	unsigned char* self = (unsigned char*)this;
 	int worldParamA = *(int*)(self + 0x500);
-	unsigned int particleAttr = (unsigned int)*(unsigned short*)(Game.game.unkCFlatData0[2] +
+	unsigned int particleAttr = (unsigned int)*(unsigned short*)(Game.unkCFlatData0[2] +
 	                                                             *(int*)((unsigned char*)hitParam + 0x0) * 0x48 + 8);
 
 	if (worldParamA == 0xD || worldParamA == 0xE) {
@@ -995,7 +995,7 @@ void CGItemObj::loadModel()
 			useParticleTable = 0;
 		}
 	} else if (worldParamA >= 0x1F && worldParamA <= 0x21) {
-		unsigned short itemEntry = *(unsigned short*)(Game.game.unkCFlatData0[2] + worldParamB * 0x48 + 2);
+		unsigned short itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + worldParamB * 0x48 + 2);
 
 		self[0x53] = 1;
 		modelNo = itemEntry & 0xFFF;
@@ -1023,7 +1023,7 @@ void CGItemObj::loadModel()
 	if (useParticleTable != 0) {
 		for (int i = 0; i < 3; i++) {
 			if (i != 0 || *(short*)(self + 0x550) != 1) {
-				int entryBase = Game.game.unkCFlatData0[2] + worldParamB * 0x48;
+				int entryBase = Game.unkCFlatData0[2] + worldParamB * 0x48;
 				unsigned short particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
 
 				if (particleNo != 0xFFFF) {
@@ -1097,7 +1097,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 	__ct__6CColorFUcUcUcUc(&textColor, 0xFF, 0xFF, 0xFF, (unsigned char)alphaInt);
 	SetColor__5CFontF8_GXColor(font, &textColor);
 
-	const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
 	const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
 	int width = GetWidth__5CFontFPc(font, name);
 	float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);

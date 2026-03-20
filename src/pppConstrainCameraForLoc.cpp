@@ -154,7 +154,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     local_a4.x = fVar3 * local_b0.x;
     local_a4.y = fVar3 * local_b0.y;
     local_a4.z = fVar3 * local_b0.z;
-    if ((s32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if ((s32)Game.m_currentSceneId == 7) {
         PSMTXInverse(ppvCameraMatrix02, local_98);
     } else {
         PSMTXInverse(local_68, local_98);
@@ -182,7 +182,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     constrainModel->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero;
     constrainModel->m_worldBaseMtx[1][3] = fVar1;
     constrainModel->m_worldBaseMtx[2][3] = fVar1;
-    if ((s32)reinterpret_cast<CGame*>(&Game)->m_currentSceneId == 7) {
+    if ((s32)Game.m_currentSceneId == 7) {
         constrainModel->m_drawMtx[0][3] = fVar1;
         constrainModel->m_drawMtx[1][3] = fVar1;
         constrainModel->m_drawMtx[2][3] = fVar1;

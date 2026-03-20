@@ -56,7 +56,7 @@ const char* s_SlotBTextByLanguage[] = {
  */
 const char* CMenuPcs::GetMcStr(int index)
 {
-    CGame& game = (CGame&)Game;
+    CGame& game = Game;
 
     switch (game.m_gameWork.m_languageId) {
     case 1:
@@ -83,7 +83,7 @@ const char* CMenuPcs::GetMcStr(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
-    CGame& game = (CGame&)Game;
+    CGame& game = Game;
     const char* const* result;
     int languageId = game.m_gameWork.m_languageId;
 
@@ -156,7 +156,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
  */
 const char* CMenuPcs::GetWinMess(int index)
 {
-    int languageId = reinterpret_cast<CGame&>(Game).m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
     if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
         return &s_WinMessTable[index * 0x14];
     }
@@ -174,7 +174,7 @@ const char* CMenuPcs::GetWinMess(int index)
  */
 int CMenuPcs::GetYesNoXPos(int right)
 {
-    CGame& game = (CGame&)Game;
+    CGame& game = Game;
     const unsigned char languageId = game.m_gameWork.m_languageId;
     const char* yesText;
     switch (languageId) {
@@ -221,7 +221,7 @@ int CMenuPcs::GetYesNoXPos(int right)
  */
 int CMenuPcs::GetSlotABXPos(int right)
 {
-    CGame& game = (CGame&)Game;
+    CGame& game = Game;
     const unsigned char languageId = game.m_gameWork.m_languageId;
     const char* slotAText;
     switch (languageId) {

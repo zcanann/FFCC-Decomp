@@ -477,7 +477,7 @@ void CMapPcs::drawBefore()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
         }
 
@@ -511,7 +511,7 @@ void CMapPcs::drawBefore()
 
         MapMng.DrawBefore();
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2B2);
         }
     }
@@ -533,7 +533,7 @@ void CMapPcs::draw()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
         }
 
@@ -567,7 +567,7 @@ void CMapPcs::draw()
 
         MapMng.Draw();
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
         }
     }
@@ -589,7 +589,7 @@ void CMapPcs::drawBeforeViewer()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
         }
 
@@ -623,7 +623,7 @@ void CMapPcs::drawBeforeViewer()
 
         MapMng.DrawBefore();
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2B2);
         }
     }
@@ -645,7 +645,7 @@ void CMapPcs::drawViewer()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
         }
 
@@ -679,7 +679,7 @@ void CMapPcs::drawViewer()
 
         MapMng.Draw();
 
-        if (Game.game.m_currentSceneId == 3) {
+        if (Game.m_currentSceneId == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
         }
     }

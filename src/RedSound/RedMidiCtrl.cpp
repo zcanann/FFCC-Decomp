@@ -2554,23 +2554,24 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
  */
 void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char mode;
-    unsigned char value8;
-    int value;
-    unsigned char* command;
     int* trackData = (int*)track;
+    unsigned char mode;
+    unsigned int rawValue;
+    int value;
+    unsigned char* modePtr;
+    unsigned char* valuePtr;
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    mode = *command;
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    value8 = *command;
+    modePtr = (unsigned char*)trackData[0];
+    trackData[0] = (int)(modePtr + 1);
+    valuePtr = (unsigned char*)trackData[0];
+    mode = *modePtr;
+    trackData[0] = (int)(valuePtr + 1);
+    rawValue = *valuePtr;
 
-    if (value8 == 0) {
+    if (rawValue == 0) {
         value = 0x100;
     } else {
-        value = value8 + 1;
+        value = rawValue + 1;
     }
 
     if (mode == 3) {

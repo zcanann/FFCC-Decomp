@@ -159,9 +159,8 @@ void CFile::Quit()
 
     u32 nextOffset = m_handlePoolHead.m_currentOffset;
     if (nextOffset != 0) {
-        nextOffset -= 0x10;
         if (nextOffset != 0) {
-            __dla__FPv((void*)nextOffset);
+            __dla__FPv((void*)(nextOffset - 0x10));
         }
         m_handlePoolHead.m_currentOffset = 0;
     }

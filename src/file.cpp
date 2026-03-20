@@ -17,6 +17,8 @@
 
 #include <string.h>
 
+extern "C" void __dla__FPv(void*);
+
 CFile File;
 
 static char s_fileCpp[] = "file.cpp";
@@ -153,7 +155,10 @@ void CFile::Quit()
 
     u32 nextOffset = m_handlePoolHead.m_currentOffset;
     if (nextOffset != 0) {
-        delete[] (CHandle*)nextOffset;
+        void* handlePool = (void*)(nextOffset - 0x10);
+        if (handlePool != 0) {
+            __dla__FPv(handlePool);
+        }
         m_handlePoolHead.m_currentOffset = 0;
     }
 

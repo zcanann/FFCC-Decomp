@@ -87,7 +87,7 @@ public:
     void CreateTempBuffer();
     void DestroyTempBuffer();
 
-    u8 _pad_0x0_to_0x71EB[0x71EC];
+    u8 _pad_0x0_to_0x71E7[0x71E8];
     void* m_scratchTextureBuffer;
 };
 

@@ -605,7 +605,7 @@ void CPartPcs::ResetDataStage()
 void CPartPcs::calcInit()
 {
 	PartMng.pppRefCnt0Up();
-	if (Game.m_currentSceneId == 7) {
+	if ((int)Game.m_currentSceneId == 7) {
 		g_par_calc_prof.ProfStart();
 		g_par_draw_prof.ProfStart();
 	}

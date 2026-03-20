@@ -88,15 +88,20 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008eb40
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3UnkC* param_2)
 {
     int offset = param_2->m_serializedDataOffsets[2];
-    void** ptrBc = (void**)((u8*)&pppYmMegaBirthShpTail3_->field_0xbc + offset);
-    void** ptrC0 = (void**)((u8*)&pppYmMegaBirthShpTail3_->field_0xc0 + offset);
-    void** ptrC4 = (void**)((u8*)&pppYmMegaBirthShpTail3_->field_0xc4 + offset);
+    u8* work = (u8*)pppYmMegaBirthShpTail3_ + 0x80 + offset;
+    void** ptrBc = (void**)(work + 0x3c);
+    void** ptrC0 = (void**)(work + 0x40);
+    void** ptrC4 = (void**)(work + 0x44);
 
     if (*ptrBc != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage(*ptrBc);
@@ -707,4 +712,3 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         }
     }
 }
-

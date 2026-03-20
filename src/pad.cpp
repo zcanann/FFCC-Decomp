@@ -57,7 +57,7 @@ void CPad::Init()
 	_1c0_4_ = 0xFFFFFFFF;
 	_1c8_4_ = 1;
 
-	if (System.IsGdev() != 0)
+	if (System.IsGdev())
 	{
 		_1ac_4_ = Memory.CreateStage(0x800000, (char*)"pad.cpp", 1);
 		if (_1ac_4_ != 0)

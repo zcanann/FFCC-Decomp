@@ -3,6 +3,20 @@
 
 #include "ffcc/system.h"
 
+extern unsigned char m_table__11CDbgMenuPcs[];
+extern u32 DAT_80212398;
+extern u32 DAT_8021239c;
+extern u32 PTR_create__11CDbgMenuPcsFv_802123a0;
+extern u32 DAT_802123a4;
+extern u32 DAT_802123a8;
+extern u32 PTR_destroy__11CDbgMenuPcsFv_802123ac;
+extern u32 DAT_802123b0;
+extern u32 DAT_802123b4;
+extern u32 PTR_calc__11CDbgMenuPcsFv_802123b8;
+extern u32 DAT_802123bc;
+extern u32 DAT_802123c0;
+extern u32 PTR_draw__11CDbgMenuPcsFv_802123c4;
+
 class CDbgMenuPcs : public CProcess
 {
 public:
@@ -59,7 +73,22 @@ public:
         void operator=(const CDMParam&);
     };
 
-    CDbgMenuPcs();
+    CDbgMenuPcs()
+    {
+        unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__11CDbgMenuPcs[4]);
+        table[0] = DAT_80212398;
+        table[1] = DAT_8021239c;
+        table[2] = PTR_create__11CDbgMenuPcsFv_802123a0;
+        table[3] = DAT_802123a4;
+        table[4] = DAT_802123a8;
+        table[5] = PTR_destroy__11CDbgMenuPcsFv_802123ac;
+        table[6] = DAT_802123b0;
+        table[7] = DAT_802123b4;
+        table[8] = PTR_calc__11CDbgMenuPcsFv_802123b8;
+        table[11] = DAT_802123bc;
+        table[12] = DAT_802123c0;
+        table[13] = PTR_draw__11CDbgMenuPcsFv_802123c4;
+    }
 	
     void Init();
     void Quit();
@@ -94,6 +123,5 @@ private:
 };
 
 extern CDbgMenuPcs DbgMenuPcs;
-extern unsigned char m_table__11CDbgMenuPcs[];
 
 #endif // _FFCC_P_DBGMENU_H_

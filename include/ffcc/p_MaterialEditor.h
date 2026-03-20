@@ -4,12 +4,18 @@
 #include "ffcc/system.h"
 #include "ffcc/memory.h"
 #include "ffcc/USBStreamData.h"
+#include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 
 struct Vec;
-struct ZLIST;
 struct RSDLISTITEM;
 struct ZCANMGRP;
+
+extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
+extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
+extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
+extern unsigned int m_table_desc3__18CMaterialEditorPcs[];
+extern unsigned char m_table__18CMaterialEditorPcs[];
 
 struct pppFMATRIX {
     float value[3][4];
@@ -18,7 +24,22 @@ struct pppFMATRIX {
 class CMaterialEditorPcs : public CProcess
 {
 public:
-    CMaterialEditorPcs();
+    CMaterialEditorPcs()
+    {
+        unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
+        dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
+        dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
+        dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
+        dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
+        dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
+        dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
+        dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
+        dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
+        dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
+        dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
+        dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
+        dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
+    }
     ~CMaterialEditorPcs();
 
     void Init();
@@ -48,7 +69,12 @@ public:
     unsigned char _pad08[0x7C];
     CUSBStreamData m_usbStream; // 0x84
 
-    unsigned char _padA8[0x84];
+    unsigned char _padA8[0x20];
+
+    ZLIST m_zlist1; // 0xC8
+    ZLIST m_zlist2; // 0xD8
+
+    unsigned char _padE8[0x44];
 
     // Raw float words consumed by calcViewer (0x12C - 0x158)
     float field_0x12c;
@@ -70,10 +96,5 @@ public:
 };
 
 extern CMaterialEditorPcs MaterialEditorPcs;
-extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
-extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
-extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
-extern unsigned int m_table_desc3__18CMaterialEditorPcs[];
-extern unsigned char m_table__18CMaterialEditorPcs[];
 
 #endif // _FFCC_P_MATERIALEDITOR_H_

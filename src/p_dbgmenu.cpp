@@ -13,23 +13,8 @@
 
 CDbgMenuPcs DbgMenuPcs;
 
-extern char __vt__8CManager[];
-extern char __vt_CProcess[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
-extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
-extern u32 DAT_80212398;
-extern u32 DAT_8021239c;
-extern u32 PTR_create__11CDbgMenuPcsFv_802123a0;
-extern u32 DAT_802123a4;
-extern u32 DAT_802123a8;
-extern u32 PTR_destroy__11CDbgMenuPcsFv_802123ac;
-extern u32 DAT_802123b0;
-extern u32 DAT_802123b4;
-extern u32 PTR_calc__11CDbgMenuPcsFv_802123b8;
-extern u32 DAT_802123bc;
-extern u32 DAT_802123c0;
-extern u32 PTR_draw__11CDbgMenuPcsFv_802123c4;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -57,54 +42,6 @@ DbgMenuDef PTR_DAT_80212524[] = {
     { "SOUND_INFO", 116, 3, 1 }, { "SHADOW", 117, 2, 1 }, { "PART_HEAP", 118, 2, 1 },  { "CHARA_INFO", 119, 3, 1 },
     { "ITEM_WEAPON", 120, 2, 1 }, { "SMITH_MASTER", 121, 2, 1 }, { "CHARA", 122, 2, 1 },
 };
-
-/*
- * --INFO--
- * PAL Address: 0x8012d288
- * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_dbgmenu_cpp()
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__11CDbgMenuPcs[4]);
-
-	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt__8CManager;
-	*reinterpret_cast<void**>(&DbgMenuPcs) = __vt_CProcess;
-	*(u32*)((u8*)&MiniGamePcs + 0x6480) = (u32)&PTR_PTR_s_CDbgMenuPcs_802126c4;
-	memset((u8*)&DbgMenuPcs + 8, 0, 0x34);
-	memset((u8*)&DbgMenuPcs + 0x3C, 0, 0x20);
-	__construct_array((u8*)&DbgMenuPcs + 0x5C, __ct__Q211CDbgMenuPcs3CDMFv, 0, 0x54, 0x80);
-
-	table[0] = DAT_80212398;
-	table[1] = DAT_8021239c;
-	table[2] = PTR_create__11CDbgMenuPcsFv_802123a0;
-	table[3] = DAT_802123a4;
-	table[4] = DAT_802123a8;
-	table[5] = PTR_destroy__11CDbgMenuPcsFv_802123ac;
-	table[6] = DAT_802123b0;
-	table[7] = DAT_802123b4;
-	table[8] = PTR_calc__11CDbgMenuPcsFv_802123b8;
-	table[11] = DAT_802123bc;
-	table[12] = DAT_802123c0;
-	table[13] = PTR_draw__11CDbgMenuPcsFv_802123c4;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CDbgMenuPcs::CDbgMenuPcs()
-{
-	// TODO
-}
 
 /*
  * --INFO--

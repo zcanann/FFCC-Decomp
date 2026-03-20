@@ -44,64 +44,13 @@ static void WriteF32(void* base, unsigned int offset, float value) {
 
 /*
  * --INFO--
- * PAL Address: 0x8004c588
- * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_MaterialEditor_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-    unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
-    *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt_CProcess;
-    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
-
-    __ct__14CUSBStreamDataFv(self + 0x84);
-    __ct__5ZLISTFv(self + 0xC8);
-    __ct__5ZLISTFv(self + 0xD8);
-    __register_global_object(
-        self, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), ARRAY_8026D338);
-
-    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
-    dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
-    dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
-    dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
-    dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
-    dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
-    dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
-    dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
-    dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
-    dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
-    dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
-    dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
-    dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMaterialEditorPcs::CMaterialEditorPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 CMaterialEditorPcs::~CMaterialEditorPcs()
 {
-    reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xD8)->~ZLIST();
-    reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xC8)->~ZLIST();
+    m_zlist2.~ZLIST();
+    m_zlist1.~ZLIST();
 }
 
 /*

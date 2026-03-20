@@ -7,11 +7,8 @@
 #include <dolphin/gba/GBA.h>
 
 CGbaPcs GbaPcs;
-extern char __vt__8CManager[];
-extern "C" void* __vt__7CGbaPcs[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
-extern char __vt_CProcess[];
 
 /*
  * --INFO--
@@ -22,16 +19,8 @@ extern char __vt_CProcess[];
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_p_gba_cpp(void)
+CGbaPcs::CGbaPcs()
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
-	*reinterpret_cast<void**>(&GbaPcs) = __vt_CProcess;
-	*reinterpret_cast<void**>(&GbaPcs) = __vt__7CGbaPcs;
-
 	unsigned int* table = &gGbaStatusWordTable[1];
 	table[0] = gGbaStatusWordTriplet0[0];
 	table[1] = gGbaStatusWordTriplet0[1];
@@ -45,15 +34,6 @@ extern "C" void __sinit_p_gba_cpp(void)
 	table[11] = gGbaStatusWordTriplet3[0];
 	table[12] = gGbaStatusWordTriplet3[1];
 	table[13] = gGbaStatusWordTriplet3[2];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CGbaPcs::CGbaPcs() : CProcess()
-{
 }
 
 /*

@@ -1,8 +1,21 @@
-#include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
 
 #include "dolphin/gx/__gx.h"
+
+extern f32 cosf(f32);
+
+static const f32 GXLight_ZeroF = 0.0f;
+static const f32 GXLight_MaxSpotCutoff = 90.0f;
+static const f32 GXLight_Pi = 3.1415927f;
+static const f32 GXLight_HalfTurnDegrees = 180.0f;
+static const f32 GXLight_FlatSpotScale = 1000.0f;
+static const f32 GXLight_FlatSpotScaleNeg = -1000.0f;
+static const f32 GXLight_OneF = 1.0f;
+static const f32 GXLight_TwoF = 2.0f;
+static const f32 GXLight_NegTwoF = -2.0f;
+static const f32 GXLight_FourF = 4.0f;
+static const f32 GXLight_NegFourF = -4.0f;
 
 // GXLightObj private data
 typedef struct {
@@ -82,51 +95,51 @@ void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     obj = (__GXLightObjInt_struct*)lt_obj;
     CHECK_GXBEGIN(200, "GXInitLightSpot");
 
-    if (cutoff <= 0.0f || cutoff > 90.0f)
+    if (cutoff <= GXLight_ZeroF || cutoff > GXLight_MaxSpotCutoff)
         spot_func = GX_SP_OFF;
 
-    cr = cosf((3.1415927f * cutoff) / 180.0f);
+    cr = cosf((GXLight_Pi * cutoff) / GXLight_HalfTurnDegrees);
 
     switch (spot_func) {
     case GX_SP_FLAT:
-        a1 = 1000.0f;
-        a2 = 0.0f;
-        a0 = -1000.0f * cr;
+        a1 = GXLight_FlatSpotScale;
+        a2 = GXLight_ZeroF;
+        a0 = GXLight_FlatSpotScaleNeg * cr;
         break;
     case GX_SP_COS:
-        a2 = 0.0f;
-        a1 = 1.0f / (1.0f - cr);
+        a2 = GXLight_ZeroF;
+        a1 = GXLight_OneF / (GXLight_OneF - cr);
         a0 = -cr * a1;
         break;
     case GX_SP_COS2:
-        a2 = 1.0f / (1.0f - cr);
+        a2 = GXLight_OneF / (GXLight_OneF - cr);
         a1 = -cr * a2;
-        a0 = 0.0f;
+        a0 = GXLight_ZeroF;
         break;
     case GX_SP_SHARP:
-        a0 = 1.0f - cr;
+        a0 = GXLight_OneF - cr;
         d = 1.0f / (a0 * a0);
-        a0 = d * (cr * (cr - 2.0f));
-        a1 = 2.0f * d;
+        a0 = d * (cr * (cr - GXLight_TwoF));
+        a1 = GXLight_TwoF * d;
         a2 = -d;
         break;
     case GX_SP_RING1:
-        d = 1.0f / ((1.0f - cr) * (1.0f - cr));
-        a2 = -4.0f * d;
-        a1 = (4.0f * (1.0f + cr)) * d;
+        d = GXLight_OneF / ((GXLight_OneF - cr) * (GXLight_OneF - cr));
+        a2 = GXLight_NegFourF * d;
+        a1 = (GXLight_FourF * (GXLight_OneF + cr)) * d;
         a0 = a2 * cr;
         break;
     case GX_SP_RING2:
-        d = 1.0f / ((1.0f - cr) * (1.0f - cr));
-        a1 = (4.0f * cr) * d;
-        a2 = -2.0f * d;
-        a0 = 1.0f - (d * ((2.0f * cr) * cr));
+        d = GXLight_OneF / ((GXLight_OneF - cr) * (GXLight_OneF - cr));
+        a1 = (GXLight_FourF * cr) * d;
+        a2 = GXLight_NegTwoF * d;
+        a0 = GXLight_OneF - (d * ((GXLight_TwoF * cr) * cr));
         break;
     case GX_SP_OFF:
     default:
-        a0 = 1.0f;
-        a1 = 0.0f;
-        a2 = 0.0f;
+        a0 = GXLight_OneF;
+        a1 = GXLight_ZeroF;
+        a2 = GXLight_ZeroF;
         break;
     }
     obj->a[0] = a0;

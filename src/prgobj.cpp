@@ -273,10 +273,10 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
  */
 int CGPrgObj::isLoopAnim()
 {
-	signed char loopFlag = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 2);
-	signed char directFlag = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 1);
+	signed char loopFlag = m_animFlagBits.bits.m_animLoop;
+	signed char directFlag = m_animFlagBits.bits.m_animDirect;
 
-	if ((loopFlag != 0) || (directFlag != 0) || ((int)IsLoopAnim(2) == 0)) {
+	if ((loopFlag != 0) || (directFlag != 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}
 
@@ -294,9 +294,9 @@ int CGPrgObj::isLoopAnim()
  */
 int CGPrgObj::isLoopAnimDirect()
 {
-	signed char flags = static_cast<unsigned char>(m_animFlagBits.m_animFlags << 1);
+	signed char directFlag = m_animFlagBits.bits.m_animDirect;
 
-	if ((flags != 0) || (IsLoopAnim(2) == 0)) {
+	if ((directFlag != 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}
 

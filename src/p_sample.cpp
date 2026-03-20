@@ -1,6 +1,6 @@
 #include "ffcc/p_sample.h"
 
-extern "C" void* __vt__10CSamplePcs[];
+CSamplePcs SamplePcs;
 
 /*
  * --INFO--
@@ -109,24 +109,13 @@ void CSamplePcs::func1()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_p_sample_cpp(void)
+CSamplePcs::CSamplePcs()
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-	unsigned int* table;
-	const unsigned int* desc0;
-	const unsigned int* desc1;
-	const unsigned int* desc2;
-	const unsigned int* desc3;
-
-	*reinterpret_cast<void**>(&SamplePcs) = __vt__10CSamplePcs;
-	table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
-	desc0 = m_table_desc0__10CSamplePcs;
-	desc1 = m_table_desc1__10CSamplePcs;
-	desc2 = m_table_desc2__10CSamplePcs;
-	desc3 = m_table_desc3__10CSamplePcs;
+	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
+	const unsigned int* desc0 = m_table_desc0__10CSamplePcs;
+	const unsigned int* desc1 = m_table_desc1__10CSamplePcs;
+	const unsigned int* desc2 = m_table_desc2__10CSamplePcs;
+	const unsigned int* desc3 = m_table_desc3__10CSamplePcs;
 
 	table[1] = desc0[0];
 	table[2] = desc0[1];

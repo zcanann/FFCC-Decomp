@@ -3,10 +3,6 @@
 #include "ffcc/p_dbgmenu.h"
 
 CSystemPcs SystemPcs;
-extern "C" unsigned int __vt__10CSystemPcs[];
-extern "C" void create__10CSystemPcsFv(CSystemPcs*);
-extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
-extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
 char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
@@ -22,22 +18,12 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_p_system_cpp(void)
+CSystemPcs::CSystemPcs()
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-    unsigned int* table;
-    const unsigned int* desc0;
-    const unsigned int* desc1;
-    const unsigned int* desc2;
-
-    *reinterpret_cast<unsigned int*>(&SystemPcs) = reinterpret_cast<unsigned int>(__vt__10CSystemPcs);
-    table = &m_table__10CSystemPcs[1];
-    desc0 = m_table_desc0__10CSystemPcs;
-    desc1 = m_table_desc1__10CSystemPcs;
-    desc2 = m_table_desc2__10CSystemPcs;
+    unsigned int* table = &m_table__10CSystemPcs[1];
+    const unsigned int* desc0 = m_table_desc0__10CSystemPcs;
+    const unsigned int* desc1 = m_table_desc1__10CSystemPcs;
+    const unsigned int* desc2 = m_table_desc2__10CSystemPcs;
     table[0] = desc0[0];
     table[1] = desc0[1];
     table[2] = desc0[2];
@@ -47,16 +33,6 @@ extern "C" void __sinit_p_system_cpp(void)
     table[6] = desc2[0];
     table[7] = desc2[1];
     table[8] = desc2[2];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CSystemPcs::CSystemPcs()
-{
-	// TODO
 }
 
 /*

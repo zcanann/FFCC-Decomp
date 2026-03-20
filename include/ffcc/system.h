@@ -12,7 +12,7 @@ struct OSThread;
 class CProcess : public CManager
 {
 public:
-    CProcess();
+    CProcess() {}
     void onScriptChanging(char*);
     void onScriptChanged(char*, int);
     void onMapChanging(int, int);

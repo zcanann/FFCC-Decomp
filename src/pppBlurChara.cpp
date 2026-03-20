@@ -190,11 +190,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
                                GX_NEAR, GX_TF_I8, 0);
 
     if (*((unsigned char*)param_3 + 4) == 1) {
-        double y = (double)*(float*)((char*)param_3 + 0x14);
-        double x = (double)FLOAT_80331044 * y;
+        float y = *(float*)((char*)param_3 + 0x14);
+        float x = FLOAT_80331044 * y;
 
-        posA.y = (float)y;
-        posA.x = (float)x;
+        posA.y = y;
+        posA.x = x;
 
         gUtil.RenderTextureQuad(-posA.x, -posA.y, FLOAT_80331050 + posA.x, FLOAT_80331054 + posA.y,
                                 (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

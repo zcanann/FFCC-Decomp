@@ -1,9 +1,9 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 #include <dolphin/axfx.h>
-#include <math.h>
-
 #include "dolphin/axfx/__axfx.h"
+
+extern f32 powf(f32 x, f32 y);
 
 // prototypes
 static void DLsetdelay(AXFX_REVHI_DELAYLINE* dl, s32 lag);
@@ -64,6 +64,7 @@ static void DLdelete(AXFX_REVHI_DELAYLINE* dl) {
 static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay, f32 crosstalk) {
     u8 i;
     u8 k;
+    f32 timeFactor;
 
 	ASSERTMSGLINE(105, coloration >= axfx_reverb_hi_f32_0 && coloration <= axfx_reverb_hi_f32_1 &&
 				  time >= axfx_reverb_hi_f32_0p01 && time <= axfx_reverb_hi_f32_10 &&
@@ -83,14 +84,13 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     }
 
     memset(rv, 0, sizeof(AXFX_REVHI_WORK));
+    timeFactor = axfx_reverb_hi_f32_32000 * time;
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 3; i++) {
             DLcreate(&rv->C[i + (k * 3)], axfx_reverb_hi_lens[i] + 2);
             DLsetdelay(&rv->C[i + (k * 3)], axfx_reverb_hi_lens[i]);
-            rv->combCoef[i + (k * 3)] =
-                (f32)pow(axfx_reverb_hi_f32_10,
-                         (axfx_reverb_hi_lens[i] * -3) / (axfx_reverb_hi_f32_32000 * time));
+            rv->combCoef[i + (k * 3)] = powf(axfx_reverb_hi_f32_10, (axfx_reverb_hi_lens[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {

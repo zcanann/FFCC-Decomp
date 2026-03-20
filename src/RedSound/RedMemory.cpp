@@ -9,11 +9,11 @@ int gRedAMemorySize;
 int* gRedMainMemoryBlockList;
 int* gRedAMemoryBlockList;
 
-char sRedMemoryLogPrefix;
-char sRedMemoryLogSuffixA;
-char sRedMemoryLogSuffixB;
-char s_redMemoryMainBankFullFmt[] = "%cMain memory bank full%c%c";
-char s_redMemoryAuxBankFullFmt[] = "%cAux memory bank full%c%c";
+const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
+const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
+const char sRedMemoryLogSuffixB[] = "\x1b[0m";
+const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
+const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 
 // Memory functions
 extern "C" {
@@ -89,7 +89,7 @@ int RedNew(int param_1)
 		if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
 			if (blockList[0x7FF] > 0) {
 				if (gRedMemoryDebugEnabled != 0) {
-					OSReport(s_redMemoryMainBankFullFmt, &sRedMemoryLogPrefix, &sRedMemoryLogSuffixA, &sRedMemoryLogSuffixB);
+					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 					fflush(&DAT_8021d1a8);
 				}
 				break;
@@ -203,7 +203,7 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 	if (gRedAMemoryBlockList[0x7FF] >= 1) {
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport(s_redMemoryAuxBankFullFmt, &sRedMemoryLogPrefix, &sRedMemoryLogSuffixA, &sRedMemoryLogSuffixB);
+			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(&DAT_8021d1a8);
 		}
 		return 0;

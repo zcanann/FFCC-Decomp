@@ -61,7 +61,6 @@ void main(int argc, char** argv)
  */
 void game(int argc, char** argv)
 {
-    CGame& game = Game;
     char c;
     int cmp;
     int i;
@@ -69,7 +68,7 @@ void game(int argc, char** argv)
     int parseLanguage;
     char** argument;
 
-    game.CGame::Init();
+    Game.Init();
     strcpy(Game.m_currentScriptName, kDefaultScriptName);
 
     if (argc != 0) {
@@ -132,6 +131,6 @@ void game(int argc, char** argv)
         }
     }
 
-    game.CGame::Exec();
-    game.CGame::Quit();
+    Game.Exec();
+    Game.Quit();
 }

@@ -11,7 +11,7 @@ extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
 
-extern "C" void pppSetFpMatrix(_pppMngSt*);
+extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
 struct pppConstrainCameraDirObject {
     int m_graphId;
@@ -109,7 +109,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             pppMngStPtr->m_matrix.value[1][3] = resultPos.y;
             pppMngStPtr->m_matrix.value[2][3] = resultPos.z;
 
-            pppSetFpMatrix(pppMngSt);
+            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         }
     }
 }

@@ -47,24 +47,24 @@ void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) 
     case GX_ITM_0:
     case GX_ITM_1:
     case GX_ITM_2:
-        mtx_id -= 1;
+        mtx_id = (GXIndTexMtxID)(mtx_id - 1);
         break;
     case GX_ITM_S0:
     case GX_ITM_S1:
     case GX_ITM_S2:
-        mtx_id -= 5;
+        mtx_id = (GXIndTexMtxID)(mtx_id - 5);
         break;
     case GX_ITM_T0:
     case GX_ITM_T1:
     case GX_ITM_T2:
-        mtx_id -= 9;
+        mtx_id = (GXIndTexMtxID)(mtx_id - 9);
         break;
     default:
-        mtx_id = 0;
+        mtx_id = (GXIndTexMtxID)0;
         break;
     }
 
-    mtx_id *= 3;
+    mtx_id = (GXIndTexMtxID)(mtx_id * 3);
     scale_exp += 17;
 
     reg = (s32)(1024.0f * offset[0][0]) & 0x7FF;

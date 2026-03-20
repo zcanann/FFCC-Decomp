@@ -21,7 +21,14 @@ struct pppYmDeformationMdlUnkB {
     f32 m_payload1;
     f32 m_payload2;
     s16 m_payload3;
-    u8 m_payloadBytes[0x1A];
+    u8 m_pad22[2];
+    f32 m_payload4;
+    u8 m_payloadByte28;
+    u8 m_payloadByte29;
+    u8 m_payloadByte2A;
+    u8 m_payloadByte2B;
+    u8 m_payloadByte2C;
+    u8 m_pad2D[0xF];
 };
 
 struct pppYmDeformationMdl {
@@ -46,4 +53,3 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 #endif
 
 #endif // _PPP_YMDEFORMATIONMDL_H_
-

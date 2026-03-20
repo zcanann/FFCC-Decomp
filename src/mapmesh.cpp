@@ -229,10 +229,10 @@ void CMapMesh::Off2Ptr()
     iVar3 = 0;
     iVar1 = 0;
     while (iVar3 < (int)(unsigned int)U16At(this, 0xA)) {
-        iVar2 = S32At(this, 0x40);
-        iVar2 = iVar2 + iVar1;
+        int base = S32At(this, 0x24);
+        iVar2 = S32At(this, 0x40) + iVar1;
         iVar1 = iVar1 + 0x10;
-        *reinterpret_cast<int*>(iVar2 + 4) = S32At(this, 0x24) + *reinterpret_cast<int*>(iVar2 + 0xC);
+        *reinterpret_cast<int*>(iVar2 + 4) = base + *reinterpret_cast<int*>(iVar2 + 0xC);
         iVar3++;
     }
 }

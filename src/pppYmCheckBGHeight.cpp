@@ -24,6 +24,26 @@ struct CMapCylinderRaw {
     f32 m_height2;
 };
 
+struct PppVec4Raw {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+};
+
+struct PppMngStYmCheckBGHeightRaw {
+    void* m_pppResSet;
+    s32 m_partIndex;
+    Vec m_position;
+    u8 unk14[0x34];
+    PppVec4Raw m_unk48;
+    PppVec4Raw m_unk58;
+    PppVec4Raw m_paramVec0;
+    u16 m_kind;
+    u16 m_nodeIndex;
+    pppFMATRIX m_matrix;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800d8c18
@@ -51,6 +71,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct pppYmCheckBGHeightUnkC* param_2)
 {
     _pppMngSt* pppMngSt;
+    PppMngStYmCheckBGHeightRaw* pppMngStRaw;
     Vec direction;
     CMapCylinderRaw cylinder;
     Vec hitPos;
@@ -59,6 +80,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
+        pppMngStRaw = (PppMngStYmCheckBGHeightRaw*)pppMngStPtr;
         direction.x = kPppYmCheckBGHeightAxisZero;
         direction.y = kPppYmCheckBGHeightProbeDirY;
         direction.z = kPppYmCheckBGHeightAxisZero;
@@ -68,9 +90,6 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cylinder.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
         cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_bottom.y = nextY + param_2->m_unk0x4;
-        cylinder.m_direction.x = direction.x;
-        cylinder.m_direction.y = direction.y;
-        cylinder.m_direction.z = direction.z;
         cylinder.m_radius = kPppYmCheckBGHeightAxisZero;
         cylinder.m_height = kPppYmCheckBGHeightProbeDirY;
         cylinder.m_top.x = kPppYmCheckBGHeightAxisZero;
@@ -96,9 +115,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         }
 
         pppMngSt->m_position.y = finalY;
-        pppMngSt->m_savedPosition.y = finalY;
-        pppMngSt->m_paramVec0.y = finalY;
-        pppMngSt->m_previousPosition.y = finalY;
+        pppMngStRaw->m_unk58.y = finalY;
+        pppMngStRaw->m_paramVec0.y = finalY;
+        pppMngStRaw->m_unk48.y = finalY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

@@ -85,11 +85,11 @@ void CFile::CHandle::Reset()
 void CFile::Init()
 {
     DVDInit();
-    m_0x08 = Memory.CreateStage(0x10ac00, s_cFile, 0);
+    m_0x04 = Memory.CreateStage(0x10ac00, s_cFile, 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
-    m_readBuffer = new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2b) unsigned char[0x100000];
-    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_0x08, s_fileCpp, 0x2e) CHandle[0x80]);
+    m_readBuffer = new ((CMemory::CStage*)m_0x04, s_fileCpp, 0x2b) unsigned char[0x100000];
+    m_handlePoolHead.m_currentOffset = (u32)(new ((CMemory::CStage*)m_0x04, s_fileCpp, 0x2e) CHandle[0x80]);
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
@@ -157,7 +157,7 @@ void CFile::Quit()
         m_handlePoolHead.m_currentOffset = 0;
     }
 
-    Memory.DestroyStage((CMemory::CStage*)m_0x08);
+    Memory.DestroyStage((CMemory::CStage*)m_0x04);
 }
 
 /*

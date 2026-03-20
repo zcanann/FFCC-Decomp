@@ -112,8 +112,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
         switch (data->mode) {
         case 0: {
-            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-
             while (count-- != 0) {
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
@@ -139,14 +137,14 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
+                        child = pppCreatePObject(pppMngStPtr, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parentMtx, &pos, &pos);
+                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
                     dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -154,15 +152,13 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         dst->y = pos.y;
                         dst->z = pos.z;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, dst);
+                        PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, dst);
                     }
                 }
             }
             break;
         }
         case 1: {
-            MtxPtr parentMtx = (MtxPtr)((u8*)parent + 0x10);
-
             while (count-- != 0) {
                 f32 randValue = Math.RandF();
                 f32 maxValue = (f32)entry->maxValue;
@@ -185,14 +181,14 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
+                        child = pppCreatePObject(pppMngStPtr, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parentMtx, &pos, &pos);
+                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
                     dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -200,7 +196,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         dst->y = pos.y;
                         dst->z = pos.z;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, dst);
+                        PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, dst);
                     }
                 }
             }

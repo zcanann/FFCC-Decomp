@@ -383,13 +383,12 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             }
 
             count = *(u16*)(work + 0x2C);
-            uvStep = FLOAT_80331844 / (f32)((f64)count - DOUBLE_80331850);
+            uvStep = FLOAT_80331844 / (f32)(count - 1);
             GXSetCullMode(GX_CULL_NONE);
             poly = *(u8**)(work + 0x28);
 
             if (count > 1) {
-                alphaScale =
-                    (f32)((f64)((u8*)pppYmTracer2)[colorOffset + 0x8B] - DOUBLE_80331850) / FLOAT_80331848;
+                alphaScale = (f32)((u8*)pppYmTracer2)[colorOffset + 0x8B] / FLOAT_80331848;
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (count - 1) * 4);
 
                 for (i = 0; i < (s32)(count - 1); i++) {

@@ -13,7 +13,7 @@ struct Vec2d;
 class CUtil
 {
 public:
-    CUtil();
+    CUtil() {}
 
     void SetVtxFmt_POS_CLR();
     void SetVtxFmt_POS_CLR_TEX();

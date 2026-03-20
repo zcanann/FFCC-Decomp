@@ -29,37 +29,7 @@ struct Vec2d {
 	float x, y;
 };
 
-extern void* __vt__5CUtil[];
-
 CUtil gUtil;
-
-/*
- * --INFO--
- * PAL Address: 0x80024e48
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_util_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    *reinterpret_cast<void**>(&gUtil) = __vt__5CUtil;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CUtil::CUtil()
-{
-	// TODO
-}
 
 /*
  * --INFO--

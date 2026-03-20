@@ -81,65 +81,6 @@ static inline void ReleaseRefObject(void* object)
 
 /*
  * --INFO--
- * PAL Address: 0x80097618
- * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_menu_cpp()
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-    u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
-    u32* table = reinterpret_cast<u32*>(gMenuProcessTable);
-
-    *(u32*)((u8*)&MenuPcs) = reinterpret_cast<u32>(__vt__8CMenuPcs);
-    mcCtrl[0] = 0;
-    mcCtrl[1] = 0;
-    mcCtrl[2] = 0;
-    mcCtrl[3] = 0;
-    mcCtrl[4] = 0;
-    mcCtrl[5] = 0;
-    mcCtrl[6] = 0;
-    mcCtrl[7] = 0;
-    __register_global_object(&MenuPcs, reinterpret_cast<void*>(__dt__8CMenuPcsFv), ARRAY_802ea1a0);
-
-    table[1] = m_table_desc0__8CMenuPcs[0];
-    table[2] = m_table_desc0__8CMenuPcs[1];
-    table[3] = m_table_desc0__8CMenuPcs[2];
-    table[4] = m_table_desc1__8CMenuPcs[0];
-    table[5] = m_table_desc1__8CMenuPcs[1];
-    table[6] = m_table_desc1__8CMenuPcs[2];
-    table[7] = m_table_desc2__8CMenuPcs[0];
-    table[8] = m_table_desc2__8CMenuPcs[1];
-    table[9] = m_table_desc2__8CMenuPcs[2];
-    table[12] = m_table_desc3__8CMenuPcs[0];
-    table[13] = m_table_desc3__8CMenuPcs[1];
-    table[14] = m_table_desc3__8CMenuPcs[2];
-    table[17] = m_table_desc4__8CMenuPcs[0];
-    table[18] = m_table_desc4__8CMenuPcs[1];
-    table[19] = m_table_desc4__8CMenuPcs[2];
-    table[22] = m_table_desc5__8CMenuPcs[0];
-    table[23] = m_table_desc5__8CMenuPcs[1];
-    table[24] = m_table_desc5__8CMenuPcs[2];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMenuPcs::CMenuPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

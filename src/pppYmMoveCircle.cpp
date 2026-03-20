@@ -4,7 +4,8 @@
 #include "ffcc/ppp_constants.h"
 #include "types.h"
 #include "dolphin/mtx.h"
-#include "math.h"
+
+extern "C" double acos(double);
 
 struct pppYmMoveCircleWork {
     f32 m_angle;

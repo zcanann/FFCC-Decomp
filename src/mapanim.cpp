@@ -97,6 +97,7 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 extern "C" CPtrArray<CMapAnimNode*>* dtor_8004AE60(CPtrArray<CMapAnimNode*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
@@ -108,6 +109,7 @@ extern "C" CPtrArray<CMapAnimNode*>* dtor_8004AE60(CPtrArray<CMapAnimNode*>* ptr
     }
     return ptrArray;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -592,6 +594,7 @@ CMapAnim::~CMapAnim()
     }
 
     reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->RemoveAll();
+    dtor_8004AE60(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this), -1);
 }
 
 /*

@@ -366,15 +366,16 @@ void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, sh
 {
     short frame = currentFrame;
     short duration;
-    short time;
     int frameOffset;
+    char* framePtr;
 
     drawFrame = frame;
-    frameOffset = (frame << 3) + 0x12;
-    time = frameTime;
-    time = time + deltaTime;
-    frameTime = time;
-    duration = *(short*)((char*)animData + (frameOffset & ~1));
+    frameOffset = frame << 3;
+    framePtr = (char*)animData;
+    frameOffset = frameOffset + 0x10;
+    framePtr = framePtr + frameOffset;
+    frameTime = frameTime + deltaTime;
+    duration = *(short*)(framePtr + 2);
     if (frameTime < duration) {
         return;
     }

@@ -176,7 +176,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > 0.0f) {
 							magnitude = sqrtf(magnitude);
-						} else {
+						} else if (magnitude < 0.0f) {
 							magnitude = 0.0f;
 						}
 

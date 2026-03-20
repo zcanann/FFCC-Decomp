@@ -190,8 +190,8 @@ void CMenuPcs::WmInit()
 	uRam8032ee25 = 0xFF;
 	gWmMenuWorkB = -1;
 	gWmMenuWorkA = -1;
-	gWmMenuScriptValueCache = Game.game.m_gameWork.m_scriptSysVal0;
-	if (Game.game.m_gameWork.m_scriptSysVal0 > 99) {
+	gWmMenuScriptValueCache = Game.m_gameWork.m_scriptSysVal0;
+	if (Game.m_gameWork.m_scriptSysVal0 > 99) {
 		gWmMenuScriptValueCache = 100;
 	}
 }
@@ -2845,7 +2845,7 @@ void CMenuPcs::CalcMainMenuSub()
 					int valid = 0;
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
 					for (int i = 0; i < 4; i++) {
-						if (Game.game.m_gameWork.m_menuStageMode != 0 && i != 0) {
+						if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
 							break;
 						}
 						if (*reinterpret_cast<short*>(world + 0x3E + i * 2) >= 0) {
@@ -3848,9 +3848,9 @@ void CMenuPcs::SetCaravanWork(Mc::SaveDat* saveDat)
 {
 	MemoryCardMan.CreateMcBuff();
 	memcpy(MemoryCardMan.m_saveBuffer, saveDat, 0x8BD0);
-	Game.game.LoadInit();
+	Game.LoadInit();
 	MemoryCardMan.SetLoadData();
-	Game.game.LoadFinished();
+	Game.LoadFinished();
 	MemoryCardMan.DestroyMcBuff();
 }
 
@@ -4703,9 +4703,9 @@ void McCtrl::LoadDat()
 				MemoryCardMan.McClose();
 				MemoryCardMan.McUnmount(m_cardChannel);
 				if (m_userBuffer == 0) {
-					Game.game.LoadInit();
+					Game.LoadInit();
 					MemoryCardMan.SetLoadData();
-					Game.game.LoadFinished();
+					Game.LoadFinished();
 				} else {
 					memcpy(m_userBuffer, MemoryCardMan.m_saveBuffer, 0x8BD0);
 					MemoryCardMan.CalcSaveDatHpMax(reinterpret_cast<Mc::SaveDat*>(m_userBuffer));
@@ -5162,9 +5162,9 @@ int McCtrl::ChkNowData()
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 
-					if ((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) == Game.game.m_gameWork.m_mcSerial1 &&
-						 *(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) == Game.game.m_gameWork.m_mcSerial0) &&
-						(*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D8) == Game.game.m_gameWork.m_mcRandom))
+					if ((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) == Game.m_gameWork.m_mcSerial1 &&
+						 *(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) == Game.m_gameWork.m_mcSerial0) &&
+						(*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D8) == Game.m_gameWork.m_mcRandom))
 					{
 						r = 1;
 					}

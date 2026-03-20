@@ -312,20 +312,20 @@ void CGPartyObj::onCancelStat(int state)
 void CGPartyObj::menu()
 {
 	PartyObjOverlay& party = PartyData(this);
-	if (Game.game.m_gameWork.m_gamePaused != 0) {
+	if (Game.m_gameWork.m_gamePaused != 0) {
 		return;
 	}
 
 	// Ghidra indicates this gates menu by controller role and stage mode.
 	if ((party.partyFlags & 0x10) == 0) {
-		if (Game.game.m_gameWork.m_menuStageMode == 0) {
+		if (Game.m_gameWork.m_menuStageMode == 0) {
 			command();
 		}
 		return;
 	}
 
 	// Local player can always force command handling in menu stage.
-	if (m_animStateMisc == 0 || Game.game.m_gameWork.m_menuStageMode != 0) {
+	if (m_animStateMisc == 0 || Game.m_gameWork.m_menuStageMode != 0) {
 		command();
 	}
 }
@@ -385,7 +385,7 @@ void CGPartyObj::onFrameAlways()
 void CGPartyObj::CheckMenu()
 {
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party != nullptr && party->m_scriptHandle != nullptr) {
 			party->menu();
 		}
@@ -411,8 +411,8 @@ void CGPartyObj::onFramePreCalc()
 
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (Game.game.unk_flat3_0xc7d0 != 0) {
-		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C);
+	if (Game.unk_flat3_0xc7d0 != 0) {
+		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 		m_projection.z = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
@@ -427,7 +427,7 @@ void CGPartyObj::onFramePreCalc()
 	int weaponRef;
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
 
-	if ((Game.game.m_gameWork.m_menuStageMode == 0) &&
+	if ((Game.m_gameWork.m_menuStageMode == 0) &&
 	    ((party.pendingWeaponItem != weaponItem) || (party.weaponItem != weaponRef))) {
 		bool canImmediateSwap =
 		    ((party.partyFlags & 0x80) == 0) &&
@@ -441,7 +441,7 @@ void CGPartyObj::onFramePreCalc()
 			if (weaponItem < 1) {
 				LoadWeapon(-1, 0);
 			} else {
-				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
 				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
 			}
 			party.pendingWeaponItem = weaponItem;
@@ -458,13 +458,13 @@ void CGPartyObj::onFramePreCalc()
 
 	onChangePrg(2);
 
-	if (Game.game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject == nullptr &&
 		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		} else {
 			float speedScale = FLOAT_80331a54;
-			if (Game.game.m_gameWork.m_menuStageMode == 0) {
+			if (Game.m_gameWork.m_menuStageMode == 0) {
 				speedScale = FLOAT_80331b08;
 			}
 			m_moveBaseSpeed = FLOAT_80331b04 * speedScale;
@@ -488,8 +488,8 @@ void CGPartyObj::onFramePostCalc()
 		return;
 	}
 
-	if (Game.game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 	    m_scriptHandle[0xED] != nullptr) {
 		ghostPartyMog();
 	} else {
@@ -628,7 +628,7 @@ void CGPartyObj::shouki()
 	                 ((self[0x6B8] & 0x20) == 0) &&
 	                 ((static_cast<unsigned char>(m_weaponNodeFlags >> 8) & 0x40) == 0);
 
-	if (!canShouki || Game.game.unk_flat3_0xc7d0 == 0) {
+	if (!canShouki || Game.unk_flat3_0xc7d0 == 0) {
 		if (*shoukiMode != 0) {
 			deletePSlotBit(0x200);
 			*shoukiMode = 0;
@@ -636,22 +636,22 @@ void CGPartyObj::shouki()
 		return;
 	}
 
-	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C);
+	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-	if (chaliceDist > FLOAT_80331b00 * Game.game.unkFloat_0xca10) {
+	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10) {
 		*shoukiMode = 2;
-	} else if (chaliceDist < FLOAT_80331a74 * Game.game.unkFloat_0xca10) {
+	} else if (chaliceDist < FLOAT_80331a74 * Game.unkFloat_0xca10) {
 		*shoukiMode = 0;
 	} else {
 		*shoukiMode = 1;
 	}
 
 	if (*shoukiMode == 0) {
-		if ((Game.game.m_gameWork.m_frameCounter % 30) == 0) {
+		if ((Game.m_gameWork.m_frameCounter % 30) == 0) {
 			addHp(1, static_cast<CGPrgObj*>(0));
 		}
 	} else if (*shoukiMode == 2) {
-		if ((Game.game.m_gameWork.m_frameCounter % 30) == 0) {
+		if ((Game.m_gameWork.m_frameCounter % 30) == 0) {
 			addHp(-1, static_cast<CGPrgObj*>(0));
 		}
 	}
@@ -1605,7 +1605,7 @@ int CGPartyObj::canPlayerPutItem()
 	    (int)((unsigned int)self[0x63C] << 0x18) < 0 &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    (*reinterpret_cast<int*>(self + 0x6F0) == 0)) {
-		if (Game.game.m_gameWork.m_menuStageMode != 0 && CanCreateFromScript__9CGItemObjFv() == 0) {
+		if (Game.m_gameWork.m_menuStageMode != 0 && CanCreateFromScript__9CGItemObjFv() == 0) {
 			return 0;
 		}
 		return 1;
@@ -1638,7 +1638,7 @@ void CGPartyObj::putItem(int)
 
 	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
 	    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
-	if (Game.game.m_gameWork.m_menuStageMode == 0) {
+	if (Game.m_gameWork.m_menuStageMode == 0) {
 		changeStat(0x1B, 0, 0);
 	}
 }
@@ -1667,7 +1667,7 @@ void CGPartyObj::putGil(int amount)
 	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
 	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
 	    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
-	if (Game.game.m_gameWork.m_menuStageMode == 0) {
+	if (Game.m_gameWork.m_menuStageMode == 0) {
 		changeStat(0x1B, 0, 0);
 	}
 }
@@ -1835,15 +1835,15 @@ void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
  */
 void CGPartyObj::CheckGameOver()
 {
-	Game.game.m_gameWork.m_gameOverFlag = 1;
+	Game.m_gameWork.m_gameOverFlag = 1;
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party == nullptr) {
 			continue;
 		}
 
 		int keepGameOver = 0;
-		if ((Game.game.m_gameWork.m_menuStageMode != 0) && (Game.game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
+		if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 			unsigned int status = (*(unsigned int(**)(CGPartyObj*))(*(unsigned char**)((unsigned char*)party + 0x48) + 0xC))(party);
 			if (((status & 0x6D) == 0x6D) &&
 			    (*(int*)(*(unsigned char**)((unsigned char*)party + 0x58) + 0x3B4) != 0)) {
@@ -1857,7 +1857,7 @@ void CGPartyObj::CheckGameOver()
 			continue;
 		}
 
-		Game.game.m_gameWork.m_gameOverFlag = 0;
+		Game.m_gameWork.m_gameOverFlag = 0;
 		return;
 	}
 }
@@ -1911,8 +1911,8 @@ void CGPartyObj::InitFinished()
 	    *reinterpret_cast<int*>(self + 0x6E0));
 	enableDamageCol(1);
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
-	if ((Game.game.m_gameWork.m_menuStageMode != 0) &&
-	    (Game.game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+	if ((Game.m_gameWork.m_menuStageMode != 0) &&
+	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
 	    (m_scriptHandle[0xED] != nullptr)) {
 		*reinterpret_cast<float*>(self + 0x144) = 0.0f;
 		*reinterpret_cast<float*>(self + 0x134) = 0.0f;
@@ -2213,7 +2213,7 @@ void CGPartyObj::onAttacked(CGPrgObj* attacker)
 void stageWeather()
 {
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party != nullptr && party->m_scriptHandle != nullptr) {
 			party->canPlayerGoMenu();
 		}
@@ -2232,7 +2232,7 @@ void stageWeather()
 void magicReady()
 {
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party != nullptr && party->m_scriptHandle != nullptr) {
 			party->ChangeCommandMode(2);
 		}
@@ -2251,7 +2251,7 @@ void magicReady()
 void chooseMagic()
 {
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party != nullptr && party->m_scriptHandle != nullptr) {
 			party->useItem(-1);
 		}
@@ -2270,7 +2270,7 @@ void chooseMagic()
 void decMagic(int amount)
 {
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party != nullptr && party->m_scriptHandle != nullptr) {
 			party->bonus(0, -amount, (CGPrgObj*)0);
 		}
@@ -2289,7 +2289,7 @@ void decMagic(int amount)
 void calcWeightMax()
 {
 	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		CGPartyObj* party = Game.m_partyObjArr[i];
 		if (party != nullptr && party->m_scriptHandle != nullptr) {
 			party->checkAndSetWeapon();
 		}
@@ -2364,7 +2364,7 @@ void CGPartyObj::gpmCalcDist(Vec*, float&)
  */
 void CGPartyObj::gpmCol()
 {
-	CGPartyObj* leader = Game.game.m_partyObjArr[0];
+	CGPartyObj* leader = Game.m_partyObjArr[0];
 	if (leader == nullptr) {
 		return;
 	}
@@ -2418,7 +2418,7 @@ void CGPartyObj::gpmCol()
  */
 void CGPartyObj::ghostPartyMog()
 {
-	CGPartyObj* leader = Game.game.m_partyObjArr[0];
+	CGPartyObj* leader = Game.m_partyObjArr[0];
 	if (leader == nullptr) {
 		return;
 	}
@@ -2427,7 +2427,7 @@ void CGPartyObj::ghostPartyMog()
 	gpmMove();
 
 	int stageMode = 0;
-	switch (Game.game.m_gameWork.m_bossArtifactStageIndex) {
+	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 	case 4:
 	case 8:
 	case 9:
@@ -2445,7 +2445,7 @@ void CGPartyObj::ghostPartyMog()
 		break;
 	}
 
-	float frameRatio = (float)(Game.game.m_gameWork.m_frameCounter % 100) / 100.0f;
+	float frameRatio = (float)(Game.m_gameWork.m_frameCounter % 100) / 100.0f;
 	float pressureScale = 1.0f;
 	if (stageMode == 2) {
 		pressureScale = 0.5f + (frameRatio * 0.5f);
@@ -2455,7 +2455,7 @@ void CGPartyObj::ghostPartyMog()
 
 	int targetPressure = (int)(100.0f * pressureScale);
 	float leaderDist = m_targetDist;
-	if (leaderDist > Game.game.unkFloat_0xca10) {
+	if (leaderDist > Game.unkFloat_0xca10) {
 		sGhostPartyWork.mood = 1;
 		sGhostPartyWork.pressure += 2;
 	} else {
@@ -2501,14 +2501,14 @@ void CGPartyObj::ghostPartyMog()
 void CGPartyObj::gpmMove()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	CGPartyObj* leader = Game.game.m_partyObjArr[0];
+	CGPartyObj* leader = Game.m_partyObjArr[0];
 	if (leader == nullptr || leader == this || m_scriptHandle == nullptr) {
 		return;
 	}
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&
-	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == reinterpret_cast<CGObject*>(Game.game.unk_flat3_0xc7d0)) {
+	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
 		sGhostPartyWork.settleTimer++;
 	} else {
 		sGhostPartyWork.settleTimer = 0;
@@ -2529,7 +2529,7 @@ void CGPartyObj::gpmMove()
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
 
-	if (dist > nearDist * 1.25f || pathDist > Game.game.unkFloat_0xca10 * 0.75f) {
+	if (dist > nearDist * 1.25f || pathDist > Game.unkFloat_0xca10 * 0.75f) {
 		dstTargetRot(reinterpret_cast<CGPrgObj*>(leader));
 		moveVector(&toLeader, m_moveBaseSpeed * 0.9f, 1);
 		*reinterpret_cast<float*>(self + 0x5D0) = dist;

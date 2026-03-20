@@ -192,7 +192,7 @@ DVDDiskID* CFile::GetCurrentDiskID()
 
 CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 {
-    if (Game.game.m_gameWork.m_gamePaused != 0)
+    if (Game.m_gameWork.m_gamePaused != 0)
     {
         pri = CFile::PRI_CRITICAL;
     }
@@ -428,7 +428,7 @@ void CFile::kick()
 
 		while (cur != sentinel)
 		{
-			if ((Game.game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
+			if ((Game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
 			    && (cur->m_completionStatus == 1 || cur->m_completionStatus == 4))
 			{
 				u32 readSize;
@@ -583,7 +583,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             break;
         }
 
-        unsigned int language = Game.game.m_gameWork.m_languageId;
+        unsigned int language = Game.m_gameWork.m_languageId;
         const char* const* lines = s_diskErrorText[msgIndex][language];
         unsigned int baseY = compactLayout ? 0x20 : 200;
 

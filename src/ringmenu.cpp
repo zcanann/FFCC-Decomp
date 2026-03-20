@@ -305,7 +305,7 @@ double CRingMenu::GetDispCounter()
 void CRingMenu::onCalc()
 {
 	const int menuIndex = RingMenuInt(this, 0x0C);
-	if ((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
+	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
 		const int animDirection = RingMenuInt(this, 0x10);
 		const unsigned int targetAnimDirection =
 			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
@@ -358,18 +358,18 @@ void CRingMenu::onCalc()
 		}
 		RingMenuInt(this, 0x508) = clampDecToZero(RingMenuInt(this, 0x508));
 
-		CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+		CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 		if (partyObj != 0) {
 			(void)partyObj;
-			CCaravanWork* caravanWork = &Game.game.m_caravanWorkArr[menuIndex];
+			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[menuIndex];
 			int currentCmd = *reinterpret_cast<int*>(Chara + 0x2004);
 
-			if (Game.game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
+			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
 				currentCmd = _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
 			}
 
 			int* trackedCmd = &RingMenuInt(this, 0x504);
-			if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 				trackedCmd = reinterpret_cast<int*>(Chara + 0x2008);
 			}
 
@@ -381,7 +381,7 @@ void CRingMenu::onCalc()
 					int nextCandidate = (currentCmd + step) % 5;
 					int prevCandidate = (currentCmd + 5 - step) % 5;
 
-					if (Game.game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
+					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
 						nextCandidate = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, next, 1);
 						prevCandidate = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, prev, -1);
 					}
@@ -437,9 +437,9 @@ void CRingMenu::onCalc()
  */
 void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1]);
 	const int* cmdNameTable = reinterpret_cast<const int*>(flatData->table[4].strings);
-	const bool isBossStage = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19);
+	const bool isBossStage = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19);
 
 	int commandLabel;
 	if (isBossStage) {
@@ -530,12 +530,12 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 void CRingMenu::onDraw()
 {
 	const int menuIndex = RingMenuInt(this, 0x0C);
-	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.game.m_cFlatDataArr[1]);
-	if (!((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1]);
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
 		return;
 	}
 
-	unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
 	if (scriptFood == 0) {
 		return;
 	}
@@ -611,7 +611,7 @@ void CRingMenu::onDraw()
 		}
 
 		if (group == 2) {
-			CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 			if (partyObj != 0) {
 				buttonAlpha = static_cast<double>((-static_cast<int>(*reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(partyObj) + 0x6F4)) & 9) >> 31);
@@ -651,11 +651,11 @@ void CRingMenu::onDraw()
 		}
 
 		if (group == 2) {
-			CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 			if (partyObj != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
 					reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
-				int cmdIndex = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                   ? *reinterpret_cast<int*>(Chara + 0x2004)
 				                   : _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
 
@@ -667,7 +667,7 @@ void CRingMenu::onDraw()
 
 				double scroll = static_cast<double>(RingMenuFloat(this, 0x50C));
 				while (scroll >= static_cast<double>(FLOAT_803309cc)) {
-					if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 1) % 5;
 					} else {
 						cmdIndex = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, -1);
@@ -675,7 +675,7 @@ void CRingMenu::onDraw()
 					scroll -= static_cast<double>(FLOAT_803309cc);
 				}
 				while (scroll < static_cast<double>(FLOAT_803309d0)) {
-					if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 4) % 5;
 					} else {
 						cmdIndex = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, 1);
@@ -689,16 +689,16 @@ void CRingMenu::onDraw()
 				}
 				labelAlphaScale = static_cast<double>(static_cast<float>(labelAlphaScale * static_cast<double>(iconAlphaScale)));
 
-				int prev1 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int prev1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 4) % 5
 				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, -1);
-				int prev2 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int prev2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (prev1 + 4) % 5
 				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, prev1, -1);
-				int next1 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int next1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 1) % 5
 				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, 1);
-				int next2 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int next2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (next1 + 1) % 5
 				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, next1, 1);
 
@@ -786,7 +786,7 @@ void CRingMenu::onDraw()
 
 			if (group == 2) {
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1F);
-				CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
 						reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
@@ -850,11 +850,11 @@ void CRingMenu::onDraw()
 void CRingMenu::drawGBA()
 {
 	const int menuIndex = RingMenuInt(this, 0x0C);
-	if (!((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
 		return;
 	}
 
-	const unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+	const unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
 	if (scriptFood == 0) {
 		return;
 	}
@@ -1058,7 +1058,7 @@ void CRingMenu::DrawIcon()
 {
 	drawGBA();
 
-	if (!((Game.game.m_gameWork.m_menuStageMode == 0) || (RingMenuInt(this, 0x0C) < 2))) {
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (RingMenuInt(this, 0x0C) < 2))) {
 		return;
 	}
 
@@ -1069,12 +1069,12 @@ void CRingMenu::DrawIcon()
 	}
 
 	int menuIndex = RingMenuInt(this, 0x0C);
-	CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 	if (partyObj == 0 || static_cast<signed char>(*reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags + 1)) >= 0) {
 		return;
 	}
 
-	unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
 	Mtx cameraMtx;
 	PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMtx);
 
@@ -1129,7 +1129,7 @@ void CRingMenu::DrawIcon()
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x19);
 	int iconRow;
 	unsigned int iconCol;
-	if ((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
+	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
 		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
 		int progress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14)) - 100;
 		int q = progress / 100 + (progress >> 31);

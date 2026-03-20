@@ -384,7 +384,7 @@ void CMenuPcs::TmpArtiCtrl()
 	}
 
 	fVar2 = FLOAT_80332f30;
-	uVar4 = Game.game.m_scriptFoodBase[0];
+	uVar4 = Game.m_scriptFoodBase[0];
 	if (hasInput) {
 		iVar6 = GetTmpArtiListBase(this) + 8;
 		for (iVar7 = 0; iVar7 < *GetTmpArtiList(this); iVar7 = iVar7 + 1) {
@@ -566,7 +566,7 @@ void CMenuPcs::TmpArtiDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
-	unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
+	unsigned int scriptFood = Game.m_scriptFoodBase[0];
 	short* entry = (short*)(GetTmpArtiListBase(this) + 8);
 	unsigned int foodPtr = scriptFood;
 
@@ -617,7 +617,7 @@ void CMenuPcs::TmpArtiDraw()
 	SetScale__5CFontFf(1.0f, font);
 	DrawInit__5CFontFv(font);
 
-	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.game.m_cFlatDataArr[1];
+	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
 	entry = (short*)(GetTmpArtiListBase(this) + 8);
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {

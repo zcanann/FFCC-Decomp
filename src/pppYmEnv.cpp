@@ -112,7 +112,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     s16 nodeIndex = raw->m_nodeIndex;
     char* nodeNameBase;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         nodeNameBase = (char*)(*(u32*)((u8*)mngSt + 0x0) + nodeIndex * 0x60);
     } else {
         nodeNameBase = (char*)(*(u32*)((u8*)mngSt + 0x0) + nodeIndex * 0x60 + 0x20);

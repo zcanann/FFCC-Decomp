@@ -484,7 +484,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *((u8*)param_2 + 0x24) = 0;
     work[0x1C] = (u32)param_2;
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         *((u8*)param_2 + 0x24) = 0;
     }
 
@@ -629,7 +629,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         centerPos.x = FLOAT_80331898;
         centerPos.y = FLOAT_80331898;
         centerPos.z = FLOAT_80331898;
@@ -1333,7 +1333,7 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
 
     (void)waterOrigin;
 
-    if (Game.game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7) {
         cameraPos.x = ppvCameraMatrix0[0][3];
         cameraPos.y = ppvCameraMatrix0[1][3];
         cameraPos.z = ppvCameraMatrix0[2][3];

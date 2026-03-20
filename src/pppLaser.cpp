@@ -152,11 +152,11 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     *((u8*)pfVar3 + 0x4c) = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
-        (CGame*)&Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
+        &Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
     if (iVar2 != 0) {
-        GetTargetCursor__5CGameFiR3VecR3Vec((CGame*)&Game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
+        GetTargetCursor__5CGameFiR3VecR3Vec(&Game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
 
-        iVar2 = (int)GetPartyObj__5CGameFi((CGame*)&Game, local_28);
+        iVar2 = (int)GetPartyObj__5CGameFi(&Game, local_28);
         local_14.x = *(f32*)(iVar2 + 0x15c);
         local_14.y = *(f32*)(iVar2 + 0x160);
         local_14.z = *(f32*)(iVar2 + 0x164);
@@ -322,7 +322,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, stru
                 s32 partIndex = ((s32)((u8*)pppMngStPtr - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                    &Game.game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
+                    &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
                     (int)((u32)baseObj->m_graphId >> 12));
                 work->m_spawnEnabled = 0;
             }

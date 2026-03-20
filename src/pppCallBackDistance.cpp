@@ -51,7 +51,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
         initWork = (s32)*(s16*)&param2->m_initWOrk;
 
         ParticleFrameCallback__5CGameFiiiiiP3Vec(
-            (CGame*)&Game, partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
+            &Game, partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
     }
 }
 

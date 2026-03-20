@@ -1,8 +1,7 @@
 #include "ffcc/p_game.h"
 
 extern "C" void* __vt__8CGamePcs[];
-CGamePcs Game;
-unsigned int GamePcs[2];
+CGamePcs GamePcs;
 
 /*
  * --INFO--
@@ -20,7 +19,7 @@ extern "C" void __sinit_p_game_cpp() {
 
     unsigned int* dst;
 
-    GamePcs[0] = reinterpret_cast<unsigned int>(__vt__8CGamePcs);
+    reinterpret_cast<unsigned int*>(&GamePcs)[0] = reinterpret_cast<unsigned int>(__vt__8CGamePcs);
     dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
 
     dst[1] = m_table_desc0__8CGamePcs[0];
@@ -107,8 +106,7 @@ int CGamePcs::GetTable(unsigned long param)
  */
 void CGamePcs::create()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Create();
+    Game.Create();
 }
 
 /*
@@ -122,8 +120,7 @@ void CGamePcs::create()
  */
 void CGamePcs::destroy()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Destroy();
+    Game.Destroy();
 }
 
 /*
@@ -133,8 +130,7 @@ void CGamePcs::destroy()
  */
 void CGamePcs::calcInit()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::CheckScriptChange();
+    Game.CheckScriptChange();
 }
 
 /*
@@ -148,8 +144,7 @@ void CGamePcs::calcInit()
  */
 void CGamePcs::calc0()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Calc();
+    Game.Calc();
 }
 
 /*
@@ -163,8 +158,7 @@ void CGamePcs::calc0()
  */
 void CGamePcs::calc1()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Calc2();
+    Game.Calc2();
 }
 
 /*
@@ -178,8 +172,7 @@ void CGamePcs::calc1()
  */
 void CGamePcs::calc2()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Calc3();
+    Game.Calc3();
 }
 
 /*
@@ -193,8 +186,7 @@ void CGamePcs::calc2()
  */
 void CGamePcs::draw0()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Draw();
+    Game.Draw();
 }
 
 /*
@@ -208,8 +200,7 @@ void CGamePcs::draw0()
  */
 void CGamePcs::draw1()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Draw2();
+    Game.Draw2();
 }
 
 /*
@@ -223,8 +214,7 @@ void CGamePcs::draw1()
  */
 void CGamePcs::draw2()
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::Draw3();
+    Game.Draw3();
 }
 
 /*
@@ -238,8 +228,7 @@ void CGamePcs::draw2()
  */
 void CGamePcs::onScriptChanging(char* script)
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::ScriptChanging(script);
+    Game.ScriptChanging(script);
 }
 
 /*
@@ -253,8 +242,7 @@ void CGamePcs::onScriptChanging(char* script)
  */
 void CGamePcs::onScriptChanged(char* script, int param)
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::ScriptChanged(script, param);
+    Game.ScriptChanged(script, param);
 }
 
 /*
@@ -268,8 +256,7 @@ void CGamePcs::onScriptChanged(char* script, int param)
  */
 void CGamePcs::onMapChanging(int a, int b)
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::MapChanging(a, b);
+    Game.MapChanging(a, b);
 }
 
 /*
@@ -283,6 +270,5 @@ void CGamePcs::onMapChanging(int a, int b)
  */
 void CGamePcs::onMapChanged(int a, int b, int c)
 {
-    CGame& game = (CGame&)Game;
-    game.CGame::MapChanged(a, b, c);
+    Game.MapChanged(a, b, c);
 }

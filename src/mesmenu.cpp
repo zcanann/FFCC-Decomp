@@ -181,7 +181,7 @@ void CMesMenu::Destroy()
 void CMesMenu::onCalc()
 {
     int menuIndex = *(int*)((char*)this + 0x18);
-    if ((Game.game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
+    if ((Game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
         return;
     }
 
@@ -208,7 +208,7 @@ void CMesMenu::onCalc()
     }
 
     if (menuIndex < 4) {
-        unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+        unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
         if (scriptFood != 0) {
             unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
             int targetValue = (int)(foodCount * 6);
@@ -466,7 +466,7 @@ void CMesMenu::onDraw()
     if (!((menuIndex < 4) || (*(int*)((char*)this + 8) != 0))) {
         return;
     }
-    if ((Game.game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
+    if ((Game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
         return;
     }
 
@@ -493,7 +493,7 @@ void CMesMenu::onDraw()
     }
 
     if (menuIndex < 4) {
-        unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+        unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
         if (scriptFood == 0) {
             return;
         }
@@ -586,7 +586,7 @@ void CMesMenu::onDraw()
  */
 void CMesMenu::CalcHeart()
 {
-    unsigned int scriptFood = Game.game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+    unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
     if (scriptFood == 0) {
         return;
     }
@@ -675,7 +675,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
     (void)z;
 
-    unsigned int scriptFood = Game.game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+    unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
     if (scriptFood == 0 || alpha <= FLOAT_803308d8) {
         return;
     }

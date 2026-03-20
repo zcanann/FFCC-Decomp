@@ -689,7 +689,7 @@ void CCameraPcs::calc()
     C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xE0), &up,
                 reinterpret_cast<Vec*>(self + 0xD4));
 
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(reinterpret_cast<MtxPtr>(self + 0x34), worldMapMtx);
         if (*reinterpret_cast<short*>(self + 0x47E) != 0 && *reinterpret_cast<short*>(self + 0x480) != 0) {
             const double t = static_cast<double>(FLOAT_8032fa18 * (
@@ -1477,7 +1477,7 @@ void CCameraPcs::drawShadowBegin()
     memcpy(self + 0x10C, self + 4, 0x108);
     memcpy(self + 0x214, self + 4, 0x108);
 
-    if (Game.game.m_currentSceneId == 3) {
+    if (Game.m_currentSceneId == 3) {
         float stickX = FLOAT_8032fa34;
         float stickY = FLOAT_8032fa34;
 
@@ -1496,7 +1496,7 @@ void CCameraPcs::drawShadowBegin()
     PSMTXRotRad(rotY, 'y', *reinterpret_cast<float*>(self + 0x368));
     PSMTXConcat(rotY, rotX, rotXY);
 
-    if (Game.game.m_currentSceneId == 4) {
+    if (Game.m_currentSceneId == 4) {
         *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
         *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;
         *reinterpret_cast<float*>(self + 0x41C) = FLOAT_8032fa78;
@@ -1556,7 +1556,7 @@ void CCameraPcs::drawShadowBegin()
     *reinterpret_cast<float*>(self + 0x2F8) = *reinterpret_cast<float*>(self + 0x42C);
     PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
 
-    if (Game.game.m_currentMapId == 0x21) {
+    if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x64), tempMtx);
         PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
     }

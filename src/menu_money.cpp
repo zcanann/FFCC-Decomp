@@ -188,7 +188,7 @@ bool CMenuPcs::MoneyOpen()
 		do {
 			iVar8 = 10000000;
 			if (iVar15 == 0) {
-				iVar12 = *(int *)(Game.game.m_scriptFoodBase[0] + 0x200);
+				iVar12 = *(int *)(Game.m_scriptFoodBase[0] + 0x200);
 			} else {
 				iVar12 = 0;
 			}
@@ -478,7 +478,7 @@ void CMenuPcs::MoneyDraw()
  */
 int CMenuPcs::MoneyCtrlCur()
 {
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	bool blocked = false;
 	unsigned short press;

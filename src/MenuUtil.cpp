@@ -77,7 +77,7 @@ struct MenuUtilFlatData {
 
 static inline int* GetMenuHelpMsgTable()
 {
-	return reinterpret_cast<int*>(reinterpret_cast<MenuUtilFlatData*>(&Game.game.m_cFlatDataArr[1])->table[6].index);
+	return reinterpret_cast<int*>(reinterpret_cast<MenuUtilFlatData*>(&Game.m_cFlatDataArr[1])->table[6].index);
 }
 }
 
@@ -208,7 +208,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
     lineBaseY[2] = DAT_801e36d8;
     lineBaseY[3] = DAT_801e36dc;
 
-    int languageIndex = Game.game.m_gameWork.m_languageId - 1;
+    int languageIndex = Game.m_gameWork.m_languageId - 1;
     int lineCount = 3;
     int firstLine = 500;
     int maxWidth = -1;
@@ -254,7 +254,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
             suffix = GetSkillStr__8CMenuPcsFi(this, 2);
             itemName[0] = '\0';
         } else {
-            MakeArtItemName__5CGameFPcii(&Game.game, itemName, msgNo, 1);
+            MakeArtItemName__5CGameFPcii(&Game, itemName, msgNo, 1);
             if ((itemName[0] != '\0') && (strlen(itemName) != 0) &&
                 (itemName[0] >= 'a') && (itemName[0] <= 'z')) {
                 itemName[0] = static_cast<char>(itemName[0] - ('a' - 'A'));
@@ -325,7 +325,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
         y = static_cast<u32>(static_cast<float>(y) + lineStep);
     }
 
-    int itemBase = Game.game.unkCFlatData0[2] + msgNo * 0x48;
+    int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
     u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
     const char* bonusLabel = DAT_80333658;
     if ((flags & 0x100) != 0) {
@@ -435,7 +435,7 @@ void CMenuPcs::SetCrystalCageAttr()
 		pppDeletePart__8CPartMngFi(&PartMng, state->m_crystalPart);
 	}
 
-	unsigned int chaliceElement = reinterpret_cast<CGame*>(&Game)->m_gameWork.m_chaliceElement;
+	unsigned int chaliceElement = Game.m_gameWork.m_chaliceElement;
 	if ((chaliceElement & 1U) != 0) {
 		state->m_crystalAttr = 0xE;
 		state->m_crystalElem = 1;
@@ -475,8 +475,8 @@ void CMenuPcs::SetManaWaterEffect()
 		pppDeletePart__8CPartMngFi(&PartMng, partNo);
 	}
 
-	BindEffect__8CMenuPcsFiii(this, 5, reinterpret_cast<CGame&>(Game).m_gameWork.m_timerA + 0x13, -1);
-	*reinterpret_cast<int*>(self + 0x70) = reinterpret_cast<CGame&>(Game).m_gameWork.m_timerA;
+	BindEffect__8CMenuPcsFiii(this, 5, Game.m_gameWork.m_timerA + 0x13, -1);
+	*reinterpret_cast<int*>(self + 0x70) = Game.m_gameWork.m_timerA;
 }
 
 /*
@@ -498,7 +498,7 @@ void CMenuPcs::GetOptionData()
 	signed char* const specialModeFlags = reinterpret_cast<signed char*>(self + 0xB5);
 
 	gameInitMode =
-	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.game.m_gameWork.m_gameInitFlag))) >> 5);
+	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
 
 	unsigned int soundMode = GetSoundMode__9CRedSoundFv(reinterpret_cast<unsigned char*>(&Sound) + 8);
 	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
@@ -512,13 +512,13 @@ void CMenuPcs::GetOptionData()
 	value = value / 10 + (value >> 31);
 	seVolume = static_cast<signed char>(value - (value >> 31));
 
-	unsigned int flag = Game.game.m_gameWork.m_spModeFlags[0];
+	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];
 	specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.game.m_gameWork.m_spModeFlags[1];
+	flag = Game.m_gameWork.m_spModeFlags[1];
 	specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.game.m_gameWork.m_spModeFlags[2];
+	flag = Game.m_gameWork.m_spModeFlags[2];
 	specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.game.m_gameWork.m_spModeFlags[3];
+	flag = Game.m_gameWork.m_spModeFlags[3];
 	specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
 }
 
@@ -767,10 +767,10 @@ void CMenuPcs::CalcOptionMenu()
 				specialModeEdit = 0;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 
-				Game.game.m_gameWork.m_spModeFlags[0] = static_cast<unsigned char>(specialModeFlags[0]);
-				Game.game.m_gameWork.m_spModeFlags[1] = static_cast<unsigned char>(specialModeFlags[1]);
-				Game.game.m_gameWork.m_spModeFlags[2] = static_cast<unsigned char>(specialModeFlags[2]);
-				Game.game.m_gameWork.m_spModeFlags[3] = static_cast<unsigned char>(specialModeFlags[3]);
+				Game.m_gameWork.m_spModeFlags[0] = static_cast<unsigned char>(specialModeFlags[0]);
+				Game.m_gameWork.m_spModeFlags[1] = static_cast<unsigned char>(specialModeFlags[1]);
+				Game.m_gameWork.m_spModeFlags[2] = static_cast<unsigned char>(specialModeFlags[2]);
+				Game.m_gameWork.m_spModeFlags[3] = static_cast<unsigned char>(specialModeFlags[3]);
 			} else if ((press & 8) != 0) {
 				specialModeCursor--;
 				if (specialModeCursor < 0) {
@@ -788,7 +788,7 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (optionChanged) {
-		Game.game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(gameInitMode == 0);
+		Game.m_gameWork.m_gameInitFlag = static_cast<unsigned char>(gameInitMode == 0);
 		Sound.SetStereo(stereoMode == 0);
 		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(seVolume)));
 		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(bgmVolume)));

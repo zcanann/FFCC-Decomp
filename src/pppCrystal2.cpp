@@ -296,7 +296,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
 
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
-        if (Game.game.m_currentSceneId == 7) {
+        if (Game.m_currentSceneId == 7) {
             C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, param_2->m_perspectiveScale,
                                   -param_2->m_perspectiveScale,
                                   FLOAT_80331fdc, FLOAT_80331fdc);

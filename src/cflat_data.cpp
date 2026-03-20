@@ -218,7 +218,7 @@ void CFlatData::Create(void* filePtr)
 				if (chunk.m_id == 0x4D455320) // 'MES '
 				{
 					m_mesCount = chunk.m_arg0;
-					charPtr = new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x76) char[chunk.m_size];
+					charPtr = new (Game.m_mainStage, (char*)"cflat_data.cpp", 0x76) char[chunk.m_size];
 					m_mesBuffer = charPtr;
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
@@ -238,7 +238,7 @@ void CFlatData::Create(void* filePtr)
 					{
 						m_data[m_dataCount].m_size = chunk.m_arg0;
 						m_data[m_dataCount].m_data =
-							new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
+							new (Game.m_mainStage, (char*)"cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
 						chunkFile.Get(m_data[m_dataCount].m_data, chunk.m_arg0);
 
 						if (chunk.m_version == 0)
@@ -251,10 +251,10 @@ void CFlatData::Create(void* filePtr)
 						{
 							iVar10 = chunkFile.Get4();
 							m_data[m_dataCount].m_numStrings = iVar10;
-							stringIndex = (char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4C)
+							stringIndex = (char**)new (Game.m_mainStage, (char*)"cflat_data.cpp", 0x4C)
 								unsigned char[iVar10 << 2];
 							m_data[m_dataCount].m_strings = stringIndex;
-							charPtr = new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4D) char[iVar10];
+							charPtr = new (Game.m_mainStage, (char*)"cflat_data.cpp", 0x4D) char[iVar10];
 							m_data[m_dataCount].m_stringBuf = charPtr;
 
 							memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), iVar10);
@@ -276,11 +276,11 @@ void CFlatData::Create(void* filePtr)
 				else if (chunk.m_id == 0x5441424C) // 'TABL'
 				{
 					m_tabl[m_tableCount].m_numEntries = chunk.m_arg0;
-					stringIndex = (char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x65)
+					stringIndex = (char**)new (Game.m_mainStage, (char*)"cflat_data.cpp", 0x65)
 						unsigned char[chunk.m_arg0 << 2];
 					m_tabl[m_tableCount].m_strings = stringIndex;
 					m_tabl[m_tableCount].m_stringBuf =
-						new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x66) char[chunk.m_size];
+						new (Game.m_mainStage, (char*)"cflat_data.cpp", 0x66) char[chunk.m_size];
 
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 

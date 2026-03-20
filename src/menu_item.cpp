@@ -534,7 +534,7 @@ void CMenuPcs::ItemDraw()
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-    int caravanWork = Game.game.m_scriptFoodBase[0];
+    int caravanWork = Game.m_scriptFoodBase[0];
     s16* itemState = reinterpret_cast<s16*>(itemMenuState);
     s16* itemList = this->itemList;
     s16 listState = itemState[8];
@@ -640,7 +640,7 @@ void CMenuPcs::ItemDraw()
         }
     }
 
-    const ItemFlatData* flatData = reinterpret_cast<const ItemFlatData*>(&Game.game.m_cFlatDataArr[1]);
+    const ItemFlatData* flatData = reinterpret_cast<const ItemFlatData*>(&Game.m_cFlatDataArr[1]);
     s16* textEntry = listStart;
     for (int i = 0; i < 8; i++, textEntry += 0x20) {
         int menuIndex = i + itemState[0x1A];
@@ -756,7 +756,7 @@ int CMenuPcs::ItemCtrlCur()
     bool blocked = false;
     u16 press;
     u16 hold;
-    int caravanWork = Game.game.m_scriptFoodBase[0];
+    int caravanWork = Game.m_scriptFoodBase[0];
 
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
         blocked = true;

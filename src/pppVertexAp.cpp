@@ -51,6 +51,16 @@ struct VertexApSource
     Vec* points;
 };
 
+struct VertexApObject
+{
+    u8 unk0[0x4];
+    _pppPObject* parent;
+    u8 unk8[0x8];
+    pppFMATRIX localMatrix;
+    u8 unk40[0x30];
+    Vec* points;
+};
+
 struct _pppPDataVal;
 
 
@@ -99,7 +109,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
     if (state->countdown == 0) {
         VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
-        Vec* points = *(Vec**)((u8*)parent + 0x70);
+        Vec* points = ((VertexApObject*)parent)->points;
         VertexApEntry* entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
@@ -138,13 +148,13 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         child = 0;
                     } else {
                         child = pppCreatePObject(pppMngStPtr, childData);
-                        *(void**)((u8*)child + 0x4) = parent;
+                        ((VertexApObject*)child)->parent = parent;
                     }
 
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+                    PSMTXMultVec(((VertexApObject*)parent)->localMatrix.value, &pos, &pos);
                     dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -182,13 +192,13 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         child = 0;
                     } else {
                         child = pppCreatePObject(pppMngStPtr, childData);
-                        *(void**)((u8*)child + 0x4) = parent;
+                        ((VertexApObject*)child)->parent = parent;
                     }
 
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+                    PSMTXMultVec(((VertexApObject*)parent)->localMatrix.value, &pos, &pos);
                     dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
@@ -202,8 +212,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             }
             break;
         }
-        default:
-            break;
         }
 
         state->countdown = data->spawnDelay;

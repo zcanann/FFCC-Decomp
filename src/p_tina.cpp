@@ -1163,27 +1163,27 @@ void LoadFieldPdt0(int mapId, int floorId)
  */
 void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned long loadCacheParam, unsigned char mode)
 {
-    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+    CPartMngState* state = GetPartMngState();
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
-    *reinterpret_cast<unsigned long*>(partMng + 0x236FC) = loadCacheParam;
+    state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
+    state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
+    state->m_partLoadCacheParam = loadCacheParam;
+    state->m_partChunkIndex = 0;
+    state->m_asyncHandleCount = 0;
 
     if (loadCacheParam == 0) {
-        *reinterpret_cast<int*>(partMng + 0x23708) = 0;
+        state->m_partLoadMode = 0;
     } else if (mode == 1) {
-        *reinterpret_cast<int*>(partMng + 0x23708) = 2;
+        state->m_partLoadMode = 2;
     } else if (mode == 2) {
-        *reinterpret_cast<int*>(partMng + 0x23708) = 3;
+        state->m_partLoadMode = 3;
         for (int i = 0; i < 0x10; i++) {
-            *reinterpret_cast<int*>(partMng + 0x2378C + (i * 4)) = 0;
+            state->m_partAsyncBusy[i] = 0;
         }
     } else {
-        *reinterpret_cast<int*>(partMng + 0x23708) = 1;
+        state->m_partLoadMode = 1;
     }
 
-    *reinterpret_cast<void**>(partMng + 0x236F4) = amemBase;
-    *reinterpret_cast<void**>(partMng + 0x236F8) = amemBase;
     LoadFieldPdt0(mapId, floorId);
 }
 

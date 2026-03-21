@@ -19,6 +19,7 @@
 #include <string.h>
 
 extern "C" void __dla__FPv(void*);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
 CFile File;
@@ -89,10 +90,10 @@ void CFile::CHandle::Reset()
 void CFile::Init()
 {
     DVDInit();
-    m_allocStage = Memory.CreateStage(0x10ac00, s_cFile, 0);
+    m_allocStage = CreateStage__7CMemoryFUlPci(&Memory, 0x10ac00, s_cFile, 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
-    m_readBuffer = new ((CMemory::CStage*)m_allocStage, s_fileCpp, 0x2b) unsigned char[0x100000];
+    m_readBuffer = __nwa__FUlPQ27CMemory6CStagePci(0x100000, (CMemory::CStage*)m_allocStage, s_fileCpp, 0x2b);
     m_handlePoolHead.m_currentOffset = (u32)__construct_new_array(
         __nwa__FUlPQ27CMemory6CStagePci(sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, s_fileCpp, 0x2e),
         0, 0, sizeof(CHandle), 0x80);
@@ -136,6 +137,7 @@ void CFile::Init()
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
+        handleIndex++;
 
         byteOffset += 0x2B0;
         handleIndex++;

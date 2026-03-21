@@ -348,13 +348,14 @@ extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const un
     unsigned char c1;
     unsigned char c2;
 
-    c1 = color[1];
-    self[0x18C] = color[0];
-    c2 = color[2];
-    self[0x18D] = c1;
-    c1 = color[3];
-    self[0x18E] = c2;
-    self[0x18F] = c1;
+    c1 = color[0];
+    c2 = color[1];
+    self[0x18C] = c1;
+    c1 = color[2];
+    self[0x18D] = c2;
+    c2 = color[3];
+    self[0x18E] = c1;
+    self[0x18F] = c2;
 }
 
 /*

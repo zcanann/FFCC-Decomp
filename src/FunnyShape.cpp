@@ -13,9 +13,9 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" s32 rand();
 
-static const u32 DAT_8032fd58 = 2155905152u;
-static const u32 DAT_8032fd5c = 2155905152u;
-static const u32 DAT_8032fd60 = 2155905152u;
+static const GXColor DAT_8032fd58 = {0x80, 0x80, 0x80, 0x80};
+static const GXColor DAT_8032fd5c = {0x80, 0x80, 0x80, 0x80};
+static const GXColor DAT_8032fd60 = {0x80, 0x80, 0x80, 0x80};
 static const double DOUBLE_8032fd88 = 4503601774854144.0;
 static const float FLOAT_8032fd64 = 1000.0f;
 static const float FLOAT_8032fd68 = -1000.0f;
@@ -182,7 +182,7 @@ CFunnyShape::~CFunnyShape()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelete)
+extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short shouldDelete)
 {
     if (funnyShape != 0) {
         if (PtrAt(funnyShape, 0x6010) != 0) {
@@ -394,10 +394,10 @@ void CFunnyShape::Render()
         _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-        u32 chanColor = DAT_8032fd60;
-        GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&chanColor));
-        u32 matColor = chanColor;
-        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&matColor));
+        GXColor chanColor = DAT_8032fd60;
+        GXSetChanAmbColor(GX_COLOR0, chanColor);
+        GXColor matColor = chanColor;
+        GXSetChanMatColor(GX_COLOR0, matColor);
 
         s32 count;
         if ((U32At(this, 0) & 0x80) == 0) {
@@ -443,10 +443,10 @@ void CFunnyShape::RenderTexture()
     GXSetNumTevStages(1);
     GXSetNumChans(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-    u32 chanColor = DAT_8032fd58;
-    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&chanColor));
-    u32 matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&matColor));
+    GXColor chanColor = DAT_8032fd58;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
@@ -459,7 +459,7 @@ void CFunnyShape::RenderTexture()
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
 
-    u32 color = DAT_8032fd5c;
+    GXColor color = DAT_8032fd5c;
     const u8* texData = reinterpret_cast<const u8*>(PtrAt(this, 0x6054));
     const float width = static_cast<float>(*reinterpret_cast<const s16*>(texData + 4));
     const float height = static_cast<float>(*reinterpret_cast<const s16*>(texData + 6));
@@ -477,25 +477,25 @@ void CFunnyShape::RenderTexture()
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd6c;
 }
@@ -539,10 +539,10 @@ void CFunnyShape::RenderShape()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    u32 chanColor = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&chanColor));
-    u32 matColor = chanColor;
-    GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&matColor));
+    GXColor chanColor = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
 
     Vec2d offset = {FLOAT_8032fd90, FLOAT_8032fd94};
     RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010)), offset, FLOAT_8032fd6c);

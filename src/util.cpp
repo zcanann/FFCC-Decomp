@@ -1108,41 +1108,38 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
  */
 void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
 {
-	s16 minX = 0x7FFF;
-	s16 minY = 0x7FFF;
-	s16 minZ = 0x7FFF;
-	s16 maxX = -0x7FFF;
-	s16 maxY = -0x7FFF;
-	s16 maxZ = -0x7FFF;
+    S16Vec min = {0x7FFF, 0x7FFF, 0x7FFF};
+    S16Vec max = {-0x7FFF, -0x7FFF, -0x7FFF};
 
-	for (unsigned long i = 0; i < count; i++) {
-		if (minX > vecs->x) {
-			minX = vecs->x;
-		}
-		if (minY > vecs->y) {
-			minY = vecs->y;
-		}
-		if (minZ > vecs->z) {
-			minZ = vecs->z;
-		}
-		if (vecs->x > maxX) {
-			maxX = vecs->x;
-		}
-		if (vecs->y > maxY) {
-			maxY = vecs->y;
-		}
-		if (vecs->z > maxZ) {
-			maxZ = vecs->z;
-		}
-		vecs++;
-	}
+    for (unsigned long i = 0; i < count; i++, vecs++) {
+        if (min.x > vecs->x) {
+            min.x = vecs->x;
+        }
+        if (min.y > vecs->y) {
+            min.y = vecs->y;
+        }
+        if (min.z > vecs->z) {
+            min.z = vecs->z;
+        }
+        if (max.x < vecs->x) {
+            max.x = vecs->x;
+        }
+        if (max.y < vecs->y) {
+            max.y = vecs->y;
+        }
+        if (max.z < vecs->z) {
+            max.z = vecs->z;
+        }
+    }
 
-	minOut->x = (float)minX / (float)(1 << shift);
-	minOut->y = (float)minY / (float)(1 << shift);
-	minOut->z = (float)minZ / (float)(1 << shift);
-	maxOut->x = (float)maxX / (float)(1 << shift);
-	maxOut->y = (float)maxY / (float)(1 << shift);
-	maxOut->z = (float)maxZ / (float)(1 << shift);
+    int scale = 1 << shift;
+
+    minOut->x = (float)min.x / (float)scale;
+    minOut->y = (float)min.y / (float)scale;
+    minOut->z = (float)min.z / (float)scale;
+    maxOut->x = (float)max.x / (float)scale;
+    maxOut->y = (float)max.y / (float)scale;
+    maxOut->z = (float)max.z / (float)scale;
 }
 
 /*

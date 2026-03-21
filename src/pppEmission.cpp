@@ -372,8 +372,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
     int* state = (int*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
+    u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -399,11 +399,11 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         return;
     }
 
+    int textureIndex = 0;
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    int textureIndex = 0;
     state[1] = GetTexture__8CMapMeshFP12CMaterialSetRi(
         pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex],
         pppEnvStPtr->m_materialSetPtr,

@@ -109,7 +109,7 @@ void CSamplePcs::func1()
  * JP Address: TODO
  * JP Size: TODO
  */
-CSamplePcs::CSamplePcs()
+inline CSamplePcs::CSamplePcs()
 {
 	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
 	const unsigned int* desc0 = m_table_desc0__10CSamplePcs;

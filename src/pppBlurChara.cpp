@@ -169,12 +169,12 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     Vec posA;
     Vec posB;
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    unsigned int width;
-    unsigned int height;
+    int width;
+    int height;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (unsigned int)FLOAT_80331050;
-    height = (unsigned int)FLOAT_80331054;
+    width = (int)FLOAT_80331050;
+    height = (int)FLOAT_80331054;
 
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 

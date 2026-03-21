@@ -53,11 +53,13 @@ struct RainParam {
     u16 lifeRange;
     u8 pad1[0x1c - 0x18];
     float minX;
+    float padMinY;
     float minZ;
+    float padMaxW;
     float maxX;
     float maxY;
     float maxZ;
-    u8 pad2[0x3c - 0x30];
+    u8 pad2[0x3c - 0x38];
     u8 lineWidth;
     u8 pad3[3];
     float lengthBase;
@@ -66,6 +68,11 @@ struct RainParam {
     u8 fogIndex;
     u8 lightTarget;
     u8 pad4;
+};
+
+struct RainColorData {
+    u8 pad[8];
+    pppCVECTOR color;
 };
 
 /*
@@ -124,8 +131,6 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     int i;
     int randA;
     int randB;
-    u16 lifeBase;
-    u16 lifeRange;
     RainWork* work;
     RainDrop* drop;
     RainParam* rain;
@@ -133,23 +138,21 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     float unitB;
     float lengthDelta;
     s16 lifeJitter;
-    u16 dropCount;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     rain = (RainParam*)param_2->m_payload;
-    dropCount = param_2->m_dataValIndex;
     work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
         work->drops = (RainDrop*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            dropCount * sizeof(RainDrop),
+            param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
             s_pppRain_cpp_801DB610,
             0x7f);
         drop = work->drops;
-        for (i = 0; i < (int)dropCount; i++) {
+        for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
             randA = rand();
             randB = rand();
             unitA = FLOAT_80331020 * (float)randA;
@@ -169,10 +172,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             }
             drop->length += lengthDelta;
 
-            lifeBase = rain->lifeBase;
-            lifeRange = rain->lifeRange;
-            drop->life = (s16)lifeBase;
-            lifeJitter = (s16)(randA % lifeRange);
+            drop->life = (s16)rain->lifeBase;
+            lifeJitter = (s16)(randA % rain->lifeRange);
             if (randA % 2 != 0) {
                 lifeJitter = -lifeJitter;
             }
@@ -190,7 +191,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     }
 
     drop = work->drops;
-    for (i = 0; i < (int)dropCount; i++) {
+    for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
         drop->posX = -(drop->dirX * work->moveY - drop->posX);
         drop->posY -= rain->driftY;
         drop->posZ = -(drop->dirZ * work->moveY - drop->posZ);
@@ -215,10 +216,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             }
             drop->length += lengthDelta;
 
-            lifeBase = rain->lifeBase;
-            lifeRange = rain->lifeRange;
-            drop->life = (s16)lifeBase;
-            lifeJitter = (s16)(randA % lifeRange);
+            drop->life = (s16)rain->lifeBase;
+            lifeJitter = (s16)(randA % rain->lifeRange);
             if (randA % 2 != 0) {
                 lifeJitter = -lifeJitter;
             }
@@ -257,7 +256,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int i;
     int colorOffset;
     int workOffset;
-    u32* color;
+    RainColorData* colorData;
     RainParam* rain;
     RainWork* work;
     RainDrop* drop;
@@ -270,12 +269,12 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
-    color = (u32*)((u8*)pppRain + 0x88 + colorOffset);
+    colorData = (RainColorData*)((u8*)pppRain + 0x80 + colorOffset);
     rain = (RainParam*)param_2->m_payload;
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     pppSetBlendMode(rain->blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        color,
+        &colorData->color,
         ppvCameraMatrix02,
         kPppRainTexCoordBase,
         rain->lightTarget,
@@ -311,14 +310,14 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
-        GXWGFifo.u32 = *color;
+        GXWGFifo.u32 = *(u32*)&colorData->color;
         GXWGFifo.f32 = tex0;
         GXWGFifo.f32 = tex0;
 
         GXWGFifo.f32 = x + segment[0].x;
         GXWGFifo.f32 = y + segment[0].y;
         GXWGFifo.f32 = z + segment[0].z;
-        GXWGFifo.u32 = *color;
+        GXWGFifo.u32 = *(u32*)&colorData->color;
         GXWGFifo.f32 = tex1;
         GXWGFifo.f32 = tex1;
         drop++;

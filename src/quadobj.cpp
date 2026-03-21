@@ -9,7 +9,6 @@
 static const float MaxBounds = 10000000.0;
 static const float MinBounds = -10000000.0;
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -97,7 +96,7 @@ bool CGQuadObj::isInner(Vec* vec)
 				float z0 = self->m_vertices[0].z;
 				float x0 = self->m_vertices[0].x;
 				int quotient = (i + 1) / (int)count;
-				int next = (i + 1) - count * quotient;
+				int next = (i + 1) - quotient * (int)count;
 				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
 					break;
 				}

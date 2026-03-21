@@ -90,7 +90,7 @@ int RedNew(int param_1)
 			if (blockList[0x7FF] > 0) {
 				if (gRedMemoryDebugEnabled != 0) {
 					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
-					fflush(&DAT_8021d1a8);
+					fflush(__files + 1);
 				}
 				break;
 			}
@@ -204,7 +204,7 @@ int RedNewA(int size, int offset, int maxSize)
 	if (gRedAMemoryBlockList[0x7FF] >= 1) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
-			fflush(&DAT_8021d1a8);
+			fflush(__files + 1);
 		}
 		return 0;
 	}

@@ -139,8 +139,8 @@ template <>
 CPtrArray<CTexture*>::CPtrArray()
 {
     m_vtable = __vt__8CPtrArrayIP8CTexture;
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -234,7 +234,7 @@ void CPtrArray<CTexture*>::SetAt(unsigned long index, CTexture* item)
 template <>
 int CPtrArray<CTexture*>::GetSize()
 {
-    return m_size;
+    return m_numItems;
 }
 
 /*
@@ -253,8 +253,8 @@ void CPtrArray<CTexture*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -288,8 +288,8 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
 }
 
 /*

@@ -9,6 +9,31 @@ struct pppRain {
 
 struct VRain;
 
+struct RainParam {
+    float pad0;
+    float moveYDelta;
+    float accelYDelta;
+    float accelZDelta;
+    float driftY;
+    u16 lifeBase;
+    u16 lifeRange;
+    u8 pad1[0x1c - 0x18];
+    float minX;
+    float minZ;
+    float maxX;
+    float maxY;
+    float maxZ;
+    u8 pad2[0x3c - 0x30];
+    u8 lineWidth;
+    u8 pad3[3];
+    float lengthBase;
+    float lengthRand;
+    u8 blendMode;
+    u8 fogIndex;
+    u8 lightTarget;
+    u8 pad4;
+};
+
 struct PRain {
     s32 m_graphId;
     u16 m_dataValIndex;
@@ -16,7 +41,7 @@ struct PRain {
     f32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[0x4C];
+    RainParam m_payload;
 };
 
 struct RAIN_DATA {

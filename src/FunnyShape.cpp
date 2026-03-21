@@ -80,6 +80,46 @@ static inline GXColor ToGXColor(u32 color)
     memcpy(&out, &color, sizeof(out));
     return out;
 }
+
+struct CFunnyShapeAnmWork {
+    s32 index;
+    void* animData;
+    f32 x;
+    f32 y;
+    f32 z;
+    s16 frame;
+    s16 delay;
+    u8 unk18[8];
+    f32 viewportX;
+    f32 viewportY;
+    f32 angle;
+    u8 unk2C[4];
+};
+
+static inline CFunnyShapeAnmWork* AnmWork(CFunnyShape* self)
+{
+    return reinterpret_cast<CFunnyShapeAnmWork*>(self);
+}
+
+static inline void* AnimData(CFunnyShape* self)
+{
+    return PtrAt(self, 0x60E4);
+}
+
+static inline u32 ShapeFlags(CFunnyShape* self)
+{
+    return U32At(self, 0x60E8);
+}
+
+static inline s16 ShapeCount(CFunnyShape* self)
+{
+    return *reinterpret_cast<s16*>(Ptr(self, 0x6110));
+}
+
+static inline s16 ShapeRange(CFunnyShape* self)
+{
+    return *reinterpret_cast<s16*>(Ptr(self, 0x6112));
+}
 }
 
 /*
@@ -236,53 +276,52 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short sho
  */
 void CFunnyShape::InitAnmWork()
 {
-    const u32 flags = U32At(this, 0);
     const float zero = FLOAT_8032fd6c;
+    const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
     const float angleMul = FLOAT_8032fda4;
     const float angleDiv = FLOAT_8032fda8;
-    u8* entry = Ptr(this, 0x30);
+    CFunnyShapeAnmWork* work = AnmWork(this);
 
     for (s32 i = 0; i < 0x200; i++) {
-        *reinterpret_cast<s32*>(entry) = i;
-        *reinterpret_cast<void**>(entry + 4) = PtrAt(this, 0xC);
+        work->index = i;
+        work->animData = AnimData(this);
 
         s32 r = rand();
-        const s16 range = *reinterpret_cast<s16*>(Ptr(this, 0x2A));
-        *reinterpret_cast<float*>(entry + 8) = static_cast<float>(r - (r / range) * range);
+        work->x = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
 
         r = rand();
-        *reinterpret_cast<float*>(entry + 0xC) = static_cast<float>(r - (r / range) * range);
-        *reinterpret_cast<float*>(entry + 0x10) = zero;
+        work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
+        work->z = zero;
 
         r = rand();
-        const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6);
-        *reinterpret_cast<s16*>(entry + 0x14) = static_cast<s16>(r - (r / shapeCount) * shapeCount);
-        *reinterpret_cast<s16*>(entry + 0x16) = 2;
-        *reinterpret_cast<float*>(entry + 0x20) = zero;
-        *reinterpret_cast<float*>(entry + 0x24) = zero;
+        const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6);
+        work->frame = static_cast<s16>(r - (r / shapeCount) * shapeCount);
+        work->delay = 0x200;
+        work->viewportY = zero;
+        work->viewportX = zero;
 
         r = rand();
         s32 q = r / 0x168 + (r >> 0x1F);
         q = r + (q - (q >> 0x1F)) * -0x168;
-        *reinterpret_cast<float*>(entry + 0x28) = (angleMul * static_cast<float>(q)) / angleDiv;
+        work->angle = (angleMul * static_cast<float>(q)) / angleDiv;
 
         u32 u = static_cast<u32>(rand());
         if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
-            *reinterpret_cast<float*>(entry + 8) *= FLOAT_8032fd80;
+            work->x *= FLOAT_8032fd80;
         }
 
         u = static_cast<u32>(rand());
         if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
-            *reinterpret_cast<float*>(entry + 0xC) *= FLOAT_8032fd80;
+            work->y *= FLOAT_8032fd80;
         }
 
-        if ((flags & 0x80) == 0) {
-            *reinterpret_cast<s16*>(entry + 0x14) = 0;
-            *reinterpret_cast<float*>(entry + 8) = zero;
-            *reinterpret_cast<float*>(entry + 0xC) = zero;
+        if (noSpread != 0) {
+            work->frame = 0;
+            work->y = zero;
+            work->x = zero;
         }
 
-        entry += 0x30;
+        work++;
     }
 }
 

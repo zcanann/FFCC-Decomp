@@ -72,16 +72,6 @@ union PackedColor {
     u8 bytes[4];
 };
 
-static float* resolveTracerWorkValue(s32 valueIndex, s32 workOffset)
-{
-    if (valueIndex == -1) {
-        return reinterpret_cast<float*>(gPppDefaultValueBuffer);
-    }
-
-    TracerMngRaw* mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
-    return reinterpret_cast<float*>(mng->dataValues[valueIndex].workBase + 0x80 + workOffset);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -201,6 +191,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     Mtx MStack_78;
     u32 uStack_44;
     u32 uStack_3c;
+    TracerMngRaw* mng;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -210,9 +201,21 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     useFallback = false;
     iVar4 = param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
+    mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
 
-    work->initWork = resolveTracerWorkValue(param_2->m_initWOrk, param_2->m_stepValue);
-    work->arg3Work = resolveTracerWorkValue(param_2->m_arg3, *(s32*)param_2->m_payload);
+    if (param_2->m_initWOrk == -1) {
+        work->initWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    } else {
+        work->initWork =
+            reinterpret_cast<float*>(mng->dataValues[param_2->m_initWOrk].workBase + param_2->m_stepValue + 0x80);
+    }
+
+    if (param_2->m_arg3 == -1) {
+        work->arg3Work = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    } else {
+        work->arg3Work =
+            reinterpret_cast<float*>(mng->dataValues[param_2->m_arg3].workBase + *(s32*)param_2->m_payload + 0x80);
+    }
 
     if (work->entries == nullptr) {
         useFallback = true;

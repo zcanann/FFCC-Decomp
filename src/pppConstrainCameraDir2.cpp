@@ -85,8 +85,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             }
 
             pppConstrainCameraDirObject* obj = reinterpret_cast<pppConstrainCameraDirObject*>(param_1);
-            float localX = obj->m_localMatrix.value[0][3];
             float localY = obj->m_localMatrix.value[1][3];
+            float localX = obj->m_localMatrix.value[0][3];
 
             Vec direct0;
             Vec direct1;

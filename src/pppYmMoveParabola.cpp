@@ -138,6 +138,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     work->m_frame = 1;
 
     if ((s32)Game.m_currentSceneId == 7) {
+        Vec matrixOffset;
         Vec basePos = pppMngSt->m_savedPosition;
         Vec worldOffset;
         Vec addPos;
@@ -145,9 +146,10 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 
         pppCopyVector__FR3Vec3Vec(&work->m_basePosition, &basePos);
 
-        worldOffset.x = pppMngStPtr->m_matrix.value[0][3];
-        worldOffset.y = pppMngStPtr->m_matrix.value[1][3];
-        worldOffset.z = pppMngStPtr->m_matrix.value[2][3];
+        matrixOffset.x = pppMngStPtr->m_matrix.value[0][3];
+        matrixOffset.y = pppMngStPtr->m_matrix.value[1][3];
+        matrixOffset.z = pppMngStPtr->m_matrix.value[2][3];
+        worldOffset = matrixOffset;
 
         addPos = work->m_basePosition;
         pppAddVector__FR3Vec3Vec3Vec(&work->m_basePosition, &addPos, &worldOffset);

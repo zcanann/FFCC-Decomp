@@ -99,46 +99,47 @@ void CFile::Init()
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
-    m_handlePoolHead.m_next = (CHandle*)m_handlePoolHead.m_currentOffset;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    int handleIndex = 0;
+    unsigned int handleIndex = 0;
     int byteOffset = 0;
-    int blockCount = 0x20;
-    do {
+    for (int blockCount = 0x20; blockCount != 0; blockCount--) {
         CHandle* nextHandle;
+
         if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeList;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
+        handleIndex++;
 
-        if (handleIndex == 0x7E) {
+        if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeList;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 2) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
+        handleIndex++;
 
-        if (handleIndex == 0x7D) {
+        if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeList;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 3) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
+        handleIndex++;
 
-        if (handleIndex == 0x7C) {
+        if (handleIndex == 0x7F) {
             nextHandle = (CHandle*)&m_freeList;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 4) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
 
         byteOffset += 0x2B0;
-        handleIndex += 4;
-        blockCount--;
-    } while (blockCount != 0);
+        handleIndex++;
+    }
 }
 
 /*

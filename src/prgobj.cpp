@@ -511,6 +511,8 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::ClassControl(int classControl, int value)
 {
+	unsigned char* weaponNodeFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+
 	switch (classControl) {
 	case 0:
 		reinterpret_cast<CGPartyObj*>(this)->ChangeCommandMode(value);
@@ -519,17 +521,15 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
-		if ((((char)m_weaponNodeFlags) >> 7) != value) {
+		if ((static_cast<int>((static_cast<unsigned int>(*weaponNodeFlags) << 24) >> 31)) != value) {
 			onChangePrg(value);
-			m_weaponNodeFlags = (m_weaponNodeFlags & 0x7FFF) | ((value & 1) << 15);
+			*weaponNodeFlags = (static_cast<unsigned char>(value) << 7) | (*weaponNodeFlags & 0x7F);
 		}
 		break;
 	case 3:
-	{
-		unsigned char* classFlags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
-		*classFlags = (*classFlags & 0xF7) | ((value & 1) << 3);
+		*(reinterpret_cast<unsigned char*>(this) + 0x6B8) =
+		    (static_cast<unsigned char>(value) << 3) & 8 | (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
 		break;
-	}
 	case 4:
 	{
 		int oldState = getReplaceStat(value);

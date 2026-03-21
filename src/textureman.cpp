@@ -1110,9 +1110,7 @@ CTextureSet::CTextureSet()
 {
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
-    CPtrArray<CTexture*>* const textures = Textures(this);
-    textures->SetDefaultSize(0x10);
-    textures->SetStage(TextureMan.m_memoryStage);
+    Textures(this)->SetStage(TextureMan.m_memoryStage);
 }
 
 /*

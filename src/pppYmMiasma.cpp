@@ -22,7 +22,7 @@ extern double DOUBLE_80330648;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
-extern void pppCalcFrameShape__FPlRsRsRss(long*, short*, short*, short*, short);
+extern void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 extern "C" void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
@@ -306,9 +306,9 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)pYmMiasma->m_dataValIndex * 4);
         pppCalcFrameShape__FPlRsRsRss(
             shapeTable,
-            (short*)((u8*)&particleData->m_colorDeltaAdd[1] + 4),
-            (short*)((u8*)&particleData->m_colorDeltaAdd[1] + 6),
-            (short*)((u8*)&particleData->m_colorDeltaAdd[1] + 2),
+            *(short*)((u8*)&particleData->m_colorDeltaAdd[0] + 4),
+            *(short*)((u8*)&particleData->m_colorDeltaAdd[0] + 6),
+            *(short*)((u8*)&particleData->m_colorDeltaAdd[0] + 2),
             (short)pYmMiasma->m_shapeFrameStep);
     }
 }

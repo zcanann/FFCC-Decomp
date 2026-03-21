@@ -301,47 +301,57 @@ unsigned int pppNotAllocAmemCacheRmem(unsigned long)
  */
 unsigned int pppFreeMngStPrioForData()
 {
-	_pppMngSt* pppMngSt;
-	_pppMngSt* pppMngStBase;
-	unsigned int prioTime = 0;
-	unsigned char bestPrio = 1;
-	int index = 0;
-	int i = 0xc0;
+	struct pppMngStPrioData {
+		char pad0[0x14];
+		int m_baseTime;
+		char pad18[0x5c];
+		short m_kind;
+		short m_nodeIndex;
+		char pad78[0x80];
+		unsigned char m_prio;
+		unsigned char padF9;
+		unsigned short m_prioTime;
+		char padFC[0x5c];
+	};
 
-	pppMngSt = 0;
-	pppMngStBase = reinterpret_cast<_pppMngSt*>(&PartMng);
+	pppMngStPrioData* bestMngSt;
+	pppMngStPrioData* pppMngStBase;
+	unsigned int prioTime;
+	unsigned char bestPrio;
+	int index;
+	int i;
+
+	pppMngStBase = reinterpret_cast<pppMngStPrioData*>(&PartMng);
+	bestPrio = 1;
+	index = 0;
+	bestMngSt = 0;
+	i = 0xc0;
 	do {
-		_pppMngSt* current = pppMngStBase;
-		if (current != pppMngStPtr && GetMngStBaseTime(current) != -0x1000 &&
-			GetMngStKind(current) != 0) {
-			unsigned char prio = GetMngStPrio(current);
-			if (1 < prio) {
-				if (bestPrio < prio) {
-					prioTime = (unsigned int)GetMngStPrioTime(current);
-					pppMngSt = current;
-					bestPrio = prio;
-				} else if (bestPrio == prio &&
-					(int)prioTime < (int)(unsigned int)GetMngStPrioTime(current)) {
-					prioTime = (unsigned int)GetMngStPrioTime(current);
-					pppMngSt = current;
-				}
+		pppMngStPrioData* current = pppMngStBase;
+		if ((((reinterpret_cast<_pppMngSt*>(current) != pppMngStPtr) && (current->m_baseTime != -0x1000)) &&
+		     (current->m_kind != 0)) &&
+		    (1 < current->m_prio)) {
+			if (bestPrio < current->m_prio) {
+				prioTime = current->m_prioTime;
+				bestMngSt = current;
+				bestPrio = current->m_prio;
+			} else if ((bestPrio == current->m_prio) && ((int)prioTime < (int)current->m_prioTime)) {
+				prioTime = current->m_prioTime;
+				bestMngSt = current;
 			}
 		}
 
 		current = pppMngStBase + 1;
-		if (current != pppMngStPtr && GetMngStBaseTime(current) != -0x1000 &&
-			GetMngStKind(current) != 0) {
-			unsigned char prio = GetMngStPrio(current);
-			if (1 < prio) {
-				if (bestPrio < prio) {
-					prioTime = (unsigned int)GetMngStPrioTime(current);
-					pppMngSt = current;
-					bestPrio = prio;
-				} else if (bestPrio == prio &&
-					(int)prioTime < (int)(unsigned int)GetMngStPrioTime(current)) {
-					prioTime = (unsigned int)GetMngStPrioTime(current);
-					pppMngSt = current;
-				}
+		if ((((reinterpret_cast<_pppMngSt*>(current) != pppMngStPtr) && (current->m_baseTime != -0x1000)) &&
+		     (current->m_kind != 0)) &&
+		    (1 < current->m_prio)) {
+			if (bestPrio < current->m_prio) {
+				prioTime = current->m_prioTime;
+				bestMngSt = current;
+				bestPrio = current->m_prio;
+			} else if ((bestPrio == current->m_prio) && ((int)prioTime < (int)current->m_prioTime)) {
+				prioTime = current->m_prioTime;
+				bestMngSt = current;
 			}
 		}
 
@@ -350,7 +360,7 @@ unsigned int pppFreeMngStPrioForData()
 		i--;
 	} while (i != 0);
 
-	if (pppMngSt == 0) {
+	if (bestMngSt == 0) {
 		return 0;
 	}
 
@@ -360,11 +370,11 @@ unsigned int pppFreeMngStPrioForData()
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(
 			s_tinaPrioTimeFmt,
-			(unsigned int)GetMngStPrioTime(pppMngSt),
-			(unsigned int)GetMngStPrio(pppMngSt),
-			(int)GetMngStKind(pppMngSt),
-			(int)GetMngStNodeIndex(pppMngSt),
-			(int)GetMngStKind(pppMngSt) * 0x38 + -0x7fd672e8);
+			(unsigned int)bestMngSt->m_prioTime,
+			(unsigned int)bestMngSt->m_prio,
+			(int)bestMngSt->m_kind,
+			(int)bestMngSt->m_nodeIndex,
+			(int)bestMngSt->m_kind * 0x38 + -0x7fd672e8);
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(DAT_801d81d4);
@@ -374,7 +384,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 
 	Graphic._WaitDrawDone(s_tinaSourceName, 0xfc);
-	_pppAllFreePObject(pppMngSt);
+	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(bestMngSt));
 	return 1;
 }
 

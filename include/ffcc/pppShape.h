@@ -16,12 +16,8 @@ extern "C" {
 
 void pppDrawShp(long*, short, CMaterialSet*, unsigned char);
 void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
-void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **);
 void pppSetShapeMaterial(pppShapeSt*, CMaterialSet*, char **);
-void pppShapeSetUseTexture(tagOAN3_SHAPE*, unsigned char*);
 void pppCacheLoadShapeTexture(pppShapeSt*, CMaterialSet*);
-void pppCacheUnLoadShapeTexture(pppShapeSt*, CMaterialSet*);
-void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*);
 void pppCacheDumpShapeTexture(pppShapeSt*, CMaterialSet*);
 void pppGetShapePos(long*, short, Vec&, Vec&, int);
 void pppGetShapeUV(long*, short, Vec2d&, Vec2d&, int);

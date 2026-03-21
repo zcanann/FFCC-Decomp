@@ -1088,15 +1088,15 @@ void JoyBus::SetPadData(ThreadParam* threadParam, unsigned char* data)
  * Address:	TODO
  * Size:	TODO
  */
-short JoyBus::GetPadData(int portIndex)
+unsigned short JoyBus::GetPadData(int portIndex)
 {
     OSWaitSemaphore(&m_accessSemaphores[portIndex]);
 
-    short value = m_stageFlags[portIndex];
+    unsigned short value = m_stageFlags[portIndex];
 	
     m_stageFlags[portIndex] = 0;
 
-    if (m_threadInitFlag != 0) {
+    if ((signed char)m_threadInitFlag != 0) {
         value = 0;
     }
 

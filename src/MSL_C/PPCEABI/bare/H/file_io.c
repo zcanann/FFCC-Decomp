@@ -107,16 +107,15 @@ int fflush(FILE* file) {
 int __get_file_modes(const char* mode, file_modes* modes)
 {
 	int mode_str;
-	unsigned char open_mode;
+	int open_mode;
 	unsigned char io_mode = 0;
 
 	modes->file_kind = __disk_file;
+	mode_str = mode[0];
 #ifndef __NO_WIDE_CHAR
 	modes->file_orientation = UNORIENTED;
 #endif
 	modes->binary_io = 0;
-	
-	mode_str = mode[0];
 	
 	switch (mode_str)
 	{

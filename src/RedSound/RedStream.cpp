@@ -8,9 +8,9 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-extern char DAT_801e7f44;
-extern char s__sPause___Stream___ON__d_801e7fb0[];
-extern char s__sPause___Stream___OFF__d_801e7fcb[];
+static const char sRedStreamLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char s_redStreamPauseOnFmt[] = "%sPause : Stream : ON  %d\n";
+static const char s_redStreamPauseOffFmt[] = "%sPause : Stream : OFF %d\n";
 
 extern "C" {
 void RedDelete__FPv(void*);
@@ -465,9 +465,9 @@ void StreamPause(int param_1, int param_2)
 	streamData = (unsigned int)DAT_8032f438;
 	if (gRedMemoryDebugEnabled != 0) {
 		if (param_2 == 1) {
-			OSReport(s__sPause___Stream___ON__d_801e7fb0, &DAT_801e7f44, param_1);
+			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
 		} else {
-			OSReport(s__sPause___Stream___OFF__d_801e7fcb, &DAT_801e7f44, param_1);
+			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
 		}
 		fflush(__files + 1);
 		streamData = (unsigned int)DAT_8032f438;

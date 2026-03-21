@@ -1058,7 +1058,7 @@ void CMemoryCardMan::SetLoadData()
 unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
     unsigned char byte;
-    int i;
+    int count;
     unsigned char* ptr;
     unsigned int crc;
     unsigned char* data = (unsigned char*)saveData;
@@ -1069,31 +1069,19 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     }
 
     crc = 0xFFFFFFFF;
-    i = 0x1C;
+    count = 0x1C;
     ptr = data;
-    while (true)
+    while (--count >= 0)
     {
-        i--;
-        if (i < 0)
-        {
-            break;
-        }
-
         byte = *ptr;
         ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
     }
 
     ptr = data + 0x20;
-    i = 0x8BB0;
-    while (true)
+    count = 0x8BB0;
+    while (--count >= 0)
     {
-        i--;
-        if (i < 0)
-        {
-            break;
-        }
-
         byte = *ptr;
         ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
@@ -1115,7 +1103,7 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
 {
     unsigned char byte;
     unsigned int crc;
-    int i;
+    int count;
     unsigned char* ptr;
     unsigned char* data = (unsigned char*)saveData;
 
@@ -1131,17 +1119,17 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
     }
 
     crc = 0xFFFFFFFF;
-    i = 0x1C;
-    while (i = i - 1, -1 < i)
+    count = 0x1C;
+    while (--count >= 0)
     {
         byte = *ptr;
         ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
     }
 
-    ptr += 0x20 - 0x1C;
-    i = 0x8BB0;
-    while (i = i - 1, -1 < i)
+    ptr = data + 0x20;
+    count = 0x8BB0;
+    while (--count >= 0)
     {
         byte = *ptr;
         ptr++;

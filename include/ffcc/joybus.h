@@ -84,7 +84,7 @@ public:
     void WriteContext(ThreadParam* threadParam);
 
     void SetPadData(ThreadParam* threadParam, unsigned char* data);
-    short GetPadData(int portIndex);
+    unsigned short GetPadData(int portIndex);
 
     int RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer);
     int SendGBA(ThreadParam* threadParam);
@@ -195,7 +195,7 @@ public:
 
     OSSemaphore m_accessSemaphores[4];
 
-    short m_stageFlags[4];
+    unsigned short m_stageFlags[4];
 
     unsigned int m_cmdQueueData[4][64];
     unsigned int m_recvQueueEntriesArr[4][64];

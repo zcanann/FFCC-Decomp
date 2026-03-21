@@ -990,9 +990,17 @@ static void GetCurrentDisplayPosition(u32* hct, u32* vct) {
     *vct = vcount;
 }
 
-static u32 getCurrentHalfLine(void) {
-    u32 hcount, vcount;
-    GetCurrentDisplayPosition(&hcount, &vcount);
+inline static u32 getCurrentHalfLine(void) {
+    u32 hcount;
+    u32 vcount0;
+    u32 vcount;
+
+    vcount = __VIRegs[VI_VERT_COUNT] & 0x7FF;
+    do {
+        vcount0 = vcount;
+        hcount = __VIRegs[VI_HORIZ_COUNT] & 0x7FF;
+        vcount = __VIRegs[VI_VERT_COUNT] & 0x7FF;
+    } while (vcount0 != vcount);
 
     return ((vcount - 1) << 1) + ((hcount - 1) / CurrTiming->hlw);
 }
@@ -1018,9 +1026,6 @@ u32 VIGetCurrentLine(void) {
     u32 halfLine;
     VITiming* tm;
     BOOL enabled;
-#if !DEBUG
-    u8 unused[4];
-#endif
 
     tm = CurrTiming;
     enabled = OSDisableInterrupts();

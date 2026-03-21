@@ -1522,25 +1522,28 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
-    char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
     if (count > 1) {
-        sprintf(out, s_numNameFmt, count, monTable[monIndex * 5 + 3]);
+        sprintf(out,
+                s_numNameFmt,
+                count,
+                reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 3]);
         return out;
     }
 
-    unsigned char hasSeparator = 0;
+    char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
+    bool hasSeparator = false;
     char* prefix = monTable[monIndex * 5];
     char* monName = monTable[monIndex * 5 + 1];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;
         if ((languageId != 3) && (languageId != 4)) {
-            hasSeparator = 1;
+            hasSeparator = true;
         }
     }
 
     const char* separator = s_nameNoSep;
-    if (hasSeparator != 0) {
+    if (hasSeparator) {
         separator = s_nameSep;
     }
 

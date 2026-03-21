@@ -88,11 +88,12 @@ int CGQuadObj::GetCID()
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
+	CGQuadObj* self;
 	u32 count = m_vertexCount;
 	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
 		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
+			self = this;
 			int i = 0;
-			CGQuadObj* self = this;
 			for (; i < (int)count; i++) {
 				float z0 = self->m_vertices[0].z;
 				float x0 = self->m_vertices[0].x;

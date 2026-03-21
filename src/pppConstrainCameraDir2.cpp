@@ -11,6 +11,7 @@ extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
 
+extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 void pppSetFpMatrix(_pppMngSt*);
 
 struct pppConstrainCameraDirObject {
@@ -38,8 +39,9 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
         float* value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
         unsigned char* flags = (unsigned char*)&param_2->m_arg3;
 
-        CalcGraphValue(&param_1->m_pppPObject, param_2->m_graphId, value[0], value[1], value[2], param_2->m_dataValIndex,
-                       param_2->m_initWOrk, param_2->m_stepValue);
+        CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param_2->m_dataValIndex, &param_1->m_pppPObject, param_2->m_graphId,
+                                                    value, value + 1, value + 2, &param_2->m_initWOrk,
+                                                    &param_2->m_stepValue);
 
         if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
             Vec resultPos;

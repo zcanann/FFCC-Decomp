@@ -27,7 +27,10 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern float FLOAT_80332f2c;
+extern float FLOAT_80332f28;
 extern float FLOAT_80332f30;
+extern float FLOAT_80332f34;
+extern float FLOAT_80332f38;
 extern double DOUBLE_80332f20;
 extern double DOUBLE_80332f40;
 extern double DOUBLE_80332f48;
@@ -584,15 +587,15 @@ void CMenuPcs::TmpArtiDraw()
 
 			if (*(short*)(foodPtr + 0x1F6) < 0) {
 				tex = 0x34;
-				alpha = 0.5f * alpha;
+				alpha = (float)(DOUBLE_80332f20 * (double)alpha);
 			}
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(255.0f * alpha));
+			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332f28 * alpha));
 			GXSetChanMatColor(GX_COLOR0A0, color.color);
 
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}
 		foodPtr += 2;
 		entry += 0x20;
@@ -604,17 +607,17 @@ void CMenuPcs::TmpArtiDraw()
 		short icon = *(short*)(foodPtr + 0x1F6);
 		if (-1 < icon) {
 			int posX = (int)entry[0] + (int)entry[2] - 0x10;
-			int posY = (int)(((float)((int)entry[1] + 6)) - 1.0f);
-			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, 0.0f);
+			int posY = (int)(((float)((int)entry[1] + 6)) - FLOAT_80332f30);
+			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
 		}
 		entry += 0x20;
 		foodPtr += 2;
 	}
 
 	CFont* font = GetTmpArtiFont(this);
-	SetMargin__5CFontFf(1.0f, font);
+	SetMargin__5CFontFf(FLOAT_80332f30, font);
 	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(1.0f, font);
+	SetScale__5CFontFf(FLOAT_80332f34, font);
 	DrawInit__5CFontFv(font);
 
 	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
@@ -624,13 +627,13 @@ void CMenuPcs::TmpArtiDraw()
 		short itemId = *(short*)(foodPtr + 0x1F6);
 		if (-1 < itemId) {
 			float alpha = *(float*)(entry + 8);
-			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(255.0f * alpha));
+			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332f28 * alpha));
 			SetColor__5CFontF8_GXColor(font, &textColor.color);
 
 			const char* text = flatData->table[0].strings[itemId * 5 + 4];
 			int width = GetWidth__5CFontFPc(font, text);
-			float posX = ((((float)entry[2] - (float)width) * 0.5f) + (float)entry[0]);
-			float posY = ((float)((int)entry[1] + 11)) - 1.0f;
+			float posX = (float)(((double)((float)entry[2] - (float)width) * DOUBLE_80332f20) + (double)(float)entry[0]);
+			float posY = ((float)((int)entry[1] + 11)) - FLOAT_80332f38;
 
 			SetPosX__5CFontFf(posX, font);
 			SetPosY__5CFontFf(posY, font);

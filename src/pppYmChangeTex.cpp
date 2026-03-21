@@ -41,13 +41,13 @@ struct pppYmChangeTexState {
 	float m_value0;
 	float m_value1;
 	float m_value2;
-	void** m_meshColorArrays;
-	void** m_displayListArrays;
-	u8 _pad14[4];
+	int m_meshColorArrays;
+	int m_displayListArrays;
+	int _pad14;
 	void* m_charaObj;
 	int m_texture;
-	u8 _pad20[4];
-	_pppEnvStYmChangeTex* m_env;
+	int _pad20;
+	void* m_context;
 };
 
 extern _pppMngStYmChangeTex* pppMngStPtr;
@@ -198,17 +198,17 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
 	float init = DAT_80330e10;
-	float* state = (float*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
-	int* stateInt = (int*)state;
+	pppYmChangeTexState* state =
+	    (pppYmChangeTexState*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
 
-	state[0] = init;
-	state[2] = init;
-	state[1] = init;
-	stateInt[6] = 0;
-	stateInt[9] = (int)pppMngStPtr;
-	stateInt[7] = 0;
-	stateInt[3] = 0;
-	stateInt[4] = 0;
+	state->m_value0 = init;
+	state->m_value2 = init;
+	state->m_value1 = init;
+	state->m_charaObj = 0;
+	state->m_context = pppMngStPtr;
+	state->m_texture = 0;
+	state->m_meshColorArrays = 0;
+	state->m_displayListArrays = 0;
 }
 
 /*
@@ -254,9 +254,9 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		*(void**)(model2 + 0x104) = 0;
 	}
 
-	void** stageArray = state->m_displayListArrays;
+	void** stageArray = (void**)state->m_displayListArrays;
 	void** meshArray;
-	if ((stageArray != 0) && ((meshArray = state->m_meshColorArrays), meshArray != 0)) {
+	if ((stageArray != 0) && ((meshArray = (void**)state->m_meshColorArrays), meshArray != 0)) {
 		int meshList = *(int*)(model + 0xac);
 		void** curStageArray = stageArray;
 		void** curMeshArray = meshArray;
@@ -316,7 +316,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
 
 		state->m_charaObj = pppMngStPtr->m_charaObj;
-		state->m_env = pppEnvStPtr;
+		state->m_context = pppEnvStPtr;
 		*(pppYmChangeTexState**)(model0 + 0xE4) = state;
 		*(pppYmChangeTexStep**)(model0 + 0xE8) = step;
 		*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
@@ -358,20 +358,21 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				unsigned int meshCount = *(unsigned int*)(*(int*)(model0 + 0xA4) + 0xC);
 
 				if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
-					state->m_meshColorArrays = (void**)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+					state->m_meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					    meshCount << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x15D);
-					state->m_displayListArrays = (void**)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+					state->m_displayListArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					    meshCount << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x160);
 
 					int* meshColorArrays = (int*)state->m_meshColorArrays;
+					int* displayListArrays = (int*)state->m_displayListArrays;
 					int curMesh = meshList;
 					for (unsigned int meshIdx = 0; meshIdx < meshCount; meshIdx++) {
 						int dlCount = *(int*)(*(int*)(curMesh + 8) + 0x4C);
-						((int*)state->m_displayListArrays)[meshIdx] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+						displayListArrays[meshIdx] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 						    dlCount << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x168);
 
 						int* dlInfo = (int*)*(int*)(*(int*)(curMesh + 8) + 0x50);
-						int* dlEntries = (int*)(((int*)state->m_displayListArrays)[meshIdx] + dlCount * 4 - 4);
+						int* dlEntries = (int*)(displayListArrays[meshIdx] + dlCount * 4 - 4);
 						for (int dlIdx = dlCount - 1; dlIdx >= 0; dlIdx--) {
 							int dlPair =
 							    (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(8, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x172);

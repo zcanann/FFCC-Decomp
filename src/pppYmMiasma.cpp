@@ -538,12 +538,11 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
     float* particle = (float*)(u32) * (u32*)workBytes;
     u8* step = (u8*)param_2;
-    u16 count = *(u16*)(step + 0xc);
     int i;
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
-    for (i = 0; i < (int)count; i++) {
+    for (i = 0; i < (int)*(u16*)(step + 0xc); i++) {
         u16 dataValIndex = *(u16*)(step + 4);
         if (dataValIndex != 0xffff) {
             long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);

@@ -90,14 +90,15 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* objBytes = (u8*)obj;
 		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
-		u8 sourceAlpha = objBytes[colorOffset + 0x8B];
+		u8* colorBase = objBytes + colorOffset;
+		u8 sourceAlpha = colorBase[0x8B];
 		double projX = (double)pppMngStPtr->m_matrix.value[0][3];
 		double projY = (double)pppMngStPtr->m_matrix.value[1][3];
 		double projZ = (double)pppMngStPtr->m_matrix.value[2][3];
 		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
 		u32 zAtPixel;
-		float viewport[6];
 		float projection[7];
+		float viewport[6];
 		Mtx cameraMtx;
 		Vec cameraPos;
 		Vec cameraLookAt;
@@ -130,12 +131,10 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		float xProjected = work->m_projectedX;
-		float yProjected = work->m_projectedY;
 		u8 argA = stepArgBytes[0];
 		u32 halfWidth = (u32)(argA >> 1);
-		u32 y0 = (u32)((int)yProjected & 0xFFFF);
-		u32 x0 = (u32)((int)xProjected & 0xFFFF);
+		u32 y0 = (u32)((int)work->m_projectedY & 0xFFFF);
+		u32 x0 = (u32)((int)work->m_projectedX & 0xFFFF);
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
 		int stepSize = (short)((u16)argA / (u16)stepArgBytes[1]);
 		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {

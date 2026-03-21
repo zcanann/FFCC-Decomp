@@ -237,9 +237,6 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short sho
 void CFunnyShape::InitAnmWork()
 {
     const u32 flags = U32At(this, 0);
-    const float zero = FLOAT_8032fd6c;
-    const float angleMul = FLOAT_8032fda4;
-    const float angleDiv = FLOAT_8032fda8;
     u8* entry = Ptr(this, 0x30);
 
     for (s32 i = 0; i < 0x200; i++) {
@@ -252,19 +249,22 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         *reinterpret_cast<float*>(entry + 0xC) = static_cast<float>(r - (r / range) * range);
-        *reinterpret_cast<float*>(entry + 0x10) = zero;
+        *reinterpret_cast<float*>(entry + 0x10) = FLOAT_8032fd6c;
 
         r = rand();
-        const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6);
-        *reinterpret_cast<s16*>(entry + 0x14) = static_cast<s16>(r - (r / shapeCount) * shapeCount);
+        *reinterpret_cast<s16*>(entry + 0x14) = static_cast<s16>(
+            r - (r / *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6)) *
+                    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6));
         *reinterpret_cast<s16*>(entry + 0x16) = 2;
-        *reinterpret_cast<float*>(entry + 0x20) = zero;
-        *reinterpret_cast<float*>(entry + 0x24) = zero;
+        *reinterpret_cast<float*>(entry + 0x20) = FLOAT_8032fd6c;
+        *reinterpret_cast<float*>(entry + 0x24) = FLOAT_8032fd6c;
 
         r = rand();
         s32 q = r / 0x168 + (r >> 0x1F);
         q = r + (q - (q >> 0x1F)) * -0x168;
-        *reinterpret_cast<float*>(entry + 0x28) = (angleMul * static_cast<float>(q)) / angleDiv;
+        *reinterpret_cast<float*>(entry + 0x28) = static_cast<float>(q);
+        *reinterpret_cast<float*>(entry + 0x28) =
+            (FLOAT_8032fda4 * *reinterpret_cast<float*>(entry + 0x28)) / FLOAT_8032fda8;
 
         u32 u = static_cast<u32>(rand());
         if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
@@ -278,8 +278,8 @@ void CFunnyShape::InitAnmWork()
 
         if ((flags & 0x80) == 0) {
             *reinterpret_cast<s16*>(entry + 0x14) = 0;
-            *reinterpret_cast<float*>(entry + 8) = zero;
-            *reinterpret_cast<float*>(entry + 0xC) = zero;
+            *reinterpret_cast<float*>(entry + 8) = FLOAT_8032fd6c;
+            *reinterpret_cast<float*>(entry + 0xC) = FLOAT_8032fd6c;
         }
 
         entry += 0x30;
@@ -325,8 +325,9 @@ void CFunnyShape::Update()
                 r = rand();
                 s32 q = r / 0x168 + (r >> 0x1F);
                 q = r + (q - (q >> 0x1F)) * -0x168;
+                *reinterpret_cast<float*>(Ptr(cur, 0x58)) = static_cast<float>(q);
                 *reinterpret_cast<float*>(Ptr(cur, 0x58)) =
-                    (FLOAT_8032fda4 * static_cast<float>(q)) / FLOAT_8032fda8;
+                    (FLOAT_8032fda4 * *reinterpret_cast<float*>(Ptr(cur, 0x58))) / FLOAT_8032fda8;
 
                 u32 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {

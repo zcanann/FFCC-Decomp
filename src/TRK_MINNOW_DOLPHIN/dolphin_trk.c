@@ -208,16 +208,7 @@ DSError TRKInitializeTarget()
 	return DS_NoError;
 }
 
-static asm void dataCacheBlockInvalidate(register void* param_1)
-{
-#ifdef __MWERKS__ // clang-format off
-	nofralloc
-	dcbi 0, param_1
-	blr
-#endif // clang-format on
-}
-
-static inline void dataCacheBlockInvalidateInline(register void* param_1)
+static inline void dataCacheBlockInvalidate(register void* param_1)
 {
 #ifdef __MWERKS__
 	asm { dcbi 0, param_1 }
@@ -231,22 +222,25 @@ static inline void dataCacheBlockInvalidateIndexed(register u32 offset, register
 #endif
 }
 
-static asm void dataCacheBlockFlush(register void* param_1)
+static inline void dataCacheBlockFlush(register void* param_1)
 {
-#ifdef __MWERKS__ // clang-format off
-	nofralloc
-	dcbf 0, param_1
-	blr
-#endif // clang-format on
+#ifdef __MWERKS__
+	asm { dcbf 0, param_1 }
+#endif
 }
 
-static asm void trkSync(register int param_1)
+static inline void dataCacheBlockFlushIndexed(register u32 offset, register void* base)
 {
-#ifdef __MWERKS__ // clang-format off
-	nofralloc
-	sync
-	blr
-#endif // clang-format on
+#ifdef __MWERKS__
+	asm { dcbf offset, base }
+#endif
+}
+
+static inline void trkSync(void)
+{
+#ifdef __MWERKS__
+	asm { sync }
+#endif
 }
 
 void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
@@ -274,15 +268,22 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 		uVar6 = (uVar2 + 0x1F) >> 8;
 		if (uVar6 != 0) {
 			do {
-				dataCacheBlockFlush((void*)(param_1 + iVar5));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x20));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x40));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x60));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x80));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0xA0));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0xC0));
-				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0xE0));
-				iVar5 += 0x100;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
+				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
+				iVar5 += 0x20;
 				uVar6--;
 			} while (uVar6 != 0);
 			uVar7 &= 7;
@@ -329,7 +330,7 @@ LAB_801adc44:
 		TRK_memcpy((void*)(param_1 + param_2), auStack_60 + uVar6, 0x20 - uVar6);
 		dataCacheBlockFlush((void*)(param_1 + param_2));
 	}
-	trkSync(0);
+	trkSync();
 	__ARClearInterrupt();
 	ARStartDMA(0, param_1, uVar1, uVar2);
 	if (sVar3 == 0) {

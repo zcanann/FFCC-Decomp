@@ -77,9 +77,11 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     }
 
     if (state->countdown == 0) {
+        int count;
         VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
+        VertexApLcEntry* entry;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
-        VertexApLcEntry* entry = &env->entries[data->entryIndex];
+        entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
             u32* srcTable = *(u32**)((u8*)env + 0x8);
@@ -87,7 +89,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        int count = data->spawnCount;
+        count = data->spawnCount;
         switch (data->mode) {
         case 0:
             while (count-- != 0) {

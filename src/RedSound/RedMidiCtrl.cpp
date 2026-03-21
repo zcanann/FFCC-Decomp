@@ -2276,9 +2276,11 @@ void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	s8* command = (s8*)((int*)track)[0];
+	register s8 fineTune = ((s8*)track)[0x148];
 
 	((int*)track)[0] = (int)(command + 1);
-	((s8*)track)[0x148] += *command;
+	register int fineTuneResult = fineTune + *command;
+	((s8*)track)[0x148] = fineTuneResult;
 	DAT_8032f4b4 |= 1;
 }
 
@@ -2312,9 +2314,12 @@ void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	s8* command = (s8*)((int*)track)[0];
+	register short keyTranspose = *(short*)((char*)track + 0x142);
 
 	((int*)track)[0] = (int)(command + 1);
-	*(short*)((char*)track + 0x142) += (short)(*command << 8);
+	register int keyTransposeDelta = *command << 8;
+	register int keyTransposeResult = keyTranspose + keyTransposeDelta;
+	*(short*)((char*)track + 0x142) = keyTransposeResult;
 	DAT_8032f4b4 |= 1;
 }
 

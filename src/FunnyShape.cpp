@@ -182,7 +182,7 @@ CFunnyShape::~CFunnyShape()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelete)
+extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short shouldDelete)
 {
     if (funnyShape != 0) {
         if (PtrAt(funnyShape, 0x6010) != 0) {

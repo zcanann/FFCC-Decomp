@@ -196,13 +196,12 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				f32 z = vertex->z;
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
-					s32 childId = data->childId;
-					_pppPObject* child;
 					_pppPDataVal* childData =
-						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
 					Vec worldPos;
 					Vec pos;
 					Mtx* outMtx;
+					_pppPObject* child;
 
 					if (childData == 0) {
 						child = 0;

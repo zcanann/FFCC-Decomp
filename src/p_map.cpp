@@ -272,35 +272,36 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    CMapMng* mapMng = &MapMng;
+    unsigned int* loadHandles =
+        reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x22A2C);
     unsigned int value = 0;
     for (int count = 2; count != 0; count--) {
-        if (*(int*)((char*)mapMng + 0x22A2C) != 0) {
+        if (loadHandles[0] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A30) != 0) {
+        if (loadHandles[1] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A34) != 0) {
+        if (loadHandles[2] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A38) != 0) {
+        if (loadHandles[3] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A3C) != 0) {
+        if (loadHandles[4] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A40) != 0) {
+        if (loadHandles[5] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A44) != 0) {
+        if (loadHandles[6] != 0) {
             return (unsigned long long)value;
         }
-        if (*(int*)((char*)mapMng + 0x22A48) != 0) {
+        if (loadHandles[7] != 0) {
             return (unsigned long long)value;
         }
 
-        mapMng = (CMapMng*)((char*)mapMng + 0xC);
+        loadHandles += 3;
         value += 7;
     }
 

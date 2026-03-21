@@ -409,24 +409,19 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	if (animFields.m_bank == 0) {
 		do {
-			if (animFields.m_bank != 0) {
-				goto copy_bank;
-			}
-
 			animFields.m_bank = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
 			    &Memory, animFields.m_bankSize, animFields.m_stage, s_charaAnimSourceFile, 0x160, 1);
 
 			if (animFields.m_bank != 0) {
-				goto copy_bank;
+				break;
 			}
+		} while (TryReleaseAnimBank__9CCharaPcsFi(&CharaPcs, animFields.m_bankSize) != 0);
 
-			if (TryReleaseAnimBank__9CCharaPcsFi(&CharaPcs, animFields.m_bankSize) == 0) {
-				return;
-			}
-		} while (true);
+		if (animFields.m_bank == 0) {
+			return;
+		}
 	}
 
-copy_bank:
 	SetGroup__7CMemoryFPvi(&Memory, animFields.m_bank, 1);
 	CopyFromAMemorySync__7CMemoryFPvPvUl(
 	    &Memory, animFields.m_bank,

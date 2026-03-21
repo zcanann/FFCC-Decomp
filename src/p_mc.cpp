@@ -10,7 +10,6 @@ class McCtrl;
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
-extern "C" void __sinit_p_mc_cpp(void);
 
 class McCtrl
 {
@@ -159,39 +158,32 @@ void CMcPcs::calc()
     }
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80124af4
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_mc_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
+namespace {
+struct CMcPcsInitializer {
+    CMcPcsInitializer()
+    {
+        unsigned int* table;
+        unsigned int* table0;
+        unsigned int* table1;
+        unsigned int* table2;
 
-    unsigned int* table;
-    unsigned int* table0;
-    unsigned int* table1;
-    unsigned int* table2;
+        gMcPcsSingletonPtr = sMcPcsSingletonData;
+        table = (unsigned int*)m_table__6CMcPcs;
+        table0 = m_table_desc0__6CMcPcs;
+        table1 = m_table_desc1__6CMcPcs;
+        table2 = m_table_desc2__6CMcPcs;
 
-    gMcPcsSingletonPtr = sMcPcsSingletonData;
-    table = (unsigned int*)m_table__6CMcPcs;
-    table0 = m_table_desc0__6CMcPcs;
-    table1 = m_table_desc1__6CMcPcs;
-    table2 = m_table_desc2__6CMcPcs;
+        table[1] = table0[0];
+        table[2] = table0[1];
+        table[3] = table0[2];
+        table[4] = table1[0];
+        table[5] = table1[1];
+        table[6] = table1[2];
+        table[7] = table2[0];
+        table[8] = table2[1];
+        table[9] = table2[2];
+    }
+};
 
-    table[1] = table0[0];
-    table[2] = table0[1];
-    table[3] = table0[2];
-    table[4] = table1[0];
-    table[5] = table1[1];
-    table[6] = table1[2];
-    table[7] = table2[0];
-    table[8] = table2[1];
-    table[9] = table2[2];
+CMcPcsInitializer sMcPcsInitializer;
 }

@@ -95,6 +95,7 @@ static inline Mtx44& CameraScreenMatrix()
 }
 
 extern "C" {
+unsigned int __cvt_fp2unsigned(double);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -193,7 +194,9 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     gUtil.EndQuadEnv();
 
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
-    GXSetScissor(0, 0, width, height);
+    unsigned int scissorHeight = __cvt_fp2unsigned((double)FLOAT_80331054);
+    unsigned int scissorWidth = __cvt_fp2unsigned((double)FLOAT_80331050);
+    GXSetScissor(0, 0, scissorWidth, scissorHeight);
 
     rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     rawModel->m_afterDrawModelCallback = 0;
@@ -348,13 +351,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
-    u8* stepBytes = reinterpret_cast<u8*>(param_2);
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    u8* blurBase = reinterpret_cast<u8*>(blurChara);
     int textureBase = 0;
+    int texOffset = param_3->m_serializedDataOffsets[2];
+    int colorOffset = param_3->m_serializedDataOffsets[1];
     int textureIndex;
-    int colorOffset = serializedDataOffsets[1];
-    int texOffset = serializedDataOffsets[2];
     int objPosBase;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
@@ -376,7 +376,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Vec quadA;
     Vec quadB;
 
-    if (stepBytes[5] == 1) {
+    if (((u8*)&param_2->m_dataValIndex)[1] == 1) {
         textureIndex = 0;
         if (param_2->m_initWOrk == -1) {
             return;
@@ -384,31 +384,31 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
             ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
-        unsigned int div = stepBytes[6];
-        Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_LINEAR, GX_TF_RGBA8,
-                                       0);
+        unsigned int div = ((u8*)&param_2->m_dataValIndex)[2];
+        Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div,
+                                       GX_LINEAR, GX_TF_RGBA8, 0);
     }
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>(blurBase + colorOffset + 0x88), 0,
-                                                               FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1, 1, 0);
-    objPosBase = *reinterpret_cast<int*>(blurBase + texOffset + 0x84);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>((u8*)blurChara + colorOffset + 0x88),
+                                                               0, FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1, 1, 0);
+    objPosBase = *reinterpret_cast<int*>((u8*)blurChara + texOffset + 0x84);
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraWorldX();
+    cameraPos.x = CameraPcs._224_4_;
     cameraPos.y = FLOAT_80331030;
-    cameraPos.z = CameraWorldZ();
-    cameraTarget.x = CameraLookAtX();
+    cameraPos.z = CameraPcs._232_4_;
+    cameraTarget.x = CameraPcs._212_4_;
     cameraTarget.y = FLOAT_80331030;
-    cameraTarget.z = CameraLookAtZ();
+    cameraTarget.z = CameraPcs._220_4_;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = FLOAT_80331030;
 
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
-    PSMTXCopy(CameraMatrix(), cameraMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXIdentity(identityMtx);
 
     objPos.x = *(float*)(objPosBase + 0x15C);
@@ -428,13 +428,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
-    drawColor = *reinterpret_cast<_GXColor*>(blurBase + colorOffset + 0x88);
+    drawColor = *reinterpret_cast<_GXColor*>((u8*)blurChara + colorOffset + 0x88);
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);
-    GXLoadTexObj(*reinterpret_cast<_GXTexObj**>(blurBase + texOffset + 0x88), GX_TEXMAP0);
+    GXLoadTexObj(*reinterpret_cast<_GXTexObj**>((u8*)blurChara + texOffset + 0x88), GX_TEXMAP0);
     _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 10, 8,
                                                                                                           0xF);
     _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
@@ -445,7 +445,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-    if (stepBytes[5] == 1) {
+    if (((u8*)&param_2->m_dataValIndex)[1] == 1) {
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
     } else {
         GXLoadTexObj(&smallBackTex, GX_TEXMAP1);
@@ -475,7 +475,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     float depth = (float)PSVECDistance(&cameraPos, &objPos);
     depth -= param_2->m_stepValue;
 
-    PSMTX44Copy(CameraScreenMatrix(), screenMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
     inVec.z = -depth;

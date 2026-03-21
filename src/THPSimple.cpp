@@ -582,13 +582,17 @@ s32 THPSimpleLoadStop(void)
         SimpleControl.isReadFrameAsync = 0;
     }
 
-    for (int i = 0; i < 8; i++) {
-        SimpleControl.readBuffer[i].mFrameNumber = 0;
-        SimpleControl.readBuffer[i].mIsValid = 0;
-    }
-    for (int i = 0; i < 3; i++) {
-        SimpleControl.audioBuffer[i].mValidSample = 0;
-    }
+    SimpleControl.readBuffer[0].mIsValid = 0;
+    SimpleControl.readBuffer[1].mIsValid = 0;
+    SimpleControl.readBuffer[2].mIsValid = 0;
+    SimpleControl.readBuffer[3].mIsValid = 0;
+    SimpleControl.readBuffer[4].mIsValid = 0;
+    SimpleControl.readBuffer[5].mIsValid = 0;
+    SimpleControl.readBuffer[6].mIsValid = 0;
+    SimpleControl.readBuffer[7].mIsValid = 0;
+    SimpleControl.audioBuffer[0].mValidSample = 0;
+    SimpleControl.audioBuffer[1].mValidSample = 0;
+    SimpleControl.audioBuffer[2].mValidSample = 0;
 
     SimpleControl.curFrame = -1;
     SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataSize);

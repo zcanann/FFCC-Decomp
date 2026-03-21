@@ -522,7 +522,7 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
         COrder* next = current->m_next;
         if (current->m_descBlock == descBlock)
         {
-            current->m_previous->m_next = next;
+            current->m_previous->m_next = current->m_next;
             current->m_next->m_previous = current->m_previous;
             current->m_next = m_freeOrderHead.m_next;
             m_freeOrderHead.m_next = current;

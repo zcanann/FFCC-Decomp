@@ -77,6 +77,32 @@ struct PYmMiasma {
     s16 m_colorDecayFrames;
 };
 
+struct YmMiasmaParticleColor {
+    s16 m_r;
+    s16 m_g;
+    s16 m_b;
+    s16 m_a;
+};
+
+struct YmMiasmaParticleState {
+    u8 m_pad0[0x20];
+    YmMiasmaParticleColor m_color;
+    s16 m_lifeFrames;
+    s16 m_shapeAngle;
+    u8 m_pad2c[4];
+    YmMiasmaParticleColor m_colorStep;
+    u8 m_pad38[4];
+    float m_speedDecay;
+    float m_speed;
+    s16 m_fadeFrames;
+    s16 m_colorDecayFrames;
+    u8 m_hasImpulse;
+    u8 m_pad49;
+    s16 m_shapeFrameTime;
+    s16 m_shapeCurrentFrame;
+    s16 m_shapeDrawFrame;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80091234
@@ -88,6 +114,7 @@ struct PYmMiasma {
  */
 void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
+    YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     u32 uVar1;
     float fVar2;
     u32 uVar3;
@@ -131,8 +158,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     uVar1 = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * dVar10) - FLOAT_80330664);
     local_50 = (long long)(int)uVar1;
     sVar5 = (short)(iVar4 - (iVar4 / (int)sVar5) * sVar5);
-    *(short*)((u8*)&particleData->m_matrix[2][2] + 2) = sVar5;
-    *(short*)&particleData->m_matrix[2][2] = sVar5;
+    state->m_shapeAngle = sVar5;
+    state->m_lifeFrames = sVar5;
     fVar2 = *(float*)((u8*)gPppTrigTable + ((uVar1 + 0x4000) & 0xfffc));
     dVar9 = (double)*(float*)((u8*)gPppTrigTable + (uVar1 & 0xfffc));
     iVar4 = (int)uVar3 / 0x168 + ((int)uVar3 >> 0x1f);
@@ -163,25 +190,25 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         local_5c = local_80;
         pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, (Vec*)&local_7c, (Vec*)&local_88);
     }
-    *(u16*)&particleData->m_matrix[2][2] =
+    state->m_lifeFrames =
         (u16)pYmMiasma->m_lifeBase + ((short)uVar3 - (short)((int)uVar3 / (int)(u32)pYmMiasma->m_lifeRange) * (u16)pYmMiasma->m_lifeRange);
-    *(u16*)&particleData->m_matrix[2][0] = (u16)pYmMiasma->m_colorStartR;
-    *(u16*)((u8*)particleData->m_matrix[2] + 2) = (u16)pYmMiasma->m_colorStartG;
-    *(u16*)&particleData->m_matrix[2][1] = (u16)pYmMiasma->m_colorStartB;
-    *(u16*)((u8*)particleData->m_matrix[2] + 6) = 0;
-    *(short*)&particleData->m_velocity.x = pYmMiasma->m_colorEndR >> 7;
-    *(u16*)&particleData->m_velocity.x = *(short*)&particleData->m_velocity.x - (u16)pYmMiasma->m_colorStartR;
-    *(short*)&particleData->m_velocity.x = *(short*)&particleData->m_velocity.x / pYmMiasma->m_colorStepFrames;
-    *(short*)&particleData->m_velocity.y = pYmMiasma->m_colorEndG >> 7;
-    *(u16*)&particleData->m_velocity.y = *(short*)&particleData->m_velocity.y - (u16)pYmMiasma->m_colorStartG;
-    *(short*)&particleData->m_velocity.y = *(short*)&particleData->m_velocity.y / pYmMiasma->m_colorStepFrames;
-    *(short*)&particleData->m_velocity.z = pYmMiasma->m_colorEndB >> 7;
-    *(u16*)&particleData->m_velocity.z = *(short*)&particleData->m_velocity.z - (u16)pYmMiasma->m_colorStartB;
-    *(short*)&particleData->m_velocity.z = *(short*)&particleData->m_velocity.z / pYmMiasma->m_colorStepFrames;
-    *(short*)((u8*)&particleData->m_velocity.z + 2) = pYmMiasma->m_colorEndA >> 7;
-    *(u16*)((u8*)&particleData->m_velocity.z + 2) = *(short*)((u8*)&particleData->m_velocity.z + 2) - (u16)pYmMiasma->m_colorEndA;
-    *(short*)((u8*)&particleData->m_velocity.z + 2) = *(short*)((u8*)&particleData->m_velocity.z + 2) / pYmMiasma->m_colorStepFrames;
-    particleData->m_directionTail.x = pYmMiasma->m_speedDecay;
+    state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
+    state->m_color.m_g = (u16)pYmMiasma->m_colorStartG;
+    state->m_color.m_b = (u16)pYmMiasma->m_colorStartB;
+    state->m_color.m_a = 0;
+    state->m_colorStep.m_r = pYmMiasma->m_colorEndR >> 7;
+    state->m_colorStep.m_r = state->m_colorStep.m_r - (u16)pYmMiasma->m_colorStartR;
+    state->m_colorStep.m_r = state->m_colorStep.m_r / pYmMiasma->m_colorStepFrames;
+    state->m_colorStep.m_g = pYmMiasma->m_colorEndG >> 7;
+    state->m_colorStep.m_g = state->m_colorStep.m_g - (u16)pYmMiasma->m_colorStartG;
+    state->m_colorStep.m_g = state->m_colorStep.m_g / pYmMiasma->m_colorStepFrames;
+    state->m_colorStep.m_b = pYmMiasma->m_colorEndB >> 7;
+    state->m_colorStep.m_b = state->m_colorStep.m_b - (u16)pYmMiasma->m_colorStartB;
+    state->m_colorStep.m_b = state->m_colorStep.m_b / pYmMiasma->m_colorStepFrames;
+    state->m_colorStep.m_a = pYmMiasma->m_colorEndA >> 7;
+    state->m_colorStep.m_a = state->m_colorStep.m_a - (u16)pYmMiasma->m_colorStartA;
+    state->m_colorStep.m_a = state->m_colorStep.m_a / pYmMiasma->m_colorStepFrames;
+    state->m_speedDecay = pYmMiasma->m_speedDecay;
     dVar10 = dVar10 * (double)pYmMiasma->m_speedVariance;
     fVar2 = (float)dVar10;
     uVar1 = (u32)dVar10;
@@ -189,10 +216,10 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     if (((uVar1 & 1) ^ uVar3) != uVar3) {
         fVar2 = fVar2 * FLOAT_80330668;
     }
-    particleData->m_directionTail.y = pYmMiasma->m_baseSpeed + fVar2;
-    *(u16*)((u8*)&particleData->m_directionTail.y + 4) = (u16)pYmMiasma->m_fadeFrames;
-    *(u16*)((u8*)&particleData->m_directionTail.y + 6) = (u16)pYmMiasma->m_colorDecayFrames;
-    *(u8*)&particleData->m_colorDeltaAdd[0] = 0;
+    state->m_speed = pYmMiasma->m_baseSpeed + fVar2;
+    state->m_fadeFrames = (u16)pYmMiasma->m_fadeFrames;
+    state->m_colorDecayFrames = (u16)pYmMiasma->m_colorDecayFrames;
+    state->m_hasImpulse = 0;
 }
 
 /*
@@ -203,6 +230,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     VYmMiasma* vData = (VYmMiasma*)((u8*)pppPObject + ((pppYmMiasmaUnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80);
+    YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     s16 fadeFrames;
     s16 colorDecayFrames;
     Vec worldPos;
@@ -212,56 +240,55 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     long* shapeTable;
     float minDist;
 
-    fadeFrames = *(s16*)((u8*)&particleData->m_directionTail.y + 4);
+    fadeFrames = state->m_fadeFrames;
     if (fadeFrames > 0) {
-        *(s16*)((u8*)particleData->m_matrix[2] + 6) =
-            *(s16*)((u8*)particleData->m_matrix[2] + 6) + (u8)(pYmMiasma->m_colorStartA - *(s16*)((u8*)particleData->m_matrix[2] + 6)) / fadeFrames;
-        *(s16*)((u8*)&particleData->m_directionTail.y + 4) = fadeFrames - 1;
+        state->m_color.m_a =
+            state->m_color.m_a + (u8)(pYmMiasma->m_colorStartA - state->m_color.m_a) / fadeFrames;
+        state->m_fadeFrames = fadeFrames - 1;
     }
 
-    colorDecayFrames = *(s16*)((u8*)&particleData->m_directionTail.y + 6);
-    if (*(s16*)&particleData->m_matrix[2][2] <= colorDecayFrames && *(u8*)&particleData->m_colorDeltaAdd[0] == 0) {
-        *(s16*)((u8*)particleData->m_matrix[2] + 6) =
-            *(s16*)((u8*)particleData->m_matrix[2] + 6) - (*(s16*)((u8*)particleData->m_matrix[2] + 6) / colorDecayFrames);
-        *(s16*)((u8*)&particleData->m_directionTail.y + 6) = colorDecayFrames - 1;
+    colorDecayFrames = state->m_colorDecayFrames;
+    if (state->m_lifeFrames <= colorDecayFrames && state->m_hasImpulse == 0) {
+        state->m_color.m_a = state->m_color.m_a - (state->m_color.m_a / colorDecayFrames);
+        state->m_colorDecayFrames = colorDecayFrames - 1;
     }
 
-    if (*(u8*)&particleData->m_colorDeltaAdd[0] != 0) {
-        *(s16*)&particleData->m_matrix[2][0] = *(s16*)&particleData->m_matrix[2][0] + *(s16*)&particleData->m_velocity.x;
-        *(s16*)((u8*)particleData->m_matrix[2] + 2) = *(s16*)((u8*)particleData->m_matrix[2] + 2) + *(s16*)&particleData->m_velocity.y;
-        *(s16*)&particleData->m_matrix[2][1] = *(s16*)&particleData->m_matrix[2][1] + *(s16*)&particleData->m_velocity.z;
-        *(s16*)((u8*)particleData->m_matrix[2] + 6) = *(s16*)((u8*)particleData->m_matrix[2] + 6) + *(short*)((u8*)&particleData->m_velocity.z + 2);
+    if (state->m_hasImpulse != 0) {
+        state->m_color.m_r = state->m_color.m_r + state->m_colorStep.m_r;
+        state->m_color.m_g = state->m_color.m_g + state->m_colorStep.m_g;
+        state->m_color.m_b = state->m_color.m_b + state->m_colorStep.m_b;
+        state->m_color.m_a = state->m_color.m_a + state->m_colorStep.m_a;
 
-        if (*(s16*)&particleData->m_matrix[2][0] > 0xff) {
-            *(s16*)&particleData->m_matrix[2][0] = 0xff;
+        if (state->m_color.m_r > 0xff) {
+            state->m_color.m_r = 0xff;
         }
-        if (*(s16*)((u8*)particleData->m_matrix[2] + 2) > 0xff) {
-            *(s16*)((u8*)particleData->m_matrix[2] + 2) = 0xff;
+        if (state->m_color.m_g > 0xff) {
+            state->m_color.m_g = 0xff;
         }
-        if (*(s16*)&particleData->m_matrix[2][1] > 0xff) {
-            *(s16*)&particleData->m_matrix[2][1] = 0xff;
+        if (state->m_color.m_b > 0xff) {
+            state->m_color.m_b = 0xff;
         }
-        if (*(s16*)((u8*)particleData->m_matrix[2] + 6) > 0xff) {
-            *(s16*)((u8*)particleData->m_matrix[2] + 6) = 0xff;
+        if (state->m_color.m_a > 0xff) {
+            state->m_color.m_a = 0xff;
         }
 
-        if (*(s16*)&particleData->m_matrix[2][0] < 0) {
-            *(s16*)&particleData->m_matrix[2][0] = 0;
+        if (state->m_color.m_r < 0) {
+            state->m_color.m_r = 0;
         }
-        if (*(s16*)((u8*)particleData->m_matrix[2] + 2) < 0) {
-            *(s16*)((u8*)particleData->m_matrix[2] + 2) = 0;
+        if (state->m_color.m_g < 0) {
+            state->m_color.m_g = 0;
         }
-        if (*(s16*)&particleData->m_matrix[2][1] < 0) {
-            *(s16*)&particleData->m_matrix[2][1] = 0;
+        if (state->m_color.m_b < 0) {
+            state->m_color.m_b = 0;
         }
-        if (*(s16*)((u8*)particleData->m_matrix[2] + 6) < 0) {
-            *(s16*)((u8*)particleData->m_matrix[2] + 6) = 0;
-            *(s16*)&particleData->m_matrix[2][2] = 0;
+        if (state->m_color.m_a < 0) {
+            state->m_color.m_a = 0;
+            state->m_lifeFrames = 0;
         }
     }
 
-    *(s16*)&particleData->m_matrix[2][2] = *(s16*)&particleData->m_matrix[2][2] - 1;
-    if (*(s16*)&particleData->m_matrix[2][2] < 0) {
+    state->m_lifeFrames = state->m_lifeFrames - 1;
+    if (state->m_lifeFrames < 0) {
         InitParticleData(vData, pppPObject, pYmMiasma, particleData);
     }
 
@@ -283,22 +310,22 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     pppSubVector__FR3Vec3Vec3Vec(&delta, &basePos, &worldPos);
     minDist = vData->m_radius - pYmMiasma->m_minDistance;
     if (pppVectorLength__F3Vec(&delta) < minDist) {
-        particleData->m_directionTail.x = particleData->m_directionTail.x + pYmMiasma->m_gravity;
-        *(u8*)&particleData->m_colorDeltaAdd[0] = 1;
+        state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
+        state->m_hasImpulse = 1;
     }
 
-    if (particleData->m_directionTail.x < pYmMiasma->m_minSpeed) {
-        particleData->m_directionTail.x = pYmMiasma->m_minSpeed;
+    if (state->m_speedDecay < pYmMiasma->m_minSpeed) {
+        state->m_speedDecay = pYmMiasma->m_minSpeed;
     }
 
-    particleData->m_matrix[0][0] = particleData->m_matrix[0][0] + particleData->m_directionTail.x * particleData->m_matrix[1][0];
+    particleData->m_matrix[0][0] = particleData->m_matrix[0][0] + state->m_speedDecay * particleData->m_matrix[1][0];
     particleData->m_matrix[0][1] = particleData->m_matrix[0][1] + pYmMiasma->m_heightJitter;
-    particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + particleData->m_directionTail.x * particleData->m_matrix[1][2];
-    particleData->m_directionTail.x = particleData->m_directionTail.x - pYmMiasma->m_speedDecay;
+    particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + state->m_speedDecay * particleData->m_matrix[1][2];
+    state->m_speedDecay = state->m_speedDecay - pYmMiasma->m_speedDecay;
 
-    if (vData->m_unknown4 != FLOAT_80330644 && *(u8*)&particleData->m_colorDeltaAdd[0] == 0) {
+    if (vData->m_unknown4 != FLOAT_80330644 && state->m_hasImpulse == 0) {
         impulse = vData->m_impulse;
-        PSVECScale(&impulse, &impulse, particleData->m_directionTail.x);
+        PSVECScale(&impulse, &impulse, state->m_speedDecay);
         pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, (Vec*)particleData, &impulse);
     }
 
@@ -306,9 +333,9 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)pYmMiasma->m_dataValIndex * 4);
         pppCalcFrameShape__FPlRsRsRss(
             shapeTable,
-            *(short*)((u8*)&particleData->m_colorDeltaAdd[0] + 4),
-            *(short*)((u8*)&particleData->m_colorDeltaAdd[0] + 6),
-            *(short*)((u8*)&particleData->m_colorDeltaAdd[0] + 2),
+            state->m_shapeCurrentFrame,
+            state->m_shapeDrawFrame,
+            state->m_shapeFrameTime,
             (short)pYmMiasma->m_shapeFrameStep);
     }
 }

@@ -416,9 +416,9 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
 void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
     s32* offsets = ((pppYmManaOffsetsRaw*)param_2)->m_serializedDataOffsets;
-    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
     s32 workOffset = offsets[2];
     u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
+    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
     void* handle;
     u32 model;
 

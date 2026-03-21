@@ -287,12 +287,12 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 
         if (fileHandle != 0)
         {
-            if (1 < (unsigned int)System.m_execParam)
+            if ((unsigned int)System.m_execParam >= 2)
             {
                 System.Printf(s_queueWarnTargetFmt, inFlight->m_name, fileHandle->m_name);
             }
         }
-        else if (2 < (unsigned int)System.m_execParam)
+        else if ((unsigned int)System.m_execParam >= 3)
         {
             System.Printf(s_queueWarnAnyFmt, inFlight->m_name);
         }

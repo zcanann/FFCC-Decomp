@@ -105,9 +105,11 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
     }
 
     if (state->countdown == 0) {
+        int count;
         VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
+        VertexApEntry* entry;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
-        VertexApEntry* entry = &env->entries[data->entryIndex];
+        entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
             u32* srcTable = *(u32**)((u8*)env + 0x8);
@@ -115,10 +117,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        int count = data->spawnCount;
+        count = data->spawnCount;
 
         switch (data->mode) {
-        case 0: {
+        case 0:
             while (count-- != 0) {
                 if (state->index >= entry->maxValue) {
                     state->index = 0;
@@ -164,8 +166,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 }
             }
             break;
-        }
-        case 1: {
+        case 1:
             while (count-- != 0) {
                 f32 randValue = Math.RandF();
                 f32 maxValue = (f32)entry->maxValue;
@@ -207,9 +208,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
             }
-            break;
-        }
-        default:
             break;
         }
 

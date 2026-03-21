@@ -89,15 +89,16 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* objBytes = (u8*)obj;
+		u8* colorBase = objBytes + colorOffset;
 		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
-		u8 sourceAlpha = objBytes[colorOffset + 0x8B];
+		u8 sourceAlpha = colorBase[0x8B];
 		double projX = (double)pppMngStPtr->m_matrix.value[0][3];
 		double projY = (double)pppMngStPtr->m_matrix.value[1][3];
 		double projZ = (double)pppMngStPtr->m_matrix.value[2][3];
 		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
 		u32 zAtPixel;
-		float viewport[6];
 		float projection[7];
+		float viewport[6];
 		Mtx cameraMtx;
 		Vec cameraPos;
 		Vec cameraLookAt;

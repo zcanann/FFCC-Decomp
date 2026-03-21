@@ -29,7 +29,16 @@ u32 DAT_8032f4b4;
 int* DAT_8032f4b8;
 volatile unsigned int DAT_8032f4c4;
 volatile int DAT_8032f4c8;
-static const char kRedSoundEmpty[] = "";
+static const char s_redSoundMemorySettingErrorFmt[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
+static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
+static const char s_redSoundAMemorySettingErrorFmt[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
+static const char sRedSoundLogErrorColor[] = "\x1B[7;31m";
+static const char sRedSoundLogReset[] = "\x1B[0m";
+static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
+static const char s_redSoundArNotInitializedFmt[] = "%s\"AR\" was not initialized.%s\n";
+static const char s_redSoundInitOkFmt[] = "%s%sSound Driver Initialize OK.%s\n";
+static const char s_redSoundInitErrorFmt[] = "%s%sSound Driver Initialize ERROR !!%s\n";
+static const char s_redSoundInvalidStreamDataFmt[] = "%s%sSTREAM : This data was not 'STREAM-DATA'.%s\n";
 
 /*
  * --INFO--
@@ -132,32 +141,34 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 	if (param_3 <= 0 || param_5 <= 0) {
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("[%s] Sound Driver Initialize ERROR! %s %s\n", "RedSound", "Invalid parameters", "");
-			fflush(__files + 2);
+			OSReport(s_redSoundInitErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
+			fflush(__files + 1);
 		}
 		return 0;
 	}
 
-	if (((unsigned)param_2 & 0x1f) != 0 || ((unsigned)param_3 & 0x1f) != 0) {
+	if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("[%s] %s Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", (unsigned)param_2, param_3, "");
-			fflush(__files + 2);
+			OSReport(s_redSoundMemorySettingErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)param_2,
+			         param_3, sRedSoundLogReset);
+			fflush(__files + 1);
 		}
 		return 0;
 	}
 
-	if (((unsigned)param_4 & 0x1f) != 0 || ((unsigned)param_5 & 0x1f) != 0) {
+	if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("[%s] A Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", param_4, param_5, "");
-			fflush(__files + 2);
+			OSReport(s_redSoundAMemorySettingErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, param_4, param_5,
+			         sRedSoundLogReset);
+			fflush(__files + 1);
 		}
 		return 0;
 	}
 
 	if (ARCheckInit() == 0) {
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("[%s] AR was not initialized %s\n", "RedSound", "");
-			fflush(__files + 2);
+			OSReport(s_redSoundArNotInitializedFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
+			fflush(__files + 1);
 		}
 		return 0;
 	}
@@ -172,8 +183,8 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	CRedDriver_8032f4c0.Init();
 
 	if (gRedMemoryDebugEnabled != 0) {
-		OSReport("[%s] Sound Driver Initialize OK! %s\n", "RedSound", "");
-		fflush(__files + 2);
+		OSReport(s_redSoundInitOkFmt, sRedSoundLogPrefix, sRedSoundLogInfoColor, sRedSoundLogReset);
+		fflush(__files + 1);
 	}
 
 	return param_3;
@@ -811,7 +822,7 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 		id = GetAutoID();
 		CRedDriver_8032f4c0.StreamPlay(id, data, param_3, param_4, param_5);
 	} else if (gRedMemoryDebugEnabled != 0) {
-		OSReport("[%s] %s STREAM : This data was not stream data. %s\n", "RedSound", kRedSoundEmpty, kRedSoundEmpty);
+		OSReport(s_redSoundInvalidStreamDataFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
 		fflush(__files + 1);
 	}
 

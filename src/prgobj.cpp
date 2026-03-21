@@ -314,7 +314,7 @@ int CGPrgObj::isLoopAnimDirect()
  */
 int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
-	if (seNo == 0 || seNo == -1) {
+	if (seNo == 0 || seNo == 0xffff) {
 		return -1;
 	}
 

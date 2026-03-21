@@ -16,8 +16,7 @@ struct pppBlurChara {
 struct pppBlurCharaUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s16 m_initWOrk;
-    u16 _pad0;
+    s32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
     u8 m_payload[8];
@@ -45,4 +44,3 @@ void pppRenderBlurChara(pppBlurChara*, pppBlurCharaUnkB*, pppBlurCharaUnkC*);
 #endif
 
 #endif
-

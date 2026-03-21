@@ -133,16 +133,6 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800659ec
  * PAL Size: 168b
  * EN Address: TODO
@@ -172,16 +162,6 @@ void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** 
         }
         currentFrame += 8;
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSetUseTexture(tagOAN3_SHAPE*, unsigned char*)
-{
-	// TODO
 }
 
 /*
@@ -235,26 +215,6 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         textureIndex++;
         texturePtr++;
     } while (textureIndex < 0x100);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheUnLoadShapeTexture(pppShapeSt*, CMaterialSet*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*)
-{
-	// TODO
 }
 
 /*

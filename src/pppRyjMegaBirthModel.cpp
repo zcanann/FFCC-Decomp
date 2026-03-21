@@ -527,8 +527,8 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
     u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
-    float value0;
     float value1;
+    float value0;
 
     memset((void*)work, 0, 0xC);
     *(u32*)(work + 0xC) = 0;

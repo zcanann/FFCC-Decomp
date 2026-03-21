@@ -126,7 +126,7 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callba
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileNo];
-    result = __CARDIsWritable(card, ent);
+    result = __CARDAccess(card, ent);
     if (result < 0)
         return __CARDPutControlBlock(card, result);
 

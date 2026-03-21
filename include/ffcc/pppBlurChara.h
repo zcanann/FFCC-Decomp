@@ -15,11 +15,17 @@ struct pppBlurChara {
 
 struct pppBlurCharaUnkB {
     s32 m_graphId;
-    s32 m_dataValIndex;
+    u8 m_afterDrawPass;
+    u8 m_textureMode;
+    u8 m_smallTextureDiv;
+    u8 _pad7;
     s32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[8];
+    f32 m_afterDrawOffsetY;
+    u8 _pad18;
+    u8 m_alpha;
+    u8 _pad1A[2];
 };
 
 struct pppBlurCharaUnkC {

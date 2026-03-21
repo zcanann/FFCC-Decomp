@@ -98,9 +98,9 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
             pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
+            pppFMATRIX outMatrix;
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
-            pppFMATRIX outMatrix;
 
             partMatrix = tailObj->m_obj.m_localMatrix;
             ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
@@ -110,16 +110,14 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.z = outMatrix.value[2][3];
         }
 
-        u8 count = work->m_count;
-        pppCopyVector__FR3Vec3Vec(&temp, &pos);
+        s32 count = work->m_count;
+        Vec historyPos;
         Vec* history = work->m_posHistory;
-        while (count != 0) {
-            Vec historyPos;
 
-            historyPos.x = temp.x;
-            historyPos.y = temp.y;
-            historyPos.z = temp.z;
-            pppCopyVector__FR3Vec3Vec(history, &historyPos);
+        pppCopyVector__FR3Vec3Vec(&historyPos, &pos);
+        while (count > 0) {
+            temp = historyPos;
+            pppCopyVector__FR3Vec3Vec(history, &temp);
             history++;
             count--;
         }
@@ -135,9 +133,9 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
         pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
+        pppFMATRIX outMatrix;
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
-        pppFMATRIX outMatrix;
 
         partMatrix = tailObj->m_obj.m_localMatrix;
         ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
@@ -147,25 +145,25 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.z = outMatrix.value[2][3];
     }
 
-    temp.x = pos.x;
-    temp.y = pos.y;
-    temp.z = pos.z;
+    temp = pos;
     pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
 
     {
-        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+        u8* shape = (u8*)*shapeTable;
         u8* frameEntry;
         s16 frameDuration;
 
         work->m_shapePrevFrame = work->m_shapeFrame;
-        frameEntry = (u8*)shape + ((u32)work->m_shapeFrame << 3) + 0x10;
+        frameEntry = shape + ((u32)work->m_shapeFrame << 3) + 0x10;
 
         work->m_frameAcc += step->m_frameStep;
+        frameEntry = (u8*)shape + ((u32)work->m_shapeFrame << 3) + 0x10;
         frameDuration = *(s16*)(frameEntry + 2);
         if (work->m_frameAcc >= frameDuration) {
             work->m_frameAcc -= frameDuration;
             work->m_shapeFrame++;
-            if (work->m_shapeFrame >= (u16)*(s16*)((u8*)shape + 6)) {
+            if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
                 if ((frameEntry[4] & 0x80) != 0) {
                     work->m_shapeFrame = 0;
                     work->m_frameAcc = 0;
@@ -193,7 +191,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_3;
     KeShpTail2XObject* tailObj = (KeShpTail2XObject*)obj;
     KeShpTail2XWork* work;
-    long* shapeTable;
+    long** shapeTable;
     long* shapeEntry;
     u16 count;
     float alphaMul;
@@ -256,8 +254,8 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     mng = (_pppMngSt*)pppMngStPtr;
-    shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-    shapeEntry = (long*)((u8*)shapeTable + *(s16*)((u8*)shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
+    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
 
     colorR = (float)step->m_colorStartR;
     colorG = (float)step->m_colorStartG;
@@ -457,4 +455,3 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }
-

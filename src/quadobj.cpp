@@ -8,6 +8,7 @@
 
 static const float MaxBounds = 10000000.0;
 static const float MinBounds = -10000000.0;
+
 /*
  * --INFO--
  * Address:	TODO

@@ -406,9 +406,10 @@ void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType typ
 }
 
 void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
-    u32 cnt;
-    s32 type;
-    u32 frac;
+    GXAttr attr;
+    GXCompCnt cnt;
+    GXCompType type;
+    u8 frac;
     u32* va;
     u32* vb;
     u32* vc;
@@ -421,14 +422,14 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
     vb = &__GXData->vatB[vtxfmt];
     vc = &__GXData->vatC[vtxfmt];
 
-    for (; list->attr != GX_VA_NULL; list++) {
-        CHECK_ATTRNAME4(725, list->attr);
-        CHECK_FRAC(726, list->frac);
+    for (; (attr = list->attr) != GX_VA_NULL; list++) {
         cnt = list->cnt;
         type = list->type;
         frac = list->frac;
+        CHECK_ATTRNAME4(725, attr);
+        CHECK_FRAC(726, frac);
 
-        switch (list->attr) {
+        switch (attr) {
         case GX_VA_POS:
             *va = (*va & ~1) | cnt;
             *va = (*va & ~0xE) | ((u32)type << 1);
@@ -495,7 +496,7 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
             break;
         }
 #ifdef DEBUG
-        __GXVerifyVATImm(list->attr, list->cnt, list->type, list->frac);
+        __GXVerifyVATImm(attr, cnt, type, frac);
 #endif
     }
     __GXData->dirtyState |= 0x10;

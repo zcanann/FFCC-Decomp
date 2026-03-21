@@ -7,8 +7,6 @@
 #include "ffcc/sound.h"
 #include "ffcc/vector.h"
 
-#include <math.h>
-
 extern "C" double atan2(double, double);
 
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
@@ -457,18 +455,16 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	Vec deltaPos;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec* basePosVec;
+	Vec deltaPos;
 	float targetRot;
 
-	basePosVec = reinterpret_cast<Vec*>(&basePos);
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
 		targetRot = 0.0f;
 	} else {
-		targetRot = (float)atan2(-deltaPos.x, -deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 	m_rotTargetY = targetRot;
 }

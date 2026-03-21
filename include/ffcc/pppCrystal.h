@@ -1,22 +1,23 @@
 #ifndef _FFCC_PPPCRYSTAL_H_
 #define _FFCC_PPPCRYSTAL_H_
 
+#include <dolphin/gx.h>
 #include <dolphin/types.h>
 
 struct HSD_ImageBuffer;
 
 struct CrystalRefractionMap {
     void* m_imageData;
-    s32 m_format;
-    s32 m_width;
-    s32 m_height;
-    s32 m_imageCount;
-    s32 m_bufferSize;
+    GXTexFmt m_format;
+    u32 m_width;
+    u32 m_height;
+    u32 m_imageCount;
+    u32 m_bufferSize;
 };
 
 struct CrystalWork {
     CrystalRefractionMap* m_refractionMap;
-    void* m_refractionTexObj;
+    GXTexObj* m_refractionTexObj;
 };
 
 struct pppCrystal {

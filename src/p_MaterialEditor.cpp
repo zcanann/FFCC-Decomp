@@ -13,6 +13,7 @@ extern "C" int __cntlzw(unsigned int);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void* __ct__14CUSBStreamDataFv(void* self);
 extern "C" void* __ct__5ZLISTFv(void* self);
+extern "C" ZLIST* __dt__5ZLISTFv(ZLIST* self, short shouldDelete);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
@@ -49,8 +50,8 @@ static void WriteF32(void* base, unsigned int offset, float value) {
  */
 CMaterialEditorPcs::~CMaterialEditorPcs()
 {
-    m_zlist2.~ZLIST();
-    m_zlist1.~ZLIST();
+    __dt__5ZLISTFv(&m_zlist2, -1);
+    __dt__5ZLISTFv(&m_zlist1, -1);
 }
 
 /*

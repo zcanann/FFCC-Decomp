@@ -100,7 +100,6 @@ void CFile::Init()
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
-    m_handlePoolHead.m_next = (CHandle*)m_handlePoolHead.m_currentOffset;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
     unsigned int handleIndex = 0;

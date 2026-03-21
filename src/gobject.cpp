@@ -28,6 +28,11 @@ extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+extern "C" void* __ct__Q29CCharaPcs7CHandleFv(void*);
+extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
+extern "C" void Add__Q29CCharaPcs7CHandleFv(void*);
+extern "C" void LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(void*, int, unsigned long, unsigned long, unsigned long, int, int, int);
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
@@ -108,6 +113,8 @@ static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
+static char s_gobject_cpp[] = "gobject.cpp";
+static char s_r_item[] = "r_item";
 static const float  sAnimFrameOffset = 1.0f;  // FLOAT_80330338
 static const double sLoopBias = 1.2;   // DOUBLE_80330378
 static const float  sZeroFloat = 0.0f;  // FLOAT_80330350
@@ -1926,12 +1933,36 @@ void CGObject::boundCheck()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007cfec
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::Turn(float, int)
+void CGObject::Turn(float targetRot, int turnFrames)
 {
-	// TODO
+    u8* shieldFlags = reinterpret_cast<u8*>(&m_shieldNodeFlags);
+
+    *shieldFlags = (*shieldFlags & 0xBF) | 0x40;
+    m_rotTargetY = targetRot;
+    m_turnBaseSpeed =
+        Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
+    m_attackColliders[0].m_localStart.x = static_cast<float>(turnFrames);
+
+    int animSlot = 2;
+    if (m_turnBaseSpeed >= sZeroFloat) {
+        animSlot = 3;
+    }
+
+    m_currentAnimSlot = m_animQueue[animSlot - 0x41];
+    *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xFE;
+    m_animExtraIndex = -1;
+    m_collisionPushTimer = -1;
+    *shieldFlags &= 0xFD;
+    *shieldFlags &= 0x7F;
+    *shieldFlags = (*shieldFlags & 0xF7) | 8;
+    m_turnSpeed = sZeroFloat;
 }
 
 /*
@@ -2055,12 +2086,40 @@ void CGObject::LoadModel(int, unsigned long, unsigned long, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007cb68
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::LoadWeapon(int, int)
+void CGObject::LoadWeapon(int itemId, int itemVariant)
 {
-	// TODO
+    if (m_weaponModelHandle != 0) {
+        __dt__Q29CCharaPcs7CHandleFv(m_weaponModelHandle, 1);
+        m_weaponModelHandle = 0;
+    }
+
+    if (itemId > 0) {
+        void* handle =
+            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(0x194, Game.m_mainStage, s_gobject_cpp, 0xA11);
+        if (handle != 0) {
+            handle = __ct__Q29CCharaPcs7CHandleFv(handle);
+        }
+
+        m_weaponModelHandle = static_cast<CCharaPcs::CHandle*>(handle);
+        Add__Q29CCharaPcs7CHandleFv(m_weaponModelHandle);
+
+        unsigned long textureVariant = 0;
+        if (m_ownerType == 0) {
+            textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
+        }
+
+        LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
+            m_weaponModelHandle, 4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant),
+            textureVariant, -1, 0, 1);
+        m_weaponAttachNode = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, s_r_item);
+    }
 }
 
 /*

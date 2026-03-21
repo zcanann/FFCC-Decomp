@@ -2,6 +2,10 @@
 #include "dolphin/os.h"
 #include "ffcc/ppp_linkage.h"
 
+struct pppCVECTOR {
+    u8 m_rgba[4];
+};
+
 struct pppYmDrawMdlTexAnmWork {
     u32 m_frame;
     u32 m_wait;
@@ -18,12 +22,42 @@ struct CMapMeshUVLayout {
     s16* m_uvPairs;
 };
 
+struct pppYmDrawMdlTexAnmObject {
+    s32 m_graphId;
+    pppFMATRIX m_localMatrix;
+    u8 _pad34[0xC];
+    pppFMATRIX m_modelViewMatrix;
+    Vec* m_drawMatrixPtr;
+    u8 _pad74[0xC];
+};
+
+struct pppYmDrawMdlTexAnmColorBlock {
+    u8 _pad0[8];
+    pppCVECTOR m_color;
+};
+
 extern f32 FLOAT_80330548;
 extern f32 FLOAT_8033054c;
 extern char DAT_801d9c54[];
 extern char s_PerU___0_2f_PerV___0_2f_801d9c38[];
 
 void pppSetBlendMode(unsigned char);
+
+static inline CMapMesh** GetMapMeshTable()
+{
+    return *(CMapMesh***)((u8*)pppEnvStPtr + 8);
+}
+
+static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(pppYmDrawMdlTexAnmObject* object, _pppCtrlTable* ctrl)
+{
+    return (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
+}
+
+static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(pppYmDrawMdlTexAnmObject* object,
+                                                                         _pppCtrlTable* ctrl)
+{
+    return (pppYmDrawMdlTexAnmColorBlock*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[0]);
+}
 
 extern "C" {
 void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX* matrix);
@@ -44,6 +78,7 @@ void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 fl
  */
 void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
+    pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
     CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
@@ -51,13 +86,14 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     s16 uvValue;
     int i;
 
-    work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
+    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
+    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
     work->m_frame = 0;
     work->m_wait = 0x200;
 
     OSReport(DAT_801d9c54);
 
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0];
+    mapMesh = GetMapMeshTable()[0];
     work->m_perU = FLOAT_8033054c;
     work->m_perV = work->m_perU;
 
@@ -94,14 +130,16 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
  */
 void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
+    pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
     CMapMeshUVLayout* uvLayout;
     s32 uvByteOffset;
     u32 frameU;
     s32 i;
 
-    work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
-    if ((work->m_frame != 0) && ((uvLayout = (CMapMeshUVLayout*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[0]) != NULL)) {
+    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
+    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
+    if ((work->m_frame != 0) && ((uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0]) != NULL)) {
         uvByteOffset = 0;
         for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
             s32 uvByteOffsetV = uvByteOffset + 2;
@@ -137,6 +175,7 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
  */
 void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
+    pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
     CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
@@ -144,7 +183,8 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     s32 uvByteOffset;
     s32 i;
 
-    work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
+    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
+    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
     if (gPppCalcDisabled != 0) {
         return;
     }
@@ -158,7 +198,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
         return;
     }
 
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
+    mapMesh = GetMapMeshTable()[step->m_dataValIndex];
     if ((work->m_perU == FLOAT_8033054c) || (work->m_perV == FLOAT_8033054c)) {
         if (mapMesh == NULL) {
             return;
@@ -217,7 +257,8 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
  */
 void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
-    pppYmDrawMdlTexAnm* ymDrawMdlTexAnm;
+    pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
+    pppYmDrawMdlTexAnmColorBlock* colorBlock;
     pppModelSt* model;
     pppFMATRIX matrix0;
     pppFMATRIX matrix1;
@@ -226,37 +267,34 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     pppFMATRIX matrix4;
     u8* initBytes;
     u8* stepBytes;
-    s32 colorOffset;
-
-    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnm*)object;
-    model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
+    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
+    model = (pppModelSt*)GetMapMeshTable()[step->m_dataValIndex];
     if (model == NULL) {
         return;
     }
 
-    colorOffset = ctrl->m_serializedDataOffsets[0];
+    colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
 
     pppUnitMatrix__FR10pppFMATRIX(&matrix0);
     matrix2 = matrix0;
     matrix2.value[2][2] *= FLOAT_80330548;
 
-    matrix1 = object->m_localMatrix;
+    matrix1 = ymDrawMdlTexAnm->m_localMatrix;
     matrix0.value[2][2] = matrix2.value[2][2];
     pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&matrix0, &matrix1, &matrix2);
 
     matrix4 = matrix0;
     matrix3 = *(pppFMATRIX*)&ppvCameraMatrix02;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX((pppFMATRIX*)((u8*)ymDrawMdlTexAnm + 0x40), &matrix3, &matrix4);
+    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&ymDrawMdlTexAnm->m_modelViewMatrix, &matrix3, &matrix4);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((u8*)ymDrawMdlTexAnm + 0x88 + colorOffset, (u8*)ymDrawMdlTexAnm + 0x40,
-                                                               step->m_arg3, step->m_payload[0xC], initBytes[2],
-                                                               initBytes[1], initBytes[3], stepBytes[0], stepBytes[1],
-                                                               stepBytes[2]);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorBlock->m_color, &ymDrawMdlTexAnm->m_modelViewMatrix,
+                                                               step->m_arg3, step->m_payload[0xC], initBytes[2], initBytes[1],
+                                                               initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
 
     pppSetBlendMode(initBytes[1]);
-    pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)ymDrawMdlTexAnm + 0x70), 1);
+    pppDrawMesh__FP10pppModelStP3Veci(model, ymDrawMdlTexAnm->m_drawMatrixPtr, 1);
 }
 
 }

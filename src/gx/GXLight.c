@@ -1,8 +1,26 @@
-#include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
 
 #include "dolphin/gx/__gx.h"
+
+extern f32 cosf(f32);
+
+static inline float sqrtf(float x) {
+    static const double half = 0.5;
+    static const double three = 3.0;
+    volatile float y;
+
+    if (x > 0.0f) {
+        double guess = __frsqrte((double)x);
+        guess = half * guess * (three - guess * guess * x);
+        guess = half * guess * (three - guess * guess * x);
+        guess = half * guess * (three - guess * guess * x);
+        y = (float)(x * guess);
+        return y;
+    }
+
+    return x;
+}
 
 // GXLightObj private data
 typedef struct {

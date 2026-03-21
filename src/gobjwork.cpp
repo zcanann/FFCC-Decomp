@@ -1868,7 +1868,7 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
 {
 	unsigned int isInvalid = 0;
-	if ((cmdListIdx > 1) && (m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF)) {
+	if ((cmdListIdx > 1) && (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1)) {
 		isInvalid = 1;
 	}
 
@@ -1880,13 +1880,13 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 
 	groupedCount = 1;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+		short* slotRef = (short*)m_commandListExtra + cmdListIdx;
 		if (slotRef[0] != 0) {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
 				do {
-					if (slotRef[0] != 0xFFFF) {
+					if (slotRef[0] != -1) {
 						break;
 					}
 					slotRef--;
@@ -1897,10 +1897,10 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 
 			groupedCount = 1;
 			scanCount = m_numCmdListSlots - (topIdx + 1);
-			slotRef = m_commandListInventorySlotRef + topIdx + 1;
+			slotRef = (short*)m_commandListExtra + topIdx + 1;
 			if ((topIdx + 1) < m_numCmdListSlots) {
 				do {
-					if (slotRef[0] != 0xFFFF) {
+					if (slotRef[0] != -1) {
 						break;
 					}
 					groupedCount++;
@@ -1917,10 +1917,10 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	int scanCount = cmdListIdx + 1;
-	short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+	short* slotRef = (short*)m_commandListExtra + cmdListIdx;
 	if (cmdListIdx >= 0) {
 		do {
-			if (slotRef[0] != 0xFFFF) {
+			if (slotRef[0] != -1) {
 				break;
 			}
 			slotRef--;

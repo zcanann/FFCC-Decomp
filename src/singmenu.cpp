@@ -1592,25 +1592,20 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
  */
 double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
 {
-    int denom;
-    float result;
     float span;
 
-    if (mode == 0) {
-        denom = listSize - 8;
+    if (mode != 0) {
+        span = static_cast<float>(static_cast<double>(listSize - 1));
     } else {
-        denom = listSize - 1;
+        span = static_cast<float>(static_cast<double>(listSize - 8));
     }
 
-    span = static_cast<float>(static_cast<double>(denom));
-
-    result = FLOAT_8033299c;
-    if ((FLOAT_8033294c < span) && (8 < listSize)) {
-        result = (FLOAT_803329a0 * (static_cast<float>(static_cast<double>(listPos)) / span)) +
-                 FLOAT_8033292c;
+    if ((span <= FLOAT_8033294c) || (listSize <= 8)) {
+        return FLOAT_8033299c;
     }
 
-    return static_cast<double>(result);
+    return (FLOAT_803329a0 * (static_cast<float>(static_cast<double>(listPos)) / span)) +
+           FLOAT_8033292c;
 }
 
 /*

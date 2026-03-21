@@ -25,9 +25,9 @@ struct Vec4d {
 };
 
 struct pppBlurCharaWork {
-    int m_captureBuffer;
+    void* m_captureBuffer;
     void* m_ownerObj;
-    int m_smallTexObj;
+    _GXTexObj* m_smallTexObj;
     float m_savedModelField;
 };
 
@@ -164,7 +164,9 @@ void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
     BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(((void**)param_2)[1], 0);
+    pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
+    pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
@@ -176,9 +178,13 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     width = (int)FLOAT_80331050;
     height = (int)FLOAT_80331054;
 
-    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
@@ -193,7 +199,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     gUtil.EndQuadEnv();
 
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
-    GXSetScissor(0, 0, width, height);
+    GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
 
     rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     rawModel->m_afterDrawModelCallback = 0;
@@ -203,22 +209,21 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     Graphic.SetViewport();
     GXSetScissor(0, 0, 0x280, 0x1C0);
-    Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, width, height, 0,
-                               GX_NEAR, GX_TF_I8, 0);
+    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
 
-    if (*((unsigned char*)param_3 + 4) == 1) {
-        float offsetY = *(float*)((char*)param_3 + 0x14);
+    if (renderData->m_afterDrawPass == 1) {
+        float offsetY = renderData->m_afterDrawOffsetY;
         float offsetX = FLOAT_80331044 * offsetY;
 
         gUtil.RenderTextureQuad(-offsetX, -offsetY, FLOAT_80331050 + offsetX, FLOAT_80331054 + offsetY,
-                                (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+                                work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_MODULATE);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-        GXLoadTexObj((_GXTexObj*)((void**)param_2)[2], GX_TEXMAP0);
+        GXLoadTexObj(work->m_smallTexObj, GX_TEXMAP0);
 
         posA.x = offsetX;
         posA.y = offsetY;
@@ -231,8 +236,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         gUtil.RenderQuad(posA, posB, white, 0, 0);
         gUtil.EndQuadEnv();
 
-        Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, width, height, 0,
-                                   GX_NEAR, GX_TF_I8, 0);
+        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
     }
 
     gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0, 0,
@@ -326,10 +330,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
-        work->m_captureBuffer = pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr,
-                                                                      s_pppBlurChara_cpp_801DB620, 0xD5);
-        work->m_smallTexObj = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
-                                                                    s_pppBlurChara_cpp_801DB620, 0xD7);
+        work->m_captureBuffer = reinterpret_cast<void*>(
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr, s_pppBlurChara_cpp_801DB620, 0xD5));
+        work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, s_pppBlurChara_cpp_801DB620, 0xD7));
 
         *(pppBlurCharaWork**)(model + 0xE4) = work;
         *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;
@@ -348,7 +352,6 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
-    u8* stepBytes = reinterpret_cast<u8*>(param_2);
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     u8* blurBase = reinterpret_cast<u8*>(blurChara);
     int textureBase = 0;
@@ -376,7 +379,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Vec quadA;
     Vec quadB;
 
-    if (stepBytes[5] == 1) {
+    if (param_2->m_textureMode == 1) {
         textureIndex = 0;
         if (param_2->m_initWOrk == -1) {
             return;
@@ -384,7 +387,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
             ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
-        unsigned int div = stepBytes[6];
+        unsigned int div = param_2->m_smallTextureDiv;
         Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_LINEAR, GX_TF_RGBA8,
                                        0);
     }
@@ -392,7 +395,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>(blurBase + colorOffset + 0x88), 0,
-                                                               FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1, 1, 0);
+                                                               FLOAT_80331030, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = *reinterpret_cast<int*>(blurBase + texOffset + 0x84);
 
     PSMTXIdentity(identityMtx);
@@ -445,7 +448,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-    if (stepBytes[5] == 1) {
+    if (param_2->m_textureMode == 1) {
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
     } else {
         GXLoadTexObj(&smallBackTex, GX_TEXMAP1);

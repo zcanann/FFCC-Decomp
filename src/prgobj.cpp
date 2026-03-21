@@ -19,6 +19,7 @@ extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" float FLOAT_80331BD4;
+extern "C" float FLOAT_80331BD8;
 
 /*
  * --INFO--
@@ -314,7 +315,7 @@ int CGPrgObj::isLoopAnimDirect()
  */
 int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
-	if (seNo == 0 || seNo == -1) {
+	if (seNo == 0 || seNo == 0xffff) {
 		return -1;
 	}
 
@@ -497,7 +498,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
-	Math.DstRot(m_rotBaseY, 3.1415927f + targetRot);
+	Math.DstRot(m_rotBaseY, FLOAT_80331BD8 + targetRot);
 }
 
 /*
@@ -511,6 +512,8 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::ClassControl(int classControl, int value)
 {
+	unsigned char* weaponNodeFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+
 	switch (classControl) {
 	case 0:
 		reinterpret_cast<CGPartyObj*>(this)->ChangeCommandMode(value);
@@ -519,17 +522,15 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
-		if ((((char)m_weaponNodeFlags) >> 7) != value) {
+		if ((static_cast<int>((static_cast<unsigned int>(*weaponNodeFlags) << 24) >> 31)) != value) {
 			onChangePrg(value);
-			m_weaponNodeFlags = (m_weaponNodeFlags & 0x7FFF) | ((value & 1) << 15);
+			*weaponNodeFlags = (static_cast<unsigned char>(value) << 7) | (*weaponNodeFlags & 0x7F);
 		}
 		break;
 	case 3:
-	{
-		unsigned char* classFlags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
-		*classFlags = (*classFlags & 0xF7) | ((value & 1) << 3);
+		*(reinterpret_cast<unsigned char*>(this) + 0x6B8) =
+		    (static_cast<unsigned char>(value) << 3) & 8 | (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
 		break;
-	}
 	case 4:
 	{
 		int oldState = getReplaceStat(value);

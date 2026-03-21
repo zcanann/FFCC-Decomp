@@ -45,13 +45,15 @@ static void WriteF32(void* base, unsigned int offset, float value) {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c6a0
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMaterialEditorPcs::~CMaterialEditorPcs()
 {
-    __dt__5ZLISTFv(&m_zlist2, -1);
-    __dt__5ZLISTFv(&m_zlist1, -1);
 }
 
 /*

@@ -69,7 +69,7 @@ void game(int argc, char** argv)
     char** argument;
 
     Game.Init();
-    strcpy(Game.m_currentScriptName, kDefaultScriptName);
+    strcpy(Game.m_startScriptName, kDefaultScriptName);
 
     if (argc != 0) {
         argument = argv + 1;
@@ -77,7 +77,7 @@ void game(int argc, char** argv)
         parseLanguage = 0;
         for (i = 1; i < argc; i++) {
             if (copyScriptName) {
-                strcpy(Game.m_currentScriptName, *argument);
+                strcpy(Game.m_startScriptName, *argument);
                 copyScriptName = 0;
             } else if (parseLanguage) {
                 cmp = strcmp(*argument, kLanguageArgUs);

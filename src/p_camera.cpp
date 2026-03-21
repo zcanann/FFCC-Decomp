@@ -936,9 +936,9 @@ void CCameraPcs::createMap()
     float fVar5;
     float fVar6;
 
-    fVar2 = FLOAT_8032fa5c;
     fVar1 = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x478) = FLOAT_8032fa34;
+    fVar2 = FLOAT_8032fa5c;
+    *reinterpret_cast<float*>(self + 0x478) = fVar1;
     fVar4 = FLOAT_8032fab0;
     *reinterpret_cast<float*>(self + 0x474) = fVar1;
     fVar5 = FLOAT_8032fab4;

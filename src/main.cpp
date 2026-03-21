@@ -63,19 +63,18 @@ void game(int argc, char** argv)
 {
     char c;
     int cmp;
-    int i;
     int copyScriptName;
     int parseLanguage;
+    int i;
     char** argument;
 
     Game.Init();
     strcpy(Game.m_startScriptName, kDefaultScriptName);
 
     if (argc != 0) {
-        argument = argv + 1;
         copyScriptName = 0;
         parseLanguage = 0;
-        for (i = 1; i < argc; i++) {
+        for (i = 1, argument = argv + 1; i < argc; i++, argument++) {
             if (copyScriptName) {
                 strcpy(Game.m_startScriptName, *argument);
                 copyScriptName = 0;
@@ -126,8 +125,6 @@ void game(int argc, char** argv)
                     }
                 }
             }
-
-            argument++;
         }
     }
 

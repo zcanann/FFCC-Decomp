@@ -89,6 +89,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* objBytes = (u8*)obj;
+		u8* colorBase = objBytes + colorOffset;
 		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
 		u8* colorBase = objBytes + colorOffset;
 		u8 sourceAlpha = colorBase[0x8B];

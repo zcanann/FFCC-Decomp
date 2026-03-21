@@ -269,30 +269,35 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 {
     CHandle* inFlight;
 
-    while ((inFlight = CheckQueue()) != 0)
+    while (1)
     {
+        inFlight = CheckQueue();
+        if (inFlight == 0)
+        {
+            break;
+        }
+
         SyncCompleted(inFlight);
 
         if (fileHandle != 0 && inFlight == fileHandle)
         {
             inFlight->m_completionStatus = 0;
+            continue;
         }
-        else
+
+        if (fileHandle != 0)
         {
-            if (fileHandle == 0)
-            {
-                if (2 < (unsigned int)System.m_execParam)
-                {
-                    System.Printf(s_queueWarnAnyFmt, inFlight->m_name);
-                }
-            }
-            else if (1 < (unsigned int)System.m_execParam)
+            if (1 < (unsigned int)System.m_execParam)
             {
                 System.Printf(s_queueWarnTargetFmt, inFlight->m_name, fileHandle->m_name);
             }
-
-            inFlight->m_completionStatus = 1;
         }
+        else if (2 < (unsigned int)System.m_execParam)
+        {
+            System.Printf(s_queueWarnAnyFmt, inFlight->m_name);
+        }
+
+        inFlight->m_completionStatus = 1;
     }
 }
 #pragma dont_inline reset

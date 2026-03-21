@@ -32,6 +32,13 @@ static void appendString(char* dst, const char* src)
 	*dst = '\0';
 }
 
+struct CFlatRuntimeLifecycleProxy
+{
+    virtual void Init();
+    virtual void Destroy();
+    virtual void Quit();
+};
+
 
 /*
  * --INFO--
@@ -79,10 +86,8 @@ CFlatRuntime::~CFlatRuntime()
 extern "C" CFlatRuntime* dtor_80069A2C(CFlatRuntime* flatRuntime, short shouldDelete)
 {
 	if (flatRuntime != 0) {
-		typedef void (*QuitFn)(CFlatRuntime*);
-
 		*(void***)flatRuntime = __vt__12CFlatRuntime;
-		reinterpret_cast<QuitFn>((*reinterpret_cast<void***>(flatRuntime))[4])(flatRuntime);
+		reinterpret_cast<CFlatRuntimeLifecycleProxy*>(flatRuntime)->Quit();
 		if (0 < shouldDelete) {
 			__dl__FPv(flatRuntime);
 		}

@@ -8,8 +8,6 @@
 
 static const float MaxBounds = 10000000.0;
 static const float MinBounds = -10000000.0;
-static const float EPS = 0.0;
-
 
 /*
  * --INFO--
@@ -97,8 +95,9 @@ bool CGQuadObj::isInner(Vec* vec)
 			for (; i < (int)count; i++) {
 				float z0 = self->m_vertices[0].z;
 				float x0 = self->m_vertices[0].x;
-				int next = (i + 1) - ((i + 1) / (int)count) * count;
-				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < EPS) {
+				int quotient = (i + 1) / (int)count;
+				int next = (i + 1) - quotient * (int)count;
+				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
 					break;
 				}
 				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));

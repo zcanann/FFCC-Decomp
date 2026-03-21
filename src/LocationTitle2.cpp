@@ -44,7 +44,7 @@ struct LocationTitle2Particle {
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
-    s16 m_frame;
+    u16 m_frame;
     s16 m_pad0;
     s16 m_shape;
     s16 m_pad1;

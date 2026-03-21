@@ -1,6 +1,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
+#include "ffcc/file.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/color.h"
@@ -275,6 +276,7 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
     unsigned int* loadHandles =
         reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x22A2C);
     unsigned int value = 0;
+
     for (int count = 2; count != 0; count--) {
         if (loadHandles[0] != 0) {
             return (unsigned long long)value;

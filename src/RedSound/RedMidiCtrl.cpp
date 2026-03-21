@@ -2560,45 +2560,38 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
 void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int* trackData = (int*)track;
-    unsigned char mode;
-    unsigned int rawValue;
-    int value;
-    unsigned char* modePtr;
-    unsigned char* valuePtr;
+    unsigned char* command = *(unsigned char**)track;
+    unsigned int value = command[1];
 
-    modePtr = (unsigned char*)trackData[0];
-    trackData[0] = (int)(modePtr + 1);
-    valuePtr = (unsigned char*)trackData[0];
-    mode = *modePtr;
-    trackData[0] = (int)(valuePtr + 1);
-    rawValue = *valuePtr;
-
-    if (rawValue == 0) {
+    *(unsigned char**)track = command + 2;
+    if (value == 0) {
         value = 0x100;
     } else {
-        value = rawValue + 1;
+        value += 1;
     }
 
-    if (mode == 3) {
+    switch (*command) {
+    case 3:
         trackData[0x3b] = value;
         trackData[0x3f] |= 0x20000;
-    } else if (mode < 3) {
-        if (mode == 1) {
-            trackData[0x39] = value;
-            trackData[0x3f] |= 0x8000;
-        } else if (mode != 0) {
-            trackData[0x3a] = value;
-            trackData[0x3f] |= 0x10000;
-        } else {
-            trackData[0x38] = value;
-            trackData[0x3f] |= 0x4000;
-        }
-    } else if (mode < 5) {
+        return;
+    case 1:
+        trackData[0x39] = value;
+        trackData[0x3f] |= 0x8000;
+        return;
+    case 2:
+        trackData[0x3a] = value;
+        trackData[0x3f] |= 0x10000;
+        return;
+    case 4:
         trackData[0x3c] = value;
         trackData[0x3f] |= 0x40000;
-    } else {
+        return;
+    case 0:
+    default:
         trackData[0x38] = value;
         trackData[0x3f] |= 0x4000;
+        return;
     }
 }
 

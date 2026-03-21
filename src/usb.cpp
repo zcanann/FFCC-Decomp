@@ -95,7 +95,7 @@ int CUSB::IsConnected()
  * Address:\tTODO
  * Size:\tTODO
  */
-bool CUSB::SendMessage(unsigned long, MCCChannel)
+int CUSB::SendMessage(unsigned long, MCCChannel)
 {
 	return true;
 }
@@ -105,7 +105,7 @@ bool CUSB::SendMessage(unsigned long, MCCChannel)
  * Address:\tTODO
  * Size:\tTODO
  */
-bool CUSB::Write(void*, int)
+int CUSB::Write(void*, int)
 {
 	return true;
 }

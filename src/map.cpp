@@ -1290,13 +1290,14 @@ void CMapKeyFrame::ReadJun(CChunkFile& chunkFile, int count)
  */
 void CMapKeyFrame::ReadFrame(CChunkFile& chunkFile, int)
 {
-    const int startFrame = static_cast<int>(chunkFile.Get4());
-    const int endFrame = static_cast<int>(chunkFile.Get4());
+    int frame = chunkFile.Get4();
 
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = startFrame;
-    *reinterpret_cast<int*>(Ptr(this, 8)) = startFrame;
-    *reinterpret_cast<int*>(Ptr(this, 0x10)) = endFrame;
-    *reinterpret_cast<int*>(Ptr(this, 0x14)) = endFrame;
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = frame;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = frame;
+
+    frame = chunkFile.Get4();
+    *reinterpret_cast<int*>(Ptr(this, 0x10)) = frame;
+    *reinterpret_cast<int*>(Ptr(this, 0x14)) = frame;
     *reinterpret_cast<unsigned char*>(Ptr(this, 0)) = static_cast<unsigned char>(chunkFile.Get4());
 }
 

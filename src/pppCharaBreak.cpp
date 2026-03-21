@@ -36,6 +36,7 @@ extern double DOUBLE_80332070;
 extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
+extern Vec kPppCharaBreakUpVector;
 extern int ppvSinTbl;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
@@ -378,14 +379,11 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     S16Vec* workNormals = *(S16Vec**)((u8*)mesh + 4);
     u8* modelData = *(u8**)((u8*)model + 0xA4);
     u32 normQuant = *(u32*)(modelData + 0x38);
-    Vec up;
-    up.x = FLOAT_80332048;
-    up.y = FLOAT_8033204c;
-    up.z = FLOAT_80332048;
 
     for (u32 i = 0; i < polygonCount; i++) {
         Vec normal;
         Vec tangent;
+        Vec up = kPppCharaBreakUpVector;
 
         int alpha = (int)breakData[0x34] + rand() % breakData[0x35];
         if (alpha > 0xFF) {
@@ -404,9 +402,9 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.x = Math.RandF(FLOAT_8033204c);
             normal.y = Math.RandF(FLOAT_8033204c);
             normal.z = Math.RandF(FLOAT_8033204c);
-            normal.x *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.y *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
-            normal.z *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.x *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.y *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.z *= (rand() % 2) ? FLOAT_80332078 : FLOAT_8033204c;
             PSVECNormalize(&normal, &normal);
             ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)gUtil, &polygonData->m_normalA, &normal, normQuant);
         } else {
@@ -432,7 +430,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
 
         if (breakData[0x40] == 1) {
             polygonData->m_normalA.x = 0;
-            polygonData->m_normalA.y = (rand() & 1);
+            polygonData->m_normalA.y = rand() % 2;
             polygonData->m_normalA.z = 0;
         }
 

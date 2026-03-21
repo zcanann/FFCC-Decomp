@@ -32,8 +32,8 @@ public:
     void Connect();
     void Disconnect();
     void Frame();
-    bool Write(void*, int);
-    bool SendMessage(unsigned long, MCCChannel);
+    int Write(void*, int);
+    int SendMessage(unsigned long, MCCChannel);
     int IsConnected();
     void AddMessageCallback(MessageCallback, void*);
     void RemoveMessageCallback(MessageCallback);

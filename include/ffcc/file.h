@@ -41,6 +41,24 @@ public:
 		void Close();
 	};
 
+	class CHandlePoolHead
+	{
+	public:
+		CHandle* m_next;
+		CHandle* m_previous;
+		unsigned int m_flags;
+		DVDFileInfo m_dvdFileInfo;
+		unsigned int m_fileOffset;
+		int m_priority;
+		int m_length;
+		unsigned int m_userParam;
+		int m_completionStatus;
+		int m_closedFlag;
+		char m_name[64];
+		unsigned int m_chunkSize;
+		unsigned int m_currentOffset;
+	};
+
 	void Init();
 	void Quit();
 	void Frame();
@@ -69,9 +87,9 @@ public:
     CHandle m_fileHandle;          // 0x0c-0xb7
     void* m_freeListSentinelDummy; // 0xb8
     CHandle* m_freeList;           // 0xbc
-    CHandle m_handlePoolHead;      // 0xc0-0x16b
-    int m_fatalDiskErrorFlag;      // 0x16c
-    int m_isDiskError;             // 0x170
+    CHandlePoolHead m_handlePoolHead; // 0xc0-0x167
+    int m_fatalDiskErrorFlag;      // 0x168
+    int m_isDiskError;             // 0x16c
 };
 
 extern CFile File;

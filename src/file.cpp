@@ -140,6 +140,7 @@ void CFile::Init()
         handleIndex++;
 
         byteOffset += 0x2B0;
+        handleIndex++;
     }
 }
 

@@ -348,11 +348,13 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
-    u8* dataValBytes = reinterpret_cast<u8*>(&param_2->m_dataValIndex);
+    u8* stepBytes = reinterpret_cast<u8*>(param_2);
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    u8* blurBase = reinterpret_cast<u8*>(blurChara);
     int textureBase = 0;
     int textureIndex;
-    int colorOffset = param_3->m_serializedDataOffsets[1];
-    int texOffset = param_3->m_serializedDataOffsets[2];
+    int colorOffset = serializedDataOffsets[1];
+    int texOffset = serializedDataOffsets[2];
     int objPosBase;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
@@ -374,7 +376,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Vec quadA;
     Vec quadB;
 
-    if (dataValBytes[1] == 1) {
+    if (stepBytes[5] == 1) {
         textureIndex = 0;
         if (param_2->m_initWOrk == -1) {
             return;
@@ -382,16 +384,16 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
             ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
-        unsigned int div = dataValBytes[2];
-        Graphic.CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);
+        unsigned int div = stepBytes[6];
+        Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / div, 0xE0 / div, GX_LINEAR, GX_TF_RGBA8,
+                                       0);
     }
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((pppCVECTOR*)((char*)blurChara + 0x88 + colorOffset),
-                                                               0, FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1,
-                                                               1, 0);
-    objPosBase = *(int*)((char*)blurChara + 0x84 + texOffset);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>(blurBase + colorOffset + 0x88), 0,
+                                                               FLOAT_80331030, param_2->m_payload[5], 0, 0, 0, 1, 1, 0);
+    objPosBase = *reinterpret_cast<int*>(blurBase + texOffset + 0x84);
 
     PSMTXIdentity(identityMtx);
 
@@ -426,13 +428,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
-    drawColor = *(_GXColor*)((char*)blurChara + 0x88 + colorOffset);
+    drawColor = *reinterpret_cast<_GXColor*>(blurBase + colorOffset + 0x88);
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);
-    GXLoadTexObj(*(_GXTexObj**)((char*)blurChara + 0x88 + texOffset), GX_TEXMAP0);
+    GXLoadTexObj(*reinterpret_cast<_GXTexObj**>(blurBase + texOffset + 0x88), GX_TEXMAP0);
     _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 10, 8,
                                                                                                           0xF);
     _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
@@ -443,7 +445,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-    if (dataValBytes[1] == 1) {
+    if (stepBytes[5] == 1) {
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
     } else {
         GXLoadTexObj(&smallBackTex, GX_TEXMAP1);

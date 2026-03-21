@@ -50,6 +50,19 @@ typedef struct {
     int precision;
 } print_format;
 
+enum {
+    PRINTF_STR_NEG_INF = 1,
+    PRINTF_STR_NEG_inf = 6,
+    PRINTF_STR_INF = 11,
+    PRINTF_STR_inf = 15,
+    PRINTF_STR_NEG_NAN = 19,
+    PRINTF_STR_NEG_nan = 24,
+    PRINTF_STR_NAN = 29,
+    PRINTF_STR_nan = 33,
+};
+
+const char printf_stringBase0[] = "\0-INF\0-inf\0INF\0inf\0-NAN\0-nan\0NAN\0nan";
+
 static const char* parse_format_801B860C(const char *format_string, va_list *arg, print_format *format) {
     print_format f;
     const char* s = format_string;
@@ -552,13 +565,13 @@ static char * double2hex(long double num, char * buff, print_format format)  {
     if (*dec.sig.text == 'I') {
         if (*(short*) &ld & 0x8000) {
             p = buff - 5;
-            if (format.conversion_char == 'A') strcpy(p, "-INF");
-            else strcpy(p, "-inf");
+            if (format.conversion_char == 'A') strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_INF);
+            else strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_inf);
         }
         else {
             p = buff - 4;
-            if (format.conversion_char == 'A') strcpy(p, "INF");
-            else strcpy(p, "inf");
+            if (format.conversion_char == 'A') strcpy(p, printf_stringBase0 + PRINTF_STR_INF);
+            else strcpy(p, printf_stringBase0 + PRINTF_STR_inf);
         }
 
         return p;
@@ -566,13 +579,13 @@ static char * double2hex(long double num, char * buff, print_format format)  {
     if (*dec.sig.text == 'N') {
         if (*(unsigned char*) &num & 0x80) {
             p = buff - 5;
-            if (format.conversion_char == 'A') strcpy(p, "-NAN");
-            else strcpy(p, "-nan");
+            if (format.conversion_char == 'A') strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_NAN);
+            else strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_nan);
         }
         else {
             p = buff - 4;
-            if (format.conversion_char == 'A') strcpy(p, "NAN");
-            else strcpy(p, "nan");
+            if (format.conversion_char == 'A') strcpy(p, printf_stringBase0 + PRINTF_STR_NAN);
+            else strcpy(p, printf_stringBase0 + PRINTF_STR_nan);
         }
 
         return p;
@@ -731,19 +744,19 @@ static char* float2str(long double num, char *buff, print_format format) {
                 p = buff - 5;
 
                 if (isupper(format.conversion_char)) {
-                    strcpy(p, "-INF");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_INF);
                 }
                 else {
-                    strcpy(p, "-inf");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_inf);
                 }
             }
             else {
                 p = buff - 4;
                 if (isupper(format.conversion_char)) {
-                    strcpy(p, "INF");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_INF);
                 }
                 else {
-                    strcpy(p, "inf");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_inf);
                 }
             }
 
@@ -754,19 +767,19 @@ static char* float2str(long double num, char *buff, print_format format) {
                 p = buff - 5;
 
                 if (isupper(format.conversion_char)) {
-                    strcpy(p, "-NAN");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_NAN);
                 }
                 else {
-                    strcpy(p, "-nan");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_NEG_nan);
                 }
             }
             else {
                 p = buff - 4;
                 if (isupper(format.conversion_char)) {
-                    strcpy(p, "NAN");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_NAN);
                 }
                 else {
-                    strcpy(p, "nan");
+                    strcpy(p, printf_stringBase0 + PRINTF_STR_nan);
                 }
             }
 

@@ -114,6 +114,8 @@ void __ct__8CMonWorkFv(void*);
 void __dt__8CMonWorkFv(void*, int);
 void __ct__9CFlatDataFv(void*);
 void __dt__9CFlatDataFv(void*, int);
+void ResetNewGame__13CFlatRuntime2Fv(void*);
+void InitFurTexBuffer__6CCharaFv(void*);
 void* __vt__8CManager[];
 CCaravanWork* dtor_800A2B9C(CCaravanWork*, short);
 CMonWork* dtor_8009E9B4(CMonWork*, short);
@@ -179,13 +181,10 @@ int CGBaseObj::GetCID()
  */
 extern "C" void __sinit_game_cpp(void)
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
     CGame* game = &Game;
     const char* townName;
 
+    *reinterpret_cast<void**>(game) = __vt__8CManager;
     *reinterpret_cast<void**>(game) = __vt__5CGame;
     memset(reinterpret_cast<unsigned char*>(game) + 0xF, 0, 0x13E1);
     memset(reinterpret_cast<unsigned char*>(game) + 0x20, 0xFF, 0x10);
@@ -206,14 +205,14 @@ extern "C" void __sinit_game_cpp(void)
     __construct_array(
         game->m_caravanWorkArr,
         reinterpret_cast<ConstructorDestructor>(__ct__12CCaravanWorkFv),
-        reinterpret_cast<ConstructorDestructor>(__dt__12CCaravanWorkFv),
+        reinterpret_cast<ConstructorDestructor>(dtor_800A2B9C),
         0xC30,
         9
     );
     __construct_array(
         game->m_monWorkArr,
         reinterpret_cast<ConstructorDestructor>(__ct__8CMonWorkFv),
-        reinterpret_cast<ConstructorDestructor>(__dt__8CMonWorkFv),
+        reinterpret_cast<ConstructorDestructor>(dtor_8009E9B4),
         0x110,
         0x40
     );
@@ -228,7 +227,7 @@ extern "C" void __sinit_game_cpp(void)
     __construct_array(
         game->m_cFlatDataArr,
         reinterpret_cast<ConstructorDestructor>(__ct__9CFlatDataFv),
-        reinterpret_cast<ConstructorDestructor>(__dt__9CFlatDataFv),
+        reinterpret_cast<ConstructorDestructor>(dtor_800980B4),
         0x14D4,
         4
     );
@@ -600,8 +599,8 @@ void CGame::InitNewGame()
     }
 
     strcpy(Game.m_gameWork.m_townName, townName);
-    gCFlatRuntime2.ResetNewGame();
-    gChara.InitFurTexBuffer();
+    ResetNewGame__13CFlatRuntime2Fv(CFlat);
+    InitFurTexBuffer__6CCharaFv(reinterpret_cast<CChara*>(Chara));
 }
 
 /*
@@ -801,8 +800,8 @@ void CGame::CheckScriptChange()
         }
 
         strcpy(gameWork->m_townName, townName);
-        gCFlatRuntime2.ResetNewGame();
-        gChara.InitFurTexBuffer();
+        ResetNewGame__13CFlatRuntime2Fv(CFlat);
+        InitFurTexBuffer__6CCharaFv(reinterpret_cast<CChara*>(Chara));
         m_nextScript.m_flags = 0;
     }
 

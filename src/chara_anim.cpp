@@ -433,67 +433,64 @@ copy_bank:
 	    reinterpret_cast<void*>(animFields.m_bankAddress + S32At(reinterpret_cast<void*>(S32At(Chara, 8284)), 8)),
 	    animFields.m_bankSize);
 
-	unsigned int frameInt = static_cast<unsigned int>(frame);
+	int frameInt = static_cast<int>(frame);
 	animFields.m_lastFrame = 0;
 
-	float v3 = 0.0f;
 	float frameFrac = frame - static_cast<float>(frameInt);
-	if (frameInt == static_cast<unsigned int>(animFields.m_frameCount - 1)) {
+	if (frameInt == animFields.m_frameCount - 1) {
 		frameFrac = 0.0f;
 	}
 
 	unsigned int flags = (node.m_flags >> 0xD) & 0x3FFFF;
-	int frameOffset = (int)(frameInt * 2);
-	float* inData = reinterpret_cast<float*>(node.m_dataOffset + reinterpret_cast<int>(animFields.m_bank));
+	int frameOffset = frameInt * 2;
+	unsigned char* inData = Ptr(animFields.m_bank, node.m_dataOffset);
 	float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
-			*outData = v3;
+			*outData = 0.0f;
 		} else if ((flags & 3) == 1) {
-			float v2 = *inData;
-			inData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + 2);
+			float v2 = *reinterpret_cast<float*>(inData);
+			inData += 2;
 			*outData = v2;
 		} else {
-			float v2 = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + frameOffset);
-			*outData = (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + frameOffset + 2) - v2) * frameFrac + v2;
-			inData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			float v2 = *reinterpret_cast<float*>(inData + frameOffset);
+			*outData = (*reinterpret_cast<float*>(inData + frameOffset + 2) - v2) * frameFrac + v2;
+			inData += (animFields.m_frameCount + 1) * 2;
 		}
-		v3 = 0.0f;
 		flags = (unsigned int)((int)flags >> 2);
-		outData = outData + 1;
+		outData++;
 	}
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
-			*outData = v3;
+			*outData = 0.0f;
 		} else if ((flags & 3) == 1) {
-			float v2 = *inData;
-			inData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + 2);
+			float v2 = *reinterpret_cast<float*>(inData);
+			inData += 2;
 			*outData = v2;
 		} else {
-			float v2 = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + frameOffset);
-			*outData = (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + frameOffset + 2) - v2) * frameFrac + v2;
-			inData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			float v2 = *reinterpret_cast<float*>(inData + frameOffset);
+			*outData = (*reinterpret_cast<float*>(inData + frameOffset + 2) - v2) * frameFrac + v2;
+			inData += (animFields.m_frameCount + 1) * 2;
 		}
-		v3 = 1.0f;
 		flags = (unsigned int)((int)flags >> 2);
-		outData = outData + 1;
+		outData++;
 	}
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
-			*outData = v3;
+			*outData = 1.0f;
 		} else if ((flags & 3) == 1) {
-			float v2 = *inData;
-			inData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + 2);
+			float v2 = *reinterpret_cast<float*>(inData);
+			inData += 2;
 			*outData = v2;
 		} else {
-			float v2 = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + frameOffset);
-			*outData = (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + frameOffset + 2) - v2) * frameFrac + v2;
-			inData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			float v2 = *reinterpret_cast<float*>(inData + frameOffset);
+			*outData = (*reinterpret_cast<float*>(inData + frameOffset + 2) - v2) * frameFrac + v2;
+			inData += (animFields.m_frameCount + 1) * 2;
 		}
 		flags = (unsigned int)((int)flags >> 2);
-		outData = outData + 1;
+		outData++;
 	}
 }

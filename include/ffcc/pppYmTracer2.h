@@ -28,8 +28,6 @@ struct pppYmTracer2 {
 extern "C" {
 #endif
 
-void initTracePolygon(PYmTracer2*, TRACE_POLYGON*);
-void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);
 void pppConstructYmTracer2(pppYmTracer2*, pppYmTracer2UnkC*);
 void pppConstruct2YmTracer2(pppYmTracer2*, pppYmTracer2UnkC*);
 void pppDestructYmTracer2(pppYmTracer2*, pppYmTracer2UnkC*);

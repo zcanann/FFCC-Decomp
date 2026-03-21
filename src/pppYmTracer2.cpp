@@ -72,36 +72,6 @@ union PackedColor {
     u8 bytes[4];
 };
 
-static float* resolveTracerWorkValue(s32 valueIndex, s32 workOffset)
-{
-    if (valueIndex == -1) {
-        return reinterpret_cast<float*>(gPppDefaultValueBuffer);
-    }
-
-    TracerMngRaw* mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
-    return reinterpret_cast<float*>(mng->dataValues[valueIndex].workBase + 0x80 + workOffset);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void initTracePolygon(PYmTracer2*, TRACE_POLYGON&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
-{
-	// TODO
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80103e68
@@ -194,6 +164,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     TraceEntry* entry;
     TraceEntry* dest;
     TracerWork* work;
+    TracerMngRaw* mng;
+    float* resolvedWork;
     Vec local_a8;
     Vec local_9c;
     Vec local_90;
@@ -211,8 +183,23 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     iVar4 = param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
 
-    work->initWork = resolveTracerWorkValue(param_2->m_initWOrk, param_2->m_stepValue);
-    work->arg3Work = resolveTracerWorkValue(param_2->m_arg3, *(s32*)param_2->m_payload);
+    if (param_2->m_initWOrk == -1) {
+        resolvedWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    } else {
+        mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
+        resolvedWork =
+            reinterpret_cast<float*>(mng->dataValues[param_2->m_initWOrk].workBase + 0x80 + param_2->m_stepValue);
+    }
+    work->initWork = resolvedWork;
+
+    if (param_2->m_arg3 == -1) {
+        resolvedWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    } else {
+        mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
+        resolvedWork =
+            reinterpret_cast<float*>(mng->dataValues[param_2->m_arg3].workBase + 0x80 + *(s32*)param_2->m_payload);
+    }
+    work->arg3Work = resolvedWork;
 
     if (work->entries == nullptr) {
         useFallback = true;

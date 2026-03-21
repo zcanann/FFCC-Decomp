@@ -40,8 +40,6 @@ public:
         dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
         dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
     }
-    ~CMaterialEditorPcs();
-
     void Init();
     void Quit();
     int GetTable(unsigned long);

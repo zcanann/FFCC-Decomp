@@ -92,23 +92,24 @@ void CSystem::Init()
     MemoryCardMan.Init();
 
     m_orderCount = 0;
-    m_orderSentinel.m_priority = 0xFF;
     m_orderSentinel.m_next = &m_orderSentinel;
     m_orderSentinel.m_previous = &m_orderSentinel;
-    m_freeOrderHead.m_next = &m_orderPool[0];
+    m_orderSentinel.m_priority = 0xFF;
+    m_freeOrderHead.m_next = m_orderPool;
     int i = 0;
-    int count = 0x20;
     COrder* order = m_orderPool;
-    do
+    for (unsigned int count = 0x20; count != 0; count--)
     {
         order[0].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
-        order[1].m_next = (i == 0x7E) ? &m_freeOrderHead : &m_orderPool[i + 2];
-        order[2].m_next = (i == 0x7D) ? &m_freeOrderHead : &m_orderPool[i + 3];
-        order[3].m_next = (i == 0x7C) ? &m_freeOrderHead : &m_orderPool[i + 4];
+        i++;
+        order[1].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
+        i++;
+        order[2].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
+        i++;
+        order[3].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
         order += 4;
-        i += 4;
-        count--;
-    } while (count != 0);
+        i++;
+    }
 
     m_ownerThread = OSGetCurrentThread();
     m_scenegraphStepMode = 0;
@@ -133,10 +134,11 @@ void CSystem::Init()
         CFile::CHandle* fileHandle = File.Open((char*)"gamePalM.map", 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            m_mapSize = File.GetLength(fileHandle);
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[m_mapSize];
+            unsigned int mapSize = File.GetLength(fileHandle);
+            m_mapSize = mapSize;
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[mapSize];
             unsigned int offset = 0;
-            unsigned int remaining = m_mapSize;
+            int remaining = mapSize;
             unsigned int chunkSize;
             for (; remaining != 0; remaining -= chunkSize)
             {
@@ -146,7 +148,7 @@ void CSystem::Init()
                     chunkSize = remaining;
                 }
 
-                fileHandle->m_length = chunkSize;
+                fileHandle->m_chunkSize = chunkSize;
                 fileHandle->m_currentOffset = offset;
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);

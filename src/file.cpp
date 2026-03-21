@@ -225,7 +225,10 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 
     if (entry != -1)
 	{
+        u32 length;
+
         DVDFastOpen(entry, &fi);
+        length = fi.length;
         handle = m_freeList;
         m_freeList = handle->m_previous;
         handle->m_previous = it;
@@ -234,19 +237,19 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
         it->m_next = handle;
         handle->m_priority = pri;
         handle->m_userParam = userParam;
-        handle->m_length = fi.length;
+        handle->m_length = length;
         handle->m_completionStatus = 0;
         handle->m_closedFlag = 0;
         handle->m_flags = 0;
         strcpy(handle->m_name, path);
-        handle->m_chunkSize = fi.length;
+        handle->m_chunkSize = length;
         handle->m_currentOffset = 0;
         handle->m_nextOffset = 0;
+        fi.cb.userData = handle;
         handle->m_dvdFileInfo = fi;
-        handle->m_dvdFileInfo.cb.userData = handle;
 	}
 
-    if (handle == 0 && System.m_execParam != 0)
+    if (handle == 0 && (unsigned int)System.m_execParam >= 1)
 	{
         System.Printf(s_queueWarnAnyFmt, path);
     }

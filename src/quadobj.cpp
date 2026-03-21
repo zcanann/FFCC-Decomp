@@ -6,11 +6,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const float MaxBounds = 10000000.0;
-static const float MinBounds = -10000000.0;
-static const float EPS = 0.0;
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -98,7 +93,7 @@ bool CGQuadObj::isInner(Vec* vec)
 				float z0 = self->m_vertices[0].z;
 				float x0 = self->m_vertices[0].x;
 				int next = (i + 1) - ((i + 1) / (int)count) * count;
-				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < EPS) {
+				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
 					break;
 				}
 				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
@@ -123,10 +118,10 @@ void CGQuadObj::Reset(float base, float height)
 	m_vertexCount = 0;
 	m_yBase = base;
 	m_yHeight = height;
-	m_bboxMinZ = MaxBounds;
-	m_bboxMinX = MaxBounds;
-	m_bboxMaxZ = MinBounds;
-	m_bboxMaxX = MinBounds;
+	m_bboxMinZ = 10000000.0f;
+	m_bboxMinX = 10000000.0f;
+	m_bboxMaxZ = -10000000.0f;
+	m_bboxMaxX = -10000000.0f;
 }
 
 /*

@@ -55,6 +55,13 @@ struct TracerWork {
     u16 pad32;
 };
 
+struct TracerDataVal {
+    u32 unk0;
+    float* work;
+    u32 unk8;
+    u32 unkC;
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -168,6 +175,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     TraceEntry* entry;
     TraceEntry* dest;
     TracerWork* work;
+    TracerDataVal* dataVals;
     Vec local_a8;
     Vec local_9c;
     Vec local_90;
@@ -184,18 +192,19 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     useFallback = false;
     iVar4 = param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
+    dataVals = *(TracerDataVal**)((u8*)pppMngStPtr + 0xD4);
 
     if (param_2->m_initWOrk == -1) {
         pWorkPtr = gPppDefaultValueBuffer;
     } else {
-        pWorkPtr = (u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue;
+        pWorkPtr = (u8*)dataVals[param_2->m_initWOrk].work + param_2->m_stepValue + 0x80;
     }
     work->initWork = (float*)pWorkPtr;
 
     if (param_2->m_arg3 == -1) {
         pWorkPtr = gPppDefaultValueBuffer;
     } else {
-        pWorkPtr = (u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload;
+        pWorkPtr = (u8*)dataVals[param_2->m_arg3].work + *(s32*)param_2->m_payload + 0x80;
     }
     work->arg3Work = (float*)pWorkPtr;
 
@@ -332,6 +341,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
     u8* work;
+    u8* color;
     u8* poly;
     CMapMesh* mapMesh;
     CTexture* texture;
@@ -339,8 +349,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     s32 dataOffset;
     s32 i;
     u16 count;
-    u32 colorTop;
-    u32 colorBottom;
+    _GXColor topColor;
+    _GXColor bottomColor;
     f32 uTop;
     f32 uBottom;
     float uvStep;
@@ -350,19 +360,20 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + dataOffset;
+    color = (u8*)pppYmTracer2 + 0x80 + colorOffset;
     mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
 
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (void*)((u8*)pppYmTracer2 + 0x88 + colorOffset), (void*)&ppvCameraMatrix0, FLOAT_80331840,
+            color + 8, (void*)&ppvCameraMatrix02, FLOAT_80331840,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
         textureIndex = 0;
         texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (texture != nullptr) {
-            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+            GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
             GXSetNumChans(1);
             GXSetNumTexGens(1);
             GXSetNumTevStages(1);
@@ -372,7 +383,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            if ((texture->m_maxLod == 8) || (texture->m_maxLod == 9)) {
+            if ((*(u32*)((u8*)texture + 0x60) == 8) || (*(u32*)((u8*)texture + 0x60) == 9)) {
                 SetUpPaletteEnv(texture);
             }
 
@@ -402,28 +413,30 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                         alphaScale = FLOAT_80331844;
                     }
 
-                    colorTop =
-                        ((u32)poly[0x1C] << 24) | ((u32)poly[0x1D] << 16) | ((u32)poly[0x1E] << 8) |
-                        (u8)(alphaScale * poly[0x1F]);
-                    colorBottom =
-                        ((u32)poly[0x44] << 24) | ((u32)poly[0x45] << 16) | ((u32)poly[0x46] << 8) |
-                        (u8)(alphaScale * poly[0x47]);
+                    topColor.r = poly[0x1C];
+                    topColor.g = poly[0x1D];
+                    topColor.b = poly[0x1E];
+                    topColor.a = (u8)(alphaScale * poly[0x1F]);
+                    bottomColor.r = poly[0x44];
+                    bottomColor.g = poly[0x45];
+                    bottomColor.b = poly[0x46];
+                    bottomColor.a = (u8)(alphaScale * poly[0x47]);
 
                     GXPosition3f32(*(f32*)(poly + 0x10), *(f32*)(poly + 0x14), *(f32*)(poly + 0x18));
-                    GXColor1u32(colorTop);
+                    GXColor1u32(*(u32*)&topColor);
                     GXTexCoord2f32(uTop, FLOAT_80331844);
 
                     GXPosition3f32(*(f32*)(poly + 0x0), *(f32*)(poly + 0x4), *(f32*)(poly + 0x8));
-                    GXColor1u32(colorTop);
+                    GXColor1u32(*(u32*)&topColor);
                     GXTexCoord2f32(uTop, FLOAT_80331840);
 
                     GXPosition3f32(*(f32*)(poly + 0x38), *(f32*)(poly + 0x3C), *(f32*)(poly + 0x40));
-                    GXColor1u32(colorBottom);
+                    GXColor1u32(*(u32*)&bottomColor);
                     GXTexCoord2f32(uBottom, FLOAT_80331844);
 
                     poly += 0x28;
                     GXPosition3f32(*(f32*)(poly + 0x0), *(f32*)(poly + 0x4), *(f32*)(poly + 0x8));
-                    GXColor1u32(colorBottom);
+                    GXColor1u32(*(u32*)&bottomColor);
                     GXTexCoord2f32(uBottom, FLOAT_80331840);
                 }
             }

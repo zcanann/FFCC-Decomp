@@ -89,73 +89,80 @@ void _InitGxFunc()
 	int tevInOff = 0;
 	int tevOpOff = 0;
 	int tevSwapOff = 0;
-	char* tevOrder = (char*)s_GXSetTevOrder_Reg;
-	int count = 2;
+	int* tevOrder = (int*)s_GXSetTevOrder_Reg;
 
-	do {
-		*(int*)((char*)s_GXSetTevColorOp_Reg + tevOpOff) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + tevOpOff) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + tevSwapOff) = -1;
-		*(int*)((char*)s_GXSetTevColorIn_Reg + tevInOff) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + tevInOff) = -1;
-		*(int*)tevOrder = -1;
+	for (int count = 2; count != 0; count--) {
+		int value = -1;
+		int i1 = i + 1;
+		int i2 = i + 2;
+		int i3 = i + 3;
+		int i4 = i + 4;
+		int i5 = i + 5;
+		int i6 = i + 6;
+		int i7 = i + 7;
 
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 1) * 8) = -1;
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 1) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 1) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 1) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 1) * 0x14) = -1;
-		*(int*)(tevOrder + 0xC) = -1;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + tevOpOff) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + tevOpOff) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + tevSwapOff) = value;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + tevInOff) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + tevInOff) = value;
+		tevOrder[0] = value;
 
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 2) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 2) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 2) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 2) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 2) * 8) = -1;
-		*(int*)(tevOrder + 0x18) = -1;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i1 * 8) = value;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i1 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i1 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i1 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i1 * 0x14) = value;
+		tevOrder[3] = value;
 
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 3) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 3) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 3) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 3) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 3) * 8) = -1;
-		*(int*)(tevOrder + 0x24) = -1;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i2 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i2 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i2 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i2 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i2 * 8) = value;
+		tevOrder[6] = value;
 
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 4) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 4) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 4) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 4) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 4) * 8) = -1;
-		*(int*)(tevOrder + 0x30) = -1;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i3 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i3 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i3 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i3 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i3 * 8) = value;
+		tevOrder[9] = value;
 
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 5) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 5) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 5) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 5) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 5) * 8) = -1;
-		*(int*)(tevOrder + 0x3C) = -1;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i4 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i4 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i4 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i4 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i4 * 8) = value;
+		tevOrder[12] = value;
 
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 6) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 6) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 6) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 6) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 6) * 8) = -1;
-		*(int*)(tevOrder + 0x48) = -1;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i5 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i5 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i5 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i5 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i5 * 8) = value;
+		tevOrder[15] = value;
 
-		*(int*)(tevOrder + 0x54) = -1;
-		*(int*)((char*)s_GXSetTevColorIn_Reg + (i + 7) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevAlphaIn_Reg + (i + 7) * 0x10) = -1;
-		*(int*)((char*)s_GXSetTevColorOp_Reg + (i + 7) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevAlphaOp_Reg + (i + 7) * 0x14) = -1;
-		*(int*)((char*)s_GXSetTevSwapMode_Reg + (i + 7) * 8) = -1;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i6 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i6 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i6 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i6 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i6 * 8) = value;
+		tevOrder[18] = value;
+
+		tevOrder[21] = value;
+		*(int*)((char*)s_GXSetTevColorIn_Reg + i7 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevAlphaIn_Reg + i7 * 0x10) = value;
+		*(int*)((char*)s_GXSetTevColorOp_Reg + i7 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevAlphaOp_Reg + i7 * 0x14) = value;
+		*(int*)((char*)s_GXSetTevSwapMode_Reg + i7 * 8) = value;
 
 		i += 8;
 		tevSwapOff += 0x40;
 		tevOpOff += 0xA0;
 		tevInOff += 0x80;
-		tevOrder += 0x60;
-		count--;
-	} while (count != 0);
+		tevOrder += 0x18;
+	}
 
 	s_GXSetTevSwapModeTable_Reg[0].red = (_GXTevColorChan)-1;
 	s_GXSetTevSwapModeTable_Reg[1].red = (_GXTevColorChan)-1;

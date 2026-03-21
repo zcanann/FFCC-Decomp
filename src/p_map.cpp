@@ -1,6 +1,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
+#include "ffcc/file.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/color.h"
@@ -272,35 +273,42 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    CMapMng* mapMng = &MapMng;
+    char* mapMng = reinterpret_cast<char*>(&MapMng);
     unsigned int value = 0;
-    for (int count = 2; count != 0; count--) {
-        if (*(int*)((char*)mapMng + 0x22A2C) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A30) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A34) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A38) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A3C) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A40) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A44) != 0) {
-            return (unsigned long long)value;
-        }
-        if (*(int*)((char*)mapMng + 0x22A48) != 0) {
-            return (unsigned long long)value;
-        }
 
-        mapMng = (CMapMng*)((char*)mapMng + 0xC);
+    for (int count = 2; count != 0; count--) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
+        }
+        mapMng += 4;
         value += 7;
     }
 

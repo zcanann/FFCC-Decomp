@@ -105,9 +105,12 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
     }
 
     if (state->countdown == 0) {
+        int count;
         VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
+        VertexApEntry* entry;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
-        VertexApEntry* entry = &env->entries[data->entryIndex];
+
+        entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
             u32* srcTable = *(u32**)((u8*)env + 0x8);
@@ -115,7 +118,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        int count = data->spawnCount;
+        count = data->spawnCount;
 
         switch (data->mode) {
         case 0: {
@@ -134,8 +137,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -178,8 +181,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
                     Vec pos;
@@ -209,8 +212,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             }
             break;
         }
-        default:
-            break;
         }
 
         state->countdown = data->spawnDelay;

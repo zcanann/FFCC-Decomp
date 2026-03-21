@@ -7,8 +7,6 @@
 #include "ffcc/sound.h"
 #include "ffcc/vector.h"
 
-#include <math.h>
-
 extern "C" double atan2(double, double);
 
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);

@@ -406,9 +406,9 @@ void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType typ
 }
 
 void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
-    u32 cnt;
-    s32 type;
-    u32 frac;
+    GXCompCnt cnt;
+    GXCompType type;
+    u8 frac;
     u32* va;
     u32* vb;
     u32* vc;

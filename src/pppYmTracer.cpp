@@ -1,6 +1,7 @@
 #include "ffcc/pppYmTracer.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/textureman.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
@@ -12,6 +13,7 @@ extern f32 FLOAT_803306e8;
 extern f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
+extern f64 DOUBLE_803306F0;
 extern f64 DOUBLE_803306f8;
 
 extern "C" {
@@ -29,6 +31,28 @@ void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int,
 }
 
 static char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
+
+struct TracerDataValue {
+    u32 unk0;
+    u8* workBase;
+    u32 unk8;
+    u32 unkC;
+};
+
+struct TracerMngRaw {
+    u8 _pad[0xD4];
+    TracerDataValue* dataValues;
+};
+
+static float* resolveTracerWorkValue(s32 valueIndex, s32 workOffset)
+{
+    if (valueIndex == -1) {
+        return reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    }
+
+    TracerMngRaw* mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
+    return reinterpret_cast<float*>(mng->dataValues[valueIndex].workBase + 0x80 + workOffset);
+}
 
 struct TRACE_POLYGON {
     Vec from;
@@ -198,19 +222,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     }
 
     if (param_2->m_graphId == ((s32*)pppYmTracer)[0]) {
-        if (param_2->m_initWOrk == -1) {
-            *(f32**)(work + 0x20) = (f32*)gPppDefaultValueBuffer;
-        } else {
-            *(f32**)(work + 0x20) =
-                (f32*)((u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue);
-        }
-
-        if (param_2->m_arg3 == -1) {
-            *(f32**)(work + 0x24) = (f32*)gPppDefaultValueBuffer;
-        } else {
-            *(f32**)(work + 0x24) =
-                (f32*)((u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload);
-        }
+        *(f32**)(work + 0x20) = resolveTracerWorkValue(param_2->m_initWOrk, param_2->m_stepValue);
+        *(f32**)(work + 0x24) = resolveTracerWorkValue(param_2->m_arg3, *(s32*)param_2->m_payload);
     }
 
     if (*(u16*)(work + 0x2C) + 1 < maxCount) {
@@ -348,7 +361,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
         textureIndex = 0;
         texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (texture != nullptr) {
-            GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
+            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
             GXSetNumTexGens(1);
             GXSetNumTevStages(1);
@@ -358,12 +371,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
+            if ((texture->m_format == 8) || (texture->m_format == 9)) {
                 SetUpPaletteEnv(texture);
             }
 
             count = *(u16*)(work + 0x2C);
-            uvStep = FLOAT_803306ec / (f32)((f64)count - DOUBLE_803306f8);
+            uvStep = FLOAT_803306ec / (f32)((f64)(u32)count - DOUBLE_803306F0);
             GXSetCullMode(GX_CULL_NONE);
             poly = *(TRACE_POLYGON**)(work + 0x28);
 

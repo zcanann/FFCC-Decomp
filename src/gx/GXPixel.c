@@ -287,8 +287,9 @@ void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
     }
 
     if (p2f[pix_fmt] == 4) {
-        pix_fmt -= GX_PF_Y8;
-        SET_REG_FIELD(534, __GXData->cmode1, 2, 9, pix_fmt);
+        u32 reg = __GXData->cmode1;
+        reg = (reg & ~0x600) | (((pix_fmt - GX_PF_Y8) & 0x3) << 9);
+        __GXData->cmode1 = reg;
         __GXData->cmode1 = (__GXData->cmode1 & ~0xFF000000) | 0x42000000;
         GX_WRITE_RAS_REG(__GXData->cmode1);
     }

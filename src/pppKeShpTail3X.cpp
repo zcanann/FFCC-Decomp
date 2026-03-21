@@ -60,6 +60,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     s16* stepWork;
     Vec pos;
     Vec temp;
+    Vec historyPos;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -89,16 +90,12 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
             pos.z = outMatrix.value[2][3];
         }
 
-        pppCopyVector__FR3Vec3Vec(&temp, &pos);
+        pppCopyVector__FR3Vec3Vec(&historyPos, &pos);
         Vec* history = work->m_posHistory;
         s32 i = 0x1c;
         do {
-            Vec historyPos;
-
-            historyPos.x = temp.x;
-            historyPos.y = temp.y;
-            historyPos.z = temp.z;
-            pppCopyVector__FR3Vec3Vec(history, &historyPos);
+            temp = historyPos;
+            pppCopyVector__FR3Vec3Vec(history, &temp);
             history++;
             i--;
         } while (i > 0);
@@ -126,9 +123,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         pos.z = outMatrix.value[2][3];
     }
 
-    temp.x = pos.x;
-    temp.y = pos.y;
-    temp.z = pos.z;
+    temp = pos;
     pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
 
     work->m_values[8] += work->m_values[0xc];

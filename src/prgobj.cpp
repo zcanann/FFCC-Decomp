@@ -429,12 +429,12 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
  */
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
-	float targetRot;
-	Vec deltaPos;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
+	CVector deltaPos;
+	float targetRot;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
 		targetRot = 0.0f;
 	} else {
@@ -480,16 +480,14 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
  */
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
-	float targetRot;
-	Vec* basePosVec;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector deltaPos;
+	float targetRot;
 
-	basePosVec = reinterpret_cast<Vec*>(&basePos);
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
-		targetRot = 0.0f;
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	if (deltaPos.x == FLOAT_80331BD4 || deltaPos.z == FLOAT_80331BD4) {
+		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}

@@ -2276,7 +2276,9 @@ void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
  */
 void CRedDriver::TestProcess(int processType)
 {
-    if (processType == 1) {
+    switch (processType) {
+    case 1:
         _DMACheckProcess();
+        break;
     }
 }

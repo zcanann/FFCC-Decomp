@@ -108,7 +108,7 @@ void CFile::Init()
         CHandle* nextHandle;
 
         if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeList;
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
@@ -116,7 +116,7 @@ void CFile::Init()
         handleIndex++;
 
         if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeList;
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
@@ -124,7 +124,7 @@ void CFile::Init()
         handleIndex++;
 
         if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeList;
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
@@ -132,7 +132,7 @@ void CFile::Init()
         handleIndex++;
 
         if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeList;
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }

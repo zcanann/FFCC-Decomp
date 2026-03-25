@@ -1,7 +1,7 @@
 #ifndef _PPP_LASER_H_
 #define _PPP_LASER_H_
 
-#include "dolphin/types.h"
+#include "ffcc/partMng.h"
 
 struct pppLaser {
     u8 field_0x0[0x84];
@@ -19,32 +19,26 @@ struct pppLaser {
 };
 
 struct pppLaserUnkB {
-    // TODO: Define pppLaserUnkB structure
-    u8 placeholder[0x100];
-};
-
-struct UnkCLaserOffsets {
-    int m_serializedDataOffsets[3];
-};
-
-struct pppLaserUnkC {
-    u8 unk_00[0xc];
-    UnkCLaserOffsets* offsets;
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u16 m_initWOrk;
+    u16 m_stepValue;
+    s32 m_arg3;
+    u8* m_payload;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructLaser(struct pppLaser* pppLaser, struct pppLaserUnkC* param_2);
-void pppConstruct2Laser(struct pppLaser* pppLaser, struct pppLaserUnkC* param_2);
-void pppDestructLaser(struct pppLaser* pppLaser, struct pppLaserUnkC* param_2);
-void pppFrameLaser(struct pppLaser* pppLaser, struct pppLaserUnkB* param_2, struct pppLaserUnkC* param_3);
-void pppRenderLaser(struct pppLaser* pppLaser, struct pppLaserUnkB* param_2, struct pppLaserUnkC* param_3);
+void pppConstructLaser(struct pppLaser* pppLaser, _pppCtrlTable* param_2);
+void pppConstruct2Laser(struct pppLaser* pppLaser, _pppCtrlTable* param_2);
+void pppDestructLaser(struct pppLaser* pppLaser, _pppCtrlTable* param_2);
+void pppFrameLaser(struct pppLaser* pppLaser, struct pppLaserUnkB* param_2, _pppCtrlTable* param_3);
+void pppRenderLaser(struct pppLaser* pppLaser, struct pppLaserUnkB* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_LASER_H_
-

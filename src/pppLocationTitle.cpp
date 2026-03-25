@@ -145,7 +145,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                                                   pppEnvStPtr->m_stagePtr, s_pppLocationTitle_cpp, 0x6d);
         particle = (LocationTitleParticle*)work->m_particles;
 
-        for (u16 i = 0; i < param_2->m_maxCount; i++) {
+        for (int i = 0; i < param_2->m_maxCount; i++) {
             int randomValue;
             s16 shapeCount;
             s16 shape;
@@ -166,79 +166,70 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         }
     }
 
-    if (work->m_count + 1 >= param_2->m_maxCount) {
-        return;
-    }
+    if (work->m_count + 1 < param_2->m_maxCount) {
+        graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
+        if (graphFrame >= (int)param_2->m_spawnFrame) {
+            LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
+            u16 count = work->m_count;
+            pppFMATRIX localMatrix;
+            pppFMATRIX managerMatrix;
+            pppFMATRIX resultMatrix;
 
-    graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
-    if (graphFrame < (int)param_2->m_spawnFrame) {
-        return;
-    }
+            localMatrix = *(pppFMATRIX*)((u8*)pppLocationTitle + 4);
+            managerMatrix = pppMngStPtr->m_matrix;
+            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&resultMatrix, &managerMatrix, &localMatrix);
 
-    {
-        LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
-        u16 count = work->m_count;
-        pppFMATRIX localMatrix;
-        pppFMATRIX managerMatrix;
-        pppFMATRIX resultMatrix;
+            particles[count].m_pos.x = resultMatrix.value[0][3];
+            particles[count].m_pos.y = resultMatrix.value[1][3];
+            particles[count].m_pos.z = resultMatrix.value[2][3];
 
-        localMatrix = *(pppFMATRIX*)((u8*)pppLocationTitle + 4);
-        managerMatrix = pppMngStPtr->m_matrix;
-        pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&resultMatrix, &managerMatrix, &localMatrix);
-
-        particles[count].m_pos.x = resultMatrix.value[0][3];
-        particles[count].m_pos.y = resultMatrix.value[1][3];
-        particles[count].m_pos.z = resultMatrix.value[2][3];
-
-        if (count == 0) {
-            particles[count].m_frame = work->m_cur;
-            memcpy(&particles[count].m_color, colorSrc, 4);
-        } else {
-            particles[count - 1].m_frame = work->m_cur;
-            memcpy(&particles[count - 1].m_color, colorSrc, 4);
-        }
-
-        work->m_count = count + 1;
-    }
-
-    if (work->m_count > 1) {
-        LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
-        Vec subVec;
-        Vec interp[50];
-        LocationTitleParticle* startParticle;
-        u8 stepCount = param_2->m_stepCount;
-        int startIndex = (int)work->m_count - 2;
-        int inserted = 0;
-        double stepScale = (double)(1.0f / (float)(stepCount + 1));
-
-        startParticle = &particles[startIndex];
-        PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &subVec);
-
-        for (int i = 0; i < stepCount; i++) {
-            Vec scaled;
-            float t = (float)(stepScale * (double)(i + 1));
-
-            PSVECScale(&subVec, &scaled, t);
-            PSVECAdd(&startParticle->m_pos, &scaled, &interp[i]);
-            inserted++;
-            work->m_count++;
-
-            if (param_2->m_maxCount <= (u16)(work->m_count + 1)) {
-                break;
+            if (count == 0) {
+                particles[count].m_frame = work->m_cur;
+                memcpy(&particles[count].m_color, colorSrc, 4);
+            } else {
+                particles[count - 1].m_frame = work->m_cur;
+                memcpy(&particles[count - 1].m_color, colorSrc, 4);
             }
-        }
 
-        {
-            Vec tailPos = particles[startIndex + 1].m_pos;
-            pppCopyVector(particles[startIndex + inserted + 1].m_pos, tailPos);
-        }
+            work->m_count = count + 1;
 
-        for (int i = 0; i < inserted; i++) {
-            LocationTitleParticle* dst = &particles[startIndex + i + 1];
-            Vec interpPos = interp[i];
-            pppCopyVector(dst->m_pos, interpPos);
-            memcpy(&dst->m_color, colorSrc, 4);
-            dst->m_frame = work->m_cur;
+            if (work->m_count > 1) {
+                Vec subVec;
+                Vec interp[50];
+                LocationTitleParticle* startParticle;
+                u8 stepCount = param_2->m_stepCount;
+                int startIndex = (int)work->m_count - 2;
+                int inserted = 0;
+                double stepScale = (double)(1.0f / (float)(stepCount + 1));
+
+                startParticle = &particles[startIndex];
+                PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &subVec);
+
+                for (int i = 0; i < stepCount; i++) {
+                    Vec scaled;
+                    float t = (float)(stepScale * (double)(i + 1));
+
+                    PSVECScale(&subVec, &scaled, t);
+                    PSVECAdd(&startParticle->m_pos, &scaled, &interp[i]);
+                    inserted++;
+                    work->m_count++;
+
+                    if (param_2->m_maxCount <= (u16)(work->m_count + 1)) {
+                        break;
+                    }
+                }
+
+                pppCopyVector(particles[startIndex + inserted + 1].m_pos,
+                              particles[startIndex + 1].m_pos);
+
+                for (int i = 0; i < inserted; i++) {
+                    LocationTitleParticle* dst = &particles[startIndex + i + 1];
+
+                    pppCopyVector(dst->m_pos, interp[i]);
+                    memcpy(&dst->m_color, colorSrc, 4);
+                    dst->m_frame = work->m_cur;
+                }
+            }
         }
     }
 }

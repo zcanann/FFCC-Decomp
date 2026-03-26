@@ -41,11 +41,11 @@ extern const char* s_SlotBTextByLanguage[];
  */
 int CMenuPcs::GetSlotABXPos(int right)
 {
-    CGame& game = Game;
-    const unsigned char languageId = game.m_gameWork.m_languageId;
+    unsigned char languageId = Game.m_gameWork.m_languageId;
     const char* slotAText;
+
     switch (languageId) {
-    case 1:
+    case 2:
         slotAText = s_McWinMessGroup0_de[2];
         break;
     case 3:
@@ -57,6 +57,7 @@ int CMenuPcs::GetSlotABXPos(int right)
     case 5:
         slotAText = s_McWinMessGroup0_fr[2];
         break;
+    case 1:
     default:
         slotAText = s_McWinMessGroup0_en[2];
         break;
@@ -89,11 +90,11 @@ int CMenuPcs::GetSlotABXPos(int right)
  */
 int CMenuPcs::GetYesNoXPos(int right)
 {
-    CGame& game = Game;
-    const unsigned char languageId = game.m_gameWork.m_languageId;
+    unsigned char languageId = Game.m_gameWork.m_languageId;
     const char* yesText;
+
     switch (languageId) {
-    case 1:
+    case 2:
         yesText = s_McWinMessGroup0_de[13];
         break;
     case 3:
@@ -105,6 +106,7 @@ int CMenuPcs::GetYesNoXPos(int right)
     case 5:
         yesText = s_McWinMessGroup0_fr[13];
         break;
+    case 1:
     default:
         yesText = s_McWinMessGroup0_en[13];
         break;
@@ -154,13 +156,12 @@ const char* CMenuPcs::GetWinMess(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
-    CGame& game = Game;
+    unsigned char languageId = Game.m_gameWork.m_languageId;
     const char* const* result;
-    int languageId = game.m_gameWork.m_languageId;
 
     if (group == 0) {
         switch (languageId) {
-        case 1:
+        case 2:
             result = s_McWinMessGroup0_de;
             break;
         case 3:
@@ -172,13 +173,14 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         case 5:
             result = s_McWinMessGroup0_fr;
             break;
+        case 1:
         default:
             result = s_McWinMessGroup0_en;
             break;
         }
     } else if (group == 1) {
         switch (languageId) {
-        case 1:
+        case 2:
             result = s_McWinMessGroup1_de;
             break;
         case 3:
@@ -190,13 +192,14 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         case 5:
             result = s_McWinMessGroup1_fr;
             break;
+        case 1:
         default:
             result = s_McWinMessGroup1_en;
             break;
         }
     } else {
         switch (languageId) {
-        case 1:
+        case 2:
             result = s_McWinMessGroup2_de;
             break;
         case 3:
@@ -208,6 +211,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
         case 5:
             result = s_McWinMessGroup2_fr;
             break;
+        case 1:
         default:
             result = s_McWinMessGroup2_en;
             break;
@@ -227,10 +231,10 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
  */
 const char* CMenuPcs::GetMcStr(int index)
 {
-    CGame& game = Game;
+    unsigned char languageId = Game.m_gameWork.m_languageId;
 
-    switch (game.m_gameWork.m_languageId) {
-    case 1:
+    switch (languageId) {
+    case 2:
         return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
     case 3:
         return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
@@ -238,6 +242,7 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_es[index];
     case 5:
         return s_McStr_fr[index];
+    case 1:
     default:
         return PTR_s_The_data_is_corrupt__80215bd8[index];
     }

@@ -176,9 +176,9 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
 }
 
 
-const static f32 value0_6 = 0.6f;
-const static f32 value0_3 = 0.3f;
-const static double i2fMagic = 4503601774854144.0;
+const static f32 reverb_hi_4ch_value0_6 = 0.6f;
+const static f32 reverb_hi_4ch_value0_3 = 0.3f;
+const static double reverb_hi_4ch_i2fMagic = 4503601774854144.0;
 
 asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DPL2* rv, register s32 k) {
     nofralloc
@@ -198,12 +198,12 @@ asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DP
 	stfd f25, 0xb8(r1)
 	stw k, 0x50(r1)
 	stw rv, 0x54(r1)
-	lis r31, value0_3@ha
-	lfs f6, value0_3@l(r31)
-	lis r31, value0_6@ha
-	lfs f9, value0_6@l(r31)
-	lis r31, i2fMagic@ha
-	lfd f5, i2fMagic@l(r31)
+	lis r31, reverb_hi_4ch_value0_3@ha
+	lfs f6, reverb_hi_4ch_value0_3@l(r31)
+	lis r31, reverb_hi_4ch_value0_6@ha
+	lfs f9, reverb_hi_4ch_value0_6@l(r31)
+	lis r31, reverb_hi_4ch_i2fMagic@ha
+	lfd f5, reverb_hi_4ch_i2fMagic@l(r31)
 	lfs f2, AXFX_REVHI_WORK_DPL2.allPassCoeff(rv)
 	lfs f15, AXFX_REVHI_WORK_DPL2.damping(rv)
 	lfs f8, AXFX_REVHI_WORK_DPL2.level(rv)

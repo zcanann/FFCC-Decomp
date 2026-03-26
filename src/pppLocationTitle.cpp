@@ -182,7 +182,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         pppFMATRIX managerMatrix;
         pppFMATRIX resultMatrix;
 
-        localMatrix = *(pppFMATRIX*)((u8*)pppLocationTitle + 4);
+        localMatrix = pppLocationTitle->m_localMatrix;
         managerMatrix = pppMngStPtr->m_matrix;
         pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&resultMatrix, &managerMatrix, &localMatrix);
 

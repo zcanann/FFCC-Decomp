@@ -332,13 +332,20 @@ void RedDeleteA(void* param_1)
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
 	unsigned int bankSize = 0x2000U;
+	int mainMemorySize;
+	int* aMemoryBlockList;
+	int mainMemoryBase;
+
 	bankSize += 0x1FU;
 	bankSize &= 0xFFFFFFE0;
 
 	gRedMainMemoryBlockList = (int*)param1;
-	gRedMainMemorySize = param2 - (bankSize * 2);
-	gRedAMemoryBlockList = (int*)((int)gRedMainMemoryBlockList + bankSize);
-	gRedMainMemoryBase = (int)gRedAMemoryBlockList + bankSize;
+	mainMemorySize = param2 - (bankSize * 2);
+	aMemoryBlockList = (int*)((int)gRedMainMemoryBlockList + bankSize);
+	gRedAMemoryBlockList = aMemoryBlockList;
+	mainMemoryBase = (int)aMemoryBlockList + bankSize;
+	gRedMainMemorySize = mainMemorySize;
+	gRedMainMemoryBase = mainMemoryBase;
 	memset(gRedMainMemoryBlockList, 0, bankSize);
 	memset(gRedAMemoryBlockList, 0, bankSize);
 	gRedAMemoryBase = param3;

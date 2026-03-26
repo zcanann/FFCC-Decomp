@@ -2181,11 +2181,12 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
  */
 void CSound::Clear3DLine(int lineIndex)
 {
-    if (lineIndex > 7) {
+    if ((u32)lineIndex > 7) {
         Printf__7CSystemFPce(&System, s_soundLineOutOfRangeFmt);
     }
-    u8* line = SoundData(this).m_lineWork + lineIndex * 0x1CC;
-    *reinterpret_cast<u32*>(line + 0x18) = 0;
+
+    CLine* line = reinterpret_cast<CLine*>(SoundData(this).m_lineWork + lineIndex * sizeof(CLine));
+    line->pointCount = 0;
 }
 
 /*
@@ -2199,13 +2200,13 @@ void CSound::Clear3DLine(int lineIndex)
  */
 void CSound::Add3DLine(int lineIndex, Vec* position)
 {
-    const int lineOffset = lineIndex * 0x1CC;
-    u8* line = SoundData(this).m_lineWork + lineOffset;
-    const u32 pointCount = *reinterpret_cast<u32*>(line + 0x18);
+    CLine* line = reinterpret_cast<CLine*>(SoundData(this).m_lineWork + lineIndex * sizeof(CLine));
+    const u32 pointCount = line->pointCount;
+
     if (pointCount < 10) {
-        *reinterpret_cast<u32*>(line + 0x18) = pointCount + 1;
-        *reinterpret_cast<Vec*>(line + 0x30 + static_cast<int>(pointCount) * 0xC) = *position;
-        CalcBound__9CLine2(reinterpret_cast<CLine*>(line));
+        line->pointCount = pointCount + 1;
+        line->points[pointCount] = *position;
+        CalcBound__9CLine2(line);
     } else {
         Printf__7CSystemFPce(&System, s_soundLineTableFullFmt);
     }

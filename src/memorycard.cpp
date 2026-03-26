@@ -16,6 +16,9 @@ char* PTR_DAT_8032e854 = sMcSaveFileName;
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern char sMemoryCardManagerName[];
+extern char sMemoryCardSourceFile[];
+extern char sMemoryAllocationError[];
 
 static inline CChara* GetCharaGlobal()
 {
@@ -96,8 +99,8 @@ void CMemoryCardMan::Init()
     m_currentSlot = -1;
     m_state = 0;
     m_saveBuffer = (char*)nullptr;
-    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(0x16000, (char*)"CMemoryCardMan", 0));
-    m_mountWorkArea = new (reinterpret_cast<CMemory::CStage*>(m_stage), (char*)"memorycard.cpp", 0x88) char[0xA000];
+    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(0x16000, sMemoryCardManagerName, 0));
+    m_mountWorkArea = new (reinterpret_cast<CMemory::CStage*>(m_stage), sMemoryCardSourceFile, 0x88) char[0xA000];
 
     m_currentSlot = -1;
 }
@@ -411,11 +414,11 @@ void CMemoryCardMan::CreateMcBuff()
     if (m_saveBuffer == 0)
     {
         m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>("memorycard.cpp"), 0x2AB));
+            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), sMemoryCardSourceFile, 0x2AB));
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            System.Printf("%s(%d): Error: memory allocation", "memorycard.cpp", 0x2AD);
+            System.Printf(sMemoryAllocationError, sMemoryCardSourceFile, 0x2AD);
         }
     }
 

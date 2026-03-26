@@ -346,8 +346,7 @@ int CWind::AddAmbient(float dir, float speed)
 		}
 
 		cur += 8;
-		blocks--;
-	} while (blocks != 0);
+	} while (--blocks != 0);
 
 	obj = 0;
 
@@ -358,7 +357,7 @@ found:
 	}
 
 	obj->type = 0;
-	obj->flags = (obj->flags & 0x7F) | 0x80;
+	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
 	int id = m_nextId;
 	m_nextId = id + 1;
@@ -427,8 +426,7 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 
 		checked += 7;
 		cur += 8;
-		blocks--;
-	} while (blocks != 0);
+	} while (--blocks != 0);
 
 	obj = 0;
 
@@ -444,7 +442,7 @@ found:
 	double centerZD = (double)centerZ;
 
 	obj->type = 1;
-	obj->flags = (obj->flags & 0x7F) | 0x80;
+	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
 	int id = m_nextId;
 	m_nextId = id + 1;
@@ -523,8 +521,7 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 
 		checked += 7;
 		cur += 8;
-		blocks--;
-	} while (blocks != 0);
+	} while (--blocks != 0);
 
 	obj = 0;
 
@@ -535,7 +532,7 @@ found:
 	}
 
 	obj->type = 2;
-	obj->flags = (obj->flags & 0x7F) | 0x80;
+	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
 	int id = m_nextId;
 	m_nextId = id + 1;

@@ -91,66 +91,78 @@ static inline unsigned int FourCC(char a, char b, char c, char d)
 	return (static_cast<unsigned int>(a) << 24) | (static_cast<unsigned int>(b) << 16) |
 	       (static_cast<unsigned int>(c) << 8) | static_cast<unsigned int>(d);
 }
+
+static inline void i2f_5(float* out, register const unsigned short* in)
+{
+	register float value;
+
+	asm {
+		psq_l value, 0(in), 1, 5
+	}
+
+	*out = value;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void i2f2_7(float*, unsigned short*, float)
+static inline void i2f2_5(float* out, register const unsigned short* in, float t)
 {
-	// TODO
+	register float a;
+	register float b;
+
+	asm {
+		psq_l a, 0(in), 1, 5
+		psq_l b, 2(in), 1, 5
+	}
+
+	*out = (b - a) * t + a;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void i2f_7(float*, unsigned short*)
+static inline void i2f_6(float* out, register const unsigned short* in)
 {
-	// TODO
+	register float value;
+
+	asm {
+		psq_l value, 0(in), 1, 6
+	}
+
+	*out = value;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void i2f2_6(float*, unsigned short*, float)
+static inline void i2f2_6(float* out, register const unsigned short* in, float t)
 {
-	// TODO
+	register float a;
+	register float b;
+
+	asm {
+		psq_l a, 0(in), 1, 6
+		psq_l b, 2(in), 1, 6
+	}
+
+	*out = (b - a) * t + a;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void i2f_6(float*, unsigned short*)
+static inline void i2f_7(float* out, register const unsigned short* in)
 {
-	// TODO
+	register float value;
+
+	asm {
+		psq_l value, 0(in), 1, 7
+	}
+
+	*out = value;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void i2f2_5(float*, unsigned short*, float)
+static inline void i2f2_7(float* out, register const unsigned short* in, float t)
 {
-	// TODO
-}
+	register float a;
+	register float b;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void i2f_5(float*, unsigned short*)
-{
-	// TODO
+	asm {
+		psq_l a, 0(in), 1, 7
+		psq_l b, 2(in), 1, 7
+	}
+
+	*out = (b - a) * t + a;
+}
 }
 
 /*
@@ -438,20 +450,18 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	unsigned int flags = (node.m_flags >> 0xD) & 0x3FFFF;
 	int frameOffset = frameInt * 2;
-	unsigned char* inData = Ptr(animFields.m_bank, node.m_dataOffset);
+	unsigned short* inData = reinterpret_cast<unsigned short*>(Ptr(animFields.m_bank, node.m_dataOffset));
 	float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
 			*outData = 0.0f;
 		} else if ((flags & 3) == 1) {
-			float v2 = *reinterpret_cast<float*>(inData);
-			inData += 2;
-			*outData = v2;
+			i2f_5(outData, inData);
+			inData++;
 		} else {
-			float v2 = *reinterpret_cast<float*>(inData + frameOffset);
-			*outData = (*reinterpret_cast<float*>(inData + frameOffset + 2) - v2) * frameFrac + v2;
-			inData += (animFields.m_frameCount + 1) * 2;
+			i2f2_5(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
+			inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
 		}
 		flags = (unsigned int)((int)flags >> 2);
 		outData++;
@@ -461,13 +471,11 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 		if ((flags & 3) == 0) {
 			*outData = 0.0f;
 		} else if ((flags & 3) == 1) {
-			float v2 = *reinterpret_cast<float*>(inData);
-			inData += 2;
-			*outData = v2;
+			i2f_6(outData, inData);
+			inData++;
 		} else {
-			float v2 = *reinterpret_cast<float*>(inData + frameOffset);
-			*outData = (*reinterpret_cast<float*>(inData + frameOffset + 2) - v2) * frameFrac + v2;
-			inData += (animFields.m_frameCount + 1) * 2;
+			i2f2_6(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
+			inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
 		}
 		flags = (unsigned int)((int)flags >> 2);
 		outData++;
@@ -477,13 +485,11 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 		if ((flags & 3) == 0) {
 			*outData = 1.0f;
 		} else if ((flags & 3) == 1) {
-			float v2 = *reinterpret_cast<float*>(inData);
-			inData += 2;
-			*outData = v2;
+			i2f_7(outData, inData);
+			inData++;
 		} else {
-			float v2 = *reinterpret_cast<float*>(inData + frameOffset);
-			*outData = (*reinterpret_cast<float*>(inData + frameOffset + 2) - v2) * frameFrac + v2;
-			inData += (animFields.m_frameCount + 1) * 2;
+			i2f2_7(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
+			inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
 		}
 		flags = (unsigned int)((int)flags >> 2);
 		outData++;

@@ -115,6 +115,7 @@ static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
 static char s_gobject_cpp[] = "gobject.cpp";
+static char s_l_item[] = "l_item";
 static char s_r_item[] = "r_item";
 static const float  sAnimFrameOffset = 1.0f;  // FLOAT_80330338
 static const double sLoopBias = 1.2;   // DOUBLE_80330378

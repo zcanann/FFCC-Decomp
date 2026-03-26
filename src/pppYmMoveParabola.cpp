@@ -9,8 +9,6 @@
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-void pppNormalize__FR3Vec3Vec(float*, Vec*);
-
 }
 
 struct pppYmMoveParabolaWork {
@@ -20,19 +18,6 @@ struct pppYmMoveParabolaWork {
     u16 m_frame;
     u16 _pad0x0E;
     Vec m_basePosition;
-};
-
-struct pppYmMoveParabolaMngState {
-    u8 _pad0x00[0x08];
-    Vec m_position;
-    u8 _pad0x14[0x34];
-    Vec m_previousPosition;
-    u32 _pad0x54;
-    Vec m_savedPosition;
-    u32 _pad0x64;
-    Vec m_paramVec0;
-    u8 _pad0x74[0x04];
-    pppFMATRIX m_matrix;
 };
 
 /*
@@ -50,7 +35,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         return;
     }
 
-    pppYmMoveParabolaMngState* pppMngSt = (pppYmMoveParabolaMngState*)pppMngStPtr;
+    _pppMngSt* pppMngSt = pppMngStPtr;
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
 
@@ -73,7 +58,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     }
 
     Vec normalizedSource = direction;
-    pppNormalize__FR3Vec3Vec((float*)&direction, &normalizedSource);
+    pppNormalize(direction, normalizedSource);
 
     s32 sinIndex;
     {
@@ -94,7 +79,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         offset.x = posX;
         offset.y = posY;
         offset.z = posZ;
-        pppAddVector__FR3Vec3Vec3Vec(&newPosition, &offset, &basePosition);
+        pppAddVector(newPosition, offset, basePosition);
     } else {
         Vec offset;
         Vec basePosition = pppMngSt->m_savedPosition;
@@ -102,17 +87,17 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         offset.x = posX;
         offset.y = posY;
         offset.z = posZ;
-        pppAddVector__FR3Vec3Vec3Vec(&newPosition, &offset, &basePosition);
+        pppAddVector(newPosition, offset, basePosition);
     }
 
     Vec oldPosition = pppMngSt->m_position;
-    pppCopyVector__FR3Vec3Vec(&pppMngSt->m_previousPosition, &oldPosition);
-    pppCopyVector__FR3Vec3Vec(&pppMngSt->m_position, &newPosition);
+    pppCopyVector(pppMngSt->m_previousPosition, oldPosition);
+    pppCopyVector(pppMngSt->m_position, newPosition);
 
     pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
     pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
     pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
-    pppSetFpMatrix((_pppMngSt*)pppMngSt);
+    pppSetFpMatrix(pppMngSt);
     work->m_frame = work->m_frame + 1;
 }
 
@@ -127,7 +112,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
-    pppYmMoveParabolaMngState* pppMngSt = (pppYmMoveParabolaMngState*)pppMngStPtr;
+    _pppMngSt* pppMngSt = pppMngStPtr;
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
     f32 zero = gPppYmMoveParabolaZero;

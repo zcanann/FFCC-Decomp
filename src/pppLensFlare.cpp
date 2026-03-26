@@ -88,15 +88,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		LensFlareStep* step = (LensFlareStep*)unkB;
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
-		u8* objBytes = (u8*)obj;
-		u8* colorBase = objBytes + colorOffset;
-		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
-		u8 sourceAlpha = colorBase[0x8B];
-		double projX = (double)pppMngStPtr->m_matrix.value[0][3];
-		double projY = (double)pppMngStPtr->m_matrix.value[1][3];
-		double projZ = (double)pppMngStPtr->m_matrix.value[2][3];
-		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
-		u32 zAtPixel;
+		LensFlareWork* work = (LensFlareWork*)((u8*)obj + shapeOffset + 0x80);
+		u8 sourceAlpha = ((u8*)obj)[colorOffset + 0x8B];
+		float projX = pppMngStPtr->m_matrix.value[0][3];
+		float projY = pppMngStPtr->m_matrix.value[1][3];
+		float projZ = pppMngStPtr->m_matrix.value[2][3];
+		float alphaScale = (float)sourceAlpha * kPppLensFlareAlphaScale;
 		float projection[7];
 		float viewport[6];
 		Mtx cameraMtx;
@@ -105,7 +102,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		Vec lookDir;
 		Vec objectPos;
 		Vec cameraToObject;
-		u8* stepArgBytes = (u8*)&step->m_arg3;
+		u8 argA = *(u8*)&step->m_arg3;
+		u8 argB = *((u8*)&step->m_arg3 + 1);
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
@@ -131,18 +129,16 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		float xProjected = work->m_projectedX;
-		float yProjected = work->m_projectedY;
-		u8 argA = stepArgBytes[0];
-		u32 halfWidth = (u32)(argA >> 1);
-		u32 y0 = (u32)((int)yProjected & 0xFFFF);
-		u32 x0 = (u32)((int)xProjected & 0xFFFF);
+		u32 zAtPixel = 0;
+		int halfWidth = (int)(argA >> 1);
+		int x0 = (u16)(int)work->m_projectedX;
+		int y0 = (u16)(int)work->m_projectedY;
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
-		int stepSize = (short)((u16)argA / (u16)stepArgBytes[1]);
-		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
-			for (u32 x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stepSize) {
-				if (((-1 < (short)x) && (-1 < (short)y)) && ((short)x < 0x281) && ((short)y < 0x1c1)) {
-					GXPeekZ((u16)(x & 0xFFFF), (u16)(y & 0xFFFF), &zAtPixel);
+		int stepSize = (short)((u16)argA / (u16)argB);
+		for (int y = y0 - halfWidth; y <= y0 + halfWidth; y += stepSize) {
+			for (int x = x0 - halfWidth; x <= x0 + halfWidth; x += stepSize) {
+				if (((short)x > -1) && ((short)y > -1) && ((short)x < 0x281) && ((short)y < 0x1c1)) {
+					GXPeekZ((u16)x, (u16)y, &zAtPixel);
 					if (z0 <= zAtPixel) {
 						work->m_alpha = (u8)(work->m_alpha + 1);
 					}
@@ -150,21 +146,21 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		stepSize = stepArgBytes[1] + 1;
-		u32 sampleCount = (u32)(stepSize * stepSize);
+		stepSize = argB + 1;
+		int sampleCount = stepSize * stepSize;
 		if (work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
 			sampleCount = work->m_alpha * (0xff / sampleCount);
 			work->m_alpha = (u8)sampleCount;
-			if ((sampleCount & 0xff) < 0x100) {
+			if ((sampleCount & 0xff) <= 0xff) {
 				work->m_alpha = (u8)sampleCount;
 			} else {
 				work->m_alpha = 0xff;
 			}
 		}
 
-		work->m_alpha = (u8)(int)((double)(float)work->m_alpha * alphaScale);
+		work->m_alpha = (u8)(int)((float)work->m_alpha * alphaScale);
 		if (step->m_dataValIndex != 0xffff) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,

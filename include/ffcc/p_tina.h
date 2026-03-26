@@ -110,7 +110,7 @@ public:
     void Quit();
 
     void onScriptChanging(char*);
-    void* GetTable(unsigned long);
+    int GetTable(unsigned long);
 
     void create0();
     void create();

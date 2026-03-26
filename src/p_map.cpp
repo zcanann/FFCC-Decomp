@@ -112,9 +112,9 @@ void CMapPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void* CMapPcs::GetTable(unsigned long tableIndex)
+int CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57;
+	return (int)(PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57);
 }
 
 /*

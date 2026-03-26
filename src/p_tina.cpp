@@ -273,10 +273,10 @@ void CPartPcs::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CPartPcs::GetTable(unsigned long index)
+int CPartPcs::GetTable(unsigned long index)
 {
 	unsigned long offset = index * 0x15c;
-	return m_table__8CPartPcs + offset;
+	return (int)(m_table__8CPartPcs + offset);
 }
 
 /*

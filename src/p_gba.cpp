@@ -70,11 +70,11 @@ void CGbaPcs::Quit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CGbaPcs::GetTable(unsigned long tableIndex)
+int CGbaPcs::GetTable(unsigned long tableIndex)
 {
 	unsigned long offset = tableIndex;
 	offset *= 0x15c;
-	return reinterpret_cast<unsigned char*>(gGbaStatusWordTable) + offset;
+	return (int)(reinterpret_cast<unsigned char*>(gGbaStatusWordTable) + offset);
 }
 
 /*

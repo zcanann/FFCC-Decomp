@@ -21,16 +21,19 @@ class COctNode
 public:
 	COctNode();
 
-private:
 	float m_boundMinX;      // 0x00
 	float m_boundMinY;      // 0x04
 	float m_boundMinZ;      // 0x08
 	float m_boundMaxX;      // 0x0C
 	float m_boundMaxY;      // 0x10
 	float m_boundMaxZ;      // 0x14
-	u8 m_pad18[0x2C];       // 0x18
-	void* m_unk44;          // 0x44
-	void* m_unk48;          // 0x48
+	u32 m_unk18;            // 0x18
+	COctNode* m_children[8]; // 0x1C
+	u16 m_meshStart;        // 0x3C
+	u16 m_meshCount;        // 0x3E
+	u32 m_unk40;            // 0x40
+	u32 m_unk44;            // 0x44
+	u32 m_unk48;            // 0x48
 };
 
 class CBound

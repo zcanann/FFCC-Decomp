@@ -174,7 +174,7 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 {
     CChunkFile::CChunk chunk;
 
-    *Ptr(this, 1) = 0;
+    m_unk01 = 0;
     chunkFile.PushChunk();
 
     for (;;) {
@@ -185,9 +185,9 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
         if (chunk.m_id == 'OBJN') {
             unsigned short objIndex = chunkFile.Get2();
-            *reinterpret_cast<void**>(Ptr(this, 8)) = GetMapObjByIndex(objIndex);
+            m_mapObject = GetMapObjByIndex(objIndex);
 
-            unsigned char* mapObj = *reinterpret_cast<unsigned char**>(Ptr(this, 8));
+            unsigned char* mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
             if (mapObj[0x1E] == 4) {
                 mapObj[0x15] = 0xFF;
                 mapObj[0x14] = 0xFF;
@@ -200,25 +200,25 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
         if (chunk.m_id == 'NODN') {
             unsigned short nodeCount = chunkFile.Get2();
-            *reinterpret_cast<unsigned short*>(Ptr(this, 2)) = nodeCount;
-            if ((*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0x1E)) != 1) &&
+            m_nodeCount = nodeCount;
+            if ((*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1E)) != 1) &&
                 (static_cast<unsigned int>(System.m_execParam) > 2U)) {
                 Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, nodeCount);
             }
             void* rootNode = __nwa__FUlPQ27CMemory6CStagePci(
                 nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapocttree_cpp, 0x59);
-            *reinterpret_cast<void**>(Ptr(this, 4)) = __construct_new_array(
-                rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount);
+            m_nodePool = reinterpret_cast<COctNode*>(
+                __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount));
             continue;
         }
 
         if (chunk.m_id == 'INFO') {
-            *Ptr(this, 1) = chunkFile.Get1();
+            m_unk01 = chunkFile.Get1();
             continue;
         }
 
         if (chunk.m_id == 'TYPE') {
-            *Ptr(this, 0) = static_cast<unsigned char>(chunkFile.Get2());
+            m_type = static_cast<unsigned char>(chunkFile.Get2());
             continue;
         }
 
@@ -237,10 +237,10 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             while (chunkFile.GetNextChunk(chunk)) {
                 if (chunk.m_id == 'OBJ ') {
                     unsigned short nodeIndex = chunkFile.Get2();
-                    node = reinterpret_cast<COctNode*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 4)), nodeIndex * 0x4C));
+                    node = m_nodePool + nodeIndex;
 
-                    *reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) = chunkFile.Get2();
-                    *reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) = chunkFile.Get2();
+                    node->m_meshStart = chunkFile.Get2();
+                    node->m_meshCount = chunkFile.Get2();
                     continue;
                 }
 
@@ -249,23 +249,23 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
                 }
 
                 if (chunk.m_id == 'BOND') {
-                    *reinterpret_cast<float*>(Ptr(node, 0x00)) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(Ptr(node, 0x04)) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(Ptr(node, 0x08)) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(Ptr(node, 0x0C)) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(Ptr(node, 0x10)) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(Ptr(node, 0x14)) = chunkFile.GetF4();
+                    node->m_boundMinX = chunkFile.GetF4();
+                    node->m_boundMinY = chunkFile.GetF4();
+                    node->m_boundMinZ = chunkFile.GetF4();
+                    node->m_boundMaxX = chunkFile.GetF4();
+                    node->m_boundMaxY = chunkFile.GetF4();
+                    node->m_boundMaxZ = chunkFile.GetF4();
                     continue;
                 }
 
                 if (chunk.m_id == 'CHLD') {
                     int childCount = 0;
-                    COctNode** childNode = reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+                    COctNode** childNode = node->m_children;
 
                     for (int i = 0; i < 8; i++) {
                         unsigned short childIndex = chunkFile.Get2();
                         if (childIndex != 0xFFFF) {
-                            *childNode = reinterpret_cast<COctNode*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 4)), childIndex * 0x4C));
+                            *childNode = m_nodePool + childIndex;
                             childNode++;
                             childCount++;
                         }
@@ -1632,7 +1632,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	COctNode* child2;
 	COctNode* child3;
 
-	minValue = *reinterpret_cast<float*>(Ptr(node, 0x0));
+	minValue = node->m_boundMinX;
 	if (s_cyl.m_top.z <= minValue) {
 		if (minValue <= s_cyl.m_top.z) {
 			axisXOk = true;
@@ -1640,11 +1640,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 			axisXOk = minValue <= s_cyl.m_direction2.z;
 		}
 	} else {
-		axisXOk = s_cyl.m_top.z <= *reinterpret_cast<float*>(Ptr(node, 0xC));
+		axisXOk = s_cyl.m_top.z <= node->m_boundMaxX;
 	}
 
 	if (axisXOk) {
-		minValue = *reinterpret_cast<float*>(Ptr(node, 0x4));
+		minValue = node->m_boundMinY;
 		if (s_cyl.m_direction2.x <= minValue) {
 			if (minValue <= s_cyl.m_direction2.x) {
 				axisXOk = true;
@@ -1652,7 +1652,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 				axisXOk = minValue <= s_cyl.m_radius2;
 			}
 		} else {
-			axisXOk = s_cyl.m_direction2.x <= *reinterpret_cast<float*>(Ptr(node, 0x10));
+			axisXOk = s_cyl.m_direction2.x <= node->m_boundMaxY;
 		}
 		if (axisXOk) {
 			axisYOk = true;
@@ -1660,7 +1660,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	}
 
 	if (axisYOk) {
-		minValue = *reinterpret_cast<float*>(Ptr(node, 0x8));
+		minValue = node->m_boundMinZ;
 		if (s_cyl.m_direction2.y <= minValue) {
 			if (minValue <= s_cyl.m_direction2.y) {
 				axisYOk = true;
@@ -1668,7 +1668,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 				axisYOk = minValue <= s_cyl.m_height2;
 			}
 		} else {
-			axisYOk = s_cyl.m_direction2.y <= *reinterpret_cast<float*>(Ptr(node, 0x14));
+			axisYOk = s_cyl.m_direction2.y <= node->m_boundMaxZ;
 		}
 		if (axisYOk) {
 			hit = true;
@@ -1679,20 +1679,20 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 		return 0;
 	}
 
-	meshStart = *reinterpret_cast<unsigned short*>(Ptr(node, 0x3C));
-	meshEnd = *reinterpret_cast<unsigned short*>(Ptr(node, 0x3E));
+	meshStart = node->m_meshStart;
+	meshEnd = node->m_meshCount;
 	if ((meshEnd != 0) &&
 		(mapHit->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
 		return 1;
 	}
 
 	for (int i = 0; i < 8; i++) {
-		child1 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		child1 = node->m_children[i];
 		if (child1 == 0) {
 			return 0;
 		}
 
-		minValue = *reinterpret_cast<float*>(Ptr(child1, 0x0));
+		minValue = child1->m_boundMinX;
 		hit = false;
 		axisYOk = false;
 		if (s_cyl.m_top.z <= minValue) {
@@ -1702,11 +1702,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 				axisXOk = minValue <= s_cyl.m_direction2.z;
 			}
 		} else {
-			axisXOk = s_cyl.m_top.z <= *reinterpret_cast<float*>(Ptr(child1, 0xC));
+			axisXOk = s_cyl.m_top.z <= child1->m_boundMaxX;
 		}
 
 		if (axisXOk) {
-			minValue = *reinterpret_cast<float*>(Ptr(child1, 0x4));
+			minValue = child1->m_boundMinY;
 			if (s_cyl.m_direction2.x <= minValue) {
 				if (minValue <= s_cyl.m_direction2.x) {
 					axisXOk = true;
@@ -1714,7 +1714,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 					axisXOk = minValue <= s_cyl.m_radius2;
 				}
 			} else {
-				axisXOk = s_cyl.m_direction2.x <= *reinterpret_cast<float*>(Ptr(child1, 0x10));
+				axisXOk = s_cyl.m_direction2.x <= child1->m_boundMaxY;
 			}
 			if (axisXOk) {
 				axisYOk = true;
@@ -1722,7 +1722,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 		}
 
 		if (axisYOk) {
-			minValue = *reinterpret_cast<float*>(Ptr(child1, 0x8));
+			minValue = child1->m_boundMinZ;
 			if (s_cyl.m_direction2.y <= minValue) {
 				if (minValue <= s_cyl.m_direction2.y) {
 					axisYOk = true;
@@ -1730,7 +1730,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 					axisYOk = minValue <= s_cyl.m_height2;
 				}
 			} else {
-				axisYOk = s_cyl.m_direction2.y <= *reinterpret_cast<float*>(Ptr(child1, 0x14));
+				axisYOk = s_cyl.m_direction2.y <= child1->m_boundMaxZ;
 			}
 			if (axisYOk) {
 				hit = true;
@@ -1738,22 +1738,22 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 		}
 
 		if (hit) {
-			meshStart = *reinterpret_cast<unsigned short*>(Ptr(child1, 0x3C));
-			meshEnd = *reinterpret_cast<unsigned short*>(Ptr(child1, 0x3E));
+			meshStart = child1->m_meshStart;
+			meshEnd = child1->m_meshCount;
 			if ((meshEnd != 0) &&
 				(mapHit->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
 				return 1;
 			}
 
 			for (int j = 0; j < 8; j++) {
-				child2 = *reinterpret_cast<COctNode**>(Ptr(child1, 0x1C));
+				child2 = child1->m_children[j];
 				if (child2 == 0) {
 					break;
 				}
 
 				if (reinterpret_cast<CBound*>(child2)->CheckCross(*(CBound*)&s_bound) != 0) {
-					meshStart = *reinterpret_cast<unsigned short*>(Ptr(child2, 0x3C));
-					meshEnd = *reinterpret_cast<unsigned short*>(Ptr(child2, 0x3E));
+					meshStart = child2->m_meshStart;
+					meshEnd = child2->m_meshCount;
 					if ((meshEnd != 0) &&
 						(mapHit->CheckHitCylinder(
 							 (CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
@@ -1761,7 +1761,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 					}
 
 					for (int k = 0; k < 8; k++) {
-						child3 = *reinterpret_cast<COctNode**>(Ptr(child2, 0x1C));
+						child3 = child2->m_children[k];
 						if (child3 == 0) {
 							break;
 						}
@@ -1769,16 +1769,10 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 						if (CheckHitCylinder_r(child3) != 0) {
 							return 1;
 						}
-
-						child2 = reinterpret_cast<COctNode*>(Ptr(child2, 4));
 					}
 				}
-
-				child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
 			}
 		}
-
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 	}
 
 	return 0;
@@ -1871,7 +1865,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	bool axisXOk = false;
 	float minValue;
 
-	minValue = *reinterpret_cast<float*>(Ptr(octNode, 0x0));
+	minValue = octNode->m_boundMinX;
 	if (s_cyl.m_top.z <= minValue) {
 		if (minValue <= s_cyl.m_top.z) {
 			axisXOk = true;
@@ -1879,11 +1873,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 			axisXOk = minValue <= s_cyl.m_direction2.z;
 		}
 	} else {
-		axisXOk = s_cyl.m_top.z <= *reinterpret_cast<float*>(Ptr(octNode, 0xC));
+		axisXOk = s_cyl.m_top.z <= octNode->m_boundMaxX;
 	}
 
 	if (axisXOk) {
-		minValue = *reinterpret_cast<float*>(Ptr(octNode, 0x4));
+		minValue = octNode->m_boundMinY;
 		if (s_cyl.m_direction2.x <= minValue) {
 			if (minValue <= s_cyl.m_direction2.x) {
 				axisXOk = true;
@@ -1891,7 +1885,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 				axisXOk = minValue <= s_cyl.m_radius2;
 			}
 		} else {
-			axisXOk = s_cyl.m_direction2.x <= *reinterpret_cast<float*>(Ptr(octNode, 0x10));
+			axisXOk = s_cyl.m_direction2.x <= octNode->m_boundMaxY;
 		}
 		if (axisXOk) {
 			axisYOk = true;
@@ -1899,7 +1893,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	}
 
 	if (axisYOk) {
-		minValue = *reinterpret_cast<float*>(Ptr(octNode, 0x8));
+		minValue = octNode->m_boundMinZ;
 		if (s_cyl.m_direction2.y <= minValue) {
 			if (minValue <= s_cyl.m_direction2.y) {
 				axisYOk = true;
@@ -1907,7 +1901,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 				axisYOk = minValue <= s_cyl.m_height2;
 			}
 		} else {
-			axisYOk = s_cyl.m_direction2.y <= *reinterpret_cast<float*>(Ptr(octNode, 0x14));
+			axisYOk = s_cyl.m_direction2.y <= octNode->m_boundMaxZ;
 		}
 		if (axisYOk) {
 			hit = true;
@@ -1918,23 +1912,23 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		return;
 	}
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
+	if (octNode->m_meshCount != 0) {
 		(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
 		    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
-		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)),
-		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
+		                           octNode->m_meshStart,
+		                           octNode->m_meshCount,
 		                           s_checkHitCylinderMask);
 	}
 
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C + (i * 4)));
+		COctNode* child = octNode->m_children[i];
 		if (child == 0) {
 			return;
 		}
 
 		hit = false;
 		axisYOk = false;
-		minValue = *reinterpret_cast<float*>(Ptr(child, 0x0));
+		minValue = child->m_boundMinX;
 		if (s_cyl.m_top.z <= minValue) {
 			if (minValue <= s_cyl.m_top.z) {
 				axisXOk = true;
@@ -1942,11 +1936,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 				axisXOk = minValue <= s_cyl.m_direction2.z;
 			}
 		} else {
-			axisXOk = s_cyl.m_top.z <= *reinterpret_cast<float*>(Ptr(child, 0xC));
+			axisXOk = s_cyl.m_top.z <= child->m_boundMaxX;
 		}
 
 		if (axisXOk) {
-			minValue = *reinterpret_cast<float*>(Ptr(child, 0x4));
+			minValue = child->m_boundMinY;
 			if (s_cyl.m_direction2.x <= minValue) {
 				if (minValue <= s_cyl.m_direction2.x) {
 					axisXOk = true;
@@ -1954,7 +1948,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 					axisXOk = minValue <= s_cyl.m_radius2;
 				}
 			} else {
-				axisXOk = s_cyl.m_direction2.x <= *reinterpret_cast<float*>(Ptr(child, 0x10));
+				axisXOk = s_cyl.m_direction2.x <= child->m_boundMaxY;
 			}
 			if (axisXOk) {
 				axisYOk = true;
@@ -1962,7 +1956,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		}
 
 		if (axisYOk) {
-			minValue = *reinterpret_cast<float*>(Ptr(child, 0x8));
+			minValue = child->m_boundMinZ;
 			if (s_cyl.m_direction2.y <= minValue) {
 				if (minValue <= s_cyl.m_direction2.y) {
 					axisYOk = true;
@@ -1970,7 +1964,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 					axisYOk = minValue <= s_cyl.m_height2;
 				}
 			} else {
-				axisYOk = s_cyl.m_direction2.y <= *reinterpret_cast<float*>(Ptr(child, 0x14));
+				axisYOk = s_cyl.m_direction2.y <= child->m_boundMaxZ;
 			}
 			if (axisYOk) {
 				hit = true;
@@ -1981,32 +1975,31 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 			continue;
 		}
 
-		if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
+		if (child->m_meshCount != 0) {
 			(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
 			    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
-			                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
-			                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
+			                           child->m_meshStart,
+			                           child->m_meshCount,
 			                           s_checkHitCylinderMask);
 		}
 
 		for (int j = 0; j < 8; j++) {
-			COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C + (j * 4)));
+			COctNode* grandChild = child->m_children[j];
 			if (grandChild == 0) {
 				break;
 			}
 
 			if (reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound)) != 0) {
-				if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
+				if (grandChild->m_meshCount != 0) {
 					(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
 					    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
-					                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
-					                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
+					                           grandChild->m_meshStart,
+					                           grandChild->m_meshCount,
 					                           s_checkHitCylinderMask);
 				}
 
 				for (int k = 0; k < 8; k++) {
-					COctNode* greatGrandChild =
-					    *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C + (k * 4)));
+					COctNode* greatGrandChild = grandChild->m_children[k];
 					if (greatGrandChild == 0) {
 						break;
 					}

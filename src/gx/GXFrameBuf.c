@@ -232,9 +232,8 @@ void GXSetCopyClamp(GXFBClamp clamp) {
     reg = (reg & 0xFFFFFFFE) | ((((u32)__cntlzw((clamp & GX_CLAMP_TOP) - GX_CLAMP_TOP)) >> 5) & 0xFF);
     gxData->cpDisp = reg;
 
-    clmpB = (u32)__cntlzw((clamp & GX_CLAMP_BOTTOM) - GX_CLAMP_BOTTOM);
+    clmpB = ((u32)__cntlzw((clamp & GX_CLAMP_BOTTOM) - GX_CLAMP_BOTTOM) >> 4) & 0x1FE;
     reg = gxData->cpDisp;
-    clmpB = (clmpB >> 4) & 0x1FE;
     reg &= 0xFFFFFFFD;
     gxData->cpDisp = reg | clmpB;
 

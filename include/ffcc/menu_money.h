@@ -7,7 +7,7 @@ public:
     void MoneyInit();
     bool MoneyOpen();
     void MoneyCtrl();
-    void MoneyClose();
+    bool MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
     void MoneySetPlace(int);

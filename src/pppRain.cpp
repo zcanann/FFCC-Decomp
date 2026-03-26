@@ -260,10 +260,10 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     RainParam* rain;
     RainWork* work;
     RainDrop* drop;
+    float tex0;
     float baseX;
     float baseY;
     float baseZ;
-    float tex0;
     float tex1;
     Vec segment[2];
 
@@ -271,7 +271,6 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     workOffset = param_3->m_serializedDataOffsets[2];
     colorData = (RainColorData*)((u8*)pppRain + 0x80 + colorOffset);
     rain = (RainParam*)param_2->m_payload;
-    work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     pppSetBlendMode(rain->blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         &colorData->color,
@@ -293,12 +292,13 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(rain->lineWidth, GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
+    work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     drop = work->drops;
+    tex0 = kPppRainTexCoordBase;
     baseX = pppMngStPtr->m_matrix.value[0][3];
     baseY = pppMngStPtr->m_matrix.value[1][3];
     baseZ = pppMngStPtr->m_matrix.value[2][3];
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
-    tex0 = kPppRainTexCoordBase;
     tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {

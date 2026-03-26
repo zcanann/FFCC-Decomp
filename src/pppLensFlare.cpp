@@ -10,16 +10,6 @@
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
 
-struct LensFlareStep {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s16 m_initWOrk;
-    s16 _pad0A;
-    f32 m_stepValue;
-    u32 m_arg3;
-    u8 m_payload[0x19];
-};
-
 struct LensFlareWork {
     u8 _pad00[0x10];
     f32 m_projectedX;
@@ -85,7 +75,7 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
 void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
 	if (gPppCalcDisabled == 0) {
-		LensFlareStep* step = (LensFlareStep*)unkB;
+		pppColumUnkB* step = unkB;
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* objBytes = (u8*)obj;
@@ -133,12 +123,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 		float xProjected = work->m_projectedX;
 		float yProjected = work->m_projectedY;
-		u8 argA = stepArgBytes[0];
+		u8 argA = step->m_arg3;
 		u32 halfWidth = (u32)(argA >> 1);
 		u32 y0 = (u32)((int)yProjected & 0xFFFF);
 		u32 x0 = (u32)((int)xProjected & 0xFFFF);
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
-		int stepSize = (short)((u16)argA / (u16)stepArgBytes[1]);
+		int stepSize = (short)((u16)argA / (u16)step->m_count);
 		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
 			for (u32 x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stepSize) {
 				if (((-1 < (short)x) && (-1 < (short)y)) && ((short)x < 0x281) && ((short)y < 0x1c1)) {
@@ -150,9 +140,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		stepSize = stepArgBytes[1] + 1;
+		stepSize = step->m_count + 1;
 		u32 sampleCount = (u32)(stepSize * stepSize);
-		if (work->m_alpha == sampleCount) {
+		if ((u8)work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
 			sampleCount = work->m_alpha * (0xff / sampleCount);
@@ -184,23 +174,21 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
  */
 void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
-	LensFlareStep* step;
+	pppColumUnkB* step;
 	int shapeOffset;
 	int colorOffset;
 	u8* objBytes;
 	u8* shapeBase;
 	u8* colorBase;
-	u8* stepArgBytes;
 	s32 dataValIndex;
 	long** shapeTable;
 
-	step = (LensFlareStep*)unkB;
+	step = unkB;
 	shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 	colorOffset = ctrlTable->m_serializedDataOffsets[1];
 	objBytes = (u8*)obj;
 	shapeBase = objBytes + shapeOffset + 0x80;
 	colorBase = objBytes + colorOffset + 0x80;
-	stepArgBytes = (u8*)&step->m_arg3;
 	dataValIndex = step->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
@@ -241,11 +229,11 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			local_70.rgba[2] = colorBase[10];
 			local_70.rgba[3] = shapeBase[0x32];
 
-			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, 0.0f, step->m_payload[0], stepArgBytes[3], stepArgBytes[2], 0,
+			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, 0.0f, step->m_payload[0], step->m_unk13, step->m_unk12, 0,
 						  1, 1, 0);
 
-			pppSetBlendMode(stepArgBytes[2]);
-			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, stepArgBytes[2]);
+			pppSetBlendMode(step->m_unk12);
+			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, step->m_unk12);
 			pppSetBlendMode(3);
 		}
 	}

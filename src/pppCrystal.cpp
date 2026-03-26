@@ -174,7 +174,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
 						float magnitude = xCoord * xCoord + ySq;
-						if (magnitude > 0.0f) {
+						if (magnitude > 1.0f) {
 							magnitude = sqrtf(magnitude);
 						} else if (magnitude < 0.0f) {
 							magnitude = 0.0f;

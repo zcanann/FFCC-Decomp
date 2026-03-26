@@ -5,11 +5,11 @@
 #include "dolphin/gx/__gx.h"
 
 void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
-    u32 fogclr;
     u32 fog0;
     u32 fog1;
     u32 fog2;
     u32 fog3;
+    u32 fogclr;
     f32 A;
     f32 B;
     f32 B_mant;
@@ -19,17 +19,11 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     u32 B_expn;
     u32 b_m;
     u32 b_s;
-    u32 a_hex;
-    u32 c_hex;
     u32 fsel;
     u32 proj;
-    u32 rgba;
 
-    fogclr = 0;
-    fog0 = 0;
     fog1 = 0;
     fog2 = 0;
-    fog3 = 0;
 
     CHECK_GXBEGIN(138, "GXSetFog");
 
@@ -79,16 +73,21 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
         fog2 = (b_s & 0x00FFFFFF) | 0xF0000000;
     }
 
-    a_hex = *(u32*)&a;
-    c_hex = *(u32*)&c;
+    fog0 = ((*(u32*)&a >> 12) & 0x7FF);
+    fog0 |= ((*(u32*)&a >> 12) & 0x7F800);
+    fog0 |= ((*(u32*)&a >> 12) & 0x80000);
+    fog0 |= 0xEE000000;
 
-    fog0 = ((a_hex >> 12) & 0x7FF) | ((a_hex >> 12) & 0x7F800) | ((a_hex >> 12) & 0x80000) |
-           0xEE000000;
-    fog3 = ((c_hex >> 12) & 0x7FF) | ((c_hex >> 12) & 0x7F800) | ((c_hex >> 12) & 0x80000) |
-           (proj << 20) | (fsel << 21) | 0xF1000000;
+    fog3 = ((*(u32*)&c >> 12) & 0x7FF);
+    fog3 |= ((*(u32*)&c >> 12) & 0x7F800);
+    fog3 |= ((*(u32*)&c >> 12) & 0x80000);
+    fog3 |= (proj << 20);
+    fog3 |= (fsel << 21);
+    fog3 |= 0xF1000000;
 
-    rgba = *(u32*)&color;
-    fogclr = (rgba >> 8) | 0xF2000000;
+    fogclr = ((u32)color.g << 8) | color.b;
+    fogclr |= (u32)color.r << 16;
+    fogclr = (fogclr & 0x00FFFFFF) | 0xF2000000;
 
     GX_WRITE_RAS_REG(fog0);
     GX_WRITE_RAS_REG(fog1);

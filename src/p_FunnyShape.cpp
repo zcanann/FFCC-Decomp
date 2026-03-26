@@ -47,9 +47,8 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 
-extern void* __vt__8CManager;
-extern "C" char __vt_CProcess[];
-extern "C" char __vt__14CFunnyShapePcs[];
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__14CFunnyShapePcs[];
 unsigned char ARRAY_8026D728[0xC];
 CFunnyShapePcs FunnyShapePcs;
 extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
@@ -186,13 +185,17 @@ CFunnyShapePcs::~CFunnyShapePcs()
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
+    volatile void** base = reinterpret_cast<volatile void**>(&FunnyShapePcs);
+    unsigned char* self = reinterpret_cast<unsigned char*>(&FunnyShapePcs);
     unsigned int* dst;
 
-    *reinterpret_cast<void**>(&FunnyShapePcs) = __vt__14CFunnyShapePcs;
-    __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(&FunnyShapePcs) + 0x3C);
-    __ct__11CFunnyShapeFv(reinterpret_cast<unsigned char*>(&FunnyShapePcs) + 0x50);
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(reinterpret_cast<unsigned char*>(&FunnyShapePcs) + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(reinterpret_cast<unsigned char*>(&FunnyShapePcs) + 0x61D8);
+    *base = __vt__8CManager;
+    *base = &__vt__8CProcess;
+    *base = __vt__14CFunnyShapePcs;
+    __ct__14CUSBStreamDataFv(self + 0x3C);
+    __ct__11CFunnyShapeFv(self + 0x50);
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
+    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
     __register_global_object(&FunnyShapePcs, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
 
     dst = reinterpret_cast<unsigned int*>(m_table__14CFunnyShapePcs);

@@ -13,13 +13,13 @@
 #include <string.h>
 
 // Linkage definitions from config/GCCP01/symbols.txt.
-const float kMapObjBoundMinInit = 10000000000.0f;
-const float kMapObjBoundMaxInit = -10000000000.0f;
-const float kMapObjZero = 1.0f;
-const float kMapObjOne = 0.0f;
-const float kMapObjInitNegOne = 1000000000000000.0f;
+extern const float kMapObjBoundMinInit = 10000000000.0f;
+extern const float kMapObjBoundMaxInit = -10000000000.0f;
+extern const float kMapObjZero = 1.0f;
+extern const float kMapObjOne = 0.0f;
+extern const float kMapObjInitNegOne = 1000000000000000.0f;
 float kMapObjDegToRad = 0.017453292f;
-const float kMapObjInitValue50 = -1.0f;
+extern const float kMapObjInitValue50 = -1.0f;
 unsigned int DAT_8032e498 = 0xFFFFFFFF;
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
@@ -203,7 +203,7 @@ void CMapObj::Init()
 
     U8At(this, 0x15) = 0x7E;
     U8At(this, 0x14) = 0x7E;
-    U8At(this, 0x1F) = 0xFF;
+    S8At(this, 0x1F) = -1;
     U8At(this, 0x20) = 0;
     U8At(this, 0x27) = 0;
     U8At(this, 0x21) = 0;
@@ -226,7 +226,7 @@ void CMapObj::Init()
     U8At(this, 0x24) = 0xFF;
     U8At(this, 0x23) = 0xFF;
     S32At(this, 0x10) = 0;
-    U16At(this, 0x16) = 0xFFFF;
+    S16At(this, 0x16) = -1;
     U8At(this, 0x22) = 1;
     S32At(this, 0x3C) = -1;
 

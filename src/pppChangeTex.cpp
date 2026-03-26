@@ -57,8 +57,6 @@ struct ChangeTexWork {
 	float m_cachedValue;
 };
 
-extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
-extern void GXCallDisplayList(void*, unsigned int);
 extern float FLOAT_80332020;
 extern float FLOAT_80332028;
 extern double DOUBLE_80332030;
@@ -74,6 +72,7 @@ void pppInitBlendMode(void);
 extern "C" {
 		int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 		void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
+		void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

@@ -261,10 +261,10 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
 
     if (param_2->m_dataValIndex != 0xFFFF) {
-        int fadeDivisor;
-        int graphFrame;
-        LocationTitleParticle* particle;
         long** shapeTable;
+        LocationTitleParticle* particle;
+        int graphFrame;
+        int fadeDivisor;
 
         fadeDivisor = -1;
         graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);

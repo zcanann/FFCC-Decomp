@@ -102,7 +102,7 @@ void CFile::Init()
     m_fileHandle.m_priority = PRI_SENTINEL;
     m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
 
-    unsigned int handleIndex = 0;
+    int handleIndex = 0;
     int byteOffset = 0;
     for (int blockCount = 0x20; blockCount != 0; blockCount--) {
         CHandle* nextHandle;
@@ -113,34 +113,30 @@ void CFile::Init()
             nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
-        handleIndex++;
 
-        if (handleIndex == 0x7F) {
+        if (handleIndex == 0x7E) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 2) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
-        handleIndex++;
 
-        if (handleIndex == 0x7F) {
+        if (handleIndex == 0x7D) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 3) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
-        handleIndex++;
 
-        if (handleIndex == 0x7F) {
+        if (handleIndex == 0x7C) {
             nextHandle = (CHandle*)&m_freeListSentinelDummy;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 4) * sizeof(CHandle));
         }
         *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
-        handleIndex++;
 
         byteOffset += 0x2B0;
-        handleIndex++;
+        handleIndex += 4;
     }
 }
 

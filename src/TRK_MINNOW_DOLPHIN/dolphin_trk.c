@@ -245,98 +245,75 @@ static inline void trkSync(void)
 
 void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 {
+	u8 buff[32] ATTRIBUTE_ALIGN(32);
+	u32 err;
+	register int count = param_1;
+	register u32 bf;
 	u32 uVar1;
-	u32 uVar2;
-	u16 sVar3;
-	u16 sVar4;
-	s32 iVar5;
-	u32 uVar6;
-	u32 uVar7;
-	u8 auStack_60[0x20] __attribute__((aligned(32)));
+	u32 size;
+	u16 r;
+	register u32 g;
+	register int counter;
+	u32 i;
 
-	if (param_2 < 0x4000) {
+	if ((size_t)param_2 < 0x4000 || param_2 + *param_3 > 0x8000000) {
 		return;
 	}
-	if (0x8000000 < param_2 + *param_3) {
-		return;
+
+	uVar1 = param_2 & ~0x1F;
+	counter = 0;
+	size = *param_3 + (param_2 & 0x1F);
+	size = OSRoundUp32B(size);
+
+	for (i = 0; i < size; i += 0x20) {
+		dataCacheBlockFlushIndexed(counter, (void*)count);
+		counter += 0x20;
 	}
-	uVar1 = param_2 & 0xFFFFFFE0;
-	iVar5 = 0;
-	uVar2 = *param_3 + (param_2 & 0x1F) + 0x1F & 0xFFFFFFE0;
-	uVar7 = (uVar2 + 0x1F) >> 5;
-	if (uVar2 != 0) {
-		uVar6 = (uVar2 + 0x1F) >> 8;
-		if (uVar6 != 0) {
-			do {
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				dataCacheBlockFlushIndexed(iVar5, (void*)param_1);
-				iVar5 += 0x20;
-				uVar6--;
-			} while (uVar6 != 0);
-			uVar7 &= 7;
-			if (uVar7 == 0) {
-				goto LAB_801adc44;
-			}
-		}
-		do {
-			dataCacheBlockFlush((void*)(param_1 + iVar5));
-			iVar5 += 0x20;
-			uVar7--;
-		} while (uVar7 != 0);
-	}
-LAB_801adc44:
+
 	do {
-		iVar5 = ARGetDMAStatus();
-	} while (iVar5 != 0);
+		err = ARGetDMAStatus();
+	} while (err);
 
-	sVar3 = __ARGetInterruptStatus();
-	uVar7 = 0x8000000;
-	if ((param_2 & 0x1F) != 0) {
-		dataCacheBlockInvalidate(auStack_60);
+	r = __ARGetInterruptStatus();
+	g = 0x8000000;
+
+	counter = param_2 & 0x1F;
+	if (counter) {
+		g = uVar1;
+		bf = (u32)buff;
+		dataCacheBlockInvalidate(buff);
 		__ARClearInterrupt();
-		ARStartDMA(1, (u32)auStack_60, uVar1, 0x20);
-		do {
-			sVar4 = __ARGetInterruptStatus();
-		} while (sVar4 == 0);
-		TRK_memcpy((void*)param_1, auStack_60, param_2 & 0x1F);
-		dataCacheBlockFlush((void*)param_1);
-		uVar7 = uVar1;
+		ARStartDMA(1, bf, uVar1, 0x20);
+
+		while (!__ARGetInterruptStatus()) { }
+
+		TRK_memcpy((void*)count, buff, counter);
+		dataCacheBlockFlush((void*)count);
 	}
 
 	param_2 += *param_3;
-	uVar6 = param_2 & 0x1F;
-	if (uVar6 != 0) {
-		if ((param_2 & 0xFFFFFFE0) != uVar7) {
-			dataCacheBlockInvalidate(auStack_60);
+	counter = param_2 & 0x1F;
+	if (counter) {
+		u32 val = param_2 & ~0x1F;
+		if (val != g) {
+			bf = (u32)buff;
+			dataCacheBlockInvalidate(buff);
 			__ARClearInterrupt();
-			ARStartDMA(1, (u32)auStack_60, param_2 & 0xFFFFFFE0, 0x20);
-			do {
-				sVar4 = __ARGetInterruptStatus();
-			} while (sVar4 == 0);
+			ARStartDMA(1, bf, val, 0x20);
+
+			while (!__ARGetInterruptStatus()) { }
 		}
-		TRK_memcpy((void*)(param_1 + param_2), auStack_60 + uVar6, 0x20 - uVar6);
-		dataCacheBlockFlush((void*)(param_1 + param_2));
+		g = count + param_2;
+		TRK_memcpy((void*)g, buff + counter, 0x20 - counter);
+
+		dataCacheBlockFlush((void*)g);
 	}
-	trkSync();
+	__sync();
 	__ARClearInterrupt();
-	ARStartDMA(0, param_1, uVar1, uVar2);
-	if (sVar3 == 0) {
-		do {
-			sVar3 = __ARGetInterruptStatus();
-		} while (sVar3 == 0);
+	ARStartDMA(0, count, uVar1, size);
+	if (!r) {
+		while (!__ARGetInterruptStatus()) { }
+
 		__ARClearInterrupt();
 	}
 }

@@ -159,7 +159,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);
 
         Crystal2RefractionMap* textureInfo = work->m_refractionMap;
-        const int textureSize = (int)GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+        u32 textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
         textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xAD);
         textureInfo->m_format = GX_TF_IA8;
@@ -168,33 +168,32 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         textureInfo->m_imageCount = 0x100;
         textureInfo->m_bufferSize = textureSize;
 
-        const float start = -1.0f;
-        const float stepX = 2.0f / (float)(textureInfo->m_width - 1);
-        const float stepY = 2.0f / (float)(textureInfo->m_height - 1);
-        float yy = start;
+        float stepX = 2.0f / (float)(textureInfo->m_width - 1);
+        float stepY = 2.0f / (float)(textureInfo->m_height - 1);
+        float yy = -1.0f;
 
         for (y = 0; y < (u32)textureInfo->m_height; ++y) {
-            float xx = start;
-            const float y2 = yy * yy;
+            float xx = -1.0f;
+            float y2 = yy * yy;
 
             for (x = 0; x < (u32)textureInfo->m_width; ++x) {
                 float normal = xx * xx + y2;
                 if (normal > 1.0f) {
                     normal = sqrtf(normal);
                 } else if (normal < 0.0f) {
-                    normal = 0.0f;
+                    normal = NAN;
                 }
 
                 if (normal > 0.8f) {
                     normal = 0.8f;
                 }
 
-                const u8 nx = (u8)__cvt_fp2unsigned((double)(xx * normal * 127.0f + 128.0f));
-                const u8 ny = (u8)__cvt_fp2unsigned((double)(yy * normal * 127.0f + 128.0f));
+                u8 nx = (u8)__cvt_fp2unsigned((double)(xx * normal * 127.0f + 128.0f));
                 u8* pixel = (u8*)((u32)textureInfo->m_imageData +
                     (y >> 2) * (textureInfo->m_width & 0x1ffffffcU) * 8 +
                     (x & 0x1ffffffc) * 8 +
                     ((x & 3) + (y & 3) * 4) * 2);
+                u8 ny = (u8)__cvt_fp2unsigned((double)(yy * normal * 127.0f + 128.0f));
 
                 pixel[0] = nx;
                 pixel[1] = ny;

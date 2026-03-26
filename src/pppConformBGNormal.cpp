@@ -95,10 +95,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     Vec local_158;
     Vec local_14c;
     Vec local_140;
-    CMapCylinderRaw cylinder;
-    Vec rayDirection;
-    Mtx scaleMtx;
-    Mtx basisMtx;
     s32 dataOffset;
 
     if (gPppCalcDisabled != 0) {
@@ -131,6 +127,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 hitFound = 1;
                 Game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
             } else if (mode == 2) {
+                CMapCylinderRaw cylinder;
+                Vec rayDirection;
+
                 rayDirection.x = kPppConformBgNormalZero;
                 rayDirection.y = kPppConformBgNormalDownRayY;
                 rayDirection.z = kPppConformBgNormalZero;
@@ -212,20 +211,25 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECNormalize(&local_140, &local_140);
             }
 
-            PSMTXIdentity(basisMtx);
-            basisMtx[0][0] = local_140.x;
-            basisMtx[0][1] = local_14c.x;
-            basisMtx[0][2] = local_158.x;
-            basisMtx[1][0] = local_140.y;
-            basisMtx[1][1] = local_14c.y;
-            basisMtx[1][2] = local_158.y;
-            basisMtx[2][0] = local_140.z;
-            basisMtx[2][1] = local_14c.z;
-            basisMtx[2][2] = local_158.z;
+            {
+                Mtx basisMtx;
+                Mtx scaleMtx;
 
-            PSMTXCopy(basisMtx, pppMngStPtr->m_matrix.value);
-            PSMTXScale(scaleMtx, pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z);
-            PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+                PSMTXIdentity(basisMtx);
+                basisMtx[0][0] = local_140.x;
+                basisMtx[0][1] = local_14c.x;
+                basisMtx[0][2] = local_158.x;
+                basisMtx[1][0] = local_140.y;
+                basisMtx[1][1] = local_14c.y;
+                basisMtx[1][2] = local_158.y;
+                basisMtx[2][0] = local_140.z;
+                basisMtx[2][1] = local_14c.z;
+                basisMtx[2][2] = local_158.z;
+
+                PSMTXCopy(basisMtx, pppMngStPtr->m_matrix.value);
+                PSMTXScale(scaleMtx, pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z);
+                PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+            }
 
             mode = param2->m_stepValue;
             if (mode == 0) {
@@ -234,6 +238,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[1][3] = *(f32*)((u8*)owner + 0x160);
                     pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
                 } else if ((((*(u8*)((u8*)owner + 0x9a) & 1) == 0) || (*(s32*)((u8*)owner + 0x18c) == 0))) {
+                    CMapCylinderRaw cylinder;
+                    Vec rayDirection;
+
                     rayDirection.x = kPppConformBgNormalZero;
                     rayDirection.y = kPppConformBgNormalDownRayY;
                     rayDirection.z = kPppConformBgNormalZero;

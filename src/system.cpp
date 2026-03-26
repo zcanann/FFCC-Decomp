@@ -73,6 +73,11 @@ CSystem::CSystem()
  */
 void CSystem::Init()
 {
+    CFile::CHandle* fileHandle;
+    unsigned int mapSize;
+    unsigned int offset;
+    unsigned int chunkSize;
+
     m_initialized = 1;
     m_currentOrder = (COrder*)0;
     m_currentOrderIndex = 0;
@@ -121,21 +126,19 @@ void CSystem::Init()
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
         m_mapStage = (CStage*)Memory.CreateStage(0x400000, (char*)"CSystem", 1);
-        CFile::CHandle* fileHandle = File.Open((char*)"gamePalM.map", 0, CFile::PRI_LOW);
+        fileHandle = File.Open((char*)"gamePalM.map", 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            unsigned int mapSize = File.GetLength(fileHandle);
+            mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[mapSize];
-            unsigned int offset = 0;
-            int remaining = mapSize;
-            unsigned int chunkSize;
-            for (; remaining != 0; remaining -= chunkSize)
+            offset = 0;
+            for (; mapSize != 0; mapSize -= chunkSize)
             {
                 chunkSize = 0x100000;
-                if (remaining < 0x100000)
+                if (mapSize < 0x100000)
                 {
-                    chunkSize = remaining;
+                    chunkSize = mapSize;
                 }
 
                 fileHandle->m_chunkSize = chunkSize;

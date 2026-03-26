@@ -30,8 +30,8 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
-extern "C" void* pppPartInit__8CPartMngFv(CPartMng* partMng, const char* filePath, unsigned long* fileSize, void* readBuffer, unsigned long readBufferSize);
+extern "C" void* pppFileRead__8CPartMngFPcRUlPvi(
+    CPartMng* partMng, const char* filePath, unsigned long* fileSize, void* readBuffer, unsigned long readBufferSize);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
@@ -2694,12 +2694,12 @@ void CPartMng::pppPartDead()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng)
+void CPartMng::pppPartInit()
 {
-	char* pppMngSt = reinterpret_cast<char*>(partMng);
+	char* pppMngSt = reinterpret_cast<char*>(this);
 	int i = 0;
 
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(partMng) + 0x8) = 0;
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
 	do {
 		int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
 		if (baseTime != -0x1000 && baseTime < 0) {
@@ -2708,11 +2708,6 @@ extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng)
 		pppMngSt += 0x158;
 		i++;
 	} while (i < 0x180);
-}
-
-void CPartMng::pppPartInit()
-{
-    pppPartInit__8CPartMngFv2(this);
 }
 
 /*
@@ -2801,7 +2796,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     }
 
     unsigned long fileSize = 0;
-    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, readBuffer, readBufferSize);
+    void* fileData = pppFileRead__8CPartMngFPcRUlPvi(this, path, &fileSize, readBuffer, readBufferSize);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
             System.Printf("CAN NOT READ[%s]!!\n", path);
@@ -2891,7 +2886,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         System.Printf("ReadPmd fn=[%s]\n", path);
     }
 
-    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, 0, 0);
+    void* fileData = pppFileRead__8CPartMngFPcRUlPvi(this, path, &fileSize, 0, 0);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
             System.Printf("CAN NOT READ[%s]!!\n", path);
@@ -3010,7 +3005,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         System.Printf("ReadPan fn=[%s]\n", path);
     }
 
-    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, 0, 0);
+    void* fileData = pppFileRead__8CPartMngFPcRUlPvi(this, path, &fileSize, 0, 0);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
             System.Printf("CAN NOT READ[%s]!!\n", path);
@@ -3123,7 +3118,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
     }
 
     unsigned long pdtSize = 0;
-    void* pdtData = pppPartInit__8CPartMngFv(this, pdtPath, &pdtSize, readBuffer, readBufferSize);
+    void* pdtData = pppFileRead__8CPartMngFPcRUlPvi(this, pdtPath, &pdtSize, readBuffer, readBufferSize);
     if (pdtData == 0) {
         pdtSlot->m_pppDataHead = 0;
         if (System.m_execParam != 0) {

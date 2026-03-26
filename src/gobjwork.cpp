@@ -1851,8 +1851,9 @@ void CCaravanWork::IsUseCmdList(int cmdListIdx)
 int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 {
 	unsigned int isInvalid = 0;
-	if ((cmdListIdx > 1) &&
-		(*(short*)((char*)m_commandListInventorySlotRef + (cmdListIdx << 1)) == -1)) {
+	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
+
+	if ((cmdListIdx >= 2) && (slotRef == -1)) {
 		isInvalid = 1;
 	}
 	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;

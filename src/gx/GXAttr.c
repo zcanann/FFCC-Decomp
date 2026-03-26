@@ -422,10 +422,11 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
     vb = &__GXData->vatB[vtxfmt];
     vc = &__GXData->vatC[vtxfmt];
 
-    for (; (attr = list->attr) != GX_VA_NULL; list++) {
-        cnt = list->cnt;
-        type = list->type;
+    while (list->attr != GX_VA_NULL) {
         frac = list->frac;
+        type = list->type;
+        cnt = list->cnt;
+        attr = list->attr;
         CHECK_ATTRNAME4(725, attr);
         CHECK_FRAC(726, frac);
 
@@ -498,6 +499,7 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
 #ifdef DEBUG
         __GXVerifyVATImm(attr, cnt, type, frac);
 #endif
+        list++;
     }
     __GXData->dirtyState |= 0x10;
     __GXData->dirtyVAT |= (u8)(1 << (u8)vtxfmt);

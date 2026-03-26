@@ -119,10 +119,10 @@ struct LaserWork {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
+void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = kPppLaserZero;
-    f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+    f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
     int local_24;
     int local_28;
     int iVar2;
@@ -181,10 +181,10 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Laser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
+void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = kPppLaserZero;
-    u8* work = (u8*)pppLaser + param_2->offsets->m_serializedDataOffsets[2] + 0x80;
+    u8* work = (u8*)pppLaser + param_2->m_serializedDataOffsets[2] + 0x80;
 
     *(f32*)(work + 0x18) = kPppLaserZero;
     *(f32*)(work + 0x14) = fVar1;
@@ -207,9 +207,9 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
+void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* alloc = work->m_points;
     if (alloc != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage(alloc);
@@ -226,7 +226,7 @@ void pppDestructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, struct pppLaserUnkC *param_3)
+void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
     LaserWork* work;
@@ -242,7 +242,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, stru
         return;
     }
 
-    work = (LaserWork*)((u8*)&pppLaser->field_0x88 + param_3->offsets->m_serializedDataOffsets[2]);
+    work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (work->m_maxLength == FLOAT_80333448) {
         return;
     }
@@ -381,13 +381,13 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, stru
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, struct pppLaserUnkC *param_3)
+void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
     _pppPObject* baseObj = (_pppPObject*)pppLaser;
     Vec* points;
-    int colorOffset = param_3->offsets->m_serializedDataOffsets[1];
-    LaserWork* work = (LaserWork*)((u8*)&pppLaser->field_0x88 + param_3->offsets->m_serializedDataOffsets[2]);
+    int colorOffset = param_3->m_serializedDataOffsets[1];
+    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
     u32 count;
     u32 i;
     u32 color;
@@ -418,7 +418,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
     pppSetBlendMode(step->m_payload[0x1c]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)&pppLaser->field_0x88 + colorOffset, &baseObj->m_localMatrix, kPppLaserZero, step->m_payload[0x39],
+        (u8*)pppLaser + 0x80 + colorOffset, &baseObj->m_localMatrix, kPppLaserZero, step->m_payload[0x39],
         step->m_payload[0x38], step->m_payload[0x1c], 0, 1, 1, 0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
@@ -436,7 +436,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
     GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
-    color = *(u32*)((u8*)&pppLaser->field_0x88 + colorOffset);
+    color = *(u32*)((u8*)pppLaser + 0x80 + colorOffset);
     halfWidth = work->m_halfWidth;
     length = work->m_length;
 

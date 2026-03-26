@@ -1926,7 +1926,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		rateDivisor = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
 	}
 	trackData[0x26] = 0x100000 / rateDivisor;
-	trackData[0x25] = (int)SineSwing;
+	trackData[0x25] = PTR_SineSwing__Fi_8021e9d0[*(unsigned char*)(trackData[0] + 2) & 0xf];
 	*(short*)((int)trackData + 0xae) = 0;
 	*(short*)(trackData + 0x2b) = 0;
 	trackData[0] += 3;

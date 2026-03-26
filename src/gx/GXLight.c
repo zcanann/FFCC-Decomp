@@ -136,9 +136,9 @@ void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
         break;
     case GX_SP_RING2:
         d = 1.0f / ((1.0f - cr) * (1.0f - cr));
+        a0 = 1.0f - (d * ((2.0f * cr) * cr));
         a1 = (4.0f * cr) * d;
         a2 = -2.0f * d;
-        a0 = 1.0f - (d * ((2.0f * cr) * cr));
         break;
     case GX_SP_OFF:
     default:

@@ -73,6 +73,7 @@ extern float FLOAT_80330424;
 extern float FLOAT_80330428;
 extern float FLOAT_8033042c;
 extern float FLOAT_80330430;
+extern "C" char s_l_item2[];
 
 struct Vec4d {
     float x;
@@ -1780,12 +1781,21 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007d648
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::CCClassRot(int, int, float, float, float, float)
+void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float rotY, float distance, float radius)
 {
-	// TODO
+    Vec targetPos;
+
+    targetPos.x = distance * static_cast<float>(sin(rotY)) + m_worldPosition.x;
+    targetPos.y = m_worldPosition.y + yOffset;
+    targetPos.z = distance * static_cast<float>(cos(rotY)) + m_worldPosition.z;
+    CCClass(useBodyRadius, classMask, yOffset, &targetPos, radius);
 }
 
 /*
@@ -2156,7 +2166,7 @@ void CGObject::LoadShield(int itemId)
 
         LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
             m_shieldModelHandle, 4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
-        m_shieldAttachNodeIndex = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, s_l_item);
+        m_shieldAttachNodeIndex = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, s_l_item2);
     }
 }
 

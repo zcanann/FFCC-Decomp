@@ -16,7 +16,7 @@ struct pppLocationTitle {
 
 struct pppLocationTitleUnkB {
     u32 m_graphId;
-    s32 m_dataValIndex;
+    u32 m_dataValIndex;
     u16 m_initWOrk;
     u16 m_maxCount;
     u8 m_stepCount;

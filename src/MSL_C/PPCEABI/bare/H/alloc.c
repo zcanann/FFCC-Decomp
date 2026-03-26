@@ -470,8 +470,9 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
 }
 
 static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+    Block* block;
     Block* current_block;
-    SubBlock* result;
+    void* result;
     unsigned long aligned_size;
 
     aligned_size = (size + 0xFUL) & 0xFFFFFFF8UL;
@@ -479,33 +480,36 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
         aligned_size = 0x50UL;
     }
 
-    current_block = pool_obj->start_;
-    if (current_block == 0) {
-        current_block = link_new_block(pool_obj, aligned_size);
-        if (current_block == 0) {
-            return 0;
-        }
+    if (pool_obj->start_ == 0) {
+        block = link_new_block(pool_obj, aligned_size);
+    } else {
+        block = pool_obj->start_;
     }
 
-    do {
-        if (aligned_size <= current_block->max_size) {
-            result = Block_subBlock(current_block, aligned_size);
-            if (result != 0) {
+    current_block = block;
+    if (current_block == 0) {
+        result = 0;
+    } else {
+        do {
+            if ((aligned_size <= current_block->max_size) &&
+                ((result = Block_subBlock(current_block, aligned_size)) != 0)) {
                 pool_obj->start_ = current_block;
                 goto done;
             }
-        }
-        current_block = current_block->next;
-    } while (current_block != pool_obj->start_);
+            current_block = current_block->next;
+        } while (current_block != pool_obj->start_);
 
-    current_block = link_new_block(pool_obj, aligned_size);
-    if (current_block == 0) {
-        return 0;
+        current_block = link_new_block(pool_obj, aligned_size);
+        if (current_block == 0) {
+            result = 0;
+        } else {
+            result = Block_subBlock(current_block, aligned_size);
+done:
+            result = (char*)result + 8;
+        }
     }
 
-    result = Block_subBlock(current_block, aligned_size);
-done:
-    return (char*)result + 8;
+    return result;
 }
 
 /*

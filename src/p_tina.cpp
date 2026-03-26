@@ -893,10 +893,10 @@ void CPartPcs::DrawShoki()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
-    if (usb->m_disableShokiDraw == 0 && Game.m_currentSceneId == 4) {
+    if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
         if (Game.m_gameWork.m_gamePaused == 0 &&
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
+            (int)*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
             Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
             pppInitDrawEnv(1);
             PartMng.pppSetRendMatrix();

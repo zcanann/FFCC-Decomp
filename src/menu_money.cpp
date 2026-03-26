@@ -39,6 +39,7 @@ extern float FLOAT_80332f78;
 extern float FLOAT_80332f7c;
 extern float FLOAT_80332f80;
 extern float FLOAT_80332f84;
+extern double DOUBLE_80332f88;
 extern double DOUBLE_80332F90;
 
 namespace {
@@ -54,6 +55,27 @@ struct MenuMoneyMembers {
     short* m_singWindow;
     unsigned char pad_084C[0x4];
     short* m_moneyPanel;
+};
+
+struct MenuMoneyOpenAnim {
+    short x;
+    short y;
+    short w;
+    short h;
+    float alpha;
+    float scale;
+    float progress;
+    float uvScale;
+    int unk18;
+    int tex;
+    int frame;
+    int startFrame;
+    int duration;
+    unsigned int flags;
+    float dx;
+    float dy;
+    float targetX;
+    float targetY;
 };
 
 STATIC_ASSERT(offsetof(MenuMoneyMembers, m_moneyFont) == 0x108);
@@ -306,49 +328,48 @@ void CMenuPcs::MoneyCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::MoneyClose()
+bool CMenuPcs::MoneyClose()
 {
-	float fVar1;
-	double dVar3;
-	int iVar4;
-	short* psVar5;
-	int iVar6;
-	int iVar7;
-	int iVar8;
+    int count;
+    int finished;
+    int step;
+    int remaining;
+    MenuMoneyOpenAnim* anim;
 
-	iVar4 = 0;
-	*(short*)(GetMoneyStateBase(this) + 0x22) = *(short*)(GetMoneyStateBase(this) + 0x22) + 1;
-	iVar6 = (int)*GetMoneyPanel(this);
-	psVar5 = GetMoneyPanel(this) + 4;
-	iVar7 = (int)*(short*)(GetMoneyStateBase(this) + 0x22);
-	iVar8 = iVar6;
-	if (0 < iVar6) {
-		do {
-			fVar1 = FLOAT_80332f64;
-			if (*(int *)(psVar5 + 0x12) <= iVar7) {
-				if (iVar7 < *(int *)(psVar5 + 0x12) + *(int *)(psVar5 + 0x14)) {
-					*(int *)(psVar5 + 0x10) = *(int *)(psVar5 + 0x10) + 1;
-					dVar3 = DOUBLE_80332F90;
-					*(float *)(psVar5 + 8) = (float)-((dVar3 / (double)*(int *)(psVar5 + 0x14)) * (double)*(int *)(psVar5 + 0x10) - dVar3);
-					if ((*(unsigned int *)(psVar5 + 0x16) & 2) == 0) {
-						fVar1 = (float)-((dVar3 / (double)*(int *)(psVar5 + 0x14)) * (double)*(int *)(psVar5 + 0x10) - dVar3);
-						*(float *)(psVar5 + 0x18) = (*(float *)(psVar5 + 0x1c) - (float)*psVar5) * fVar1;
-						*(float *)(psVar5 + 0x1a) = (*(float *)(psVar5 + 0x1e) - (float)psVar5[1]) * fVar1;
-					}
-				}
-				else {
-					iVar4 = iVar4 + 1;
-					*(float *)(psVar5 + 8) = FLOAT_80332f64;
-					*(float *)(psVar5 + 0x18) = fVar1;
-					*(float *)(psVar5 + 0x1a) = fVar1;
-				}
-			}
-			psVar5 = psVar5 + 0x20;
-			iVar8 = iVar8 + -1;
-		} while (iVar8 != 0);
-	}
-	(void)iVar6;
-	(void)iVar4;
+    finished = 0;
+    *(short*)(GetMoneyStateBase(this) + 0x22) = *(short*)(GetMoneyStateBase(this) + 0x22) + 1;
+    count = (int)*GetMoneyPanel(this);
+    anim = (MenuMoneyOpenAnim*)(GetMoneyPanel(this) + 4);
+    step = (int)*(short*)(GetMoneyStateBase(this) + 0x22);
+    remaining = count;
+
+    if (0 < count) {
+        do {
+            double dVar2 = DOUBLE_80332f88;
+            float zero = FLOAT_80332f64;
+            if (anim->startFrame <= step) {
+                if (step < anim->startFrame + anim->duration) {
+                    double dVar3 = DOUBLE_80332F90;
+                    anim->frame = anim->frame + 1;
+                    anim->progress =
+                        (float)-((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332F90);
+                    if ((anim->flags & 2) == 0) {
+                        float t = (float)-((dVar3 / (double)anim->duration) * (double)anim->frame - dVar3);
+                        anim->dx = (anim->targetX - (float)anim->x) * t;
+                        anim->dy = (anim->targetY - (float)anim->y) * t;
+                    }
+                } else {
+                    finished = finished + 1;
+                    anim->progress = FLOAT_80332f64;
+                    anim->dx = zero;
+                    anim->dy = zero;
+                }
+            }
+            anim = anim + 1;
+            remaining = remaining - 1;
+        } while (remaining != 0);
+    }
+    return count == finished;
 }
 
 /*

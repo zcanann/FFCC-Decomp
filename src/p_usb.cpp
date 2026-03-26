@@ -20,7 +20,7 @@ u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
 };
 static const char s_usbRootPath[] = "plot/kmitsuru/";
-static char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
+static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
@@ -90,9 +90,9 @@ void CUSBPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void* CUSBPcs::GetTable(unsigned long param)
+int CUSBPcs::GetTable(unsigned long param)
 {
-    return (void*)((char*)m_table__7CUSBPcs + (param * 0x15c));
+    return (int)((char*)m_table__7CUSBPcs + (param * 0x15c));
 }
 
 /*
@@ -217,7 +217,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(value, stage, s_p_usb_cpp_801D6D08, 0x1ca);
+    ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
     ptr[1] = value;
     ptr[0] = 4;
     ptr[9] = Swap32((unsigned int)code);
@@ -234,7 +234,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
         dstBuffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
-            (ptr[1] + 0x1F) & ~0x1F, stage, s_p_usb_cpp_801D6D08, 0x19e);
+            (ptr[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x19e);
         memcpy(dstBuffer, ptr, (ptr[1] + 0x1F) & ~0x1F);
 
         value = ptr[0];

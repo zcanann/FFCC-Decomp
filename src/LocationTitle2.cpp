@@ -46,8 +46,8 @@ struct LocationTitle2Particle {
     float m_scaleZ;
     u16 m_frame;
     s16 m_pad0;
-    s16 m_shape;
     s16 m_pad1;
+    s16 m_shape;
 };
 
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
@@ -109,15 +109,21 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
  */
 extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
+    int serializedOffset;
     int colorOffset;
+    s32* serializedOffsets;
     LocationTitle2Work* work;
+    u8* colorSrc;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    colorOffset = unkC->m_serializedDataOffsets[1];
-    work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
+    serializedOffsets = unkC->m_serializedDataOffsets;
+    serializedOffset = serializedOffsets[0];
+    colorOffset = serializedOffsets[1];
+    work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
+    colorSrc = (u8*)locationTitle + 0x88 + colorOffset;
     rand();
 
     if (unkB->m_dataValIndex == 0xFFFF) {
@@ -138,9 +144,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         int ownerData;
         CChara::CModel* model;
         int nodeIndex;
-        u8* modelBytes;
         u8* modelAnim;
         u8* modelNodes;
+        double zOffset;
 
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
@@ -155,36 +161,34 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         }
 
         nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);
-        modelBytes = (u8*)model;
-        modelAnim = *(u8**)(modelBytes + 0xA4);
-        modelNodes = *(u8**)(modelBytes + 0xA8);
+        modelAnim = *(u8**)((u8*)model + 0xA4);
+        modelNodes = *(u8**)((u8*)model + 0xA8);
+        zOffset = (double)FLOAT_80330f4c;
 
         for (u32 frameIndex = 0; frameIndex < *(u16*)(modelAnim + 0x10); frameIndex++) {
             Mtx nodeMtx;
             LocationTitle2Particle* particle;
-            u16 count;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(modelNodes + nodeIndex * 0xC0, model);
             SetFrame__Q26CChara6CModelFf((float)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
             PSMTXCopy((float(*)[4])(modelNodes + nodeIndex * 0xC0 + 0xC), nodeMtx);
 
-            count = work->m_count;
-            particle = &particles[count];
+            particle = &particles[work->m_count];
             particle->m_pos.x = nodeMtx[0][3];
             particle->m_pos.y = nodeMtx[1][3];
-            particle->m_pos.z = nodeMtx[2][3] + FLOAT_80330f4c;
-            memcpy(&particle->m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
+            particle->m_pos.z = (float)((double)nodeMtx[2][3] + zOffset);
+            memcpy(&particle->m_color, colorSrc, 4);
             particle->m_pad0 = 0;
-            particle->m_shape = 0;
             particle->m_pad1 = 0;
+            particle->m_shape = 0;
             particle->m_frame = (s16)frameIndex;
             particle->m_scaleX = locationTitle->m_localMatrix.value[0][0];
             particle->m_scaleY = locationTitle->m_localMatrix.value[1][1];
             particle->m_scaleZ = locationTitle->m_localMatrix.value[2][2];
-            work->m_count = count + 1;
+            work->m_count++;
 
-            if (unkB->m_maxCount <= (u16)(work->m_count + 1)) {
+            if (unkB->m_maxCount <= (u16)(work->m_count + 1U)) {
                 return;
             }
 
@@ -196,12 +200,14 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 int inserted;
                 double stepScale;
                 LocationTitle2Particle* startParticle;
+                Vec* interpIt;
 
                 stepCount = unkB->m_stepCount;
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
                 stepScale = (double)(FLOAT_80330f4c / (float)(stepCount + 1));
+                interpIt = interp;
                 PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &stepDir);
 
                 for (int i = 0; i < stepCount; i++) {
@@ -210,32 +216,36 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
                     t = (float)(stepScale * (double)(i + 1));
                     PSVECScale(&stepDir, &scaled, t);
-                    PSVECAdd(&startParticle->m_pos, &scaled, &interp[i]);
+                    PSVECAdd(&startParticle->m_pos, &scaled, interpIt);
                     inserted++;
                     work->m_count++;
 
-                    if (unkB->m_maxCount <= (u16)(work->m_count + 1)) {
+                    if (unkB->m_maxCount <= (u16)(work->m_count + 1U)) {
                         break;
                     }
+
+                    interpIt++;
                 }
 
                 pppCopyVector(particles[startIndex + inserted + 1].m_pos,
                               particles[startIndex + 1].m_pos);
 
+                interpIt = interp;
                 for (int i = 0; i < inserted; i++) {
                     LocationTitle2Particle* dst;
 
                     dst = &particles[startIndex + i + 1];
-                    interp[i].z += FLOAT_80330f4c;
-                    pppCopyVector(dst->m_pos, interp[i]);
-                    memcpy(&dst->m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
+                    interpIt->z = (float)((double)interpIt->z + zOffset);
+                    pppCopyVector(dst->m_pos, *interpIt);
+                    memcpy(&dst->m_color, colorSrc, 4);
                     dst->m_pad0 = 0;
-                    dst->m_shape = 0;
                     dst->m_pad1 = 0;
+                    dst->m_shape = 0;
                     dst->m_scaleX = locationTitle->m_localMatrix.value[0][0];
                     dst->m_scaleY = locationTitle->m_localMatrix.value[1][1];
                     dst->m_scaleZ = locationTitle->m_localMatrix.value[2][2];
                     dst->m_frame = (s16)frameIndex;
+                    interpIt++;
                 }
             }
         }

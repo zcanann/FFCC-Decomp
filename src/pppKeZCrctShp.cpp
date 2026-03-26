@@ -2,6 +2,11 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
+struct pppKeZCrctShpObject {
+    char _pad00[0x10];
+    pppFMATRIX m_localMatrix;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8008821c
@@ -26,7 +31,7 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
 
     (void)ctrlTable;
 
-    pppGetRowVector(object->m_localMatrix, rowX, rowY, rowZ, rowPos);
+    pppGetRowVector(((pppKeZCrctShpObject*)object)->m_localMatrix, rowX, rowY, rowZ, rowPos);
     pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);

@@ -142,12 +142,12 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
  */
 void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** textureNames)
 {
-    int shapeBase;
+    int shapeIndex;
     int shapeEntry;
     char* currentFrame;
     char* animData;
     int frameIndex;
-    int shapeIndex;
+    int shapeBase;
 
     animData = (char*)shapeSt->m_animData;
     currentFrame = animData;

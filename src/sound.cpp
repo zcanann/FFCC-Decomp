@@ -2429,22 +2429,14 @@ void CSound::PauseAllSe(int pause)
  */
 void CSound::AddNoFreeSeGroup(int group)
 {
-    CSoundLayout& sound = SoundData(this);
-    s16* groupEntry = sound.m_noFreeSeGroups;
-    int i = 0;
-    int remaining = 4;
-
-    while (remaining != 0) {
-        if (*groupEntry == -1) {
-            sound.m_noFreeSeGroups[i] = static_cast<s16>(group);
+    for (int i = 0; i < 4; i++) {
+        if (SoundData(this).m_noFreeSeGroups[i] == -1) {
+            SoundData(this).m_noFreeSeGroups[i] = static_cast<s16>(group);
             return;
         }
-        remaining--;
-        groupEntry++;
-        i++;
     }
 
-    if (System.m_execParam == 0) {
+    if ((unsigned int)System.m_execParam < 1) {
         return;
     }
 
@@ -2462,22 +2454,14 @@ void CSound::AddNoFreeSeGroup(int group)
  */
 void CSound::AddNoFreeWave(int wave)
 {
-    CSoundLayout& sound = SoundData(this);
-    s16* waveEntry = sound.m_noFreeWaves;
-    int i = 0;
-    int remaining = 4;
-
-    while (remaining != 0) {
-        if (*waveEntry == -1) {
-            sound.m_noFreeWaves[i] = static_cast<s16>(wave);
+    for (int i = 0; i < 4; i++) {
+        if (SoundData(this).m_noFreeWaves[i] == -1) {
+            SoundData(this).m_noFreeWaves[i] = static_cast<s16>(wave);
             return;
         }
-        remaining--;
-        waveEntry++;
-        i++;
     }
 
-    if (System.m_execParam == 0) {
+    if ((unsigned int)System.m_execParam < 1) {
         return;
     }
 

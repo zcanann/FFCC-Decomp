@@ -114,6 +114,7 @@ static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
 static char s_gobject_cpp[] = "gobject.cpp";
+static char s_l_item[] = "l_item";
 static char s_r_item[] = "r_item";
 static const float  sAnimFrameOffset = 1.0f;  // FLOAT_80330338
 static const double sLoopBias = 1.2;   // DOUBLE_80330378
@@ -2124,12 +2125,39 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007ca80
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::LoadShield(int)
+void CGObject::LoadShield(int itemId)
 {
-	// TODO
+    if (m_shieldModelHandle != 0) {
+        __dt__Q29CCharaPcs7CHandleFv(m_shieldModelHandle, 1);
+        m_shieldModelHandle = 0;
+    }
+
+    if (itemId > 0) {
+        void* handle =
+            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(0x194, Game.m_mainStage, s_gobject_cpp, 0xA23);
+        if (handle != 0) {
+            handle = __ct__Q29CCharaPcs7CHandleFv(handle);
+        }
+
+        m_shieldModelHandle = static_cast<CCharaPcs::CHandle*>(handle);
+        Add__Q29CCharaPcs7CHandleFv(m_shieldModelHandle);
+
+        unsigned long textureVariant = 0;
+        if (m_ownerType == 0) {
+            textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
+        }
+
+        LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
+            m_shieldModelHandle, 4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
+        m_shieldAttachNodeIndex = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, s_l_item);
+    }
 }
 
 /*

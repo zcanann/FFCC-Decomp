@@ -647,19 +647,20 @@ void CCaravanWork::ChgEquipPos(int idx, int equip)
  */
 int CCaravanWork::CanAddComList(int count)
 {
-	int slotCount = m_numCmdListSlots;
 	short* slot = m_commandListInventorySlotRef;
+	int remaining = (short)m_numCmdListSlots - 2;
 
-	if (slotCount > 2) {
-		for (int i = slotCount - 2; i != 0; i--) {
+	if (2 < (short)m_numCmdListSlots) {
+		do {
 			if ((*slot == 0xFFFF) && (--count == 0)) {
 				break;
 			}
 			slot++;
-		}
+			remaining--;
+		} while (remaining != 0);
 	}
 
-	return count == 0;
+	return (((unsigned int)__cntlzw(count)) >> 5) & 0xFF;
 }
 
 /*
@@ -954,14 +955,15 @@ int CCaravanWork::AddGil(int gilToAdd)
 
 	m_gil = m_gil + gilToAdd;
 	totalGil = m_gil;
-	if (totalGil < 100000000) {
+	if (totalGil <= 99999999) {
 		if (totalGil < 0) {
 			gilToAdd = gilToAdd - totalGil;
 			m_gil = 0;
 		}
 	} else {
-		m_gil = totalGil - (totalGil + -99999999);
-		gilToAdd = gilToAdd - (totalGil + -99999999);
+		int overflow = totalGil - 99999999;
+		m_gil = totalGil - overflow;
+		gilToAdd = gilToAdd - overflow;
 	}
 	return gilToAdd;
 }

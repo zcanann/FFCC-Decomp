@@ -87,20 +87,16 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         if (alpha != 0) {
             pppColumValue* values = frameWork->m_values;
             Mtx identityMtx;
-            Vec basePos;
             Vec cameraDelta;
             short shapeFrame;
             float lengthXY;
-            float fadeRange = *(float*)(param_2->m_payload + 0x10);
             float segmentStep;
             float drawScale = 0.0f;
 
             PSMTXIdentity(identityMtx);
-            basePos = positionWork->m_position;
-
-            cameraDelta.x = ppvCameraMatrix0[0][3] - basePos.x;
-            cameraDelta.y = ppvCameraMatrix0[1][3] - basePos.y;
-            cameraDelta.z = ppvCameraMatrix0[2][3] + basePos.z;
+            cameraDelta.x = ppvCameraMatrix0[0][3] - positionWork->m_position.x;
+            cameraDelta.y = ppvCameraMatrix0[1][3] - positionWork->m_position.y;
+            cameraDelta.z = ppvCameraMatrix0[2][3] + positionWork->m_position.z;
 
             lengthXY = sqrtf(cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y);
             if (lengthXY > 0.0f) {
@@ -118,19 +114,20 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 Vec2d uvB;
                 float dist;
                 float fadeAmount;
+                float positionStep = segmentStep * values->m_positionScale;
 
                 center.x =
-                    basePos.x + ((cameraDelta.x * (float)(i + 1)) * segmentStep) * values->m_positionScale;
+                    positionWork->m_position.x + positionStep * (cameraDelta.x * (float)(i + 1));
                 center.y =
-                    basePos.y + ((cameraDelta.y * (float)(i + 1)) * segmentStep) * values->m_positionScale;
+                    positionWork->m_position.y + positionStep * (cameraDelta.y * (float)(i + 1));
                 center.z = 0.0f;
 
-                PSVECSubtract(&center, &basePos, &offset);
+                PSVECSubtract(&center, &positionWork->m_position, &offset);
                 dist = PSVECMag(&offset);
 
                 color.m_rgba[3] = alpha;
-                fadeAmount = dist / fadeRange;
-                if (dist < fadeRange && fadeAmount > 0.0f) {
+                fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
+                if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > 0.0f) {
                     color.m_rgba[3] = (u8)((float)color.m_rgba[3] * fadeAmount);
                 }
                 color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
@@ -150,8 +147,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;
-                shapeFrame =
-                    *(short*)((u8*)shapeSt->m_animData + ((u16)frameWork->m_shapeB * 8) + 0x10);
+                shapeFrame = *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
                 for (int j = 0; j < *(short*)((u8*)shapeSt->m_animData + shapeFrame + 2); j++) {
                     pppGetShapePos__FPlsR3VecR3Veci(
                         (long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);

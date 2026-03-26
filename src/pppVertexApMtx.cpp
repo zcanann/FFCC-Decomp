@@ -63,38 +63,6 @@ _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
- * PAL Address: 0x800de6d0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx)
-{
-	s32 offset = **(s32**)((u8*)vtx + 0xC);
-	u16* state = (u16*)((u8*)obj + offset + 0x80);
-
-	state[0] = 0;
-	state[1] = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void apea(_pppPObject*, PVertexApMtx*, Vec*)
-{
-	// Intentionally empty.
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800de360
  * PAL Size: 880b
  * EN Address: TODO
@@ -119,9 +87,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	}
 
 	if (state->countdown == 0) {
+		int count;
 		VertexApMtxEnv* env = (VertexApMtxEnv*)pppEnvStPtr;
+		VertexApMtxEntry* entry;
 		Vec* points = *(Vec**)((u8*)parent + 0x70);
-		VertexApMtxEntry* entry = &env->entries[data->entryIndex];
+		entry = &env->entries[data->entryIndex];
 
 		if (points == 0) {
 			u32* srcTable = *(u32**)((u8*)env + 0x8);
@@ -129,10 +99,10 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			points = src->points;
 		}
 
-		int count = data->spawnCount;
+		count = data->spawnCount;
 
 		switch (data->mode) {
-		case 0: {
+		case 0:
 			while (count-- != 0) {
 				if (state->index >= entry->maxValue) {
 					state->index = 0;
@@ -182,8 +152,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				}
 			}
 			break;
-		}
-		case 1: {
+		case 1:
 			while (count-- != 0) {
 				f32 randValue = Math.RandF();
 				f32 maxValue = (f32)entry->maxValue;
@@ -231,11 +200,40 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			}
 			break;
 		}
-		default:
-			break;
-		}
 		state->countdown = data->spawnDelay;
 	}
 
 	state->countdown--;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void apea(_pppPObject*, PVertexApMtx*, Vec*)
+{
+	// Intentionally empty.
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de6d0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx)
+{
+	s32 offset = **(s32**)((u8*)vtx + 0xC);
+	u16* state = (u16*)((u8*)obj + offset + 0x80);
+
+	state[0] = 0;
+	state[1] = 0;
 }

@@ -152,7 +152,7 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
     displayList += param_5;
     MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-    if ((callbackData->m_meshIndex != -1) && (meshIndex == callbackData->m_meshIndex)) {
+    if ((callbackData->m_meshIndex != 0xFF) && (meshIndex == callbackData->m_meshIndex)) {
         GXSetArray((GXAttr)0xB, colorArray, 4);
     }
 

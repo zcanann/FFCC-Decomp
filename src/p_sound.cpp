@@ -39,9 +39,9 @@ void CSoundPcs::Quit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CSoundPcs::GetTable(unsigned long index)
+int CSoundPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<unsigned char*>(m_table__9CSoundPcs) + (index * 0x15C);
+    return (int)(reinterpret_cast<unsigned char*>(m_table__9CSoundPcs) + (index * 0x15C));
 }
 
 /*

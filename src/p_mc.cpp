@@ -63,9 +63,9 @@ void CMcPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void* CMcPcs::GetTable(unsigned long index)
+int CMcPcs::GetTable(unsigned long index)
 {
-	return m_table__6CMcPcs + (index * 0x15c);
+	return (int)(m_table__6CMcPcs + (index * 0x15c));
 }
 
 /*

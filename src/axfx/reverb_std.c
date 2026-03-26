@@ -5,6 +5,9 @@
 #include "dolphin/axfx/__axfx.h"
 
 extern f32 powf(f32 x, f32 y);
+extern const f32 axfx_reverb_std_handle_f32_0p3;
+extern const f32 axfx_reverb_std_handle_f32_0p6;
+extern const double axfx_reverb_std_handle_i2f_magic;
 
 // prototypes
 static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
@@ -171,10 +174,6 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     return ReverbSTDCreate(rv, coloration, time, mix, damping, predelay);
 }
 
-const static f32 value0_3 = 0.3f;
-const static f32 value0_6 = 0.6f;
-const static double i2fMagic = 4503601774854144.0;
-
 asm static void HandleReverb2(register s32* sptr, register AXFX_REVSTD_WORK* rv) {
     nofralloc
 	stwu r1, -144(r1)
@@ -186,12 +185,12 @@ asm static void HandleReverb2(register s32* sptr, register AXFX_REVSTD_WORK* rv)
 	stfd f18, 120(r1)
 	stfd f19, 128(r1)
 	stfd f20, 136(r1)
-	lis r31, value0_3@ha
-	lfs f6, value0_3@l(r31)
-	lis r31, value0_6@ha
-	lfs f9, value0_6@l(r31)
-	lis r31, i2fMagic@ha
-	lfd f5, i2fMagic@l(r31)
+	lis r31, axfx_reverb_std_handle_f32_0p3@ha
+	lfs f6, axfx_reverb_std_handle_f32_0p3@l(r31)
+	lis r31, axfx_reverb_std_handle_f32_0p6@ha
+	lfs f9, axfx_reverb_std_handle_f32_0p6@l(r31)
+	lis r31, axfx_reverb_std_handle_i2f_magic@ha
+	lfd f5, axfx_reverb_std_handle_i2f_magic@l(r31)
 	lfs f2, AXFX_REVSTD_WORK.allPassCoeff(rv)
 	lfs f11, AXFX_REVSTD_WORK.damping(rv)
 	lfs f8, AXFX_REVSTD_WORK.level(rv)

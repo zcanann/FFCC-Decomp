@@ -273,10 +273,10 @@ void CPartPcs::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CPartPcs::GetTable(unsigned long index)
+int CPartPcs::GetTable(unsigned long index)
 {
 	unsigned long offset = index * 0x15c;
-	return m_table__8CPartPcs + offset;
+	return (int)(m_table__8CPartPcs + offset);
 }
 
 /*
@@ -479,8 +479,7 @@ void CPartPcs::create()
  */
 void CPartPcs::createLoad()
 {
-    CPartMngState* state = GetPartMngState();
-    char* stringBase = s_p_tina_rodata_801d7ee0;
+    CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
 
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
@@ -489,14 +488,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x24C, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, stringBase + 0x24C);
-    pppLoadPan__8CPartMngFPCc(&PartMng, stringBase + 0x24C);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x25C, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x270, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x284, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x298, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x2AC, 5, 1, 0, 0);
+    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
+    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
+    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 
@@ -894,10 +893,10 @@ void CPartPcs::DrawShoki()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
 
-    if (usb->m_disableShokiDraw == 0 && Game.m_currentSceneId == 4) {
+    if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
         if (Game.m_gameWork.m_gamePaused == 0 &&
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
+            (int)*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
             Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
             pppInitDrawEnv(1);
             PartMng.pppSetRendMatrix();

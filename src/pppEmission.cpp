@@ -284,7 +284,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         u8 field1C;
     };
 
-    const float baseScale = FLOAT_803311f8;
+    float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
 

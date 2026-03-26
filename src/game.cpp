@@ -372,9 +372,11 @@ void CGame::LoadLogoWaitingData()
 		CharaPcs.createLoad();
 		createLoad__8CPartPcsFv(&PartPcs);
 		m_assetsLoadedFlag = 1;
-		if (System.m_execParam > 2) {
-			System.Printf(const_cast<char*>(DAT_801d61dc));
+		if ((u32)System.m_execParam < 3) {
+			return;
 		}
+
+		System.Printf(const_cast<char*>(DAT_801d61dc));
 	}
 }
 

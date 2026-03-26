@@ -13,18 +13,16 @@ class CProcess : public CManager
 {
 public:
     CProcess() {}
-    void onScriptChanging(char*);
-    void onScriptChanged(char*, int);
-    void onMapChanging(int, int);
-    void onMapChanged(int, int, int);
+    virtual int GetTable(unsigned long) = 0;
+    virtual void onScriptChanging(char*);
+    virtual void onScriptChanged(char*, int);
+    virtual void onMapChanging(int, int);
+    virtual void onMapChanged(int, int, int);
 
-    virtual void create();
-    virtual void destroy();
-    virtual void calc();
-    virtual void ScriptChanging(char*);
-    virtual void ScriptChanged(char*, int);
-    virtual void MapChanging(int, int);
-    virtual void MapChanged(int, int, int);
+    void ScriptChanging(char* script) { onScriptChanging(script); }
+    void ScriptChanged(char* script, int param) { onScriptChanged(script, param); }
+    void MapChanging(int mapNo1, int mapNo2) { onMapChanging(mapNo1, mapNo2); }
+    void MapChanged(int mapNo1, int mapNo2, int value) { onMapChanged(mapNo1, mapNo2, value); }
 };
 
 class CSystem : public CManager

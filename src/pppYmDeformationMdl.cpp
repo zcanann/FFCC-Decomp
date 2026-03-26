@@ -275,7 +275,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
         GXSetNumIndStages(1);
         GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
-        GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_ITW_0, GX_ITM_1);
+        GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
         if ((*state == 0) || (*state == 0x168)) {
@@ -292,7 +292,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         indMtx[1][1] = rotMtx[1][1] * indScale;
         indMtx[0][2] = FLOAT_80330dac;
         indMtx[1][2] = FLOAT_80330dac;
-        GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+        GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
         GXLoadTexObj((_GXTexObj*)backTexture, GX_TEXMAP0);
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
@@ -309,7 +309,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         resetIndMtx[1][0] = FLOAT_80330dac;
         resetIndMtx[1][1] = FLOAT_80330dac;
         resetIndMtx[1][2] = FLOAT_80330dac;
-        GXSetIndTexMtx(GX_ITM_1, resetIndMtx, 1);
+        GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);

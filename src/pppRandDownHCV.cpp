@@ -24,16 +24,6 @@ struct PppRandDownHCVParam3 {
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randshort(short value, float multiplier)
-{
-    return;
-}
-
-/*
- * --INFO--
  * PAL Address: 80061794
  * PAL Size: 456b
  * EN Address: TODO

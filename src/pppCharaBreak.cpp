@@ -116,6 +116,50 @@ struct CharaBreakDisplayListPair {
     POLYGON_DATA* m_polygonData;
 };
 
+struct CharaBreakDisplayList {
+    u32 m_size;
+    void* m_data;
+    u16 m_material;
+    u16 _padA;
+};
+
+struct CharaBreakMeshData {
+    char m_name[0x14];
+    u32 m_vertexCount;
+    u8 _pad18[0x34];
+    s32 m_displayListCount;
+    CharaBreakDisplayList* m_displayLists;
+    u32 m_skinCount;
+    u8 _pad58[0x4];
+    s32 m_nodeIndex;
+};
+
+struct CharaBreakMeshRef {
+    S16Vec* m_workPositions;
+    S16Vec* m_workNormals;
+    CharaBreakMeshData* m_data;
+    u8 _padC[0x8];
+};
+
+struct CharaBreakModelData {
+    u8 _pad0[0xC];
+    u32 m_meshCount;
+    u8 _pad10[0x14];
+    void* m_materialSet;
+    u8 _pad28[0xC];
+    u32 m_posQuant;
+    u32 m_normQuant;
+};
+
+struct CharaBreakModelView {
+    u8 _pad0[0x38];
+    Mtx m_localMtx;
+    u8 _pad78[0x2C];
+    CharaBreakModelData* m_data;
+    void* m_nodes;
+    CharaBreakMeshRef* m_meshes;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80140F18
@@ -262,16 +306,15 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    u8* meshData = *(u8**)((u8*)mesh + 8);
-    s32 isSkinned = *(u32*)(meshData + 0x54) != 0;
+    CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
+    s32 isSkinned = meshData->m_skinCount != 0;
     S16Vec* workPositions = *(S16Vec**)mesh;
     u16* stream = (u16*)displayList;
     u8* polygonBytes = (u8*)polygonData;
     Mtx meshMtx;
 
     if (isSkinned == 0) {
-        PSMTXConcat(*(Mtx*)((u8*)model + 0x38),
-                    *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x58) * 0xC0) + 0xC),
+        PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0xC),
                     meshMtx);
     }
 
@@ -465,17 +508,16 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     for (meshIndex = 0; meshIndex < meshCount; meshIndex++) {
         bool needsMtxUpdate = false;
         Mtx meshToWorld;
-        u8* meshData = *(u8**)((u8*)mesh + 8);
+        CharaBreakMeshData* meshData = *(CharaBreakMeshData**)((u8*)mesh + 8);
         S16Vec* workPositions = *(S16Vec**)mesh;
 
-        if (*(u32*)(meshData + 0x54) == 0 && stepData[0x42] == 1) {
+        if (meshData->m_skinCount == 0 && stepData[0x42] == 1) {
             needsMtxUpdate = true;
-            PSMTXConcat(*(Mtx*)((u8*)model + 0x38),
-                        *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(meshData + 0x58) * 0xC0) + 0xC),
+            PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (meshData->m_nodeIndex * 0xC0) + 0xC),
                         meshToWorld);
         }
 
-        for (int dl = *(int*)(meshData + 0x4C) - 1; dl >= 0; dl--) {
+        for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
             int meshBuffers = *(int*)(*(int*)(workData + 0x1C) + (meshIndex * 4));
             u8* polygon = *(u8**)(*(int*)(meshBuffers + (dl * 4)) + 0xC);
             u16 polygonCount = *(u16*)(*(int*)(meshBuffers + (dl * 4)) + 8);
@@ -851,25 +893,26 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         }
 
         for (i = 0; i < meshCount; i++) {
-            int meshRef = *(u32*)(mesh + 8);
-            if (strcmp((char*)meshRef, "") == 0) {
+            CharaBreakMeshData* meshData = *(CharaBreakMeshData**)(mesh + 8);
+
+            if (strcmp(meshData->m_name, "") == 0) {
                 CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
                     gUtil,
                     &work->m_bboxMin,
                     &work->m_bboxMax,
-                    *(void**)(mesh + 0x10),
-                    *(u32*)(meshRef + 0x14),
+                    *(void**)mesh,
+                    meshData->m_vertexCount,
                     *(u32*)(*(u32*)(model + 0xA4) + 0x34));
             }
 
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(meshRef + 0x4C) << 2, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x3E9);
+                meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x3E9);
             if (((u32*)work->m_meshBuffers)[i] == 0) {
                 goto fail;
             }
 
             {
-                int displayListCount = *(s32*)(meshRef + 0x4C);
+                int displayListCount = meshData->m_displayListCount;
                 int* dlEntries = (int*)((u32*)work->m_meshBuffers)[i];
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     dlEntries[dl] = 0;
@@ -877,8 +920,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             }
 
             {
-                int displayListCount = *(s32*)(meshRef + 0x4C);
-                u8* displayList = *(u8**)(meshRef + 0x50);
+                int displayListCount = meshData->m_displayListCount;
+                CharaBreakDisplayList* displayList = meshData->m_displayLists;
                 int* dlEntries = (int*)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     CharaBreakDisplayListPair* dlPair = (CharaBreakDisplayListPair*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -891,14 +934,14 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     dlPair->m_rewrittenDisplayList = NULL;
                     dlPair->m_displayListSize = 0;
                     dlPair->m_polygonData = 0;
-                    dlPair->m_displayListSize = *(u32*)(displayList + 4);
+                    dlPair->m_displayListSize = displayList->m_size;
                     dlPair->m_rewrittenDisplayList = pppMemAlloc__FUlPQ27CMemory6CStagePci(
                         dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x40B);
                     if (dlPair->m_rewrittenDisplayList == NULL) {
                         goto fail;
                     }
 
-                    memcpy(dlPair->m_rewrittenDisplayList, *(void**)displayList, dlPair->m_displayListSize);
+                    memcpy(dlPair->m_rewrittenDisplayList, displayList->m_data, dlPair->m_displayListSize);
                     ReWriteDisplayList__5CUtilFPvUlUl(gUtil, dlPair->m_rewrittenDisplayList, dlPair->m_displayListSize, 1);
 
                     dlPair->m_polygonCount = (u16)GetNumPolygonFromDL__5CUtilFPvUl(gUtil, dlPair->m_rewrittenDisplayList);
@@ -908,13 +951,13 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                         goto fail;
                     }
 
-                    CreatePolygon(dlPair->m_polygonData, *(void**)displayList, *(u32*)(displayList + 4), (CChara::CModel*)model,
+                    CreatePolygon(dlPair->m_polygonData, displayList->m_data, displayList->m_size, (CChara::CModel*)model,
                                   (CChara::CMesh*)mesh);
                     InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, dlPair->m_polygonData, dlPair->m_polygonCount,
                                          (CChara::CModel*)model, (CChara::CMesh*)mesh);
 
                     dlEntries--;
-                    displayList += 0xC;
+                    displayList++;
                 }
             }
 

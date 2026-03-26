@@ -33,9 +33,9 @@ CSystem System;
 
 class CScenegraphProcessProxy {
 public:
-    virtual void create();
-    virtual void destroy();
-    virtual void* GetTable(unsigned long);
+    virtual void Init();
+    virtual void Quit();
+    virtual int GetTable(unsigned long);
 };
 
 typedef void (CProcess::*ScenegraphCallback)();

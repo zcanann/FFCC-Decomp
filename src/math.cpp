@@ -7,7 +7,9 @@
 extern "C" int rand(void);
 extern "C" int __cntlzw(unsigned int);
 extern "C" float FLOAT_8032F740;
+extern "C" float FLOAT_8032F744;
 extern "C" float FLOAT_8032F788;
+extern "C" double DOUBLE_8032F778;
 
 CMath Math;
 static Vec s_f_vpos;
@@ -701,8 +703,8 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
     PSVECNormalize(&zAxis, &zAxis);
 
     PSVECCrossProduct(&yAxis, &zAxis, &temp);
-    if (PSVECDotProduct(&xAxis, &temp) < 0.0) {
-        PSVECScale(outScale, outScale, -1.0f);
+    if (PSVECDotProduct(&xAxis, &temp) < DOUBLE_8032F778) {
+        PSVECScale(outScale, outScale, FLOAT_8032F744);
     }
 }
 

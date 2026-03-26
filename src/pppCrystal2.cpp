@@ -7,7 +7,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
-#include <math.h>
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
@@ -159,7 +159,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);
 
         Crystal2RefractionMap* textureInfo = work->m_refractionMap;
-        const int textureSize = (int)GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+        int textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
         textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xAD);
         textureInfo->m_format = GX_TF_IA8;
@@ -171,37 +171,39 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         const float start = -1.0f;
         const float stepX = 2.0f / (float)(textureInfo->m_width - 1);
         const float stepY = 2.0f / (float)(textureInfo->m_height - 1);
-        float yy = start;
+        float yCoord = start;
 
         for (y = 0; y < (u32)textureInfo->m_height; ++y) {
-            float xx = start;
-            const float y2 = yy * yy;
+            float xCoord = start;
+            float ySq = yCoord * yCoord;
 
             for (x = 0; x < (u32)textureInfo->m_width; ++x) {
-                float normal = xx * xx + y2;
+                float normal = xCoord * xCoord + ySq;
                 if (normal > 1.0f) {
-                    normal = sqrtf(normal);
+                    normal = std::sqrtf(normal);
                 } else if (normal < 0.0f) {
-                    normal = 0.0f;
+                    normal = NAN;
+                } else if (isnan(normal)) {
+                    normal = NAN;
                 }
 
                 if (normal > 0.8f) {
                     normal = 0.8f;
                 }
 
-                const u8 nx = (u8)__cvt_fp2unsigned((double)(xx * normal * 127.0f + 128.0f));
-                const u8 ny = (u8)__cvt_fp2unsigned((double)(yy * normal * 127.0f + 128.0f));
+                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * normal * 127.0f + 128.0f));
                 u8* pixel = (u8*)((u32)textureInfo->m_imageData +
                     (y >> 2) * (textureInfo->m_width & 0x1ffffffcU) * 8 +
                     (x & 0x1ffffffc) * 8 +
                     ((x & 3) + (y & 3) * 4) * 2);
+                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * normal * 127.0f + 128.0f));
 
                 pixel[0] = nx;
                 pixel[1] = ny;
-                xx += stepX;
+                xCoord += stepX;
             }
 
-            yy += stepY;
+            yCoord += stepY;
         }
 
         DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
@@ -209,7 +211,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             sizeof(GXTexObj), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xB5);
 
         GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
-                     (u16)textureInfo->m_height, GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+                     (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
     }
 }
 

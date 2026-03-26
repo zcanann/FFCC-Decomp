@@ -318,8 +318,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
     ScreenBreakDisplayList* displayList = modelView->m_meshes[meshIndex].m_data->m_displayLists + drawListIndex;
 
     if (work[0x24] != 0) {
-        GXColor color0;
-        GXColor color1;
+        unsigned char colorStorage0[4];
+        unsigned char colorStorage1[4];
         CMaterial* material;
 
         material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
@@ -331,8 +331,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         if (*(u16*)((u8*)material + 0x18) == 1) {
             GXSetNumChans(1);
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            __ct__6CColorFUcUcUcUc(&color0, 0xA0, 0xA0, 0xA0, 0xA0);
-            GXSetTevKColor((GXTevKColorID)0, color0);
+            GXSetTevKColor((GXTevKColorID)0,
+                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0)));
             GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
             GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 10, 0xE, 10, 0xF);
@@ -341,8 +341,8 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 0, 4);
-            __ct__6CColorFUcUcUcUc(&color1, 0x60, 0x60, 0x60, work[0x2B]);
-            GXSetTevKColor((GXTevKColorID)1, color1);
+            GXSetTevKColor((GXTevKColorID)1,
+                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage1, 0x60, 0x60, 0x60, work[0x2B])));
             GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
             GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
             _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 0xE, 0, 0xF);

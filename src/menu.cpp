@@ -27,19 +27,6 @@ CMenu::CMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMenu::~CMenu()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009b448
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 extern "C" CMenu* dtor_8009B448(CMenu* menu, short shouldDelete)
 {
 	if (menu != 0) {
@@ -101,24 +88,6 @@ void CMenu::Draw()
 void CMenu::ScriptChanging(char* script)
 {
 	onScriptChanging(script);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::onCalc()
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::onDraw()
-{
 }
 
 /*

@@ -1891,7 +1891,8 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
  */
 unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
 {
-	unsigned int state = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1778 + layerNo * 0xC);
+	unsigned int* layerStates = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1778);
+	unsigned int state = layerStates[layerNo * 3];
 	return static_cast<unsigned int>(__cntlzw(state)) >> 5;
 }
 

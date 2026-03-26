@@ -1738,66 +1738,67 @@ void CSound::searchSe3D(int)
  */
 int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
 {
+    u8* se;
+    int slot;
+    int pan;
+    int volume[4];
+    CRedSound* redSound;
+
     if (soundId < 0) {
         Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else {
         CSoundLayout& sound = SoundData(this);
-        u8* se = sound.m_seWork;
-        for (int i = 0; i < 0x80; i++, se += 0x28) {
+        redSound = RedSound(this);
+        se = sound.m_seWork;
+        slot = 0x80;
+        do {
             if (static_cast<s8>(*se) >= 0) {
-                int volume;
-                int pan;
-
                 *se = (*se & 0x7F) | 0x80;
                 *se &= 0xBF;
                 *reinterpret_cast<int*>(se + 0xC) = soundId;
-
-                int& seCount = sound.m_seCount;
-                const int seIndex = seCount;
-                seCount = seIndex + 1;
-                *reinterpret_cast<int*>(se + 4) = seIndex;
+                slot = sound.m_seCount;
+                sound.m_seCount = slot + 1;
+                *reinterpret_cast<int*>(se + 4) = slot;
 
                 *reinterpret_cast<float*>(se + 0x10) = nearDistance;
                 *reinterpret_cast<float*>(se + 0x14) = farDistance;
                 *reinterpret_cast<Vec*>(se + 0x18) = *pos;
                 se[3] = 0xFF;
 
-                calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
-                se[1] = static_cast<u8>(volume);
+                calcVolumePan(reinterpret_cast<CSe3D*>(se), volume[0], pan);
+                se[1] = static_cast<u8>(volume[0]);
                 se[2] = static_cast<u8>(pan);
                 se[0x24] = 0xFF;
                 se[0x25] = 0xFF;
                 se[0x26] = 0xFF;
                 se[0x27] = 0xFF;
 
-                int sePlayId;
                 if (soundId < 0) {
                     Printf__7CSystemFPce(&System, s_soundErrorFmt);
-                    sePlayId = -1;
+                    slot = -1;
                 } else if (soundId < 4000) {
-                    int bank = soundId / 1000 + (soundId >> 31);
-                    bank -= (bank >> 31);
-
-                    const u32 fade = static_cast<u32>(fadeFrames);
-                    const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
-                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), bank,
-                                                        soundId + bank * -1000, pan, firstVolume, 0);
-                    if (fade != 0) {
-                        SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
+                    slot = soundId / 1000 + (soundId >> 31);
+                    slot = SePlay__9CRedSoundFiiiii(redSound, slot - (slot >> 31),
+                                                    soundId + (slot - (slot >> 31)) * -1000, pan,
+                                                    volume[0] & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+                    if (fadeFrames != 0) {
+                        SeVolume__9CRedSoundFiii(redSound, slot, volume[0], fadeFrames);
                     }
                 } else {
-                    const u32 fade = static_cast<u32>(fadeFrames);
-                    const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
-                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, soundId, pan, firstVolume, 0);
-                    if (fade != 0) {
-                        SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
+                    slot = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan,
+                                                    volume[0] & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+                    if (fadeFrames != 0) {
+                        SeVolume__9CRedSoundFiii(redSound, slot, volume[0], fadeFrames);
                     }
                 }
 
-                *reinterpret_cast<int*>(se + 8) = sePlayId;
+                *reinterpret_cast<int*>(se + 8) = slot;
                 return *reinterpret_cast<int*>(se + 4);
             }
+            se += 0x28;
+            slot--;
         }
+        while (slot != 0);
     }
 
     return -1;

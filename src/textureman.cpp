@@ -468,8 +468,6 @@ int CTextureMan::SetTexture(_GXTexMapID texMapId, CTexture* texture)
  */
 int CTextureMan::SetTextureTev(CTexture* texture)
 {
-    GXColorS10 tevColor1;
-    GXColorS10 tevColor2;
     bool usePalette;
 
     GXSetNumIndStages(0);
@@ -482,17 +480,11 @@ int CTextureMan::SetTextureTev(CTexture* texture)
 
     usePalette = *(u8*)((u8*)texture + 0x60) == 9 || *(u8*)((u8*)texture + 0x60) == 8;
     if (usePalette) {
-        tevColor1.r = -1;
-        tevColor1.g = 0;
-        tevColor1.b = 0;
-        tevColor1.a = -1;
-        GXSetTevColorS10((GXTevRegID)1, tevColor1);
+        GXColor tevColor1 = {0xFF, 0, 0, 0xFF};
+        GXSetTevColor((GXTevRegID)1, tevColor1);
 
-        tevColor2.r = 0;
-        tevColor2.g = 0;
-        tevColor2.b = 0;
-        tevColor2.a = -1;
-        GXSetTevColorS10((GXTevRegID)2, tevColor2);
+        GXColor tevColor2 = {0, 0, 0, 0xFF};
+        GXSetTevColor((GXTevRegID)2, tevColor2);
 
         _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
             0, 0, 1, 2, 3);

@@ -160,9 +160,9 @@ void CCameraPcs::Quit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CCameraPcs::GetTable(unsigned long tableIndex)
+int CCameraPcs::GetTable(unsigned long tableIndex)
 {
-	return PTR_s_CCameraPcs_GAME__801e915c + tableIndex * 0x57;
+	return (int)(PTR_s_CCameraPcs_GAME__801e915c + tableIndex * 0x57);
 }
 
 /*

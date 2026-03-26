@@ -1,6 +1,7 @@
 #ifndef _FFCC_P_FUNNYSHAPE_H_
 #define _FFCC_P_FUNNYSHAPE_H_
 
+#include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
 
@@ -33,6 +34,13 @@ public:
     void SetDisplay(FS_DISPLAY_STATUS);
     void SetUSBData();
     void USBDataCallback(CDataHeader*);
+
+    CMemory::CStage* m_viewerStage;        // 0x04
+    u8 m_viewerState[0x34];                // 0x08
+    u8 m_usbStreamDataStorage[0x14];       // 0x3C
+    u8 m_funnyShapeStorage[0x616C];        // 0x50
+    u8 m_texturePtrArrayStorage[0x1C];     // 0x61BC
+    u8 m_gxTexObjPtrArrayStorage[0x1C];    // 0x61D8
 };
 
 extern CFunnyShapePcs FunnyShapePcs;

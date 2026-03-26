@@ -40,7 +40,6 @@ void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
 void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
-void memset__FPviUl(void*, int, unsigned long);
 int __cntlzw(unsigned int);
 }
 
@@ -452,12 +451,12 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
     *(u16*)(work + 0x1bc) = 0;
     *(u32*)(work + 0x1b8) = 0;
     *(u16*)(work + 0x1c0) = (u16)rand();
-    memset__FPviUl(work, 0, 8);
-    memset__FPviUl(work + 8, 0, 8);
-    memset__FPviUl(work + 0x10, 0, 8);
-    memset__FPviUl(work + 0x18, 0, 8);
-    memset__FPviUl(work + 0x20, 0, 8);
-    memset__FPviUl(work + 0x28, 0, 8);
+    memset(work, 0, 8);
+    memset(work + 8, 0, 8);
+    memset(work + 0x10, 0, 8);
+    memset(work + 0x18, 0, 8);
+    memset(work + 0x20, 0, 8);
+    memset(work + 0x28, 0, 8);
 
     one = kPppKeShpTail3XOne;
     i = 0;

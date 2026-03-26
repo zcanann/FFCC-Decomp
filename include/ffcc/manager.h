@@ -3,14 +3,8 @@
 
 class CManager {
 public:
-    virtual void create() {}
-    virtual void destroy() {}
-    virtual void calc() {}
-    virtual void ScriptChanging(char*);
-    virtual void ScriptChanged(char*, int);
-
-    virtual void MapChanging(int, int);
-    virtual void MapChanged(int, int, int);
+    virtual void Init() = 0;
+    virtual void Quit() = 0;
 };
 
 #endif // _FFCC_MANAGER_H

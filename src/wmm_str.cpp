@@ -27,50 +27,120 @@ extern const char* s_McWinMessGroup1_es[];
 extern const char* s_McWinMessGroup1_fr[];
 
 extern const char s_WinMessTable[];
-
-const char* s_NoTextByLanguage[] = {
-    "No",
-    "Nein",
-    "No",
-    "Non",
-    "No",
-};
-
-const char* s_SlotBTextByLanguage[] = {
-    "Slot B",
-    "Steckplatz B",
-    "Slot B",
-    "Slot B",
-    "Ranura B",
-    0,
-};
+extern const char* s_NoTextByLanguage[];
+extern const char* s_SlotBTextByLanguage[];
 
 /*
  * --INFO--
- * PAL Address: 0x8017b3f8
- * PAL Size: 156b
+ * PAL Address: 0x8017af14
+ * PAL Size: 396b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-const char* CMenuPcs::GetMcStr(int index)
+int CMenuPcs::GetSlotABXPos(int right)
 {
-    const unsigned char languageId = Game.m_gameWork.m_languageId;
-
+    CGame& game = Game;
+    const unsigned char languageId = game.m_gameWork.m_languageId;
+    const char* slotAText;
     switch (languageId) {
     case 1:
-        return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
+        slotAText = s_McWinMessGroup0_de[2];
+        break;
     case 3:
-        return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
+        slotAText = s_McWinMessGroup0_it[2];
+        break;
     case 4:
-        return s_McStr_es[index];
+        slotAText = s_McWinMessGroup0_es[2];
+        break;
     case 5:
-        return s_McStr_fr[index];
-    case 0:
+        slotAText = s_McWinMessGroup0_fr[2];
+        break;
     default:
-        return PTR_s_The_data_is_corrupt__80215bd8[index];
+        slotAText = s_McWinMessGroup0_en[2];
+        break;
     }
+
+    CFont* font = menuFont;
+    font->SetMargin(1.0f);
+    font->SetShadow(0);
+    font->SetScale(1.0f);
+    font->SetTlut(0x23);
+
+    const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
+    short* windowInfo = singWindowInfo;
+    int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
+    if (right != 0) {
+        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
+        x += slotAWidth - slotBWidth;
+    }
+    return x - 0x1e;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8017b0a0
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMenuPcs::GetYesNoXPos(int right)
+{
+    CGame& game = Game;
+    const unsigned char languageId = game.m_gameWork.m_languageId;
+    const char* yesText;
+    switch (languageId) {
+    case 1:
+        yesText = s_McWinMessGroup0_de[13];
+        break;
+    case 3:
+        yesText = s_McWinMessGroup0_it[13];
+        break;
+    case 4:
+        yesText = s_McWinMessGroup0_es[13];
+        break;
+    case 5:
+        yesText = s_McWinMessGroup0_fr[13];
+        break;
+    default:
+        yesText = s_McWinMessGroup0_en[13];
+        break;
+    }
+
+    CFont* font = menuFont;
+    font->SetMargin(1.0f);
+    font->SetShadow(0);
+    font->SetScale(1.0f);
+
+    const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
+    short* windowInfo = singWindowInfo;
+    int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
+    if (right != 0) {
+        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
+        x += yesWidth - noWidth;
+    }
+    return x - 0x1e;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8017b220
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+const char* CMenuPcs::GetWinMess(int index)
+{
+    int languageId = Game.m_gameWork.m_languageId;
+    if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
+        return &s_WinMessTable[index * 0x14];
+    }
+    return &s_WinMessTable[index * 0x14];
 }
 
 /*
@@ -148,113 +218,27 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 
 /*
  * --INFO--
- * PAL Address: 0x8017b220
- * PAL Size: 72b
+ * PAL Address: 0x8017b3f8
+ * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-const char* CMenuPcs::GetWinMess(int index)
-{
-    int languageId = Game.m_gameWork.m_languageId;
-    if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
-        return &s_WinMessTable[index * 0x14];
-    }
-    return &s_WinMessTable[index * 0x14];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8017b0a0
- * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMenuPcs::GetYesNoXPos(int right)
+const char* CMenuPcs::GetMcStr(int index)
 {
     CGame& game = Game;
-    const unsigned char languageId = game.m_gameWork.m_languageId;
-    const char* yesText;
-    switch (languageId) {
+
+    switch (game.m_gameWork.m_languageId) {
     case 1:
-        yesText = s_McWinMessGroup0_de[13];
-        break;
+        return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
     case 3:
-        yesText = s_McWinMessGroup0_it[13];
-        break;
+        return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
     case 4:
-        yesText = s_McWinMessGroup0_es[13];
-        break;
+        return s_McStr_es[index];
     case 5:
-        yesText = s_McWinMessGroup0_fr[13];
-        break;
+        return s_McStr_fr[index];
     default:
-        yesText = s_McWinMessGroup0_en[13];
-        break;
+        return PTR_s_The_data_is_corrupt__80215bd8[index];
     }
-
-    CFont* font = menuFont;
-    font->SetMargin(1.0f);
-    font->SetShadow(0);
-    font->SetScale(1.0f);
-
-    const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
-    short* windowInfo = singWindowInfo;
-    int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
-    if (right != 0) {
-        const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
-        x += yesWidth - noWidth;
-    }
-    return x - 0x1e;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8017af14
- * PAL Size: 396b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMenuPcs::GetSlotABXPos(int right)
-{
-    CGame& game = Game;
-    const unsigned char languageId = game.m_gameWork.m_languageId;
-    const char* slotAText;
-    switch (languageId) {
-    case 1:
-        slotAText = s_McWinMessGroup0_de[2];
-        break;
-    case 3:
-        slotAText = s_McWinMessGroup0_it[2];
-        break;
-    case 4:
-        slotAText = s_McWinMessGroup0_es[2];
-        break;
-    case 5:
-        slotAText = s_McWinMessGroup0_fr[2];
-        break;
-    default:
-        slotAText = s_McWinMessGroup0_en[2];
-        break;
-    }
-
-    CFont* font = menuFont;
-    font->SetMargin(1.0f);
-    font->SetShadow(0);
-    font->SetScale(1.0f);
-    font->SetTlut(0x23);
-
-    const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
-    short* windowInfo = singWindowInfo;
-    int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
-    if (right != 0) {
-        const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
-        x += slotAWidth - slotBWidth;
-    }
-    return x - 0x1e;
 }

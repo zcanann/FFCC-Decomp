@@ -258,7 +258,6 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int workOffset;
     RainColorData* colorData;
     RainParam* rain;
-    RainWork* work;
     RainDrop* drop;
     float tex0;
     float baseX;
@@ -292,12 +291,11 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(rain->lineWidth, GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
-    drop = work->drops;
-    tex0 = kPppRainTexCoordBase;
+    drop = *(RainDrop**)((u8*)pppRain + 0x80 + workOffset);
     baseX = pppMngStPtr->m_matrix.value[0][3];
     baseY = pppMngStPtr->m_matrix.value[1][3];
     baseZ = pppMngStPtr->m_matrix.value[2][3];
+    tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex1 = FLOAT_8033101c;
     i = 0;

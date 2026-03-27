@@ -39,6 +39,7 @@
 typedef void* ConstructorDestructor;
 
 extern "C" {
+void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
@@ -86,9 +87,9 @@ extern const char DAT_801d61b8[];
 extern const char DAT_801d6214[];
 extern const char DAT_801d6234[];
 extern const char DAT_8032f698[];
-extern const char DAT_8032f6a0[];
-extern const char DAT_8032f6a4[];
-extern const char DAT_8032f6ac[];
+extern const char* DAT_8032f6a0;
+extern const char* DAT_8032f6a4;
+extern const char* DAT_8032f6ac;
 extern const s16 DAT_8032e3d0[];
 const char* s_localLangDirs[] = {
     "jp/",
@@ -580,26 +581,21 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    const char* townName;
+    const char* townName = DAT_8032f6ac;
 
-    System.Printf(const_cast<char*>(DAT_8032f6a0));
-    System.Printf(const_cast<char*>(DAT_801d6214));
-    System.Printf(const_cast<char*>(DAT_8032f6a0));
+    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    Printf__7CSystemFPce(&System, DAT_801d6214);
+    Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
     memset(&Game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
     memset(Game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.m_gameWork.m_wmBackupParams));
 
-    townName = DAT_8032f6ac;
-    Game.m_gameWork.m_scriptSysVal0 = 0;
-    Game.m_gameWork.m_scriptSysVal1 = 0;
-    Game.m_gameWork.m_scriptSysVal2 = 0;
-    Game.m_gameWork.m_scriptSysVal3 = 1;
+    *reinterpret_cast<unsigned int*>(&Game.m_gameWork.m_scriptSysVal0) = 1;
     Game.m_gameWork.m_chaliceElement = 1;
 
     if (Game.m_gameWork.m_languageId == 3) {
         townName = DAT_8032f6a4;
     }
-
     strcpy(Game.m_gameWork.m_townName, townName);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
     InitFurTexBuffer__6CCharaFv(reinterpret_cast<CChara*>(Chara));
@@ -784,17 +780,14 @@ void CGame::CheckScriptChange()
 
         gameWork = &Game.m_gameWork;
 
-        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        Printf__7CSystemFPce(&System, DAT_8032f6a0);
         System.Printf(const_cast<char*>(DAT_801d6214));
-        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
         memset(&gameWork->m_gameDataStartMarker, 0, 0x13E1);
         memset(gameWork->m_wmBackupParams, 0xFF, sizeof(gameWork->m_wmBackupParams));
 
-        gameWork->m_scriptSysVal0 = 0;
-        gameWork->m_scriptSysVal1 = 0;
-        gameWork->m_scriptSysVal2 = 0;
-        gameWork->m_scriptSysVal3 = 1;
+        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) = 1;
         gameWork->m_chaliceElement = 1;
 
         if (gameWork->m_languageId == 3) {

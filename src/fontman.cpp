@@ -737,8 +737,11 @@ float CFont::GetWidth(char* text)
  */
 float CFont::GetWidth(unsigned short ch)
 {
-	unsigned short* glyph = m_glyphBuckets[ch & 0xFF] + 1;
-	int count = static_cast<int>(*m_glyphBuckets[ch & 0xFF]);
+	unsigned char flags;
+	unsigned int drawWidth;
+	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
+	unsigned short* glyph = glyphBucket + 1;
+	int count = static_cast<int>(*glyphBucket);
 
 	for (; count != 0; count--) {
 		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
@@ -750,8 +753,9 @@ float CFont::GetWidth(unsigned short ch)
 
 found_glyph:
 	if (glyph == 0) {
-		glyph = m_glyphBuckets[63] + 1;
-		for (count = static_cast<int>(*m_glyphBuckets[63]); count != 0; count--) {
+		glyphBucket = m_glyphBuckets[63];
+		glyph = glyphBucket + 1;
+		for (count = static_cast<int>(*glyphBucket); count != 0; count--) {
 			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
 				goto found_fallback;
 			}
@@ -761,20 +765,21 @@ found_glyph:
 	}
 
 found_fallback:
-	unsigned char flags = renderFlags;
-	unsigned int drawWidth;
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | (static_cast<unsigned int>(flags) >> 5)) < 0) {
+	flags = renderFlags;
+	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
 		drawWidth = static_cast<unsigned int>(m_glyphWidth);
 	} else {
 		signed char sign = static_cast<signed char>(flags) >> 7;
-		unsigned int extra = static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
+		unsigned int extra =
+		    static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
 		drawWidth = static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
 	}
 
 	double width = static_cast<double>(scaleX * (margin + static_cast<float>(drawWidth)));
-	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | (static_cast<unsigned int>(flags) >> 4)) < 0) {
+	if (static_cast<int>((static_cast<unsigned int>(flags) << 28) | static_cast<unsigned int>(flags >> 4)) < 0) {
 		width = static_cast<double>(static_cast<float>(floor(width)));
 	}
+
 	return static_cast<float>(width);
 }
 

@@ -19,10 +19,8 @@ struct pppYmTracerUnkC {
 
 struct TRACE_POLYGON;
 
-// Basic structure for pppYmTracer - based on Ghidra analysis
 struct pppYmTracer {
-    char field0_0x0[8]; // Base object data
-    // Additional fields inferred from usage pattern
+    u8 _pad[0x80];
 };
 
 void initTracePolygon(pppYmTracer*, TRACE_POLYGON*);
@@ -43,4 +41,3 @@ void pppRenderYmTracer(pppYmTracer*, pppYmTracerUnkB*, pppYmTracerUnkC*);
 #endif
 
 #endif // _FFCC_PPP_YMTRACER_H_
-

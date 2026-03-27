@@ -55,6 +55,7 @@ extern "C" void DrawOt__10pppDrawMngFv(void*);
 extern "C" void SetDrawDoneDebugDataPartControl__8CGraphicFi(void*, int);
 extern "C" void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
+extern "C" void pppPartInit__8CPartMngFv2(CPartMng*);
 extern "C" void pppSetRendMatrix__8CPartMngFv(CPartMng*);
 extern "C" void pppDraw__8CPartMngFv(CPartMng*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
@@ -618,7 +619,7 @@ void CPartPcs::calcInit()
 		g_par_calc_prof.ProfStart();
 		g_par_draw_prof.ProfStart();
 	}
-	PartMng.pppPartInit();
+	pppPartInit__8CPartMngFv2(&PartMng);
 }
 
 /*

@@ -3,10 +3,6 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 extern "C" void __dl__FPv(void* ptr);
 
-const float kStopwatchTickToMilliseconds = 100.0f;
-const float kStopwatchZeroFloat = 0.0f;
-const char s_stopwatchDefaultName[] = "no name";
-
 /*
  * --INFO--
  * Address:	TODO
@@ -154,3 +150,7 @@ void CProfile::ProfEnd()
 		m_frame = 0;
 	}
 }
+
+const float kStopwatchTickToMilliseconds = 100.0f;
+const float kStopwatchZeroFloat = 0.0f;
+const char s_stopwatchDefaultName[] = "no name";

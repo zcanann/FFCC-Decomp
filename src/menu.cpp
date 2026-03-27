@@ -6,14 +6,69 @@ extern "C" void __dl__FPv(void*);
 
 /*
  * --INFO--
- * PAL Address: 0x8009b4a8
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:	TODO
+ * Size:	TODO
  */
-CMenu::CMenu()
+void CMenu::onScriptChanged(char*, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::onScriptChanging(char*)
+{
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::ScriptChanging(char* script)
+{
+	onScriptChanging(script);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::Draw()
+{
+	onDraw();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::Calc()
+{
+	onCalc();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::Destroy()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::Create()
 {
 	// TODO
 }
@@ -42,69 +97,14 @@ extern "C" CMenu* dtor_8009B448(CMenu* menu, short shouldDelete)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009b4a8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenu::Create()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::Destroy()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::Calc()
-{
-	onCalc();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::Draw()
-{
-	onDraw();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::ScriptChanging(char* script)
-{
-	onScriptChanging(script);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::onScriptChanging(char*)
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::onScriptChanged(char*, int)
+CMenu::CMenu()
 {
 	// TODO
 }

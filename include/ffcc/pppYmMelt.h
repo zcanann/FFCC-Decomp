@@ -27,12 +27,23 @@ struct PYmMeltDataOffsets {
     s32* m_serializedDataOffsets;
 };
 
+struct YmMeltCtrlInitWork {
+    s16 m_shapeStep;
+    u16 m_gridSize;
+};
+
+struct YmMeltCtrlArg3 {
+    u8 m_blendMode;
+    u8 _pad1;
+    s16 m_phaseDiv;
+};
+
 struct YmMeltCtrl {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_initWOrk;
+    YmMeltCtrlInitWork m_initWOrk;
     f32 m_stepValue;
-    s32 m_arg3;
+    YmMeltCtrlArg3 m_arg3;
     u8 m_payload[0x20];
 };
 

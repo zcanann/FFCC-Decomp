@@ -191,7 +191,7 @@ static inline unsigned int Align32(unsigned int x)
 static inline unsigned int Swap32(unsigned int x)
 {
     unsigned int tmp = x;
-    return __lwbrx((void*)&tmp, 4);
+    return __lwbrx((void*)&tmp, 0);
 }
 
 /*
@@ -205,13 +205,14 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
+    unsigned int count;
     unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
     unsigned int value;
+    unsigned int swappedCount;
     CMemory::CStage* stage;
     int result;
-    unsigned int count;
 
     count = (unsigned int)(elemSize * elemCount);
     value = (count + 0x5F) & ~0x1F;
@@ -222,9 +223,10 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     ptr[0] = 4;
     ptr[9] = Swap32((unsigned int)code);
     ptr[10] = Swap32((unsigned int)elemCount);
-    ptr[12] = Swap32(count);
-    ptr[11] = Swap32(0);
-    ptr[8] = Swap32(count);
+    swappedCount = Swap32(count);
+    ptr[12] = swappedCount;
+    ptr[11] = 0;
+    ptr[8] = swappedCount;
     memcpy(ptr + 0x10, src, count);
 
     connected = USB.IsConnected();

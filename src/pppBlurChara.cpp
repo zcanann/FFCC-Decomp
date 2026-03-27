@@ -352,13 +352,14 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    u8* blurBase = reinterpret_cast<u8*>(blurChara);
     int textureBase = 0;
     int textureIndex;
-    int colorOffset = serializedDataOffsets[1];
-    int texOffset = serializedDataOffsets[2];
+    int texOffset = param_3->m_serializedDataOffsets[2];
+    int colorOffset = param_3->m_serializedDataOffsets[1];
     int objPosBase;
+    u8* blurBase = reinterpret_cast<u8*>(blurChara) + 0x80;
+    u8* colorBase = blurBase + colorOffset;
+    u8* texBase = blurBase + texOffset;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
     Mtx identityMtx;
@@ -394,24 +395,24 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>(blurBase + colorOffset + 0x88), 0,
-                                                               FLOAT_80331030, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
-    objPosBase = *reinterpret_cast<int*>(blurBase + texOffset + 0x84);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>(colorBase + 8), 0, FLOAT_80331030,
+                                                               param_2->m_alpha, 0, 0, 0, 1, 1, 0);
+    objPosBase = *reinterpret_cast<int*>(texBase + 4);
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraWorldX();
+    cameraPos.x = CameraPcs._224_4_;
     cameraPos.y = FLOAT_80331030;
-    cameraPos.z = CameraWorldZ();
-    cameraTarget.x = CameraLookAtX();
+    cameraPos.z = CameraPcs._232_4_;
+    cameraTarget.x = CameraPcs._212_4_;
     cameraTarget.y = FLOAT_80331030;
-    cameraTarget.z = CameraLookAtZ();
+    cameraTarget.z = CameraPcs._220_4_;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = FLOAT_80331030;
 
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
-    PSMTXCopy(CameraMatrix(), cameraMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXIdentity(identityMtx);
 
     objPos.x = *(float*)(objPosBase + 0x15C);
@@ -431,13 +432,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
-    drawColor = *reinterpret_cast<_GXColor*>(blurBase + colorOffset + 0x88);
+    drawColor = *reinterpret_cast<_GXColor*>(colorBase + 8);
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);
-    GXLoadTexObj(*reinterpret_cast<_GXTexObj**>(blurBase + texOffset + 0x88), GX_TEXMAP0);
+    GXLoadTexObj(*reinterpret_cast<_GXTexObj**>(texBase + 8), GX_TEXMAP0);
     _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 10, 8,
                                                                                                           0xF);
     _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
@@ -478,7 +479,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     float depth = (float)PSVECDistance(&cameraPos, &objPos);
     depth -= param_2->m_stepValue;
 
-    PSMTX44Copy(CameraScreenMatrix(), screenMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
     inVec.z = -depth;

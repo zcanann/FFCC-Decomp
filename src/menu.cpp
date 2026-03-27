@@ -82,7 +82,7 @@ void CMenu::Create()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CMenu* dtor_8009B448(CMenu* menu, short shouldDelete)
+extern "C" CMenu* __dt__5CMenuFv(CMenu* menu, short shouldDelete)
 {
 	if (menu != 0) {
 		*(void***)menu = __vt__5CMenu;

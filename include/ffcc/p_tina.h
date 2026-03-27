@@ -3,6 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "ffcc/USBStreamData.h"
 
 struct Vec;
 struct pppIVECTOR3;
@@ -15,7 +16,6 @@ unsigned int pppFreeMngStPrioForData();
 unsigned char pppAmemDeletePmng(unsigned long);
 unsigned int pppAmemRefCntError(unsigned long);
 
-extern "C" void* __ct__14CUSBStreamDataFv(void*);
 extern unsigned int m_table_desc0__8CPartPcs[];
 extern unsigned int m_table_desc1__8CPartPcs[];
 extern unsigned int m_table_desc2__8CPartPcs[];
@@ -40,10 +40,10 @@ extern unsigned char m_table__8CPartPcs[];
 class CPartPcs : public CProcess
 {
 public:
+    CUSBStreamData m_usbStreamData; // 0x04
+
     CPartPcs()
     {
-        __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x8);
-
         unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
         table[1] = m_table_desc0__8CPartPcs[0];
         table[2] = m_table_desc0__8CPartPcs[1];

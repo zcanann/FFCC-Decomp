@@ -33,11 +33,12 @@ void pppSRandCV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     SRandCVParam* in = (SRandCVParam*)param2;
     SRandCVCtx* ctx = (SRandCVCtx*)param3;
+    float* target;
+    u8* targetColor;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
-
-    float* target;
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         target = (float*)(base + *ctx->outputOffset + 0x80);
@@ -48,8 +49,7 @@ void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[0] = value;
         }
@@ -60,8 +60,7 @@ void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[1] = value;
         }
@@ -72,8 +71,7 @@ void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[2] = value;
         }
@@ -84,40 +82,25 @@ void pppSRandCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                float scale = kPppSRandCVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandCVSingleSampleScale;
             }
             target[3] = value;
         }
+    } else if (in->targetId != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (in->targetId != *(s32*)(base + 0xC)) {
-            return;
-        }
         target = (float*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s32 color_offset = in->sourceOffset;
-    u8* target_colors;
-    if (color_offset == -1) {
-        target_colors = gPppDefaultValueBuffer;
+    s32 colorOffset = in->sourceOffset;
+    if (colorOffset == -1) {
+        targetColor = gPppDefaultValueBuffer;
     } else {
-        target_colors = base + color_offset + 0x80;
+        targetColor = base + colorOffset + 0x80;
     }
 
-    {
-        u8 color = target_colors[0];
-        target_colors[0] = color + (s8)((f32)in->delta[0] * target[0] - (f32)in->delta[0]);
-    }
-    {
-        u8 color = target_colors[1];
-        target_colors[1] = color + (s8)((f32)in->delta[1] * target[1] - (f32)in->delta[1]);
-    }
-    {
-        u8 color = target_colors[2];
-        target_colors[2] = color + (s8)((f32)in->delta[2] * target[2] - (f32)in->delta[2]);
-    }
-    {
-        u8 color = target_colors[3];
-        target_colors[3] = color + (s8)((f32)in->delta[3] * target[3] - (f32)in->delta[3]);
-    }
+    targetColor[0] = (u8)(targetColor[0] + (s8)((float)in->delta[0] * target[0] - (float)in->delta[0]));
+    targetColor[1] = (u8)(targetColor[1] + (s8)((float)in->delta[1] * target[1] - (float)in->delta[1]));
+    targetColor[2] = (u8)(targetColor[2] + (s8)((float)in->delta[2] * target[2] - (float)in->delta[2]));
+    targetColor[3] = (u8)(targetColor[3] + (s8)((float)in->delta[3] * target[3] - (float)in->delta[3]));
 }

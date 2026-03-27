@@ -2245,14 +2245,13 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
     GetItemType__8CMenuPcsFii(this, itemNo, 1);
 
     u8* itemBase = reinterpret_cast<u8*>(Game.unkCFlatData0[2]) + (itemNo * 0x48);
-    u16* out = reinterpret_cast<u16*>(materialInfo);
 
-    out[0] = *reinterpret_cast<u16*>(itemBase + 0x26);
-    out[3] = *reinterpret_cast<u16*>(itemBase + 0x2C);
-    out[1] = *reinterpret_cast<u16*>(itemBase + 0x28);
-    out[4] = *reinterpret_cast<u16*>(itemBase + 0x2E);
-    out[2] = *reinterpret_cast<u16*>(itemBase + 0x2A);
-    out[5] = *reinterpret_cast<u16*>(itemBase + 0x30);
+    materialInfo->m_itemNo[0] = *reinterpret_cast<u16*>(itemBase + 0x26);
+    materialInfo->m_count[0] = *reinterpret_cast<u16*>(itemBase + 0x2C);
+    materialInfo->m_itemNo[1] = *reinterpret_cast<u16*>(itemBase + 0x28);
+    materialInfo->m_count[1] = *reinterpret_cast<u16*>(itemBase + 0x2E);
+    materialInfo->m_itemNo[2] = *reinterpret_cast<u16*>(itemBase + 0x2A);
+    materialInfo->m_count[2] = *reinterpret_cast<u16*>(itemBase + 0x30);
 }
 
 /*

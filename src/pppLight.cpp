@@ -46,7 +46,7 @@ struct PppLightWork {
 struct PppLightStep {
 	s32 sourceId;
 	u8 unk4[0x40];
-	s32 targetIndex;
+	u32 targetIndex;
 	u8 unk48[0x10];
 	u8 type;
 	u8 color0Enabled;
@@ -249,33 +249,35 @@ void pppLight(void* param1, void* param2, void* param3)
 				light.m_spotScale = kPppLightDefaultCosAtten;
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
+				u32 targetIndex;
 				unsigned char* obj;
 
 				light.m_type = 1;
-				if (step->targetIndex == -1) {
-					obj = &gPppDefaultValueBuffer[0];
+				targetIndex = step->targetIndex;
+				if (targetIndex == 0xFFFFFFFF) {
+					obj = gPppDefaultValueBuffer;
 				} else {
 					pppLightTarget* targetTable =
 						(pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable;
-					obj = targetTable[step->targetIndex].obj;
+					obj = targetTable[targetIndex].obj;
 				}
 
-				light.m_targetPosition.x = *(f32*)(obj + 0x1c);
-				light.m_targetPosition.y = *(f32*)(obj + 0x2c);
-				light.m_targetPosition.z = *(f32*)(obj + 0x3c);
-				PSMTXMultVec(pppMngStPtr->m_matrix.value, (Vec*)&light.m_targetPosition, (Vec*)&light.m_targetPosition);
+					light.m_targetPosition.x = *(f32*)(obj + 0x1c);
+					light.m_targetPosition.y = *(f32*)(obj + 0x2c);
+					light.m_targetPosition.z = *(f32*)(obj + 0x3c);
+					PSMTXMultVec(pppMngStPtr->m_matrix.value, (Vec*)&light.m_targetPosition, (Vec*)&light.m_targetPosition);
 
-				PSVECSubtract((Vec*)&light.m_targetPosition, (Vec*)&light.m_position, (Vec*)&light.m_direction);
-				PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);
-				light.m_spotScale = kPppLightSpotScale * work->spotScale;
+					PSVECSubtract((Vec*)&light.m_targetPosition, (Vec*)&light.m_position, (Vec*)&light.m_direction);
+					PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);
+					light.m_spotScale = kPppLightSpotScale * work->spotScale;
 
-				if (step->type == 2) {
-					light.m_specularScale = work->specularScale;
-					light.m_specularMode = 1;
+					if (step->type == 2) {
+						light.m_specularScale = work->specularScale;
+						light.m_specularMode = 1;
+					}
+
+					Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 				}
-
-				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
-			}
 		}
 	}
 }

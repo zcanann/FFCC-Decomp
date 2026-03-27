@@ -24,7 +24,7 @@
 
 static inline CUSBStreamData* UsbStream(CPartPcs* self)
 {
-    return reinterpret_cast<CUSBStreamData*>((char*)self + 0x10);
+    return &self->m_usbStreamData;
 }
 
 struct CMapCylinderRaw

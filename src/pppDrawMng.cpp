@@ -10,8 +10,8 @@
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
-float kPppDrawDepthScaleNear = 0.0512f;
-float kPppDrawDepthScaleFar = 0.512f;
+extern const float kPppDrawDepthScaleNear;
+extern const float kPppDrawDepthScaleFar;
 }
 
 /*

@@ -15,12 +15,12 @@ extern u8 gGraphicDrawDonePartControlInit;
 extern _GXColor gGraphicDefaultClearColor;
 extern char sGraphicUnknownOrderName[];
 extern u8 gGraphicNoiseTextureI8_64x96[];
-extern float kGraphicZeroF;
-extern float kGraphicOneF;
-extern double kGraphicHalfF64;
-extern float kGraphicBlurAlphaScale;
-extern float kGraphicNoiseTexScaleU;
-extern float kGraphicNoiseTexScaleV;
+extern const float kGraphicZeroF;
+extern const float kGraphicOneF;
+extern const double kGraphicHalfF64;
+extern const float kGraphicBlurAlphaScale;
+extern const float kGraphicNoiseTexScaleU;
+extern const float kGraphicNoiseTexScaleV;
 
 #ifdef __cplusplus
 }

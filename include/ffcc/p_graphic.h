@@ -5,6 +5,18 @@
 
 #include <dolphin/gx.h>
 
+extern u32 m_table_desc0__11CGraphicPcs[];
+extern u32 m_table_desc1__11CGraphicPcs[];
+extern u32 m_table_desc2__11CGraphicPcs[];
+extern u32 m_table_desc3__11CGraphicPcs[];
+extern u32 m_table_desc4__11CGraphicPcs[];
+extern u32 m_table_desc5__11CGraphicPcs[];
+extern u32 m_table_desc6__11CGraphicPcs[];
+extern u32 m_table_desc7__11CGraphicPcs[];
+extern u32 m_table_desc8__11CGraphicPcs[];
+extern u32 m_table_desc9__11CGraphicPcs[];
+extern u32 m_table__11CGraphicPcs[];
+
 class CGraphicPcs : public CProcess
 {
 public:
@@ -52,7 +64,40 @@ public:
     unsigned int GetScreenFadeExecutingBit();
     void drawScreenFade();
 
-    CGraphicPcs();
+    CGraphicPcs()
+    {
+        u32* table = &m_table__11CGraphicPcs[1];
+        table[0] = m_table_desc0__11CGraphicPcs[0];
+        table[1] = m_table_desc0__11CGraphicPcs[1];
+        table[2] = m_table_desc0__11CGraphicPcs[2];
+        table[3] = m_table_desc1__11CGraphicPcs[0];
+        table[4] = m_table_desc1__11CGraphicPcs[1];
+        table[5] = m_table_desc1__11CGraphicPcs[2];
+        table[6] = m_table_desc2__11CGraphicPcs[0];
+        table[7] = m_table_desc2__11CGraphicPcs[1];
+        table[8] = m_table_desc2__11CGraphicPcs[2];
+        table[11] = m_table_desc3__11CGraphicPcs[0];
+        table[12] = m_table_desc3__11CGraphicPcs[1];
+        table[13] = m_table_desc3__11CGraphicPcs[2];
+        table[16] = m_table_desc4__11CGraphicPcs[0];
+        table[17] = m_table_desc4__11CGraphicPcs[1];
+        table[18] = m_table_desc4__11CGraphicPcs[2];
+        table[21] = m_table_desc5__11CGraphicPcs[0];
+        table[22] = m_table_desc5__11CGraphicPcs[1];
+        table[23] = m_table_desc5__11CGraphicPcs[2];
+        table[26] = m_table_desc6__11CGraphicPcs[0];
+        table[27] = m_table_desc6__11CGraphicPcs[1];
+        table[28] = m_table_desc6__11CGraphicPcs[2];
+        table[31] = m_table_desc7__11CGraphicPcs[0];
+        table[32] = m_table_desc7__11CGraphicPcs[1];
+        table[33] = m_table_desc7__11CGraphicPcs[2];
+        table[36] = m_table_desc8__11CGraphicPcs[0];
+        table[37] = m_table_desc8__11CGraphicPcs[1];
+        table[38] = m_table_desc8__11CGraphicPcs[2];
+        table[41] = m_table_desc9__11CGraphicPcs[0];
+        table[42] = m_table_desc9__11CGraphicPcs[1];
+        table[43] = m_table_desc9__11CGraphicPcs[2];
+    }
 
     ScreenFadeSlot m_screenFade[4]; // 0x004
     int m_unkB4;                    // 0x0B4
@@ -81,16 +126,5 @@ public:
 };
 
 extern CGraphicPcs GraphicsPcs;
-extern u32 m_table_desc0__11CGraphicPcs[];
-extern u32 m_table_desc1__11CGraphicPcs[];
-extern u32 m_table_desc2__11CGraphicPcs[];
-extern u32 m_table_desc3__11CGraphicPcs[];
-extern u32 m_table_desc4__11CGraphicPcs[];
-extern u32 m_table_desc5__11CGraphicPcs[];
-extern u32 m_table_desc6__11CGraphicPcs[];
-extern u32 m_table_desc7__11CGraphicPcs[];
-extern u32 m_table_desc8__11CGraphicPcs[];
-extern u32 m_table_desc9__11CGraphicPcs[];
-extern u32 m_table__11CGraphicPcs[];
 
 #endif // _FFCC_P_GRAPHIC_H_

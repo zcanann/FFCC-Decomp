@@ -14,10 +14,10 @@ static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDistance() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xFC); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
-float kPppConstrainCameraDirScaleBase = 1.0f;
-float kPppConstrainCameraDirDistanceBase = 25.0f;
-float kPppConstrainCameraDirScaleMul = 1.3333f;
-float kPppConstrainCameraDirInitScale = 0.0f;
+extern const float kPppConstrainCameraDirScaleBase;
+extern const float kPppConstrainCameraDirDistanceBase;
+extern const float kPppConstrainCameraDirScaleMul;
+extern const float kPppConstrainCameraDirInitScale;
 
 /*
  * --INFO--

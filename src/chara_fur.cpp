@@ -394,16 +394,16 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
 		int count = 8;
 		do {
 			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(Chara + idx0 + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + idx0 + 4) = 0x7FFF;
 			idx0 += 0x10;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 1) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 1) << 1) + 4) = 0x7FFF;
 			inner += 8;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 2) << 1) + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 3) << 1) + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 4) << 1) + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 5) << 1) + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 6) << 1) + 4) = 0x7FFF;
-			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 7) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 2) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 3) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 4) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 5) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 6) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 7) << 1) + 4) = 0x7FFF;
 			count--;
 		} while (count != 0);
 		i++;
@@ -411,7 +411,7 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
 	} while (i < 0x40);
 
 	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chara) + 0x2004) = 0;
-	*reinterpret_cast<unsigned int*>(Chara + 0x2014) = System.m_frameCounter;
+	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2014) = System.m_frameCounter;
 	memset(reinterpret_cast<unsigned char*>(chara) + 0x2018, 0, 0x40);
 	CalcMogScore__6CCharaFv(chara);
 }
@@ -427,7 +427,7 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
  */
 extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels)
 {
-	memcpy(outTexels, Chara + 4, 0x2000);
+	memcpy(outTexels, reinterpret_cast<unsigned char*>(&Chara) + 4, 0x2000);
 }
 
 /*
@@ -441,7 +441,7 @@ extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels
  */
 extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels)
 {
-	memcpy(Chara + 4, inTexels, 0x2000);
+	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, inTexels, 0x2000);
 	CalcMogScore__6CCharaFv(chara);
 }
 
@@ -475,7 +475,7 @@ void CChara::CModel::InitMogFurTex()
 			                      *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x68) * 2;
 
 			DCInvalidateRange(dstBuffer, texelCountBytes);
-			memcpy(dstBuffer, Chara + 4, 0x2000);
+			memcpy(dstBuffer, reinterpret_cast<unsigned char*>(&Chara) + 4, 0x2000);
 			DCFlushRange(dstBuffer, texelCountBytes);
 			GXInvalidateTexAll();
 		}
@@ -502,7 +502,7 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void*)
 		return;
 	}
 
-	unsigned char* charaBytes = Chara;
+	unsigned char* charaBytes = reinterpret_cast<unsigned char*>(&Chara);
 	unsigned int* mogState = reinterpret_cast<unsigned int*>(m_mogWork);
 	unsigned int* cursorX = reinterpret_cast<unsigned int*>(charaBytes + 0x200C);
 	unsigned int* cursorY = reinterpret_cast<unsigned int*>(charaBytes + 0x2010);
@@ -598,8 +598,8 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		return 0;
 	}
 
-	float fx = static_cast<float>(*reinterpret_cast<unsigned int*>(Chara + 0x200C)) / 640.0f;
-	float fy = static_cast<float>(*reinterpret_cast<unsigned int*>(Chara + 0x2010)) / 448.0f;
+	float fx = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x200C)) / 640.0f;
+	float fy = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2010)) / 448.0f;
 	if (fx < 0.0f) {
 		fx = 0.0f;
 	} else if (fx > 1.0f) {

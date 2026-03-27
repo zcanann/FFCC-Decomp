@@ -19,7 +19,7 @@ extern "C" {
 }
 
 // RedSound global linkage that is shared across Red* units.
-u32 DAT_8032e170[3];
+CRedDriver CRedDriver_8032f4c0;
 int DAT_8032e17c[0x40];
 int DAT_8032f3f8;
 u8 DAT_8032f4a8;
@@ -956,27 +956,4 @@ void CRedSound::DisplayWaveInfo()
 void CRedSound::TestProcess(int mode)
 {
 	CRedDriver_8032f4c0.TestProcess(mode);
-}
-#pragma optimization_level 4
-
-/*
- * --INFO--
- * PAL Address: 0x801cd8bc
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-// Forward declaration
-extern "C" void* __ct__10CRedDriverFv(void*);
-extern "C" void __dt__10CRedDriverFv(void*);
-
-extern "C" void __sinit_RedSound_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-	__register_global_object(__ct__10CRedDriverFv(&CRedDriver_8032f4c0), __dt__10CRedDriverFv, &DAT_8032e170);
 }

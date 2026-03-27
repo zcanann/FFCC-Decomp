@@ -28,9 +28,7 @@ static char s_tinaCalcFmt[] = "clc :%f / max :%f\n";
 static char s_tinaDrawFmt[] = "drw :%f / max :%f\n";
 static char s_tinaHeapFmt[] = "hpm :%f / max :%f\n";
 
-extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
-extern "C" CPartPcs* __dt__8CPartPcsFv(CPartPcs*, short);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
@@ -90,12 +88,8 @@ extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
 extern char s_dvd__smenu__s_801d7fb0[];
 extern char s_dvd_tina_mon_m_03d_801d7fc0[];
 extern char s_dvd_tina_mon_m_03d__c_801d7fd4[];
-unsigned char ARRAY_80273928[0xC];
 unsigned char ARRAY_80273968[0xC];
 unsigned char ARRAY_802739e8[0xC];
-extern void* __vt__8CManager;
-extern void* __vt__8CPartPcs;
-extern "C" void* __ct__14CUSBStreamDataFv(void*);
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;
@@ -227,84 +221,6 @@ static CPartMngState* GetPartMngState()
 CPartPcs::~CPartPcs()
 {
     reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4)->~CUSBStreamData();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80053960
- * PAL Size: 832b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_tina_cpp(void)
-{
-    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
-
-    *reinterpret_cast<void**>(&PartPcs) = __vt__8CManager;
-    *reinterpret_cast<void**>(&PartPcs) = &__vt__8CProcess;
-    *reinterpret_cast<void**>(&PartPcs) = __vt__8CPartPcs;
-    __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(&PartPcs) + 4);
-    __register_global_object(&PartPcs, __dt__8CPartPcsFv, ARRAY_80273928);
-
-    table[1] = m_table_desc0__8CPartPcs[0];
-    table[2] = m_table_desc0__8CPartPcs[1];
-    table[3] = m_table_desc0__8CPartPcs[2];
-    table[4] = m_table_desc1__8CPartPcs[0];
-    table[5] = m_table_desc1__8CPartPcs[1];
-    table[6] = m_table_desc1__8CPartPcs[2];
-    table[7] = m_table_desc2__8CPartPcs[0];
-    table[8] = m_table_desc2__8CPartPcs[1];
-    table[9] = m_table_desc2__8CPartPcs[2];
-    table[12] = m_table_desc3__8CPartPcs[0];
-    table[13] = m_table_desc3__8CPartPcs[1];
-    table[14] = m_table_desc3__8CPartPcs[2];
-    table[17] = m_table_desc4__8CPartPcs[0];
-    table[18] = m_table_desc4__8CPartPcs[1];
-    table[19] = m_table_desc4__8CPartPcs[2];
-    table[22] = m_table_desc5__8CPartPcs[0];
-    table[23] = m_table_desc5__8CPartPcs[1];
-    table[24] = m_table_desc5__8CPartPcs[2];
-    table[27] = m_table_desc6__8CPartPcs[0];
-    table[28] = m_table_desc6__8CPartPcs[1];
-    table[29] = m_table_desc6__8CPartPcs[2];
-    table[32] = m_table_desc7__8CPartPcs[0];
-    table[33] = m_table_desc7__8CPartPcs[1];
-    table[35] = m_table_desc7__8CPartPcs[2];
-    table[37] = m_table_desc8__8CPartPcs[1];
-    table[38] = m_table_desc8__8CPartPcs[2];
-    table[39] = m_table_desc8__8CPartPcs[0];
-    table[44] = m_table_desc9__8CPartPcs[1];
-    table[45] = m_table_desc9__8CPartPcs[2];
-    table[46] = m_table_desc9__8CPartPcs[0];
-    table[88] = m_table_desc10__8CPartPcs[0];
-    table[89] = m_table_desc10__8CPartPcs[1];
-    table[90] = m_table_desc10__8CPartPcs[2];
-    table[93] = m_table_desc11__8CPartPcs[0];
-    table[94] = m_table_desc11__8CPartPcs[1];
-    table[95] = m_table_desc11__8CPartPcs[2];
-    table[96] = m_table_desc12__8CPartPcs[0];
-    table[97] = m_table_desc12__8CPartPcs[1];
-    table[98] = m_table_desc12__8CPartPcs[2];
-    table[101] = m_table_desc13__8CPartPcs[0];
-    table[102] = m_table_desc13__8CPartPcs[1];
-    table[103] = m_table_desc13__8CPartPcs[2];
-    table[106] = m_table_desc14__8CPartPcs[0];
-    table[107] = m_table_desc14__8CPartPcs[1];
-    table[108] = m_table_desc14__8CPartPcs[2];
-    table[111] = m_table_desc15__8CPartPcs[0];
-    table[112] = m_table_desc15__8CPartPcs[1];
-    table[113] = m_table_desc15__8CPartPcs[2];
-    table[114] = m_table_desc16__8CPartPcs[0];
-    table[117] = m_table_desc17__8CPartPcs[0];
-    table[118] = m_table_desc17__8CPartPcs[1];
-    table[119] = m_table_desc17__8CPartPcs[2];
-    table[120] = m_table_desc16__8CPartPcs[1];
-    table[121] = m_table_desc16__8CPartPcs[2];
-    table[124] = m_table_desc18__8CPartPcs[0];
-    table[125] = m_table_desc18__8CPartPcs[1];
-    table[126] = m_table_desc18__8CPartPcs[2];
 }
 
 /*

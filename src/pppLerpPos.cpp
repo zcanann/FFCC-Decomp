@@ -28,7 +28,7 @@ void pppCopyVector__FR3Vec3Vec(Vec* dst, const Vec* src);
 }
 extern float FLOAT_80331bf8;
 extern float FLOAT_80331bfc;
-char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
+extern char s_pppLerpPos_cpp_801dd418[];
 
 /*
  * --INFO--

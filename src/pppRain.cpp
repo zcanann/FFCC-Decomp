@@ -264,11 +264,11 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     float baseY;
     float baseZ;
     float tex1;
-    Vec segment[2];
+    Vec segment;
 
-    colorOffset = param_3->m_serializedDataOffsets[1];
-    workOffset = param_3->m_serializedDataOffsets[2];
-    colorData = (RainColorData*)((u8*)pppRain + 0x80 + colorOffset);
+    colorOffset = param_3->m_serializedDataOffsets[1] + 0x80;
+    workOffset = param_3->m_serializedDataOffsets[2] + 0x80;
+    colorData = (RainColorData*)((u8*)pppRain + colorOffset);
     rain = (RainParam*)param_2->m_payload;
     pppSetBlendMode(rain->blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -291,12 +291,13 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(rain->lineWidth, GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-    drop = *(RainDrop**)((u8*)pppRain + 0x80 + workOffset);
+    drop = *(RainDrop**)((u8*)pppRain + workOffset);
     baseX = pppMngStPtr->m_matrix.value[0][3];
     baseY = pppMngStPtr->m_matrix.value[1][3];
     baseZ = pppMngStPtr->m_matrix.value[2][3];
     tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
+    tex0 = kPppRainTexCoordBase;
     tex1 = FLOAT_8033101c;
     i = 0;
     while (i < (int)(u32)param_2->m_dataValIndex) {
@@ -304,7 +305,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
         float y = baseY + drop->posY;
         float z = baseZ + drop->posZ;
 
-        PSVECScale((Vec*)&drop->dirX, &segment[0], drop->length);
+        PSVECScale((Vec*)&drop->dirX, &segment, drop->length);
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
@@ -312,9 +313,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
         GXWGFifo.f32 = tex0;
         GXWGFifo.f32 = tex0;
 
-        GXWGFifo.f32 = x + segment[0].x;
-        GXWGFifo.f32 = y + segment[0].y;
-        GXWGFifo.f32 = z + segment[0].z;
+        GXWGFifo.f32 = x + segment.x;
+        GXWGFifo.f32 = y + segment.y;
+        GXWGFifo.f32 = z + segment.z;
         GXWGFifo.u32 = *(u32*)&colorData->color;
         GXWGFifo.f32 = tex1;
         GXWGFifo.f32 = tex1;

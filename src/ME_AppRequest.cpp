@@ -43,6 +43,105 @@ static inline CMemory::CStage* MaterialEditorStage()
 
 /*
  * --INFO--
+ * PAL Address: 0x8004dce8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialEditorPcs::GetRsdItem()
+{
+    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xC8);
+    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x9C);
+    list->GetDataIdx(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004dd10
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMaterialEditorPcs::SetRsdIndex()
+{
+    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
+    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
+    unsigned int* rsd = reinterpret_cast<unsigned int*>(list->GetDataIdx(index));
+
+    if (rsd == nullptr) {
+        return 0;
+    }
+    if (*rsd == 0) {
+        return 0;
+    }
+
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0xBC) = *rsd;
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004dd70
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMaterialEditorPcs::SetRsdFlag()
+{
+    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
+    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
+    int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
+
+    if (rsd == 0) {
+        return 0;
+    }
+
+    rsd[3] = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC0);
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004ddc0
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
+{
+    RSDLISTITEM* listItem =
+        (RSDLISTITEM*)__nw__FUlPQ27CMemory6CStagePci(0x10, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x61);
+    if (listItem == 0) {
+        return 0;
+    }
+
+    memset(listItem, 0, 0x10);
+    RSDITEM* rsdItem =
+        (RSDITEM*)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x67);
+    if (rsdItem == 0) {
+        if (listItem != 0) {
+            __dl__FPv(listItem);
+        }
+        return 0;
+    }
+
+    memset(rsdItem, 0, 0x1c);
+    listItem->rsdItem = rsdItem;
+    listItem->flag = 1;
+    zlist->AddTail(listItem);
+    return 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004de94
  * PAL Size: 316b
  * EN Address: TODO
@@ -56,7 +155,6 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
     _ZLISTITEM* it[1];
     RSDITEM* rsdItem;
     int i;
-    int zero;
     ZCANMGRP* colAnmData;
     int colAnmCount;
     RSDLISTITEM* listItem;
@@ -91,11 +189,10 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         colAnmData = listItem->colAnmData;
         if (colAnmData != (ZCANMGRP*)0) {
             i = 0;
-            zero = 0;
             while (i < colAnmCount) {
                 if (colAnmData->ptr != (void*)0) {
                     __dla__FPv(colAnmData->ptr);
-                    colAnmData->ptr = (void*)zero;
+                    colAnmData->ptr = 0;
                 }
                 colAnmData = colAnmData + 1;
                 i = i + 1;
@@ -109,129 +206,4 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         __dl__FPv(listItem);
     }
     list->DeleteList();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP **, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
-{
-    RSDLISTITEM* listItem =
-        (RSDLISTITEM*)__nw__FUlPQ27CMemory6CStagePci(0x10, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x61);
-    if (listItem == 0) {
-        return 0;
-    }
-
-    memset(listItem, 0, 0x10);
-    RSDITEM* rsdItem =
-        (RSDITEM*)__nw__FUlPQ27CMemory6CStagePci(0x1c, MaterialEditorStage(), s_ME_AppRequest_cpp_801d7da8, 0x67);
-    if (rsdItem == 0) {
-        if (listItem != 0) {
-            __dl__FPv(listItem);
-        }
-        return 0;
-    }
-
-    memset(rsdItem, 0, 0x1c);
-    listItem->rsdItem = rsdItem;
-    listItem->flag = 1;
-    zlist->AddTail(listItem);
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004dd70
- * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMaterialEditorPcs::SetRsdFlag()
-{
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
-    int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
-
-    if (rsd == 0) {
-        return 0;
-    }
-
-    rsd[3] = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC0);
-    return 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialEditorPcs::GetRsdItemR()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004dd10
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMaterialEditorPcs::SetRsdIndex()
-{
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
-    unsigned int* rsd = reinterpret_cast<unsigned int*>(list->GetDataIdx(index));
-
-    if (rsd == nullptr) {
-        return 0;
-    }
-    if (*rsd == 0) {
-        return 0;
-    }
-
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0xBC) = *rsd;
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004dce8
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::GetRsdItem()
-{
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xC8);
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x9C);
-    list->GetDataIdx(index);
 }

@@ -387,45 +387,50 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
 	int checked = 0;
 	int blocks = 4;
-	WindObject* cur = m_objects;
-	WindObject* obj;
+	WindObject* obj = m_objects;
 
 	do {
-		obj = cur;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) >= 0) {
 			goto found;
 		}
 
 		checked += 7;
-		cur += 8;
+		obj++;
 	} while (--blocks != 0);
 
 	obj = 0;
@@ -480,45 +485,50 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
 	int checked = 0;
 	int blocks = 4;
-	WindObject* cur = m_objects;
-	WindObject* obj;
+	WindObject* obj = m_objects;
 
 	do {
-		obj = cur;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) >= 0) {
 			goto found;
 		}
 
 		checked += 7;
-		cur += 8;
+		obj++;
 	} while (--blocks != 0);
 
 	obj = 0;
@@ -561,30 +571,29 @@ found:
 void CWind::ChangePower(int id, float power)
 {
     WindObject* obj = m_objects;
-    int i = 8;
+    int blocks = 8;
 
     do {
-        if ((s8)obj->flags < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        if ((s8)obj->flags < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        if ((s8)obj->flags < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        if ((s8)obj->flags < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
-        i--;
-    } while (i != 0);
+    } while (--blocks != 0);
 
     obj = 0;
 

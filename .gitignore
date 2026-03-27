@@ -38,3 +38,4 @@ reference_projects/*
 # macOS system files
 .DS_Store
 **/.DS_Store
+tools/objdiff-cli

@@ -278,7 +278,7 @@ void CGObject::onCreate()
     m_bgDownDist = 9.0f;
     m_groundSlide = 0.0f;
     m_worldParam = 0.0f;
-    m_worldParamA = 0.0f;
+    m_worldParamA = 0;
     *reinterpret_cast<float*>(m_worldMode) = 0.0f;
 
     m_lookAtTargetNodeIndex = -1;
@@ -1800,12 +1800,45 @@ void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007d568
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::Attach(CGObject*, char*, Vec*)
+void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
-	// TODO
+    bool hasModel = false;
+    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (hasModel) {
+        int nodeIndex = SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName);
+        if (nodeIndex >= 0) {
+            int weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
+            int setFlag = 1;
+            weaponFlags = __rlwimi(weaponFlags, setFlag, 0, 31, 31);
+            *reinterpret_cast<u8*>(&m_weaponNodeFlags) = static_cast<u8>(weaponFlags);
+
+            m_attachOwner = owner;
+            m_attachNode = nodeIndex;
+            m_attachLocal.x = attachLocal->x;
+            m_attachLocal.y = attachLocal->y;
+            m_attachLocal.z = attachLocal->z;
+
+            if ((m_worldParamA != 0x24) && (m_worldParamB != 0x125)) {
+                float rotY = m_rotBaseY - owner->m_rotBaseY;
+                m_rotTargetY = rotY;
+                m_rotBaseY = rotY;
+            }
+
+            m_moveMode = m_moveModePrevious;
+        }
+    }
 }
 
 /*

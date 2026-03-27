@@ -222,10 +222,10 @@ void pppDestructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
+char s_pppYmMelt_cpp_801DA048[] = "pppYmMelt.cpp";
+
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
-    static char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
-
     if (gPppCalcDisabled != 0) {
         return;
     }
@@ -236,14 +236,15 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
-        YmMeltVertex* vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp, 0xA9);
-        work->m_vertexData = vertexData;
+        work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp_801DA048,
+            0xA9);
 
-        YmMeltVertex* vtx = vertexData;
+        YmMeltVertex* vertexData = work->m_vertexData;
+        YmMeltVertex* vtxBase = vertexData;
         int angleSeed = rand();
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
-        work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
+        work->m_phaseOffset = (s16)(angleSeed - (angleSeed / (int)phaseDiv) * phaseDiv);
         s16 phaseOffset = work->m_phaseOffset;
 
         double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
@@ -252,6 +253,8 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         Mtx rotMtx;
 
         for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
+            YmMeltVertex* vtx = vtxBase;
+
             for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
                 vtx->m_position.x = (float)x;
                 vtx->m_position.y = kPppYmMeltZero;
@@ -263,6 +266,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
                 }
 
                 vtx++;
+                vtxBase++;
             }
         }
 

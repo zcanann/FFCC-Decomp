@@ -1476,7 +1476,7 @@ void CSound::FreeWave(int waveId)
     if (waveId < 0) {
         Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else {
-        ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), waveId);
+        ClearWaveData__9CRedSoundFi(RedSound(this), waveId);
     }
 }
 
@@ -1568,7 +1568,7 @@ void CSound::StopSe(int seId)
     if (seId < 0) {
         Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else {
-        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), seId);
+        SeStop__9CRedSoundFi(RedSound(this), seId);
     }
 }
 
@@ -1586,7 +1586,7 @@ void CSound::FadeOutSe(int seId, int fadeFrames)
     if (seId < 0) {
         Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else {
-        SeFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), seId, fadeFrames);
+        SeFadeOut__9CRedSoundFii(RedSound(this), seId, fadeFrames);
     }
 }
 

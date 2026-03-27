@@ -118,6 +118,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 	modes->file_orientation = UNORIENTED;
 #endif
 	modes->binary_io = 0;
+	mode_str = mode[0];
 	
 	switch (mode_str)
 	{
@@ -143,7 +144,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 	switch (next_mode)
 	{
 		case 'b':
-			next_mode = *mode_ptr;
+			next_mode = mode[2];
 			modes->binary_io = 1;
 			
 			if (next_mode == '+')
@@ -152,7 +153,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 			break;
 			
 		case '+':
-			next_mode = *mode_ptr;
+			next_mode = mode[2];
 			mode_str = (mode_str << 8) | '+';
 			
 			if (next_mode == 'b')

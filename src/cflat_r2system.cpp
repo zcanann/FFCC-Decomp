@@ -24,7 +24,7 @@
 
 static inline CUSBStreamData* UsbStream(CPartPcs* self)
 {
-    return reinterpret_cast<CUSBStreamData*>((char*)self + 0x10);
+    return &self->m_usbStreamData;
 }
 
 struct CMapCylinderRaw
@@ -1306,11 +1306,9 @@ void CVector::operator=(const CVector& other)
  */
 CVector::CVector(const CVector& other)
 {
-    float y = other.y;
     x = other.x;
-    float z = other.z;
-    this->y = y;
-    this->z = z;
+    y = other.y;
+    z = other.z;
 }
 
 /*

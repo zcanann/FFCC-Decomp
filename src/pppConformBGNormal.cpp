@@ -3,6 +3,7 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/gobject.h"
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
@@ -85,7 +86,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     _pppMngSt* pppMngSt;
     s32 hitFound;
     ConformState* state;
-    u8* owner;
+    CGObject* owner;
     f64 trigValue;
     Quaternion local_1ac;
     Quaternion local_19c;
@@ -102,7 +103,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     }
 
     pppMngSt = pppMngStPtr;
-    owner = (u8*)pppMngSt->m_owner;
+    owner = (CGObject*)pppMngSt->m_owner;
     hitFound = 0;
     matrixX = pppMngSt->m_matrix.value[0][3];
     matrixY = pppMngSt->m_matrix.value[1][3];
@@ -114,10 +115,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             mode = param2->m_stepValue;
 
             if (mode == 0) {
-                if (*(s8*)(owner + 0x50) < 0) {
-                    local_164.x = *(f32*)(owner + 0x4ec);
-                    local_164.y = *(f32*)(owner + 0x4f0);
-                    local_164.z = *(f32*)(owner + 0x4f4);
+                if ((s8)owner->m_stateFlags0 < 0) {
+                    local_164.x = *(f32*)((u8*)owner + 0x4ec);
+                    local_164.y = *(f32*)((u8*)owner + 0x4f0);
+                    local_164.z = *(f32*)((u8*)owner + 0x4f4);
                 } else {
                     local_164.x = kPppConformBgNormalZero;
                     local_164.y = kPppConformBgNormalOne;
@@ -192,10 +193,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             PSVECNormalize(&state->m_normal, &local_158);
 
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
-                trigValue = sin((f64)*(f32*)(owner + 0x1a8));
+                trigValue = sin((f64)owner->m_rotBaseY);
                 local_14c.x = (f32)trigValue;
                 local_14c.y = kPppConformBgNormalZero;
-                trigValue = cos((f64)*(f32*)(owner + 0x1a8));
+                trigValue = cos((f64)owner->m_rotBaseY);
                 local_14c.z = (f32)trigValue;
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
                 PSVECNormalize(&local_140, &local_140);
@@ -233,11 +234,11 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
             mode = param2->m_stepValue;
             if (mode == 0) {
-                if (*(s8*)(owner + 0x50) < 0) {
-                    pppMngStPtr->m_matrix.value[0][3] = *(f32*)((u8*)owner + 0x15c);
-                    pppMngStPtr->m_matrix.value[1][3] = *(f32*)((u8*)owner + 0x160);
-                    pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
-                } else if ((((*(u8*)((u8*)owner + 0x9a) & 1) == 0) || (*(s32*)((u8*)owner + 0x18c) == 0))) {
+                if ((s8)owner->m_stateFlags0 < 0) {
+                    pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                    pppMngStPtr->m_matrix.value[1][3] = owner->m_worldPosition.y;
+                    pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
+                } else if ((((*(u8*)&owner->m_weaponNodeFlags & 1) == 0) || (owner->m_attachOwner == NULL))) {
                     CMapCylinderRaw cylinder;
                     Vec rayDirection;
 
@@ -245,9 +246,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     rayDirection.y = kPppConformBgNormalDownRayY;
                     rayDirection.z = kPppConformBgNormalZero;
 
-                    cylinder.m_bottom.x = *(f32*)((u8*)owner + 0x15c);
-                    cylinder.m_bottom.y = *(f32*)((u8*)owner + 0x160);
-                    cylinder.m_bottom.z = *(f32*)((u8*)owner + 0x164);
+                    cylinder.m_bottom = owner->m_worldPosition;
                     cylinder.m_direction.x = kPppConformBgNormalCylinderRadius;
                     cylinder.m_direction.y = kPppConformBgNormalCylinderRadius;
                     cylinder.m_direction.z = kPppConformBgNormalCylinderRadius;
@@ -265,9 +264,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                         &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
                     if (hitFound == 0) {
-                        pppMngStPtr->m_matrix.value[0][3] = *(f32*)(owner + 0x15c);
+                        pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
                         pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                        pppMngStPtr->m_matrix.value[2][3] = *(f32*)(owner + 0x164);
+                        pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
                     } else {
                         CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
                         pppMngStPtr->m_matrix.value[0][3] = local_170.x;
@@ -275,10 +274,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         pppMngStPtr->m_matrix.value[2][3] = local_170.z;
                     }
                 } else {
-                    ownerY = *(f32*)(*(s32*)(owner + 0x18c) + 0x160);
-                    pppMngStPtr->m_matrix.value[0][3] = *(f32*)(owner + 0x15c);
+                    ownerY = owner->m_attachOwner->m_worldPosition.y;
+                    pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
-                    pppMngStPtr->m_matrix.value[2][3] = *(f32*)(owner + 0x164);
+                    pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
                 }
             } else if (mode == 1) {
                 if (hitFound == 0) {

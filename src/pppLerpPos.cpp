@@ -1,6 +1,7 @@
 #include "ffcc/pppLerpPos.h"
 #include "ffcc/memory.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 
@@ -23,7 +24,6 @@ void pppSetFpMatrix(_pppMngSt*);
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-void pppCopyVector__FR3Vec3Vec(Vec* dst, const Vec* src);
 
 }
 extern float FLOAT_80331bf8;
@@ -48,9 +48,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     s32 iVar4;
     s32 iVar5;
     s32 iVar7;
-    u32* pWordData;
     Vec local_2c;
-    Vec local_38;
     u32 count;
 
     if (gPppCalcDisabled == 0) {
@@ -78,13 +76,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             iVar5 = (u8)param_2->m_dataValIndex - 1;
             iVar7 = iVar5 * 0xc;
             while (0 < iVar5) {
-                pWordData = (u32*)((u8*)*historyPtr + iVar7 - 0xc);
-                *(u32*)&local_38.x = *pWordData;
-                pWordData++;
-                *(u32*)&local_38.y = *pWordData;
-                pWordData++;
-                *(u32*)&local_38.z = *pWordData;
-                pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar7), &local_38);
+                pppCopyVector(*(Vec*)((u8*)*historyPtr + iVar7), *(Vec*)((u8*)*historyPtr + iVar7 - 0xc));
                 iVar7 = iVar7 - 0xc;
                 iVar5 = iVar5 - 1;
             }

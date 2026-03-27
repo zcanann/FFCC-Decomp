@@ -6,46 +6,10 @@ extern "C" void __dl__FPv(void*);
 
 /*
  * --INFO--
- * PAL Address: 0x8009b4a8
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMenu::CMenu()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009b448
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CMenu* dtor_8009B448(CMenu* menu, short shouldDelete)
-{
-	if (menu != 0) {
-		*(void***)menu = __vt__5CMenu;
-		dtor_80043D10(menu, 0);
-		if (0 < shouldDelete) {
-			__dl__FPv(menu);
-		}
-	}
-
-	return menu;
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::Create()
+void CMenu::onScriptChanged(char*, int)
 {
 	// TODO
 }
@@ -55,29 +19,8 @@ void CMenu::Create()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::Destroy()
+void CMenu::onScriptChanging(char*)
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::Calc()
-{
-	onCalc();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenu::Draw()
-{
-	onDraw();
 }
 
 /*
@@ -95,8 +38,9 @@ void CMenu::ScriptChanging(char* script)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::onScriptChanging(char*)
+void CMenu::Draw()
 {
+	onDraw();
 }
 
 /*
@@ -104,7 +48,63 @@ void CMenu::onScriptChanging(char*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::onScriptChanged(char*, int)
+void CMenu::Calc()
+{
+	onCalc();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::Destroy()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::Create()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8009b448
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CMenu* __dt__5CMenuFv(CMenu* menu, short shouldDelete)
+{
+	if (menu != 0) {
+		*(void***)menu = __vt__5CMenu;
+		dtor_80043D10(menu, 0);
+		if (0 < shouldDelete) {
+			__dl__FPv(menu);
+		}
+	}
+
+	return menu;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8009b4a8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMenu::CMenu()
 {
 	// TODO
 }

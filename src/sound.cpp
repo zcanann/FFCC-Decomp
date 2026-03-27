@@ -21,10 +21,10 @@
 
 CSound Sound;
 
-float kLineSegmentMinT = 0.0f;
-float kLineSegmentMaxT = 1.0f;
-float kLineBoundsInitMin = 10000000.0f;
-float kLineBoundsInitMax = -10000000.0f;
+extern const float kLineSegmentMinT;
+extern const float kLineSegmentMaxT;
+extern const float kLineBoundsInitMin;
+extern const float kLineBoundsInitMax;
 
 static char s_soundStageName[] = "CSound";
 static char s_soundSourceName[] = "sound.cpp";

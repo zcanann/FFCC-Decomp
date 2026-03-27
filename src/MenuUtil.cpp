@@ -51,15 +51,15 @@ extern char DAT_8033367c[];
 extern char* PTR_s_Strength__80215a48[];
 extern char* PTR_s_Defence__80215a4c[];
 
-// Linkage definitions from config/GCCP01/symbols.txt.
-float kMenuCenteringHalfWidth = 0.5f;
-float kOptionAnimMin = 0.0f;
-float kOptionAnimMax = 1.0f;
-float kMenuCenteringOffset = 320.0f;
-float kOptionRowAnimStep = 0.125f;
-float kOptionOpenAnimStep = 0.04f;
-float kOptionColumnAnimStep = 0.2f;
-float kOptionVolumeScale = 10.583333f;
+// Constants defined externally, placed in .sdata2 by the linker.
+extern const float kMenuCenteringHalfWidth;
+extern const float kOptionAnimMin;
+extern const float kOptionAnimMax;
+extern const float kMenuCenteringOffset;
+extern const float kOptionRowAnimStep;
+extern const float kOptionOpenAnimStep;
+extern const float kOptionColumnAnimStep;
+extern const float kOptionVolumeScale;
 
 extern "C" int __cntlzw(unsigned int);
 

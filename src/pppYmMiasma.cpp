@@ -549,7 +549,6 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
-            Mtx rotMtx;
             Vec srcPos;
             Vec worldPos;
             GXColor amb;
@@ -561,9 +560,8 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
             model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
 
-            PSMTXRotRad(rotMtx, 'z', FLOAT_80330640 * (float)*(s16*)((u8*)particle + 0x38));
+            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)*(s16*)((u8*)particle + 0x38));
             scaleMatrix = model;
-            memcpy(rotMatrix.value, rotMtx, sizeof(Mtx));
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&model, &rotMatrix, &scaleMatrix);
 
             srcPos.x = particle[0];

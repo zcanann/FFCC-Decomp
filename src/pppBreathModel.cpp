@@ -646,30 +646,24 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 {
     _pppPObject* object;
     int i;
-    int j;
     int dataOffset;
     int colorOffset;
     int maxParticleCount;
     int graphId;
     int groupCount;
     int slotCount;
-    int firstParticle;
     unsigned char* base;
     unsigned char* work;
     unsigned char* particleData;
     unsigned char* particleWMat;
     unsigned char* groupPtr;
     float* particleColor;
-    float groupScale;
     pppModelSt* model;
-    GXColor baseColor;
-    GXColor drawColor;
-    GXColor debugColor;
-    Mtx scaledMtx;
-    Mtx drawMtx;
+    unsigned char colorR;
+    unsigned char colorG;
+    unsigned char colorB;
+    unsigned char colorA;
     Mtx worldMtx;
-    Mtx sphereMtx;
-    Vec pos;
 
     dataOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
@@ -694,17 +688,21 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                                                                *(unsigned char*)((unsigned char*)pBreathModel + 4), 0xFF, 0xFF,
                                                                1, 0xFF);
 
-    baseColor.r = *(unsigned char*)(base + colorOffset + 0);
-    baseColor.g = *(unsigned char*)(base + colorOffset + 1);
-    baseColor.b = *(unsigned char*)(base + colorOffset + 2);
-    baseColor.a = *(unsigned char*)(base + colorOffset + 3);
+    colorR = *(unsigned char*)(base + colorOffset + 0);
+    colorG = *(unsigned char*)(base + colorOffset + 1);
+    colorB = *(unsigned char*)(base + colorOffset + 2);
+    colorA = *(unsigned char*)(base + colorOffset + 3);
 
     for (i = 0; i < maxParticleCount; i++) {
         if (*(short*)(particleData + 0x50) > 0) {
-            int r = (int)baseColor.r;
-            int g = (int)baseColor.g;
-            int b = (int)baseColor.b;
-            int a = (int)baseColor.a - (int)*(float*)(particleData + 0x88);
+            GXColor drawColor;
+            Mtx scaledMtx;
+            Mtx drawMtx;
+            Vec pos;
+            int r;
+            int g;
+            int b;
+            int a;
 
             PSMTXScale(scaledMtx,
                        *(float*)(pppMngStPtr + 0x28) * *(float*)(particleData + 0x64),
@@ -717,6 +715,12 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             drawMtx[0][3] = pos.x;
             drawMtx[1][3] = pos.y;
             drawMtx[2][3] = pos.z;
+            GXLoadPosMtxImm(drawMtx, 0);
+
+            r = colorR;
+            g = colorG;
+            b = colorB;
+            a = (int)((double)(int)colorA - *(float*)(particleData + 0x88));
 
             if (particleColor != NULL) {
                 r += (int)particleColor[0];
@@ -724,20 +728,32 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 b += (int)particleColor[2];
                 a += (int)particleColor[3];
             }
-            if (r < 0) r = 0;
-            if (r > 255) r = 255;
-            if (g < 0) g = 0;
-            if (g > 255) g = 255;
-            if (b < 0) b = 0;
-            if (b > 255) b = 255;
-            if (a < 0) a = 0;
-            if (a > 127) a = 127;
+
+            if (r < 0) {
+                r = 0;
+            } else if (r > 255) {
+                r = 255;
+            }
+            if (g < 0) {
+                g = 0;
+            } else if (g > 255) {
+                g = 255;
+            }
+            if (b < 0) {
+                b = 0;
+            } else if (b > 255) {
+                b = 255;
+            }
+            if (a < 0) {
+                a = 0;
+            } else if (a > 127) {
+                a = 127;
+            }
+
             drawColor.r = (u8)r;
             drawColor.g = (u8)g;
             drawColor.b = (u8)b;
             drawColor.a = (u8)a;
-
-            GXLoadPosMtxImm(drawMtx, 0);
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
             pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((unsigned char*)breathModel + 0x70), 1);
         }
@@ -758,7 +774,14 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 
         for (i = 0; i < groupCount; i++) {
             if (*(int*)groupPtr == 1) {
-                if (i == 0) {
+                GXColor debugColor;
+                int firstParticle;
+                int j;
+                float groupScale;
+                Mtx sphereMtx;
+                Vec pos;
+
+                if ((i == 0) || (i == 2)) {
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
                     debugColor.b = 0x00;
@@ -767,11 +790,6 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                     debugColor.r = 0x80;
                     debugColor.g = 0x80;
                     debugColor.b = 0xFF;
-                    debugColor.a = 0xFF;
-                } else if (i == 2) {
-                    debugColor.r = 0x80;
-                    debugColor.g = 0x00;
-                    debugColor.b = 0x00;
                     debugColor.a = 0xFF;
                 } else if (i == 3) {
                     debugColor.r = 0x80;

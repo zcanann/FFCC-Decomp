@@ -138,7 +138,7 @@ public:
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
     short m_commandListInventorySlotRef[8];     // 0x0204
-    unsigned char m_commandListExtra[16];       // 0x0214
+    short m_commandListExtra[8];                // 0x0214
     short m_currentCmdListIndex;                // 0x0224
     short m_weaponIdx;                          // 0x0226
     short m_backupEquipment[4];                 // 0x0228
@@ -148,7 +148,7 @@ public:
     unsigned char m_backupMoneyFlags;           // 0x037B
     int m_backupGil;                            // 0x037C
     short m_backupCommandListInventorySlotRef[8]; // 0x0380
-    unsigned char m_backupCmdlistExtra[16];     // 0x0390
+    short m_backupCmdlistExtra[8];              // 0x0390
     short m_backupCurrentCmdListIndex;          // 0x03A0
     short m_backupWeaponIdx;                    // 0x03A2
     int m_shopState;                            // 0x03A4

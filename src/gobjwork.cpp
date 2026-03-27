@@ -1871,7 +1871,7 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
 {
 	unsigned int isInvalid = 0;
-	if ((cmdListIdx > 1) && (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1)) {
+	if ((cmdListIdx >= 2) && (m_commandListInventorySlotRef[cmdListIdx] == -1)) {
 		isInvalid = 1;
 	}
 
@@ -1883,7 +1883,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 
 	groupedCount = 1;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		short* slotRef = (short*)m_commandListExtra + cmdListIdx;
+		short* slotRef = m_commandListExtra + cmdListIdx;
 		if (slotRef[0] != 0) {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
@@ -1900,7 +1900,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 
 			groupedCount = 1;
 			scanCount = m_numCmdListSlots - (topIdx + 1);
-			slotRef = (short*)m_commandListExtra + topIdx + 1;
+			slotRef = m_commandListExtra + topIdx + 1;
 			if ((topIdx + 1) < m_numCmdListSlots) {
 				do {
 					if (slotRef[0] != -1) {
@@ -1920,7 +1920,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	int scanCount = cmdListIdx + 1;
-	short* slotRef = (short*)m_commandListExtra + cmdListIdx;
+	short* slotRef = m_commandListExtra + cmdListIdx;
 	if (cmdListIdx >= 0) {
 		do {
 			if (slotRef[0] != -1) {
@@ -1990,7 +1990,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			} while (scanCount != 0);
 		}
 
-		short cmdId = *(short*)(caravanWork->m_commandListExtra + cmdListIdx * 2);
+		short cmdId = caravanWork->m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			*firstCmdIdx = cmdListIdx;
 			for (int i = 0; i < groupedCount; i++) {
@@ -2043,7 +2043,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 	int itemCmdListIdx;
 
 	if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
-		short cmdId = *(short*)(m_commandListExtra + cmdTopIdx * 2);
+		short cmdId = m_commandListExtra[cmdTopIdx];
 		if (cmdId == 0x207) {
 			return 0;
 		}
@@ -2136,7 +2136,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 				} while (scanCount != 0);
 			}
 
-			short cmdResult = *reinterpret_cast<short*>(m_commandListExtra + cmdListIdx * 2);
+			short cmdResult = m_commandListExtra[cmdListIdx];
 			int cmdTopIdx;
 			int itemCmdListIdx;
 			if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
@@ -2216,11 +2216,11 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 		}
 
 		if (Game.m_gameWork.m_menuStageMode != 0) {
-			if (*(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
+			if (m_commandListExtra[cmdListIdx] == -1) {
 				continue;
 			}
-			if (dir == -1 && *(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
-				if (0 < *(short*)(m_commandListExtra + (prev * 2))) {
+			if (dir == -1 && m_commandListExtra[cmdListIdx] == -1) {
+				if (0 < m_commandListExtra[prev]) {
 					continue;
 				}
 			}
@@ -2431,7 +2431,7 @@ void CCaravanWork::UniteComList(int startIdx, int count, int cmdId)
 		if (i == 0) {
 			value = (short)cmdId;
 		}
-		*(short*)(m_commandListExtra + (startIdx + i) * 2) = value;
+		m_commandListExtra[startIdx + i] = value;
 	}
 
 	if ((startIdx <= m_weaponIdx) && (m_weaponIdx < (startIdx + count))) {
@@ -2463,7 +2463,7 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 	}
 
 	for (int i = 0; i < count; i++) {
-		*(short*)(m_commandListExtra + (startIdx + i) * 2) = 0;
+		m_commandListExtra[startIdx + i] = 0;
 	}
 }
 

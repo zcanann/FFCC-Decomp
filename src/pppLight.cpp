@@ -46,7 +46,7 @@ struct PppLightWork {
 struct PppLightStep {
 	s32 sourceId;
 	u8 unk4[0x40];
-	s32 targetIndex;
+	u32 targetIndex;
 	u8 unk48[0x10];
 	u8 type;
 	u8 color0Enabled;
@@ -252,8 +252,8 @@ void pppLight(void* param1, void* param2, void* param3)
 				unsigned char* obj;
 
 				light.m_type = 1;
-				if (step->targetIndex == -1) {
-					obj = &gPppDefaultValueBuffer[0];
+				if (step->targetIndex == 0xFFFFFFFF) {
+					obj = gPppDefaultValueBuffer;
 				} else {
 					pppLightTarget* targetTable =
 						(pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable;

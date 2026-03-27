@@ -218,8 +218,8 @@ public:
     float m_groundSlide;              // 0x4F4
     float m_worldParam;               // 0x4F8
     unsigned char m_worldMode[4];     // 0x4FC
-    float m_worldParamA;              // 0x500
-    float m_worldParamB;              // 0x504
+    int m_worldParamA;                // 0x500
+    int m_worldParamB;                // 0x504
     float m_lookAtAccumYaw;           // 0x508
     float m_lookAtAccumPitch;         // 0x50C
     unsigned short m_dropItemCodes[4]; // 0x510

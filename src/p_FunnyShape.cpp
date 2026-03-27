@@ -181,43 +181,42 @@ CFunnyShapePcs::~CFunnyShapePcs()
  */
 void CFunnyShapePcs::Init()
 {
-    u8* self = Ptr(this, 0);
-    u8 bVar3f;
-    u8 bVar0a;
-    u8 bVar0b;
+    int state0;
+    int state1;
+    int state2;
     f32 ndcMin;
     f32 viewportOrigin;
 
-    self[0x8] = 0x7F;
-    bVar3f = (u8)(-((__cntlzw(0) >> 5) & 1));
-    self[0x9] = 0x7F;
-    self[0xA] = 0x7F;
-    bVar0a = (u8)(-((__cntlzw(1) >> 5) & 1));
-    self[0xB] = 0xFF;
+    m_viewerState[0] = 0x7F;
+    state0 = 0x3F & -((__cntlzw(0) >> 5) & 1);
+    m_viewerState[1] = 0x7F;
+    m_viewerState[2] = 0x7F;
+    m_viewerState[3] = 0xFF;
+    state1 = 0x3F & -((__cntlzw(1) >> 5) & 1);
     viewportOrigin = kFunnyShapeViewportOrigin;
-    self[0xC] = bVar3f;
+    m_viewerState[4] = state0;
     ndcMin = kFunnyShapeNdcMin;
-    self[0xD] = bVar3f;
-    self[0xE] = bVar3f;
-    self[0xF] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x18) = viewportOrigin;
-    *reinterpret_cast<f32*>(self + 0x1C) = viewportOrigin;
-    *reinterpret_cast<f32*>(self + 0x20) = ndcMin;
-    self[0x10] = bVar0a;
-    self[0x11] = bVar0a;
-    self[0x12] = bVar0a;
-    bVar0b = (u8)(-((__cntlzw(2) >> 5) & 1));
-    self[0x13] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x24) = viewportOrigin;
-    *reinterpret_cast<f32*>(self + 0x28) = viewportOrigin;
-    *reinterpret_cast<f32*>(self + 0x2C) = ndcMin;
-    self[0x14] = bVar0b;
-    self[0x15] = bVar0b;
-    self[0x16] = bVar0b;
-    self[0x17] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x30) = viewportOrigin;
-    *reinterpret_cast<f32*>(self + 0x34) = viewportOrigin;
-    *reinterpret_cast<f32*>(self + 0x38) = ndcMin;
+    m_viewerState[5] = state0;
+    m_viewerState[6] = state0;
+    state2 = 0x3F & -((__cntlzw(2) >> 5) & 1);
+    m_viewerState[7] = 0xFF;
+    *reinterpret_cast<f32*>(&m_viewerState[0x10]) = viewportOrigin;
+    *reinterpret_cast<f32*>(&m_viewerState[0x14]) = viewportOrigin;
+    *reinterpret_cast<f32*>(&m_viewerState[0x18]) = ndcMin;
+    m_viewerState[8] = state1;
+    m_viewerState[9] = state1;
+    m_viewerState[10] = state1;
+    m_viewerState[11] = 0xFF;
+    *reinterpret_cast<f32*>(&m_viewerState[0x1C]) = viewportOrigin;
+    *reinterpret_cast<f32*>(&m_viewerState[0x20]) = viewportOrigin;
+    *reinterpret_cast<f32*>(&m_viewerState[0x24]) = ndcMin;
+    m_viewerState[12] = state2;
+    m_viewerState[13] = state2;
+    m_viewerState[14] = state2;
+    m_viewerState[15] = 0xFF;
+    *reinterpret_cast<f32*>(&m_viewerState[0x28]) = viewportOrigin;
+    *reinterpret_cast<f32*>(&m_viewerState[0x2C]) = viewportOrigin;
+    *reinterpret_cast<f32*>(&m_viewerState[0x30]) = ndcMin;
 }
 
 /*

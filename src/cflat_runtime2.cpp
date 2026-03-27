@@ -520,11 +520,11 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
 	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat - 0x20);
 
 	__construct_array(CFlat + 0x10440, reinterpret_cast<void (*)(void*)>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
-	__construct_array(CFlat + 0x110C0, reinterpret_cast<void (*)(void*)>(__ct__9CGQuadObjFv), 0, 0x18, 0xAC);
-	__construct_array(CFlat + 0x120E0, reinterpret_cast<void (*)(void*)>(__ct__8CGObjectFv), 0, 0x38, 0x518);
-	__construct_array(m_objItem, reinterpret_cast<void (*)(void*)>(__ct__9CGItemObjFv), 0, 0x20, 0x57C);
-	__construct_array(m_objParty, reinterpret_cast<void (*)(void*)>(__ct__10CGPartyObjFv), 0, 4, 0x6F8);
-	__construct_array(m_objMon, reinterpret_cast<void (*)(void*)>(__ct__8CGMonObjFv), 0, 0x40, 0x740);
+	__construct_array(CFlat + 0x110C0, reinterpret_cast<void (*)(void*)>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
+	__construct_array(CFlat + 0x120E0, reinterpret_cast<void (*)(void*)>(__ct__8CGObjectFv), 0, 0x518, 0x38);
+	__construct_array(m_objItem, reinterpret_cast<void (*)(void*)>(__ct__9CGItemObjFv), 0, 0x57C, 0x20);
+	__construct_array(m_objParty, reinterpret_cast<void (*)(void*)>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
+	__construct_array(m_objMon, reinterpret_cast<void (*)(void*)>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
 }
 
 /*

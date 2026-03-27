@@ -11,18 +11,11 @@
 #include "dolphin/os.h"
 
 // Global objects that need initialization
-void* DAT_8032e13c;
-void* DAT_8032e148;
 
 struct RedMusicHEAD;
 struct RedSeSepHEAD;
 
 extern "C" {
-    void __register_global_object(void*, void (*)(void*), void*);
-    void* __ct__10CRedMemoryFv(void*);
-    void* __ct__9CRedEntryFv(void*);
-    void __dt__10CRedMemoryFv(void*);
-    void __dt__9CRedEntryFv(void*);
     void __dl__FPv(void*);
     void* RedNew__Fi(int);
     void RedDelete__FPv(void*);
@@ -66,9 +59,8 @@ struct RedDriverSyncState {
     OSSemaphore m_musicSemaphore;
 };
 
-CRedEntry DAT_8032e154;
 CRedMemory DAT_8032f480;
-CRedDriver CRedDriver_8032f4c0;
+CRedEntry DAT_8032e154;
 FILE DAT_8021d1a8;
 s16 DAT_8021de4e;
 
@@ -143,29 +135,6 @@ static inline RedDriverSyncState& RedDriverSync()
 extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);
 extern void InitReverb();
-
-/*
- * --INFO--
- * PAL Address: 0x801bfed8
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_RedDriver_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    void* uVar1;
-    
-    uVar1 = __ct__10CRedMemoryFv(&DAT_8032f480);
-    __register_global_object(uVar1, __dt__10CRedMemoryFv, &DAT_8032e13c);
-    uVar1 = __ct__9CRedEntryFv(&DAT_8032e154);
-    __register_global_object(uVar1, __dt__9CRedEntryFv, &DAT_8032e148);
-}
 
 /*
  * --INFO--

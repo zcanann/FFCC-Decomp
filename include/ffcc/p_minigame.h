@@ -22,10 +22,27 @@ void GbaThreadReadInitialCode(MgGbaThreadParam*);
 void _GbaThreadMain(void*);
 void _MngThreadMain(void*);
 
+extern unsigned int m_table_desc0__12CMiniGamePcs[];
+extern unsigned int m_table_desc1__12CMiniGamePcs[];
+extern unsigned int m_table_desc2__12CMiniGamePcs[];
+extern unsigned char m_table__12CMiniGamePcs[];
+
 class CMiniGamePcs : public CProcess
 {
 public:
-    CMiniGamePcs();
+    CMiniGamePcs()
+    {
+        unsigned int* table = reinterpret_cast<unsigned int*>(m_table__12CMiniGamePcs);
+        table[1] = m_table_desc0__12CMiniGamePcs[0];
+        table[2] = m_table_desc0__12CMiniGamePcs[1];
+        table[3] = m_table_desc0__12CMiniGamePcs[2];
+        table[4] = m_table_desc1__12CMiniGamePcs[0];
+        table[5] = m_table_desc1__12CMiniGamePcs[1];
+        table[6] = m_table_desc1__12CMiniGamePcs[2];
+        table[7] = m_table_desc2__12CMiniGamePcs[0];
+        table[8] = m_table_desc2__12CMiniGamePcs[1];
+        table[9] = m_table_desc2__12CMiniGamePcs[2];
+    }
 
     int GetTable(unsigned long);
 
@@ -60,9 +77,5 @@ public:
 };
 
 extern CMiniGamePcs MiniGamePcs;
-extern unsigned int m_table_desc0__12CMiniGamePcs[];
-extern unsigned int m_table_desc1__12CMiniGamePcs[];
-extern unsigned int m_table_desc2__12CMiniGamePcs[];
-extern unsigned char m_table__12CMiniGamePcs[];
 
 #endif // _FFCC_P_MINIGAME_H_

@@ -18,7 +18,6 @@ extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
-extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__10CTexScrollFv(void*);
@@ -52,8 +51,6 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
-extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
 extern "C" void* PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc[];
 extern float FLOAT_8032faf0;
@@ -68,26 +65,6 @@ extern float FLOAT_8032fb10;
 extern float FLOAT_8032fb14;
 extern float FLOAT_8032fb20;
 static const char s_materialStageName[] = "material";
-
-/*
- * --INFO--
- * PAL Address: 0x80043ccc
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_materialman_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    *reinterpret_cast<void**>(&MaterialMan) = __vt__8CManager;
-    *reinterpret_cast<void**>(&MaterialMan) = __vt__12CMaterialMan;
-    __ct__6CColorFv(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x213);
-}
 
 class CMapKeyFrame
 {

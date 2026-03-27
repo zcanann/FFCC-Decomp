@@ -47,11 +47,7 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 
-extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__14CFunnyShapePcs[];
-unsigned char ARRAY_8026D728[0xC];
 CFunnyShapePcs FunnyShapePcs;
-extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 
@@ -172,45 +168,6 @@ CFunnyShapePcs::~CFunnyShapePcs()
     dtor_8004EAD0(reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(reinterpret_cast<u8*>(this) + 0x61BC), -1);
     __dt__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(this) + 0x50), -1);
     __dt__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C), -1);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e844
- * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_FunnyShape_cpp(void)
-{
-    volatile void** base = reinterpret_cast<volatile void**>(&FunnyShapePcs);
-    unsigned char* self = reinterpret_cast<unsigned char*>(&FunnyShapePcs);
-    unsigned int* dst;
-
-    *base = __vt__8CManager;
-    *base = &__vt__8CProcess;
-    *base = __vt__14CFunnyShapePcs;
-    __ct__14CUSBStreamDataFv(self + 0x3C);
-    __ct__11CFunnyShapeFv(self + 0x50);
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
-    __register_global_object(&FunnyShapePcs, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
-
-    dst = reinterpret_cast<unsigned int*>(m_table__14CFunnyShapePcs);
-    dst[1] = m_table_desc0__14CFunnyShapePcs[0];
-    dst[2] = m_table_desc0__14CFunnyShapePcs[1];
-    dst[3] = m_table_desc0__14CFunnyShapePcs[2];
-    dst[4] = m_table_desc1__14CFunnyShapePcs[0];
-    dst[5] = m_table_desc1__14CFunnyShapePcs[1];
-    dst[6] = m_table_desc1__14CFunnyShapePcs[2];
-    dst[7] = m_table_desc2__14CFunnyShapePcs[0];
-    dst[8] = m_table_desc2__14CFunnyShapePcs[1];
-    dst[9] = m_table_desc2__14CFunnyShapePcs[2];
-    dst[12] = m_table_desc3__14CFunnyShapePcs[0];
-    dst[13] = m_table_desc3__14CFunnyShapePcs[1];
-    dst[14] = m_table_desc3__14CFunnyShapePcs[2];
 }
 
 /*

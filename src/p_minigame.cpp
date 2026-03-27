@@ -19,7 +19,6 @@ unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 unsigned char m_table__12CMiniGamePcs[0x15C];
-extern "C" void* __vt__12CMiniGamePcs[];
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
@@ -52,35 +51,6 @@ static void MiniGameThreadSleepTicks(OSTime ticks)
 static bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
 {
     return static_cast<u64>(OSGetTime() - start) > static_cast<u64>(timeout);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012b19c
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_minigame_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__12CMiniGamePcs);
-
-    *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(__vt__12CMiniGamePcs);
-    table[1] = m_table_desc0__12CMiniGamePcs[0];
-    table[2] = m_table_desc0__12CMiniGamePcs[1];
-    table[3] = m_table_desc0__12CMiniGamePcs[2];
-    table[4] = m_table_desc1__12CMiniGamePcs[0];
-    table[5] = m_table_desc1__12CMiniGamePcs[1];
-    table[6] = m_table_desc1__12CMiniGamePcs[2];
-    table[7] = m_table_desc2__12CMiniGamePcs[0];
-    table[8] = m_table_desc2__12CMiniGamePcs[1];
-    table[9] = m_table_desc2__12CMiniGamePcs[2];
 }
 
 /*
@@ -207,16 +177,6 @@ void _GbaThreadMain(void* param)
 void _MngThreadMain(void* param)
 {
     MiniGamePcs.MngThreadMain(param);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMiniGamePcs::CMiniGamePcs()
-{
-	// TODO
 }
 
 /*

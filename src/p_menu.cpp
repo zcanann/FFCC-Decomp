@@ -36,7 +36,6 @@ struct Vec4d
     float w;
 };
 u8 ARRAY_802ea1a0[0x20];
-extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__8CMenuPcs[];
 extern int DAT_8020ef9c[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
@@ -66,46 +65,6 @@ extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
-
-extern "C" void __sinit_p_menu_cpp(void)
-{
-    volatile void** base = reinterpret_cast<volatile void**>(&MenuPcs);
-    *base = __vt__8CManager;
-    *base = &__vt__8CProcess;
-    *base = __vt__8CMenuPcs;
-
-    u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
-    mcCtrl[0] = 0;
-    mcCtrl[1] = 0;
-    mcCtrl[2] = 0;
-    mcCtrl[3] = 0;
-    mcCtrl[4] = 0;
-    mcCtrl[5] = 0;
-    mcCtrl[6] = 0;
-    mcCtrl[7] = 0;
-
-    __register_global_object(&MenuPcs, __dt__8CMenuPcsFv, ARRAY_802ea1a0);
-
-    u32* table = reinterpret_cast<u32*>(gMenuProcessTable);
-    table[1] = m_table_desc0__8CMenuPcs[0];
-    table[2] = m_table_desc0__8CMenuPcs[1];
-    table[3] = m_table_desc0__8CMenuPcs[2];
-    table[4] = m_table_desc1__8CMenuPcs[0];
-    table[5] = m_table_desc1__8CMenuPcs[1];
-    table[6] = m_table_desc1__8CMenuPcs[2];
-    table[7] = m_table_desc2__8CMenuPcs[0];
-    table[8] = m_table_desc2__8CMenuPcs[1];
-    table[9] = m_table_desc2__8CMenuPcs[2];
-    table[12] = m_table_desc3__8CMenuPcs[0];
-    table[13] = m_table_desc3__8CMenuPcs[1];
-    table[14] = m_table_desc3__8CMenuPcs[2];
-    table[17] = m_table_desc4__8CMenuPcs[0];
-    table[18] = m_table_desc4__8CMenuPcs[1];
-    table[19] = m_table_desc4__8CMenuPcs[2];
-    table[22] = m_table_desc5__8CMenuPcs[0];
-    table[23] = m_table_desc5__8CMenuPcs[1];
-    table[24] = m_table_desc5__8CMenuPcs[2];
-}
 
 static inline void ReleaseRefObject(void* object)
 {

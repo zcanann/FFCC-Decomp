@@ -1,6 +1,7 @@
 #ifndef _FFCC_MATERIALMAN_H_
 #define _FFCC_MATERIALMAN_H_
 
+#include "ffcc/color.h"
 #include "ffcc/mapshadow.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_light.h"
@@ -87,7 +88,7 @@ public:
     CMemory::CStage* GetMemoryStage();
 
 private:
-    unsigned char m_pad000[0x40];
+    unsigned char m_pad004[0x3C];
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
@@ -110,7 +111,9 @@ private:
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
-    unsigned char m_pad209[0x0F];
+    unsigned char m_pad209[0x0A];
+    CColor m_color213;                   // 0x213
+    unsigned char m_pad217[1];
     CMemory::CStage* m_materialStage;    // 0x218
 };
 

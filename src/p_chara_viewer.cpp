@@ -211,7 +211,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(Chara + 0x2058), s_no_texture____801da7e8 + 0x10, 0xEA);
+                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), s_no_texture____801da7e8 + 0x10, 0xEA);
                 if (*(void**)(p + 0x190) != 0) {
                     *(void**)(p + 0x190) = __ct__Q26CChara6CModelFv(*(void**)(p + 0x190));
                 }
@@ -253,7 +253,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                         releaseRef(p, 0x1B0 + idx * 4);
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), s_no_texture____801da7e8 + 0x10, 0x124);
+                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), s_no_texture____801da7e8 + 0x10, 0x124);
                         if (*(void**)(p + 0x1B0 + idx * 4) != 0) {
                             *(void**)(p + 0x1B0 + idx * 4) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x1B0 + idx * 4));
                         }
@@ -273,7 +273,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), s_no_texture____801da7e8 + 0x10, 0x111);
+                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), s_no_texture____801da7e8 + 0x10, 0x111);
                     if (*(void**)(p + 0x198) != 0) {
                         *(void**)(p + 0x198) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x198));
                     }
@@ -540,9 +540,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(float*)(bumpLight + 0x2C) = kCharaViewerZero;
     *(float*)(bumpLight + 0x30) = kCharaViewerZero;
     gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
-        &LightPcs, bumpLight, 0, *(void**)(Chara + 0x2058), 4));
+        &LightPcs, bumpLight, 0, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
 
-    Create__6CCharaFv(Chara);
+    Create__6CCharaFv(&Chara);
 }
 
 /*
@@ -560,7 +560,7 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     int* ref;
     unsigned int i;
 
-    Destroy__6CCharaFv(Chara);
+    Destroy__6CCharaFv(&Chara);
     DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
     gCharaPartWorkPtr = 0;
 
@@ -622,18 +622,3 @@ extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD0));
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD4));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

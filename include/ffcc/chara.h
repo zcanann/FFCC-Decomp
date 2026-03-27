@@ -14,7 +14,7 @@ struct Vec;
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec*, Vec*, Vec*, float);
 
-class CChara
+class CChara : public CManager
 {
 public:
 	class CModel;
@@ -146,8 +146,7 @@ public:
 		void Calc(CChara::CModel*);
 	};
 	
-	CChara();
-	~CChara();
+	CChara() {}
 
 	void Init();
 	void Quit();
@@ -167,7 +166,7 @@ public:
     void LoadFurTexBuffer(unsigned short* inTexels);
 };
 
-extern unsigned char Chara[0x2078];
+extern CChara Chara;
 extern CChara& gChara;
 
 #endif // _FFCC_CHARA_H_

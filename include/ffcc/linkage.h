@@ -7,7 +7,8 @@
 // Canonical linkage declarations for globals that are still represented as
 // raw storage in decomped units.
 extern unsigned char CFlat[0x10440];
-extern unsigned char Chara[0x2078];
+class CChara;
+extern CChara Chara;
 class CFile;
 extern CFile File;
 class CGraphic;

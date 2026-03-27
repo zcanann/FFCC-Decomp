@@ -366,7 +366,7 @@ void CCharaPcs::Init()
  */
 void CCharaPcs::Quit()
 {
-    *reinterpret_cast<int*>(Ptr(Chara, 0x205C)) = 0;
+    *reinterpret_cast<int*>(Ptr(&Chara, 0x205C)) = 0;
     Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0xC8)));
     Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0xC4)));
     Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0xC0)));

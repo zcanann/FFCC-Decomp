@@ -362,7 +362,7 @@ void CRingMenu::onCalc()
 		if (partyObj != 0) {
 			(void)partyObj;
 			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[menuIndex];
-			int currentCmd = *reinterpret_cast<int*>(Chara + 0x2004);
+			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
 
 			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
 				currentCmd = _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
@@ -370,7 +370,7 @@ void CRingMenu::onCalc()
 
 			int* trackedCmd = &RingMenuInt(this, 0x504);
 			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-				trackedCmd = reinterpret_cast<int*>(Chara + 0x2008);
+				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
 			}
 
 			double scrollDelta = 0.0;
@@ -656,7 +656,7 @@ void CRingMenu::onDraw()
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
 					reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
 				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
-				                   ? *reinterpret_cast<int*>(Chara + 0x2004)
+				                   ? *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004)
 				                   : _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
 
 				CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcsRaw() + 0xFC));

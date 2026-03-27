@@ -10,7 +10,6 @@ extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, uns
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__7CVectorFv(void*);
-extern "C" char __vt__6CChara[];
 
 /*
  * --INFO--
@@ -33,21 +32,6 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 	out[2][3] = a[2][3];
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 0b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CChara::CChara()
-{
-	memset(this, 0, 0x2078);
-	*(s32*)((u8*)this + 0x2060) = 1;
-	*(u32*)((u8*)this + 0x2074) = 0;
-}
 
 /*
  * --INFO--
@@ -1433,26 +1417,5 @@ void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node
 	}
 }
 
-unsigned char Chara[0x2078];
-CChara& gChara = *reinterpret_cast<CChara*>(Chara);
-
-extern "C" char __vt__8CManager[];
-
-/*
- * --INFO--
- * PAL Address: 0x80073ad4
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_chara_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-	*(void**)&Chara = __vt__8CManager;
-	*(void**)&Chara = __vt__6CChara;
-}
+CChara Chara;
+CChara& gChara = Chara;

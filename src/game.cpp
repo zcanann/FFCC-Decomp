@@ -598,7 +598,7 @@ void CGame::InitNewGame()
     }
     strcpy(Game.m_gameWork.m_townName, townName);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
-    InitFurTexBuffer__6CCharaFv(reinterpret_cast<CChara*>(Chara));
+    InitFurTexBuffer__6CCharaFv(&Chara);
 }
 
 /*
@@ -796,7 +796,7 @@ void CGame::CheckScriptChange()
 
         strcpy(gameWork->m_townName, townName);
         ResetNewGame__13CFlatRuntime2Fv(CFlat);
-        InitFurTexBuffer__6CCharaFv(reinterpret_cast<CChara*>(Chara));
+        InitFurTexBuffer__6CCharaFv(&Chara);
         m_nextScript.m_flags = 0;
     }
 

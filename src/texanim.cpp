@@ -37,6 +37,7 @@ extern "C" void __dla__FPv(void*);
 extern "C" void* memcpy(void*, const void*, unsigned long);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
+extern "C" void* dtor_80043D10(void*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__11CTexAnimSet[];
@@ -1120,7 +1121,7 @@ CTexAnimSeq::~CTexAnimSeq()
         __dla__FPv(*keys);
         *keys = 0;
     }
-    __dt__4CRefFv(this, 0);
+    dtor_80043D10(this, 0);
 }
 
 /*

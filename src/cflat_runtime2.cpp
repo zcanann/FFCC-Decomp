@@ -2700,13 +2700,16 @@ void CFlatRuntime2::resetSpawnBit(int spawnBit)
 		memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, 0x48);
 		return;
 	}
-	if (spawnBit < 0 || spawnBit > 8) {
+
+	if (spawnBit < 0) {
 		return;
 	}
 
-	u8* ptr = reinterpret_cast<u8*>(this) + (spawnBit << 3);
-	*reinterpret_cast<int*>(ptr + 0x12F4) = 0;
-	*reinterpret_cast<int*>(ptr + 0x12F0) = 0;
+	if (spawnBit <= 8) {
+		spawnBit <<= 3;
+		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + spawnBit + 0x12F4) = 0;
+		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + spawnBit + 0x12F0) = 0;
+	}
 }
 
 /*

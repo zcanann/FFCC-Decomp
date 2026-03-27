@@ -13,8 +13,10 @@ public:
     class CTmp
 	{
 	};
-    class MaterialInfo
+    struct MaterialInfo
 	{
+        short m_itemNo[3];
+        short m_count[3];
 	};
 
     void createSingleMenu();

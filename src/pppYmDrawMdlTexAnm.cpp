@@ -97,8 +97,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     if (uvLayout != NULL) {
         uvByteOffset = 0;
-        i = 0;
-        for (; i < (s32)(u16)uvLayout->m_uvCount; i++, uvByteOffset += 4) {
+        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
             if (work->m_perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
                 work->m_perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
             }
@@ -106,6 +105,8 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
             if (work->m_perV < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)) {
                 work->m_perV = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
             }
+
+            uvByteOffset += 4;
         }
 
         OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, work->m_perU, work->m_perV);

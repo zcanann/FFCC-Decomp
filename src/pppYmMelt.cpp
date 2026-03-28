@@ -231,11 +231,11 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    u16 gridSize = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
-    int grid = (int)gridSize + 1;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
+        u16 gridSize = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
+        int grid = (int)gridSize + 1;
         work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp_801DA048,
             0xA9);
@@ -247,21 +247,21 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         work->m_phaseOffset = (s16)(angleSeed - (angleSeed / (int)phaseDiv) * phaseDiv);
         s16 phaseOffset = work->m_phaseOffset;
 
-        double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
-        double step = (double)(ctrl->m_stepValue / (float)((double)gridSize - DOUBLE_80330af8));
-        double rot = (double)(FLOAT_80330b0c * (float)((double)phaseOffset - DOUBLE_80330b00));
+        float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
+        float step = ctrl->m_stepValue / (float)((double)gridSize - DOUBLE_80330af8);
+        float rot = FLOAT_80330b0c * (float)((double)phaseOffset - DOUBLE_80330b00);
         Mtx rotMtx;
 
-        for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
+        for (float z = -halfWidth; z <= halfWidth; z += step) {
             YmMeltVertex* vtx = vtxBase;
 
-            for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
-                vtx->m_position.x = (float)x;
+            for (float x = -halfWidth; x <= halfWidth; x += step) {
+                vtx->m_position.x = x;
                 vtx->m_position.y = kPppYmMeltZero;
-                vtx->m_position.z = (float)z;
+                vtx->m_position.z = z;
 
                 if (phaseOffset != 0) {
-                    PSMTXRotRad(rotMtx, 'y', (float)rot);
+                    PSMTXRotRad(rotMtx, 'y', rot);
                     PSMTXMultVec(rotMtx, &vtx->m_position, &vtx->m_position);
                 }
 

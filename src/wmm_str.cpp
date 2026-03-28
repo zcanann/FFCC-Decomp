@@ -30,6 +30,10 @@ extern const char s_WinMessTable[];
 extern const char* s_NoTextByLanguage[];
 extern const char* s_SlotBTextByLanguage[];
 
+extern const float FLOAT_803336CC;
+extern const double DOUBLE_803336D0;
+extern const double DOUBLE_803336D8;
+
 /*
  * --INFO--
  * PAL Address: 0x8017af14
@@ -42,6 +46,7 @@ extern const char* s_SlotBTextByLanguage[];
 int CMenuPcs::GetSlotABXPos(int right)
 {
     unsigned char languageId = Game.m_gameWork.m_languageId;
+    CFont* font;
     const char* slotAText;
 
     switch (languageId) {
@@ -63,15 +68,15 @@ int CMenuPcs::GetSlotABXPos(int right)
         break;
     }
 
-    CFont* font = menuFont;
-    font->SetMargin(1.0f);
+    font = menuFont;
+    font->SetMargin(FLOAT_803336CC);
     font->SetShadow(0);
-    font->SetScale(1.0f);
+    font->SetScale(FLOAT_803336CC);
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     short* windowInfo = singWindowInfo;
-    int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
+    int x = (int)(((double)(windowInfo[2] - slotAWidth) * DOUBLE_803336D0) + (double)windowInfo[0]);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
@@ -91,6 +96,7 @@ int CMenuPcs::GetSlotABXPos(int right)
 int CMenuPcs::GetYesNoXPos(int right)
 {
     unsigned char languageId = Game.m_gameWork.m_languageId;
+    CFont* font;
     const char* yesText;
 
     switch (languageId) {
@@ -112,14 +118,14 @@ int CMenuPcs::GetYesNoXPos(int right)
         break;
     }
 
-    CFont* font = menuFont;
-    font->SetMargin(1.0f);
+    font = menuFont;
+    font->SetMargin(FLOAT_803336CC);
     font->SetShadow(0);
-    font->SetScale(1.0f);
+    font->SetScale(FLOAT_803336CC);
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     short* windowInfo = singWindowInfo;
-    int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
+    int x = (int)(((double)(windowInfo[2] - yesWidth) * DOUBLE_803336D0) + (double)windowInfo[0]);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;

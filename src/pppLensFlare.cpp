@@ -75,16 +75,15 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
 void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
 	if (gPppCalcDisabled == 0) {
-		pppColumUnkB* step = unkB;
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* objBytes = (u8*)obj;
 		u8* colorBase = objBytes + colorOffset;
 		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
 		u8 sourceAlpha = colorBase[0x8B];
-		double projX = (double)pppMngStPtr->m_matrix.value[0][3];
-		double projY = (double)pppMngStPtr->m_matrix.value[1][3];
-		double projZ = (double)pppMngStPtr->m_matrix.value[2][3];
+		float projX = pppMngStPtr->m_matrix.value[0][3];
+		float projY = pppMngStPtr->m_matrix.value[1][3];
+		float projZ = pppMngStPtr->m_matrix.value[2][3];
 		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
 		u32 zAtPixel;
 		float projection[7];
@@ -95,7 +94,6 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		Vec lookDir;
 		Vec objectPos;
 		Vec cameraToObject;
-		u8* stepArgBytes = (u8*)&step->m_arg3;
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
@@ -121,48 +119,52 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		u32 y0 = (u32)((int)work->m_projectedY & 0xFFFF);
-		u32 x0 = (u32)((int)work->m_projectedX & 0xFFFF);
-		u8 flareWidth = step->m_arg3;
+		int projectedX = (int)work->m_projectedX;
+		int projectedY = (int)work->m_projectedY;
+		u32 x0 = (u32)(projectedX & 0xFFFF);
+		u32 y0 = (u32)(projectedY & 0xFFFF);
+		u8 flareWidth = unkB->m_arg3;
 		u32 halfWidth = (u32)(flareWidth >> 1);
+
+		zAtPixel = 0;
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
-		s16 stepSize = (s16)((u16)flareWidth / (u16)step->m_count);
+		s16 stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
 		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
 			for (u32 x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stepSize) {
 				s16 xShort = (s16)x;
 				s16 yShort = (s16)y;
 
-				if ((xShort <= -1) || (yShort <= -1) || (xShort >= 0x281) || (yShort >= 0x1C1)) {
-					continue;
-				}
-
-				GXPeekZ((u16)xShort, (u16)yShort, &zAtPixel);
-				if (z0 <= zAtPixel) {
-					work->m_alpha = (u8)(work->m_alpha + 1);
+				if ((xShort >= 0) && (yShort >= 0) && (xShort <= 0x280) && (yShort <= 0x1C0)) {
+					GXPeekZ((u16)xShort, (u16)yShort, &zAtPixel);
+					if (z0 <= zAtPixel) {
+						work->m_alpha = (u8)(work->m_alpha + 1);
+					}
 				}
 			}
 		}
 
-		u32 sampleCount = (u32)(step->m_count + 1);
+		int sampleCount = (int)unkB->m_count + 1;
 		sampleCount *= sampleCount;
-		u32 alpha = (u32)work->m_alpha;
+		int alpha = (u8)work->m_alpha;
 
 		if (alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			u32 scaledAlpha = alpha * (0xFFu / sampleCount);
+			int scaledAlpha = alpha * (0xFF / sampleCount);
 
 			work->m_alpha = (u8)scaledAlpha;
-			if (scaledAlpha >= 0x100u) {
+			if ((scaledAlpha & 0xFF) > 0xFF) {
 				work->m_alpha = 0xff;
+			} else {
+				work->m_alpha = (u8)scaledAlpha;
 			}
 		}
 
 		work->m_alpha = (u8)(int)((double)(u8)work->m_alpha * alphaScale);
-		if (step->m_dataValIndex != 0xffff) {
-			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+		if (unkB->m_dataValIndex != 0xffff) {
+			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,
-							  step->m_initWOrk);
+							  unkB->m_initWOrk);
 		}
 	}
 }

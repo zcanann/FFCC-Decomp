@@ -50,6 +50,28 @@ struct LocationTitle2Particle {
     s16 m_shape;
 };
 
+struct LocationTitle2OwnerView {
+    u8 _pad0[0x168];
+    CChara::CModel* m_model;
+};
+
+struct LocationTitle2AnimView {
+    u8 _pad0[0x10];
+    u16 m_frameCount;
+};
+
+struct LocationTitle2NodeView {
+    u8 _pad0[0xC];
+    Mtx m_matrix;
+    u8 _pad3c[0x84];
+};
+
+struct LocationTitle2ModelView {
+    u8 _pad0[0xA4];
+    LocationTitle2AnimView* m_anim;
+    LocationTitle2NodeView* m_nodes;
+};
+
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 
 /*
@@ -141,11 +163,11 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
     if (work->m_particles == 0) {
         LocationTitle2Particle* particles;
-        int ownerData;
+        LocationTitle2OwnerView* ownerData;
         CChara::CModel* model;
+        LocationTitle2AnimView* modelAnim;
+        LocationTitle2NodeView* modelNodes;
         int nodeIndex;
-        u8* modelAnim;
-        u8* modelNodes;
         double zOffset;
 
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -154,25 +176,25 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
 
-        ownerData = *(int*)((u8*)pppMngStPtr->m_owner + 0xF8);
+        ownerData = *(LocationTitle2OwnerView**)((u8*)pppMngStPtr->m_owner + 0xF8);
         model = 0;
-        if (ownerData != 0 && *(CChara::CModel**)(ownerData + 0x168) != 0) {
-            model = *(CChara::CModel**)(ownerData + 0x168);
+        if (ownerData != 0 && ownerData->m_model != 0) {
+            model = ownerData->m_model;
         }
 
+        modelAnim = ((LocationTitle2ModelView*)model)->m_anim;
+        modelNodes = ((LocationTitle2ModelView*)model)->m_nodes;
         nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);
-        modelAnim = *(u8**)((u8*)model + 0xA4);
-        modelNodes = *(u8**)((u8*)model + 0xA8);
         zOffset = (double)FLOAT_80330f4c;
 
-        for (u32 frameIndex = 0; frameIndex < *(u16*)(modelAnim + 0x10); frameIndex++) {
+        for (u32 frameIndex = 0; frameIndex < modelAnim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
             LocationTitle2Particle* particle;
 
-            CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(modelNodes + nodeIndex * 0xC0, model);
+            CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(&modelNodes[nodeIndex], model);
             SetFrame__Q26CChara6CModelFf((float)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
-            PSMTXCopy((float(*)[4])(modelNodes + nodeIndex * 0xC0 + 0xC), nodeMtx);
+            PSMTXCopy(modelNodes[nodeIndex].m_matrix, nodeMtx);
 
             particle = &particles[work->m_count];
             particle->m_pos.x = nodeMtx[0][3];

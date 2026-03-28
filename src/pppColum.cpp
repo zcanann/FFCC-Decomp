@@ -35,6 +35,32 @@ struct pppColumPositionWork {
     u8 m_alpha;
 };
 
+struct pppColumStepData {
+    float m_scaleBase;
+    float m_scaleRandom;
+    float m_positionBase;
+    float m_positionRandom;
+    float m_fadeDistance;
+    u8 m_drawArg0;
+    u8 m_drawArg1;
+    u8 m_noiseR;
+    u8 m_noiseG;
+    u8 m_noiseB;
+};
+
+struct pppColumStep {
+    u32 m_unk0;
+    s32 m_dataValIndex;
+    s16 m_initWOrk;
+    u16 m_unkA;
+    u32 m_stepValue;
+    u8 m_blendMode;
+    u8 m_count;
+    u8 m_unk12;
+    u8 m_unk13;
+    pppColumStepData m_data;
+};
+
 static inline int* GetColumSerializedDataOffsets(void* param) {
     return *(int**)((char*)param + 0xc);
 }
@@ -70,27 +96,36 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
  */
 void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
+    pppColumStep* step = (pppColumStep*)param_2;
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
     pppColumFrameWork* frameWork = (pppColumFrameWork*)((u8*)column + serializedDataOffsets[3] + 0x80);
     pppColumPositionWork* positionWork = (pppColumPositionWork*)((u8*)column + serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
-    if (param_2->m_dataValIndex != 0xFFFF) {
+    if (step->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
-            *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+            *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         void* texture;
         pppCVector color;
         GXColor quadColor;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
-        u8 alpha = positionWork->m_alpha;
-        if (alpha != 0) {
+        if (positionWork->m_alpha != 0) {
             pppColumValue* values = frameWork->m_values;
             Mtx identityMtx;
             Vec cameraDelta;
+            Vec center;
+            Vec offset;
+            Vec shapePosA;
+            Vec shapePosB;
+            Vec2d uvA;
+            Vec2d uvB;
             short shapeFrame;
+            u8 alpha = positionWork->m_alpha;
+            u8* stepColor = (u8*)&step->m_stepValue;
             float lengthXY;
             float segmentStep;
+            float dist;
             float drawScale = 0.0f;
 
             PSMTXIdentity(identityMtx);
@@ -102,41 +137,36 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             if (lengthXY > 0.0f) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
-            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
+            segmentStep = (150.0f * lengthXY) / ((float)step->m_count - 1.0f);
 
             pppInitBlendMode();
-            for (int i = 0; i < param_2->m_count; i++) {
-                Vec center;
-                Vec offset;
-                Vec shapePosA;
-                Vec shapePosB;
-                Vec2d uvA;
-                Vec2d uvB;
-                float dist;
-                float fadeAmount;
-                float positionStep = segmentStep * values->m_positionScale;
-
+            for (int i = 0; i < step->m_count; i++) {
                 center.x =
-                    positionWork->m_position.x + positionStep * (cameraDelta.x * (float)(i + 1));
+                    positionWork->m_position.x +
+                    (segmentStep * values->m_positionScale) * (cameraDelta.x * (float)(i + 1));
                 center.y =
-                    positionWork->m_position.y + positionStep * (cameraDelta.y * (float)(i + 1));
+                    positionWork->m_position.y +
+                    (segmentStep * values->m_positionScale) * (cameraDelta.y * (float)(i + 1));
                 center.z = 0.0f;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 dist = PSVECMag(&offset);
 
                 color.m_rgba[3] = alpha;
-                fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
-                if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > 0.0f) {
-                    color.m_rgba[3] = (u8)((float)color.m_rgba[3] * fadeAmount);
+                if (dist < step->m_data.m_fadeDistance) {
+                    float alphaScale = dist / step->m_data.m_fadeDistance;
+
+                    if (alphaScale > 0.0f) {
+                        color.m_rgba[3] = (u8)((float)color.m_rgba[3] * alphaScale);
+                    }
                 }
-                color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
-                color.m_rgba[1] = *((u8*)&param_2->m_stepValue + 1) + values->m_colorG;
-                color.m_rgba[2] = *((u8*)&param_2->m_stepValue + 2) + values->m_colorB;
+                color.m_rgba[0] = stepColor[0] + values->m_colorR;
+                color.m_rgba[1] = stepColor[1] + values->m_colorG;
+                color.m_rgba[2] = stepColor[2] + values->m_colorB;
 
                 pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-                    &color, NULL, 0.0f, (u8)param_2->m_payload[0x15], (u8)param_2->m_payload[0x14],
-                    param_2->m_arg3, 0, 0, 1, 0);
+                    &color, NULL, 0.0f, step->m_data.m_drawArg1, step->m_data.m_drawArg0,
+                    step->m_blendMode, 0, 0, 1, 0);
 
                 BeginQuadEnv__5CUtilFv(&gUtil);
                 SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
@@ -144,7 +174,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 GXLoadTexObj((GXTexObj*)((char*)texture + 0x28), GX_TEXMAP0);
-                pppSetBlendMode(param_2->m_arg3);
+                pppSetBlendMode(step->m_blendMode);
 
                 drawScale += values->m_scaleStep;
                 shapeFrame = *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
@@ -187,6 +217,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
  */
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
+    pppColumStep* step = (pppColumStep*)param_2;
     int* serializedDataOffsets;
     pppColumValue* values;
     pppColumFrameWork* work;
@@ -197,31 +228,31 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
+                (unsigned long)step->m_count * 0xc, pppEnvStPtr->m_stagePtr,
                 s_pppColum_cpp_801DB638, 0x7d);
 
             values = work->m_values;
-            for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values->m_scaleStep = Math.RandF(*(float*)(param_2->m_payload + 4));
-                values->m_scaleStep = values->m_scaleStep + *(float*)(param_2->m_payload + 0);
-                values->m_positionScale = Math.RandF(*(float*)(param_2->m_payload + 0xc));
-                values->m_positionScale = values->m_positionScale + *(float*)(param_2->m_payload + 8);
+            for (i = 0; i < (int)(unsigned int)step->m_count; i++) {
+                values->m_scaleStep = Math.RandF(step->m_data.m_scaleRandom);
+                values->m_scaleStep = values->m_scaleStep + step->m_data.m_scaleBase;
+                values->m_positionScale = Math.RandF(step->m_data.m_positionRandom);
+                values->m_positionScale = values->m_positionScale + step->m_data.m_positionBase;
                 values->m_colorR =
-                    GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x16));
+                    GetNoise__5CUtilFUc(&gUtil, step->m_data.m_noiseR);
                 values->m_colorG =
-                    GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x17));
+                    GetNoise__5CUtilFUc(&gUtil, step->m_data.m_noiseG);
                 values->m_colorB =
-                    GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(param_2->m_payload + 0x18));
+                    GetNoise__5CUtilFUc(&gUtil, step->m_data.m_noiseB);
                 values++;
             }
         }
 
-        if (param_2->m_dataValIndex != 0xFFFF) {
+        if (step->m_dataValIndex != 0xFFFF) {
             long* animData =
-                **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+                **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
             pppCalcFrameShape__FPlRsRsRss(
                 animData,
-                work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);
+                work->m_shapeA, work->m_shapeB, work->m_shapeC, step->m_initWOrk);
         }
     }
 }

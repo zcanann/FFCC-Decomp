@@ -32,7 +32,6 @@ extern const char* s_SlotBTextByLanguage[];
 
 extern const float FLOAT_803336CC;
 extern const double DOUBLE_803336D0;
-extern const double DOUBLE_803336D8;
 
 /*
  * --INFO--

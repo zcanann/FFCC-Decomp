@@ -69,12 +69,12 @@ public:
     unsigned char _pad08[0x7C];
     CUSBStreamData m_usbStream; // 0x84
 
-    unsigned char _padA8[0x20];
+    unsigned char _padB4[0x20];
 
-    ZLIST m_zlist1; // 0xC8
-    ZLIST m_zlist2; // 0xD8
+    ZLIST m_zlist1; // 0xD4
+    ZLIST m_zlist2; // 0xE4
 
-    unsigned char _padE8[0x44];
+    unsigned char _padF4[0x38];
 
     // Raw float words consumed by calcViewer (0x12C - 0x158)
     float field_0x12c;

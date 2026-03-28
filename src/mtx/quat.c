@@ -208,35 +208,28 @@ void C_QUATLerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
 void C_QUATSlerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
 {
     f32 ratioA, ratioB;
-    f32 prodX;
-    f32 prodY;
-    f32 prodZ;
     f32 tmp;
     f32 value = 1.0f;
     f32 cosHalfTheta;
 
-    prodX = p->x * q->x;
-    prodY = p->y * q->y;
-    prodZ = p->z * q->z;
-    cosHalfTheta = prodX + prodY + prodZ;
-    cosHalfTheta += p->w * q->w;
+    cosHalfTheta = p->w * q->w + ((p->x * q->x + p->y * q->y) + p->z * q->z);
 
     if (cosHalfTheta < 0.0f) {
         cosHalfTheta = -cosHalfTheta;
         value = -value;
     }
 
-    if (cosHalfTheta < 0.9999899864196777f) {
+    if (cosHalfTheta >= 0.9999899864196777f) {
+        ratioA = 1.0f - t;
+        value *= t;
+    }
+    else {
         f32 halfTheta = acosf(cosHalfTheta);
         f32 sinHalfTheta = sinf(halfTheta);
 
         ratioA = sinf((1.0f - t) * halfTheta) / sinHalfTheta;
         ratioB = sinf(t * halfTheta) / sinHalfTheta;
         value *= ratioB;
-    }
-    else {
-        ratioA = 1.0f - t;
-        value *= t;
     }
 
     ratioB = ratioA * p->x;

@@ -97,27 +97,27 @@ void pppSRandCV(void* param1, void* param2, void* param3)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors;
-    if (color_offset == -1) {
-        target_colors = gPppDefaultValueBuffer;
-    } else {
-        target_colors = base + color_offset + 0x80;
-    }
+    u8* target_colors =
+        (color_offset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + color_offset + 0x80);
 
     {
-        u8 color = target_colors[0];
-        target_colors[0] = color + (s8)((f32)in->delta[0] * target[0] - (f32)in->delta[0]);
+        s8 deltaBase = in->delta[0];
+        s8 delta = (s8)((f32)deltaBase * target[0] - (f32)deltaBase);
+        target_colors[0] = (u8)(target_colors[0] + delta);
     }
     {
-        u8 color = target_colors[1];
-        target_colors[1] = color + (s8)((f32)in->delta[1] * target[1] - (f32)in->delta[1]);
+        s8 deltaBase = in->delta[1];
+        s8 delta = (s8)((f32)deltaBase * target[1] - (f32)deltaBase);
+        target_colors[1] = (u8)(target_colors[1] + delta);
     }
     {
-        u8 color = target_colors[2];
-        target_colors[2] = color + (s8)((f32)in->delta[2] * target[2] - (f32)in->delta[2]);
+        s8 deltaBase = in->delta[2];
+        s8 delta = (s8)((f32)deltaBase * target[2] - (f32)deltaBase);
+        target_colors[2] = (u8)(target_colors[2] + delta);
     }
     {
-        u8 color = target_colors[3];
-        target_colors[3] = color + (s8)((f32)in->delta[3] * target[3] - (f32)in->delta[3]);
+        s8 deltaBase = in->delta[3];
+        s8 delta = (s8)((f32)deltaBase * target[3] - (f32)deltaBase);
+        target_colors[3] = (u8)(target_colors[3] + delta);
     }
 }

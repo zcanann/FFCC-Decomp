@@ -581,22 +581,24 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    const char* townName = DAT_8032f6ac;
+    CGame* game = &Game;
+    const char* townName;
 
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
     Printf__7CSystemFPce(&System, DAT_801d6214);
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
-    memset(&Game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
-    memset(Game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.m_gameWork.m_wmBackupParams));
+    memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
-    *reinterpret_cast<unsigned int*>(&Game.m_gameWork.m_scriptSysVal0) = 1;
-    Game.m_gameWork.m_chaliceElement = 1;
+    *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
+    game->m_gameWork.m_chaliceElement = 1;
 
-    if (Game.m_gameWork.m_languageId == 3) {
+    townName = DAT_8032f6ac;
+    if (game->m_gameWork.m_languageId == 3) {
         townName = DAT_8032f6a4;
     }
-    strcpy(Game.m_gameWork.m_townName, townName);
+    strcpy(game->m_gameWork.m_townName, townName);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
     InitFurTexBuffer__6CCharaFv(&Chara);
 }

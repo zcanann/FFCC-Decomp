@@ -1,6 +1,7 @@
 #include "ffcc/texanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/materialman.h"
+#include "ffcc/ref.h"
 #include "ffcc/system.h"
 #include "ffcc/math.h"
 
@@ -43,6 +44,7 @@ extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
 extern "C" void* __vt__Q28CTexAnim8CRefData[];
+extern "C" CRef* dtor_80043D10(CRef*, short);
 extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" void __ct__25CPtrArray_P11CTexAnimSeq_Fv(void*);
 extern "C" {
@@ -1120,7 +1122,7 @@ CTexAnimSeq::~CTexAnimSeq()
         __dla__FPv(*keys);
         *keys = 0;
     }
-    __dt__4CRefFv(this, 0);
+    dtor_80043D10((CRef*)this, 0);
 }
 
 /*

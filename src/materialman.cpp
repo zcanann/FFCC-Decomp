@@ -114,6 +114,91 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
+static inline unsigned int& StdEnvTevBit(CMaterialMan* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x40));
+}
+
+static inline unsigned int& ActiveEnvTevBit(CMaterialMan* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x44));
+}
+
+static inline unsigned int& CurEnvTevBit(CMaterialMan* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x48));
+}
+
+static inline int& TexMapIdCur(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x11C));
+}
+
+static inline int& TexMtxCur(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x120));
+}
+
+static inline int& TexCoordIdCur(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x124));
+}
+
+static inline int& StdTexMapId(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x128));
+}
+
+static inline int& StdTexMtx(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x12C));
+}
+
+static inline int& StdTexCoordId(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x130));
+}
+
+static inline int& TexMapIdCurShadow(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x134));
+}
+
+static inline int& TexMtxCurShadow(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x138));
+}
+
+static inline int& TexCoordIdCurShadow(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x13C));
+}
+
+static inline unsigned char& BlendMode(CMaterialMan* self)
+{
+    return *Ptr(self, 0x205);
+}
+
+static inline unsigned char& FogEnable(CMaterialMan* self)
+{
+    return *Ptr(self, 0x206);
+}
+
+static inline unsigned char& BlendOverrideMode(CMaterialMan* self)
+{
+    return *Ptr(self, 0x207);
+}
+
+static inline unsigned char& ShadowKColorMask(CMaterialMan* self)
+{
+    return *Ptr(self, 0x208);
+}
+
+static inline CMemory::CStage*& MaterialStage(CMaterialMan* self)
+{
+    return *reinterpret_cast<CMemory::CStage**>(Ptr(self, 0x218));
+}
+
 typedef void (*VirtualDtorFn)(void*, int);
 
 static void ReleaseRef(void* object)
@@ -391,7 +476,7 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	MaterialStage(this) = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
 	*Ptr(this, 0x204) = 0x30;
 }
 
@@ -402,7 +487,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	Memory.DestroyStage(m_materialStage);
+	Memory.DestroyStage(MaterialStage(this));
 }
 
 /*
@@ -425,7 +510,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     }
 
     unsigned char blendMode = *Ptr(material, 0xA0);
-    if (m_blendOverrideMode != 0xFF) {
+    if (BlendOverrideMode(this) != 0xFF) {
         if (blendMode == 0) {
             blendMode = 5;
         } else if (blendMode == 4) {
@@ -433,21 +518,21 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         }
     }
 
-    if ((m_blendMode == blendMode) && (m_fogEnable == fogEnable)) {
+    if ((BlendMode(this) == blendMode) && (FogEnable(this) == fogEnable)) {
         return;
     }
 
-    m_blendMode = blendMode;
-    m_fogEnable = fogEnable;
+    BlendMode(this) = blendMode;
+    FogEnable(this) = fogEnable;
 
-    switch (m_blendMode) {
+    switch (BlendMode(this)) {
     case 3:
         _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
             0, 3, 3, 3, 3);
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(m_fogEnable, 1);
+        Graphic.SetFog(FogEnable(this), 1);
         return;
 
     case 0:
@@ -456,7 +541,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0xC0, 0, 7, 0xFF);
         GXSetZCompLoc(0);
-        Graphic.SetFog(m_fogEnable, 0);
+        Graphic.SetFog(FogEnable(this), 0);
         return;
 
     case 1:
@@ -465,7 +550,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(m_fogEnable, 0);
+        Graphic.SetFog(FogEnable(this), 0);
         return;
 
     case 2:
@@ -474,7 +559,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(m_fogEnable, 1);
+        Graphic.SetFog(FogEnable(this), 1);
         return;
 
     case 4:
@@ -483,7 +568,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(m_fogEnable, 0);
+        Graphic.SetFog(FogEnable(this), 0);
         return;
 
     case 5:
@@ -492,7 +577,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0xFF);
         GXSetZCompLoc(0);
-        Graphic.SetFog(m_fogEnable, 0);
+        Graphic.SetFog(FogEnable(this), 0);
         return;
 
     default:
@@ -818,7 +903,7 @@ void CMaterialMan::addtev_lightmap(long index)
     unsigned char indexByte = static_cast<unsigned char>(index);
     int stageOffset = static_cast<int>(index) * 4;
 
-    if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
+    if ((ShadowKColorMask(this) & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
             stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
@@ -896,7 +981,7 @@ void CMaterialMan::addtev_shadow(long index)
     unsigned char indexByte = static_cast<unsigned char>(index);
     int stageOffset = static_cast<int>(index) * 4;
 
-    if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
+    if ((ShadowKColorMask(this) & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
             stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
@@ -1209,24 +1294,24 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
  */
 void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex, int setVtxDesc)
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    TexMapIdCur(this) = StdTexMapId(this);
+    TexMapIdCurShadow(this) = StdTexMapId(this);
+    TexMtxCur(this) = StdTexMtx(this);
+    TexMtxCurShadow(this) = StdTexMtx(this);
+    TexCoordIdCur(this) = StdTexCoordId(this);
+    TexCoordIdCurShadow(this) = StdTexCoordId(this);
+    CurEnvTevBit(this) = StdEnvTevBit(this);
 
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[materialIndex];
-    material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
+    material->Set(static_cast<_GXTexMapID>(TexMapIdCur(this)));
 
-    unsigned int tevBit = m_curEnvTevBit &
+    unsigned int tevBit = CurEnvTevBit(this) &
                           *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    if (m_activeEnvTevBit == tevBit) {
+    if (ActiveEnvTevBit(this) == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
-                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
+                1, TexCoordIdCurShadow(this), TexMapIdCurShadow(this) + 1, 0xFF);
         }
         return;
     }
@@ -2187,8 +2272,8 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    int texCoordId = TexCoordIdCur(this);
+    TexCoordIdCur(this) = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2288,8 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    int texMtx = TexMtxCur(this);
+    TexMtxCur(this) = texMtx + 3;
     return texMtx;
 }
 
@@ -2245,13 +2330,13 @@ void CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    TexMapIdCur(this) = StdTexMapId(this);
+    TexMapIdCurShadow(this) = StdTexMapId(this);
+    TexMtxCur(this) = StdTexMtx(this);
+    TexMtxCurShadow(this) = StdTexMtx(this);
+    TexCoordIdCur(this) = StdTexCoordId(this);
+    TexCoordIdCurShadow(this) = StdTexCoordId(this);
+    CurEnvTevBit(this) = StdEnvTevBit(this);
 }
 
 /*
@@ -2478,7 +2563,7 @@ CMaterial::CMaterial()
  */
 CMemory::CStage* CMaterialMan::GetMemoryStage()
 {
-	return m_materialStage;
+	return MaterialStage(this);
 }
 
 /*

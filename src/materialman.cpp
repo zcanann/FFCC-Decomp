@@ -2187,8 +2187,8 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    int texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x124));
+    *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2203,8 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    int texMtx = *reinterpret_cast<int*>(Ptr(this, 0x120));
+    *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtx + 3;
     return texMtx;
 }
 
@@ -2245,13 +2245,13 @@ void CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
+    *reinterpret_cast<int*>(Ptr(this, 0x134)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
+    *reinterpret_cast<int*>(Ptr(this, 0x120)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
+    *reinterpret_cast<int*>(Ptr(this, 0x138)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
+    *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
+    *reinterpret_cast<int*>(Ptr(this, 0x13C)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
+    *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) = *reinterpret_cast<unsigned int*>(Ptr(this, 0x40));
 }
 
 /*

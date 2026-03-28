@@ -11,6 +11,10 @@ struct Vec;
 struct RSDLISTITEM;
 struct ZCANMGRP;
 
+extern "C" void* __ct__14CUSBStreamDataFv(void*);
+extern "C" void* __ct__5ZLISTFv(void*);
+extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData*, short);
+
 extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
@@ -26,6 +30,10 @@ class CMaterialEditorPcs : public CProcess
 public:
     CMaterialEditorPcs()
     {
+        __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x84);
+        __ct__5ZLISTFv(reinterpret_cast<unsigned char*>(this) + 0xC8);
+        __ct__5ZLISTFv(reinterpret_cast<unsigned char*>(this) + 0xD8);
+
         unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
         dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
         dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
@@ -65,14 +73,20 @@ public:
     int SetRsdIndex();
     void GetRsdItem();
 
+    CUSBStreamData* UsbStream() { return reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84); }
+    const CUSBStreamData* UsbStream() const
+    {
+        return reinterpret_cast<const CUSBStreamData*>(reinterpret_cast<const unsigned char*>(this) + 0x84);
+    }
+
     CMemory::CStage* m_stage; // 0x04
     unsigned char _pad08[0x7C];
-    CUSBStreamData m_usbStream; // 0x84
+    unsigned char m_usbStream[0x14]; // 0x84
 
-    unsigned char _padA8[0x20];
+    unsigned char _pad98[0x30];
 
-    ZLIST m_zlist1; // 0xC8
-    ZLIST m_zlist2; // 0xD8
+    unsigned char m_zlist1[0x10]; // 0xC8
+    unsigned char m_zlist2[0x10]; // 0xD8
 
     unsigned char _padE8[0x44];
 

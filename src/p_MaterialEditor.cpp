@@ -54,6 +54,9 @@ static void WriteF32(void* base, unsigned int offset, float value) {
  */
 CMaterialEditorPcs::~CMaterialEditorPcs()
 {
+    __dt__5ZLISTFv(reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xD8), -1);
+    __dt__5ZLISTFv(reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xC8), -1);
+    __dt__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84), -1);
 }
 
 /*
@@ -270,7 +273,7 @@ void CMaterialEditorPcs::createViewer()
     WriteF32(self, 0xec, fVar1);
 
     PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x20C));
-    m_usbStream.CreateBuffer();
+    UsbStream()->CreateBuffer();
 }
 
 /*
@@ -374,10 +377,10 @@ void CMaterialEditorPcs::calcViewer()
 
     USBPcs.mccReadData();
 
-    int usbDone = m_usbStream.IsUSBStreamDataDone();
+    int usbDone = UsbStream()->IsUSBStreamDataDone();
     if (usbDone != 0) {
         SetUSBData();
-        m_usbStream.SetUSBStreamDataDone();
+        UsbStream()->SetUSBStreamDataDone();
     }
 
     srt.transX = FLOAT_8032FCD8;

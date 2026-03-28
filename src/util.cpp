@@ -1153,20 +1153,21 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-    u8* data = static_cast<u8*>(dlData);
-    bool running = true;
-    int polygonCount = 0;
+    u8* data;
+    bool running;
+    int polygonCount;
 
-    do {
-        if (!running) {
-            return polygonCount;
-        }
+    data = static_cast<u8*>(dlData);
+    running = true;
+    polygonCount = 0;
 
+    while (running) {
         u8 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
-        u32 count = vertexCount;
+        int count = vertexCount;
+        u8 format = opcode & 7;
         u8 primitive = opcode & 0xF8;
-        bool isPrimitive;
+        u8 isPrimitive;
 
         data += 3;
 
@@ -1182,7 +1183,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
             break;
 
         default:
-            isPrimitive = false;
+            isPrimitive = 0;
             break;
         }
 
@@ -1197,48 +1198,38 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
             polygonCount += count - 2;
         }
 
-        if ((opcode & 7) == 2) {
-            if (count != 0) {
-                u32 blocks = vertexCount >> 3;
+        if (format == 2) {
+            if (count > 0) {
+                int blocks = count >> 3;
 
-                if (blocks != 0) {
-                    do {
-                        data += 0x50;
-                        blocks--;
-                    } while (blocks != 0);
-
-                    count &= 7;
-                    if ((vertexCount & 7) == 0) {
-                        continue;
-                    }
-                }
-
-                do {
-                    data += 10;
-                    count--;
-                } while (count != 0);
-            }
-        } else if (count != 0) {
-            u32 blocks = vertexCount >> 3;
-
-            if (blocks != 0) {
-                do {
-                    data += 0x40;
+                while (blocks != 0) {
+                    data += 0x50;
                     blocks--;
-                } while (blocks != 0);
+                }
 
                 count &= 7;
-                if ((vertexCount & 7) == 0) {
-                    continue;
+                while (count != 0) {
+                    data += 10;
+                    count--;
                 }
             }
+        } else if (count > 0) {
+            int blocks = count >> 3;
 
-            do {
+            while (blocks != 0) {
+                data += 0x40;
+                blocks--;
+            }
+
+            count &= 7;
+            while (count != 0) {
                 data += 8;
                 count--;
-            } while (count != 0);
+            }
         }
-    } while (true);
+    }
+
+    return polygonCount;
 }
 
 /*

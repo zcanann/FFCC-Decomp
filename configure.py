@@ -649,7 +649,11 @@ config.libs = [
             Object(NonMatching, "shopmenu.cpp"),
             Object(NonMatching, "singmenu.cpp"),
             Object(NonMatching, "sound.cpp"),
-            Object(NonMatching, "stopwatch.cpp"),
+            Object(
+                NonMatching,
+                "stopwatch.cpp",
+                cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
+            ),
             Object(NonMatching, "system.cpp"),
             Object(NonMatching, "texanim.cpp"),
             Object(NonMatching, "textureman.cpp"),

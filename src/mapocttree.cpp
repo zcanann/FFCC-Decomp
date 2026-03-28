@@ -2086,10 +2086,10 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
  */
 void CMaterialMan::LockEnv()
 {
-	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexMtx = m_texMtxCur;
-	m_stdTexCoordId = m_texCoordIdCur;
-	m_stdEnvTevBit = m_curEnvTevBit;
+	*reinterpret_cast<int*>(Ptr(this, 0x128)) = *reinterpret_cast<int*>(Ptr(this, 0x11C));
+	*reinterpret_cast<int*>(Ptr(this, 0x12C)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
+	*reinterpret_cast<int*>(Ptr(this, 0x130)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
+	*reinterpret_cast<unsigned int*>(Ptr(this, 0x40)) = *reinterpret_cast<unsigned int*>(Ptr(this, 0x48));
 }
 
 /*
@@ -2099,20 +2099,20 @@ void CMaterialMan::LockEnv()
  */
 void CMaterialMan::InitEnv()
 {
-	m_curEnvTevBit = 0x000ACE0F;
-	m_activeEnvTevBit = 0xFFFFFFFF;
-	m_alphaRef = 0xFF;
-	m_stdTexMapId = 0;
-	m_texMapIdCur = 0;
-	m_stdTexMtx = 0x1E;
-	m_texMtxCur = 0x1E;
-	m_stdTexCoordId = 0;
-	m_texCoordIdCur = 0;
-	m_blendMode = 0xFF;
-	m_fogEnable = 0xFF;
-	m_lockedEnvTevBit = 0;
-	m_lockedEnvUnknown5c = 0;
-	m_shadowKColorMask = 0;
+	*reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) = 0x000ACE0F;
+	*reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) = 0xFFFFFFFF;
+	*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0xFF;
+	*reinterpret_cast<int*>(Ptr(this, 0x128)) = 0;
+	*reinterpret_cast<int*>(Ptr(this, 0x11C)) = 0;
+	*reinterpret_cast<int*>(Ptr(this, 0x12C)) = 0x1E;
+	*reinterpret_cast<int*>(Ptr(this, 0x120)) = 0x1E;
+	*reinterpret_cast<int*>(Ptr(this, 0x130)) = 0;
+	*reinterpret_cast<int*>(Ptr(this, 0x124)) = 0;
+	*reinterpret_cast<unsigned char*>(Ptr(this, 0x205)) = 0xFF;
+	*reinterpret_cast<unsigned char*>(Ptr(this, 0x206)) = 0xFF;
+	*reinterpret_cast<unsigned int*>(Ptr(this, 0x58)) = 0;
+	*reinterpret_cast<unsigned int*>(Ptr(this, 0x5C)) = 0;
+	*reinterpret_cast<unsigned char*>(Ptr(this, 0x208)) = 0;
 }
 
 /*

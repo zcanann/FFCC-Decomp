@@ -2480,54 +2480,30 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 {
 	CGObjWork* gObjWork = this;
 	CCaravanWork* artifactWork = this;
+	unsigned short* baseData = (unsigned short*)(Game.unkCFlatData0[0] + gObjWork->m_baseDataIndex * 0x1D0);
+	unsigned short* itemData = (unsigned short*)Game.unkCFlatData0[2];
 	int hpMax = 0;
 	int artifactIndex = 0;
-	int count = 0x32;
-
-	do {
-		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[0] > 0)) {
-			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[0]);
-			unsigned short artifactType = artifactData[0];
-
-			if (artifactType == 0xDB) {
-			} else if (artifactType < 0xDB) {
-				if (artifactType == 0xB6) {
-				} else if (artifactType < 0xB6) {
-					if (artifactType == 0x9F) {
-					}
-				} else if (artifactType == 0xCC) {
-				}
-			} else if (artifactType == 0xE4) {
+	for (int i = 0; i < 0x32; i++) {
+		short artifactId = artifactWork->m_artifacts[0];
+		if ((artifactIndex < 0x60) && (artifactId > 0)) {
+			unsigned short* artifactData = (unsigned short*)(itemData + artifactId * 0x24);
+			if (artifactData[0] == 0xE4) {
 				hpMax += artifactData[3];
-			} else if ((artifactType < 0xE4) && (artifactType == 0xDF)) {
 			}
 		}
-
-		artifactIndex++;
-		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[1] > 0)) {
-			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[1]);
-			unsigned short artifactType = artifactData[0];
-
-			if (artifactType == 0xDB) {
-			} else if (artifactType < 0xDB) {
-				if (artifactType == 0xB6) {
-				} else if (artifactType < 0xB6) {
-					if (artifactType == 0x9F) {
-					}
-				} else if (artifactType == 0xCC) {
-				}
-			} else if (artifactType == 0xE4) {
+		artifactId = artifactWork->m_artifacts[1];
+		if (((artifactIndex + 1) < 0x60) && (artifactId > 0)) {
+			unsigned short* artifactData = (unsigned short*)(itemData + artifactId * 0x24);
+			if (artifactData[0] == 0xE4) {
 				hpMax += artifactData[3];
-			} else if ((artifactType < 0xE4) && (artifactType == 0xDF)) {
 			}
 		}
-
 		artifactWork = (CCaravanWork*)&artifactWork->m_objType;
-		artifactIndex++;
-		count--;
-	} while (count != 0);
+		artifactIndex += 2;
+	}
 
-	hpMax += *(unsigned short*)(Game.unkCFlatData0[0] + gObjWork->m_baseDataIndex * 0x1D0 + 6);
+	hpMax += baseData[3];
 	if (hpMax > 0xF) {
 		return 0x10;
 	}

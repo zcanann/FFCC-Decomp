@@ -802,9 +802,9 @@ void CGraphic::DrawDebugString()
  */
 void CGraphic::InitDebugString()
 {
+    Mtx texMtx;
     Mtx44 proj;
     Mtx model;
-    Mtx texMtx;
     GXTexObj texObj;
 
     void* renderMode = PtrAt(this, 0x71E0);

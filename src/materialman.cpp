@@ -114,6 +114,29 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
+struct MaterialManState
+{
+    unsigned char _pad0[0x40];
+    unsigned int m_stdEnvTevBit;
+    unsigned int m_activeEnvTevBit;
+    unsigned int m_curEnvTevBit;
+    unsigned char _pad4C[0xD0];
+    int m_texMapIdCur;
+    int m_texMtxCur;
+    int m_texCoordIdCur;
+    int m_stdTexMapId;
+    int m_stdTexMtx;
+    int m_stdTexCoordId;
+    int m_texMapIdCurShadow;
+    int m_texMtxCurShadow;
+    int m_texCoordIdCurShadow;
+};
+
+static inline MaterialManState& State(CMaterialMan* self)
+{
+    return *reinterpret_cast<MaterialManState*>(self);
+}
+
 typedef void (*VirtualDtorFn)(void*, int);
 
 static void ReleaseRef(void* object)
@@ -1209,24 +1232,24 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
  */
 void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex, int setVtxDesc)
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    State(this).m_texMapIdCur = State(this).m_stdTexMapId;
+    State(this).m_texMapIdCurShadow = State(this).m_stdTexMapId;
+    State(this).m_texMtxCur = State(this).m_stdTexMtx;
+    State(this).m_texMtxCurShadow = State(this).m_stdTexMtx;
+    State(this).m_texCoordIdCur = State(this).m_stdTexCoordId;
+    State(this).m_texCoordIdCurShadow = State(this).m_stdTexCoordId;
+    State(this).m_curEnvTevBit = State(this).m_stdEnvTevBit;
 
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[materialIndex];
-    material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
+    material->Set(static_cast<_GXTexMapID>(State(this).m_texMapIdCur));
 
-    unsigned int tevBit = m_curEnvTevBit &
+    unsigned int tevBit = State(this).m_curEnvTevBit &
                           *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    if (m_activeEnvTevBit == tevBit) {
+    if (State(this).m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
-                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
+                1, State(this).m_texCoordIdCurShadow, State(this).m_texMapIdCurShadow + 1, 0xFF);
         }
         return;
     }
@@ -2187,8 +2210,8 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    int texCoordId = State(this).m_texCoordIdCur;
+    State(this).m_texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2226,8 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    int texMtx = State(this).m_texMtxCur;
+    State(this).m_texMtxCur = texMtx + 3;
     return texMtx;
 }
 
@@ -2245,13 +2268,13 @@ void CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    State(this).m_texMapIdCur = State(this).m_stdTexMapId;
+    State(this).m_texMapIdCurShadow = State(this).m_stdTexMapId;
+    State(this).m_texMtxCur = State(this).m_stdTexMtx;
+    State(this).m_texMtxCurShadow = State(this).m_stdTexMtx;
+    State(this).m_texCoordIdCur = State(this).m_stdTexCoordId;
+    State(this).m_texCoordIdCurShadow = State(this).m_stdTexCoordId;
+    State(this).m_curEnvTevBit = State(this).m_stdEnvTevBit;
 }
 
 /*

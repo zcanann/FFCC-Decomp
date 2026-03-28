@@ -509,10 +509,8 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 		CMes::m_tempVar[7] = (words16[1] & 0x1FF) * 100;
 	}
 
-	CMes::m_tempVar[0x20] = m_saveSlot;
-	CMes::m_tempVar[0x21] = m_partyIndex;
-	CMes::m_tempVar[0x22] = m_isLoadingFlag;
-	CMes::m_tempVar[0x23] = m_miscFlags;
+	*reinterpret_cast<unsigned int*>(&CMes::m_tempVar[8]) =
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 8);
 	letter[0] = (letter[0] & 0x7F) | 0x80;
 }
 

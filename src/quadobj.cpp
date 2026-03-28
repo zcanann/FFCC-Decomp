@@ -41,7 +41,8 @@ void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (*(u32*)(CFlat + 0x129C) & 0x10000) != 0) {
         CColor color(0xff, 0xff, 0xff, 0xff);
-        GXSetChanMatColor(GX_COLOR0A0, color.color);
+        GXColor drawColor = color.color;
+        GXSetChanMatColor(GX_COLOR0A0, drawColor);
         GXLoadPosMtxImm(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 

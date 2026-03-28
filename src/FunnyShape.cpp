@@ -336,63 +336,60 @@ void CFunnyShape::InitAnmWork()
  */
 void CFunnyShape::Update()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (PtrAt(this, 0xC) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (AnimData(this) == 0)) {
         return;
     }
 
-    const u32 noSpread = (((U32At(this, 0) >> 7) & 1) ^ 1);
-    CFunnyShape* cur = this;
-    for (s32 i = 0; i < *reinterpret_cast<s16*>(Ptr(this, 0x28)); i++) {
-        *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = static_cast<s16>(*reinterpret_cast<s16*>(Ptr(cur, 0x46)) - 0x200);
-        if (*reinterpret_cast<s16*>(Ptr(cur, 0x46)) < 1) {
-            *reinterpret_cast<s16*>(Ptr(cur, 0x44)) = static_cast<s16>(*reinterpret_cast<s16*>(Ptr(cur, 0x44)) + 1);
-            if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6) <=
-                *reinterpret_cast<s16*>(Ptr(cur, 0x44))) {
-                *reinterpret_cast<s16*>(Ptr(cur, 0x44)) = 0;
+    CFunnyShapeAnmWork* work = AnmWork(this);
+    const u8 noSpread = static_cast<u8>(((ShapeFlags(this) >> 7) & 1) ^ 1);
+    for (s32 i = 0; i < ShapeCount(this); i++) {
+        work->delay = static_cast<s16>(work->delay - 0x200);
+        if (work->delay <= 0) {
+            work->frame = static_cast<s16>(work->frame + 1);
+            if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6) <= work->frame) {
+                work->frame = 0;
 
                 s32 r = rand();
-                const s16 range = *reinterpret_cast<s16*>(Ptr(this, 0x2A));
-                *reinterpret_cast<float*>(Ptr(cur, 0x38)) = static_cast<float>(r - (r / range) * range);
+                const s16 range = ShapeRange(this);
+                work->x = static_cast<float>(r - (r / range) * range);
 
                 r = rand();
-                *reinterpret_cast<float*>(Ptr(cur, 0x3C)) = static_cast<float>(r - (r / range) * range);
-                *reinterpret_cast<float*>(Ptr(cur, 0x40)) = FLOAT_8032fd6c;
-                *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = 2;
-                *reinterpret_cast<float*>(Ptr(cur, 0x50)) = FLOAT_8032fd6c;
-                *reinterpret_cast<float*>(Ptr(cur, 0x54)) = FLOAT_8032fd6c;
+                work->y = static_cast<float>(r - (r / range) * range);
+                work->z = FLOAT_8032fd6c;
+                work->delay = 2;
+                work->viewportX = FLOAT_8032fd6c;
+                work->viewportY = FLOAT_8032fd6c;
 
                 r = rand();
                 s32 q = r / 0x168 + (r >> 0x1F);
                 q = r + (q - (q >> 0x1F)) * -0x168;
-                *reinterpret_cast<float*>(Ptr(cur, 0x58)) =
-                    (FLOAT_8032fda4 * static_cast<float>(q)) / FLOAT_8032fda8;
+                work->angle = (FLOAT_8032fda4 * static_cast<float>(q)) / FLOAT_8032fda8;
 
                 u32 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
-                    *reinterpret_cast<float*>(Ptr(cur, 0x38)) *= FLOAT_8032fd80;
+                    work->x *= FLOAT_8032fd80;
                 }
 
                 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
-                    *reinterpret_cast<float*>(Ptr(cur, 0x3C)) *= FLOAT_8032fd80;
+                    work->y *= FLOAT_8032fd80;
                 }
 
                 if (noSpread != 0) {
-                    *reinterpret_cast<s16*>(Ptr(cur, 0x44)) = 0;
-                    *reinterpret_cast<float*>(Ptr(cur, 0x38)) = FLOAT_8032fd6c;
-                    *reinterpret_cast<float*>(Ptr(cur, 0x3C)) = FLOAT_8032fd6c;
+                    work->frame = 0;
+                    work->x = FLOAT_8032fd6c;
+                    work->y = FLOAT_8032fd6c;
                 }
             }
 
-            *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = *reinterpret_cast<s16*>(
-                reinterpret_cast<u8*>(PtrAt(this, 0xC)) + *reinterpret_cast<s16*>(Ptr(cur, 0x44)) * 8 + 0x12);
+            work->delay = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + work->frame * 8 + 0x12);
         }
 
         if (noSpread != 0) {
             return;
         }
 
-        cur = reinterpret_cast<CFunnyShape*>(Ptr(cur, 0x30));
+        work++;
     }
 }
 

@@ -326,29 +326,28 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	u16 sVar4;
 	u32 i;
 
-	if (param_2 < 0x4000) {
+	if ((param_2 < 0x4000) || (param_2 + *param_3 > 0x8000000)) {
 		return;
 	}
-	if (param_2 + *param_3 <= 0x8000000) {
-		alignedAddress = param_2 & 0xFFFFFFE0;
-		uVar1 = *param_3 + (param_2 & 0x1F);
-		uVar1 = OSRoundUp32B(uVar1);
 
-		for (i = 0; i < uVar1; i += 0x20) {
-			dataCacheBlockInvalidateIndexed(i, (void*)param_1);
-		}
+	alignedAddress = param_2 & 0xFFFFFFE0;
+	uVar1 = *param_3 + (param_2 & 0x1F);
+	uVar1 = OSRoundUp32B(uVar1);
 
-		do {
-			i = ARGetDMAStatus();
-		} while (i != 0);
-		sVar3 = __ARGetInterruptStatus();
+	for (i = 0; i < uVar1; i += 0x20) {
+		dataCacheBlockInvalidateIndexed(i, (void*)param_1);
+	}
+
+	do {
+		i = ARGetDMAStatus();
+	} while (i != 0);
+	sVar3 = __ARGetInterruptStatus();
+	__ARClearInterrupt();
+	ARStartDMA(1, param_1, alignedAddress, uVar1);
+	do {
+		sVar4 = __ARGetInterruptStatus();
+	} while (sVar4 == 0);
+	if (sVar3 == 0) {
 		__ARClearInterrupt();
-		ARStartDMA(1, param_1, alignedAddress, uVar1);
-		do {
-			sVar4 = __ARGetInterruptStatus();
-		} while (sVar4 == 0);
-		if (sVar3 == 0) {
-			__ARClearInterrupt();
-		}
 	}
 }

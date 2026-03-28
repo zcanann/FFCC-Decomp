@@ -2390,12 +2390,103 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005a308
+ * PAL Size: 492b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppDrawPrioPdtFpno(unsigned char, short, short)
+void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short nodeIndex)
 {
-	// TODO
+    struct PppMngStDrawPdtRaw {
+        void* m_pppResSet;                   // 0x00
+        int m_partIndex;                     // 0x04
+        Vec m_position;                      // 0x08
+        int m_baseTime;                      // 0x14
+        unsigned char m_pad18[0x74 - 0x18]; // 0x18
+        short m_kind;                        // 0x74
+        short m_nodeIndex;                   // 0x76
+        pppFMATRIX m_matrix;                 // 0x78
+        unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
+        unsigned char m_endRequested;        // 0xE4
+        unsigned char m_stopRequested;       // 0xE5
+        unsigned char m_isFinished;          // 0xE6
+        unsigned char m_matrixMode;          // 0xE7
+        unsigned char m_hitBgFlag;           // 0xE8
+        unsigned char m_slotVisible;         // 0xE9
+        unsigned char m_ownerFacing;         // 0xEA
+        unsigned char m_drawVariant;         // 0xEB
+        unsigned char m_rotationOrder;       // 0xEC
+        unsigned char m_drawMode;            // 0xED
+        signed char m_drawSubType;           // 0xEE
+        unsigned char m_useOwnerScaleSign;   // 0xEF
+        unsigned char m_ownerVisible;        // 0xF0
+        unsigned char m_nodeScaleInitialized; // 0xF1
+        unsigned char m_fieldF2;             // 0xF2
+        unsigned char m_padF3[0x108 - 0xF3]; // 0xF3
+        float m_cullRadiusSq;                // 0x108
+        float m_cullRadius;                  // 0x10C
+        float m_cullYOffset;                 // 0x110
+        float m_sortDepth;                   // 0x114
+    };
+
+    Mtx invCamera;
+    Vec cameraPos;
+    Vec partPos;
+    Vec cameraDelta;
+    Vec viewPos;
+    PppMngStDrawPdtRaw* mng;
+    int remaining;
+
+    PSMTXInverse(ppvCameraMatrix0, invCamera);
+    cameraPos.x = invCamera[0][3];
+    cameraPos.y = invCamera[1][3];
+    cameraPos.z = invCamera[2][3];
+
+    mng = reinterpret_cast<PppMngStDrawPdtRaw*>(m_pppMng);
+    remaining = 0x180;
+    while ((mng->m_nodeIndex != nodeIndex || mng->m_kind != kind || mng->m_endRequested != 0
+            || mng->m_baseTime == -0x1000 || mng->m_drawMode != drawMode || mng->m_baseTime >= 0)) {
+        mng++;
+        remaining--;
+        if (remaining == 0) {
+            return;
+        }
+    }
+
+    if (mng->m_slotVisible == 0) {
+        return;
+    }
+
+    partPos.x = mng->m_matrix.value[0][3];
+    partPos.y = mng->m_matrix.value[1][3];
+    partPos.z = mng->m_matrix.value[2][3];
+    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+
+    if ((double)mng->m_cullRadiusSq != 0.0) {
+        CBound bound;
+        Vec min;
+
+        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+        if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+            return;
+        }
+
+        min.x = partPos.x - mng->m_cullRadius;
+        min.y = partPos.y;
+        min.z = partPos.z - mng->m_cullRadius;
+        if (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + mng->m_cullYOffset) == 0) {
+            return;
+        }
+    }
+
+    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+    mng->m_sortDepth = viewPos.z;
+    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+    pppSetFpMatrix(pppMngStPtr);
+    _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
 }
 
 /*

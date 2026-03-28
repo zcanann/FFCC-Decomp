@@ -97,7 +97,7 @@ CMesMenu::~CMesMenu()
     typedef void (*VFunc)(void*);
 
     *(void***)this = __vt__8CMesMenu;
-    ((VFunc)(*(unsigned int*)this + 0x10))(this);
+    (*(VFunc*)((u8*)*(void***)this + 0x10))(this);
     __dt__4CMesFv((char*)this + 0x1C, -1);
     __dt__5CMenuFv(this, 0);
 }
@@ -115,7 +115,7 @@ void CMesMenu::Create()
 {
     typedef void (*VFunc)(void*);
 
-    ((VFunc)(*(unsigned int*)this + 0x10))(this);
+    (*(VFunc*)((u8*)*(void***)this + 0x10))(this);
     Create__5CMenuFv(this);
 
     *(float*)((char*)this + 0x3D78) = FLOAT_803308d8;

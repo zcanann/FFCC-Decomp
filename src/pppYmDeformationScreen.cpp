@@ -256,8 +256,9 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	float* work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
-	Mtx identity;
+	Mtx44 savedProjection;
 	Mtx44 orthoMtx;
+	Mtx identity;
 	Mtx rot;
 	float indMtx[2][3];
 	float depth;
@@ -301,6 +302,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXSetNumTevStages(1);
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
+	PSMTX44Copy(ppvScreenMatrix, savedProjection);
 	PSMTXIdentity(identity);
 	GXLoadPosMtxImm(identity, 0);
 	GXSetCurrentMtx(0);
@@ -384,7 +386,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
-	GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
+	GXSetProjection(savedProjection, GX_PERSPECTIVE);
 	pppInitBlendMode();
 }
 

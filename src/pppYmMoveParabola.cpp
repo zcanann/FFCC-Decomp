@@ -6,11 +6,6 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-extern "C" {
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-}
-
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;
@@ -50,15 +45,14 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     double frameCount = (double)work->m_frame;
     Vec direction;
     if ((s32)Game.m_currentSceneId == 7) {
-        direction.y = gPppYmMoveParabolaZero;
         direction.x = gPppYmMoveParabolaYOffsetStep;
+        direction.y = gPppYmMoveParabolaZero;
         direction.z = gPppYmMoveParabolaZero;
     } else {
         PSVECSubtract(&pppMngSt->m_paramVec0, &pppMngSt->m_savedPosition, &direction);
     }
 
-    Vec normalizedSource = direction;
-    pppNormalize(direction, normalizedSource);
+    pppNormalize(direction, direction);
 
     s32 sinIndex;
     {
@@ -77,15 +71,12 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     newPosition.y = posY;
     newPosition.z = posZ;
     if ((s32)Game.m_currentSceneId == 7) {
-        Vec basePosition = work->m_basePosition;
-        pppAddVector(newPosition, newPosition, basePosition);
+        pppAddVector(newPosition, newPosition, work->m_basePosition);
     } else {
-        Vec basePosition = pppMngSt->m_savedPosition;
-        pppAddVector(newPosition, newPosition, basePosition);
+        pppAddVector(newPosition, newPosition, pppMngSt->m_savedPosition);
     }
 
-    Vec oldPosition = pppMngSt->m_position;
-    pppCopyVector(pppMngSt->m_previousPosition, oldPosition);
+    pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
     pppCopyVector(pppMngSt->m_position, newPosition);
 
     pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
@@ -109,30 +100,22 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     _pppMngSt* pppMngSt = pppMngStPtr;
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
-    f32 zero = gPppYmMoveParabolaZero;
 
-    work->m_acceleration = zero;
-    work->m_velocity = zero;
-    work->m_distance = zero;
+    work->m_acceleration = gPppYmMoveParabolaZero;
+    work->m_velocity = gPppYmMoveParabolaZero;
+    work->m_distance = gPppYmMoveParabolaZero;
     work->m_frame = 1;
 
     if ((s32)Game.m_currentSceneId == 7) {
-        Vec savedPosition = pppMngSt->m_savedPosition;
         Vec matrixOffset;
-        Vec basePosition;
-        Vec paramPosition;
-
-        pppCopyVector__FR3Vec3Vec(&work->m_basePosition, &savedPosition);
+        pppCopyVector(work->m_basePosition, pppMngSt->m_savedPosition);
 
         matrixOffset.x = pppMngStPtr->m_matrix.value[0][3];
         matrixOffset.y = pppMngStPtr->m_matrix.value[1][3];
         matrixOffset.z = pppMngStPtr->m_matrix.value[2][3];
 
-        basePosition = work->m_basePosition;
-        pppAddVector__FR3Vec3Vec3Vec(&work->m_basePosition, &basePosition, &matrixOffset);
-
-        paramPosition = work->m_basePosition;
-        pppCopyVector__FR3Vec3Vec(&pppMngSt->m_paramVec0, &paramPosition);
+        pppAddVector(work->m_basePosition, work->m_basePosition, matrixOffset);
+        pppCopyVector(pppMngSt->m_paramVec0, work->m_basePosition);
         pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
     }
 }

@@ -53,6 +53,11 @@ struct CScenegraphDesc {
     CScenegraphEntry m_entries[1];
 };
 
+static char s_cSystem[] = "CSystem";
+static char s_gamePalM_map[] = "gamePalM.map";
+static char s_system_cpp[] = "system.cpp";
+static char s_emptyString[] = "";
+
 /*
  * --INFO--
  * Address:	TODO
@@ -74,9 +79,9 @@ CSystem::CSystem()
 void CSystem::Init()
 {
     CFile::CHandle* fileHandle;
-    unsigned int mapSize;
-    unsigned int offset;
-    unsigned int chunkSize;
+    int mapSize;
+    int offset;
+    int chunkSize;
 
     m_initialized = 1;
     m_currentOrder = (COrder*)0;
@@ -97,11 +102,11 @@ void CSystem::Init()
     MemoryCardMan.Init();
 
     m_orderCount = 0;
-    m_orderSentinel.m_next = &m_orderSentinel;
     m_orderSentinel.m_previous = &m_orderSentinel;
+    m_orderSentinel.m_next = &m_orderSentinel;
     m_orderSentinel.m_priority = 0xFF;
     m_freeOrderHead.m_next = m_orderPool;
-    for (int i = 0; i < 0x80; i++)
+    for (unsigned int i = 0; i < 0x80; i++)
     {
         m_orderPool[i].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
     }
@@ -125,13 +130,13 @@ void CSystem::Init()
 
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
-        m_mapStage = (CStage*)Memory.CreateStage(0x400000, (char*)"CSystem", 1);
-        fileHandle = File.Open((char*)"gamePalM.map", 0, CFile::PRI_LOW);
+        m_mapStage = (CStage*)Memory.CreateStage(0x400000, s_cSystem, 1);
+        fileHandle = File.Open(s_gamePalM_map, 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
             mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[mapSize];
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, s_system_cpp, 0x123) unsigned char[mapSize];
             offset = 0;
             for (; mapSize != 0; mapSize -= chunkSize)
             {
@@ -150,7 +155,7 @@ void CSystem::Init()
                 offset += chunkSize;
             }
             File.Close(fileHandle);
-            Printf((char*)"");
+            Printf(s_emptyString);
         }
     }
 }
@@ -227,7 +232,7 @@ void CSystem::ExecScenegraph()
 
     if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
     {
-        Graphic._WaitDrawDone((char*)"system.cpp", 0x219);
+        Graphic._WaitDrawDone(s_system_cpp, 0x219);
         Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)
         {
@@ -428,7 +433,7 @@ void CSystem::ExecScenegraph()
             watch.Start();
             if ((perfTrigger & 1) != 0)
             {
-                Graphic._WaitDrawDone((char*)"system.cpp", 0x2CA);
+                Graphic._WaitDrawDone(s_system_cpp, 0x2CA);
                 GXReadGP0Metric();
                 GXReadGP1Metric();
             }

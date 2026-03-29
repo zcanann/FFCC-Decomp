@@ -479,7 +479,8 @@ void CPartPcs::create()
  */
 void CPartPcs::createLoad()
 {
-    CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
+    CPartMngState* state = GetPartMngState();
+    const char* stringBase = DAT_801d8068;
 
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
@@ -488,14 +489,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
+    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, stringBase + 0xC4, 1, 1, 0, 0);
+    pppLoadPmd__8CPartMngFPCc(&PartMng, stringBase + 0xC4);
+    pppLoadPan__8CPartMngFPCc(&PartMng, stringBase + 0xC4);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0xD4, 1, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0xE8, 2, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0xFC, 3, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x110, 4, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x124, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 

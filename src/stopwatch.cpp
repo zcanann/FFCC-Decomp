@@ -3,9 +3,7 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 extern "C" void __dl__FPv(void* ptr);
 
-const float kStopwatchTickToMilliseconds = 100.0f;
-const float kStopwatchZeroFloat = 0.0f;
-const char s_stopwatchDefaultName[] = "no name";
+static const char s_stopwatchDefaultName[] = "no name";
 
 /*
  * --INFO--
@@ -78,7 +76,7 @@ float CStopWatch::Get()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	ticks = ticks / denom;
-	return kStopwatchTickToMilliseconds * ticks;
+	return 100.0f * ticks;
 }
 
 /*
@@ -99,7 +97,7 @@ CProfile::CProfile(char* name)
 	OSInitStopwatch(&tmp, name);
 	OSResetStopwatch(&tmp);
 
-	float time = kStopwatchZeroFloat;
+	float time = 0.0f;
 	m_maxTime = time;
 	m_lastTime = time;
 	m_frame = 0;
@@ -137,14 +135,14 @@ void CProfile::ProfEnd()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	float elapsed = ticks / denom;
-	elapsed = kStopwatchTickToMilliseconds * elapsed;
+	elapsed = 100.0f * elapsed;
 	m_lastTime = elapsed;
 
 	int next = m_frame + 1;
 	m_frame = next;
 	if (next == 0x5A)
 	{
-		m_maxTime = kStopwatchZeroFloat;
+		m_maxTime = 0.0f;
 		m_frame = 0;
 	}
 

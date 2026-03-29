@@ -682,15 +682,12 @@ void GXInvalidateVtxCache(void) {
  */
 void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx) {
     u32 reg = 0;
-    u32 row;
-    u32 bumprow;
-    u32 form;
+    u32 row = 5;
+    u32 form = 0;
     GXAttr mtxIdAttr;
 
     CHECK_GXBEGIN(1030, "GXSetTexCoordGen");
     ASSERTMSGLINE(1031, dst_coord < GX_MAX_TEXCOORD, "GXSetTexCoordGen: Invalid coordinate Id");
-    form = 0;
-    row = 5;
 
     switch (src_param) {
     case GX_TG_POS:     row = 0; form = 1; break;
@@ -707,13 +704,15 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_TEX5:    row = 10; break;
     case GX_TG_TEX6:    row = 11; break;
     case GX_TG_TEX7:    row = 12; break;
-    case GX_TG_TEXCOORD0: bumprow; break;
-    case GX_TG_TEXCOORD1: bumprow; break;
-    case GX_TG_TEXCOORD2: bumprow; break;
-    case GX_TG_TEXCOORD3: bumprow; break;
-    case GX_TG_TEXCOORD4: bumprow; break;
-    case GX_TG_TEXCOORD5: bumprow; break;
-    case GX_TG_TEXCOORD6: bumprow; break;
+    case GX_TG_TEXCOORD0:
+    case GX_TG_TEXCOORD1:
+    case GX_TG_TEXCOORD2:
+    case GX_TG_TEXCOORD3:
+    case GX_TG_TEXCOORD4:
+    case GX_TG_TEXCOORD5:
+    case GX_TG_TEXCOORD6:
+        row = 2;
+        break;
     default:
         ASSERTMSGLINE(1059, 0, "GXSetTexCoordGen: Invalid source parameter");
         break;
@@ -721,10 +720,13 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
 
     switch (func) {
     case GX_TG_MTX2x4:
-        reg = (form << 2) | (row << 7);
+        OLD_SET_REG_FIELD(1065, reg, 1, 2, form);
+        OLD_SET_REG_FIELD(1066, reg, 5, 7, row);
         break;
     case GX_TG_MTX3x4:
-        reg = (form << 2) | 2U | (row << 7);
+        OLD_SET_REG_FIELD(1070, reg, 1, 2, form);
+        OLD_SET_REG_FIELD(1071, reg, 1, 1, 1);
+        OLD_SET_REG_FIELD(1072, reg, 5, 7, row);
         break;
     case GX_TG_BUMP0:
     case GX_TG_BUMP1:
@@ -735,15 +737,20 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_BUMP6:
     case GX_TG_BUMP7:
         ASSERTMSGLINE(1091, src_param >= 12 && src_param <= 18, "GXSetTexCoordGen:  Bump source texture value is invalid");
-        reg = (form << 2) | 0x10 | (row << 7) | (((src_param - 12) & 7) << 12) | ((func - 2) << 15);
+        OLD_SET_REG_FIELD(1092, reg, 1, 2, form);
+        OLD_SET_REG_FIELD(1093, reg, 1, 4, 1);
+        OLD_SET_REG_FIELD(1094, reg, 5, 7, row);
+        OLD_SET_REG_FIELD(1095, reg, 3, 12, src_param - 12);
+        OLD_SET_REG_FIELD(1096, reg, 3, 15, func - 2);
         break;
     case GX_TG_SRTG:
+        OLD_SET_REG_FIELD(1101, reg, 1, 2, form);
         if (src_param == GX_TG_COLOR0) {
-            reg = (form << 2) | 0x20;
+            OLD_SET_REG_FIELD(1103, reg, 2, 4, 2);
         } else {
-            reg = (form << 2) | 0x30;
+            OLD_SET_REG_FIELD(1105, reg, 2, 4, 3);
         }
-        reg |= 0x100;
+        OLD_SET_REG_FIELD(1107, reg, 1, 8, 1);
         break;
     default:
         ASSERTMSGLINE(1113, 0, "GXSetTexCoordGen:  Invalid function");
@@ -751,7 +758,8 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     }
 
     GX_WRITE_XF_REG(dst_coord + 0x40, reg);
-    reg = ((pt_texmtx - 64U) & 0xFFFFFEFF) | ((u32)(u8)normalize << 8);
+    reg = pt_texmtx - 64U;
+    OLD_SET_REG_FIELD(1117, reg, 1, 8, normalize);
     GX_WRITE_XF_REG(dst_coord + 0x50, reg);
 
     switch (dst_coord) {

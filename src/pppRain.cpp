@@ -266,8 +266,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     float tex1;
     Vec segment;
 
-    colorOffset = param_3->m_serializedDataOffsets[1] + 0x80;
     workOffset = param_3->m_serializedDataOffsets[2] + 0x80;
+    colorOffset = param_3->m_serializedDataOffsets[1];
     colorData = (RainColorData*)((u8*)pppRain + colorOffset);
     rain = (RainParam*)param_2->m_payload;
     pppSetBlendMode(rain->blendMode);
@@ -298,9 +298,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
-    tex1 = FLOAT_8033101c;
     i = 0;
-    while (i < (int)(u32)param_2->m_dataValIndex) {
+    tex1 = FLOAT_8033101c;
+    for (; i < (int)(u32)param_2->m_dataValIndex; i++, drop++) {
         float x = baseX + drop->posX;
         float y = baseY + drop->posY;
         float z = baseZ + drop->posZ;
@@ -319,8 +319,6 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
         GXWGFifo.u32 = *(u32*)&colorData->color;
         GXWGFifo.f32 = tex1;
         GXWGFifo.f32 = tex1;
-        drop++;
-        i++;
     }
     GXSetLineWidth(8, GX_TO_ZERO);
 }

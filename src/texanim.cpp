@@ -326,6 +326,7 @@ CTexAnimSeq* CPtrArray<CTexAnimSeq*>::GetAt(unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 CPtrArray<CTexAnim*>::CPtrArray()
 {
@@ -529,6 +530,7 @@ CTexAnim* CPtrArray<CTexAnim*>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
+#pragma dont_inline reset
 /*
  * --INFO--
  * PAL Address: 0x80044a9c

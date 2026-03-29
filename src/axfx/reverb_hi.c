@@ -23,6 +23,7 @@ static const s32 axfx_reverb_hi_lens[8] = {
 static const f32 axfx_reverb_hi_f32_0 = 0.0f;
 static const f32 axfx_reverb_hi_f32_0p01 = 0.01f;
 static const f32 axfx_reverb_hi_f32_0p05 = 0.05f;
+static const f32 axfx_reverb_hi_f32_0p1 = 0.1f;
 static const f32 axfx_reverb_hi_f32_0p8 = 0.8f;
 static const f32 axfx_reverb_hi_f32_1 = 1.0f;
 static const f32 axfx_reverb_hi_f32_10 = 10.0f;
@@ -71,7 +72,7 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
 				  mix >= axfx_reverb_hi_f32_0 && mix <= axfx_reverb_hi_f32_1 &&
 				  crosstalk >= axfx_reverb_hi_f32_0 && crosstalk <= axfx_reverb_hi_f32_1 &&
 				  damping >= axfx_reverb_hi_f32_0 && damping <= axfx_reverb_hi_f32_1 &&
-				  preDelay >= axfx_reverb_hi_f32_0 && preDelay <= 0.1f,
+				  preDelay >= axfx_reverb_hi_f32_0 && preDelay <= axfx_reverb_hi_f32_0p1,
 				  "The value of specified parameter is out of range.");
 
     if ((coloration < axfx_reverb_hi_f32_0) || (coloration > axfx_reverb_hi_f32_1)
@@ -79,7 +80,7 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
      || (mix < axfx_reverb_hi_f32_0) || (mix > axfx_reverb_hi_f32_1)
      || (crosstalk < axfx_reverb_hi_f32_0) || (crosstalk > axfx_reverb_hi_f32_1)
      || (damping < axfx_reverb_hi_f32_0) || (damping > axfx_reverb_hi_f32_1)
-     || (preDelay < axfx_reverb_hi_f32_0) || (preDelay > 0.1f)) {
+     || (preDelay < axfx_reverb_hi_f32_0) || (preDelay > axfx_reverb_hi_f32_0p1)) {
         return 0;
     }
 
@@ -112,8 +113,7 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     }
     {
         f32 damp = axfx_reverb_hi_f32_0p8 * rv->damping;
-        damp += axfx_reverb_hi_f32_0p05;
-        rv->damping = axfx_reverb_hi_f32_1 - damp;
+        rv->damping = axfx_reverb_hi_f32_1 - (axfx_reverb_hi_f32_0p05 + damp);
     }
 
     if (axfx_reverb_hi_f32_0 != preDelay) {
@@ -147,20 +147,20 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
 static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay, f32 crosstalk) {
     u8 i;
 
-	ASSERTMSGLINE(209, coloration >= 0.0f && coloration <= 1.0f &&
-				  time >= 0.01f && time <= 10.0f &&
-				  mix >= 0.0f && mix <= 1.0f &&
-				  crosstalk >= 0.0f && crosstalk <= 1.0f &&
-				  damping >= 0.0f && damping <= 1.0f &&
-				  preDelay >= 0.0f && preDelay <= 0.1f,
+	ASSERTMSGLINE(209, coloration >= axfx_reverb_hi_f32_0 && coloration <= axfx_reverb_hi_f32_1 &&
+				  time >= axfx_reverb_hi_f32_0p01 && time <= axfx_reverb_hi_f32_10 &&
+				  mix >= axfx_reverb_hi_f32_0 && mix <= axfx_reverb_hi_f32_1 &&
+				  crosstalk >= axfx_reverb_hi_f32_0 && crosstalk <= axfx_reverb_hi_f32_1 &&
+				  damping >= axfx_reverb_hi_f32_0 && damping <= axfx_reverb_hi_f32_1 &&
+				  preDelay >= axfx_reverb_hi_f32_0 && preDelay <= axfx_reverb_hi_f32_0p1,
 				  "The value of specified parameter is out of range.");
 
-    if ((coloration < 0.0f ) || (coloration > 1.0f  )
-     || (time       < 0.01f) || (time       > 10.0f )
-     || (mix        < 0.0f ) || (mix        > 1.0f  )
-     || (crosstalk  < 0.0f ) || (crosstalk  > 1.0f  )
-     || (damping    < 0.0f ) || (damping    > 1.0f  )
-     || (preDelay   < 0.0f ) || (preDelay   > 0.1f)) {
+    if ((coloration < axfx_reverb_hi_f32_0) || (coloration > axfx_reverb_hi_f32_1)
+     || (time < axfx_reverb_hi_f32_0p01) || (time > axfx_reverb_hi_f32_10)
+     || (mix < axfx_reverb_hi_f32_0) || (mix > axfx_reverb_hi_f32_1)
+     || (crosstalk < axfx_reverb_hi_f32_0) || (crosstalk > axfx_reverb_hi_f32_1)
+     || (damping < axfx_reverb_hi_f32_0) || (damping > axfx_reverb_hi_f32_1)
+     || (preDelay < axfx_reverb_hi_f32_0) || (preDelay > axfx_reverb_hi_f32_0p1)) {
         return 0;
     }
 
@@ -168,13 +168,12 @@ static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     rv->level = mix;
     rv->crosstalk = crosstalk;
     rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (rv->damping < axfx_reverb_hi_f32_0p05) {
+        rv->damping = axfx_reverb_hi_f32_0p05;
     }
     {
-        f32 damp = 0.8f * rv->damping;
-        damp += 0.05f;
-        rv->damping = 1.0f - damp;
+        f32 damp = axfx_reverb_hi_f32_0p8 * rv->damping;
+        rv->damping = axfx_reverb_hi_f32_1 - (axfx_reverb_hi_f32_0p05 + damp);
     }
 
     for (i = 0; i < 9; i++) {

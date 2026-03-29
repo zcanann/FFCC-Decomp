@@ -2187,8 +2187,9 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    int* texCoordIdCur = reinterpret_cast<int*>(Ptr(this, 0x124));
+    int texCoordId = *texCoordIdCur;
+    *texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2204,9 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    int* texMtxCur = reinterpret_cast<int*>(Ptr(this, 0x120));
+    int texMtx = *texMtxCur;
+    *texMtxCur = texMtx + 3;
     return texMtx;
 }
 

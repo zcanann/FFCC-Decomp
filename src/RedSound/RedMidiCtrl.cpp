@@ -77,14 +77,17 @@ int gRedCommandHandlerTable[] = {
 #pragma dont_inline on
 int DataAddCompute(int* current, int target, int* delta)
 {
+    int result = 0;
     int value = *current;
 
     if (target != (value >> 0xc)) {
-        return (((target << 0xc) | 0x800) - value) / *delta;
+        int targetValue = (target << 0xc) | 0x800;
+        result = (targetValue - value) / *delta;
+    } else {
+        *delta = 0;
     }
 
-    *delta = 0;
-    return 0;
+    return result;
 }
 #pragma dont_inline reset
 

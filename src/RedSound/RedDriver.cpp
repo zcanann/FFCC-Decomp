@@ -113,7 +113,7 @@ int DAT_8032f3bc;
 int DAT_8032f3b8;
 void* DAT_8032f3e0[2];
 void* DAT_8032f3e8[2];
-u8 DAT_8032b860[0x1F18];
+u8 gRedDriverSyncBuffer[0x1F18];
 int DAT_8032e12c[10];
 int DAT_8032c660[0x380];
 OSThread DAT_8032d460;
@@ -129,7 +129,7 @@ OSSemaphore DAT_8032e120;
 
 static inline RedDriverSyncState& RedDriverSync()
 {
-    return *reinterpret_cast<RedDriverSyncState*>(DAT_8032b860);
+    return *reinterpret_cast<RedDriverSyncState*>(gRedDriverSyncBuffer);
 }
 
 extern void ReverbAreaAlloc(unsigned long);
@@ -894,7 +894,7 @@ void _DMACheckProcess()
         fflush(&DAT_8021d1a8);
     }
 
-    dmaInfo = (int*)&DAT_8032b860;
+    dmaInfo = (int*)&gRedDriverSyncBuffer;
     do {
         if ((*dmaInfo != 0) && (gRedMemoryDebugEnabled != 0)) {
             OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
@@ -947,7 +947,7 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
         queuePtr = &DAT_8032f3e0[1];
     } else {
         queuePtr = &DAT_8032f3e0[0];
-        baseAddr = &DAT_8032b860;
+        baseAddr = &gRedDriverSyncBuffer;
     }
     queueEntry = (int*)*queuePtr;
     entryID = GetMyEntryID();
@@ -1015,7 +1015,7 @@ int RedDmaSearchID(int id)
     found = 0;
     interruptLevel = OSDisableInterrupts();
     if (id != 0) {
-        queueEntry = (int*)&DAT_8032b860;
+        queueEntry = (int*)&gRedDriverSyncBuffer;
         do {
             if ((*queueEntry != 0) && ((id == 0) || (*queueEntry == id))) {
                 found = 1;
@@ -1059,7 +1059,7 @@ void _DmaExecute()
                 piVar4 = (int*)&DAT_8032c660;
             } else {
                 ppiVar5 = (int**)&DAT_8032f3e8[0];
-                piVar4 = (int*)&DAT_8032b860;
+                piVar4 = (int*)&gRedDriverSyncBuffer;
             }
             piVar7 = *ppiVar5;
             DAT_8032f488[0] = 2;
@@ -1309,9 +1309,9 @@ void CRedDriver::Init()
     DAT_8032f438 = RedNew__Fi(0x4c0);
     memset(DAT_8032f438, 0, 0x4c0);
     DAT_8032f43c = 0;
-    memset(&DAT_8032b860, 0, 0x1c00);
-    DAT_8032f3e0[0] = &DAT_8032b860;
-    DAT_8032f3e8[0] = &DAT_8032b860;
+    memset(&gRedDriverSyncBuffer, 0, 0x1c00);
+    DAT_8032f3e0[0] = &gRedDriverSyncBuffer;
+    DAT_8032f3e8[0] = &gRedDriverSyncBuffer;
     DAT_8032f3e0[1] = &DAT_8032c660;
     DAT_8032f3e8[1] = &DAT_8032c660;
     DAT_8032f3b8 = 0;

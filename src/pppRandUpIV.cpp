@@ -60,9 +60,25 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     }
 
     s32* target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s32*)(base + in->field4 + 0x80);
-    f32 scale = *valuePtr;
 
-    target[0] += (s32)((f32)in->field8 * scale);
-    target[1] += (s32)((f32)in->fieldC * scale);
-    target[2] += (s32)((f32)in->field10 * scale);
+    {
+        f32 factor = (f32)in->field8;
+        f32 scaled = factor * *valuePtr;
+        s32 delta = (s32)scaled;
+        target[0] += delta;
+    }
+
+    {
+        f32 factor = (f32)in->fieldC;
+        f32 scaled = factor * *valuePtr;
+        s32 delta = (s32)scaled;
+        target[1] += delta;
+    }
+
+    {
+        f32 factor = (f32)in->field10;
+        f32 scaled = factor * *valuePtr;
+        s32 delta = (s32)scaled;
+        target[2] += delta;
+    }
 }

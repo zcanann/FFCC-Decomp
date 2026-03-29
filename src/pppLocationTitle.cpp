@@ -107,7 +107,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     s32* serializedOffsets;
     int serializedOffset;
     int colorOffset;
-    u8* colorSrc;
+    u8* colorBase;
     LocationTitleWork* work;
     int graphFrame;
 
@@ -119,7 +119,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     serializedOffset = serializedOffsets[0];
     colorOffset = serializedOffsets[1];
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
-    colorSrc = (u8*)pppLocationTitle + 0x88 + colorOffset;
+    colorBase = (u8*)pppLocationTitle + 0x80 + colorOffset;
     rand();
 
     if (param_2->m_dataValIndex == 0xFFFF) {
@@ -153,14 +153,14 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_pos.x = 0.0f;
             particle->m_pos.y = 0.0f;
             particle->m_pos.z = 0.0f;
-            memcpy(&particle->m_color, colorSrc, 4);
+            memcpy(&particle->m_color, colorBase + 8, 4);
             particle->m_shapeUnk = 0;
             particle->m_frame = work->m_cur;
             randomValue = rand();
             shapeCount = *(s16*)((u8*)shapeTable + 6);
-            shape = (s16)randomValue - (s16)(randomValue / (int)shapeCount) * shapeCount;
-            particle->m_shapeA = shape;
+            shape = randomValue - (randomValue / shapeCount) * shapeCount;
             particle->m_shapeB = shape;
+            particle->m_shapeA = shape;
 
             particle++;
         }
@@ -170,28 +170,27 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
         if (graphFrame >= (int)param_2->m_spawnFrame) {
             LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
-            u16 count = work->m_count;
-            pppFMATRIX localMatrix;
-            pppFMATRIX managerMatrix;
             pppFMATRIX resultMatrix;
+            pppFMATRIX managerMatrix;
+            pppFMATRIX localMatrix;
 
             localMatrix = *(pppFMATRIX*)((u8*)pppLocationTitle + 4);
             managerMatrix = pppMngStPtr->m_matrix;
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&resultMatrix, &managerMatrix, &localMatrix);
 
-            particles[count].m_pos.x = resultMatrix.value[0][3];
-            particles[count].m_pos.y = resultMatrix.value[1][3];
-            particles[count].m_pos.z = resultMatrix.value[2][3];
+            particles[work->m_count].m_pos.x = resultMatrix.value[0][3];
+            particles[work->m_count].m_pos.y = resultMatrix.value[1][3];
+            particles[work->m_count].m_pos.z = resultMatrix.value[2][3];
 
-            if (count == 0) {
-                particles[count].m_frame = work->m_cur;
-                memcpy(&particles[count].m_color, colorSrc, 4);
+            if (work->m_count == 0) {
+                particles[work->m_count].m_frame = work->m_cur;
+                memcpy(&particles[work->m_count].m_color, colorBase + 8, 4);
             } else {
-                particles[count - 1].m_frame = work->m_cur;
-                memcpy(&particles[count - 1].m_color, colorSrc, 4);
+                particles[work->m_count - 1].m_frame = work->m_cur;
+                memcpy(&particles[work->m_count - 1].m_color, colorBase + 8, 4);
             }
 
-            work->m_count = count + 1;
+            work->m_count++;
 
             if (work->m_count > 1) {
                 Vec subVec;
@@ -226,7 +225,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                     LocationTitleParticle* dst = &particles[startIndex + i + 1];
 
                     pppCopyVector(dst->m_pos, interp[i]);
-                    memcpy(&dst->m_color, colorSrc, 4);
+                    memcpy(&dst->m_color, colorBase + 8, 4);
                     dst->m_frame = work->m_cur;
                 }
             }

@@ -40,8 +40,7 @@ void CGQuadObj::onDestroy()
 void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (*(u32*)(CFlat + 0x129C) & 0x10000) != 0) {
-        CColor color(0xff, 0xff, 0xff, 0xff);
-        GXSetChanMatColor(GX_COLOR0A0, color.color);
+        GXSetChanMatColor(GX_COLOR0A0, CColor(0xff, 0xff, 0xff, 0xff).color);
         GXLoadPosMtxImm(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
@@ -52,11 +51,11 @@ void CGQuadObj::onDraw()
             i = i + 1;
 
             GXPosition3f32(self->m_vertices[0].x, m_yBase, self->m_vertices[0].z);
-            int wrapped = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
-            GXPosition3f32(m_vertices[wrapped].x, m_yBase, m_vertices[wrapped].z);
+            GXPosition3f32(m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].x, m_yBase,
+                           m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].z);
             GXPosition3f32(self->m_vertices[0].x, m_yBase + m_yHeight, self->m_vertices[0].z);
-            wrapped = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
-            GXPosition3f32(m_vertices[wrapped].x, m_yBase + m_yHeight, m_vertices[wrapped].z);
+            GXPosition3f32(m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].x, m_yBase + m_yHeight,
+                           m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].z);
             GXPosition3f32(self->m_vertices[0].x, m_yBase, self->m_vertices[0].z);
             GXPosition3f32(self->m_vertices[0].x, m_yBase + m_yHeight, self->m_vertices[0].z);
 

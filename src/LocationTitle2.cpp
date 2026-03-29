@@ -340,7 +340,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 model[2][2] = pppMngStPtr->m_scale.z * locationTitle->m_localMatrix.value[2][2];
 
                 PSMTXMultVec(pppMngStPtr->m_matrix.value, &particle->m_pos, &transformedPos);
-                PSMTXMultVec(ppvCameraMatrix0, &transformedPos, &transformedPos);
+                PSMTXMultVec(ppvCameraMatrix02, &transformedPos, &transformedPos);
 
                 model[0][3] = transformedPos.x;
                 model[1][3] = transformedPos.y;

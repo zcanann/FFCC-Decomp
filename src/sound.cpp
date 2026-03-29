@@ -1182,7 +1182,7 @@ void CSound::PlayBgm(int bgmId)
  */
 void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CRedSound* redSound = RedSound(this);
 
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundErrorFmt);

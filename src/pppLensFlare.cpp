@@ -234,7 +234,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			local_70.rgba[2] = colorBase[10];
 			local_70.rgba[3] = shapeBase[0x32];
 
-			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, 0.0f, step->m_payload[0], step->m_unk13, step->m_unk12, 0,
+			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, kPppLensFlareZero, step->m_payload[0], step->m_unk13, step->m_unk12, 0,
 						  1, 1, 0);
 
 			pppSetBlendMode(step->m_unk12);

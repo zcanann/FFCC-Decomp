@@ -2087,8 +2087,8 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 void CMaterialMan::LockEnv()
 {
 	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexMtx = m_texMtxCur;
 	m_stdTexCoordId = m_texCoordIdCur;
+	m_stdTexMtx = m_texMtxCur;
 	m_stdEnvTevBit = m_curEnvTevBit;
 }
 

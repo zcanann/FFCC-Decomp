@@ -336,15 +336,15 @@ void CFunnyShape::InitAnmWork()
  */
 void CFunnyShape::Update()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (AnimData(this) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (AnimData(this) == 0)) {
         return;
     }
 
-    const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
     CFunnyShapeAnmWork* work = AnmWork(this);
+    const u8 noSpread = static_cast<u8>(((ShapeFlags(this) >> 7) & 1) ^ 1);
     for (s32 i = 0; i < ShapeCount(this); i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
-        if (work->delay < 1) {
+        if (work->delay <= 0) {
             work->frame = static_cast<s16>(work->frame + 1);
             if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6) <= work->frame) {
                 work->frame = 0;

@@ -145,6 +145,13 @@ struct RawPtrArray {
     int growCapacity;
 };
 
+struct MaterialManTexCursorView {
+    u8 _pad0[0x11C];
+    int texMapIdCur;
+    int texMtxCur;
+    int texCoordIdCur;
+};
+
 static int HighestSetBit(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
@@ -2187,8 +2194,9 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    MaterialManTexCursorView* view = reinterpret_cast<MaterialManTexCursorView*>(this);
+    int texCoordId = view->texCoordIdCur;
+    view->texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2211,9 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    MaterialManTexCursorView* view = reinterpret_cast<MaterialManTexCursorView*>(this);
+    int texMtx = view->texMtxCur;
+    view->texMtxCur = texMtx + 3;
     return texMtx;
 }
 

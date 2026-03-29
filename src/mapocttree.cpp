@@ -78,6 +78,29 @@ static inline unsigned char* Ptr(void* ptr, unsigned int offset)
     return reinterpret_cast<unsigned char*>(ptr) + offset;
 }
 
+struct MaterialManEnvView {
+    u8 _pad0[0x40];
+    u32 stdEnvTevBit;
+    u32 activeEnvTevBit;
+    u32 curEnvTevBit;
+    u8 alphaRef;
+    u8 _pad4d[0x0B];
+    u32 lockedEnvTevBit;
+    u32 lockedEnvUnknown5c;
+    u8 _pad60[0xBC];
+    int texMapIdCur;
+    int texMtxCur;
+    int texCoordIdCur;
+    int stdTexMapId;
+    int stdTexMtx;
+    int stdTexCoordId;
+    u8 _pad134[0xD1];
+    u8 blendMode;
+    u8 fogEnable;
+    u8 blendOverrideMode;
+    u8 shadowKColorMask;
+};
+
 static inline COctNode* GetMapObjByIndex(unsigned short index)
 {
     return reinterpret_cast<COctNode*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x960 + (index * 0xF0));
@@ -2086,10 +2109,11 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
  */
 void CMaterialMan::LockEnv()
 {
-	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexMtx = m_texMtxCur;
-	m_stdTexCoordId = m_texCoordIdCur;
-	m_stdEnvTevBit = m_curEnvTevBit;
+	MaterialManEnvView* view = reinterpret_cast<MaterialManEnvView*>(this);
+	view->stdTexMapId = view->texMapIdCur;
+	view->stdTexMtx = view->texMtxCur;
+	view->stdTexCoordId = view->texCoordIdCur;
+	view->stdEnvTevBit = view->curEnvTevBit;
 }
 
 /*
@@ -2099,20 +2123,21 @@ void CMaterialMan::LockEnv()
  */
 void CMaterialMan::InitEnv()
 {
-	m_curEnvTevBit = 0x000ACE0F;
-	m_activeEnvTevBit = 0xFFFFFFFF;
-	m_alphaRef = 0xFF;
-	m_stdTexMapId = 0;
-	m_texMapIdCur = 0;
-	m_stdTexMtx = 0x1E;
-	m_texMtxCur = 0x1E;
-	m_stdTexCoordId = 0;
-	m_texCoordIdCur = 0;
-	m_blendMode = 0xFF;
-	m_fogEnable = 0xFF;
-	m_lockedEnvTevBit = 0;
-	m_lockedEnvUnknown5c = 0;
-	m_shadowKColorMask = 0;
+	MaterialManEnvView* view = reinterpret_cast<MaterialManEnvView*>(this);
+	view->curEnvTevBit = 0x000ACE0F;
+	view->activeEnvTevBit = 0xFFFFFFFF;
+	view->alphaRef = 0xFF;
+	view->stdTexMapId = 0;
+	view->texMapIdCur = 0;
+	view->stdTexMtx = 0x1E;
+	view->texMtxCur = 0x1E;
+	view->stdTexCoordId = 0;
+	view->texCoordIdCur = 0;
+	view->blendMode = 0xFF;
+	view->fogEnable = 0xFF;
+	view->lockedEnvTevBit = 0;
+	view->lockedEnvUnknown5c = 0;
+	view->shadowKColorMask = 0;
 }
 
 /*

@@ -8,6 +8,7 @@ extern f32 powf(f32 x, f32 y);
 extern const f32 axfx_reverb_std_handle_f32_0p3;
 extern const f32 axfx_reverb_std_handle_f32_0p6;
 extern const double axfx_reverb_std_handle_i2f_magic;
+extern const s32 sReverbStdDelayLengths[4];
 
 // prototypes
 static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
@@ -56,12 +57,6 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     u8 i;
     u8 k;
     f32 timeFactor;
-    static s32 lens[4] = {
-        0x000006FD,
-        0x000007CF,
-        0x000001B1,
-        0x00000095,
-    };
 
 	ASSERTMSGLINE(109, coloration >= 0.0f && coloration <= 1.0f &&
 				  time >= 0.01f && time <= 10.0f &&
@@ -83,14 +78,14 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 2; i++) {
-            DLcreate(&rv->C[i + (k * 2)], lens[i] + 2);
-            DLsetdelay(&rv->C[i + (k * 2)], lens[i]);
-            rv->combCoef[i + (k * 2)] = powf(10.0f, (lens[i] * -3) / timeFactor);
+            DLcreate(&rv->C[i + (k * 2)], sReverbStdDelayLengths[i] + 2);
+            DLsetdelay(&rv->C[i + (k * 2)], sReverbStdDelayLengths[i]);
+            rv->combCoef[i + (k * 2)] = powf(10.0f, (sReverbStdDelayLengths[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {
-            DLcreate(&rv->AP[i + (k * 2)], lens[i + 2] + 2);
-            DLsetdelay(&rv->AP[i + (k * 2)], lens[i + 2]);
+            DLcreate(&rv->AP[i + (k * 2)], sReverbStdDelayLengths[i + 2] + 2);
+            DLsetdelay(&rv->AP[i + (k * 2)], sReverbStdDelayLengths[i + 2]);
         }
         rv->lpLastout[k] = 0.0f;
     }

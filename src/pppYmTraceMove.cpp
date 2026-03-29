@@ -11,6 +11,17 @@ extern "C" {
 	void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 }
 
+struct pppYmTraceMoveMngStRaw {
+	char pad00[0x08];
+	Vec m_position;
+	char pad14[0x34];
+	float m_userFloat0;
+	float m_userFloat1;
+	Vec m_savedPosition;
+	char pad5c[0x80];
+	void* m_owner;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800d4bd0
@@ -48,6 +59,7 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
 void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3)
 {
 	_pppMngSt* pppMngSt;
+	pppYmTraceMoveMngStRaw* rawPppMngSt;
 	u8* owner;
 	Vec* dest;
 	Vec local_128;
@@ -74,8 +86,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	}
 
 	pppMngSt = pppMngStPtr;
+	rawPppMngSt = (pppYmTraceMoveMngStRaw*)pppMngSt;
 	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
-	owner = (u8*)pppMngSt->m_owner;
+	owner = (u8*)rawPppMngSt->m_owner;
 
 	dest[2].z = dest[2].z + dest[3].x;
 	dest[2].y = dest[2].y + dest[2].z;
@@ -101,9 +114,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_74.y = *(f32*)(owner + 0x160);
 		local_74.z = *(f32*)(owner + 0x164);
 
-		local_68.x = pppMngSt->m_position.x;
-		local_68.y = pppMngSt->m_position.y;
-		local_68.z = pppMngSt->m_position.z;
+		local_68.x = rawPppMngSt->m_position.x;
+		local_68.y = rawPppMngSt->m_position.y;
+		local_68.z = rawPppMngSt->m_position.z;
 		pppSubVector__FR3Vec3Vec3Vec(&local_20, &local_74, &local_68);
 
 		local_20.y = local_20.y + param_2->m_payload;
@@ -117,12 +130,12 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_50.z = local_20.z;
 		pppCopyVector__FR3Vec3Vec(dest, &local_50);
 
-		local_44.x = pppMngSt->m_userFloat0;
-		local_44.y = pppMngSt->m_userFloat1;
-		local_44.z = pppMngSt->m_savedPosition.x;
-		local_38.x = pppMngSt->m_position.x;
-		local_38.y = pppMngSt->m_position.y;
-		local_38.z = pppMngSt->m_position.z;
+		local_44.x = rawPppMngSt->m_userFloat0;
+		local_44.y = rawPppMngSt->m_userFloat1;
+		local_44.z = rawPppMngSt->m_savedPosition.x;
+		local_38.x = rawPppMngSt->m_position.x;
+		local_38.y = rawPppMngSt->m_position.y;
+		local_38.z = rawPppMngSt->m_position.z;
 		pppSubVector__FR3Vec3Vec3Vec(&local_2c, &local_38, &local_44);
 
 		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {

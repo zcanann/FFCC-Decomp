@@ -581,7 +581,7 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    const char* townName = DAT_8032f6ac;
+    register const char* townName = DAT_8032f6ac;
 
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
     Printf__7CSystemFPce(&System, DAT_801d6214);

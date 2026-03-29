@@ -69,7 +69,7 @@ public:
     unsigned char _pad08[0x7C];
     CUSBStreamData m_usbStream; // 0x84
 
-    unsigned char _padA8[0x20];
+    unsigned char _pad98[0x30];
 
     ZLIST m_zlist1; // 0xC8
     ZLIST m_zlist2; // 0xD8

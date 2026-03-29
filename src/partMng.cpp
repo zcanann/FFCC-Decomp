@@ -1228,8 +1228,8 @@ void CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
     };
 
     struct PartPcsRaw {
-        unsigned char m_unk0[4];
-        CUSBStreamData m_usbStreamData;
+        unsigned char m_unk0[0x1C];
+        CMemory::CStage* m_stageLoad;
     };
 
     char* textureNames[0x101];
@@ -1246,7 +1246,7 @@ void CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
                         textureNames[i] = chunkFile.GetString();
                     }
                 } else if (chunk.m_id == 'MESH') {
-                    modelSt->ReadOtmMesh(chunkFile, partPcs->m_usbStreamData.m_stageLoad, 0, 0);
+                    modelSt->ReadOtmMesh(chunkFile, partPcs->m_stageLoad, 0, 0);
                     modelSt->SetDisplayListMaterial(res->m_materialSet, textureNames, 0);
                 }
             }

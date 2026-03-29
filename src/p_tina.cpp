@@ -213,6 +213,11 @@ static CPartMngState* GetPartMngState()
     return reinterpret_cast<CPartMngState*>(&PartMng);
 }
 
+static inline CUSBStreamDataRaw* GetUsbStreamState(CPartPcs* self)
+{
+    return reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(self) + 4);
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1334,7 +1339,7 @@ void CPartPcs::StartLocationTitle()
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
     loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0);
     if ((loaded != 0) && ((loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0), loaded != 0))) {
-        m_usbStreamData.m_blockOnFrame = 1;
+        GetUsbStreamState(this)->m_blockOnFrame = 1;
     }
 }
 
@@ -1350,7 +1355,7 @@ void CPartPcs::StartLocationTitle()
 void CPartPcs::EndLocationTitle()
 {
     pppReleasePdt__8CPartMngFi(&PartMng, 6);
-    m_usbStreamData.m_blockOnFrame = 0;
+    GetUsbStreamState(this)->m_blockOnFrame = 0;
 }
 
 /*
@@ -1371,7 +1376,7 @@ void CPartPcs::StartMiruraEvent()
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
     loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0);
     if ((loaded != 0) && ((loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0), loaded != 0))) {
-        m_usbStreamData.m_miruraEventActive = 1;
+        GetUsbStreamState(this)->m_miruraEventActive = 1;
     }
 }
 
@@ -1387,7 +1392,7 @@ void CPartPcs::StartMiruraEvent()
 void CPartPcs::EndMiruraEvent()
 {
     pppReleasePdt__8CPartMngFi(&PartMng, 7);
-    m_usbStreamData.m_miruraEventActive = 0;
+    GetUsbStreamState(this)->m_miruraEventActive = 0;
 }
 
 /*

@@ -27,6 +27,25 @@ static inline CUSBStreamData* UsbStream(CPartPcs* self)
     return &self->m_usbStreamData;
 }
 
+struct CPartPcsUsbStreamState {
+    CUSBStreamData m_usbStreamData;
+    CMemory::CStage* m_stageDefault;
+    CMemory::CStage* m_stageLoad;
+    CMemory::CStage* m_stageAmem;
+    CMemory::CStage* m_stageExtra;
+    void* m_freePtr;
+    unsigned char m_fieldLoadReq;
+    unsigned char m_printFreeOnNext;
+    unsigned char m_blockOnFrame;
+    unsigned char m_miruraEventActive;
+    unsigned char m_disableShokiDraw;
+};
+
+static inline CPartPcsUsbStreamState* UsbStreamState(CPartPcs* self)
+{
+    return reinterpret_cast<CPartPcsUsbStreamState*>(UsbStream(self));
+}
+
 struct CMapCylinderRaw
 {
     Vec m_bottom;
@@ -166,7 +185,7 @@ void CSound::SeMaxVolume(int volume)
  */
 void CPartPcs::pppSetDebugHide(unsigned char hide)
 {
-    UsbStream(this)->m_disableShokiDraw = hide;
+    UsbStreamState(this)->m_disableShokiDraw = hide;
 }
 
 /*

@@ -2182,12 +2182,11 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
  */
 void CSound::Clear3DLine(int lineIndex)
 {
-    if ((u32)lineIndex > 7) {
+    if ((u32)lineIndex >= 8) {
         Printf__7CSystemFPce(&System, s_soundLineOutOfRangeFmt);
     }
 
-    CLine* line = reinterpret_cast<CLine*>(SoundData(this).m_lineWork + lineIndex * sizeof(CLine));
-    line->pointCount = 0;
+    reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C)[lineIndex].pointCount = 0;
 }
 
 /*

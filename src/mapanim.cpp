@@ -407,16 +407,15 @@ void CMapAnimNode::ReadOtmAnimNode(CChunkFile&, CMapAnim*)
 void CMapAnimNode::Interp(int frame)
 {
     unsigned char* node = reinterpret_cast<unsigned char*>(this);
-    int* mapAnim = *reinterpret_cast<int**>(node + 0x04);
-    CMapAnimNodeTracks* tracks = *reinterpret_cast<CMapAnimNodeTracks**>(node + 0x08);
-    int startFrame = mapAnim[7];
-    int loopFrameCount = (mapAnim[8] - startFrame) + 1;
-    int frameInLoop = startFrame + (frame - (frame / loopFrameCount) * loopFrameCount);
+    int startFrame = *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(node + 0x04) + 0x1C);
+    unsigned int loopFrameCount =
+        static_cast<unsigned int>((*reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(node + 0x04) + 0x20) - startFrame) + 1);
+    unsigned int frameInLoop = startFrame + (frame - (frame / loopFrameCount) * loopFrameCount);
 
     {
-        CMapAnimNodeTrack* track = &tracks->position;
+        CMapAnimNodeTrack* track = reinterpret_cast<CMapAnimNodeTrack*>(*reinterpret_cast<unsigned char**>(node + 0x08));
         CMapAnimNodeTrackKey* keys = track->keys;
-        int trackCount = static_cast<int>(track->count);
+        unsigned int trackCount = track->count;
         Vec* out = reinterpret_cast<Vec*>(*reinterpret_cast<unsigned char**>(node + 0x00) + 0x64);
 
         if (trackCount == 1) {
@@ -424,16 +423,16 @@ void CMapAnimNode::Interp(int frame)
         } else {
             CMapAnimNodeTrackKey* current = keys;
 
-            for (int i = 0, remaining = trackCount; remaining > 0; remaining--) {
-                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= i + 1);
+            for (unsigned int i = 0; i < trackCount; i++) {
+                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= (i + 1U));
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
-                int endFrame = static_cast<int>(next->frame);
+                unsigned int endFrame = next->frame;
 
                 if (nextIndex == 0) {
                     endFrame += loopFrameCount;
                 }
 
-                int currentFrame = static_cast<int>(current->frame);
+                unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && (frameInLoop < endFrame)) {
                     int frameRange = endFrame - currentFrame;
                     float t = 0.0f;
@@ -451,15 +450,15 @@ void CMapAnimNode::Interp(int frame)
                 }
 
                 current++;
-                i++;
             }
         }
     }
 
     {
-        CMapAnimNodeTrack* track = &(*reinterpret_cast<CMapAnimNodeTracks**>(node + 0x08))->rotation;
+        CMapAnimNodeTrack* track =
+            reinterpret_cast<CMapAnimNodeTrack*>(*reinterpret_cast<unsigned char**>(node + 0x08) + sizeof(CMapAnimNodeTrack));
         CMapAnimNodeTrackKey* keys = track->keys;
-        int trackCount = static_cast<int>(track->count);
+        unsigned int trackCount = track->count;
         Vec* out = reinterpret_cast<Vec*>(*reinterpret_cast<unsigned char**>(node + 0x00) + 0x70);
 
         if (trackCount == 1) {
@@ -467,16 +466,19 @@ void CMapAnimNode::Interp(int frame)
         } else {
             CMapAnimNodeTrackKey* current = keys;
 
-            for (int i = 0, remaining = trackCount; remaining > 0; remaining--) {
-                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= i + 1);
+            for (unsigned int i = 0; i < trackCount; i++) {
+                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= (i + 1U));
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
-                int endFrame = static_cast<int>(next->frame);
+                unsigned int endFrame = next->frame;
 
                 if (nextIndex == 0) {
-                    endFrame += (mapAnim[8] - mapAnim[7]) + 1;
+                    endFrame +=
+                        static_cast<unsigned int>((*reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(node + 0x04) + 0x20) -
+                                                   *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(node + 0x04) + 0x1C)) +
+                                                  1);
                 }
 
-                int currentFrame = static_cast<int>(current->frame);
+                unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && (frameInLoop < endFrame)) {
                     int frameRange = endFrame - currentFrame;
                     float t = 0.0f;
@@ -494,15 +496,15 @@ void CMapAnimNode::Interp(int frame)
                 }
 
                 current++;
-                i++;
             }
         }
     }
 
     {
-        CMapAnimNodeTrack* track = &(*reinterpret_cast<CMapAnimNodeTracks**>(node + 0x08))->scale;
+        CMapAnimNodeTrack* track = reinterpret_cast<CMapAnimNodeTrack*>(
+            *reinterpret_cast<unsigned char**>(node + 0x08) + (sizeof(CMapAnimNodeTrack) * 2));
         CMapAnimNodeTrackKey* keys = track->keys;
-        int trackCount = static_cast<int>(track->count);
+        unsigned int trackCount = track->count;
         Vec* out = reinterpret_cast<Vec*>(*reinterpret_cast<unsigned char**>(node + 0x00) + 0x7C);
 
         if (trackCount == 1) {
@@ -510,16 +512,19 @@ void CMapAnimNode::Interp(int frame)
         } else {
             CMapAnimNodeTrackKey* current = keys;
 
-            for (int i = 0, remaining = trackCount; remaining > 0; remaining--) {
-                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= i + 1);
+            for (unsigned int i = 0; i < trackCount; i++) {
+                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= (i + 1U));
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
-                int endFrame = static_cast<int>(next->frame);
+                unsigned int endFrame = next->frame;
 
                 if (nextIndex == 0) {
-                    endFrame += (mapAnim[8] - mapAnim[7]) + 1;
+                    endFrame +=
+                        static_cast<unsigned int>((*reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(node + 0x04) + 0x20) -
+                                                   *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(node + 0x04) + 0x1C)) +
+                                                  1);
                 }
 
-                int currentFrame = static_cast<int>(current->frame);
+                unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && (frameInLoop < endFrame)) {
                     int frameRange = endFrame - currentFrame;
                     float t = 0.0f;
@@ -537,7 +542,6 @@ void CMapAnimNode::Interp(int frame)
                 }
 
                 current++;
-                i++;
             }
         }
     }

@@ -113,27 +113,40 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
  */
 void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
 {
-    float* const s = reinterpret_cast<float*>(srt);
+    double temp;
+    double sinZ;
+    double cosY;
+    double sinY;
+    double cosX;
+    double sinX;
+    float* matrix = &out[0][0];
+    float* values = reinterpret_cast<float*>(srt);
 
-    const double sx = (double)(float)sin((double)s[3]);
-    const double cx = (double)(float)cos((double)s[3]);
-    const double sy = (double)(float)sin((double)s[4]);
-    const double cy = (double)(float)cos((double)s[4]);
-    const double sz = (double)(float)sin((double)s[5]);
-    const double cz = (double)(float)cos((double)s[5]);
+    temp = (double)sin((double)values[3]);
+    sinX = (double)(float)temp;
+    temp = (double)cos((double)values[3]);
+    cosX = (double)(float)temp;
+    temp = (double)sin((double)values[4]);
+    sinY = (double)(float)temp;
+    temp = (double)cos((double)values[4]);
+    cosY = (double)(float)temp;
+    temp = (double)sin((double)values[5]);
+    sinZ = (double)(float)temp;
+    temp = (double)cos((double)values[5]);
+    temp = (double)(float)temp;
 
-    out[0][0] = (float)(cy * cz);
-    out[1][0] = (float)(cy * sz);
-    out[2][0] = (float)-sy;
-    out[0][1] = (float)(cz * (double)(float)(sx * sy) - (double)(float)(cx * sz));
-    out[1][1] = (float)(sz * (double)(float)(sx * sy) + (double)(float)(cx * cz));
-    out[2][1] = (float)(sx * cy);
-    out[0][2] = (float)(cz * (double)(float)(cx * sy) + (double)(float)(sx * sz));
-    out[1][2] = (float)(sz * (double)(float)(cx * sy) - (double)(float)(sx * cz));
-    out[2][2] = (float)(cx * cy);
-    out[0][3] = s[0];
-    out[1][3] = s[1];
-    out[2][3] = s[2];
+    matrix[0] = (float)(cosY * temp);
+    matrix[4] = (float)(cosY * sinZ);
+    matrix[8] = (float)-sinY;
+    matrix[1] = (float)(temp * (double)(float)(sinX * sinY) - (double)(float)(cosX * sinZ));
+    matrix[5] = (float)(sinZ * (double)(float)(sinX * sinY) + (double)(float)(cosX * temp));
+    matrix[9] = (float)(sinX * cosY);
+    matrix[2] = (float)(temp * (double)(float)(cosX * sinY) + (double)(float)(sinX * sinZ));
+    matrix[6] = (float)(sinZ * (double)(float)(cosX * sinY) - (double)(float)(sinX * temp));
+    matrix[10] = (float)(cosX * cosY);
+    matrix[3] = values[0];
+    matrix[7] = values[1];
+    matrix[11] = values[2];
 }
 
 /*

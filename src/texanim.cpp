@@ -65,6 +65,43 @@ inline void* operator new(unsigned long, void* p)
 }
 
 namespace {
+struct CTexAnimSeqLayout {
+    void* vtable;
+    int refCount;
+    char name[0x100];
+    unsigned int totalFrame;
+    int keyCount;
+    unsigned char flags;
+    unsigned char _pad111[3];
+    void* keys;
+};
+
+struct CTexAnimLayout {
+    void* vtable;
+    int refCount;
+    void* refData;
+    int seqIndex;
+    float frame;
+    int mode;
+    Vec texGen;
+};
+
+struct CTexAnimSetLayout {
+    void* vtable;
+    int refCount;
+    CPtrArray<CTexAnim*> texAnims;
+    float chinValue;
+};
+
+struct CTexAnimRefDataLayout {
+    void* vtable;
+    int refCount;
+    char name[0x100];
+    void* material;
+    int materialIndex;
+    CPtrArray<CTexAnimSeq*> sequences;
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -684,49 +721,45 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  */
 CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
+    CTexAnimSetLayout* srcSet = reinterpret_cast<CTexAnimSetLayout*>(this);
     CTexAnimSet* dup =
         static_cast<CTexAnimSet*>(__nw__FUlPQ27CMemory6CStagePci(0x28, stage, s_texanim_cpp_801d7adc, 0x54));
+    CTexAnimSetLayout* dupSet = reinterpret_cast<CTexAnimSetLayout*>(dup);
     if (dup != 0) {
         __ct__4CRefFv(dup);
-        *reinterpret_cast<void**>(dup) = __vt__11CTexAnimSet;
-        new (Ptr(dup, 8)) CPtrArray<CTexAnim*>();
-        F32At(dup, 0x24) = FLOAT_8032fb38;
+        dupSet->vtable = __vt__11CTexAnimSet;
+        new (&dupSet->texAnims) CPtrArray<CTexAnim*>();
+        dupSet->chinValue = FLOAT_8032fb38;
     }
 
-    CPtrArray<CTexAnim*>* const dstArray = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(dup, 8));
-    CPtrArray<CTexAnim*>* const srcArray = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
-    int (CPtrArray<CTexAnim*>::*getSizeFn)() = &CPtrArray<CTexAnim*>::GetSize;
-    CTexAnim* (CPtrArray<CTexAnim*>::*indexFn)(unsigned long) = &CPtrArray<CTexAnim*>::operator[];
-    bool (CPtrArray<CTexAnim*>::*addFn)(CTexAnim*) = &CPtrArray<CTexAnim*>::Add;
-    dstArray->SetStage(stage);
-    for (unsigned long i = 0; i < static_cast<unsigned long>((srcArray->*getSizeFn)()); i++) {
-        CTexAnim* const src = (srcArray->*indexFn)(i);
+    dupSet->texAnims.SetStage(stage);
+    for (unsigned long i = 0; i < static_cast<unsigned long>(srcSet->texAnims.GetSize()); i++) {
+        CTexAnimLayout* src = reinterpret_cast<CTexAnimLayout*>(srcSet->texAnims[i]);
         CTexAnim* const copy =
             static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0xF4));
+        CTexAnimLayout* copyAnim = reinterpret_cast<CTexAnimLayout*>(copy);
         if (copy != 0) {
             __ct__4CRefFv(copy);
-            *reinterpret_cast<void**>(copy) = __vt__8CTexAnim;
-            *reinterpret_cast<void**>(Ptr(copy, 8)) = 0;
-            S32At(copy, 0x0C) = 0;
-            F32At(copy, 0x10) = FLOAT_8032fb38;
-            S32At(copy, 0x14) = -2;
-            F32At(copy, 0x18) = FLOAT_8032fb38;
-            F32At(copy, 0x1C) = FLOAT_8032fb38;
-            F32At(copy, 0x20) = FLOAT_8032fb38;
+            copyAnim->vtable = __vt__8CTexAnim;
+            copyAnim->refData = 0;
+            copyAnim->seqIndex = 0;
+            copyAnim->frame = FLOAT_8032fb38;
+            copyAnim->mode = -2;
+            copyAnim->texGen.x = FLOAT_8032fb38;
+            copyAnim->texGen.y = FLOAT_8032fb38;
+            copyAnim->texGen.z = FLOAT_8032fb38;
         }
 
-        *reinterpret_cast<void**>(Ptr(copy, 8)) = *reinterpret_cast<void**>(Ptr(src, 8));
-        S32At(*reinterpret_cast<void**>(Ptr(copy, 8)), 4) = S32At(*reinterpret_cast<void**>(Ptr(copy, 8)), 4) + 1;
-        S32At(copy, 0x0C) = S32At(src, 0x0C);
-        F32At(copy, 0x10) = F32At(src, 0x10);
-        S32At(copy, 0x14) = S32At(src, 0x14);
-        F32At(copy, 0x18) = F32At(src, 0x18);
-        F32At(copy, 0x1C) = F32At(src, 0x1C);
-        F32At(copy, 0x20) = F32At(src, 0x20);
-        (dstArray->*addFn)(copy);
+        copyAnim->refData = src->refData;
+        S32At(copyAnim->refData, 4) = S32At(copyAnim->refData, 4) + 1;
+        copyAnim->seqIndex = src->seqIndex;
+        copyAnim->frame = src->frame;
+        copyAnim->mode = src->mode;
+        copyAnim->texGen = src->texGen;
+        dupSet->texAnims.Add(copy);
     }
 
-    F32At(dup, 0x24) = F32At(this, 0x24);
+    dupSet->chinValue = srcSet->chinValue;
     return dup;
 }
 
@@ -1078,18 +1111,20 @@ CTexAnim::CRefData::CRefData()
 #pragma dont_inline on
 CTexAnim::CRefData::~CRefData()
 {
-    *reinterpret_cast<void**>(this) = __vt__Q28CTexAnim8CRefData;
-    int* ref = *reinterpret_cast<int**>(Ptr(this, 0x108));
+    CTexAnimRefDataLayout* refData = reinterpret_cast<CTexAnimRefDataLayout*>(this);
+
+    refData->vtable = __vt__Q28CTexAnim8CRefData;
+    int* ref = reinterpret_cast<int*>(refData->material);
     if (ref != 0) {
-        const int nextRefCount = ref[1] - 1;
-        ref[1] = nextRefCount;
-        if ((nextRefCount == 0) && (ref != 0)) {
+        int refCount = ref[1];
+        ref[1] = refCount - 1;
+        if ((refCount - 1 == 0) && (ref != 0)) {
             (*(void (**)(int*, int))(*ref + 8))(ref, 1);
         }
-        *reinterpret_cast<void**>(Ptr(this, 0x108)) = 0;
+        refData->material = 0;
     }
-    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->ReleaseAndRemoveAll();
-    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->~CPtrArray<CTexAnimSeq*>();
+    refData->sequences.ReleaseAndRemoveAll();
+    refData->sequences.~CPtrArray<CTexAnimSeq*>();
 
     __dt__4CRefFv(this, 0);
 }

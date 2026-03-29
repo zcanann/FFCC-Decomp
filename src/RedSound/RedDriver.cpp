@@ -1409,12 +1409,18 @@ void CRedDriver::SetSoundMode(int soundMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bec90
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CRedDriver::GetSoundMode()
 {
-    if (__OSReadROM() == 0) {
+    int soundMode = __OSReadROM();
+
+    if (soundMode == 0) {
         DAT_8032f400 = 1;
     } else {
         DAT_8032f400 = DAT_8032f3c8;

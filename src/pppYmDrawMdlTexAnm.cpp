@@ -36,10 +36,17 @@ struct pppYmDrawMdlTexAnmColorBlock {
     pppCVECTOR m_color;
 };
 
+extern "C" {
 extern f32 FLOAT_80330548;
 extern f32 FLOAT_8033054c;
-extern char DAT_801d9c54[];
-extern char s_PerU___0_2f_PerV___0_2f_801d9c38[];
+extern const char s_PerU___0_2f_PerV___0_2f_801d9c38[] = "PerU: %0.2f PerV: %0.2f\n";
+extern const char DAT_801d9c54[0x14] = {
+    (char)0x83, (char)0x52, (char)0x83, (char)0x93, (char)0x83,
+    (char)0x58, (char)0x83, (char)0x67, (char)0x83, (char)0x89,
+    (char)0x83, (char)0x4E, (char)0x83, (char)0x5E, '\n',
+    '\0',       '\0',       '\0',       '\0',       '\0',
+};
+}
 
 void pppSetBlendMode(unsigned char);
 

@@ -121,44 +121,40 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		u32 y0 = (u32)((int)work->m_projectedY & 0xFFFF);
-		u32 x0 = (u32)((int)work->m_projectedX & 0xFFFF);
-		u8 flareWidth = step->m_arg3;
+		float xProjected = work->m_projectedX;
+		float yProjected = work->m_projectedY;
+		u8 flareWidth = stepArgBytes[0];
 		u32 halfWidth = (u32)(flareWidth >> 1);
+		u32 y0 = (u32)((int)yProjected & 0xFFFF);
+		u32 x0 = (u32)((int)xProjected & 0xFFFF);
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
-		s16 stepSize = (s16)((u16)flareWidth / (u16)step->m_count);
+		int stepSize = (short)((u16)flareWidth / (u16)stepArgBytes[1]);
 		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
 			for (u32 x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stepSize) {
-				s16 xShort = (s16)x;
-				s16 yShort = (s16)y;
-
-				if ((xShort <= -1) || (yShort <= -1) || (xShort >= 0x281) || (yShort >= 0x1C1)) {
-					continue;
-				}
-
-				GXPeekZ((u16)xShort, (u16)yShort, &zAtPixel);
-				if (z0 <= zAtPixel) {
-					work->m_alpha = (u8)(work->m_alpha + 1);
+				if (((-1 < (short)x) && (-1 < (short)y)) && ((short)x < 0x281) && ((short)y < 0x1c1)) {
+					GXPeekZ((u16)(x & 0xFFFF), (u16)(y & 0xFFFF), &zAtPixel);
+					if (z0 <= zAtPixel) {
+						work->m_alpha = (u8)(work->m_alpha + 1);
+					}
 				}
 			}
 		}
 
-		u32 sampleCount = (u32)(step->m_count + 1);
-		sampleCount *= sampleCount;
-		u32 alpha = (u32)work->m_alpha;
-
-		if (alpha == sampleCount) {
+		stepSize = stepArgBytes[1] + 1;
+		u32 sampleCount = (u32)(stepSize * stepSize);
+		if (work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			u32 scaledAlpha = alpha * (0xFFu / sampleCount);
-
-			work->m_alpha = (u8)scaledAlpha;
-			if (scaledAlpha >= 0x100u) {
+			sampleCount = work->m_alpha * (0xff / sampleCount);
+			work->m_alpha = (u8)sampleCount;
+			if (sampleCount < 0x100) {
+				work->m_alpha = (u8)sampleCount;
+			} else {
 				work->m_alpha = 0xff;
 			}
 		}
 
-		work->m_alpha = (u8)(int)((double)(u8)work->m_alpha * alphaScale);
+		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
 		if (step->m_dataValIndex != 0xffff) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,

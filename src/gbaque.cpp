@@ -3964,24 +3964,24 @@ void GbaQueue::OpenMenu(int, int, int)
 void GbaQueue::SetPauseMode(int mode)
 {
 	int i;
-	GbaQueue* semaphoreIter;
+	OSSemaphore* semaphoreIter;
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
 	reinterpret_cast<char*>(this)[0x2D5B] = static_cast<char>(mode);
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 }
 

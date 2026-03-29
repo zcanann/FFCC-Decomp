@@ -70,7 +70,7 @@ public:
     void SetStreamVolume(int, int);
     void IsPlayStream();
     void IsDebugPrint(int);
-    void PauseAllSe(int);
+    void PauseAllSe(unsigned int);
     void AddNoFreeSeGroup(int);
     void AddNoFreeWave(int);
     void WaitASync();

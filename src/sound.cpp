@@ -2409,12 +2409,10 @@ void CSound::IsDebugPrint(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSound::PauseAllSe(int pause)
+void CSound::PauseAllSe(unsigned int pause)
 {
-    int pauseFlag = (pause != 0);
-    CRedSound* redSound = RedSound(this);
-    SePause__9CRedSoundFii(redSound, -1, pauseFlag);
-    StreamPause__9CRedSoundFii(redSound, -1, pauseFlag);
+    SePause__9CRedSoundFii(RedSound(this), -1, ((-pause) | pause) >> 31);
+    StreamPause__9CRedSoundFii(RedSound(this), -1, ((-pause) | pause) >> 31);
     SoundData(this).m_pauseAllSe = pause;
 }
 

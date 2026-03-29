@@ -16,6 +16,39 @@ const float kOctTreeBoundMinInit = 10000000000.0f;
 const float kOctTreeBoundMaxInit = -10000000000.0f;
 const float kOctTreeCylinderPad = 1.0f;
 static unsigned long s_clearFlagMask;
+
+namespace {
+struct CMaterialManEnvState {
+    u32 stdEnvTevBit;
+    u32 activeEnvTevBit;
+    u32 curEnvTevBit;
+    u8 alphaRef;
+    u8 pad04D[0x0B];
+    u32 lockedEnvTevBit;
+    u32 lockedEnvUnknown5c;
+    u8 pad060[0xBC];
+    int texMapIdCur;
+    int texMtxCur;
+    int texCoordIdCur;
+    int stdTexMapId;
+    int stdTexMtx;
+    int stdTexCoordId;
+    int texMapIdCurShadow;
+    int texMtxCurShadow;
+    int texCoordIdCurShadow;
+    u8 pad140[0xC5];
+    u8 blendMode;
+    u8 fogEnable;
+    u8 blendOverrideMode;
+    u8 shadowKColorMask;
+};
+
+static inline CMaterialManEnvState* MaterialEnvState(CMaterialMan* self)
+{
+    return reinterpret_cast<CMaterialManEnvState*>(reinterpret_cast<u8*>(self) + 0x40);
+}
+}
+
 struct CBoundRaw
 {
     CBoundRaw()
@@ -2086,10 +2119,12 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
  */
 void CMaterialMan::LockEnv()
 {
-	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexMtx = m_texMtxCur;
-	m_stdTexCoordId = m_texCoordIdCur;
-	m_stdEnvTevBit = m_curEnvTevBit;
+	CMaterialManEnvState* state = MaterialEnvState(this);
+
+	state->stdTexMapId = state->texMapIdCur;
+	state->stdTexMtx = state->texMtxCur;
+	state->stdTexCoordId = state->texCoordIdCur;
+	state->stdEnvTevBit = state->curEnvTevBit;
 }
 
 /*
@@ -2099,20 +2134,22 @@ void CMaterialMan::LockEnv()
  */
 void CMaterialMan::InitEnv()
 {
-	m_curEnvTevBit = 0x000ACE0F;
-	m_activeEnvTevBit = 0xFFFFFFFF;
-	m_alphaRef = 0xFF;
-	m_stdTexMapId = 0;
-	m_texMapIdCur = 0;
-	m_stdTexMtx = 0x1E;
-	m_texMtxCur = 0x1E;
-	m_stdTexCoordId = 0;
-	m_texCoordIdCur = 0;
-	m_blendMode = 0xFF;
-	m_fogEnable = 0xFF;
-	m_lockedEnvTevBit = 0;
-	m_lockedEnvUnknown5c = 0;
-	m_shadowKColorMask = 0;
+	CMaterialManEnvState* state = MaterialEnvState(this);
+
+	state->curEnvTevBit = 0x000ACE0F;
+	state->activeEnvTevBit = 0xFFFFFFFF;
+	state->alphaRef = 0xFF;
+	state->stdTexMapId = 0;
+	state->texMapIdCur = 0;
+	state->stdTexMtx = 0x1E;
+	state->texMtxCur = 0x1E;
+	state->stdTexCoordId = 0;
+	state->texCoordIdCur = 0;
+	state->blendMode = 0xFF;
+	state->fogEnable = 0xFF;
+	state->lockedEnvTevBit = 0;
+	state->lockedEnvUnknown5c = 0;
+	state->shadowKColorMask = 0;
 }
 
 /*

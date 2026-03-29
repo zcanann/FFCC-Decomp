@@ -363,9 +363,11 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
-    float fVar1 = 1.0f;
-    float* work = (float*)workBytes;
+    float fVar1;
     float fVar2 = FLOAT_80330644;
+    float* work = (float*)workBytes;
+
+    fVar1 = FLOAT_80330658;
 
     *(u32*)workBytes = 0;
     work[7] = fVar2;

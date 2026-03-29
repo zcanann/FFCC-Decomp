@@ -37,7 +37,6 @@ struct YmMeltCtrl {
 };
 
 void InitPolygonData(PYmMelt*, VERTEX_DATA*, short);
-void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
 
 #ifdef __cplusplus
 extern "C" {

@@ -457,7 +457,7 @@ void CMaterialEditorPcs::drawViewer()
         return;
     }
 
-    ZLIST* zlist = reinterpret_cast<ZLIST*>(self + 0xC8);
+    ZLIST* zlist = reinterpret_cast<ZLIST*>(self + 0xD4);
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
         int* listData = reinterpret_cast<int*>(zlist->GetDataNext(&it));

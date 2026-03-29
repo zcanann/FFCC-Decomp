@@ -193,10 +193,10 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x40:
-        ResetRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, reinterpret_cast<ZLIST*>(Ptr(materialEditorPcs, 0xC8)));
+        ResetRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, reinterpret_cast<ZLIST*>(Ptr(materialEditorPcs, 0xD4)));
         break;
     case 0x41:
-        AddRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, reinterpret_cast<ZLIST*>(Ptr(materialEditorPcs, 0xC8)));
+        AddRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, reinterpret_cast<ZLIST*>(Ptr(materialEditorPcs, 0xD4)));
         break;
     case 0x42:
         memcpy(Ptr(materialEditorPcs, 0x20), usb->m_data, 4);

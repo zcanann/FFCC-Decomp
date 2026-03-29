@@ -3740,16 +3740,24 @@ int GbaQueue::GetScouterInfo(int, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
+namespace {
+static inline OSSemaphore* AccessSemaphoreAt(GbaQueue* self, unsigned int channel)
+{
+	return reinterpret_cast<OSSemaphore*>(reinterpret_cast<char*>(self) + channel * sizeof(OSSemaphore));
+}
+}
+
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
-	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
+	                             ~static_cast<unsigned int>((-reinterpret_cast<signed char*>(this)[0x2D56] |
+	                                                        reinterpret_cast<signed char*>(this)[0x2D56]) >>
 	                                                       31);
-	char* obj = reinterpret_cast<char*>(this);
-	OSWaitSemaphore(accessSemaphores + actualChannel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2CE8])) & (1U << actualChannel);
-	OSSignalSemaphore(accessSemaphores + actualChannel);
+	OSSemaphore* semaphore = AccessSemaphoreAt(this, actualChannel);
+	OSWaitSemaphore(semaphore);
+	signed char flag = reinterpret_cast<signed char*>(this)[0x2D54];
+	OSSignalSemaphore(semaphore);
+	unsigned int value = static_cast<unsigned int>(flag) & (1U << actualChannel);
 	return (-value | value) >> 31U;
 }
 
@@ -3761,13 +3769,14 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
 void GbaQueue::ClrChgHitFlg(int channel)
 {
 	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-reinterpret_cast<char*>(this)[0x2D56] |
-	                                                        reinterpret_cast<char*>(this)[0x2D56]) >>
+	                             ~static_cast<unsigned int>((-reinterpret_cast<signed char*>(this)[0x2D56] |
+	                                                        reinterpret_cast<signed char*>(this)[0x2D56]) >>
 	                                                       31);
-	char* obj = reinterpret_cast<char*>(this);
-	OSWaitSemaphore(accessSemaphores + actualChannel);
-	obj[0x2CE8] = static_cast<char>(static_cast<unsigned char>(obj[0x2CE8]) & ~(1U << actualChannel));
-	OSSignalSemaphore(accessSemaphores + actualChannel);
+	OSSemaphore* semaphore = AccessSemaphoreAt(this, actualChannel);
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	OSWaitSemaphore(semaphore);
+	obj[0x2D54] = static_cast<unsigned char>(obj[0x2D54] & ~(1U << actualChannel));
+	OSSignalSemaphore(semaphore);
 }
 
 /*
@@ -3777,10 +3786,11 @@ void GbaQueue::ClrChgHitFlg(int channel)
  */
 unsigned int GbaQueue::GetChgScouFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
-	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2CE9])) & (1U << channel);
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSSemaphore* semaphore = AccessSemaphoreAt(this, channel);
+	OSWaitSemaphore(semaphore);
+	signed char flag = reinterpret_cast<signed char*>(this)[0x2D55];
+	OSSignalSemaphore(semaphore);
+	unsigned int value = static_cast<unsigned int>(flag) & (1U << channel);
 	return (-value | value) >> 31U;
 }
 
@@ -3791,10 +3801,11 @@ unsigned int GbaQueue::GetChgScouFlg(int channel)
  */
 void GbaQueue::ClrChgScouFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
-	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CE9] = static_cast<char>(static_cast<unsigned char>(obj[0x2CE9]) & ~(1U << channel));
-	OSSignalSemaphore(accessSemaphores + channel);
+	OSSemaphore* semaphore = AccessSemaphoreAt(this, channel);
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	OSWaitSemaphore(semaphore);
+	obj[0x2D55] = static_cast<unsigned char>(obj[0x2D55] & ~(1U << channel));
+	OSSignalSemaphore(semaphore);
 }
 
 /*

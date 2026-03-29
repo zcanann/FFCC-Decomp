@@ -74,9 +74,9 @@ CSystem::CSystem()
 void CSystem::Init()
 {
     CFile::CHandle* fileHandle;
-    unsigned int mapSize;
-    unsigned int offset;
-    unsigned int chunkSize;
+    int mapSize;
+    int offset;
+    int chunkSize;
 
     m_initialized = 1;
     m_currentOrder = (COrder*)0;
@@ -97,11 +97,11 @@ void CSystem::Init()
     MemoryCardMan.Init();
 
     m_orderCount = 0;
-    m_orderSentinel.m_next = &m_orderSentinel;
     m_orderSentinel.m_previous = &m_orderSentinel;
+    m_orderSentinel.m_next = &m_orderSentinel;
     m_orderSentinel.m_priority = 0xFF;
     m_freeOrderHead.m_next = m_orderPool;
-    for (int i = 0; i < 0x80; i++)
+    for (unsigned int i = 0; i < 0x80; i++)
     {
         m_orderPool[i].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
     }

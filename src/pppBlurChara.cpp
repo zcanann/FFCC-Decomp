@@ -382,7 +382,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     if (param_2->m_textureMode == 1) {
         textureIndex = 0;
-        if (param_2->m_initWOrk == -1) {
+        if (param_2->m_initWOrk == 0xFFFF) {
             return;
         }
         textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(

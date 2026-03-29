@@ -88,7 +88,7 @@ public:
     CMemory::CStage* GetMemoryStage();
 
 private:
-    unsigned char m_pad004[0x3C];
+    unsigned char m_pad004[0x40];
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48

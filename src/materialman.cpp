@@ -64,7 +64,6 @@ extern float FLOAT_8032fb0c;
 extern float FLOAT_8032fb10;
 extern float FLOAT_8032fb14;
 extern float FLOAT_8032fb20;
-static const char s_materialStageName[] = "material";
 
 class CMapKeyFrame
 {
@@ -391,7 +390,7 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) = Memory.CreateStage(0x20000, "material", 0);
 	*Ptr(this, 0x204) = 0x30;
 }
 
@@ -402,7 +401,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	Memory.DestroyStage(m_materialStage);
+	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)));
 }
 
 /*
@@ -2478,7 +2477,7 @@ CMaterial::CMaterial()
  */
 CMemory::CStage* CMaterialMan::GetMemoryStage()
 {
-	return m_materialStage;
+	return *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218));
 }
 
 /*

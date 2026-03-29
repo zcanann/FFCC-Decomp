@@ -113,36 +113,30 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
  */
 void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
 {
-    double temp;
-    double sinZ;
-    double cosY;
-    double sinY;
-    double cosX;
     double sinX;
+    double cosX;
+    double sinY;
+    double cosY;
+    double sinZ;
+    double cosZ;
     float* matrix = &out[0][0];
     float* values = reinterpret_cast<float*>(srt);
 
-    temp = (double)sin((double)values[3]);
-    sinX = (double)(float)temp;
-    temp = (double)cos((double)values[3]);
-    cosX = (double)(float)temp;
-    temp = (double)sin((double)values[4]);
-    sinY = (double)(float)temp;
-    temp = (double)cos((double)values[4]);
-    cosY = (double)(float)temp;
-    temp = (double)sin((double)values[5]);
-    sinZ = (double)(float)temp;
-    temp = (double)cos((double)values[5]);
-    temp = (double)(float)temp;
+    sinX = (float)sin((double)values[3]);
+    cosX = (float)cos((double)values[3]);
+    sinY = (float)sin((double)values[4]);
+    cosY = (float)cos((double)values[4]);
+    sinZ = (float)sin((double)values[5]);
+    cosZ = (float)cos((double)values[5]);
 
-    matrix[0] = (float)(cosY * temp);
+    matrix[0] = (float)(cosY * cosZ);
     matrix[4] = (float)(cosY * sinZ);
     matrix[8] = (float)-sinY;
-    matrix[1] = (float)(temp * (double)(float)(sinX * sinY) - (double)(float)(cosX * sinZ));
-    matrix[5] = (float)(sinZ * (double)(float)(sinX * sinY) + (double)(float)(cosX * temp));
+    matrix[1] = (float)(cosZ * sinX * sinY - cosX * sinZ);
+    matrix[5] = (float)(sinZ * sinX * sinY + cosX * cosZ);
     matrix[9] = (float)(sinX * cosY);
-    matrix[2] = (float)(temp * (double)(float)(cosX * sinY) + (double)(float)(sinX * sinZ));
-    matrix[6] = (float)(sinZ * (double)(float)(cosX * sinY) - (double)(float)(sinX * temp));
+    matrix[2] = (float)(cosZ * cosX * sinY + sinX * sinZ);
+    matrix[6] = (float)(sinZ * cosX * sinY - sinX * cosZ);
     matrix[10] = (float)(cosX * cosY);
     matrix[3] = values[0];
     matrix[7] = values[1];

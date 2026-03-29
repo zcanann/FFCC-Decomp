@@ -22,12 +22,12 @@ struct pppYmMegaBirthShpTail2
 struct VYmMegaBirthShpTail2
 {
     pppFMATRIX m_emitterMatrix;         // 0x0
-    _PARTICLE_DATA* m_particles;        // 0x30
-    _PARTICLE_WMAT* m_wmats;            // 0x34
-    _PARTICLE_COLOR* m_colors;          // 0x38
-    unsigned int m_maxParticles;        // 0x3c
-    unsigned int m_lifeLimit;           // 0x40
-    Vec m_tailScaleDirection;           // 0x44
+    Vec m_tailScaleDirection;           // 0x30
+    _PARTICLE_DATA* m_particles;        // 0x3c
+    _PARTICLE_WMAT* m_wmats;            // 0x40
+    _PARTICLE_COLOR* m_colors;          // 0x44
+    unsigned int m_maxParticles;        // 0x48
+    unsigned int m_lifeLimit;           // 0x4c
 };
 
 struct pppYmMegaBirthShpTail2UnkB;
@@ -56,4 +56,3 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, pppYmMegaBirthShpTail
 #endif
 
 #endif // _PPP_YMMEGABIRTHSHPTAIL2_H_
-

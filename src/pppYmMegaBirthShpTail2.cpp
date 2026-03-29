@@ -406,8 +406,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             }
         }
 
-        work->m_tailScaleDirection = param->m_directionTail;
-        PSVECNormalize(&work->m_tailScaleDirection, &work->m_tailScaleDirection);
+        pppNormalize(work->m_tailScaleDirection, param->m_directionTail);
     }
 
     if (work->m_particles == 0) {
@@ -424,26 +423,51 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         return;
     }
 
-    switch (paramPayload[0x16]) {
+    switch (paramPayload[0x18]) {
     default:
-        PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_emitterMatrix.value);
+        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
         break;
     case 1:
     case 3:
     case 5:
     case 7:
     case 9:
+    {
+        Vec col;
+
         PSMTXIdentity(work->m_emitterMatrix.value);
-        work->m_emitterMatrix.value[0][0] = pppMngStPtr->m_scale.x;
-        work->m_emitterMatrix.value[1][1] = pppMngStPtr->m_scale.y;
-        work->m_emitterMatrix.value[2][2] = pppMngStPtr->m_scale.z;
+        col.x = work->m_emitterMatrix.value[0][0];
+        col.y = work->m_emitterMatrix.value[1][0];
+        col.z = work->m_emitterMatrix.value[2][0];
+        PSVECScale(&col, &col, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][0] = col.x;
+        work->m_emitterMatrix.value[1][0] = col.y;
+        work->m_emitterMatrix.value[2][0] = col.z;
+
+        col.x = work->m_emitterMatrix.value[0][1];
+        col.y = work->m_emitterMatrix.value[1][1];
+        col.z = work->m_emitterMatrix.value[2][1];
+        PSVECScale(&col, &col, pppMngStPtr->m_scale.y);
+        work->m_emitterMatrix.value[0][1] = col.x;
+        work->m_emitterMatrix.value[1][1] = col.y;
+        work->m_emitterMatrix.value[2][1] = col.z;
+
+        col.x = work->m_emitterMatrix.value[0][2];
+        col.y = work->m_emitterMatrix.value[1][2];
+        col.z = work->m_emitterMatrix.value[2][2];
+        PSVECScale(&col, &col, pppMngStPtr->m_scale.z);
+        work->m_emitterMatrix.value[0][2] = col.x;
+        work->m_emitterMatrix.value[1][2] = col.y;
+        work->m_emitterMatrix.value[2][2] = col.z;
+
         work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
         work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
         work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
         break;
     }
+    }
 
-    if ((gPppCalcDisabled != 0) || (paramPayload[0x16] == 0)) {
+    if ((gPppCalcDisabled != 0) || (paramPayload[0x18] == 0)) {
         return;
     }
 
@@ -660,4 +684,3 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         }
     }
 }
-

@@ -82,7 +82,6 @@ struct pppScreenBreakUnkC {
 };
 
 static const float FLOAT_80331cc0 = 2.0f;
-static const float FLOAT_80331cc4 = 0.0f;
 static const float FLOAT_80331cc8 = 0.3f;
 static const float FLOAT_80331ccc = -0.5f;
 static const float FLOAT_80331cd0 = 1.0f;
@@ -211,7 +210,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     (*(Mtx*)((u8*)model + 0x38))[1][3] = screenOffset.y;
     (*(Mtx*)((u8*)model + 0x38))[2][3] = screenOffset.z;
 
-    if (*(float*)((u8*)param_3 + 0x30) != FLOAT_80331cc4) {
+    if (*(float*)((u8*)param_3 + 0x30) != 0.0f) {
         PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }
 
@@ -220,9 +219,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             u8* node = *(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)(mesh + 8) + 0x5C) * 0xC0);
             u8* nodeMtx = node + 0xC;
 
-            *(float*)(node + 0x18) = FLOAT_80331cc4;
-            *(float*)(node + 0x28) = FLOAT_80331cc4;
-            *(float*)(node + 0x38) = FLOAT_80331cc4;
+            *(float*)(node + 0x18) = 0.0f;
+            *(float*)(node + 0x28) = 0.0f;
+            *(float*)(node + 0x38) = 0.0f;
 
             PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
             PSMTXIdentity(transMtx);
@@ -246,7 +245,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
                            FLOAT_80331cf4 * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
             pieceData[5] -= pieceData[2];
 
-            if (*(float*)((u8*)param_3 + 0x30) != FLOAT_80331cc4) {
+            if (*(float*)((u8*)param_3 + 0x30) != 0.0f) {
                 pieceData[3] += gravityAdd.x;
                 pieceData[5] += gravityAdd.z;
             }
@@ -286,7 +285,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
     const float cameraOffset = FLOAT_80331ce8;
-    const float zero = FLOAT_80331cc4;
+    const float zero = 0.0f;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
     lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
@@ -405,7 +404,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     const double dVar19 = (double)FLOAT_80331cc8;
     const double dVar20 = (double)FLOAT_80331cd0;
     const double dVar21 = (double)FLOAT_80331cd4;
-    const double dVar22 = (double)FLOAT_80331cc4;
+    const double dVar22 = 0.0;
     const double dVar24 = (double)FLOAT_80331cc0;
     const double dVar25 = (double)FLOAT_80331cd8;
     S16Vec local_e8;
@@ -584,7 +583,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    float f = FLOAT_80331cc4;
+    float f = 0.0f;
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
@@ -618,8 +617,8 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
-    float f = FLOAT_80331cc4;
-    value[2] = FLOAT_80331cc4;
+    float f = 0.0f;
+    value[2] = 0.0f;
     value[1] = f;
     *value = f;
 }

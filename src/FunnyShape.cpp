@@ -336,11 +336,11 @@ void CFunnyShape::InitAnmWork()
  */
 void CFunnyShape::Update()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (PtrAt(this, 0xC) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (PtrAt(this, 0xC) == 0)) {
         return;
     }
 
-    const u32 noSpread = (((U32At(this, 0) >> 7) & 1) ^ 1);
+    const u8 noSpread = static_cast<u8>(((U32At(this, 0) >> 7) & 1) ^ 1);
     CFunnyShape* cur = this;
     for (s32 i = 0; i < *reinterpret_cast<s16*>(Ptr(this, 0x28)); i++) {
         *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = static_cast<s16>(*reinterpret_cast<s16*>(Ptr(cur, 0x46)) - 0x200);
@@ -364,8 +364,9 @@ void CFunnyShape::Update()
                 r = rand();
                 s32 q = r / 0x168 + (r >> 0x1F);
                 q = r + (q - (q >> 0x1F)) * -0x168;
+                *reinterpret_cast<float*>(Ptr(cur, 0x58)) = static_cast<float>(q);
                 *reinterpret_cast<float*>(Ptr(cur, 0x58)) =
-                    (FLOAT_8032fda4 * static_cast<float>(q)) / FLOAT_8032fda8;
+                    (FLOAT_8032fda4 * *reinterpret_cast<float*>(Ptr(cur, 0x58))) / FLOAT_8032fda8;
 
                 u32 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {

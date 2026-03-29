@@ -145,6 +145,12 @@ struct RawPtrArray {
     int growCapacity;
 };
 
+struct MaterialManCursorState {
+    unsigned char pad[0x120];
+    int texMtxCur;
+    int texCoordIdCur;
+};
+
 static int HighestSetBit(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
@@ -2187,8 +2193,9 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    MaterialManCursorState* state = reinterpret_cast<MaterialManCursorState*>(this);
+    int texCoordId = state->texCoordIdCur;
+    state->texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2210,9 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    MaterialManCursorState* state = reinterpret_cast<MaterialManCursorState*>(this);
+    int texMtx = state->texMtxCur;
+    state->texMtxCur = texMtx + 3;
     return texMtx;
 }
 

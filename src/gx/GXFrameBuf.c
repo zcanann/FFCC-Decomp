@@ -543,7 +543,6 @@ void GXCopyDisp(void* dest, GXBool clear) {
 void GXCopyTex(void* dest, GXBool clear) {
     u32 reg;
     u32 tempPeCtrl;
-    u32 phyAddr;
     u8 changePeCtrl;
 
     CHECK_GXBEGIN(1916, "GXCopyTex");
@@ -583,8 +582,7 @@ void GXCopyTex(void* dest, GXBool clear) {
     GX_WRITE_RAS_REG(__GXData->cpTexSize);
     GX_WRITE_RAS_REG(__GXData->cpTexStride);
 
-    phyAddr = (u32)dest & 0x3FFFFFFF;
-    reg = ((phyAddr >> 5) & 0x1FFFFF) | 0x4B000000;
+    reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cpTex = (__GXData->cpTex & 0xFFFFF7FF) | ((u32)clear << 11);

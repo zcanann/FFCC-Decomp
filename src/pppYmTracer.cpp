@@ -211,8 +211,13 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
  */
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
+    TracerMngRaw* mng;
     TracerWork* work;
     TRACE_POLYGON* entries;
+    float* valuePtr;
+    f32 fVar3;
+    u8 alpha;
+    u8 decay;
     u16 maxCount;
 
     if (gPppCalcDisabled != 0) {
@@ -224,31 +229,73 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     maxCount = *(u16*)(param_2->m_payload + 4);
 
     if (entries == 0) {
+        alpha = param_2->m_payload[8];
+        decay = (u8)((u16)alpha / *(u16*)(param_2->m_payload + 6));
         entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * sizeof(TRACE_POLYGON),
                                                                          pppEnvStPtr->m_stagePtr,
                                                                          s_pppYmTracer_cpp_801d9ce0, 0xEB);
         work->entries = entries;
+        fVar3 = FLOAT_803306e8;
 
         for (s32 i = 0; i < (s32)maxCount; i++) {
-            initTracePolygon(pppYmTracer, &entries[i]);
-            entries[i].alpha = param_2->m_payload[8];
-            entries[i].decay = (u8)((u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6));
+            entries[i].life = -1;
+            entries[i].alpha = alpha;
+            entries[i].decay = decay;
+            entries[i].from.z = fVar3;
+            entries[i].from.y = fVar3;
+            entries[i].from.x = fVar3;
+            entries[i].to.z = fVar3;
+            entries[i].to.y = fVar3;
+            entries[i].to.x = fVar3;
         }
     }
 
     if (param_2->m_graphId == ((s32*)pppYmTracer)[0]) {
-        work->initWork = resolveTracerWorkValue(param_2->m_initWOrk, param_2->m_stepValue);
-        work->arg3Work = resolveTracerWorkValue(param_2->m_arg3, *(s32*)param_2->m_payload);
+        if (param_2->m_initWOrk == -1) {
+            valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+        } else {
+            mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
+            valuePtr = reinterpret_cast<float*>(mng->dataValues[param_2->m_initWOrk].workBase + 0x80 +
+                                                param_2->m_stepValue);
+        }
+        work->initWork = valuePtr;
+
+        if (param_2->m_arg3 == -1) {
+            valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+        } else {
+            mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
+            valuePtr = reinterpret_cast<float*>(mng->dataValues[param_2->m_arg3].workBase + 0x80 +
+                                                *(s32*)param_2->m_payload);
+        }
+        work->arg3Work = valuePtr;
     }
 
     if (work->count + 1 < maxCount) {
         for (s32 i = maxCount - 2; i >= 0; i--) {
-            copyPolygonData(&entries[i + 1], &entries[i]);
+            TRACE_POLYGON* src = &entries[i];
+            TRACE_POLYGON* dst = &entries[i + 1];
+
+            pppCopyVector(dst->from, src->from);
+            pppCopyVector(dst->to, src->to);
+            dst->life = src->life;
+            dst->decay = src->decay;
+            dst->colorR = src->colorR;
+            dst->colorG = src->colorG;
+            dst->colorB = src->colorB;
+            dst->alpha = src->alpha;
         }
 
-        entries[0].life = *(s16*)(param_2->m_payload + 6);
+        entries[0].life = -1;
         entries[0].alpha = param_2->m_payload[8];
         entries[0].decay = (u8)((u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6));
+        fVar3 = FLOAT_803306e8;
+        entries[0].from.z = fVar3;
+        entries[0].from.y = fVar3;
+        entries[0].from.x = fVar3;
+        entries[0].to.z = fVar3;
+        entries[0].to.y = fVar3;
+        entries[0].to.x = fVar3;
+        entries[0].life = *(s16*)(param_2->m_payload + 6);
 
         {
             f32* from = work->initWork;
@@ -304,7 +351,17 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
             for (s32 i = 0; i < splineCount; i++) {
                 for (s32 j = maxCount - 2; j > 1; j--) {
-                    copyPolygonData(&entries[j + 1], &entries[j]);
+                    TRACE_POLYGON* src = &entries[j];
+                    TRACE_POLYGON* dst = &entries[j + 1];
+
+                    pppCopyVector(dst->from, src->from);
+                    pppCopyVector(dst->to, src->to);
+                    dst->life = src->life;
+                    dst->decay = src->decay;
+                    dst->colorR = src->colorR;
+                    dst->colorG = src->colorG;
+                    dst->colorB = src->colorB;
+                    dst->alpha = src->alpha;
                 }
             }
 
@@ -385,11 +442,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            if ((texture->m_format == 8) || (texture->m_format == 9)) {
+            u32 format = (u32)texture->m_format;
+            if ((format == 8) || (format == 9)) {
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)((f64)(u32)work->count - DOUBLE_803306F0);
+            uvStep = FLOAT_803306ec / (f32)work->count;
             GXSetCullMode(GX_CULL_NONE);
             poly = work->entries;
 

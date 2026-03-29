@@ -285,12 +285,12 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     pppSetBlendMode(unkB->m_blendMode);
 
     if (Game.m_currentSceneId != 7) {
-        Vec matrixPos;
-        Vec cameraPos;
-        Vec look;
-        Vec lookNorm;
         Vec side;
         Vec up;
+        Vec look;
+        Vec lookNorm;
+        Vec cameraPos;
+        Vec matrixPos;
 
         matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
         matrixPos.y = pppMngStPtr->m_matrix.value[1][3];

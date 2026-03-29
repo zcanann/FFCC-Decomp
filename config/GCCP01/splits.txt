@@ -687,6 +687,8 @@ pppYmDrawMdlTexAnm.cpp:
 	extab       start:0x80007A50 end:0x80007A70
 	extabindex  start:0x8000DCCC end:0x8000DCFC
 	.text       start:0x8008A38C end:0x8008ABC0
+	.rodata     start:0x801D9C38 end:0x801D9C68
+	.sdata2     start:0x80330550 end:0x80330560
 
 pppDrawMatrixWood.cpp:
 	extab       start:0x80007A70 end:0x80007A78

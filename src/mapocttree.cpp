@@ -55,6 +55,34 @@ struct CMapCylinderRaw
     float m_radius2;
     float m_height2;
 };
+
+struct CMaterialManEnvRaw
+{
+    unsigned char m_pad004[0x40];
+    unsigned int m_stdEnvTevBit;
+    unsigned int m_activeEnvTevBit;
+    unsigned int m_curEnvTevBit;
+    unsigned char m_alphaRef;
+    unsigned char m_pad04D[0x0B];
+    unsigned int m_lockedEnvTevBit;
+    unsigned int m_lockedEnvUnknown5c;
+    unsigned char m_pad060[0xBC];
+    int m_texMapIdCur;
+    int m_texMtxCur;
+    int m_texCoordIdCur;
+    int m_stdTexMapId;
+    int m_stdTexMtx;
+    int m_stdTexCoordId;
+    int m_texMapIdCurShadow;
+    int m_texMtxCurShadow;
+    int m_texCoordIdCurShadow;
+    unsigned char m_pad140[0xC5];
+    unsigned char m_blendMode;
+    unsigned char m_fogEnable;
+    unsigned char m_blendOverrideMode;
+    unsigned char m_shadowKColorMask;
+};
+
 CBoundRaw s_bound;
 CMapCylinderRaw s_cyl;
 Vec s_mvec;
@@ -2086,10 +2114,12 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
  */
 void CMaterialMan::LockEnv()
 {
-	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexCoordId = m_texCoordIdCur;
-	m_stdTexMtx = m_texMtxCur;
-	m_stdEnvTevBit = m_curEnvTevBit;
+	CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(this);
+
+	env->m_stdTexMapId = env->m_texMapIdCur;
+	env->m_stdTexMtx = env->m_texMtxCur;
+	env->m_stdTexCoordId = env->m_texCoordIdCur;
+	env->m_stdEnvTevBit = env->m_curEnvTevBit;
 }
 
 /*
@@ -2099,20 +2129,22 @@ void CMaterialMan::LockEnv()
  */
 void CMaterialMan::InitEnv()
 {
-	m_curEnvTevBit = 0x000ACE0F;
-	m_activeEnvTevBit = 0xFFFFFFFF;
-	m_alphaRef = 0xFF;
-	m_stdTexMapId = 0;
-	m_texMapIdCur = 0;
-	m_stdTexMtx = 0x1E;
-	m_texMtxCur = 0x1E;
-	m_stdTexCoordId = 0;
-	m_texCoordIdCur = 0;
-	m_blendMode = 0xFF;
-	m_fogEnable = 0xFF;
-	m_lockedEnvTevBit = 0;
-	m_lockedEnvUnknown5c = 0;
-	m_shadowKColorMask = 0;
+	CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(this);
+
+	env->m_curEnvTevBit = 0x000ACE0F;
+	env->m_activeEnvTevBit = 0xFFFFFFFF;
+	env->m_alphaRef = 0xFF;
+	env->m_stdTexMapId = 0;
+	env->m_texMapIdCur = 0;
+	env->m_stdTexMtx = 0x1E;
+	env->m_texMtxCur = 0x1E;
+	env->m_stdTexCoordId = 0;
+	env->m_texCoordIdCur = 0;
+	env->m_blendMode = 0xFF;
+	env->m_fogEnable = 0xFF;
+	env->m_lockedEnvTevBit = 0;
+	env->m_lockedEnvUnknown5c = 0;
+	env->m_shadowKColorMask = 0;
 }
 
 /*

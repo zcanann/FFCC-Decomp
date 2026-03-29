@@ -385,11 +385,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            if ((texture->m_format == 8) || (texture->m_format == 9)) {
+            u32 format = (u32)texture->m_format;
+            if ((format == 8) || (format == 9)) {
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)((f64)(u32)work->count - DOUBLE_803306F0);
+            uvStep = FLOAT_803306ec / (f32)work->count;
             GXSetCullMode(GX_CULL_NONE);
             poly = work->entries;
 

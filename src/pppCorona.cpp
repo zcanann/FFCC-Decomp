@@ -124,7 +124,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     color.rgba[2] = param2->m_colorB;
     color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, kPppCoronaViewDirZ, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);

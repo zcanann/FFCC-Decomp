@@ -54,7 +54,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         direction.x = gPppYmMoveParabolaYOffsetStep;
         direction.z = gPppYmMoveParabolaZero;
     } else {
-        PSVECSubtract(&pppMngSt->m_paramVec0, &pppMngSt->m_savedPosition, &direction);
+        PSVECSubtract(&pppMngSt->m_paramVec0, (Vec*)((u8*)pppMngSt + 0x58), &direction);
     }
 
     Vec normalizedSource = direction;
@@ -80,7 +80,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         Vec basePosition = work->m_basePosition;
         pppAddVector(newPosition, newPosition, basePosition);
     } else {
-        Vec basePosition = pppMngSt->m_savedPosition;
+        Vec basePosition = *(Vec*)((u8*)pppMngSt + 0x58);
         pppAddVector(newPosition, newPosition, basePosition);
     }
 
@@ -117,7 +117,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     work->m_frame = 1;
 
     if ((s32)Game.m_currentSceneId == 7) {
-        Vec savedPosition = pppMngSt->m_savedPosition;
+        Vec savedPosition = *(Vec*)((u8*)pppMngSt + 0x58);
         Vec matrixOffset;
         Vec basePosition;
         Vec paramPosition;

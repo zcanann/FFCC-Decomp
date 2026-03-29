@@ -50,6 +50,7 @@ struct MenuLstEntry {
 	float t;
 	float alpha;
 	float z;
+	int unk_18;
 	int tex;
 	int timer;
 	int startFrame;
@@ -77,6 +78,13 @@ struct MenuLstMembers {
 STATIC_ASSERT(offsetof(MenuLstMembers, m_font) == 0x108);
 STATIC_ASSERT(offsetof(MenuLstMembers, m_lstState) == 0x82C);
 STATIC_ASSERT(offsetof(MenuLstMembers, m_lstData) == 0x850);
+STATIC_ASSERT(offsetof(MenuLstEntry, tex) == 0x1C);
+STATIC_ASSERT(offsetof(MenuLstEntry, timer) == 0x20);
+STATIC_ASSERT(offsetof(MenuLstEntry, startFrame) == 0x24);
+STATIC_ASSERT(offsetof(MenuLstEntry, duration) == 0x28);
+STATIC_ASSERT(offsetof(MenuLstEntry, unk_2C) == 0x2C);
+STATIC_ASSERT(sizeof(MenuLstEntry) == 0x40);
+STATIC_ASSERT(sizeof(MenuLstList) == 0x1008);
 STATIC_ASSERT(offsetof(MenuLstState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(MenuLstState, closeRequested) == 0xD);
 STATIC_ASSERT(offsetof(MenuLstState, mode) == 0x10);
@@ -137,17 +145,15 @@ int CMenuPcs::MLstOpen()
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
-	MenuLstState* state = GetMenuLstStateStruct(this);
-	MenuLstList* list = GetMenuLstListStruct(this);
 
-	if (state->initialized == '\0') {
+	if (GetMenuLstStateStruct(this)->initialized == '\0') {
 		int i;
 		short initializedCount;
 		short yPos;
 
-		memset(list, 0, sizeof(MenuLstList));
+		memset(GetMenuLstListStruct(this), 0, sizeof(MenuLstList));
 		one = 1.0f;
-		entry = list->entries;
+		entry = GetMenuLstListStruct(this)->entries;
 		i = 8;
 		do {
 			entry[0].z = one;
@@ -163,7 +169,7 @@ int CMenuPcs::MLstOpen()
 		} while (i != 0);
 
 		initializedCount = 0;
-		entry = list->entries;
+		entry = GetMenuLstListStruct(this)->entries;
 		i = 0;
 		yPos = 0x18;
 		do {
@@ -182,15 +188,15 @@ int CMenuPcs::MLstOpen()
 			entry->duration = 4;
 			entry++;
 		} while (i < 9);
-		list->count = initializedCount;
-		state->initialized = 1;
+		GetMenuLstListStruct(this)->count = initializedCount;
+		GetMenuLstStateStruct(this)->initialized = 1;
 	}
 
 	completedItems = 0;
-	state->frame = state->frame + 1;
-	itemCount = (unsigned int)list->count;
-	entry = list->entries;
-	currentFrame = (int)state->frame;
+	GetMenuLstStateStruct(this)->frame = GetMenuLstStateStruct(this)->frame + 1;
+	itemCount = (unsigned int)GetMenuLstListStruct(this)->count;
+	entry = GetMenuLstListStruct(this)->entries;
+	currentFrame = (int)GetMenuLstStateStruct(this)->frame;
 	count = itemCount;
 	if ((int)itemCount > 0) {
 		do {
@@ -209,8 +215,8 @@ int CMenuPcs::MLstOpen()
 	}
 
 	one = 1.0f;
-	if (list->count == completedItems) {
-		entry = list->entries;
+	if (GetMenuLstListStruct(this)->count == completedItems) {
+		entry = GetMenuLstListStruct(this)->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;
 			if (count != 0) {

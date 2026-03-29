@@ -101,9 +101,9 @@ void CSystem::Init()
     m_orderSentinel.m_previous = &m_orderSentinel;
     m_orderSentinel.m_priority = 0xFF;
     m_freeOrderHead.m_next = m_orderPool;
-    for (int i = 0; i < 0x80; i++)
+    for (u32 i = 0; i < 0x80; i++)
     {
-        m_orderPool[i].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
+        m_orderPool[i].m_next = (i == 0x7Fu) ? &m_freeOrderHead : &m_orderPool[i + 1];
     }
 
     m_ownerThread = OSGetCurrentThread();

@@ -35,9 +35,9 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         return;
     }
 
-    _pppMngSt* pppMngSt = pppMngStPtr;
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
+    _pppMngSt* pppMngSt = pppMngStPtr;
 
     work->m_velocity = work->m_velocity + work->m_acceleration;
     work->m_distance = work->m_distance + work->m_velocity;

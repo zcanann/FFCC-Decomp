@@ -2014,9 +2014,23 @@ void CGObject::Turn(float targetRot, int turnFrames)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::HitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
+void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int colliderIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-	// TODO
+    CFlatRuntime::CStack stack[9];
+
+    stack[0].m_word = effectIndex;
+    stack[1].m_word = kind;
+    stack[2].m_word = nodeIndex;
+    stack[3].m_word = colliderIndex;
+    *(float*)&stack[4].m_word = pos->x;
+    *(float*)&stack[5].m_word = pos->y;
+    *(float*)&stack[6].m_word = pos->z;
+    stack[7].m_word = hitParam->m_particleIndex;
+    stack[8].m_word = (int)hitParam->m_classId;
+
+    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+        &CFlat, this, 2, 0xB, 9, stack, 0);
+    onHitParticle(effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
 }
 
 /*

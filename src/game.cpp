@@ -87,9 +87,9 @@ extern const char DAT_801d61b8[];
 extern const char DAT_801d6214[];
 extern const char DAT_801d6234[];
 extern const char DAT_8032f698[];
-extern const char* DAT_8032f6a0;
-extern const char* DAT_8032f6a4;
-extern const char* DAT_8032f6ac;
+extern const char DAT_8032f6a0[];
+extern const char DAT_8032f6a4[];
+extern const char DAT_8032f6ac[];
 extern const s16 DAT_8032e3d0[];
 const char* s_localLangDirs[] = {
     "jp/",
@@ -581,24 +581,27 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    const char* townName = DAT_8032f6ac;
+    CGame* game;
 
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
     Printf__7CSystemFPce(&System, DAT_801d6214);
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
-    memset(&Game.m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
-    memset(Game.m_gameWork.m_wmBackupParams, 0xFF, sizeof(Game.m_gameWork.m_wmBackupParams));
+    game = &Game;
 
-    *reinterpret_cast<unsigned int*>(&Game.m_gameWork.m_scriptSysVal0) = 1;
-    Game.m_gameWork.m_chaliceElement = 1;
+    memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
-    if (Game.m_gameWork.m_languageId == 3) {
-        townName = DAT_8032f6a4;
+    *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
+    game->m_gameWork.m_chaliceElement = 1;
+
+    if (game->m_gameWork.m_languageId == 3) {
+        strcpy(game->m_gameWork.m_townName, DAT_8032f6a4);
+    } else {
+        strcpy(game->m_gameWork.m_townName, DAT_8032f6ac);
     }
-    strcpy(Game.m_gameWork.m_townName, townName);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
-    InitFurTexBuffer__6CCharaFv(&Chara);
+    Chara.InitFurTexBuffer();
 }
 
 /*

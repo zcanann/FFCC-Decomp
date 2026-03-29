@@ -16,6 +16,8 @@ extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc3__18CMaterialEditorPcs[];
 extern unsigned char m_table__18CMaterialEditorPcs[];
+extern "C" void* __ct__14CUSBStreamDataFv(void*);
+extern "C" void* __ct__5ZLISTFv(void*);
 
 struct pppFMATRIX {
     float value[3][4];
@@ -26,6 +28,10 @@ class CMaterialEditorPcs : public CProcess
 public:
     CMaterialEditorPcs()
     {
+        __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x84);
+        __ct__5ZLISTFv(reinterpret_cast<unsigned char*>(this) + 0xC8);
+        __ct__5ZLISTFv(reinterpret_cast<unsigned char*>(this) + 0xD8);
+
         unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
         dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
         dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
@@ -67,12 +73,10 @@ public:
 
     CMemory::CStage* m_stage; // 0x04
     unsigned char _pad08[0x7C];
-    CUSBStreamData m_usbStream; // 0x84
-
-    unsigned char _padA8[0x20];
-
-    ZLIST m_zlist1; // 0xC8
-    ZLIST m_zlist2; // 0xD8
+    unsigned char m_usbStreamStorage[0x14]; // 0x84
+    unsigned char _pad98[0x30];
+    unsigned char m_zlist1Storage[0x10]; // 0xC8
+    unsigned char m_zlist2Storage[0x10]; // 0xD8
 
     unsigned char _padE8[0x44];
 

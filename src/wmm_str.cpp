@@ -32,7 +32,6 @@ extern const char* s_SlotBTextByLanguage[];
 
 extern const float FLOAT_803336CC;
 extern const double DOUBLE_803336D0;
-extern const double DOUBLE_803336D8;
 
 /*
  * --INFO--
@@ -76,7 +75,9 @@ int CMenuPcs::GetSlotABXPos(int right)
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     short* windowInfo = singWindowInfo;
-    int x = (int)(((double)(windowInfo[2] - slotAWidth) * DOUBLE_803336D0) + (double)windowInfo[0]);
+    double centeredWidth = (double)(windowInfo[2] - slotAWidth);
+    double windowLeft = (double)windowInfo[0];
+    int x = (int)(centeredWidth * DOUBLE_803336D0 + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
@@ -125,7 +126,9 @@ int CMenuPcs::GetYesNoXPos(int right)
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     short* windowInfo = singWindowInfo;
-    int x = (int)(((double)(windowInfo[2] - yesWidth) * DOUBLE_803336D0) + (double)windowInfo[0]);
+    double centeredWidth = (double)(windowInfo[2] - yesWidth);
+    double windowLeft = (double)windowInfo[0];
+    int x = (int)(centeredWidth * DOUBLE_803336D0 + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;

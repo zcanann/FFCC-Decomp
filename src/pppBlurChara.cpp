@@ -341,6 +341,27 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 }
 
+struct BlurCharaColorData {
+    u8 _pad0[8];
+    pppCVECTOR m_color;
+};
+
+struct BlurCharaTexData {
+    u8 _pad0[4];
+    int m_objPosBase;
+    _GXTexObj* m_texObj;
+};
+
+static inline BlurCharaColorData* GetBlurColorData(pppBlurChara* blurChara, const pppBlurCharaUnkC* data)
+{
+    return reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + data->m_serializedDataOffsets[1]);
+}
+
+static inline BlurCharaTexData* GetBlurTexData(pppBlurChara* blurChara, const pppBlurCharaUnkC* data)
+{
+    return reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800ddaf8
@@ -352,14 +373,11 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
+    BlurCharaColorData* colorData = GetBlurColorData(blurChara, param_3);
+    BlurCharaTexData* texData = GetBlurTexData(blurChara, param_3);
     int textureBase = 0;
     int textureIndex;
-    int texOffset = param_3->m_serializedDataOffsets[2];
-    int colorOffset = param_3->m_serializedDataOffsets[1];
     int objPosBase;
-    u8* blurBase = reinterpret_cast<u8*>(blurChara) + 0x80;
-    u8* colorBase = blurBase + colorOffset;
-    u8* texBase = blurBase + texOffset;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
     Mtx identityMtx;
@@ -382,7 +400,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     if (param_2->m_textureMode == 1) {
         textureIndex = 0;
-        if (param_2->m_initWOrk == -1) {
+        if (param_2->m_initWOrk == 0xFFFF) {
             return;
         }
         textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
@@ -395,9 +413,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(reinterpret_cast<pppCVECTOR*>(colorBase + 8), 0, FLOAT_80331030,
-                                                               param_2->m_alpha, 0, 0, 0, 1, 1, 0);
-    objPosBase = *reinterpret_cast<int*>(texBase + 4);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, 0, FLOAT_80331030, param_2->m_alpha, 0, 0,
+                                                               0, 1, 1, 0);
+    objPosBase = texData->m_objPosBase;
 
     PSMTXIdentity(identityMtx);
 
@@ -432,13 +450,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
-    drawColor = *reinterpret_cast<_GXColor*>(colorBase + 8);
+    drawColor = *reinterpret_cast<_GXColor*>(&colorData->m_color);
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);
-    GXLoadTexObj(*reinterpret_cast<_GXTexObj**>(texBase + 8), GX_TEXMAP0);
+    GXLoadTexObj(texData->m_texObj, GX_TEXMAP0);
     _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 10, 8,
                                                                                                           0xF);
     _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);

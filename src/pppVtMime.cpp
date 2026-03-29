@@ -146,34 +146,15 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     }
 
     float* outputVerts = (float*)*memPtr;
-    if (vertCount != 0) {
-        int pairCount = (unsigned int)vertCount >> 1;
-        if (pairCount != 0) {
-            do {
+    int pairCount = vertCount;
+    if (pairCount != 0) {
+        for (; pairCount != 0; pairCount--) {
             outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
             outputVerts[1] = vert1Pos[1] + state->value * (vert2Pos[1] - vert1Pos[1]);
             outputVerts[2] = vert1Pos[2] + state->value * (vert2Pos[2] - vert1Pos[2]);
-            outputVerts[3] = vert1Pos[3] + state->value * (vert2Pos[3] - vert1Pos[3]);
-            outputVerts[4] = vert1Pos[4] + state->value * (vert2Pos[4] - vert1Pos[4]);
-            outputVerts[5] = vert1Pos[5] + state->value * (vert2Pos[5] - vert1Pos[5]);
-            vert1Pos += 6;
-            vert2Pos += 6;
-            outputVerts += 6;
-                pairCount--;
-            } while (pairCount != 0);
-        }
-
-        pairCount = vertCount & 1;
-        if (pairCount != 0) {
-            do {
-                outputVerts[0] = vert1Pos[0] + state->value * (vert2Pos[0] - vert1Pos[0]);
-                outputVerts[1] = vert1Pos[1] + state->value * (vert2Pos[1] - vert1Pos[1]);
-                outputVerts[2] = vert1Pos[2] + state->value * (vert2Pos[2] - vert1Pos[2]);
-                vert1Pos += 3;
-                vert2Pos += 3;
-                outputVerts += 3;
-                pairCount--;
-            } while (pairCount != 0);
+            vert1Pos += 3;
+            vert2Pos += 3;
+            outputVerts += 3;
         }
     }
 

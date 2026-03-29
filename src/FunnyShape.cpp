@@ -404,59 +404,59 @@ void CFunnyShape::Update()
  */
 void CFunnyShape::Render()
 {
-    if ((Ptr(this, 0x60D4)[0] != 0) && (PtrAt(this, 0x6010) != 0)) {
-        GXClearVtxDesc();
-        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-        GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-        GXSetNumTexGens(1);
-        GXSetNumTevStages(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
-        GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
-        GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-        GXSetNumTevStages(1);
-        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-        _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-        _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
-        _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    if ((Ptr(this, 0x60D4)[0] == 0) || (AnimData(this) == 0)) {
+        return;
+    }
 
-        GXColor chanColor = DAT_8032fd60;
-        GXSetChanAmbColor(GX_COLOR0, chanColor);
-        GXColor matColor = chanColor;
-        GXSetChanMatColor(GX_COLOR0, matColor);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetNumTevStages(1);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-        s32 count;
-        if ((U32At(this, 0) & 0x80) == 0) {
-            count = 1;
-        } else {
-            count = *reinterpret_cast<s16*>(Ptr(this, 0x28));
-        }
+    GXColor chanColor = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXColor matColor = chanColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
 
-        const double baseX = static_cast<double>(FLOAT_8032fd9c);
-        const double baseY = static_cast<double>(FLOAT_8032fda0);
-        u8* cur = reinterpret_cast<u8*>(this);
-        u8* anm = reinterpret_cast<u8*>(PtrAt(this, 0x6010));
-        for (s32 i = 0; i < count; i++) {
-            Vec2d pos;
-            pos.x = static_cast<float>(baseX + static_cast<double>(*reinterpret_cast<float*>(cur + 0x38)));
-            pos.y = static_cast<float>(baseY + static_cast<double>(*reinterpret_cast<float*>(cur + 0x3C)));
+    s32 count;
+    if ((ShapeFlags(this) & 0x80) == 0) {
+        count = 1;
+    } else {
+        count = ShapeCount(this);
+    }
 
-            const s16 shapeIndex = *reinterpret_cast<s16*>(cur + 0x44);
-            const s32 shapeOffset = *reinterpret_cast<s32*>(anm + 0x10 + shapeIndex * 8);
-            const float drawAngle = *reinterpret_cast<float*>(cur + 0x58);
-            RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(anm + shapeOffset), pos, drawAngle);
-            cur += 0x30;
-        }
+    const double baseX = static_cast<double>(FLOAT_8032fd9c);
+    const double baseY = static_cast<double>(FLOAT_8032fda0);
+    CFunnyShapeAnmWork* work = AnmWork(this);
+    u8* animData = reinterpret_cast<u8*>(AnimData(this));
+    for (s32 i = 0; i < count; i++) {
+        Vec2d pos;
+        pos.x = static_cast<float>(baseX + static_cast<double>(work->x));
+        pos.y = static_cast<float>(baseY + static_cast<double>(work->y));
+
+        const s32 shapeOffset = *reinterpret_cast<s32*>(animData + 0x10 + work->frame * 8);
+        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, work->angle);
+        work++;
     }
 }
 

@@ -258,14 +258,14 @@ void CGItemObj::onCancelStat(int)
 void CGItemObj::onFrame()
 {
 	unsigned char* self = (unsigned char*)this;
-	void* pendingHandle = *(void**)(self + 0x564);
+	void* handle = *(void**)(self + 0x564);
 
-	if (pendingHandle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(pendingHandle) != 0) {
+	if (handle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(handle) != 0) {
 		if ((unsigned int)System.m_execParam > 2U) {
 			Printf__7CSystemFPce(&System, DAT_801dd010);
 		}
 
-		*(void**)(self + 0xF8) = pendingHandle;
+		*(void**)(self + 0xF8) = *(void**)(self + 0x564);
 		*(void**)(self + 0x564) = 0;
 
 		if (*(int*)(self + 0x500) == 0xCB) {
@@ -274,19 +274,20 @@ void CGItemObj::onFrame()
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
 			int soundEntry = *(int*)(*(int*)(SoundBuffer + 0x1260 + 0xF8) + 0x178);
-			if (soundEntry == 0) {
-				soundEntry = -1;
-			} else {
+			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
+			} else {
+				soundEntry = -1;
 			}
 
-			int ownerAttr = *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4);
-			int itemDataEntry = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
-			float particleScale =
-			    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(itemDataEntry + 0x10) + FLOAT_80331b4c;
-
-			putParticle__8CGPrgObjFiiP8CGObjectfi(this, (soundEntry << 8) | ownerAttr, *(int*)(self + 0x558), this,
-			                                      particleScale, 0x12909);
+			putParticle__8CGPrgObjFiiP8CGObjectfi(
+			    this, (soundEntry << 8) | *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4),
+			    *(int*)(self + 0x558), this,
+			    FLOAT_80331b50 *
+			            (float)(unsigned short)*(unsigned short*)(Game.unkCFlatData0[2] +
+			                                                       *(int*)(self + 0x504) * 0x48 + 0x10) +
+			        FLOAT_80331b4c,
+			    0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8,

@@ -1888,9 +1888,25 @@ void CGObject::DispCharaParts(int showParts)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetAttackCol(int, char*, float, Vec*)
+void CGObject::SetAttackCol(int hitIndex, char* nodeName, float hitMask, Vec* position)
 {
-	// TODO
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+    bool hasModel = false;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (hasModel) {
+        float nodeIndex = static_cast<float>(SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName));
+        AttackCol& attack = m_attackColliders[hitIndex];
+
+        attack.m_radius2 = nodeIndex;
+        attack.m_hitMask = static_cast<unsigned int>(hitMask);
+        attack.m_localStart.y = position->x;
+        attack.m_localStart.z = position->y;
+        attack.m_localEnd.x = position->z;
+    }
 }
 
 /*
@@ -1898,9 +1914,26 @@ void CGObject::SetAttackCol(int, char*, float, Vec*)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetDamageCol(int, char*, float, float, Vec*)
+void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, float active, Vec* position)
 {
-	// TODO
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+    bool hasModel = false;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (hasModel) {
+        float nodeIndex = static_cast<float>(SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName));
+        DamageCol& damage = m_damageColliders[colliderIndex];
+
+        damage.m_outerRadius = nodeIndex;
+        damage.m_hitMask = static_cast<unsigned int>(hitMask);
+        damage.m_active = static_cast<int>(active);
+        damage.m_localPosition.y = position->x;
+        damage.m_localPosition.z = position->y;
+        damage.m_worldPosition.x = position->z;
+    }
 }
 
 /*
@@ -2014,9 +2047,39 @@ void CGObject::Turn(float targetRot, int turnFrames)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::HitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
+void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int colliderIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-	// TODO
+    struct HitParticleStack {
+        int m_effectIndex;
+        int m_kind;
+        int m_nodeIndex;
+        int m_colliderIndex;
+        float m_x;
+        float m_y;
+        float m_z;
+        int m_particleIndex;
+        int m_classId;
+    };
+
+    typedef void (*OnHitParticleFn)(CGObject*, int, int, int, int, Vec*, PPPIFPARAM*);
+
+    HitParticleStack stack;
+    stack.m_effectIndex = effectIndex;
+    stack.m_kind = kind;
+    stack.m_nodeIndex = nodeIndex;
+    stack.m_colliderIndex = colliderIndex;
+    stack.m_x = pos->x;
+    stack.m_y = pos->y;
+    stack.m_z = pos->z;
+    stack.m_particleIndex = hitParam->m_particleIndex;
+    stack.m_classId = static_cast<int>(hitParam->m_classId);
+
+    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+        &CFlat, this, 2, 0xB, 9, reinterpret_cast<CFlatRuntime::CStack*>(&stack), 0);
+
+    OnHitParticleFn onHitParticle = *reinterpret_cast<OnHitParticleFn*>(
+        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x3C);
+    onHitParticle(this, effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
 }
 
 /*
@@ -2123,9 +2186,21 @@ void CGObject::InitWork(int index)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::LoadModel(int, unsigned long, unsigned long, int)
+void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant, int arg3)
 {
-	// TODO
+    if (m_charaModelHandle != 0) {
+        __dt__Q29CCharaPcs7CHandleFv(m_charaModelHandle, 1);
+        m_charaModelHandle = 0;
+    }
+
+    void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(0x194, Game.m_mainStage, s_gobject_cpp, 0xA01);
+    if (handle != 0) {
+        handle = __ct__Q29CCharaPcs7CHandleFv(handle);
+    }
+
+    m_charaModelHandle = static_cast<CCharaPcs::CHandle*>(handle);
+    Add__Q29CCharaPcs7CHandleFv(m_charaModelHandle);
+    LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(m_charaModelHandle, kind, modelId, variant, 0, -1, 0, arg3);
 }
 
 /*

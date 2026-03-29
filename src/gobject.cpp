@@ -2735,20 +2735,30 @@ void CGObject::ResetAnimPoint(int slot)
  */
 void CGObject::AddAnimPoint(int slot, int pointType, int pointFrame)
 {
-    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+    bool hasModel = false;
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (!hasModel) {
         return;
     }
 
-    CRef* animRef = m_charaModelHandle->m_animSlot[slot];
+    CRef* animRef = handle->m_animSlot[slot];
     if (animRef == 0) {
         return;
     }
 
     u8* animRefBytes = reinterpret_cast<u8*>(animRef);
-    u16 count = *reinterpret_cast<u16*>(animRefBytes + 0x2C);
-    *reinterpret_cast<u16*>(animRefBytes + 0x2E + count * 4) = static_cast<u16>(pointFrame);
-    *reinterpret_cast<u16*>(animRefBytes + 0x30 + count) = static_cast<u16>(pointType);
-    *reinterpret_cast<u16*>(animRefBytes + 0x2C) = static_cast<u16>(count + 1);
+    u16* count = reinterpret_cast<u16*>(animRefBytes + 0x2C);
+    u8* point = animRefBytes + *count * 4;
+
+    *reinterpret_cast<u16*>(point + 0x2E) = static_cast<u16>(pointFrame);
+    point = animRefBytes + *count * 4;
+    *reinterpret_cast<u16*>(point + 0x30) = static_cast<u16>(pointType);
+    *count = static_cast<u16>(*count + 1);
 }
 
 /*

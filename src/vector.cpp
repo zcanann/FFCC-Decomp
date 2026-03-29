@@ -10,8 +10,8 @@
  */
 float CVector::GetRotateY()
 {
-    const float zero = 0.0f;
-    if (this->x == zero && this->z == zero)
+    const float zero = kVectorZero;
+    if (zero == this->x && zero == this->z)
     {
         return zero;
     }

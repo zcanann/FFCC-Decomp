@@ -580,8 +580,10 @@ void CFunnyShape::RenderShape()
     GXColor matColor = chanColor;
     GXSetChanMatColor(GX_COLOR0, matColor);
 
+    FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010));
     Vec2d offset = {FLOAT_8032fd90, FLOAT_8032fd94};
-    RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010)), offset, FLOAT_8032fd6c);
+    const float angle = FLOAT_8032fd6c;
+    RenderShape(shape, offset, angle);
 }
 
 /*

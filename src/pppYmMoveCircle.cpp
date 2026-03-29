@@ -107,29 +107,37 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStep += stepData->m_angleStepStep;
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
+
     turnSpan = gPppYmMoveCircleTurnSpan;
-    work->m_angle += work->m_angleStep;
+    {
+        f32 angle = work->m_angle;
+
+        angle += work->m_angleStep;
+        work->m_angle = angle;
+    }
 
     if (work->m_angle > turnSpan) {
-        work->m_angle -= turnSpan;
-    }
-    if (work->m_angle < gPppYmMoveCircleZero) {
-        work->m_angle += gPppYmMoveCircleTurnSpan;
+        work->m_angle = work->m_angle - turnSpan;
     }
 
+    if (work->m_angle < gPppYmMoveCircleZero) {
+        work->m_angle = work->m_angle + gPppYmMoveCircleTurnSpan;
+    }
+
+    nextPos.y = gPppYmMoveCircleZero;
     {
         f32 tableAngle = (gPppYmMoveCircleAngleScale * (gPppYmMoveCircleAngleToTableScale * work->m_angle)) / gPppYmMoveCircleTableDivisor;
         tableIndex = (s32)tableAngle;
     }
+
+    nextPos.y = *(f32*)(pppMngSt + 0xC);
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
     cosAngle = *(f32*)((u8*)gPppTrigTable + ((tableIndex + 0x4000) & 0xFFFC));
     radiusX = work->m_radius * cosAngle;
     radiusZ = work->m_radius * -sinAngle;
-    nextPos.y = gPppYmMoveCircleZero;
     nextPos.x = radiusX;
     nextPos.z = radiusZ;
     nextPos.x += work->m_center.x;
-    nextPos.y = *(f32*)(pppMngSt + 0xC);
     nextPos.z += work->m_center.z;
 
     pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));

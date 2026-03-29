@@ -199,8 +199,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
         }
 
         uvLayout = (CMapMeshUVLayout*)mapMesh;
-        uvByteOffset = 0;
-        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+        for (i = uvByteOffset = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
             if (work->m_perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
                 work->m_perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
             }
@@ -216,8 +215,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     work->m_frame += 1;
     work->m_wait = 0x200;
 
-    uvByteOffset = 0;
-    for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+    for (i = uvByteOffset = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
         *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) + work->m_perU);
         if ((work->m_frame % (u32)payload[1]) == 0) {
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)(-((work->m_perU * (f32)(u32)payload[1]) -

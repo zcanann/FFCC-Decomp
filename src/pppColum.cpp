@@ -83,15 +83,13 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         GXColor quadColor;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
-        u8 alpha = positionWork->m_alpha;
-        if (alpha != 0) {
-            pppColumValue* values = frameWork->m_values;
+        if (positionWork->m_alpha != 0) {
             Mtx identityMtx;
             Vec cameraDelta;
-            short shapeFrame;
+            pppColumValue* values = frameWork->m_values;
             float lengthXY;
             float segmentStep;
-            float drawScale = 0.0f;
+            float drawScale;
 
             PSMTXIdentity(identityMtx);
             cameraDelta.x = ppvCameraMatrix0[0][3] - positionWork->m_position.x;
@@ -99,12 +97,14 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             cameraDelta.z = ppvCameraMatrix0[2][3] + positionWork->m_position.z;
 
             lengthXY = sqrtf(cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y);
-            if (lengthXY > 0.0f) {
+            if (0.0f < lengthXY) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
-            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
 
             pppInitBlendMode();
+            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
+            drawScale = 0.0f;
+
             for (int i = 0; i < param_2->m_count; i++) {
                 Vec center;
                 Vec offset;
@@ -114,20 +114,18 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 Vec2d uvB;
                 float dist;
                 float fadeAmount;
-                float positionStep = segmentStep * values->m_positionScale;
+                float positionScale = segmentStep * values->m_positionScale;
 
-                center.x =
-                    positionWork->m_position.x + positionStep * (cameraDelta.x * (float)(i + 1));
-                center.y =
-                    positionWork->m_position.y + positionStep * (cameraDelta.y * (float)(i + 1));
+                center.x = positionWork->m_position.x + positionScale * (cameraDelta.x * (float)(i + 1));
+                center.y = positionWork->m_position.y + positionScale * (cameraDelta.y * (float)(i + 1));
                 center.z = 0.0f;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 dist = PSVECMag(&offset);
 
-                color.m_rgba[3] = alpha;
+                color.m_rgba[3] = positionWork->m_alpha;
                 fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
-                if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > 0.0f) {
+                if (dist < *(float*)(param_2->m_payload + 0x10) && 0.0f < fadeAmount) {
                     color.m_rgba[3] = (u8)((float)color.m_rgba[3] * fadeAmount);
                 }
                 color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
@@ -147,8 +145,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;
-                shapeFrame = *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
-                for (int j = 0; j < *(short*)((u8*)shapeSt->m_animData + shapeFrame + 2); j++) {
+                u8* frameData =
+                    (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
+                for (int j = 0; j < *(short*)(frameData + 2); j++) {
                     pppGetShapePos__FPlsR3VecR3Veci(
                         (long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);
                     pppGetShapeUV__FPlsR5Vec2dR5Vec2di(

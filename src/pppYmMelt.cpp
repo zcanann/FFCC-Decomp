@@ -58,15 +58,12 @@ struct YmMeltWork {
     f32 m_phaseAccel;
 };
 
-struct CMapCylinderRaw {
-    Vec m_bottom;
-    Vec m_direction;
-    f32 m_radius;
-    f32 m_height;
-    Vec m_top;
-    Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
+struct YmMeltColorWork {
+    u8 _pad0[8];
+    union {
+        pppCVECTOR m_color;
+        float m_colorValue;
+    };
 };
 
 struct Vec2d {
@@ -84,6 +81,9 @@ void InitPolygonData(PYmMelt*, VERTEX_DATA*, short)
 	// TODO
 }
 
+#define CalcPolygonHeight CalcPolygonHeight__FP7PYmMeltP11VERTEX_DATAP8_GXColorf
+extern "C" void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
+
 /*
  * --INFO--
  * PAL Address: 0x800A5D5C
@@ -93,7 +93,7 @@ void InitPolygonData(PYmMelt*, VERTEX_DATA*, short)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float param_4)
+extern "C" void CalcPolygonHeight(PYmMelt* ymMelt, VERTEX_DATA* param_2, _GXColor* param_3, float param_4)
 {
     int i;
     int pointCount;
@@ -104,26 +104,30 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
     float expand;
     Vec worldBase;
     Vec rayDirection;
-    CMapCylinderRaw cylinder;
+    CMapCylinder cylinder;
     YmMeltVertex* vertex;
+    VERTEX_DATA* vertexData = (VERTEX_DATA*)ymMelt;
+    YmMeltVertex* vertexBuffer = (YmMeltVertex*)param_2;
+    pppCVECTOR* color = (pppCVECTOR*)param_3;
+    float yOffset = param_4;
 
-    pointCount = param_2->m_gridSize + 1;
+    pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
     savedY = pppMngStPtr->m_savedPosition.y;
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
     expand = FLOAT_80330b18;
-    vertex = (YmMeltVertex*)param_3;
+    vertex = vertexBuffer;
 
     for (i = 0; i < pointCount; i++, vertex++) {
-        vertex->m_color.m_bytes[0] = param_3->r;
-        vertex->m_color.m_bytes[1] = param_3->g;
-        vertex->m_color.m_bytes[2] = param_3->b;
-        vertex->m_color.m_bytes[3] = param_3->a;
+        vertex->m_color.m_bytes[0] = color->rgba[0];
+        vertex->m_color.m_bytes[1] = color->rgba[1];
+        vertex->m_color.m_bytes[2] = color->rgba[2];
+        vertex->m_color.m_bytes[3] = color->rgba[3];
 
         worldBase.x = pppMngStPtr->m_matrix.value[0][3];
-        worldBase.y = pppMngStPtr->m_matrix.value[1][3] + param_2->m_collisionYOffset;
+        worldBase.y = pppMngStPtr->m_matrix.value[1][3] + vertexData->m_collisionYOffset;
         worldBase.z = pppMngStPtr->m_matrix.value[2][3];
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
@@ -146,16 +150,16 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) == 0) {
             vertex->m_position.y = savedY;
-            if (param_2->m_hideWhenNoGround != 0) {
+            if (vertexData->m_hideWhenNoGround != 0) {
                 vertex->m_color.m_bytes[0] = 0;
                 vertex->m_color.m_bytes[1] = 0;
                 vertex->m_color.m_bytes[2] = 0;
                 vertex->m_color.m_bytes[3] = 0;
             }
         } else {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &vertex->m_position);
-            if ((vertex->m_position.y < (savedY - param_2->m_maxDropDistance)) &&
-                ((vertex->m_position.y = savedY), param_2->m_hideWhenNoGround != 0)) {
+            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &vertex->m_position);
+            if ((vertex->m_position.y < (savedY - vertexData->m_maxDropDistance)) &&
+                ((vertex->m_position.y = savedY), vertexData->m_hideWhenNoGround != 0)) {
                 vertex->m_color.m_bytes[0] = 0;
                 vertex->m_color.m_bytes[1] = 0;
                 vertex->m_color.m_bytes[2] = 0;
@@ -163,11 +167,11 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
             }
         }
 
-        vertex->m_position.y += param_2->m_heightBias;
-        vertex->m_position.y -= param_4;
+        vertex->m_position.y += vertexData->m_heightBias;
+        vertex->m_position.y -= yOffset;
     }
 
-    DCFlushRange(param_3, pointCount * 0x10);
+    DCFlushRange(vertexBuffer, pointCount * 0x10);
 }
 
 /*
@@ -231,6 +235,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
+    YmMeltColorWork* colorWork = (YmMeltColorWork*)((u8*)ymMelt + offsets->m_serializedDataOffsets[1] + 0x80);
     u16 gridSize = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
     int grid = (int)gridSize + 1;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
@@ -241,36 +246,34 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
             0xA9);
 
         YmMeltVertex* vertexData = work->m_vertexData;
-        YmMeltVertex* vtxBase = vertexData;
         int angleSeed = rand();
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         work->m_phaseOffset = (s16)(angleSeed - (angleSeed / (int)phaseDiv) * phaseDiv);
-        s16 phaseOffset = work->m_phaseOffset;
-
-        double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
-        double step = (double)(ctrl->m_stepValue / (float)((double)gridSize - DOUBLE_80330af8));
-        double rot = (double)(FLOAT_80330b0c * (float)((double)phaseOffset - DOUBLE_80330b00));
+        float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
+        float step = ctrl->m_stepValue / (f32)((double)gridSize - DOUBLE_80330af8);
+        float rot = FLOAT_80330b0c * (f32)((double)work->m_phaseOffset - DOUBLE_80330b00);
         Mtx rotMtx;
 
-        for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
-            YmMeltVertex* vtx = vtxBase;
+        for (float z = -halfWidth; z <= halfWidth; z += step) {
+            YmMeltVertex* vtx = vertexData;
 
-            for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
-                vtx->m_position.x = (float)x;
+            for (float x = -halfWidth; x <= halfWidth; x += step) {
+                vtx->m_position.x = x;
                 vtx->m_position.y = kPppYmMeltZero;
-                vtx->m_position.z = (float)z;
+                vtx->m_position.z = z;
 
-                if (phaseOffset != 0) {
-                    PSMTXRotRad(rotMtx, 'y', (float)rot);
+                if (work->m_phaseOffset != 0) {
+                    PSMTXRotRad(rotMtx, 'y', rot);
                     PSMTXMultVec(rotMtx, &vtx->m_position, &vtx->m_position);
                 }
 
                 vtx++;
-                vtxBase++;
+                vertexData++;
             }
         }
 
-        CalcPolygonHeight(ymMelt, (VERTEX_DATA*)ctrl, (_GXColor*)vertexData, matrixY);
+        CalcPolygonHeight((PYmMelt*)ctrl, (VERTEX_DATA*)work->m_vertexData, (_GXColor*)&colorWork->m_color,
+                          matrixY);
     }
 
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;
@@ -303,6 +306,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 {
     s32 colorOffset;
     YmMeltWork* work;
+    YmMeltColorWork* colorWork;
     pppShapeSt* shape;
     CTexture* texture;
     int textureIndex;
@@ -319,6 +323,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
+    colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
     if (ctrl->m_dataValIndex == 0xFFFF) {
         return;
     }
@@ -326,7 +331,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)ymMelt + 0x88 + colorOffset, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
+        &colorWork->m_color, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
         ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
     pppSetBlendMode(*(u8*)&ctrl->m_arg3);
 
@@ -360,7 +365,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     }
 
     phaseLerp = FLOAT_80330af4 - work->m_phase;
-    drawColor = *(float*)((u8*)ymMelt + 0x88 + colorOffset);
+    drawColor = colorWork->m_colorValue;
     worldX = pppMngStPtr->m_matrix.value[0][3];
     worldY = pppMngStPtr->m_matrix.value[1][3];
     worldZ = pppMngStPtr->m_matrix.value[2][3];

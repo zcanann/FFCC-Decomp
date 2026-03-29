@@ -88,7 +88,7 @@ public:
     CMemory::CStage* GetMemoryStage();
 
 private:
-    unsigned char m_pad004[0x3C];
+    unsigned char m_pad004[0x40];
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
@@ -98,22 +98,22 @@ private:
     unsigned int m_lockedEnvUnknown5c;   // 0x5C
     unsigned char m_pad060[0xBC];
     int m_texMapIdCur;                   // 0x11C
-    int m_texMtxCur;                     // 0x120
-    int m_texCoordIdCur;                 // 0x124
+    int m_texCoordIdCur;                 // 0x120
+    int m_texMtxCur;                     // 0x124
     int m_stdTexMapId;                   // 0x128
-    int m_stdTexMtx;                     // 0x12C
-    int m_stdTexCoordId;                 // 0x130
+    int m_stdTexCoordId;                 // 0x12C
+    int m_stdTexMtx;                     // 0x130
     int m_texMapIdCurShadow;             // 0x134
-    int m_texMtxCurShadow;               // 0x138
-    int m_texCoordIdCurShadow;           // 0x13C
+    int m_texCoordIdCurShadow;           // 0x138
+    int m_texMtxCurShadow;               // 0x13C
     unsigned char m_pad140[0xC5];
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
-    unsigned char m_pad209[0x0A];
-    CColor m_color213;                   // 0x213
-    unsigned char m_pad217[1];
+    unsigned char m_pad209[0x07];
+    CColor m_color210;                   // 0x210
+    unsigned char m_pad214[0x04];
     CMemory::CStage* m_materialStage;    // 0x218
 };
 

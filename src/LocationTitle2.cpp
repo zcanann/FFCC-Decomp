@@ -265,104 +265,107 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
  */
 extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
-    int serializedOffset = *unkC->m_serializedDataOffsets;
+    int serializedOffset;
+    int graphFrame;
+    LocationTitle2Work* work;
+    LocationTitle2Particle* particle;
+    long** shapeTable;
 
-    if (unkB->m_dataValIndex != 0xFFFF) {
-        int graphFrame;
-        LocationTitle2Work* work;
-        LocationTitle2Particle* particle;
-        long** shapeTable;
+    serializedOffset = *unkC->m_serializedDataOffsets;
+    work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
 
-        work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
-        graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
-        particle = (LocationTitle2Particle*)work->m_particles;
-        shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-
-        pppSetBlendMode(unkB->m_blendMode);
-
-        if (Game.m_currentSceneId != 7) {
-            Vec matrixPos;
-            Vec cameraPos;
-            Vec look;
-            Vec lookNorm;
-            Vec side;
-            Vec up;
-
-            matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
-            matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
-            matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
-
-            cameraPos.x = CameraPcs._224_4_;
-            cameraPos.y = CameraPcs._228_4_;
-            cameraPos.z = CameraPcs._232_4_;
-
-            PSVECSubtract(&cameraPos, &matrixPos, &look);
-            if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {
-                return;
-            }
-
-            PSVECNormalize(&look, &lookNorm);
-            side.x = lookNorm.z;
-            side.y = 0.0f;
-            side.z = -lookNorm.x;
-
-            if ((lookNorm.z == 0.0f) && (side.z == 0.0f)) {
-                side.x = 1.0f;
-                side.z = 0.0f;
-                up.x = 0.0f;
-                up.y = 0.0f;
-                up.z = 1.0f;
-            } else {
-                PSVECNormalize(&side, &side);
-                PSVECCrossProduct(&lookNorm, &side, &up);
-                PSVECNormalize(&up, &up);
-            }
-
-            pppMngStPtr->m_matrix.value[0][0] = side.x;
-            pppMngStPtr->m_matrix.value[1][0] = side.y;
-            pppMngStPtr->m_matrix.value[2][0] = side.z;
-            pppMngStPtr->m_matrix.value[0][1] = up.x;
-            pppMngStPtr->m_matrix.value[1][1] = up.y;
-            pppMngStPtr->m_matrix.value[2][1] = up.z;
-            pppMngStPtr->m_matrix.value[0][2] = lookNorm.x;
-            pppMngStPtr->m_matrix.value[1][2] = lookNorm.y;
-            pppMngStPtr->m_matrix.value[2][2] = lookNorm.z;
-        }
-
-        for (int i = 0; i < work->m_count; i++) {
-            Mtx model;
-            Vec transformedPos;
-
-            if (graphFrame <= particle->m_frame) {
-                PSMTXIdentity(model);
-                model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];
-                model[1][1] = pppMngStPtr->m_scale.y * locationTitle->m_localMatrix.value[1][1];
-                model[2][2] = pppMngStPtr->m_scale.z * locationTitle->m_localMatrix.value[2][2];
-
-                PSMTXMultVec(pppMngStPtr->m_matrix.value, &particle->m_pos, &transformedPos);
-                PSMTXMultVec(ppvCameraMatrix0, &transformedPos, &transformedPos);
-
-                model[0][3] = transformedPos.x;
-                model[1][3] = transformedPos.y;
-                model[2][3] = transformedPos.z;
-
-                pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 1, 1, 1);
-                GXSetCullMode(GX_CULL_NONE);
-                GXSetColorUpdate(GX_FALSE);
-                GXLoadPosMtxImm(model, 0);
-
-                if (unkB->m_enableColorUpdate != 0) {
-                    GXSetColorUpdate(GX_TRUE);
-                }
-
-                GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
-                pppDrawShp(*shapeTable, particle->m_shape, pppEnvStPtr->m_materialSetPtr, unkB->m_blendMode);
-            }
-
-            particle++;
-        }
-
-        GXSetColorUpdate(GX_TRUE);
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    if (unkB->m_dataValIndex == 0xFFFF) {
+        return;
     }
+
+    graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
+    particle = (LocationTitle2Particle*)work->m_particles;
+    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+
+    pppSetBlendMode(unkB->m_blendMode);
+
+    if (Game.m_currentSceneId != 7) {
+        Vec matrixPos;
+        Vec cameraPos;
+        Vec look;
+        Vec lookNorm;
+        Vec side;
+        Vec up;
+
+        matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
+        matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
+        matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+
+        cameraPos.x = CameraPcs._224_4_;
+        cameraPos.y = CameraPcs._228_4_;
+        cameraPos.z = CameraPcs._232_4_;
+
+        PSVECSubtract(&cameraPos, &matrixPos, &look);
+        if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {
+            return;
+        }
+
+        PSVECNormalize(&look, &lookNorm);
+        side.x = lookNorm.z;
+        side.y = 0.0f;
+        side.z = -lookNorm.x;
+
+        if ((lookNorm.z == 0.0f) && (side.z == 0.0f)) {
+            side.x = 1.0f;
+            side.z = 0.0f;
+            up.x = 0.0f;
+            up.y = 0.0f;
+            up.z = 1.0f;
+        } else {
+            PSVECNormalize(&side, &side);
+            PSVECCrossProduct(&lookNorm, &side, &up);
+            PSVECNormalize(&up, &up);
+        }
+
+        pppMngStPtr->m_matrix.value[0][0] = side.x;
+        pppMngStPtr->m_matrix.value[1][0] = side.y;
+        pppMngStPtr->m_matrix.value[2][0] = side.z;
+        pppMngStPtr->m_matrix.value[0][1] = up.x;
+        pppMngStPtr->m_matrix.value[1][1] = up.y;
+        pppMngStPtr->m_matrix.value[2][1] = up.z;
+        pppMngStPtr->m_matrix.value[0][2] = lookNorm.x;
+        pppMngStPtr->m_matrix.value[1][2] = lookNorm.y;
+        pppMngStPtr->m_matrix.value[2][2] = lookNorm.z;
+    }
+
+    for (int i = 0; i < work->m_count; i++) {
+        Mtx model;
+        Vec transformedPos;
+
+        if (graphFrame <= particle->m_frame) {
+            PSMTXIdentity(model);
+            model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];
+            model[1][1] = pppMngStPtr->m_scale.y * locationTitle->m_localMatrix.value[1][1];
+            model[2][2] = pppMngStPtr->m_scale.z * locationTitle->m_localMatrix.value[2][2];
+
+            PSMTXMultVec(pppMngStPtr->m_matrix.value, &particle->m_pos, &transformedPos);
+            PSMTXMultVec(ppvCameraMatrix0, &transformedPos, &transformedPos);
+
+            model[0][3] = transformedPos.x;
+            model[1][3] = transformedPos.y;
+            model[2][3] = transformedPos.z;
+
+            pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 1, 1, 1);
+            GXSetCullMode(GX_CULL_NONE);
+            GXSetColorUpdate(GX_FALSE);
+            GXLoadPosMtxImm(model, 0);
+
+            if (unkB->m_enableColorUpdate != 0) {
+                GXSetColorUpdate(GX_TRUE);
+            }
+
+            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
+            pppDrawShp(*shapeTable, particle->m_shape, pppEnvStPtr->m_materialSetPtr, unkB->m_blendMode);
+        }
+
+        particle++;
+    }
+
+    GXSetColorUpdate(GX_TRUE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }

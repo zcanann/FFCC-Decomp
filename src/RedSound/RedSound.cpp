@@ -139,55 +139,56 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
 	memset(DAT_8032e17c, 0, 0x100);
 
-	if (param_3 <= 0 || param_5 <= 0) {
+	if (param_3 > 0 && param_5 > 0) {
+		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
+			if (gRedMemoryDebugEnabled != 0) {
+				OSReport(s_redSoundMemorySettingErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)param_2,
+				         param_3, sRedSoundLogReset);
+				fflush(__files + 1);
+			}
+			return 0;
+		}
+
+		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
+			if (gRedMemoryDebugEnabled != 0) {
+				OSReport(s_redSoundAMemorySettingErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, param_4, param_5,
+				         sRedSoundLogReset);
+				fflush(__files + 1);
+			}
+			return 0;
+		}
+
+		if (ARCheckInit() == 0) {
+			if (gRedMemoryDebugEnabled != 0) {
+				OSReport(s_redSoundArNotInitializedFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
+				fflush(__files + 1);
+			}
+			return 0;
+		}
+
+		AIReset();
+		AIInit(0);
+		AXInit();
+		AXARTInit();
+		DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
+		DAT_8032e154.Init();
+		Start();
+		CRedDriver_8032f4c0.Init();
+
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport(s_redSoundInitErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
+			OSReport(s_redSoundInitOkFmt, sRedSoundLogPrefix, sRedSoundLogInfoColor, sRedSoundLogReset);
 			fflush(__files + 1);
 		}
-		return 0;
-	}
 
-	if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
-		if (gRedMemoryDebugEnabled != 0) {
-			OSReport(s_redSoundMemorySettingErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)param_2,
-			         param_3, sRedSoundLogReset);
-			fflush(__files + 1);
-		}
-		return 0;
+		return param_3;
 	}
-
-	if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
-		if (gRedMemoryDebugEnabled != 0) {
-			OSReport(s_redSoundAMemorySettingErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, param_4, param_5,
-			         sRedSoundLogReset);
-			fflush(__files + 1);
-		}
-		return 0;
-	}
-
-	if (ARCheckInit() == 0) {
-		if (gRedMemoryDebugEnabled != 0) {
-			OSReport(s_redSoundArNotInitializedFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
-			fflush(__files + 1);
-		}
-		return 0;
-	}
-
-	AIReset();
-	AIInit(0);
-	AXInit();
-	AXARTInit();
-	DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
-	DAT_8032e154.Init();
-	Start();
-	CRedDriver_8032f4c0.Init();
 
 	if (gRedMemoryDebugEnabled != 0) {
-		OSReport(s_redSoundInitOkFmt, sRedSoundLogPrefix, sRedSoundLogInfoColor, sRedSoundLogReset);
+		OSReport(s_redSoundInitErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
 		fflush(__files + 1);
 	}
 
-	return param_3;
+	return 0;
 }
 #pragma optimization_level 4
 

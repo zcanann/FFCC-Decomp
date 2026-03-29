@@ -365,12 +365,12 @@ CPtrArray<CTexAnim*>::~CPtrArray()
 template <>
 bool CPtrArray<CTexAnim*>::Add(CTexAnim* item)
 {
-    if (setSize(m_numItems + 1) != 0) {
-        m_items[m_numItems] = item;
-        m_numItems = m_numItems + 1;
-        return true;
+    if (setSize(m_numItems + 1) == 0) {
+        return false;
     }
-    return false;
+    m_items[m_numItems] = item;
+    m_numItems = m_numItems + 1;
+    return true;
 }
 
 /*

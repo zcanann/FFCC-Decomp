@@ -326,7 +326,7 @@ void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	u16 sVar4;
 	u32 i;
 
-	if ((param_2 < 0x4000) || (0x8000000 < param_2 + *param_3)) {
+	if ((param_2 < 0x4000) || (param_2 + *param_3 > 0x8000000)) {
 		return;
 	}
 

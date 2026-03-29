@@ -80,7 +80,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
-    int i;
+    s32 i;
     s32 uvByteOffset;
     CMapMeshUVLayout* uvLayout;
 
@@ -93,7 +93,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0];
     work->m_perU = FLOAT_8033054c;
-    work->m_perV = work->m_perU;
+    work->m_perV = FLOAT_8033054c;
 
     if (uvLayout != NULL) {
         uvByteOffset = 0;
@@ -174,6 +174,8 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     CMapMesh* mapMesh;
     CMapMeshUVLayout* uvLayout;
     s32* payload;
+    f32 perU;
+    f32 perV;
     s32 uvByteOffset;
     s32 i;
 
@@ -193,7 +195,10 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     }
 
     mapMesh = GetMapMeshTable()[step->m_dataValIndex];
-    if ((work->m_perU == FLOAT_8033054c) || (work->m_perV == FLOAT_8033054c)) {
+    perU = work->m_perU;
+    perV = work->m_perV;
+
+    if ((perU == FLOAT_8033054c) || (perV == FLOAT_8033054c)) {
         if (mapMesh == NULL) {
             return;
         }
@@ -218,17 +223,16 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
 
     uvByteOffset = 0;
     for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-        *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) + work->m_perU);
+        *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) + perU);
         if ((work->m_frame % (u32)payload[1]) == 0) {
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) = (s16)(-((work->m_perU * (f32)(u32)payload[1]) -
-                                                                         (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)));
+            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
+                (s16)(-((perU * (f32)(u32)payload[1]) - (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)));
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) =
-                (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) + work->m_perV);
+                (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) + perV);
         }
         if ((u32)(payload[1] * payload[2]) <= work->m_frame) {
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) = (s16)(-((work->m_perV * (f32)(u32)payload[2]) -
-                                                                             (f32)*(s16*)((u8*)uvLayout->m_uvPairs +
-                                                                                          uvByteOffset + 2)));
+            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) =
+                (s16)(-((perV * (f32)(u32)payload[2]) - (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)));
         }
         uvByteOffset += 4;
     }

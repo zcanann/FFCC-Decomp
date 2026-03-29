@@ -336,7 +336,7 @@ void CFunnyShape::InitAnmWork()
  */
 void CFunnyShape::Update()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (PtrAt(this, 0xC) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (PtrAt(this, 0xC) == 0)) {
         return;
     }
 
@@ -550,7 +550,7 @@ void CFunnyShape::RenderTexture()
  */
 void CFunnyShape::RenderShape()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (PtrAt(this, 0x6010) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (PtrAt(this, 0x6010) == 0)) {
         return;
     }
 

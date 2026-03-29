@@ -43,6 +43,11 @@ static void WriteF32(void* base, unsigned int offset, float value) {
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
 }
 
+static inline CUSBStreamData* UsbStream(CMaterialEditorPcs* self)
+{
+    return reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(self) + 0x84);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004c6a0
@@ -54,6 +59,9 @@ static void WriteF32(void* base, unsigned int offset, float value) {
  */
 CMaterialEditorPcs::~CMaterialEditorPcs()
 {
+    reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xD8)->~ZLIST();
+    reinterpret_cast<ZLIST*>(reinterpret_cast<unsigned char*>(this) + 0xC8)->~ZLIST();
+    UsbStream(this)->~CUSBStreamData();
 }
 
 /*
@@ -270,7 +278,7 @@ void CMaterialEditorPcs::createViewer()
     WriteF32(self, 0xec, fVar1);
 
     PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x20C));
-    m_usbStream.CreateBuffer();
+    UsbStream(this)->CreateBuffer();
 }
 
 /*
@@ -374,10 +382,10 @@ void CMaterialEditorPcs::calcViewer()
 
     USBPcs.mccReadData();
 
-    int usbDone = m_usbStream.IsUSBStreamDataDone();
+    int usbDone = UsbStream(this)->IsUSBStreamDataDone();
     if (usbDone != 0) {
         SetUSBData();
-        m_usbStream.SetUSBStreamDataDone();
+        UsbStream(this)->SetUSBStreamDataDone();
     }
 
     srt.transX = FLOAT_8032FCD8;

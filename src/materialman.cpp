@@ -114,6 +114,63 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
+// The TEV state block is still under reconstruction, so these helpers pin the
+// verified offsets in one place instead of scattering raw byte math.
+static inline int& TexMapIdCur(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x118));
+}
+
+static inline int& TexMtxCur(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x11C));
+}
+
+static inline int& TexCoordIdCur(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x120));
+}
+
+static inline int& StdTexMapId(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x124));
+}
+
+static inline int& StdTexMtx(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x128));
+}
+
+static inline int& StdTexCoordId(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x12C));
+}
+
+static inline int& TexMapIdCurShadow(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x130));
+}
+
+static inline int& TexMtxCurShadow(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x134));
+}
+
+static inline int& TexCoordIdCurShadow(CMaterialMan* self)
+{
+    return *reinterpret_cast<int*>(Ptr(self, 0x138));
+}
+
+static inline unsigned int& StdEnvTevBit(CMaterialMan* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x3C));
+}
+
+static inline unsigned int& CurEnvTevBit(CMaterialMan* self)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x44));
+}
+
 typedef void (*VirtualDtorFn)(void*, int);
 
 static void ReleaseRef(void* object)
@@ -2187,8 +2244,8 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = m_texCoordIdCur;
-    m_texCoordIdCur = texCoordId + 1;
+    int texCoordId = TexCoordIdCur(this);
+    TexCoordIdCur(this) = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2260,8 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = m_texMtxCur;
-    m_texMtxCur = texMtx + 3;
+    int texMtx = TexMtxCur(this);
+    TexMtxCur(this) = texMtx + 3;
     return texMtx;
 }
 
@@ -2245,13 +2302,19 @@ void CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    int texMapId = StdTexMapId(this);
+    TexMapIdCur(this) = texMapId;
+    TexMapIdCurShadow(this) = texMapId;
+
+    int texMtx = StdTexMtx(this);
+    TexMtxCur(this) = texMtx;
+    TexMtxCurShadow(this) = texMtx;
+
+    int texCoordId = StdTexCoordId(this);
+    TexCoordIdCur(this) = texCoordId;
+    TexCoordIdCurShadow(this) = texCoordId;
+
+    CurEnvTevBit(this) = StdEnvTevBit(this);
 }
 
 /*

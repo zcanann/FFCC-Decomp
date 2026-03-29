@@ -145,6 +145,34 @@ struct RawPtrArray {
     int growCapacity;
 };
 
+struct MaterialManTevState {
+    unsigned int stdEnvTevBit;
+    unsigned int activeEnvTevBit;
+    unsigned int curEnvTevBit;
+};
+
+struct MaterialManTexState {
+    int texMapIdCur;
+    int texMtxCur;
+    int texCoordIdCur;
+    int stdTexMapId;
+    int stdTexMtx;
+    int stdTexCoordId;
+    int texMapIdCurShadow;
+    int texMtxCurShadow;
+    int texCoordIdCurShadow;
+};
+
+static MaterialManTevState* GetMaterialManTevState(CMaterialMan* materialMan)
+{
+    return reinterpret_cast<MaterialManTevState*>(Ptr(materialMan, 0x40));
+}
+
+static MaterialManTexState* GetMaterialManTexState(CMaterialMan* materialMan)
+{
+    return reinterpret_cast<MaterialManTexState*>(Ptr(materialMan, 0x11C));
+}
+
 static int HighestSetBit(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
@@ -2187,8 +2215,9 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x124));
-    *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordId + 1;
+    MaterialManTexState* state = GetMaterialManTexState(this);
+    int texCoordId = state->texCoordIdCur;
+    state->texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2203,8 +2232,9 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = *reinterpret_cast<int*>(Ptr(this, 0x120));
-    *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtx + 3;
+    MaterialManTexState* state = GetMaterialManTexState(this);
+    int texMtx = state->texMtxCur;
+    state->texMtxCur = texMtx + 3;
     return texMtx;
 }
 
@@ -2245,13 +2275,16 @@ void CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    m_texMapIdCur = m_stdTexMapId;
-    m_texMapIdCurShadow = m_stdTexMapId;
-    m_texMtxCur = m_stdTexMtx;
-    m_texMtxCurShadow = m_stdTexMtx;
-    m_texCoordIdCur = m_stdTexCoordId;
-    m_texCoordIdCurShadow = m_stdTexCoordId;
-    m_curEnvTevBit = m_stdEnvTevBit;
+    MaterialManTexState* texState = GetMaterialManTexState(this);
+    MaterialManTevState* tevState = GetMaterialManTevState(this);
+
+    texState->texMapIdCur = texState->stdTexMapId;
+    texState->texMapIdCurShadow = texState->stdTexMapId;
+    texState->texMtxCur = texState->stdTexMtx;
+    texState->texMtxCurShadow = texState->stdTexMtx;
+    texState->texCoordIdCur = texState->stdTexCoordId;
+    texState->texCoordIdCurShadow = texState->stdTexCoordId;
+    tevState->curEnvTevBit = tevState->stdEnvTevBit;
 }
 
 /*

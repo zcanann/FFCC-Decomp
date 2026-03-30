@@ -100,7 +100,6 @@ void CFontMan::Init()
 		font->renderFlags &= static_cast<unsigned char>(~0x40);
 		font->renderFlags &= static_cast<unsigned char>(~0x20);
 		font->m_usesEmbeddedData = 0;
-		font->m_pad0f = 0;
 	}
 
 	m_font = font;
@@ -174,7 +173,6 @@ CFont::CFont()
 	renderFlags &= static_cast<unsigned char>(~0x40);
 	renderFlags &= static_cast<unsigned char>(~0x20);
 	m_usesEmbeddedData = 0;
-	m_pad0f = 0;
 }
 
 /*

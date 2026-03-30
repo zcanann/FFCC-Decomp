@@ -40,10 +40,11 @@ struct CompaOpenAnim {
 	s16 y;
 	s16 w;
 	s16 h;
+	float u;
+	float v;
 	float alpha;
-	float scale;
-	float progress;
 	float uvScale;
+	int drawFlags;
 	int tex;
 	int frame;
 	int startFrame;
@@ -53,6 +54,14 @@ struct CompaOpenAnim {
 	float dy;
 	float targetX;
 	float targetY;
+};
+
+struct CompaOpenAnimList
+{
+	s16 count;
+	s16 pad_02;
+	int pad_04;
+	CompaOpenAnim entries[64];
 };
 
 struct CompaFlatTableEntry
@@ -276,8 +285,8 @@ void CMenuPcs::CompaCtrl()
 	unsigned short press;
 	short hold;
 	bool doReset = false;
-	int compaState = (int)this->compaMenuState;
-	short* compaList = this->compaList;
+	CompaMenuState* compaState = this->compaMenuState;
+	CompaOpenAnimList* compaList = reinterpret_cast<CompaOpenAnimList*>(this->compaList);
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		activeInput = true;
@@ -303,18 +312,18 @@ void CMenuPcs::CompaCtrl()
 	if (hold == 0) {
 		doReset = false;
 	} else if ((press & 0x20) != 0) {
-		*reinterpret_cast<short*>(compaState + 0x1e) = 1;
+		compaState->cursorMove = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x40) != 0) {
-		*reinterpret_cast<short*>(compaState + 0x1e) = -1;
+		compaState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
 		doReset = false;
 	} else if ((press & 0x200) != 0) {
-		*reinterpret_cast<char*>(compaState + 0xd) = 1;
+		compaState->closeRequested = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
 		doReset = true;
 	} else {
@@ -322,27 +331,27 @@ void CMenuPcs::CompaCtrl()
 	}
 
 	if (doReset) {
-		*reinterpret_cast<int*>((int)compaList + 0x2c) = 2;
-		*reinterpret_cast<int*>((int)compaList + 0x30) = 5;
-		*reinterpret_cast<int*>((int)compaList + 0x6c) = 2;
-		*reinterpret_cast<int*>((int)compaList + 0x70) = 5;
-		*reinterpret_cast<int*>((int)compaList + 0xac) = 2;
-		*reinterpret_cast<int*>((int)compaList + 0xb0) = 5;
-		*reinterpret_cast<int*>((int)compaList + 0xec) = 7;
-		*reinterpret_cast<int*>((int)compaList + 0xf0) = 5;
-		*reinterpret_cast<int*>((int)compaList + 300) = 7;
-		*reinterpret_cast<int*>((int)compaList + 0x130) = 5;
-		*reinterpret_cast<int*>((int)compaList + 0x174) = 2;
-		*reinterpret_cast<int*>((int)compaList + 0x16c) = 7;
-		*reinterpret_cast<int*>((int)compaList + 0x170) = 5;
+		compaList->entries[0].startFrame = 2;
+		compaList->entries[0].duration = 5;
+		compaList->entries[1].startFrame = 2;
+		compaList->entries[1].duration = 5;
+		compaList->entries[2].startFrame = 2;
+		compaList->entries[2].duration = 5;
+		compaList->entries[3].startFrame = 7;
+		compaList->entries[3].duration = 5;
+		compaList->entries[4].startFrame = 7;
+		compaList->entries[4].duration = 5;
+		compaList->entries[5].flags = 2;
+		compaList->entries[5].startFrame = 7;
+		compaList->entries[5].duration = 5;
 
-		int entryCount = static_cast<int>(*compaList);
-		short* entry = compaList + 4;
-		for (int i = 0; i < entryCount; ++i) {
-			*reinterpret_cast<int*>(entry + 0x10) = 0;
-			*reinterpret_cast<int*>(entry + 0x12) = 0;
-			*reinterpret_cast<float*>(entry + 8) = 1.0f;
-			entry += 0x20;
+		unsigned int entryCount = static_cast<unsigned short>(compaList->count);
+		CompaOpenAnim* entry = compaList->entries;
+		while (entryCount != 0) {
+			entry->frame = 0;
+			entry->alpha = 1.0f;
+			entry++;
+			entryCount--;
 		}
 	}
 }
@@ -361,42 +370,37 @@ bool CMenuPcs::CompaClose()
 	int finished;
 	double one;
 	double base;
-	int compaState = (int)this->compaMenuState;
-	short* compaList = this->compaList;
-	short time = static_cast<short>(*reinterpret_cast<short*>(compaState + 0x22) + 1);
-	*reinterpret_cast<short*>(compaState + 0x22) = time;
+	CompaMenuState* compaState = this->compaMenuState;
+	CompaOpenAnimList* compaList = reinterpret_cast<CompaOpenAnimList*>(this->compaList);
+	short time = static_cast<short>(compaState->frame + 1);
+	compaState->frame = time;
 
-	short* entry = compaList;
-	int entryCount = static_cast<int>(*entry);
-	short currentTime = *reinterpret_cast<short*>(compaState + 0x22);
+	int entryCount = static_cast<int>(compaList->count);
+	short currentTime = compaState->frame;
 	finished = 0;
-	entry += 4;
+	CompaOpenAnim* entry = compaList->entries;
 	for (int i = 0; i < entryCount; ++i) {
 		float zero = FLOAT_80332ff8;
-		if (*reinterpret_cast<int*>(entry + 0x12) <= currentTime) {
-			if (currentTime < *reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14)) {
-				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
+		if (entry->startFrame <= currentTime) {
+			if (currentTime < entry->startFrame + entry->duration) {
+				entry->frame = entry->frame + 1;
 				base = DOUBLE_80333030;
 				one = DOUBLE_80333008;
-				*reinterpret_cast<float*>(entry + 8) = (float)-((DOUBLE_80333008 /
-					(double)*reinterpret_cast<int*>(entry + 0x14)) *
-					(double)*reinterpret_cast<int*>(entry + 0x10) - DOUBLE_80333008);
-				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
-					zero = (float)-((one / (double)*reinterpret_cast<int*>(entry + 0x14)) *
-						(double)*reinterpret_cast<int*>(entry + 0x10) - one);
-					*reinterpret_cast<float*>(entry + 0x18) =
-						(*reinterpret_cast<float*>(entry + 0x1c) - (float)((double)(int)*entry - base)) * zero;
-					*reinterpret_cast<float*>(entry + 0x1a) =
-						(*reinterpret_cast<float*>(entry + 0x1e) - (float)((double)(int)entry[1] - base)) * zero;
+				entry->alpha = (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame -
+					DOUBLE_80333008);
+				if ((entry->flags & 2) == 0) {
+					zero = (float)-((one / (double)entry->duration) * (double)entry->frame - one);
+					entry->dx = (entry->targetX - (float)entry->x) * zero;
+					entry->dy = (entry->targetY - (float)entry->y) * zero;
 				}
 			} else {
 				finished += 1;
-				*reinterpret_cast<float*>(entry + 8) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x18) = zero;
-				*reinterpret_cast<float*>(entry + 0x1a) = zero;
+				entry->alpha = 0.0f;
+				entry->dx = zero;
+				entry->dy = zero;
 			}
 		}
-		entry += 0x20;
+		entry++;
 	}
 
 	return entryCount == finished;

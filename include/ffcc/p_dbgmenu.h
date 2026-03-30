@@ -46,8 +46,6 @@ public:
         CDM* m_firstChild;                      // 0x50
 
         CDM();
-
-        void Clear();
     };
 
     struct CDMParam
@@ -65,12 +63,6 @@ public:
         u32 m_unk28;                            // 0x28
         u32 m_unk2C;                            // 0x2C
         u32 m_unk30;                            // 0x30
-
-        CDMParam();
-        CDMParam(int, int, int, int, int, int, void*, void (*)(CDM&, void*), void (*)(CDM&, void*));
-        
-        void Clear();
-        void operator=(const CDMParam&);
     };
 
     CDbgMenuPcs()

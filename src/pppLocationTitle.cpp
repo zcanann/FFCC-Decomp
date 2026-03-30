@@ -245,13 +245,14 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int serializedOffset;
-    u8* workBase;
+    LocationTitleWork* work;
     int graphFrame;
     int fadeDivisor;
+    LocationTitleParticle* particle;
     long** shapeTable;
 
     serializedOffset = *param_3->m_serializedDataOffsets;
-    workBase = (u8*)pppLocationTitle + 0x80 + serializedOffset;
+    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
@@ -266,9 +267,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
     }
 
-    LocationTitleParticle* particle = *(LocationTitleParticle**)workBase;
+    particle = (LocationTitleParticle*)work->m_particles;
 
-    for (int i = 0; i < *(u16*)(workBase + 4); i++) {
+    for (int i = 0; i < work->m_count; i++) {
         Mtx model;
         Vec worldPos;
 

@@ -50,7 +50,7 @@ extern "C" void* gVtable_CPtrArray_GXTexObj[];
 CFunnyShapePcs FunnyShapePcs;
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
-static const char s_CFunnyShapePcs_801D7E0C[] = "CFunnyShapePcs";
+static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -249,7 +249,7 @@ int CFunnyShapePcs::GetTable(unsigned long index)
 void CFunnyShapePcs::createViewer()
 {
     *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4)) =
-        Memory.CreateStage(0x200000, const_cast<char*>(s_CFunnyShapePcs_801D7E0C), 0);
+        Memory.CreateStage(0x200000, const_cast<char*>(s_CFunnyShapePcs), 0);
     USBPcs.IsBigAlloc(1);
 
     GXColor clearColor;

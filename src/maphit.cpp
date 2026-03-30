@@ -641,12 +641,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
-        float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, position, g_hit_t_min - (s_epsilon / len));
+        float len = PSVECMag(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius));
+        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t_min - (s_epsilon / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
-        float len = PSVECMag(&g_hit_cyl_min.m_direction);
-        PSVECScale(&g_hit_cyl_min.m_direction, position, g_hit_t_min - (s_push / len));
+        float len = PSVECMag(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius));
+        PSVECScale(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), position, g_hit_t_min - (s_push / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }

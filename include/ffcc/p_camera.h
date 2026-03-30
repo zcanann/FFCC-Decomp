@@ -219,9 +219,8 @@ public:
     void GetWorldMapInverseMatrix(float (*)[4]);
 
     Mtx m_cameraMatrix;
-    u8 _pad34[0x48 - 0x34];
+    u8 _pad34[0x94 - 0x34];
     Mtx44 m_screenMatrix;
-    u8 _pad88[0xD4 - 0x88];
     float _212_4_;
     float _216_4_;
     float _220_4_;

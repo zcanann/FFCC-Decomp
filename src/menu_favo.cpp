@@ -503,44 +503,49 @@ unsigned int CMenuPcs::FavoCtrl()
  */
 bool CMenuPcs::FavoClose()
 {
-	short* psVar4;
-	int iVar5;
-	int iVar6;
-	int iVar7;
-	int iVar8;
+	short* entry;
+	int finished;
+	int count;
+	int frame;
+	int remaining;
 
-	iVar5 = 0;
+	finished = 0;
 	singMenuState->frame = singMenuState->frame + 1;
-	iVar6 = (int)*favoList;
-	psVar4 = favoList + 4;
-	iVar7 = (int)singMenuState->frame;
-	iVar8 = iVar6;
-	if (0 < iVar6) {
-		do {
-			if (*(int*)(psVar4 + 0x12) <= iVar7) {
-				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
-					float fVar1;
+	count = (int)*favoList;
+	entry = favoList + 4;
+	frame = (int)singMenuState->frame;
+	remaining = count;
+	while (0 < remaining) {
+		float zero = FLOAT_80333040;
 
-					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-					fVar1 = 1.0f - (float)*(int*)(psVar4 + 0x10) / (float)*(int*)(psVar4 + 0x14);
-					*(float*)(psVar4 + 8) = fVar1;
-					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-						*(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1c) - (float)psVar4[0]) * fVar1;
-						*(float*)(psVar4 + 0x1a) = (*(float*)(psVar4 + 0x1e) - (float)psVar4[1]) * fVar1;
-					}
-				} else {
-					iVar5 = iVar5 + 1;
-					*(float*)(psVar4 + 8) = 0.0f;
-					*(float*)(psVar4 + 0x18) = 0.0f;
-					*(float*)(psVar4 + 0x1a) = 0.0f;
+		if (*(int*)(entry + 0x12) <= frame) {
+			if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
+				int duration;
+				int progress;
+				float alpha;
+
+				*(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
+				duration = *(int*)(entry + 0x14);
+				progress = *(int*)(entry + 0x10);
+				alpha = (float)(1.0 - (double)progress / (double)duration);
+				*(float*)(entry + 8) = alpha;
+				if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
+					zero = alpha;
+					*(float*)(entry + 0x18) = (*(float*)(entry + 0x1c) - (float)entry[0]) * zero;
+					*(float*)(entry + 0x1a) = (*(float*)(entry + 0x1e) - (float)entry[1]) * zero;
 				}
+			} else {
+				finished = finished + 1;
+				*(float*)(entry + 8) = FLOAT_80333040;
+				*(float*)(entry + 0x18) = zero;
+				*(float*)(entry + 0x1a) = zero;
 			}
-			psVar4 = psVar4 + 0x20;
-			iVar8 = iVar8 + -1;
-		} while (iVar8 != 0);
+		}
+		entry = entry + 0x20;
+		remaining = remaining + -1;
 	}
 
-	return iVar6 == iVar5;
+	return count == finished;
 }
 
 /*

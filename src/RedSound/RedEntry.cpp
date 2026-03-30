@@ -49,7 +49,6 @@ static const char s__s____________0x_8_8X___0x_8_8X___801e7dd2[] = "%s -------- 
 static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 
 extern "C" {
-	void __dl__FPv(void*);
 	void* RedNew__Fi(int);
 	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
 	int SearchWaveSequence__9CRedEntryFi(CRedEntry*, int);
@@ -67,22 +66,13 @@ CRedEntry::CRedEntry()
 
 /*
  * --INFO--
- * PAL Address: 0x801c05fc
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:	TODO
+ * Size:	TODO
  */
-#pragma optimization_level 0
-extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete)
+CRedEntry::~CRedEntry()
 {
-	if ((redEntry != 0) && (0 < shouldDelete)) {
-		__dl__FPv(redEntry);
-	}
-	return redEntry;
+	// TODO
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--

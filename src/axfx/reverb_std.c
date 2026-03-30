@@ -10,6 +10,15 @@ extern const f32 axfx_reverb_std_handle_f32_0p6;
 extern const double axfx_reverb_std_handle_i2f_magic;
 extern const s32 sReverbStdDelayLengths[4];
 
+static const f32 axfx_reverb_std_f32_0 = 0.0f;
+static const f32 axfx_reverb_std_f32_0p01 = 0.01f;
+static const f32 axfx_reverb_std_f32_0p05 = 0.05f;
+static const f32 axfx_reverb_std_f32_0p1 = 0.1f;
+static const f32 axfx_reverb_std_f32_0p8 = 0.8f;
+static const f32 axfx_reverb_std_f32_1 = 1.0f;
+static const f32 axfx_reverb_std_f32_10 = 10.0f;
+static const f32 axfx_reverb_std_f32_32000 = 32000.0f;
+
 // prototypes
 static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
 static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length);
@@ -58,52 +67,51 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     u8 k;
     f32 timeFactor;
 
-	ASSERTMSGLINE(109, coloration >= 0.0f && coloration <= 1.0f &&
-				  time >= 0.01f && time <= 10.0f &&
-				  mix >= 0.0f && mix <= 1.0f &&
-				  damping >= 0.0f && damping <= 1.0f &&
-				  predelay >= 0.0f && predelay <= 0.1f,
+	ASSERTMSGLINE(109, coloration >= axfx_reverb_std_f32_0 && coloration <= axfx_reverb_std_f32_1 &&
+				  time >= axfx_reverb_std_f32_0p01 && time <= axfx_reverb_std_f32_10 &&
+				  mix >= axfx_reverb_std_f32_0 && mix <= axfx_reverb_std_f32_1 &&
+				  damping >= axfx_reverb_std_f32_0 && damping <= axfx_reverb_std_f32_1 &&
+				  predelay >= axfx_reverb_std_f32_0 && predelay <= axfx_reverb_std_f32_0p1,
 				  "The value of specified parameter is out of range.");
 
-    if ((coloration < 0.0f ) || (coloration > 1.0f ) 
-     || (time       < 0.01f) || (time       > 10.0f) 
-     || (mix        < 0.0f ) || (mix        > 1.0f ) 
-     || (damping    < 0.0f ) || (damping    > 1.0f ) 
-     || (predelay   < 0.0f ) || (predelay   > 0.1f )) {
+    if ((coloration < axfx_reverb_std_f32_0) || (coloration > axfx_reverb_std_f32_1)
+     || (time < axfx_reverb_std_f32_0p01) || (time > axfx_reverb_std_f32_10)
+     || (mix < axfx_reverb_std_f32_0) || (mix > axfx_reverb_std_f32_1)
+     || (damping < axfx_reverb_std_f32_0) || (damping > axfx_reverb_std_f32_1)
+     || (predelay < axfx_reverb_std_f32_0) || (predelay > axfx_reverb_std_f32_0p1)) {
         return 0;
     }
 
     memset(rv, 0, sizeof(AXFX_REVSTD_WORK));
-    timeFactor = 32000.0f * time;
+    timeFactor = axfx_reverb_std_f32_32000 * time;
 
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 2; i++) {
             DLcreate(&rv->C[i + (k * 2)], sReverbStdDelayLengths[i] + 2);
             DLsetdelay(&rv->C[i + (k * 2)], sReverbStdDelayLengths[i]);
-            rv->combCoef[i + (k * 2)] = powf(10.0f, (sReverbStdDelayLengths[i] * -3) / timeFactor);
+            rv->combCoef[i + (k * 2)] = powf(axfx_reverb_std_f32_10, (sReverbStdDelayLengths[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {
             DLcreate(&rv->AP[i + (k * 2)], sReverbStdDelayLengths[i + 2] + 2);
             DLsetdelay(&rv->AP[i + (k * 2)], sReverbStdDelayLengths[i + 2]);
         }
-        rv->lpLastout[k] = 0.0f;
+        rv->lpLastout[k] = axfx_reverb_std_f32_0;
     }
 
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (rv->damping < axfx_reverb_std_f32_0p05) {
+        rv->damping = axfx_reverb_std_f32_0p05;
     }
     {
-        f32 damp = 0.8f * rv->damping;
-        damp += 0.05f;
-        rv->damping = 1.0f - damp;
+        f32 damp = axfx_reverb_std_f32_0p8 * rv->damping;
+        rv->damping = axfx_reverb_std_f32_1 - (axfx_reverb_std_f32_0p05 + damp);
     }
 
-    if (0.0f != predelay) {
-        rv->preDelayTime = (32000.0f * predelay);
+    if (axfx_reverb_std_f32_0 != predelay) {
+        rv->preDelayTime = (axfx_reverb_std_f32_32000 * predelay);
         for (i = 0; i < 3; i++) {
             rv->preDelayLine[i] = __AXFXAlloc(rv->preDelayTime * 4);
             ASSERTMSGLINE(162, rv->preDelayLine[i], "Can't allocate the memory.");
@@ -124,32 +132,31 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
 static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
 
-	ASSERTMSGLINE(196, coloration >= 0.0f && coloration <= 1.0f &&
-				  time >= 0.01f && time <= 10.0f &&
-				  mix >= 0.0f && mix <= 1.0f &&
-				  damping >= 0.0f && damping <= 1.0f &&
-				  predelay >= 0.0f && predelay <= 0.1f,
+	ASSERTMSGLINE(196, coloration >= axfx_reverb_std_f32_0 && coloration <= axfx_reverb_std_f32_1 &&
+				  time >= axfx_reverb_std_f32_0p01 && time <= axfx_reverb_std_f32_10 &&
+				  mix >= axfx_reverb_std_f32_0 && mix <= axfx_reverb_std_f32_1 &&
+				  damping >= axfx_reverb_std_f32_0 && damping <= axfx_reverb_std_f32_1 &&
+				  predelay >= axfx_reverb_std_f32_0 && predelay <= axfx_reverb_std_f32_0p1,
 				  "The value of specified parameter is out of range.");
 
 
-    if ((coloration < 0.0f ) || (coloration > 1.0f ) 
-     || (time       < 0.01f) || (time       > 10.0f) 
-     || (mix        < 0.0f ) || (mix        > 1.0f ) 
-     || (damping    < 0.0f ) || (damping    > 1.0f ) 
-     || (predelay   < 0.0f ) || (predelay   > 0.1f )) {
+    if ((coloration < axfx_reverb_std_f32_0) || (coloration > axfx_reverb_std_f32_1)
+     || (time < axfx_reverb_std_f32_0p01) || (time > axfx_reverb_std_f32_10)
+     || (mix < axfx_reverb_std_f32_0) || (mix > axfx_reverb_std_f32_1)
+     || (damping < axfx_reverb_std_f32_0) || (damping > axfx_reverb_std_f32_1)
+     || (predelay < axfx_reverb_std_f32_0) || (predelay > axfx_reverb_std_f32_0p1)) {
         return 0;
     }
 
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (rv->damping < axfx_reverb_std_f32_0p05) {
+        rv->damping = axfx_reverb_std_f32_0p05;
     }
     {
-        f32 damp = 0.8f * rv->damping;
-        damp += 0.05f;
-        rv->damping = 1.0f - damp;
+        f32 damp = axfx_reverb_std_f32_0p8 * rv->damping;
+        rv->damping = axfx_reverb_std_f32_1 - (axfx_reverb_std_f32_0p05 + damp);
     }
 
     for (i = 0; i < 6; i++) {

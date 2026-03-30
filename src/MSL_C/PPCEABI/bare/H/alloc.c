@@ -480,10 +480,10 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
         aligned_size = 0x50UL;
     }
 
-    if (pool_obj->start_ == 0) {
-        block = link_new_block(pool_obj, aligned_size);
-    } else {
+    if (pool_obj->start_ != 0) {
         block = pool_obj->start_;
+    } else {
+        block = link_new_block(pool_obj, aligned_size);
     }
 
     current_block = block;

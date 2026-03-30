@@ -10,6 +10,7 @@
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
+void InitEnv__9CCharaPcsFi(void* charaPcs, int drawType);
 extern const float kPppDrawDepthScaleNear;
 extern const float kPppDrawDepthScaleFar;
 }
@@ -147,7 +148,7 @@ void pppDrawMng::DrawOt()
 					if (lastType != prim->m_type)
 					{
 						pppInitDrawEnv(0);
-						CharaPcs.InitEnv(4);
+						InitEnv__9CCharaPcsFi(&CharaPcs, 4);
 					}
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);

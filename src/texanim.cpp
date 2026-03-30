@@ -92,6 +92,15 @@ struct CTexAnimSetStorage
     float unk24;
 };
 
+struct CTexAnimRefDataStorage
+{
+    void* vtable;
+    int refCount;
+    char name[0x100];
+    void* material;
+    CPtrArray<CTexAnimSeq*> texAnimSeqs;
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -1108,18 +1117,20 @@ CTexAnim::CRefData::CRefData()
 #pragma dont_inline on
 CTexAnim::CRefData::~CRefData()
 {
-    *reinterpret_cast<void**>(this) = __vt__Q28CTexAnim8CRefData;
-    int* ref = *reinterpret_cast<int**>(Ptr(this, 0x108));
-    if (ref != 0) {
-        const int nextRefCount = ref[1] - 1;
-        ref[1] = nextRefCount;
-        if ((nextRefCount == 0) && (ref != 0)) {
-            (*(void (**)(int*, int))(*ref + 8))(ref, 1);
+    CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(this);
+
+    refData->vtable = __vt__Q28CTexAnim8CRefData;
+    int* material = reinterpret_cast<int*>(refData->material);
+    if (material != 0) {
+        const int nextRefCount = material[1] - 1;
+        material[1] = nextRefCount;
+        if ((nextRefCount == 0) && (material != 0)) {
+            (*(void (**)(int*, int))(*material + 8))(material, 1);
         }
-        *reinterpret_cast<void**>(Ptr(this, 0x108)) = 0;
+        refData->material = 0;
     }
-    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->ReleaseAndRemoveAll();
-    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->~CPtrArray<CTexAnimSeq*>();
+    refData->texAnimSeqs.ReleaseAndRemoveAll();
+    refData->texAnimSeqs.~CPtrArray<CTexAnimSeq*>();
 
     __dt__4CRefFv(this, 0);
 }

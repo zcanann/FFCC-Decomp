@@ -11,6 +11,7 @@
 #include "stdarg.h"
 
 extern void __num2dec(const decform*, double, decimal*);
+extern const double printf_double_zero;
 
 #define TARGET_FLOAT_BITS           64
 #define TARGET_FLOAT_BYTES          (TARGET_FLOAT_BITS / 8)
@@ -740,7 +741,7 @@ static char* float2str(long double num, char *buff, print_format format) {
             dec.exp = 0;
             break;
         case 'I':
-            if (num < 0) {
+            if (num < printf_double_zero) {
                 p = buff - 5;
 
                 if (isupper(format.conversion_char)) {

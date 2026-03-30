@@ -27,7 +27,8 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
         return;
     }
 
-    PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + *(s32*)container->ptrData + 0x80);
+    s32 objOffset = *(s32*)container->ptrData;
+    PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + objOffset + 0x80);
 
     if (objData->id == pointData->id) {
         u8* vecPtr;
@@ -49,4 +50,3 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     objPtr->y = ((f32*)objPtr->vecPtr)[1];
     objPtr->z = ((f32*)objPtr->vecPtr)[2];
 }
-

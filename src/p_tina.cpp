@@ -311,53 +311,56 @@ unsigned int pppFreeMngStPrioForData()
 		char padFC[0x5c];
 	};
 
-	pppMngStPrioData* bestMngSt;
-	pppMngStPrioData* pppMngStBase;
-	unsigned int prioTime;
-	unsigned char bestPrio;
-	int index;
-	int i;
+	pppMngStPrioData* selectedMngSt = 0;
+	pppMngStPrioData* pppMngStBase = reinterpret_cast<pppMngStPrioData*>(&PartMng);
+	unsigned short selectedPrioTime = 0;
+	unsigned char selectedPrio = 1;
+	int index = 0;
 
-	pppMngStBase = reinterpret_cast<pppMngStPrioData*>(&PartMng);
-	bestPrio = 1;
-	index = 0;
-	bestMngSt = 0;
-	i = 0xc0;
-	do {
-		pppMngStPrioData* current = pppMngStBase;
-		if ((((reinterpret_cast<_pppMngSt*>(current) != pppMngStPtr) && (current->m_baseTime != -0x1000)) &&
-		     (current->m_kind != 0)) &&
-		    (1 < current->m_prio)) {
-			if (bestPrio < current->m_prio) {
-				prioTime = current->m_prioTime;
-				bestMngSt = current;
-				bestPrio = current->m_prio;
-			} else if ((bestPrio == current->m_prio) && ((int)prioTime < (int)current->m_prioTime)) {
-				prioTime = current->m_prioTime;
-				bestMngSt = current;
+	for (int i = 0xc0; i != 0; i--) {
+		pppMngStPrioData* candidateA = pppMngStBase;
+		if (reinterpret_cast<_pppMngSt*>(candidateA) != pppMngStPtr && candidateA->m_baseTime != -0x1000 &&
+		    candidateA->m_kind != 0) {
+			unsigned char prioA = candidateA->m_prio;
+			if (prioA > 1) {
+				if (selectedPrio < prioA) {
+					selectedMngSt = candidateA;
+					selectedPrio = prioA;
+					selectedPrioTime = candidateA->m_prioTime;
+				} else if (selectedPrio == prioA) {
+					unsigned short prioTimeA = candidateA->m_prioTime;
+					if (selectedPrioTime < prioTimeA) {
+						selectedMngSt = candidateA;
+						selectedPrioTime = prioTimeA;
+					}
+				}
 			}
 		}
 
-		current = pppMngStBase + 1;
-		if ((((reinterpret_cast<_pppMngSt*>(current) != pppMngStPtr) && (current->m_baseTime != -0x1000)) &&
-		     (current->m_kind != 0)) &&
-		    (1 < current->m_prio)) {
-			if (bestPrio < current->m_prio) {
-				prioTime = current->m_prioTime;
-				bestMngSt = current;
-				bestPrio = current->m_prio;
-			} else if ((bestPrio == current->m_prio) && ((int)prioTime < (int)current->m_prioTime)) {
-				prioTime = current->m_prioTime;
-				bestMngSt = current;
+		pppMngStPrioData* candidateB = candidateA + 1;
+		if (reinterpret_cast<_pppMngSt*>(candidateB) != pppMngStPtr && candidateB->m_baseTime != -0x1000 &&
+		    candidateB->m_kind != 0) {
+			unsigned char prioB = candidateB->m_prio;
+			if (prioB > 1) {
+				if (selectedPrio < prioB) {
+					selectedMngSt = candidateB;
+					selectedPrio = prioB;
+					selectedPrioTime = candidateB->m_prioTime;
+				} else if (selectedPrio == prioB) {
+					unsigned short prioTimeB = candidateB->m_prioTime;
+					if (selectedPrioTime < prioTimeB) {
+						selectedMngSt = candidateB;
+						selectedPrioTime = prioTimeB;
+					}
+				}
 			}
 		}
 
 		pppMngStBase += 2;
 		index++;
-		i--;
-	} while (i != 0);
+	}
 
-	if (bestMngSt == 0) {
+	if (selectedMngSt == 0) {
 		return 0;
 	}
 
@@ -367,11 +370,11 @@ unsigned int pppFreeMngStPrioForData()
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(
 			s_tinaPrioTimeFmt,
-			(unsigned int)bestMngSt->m_prioTime,
-			(unsigned int)bestMngSt->m_prio,
-			(int)bestMngSt->m_kind,
-			(int)bestMngSt->m_nodeIndex,
-			(int)bestMngSt->m_kind * 0x38 + -0x7fd672e8);
+			(unsigned int)selectedMngSt->m_prioTime,
+			(unsigned int)selectedMngSt->m_prio,
+			(int)selectedMngSt->m_kind,
+			(int)selectedMngSt->m_nodeIndex,
+			(int)selectedMngSt->m_kind * 0x38 + -0x7fd672e8);
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(DAT_801d81d4);
@@ -381,7 +384,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 
 	Graphic._WaitDrawDone(s_tinaSourceName, 0xfc);
-	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(bestMngSt));
+	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
 	return 1;
 }
 

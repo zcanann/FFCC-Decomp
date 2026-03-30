@@ -1,5 +1,6 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/linkage.h"
+#include "ffcc/menu.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/sound.h"
@@ -94,10 +95,8 @@ CMesMenu::CMesMenu()
  */
 CMesMenu::~CMesMenu()
 {
-    typedef void (*VFunc)(void*);
-
     *(void***)this = __vt__8CMesMenu;
-    (*(VFunc*)((u8*)*(void***)this + 0x10))(this);
+    ((CMenu*)this)->Destroy();
     __dt__4CMesFv((char*)this + 0x1C, -1);
     __dt__5CMenuFv(this, 0);
 }
@@ -913,4 +912,3 @@ void CMesMenu::close(int)
 {
 	// TODO
 }
-

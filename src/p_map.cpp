@@ -50,14 +50,14 @@ unsigned int s_mapRelProfile1__7CMapPcs;
 unsigned long long s_mapRelProfile2__7CMapPcs;
 unsigned int s_loadedStageNo__7CMapPcs;
 unsigned int s_loadedMapNo__7CMapPcs;
-extern float DrawRangeDefault;
+extern const float DrawRangeDefault;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
 extern "C" const char s__________________________________801d7734[];
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
-extern "C" void _MapFileRead__7CMapMngFPcRUl(CMapMng*);
+extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 extern "C" void __dl__FPv(void*);
@@ -366,7 +366,7 @@ void CMapPcs::calc()
     Mtx cameraMtx;
     Mtx44 screenMtx;
 
-    _MapFileRead__7CMapMngFPcRUl(&MapMng);
+    MapFileRead__7CMapMngFPcRUl(&MapMng);
     *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
     *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
@@ -374,19 +374,16 @@ void CMapPcs::calc()
     *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-    if (m_useStoredViewMtx == 0) {
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
-        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
-    } else {
+    if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
         memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
+    } else {
+        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     }
     MapMng.SetViewMtx(cameraMtx, screenMtx);
 
-    if (m_forceMapReload == 0) {
-        m_mapCalcReady = 0;
-        MapMng.Calc();
-    } else {
+    if (m_forceMapReload != 0) {
         MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
         MapMng.SetDrawRangeOctTree(DrawRangeDefault);
@@ -436,19 +433,23 @@ void CMapPcs::calc()
                 &System,
                 s__________________________________801d7734,
                 m_mapName,
-                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0xC),
-                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x8),
+                *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
+                *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
                 heapUnuseKB);
         }
 
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
         if (mapLightHolderArr[1].GetSize() != 0) {
-            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(&s_mapRelProfile0__7CMapPcs), 0);
+            mapLightHolderArr[1][0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
+                                                    static_cast<Vec*>(0));
         }
 
         m_forceMapReload = 0;
         m_mapCalcReady = 1;
+    } else {
+        m_mapCalcReady = 0;
+        MapMng.Calc();
     }
 }
 
@@ -516,7 +517,7 @@ void CMapPcs::drawBefore()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
-        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
 
@@ -572,7 +573,7 @@ void CMapPcs::draw()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
-        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
 
@@ -628,7 +629,7 @@ void CMapPcs::drawBeforeViewer()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
-        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
 
@@ -684,7 +685,7 @@ void CMapPcs::drawViewer()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
-        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
 
@@ -738,7 +739,7 @@ void CMapPcs::drawAfter()
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
             PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
-            PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+            PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
             GXSetColorUpdate(GX_TRUE);
             GXSetAlphaUpdate(GX_FALSE);

@@ -63,8 +63,9 @@ enum {
 };
 
 const char printf_stringBase0[] = "\0-INF\0-inf\0INF\0inf\0-NAN\0-nan\0NAN\0nan";
+static wchar_t printf_wstringBase0[] = L"";
 
-static const char* parse_format_801B860C(const char *format_string, va_list *arg, print_format *format) {
+static const char* parse_format(const char *format_string, va_list *arg, print_format *format) {
     print_format f;
     const char* s = format_string;
     int c;
@@ -304,7 +305,7 @@ static const char* parse_format_801B860C(const char *format_string, va_list *arg
     return ((const char*)s + 1);
 }
 
-static char* long2str_801B83B4(long num, char* buff, print_format format)
+static char* long2str(long num, char* buff, print_format format)
 {
     unsigned long unsigned_num, base;
     char* p;
@@ -423,7 +424,7 @@ static char* long2str_801B83B4(long num, char* buff, print_format format)
     return p;
 }
 
-static char* longlong2str_801B80A0(long long num, char* pBuf, print_format fmt)
+static char* longlong2str(long long num, char* pBuf, print_format fmt)
 {
     unsigned long long unsigned_num, base;
     char* p;
@@ -602,7 +603,7 @@ static char * double2hex(long double num, char * buff, print_format format)  {
     exp_format.conversion_char = 'd';
 
     exp = (short) ((*(short*) &ld & 0x7FFF) >> 4) - 0x3FF;
-    p = long2str_801B83B4(exp, buff, exp_format);
+    p = long2str(exp, buff, exp_format);
     if (format.conversion_char == 'a')
         *--p = 'p';
     else
@@ -987,7 +988,7 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
         }
 
         format_ptr = curr_format;
-        format_ptr = parse_format_801B860C(format_ptr, (va_list*)arg, &format);
+        format_ptr = parse_format(format_ptr, (va_list*)arg, &format);
 
         switch (format.conversion_char) {
             case 'd':
@@ -1011,12 +1012,12 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
                 }
 
                 if (format.argument_options == long_long_argument) {
-                    if (!(buff_ptr = longlong2str_801B80A0(long_long_num, buff + 512, format))) {
+                    if (!(buff_ptr = longlong2str(long_long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
                 else {
-                    if (!(buff_ptr = long2str_801B83B4(long_num, buff + 512, format))) {
+                    if (!(buff_ptr = long2str(long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
@@ -1047,12 +1048,12 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
                 }
 
                 if (format.argument_options == long_long_argument) {
-                    if (!(buff_ptr = longlong2str_801B80A0(long_long_num, buff + 512, format))) {
+                    if (!(buff_ptr = longlong2str(long_long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
                 else {
-                    if (!(buff_ptr = long2str_801B83B4(long_num, buff + 512, format))) {
+                    if (!(buff_ptr = long2str(long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
@@ -1101,7 +1102,7 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
                     wchar_t* wcs_ptr = va_arg(arg, wchar_t*);
 
                     if(wcs_ptr == NULL){
-                        wcs_ptr = L"";
+                        wcs_ptr = (wchar_t*)printf_wstringBase0;
                     }
 
                     if ((num_chars = wcstombs(buff, wcs_ptr, sizeof(buff))) < 0) {
@@ -1115,7 +1116,7 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
                 }
 
                 if (buff_ptr == NULL) {
-                    buff_ptr = "";
+                    buff_ptr = (char*)printf_stringBase0;
                 }
 
                 if (format.alternate_form) {

@@ -222,8 +222,9 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
  */
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
-    int workOffset = param_3->m_serializedDataOffsets[2];
-    int colorOffset = param_3->m_serializedDataOffsets[1];
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    Crystal2Work* work = (Crystal2Work*)((u8*)&pppCrystal2->m_work + serializedDataOffsets[2]);
+    float* color = &pppCrystal2->m_color[serializedDataOffsets[1]];
     int sourceTex;
     pppModelSt* model;
     _GXTexObj backTexObj;
@@ -267,7 +268,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         pppSetBlendMode(0);
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (u8*)pppCrystal2 + 0x88 + colorOffset, (u8*)pppCrystal2 + 0x40, param_2->m_arg3,
+            color, (u8*)pppCrystal2 + 0x40, param_2->m_arg3,
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
@@ -312,7 +313,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         if (param_2->m_payload[0] == 0) {
             GXLoadTexObj((_GXTexObj*)(sourceTex + 0x28), GX_TEXMAP1);
         } else {
-            GXLoadTexObj((_GXTexObj*)(*(u32*)((u8*)pppCrystal2 + 0x84 + workOffset)), GX_TEXMAP1);
+            GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
         }
 
         GXSetNumIndStages(1);

@@ -11,10 +11,10 @@ struct HSD_ImageBuffer;
 struct Crystal2RefractionMap {
     void* m_imageData;
     GXTexFmt m_format;
-    s32 m_width;
-    s32 m_height;
-    s32 m_imageCount;
-    s32 m_bufferSize;
+    u32 m_width;
+    u32 m_height;
+    u32 m_imageCount;
+    u32 m_bufferSize;
 };
 
 struct Crystal2Work {
@@ -26,8 +26,8 @@ struct Crystal2Work {
 struct pppCrystal2 {
     _pppPObject m_object; // 0x0
     u8 m_pad34[0x50];
-    u8 m_workData[4];
-    u8 m_color[4];
+    Crystal2Work m_work;
+    float m_color[4];
 };
 
 struct pppCrystal2UnkB {

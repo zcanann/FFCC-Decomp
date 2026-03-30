@@ -258,8 +258,9 @@ int TriangleSwing(int phase)
  */
 int SawSwing(int phase)
 {
-    signed char value = (signed char)(phase >> 2);
-    return (int)value << 8;
+    int result = (int)(char)(phase >> 2) << 8;
+
+    return result;
 }
 
 /*
@@ -297,12 +298,9 @@ int DutySwing(int phase)
  */
 int RandomSwing(int phase)
 {
-    int index = phase >> 8;
-    char value;
+    int result = (int)DAT_8021dcce[(phase >> 8) & 0xFF] << 8;
 
-    index &= 0xFF;
-    value = DAT_8021dcce[index];
-    return (int)value << 8;
+    return result;
 }
 
 /*
@@ -382,8 +380,9 @@ int DutySwingR(int phase)
  */
 int SawSwingR(int phase)
 {
-    signed char value = static_cast<signed char>((~phase) >> 2);
-    return static_cast<int>(value) << 8;
+    int result = (int)(char)((phase ^ -1) >> 2) << 8;
+
+    return result;
 }
 
 /*
@@ -397,7 +396,9 @@ int SawSwingR(int phase)
  */
 int RandomSwingR(int phase)
 {
-    return static_cast<int>(DAT_8021dcce[((phase >> 8) & 0xFF) ^ 0x40]) << 8;
+    int result = (int)DAT_8021dcce[((phase >> 8) & 0xFF) ^ 0x40] << 8;
+
+    return result;
 }
 
 /*

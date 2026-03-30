@@ -204,7 +204,9 @@ void CFlatData::Create(void* filePtr)
 			chunkFile.PushChunk();
 			while (chunkFile.GetNextChunk(chunk))
 			{
-				if (chunk.m_id == 0x44415441) // 'DATA'
+				switch (chunk.m_id)
+				{
+				case 0x44415441: // 'DATA'
 				{
 					m_data[m_dataCount].m_size = chunk.m_arg0;
 					m_data[m_dataCount].m_data = new (Game.m_mainStage, s_cflat_data_cpp, 0x45) unsigned char[chunk.m_arg0];
@@ -246,8 +248,9 @@ void CFlatData::Create(void* filePtr)
 					}
 
 					m_dataCount++;
+					break;
 				}
-				else if (chunk.m_id == 0x5441424C) // 'TABL'
+				case 0x5441424C: // 'TABL'
 				{
 					char** stringIndex;
 					int iVar6;
@@ -279,8 +282,9 @@ void CFlatData::Create(void* filePtr)
 						iVar7++;
 					}
 					m_tableCount = iVar1 + 1;
+					break;
 				}
-				else if (chunk.m_id == 0x4D455320) // 'MES '
+				case 0x4D455320: // 'MES '
 				{
 					int iVar7;
 					int iVar8;
@@ -300,6 +304,8 @@ void CFlatData::Create(void* filePtr)
 						chunkFile.GetString();
 						flatData = (CFlatData*)flatData->m_data;
 					}
+					break;
+				}
 				}
 			}
 			chunkFile.PopChunk();

@@ -20,7 +20,7 @@ struct THPSimpleControl {
     THPVideoInfo videoInfo;        // 0x80
     THPAudioInfo audioInfo;        // 0x8C
     u32 unk_9C;                    // 0x9C
-    u32 isOpen;                    // 0xA0
+    s32 isOpen;                    // 0xA0
     u8 isPreLoaded;                // 0xA4
     u8 isBufferSet;                // 0xA5
     u8 isLooping;                  // 0xA6
@@ -320,20 +320,25 @@ s32 THPSimpleClose(void)
  */
 s32 THPSimpleCalcNeedMemory(void)
 {
-    if (SimpleControl.isOpen != 0) {
-        s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
-        need += (SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize + 0x1F) & ~0x1F;
-        need += (((u32)(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize) >> 2) + 0x1F) & ~0x1F;
-        need += (((u32)(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize) >> 2) + 0x1F) & ~0x1F;
-
-        if (SimpleControl.hasAudio != 0) {
-            need += (((SimpleControl.header.mAudioMaxSamples * 4) + 0x1F) & ~0x1F) * 3;
-        }
-
-        return need + 0x1000;
+    if (SimpleControl.isOpen == 0) {
+        return 0;
     }
 
-    return 0;
+    s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
+    s32 alignedFrameSize = (frameSize + 0x1F) & ~0x1F;
+    s32 quarterFrameSize = (u32)frameSize >> 2;
+    s32 alignedQuarterFrameSize = (quarterFrameSize + 0x1F) & ~0x1F;
+    s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+
+    need += alignedFrameSize;
+    need += alignedQuarterFrameSize;
+    need += alignedQuarterFrameSize;
+
+    if (SimpleControl.hasAudio != 0) {
+        need += (((SimpleControl.header.mAudioMaxSamples * 4) + 0x1F) & ~0x1F) * 3;
+    }
+
+    return need + 0x1000;
 }
 
 /*

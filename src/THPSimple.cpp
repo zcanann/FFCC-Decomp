@@ -463,7 +463,7 @@ void __THPSimpleDVDCallback(long result, DVDFileInfo*)
                 return;
             }
             SimpleControl.curAudioTrack = 0;
-            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataSize);
+            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
             SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
         }
 
@@ -528,7 +528,7 @@ s32 THPSimplePreLoad(s32 loop)
         if (((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) &&
             (SimpleControl.isLooping == 1)) {
             SimpleControl.curAudioTrack = 0;
-            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataSize);
+            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
             SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
         }
     }
@@ -600,7 +600,7 @@ s32 THPSimpleLoadStop(void)
     SimpleControl.audioBuffer[2].mValidSample = 0;
 
     SimpleControl.curFrame = -1;
-    SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataSize);
+    SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
     SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
     SimpleControl.readIndex = 0;
     SimpleControl.curAudioTrack = 0;
@@ -636,7 +636,7 @@ s32 THPSimpleDecode(s32 audioTrack)
                 goto restore_interrupts_1;
             }
             SimpleControl.curAudioTrack = 0;
-            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataSize);
+            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
             SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
         }
 
@@ -721,7 +721,7 @@ restore_interrupts_1:
                 goto restore_interrupts_2;
             }
             SimpleControl.curAudioTrack = 0;
-            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataSize);
+            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
             SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
         }
 

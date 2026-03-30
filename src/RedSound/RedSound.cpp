@@ -187,13 +187,15 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		return param_3;
 	}
 
+	param_3 = 0;
+
 	if (gRedMemoryDebugEnabled != 0) {
 		OSReport("%s%sSound Driver Initialize ERROR !!%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
 		         sRedSoundLogReset);
 		fflush(__files + 1);
 	}
 
-	return 0;
+	return param_3;
 }
 #pragma optimization_level 4
 

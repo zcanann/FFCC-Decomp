@@ -1854,6 +1854,9 @@ MSL_C/PPCEABI/bare/H/misc_io.c:
 
 MSL_C/PPCEABI/bare/H/printf.c:
 	.text       start:0x801B6A10 end:0x801B8B10
+	.rodata     start:0x801E70B8 end:0x801E70E0
+	.data       start:0x8021D5C0 end:0x8021D7EC
+	.sdata      start:0x8032EC08 end:0x8032EC10
 
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text       start:0x801B8B10 end:0x801B8B30

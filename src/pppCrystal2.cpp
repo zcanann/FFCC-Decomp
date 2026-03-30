@@ -224,7 +224,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
 {
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     Crystal2Work* work = (Crystal2Work*)((u8*)&pppCrystal2->m_work + serializedDataOffsets[2]);
-    float* color = &pppCrystal2->m_color[serializedDataOffsets[1]];
+    pppCVECTOR* color = (pppCVECTOR*)(pppCrystal2->m_color + serializedDataOffsets[1]);
     int sourceTex;
     pppModelSt* model;
     _GXTexObj backTexObj;

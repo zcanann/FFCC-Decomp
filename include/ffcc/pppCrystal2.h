@@ -25,9 +25,9 @@ struct Crystal2Work {
 // Forward declarations
 struct pppCrystal2 {
     _pppPObject m_object; // 0x0
-    u8 m_pad34[0x50];
-    Crystal2Work m_work;
-    float m_color[4];
+    u8 m_pad34[0x4C];     // 0x34
+    Crystal2Work m_work;  // 0x80
+    u8 m_color[4];        // 0x88
 };
 
 struct pppCrystal2UnkB {

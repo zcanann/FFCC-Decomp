@@ -64,8 +64,7 @@ public:
 	unsigned short m_glyphWidth;
 	unsigned short m_glyphHeight;
 	unsigned short m_glyphColumns;
-	unsigned char m_usesEmbeddedData;
-	unsigned char m_pad0f;
+	unsigned short m_usesEmbeddedData;
 	unsigned int m_unk10;
 	float posX;
 	float posY;

@@ -154,6 +154,8 @@ public:
     void drawOverlap();
     void LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
+
+    u8 _pad_0x4_to_0x71B[0x71C - sizeof(CProcess)];
 };
 
 extern CCharaPcs CharaPcs;

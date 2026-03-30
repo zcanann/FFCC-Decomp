@@ -308,44 +308,49 @@ void CWind::getObj(int)
 int CWind::AddAmbient(float dir, float speed)
 {
 	int blocks = 4;
-	WindObject* cur = m_objects;
-	WindObject* obj;
+	WindObject* obj = m_objects;
 
 	do {
-		obj = cur;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) < 0) {
+			obj++;
+		} else {
 			goto found;
 		}
-		obj++;
-		if ((s8)obj->flags >= 0) {
+		if (static_cast<s8>(obj->flags & 0x80) >= 0) {
 			goto found;
 		}
 
-		cur += 8;
+		obj++;
 	} while (--blocks != 0);
 
 	obj = 0;
@@ -371,7 +376,7 @@ found:
 	obj->curPower = speed;
 	obj->basePower = speed;
 
-	return id;
+	return obj->id;
 }
 
 /*

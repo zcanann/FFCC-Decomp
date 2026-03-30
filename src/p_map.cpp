@@ -222,10 +222,18 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 COctNode* rootNode =
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
                 if (rootNode != 0) {
-                    float* bounds = reinterpret_cast<float*>(rootNode);
-                    unusedVec.x = (bounds[0] + bounds[3]) * kMapBoundsCenterScale;
-                    unusedVec.y = (bounds[1] + bounds[4]) * kMapBoundsCenterScale;
-                    unusedVec.z = (bounds[2] + bounds[5]) * kMapBoundsCenterScale;
+                    unusedVec.x =
+                        (rootNode->m_boundMinX + rootNode->m_boundMaxX) * kMapBoundsCenterScale;
+                    unusedVec.y =
+                        (rootNode->m_boundMinY + rootNode->m_boundMaxY) * kMapBoundsCenterScale;
+                    unusedVec.z =
+                        (rootNode->m_boundMinZ + rootNode->m_boundMaxZ) * kMapBoundsCenterScale;
+                } else {
+                    float* mapCenter =
+                        reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
+                    unusedVec.x = mapCenter[0];
+                    unusedVec.y = mapCenter[1];
+                    unusedVec.z = mapCenter[2];
                 }
             }
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y + kMapCameraCenterYOffset;
@@ -400,10 +408,18 @@ void CMapPcs::calc()
                 COctNode* rootNode =
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
                 if (rootNode != 0) {
-                    float* bounds = reinterpret_cast<float*>(rootNode);
-                    cameraPos.x = (bounds[0] + bounds[3]) * kMapBoundsCenterScale;
-                    cameraPos.y = (bounds[1] + bounds[4]) * kMapBoundsCenterScale;
-                    cameraPos.z = (bounds[2] + bounds[5]) * kMapBoundsCenterScale;
+                    cameraPos.x =
+                        (rootNode->m_boundMinX + rootNode->m_boundMaxX) * kMapBoundsCenterScale;
+                    cameraPos.y =
+                        (rootNode->m_boundMinY + rootNode->m_boundMaxY) * kMapBoundsCenterScale;
+                    cameraPos.z =
+                        (rootNode->m_boundMinZ + rootNode->m_boundMaxZ) * kMapBoundsCenterScale;
+                } else {
+                    float* mapCenter =
+                        reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
+                    cameraPos.x = mapCenter[0];
+                    cameraPos.y = mapCenter[1];
+                    cameraPos.z = mapCenter[2];
                 }
             }
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;

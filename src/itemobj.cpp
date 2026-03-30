@@ -64,7 +64,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, unsigned int);
+extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
 extern float FLOAT_80331b24;
@@ -114,6 +114,17 @@ struct ItemObjFlatTableEntry {
 struct ItemObjFlatData {
 	char pad[0x6c];
 	ItemObjFlatTableEntry table[8];
+};
+
+struct CMapCylinderRaw {
+	Vec m_bottom;
+	Vec m_direction;
+	float m_radius;
+	float m_height;
+	Vec m_top;
+	Vec m_direction2;
+	float m_radius2;
+	float m_height2;
 };
 
 /*
@@ -1125,51 +1136,37 @@ void CGItemObj::ItemJump(int state, float jump)
 {
 	for (CGItemObj* itemObj = static_cast<CGItemObj*>(FindGItemObjFirst__13CFlatRuntime2Fv(CFlat)); itemObj != 0;
 	     itemObj = static_cast<CGItemObj*>(FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj))) {
-		CGObject* obj = reinterpret_cast<CGObject*>(itemObj);
-		if ((obj->m_displayFlags & 0x10) == 0) {
-			float local_78;
-			float local_74;
-			float local_70;
-			float local_6c;
-			float local_68;
-			float local_64;
-			float local_60;
-			float local_5c;
-			float local_58;
-			float local_48;
-			float local_44;
-			float local_40;
-			float local_3c;
-			float local_38;
-			float local_34;
-			float local_30;
-			float local_2c;
-			float local_28;
-			float local_24;
-			unsigned int mapMask = *reinterpret_cast<unsigned int*>(&obj->m_moveVec.x);
+		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
-			local_6c = obj->m_worldPosition.x;
-			local_64 = obj->m_worldPosition.z;
-			local_68 = obj->m_worldPosition.y + FLOAT_80331b1c;
-			local_78 = FLOAT_80331b20;
-			local_70 = FLOAT_80331b20;
-			local_74 = FLOAT_80331b24;
-			local_30 = FLOAT_80331b28;
-			local_34 = FLOAT_80331b28;
-			local_38 = FLOAT_80331b28;
-			local_24 = FLOAT_80331b2c;
-			local_28 = FLOAT_80331b2c;
-			local_2c = FLOAT_80331b2c;
-			local_48 = FLOAT_80331b20;
-			local_44 = FLOAT_80331b24;
-			local_40 = FLOAT_80331b20;
-			local_3c = FLOAT_80331b20;
-			local_60 = local_6c;
-			local_5c = local_68;
-			local_58 = local_64;
-			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &local_60, &local_78, mapMask) != 0 &&
+		if ((object->m_displayFlags & 0x10) == 0) {
+			CMapCylinderRaw cylinder;
+			Vec move;
+			unsigned int mapMask = *reinterpret_cast<unsigned int*>(&object->m_moveVec.x);
+
+			move.x = FLOAT_80331b20;
+			move.y = FLOAT_80331b24;
+			move.z = FLOAT_80331b20;
+
+			cylinder.m_bottom = object->m_worldPosition;
+			cylinder.m_bottom.y += FLOAT_80331b1c;
+			cylinder.m_direction.x = FLOAT_80331b20;
+			cylinder.m_direction.y = FLOAT_80331b20;
+			cylinder.m_direction.z = FLOAT_80331b20;
+			cylinder.m_radius = FLOAT_80331b20;
+			cylinder.m_height = FLOAT_80331b24;
+			cylinder.m_top.x = FLOAT_80331b20;
+			cylinder.m_top.y = FLOAT_80331b20;
+			cylinder.m_top.z = FLOAT_80331b28;
+			cylinder.m_direction2.x = FLOAT_80331b28;
+			cylinder.m_direction2.y = FLOAT_80331b28;
+			cylinder.m_direction2.z = FLOAT_80331b2c;
+			cylinder.m_radius2 = FLOAT_80331b2c;
+			cylinder.m_height2 = FLOAT_80331b2c;
+
+			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
 			    reinterpret_cast<unsigned char*>(gMapHitFace)[0x47] == state) {
-				obj->m_groundHitOffset.y = obj->m_groundHitOffset.y + jump;
+				object->m_groundHitOffset.y += jump;
 			}
 		}
 	}

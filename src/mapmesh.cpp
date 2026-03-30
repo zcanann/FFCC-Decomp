@@ -258,32 +258,32 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
     // Re-read in a pre-pass to compute required allocation size.
     unsigned int workSize = 0;
     CChunkFile::CChunk chunk;
-    CChunkFile prepass = chunkFile;
-    prepass.PushChunk();
-    while (prepass.GetNextChunk(chunk)) {
+    CChunkFile reader = chunkFile;
+    reader.PushChunk();
+    while (reader.GetNextChunk(chunk)) {
         if (chunk.m_id == CHUNK_NORM || chunk.m_id == CHUNK_COLR || chunk.m_id == CHUNK_NBT ||
             chunk.m_id == CHUNK_UV || chunk.m_id == CHUNK_VERT) {
             workSize = Align32(workSize) + chunk.m_size;
         } else if (chunk.m_id == CHUNK_DLHD) {
             U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
             workSize = Align32(workSize) + (static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U);
-            prepass.PushChunk();
-            while (prepass.GetNextChunk(chunk)) {
+            reader.PushChunk();
+            while (reader.GetNextChunk(chunk)) {
                 if (chunk.m_id == CHUNK_DLST) {
-                    prepass.Align(0x20);
+                    reader.Align(0x20);
                     if (chunk.m_arg0 != 0) {
                         workSize = Align32(workSize) + Align32(chunk.m_arg0);
                     }
-                    prepass.Align(0x20);
+                    reader.Align(0x20);
                 }
             }
-            prepass.PopChunk();
+            reader.PopChunk();
         }
     }
-    prepass.PopChunk();
+    reader.PopChunk();
     workSize = Align32(workSize);
 
-    CChunkFile reader = chunkFile;
+    reader = chunkFile;
     unsigned int cursor = 0;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {

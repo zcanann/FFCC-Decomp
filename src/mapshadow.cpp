@@ -123,30 +123,24 @@ void CMapShadow::Init()
 	float height;
 	CMaterial* material;
 	int materialSet;
-	u32 materialWidth;
-	u32 materialHeight;
-	u32 materialMode;
-	u32 materialIndex;
 
 	materialSet = *(int*)((char*)&MapMng + 0x213d4);
-	materialIndex = m_materialIndex;
-	material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[materialIndex];
+	material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[m_materialIndex];
 	material = *reinterpret_cast<CMaterial**>(reinterpret_cast<int>(material) + 0x3c);
-	materialWidth = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x64);
-	materialHeight = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x68);
-	materialMode = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x6c);
-	m_materialMode = (u8)materialMode;
-	width = (float)materialWidth;
-	height = (float)materialHeight;
+	width = (float)*reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x64);
+	height = (float)*reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x68);
+	m_materialMode = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x6c);
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
+		double scaleBias = DOUBLE_8032fce8;
+		float scaleStep = FLOAT_8032fcf0;
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
-		                  (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
-		                  FLOAT_8032fcf0);
+		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
+		double scaleBias = DOUBLE_8032fce8;
+		float scaleStep = FLOAT_8032fcf0;
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
-		                (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
-		                FLOAT_8032fcf0);
+		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	}
 }

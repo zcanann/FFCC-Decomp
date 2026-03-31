@@ -393,155 +393,187 @@ pppRandChar.cpp:
 	extab       start:0x800070B0 end:0x800070B8
 	extabindex  start:0x8000CFB8 end:0x8000CFC4
 	.text       start:0x80060EFC end:0x8006103C
+	.sdata2     start:0x8032FEF8 end:0x8032FF08
 
 pppRandCV.cpp:
 	extab       start:0x800070B8 end:0x800070C0
 	extabindex  start:0x8000CFC4 end:0x8000CFD0
 	.text       start:0x8006103C end:0x80061258
+	.sdata2     start:0x8032FF08 end:0x8032FF18
 
 pppRandDownChar.cpp:
 	extab       start:0x800070C0 end:0x800070C8
 	extabindex  start:0x8000CFD0 end:0x8000CFDC
 	.text       start:0x80061258 end:0x80061384
+	.sdata2     start:0x8032FF18 end:0x8032FF28
 
 pppRandDownCV.cpp:
 	extab       start:0x800070C8 end:0x800070D0
 	extabindex  start:0x8000CFDC end:0x8000CFE8
 	.text       start:0x80061384 end:0x8006155C
+	.sdata2     start:0x8032FF28 end:0x8032FF38
 
 pppRandDownFloat.cpp:
 	extab       start:0x800070D0 end:0x800070D8
 	extabindex  start:0x8000CFE8 end:0x8000CFF4
 	.text       start:0x8006155C end:0x80061664
+	.sdata2     start:0x8032FF38 end:0x8032FF3C
 
 pppRandDownFV.cpp:
 	extab       start:0x800070D8 end:0x800070E0
 	extabindex  start:0x8000CFF4 end:0x8000D000
 	.text       start:0x80061664 end:0x80061794
+	.sdata2     start:0x8032FF40 end:0x8032FF44
 
 pppRandDownHCV.cpp:
 	extab       start:0x800070E0 end:0x800070E8
 	extabindex  start:0x8000D000 end:0x8000D00C
 	.text       start:0x80061794 end:0x8006195C
+	.sdata2     start:0x8032FF48 end:0x8032FF58
 
 pppRandDownInt.cpp:
 	extab       start:0x800070E8 end:0x800070F0
 	extabindex  start:0x8000D00C end:0x8000D018
 	.text       start:0x8006195C end:0x80061A88
+	.sdata2     start:0x8032FF58 end:0x8032FF68
 
 pppRandDownIV.cpp:
 	extab       start:0x800070F0 end:0x800070F8
 	extabindex  start:0x8000D018 end:0x8000D024
 	.text       start:0x80061A88 end:0x80061C1C
+	.sdata2     start:0x8032FF68 end:0x8032FF78
 
 pppRandDownShort.cpp:
 	extab       start:0x800070F8 end:0x80007100
 	extabindex  start:0x8000D024 end:0x8000D030
 	.text       start:0x80061C1C end:0x80061D48
+	.sdata2     start:0x8032FF78 end:0x8032FF88
 
 pppRandFloat.cpp:
 	extab       start:0x80007100 end:0x80007108
 	extabindex  start:0x8000D030 end:0x8000D03C
 	.text       start:0x80061D48 end:0x80061E54
+	.sdata2     start:0x8032FF88 end:0x8032FF8C
 
 pppRandFV.cpp:
 	extab       start:0x80007108 end:0x80007110
 	extabindex  start:0x8000D03C end:0x8000D048
 	.text       start:0x80061E54 end:0x80061F88
+	.sdata2     start:0x8032FF90 end:0x8032FF94
 
 pppRandHCV.cpp:
 	extab       start:0x80007110 end:0x80007118
 	extabindex  start:0x8000D048 end:0x8000D054
 	.text       start:0x80061F88 end:0x80062194
+	.sdata2     start:0x8032FF98 end:0x8032FFA8
 
 pppRandInt.cpp:
 	extab       start:0x80007118 end:0x80007120
 	extabindex  start:0x8000D054 end:0x8000D060
 	.text       start:0x80062194 end:0x800622D4
+	.sdata2     start:0x8032FFA8 end:0x8032FFB8
 
 pppRandIV.cpp:
 	extab       start:0x80007120 end:0x80007128
 	extabindex  start:0x8000D060 end:0x8000D06C
 	.text       start:0x800622D4 end:0x8006249C
+	.sdata2     start:0x8032FFB8 end:0x8032FFC8
 
 pppRandShort.cpp:
 	extab       start:0x80007128 end:0x80007130
 	extabindex  start:0x8000D06C end:0x8000D078
 	.text       start:0x8006249C end:0x800625DC
+	.sdata2     start:0x8032FFC8 end:0x8032FFD8
 
 pppRandUpChar.cpp:
 	extab       start:0x80007130 end:0x80007138
 	extabindex  start:0x8000D078 end:0x8000D084
 	.text       start:0x800625DC end:0x80062708
+	.sdata2     start:0x8032FFD8 end:0x8032FFE8
 
 pppRandUpCV.cpp:
 	extab       start:0x80007138 end:0x80007140
 	extabindex  start:0x8000D084 end:0x8000D090
 	.text       start:0x80062708 end:0x800628E0
+	.sdata2     start:0x8032FFE8 end:0x8032FFF8
 
 pppRandUpFloat.cpp:
 	extab       start:0x80007140 end:0x80007148
 	extabindex  start:0x8000D090 end:0x8000D09C
 	.text       start:0x800628E0 end:0x800629E8
+	.sdata2     start:0x8032FFF8 end:0x8032FFFC
 
 pppRandUpFV.cpp:
 	extab       start:0x80007148 end:0x80007150
 	extabindex  start:0x8000D09C end:0x8000D0A8
 	.text       start:0x800629E8 end:0x80062B18
+	.sdata2     start:0x80330000 end:0x80330004
 
 pppRandUpHCV.cpp:
 	extab       start:0x80007150 end:0x80007158
 	extabindex  start:0x8000D0A8 end:0x8000D0B4
 	.text       start:0x80062B18 end:0x80062CE0
+	.sdata2     start:0x80330008 end:0x80330018
 
 pppRandUpInt.cpp:
 	extab       start:0x80007158 end:0x80007160
 	extabindex  start:0x8000D0B4 end:0x8000D0C0
 	.text       start:0x80062CE0 end:0x80062E0C
+	.sdata2     start:0x80330018 end:0x80330028
 
 pppRandUpIV.cpp:
 	extab       start:0x80007160 end:0x80007168
 	extabindex  start:0x8000D0C0 end:0x8000D0CC
 	.text       start:0x80062E0C end:0x80062FA0
+	.sdata2     start:0x80330028 end:0x80330038
 
 pppRandUpShort.cpp:
 	extab       start:0x80007168 end:0x80007170
 	extabindex  start:0x8000D0CC end:0x8000D0D8
 	.text       start:0x80062FA0 end:0x800630CC
+	.sdata2     start:0x80330038 end:0x80330048
 
 pppScale.cpp:
 	.text       start:0x800630CC end:0x80063150
+	.sdata2     start:0x80330048 end:0x8033004C
 
 pppSclAccele.cpp:
 	.text       start:0x80063150 end:0x80063210
+	.sdata2     start:0x80330050 end:0x80330054
 
 pppSclMove.cpp:
 	.text       start:0x80063210 end:0x800632D0
+	.sdata2     start:0x80330058 end:0x8033005C
 
 pppSRandCV.cpp:
 	extab       start:0x80007170 end:0x80007178
 	extabindex  start:0x8000D0D8 end:0x8000D0E4
 	.text       start:0x800632D0 end:0x800635B0
+	.sdata2     start:0x80330060 end:0x80330070
 
 pppSRandDownCV.cpp:
 	extab       start:0x80007178 end:0x80007180
 	extabindex  start:0x8000D0E4 end:0x8000D0F0
 	.text       start:0x800635B0 end:0x80063840
+	.sdata2     start:0x80330070 end:0x80330080
 
 pppSRandDownFV.cpp:
 	extab       start:0x80007180 end:0x80007188
 	extabindex  start:0x8000D0F0 end:0x8000D0FC
 	.text       start:0x80063840 end:0x800639EC
+	.sdata2     start:0x80330080 end:0x80330084
 
 pppSRandDownHCV.cpp:
 	extab       start:0x80007188 end:0x80007190
 	extabindex  start:0x8000D0FC end:0x8000D108
 	.text       start:0x800639EC end:0x80063C7C
+	.sdata2     start:0x80330088 end:0x80330098
 
 pppSRandFV.cpp:
 	extab       start:0x80007190 end:0x80007198
 	extabindex  start:0x8000D108 end:0x8000D114
 	.text       start:0x80063C7C end:0x80063E34
+	.sdata2     start:0x80330098 end:0x8033009C
 
 pppSRandHCV.cpp:
 	extab       start:0x80007198 end:0x800071A0
@@ -553,16 +585,19 @@ pppSRandUpCV.cpp:
 	extab       start:0x800071A0 end:0x800071A8
 	extabindex  start:0x8000D120 end:0x8000D12C
 	.text       start:0x80064114 end:0x800643A4
+	.sdata2     start:0x803300B0 end:0x803300C0
 
 pppSRandUpFV.cpp:
 	extab       start:0x800071A8 end:0x800071B0
 	extabindex  start:0x8000D12C end:0x8000D138
 	.text       start:0x800643A4 end:0x80064550
+	.sdata2     start:0x803300C0 end:0x803300C4
 
 pppSRandUpHCV.cpp:
 	extab       start:0x800071B0 end:0x800071B8
 	extabindex  start:0x8000D138 end:0x8000D144
 	.text       start:0x80064550 end:0x800647E0
+	.sdata2     start:0x803300C8 end:0x803300D8
 
 pppVertexAp.cpp:
 	extab       start:0x800071B8 end:0x800071C0

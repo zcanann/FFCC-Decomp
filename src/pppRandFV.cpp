@@ -1,9 +1,10 @@
 #include "ffcc/pppRandFV.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandFVSingleSampleScale = 2.0f;
 extern f32 gPppDefaultValueBuffer[];
 
 struct PppRandFVParam2 {

@@ -1,10 +1,11 @@
 #include "ffcc/pppRandDownChar.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandDownCharDualSampleScale = 0.5f;
 
 
 struct PppRandDownCharParam2 {
@@ -44,7 +45,8 @@ void pppRandDownChar(void* param1, void* param2, void* param3)
         f32 value = -Math.RandF();
         if (in->field9 != 0) {
             f32 mixed = value - Math.RandF();
-            value = mixed * kPppRandDownCharDualSampleScale;
+            f32 scale = kPppRandDownCharDualSampleScale;
+            value = mixed * scale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

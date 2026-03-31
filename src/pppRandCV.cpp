@@ -1,10 +1,11 @@
 #include "ffcc/pppRandCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandCVSingleSampleScale = 2.0f;
 
 typedef struct RandCVParams {
     s32 index;

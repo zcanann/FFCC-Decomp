@@ -1,9 +1,10 @@
 #include "ffcc/pppRandDownHCV.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandDownHCVDualSampleScale = 0.5f;
 extern s16 gPppDefaultValueBuffer[];
 
 
@@ -48,7 +49,8 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
         if (in->field10 != 0) {
             f32 random = Math.RandF();
             f32 blend = value - random;
-            value = blend * kPppRandDownHCVDualSampleScale;
+            f32 scale = kPppRandDownHCVDualSampleScale;
+            value = blend * scale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

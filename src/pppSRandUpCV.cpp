@@ -1,10 +1,11 @@
 #include "ffcc/pppSRandUpCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppSRandUpCVDualSampleScale = 0.5f;
 
 struct SRandUpCVParam {
     s32 targetId;
@@ -46,7 +47,8 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                value = randomPair * kPppSRandUpCVDualSampleScale;
+                f32 scale = kPppSRandUpCVDualSampleScale;
+                value = randomPair * scale;
             }
             target[0] = value;
         }
@@ -56,7 +58,8 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                value = randomPair * kPppSRandUpCVDualSampleScale;
+                f32 scale = kPppSRandUpCVDualSampleScale;
+                value = randomPair * scale;
             }
             target[1] = value;
         }
@@ -66,7 +69,8 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                value = randomPair * kPppSRandUpCVDualSampleScale;
+                f32 scale = kPppSRandUpCVDualSampleScale;
+                value = randomPair * scale;
             }
             target[2] = value;
         }
@@ -76,7 +80,8 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             f32 value = Math.RandF();
             if (flag != 0) {
                 f32 randomPair = value + Math.RandF();
-                value = randomPair * kPppSRandUpCVDualSampleScale;
+                f32 scale = kPppSRandUpCVDualSampleScale;
+                value = randomPair * scale;
             }
             target[3] = value;
         }

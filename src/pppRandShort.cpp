@@ -1,9 +1,10 @@
 #include "ffcc/pppRandShort.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandShortSingleSampleScale = 2.0f;
 extern s16 gPppDefaultValueBuffer[];
 
 

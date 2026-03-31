@@ -1,9 +1,10 @@
 #include "ffcc/pppSRandDownFV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppSRandDownFVDualSampleScale = 0.5f;
 extern f32 gPppDefaultValueBuffer[];
 
 

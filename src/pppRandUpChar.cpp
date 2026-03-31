@@ -1,10 +1,11 @@
 #include "ffcc/pppRandUpChar.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandUpCharDualSampleScale = 0.5f;
 
 struct RandUpCharParam {
     s32 targetId;
@@ -44,7 +45,8 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
         f32 value = Math.RandF();
         if (in->randomTwice != 0) {
             f32 mixed = value + Math.RandF();
-            value = mixed * kPppRandUpCharDualSampleScale;
+            f32 scale = kPppRandUpCharDualSampleScale;
+            value = mixed * scale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

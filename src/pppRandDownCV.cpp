@@ -1,10 +1,11 @@
 #include "ffcc/pppRandDownCV.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandDownCVDualSampleScale = 0.5f;
 
 struct PppRandDownCVParam2 {
     s32 field0;
@@ -47,7 +48,8 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
         if (in->fieldC != 0) {
             f32 random = Math.RandF();
             f32 blend = value - random;
-            value = blend * kPppRandDownCVDualSampleScale;
+            f32 scale = kPppRandDownCVDualSampleScale;
+            value = blend * scale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

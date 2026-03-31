@@ -1,9 +1,10 @@
 #include "ffcc/pppRandUpFV.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandUpFVDualSampleScale = 0.5f;
 extern f32 gPppDefaultValueBuffer[];
 
 struct PppRandUpFVParam2 {
@@ -46,7 +47,8 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
         f32 value = Math.RandF();
         if (in->field18 != 0) {
             f32 randomValue = value + Math.RandF();
-            value = randomValue * kPppRandUpFVDualSampleScale;
+            f32 scale = kPppRandUpFVDualSampleScale;
+            value = randomValue * scale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

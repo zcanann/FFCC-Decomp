@@ -1,9 +1,10 @@
 #include "ffcc/pppRandHCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandHCVSingleSampleScale = 2.0f;
 extern s16 gPppDefaultValueBuffer[];
 
 typedef struct RandHCVParams {

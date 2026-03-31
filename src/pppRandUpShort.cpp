@@ -1,9 +1,10 @@
 #include "ffcc/pppRandUpShort.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandUpShortDualSampleScale = 0.5f;
 extern s16 gPppDefaultValueBuffer[];
 
 struct RandUpShortParam {
@@ -44,7 +45,8 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
         f32 value = Math.RandF();
         if (in->randomTwice != 0) {
             f32 mixed = value + Math.RandF();
-            value = mixed * kPppRandUpShortDualSampleScale;
+            f32 scale = kPppRandUpShortDualSampleScale;
+            value = mixed * scale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

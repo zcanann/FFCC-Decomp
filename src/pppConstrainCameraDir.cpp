@@ -100,15 +100,14 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPosX();
             float cameraPosY = CameraPosY();
             float cameraPosZ = CameraPosZ();
-            float scale = kPppConstrainCameraDirScaleBase +
-                          ((CameraDistance() - kPppConstrainCameraDirDistanceBase) / kPppConstrainCameraDirDistanceBase);
+            float distanceBase = kPppConstrainCameraDirDistanceBase;
+            float scale = ((CameraDistance() - distanceBase) / distanceBase) + kPppConstrainCameraDirScaleBase;
             
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
             
-            float baseScale = kPppConstrainCameraDirScaleBase;
             pppMngSt->m_scale.x = kPppConstrainCameraDirScaleMul * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = baseScale;
+            pppMngSt->m_scale.z = kPppConstrainCameraDirScaleBase;
             
             Mtx MStack_e8;
             PSMTXScale(MStack_e8, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -120,10 +119,10 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             PSMTXConcat(MStack_e8, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
             
             if (flags[0] != 0) {
-                float value0 = *value;
-                pppMngStPtr->m_matrix.value[0][3] = cameraDirX * value0 + cameraPosX;
-                pppMngStPtr->m_matrix.value[1][3] = cameraDirY * value0 + cameraPosY;
-                pppMngStPtr->m_matrix.value[2][3] = cameraDirZ * value0 + cameraPosZ;
+                float graphValue = value[0];
+                pppMngStPtr->m_matrix.value[0][3] = cameraDirX * graphValue + cameraPosX;
+                pppMngStPtr->m_matrix.value[1][3] = cameraDirY * graphValue + cameraPosY;
+                pppMngStPtr->m_matrix.value[2][3] = cameraDirZ * graphValue + cameraPosZ;
             }
             
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);

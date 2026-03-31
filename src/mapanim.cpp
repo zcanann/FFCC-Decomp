@@ -415,7 +415,7 @@ void CMapAnimNode::Interp(int frame)
     {
         CMapAnimNodeTrack* track = reinterpret_cast<CMapAnimNodeTrack*>(*reinterpret_cast<unsigned char**>(node + 0x08));
         CMapAnimNodeTrackKey* keys = track->keys;
-        unsigned int trackCount = track->count;
+        int trackCount = track->count;
         Vec* out = reinterpret_cast<Vec*>(*reinterpret_cast<unsigned char**>(node + 0x00) + 0x64);
 
         if (trackCount == 1) {
@@ -423,8 +423,12 @@ void CMapAnimNode::Interp(int frame)
         } else {
             CMapAnimNodeTrackKey* current = keys;
 
-            for (unsigned int i = 0; i < trackCount; i++) {
-                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= (i + 1U));
+            for (int i = 0; i < trackCount; i++) {
+                int nextIndex = i + 1;
+
+                if (trackCount <= nextIndex) {
+                    nextIndex = 0;
+                }
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
                 unsigned int endFrame = next->frame;
 
@@ -434,7 +438,7 @@ void CMapAnimNode::Interp(int frame)
 
                 unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && (frameInLoop < endFrame)) {
-                    int frameRange = endFrame - currentFrame;
+                    unsigned int frameRange = endFrame - currentFrame;
                     float t = 0.0f;
                     Vec nextScaled;
                     Vec currentScaled;
@@ -458,7 +462,7 @@ void CMapAnimNode::Interp(int frame)
         CMapAnimNodeTrack* track =
             reinterpret_cast<CMapAnimNodeTrack*>(*reinterpret_cast<unsigned char**>(node + 0x08) + sizeof(CMapAnimNodeTrack));
         CMapAnimNodeTrackKey* keys = track->keys;
-        unsigned int trackCount = track->count;
+        int trackCount = track->count;
         Vec* out = reinterpret_cast<Vec*>(*reinterpret_cast<unsigned char**>(node + 0x00) + 0x70);
 
         if (trackCount == 1) {
@@ -466,8 +470,12 @@ void CMapAnimNode::Interp(int frame)
         } else {
             CMapAnimNodeTrackKey* current = keys;
 
-            for (unsigned int i = 0; i < trackCount; i++) {
-                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= (i + 1U));
+            for (int i = 0; i < trackCount; i++) {
+                int nextIndex = i + 1;
+
+                if (trackCount <= nextIndex) {
+                    nextIndex = 0;
+                }
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
                 unsigned int endFrame = next->frame;
 
@@ -480,7 +488,7 @@ void CMapAnimNode::Interp(int frame)
 
                 unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && (frameInLoop < endFrame)) {
-                    int frameRange = endFrame - currentFrame;
+                    unsigned int frameRange = endFrame - currentFrame;
                     float t = 0.0f;
                     Vec nextScaled;
                     Vec currentScaled;
@@ -504,7 +512,7 @@ void CMapAnimNode::Interp(int frame)
         CMapAnimNodeTrack* track = reinterpret_cast<CMapAnimNodeTrack*>(
             *reinterpret_cast<unsigned char**>(node + 0x08) + (sizeof(CMapAnimNodeTrack) * 2));
         CMapAnimNodeTrackKey* keys = track->keys;
-        unsigned int trackCount = track->count;
+        int trackCount = track->count;
         Vec* out = reinterpret_cast<Vec*>(*reinterpret_cast<unsigned char**>(node + 0x00) + 0x7C);
 
         if (trackCount == 1) {
@@ -512,8 +520,12 @@ void CMapAnimNode::Interp(int frame)
         } else {
             CMapAnimNodeTrackKey* current = keys;
 
-            for (unsigned int i = 0; i < trackCount; i++) {
-                unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(trackCount <= (i + 1U));
+            for (int i = 0; i < trackCount; i++) {
+                int nextIndex = i + 1;
+
+                if (trackCount <= nextIndex) {
+                    nextIndex = 0;
+                }
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
                 unsigned int endFrame = next->frame;
 
@@ -526,7 +538,7 @@ void CMapAnimNode::Interp(int frame)
 
                 unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && (frameInLoop < endFrame)) {
-                    int frameRange = endFrame - currentFrame;
+                    unsigned int frameRange = endFrame - currentFrame;
                     float t = 0.0f;
                     Vec nextScaled;
                     Vec currentScaled;

@@ -443,7 +443,7 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXCha
     u32* ptref;
     u32 tmap;
     u32 tcoord;
-    static int c2r[] = { 0, 1, 0, 1, 0, 1, 7, 5, 6 };
+    static int c2r[10] = { 0, 1, 0, 1, 0, 1, 7, 5, 6, 0 };
 
     CHECK_GXBEGIN(1131, "GXSetTevOrder");
     ASSERTMSGLINE(1132, stage < GX_MAX_TEVSTAGE, "GXSetTevOrder: Invalid Tev Stage Index");

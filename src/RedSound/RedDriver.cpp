@@ -147,21 +147,16 @@ extern void InitReverb();
  */
 void _SetSoundMode(int* param_1)
 {
-    int soundMode;
-
-    soundMode = *param_1;
-    DAT_8032f3c8 = soundMode;
-    if (soundMode == 1) {
+    DAT_8032f3c8 = *param_1;
+    if (*param_1 == 1) {
         OSGetSoundMode(0);
     } else {
         OSGetSoundMode(1);
     }
-    soundMode = DAT_8032f3c8;
-    DAT_8032f400 = soundMode;
-    if (soundMode == 2) {
-        AXSetMode(2);
-    } else {
+    if ((DAT_8032f400 = DAT_8032f3c8) != 2) {
         AXSetMode(0);
+    } else {
+        AXSetMode(2);
     }
 }
 

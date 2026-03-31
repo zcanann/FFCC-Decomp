@@ -102,7 +102,7 @@ struct pppYmLaserWork {
  */
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 one = FLOAT_80330dc0;
+	f32 one = kPppYmLaserOne;
 	f32 randArg = FLOAT_80330df0;
 	pppYmLaserWork* work = (pppYmLaserWork*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 

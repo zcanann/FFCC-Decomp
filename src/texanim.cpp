@@ -780,29 +780,20 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
  */
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>((int)this + 8);
+    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
 
-    for (unsigned int i = 0; i < (unsigned int)texAnims->GetSize(); i++) {
-        CTexAnim* texAnim = (*texAnims)[i];
-        int refData = *reinterpret_cast<int*>((int)texAnim + 8);
-        int* material = *reinterpret_cast<int**>(refData + 0x108);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
+        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
 
-        if (material != 0) {
-            int refCount = material[1];
-            material[1] = refCount - 1;
-            if ((refCount - 1 == 0) && (material != 0)) {
-                (*reinterpret_cast<void (**)(int*, int)>(*material + 8))(material, 1);
-            }
-            *reinterpret_cast<void**>(refData + 0x108) = 0;
-        }
+        ReleaseRef(&refData->material);
 
         int materialIndex;
-        if ((materialSet != 0) &&
-            ((materialIndex = (int)materialSet->Find((char*)(refData + 8))), (materialIndex >= 0))) {
+        if ((materialSet != 0) && ((materialIndex = static_cast<int>(materialSet->Find(refData->name))) >= 0)) {
             CMaterial* found =
-                (*reinterpret_cast<CPtrArray<CMaterial*>*>((int)materialSet + 8))[(unsigned long)materialIndex];
-            *reinterpret_cast<CMaterial**>(refData + 0x108) = found;
-            *reinterpret_cast<int*>((int)found + 4) = *reinterpret_cast<int*>((int)found + 4) + 1;
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<unsigned long>(materialIndex)];
+            refData->material = found;
+            AddRef(found);
         }
     }
 }

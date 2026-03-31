@@ -312,19 +312,19 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
  */
 void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
-    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     u8* work = (u8*)param_2;
-    ScreenBreakDisplayList* displayList = modelView->m_meshes[meshIndex].m_data->m_displayLists + drawListIndex;
+    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
+    ScreenBreakMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    ScreenBreakDisplayList* displayList = meshData->m_displayLists;
+
+    displayList += drawListIndex;
 
     if (work[0x24] != 0) {
+        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
         unsigned char colorStorage0[4];
         unsigned char colorStorage1[4];
-        CMaterial* material;
 
-        material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
-
-        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, modelView->m_data->m_materialSet,
-                                                                   displayList->m_material, 1, 0);
+        MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, work + 0x28, 4);
 
         if (*(u16*)((u8*)material + 0x18) == 1) {

@@ -1463,15 +1463,21 @@ mtx/quat.c:
 
 dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0
+	.bss        start:0x8030C950 end:0x8030CA20
+	.sbss       start:0x8032F00C end:0x8032F054
 
 dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
+	.sbss       start:0x8032F054 end:0x8032F074
 
 dvd/dvd.c:
 	.text       start:0x80188A70 end:0x8018B16C
+	.bss        start:0x8030CA20 end:0x8030CAB8
+	.sbss       start:0x8032F074 end:0x8032F0D0
 
 dvd/dvdqueue.c:
 	.text       start:0x8018B16C end:0x8018B364
+	.bss        start:0x8030CAB8 end:0x8030CAD8
 
 dvd/dvderror.c:
 	.text       start:0x8018B364 end:0x8018B4FC
@@ -1481,9 +1487,12 @@ dvd/dvdidutils.c:
 
 dvd/dvdFatal.c:
 	.text       start:0x8018B5F4 end:0x8018B624
+	.sbss       start:0x8032F0D0 end:0x8032F0D4
 
 dvd/fstload.c:
 	.text       start:0x8018B624 end:0x8018B864
+	.bss        start:0x8030CAD8 end:0x8030CB48
+	.sbss       start:0x8032F0D4 end:0x8032F0E0
 
 vi/vi.c:
 	.text       start:0x8018B864 end:0x8018D298

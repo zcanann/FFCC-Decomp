@@ -11,7 +11,7 @@
 #ifdef DEBUG
 const char* __VIVersion = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
 #else
-const char* __VIVersion = "<< Dolphin SDK - VI\trelease build: Apr  7 2004 04:13:59 (0x2301) >>";
+const char* __VIVersion = "<< Dolphin SDK - VI\trelease build: Sep  5 2002 05:33:13 (0x2301) >>";
 #endif
 
 typedef struct {

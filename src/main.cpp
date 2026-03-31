@@ -61,10 +61,10 @@ void main(int argc, char** argv)
  */
 void game(int argc, char** argv)
 {
-    int i;
+    char** argument;
     int copyScriptName;
     int parseLanguage;
-    char** argument;
+    int i;
 
     Game.Init();
     strcpy(Game.m_startScriptName, kDefaultScriptName);

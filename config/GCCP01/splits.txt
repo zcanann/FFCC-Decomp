@@ -1624,30 +1624,37 @@ card/CARDNet.c:
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8
 	.data       start:0x8021C3C4 end:0x8021C4C0
+	.bss        start:0x80327780 end:0x80327C78
 	.sdata      start:0x8032EB88 end:0x8032EB90
 	.sbss       start:0x8032F2E8 end:0x8032F310
 
 gx/GXFifo.c:
 	.text       start:0x801A02C8 end:0x801A0B10
+	.sbss       start:0x8032F310 end:0x8032F330
 
 gx/GXAttr.c:
 	.text       start:0x801A0B10 end:0x801A1C80
+	.data       start:0x8021C4C0 end:0x8021C620
 	.sdata      start:0x8032EB90 end:0x8032EBA0
 
 gx/GXMisc.c:
 	.text       start:0x801A1C80 end:0x801A2424
+	.sbss       start:0x8032F330 end:0x8032F348
 
 gx/GXGeometry.c:
 	.text       start:0x801A2424 end:0x801A27D4
 
 gx/GXFrameBuf.c:
 	.text       start:0x801A27D4 end:0x801A34F0
+	.data       start:0x8021C620 end:0x8021C710
 
 gx/GXLight.c:
 	.text       start:0x801A34F0 end:0x801A3B78
+	.data       start:0x8021C710 end:0x8021C72C
 
 gx/GXTexture.c:
 	.text       start:0x801A3B78 end:0x801A4B44
+	.data       start:0x8021C730 end:0x8021C958
 	.sdata      start:0x8032EBA0 end:0x8032EBE0
 
 gx/GXBump.c:
@@ -1655,9 +1662,11 @@ gx/GXBump.c:
 
 gx/GXTev.c:
 	.text       start:0x801A51D8 end:0x801A59BC
+	.data       start:0x8021C958 end:0x8021C9D0
 
 gx/GXPixel.c:
 	.text       start:0x801A59BC end:0x801A5FF4
+	.data       start:0x8021C9D0 end:0x8021C9F0
 
 gx/GXStubs.c:
 	.text       start:0x801A5FF4 end:0x801A5FF8
@@ -1670,9 +1679,13 @@ gx/GXTransform.c:
 
 gx/GXPerf.c:
 	.text       start:0x801A69B4 end:0x801A740C
+	.data       start:0x8021C9F0 end:0x8021CB38
 
 gba/GBA.c:
 	.text       start:0x801A740C end:0x801A76FC
+	.data       start:0x80217BF8 end:0x80217C08
+	.bss        start:0x80328320 end:0x80328720
+	.sbss       start:0x8032F350 end:0x8032F358
 
 gba/GBAGetProcessStatus.c:
 	.text       start:0x801A76FC end:0x801A7870
@@ -1866,6 +1879,7 @@ MSL_C/PPCEABI/bare/H/abort_exit.c:
 MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801B1DEC end:0x801B2CC4
 	.rodata     start:0x801E6FC0 end:0x801E6FD8
+	.bss        start:0x8032B510 end:0x8032B548
 	.sbss       start:0x8032F388 end:0x8032F390
 
 MSL_C/PPCEABI/bare/H/ansi_files.c:

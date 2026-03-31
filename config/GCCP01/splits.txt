@@ -1688,18 +1688,23 @@ TRK_MINNOW_DOLPHIN/mainloop.c:
 
 TRK_MINNOW_DOLPHIN/nubevent.c:
 	.text       start:0x801A90FC end:0x801A9324
+	.bss        start:0x80328720 end:0x80328748
 
 TRK_MINNOW_DOLPHIN/nubinit.c:
 	.text       start:0x801A9324 end:0x801A94BC
+	.bss        start:0x80328748 end:0x80328750
 
 TRK_MINNOW_DOLPHIN/msg.c:
 	.text       start:0x801A94BC end:0x801A9500
 
 TRK_MINNOW_DOLPHIN/msgbuf.c:
 	.text       start:0x801A9500 end:0x801A9D3C
+	.bss        start:0x80328750 end:0x8032A100
 
 TRK_MINNOW_DOLPHIN/serpoll.c:
 	.text       start:0x801A9D3C end:0x801A9FF4
+	.bss        start:0x8032A100 end:0x8032A118
+	.sbss       start:0x8032F358 end:0x8032F360
 
 TRK_MINNOW_DOLPHIN/usr_put.c:
 	.text       start:0x801A9FF4 end:0x801AA080
@@ -1709,6 +1714,7 @@ TRK_MINNOW_DOLPHIN/dispatch.c:
 
 TRK_MINNOW_DOLPHIN/msghndlr.c:
 	.text       start:0x801AA1F8 end:0x801AB268
+	.bss        start:0x8032A118 end:0x8032A120
 
 TRK_MINNOW_DOLPHIN/support.c:
 	.text       start:0x801AB268 end:0x801AB97C
@@ -1734,6 +1740,8 @@ TRK_MINNOW_DOLPHIN/mem_TRK.c:
 
 TRK_MINNOW_DOLPHIN/targimpl.c:
 	.text       start:0x801ABB1C end:0x801AD6B0
+	.data       start:0x8021CFC8 end:0x8021CFF8
+	.bss        start:0x8032A120 end:0x8032A6A0
 
 TRK_MINNOW_DOLPHIN/targsupp.s:
 	.text       start:0x801AD6B0 end:0x801AD6D0
@@ -1752,10 +1760,12 @@ TRK_MINNOW_DOLPHIN/dolphin_trk.c:
 
 TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text       start:0x801AE07C end:0x801AE0D4
+	.bss        start:0x8032A6A8 end:0x8032A6B0
 
 TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x801AE0D4 end:0x801AE62C
 	.data       start:0x8021D038 end:0x8021D060
+	.bss        start:0x8032A6B0 end:0x8032A6C0
 
 TRK_MINNOW_DOLPHIN/targcont.c:
 	.text       start:0x801AE62C end:0x801AE660
@@ -1771,12 +1781,18 @@ TRK_MINNOW_DOLPHIN/UDP_Stubs.c:
 
 TRK_MINNOW_DOLPHIN/main.c:
 	.text       start:0x801AED04 end:0x801AF048
+	.rodata     start:0x801E6D04 end:0x801E6D88
+	.bss        start:0x8032A6C0 end:0x8032AEE0
+	.sbss       start:0x8032F360 end:0x8032F368
 
 TRK_MINNOW_DOLPHIN/CircleBuffer.c:
 	.text       start:0x801AF048 end:0x801AF2B0
 
 TRK_MINNOW_DOLPHIN/main_gdev.c:
 	.text       start:0x801AF2B0 end:0x801AF5FC
+	.rodata     start:0x801E6D88 end:0x801E6E68
+	.bss        start:0x8032AEE0 end:0x8032B400
+	.sbss       start:0x8032F368 end:0x8032F370
 
 TRK_MINNOW_DOLPHIN/MWTrace.c:
 	.text       start:0x801AF5FC end:0x801AF64C
@@ -1991,6 +2007,8 @@ odenotstub/odenotstub.c:
 
 OdemuExi2/DebuggerDriver.c:
 	.text       start:0x801BC48C end:0x801BCF0C
+	.sdata      start:0x8032EC28 end:0x8032EC38
+	.sbss       start:0x8032F3A0 end:0x8032F3B8
 
 RedSound/RedDriver.cpp:
 	extab       start:0x8000A2E0 end:0x8000A5B8

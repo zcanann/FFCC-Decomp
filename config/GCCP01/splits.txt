@@ -1683,7 +1683,6 @@ gx/GXPerf.c:
 
 gba/GBA.c:
 	.text       start:0x801A740C end:0x801A76FC
-	.data       start:0x80217BF8 end:0x80217C08
 	.bss        start:0x80328320 end:0x80328720
 	.sbss       start:0x8032F350 end:0x8032F358
 

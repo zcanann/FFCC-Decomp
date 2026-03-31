@@ -21,6 +21,8 @@ static BOOL gIsInitialized;
 static const char ddh_cc_write_not_initialized[] = "cc not initialized\n";
 static const char ddh_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
 static const char ddh_cc_write_sending[] = "cc_write sending %ld bytes\n";
+static const char ddh_cc_initialize_calling_exi2_init[] = "CALLING EXI2_Init\n";
+static const char ddh_cc_initialize_done_calling_exi2_init[] = "DONE CALLING EXI2_Init\n";
 
 /*
  * --INFO--
@@ -253,9 +255,9 @@ int ddh_cc_shutdown()
  */
 int ddh_cc_initialize(void* inputPendingPtrRef, EXICallback monitorCallback)
 {
-    MWTRACE(1, "CALLING EXI2_Init\n");
+    MWTRACE(1, (char*)ddh_cc_initialize_calling_exi2_init);
     EXI2_Init(inputPendingPtrRef, monitorCallback);
-    MWTRACE(1, "DONE CALLING EXI2_Init\n");
+    MWTRACE(1, (char*)ddh_cc_initialize_done_calling_exi2_init);
     CircleBufferInitialize(&gRecvCB, gRecvBuf, DDH_BUF_SIZE);
     return 0;
 }

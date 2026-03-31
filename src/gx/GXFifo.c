@@ -16,9 +16,9 @@ static BOOL GXOverflowSuspendInProgress;
 static GXBreakPtCallback BreakPointCB;
 static u32 __GXOverflowCount;
 
-// #if DEBUG
+#if DEBUG
 static BOOL IsWGPipeRedirected;
-// #endif
+#endif
 
 void* __GXCurrentBP;
 

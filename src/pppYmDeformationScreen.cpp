@@ -350,16 +350,16 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_80330670, depth);
 	GXColor1u32(*(u32*)color.m_rgba);
-	GXTexCoord2f32(texU, FLOAT_80330670);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
+	GXTexCoord2f32(texU, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
 	GXColor1u32(*(u32*)color.m_rgba);
-	GXTexCoord2f32(texU, texV);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
+	GXTexCoord2f32(texU, texV);
 	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
 	GXColor1u32(*(u32*)color.m_rgba);
-	GXTexCoord2f32(FLOAT_80330670, texV);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
+	GXTexCoord2f32(FLOAT_80330670, texV);
 
 	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
@@ -371,16 +371,16 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
 	GXColor1u32(*(u32*)color.m_rgba);
-	GXTexCoord2f32(texU, FLOAT_80330670);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
+	GXTexCoord2f32(texU, FLOAT_80330670);
 	GXPosition3f32(FLOAT_80330688, FLOAT_80330690, depth);
 	GXColor1u32(*(u32*)color.m_rgba);
-	GXTexCoord2f32(texU, texV);
 	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
+	GXTexCoord2f32(texU, texV);
 	GXPosition3f32(FLOAT_80330670, FLOAT_80330690, depth);
 	GXColor1u32(*(u32*)color.m_rgba);
-	GXTexCoord2f32(FLOAT_80330670, texV);
 	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
+	GXTexCoord2f32(FLOAT_80330670, texV);
 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);

@@ -307,10 +307,9 @@ void CWind::getObj(int)
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	int blocks = 4;
 	WindObject* obj = m_objects;
 
-	do {
+	for (int blocks = 4; blocks != 0; blocks--) {
 		if (static_cast<s8>(obj->flags & 0x80) < 0) {
 			obj++;
 		} else {
@@ -351,7 +350,7 @@ int CWind::AddAmbient(float dir, float speed)
 		}
 
 		obj++;
-	} while (--blocks != 0);
+	}
 
 	obj = 0;
 
@@ -391,10 +390,9 @@ found:
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
 	int checked = 0;
-	int blocks = 4;
 	WindObject* obj = m_objects;
 
-	do {
+	for (int blocks = 4; blocks != 0; blocks--) {
 		if (static_cast<s8>(obj->flags & 0x80) < 0) {
 			obj++;
 		} else {
@@ -436,7 +434,7 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 
 		checked += 7;
 		obj++;
-	} while (--blocks != 0);
+	}
 
 	obj = 0;
 

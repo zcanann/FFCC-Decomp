@@ -281,22 +281,26 @@ CGame::~CGame()
  */
 void CGame::Init()
 {
-    int progressiveMode = OSSetProgressiveMode();
-
-    if (progressiveMode == 3) {
+    switch (OSSetProgressiveMode()) {
+    case 3:
         m_gameWork.m_languageId = 5;
-    } else if (progressiveMode < 3) {
-        if (progressiveMode == 1) {
-            m_gameWork.m_languageId = 2;
-        } else if (progressiveMode != 0) {
-            m_gameWork.m_languageId = 4;
-        } else {
-            m_gameWork.m_languageId = 1;
-        }
-    } else if ((progressiveMode < 5) && (progressiveMode != 5)) {
+        break;
+
+    case 1:
+        m_gameWork.m_languageId = 2;
+        break;
+
+    case 2:
+        m_gameWork.m_languageId = 4;
+        break;
+
+    case 4:
         m_gameWork.m_languageId = 3;
-    } else {
+        break;
+
+    default:
         m_gameWork.m_languageId = 1;
+        break;
     }
 
     CameraPcs.Init();

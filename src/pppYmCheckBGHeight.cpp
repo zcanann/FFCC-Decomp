@@ -56,31 +56,39 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     Vec hitPos;
     float nextY;
     float finalY;
+    float zero;
+    float probeY;
+    float scale;
+    float offset;
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        direction.x = kPppYmCheckBGHeightAxisZero;
-        direction.y = kPppYmCheckBGHeightProbeDirY;
-        direction.z = kPppYmCheckBGHeightAxisZero;
+        zero = kPppYmCheckBGHeightAxisZero;
+        probeY = kPppYmCheckBGHeightProbeDirY;
+        scale = kPppYmCheckBGHeightCylinderScale;
+        offset = kPppYmCheckBGHeightCylinderOffset;
+        direction.x = zero;
+        direction.y = probeY;
+        direction.z = zero;
 
         nextY = pppMngStPtr->m_matrix.value[1][3];
         finalY = nextY;
         cylinder.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
         cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_bottom.y = nextY + param_2->m_unk0x4;
-        cylinder.m_direction.x = direction.x;
-        cylinder.m_direction.y = direction.y;
-        cylinder.m_direction.z = direction.z;
-        cylinder.m_radius = kPppYmCheckBGHeightAxisZero;
-        cylinder.m_height = kPppYmCheckBGHeightProbeDirY;
-        cylinder.m_top.x = kPppYmCheckBGHeightAxisZero;
-        cylinder.m_top.y = kPppYmCheckBGHeightAxisZero;
-        cylinder.m_top.z = kPppYmCheckBGHeightCylinderScale;
-        cylinder.m_direction2.x = kPppYmCheckBGHeightCylinderScale;
-        cylinder.m_direction2.y = kPppYmCheckBGHeightCylinderScale;
-        cylinder.m_direction2.z = kPppYmCheckBGHeightCylinderOffset;
-        cylinder.m_radius2 = kPppYmCheckBGHeightCylinderOffset;
-        cylinder.m_height2 = kPppYmCheckBGHeightCylinderOffset;
+        cylinder.m_direction.x = zero;
+        cylinder.m_direction.y = probeY;
+        cylinder.m_direction.z = zero;
+        cylinder.m_radius = zero;
+        cylinder.m_height = probeY;
+        cylinder.m_top.x = zero;
+        cylinder.m_top.y = zero;
+        cylinder.m_top.z = scale;
+        cylinder.m_direction2.x = scale;
+        cylinder.m_direction2.y = scale;
+        cylinder.m_direction2.z = offset;
+        cylinder.m_radius2 = offset;
+        cylinder.m_height2 = offset;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {

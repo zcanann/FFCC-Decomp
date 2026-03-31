@@ -1,7 +1,8 @@
 #include "ffcc/pppSclMove.h"
 #include <dolphin/mtx.h>
-#include "ffcc/ppp_constants.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppSclMoveZero = 0.0f;
 
 /*
  * --INFO--

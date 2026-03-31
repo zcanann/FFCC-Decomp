@@ -1,9 +1,10 @@
 #include "ffcc/pppRandDownInt.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandDownIntDualSampleScale = 0.5f;
 extern s32 gPppDefaultValueBuffer[];
 
 
@@ -44,7 +45,8 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
         f32 value = -Math.RandF();
         if (in->fieldC != 0) {
             f32 mixed = value - Math.RandF();
-            value = mixed * kPppRandDownIntDualSampleScale;
+            f32 scale = kPppRandDownIntDualSampleScale;
+            value = mixed * scale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

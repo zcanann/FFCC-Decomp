@@ -1,9 +1,10 @@
 #include "ffcc/pppSRandFV.h"
 #include "ffcc/math.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "dolphin/types.h"
+
+const float kPppSRandFVSingleSampleScale = 2.0f;
 extern f32 gPppDefaultValueBuffer[];
 
 void randfloat(float, float);

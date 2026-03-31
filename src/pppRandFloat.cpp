@@ -1,9 +1,10 @@
 #include "ffcc/pppRandFloat.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandFloatSingleSampleScale = 2.0f;
 extern f32 gPppDefaultValueBuffer[];
 
 struct RandFloatParam {

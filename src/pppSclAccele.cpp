@@ -1,6 +1,7 @@
 #include "ffcc/pppSclAccele.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppSclAcceleZero = 0.0f;
 
 typedef struct {
     int m_graphId;

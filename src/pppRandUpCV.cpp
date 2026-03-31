@@ -1,10 +1,11 @@
 #include "ffcc/pppRandUpCV.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandUpCVDualSampleScale = 0.5f;
 
 struct RandUpCVParam {
     s32 targetId;
@@ -44,7 +45,8 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         if (in->randomTwice != 0) {
             f32 random = Math.RandF();
             f32 blend = value + random;
-            value = blend * kPppRandUpCVDualSampleScale;
+            f32 scale = kPppRandUpCVDualSampleScale;
+            value = blend * scale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

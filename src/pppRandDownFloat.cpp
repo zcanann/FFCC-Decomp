@@ -1,9 +1,10 @@
 #include "ffcc/pppRandDownFloat.h"
 #include "ffcc/math.h"
 #include "types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandDownFloatDualSampleScale = 0.5f;
 extern f32 gPppDefaultValueBuffer[];
 
 struct RandDownFloatParam {
@@ -45,7 +46,8 @@ void pppRandDownFloat(void* param1, void* param2, void* param3)
         f32 value = -Math.RandF();
         if (p2->randomTwice != 0) {
             f32 randomValue = value - Math.RandF();
-            value = randomValue * kPppRandDownFloatDualSampleScale;
+            f32 scale = kPppRandDownFloatDualSampleScale;
+            value = randomValue * scale;
         }
 
         valuePtr = (f32*)(base + *p3->outputOffset + 0x80);

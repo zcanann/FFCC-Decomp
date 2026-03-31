@@ -1,9 +1,10 @@
 #include "ffcc/pppSRandUpHCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppSRandUpHCVDualSampleScale = 0.5f;
 extern s16 gPppDefaultValueBuffer[];
 
 struct PppSRandUpHCVParam2 {

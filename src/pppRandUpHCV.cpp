@@ -1,9 +1,10 @@
 #include "ffcc/pppRandUpHCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+
+const float kPppRandUpHCVDualSampleScale = 0.5f;
 extern s16 gPppDefaultValueBuffer[];
 static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;
 
@@ -44,7 +45,8 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
         if (params->flag != 0) {
             f32 random = Math.RandF();
             f32 blend = value + random;
-            value = blend * kPppRandUpHCVDualSampleScale;
+            f32 scale = kPppRandUpHCVDualSampleScale;
+            value = blend * scale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

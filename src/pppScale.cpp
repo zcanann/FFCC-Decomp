@@ -1,7 +1,7 @@
 #include "ffcc/pppScale.h"
 #include "ffcc/ppp_linkage.h"
 
-extern const float FLOAT_80330048;
+const float kPppScaleZero = 0.0f;
 
 /*
  * --INFO--
@@ -42,9 +42,9 @@ void pppScaleCon(void* obj, void* param)
 {
 	int* data = *((int**)((char*)param + 0x0c));
 	float* value = (float*)((char*)obj + data[0] + 0x80);
-	float one = FLOAT_80330048;
+	float zero = kPppScaleZero;
 	
-	value[2] = one;
-	value[1] = one;
-	value[0] = one;
+	value[2] = zero;
+	value[1] = zero;
+	value[0] = zero;
 }

@@ -304,16 +304,16 @@ unsigned int pppFreeMngStPrioForData()
 		char pad18[0x5c];
 		short m_kind;
 		short m_nodeIndex;
-		char pad78[0x80];
+		char pad78[0x34];
+		int m_prioTime;
+		char padB0[0x48];
 		unsigned char m_prio;
-		unsigned char padF9;
-		unsigned short m_prioTime;
-		char padFC[0x5c];
+		char padF9[0x63];
 	};
 
 	pppMngStPrioData* selectedMngSt = 0;
 	pppMngStPrioData* pppMngStBase = reinterpret_cast<pppMngStPrioData*>(&PartMng);
-	unsigned short selectedPrioTime = 0;
+	unsigned int selectedPrioTime = 0;
 	unsigned char selectedPrio = 1;
 	int index = 0;
 
@@ -328,7 +328,7 @@ unsigned int pppFreeMngStPrioForData()
 					selectedPrio = prioA;
 					selectedPrioTime = candidateA->m_prioTime;
 				} else if (selectedPrio == prioA) {
-					unsigned short prioTimeA = candidateA->m_prioTime;
+					unsigned int prioTimeA = candidateA->m_prioTime;
 					if (selectedPrioTime < prioTimeA) {
 						selectedMngSt = candidateA;
 						selectedPrioTime = prioTimeA;
@@ -347,7 +347,7 @@ unsigned int pppFreeMngStPrioForData()
 					selectedPrio = prioB;
 					selectedPrioTime = candidateB->m_prioTime;
 				} else if (selectedPrio == prioB) {
-					unsigned short prioTimeB = candidateB->m_prioTime;
+					unsigned int prioTimeB = candidateB->m_prioTime;
 					if (selectedPrioTime < prioTimeB) {
 						selectedMngSt = candidateB;
 						selectedPrioTime = prioTimeB;
@@ -479,7 +479,9 @@ void CPartPcs::create()
  */
 void CPartPcs::createLoad()
 {
-    CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
+    CPartMng* partMng = &PartMng;
+    CPartMngState* state = reinterpret_cast<CPartMngState*>(partMng);
+    char* stringBase = s_p_tina_rodata_801d7ee0;
 
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
@@ -488,14 +490,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
+    pppLoadPtx__8CPartMngFPCciiPvi(partMng, stringBase + 0x24C, 1, 1, 0, 0);
+    pppLoadPmd__8CPartMngFPCc(partMng, stringBase + 0x24C);
+    pppLoadPan__8CPartMngFPCc(partMng, stringBase + 0x24C);
+    pppLoadPdt__8CPartMngFPCciiPvi(partMng, stringBase + 0x25C, 1, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(partMng, stringBase + 0x270, 2, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(partMng, stringBase + 0x284, 3, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(partMng, stringBase + 0x298, 4, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(partMng, stringBase + 0x2AC, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 

@@ -1435,6 +1435,10 @@ exi/EXIUart.c:
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
+	.data       start:0x80217304 end:0x802175F0
+	.bss        start:0x8030C750 end:0x8030C950
+	.sdata      start:0x8032EAC0 end:0x8032EAD0
+	.sbss       start:0x8032F004 end:0x8032F00C
 
 si/SISamplingRate.c:
 	.text       start:0x801858B0 end:0x801859B8
@@ -1483,6 +1487,10 @@ dvd/fstload.c:
 
 vi/vi.c:
 	.text       start:0x8018B864 end:0x8018D298
+	.data       start:0x802177E0 end:0x80217BF8
+	.bss        start:0x8030CB48 end:0x8030CC90
+	.sdata      start:0x8032EAD0 end:0x8032EAE0
+	.sbss       start:0x8032F0E0 end:0x8032F134
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC
@@ -1606,12 +1614,16 @@ card/CARDNet.c:
 
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8
+	.data       start:0x8021C3C4 end:0x8021C4C0
+	.sdata      start:0x8032EB88 end:0x8032EB90
+	.sbss       start:0x8032F2E8 end:0x8032F310
 
 gx/GXFifo.c:
 	.text       start:0x801A02C8 end:0x801A0B10
 
 gx/GXAttr.c:
 	.text       start:0x801A0B10 end:0x801A1C80
+	.sdata      start:0x8032EB90 end:0x8032EBA0
 
 gx/GXMisc.c:
 	.text       start:0x801A1C80 end:0x801A2424
@@ -1627,6 +1639,7 @@ gx/GXLight.c:
 
 gx/GXTexture.c:
 	.text       start:0x801A3B78 end:0x801A4B44
+	.sdata      start:0x8032EBA0 end:0x8032EBE0
 
 gx/GXBump.c:
 	.text       start:0x801A4B44 end:0x801A51D8
@@ -1734,12 +1747,15 @@ TRK_MINNOW_DOLPHIN/__exception.s:
 TRK_MINNOW_DOLPHIN/dolphin_trk.c:
 	.init       start:0x800053E0 end:0x8000540C
 	.text       start:0x801ADA40 end:0x801AE07C
+	.data       start:0x8021CFF8 end:0x8021D038
+	.bss        start:0x8032A6A0 end:0x8032A6A8
 
 TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text       start:0x801AE07C end:0x801AE0D4
 
 TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x801AE0D4 end:0x801AE62C
+	.data       start:0x8021D038 end:0x8021D060
 
 TRK_MINNOW_DOLPHIN/targcont.c:
 	.text       start:0x801AE62C end:0x801AE660
@@ -1794,6 +1810,7 @@ Runtime.PPCEABI.H/ptmf.c:
 
 Runtime.PPCEABI.H/runtime.c:
 	.text       start:0x801AFF44 end:0x801B063C
+	.rodata     start:0x801E6E98 end:0x801E6EB0
 
 Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
 	.text       start:0x801B063C end:0x801B06B8
@@ -1808,12 +1825,14 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 
 Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801B1AF0 end:0x801B1C60
+	.rodata     start:0x801E6F48 end:0x801E6FC0
 
 MSL_C/PPCEABI/bare/H/abort_exit.c:
 	.text       start:0x801B1C60 end:0x801B1DEC
 
 MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801B1DEC end:0x801B2CC4
+	.rodata     start:0x801E6FC0 end:0x801E6FD8
 
 MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x801B2CC4 end:0x801B2FD4

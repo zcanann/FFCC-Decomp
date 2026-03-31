@@ -1032,9 +1032,12 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
  */
 unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
-    int t = (saturation * 0xFF) / 100 + ((saturation * 0xFF) >> 31);
+    int satScaled = saturation * 0xFF;
+    int t = satScaled / 100 + (satScaled >> 31);
     unsigned int sat = t - (t >> 31);
-    t = (brightness * 0xFF) / 100 + ((brightness * 0xFF) >> 31);
+
+    int valScaled = brightness * 0xFF;
+    t = valScaled / 100 + (valScaled >> 31);
     unsigned int val = t - (t >> 31);
     char cVal = (char)val;
 
@@ -1048,7 +1051,8 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
         int floor = low / 0xFF + (low >> 31);
         int sector = hue / 0x3C + (hue >> 31);
         floor -= floor >> 31;
-        int delta = (hue + (sector - (sector >> 31)) * -0x3C) * (val - floor);
+        sector -= sector >> 31;
+        int delta = (hue + sector * -0x3C) * (val - floor);
         delta = delta / 0x3C + (delta >> 31);
 
         char add = (char)delta - (char)(delta >> 31);

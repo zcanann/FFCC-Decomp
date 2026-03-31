@@ -1799,11 +1799,14 @@ Runtime.PPCEABI.H/New.cp:
 	extab       start:0x8000A1DC end:0x8000A204
 	extabindex  start:0x80011794 end:0x800117A0
 	.text       start:0x801AF7FC end:0x801AF87C
+	.rodata     start:0x801E6E68 end:0x801E6E98
+	.data       start:0x8021D060 end:0x8021D070
 
 Runtime.PPCEABI.H/NMWException.cp:
 	extab       start:0x8000A204 end:0x8000A26C
 	extabindex  start:0x800117A0 end:0x8001180C
 	.text       start:0x801AF87C end:0x801AFEEC
+	.sdata      start:0x8032EBE8 end:0x8032EBF0
 
 Runtime.PPCEABI.H/ptmf.c:
 	.text       start:0x801AFEEC end:0x801AFF44
@@ -1822,6 +1825,9 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	extab       start:0x8000A26C end:0x8000A2E0
 	extabindex  start:0x8001180C end:0x80011860
 	.text       start:0x801B06B8 end:0x801B1AF0
+	.rodata     start:0x801E6EB0 end:0x801E6F48
+	.data       start:0x8021D070 end:0x8021D158
+	.bss        start:0x8032B400 end:0x8032B40C
 
 Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801B1AF0 end:0x801B1C60
@@ -1829,16 +1835,23 @@ Runtime.PPCEABI.H/GCN_mem_alloc.c:
 
 MSL_C/PPCEABI/bare/H/abort_exit.c:
 	.text       start:0x801B1C60 end:0x801B1DEC
+	.bss        start:0x8032B410 end:0x8032B510
+	.sbss       start:0x8032F378 end:0x8032F388
 
 MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801B1DEC end:0x801B2CC4
 	.rodata     start:0x801E6FC0 end:0x801E6FD8
+	.sbss       start:0x8032F388 end:0x8032F390
 
 MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x801B2CC4 end:0x801B2FD4
+	.data       start:0x8021D158 end:0x8021D298
+	.bss        start:0x8032B548 end:0x8032B848
 
 MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x801B2FD4 end:0x801B4F28
+	.rodata     start:0x801E6FD8 end:0x801E70B8
+	.data       start:0x8021D298 end:0x8021D3C0
 
 MSL_C/PPCEABI/bare/H/buffer_io.c:
 	.text       start:0x801B4F28 end:0x801B5294
@@ -1879,12 +1892,15 @@ MSL_C/PPCEABI/bare/H/printf.c:
 
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text       start:0x801B8B10 end:0x801B8B30
+	.sdata      start:0x8032EC10 end:0x8032EC18
 
 MSL_C/PPCEABI/bare/H/signal.c:
 	.text       start:0x801B8B30 end:0x801B8BF0
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x801B8BF0 end:0x801B90B8
+	.rodata     start:0x801E70E0 end:0x801E7100
+	.sdata      start:0x8032EC18 end:0x8032EC20
 
 MSL_C/PPCEABI/bare/H/wchar_io.c:
 	.text       start:0x801B90B8 end:0x801B9140

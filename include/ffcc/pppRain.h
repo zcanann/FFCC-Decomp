@@ -4,8 +4,9 @@
 #include <dolphin/types.h>
 
 struct pppRain {
+    u8 _pad0[0x0C];
     s32 m_graphId;
-    u8 field_0x4[0x7C];
+    u8 _pad10[0x70];
 };
 
 struct VRain;

@@ -320,25 +320,22 @@ s32 THPSimpleClose(void)
  */
 s32 THPSimpleCalcNeedMemory(void)
 {
-    if (SimpleControl.isOpen == 0) {
-        return 0;
+    if (SimpleControl.isOpen != 0) {
+        s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
+        s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+        need += (frameSize + 0x1F) & ~0x1F;
+        frameSize = (((u32)frameSize >> 2) + 0x1F) & ~0x1F;
+        need += frameSize;
+        need += frameSize;
+
+        if (SimpleControl.hasAudio != 0) {
+            need += (((SimpleControl.header.mAudioMaxSamples * 4) + 0x1F) & ~0x1F) * 3;
+        }
+
+        return need + 0x1000;
     }
 
-    s32 frameSize = SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize;
-    s32 alignedFrameSize = (frameSize + 0x1F) & ~0x1F;
-    s32 quarterFrameSize = (u32)frameSize >> 2;
-    s32 alignedQuarterFrameSize = (quarterFrameSize + 0x1F) & ~0x1F;
-    s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
-
-    need += alignedFrameSize;
-    need += alignedQuarterFrameSize;
-    need += alignedQuarterFrameSize;
-
-    if (SimpleControl.hasAudio != 0) {
-        need += (((SimpleControl.header.mAudioMaxSamples * 4) + 0x1F) & ~0x1F) * 3;
-    }
-
-    return need + 0x1000;
+    return 0;
 }
 
 /*

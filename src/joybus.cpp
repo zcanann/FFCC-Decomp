@@ -6158,7 +6158,7 @@ void JoyBus::ExitThread()
  */
 bool JoyBus::IsThreadRunning()
 {
-    return m_threadRunningMask != 0;
+    return (signed char)m_threadRunningMask != 0;
 }
 
 /*

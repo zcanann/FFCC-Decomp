@@ -21,6 +21,7 @@
 extern "C" void __dla__FPv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern char s_openWarnFmt[];
 
 CFile File;
 
@@ -251,7 +252,7 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 
     if (handle == 0 && (unsigned int)System.m_execParam >= 1)
 	{
-        System.Printf(s_queueWarnAnyFmt, path);
+        System.Printf(s_openWarnFmt, path);
     }
 
     return handle;

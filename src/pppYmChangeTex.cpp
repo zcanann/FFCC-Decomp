@@ -433,11 +433,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				*(unsigned char*)(vertColors + 3) = fallbackAlpha;
 			} else {
 				int level = 0;
-				int tries = 7;
 				float threshold = FLOAT_80330df8;
-				do {
-					double deltaDouble = (double)delta;
-					if (FLOAT_80330dfc * threshold < (float)deltaDouble) {
+				for (int tries = 7; tries != 0; tries--) {
+					if (FLOAT_80330dfc * threshold < (float)delta) {
 						if (negativeRamp == -1) {
 							*(char*)(vertColors + 3) = -1 - (char)(level << 4);
 						} else {
@@ -447,8 +445,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 					}
 					threshold = threshold - FLOAT_80330e00;
 					level = level + 1;
-					tries = tries - 1;
-				} while (tries != 0);
+				}
 			}
 
 			pointOffset = pointOffset + 6;

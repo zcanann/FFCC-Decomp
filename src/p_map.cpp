@@ -725,7 +725,6 @@ void CMapPcs::drawAfter()
     if (m_mapCalcReady == 0) {
         if (m_drawEnabled != 0) {
             CBoundHack bound;
-            _GXColor debugColor;
             Mtx cameraMtx;
             Mtx44 screenMtx;
 
@@ -738,7 +737,7 @@ void CMapPcs::drawAfter()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-            PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
             GXSetColorUpdate(GX_TRUE);
@@ -758,13 +757,9 @@ void CMapPcs::drawAfter()
             MapMng.DrawAfter();
 
             if ((CFlatFlags & 0x02000000) != 0) {
-                debugColor.r = 0xFF;
-                debugColor.g = 0xFF;
-                debugColor.b = 0x80;
-                debugColor.a = 0xFF;
-
+                CColor debugColor(0xFF, 0xFF, 0x80, 0xFF);
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
-                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor);
+                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor.color);
             }
         }
     }

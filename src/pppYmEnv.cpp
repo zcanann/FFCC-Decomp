@@ -85,16 +85,22 @@ struct PppYmEnvMngStRaw {
  */
 CChara::CModel* GetModelPtr(CGObject* gObject)
 {
+    CCharaPcs::CHandle* handle;
+
     if (gObject == 0) {
         return 0;
     }
 
-    CCharaPcs::CHandle* handle = gObject->m_charaModelHandle;
+    handle = gObject->m_charaModelHandle;
     if (handle == 0) {
         return 0;
     }
 
-    return handle->m_model;
+    if (handle != 0) {
+        return handle->m_model;
+    }
+
+    return 0;
 }
 /*
  * --INFO--

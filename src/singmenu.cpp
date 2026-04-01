@@ -22,6 +22,26 @@
 typedef signed short s16;
 typedef unsigned char u8;
 
+struct SingleFadeEntry
+{
+    char pad_00[0x10];
+    float alpha;
+    char pad_14[0x0C];
+    int elapsed;
+    int startFrame;
+    int duration;
+    char pad_2C[0x14];
+};
+
+struct SingleFadeState
+{
+    s16 count;
+    s16 pad_02;
+    s16 active;
+    s16 done;
+    SingleFadeEntry entries[64];
+};
+
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -1042,49 +1062,47 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
 void CMenuPcs::SingleCalcFadeIn()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int fadeState = *reinterpret_cast<int*>(self + 0x850);
+    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(self + 0x850);
 
-    if (*reinterpret_cast<s16*>(fadeState + 4) == 0) {
+    if (fadeState->active == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
-        memset(reinterpret_cast<void*>(fadeState), 0, 0x1008);
+        memset(fadeState, 0, sizeof(SingleFadeState));
 
-        *reinterpret_cast<int*>(fadeState + 0x2C) = 0;
-        *reinterpret_cast<int*>(fadeState + 0x30) = 10;
+        int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) * 10;
+        fadeState->entries[0].startFrame = 0;
+        fadeState->entries[0].duration = 10;
+        fadeState->entries[1].startFrame = phase;
+        fadeState->entries[1].duration = 10;
+        fadeState->entries[2].startFrame = phase;
+        fadeState->entries[2].duration = 10;
+        fadeState->entries[3].startFrame = phase;
+        fadeState->entries[3].duration = 10;
 
-        int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
-        *reinterpret_cast<int*>(fadeState + 0x6C) = phase;
-        *reinterpret_cast<int*>(fadeState + 0x70) = 10;
-        *reinterpret_cast<int*>(fadeState + 0xAC) = phase;
-        *reinterpret_cast<int*>(fadeState + 0xB0) = 10;
-        *reinterpret_cast<int*>(fadeState + 0xEC) = phase;
-        *reinterpret_cast<int*>(fadeState + 0xF0) = 10;
-
-        *reinterpret_cast<s16*>(fadeState + 0) = 4;
-        *reinterpret_cast<s16*>(fadeState + 4) = 1;
-        *reinterpret_cast<s16*>(fadeState + 6) = 0;
+        fadeState->count = 4;
+        fadeState->active = 1;
+        fadeState->done = 0;
     }
 
     int completed = 0;
     int ctrlState = *reinterpret_cast<int*>(self + 0x82C);
     ++(*reinterpret_cast<s16*>(ctrlState + 0x22));
 
-    s16 totalEntries = *reinterpret_cast<s16*>(fadeState + 0);
+    int totalEntries = static_cast<int>(fadeState->count);
     int frame = static_cast<int>(*reinterpret_cast<s16*>(ctrlState + 0x22));
-    u8* entry = reinterpret_cast<u8*>(fadeState + 8);
-    for (s16 i = 0; i < totalEntries; i++) {
-        int start = *reinterpret_cast<int*>(entry + 0x24);
-        int duration = *reinterpret_cast<int*>(entry + 0x28);
+    for (int i = 0; i < totalEntries; i++) {
+        SingleFadeEntry* entry = &fadeState->entries[i];
+        int start = entry->startFrame;
+        int duration = entry->duration;
         if (start <= frame) {
             if (frame < start + duration) {
-                int elapsed = ++(*reinterpret_cast<int*>(entry + 0x20));
-                *reinterpret_cast<float*>(entry + 0x10) =
+                int elapsed = ++entry->elapsed;
+                entry->alpha =
                     static_cast<float>((DOUBLE_80332980 / static_cast<double>(duration)) * static_cast<double>(elapsed));
             } else {
                 completed++;
-                *reinterpret_cast<float*>(entry + 0x10) = FLOAT_80332934;
+                entry->alpha = FLOAT_80332934;
             }
         }
-        entry += 0x40;
     }
 
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
@@ -1110,7 +1128,7 @@ void CMenuPcs::SingleCalcFadeIn()
     CalcSkin__Q26CChara6CModelFv(model);
 
     if (totalEntries == completed) {
-        *reinterpret_cast<s16*>(fadeState + 6) = 1;
+        fadeState->done = 1;
     }
 }
 
@@ -1136,52 +1154,49 @@ void CMenuPcs::SingleDrawFadeIn()
 void CMenuPcs::SingleCalcFadeOut()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int fadeState = *reinterpret_cast<int*>(self + 0x850);
+    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(self + 0x850);
 
-    if (*reinterpret_cast<s16*>(fadeState + 4) == 0) {
+    if (fadeState->active == 0) {
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
-        memset(reinterpret_cast<void*>(fadeState), 0, 0x1008);
+        memset(fadeState, 0, sizeof(SingleFadeState));
 
-        *reinterpret_cast<int*>(fadeState + 0x2C) =
-            (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
-        *reinterpret_cast<int*>(fadeState + 0x30) = 10;
+        fadeState->entries[0].startFrame = (*reinterpret_cast<s16*>(self + 0x864) == 8) * 10;
+        fadeState->entries[0].duration = 10;
+        fadeState->entries[1].startFrame = 0;
+        fadeState->entries[1].duration = 10;
+        fadeState->entries[2].startFrame = 0;
+        fadeState->entries[2].duration = 10;
+        fadeState->entries[3].startFrame = 0;
+        fadeState->entries[3].duration = 10;
 
-        *reinterpret_cast<int*>(fadeState + 0x6C) = 0;
-        *reinterpret_cast<int*>(fadeState + 0x70) = 10;
-        *reinterpret_cast<int*>(fadeState + 0xAC) = 0;
-        *reinterpret_cast<int*>(fadeState + 0xB0) = 10;
-        *reinterpret_cast<int*>(fadeState + 0xEC) = 0;
-        *reinterpret_cast<int*>(fadeState + 0xF0) = 10;
-
-        *reinterpret_cast<s16*>(fadeState + 0) = 4;
-        *reinterpret_cast<s16*>(fadeState + 6) = 0;
-        *reinterpret_cast<s16*>(fadeState + 4) = 1;
+        fadeState->count = 4;
+        fadeState->done = 0;
+        fadeState->active = 1;
     }
 
     int completed = 0;
     int ctrlState = *reinterpret_cast<int*>(self + 0x82C);
     ++(*reinterpret_cast<s16*>(ctrlState + 0x22));
 
-    int totalEntries = static_cast<int>(*reinterpret_cast<s16*>(fadeState + 0));
-    s16* entry = reinterpret_cast<s16*>(fadeState + 8);
+    int totalEntries = static_cast<int>(fadeState->count);
     int frame = static_cast<int>(*reinterpret_cast<s16*>(ctrlState + 0x22));
     for (int i = 0; i < totalEntries; i++) {
-        int start = *reinterpret_cast<int*>(entry + 0x12);
+        SingleFadeEntry* entry = &fadeState->entries[i];
+        int start = entry->startFrame;
         if (frame < start) {
-            *reinterpret_cast<float*>(entry + 8) = FLOAT_80332934;
+            entry->alpha = FLOAT_80332934;
         } else {
-            int duration = *reinterpret_cast<int*>(entry + 0x14);
+            int duration = entry->duration;
             if (frame < start + duration) {
-                int elapsed = ++(*reinterpret_cast<int*>(entry + 0x10));
-                *reinterpret_cast<float*>(entry + 8) =
+                int elapsed = ++entry->elapsed;
+                entry->alpha =
                     static_cast<float>(-((DOUBLE_80332980 / static_cast<double>(duration)) *
                                           static_cast<double>(elapsed) - DOUBLE_80332980));
             } else {
                 completed++;
-                *reinterpret_cast<float*>(entry + 8) = FLOAT_8033294c;
+                entry->alpha = FLOAT_8033294c;
             }
         }
-        entry += 0x20;
     }
 
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
@@ -1207,7 +1222,7 @@ void CMenuPcs::SingleCalcFadeOut()
     CalcSkin__Q26CChara6CModelFv(model);
 
     if (totalEntries == completed) {
-        *reinterpret_cast<s16*>(fadeState + 6) = 1;
+        fadeState->done = 1;
     }
 }
 

@@ -35,7 +35,6 @@ void ReserveEXI2Port(void);
 int TRKPollUART(void);
 UARTError TRKReadUARTN(void* bytes, u32 length);
 UARTError TRKWriteUARTN(const void* bytes, u32 length);
-UARTError WriteUARTFlush(void);
 void TRKLoadContext(OSContext* ctx, u32 r4);
 int InitMetroTRKCommTable(int hwId);
 void EnableEXI2Interrupts(void);

@@ -1398,15 +1398,18 @@ db/db.c:
 
 os/OS.c:
 	.text       start:0x8017B694 end:0x8017C180
+	.sdata      start:0x8032EA80 end:0x8032EA90
 
 os/OSAlarm.c:
 	.text       start:0x8017C180 end:0x8017C8E8
 
 os/OSAlloc.c:
 	.text       start:0x8017C8E8 end:0x8017CBF8
+	.sdata      start:0x8032EA90 end:0x8032EA98
 
 os/OSArena.c:
 	.text       start:0x8017CBF8 end:0x8017CC18
+	.sdata      start:0x8032EA98 end:0x8032EA9C
 
 os/OSAudioSystem.c:
 	.text       start:0x8017CC18 end:0x8017CEAC
@@ -1419,9 +1422,11 @@ os/OSContext.c:
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
+	.sdata      start:0x8032EA9C end:0x8032EAA8
 
 os/OSFont.c:
 	.text       start:0x8017E2E8 end:0x8017E340
+	.sdata      start:0x8032EAA8 end:0x8032EAB0
 
 os/OSInterrupt.c:
 	.text       start:0x8017E340 end:0x8017EBAC
@@ -1461,6 +1466,7 @@ os/OSSync.c:
 
 os/OSThread.c:
 	.text       start:0x801809F4 end:0x80181BF8
+	.sdata      start:0x8032EAB0 end:0x8032EAB4
 
 os/OSTime.c:
 	.text       start:0x80181BF8 end:0x8018201C
@@ -1470,9 +1476,13 @@ os/__ppc_eabi_init.c:
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
+	.bss        start:0x8030C690 end:0x8030C750
+	.sdata      start:0x8032EAB8 end:0x8032EAC0
+	.sbss       start:0x8032EFE8 end:0x8032EFF0
 
 exi/EXIUart.c:
 	.text       start:0x80183A8C end:0x80184060
+	.sbss       start:0x8032EFF0 end:0x8032F004
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
@@ -1547,36 +1557,58 @@ pad/Padclamp.c:
 
 pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
+	.data       start:0x80217BF8 end:0x80217C08
+	.bss        start:0x8030CC90 end:0x8030CCE0
+	.sdata      start:0x8032EB18 end:0x8032EB38
+	.sbss       start:0x8032F134 end:0x8032F164
 
 ai/ai.c:
 	.text       start:0x8018EE04 end:0x8018F710
+	.data       start:0x80217C08 end:0x80217C50
+	.sdata      start:0x8032EB38 end:0x8032EB40
+	.sbss       start:0x8032F164 end:0x8032F1B4
 
 ar/ar.c:
 	.text       start:0x8018F710 end:0x801911E8
+	.data       start:0x80217C50 end:0x80217C98
+	.sdata      start:0x8032EB40 end:0x8032EB48
+	.sbss       start:0x8032F1B4 end:0x8032F1D4
 
 ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
+	.data       start:0x80217C98 end:0x80217CE0
+	.sdata      start:0x8032EB48 end:0x8032EB50
+	.sbss       start:0x8032F1D4 end:0x8032F204
 
 ax/AX.c:
 	.text       start:0x801915A4 end:0x80191614
+	.data       start:0x80217CE0 end:0x80217D28
+	.sdata      start:0x8032EB50 end:0x8032EB58
 
 ax/AXAlloc.c:
 	.text       start:0x80191614 end:0x80191ADC
 
 ax/AXAux.c:
 	.text       start:0x80191ADC end:0x80191F7C
+	.bss        start:0x8030CDE0 end:0x8030FAE0
 
 ax/AXCL.c:
 	.text       start:0x80191F7C end:0x801926B4
+	.bss        start:0x8030FAE0 end:0x803100E0
 
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0
+	.bss        start:0x803100E0 end:0x80314900
+	.sbss       start:0x8032F240 end:0x8032F270
 
 ax/AXSPB.c:
 	.text       start:0x80192DA0 end:0x80193268
 
 ax/AXVPB.c:
 	.text       start:0x80193268 end:0x80193E28
+	.data       start:0x80217D28 end:0x80217DFC
+	.bss        start:0x80314940 end:0x80325D40
+	.sbss       start:0x8032F290 end:0x8032F29C
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
@@ -1595,6 +1627,7 @@ axfx/delay.c:
 
 axfx/axfx.c:
 	.text       start:0x801969C4 end:0x80196A20
+	.sdata      start:0x8032EB60 end:0x8032EB68
 
 axfx/reverb_hi_4ch.c:
 	.text       start:0x80196A20 end:0x80197958
@@ -1661,11 +1694,12 @@ card/CARDStat.c:
 
 card/CARDNet.c:
 	.text       start:0x8019EE80 end:0x8019EF44
+	.sdata      start:0x8032EB80 end:0x8032EB88
 
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8
 	.data       start:0x8021C3C4 end:0x8021C4C0
-	.bss        start:0x80327780 end:0x80327C78
+	.bss        start:0x80327780 end:0x80327CF8
 	.sdata      start:0x8032EB88 end:0x8032EB90
 	.sbss       start:0x8032F2E8 end:0x8032F310
 
@@ -1724,6 +1758,7 @@ gx/GXPerf.c:
 
 gba/GBA.c:
 	.text       start:0x801A740C end:0x801A76FC
+	.data       start:0x8021CB38 end:0x8021CB48
 	.bss        start:0x80328320 end:0x80328720
 	.sbss       start:0x8032F350 end:0x8032F358
 
@@ -1940,6 +1975,7 @@ MSL_C/PPCEABI/bare/H/gamecube.c:
 
 MSL_C/PPCEABI/bare/H/ctype.c:
 	.text       start:0x801B52A0 end:0x801B52C4
+	.data       start:0x8021D3C0 end:0x8021D4C0
 
 MSL_C/PPCEABI/bare/H/direct_io.c:
 	.text       start:0x801B52C4 end:0x801B5A18
@@ -1986,6 +2022,7 @@ MSL_C/PPCEABI/bare/H/wchar_io.c:
 
 MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
 	.text       start:0x801B9140 end:0x801B9210
+	.sbss       start:0x8032F398 end:0x8032F3A0
 
 MSL_C/PPCEABI/bare/H/e_acos.c:
 	.text       start:0x801B9210 end:0x801B944C
@@ -2119,6 +2156,10 @@ RedSound/RedSound.cpp:
 
 thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C
+	.rodata     start:0x801E8110 end:0x801E81A0
+	.bss        start:0x8032E280 end:0x8032E3B0
+	.sdata      start:0x8032EC38 end:0x8032EC3C
+	.sbss       start:0x8032F4E0 end:0x8032F5F8
 
 thp/THPAudio.c:
 	.text       start:0x801D4E5C end:0x801D538C

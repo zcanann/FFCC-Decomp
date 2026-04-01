@@ -3,9 +3,6 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/card/__card.h"
 
-u16 __CARDVendorID = 0xFFFF;
-u8 __CARDPermMask = 0x1C;
-
 u16 CARDSetVendorID(u16 vendorID) {
     u16 prevID = __CARDVendorID;
     __CARDVendorID = vendorID;

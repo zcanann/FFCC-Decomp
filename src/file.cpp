@@ -209,11 +209,12 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
         pri = CFile::PRI_CRITICAL;
     }
 
-    CHandle* handle = 0;
     CHandle* it = m_fileHandle.m_previous;
+    CHandle* end = &m_fileHandle;
+    CHandle* handle = 0;
     DVDFileInfo fi;
 
-    while (it != &m_fileHandle)
+    while (it != end)
     {
         if (pri < it->m_priority) {
             break;

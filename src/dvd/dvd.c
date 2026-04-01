@@ -16,8 +16,9 @@ const char* __DVDVersion = "<< Dolphin SDK - DVD\tdebug build: Apr  5 2004 03:56
 const char* __DVDVersion = "<< Dolphin SDK - DVD\trelease build: Apr  5 2004 04:14:51 (0x2301) >>";
 #endif
 
-static const char s_dvd_c[] = "dvd.c";
-static const char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";
+static char s_dvd_c[] = "dvd.c";
+static char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";
+static char s_load_fst[] = "load fst\n";
 
 static BOOL autoInvalidation = TRUE;
 
@@ -124,7 +125,7 @@ void DVDInit(void) {
         __DIRegs[1] = 0;
 
         if (bootInfo->magic == 0xE5207C22) {
-            OSReport("load fst\n");
+            OSReport(s_load_fst);
             __fstLoad();
         } else if (bootInfo->magic == 0x0D15EA5E) {
 

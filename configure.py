@@ -924,7 +924,11 @@ config.libs = [
                 "Runtime.PPCEABI.H/global_destructor_chain.c",
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
-            Object(NonMatching, "Runtime.PPCEABI.H/New.cp"),
+            Object(
+                NonMatching,
+                "Runtime.PPCEABI.H/New.cp",
+                cflags=replace_flag_prefix(cflags_runtime, "-RTTI ", "-RTTI on"),
+            ),
             Object(
                 Matching,
                 "Runtime.PPCEABI.H/NMWException.cp",

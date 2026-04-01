@@ -794,10 +794,8 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)*(int*)track;
-
-    *(unsigned short*)((int)control + 0x18) = command[0];
-    *(unsigned short*)((int)control + 0x1a) = command[1];
+    *(unsigned short*)((int)control + 0x18) = *(unsigned char*)*(int*)track;
+    *(unsigned short*)((int)control + 0x1a) = *(unsigned char*)(*(int*)track + 1);
     *(int*)((int)control + 0x14) =
         (0xc0 / (int)*(short*)((int)control + 0x1a)) * (int)*(short*)((int)control + 0x18);
     *(int*)track += 2;

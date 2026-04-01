@@ -215,7 +215,7 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 
     while (it != &m_fileHandle)
     {
-        if (it->m_priority > pri) {
+        if (pri < it->m_priority) {
             break;
         }
 

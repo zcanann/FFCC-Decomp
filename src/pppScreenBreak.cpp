@@ -736,10 +736,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             sx = value[6];
             sy = value[7];
             float x = *value * sx;
-            float pieceX = *(float*)(piece + 0x24);
             float y = *value * sy;
-            if ((x >= pieceX) && (-pieceX <= x) &&
-                (y >= *(float*)(piece + 0x28)) && (-*(float*)(piece + 0x28) <= y)) {
+            float pieceX = *(float*)(piece + 0x24);
+            if ((pieceX <= x) && (-pieceX <= x) &&
+                (*(float*)(piece + 0x28) <= y) && (-*(float*)(piece + 0x28) <= y)) {
                 piece[0x38] = 1;
             }
             break;

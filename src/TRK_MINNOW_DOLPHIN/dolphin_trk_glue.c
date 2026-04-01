@@ -5,15 +5,7 @@
 #include "dolphin/base/PPCArch.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
-#define BUFF_LEN 4362
-
-u8 gWriteBuf[BUFF_LEN];
-u8 gReadBuf[BUFF_LEN];
-s32 _MetroTRK_Has_Framing;
-s32 gReadCount;
-s32 gReadPos;
-s32 gWritePos;
-extern volatile u8 TRK_Use_BBA;
+volatile u8 TRK_Use_BBA = 0;
 int ddh_cc_initinterrupts(void);
 int ddh_cc_initialize(void*, __OSInterruptHandler);
 int ddh_cc_shutdown(void);
@@ -187,52 +179,6 @@ UARTError TRKWriteUARTN(const void* bytes, u32 length)
 {
     int writeErr = gDBCommTable.write_func(bytes, length);
     return writeErr == 0 ? 0 : -1;
-}
-
-UARTError WriteUARTFlush(void)
-{
-    UARTError readErr = 0;
-
-    while (gWritePos < 0x800) {
-        gWriteBuf[gWritePos] = 0;
-        gWritePos++;
-    }
-    if (gWritePos != 0) {
-        readErr = TRKWriteUARTN(gWriteBuf, gWritePos);
-        gWritePos = 0;
-    }
-    return readErr;
-}
-
-UARTError WriteUART1(u8 arg0)
-{
-    gWriteBuf[gWritePos++] = arg0;
-    return 0;
-}
-
-UARTError TRKReadUARTPoll(u8* arg0)
-{
-    UARTError readErr = 4;
-    s32 cnt;
-
-    if (gReadPos >= gReadCount) {
-        gReadPos = 0;
-        cnt = gReadCount = TRKPollUART();
-        if (cnt > 0) {
-            if (cnt > BUFF_LEN) {
-                gReadCount = BUFF_LEN;
-            }
-            readErr = TRKReadUARTN(gReadBuf, gReadCount);
-            if (readErr != 0) {
-                gReadCount = 0;
-            }
-        }
-    }
-    if (gReadPos < gReadCount) {
-        *arg0 = gReadBuf[gReadPos++];
-        readErr = 0;
-    }
-    return readErr;
 }
 
 void ReserveEXI2Port(void) { gDBCommTable.post_stop_func(); }

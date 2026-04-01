@@ -266,10 +266,10 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset;
-    int graphFrame;
     LocationTitle2Work* work;
     LocationTitle2Particle* particle;
     long** shapeTable;
+    int graphFrame;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
@@ -278,19 +278,19 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         return;
     }
 
-    graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
     particle = (LocationTitle2Particle*)work->m_particles;
     shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+    graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
 
     pppSetBlendMode(unkB->m_blendMode);
 
     if ((int)Game.m_currentSceneId != 7) {
-        Vec side;
-        Vec up;
-        Vec look;
-        Vec lookNorm;
-        Vec cameraPos;
         Vec matrixPos;
+        Vec cameraPos;
+        Vec lookNorm;
+        Vec look;
+        Vec up;
+        Vec side;
 
         matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
         matrixPos.y = pppMngStPtr->m_matrix.value[1][3];

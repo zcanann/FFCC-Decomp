@@ -1223,11 +1223,7 @@ void CGame::SaveScript(char* scriptData)
     int entryOffset = 0;
     int i = 0;
 
-    while (true) {
-        if (*(int*)(CFlat + 4) <= i) {
-            break;
-        }
-
+    while (i < *(int*)(CFlat + 4)) {
         if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
             *(u32*)(scriptData + scriptOffset) = *(u32*)(*(int*)(CFlat + 12) + entryOffset);
             scriptOffset += 4;

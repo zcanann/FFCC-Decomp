@@ -518,14 +518,14 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
-		if ((static_cast<int>((static_cast<unsigned int>(*weaponNodeFlags) << 24) >> 31)) != value) {
+		if ((*weaponNodeFlags >> 7) != value) {
 			onChangePrg(value);
-			*weaponNodeFlags = (static_cast<unsigned char>(value) << 7) | (*weaponNodeFlags & 0x7F);
+			*weaponNodeFlags = (value << 7) | (*weaponNodeFlags & 0x7F);
 		}
 		break;
 	case 3:
 		*(reinterpret_cast<unsigned char*>(this) + 0x6B8) =
-		    (static_cast<unsigned char>(value) << 3) & 8 | (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
+		    (value << 3) & 8 | (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
 		break;
 	case 4:
 	{

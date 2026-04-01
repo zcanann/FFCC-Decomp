@@ -8,63 +8,59 @@
 #pragma dont_inline on
 /* 8036F580-8036F638 369EC0 00B8+00 0/0 1/1 0/0 .text            TRK_fill_mem */
 void TRK_fill_mem(void* dst, int val, u32 n) {
+    u32 i;
+    u32 v;
     u8* p8;
     u32* p32;
-    u32 v;
-    u32 i;
 
     v = (u8)val;
     p8 = (u8*)dst - 1;
 
-    if (n >= 32) {
+    if (n > 0x1F) {
         i = (~(u32)p8) & 3;
 
-        if (i) {
+        if (i != 0) {
             n -= i;
 
             do {
-                *++p8 = (u8)v;
-            } while (--i);
+                i--;
+                p8++;
+                *p8 = (u8)v;
+            } while (i != 0);
         }
 
-        if (v)
-            v |= v << 24 | v << 16 | v << 8;
+        if (v != 0) {
+            v = v | v << 8 | v << 24 | v << 16;
+        }
 
         p32 = (u32*)(p8 - 3);
-        i = n >> 5;
-        if (i != 0) {
-            do {
-                p32[1] = v;
-                p32[2] = v;
-                p32[3] = v;
-                p32[4] = v;
-                p32[5] = v;
-                p32[6] = v;
-                p32[7] = v;
-                p32 += 8;
-                *p32 = v;
-            } while (--i);
+        for (i = n >> 5; i != 0; i--) {
+            p32[1] = v;
+            p32[2] = v;
+            p32[3] = v;
+            p32[4] = v;
+            p32[5] = v;
+            p32[6] = v;
+            p32[7] = v;
+            p32 += 8;
+            *p32 = v;
         }
 
-        i = (n >> 2) & 7;
-
-        if (i != 0) {
-            do {
-                *++p32 = v;
-            } while (--i);
+        for (i = (n >> 2) & 7; i != 0; i--) {
+            p32++;
+            *p32 = v;
         }
 
         p8 = (u8*)p32 + 3;
-        {
-            u32 mask = 3;
-            n &= mask;
-        }
+        n &= 3;
     }
 
-    if (n)
+    if (n != 0)
         do {
-            *++p8 = (u8)v;
-        } while (--n);
+            n--;
+            p8++;
+            *p8 = (u8)v;
+        } while (n != 0);
 }
 #pragma dont_inline reset
 

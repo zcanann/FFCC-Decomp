@@ -15,7 +15,8 @@ static OSBootInfo* BootInfo;
 static FSTEntry* FstStart;
 char* FstStringStart;
 static u32 MaxEntryNum;
-static u32 currentDirectory;
+static const char s_dvdfs_c[] = "dvdfs.c";
+static u32 sDvdfsCurrentDirEntry;
 
 // prototypes
 static BOOL isSame(const char* path, const char* string);
@@ -74,7 +75,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
     
     ASSERTMSGLINE(318, pathPtr, "DVDConvertPathToEntrynum(): null pointer is specified  ");
     
-    dirLookAt = currentDirectory;
+    dirLookAt = sDvdfsCurrentDirEntry;
     
     while (1) {
         if (*pathPtr == '\0') {
@@ -121,7 +122,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
                 illegal = TRUE;
         
             if (illegal)
-                OSPanic(__FILE__, 379,
+                OSPanic(s_dvdfs_c, 379,
                     "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): "
                     "specified directory or file (%s) doesn't match standard 8.3 format. This is a "
                     "temporary restriction and will be removed soon\n",
@@ -274,7 +275,7 @@ static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
-    return DVDConvertEntrynumToPath((s32)currentDirectory, path, maxlen);
+    return DVDConvertEntrynumToPath((s32)sDvdfsCurrentDirEntry, path, maxlen);
 }
 
 BOOL DVDChangeDir(const char* dirName) {
@@ -290,7 +291,7 @@ BOOL DVDChangeDir(const char* dirName) {
         return FALSE;
     }
     
-    currentDirectory = (u32)entry;
+    sDvdfsCurrentDirEntry = (u32)entry;
     
     return TRUE;
 }

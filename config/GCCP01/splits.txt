@@ -23,6 +23,7 @@ file.cpp:
 	extabindex  start:0x8000AD98 end:0x8000AE4C
 	.text       start:0x80012BAC end:0x80013D70
 	.ctors      start:0x801D53A4 end:0x801D53A8
+	.bss        start:0x8021ED40 end:0x8021EEB0
 
 game.cpp:
 	extab       start:0x80005688 end:0x800057E0
@@ -52,6 +53,7 @@ memory.cpp:
 	extabindex  start:0x8000B2CC end:0x8000B434
 	.text       start:0x8001C2F0 end:0x8001FE74
 	.ctors      start:0x801D53B4 end:0x801D53B8
+	.bss        start:0x8023C888 end:0x80244028
 
 p_sample.cpp:
 	extab       start:0x80005BDC end:0x80005BE4
@@ -74,6 +76,7 @@ pad.cpp:
 	extabindex  start:0x8000B4AC end:0x8000B4D0
 	.text       start:0x80020494 end:0x800211D4
 	.ctors      start:0x801D53C0 end:0x801D53C4
+	.bss        start:0x80244140 end:0x8024430C
 
 stopwatch.cpp:
 	extab       start:0x80005C44 end:0x80005CA0
@@ -86,12 +89,14 @@ system.cpp:
 	extabindex  start:0x8000B53C end:0x8000B5D8
 	.text       start:0x8002147C end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
+	.bss        start:0x80244340 end:0x802455C0
 
 usb.cpp:
 	extab       start:0x80005D18 end:0x80005D30
 	extabindex  start:0x8000B5D8 end:0x8000B5FC
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
+	.bss        start:0x802455C0 end:0x80245640
 
 util.cpp:
 	extab       start:0x80005D30 end:0x80005E00
@@ -166,6 +171,7 @@ p_graphic.cpp:
 	extabindex  start:0x8000C3DC end:0x8000C460
 	.text       start:0x80045178 end:0x80047930
 	.ctors      start:0x801D53EC end:0x801D53F0
+	.bss        start:0x80268E90 end:0x80268F88
 
 p_game.cpp:
 	extab       start:0x800068A8 end:0x80006918

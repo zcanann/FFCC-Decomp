@@ -45,6 +45,7 @@ float ppvChrScl[4];
 Mtx ppvUnitMatrix;
 Vec ppvZeroVector;
 }
+CAmemCacheSet ppvAmemCacheSet;
 extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;

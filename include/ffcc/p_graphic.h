@@ -123,6 +123,7 @@ public:
     unsigned char m_blurA;          // 0x0F0
     unsigned char m_blurMode2;      // 0x0F1
     short m_blurScale;              // 0x0F2
+    int m_unkF4;                    // 0x0F4
 };
 
 extern CGraphicPcs GraphicsPcs;

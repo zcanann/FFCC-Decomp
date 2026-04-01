@@ -79,6 +79,7 @@ public:
     CStage* m_mapStage;          // 0x1270
     void* m_mapBuffer;           // 0x1274
     unsigned int m_mapSize;      // 0x1278
+    int m_unk127C;               // 0x127C
 };
 
 extern CSystem System;

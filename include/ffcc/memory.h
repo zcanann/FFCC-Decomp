@@ -55,7 +55,7 @@ public:
 
 private:
     // Backing storage for the recovered CMemory instance; methods access fields via known offsets.
-    u8 m_storage[0x77A0];
+    u8 m_storage[0x779C];
 };
 
 class CAmemCache

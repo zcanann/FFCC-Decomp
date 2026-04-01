@@ -2156,6 +2156,8 @@ RedSound/RedSound.cpp:
 
 thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C
+	.rodata     start:0x801E8110 end:0x801E81A0
+	.bss        start:0x8032E280 end:0x8032E3B0
 	.sdata      start:0x8032EC38 end:0x8032EC3C
 	.sbss       start:0x8032F4E0 end:0x8032F5F8
 

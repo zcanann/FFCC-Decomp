@@ -11,10 +11,12 @@ extern int DVDCompareDiskID(const struct DVDDiskID * id1 /* r29 */, const struct
 extern int __DVDLowTestAlarm(const OSAlarm * alarm /* r3 */);
 
 #ifdef DEBUG
-const char* __DVDVersion = "<< Dolphin SDK - DVD\tdebug build: Apr  5 2004 03:56:07 (0x2301) >>";
+static const char s___DVDVersion[] = "<< Dolphin SDK - DVD\tdebug build: Apr  5 2004 03:56:07 (0x2301) >>";
 #else
-const char* __DVDVersion = "<< Dolphin SDK - DVD\trelease build: Apr  5 2004 04:14:51 (0x2301) >>";
+static const char s___DVDVersion[] = "<< Dolphin SDK - DVD\trelease build: Apr  5 2004 04:14:51 (0x2301) >>";
 #endif
+
+const char* __DVDVersion = s___DVDVersion;
 
 static char s_dvd_c[] = "dvd.c";
 static char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";

@@ -239,61 +239,62 @@ void CMes::Set(char* text, int param)
  */
 void CMes::Next()
 {
+	unsigned char type;
+	float groupWidth;
+	float halfVal;
+	int remaining;
+	unsigned int runLength;
+	int i;
+	unsigned char* flagEntry;
+	float* start;
+	int entryCount;
+	float* curr;
+	char tempFlags[0x50];
+
 	if (*(int*)((char*)this + 4) != 0)
 	{
-		float zeroVal;
-		float halfVal;
-		int entryCount = *(int*)((char*)this + 0x3c0c);
-		unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-
-		zeroVal = FLOAT_8033089c;
-		while (*(int*)((char*)this + 0x3c10) < entryCount)
+		entryCount = *(int*)((char*)this + 0x3c0c);
+		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
+		while ((halfVal = FLOAT_8033089c, *(int*)((char*)this + 0x3c10) < entryCount))
 		{
-			unsigned char type = flagEntry[0];
-			if ((type != 3) && (type < 3))
+			type = *flagEntry;
+			if (type < 3)
 			{
 				if (type == 1)
 				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
 				}
 				else if (type != 0)
 				{
 					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 				}
 			}
-
 			flagEntry += 6;
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
 		}
-
 		*(int*)((char*)this + 8) = 0;
 		*(int*)((char*)this + 0x3c10) = 0;
 		*(int*)((char*)this + 0x3c0c) = 0;
-		*(float*)((char*)this + 0x3c88) = zeroVal;
-		*(float*)((char*)this + 0x3c84) = zeroVal;
-		*(float*)((char*)this + 0x3c90) = zeroVal;
-		*(float*)((char*)this + 0x3c8c) = zeroVal;
+		*(float*)((char*)this + 0x3c88) = halfVal;
+		*(float*)((char*)this + 0x3c84) = halfVal;
+		*(float*)((char*)this + 0x3c90) = halfVal;
+		*(float*)((char*)this + 0x3c8c) = halfVal;
 		*(int*)((char*)this + 0x3c80) = 0;
 		*(int*)((char*)this + 0x3c7c) = 0;
 		*(int*)((char*)this + 0x3cac) = 0;
-
-		char tempFlags[0x50];
 		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
 		addString((char**)((char*)this + 4), 0);
 		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
-
 		halfVal = FLOAT_803308b0;
-		int i = 0;
-		float* curr = (float*)((char*)this + 0xc);
-		while (i < *(int*)((char*)this + 8))
+		i = 0;
+		curr = (float*)((char*)this + 0xc);
+		while ((start = curr, remaining = *(int*)((char*)this + 8), i < remaining))
 		{
-			float* start = curr;
-			i++;
+			i = i + 1;
 			curr = start + 5;
-
-			int remaining = *(int*)((char*)this + 8) - i;
-			if (i < *(int*)((char*)this + 8))
+			entryCount = remaining - i;
+			if (i < remaining)
 			{
 				do
 				{
@@ -302,29 +303,28 @@ void CMes::Next()
 					{
 						break;
 					}
-					i++;
-					curr += 5;
-					remaining--;
-				} while (remaining != 0);
+					i = i + 1;
+					curr = curr + 5;
+					entryCount = entryCount + -1;
+				} while (entryCount != 0);
 			}
-
-			unsigned int runLength = (unsigned int)(((char*)curr - (char*)start) / 0x14);
-			float groupWidth = (curr[-5] - start[0]) + start[1] + *(float*)((char*)this + 0x3d3c);
+			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
+			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
 			if (start <= curr - 5)
 			{
 				do
 				{
-					unsigned char align = *(unsigned char*)((char*)start + 0xe) >> 4;
-					if (align == 1)
+					type = *(unsigned char*)((char*)start + 0xe) >> 4;
+					if (type == 1)
 					{
-						start[0] = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + start[0];
+						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
 					}
-					else if (align == 2)
+					else if (type == 2)
 					{
-						start[0] = start[0] + (*(float*)((char*)this + 0x3ca4) - groupWidth);
+						*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
 					}
-					start += 5;
-					runLength--;
+					start = start + 5;
+					runLength = runLength - 1;
 				} while (runLength != 0);
 			}
 		}

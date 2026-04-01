@@ -252,6 +252,7 @@ void CFlatData::Create(void* filePtr)
 				}
 				case 0x5441424C: // 'TABL'
 				{
+					TableEntry* tableEntry;
 					char** stringIndex;
 					int iVar6;
 					int iVar7;
@@ -267,21 +268,16 @@ void CFlatData::Create(void* filePtr)
 					iVar10 = (int)chunkFile.GetAddress();
 					iVar7 = 0;
 					indexOffset = 0;
-					while (true)
+					tableEntry = &m_tabl[m_tableCount];
+					while (iVar7 < tableEntry->m_numEntries)
 					{
-						iVar1 = m_tableCount;
-						if (m_tabl[iVar1].m_numEntries <= iVar7)
-						{
-							break;
-						}
-
 						iVar6 = (int)chunkFile.GetAddress();
-						*(char**)((int)m_tabl[iVar1].m_strings + indexOffset) = m_tabl[iVar1].m_stringBuf + (iVar6 - iVar10);
+						*(char**)((int)tableEntry->m_strings + indexOffset) = tableEntry->m_stringBuf + (iVar6 - iVar10);
 						chunkFile.GetString();
 						indexOffset += 4;
 						iVar7++;
 					}
-					m_tableCount = iVar1 + 1;
+					m_tableCount++;
 					break;
 				}
 				case 0x4D455320: // 'MES '

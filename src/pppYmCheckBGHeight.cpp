@@ -104,9 +104,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         }
 
         pppMngSt->m_position.y = finalY;
-        pppMngSt->m_savedPosition.y = finalY;
-        pppMngSt->m_paramVec0.y = finalY;
-        pppMngSt->m_previousPosition.y = finalY;
+        ((Vec*)((u8*)pppMngSt + 0x58))->y = finalY;
+        ((Vec*)((u8*)pppMngSt + 0x68))->y = finalY;
+        ((Vec*)((u8*)pppMngSt + 0x48))->y = finalY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

@@ -85,7 +85,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     }
 
     Vec oldPosition = pppMngSt->m_position;
-    pppCopyVector(pppMngSt->m_previousPosition, oldPosition);
+    pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), oldPosition);
     pppCopyVector(pppMngSt->m_position, newPosition);
 
     pppMngStPtr->m_matrix.value[0][3] = newPosition.x;

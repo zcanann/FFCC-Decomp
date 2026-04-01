@@ -1405,6 +1405,7 @@ os/OSAlarm.c:
 
 os/OSAlloc.c:
 	.text       start:0x8017C8E8 end:0x8017CBF8
+	.sdata      start:0x8032EA90 end:0x8032EA98
 
 os/OSArena.c:
 	.text       start:0x8017CBF8 end:0x8017CC18
@@ -1421,9 +1422,11 @@ os/OSContext.c:
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
+	.sdata      start:0x8032EA9C end:0x8032EAA8
 
 os/OSFont.c:
 	.text       start:0x8017E2E8 end:0x8017E340
+	.sdata      start:0x8032EAA8 end:0x8032EAB0
 
 os/OSInterrupt.c:
 	.text       start:0x8017E340 end:0x8017EBAC
@@ -1556,37 +1559,56 @@ pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
 	.data       start:0x80217BF8 end:0x80217C08
 	.bss        start:0x8030CC90 end:0x8030CCE0
-	.sdata      start:0x8032EB18 end:0x8032EB58
+	.sdata      start:0x8032EB18 end:0x8032EB38
+	.sbss       start:0x8032F134 end:0x8032F164
 
 ai/ai.c:
 	.text       start:0x8018EE04 end:0x8018F710
+	.data       start:0x80217C08 end:0x80217C50
+	.sdata      start:0x8032EB38 end:0x8032EB40
+	.sbss       start:0x8032F164 end:0x8032F1B4
 
 ar/ar.c:
 	.text       start:0x8018F710 end:0x801911E8
+	.data       start:0x80217C50 end:0x80217C98
+	.sdata      start:0x8032EB40 end:0x8032EB48
+	.sbss       start:0x8032F1B4 end:0x8032F1D4
 
 ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
+	.data       start:0x80217C98 end:0x80217CE0
+	.sdata      start:0x8032EB48 end:0x8032EB50
+	.sbss       start:0x8032F1D4 end:0x8032F204
 
 ax/AX.c:
 	.text       start:0x801915A4 end:0x80191614
+	.data       start:0x80217CE0 end:0x80217D28
+	.sdata      start:0x8032EB50 end:0x8032EB58
 
 ax/AXAlloc.c:
 	.text       start:0x80191614 end:0x80191ADC
 
 ax/AXAux.c:
 	.text       start:0x80191ADC end:0x80191F7C
+	.bss        start:0x8030CDE0 end:0x8030FAE0
 
 ax/AXCL.c:
 	.text       start:0x80191F7C end:0x801926B4
+	.bss        start:0x8030FAE0 end:0x803100E0
 
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0
+	.bss        start:0x803100E0 end:0x80314900
+	.sbss       start:0x8032F240 end:0x8032F270
 
 ax/AXSPB.c:
 	.text       start:0x80192DA0 end:0x80193268
 
 ax/AXVPB.c:
 	.text       start:0x80193268 end:0x80193E28
+	.data       start:0x80217D28 end:0x80217DFC
+	.bss        start:0x80314940 end:0x80325D40
+	.sbss       start:0x8032F290 end:0x8032F29C
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70

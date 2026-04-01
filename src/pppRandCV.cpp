@@ -45,7 +45,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
         if (params->flag != 0) {
             value = value + Math.RandF();
         } else {
-            value = value * kPppRandCVSingleSampleScale;
+            value *= kPppRandCVSingleSampleScale;
         }
 
         target = (f32*)(base + *ctx->outputOffset + 0x80);

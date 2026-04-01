@@ -38,10 +38,10 @@ struct HeapDesc {
 
 volatile int __OSCurrHeap = -1;
 
-static HeapDesc* HeapArray;
-static int NumHeaps;
-static void* ArenaStart;
-static void* ArenaEnd;
+HeapDesc* HeapArray;
+int NumHeaps;
+void* ArenaStart;
+void* ArenaEnd;
 
 // prototypes
 static Cell* DLAddFront(Cell* list, Cell* cell);

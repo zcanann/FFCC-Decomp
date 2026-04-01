@@ -49,7 +49,9 @@ struct RedWaveSettingState {
 };
 
 struct RedDriverSyncState {
-    u8 m_work[0x1F18];
+    int m_dmaQueue[0x380];
+    int m_streamDmaQueue[0x380];
+    OSThread m_mainThread;
     OSSemaphore m_mainSemaphore;
     u8 m_pad2240[0x2240 - 0x1F18 - sizeof(OSSemaphore)];
     OSSemaphore m_waveSemaphore;
@@ -58,11 +60,6 @@ struct RedDriverSyncState {
     u8 m_pad28c0[0x28C0 - 0x2578 - sizeof(OSSemaphore)];
     OSSemaphore m_musicSemaphore;
 };
-
-CRedMemory DAT_8032f480;
-CRedEntry DAT_8032e154;
-FILE DAT_8021d1a8;
-s16 DAT_8021de4e;
 
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 int DAT_8032f3c4;
@@ -114,9 +111,6 @@ int DAT_8032f3b8;
 void* DAT_8032f3e0[2];
 void* DAT_8032f3e8[2];
 u8 gRedDriverSyncBuffer[0x1F18];
-int DAT_8032e12c[10];
-int DAT_8032c660[0x380];
-OSThread DAT_8032d460;
 OSSemaphore DAT_8032d778;
 OSThread DAT_8032d788;
 OSSemaphore DAT_8032daa0;
@@ -126,10 +120,33 @@ OSSemaphore DAT_8032ddd8;
 ARQRequest DAT_8032dde4;
 OSThread DAT_8032de08;
 OSSemaphore DAT_8032e120;
+int DAT_8032e12c[4];
+CRedMemory DAT_8032f480;
+CRedEntry DAT_8032e154;
 
 static inline RedDriverSyncState& RedDriverSync()
 {
     return *reinterpret_cast<RedDriverSyncState*>(gRedDriverSyncBuffer);
+}
+
+static inline int* RedDriverMainDmaQueue()
+{
+    return RedDriverSync().m_dmaQueue;
+}
+
+static inline int* RedDriverStreamDmaQueue()
+{
+    return RedDriverSync().m_streamDmaQueue;
+}
+
+static inline int* RedDriverStreamDmaQueueEnd()
+{
+    return reinterpret_cast<int*>(&RedDriverSync().m_mainThread);
+}
+
+static inline OSThread& RedDriverMainThread()
+{
+    return RedDriverSync().m_mainThread;
 }
 
 extern void ReverbAreaAlloc(unsigned long);
@@ -889,14 +906,14 @@ void _DMACheckProcess()
         fflush(&DAT_8021d1a8);
     }
 
-    dmaInfo = (int*)&gRedDriverSyncBuffer;
+    dmaInfo = RedDriverMainDmaQueue();
     do {
         if ((*dmaInfo != 0) && (gRedMemoryDebugEnabled != 0)) {
             OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
             fflush(&DAT_8021d1a8);
         }
         dmaInfo += 7;
-    } while (dmaInfo < (int*)&DAT_8032d460);
+    } while (dmaInfo < RedDriverStreamDmaQueueEnd());
 
     fflush(&DAT_8021d1a8);
 }
@@ -938,11 +955,11 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
 
     interrupt = OSDisableInterrupts();
     if ((param_1 & 0xffff7fff) == 0) {
-        baseAddr = &DAT_8032c660;
+        baseAddr = RedDriverStreamDmaQueue();
         queuePtr = &DAT_8032f3e0[1];
     } else {
         queuePtr = &DAT_8032f3e0[0];
-        baseAddr = &gRedDriverSyncBuffer;
+        baseAddr = RedDriverMainDmaQueue();
     }
     queueEntry = (int*)*queuePtr;
     entryID = GetMyEntryID();
@@ -1010,14 +1027,14 @@ int RedDmaSearchID(int id)
     found = 0;
     interruptLevel = OSDisableInterrupts();
     if (id != 0) {
-        queueEntry = (int*)&gRedDriverSyncBuffer;
+        queueEntry = RedDriverMainDmaQueue();
         do {
             if ((*queueEntry != 0) && ((id == 0) || (*queueEntry == id))) {
                 found = 1;
                 break;
             }
             queueEntry += 7;
-        } while (queueEntry < (int*)&DAT_8032d460);
+        } while (queueEntry < RedDriverStreamDmaQueueEnd());
     }
     OSRestoreInterrupts(interruptLevel);
     return found;
@@ -1051,10 +1068,10 @@ void _DmaExecute()
             }
             if (DAT_8032f3e0[0] == DAT_8032f3e8[0]) {
                 ppiVar5 = (int**)&DAT_8032f3e8[1];
-                piVar4 = (int*)&DAT_8032c660;
+                piVar4 = RedDriverStreamDmaQueue();
             } else {
                 ppiVar5 = (int**)&DAT_8032f3e8[0];
-                piVar4 = (int*)&gRedDriverSyncBuffer;
+                piVar4 = RedDriverMainDmaQueue();
             }
             piVar7 = *ppiVar5;
             DAT_8032f488[0] = 2;
@@ -1305,10 +1322,10 @@ void CRedDriver::Init()
     memset(DAT_8032f438, 0, 0x4c0);
     DAT_8032f43c = 0;
     memset(&gRedDriverSyncBuffer, 0, 0x1c00);
-    DAT_8032f3e0[0] = &gRedDriverSyncBuffer;
-    DAT_8032f3e8[0] = &gRedDriverSyncBuffer;
-    DAT_8032f3e0[1] = &DAT_8032c660;
-    DAT_8032f3e8[1] = &DAT_8032c660;
+    DAT_8032f3e0[0] = RedDriverMainDmaQueue();
+    DAT_8032f3e8[0] = RedDriverMainDmaQueue();
+    DAT_8032f3e0[1] = RedDriverStreamDmaQueue();
+    DAT_8032f3e8[1] = RedDriverStreamDmaQueue();
     DAT_8032f3b8 = 0;
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
@@ -1331,8 +1348,9 @@ void CRedDriver::Init()
     OSInitSemaphore(&DAT_8032d778, 0);
     DAT_8032f458 = 0;
     DAT_8032f454 = RedNew__Fi(0x1000);
-    OSCreateThread(&DAT_8032d460, (void* (*)(void*))_MainThread, 0, (char*)DAT_8032f454 + 0x1000, 0x1000, 4, 1);
-    OSResumeThread(&DAT_8032d460);
+    OSCreateThread(&RedDriverMainThread(), (void* (*)(void*))_MainThread, 0, (char*)DAT_8032f454 + 0x1000, 0x1000,
+                   4, 1);
+    OSResumeThread(&RedDriverMainThread());
 }
 
 /*

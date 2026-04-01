@@ -711,7 +711,6 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_TEXCOORD4:
     case GX_TG_TEXCOORD5:
     case GX_TG_TEXCOORD6:
-        row = 2;
         break;
     default:
         ASSERTMSGLINE(1059, 0, "GXSetTexCoordGen: Invalid source parameter");

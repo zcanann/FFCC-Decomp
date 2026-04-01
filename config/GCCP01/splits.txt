@@ -1800,6 +1800,7 @@ TRK_MINNOW_DOLPHIN/msgbuf.c:
 
 TRK_MINNOW_DOLPHIN/serpoll.c:
 	.text       start:0x801A9D3C end:0x801A9FF4
+	.rodata     start:0x801E6698 end:0x801E6828
 	.bss        start:0x8032A100 end:0x8032A114
 	.sbss       start:0x8032F358 end:0x8032F35C
 

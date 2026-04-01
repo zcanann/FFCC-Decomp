@@ -9,14 +9,24 @@
 
 #define DDH_BUF_SIZE (0x800)
 
+typedef struct DdhRecvCB {
+    CircleBuffer cb;
+    u32 reserved;
+} DdhRecvCB;
+
+typedef struct DdhInitFlag {
+    BOOL value;
+    u32 reserved;
+} DdhInitFlag;
+
 /* 80450030-80450050 07CD50 001C+04 3/3 0/0 0/0 .bss             gRecvCB */
-static CircleBuffer gRecvCB;
+static DdhRecvCB gRecvCB ATTRIBUTE_ALIGN(8);
 
 /* 8044F830-80450030 07C550 0800+00 1/1 0/0 0/0 .bss             gRecvBuf */
 static u8 gRecvBuf[DDH_BUF_SIZE];
 
 /* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
-static BOOL gIsInitialized;
+static DdhInitFlag gIsInitialized ATTRIBUTE_ALIGN(8);
 
 static const char ddh_cc_write_not_initialized[] = "cc not initialized\n";
 static const char ddh_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
@@ -61,7 +71,7 @@ int ddh_cc_peek()
 
     if (EXI2_ReadN(buff, poll) == 0)
 	{
-        CircleBufferWriteBytes(&gRecvCB, buff, poll);
+        CircleBufferWriteBytes(&gRecvCB.cb, buff, poll);
     } else
 	{
         return DDH_ERR_READ_ERROR;
@@ -118,7 +128,7 @@ int ddh_cc_write(const u8* bytes, int length)
     hexCopy = (u32)bytes;
     n_copy = length;
 
-    if (gIsInitialized == FALSE)
+    if (gIsInitialized.value == FALSE)
 	{
         MWTRACE(8, (char*)ddh_cc_write_not_initialized);
         return DDH_ERR_NOT_INITIALIZED;
@@ -162,7 +172,7 @@ int ddh_cc_read(u8* data, int size)
 
     result = 0;
 	
-    if (!gIsInitialized)
+    if (!gIsInitialized.value)
 	{
         return DDH_ERR_NOT_INITIALIZED;
     }
@@ -170,7 +180,7 @@ int ddh_cc_read(u8* data, int size)
     MWTRACE(1, "Expected packet size : 0x%08x (%ld)\n", size, size);
     originalDataSize = expectedDataSize = size;
 	
-    while ((u32)CBGetBytesAvailableForRead(&gRecvCB) < expectedDataSize)
+    while ((u32)CBGetBytesAvailableForRead(&gRecvCB.cb) < expectedDataSize)
 	{
         result = 0;
         poll = EXI2_Poll();
@@ -179,14 +189,14 @@ int ddh_cc_read(u8* data, int size)
 		{
             result = EXI2_ReadN(buff, poll);
             if (result == 0) {
-                CircleBufferWriteBytes(&gRecvCB, buff, poll);
+                CircleBufferWriteBytes(&gRecvCB.cb, buff, poll);
             }
         }
     }
 
     if (result == 0)
 	{
-        CircleBufferReadBytes(&gRecvCB, data, originalDataSize);
+        CircleBufferReadBytes(&gRecvCB.cb, data, originalDataSize);
     }
 	else
 	{
@@ -221,12 +231,12 @@ int ddh_cc_close()
  */
 int ddh_cc_open()
 {
-    if (gIsInitialized != 0)
+    if (gIsInitialized.value != 0)
 	{
         return DDH_ERR_ALREADY_INITIALIZED;
     }
 
-    gIsInitialized = TRUE;
+    gIsInitialized.value = TRUE;
     return 0;
 }
 
@@ -258,6 +268,6 @@ int ddh_cc_initialize(void* inputPendingPtrRef, EXICallback monitorCallback)
     MWTRACE(1, (char*)ddh_cc_initialize_calling_exi2_init);
     EXI2_Init(inputPendingPtrRef, monitorCallback);
     MWTRACE(1, (char*)ddh_cc_initialize_done_calling_exi2_init);
-    CircleBufferInitialize(&gRecvCB, gRecvBuf, DDH_BUF_SIZE);
+    CircleBufferInitialize(&gRecvCB.cb, gRecvBuf, DDH_BUF_SIZE);
     return 0;
 }

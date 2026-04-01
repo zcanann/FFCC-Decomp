@@ -71,8 +71,12 @@ extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
+unsigned char CFlat_guard[0x20];
 unsigned char CFlat[0x10440];
 CFlatRuntime2& gCFlatRuntime2 = *reinterpret_cast<CFlatRuntime2*>(CFlat);
+unsigned char m_gBaseObjArr[0xC80];
+unsigned char m_gObjQuadArr[0x1020];
+unsigned char m_gObjArr[0x11D40];
 unsigned char m_objItem[0xAF80];
 unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
@@ -517,11 +521,11 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
     // function. The compiler will auto-generate __sinit from the global object.
 
 	__ct__13CFlatRuntime2Fv(reinterpret_cast<CFlatRuntime2*>(CFlat));
-	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat - 0x20);
+	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat_guard);
 
-	__construct_array(CFlat + 0x10440, reinterpret_cast<void (*)(void*)>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
-	__construct_array(CFlat + 0x110C0, reinterpret_cast<void (*)(void*)>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
-	__construct_array(CFlat + 0x120E0, reinterpret_cast<void (*)(void*)>(__ct__8CGObjectFv), 0, 0x518, 0x38);
+	__construct_array(m_gBaseObjArr, reinterpret_cast<void (*)(void*)>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
+	__construct_array(m_gObjQuadArr, reinterpret_cast<void (*)(void*)>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
+	__construct_array(m_gObjArr, reinterpret_cast<void (*)(void*)>(__ct__8CGObjectFv), 0, 0x518, 0x38);
 	__construct_array(m_objItem, reinterpret_cast<void (*)(void*)>(__ct__9CGItemObjFv), 0, 0x57C, 0x20);
 	__construct_array(m_objParty, reinterpret_cast<void (*)(void*)>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
 	__construct_array(m_objMon, reinterpret_cast<void (*)(void*)>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
@@ -727,7 +731,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 
 	if (classType < 3) {
 		if (classType == 1) {
-			signed char* obj = reinterpret_cast<signed char*>(CFlat + 0x110C0);
+			signed char* obj = reinterpret_cast<signed char*>(m_gObjQuadArr);
 			for (int i = 0; i < 3; i++) {
 				if (obj[0x4C] >= 0) {
 					count++;
@@ -763,7 +767,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 				return count;
 			}
 
-			signed char* obj = reinterpret_cast<signed char*>(CFlat + 0x10440);
+			signed char* obj = reinterpret_cast<signed char*>(m_gBaseObjArr);
 			for (int i = 0; i < 5; i++) {
 				if (obj[0x4C] >= 0) {
 					count++;
@@ -794,7 +798,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 			return count;
 		}
 
-		signed char* obj = reinterpret_cast<signed char*>(CFlat + 0x120E0);
+		signed char* obj = reinterpret_cast<signed char*>(m_gObjArr);
 		for (int i = 0; i < 7; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
@@ -918,12 +922,12 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 		} while (count != 0);
 	} else if (classType < 3) {
 		if (classType == 1) {
-			unsigned char* obj = CFlat + 0x110C0;
+			unsigned char* obj = m_gObjQuadArr;
 			int i = 0;
 			int count = 0x18;
 			do {
 				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(CFlat + 0x110C0 + i * 0xAC);
+					return reinterpret_cast<CGObject*>(m_gObjQuadArr + i * 0xAC);
 				}
 				obj += 0xAC;
 				i++;
@@ -933,24 +937,24 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 			if (classType < 0) {
 				return 0;
 			}
-			unsigned char* obj = CFlat + 0x10440;
+			unsigned char* obj = m_gBaseObjArr;
 			int i = 0;
 			int count = 0x28;
 			do {
 				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(CFlat + 0x10440 + i * 0x50);
+					return reinterpret_cast<CGObject*>(m_gBaseObjArr + i * 0x50);
 				}
 				obj += 0x50;
 				i++;
 				count--;
 			} while (count != 0);
 		} else {
-			unsigned char* obj = CFlat + 0x120E0;
+			unsigned char* obj = m_gObjArr;
 			int i = 0;
 			int count = 0x38;
 			do {
 				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(CFlat + 0x120E0 + i * 0x518);
+					return reinterpret_cast<CGObject*>(m_gObjArr + i * 0x518);
 				}
 				obj += 0x518;
 				i++;
@@ -1017,17 +1021,17 @@ void* CFlatRuntime2::intToClass(int classId)
 	}
 
 	if (classType == 1) {
-		return CFlat + 0x110C0 + (slot - 1) * 0xAC;
+		return m_gObjQuadArr + (slot - 1) * 0xAC;
 	}
 
 	if (classType < 1) {
 		if (classType < 0) {
 			return this;
 		}
-		return CFlat + 0x10440 + (slot - 1) * 0x50;
+		return m_gBaseObjArr + (slot - 1) * 0x50;
 	}
 
-	return CFlat + 0x120E0 + (slot - 1) * 0x518;
+	return m_gObjArr + (slot - 1) * 0x518;
 }
 
 /*

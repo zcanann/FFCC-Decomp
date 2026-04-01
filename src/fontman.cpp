@@ -38,8 +38,6 @@ Mtx44Ptr GetScreenMatrix()
  */
 CFontMan::CFontMan()
 {
-	m_stage = 0;
-	m_font = 0;
 }
 
 /*

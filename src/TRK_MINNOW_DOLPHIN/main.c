@@ -10,13 +10,13 @@
 #define DDH_BUF_SIZE (0x800)
 
 /* 80450030-80450050 07CD50 001C+04 3/3 0/0 0/0 .bss             gRecvCB */
-static CircleBuffer gRecvCB;
+static CircleBuffer gRecvCB ATTRIBUTE_ALIGN(8);
 
 /* 8044F830-80450030 07C550 0800+00 1/1 0/0 0/0 .bss             gRecvBuf */
 static u8 gRecvBuf[DDH_BUF_SIZE];
 
 /* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
-static BOOL gIsInitialized;
+static BOOL gIsInitialized ATTRIBUTE_ALIGN(8);
 
 static const char ddh_cc_write_not_initialized[] = "cc not initialized\n";
 static const char ddh_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";

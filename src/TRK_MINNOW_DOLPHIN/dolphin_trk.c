@@ -247,7 +247,6 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 {
 	u8 buff[32] ATTRIBUTE_ALIGN(32);
 	u32 err;
-	register int count = param_1;
 	register u32 bf;
 	u32 uVar1;
 	u32 size;
@@ -266,7 +265,7 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	size = OSRoundUp32B(size);
 
 	for (i = 0; i < size; i += 0x20) {
-		dataCacheBlockFlushIndexed(counter, (void*)count);
+		dataCacheBlockFlushIndexed(counter, (void*)param_1);
 		counter += 0x20;
 	}
 
@@ -287,8 +286,8 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 
 		while (!__ARGetInterruptStatus()) { }
 
-		TRK_memcpy((void*)count, buff, counter);
-		dataCacheBlockFlush((void*)count);
+		TRK_memcpy((void*)param_1, buff, counter);
+		dataCacheBlockFlush((void*)param_1);
 	}
 
 	param_2 += *param_3;
@@ -303,14 +302,14 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 
 			while (!__ARGetInterruptStatus()) { }
 		}
-		g = count + param_2;
+		g = param_1 + param_2;
 		TRK_memcpy((void*)g, buff + counter, 0x20 - counter);
 
 		dataCacheBlockFlush((void*)g);
 	}
 	__sync();
 	__ARClearInterrupt();
-	ARStartDMA(0, count, uVar1, size);
+	ARStartDMA(0, param_1, uVar1, size);
 	if (!r) {
 		while (!__ARGetInterruptStatus()) { }
 

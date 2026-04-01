@@ -45,6 +45,44 @@ static void WriteF32(void* base, unsigned int offset, float value) {
 
 /*
  * --INFO--
+ * PAL Address: 0x8004c588
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_MaterialEditor_cpp(void)
+{
+    unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
+
+    *reinterpret_cast<void**>(self) = &__vt__8CManager;
+    *reinterpret_cast<void**>(self) = &__vt_CProcess;
+    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x84);
+    __ct__5ZLISTFv(self + 0xC8);
+    __ct__5ZLISTFv(self + 0xD8);
+
+    __register_global_object(&MaterialEditorPcs, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), ARRAY_8026D338);
+
+    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
+    table[1] = m_table_desc0__18CMaterialEditorPcs[0];
+    table[2] = m_table_desc0__18CMaterialEditorPcs[1];
+    table[3] = m_table_desc0__18CMaterialEditorPcs[2];
+    table[4] = m_table_desc1__18CMaterialEditorPcs[0];
+    table[5] = m_table_desc1__18CMaterialEditorPcs[1];
+    table[6] = m_table_desc1__18CMaterialEditorPcs[2];
+    table[7] = m_table_desc2__18CMaterialEditorPcs[0];
+    table[8] = m_table_desc2__18CMaterialEditorPcs[1];
+    table[9] = m_table_desc2__18CMaterialEditorPcs[2];
+    table[12] = m_table_desc3__18CMaterialEditorPcs[0];
+    table[13] = m_table_desc3__18CMaterialEditorPcs[1];
+    table[14] = m_table_desc3__18CMaterialEditorPcs[2];
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004c6a0
  * PAL Size: 124b
  * EN Address: TODO

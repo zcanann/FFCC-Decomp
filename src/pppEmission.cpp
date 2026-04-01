@@ -93,6 +93,40 @@ struct EmissionModelData {
     void* m_materialSet;
 };
 
+struct EmissionModelView {
+    u8 _pad0[0xA4];
+    EmissionModelData* m_data;
+    u8 _padA8[0x4];
+    EmissionMeshRef* m_meshes;
+};
+
+struct EmissionState {
+    void* m_particles;
+    int m_texture;
+    u8 m_colorR;
+    u8 m_colorG;
+    u8 m_colorB;
+    u8 m_colorA;
+    float m_scale0;
+    float m_scale1;
+    float m_scale2;
+    float m_scale3;
+    u8 m_field1C;
+};
+
+struct EmissionParticle {
+    float m_scale;
+    u16 m_alpha;
+    u8 m_colorR;
+    u8 m_colorG;
+    u8 m_colorB;
+    u8 m_colorA;
+    s16 m_fieldA;
+    u16 m_fieldC;
+    u8 m_fieldE;
+    u8 m_padF;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800E6AB4
@@ -136,17 +170,20 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
 
-    char* meshData = *(char**)((char*)model + 0xAC + (meshIndex * 0x14) + 8);
-    if ((strcmp(meshData, &DAT_803311fc) == 0) && (*(u8*)((u8*)param_2 + 0xB) != 0)) {
-        int textureInfo = *(int*)((u8*)param_2 + 4);
+    EmissionModelView* modelView = (EmissionModelView*)model;
+    EmissionState* state = (EmissionState*)param_2;
+    pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
+    EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
+        int textureInfo = state->m_texture;
         pppInitBlendMode();
-        pppSetBlendMode(*(u8*)((u8*)param_3 + 0x1C));
+        pppSetBlendMode(step->m_payload[8]);
         *(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
 
-        u8 mode = *(u8*)((u8*)param_3 + 0x1D);
+        u8 mode = step->m_payload[9];
         if (mode == 0) {
-            for (u32 i = 0; i < *(u8*)((u8*)param_3 + 8); i++) {
-                float scale = ((float)i * *(float*)((u8*)param_2 + 0xC)) + FLOAT_803311e4;
+            for (u32 i = 0; i < (u8)step->m_initWOrk; i++) {
+                float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
                 Mtx objMtx;
                 Mtx viewMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
@@ -154,8 +191,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXCopy(CameraMatrix(), viewMtx);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
 
-                int remaining = *(int*)(meshData + 0x4C);
-                char* displayList = *(char**)(meshData + 0x50);
+                int remaining = meshData->m_displayListCount;
+                EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (--remaining >= 0) {
                     *(int*)(MaterialManRaw() + 0x44) = -1;
                     *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
@@ -172,12 +209,10 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
-                    void* modelData = *(void**)((char*)model + 0xA4);
-                    void* materialSet = *(void**)((char*)modelData + 0x24);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
+                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
 
-                    u8 texMode = *(u8*)((u8*)param_3 + 0x1E);
+                    u8 texMode = step->m_payload[10];
                     if (texMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
@@ -191,16 +226,16 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                         }
                     }
 
-                    GXSetArray((GXAttr)0xB, (u8*)param_2 + 8, 4);
+                    GXSetArray((GXAttr)0xB, &state->m_colorR, 4);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-                    GXCallDisplayList(*(void**)displayList, *(u32*)(displayList + 4));
-                    displayList += 0xC;
+                    GXCallDisplayList(displayList->m_data, displayList->m_size);
+                    displayList++;
                 }
             }
         } else if (mode == 1) {
-            float* particle = *(float**)param_2;
-            for (int i = 0; i < (int)(u32)*(u8*)((u8*)param_3 + 8); i++) {
-                float scale = particle[0];
+            EmissionParticle* particle = (EmissionParticle*)state->m_particles;
+            for (int i = 0; i < (int)(u8)step->m_initWOrk; i++) {
+                float scale = particle->m_scale;
                 Mtx objMtx;
                 Mtx viewMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
@@ -209,8 +244,8 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXConcat(viewMtx, objMtx, objMtx);
                 GXLoadPosMtxImm(objMtx, 0);
 
-                int remaining = *(int*)(meshData + 0x4C);
-                char* displayList = *(char**)(meshData + 0x50);
+                int remaining = meshData->m_displayListCount;
+                EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (--remaining >= 0) {
                     *(int*)(MaterialManRaw() + 0x44) = -1;
                     *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
@@ -227,12 +262,10 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
-                    void* modelData = *(void**)((char*)model + 0xA4);
-                    void* materialSet = *(void**)((char*)modelData + 0x24);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, materialSet, *(u16*)(displayList + 8), 0, 0);
+                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
 
-                    u8 texMode = *(u8*)((u8*)param_3 + 0x1E);
+                    u8 texMode = step->m_payload[10];
                     if (texMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
@@ -246,12 +279,12 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                         }
                     }
 
-                    GXSetArray((GXAttr)0xB, (u8*)particle + 6, 4);
+                    GXSetArray((GXAttr)0xB, &particle->m_colorR, 4);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-                    GXCallDisplayList(*(void**)displayList, *(u32*)(displayList + 4));
-                    displayList += 0xC;
+                    GXCallDisplayList(displayList->m_data, displayList->m_size);
+                    displayList++;
                 }
-                particle += 4;
+                particle++;
             }
         }
 

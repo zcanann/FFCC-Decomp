@@ -208,12 +208,11 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
-    unsigned int value;
     CMemory::CStage* stage;
     int result;
 
     count = (unsigned int)(elemSize * elemCount);
-    value = (count + 0x5F) & ~0x1F;
+    unsigned int value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
     ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
@@ -236,10 +235,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
             (ptr[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x19e);
         memcpy(dstBuffer, ptr, (ptr[1] + 0x1F) & ~0x1F);
 
-        value = ptr[0];
-        dstBuffer[0] = Swap32(value);
-        value = ptr[1];
-        dstBuffer[1] = Swap32(value);
+        dstBuffer[0] = Swap32(ptr[0]);
+        dstBuffer[1] = Swap32(ptr[1]);
 
         DCFlushRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
         DCInvalidateRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);

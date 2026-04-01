@@ -284,7 +284,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
     pppSetBlendMode(unkB->m_blendMode);
 
-    if (Game.m_currentSceneId != 7) {
+    if ((int)Game.m_currentSceneId != 7) {
         Vec side;
         Vec up;
         Vec look;
@@ -337,7 +337,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         Mtx model;
         Vec transformedPos;
 
-        if (graphFrame <= particle->m_frame) {
+        if ((int)particle->m_frame >= graphFrame) {
             transformedPos.x = 0.0f;
             transformedPos.y = 0.0f;
             transformedPos.z = 0.0f;

@@ -32,7 +32,7 @@ public:
     _GXColor GetTlutColor(int);
     void GetExternalTlutColor(void*, int, int);
     void SetTlutColor(int, _GXColor);
-    void SetExternalTlutColor(void*, int, int, _GXColor&);
+    static void SetExternalTlutColor(void*, int, int, _GXColor&);
     void FlushTlut();
     void FlushExternalTlut(void*);
     void FlushExternalTlut(void*, int);

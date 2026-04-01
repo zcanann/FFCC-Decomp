@@ -65,7 +65,8 @@ f64 ZeroF;
 f32 ZeroPS[2];
 BOOL AreWeInitialized;
 void (**OSExceptionTable)(u8, OSContext*);
-static const char sOSRegisterVersionFmt[] = "%s\n";
+static char sOSConsoleTypeFmt[] = "%08x\n";
+static char sOSRegisterVersionFmt[] = "%s\n";
 static void* __OSSavedRegionEnd;
 static void* __OSSavedRegionStart;
 BOOL __OSInIPL;
@@ -336,9 +337,9 @@ void OSInit(void) {
             }
             break;
         default:
-            OSReport("%08x\n", consoleType);
+            OSReport(sOSConsoleTypeFmt, consoleType);
             break;
-        }
+    }
 
         OSReport("Memory %d MB\n", (u32)BootInfo->memorySize >> 0x14U);
         OSReport("Arena : 0x%x - 0x%x\n", OSGetArenaLo(), OSGetArenaHi());

@@ -704,15 +704,6 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_TEX5:    row = 10; break;
     case GX_TG_TEX6:    row = 11; break;
     case GX_TG_TEX7:    row = 12; break;
-    case GX_TG_TEXCOORD0:
-    case GX_TG_TEXCOORD1:
-    case GX_TG_TEXCOORD2:
-    case GX_TG_TEXCOORD3:
-    case GX_TG_TEXCOORD4:
-    case GX_TG_TEXCOORD5:
-    case GX_TG_TEXCOORD6:
-        row = 2;
-        break;
     default:
         ASSERTMSGLINE(1059, 0, "GXSetTexCoordGen: Invalid source parameter");
         break;

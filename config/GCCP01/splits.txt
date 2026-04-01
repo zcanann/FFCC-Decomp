@@ -1193,6 +1193,7 @@ pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
 	extabindex  start:0x800107EC end:0x80010804
 	.text       start:0x8012B24C end:0x8012B4A8
+	.sdata2     start:0x80333858 end:0x80333860
 
 pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784

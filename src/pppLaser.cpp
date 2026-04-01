@@ -69,10 +69,10 @@ static char s_pppLaser_cpp[] = "pppLaser.cpp";
 struct LaserStep {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u16 m_stepValue;
+    s32 m_initWOrk;
+    s32 m_stepValue;
     s32 m_arg3;
-    u8* m_payload;
+    u8 m_payload[0x40];
 };
 
 struct CMapCylinderRaw {

@@ -194,7 +194,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	bool emptyHistory;
 
 	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 1)) {
-		work = (pppYmLaserWork*)((u8*)laser + 0x88 + data->m_serializedDataOffsets[2]);
+		work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
 		emptyHistory = (work->m_points == 0);
 
 	if (emptyHistory) {

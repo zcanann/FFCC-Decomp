@@ -29,6 +29,9 @@ static DVDDiskID CurrDiskID;
 static DVDCommandBlock DummyCommandBlock;
 static OSAlarm ResetAlarm;
 
+u32 __DVDLongFileNameFlag;
+OSThreadQueue __DVDThreadQueue;
+
 static DVDCommandBlock* executing;
 static DVDDiskID* IDShouldBe;
 static OSBootInfo* bootInfo;

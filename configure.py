@@ -982,6 +982,7 @@ config.libs = [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/signal.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/string.c"),
+            Object(NonMatching, "MSL_C/PPCEABI/bare/H/float.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/s_atan.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/s_copysign.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/s_cos.c"),

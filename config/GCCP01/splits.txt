@@ -2017,6 +2017,9 @@ MSL_C/PPCEABI/bare/H/string.c:
 	.rodata     start:0x801E70E0 end:0x801E7100
 	.sdata      start:0x8032EC18 end:0x8032EC20
 
+MSL_C/PPCEABI/bare/H/float.c:
+	.sdata      start:0x8032EC20 end:0x8032EC28
+
 MSL_C/PPCEABI/bare/H/wchar_io.c:
 	.text       start:0x801B90B8 end:0x801B9140
 

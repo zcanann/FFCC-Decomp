@@ -78,11 +78,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
             *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        void* texture;
+        int texture;
         pppCVector color;
         GXColor quadColor;
 
-        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionWork->m_alpha != 0) {
             Mtx identityMtx;
             Vec cameraDelta;
@@ -141,7 +141,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-                GXLoadTexObj((GXTexObj*)((char*)texture + 0x28), GX_TEXMAP0);
+                GXLoadTexObj((GXTexObj*)(texture + 0x28), GX_TEXMAP0);
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;

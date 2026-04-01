@@ -1592,6 +1592,7 @@ ax/AX.c:
 
 ax/AXAlloc.c:
 	.text       start:0x80191614 end:0x80191ADC
+	.bss        start:0x8030CCE0 end:0x8030CDE0
 
 ax/AXAux.c:
 	.text       start:0x80191ADC end:0x80191F7C
@@ -1640,6 +1641,7 @@ axfx/reverb_hi_4ch.c:
 
 mix/mix.c:
 	.text       start:0x80197958 end:0x80197978
+	.bss        start:0x80325D40 end:0x80327540
 
 axart/axart.c:
 	.text       start:0x80197978 end:0x80197A0C
@@ -1658,6 +1660,7 @@ dsp/dsp_task.c:
 
 card/CARDBios.c:
 	.text       start:0x80198580 end:0x801998E8
+	.bss        start:0x80327540 end:0x80327780
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48
@@ -2027,6 +2030,7 @@ MSL_C/PPCEABI/bare/H/rand.c:
 
 MSL_C/PPCEABI/bare/H/signal.c:
 	.text       start:0x801B8B30 end:0x801B8BF0
+	.bss        start:0x8032B848 end:0x8032B860
 
 MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x801B8BF0 end:0x801B90B8

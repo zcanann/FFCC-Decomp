@@ -1479,6 +1479,7 @@ os/__ppc_eabi_init.c:
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
+	.data       start:0x80217150 end:0x80217304
 	.bss        start:0x8030C690 end:0x8030C750
 	.sdata      start:0x8032EAB8 end:0x8032EAC0
 	.sbss       start:0x8032EFE8 end:0x8032EFF0
@@ -1526,6 +1527,7 @@ dvd/dvdfs.c:
 
 dvd/dvd.c:
 	.text       start:0x80188A70 end:0x8018B16C
+	.data       start:0x802175F0 end:0x80217728
 	.bss        start:0x8030CA20 end:0x8030CAB8
 	.sbss       start:0x8032F074 end:0x8032F0D0
 

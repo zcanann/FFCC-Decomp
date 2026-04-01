@@ -35,10 +35,11 @@ public:
     CFont* listFont;
     char pad_10c[0x720];
     ItemMenuState* itemMenuState;
-    char pad_830[0x20];
+    char pad_830[0x18];
     short* singWindowInfo;
+    int unk84c;
     short* itemList;
-    char pad_854[0x100];
+    char pad_854[0x104];
 };
 
 #endif // _FFCC_MENU_ITEM_H_

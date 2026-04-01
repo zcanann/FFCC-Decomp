@@ -785,15 +785,24 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
+        void** material = &refData->material;
+        int* current = reinterpret_cast<int*>(*material);
 
-        ReleaseRef(&refData->material);
+        if (current != 0) {
+            int refCount = current[1];
+            current[1] = refCount - 1;
+            if ((refCount - 1 == 0) && (current != 0)) {
+                (*(void (**)(int*, int))(*current + 8))(current, 1);
+            }
+            *material = 0;
+        }
 
         int materialIndex;
         if ((materialSet != 0) && ((materialIndex = static_cast<int>(materialSet->Find(refData->name))) >= 0)) {
-            CMaterial* found =
+            *material =
                 (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<unsigned long>(materialIndex)];
-            refData->material = found;
-            AddRef(found);
+            current = reinterpret_cast<int*>(*material);
+            current[1] = current[1] + 1;
         }
     }
 }

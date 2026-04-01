@@ -75,6 +75,7 @@ static ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
 extern "C" char s_bad_exception[];
+extern "C" void __dt__Q23std13bad_exceptionFv(void*, int);
 
 namespace std {
 
@@ -695,8 +696,12 @@ static inline int ExPPC_IsInSpecification(const char* extype, const ex_specifica
 extern void __unexpected(CatchInfo* catchinfo)
 {
 	const ex_specification* unexp = (const ex_specification*)catchinfo->stacktop;
-	static const char unexpectedTypes[] = "!bad_exception!!\0!std::bad_exception!!";
-	const char* stdBadExceptionType = unexpectedTypes + sizeof("!bad_exception!!");
+	static const char unexpectedTypes[] =
+	    "!bad_exception!!\0\0\0\0"
+	    "!std::exception!!std::bad_exception!!\0\0\0"
+	    "!std::bad_exception!!\0\0";
+	const char* throwBadExceptionType = unexpectedTypes + 0x14;
+	const char* stdBadExceptionType = unexpectedTypes + 0x3C;
 
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 
@@ -707,10 +712,14 @@ extern void __unexpected(CatchInfo* catchinfo)
 			throw;
 		}
 		if (ExPPC_IsInSpecification(unexpectedTypes, unexp)) {
-			throw std::bad_exception();
+			std::bad_exception exception;
+
+			__throw((char*)throwBadExceptionType, &exception, __dt__Q23std13bad_exceptionFv);
 		}
 		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
-			throw std::bad_exception();
+			std::bad_exception exception;
+
+			__throw((char*)throwBadExceptionType, &exception, __dt__Q23std13bad_exceptionFv);
 		}
 	}
 	std::terminate();

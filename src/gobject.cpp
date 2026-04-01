@@ -2501,28 +2501,37 @@ void CGObject::CancelAnim(int keepFacing)
  */
 void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, signed char* animData)
 {
-	m_currentAnimSlot = m_animQueue[slot - 0x41];
-	
-	// Set weapon node flag bit 0
-	*((u8*)&m_weaponNodeFlags + 1) = (param2 & 1) | (*((u8*)&m_weaponNodeFlags + 1) & 0xfe);
-	
-	m_animExtraIndex = param4;
-	m_collisionPushTimer = param5;
-	
-	// Set shield node flag bit 1
-	*((u8*)&m_shieldNodeFlags) = ((param3 << 1) & 2) | (*((u8*)&m_shieldNodeFlags) & 0xfd);
-	
-	if (animData == NULL) {
-		*((u8*)&m_shieldNodeFlags) &= 0x7f; // Clear bit 7
-	} else {
-		*((u8*)&m_shieldNodeFlags) = (*((u8*)&m_shieldNodeFlags) & 0x7f) | 0x80; // Set bit 7
-		m_animQueuePos = 0;
-		// Copy 4 bytes manually
-		*((u32*)m_animQueue) = *((u32*)animData);
-	}
-	
-	*((u8*)&m_shieldNodeFlags) = (*((u8*)&m_shieldNodeFlags) & 0xf7) | 8; // Set bit 3
-	m_turnSpeed = sZeroFloat;
+    u8* weaponFlags = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    u8* shieldFlags = reinterpret_cast<u8*>(&m_shieldNodeFlags);
+    u8 flags;
+
+    m_currentAnimSlot = m_animQueue[slot - 0x41];
+
+    *weaponFlags = (*weaponFlags & 0xFE);
+    *weaponFlags |= (param2 & 1);
+    m_animExtraIndex = param4;
+    m_collisionPushTimer = param5;
+
+    flags = *shieldFlags;
+    flags &= 0xFD;
+    flags |= ((param3 << 1) & 2);
+    *shieldFlags = flags;
+
+    if (animData != NULL) {
+        flags = *shieldFlags;
+        flags &= 0x7F;
+        flags |= 0x80;
+        *shieldFlags = flags;
+        m_animQueuePos = 0;
+        *reinterpret_cast<u32*>(static_cast<void*>(m_animQueue)) =
+            *reinterpret_cast<u32*>(animData);
+    } else {
+        *shieldFlags &= 0x7F;
+    }
+
+    *shieldFlags &= 0xF7;
+    *shieldFlags |= 8;
+    m_turnSpeed = sZeroFloat;
 }
 
 /*

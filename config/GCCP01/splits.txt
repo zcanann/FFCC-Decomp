@@ -1663,6 +1663,7 @@ dsp/dsp_task.c:
 card/CARDBios.c:
 	.text       start:0x80198580 end:0x801998E8
 	.bss        start:0x80327540 end:0x80327780
+	.sdata      start:0x8032EB70 end:0x8032EB78
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48

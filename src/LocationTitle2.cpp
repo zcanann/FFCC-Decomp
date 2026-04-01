@@ -24,11 +24,6 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
-static int GetGraphFrameFromId(u32 graphId)
-{
-    return (int)graphId / 0x1000;
-}
-
 struct LocationTitle2Work {
     void* m_particles;
     u16 m_count;
@@ -265,6 +260,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
  */
 extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
+    u32 dataValIndex;
+    int graphId;
     int serializedOffset;
     int graphFrame;
     LocationTitle2Work* work;
@@ -274,13 +271,15 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     serializedOffset = *unkC->m_serializedDataOffsets;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
 
-    if (unkB->m_dataValIndex == 0xFFFF) {
+    dataValIndex = unkB->m_dataValIndex;
+    if (dataValIndex == 0xFFFF) {
         return;
     }
 
-    graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
+    graphId = locationTitle->m_graphId;
+    graphFrame = graphId / 0x1000;
     particle = (LocationTitle2Particle*)work->m_particles;
-    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
 
     pppSetBlendMode(unkB->m_blendMode);
 
@@ -337,7 +336,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         Mtx model;
         Vec transformedPos;
 
-        if ((int)particle->m_frame >= graphFrame) {
+        if (graphFrame <= (int)particle->m_frame) {
             transformedPos.x = 0.0f;
             transformedPos.y = 0.0f;
             transformedPos.z = 0.0f;

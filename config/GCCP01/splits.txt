@@ -1694,7 +1694,6 @@ card/CARDStat.c:
 
 card/CARDNet.c:
 	.text       start:0x8019EE80 end:0x8019EF44
-	.sdata      start:0x8032EB80 end:0x8032EB88
 
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8

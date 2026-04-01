@@ -11,8 +11,6 @@
 const float FLOAT_80330af4 = 1.0f;
 const float FLOAT_80330b08 = 0.5f;
 const float FLOAT_80330b0c = 0.017453292f;
-const double DOUBLE_80330af8 = 4503599627370496.0;
-const double DOUBLE_80330b00 = 4503601774854144.0;
 const float FLOAT_80330b10 = -2000.0f;
 const float FLOAT_80330b14 = 10000000000.0f;
 const float FLOAT_80330b18 = -10000000000.0f;
@@ -250,8 +248,8 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         work->m_phaseOffset = (s16)(angleSeed - (angleSeed / (int)phaseDiv) * phaseDiv);
         float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
-        float step = ctrl->m_stepValue / (f32)((double)gridSize - DOUBLE_80330af8);
-        float rot = FLOAT_80330b0c * (f32)((double)work->m_phaseOffset - DOUBLE_80330b00);
+        float step = ctrl->m_stepValue / (f32)gridSize;
+        float rot = FLOAT_80330b0c * (f32)work->m_phaseOffset;
         Mtx rotMtx;
 
         for (float z = -halfWidth; z <= halfWidth; z += step) {
@@ -372,8 +370,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shape->m_animData, work->m_shapeDrawFrame, uvMin, uvMax, 0);
 
     grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
-    uStep = (uvMax.x - uvMin.x) / (f32)((double)grid - DOUBLE_80330af8);
-    vStep = (uvMax.y - uvMin.y) / (f32)((double)grid - DOUBLE_80330af8);
+    uStep = (uvMax.x - uvMin.x) / (f32)grid;
+    vStep = (uvMax.y - uvMin.y) / (f32)grid;
     GXBegin((GXPrimitive)0x80, GX_VTXFMT7, (u16)((grid * grid * 4) & 0xFFFC));
 
     for (u32 z = 0; z < grid; z++) {

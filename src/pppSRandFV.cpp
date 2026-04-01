@@ -48,14 +48,14 @@ void pppSRandFV(void* param1, void* param2, void* param3)
     s32 currentIndex = *(s32*)(self + 0xC);
     if (currentIndex == 0) {
         randVec = (f32*)(self + *info->fieldC + 0x80);
-
         {
             u8 flag = cfg->field18;
             f32 value = Math.RandF();
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                value = value * kPppSRandFVSingleSampleScale;
+                f32 scale = kPppSRandFVSingleSampleScale;
+                value = value * scale;
             }
             randVec[0] = value;
         }
@@ -66,7 +66,8 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                value = value * kPppSRandFVSingleSampleScale;
+                f32 scale = kPppSRandFVSingleSampleScale;
+                value = value * scale;
             }
             randVec[1] = value;
         }
@@ -77,7 +78,8 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 value = value + Math.RandF();
             } else {
-                value = value * kPppSRandFVSingleSampleScale;
+                f32 scale = kPppSRandFVSingleSampleScale;
+                value = value * scale;
             }
             randVec[2] = value;
         }

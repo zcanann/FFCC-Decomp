@@ -1398,6 +1398,7 @@ db/db.c:
 
 os/OS.c:
 	.text       start:0x8017B694 end:0x8017C180
+	.sdata      start:0x8032EA80 end:0x8032EA90
 
 os/OSAlarm.c:
 	.text       start:0x8017C180 end:0x8017C8E8
@@ -1470,9 +1471,13 @@ os/__ppc_eabi_init.c:
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
+	.bss        start:0x8030C690 end:0x8030C750
+	.sdata      start:0x8032EAB8 end:0x8032EAC0
+	.sbss       start:0x8032EFE8 end:0x8032EFF0
 
 exi/EXIUart.c:
 	.text       start:0x80183A8C end:0x80184060
+	.sbss       start:0x8032EFF0 end:0x8032F004
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
@@ -1547,6 +1552,7 @@ pad/Padclamp.c:
 
 pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
+	.sdata      start:0x8032EB18 end:0x8032EB58
 
 ai/ai.c:
 	.text       start:0x8018EE04 end:0x8018F710

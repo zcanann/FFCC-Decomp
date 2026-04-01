@@ -556,7 +556,7 @@ config.libs = [
             Object(NonMatching, "pppMove.cpp"),
             Object(NonMatching, "pppParHitSph.cpp"),
             Object(NonMatching, "pppParHitSphMat.cpp"),
-            Object(NonMatching, "pppParMatrix.cpp"),
+            Object(Matching, "pppParMatrix.cpp"),
             Object(NonMatching, "pppParMoveLine.cpp"),
             Object(NonMatching, "pppParMoveMatrix.cpp"),
             Object(NonMatching, "pppPart.cpp"),

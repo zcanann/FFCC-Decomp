@@ -378,39 +378,40 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 
     if (type == 1) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
-    } else if (type == 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    } else if (type < 1) {
+        if (-1 < type) {
+            stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+        }
     } else if (type < 3) {
         stage = pppEnvStPtr->m_stagePtr;
     }
 
-    CFont** fontSlot = reinterpret_cast<CFont**>(self + 0xF8 + slot * 4);
     if ((slot == 0) && (FontMan.m_font != 0)) {
-        *fontSlot = FontMan.m_font;
-        reinterpret_cast<u32*>(*fontSlot)[1] = reinterpret_cast<u32*>(*fontSlot)[1] + 1;
+        *reinterpret_cast<CFont**>(self + 0xF8) = FontMan.m_font;
+        reinterpret_cast<u32*>(*reinterpret_cast<CFont**>(self + 0xF8))[1] =
+            reinterpret_cast<u32*>(*reinterpret_cast<CFont**>(self + 0xF8))[1] + 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
         CFont* font = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
-        *fontSlot = font;
-        if (font != 0) {
-            font->Create(File.m_readBuffer, stage);
-        }
+        *reinterpret_cast<CFont**>(self + 0xF8 + slot * 4) = font;
+        (*reinterpret_cast<CFont**>(self + 0xF8 + slot * 4))->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
     }
 
     if (tlutMode < 2) {
+        int slotOffset = slot * 4;
         const _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
         for (int tlut = 0; tlut < 0x10; tlut++) {
             for (int i = 0; i < 0x1C; i++) {
-                (*fontSlot)->SetTlutColor(tlut, i, white);
-                (*fontSlot)->SetTlutColor(tlut, i + 0x1C, white);
+                (*reinterpret_cast<CFont**>(self + 0xF8 + slotOffset))->SetTlutColor(tlut, i, white);
+                (*reinterpret_cast<CFont**>(self + 0xF8 + slotOffset))->SetTlutColor(tlut, i + 0x1C, white);
             }
         }
-        (*fontSlot)->FlushTlutColor();
+        (*reinterpret_cast<CFont**>(self + 0xF8 + slotOffset))->FlushTlutColor();
     }
 }
 

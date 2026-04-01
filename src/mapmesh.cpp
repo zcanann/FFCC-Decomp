@@ -12,6 +12,10 @@ class CMaterial;
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
+extern "C" CMemory::CStage* DAT_8032EC98;
+extern "C" char s_mapmesh_cpp_801D70B0[];
+extern "C" float FLOAT_8032F930;
+extern "C" float FLOAT_8032F934;
 
 extern "C" {
 void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);
@@ -284,16 +288,16 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
     workSize = Align32(workSize);
 
     reader = chunkFile;
+    DAT_8032EC98 = stage;
     unsigned int cursor = 0;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
         if (chunk.m_id == CHUNK_VERT) {
             S32At(this, 0x24) = reinterpret_cast<int>(
-                __nwa__FUlPQ27CMemory6CStagePci(workSize, stage,
-                                                const_cast<char*>("mapmesh.cpp"), 0x13A));
+                __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A));
 
-            const float minInit = 10000000000.0f;
-            const float maxInit = -10000000000.0f;
+            const float minInit = FLOAT_8032F930;
+            const float maxInit = FLOAT_8032F934;
             U16At(this, 0x0) = static_cast<unsigned short>(chunk.m_size / 0xC);
             S32At(this, 0x2C) = static_cast<int>(Align32(S32At(this, 0x24)));
             F32At(this, 0x14) = minInit;
@@ -383,8 +387,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
                 S32At(this, 0x40) = static_cast<int>(Align32(cursor));
             } else {
                 S32At(this, 0x28) = reinterpret_cast<int>(__nwa__FUlPQ27CMemory6CStagePci(
-                    workSize, stage,
-                    const_cast<char*>("mapmesh.cpp"), 0x1D5));
+                    workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x1D5));
                 S32At(this, 0x40) = S32At(this, 0x28);
             }
 

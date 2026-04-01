@@ -717,7 +717,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 2:
-            if (-((*value * sy) - value[7]) < -*(float*)(piece + 0x28)) {
+            float pieceY = *(float*)(piece + 0x28);
+            if (-pieceY < value[7] - (*value * sy)) {
                 piece[0x38] = 1;
             }
             break;
@@ -727,7 +728,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 4:
-            if (-((*value * sx) - value[6]) < -*(float*)(piece + 0x24)) {
+            if (-*(float*)(piece + 0x24) < -((*value * sx) - value[6])) {
                 piece[0x38] = 1;
             }
             break;
@@ -735,9 +736,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             sx = value[6];
             sy = value[7];
             float x = *value * sx;
+            float pieceX = *(float*)(piece + 0x24);
             float y = *value * sy;
-            if ((*(float*)(piece + 0x24) <= x) && (-*(float*)(piece + 0x24) <= x) &&
-                (*(float*)(piece + 0x28) <= y) && (-*(float*)(piece + 0x28) <= y)) {
+            if ((x >= pieceX) && (-pieceX <= x) &&
+                (y >= *(float*)(piece + 0x28)) && (-*(float*)(piece + 0x28) <= y)) {
                 piece[0x38] = 1;
             }
             break;
@@ -747,8 +749,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             float x = *value * sx;
             sy = value[7];
             float y = *value * sy;
-            if ((sx - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -sx + x) ||
-                (sy - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -sy + y)) {
+            if ((-*(float*)(piece + 0x24) >= sx - x) || (-*(float*)(piece + 0x24) <= -sx + x) ||
+                (-*(float*)(piece + 0x28) >= sy - y) || (-*(float*)(piece + 0x28) <= -sy + y)) {
                 piece[0x38] = 1;
             }
             break;

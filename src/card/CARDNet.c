@@ -4,7 +4,7 @@
 #include "dolphin/card/__card.h"
 
 u16 __CARDVendorID = 0xFFFF;
-u8 __CARDPermMask = 0x1C;
+u8 __CARDPermMask;
 
 u16 CARDSetVendorID(u16 vendorID) {
     u16 prevID = __CARDVendorID;

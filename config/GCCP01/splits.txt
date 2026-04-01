@@ -1408,6 +1408,7 @@ os/OSAlloc.c:
 
 os/OSArena.c:
 	.text       start:0x8017CBF8 end:0x8017CC18
+	.sdata      start:0x8032EA98 end:0x8032EA9C
 
 os/OSAudioSystem.c:
 	.text       start:0x8017CC18 end:0x8017CEAC
@@ -1462,6 +1463,7 @@ os/OSSync.c:
 
 os/OSThread.c:
 	.text       start:0x801809F4 end:0x80181BF8
+	.sdata      start:0x8032EAB0 end:0x8032EAB4
 
 os/OSTime.c:
 	.text       start:0x80181BF8 end:0x8018201C
@@ -1552,6 +1554,8 @@ pad/Padclamp.c:
 
 pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
+	.data       start:0x80217BF8 end:0x80217C08
+	.bss        start:0x8030CC90 end:0x8030CCE0
 	.sdata      start:0x8032EB18 end:0x8032EB58
 
 ai/ai.c:
@@ -1601,6 +1605,7 @@ axfx/delay.c:
 
 axfx/axfx.c:
 	.text       start:0x801969C4 end:0x80196A20
+	.sdata      start:0x8032EB60 end:0x8032EB68
 
 axfx/reverb_hi_4ch.c:
 	.text       start:0x80196A20 end:0x80197958
@@ -1667,11 +1672,12 @@ card/CARDStat.c:
 
 card/CARDNet.c:
 	.text       start:0x8019EE80 end:0x8019EF44
+	.sdata      start:0x8032EB80 end:0x8032EB88
 
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8
 	.data       start:0x8021C3C4 end:0x8021C4C0
-	.bss        start:0x80327780 end:0x80327C78
+	.bss        start:0x80327780 end:0x80327CF8
 	.sdata      start:0x8032EB88 end:0x8032EB90
 	.sbss       start:0x8032F2E8 end:0x8032F310
 
@@ -1730,6 +1736,7 @@ gx/GXPerf.c:
 
 gba/GBA.c:
 	.text       start:0x801A740C end:0x801A76FC
+	.data       start:0x8021CB38 end:0x8021CB48
 	.bss        start:0x80328320 end:0x80328720
 	.sbss       start:0x8032F350 end:0x8032F358
 
@@ -1946,6 +1953,7 @@ MSL_C/PPCEABI/bare/H/gamecube.c:
 
 MSL_C/PPCEABI/bare/H/ctype.c:
 	.text       start:0x801B52A0 end:0x801B52C4
+	.data       start:0x8021D3C0 end:0x8021D4C0
 
 MSL_C/PPCEABI/bare/H/direct_io.c:
 	.text       start:0x801B52C4 end:0x801B5A18
@@ -1992,6 +2000,7 @@ MSL_C/PPCEABI/bare/H/wchar_io.c:
 
 MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
 	.text       start:0x801B9140 end:0x801B9210
+	.sbss       start:0x8032F398 end:0x8032F3A0
 
 MSL_C/PPCEABI/bare/H/e_acos.c:
 	.text       start:0x801B9210 end:0x801B944C
@@ -2125,6 +2134,8 @@ RedSound/RedSound.cpp:
 
 thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C
+	.sdata      start:0x8032EC38 end:0x8032EC3C
+	.sbss       start:0x8032F4E0 end:0x8032F5F8
 
 thp/THPAudio.c:
 	.text       start:0x801D4E5C end:0x801D538C

@@ -11,15 +11,16 @@ static u16 __AXDramImage[8192];
 AXPROFILE __AXLocalProfile;
 
 volatile static u32 __AXOutFrame;
-volatile static u32 __AXAiDmaFrame;
 volatile static u32 __AXOutDspReady;
 volatile static OSTime __AXOsTime;
-void (*__AXUserFrameCallback)();
+static void (*__AXUserFrameCallback)();
 volatile static int __AXDSPInitFlag;
 static int __AXDSPDoneFlag;
 
 static volatile u32 __AXDebugSteppingMode;
 static OSThreadQueue __AXOutThreadQueue;
+s32 __AXSpbAL;
+s32 __AXSpbAR;
 
 // prototypes
 static void __AXDSPInitCallback(void* task);

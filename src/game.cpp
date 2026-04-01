@@ -1426,12 +1426,15 @@ CGPartyObj* CGame::GetPartyObj(int index)
  */
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
-    char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
     if (count > 1) {
-        sprintf(out, s_numNameFmt, count, itemTable[itemIndex * 5 + 3]);
+        sprintf(out,
+                s_numNameFmt,
+                count,
+                reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 3]);
         return out;
     }
 
+    char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
     unsigned char hasSeparator = 0;
     char* prefix = itemTable[itemIndex * 5];
     char* itemName = itemTable[itemIndex * 5 + 1];

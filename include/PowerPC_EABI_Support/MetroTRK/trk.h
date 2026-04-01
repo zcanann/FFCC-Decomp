@@ -214,7 +214,6 @@ typedef struct TRKFramingState {
     ReceiverState receiveState;  // _08
     BOOL isEscape;               // _0C
     u8 fcsType;                  // _10
-    u32 unk14;                   // _14
 } TRKFramingState;
 
 typedef struct TRKState_PPC {

@@ -17,7 +17,7 @@ void __AXOutQuit(void);
 #ifdef DEBUG
 const char* __AXVersion = "<< Dolphin SDK - AX\tdebug build: Apr  5 2004 03:56:21 (0x2301) >>";
 #else
-const char* __AXVersion = "<< Dolphin SDK - AX\trelease build: Apr  5 2004 04:15:05 (0x2301) >>";
+const char* __AXVersion = "<< Dolphin SDK - AX\trelease build: Mar 11 2003 11:19:39 (0x2301) >>";
 #endif
 
 void AXInit(void) {

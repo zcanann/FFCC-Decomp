@@ -6,9 +6,9 @@
 
 #define DVD_WATYPE_MAX 2
 
-static BOOL FirstRead = TRUE;
+extern BOOL FirstRead;
 static volatile BOOL StopAtNextInt = FALSE;
-static u32 LastLength = 0;
+extern u32 LastLength;
 static DVDLowCallback Callback = NULL;
 static DVDLowCallback ResetCoverCallback = NULL;
 static volatile OSTime LastResetEnd = 0;
@@ -20,7 +20,7 @@ static u32 WorkAroundSeekLocation = 0;
 static volatile OSTime LastReadFinished = 0;
 static OSTime LastReadIssued = 0;
 static volatile BOOL LastCommandWasRead = FALSE;
-static volatile u32 NextCommandNumber = 0;
+extern volatile u32 NextCommandNumber;
 
 typedef struct {
 	void* addr;

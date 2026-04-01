@@ -7,7 +7,7 @@
 #ifdef DEBUG
 const char* __ARVersion = "<< Dolphin SDK - AR\tdebug build: Apr  5 2004 03:56:19 (0x2301) >>";
 #else
-const char* __ARVersion = "<< Dolphin SDK - AR\trelease build: Apr  5 2004 04:15:03 (0x2301) >>";
+const char* __ARVersion = "<< Dolphin SDK - AR\trelease build: Sep  5 2002 05:34:27 (0x2301) >>";
 #endif
 
 static void (*__AR_Callback)();

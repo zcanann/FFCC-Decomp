@@ -1396,6 +1396,7 @@ base/PPCArch.c:
 
 db/db.c:
 	.text       start:0x8017B5A8 end:0x8017B694
+	.data       start:0x80216758 end:0x80216770
 
 os/OS.c:
 	.text       start:0x8017B694 end:0x8017C180
@@ -1414,6 +1415,7 @@ os/OSArena.c:
 
 os/OSAudioSystem.c:
 	.text       start:0x8017CC18 end:0x8017CEAC
+	.data       start:0x80216968 end:0x802169E8
 
 os/OSCache.c:
 	.text       start:0x8017CEAC end:0x8017D4F8
@@ -1533,6 +1535,7 @@ dvd/dvdqueue.c:
 
 dvd/dvderror.c:
 	.text       start:0x8018B364 end:0x8018B4FC
+	.data       start:0x80217728 end:0x80217770
 
 dvd/dvdidutils.c:
 	.text       start:0x8018B4FC end:0x8018B5F4
@@ -1543,6 +1546,7 @@ dvd/dvdFatal.c:
 
 dvd/fstload.c:
 	.text       start:0x8018B624 end:0x8018B864
+	.data       start:0x80217770 end:0x802177E0
 	.bss        start:0x8030CAD8 end:0x8030CB48
 	.sbss       start:0x8032F0D4 end:0x8032F0E0
 
@@ -1622,6 +1626,7 @@ axfx/reverb_std.c:
 
 axfx/chorus.c:
 	.text       start:0x80195B30 end:0x80196518
+	.data       start:0x8021B790 end:0x8021BF90
 
 axfx/delay.c:
 	.text       start:0x80196518 end:0x801969C4
@@ -1924,6 +1929,7 @@ Runtime.PPCEABI.H/New.cp:
 	.text       start:0x801AF7FC end:0x801AF87C
 	.rodata     start:0x801E6E68 end:0x801E6E98
 	.data       start:0x8021D060 end:0x8021D070
+	.sdata      start:0x8032EBE0 end:0x8032EBE8
 
 Runtime.PPCEABI.H/NMWException.cp:
 	extab       start:0x8000A204 end:0x8000A26C

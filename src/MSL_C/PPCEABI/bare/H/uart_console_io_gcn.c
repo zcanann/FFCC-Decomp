@@ -16,8 +16,8 @@ extern int InitializeUART(unsigned int);
 extern int WriteUARTN(unsigned int, unsigned int);
 extern int __TRK_write_console(unsigned int, unsigned int, unsigned int *, unsigned int);
 
-// Static variable for UART initialization state  
-static int DAT_8032f398 = 0;
+// Tracks one-time UART initialization in the MSL console shim.
+static int uart_console_initialized = 0;
 
 int __write_console(unsigned int param_1, unsigned int param_2, unsigned int *param_3, unsigned int param_4)
 {
@@ -27,8 +27,8 @@ int __write_console(unsigned int param_1, unsigned int param_2, unsigned int *pa
 	uVar1 = OSGetConsoleType();
 	if ((uVar1 & 0x20000000) == 0) {
 		iVar2 = 0;
-		if ((DAT_8032f398 == 0) && (iVar2 = InitializeUART(0xe100), iVar2 == 0)) {
-			DAT_8032f398 = 1;
+		if ((uart_console_initialized == 0) && (iVar2 = InitializeUART(0xe100), iVar2 == 0)) {
+			uart_console_initialized = 1;
 		}
 		if (iVar2 != 0) {
 			return 1;

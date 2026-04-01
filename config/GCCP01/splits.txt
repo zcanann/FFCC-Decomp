@@ -1800,8 +1800,8 @@ TRK_MINNOW_DOLPHIN/msgbuf.c:
 
 TRK_MINNOW_DOLPHIN/serpoll.c:
 	.text       start:0x801A9D3C end:0x801A9FF4
-	.bss        start:0x8032A100 end:0x8032A118
-	.sbss       start:0x8032F358 end:0x8032F360
+	.bss        start:0x8032A100 end:0x8032A114
+	.sbss       start:0x8032F358 end:0x8032F35C
 
 TRK_MINNOW_DOLPHIN/usr_put.c:
 	.text       start:0x801A9FF4 end:0x801AA080
@@ -1811,7 +1811,7 @@ TRK_MINNOW_DOLPHIN/dispatch.c:
 
 TRK_MINNOW_DOLPHIN/msghndlr.c:
 	.text       start:0x801AA1F8 end:0x801AB268
-	.bss        start:0x8032A118 end:0x8032A120
+	.bss        start:0x8032A118 end:0x8032A11C
 
 TRK_MINNOW_DOLPHIN/support.c:
 	.text       start:0x801AB268 end:0x801AB97C
@@ -1852,8 +1852,8 @@ TRK_MINNOW_DOLPHIN/__exception.s:
 TRK_MINNOW_DOLPHIN/dolphin_trk.c:
 	.init       start:0x800053E0 end:0x8000540C
 	.text       start:0x801ADA40 end:0x801AE07C
-	.data       start:0x8021CFF8 end:0x8021D038
-	.bss        start:0x8032A6A0 end:0x8032A6A8
+	.data       start:0x8021CFF8 end:0x8021D034
+	.bss        start:0x8032A6A0 end:0x8032A6A4
 
 TRK_MINNOW_DOLPHIN/main_TRK.c:
 	.text       start:0x801AE07C end:0x801AE0D4
@@ -2007,7 +2007,7 @@ MSL_C/PPCEABI/bare/H/printf.c:
 
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text       start:0x801B8B10 end:0x801B8B30
-	.sdata      start:0x8032EC10 end:0x8032EC18
+	.sdata      start:0x8032EC10 end:0x8032EC14
 
 MSL_C/PPCEABI/bare/H/signal.c:
 	.text       start:0x801B8B30 end:0x801B8BF0
@@ -2017,12 +2017,15 @@ MSL_C/PPCEABI/bare/H/string.c:
 	.rodata     start:0x801E70E0 end:0x801E7100
 	.sdata      start:0x8032EC18 end:0x8032EC20
 
+MSL_C/PPCEABI/bare/H/float.c:
+	.sdata      start:0x8032EC20 end:0x8032EC28
+
 MSL_C/PPCEABI/bare/H/wchar_io.c:
 	.text       start:0x801B90B8 end:0x801B9140
 
 MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
 	.text       start:0x801B9140 end:0x801B9210
-	.sbss       start:0x8032F398 end:0x8032F3A0
+	.sbss       start:0x8032F398 end:0x8032F39C
 
 MSL_C/PPCEABI/bare/H/e_acos.c:
 	.text       start:0x801B9210 end:0x801B944C

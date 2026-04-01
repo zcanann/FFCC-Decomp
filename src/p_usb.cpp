@@ -190,8 +190,7 @@ static inline unsigned int Align32(unsigned int x)
 
 static inline unsigned int Swap32(unsigned int x)
 {
-    unsigned int tmp = x;
-    return __lwbrx((void*)&tmp, 4);
+    return __lwbrx((void*)&x, 0);
 }
 
 /*

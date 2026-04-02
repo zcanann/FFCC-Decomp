@@ -1956,7 +1956,7 @@ Runtime.PPCEABI.H/New.cp:
 	extab       start:0x8000A1DC end:0x8000A204
 	extabindex  start:0x80011794 end:0x800117A0
 	.text       start:0x801AF7FC end:0x801AF87C
-	.rodata     start:0x801E6E68 end:0x801E6E98
+	.rodata     start:0x801E6E68 end:0x801E6E88
 	.data       start:0x8021D060 end:0x8021D070
 	.sdata      start:0x8032EBE0 end:0x8032EBE8
 

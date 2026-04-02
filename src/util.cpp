@@ -1154,14 +1154,10 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
     bool running = true;
     int polygonCount = 0;
 
-    do {
-        if (!running) {
-            return polygonCount;
-        }
-
+    while (running) {
         u8 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
-        u32 count = vertexCount;
+        int count = vertexCount;
         u8 primitive = opcode & 0xF8;
         bool isPrimitive;
 
@@ -1196,7 +1192,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 
         if ((opcode & 7) == 2) {
             if (count != 0) {
-                u32 blocks = vertexCount >> 3;
+                int blocks = vertexCount >> 3;
 
                 if (blocks != 0) {
                     do {
@@ -1216,7 +1212,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
                 } while (count != 0);
             }
         } else if (count != 0) {
-            u32 blocks = vertexCount >> 3;
+            int blocks = vertexCount >> 3;
 
             if (blocks != 0) {
                 do {
@@ -1235,7 +1231,9 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
                 count--;
             } while (count != 0);
         }
-    } while (true);
+    }
+
+    return polygonCount;
 }
 
 /*

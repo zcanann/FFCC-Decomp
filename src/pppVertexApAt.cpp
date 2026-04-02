@@ -1,6 +1,6 @@
 #include "ffcc/pppVertexApAt.h"
 #include "ffcc/math.h"
-#include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 #include <dolphin/types.h>
 
@@ -42,8 +42,6 @@ struct VertexApAtState
 };
 
 struct _pppPDataVal;
-
-extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -161,5 +159,3 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
     state->countdown--;
 }
-
-

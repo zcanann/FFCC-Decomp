@@ -36,10 +36,6 @@ struct KeShpTail3XWork {
 };
 
 extern "C" {
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
-void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
-void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 int __cntlzw(unsigned int);
 }
 
@@ -83,18 +79,18 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
 
             partMatrix = obj->pppPObject.m_localMatrix;
             ownerMatrix = pppMngStPtr->m_matrix;
-            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
+            pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
             pos.z = outMatrix.value[2][3];
         }
 
-        pppCopyVector__FR3Vec3Vec(&historyPos, &pos);
+        pppCopyVector(historyPos, pos);
         Vec* history = work->m_posHistory;
         s32 i = 0x1c;
         do {
             temp = historyPos;
-            pppCopyVector__FR3Vec3Vec(history, &temp);
+            pppCopyVector(*history, temp);
             history++;
             i--;
         } while (i > 0);
@@ -116,14 +112,14 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
 
         partMatrix = obj->pppPObject.m_localMatrix;
         ownerMatrix = pppMngStPtr->m_matrix;
-        pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
+        pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];
     }
 
     temp = pos;
-    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
+    pppCopyVector(work->m_posHistory[work->m_head], temp);
 
     work->m_values[8] += work->m_values[0xc];
     work->m_values[0] += work->m_values[8];
@@ -266,8 +262,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
                 (float)(count - 1);
     }
 
-    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&localBase, &obj->pppPObject.m_localMatrix);
-    pppUnitMatrix__FR10pppFMATRIX(&local);
+    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
+    pppUnitMatrix(local);
 
     scaleFalloff = ((float)step->m_stepValue - (float)step->m_arg3) / (float)(count - 1);
     baseScale = *(float*)(step->m_payload + 4) * pppMngStPtr->m_scale.x;
@@ -332,20 +328,20 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
                             drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
             if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
-                pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&tmpMtx, &obj->field_0x40);
-                pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&obj->field_0x40, &rotMtx, &tmpMtx);
+                pppCopyMatrix(tmpMtx, obj->field_0x40);
+                pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
             }
             PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
             PSMTXCopy(obj->field_0x40.value, drawMtx.value);
         } else if (step->m_payload[0x3f] == 1) {
-            pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
+            pppUnitMatrix(drawMtx);
             drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
             drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
             drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
             if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
-                pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&tmpMtx, &drawMtx);
-                pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&drawMtx, &rotMtx, &tmpMtx);
+                pppCopyMatrix(tmpMtx, drawMtx);
+                pppMulMatrix(drawMtx, rotMtx, tmpMtx);
             }
             PSMTXMultVec(ppvCameraMatrix0, &pos, &pos);
         }

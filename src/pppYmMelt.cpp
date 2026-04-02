@@ -21,7 +21,6 @@ int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void DCFlushRange(void*, unsigned long);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
@@ -31,7 +30,6 @@ void pppGetShapeUV__FPlsR5Vec2dR5Vec2di(long*, short, Vec2d&, Vec2d&, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 }
 
 struct YmMeltVertex
@@ -285,7 +283,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
         long* animData = **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
-        pppCalcFrameShape__FPlRsRsRss(animData, work->m_shapeCurrentFrame, work->m_shapeDrawFrame,
+        pppCalcFrameShape(animData, work->m_shapeCurrentFrame, work->m_shapeDrawFrame,
                                       work->m_shapeFrameTime, *(s16*)&ctrl->m_initWOrk);
     }
 }
@@ -397,10 +395,10 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             float c2 = drawColor;
             float c3 = drawColor;
 
-            pppCopyVector__FR3Vec3Vec(&vtx0, &p0Data->m_position);
-            pppCopyVector__FR3Vec3Vec(&vtx1, &p1Data->m_position);
-            pppCopyVector__FR3Vec3Vec(&vtx2, &p2Data->m_position);
-            pppCopyVector__FR3Vec3Vec(&vtx3, &p3Data->m_position);
+            pppCopyVector(vtx0, p0Data->m_position);
+            pppCopyVector(vtx1, p1Data->m_position);
+            pppCopyVector(vtx2, p2Data->m_position);
+            pppCopyVector(vtx3, p3Data->m_position);
 
             vtx0.y += worldY;
             vtx1.y += worldY;

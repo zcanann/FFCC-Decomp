@@ -21,7 +21,6 @@ extern "C" void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 extern float FLOAT_80331840;
 extern float FLOAT_80331844;
@@ -236,11 +235,11 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             dest = entries + (iVar8 + 1);
             local_a8.y = pfVar6[1];
             local_a8.z = pfVar6[2];
-            pppCopyVector__FR3Vec3Vec(&dest->pos, &local_a8);
+            pppCopyVector(dest->pos, local_a8);
             local_9c.x = pfVar6[4];
             local_9c.y = pfVar6[5];
             local_9c.z = pfVar6[6];
-            pppCopyVector__FR3Vec3Vec(&dest->targetPos, &local_9c);
+            pppCopyVector(dest->targetPos, local_9c);
             *(u8*)(pfVar6 + 0x11) = *(u8*)(pfVar6 + 7);
             *(u8*)((u8*)pfVar6 + 0x45) = *(u8*)((u8*)pfVar6 + 0x1d);
             *(u8*)((u8*)pfVar6 + 0x46) = *(u8*)((u8*)pfVar6 + 0x1e);
@@ -299,11 +298,11 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             local_84.x = entries->pos.x;
             local_84.y = entries->pos.y;
             local_84.z = entries->pos.z;
-            pppCopyVector__FR3Vec3Vec(&pFallback->pos, &local_84);
+            pppCopyVector(pFallback->pos, local_84);
             local_90.x = entries->targetPos.x;
             local_90.y = entries->targetPos.y;
             local_90.z = entries->targetPos.z;
-            pppCopyVector__FR3Vec3Vec(&pFallback->targetPos, &local_90);
+            pppCopyVector(pFallback->targetPos, local_90);
             pFallback++;
         }
     }

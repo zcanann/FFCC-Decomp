@@ -19,7 +19,6 @@ extern f64 DOUBLE_803306f8;
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
@@ -321,7 +320,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             pppFMATRIX world = pppMngStPtr->m_matrix;
             pppFMATRIX result;
 
-            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&result, &world, &local);
+            pppMulMatrix(result, world, local);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }

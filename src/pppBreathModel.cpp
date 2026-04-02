@@ -1,10 +1,10 @@
 #include "ffcc/pppBreathModel.h"
 #include "ffcc/linkage.h"
-#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/pppPart.h"
 #include <string.h>
 
 const float FLOAT_80330F80 = -1.0f;
@@ -17,11 +17,9 @@ void pppSetBlendMode(unsigned char);
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -460,7 +458,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
             group[5] = 0;
             group[4] = 0;
             group[3] = 0;
-            pppCopyVector__FR3Vec3Vec((Vec*)(group + 6), &unitVelocity);
+            pppCopyVector(*(Vec*)(group + 6), unitVelocity);
             PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
@@ -625,7 +623,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             PSVECAdd(&origin, &target, &target);
             PSVECSubtract(&target, &origin, &hitVector);
 
-            pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaleValue,
+            pppHitCylinderSendSystem(pppMngStPtr, &origin, &hitVector, scaleValue,
                                                                 *(float*)((unsigned char*)pBreathModel + 4));
         }
 

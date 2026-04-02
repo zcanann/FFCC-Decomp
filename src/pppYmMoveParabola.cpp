@@ -6,11 +6,6 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-extern "C" {
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-}
-
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;
@@ -123,7 +118,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         Vec savedPosition = *(Vec*)((u8*)pppMngSt + 0x58);
         Vec matrixOffset;
 
-        pppCopyVector__FR3Vec3Vec(&work->m_basePosition, &savedPosition);
+        pppCopyVector(work->m_basePosition, savedPosition);
 
         matrixOffsetX = pppMngStPtr->m_matrix.value[0][3];
         matrixOffsetY = pppMngStPtr->m_matrix.value[1][3];
@@ -133,10 +128,10 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         matrixOffset.z = matrixOffsetZ;
 
         Vec basePosition = work->m_basePosition;
-        pppAddVector__FR3Vec3Vec3Vec(&work->m_basePosition, &basePosition, &matrixOffset);
+        pppAddVector(work->m_basePosition, basePosition, matrixOffset);
 
         Vec paramPosition = work->m_basePosition;
-        pppCopyVector__FR3Vec3Vec(&pppMngSt->m_paramVec0, &paramPosition);
+        pppCopyVector(pppMngSt->m_paramVec0, paramPosition);
         pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
     }
 }

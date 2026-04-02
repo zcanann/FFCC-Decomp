@@ -2,36 +2,26 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
-#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
-extern "C" void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
-extern "C" void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
-extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-extern "C" void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern Mtx ppvCameraMatrix0;
 extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
 extern double DOUBLE_80330c88;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
-extern _pppEnvSt* pppEnvStPtr;
-extern _pppMngSt* pppMngStPtr;
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
@@ -407,7 +397,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             }
         } else {
             UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
-            pppCalcFrameShape__FPlRsRsRss(
+            pppCalcFrameShape(
                 *(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)(particleData + 0x58),
                 *(short*)(particleData + 0x5A), *(short*)(particleData + 0x56),
                 *(short*)((unsigned char*)pYmBreath + 0x10));
@@ -436,7 +426,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             group[5] = 0;
             group[4] = 0;
             group[3] = 0;
-            pppCopyVector__FR3Vec3Vec((Vec*)(group + 6), &unitVelocity);
+            pppCopyVector(*(Vec*)(group + 6), unitVelocity);
             PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
@@ -593,18 +583,18 @@ group_ready:
             particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
             PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(ymBreath)->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
-            pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&rotMtx, reinterpret_cast<pppFMATRIX*>(particleMtx));
+            pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = FLOAT_80330c80;
             rotMtx.value[1][3] = FLOAT_80330c80;
             rotMtx.value[2][3] = FLOAT_80330c80;
             *(float*)(groupTable + 0x28) = scaledOwner;
-            pppCopyVector__FR3Vec3Vec(&dir, (Vec*)(groupTable + 0x18));
+            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
             pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
             PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
-            pppAddVector__FR3Vec3Vec3Vec(&target, &origin, &target);
-            pppSubVector__FR3Vec3Vec3Vec(&hitVector, &target, &origin);
-            pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaledOwner,
+            pppAddVector(target, origin, target);
+            pppSubVector(hitVector, target, origin);
+            pppHitCylinderSendSystem(pppMngStPtr, &origin, &hitVector, scaledOwner,
                                                                 *(float*)((unsigned char*)pYmBreath + 4));
         }
 
@@ -681,7 +671,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 PSMTXConcat(drawMtx, rotMtx, drawMtx);
             }
 
-            pppUnitMatrix__FR10pppFMATRIX(&viewMtx);
+            pppUnitMatrix(viewMtx);
             PSMTXConcat(*matrixList, object->m_localMatrix.value, viewMtx.value);
             PSMTXConcat(ppvCameraMatrix0, viewMtx.value, viewMtx.value);
             PSMTXMultVec(viewMtx.value, source, &pos);

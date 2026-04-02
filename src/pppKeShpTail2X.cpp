@@ -9,10 +9,6 @@
 #include <string.h>
 
 extern "C" {
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
-void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
-void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 int __cntlzw(unsigned int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char,
@@ -112,7 +108,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
 
             partMatrix = tailObj->m_obj.m_localMatrix;
             ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
-            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
+            pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
             pos.z = outMatrix.value[2][3];
@@ -144,7 +140,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
 
         partMatrix = tailObj->m_obj.m_localMatrix;
         ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
-        pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
+        pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];
@@ -265,8 +261,8 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     colorB = (float)step->m_colorStartB;
     colorA = (float)step->m_colorStartA * alphaMul;
 
-    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&localBase, &tailObj->m_obj.m_localMatrix);
-    pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
+    pppCopyMatrix(localBase, tailObj->m_obj.m_localMatrix);
+    pppUnitMatrix(drawMtx);
 
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
@@ -316,7 +312,7 @@ draw_loop:
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
         PSMTXCopy(*(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
-        pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
+        pppUnitMatrix(drawMtx);
         drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * mng->m_scale.x);
         drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * mng->m_scale.y);
         drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * mng->m_scale.z);

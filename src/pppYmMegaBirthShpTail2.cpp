@@ -7,7 +7,6 @@
 #include <string.h>
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
@@ -66,7 +65,7 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBi
     pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
     float initVal;
 
-    pppUnitMatrix__FR10pppFMATRIX(work);
+    pppUnitMatrix(*work);
     initVal = kPppYmMegaBirthShpTail2Zero;
 
     work[1].value[0][2] = initVal;
@@ -79,7 +78,7 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBi
     *(u16*)(work[1].value[1] + 3) = 0;
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;
-    pppUnitMatrix__FR10pppFMATRIX(&g_matUnit2);
+    pppUnitMatrix(g_matUnit2);
 }
 
 /*
@@ -597,7 +596,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     Vec trailPos = drawPos;
                     bool canDraw = (trailPos.x != 0.0f) || (trailPos.y != 0.0f) || (trailPos.z != 0.0f);
                     if (canDraw) {
-                        pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
+                        pppUnitMatrix(drawMtx);
                         drawMtx.value[0][0] = drawScale * pppMngStPtr->m_scale.x;
                         drawMtx.value[1][1] = drawScale * pppMngStPtr->m_scale.y;
                         drawMtx.value[2][2] = drawScale * pppMngStPtr->m_scale.z;

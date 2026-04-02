@@ -17,9 +17,7 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
                                                                        unsigned char, unsigned char,
                                                                        unsigned char, unsigned char,
                                                                        unsigned char);
-extern void pppSetBlendMode(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 extern float FLOAT_80330ee0;
 extern float FLOAT_80330ee4;
 extern "C" int rand(void);
@@ -179,7 +177,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
             localMatrix = pppLocationTitle->m_localMatrix;
             managerMatrix = pppMngStPtr->m_matrix;
-            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&resultMatrix, &managerMatrix, &localMatrix);
+            pppMulMatrix(resultMatrix, managerMatrix, localMatrix);
 
             particles[work->m_count].m_pos.x = resultMatrix.value[0][3];
             particles[work->m_count].m_pos.y = resultMatrix.value[1][3];

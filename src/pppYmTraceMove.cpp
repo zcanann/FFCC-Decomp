@@ -1,14 +1,10 @@
 #include "ffcc/pppYmTraceMove.h"
-#include "ffcc/partMng.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
-
 extern "C" {
-	void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-	void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-	void pppNormalize__FR3Vec3Vec(float*, Vec*);
-	void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
+void pppNormalize__FR3Vec3Vec(float*, Vec*);
 }
 
 struct pppYmTraceMoveMngStRaw {
@@ -38,9 +34,9 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
 	Vec paramVec = pppMngStPtr->m_paramVec0;
 	f32 zero;
 
-	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &savedPosition, &paramVec);
+	pppSubVector(*(Vec*)&dest[1].y, savedPosition, paramVec);
 	Vec dir = *(Vec*)&dest[1].y;
-	pppCopyVector__FR3Vec3Vec(dest, &dir);
+	pppCopyVector(*dest, dir);
 	zero = kPppYmTraceMoveZero;
 	dest[3].x = zero;
 	dest[2].z = zero;
@@ -103,12 +99,12 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_8c.x = dest->x;
 		local_8c.y = dest->y;
 		local_8c.z = dest->z;
-		pppCopyVector__FR3Vec3Vec(&local_20, &local_8c);
+		pppCopyVector(local_20, local_8c);
 
 		local_98.x = dest[1].y;
 		local_98.y = dest[1].z;
 		local_98.z = dest[2].x;
-		pppCopyVector__FR3Vec3Vec(&local_2c, &local_98);
+		pppCopyVector(local_2c, local_98);
 	} else {
 		local_74.x = *(f32*)(owner + 0x15c);
 		local_74.y = *(f32*)(owner + 0x160);
@@ -117,7 +113,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_68.x = rawPppMngSt->m_position.x;
 		local_68.y = rawPppMngSt->m_position.y;
 		local_68.z = rawPppMngSt->m_position.z;
-		pppSubVector__FR3Vec3Vec3Vec(&local_20, &local_74, &local_68);
+		pppSubVector(local_20, local_74, local_68);
 
 		local_20.y = local_20.y + param_2->m_payload;
 		local_5c.x = local_20.x;
@@ -128,7 +124,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_50.x = local_20.x;
 		local_50.y = local_20.y;
 		local_50.z = local_20.z;
-		pppCopyVector__FR3Vec3Vec(dest, &local_50);
+		pppCopyVector(*dest, local_50);
 
 		local_44.x = rawPppMngSt->m_userFloat0;
 		local_44.y = rawPppMngSt->m_userFloat1;
@@ -136,13 +132,13 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_38.x = rawPppMngSt->m_position.x;
 		local_38.y = rawPppMngSt->m_position.y;
 		local_38.z = rawPppMngSt->m_position.z;
-		pppSubVector__FR3Vec3Vec3Vec(&local_2c, &local_38, &local_44);
+		pppSubVector(local_2c, local_38, local_44);
 
 		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {
 			local_ec.x = dest[1].y;
 			local_ec.y = dest[1].z;
 			local_ec.z = dest[2].x;
-			pppCopyVector__FR3Vec3Vec(&local_2c, &local_ec);
+			pppCopyVector(local_2c, local_ec);
 		}
 		local_44.x = local_2c.x;
 		local_44.y = local_2c.y;
@@ -172,17 +168,17 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	local_104.x = local_8c.x;
 	local_104.y = local_8c.y;
 	local_104.z = local_8c.z;
-	pppAddVector__FR3Vec3Vec3Vec(&local_ec, &local_104, &local_110);
+	pppAddVector(local_ec, local_104, local_110);
 
 	local_11c.x = pppMngSt->m_position.x;
 	local_11c.y = pppMngSt->m_position.y;
 	local_11c.z = pppMngSt->m_position.z;
-	pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), &local_11c);
+	pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), local_11c);
 
 	local_128.x = local_ec.x;
 	local_128.y = local_ec.y;
 	local_128.z = local_ec.z;
-	pppCopyVector__FR3Vec3Vec(&pppMngSt->m_position, &local_128);
+	pppCopyVector(pppMngSt->m_position, local_128);
 
 	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
 	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;

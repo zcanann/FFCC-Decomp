@@ -3,6 +3,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
+#include "ffcc/pppShape.h"
 
 #include <math.h>
 
@@ -44,7 +45,6 @@ static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 unsigned char GetNoise__5CUtilFUc(void*, unsigned int);
-void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char,
                                                                 unsigned char, unsigned char, unsigned char,
@@ -218,7 +218,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         if (param_2->m_dataValIndex != 0xFFFF) {
             long* animData =
                 **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-            pppCalcFrameShape__FPlRsRsRss(
+            pppCalcFrameShape(
                 animData,
                 work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);
         }

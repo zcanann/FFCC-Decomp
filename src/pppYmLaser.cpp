@@ -3,10 +3,11 @@
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
-#include "ffcc/partMng.h"
 #include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
+#include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
 
 #include <string.h>
 
@@ -26,14 +27,10 @@ void pppSetBlendMode(unsigned char);
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
-void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
 int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
-void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
@@ -51,10 +48,7 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 	int, int, int, int, int);
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
 	int, int, int, int, int, int);
-void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
-void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
-
 }
 
 static char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
@@ -210,7 +204,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		*(float*)(step->m_payload + 4), baseObj, step->m_graphId, &work->m_speed, &work->_unk8, &work->_unkC,
 		(float*)(step->m_payload + 8), (float*)(step->m_payload + 0xc));
 
-	pppCalcFrameShape__FPlRsRsRss(
+	pppCalcFrameShape(
 		*(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeB,
 		work->m_shapeC, work->m_shapeA, *(short*)(step->m_payload + 0x2c));
 
@@ -220,7 +214,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 
 		for (int j = max; (int)i <= j; j--) {
 			localA = points[j];
-			pppCopyVector__FR3Vec3Vec(&points[j + 1], &localA);
+			pppCopyVector(points[j + 1], localA);
 		}
 
 		localB.x = kPppYmLaserOne;
@@ -245,7 +239,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 
 		localPos = work->m_origin;
-		pppSubVector__FR3Vec3Vec3Vec(&localA, &points[i], &localPos);
+		pppSubVector(localA, points[i], localPos);
 		PSVECScale(&localA, &localA, FLOAT_80330de4);
 
 		cyl.m_bottom = localPos;
@@ -270,7 +264,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		}
 
 		if (step->m_payload[0x3b] == 0) {
-			pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(
+			pppHitCylinderSendSystem(
 				pppMngStPtr, &work->m_origin, &localA, pppMngStPtr->m_ownerScale * *(float*)(step->m_payload + 0x24),
 				*(float*)(step->m_payload + 0x20));
 		}
@@ -375,8 +369,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	halfWidth = work->m_halfWidth;
 	length = work->m_length;
 
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &baseObj->m_localMatrix);
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix0, &modelView);
+	pppMulMatrix(modelView, pppMngStPtr->m_matrix, baseObj->m_localMatrix);
+	pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix0, modelView);
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
@@ -409,7 +403,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 	if (step->m_stepValue != 0) {
 		long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
-		pppUnitMatrix__FR10pppFMATRIX(&shapeMtx);
+		pppUnitMatrix(shapeMtx);
 		shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
 		shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
 		shapeMtx.value[2][2] = shapeMtx.value[0][0];

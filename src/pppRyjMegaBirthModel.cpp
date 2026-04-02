@@ -6,7 +6,6 @@
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 
 extern float FLOAT_80330498;
 extern float FLOAT_8033049c;
@@ -17,7 +16,6 @@ extern float FLOAT_803304bc;
 extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
-
 
 static char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
 
@@ -250,7 +248,7 @@ void birth(
         memset(particleColor, 0, 0x20);
     }
 
-    pppUnitMatrix__FR10pppFMATRIX((pppFMATRIX*)&particleData->m_matrix);
+    pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);
 
     pos.x = pObject->m_localMatrix.value[0][3];
     pos.y = pObject->m_localMatrix.value[1][3];
@@ -470,7 +468,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     Mtx scale;
 
     if (payload[0x2A] == 0) {
-        pppUnitMatrix__FR10pppFMATRIX(&model);
+        pppUnitMatrix(model);
         model.value[0][3] = particleData->m_matrix[0][3];
         model.value[1][3] = particleData->m_matrix[1][3];
         model.value[2][3] = particleData->m_matrix[2][3];
@@ -487,8 +485,8 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         rot.z = -particleData->m_colorDeltaAdd[1] * (FLOAT_803304a0 / FLOAT_803304a4);
         pppFMATRIX r;
         pppFMATRIX src;
-        pppUnitMatrix__FR10pppFMATRIX(&r);
-        pppUnitMatrix__FR10pppFMATRIX(&src);
+        pppUnitMatrix(r);
+        pppUnitMatrix(src);
         PSMTXCopy(model.value, src.value);
         pppRotMatrix(r, src, rot);
         PSMTXCopy(r.value, model.value);

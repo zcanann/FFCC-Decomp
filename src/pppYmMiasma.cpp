@@ -1,8 +1,9 @@
 #include "ffcc/pppYmMiasma.h"
 #include "ffcc/math.h"
-#include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/ppp_constants.h"
+#include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/gx.h>
@@ -22,13 +23,7 @@ extern double DOUBLE_80330648;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
-extern void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-extern "C" void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
-extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
-extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
@@ -183,7 +178,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         particlePos.x = particleData->m_matrix[0][0];
         particlePos.y = particleData->m_matrix[0][1];
         particlePos.z = particleData->m_matrix[0][2];
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, &particlePos, &basePos);
+        pppAddVector(*(Vec*)particleData, particlePos, basePos);
     }
     state->m_lifeFrames = (u16)pYmMiasma->m_lifeBase + (short)(randomValue % pYmMiasma->m_lifeRange);
     state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
@@ -294,7 +289,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     particlePos.x = particleData->m_matrix[0][0];
     particlePos.y = particleData->m_matrix[0][1];
     particlePos.z = particleData->m_matrix[0][2];
-    pppCopyVector__FR3Vec3Vec(&worldPos, &particlePos);
+    pppCopyVector(worldPos, particlePos);
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
     if ((s32)Game.m_currentSceneId != 7) {
@@ -303,10 +298,10 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
     } else {
-        pppCopyVector__FR3Vec3Vec(&basePos, &worldPos);
+        pppCopyVector(basePos, worldPos);
     }
 
-    pppSubVector__FR3Vec3Vec3Vec(&delta, &basePos, &worldPos);
+    pppSubVector(delta, basePos, worldPos);
     if (pppVectorLength__F3Vec(&delta) < vData->m_radius - pYmMiasma->m_minDistance) {
         state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
         state->m_hasImpulse = 1;
@@ -327,12 +322,12 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         currentPos.x = particleData->m_matrix[0][0];
         currentPos.y = particleData->m_matrix[0][1];
         currentPos.z = particleData->m_matrix[0][2];
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, &currentPos, &impulse);
+        pppAddVector(*(Vec*)particleData, currentPos, impulse);
     }
 
     if ((u16)pYmMiasma->m_dataValIndex != 0xffff) {
         shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
-        pppCalcFrameShape__FPlRsRsRss(
+        pppCalcFrameShape(
             shapeTable[pYmMiasma->m_dataValIndex],
             state->m_shapeCurrentFrame,
             state->m_shapeDrawFrame,
@@ -517,14 +512,14 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
     oldPos.y = work[11];
     oldPos.z = work[12];
 
-    pppSubVector__FR3Vec3Vec3Vec(&delta, &matrixPos, &oldPos);
+    pppSubVector(delta, matrixPos, oldPos);
     if ((double)PSVECDistance(&matrixPos, (Vec*)(work + 10)) == (double)FLOAT_80330644) {
         workBytes[0x34] = 0;
     } else {
         workBytes[0x34] = 0xff;
     }
 
-    pppCopyVector__FR3Vec3Vec((Vec*)(work + 10), &matrixPos);
+    pppCopyVector(*(Vec*)(work + 10), matrixPos);
 }
 
 /*
@@ -557,7 +552,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             GXColor amb;
             u8 blend = step[0x18 + 0x1e];
 
-            pppUnitMatrix__FR10pppFMATRIX(&model);
+            pppUnitMatrix(model);
             model.value[2][2] = particle[0x10];
             model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
             model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
@@ -565,12 +560,12 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
 
             PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)*(s16*)((u8*)particle + 0x38));
             scaleMatrix = model;
-            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&model, &rotMatrix, &scaleMatrix);
+            pppMulMatrix(model, rotMatrix, scaleMatrix);
 
             srcPos.x = particle[0];
             srcPos.y = particle[1];
             srcPos.z = particle[2];
-            pppCopyVector__FR3Vec3Vec(&worldPos, &srcPos);
+            pppCopyVector(worldPos, srcPos);
             if (Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {

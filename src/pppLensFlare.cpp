@@ -26,7 +26,6 @@ struct LensFlareWork {
 };
 
 extern "C" unsigned int __cvt_fp2unsigned(double);
-extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 /*
  * --INFO--
@@ -230,7 +229,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			*(u32*)&local_6c.y = *(u32*)&local_60.y;
 			*(u32*)&local_6c.z = *(u32*)&local_60.z;
 
-			pppCopyVector__FR3Vec3Vec((Vec*)(shapeBase + 0x20), &local_6c);
+			pppCopyVector(*(Vec*)(shapeBase + 0x20), local_6c);
 
 			GXLoadPosMtxImm(local_54, 0);
 

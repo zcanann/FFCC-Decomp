@@ -347,6 +347,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     f32 uBottom;
     f32 uvStep;
     f32 alphaScale;
+    u32 format;
     int textureIndex;
 
     dataOffset = *param_3->m_serializedDataOffsets;
@@ -374,7 +375,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            if ((texture->m_maxLod == 8) || (texture->m_maxLod == 9)) {
+            format = (u32)texture->m_format;
+            if ((format == 8) || (format == 9)) {
                 SetUpPaletteEnv(texture);
             }
 

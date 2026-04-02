@@ -313,9 +313,10 @@ unsigned int pppFreeMngStPrioForData()
 
 	pppMngStPrioData* selectedMngSt = 0;
 	pppMngStPrioData* pppMngStBase = reinterpret_cast<pppMngStPrioData*>(&PartMng);
-	unsigned short selectedPrioTime = 0;
+	unsigned int selectedPrioTime = 0;
 	unsigned char selectedPrio = 1;
 	int index = 0;
+	char* stringBase = s_p_tina_rodata_801d7ee0;
 
 	for (int i = 0xc0; i != 0; i--) {
 		pppMngStPrioData* candidateA = pppMngStBase;
@@ -328,8 +329,8 @@ unsigned int pppFreeMngStPrioForData()
 					selectedPrio = prioA;
 					selectedPrioTime = candidateA->m_prioTime;
 				} else if (selectedPrio == prioA) {
-					unsigned short prioTimeA = candidateA->m_prioTime;
-					if (selectedPrioTime < prioTimeA) {
+					unsigned int prioTimeA = candidateA->m_prioTime;
+					if ((int)selectedPrioTime < (int)prioTimeA) {
 						selectedMngSt = candidateA;
 						selectedPrioTime = prioTimeA;
 					}
@@ -347,8 +348,8 @@ unsigned int pppFreeMngStPrioForData()
 					selectedPrio = prioB;
 					selectedPrioTime = candidateB->m_prioTime;
 				} else if (selectedPrio == prioB) {
-					unsigned short prioTimeB = candidateB->m_prioTime;
-					if (selectedPrioTime < prioTimeB) {
+					unsigned int prioTimeB = candidateB->m_prioTime;
+					if ((int)selectedPrioTime < (int)prioTimeB) {
 						selectedMngSt = candidateB;
 						selectedPrioTime = prioTimeB;
 					}
@@ -369,7 +370,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(
-			s_tinaPrioTimeFmt,
+			stringBase + 0x2c0,
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
@@ -377,13 +378,13 @@ unsigned int pppFreeMngStPrioForData()
 			(int)selectedMngSt->m_kind * 0x38 + -0x7fd672e8);
 	}
 	if (2 < (unsigned int)System.m_execParam) {
-		System.Printf(DAT_801d81d4);
+		System.Printf(stringBase + 0x2f4);
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(DAT_801ead4c);
 	}
 
-	Graphic._WaitDrawDone(s_tinaSourceName, 0xfc);
+	Graphic._WaitDrawDone(stringBase + 0x128, 0xfc);
 	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
 	return 1;
 }
@@ -480,6 +481,7 @@ void CPartPcs::create()
 void CPartPcs::createLoad()
 {
     CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
+    char* stringBase = s_p_tina_rodata_801d7ee0;
 
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
@@ -488,14 +490,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
+    PartMng.pppLoadPtx(stringBase + 0x24c, 1, 1, 0, 0);
+    PartMng.pppLoadPmd(stringBase + 0x24c);
+    PartMng.pppLoadPan(stringBase + 0x24c);
+    PartMng.pppLoadPdt(stringBase + 0x25c, 1, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x270, 2, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x2ac, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 

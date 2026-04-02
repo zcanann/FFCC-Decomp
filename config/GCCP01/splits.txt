@@ -1595,7 +1595,7 @@ ar/ar.c:
 ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
 	.data       start:0x80217C98 end:0x80217CE0
-	.sdata      start:0x8032EB48 end:0x8032EB50
+	.sdata      start:0x8032EB48 end:0x8032EB4C
 	.sbss       start:0x8032F1D4 end:0x8032F204
 
 ax/AX.c:

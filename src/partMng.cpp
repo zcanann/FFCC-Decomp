@@ -3634,6 +3634,14 @@ int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam,
  * JP Address: TODO
  * JP Size: TODO
  */
+struct PppMngLifecycleState {
+    unsigned char m_pad00[0xE4];
+    unsigned char m_endRequested;
+    unsigned char m_stopRequested;
+    unsigned char m_padE6[0x36];
+    PPPSEST m_soundEffectData;
+};
+
 void CPartMng::pppGetFreeSlot()
 {
     char* self = reinterpret_cast<char*>(this);
@@ -3731,16 +3739,15 @@ void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
  */
 void CPartMng::pppDeletePart(int index)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
-    pppMngSt += 0x158 * index;
+    _pppMngSt* mng = &m_pppMng[index];
+    PppMngLifecycleState* lifecycle = reinterpret_cast<PppMngLifecycleState*>(mng);
+    int baseTime = mng->m_baseTime;
 
-    int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
     if (baseTime < 0) {
-        *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
-                                         reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+        lifecycle->m_stopRequested = 1;
+        pppStopSe__FP9_pppMngStP7PPPSEST(mng, &lifecycle->m_soundEffectData);
     } else {
-        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+        mng->m_baseTime = -0x1000;
     }
 }
 
@@ -3751,12 +3758,11 @@ void CPartMng::pppDeletePart(int index)
  */
 void CPartMng::pppEndPart(int index)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
-    pppMngSt += 0x158 * index;
+    _pppMngSt* mng = &m_pppMng[index];
+    PppMngLifecycleState* lifecycle = reinterpret_cast<PppMngLifecycleState*>(mng);
 
-    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
-    pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
-                                     reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+    lifecycle->m_endRequested = 1;
+    pppStopSe__FP9_pppMngStP7PPPSEST(mng, &lifecycle->m_soundEffectData);
 }
 
 /*

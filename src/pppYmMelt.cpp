@@ -284,10 +284,9 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
-        long** shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
-        pppCalcFrameShape__FPlRsRsRss(shapeTable[ctrl->m_dataValIndex], work->m_shapeCurrentFrame,
-                                      work->m_shapeDrawFrame, work->m_shapeFrameTime,
-                                      *(s16*)&ctrl->m_initWOrk);
+        long* animData = **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
+        pppCalcFrameShape__FPlRsRsRss(animData, work->m_shapeCurrentFrame, work->m_shapeDrawFrame,
+                                      work->m_shapeFrameTime, *(s16*)&ctrl->m_initWOrk);
     }
 }
 

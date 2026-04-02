@@ -68,21 +68,31 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
 int RedNew(int param_1)
 {
 	unsigned int interrupts;
-	int alignedSize;
+	unsigned int alignedSize;
 	int address;
 	int entryCount;
 	unsigned int moveCount;
 	int* blockList;
+	int* blockEnd;
 	int* slot;
 
-	if ((param_1 < 1) || (gRedMainMemoryBlockList == (int*)0) || (gRedMainMemoryBase == 0)) {
+	if (param_1 < 1) {
+		return 0;
+	}
+
+	blockList = gRedMainMemoryBlockList;
+	if (blockList == 0) {
+		return 0;
+	}
+
+	address = gRedMainMemoryBase;
+	if (address == 0) {
 		return 0;
 	}
 
 	interrupts = OSDisableInterrupts();
 	alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
-	blockList = gRedMainMemoryBlockList;
-	address = gRedMainMemoryBase;
+	blockEnd = blockList + 0x800;
 	slot = blockList;
 
 	do {
@@ -115,7 +125,7 @@ int RedNew(int param_1)
 
 		address = *slot + slot[1];
 		slot += 2;
-	} while (slot < gRedMainMemoryBlockList + 0x800);
+	} while (slot < blockEnd);
 
 	OSRestoreInterrupts(interrupts);
 	return 0;

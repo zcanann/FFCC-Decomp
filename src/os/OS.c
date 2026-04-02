@@ -23,19 +23,9 @@ extern BOOL __DBIsExceptionMarked(__OSException exception);
 #define OS_EXCEPTIONTABLE_ADDR 0x3000
 #define OS_DBJUMPPOINT_ADDR 0x60
 
-#if SDK_REVISION < 1
-#define BUILD_DATE  "Apr  5 2004"
-#define DBUILD_TIME "03:55:13"
-#define RBUILD_TIME "04:13:58"
-#elif SDK_REVISION < 2
-#define BUILD_DATE  "May 21 2004"
-#define DBUILD_TIME "09:15:32"
-#define RBUILD_TIME "09:28:09"
-#else
-#define BUILD_DATE  "Nov 10 2004"
-#define DBUILD_TIME "06:08:19"
-#define RBUILD_TIME "06:26:41"
-#endif
+#define BUILD_DATE  "Mar 17 2003"
+#define DBUILD_TIME "04:20:41"
+#define RBUILD_TIME "04:20:41"
 
 #ifdef DEBUG
 const char* __OSVersion = "<< Dolphin SDK - OS\tdebug build: "BUILD_DATE" "DBUILD_TIME" (0x2301) >>";

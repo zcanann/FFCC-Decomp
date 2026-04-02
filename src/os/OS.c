@@ -24,9 +24,9 @@ extern BOOL __DBIsExceptionMarked(__OSException exception);
 #define OS_DBJUMPPOINT_ADDR 0x60
 
 #if SDK_REVISION < 1
-#define BUILD_DATE  "Apr  5 2004"
-#define DBUILD_TIME "03:55:13"
-#define RBUILD_TIME "04:13:58"
+#define BUILD_DATE  "Mar 17 2003"
+#define DBUILD_TIME "04:06:39"
+#define RBUILD_TIME "04:20:41"
 #elif SDK_REVISION < 2
 #define BUILD_DATE  "May 21 2004"
 #define DBUILD_TIME "09:15:32"

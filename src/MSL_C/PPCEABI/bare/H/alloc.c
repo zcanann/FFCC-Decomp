@@ -368,6 +368,7 @@ static void Block_construct(Block* block, unsigned long size) {
     sb->block = (Block*)((unsigned long)block | 1);
     size -= 24;
     sb->size = size;
+    *(unsigned long*)((char*)sb + size - sizeof(unsigned long)) = size;
     block->max_size = size;
     *(SubBlock**)((char*)block + (block->size & 0xFFFFFFF8UL) - 4) = 0;
     Block_link(block, sb);

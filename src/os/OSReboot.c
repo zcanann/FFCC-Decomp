@@ -10,10 +10,10 @@ extern u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
 extern u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
 extern u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
 
-static int Prepared;
+int Prepared[2];
 
-static void* SaveStart;
-static void* SaveEnd;
+void* SaveStart;
+void* SaveEnd;
 
 typedef struct {
     char date[16];
@@ -35,7 +35,7 @@ asm void Run(register void* entryPoint) {
 }
 
 static void Callback(s32, DVDCommandBlock*) {
-    Prepared = TRUE;
+    Prepared[0] = TRUE;
 }
 
 static inline int IsStreamEnabled(void) {
@@ -84,7 +84,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     DVDSetAutoInvalidation(TRUE);
     DVDResume();
 
-    Prepared = FALSE;
+    Prepared[0] = FALSE;
     __DVDPrepareResetAsync(Callback);
     __OSMaskInterrupts(0xFFFFFFE0);
     __OSUnmaskInterrupts(0x400);
@@ -94,7 +94,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     start = OSGetTime();
 #endif
 
-    while (Prepared != TRUE) {
+    while (Prepared[0] != TRUE) {
 #if SDK_REVISION < 1
         if (!DVDCheckDisk() || OS_TIMER_CLOCK < (OSGetTime() - start))
 #else
@@ -170,4 +170,3 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     ICFlashInvalidate();
     Run((void*)0x81300000);
 }
-

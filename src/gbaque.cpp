@@ -3441,7 +3441,7 @@ unsigned int GbaQueue::GetArtifactFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2C89])) & (1U << channel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D36])) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31;
 }
@@ -3459,7 +3459,7 @@ void GbaQueue::ClrArtifactFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2C89] = obj[0x2C89] & ~(1 << channel);
+	obj[0x2D36] = static_cast<char>(static_cast<unsigned char>(obj[0x2D36]) & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3496,7 +3496,7 @@ unsigned int GbaQueue::GetChgUseItemFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D60])) & (1U << channel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D37])) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return ((-static_cast<int>(value) | static_cast<int>(value)) >> 31U);
 }
@@ -3510,7 +3510,7 @@ void GbaQueue::ClrChgUseItemFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D60] = static_cast<char>(static_cast<unsigned char>(obj[0x2D60]) & ~(1U << channel));
+	obj[0x2D37] = static_cast<char>(static_cast<unsigned char>(obj[0x2D37]) & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3523,7 +3523,7 @@ void GbaQueue::SetChgUseItemFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D60] = static_cast<char>(static_cast<unsigned char>(obj[0x2D60]) | (1U << channel));
+	obj[0x2D37] = static_cast<char>(static_cast<unsigned char>(obj[0x2D37]) | (1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3536,7 +3536,7 @@ unsigned int GbaQueue::GetStrengthFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D58])) & (1U << channel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D3E])) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31U;
 }
@@ -3550,7 +3550,7 @@ void GbaQueue::ClrStrengthFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D58] = static_cast<char>(static_cast<unsigned char>(obj[0x2D58]) & ~(1U << channel));
+	obj[0x2D3E] = static_cast<char>(static_cast<unsigned char>(obj[0x2D3E]) & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3585,7 +3585,7 @@ unsigned int GbaQueue::GetArtiDatFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D59])) & (1U << channel);
+	unsigned int value = static_cast<unsigned int>(static_cast<unsigned char>(obj[0x2D3F])) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return (-value | value) >> 31U;
 }
@@ -3599,7 +3599,7 @@ void GbaQueue::ClrArtiDatFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D59] = static_cast<char>(static_cast<unsigned char>(obj[0x2D59]) & ~(1U << channel));
+	obj[0x2D3F] = static_cast<char>(static_cast<unsigned char>(obj[0x2D3F]) & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }

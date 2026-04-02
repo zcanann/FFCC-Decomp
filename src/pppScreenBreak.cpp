@@ -90,8 +90,12 @@ static const float FLOAT_80331cd8 = 0.017453292f;
 static const float FLOAT_80331ce8 = 30.0f;
 static const float FLOAT_80331cec = 4.0f;
 static const float FLOAT_80331cf0 = -3.0f;
-static const Vec DAT_801dd4bc = {0.0f, 1.0f, 0.0f};
-static const Vec DAT_801dd4b0 = {0.0f, 1.0f, 0.0f};
+static const float DAT_801dd4bc = 0.0f;
+static const float DAT_801dd4c0 = 1.0f;
+static const float DAT_801dd4c4 = 0.0f;
+static const float DAT_801dd4b0 = 0.0f;
+static const float DAT_801dd4b4 = 1.0f;
+static const float DAT_801dd4b8 = 0.0f;
 static char s_f999_root_801dd4c8[] = "f999_root";
 char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 static const float FLOAT_80331cf4 = 0.5f;
@@ -102,7 +106,7 @@ static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
-static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x94); }
+static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48); }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline int GraphicScreenBreakBlurEnabled() { return *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Graphic) + 0x7358); }
@@ -170,7 +174,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Mtx quatMtx;
     Mtx44 screenMtx;
 
-    basis = DAT_801dd4b0;
+    basis.x = DAT_801dd4b0;
+    basis.y = DAT_801dd4b4;
+    basis.z = DAT_801dd4b8;
 
     cameraForward.x = CameraDirX();
     cameraForward.y = CameraDirY();
@@ -519,7 +525,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->z = (float)dVar21;
         PSVECNormalize(inVec, inVec);
 
-        local_c8 = DAT_801dd4bc;
+        local_c8.x = DAT_801dd4bc;
+        local_c8.y = DAT_801dd4c0;
+        local_c8.z = DAT_801dd4c4;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
         dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));

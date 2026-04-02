@@ -811,7 +811,11 @@ config.libs = [
             Object(Matching, "axfx/delay.c"),
             Object(NonMatching, "axfx/reverb_hi.c"),
             Object(NonMatching, "axfx/reverb_hi_4ch.c"),
-            Object(NonMatching, "axfx/reverb_std.c"),
+            Object(
+                NonMatching,
+                "axfx/reverb_std.c",
+                cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
+            ),
         ],
     ),
     DolphinLib(

@@ -211,22 +211,20 @@ void GXSetTevColor(GXTevRegID id, GXColor color) {
     u8 r;
     u8 g;
     u8 b;
-    u32 id2;
     u32 regRA;
     u32 regBG;
 
     CHECK_GXBEGIN(740, "GXSetTevColor");
     a = color.a;
-    id2 = id * 2;
     r = color.r;
     regRA = r;
     regRA = (regRA & ~0x000FF000) | ((u32)a << 12);
     g = color.g;
     b = color.b;
-    regRA = (regRA & ~0xFF000000) | ((id2 + 0xE0) << 24);
+    regRA = (regRA & ~0xFF000000) | (((id * 2) + 0xE0) << 24);
     regBG = b;
     regBG = (regBG & ~0x000FF000) | ((u32)g << 12);
-    regBG = (regBG & ~0xFF000000) | ((id2 + 0xE1) << 24);
+    regBG = (regBG & ~0xFF000000) | (((id * 2) + 0xE1) << 24);
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);
@@ -241,7 +239,6 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     s16 g;
     s16 b;
     s16 a;
-    u32 id2;
     u32 regRA;
     u32 regBG;
 
@@ -255,15 +252,13 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     a = color.a;
     b = color.b;
     g = color.g;
-    id2 = id * 2;
-
     regRA = r & 0x7FF;
     regRA = (regRA & ~0x7FF000) | ((u32)(a & 0x7FF) << 12);
-    regRA = (regRA & ~0xFF000000) | ((id2 + 0xE0) << 24);
+    regRA = (regRA & ~0xFF000000) | (((id * 2) + 0xE0) << 24);
 
     regBG = b & 0x7FF;
     regBG = (regBG & ~0x7FF000) | ((u32)(g & 0x7FF) << 12);
-    regBG = (regBG & ~0xFF000000) | ((id2 + 0xE1) << 24);
+    regBG = (regBG & ~0xFF000000) | (((id * 2) + 0xE1) << 24);
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);

@@ -83,6 +83,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     s32 shapeId;
     float mag;
     float scale;
+    float distScale;
 
     work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
     vecWork = (CoronaVecWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
@@ -104,8 +105,9 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
     if (mag < param2->m_distRange) {
-        scale = (param2->m_distMax - param2->m_distMin) * (kPppCoronaDistanceScaleBase - (mag / param2->m_distRange));
-        scale += param2->m_distMin;
+        distScale = param2->m_distMax - param2->m_distMin;
+        distScale *= kPppCoronaDistanceScaleBase - (mag / param2->m_distRange);
+        scale = param2->m_distMin + distScale;
     }
 
     mtx.value[0][0] = *(float*)((u8*)pppMngStPtr + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;

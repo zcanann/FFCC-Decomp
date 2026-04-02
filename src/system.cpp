@@ -56,7 +56,6 @@ struct CScenegraphDesc {
 static const char s_cSystem[] = "CSystem";
 static const char s_gamePalM_map[] = "gamePalM.map";
 static const char s_system_cpp[] = "system.cpp";
-static const char s_emptyString[] = "";
 
 /*
  * --INFO--
@@ -155,7 +154,7 @@ void CSystem::Init()
                 offset += chunkSize;
             }
             File.Close(fileHandle);
-            Printf(const_cast<char*>(s_emptyString));
+            Printf(const_cast<char*>(""));
         }
     }
 }

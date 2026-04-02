@@ -209,19 +209,19 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
         pri = CFile::PRI_CRITICAL;
     }
 
-    CHandle* it = m_fileHandle.m_previous;
-    CHandle* end = &m_fileHandle;
+    CHandle* end = m_fileHandle.m_previous;
+    CHandle* it = end;
     CHandle* handle = 0;
     DVDFileInfo fi;
 
-    while (it != end)
-    {
+    do {
         if (pri < it->m_priority) {
             break;
         }
-
         it = it->m_previous;
-    }
+    } while (it != end);
+
+    it = it->m_next;
 
     s32 entry = DVDConvertPathToEntrynum(path);
 

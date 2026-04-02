@@ -2019,7 +2019,7 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 unsigned int GbaQueue::GetLetterLstFlg(int channel)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = (unsigned char)reinterpret_cast<char*>(this)[0x2C89] & (1U << channel);
+	unsigned int value = m_letterFlags & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value != 0;
 }
@@ -2050,7 +2050,7 @@ void GbaQueue::ClrLetterLstFlg(int channel)
 unsigned int GbaQueue::GetLetterDatFlg(int channel)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = (unsigned char)reinterpret_cast<char*>(this)[0x2C89] & (0x10U << channel);
+	unsigned int value = m_letterFlags & (0x10U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value != 0;
 }
@@ -3884,24 +3884,24 @@ void GbaQueue::SetControllerMode(int controllerMode)
 	int i;
 	int retries;
 	int ret;
-	GbaQueue* semaphoreIter;
+	OSSemaphore* semaphoreIter;
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = accessSemaphores;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
-	reinterpret_cast<char*>(this)[0x2D57] = static_cast<char>(controllerMode & 1);
+	m_controllerMode = static_cast<char>(controllerMode & 1);
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = accessSemaphores;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
 	for (i = 0; i < 4; i++) {
@@ -3930,24 +3930,24 @@ unsigned int GbaQueue::GetControllerMode()
 {
 	char mode;
 	int i;
-	GbaQueue* semaphoreIter;
+	OSSemaphore* semaphoreIter;
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = accessSemaphores;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
-	mode = reinterpret_cast<char*>(this)[0x2D57];
+	mode = m_controllerMode;
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = accessSemaphores;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
 	return static_cast<unsigned int>((-static_cast<int>(mode) | static_cast<int>(mode)) >> 31);
@@ -3978,17 +3978,17 @@ void GbaQueue::SetPauseMode(int mode)
 	OSSemaphore* semaphoreIter;
 
 	i = 0;
-	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
+	semaphoreIter = accessSemaphores;
 	do {
 		OSWaitSemaphore(semaphoreIter);
 		i++;
 		semaphoreIter++;
 	} while (i < 4);
 
-	reinterpret_cast<char*>(this)[0x2D5B] = static_cast<char>(mode);
+	m_pauseMode = static_cast<char>(mode);
 
 	i = 0;
-	semaphoreIter = reinterpret_cast<OSSemaphore*>(this);
+	semaphoreIter = accessSemaphores;
 	do {
 		OSSignalSemaphore(semaphoreIter);
 		i++;
@@ -4009,24 +4009,24 @@ unsigned int GbaQueue::GetPauseMode()
 {
 	char mode;
 	int i;
-	GbaQueue* semaphoreIter;
+	OSSemaphore* semaphoreIter;
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = accessSemaphores;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
-	mode = reinterpret_cast<char*>(this)[0x2D5B];
+	mode = m_pauseMode;
 
 	i = 0;
-	semaphoreIter = this;
+	semaphoreIter = accessSemaphores;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(semaphoreIter);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		semaphoreIter++;
 	} while (i < 4);
 
 	return static_cast<unsigned int>((-static_cast<int>(mode) | static_cast<int>(mode)) >> 31);

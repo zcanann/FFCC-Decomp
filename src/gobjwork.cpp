@@ -648,16 +648,17 @@ void CCaravanWork::ChgEquipPos(int idx, int equip)
 int CCaravanWork::CanAddComList(int count)
 {
 	short* slot = m_commandListInventorySlotRef;
-	int remaining = (short)m_numCmdListSlots - 2;
+	int remaining = (short)m_numCmdListSlots;
 
-	if (2 < (short)m_numCmdListSlots) {
-		do {
-			if ((*slot == 0xFFFF) && (--count == 0)) {
+	if (2 < remaining) {
+		remaining = remaining - 2;
+		while (remaining != 0) {
+			if ((*slot == -1) && (--count == 0)) {
 				break;
 			}
 			slot++;
 			remaining--;
-		} while (remaining != 0);
+		}
 	}
 
 	return (((unsigned int)__cntlzw(count)) >> 5) & 0xFF;

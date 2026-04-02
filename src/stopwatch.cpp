@@ -3,7 +3,7 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 extern "C" void __dl__FPv(void* ptr);
 
-static const char s_stopwatchDefaultName[] = "no name";
+static const float s_stopwatchScale = 100.0f;
 
 /*
  * --INFO--
@@ -76,8 +76,10 @@ float CStopWatch::Get()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	ticks = ticks / denom;
-	return 100.0f * ticks;
+	return s_stopwatchScale * ticks;
 }
+
+static const char s_stopwatchDefaultName[] = "no name";
 
 /*
  * --INFO--
@@ -135,7 +137,7 @@ void CProfile::ProfEnd()
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	float elapsed = ticks / denom;
-	elapsed = 100.0f * elapsed;
+	elapsed = s_stopwatchScale * elapsed;
 	m_lastTime = elapsed;
 
 	int next = m_frame + 1;

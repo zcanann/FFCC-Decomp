@@ -1213,11 +1213,12 @@ void loadPdtPtx(char*, void*, int, void*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
+int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
 {
     int pdtSlotIndex;
+    int loaded;
     char path[260];
-    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+    CPartMngState* state = GetPartMngState();
 
     if (variant == 0) {
         sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);
@@ -1225,25 +1226,33 @@ void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdt
         sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
     }
 
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
-    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
+    state->m_partAMemBase = 0;
+    state->m_partAMemCursor = 0;
+    state->m_partLoadCacheParam = 0;
+    state->m_partChunkIndex = 0;
+    state->m_asyncHandleCount = 0;
+    state->m_partLoadMode = 0;
 
     pdtSlotIndex = pppGetFreeDataMng__8CPartMngFv(&PartMng);
-    if (pdtSlotIndex != -1) {
-        if (pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 1, ptxData, ptxCount) == 0) {
-            pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
-            pdtSlotIndex = -1;
-        } else if (pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 1, pdtData, pdtCount) == 0) {
+    if (pdtSlotIndex == -1) {
+        pdtSlotIndex = -1;
+    } else {
+        loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 1, ptxData, ptxCount);
+        if (loaded == 0) {
             pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
             pdtSlotIndex = -1;
         } else {
-            reinterpret_cast<unsigned char*>(&PartPcs)[0x2d] = 1;
+            loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 1, pdtData, pdtCount);
+            if (loaded == 0) {
+                pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+                pdtSlotIndex = -1;
+            } else {
+                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
+            }
         }
     }
+
+    return pdtSlotIndex;
 }
 
 /*

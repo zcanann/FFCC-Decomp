@@ -1,5 +1,6 @@
 #include "dolphin/math.h"
 #include "dolphin/mtx.h"
+#include "ffcc/symbols_shared.h"
 
 float acosf(float x);
 
@@ -58,21 +59,13 @@ void PSQUATMultiply(register const Quaternion *a, register const Quaternion *b, 
 
 void PSQUATNormalize(const register Quaternion *src, register Quaternion *unit)
 {
-    // sdata2
-    (void)0.00001f;
-    (void)0.0f;
-    (void)0.5;
-    (void)3.0;
-    (void)1.0f;
-    (void)0.5f;
-    (void)3.0f;
     {
         register f32 vv1, vv2, vv3;
         register f32 vv4, vv5, vv6;
         register f32 vv7, vv8;
-        register f32 vv9 = 0.00001f;
-        register f32 vvA = 0.5F;
-        register f32 vvB = 3.0F;
+        register f32 vv9 = kQuatNormalizeEpsilon;
+        register f32 vvA = kQuatHalf;
+        register f32 vvB = kQuatNormalizeThree;
         asm
         {
             psq_l    vv1, 0(src), 0, 0;

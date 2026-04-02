@@ -214,12 +214,12 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
     CHandle* handle = 0;
     DVDFileInfo fi;
 
-    do {
+    while (it != end) {
         if (pri < it->m_priority) {
             break;
         }
         it = it->m_previous;
-    } while (it != end);
+    }
 
     it = it->m_next;
 

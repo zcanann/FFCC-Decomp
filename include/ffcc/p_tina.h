@@ -149,7 +149,7 @@ public:
     unsigned int IsLoadPartCompleted();
 
     void LoadFieldPdt(int, int, void*, unsigned long, unsigned char);
-    void LoadMonsterPdt(int, int, void*, int, void*, int);
+    int LoadMonsterPdt(int, int, void*, int, void*, int);
     int LoadMenuPdt(char*);
     void ReleasePdt(int);
 

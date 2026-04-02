@@ -20,10 +20,12 @@
 #define RBUILD_TIME "06:27:12"
 #endif
 
+extern const char GXVersionString[];
+
 #ifdef DEBUG
-const char* __GXVersion = "<< Dolphin SDK - GX\tdebug build: "BUILD_DATE" "DBUILD_TIME" (0x2301) >>";
+const char* __GXVersion = GXVersionString;
 #else
-const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: "BUILD_DATE" "RBUILD_TIME" (0x2301) >>";
+const char* __GXVersion = GXVersionString;
 #endif
 
 static GXData gxData;

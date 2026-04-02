@@ -7,14 +7,6 @@ public:
 	class CChunk
 	{
 	public:
-		CChunk()
-		{
-		}
-
-		~CChunk()
-		{
-		}
-
 		unsigned int m_id;      // 0x00 - FourCC tag, e.g. 'TANM', 'NAME', 'IMAG', 'SIZE'.
 		unsigned int m_arg0;    // 0x04 - chunk-specific argument; often a count or flags.
 		unsigned int m_version; // 0x08 - chunk-specific argument; often version/variant.

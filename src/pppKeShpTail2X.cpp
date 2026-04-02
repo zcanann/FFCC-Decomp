@@ -82,7 +82,6 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XWork* work;
     KeShpTail2XObject* tailObj;
     Vec pos;
-    Vec temp;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -90,9 +89,11 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
 
     step = (KeShpTail2XStep*)param_2;
     tailObj = (KeShpTail2XObject*)obj;
-    work = (KeShpTail2XWork*)((u8*)obj + 0x80 + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0]);
+    work = (KeShpTail2XWork*)((u8*)obj + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0] + 0x80);
 
     if (tailObj->m_obj.m_graphId == 0) {
+        Vec historyPos ATTRIBUTE_ALIGN(8);
+
         if (step->m_worldSpaceMode == 0) {
             pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
             pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
@@ -110,16 +111,13 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.z = outMatrix.value[2][3];
         }
 
-        s32 count = work->m_count;
-        Vec historyPos;
-        Vec* history = work->m_posHistory;
+        pppCopyVector(historyPos, pos);
 
-        pppCopyVector__FR3Vec3Vec(&historyPos, &pos);
-        while (count > 0) {
-            temp = historyPos;
-            pppCopyVector__FR3Vec3Vec(history, &temp);
+        Vec* history = work->m_posHistory;
+        s32 count = work->m_count;
+        for (; count > 0; count--) {
+            pppCopyVector(*history, historyPos);
             history++;
-            count--;
         }
     }
 
@@ -145,8 +143,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.z = outMatrix.value[2][3];
     }
 
-    temp = pos;
-    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
+    pppCopyVector(work->m_posHistory[work->m_head], pos);
 
     {
         long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);

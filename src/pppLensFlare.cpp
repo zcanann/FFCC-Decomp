@@ -84,7 +84,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		float projX = pppMngStPtr->m_matrix.value[0][3];
 		float projY = pppMngStPtr->m_matrix.value[1][3];
 		float projZ = pppMngStPtr->m_matrix.value[2][3];
-		double alphaScale = (double)((float)sourceAlpha * kPppLensFlareAlphaScale);
+		float alphaScale = (float)sourceAlpha * kPppLensFlareAlphaScale;
 		u32 zAtPixel;
 		float projection[7];
 		float viewport[6];
@@ -160,7 +160,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		work->m_alpha = (u8)(int)((double)(u8)work->m_alpha * alphaScale);
+		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,

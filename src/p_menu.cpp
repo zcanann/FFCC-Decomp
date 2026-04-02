@@ -729,10 +729,7 @@ void CMenuPcs::DrawInit()
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        GXSetChanAmbColor(GX_COLOR0A0, white.color);
-    }
+    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);

@@ -334,25 +334,33 @@ u32 GXSetDispCopyYScale(f32 vscale) {
 }
 
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
-    u32 regA;
-    u32 regGB;
+    GXData* gxData;
+    u32 reg;
+    u8 regAddr;
 
     CHECK_GXBEGIN(1596, "GXSetCopyClear");
     ASSERTMSGLINE(1598, clear_z <= 0xFFFFFF, "GXSetCopyClear: Z clear value is out of range");
 
-    regA = clear_clr.r;
-    regA = (regA & ~0xFF00) | ((u32)clear_clr.a << 8);
-    regA &= 0xFFFFFF;
-    GX_WRITE_RAS_REG(regA | 0x4F000000);
+    gxData = __GXData;
+    regAddr = 0x61;
 
-    regGB = clear_clr.b;
-    regGB = (regGB & ~0xFF00) | ((u32)clear_clr.g << 8);
-    regGB &= 0xFFFFFF;
-    GX_WRITE_RAS_REG(regGB | 0x50000000);
+    reg = clear_clr.r;
+    reg = (reg & ~0xFF00) | ((u32)clear_clr.a << 8);
+    reg &= 0xFFFFFF;
+    GX_WRITE_U8(regAddr);
+    GX_WRITE_U32(reg | 0x4F000000);
 
-    GX_WRITE_RAS_REG((clear_z & 0xFFFFFF) | 0x51000000);
+    reg = clear_clr.b;
+    reg = (reg & ~0xFF00) | ((u32)clear_clr.g << 8);
+    reg &= 0xFFFFFF;
+    GX_WRITE_U8(regAddr);
+    GX_WRITE_U32(reg | 0x50000000);
 
-    __GXData->bpSentNot = 0;
+    reg = (clear_z & 0xFFFFFF) | 0x51000000;
+    GX_WRITE_U8(regAddr);
+    GX_WRITE_U32(reg);
+
+    gxData->bpSentNot = 0;
 }
 
 /*

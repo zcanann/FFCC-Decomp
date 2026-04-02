@@ -121,9 +121,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         f32 matrixOffsetY;
         f32 matrixOffsetZ;
         Vec savedPosition = *(Vec*)((u8*)pppMngSt + 0x58);
-        Vec basePosition;
         Vec matrixOffset;
-        Vec paramPosition;
 
         pppCopyVector__FR3Vec3Vec(&work->m_basePosition, &savedPosition);
 
@@ -134,10 +132,10 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         matrixOffset.y = matrixOffsetY;
         matrixOffset.z = matrixOffsetZ;
 
-        basePosition = work->m_basePosition;
+        Vec basePosition = work->m_basePosition;
         pppAddVector__FR3Vec3Vec3Vec(&work->m_basePosition, &basePosition, &matrixOffset);
 
-        paramPosition = work->m_basePosition;
+        Vec paramPosition = work->m_basePosition;
         pppCopyVector__FR3Vec3Vec(&pppMngSt->m_paramVec0, &paramPosition);
         pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
     }

@@ -19,8 +19,29 @@ extern "C" char __vt_CProcess[];
 
 static char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
-unsigned char ARRAY_8026D338[0xC];
+static unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
+
+struct MaterialEditorTableInit {
+    MaterialEditorTableInit()
+    {
+        unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
+        dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
+        dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
+        dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
+        dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
+        dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
+        dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
+        dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
+        dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
+        dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
+        dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
+        dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
+        dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
+    }
+};
+
+static MaterialEditorTableInit sMaterialEditorTableInit;
 static char s_MaterialEditor[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);

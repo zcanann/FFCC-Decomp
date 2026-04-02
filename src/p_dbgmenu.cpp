@@ -890,16 +890,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	menu->m_id = id;
 
 	CDM* child = parentMenu->m_firstChild;
-	if (child == 0) {
-		parentMenu->m_firstChild = menu;
-		if ((menu->m_flags & 1) != 0) {
-			menu->m_status = (menu->m_status & 0xBF) | 0x40;
-			m_selectedMenu = menu;
-		}
-		if ((menu->m_flags & 2) != 0) {
-			m_defaultMenu = menu;
-		}
-	} else {
+	if (child != 0) {
 		bool found = false;
 		do {
 			if (!found && ((child->m_flags & 1) != 0)) {
@@ -914,6 +905,15 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 		menu->m_prev = child->m_prev;
 		child->m_prev = menu;
 		menu->m_next = child;
+	} else {
+		parentMenu->m_firstChild = menu;
+		if ((menu->m_flags & 1) != 0) {
+			menu->m_status = (menu->m_status & 0xBF) | 0x40;
+			m_selectedMenu = menu;
+		}
+		if ((menu->m_flags & 2) != 0) {
+			m_defaultMenu = menu;
+		}
 	}
 }
 

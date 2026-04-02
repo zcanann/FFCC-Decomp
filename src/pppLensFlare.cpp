@@ -143,20 +143,21 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		int sampleCount = (int)unkB->m_count + 1;
-		sampleCount *= sampleCount;
-		int alpha = (u8)work->m_alpha;
+		u32 sampleCount = (u32)((int)unkB->m_count + 1);
+		u32 alpha = (u8)work->m_alpha;
 
+		sampleCount *= sampleCount;
 		if (alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			int scaledAlpha = alpha * (0xFF / sampleCount);
+			u32 scaledAlpha = alpha * (0xFF / sampleCount);
+			u8 scaledAlphaByte = (u8)scaledAlpha;
 
-			work->m_alpha = (u8)scaledAlpha;
-			if ((scaledAlpha & 0xFF) > 0xFF) {
-				work->m_alpha = 0xff;
+			work->m_alpha = scaledAlphaByte;
+			if (scaledAlpha < 0x100) {
+				work->m_alpha = scaledAlphaByte;
 			} else {
-				work->m_alpha = (u8)scaledAlpha;
+				work->m_alpha = 0xff;
 			}
 		}
 

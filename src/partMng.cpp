@@ -3765,7 +3765,7 @@ void CPartMng::pppDeletePart(int index)
         mng->m_deleteRequested = 1;
         pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
     } else {
-        mng->m_baseTime = -0x1000;
+        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
     }
 }
 

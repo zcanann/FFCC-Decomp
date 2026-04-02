@@ -2334,10 +2334,10 @@ void GbaQueue::ClrFavoriteFlg(int channel)
  */
 int GbaQueue::GetFavorite(int channel, char* favorite)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+	char* obj = reinterpret_cast<char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(favorite, compatibilityStr + channel * 0xDC + 0x14, 8);
+	memcpy(favorite, obj + channel * 0xDC + 0x3C, 8);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return 8;

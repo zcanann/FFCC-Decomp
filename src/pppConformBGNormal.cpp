@@ -52,7 +52,7 @@ struct CMapCylinderRaw {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkC* param2)
+void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
 {
     int* serializedDataOffsets;
     f32* pfVar2;
@@ -76,7 +76,7 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct pp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, struct pppConformBGNormalUnkB* param2, struct pppConformBGNormalUnkC* param3)
+void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* param3)
 {
     u8 mode;
     f32 matrixX;
@@ -103,7 +103,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     }
 
     pppMngSt = pppMngStPtr;
-    owner = (CGObject*)pppMngSt->m_owner;
+    owner = *(CGObject**)((u8*)pppMngSt + 0xDC);
     hitFound = 0;
     matrixX = pppMngSt->m_matrix.value[0][3];
     matrixY = pppMngSt->m_matrix.value[1][3];

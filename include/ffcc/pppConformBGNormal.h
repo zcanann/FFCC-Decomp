@@ -2,6 +2,7 @@
 #define _FFCC_PPPCONFORMBGNORMAL_H_
 
 #include "types.h"
+#include "ffcc/partMng.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,16 +21,11 @@ struct pppConformBGNormalUnkB {
     float m_arg3;
 };
 
-struct pppConformBGNormalUnkC {
-    int* m_serializedDataOffsets;
-};
-
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkC* param2);
-void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkB* param2, struct pppConformBGNormalUnkC* param3);
+void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* data);
+void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* data);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCONFORMBGNORMAL_H_
-

@@ -3,11 +3,9 @@
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandIVSingleSampleScale = 2.0f;
-extern s32 gPppDefaultValueBuffer[];
-
-
 struct PppRandIVParam2 {
     s32 field0;
     s32 field4;
@@ -60,7 +58,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
     
-    target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s32*)(base + in->field4 + 0x80);
+    target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
 
     {
         f32 randValue = *valuePtr;

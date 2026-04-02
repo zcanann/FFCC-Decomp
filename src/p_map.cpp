@@ -15,6 +15,7 @@
 
 #include <dolphin/mtx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 CMapPcs MapPcs;
 extern void* __vt__8CManager;
 extern "C" void* __vt__7CMapPcs[];
@@ -63,7 +64,6 @@ extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
-extern "C" int sprintf(char*, const char*, ...);
 
 struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);

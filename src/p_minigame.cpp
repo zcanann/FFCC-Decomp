@@ -10,6 +10,7 @@
 #include <dolphin/os.h>
 #include <dolphin/si.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMiniGamePcs MiniGamePcs;
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
@@ -22,7 +23,6 @@ unsigned char m_table__12CMiniGamePcs[0x15C];
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
-extern "C" int sprintf(char* buffer, const char* format, ...);
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void* flatRuntime, int object, int a, int b, int c, void* inStack, void* outStack);

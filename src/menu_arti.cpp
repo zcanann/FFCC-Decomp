@@ -38,15 +38,6 @@ extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 namespace {
 struct MenuArtiMembers {
@@ -613,10 +604,10 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	CFont* listFont = GetArtiListFont(this);
-	SetMargin__5CFontFf(0.0f, listFont);
-	SetShadow__5CFontFi(listFont, 0);
-	SetScale__5CFontFf(0.875f, listFont);
-	DrawInit__5CFontFv(listFont);
+	listFont->SetMargin(0.0f);
+	listFont->SetShadow(0);
+	listFont->SetScale(0.875f);
+	listFont->DrawInit();
 
 	short* listStart = (short*)(GetArtiListBase(this) + 8);
 	int listCount = *GetArtiList(this);
@@ -631,7 +622,7 @@ void CMenuPcs::ArtiDraw()
 	for (int i = 0; i < 8; i++) {
 		u8 alpha = (u8)(255.0f * *(float*)(listStart + 8));
 		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
-		SetColor__5CFontF8_GXColor(listFont, &color);
+		listFont->SetColor(color);
 
 		int menuIndex = i + *(short*)(GetArtiStateBase(this) + 0x34);
 		short itemCount = *(short*)(scriptFood + menuIndex * 2 + 0x136);
@@ -646,10 +637,10 @@ void CMenuPcs::ArtiDraw()
 			}
 		}
 
-		GetWidth__5CFontFPc(listFont, text);
-		SetPosX__5CFontFf((float)(listStart[0] + 0x1c), listFont);
-		SetPosY__5CFontFf((float)(listStart[1] + 0xb) - 5.0f, listFont);
-		Draw__5CFontFPc(listFont, text);
+		listFont->GetWidth(text);
+		listFont->SetPosX((float)(listStart[0] + 0x1c));
+		listFont->SetPosY((float)(listStart[1] + 0xb) - 5.0f);
+		listFont->Draw(text);
 		listStart += 0x20;
 	}
 
@@ -707,10 +698,10 @@ void CMenuPcs::ArtiDraw()
 	if (selectedArtifactId == -1) {
 		const char* text = GetMenuStr__8CMenuPcsFi(this, 0x14);
 		GXColor color = {0xFF, 0xFF, 0xFF, helpAlpha};
-		SetColor__5CFontF8_GXColor(helpFont, &color);
-		SetPosX__5CFontFf(0.0f, helpFont);
-		SetPosY__5CFontFf(FLOAT_80332fcc, helpFont);
-		Draw__5CFontFPc(helpFont, text);
+		helpFont->SetColor(color);
+		helpFont->SetPosX(0.0f);
+		helpFont->SetPosY(FLOAT_80332fcc);
+		helpFont->Draw(text);
 	} else {
 		GXColor helpColor = {0xFF, 0xFF, 0xFF, helpAlpha};
 		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, selectedArtifactId, helpFont, 0, -20, helpColor, 0, 1.0f, 0.0f);

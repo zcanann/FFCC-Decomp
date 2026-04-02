@@ -3,10 +3,9 @@
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppSRandHCVSingleSampleScale = 2.0f;
-
-extern s16 gPppDefaultValueBuffer[];
 
 struct PppSRandHCVParam2 {
     s32 field0;
@@ -102,7 +101,7 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 	s32 color_offset = in->field4;
 	s16* target_colors;
 	if (color_offset == -1) {
-		target_colors = &gPppDefaultValueBuffer[0];
+		target_colors = (s16*)gPppDefaultValueBuffer;
 	} else {
 		target_colors = (s16*)(base + color_offset + 0x80);
 	}

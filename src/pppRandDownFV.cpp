@@ -3,11 +3,9 @@
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandDownFVDualSampleScale = 0.5f;
-extern f32 gPppDefaultValueBuffer[];
-
-
 struct PppRandDownFVParam2 {
     s32 field0;
     s32 field4;
@@ -63,7 +61,7 @@ void pppRandDownFV(void* param1, void* param2, void* param3)
     }
 
     s32 sourceOffset = in->field4;
-    f32* target = (sourceOffset == -1) ? gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
+    f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
 
     f32 base0 = target[0];
     f32 value = in->field8;

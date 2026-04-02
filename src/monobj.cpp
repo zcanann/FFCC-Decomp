@@ -14,6 +14,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern unsigned char ARRAY_8030918c[];
 extern "C" char DAT_803319ec[];
@@ -26,14 +27,8 @@ extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void onDestroy__10CGCharaObjFv(CGCharaObj*);
 extern "C" void SetHitEnemy__8GbaQueueFii(void*, int, int);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" char SoundBuffer_1248_[];
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	int, int, int, CGObject*, float, void*);
@@ -1329,10 +1324,10 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		}
 
 		sprintf(text, "%d:%c %d:%c", (int)object->m_scriptHandle[2], aiChar, *reinterpret_cast<int*>(mon + 0x6D0), targetChar);
-		SetPosX__5CFontFf(posX - static_cast<float>(GetWidth__5CFontFPc(font, text)) * 0.5f, font);
-		SetPosY__5CFontFf(posY, font);
-		SetPosZ__5CFontFf(posZ, font);
-		Draw__5CFontFPc(font, text);
+		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
+		font->SetPosY(posY);
+		font->SetPosZ(posZ);
+		font->Draw(text);
 		posY -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
 
 		int targetDist = 0;
@@ -1343,10 +1338,10 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
 		int spawnDist = static_cast<int>(PSVECDistance(reinterpret_cast<Vec*>(mon + 0x6F8), &object->m_worldPosition));
 		sprintf(text, "%d %d %d", targetDist, spawnDist, chaseRange);
-		SetPosX__5CFontFf(posX - static_cast<float>(GetWidth__5CFontFPc(font, text)) * 0.5f, font);
-		SetPosY__5CFontFf(posY, font);
-		SetPosZ__5CFontFf(posZ, font);
-		Draw__5CFontFPc(font, text);
+		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
+		font->SetPosY(posY);
+		font->SetPosZ(posZ);
+		font->Draw(text);
 		posY -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
 	}
 }

@@ -4,33 +4,21 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include <string.h>
+#include "ffcc/fontman.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScaleX__5CFontFf(float, CFont*);
-extern "C" void SetScaleY__5CFontFf(float, CFont*);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void __dla__FPv(void*);
+extern "C" char* strcat(char*, const char*);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int drawTagString__4CMesFP5CFontPciii(CFont*, int, int, int, int);
 extern "C" const char* GetSkillStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" char ChkEquipActive__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void MakeArtItemName__5CGameFPcii(void*, char*, int, int);
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" char* strcpy(char*, const char*);
-extern "C" char* strcat(char*, const char*);
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern u32 DAT_801e36d0;
 extern u32 DAT_801e36d4;
@@ -60,8 +48,6 @@ extern const float kOptionRowAnimStep;
 extern const float kOptionOpenAnimStep;
 extern const float kOptionColumnAnimStep;
 extern const float kOptionVolumeScale;
-
-extern "C" int __cntlzw(unsigned int);
 
 namespace {
 struct MenuUtilFlatTableEntry {
@@ -121,11 +107,11 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 	CFont* font = menuFont;
 	float width;
 
-	SetShadow__5CFontFi(font, 1);
-	SetMargin__5CFontFf(margin, font);
-	SetScaleX__5CFontFf(scale, font);
-	SetScaleY__5CFontFf(kOptionAnimMax, font);
-	width = GetWidth__5CFontFPc(font, text);
+	font->SetShadow(1);
+	font->SetMargin(margin);
+	font->SetScaleX(scale);
+	font->SetScaleY(kOptionAnimMax);
+	width = font->GetWidth(text);
 	return kMenuCenteringOffset - width * kMenuCenteringHalfWidth;
 }
 
@@ -136,7 +122,7 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
  */
 float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 {
-    float width = GetWidth__5CFontFPc(font, text);
+    float width = font->GetWidth(text);
     return -(width * kMenuCenteringHalfWidth - kMenuCenteringOffset);
 }
 
@@ -149,15 +135,15 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
 {
 	CFont* font = menuFont;
 
-	SetMargin__5CFontFf(margin, font);
-	SetShadow__5CFontFi(font, 1);
-	SetScale__5CFontFf(scale, font);
-	DrawInit__5CFontFv(font);
-	SetTlut__5CFontFi(font, tlut);
-	SetColor__5CFontF8_GXColor(font, &color);
-	SetPosX__5CFontFf((float)posX, font);
-	SetPosY__5CFontFf((float)posY, font);
-	Draw__5CFontFPc(font, text);
+	font->SetMargin(margin);
+	font->SetShadow(1);
+	font->SetScale(scale);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetPosX((float)posX);
+	font->SetPosY((float)posY);
+	font->Draw(text);
 }
 
 /*
@@ -183,16 +169,16 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 {
 	CFont* font = menuFont;
 
-	SetMargin__5CFontFf(margin, font);
-	SetShadow__5CFontFi(font, 1);
-	SetScaleX__5CFontFf(scaleX, font);
-	SetScaleY__5CFontFf(scaleY, font);
-	DrawInit__5CFontFv(font);
-	SetTlut__5CFontFi(font, tlut);
-	SetColor__5CFontF8_GXColor(font, &color);
-	SetPosX__5CFontFf((float)posX, font);
-	SetPosY__5CFontFf((float)posY, font);
-	Draw__5CFontFPc(font, text);
+	font->SetMargin(margin);
+	font->SetShadow(1);
+	font->SetScaleX(scaleX);
+	font->SetScaleY(scaleY);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetPosX((float)posX);
+	font->SetPosY((float)posY);
+	font->Draw(text);
 }
 
 /*
@@ -219,13 +205,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
     char scratch[0x200];
     itemName[0] = '\0';
 
-    SetMargin__5CFontFf(margin, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(scale, font);
-    DrawInit__5CFontFv(font);
-    SetTlut__5CFontFi(font, tlut);
-    SetColor__5CFontF8_GXColor(font, &color);
-    SetScale__5CFontFf(kOptionAnimMax, font);
+    font->SetMargin(margin);
+    font->SetShadow(1);
+    font->SetScale(scale);
+    font->DrawInit();
+    font->SetTlut(tlut);
+    font->SetColor(color);
+    font->SetScale(kOptionAnimMax);
 
     if ((0 <= msgNo) && (msgNo < 0x269)) {
         firstLine = msgNo * 3 + 0x1F5;
@@ -289,18 +275,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
         u32 y = lineBaseY[lineCount + drawPrefix - 1];
         if (drawPrefix != 0) {
-            SetPosX__5CFontFf(FLOAT_8033357c, font);
-            SetPosY__5CFontFf(static_cast<float>(y), font);
-            Draw__5CFontFPc(font, itemName);
-            Draw__5CFontFPc(font, suffix);
+            font->SetPosX(FLOAT_8033357c);
+            font->SetPosY(static_cast<float>(y));
+            font->Draw(itemName);
+            font->Draw(suffix);
             y = static_cast<u32>(static_cast<float>(y) + lineStep);
         }
 
         for (int i = 0; i < lineCount; i++) {
             int x = 0x140 - maxWidth / 2;
             int msgId = GetMenuHelpMsgTable()[firstLine + i];
-            SetPosX__5CFontFf(static_cast<float>(x), font);
-            SetPosY__5CFontFf(static_cast<float>(y), font);
+            font->SetPosX(static_cast<float>(x));
+            font->SetPosY(static_cast<float>(y));
             drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
             y = static_cast<u32>(static_cast<float>(y) + lineStep);
         }
@@ -309,18 +295,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
     u32 y = lineBaseY[drawPrefix + 2];
     if (drawPrefix != 0) {
-        SetPosX__5CFontFf(FLOAT_8033357c, font);
-        SetPosY__5CFontFf(static_cast<float>(y), font);
-        Draw__5CFontFPc(font, itemName);
-        Draw__5CFontFPc(font, suffix);
+        font->SetPosX(FLOAT_8033357c);
+        font->SetPosY(static_cast<float>(y));
+        font->Draw(itemName);
+        font->Draw(suffix);
         y = static_cast<u32>(static_cast<float>(y) + lineStep);
     }
 
     for (int i = 0; i < 3; i++) {
         int x = 0x140 - maxWidth / 2;
         int msgId = GetMenuHelpMsgTable()[firstLine + i];
-        SetPosX__5CFontFf(static_cast<float>(x), font);
-        SetPosY__5CFontFf(static_cast<float>(y), font);
+        font->SetPosX(static_cast<float>(x));
+        font->SetPosY(static_cast<float>(y));
         drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
         y = static_cast<u32>(static_cast<float>(y) + lineStep);
     }
@@ -334,53 +320,53 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
         bonusLabel = PTR_s_Defence__80215a4c[languageIndex];
     }
 
-    SetPosX__5CFontFf(FLOAT_8033357c, font);
-    SetPosY__5CFontFf(static_cast<float>(y), font);
+    font->SetPosX(FLOAT_8033357c);
+    font->SetPosY(static_cast<float>(y));
 
     if ((flags & 0x1000) == 0) {
         strcpy(scratch, bonusLabel);
         strcat(scratch, DAT_8033366c);
-        Draw__5CFontFPc(font, scratch);
+        font->Draw(scratch);
 
-        float x = FLOAT_8033357c + GetWidth__5CFontFPc(font, scratch) + FLOAT_803335a0;
-        SetTlut__5CFontFi(font, 1);
-        SetPosX__5CFontFf(x, font);
+        float x = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
+        font->SetTlut(1);
+        font->SetPosX(x);
         sprintf(scratch, DAT_80333670, *reinterpret_cast<u16*>(itemBase + 6));
-        Draw__5CFontFPc(font, scratch);
+        font->Draw(scratch);
 
-        float markerX = FLOAT_8033357c + GetWidth__5CFontFPc(font, DAT_8033366c);
-        SetPosX__5CFontFf(markerX, font);
+        float markerX = FLOAT_8033357c + font->GetWidth(DAT_8033366c);
+        font->SetPosX(markerX);
         u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
         if ((attr != 0) && (attr < 0x14)) {
-            SetTlut__5CFontFi(font, 4);
+            font->SetTlut(4);
             strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
-            Draw__5CFontFPc(font, scratch);
-            SetTlut__5CFontFi(font, 9);
+            font->Draw(scratch);
+            font->SetTlut(9);
             if (attr < 9) {
                 sprintf(scratch, DAT_8033367c, DAT_80333660);
-                Draw__5CFontFPc(font, scratch);
+                font->Draw(scratch);
             }
         }
     } else {
         u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
         if ((attr != 0) && (attr < 0x14)) {
-            SetTlut__5CFontFi(font, 4);
+            font->SetTlut(4);
             strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
-            Draw__5CFontFPc(font, scratch);
-            float x = FLOAT_8033357c + GetWidth__5CFontFPc(font, scratch) + FLOAT_803335a0;
-            SetPosX__5CFontFf(x, font);
-            SetTlut__5CFontFi(font, 9);
+            font->Draw(scratch);
+            float x = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
+            font->SetPosX(x);
+            font->SetTlut(9);
             if (attr < 9) {
                 sprintf(scratch, DAT_8033365c, DAT_80333660);
             } else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
                 sprintf(scratch, DAT_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
             } else if (((9 <= attr) && (attr <= 0xA)) || (attr == 0xC)) {
                 sprintf(scratch, DAT_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
-                SetTlut__5CFontFi(font, 3);
+                font->SetTlut(3);
             } else {
                 return;
             }
-            Draw__5CFontFPc(font, scratch);
+            font->Draw(scratch);
         }
     }
 }

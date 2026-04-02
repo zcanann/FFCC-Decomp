@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" int __cntlzw(unsigned int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);

@@ -2,7 +2,6 @@
 #include "ffcc/gobject.h"
 #include "ffcc/system.h"
 
-extern "C" int __cntlzw(unsigned int);
 extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);
 extern "C" void push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(CFlatRuntime2*, CFlatRuntime::CObject*, int);
 

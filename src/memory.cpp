@@ -10,6 +10,7 @@
 #include <dolphin/mtx.h>
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMemory Memory;
 
@@ -59,11 +60,9 @@ long long DAT_8032ec58;
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
     void*, int, int, int, int, int, void (*)(void*), void*);
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
-extern "C" int __cntlzw(unsigned int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);

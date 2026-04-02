@@ -3,10 +3,9 @@
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandHCVSingleSampleScale = 2.0f;
-extern s16 gPppDefaultValueBuffer[];
-
 typedef struct RandHCVParams {
     s32 field0;
     s32 field4;
@@ -62,7 +61,7 @@ void pppRandHCV(void* p1, void* p2, void* p3)
         randomValue = (f32*)(base + *ctx->fieldC + 0x80);
     }
 
-    target = (params->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + params->field4 + 0x80);
+    target = (params->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + params->field4 + 0x80);
 
     {
         f32 scale = *randomValue;

@@ -13,9 +13,9 @@
 #include "types.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CGraphicPcs GraphicsPcs;
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
 extern "C" double cos(double);
 extern "C" int GetPadType__6JoyBusFi(void*, int);

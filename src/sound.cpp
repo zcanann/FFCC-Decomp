@@ -18,6 +18,7 @@
 #include "dolphin/os.h"
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CSound Sound;
 
@@ -96,7 +97,6 @@ extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetSeBlockData__9CRedSoundFiPv(CRedSound*, int, void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);

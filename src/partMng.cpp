@@ -22,8 +22,8 @@
 #include "ffcc/stopwatch.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);

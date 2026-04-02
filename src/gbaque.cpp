@@ -57,6 +57,23 @@ struct GbaFlatDataView
 	GbaFlatDataTableEntryView m_tabl[8];
 };
 
+struct GbaQueueFlagView
+{
+	unsigned char _pad0[0x2AFC];
+	unsigned char m_letterDatFlg;
+	unsigned char _pad2AFD[0x18D];
+	unsigned char m_compatibilityFlg[4];
+	unsigned char _pad2C8E[0xAC];
+	unsigned char m_sellFlg;
+	unsigned char m_buyFlg;
+	unsigned char m_mkSmithFlg;
+};
+
+static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
+{
+	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
+}
+
 static char s_gbaque_cpp[] = "gbaque.cpp";
 static char s_mem_alloc_error[] = "%s[%d] Error! memory allocation.\n";
 static char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
@@ -2018,10 +2035,13 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
  */
 unsigned int GbaQueue::GetLetterLstFlg(int channel)
 {
+	GbaQueueFlagView* flags = GetFlagView(this);
+	unsigned int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = m_letterFlags & (1U << channel);
+	value = static_cast<unsigned int>(flags->m_letterDatFlg) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-	return value != 0;
+	return (-value | value) >> 31;
 }
 
 /*
@@ -2035,9 +2055,10 @@ unsigned int GbaQueue::GetLetterLstFlg(int channel)
  */
 void GbaQueue::ClrLetterLstFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueFlagView* flags = GetFlagView(this);
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2C89] = static_cast<char>(obj[0x2C89] & ~(1 << channel));
+	flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg & ~(1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }
@@ -2049,10 +2070,13 @@ void GbaQueue::ClrLetterLstFlg(int channel)
  */
 unsigned int GbaQueue::GetLetterDatFlg(int channel)
 {
+	GbaQueueFlagView* flags = GetFlagView(this);
+	unsigned int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned int value = m_letterFlags & (0x10U << channel);
+	value = static_cast<unsigned int>(flags->m_letterDatFlg) & (0x10U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-	return value != 0;
+	return (-value | value) >> 31;
 }
 
 /*
@@ -2066,9 +2090,10 @@ unsigned int GbaQueue::GetLetterDatFlg(int channel)
  */
 void GbaQueue::ClrLetterDatFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueFlagView* flags = GetFlagView(this);
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2C89] = static_cast<char>(obj[0x2C89] & ~(0x10 << channel));
+	flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg & ~(0x10 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }
@@ -2762,11 +2787,13 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
  */
 unsigned int GbaQueue::GetCompatibilityFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueFlagView* flags = GetFlagView(this);
+	int value;
+
 	OSWaitSemaphore(accessSemaphores + channel);
 	char value = obj[0x2C8A + channel];
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>((-static_cast<int>(value) | static_cast<int>(value)) >> 31);
+	return static_cast<unsigned int>((-value | value) >> 31);
 }
 
 /*
@@ -2780,7 +2807,8 @@ unsigned int GbaQueue::GetCompatibilityFlg(int channel)
  */
 void GbaQueue::ClrCompatibilityFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueFlagView* flags = GetFlagView(this);
+
 	OSWaitSemaphore(accessSemaphores + channel);
 	obj[0x2C8A + channel] = 0;
 	OSSignalSemaphore(accessSemaphores + channel);
@@ -3291,12 +3319,13 @@ void GbaQueue::MakeSmithData(int channel, char* outData)
  */
 unsigned int GbaQueue::GetSellFlg(int channel)
 {
-	unsigned int flag;
+	GbaQueueFlagView* flags = GetFlagView(this);
+	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D57])) & (1U << channel);
+	value = static_cast<unsigned int>(flags->m_sellFlg) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
+	return (-value | value) >> 31;
 }
 
 /*
@@ -3310,9 +3339,10 @@ unsigned int GbaQueue::GetSellFlg(int channel)
  */
 void GbaQueue::ClrSellFlg(int channel)
 {
+	GbaQueueFlagView* flags = GetFlagView(this);
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<char*>(this)[0x2D57] =
-		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D57]) & ~(1 << channel));
+	flags->m_sellFlg = static_cast<unsigned char>(flags->m_sellFlg & ~(1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }
@@ -3328,12 +3358,13 @@ void GbaQueue::ClrSellFlg(int channel)
  */
 unsigned int GbaQueue::GetBuyFlg(int channel)
 {
-	unsigned int flag;
+	GbaQueueFlagView* flags = GetFlagView(this);
+	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D55])) & (1U << channel);
+	value = static_cast<unsigned int>(flags->m_buyFlg) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
+	return (-value | value) >> 31;
 }
 
 /*
@@ -3347,9 +3378,10 @@ unsigned int GbaQueue::GetBuyFlg(int channel)
  */
 void GbaQueue::ClrBuyFlg(int channel)
 {
+	GbaQueueFlagView* flags = GetFlagView(this);
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<char*>(this)[0x2D55] =
-		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D55]) & ~(1 << channel));
+	flags->m_buyFlg = static_cast<unsigned char>(flags->m_buyFlg & ~(1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }
@@ -3365,12 +3397,13 @@ void GbaQueue::ClrBuyFlg(int channel)
  */
 unsigned int GbaQueue::GetMkSmithFlg(int channel)
 {
-	unsigned int flag;
+	GbaQueueFlagView* flags = GetFlagView(this);
+	unsigned int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56])) & (1U << channel);
+	value = static_cast<unsigned int>(flags->m_mkSmithFlg) & (1U << channel);
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
+	return (-value | value) >> 31;
 }
 
 /*
@@ -3384,9 +3417,10 @@ unsigned int GbaQueue::GetMkSmithFlg(int channel)
  */
 void GbaQueue::ClrMkSmithFlg(int channel)
 {
+	GbaQueueFlagView* flags = GetFlagView(this);
+
 	OSWaitSemaphore(accessSemaphores + channel);
-	reinterpret_cast<char*>(this)[0x2D56] =
-		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56]) & ~(1 << channel));
+	flags->m_mkSmithFlg = static_cast<unsigned char>(flags->m_mkSmithFlg & ~(1 << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }

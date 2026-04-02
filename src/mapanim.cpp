@@ -449,22 +449,25 @@ void CMapAnimNode::Interp(int frame)
 
             for (unsigned int remaining = keyCount; remaining != 0; remaining--) {
                 unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
-                unsigned int endFrame = next->frame;
+                unsigned int endFrame;
 
                 if (nextIndex == 0) {
-                    endFrame += loopFrameCount;
+                    endFrame = next->frame + loopFrameCount;
+                } else {
+                    endFrame = next->frame;
                 }
 
                 unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && ((int)frameInLoop < (int)endFrame)) {
                     unsigned int frameRange = endFrame - currentFrame;
-                    float t = 0.0f;
+                    float t;
                     Vec nextScaled;
                     Vec currentScaled;
 
-                    if (frameRange != 0) {
+                    if (frameRange == 0) {
+                        t = 0.0f;
+                    } else {
                         t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
                     }
 
@@ -494,22 +497,27 @@ void CMapAnimNode::Interp(int frame)
 
             for (unsigned int remaining = keyCount; remaining != 0; remaining--) {
                 unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
-                unsigned int endFrame = next->frame;
+                unsigned int endFrame;
 
                 if (nextIndex == 0) {
-                    endFrame += static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                    endFrame =
+                        next->frame +
+                        static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                } else {
+                    endFrame = next->frame;
                 }
 
                 unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && ((int)frameInLoop < (int)endFrame)) {
                     unsigned int frameRange = endFrame - currentFrame;
-                    float t = 0.0f;
+                    float t;
                     Vec nextScaled;
                     Vec currentScaled;
 
-                    if (frameRange != 0) {
+                    if (frameRange == 0) {
+                        t = 0.0f;
+                    } else {
                         t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
                     }
 
@@ -539,22 +547,27 @@ void CMapAnimNode::Interp(int frame)
 
             for (unsigned int remaining = keyCount; remaining != 0; remaining--) {
                 unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
-                unsigned int endFrame = next->frame;
+                unsigned int endFrame;
 
                 if (nextIndex == 0) {
-                    endFrame += static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                    endFrame =
+                        next->frame +
+                        static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
+                } else {
+                    endFrame = next->frame;
                 }
 
                 unsigned int currentFrame = current->frame;
                 if ((currentFrame <= frameInLoop) && ((int)frameInLoop < (int)endFrame)) {
                     unsigned int frameRange = endFrame - currentFrame;
-                    float t = 0.0f;
+                    float t;
                     Vec nextScaled;
                     Vec currentScaled;
 
-                    if (frameRange != 0) {
+                    if (frameRange == 0) {
+                        t = 0.0f;
+                    } else {
                         t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
                     }
 

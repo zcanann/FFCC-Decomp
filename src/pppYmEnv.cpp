@@ -73,22 +73,21 @@ struct PartMngEditRaw {
  */
 CChara::CModel* GetModelPtr(CGObject* gObject)
 {
-    CCharaPcs::CHandle* handle;
-
     if (gObject == 0) {
         return 0;
     }
 
-    handle = gObject->m_charaModelHandle;
+    CCharaPcs::CHandle* handle = gObject->m_charaModelHandle;
     if (handle == 0) {
         return 0;
     }
 
-    if (handle != 0) {
-        return handle->m_model;
+    CChara::CModel* model = handle->m_model;
+    if (model == 0) {
+        return 0;
     }
 
-    return 0;
+    return model;
 }
 /*
  * --INFO--

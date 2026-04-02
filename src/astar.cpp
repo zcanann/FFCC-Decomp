@@ -37,6 +37,7 @@ struct CMapCylinderRaw
 };
 
 extern "C" int __cntlzw(unsigned int);
+extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 
 CAStar AStar;
 
@@ -939,7 +940,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) == 0)
+	if ((m_flags & 1) == 0)
 	{
 		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
@@ -959,8 +960,11 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction.z = base.z;
 		cyl.m_radius = kPolyGroupBaseZ;
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-		                                reinterpret_cast<Vec*>(&base), hitAttributeMask) != 0)
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+		        &MapMng,
+		        reinterpret_cast<CMapCylinder*>(&cyl),
+		        reinterpret_cast<Vec*>(&base),
+		        hitAttributeMask) != 0)
 		{
 			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
 		}
@@ -985,8 +989,11 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction.z = base.z;
 		cyl.m_radius = kPolyGroupBaseZ;
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-		                                reinterpret_cast<Vec*>(&base), m_hitAttributeMask) != 0)
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+		        &MapMng,
+		        reinterpret_cast<CMapCylinder*>(&cyl),
+		        reinterpret_cast<Vec*>(&base),
+		        m_hitAttributeMask) != 0)
 		{
 			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
 		}

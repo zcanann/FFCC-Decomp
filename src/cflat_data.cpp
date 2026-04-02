@@ -252,11 +252,11 @@ void CFlatData::Create(void* filePtr)
 				}
 				case 0x5441424C: // 'TABL'
 				{
-					TableEntry* tableEntry;
 					char** stringIndex;
 					int iVar6;
 					int iVar7;
 					int indexOffset;
+					int stringBase;
 
 					m_tabl[m_tableCount].m_numEntries = chunk.m_arg0;
 					stringIndex = (char**)new (Game.m_mainStage, s_cflat_data_cpp, 0x65) unsigned char[chunk.m_arg0 << 2];
@@ -265,14 +265,14 @@ void CFlatData::Create(void* filePtr)
 
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
-					iVar10 = (int)chunkFile.GetAddress();
+					stringBase = (int)chunkFile.GetAddress();
 					iVar7 = 0;
 					indexOffset = 0;
-					tableEntry = &m_tabl[m_tableCount];
-					while (iVar7 < tableEntry->m_numEntries)
+					while (iVar7 < m_tabl[m_tableCount].m_numEntries)
 					{
 						iVar6 = (int)chunkFile.GetAddress();
-						*(char**)((int)tableEntry->m_strings + indexOffset) = tableEntry->m_stringBuf + (iVar6 - iVar10);
+						*(char**)((int)m_tabl[m_tableCount].m_strings + indexOffset) =
+							m_tabl[m_tableCount].m_stringBuf + (iVar6 - stringBase);
 						chunkFile.GetString();
 						indexOffset += 4;
 						iVar7++;

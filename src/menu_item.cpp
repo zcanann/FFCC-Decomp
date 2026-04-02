@@ -253,95 +253,93 @@ void CMenuPcs::ItemInit()
  */
 void CMenuPcs::ItemInit1()
 {
-    float fVar1;
-    ItemMenuAnimList* itemList;
+    float progress;
     MenuItemOpenAnim* anim;
-    unsigned int uVar4;
-    unsigned int uVar5;
+    unsigned int count;
+    unsigned int blocks;
 
-    itemList = reinterpret_cast<ItemMenuAnimList*>(this->itemList);
+    anim = reinterpret_cast<MenuItemOpenAnim*>(this->itemList + 4);
+    anim[0].tex = 0x2E;
+    anim[0].startFrame = 2;
+    anim[0].duration = 5;
+    anim[1].tex = 0x47;
+    anim[1].startFrame = 7;
+    anim[1].duration = 5;
+    anim[2].tex = 0x47;
+    anim[2].startFrame = 7;
+    anim[2].duration = 5;
+    anim[3].tex = 0x2E;
+    anim[3].startFrame = 7;
+    anim[3].duration = 5;
+    anim[4].flags = 2;
+    anim[4].tex = 0x37;
+    anim[4].startFrame = 0;
+    anim[4].duration = 5;
+    anim[5].flags = 2;
+    anim[5].tex = 0x37;
+    anim[5].startFrame = 0;
+    anim[5].duration = 5;
+    anim[6].flags = 2;
+    anim[6].tex = 0x37;
+    anim[6].startFrame = 0;
+    anim[6].duration = 5;
+    anim[7].flags = 2;
+    anim[7].tex = 0x37;
+    progress = FLOAT_80332e64;
+    anim[7].startFrame = 0;
+    anim[7].duration = 5;
+    anim[8].flags = 2;
+    anim[8].tex = 0x37;
+    anim[8].startFrame = 0;
+    anim[8].duration = 5;
+    anim[9].flags = 2;
+    anim[9].tex = 0x37;
+    anim[9].startFrame = 0;
+    anim[9].duration = 5;
+    anim[10].flags = 2;
+    anim[10].tex = 0x37;
+    anim[10].startFrame = 0;
+    anim[10].duration = 5;
+    anim[11].flags = 2;
+    anim[11].tex = 0x37;
+    anim[11].startFrame = 0;
+    anim[11].duration = 5;
 
-    itemList->anims[0].tex = 0x2E;
-    itemList->anims[0].startFrame = 2;
-    itemList->anims[0].duration = 5;
-    itemList->anims[1].tex = 0x47;
-    itemList->anims[1].startFrame = 7;
-    itemList->anims[1].duration = 5;
-    itemList->anims[2].tex = 0x47;
-    itemList->anims[2].startFrame = 7;
-    itemList->anims[2].duration = 5;
-    itemList->anims[3].tex = 0x2E;
-    itemList->anims[3].startFrame = 7;
-    itemList->anims[3].duration = 5;
-    itemList->anims[4].flags = 2;
-    itemList->anims[4].tex = 0x37;
-    itemList->anims[4].startFrame = 0;
-    itemList->anims[4].duration = 5;
-    itemList->anims[5].flags = 2;
-    itemList->anims[5].tex = 0x37;
-    itemList->anims[5].startFrame = 0;
-    itemList->anims[5].duration = 5;
-    itemList->anims[6].flags = 2;
-    itemList->anims[6].tex = 0x37;
-    itemList->anims[6].startFrame = 0;
-    itemList->anims[6].duration = 5;
-    itemList->anims[7].flags = 2;
-    itemList->anims[7].tex = 0x37;
-    fVar1 = FLOAT_80332e64;
-    itemList->anims[7].startFrame = 0;
-    itemList->anims[7].duration = 5;
-    itemList->anims[8].flags = 2;
-    itemList->anims[8].tex = 0x37;
-    itemList->anims[8].startFrame = 0;
-    itemList->anims[8].duration = 5;
-    itemList->anims[9].flags = 2;
-    itemList->anims[9].tex = 0x37;
-    itemList->anims[9].startFrame = 0;
-    itemList->anims[9].duration = 5;
-    itemList->anims[10].flags = 2;
-    itemList->anims[10].tex = 0x37;
-    itemList->anims[10].startFrame = 0;
-    itemList->anims[10].duration = 5;
-    itemList->anims[11].flags = 2;
-    itemList->anims[11].tex = 0x37;
-    itemList->anims[11].startFrame = 0;
-    itemList->anims[11].duration = 5;
-    uVar4 = static_cast<unsigned int>(itemList->count);
-    anim = itemList->anims;
-    if (0 < (int)uVar4) {
-        uVar5 = uVar4 >> 3;
-        if (uVar5 != 0) {
+    count = (unsigned int)*this->itemList;
+    if (0 < (int)count) {
+        blocks = count >> 3;
+        if (blocks != 0) {
             do {
                 anim[0].frame = 0;
-                anim[0].progress = fVar1;
+                anim[0].progress = progress;
                 anim[1].frame = 0;
-                anim[1].progress = fVar1;
+                anim[1].progress = progress;
                 anim[2].frame = 0;
-                anim[2].progress = fVar1;
+                anim[2].progress = progress;
                 anim[3].frame = 0;
-                anim[3].progress = fVar1;
+                anim[3].progress = progress;
                 anim[4].frame = 0;
-                anim[4].progress = fVar1;
+                anim[4].progress = progress;
                 anim[5].frame = 0;
-                anim[5].progress = fVar1;
+                anim[5].progress = progress;
                 anim[6].frame = 0;
-                anim[6].progress = fVar1;
+                anim[6].progress = progress;
                 anim[7].frame = 0;
-                anim[7].progress = fVar1;
-                anim = anim + 8;
-                uVar5 = uVar5 - 1;
-            } while (uVar5 != 0);
-            uVar4 = uVar4 & 7;
-            if (uVar4 == 0) {
+                anim[7].progress = progress;
+                anim += 8;
+                blocks--;
+            } while (blocks != 0);
+            count &= 7;
+            if (count == 0) {
                 return;
             }
         }
         do {
             anim->frame = 0;
-            anim->progress = fVar1;
-            anim = anim + 1;
-            uVar4 = uVar4 - 1;
-        } while (uVar4 != 0);
+            anim->progress = progress;
+            anim++;
+            count--;
+        } while (count != 0);
     }
 }
 

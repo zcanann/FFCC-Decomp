@@ -53,6 +53,13 @@ struct KeShpTail2XOffsets {
     s32* m_serializedDataOffsets;
 };
 
+struct KeShpTail2XShapeFrame {
+    s16 m_shapeOffset;
+    s16 m_duration;
+    u8 m_flags;
+    u8 _pad5[3];
+};
+
 struct KeShpTail2XWork {
     u8 m_count;
     u8 m_head;
@@ -148,20 +155,19 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     {
         long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* shape = (u8*)*shapeTable;
-        u8* frameEntry;
+        KeShpTail2XShapeFrame* frameEntry;
         s16 frameDuration;
 
         work->m_shapePrevFrame = work->m_shapeFrame;
-        frameEntry = shape + ((u32)work->m_shapeFrame << 3) + 0x10;
 
         work->m_frameAcc += step->m_frameStep;
-        frameEntry = (u8*)shape + ((u32)work->m_shapeFrame << 3) + 0x10;
-        frameDuration = *(s16*)(frameEntry + 2);
+        frameEntry = (KeShpTail2XShapeFrame*)(shape + 0x10) + work->m_shapeFrame;
+        frameDuration = frameEntry->m_duration;
         if (work->m_frameAcc >= frameDuration) {
             work->m_frameAcc -= frameDuration;
             work->m_shapeFrame++;
             if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
-                if ((frameEntry[4] & 0x80) != 0) {
+                if ((frameEntry->m_flags & 0x80) != 0) {
                     work->m_shapeFrame = 0;
                     work->m_frameAcc = 0;
                 } else {

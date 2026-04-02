@@ -1,19 +1,17 @@
-#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppYmBreath.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
+#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-struct pppFMATRIX;
-
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
 extern "C" void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -21,7 +19,10 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+extern "C" void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
+extern "C" void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
+extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern Mtx ppvCameraMatrix0;
@@ -29,27 +30,12 @@ extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
 extern double DOUBLE_80330c88;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
-extern unsigned char* pppEnvStPtr;
-extern unsigned char* pppMngStPtr;
+extern _pppEnvSt* pppEnvStPtr;
+extern _pppMngSt* pppMngStPtr;
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;
-};
-
-struct pppIVECTOR4 {
-    short x;
-    short y;
-    short z;
-    short w;
-};
-
-struct pppFMATRIX {
-    Mtx value;
-};
-
-struct pppYmBreath {
-    unsigned char _pad[8];
 };
 
 struct YmBreathRenderStep {
@@ -482,18 +468,20 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, _PARTICLE_DATA*, Mtx*)
  */
 extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
-    int i;
-    int j;
-    int firstParticle;
-    int slotCount;
-    int groupCount;
+    int colorOffset;
     int* dataOffsets;
-    unsigned char* base;
     unsigned char* work;
-    unsigned char* groupPtr;
-    unsigned char* particleWMat;
+    int* groupData;
+    Mtx* particleWMat;
+    Mtx* particleMtx;
+    int i;
+    int groupIndex;
+    int firstParticle;
+    int groupTable;
+    int slotIndex;
+    unsigned int slotCount;
     bool ready;
-    float scaleValue;
+    float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -508,8 +496,8 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     }
 
     dataOffsets = offsets->m_serializedDataOffsets;
-    base = (unsigned char*)ymBreath + 8;
-    work = base + dataOffsets[0];
+    colorOffset = dataOffsets[1];
+    work = reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0];
 
     if (*(void**)(work + 0x30) == NULL) {
         int maxParticleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
@@ -518,32 +506,32 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         int* groupTable;
 
         *(int*)(work + 0x40) = maxParticleCount;
-        *(short*)(work + 0x54) = *(short*)((unsigned char*)pYmBreath + 0x12);
-        *(short*)(work + 0x56) = *(short*)((unsigned char*)pYmBreath + 0x14);
+        *(short*)(work + 0x54) = *(short*)((unsigned char*)pYmBreath + 0x14);
+        *(short*)(work + 0x56) = *(short*)((unsigned char*)pYmBreath + 0x12);
 
         *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), pppEnvStPtr->m_stagePtr,
                                                   s_pppYmBreath_cpp, 0x243);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(maxParticleCount * 0x98));
         }
 
         *(void**)(work + 0x34) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), pppEnvStPtr->m_stagePtr,
                                                   s_pppYmBreath_cpp, 0x249);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(maxParticleCount * 0x30));
         }
 
         *(void**)(work + 0x38) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), pppEnvStPtr->m_stagePtr,
                                                   s_pppYmBreath_cpp, 0x24F);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(maxParticleCount * 0x20));
         }
 
         *(void**)(work + 0x3C) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), pppEnvStPtr->m_stagePtr,
                                                   s_pppYmBreath_cpp, 0x255);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0, (unsigned long)(particleGroups * 0x5C));
@@ -551,11 +539,11 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             groupTable = (int*)*(void**)(work + 0x3C);
             for (i = 0; i < particleGroups; i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppYmBreath_cpp, 0x260);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppYmBreath_cpp, 0x260);
                 memset((void*)groupTable[1], 0xFF, (unsigned long)particlePerGroup);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppYmBreath_cpp, 0x263);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppYmBreath_cpp, 0x263);
                 memset((void*)groupTable[2], 0xFF, (unsigned long)particlePerGroup);
                 groupTable[0] = 0;
                 groupTable += 0x17;
@@ -568,68 +556,59 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
 
-    PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)work);
-    UpdateAllParticle((_pppPObject*)ymBreath, (VYmBreath*)work, pYmBreath, (VColor*)(base + dataOffsets[1]));
+    PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), (VYmBreath*)work, pYmBreath,
+                      (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset));
 
-    groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
-    slotCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
-    particleWMat = *(unsigned char**)(work + 0x34);
-    groupPtr = *(unsigned char**)(work + 0x3C);
-    scaleValue = *(float*)((unsigned char*)pYmBreath + 8);
-
-    for (i = 0; i < groupCount; i++) {
-        ready = true;
-        for (j = 0; j < slotCount; j++) {
-            if ((*(signed char*)(*(int*)(groupPtr + 4) + j) == -1) || (*(signed char*)(*(int*)(groupPtr + 8) + j) != 1)) {
+    particleWMat = *(Mtx**)(work + 0x34);
+    groupData = *(int**)(work + 0x3C);
+    for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
+         groupIndex++) {
+        slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
+        groupTable = *(int*)(work + 0x3C) + groupIndex * 0x5C;
+        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
+            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
+                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
                 ready = false;
-                break;
+                goto group_ready;
             }
         }
-
+        ready = true;
+group_ready:
         if (ready) {
             firstParticle = -1;
-            for (j = 0; j < slotCount; j++) {
-                if (*(signed char*)(*(int*)(groupPtr + 8) + j) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupPtr + 4) + j);
+            scaledOwner = pppMngStPtr->m_ownerScale * *(float*)((unsigned char*)pYmBreath + 8);
+            for (slotIndex = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
                     break;
                 }
+                slotIndex++;
             }
 
-            if (firstParticle >= 0) {
-                Mtx* particleMtx = (Mtx*)(particleWMat + firstParticle * 0x30);
-
-                PSMTXIdentity(scaleMtx);
-                scaleMtx[0][0] = scaleValue;
-                scaleMtx[1][1] = scaleValue;
-                scaleMtx[2][2] = scaleValue;
-
-                PSMTXConcat(*particleMtx, *(Mtx*)((unsigned char*)ymBreath + 4), worldMtx);
-                PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0xC), &origin);
-
-                PSMTXCopy(*particleMtx, rotMtx.value);
-                rotMtx.value[0][3] = 0.0f;
-                rotMtx.value[1][3] = 0.0f;
-                rotMtx.value[2][3] = 0.0f;
-
-                dir = *(Vec*)(groupPtr + 0x18);
-                PSMTXMultVec(rotMtx.value, &dir, &dir);
-                if ((dir.x != 0.0f) || (dir.y != 0.0f) || (dir.z != 0.0f)) {
-                    PSVECNormalize(&dir, &dirNorm);
-                } else {
-                    dirNorm.x = 0.0f;
-                    dirNorm.y = 0.0f;
-                    dirNorm.z = 0.0f;
-                }
-                PSVECScale(&dirNorm, &target, *(float*)(groupPtr + 0x24));
-                PSVECAdd(&origin, &target, &target);
-                PSVECSubtract(&target, &origin, &hitVector);
-
-                pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaleValue,
-                                                                    *(float*)((unsigned char*)pYmBreath + 4));
-            }
+            PSMTXIdentity(scaleMtx);
+            scaleMtx[0][0] = scaledOwner;
+            scaleMtx[1][1] = scaledOwner;
+            scaleMtx[2][2] = scaledOwner;
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
+            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(ymBreath)->m_localMatrix.value, worldMtx);
+            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
+            pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&rotMtx, reinterpret_cast<pppFMATRIX*>(particleMtx));
+            rotMtx.value[0][3] = FLOAT_80330c80;
+            rotMtx.value[1][3] = FLOAT_80330c80;
+            rotMtx.value[2][3] = FLOAT_80330c80;
+            *(float*)(groupTable + 0x28) = scaledOwner;
+            pppCopyVector__FR3Vec3Vec(&dir, (Vec*)(groupTable + 0x18));
+            PSMTXMultVec(rotMtx.value, &dir, &dir);
+            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
+            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            pppAddVector__FR3Vec3Vec3Vec(&target, &origin, &target);
+            pppSubVector__FR3Vec3Vec3Vec(&hitVector, &target, &origin);
+            pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaledOwner,
+                                                                *(float*)((unsigned char*)pYmBreath + 4));
         }
 
-        groupPtr += 0x5C;
+        groupData += 0x17;
     }
 }
 
@@ -640,6 +619,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
  */
 extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
+    _pppPObject* object;
     YmBreathRenderStep* step;
     int workOffset;
     int colorOffset;
@@ -655,29 +635,30 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     unsigned char colorA;
     int i;
 
+    object = reinterpret_cast<_pppPObject*>(ymBreath);
     step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    source = *(Vec**)((unsigned char*)ymBreath + 8 + workOffset + 0x30);
-    matrixList = *(Mtx**)((unsigned char*)ymBreath + 8 + workOffset + 0x34);
-    colorDelta = *(float**)((unsigned char*)ymBreath + 8 + workOffset + 0x38);
-    groupData = *(int**)((unsigned char*)ymBreath + 8 + workOffset + 0x3C);
-    groupCount = *(int*)((unsigned char*)ymBreath + 8 + workOffset + 0x40);
+    source = *(Vec**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x30);
+    matrixList = *(Mtx**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x34);
+    colorDelta = *(float**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x38);
+    groupData = *(int**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x3C);
+    groupCount = *(int*)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x40);
 
     if (step->m_stepValue == 0) {
         return;
     }
 
-    shape = *(long**)(*(unsigned int*)(pppEnvStPtr + 0xC) + step->m_stepValue * 4);
+    shape = *(long**)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) + step->m_stepValue * 4);
     pppSetBlendMode(step->m_payload[8]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         step->m_payload + 0xB0, 0, 0.0f, step->m_payload[0xB6], step->m_payload[0xB5], step->m_payload[8], 0, 1, 1, 0);
 
-    colorR = *((unsigned char*)ymBreath + 8 + colorOffset);
-    colorG = *((unsigned char*)ymBreath + 8 + colorOffset + 1);
-    colorB = *((unsigned char*)ymBreath + 8 + colorOffset + 2);
-    colorA = *((unsigned char*)ymBreath + 8 + colorOffset + 3);
+    colorR = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 0);
+    colorG = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 1);
+    colorB = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 2);
+    colorA = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 3);
 
     for (i = 0; i < groupCount; i++) {
         if (*(short*)&source[2].z > 0) {
@@ -692,8 +673,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             int a;
 
             PSMTXIdentity(drawMtx);
-            drawMtx[0][0] = source[4].y * ((Vec*)(pppMngStPtr + 0x64))->x;
-            drawMtx[1][1] = source[4].z * ((Vec*)(pppMngStPtr + 0x64))->y;
+            drawMtx[0][0] = source[4].y * pppMngStPtr->m_scale.x;
+            drawMtx[1][1] = source[4].z * pppMngStPtr->m_scale.y;
             drawMtx[2][2] = drawMtx[0][0];
             if (FLOAT_80330c80 != source[3].y) {
                 PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * source[3].y);
@@ -701,7 +682,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             }
 
             pppUnitMatrix__FR10pppFMATRIX(&viewMtx);
-            PSMTXConcat(*matrixList, *reinterpret_cast<Mtx*>(&ymBreath->_pad[4]), viewMtx.value);
+            PSMTXConcat(*matrixList, object->m_localMatrix.value, viewMtx.value);
             PSMTXConcat(ppvCameraMatrix0, viewMtx.value, viewMtx.value);
             PSMTXMultVec(viewMtx.value, source, &pos);
             drawMtx[0][3] = pos.x;
@@ -747,7 +728,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             amb.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppDrawShp__FPlsP12CMaterialSetUc(shape, *(short*)((unsigned char*)&source[7].y + 2),
-                                              *(CMaterialSet**)(pppEnvStPtr + 4),
+                                              pppEnvStPtr->m_materialSetPtr,
                                               step->m_payload[8]);
         }
 
@@ -807,8 +788,9 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 sphereMtx[1][1] = scale;
                 sphereMtx[2][2] = scale;
 
-                PSMTXConcat(*(Mtx*)(*(int*)((unsigned char*)ymBreath + 8 + workOffset + 0x34) + firstParticle * 0x30),
-                            *reinterpret_cast<Mtx*>(&ymBreath->_pad[4]), tempMtx);
+                PSMTXConcat(*(Mtx*)(*(int*)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x34) +
+                                    firstParticle * 0x30),
+                            object->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);
                 sphereMtx[0][3] = debugPos.x;

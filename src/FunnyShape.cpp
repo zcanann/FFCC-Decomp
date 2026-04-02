@@ -447,10 +447,10 @@ void CFunnyShape::Render()
     u8* animData = reinterpret_cast<u8*>(AnimData(this));
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
+        const s16 shapeOffset = *reinterpret_cast<s16*>(animData + 0x10 + work->frame * 8);
         pos.x = static_cast<float>(static_cast<double>(FLOAT_8032fd9c) + static_cast<double>(work->x));
         pos.y = static_cast<float>(static_cast<double>(FLOAT_8032fda0) + static_cast<double>(work->y));
-        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + *reinterpret_cast<s32*>(animData + 0x10 + work->frame * 8)),
-                    pos, work->angle);
+        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, work->angle);
         work++;
     }
 }

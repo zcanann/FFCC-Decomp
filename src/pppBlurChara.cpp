@@ -170,7 +170,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor white;
     int width;
     int height;
 
@@ -365,9 +365,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 {
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
-    BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
-    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
     int textureBase = 0;
+    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
+    BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
     int textureIndex;
     int objPosBase;
     _GXTexObj smallBackTex;
@@ -441,7 +441,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
-    drawColor = *reinterpret_cast<_GXColor*>(&colorData->m_color);
+    drawColor.r = colorData->m_color.rgba[0];
+    drawColor.g = colorData->m_color.rgba[1];
+    drawColor.b = colorData->m_color.rgba[2];
+    drawColor.a = colorData->m_color.rgba[3];
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
@@ -499,13 +502,11 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    float arg3 = param_2->m_arg3;
-
-    quadB.x = -arg3;
-    quadA.x = -(FLOAT_80331044 * arg3);
-    quadA.y = FLOAT_80331048 + (FLOAT_80331044 * arg3);
+    quadB.x = -param_2->m_arg3;
+    quadA.x = -(FLOAT_80331044 * param_2->m_arg3);
+    quadA.y = FLOAT_80331048 + (FLOAT_80331044 * param_2->m_arg3);
     quadA.z = outVec.z;
-    quadB.y = FLOAT_8033104c + arg3;
+    quadB.y = FLOAT_8033104c + param_2->m_arg3;
     quadB.z = outVec.z;
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);

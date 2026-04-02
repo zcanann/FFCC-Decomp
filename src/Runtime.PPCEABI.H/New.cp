@@ -29,7 +29,7 @@ exception::~exception() {
 }
 
 const char* exception::what() const {
-    return "std::exception";
+    return "exception";
 }
 
 } // namespace std

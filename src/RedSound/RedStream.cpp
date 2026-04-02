@@ -30,7 +30,7 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  */
 unsigned int _SearchEmptyStreamData()
 {
-	volatile unsigned int streamData;
+	register volatile unsigned int streamData;
 
 	streamData = (unsigned int)DAT_8032f438;
 	do {

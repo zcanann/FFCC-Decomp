@@ -23,7 +23,7 @@ extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*
 extern float FLOAT_80330ee0;
 extern float FLOAT_80330ee4;
 extern "C" int rand(void);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 struct LocationTitleWork {
     void* m_particles;
@@ -44,7 +44,7 @@ struct LocationTitleParticle {
     s16 m_pad;
 };
 
-static char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
+static const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
 
 /*
  * --INFO--

@@ -939,7 +939,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) == 0)
+	if ((AStar.m_flags & 1) == 0)
 	{
 		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);

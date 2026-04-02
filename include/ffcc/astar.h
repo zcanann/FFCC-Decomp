@@ -52,8 +52,7 @@ public:
 	unsigned char calcSpecialPolygonGroup(Vec* pos);
 	unsigned char calcPolygonGroup(Vec* pos, int hitAttributeMask);
 
-	unsigned char m_flags;                  // 0x00
-	// Unused                               // 0x1-0x3
+	unsigned int m_flags;                   // 0x00
 	unsigned int m_hitAttributeMask;        // 0x4
 	int m_portalCount;                      // 0x8
 	CAPos m_portals[64];                    // 0xc

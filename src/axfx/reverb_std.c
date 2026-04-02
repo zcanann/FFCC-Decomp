@@ -154,10 +154,7 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     if (rv->damping < axfx_reverb_std_f32_0p05) {
         rv->damping = axfx_reverb_std_f32_0p05;
     }
-    {
-        f32 damp = axfx_reverb_std_f32_0p8 * rv->damping;
-        rv->damping = axfx_reverb_std_f32_1 - (axfx_reverb_std_f32_0p05 + damp);
-    }
+    rv->damping = axfx_reverb_std_f32_1 - (axfx_reverb_std_f32_0p05 + axfx_reverb_std_f32_0p8 * rv->damping);
 
     for (i = 0; i < 6; i++) {
         DLdelete(&rv->AP[i]);

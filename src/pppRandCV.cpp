@@ -1,11 +1,11 @@
 #include "ffcc/pppRandCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
+#include "ffcc/ppp_constants.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
-
-const float kPppRandCVSingleSampleScale = 2.0f;
+extern "C" f32 RandF__5CMathFv(CMath*);
 
 typedef struct RandCVParams {
     s32 index;
@@ -41,11 +41,11 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     if (params->index == *(s32*)(base + 0xC)) {
-        f32 value = Math.RandF();
+        f32 value = RandF__5CMathFv(&Math);
         if (params->flag != 0) {
-            value = value + Math.RandF();
+            value = value + RandF__5CMathFv(&Math);
         } else {
-            value *= kPppRandCVSingleSampleScale;
+            value = value * kPppRandCVSingleSampleScale;
         }
 
         target = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -56,17 +56,16 @@ void pppRandCV(void* param1, void* param2, void* param3)
         target = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s32 colorOffset = params->colorOffset;
     u8* targetColor;
-    if (colorOffset == -1) {
-        targetColor = &gPppDefaultValueBuffer[0];
+    if (params->colorOffset == -1) {
+        targetColor = gPppDefaultValueBuffer;
     } else {
-        targetColor = base + colorOffset + 0x80;
+        targetColor = base + params->colorOffset + 0x80;
     }
 
     f32 scale = target[0];
-    targetColor[0] = (u8)(targetColor[0] + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]));
-    targetColor[1] = (u8)(targetColor[1] + (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]));
-    targetColor[2] = (u8)(targetColor[2] + (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]));
-    targetColor[3] = (u8)(targetColor[3] + (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]));
+    targetColor[0] += (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]);
+    targetColor[1] += (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]);
+    targetColor[2] += (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]);
+    targetColor[3] += (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]);
 }

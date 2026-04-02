@@ -1158,6 +1158,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
         u8 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
         int count = vertexCount;
+        u8 vertexFormat = opcode & 7;
         u8 primitive = opcode & 0xF8;
         bool isPrimitive;
 
@@ -1190,7 +1191,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
             polygonCount += count - 2;
         }
 
-        if ((opcode & 7) == 2) {
+        if (vertexFormat == 2) {
             if (count != 0) {
                 int blocks = vertexCount >> 3;
 

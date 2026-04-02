@@ -1425,7 +1425,7 @@ os/OSContext.c:
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
-	.sdata      start:0x8032EA9C end:0x8032EAA8
+	.sdata      start:0x8032EAA0 end:0x8032EAA6
 
 os/OSFont.c:
 	.text       start:0x8017E2E8 end:0x8017E340

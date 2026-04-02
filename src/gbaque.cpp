@@ -2764,7 +2764,7 @@ unsigned int GbaQueue::GetCompatibilityFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	char value = obj[0x2CCA + channel];
+	char value = obj[0x2C8A + channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>((-static_cast<int>(value) | static_cast<int>(value)) >> 31);
 }
@@ -2782,7 +2782,7 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CCA + channel] = 0;
+	obj[0x2C8A + channel] = 0;
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

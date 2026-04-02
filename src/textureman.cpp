@@ -1235,9 +1235,10 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 {
     CChunkFile::CChunk chunk;
     CTexture* texture;
+    CPtrArray<CTexture*>& textures = *Textures(this);
 
     if (append == 0) {
-        Textures(this)->ReleaseAndRemoveAll();
+        textures.ReleaseAndRemoveAll();
     }
 
     chunkFile.PushChunk();
@@ -1269,8 +1270,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
         if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
             unsigned int duplicateIdx;
-            for (duplicateIdx = 0; duplicateIdx < (unsigned int)Textures(this)->GetSize(); duplicateIdx++) {
-                CTexture* existing = (*Textures(this))[duplicateIdx];
+            for (duplicateIdx = 0; duplicateIdx < (unsigned int)textures.GetSize(); duplicateIdx++) {
+                CTexture* existing = textures[duplicateIdx];
                 if ((existing != 0)
                     && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8))) == 0)) {
                     goto found_duplicate;
@@ -1292,21 +1293,21 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                     (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
                 }
 
-                texture = (*Textures(this))[duplicateIdx];
+                texture = textures[duplicateIdx];
                 *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
             }
         }
 
         if (append != 0) {
-            for (unsigned int i = 0; i < (unsigned int)Textures(this)->GetSize(); i++) {
-                if ((*Textures(this))[i] == 0) {
-                    Textures(this)->SetAt(i, texture);
+            for (unsigned int i = 0; i < (unsigned int)textures.GetSize(); i++) {
+                if (textures[i] == 0) {
+                    textures.SetAt(i, texture);
                     goto next_chunk;
                 }
             }
         }
 
-        Textures(this)->Add(texture);
+        textures.Add(texture);
     next_chunk:;
     }
     chunkFile.PopChunk();

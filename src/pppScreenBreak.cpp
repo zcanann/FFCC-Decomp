@@ -659,8 +659,12 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d500
+ * PAL Size: 880b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
 {
@@ -717,8 +721,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 2:
-            float pieceY = *(float*)(piece + 0x28);
-            if (-pieceY < value[7] - (*value * sy)) {
+            if (-((*value * sy) - value[7]) < -*(float*)(piece + 0x28)) {
                 piece[0x38] = 1;
             }
             break;
@@ -728,7 +731,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 4:
-            if (-*(float*)(piece + 0x24) < -((*value * sx) - value[6])) {
+            if (-((*value * sx) - value[6]) < -*(float*)(piece + 0x24)) {
                 piece[0x38] = 1;
             }
             break;
@@ -737,8 +740,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             sy = value[7];
             float x = *value * sx;
             float y = *value * sy;
-            float pieceX = *(float*)(piece + 0x24);
-            if ((pieceX <= x) && (-pieceX <= x) &&
+            if ((*(float*)(piece + 0x24) <= x) && (-*(float*)(piece + 0x24) <= x) &&
                 (*(float*)(piece + 0x28) <= y) && (-*(float*)(piece + 0x28) <= y)) {
                 piece[0x38] = 1;
             }
@@ -749,8 +751,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             float x = *value * sx;
             sy = value[7];
             float y = *value * sy;
-            if ((-*(float*)(piece + 0x24) >= sx - x) || (-*(float*)(piece + 0x24) <= -sx + x) ||
-                (-*(float*)(piece + 0x28) >= sy - y) || (-*(float*)(piece + 0x28) <= -sy + y)) {
+            if (((sx - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -sx + x)) ||
+                (sy - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -sy + y)) {
                 piece[0x38] = 1;
             }
             break;

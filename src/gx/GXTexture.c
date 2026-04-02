@@ -1209,6 +1209,9 @@ static void __SetSURegs(int tmap, int tcoord) {
     u8* mapBase;
     u32 image0;
     u32 mode0;
+    u32 reg;
+    u32 wrapS;
+    u32 wrapT;
     u32* suTs0;
     u32* suTs1;
 
@@ -1219,11 +1222,24 @@ static void __SetSURegs(int tmap, int tcoord) {
     suTs1 = (u32*)(coordBase + 0xD8);
     image0 = *(u32*)(mapBase + 0x45C);
     mode0 = *(u32*)(mapBase + 0x47C);
-    *suTs0 = (*suTs0 & 0xFFFF0000) | (image0 & 0x3FF);
-    *suTs1 = (*suTs1 & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
+    wrapS = 1 - (mode0 & 3);
+    wrapT = 1 - ((mode0 >> 2) & 3);
 
-    *suTs0 = (*suTs0 & 0xFFFEFFFF) | ((__cntlzw(1 - (mode0 & 3)) & 0x20) << 11);
-    *suTs1 = (*suTs1 & 0xFFFEFFFF) | ((__cntlzw(1 - ((mode0 >> 2) & 3)) & 0x20) << 11);
+    reg = *suTs0 & 0xFFFF0000;
+    reg |= image0 & 0x3FF;
+    *suTs0 = reg;
+
+    reg = *suTs1 & 0xFFFF0000;
+    reg |= (image0 >> 10) & 0x3FF;
+    *suTs1 = reg;
+
+    reg = *suTs0 & 0xFFFEFFFF;
+    reg |= (__cntlzw(wrapS) & 0x20) << 11;
+    *suTs0 = reg;
+
+    reg = *suTs1 & 0xFFFEFFFF;
+    reg |= (__cntlzw(wrapT) & 0x20) << 11;
+    *suTs1 = reg;
 
     GX_WRITE_RAS_REG(*suTs0);
     GX_WRITE_RAS_REG(*suTs1);

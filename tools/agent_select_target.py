@@ -23,6 +23,13 @@ WARNING_BUILD_MISMATCH = (
 )
 COMPLETE_THRESHOLD_PERCENT = 100
 
+# Units permanently excluded from target selection.
+# These units thrash between extab and code improvements, wasting PR cycles.
+PERMANENTLY_BLACKLISTED_UNITS = {
+    "main/pppSRandCV",
+    "main/pppSRandHCV",
+}
+
 
 def _path_name(path_str):
     """Return basename for paths that may use POSIX or Windows separators."""
@@ -116,6 +123,10 @@ def is_viable_target(unit, blacklist):
     # Skip auto-generated units
     if unit.get("metadata", {}).get("auto_generated", False):
         return False, "auto-generated"
+
+    # Skip permanently blacklisted units (thrash between extab/code, waste PR cycles)
+    if name in PERMANENTLY_BLACKLISTED_UNITS:
+        return False, "permanently blacklisted"
 
     # Skip recently failed units
     if name in blacklist:

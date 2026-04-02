@@ -481,7 +481,6 @@ void CPartPcs::create()
 void CPartPcs::createLoad()
 {
     CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
-    char* stringBase = s_p_tina_rodata_801d7ee0;
 
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
@@ -490,14 +489,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    PartMng.pppLoadPtx(stringBase + 0x24c, 1, 1, 0, 0);
-    PartMng.pppLoadPmd(stringBase + 0x24c);
-    PartMng.pppLoadPan(stringBase + 0x24c);
-    PartMng.pppLoadPdt(stringBase + 0x25c, 1, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x270, 2, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x2ac, 5, 1, 0, 0);
+    PartMng.pppLoadPtx(s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
+    PartMng.pppLoadPmd(s_dvd_tina_chobit_801d812c);
+    PartMng.pppLoadPan(s_dvd_tina_chobit_801d812c);
+    PartMng.pppLoadPdt(s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
+    PartMng.pppLoadPdt(s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
+    PartMng.pppLoadPdt(s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
+    PartMng.pppLoadPdt(s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
+    PartMng.pppLoadPdt(s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 
@@ -1124,14 +1123,13 @@ void LoadFieldPdt0(int mapId, int floorId)
 {
     CPartMngState* loadState = GetPartMngState();
     unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
-    int partLoadMode = loadState->m_partLoadMode;
     int pdtSlot;
     char path[1024];
 
     DAT_8032ed3c = 0;
     DAT_8032ed38 = 0;
 
-    if (partLoadMode != 3) {
+    if (loadState->m_partLoadMode != 3) {
         pppReleasePdt__8CPartMngFi(&PartMng, 0);
         pppReleasePdt__8CPartMngFi(&PartMng, 6);
         pppReleasePdt__8CPartMngFi(&PartMng, 7);
@@ -1144,18 +1142,20 @@ void LoadFieldPdt0(int mapId, int floorId)
     sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
     pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
     if (pdtSlot != 0) {
+        _pppDataHead* pppDataHead;
+
         pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
-        if ((pdtSlot != 0) && (partLoadMode != 2) && (partLoadMode != 3)) {
-            _pppDataHead* pppDataHead;
+        pppDataHead = *reinterpret_cast<_pppDataHead**>(partMng + 0x22E18);
+        if ((pdtSlot != 0) && (loadState->m_partLoadMode != 2) && (loadState->m_partLoadMode != 3)) {
+            PPPCREATEPARAM* createParam;
             int checkOff;
             int i;
 
-            PartMng.pppGetDefaultCreateParam();
-            pppDataHead = *reinterpret_cast<_pppDataHead**>(partMng + 0x22E18);
+            createParam = PartMng.pppGetDefaultCreateParam();
             checkOff = 0;
             for (i = 0; i < static_cast<int>(pppDataHead->m_partCount); i++) {
                 if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(pppDataHead) + 0x4C + checkOff) != -0x1000) {
-                    pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, &g_dcp, 0);
+                    pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, createParam, 0);
                 }
                 checkOff += 0x60;
             }

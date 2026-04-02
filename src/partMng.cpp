@@ -3320,7 +3320,7 @@ int CPartMng::pppGetFreeDataMng()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppGetDefaultCreateParam()
+PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
 {
     g_dcp.m_positionOffsetPtr = 0;
     g_dcp.m_rotationPtr = 0;
@@ -3340,6 +3340,7 @@ void CPartMng::pppGetDefaultCreateParam()
     g_dcp.m_soundEffectParams.m_soundEffectStartFrame = 0;
     g_dcp.m_soundEffectParams.m_soundEffectStartedOnce = 0;
     g_dcp.m_soundEffectParams.m_soundEffectFadeFrames = 0x1e;
+    return &g_dcp;
 }
 
 /*

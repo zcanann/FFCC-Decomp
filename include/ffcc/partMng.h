@@ -397,7 +397,7 @@ public:
     void pppLoadPdt(const char*, int, int, void*, int);
 
     int pppGetFreeDataMng();
-    void pppGetDefaultCreateParam();
+    PPPCREATEPARAM* pppGetDefaultCreateParam();
 
     int pppCreate0(int, int, PPPCREATEPARAM*, int);
     int pppCreate(int, int, PPPCREATEPARAM*, int);

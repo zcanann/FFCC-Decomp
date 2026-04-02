@@ -11,7 +11,10 @@ static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;
 typedef struct RandUpHCVParams {
     int index;
     int colorOffset;
-    s16 delta[4];
+    s16 field8;
+    s16 fieldA;
+    s16 fieldC;
+    s16 fieldE;
     u8 flag;
     u8 pad[3];
 } RandUpHCVParams;
@@ -59,22 +62,15 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
 
     s16* target = (params->colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + params->colorOffset + 0x80);
 
-    f32 scale = *valuePtr;
+    s32 delta = (s32)((f32)params->field8 * *valuePtr);
+    target[0] = (s16)(target[0] + delta);
 
-    {
-        s16 base = params->delta[0];
-        target[0] = (s16)(target[0] + (int)((float)base * scale));
-    }
-    {
-        s16 base = params->delta[1];
-        target[1] = (s16)(target[1] + (int)((float)base * scale));
-    }
-    {
-        s16 base = params->delta[2];
-        target[2] = (s16)(target[2] + (int)((float)base * scale));
-    }
-    {
-        s16 base = params->delta[3];
-        target[3] = (s16)(target[3] + (int)((float)base * scale));
-    }
+    delta = (s32)((f32)params->fieldA * *valuePtr);
+    target[1] = (s16)(target[1] + delta);
+
+    delta = (s32)((f32)params->fieldC * *valuePtr);
+    target[2] = (s16)(target[2] + delta);
+
+    delta = (s32)((f32)params->fieldE * *valuePtr);
+    target[3] = (s16)(target[3] + delta);
 }

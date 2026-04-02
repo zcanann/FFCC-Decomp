@@ -1401,6 +1401,7 @@ db/db.c:
 
 os/OS.c:
 	.text       start:0x8017B694 end:0x8017C180
+	.data       start:0x80216770 end:0x80216968
 	.sdata      start:0x8032EA80 end:0x8032EA90
 	.sbss       start:0x8032EF20 end:0x8032EF60
 
@@ -1424,13 +1425,16 @@ os/OSAudioSystem.c:
 
 os/OSCache.c:
 	.text       start:0x8017CEAC end:0x8017D4F8
+	.data       start:0x802169E8 end:0x80216C18
 
 os/OSContext.c:
 	.text       start:0x8017D4F8 end:0x8017DD68
+	.data       start:0x80216C18 end:0x80216DF0
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
 	.data       start:0x80216DF0 end:0x8021710C
+	.bss        start:0x8030BBD0 end:0x8030BC14
 	.sdata      start:0x8032EA9C end:0x8032EAA8
 
 os/OSFont.c:
@@ -1468,6 +1472,7 @@ os/OSResetSW.c:
 
 os/OSRtc.c:
 	.text       start:0x8017FBF8 end:0x80180690
+	.bss        start:0x8030BC40 end:0x8030BC94
 
 os/OSSemaphore.c:
 	.text       start:0x80180690 end:0x80180814
@@ -1480,6 +1485,7 @@ os/OSSync.c:
 
 os/OSThread.c:
 	.text       start:0x801809F4 end:0x80181BF8
+	.bss        start:0x8030BC98 end:0x8030C690
 	.sdata      start:0x8032EAB0 end:0x8032EAB4
 
 os/OSTime.c:

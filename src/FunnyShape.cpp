@@ -543,7 +543,7 @@ void CFunnyShape::RenderTexture()
  */
 void CFunnyShape::RenderShape()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (PtrAt(this, 0x6010) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (PtrAt(this, 0x6010) == 0)) {
         return;
     }
 
@@ -576,10 +576,11 @@ void CFunnyShape::RenderShape()
     GXColor matColor = chanColor;
     GXSetChanMatColor(GX_COLOR0, matColor);
 
+    FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010));
     Vec2d offset;
     offset.x = FLOAT_8032fd90;
     offset.y = FLOAT_8032fd94;
-    RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010)), offset, FLOAT_8032fd6c);
+    RenderShape(shape, offset, 0.0f);
 }
 
 /*

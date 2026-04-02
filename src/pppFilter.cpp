@@ -32,43 +32,6 @@ void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlend
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppConstructFilter(_pppPObjLink*, _pppCtrlTable*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8015a8c8
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*)
-{
-	volatile int* stateFlag = &gPppCalcDisabled;
-	if (*stateFlag == 0) {
-		return;
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8015a788
  * PAL Size: 196b
  * EN Address: TODO
@@ -105,3 +68,40 @@ void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTa
 
 
 
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015a8c8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*)
+{
+	volatile int* stateFlag = &gPppCalcDisabled;
+	if (*stateFlag == 0) {
+		return;
+	}
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void pppConstructFilter(_pppPObjLink*, _pppCtrlTable*)
+{
+	// TODO
+}

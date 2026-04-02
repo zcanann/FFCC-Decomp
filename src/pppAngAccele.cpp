@@ -4,6 +4,24 @@
 
 /*
  * --INFO--
+ * PAL Address: 0x80064d18
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppAngAcceleCon(pppAngAcceleObj* obj, pppAngAcceleUnkC* param)
+{
+    int* angularAccel = (int*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
+
+    angularAccel[2] = 0;
+    angularAccel[1] = 0;
+    angularAccel[0] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80064d3c
  * PAL Size: 156b
  * EN Address: TODO
@@ -29,22 +47,4 @@ void pppAngAccele(pppAngAcceleObj* obj, pppAngAcceleUnkB* param_2, pppAngAcceleU
     angularVelocity[0] += angularAccel[0];
     angularVelocity[1] += angularAccel[1];
     angularVelocity[2] += angularAccel[2];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80064d18
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppAngAcceleCon(pppAngAcceleObj* obj, pppAngAcceleUnkC* param)
-{
-    int* angularAccel = (int*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
-
-    angularAccel[2] = 0;
-    angularAccel[1] = 0;
-    angularAccel[0] = 0;
 }

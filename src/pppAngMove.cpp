@@ -23,6 +23,24 @@ struct PppAngMoveInput {
 
 /*
  * --INFO--
+ * PAL Address: 0x80064e5c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
+{
+    int offset = ctrlTable->m_serializedDef->m_workOffsetAlt;
+    int* ptr = (int*)((char*)dest + offset + 0x80);
+    ptr[2] = 0;
+    ptr[1] = 0;
+    ptr[0] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80064e80
  * PAL Size: 156b
  * EN Address: TODO
@@ -53,22 +71,4 @@ void pppAngMove(void* basePtr, void* input, _pppCtrlTable* ctrlTable)
     a->x += b->x;
     a->y += b->y;
     a->z += b->z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80064e5c
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
-{
-    int offset = ctrlTable->m_serializedDef->m_workOffsetAlt;
-    int* ptr = (int*)((char*)dest + offset + 0x80);
-    ptr[2] = 0;
-    ptr[1] = 0;
-    ptr[0] = 0;
 }

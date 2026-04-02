@@ -1397,21 +1397,26 @@ base/PPCArch.c:
 db/db.c:
 	.text       start:0x8017B5A8 end:0x8017B694
 	.data       start:0x80216758 end:0x80216770
+	.sbss       start:0x8032EF18 end:0x8032EF20
 
 os/OS.c:
 	.text       start:0x8017B694 end:0x8017C180
 	.sdata      start:0x8032EA80 end:0x8032EA90
+	.sbss       start:0x8032EF20 end:0x8032EF60
 
 os/OSAlarm.c:
 	.text       start:0x8017C180 end:0x8017C8E8
+	.sbss       start:0x8032EF60 end:0x8032EF68
 
 os/OSAlloc.c:
 	.text       start:0x8017C8E8 end:0x8017CBF8
 	.sdata      start:0x8032EA90 end:0x8032EA98
+	.sbss       start:0x8032EF68 end:0x8032EF78
 
 os/OSArena.c:
 	.text       start:0x8017CBF8 end:0x8017CC18
 	.sdata      start:0x8032EA98 end:0x8032EA9C
+	.sbss       start:0x8032EF78 end:0x8032EF7C
 
 os/OSAudioSystem.c:
 	.text       start:0x8017CC18 end:0x8017CEAC
@@ -1425,6 +1430,7 @@ os/OSContext.c:
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
+	.data       start:0x80216DF0 end:0x8021710C
 	.sdata      start:0x8032EA9C end:0x8032EAA8
 
 os/OSFont.c:
@@ -1433,6 +1439,7 @@ os/OSFont.c:
 
 os/OSInterrupt.c:
 	.text       start:0x8017E340 end:0x8017EBAC
+	.sbss       start:0x8032EF80 end:0x8032EF98
 
 os/OSLink.c:
 	.text       start:0x8017EBAC end:0x8017EBC4
@@ -1442,18 +1449,22 @@ os/OSMessage.c:
 
 os/OSMemory.c:
 	.text       start:0x8017EDC8 end:0x8017F0AC
+	.data       start:0x80217140 end:0x80217150
 
 os/OSMutex.c:
 	.text       start:0x8017F0AC end:0x8017F11C
 
 os/OSReboot.c:
 	.text       start:0x8017F11C end:0x8017F478
+	.sbss       start:0x8032EF98 end:0x8032EFA8
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C
+	.sbss       start:0x8032EFA8 end:0x8032EFB4
 
 os/OSResetSW.c:
 	.text       start:0x8017F86C end:0x8017FBF8
+	.sbss       start:0x8032EFB4 end:0x8032EFD4
 
 os/OSRtc.c:
 	.text       start:0x8017FBF8 end:0x80180690
@@ -1667,6 +1678,7 @@ card/CARDBios.c:
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48
+	.data       start:0x8021C1E0 end:0x8021C340
 
 card/CARDRdwr.c:
 	.text       start:0x8019AB48 end:0x8019ADC8
@@ -1682,6 +1694,7 @@ card/CARDCheck.c:
 
 card/CARDMount.c:
 	.text       start:0x8019C36C end:0x8019CE2C
+	.data       start:0x8021C340 end:0x8021C380
 
 card/CARDFormat.c:
 	.text       start:0x8019CE2C end:0x8019D664
@@ -1760,6 +1773,7 @@ gx/GXStubs.c:
 
 gx/GXDisplayList.c:
 	.text       start:0x801A5FF8 end:0x801A6204
+	.sbss       start:0x8032F348 end:0x8032F34C
 
 gx/GXTransform.c:
 	.text       start:0x801A6204 end:0x801A69B4
@@ -1801,13 +1815,16 @@ TRK_MINNOW_DOLPHIN/nubevent.c:
 
 TRK_MINNOW_DOLPHIN/nubinit.c:
 	.text       start:0x801A9324 end:0x801A94BC
+	.rodata     start:0x801E6620 end:0x801E664C
 	.bss        start:0x80328748 end:0x80328750
 
 TRK_MINNOW_DOLPHIN/msg.c:
 	.text       start:0x801A94BC end:0x801A9500
+	.rodata     start:0x801E6650 end:0x801E6675
 
 TRK_MINNOW_DOLPHIN/msgbuf.c:
 	.text       start:0x801A9500 end:0x801A9D3C
+	.rodata     start:0x801E6678 end:0x801E6695
 	.bss        start:0x80328750 end:0x8032A100
 
 TRK_MINNOW_DOLPHIN/serpoll.c:

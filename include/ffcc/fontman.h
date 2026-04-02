@@ -52,10 +52,12 @@ public:
 
 	void DrawInit();
 	void DrawQuit();
-	void Draw(const char*);
+	void Draw(char*);
+	void Draw(const char* text) { Draw(const_cast<char*>(text)); }
 	void Draw(unsigned short);
 
-	float GetWidth(const char*);
+	float GetWidth(char*);
+	float GetWidth(const char* text) { return GetWidth(const_cast<char*>(text)); }
 	float GetWidth(unsigned short);
 
 	void searchChar(unsigned short);

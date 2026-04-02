@@ -552,7 +552,7 @@ void CFont::DrawQuit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFont::Draw(const char* text)
+void CFont::Draw(char* text)
 {
 	unsigned char ch;
 	do {
@@ -671,10 +671,10 @@ void CFont::Draw(unsigned short ch)
  * JP Address: TODO
  * JP Size: TODO
  */
-float CFont::GetWidth(const char* text)
+float CFont::GetWidth(char* text)
 {
 	float width = 0.0f;
-	const unsigned char* cursor = reinterpret_cast<const unsigned char*>(text);
+	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
 
 	while (*cursor != '\0') {
 		unsigned char ch = *cursor++;

@@ -53,10 +53,10 @@ struct CScenegraphDesc {
     CScenegraphEntry m_entries[1];
 };
 
-static char s_cSystem[] = "CSystem";
-static char s_gamePalM_map[] = "gamePalM.map";
-static char s_system_cpp[] = "system.cpp";
-static char s_emptyString[] = "";
+static const char s_cSystem[] = "CSystem";
+static const char s_gamePalM_map[] = "gamePalM.map";
+static const char s_system_cpp[] = "system.cpp";
+static const char s_emptyString[] = "";
 
 /*
  * --INFO--
@@ -130,13 +130,13 @@ void CSystem::Init()
 
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
-        m_mapStage = (CStage*)Memory.CreateStage(0x400000, s_cSystem, 1);
-        fileHandle = File.Open(s_gamePalM_map, 0, CFile::PRI_LOW);
+        m_mapStage = (CStage*)Memory.CreateStage(0x400000, const_cast<char*>(s_cSystem), 1);
+        fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
             mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, s_system_cpp, 0x123) unsigned char[mapSize];
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
             offset = 0;
             for (; mapSize != 0; mapSize -= chunkSize)
             {
@@ -155,7 +155,7 @@ void CSystem::Init()
                 offset += chunkSize;
             }
             File.Close(fileHandle);
-            Printf(s_emptyString);
+            Printf(const_cast<char*>(s_emptyString));
         }
     }
 }
@@ -232,7 +232,7 @@ void CSystem::ExecScenegraph()
 
     if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
     {
-        Graphic._WaitDrawDone(s_system_cpp, 0x219);
+        Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x219);
         Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)
         {
@@ -433,7 +433,7 @@ void CSystem::ExecScenegraph()
             watch.Start();
             if ((perfTrigger & 1) != 0)
             {
-                Graphic._WaitDrawDone(s_system_cpp, 0x2CA);
+                Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                 GXReadGP0Metric();
                 GXReadGP1Metric();
             }

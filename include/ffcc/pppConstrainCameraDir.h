@@ -6,6 +6,13 @@
 typedef struct pppConstrainCameraDir {
     union {
         _pppPObject m_pppPObject;
+        struct {
+            s32 m_graphId;
+            s32 m_unknown04;
+            s32 m_unknown08;
+            s32 m_unknown0C;
+            pppFMATRIX m_localMatrix;
+        } m_object;
         float field0_0x0;
     };
 } pppConstrainCameraDir;

@@ -65,6 +65,9 @@ struct KeShpTail2XWork {
 struct KeShpTail2XObject {
     u8 _pad0[0xc];
     _pppPObject m_obj;
+    pppFMATRIX m_drawMatrix;
+    u8 _pad70[0xd];
+    u8 m_initialized;
 };
 
 /*
@@ -81,8 +84,9 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XStep* step;
     KeShpTail2XWork* work;
     KeShpTail2XObject* tailObj;
-    Vec pos;
+    Vec historyPos ATTRIBUTE_ALIGN(8);
     Vec temp;
+    Vec pos;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -99,8 +103,8 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
             pppFMATRIX outMatrix;
-            pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
+            pppFMATRIX ownerMatrix;
 
             partMatrix = tailObj->m_obj.m_localMatrix;
             ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
@@ -110,11 +114,11 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.z = outMatrix.value[2][3];
         }
 
-        s32 count = work->m_count;
-        Vec historyPos;
+        u8 count;
         Vec* history = work->m_posHistory;
 
         pppCopyVector__FR3Vec3Vec(&historyPos, &pos);
+        count = work->m_count;
         while (count > 0) {
             temp = historyPos;
             pppCopyVector__FR3Vec3Vec(history, &temp);
@@ -134,8 +138,8 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
         pppFMATRIX outMatrix;
-        pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
+        pppFMATRIX ownerMatrix;
 
         partMatrix = tailObj->m_obj.m_localMatrix;
         ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
@@ -149,21 +153,19 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &temp);
 
     {
-        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-        u8* shape = (u8*)*shapeTable;
+        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* frameEntry;
-        s16 frameDuration;
+        u16 shapeFrame;
 
-        work->m_shapePrevFrame = work->m_shapeFrame;
-        frameEntry = shape + ((u32)work->m_shapeFrame << 3) + 0x10;
+        shapeFrame = work->m_shapeFrame;
+        work->m_shapePrevFrame = shapeFrame;
+        frameEntry = (u8*)shape + ((u32)shapeFrame << 3) + 0x10;
 
         work->m_frameAcc += step->m_frameStep;
-        frameEntry = (u8*)shape + ((u32)work->m_shapeFrame << 3) + 0x10;
-        frameDuration = *(s16*)(frameEntry + 2);
-        if (work->m_frameAcc >= frameDuration) {
-            work->m_frameAcc -= frameDuration;
+        if (work->m_frameAcc >= *(s16*)(frameEntry + 2)) {
+            work->m_frameAcc -= *(s16*)(frameEntry + 2);
             work->m_shapeFrame++;
-            if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
+            if (work->m_shapeFrame >= *(s16*)((u8*)shape + 6)) {
                 if ((frameEntry[4] & 0x80) != 0) {
                     work->m_shapeFrame = 0;
                     work->m_frameAcc = 0;

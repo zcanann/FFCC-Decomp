@@ -192,11 +192,11 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                         (y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
                         (x & 0x1FFFFFFC) * 8 +
                         ((x & 3) + (y & 3) * 4) * 2);
-                    u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
 
                     pixel[0] = nx;
-                    pixel[1] = ny;
+                    u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
                     xCoord += stepX;
+                    pixel[1] = ny;
                 }
 
                 yCoord += stepY;

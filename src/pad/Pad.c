@@ -8,7 +8,8 @@
 #if DEBUG
 const char* __PADVersion = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
 #else
-const char* __PADVersion = "<< Dolphin SDK - PAD\trelease build: Sep  5 2002 05:34:02 (0x2301) >>";
+extern const char lbl_80217BB0[];
+const char* __PADVersion = lbl_80217BB0;
 #endif
 
 #define PAD_ALL                                                                                                        \
@@ -62,11 +63,11 @@ static void PADOriginCallback(s32 chan, u32 error, OSContext *context);
 static void PADFixCallback(s32 unused, u32 error, struct OSContext *context);
 static void PADResetCallback(s32 unused, u32 error, struct OSContext *context);
 static void PADReceiveCheckCallback(s32 chan, u32 error);
-static void SPEC0_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
-static void SPEC1_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
+void SPEC0_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
+void SPEC1_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static s8 ClampS8(s8 var, s8 org);
 static u8 ClampU8(u8 var, u8 org);
-static void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
+void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static BOOL OnReset2(BOOL f);
 void __PADDisableXPatch(void);
 #ifndef VERSION_GCCP01
@@ -576,7 +577,7 @@ u32 PADGetSpec(void) {
     return Spec;
 }
 
-static void SPEC0_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
+void SPEC0_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     status->button = 0;
     status->button |= ((data[0] >> 16) & 0x0008) ? PAD_BUTTON_A : 0;
     status->button |= ((data[0] >> 16) & 0x0020) ? PAD_BUTTON_B : 0;
@@ -601,7 +602,7 @@ static void SPEC0_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     status->substickY -= 128;
 }
 
-static void SPEC1_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
+void SPEC1_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     status->button = 0;
     status->button |= ((data[0] >> 16) & 0x0080) ? PAD_BUTTON_A : 0;
     status->button |= ((data[0] >> 16) & 0x0100) ? PAD_BUTTON_B : 0;
@@ -650,7 +651,7 @@ static u8 ClampU8(u8 var, u8 org) {
     return var -= org;
 }
 
-static void SPEC2_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
+void SPEC2_MakeStatus(s32 chan, PADStatus* status, u32 data[2]) {
     PADStatus* origin;
 
     status->button = (u16)((data[0] >> 16) & PAD_ALL);

@@ -3739,15 +3739,14 @@ void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
  */
 void CPartMng::pppDeletePart(int index)
 {
-    _pppMngSt* mng = &m_pppMng[index];
-    PppMngLifecycleState* lifecycle = reinterpret_cast<PppMngLifecycleState*>(mng);
-    int baseTime = mng->m_baseTime;
+    char* pppMngSt = reinterpret_cast<char*>(this) + (index * 0x158) + 0x2A18;
 
-    if (baseTime < 0) {
-        lifecycle->m_stopRequested = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(mng, &lifecycle->m_soundEffectData);
+    if (*reinterpret_cast<int*>(pppMngSt + 0x14) < 0) {
+        *reinterpret_cast<unsigned char*>(pppMngSt + 0xE8) = 1;
+        pppStopSe__FP9_pppMngStP7PPPSEST(
+            reinterpret_cast<_pppMngSt*>(pppMngSt), reinterpret_cast<PPPSEST*>(pppMngSt + 0x11C));
     } else {
-        mng->m_baseTime = -0x1000;
+        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
     }
 }
 
@@ -3758,11 +3757,10 @@ void CPartMng::pppDeletePart(int index)
  */
 void CPartMng::pppEndPart(int index)
 {
-    _pppMngSt* mng = &m_pppMng[index];
-    PppMngLifecycleState* lifecycle = reinterpret_cast<PppMngLifecycleState*>(mng);
-
-    lifecycle->m_endRequested = 1;
-    pppStopSe__FP9_pppMngStP7PPPSEST(mng, &lifecycle->m_soundEffectData);
+    char* pppMngSt = reinterpret_cast<char*>(this) + (index * 0x158) + 0x2A18;
+    *reinterpret_cast<unsigned char*>(pppMngSt + 0xE5) = 1;
+    pppStopSe__FP9_pppMngStP7PPPSEST(
+        reinterpret_cast<_pppMngSt*>(pppMngSt), reinterpret_cast<PPPSEST*>(pppMngSt + 0x11C));
 }
 
 /*

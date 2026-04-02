@@ -120,17 +120,21 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
 		int projectedX = (int)work->m_projectedX;
-		int projectedY = (int)work->m_projectedY;
-		u32 x0 = (u32)(projectedX & 0xFFFF);
-		u32 y0 = (u32)(projectedY & 0xFFFF);
-		u8 flareWidth = unkB->m_arg3;
-		u32 halfWidth = (u32)(flareWidth >> 1);
-
 		zAtPixel = 0;
+		int projectedY = (int)work->m_projectedY;
+		u8 flareWidth = unkB->m_arg3;
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
+		u32 y0 = (u32)(projectedY & 0xFFFF);
+		u32 x0 = (u32)(projectedX & 0xFFFF);
+		u32 halfWidth = (u32)(flareWidth >> 1);
 		s16 stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
-		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
-			for (u32 x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stepSize) {
+		u32 yStart = y0 - halfWidth;
+		u32 xStart = x0 - halfWidth;
+		u32 xEnd = x0 + halfWidth;
+		u32 yEnd = y0 + halfWidth;
+
+		for (u32 y = yStart; (int)y <= (int)yEnd; y += stepSize) {
+			for (u32 x = xStart; (int)x <= (int)xEnd; x += stepSize) {
 				s16 xShort = (s16)x;
 				s16 yShort = (s16)y;
 

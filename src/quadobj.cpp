@@ -6,8 +6,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const float MaxBounds = 10000000.0;
-static const float MinBounds = -10000000.0;
+extern const float kQuadObjMaxBounds;
+extern const float kQuadObjMinBounds;
+extern const float kQuadObjZero;
 
 /*
  * --INFO--
@@ -124,10 +125,10 @@ void CGQuadObj::Reset(float base, float height)
 	m_vertexCount = 0;
 	m_yBase = base;
 	m_yHeight = height;
-	m_bboxMinZ = MaxBounds;
-	m_bboxMinX = MaxBounds;
-	m_bboxMaxZ = MinBounds;
-	m_bboxMaxX = MinBounds;
+	m_bboxMinZ = kQuadObjMaxBounds;
+	m_bboxMinX = kQuadObjMaxBounds;
+	m_bboxMaxZ = kQuadObjMinBounds;
+	m_bboxMaxX = kQuadObjMinBounds;
 }
 
 /*

@@ -34,7 +34,6 @@ public:
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
-extern "C" void* memcpy(void*, const void*, unsigned long);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -50,8 +49,6 @@ char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
 static const char DAT_8032fb48[] = "";
 const float FLOAT_8032fb38 = 0.0f;
-extern "C" int __cntlzw(unsigned int);
-
 const float FLOAT_8032fb3c = 1.0f;
 const float FLOAT_8032fb4c = 1.25f;
 const double DOUBLE_8032fb40 = 4503599627370496.0;

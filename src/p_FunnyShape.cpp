@@ -39,7 +39,6 @@ inline void SetPtrArrayDtorVtable(CPtrArray<T>*)
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
-extern "C" int __cntlzw(unsigned int);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);

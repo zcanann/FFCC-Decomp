@@ -40,15 +40,6 @@ extern "C" void DrawSingLife__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern double DOUBLE_80332ea0;
 extern float FLOAT_80332e60;
@@ -614,10 +605,10 @@ void CMenuPcs::ItemDraw()
     }
 
     CFont* listFont = this->listFont;
-    SetMargin__5CFontFf(FLOAT_80332e64, listFont);
-    SetShadow__5CFontFi(listFont, 0);
-    SetScale__5CFontFf(FLOAT_80332e84, listFont);
-    DrawInit__5CFontFv(listFont);
+    listFont->SetMargin(FLOAT_80332e64);
+    listFont->SetShadow(0);
+    listFont->SetScale(FLOAT_80332e84);
+    listFont->DrawInit();
 
     s16* listStart = (s16*)((u8*)itemList + 8);
     int listCount = itemList[0];
@@ -636,7 +627,7 @@ void CMenuPcs::ItemDraw()
         }
 
         GXColor textColor = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(listStart + 8))};
-        SetColor__5CFontF8_GXColor(listFont, &textColor);
+        listFont->SetColor(textColor);
 
         s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
         if (itemId > 0) {
@@ -650,10 +641,10 @@ void CMenuPcs::ItemDraw()
                 selectedItemId = itemId;
             }
 
-            GetWidth__5CFontFPc(listFont, text);
-            SetPosX__5CFontFf((float)(textEntry[0] + 0x1C), listFont);
-            SetPosY__5CFontFf((float)(textEntry[1] + 0xB) - FLOAT_80332e88, listFont);
-            Draw__5CFontFPc(listFont, text);
+            listFont->GetWidth(text);
+            listFont->SetPosX((float)(textEntry[0] + 0x1C));
+            listFont->SetPosY((float)(textEntry[1] + 0xB) - FLOAT_80332e88);
+            listFont->Draw(text);
         }
     }
 

@@ -16,6 +16,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
+#include "ffcc/fontman.h"
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__8CGBaseObj[];
@@ -35,16 +36,6 @@ extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, void*, int, int, int, void*, void*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
@@ -3576,14 +3567,14 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 		return;
 	}
 
-	SetMargin__5CFontFf(FLOAT_803313e8, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(FLOAT_803313e8, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803313e8);
+	font->DrawInit();
 
 	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	SetColor__5CFontF8_GXColor(font, &textColor);
-	SetTlut__5CFontFi(font, 0x23);
+	font->SetColor(textColor);
+	font->SetTlut(0x23);
 
 	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
@@ -3609,14 +3600,14 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			strncpy(textBuf, text, sizeof(textBuf) - 1);
 			textBuf[sizeof(textBuf) - 1] = '\0';
 
-			const int textWidth = GetWidth__5CFontFPc(font, textBuf);
+			const int textWidth = font->GetWidth(textBuf);
 			float posX = static_cast<float>(win[0] + 0x20);
 			if (winType != 0) {
 				posX = centerX - static_cast<float>(textWidth) * 0.5f;
 			}
-			SetPosX__5CFontFf(posX, font);
-			SetPosY__5CFontFf(y, font);
-			Draw__5CFontFPc(font, textBuf);
+			font->SetPosX(posX);
+			font->SetPosY(y);
+			font->Draw(textBuf);
 		}
 		y += 30.0f;
 		entry += 8;
@@ -3639,9 +3630,9 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* const font = *reinterpret_cast<CFont**>(bytes + 0xF8);
 
-	SetMargin__5CFontFf(FLOAT_803313e8, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(FLOAT_803313e8, font);
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803313e8);
 
 	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
@@ -3656,7 +3647,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 			if (text[0] == '$') {
 				text++;
 			}
-			const int textWidth = GetWidth__5CFontFPc(font, text);
+			const int textWidth = font->GetWidth(text);
 			if (maxWidth < textWidth) {
 				maxWidth = textWidth;
 			}

@@ -36,8 +36,6 @@ struct CMapCylinderRaw
 	float m_height2;
 };
 
-extern "C" int __cntlzw(unsigned int);
-
 CAStar AStar;
 
 /*

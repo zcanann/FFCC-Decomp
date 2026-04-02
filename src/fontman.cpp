@@ -9,9 +9,9 @@
 extern "C" void __dt__8CFontManFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* __vt__5CFont[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void* __vt__5CFont[];
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
@@ -552,7 +552,7 @@ void CFont::DrawQuit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFont::Draw(char* text)
+void CFont::Draw(const char* text)
 {
 	unsigned char ch;
 	do {
@@ -671,10 +671,10 @@ void CFont::Draw(unsigned short ch)
  * JP Address: TODO
  * JP Size: TODO
  */
-float CFont::GetWidth(char* text)
+float CFont::GetWidth(const char* text)
 {
 	float width = 0.0f;
-	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
+	const unsigned char* cursor = reinterpret_cast<const unsigned char*>(text);
 
 	while (*cursor != '\0') {
 		unsigned char ch = *cursor++;

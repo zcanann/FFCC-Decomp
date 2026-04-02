@@ -7,6 +7,7 @@
 #include "ffcc/sound.h"
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, int, int, int, int, void*, void*);
@@ -16,12 +17,6 @@ extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern "C" char sCharaObjDebugStatFormat[];
 
@@ -1449,11 +1444,11 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		        *reinterpret_cast<short*>(script + 0x22));
 
 		posYDouble = (double)posY;
-		widthDouble = (double)GetWidth__5CFontFPc(font, text);
-		SetPosX__5CFontFf(-(float)((double)kHalfF32 * widthDouble - (double)posX), font);
-		SetPosY__5CFontFf((float)posYDouble, font);
-		SetPosZ__5CFontFf((float)posZ, font);
-		Draw__5CFontFPc(font, text);
+		widthDouble = (double)font->GetWidth(text);
+		font->SetPosX(-(float)((double)kHalfF32 * widthDouble - (double)posX));
+		font->SetPosY((float)posYDouble);
+		font->SetPosZ((float)posZ);
+		font->Draw(text);
 		posY -= (float)((double)(unsigned short)font->m_glyphWidth * (double)font->scaleY);
 	}
 }

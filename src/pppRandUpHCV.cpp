@@ -3,9 +3,9 @@
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandUpHCVDualSampleScale = 0.5f;
-extern s16 gPppDefaultValueBuffer[];
 static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;
 
 typedef struct RandUpHCVParams {
@@ -57,7 +57,7 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s16* target = (params->colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + params->colorOffset + 0x80);
+    s16* target = (params->colorOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + params->colorOffset + 0x80);
 
     f32 scale = *valuePtr;
 

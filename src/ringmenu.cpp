@@ -14,7 +14,6 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-extern "C" int __cntlzw(unsigned int);
 extern "C" void* __vt__9CRingMenu[];
 extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
 extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
@@ -27,19 +26,6 @@ extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetScaleX__5CFontFf(float, CFont*);
-extern "C" void SetScaleY__5CFontFf(float, CFont*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" int GetWidth__5CFontFPc(CFont*, int);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, int);
-extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
@@ -452,26 +438,26 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 
 	if (isBossStage) {
 		if (cmdIndex == 2) {
-			SetTlut__5CFontFi(font, 4);
+			font->SetTlut(4);
 		} else if (cmdIndex < 2) {
 			if (cmdIndex == 0) {
-				SetTlut__5CFontFi(font, 2);
+				font->SetTlut(2);
 			} else if (cmdIndex >= 0) {
-				SetTlut__5CFontFi(font, 1);
+				font->SetTlut(1);
 			} else {
-				SetTlut__5CFontFi(font, 7);
+				font->SetTlut(7);
 			}
 		} else if (cmdIndex == 4) {
-			SetTlut__5CFontFi(font, 7);
+			font->SetTlut(7);
 		} else if (cmdIndex < 4) {
-			SetTlut__5CFontFi(font, 6);
+			font->SetTlut(6);
 		} else {
-			SetTlut__5CFontFi(font, 7);
+			font->SetTlut(7);
 		}
 	} else if (cmdIndex == 0) {
-		SetTlut__5CFontFi(font, 7);
+		font->SetTlut(7);
 	} else {
-		SetTlut__5CFontFi(font, 4);
+		font->SetTlut(4);
 	}
 
 	const double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
@@ -485,9 +471,9 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
 	}
 
-	SetScale__5CFontFf(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)), font);
+	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
 
-	const double textWidth = static_cast<double>(GetWidth__5CFontFPc(font, commandLabel));
+	const double textWidth = static_cast<double>(font->GetWidth(commandLabel));
 	const float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
 	float clampedAlpha = FLOAT_803309c0;
 	if (alphaRange >= FLOAT_803309c0) {
@@ -500,7 +486,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	const int alpha = static_cast<int>(static_cast<float>(static_cast<double>(FLOAT_80330a34) * static_cast<double>(alphaScale)) * clampedAlpha);
 	unsigned int colorRaw[1];
 	__ct__6CColorFUcUcUcUc(colorRaw, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
-	SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(colorRaw));
+	font->SetColor(*reinterpret_cast<GXColor*>(colorRaw));
 
 	const double textHeight = static_cast<double>(font->m_glyphWidth) * font->scaleY;
 	const float textX = static_cast<float>(
@@ -512,10 +498,10 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	                                                                                         static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) +
 	                                                                                                                            static_cast<double>(posY)))))));
 
-	SetPosX__5CFontFf(textX, font);
-	SetPosY__5CFontFf(textY, font);
-	SetPosZ__5CFontFf(FLOAT_803309c0, font);
-	Draw__5CFontFPc(font, commandLabel);
+	font->SetPosX(textX);
+	font->SetPosY(textY);
+	font->SetPosZ(FLOAT_803309c0);
+	font->Draw(commandLabel);
 }
 
 /*
@@ -660,10 +646,10 @@ void CRingMenu::onDraw()
 				                   : _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
 
 				CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcsRaw() + 0xFC));
-				DrawInit__5CFontFv(font);
-				SetMargin__5CFontFf(FLOAT_80330a8c, font);
-				SetShadow__5CFontFi(font, 1);
-				SetTlut__5CFontFi(font, 4);
+				font->DrawInit();
+				font->SetMargin(FLOAT_80330a8c);
+				font->SetShadow(1);
+				font->SetTlut(4);
 
 				double scroll = static_cast<double>(RingMenuFloat(this, 0x50C));
 				while (scroll >= static_cast<double>(FLOAT_803309cc)) {
@@ -734,34 +720,34 @@ void CRingMenu::onDraw()
 				fade = static_cast<double>(FLOAT_803309cc) - fade;
 			}
 
-			DrawInit__5CFontFv(font);
-			SetMargin__5CFontFf(FLOAT_80330a8c, font);
-			SetShadow__5CFontFi(font, 1);
+			font->DrawInit();
+			font->SetMargin(FLOAT_80330a8c);
+			font->SetShadow(1);
 
 			float textScale;
 			if (group == 1) {
-				SetTlut__5CFontFi(font, 0xE);
+				font->SetTlut(0xE);
 				textScale = FLOAT_80330a4c;
 			} else if (group == 0) {
-				SetTlut__5CFontFi(font, 0xD);
+				font->SetTlut(0xD);
 				textScale = FLOAT_80330ab8;
 			} else {
-				SetTlut__5CFontFi(font, (buttonValue == 1) ? 7 : 4);
+				font->SetTlut((buttonValue == 1) ? 7 : 4);
 				const double wobble = sin(static_cast<double>(FLOAT_80330a0c) * static_cast<double>(FLOAT_803309cc - fade));
 				textScale = FLOAT_80330a4c * (FLOAT_80330abc * static_cast<float>(wobble) + FLOAT_803309cc);
 			}
 
-			SetScaleX__5CFontFf(textScale, font);
-			SetScaleY__5CFontFf(textScale, font);
+			font->SetScaleX(textScale);
+			font->SetScaleY(textScale);
 
-			const float width = static_cast<float>(GetWidth__5CFontFPc(font, labelId));
+			const float width = static_cast<float>(font->GetWidth(labelId));
 			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
 			if ((group == 2) && (RingMenuInt(this, 0x30) >= 0)) {
 				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
 			}
 
 			GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
-			SetColor__5CFontF8_GXColor(font, &textColor);
+			font->SetColor(textColor);
 
 			float textX;
 			float textY;
@@ -776,11 +762,11 @@ void CRingMenu::onDraw()
 				textY = FLOAT_80330ab4 + drawY;
 			}
 
-			SetPosX__5CFontFf(textX, font);
-			SetPosY__5CFontFf(textY, font);
-			SetPosZ__5CFontFf(FLOAT_803309c0, font);
+			font->SetPosX(textX);
+			font->SetPosY(textY);
+			font->SetPosZ(FLOAT_803309c0);
 			if (group != 2) {
-				Draw__5CFontFPc(font, labelId);
+				font->Draw(labelId);
 			}
 			DrawInit__8CMenuPcsFv(MenuPcsVoid());
 

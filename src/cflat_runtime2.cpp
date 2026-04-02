@@ -18,14 +18,13 @@
 #include "ffcc/textureman.h"
 #include <math.h>
 #include <string.h>
+#include "ffcc/fontman.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 class CFont;
 
 extern "C" void reset__6CAStarFv(void*);
 extern "C" void drawAStar__6CAStarFv(void*);
-extern "C" int printf(const char*, ...);
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" int __cntlzw(unsigned int);
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void CheckGameOver__10CGPartyObjFv();
 extern "C" void DrawDebug__8CGObjectFP5CFont(CGObject*, CFont*);
@@ -59,14 +58,6 @@ extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, P
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetZMode__5CFontFii(CFont*, int, int);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
@@ -1553,14 +1544,14 @@ void CFlatRuntime2::Calc()
 void CFlatRuntime2::Draw()
 {
 	CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
-	SetScale__5CFontFf(1.0f, font);
-	SetShadow__5CFontFi(font, 1);
-	SetMargin__5CFontFf(0.0f, font);
-	SetZMode__5CFontFii(font, 0, 0);
-	DrawInit__5CFontFv(font);
-	SetTlut__5CFontFi(font, 7);
+	font->SetScale(1.0f);
+	font->SetShadow(1);
+	font->SetMargin(0.0f);
+	font->SetZMode(0, 0);
+	font->DrawInit();
+	font->SetTlut(7);
 	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-	SetColor__5CFontF8_GXColor(font, &color);
+	font->SetColor(color);
 
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
@@ -1572,17 +1563,17 @@ void CFlatRuntime2::Draw()
 		DrawDebug__8CGObjectFP5CFont(object, font);
 	}
 
-	SetZMode__5CFontFii(font, 0, 0);
-	SetPosZ__5CFontFf(1.0f, font);
+	font->SetZMode(0, 0);
+	font->SetPosZ(1.0f);
 	Mtx44 projection;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
-	SetScale__5CFontFf(0.875f, font);
-	SetShadow__5CFontFi(font, 1);
-	SetMargin__5CFontFf(0.0f, font);
-	SetZMode__5CFontFii(font, 1, 1);
-	DrawInit__5CFontFv(font);
+	font->SetScale(0.875f);
+	font->SetShadow(1);
+	font->SetMargin(0.0f);
+	font->SetZMode(1, 1);
+	font->DrawInit();
 
 	for (CGItemObj* item = reinterpret_cast<CGItemObj*>(
 			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 0x1D));
@@ -1592,8 +1583,8 @@ void CFlatRuntime2::Draw()
 		DrawOmoideName__9CGItemObjFP5CFont(item, font);
 	}
 
-	SetZMode__5CFontFii(font, 0, 0);
-	SetPosZ__5CFontFf(1.0f, font);
+	font->SetZMode(0, 0);
+	font->SetPosZ(1.0f);
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x40), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 

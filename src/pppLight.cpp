@@ -7,8 +7,6 @@
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
-extern unsigned char gPppInSubFrameCalc;
-
 struct pppLightTarget {
 	int unk0;
 	unsigned char* obj;

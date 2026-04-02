@@ -25,8 +25,6 @@ extern "C" char DAT_801d637c[];
 extern "C" char DAT_801d63c0[];
 extern "C" char DAT_801d6400[];
 extern "C" char DAT_801d643c[];
-extern "C" int __cntlzw(unsigned int);
-
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" char s_graphic_cpp_801d6348[];
 extern "C" char s_CGraphic_801d6330[];

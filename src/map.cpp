@@ -16,6 +16,7 @@
 #include "ffcc/system.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMapMng MapMng;
 
@@ -91,7 +92,6 @@ extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void SetLink__7CMapObjFv();
 extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static char s_map_cpp[] = "map.cpp";

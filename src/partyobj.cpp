@@ -8,6 +8,8 @@
 #include "ffcc/itemobj.h"
 
 #include <math.h>
+#include "ffcc/fontman.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -15,12 +17,6 @@ extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
@@ -2593,11 +2589,11 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	sprintf(text, "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d",
 	        commandMode, m_lastStateId, m_subState, m_subFrame, alive, targetState, sGhostPartyWork.mood);
 
-	float width = static_cast<float>(GetWidth__5CFontFPc(font, text));
-	SetPosX__5CFontFf(x - width * 0.5f, font);
-	SetPosY__5CFontFf(y, font);
-	SetPosZ__5CFontFf(z, font);
-	Draw__5CFontFPc(font, text);
+	float width = static_cast<float>(font->GetWidth(text));
+	font->SetPosX(x - width * 0.5f);
+	font->SetPosY(y);
+	font->SetPosZ(z);
+	font->Draw(text);
 	y -= 12.0f;
 }
 

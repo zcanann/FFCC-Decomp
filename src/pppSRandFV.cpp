@@ -3,10 +3,9 @@
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "dolphin/types.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppSRandFVSingleSampleScale = 2.0f;
-extern f32 gPppDefaultValueBuffer[];
-
 void randfloat(float, float);
 void randf(unsigned char);
 
@@ -90,7 +89,7 @@ void pppSRandFV(void* param1, void* param2, void* param3)
         randVec = (f32*)(self + *info->fieldC + 0x80);
     }
 
-    f32* target = (cfg->field4 == -1) ? gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
+    f32* target = (cfg->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
 
     {
         f32 value = cfg->field8 * randVec[0] - cfg->field8;

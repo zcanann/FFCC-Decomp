@@ -15,15 +15,6 @@ extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
 namespace {
@@ -567,18 +558,18 @@ void CMenuPcs::MLstDraw()
 	}
 
 	CFont* font = members.m_font;
-	SetMargin__5CFontFf(1.0f, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(1.0f, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(1.0f);
+	font->SetShadow(0);
+	font->SetScale(1.0f);
+	font->DrawInit();
 
 	item = list->entries;
 	for (int i = 0; i < itemCount; i++) {
 		CColor color(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha));
-		SetColor__5CFontF8_GXColor(font, &color.color);
+		font->SetColor(color.color);
 
 		const char* text = GetMenuStr__8CMenuPcsFi(this, i + 0x2e);
-		GetWidth__5CFontFPc(font, text);
+		font->GetWidth(text);
 
 		float textX = (float)(item->x + 0x28);
 		float textY = (float)(item->y - 3);
@@ -586,9 +577,9 @@ void CMenuPcs::MLstDraw()
 			textX += 6.0f;
 		}
 
-		SetPosX__5CFontFf(textX, font);
-		SetPosY__5CFontFf(textY, font);
-		Draw__5CFontFPc(font, text);
+		font->SetPosX(textX);
+		font->SetPosY(textY);
+		font->Draw(text);
 
 		item++;
 	}

@@ -12,6 +12,7 @@
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -27,7 +28,6 @@ extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
 extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" int __cntlzw(unsigned int);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
@@ -52,7 +52,6 @@ extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, uns
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char s_no_texture____801da7e8[];
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" double fmod(double, double);
 
 static void releaseRef(unsigned char* p, int offset)

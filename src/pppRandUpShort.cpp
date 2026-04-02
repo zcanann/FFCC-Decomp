@@ -3,10 +3,9 @@
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandUpShortDualSampleScale = 0.5f;
-extern s16 gPppDefaultValueBuffer[];
-
 struct RandUpShortParam {
     s32 targetId;
     s32 sourceOffset;
@@ -58,7 +57,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
 
     u16 scale = in->scale;
     f32 scaled = (f32)scale * *valuePtr;

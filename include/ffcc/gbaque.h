@@ -147,7 +147,7 @@ public:
     unsigned int GetSPMode(int);
     unsigned int GetMemorysFlg(int);
     void ClrMemorysFlg(int);
-    unsigned char GetMemorys(int);
+    unsigned int GetMemorys(int);
     unsigned int GetCmdNumFlg(int);
     void ClrCmdNumFlg(int);
     int GetCmdNum(int);

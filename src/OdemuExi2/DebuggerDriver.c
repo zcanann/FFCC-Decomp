@@ -15,8 +15,6 @@ static u8 EXIInputFlag;
 
 static u8 SendCount = 0x80;
 
-u64 DebuggerDriverSDataPad = 0;
-
 #define ROUND_UP(x, align) (((x) + (align)-1) & (-(align)))
 
 void DBGEXIInit() {

@@ -1055,7 +1055,11 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/notify.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/serpoll.c"),
+            Object(
+                NonMatching,
+                "TRK_MINNOW_DOLPHIN/serpoll.c",
+                cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
+            ),
             Object(
                 NonMatching,
                 "TRK_MINNOW_DOLPHIN/support.c",

@@ -3,9 +3,9 @@
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandIntSingleSampleScale = 2.0f;
-extern s32 gPppDefaultValueBuffer[];
 /*
  * --INFO--
  * PAL Address: 0x80062194
@@ -60,6 +60,6 @@ void pppRandInt(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s32* target = (in->field4 == -1) ? gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
+    s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
     *target += (s32)((f32)in->field8 * *valuePtr - (f32)in->field8);
 }

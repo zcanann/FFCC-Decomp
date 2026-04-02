@@ -21,6 +21,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMenuPcs MenuPcs;
 u8 gMenuProcessTable[0x15C];
@@ -46,8 +47,6 @@ extern char s_dvd__smenu_gc23_fnt_801d9d8c[];
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
-extern "C" int __cntlzw(unsigned int);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);

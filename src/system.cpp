@@ -27,7 +27,6 @@ extern "C" {
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
 }
 
-extern "C" int __cntlzw(unsigned int);
 extern void* __vt__7CSystem[];
 CSystem System;
 

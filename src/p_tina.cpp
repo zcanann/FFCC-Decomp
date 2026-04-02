@@ -12,6 +12,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/USBStreamData.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 char* gDebugSpinnerText = 0;
 unsigned char gDebugSpinnerTextInitialized = 0;
@@ -30,7 +31,6 @@ static char s_tinaHeapFmt[] = "hpm :%f / max :%f\n";
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" void pppLoadPmd__8CPartMngFPCc(CPartMng*, const char*);

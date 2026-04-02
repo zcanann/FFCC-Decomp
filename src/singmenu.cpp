@@ -18,6 +18,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
@@ -73,22 +74,9 @@ extern "C" void __dla__FPv(void*);
 extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetScaleX__5CFontFf(float, CFont*);
-extern "C" void SetScaleY__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
 extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
@@ -888,32 +876,32 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
     DrawInit__8CMenuPcsFv(this);
     CFont* font = *reinterpret_cast<CFont**>(self + 0xF8);
-    SetMargin__5CFontFf(0.0f, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_803329b8, font);
+    font->SetMargin(0.0f);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_803329b8);
 
     _GXColor fontColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
-    SetColor__5CFontF8_GXColor(font, &fontColor);
-    DrawInit__5CFontFv(font);
+    font->SetColor(fontColor);
+    font->DrawInit();
 
     char* charaName = reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0x3CA);
-    float titleWidth = static_cast<float>(GetWidth__5CFontFPc(font, charaName));
+    float titleWidth = static_cast<float>(font->GetWidth(charaName));
     float titleX = FLOAT_803329d4 + (FLOAT_803329d8 - titleWidth) * static_cast<float>(DOUBLE_80332968);
-    SetTlut__5CFontFi(font, 0x12);
-    SetPosX__5CFontFf(titleX, font);
-    SetPosY__5CFontFf(FLOAT_803329fc, font);
-    Draw__5CFontFPc(font, charaName);
+    font->SetTlut(0x12);
+    font->SetPosX(titleX);
+    font->SetPosY(FLOAT_803329fc);
+    font->Draw(charaName);
 
-    SetTlut__5CFontFi(font, 0x17);
-    SetPosX__5CFontFf(titleX, font);
-    SetPosY__5CFontFf(FLOAT_80332a00, font);
-    Draw__5CFontFPc(font, charaName);
+    font->SetTlut(0x17);
+    font->SetPosX(titleX);
+    font->SetPosY(FLOAT_80332a00);
+    font->Draw(charaName);
 
-    SetTlut__5CFontFi(font, 0x15);
+    font->SetTlut(0x15);
     float y = FLOAT_80332a04;
     for (int i = 0; i < 4; i++) {
-        SetPosX__5CFontFf(FLOAT_803329d4, font);
-        SetPosY__5CFontFf(y - 5.0f, font);
+        font->SetPosX(FLOAT_803329d4);
+        font->SetPosY(y - 5.0f);
 
         char* label;
         if (languageId == 3) {
@@ -933,21 +921,21 @@ void CMenuPcs::DrawSingleStat(float alpha)
         }
 
         if ((languageId == 2) && (i == 3)) {
-            SetScaleX__5CFontFf(FLOAT_80332a08, font);
-            SetScaleY__5CFontFf(FLOAT_803329b8, font);
+            font->SetScaleX(FLOAT_80332a08);
+            font->SetScaleY(FLOAT_803329b8);
         } else {
-            SetScaleX__5CFontFf(FLOAT_803329b8, font);
+            font->SetScaleX(FLOAT_803329b8);
         }
-        Draw__5CFontFPc(font, label);
+        font->Draw(label);
 
         font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
         if (languageId == 2) {
-            SetMargin__5CFontFf(FLOAT_80332a0c, font);
-            SetScaleX__5CFontFf(FLOAT_80332a08, font);
-            SetScaleY__5CFontFf(FLOAT_803329b8, font);
+            font->SetMargin(FLOAT_80332a0c);
+            font->SetScaleX(FLOAT_80332a08);
+            font->SetScaleY(FLOAT_803329b8);
         } else {
-            SetMargin__5CFontFf(FLOAT_80332a10, font);
-            SetScale__5CFontFf(FLOAT_803329b8, font);
+            font->SetMargin(FLOAT_80332a10);
+            font->SetScale(FLOAT_803329b8);
         }
 
         unsigned short stat;
@@ -963,17 +951,17 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         char valueText[36];
         sprintf(valueText, "%d", stat);
-        float valueW = static_cast<float>(GetWidth__5CFontFPc(font, valueText));
-        SetPosX__5CFontFf(FLOAT_80332a18 - valueW, font);
-        Draw__5CFontFPc(font, valueText);
+        float valueW = static_cast<float>(font->GetWidth(valueText));
+        font->SetPosX(FLOAT_80332a18 - valueW);
+        font->Draw(valueText);
 
         font->renderFlags &= 0xEF;
-        SetMargin__5CFontFf(FLOAT_80332934, font);
+        font->SetMargin(FLOAT_80332934);
         y += FLOAT_80332a1c;
     }
 
     font->renderFlags &= 0xEF;
-    SetMargin__5CFontFf(FLOAT_80332934, font);
+    font->SetMargin(FLOAT_80332934);
     DrawInit__8CMenuPcsFv(this);
 }
 
@@ -1527,15 +1515,15 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
  */
 void CMenuPcs::DrawShadowFont(CFont* font, char* text, float x, float y, int tlut, int shadowTlut)
 {
-    SetTlut__5CFontFi(font, shadowTlut);
-    SetPosX__5CFontFf(FLOAT_80332934 + x, font);
-    SetPosY__5CFontFf((FLOAT_80332934 + y) - FLOAT_80332954, font);
-    Draw__5CFontFPc(font, text);
+    font->SetTlut(shadowTlut);
+    font->SetPosX(FLOAT_80332934 + x);
+    font->SetPosY((FLOAT_80332934 + y) - FLOAT_80332954);
+    font->Draw(text);
 
-    SetTlut__5CFontFi(font, tlut);
-    SetPosX__5CFontFf(x, font);
-    SetPosY__5CFontFf(y - FLOAT_80332954, font);
-    Draw__5CFontFPc(font, text);
+    font->SetTlut(tlut);
+    font->SetPosX(x);
+    font->SetPosY(y - FLOAT_80332954);
+    font->Draw(text);
 }
 
 /*
@@ -1549,10 +1537,10 @@ void CMenuPcs::DrawShadowFont(CFont* font, char* text, float x, float y, int tlu
  */
 void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int tlut, int)
 {
-    SetTlut__5CFontFi(font, tlut);
-    SetPosX__5CFontFf(x, font);
-    SetPosY__5CFontFf(y - FLOAT_80332954, font);
-    Draw__5CFontFPc(font, text);
+    font->SetTlut(tlut);
+    font->SetPosX(x);
+    font->SetPosY(y - FLOAT_80332954);
+    font->Draw(text);
 }
 
 /*
@@ -1869,13 +1857,13 @@ void CMenuPcs::DrawSingWin(short mode)
 void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 {
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
-    SetMargin__5CFontFf(FLOAT_80332934, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_8032ea78, font);
-    DrawInit__5CFontFv(font);
+    font->SetMargin(FLOAT_80332934);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_8032ea78);
+    font->DrawInit();
 
     _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &color);
+    font->SetColor(color);
 
     int lineCount = AStar.m_bestPath.m_pathLength;
     if (useDynamic == 0) {
@@ -1887,7 +1875,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
         short textId = *reinterpret_cast<short*>(staticInfo + 4);
-        int textWidth = GetWidth__5CFontFPc(font, GetSingWinMessage(textId, dynamicText, useDynamic));
+        int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }
@@ -1908,16 +1896,16 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     dynamicText = s_DynamicMessStr;
     staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
-        SetTlut__5CFontFi(font, ((activeMask & (1 << i)) != 0) + 8);
+        font->SetTlut(((activeMask & (1 << i)) != 0) + 8);
 
         short textId = *reinterpret_cast<short*>(staticInfo + 4);
         const char* text = GetSingWinMessage(textId, dynamicText, useDynamic);
         if (strlen(text) != 0) {
             char lineBuffer[128];
             strcpy(lineBuffer, text);
-            SetPosX__5CFontFf(x, font);
-            SetPosY__5CFontFf(y - FLOAT_80332954, font);
-            Draw__5CFontFPc(font, lineBuffer);
+            font->SetPosX(x);
+            font->SetPosY(y - FLOAT_80332954);
+            font->Draw(lineBuffer);
         }
 
         staticInfo += 2;
@@ -1940,9 +1928,9 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, int useDynamic)
 {
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
-    SetMargin__5CFontFf(FLOAT_80332934, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_8032ea78, font);
+    font->SetMargin(FLOAT_80332934);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_8032ea78);
 
     int lineCount = AStar.m_bestPath.m_pathLength;
     if (useDynamic == 0) {
@@ -1954,7 +1942,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
         short textId = *reinterpret_cast<short*>(staticInfo + 4);
-        int textWidth = GetWidth__5CFontFPc(font, GetSingWinMessage(textId, dynamicText, useDynamic));
+        int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }

@@ -4,6 +4,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include <string.h>
+#include "ffcc/fontman.h"
 
 typedef signed short s16;
 typedef unsigned char u8;
@@ -37,15 +38,6 @@ extern "C" void DrawEquipMark__8CMenuPcsFiif(double, CMenuPcs*, int, int);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
 extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" int GetWidth__5CFontFPc(void*, int);
-extern "C" void SetMargin__5CFontFf(float, void*);
-extern "C" void SetShadow__5CFontFi(void*, int);
-extern "C" void SetScale__5CFontFf(float, void*);
-extern "C" void DrawInit__5CFontFv(void*);
-extern "C" void SetColor__5CFontF8_GXColor(void*, void*);
-extern "C" void SetPosX__5CFontFf(float, void*);
-extern "C" void SetPosY__5CFontFf(float, void*);
-extern "C" void Draw__5CFontFPc(void*, int);
 
 static const float FLOAT_80332eb8 = 0.0f;
 static const float FLOAT_80332ee0 = 1.0f;
@@ -676,28 +668,28 @@ void CMenuPcs::EquipDraw()
 		item += 0x20;
 	}
 
-	void* font = GetEquipFont(this);
-	SetMargin__5CFontFf(FLOAT_80332ee0, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(FLOAT_80332ee8, font);
-	DrawInit__5CFontFv(font);
+	CFont* font = (CFont*)GetEquipFont(this);
+	font->SetMargin(FLOAT_80332ee0);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_80332ee8);
+	font->DrawInit();
 
 	item = menuData + 4;
 	for (int i = 0; i < 4; i++) {
 		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
 			u8 alpha = (u8)(FLOAT_80332ee4 * *(float*)(item + 8));
 			u32 color = (u32)alpha | 0xFFFFFF00;
-			SetColor__5CFontF8_GXColor(font, &color);
+			font->SetColor(*reinterpret_cast<_GXColor*>(&color));
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
-			int str = GetAttrStr__8CMenuPcsFi(this, itemIdx);
+			const char* str = (const char*)GetAttrStr__8CMenuPcsFi(this, itemIdx);
 			if ((mode == 0) && (i == (int)*(s16*)(menuState + 0x26))) {
 				helpItem = itemIdx;
 			}
-			double textX = (double)item[0] + ((double)item[2] - (double)GetWidth__5CFontFPc(font, str)) * DOUBLE_80332ed0;
+			double textX = (double)item[0] + ((double)item[2] - (double)font->GetWidth(str)) * DOUBLE_80332ed0;
 			double textY = (double)item[1] + 11.0;
-			SetPosX__5CFontFf((float)textX, font);
-			SetPosY__5CFontFf((float)(textY - (double)FLOAT_80332eec), font);
-			Draw__5CFontFPc(font, str);
+			font->SetPosX((float)textX);
+			font->SetPosY((float)(textY - (double)FLOAT_80332eec));
+			font->Draw(str);
 		}
 		item += 0x20;
 	}

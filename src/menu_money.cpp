@@ -20,14 +20,6 @@ extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern float FLOAT_80332f60;
 extern float FLOAT_80332f64;
@@ -447,24 +439,24 @@ void CMenuPcs::MoneyDraw()
     }
 
     CFont* font = GetMoneyFont(this);
-    SetMargin__5CFontFf(FLOAT_80332f70, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(FLOAT_80332f7c, font);
-    DrawInit__5CFontFv(font);
+    font->SetMargin(FLOAT_80332f70);
+    font->SetShadow(0);
+    font->SetScale(FLOAT_80332f7c);
+    font->DrawInit();
 
     {
         float alpha = *reinterpret_cast<float*>(firstEntry + 8);
         GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * alpha)};
-        SetColor__5CFontF8_GXColor(font, &color);
+        font->SetColor(color);
     }
 
     const char* label = GetMenuStr__8CMenuPcsFi(this, 0x15);
     for (int i = 0; i < 2; i++) {
         float textX = (float)(firstEntry[0] + 0xB6);
         float textY = (FLOAT_80332f68 + (FLOAT_80332f68 * (float)i + (float)(firstEntry[1] + 0x18))) - FLOAT_80332f80;
-        SetPosX__5CFontFf(textX, font);
-        SetPosY__5CFontFf(textY - FLOAT_80332f84, font);
-        Draw__5CFontFPc(font, label);
+        font->SetPosX(textX);
+        font->SetPosY(textY - FLOAT_80332f84);
+        font->Draw(label);
     }
 
     DrawInit__8CMenuPcsFv(this);

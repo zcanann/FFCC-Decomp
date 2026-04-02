@@ -8,23 +8,12 @@
 #include <string.h>
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" int __cntlzw(unsigned int);
-
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern float FLOAT_80332f2c;
 extern float FLOAT_80332f28;
@@ -615,10 +604,10 @@ void CMenuPcs::TmpArtiDraw()
 	}
 
 	CFont* font = GetTmpArtiFont(this);
-	SetMargin__5CFontFf(FLOAT_80332f30, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(FLOAT_80332f34, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(FLOAT_80332f30);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_80332f34);
+	font->DrawInit();
 
 	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
 	entry = (short*)(GetTmpArtiListBase(this) + 8);
@@ -628,16 +617,16 @@ void CMenuPcs::TmpArtiDraw()
 		if (-1 < itemId) {
 			float alpha = *(float*)(entry + 8);
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332f28 * alpha));
-			SetColor__5CFontF8_GXColor(font, &textColor.color);
+			font->SetColor(textColor.color);
 
 			const char* text = flatData->table[0].strings[itemId * 5 + 4];
-			int width = GetWidth__5CFontFPc(font, text);
+			int width = font->GetWidth(text);
 			float posX = (float)(((double)((float)entry[2] - (float)width) * DOUBLE_80332f20) + (double)(float)entry[0]);
 			float posY = ((float)((int)entry[1] + 11)) - FLOAT_80332f38;
 
-			SetPosX__5CFontFf(posX, font);
-			SetPosY__5CFontFf(posY, font);
-			Draw__5CFontFPc(font, text);
+			font->SetPosX(posX);
+			font->SetPosY(posY);
+			font->Draw(text);
 		}
 		entry += 0x20;
 		foodPtr += 2;

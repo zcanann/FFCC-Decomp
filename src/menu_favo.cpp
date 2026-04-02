@@ -5,11 +5,9 @@
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 unsigned char s_rank[0x20];
-
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" int __cntlzw(unsigned int);
 
 extern float FLOAT_80333040;
 extern float FLOAT_80333048;

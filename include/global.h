@@ -100,7 +100,9 @@
 #endif
 
 // Intrinsics
-// extern int __cntlzw(uint);
+#ifdef __MWERKS__
+int __cntlzw(unsigned int);
+#endif
 // extern int __rlwimi(int, int, int, int, int);
 // extern void __dcbz(void*, int);
 // extern void __sync();

@@ -16,7 +16,6 @@ CDbgMenuPcs DbgMenuPcs;
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
 
-extern "C" int __cntlzw(unsigned int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(

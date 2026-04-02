@@ -9,7 +9,6 @@
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" int __cntlzw(unsigned int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);

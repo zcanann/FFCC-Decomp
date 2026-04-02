@@ -9,13 +9,13 @@
 
 #include <math.h>
 #include <string.h>
+#include "ffcc/fontman.h"
 
 extern "C" void onCreate__8CGPrgObjFv(void*);
 extern "C" void onDestroy__8CGPrgObjFv(void*);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
 extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
-extern "C" int __cntlzw(unsigned int);
 extern "C" void Attach__8CGObjectFP8CGObjectPcP3Vec(void*, void*, char*, Vec*);
 extern "C" void Detach__8CGObjectFv(void*);
 extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
@@ -56,14 +56,7 @@ extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned 
 extern "C" int IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
 extern "C" void onFrame__8CGPrgObjFv(void*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
@@ -1102,25 +1095,25 @@ void CGItemObj::DrawOmoideName(CFont* font)
 		return;
 	}
 
-	SetTlut__5CFontFi(font, 7);
+	font->SetTlut(7);
 
 	int alphaInt = (int)(FLOAT_80331b30 * *(float*)(self + 0x4B0));
 	GXColor textColor;
 	__ct__6CColorFUcUcUcUc(&textColor, 0xFF, 0xFF, 0xFF, (unsigned char)alphaInt);
-	SetColor__5CFontF8_GXColor(font, &textColor);
+	font->SetColor(textColor);
 
 	const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
 	const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
-	int width = GetWidth__5CFontFPc(font, name);
+	int width = font->GetWidth(name);
 	float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
 	float posZ = *(float*)(self + 0x70) * depthScale;
 	float posY = -(FLOAT_80331b34 * *(float*)(self + 0x6C) * depthScale - FLOAT_80331b34);
 	float posX = -(FLOAT_80331b3c * (float)width - (FLOAT_80331b38 * *(float*)(self + 0x68) * depthScale + FLOAT_80331b38));
 
-	SetPosX__5CFontFf(posX, font);
-	SetPosY__5CFontFf(posY - FLOAT_80331b40, font);
-	SetPosZ__5CFontFf(posZ, font);
-	Draw__5CFontFPc(font, name);
+	font->SetPosX(posX);
+	font->SetPosY(posY - FLOAT_80331b40);
+	font->SetPosZ(posZ);
+	font->Draw(name);
 }
 
 /*

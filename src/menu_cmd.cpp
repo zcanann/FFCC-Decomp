@@ -39,16 +39,6 @@ extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 static const double DOUBLE_80332a58 = 1.0;
 static const double DOUBLE_80332a60 = 0.5;
@@ -1088,10 +1078,10 @@ void CMenuPcs::CmdDraw()
 	}
 
 	CFont* nameFont = GetMenuCmdMembers(this).m_nameFont;
-	SetMargin__5CFontFf(FLOAT_80332a70, nameFont);
-	SetShadow__5CFontFi(nameFont, 0);
-	SetScale__5CFontFf(FLOAT_80332ad8, nameFont);
-	DrawInit__5CFontFv(nameFont);
+	nameFont->SetMargin(FLOAT_80332a70);
+	nameFont->SetShadow(0);
+	nameFont->SetScale(FLOAT_80332ad8);
+	nameFont->DrawInit();
 
 	entry = drawList + 4;
 	caravanIter = caravanWork;
@@ -1107,7 +1097,7 @@ void CMenuPcs::CmdDraw()
 			textColor.g = 0xFF;
 			textColor.b = 0xFF;
 			textColor.a = static_cast<u8>(FLOAT_80332acc * alpha);
-			SetColor__5CFontF8_GXColor(nameFont, &textColor);
+			nameFont->SetColor(textColor);
 
 			const char* text;
 			if (i < 2) {
@@ -1129,12 +1119,12 @@ void CMenuPcs::CmdDraw()
 				}
 			}
 
-			const float textW = static_cast<float>(GetWidth__5CFontFPc(nameFont, text));
+			const float textW = static_cast<float>(nameFont->GetWidth(text));
 			const float px = static_cast<float>(entry[0]) + ((static_cast<float>(entry[2]) - textW) * 0.5f);
 			const float py = static_cast<float>(entry[1] + 3) - FLOAT_80332ae8;
-			SetPosX__5CFontFf(px, nameFont);
-			SetPosY__5CFontFf(py, nameFont);
-			Draw__5CFontFPc(nameFont, text);
+			nameFont->SetPosX(px);
+			nameFont->SetPosY(py);
+			nameFont->Draw(text);
 		}
 		caravanIter += 2;
 		entry += 0x20;
@@ -2076,11 +2066,11 @@ void CMenuPcs::DrawUniteList()
 	}
 
 	CFont* const font = GetMenuCmdMembers(this).m_helpFont;
-	SetMargin__5CFontFf(FLOAT_80332a70, font);
-	SetShadow__5CFontFi(font, 1);
-	SetScale__5CFontFf(FLOAT_80332ad8, font);
-	DrawInit__5CFontFv(font);
-	SetTlut__5CFontFi(font, 7);
+	font->SetMargin(FLOAT_80332a70);
+	font->SetShadow(1);
+	font->SetScale(FLOAT_80332ad8);
+	font->DrawInit();
+	font->SetTlut(7);
 
 	const s16 topX = list[4];
 	for (s32 i = 0; i < foodCount; i++) {
@@ -2097,7 +2087,7 @@ void CMenuPcs::DrawUniteList()
 		color.g = 0xFF;
 		color.b = 0xFF;
 		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
-		SetColor__5CFontF8_GXColor(font, &color);
+		font->SetColor(color);
 
 		const char* text = 0;
 		if (i < 2) {
@@ -2113,7 +2103,7 @@ void CMenuPcs::DrawUniteList()
 			text = flatText[skillId * 5 + 4];
 		}
 
-		const float width = static_cast<float>(GetWidth__5CFontFPc(font, text));
+		const float width = static_cast<float>(font->GetWidth(text));
 		float x = (static_cast<float>(entry[2]) - width) * static_cast<float>(DOUBLE_80332a60) + static_cast<float>(entry[0]);
 		if (topX != entry[0]) {
 			float diff = static_cast<float>(topX - entry[0]);
@@ -2125,9 +2115,9 @@ void CMenuPcs::DrawUniteList()
 			x = (target - x) * t + x;
 		}
 
-		SetPosX__5CFontFf(x, font);
-		SetPosY__5CFontFf(static_cast<float>(entry[1] + 3) - FLOAT_80332ae8, font);
-		Draw__5CFontFPc(font, text);
+		font->SetPosX(x);
+		font->SetPosY(static_cast<float>(entry[1] + 3) - FLOAT_80332ae8);
+		font->Draw(text);
 	}
 
 	DrawInit__8CMenuPcsFv(this);

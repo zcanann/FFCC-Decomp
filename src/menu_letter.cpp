@@ -8,6 +8,7 @@
 #include "ffcc/linkage.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
@@ -21,7 +22,6 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*, int, char*, char*, char*, char*, char*, char*, char*, char*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
@@ -35,17 +35,7 @@ extern "C" void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
 extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void DrawShadowFont__8CMenuPcsFP5CFontPcffii(CMenuPcs*, CFont*, const char*, float, float, int, int);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
@@ -1173,16 +1163,16 @@ void CMenuPcs::LetterListDraw()
 	LetterLstBaseDraw(*reinterpret_cast<float*>(menuDataBase + 0x58));
 
 	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0xF8);
-	SetMargin__5CFontFf(FLOAT_803330f8, font);
-	SetShadow__5CFontFi(font, 1);
-	SetScale__5CFontFf(FLOAT_803330f8, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(FLOAT_803330f8);
+	font->SetShadow(1);
+	font->SetScale(FLOAT_803330f8);
+	font->DrawInit();
 
 	GXColor titleColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58))};
-	SetColor__5CFontF8_GXColor(font, &titleColor);
+	font->SetColor(titleColor);
 
 	const char* menuTitle = GetMenuStr__8CMenuPcsFi(this, 0x1D);
-	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(GetWidth__5CFontFPc(font, menuTitle))) *
+	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(font->GetWidth(menuTitle))) *
 	                                  DOUBLE_803330a8);
 	DrawShadowFont__8CMenuPcsFP5CFontPcffii(this, font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
 
@@ -1191,7 +1181,7 @@ void CMenuPcs::LetterListDraw()
 	}
 
 	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	SetColor__5CFontF8_GXColor(font, &textColor);
+	font->SetColor(textColor);
 
 	const unsigned int caravanWork = Game.m_scriptFoodBase[0];
 	const int topRow = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34));
@@ -1212,17 +1202,17 @@ void CMenuPcs::LetterListDraw()
 			tlut = ((*reinterpret_cast<unsigned char*>(letterOffset) >> 5) & 1) ? 8 : 0;
 		}
 
-		SetTlut__5CFontFi(font, tlut);
+		font->SetTlut(tlut);
 
 		const char* from = flatData->m_tabl[5].m_strings[(letterWord & 0x7FC) >> 2];
-		SetPosX__5CFontFf(FLOAT_80333160, font);
-		SetPosY__5CFontFf(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)), font);
-		Draw__5CFontFPc(font, from);
+		font->SetPosX(FLOAT_80333160);
+		font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
+		font->Draw(from);
 
 		const char* subject = flatData->m_tabl[2].m_strings[(letterWord >> 7) & 0x1FF];
-		SetPosX__5CFontFf(FLOAT_80333164, font);
-		SetPosY__5CFontFf(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)), font);
-		Draw__5CFontFPc(font, subject);
+		font->SetPosX(FLOAT_80333164);
+		font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
+		font->Draw(subject);
 
 		y += 0x20;
 	}
@@ -1334,16 +1324,16 @@ void CMenuPcs::LetterMessDraw()
 	}
 
 	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0x108);
-	SetShadow__5CFontFi(font, 0);
-	SetMargin__5CFontFf(FLOAT_8033313c, font);
-	SetScale__5CFontFf(FLOAT_80333140, font);
-	DrawInit__5CFontFv(font);
-	SetTlut__5CFontFi(font, 0x1C);
+	font->SetShadow(0);
+	font->SetMargin(FLOAT_8033313c);
+	font->SetScale(FLOAT_80333140);
+	font->DrawInit();
+	font->SetTlut(0x1C);
 
 	{
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC));
 		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
-		SetColor__5CFontF8_GXColor(font, &color);
+		font->SetColor(color);
 	}
 
 	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
@@ -1372,9 +1362,9 @@ void CMenuPcs::LetterMessDraw()
 		}
 
 		if (strlen(curLine) != 0) {
-			SetPosX__5CFontFf(FLOAT_80333144, font);
-			SetPosY__5CFontFf(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)), font);
-			Draw__5CFontFPc(font, curLine);
+			font->SetPosX(FLOAT_80333144);
+			font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
+			font->Draw(curLine);
 		}
 
 		if (newline == 0) {

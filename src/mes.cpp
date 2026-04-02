@@ -4,19 +4,8 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/joybus.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFUs(CFont*, unsigned short);
-extern "C" float GetWidth__5CFontFUs(CFont*, unsigned short);
-extern "C" void SetShadow__5CFontFi(int, CFont*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetScaleX__5CFontFf(float, CFont*);
-extern "C" void SetScaleY__5CFontFf(float, CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void DrawQuit__5CFontFv(CFont*);
 extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -35,7 +24,6 @@ extern float FLOAT_803308b0;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14] = {};
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" int toupper(int);
 extern "C" int tolower(int);
 
@@ -375,10 +363,10 @@ void CMes::addString(char** text, int branchMode)
 		return;
 	}
 
-	SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), font);
-	SetMargin__5CFontFf(FLOAT_8033089c, font);
-	SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
-	SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+	font->SetShadow(*(int*)((char*)this + 0x3D38));
+	font->SetMargin(FLOAT_8033089c);
+	font->SetScaleX(*(float*)((char*)this + 0x3D44));
+	font->SetScaleY(*(float*)((char*)this + 0x3D48));
 
 	for (;;)
 	{
@@ -445,8 +433,8 @@ void CMes::addString(char** text, int branchMode)
 				break;
 			case 0x1A:
 				*(float*)((char*)this + 0x3D44) = FLOAT_803308a0 * (float)ReadTagS16(text);
-				SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
-				SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+				font->SetScaleX(*(float*)((char*)this + 0x3D44));
+				font->SetScaleY(*(float*)((char*)this + 0x3D48));
 				break;
 			case 0x1B:
 			{
@@ -501,10 +489,10 @@ void CMes::addString(char** text, int branchMode)
 				{
 					font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 				}
-				SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), font);
-				SetMargin__5CFontFf(FLOAT_8033089c, font);
-				SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
-				SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+				font->SetShadow(*(int*)((char*)this + 0x3D38));
+				font->SetMargin(FLOAT_8033089c);
+				font->SetScaleX(*(float*)((char*)this + 0x3D44));
+				font->SetScaleY(*(float*)((char*)this + 0x3D48));
 				break;
 			}
 			case 0x35:
@@ -512,8 +500,8 @@ void CMes::addString(char** text, int branchMode)
 				float scale = FLOAT_803308a0 * (float)ReadTagS16(text);
 				*(float*)((char*)this + 0x3D44) = scale;
 				*(float*)((char*)this + 0x3D48) = scale;
-				SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
-				SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+				font->SetScaleX(*(float*)((char*)this + 0x3D44));
+				font->SetScaleY(*(float*)((char*)this + 0x3D48));
 				break;
 			}
 			case 0x41:
@@ -596,7 +584,7 @@ render_char:
 		}
 		else
 		{
-			glyph[1] = GetWidth__5CFontFUs(font, ch);
+			glyph[1] = font->GetWidth(ch);
 		}
 		font->renderFlags &= 0xF7;
 
@@ -801,7 +789,7 @@ void CMes::Draw()
 				{
 					if (font != 0)
 					{
-						DrawQuit__5CFontFv(font);
+						font->DrawQuit();
 					}
 					DrawInit__8CMenuPcsFv(&MenuPcs);
 
@@ -884,7 +872,7 @@ void CMes::Draw()
 
 					if (font != 0)
 					{
-						DrawInit__5CFontFv(font);
+						font->DrawInit();
 					}
 				}
 				else
@@ -902,11 +890,11 @@ void CMes::Draw()
 							nextFont = font;
 						}
 
-						SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), nextFont);
-						SetMargin__5CFontFf(FLOAT_8033089c, nextFont);
-						SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), nextFont);
-						SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), nextFont);
-						DrawInit__5CFontFv(nextFont);
+						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
+						nextFont->SetMargin(FLOAT_8033089c);
+						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
+						nextFont->SetScaleY(*(float*)((char*)this + 0x3D48));
+						nextFont->DrawInit();
 						activeFontId = fontId;
 						font = nextFont;
 					}
@@ -925,21 +913,21 @@ void CMes::Draw()
 					}
 
 					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
-					SetColor__5CFontF8_GXColor(font, &color);
+					font->SetColor(color);
 
 					unsigned int tlut = (unsigned int)*(unsigned char*)((char*)glyph + 0x12);
 					if ((activeTlut != tlut) && (((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F) < 2))
 					{
-						SetTlut__5CFontFi(font, (int)tlut + *(int*)((char*)this + 0x3D34));
+						font->SetTlut((int)tlut + *(int*)((char*)this + 0x3D34));
 						activeTlut = tlut;
 					}
 
-					SetPosX__5CFontFf(*(float*)((char*)this + 0x3C9C) + *glyph, font);
-					SetPosY__5CFontFf(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2), font);
-					SetScaleX__5CFontFf(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A), font);
-					SetScaleY__5CFontFf(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11), font);
+					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);
+					font->SetPosY(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2));
+					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
+					font->SetScaleY(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11));
 					font->renderFlags = font->renderFlags & 0xF7 | 8;
-					Draw__5CFontFUs(font, (unsigned short)ch);
+					font->Draw((unsigned short)ch);
 					font->renderFlags &= 0xF7;
 				}
 			}
@@ -948,7 +936,7 @@ void CMes::Draw()
 			font = nextFont;
 		}
 
-		DrawQuit__5CFontFv(font);
+		font->DrawQuit();
 	}
 }
 
@@ -1367,17 +1355,17 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			}
 			else if ((tag == 0xA0) && (breakOnLineTag != 0))
 			{
-				SetPosX__5CFontFf((float)lineStartXInt, font);
-				SetPosY__5CFontFf((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY, font);
+				font->SetPosX((float)lineStartXInt);
+				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY);
 			}
 		}
 		else
 		{
 			if (drawChars != 0)
 			{
-				Draw__5CFontFUs(font, ch);
+				font->Draw(ch);
 			}
-			width = (unsigned int)((double)(float)width + (double)GetWidth__5CFontFUs(font, ch));
+			width = (unsigned int)((double)(float)width + (double)font->GetWidth(ch));
 			src = next;
 		}
 	}

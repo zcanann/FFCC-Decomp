@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void __dl__FPv(void*);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
@@ -67,7 +68,6 @@ extern "C" double DOUBLE_803333a0;
 extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -76,16 +76,6 @@ extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
-extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
@@ -630,22 +620,22 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     }
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
-    SetMargin__5CFontFf(FLOAT_80333258, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80333258, font);
-    DrawInit__5CFontFv(font);
-    SetTlut__5CFontFi(font, 7);
+    font->SetMargin(FLOAT_80333258);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80333258);
+    font->DrawInit();
+    font->SetTlut(7);
 
     unsigned char rgba[8];
     __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
+    font->SetColor(*reinterpret_cast<GXColor*>(rgba));
 
     const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x29);
-    float w = static_cast<float>(GetWidth__5CFontFPc(font, txt));
+    float w = static_cast<float>(font->GetWidth(txt));
     float tx = (FLOAT_80333380 - w) * 0.5f + 0x178;
-    SetPosX__5CFontFf(tx, font);
-    SetPosY__5CFontFf(0x184, font);
-    Draw__5CFontFPc(font, txt);
+    font->SetPosX(tx);
+    font->SetPosY(0x184);
+    font->Draw(txt);
     DrawInit__8CMenuPcsFv(this);
 
     if (yesNoSel != 0) {
@@ -716,21 +706,21 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     }
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80333258, font);
-    DrawInit__5CFontFv(font);
-    SetMargin__5CFontFf(FLOAT_80333258, font);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80333258);
+    font->DrawInit();
+    font->SetMargin(FLOAT_80333258);
 
     unsigned char rgba[8];
     __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF,
         static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha)));
-    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
-    SetTlut__5CFontFi(font, 6);
+    font->SetColor(*reinterpret_cast<GXColor*>(rgba));
+    font->SetTlut(6);
 
-    float textW = static_cast<float>(GetWidth__5CFontFPc(font, text));
-    SetPosX__5CFontFf(static_cast<float>(static_cast<int>(nameX)), font);
-    SetPosY__5CFontFf(static_cast<float>(baseY - 4), font);
-    Draw__5CFontFPc(font, text);
+    float textW = static_cast<float>(font->GetWidth(text));
+    font->SetPosX(static_cast<float>(static_cast<int>(nameX)));
+    font->SetPosY(static_cast<float>(baseY - 4));
+    font->Draw(text);
     DrawInit__8CMenuPcsFv(this);
 
     if (y != 0) {
@@ -810,29 +800,29 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     }
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
-    SetMargin__5CFontFf(FLOAT_80333258, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80333258, font);
-    DrawInit__5CFontFv(font);
-    SetTlut__5CFontFi(font, 7);
+    font->SetMargin(FLOAT_80333258);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80333258);
+    font->DrawInit();
+    font->SetTlut(7);
 
     unsigned char rgba[8];
     __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
+    font->SetColor(*reinterpret_cast<GXColor*>(rgba));
 
     const char* yesStr = GetMenuStr__8CMenuPcsFi(this, 1);
-    float yesW = static_cast<float>(GetWidth__5CFontFPc(font, yesStr));
+    float yesW = static_cast<float>(font->GetWidth(yesStr));
     float yesX = (FLOAT_803332b0 - yesW) * FLOAT_8033335c + 0x1D0;
-    SetPosX__5CFontFf(yesX, font);
-    SetPosY__5CFontFf(FLOAT_80333360, font);
-    Draw__5CFontFPc(font, yesStr);
+    font->SetPosX(yesX);
+    font->SetPosY(FLOAT_80333360);
+    font->Draw(yesStr);
 
     const char* noStr = GetMenuStr__8CMenuPcsFi(this, 2);
-    float noW = static_cast<float>(GetWidth__5CFontFPc(font, noStr));
+    float noW = static_cast<float>(font->GetWidth(noStr));
     float noX = (FLOAT_803332b0 - noW) * FLOAT_8033335c + 0x218;
-    SetPosX__5CFontFf(noX, font);
-    SetPosY__5CFontFf(FLOAT_80333360, font);
-    Draw__5CFontFPc(font, noStr);
+    font->SetPosX(noX);
+    font->SetPosY(FLOAT_80333360);
+    font->Draw(noStr);
 
     DrawInit__8CMenuPcsFv(this);
     if (yesNoSel != 0) {
@@ -1149,22 +1139,22 @@ void CMenuPcs::CmakeSexDraw()
     DrawCmakeTitle(2, 0.0f, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
-    SetMargin__5CFontFf(FLOAT_80333258, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(FLOAT_80333258, font);
-    DrawInit__5CFontFv(font);
+    font->SetMargin(FLOAT_80333258);
+    font->SetShadow(0);
+    font->SetScale(FLOAT_80333258);
+    font->DrawInit();
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
     unsigned char rgba[8];
     __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
+    font->SetColor(*reinterpret_cast<GXColor*>(rgba));
 
     for (int i = 0; i < 2; ++i) {
         const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x11 + i);
-        float x = FLOAT_80333288 - static_cast<float>(GetWidth__5CFontFPc(font, txt)) * FLOAT_80333298;
-        SetPosX__5CFontFf(x, font);
-        SetPosY__5CFontFf(0x9C + i * 0x28 - FLOAT_803332f4, font);
-        Draw__5CFontFPc(font, txt);
+        float x = FLOAT_80333288 - static_cast<float>(font->GetWidth(txt)) * FLOAT_80333298;
+        font->SetPosX(x);
+        font->SetPosY(0x9C + i * 0x28 - FLOAT_803332f4);
+        font->Draw(txt);
     }
     DrawInit__8CMenuPcsFv(this);
 
@@ -1366,23 +1356,23 @@ void CMenuPcs::CmakeJobDraw()
     DrawCmakeTitle(5, 0.0f, alpha);
 
     CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
-    SetMargin__5CFontFf(FLOAT_80333258, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScale__5CFontFf(FLOAT_80333258, font);
-    DrawInit__5CFontFv(font);
+    font->SetMargin(FLOAT_80333258);
+    font->SetShadow(0);
+    font->SetScale(FLOAT_80333258);
+    font->DrawInit();
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
     unsigned char rgba[8];
     __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
+    font->SetColor(*reinterpret_cast<GXColor*>(rgba));
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr__8CMenuPcsFi(this, i);
         float x = (i < 4) ? 272.0f : 424.0f;
         int row = (i < 4) ? i : (i - 4);
-        SetPosX__5CFontFf(x, font);
-        SetPosY__5CFontFf(0x70 + row * 0x28 - FLOAT_803332f4, font);
-        Draw__5CFontFPc(font, txt);
+        font->SetPosX(x);
+        font->SetPosY(0x70 + row * 0x28 - FLOAT_803332f4);
+        font->Draw(txt);
     }
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {

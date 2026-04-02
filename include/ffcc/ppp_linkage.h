@@ -9,6 +9,7 @@ extern "C" {
 
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
+extern unsigned char gPppInSubFrameCalc;
 
 #ifdef __cplusplus
 }

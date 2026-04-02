@@ -8,6 +8,7 @@
 #include "ffcc/symbols_shared.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CCharaPcs CharaPcs;
 
@@ -17,7 +18,6 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);

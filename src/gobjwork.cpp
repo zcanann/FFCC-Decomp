@@ -8,6 +8,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/system.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 namespace {
 static inline unsigned short* GetItemDataPtr(int itemIdx)
@@ -33,8 +34,6 @@ static inline float GetStatusMultiplier(int offset)
 }
 
 extern "C" void __dl__FPv(void*);
-extern "C" int __cntlzw(unsigned int);
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);

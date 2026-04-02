@@ -16,17 +16,6 @@ extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned lo
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScaleX__5CFontFf(float, CFont*);
-extern "C" void SetScaleY__5CFontFf(float, CFont*);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 
@@ -573,14 +562,14 @@ void CMenuPcs::CompaDraw()
 	}
 
 	CFont* font = listFont;
-	SetMargin__5CFontFf(0.0f, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScaleX__5CFontFf(0.875f, font);
-	SetScaleY__5CFontFf(1.0f, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(0.0f);
+	font->SetShadow(0);
+	font->SetScaleX(0.875f);
+	font->SetScaleY(1.0f);
+	font->DrawInit();
 
 	GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * globalAlpha)};
-	SetColor__5CFontF8_GXColor(font, &textColor);
+	font->SetColor(textColor);
 
 	const CompaFlatData* flatData = reinterpret_cast<const CompaFlatData*>(&Game.m_cFlatDataArr[1]);
 	memberIndex = 0;
@@ -598,16 +587,16 @@ void CMenuPcs::CompaDraw()
 
 		const char* name = GetMenuStr__8CMenuPcsFi(this, drawIndex + 0x16);
 		float y = static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x45 + shown * 0x28) - 8.0f;
-		SetPosX__5CFontFf(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18), font);
-		SetPosY__5CFontFf(y, font);
-		Draw__5CFontFPc(font, name);
+		font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18));
+		font->SetPosY(y);
+		font->Draw(name);
 
 		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
 		if (food >= 0) {
 			const char* value = flatData->table[2].strings[food];
-			SetPosX__5CFontFf(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x90), font);
-			SetPosY__5CFontFf(y, font);
-			Draw__5CFontFPc(font, value);
+			font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x90));
+			font->SetPosY(y);
+			font->Draw(value);
 		}
 
 		shown++;
@@ -615,17 +604,17 @@ void CMenuPcs::CompaDraw()
 	}
 
 	font = listFont;
-	SetMargin__5CFontFf(0.0f, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(0.75f, font);
-	DrawInit__5CFontFv(font);
-	SetColor__5CFontF8_GXColor(font, &textColor);
+	font->SetMargin(0.0f);
+	font->SetShadow(0);
+	font->SetScale(0.75f);
+	font->DrawInit();
+	font->SetColor(textColor);
 
 	const char* job = GetJobStr__8CMenuPcsFi(this, *reinterpret_cast<int*>(scriptFood + 0x3AC));
-	GetWidth__5CFontFPc(font, job);
-	SetPosX__5CFontFf(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18), font);
-	SetPosY__5CFontFf(static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x20) - 18.0f, font);
-	Draw__5CFontFPc(font, job);
+	font->GetWidth(job);
+	font->SetPosX(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x18));
+	font->SetPosY(static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x20) - 18.0f);
+	font->Draw(job);
 
 	DrawInit__8CMenuPcsFv(this);
 }

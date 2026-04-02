@@ -19,8 +19,6 @@ extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
-extern "C" int __cntlzw(unsigned int);
-
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;

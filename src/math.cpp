@@ -5,7 +5,6 @@
 #include "string.h"
 
 extern "C" int rand(void);
-extern "C" int __cntlzw(unsigned int);
 extern "C" float FLOAT_8032F740;
 extern "C" float FLOAT_8032F780;
 extern "C" float FLOAT_8032F788;

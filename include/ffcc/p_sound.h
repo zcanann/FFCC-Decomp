@@ -34,16 +34,15 @@ public:
         table[14] = desc3[2];
     }
 
-    void Init();
-    void Quit();
-    int GetTable(unsigned long);
-
-    void create();
-    void createLoad();
-    void destroy();
-
-    void calc();
     void draw();
+    void calc();
+    void destroy();
+    void createLoad();
+    void create();
+
+    int GetTable(unsigned long);
+    void Quit();
+    void Init();
 };
 
 extern CSoundPcs SoundPcs;

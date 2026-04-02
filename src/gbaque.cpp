@@ -491,7 +491,7 @@ void GbaQueue::LoadMask()
 int GbaQueue::SetQueue(int channel, unsigned int value)
 {
 	int ret;
-	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	if (compatibilityStr[channel - 0x18] == 0) {
@@ -2334,10 +2334,10 @@ void GbaQueue::ClrFavoriteFlg(int channel)
  */
 int GbaQueue::GetFavorite(int channel, char* favorite)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+	char* obj = reinterpret_cast<char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(favorite, compatibilityStr + channel * 0xDC + 0x14, 8);
+	memcpy(favorite, obj + channel * 0xDC + 0x3C, 8);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return 8;
@@ -2389,7 +2389,7 @@ void GbaQueue::ClrMoneyFlg(int channel)
  */
 int GbaQueue::GetMoney(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	int value = *reinterpret_cast<int*>(compatibilityStr + channel * 0xDC + 0x20);
@@ -2808,7 +2808,7 @@ int GbaQueue::GetCompatibility(int, unsigned char*)
 void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 {
 	OSSemaphore* sem = accessSemaphores + channel;
-	void* src = &cmakeInfo[channel];
+	void* src = reinterpret_cast<char*>(this) + channel * 0x20 + 0x2CB2;
 
 	OSWaitSemaphore(sem);
 	memcpy(outInfo, src, 0x20);
@@ -3421,7 +3421,7 @@ void GbaQueue::SetResetFlg(int channel)
  */
 unsigned char GbaQueue::GetBonus(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSWaitSemaphore(accessSemaphores + channel);
 	unsigned char value = static_cast<unsigned char>(obj[channel * 0xDC + 0x526]);
 	OSSignalSemaphore(accessSemaphores + channel);
@@ -3565,7 +3565,7 @@ void GbaQueue::ClrStrengthFlg(int channel)
  */
 int GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	strengthData[0] = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0x1C]);

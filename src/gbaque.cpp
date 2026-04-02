@@ -2782,7 +2782,7 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2CCA + channel] = 0;
+	obj[0x2C8A + channel] = 0;
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -3423,7 +3423,7 @@ unsigned char GbaQueue::GetBonus(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned char value = static_cast<unsigned char>(obj[channel * 0xDC + 0x527]);
+	unsigned char value = static_cast<unsigned char>(obj[channel * 0xDC + 0x526]);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }

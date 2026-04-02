@@ -21,6 +21,7 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern Mtx ppvCameraMatrix0;
@@ -342,17 +343,17 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     int j;
     int groupTableWork;
     int* groupTable;
-    Vec* particleData;
+    unsigned char* particleData;
     unsigned char* particleWmat;
     unsigned char* particleColor;
     int maxParticleCount;
     short foundSlot;
     short foundGroup;
-    Vec step;
+    Vec stepVelocity;
     Vec unitVelocity;
 
     spawnCount = 0;
-    particleData = *(Vec**)((unsigned char*)vYmBreath + 0x30);
+    particleData = (unsigned char*)*(void**)((unsigned char*)vYmBreath + 0x30);
     particleWmat = (unsigned char*)*(void**)((unsigned char*)vYmBreath + 0x34);
     particleColor = (unsigned char*)*(void**)((unsigned char*)vYmBreath + 0x38);
     groupTable = *(int**)((unsigned char*)vYmBreath + 0x3C);
@@ -365,7 +366,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     *(short*)((unsigned char*)vYmBreath + 0x44) = *(short*)((unsigned char*)vYmBreath + 0x44) + 1;
 
     for (i = 0; i < maxParticleCount; i++) {
-        if (*(short*)&particleData[2].z < 1) {
+        if (*(short*)(particleData + 0x50) < 1) {
             groupTableWork = *(int*)((unsigned char*)vYmBreath + 0x3C);
             for (foundGroup = 0; foundGroup < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
                  foundGroup++) {
@@ -421,18 +422,18 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         } else {
             UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
             pppCalcFrameShape__FPlRsRsRss(
-                *(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)&particleData[7].y,
-                *(short*)((unsigned char*)&particleData[7].y + 2), *(short*)((unsigned char*)&particleData[7].x + 2),
+                *(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)(particleData + 0x58),
+                *(short*)(particleData + 0x5A), *(short*)(particleData + 0x56),
                 *(short*)((unsigned char*)pYmBreath + 0x10));
         }
 
+        particleData += 0x98;
         if (particleWmat != NULL) {
             particleWmat += 0x30;
         }
         if (particleColor != NULL) {
             particleColor += 0x20;
         }
-        particleData += 8;
     }
 
     if (spawnCount > 0) {
@@ -449,16 +450,16 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             group[5] = 0;
             group[4] = 0;
             group[3] = 0;
-            *(Vec*)(group + 6) = unitVelocity;
+            pppCopyVector__FR3Vec3Vec((Vec*)(group + 6), &unitVelocity);
             PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
     }
 
-    for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); i++) {
+    for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
         if (*groupTable != 0) {
-            PSVECScale((Vec*)(groupTable + 6), &step, (float)groupTable[9]);
-            PSVECAdd(&step, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
+            PSVECScale((Vec*)(groupTable + 6), &stepVelocity, (float)groupTable[9]);
+            PSVECAdd(&stepVelocity, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
         }
         groupTable += 0x17;
     }

@@ -1430,6 +1430,7 @@ os/OSContext.c:
 
 os/OSError.c:
 	.text       start:0x8017DD68 end:0x8017E2E8
+	.data       start:0x80216DF0 end:0x8021710C
 	.sdata      start:0x8032EA9C end:0x8032EAA8
 
 os/OSFont.c:
@@ -1448,6 +1449,7 @@ os/OSMessage.c:
 
 os/OSMemory.c:
 	.text       start:0x8017EDC8 end:0x8017F0AC
+	.data       start:0x80217140 end:0x80217150
 
 os/OSMutex.c:
 	.text       start:0x8017F0AC end:0x8017F11C
@@ -1676,6 +1678,7 @@ card/CARDBios.c:
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48
+	.data       start:0x8021C1E0 end:0x8021C340
 
 card/CARDRdwr.c:
 	.text       start:0x8019AB48 end:0x8019ADC8
@@ -1691,6 +1694,7 @@ card/CARDCheck.c:
 
 card/CARDMount.c:
 	.text       start:0x8019C36C end:0x8019CE2C
+	.data       start:0x8021C340 end:0x8021C380
 
 card/CARDFormat.c:
 	.text       start:0x8019CE2C end:0x8019D664

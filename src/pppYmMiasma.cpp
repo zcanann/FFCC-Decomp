@@ -51,11 +51,15 @@ struct VYmMiasma {
 struct PYmMiasma {
     u32 m_flags;
     s32 m_dataValIndex;
-    s32 m_shapeFrameStep;
+    s16 m_shapeFrameStep;
+    s16 m_pad0A;
+    u16 m_particleCount;
+    u16 m_pad0E;
     float m_baseSpeed;
     float m_speedVariance;
-    float m_spawnInterval;
+    float m_unk18;
     float m_minDistance;
+    float m_gravity;
     u8 m_colorStartR;
     u8 m_colorStartG;
     u8 m_colorStartB;
@@ -65,10 +69,12 @@ struct PYmMiasma {
     s16 m_colorEndB;
     s16 m_colorEndA;
     s16 m_colorStepFrames;
+    s16 m_pad32;
+    float m_initialSpeedDecay;
     float m_speedDecay;
     float m_radiusJitter;
+    float m_spawnHeightJitter;
     float m_heightJitter;
-    float m_gravity;
     u8 m_lifeBase;
     u8 m_lifeRange;
     u8 m_pad4A[2];
@@ -115,21 +121,21 @@ struct YmMiasmaParticleState {
 void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
-    u32 uVar1;
-    float fVar2;
-    u32 uVar3;
-    int iVar4;
-    short sVar5;
-    int iVar6;
-    double dVar7;
-    double dVar8;
-    double dVar9;
-    double dVar10;
-    Vec local_88;
-    Vec local_7c;
-    Vec local_70;
-    u32 local_58;
-    u32 uStack_54;
+    u32 angle;
+    float trigCos;
+    u32 randomValue;
+    int shapeRandom;
+    short shapeCount;
+    long* shapeTable;
+    double randomHeight;
+    double radiusJitter;
+    double trigSin;
+    double randomScale;
+    Vec basePos;
+    Vec particlePos;
+    Vec normalizedPos;
+    u32 highWord;
+    u32 lowWord;
     long long local_50;
     union {
         unsigned long long ull;
@@ -138,46 +144,48 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
 
     (void)pppPObject;
 
-    uVar3 = rand();
-    uStack_54 = uVar3 ^ 0x80000000;
-    local_58 = 0x43300000;
-    temp.ull = ((unsigned long long)local_58 << 32) | (unsigned long long)uStack_54;
-    dVar10 = (double)(FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648));
-    iVar6 = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
-    iVar4 = rand();
-    sVar5 = *(short*)(iVar6 + 6);
-    uVar1 = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * dVar10) - FLOAT_80330664);
-    local_50 = (long long)(int)uVar1;
-    sVar5 = (short)(iVar4 % sVar5);
-    state->m_shapeAngle = sVar5;
-    state->m_lifeFrames = sVar5;
-    fVar2 = *(float*)((u8*)gPppTrigTable + ((uVar1 + 0x4000) & 0xfffc));
-    dVar9 = (double)*(float*)((u8*)gPppTrigTable + (uVar1 & 0xfffc));
-    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(uVar3 % 0x168);
-    dVar8 = (double)(float)(dVar10 * (double)pYmMiasma->m_radiusJitter);
-    fVar2 = fVar2 * (float)((double)vYmMiasma->m_radius + dVar8);
-    particleData->m_matrix[0][0] = fVar2;
-    particleData->m_matrix[1][0] = fVar2;
-    dVar7 = (double)Math.RandF(pYmMiasma->m_heightJitter);
-    particleData->m_matrix[0][1] = (float)dVar7;
-    particleData->m_matrix[1][1] = (float)dVar7;
-    fVar2 = (float)(dVar9 * (double)(float)((double)vYmMiasma->m_radius + dVar8));
-    particleData->m_matrix[0][2] = fVar2;
-    particleData->m_matrix[1][2] = fVar2;
-    local_70.x = particleData->m_matrix[1][0];
-    local_70.y = particleData->m_matrix[1][1];
-    local_70.z = particleData->m_matrix[1][2];
-    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &local_70);
-    if (Game.m_currentSceneId != 7) {
-        local_88.x = pppMngStPtr->m_matrix.value[0][3];
-        local_88.y = pppMngStPtr->m_matrix.value[1][3];
-        local_88.z = pppMngStPtr->m_matrix.value[2][3];
-        local_7c.x = particleData->m_matrix[0][0];
-        local_7c.y = particleData->m_matrix[0][1];
-        local_7c.z = particleData->m_matrix[0][2];
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, &local_7c, &local_88);
+    randomValue = rand();
+    lowWord = randomValue ^ 0x80000000;
+    highWord = 0x43300000;
+    temp.ull = ((unsigned long long)highWord << 32) | (unsigned long long)lowWord;
+    randomScale = (double)(FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648));
+    shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+    shapeTable = (long*)*shapeTable;
+    shapeRandom = rand();
+    shapeCount = *(short*)((u8*)shapeTable + 6);
+    angle =
+        (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * randomScale) - FLOAT_80330664);
+    local_50 = (long long)(int)angle;
+    shapeCount = (short)(shapeRandom % shapeCount);
+    state->m_shapeDrawFrame = shapeCount;
+    state->m_shapeCurrentFrame = shapeCount;
+    trigCos = *(float*)((u8*)gPppTrigTable + ((angle + 0x4000) & 0xFFFC));
+    trigSin = (double)*(float*)((u8*)gPppTrigTable + (angle & 0xFFFC));
+    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
+    radiusJitter = (double)(float)(randomScale * (double)pYmMiasma->m_radiusJitter);
+    trigCos = trigCos * (float)((double)vYmMiasma->m_radius + radiusJitter);
+    particleData->m_matrix[0][0] = trigCos;
+    particleData->m_matrix[1][0] = trigCos;
+    randomHeight = (double)Math.RandF(pYmMiasma->m_spawnHeightJitter);
+    particleData->m_matrix[0][1] = (float)randomHeight;
+    particleData->m_matrix[1][1] = (float)randomHeight;
+    trigCos = (float)(trigSin * (double)(float)((double)vYmMiasma->m_radius + radiusJitter));
+    particleData->m_matrix[0][2] = trigCos;
+    particleData->m_matrix[1][2] = trigCos;
+    normalizedPos.x = particleData->m_matrix[1][0];
+    normalizedPos.y = particleData->m_matrix[1][1];
+    normalizedPos.z = particleData->m_matrix[1][2];
+    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &normalizedPos);
+    if ((s32)Game.m_currentSceneId != 7) {
+        basePos.x = pppMngStPtr->m_matrix.value[0][3];
+        basePos.y = pppMngStPtr->m_matrix.value[1][3];
+        basePos.z = pppMngStPtr->m_matrix.value[2][3];
+        particlePos.x = particleData->m_matrix[0][0];
+        particlePos.y = particleData->m_matrix[0][1];
+        particlePos.z = particleData->m_matrix[0][2];
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, &particlePos, &basePos);
     }
-    state->m_lifeFrames = (u16)pYmMiasma->m_lifeBase + (short)(uVar3 % pYmMiasma->m_lifeRange);
+    state->m_lifeFrames = (u16)pYmMiasma->m_lifeBase + (short)(randomValue % pYmMiasma->m_lifeRange);
     state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
     state->m_color.m_g = (u16)pYmMiasma->m_colorStartG;
     state->m_color.m_b = (u16)pYmMiasma->m_colorStartB;
@@ -194,15 +202,15 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     state->m_colorStep.m_a = pYmMiasma->m_colorEndA >> 7;
     state->m_colorStep.m_a = state->m_colorStep.m_a - (u16)pYmMiasma->m_colorStartA;
     state->m_colorStep.m_a = state->m_colorStep.m_a / pYmMiasma->m_colorStepFrames;
-    state->m_speedDecay = pYmMiasma->m_speedDecay;
-    dVar10 = dVar10 * (double)pYmMiasma->m_speedVariance;
-    fVar2 = (float)dVar10;
-    uVar1 = (u32)dVar10;
-    uVar3 = uVar1 >> 0x1f;
-    if (((uVar1 & 1) ^ uVar3) != uVar3) {
-        fVar2 = fVar2 * FLOAT_80330668;
+    state->m_speedDecay = pYmMiasma->m_initialSpeedDecay;
+    randomScale = randomScale * (double)pYmMiasma->m_speedVariance;
+    trigCos = (float)randomScale;
+    angle = (u32)randomScale;
+    randomValue = angle >> 0x1f;
+    if (((angle & 1) ^ randomValue) != randomValue) {
+        trigCos = trigCos * FLOAT_80330668;
     }
-    state->m_speed = pYmMiasma->m_baseSpeed + fVar2;
+    state->m_speed = pYmMiasma->m_baseSpeed + trigCos;
     state->m_fadeFrames = (u16)pYmMiasma->m_fadeFrames;
     state->m_colorDecayFrames = (u16)pYmMiasma->m_colorDecayFrames;
     state->m_hasImpulse = 0;
@@ -210,33 +218,38 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
 
 /*
  * --INFO--
- * Address:	80090e3c
- * Size:	1016b
+ * PAL Address: 0x80090e3c
+ * PAL Size: 1016b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     VYmMiasma* vData = (VYmMiasma*)((u8*)pppPObject + ((pppYmMiasmaUnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80);
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
-    s16 fadeFrames;
-    s16 colorDecayFrames;
+    s16 frameCount;
+    s16 decayCount;
+    Vec particlePos;
     Vec worldPos;
     Vec basePos;
     Vec delta;
     Vec impulse;
-    long* shapeTable;
-    float minDist;
+    Vec currentPos;
+    long** shapeTable;
 
-    fadeFrames = state->m_fadeFrames;
-    if (fadeFrames > 0) {
+    frameCount = state->m_fadeFrames;
+    if (frameCount > 0) {
         state->m_color.m_a =
-            state->m_color.m_a + (u8)(pYmMiasma->m_colorStartA - state->m_color.m_a) / fadeFrames;
-        state->m_fadeFrames = fadeFrames - 1;
+            state->m_color.m_a + (u8)(pYmMiasma->m_colorStartA - state->m_color.m_a) / frameCount;
+        state->m_fadeFrames = state->m_fadeFrames - 1;
     }
 
-    colorDecayFrames = state->m_colorDecayFrames;
-    if (state->m_lifeFrames <= colorDecayFrames && state->m_hasImpulse == 0) {
-        state->m_color.m_a = state->m_color.m_a - (state->m_color.m_a / colorDecayFrames);
-        state->m_colorDecayFrames = colorDecayFrames - 1;
+    decayCount = state->m_colorDecayFrames;
+    if (state->m_lifeFrames <= decayCount && state->m_hasImpulse == 0) {
+        state->m_color.m_a = state->m_color.m_a - (state->m_color.m_a / decayCount);
+        state->m_colorDecayFrames = state->m_colorDecayFrames - 1;
     }
 
     if (state->m_hasImpulse != 0) {
@@ -278,13 +291,13 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         InitParticleData(vData, pppPObject, pYmMiasma, particleData);
     }
 
-    worldPos.x = particleData->m_matrix[0][0];
-    worldPos.y = particleData->m_matrix[0][1];
-    worldPos.z = particleData->m_matrix[0][2];
-    pppCopyVector__FR3Vec3Vec(&worldPos, &worldPos);
+    particlePos.x = particleData->m_matrix[0][0];
+    particlePos.y = particleData->m_matrix[0][1];
+    particlePos.z = particleData->m_matrix[0][2];
+    pppCopyVector__FR3Vec3Vec(&worldPos, &particlePos);
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
-    if (Game.m_currentSceneId != 7) {
+    if ((s32)Game.m_currentSceneId != 7) {
         basePos.x = pppMngStPtr->m_matrix.value[0][3];
         basePos.y = pppMngStPtr->m_matrix.value[1][3];
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
@@ -294,8 +307,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     pppSubVector__FR3Vec3Vec3Vec(&delta, &basePos, &worldPos);
-    minDist = vData->m_radius - pYmMiasma->m_minDistance;
-    if (pppVectorLength__F3Vec(&delta) < minDist) {
+    if (pppVectorLength__F3Vec(&delta) < vData->m_radius - pYmMiasma->m_minDistance) {
         state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
         state->m_hasImpulse = 1;
     }
@@ -312,13 +324,16 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     if (vData->m_unknown4 != FLOAT_80330644 && state->m_hasImpulse == 0) {
         impulse = vData->m_impulse;
         PSVECScale(&impulse, &impulse, state->m_speedDecay);
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, (Vec*)particleData, &impulse);
+        currentPos.x = particleData->m_matrix[0][0];
+        currentPos.y = particleData->m_matrix[0][1];
+        currentPos.z = particleData->m_matrix[0][2];
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)particleData, &currentPos, &impulse);
     }
 
     if ((u16)pYmMiasma->m_dataValIndex != 0xffff) {
-        shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)pYmMiasma->m_dataValIndex * 4);
+        shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
         pppCalcFrameShape__FPlRsRsRss(
-            shapeTable,
+            shapeTable[pYmMiasma->m_dataValIndex],
             state->m_shapeCurrentFrame,
             state->m_shapeDrawFrame,
             state->m_shapeFrameTime,

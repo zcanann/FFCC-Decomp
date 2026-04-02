@@ -27,6 +27,15 @@ extern "C" float FLOAT_8032f828;
 extern "C" double DOUBLE_8032f830;
 extern "C" double DOUBLE_8032f838;
 
+static char s_CPad[] = "CPad";
+static char s_pad_cpp[] = "pad.cpp";
+static char s_rb[] = "rb";
+static char s_replay_dat[] = "/replay.dat";
+static char s_replay_host_msg[] =
+    "\x43\x50\x61\x64\x2E\x49\x6E\x69\x74\x3A\x20\x68\x6F\x73\x74\x82\xA9\x82\xE7\x96\xF1\x25\x64\x95\x62\x82\xCC"
+    "\x83\x8A\x83\x76\x83\x8C\x83\x43\x83\x66\x81\x5B\x83\x5E\x82\xF0\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xDC\x82"
+    "\xB5\x82\xBD\x81\x42\x0A";
+
 CPad::CPad()
 {
 	_1b4_4_ = 0;
@@ -59,11 +68,11 @@ void CPad::Init()
 
 	if (System.IsGdev())
 	{
-		_1ac_4_ = Memory.CreateStage(0x800000, (char*)"pad.cpp", 1);
+		_1ac_4_ = Memory.CreateStage(0x800000, s_CPad, 1);
 		if (_1ac_4_ != 0)
 		{
-			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), (char*)"pad.cpp", 0x54) unsigned char[0x69780C];
-			if ((_1b4_4_ != 0) && ((fp = fopen("replay.dat", "rb")) != 0))
+			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), s_pad_cpp, 0x54) unsigned char[0x69780C];
+			if ((_1b4_4_ != 0) && ((fp = fopen(s_replay_dat, s_rb)) != 0))
 			{
 				fseek(fp, 0, 2);
 				size = ftell(fp);
@@ -72,7 +81,7 @@ void CPad::Init()
 				fclose(fp);
 				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 0;
 				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
-				System.Printf((char*)"replay frames=%d\n", frames / 30);
+				System.Printf(s_replay_host_msg, frames / 30);
 			}
 			else
 			{

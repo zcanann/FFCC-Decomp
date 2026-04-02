@@ -5,8 +5,48 @@
  * Address:	TODO
  * Size:	TODO
  */
-CColor::CColor()
+CColor3::CColor3(_GXColor& other)
 {
+	this->raw = *(u32*)&other;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CColor3::CColor3(CColor3& other)
+{
+	this->raw = other.raw;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CColor3::CColor3()
+{
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CColor::CColor(_GXColor& other)
+{
+	this->raw = *(u32*)&other;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CColor::CColor(CColor& other)
+{
+	this->raw = other.raw;
 }
 
 /*
@@ -27,46 +67,6 @@ CColor::CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char 
  * Address:	TODO
  * Size:	TODO
  */
-CColor::CColor(CColor& other)
+CColor::CColor()
 {
-	this->raw = other.raw;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CColor::CColor(_GXColor& other)
-{
-	this->raw = *(u32*)&other;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CColor3::CColor3()
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CColor3::CColor3(CColor3& other)
-{
-	this->raw = other.raw;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CColor3::CColor3(_GXColor& other)
-{
-	this->raw = *(u32*)&other;
 }

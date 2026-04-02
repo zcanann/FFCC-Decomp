@@ -21,22 +21,6 @@ struct _pppPointApStep {
 
 /*
  * --INFO--
- * PAL Address: 0x80060d08
- * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
-    u8* target = (u8*)pObject + data->targetOffset;
-    target[0x81] = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80060c04
  * PAL Size: 260b
  * EN Address: TODO
@@ -85,4 +69,20 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     }
 
     target[1]--;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80060d08
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
+{
+    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDef;
+    u8* target = (u8*)pObject + data->targetOffset;
+    target[0x81] = 0;
 }

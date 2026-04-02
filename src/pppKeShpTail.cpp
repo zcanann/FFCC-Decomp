@@ -25,6 +25,43 @@ struct KeShpTailObject {
 
 /*
  * --INFO--
+ * PAL Address: 0x800880f0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+{
+	(void)obj;
+	(void)stepData;
+	(void)ctrlTable;
+	return;
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: 0x800880f4
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppKeShpTailCon(void* r3, void* r4)
+{
+	KeShpTailWork* work = (KeShpTailWork*)((u8*)r3 + ((KeShpTailOffsets*)r4)->m_serializedDataOffsets[0] + 0x80);
+	work->m_field2 = 0;
+	work->m_field4 = 0;
+	work->m_field6 = 0;
+	work->m_head = 0;
+	work->m_count = 0x1f;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80088124
  * PAL Size: 248b
  * EN Address: TODO
@@ -63,40 +100,3 @@ void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets
 	}
 	work->m_head--;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x800880f4
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppKeShpTailCon(void* r3, void* r4)
-{
-	KeShpTailWork* work = (KeShpTailWork*)((u8*)r3 + ((KeShpTailOffsets*)r4)->m_serializedDataOffsets[0] + 0x80);
-	work->m_field2 = 0;
-	work->m_field4 = 0;
-	work->m_field6 = 0;
-	work->m_head = 0;
-	work->m_count = 0x1f;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800880f0
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
-{
-	(void)obj;
-	(void)stepData;
-	(void)ctrlTable;
-	return;
-}
-

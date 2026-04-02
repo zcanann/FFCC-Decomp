@@ -11,26 +11,6 @@ void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, V
 
 /*
  * --INFO--
- * PAL Address: 0x800a6090
- * PAL Size: 4b
- */
-void pppConstructYmCallBack(pppYmCallBack*, void*)
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: 4b
- */
-void pppDestructYmCallBack(pppYmCallBack*, void*)
-{
-	return;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800A5FCC
  * PAL Size: 192b
  * EN Address: TODO
@@ -58,3 +38,23 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
     }
 }
 
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 4b
+ */
+void pppDestructYmCallBack(pppYmCallBack*, void*)
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a6090
+ * PAL Size: 4b
+ */
+void pppConstructYmCallBack(pppYmCallBack*, void*)
+{
+	return;
+}

@@ -9,21 +9,6 @@ extern "C" void pppSetFpMatrix(struct _pppMngSt*);
 
 /*
  * --INFO--
- * PAL Address: 0x800d8aa4
- * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkC* param_2)
-{
-    int dataOffset = *param_2->m_serializedDataOffsets;
-    *(int*)((char*)pppYmLookOn + dataOffset + 0x80) = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d88c8
  * PAL Size: 476b
  * EN Address: TODO
@@ -100,4 +85,19 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
         *(f32*)((u8*)pppMngStPtr + 0xa0) = local_40.z;
         pppSetFpMatrix(pppMngSt);
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d8aa4
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkC* param_2)
+{
+    int dataOffset = *param_2->m_serializedDataOffsets;
+    *(int*)((char*)pppYmLookOn + dataOffset + 0x80) = 0;
 }

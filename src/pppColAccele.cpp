@@ -4,6 +4,29 @@
 
 /*
  * --INFO--
+ * PAL Address: 0x8005fdc4
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppColAcceleCon(_pppPObject* obj, void* data)
+{
+    // Access pointer chain: data + 0xC -> [4] + 0x80
+    void** dataPtr = (void**)((char*)data + 0xC);
+    void* workPtr = ((void**)*dataPtr)[1];
+    short* accel = (short*)((char*)obj + (int)workPtr + 0x80);
+    
+    // Zero out acceleration values
+    accel[3] = 0;
+    accel[2] = 0;
+    accel[1] = 0;
+    accel[0] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8005fdec
  * PAL Size: 188b
  * EN Address: TODO
@@ -47,27 +70,4 @@ accumulate:
     accel1[1] += accel2[1];
     accel1[2] += accel2[2];
     accel1[3] += accel2[3];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005fdc4
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppColAcceleCon(_pppPObject* obj, void* data)
-{
-    // Access pointer chain: data + 0xC -> [4] + 0x80
-    void** dataPtr = (void**)((char*)data + 0xC);
-    void* workPtr = ((void**)*dataPtr)[1];
-    short* accel = (short*)((char*)obj + (int)workPtr + 0x80);
-    
-    // Zero out acceleration values
-    accel[3] = 0;
-    accel[2] = 0;
-    accel[1] = 0;
-    accel[0] = 0;
 }

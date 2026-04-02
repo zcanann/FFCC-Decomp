@@ -42,22 +42,47 @@ typedef struct ShapeControlData {
 
 /*
  * --INFO--
- * PAL Address: 0x800daadc
- * PAL Size: 36b
+ * PAL Address: 0x800da93c  
+ * PAL Size: 212b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape2Construct(void* param1, void* param2)
+void pppDrawShape2(void* param1, void* param2, void* param3)
 {
-    ShapeRuntimeData* data = *(ShapeRuntimeData**)((u8*)param2 + 0xC);
-    ShapeState* shapeData = (ShapeState*)((u8*)param1 + data->shapeDataOffset + 0x80);
+    ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
+    ShapeControlData* controlData = (ShapeControlData*)param2;
+    ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
+    void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
+    s32 type = controlData->type;
 
-    shapeData->currentId = 0;
-    shapeData->counter = 0;
-    shapeData->value = 0;
+    if (type == 0xFFFF) {
+        return;
+    }
+
+    void** shapeTables = *(void***)((u8*)pppEnvStPtr + 0xC);
+    void* shapeSpec = *(void**)shapeTables[type];
+    ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
+    void* drawShape = (u8*)shapeSpec + shape->offset;
+
+    pppSetDrawEnv(
+        (pppCVECTOR*)((u8*)posData + 8),
+        (pppFMATRIX*)((u8*)param1 + 0x40),
+        controlData->scale,
+        controlData->param15,
+        controlData->paramE,
+        controlData->blendMode,
+        0,
+        controlData->param14,
+        1,
+        0
+    );
+
+    pppSetBlendMode(controlData->blendMode);
+    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), controlData->blendMode);
 }
+
 
 /*
  * --INFO--
@@ -114,44 +139,19 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
 
 /*
  * --INFO--
- * PAL Address: 0x800da93c  
- * PAL Size: 212b
+ * PAL Address: 0x800daadc
+ * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape2(void* param1, void* param2, void* param3)
+void pppDrawShape2Construct(void* param1, void* param2)
 {
-    ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
-    ShapeControlData* controlData = (ShapeControlData*)param2;
-    ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    s32 type = controlData->type;
+    ShapeRuntimeData* data = *(ShapeRuntimeData**)((u8*)param2 + 0xC);
+    ShapeState* shapeData = (ShapeState*)((u8*)param1 + data->shapeDataOffset + 0x80);
 
-    if (type == 0xFFFF) {
-        return;
-    }
-
-    void** shapeTables = *(void***)((u8*)pppEnvStPtr + 0xC);
-    void* shapeSpec = *(void**)shapeTables[type];
-    ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
-    void* drawShape = (u8*)shapeSpec + shape->offset;
-
-    pppSetDrawEnv(
-        (pppCVECTOR*)((u8*)posData + 8),
-        (pppFMATRIX*)((u8*)param1 + 0x40),
-        controlData->scale,
-        controlData->param15,
-        controlData->paramE,
-        controlData->blendMode,
-        0,
-        controlData->param14,
-        1,
-        0
-    );
-
-    pppSetBlendMode(controlData->blendMode);
-    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), controlData->blendMode);
+    shapeData->currentId = 0;
+    shapeData->counter = 0;
+    shapeData->value = 0;
 }
-

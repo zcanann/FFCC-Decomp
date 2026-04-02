@@ -227,10 +227,15 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     }
 
     if (gPppInConstructor == 0) {
-        float posX = CameraPcs._212_4_;
-        float posY = CameraPcs._216_4_;
-        float posZ = CameraPcs._220_4_;
-        if (Game.m_currentSceneId == 7) {
+        float posX;
+        float posY;
+        float posZ;
+
+        if (Game.m_currentSceneId != 7) {
+            posX = CameraPcs._212_4_;
+            posY = CameraPcs._216_4_;
+            posZ = CameraPcs._220_4_;
+        } else {
             posX = ppvCameraMatrix0[0][3];
             posY = ppvCameraMatrix0[1][3];
             posZ = ppvCameraMatrix0[2][3];

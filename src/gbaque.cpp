@@ -4157,14 +4157,14 @@ void GbaQueue::ClrMemorysFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char GbaQueue::GetMemorys(int channel)
+unsigned int GbaQueue::GetMemorys(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(this) + channel;
 	OSWaitSemaphore(semaphore);
 	unsigned short value = *reinterpret_cast<unsigned short*>(obj + channel * 0xDC + 0x468);
 	OSSignalSemaphore(semaphore);
-	return static_cast<unsigned char>(value);
+	return value;
 }
 
 /*

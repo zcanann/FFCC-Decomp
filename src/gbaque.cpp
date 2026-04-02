@@ -2258,19 +2258,19 @@ int GbaQueue::GetMapObj(unsigned char* outData)
  */
 void GbaQueue::GetMapObjDrawFlg(unsigned int* drawFlags)
 {
-	GbaQueue* semaphoreQueue = this;
+	OSSemaphore* semaphoreQueue = reinterpret_cast<OSSemaphore*>(this);
 
 	for (int i = 0; i < 4; i++) {
-		OSWaitSemaphore(semaphoreQueue->accessSemaphores);
-		semaphoreQueue = reinterpret_cast<GbaQueue*>(semaphoreQueue->accessSemaphores + 1);
+		OSWaitSemaphore(semaphoreQueue);
+		semaphoreQueue++;
 	}
 
 	*drawFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0x2B04);
 
-	semaphoreQueue = this;
+	semaphoreQueue = reinterpret_cast<OSSemaphore*>(this);
 	for (int i = 0; i < 4; i++) {
-		OSSignalSemaphore(semaphoreQueue->accessSemaphores);
-		semaphoreQueue = reinterpret_cast<GbaQueue*>(semaphoreQueue->accessSemaphores + 1);
+		OSSignalSemaphore(semaphoreQueue);
+		semaphoreQueue++;
 	}
 }
 

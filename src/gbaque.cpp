@@ -2337,7 +2337,7 @@ int GbaQueue::GetFavorite(int channel, char* favorite)
 	char* obj = reinterpret_cast<char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(favorite, obj + channel * 0xDC + 0x3C, 8);
+	memcpy(favorite, obj + channel * 0xDC + 0x46C, 8);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return 8;

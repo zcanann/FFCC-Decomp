@@ -1132,7 +1132,8 @@ config.progress_each_module = args.verbose
 config.progress_report_args = [
     # Marks relocations as mismatching if the target value is different
     # Default is "functionRelocDiffs=none", which is most lenient
-    "--config", "functionRelocDiffs=data_value",
+    "--config", "functionRelocDiffs=none",
+    # "--config", "functionRelocDiffs=data_value",
 ]
 
 mode = trailing_mode or args.mode

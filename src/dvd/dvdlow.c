@@ -341,7 +341,7 @@ BOOL DVDLowSeek(u32 offset, DVDLowCallback callback) {
 }
 
 BOOL DVDLowWaitCoverClose(DVDLowCallback callback) {
-	Callback = callback;
+	ResetCoverCallback = callback;
 	WaitingCoverClose = TRUE;
 	StopAtNextInt = FALSE;
 	__DIRegs[1] = 2;
@@ -494,8 +494,8 @@ BOOL DVDLowBreak(void) {
 DVDLowCallback DVDLowClearCallback(void) {
 	DVDLowCallback old;
 	__DIRegs[1] = 0;
-	old = Callback;
-	Callback = NULL;
+	old = ResetCoverCallback;
+	ResetCoverCallback = NULL;
 	return old;
 }
 

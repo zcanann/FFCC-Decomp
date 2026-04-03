@@ -223,7 +223,7 @@ extern "C" CMapHit* dtor_80026D5C(CMapHit* mapHit, short shouldDelete)
 {
     if (mapHit != 0) {
         if (mapHit->m_vertices != 0) {
-            delete[] mapHit->m_vertices;
+            operator delete(mapHit->m_vertices);
             mapHit->m_vertices = 0;
         }
 

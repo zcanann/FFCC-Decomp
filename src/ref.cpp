@@ -26,7 +26,7 @@ CRef::CRef()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CRef* dtor_80043D10(CRef* ref, short param_2)
+extern "C" CRef* __dt__4CRefFv(CRef* ref, short param_2)
 {
 	if (ref != 0) {
 		*(void**)ref = __vt__4CRef;

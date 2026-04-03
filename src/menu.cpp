@@ -1,7 +1,7 @@
 #include "ffcc/menu.h"
 
 extern "C" void* __vt__5CMenu[];
-extern "C" CRef* dtor_80043D10(CRef*, short);
+extern "C" CRef* __dt__4CRefFv(CRef*, short);
 extern "C" void __dl__FPv(void*);
 
 /*
@@ -86,7 +86,7 @@ extern "C" CMenu* __dt__5CMenuFv(CMenu* menu, short shouldDelete)
 {
 	if (menu != 0) {
 		*(void***)menu = __vt__5CMenu;
-		dtor_80043D10(menu, 0);
+		__dt__4CRefFv(menu, 0);
 		if (0 < shouldDelete) {
 			__dl__FPv(menu);
 		}

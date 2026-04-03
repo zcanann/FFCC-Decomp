@@ -9,7 +9,6 @@
 
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* dtor_80043D10(void*, short);
 extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);
 extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -221,7 +220,7 @@ CChara::CAnim::~CAnim()
 		anim.m_bank = 0;
 	}
 
-	dtor_80043D10(this, 0);
+	__dt__4CRefFv(this, 0);
 }
 
 /*

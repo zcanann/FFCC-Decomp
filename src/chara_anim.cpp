@@ -22,6 +22,8 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
+extern "C" float FLOAT_80330C68;
+extern "C" float FLOAT_80330C6C;
 
 namespace {
 struct CAnimFields {
@@ -443,7 +445,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	register float frameFrac = frame - static_cast<float>(frameInt);
 	if (frameInt == animFields.m_frameCount - 1) {
-		frameFrac = 0.0f;
+		frameFrac = FLOAT_80330C68;
 	}
 
 	register int flags = static_cast<int>((node.m_flags >> 0xD) & 0x3FFFF);
@@ -453,7 +455,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
-			*outData = 0.0f;
+			*outData = FLOAT_80330C68;
 		} else if ((flags & 3) == 1) {
 			i2f_5(outData, inData);
 			inData++;
@@ -467,7 +469,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
-			*outData = 0.0f;
+			*outData = FLOAT_80330C68;
 		} else if ((flags & 3) == 1) {
 			i2f_6(outData, inData);
 			inData++;
@@ -481,7 +483,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	for (int i = 0; i < 3; i++) {
 		if ((flags & 3) == 0) {
-			*outData = 1.0f;
+			*outData = FLOAT_80330C6C;
 		} else if ((flags & 3) == 1) {
 			i2f_7(outData, inData);
 			inData++;

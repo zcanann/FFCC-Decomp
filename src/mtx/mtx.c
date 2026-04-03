@@ -1269,8 +1269,6 @@ void PSMTXReflect(register Mtx m, const register Vec *p, const register Vec *n)
 void C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* target)
 {
     Vec vLook, vRight, vUp;
-    f32 dot;
-    f32 prodX, prodY, prodZ;
 
     vLook.x = camPos->x - target->x;
     vLook.y = camPos->y - target->y;
@@ -1283,29 +1281,17 @@ void C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* 
     m[0][0] = vRight.x;
     m[0][1] = vRight.y;
     m[0][2] = vRight.z;
-    prodX = camPos->x * vRight.x;
-    prodY = camPos->y * vRight.y;
-    prodZ = camPos->z * vRight.z;
-    dot = prodZ + prodX + prodY;
-    m[0][3] = -dot;
+    m[0][3] = -(camPos->x * vRight.x + camPos->y * vRight.y + camPos->z * vRight.z);
 
     m[1][0] = vUp.x;
     m[1][1] = vUp.y;
     m[1][2] = vUp.z;
-    prodX = camPos->x * vUp.x;
-    prodY = camPos->y * vUp.y;
-    prodZ = camPos->z * vUp.z;
-    dot = prodX + prodY + prodZ;
-    m[1][3] = -dot;
+    m[1][3] = -(camPos->x * vUp.x + camPos->y * vUp.y + camPos->z * vUp.z);
 
     m[2][0] = vLook.x;
     m[2][1] = vLook.y;
     m[2][2] = vLook.z;
-    prodX = camPos->x * vLook.x;
-    prodY = camPos->y * vLook.y;
-    prodZ = camPos->z * vLook.z;
-    dot = prodX + prodY + prodZ;
-    m[2][3] = -dot;
+    m[2][3] = -(camPos->x * vLook.x + camPos->y * vLook.y + camPos->z * vLook.z);
 }
 
 void C_MTXLightFrustum(Mtx m, float t, float b, float l, float r, float n, float scaleS, float scaleT, float transS, float transT)

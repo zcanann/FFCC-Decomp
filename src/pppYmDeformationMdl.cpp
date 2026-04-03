@@ -190,15 +190,14 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
-    short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
+    short* state = (short*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    int colorOffset = param_3->m_serializedDataOffsets[1];
-    pppCVECTOR* color = (pppCVECTOR*)((u8*)pppYmDeformationMdl + 0x88 + colorOffset);
+    pppCVECTOR* color = (pppCVECTOR*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x88);
     pppFMATRIX* modelMatrix = (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40);
     Mtx texMtx;
     Mtx cameraMtx;
@@ -288,9 +287,9 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         float indScale = *(float*)(state + 2);
         indMtx[0][0] = rotMtx[0][0] * indScale;
         indMtx[0][1] = rotMtx[0][1] * indScale;
+        indMtx[0][2] = FLOAT_80330dac;
         indMtx[1][0] = rotMtx[1][0] * indScale;
         indMtx[1][1] = rotMtx[1][1] * indScale;
-        indMtx[0][2] = FLOAT_80330dac;
         indMtx[1][2] = FLOAT_80330dac;
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 

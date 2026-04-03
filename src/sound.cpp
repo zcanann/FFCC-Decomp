@@ -2223,8 +2223,11 @@ void CSound::Add3DLine(int lineIndex, Vec* position)
  */
 void CSound::SetReverb(int reverb, int depth)
 {
-    SetReverb__9CRedSoundFii(RedSound(this), 1, reverb);
-    SetReverbDepth__9CRedSoundFiii(RedSound(this), 1, depth, 0xF);
+    u8* self = reinterpret_cast<u8*>(this);
+    int depthValue = depth;
+
+    SetReverb__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), 1, reverb);
+    SetReverbDepth__9CRedSoundFiii(reinterpret_cast<CRedSound*>(self + 8), 1, depthValue, 0xF);
 }
 
 /*

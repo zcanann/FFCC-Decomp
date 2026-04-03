@@ -462,7 +462,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
-		targetRot = 0.0f;
+		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
@@ -489,7 +489,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	basePosVec = reinterpret_cast<Vec*>(&basePos);
 	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
-		targetRot = 0.0f;
+		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}

@@ -6,6 +6,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "dolphin/types.h"
+#include <math.h>
 #include <string.h>
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
@@ -2161,16 +2162,16 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
-	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
-	int caravanWork = Game.m_scriptFoodBase[0];
-
 	if (DAT_8032eec8 == 0) {
 		return 1;
 	}
 
-	if (topIdx < 1) {
+	float baseX = static_cast<float>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
+	int caravanWork = Game.m_scriptFoodBase[0];
+
+	if (topIdx <= 0) {
 		int finished = 0;
-		float targetX = FLOAT_80332ac8 + static_cast<float>(baseX);
+		float targetX = FLOAT_80332ac8 + baseX;
 		s32* top = s_UniteTop;
 		for (int i = 0; i < DAT_8032eec8; i++) {
 			int j = 0;
@@ -2185,9 +2186,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 				*reinterpret_cast<s16*>(listBase + entry) =
 				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entry)) + DOUBLE_80332ab8);
-				double delta = static_cast<double>(*reinterpret_cast<s16*>(listBase + entry)) - baseX;
-				if ((static_cast<float>(DOUBLE_80332ac0) < static_cast<float>(delta)) ||
-				    (static_cast<float>(delta) < -static_cast<float>(DOUBLE_80332ac0))) {
+				if (fabs(static_cast<double>(static_cast<float>(*reinterpret_cast<s16*>(listBase + entry)) - baseX)) >
+				    DOUBLE_80332ac0) {
 					*reinterpret_cast<s16*>(listBase + entry) = static_cast<s16>(targetX);
 					if (j == 0) {
 						finished++;
@@ -2215,10 +2215,9 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 			*reinterpret_cast<s16*>(listBase + entry) =
 			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entry)) + DOUBLE_80332ab8);
-			double delta = static_cast<double>(*reinterpret_cast<s16*>(listBase + entry) - baseX);
-			if ((static_cast<float>(DOUBLE_80332ac0) < static_cast<float>(delta)) ||
-			    (static_cast<float>(delta) < -static_cast<float>(DOUBLE_80332ac0))) {
-				*reinterpret_cast<s16*>(listBase + entry) = static_cast<s16>(FLOAT_80332ac8 + static_cast<float>(baseX));
+			if (fabs(static_cast<double>(static_cast<float>(*reinterpret_cast<s16*>(listBase + entry)) - baseX)) >
+			    DOUBLE_80332ac0) {
+				*reinterpret_cast<s16*>(listBase + entry) = static_cast<s16>(FLOAT_80332ac8 + baseX);
 				return 1;
 			}
 
@@ -2241,12 +2240,12 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  */
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
-	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
-	int caravanWork = Game.m_scriptFoodBase[0];
-
 	if (DAT_8032eec8 == 0) {
 		return 1;
 	}
+
+	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
+	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (topIdx < 0) {
 		int finished = 0;

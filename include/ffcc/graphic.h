@@ -87,7 +87,9 @@ public:
     void CreateTempBuffer();
     void DestroyTempBuffer();
 
-    u8 _pad_0x0_to_0x71E7[0x71E8];
+    u8 _pad_0x4_to_0x71DF[0x71DC];
+    void* m_renderMode;
+    void* m_frameBuffer;
     void* m_scratchTextureBuffer;
 };
 

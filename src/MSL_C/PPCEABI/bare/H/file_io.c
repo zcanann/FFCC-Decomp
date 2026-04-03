@@ -115,14 +115,15 @@ int fflush(FILE* file) {
  */
 int __get_file_modes(const char* mode, file_modes* modes)
 {
-	const char* mode_ptr = mode + 2;
+	signed char mode_char;
 	int mode_str;
 	int next_mode;
 	int open_mode;
-	int io_mode = 0;
+	int io_mode;
 
 	modes->file_kind = __disk_file;
-	mode_str = (unsigned char)mode[0];
+	mode_char = mode[0];
+	mode_str = mode_char;
 #ifndef __NO_WIDE_CHAR
 	modes->file_orientation = UNORIENTED;
 #endif
@@ -152,7 +153,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 	switch (next_mode)
 	{
 		case 'b':
-			next_mode = *mode_ptr;
+			next_mode = mode[2];
 			modes->binary_io = 1;
 			
 			if (next_mode == '+')
@@ -161,7 +162,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 			break;
 			
 		case '+':
-			next_mode = *mode_ptr;
+			next_mode = mode[2];
 			mode_str = (mode_str << 8) | '+';
 			
 			if (next_mode == 'b')

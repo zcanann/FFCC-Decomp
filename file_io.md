@@ -179,3 +179,51 @@ Notes on source experiments after the compiler finding
 - Re-tried signed-char and `mode + 2` scheduling ideas after the assembly recheck.
 - They could recover isolated target features like `extsb` or `addi`, but overall they regressed the symbol badly and are not worth keeping.
 - The checked-in source should stay as-is; the progress is in the unit compile configuration.
+
+`__get_file_modes` follow-up, 2026-04-03 (source-body improvement on top of GC/2.7)
+
+Current verified state
+- Starting point for this session was the already-improved project state:
+  - `configure.py` keeps `Object(NonMatching, "MSL_C/PPCEABI/bare/H/file_io.c", mw_version="GC/2.7")`
+  - full-build baseline: `__get_file_modes` about `95.189476%`
+  - unit `.text`: about `98.94213%`
+
+Reference / structural recheck
+- Re-checked local reference copies under:
+  - `reference_projects/animal_crossing`
+  - `reference_projects/marioparty4`
+  - `reference_projects/mark_kart_double_dash`
+  - `reference_projects/twilight_princess`
+  - plus the other previously checked MSL headers/copies
+- Still no literal `__get_file_modes` source drop turned up in those local references.
+- The useful structural clue remained the target assembly itself:
+  - original sign-extends `mode[0]` before the first compare
+  - current checked-in source was still forcing `(unsigned char)mode[0]`, which suppresses that `extsb`
+
+Kept source change
+- In `src/MSL_C/PPCEABI/bare/H/file_io.c`, these changes are now the best confirmed state:
+  - replace `const char* mode_ptr = mode + 2;` with `signed char mode_char;`
+  - replace `mode_str = (unsigned char)mode[0];` with:
+    - `mode_char = mode[0];`
+    - `mode_str = mode_char;`
+  - change `int io_mode = 0;` to `int io_mode;`
+  - replace `*mode_ptr` uses with `mode[2]`
+
+Verified result
+- Ran:
+  - `ninja`
+  - `tools/objdiff-cli diff -p . -u main/MSL_C/PPCEABI/bare/H/file_io -o - __get_file_modes`
+- Result:
+  - `__get_file_modes`: about `98.2421%`
+  - unit `.text`: about `99.61343%`
+
+Why this worked
+- The signed-char temporary recovers the target's early `lbz` + `extsb` + `cmpwi` sequence for `mode[0]`.
+- The older cleanup still helps on top of `GC/2.7`:
+  - uninitialized `io_mode`
+  - direct `mode[2]` access instead of carrying `mode_ptr`
+- Re-introducing a delayed `mode_ptr = mode + 2` after this improvement produced identical codegen, so it is not worth keeping.
+
+Net improvement from the session
+- `__get_file_modes`: `95.189476% -> 98.2421%`
+- unit `.text`: `98.94213% -> 99.61343%`

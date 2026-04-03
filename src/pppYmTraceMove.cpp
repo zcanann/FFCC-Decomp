@@ -20,9 +20,10 @@ struct pppYmTraceMoveMngStRaw {
 	char pad00[0x08];
 	Vec m_position;
 	char pad14[0x34];
-	Vec m_historyDirection;
+	Vec m_previousPosition;
 	f32 m_scale;
 	Vec m_basePosition;
+	u32 _pad64;
 	Vec m_paramVec0;
 	char pad74[0x68];
 	void* m_owner;
@@ -39,11 +40,11 @@ struct pppYmTraceMoveMngStRaw {
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
 {
-	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
 	pppYmTraceMoveWork* work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
+	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
 	f32 zero;
 
-	pppSubVector(work->m_previousDirection, pppMngSt->m_basePosition, pppMngSt->m_paramVec0);
+	pppSubVector(work->m_previousDirection, pppMngSt->m_paramVec0, pppMngSt->m_basePosition);
 	pppCopyVector(work->m_direction, work->m_previousDirection);
 	zero = kPppYmTraceMoveZero;
 	work->m_acceleration = zero;
@@ -113,7 +114,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_5c);
 
 		pppCopyVector(work->m_direction, local_20);
-		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_historyDirection);
+		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
 
 		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {
 			pppCopyVector(local_2c, work->m_previousDirection);
@@ -146,7 +147,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	pppAddVector(local_ec, local_e0, local_110);
 
 	pppCopyVector(local_11c, pppMngSt->m_position);
-	pppCopyVector(pppMngSt->m_historyDirection, local_11c);
+	pppCopyVector(pppMngSt->m_previousPosition, local_11c);
 
 	local_128.x = local_ec.x;
 	local_128.y = local_ec.y;

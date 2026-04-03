@@ -38,9 +38,10 @@ struct KeShpTail2XStep {
     u8 m_drawB;
     u8 m_useEnvDepth;
     u8 m_worldSpaceMode;
+    u8 _pad27;
     u8 m_zDisable;
     u8 m_blendMode;
-    u8 _pad2B[2];
+    u8 _pad2A[2];
     float m_envDepth;
 };
 
@@ -220,7 +221,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     float segBaseY;
     float segBaseZ;
     float drawScale;
-    float drawScaleStep;
+    float trailStep;
     float scaleStepDelta;
     u8 curIndex;
     u8 nextIndex;
@@ -237,7 +238,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
         return;
     }
 
-    invCountMinusOne = (float)(step->m_drawCount - 1);
+    invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
     if (invCountMinusOne != kPppKeShpTail2XZero) {
         colorStepR = ((float)step->m_colorStartR - (float)step->m_colorEndR) / invCountMinusOne;
@@ -266,8 +267,8 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
 
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
-    drawScaleStep = step->m_stepDistance * mng->m_scale.x;
-    if (drawScaleStep <= kPppKeShpTail2XZero) {
+    trailStep = step->m_stepDistance * mng->m_scale.x;
+    if (trailStep <= kPppKeShpTail2XZero) {
         return;
     }
 
@@ -350,20 +351,19 @@ draw_loop:
     colorB -= colorStepB;
     colorA -= colorStepA;
     drawScale -= scaleStepDelta;
-    drawScaleStep -= scaleStepDelta;
-    if (drawScaleStep <= kPppKeShpTail2XZero) {
+    if (trailStep <= kPppKeShpTail2XZero) {
         return;
     }
 
-    if (segRemain < drawScaleStep) {
+    if (segRemain < trailStep) {
         goto advance_segment;
     }
 
     pos.x = segDx * (segCursor / segLen) + segBaseX;
     pos.y = segDy * (segCursor / segLen) + segBaseY;
     pos.z = segDz * (segCursor / segLen) + segBaseZ;
-    segCursor += drawScaleStep;
-    segRemain -= drawScaleStep;
+    segCursor += trailStep;
+    segRemain -= trailStep;
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;

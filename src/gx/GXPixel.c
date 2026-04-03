@@ -149,30 +149,42 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
  */
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
     u32 range_adj;
+    const u16* range;
+    u8 reg;
 
     CHECK_GXBEGIN(331, "GXSetFogRangeAdj");
 
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
+        range = table->r;
 
-        range_adj = (table->r[0] & 0xFFF) | ((u32)table->r[1] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xE9000000;
+        range_adj = (range[0] & 0xFFF) | ((u32)range[1] << 12);
+        reg = 0xE9;
+        range_adj = (range_adj & 0x00FFFFFF) | ((u32)reg << 24);
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[2] & 0xFFF) | ((u32)table->r[3] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xEA000000;
+        reg = 0xEA;
+        range += 2;
+        range_adj = (u32)reg << 24;
+        range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[4] & 0xFFF) | ((u32)table->r[5] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xEB000000;
+        reg = 0xEB;
+        range_adj = (u32)reg << 24;
+        range += 2;
+        range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[6] & 0xFFF) | ((u32)table->r[7] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xEC000000;
+        reg = 0xEC;
+        range_adj = (u32)reg << 24;
+        range += 2;
+        range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[8] & 0xFFF) | ((u32)table->r[9] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xED000000;
+        range += 2;
+        range_adj = (range[0] & 0xFFF) | ((u32)range[1] << 12);
+        reg = 0xED;
+        range_adj = (range_adj & 0x00FFFFFF) | ((u32)reg << 24);
         GX_WRITE_RAS_REG(range_adj);
     }
 

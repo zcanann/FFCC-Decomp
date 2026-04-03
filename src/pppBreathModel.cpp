@@ -20,6 +20,7 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
+void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -480,19 +481,20 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
  */
 extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
-    _pppPObject* object;
+    int colorOffset;
+    int* groupData;
+    Mtx* particleMtx;
+    Mtx* particleWMat;
     int i;
-    int j;
+    int groupIndex;
     int firstParticle;
-    int slotCount;
-    int groupCount;
+    int groupTable;
+    int slotIndex;
     int* dataOffsets;
-    unsigned char* base;
     unsigned char* work;
-    unsigned char* groupPtr;
-    unsigned char* particleWMat;
+    unsigned int slotCount;
     bool ready;
-    float scaleValue;
+    float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -506,10 +508,9 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         return;
     }
 
-    object = (_pppPObject*)breathModel;
     dataOffsets = offsets->m_serializedDataOffsets;
-    base = (unsigned char*)breathModel + 0x80;
-    work = base + dataOffsets[0];
+    colorOffset = dataOffsets[1];
+    work = (unsigned char*)breathModel + 0x80 + dataOffsets[0];
 
     if (*(void**)(work + 0x30) == NULL) {
         int maxParticleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
@@ -568,66 +569,61 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
 
-    PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)work);
-    UpdateAllParticle((_pppPObject*)breathModel, (VBreathModel*)work, pBreathModel, (VColor*)(base + dataOffsets[1]));
+    PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
+    UpdateAllParticle((_pppPObject*)breathModel, (VBreathModel*)work, pBreathModel,
+                      (VColor*)((unsigned char*)breathModel + 0x80 + colorOffset));
 
-    groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
-    slotCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-    particleWMat = *(unsigned char**)(work + 0x34);
-    groupPtr = *(unsigned char**)(work + 0x3C);
-    scaleValue = *(float*)((unsigned char*)pBreathModel + 8);
-
-    for (i = 0; i < groupCount; i++) {
-        ready = true;
-        for (j = 0; j < slotCount; j++) {
-            if ((*(signed char*)(*(int*)(groupPtr + 4) + j) == -1) || (*(signed char*)(*(int*)(groupPtr + 8) + j) != 1)) {
+    particleWMat = *(Mtx**)(work + 0x34);
+    groupData = *(int**)(work + 0x3C);
+    for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
+         groupIndex++) {
+        slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+        groupTable = *(int*)(work + 0x3C) + groupIndex * 0x5C;
+        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
+            if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
+                (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {
                 ready = false;
-                break;
+                goto group_ready;
             }
         }
-
+        ready = true;
+group_ready:
         if (ready) {
             firstParticle = -1;
-            for (j = 0; j < slotCount; j++) {
-                if (*(signed char*)(*(int*)(groupPtr + 8) + j) != -1) {
-                    firstParticle = (int)*(signed char*)(*(int*)(groupPtr + 4) + j);
+            scaledOwner = pppMngStPtr->m_ownerScale * *(float*)((unsigned char*)pBreathModel + 8);
+            for (slotIndex = 0; slotCount != 0; slotCount--) {
+                if (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != -1) {
+                    firstParticle = (int)*(signed char*)(*(int*)(groupTable + 4) + slotIndex);
                     break;
                 }
+                slotIndex++;
             }
 
-            Mtx* particleMtx = (Mtx*)(particleWMat + firstParticle * 0x30);
-
             PSMTXIdentity(scaleMtx);
-            scaleMtx[0][0] = scaleValue;
-            scaleMtx[1][1] = scaleValue;
-            scaleMtx[2][2] = scaleValue;
+            scaleMtx[0][0] = scaledOwner;
+            scaleMtx[1][1] = scaledOwner;
+            scaleMtx[2][2] = scaledOwner;
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
 
-            PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
-            PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0xC), &origin);
+            PSMTXConcat(*particleMtx, reinterpret_cast<_pppPObject*>(breathModel)->m_localMatrix.value, worldMtx);
+            PSMTXMultVec(worldMtx, (Vec*)(groupTable + 0xC), &origin);
 
-            PSMTXCopy(*particleMtx, rotMtx.value);
+            pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = kPppBreathModelZero;
             rotMtx.value[1][3] = kPppBreathModelZero;
             rotMtx.value[2][3] = kPppBreathModelZero;
-
-            dir = *(Vec*)(groupPtr + 0x18);
+            *(float*)(groupTable + 0x28) = scaledOwner;
+            pppCopyVector(dir, *(Vec*)(groupTable + 0x18));
             PSMTXMultVec(rotMtx.value, &dir, &dir);
-            if ((dir.x != 0.0f) || (dir.y != 0.0f) || (dir.z != 0.0f)) {
-                PSVECNormalize(&dir, &dirNorm);
-            } else {
-                dirNorm.x = 0.0f;
-                dirNorm.y = 0.0f;
-                dirNorm.z = 0.0f;
-            }
-            PSVECScale(&dirNorm, &target, *(float*)(groupPtr + 0x24));
-            PSVECAdd(&origin, &target, &target);
-            PSVECSubtract(&target, &origin, &hitVector);
-
-            pppHitCylinderSendSystem(pppMngStPtr, &origin, &hitVector, scaleValue,
-                                                                *(float*)((unsigned char*)pBreathModel + 4));
+            pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&dir), &dirNorm);
+            PSVECScale(&dirNorm, &target, *(float*)(groupTable + 0x24));
+            pppAddVector(target, origin, target);
+            pppSubVector(hitVector, target, origin);
+            pppHitCylinderSendSystem(pppMngStPtr, &origin, &hitVector, scaledOwner,
+                                     *(float*)((unsigned char*)pBreathModel + 4));
         }
 
-        groupPtr += 0x5C;
+        groupData += 0x17;
     }
 }
 

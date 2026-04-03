@@ -388,11 +388,9 @@ int* SetReverb(int bank, int kind, int* params)
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
     int* bestVoice = 0;
-    int* voice;
+    int* voice = 0;
     int bestEnvelope;
     int* voiceEnd;
-    int* selectedVoice;
-    int trackAddr = (int)track;
 
     if ((((u8*)track)[0x26] & 5) == 0) {
         voice = (int*)DAT_8032f444;
@@ -426,20 +424,21 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
                 voice = 0;
             }
         }
-        selectedVoice = voice;
-    } else if (((((u8*)track)[0x26] & 1) == 0) && (DAT_8032f444[(s8)((u8*)track)[0x14E] * 0x30] != 0) &&
-               (DAT_8032f444[(s8)((u8*)track)[0x14E] * 0x30] != (u32)trackAddr)) {
-        selectedVoice = 0;
     } else {
-        selectedVoice = (int*)DAT_8032f444 + (s8)((u8*)track)[0x14E] * 0x30;
+        s8 voiceIndex = *(s8*)((u8*)track + 0x14E);
+        voice = (int*)DAT_8032f444 + voiceIndex * 0x30;
+
+        if (((((u8*)track)[0x26] & 1) == 0) && (*voice != 0) && (*voice != (int)track)) {
+            voice = 0;
+        }
     }
 
-    if (selectedVoice != 0) {
-        selectedVoice[0x24] = selectedVoice[0x24] & 0xFFFFFFFD;
-        selectedVoice[0x2C] = 0x8000;
+    if (voice != 0) {
+        voice[0x24] = voice[0x24] & 0xFFFFFFFD;
+        voice[0x2C] = 0x8000;
     }
 
-    return (RedVoiceDATA*)selectedVoice;
+    return (RedVoiceDATA*)voice;
 }
 
 /*

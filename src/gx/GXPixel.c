@@ -85,8 +85,9 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     fog3 |= (fsel << 21);
     fog3 |= 0xF1000000;
 
-    fogclr = ((u32)color.g << 8) | color.b;
-    fogclr |= (u32)color.r << 16;
+    fogclr = (u32)color.r << 16;
+    fogclr |= (u32)color.g << 8;
+    fogclr |= color.b;
     fogclr = (fogclr & 0x00FFFFFF) | 0xF2000000;
 
     GX_WRITE_RAS_REG(fog0);

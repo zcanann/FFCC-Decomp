@@ -291,10 +291,6 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
             }
         }
 
-        if ((i != 0) && resetPoints) {
-            continue;
-        }
-
         localPos = work->m_origin;
         pppSubVector(localA, points[i], localPos);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
@@ -336,20 +332,22 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
                 *(float*)(step->m_payload + 0x20));
         }
 
-        if ((step->m_payload[0x3c] == 0) && hit && step->m_arg3 != -1) {
+        if (step->m_payload[0x3c] == 0) {
             u8* hitFrame = &work->m_hitFrame;
             if (*hitFrame >= step->m_payload[0x1d]) {
                 *hitFrame = 0;
-                u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
-                if (dataVals != 0) {
-                    int created =
-                        pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-                    if (created != 0) {
-                        *(struct pppLaser**)(created + 4) = pppLaser;
-                        Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
-                        createdPos->x = points[i].x;
-                        createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
-                        createdPos->z = points[i].z;
+                if (hit && (step->m_arg3 != -1)) {
+                    u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
+                    if (dataVals != 0) {
+                        int created =
+                            pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
+                        if (created != 0) {
+                            *(struct pppLaser**)(created + 4) = pppLaser;
+                            Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
+                            createdPos->x = points[i].x;
+                            createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+                            createdPos->z = points[i].z;
+                        }
                     }
                 }
             } else {

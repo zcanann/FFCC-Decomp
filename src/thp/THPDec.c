@@ -11,17 +11,17 @@ static f32 __THPIDCTWorkspace[64] ATTRIBUTE_ALIGN(32);
 static u8 *__THPHuffmanBits;
 static u8 *__THPHuffmanSizeTab;
 static u16 *__THPHuffmanCodeTab;
-THPSample *Gbase ATTRIBUTE_ALIGN(32);
-u32 Gwid ATTRIBUTE_ALIGN(32);
-f32 *Gq ATTRIBUTE_ALIGN(32);
 static u8 *__THPLCWork512[3];
 static u8 *__THPLCWork640[3];
-u32 __THPOldGQR5;
-u32 __THPOldGQR6;
-static u8 *__THPWorkArea;
 static THPCoeff *__THPMCUBuffer[6];
+static u8 *__THPWorkArea;
 THPFileInfo *__THPInfo;
-static BOOL __THPInitFlag = FALSE;
+u32 __THPOldGQR6;
+u32 __THPOldGQR5;
+f32 *Gq ATTRIBUTE_ALIGN(32);
+u32 Gwid ATTRIBUTE_ALIGN(32);
+THPSample *Gbase ATTRIBUTE_ALIGN(32);
+static BOOL __THPInitFlag;
 
 #ifdef DEBUG
 static const char* __THPVersion = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";

@@ -2673,11 +2673,12 @@ int CFlatRuntime2::GetSysControl(int controlNo)
 		int m_control;
 	};
 
-	if (controlNo == 3) {
-		return reinterpret_cast<RuntimeSysControlView*>(this)->m_control;
+	switch (controlNo) {
+	case 3:
+		return reinterpret_cast<RuntimeSysControlView*>(CFlat)->m_control;
+	default:
+		return 0;
 	}
-
-	return 0;
 }
 
 /*

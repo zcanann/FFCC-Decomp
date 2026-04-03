@@ -369,12 +369,10 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     s32 i;
     s32 j;
     s32 k;
-    s32 rowOfs;
-    s32 colOfs;
     f32 w;
     f32 max;
     s32 swp;
-    f32 absVal;
+    f32 ftmp;
 
     ASSERTMSGLINE(734, src, "MTX44Inverse():  NULL Mtx44Ptr 'src' ");
     ASSERTMSGLINE(735, inv, "MTX44Inverse():  NULL Mtx44Ptr 'inv' ");
@@ -382,24 +380,16 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     MTX44Copy(src, gjm);
     MTX44Identity(inv);
 
-    i = 0;
-    rowOfs = 0;
-    colOfs = 0;
-    while (i < 4) {
-        s32 rowOfs4;
-        s32 rowOfs8;
-        s32 rowOfsC;
-
+    for (i = 0; i < 4; i++) {
         max = 0.0f;
         swp = i;
-        j = i;
-        while (j < 4) {
-            absVal = fabsf(*(f32*)((u8*)gjm + (j << 4) + colOfs));
-            if (absVal > max) {
-                max = absVal;
-                swp = j;
+
+        for (k = i; k < 4; k++) {
+            ftmp = __fabsf(gjm[k][i]);
+            if (ftmp > max) {
+                max = ftmp;
+                swp = k;
             }
-            j++;
         }
 
         if (max == 0.0f) {
@@ -407,56 +397,27 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
         }
 
         if (swp != i) {
-            k = 0;
-            while (k < 4) {
+            for (k = 0; k < 4; k++) {
                 SWAP(gjm[i][k], gjm[swp][k]);
                 SWAP(inv[i][k], inv[swp][k]);
-                k++;
             }
         }
 
-        rowOfs4 = rowOfs + 0x4;
-        rowOfs8 = rowOfs + 0x8;
-        rowOfsC = rowOfs + 0xc;
-        w = 1.0f / *(f32*)((u8*)gjm + rowOfs + colOfs);
-        *(f32*)((u8*)gjm + rowOfs + 0x0) *= w;
-        *(f32*)((u8*)inv + rowOfs + 0x0) *= w;
-        *(f32*)((u8*)gjm + rowOfs4) *= w;
-        *(f32*)((u8*)inv + rowOfs4) *= w;
-        *(f32*)((u8*)gjm + rowOfs8) *= w;
-        *(f32*)((u8*)inv + rowOfs8) *= w;
-        *(f32*)((u8*)gjm + rowOfsC) *= w;
-        *(f32*)((u8*)inv + rowOfsC) *= w;
+        w = 1.0f / gjm[i][i];
+        for (j = 0; j < 4; j++) {
+            gjm[i][j] *= w;
+            inv[i][j] *= w;
+        }
 
-        for (k = 0, j = 0; k < 4; k += 2, j += 0x20) {
+        for (k = 0; k < 4; k++) {
             if (k != i) {
-                w = *(f32*)((u8*)gjm + j + colOfs);
-                *(f32*)((u8*)gjm + j + 0x0) -= *(f32*)((u8*)gjm + rowOfs + 0x0) * w;
-                *(f32*)((u8*)inv + j + 0x0) -= *(f32*)((u8*)inv + rowOfs + 0x0) * w;
-                *(f32*)((u8*)gjm + j + 0x4) -= *(f32*)((u8*)gjm + rowOfs4) * w;
-                *(f32*)((u8*)inv + j + 0x4) -= *(f32*)((u8*)inv + rowOfs4) * w;
-                *(f32*)((u8*)gjm + j + 0x8) -= *(f32*)((u8*)gjm + rowOfs8) * w;
-                *(f32*)((u8*)inv + j + 0x8) -= *(f32*)((u8*)inv + rowOfs8) * w;
-                *(f32*)((u8*)gjm + j + 0xc) -= *(f32*)((u8*)gjm + rowOfsC) * w;
-                *(f32*)((u8*)inv + j + 0xc) -= *(f32*)((u8*)inv + rowOfsC) * w;
-            }
-
-            if (k + 1 != i) {
-                w = *(f32*)((u8*)gjm + j + 0x10 + colOfs);
-                *(f32*)((u8*)gjm + j + 0x10) -= *(f32*)((u8*)gjm + rowOfs + 0x0) * w;
-                *(f32*)((u8*)inv + j + 0x10) -= *(f32*)((u8*)inv + rowOfs + 0x0) * w;
-                *(f32*)((u8*)gjm + j + 0x14) -= *(f32*)((u8*)gjm + rowOfs4) * w;
-                *(f32*)((u8*)inv + j + 0x14) -= *(f32*)((u8*)inv + rowOfs4) * w;
-                *(f32*)((u8*)gjm + j + 0x18) -= *(f32*)((u8*)gjm + rowOfs8) * w;
-                *(f32*)((u8*)inv + j + 0x18) -= *(f32*)((u8*)inv + rowOfs8) * w;
-                *(f32*)((u8*)gjm + j + 0x1c) -= *(f32*)((u8*)gjm + rowOfsC) * w;
-                *(f32*)((u8*)inv + j + 0x1c) -= *(f32*)((u8*)inv + rowOfsC) * w;
+                w = gjm[k][i];
+                for (j = 0; j < 4; j++) {
+                    gjm[k][j] -= gjm[i][j] * w;
+                    inv[k][j] -= inv[i][j] * w;
+                }
             }
         }
-
-        i++;
-        rowOfs += 0x10;
-        colOfs += 0x4;
     }
 
     return 1;

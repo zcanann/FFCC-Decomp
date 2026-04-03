@@ -240,6 +240,7 @@ elif args.warn == "error":
     cflags_base.append("-W error")
     
 # Game flags
+cflags_fmadd = [f for f in cflags_base if '-fp ' not in f and '-fp_contract' not in f] + ["-fp fmadd"]
 cflags_game = [
     *cflags_base,
     "-use_lmw_stmw on",
@@ -736,10 +737,10 @@ config.libs = [
     {
         "lib": "mtx",
         "mw_version": "GC/1.2.5n",
-        "cflags": [*cflags_base, "-DGEKKO"],
+        "cflags": [*cflags_fmadd, "-DGEKKO"],
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "mtx/mtx.c", cflags=[*replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"), "-DGEKKO"]),
+            Object(NonMatching, "mtx/mtx.c", cflags=[*replace_flag_prefix(cflags_fmadd, "-fp ", "-fp hardware"), "-DGEKKO"]),
             Object(Matching, "mtx/mtxvec.c"),
             Object(NonMatching, "mtx/mtx44.c"),
             Object(Matching, "mtx/mtx44vec.c"),

@@ -216,53 +216,34 @@ void C_QUATLerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma fp_contract off
 void C_QUATSlerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
 {
-    f32 ratioA, ratioB;
-    f32 prodX;
-    f32 prodY;
-    f32 prodZ;
-    f32 tmp;
-    f32 value = 1.0f;
-    f32 cosHalfTheta;
+    f32 theta, sin_th, cos_th;
+    f32 tp, tq;
 
-    prodX = p->x * q->x;
-    prodY = p->y * q->y;
-    prodZ = p->z * q->z;
-    cosHalfTheta = prodX + prodY + prodZ;
-    cosHalfTheta += p->w * q->w;
+    cos_th = p->x * q->x + p->y * q->y + p->z * q->z + p->w * q->w;
+    tq = 1.0f;
 
-    if (cosHalfTheta < 0.0f) {
-        cosHalfTheta = -cosHalfTheta;
-        value = -value;
+    if (cos_th < 0.0f) {
+        cos_th = -cos_th;
+        tq = -tq;
     }
 
-    if (cosHalfTheta < 0.9999899864196777f) {
-        f32 halfTheta = acosf(cosHalfTheta);
-        f32 sinHalfTheta = sinf(halfTheta);
+    if (cos_th <= 0.99999f) {
+        theta = acosf(cos_th);
+        sin_th = sinf(theta);
 
-        ratioA = sinf((1.0f - t) * halfTheta) / sinHalfTheta;
-        ratioB = sinf(t * halfTheta) / sinHalfTheta;
-        value *= ratioB;
-    }
-    else {
-        ratioA = 1.0f - t;
-        value *= t;
+        tp = sinf((1.0f - t) * theta) / sin_th;
+        tq *= sinf(t * theta) / sin_th;
+    } else {
+        tp = 1.0f - t;
+        tq *= t;
     }
 
-    ratioB = ratioA * p->x;
-    tmp = value * q->x;
-    r->x = ratioB + tmp;
-
-    ratioB = ratioA * p->y;
-    tmp = value * q->y;
-    r->y = ratioB + tmp;
-
-    ratioB = ratioA * p->z;
-    tmp = value * q->z;
-    r->z = ratioB + tmp;
-
-    ratioB = ratioA * p->w;
-    tmp = value * q->w;
-    r->w = ratioB + tmp;
+    r->x = (tp * p->x) + (tq * q->x);
+    r->y = (tp * p->y) + (tq * q->y);
+    r->z = (tp * p->z) + (tq * q->z);
+    r->w = (tp * p->w) + (tq * q->w);
 }
+#pragma fp_contract on

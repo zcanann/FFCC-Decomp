@@ -1739,9 +1739,10 @@ void CSound::searchSe3D(int)
 int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
 {
     u8* se;
+    int loopCount;
     int slot;
     int pan;
-    int volume[4];
+    int volume;
     CRedSound* redSound;
 
     if (soundId < 0) {
@@ -1750,55 +1751,53 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         CSoundLayout& sound = SoundData(this);
         redSound = RedSound(this);
         se = sound.m_seWork;
-        slot = 0x80;
-        do {
-            if (static_cast<s8>(*se) >= 0) {
-                *se = (*se & 0x7F) | 0x80;
-                *se &= 0xBF;
-                *reinterpret_cast<int*>(se + 0xC) = soundId;
-                slot = sound.m_seCount;
-                sound.m_seCount = slot + 1;
-                *reinterpret_cast<int*>(se + 4) = slot;
 
-                *reinterpret_cast<float*>(se + 0x10) = nearDistance;
-                *reinterpret_cast<float*>(se + 0x14) = farDistance;
-                *reinterpret_cast<Vec*>(se + 0x18) = *pos;
-                se[3] = 0xFF;
-
-                calcVolumePan(reinterpret_cast<CSe3D*>(se), volume[0], pan);
-                se[1] = static_cast<u8>(volume[0]);
-                se[2] = static_cast<u8>(pan);
-                se[0x24] = 0xFF;
-                se[0x25] = 0xFF;
-                se[0x26] = 0xFF;
-                se[0x27] = 0xFF;
-
-                if (soundId < 0) {
-                    Printf__7CSystemFPce(&System, s_soundErrorFmt);
-                    slot = -1;
-                } else if (soundId < 4000) {
-                    slot = soundId / 1000 + (soundId >> 31);
-                    slot = SePlay__9CRedSoundFiiiii(redSound, slot - (slot >> 31),
-                                                    soundId + (slot - (slot >> 31)) * -1000, pan,
-                                                    volume[0] & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-                    if (fadeFrames != 0) {
-                        SeVolume__9CRedSoundFiii(redSound, slot, volume[0], fadeFrames);
-                    }
-                } else {
-                    slot = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan,
-                                                    volume[0] & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-                    if (fadeFrames != 0) {
-                        SeVolume__9CRedSoundFiii(redSound, slot, volume[0], fadeFrames);
-                    }
-                }
-
-                *reinterpret_cast<int*>(se + 8) = slot;
-                return *reinterpret_cast<int*>(se + 4);
+        for (loopCount = 0x80; loopCount != 0; loopCount--, se += 0x28) {
+            if (static_cast<s8>(*se) < 0) {
+                continue;
             }
-            se += 0x28;
-            slot--;
+
+            *se = (*se & 0x7F) | 0x80;
+            *se &= 0xBF;
+            *reinterpret_cast<int*>(se + 0xC) = soundId;
+            slot = sound.m_seCount;
+            sound.m_seCount = slot + 1;
+            *reinterpret_cast<int*>(se + 4) = slot;
+
+            *reinterpret_cast<float*>(se + 0x10) = nearDistance;
+            *reinterpret_cast<float*>(se + 0x14) = farDistance;
+            *reinterpret_cast<Vec*>(se + 0x18) = *pos;
+            se[3] = 0xFF;
+
+            calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
+            se[1] = static_cast<u8>(volume);
+            se[2] = static_cast<u8>(pan);
+            se[0x24] = 0xFF;
+            se[0x25] = 0xFF;
+            se[0x26] = 0xFF;
+            se[0x27] = 0xFF;
+
+            if (soundId < 0) {
+                Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                slot = -1;
+            } else if (soundId < 4000) {
+                int bank = soundId / 1000;
+                slot = SePlay__9CRedSoundFiiiii(redSound, bank, soundId - bank * 1000, pan,
+                                                volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+                if (fadeFrames != 0) {
+                    SeVolume__9CRedSoundFiii(redSound, slot, volume, fadeFrames);
+                }
+            } else {
+                slot = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan,
+                                                volume & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+                if (fadeFrames != 0) {
+                    SeVolume__9CRedSoundFiii(redSound, slot, volume, fadeFrames);
+                }
+            }
+
+            *reinterpret_cast<int*>(se + 8) = slot;
+            return *reinterpret_cast<int*>(se + 4);
         }
-        while (slot != 0);
     }
 
     return -1;

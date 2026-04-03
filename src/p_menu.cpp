@@ -36,10 +36,21 @@ struct Vec4d
     float z;
     float w;
 };
+
+struct MenuFontTlutPalette
+{
+    _GXColor shadow;
+    _GXColor highlight;
+};
+
 u8 ARRAY_802ea1a0[0x20];
 extern void* __vt__8CManager;
 extern "C" void* __vt__8CMenuPcs[];
 extern int DAT_8020ef9c[];
+extern u8 sMenuFontShadeTable[];
+extern u8 sMenuFontPrimaryAlphaTable[];
+extern u8 sMenuFontSecondaryAlphaTable[];
+extern MenuFontTlutPalette sMenuFontTlutPaletteTable[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
 extern char s_dvd__smenu__s_fnt_801d9da0[];
 extern char s_dvd__smenu_gc22_fnt_801d9db4[];
@@ -374,43 +385,71 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
     u8* self = reinterpret_cast<u8*>(this);
+    CFont** fontSlot = reinterpret_cast<CFont**>(self + 0xF8 + slot * 4);
 
     if (type == 1) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
-    } else if (type < 1) {
-        if (-1 < type) {
+    } else if (type >= 0) {
+        if (type < 1) {
             stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+        } else if (type < 3) {
+            stage = pppEnvStPtr->m_stagePtr;
         }
-    } else if (type < 3) {
-        stage = pppEnvStPtr->m_stagePtr;
     }
 
-    if ((slot == 0) && (FontMan.m_font != 0)) {
-        *reinterpret_cast<CFont**>(self + 0xF8) = FontMan.m_font;
-        reinterpret_cast<u32*>(*reinterpret_cast<CFont**>(self + 0xF8))[1] =
-            reinterpret_cast<u32*>(*reinterpret_cast<CFont**>(self + 0xF8))[1] + 1;
+    CFont* font = FontMan.m_font;
+    if ((slot == 0) && (font != 0)) {
+        *fontSlot = font;
+        reinterpret_cast<u32*>(font)[1] = reinterpret_cast<u32*>(font)[1] + 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        CFont* font = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
-        *reinterpret_cast<CFont**>(self + 0xF8 + slot * 4) = font;
-        (*reinterpret_cast<CFont**>(self + 0xF8 + slot * 4))->Create(File.m_readBuffer, stage);
+        font = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
+        *fontSlot = font;
+        font->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
     }
 
     if (tlutMode < 2) {
-        int slotOffset = slot * 4;
-        const _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-        for (int tlut = 0; tlut < 0x10; tlut++) {
-            for (int i = 0; i < 0x1C; i++) {
-                (*reinterpret_cast<CFont**>(self + 0xF8 + slotOffset))->SetTlutColor(tlut, i, white);
-                (*reinterpret_cast<CFont**>(self + 0xF8 + slotOffset))->SetTlutColor(tlut, i + 0x1C, white);
+        font = *fontSlot;
+        MenuFontTlutPalette* palette = &sMenuFontTlutPaletteTable[tlutMode * 0x1C];
+
+        for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {
+            for (int tlutIndex = 0; tlutIndex < 0x1C; tlutIndex++) {
+                _GXColor color = {
+                    static_cast<u8>(0xFF - sMenuFontShadeTable[colorIndex]),
+                    static_cast<u8>(0xFF - sMenuFontShadeTable[colorIndex]),
+                    static_cast<u8>(0xFF - sMenuFontShadeTable[colorIndex]),
+                    sMenuFontPrimaryAlphaTable[colorIndex],
+                };
+
+                if (colorIndex < 8) {
+                    color.r = palette[tlutIndex].highlight.r;
+                    color.g = palette[tlutIndex].highlight.g;
+                    color.b = palette[tlutIndex].highlight.b;
+                } else {
+                    float blend = 1.0f - static_cast<float>(colorIndex - 8) * 0.125f;
+                    float blendInv = 1.0f - blend;
+
+                    color.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.r) * blendInv +
+                                              static_cast<float>(palette[tlutIndex].highlight.r) * blend);
+                    color.g = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.g) * blendInv +
+                                              static_cast<float>(palette[tlutIndex].highlight.g) * blend);
+                    color.b = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.b) * blendInv +
+                                              static_cast<float>(palette[tlutIndex].highlight.b) * blend);
+                }
+
+                font->SetTlutColor(tlutIndex, colorIndex, color);
+
+                color.a = sMenuFontSecondaryAlphaTable[colorIndex];
+                font->SetTlutColor(tlutIndex + 0x1C, colorIndex, color);
             }
         }
-        (*reinterpret_cast<CFont**>(self + 0xF8 + slotOffset))->FlushTlutColor();
+
+        font->FlushTlutColor();
     }
 }
 

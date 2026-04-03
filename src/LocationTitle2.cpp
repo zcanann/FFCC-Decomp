@@ -25,9 +25,9 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
-static int GetGraphFrameFromId(int graphId)
+static int GetGraphFrameFromId(u32 graphId)
 {
-    return graphId / 0x1000;
+    return (int)graphId / 0x1000;
 }
 
 struct LocationTitle2Work {

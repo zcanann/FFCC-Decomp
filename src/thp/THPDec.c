@@ -24,9 +24,10 @@ THPSample *Gbase ATTRIBUTE_ALIGN(32);
 static BOOL __THPInitFlag;
 
 #ifdef DEBUG
-static const char* __THPVersion = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";
+const char* __THPVersion = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";
 #else
-static const char* __THPVersion = "<< Dolphin SDK - THP\trelease build: Apr  5 2004 04:18:14 (0x2301) >>";
+extern const char __THPVersionString[];
+const char* __THPVersion = __THPVersionString;
 #endif
 
 #define THPROUNDUP(a, b) ((((s32)(a)) + ((s32)(b)-1L)) / ((s32)(b)))

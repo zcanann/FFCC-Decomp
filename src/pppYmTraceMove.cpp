@@ -25,7 +25,7 @@ struct pppYmTraceMoveMngStRaw {
 	Vec m_basePosition;
 	u32 _pad64;
 	Vec m_paramVec0;
-	char pad74[0x68];
+	char pad74[0x64];
 	void* m_owner;
 };
 

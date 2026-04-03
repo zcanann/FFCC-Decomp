@@ -7,14 +7,24 @@ extern "C" {
 void pppNormalize__FR3Vec3Vec(float*, Vec*);
 }
 
+struct pppYmTraceMoveWork {
+	Vec m_direction;
+	u32 _pad0C;
+	Vec m_previousDirection;
+	f32 m_distance;
+	f32 m_velocity;
+	f32 m_acceleration;
+};
+
 struct pppYmTraceMoveMngStRaw {
 	char pad00[0x08];
 	Vec m_position;
 	char pad14[0x34];
-	float m_userFloat0;
-	float m_userFloat1;
-	Vec m_savedPosition;
-	char pad5c[0x80];
+	Vec m_historyDirection;
+	f32 m_scale;
+	Vec m_basePosition;
+	Vec m_paramVec0;
+	char pad74[0x68];
 	void* m_owner;
 };
 
@@ -29,18 +39,16 @@ struct pppYmTraceMoveMngStRaw {
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
 {
-	Vec* dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	Vec savedPosition = *(Vec*)&pppMngStPtr->m_savedPosition.z;
-	Vec paramVec = pppMngStPtr->m_paramVec0;
+	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
+	pppYmTraceMoveWork* work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
 	f32 zero;
 
-	pppSubVector(*(Vec*)&dest[1].y, savedPosition, paramVec);
-	Vec dir = *(Vec*)&dest[1].y;
-	pppCopyVector(*dest, dir);
+	pppSubVector(work->m_previousDirection, pppMngSt->m_basePosition, pppMngSt->m_paramVec0);
+	pppCopyVector(work->m_direction, work->m_previousDirection);
 	zero = kPppYmTraceMoveZero;
-	dest[3].x = zero;
-	dest[2].z = zero;
-	dest[2].y = zero;
+	work->m_acceleration = zero;
+	work->m_velocity = zero;
+	work->m_distance = zero;
 }
 
 /*
@@ -54,23 +62,18 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
  */
 void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3)
 {
-	_pppMngSt* pppMngSt;
-	pppYmTraceMoveMngStRaw* rawPppMngSt;
+	pppYmTraceMoveMngStRaw* pppMngSt;
+	pppYmTraceMoveWork* work;
 	u8* owner;
-	Vec* dest;
 	Vec local_128;
 	Vec local_11c;
 	Vec local_110;
-	Vec local_104;
 	Vec local_ec;
-	Vec local_98;
+	Vec local_e0;
 	Vec local_8c;
 	Vec local_74;
-	Vec local_68;
 	Vec local_5c;
-	Vec local_50;
 	Vec local_44;
-	Vec local_38;
 	Vec local_2c;
 	Vec local_20;
 	Quaternion local_80;
@@ -81,39 +84,27 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		return;
 	}
 
-	pppMngSt = pppMngStPtr;
-	rawPppMngSt = (pppYmTraceMoveMngStRaw*)pppMngSt;
-	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
-	owner = (u8*)rawPppMngSt->m_owner;
+	pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
+	work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
+	owner = (u8*)pppMngSt->m_owner;
 
-	dest[2].z = dest[2].z + dest[3].x;
-	dest[2].y = dest[2].y + dest[2].z;
+	work->m_velocity = work->m_velocity + work->m_acceleration;
+	work->m_distance = work->m_distance + work->m_velocity;
 
 	if (param_2->m_graphId == pppYmTraceMove->m_graphId) {
-		dest[2].y = dest[2].y + param_2->m_initWOrk;
-		dest[2].z = dest[2].z + param_2->m_stepValue;
-		dest[3].x = dest[3].x + param_2->m_arg3;
+		work->m_distance = work->m_distance + param_2->m_initWOrk;
+		work->m_velocity = work->m_velocity + param_2->m_stepValue;
+		work->m_acceleration = work->m_acceleration + param_2->m_arg3;
 	}
 
 	if (owner == nullptr) {
-		local_8c.x = dest->x;
-		local_8c.y = dest->y;
-		local_8c.z = dest->z;
-		pppCopyVector(local_20, local_8c);
-
-		local_98.x = dest[1].y;
-		local_98.y = dest[1].z;
-		local_98.z = dest[2].x;
-		pppCopyVector(local_2c, local_98);
+		pppCopyVector(local_20, work->m_direction);
+		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
 		local_74.x = *(f32*)(owner + 0x15c);
 		local_74.y = *(f32*)(owner + 0x160);
 		local_74.z = *(f32*)(owner + 0x164);
-
-		local_68.x = rawPppMngSt->m_position.x;
-		local_68.y = rawPppMngSt->m_position.y;
-		local_68.z = rawPppMngSt->m_position.z;
-		pppSubVector(local_20, local_74, local_68);
+		pppSubVector(local_20, local_74, pppMngSt->m_position);
 
 		local_20.y = local_20.y + param_2->m_payload;
 		local_5c.x = local_20.x;
@@ -121,25 +112,13 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_5c.z = local_20.z;
 		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_5c);
 
-		local_50.x = local_20.x;
-		local_50.y = local_20.y;
-		local_50.z = local_20.z;
-		pppCopyVector(*dest, local_50);
-
-		local_44.x = rawPppMngSt->m_userFloat0;
-		local_44.y = rawPppMngSt->m_userFloat1;
-		local_44.z = rawPppMngSt->m_savedPosition.x;
-		local_38.x = rawPppMngSt->m_position.x;
-		local_38.y = rawPppMngSt->m_position.y;
-		local_38.z = rawPppMngSt->m_position.z;
-		pppSubVector(local_2c, local_38, local_44);
+		pppCopyVector(work->m_direction, local_20);
+		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_historyDirection);
 
 		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {
-			local_ec.x = dest[1].y;
-			local_ec.y = dest[1].z;
-			local_ec.z = dest[2].x;
-			pppCopyVector(local_2c, local_ec);
+			pppCopyVector(local_2c, work->m_previousDirection);
 		}
+
 		local_44.x = local_2c.x;
 		local_44.y = local_2c.y;
 		local_44.z = local_2c.z;
@@ -160,20 +139,14 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	local_8c.x = local_80.x;
 	local_8c.y = local_80.y;
 	local_8c.z = local_80.z;
-	PSVECScale(&local_8c, &local_8c, dest[2].y * *(f32*)((u8*)pppMngSt + 0x54));
+	PSVECScale(&local_8c, &local_8c, work->m_distance * pppMngSt->m_scale);
 
-	local_110.x = pppMngSt->m_position.x;
-	local_110.y = pppMngSt->m_position.y;
-	local_110.z = pppMngSt->m_position.z;
-	local_104.x = local_8c.x;
-	local_104.y = local_8c.y;
-	local_104.z = local_8c.z;
-	pppAddVector(local_ec, local_104, local_110);
+	pppCopyVector(local_110, pppMngSt->m_position);
+	pppCopyVector(local_e0, local_8c);
+	pppAddVector(local_ec, local_e0, local_110);
 
-	local_11c.x = pppMngSt->m_position.x;
-	local_11c.y = pppMngSt->m_position.y;
-	local_11c.z = pppMngSt->m_position.z;
-	pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), local_11c);
+	pppCopyVector(local_11c, pppMngSt->m_position);
+	pppCopyVector(pppMngSt->m_historyDirection, local_11c);
 
 	local_128.x = local_ec.x;
 	local_128.y = local_ec.y;

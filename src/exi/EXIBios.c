@@ -23,11 +23,47 @@
 
 #define EXI_0LENGTH_EXILENGTH_MASK 0x03FFFFE0
 
+enum {
+    EXI_STRING_MEMORY_CARD_59 = 0x48,
+    EXI_STRING_MEMORY_CARD_123 = 0x58,
+    EXI_STRING_MEMORY_CARD_251 = 0x68,
+    EXI_STRING_MEMORY_CARD_507 = 0x78,
+    EXI_STRING_MEMORY_CARD_1019 = 0x88,
+    EXI_STRING_MEMORY_CARD_2043 = 0x9C,
+    EXI_STRING_USB_ADAPTER = 0xB0,
+    EXI_STRING_NET_CARD = 0xBC,
+    EXI_STRING_ARTIST_ETHER = 0xC8,
+    EXI_STRING_BROADBAND_ADAPTER = 0xD8,
+    EXI_STRING_STREAM_HANGER = 0xEC,
+    EXI_STRING_IS_DOL_VIEWER = 0xFC,
+};
+
 #if DEBUG
 const char* __EXIVersion = "<< Dolphin SDK - EXI\tdebug build: Apr  5 2004 03:55:29 (0x2301) >>";
 #else
-extern const char gEXIStringTable[];
+static u32 sExiSdkStringOffsetsA[] = {
+    0x0, 0x1F, 0x3B, 0x5A, 0x78, 0x97, 0xB5, 0xD4, 0xF3, 0x111, 0x130, 0x14E,
+};
+static u32 sExiSdkStringOffsetsB[] = {
+    0x0, 0x1F, 0x3C, 0x5B, 0x79, 0x98, 0xB6, 0xD5, 0xF4, 0x112, 0x131, 0x14F,
+};
+char gEXIStringTable[] =
+    "<< Dolphin SDK - EXI\trelease build: Mar 11 2003 11:19:00 (0x2301) >>\0\0\0\0"
+    "Memory Card 59\0\0"
+    "Memory Card 123\0"
+    "Memory Card 251\0"
+    "Memory Card 507\0"
+    "Memory Card 1019\0\0\0\0"
+    "Memory Card 2043\0\0\0\0"
+    "USB Adapter\0"
+    "Net Card\0\0\0\0"
+    "Artist Ether\0\0\0\0"
+    "Broadband Adapter\0\0\0"
+    "Stream Hanger\0\0\0"
+    "IS-DOL-VIEWER\0\0\0\0\0\0";
+static char sSIVersionString[] = "<< Dolphin SDK - SI\trelease build: Sep  5 2002 05:33:08 (0x2301) >>";
 const char* __EXIVersion = gEXIStringTable;
+static u32 sExiSdataPad = 0;
 #endif
 
 static EXIControl Ecb[3];
@@ -827,51 +863,51 @@ s32 EXIGetType(s32 chan, u32 dev, u32* type) {
 char* EXIGetTypeString(u32 type) {
     switch (type) {
     case EXI_MEMORY_CARD_59:
-        return "Memory Card 59";
+        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_59];
     case EXI_MEMORY_CARD_123:
-        return "Memory Card 123";
+        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_123];
     case EXI_MEMORY_CARD_251:
-        return "Memory Card 251";
+        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_251];
     case EXI_MEMORY_CARD_507:
-        return "Memory Card 507";
+        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_507];
     case EXI_MEMORY_CARD_1019:
-        return "Memory Card 1019";
+        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_1019];
     case EXI_MEMORY_CARD_2043:
-        return "Memory Card 2043";
+        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_2043];
     case EXI_USB_ADAPTER:
-        return "USB Adapter";
+        return (char*)&gEXIStringTable[EXI_STRING_USB_ADAPTER];
     case EXI_NPDP_GDEV:
-        return "GDEV";
+        return NULL;
     case EXI_MODEM:
-        return "Modem";
+        return NULL;
     case EXI_MARLIN:
-        return "Marlin";
+        return NULL;
     case EXI_AD16:
-        return "AD16";
+        return NULL;
     case EXI_RS232C:
-        return "RS232C";
+        return NULL;
     case 0x80000020:
     case 0x80000080:
     case 0x80000040:
     case 0x80000008:
     case 0x80000010:
     case 0x80000004:
-        return "Net Card";
+        return (char*)&gEXIStringTable[EXI_STRING_NET_CARD];
     case EXI_ETHER_VIEWER:
-        return "Artist Ether";
+        return (char*)&gEXIStringTable[EXI_STRING_ARTIST_ETHER];
     case 0x4020100:
     case 0x4020300:
     case EXI_ETHER:
     case 0x4220000:
-        return "Broadband Adapter";
+        return (char*)&gEXIStringTable[EXI_STRING_BROADBAND_ADAPTER];
     case EXI_MIC:
-        return "Mic";
+        return NULL;
     case EXI_STREAM_HANGER:
-        return "Stream Hanger";
+        return (char*)&gEXIStringTable[EXI_STRING_STREAM_HANGER];
     case EXI_IS_VIEWER:
-        return "IS-DOL-VIEWER";
+        return (char*)&gEXIStringTable[EXI_STRING_IS_DOL_VIEWER];
     default:
-        return "Unknown";
+        return NULL;
     }
 }
 

@@ -520,14 +520,14 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->y = (float)dVar20;
         inVec->z = (float)dVar21;
         PSVECNormalize(inVec, inVec);
-
+        local_c8.x = DAT_801dd4bc;
+        local_c8.y = DAT_801dd4c0;
+        local_c8.z = DAT_801dd4c4;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
         dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)step + 0x38) + dVar17));
-        local_c8.x = DAT_801dd4bc;
-        local_c8.y = DAT_801dd4c0;
-        local_c8.z = DAT_801dd4c4;
+
         inVec[1].x = (float)dVar22;
         inVec[1].y = (float)dVar22;
         inVec[1].z = (float)dVar22;

@@ -87,121 +87,110 @@ CMaterialEditorPcs::~CMaterialEditorPcs()
  */
 void CMaterialEditorPcs::Init()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    u32 clz0;
+    u32 clz1;
+    u8 level;
+    unsigned char* self;
+    int remaining;
 
-    const float kZero = 0.0f;
-    const float kOne = 1.0f;
-    const float kNegOne = -1.0f;
+    self = reinterpret_cast<unsigned char*>(this);
+    self[0x8] = 0x7f;
+    clz0 = static_cast<u32>(__cntlzw(0));
+    self[0x9] = 0x7f;
+    self[0xa] = 0x7f;
+    clz1 = static_cast<u32>(__cntlzw(1));
+    level = static_cast<u8>(-((u8)(clz0 >> 5) & 1)) & 0x3f;
+    self[0xb] = 0xff;
+    self[0xc] = level;
+    clz0 = static_cast<u32>(__cntlzw(2));
+    self[0xd] = level;
+    self[0xe] = level;
+    level = static_cast<u8>(-((u8)(clz1 >> 5) & 1)) & 0x3f;
+    self[0xf] = 0xff;
+    *reinterpret_cast<float*>(self + 0x18) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x1c) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x20) = -1.0f;
+    self[0x10] = level;
+    self[0x11] = level;
+    self[0x12] = level;
+    level = static_cast<u8>(-((u8)(clz0 >> 5) & 1)) & 0x3f;
+    self[0x13] = 0xff;
+    *reinterpret_cast<float*>(self + 0x24) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x28) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x2c) = -1.0f;
+    self[0x14] = level;
+    self[0x15] = level;
+    self[0x16] = level;
+    self[0x17] = 0xff;
+    *reinterpret_cast<float*>(self + 0x30) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x34) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x38) = -1.0f;
+    *reinterpret_cast<float*>(self + 0x44) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x40) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x3c) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x50) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x4c) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x48) = 0.0f;
+    *reinterpret_cast<float*>(self + 0x5c) = 1.0f;
+    *reinterpret_cast<float*>(self + 0x58) = 1.0f;
+    *reinterpret_cast<float*>(self + 0x54) = 1.0f;
+    *reinterpret_cast<u32*>(self + 0xbc) = 0;
 
-    const unsigned int clz0 = static_cast<unsigned int>(__cntlzw(0));
-    const unsigned int clz1 = static_cast<unsigned int>(__cntlzw(1));
-    const unsigned int clz2 = static_cast<unsigned int>(__cntlzw(2));
-
-    WriteU8(self, 0x8, 0x7f);
-    WriteU8(self, 0x9, 0x7f);
-    WriteU8(self, 0xA, 0x7f);
-    WriteU8(self, 0xB, 0xff);
-
-    unsigned char level = static_cast<unsigned char>(-static_cast<int>((clz0 >> 5) & 1)) & 0x3f;
-    WriteU8(self, 0xC, level);
-    WriteU8(self, 0xD, level);
-    WriteU8(self, 0xE, level);
-    WriteU8(self, 0xF, 0xff);
-
-    WriteF32(self, 0x18, kZero);
-    WriteF32(self, 0x1C, kZero);
-    WriteF32(self, 0x20, kNegOne);
-
-    level = static_cast<unsigned char>(-static_cast<int>((clz1 >> 5) & 1)) & 0x3f;
-    WriteU8(self, 0x10, level);
-    WriteU8(self, 0x11, level);
-    WriteU8(self, 0x12, level);
-    WriteU8(self, 0x13, 0xff);
-
-    WriteF32(self, 0x24, kZero);
-    WriteF32(self, 0x28, kZero);
-    WriteF32(self, 0x2C, kNegOne);
-
-    level = static_cast<unsigned char>(-static_cast<int>((clz2 >> 5) & 1)) & 0x3f;
-    WriteU8(self, 0x14, level);
-    WriteU8(self, 0x15, level);
-    WriteU8(self, 0x16, level);
-    WriteU8(self, 0x17, 0xff);
-
-    WriteF32(self, 0x30, kZero);
-    WriteF32(self, 0x34, kZero);
-    WriteF32(self, 0x38, kNegOne);
-    WriteF32(self, 0x3C, kZero);
-    WriteF32(self, 0x40, kZero);
-    WriteF32(self, 0x44, kZero);
-    WriteF32(self, 0x48, kZero);
-    WriteF32(self, 0x4C, kZero);
-    WriteF32(self, 0x50, kZero);
-    WriteF32(self, 0x54, kOne);
-    WriteF32(self, 0x58, kOne);
-    WriteF32(self, 0x5C, kOne);
-
-    WriteU32(self, 0xBC, 0);
-
-    int remaining = 2;
-    CMaterialEditorPcs* cursor = this;
+    remaining = 2;
     do {
-        unsigned char* block = reinterpret_cast<unsigned char*>(cursor);
-
-        *reinterpret_cast<unsigned int*>(block + 0x2BC) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2FC) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x23C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x33C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x37C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x27C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2C0) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x300) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x240) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x340) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x380) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x280) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2C4) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x304) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x244) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x344) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x384) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x284) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2C8) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x308) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x248) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x348) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x388) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x288) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2CC) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x30C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x24C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x34C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x38C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x28C) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2D0) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x310) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x250) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x350) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x390) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x290) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2D4) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x314) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x254) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x354) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x394) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x294) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x2D8) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x318) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x258) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x358) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x398) = 0;
-        *reinterpret_cast<unsigned int*>(block + 0x298) = 0;
-
-        cursor = reinterpret_cast<CMaterialEditorPcs*>(block + 0x20);
-        remaining -= 1;
+        *reinterpret_cast<u32*>(self + 0x2bc) = 0;
+        *reinterpret_cast<u32*>(self + 0x2fc) = 0;
+        *reinterpret_cast<u32*>(self + 0x23c) = 0;
+        *reinterpret_cast<u32*>(self + 0x33c) = 0;
+        *reinterpret_cast<u32*>(self + 0x37c) = 0;
+        *reinterpret_cast<u32*>(self + 0x27c) = 0;
+        *reinterpret_cast<u32*>(self + 0x2c0) = 0;
+        *reinterpret_cast<u32*>(self + 0x300) = 0;
+        *reinterpret_cast<u32*>(self + 0x240) = 0;
+        *reinterpret_cast<u32*>(self + 0x340) = 0;
+        *reinterpret_cast<u32*>(self + 0x380) = 0;
+        *reinterpret_cast<u32*>(self + 0x280) = 0;
+        *reinterpret_cast<u32*>(self + 0x2c4) = 0;
+        *reinterpret_cast<u32*>(self + 0x304) = 0;
+        *reinterpret_cast<u32*>(self + 0x244) = 0;
+        *reinterpret_cast<u32*>(self + 0x344) = 0;
+        *reinterpret_cast<u32*>(self + 0x384) = 0;
+        *reinterpret_cast<u32*>(self + 0x284) = 0;
+        *reinterpret_cast<u32*>(self + 0x2c8) = 0;
+        *reinterpret_cast<u32*>(self + 0x308) = 0;
+        *reinterpret_cast<u32*>(self + 0x248) = 0;
+        *reinterpret_cast<u32*>(self + 0x348) = 0;
+        *reinterpret_cast<u32*>(self + 0x388) = 0;
+        *reinterpret_cast<u32*>(self + 0x288) = 0;
+        *reinterpret_cast<u32*>(self + 0x2cc) = 0;
+        *reinterpret_cast<u32*>(self + 0x30c) = 0;
+        *reinterpret_cast<u32*>(self + 0x24c) = 0;
+        *reinterpret_cast<u32*>(self + 0x34c) = 0;
+        *reinterpret_cast<u32*>(self + 0x38c) = 0;
+        *reinterpret_cast<u32*>(self + 0x28c) = 0;
+        *reinterpret_cast<u32*>(self + 0x2d0) = 0;
+        *reinterpret_cast<u32*>(self + 0x310) = 0;
+        *reinterpret_cast<u32*>(self + 0x250) = 0;
+        *reinterpret_cast<u32*>(self + 0x350) = 0;
+        *reinterpret_cast<u32*>(self + 0x390) = 0;
+        *reinterpret_cast<u32*>(self + 0x290) = 0;
+        *reinterpret_cast<u32*>(self + 0x2d4) = 0;
+        *reinterpret_cast<u32*>(self + 0x314) = 0;
+        *reinterpret_cast<u32*>(self + 0x254) = 0;
+        *reinterpret_cast<u32*>(self + 0x354) = 0;
+        *reinterpret_cast<u32*>(self + 0x394) = 0;
+        *reinterpret_cast<u32*>(self + 0x294) = 0;
+        *reinterpret_cast<u32*>(self + 0x2d8) = 0;
+        *reinterpret_cast<u32*>(self + 0x318) = 0;
+        *reinterpret_cast<u32*>(self + 0x258) = 0;
+        *reinterpret_cast<u32*>(self + 0x358) = 0;
+        *reinterpret_cast<u32*>(self + 0x398) = 0;
+        *reinterpret_cast<u32*>(self + 0x298) = 0;
+        self += 0x20;
+        remaining += -1;
     } while (remaining != 0);
 
-    WriteU8(self, 0x3BC, 0);
+    reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
 }
 
 /*

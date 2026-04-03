@@ -346,7 +346,7 @@ void CFunnyShape::Update()
         work->delay = static_cast<s16>(work->delay - 0x200);
         if (work->delay <= 0) {
             work->frame = static_cast<s16>(work->frame + 1);
-            if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6) <= work->frame) {
+            if (work->frame >= *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6)) {
                 work->frame = 0;
 
                 s32 r = rand();
@@ -357,13 +357,14 @@ void CFunnyShape::Update()
                 work->y = static_cast<float>(r - (r / range) * range);
                 work->z = FLOAT_8032fd6c;
                 work->delay = 2;
-                work->viewportX = FLOAT_8032fd6c;
                 work->viewportY = FLOAT_8032fd6c;
+                work->viewportX = FLOAT_8032fd6c;
 
                 r = rand();
                 s32 q = r / 0x168 + (r >> 0x1F);
                 q = r + (q - (q >> 0x1F)) * -0x168;
-                work->angle = (FLOAT_8032fda4 * static_cast<float>(q)) / FLOAT_8032fda8;
+                work->angle = static_cast<float>(q);
+                work->angle = (FLOAT_8032fda4 * work->angle) / FLOAT_8032fda8;
 
                 u32 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
@@ -382,7 +383,8 @@ void CFunnyShape::Update()
                 }
             }
 
-            work->delay = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + work->frame * 8 + 0x12);
+            work->delay =
+                reinterpret_cast<const s16*>(reinterpret_cast<u8*>(AnimData(this)) + 0x12)[work->frame * 4];
         }
 
         if (noSpread != 0) {

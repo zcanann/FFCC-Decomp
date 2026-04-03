@@ -360,9 +360,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         Vec transformedPos;
 
         if ((int)particle->m_frame >= graphFrame) {
-            transformedPos.x = 0.0f;
-            transformedPos.y = 0.0f;
-            transformedPos.z = 0.0f;
+            transformedPos.x = transformedPos.y = transformedPos.z = 0.0f;
             PSMTXIdentity(model);
             model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];
             model[1][1] = pppMngStPtr->m_scale.y * locationTitle->m_localMatrix.value[1][1];

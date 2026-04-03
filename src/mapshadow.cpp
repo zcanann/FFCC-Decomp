@@ -14,8 +14,11 @@ public:
 };
 
 extern const float FLOAT_8032fce0 = 1.0f;
-extern const double DOUBLE_8032fce8 = 0.5;
-extern const float FLOAT_8032fcf0 = 0.5f;
+extern "C" {
+extern const double DOUBLE_8032fce8;
+extern const float FLOAT_8032fcf0;
+extern const double DOUBLE_8032FCF8;
+}
 
 /*
  * --INFO--

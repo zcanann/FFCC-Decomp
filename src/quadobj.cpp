@@ -8,8 +8,6 @@
 
 extern const float kQuadObjMaxBounds;
 extern const float kQuadObjMinBounds;
-extern const float kQuadObjZero;
-
 /*
  * --INFO--
  * Address:	TODO

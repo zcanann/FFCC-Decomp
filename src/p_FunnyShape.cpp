@@ -209,24 +209,25 @@ CFunnyShapePcs::~CFunnyShapePcs()
  */
 void CFunnyShapePcs::Init()
 {
-    int state0;
-    int state1;
-    int state2;
+    u8 state0;
+    u8 state1;
+    u8 state2;
     f32 ndcMin;
     f32 viewportOrigin;
 
     m_viewerState[0] = 0x7F;
-    state0 = 0x3F & -((__cntlzw(0) >> 5) & 1);
     m_viewerState[1] = 0x7F;
     m_viewerState[2] = 0x7F;
     m_viewerState[3] = 0xFF;
-    state1 = 0x3F & -((__cntlzw(1) >> 5) & 1);
+
+    state0 = static_cast<u8>(-((__cntlzw(0) >> 5) & 1)) & 0x3F;
+    state1 = static_cast<u8>(-((__cntlzw(1) >> 5) & 1)) & 0x3F;
+    state2 = static_cast<u8>(-((__cntlzw(2) >> 5) & 1)) & 0x3F;
     viewportOrigin = kFunnyShapeViewportOrigin;
-    m_viewerState[4] = state0;
     ndcMin = kFunnyShapeNdcMin;
+    m_viewerState[4] = state0;
     m_viewerState[5] = state0;
     m_viewerState[6] = state0;
-    state2 = 0x3F & -((__cntlzw(2) >> 5) & 1);
     m_viewerState[7] = 0xFF;
     *reinterpret_cast<f32*>(&m_viewerState[0x10]) = viewportOrigin;
     *reinterpret_cast<f32*>(&m_viewerState[0x14]) = viewportOrigin;

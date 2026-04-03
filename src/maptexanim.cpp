@@ -12,7 +12,6 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* dtor_80043D10(void*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
@@ -412,5 +411,5 @@ CMapTexAnim::~CMapTexAnim()
         }
     }
 
-    dtor_80043D10(this, 0);
+    __dt__4CRefFv(this, 0);
 }

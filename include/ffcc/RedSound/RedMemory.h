@@ -35,6 +35,9 @@ public:
 	int GetABufferAddress();
 	int GetABufferSize();
 	int* GetABankAddress();
+
+private:
+	int m_state;
 };
 
 #endif // _FFCC_REDSOUND_REDMEMORY_H

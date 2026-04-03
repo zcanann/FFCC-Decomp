@@ -109,6 +109,9 @@ public:
 	void SetReverb(int, int);
 	void SetReverbDepth(int, int, int);
 	void TestProcess(int);
+
+private:
+	int m_state;
 };
 
 #endif // _FFCC_REDSOUND_REDDRIVER_H

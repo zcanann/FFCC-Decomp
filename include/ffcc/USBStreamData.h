@@ -11,7 +11,7 @@ public:
 
     void CreateBuffer();
     void DeleteBuffer();
-    bool IsUSBStreamDataDone();
+    int IsUSBStreamDataDone();
     void SetUSBStreamDataDone();
 
     unsigned char* m_data;             // 0x0

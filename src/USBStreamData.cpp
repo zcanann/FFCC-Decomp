@@ -26,14 +26,14 @@ void CUSBStreamData::SetUSBStreamDataDone()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CUSBStreamData::IsUSBStreamDataDone()
+int CUSBStreamData::IsUSBStreamDataDone()
 { 
 	if (m_dataReady != 0 && m_headerReady != 0)
 	{
-		return true;
+		return 1;
 	}
 
-	return false;
+	return 0;
 }
 
 /*

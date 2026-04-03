@@ -6,6 +6,7 @@
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 volatile u8 TRK_Use_BBA = 0;
+u64 gTRKReserved = 0;
 int ddh_cc_initinterrupts(void);
 int ddh_cc_initialize(void*, __OSInterruptHandler);
 int ddh_cc_shutdown(void);
@@ -185,6 +186,8 @@ void ReserveEXI2Port(void) { gDBCommTable.post_stop_func(); }
 
 void UnreserveEXI2Port(void) { gDBCommTable.pre_continue_func(); }
 
+void TRK_board_display(char* str) { OSReport("%s\n", str); }
+
 /*
  * --INFO--
  * PAL Address: 0x801AE160
@@ -203,7 +206,5 @@ void InitializeProgramEndTrap(void)
     ICInvalidateRange(ppcHalt + 4, 4);
     DCFlushRange(ppcHalt + 4, 4);
 }
-
-void TRK_board_display(char* str) { OSReport("%s", str); }
 
 void TRKUARTInterruptHandler() { }

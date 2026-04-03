@@ -384,7 +384,7 @@ bool CMenuPcs::CompaClose()
 				}
 			} else {
 				finished += 1;
-				entry->alpha = 0.0f;
+				entry->alpha = FLOAT_80332ff8;
 				entry->dx = zero;
 				entry->dy = zero;
 			}

@@ -461,13 +461,13 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
 
     for (current = firstRegister;
          (current <= lastRegister) && (error == DS_NoError); current++) {
+        u32 fprInstructions[10] = {
+            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+        };
+
         if (read) {
             if (current < 0x20) {
-                u32 fprInstructions[] = {
-                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-                };
-
                 fprInstructions[0] = INSTR_STFD(current, 0, 3);
                 fprInstructions[9] = INSTR_BLR;
                 TRK_flush_cache(fprInstructions, sizeof(fprInstructions));
@@ -482,7 +482,7 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
                     INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
                 };
 
-                fpscrInstructions[0] = INSTR_MFSPR(4, SPR_IBAT4U);
+                fpscrInstructions[0] = INSTR_MFSPR(4, SPR_FPECR);
                 fpscrInstructions[1] = INSTR_STW(4, 0, 3);
                 fpscrInstructions[9] = INSTR_BLR;
                 TRK_flush_cache(fpscrInstructions, sizeof(fpscrInstructions));
@@ -496,11 +496,6 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
             TRKReadBuffer1_ui64(b, &temp);
 
             if (current < 0x20) {
-                u32 fprInstructions[] = {
-                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-                };
-
                 fprInstructions[0] = INSTR_LFD(current, 0, 3);
                 fprInstructions[9] = INSTR_BLR;
                 TRK_flush_cache(fprInstructions, sizeof(fprInstructions));
@@ -517,7 +512,7 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
 
                 *(u32*)&temp            = *((u32*)&temp + 1);
                 fpscrInstructions[0]    = INSTR_LWZ(4, 0, 3);
-                fpscrInstructions[1]    = INSTR_MTSPR(SPR_IBAT4U, 4);
+                fpscrInstructions[1]    = INSTR_MTSPR(SPR_FPECR, 4);
                 fpscrInstructions[9]    = INSTR_BLR;
                 TRK_flush_cache(fpscrInstructions, sizeof(fpscrInstructions));
                 (*(asm_access_type)fpscrInstructions)(
@@ -1218,12 +1213,12 @@ u32 TRKTargetStop()
 
 DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL read)
 {
-    /* Initialize instruction array with nop */
+    int i;
+    u32 access_func[10];
 
-    u32 access_func[10] = {
-        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-    };
+    for (i = 0; i < 10; i++) {
+        access_func[i] = INSTR_NOP;
+    }
     /*
     ** Construct a small assembly function to perform the
     ** requested access and call it.  The read/write function
@@ -1254,11 +1249,12 @@ DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL read)
 
 DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, BOOL read)
 {
-    // all nop by default
-    u32 instructionData[] = {
-        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-    };
+    int i;
+    u32 instructionData[10];
+
+    for (i = 0; i < 10; i++) {
+        instructionData[i] = INSTR_NOP;
+    }
 
     if (read) {
         instructionData[0]
@@ -1275,11 +1271,12 @@ DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, BOOL read)
 DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 {
     DSError error = DS_NoError;
-    // all nop by default
-    u32 instructionData1[] = {
-        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-    };
+    int i;
+    u32 instructionData1[10];
+
+    for (i = 0; i < 10; i++) {
+        instructionData1[i] = INSTR_NOP;
+    }
 
     if (fpr < 0x20) {
         if (read) {
@@ -1290,10 +1287,11 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
         error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
     } else if (fpr == 0x20) {
-        u32 fpscrInstructions[] = {
-            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-        };
+        u32 fpscrInstructions[10];
+
+        for (i = 0; i < 10; i++) {
+            fpscrInstructions[i] = INSTR_NOP;
+        }
 
         if (read) {
             fpscrInstructions[0] = 0xD8240000;
@@ -1314,10 +1312,11 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
             *(u32*)srcDestPtr = *((u32*)(srcDestPtr) + 1);
         }
         {
-            u32 fpecrInstructions[] = {
-                INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
-                INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
-            };
+            u32 fpecrInstructions[10];
+
+            for (i = 0; i < 10; i++) {
+                fpecrInstructions[i] = INSTR_NOP;
+            }
 
             if (read) {
                 fpecrInstructions[0] = INSTR_MFSPR(4, 1022);

@@ -104,6 +104,18 @@ struct YmMiasmaParticleState {
     s16 m_shapeDrawFrame;
 };
 
+struct YmMiasmaRenderStep {
+    u8 m_pad0[4];
+    u16 m_dataValIndex;
+    u8 m_pad6[6];
+    u16 m_particleCount;
+    u8 m_pad0E[0x24];
+    u8 m_blendMode;
+    u8 m_pad33[0x41];
+    u8 m_drawEnvA;
+    u8 m_drawEnvB;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80091234
@@ -534,37 +546,37 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
-    float* particle = (float*)(u32) * (u32*)workBytes;
-    u8* step = (u8*)param_2;
+    PARTICLE_DATA* particleData = (PARTICLE_DATA*)(u32) * (u32*)workBytes;
+    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)param_2;
     int i;
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
-    for (i = 0; i < (int)*(u16*)(step + 0xc); i++) {
-        u16 dataValIndex = *(u16*)(step + 4);
-        if (dataValIndex != 0xffff) {
-            long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    for (i = 0; i < (int)step->m_particleCount; i++) {
+        if (step->m_dataValIndex != 0xffff) {
+            YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
+            long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
             Vec srcPos;
             Vec worldPos;
             GXColor amb;
-            u8 blend = step[0x18 + 0x1e];
+            u8 blend = step->m_blendMode;
 
             pppUnitMatrix(model);
-            model.value[2][2] = particle[0x10];
+            model.value[2][2] = state->m_speed;
             model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
             model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
             model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
 
-            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)*(s16*)((u8*)particle + 0x38));
+            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)(double)state->m_shapeAngle);
             scaleMatrix = model;
             pppMulMatrix(model, rotMatrix, scaleMatrix);
 
-            srcPos.x = particle[0];
-            srcPos.y = particle[1];
-            srcPos.z = particle[2];
+            srcPos.x = particleData->m_matrix[0][0];
+            srcPos.y = particleData->m_matrix[0][1];
+            srcPos.z = particleData->m_matrix[0][2];
             pppCopyVector(worldPos, srcPos);
             if (Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
@@ -577,18 +589,18 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             model.value[2][3] = worldPos.z;
 
             pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-                0, &model, FLOAT_80330644, step[0x18 + 0x61], step[0x18 + 0x60], blend, 0, 1, 1, 0);
+                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, blend, 0, 1, 1, 0);
 
-            amb.r = *(u8*)((u8*)particle + 0x20);
-            amb.g = *(u8*)((u8*)particle + 0x22);
-            amb.b = *(u8*)((u8*)particle + 0x24);
-            amb.a = *(u8*)((u8*)particle + 0x26);
+            amb.r = state->m_color.m_r;
+            amb.g = state->m_color.m_g;
+            amb.b = state->m_color.m_b;
+            amb.a = state->m_color.m_a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(blend);
             pppDrawShp__FPlsP12CMaterialSetUc(
-                shapeTable, *(s16*)((u8*)particle + 0x4e), pppEnvStPtr->m_materialSetPtr, blend);
+                shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, blend);
         }
 
-        particle += 0x14;
+        particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);
     }
 }

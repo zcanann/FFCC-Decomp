@@ -1221,11 +1221,10 @@ static inline DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr,
 {
     DSError error = DS_NoError;
     int i;
-    u32 instructionData1[10];
-
-    for (i = 0; i < 10; i++) {
-        instructionData1[i] = INSTR_NOP;
-    }
+    u32 instructionData1[10] = {
+        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+    };
 
     if (fpr < 0x20) {
         if (read) {
@@ -1236,46 +1235,20 @@ static inline DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr,
 
         error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
     } else if (fpr == 0x20) {
-        u32 fpscrInstructions[10];
-
-        for (i = 0; i < 10; i++) {
-            fpscrInstructions[i] = INSTR_NOP;
-        }
-
         if (read) {
-            fpscrInstructions[0] = 0xD8240000;
-            fpscrInstructions[1] = 0xFC20048E;
-            fpscrInstructions[2] = 0xD8230000;
-            fpscrInstructions[3] = 0xC8240000;
+            ReadFPSCR(srcDestPtr);
         } else {
-            fpscrInstructions[0] = 0xD8240000;
-            fpscrInstructions[1] = 0xC8230000;
-            fpscrInstructions[2] = 0xFDFE0D8E;
-            fpscrInstructions[3] = 0xC8240000;
+            WriteFPSCR(srcDestPtr);
         }
 
-        error = TRKPPCAccessSpecialReg(srcDestPtr, fpscrInstructions, read);
         DSFetch_u64(srcDestPtr) &= 0xFFFFFFFF;
     } else if (fpr == 0x21) {
         if (!read) {
             *(u32*)srcDestPtr = *((u32*)(srcDestPtr) + 1);
         }
-        {
-            u32 fpecrInstructions[10];
 
-            for (i = 0; i < 10; i++) {
-                fpecrInstructions[i] = INSTR_NOP;
-            }
+        error = TRKPPCAccessSPR(srcDestPtr, SPR_FPECR, read);
 
-            if (read) {
-                fpecrInstructions[0] = INSTR_MFSPR(4, 1022);
-                fpecrInstructions[1] = INSTR_STW(4, 0, 3);
-            } else {
-                fpecrInstructions[0] = INSTR_LWZ(4, 0, 3);
-                fpecrInstructions[1] = INSTR_MTSPR(1022, 4);
-            }
-            error = TRKPPCAccessSpecialReg(srcDestPtr, fpecrInstructions, read);
-        }
         if (read) {
             DSFetch_u64(srcDestPtr) = DSFetch_u32(srcDestPtr) & 0xffffffffLL;
         }

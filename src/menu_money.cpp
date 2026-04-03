@@ -322,12 +322,14 @@ void CMenuPcs::MoneyCtrl()
  */
 bool CMenuPcs::MoneyClose()
 {
+    float zero;
     int count;
     int finished;
     int step;
     int remaining;
     MenuMoneyOpenAnim* anim;
 
+    zero = FLOAT_80332f64;
     finished = 0;
     *(short*)(GetMoneyStateBase(this) + 0x22) = *(short*)(GetMoneyStateBase(this) + 0x22) + 1;
     count = (int)*GetMoneyPanel(this);
@@ -337,29 +339,24 @@ bool CMenuPcs::MoneyClose()
 
     if (0 < count) {
         do {
-            double dVar2 = DOUBLE_80332f88;
-            float zero = FLOAT_80332f64;
             if (anim->startFrame <= step) {
-                if (step < anim->startFrame + anim->duration) {
-                    double dVar3 = DOUBLE_80332F90;
+                if (anim->startFrame + anim->duration <= step) {
+                    finished = finished + 1;
+                    anim->progress = zero;
+                    anim->dx = zero;
+                    anim->dy = zero;
+                } else {
                     anim->frame = anim->frame + 1;
-                    anim->progress =
-                        (float)-((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332F90);
+                    anim->progress = -(float)(((double)anim->frame * DOUBLE_80332F90) / (double)anim->duration - DOUBLE_80332F90);
                     if ((anim->flags & 2) == 0) {
-                        float t = (float)-((dVar3 / (double)anim->duration) * (double)anim->frame - dVar3);
+                        float t = -(float)(((double)anim->frame * DOUBLE_80332F90) / (double)anim->duration - DOUBLE_80332F90);
                         anim->dx = (anim->targetX - (float)anim->x) * t;
                         anim->dy = (anim->targetY - (float)anim->y) * t;
                     }
-                } else {
-                    finished = finished + 1;
-                    anim->progress = FLOAT_80332f64;
-                    anim->dx = zero;
-                    anim->dy = zero;
                 }
             }
             anim = anim + 1;
-            remaining = remaining - 1;
-        } while (remaining != 0);
+        } while (--remaining != 0);
     }
     return count == finished;
 }

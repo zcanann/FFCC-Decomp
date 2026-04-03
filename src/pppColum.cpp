@@ -3,7 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
-#include "ffcc/pppShape.h"
 
 #include <math.h>
 
@@ -45,6 +44,7 @@ static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 unsigned char GetNoise__5CUtilFUc(void*, unsigned int);
+void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char,
                                                                 unsigned char, unsigned char, unsigned char,
@@ -78,18 +78,20 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
             *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        int texture;
+        void* texture;
         pppCVector color;
         GXColor quadColor;
 
-        texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
-        if (positionWork->m_alpha != 0) {
+        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        u8 alpha = positionWork->m_alpha;
+        if (alpha != 0) {
+            pppColumValue* values = frameWork->m_values;
             Mtx identityMtx;
             Vec cameraDelta;
-            pppColumValue* values = frameWork->m_values;
+            short shapeFrame;
             float lengthXY;
             float segmentStep;
-            float drawScale;
+            float drawScale = 0.0f;
 
             PSMTXIdentity(identityMtx);
             cameraDelta.x = ppvCameraMatrix0[0][3] - positionWork->m_position.x;
@@ -97,14 +99,12 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             cameraDelta.z = ppvCameraMatrix0[2][3] + positionWork->m_position.z;
 
             lengthXY = sqrtf(cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y);
-            if (0.0f < lengthXY) {
+            if (lengthXY > 0.0f) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
+            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
 
             pppInitBlendMode();
-            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
-            drawScale = 0.0f;
-
             for (int i = 0; i < param_2->m_count; i++) {
                 Vec center;
                 Vec offset;
@@ -114,18 +114,20 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 Vec2d uvB;
                 float dist;
                 float fadeAmount;
-                float positionScale = segmentStep * values->m_positionScale;
+                float positionStep = segmentStep * values->m_positionScale;
 
-                center.x = positionWork->m_position.x + positionScale * (cameraDelta.x * (float)(i + 1));
-                center.y = positionWork->m_position.y + positionScale * (cameraDelta.y * (float)(i + 1));
+                center.x =
+                    positionWork->m_position.x + positionStep * (cameraDelta.x * (float)(i + 1));
+                center.y =
+                    positionWork->m_position.y + positionStep * (cameraDelta.y * (float)(i + 1));
                 center.z = 0.0f;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 dist = PSVECMag(&offset);
 
-                color.m_rgba[3] = positionWork->m_alpha;
+                color.m_rgba[3] = alpha;
                 fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
-                if (dist < *(float*)(param_2->m_payload + 0x10) && 0.0f < fadeAmount) {
+                if (dist < *(float*)(param_2->m_payload + 0x10) && fadeAmount > 0.0f) {
                     color.m_rgba[3] = (u8)((float)color.m_rgba[3] * fadeAmount);
                 }
                 color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
@@ -141,13 +143,12 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-                GXLoadTexObj((GXTexObj*)(texture + 0x28), GX_TEXMAP0);
+                GXLoadTexObj((GXTexObj*)((char*)texture + 0x28), GX_TEXMAP0);
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;
-                u8* frameData =
-                    (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
-                for (int j = 0; j < *(short*)(frameData + 2); j++) {
+                shapeFrame = *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
+                for (int j = 0; j < *(short*)((u8*)shapeSt->m_animData + shapeFrame + 2); j++) {
                     pppGetShapePos__FPlsR3VecR3Veci(
                         (long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);
                     pppGetShapeUV__FPlsR5Vec2dR5Vec2di(
@@ -218,7 +219,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         if (param_2->m_dataValIndex != 0xFFFF) {
             long* animData =
                 **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-            pppCalcFrameShape(
+            pppCalcFrameShape__FPlRsRsRss(
                 animData,
                 work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);
         }

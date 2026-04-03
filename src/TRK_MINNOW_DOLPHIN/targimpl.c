@@ -443,14 +443,9 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
 {
     typedef void (*asm_access_type)(void*, void*);
     u64 temp;
-    u32 fprReadInstructions[10];
-    u32 fpscrReadInstructions[10];
-    u32 fprWriteInstructions[10];
-    u32 fpscrWriteInstructions[10];
     DSError error;
     TRKExceptionStatus tempExceptionStatus;
     u32 current;
-    asm_access_type asm_access;
 
     if (lastRegister > 0x21) {
         return DS_InvalidRegister;
@@ -468,76 +463,66 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
          (current <= lastRegister) && (error == DS_NoError); current++) {
         if (read) {
             if (current < 0x20) {
-                memcpy(fprReadInstructions, "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                            "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                            "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                            "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                            "\x60\x00\x00\x00\x60\x00\x00\x00",
-                       sizeof(fprReadInstructions));
-                fprReadInstructions[0] = INSTR_STFD(current, 0, 3);
-                fprReadInstructions[9] = INSTR_BLR;
-                asm_access             = (asm_access_type)fprReadInstructions;
-                TRK_flush_cache(fprReadInstructions, sizeof(fprReadInstructions));
-                (*asm_access)(&temp, (void*)&TRKvalue128_temp);
+                u32 fprInstructions[] = {
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                };
+
+                fprInstructions[0] = INSTR_STFD(current, 0, 3);
+                fprInstructions[9] = INSTR_BLR;
+                TRK_flush_cache(fprInstructions, sizeof(fprInstructions));
+                (*(asm_access_type)fprInstructions)(&temp,
+                                                    (void*)&TRKvalue128_temp);
             } else if (current == 0x20) {
                 ReadFPSCR((f64*)&temp);
-                temp &= 0xffffffffULL;
+                DSFetch_u64(&temp) &= 0xffffffffULL;
             } else if (current == 0x21) {
-                memcpy(fpscrReadInstructions, "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                              "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                              "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                              "\x60\x00\x00\x00\x60\x00\x00\x00"
-                                              "\x60\x00\x00\x00\x60\x00\x00\x00",
-                       sizeof(fpscrReadInstructions));
-                fpscrReadInstructions[0] = INSTR_MFSPR(4, SPR_IBAT4U);
-                fpscrReadInstructions[1] = INSTR_STW(4, 0, 3);
-                fpscrReadInstructions[9] = INSTR_BLR;
-                asm_access               = (asm_access_type)fpscrReadInstructions;
-                TRK_flush_cache(fpscrReadInstructions,
-                                sizeof(fpscrReadInstructions));
-                (*asm_access)(&temp, (void*)&TRKvalue128_temp);
-                temp = (*(u32*)&temp) & 0xffffffffULL;
+                u32 fpscrInstructions[] = {
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                };
+
+                fpscrInstructions[0] = INSTR_MFSPR(4, SPR_IBAT4U);
+                fpscrInstructions[1] = INSTR_STW(4, 0, 3);
+                fpscrInstructions[9] = INSTR_BLR;
+                TRK_flush_cache(fpscrInstructions, sizeof(fpscrInstructions));
+                (*(asm_access_type)fpscrInstructions)(
+                    &temp, (void*)&TRKvalue128_temp);
+                DSFetch_u64(&temp) = DSFetch_u32(&temp) & 0xffffffffULL;
             }
 
             error = TRKAppendBuffer1_ui64(b, temp);
         } else {
-            error = TRKReadBuffer1_ui64(b, &temp);
-            if (error == DS_NoError) {
-                if (current < 0x20) {
-                    memcpy(fprWriteInstructions,
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00",
-                           sizeof(fprWriteInstructions));
-                    fprWriteInstructions[0] = INSTR_LFD(current, 0, 3);
-                    fprWriteInstructions[9] = INSTR_BLR;
-                    asm_access              = (asm_access_type)fprWriteInstructions;
-                    TRK_flush_cache(fprWriteInstructions,
-                                    sizeof(fprWriteInstructions));
-                    (*asm_access)(&temp, (void*)&TRKvalue128_temp);
-                } else if (current == 0x20) {
-                    WriteFPSCR((f64*)&temp);
-                    temp &= 0xffffffffULL;
-                } else if (current == 0x21) {
-                    *(u32*)&temp         = *((u32*)&temp + 1);
-                    memcpy(fpscrWriteInstructions,
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00"
-                           "\x60\x00\x00\x00\x60\x00\x00\x00",
-                           sizeof(fpscrWriteInstructions));
-                    fpscrWriteInstructions[0] = INSTR_LWZ(4, 0, 3);
-                    fpscrWriteInstructions[1] = INSTR_MTSPR(SPR_IBAT4U, 4);
-                    fpscrWriteInstructions[9] = INSTR_BLR;
-                    asm_access                = (asm_access_type)fpscrWriteInstructions;
-                    TRK_flush_cache(fpscrWriteInstructions,
-                                    sizeof(fpscrWriteInstructions));
-                    (*asm_access)(&temp, (void*)&TRKvalue128_temp);
-                    temp = 0;
-                }
+            TRKReadBuffer1_ui64(b, &temp);
+
+            if (current < 0x20) {
+                u32 fprInstructions[] = {
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                };
+
+                fprInstructions[0] = INSTR_LFD(current, 0, 3);
+                fprInstructions[9] = INSTR_BLR;
+                TRK_flush_cache(fprInstructions, sizeof(fprInstructions));
+                (*(asm_access_type)fprInstructions)(&temp,
+                                                    (void*)&TRKvalue128_temp);
+            } else if (current == 0x20) {
+                WriteFPSCR((f64*)&temp);
+                DSFetch_u64(&temp) &= 0xffffffffULL;
+            } else if (current == 0x21) {
+                u32 fpscrInstructions[] = {
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                };
+
+                *(u32*)&temp            = *((u32*)&temp + 1);
+                fpscrInstructions[0]    = INSTR_LWZ(4, 0, 3);
+                fpscrInstructions[1]    = INSTR_MTSPR(SPR_IBAT4U, 4);
+                fpscrInstructions[9]    = INSTR_BLR;
+                TRK_flush_cache(fpscrInstructions, sizeof(fpscrInstructions));
+                (*(asm_access_type)fpscrInstructions)(
+                    &temp, (void*)&TRKvalue128_temp);
+                temp = 0;
             }
         }
 
@@ -1305,18 +1290,44 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
         error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
     } else if (fpr == 0x20) {
+        u32 fpscrInstructions[] = {
+            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+        };
+
         if (read) {
-            ReadFPSCR(srcDestPtr);
+            fpscrInstructions[0] = 0xD8240000;
+            fpscrInstructions[1] = 0xFC20048E;
+            fpscrInstructions[2] = 0xD8230000;
+            fpscrInstructions[3] = 0xC8240000;
         } else {
-            WriteFPSCR(srcDestPtr);
+            fpscrInstructions[0] = 0xD8240000;
+            fpscrInstructions[1] = 0xC8230000;
+            fpscrInstructions[2] = 0xFDFE0D8E;
+            fpscrInstructions[3] = 0xC8240000;
         }
 
+        error = TRKPPCAccessSpecialReg(srcDestPtr, fpscrInstructions, read);
         DSFetch_u64(srcDestPtr) &= 0xFFFFFFFF;
     } else if (fpr == 0x21) {
         if (!read) {
             *(u32*)srcDestPtr = *((u32*)(srcDestPtr) + 1);
         }
-        error = TRKPPCAccessSPR(srcDestPtr, 1022, read);
+        {
+            u32 fpecrInstructions[] = {
+                INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+            };
+
+            if (read) {
+                fpecrInstructions[0] = INSTR_MFSPR(4, 1022);
+                fpecrInstructions[1] = INSTR_STW(4, 0, 3);
+            } else {
+                fpecrInstructions[0] = INSTR_LWZ(4, 0, 3);
+                fpecrInstructions[1] = INSTR_MTSPR(1022, 4);
+            }
+            error = TRKPPCAccessSpecialReg(srcDestPtr, fpecrInstructions, read);
+        }
         if (read) {
             DSFetch_u64(srcDestPtr) = DSFetch_u32(srcDestPtr) & 0xffffffffLL;
         }

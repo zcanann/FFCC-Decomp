@@ -41,30 +41,33 @@ u8 GetRandomData()
  */
 int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 {
-    u32 noteBand;
+    int pitch;
     int octaveAdjust;
-    u32 pitch;
-    u32 note;
-    u32 octave;
-    int shift;
+    int noteBand;
+    int octave;
+    int note;
     int value;
 
+    pitch = (param_1 >> 12) + param_2 + (param_3 >> 16);
     octaveAdjust = 0;
-    for (pitch = (param_1 >> 12) + param_2 + (param_3 >> 16); (int)pitch < 0; pitch = pitch + 0xC00) {
-        octaveAdjust = octaveAdjust - 1;
+    if (pitch < 0) {
+        do {
+            pitch = pitch + 0xC00;
+            octaveAdjust = octaveAdjust - 1;
+        } while (pitch < 0);
     }
 
     noteBand = (pitch >> 8) & 0x7F;
-    note = noteBand % 12;
     octave = noteBand / 12;
-    shift = 10 - (octaveAdjust + (int)octave);
-    value = (int)((DAT_8021d7f0[note] >> shift) * DAT_8021d820[pitch & 0xFF]) >> 12;
+    octaveAdjust = octaveAdjust + octave;
+    note = noteBand - (octave * 12);
+    value = (int)((DAT_8021d7f0[note] >> (10 - octaveAdjust)) * DAT_8021d820[pitch & 0xFF]) >> 12;
 
-    if ((u32)param_4 != 0) {
-        if ((int)(u32)param_4 < 1) {
-            value = (int)(value * ((u32)param_4 & 0xFF)) >> 8;
+    if (param_4 != 0) {
+        if (param_4 <= 0) {
+            value = (int)(value * (param_4 & 0xFF)) >> 8;
         } else {
-            value = value + ((int)(value * ((u32)param_4 + 1)) >> 7);
+            value = value + ((int)(value * (param_4 + 1)) >> 7);
         }
     }
 

@@ -22,7 +22,7 @@ typedef struct RandCVCtx {
 
 /*
  * --INFO--
- * PAL Address: 0x80066194
+ * PAL Address: 0x8006103C
  * PAL Size: 540b
  * EN Address: TODO
  * EN Size: TODO
@@ -43,7 +43,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
     if (params->index == *(s32*)(base + 0xC)) {
         f32 value = Math.RandF();
         if (params->flag != 0) {
-            value = value + Math.RandF();
+            value += Math.RandF();
         } else {
             value *= kPppRandCVSingleSampleScale;
         }
@@ -59,14 +59,29 @@ void pppRandCV(void* param1, void* param2, void* param3)
     s32 colorOffset = params->colorOffset;
     u8* targetColor;
     if (colorOffset == -1) {
-        targetColor = &gPppDefaultValueBuffer[0];
+        targetColor = gPppDefaultValueBuffer;
     } else {
         targetColor = base + colorOffset + 0x80;
     }
 
-    f32 scale = target[0];
-    targetColor[0] = (u8)(targetColor[0] + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]));
-    targetColor[1] = (u8)(targetColor[1] + (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]));
-    targetColor[2] = (u8)(targetColor[2] + (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]));
-    targetColor[3] = (u8)(targetColor[3] + (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]));
+    {
+        f32 scale = target[0];
+
+        {
+            u8 color = targetColor[0];
+            targetColor[0] = color + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]);
+        }
+        {
+            u8 color = targetColor[1];
+            targetColor[1] = color + (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]);
+        }
+        {
+            u8 color = targetColor[2];
+            targetColor[2] = color + (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]);
+        }
+        {
+            u8 color = targetColor[3];
+            targetColor[3] = color + (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]);
+        }
+    }
 }

@@ -12,10 +12,24 @@ extern "C" int rand(void);
 struct KeShpTail3XStep {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_initWOrk;
+    s32 m_initWork;
     s32 m_stepValue;
     s32 m_arg3;
-    u8 m_payload[0x40];
+    float m_randomScale;
+    float m_stepDistance;
+    u8 m_drawCount;
+    u8 m_useRandomShape;
+    s16 m_rotateEnabled;
+    s16 m_valueSteps[24];
+    u8 m_drawA;
+    u8 _pad51;
+    u8 m_useEnvDepth;
+    u8 m_worldSpaceMode;
+    u8 _pad54;
+    u8 m_zDisable;
+    u8 m_blendMode;
+    u8 _pad57;
+    float m_envDepth;
 };
 
 struct KeShpTail3XOffsets {
@@ -52,7 +66,6 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
 {
     KeShpTail3XStep* step;
     KeShpTail3XWork* work;
-    s16* stepWork;
     Vec pos;
     Vec temp;
     Vec historyPos;
@@ -63,16 +76,15 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
 
     step = (KeShpTail3XStep*)param_2;
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
-    stepWork = (s16*)&step->m_payload[0xc];
 
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
         work->m_initialized = 1;
 
-        if (step->m_payload[0x3f] == 0) {
+        if (step->m_worldSpaceMode == 0) {
             pos.x = obj->pppPObject.m_localMatrix.value[0][3];
             pos.y = obj->pppPObject.m_localMatrix.value[1][3];
             pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-        } else if (step->m_payload[0x3f] == 1) {
+        } else if (step->m_worldSpaceMode == 1) {
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
@@ -101,11 +113,11 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     }
     work->m_head--;
 
-    if (step->m_payload[0x3f] == 0) {
+    if (step->m_worldSpaceMode == 0) {
         pos.x = obj->pppPObject.m_localMatrix.value[0][3];
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-    } else if (step->m_payload[0x3f] == 1) {
+    } else if (step->m_worldSpaceMode == 1) {
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;
@@ -139,33 +151,33 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     work->m_values[7] += work->m_values[0x13];
 
     if (obj->pppPObject.m_graphId == step->m_graphId) {
-        work->m_values[0] += stepWork[0];
-        work->m_values[1] += stepWork[1];
-        work->m_values[2] += stepWork[2];
-        work->m_values[3] += stepWork[3];
-        work->m_values[8] += stepWork[8];
-        work->m_values[9] += stepWork[9];
-        work->m_values[10] += stepWork[10];
-        work->m_values[0xb] += stepWork[11];
-        work->m_values[0xc] += stepWork[12];
-        work->m_values[0xd] += stepWork[13];
-        work->m_values[0xe] += stepWork[14];
-        work->m_values[0xf] += stepWork[15];
-        work->m_values[4] += stepWork[4];
-        work->m_values[5] += stepWork[5];
-        work->m_values[6] += stepWork[6];
-        work->m_values[7] += stepWork[7];
-        work->m_values[0x10] += stepWork[16];
-        work->m_values[0x11] += stepWork[17];
-        work->m_values[0x12] += stepWork[18];
-        work->m_values[0x13] += stepWork[19];
-        work->m_values[0x14] += stepWork[20];
-        work->m_values[0x15] += stepWork[21];
-        work->m_values[0x16] += stepWork[22];
-        work->m_values[0x17] += stepWork[23];
+        work->m_values[0] += step->m_valueSteps[0];
+        work->m_values[1] += step->m_valueSteps[1];
+        work->m_values[2] += step->m_valueSteps[2];
+        work->m_values[3] += step->m_valueSteps[3];
+        work->m_values[8] += step->m_valueSteps[8];
+        work->m_values[9] += step->m_valueSteps[9];
+        work->m_values[10] += step->m_valueSteps[10];
+        work->m_values[0xb] += step->m_valueSteps[11];
+        work->m_values[0xc] += step->m_valueSteps[12];
+        work->m_values[0xd] += step->m_valueSteps[13];
+        work->m_values[0xe] += step->m_valueSteps[14];
+        work->m_values[0xf] += step->m_valueSteps[15];
+        work->m_values[4] += step->m_valueSteps[4];
+        work->m_values[5] += step->m_valueSteps[5];
+        work->m_values[6] += step->m_valueSteps[6];
+        work->m_values[7] += step->m_valueSteps[7];
+        work->m_values[0x10] += step->m_valueSteps[16];
+        work->m_values[0x11] += step->m_valueSteps[17];
+        work->m_values[0x12] += step->m_valueSteps[18];
+        work->m_values[0x13] += step->m_valueSteps[19];
+        work->m_values[0x14] += step->m_valueSteps[20];
+        work->m_values[0x15] += step->m_valueSteps[21];
+        work->m_values[0x16] += step->m_valueSteps[22];
+        work->m_values[0x17] += step->m_valueSteps[23];
     }
 
-    work->m_shapeData += step->m_initWOrk;
+    work->m_shapeData += step->m_initWork;
 }
 
 /*
@@ -181,165 +193,158 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XOffsets* offsets = (KeShpTail3XOffsets*)param_3;
-    s16* work;
-    u8* workBytes;
-    long* shapeTable;
-    int shapeData;
+    KeShpTail3XWork* work;
+    long** shapeTable;
+    u8* shapeData;
     u8 count;
-    float fadeR;
-    float fadeG;
-    float fadeB;
-    float fadeA;
-    float stepR;
-    float stepG;
-    float stepB;
-    float stepA;
-    pppFMATRIX local;
+    float alphaMul;
+    float colorR;
+    float colorG;
+    float colorB;
+    float colorA;
+    float colorStepR;
+    float colorStepG;
+    float colorStepB;
+    float colorStepA;
+    float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
     pppFMATRIX rotMtx;
     pppFMATRIX tmpMtx;
+    Vec zeroVec;
     Vec pos;
     Vec nextPos;
     Vec seg;
-    Vec zeroVec;
     u16 rng;
     int life;
     u16 shapeSetCount;
     s16 shapeCount;
-    float scaleFalloff;
-    float baseScale;
-    float baseScaleStep;
-    float stepScale;
-    float lenNow;
+    float shapeScale;
+    float shapeScaleStep;
+    float trailStep;
+    float trailStepDelta;
     float segLen;
+    float trailLen;
+    float segCursor;
+    float segRemain;
     float segBaseX;
     float segBaseY;
     float segBaseZ;
-    float segDirX;
-    float segDirY;
-    float segDirZ;
-    float segCursor;
-    float segCursorLen;
-    float segWork;
     u8 currentIndex;
     u8 nextIndex;
 
     if (step->m_dataValIndex == -1) {
         return;
     }
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
-    zeroVec.z = 0.0f;
-
-    work = (s16*)((u8*)&obj->pppPObject + 8 + offsets->m_serializedDataOffsets[0]);
-    workBytes = (u8*)work;
-    shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-    if (shapeTable == NULL) {
-        return;
-    }
-    shapeData = *(int*)shapeTable;
-
-    count = step->m_payload[8];
+    count = step->m_drawCount;
     if (count == 0) {
         return;
     }
 
-    fadeR = (float)(work[0] >> 7);
-    fadeG = (float)(work[1] >> 7);
-    fadeB = (float)(work[2] >> 7);
-    fadeA = (float)(work[3] >> 7) * ((float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / 128.0f);
-    if (count == 1) {
-        stepR = 0.0f;
-        stepG = 0.0f;
-        stepB = 0.0f;
-        stepA = 0.0f;
-    } else {
-        stepR = (fadeR - (float)(work[4] >> 7)) / (float)(count - 1);
-        stepG = (fadeG - (float)(work[5] >> 7)) / (float)(count - 1);
-        stepB = (fadeB - (float)(work[6] >> 7)) / (float)(count - 1);
-        stepA = (fadeA - ((float)(work[7] >> 7) * ((float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / 128.0f))) /
-                (float)(count - 1);
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
+    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+    if (shapeTable == NULL) {
+        return;
     }
-
-    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
-    pppUnitMatrix(local);
-
-    scaleFalloff = ((float)step->m_stepValue - (float)step->m_arg3) / (float)(count - 1);
-    baseScale = *(float*)(step->m_payload + 4) * pppMngStPtr->m_scale.x;
-    baseScaleStep = baseScale * (scaleFalloff / (float)step->m_stepValue);
-    if (baseScale == 0.0f) {
+    shapeData = (u8*)*shapeTable;
+    if (shapeData == NULL) {
         return;
     }
 
-    rng = (u16)work[0xe0];
-    life = *(s32*)(work + 0xdc);
+    invCountMinusOne = (float)(count - 1);
+    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / 128.0f;
+    colorR = (float)(work->m_values[0] >> 7);
+    colorG = (float)(work->m_values[1] >> 7);
+    colorB = (float)(work->m_values[2] >> 7);
+    colorA = (float)(work->m_values[3] >> 7) * alphaMul;
+    if (invCountMinusOne != 0.0f) {
+        colorStepR = (colorR - (float)(work->m_values[4] >> 7)) / invCountMinusOne;
+        colorStepG = (colorG - (float)(work->m_values[5] >> 7)) / invCountMinusOne;
+        colorStepB = (colorB - (float)(work->m_values[6] >> 7)) / invCountMinusOne;
+        colorStepA = (colorA - ((float)(work->m_values[7] >> 7) * alphaMul)) / invCountMinusOne;
+    } else {
+        colorStepR = 0.0f;
+        colorStepG = 0.0f;
+        colorStepB = 0.0f;
+        colorStepA = 0.0f;
+    }
+
+    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
+    pppUnitMatrix(drawMtx);
+
+    shapeScale = (float)step->m_stepValue;
+    shapeScaleStep = ((float)step->m_stepValue - (float)step->m_arg3) / invCountMinusOne;
+    trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
+    trailStepDelta = trailStep * (shapeScaleStep / (float)step->m_stepValue);
+    if (trailStep == 0.0f) {
+        return;
+    }
+
+    rng = work->m_rand;
+    life = work->m_shapeData;
     shapeSetCount = *(u16*)(shapeData + 0x12);
     shapeCount = *(s16*)(shapeData + 6);
-    stepScale = (float)step->m_stepValue;
 
-    currentIndex = workBytes[0x1c2];
+    currentIndex = work->m_head;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
         nextIndex = 0;
     }
 
-    pos = ((Vec*)(work + 0x18))[currentIndex];
-    nextPos = ((Vec*)(work + 0x18))[nextIndex];
+    pos = work->m_posHistory[currentIndex];
+    nextPos = work->m_posHistory[nextIndex];
     seg.x = nextPos.x - pos.x;
     seg.y = nextPos.y - pos.y;
     seg.z = nextPos.z - pos.z;
+    zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
     segLen = PSVECDistance(&zeroVec, &seg);
-    segCursorLen = segLen;
     segCursor = 0.0f;
+    segRemain = segLen;
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;
-    segDirX = seg.x;
-    segDirY = seg.y;
-    segDirZ = seg.z;
 
+draw_loop:
     while (count != 0) {
         int shapeEntry;
-        GXColor amb;
-        u8 zEnable;
         float envDepth = 0.0f;
-        u8 blendMode = step->m_payload[0x42];
-        float drawScale = stepScale;
+        float drawScale = shapeScale;
 
-        if (step->m_payload[9] != 0) {
+        if (step->m_useRandomShape != 0) {
             u32 lcg = (u32)rng * 0x80du + 7u;
             rng = (u16)lcg;
-            drawScale *= -((((float)rng / 65535.0f) * *(float*)(step->m_payload) - 1.0f));
+            drawScale *= -((((float)rng / 65535.0f) * step->m_randomScale) - 1.0f);
             {
                 u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
-                shapeEntry = shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10);
+                shapeEntry = (int)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
             }
         } else {
-            shapeEntry = shapeData;
+            shapeEntry = (int)shapeData;
         }
 
         pos.x = segBaseX;
         pos.y = segBaseY;
         pos.z = segBaseZ;
 
-        if (step->m_payload[0x3f] == 0) {
+        if (step->m_worldSpaceMode == 0) {
             PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
                             drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
-            if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
-                PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
+            if ((step->m_rotateEnabled != 0) && (count != 0)) {
+                PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, obj->field_0x40);
                 pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
             }
             PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
             PSMTXCopy(obj->field_0x40.value, drawMtx.value);
-        } else if (step->m_payload[0x3f] == 1) {
+        } else if (step->m_worldSpaceMode == 1) {
             pppUnitMatrix(drawMtx);
             drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
             drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
             drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
-            if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
-                PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
+            if ((step->m_rotateEnabled != 0) && (count != 0)) {
+                PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, drawMtx);
                 pppMulMatrix(drawMtx, rotMtx, tmpMtx);
             }
@@ -350,76 +355,78 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         drawMtx.value[1][3] = pos.y;
         drawMtx.value[2][3] = pos.z;
 
-        zEnable = (u8)((u32)__cntlzw((u32)step->m_payload[0x41]) >> 5);
-        if (step->m_payload[0x3e] != 0) {
-            envDepth = *(float*)(step->m_payload + 0x44);
+        if (step->m_useEnvDepth != 0) {
+            envDepth = step->m_envDepth;
         }
-        pppSetDrawEnv((pppCVECTOR*)0, &drawMtx, envDepth, 0, step->m_payload[0x3c], blendMode, 0, zEnable, 1, 0);
+        pppSetDrawEnv((pppCVECTOR*)0, &drawMtx, envDepth, 0, step->m_drawA, step->m_blendMode, 0,
+                      (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5), 1, 0);
         GXLoadPosMtxImm(drawMtx.value, 0);
 
-        amb.r = (u8)fadeR;
-        amb.g = (u8)fadeG;
-        amb.b = (u8)fadeB;
-        amb.a = (u8)fadeA;
-        GXSetChanAmbColor(GX_COLOR0A0, amb);
+        {
+            GXColor amb;
 
-        pppSetBlendMode(blendMode);
-        pppDrawShp((tagOAN3_SHAPE*)shapeEntry, pppEnvStPtr->m_materialSetPtr, blendMode);
+            amb.r = (u8)colorR;
+            amb.g = (u8)colorG;
+            amb.b = (u8)colorB;
+            amb.a = (u8)colorA;
+            GXSetChanAmbColor(GX_COLOR0A0, amb);
+        }
+
+        pppSetBlendMode(step->m_blendMode);
+        pppDrawShp((tagOAN3_SHAPE*)shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
         count--;
         if (count == 0) {
             break;
         }
 
-        lenNow = baseScale - baseScaleStep;
-        fadeR -= stepR;
-        fadeG -= stepG;
-        fadeB -= stepB;
-        fadeA -= stepA;
-        stepScale -= scaleFalloff;
-        baseScale = lenNow;
-        if (lenNow <= 0.0f) {
+        trailLen = trailStep - trailStepDelta;
+        colorR -= colorStepR;
+        colorG -= colorStepG;
+        colorB -= colorStepB;
+        colorA -= colorStepA;
+        shapeScale -= shapeScaleStep;
+        trailStep = trailLen;
+        if (trailLen <= 0.0f) {
             return;
         }
 
-        for (; segCursorLen < lenNow; segCursorLen += segLen) {
-            nextIndex++;
-            if (nextIndex == 0x1c) {
-                nextIndex = 0;
-            }
-            if (nextIndex == currentIndex) {
-                return;
-            }
-
-            {
-                Vec* p = &((Vec*)(work + 0x18))[nextIndex];
-                segWork = segCursor - segLen;
-                segBaseX = nextPos.x;
-                segBaseY = nextPos.y;
-                segBaseZ = nextPos.z;
-                seg.x = p->x - nextPos.x;
-                seg.y = p->y - nextPos.y;
-                seg.z = p->z - nextPos.z;
-                segLen = PSVECDistance(&zeroVec, &seg);
-                nextPos = *p;
-                segDirX = seg.x;
-                segDirY = seg.y;
-                segDirZ = seg.z;
-                segCursor = segWork;
-            }
+        if (segRemain < trailLen) {
+            goto advance_segment;
         }
 
-        {
-            float t = segCursor / segLen;
-            pos.x = segDirX * t + segBaseX;
-            pos.y = segDirY * t + segBaseY;
-            pos.z = segDirZ * t + segBaseZ;
-            segCursor += lenNow;
-            segCursorLen -= lenNow;
-            segBaseX = pos.x;
-            segBaseY = pos.y;
-            segBaseZ = pos.z;
+        pos.x = seg.x * (segCursor / segLen) + segBaseX;
+        pos.y = seg.y * (segCursor / segLen) + segBaseY;
+        pos.z = seg.z * (segCursor / segLen) + segBaseZ;
+        segCursor += trailLen;
+        segRemain -= trailLen;
+        segBaseX = pos.x;
+        segBaseY = pos.y;
+        segBaseZ = pos.z;
+        goto draw_loop;
+
+advance_segment:
+        nextIndex++;
+        if (nextIndex == 0x1c) {
+            nextIndex = 0;
         }
+        if (nextIndex == currentIndex) {
+            return;
+        }
+
+        pos = nextPos;
+        trailLen = segCursor - segLen;
+        nextPos = work->m_posHistory[nextIndex];
+        seg.x = nextPos.x - pos.x;
+        seg.y = nextPos.y - pos.y;
+        seg.z = nextPos.z - pos.z;
+        segLen = PSVECDistance(&zeroVec, &seg);
+        segCursor = trailLen;
+        segRemain += segLen;
+        segBaseX = pos.x;
+        segBaseY = pos.y;
+        segBaseZ = pos.z;
+        goto draw_loop;
     }
 
     pppSetBlendMode(3);

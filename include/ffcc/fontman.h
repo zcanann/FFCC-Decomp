@@ -9,7 +9,7 @@
 
 class CFont;
 
-class CFontMan
+class CFontMan : public CManager
 {
 public:
 	CFontMan();
@@ -81,7 +81,7 @@ public:
 	void* m_glyphData;
 	unsigned short* m_glyphBuckets[64];
 	unsigned char m_pad13c[0x304];
-	unsigned char m_tlutData[0x400];
+	unsigned char m_tlutData[0x1000];
 };
 
 extern CFontMan FontMan;

@@ -261,6 +261,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     int graphFrame;
     int fadeDivisor;
     LocationTitleParticle* particle;
+    LocationTitleParticle* particles;
     long** shapeTable;
 
     serializedOffset = *param_3->m_serializedDataOffsets;
@@ -272,6 +273,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 
     graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
     fadeDivisor = -1;
+    particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =
         *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
 
@@ -279,7 +281,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
     }
 
-    particle = (LocationTitleParticle*)work->m_particles;
+    particle = particles;
 
     for (int i = 0; i < work->m_count; i++) {
         Mtx model;

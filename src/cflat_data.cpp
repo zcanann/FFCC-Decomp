@@ -215,10 +215,10 @@ void CFlatData::Create(void* filePtr)
 					{
 						char* charPtr;
 						char** stringIndex;
+						int indexOffset;
 						int iVar6;
 						int iVar7;
 						int iVar8;
-						int indexOffset;
 
 						iVar10 = chunkFile.Get4();
 						m_data[m_dataCount].m_numStrings = iVar10;

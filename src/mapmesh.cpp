@@ -80,7 +80,7 @@ struct MeshDrawEntry
     void* displayList;
     unsigned short materialIdx;
     unsigned short _padA;
-    unsigned int _padB;
+    int displayListOffset;
 };
 
 static inline MeshDrawEntry* DrawEntries(CMapMesh* self)
@@ -244,36 +244,30 @@ void CMapMesh::Off2Ptr()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80027c4c
+ * PAL Size: 2292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int usePreallocated, int halfColor)
+unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int usePreallocated, int halfColor)
 {
-    // TODO: chunk tags should move to shared constants once map format headers are restored.
-    const unsigned int CHUNK_COLR = 0x434F4C52;
-    const unsigned int CHUNK_DLHD = 0x444C4844;
-    const unsigned int CHUNK_DLST = 0x444C5354;
-    const unsigned int CHUNK_NBT = 0x4E425420;
-    const unsigned int CHUNK_NORM = 0x4E4F524D;
-    const unsigned int CHUNK_UV = 0x55562020;
-    const unsigned int CHUNK_VERT = 0x56455254;
-    const unsigned int CHUNK_BOFF = 0x424F4646;
-
     // Re-read in a pre-pass to compute required allocation size.
     unsigned int workSize = 0;
     CChunkFile::CChunk chunk;
     CChunkFile reader = chunkFile;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
-        if (chunk.m_id == CHUNK_NORM || chunk.m_id == CHUNK_COLR || chunk.m_id == CHUNK_NBT ||
-            chunk.m_id == CHUNK_UV || chunk.m_id == CHUNK_VERT) {
+        if (chunk.m_id == 0x4E4F524D || chunk.m_id == 0x434F4C52 || chunk.m_id == 0x4E425420 ||
+            chunk.m_id == 0x55562020 || chunk.m_id == 0x56455254) {
             workSize = Align32(workSize) + chunk.m_size;
-        } else if (chunk.m_id == CHUNK_DLHD) {
+        } else if (chunk.m_id == 0x444C4844) {
             U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
             workSize = Align32(workSize) + (static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U);
             reader.PushChunk();
             while (reader.GetNextChunk(chunk)) {
-                if (chunk.m_id == CHUNK_DLST) {
+                if (chunk.m_id == 0x444C5354) {
                     reader.Align(0x20);
                     if (chunk.m_arg0 != 0) {
                         workSize = Align32(workSize) + Align32(chunk.m_arg0);
@@ -292,7 +286,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
     unsigned int cursor = 0;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
-        if (chunk.m_id == CHUNK_VERT) {
+        if (chunk.m_id == 0x56455254) {
             S32At(this, 0x24) = reinterpret_cast<int>(
                 __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A));
 
@@ -333,7 +327,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
                     F32At(this, 0x20) = vert[2];
                 }
             }
-        } else if (chunk.m_id == CHUNK_NORM) {
+        } else if (chunk.m_id == 0x4E4F524D) {
             U16At(this, 0x2) = static_cast<unsigned short>(chunk.m_size / 6);
             S32At(this, 0x30) = static_cast<int>(Align32(cursor));
             cursor = S32At(this, 0x30) + chunk.m_size;
@@ -344,7 +338,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
                 norm[1] = reader.Get2();
                 norm[2] = reader.Get2();
             }
-        } else if (chunk.m_id == CHUNK_UV) {
+        } else if (chunk.m_id == 0x55562020) {
             U16At(this, 0x6) = static_cast<unsigned short>(chunk.m_size >> 2);
             S32At(this, 0x38) = static_cast<int>(Align32(cursor));
             cursor = S32At(this, 0x38) + chunk.m_size;
@@ -354,7 +348,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
                 uv[0] = reader.Get2();
                 uv[1] = reader.Get2();
             }
-        } else if (chunk.m_id == CHUNK_COLR) {
+        } else if (chunk.m_id == 0x434F4C52) {
             U16At(this, 0x8) = static_cast<unsigned short>(chunk.m_size >> 2);
             S32At(this, 0x3C) = static_cast<int>(Align32(cursor));
             cursor = S32At(this, 0x3C) + chunk.m_size;
@@ -371,7 +365,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
                     rgba[2] = static_cast<unsigned char>(rgba[2] >> 1);
                 }
             }
-        } else if (chunk.m_id == CHUNK_BOFF) {
+        } else if (chunk.m_id == 0x424F4646) {
             float x = reader.GetF4();
             float y = reader.GetF4();
             float z = reader.GetF4();
@@ -381,7 +375,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
             F32At(this, 0x18) += x;
             F32At(this, 0x1C) += y;
             F32At(this, 0x20) += z;
-        } else if (chunk.m_id == CHUNK_DLHD) {
+        } else if (chunk.m_id == 0x444C4844) {
             U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated == 0) {
                 S32At(this, 0x40) = static_cast<int>(Align32(cursor));
@@ -401,31 +395,26 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
             unsigned int dlOffset = 0;
             reader.PushChunk();
             while (reader.GetNextChunk(chunk)) {
-                if (chunk.m_id == CHUNK_DLST) {
-                    int entry = S32At(this, 0x40) + dlOffset;
+                if (chunk.m_id == 0x444C5354) {
+                    MeshDrawEntry* entry = reinterpret_cast<MeshDrawEntry*>(S32At(this, 0x40) + dlOffset);
                     dlOffset += 0x10;
-                    *reinterpret_cast<unsigned short*>(entry + 8) = reader.Get2();
-                    *reinterpret_cast<unsigned int*>(entry + 0) = chunk.m_arg0;
+                    entry->materialIdx = reader.Get2();
+                    entry->size = chunk.m_arg0;
 
                     reader.Align(0x20);
-                    *reinterpret_cast<unsigned int*>(entry + 4) = 0;
-                    if (*reinterpret_cast<unsigned int*>(entry + 0) != 0) {
-                        *reinterpret_cast<unsigned int*>(entry + 4) = Align32(cursor);
+                    entry->displayList = 0;
+                    if (entry->size != 0) {
+                        entry->displayList = reinterpret_cast<void*>(Align32(cursor));
                         if (usePreallocated == 0) {
-                            *reinterpret_cast<int*>(entry + 0xC) =
-                                *reinterpret_cast<int*>(entry + 4) - S32At(this, 0x24);
+                            entry->displayListOffset = reinterpret_cast<int>(entry->displayList) - S32At(this, 0x24);
                         } else {
-                            *reinterpret_cast<int*>(entry + 0xC) =
-                                *reinterpret_cast<int*>(entry + 4) - S32At(this, 0x28);
+                            entry->displayListOffset = reinterpret_cast<int>(entry->displayList) - S32At(this, 0x28);
                         }
 
-                        cursor = *reinterpret_cast<unsigned int*>(entry + 4) + Align32(chunk.m_arg0);
-                        memset(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(entry + 4)), 0,
-                               Align32(chunk.m_arg0));
-                        reader.Get(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(entry + 4)),
-                                   chunk.m_arg0);
-                        DCFlushRange(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(entry + 4)),
-                                     Align32(chunk.m_arg0));
+                        cursor = reinterpret_cast<unsigned int>(entry->displayList) + Align32(chunk.m_arg0);
+                        memset(entry->displayList, 0, Align32(chunk.m_arg0));
+                        reader.Get(entry->displayList, chunk.m_arg0);
+                        DCFlushRange(entry->displayList, Align32(chunk.m_arg0));
                     }
                     reader.Align(0x20);
                 }
@@ -440,6 +429,7 @@ void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int us
         }
     }
     reader.PopChunk();
+    return workSize;
 }
 
 /*

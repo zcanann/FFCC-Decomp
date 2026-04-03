@@ -20,7 +20,7 @@ public:
     void Destroy();
     void Ptr2Off();
     void Off2Ptr();
-    void ReadOtmMesh(CChunkFile&, CMemory::CStage*, int, int);
+    unsigned int ReadOtmMesh(CChunkFile&, CMemory::CStage*, int, int);
     void SetRenderArray();
     void DrawMesh(unsigned short, unsigned short);
     void DrawMeshCharaShadow(unsigned short, unsigned short);

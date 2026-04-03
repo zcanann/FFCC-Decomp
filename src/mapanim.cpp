@@ -24,9 +24,6 @@ public:
     ~CPtrArray();
 
     int Add(T item);
-    T GetAt(unsigned long index);
-    T operator[](unsigned long index);
-    int GetSize();
     void RemoveAll();
     void SetStage(CMemory::CStage* stage);
     int setSize(unsigned long newSize);
@@ -130,51 +127,6 @@ int CPtrArray<CMapAnimNode*>::Add(CMapAnimNode* item)
     m_items[m_numItems] = item;
     m_numItems++;
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034130
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CMapAnimNode*>::GetSize()
-{
-    return m_numItems;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034270
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034138
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
-{
-    return GetAt(index);
 }
 
 /*
@@ -790,7 +742,7 @@ void CMapAnimRun::Calc(long frame)
 runFrame:
     CPtrArray<CMapAnim*>* mapAnimArray =
         reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
-    CMapAnim* mapAnim = (*mapAnimArray)[run->mapAnimIndex];
+    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(mapAnimArray, run->mapAnimIndex);
     Calc__8CMapAnimFl(mapAnim, run->currentFrame);
     if (++run->currentFrame > run->endFrame) {
         if (run->loop != 0) {

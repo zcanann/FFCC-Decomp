@@ -590,7 +590,7 @@ void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CFlatRuntime::Frame(int, int mode)
+int CFlatRuntime::Frame(int unused, int mode)
 {
 	u8* const self = reinterpret_cast<u8*>(this);
 	CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
@@ -602,31 +602,36 @@ int CFlatRuntime::Frame(int, int mode)
 
 		if ((static_cast<s8>(object->m_flags) >= 0) && (mode != 0)) {
 			object->m_flags &= 0xBF;
-			objectFrame(object);
-
-			u16* const scriptPriority = reinterpret_cast<u16*>(reinterpret_cast<u8*>(object) + 0x34);
-			while (*scriptPriority != 0) {
-				object->m_sp--;
-
+			if (objectFrame(object) != 0) {
 				int scriptIndex = -1;
-				const u16 priority = *scriptPriority;
-				if (priority != 0) {
-					scriptIndex = 31 - __cntlzw(static_cast<unsigned int>(priority));
+				if (object->m_0x34 != 0) {
+					do {
+						object->m_sp--;
+
+						if (object->m_0x34 != 0) {
+							scriptIndex = 31 - __cntlzw(static_cast<unsigned int>(static_cast<u16>(object->m_0x34)));
+						} else {
+							scriptIndex = -1;
+						}
+
+						typedef void (*ReqFinishedFn)(CFlatRuntime*, int, CObject*);
+						reinterpret_cast<ReqFinishedFn>((*reinterpret_cast<void***>(this))[0x10])(this, scriptIndex, object);
+
+						if (scriptIndex >= 0) {
+							object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
+							if (object->m_0x34 != 0) {
+								scriptIndex = 31 - __cntlzw(static_cast<unsigned int>(static_cast<u16>(object->m_0x34)));
+							} else {
+								scriptIndex = -1;
+							}
+						}
+					} while (scriptIndex >= 0);
 				}
 
-				typedef void (*ReqFinishedFn)(CFlatRuntime*, int, CObject*);
-				reinterpret_cast<ReqFinishedFn>((*reinterpret_cast<void***>(this))[0x10])(this, scriptIndex, object);
-
-				if (scriptIndex < 0) {
-					break;
+				object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
+				if (object->m_particleId == 1) {
+					hasParticle = 1;
 				}
-
-				*scriptPriority = static_cast<u16>(*scriptPriority & ~(1U << scriptIndex));
-			}
-
-			object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
-			if (object->m_particleId == 1) {
-				hasParticle = 1;
 			}
 		}
 

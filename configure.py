@@ -967,7 +967,7 @@ config.libs = [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/e_pow.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/e_rem_pio2.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/e_sqrt.c"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/file_io.c"),
+            Object(NonMatching, "MSL_C/PPCEABI/bare/H/file_io.c", mw_version="GC/2.7"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/FILE_POS.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/k_cos.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/k_rem_pio2.c"),

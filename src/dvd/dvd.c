@@ -19,8 +19,8 @@ static const char s___DVDVersion[] = "<< Dolphin SDK - DVD\trelease build: Apr  
 const char* __DVDVersion = s___DVDVersion;
 
 static char s_dvd_c[] = "dvd.c";
-static char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";
 static char s_load_fst[] = "load fst\n";
+static char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";
 
 static BOOL autoInvalidation = TRUE;
 

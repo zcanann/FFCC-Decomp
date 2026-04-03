@@ -35,6 +35,8 @@ static u32 XPatchBits = PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN
 static u32 AnalogMode = 0x300;
 static u32 Spec = PAD_SPEC_5;
 
+u32 PrintDebugPalCaution_message;
+
 static BOOL Initialized;
 static u32 EnabledBits;
 static u32 ResettingBits;
@@ -42,12 +44,12 @@ static u32 RecalibrateBits;
 static u32 WaitingBits;
 static u32 CheckingBits;
 static u32 PendingBits;
-static u32 BarrelBits;
 
 static u32 Type[4];
 static PADStatus Origin[4];
 
 u32 __PADSpec;
+AISCallback __AIS_Callback;
 
 // prototypes
 static void PADTypeAndStatusCallback(s32 chan, u32 type);
@@ -77,7 +79,6 @@ BOOL __PADDisableRumble(BOOL disable);
 typedef void (*SPECCallback)(s32, PADStatus*, u32*);
 static SPECCallback MakeStatus = SPEC2_MakeStatus;
 
-static u32 CmdTypeAndStatus;
 static u32 CmdReadOrigin = 0x41000000;
 static u32 CmdCalibrate = 0x42000000;
 static u32 CmdProbeDevice[4];

@@ -11,7 +11,7 @@ const char* __AIVersion = "<< Dolphin SDK - AI\tdebug build: Apr  5 2004 03:56:1
 const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34:25 (0x2301) >>";
 #endif
 
-AISCallback __AIS_Callback;
+extern AISCallback __AIS_Callback;
 static AIDCallback __AID_Callback;
 static u8* __CallbackStack;
 static u8* __OldStack;
@@ -31,7 +31,10 @@ typedef struct {
     OSTime t4;
     OSTime t_end;
 } STRUCT_TIMELOG;
+
+#if DEBUG
 STRUCT_TIMELOG profile;
+#endif
 
 OSTime __ai_src_time_start;
 OSTime __ai_src_time_end;

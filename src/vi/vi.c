@@ -8,6 +8,8 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/vi/__vi.h"
 
+extern u32 PrintDebugPalCaution_message;
+
 #ifdef DEBUG
 const char* __VIVersion = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
 #else
@@ -699,10 +701,8 @@ static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 pr
 }
 
 static void PrintDebugPalCaution(void) {
-    static u32 message;
-
-    if (message == 0) {
-        message = 1;
+    if (PrintDebugPalCaution_message == 0) {
+        PrintDebugPalCaution_message = 1;
         OSReport("***************************************\n");
         OSReport(" ! ! ! C A U T I O N ! ! !             \n");
         OSReport("This TV format \"DEBUG_PAL\" is only for \n");

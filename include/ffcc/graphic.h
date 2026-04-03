@@ -91,6 +91,7 @@ public:
     void* m_renderMode;
     void* m_frameBuffer;
     void* m_scratchTextureBuffer;
+    void* m_savedFrameBuffer;
 };
 
 extern CGraphic Graphic;

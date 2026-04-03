@@ -4193,10 +4193,11 @@ void GbaQueue::ClrMemorysFlg(int channel)
  */
 unsigned int GbaQueue::GetMemorys(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(this) + channel;
 	OSWaitSemaphore(semaphore);
-	unsigned short value = *reinterpret_cast<unsigned short*>(obj + channel * 0xDC + 0x468);
+	unsigned short value =
+		*reinterpret_cast<unsigned short*>(compatibilityStr + channel * 0xDC + 0x10);
 	OSSignalSemaphore(semaphore);
 	return value;
 }

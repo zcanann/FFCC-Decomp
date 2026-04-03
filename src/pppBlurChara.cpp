@@ -213,9 +213,9 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     if (renderData->m_afterDrawPass == 1) {
         float offsetY = renderData->m_afterDrawOffsetY;
-        float offsetX = FLOAT_80331044 * offsetY;
 
-        gUtil.RenderTextureQuad(-offsetX, -offsetY, FLOAT_80331050 + offsetX, FLOAT_80331054 + offsetY,
+        gUtil.RenderTextureQuad(-(FLOAT_80331044 * offsetY), -offsetY, FLOAT_80331050 + (FLOAT_80331044 * offsetY),
+                                FLOAT_80331054 + offsetY,
                                 work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
         gUtil.BeginQuadEnv();
@@ -225,10 +225,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
         GXLoadTexObj(work->m_smallTexObj, GX_TEXMAP0);
 
-        posA.x = offsetX;
+        posA.x = FLOAT_80331044 * offsetY;
         posA.y = offsetY;
         posA.z = FLOAT_80331030;
-        posB.x = FLOAT_80331050 - offsetX;
+        posB.x = FLOAT_80331050 - (FLOAT_80331044 * offsetY);
         posB.y = FLOAT_80331054 - offsetY;
         posB.z = FLOAT_80331030;
 

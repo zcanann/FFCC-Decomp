@@ -207,17 +207,17 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
 
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         for (i = uvByteOffset = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            if (perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
-                perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
+            if (work->m_perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
+                work->m_perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
             }
-            if (perV < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)) {
-                perV = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
+            if (work->m_perV < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)) {
+                work->m_perV = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
             }
             uvByteOffset += 4;
         }
-        work->m_perU = perU;
-        work->m_perV = perV;
-        OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, perU, perV);
+        OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, work->m_perU, work->m_perV);
+        perU = work->m_perU;
+        perV = work->m_perV;
     }
 
     uvLayout = (CMapMeshUVLayout*)mapMesh;
@@ -232,7 +232,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) =
                 (s16)((f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) + perV);
         }
-        if ((u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8)) <= work->m_frame) {
+        if (work->m_frame >= (u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8))) {
             *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2) = (s16)(-((perV * (f32)*(u32*)(step->m_payload + 8)) -
                                                                              (f32)*(s16*)((u8*)uvLayout->m_uvPairs +
                                                                                           uvByteOffset + 2)));
@@ -240,9 +240,9 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
         uvByteOffset += 4;
     }
 
-    DCFlushRange(uvLayout->m_uvPairs, (u32)(u16)uvLayout->m_uvCount << 2);
+    DCFlushRange(uvLayout->m_uvPairs, uvLayout->m_uvCount * 4);
 
-    if ((u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8)) <= work->m_frame) {
+    if (work->m_frame >= (u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8))) {
         work->m_frame = 0;
     }
 }

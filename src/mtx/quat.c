@@ -120,6 +120,15 @@ void PSQUATInverse(const register Quaternion *src, register Quaternion *inv)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80186FD4
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void C_QUATRotAxisRad(Quaternion *q, const Vec *axis, f32 rad)
 {
     f32 tmp, tmp2, tmp3;
@@ -128,8 +137,8 @@ void C_QUATRotAxisRad(Quaternion *q, const Vec *axis, f32 rad)
     tmp = rad;
     PSVECNormalize(axis, &dst);
 
-    tmp2 = tmp * 0.5f;
-    tmp3 = sinf(tmp * 0.5f);
+    tmp2 = kQuatHalf * tmp;
+    tmp3 = sinf(kQuatHalf * tmp);
     tmp = tmp3;
     tmp3 = cosf(tmp2);
 
@@ -198,6 +207,15 @@ void C_QUATLerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
     r->w = p->w + value;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8018731C
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void C_QUATSlerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
 {
     f32 ratioA, ratioB;

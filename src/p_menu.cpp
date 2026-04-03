@@ -385,28 +385,28 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
     u8* self = reinterpret_cast<u8*>(this);
+    CMemory::CStage* menuStage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     CFont** fontSlot = reinterpret_cast<CFont**>(self + 0xF8 + slot * 4);
 
     if (type == 1) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
-    } else if (type >= 0) {
-        if (type < 1) {
-            stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-        } else if (type < 3) {
-            stage = pppEnvStPtr->m_stagePtr;
+    } else if (type < 1) {
+        if (type >= 0) {
+            stage = menuStage;
         }
+    } else if (type < 3) {
+        stage = pppEnvStPtr->m_stagePtr;
     }
 
-    CFont* font = FontMan.m_font;
-    if ((slot == 0) && (font != 0)) {
-        *fontSlot = font;
-        reinterpret_cast<u32*>(font)[1] = reinterpret_cast<u32*>(font)[1] + 1;
+    if ((slot == 0) && (FontMan.m_font != 0)) {
+        *fontSlot = FontMan.m_font;
+        reinterpret_cast<u32*>(*fontSlot)[1] = reinterpret_cast<u32*>(*fontSlot)[1] + 1;
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        font = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
+        CFont* font = new (menuStage, const_cast<char*>(kPMenuSourceFile), 0xF8) CFont;
         *fontSlot = font;
         font->Create(File.m_readBuffer, stage);
 
@@ -414,7 +414,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
     }
 
     if (tlutMode < 2) {
-        font = *fontSlot;
+        CFont* font = *fontSlot;
         MenuFontTlutPalette* palette = &sMenuFontTlutPaletteTable[tlutMode * 0x1C];
 
         for (int colorIndex = 0; colorIndex < 0x10; colorIndex++) {

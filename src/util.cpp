@@ -190,15 +190,14 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 
 	float t2 = t * t;
 	float t3 = t2 * t;
-
-	float h01 = (kUtilHermiteCoeffNeg2 * t3) + (kUtilHermiteCoeff3 * t2);
-	float h00 = kUtilOne + (kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2);
 	float h10 = t - ((kUtilHermiteCoeff2 * t2) - t3);
 	float h11 = t3 - t2;
+	float h00 = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
+	float h01 = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
 
-	out.x = (h11 * tan1.x) + (h10 * tan0.x) + (h00 * p1.x) + (h01 * p2.x);
-	out.y = (h11 * tan1.y) + (h10 * tan0.y) + (h00 * p1.y) + (h01 * p2.y);
-	out.z = (h11 * tan1.z) + (h10 * tan0.z) + (h00 * p1.z) + (h01 * p2.z);
+	out.x = (h10 * tan0.x) + (h11 * tan1.x) + (h00 * p1.x) + (h01 * p2.x);
+	out.y = (h10 * tan0.y) + (h11 * tan1.y) + (h00 * p1.y) + (h01 * p2.y);
+	out.z = (h10 * tan0.z) + (h11 * tan1.z) + (h00 * p1.z) + (h01 * p2.z);
 }
 
 /*
@@ -1109,17 +1108,17 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
  */
 void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
 {
-    S16Vec min = {0x7FFF, 0x7FFF, 0x7FFF};
     S16Vec max = {-0x7FFF, -0x7FFF, -0x7FFF};
+    S16Vec min = {0x7FFF, 0x7FFF, 0x7FFF};
 
     for (unsigned long i = 0; i < count; i++, vecs++) {
-        if (min.x > vecs->x) {
+        if (vecs->x < min.x) {
             min.x = vecs->x;
         }
-        if (min.y > vecs->y) {
+        if (vecs->y < min.y) {
             min.y = vecs->y;
         }
-        if (min.z > vecs->z) {
+        if (vecs->z < min.z) {
             min.z = vecs->z;
         }
         if (max.x < vecs->x) {

@@ -559,7 +559,6 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
-            Vec srcPos;
             Vec worldPos;
             GXColor amb;
             u8 blend = step->m_blendMode;
@@ -574,14 +573,11 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             scaleMatrix = model;
             pppMulMatrix(model, rotMatrix, scaleMatrix);
 
-            srcPos.x = particleData->m_matrix[0][0];
-            srcPos.y = particleData->m_matrix[0][1];
-            srcPos.z = particleData->m_matrix[0][2];
-            pppCopyVector(worldPos, srcPos);
+            pppCopyVector(worldPos, *(Vec*)particleData);
             if (Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {
-                PSMTXMultVec(ppvCameraMatrix0, &worldPos, &worldPos);
+                PSMTXMultVec(ppvCameraMatrix02, &worldPos, &worldPos);
             }
 
             model.value[0][3] = worldPos.x;

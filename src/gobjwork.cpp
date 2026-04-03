@@ -2479,13 +2479,12 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	CGObjWork* gObjWork = this;
 	CCaravanWork* artifactWork = this;
 	int hpMax = 0;
 	int artifactIndex = 0;
 	int count = 0x32;
 
-	do {
+	while (count != 0) {
 		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[0] > 0)) {
 			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[0]);
 			unsigned short artifactType = artifactData[0];
@@ -2526,9 +2525,9 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 		artifactWork = (CCaravanWork*)&artifactWork->m_objType;
 		artifactIndex++;
 		count--;
-	} while (count != 0);
+	}
 
-	hpMax += *(unsigned short*)(Game.unkCFlatData0[0] + gObjWork->m_baseDataIndex * 0x1D0 + 6);
+	hpMax += *(unsigned short*)(Game.unkCFlatData0[0] + m_baseDataIndex * 0x1D0 + 6);
 	if (hpMax > 0xF) {
 		return 0x10;
 	}

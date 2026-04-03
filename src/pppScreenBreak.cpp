@@ -783,7 +783,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
 
     if (value[0x24] == 0) {
         Graphic.GetBackBufferRect2(
-            Graphic.m_scratchTextureBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
+            Graphic.m_savedFrameBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
         value[0x24] = 1;
     }
 }

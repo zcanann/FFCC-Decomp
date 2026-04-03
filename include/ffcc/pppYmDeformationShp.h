@@ -12,10 +12,18 @@ struct Vec4d;
 struct pppYmDeformationShpUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_unk_0x8;
+    u8 m_size;
+    u8 m_pad_0x9[3];
     f32 m_payload[6];
     s16 m_payload3;
-    u8 m_pad_0x26[0x16];
+    s8 m_splitMode;
+    u8 m_splitSize;
+    s8 m_orientation;
+    u8 m_pad_0x29[3];
+    f32 m_drawZ;
+    u8 m_pad_0x30;
+    u8 m_alpha;
+    u8 m_pad_0x32[0xA];
 };
 struct pppYmDeformationShpUnkC {
     u8 m_pad_0x0[0xc];

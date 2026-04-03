@@ -85,8 +85,9 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     fog3 |= (fsel << 21);
     fog3 |= 0xF1000000;
 
-    fogclr = ((u32)color.g << 8) | color.b;
-    fogclr |= (u32)color.r << 16;
+    fogclr = (u32)color.r << 16;
+    fogclr |= (u32)color.g << 8;
+    fogclr |= color.b;
     fogclr = (fogclr & 0x00FFFFFF) | 0xF2000000;
 
     GX_WRITE_RAS_REG(fog0);
@@ -148,9 +149,9 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
  * JP Size: TODO
  */
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
-    u32 range_adj;
     const u16* range;
-    u8 reg;
+    u32 range_adj;
+    u32 tag;
 
     CHECK_GXBEGIN(331, "GXSetFogRangeAdj");
 
@@ -159,32 +160,32 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
         range = table->r;
 
         range_adj = (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        reg = 0xE9;
-        range_adj = (range_adj & 0x00FFFFFF) | ((u32)reg << 24);
+        tag = 0xE9;
+        range_adj = (range_adj & 0x00FFFFFF) | (tag << 24);
         GX_WRITE_RAS_REG(range_adj);
 
-        reg = 0xEA;
+        tag = 0xEA;
         range += 2;
-        range_adj = (u32)reg << 24;
+        range_adj = tag << 24;
         range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
         GX_WRITE_RAS_REG(range_adj);
 
-        reg = 0xEB;
-        range_adj = (u32)reg << 24;
+        tag = 0xEB;
         range += 2;
+        range_adj = tag << 24;
         range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
         GX_WRITE_RAS_REG(range_adj);
 
-        reg = 0xEC;
-        range_adj = (u32)reg << 24;
+        tag = 0xEC;
         range += 2;
+        range_adj = tag << 24;
         range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
         GX_WRITE_RAS_REG(range_adj);
 
+        tag = 0xED;
         range += 2;
         range_adj = (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        reg = 0xED;
-        range_adj = (range_adj & 0x00FFFFFF) | ((u32)reg << 24);
+        range_adj = (range_adj & 0x00FFFFFF) | (tag << 24);
         GX_WRITE_RAS_REG(range_adj);
     }
 

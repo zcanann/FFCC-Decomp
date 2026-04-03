@@ -66,9 +66,12 @@ static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(pppYmDr
     return (pppYmDrawMdlTexAnmColorBlock*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[0]);
 }
 
+void pppUnitMatrix(pppFMATRIX&);
+void pppMulMatrix(pppFMATRIX&, pppFMATRIX, pppFMATRIX);
+
 extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void* color, void* matrix, f32 z, u8 a3, u8 a4, u8 a5,
-                                                                 u8 a6, u8 a7, u8 a8, u8 a9);
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR* color, pppFMATRIX* matrix, f32 z, u8 a3, u8 a4,
+                                                               u8 a5, u8 a6, u8 a7, u8 a8, u8 a9);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 flag);
 
@@ -276,14 +279,15 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 
     colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
 
-    matrix2 = matrix0;
+    pppUnitMatrix(matrix4);
+    matrix2 = matrix4;
     matrix2.value[2][2] *= FLOAT_80330548;
 
     matrix1 = ymDrawMdlTexAnm->m_localMatrix;
-    matrix0.value[2][2] = matrix2.value[2][2];
+    pppMulMatrix(matrix0, matrix1, matrix2);
 
-    matrix4 = matrix0;
     matrix3 = *(pppFMATRIX*)&ppvCameraMatrix02;
+    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, matrix3, matrix0);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;

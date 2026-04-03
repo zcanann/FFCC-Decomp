@@ -409,7 +409,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     s16 local_d0;
     s16 sStack_ce;
     s16 local_cc;
-    Vec local_c8 = { DAT_801dd4bc, DAT_801dd4c0, DAT_801dd4c4 };
+    Vec local_c8;
     u32 uStack_b4;
     s16 sVar8;
     s16 sVar10;
@@ -525,7 +525,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
         dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));
         PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)step + 0x38) + dVar17));
-
+        local_c8.x = DAT_801dd4bc;
+        local_c8.y = DAT_801dd4c0;
+        local_c8.z = DAT_801dd4c4;
         inVec[1].x = (float)dVar22;
         inVec[1].y = (float)dVar22;
         inVec[1].z = (float)dVar22;

@@ -3,7 +3,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "ffcc/joybus.h"
-#include "ffcc/p_minigame.h"
+#include "ffcc/p_dbgmenu.h"
 
 #include "dolphin/pad.h"
 #include "dolphin/si.h"
@@ -177,26 +177,7 @@ void CPad::Frame()
 		u8* replay = *reinterpret_cast<u8**>(self + 0x1B0);
 		s32 frameIndex = *reinterpret_cast<s32*>(self + 0x1BC);
 		int* replayFlags = reinterpret_cast<int*>(replay + 4);
-		if (*replayFlags == 0)
-		{
-			if (frameIndex < 0x1A5E0)
-			{
-				for (int i = 0; i < 4; i++)
-				{
-					u16 originalButtons = status[i].button;
-					const u8* src = replay + frameIndex * 0x40 + i * 0x0C + 0x0C;
-					const u16* replayJoyBus = reinterpret_cast<const u16*>(replay + frameIndex * 0x40 + i * 4 + 0x3C);
-					status[i] = *reinterpret_cast<const PADStatus*>(src);
-					joyBusData[i * 2] = replayJoyBus[0];
-					joyBusData[i * 2 + 1] = replayJoyBus[1];
-					if ((originalButtons & PAD_TRIGGER_Z) != 0)
-					{
-						status[i].button = static_cast<u16>(status[i].button | originalButtons);
-					}
-				}
-			}
-		}
-		else
+		if (*replayFlags != 0)
 		{
 			int* replayFrames = reinterpret_cast<int*>(replay + 8);
 			if (*replayFrames < 0x1A5E0)
@@ -205,13 +186,47 @@ void CPad::Frame()
 				{
 					u8* dst = replay + *replayFrames * 0x40 + i * 0x0C + 0x0C;
 					u16* dstJoyBus = reinterpret_cast<u16*>(replay + *replayFrames * 0x40 + i * 4 + 0x3C);
-					*reinterpret_cast<PADStatus*>(dst) = status[i];
+					*reinterpret_cast<u16*>(dst) = status[i].button;
+					*reinterpret_cast<s8*>(dst + 2) = status[i].stickX;
+					*reinterpret_cast<s8*>(dst + 3) = status[i].stickY;
+					*reinterpret_cast<s8*>(dst + 4) = status[i].substickX;
+					*reinterpret_cast<s8*>(dst + 5) = status[i].substickY;
+					dst[6] = status[i].triggerLeft;
+					dst[7] = status[i].triggerRight;
+					dst[8] = status[i].analogA;
+					dst[9] = status[i].analogB;
+					*reinterpret_cast<s8*>(dst + 10) = status[i].err;
 					dstJoyBus[0] = joyBusData[i * 2];
 					dstJoyBus[1] = joyBusData[i * 2 + 1];
 				}
 
 				(*replayFrames)++;
 				*reinterpret_cast<int*>(_1b0_4_) += 0x40;
+			}
+		}
+		else if (frameIndex < 0x1A5E0)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				u16 originalButtons = status[i].button;
+				const u8* src = replay + frameIndex * 0x40 + i * 0x0C + 0x0C;
+				const u16* replayJoyBus = reinterpret_cast<const u16*>(replay + frameIndex * 0x40 + i * 4 + 0x3C);
+				status[i].button = *reinterpret_cast<const u16*>(src);
+				status[i].stickX = *reinterpret_cast<const s8*>(src + 2);
+				status[i].stickY = *reinterpret_cast<const s8*>(src + 3);
+				status[i].substickX = *reinterpret_cast<const s8*>(src + 4);
+				status[i].substickY = *reinterpret_cast<const s8*>(src + 5);
+				status[i].triggerLeft = src[6];
+				status[i].triggerRight = src[7];
+				status[i].analogA = src[8];
+				status[i].analogB = src[9];
+				status[i].err = *reinterpret_cast<const s8*>(src + 10);
+				joyBusData[i * 2] = replayJoyBus[0];
+				joyBusData[i * 2 + 1] = replayJoyBus[1];
+				if ((originalButtons & PAD_TRIGGER_Z) != 0)
+				{
+					status[i].button = static_cast<u16>(status[i].button | originalButtons);
+				}
 			}
 		}
 	}
@@ -251,7 +266,7 @@ void CPad::Frame()
 
 	if ((missingGbaMask & 0xF0000000) != 0)
 	{
-		PADReset(0);
+		PADReset(missingGbaMask & 0xF0000000);
 	}
 
 	padStateBase = reinterpret_cast<u16*>(self + 0x154);
@@ -328,7 +343,7 @@ void CPad::Frame()
 							*playerButtons |= 0x20;
 						}
 
-						if ((*reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484) & 0x100) != 0)
+						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							s8 stickX = *reinterpret_cast<s8*>(padInfo + 0x18);
 							s8 stickY = *reinterpret_cast<s8*>(padInfo + 0x19);
@@ -385,17 +400,17 @@ void CPad::Frame()
 						*reinterpret_cast<u8*>(padInfo + 0x17) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(statusCursor) + 7);
 
 						*reinterpret_cast<float*>(padInfo + 0x24) =
-							static_cast<float>((static_cast<double>(*reinterpret_cast<s8*>(padInfo + 0x18)) + DOUBLE_8032f830) - DOUBLE_8032f830) * FLOAT_8032f824;
+							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x18)) * FLOAT_8032f824;
 						*reinterpret_cast<float*>(padInfo + 0x28) =
-							static_cast<float>((static_cast<double>(*reinterpret_cast<s8*>(padInfo + 0x19)) + DOUBLE_8032f830) - DOUBLE_8032f830) * FLOAT_8032f824;
+							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x19)) * FLOAT_8032f824;
 						*reinterpret_cast<float*>(padInfo + 0x2C) =
-							static_cast<float>((static_cast<double>(*reinterpret_cast<s8*>(padInfo + 0x1A)) + DOUBLE_8032f830) - DOUBLE_8032f830) * FLOAT_8032f824;
+							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x1A)) * FLOAT_8032f824;
 						*reinterpret_cast<float*>(padInfo + 0x30) =
-							static_cast<float>((static_cast<double>(*reinterpret_cast<s8*>(padInfo + 0x1B)) + DOUBLE_8032f830) - DOUBLE_8032f830) * FLOAT_8032f824;
+							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x1B)) * FLOAT_8032f824;
 						*reinterpret_cast<float*>(padInfo + 0x1C) =
-							static_cast<float>((static_cast<double>(*reinterpret_cast<u8*>(padInfo + 0x16)) + DOUBLE_8032f838) - DOUBLE_8032f838) / FLOAT_8032f828;
+							static_cast<float>(*reinterpret_cast<u8*>(padInfo + 0x16)) / FLOAT_8032f828;
 						*reinterpret_cast<float*>(padInfo + 0x20) =
-							static_cast<float>((static_cast<double>(*reinterpret_cast<u8*>(padInfo + 0x17)) + DOUBLE_8032f838) - DOUBLE_8032f838) / FLOAT_8032f828;
+							static_cast<float>(*reinterpret_cast<u8*>(padInfo + 0x17)) / FLOAT_8032f828;
 					}
 					else
 					{

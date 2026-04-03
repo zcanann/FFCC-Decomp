@@ -152,7 +152,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 {
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     u8* mesh = *(u8**)((u8*)model + 0xAC);
-    Vec basis;
+    Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
     Vec cameraForward;
     Vec cameraPos;
     Vec cameraRefPos;
@@ -173,10 +173,6 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Mtx invTransMtx;
     Mtx quatMtx;
     Mtx44 screenMtx;
-
-    basis.x = DAT_801dd4b0;
-    basis.y = DAT_801dd4b4;
-    basis.z = DAT_801dd4b8;
 
     cameraForward.x = CameraDirX();
     cameraForward.y = CameraDirY();
@@ -413,7 +409,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     s16 local_d0;
     s16 sStack_ce;
     s16 local_cc;
-    Vec local_c8;
+    Vec local_c8 = { DAT_801dd4bc, DAT_801dd4c0, DAT_801dd4c4 };
     u32 uStack_b4;
     s16 sVar8;
     s16 sVar10;
@@ -525,9 +521,6 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->z = (float)dVar21;
         PSVECNormalize(inVec, inVec);
 
-        local_c8.x = DAT_801dd4bc;
-        local_c8.y = DAT_801dd4c0;
-        local_c8.z = DAT_801dd4c4;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
         dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));

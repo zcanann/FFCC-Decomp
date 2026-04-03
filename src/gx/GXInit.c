@@ -10,26 +10,19 @@
 #undef SET_REG_FIELD
 #define SET_REG_FIELD OLD_SET_REG_FIELD
 
-#if SDK_REVISION < 2
-#define BUILD_DATE  "Apr  5 2004"
-#define DBUILD_TIME "03:55:13"
-#define RBUILD_TIME "04:13:58"
-#else
-#define BUILD_DATE  "Nov 10 2004"
-#define DBUILD_TIME "06:08:50"
-#define RBUILD_TIME "06:27:12"
-#endif
+extern char lbl_8021C380[];
+extern const GXColor GXInit_ClearColor;
+extern const GXColor GXInit_BlackColor;
+extern const GXColor GXInit_WhiteColor;
+extern const f32 GXInit_ZeroF;
+extern const f32 GXInit_OneF;
+extern const f32 GXInit_PointOneF;
 
-#ifdef DEBUG
-const char* __GXVersion = "<< Dolphin SDK - GX\tdebug build: "BUILD_DATE" "DBUILD_TIME" (0x2301) >>";
-#else
-const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: "BUILD_DATE" "RBUILD_TIME" (0x2301) >>";
-#endif
+const char* __GXVersion = lbl_8021C380;
 
 static GXData gxData;
 static GXFifoObj FifoObj;
 GXData* const gx = &gxData;
-GXData* const __GXData = &gxData;
 
 // these remain file-scope in the target object
 u32 calledOnce;
@@ -45,11 +38,6 @@ void* __piReg;
 #if DEBUG
 GXBool __GXinBegin;
 #endif
-
-static u16 DefaultTexData[] __attribute__((aligned(32))) = {
-    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-};
 
 static GXVtxAttrFmtList GXDefaultVATList[] = {
     {GX_VA_POS, GX_POS_XYZ, GX_F32, 0},
@@ -68,14 +56,6 @@ static GXVtxAttrFmtList GXDefaultVATList[] = {
 };
 
 static f32 GXDefaultProjData[] = {1.0f, 0.0f, 1.0f, 0.0f, -1.0f, -2.0f, 0.0f};
-
-static u32 GXTexRegionAddrTable[] = {
-    0x00000, 0x10000, 0x20000, 0x30000, 0x40000, 0x50000, 0x60000, 0x70000, 0x08000, 0x18000,
-    0x28000, 0x38000, 0x48000, 0x58000, 0x68000, 0x78000, 0x00000, 0x90000, 0x20000, 0xB0000,
-    0x40000, 0x98000, 0x60000, 0xB8000, 0x80000, 0x10000, 0xA0000, 0x30000, 0x88000, 0x50000,
-    0xA8000, 0x70000, 0x00000, 0x90000, 0x20000, 0xB0000, 0x40000, 0x90000, 0x60000, 0xB0000,
-    0x80000, 0x10000, 0xA0000, 0x30000, 0x80000, 0x50000, 0xA0000, 0x70000,
-};
 
 // prototypes
 static int __GXShutdown(int final);
@@ -373,9 +353,9 @@ GXFifoObj* GXInit(void* base, u32 size) {
 void __GXInitGX(void) {
     GXRenderModeObj* rmode;
     float identity_mtx[3][4];
-    GXColor clear = {64, 64, 64, 255};
-    GXColor black = {0, 0, 0, 0};
-    GXColor white = {255, 255, 255, 255};
+    GXColor clear = GXInit_ClearColor;
+    GXColor black = GXInit_BlackColor;
+    GXColor white = GXInit_WhiteColor;
     u32 i;
 
     switch (VIGetTvFormat()) {
@@ -420,24 +400,24 @@ void __GXInitGX(void) {
     GXEnableTexOffsets(GX_TEXCOORD5, 0, 0);
     GXEnableTexOffsets(GX_TEXCOORD6, 0, 0);
     GXEnableTexOffsets(GX_TEXCOORD7, 0, 0);
-    identity_mtx[0][0] = 1.0f;
-    identity_mtx[0][1] = 0.0f;
-    identity_mtx[0][2] = 0.0f;
-    identity_mtx[0][3] = 0.0f;
-    identity_mtx[1][0] = 0.0f;
-    identity_mtx[1][1] = 1.0f;
-    identity_mtx[1][2] = 0.0f;
-    identity_mtx[1][3] = 0.0f;
-    identity_mtx[2][0] = 0.0f;
-    identity_mtx[2][1] = 0.0f;
-    identity_mtx[2][2] = 1.0f;
-    identity_mtx[2][3] = 0.0f;
+    identity_mtx[0][0] = GXInit_OneF;
+    identity_mtx[0][1] = GXInit_ZeroF;
+    identity_mtx[0][2] = GXInit_ZeroF;
+    identity_mtx[0][3] = GXInit_ZeroF;
+    identity_mtx[1][0] = GXInit_ZeroF;
+    identity_mtx[1][1] = GXInit_OneF;
+    identity_mtx[1][2] = GXInit_ZeroF;
+    identity_mtx[1][3] = GXInit_ZeroF;
+    identity_mtx[2][0] = GXInit_ZeroF;
+    identity_mtx[2][1] = GXInit_ZeroF;
+    identity_mtx[2][2] = GXInit_OneF;
+    identity_mtx[2][3] = GXInit_ZeroF;
     GXLoadPosMtxImm(identity_mtx, GX_PNMTX0);
     GXLoadNrmMtxImm(identity_mtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
     GXLoadTexMtxImm(identity_mtx, GX_IDENTITY, GX_MTX3x4);
     GXLoadTexMtxImm(identity_mtx, GX_PTIDENTITY, GX_MTX3x4);
-    GXSetViewport(0.0f, 0.0f, rmode->fbWidth, rmode->xfbHeight, 0.0f, 1.0f);
+    GXSetViewport(GXInit_ZeroF, GXInit_ZeroF, rmode->fbWidth, rmode->xfbHeight, GXInit_ZeroF, GXInit_OneF);
     GXSetProjectionv(GXDefaultProjData);
     GXSetCoPlanar(GX_DISABLE);
     GXSetCullMode(GX_CULL_BACK);
@@ -499,7 +479,7 @@ void __GXInitGX(void) {
     GXSetIndTexCoordScale(GX_INDTEXSTAGE2, GX_ITS_1, GX_ITS_1);
     GXSetIndTexCoordScale(GX_INDTEXSTAGE3, GX_ITS_1, GX_ITS_1);
 
-    GXSetFog(GX_FOG_NONE, 0.0f, 1.0f, 0.1f, 1.0f, black);
+    GXSetFog(GX_FOG_NONE, GXInit_ZeroF, GXInit_OneF, GXInit_PointOneF, GXInit_OneF, black);
     GXSetFogRangeAdj(GX_DISABLE, 0, NULL);
     GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetColorUpdate(GX_ENABLE);

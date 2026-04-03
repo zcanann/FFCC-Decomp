@@ -97,12 +97,11 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     OSReport(DAT_801d9c54);
 
     uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0];
-    work->m_perU = FLOAT_8033054c;
-    work->m_perV = work->m_perU;
+    work->m_perV = work->m_perU = FLOAT_8033054c;
 
     if (uvLayout != NULL) {
-        uvByteOffset = 0;
-        for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+        i = 0;
+        for (uvByteOffset = i; i < (s32)(u16)uvLayout->m_uvCount; i++) {
             if (work->m_perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
                 work->m_perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
             }

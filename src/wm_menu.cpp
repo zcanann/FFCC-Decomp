@@ -91,10 +91,8 @@ extern char DAT_80331648[];
 extern char DAT_8033164c[];
 extern char DAT_80331654[];
 extern char DAT_8033165c[];
-char gWmMenuCursorX;
-char uRam8032ee21;
-char gWmMenuCursorY;
-char uRam8032ee25;
+char gWmMenuCursorX[2];
+char gWmMenuCursorY[2];
 int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
@@ -175,10 +173,10 @@ void CMenuPcs::WmInit()
 	bytes[0x13] = 0;
 	bytes[0xD] = 1;
 	bytes[0x16] = 0;
-	gWmMenuCursorX = 0xFF;
-	uRam8032ee21 = 0xFF;
-	gWmMenuCursorY = 0xFF;
-	uRam8032ee25 = 0xFF;
+	gWmMenuCursorX[0] = 0xFF;
+	gWmMenuCursorX[1] = 0xFF;
+	gWmMenuCursorY[0] = 0xFF;
+	gWmMenuCursorY[1] = 0xFF;
 	gWmMenuWorkB = -1;
 	gWmMenuWorkA = -1;
 	gWmMenuScriptValueCache = Game.m_gameWork.m_scriptSysVal0;
@@ -2902,7 +2900,7 @@ void CMenuPcs::DrawMainMenuSub()
 	DrawPageMark();
 	DrawWMFrame0(3, 1.0f);
 	if (gWmMenuWorkA > 0) {
-		DrawCursor(gWmMenuCursorX, uRam8032ee21, 1.0f);
+		DrawCursor(gWmMenuCursorX[0], gWmMenuCursorX[1], 1.0f);
 	}
 }
 
@@ -2917,8 +2915,8 @@ void CMenuPcs::DrawMainMenuSub()
  */
 void CMenuPcs::GetMcAccessPos(int* x, int* y)
 {
-	*x = gWmMenuCursorX;
-	*y = uRam8032ee21;
+	*x = gWmMenuCursorX[0];
+	*y = gWmMenuCursorX[1];
 }
 
 /*
@@ -2932,8 +2930,8 @@ void CMenuPcs::GetMcAccessPos(int* x, int* y)
  */
 void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 {
-	*x = gWmMenuCursorY;
-	*y = uRam8032ee25;
+	*x = gWmMenuCursorY[0];
+	*y = gWmMenuCursorY[1];
 }
 
 /*
@@ -3143,10 +3141,10 @@ void CMenuPcs::ClrMcList()
 	if (list != 0) {
 		memset(list, 0, kMcListEntrySize * kMcListCount);
 	}
-	gWmMenuCursorX = 0xFF;
-	uRam8032ee21 = 0xFF;
-	gWmMenuCursorY = 0xFF;
-	uRam8032ee25 = 0xFF;
+	gWmMenuCursorX[0] = 0xFF;
+	gWmMenuCursorX[1] = 0xFF;
+	gWmMenuCursorY[0] = 0xFF;
+	gWmMenuCursorY[1] = 0xFF;
 	gWmMenuWorkA = 0;
 	gWmMenuWorkB = 0;
 }

@@ -31,6 +31,8 @@ static DdhInitFlag gIsInitialized ATTRIBUTE_ALIGN(8);
 static const char ddh_cc_write_not_initialized[] = "cc not initialized\n";
 static const char ddh_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
 static const char ddh_cc_write_sending[] = "cc_write sending %ld bytes\n";
+static const char ddh_cc_expected_packet_size[] = "Expected packet size : 0x%08x (%ld)\n";
+static const char ddh_cc_read_error[] = "cc_read : error reading bytes from EXI2 %ld\n";
 static const char ddh_cc_initialize_calling_exi2_init[] = "CALLING EXI2_Init\n";
 static const char ddh_cc_initialize_done_calling_exi2_init[] = "DONE CALLING EXI2_Init\n";
 
@@ -177,7 +179,7 @@ int ddh_cc_read(u8* data, int size)
         return DDH_ERR_NOT_INITIALIZED;
     }
 
-    MWTRACE(1, "Expected packet size : 0x%08x (%ld)\n", size, size);
+    MWTRACE(1, (char*)ddh_cc_expected_packet_size, size, size);
     originalDataSize = expectedDataSize = size;
 	
     while ((u32)CBGetBytesAvailableForRead(&gRecvCB.cb) < expectedDataSize)
@@ -200,7 +202,7 @@ int ddh_cc_read(u8* data, int size)
     }
 	else
 	{
-        MWTRACE(8, "cc_read : error reading bytes from EXI2 %ld\n", result);
+        MWTRACE(8, (char*)ddh_cc_read_error, result);
     }
 
     return result;

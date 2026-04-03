@@ -1079,7 +1079,7 @@ static BOOL TRKTargetStepDone()
 static DSError TRKTargetDoStep()
 {
     gTRKStepStatus.active = TRUE;
-    MWTRACE(1, "TargetDoStep:\n");
+    MWTRACE(1, "TargetDoStep()\n");
     TRKTargetEnableTrace(TRUE);
 
     if (gTRKStepStatus.type == DSSTEP_IntoCount
@@ -1116,7 +1116,7 @@ DSError TRKTargetSingleStep(u32 count, BOOL stepOver)
     gTRKStepStatus.active = TRUE;
     gTRKStepStatus.count  = count;
 
-    MWTRACE(1, "TargetDoStep:\n");
+    MWTRACE(1, "TargetDoStep()\n");
     TRKTargetEnableTrace(TRUE);
 
     if (gTRKStepStatus.type == DSSTEP_IntoCount
@@ -1139,7 +1139,7 @@ DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver)
     gTRKStepStatus.rangeStart = rangeStart;
     gTRKStepStatus.rangeEnd   = rangeEnd;
 
-    MWTRACE(1, "TargetDoStep:\n");
+    MWTRACE(1, "TargetDoStep()\n");
     TRKTargetEnableTrace(TRUE);
 
     if (gTRKStepStatus.type == DSSTEP_IntoCount

@@ -423,72 +423,72 @@ void CRingMenu::onCalc()
  */
 void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1]);
-	const int* cmdNameTable = reinterpret_cast<const int*>(flatData->table[4].strings);
+	const int* cmdNameTable =
+		reinterpret_cast<const int*>(reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
 	const bool isBossStage = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19);
 
 	int commandLabel;
 	if (isBossStage) {
 		commandLabel = cmdNameTable[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
-		commandLabel = cmdNameTable[(cmdIndex == 0) ? 1 : 9];
+		int indexOffset = 9;
+		if (cmdIndex == 0) {
+			indexOffset = 1;
+		}
+		commandLabel = cmdNameTable[indexOffset];
 	} else {
 		commandLabel = _GetWeaponAttrib__12CCaravanWorkFi(caravanWork, cmdIndex);
 	}
 
+	int tlut = 7;
 	if (isBossStage) {
 		if (cmdIndex == 2) {
-			font->SetTlut(4);
+			tlut = 4;
 		} else if (cmdIndex < 2) {
 			if (cmdIndex == 0) {
-				font->SetTlut(2);
+				tlut = 2;
 			} else if (cmdIndex >= 0) {
-				font->SetTlut(1);
-			} else {
-				font->SetTlut(7);
+				tlut = 1;
 			}
-		} else if (cmdIndex == 4) {
-			font->SetTlut(7);
 		} else if (cmdIndex < 4) {
-			font->SetTlut(6);
-		} else {
-			font->SetTlut(7);
+			if (cmdIndex != 4) {
+				tlut = 6;
+			}
 		}
-	} else if (cmdIndex == 0) {
-		font->SetTlut(7);
-	} else {
-		font->SetTlut(4);
+	} else if (cmdIndex != 0) {
+		tlut = 4;
 	}
+	font->SetTlut(tlut);
 
-	const double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
-
-	float waveDir = FLOAT_80330a40;
+	const double sinAngle = sin(static_cast<double>(angle));
+	const double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sinAngle));
+	bool reverseDir = false;
 	if ((state == 0) || (state == 3)) {
-		waveDir = -waveDir;
+		reverseDir = true;
 	}
-	double waveY = static_cast<double>(waveDir * static_cast<float>(sin(static_cast<double>(angle))));
+	int sign = 1;
+	if (reverseDir) {
+		sign = -1;
+	}
+	double waveY = static_cast<double>(static_cast<float>(sign) * FLOAT_80330a40 * static_cast<float>(sinAngle));
 	if (isBossStage) {
 		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
 	}
 
 	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
 
-	const double textWidth = static_cast<double>(font->GetWidth(commandLabel));
-	const float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	double textWidth = static_cast<double>(font->GetWidth(commandLabel));
+	float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	double textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
 	float clampedAlpha = FLOAT_803309c0;
-	if (alphaRange >= FLOAT_803309c0) {
-		clampedAlpha = alphaRange;
-		if (alphaRange > FLOAT_803309cc) {
-			clampedAlpha = FLOAT_803309cc;
-		}
+	if ((FLOAT_803309c0 <= alphaRange) && ((clampedAlpha = alphaRange), (FLOAT_803309cc < alphaRange))) {
+		clampedAlpha = FLOAT_803309cc;
 	}
 
-	const int alpha = static_cast<int>(static_cast<float>(static_cast<double>(FLOAT_80330a34) * static_cast<double>(alphaScale)) * clampedAlpha);
-	unsigned int colorRaw[1];
-	__ct__6CColorFUcUcUcUc(colorRaw, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
-	font->SetColor(*reinterpret_cast<GXColor*>(colorRaw));
-
-	const double textHeight = static_cast<double>(font->m_glyphWidth) * font->scaleY;
+	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
+	unsigned char colorStorage[4];
+	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
+	font->SetColor(*color);
 	const float textX = static_cast<float>(
 		waveX + -(static_cast<double>(static_cast<float>(textWidth * static_cast<double>(FLOAT_803309c4) -
 		                                                static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) +

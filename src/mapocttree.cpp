@@ -205,17 +205,14 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
     m_unk01 = 0;
     chunkFile.PushChunk();
 
-    for (;;) {
-        if (!chunkFile.GetNextChunk(chunk)) {
-            chunkFile.PopChunk();
-            return;
-        }
-
-        if (chunk.m_id == 'OBJN') {
+    while (chunkFile.GetNextChunk(chunk)) {
+        switch (chunk.m_id) {
+        case 'OBJN': {
             unsigned short objIndex = chunkFile.Get2();
-            m_mapObject = GetMapObjByIndex(objIndex);
+            unsigned char* mapObj;
 
-            unsigned char* mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
+            m_mapObject = GetMapObjByIndex(objIndex);
+            mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
             if (mapObj[0x1E] == 4) {
                 mapObj[0x15] = 0xFF;
                 mapObj[0x14] = 0xFF;
@@ -223,92 +220,95 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             } else if (mapObj[0x1E] == 3) {
                 mapObj[0x22] = 0;
             }
-            continue;
+            break;
         }
 
-        if (chunk.m_id == 'NODN') {
+        case 'NODN': {
             unsigned short nodeCount = chunkFile.Get2();
+            void* rootNode;
+
             m_nodeCount = nodeCount;
             if ((*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1E)) != 1) &&
                 (static_cast<unsigned int>(System.m_execParam) > 2U)) {
                 Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, nodeCount);
             }
-            void* rootNode = __nwa__FUlPQ27CMemory6CStagePci(
+
+            rootNode = __nwa__FUlPQ27CMemory6CStagePci(
                 nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapocttree_cpp, 0x59);
             m_nodePool = reinterpret_cast<COctNode*>(
                 __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount));
-            continue;
+            break;
         }
 
-        if (chunk.m_id == 'INFO') {
+        case 'INFO':
             m_unk01 = chunkFile.Get1();
-            continue;
-        }
+            break;
 
-        if (chunk.m_id == 'TYPE') {
+        case 'TYPE':
             m_type = static_cast<unsigned char>(chunkFile.Get2());
-            continue;
-        }
+            break;
 
-        if (chunk.m_id != 'TREE') {
-            continue;
-        }
-
-        chunkFile.PushChunk();
-        while (chunkFile.GetNextChunk(chunk)) {
-            if (chunk.m_id != 'NODE') {
-                continue;
-            }
-
+        case 'TREE':
             chunkFile.PushChunk();
-            COctNode* node = 0;
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 'OBJ ') {
-                    unsigned short nodeIndex = chunkFile.Get2();
-                    node = m_nodePool + nodeIndex;
+                if (chunk.m_id == 'NODE') {
+                    COctNode* node = 0;
 
-                    node->m_meshStart = chunkFile.Get2();
-                    node->m_meshCount = chunkFile.Get2();
-                    continue;
-                }
+                    chunkFile.PushChunk();
+                    while (chunkFile.GetNextChunk(chunk)) {
+                        switch (chunk.m_id) {
+                        case 'OBJ ': {
+                            unsigned short nodeIndex = chunkFile.Get2();
 
-                if (node == 0) {
-                    continue;
-                }
+                            node = m_nodePool + nodeIndex;
+                            node->m_meshStart = chunkFile.Get2();
+                            node->m_meshCount = chunkFile.Get2();
+                            break;
+                        }
 
-                if (chunk.m_id == 'BOND') {
-                    node->m_boundMinX = chunkFile.GetF4();
-                    node->m_boundMinY = chunkFile.GetF4();
-                    node->m_boundMinZ = chunkFile.GetF4();
-                    node->m_boundMaxX = chunkFile.GetF4();
-                    node->m_boundMaxY = chunkFile.GetF4();
-                    node->m_boundMaxZ = chunkFile.GetF4();
-                    continue;
-                }
+                        case 'BOND':
+                            if (node != 0) {
+                                node->m_boundMinX = chunkFile.GetF4();
+                                node->m_boundMinY = chunkFile.GetF4();
+                                node->m_boundMinZ = chunkFile.GetF4();
+                                node->m_boundMaxX = chunkFile.GetF4();
+                                node->m_boundMaxY = chunkFile.GetF4();
+                                node->m_boundMaxZ = chunkFile.GetF4();
+                            }
+                            break;
 
-                if (chunk.m_id == 'CHLD') {
-                    int childCount = 0;
-                    COctNode** childNode = node->m_children;
+                        case 'CHLD':
+                            if (node != 0) {
+                                int childCount = 0;
+                                COctNode** childNode = node->m_children;
 
-                    for (int i = 0; i < 8; i++) {
-                        unsigned short childIndex = chunkFile.Get2();
-                        if (childIndex != 0xFFFF) {
-                            *childNode = m_nodePool + childIndex;
-                            childNode++;
-                            childCount++;
+                                for (int i = 0; i < 8; i++) {
+                                    unsigned short childIndex = chunkFile.Get2();
+
+                                    if (childIndex != 0xFFFF) {
+                                        *childNode = m_nodePool + childIndex;
+                                        childNode++;
+                                        childCount++;
+                                    }
+                                }
+
+                                for (int i = childCount; i < 8; i++) {
+                                    *childNode = 0;
+                                    childNode++;
+                                }
+                            }
+                            break;
                         }
                     }
-
-                    for (int i = childCount; i < 8; i++) {
-                        *childNode = 0;
-                        childNode++;
-                    }
+                    chunkFile.PopChunk();
                 }
             }
             chunkFile.PopChunk();
+            break;
         }
-        chunkFile.PopChunk();
     }
+
+    chunkFile.PopChunk();
 }
 
 /*

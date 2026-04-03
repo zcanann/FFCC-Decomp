@@ -25,7 +25,7 @@
 
 CMenuPcs MenuPcs;
 u8 gMenuProcessTable[0x15C];
-const f32 kMenuInitOne = 1.0f;
+extern const f32 kMenuInitOne = 1.0f;
 static const char kMenuPcsStageName[] = "CMenuPcs";
 static const char kPMenuSourceFile[] = "p_menu.cpp";
 
@@ -678,7 +678,7 @@ void CMenuPcs::draw()
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
-    C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    C_MTXOrtho(orthoMtx, kMenuInitOne, kMenuOrthoBottom, kMenuInitOne, kMenuOrthoRight, kMenuInitOne, kMenuOrthoFar);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
@@ -761,7 +761,7 @@ void CMenuPcs::DrawInit()
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
-    C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    C_MTXOrtho(orthoMtx, kMenuInitOne, kMenuOrthoBottom, kMenuInitOne, kMenuOrthoRight, kMenuInitOne, kMenuOrthoFar);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);

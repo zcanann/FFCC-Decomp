@@ -104,6 +104,15 @@ int fflush(FILE* file) {
     return 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801B5A18
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int __get_file_modes(const char* mode, file_modes* modes)
 {
 	const char* mode_ptr = mode + 2;
@@ -113,12 +122,12 @@ int __get_file_modes(const char* mode, file_modes* modes)
 	int io_mode = 0;
 
 	modes->file_kind = __disk_file;
-	mode_str = mode[0];
+	mode_str = (unsigned char)mode[0];
 #ifndef __NO_WIDE_CHAR
 	modes->file_orientation = UNORIENTED;
 #endif
 	modes->binary_io = 0;
-	
+
 	switch (mode_str)
 	{
 		case 'r':
@@ -128,7 +137,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 		case 'w':
 			open_mode = __create_or_truncate;
 			break;
-		
+
 		case 'a':
 			open_mode = __create_if_necessary;
 			break;
@@ -136,10 +145,10 @@ int __get_file_modes(const char* mode, file_modes* modes)
 		default:
 			return(0);
 	}
-	
+
 	next_mode = mode[1];
 	modes->open_mode = open_mode;
-	
+
 	switch (next_mode)
 	{
 		case 'b':

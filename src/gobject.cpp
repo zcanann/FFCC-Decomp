@@ -2673,9 +2673,16 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
  */
 void CGObject::ResetDynamics()
 {
-    if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        u8* modelBytes = reinterpret_cast<u8*>(m_charaModelHandle->m_model);
-        modelBytes[0x10C] = (modelBytes[0x10C] & 0x7F) | 0x80;
+    bool hasModel = false;
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (hasModel) {
+        u8* modelBytes = reinterpret_cast<u8*>(handle->m_model);
+        modelBytes[0x10C] |= 0x80;
     }
 }
 

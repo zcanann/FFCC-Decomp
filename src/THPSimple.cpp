@@ -187,12 +187,16 @@ s32 THPSimpleOpen(const char* path)
     s32 componentOffset;
     u8* frameComp;
 
-    if ((gTHPSimpleInitialized == 0) || (SimpleControl.isOpen != 0)) {
+    if (gTHPSimpleInitialized == 0) {
         return 0;
     }
 
-    memset(&sVideoInfoWork, 0, sizeof(sVideoInfoWork));
-    memset(&sAudioInfoWork, 0, sizeof(sAudioInfoWork));
+    if (SimpleControl.isOpen != 0) {
+        return 0;
+    }
+
+    memset(&sVideoInfoWork, 0, 0xC);
+    memset(&sAudioInfoWork, 0, 0x10);
 
     if (!DVDOpen(path, &SimpleControl.fileInfo)) {
         return 0;
@@ -265,13 +269,14 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.curFrame = -1;
     SimpleControl.readFrame = 0;
     SimpleControl.unk_D0 = 0;
-    SimpleControl.unk_CC = 0.0f;
     SimpleControl.isPreLoaded = 0;
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
     SimpleControl.unk_C4 = 0.0f;
     SimpleControl.unk_C8 = 0.0f;
+    SimpleControl.audioDecodeIndex = 0;
+    SimpleControl.audioPlayIndex = 0;
 
     return 1;
 }

@@ -390,24 +390,37 @@ static char* long2str(long num, char* buff, print_format format)
         return (0);
 
     if (digits < format.precision) {
-        while (digits + 8 <= format.precision) {
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            digits += 8;
+        unsigned int remaining = format.precision - digits;
+        unsigned int blocks = remaining >> 3;
+
+        if (blocks != 0) {
+            do {
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                digits += 8;
+                --blocks;
+            } while (blocks != 0);
+
+            remaining &= 7;
+            if (remaining == 0) {
+                goto long2str_done_zero_pad;
+            }
         }
 
-        while (digits < format.precision) {
+        do {
             *--p = '0';
             ++digits;
-        }
+            --remaining;
+        } while (remaining != 0);
     }
 
+long2str_done_zero_pad:
     if (base == 16 && format.alternate_form) {
         *--p = format.conversion_char;
         *--p = '0';
@@ -507,24 +520,37 @@ static char* longlong2str(long long num, char* pBuf, print_format fmt)
     }
 
     if (digits < fmt.precision) {
-        while (digits + 8 <= fmt.precision) {
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            *--p = '0';
-            digits += 8;
+        unsigned int remaining = fmt.precision - digits;
+        unsigned int blocks = remaining >> 3;
+
+        if (blocks != 0) {
+            do {
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                *--p = '0';
+                digits += 8;
+                --blocks;
+            } while (blocks != 0);
+
+            remaining &= 7;
+            if (remaining == 0) {
+                goto longlong2str_done_zero_pad;
+            }
         }
 
-        while (digits < fmt.precision) {
+        do {
             *--p = '0';
             ++digits;
-        }
+            --remaining;
+        } while (remaining != 0);
     }
 
+longlong2str_done_zero_pad:
     if (base == 16 && fmt.alternate_form) {
         *--p = fmt.conversion_char;
         *--p = '0';

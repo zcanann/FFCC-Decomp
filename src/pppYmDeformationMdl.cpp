@@ -21,6 +21,27 @@ struct pppFMATRIX {
 struct pppModelSt;
 struct _pppPObject;
 
+struct YmDeformationMdlColorInfo {
+    u32 m_unk0;
+    u32 m_unk4;
+    pppCVECTOR m_color;
+};
+
+struct YmDeformationMdlState {
+    s16 m_angle;
+    u8 m_direction;
+    u8 m_pad;
+    float m_values[6];
+};
+
+struct pppYmDeformationMdlLayout {
+    u8 m_pad0[0x40];
+    pppFMATRIX m_modelMatrix;
+    u8 m_pad70[0x10];
+    Vec* m_drawMatrixPtr;
+    u8 m_pad74[0xC];
+};
+
 struct _pppEnvStYmDeformationMdl {
     void* m_stagePtr;
     CMaterialSet* m_materialSetPtr;
@@ -190,15 +211,16 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
-    short* state = (short*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
+    pppYmDeformationMdlLayout* modelObject = (pppYmDeformationMdlLayout*)pppYmDeformationMdl;
+    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    pppCVECTOR* color = (pppCVECTOR*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x88);
-    pppFMATRIX* modelMatrix = (pppFMATRIX*)((u8*)pppYmDeformationMdl + 0x40);
+    YmDeformationMdlColorInfo* colorInfo =
+        (YmDeformationMdlColorInfo*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x80);
     Mtx texMtx;
     Mtx cameraMtx;
     Mtx44 screenMtx;
@@ -217,8 +239,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        color, modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A, param_2->m_payloadByte28,
-        param_2->m_payloadByte29, (u8)(param_2->m_payloadByte2C == 0), 1, 0);
+        &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
+        param_2->m_payloadByte28, param_2->m_payloadByte29, (u8)(param_2->m_payloadByte2C == 0), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -268,7 +290,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = 0.0f;
         texMtx[1][2] = 0.0f;
         texMtx[2][2] = 1.0f;
-        PSMTXConcat(texMtx, *(Mtx*)((u8*)pppYmDeformationMdl + 0x40), texMtx);
+        PSMTXConcat(texMtx, modelObject->m_modelMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -277,14 +299,14 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-        if ((*state == 0) || (*state == 0x168)) {
-            *state = 1;
+        if ((state->m_angle == 0) || (state->m_angle == 0x168)) {
+            state->m_angle = 1;
         }
 
-        PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)*state);
+        PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)state->m_angle);
         float indMtx[2][3];
         float resetIndMtx[2][3];
-        float indScale = *(float*)(state + 2);
+        float indScale = state->m_values[0];
         indMtx[0][0] = rotMtx[0][0] * indScale;
         indMtx[0][1] = rotMtx[0][1] * indScale;
         indMtx[0][2] = FLOAT_80330dac;
@@ -295,7 +317,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
         GXLoadTexObj((_GXTexObj*)backTexture, GX_TEXMAP0);
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
-        pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)pppYmDeformationMdl + 0x70), 0);
+        pppDrawMesh__FP10pppModelStP3Veci(model, modelObject->m_drawMatrixPtr, 0);
 
         GXSetTevDirect((GXTevStageID)1);
         GXSetNumIndStages(0);

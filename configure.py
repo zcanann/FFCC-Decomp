@@ -402,7 +402,7 @@ config.libs = [
             Object(NonMatching, "cflat_r2system.cpp"),
             Object(NonMatching, "cflat_runtime.cpp"),
             Object(NonMatching, "cflat_runtime2.cpp"),
-            Object(NonMatching, "chara_anim.cpp"),
+            Object(NonMatching, "chara_anim.cpp", cflags=[*cflags_game_cpp_exceptions, "-sdata 0"]),
             Object(NonMatching, "chara_fur.cpp"),
             Object(NonMatching, "chara.cpp"),
             Object(NonMatching, "charaobj.cpp"),

@@ -79,10 +79,14 @@ Default_PPC gTRKSaveState;
 #define DSFetch_u32(_p_) (*((u32*)_p_))
 #define DSFetch_u64(_p_) (*((u64*)_p_))
 
-DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL read);
-DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, BOOL read);
-DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read);
-DSError TRKPPCAccessSpecialReg(void* value, u32* access_func, BOOL read);
+static inline DSError TRKPPCAccessSPR(void* value, u32 spr_register_num,
+                                      BOOL read);
+static inline DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr,
+                                                       BOOL read);
+static inline DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr,
+                                             BOOL read);
+static inline DSError TRKPPCAccessSpecialReg(void* value, u32* access_func,
+                                             BOOL read);
 static void TRKExceptionHandler(u16);
 void TRKInterruptHandlerEnableInterrupts(void);
 void WriteFPSCR(register f64*);
@@ -1211,14 +1215,13 @@ u32 TRKTargetStop()
     return 0;
 }
 
-DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL read)
+static inline DSError TRKPPCAccessSPR(void* value, u32 spr_register_num,
+                                      BOOL read)
 {
-    int i;
-    u32 access_func[10];
-
-    for (i = 0; i < 10; i++) {
-        access_func[i] = INSTR_NOP;
-    }
+    u32 access_func[10] = {
+        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+    };
     /*
     ** Construct a small assembly function to perform the
     ** requested access and call it.  The read/write function
@@ -1247,14 +1250,13 @@ DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL read)
     return TRKPPCAccessSpecialReg(value, access_func, read);
 }
 
-DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, BOOL read)
+static inline DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr,
+                                                       BOOL read)
 {
-    int i;
-    u32 instructionData[10];
-
-    for (i = 0; i < 10; i++) {
-        instructionData[i] = INSTR_NOP;
-    }
+    u32 instructionData[10] = {
+        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+    };
 
     if (read) {
         instructionData[0]
@@ -1268,7 +1270,8 @@ DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, BOOL read)
 }
 
 #pragma dont_inline on
-DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
+static inline DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr,
+                                             BOOL read)
 {
     DSError error = DS_NoError;
     int i;
@@ -1338,7 +1341,8 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
 #define DEBUG_VECTORREG_ACCESS 0
 
-DSError TRKPPCAccessSpecialReg(void* value, u32* access_func, BOOL read)
+static inline DSError TRKPPCAccessSpecialReg(void* value, u32* access_func,
+                                             BOOL read)
 {
     typedef void (*asm_access_type)(void*, void*);
 

@@ -163,15 +163,12 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     TraceEntry* entry;
     TraceEntry* dest;
     TracerWork* work;
-    TracerMngRaw* mng;
-    float* resolvedWork;
     Vec local_a8;
     Vec local_9c;
     Vec local_90;
     Vec local_84;
     Mtx MStack_78;
-    u32 uStack_44;
-    u32 uStack_3c;
+    float frameT;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -182,23 +179,21 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     iVar4 = param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
 
-    if (param_2->m_initWOrk == -1) {
-        resolvedWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    if (param_2->m_initWOrk == 0xffffffff) {
+        work->initWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
     } else {
-        mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
-        resolvedWork =
-            reinterpret_cast<float*>(mng->dataValues[param_2->m_initWOrk].workBase + 0x80 + param_2->m_stepValue);
+        work->initWork = reinterpret_cast<float*>(
+            reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_initWOrk].workBase + 0x80 +
+            param_2->m_stepValue);
     }
-    work->initWork = resolvedWork;
 
-    if (param_2->m_arg3 == -1) {
-        resolvedWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+    if (param_2->m_arg3 == 0xffffffff) {
+        work->arg3Work = reinterpret_cast<float*>(gPppDefaultValueBuffer);
     } else {
-        mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
-        resolvedWork =
-            reinterpret_cast<float*>(mng->dataValues[param_2->m_arg3].workBase + 0x80 + *(s32*)param_2->m_payload);
+        work->arg3Work = reinterpret_cast<float*>(
+            reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase + 0x80 +
+            *(s32*)param_2->m_payload);
     }
-    work->arg3Work = resolvedWork;
 
     if (work->entries == nullptr) {
         useFallback = true;
@@ -274,12 +269,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
-            uStack_3c = i ^ 0x80000000;
-            uStack_44 = (param_2->m_payload[9] + 1) ^ 0x80000000;
-            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(
-                    (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
-                        (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858),
-                    pppMngStPtr, MStack_78) == 0) {
+            frameT = (FLOAT_80331860 / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
+            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(frameT, pppMngStPtr, MStack_78) == 0) {
                 useFallback = true;
             } else {
                 PSMTXConcat(MStack_78, baseObj->m_localMatrix.value, MStack_78);

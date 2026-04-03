@@ -45,37 +45,6 @@ struct _pppPDataVal;
 
 /*
  * --INFO--
- * PAL Address: 0x80064cc8
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppVertexApAtCon(_pppPObject* obj, PVertexApAt* data)
-{
-    s32 offset = **(s32**)((u8*)data + 0xC);
-    u16* state = (u16*)((u8*)obj + offset + 0x80);
-    state[0] = 0;
-    state[1] = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80064ce8
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void apea(_pppPObject*, PVertexApAt*, unsigned short)
-{
-    // Intentionally empty.
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80064b08
  * PAL Size: 444b
  * EN Address: TODO
@@ -158,4 +127,21 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
     }
 
     state->countdown--;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80064cc8
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppVertexApAtCon(_pppPObject* obj, PVertexApAt* data)
+{
+    s32 offset = **(s32**)((u8*)data + 0xC);
+    u16* state = (u16*)((u8*)obj + offset + 0x80);
+    state[0] = 0;
+    state[1] = 0;
 }

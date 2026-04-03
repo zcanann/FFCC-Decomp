@@ -909,10 +909,11 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
 int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
     int i;
+    short* treasure;
 
-    for (i = 0; i < 4; i++) {
-        unsigned short treasure = m_treasures[i];
-        if ((short)treasure == -1) {
+    treasure = reinterpret_cast<short*>(m_treasures);
+    for (i = 0; i < 4; i++, treasure++) {
+        if (*treasure == -1) {
             m_treasures[i] = (unsigned short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {

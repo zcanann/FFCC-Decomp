@@ -363,7 +363,6 @@ static void Block_construct(Block* block, unsigned long size) {
     SubBlock* sb;
 
     block->size = size | 3;
-    *(unsigned long*)((char*)block + size - 8) = block->size;
     sb = (SubBlock*)((char*)block + 16);
     sb->block = (Block*)((unsigned long)block | 1);
     size -= 24;
@@ -415,20 +414,20 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         SubBlock* split_block;
         unsigned long old_size_flags;
         unsigned long block_flags;
-        int previous_free;
-        int previous_used;
+        unsigned long prev_used_clz;
+        unsigned long prev_used_is_zero_clz;
 
         split_block = (SubBlock*)((char*)current + requested_size);
         old_size_flags = current->size;
         block_flags = (unsigned long)current->block & 0xFFFFFFFEUL | 1;
         current->block = (Block*)block_flags;
-        previous_free = __cntlzw(old_size_flags & 2) >> 5;
+        prev_used_clz = __cntlzw(old_size_flags & 2);
         current->size = requested_size;
-        previous_used = __cntlzw(previous_free) >> 5;
+        prev_used_is_zero_clz = __cntlzw(prev_used_clz >> 5);
         if ((old_size_flags & 4) != 0) {
             current->size |= 4;
         }
-        if (previous_used != 0) {
+        if ((prev_used_is_zero_clz >> 5) != 0) {
             current->size |= 2;
             split_block->size |= 4;
         } else {
@@ -437,14 +436,14 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         split_block->block = (Block*)block_flags;
         requested_size = (old_size_flags & 0xFFFFFFF8UL) - requested_size;
         split_block->size = requested_size;
-        if (previous_used != 0) {
+        if ((prev_used_is_zero_clz >> 5) != 0) {
             split_block->size |= 4;
             split_block->size |= 2;
             *(unsigned long*)((char*)split_block + requested_size) |= 4;
         } else {
             *(unsigned long*)((char*)split_block + requested_size - 4) = requested_size;
         }
-        if (previous_free != 0) {
+        if ((prev_used_clz >> 5) != 0) {
             split_block->next = current->next;
             split_block->next->prev = split_block;
             split_block->prev = current;

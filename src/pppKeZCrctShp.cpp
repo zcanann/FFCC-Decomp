@@ -25,9 +25,10 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     Vec scaledX;
     Vec scaledY;
     Vec scaledZ;
-    Vec zeroVec;
     Vec transformedPos;
+    Vec zeroVec;
     pppFMATRIX transformMatrix;
+    u8 mode;
 
     (void)ctrlTable;
 
@@ -46,14 +47,16 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     transformedPos.y *= stepData->m_positionScale.y;
     transformedPos.z *= stepData->m_positionScale.z;
 
-    if (stepData->m_mode == 0) {
+    mode = stepData->m_mode;
+
+    if (mode == 0) {
         transformedPos.x += stepData->m_offset.x;
         transformedPos.y += stepData->m_offset.y;
         transformedPos.z += stepData->m_offset.z;
         pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
-    } else if (stepData->m_mode == 1) {
+    } else if (mode == 1) {
         pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
-    } else if (stepData->m_mode == 2) {
+    } else if (mode == 2) {
         pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
         zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
         zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;

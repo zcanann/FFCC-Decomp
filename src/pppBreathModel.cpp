@@ -490,7 +490,6 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int firstParticle;
     int groupTable;
     int slotIndex;
-    int* dataOffsets;
     unsigned char* work;
     unsigned int slotCount;
     bool ready;
@@ -508,9 +507,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         return;
     }
 
-    dataOffsets = offsets->m_serializedDataOffsets;
-    colorOffset = dataOffsets[1];
-    work = (unsigned char*)breathModel + 0x80 + dataOffsets[0];
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    work = (unsigned char*)breathModel + 0x80 + *offsets->m_serializedDataOffsets;
 
     if (*(void**)(work + 0x30) == NULL) {
         int maxParticleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
@@ -519,32 +517,32 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         int* groupTable;
 
         *(int*)(work + 0x40) = maxParticleCount;
-        *(short*)(work + 0x54) = *(short*)((unsigned char*)pBreathModel + 0x12);
         *(short*)(work + 0x56) = *(short*)((unsigned char*)pBreathModel + 0x10);
+        *(short*)(work + 0x54) = *(short*)((unsigned char*)pBreathModel + 0x12);
 
         *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), pppEnvStPtr->m_stagePtr,
                                                   s_pppBreathModel_cpp, 0x257);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(maxParticleCount * 0x98));
         }
 
         *(void**)(work + 0x34) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), pppEnvStPtr->m_stagePtr,
                                                   s_pppBreathModel_cpp, 0x25d);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(maxParticleCount * 0x30));
         }
 
         *(void**)(work + 0x38) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), pppEnvStPtr->m_stagePtr,
                                                   s_pppBreathModel_cpp, 0x263);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(maxParticleCount * 0x20));
         }
 
         *(void**)(work + 0x3C) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), pppEnvStPtr->m_stagePtr,
                                                   s_pppBreathModel_cpp, 0x269);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0, (unsigned long)(particleGroups * 0x5C));
@@ -552,11 +550,11 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             groupTable = (int*)*(void**)(work + 0x3C);
             for (i = 0; i < particleGroups; i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppBreathModel_cpp, 0x274);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppBreathModel_cpp, 0x274);
                 memset((void*)groupTable[1], 0xFF, (unsigned long)particlePerGroup);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppBreathModel_cpp, 0x277);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppBreathModel_cpp, 0x277);
                 memset((void*)groupTable[2], 0xFF, (unsigned long)particlePerGroup);
                 groupTable[0] = 0;
                 groupTable += 0x17;
@@ -578,7 +576,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
          groupIndex++) {
         slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-        groupTable = *(int*)(work + 0x3C) + groupIndex * 0x5C;
+        groupTable = (int)groupData;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {

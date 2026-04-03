@@ -739,7 +739,7 @@ config.libs = [
         "cflags": [*cflags_base, "-DGEKKO"],
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "mtx/mtx.c"),
+            Object(NonMatching, "mtx/mtx.c", cflags=[*replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"), "-DGEKKO"]),
             Object(Matching, "mtx/mtxvec.c"),
             Object(NonMatching, "mtx/mtx44.c"),
             Object(Matching, "mtx/mtx44vec.c"),

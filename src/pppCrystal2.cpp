@@ -57,6 +57,20 @@ struct Crystal2TexMtx {
     f32 value[3][4];
 };
 
+struct pppCrystal2RenderObject {
+    u8 _pad0[0x10];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+    Vec* m_drawMatrixPtr;
+    u8 _pad74[0xC];
+    Crystal2Work m_work;
+};
+
+struct pppCrystal2ColorBlock {
+    u8 _pad0[8];
+    pppCVECTOR m_color;
+};
+
 static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
@@ -219,23 +233,27 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
  */
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
+    pppCrystal2RenderObject* object = (pppCrystal2RenderObject*)pppCrystal2;
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    Crystal2Work* work = (Crystal2Work*)((u8*)&pppCrystal2->m_work + serializedDataOffsets[2]);
-    pppCVECTOR* color = (pppCVECTOR*)(pppCrystal2->m_color + serializedDataOffsets[1]);
-    int sourceTex;
+    s32 dataValIndex = param_2->m_dataValIndex;
+    Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + serializedDataOffsets[2] + 0x80);
+    pppCrystal2ColorBlock* colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + serializedDataOffsets[1] + 0x80);
     pppModelSt* model;
+    int sourceTex;
     _GXTexObj backTexObj;
-    int textureIndex = 0;
+    int textureIndex;
     Crystal2IndTexMtx indTexMtx;
-    Crystal2TexMtx texMtx;
-    Mtx lightMtx;
-    Mtx drawMtx;
-    Mtx tmpMtx;
-    Mtx cameraMtx;
     Mtx normalMtx;
+    Mtx cameraMtx;
+    Mtx tmpMtx;
+    Mtx drawMtx;
+    Mtx lightMtx;
+    Crystal2TexMtx texMtx;
 
-    if (param_2->m_dataValIndex != 0xFFFF) {
-        model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+    if (dataValIndex != 0xFFFF) {
+        sourceTex = 0;
+        model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
+        textureIndex = 0;
         GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (param_2->m_payload[0] == 0) {
             if (param_2->m_initWOrk == 0xFFFF) {
@@ -247,10 +265,10 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         }
 
         pppSetBlendMode(0);
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            color, (u8*)pppCrystal2 + 0x40, param_2->m_arg3,
+            &colorBlock->m_color, &object->m_drawMatrix, param_2->m_arg3,
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
@@ -261,7 +279,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         texMtx = s_crystal2TexMtxBase;
 
         PSMTXIdentity(drawMtx);
-        PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
+        PSMTXConcat(pppMngStPtr->m_matrix.value, object->m_localMatrix.value, cameraMtx);
         if (Game.m_currentSceneId == 7) {
             C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, param_2->m_perspectiveScale,
                                   -param_2->m_perspectiveScale,

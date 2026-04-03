@@ -190,7 +190,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
 
     for (i = 0; i < 1; i++) {
         if ((start <= (u32)gTRKMemMap[i].end)
-            && ((u32)gTRKMemMap[i].start <= end)) {
+            && (end >= (u32)gTRKMemMap[i].start)) {
             if (((readWriteable == VALIDMEM_Readable)
                  && !gTRKMemMap[i].readable)
                 || ((readWriteable == VALIDMEM_Writeable)
@@ -203,7 +203,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                     err = DS_InvalidMemory;
                     if ((start <= upperEnd)
                         && (start <= (u32)gTRKMemMap[i].end)
-                        && ((u32)gTRKMemMap[i].start <= upperEnd)) {
+                        && (upperEnd >= (u32)gTRKMemMap[i].start)) {
                         if (((readWriteable == VALIDMEM_Readable)
                              && !gTRKMemMap[i].readable)
                             || ((readWriteable == VALIDMEM_Writeable)
@@ -218,7 +218,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                                     readWriteable);
                             }
                             if ((err == DS_NoError)
-                                && ((u32)gTRKMemMap[i].end < upperEnd)) {
+                                && (upperEnd > (u32)gTRKMemMap[i].end)) {
                                 err = TRKValidMemory32(
                                     (const void*)gTRKMemMap[i].end,
                                     upperEnd - (u32)gTRKMemMap[i].end,
@@ -231,7 +231,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                     err = DS_InvalidMemory;
                     end = (start + (u32)length) - 2;
                     if (((u32)gTRKMemMap[i].end <= end)
-                        && ((u32)gTRKMemMap[i].start <= end)) {
+                        && (end >= (u32)gTRKMemMap[i].start)) {
                         if (((readWriteable == VALIDMEM_Readable)
                              && !gTRKMemMap[i].readable)
                             || ((readWriteable == VALIDMEM_Writeable)
@@ -248,7 +248,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                                     readWriteable);
                             }
                             if ((err == DS_NoError)
-                                && ((u32)gTRKMemMap[i].end < end)) {
+                                && (end > (u32)gTRKMemMap[i].end)) {
                                 err = TRKValidMemory32(
                                     (const void*)gTRKMemMap[i].end,
                                     end - (u32)gTRKMemMap[i].end,

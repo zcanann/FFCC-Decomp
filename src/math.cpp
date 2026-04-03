@@ -1035,55 +1035,51 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
 unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
     int satScaled = saturation * 0xFF;
-    int t = satScaled / 100 + (satScaled >> 31);
-    unsigned int sat = t - (t >> 31);
+    int sat = satScaled / 100 + (satScaled >> 31);
 
     int valScaled = brightness * 0xFF;
-    t = valScaled / 100 + (valScaled >> 31);
-    unsigned int val = t - (t >> 31);
-    char cVal = (char)val;
+    int val = valScaled / 100 + (valScaled >> 31);
 
     unsigned char rgba[4];
     if ((float)sat == 0.0f) {
-        rgba[0] = (unsigned char)cVal;
-        rgba[1] = (unsigned char)cVal;
-        rgba[2] = (unsigned char)cVal;
+        rgba[0] = (unsigned char)val;
+        rgba[1] = (unsigned char)val;
+        rgba[2] = (unsigned char)val;
     } else {
         int low = (0xFF - sat) * val;
-        int floor = low / 0xFF + (low >> 31);
+        low = low / 0xFF + (low >> 31);
         int sector = hue / 0x3C + (hue >> 31);
-        floor -= floor >> 31;
+        int delta;
+
+        low -= low >> 31;
         sector -= sector >> 31;
-        int delta = (hue + sector * -0x3C) * (val - floor);
+        delta = (hue - sector * 0x3C) * (val - low);
         delta = delta / 0x3C + (delta >> 31);
 
-        char add = (char)delta - (char)(delta >> 31);
-        char cLow = (char)floor;
-        char cHigh = (char)val;
         if (hue < 60) {
-            rgba[0] = (unsigned char)cHigh;
-            rgba[1] = (unsigned char)(cLow + add);
-            rgba[2] = (unsigned char)cLow;
+            rgba[0] = (unsigned char)val;
+            rgba[1] = (unsigned char)(low + delta);
+            rgba[2] = (unsigned char)low;
         } else if (hue < 120) {
-            rgba[0] = (unsigned char)(cHigh - add);
-            rgba[1] = (unsigned char)cHigh;
-            rgba[2] = (unsigned char)cLow;
+            rgba[0] = (unsigned char)(val - delta);
+            rgba[1] = (unsigned char)val;
+            rgba[2] = (unsigned char)low;
         } else if (hue < 180) {
-            rgba[0] = (unsigned char)cLow;
-            rgba[1] = (unsigned char)cHigh;
-            rgba[2] = (unsigned char)(cLow + add);
+            rgba[0] = (unsigned char)low;
+            rgba[1] = (unsigned char)val;
+            rgba[2] = (unsigned char)(low + delta);
         } else if (hue < 240) {
-            rgba[0] = (unsigned char)cLow;
-            rgba[1] = (unsigned char)(cHigh - add);
-            rgba[2] = (unsigned char)cHigh;
+            rgba[0] = (unsigned char)low;
+            rgba[1] = (unsigned char)(val - delta);
+            rgba[2] = (unsigned char)val;
         } else if (hue < 300) {
-            rgba[0] = (unsigned char)(cLow + add);
-            rgba[1] = (unsigned char)cLow;
-            rgba[2] = (unsigned char)cHigh;
+            rgba[0] = (unsigned char)(low + delta);
+            rgba[1] = (unsigned char)low;
+            rgba[2] = (unsigned char)val;
         } else if (hue < 360) {
-            rgba[0] = (unsigned char)cHigh;
-            rgba[1] = (unsigned char)cLow;
-            rgba[2] = (unsigned char)(cHigh - add);
+            rgba[0] = (unsigned char)val;
+            rgba[1] = (unsigned char)low;
+            rgba[2] = (unsigned char)(val - delta);
         } else {
             rgba[0] = 0;
             rgba[1] = 0;

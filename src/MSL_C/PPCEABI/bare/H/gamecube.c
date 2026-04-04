@@ -2,14 +2,14 @@
 
 /*
  * --INFO--
- * PAL Address: 0x801B5294
+ * PAL Address: 0x801B529C
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void __end_critical_region(void)
+void __kill_critical_regions(void)
 {
 }
 
@@ -28,13 +28,13 @@ void __begin_critical_region(void)
 
 /*
  * --INFO--
- * PAL Address: 0x801B529C
+ * PAL Address: 0x801B5294
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void __kill_critical_regions(void)
+void __end_critical_region(void)
 {
 }

@@ -17,10 +17,10 @@ static const f32 axfx_reverb_hi_dpl2_f32_0 = 0.0f;
 static const f32 axfx_reverb_hi_dpl2_f32_1 = 1.0f;
 static const f32 axfx_reverb_hi_dpl2_f32_0p01 = 0.01f;
 static const f32 axfx_reverb_hi_dpl2_f32_10 = 10.0f;
-static const f32 axfx_reverb_hi_dpl2_f32_0p3 = 0.3f;
-static const f32 axfx_reverb_hi_dpl2_f32_32000 = 32000.0f;
-static const f32 axfx_reverb_hi_dpl2_f32_0p6 = 0.6f;
 static const f32 axfx_reverb_hi_dpl2_f32_0p1 = 0.1f;
+static const f32 axfx_reverb_hi_dpl2_f32_32000 = 32000.0f;
+static const f32 axfx_reverb_hi_dpl2_f32_0p05 = 0.05f;
+static const f32 axfx_reverb_hi_dpl2_f32_0p8 = 0.8f;
 
 static void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
@@ -98,13 +98,13 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p3) {
-        rv->damping = axfx_reverb_hi_dpl2_f32_0p3;
+    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p05) {
+        rv->damping = axfx_reverb_hi_dpl2_f32_0p05;
     }
 
     {
-        f32 damp = axfx_reverb_hi_dpl2_f32_0p6 * rv->damping;
-        rv->damping = axfx_reverb_hi_dpl2_f32_1 - (axfx_reverb_hi_dpl2_f32_0p3 + damp);
+        f32 damp = axfx_reverb_hi_dpl2_f32_0p8 * rv->damping;
+        rv->damping = axfx_reverb_hi_dpl2_f32_1 - (axfx_reverb_hi_dpl2_f32_0p05 + damp);
     }
 
     if (axfx_reverb_hi_dpl2_f32_0 != preDelay) {
@@ -157,12 +157,12 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p3) {
-        rv->damping = axfx_reverb_hi_dpl2_f32_0p3;
+    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p05) {
+        rv->damping = axfx_reverb_hi_dpl2_f32_0p05;
     }
     {
-        f32 damp = axfx_reverb_hi_dpl2_f32_0p6 * rv->damping;
-        rv->damping = axfx_reverb_hi_dpl2_f32_1 - (axfx_reverb_hi_dpl2_f32_0p3 + damp);
+        f32 damp = axfx_reverb_hi_dpl2_f32_0p8 * rv->damping;
+        rv->damping = axfx_reverb_hi_dpl2_f32_1 - (axfx_reverb_hi_dpl2_f32_0p05 + damp);
     }
 
     for (i = 0; i < 12; i++) {

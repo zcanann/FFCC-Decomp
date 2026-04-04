@@ -798,7 +798,7 @@ config.libs = [
             Object(NonMatching, "ax/AXAlloc.c"),
             Object(NonMatching, "ax/AXAux.c"),
             Object(NonMatching, "ax/AXCL.c"),
-            Object(NonMatching, "ax/AXOut.c"),
+            Object(Matching, "ax/AXOut.c"),
             Object(NonMatching, "ax/AXProf.c"),
             Object(NonMatching, "ax/AXSPB.c"),
             Object(Matching, "ax/AXVPB.c"),

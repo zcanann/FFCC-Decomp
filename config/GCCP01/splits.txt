@@ -1460,7 +1460,7 @@ os/OSMutex.c:
 
 os/OSReboot.c:
 	.text       start:0x8017F11C end:0x8017F478
-	.sbss       start:0x8032EF98 end:0x8032EFA8
+	.bss        start:0x8030BC20 end:0x8030BC40
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C
@@ -1623,7 +1623,7 @@ ax/AXCL.c:
 
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0
-	.bss        start:0x803100E0 end:0x80314900
+	.bss        start:0x803100E0 end:0x803148E8
 	.sbss       start:0x8032F240 end:0x8032F270
 
 ax/AXSPB.c:

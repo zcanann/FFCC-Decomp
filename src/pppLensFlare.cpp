@@ -197,9 +197,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 
 			PSMTXIdentity(local_54);
 			scale = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = scale * pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40);
-			local_54[1][1] = scale * pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54);
-			local_54[2][2] = scale * pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68);
+			local_54[0][0] = (pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40)) * scale;
+			local_54[1][1] = (pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54)) * scale;
+			local_54[2][2] = (pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68)) * scale;
 
 			local_60.x = pppMngStPtr->m_matrix.value[0][3];
 			local_60.y = pppMngStPtr->m_matrix.value[1][3];

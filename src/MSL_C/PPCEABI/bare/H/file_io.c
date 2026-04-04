@@ -148,9 +148,9 @@ int __get_file_modes(const char* mode, file_modes* modes)
 	}
 
 	modes->open_mode = open_mode;
-	mode_ptr = mode + 2;
+	mode_ptr = mode + 1;
 
-	switch (mode[1])
+	switch (*mode_ptr++)
 	{
 		case 'b':
 			modes->binary_io = 1;

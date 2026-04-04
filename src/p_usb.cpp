@@ -204,15 +204,16 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-    unsigned int count;
     unsigned int* ptr;
     int connected;
     unsigned int* dstBuffer;
+    unsigned int value;
     CMemory::CStage* stage;
     int result;
+    unsigned int count;
 
     count = (unsigned int)(elemSize * elemCount);
-    unsigned int value = (count + 0x5F) & ~0x1F;
+    value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
     ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);

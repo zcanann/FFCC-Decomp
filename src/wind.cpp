@@ -577,22 +577,22 @@ void CWind::ChangePower(int id, float power)
     int blocks = 8;
 
     do {
-        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags) < 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        if (static_cast<s8>(obj->flags & 0x80) < 0 && id == obj->id) {
+        if (static_cast<s8>(obj->flags) < 0 && id == obj->id) {
             goto found;
         }
         obj++;

@@ -30,21 +30,7 @@ CFlatData::CFlatData()
  * JP Address: TODO
  * JP Size: TODO
  */
-CFlatData::~CFlatData()
-{
-	Destroy();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800980b4
- * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
+extern "C" CFlatData* __dt__9CFlatDataFv(CFlatData* flatData, short shouldDelete)
 {
 	struct DataEntryLayout
 	{

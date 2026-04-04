@@ -25,7 +25,7 @@ struct pppYmTraceMoveMngStRaw {
 	Vec m_basePosition;
 	u32 _pad64;
 	Vec m_paramVec0;
-	char pad74[0x64];
+	char pad74[0x68];
 	void* m_owner;
 };
 
@@ -73,6 +73,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
+	Vec local_ec;
+	Vec local_e0;
 	Quaternion local_60;
 	Quaternion local_70;
 	Quaternion local_80;
@@ -125,20 +127,15 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
 	PSQUATNormalize(&local_80, &local_80);
 
-	{
-		Vec local_e0;
-		Vec local_ec;
+	local_e0.x = local_80.x;
+	local_e0.y = local_80.y;
+	local_e0.z = local_80.z;
+	PSVECScale(&local_e0, &local_e0, work->m_distance * pppMngSt->m_scale);
+	pppAddVector(local_ec, local_e0, pppMngSt->m_position);
+	pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
+	pppCopyVector(pppMngSt->m_position, local_ec);
 
-		local_e0.x = local_80.x;
-		local_e0.y = local_80.y;
-		local_e0.z = local_80.z;
-		PSVECScale(&local_e0, &local_e0, work->m_distance * pppMngSt->m_scale);
-		pppAddVector(local_ec, local_e0, pppMngSt->m_position);
-		pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
-		pppCopyVector(pppMngSt->m_position, local_ec);
-
-		pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
-		pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
-		pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
-	}
+	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
+	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
+	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
 }

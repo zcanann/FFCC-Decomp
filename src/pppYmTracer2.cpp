@@ -150,10 +150,10 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    _pppPObject* baseObj;
     bool useFallback;
     float fVar2;
     s16 alpha;
+    u8* colorData;
     s32 iVar4;
     float* pfVar6;
     s32 iVar8;
@@ -174,26 +174,27 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         return;
     }
 
-    baseObj = (_pppPObject*)pppYmTracer2;
     useFallback = false;
-    iVar4 = param_3->m_serializedDataOffsets[1];
+    colorData = (u8*)pppYmTracer2 + 0x80 + param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets);
 
     if (param_2->m_initWOrk == 0xffffffff) {
-        work->initWork = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+        pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
     } else {
-        work->initWork = reinterpret_cast<float*>(
+        pfVar6 = reinterpret_cast<float*>(
             reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_initWOrk].workBase + 0x80 +
             param_2->m_stepValue);
     }
+    work->initWork = pfVar6;
 
     if (param_2->m_arg3 == 0xffffffff) {
-        work->arg3Work = reinterpret_cast<float*>(gPppDefaultValueBuffer);
+        pfVar6 = reinterpret_cast<float*>(gPppDefaultValueBuffer);
     } else {
-        work->arg3Work = reinterpret_cast<float*>(
+        pfVar6 = reinterpret_cast<float*>(
             reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase + 0x80 +
             *(s32*)param_2->m_payload);
     }
+    work->arg3Work = pfVar6;
 
     if (work->entries == nullptr) {
         useFallback = true;
@@ -260,12 +261,12 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         fVar2 = work->arg3Work[2];
         work->targetPos.z = fVar2;
         entry->targetPos.z = fVar2;
-        entry->color[0] = ((u8*)pppYmTracer2)[iVar4 + 0x88];
-        entry->color[1] = ((u8*)pppYmTracer2)[iVar4 + 0x89];
-        entry->color[2] = ((u8*)pppYmTracer2)[iVar4 + 0x8A];
+        entry->color[0] = colorData[8];
+        entry->color[1] = colorData[9];
+        entry->color[2] = colorData[10];
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, baseObj->m_localMatrix.value, MStack_78);
+            PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppYmTracer2)->m_localMatrix.value, MStack_78);
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
@@ -273,7 +274,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(frameT, pppMngStPtr, MStack_78) == 0) {
                 useFallback = true;
             } else {
-                PSMTXConcat(MStack_78, baseObj->m_localMatrix.value, MStack_78);
+                PSMTXConcat(MStack_78, ((_pppPObject*)pppYmTracer2)->m_localMatrix.value, MStack_78);
                 PSMTXMultVec(MStack_78, &entry->pos, &entry->pos);
                 PSMTXMultVec(MStack_78, &entry->targetPos, &entry->targetPos);
             }
@@ -303,7 +304,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         alpha = (u16)param_2->m_payload[8] - (s16)iVar4 * work->alphaStep;
         if ((alpha < 0) || (entries->active == 0)) {
             entries->color[3] = 0;
-        } else {
+        } else if (entries->active != 0) {
             entries->color[3] = (u8)alpha;
             visibleCount++;
         }
@@ -323,6 +324,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  */
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
+    u8* colorData;
     u8* work;
     u8* poly;
     CMapMesh* mapMesh;
@@ -343,12 +345,14 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + dataOffset;
+    colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
+    poly = *(u8**)(work + 0x28);
     mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
 
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (void*)((u8*)pppYmTracer2 + 0x88 + colorOffset), (void*)&ppvCameraMatrix02, FLOAT_80331840,
+            (void*)(colorData + 8), (void*)&ppvCameraMatrix02, FLOAT_80331840,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
@@ -379,10 +383,9 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             count = *(u16*)(work + 0x2C);
             uvStep = FLOAT_80331844 / (f32)((f64)count - DOUBLE_80331850);
             GXSetCullMode(GX_CULL_NONE);
-            poly = *(u8**)(work + 0x28);
 
             if (count > 1) {
-                alphaScale = (f32)((u8*)pppYmTracer2)[colorOffset + 0x8B] / FLOAT_80331848;
+                alphaScale = (f32)colorData[0x0B] / FLOAT_80331848;
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (count - 1) * 4);
 
                 for (i = 0; i < (u32)(count - 1); i++) {

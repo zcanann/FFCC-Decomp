@@ -87,9 +87,9 @@ extern const char DAT_801d61b8[];
 extern const char DAT_801d6214[];
 extern const char DAT_801d6234[];
 extern const char DAT_8032f698[];
-extern const char* DAT_8032f6a0;
-extern const char* DAT_8032f6a4;
-extern const char* DAT_8032f6ac;
+extern const char DAT_8032f6a0;
+extern const char DAT_8032f6a4;
+extern const char DAT_8032f6ac;
 extern const s16 DAT_8032e3d0[];
 const char* s_localLangDirs[] = {
     "jp/",
@@ -125,10 +125,10 @@ void __dt__5CGameFv(void*, int);
 void* __vt__5CGame[];
 }
 
-static const float FLOAT_8032f688 = 1.0E+10;
-static const float FLOAT_8032f68c = -1.0E+10;
-static const float FLOAT_8032f690 = 0.0;    
-static const float FLOAT_8032f694 = 0.001;
+const float FLOAT_8032f688 = 1.0E+10;
+const float FLOAT_8032f68c = -1.0E+10;
+const float FLOAT_8032f690 = 0.0;
+const float FLOAT_8032f694 = 0.001;
 static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
 float s_ratio[] = {0.4f, 0.55f, 0.7f, 0.85f};
 static const char s_numNameFmt[] = "%d%s";
@@ -154,6 +154,7 @@ struct CFlatDataView
 };
 
 // Uninitialized
+unsigned char GameDtorChain[0x10];
 static float FLOAT_8032ec40;
 static bool BOOL_8032ec44;
 
@@ -190,15 +191,12 @@ extern "C" void __sinit_game_cpp(void)
     memset(reinterpret_cast<unsigned char*>(game) + 0xF, 0, 0x13E1);
     memset(reinterpret_cast<unsigned char*>(game) + 0x20, 0xFF, 0x10);
 
-    game->m_gameWork.m_scriptSysVal0 = 0;
-    game->m_gameWork.m_scriptSysVal1 = 0;
-    game->m_gameWork.m_scriptSysVal2 = 0;
-    game->m_gameWork.m_scriptSysVal3 = 1;
+    *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
 
-    townName = DAT_8032f6ac;
+    townName = &DAT_8032f6ac;
     if (game->m_gameWork.m_languageId == 3) {
-        townName = DAT_8032f6a4;
+        townName = &DAT_8032f6a4;
     }
     strcpy(game->m_gameWork.m_townName, townName);
     game->m_gameWork.m_gameInitFlag = 1;
@@ -233,7 +231,7 @@ extern "C" void __sinit_game_cpp(void)
         4
     );
 
-    __register_global_object(&Game, reinterpret_cast<void*>(__dt__5CGameFv), &Game);
+    __register_global_object(&Game, reinterpret_cast<void*>(__dt__5CGameFv), GameDtorChain);
 }
 
 /*
@@ -585,24 +583,18 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    CGame* game = &Game;
-    const char* townName;
-
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    Printf__7CSystemFPce(&System, &DAT_8032f6a0);
     Printf__7CSystemFPce(&System, DAT_801d6214);
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    Printf__7CSystemFPce(&System, &DAT_8032f6a0);
+
+    CGame* game = &Game;
 
     memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
     memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
-
-    townName = DAT_8032f6ac;
-    if (game->m_gameWork.m_languageId == 3) {
-        townName = DAT_8032f6a4;
-    }
-    strcpy(game->m_gameWork.m_townName, townName);
+    strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
     InitFurTexBuffer__6CCharaFv(&Chara);
 }
@@ -782,13 +774,13 @@ void CGame::CheckScriptChange()
 
     if (m_nextScript.m_flags != 0) {
         CGame::CGameWork* gameWork;
-        const char* townName = DAT_8032f6ac;
+        const char* townName = &DAT_8032f6ac;
 
         gameWork = &Game.m_gameWork;
 
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+        Printf__7CSystemFPce(&System, &DAT_8032f6a0);
         System.Printf(const_cast<char*>(DAT_801d6214));
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+        Printf__7CSystemFPce(&System, &DAT_8032f6a0);
 
         memset(&gameWork->m_gameDataStartMarker, 0, 0x13E1);
         memset(gameWork->m_wmBackupParams, 0xFF, sizeof(gameWork->m_wmBackupParams));
@@ -797,7 +789,7 @@ void CGame::CheckScriptChange()
         gameWork->m_chaliceElement = 1;
 
         if (gameWork->m_languageId == 3) {
-            townName = DAT_8032f6a4;
+            townName = &DAT_8032f6a4;
         }
 
         strcpy(gameWork->m_townName, townName);

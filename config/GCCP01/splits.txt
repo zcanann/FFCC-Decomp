@@ -1562,6 +1562,7 @@ dvd/dvdidutils.c:
 
 dvd/dvdFatal.c:
 	.text       start:0x8018B5F4 end:0x8018B624
+	.rodata     start:0x801DF264 end:0x801DF27C
 	.sbss       start:0x8032F0D0 end:0x8032F0D4
 
 dvd/fstload.c:

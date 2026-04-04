@@ -1461,6 +1461,7 @@ os/OSMutex.c:
 os/OSReboot.c:
 	.text       start:0x8017F11C end:0x8017F478
 	.bss        start:0x8030BC20 end:0x8030BC40
+	.sbss       start:0x8032EF98 end:0x8032EFA8
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C
@@ -1468,7 +1469,7 @@ os/OSReset.c:
 
 os/OSResetSW.c:
 	.text       start:0x8017F86C end:0x8017FBF8
-	.sbss       start:0x8032EFB0 end:0x8032EFD4
+	.sbss       start:0x8032EFB0 end:0x8032EFD0
 
 os/OSRtc.c:
 	.text       start:0x8017FBF8 end:0x80180690
@@ -1507,13 +1508,15 @@ exi/EXIUart.c:
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
-	.data       start:0x80217304 end:0x802175F0
+	.data       start:0x80217304 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
 	.sdata      start:0x8032EAC0 end:0x8032EAD0
 	.sbss       start:0x8032F004 end:0x8032F00C
 
 si/SISamplingRate.c:
 	.text       start:0x801858B0 end:0x801859B8
+	.data       start:0x802173D8 end:0x80217470
+	.sbss       start:0x8032F010 end:0x8032F014
 
 mtx/mtx.c:
 	.text       start:0x801859B8 end:0x801863F4
@@ -1561,6 +1564,7 @@ dvd/dvdidutils.c:
 
 dvd/dvdFatal.c:
 	.text       start:0x8018B5F4 end:0x8018B624
+	.rodata     start:0x801DF264 end:0x801DF27C
 	.sbss       start:0x8032F0D0 end:0x8032F0D4
 
 dvd/fstload.c:
@@ -1578,6 +1582,7 @@ vi/vi.c:
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC
+	.rodata     start:0x801E2F24 end:0x801E2F30
 
 pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
@@ -1641,6 +1646,7 @@ ax/AXProf.c:
 
 axfx/reverb_hi.c:
 	.text       start:0x80193E70 end:0x80194F34
+	.data       start:0x8021B760 end:0x8021B780
 
 axfx/reverb_std.c:
 	.text       start:0x80194F34 end:0x80195B30
@@ -1658,6 +1664,7 @@ axfx/axfx.c:
 
 axfx/reverb_hi_4ch.c:
 	.text       start:0x80196A20 end:0x80197958
+	.data       start:0x8021BF90 end:0x8021BFB8
 
 mix/mix.c:
 	.text       start:0x80197958 end:0x80197978
@@ -1760,11 +1767,13 @@ gx/GXFrameBuf.c:
 gx/GXLight.c:
 	.text       start:0x801A34F0 end:0x801A3B78
 	.data       start:0x8021C710 end:0x8021C72C
+	.sdata2     start:0x80333860 end:0x803338A8
 
 gx/GXTexture.c:
 	.text       start:0x801A3B78 end:0x801A4B44
 	.data       start:0x8021C730 end:0x8021C958
 	.sdata      start:0x8032EBA0 end:0x8032EBE0
+	.sdata2     start:0x803338A8 end:0x803338D0
 
 gx/GXBump.c:
 	.text       start:0x801A4B44 end:0x801A51D8
@@ -1776,6 +1785,7 @@ gx/GXTev.c:
 gx/GXPixel.c:
 	.text       start:0x801A59BC end:0x801A5FF4
 	.data       start:0x8021C9D0 end:0x8021C9F0
+	.sdata2     start:0x803338D8 end:0x80333910
 
 gx/GXStubs.c:
 	.text       start:0x801A5FF4 end:0x801A5FF8
@@ -1786,6 +1796,7 @@ gx/GXDisplayList.c:
 
 gx/GXTransform.c:
 	.text       start:0x801A6204 end:0x801A69B4
+	.sdata2     start:0x80333910 end:0x80333930
 
 gx/GXPerf.c:
 	.text       start:0x801A69B4 end:0x801A740C
@@ -2189,11 +2200,15 @@ RedSound/RedDriver.cpp:
 	extabindex  start:0x80011860 end:0x80011CA4
 	.text       start:0x801BCF0C end:0x801BFF34
 	.ctors      start:0x801D544C end:0x801D5450
+	.bss        start:0x8032B860 end:0x8032E170
+	.sbss       start:0x8032F3B8 end:0x8032F490
 
 RedSound/RedMemory.cpp:
 	extab       start:0x8000A5B8 end:0x8000A5F8
 	extabindex  start:0x80011CA4 end:0x80011D04
 	.text       start:0x801BFF34 end:0x801C05F8
+	.sbss       start:0x8032F490 end:0x8032F4A8
+	.sdata2     start:0x80333D20 end:0x80333D30
 
 RedSound/RedEntry.cpp:
 	extab       start:0x8000A5F8 end:0x8000A760
@@ -2227,6 +2242,10 @@ RedSound/RedSound.cpp:
 	extabindex  start:0x800125BC end:0x80012850
 	.text       start:0x801CCA34 end:0x801CD8F4
 	.ctors      start:0x801D5450 end:0x801D5454
+	.bss        start:0x8032E170 end:0x8032E280
+	.sdata      start:0x8032EC30 end:0x8032EC38
+	.sbss       start:0x8032F4A8 end:0x8032F4E0
+	.sdata2     start:0x80333D98 end:0x80333DB0
 
 thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C

@@ -5,10 +5,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-#undef __GXData
-#define __GXData gx
-
 static __GXFifoObj DisplayListFifo;
 static volatile __GXFifoObj* OldCPUFifo;
 static GXData __savedGXdata;

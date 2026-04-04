@@ -1,8 +1,18 @@
-#include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
 
 #include "dolphin/gx/__gx.h"
+
+extern f32 sqrtf(f32);
+
+const f32 GXPixel_ZeroF = 0.0f;
+const f32 GXPixel_OneF = 1.0f;
+const f32 GXPixel_HalfF = 0.5f;
+const f64 GXPixel_OneD = 1.0;
+const f32 GXPixel_TwoF = 2.0f;
+const f64 GXPixel_HalfD = 0.5;
+const f32 GXPixel_FogMantissaScale = 8388638.0f;
+const f64 GXPixel_IntToDoubleBias = 4503601774854144.0;
 
 void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     u32 fog0;
@@ -27,7 +37,7 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
 
     CHECK_GXBEGIN(138, "GXSetFog");
 
-    ASSERTMSGLINE(140, farz >= 0.0f, "GXSetFog: The farz should be positive value");
+    ASSERTMSGLINE(140, farz >= GXPixel_ZeroF, "GXSetFog: The farz should be positive value");
     ASSERTMSGLINE(141, farz >= nearz, "GXSetFog: The farz should be larger than nearz");
 
     fsel = type & 7;
@@ -35,18 +45,18 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     
     if (proj) {
         if (farz == nearz || endz == startz) {
-            a = 0.0f;
-            c = 0.0f;
+            a = GXPixel_ZeroF;
+            c = GXPixel_ZeroF;
         } else {
-            A = (1.0f / (endz - startz));
+            A = (GXPixel_OneF / (endz - startz));
             a = A * (farz - nearz);
             c = A * (startz - nearz);
         }
     } else {
         if (farz == nearz || endz == startz) {
-            A = 0.0f;
-            B = 0.5f;
-            C = 0.0f;
+            A = GXPixel_ZeroF;
+            B = GXPixel_HalfF;
+            C = GXPixel_ZeroF;
         } else {
             A = (farz * nearz) / ((farz - nearz) * (endz - startz));
             B = farz / (farz - nearz);
@@ -55,17 +65,17 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
 
         B_mant = B;
         B_expn = 0;
-        while (B_mant > 1.0) {
-            B_mant /= 2.0f;
+        while (B_mant > GXPixel_OneD) {
+            B_mant /= GXPixel_TwoF;
             B_expn++;
         }
-        while (B_mant > 0.0f && B_mant < 0.5) {
-            B_mant *= 2.0f;
+        while (B_mant > GXPixel_ZeroF && B_mant < GXPixel_HalfD) {
+            B_mant *= GXPixel_TwoF;
             B_expn--;
         }
 
         a = A / (f32) (1 << (B_expn + 1));
-        b_m = 8.388638e6f * B_mant;
+        b_m = GXPixel_FogMantissaScale * B_mant;
         b_s = B_expn + 1;
         c = C;
 
@@ -121,20 +131,20 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
     ASSERTMSGLINE(276, table != NULL, "GXInitFogAdjTable: table pointer is null");
     ASSERTMSGLINE(277, width <= 640, "GXInitFogAdjTable: invalid width value");
 
-    if (0.0 == projmtx[3][3]) {
-        nearZ = projmtx[2][3] / (projmtx[2][2] - 1.0f);
+    if (GXPixel_ZeroF == projmtx[3][3]) {
+        nearZ = projmtx[2][3] / (projmtx[2][2] - GXPixel_OneF);
         sideX = nearZ / projmtx[0][0];
     } else {
-        sideX = 1.0f / projmtx[0][0];
+        sideX = GXPixel_OneF / projmtx[0][0];
         nearZ = 1.73205f * sideX;
     }
 
-    iw = 2.0f / width;
+    iw = GXPixel_TwoF / width;
     for (i = 0; i < 10; i++) {
         xi = (i + 1) << 5;
         xi *= iw;
         xi *= sideX;
-        rangeVal = sqrtf(1.0f + ((xi * xi) / (nearZ * nearZ)));
+        rangeVal = sqrtf(GXPixel_OneF + ((xi * xi) / (nearZ * nearZ)));
         table->r[i] = (u32)(256.0f * rangeVal) & 0xFFF;
     }
 }

@@ -5,8 +5,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-
 static __GXFifoObj* CPUFifo;
 static __GXFifoObj* GPFifo;
 

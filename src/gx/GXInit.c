@@ -11,18 +11,19 @@
 #define SET_REG_FIELD OLD_SET_REG_FIELD
 
 extern char lbl_8021C380[];
-extern const GXColor GXInit_ClearColor;
-extern const GXColor GXInit_BlackColor;
-extern const GXColor GXInit_WhiteColor;
-extern const f32 GXInit_ZeroF;
-extern const f32 GXInit_OneF;
-extern const f32 GXInit_PointOneF;
 
 const char* __GXVersion = lbl_8021C380;
 
 static GXData gxData;
 static GXFifoObj FifoObj;
-GXData* const gx = &gxData;
+GXData* const __GXData = &gxData;
+const GXColor GXInit_ClearColor = {64, 64, 64, 255};
+const GXColor GXInit_BlackColor = {0, 0, 0, 0};
+const GXColor GXInit_WhiteColor = {255, 255, 255, 255};
+const f32 GXInit_ZeroF = 0.0f;
+const f32 GXInit_OneF = 1.0f;
+const f32 GXInit_PointOneF = 0.1f;
+const f64 GXInit_IntToFloatBias = 4503599627370496.0;
 
 // these remain file-scope in the target object
 u32 calledOnce;

@@ -1515,6 +1515,7 @@ si/SIBios.c:
 
 si/SISamplingRate.c:
 	.text       start:0x801858B0 end:0x801859B8
+	.sbss       start:0x8032F010 end:0x8032F014
 
 mtx/mtx.c:
 	.text       start:0x801859B8 end:0x801863F4

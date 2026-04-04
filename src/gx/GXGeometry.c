@@ -4,38 +4,34 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern GXData* const gx;
-#undef __GXData
-#define __GXData gx
-
 void __GXSetDirtyState(void) {
-    if (gx->dirtyState & 1) {
+    if (__GXData->dirtyState & 1) {
         __GXSetSUTexRegs();
     }
-    if (gx->dirtyState & 2) {
+    if (__GXData->dirtyState & 2) {
         __GXUpdateBPMask();
     }
-    if (gx->dirtyState & 4) {
+    if (__GXData->dirtyState & 4) {
         __GXSetGenMode();
     }
-    if (gx->dirtyState & 8) {
+    if (__GXData->dirtyState & 8) {
         __GXSetVCD();
     }
-    if (gx->dirtyState & 0x10) {
+    if (__GXData->dirtyState & 0x10) {
         __GXSetVAT();
     }
-    if (gx->dirtyState & 0x18) {
+    if (__GXData->dirtyState & 0x18) {
         __GXCalculateVLim();
     }
 
-    gx->dirtyState = 0;
+    __GXData->dirtyState = 0;
 }
 
 void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts) {
     ASSERTMSGLINE(359, vtxfmt < GX_MAX_VTXFMT,   "GXBegin: Format Index is out of range");
     ASSERTMSGLINE(360, !__GXinBegin, "GXBegin: called inside another GXBegin/GXEnd");
 
-    if (gx->dirtyState != 0) {
+    if (__GXData->dirtyState != 0) {
         __GXSetDirtyState();
     }
 

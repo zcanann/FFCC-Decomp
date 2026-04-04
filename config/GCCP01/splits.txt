@@ -1461,6 +1461,7 @@ os/OSMutex.c:
 os/OSReboot.c:
 	.text       start:0x8017F11C end:0x8017F478
 	.bss        start:0x8030BC20 end:0x8030BC40
+	.sbss       start:0x8032EF98 end:0x8032EFA8
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C

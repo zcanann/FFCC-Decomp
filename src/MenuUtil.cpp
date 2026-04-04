@@ -131,7 +131,7 @@ float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float margin, float scale)
+void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
 {
 	CFont* font = menuFont;
 
@@ -165,7 +165,7 @@ void CMenuPcs::GetFontWidth(char*, float, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float margin, float scaleX, float scaleY)
+void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
 {
 	CFont* font = menuFont;
 

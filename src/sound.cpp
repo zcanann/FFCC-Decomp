@@ -30,6 +30,7 @@ extern const float kLineBoundsInitMax;
 static char s_soundStageName[] = "CSound";
 static char s_soundSourceName[] = "sound.cpp";
 static char s_soundErrorFmt[] = "Sound\n";
+static char s_soundMinusOneFmt[] = "Sound: -1\n";
 static char s_soundLineOutOfRangeFmt[] = "CSound(%d)\n";
 static char s_soundLineTableFullFmt[] = "CSound(%d+)\n";
 
@@ -1203,13 +1204,13 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
  */
 void CSound::PlayNextBgm(int bgmId)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CSound* sound = this;
 
     if (bgmId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        MusicNextPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, 0);
-        SetMusicPhraseStop__9CRedSoundFi(redSound, 1);
+        MusicNextPlay__9CRedSoundFiii(RedSound(sound), bgmId, 0x7F, 0);
+        SetMusicPhraseStop__9CRedSoundFi(RedSound(sound), 1);
     }
 }
 

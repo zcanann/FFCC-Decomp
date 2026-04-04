@@ -654,8 +654,12 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d500
+ * PAL Size: 880b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
 {
@@ -723,7 +727,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 4:
-            if ((*value * sx) - value[6] < *(float*)(piece + 0x24)) {
+            if (-((*value * sx) - value[6]) < -*(float*)(piece + 0x24)) {
                 piece[0x38] = 1;
             }
             break;

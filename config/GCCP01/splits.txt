@@ -1508,13 +1508,14 @@ exi/EXIUart.c:
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
-	.data       start:0x80217304 end:0x802175F0
+	.data       start:0x80217304 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
 	.sdata      start:0x8032EAC0 end:0x8032EAD0
 	.sbss       start:0x8032F004 end:0x8032F00C
 
 si/SISamplingRate.c:
 	.text       start:0x801858B0 end:0x801859B8
+	.data       start:0x802173D8 end:0x80217470
 	.sbss       start:0x8032F010 end:0x8032F014
 
 mtx/mtx.c:
@@ -1795,7 +1796,7 @@ gx/GXDisplayList.c:
 
 gx/GXTransform.c:
 	.text       start:0x801A6204 end:0x801A69B4
-	.sdata2     start:0x80333910 end:0x80333940
+	.sdata2     start:0x80333910 end:0x80333930
 
 gx/GXPerf.c:
 	.text       start:0x801A69B4 end:0x801A740C

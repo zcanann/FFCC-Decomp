@@ -1622,15 +1622,12 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  */
 void CRedDriver::SetSeBlockData(int param_1, void* param_2)
 {
-    void* copiedBuffer;
+    void* copiedBuffer = 0;
     int copySize;
 
-    if (param_2 == 0) {
-        copiedBuffer = 0;
-    } else {
+    if (param_2 != 0) {
         copySize = *(int*)((char*)param_2 + 0xc);
         if (copySize < 1) {
-            copiedBuffer = 0;
         } else {
             copiedBuffer = RedNew__Fi(copySize);
             if (copiedBuffer != 0) {

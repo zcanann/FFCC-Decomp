@@ -15,6 +15,8 @@ CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
+extern u32 gDbgMenuWindowBorderColors[4];
+extern u32 gDbgMenuWindowFillColors[2];
 
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
@@ -510,9 +512,8 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, char* text)
+void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
-	// Set up GX vertex format if not already done
 	if (m_currentVtxFmt != 1) {
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -525,48 +526,57 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 		m_currentVtxFmt = 1;
 	}
 
-	// Draw window border if flag is not set
 	if ((flags & 1) == 0) {
+		const u32* borderColors = gDbgMenuWindowBorderColors;
+		u32 vertexIndex = 0;
+
 		GXBegin(GX_QUADS, GX_VTXFMT1, 4);
-		for (int i = 0; i < 4; i += 2) {
-			int row = i >> 1;
-			int next = i + 1;
+
+		for (int i = 0; i < 2; i++) {
+			u32 row = vertexIndex >> 1;
+			u32 nextVertexIndex = vertexIndex + 1;
+			vertexIndex += 2;
+
 			GXPosition3f32((float)x, (float)(y + (height & -(row & 1))), 0.0f);
-			GXColor1u32(s_windowBorderColors[i]);
-			GXPosition3f32((float)(x + (width & -(next & 1))), (float)(y + (height & -((next >> 1) & 1))), 0.0f);
-			GXColor1u32(s_windowBorderColors[next]);
+			GXColor1u32(borderColors[0]);
+
+			GXPosition3f32((float)(x + (width & -(nextVertexIndex & 1))),
+			               (float)(y + (height & -((nextVertexIndex >> 1) & 1))),
+			               0.0f);
+			GXColor1u32(borderColors[1]);
+
+			borderColors += 2;
 		}
 	}
 
-	// Draw window triangles
+	u32 fillColorIndex = (flags >> 1) & 1;
+
 	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
-	int colorOffset = (flags >> 1 & 1) * 4;
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);
-	GXColor1u32(s_windowFillColors[(flags >> 1) & 1]);
+	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
 	GXPosition3f32((float)x, (float)y, 0.0f);
-	GXColor1u32(s_windowFillColors[(flags >> 1) & 1]);
+	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
-	GXColor1u32(s_windowFillColors[(flags >> 1) & 1]);
+	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
 
 	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);
-	GXColor1u32(s_windowFillColors[1 - ((flags >> 1) & 1)]);
+	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 	GXPosition3f32((float)(x + width), (float)(y + height), 0.0f);
-	GXColor1u32(s_windowFillColors[1 - ((flags >> 1) & 1)]);
+	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
-	GXColor1u32(s_windowFillColors[1 - ((flags >> 1) & 1)]);
+	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 
-	// Draw selection highlight if flag is set
-	char selectionFlag = (char)m_currentMenu->m_status;
-	if (selectionFlag < 0) {
-		unsigned char alpha = 0xc0;
+	if ((s8)m_currentMenu->m_status < 0) {
+		u8 alpha = 0xC0;
+
 		if ((System.m_frameCounter >> 2 & 1) != 0) {
-			alpha = 0xff;
+			alpha = 0xFF;
 		}
-		u32 highlightColor = (alpha << 24) | (alpha << 16) | (alpha << 8) | 0xff;
+
+		u32 highlightColor = (alpha << 24) | (alpha << 16) | (alpha << 8) | 0xFF;
 
 		GXBegin(GX_QUADS, GX_VTXFMT1, 5);
-		// Highlight border
 		GXPosition3f32((float)(x + width + 1), (float)(y - 1), 0.0f);
 		GXColor1u32(highlightColor);
 		GXPosition3f32((float)(x - 1), (float)(y - 1), 0.0f);
@@ -579,8 +589,7 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 		GXColor1u32(highlightColor);
 	}
 
-	// Draw text if provided
-	if (text != nullptr) {
+	if (text != NULL) {
 		drawFont(5, x + 8, y - 6, text);
 	}
 }
@@ -597,35 +606,31 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	if (m_currentVtxFmt != 0) {
-		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		m_currentVtxFmt = 0;
 	}
 
-	GXColor mainColor = { 0xFF, 0xFF, 0xFF, 0xFF };
+	u32 mainColor = 0xFFFFFFFF;
 	if ((flags & 2) != 0) {
-		mainColor.r = 0;
-		mainColor.g = 0;
-		mainColor.b = 0;
+		mainColor = 0x000000FF;
 	}
 
 	if ((flags & 4) != 0) {
 		u32 smallFont = flags & 1;
 		u32 centered = flags & 8;
-		short drawX;
-		short drawY;
+		u32 shadowColor = 0x000000FF;
 		int fontSize;
-		GXColor shadowColor = { 0, 0, 0, 0xFF };
+		short drawX = (short)(x - 1);
+		short drawY = (short)y;
 
-		drawX = (short)(x - 1);
 		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
 		fontSize = 10;
 		if (smallFont != 0) {
 			fontSize = 8;
 		}
-		drawY = (short)y;
 		if (centered != 0) {
 			int textLen = strlen(text);
 			drawX = (short)(drawX - (short)((u32)(fontSize * textLen) >> 1));
@@ -635,7 +640,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 
 		drawY = (short)(y + 1);
 		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
 		fontSize = 10;
 		if (smallFont != 0) {
 			fontSize = 8;
@@ -650,7 +655,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 
 		drawX = (short)(x + 1);
 		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
 		fontSize = 10;
 		if (smallFont != 0) {
 			fontSize = 8;
@@ -665,7 +670,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 
 		drawY = (short)(y - 1);
 		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
 		fontSize = 10;
 		if (smallFont != 0) {
 			fontSize = 8;
@@ -679,7 +684,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
 	}
 
-	GXSetChanMatColor(GX_COLOR0A0, mainColor);
+	GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&mainColor));
 
 	int fontSize = 10;
 	if ((flags & 1) != 0) {

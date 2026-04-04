@@ -1464,11 +1464,11 @@ os/OSReboot.c:
 
 os/OSReset.c:
 	.text       start:0x8017F478 end:0x8017F86C
-	.sbss       start:0x8032EFA8 end:0x8032EFB4
+	.sbss       start:0x8032EFA8 end:0x8032EFB0
 
 os/OSResetSW.c:
 	.text       start:0x8017F86C end:0x8017FBF8
-	.sbss       start:0x8032EFB4 end:0x8032EFD4
+	.sbss       start:0x8032EFB0 end:0x8032EFD4
 
 os/OSRtc.c:
 	.text       start:0x8017FBF8 end:0x80180690

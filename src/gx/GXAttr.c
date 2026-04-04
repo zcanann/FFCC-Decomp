@@ -712,12 +712,12 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     switch (func) {
     case GX_TG_MTX2x4:
         OLD_SET_REG_FIELD(1065, reg, 1, 2, form);
-        OLD_SET_REG_FIELD(1066, reg, 5, 7, row);
+        OLD_SET_REG_FIELD(1066, reg, 8, 4, row << 3);
         break;
     case GX_TG_MTX3x4:
         OLD_SET_REG_FIELD(1070, reg, 1, 2, form);
         OLD_SET_REG_FIELD(1071, reg, 1, 1, 1);
-        OLD_SET_REG_FIELD(1072, reg, 5, 7, row);
+        OLD_SET_REG_FIELD(1072, reg, 8, 4, row << 3);
         break;
     case GX_TG_BUMP0:
     case GX_TG_BUMP1:
@@ -729,7 +729,7 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_BUMP7:
         ASSERTMSGLINE(1091, src_param >= 12 && src_param <= 18, "GXSetTexCoordGen:  Bump source texture value is invalid");
         OLD_SET_REG_FIELD(1092, reg, 1, 2, form);
-        OLD_SET_REG_FIELD(1093, reg, 1, 4, 1);
+        OLD_SET_REG_FIELD(1093, reg, 3, 4, 1);
         OLD_SET_REG_FIELD(1094, reg, 5, 7, row);
         OLD_SET_REG_FIELD(1095, reg, 3, 12, src_param - 12);
         OLD_SET_REG_FIELD(1096, reg, 3, 15, func - 2);
@@ -737,11 +737,11 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_SRTG:
         OLD_SET_REG_FIELD(1101, reg, 1, 2, form);
         if (src_param == GX_TG_COLOR0) {
-            OLD_SET_REG_FIELD(1103, reg, 2, 4, 2);
+            OLD_SET_REG_FIELD(1103, reg, 3, 4, 2);
         } else {
-            OLD_SET_REG_FIELD(1105, reg, 2, 4, 3);
+            OLD_SET_REG_FIELD(1105, reg, 3, 4, 3);
         }
-        OLD_SET_REG_FIELD(1107, reg, 1, 8, 1);
+        OLD_SET_REG_FIELD(1107, reg, 5, 7, 2);
         break;
     default:
         ASSERTMSGLINE(1113, 0, "GXSetTexCoordGen:  Invalid function");

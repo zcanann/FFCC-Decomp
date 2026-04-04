@@ -227,3 +227,50 @@ Why this worked
 Net improvement from the session
 - `__get_file_modes`: `95.189476% -> 98.2421%`
 - unit `.text`: `98.94213% -> 99.61343%`
+
+`__get_file_modes` follow-up, 2026-04-03 (current session)
+
+Current verified state
+- `configure.py` still keeps `Object(NonMatching, "MSL_C/PPCEABI/bare/H/file_io.c", mw_version="GC/2.7")`.
+- Starting point when I began this pass:
+  - `__get_file_modes`: about `98.2421%`
+  - unit `.text`: about `99.61343%`
+- After the kept source change below and a full `ninja`:
+  - `__get_file_modes`: about `98.663155%`
+  - unit `.text`: about `99.70602%`
+
+Kept source change
+- In `src/MSL_C/PPCEABI/bare/H/file_io.c`:
+  - change `open_mode` from `int` to `unsigned char`
+  - keep `mode_ptr = mode + 2`
+  - remove the separate `next_mode` temporary for `mode[1]`
+  - compare `*mode_ptr` directly in the `'b'` / `'+'` cases instead of storing `mode[2]` in a temporary first
+
+Why this helped
+- The narrowed `open_mode` recovers the target's `li r7, ...` path for the first switch results.
+- It also recovers the cleaner `lbz mode[1]` -> `extsb` -> compare sequence in the second parse block.
+- The remaining miss is smaller and now mostly looks like:
+  - target keeps an explicit `addi r5, r3, 2`
+  - current code still prefers loading the `file_modes` byte first and reuses registers differently around that block
+
+Important verification note
+- A single-object rebuild under-reported the improvement.
+- The authoritative result here was again the full-build check:
+  - `ninja`
+  - `tools/objdiff-cli diff -p . -u main/MSL_C/PPCEABI/bare/H/file_io -o - __get_file_modes`
+
+Experiments tried this session that did not help
+- Re-introducing `mode_ptr` while leaving `open_mode` as `int`
+  - recovered the `mode + 2` materialization in some single-object checks, but not a net score gain
+- `signed char next_mode`
+  - no gain
+- `register int open_mode`
+  - bad regression
+- `switch (mode[1])` while still carrying a `next_mode` temporary
+  - no effective codegen change
+
+Current best hypothesis if revisiting
+- The last remaining gap is probably not parser logic anymore.
+- Higher-value next steps would be:
+  - force the `mode + 2` address to stay live without losing the recovered `open_mode` register assignment
+  - inspect whether a still-missing tiny surrounding scheduling difference can be driven by a local temporary type/order change without giving up the current win

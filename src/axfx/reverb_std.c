@@ -476,15 +476,14 @@ int AXFXReverbStdShutdown(AXFX_REVERBSTD* rev) {
 }
 
 int AXFXReverbStdSettings(AXFX_REVERBSTD* rev) {
-    int ret;
     BOOL old;
 
     old = OSDisableInterrupts();
     rev->tempDisableFX = 1;
-    ret = ReverbSTDModify(&rev->rv, rev->coloration, rev->time, rev->mix, rev->damping, rev->preDelay);
+    ReverbSTDModify(&rev->rv, rev->coloration, rev->time, rev->mix, rev->damping, rev->preDelay);
     rev->tempDisableFX = 0;
     OSRestoreInterrupts(old);
-    return ret;
+    return 1;
 }
 
 void AXFXReverbStdCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBSTD* reverb) {

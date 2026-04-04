@@ -1628,6 +1628,7 @@ ax/AXOut.c:
 
 ax/AXSPB.c:
 	.text       start:0x80192DA0 end:0x80193268
+	.bss        start:0x80314900 end:0x80314940
 
 ax/AXVPB.c:
 	.text       start:0x80193268 end:0x80193E28

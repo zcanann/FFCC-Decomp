@@ -366,7 +366,30 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             }
 
             if (foundGroup != -1) {
-                IsDeadGroupBreath(pYmBreath, vYmBreath, foundGroup);
+                float zero = 0.0f;
+                int* group = groupTable + (int)foundGroup * 0x17;
+
+                found = true;
+                for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); j++) {
+                    if ((*(signed char*)(group[1] + j) != -1) || (*(signed char*)(group[2] + j) != 1)) {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); j++) {
+                        *(unsigned char*)(group[2] + j) = 0xFF;
+                        group[5] = (int)zero;
+                        group[4] = (int)zero;
+                        group[3] = (int)zero;
+                        group[8] = (int)zero;
+                        group[7] = (int)zero;
+                        group[6] = (int)zero;
+                        group[9] = (int)zero;
+                    }
+                    group[0] = 0;
+                }
             }
 
             if ((*(unsigned short*)((unsigned char*)pYmBreath + 0x22) <= *(unsigned short*)((unsigned char*)vYmBreath + 0x44)) &&

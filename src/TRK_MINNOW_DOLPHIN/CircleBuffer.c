@@ -12,31 +12,27 @@
  * EN Address: 
  * EN Size: 
  */
-int CircleBufferReadBytes(CircleBuffer* cb, u8* buf, u32 size) {
-    int availSize;
+u32 CBGetBytesAvailableForRead(CircleBuffer* cb) {
+    return cb->mBytesToRead;
+}
 
-    if (size > cb->mBytesToRead) {
-        return -1;
-    }
-    MWEnterCriticalSection(&cb->mCriticalSection);
-    availSize = cb->size - (cb->read_ptr - cb->start_ptr);
-    if (size < availSize) {
-        memcpy(buf, cb->read_ptr, size);
-        cb->read_ptr += size;
-    } else {
-        memcpy(buf, cb->read_ptr, availSize);
-        memcpy(buf + availSize, cb->start_ptr, size - availSize);
-        cb->read_ptr = cb->start_ptr + size - availSize;
-    }
-
-    if (cb->size == (cb->read_ptr - cb->start_ptr)) {
-        cb->read_ptr = cb->start_ptr;
-    }
-
-    cb->mBytesToWrite += size;
-    cb->mBytesToRead -= size;
-    MWExitCriticalSection(&cb->mCriticalSection);
-    return 0;
+/*
+ * --INFO--
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
+ */
+void CircleBufferInitialize(CircleBuffer* cb, u8* buf, s32 size) {
+    cb->start_ptr = buf;
+    cb->size = size;
+    cb->read_ptr = cb->start_ptr;
+    cb->write_ptr = cb->start_ptr;
+    cb->mBytesToRead = 0;
+    cb->mBytesToWrite = cb->size;
+    MWInitializeCriticalSection(&cb->mCriticalSection);
 }
 
 /*
@@ -84,26 +80,29 @@ int CircleBufferWriteBytes(CircleBuffer* cb, u8* buf, u32 size) {
  * EN Address: 
  * EN Size: 
  */
-void CircleBufferInitialize(CircleBuffer* cb, u8* buf, s32 size) {
-    cb->start_ptr = buf;
-    cb->size = size;
-    cb->read_ptr = cb->start_ptr;
-    cb->write_ptr = cb->start_ptr;
-    cb->mBytesToRead = 0;
-    cb->mBytesToWrite = cb->size;
-    MWInitializeCriticalSection(&cb->mCriticalSection);
-}
+int CircleBufferReadBytes(CircleBuffer* cb, u8* buf, u32 size) {
+    int availSize;
 
+    if (size > cb->mBytesToRead) {
+        return -1;
+    }
+    MWEnterCriticalSection(&cb->mCriticalSection);
+    availSize = cb->size - (cb->read_ptr - cb->start_ptr);
+    if (size < availSize) {
+        memcpy(buf, cb->read_ptr, size);
+        cb->read_ptr += size;
+    } else {
+        memcpy(buf, cb->read_ptr, availSize);
+        memcpy(buf + availSize, cb->start_ptr, size - availSize);
+        cb->read_ptr = cb->start_ptr + size - availSize;
+    }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-u32 CBGetBytesAvailableForRead(CircleBuffer* cb) {
-    return cb->mBytesToRead;
+    if (cb->size == (cb->read_ptr - cb->start_ptr)) {
+        cb->read_ptr = cb->start_ptr;
+    }
+
+    cb->mBytesToWrite += size;
+    cb->mBytesToRead -= size;
+    MWExitCriticalSection(&cb->mCriticalSection);
+    return 0;
 }

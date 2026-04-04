@@ -63,31 +63,19 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC*
  */
 void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3)
 {
-	pppYmTraceMoveMngStRaw* pppMngSt;
-	pppYmTraceMoveWork* work;
-	u8* owner;
-	Vec local_128;
-	Vec local_11c;
-	Vec local_110;
-	Vec local_ec;
-	Vec local_e0;
-	Vec local_8c;
-	Vec local_74;
-	Vec local_5c;
-	Vec local_44;
-	Vec local_2c;
-	Vec local_20;
-	Quaternion local_80;
-	Quaternion local_70;
-	Quaternion local_60;
-
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
-	work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
-	owner = (u8*)pppMngSt->m_owner;
+	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
+	pppYmTraceMoveWork* work =
+		(pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
+	void* owner = pppMngSt->m_owner;
+	Vec local_20;
+	Vec local_2c;
+	Quaternion local_60;
+	Quaternion local_70;
+	Quaternion local_80;
 
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
@@ -102,16 +90,18 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppCopyVector(local_20, work->m_direction);
 		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
-		local_74.x = *(f32*)(owner + 0x15c);
-		local_74.y = *(f32*)(owner + 0x160);
-		local_74.z = *(f32*)(owner + 0x164);
-		pppSubVector(local_20, local_74, pppMngSt->m_position);
+		u8* ownerBytes = (u8*)owner;
+		Vec local_8c;
+		Vec local_74;
+
+		local_8c.x = *(f32*)(ownerBytes + 0x15c);
+		local_8c.y = *(f32*)(ownerBytes + 0x160);
+		local_8c.z = *(f32*)(ownerBytes + 0x164);
+		pppSubVector(local_20, local_8c, pppMngSt->m_position);
 
 		local_20.y = local_20.y + param_2->m_payload;
-		local_5c.x = local_20.x;
-		local_5c.y = local_20.y;
-		local_5c.z = local_20.z;
-		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_5c);
+		local_74 = local_20;
+		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_74);
 
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
@@ -120,10 +110,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
-		local_44.x = local_2c.x;
-		local_44.y = local_2c.y;
-		local_44.z = local_2c.z;
-		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_44);
+		local_74 = local_2c;
+		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_74);
 	}
 
 	local_60.x = local_20.x;
@@ -137,24 +125,20 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
 	PSQUATNormalize(&local_80, &local_80);
 
-	local_8c.x = local_80.x;
-	local_8c.y = local_80.y;
-	local_8c.z = local_80.z;
-	PSVECScale(&local_8c, &local_8c, work->m_distance * pppMngSt->m_scale);
+	{
+		Vec local_e0;
+		Vec local_ec;
 
-	pppCopyVector(local_110, pppMngSt->m_position);
-	pppCopyVector(local_e0, local_8c);
-	pppAddVector(local_ec, local_e0, local_110);
+		local_e0.x = local_80.x;
+		local_e0.y = local_80.y;
+		local_e0.z = local_80.z;
+		PSVECScale(&local_e0, &local_e0, work->m_distance * pppMngSt->m_scale);
+		pppAddVector(local_ec, local_e0, pppMngSt->m_position);
+		pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
+		pppCopyVector(pppMngSt->m_position, local_ec);
 
-	pppCopyVector(local_11c, pppMngSt->m_position);
-	pppCopyVector(pppMngSt->m_previousPosition, local_11c);
-
-	local_128.x = local_ec.x;
-	local_128.y = local_ec.y;
-	local_128.z = local_ec.z;
-	pppCopyVector(pppMngSt->m_position, local_128);
-
-	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
-	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
-	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
+		pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
+		pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
+		pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
+	}
 }

@@ -380,6 +380,7 @@ void CMaterialEditorPcs::calcViewer()
     Mtx cameraMatrix;
     ViewerSRT srt;
     Mtx scaleMatrix;
+    float rotationValue;
 
     USBPcs.mccReadData();
 
@@ -389,15 +390,16 @@ void CMaterialEditorPcs::calcViewer()
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    srt.transX = FLOAT_8032FCD8;
-    srt.transY = FLOAT_8032FCD8;
+    rotationValue = FLOAT_8032FCC8;
     srt.transZ = FLOAT_8032FCD8;
-    srt.rotX = FLOAT_8032FCC8;
-    srt.rotY = FLOAT_8032FCC8;
-    srt.rotZ = FLOAT_8032FCC8;
-    srt.scaleX = FLOAT_8032FCD8;
-    srt.scaleY = FLOAT_8032FCD8;
+    srt.transY = FLOAT_8032FCD8;
+    srt.transX = FLOAT_8032FCD8;
+    srt.rotZ = rotationValue;
+    srt.rotY = rotationValue;
+    srt.rotX = rotationValue;
     srt.scaleZ = FLOAT_8032FCD8;
+    srt.scaleY = FLOAT_8032FCD8;
+    srt.scaleX = FLOAT_8032FCD8;
     srt.transX = field268_0x15c.x;
     srt.transY = field268_0x15c.y;
     srt.transZ = -field268_0x15c.z;

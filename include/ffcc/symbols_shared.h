@@ -77,6 +77,7 @@ extern const float kPppYmMeltZero;
 extern const float kVectorZero;
 extern const f32 kPppYmLaserOne;
 extern const float kPppYmTraceMoveZero;
+extern const float kPppYmTraceMoveOne;
 extern const float kPppYmCheckBGHeightAxisZero;
 extern const float kPppYmCheckBGHeightProbeDirY;
 extern const float kPppYmCheckBGHeightCylinderScale;

@@ -82,6 +82,7 @@ CPtrArray<CMapAnimNode*>::CPtrArray()
 template <>
 CPtrArray<CMapAnimNode*>::~CPtrArray()
 {
+    m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
     RemoveAll();
 }
 

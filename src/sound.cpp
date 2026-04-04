@@ -1475,7 +1475,7 @@ void CSound::LoadWave(void* waveData)
 void CSound::FreeWave(int waveId)
 {
     if (waveId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         ClearWaveData__9CRedSoundFi(RedSound(this), waveId);
     }
@@ -1567,7 +1567,7 @@ int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 void CSound::StopSe(int seId)
 {
     if (seId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         SeStop__9CRedSoundFi(RedSound(this), seId);
     }
@@ -1585,7 +1585,7 @@ void CSound::StopSe(int seId)
 void CSound::FadeOutSe(int seId, int fadeFrames)
 {
     if (seId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         SeFadeOut__9CRedSoundFii(RedSound(this), seId, fadeFrames);
     }

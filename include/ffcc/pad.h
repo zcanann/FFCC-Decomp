@@ -27,17 +27,17 @@ public:
     unsigned int _1a8_4_;
     void* _1ac_4_;
     unsigned char* _1b0_4_;
+    int _1b4_4_;
+    int _1b8_4_;
+    int _1bc_4_;
     union {
-        int _1b4_4_;
+        unsigned int _1c0_4_;
         int _448_4_;
     };
     union {
-        int _1b8_4_;
+        unsigned int _1c4_4_;
         int _452_4_;
     };
-    int _1bc_4_;
-    unsigned int _1c0_4_;
-    unsigned int _1c4_4_;
     unsigned int _1c8_4_;
 };
 

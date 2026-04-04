@@ -40,6 +40,9 @@ extern char* gSingMenuAttrTableFr[];
 extern char* gSingMenuAttrTableEs[];
 extern unsigned char gMenuProcessTable[];
 extern const f32 kMenuInitOne;
+extern const f32 kMenuOrthoBottom;
+extern const f32 kMenuOrthoRight;
+extern const f32 kMenuOrthoFar;
 
 extern unsigned char gFontResArchiveData[];
 

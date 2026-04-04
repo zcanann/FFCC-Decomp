@@ -32,6 +32,8 @@ struct DbgMenuDef {
 };
 
 char s_Debug_80331c90[] = "Debug";
+static u32 s_windowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
+static u32 s_windowFillColors[2] = {0xFFFFFF80, 0x00000080};
 
 DbgMenuDef PTR_DAT_80212524[] = {
     { "MENU", 100, 2, 1 }, { "SHOUKI", 101, 2, 1 },      { "MARK", 102, 2, 1 },       { "BAR", 103, 2, 1 },
@@ -487,11 +489,11 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
             GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
             GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
         } else if (vtxFmt == 0) {
-            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         }
@@ -517,7 +519,7 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 		GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 		m_currentVtxFmt = 1;
@@ -526,12 +528,13 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 	// Draw window border if flag is not set
 	if ((flags & 1) == 0) {
 		GXBegin(GX_QUADS, GX_VTXFMT1, 4);
-		// Window border quad rendering
-		for (int i = 0; i < 4; i++) {
-			float xPos = (float)(x + (width & (i & 1 ? -1 : 0)));
-			float yPos = (float)(y + (height & (i > 1 ? -1 : 0)));
-			GXPosition3f32(xPos, yPos, 0.0f);
-			GXColor1u32(0x808080ff); // Gray border color
+		for (int i = 0; i < 4; i += 2) {
+			int row = i >> 1;
+			int next = i + 1;
+			GXPosition3f32((float)x, (float)(y + (height & -(row & 1))), 0.0f);
+			GXColor1u32(s_windowBorderColors[i]);
+			GXPosition3f32((float)(x + (width & -(next & 1))), (float)(y + (height & -((next >> 1) & 1))), 0.0f);
+			GXColor1u32(s_windowBorderColors[next]);
 		}
 	}
 
@@ -539,19 +542,19 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
 	int colorOffset = (flags >> 1 & 1) * 4;
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);
-	GXColor1u32(0x404040ff); // Dark color
+	GXColor1u32(s_windowFillColors[(flags >> 1) & 1]);
 	GXPosition3f32((float)x, (float)y, 0.0f);
-	GXColor1u32(0x404040ff);
+	GXColor1u32(s_windowFillColors[(flags >> 1) & 1]);
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
-	GXColor1u32(0x404040ff);
+	GXColor1u32(s_windowFillColors[(flags >> 1) & 1]);
 
 	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, 0.0f);
-	GXColor1u32(0x808080ff); // Light color
+	GXColor1u32(s_windowFillColors[1 - ((flags >> 1) & 1)]);
 	GXPosition3f32((float)(x + width), (float)(y + height), 0.0f);
-	GXColor1u32(0x808080ff);
+	GXColor1u32(s_windowFillColors[1 - ((flags >> 1) & 1)]);
 	GXPosition3f32((float)x, (float)(y + height), 0.0f);
-	GXColor1u32(0x808080ff);
+	GXColor1u32(s_windowFillColors[1 - ((flags >> 1) & 1)]);
 
 	// Draw selection highlight if flag is set
 	char selectionFlag = (char)m_currentMenu->m_status;
@@ -594,7 +597,7 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	if (m_currentVtxFmt != 0) {
-		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		m_currentVtxFmt = 0;

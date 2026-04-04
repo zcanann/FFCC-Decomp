@@ -224,232 +224,242 @@ void CSystem::Printf(char* fmt, ...)
  */
 void CSystem::ExecScenegraph()
 {
-    unsigned short stepTrigger = 0;
-    unsigned short perfTrigger = 0;
-    CStopWatch watch((char*)-1);
+    m_exitFlag = 0;
 
-    if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
+    do
     {
-        Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x219);
-        Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
-        if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)
+        unsigned short stepTrigger;
+        unsigned short perfTrigger;
+
+        if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
-            Sound.PauseAllSe(1);
-            File.BackAllFilesToQueue((CFile::CHandle*)0);
+            Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x219);
+            Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
+            if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 1)
+            {
+                Sound.PauseAllSe(1);
+                File.BackAllFilesToQueue((CFile::CHandle*)0);
+            }
+            else
+            {
+                Sound.PauseAllSe(0);
+            }
+        }
+
+        Pad.Frame();
+        File.Frame();
+        Memory.Frame();
+
+        if (Pad._452_4_ == 0)
+        {
+            unsigned int stepPad = (Pad._448_4_ == 4) ? 4 : 0;
+            stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
+            perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + stepPad * 0x54);
         }
         else
         {
-            Sound.PauseAllSe(0);
+            stepTrigger = 0;
+            perfTrigger = 0;
         }
-    }
 
-    Pad.Frame();
-    File.Frame();
-    Memory.Frame();
-
-    if (Pad._452_4_ == 0)
-    {
-        unsigned int stepPad = (Pad._448_4_ == 4) ? 4 : 0;
-        stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
-        perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + stepPad * 0x54);
-    }
-    else
-    {
-        stepTrigger = 0;
-        perfTrigger = 0;
-    }
-
-    if ((stepTrigger & 0xC) != 0)
-    {
-        if ((stepTrigger & 8) != 0)
+        if ((stepTrigger & 0xC) != 0)
         {
-            m_scenegraphStepMode = (unsigned int)__cntlzw((unsigned int)m_scenegraphStepMode) >> 5;
-        }
-        else if ((stepTrigger & 4) != 0)
-        {
-            if (m_scenegraphStepMode == 2)
+            if ((stepTrigger & 8) != 0)
             {
-                m_scenegraphStepMode = 3;
+                m_scenegraphStepMode = (unsigned int)__cntlzw((unsigned int)m_scenegraphStepMode) >> 5;
             }
-            else if (m_scenegraphStepMode == 3)
-            {
-                m_scenegraphStepMode = 4;
-            }
-            else if (m_scenegraphStepMode == 4)
-            {
-                m_scenegraphStepMode = 5;
-            }
-            else
-            {
-                m_scenegraphStepMode = 2;
-            }
-        }
-    }
-
-    if (((*(unsigned int*)((unsigned char*)&MiniGamePcs + 0x6484) & 0x40) != 0) &&
-        (Game.m_gameWork.m_gamePaused == 0))
-    {
-        for (unsigned int port = 0; port < 4; port++)
-        {
-            unsigned short trigger;
-            bool forceOff = false;
-            if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
-            {
-                forceOff = true;
-            }
-            if (forceOff)
-            {
-                trigger = 0;
-            }
-            else
-            {
-                unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
-                trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
-            }
-
-            unsigned short held;
-            forceOff = false;
-            if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
-            {
-                forceOff = true;
-            }
-            if (forceOff)
-            {
-                held = 0;
-            }
-            else
-            {
-                unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
-                held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
-            }
-
-            if (((trigger | held) & 0x1000) != 0)
+            else if ((stepTrigger & 4) != 0)
             {
                 if (m_scenegraphStepMode == 2)
                 {
-                    Sound.PauseAllSe(0);
-                    m_scenegraphStepMode = 0;
-                    GbaQue.ClrShopMode();
-                    GbaQue.SetPauseMode(0);
+                    m_scenegraphStepMode = 3;
                 }
-                else if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
+                else if (m_scenegraphStepMode == 3)
                 {
-                    Sound.PauseAllSe(1);
+                    m_scenegraphStepMode = 4;
+                }
+                else if (m_scenegraphStepMode == 4)
+                {
+                    m_scenegraphStepMode = 5;
+                }
+                else
+                {
                     m_scenegraphStepMode = 2;
-                    GbaQue.SetPauseMode(1);
                 }
             }
         }
-    }
 
-    int scenegraphStepMode = m_scenegraphStepMode;
-    unsigned int drawToggle;
-    if (scenegraphStepMode == 1)
-    {
-        drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
-    }
-    else
-    {
-        drawToggle = 1;
-    }
-
-    unsigned int stepGate = 0;
-    if (scenegraphStepMode == 4)
-    {
-        stepGate = ((-(int)(m_frameCounter & 3)) >> 31);
-    }
-    else if (scenegraphStepMode < 4)
-    {
-        if (scenegraphStepMode == 2)
+        if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x40) != 0) && (Game.m_gameWork.m_gamePaused == 0))
         {
-            stepGate = 1;
-        }
-        else if (scenegraphStepMode > 2)
-        {
-            stepGate = ((-(int)(m_frameCounter & 7)) >> 31);
-        }
-    }
-    else if (scenegraphStepMode < 6)
-    {
-        stepGate = m_frameCounter & 1;
-    }
-
-    int index = 0;
-    for (COrder* order = m_orderSentinel.m_next;
-         order != &m_orderSentinel;
-         order = order->m_next, index++)
-    {
-        m_currentOrder = order;
-        m_currentOrderIndex = index;
-
-        unsigned int flags = *(unsigned int*)((unsigned char*)order->m_entry + 0x10);
-        unsigned int skip;
-        if ((flags & 1) == 0)
-        {
-            skip = stepGate;
-            if ((stepGate != 0) && (drawToggle != 0) && ((flags & 4) != 0))
+            for (unsigned int port = 0; port < 4; port++)
             {
-                skip = 0;
+                unsigned short trigger;
+                unsigned short held;
+                bool forceOff = false;
+
+                if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                {
+                    forceOff = true;
+                }
+                if (forceOff)
+                {
+                    trigger = 0;
+                }
+                else
+                {
+                    unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
+                    trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
+                }
+
+                forceOff = false;
+                if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                {
+                    forceOff = true;
+                }
+                if (forceOff)
+                {
+                    held = 0;
+                }
+                else
+                {
+                    unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
+                    held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
+                }
+
+                if (((trigger | held) & 0x1000) != 0)
+                {
+                    if (m_scenegraphStepMode == 2)
+                    {
+                        Sound.PauseAllSe(0);
+                        m_scenegraphStepMode = 0;
+                        GbaQue.ClrShopMode();
+                        GbaQue.SetPauseMode(0);
+                    }
+                    else if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
+                    {
+                        Sound.PauseAllSe(1);
+                        m_scenegraphStepMode = 2;
+                        GbaQue.SetPauseMode(1);
+                    }
+                }
             }
+        }
+
+        int scenegraphStepMode = m_scenegraphStepMode;
+        unsigned int drawToggle;
+        if (scenegraphStepMode == 1)
+        {
+            drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
         }
         else
         {
-            skip = (drawToggle == 0);
+            drawToggle = 1;
         }
 
-        if (Game.m_gameWork.m_gamePaused == 0)
+        unsigned int stepGate = 0;
+        if (scenegraphStepMode == 4)
         {
-            if ((flags & 0x10) != 0)
+            stepGate = ((-(int)(m_frameCounter & 3)) >> 31);
+        }
+        else if (scenegraphStepMode < 4)
+        {
+            if (scenegraphStepMode == 2)
             {
-                skip = 1;
+                stepGate = 1;
+            }
+            else if (scenegraphStepMode > 2)
+            {
+                stepGate = ((-(int)(m_frameCounter & 7)) >> 31);
             }
         }
-        else
+        else if (scenegraphStepMode < 6)
         {
-            if ((flags & 8) == 0)
-            {
-                skip = 1;
-            }
-            if ((flags & 0x10) != 0)
-            {
-                skip = 0;
-            }
+            stepGate = m_frameCounter & 1;
         }
 
-        if (skip == 0)
-        {
-            watch.Reset();
-            watch.Start();
-            if ((flags & 1) != 0)
-            {
-                Graphic.SetDrawDoneDebugData(-1);
-            }
-            __ptmf_scall(order->m_owner);
-            watch.Stop();
-            order->m_lastTime = watch.Get();
+        float totalTime = 0.0f;
+        CStopWatch watch(reinterpret_cast<char*>(-1));
+        DumpMapFile(&watch);
 
-            watch.Start();
-            if ((perfTrigger & 1) != 0)
+        int index = 0;
+        for (COrder* order = m_orderSentinel.m_next;
+             order != &m_orderSentinel;
+             order = order->m_next, index++)
+        {
+            m_currentOrder = order;
+            m_currentOrderIndex = index;
+
+            unsigned int flags = *(unsigned int*)((unsigned char*)order->m_entry + 0x10);
+            unsigned int skip;
+            if ((flags & 1) == 0)
             {
-                Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
-                GXReadGP0Metric();
-                GXReadGP1Metric();
+                skip = stepGate;
+                if ((stepGate != 0) && (drawToggle != 0) && ((flags & 4) != 0))
+                {
+                    skip = 0;
+                }
             }
-            watch.Stop();
-            if ((perfTrigger & 1) != 0)
+            else
             {
+                skip = (drawToggle == 0);
+            }
+
+            if (Game.m_gameWork.m_gamePaused == 0)
+            {
+                if ((flags & 0x10) != 0)
+                {
+                    skip = 1;
+                }
+            }
+            else
+            {
+                if ((flags & 8) == 0)
+                {
+                    skip = 1;
+                }
+                if ((flags & 0x10) != 0)
+                {
+                    skip = 0;
+                }
+            }
+
+            if (skip == 0)
+            {
+                watch.Reset();
+                watch.Start();
+                if ((flags & 1) != 0)
+                {
+                    Graphic.SetDrawDoneDebugData(-1);
+                }
+                __ptmf_scall(order->m_owner);
+                watch.Stop();
                 order->m_lastTime = watch.Get();
-            }
-            watch.Get();
-        }
-        else
-        {
-            order->m_lastTime = 0.0f;
-        }
-    }
 
-    m_currentOrder = (COrder*)0;
-    m_frameCounter++;
+                watch.Start();
+                if ((perfTrigger & 1) != 0)
+                {
+                    Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
+                    GXReadGP0Metric();
+                    GXReadGP1Metric();
+                }
+                watch.Stop();
+                if ((perfTrigger & 1) != 0)
+                {
+                    order->m_lastTime = watch.Get();
+                }
+                totalTime += watch.Get();
+            }
+            else
+            {
+                order->m_lastTime = 0.0f;
+            }
+        }
+
+        m_currentOrder = (COrder*)0;
+        m_frameCounter++;
+    } while (m_exitFlag == 0);
+
+    Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2F6);
 }
 
 /*

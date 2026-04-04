@@ -1,7 +1,6 @@
 #include "ffcc/stopwatch.h"
 
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
-extern "C" void __dl__FPv(void* ptr);
 
 static const float s_stopwatchScale = 100.0f;
 
@@ -22,24 +21,6 @@ CStopWatch::CStopWatch(char* name)
  * Size:	TODO
  */
 CStopWatch::~CStopWatch() {}
-
-/*
- * --INFO--
- * PAL Address: 0x80021440
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CStopWatch* dtor_80021440(CStopWatch* stopWatch, short shouldDelete)
-{
-	if ((stopWatch != nullptr) && (shouldDelete > 0))
-	{
-		__dl__FPv(stopWatch);
-	}
-	return stopWatch;
-}
 
 /*
  * --INFO--

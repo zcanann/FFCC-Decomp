@@ -118,9 +118,6 @@ void __dt__9CFlatDataFv(void*, int);
 void ResetNewGame__13CFlatRuntime2Fv(void*);
 void InitFurTexBuffer__6CCharaFv(void*);
 void* __vt__8CManager[];
-CCaravanWork* dtor_800A2B9C(CCaravanWork*, short);
-CMonWork* dtor_8009E9B4(CMonWork*, short);
-CFlatData* dtor_800980B4(CFlatData*, short);
 void __dt__5CGameFv(void*, int);
 void* __vt__5CGame[];
 }
@@ -204,14 +201,14 @@ extern "C" void __sinit_game_cpp(void)
     __construct_array(
         game->m_caravanWorkArr,
         reinterpret_cast<ConstructorDestructor>(__ct__12CCaravanWorkFv),
-        reinterpret_cast<ConstructorDestructor>(dtor_800A2B9C),
+        reinterpret_cast<ConstructorDestructor>(__dt__12CCaravanWorkFv),
         0xC30,
         9
     );
     __construct_array(
         game->m_monWorkArr,
         reinterpret_cast<ConstructorDestructor>(__ct__8CMonWorkFv),
-        reinterpret_cast<ConstructorDestructor>(dtor_8009E9B4),
+        reinterpret_cast<ConstructorDestructor>(__dt__8CMonWorkFv),
         0x110,
         0x40
     );
@@ -226,7 +223,7 @@ extern "C" void __sinit_game_cpp(void)
     __construct_array(
         game->m_cFlatDataArr,
         reinterpret_cast<ConstructorDestructor>(__ct__9CFlatDataFv),
-        reinterpret_cast<ConstructorDestructor>(dtor_800980B4),
+        reinterpret_cast<ConstructorDestructor>(__dt__9CFlatDataFv),
         0x14D4,
         4
     );

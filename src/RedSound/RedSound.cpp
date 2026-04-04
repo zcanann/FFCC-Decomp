@@ -51,13 +51,22 @@ CRedSound::CRedSound()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cca38
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CRedSound::~CRedSound()
+#pragma optimization_level 0
+extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete)
 {
-	End();
+    if ((redSound != 0) && (0 < shouldDelete)) {
+        __dl__FPv(redSound);
+    }
+    return redSound;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

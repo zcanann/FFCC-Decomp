@@ -146,11 +146,14 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
     u8* colorArray = (u8*)param_2;
     pppEraseCharaPartsUnkB* callbackData = (pppEraseCharaPartsUnkB*)param_3;
     EraseCharaPartsModelView* modelView = (EraseCharaPartsModelView*)model;
-    EraseCharaPartsMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    CMaterialMan* materialMan = &MaterialMan;
+    EraseCharaPartsMesh* mesh = modelView->m_meshes;
+    mesh += meshIndex;
+    EraseCharaPartsMeshData* meshData = mesh->m_data;
     EraseCharaPartsDisplayList* displayList = meshData->m_displayLists;
 
     displayList += param_5;
-    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+    materialMan->SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
     if ((callbackData->m_meshIndex != 0xFF) && (meshIndex == callbackData->m_meshIndex)) {
         GXSetArray((GXAttr)0xB, colorArray, 4);

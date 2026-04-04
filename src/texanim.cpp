@@ -778,28 +778,31 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        void** material = &refData->material;
-        int* current = reinterpret_cast<int*>(*material);
+        int* current = reinterpret_cast<int*>(refData->material);
 
         if (current != 0) {
             int refCount = current[1];
-            current[1] = refCount - 1;
-            if ((refCount - 1 == 0) && (current != 0)) {
+            int nextRefCount = refCount - 1;
+
+            current[1] = nextRefCount;
+            if ((nextRefCount == 0) && (current != 0)) {
                 (*(void (**)(int*, int))(*current + 8))(current, 1);
             }
-            *material = 0;
+            refData->material = 0;
         }
 
-        int materialIndex;
-        if ((materialSet != 0) && ((materialIndex = static_cast<int>(materialSet->Find(refData->name))) >= 0)) {
-            *material =
-                (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<unsigned long>(materialIndex)];
-            current = reinterpret_cast<int*>(*material);
-            current[1] = current[1] + 1;
+        if (materialSet != 0) {
+            int materialIndex = static_cast<int>(materialSet->Find(refData->name));
+            if (materialIndex >= 0) {
+                refData->material = (*materials)[static_cast<unsigned long>(materialIndex)];
+                current = reinterpret_cast<int*>(refData->material);
+                current[1] = current[1] + 1;
+            }
         }
     }
 }

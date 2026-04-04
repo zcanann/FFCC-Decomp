@@ -509,7 +509,7 @@ void CPartPcs::createLoad()
 void CPartPcs::createViewer()
 {
     CPartPcsViewerState* viewer = reinterpret_cast<CPartPcsViewerState*>(this);
-    char* stringBase = DAT_801d8068;
+    char* stringBase = s_p_tina_rodata_801d7ee0;
     void* stage;
 
     IsBigAlloc__7CUSBPcsFi(&USBPcs, 1);

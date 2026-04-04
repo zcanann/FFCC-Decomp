@@ -86,75 +86,37 @@ FILE __files[4] = {
 
 /*
  * --INFO--
- * PAL Address: 0x801b2cc4
- * PAL Size: 140b
+ * PAL Address: 0x801b2f44
+ * PAL Size: 144b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int __flush_line_buffered_output_files(void) {
-    int result = 0;
-    FILE* file = &__files[0];
-    unsigned char* file_bytes;
-    unsigned short mode_bits;
+FILE* __find_unopened_file(void) {
+    FILE* result;
+    FILE* prev;
+    FILE* file = __files[2].next_file_struct;
 
     while (file != NULL) {
-        file_bytes = (unsigned char*)file;
-        mode_bits = *(unsigned short*)(file_bytes + 4);
-        if ((((mode_bits >> 6) & 7) != 0) && (((file_bytes[4] >> 1) & 1) != 0) &&
-            (((file_bytes[8] & 0xE0) >> 5) == 1u)) {
-            if (fflush(file) != 0) {
-                result = -1;
-            }
+        if (file->file_mode.file_kind == __closed_file) {
+            return file;
         }
-
+        prev = file;
         file = file->next_file_struct;
+    }
+
+    result = (FILE*)malloc(sizeof(FILE));
+    if (result == NULL) {
+        result = NULL;
+    } else {
+        memset(result, 0, sizeof(FILE));
+        result->is_dynamically_allocated = 1;
+        prev->next_file_struct = result;
+        return result;
     }
 
     return result;
-}
-
-unsigned int __flush_all() {
-  unsigned int retval = 0;
-  FILE* __stream;
-
-    __stream = &__files[0];
-    while (__stream) {
-        if ((__stream->file_mode.file_kind) && (fflush(__stream))) {
-            retval = -1;
-        }
-        __stream = __stream->next_file_struct;
-    };
-
-    return retval;
-}
-
-void __close_all() {
-    FILE* file = &__files[0];
-    FILE* last_file;
-
-    __begin_critical_region(2);
-
-    while (file != NULL) {
-        if (file->file_mode.file_kind != __closed_file) {
-            fclose(file);
-        }
-
-        last_file = file;
-        file = file->next_file_struct;
-
-        if (last_file->is_dynamically_allocated) {
-            free(last_file);
-        } else {
-            last_file->file_mode.file_kind = __strinFile;
-            if (file != NULL && file->is_dynamically_allocated) {
-                last_file->next_file_struct = NULL;
-            }
-        }
-    }
-
-    __end_critical_region(2);
 }
 
 /*
@@ -196,36 +158,74 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, unsigned lo
     file->idle_fn = NULL;
 }
 
+void __close_all() {
+    FILE* file = &__files[0];
+    FILE* last_file;
+
+    __begin_critical_region(2);
+
+    while (file != NULL) {
+        if (file->file_mode.file_kind != __closed_file) {
+            fclose(file);
+        }
+
+        last_file = file;
+        file = file->next_file_struct;
+
+        if (last_file->is_dynamically_allocated) {
+            free(last_file);
+        } else {
+            last_file->file_mode.file_kind = __strinFile;
+            if (file != NULL && file->is_dynamically_allocated) {
+                last_file->next_file_struct = NULL;
+            }
+        }
+    }
+
+    __end_critical_region(2);
+}
+
+unsigned int __flush_all() {
+  unsigned int retval = 0;
+  FILE* __stream;
+
+    __stream = &__files[0];
+    while (__stream) {
+        if ((__stream->file_mode.file_kind) && (fflush(__stream))) {
+            retval = -1;
+        }
+        __stream = __stream->next_file_struct;
+    };
+
+    return retval;
+}
+
 /*
  * --INFO--
- * PAL Address: 0x801b2f44
- * PAL Size: 144b
+ * PAL Address: 0x801b2cc4
+ * PAL Size: 140b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-FILE* __find_unopened_file(void) {
-    FILE* result;
-    FILE* prev;
-    FILE* file = __files[2].next_file_struct;
+int __flush_line_buffered_output_files(void) {
+    int result = 0;
+    FILE* file = &__files[0];
+    unsigned char* file_bytes;
+    unsigned short mode_bits;
 
     while (file != NULL) {
-        if (file->file_mode.file_kind == __closed_file) {
-            return file;
+        file_bytes = (unsigned char*)file;
+        mode_bits = *(unsigned short*)(file_bytes + 4);
+        if ((((mode_bits >> 6) & 7) != 0) && (((file_bytes[4] >> 1) & 1) != 0) &&
+            (((file_bytes[8] & 0xE0) >> 5) == 1u)) {
+            if (fflush(file) != 0) {
+                result = -1;
+            }
         }
-        prev = file;
-        file = file->next_file_struct;
-    }
 
-    result = (FILE*)malloc(sizeof(FILE));
-    if (result == NULL) {
-        result = NULL;
-    } else {
-        memset(result, 0, sizeof(FILE));
-        result->is_dynamically_allocated = 1;
-        prev->next_file_struct = result;
-        return result;
+        file = file->next_file_struct;
     }
 
     return result;

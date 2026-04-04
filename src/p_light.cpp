@@ -283,16 +283,15 @@ void CLightPcs::destroy()
  */
 void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-    CMemory* memory = &Memory;
-    unsigned char* light = reinterpret_cast<unsigned char*>(this) + (static_cast<int>(target) * 0x9c0);
-    unsigned int i = 0;
+    char* light = reinterpret_cast<char*>(this) + (static_cast<int>(target) * 0x9c0);
+    u32 i = 0;
 
     do {
         bool hasTexture = *reinterpret_cast<void**>(light + 0x1cf0) != 0;
 
         if (hasTexture) {
             if (hasTexture) {
-                Free__7CMemoryFPv(memory, *reinterpret_cast<void**>(light + 0x1cf0));
+                Free__7CMemoryFPv(&Memory, *reinterpret_cast<void**>(light + 0x1cf0));
                 *reinterpret_cast<void**>(light + 0x1cf0) = 0;
             }
 

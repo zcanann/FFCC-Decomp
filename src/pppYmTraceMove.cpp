@@ -73,6 +73,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
+	Vec local_8c;
 	Vec local_ec;
 	Vec local_e0;
 	Quaternion local_60;
@@ -93,7 +94,6 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
 		u8* ownerBytes = (u8*)owner;
-		Vec local_8c;
 		Vec local_74;
 
 		local_8c.x = *(f32*)(ownerBytes + 0x15c);
@@ -108,7 +108,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
 
-		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {
+		if ((local_2c.x == kPppYmTraceMoveZero) && (local_2c.y == kPppYmTraceMoveZero) &&
+		    (local_2c.z == kPppYmTraceMoveZero)) {
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
@@ -119,11 +120,11 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	local_60.x = local_20.x;
 	local_60.y = local_20.y;
 	local_60.z = local_20.z;
-	local_60.w = 1.0f;
+	local_60.w = kPppYmTraceMoveOne;
 	local_70.x = local_2c.x;
 	local_70.y = local_2c.y;
 	local_70.z = local_2c.z;
-	local_70.w = 1.0f;
+	local_70.w = kPppYmTraceMoveOne;
 	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
 	PSQUATNormalize(&local_80, &local_80);
 

@@ -12,8 +12,8 @@ extern u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
 
 int Prepared[2];
 
-void* SaveStart;
 void* SaveEnd;
+void* SaveStart;
 
 typedef struct {
     char date[16];
@@ -23,7 +23,7 @@ typedef struct {
     u32 reserved2;
 } AppLoaderStruct;
 
-static AppLoaderStruct FatalParam ATTRIBUTE_ALIGN(32);
+AppLoaderStruct FatalParam ATTRIBUTE_ALIGN(32);
 
 asm void Run(register void* entryPoint) {
     nofralloc
@@ -34,7 +34,7 @@ asm void Run(register void* entryPoint) {
     blr
 }
 
-static void Callback(s32, DVDCommandBlock*) {
+void Callback(s32, DVDCommandBlock*) {
     Prepared[0] = TRUE;
 }
 

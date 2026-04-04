@@ -32,12 +32,12 @@ DSIOResult __TRK_write_console(u32 handle, u8* buffer, u32* count, void* ref_con
     return __write_file(DS_Stdout, buffer, count, ref_con);
 }
 
-static DSIOResult __read_file(u32 handle, u8* buffer, u32* count, void* ref_con)
+DSIOResult __read_file(u32 handle, u8* buffer, u32* count, void* ref_con)
 {
     return __access_file(handle, buffer, count, ref_con, DSMSG_ReadFile);
 }
 
-static DSIOResult __write_file(u32 handle, u8* buffer, u32* count, void* ref_con)
+DSIOResult __write_file(u32 handle, u8* buffer, u32* count, void* ref_con)
 {
     return __access_file(handle, buffer, count, ref_con, DSMSG_WriteFile);
 }

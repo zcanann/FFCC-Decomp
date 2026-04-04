@@ -37,7 +37,6 @@ struct YmDeformationMdlState {
 struct pppYmDeformationMdlLayout {
     u8 m_pad0[0x40];
     pppFMATRIX m_modelMatrix;
-    u8 m_pad70[0x10];
     Vec* m_drawMatrixPtr;
     u8 m_pad74[0xC];
 };

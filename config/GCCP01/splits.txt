@@ -1765,11 +1765,13 @@ gx/GXFrameBuf.c:
 gx/GXLight.c:
 	.text       start:0x801A34F0 end:0x801A3B78
 	.data       start:0x8021C710 end:0x8021C72C
+	.sdata2     start:0x80333860 end:0x803338A8
 
 gx/GXTexture.c:
 	.text       start:0x801A3B78 end:0x801A4B44
 	.data       start:0x8021C730 end:0x8021C958
 	.sdata      start:0x8032EBA0 end:0x8032EBE0
+	.sdata2     start:0x803338A8 end:0x803338D0
 
 gx/GXBump.c:
 	.text       start:0x801A4B44 end:0x801A51D8
@@ -1781,6 +1783,7 @@ gx/GXTev.c:
 gx/GXPixel.c:
 	.text       start:0x801A59BC end:0x801A5FF4
 	.data       start:0x8021C9D0 end:0x8021C9F0
+	.sdata2     start:0x803338D8 end:0x80333910
 
 gx/GXStubs.c:
 	.text       start:0x801A5FF4 end:0x801A5FF8
@@ -1791,6 +1794,7 @@ gx/GXDisplayList.c:
 
 gx/GXTransform.c:
 	.text       start:0x801A6204 end:0x801A69B4
+	.sdata2     start:0x80333910 end:0x80333940
 
 gx/GXPerf.c:
 	.text       start:0x801A69B4 end:0x801A740C

@@ -149,50 +149,25 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
  * JP Size: TODO
  */
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
-    const u16* range;
-    u32 range_adj;
-    u32 tag;
+    u32 fogRangeReg;
+    u32 fogRangeRegK;
+    u32 i;
 
     CHECK_GXBEGIN(331, "GXSetFogRangeAdj");
 
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
-        range = table->r;
-
-        range_adj = (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        tag = 0xE9;
-        range_adj = (range_adj & 0x00FFFFFF) | (tag << 24);
-        GX_WRITE_RAS_REG(range_adj);
-
-        tag = 0xEA;
-        range += 2;
-        range_adj = tag << 24;
-        range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        GX_WRITE_RAS_REG(range_adj);
-
-        tag = 0xEB;
-        range += 2;
-        range_adj = tag << 24;
-        range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        GX_WRITE_RAS_REG(range_adj);
-
-        tag = 0xEC;
-        range += 2;
-        range_adj = tag << 24;
-        range_adj |= (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        GX_WRITE_RAS_REG(range_adj);
-
-        tag = 0xED;
-        range += 2;
-        range_adj = (range[0] & 0xFFF) | ((u32)range[1] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | (tag << 24);
-        GX_WRITE_RAS_REG(range_adj);
+        for (i = 0; i < 10; i += 2) {
+            fogRangeRegK = (table->r[i] & 0xFFF) | ((u32)table->r[i + 1] << 12);
+            fogRangeRegK = (fogRangeRegK & 0x00FFFFFF) | ((0xE9 + (i >> 1)) << 24);
+            GX_WRITE_RAS_REG(fogRangeRegK);
+        }
     }
 
-    range_adj = (center + 342) & 0xFFFFFBFF;
-    range_adj |= (u32)(u8)enable << 10;
-    range_adj = (range_adj & 0x00FFFFFF) | 0xE8000000;
-    GX_WRITE_RAS_REG(range_adj);
+    fogRangeReg = (center + 342) & 0xFFFFFBFF;
+    fogRangeReg |= (u32)(u8)enable << 10;
+    fogRangeReg = (fogRangeReg & 0x00FFFFFF) | 0xE8000000;
+    GX_WRITE_RAS_REG(fogRangeReg);
     __GXData->bpSentNot = 0;
 }
 

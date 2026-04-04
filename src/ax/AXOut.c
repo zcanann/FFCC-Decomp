@@ -19,8 +19,8 @@ static int __AXDSPDoneFlag;
 
 static volatile u32 __AXDebugSteppingMode;
 static OSThreadQueue __AXOutThreadQueue;
-s32 __AXSpbAL;
 s32 __AXSpbAR;
+s32 __AXSpbAL;
 
 // prototypes
 static void __AXDSPInitCallback(void* task);
@@ -106,9 +106,11 @@ static void __AXDSPInitCallback(void* task) {
     __AXDSPInitFlag = 1;
 }
 
+#if DEBUG
 void AXSetStepMode(u32 i) {
     __AXDebugSteppingMode = i;
 }
+#endif
 
 static void __AXDSPResumeCallback(void* task) {
 #if DEBUG

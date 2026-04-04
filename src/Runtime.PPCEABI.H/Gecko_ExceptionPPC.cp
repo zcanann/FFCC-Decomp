@@ -74,7 +74,12 @@ typedef struct ActionIterator {
 static ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
-extern "C" char s_bad_exception[];
+extern "C" {
+extern const char s_std_bad_exception[];
+extern const char s_std_exception[];
+extern const char s_bad_exception[];
+extern const char s_exception[];
+}
 
 namespace std {
 
@@ -714,6 +719,13 @@ extern void __unexpected(CatchInfo* catchinfo)
 		}
 	}
 	std::terminate();
+}
+
+extern "C" {
+const char s_std_bad_exception[] = "std::bad_exception";
+const char s_std_exception[]     = "std::exception";
+const char s_bad_exception[]     = "bad_exception";
+const char s_exception[]         = "exception";
 }
 
 /**

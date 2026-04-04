@@ -391,9 +391,8 @@ static char* long2str(long num, char* buff, print_format format)
 
     if (digits < format.precision) {
         unsigned int remaining = format.precision - digits;
-        unsigned int blocks = remaining >> 3;
-
-        if (blocks != 0) {
+        if (remaining >= 8) {
+            unsigned int blocks = remaining >> 3;
             do {
                 *--p = '0';
                 *--p = '0';
@@ -408,16 +407,15 @@ static char* long2str(long num, char* buff, print_format format)
             } while (blocks != 0);
 
             remaining &= 7;
-            if (remaining == 0) {
-                goto long2str_done_zero_pad;
-            }
         }
 
-        do {
-            *--p = '0';
-            ++digits;
-            --remaining;
-        } while (remaining != 0);
+        if (remaining != 0) {
+            do {
+                *--p = '0';
+                ++digits;
+                --remaining;
+            } while (remaining != 0);
+        }
     }
 
 long2str_done_zero_pad:
@@ -521,9 +519,8 @@ static char* longlong2str(long long num, char* pBuf, print_format fmt)
 
     if (digits < fmt.precision) {
         unsigned int remaining = fmt.precision - digits;
-        unsigned int blocks = remaining >> 3;
-
-        if (blocks != 0) {
+        if (remaining >= 8) {
+            unsigned int blocks = remaining >> 3;
             do {
                 *--p = '0';
                 *--p = '0';
@@ -538,16 +535,15 @@ static char* longlong2str(long long num, char* pBuf, print_format fmt)
             } while (blocks != 0);
 
             remaining &= 7;
-            if (remaining == 0) {
-                goto longlong2str_done_zero_pad;
-            }
         }
 
-        do {
-            *--p = '0';
-            ++digits;
-            --remaining;
-        } while (remaining != 0);
+        if (remaining != 0) {
+            do {
+                *--p = '0';
+                ++digits;
+                --remaining;
+            } while (remaining != 0);
+        }
     }
 
 longlong2str_done_zero_pad:

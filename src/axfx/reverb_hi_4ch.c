@@ -8,11 +8,6 @@ extern f32 powf(f32 x, f32 y);
 
 static void ReverbHIDpl2Free(AXFX_REVHI_WORK_DPL2* rv);
 
-static const s32 axfx_reverb_hi_dpl2_lens[9] = {
-    0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1, 0x00000095,
-    0x0000002F, 0x00000049, 0x00000043, 0x00000047,
-};
-
 static const f32 axfx_reverb_hi_dpl2_f32_0 = 0.0f;
 static const f32 axfx_reverb_hi_dpl2_f32_1 = 1.0f;
 static const f32 axfx_reverb_hi_dpl2_f32_0p01 = 0.01f;
@@ -59,6 +54,10 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     u8 i;
     u8 k;
     f32 timeFactor;
+    static s32 lens[9] = {
+        0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1, 0x00000095,
+        0x0000002F, 0x00000049, 0x00000043, 0x00000047,
+    };
 
     ASSERTMSGLINE(117, coloration >= axfx_reverb_hi_dpl2_f32_0 && coloration <= axfx_reverb_hi_dpl2_f32_1 &&
                            time >= axfx_reverb_hi_dpl2_f32_0p01 && time <= axfx_reverb_hi_dpl2_f32_10 &&
@@ -80,18 +79,18 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
 
     for (k = 0; k < 4; k++) {
         for (i = 0; i < 3; i++) {
-            DLcreateDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i] + 2);
-            DLsetdelayDpl2(&rv->C[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i]);
-            rv->combCoef[i + (k * 3)] = powf(axfx_reverb_hi_dpl2_f32_10, (axfx_reverb_hi_dpl2_lens[i] * -3) / timeFactor);
+            DLcreateDpl2(&rv->C[i + (k * 3)], lens[i] + 2);
+            DLsetdelayDpl2(&rv->C[i + (k * 3)], lens[i]);
+            rv->combCoef[i + (k * 3)] = powf(axfx_reverb_hi_dpl2_f32_10, (lens[i] * -3) / timeFactor);
         }
 
         for (i = 0; i < 2; i++) {
-            DLcreateDpl2(&rv->AP[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i + 3] + 2);
-            DLsetdelayDpl2(&rv->AP[i + (k * 3)], axfx_reverb_hi_dpl2_lens[i + 3]);
+            DLcreateDpl2(&rv->AP[i + (k * 3)], lens[i + 3] + 2);
+            DLsetdelayDpl2(&rv->AP[i + (k * 3)], lens[i + 3]);
         }
 
-        DLcreateDpl2(&rv->AP[2 + (k * 3)], axfx_reverb_hi_dpl2_lens[k + 5] + 2);
-        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], axfx_reverb_hi_dpl2_lens[k + 5]);
+        DLcreateDpl2(&rv->AP[2 + (k * 3)], lens[k + 5] + 2);
+        DLsetdelayDpl2(&rv->AP[2 + (k * 3)], lens[k + 5]);
         rv->lpLastout[k] = 0.0f;
     }
 

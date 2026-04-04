@@ -170,27 +170,6 @@ COctTree::~COctTree()
 
 /*
  * --INFO--
- * PAL Address: 0x8002f384
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" COctTree* dtor_8002F384(COctTree* octTree, short param_2)
-{
-	if (octTree != 0) {
-		octTree->~COctTree();
-		if (0 < param_2) {
-			__dl__FPv(octTree);
-		}
-	}
-
-	return octTree;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8002ef9c
  * PAL Size: 952b
  * EN Address: TODO

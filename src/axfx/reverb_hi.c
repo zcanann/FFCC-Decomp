@@ -719,14 +719,15 @@ int AXFXReverbHiShutdown(AXFX_REVERBHI* rev) {
 }
 
 int AXFXReverbHiSettings(AXFX_REVERBHI* rev) {
+    int ret;
     BOOL old;
 
     old = OSDisableInterrupts();
     rev->tempDisableFX = 1;
-    ReverbHIModify(&rev->rv, rev->coloration, rev->time, rev->mix, rev->damping, rev->preDelay, rev->crosstalk);
+    ret = ReverbHIModify(&rev->rv, rev->coloration, rev->time, rev->mix, rev->damping, rev->preDelay, rev->crosstalk);
     rev->tempDisableFX = 0;
     OSRestoreInterrupts(old);
-    return 1;
+    return ret;
 }
 
 void AXFXReverbHiCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBHI* reverb) {

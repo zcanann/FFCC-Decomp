@@ -76,28 +76,6 @@ CFlatRuntime::~CFlatRuntime()
 
 /*
  * --INFO--
- * PAL Address: 0x80069a2c
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CFlatRuntime* dtor_80069A2C(CFlatRuntime* flatRuntime, short shouldDelete)
-{
-	if (flatRuntime != 0) {
-		*(void***)flatRuntime = __vt__12CFlatRuntime;
-		reinterpret_cast<CFlatRuntimeLifecycleProxy*>(flatRuntime)->Quit();
-		if (0 < shouldDelete) {
-			__dl__FPv(flatRuntime);
-		}
-	}
-
-	return flatRuntime;
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

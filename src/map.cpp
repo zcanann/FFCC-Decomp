@@ -899,7 +899,13 @@ CPtrArray<CMapAnimKeyDt*>::CPtrArray()
 template <>
 CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 {
-    RemoveAll();
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -965,7 +971,13 @@ CPtrArray<CMapShadow*>::CPtrArray()
 template <>
 CPtrArray<CMapShadow*>::~CPtrArray()
 {
-    RemoveAll();
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*

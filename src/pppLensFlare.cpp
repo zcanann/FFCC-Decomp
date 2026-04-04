@@ -153,7 +153,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			u8 alpha = (u8)scaledAlpha;
 
 			work->m_alpha = alpha;
-			if ((scaledAlpha & 0xFF) < 0x100) {
+			if (alpha < 0x100) {
 				work->m_alpha = alpha;
 			} else {
 				work->m_alpha = 0xff;

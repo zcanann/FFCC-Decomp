@@ -53,8 +53,8 @@ const float FLOAT_8032fb3c = 1.0f;
 const float FLOAT_8032fb4c = 1.25f;
 const double DOUBLE_8032fb40 = 4503599627370496.0;
 
-static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
+static char s_ptrarray_grow_error_801D7B14[] = "CPtrArray grow error";
 
 inline void* operator new(unsigned long, void* p)
 {
@@ -318,13 +318,13 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(s_ptrarray_grow_error_801D7B14);
             }
             m_size = m_size << 1;
         }
 
         newItems = (CTexAnimSeq**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h_801D7B30, 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }
@@ -532,13 +532,13 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(s_ptrarray_grow_error_801D7B14);
             }
             m_size = m_size << 1;
         }
 
         newItems = (CTexAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h_801D7B30, 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }

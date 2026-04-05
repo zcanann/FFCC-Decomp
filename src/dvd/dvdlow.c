@@ -6,7 +6,7 @@
 
 #define DVD_WATYPE_MAX 2
 
-extern BOOL FirstRead;
+BOOL FirstRead = TRUE;
 static volatile BOOL StopAtNextInt = FALSE;
 extern u32 LastLength;
 static DVDLowCallback Callback = NULL;

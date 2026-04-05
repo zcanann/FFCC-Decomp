@@ -9,7 +9,7 @@ typedef struct FSTEntry {
     /* 0x08 */ unsigned int nextEntryOrLength;
 } FSTEntry;
 
-BOOL FirstRead;
+extern BOOL FirstRead;
 u32 LastLength;
 volatile u32 NextCommandNumber;
 

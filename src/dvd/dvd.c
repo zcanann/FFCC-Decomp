@@ -17,8 +17,6 @@ static const char s___DVDVersion[] = "<< Dolphin SDK - DVD\trelease build: Oct 2
 #endif
 
 const char* __DVDVersion = s___DVDVersion;
-
-static char s_dvd_c[] = "dvd.c";
 static char s_load_fst[] = "load fst\n";
 static char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";
 
@@ -144,7 +142,7 @@ static void stateReadingFST() {
     LastState = stateReadingFST;
     ASSERTLINE(652, ((u32)(bootInfo->FSTLocation) & (32 - 1)) == 0);
     if (bootInfo->FSTMaxLength < BB2.FSTLength) {
-        OSPanic(s_dvd_c, 647, s_DVDChangeDiskFSTTooBig);
+        OSPanic("dvd.c", 647, s_DVDChangeDiskFSTTooBig);
     }
     DVDLowRead(bootInfo->FSTLocation, (u32)(BB2.FSTLength + 0x1F) & 0xFFFFFFE0, BB2.FSTPosition, cbForStateReadingFST);
 }

@@ -1,14 +1,14 @@
 #include "dolphin/gba/GBAPriv.h"
 
-static GBASecParam SecParams[4];
+extern GBASecParam SecParams[4];
 GBAControl __GBA[4];
 BOOL __GBAReset = FALSE;
 
-static BOOL OnReset4(BOOL final);
+BOOL OnReset4(BOOL final);
 
 static OSResetFunctionInfo ResetFunctionInfo = {OnReset4, 127};
 
-static void ShortCommandProc(s32 chan) {
+void ShortCommandProc(s32 chan) {
     GBAControl* gba;
     gba = &__GBA[chan];
 

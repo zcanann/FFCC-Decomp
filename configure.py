@@ -896,7 +896,7 @@ config.libs = [
     DolphinLib(
         "gba",
         [
-            Object(NonMatching, "gba/GBA.c"),
+            Object(Matching, "gba/GBA.c"),
             Object(Matching, "gba/GBAGetProcessStatus.c"),
             Object(NonMatching, "gba/GBAJoyBoot.c"),
             Object(Matching, "gba/GBARead.c"),
@@ -925,7 +925,7 @@ config.libs = [
                 extra_cflags=["-inline auto,deferred", "-char signed"],
             ),
             Object(
-                NonMatching,
+                Matching,
                 "Runtime.PPCEABI.H/global_destructor_chain.c",
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),

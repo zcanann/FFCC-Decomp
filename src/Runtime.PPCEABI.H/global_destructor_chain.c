@@ -23,5 +23,5 @@ void* __register_global_object(void* object, void* destructor, void* regmem) {
 }
 
 /* clang-format off */
-__declspec(section ".dtors") extern void* const __destroy_global_chain_reference = __destroy_global_chain;
+static __declspec(section ".dtors") void* const __destroy_global_chain_reference = __destroy_global_chain;
 /* clang-format on */

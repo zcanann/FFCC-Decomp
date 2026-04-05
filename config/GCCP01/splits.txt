@@ -1583,7 +1583,7 @@ vi/vi.c:
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC
-	.rodata     start:0x801E2F24 end:0x801E2F30
+	.rodata     start:0x801E6610 end:0x801E661A
 
 pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04

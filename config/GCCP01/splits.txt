@@ -1493,13 +1493,14 @@ os/OSThread.c:
 
 os/OSTime.c:
 	.text       start:0x80181BF8 end:0x8018201C
+	.data       start:0x80217150 end:0x802171B0
 
 os/__ppc_eabi_init.c:
 	.text       start:0x8018201C end:0x801820B0
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
-	.data       start:0x80217150 end:0x80217304
+	.data       start:0x802171B0 end:0x80217304
 	.bss        start:0x8030C690 end:0x8030C750
 	.sdata      start:0x8032EAB8 end:0x8032EAC0
 	.sbss       start:0x8032EFE8 end:0x8032EFF0

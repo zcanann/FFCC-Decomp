@@ -1501,7 +1501,7 @@ os/__ppc_eabi_init.c:
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
-	.data       start:0x802171B0 end:0x80217304
+	.data       start:0x802171B0 end:0x802172C0
 	.bss        start:0x8030C690 end:0x8030C750
 	.sdata      start:0x8032EAB8 end:0x8032EAC0
 	.sbss       start:0x8032EFE8 end:0x8032EFF0
@@ -1512,7 +1512,7 @@ exi/EXIUart.c:
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
-	.data       start:0x80217304 end:0x802173D8
+	.data       start:0x802172C0 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
 	.sdata      start:0x8032EAC0 end:0x8032EAD0
 	.sbss       start:0x8032F004 end:0x8032F00C

@@ -676,13 +676,13 @@ config.libs = [
         "os",
         [
             Object(
-                NonMatching,
+                Matching,
                 "dolphin/os/__start.c",
                 source="os/__start.c",
             ),
             Object(Matching, "os/__ppc_eabi_init.c"),
             Object(
-                NonMatching,
+                Matching,
                 "dolphin/os/__ppc_eabi_init.cpp",
                 source="os/__ppc_eabi_init.cpp",
                 cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),

@@ -61,7 +61,7 @@ char gEXIStringTable[] =
     "Broadband Adapter\0\0\0"
     "Stream Hanger\0\0\0"
     "IS-DOL-VIEWER\0\0\0\0\0\0";
-static char sSIVersionString[] = "<< Dolphin SDK - SI\trelease build: Sep  5 2002 05:33:08 (0x2301) >>";
+char SIVersionString[] = "<< Dolphin SDK - SI\trelease build: Sep  5 2002 05:33:08 (0x2301) >>";
 const char* __EXIVersion = gEXIStringTable;
 static u32 sExiSdataPad = 0;
 #endif

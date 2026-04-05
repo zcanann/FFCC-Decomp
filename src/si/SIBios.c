@@ -5,11 +5,9 @@
 
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 
-#ifdef DEBUG
-const char* __SIVersion = "<< Dolphin SDK - SI\tdebug build: Apr  5 2004 03:55:31 (0x2301) >>";
-#else
-const char* __SIVersion = "<< Dolphin SDK - SI\trelease build: Sep  5 2002 05:33:08 (0x2301) >>";
-#endif
+extern char SIVersionString[];
+
+char* __SIVersion = SIVersionString;
 
 static SIControl Si = {
     /* chan */       -1,
@@ -22,6 +20,18 @@ static SIControl Si = {
 static SIPacket Packet[4];
 static OSAlarm Alarm[4];
 static u32 Type[4] = { SI_ERROR_NO_RESPONSE, SI_ERROR_NO_RESPONSE, SI_ERROR_NO_RESPONSE, SI_ERROR_NO_RESPONSE };
+char SITypeStrings[] =
+    "No response\0"
+    "N64 controller\0\0"
+    "N64 microphone\0\0"
+    "N64 keyboard\0\0\0\0"
+    "N64 mouse\0\0\0"
+    "GameBoy Advance\0"
+    "Standard controller\0"
+    "Wireless receiver\0\0\0"
+    "WaveBird controller\0"
+    "Keyboard\0\0\0\0"
+    "Steering\0\0\0\0\0\0\0";
 static OSTime TypeTime[4];
 static OSTime XferTime[4];
 static SITypeCallback TypeCallback[4][4];
@@ -29,6 +39,11 @@ static __OSInterruptHandler RDSTHandler[4];
 static BOOL InputBufferValid[4];
 static u32 InputBuffer[4][2];
 static volatile u32 InputBufferVcount[4];
+typedef union FloatPair {
+    u64 align;
+    f32 values[2];
+} FloatPair;
+FloatPair Unit01 = { 0x000000003F800000ULL };
 
 u32 __PADFixBits;
 
@@ -763,36 +778,4 @@ u32 SIDecodeType(u32 type) {
 
 u32 SIProbe(s32 chan) {
     return SIDecodeType(SIGetType(chan));
-}
-
-char* SIGetTypeString(u32 type) {
-    switch (SIDecodeType(type)) {
-    case SI_ERROR_NO_RESPONSE:
-        return "No response";
-    case SI_ERROR_BUSY:
-        return "Busy";
-    case SI_N64_CONTROLLER:
-        return "N64 controller";
-    case SI_N64_MIC:
-        return "N64 microphone";
-    case SI_N64_KEYBOARD:
-        return "N64 keyboard";
-    case SI_N64_MOUSE:
-        return "N64 mouse";
-    case SI_GBA:
-        return "GameBoy Advance";
-    case SI_GC_CONTROLLER:
-        return "Standard controller";
-    case SI_GC_RECEIVER:
-        return "Wireless receiver";
-    case SI_GC_WAVEBIRD:
-        return "WaveBird controller";
-    case SI_GC_KEYBOARD:
-        return "Keyboard";
-    case SI_GC_STEERING:
-        return "Steering";
-    case SI_ERROR_UNKNOWN:
-    default:
-        return "Unknown";
-    }
 }

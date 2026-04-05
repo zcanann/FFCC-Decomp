@@ -25,10 +25,10 @@ static u8 *__THPLCWork512[3];
 static u8 *__THPLCWork640[3];
 u32 __THPOldGQR5;
 u32 __THPOldGQR6;
-static u8 *__THPWorkArea;
+u8 *__THPWorkArea;
 static THPCoeff *__THPMCUBuffer[6];
 THPFileInfo *__THPInfo;
-static BOOL __THPInitFlag;
+BOOL __THPInitFlag;
 
 #define THPROUNDUP(a, b) ((((s32)(a)) + ((s32)(b)-1L)) / ((s32)(b)))
 

@@ -705,7 +705,7 @@ config.libs = [
             Object(Matching, "os/OSMutex.c"),
             Object(Matching, "os/OSReboot.c"),
             Object(NonMatching, "os/OSReset.c"),
-            Object(NonMatching, "os/OSResetSW.c"),
+            Object(Matching, "os/OSResetSW.c"),
             Object(NonMatching, "os/OSRtc.c"),
             Object(Matching, "os/OSSemaphore.c"),
             Object(Matching, "os/OSStopwatch.c"),

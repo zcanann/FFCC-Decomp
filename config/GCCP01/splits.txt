@@ -1851,7 +1851,7 @@ TRK_MINNOW_DOLPHIN/msgbuf.c:
 
 TRK_MINNOW_DOLPHIN/serpoll.c:
 	.text       start:0x801A9D3C end:0x801A9FF4
-	.rodata     start:0x801E6698 end:0x801E6828
+	.rodata     start:0x801E6698 end:0x801E6821
 	.bss        start:0x8032A100 end:0x8032A114
 	.sbss       start:0x8032F358 end:0x8032F35C
 
@@ -1920,7 +1920,7 @@ TRK_MINNOW_DOLPHIN/main_TRK.c:
 
 TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x801AE0D4 end:0x801AE62C
-	.rodata     start:0x801E6BA0 end:0x801E6CA8
+	.rodata     start:0x801E6BA0 end:0x801E6CA4
 	.data       start:0x8021D038 end:0x8021D060
 	.bss        start:0x8032A6B0 end:0x8032A6C0
 
@@ -2025,7 +2025,7 @@ MSL_C/PPCEABI/bare/H/ansi_files.c:
 
 MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x801B2FD4 end:0x801B4F28
-	.rodata     start:0x801E6FD8 end:0x801E70B8
+	.rodata     start:0x801E6FD8 end:0x801E70B5
 	.data       start:0x8021D298 end:0x8021D3C0
 
 MSL_C/PPCEABI/bare/H/buffer_io.c:

@@ -1445,6 +1445,7 @@ os/OSFont.c:
 
 os/OSInterrupt.c:
 	.text       start:0x8017E340 end:0x8017EBAC
+	.data       start:0x80217110 end:0x80217140
 	.sbss       start:0x8032EF80 end:0x8032EF98
 
 os/OSLink.c:

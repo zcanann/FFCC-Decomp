@@ -25,6 +25,7 @@ static OSInterruptMask InterruptPrioTable[] = {
     OS_INTERRUPTMASK_DSP_AI,
     OS_INTERRUPTMASK_PI_CP,
     0xFFFFFFFF,
+    0,
 };
 
 #if DEBUG
@@ -290,28 +291,6 @@ static u32 SetInterruptMask(OSInterruptMask mask, OSInterruptMask current) {
         break;
     }
     return mask;
-}
-
-OSInterruptMask OSGetInterruptMask(void) { 
-    return *(OSInterruptMask*)OSPhysicalToCached(0x00C8);
-}
-
-OSInterruptMask OSSetInterruptMask(OSInterruptMask local) {
-    BOOL enabled;
-    OSInterruptMask global;
-    OSInterruptMask prev;
-    OSInterruptMask mask;
-
-    enabled = OSDisableInterrupts();
-    global = *(OSInterruptMask*)OSPhysicalToCached(0x00C4);
-    prev = *(OSInterruptMask*)OSPhysicalToCached(0x00C8);
-    mask = (global | prev) ^ local;
-    *(OSInterruptMask*)OSPhysicalToCached(0x00C8) = local;
-    while (mask) {
-        mask = SetInterruptMask(mask, global | local);
-    }
-    OSRestoreInterrupts(enabled);
-    return prev;
 }
 
 OSInterruptMask __OSMaskInterrupts(OSInterruptMask global) {

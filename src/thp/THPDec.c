@@ -1,10 +1,10 @@
 #include <dolphin/thp.h>
 #include <dolphin/base/PPCArch.h>
 
-#ifdef DEBUG
+#if DEBUG
 static const char s___THPVersion[] = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";
 #else
-static const char s___THPVersion[] = "<< Dolphin SDK - THP\trelease build: Aug 27 2002 20:42:01 >>";
+extern const char s___THPVersion[];
 #endif
 const char* __THPVersion = s___THPVersion;
 

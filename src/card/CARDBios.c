@@ -5,10 +5,10 @@
 #if DEBUG
 static const char s___CARDVersion[] = "<< Dolphin SDK - CARD\tdebug build: Apr  5 2004 03:56:53 (0x2301) >>";
 #else
-static const char s___CARDVersion[] = "<< Dolphin SDK - CARD\trelease build: Sep  5 2002 05:35:20 (0x2301) >>";
+extern const char s___CARDVersion[];
 #endif
 const char* __CARDVersion = s___CARDVersion;
-u32 __CARDFreq = EXI_FREQ_16M;
+u32 __CARDFreq = 0;
 
 CARDControl __CARDBlock[2];
 

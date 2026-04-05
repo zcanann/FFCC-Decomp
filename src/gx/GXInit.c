@@ -13,7 +13,7 @@
 #if DEBUG
 static const char s___GXVersion[] = "<< Dolphin SDK - GX\tdebug build: Apr  5 2004 03:55:13 (0x2301) >>";
 #else
-static const char s___GXVersion[] = "<< Dolphin SDK - GX\trelease build: Feb  7 2003 04:01:13 (0x2301) >>";
+extern const char s___GXVersion[];
 #endif
 static GXFifoObj FifoObj;
 const char* __GXVersion = s___GXVersion;

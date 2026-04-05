@@ -1352,6 +1352,7 @@ goout.cpp:
 	extab       start:0x8000A01C end:0x8000A06C
 	extabindex  start:0x800114F4 end:0x8001156C
 	.text       start:0x80168130 end:0x8016C9E8
+	.rodata     start:0x801DF264 end:0x801DF27C
 
 pppDrawMatrixLoc.cpp:
 	extab       start:0x8000A06C end:0x8000A074
@@ -1500,7 +1501,7 @@ exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
 	.data       start:0x80217150 end:0x80217304
 	.bss        start:0x8030C690 end:0x8030C750
-	.sdata      start:0x8032EAB8 end:0x8032EAC0
+	.sdata      start:0x8032EAC0 end:0x8032EAC8
 	.sbss       start:0x8032EFE8 end:0x8032EFF0
 
 exi/EXIUart.c:
@@ -1511,16 +1512,17 @@ si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
 	.data       start:0x80217304 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
-	.sdata      start:0x8032EAC0 end:0x8032EAD0
-	.sbss       start:0x8032F004 end:0x8032F00C
+	.sdata      start:0x8032EAC8 end:0x8032EAD0
+	.sbss       start:0x8032F018 end:0x8032F028
 
 si/SISamplingRate.c:
 	.text       start:0x801858B0 end:0x801859B8
 	.data       start:0x802173D8 end:0x80217470
-	.sbss       start:0x8032F010 end:0x8032F014
+	.sbss       start:0x8032F028 end:0x8032F030
 
 mtx/mtx.c:
 	.text       start:0x801859B8 end:0x801863F4
+	.sdata      start:0x8032EAD0 end:0x8032EAD8
 
 mtx/mtxvec.c:
 	.text       start:0x801863F4 end:0x80186528
@@ -1540,17 +1542,20 @@ mtx/quat.c:
 dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0
 	.bss        start:0x8030C950 end:0x8030CA20
-	.sbss       start:0x8032F018 end:0x8032F054
+	.sdata      start:0x8032EAD8 end:0x8032EAE0
+	.sbss       start:0x8032F030 end:0x8032F078
 
 dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
-	.sbss       start:0x8032F054 end:0x8032F074
+	.sdata      start:0x8032EAE0 end:0x8032EAE8
+	.sbss       start:0x8032F078 end:0x8032F098
 
 dvd/dvd.c:
 	.text       start:0x80188A70 end:0x8018B16C
 	.data       start:0x802175F0 end:0x80217728
 	.bss        start:0x8030CA20 end:0x8030CAB8
-	.sbss       start:0x8032F074 end:0x8032F0D0
+	.sdata      start:0x8032EAE8 end:0x8032EB00
+	.sbss       start:0x8032F098 end:0x8032F0E0
 
 dvd/dvdqueue.c:
 	.text       start:0x8018B16C end:0x8018B364
@@ -1565,21 +1570,21 @@ dvd/dvdidutils.c:
 
 dvd/dvdFatal.c:
 	.text       start:0x8018B5F4 end:0x8018B624
-	.rodata     start:0x801DF264 end:0x801DF27C
-	.sbss       start:0x8032F0D0 end:0x8032F0D4
+	.sbss       start:0x8032F0E0 end:0x8032F0E4
 
 dvd/fstload.c:
 	.text       start:0x8018B624 end:0x8018B864
 	.data       start:0x80217770 end:0x802177E0
 	.bss        start:0x8030CAD8 end:0x8030CB48
-	.sbss       start:0x8032F0D4 end:0x8032F0E0
+	.sdata      start:0x8032EB00 end:0x8032EB10
+	.sbss       start:0x8032F0E8 end:0x8032F0F8
 
 vi/vi.c:
 	.text       start:0x8018B864 end:0x8018D298
 	.data       start:0x802177E0 end:0x80217BF8
 	.bss        start:0x8030CB48 end:0x8030CC90
-	.sdata      start:0x8032EAD0 end:0x8032EAE0
-	.sbss       start:0x8032F0E0 end:0x8032F134
+	.sdata      start:0x8032EB10 end:0x8032EB20
+	.sbss       start:0x8032F0F8 end:0x8032F150
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC
@@ -1589,31 +1594,31 @@ pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
 	.data       start:0x80217BF8 end:0x80217C08
 	.bss        start:0x8030CC90 end:0x8030CCE0
-	.sdata      start:0x8032EB18 end:0x8032EB38
-	.sbss       start:0x8032F134 end:0x8032F164
+	.sdata      start:0x8032EB20 end:0x8032EB40
+	.sbss       start:0x8032F150 end:0x8032F178
 
 ai/ai.c:
 	.text       start:0x8018EE04 end:0x8018F710
 	.data       start:0x80217C08 end:0x80217C50
-	.sdata      start:0x8032EB38 end:0x8032EB40
-	.sbss       start:0x8032F164 end:0x8032F1B0
+	.sdata      start:0x8032EB40 end:0x8032EB48
+	.sbss       start:0x8032F178 end:0x8032F1B8
 
 ar/ar.c:
 	.text       start:0x8018F710 end:0x801911E8
 	.data       start:0x80217C50 end:0x80217C98
-	.sdata      start:0x8032EB40 end:0x8032EB48
-	.sbss       start:0x8032F1B0 end:0x8032F1D0
+	.sdata      start:0x8032EB48 end:0x8032EB50
+	.sbss       start:0x8032F1B8 end:0x8032F1D8
 
 ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
 	.data       start:0x80217C98 end:0x80217CE0
-	.sdata      start:0x8032EB48 end:0x8032EB4C
-	.sbss       start:0x8032F1D0 end:0x8032F200
+	.sdata      start:0x8032EB50 end:0x8032EB58
+	.sbss       start:0x8032F1D8 end:0x8032F200
 
 ax/AX.c:
 	.text       start:0x801915A4 end:0x80191614
 	.data       start:0x80217CE0 end:0x80217D28
-	.sdata      start:0x8032EB50 end:0x8032EB58
+	.sdata      start:0x8032EB58 end:0x8032EB68
 
 ax/AXAlloc.c:
 	.text       start:0x80191614 end:0x80191ADC
@@ -1661,7 +1666,7 @@ axfx/delay.c:
 
 axfx/axfx.c:
 	.text       start:0x801969C4 end:0x80196A20
-	.sdata      start:0x8032EB60 end:0x8032EB68
+	.sdata      start:0x8032EB68 end:0x8032EB70
 
 axfx/reverb_hi_4ch.c:
 	.text       start:0x80196A20 end:0x80197958
@@ -1679,7 +1684,7 @@ axart/axart3d.c:
 
 dsp/dsp.c:
 	.text       start:0x80197A1C end:0x80197CAC
-	.sdata      start:0x8032EB68 end:0x8032EB6C
+	.sdata      start:0x8032EB70 end:0x8032EB78
 
 dsp/dsp_debug.c:
 	.text       start:0x80197CAC end:0x80197CFC
@@ -1691,11 +1696,12 @@ card/CARDBios.c:
 	.text       start:0x80198580 end:0x801998E8
 	.data       start:0x8021C1C0 end:0x8021C1D0
 	.bss        start:0x80327540 end:0x80327780
-	.sdata      start:0x8032EB70 end:0x8032EB78
+	.sdata      start:0x8032EB78 end:0x8032EB80
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48
 	.data       start:0x8021C1E0 end:0x8021C340
+	.sdata      start:0x8032EB80 end:0x8032EB88
 
 card/CARDRdwr.c:
 	.text       start:0x8019AB48 end:0x8019ADC8
@@ -1736,13 +1742,13 @@ card/CARDStat.c:
 
 card/CARDNet.c:
 	.text       start:0x8019EE80 end:0x8019EF44
-	.sdata      start:0x8032EB80 end:0x8032EB88
+	.sdata      start:0x8032EB88 end:0x8032EB90
 
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8
 	.data       start:0x8021C3C4 end:0x8021C4C0
 	.bss        start:0x80327780 end:0x80327CF8
-	.sdata      start:0x8032EB88 end:0x8032EB90
+	.sdata      start:0x8032EB90 end:0x8032EB98
 	.sbss       start:0x8032F2E8 end:0x8032F310
 
 gx/GXFifo.c:
@@ -1752,7 +1758,7 @@ gx/GXFifo.c:
 gx/GXAttr.c:
 	.text       start:0x801A0B10 end:0x801A1C80
 	.data       start:0x8021C4C0 end:0x8021C620
-	.sdata      start:0x8032EB90 end:0x8032EBA0
+	.sdata      start:0x8032EB98 end:0x8032EBA8
 
 gx/GXMisc.c:
 	.text       start:0x801A1C80 end:0x801A2424
@@ -1773,7 +1779,7 @@ gx/GXLight.c:
 gx/GXTexture.c:
 	.text       start:0x801A3B78 end:0x801A4B44
 	.data       start:0x8021C730 end:0x8021C958
-	.sdata      start:0x8032EBA0 end:0x8032EBE0
+	.sdata      start:0x8032EBA8 end:0x8032EBE8
 	.sdata2     start:0x803338A8 end:0x803338D0
 
 gx/GXBump.c:
@@ -1973,13 +1979,13 @@ Runtime.PPCEABI.H/New.cp:
 	.text       start:0x801AF7FC end:0x801AF87C
 	.rodata     start:0x801E6E68 end:0x801E6E88
 	.data       start:0x8021D060 end:0x8021D070
-	.sdata      start:0x8032EBE0 end:0x8032EBE8
+	.sdata      start:0x8032EBE8 end:0x8032EBF0
 
 Runtime.PPCEABI.H/NMWException.cp:
 	extab       start:0x8000A204 end:0x8000A26C
 	extabindex  start:0x800117A0 end:0x8001180C
 	.text       start:0x801AF87C end:0x801AFEEC
-	.sdata      start:0x8032EBE8 end:0x8032EBF0
+	.sdata      start:0x8032EBF0 end:0x8032EBF8
 
 Runtime.PPCEABI.H/ptmf.c:
 	.text       start:0x801AFEEC end:0x801AFF44
@@ -1992,7 +1998,7 @@ Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
 	.text       start:0x801B063C end:0x801B06B8
 	.ctors      start:0x801D53A0 end:0x801D53A4
 	.dtors      start:0x801D5460 end:0x801D5468
-	.sdata      start:0x8032EBF0 end:0x8032EBF4
+	.sdata      start:0x8032EBF8 end:0x8032EBFC
 
 Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	extab       start:0x8000A26C end:0x8000A2E0
@@ -2001,6 +2007,7 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	.rodata     start:0x801E6EB0 end:0x801E6F48
 	.data       start:0x8021D070 end:0x8021D158
 	.bss        start:0x8032B400 end:0x8032B40C
+	.sdata      start:0x8032EC00 end:0x8032EC10
 
 Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801B1AF0 end:0x801B1C60
@@ -2063,11 +2070,11 @@ MSL_C/PPCEABI/bare/H/printf.c:
 	.text       start:0x801B6A10 end:0x801B8B10
 	.rodata     start:0x801E70B8 end:0x801E70E0
 	.data       start:0x8021D5C0 end:0x8021D7EC
-	.sdata      start:0x8032EC08 end:0x8032EC10
+	.sdata      start:0x8032EC10 end:0x8032EC18
 
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text       start:0x801B8B10 end:0x801B8B30
-	.sdata      start:0x8032EC10 end:0x8032EC14
+	.sdata      start:0x8032EC18 end:0x8032EC20
 
 MSL_C/PPCEABI/bare/H/signal.c:
 	.text       start:0x801B8B30 end:0x801B8BF0
@@ -2076,10 +2083,10 @@ MSL_C/PPCEABI/bare/H/signal.c:
 MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x801B8BF0 end:0x801B90B8
 	.rodata     start:0x801E70E0 end:0x801E7100
-	.sdata      start:0x8032EC18 end:0x8032EC20
+	.sdata      start:0x8032EC20 end:0x8032EC28
 
 MSL_C/PPCEABI/bare/H/float.c:
-	.sdata      start:0x8032EC20 end:0x8032EC28
+	.sdata      start:0x8032EC28 end:0x8032EC30
 
 MSL_C/PPCEABI/bare/H/wchar_io.c:
 	.text       start:0x801B90B8 end:0x801B9140
@@ -2193,7 +2200,7 @@ odenotstub/odenotstub.c:
 
 OdemuExi2/DebuggerDriver.c:
 	.text       start:0x801BC48C end:0x801BCF0C
-	.sdata      start:0x8032EC28 end:0x8032EC30
+	.sdata      start:0x8032EC30 end:0x8032EC38
 	.sbss       start:0x8032F3A0 end:0x8032F3B8
 
 RedSound/RedDriver.cpp:
@@ -2220,6 +2227,7 @@ RedSound/RedExecute.cpp:
 	extab       start:0x8000A760 end:0x8000A880
 	extabindex  start:0x80011F20 end:0x800120D0
 	.text       start:0x801C2FC4 end:0x801C7478
+	.sdata      start:0x8032EC38 end:0x8032EC3C
 
 RedSound/RedMidiCtrl.cpp:
 	extab       start:0x8000A880 end:0x8000AB00
@@ -2244,7 +2252,6 @@ RedSound/RedSound.cpp:
 	.text       start:0x801CCA34 end:0x801CD8F4
 	.ctors      start:0x801D5450 end:0x801D5454
 	.bss        start:0x8032E170 end:0x8032E280
-	.sdata      start:0x8032EC30 end:0x8032EC38
 	.sbss       start:0x8032F4A8 end:0x8032F4E0
 	.sdata2     start:0x80333D98 end:0x80333DB0
 
@@ -2252,7 +2259,6 @@ thp/THPDec.c:
 	.text       start:0x801CD8F4 end:0x801D4E5C
 	.rodata     start:0x801E8110 end:0x801E81A0
 	.bss        start:0x8032E280 end:0x8032E3B0
-	.sdata      start:0x8032EC38 end:0x8032EC3C
 	.sbss       start:0x8032F4E0 end:0x8032F5F8
 	.sdata2     start:0x80333DB0 end:0x80333DCC
 

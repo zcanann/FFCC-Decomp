@@ -5,11 +5,13 @@
 #include "string.h"
 
 extern "C" int rand(void);
-extern "C" float FLOAT_8032F740;
-extern "C" float FLOAT_8032F744;
+extern "C" float kZeroF;
+extern "C" float kNegOneF;
 extern "C" double DOUBLE_8032F778;
 extern "C" float FLOAT_8032F780;
 extern "C" float FLOAT_8032F788;
+extern "C" float kRandSignedScaleF;
+extern "C" float kRandScaleF;
 
 CMath Math;
 static Vec s_f_vpos;
@@ -174,11 +176,11 @@ int CMath::Rand(unsigned long max)
  */
 float CMath::RandF(float scale)
 {
-    if (scale == 0.0f) {
-        return 0.0f;
+    if (kZeroF == scale) {
+        return kZeroF;
     }
 
-    return scale * ((float)rand() * (1.0f / 32768.0f));
+    return scale * ((float)rand() * kRandScaleF);
 }
 
 /*
@@ -192,7 +194,7 @@ float CMath::RandF(float scale)
  */
 float CMath::RandF()
 {
-    return (float)rand() * (1.0f / 32768.0f);
+    return (float)rand() * kRandScaleF;
 }
 
 /*
@@ -228,11 +230,11 @@ int CMath::RandPM(unsigned long max)
  */
 float CMath::RandFPM(float scale)
 {
-    if (scale == 0.0f) {
-        return 0.0f;
+    if (kZeroF == scale) {
+        return kZeroF;
     }
 
-    return scale * (((float)rand() * (2.0f / 32768.0f)) + -1.0f);
+    return scale * (((float)rand() * kRandSignedScaleF) + kNegOneF);
 }
 
 /*
@@ -487,7 +489,7 @@ int CBound::CheckFrustum0(float farPlane)
     }
 
     dVar8 = (double)FLOAT_8032F780;
-    dVar9 = (double)FLOAT_8032F740;
+    dVar9 = (double)kZeroF;
     uVar3 = 0xF;
     uVar5 = 0;
     iVar6 = 0;
@@ -711,7 +713,7 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
 
     PSVECCrossProduct(&yAxis, &zAxis, &temp);
     if ((double)PSVECDotProduct(&xAxis, &temp) < DOUBLE_8032F778) {
-        PSVECScale(outScale, outScale, FLOAT_8032F744);
+        PSVECScale(outScale, outScale, kNegOneF);
     }
 }
 

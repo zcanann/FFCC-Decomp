@@ -1445,6 +1445,7 @@ os/OSFont.c:
 
 os/OSInterrupt.c:
 	.text       start:0x8017E340 end:0x8017EBAC
+	.data       start:0x80217110 end:0x80217140
 	.sbss       start:0x8032EF80 end:0x8032EF98
 
 os/OSLink.c:
@@ -1493,13 +1494,14 @@ os/OSThread.c:
 
 os/OSTime.c:
 	.text       start:0x80181BF8 end:0x8018201C
+	.data       start:0x80217150 end:0x802171B0
 
 os/__ppc_eabi_init.c:
 	.text       start:0x8018201C end:0x801820B0
 
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
-	.data       start:0x80217150 end:0x80217304
+	.data       start:0x802171B0 end:0x802172C0
 	.bss        start:0x8030C690 end:0x8030C750
 	.sdata      start:0x8032EAB8 end:0x8032EAC0
 	.sbss       start:0x8032EFE8 end:0x8032EFF0
@@ -1510,7 +1512,7 @@ exi/EXIUart.c:
 
 si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
-	.data       start:0x80217304 end:0x802173D8
+	.data       start:0x802172C0 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
 	.sdata      start:0x8032EAC0 end:0x8032EAD0
 	.sbss       start:0x8032F004 end:0x8032F00C
@@ -1602,7 +1604,7 @@ ar/ar.c:
 	.text       start:0x8018F710 end:0x801911E8
 	.data       start:0x80217C50 end:0x80217C98
 	.sdata      start:0x8032EB40 end:0x8032EB48
-	.sbss       start:0x8032F1B0 end:0x8032F1D0
+	.sbss       start:0x8032F1B8 end:0x8032F1D8
 
 ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
@@ -1618,6 +1620,7 @@ ax/AX.c:
 ax/AXAlloc.c:
 	.text       start:0x80191614 end:0x80191ADC
 	.bss        start:0x8030CCE0 end:0x8030CDE0
+	.sbss       start:0x8032F200 end:0x8032F204
 
 ax/AXAux.c:
 	.text       start:0x80191ADC end:0x80191F7C
@@ -1641,6 +1644,9 @@ ax/AXVPB.c:
 	.data       start:0x80217D28 end:0x80217DFC
 	.bss        start:0x80314940 end:0x80325D40
 	.sbss       start:0x8032F290 end:0x8032F29C
+
+ax/AXComp.c:
+	.data       start:0x80217E00 end:0x80219840
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
@@ -1883,10 +1889,10 @@ TRK_MINNOW_DOLPHIN/flush_cache.c:
 	.text       start:0x801ABA2C end:0x801ABA64
 
 dolphin/os/__start.c:
-	.init       start:0x80003100 end:0x80003340
+	.init       start:0x80003100 end:0x80003400
 
 dolphin/os/__ppc_eabi_init.cpp:
-	.init       start:0x80003340 end:0x80003424
+	.init       start:0x80003400 end:0x80003458
 
 TRK_MINNOW_DOLPHIN/mem_TRK.c:
 	.init       start:0x80003458 end:0x800034AC

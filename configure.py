@@ -676,13 +676,13 @@ config.libs = [
         "os",
         [
             Object(
-                NonMatching,
+                Matching,
                 "dolphin/os/__start.c",
                 source="os/__start.c",
             ),
             Object(Matching, "os/__ppc_eabi_init.c"),
             Object(
-                NonMatching,
+                Matching,
                 "dolphin/os/__ppc_eabi_init.cpp",
                 source="os/__ppc_eabi_init.cpp",
                 cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
@@ -698,7 +698,7 @@ config.libs = [
             Object(Matching, "os/OSError.c"),
             Object(Matching, "os/OSFatal.c"),
             Object(Matching, "os/OSFont.c"),
-            Object(NonMatching, "os/OSInterrupt.c"),
+            Object(Matching, "os/OSInterrupt.c"),
             Object(Matching, "os/OSLink.c"),
             Object(Matching, "os/OSMemory.c"),
             Object(Matching, "os/OSMessage.c"),
@@ -711,7 +711,7 @@ config.libs = [
             Object(Matching, "os/OSStopwatch.c"),
             Object(Matching, "os/OSSync.c"),
             Object(NonMatching, "os/OSThread.c"),
-            Object(NonMatching, "os/OSTime.c"),
+            Object(Matching, "os/OSTime.c"),
         ],
     ),
     DolphinLib(
@@ -802,6 +802,7 @@ config.libs = [
             Object(NonMatching, "ax/AXProf.c"),
             Object(NonMatching, "ax/AXSPB.c"),
             Object(Matching, "ax/AXVPB.c"),
+            Object(Matching, "ax/AXComp.c"),
         ],
     ),
     DolphinLib(

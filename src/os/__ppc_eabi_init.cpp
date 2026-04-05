@@ -1,59 +1,9 @@
-#include "__ppc_eabi_linker.h"
 #include "global.h"
 
 extern "C" {
-#include "string.h"
-
-SECTION_INIT extern void __flush_cache(void* addr, unsigned int size);
 extern void __OSPSInit(void);
 extern void __OSFPRInit(void);
 extern void __OSCacheInit(void);
-
-inline static void __copy_rom_section(void* dst, const void* src, unsigned int size)
-{
-    if (size && (dst != src)) {
-        memcpy(dst, src, size);
-        __flush_cache(dst, size);
-    }
-}
-
-inline static void __init_bss_section(void* dst, unsigned int size)
-{
-    if (size) {
-        memset(dst, 0, size);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80003340
- * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-SECTION_INIT void __init_data_80003340(void)
-{
-    __rom_copy_info* dci;
-    __bss_init_info* bii;
-
-    dci = _rom_copy_info;
-    while (TRUE) {
-        if (dci->size == 0)
-            break;
-        __copy_rom_section(dci->addr, dci->rom, dci->size);
-        dci++;
-    }
-
-    bii = _bss_init_info;
-    while (TRUE) {
-        if (bii->size == 0)
-            break;
-        __init_bss_section(bii->addr, bii->size);
-        bii++;
-    }
-}
 
 /*
  * --INFO--
@@ -77,6 +27,39 @@ SECTION_INIT asm void __init_hardware(void)
     bl __OSFPRInit
     bl __OSCacheInit
     mtlr r31
+    blr
+    // clang-format on
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80003424
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+SECTION_INIT asm void __flush_cache(void* addr, unsigned int size)
+{
+    // clang-format off
+    nofralloc
+
+    lis r5, 0xFFFF
+    ori r5, r5, 0xFFF1
+    and r5, r5, r3
+    subf r3, r5, r3
+    add r4, r4, r3
+
+lbl_80003438:
+    dcbst 0, r5
+    sync
+    icbi 0, r5
+    addic r5, r5, 8
+    addic. r4, r4, -8
+    bge lbl_80003438
+
+    isync
     blr
     // clang-format on
 }

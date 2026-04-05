@@ -127,11 +127,11 @@ DSIOResult __open_file(u32 handle, u8* mode, u32* outHandle)
         flags |= 0x07;
         break;
     default:
-        /* other encodings don’t add anything */
+        /* other encodings do not add anything */
         break;
     }
 
-    /* Bit 3 of mode[1] is an extra “append / update” flag. */
+    /* Bit 3 of mode[1] is an extra append/update flag. */
     if (appendBit == 1) {
         flags |= 0x08;
     }

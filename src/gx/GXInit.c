@@ -15,10 +15,10 @@ static const char s___GXVersion[] = "<< Dolphin SDK - GX\tdebug build: Apr  5 20
 #else
 extern const char s___GXVersion[];
 #endif
-static GXFifoObj FifoObj;
 const char* __GXVersion = s___GXVersion;
 
 static GXData gxData;
+static GXFifoObj FifoObj;
 GXData* const __GXData = &gxData;
 const GXColor GXInit_ClearColor = {64, 64, 64, 255};
 const GXColor GXInit_BlackColor = {0, 0, 0, 0};
@@ -29,10 +29,10 @@ const f32 GXInit_PointOneF = 0.1f;
 const f64 GXInit_IntToFloatBias = 4503599627370496.0;
 
 // these remain file-scope in the target object
-u32 resetFuncRegistered;
 u32 calledOnce;
 OSTime time;
 u32 peCount;
+u32 resetFuncRegistered;
 
 void* __memReg;
 void* __peReg;

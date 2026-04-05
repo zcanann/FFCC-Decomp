@@ -226,14 +226,17 @@ char s_pppYmMelt_cpp_801DA048[] = "pppYmMelt.cpp";
 
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
+    int colorOffset;
+    int grid;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    YmMeltColorWork* colorWork = (YmMeltColorWork*)((u8*)ymMelt + offsets->m_serializedDataOffsets[1] + 0x80);
-    u16 gridSize = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
-    int grid = (int)gridSize + 1;
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    YmMeltColorWork* colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
+    grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2) + 1;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
@@ -244,10 +247,10 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         YmMeltVertex* vertex = work->m_vertexData;
         int angleSeed = rand();
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
-        work->m_phaseOffset = (s16)(angleSeed - (angleSeed / (int)phaseDiv) * phaseDiv);
+        work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
         s16 phaseOffset = work->m_phaseOffset;
         float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
-        float step = ctrl->m_stepValue / (f32)gridSize;
+        float step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
         float rot = FLOAT_80330b0c * (f32)phaseOffset;
         Mtx rotMtx;
 

@@ -1,4 +1,5 @@
 #include <dolphin.h>
+#include <dolphin/ai.h>
 #include <dolphin/pad.h>
 #include <dolphin/si.h>
 #include <global.h>
@@ -6,11 +7,11 @@
 #include "dolphin/si/__si.h"
 
 #if DEBUG
-const char* __PADVersion = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
+static const char s___PADVersion[] = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
 #else
-extern const char lbl_80217BB0[];
-const char* __PADVersion = lbl_80217BB0;
+extern const char s___PADVersion[];
 #endif
+const char* __PADVersion = s___PADVersion;
 
 #define PAD_ALL                                                                                                        \
     (                      \
@@ -47,7 +48,9 @@ static u32 BarrelBits;
 static u32 Type[4];
 static PADStatus Origin[4];
 
+u32 PrintDebugPalCaution_message;
 u32 __PADSpec;
+AISCallback __AIS_Callback;
 
 // prototypes
 static void PADTypeAndStatusCallback(s32 chan, u32 type);

@@ -10,9 +10,12 @@
 #undef SET_REG_FIELD
 #define SET_REG_FIELD OLD_SET_REG_FIELD
 
-extern char lbl_8021C380[];
-
-const char* __GXVersion = lbl_8021C380;
+#if DEBUG
+static const char s___GXVersion[] = "<< Dolphin SDK - GX\tdebug build: Apr  5 2004 03:55:13 (0x2301) >>";
+#else
+extern const char s___GXVersion[];
+#endif
+const char* __GXVersion = s___GXVersion;
 
 static GXData gxData;
 static GXFifoObj FifoObj;

@@ -35,7 +35,6 @@ const char* __OSVersion = "<< Dolphin SDK - OS\trelease build: "BUILD_DATE" "RBU
 
 static DVDDriveInfo DriveInfo;
 static DVDCommandBlock DriveBlock;
-OSExecParams __OSRebootParams;
 
 extern u32 __DVDLongFileNameFlag;
 extern u32 __PADSpec;
@@ -50,17 +49,17 @@ extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 static OSBootInfo* BootInfo;
 static u32* BI2DebugFlag;
 static u32 BI2DebugFlagHolder;
-BOOL __OSIsGcam;
-f64 ZeroF;
-f32 ZeroPS[2];
-BOOL AreWeInitialized;
-void (**OSExceptionTable)(u8, OSContext*);
+static f64 ZeroF;
+static f32 ZeroPS[2];
+static BOOL AreWeInitialized;
+static void (**OSExceptionTable)(u8, OSContext*);
 static char sOSConsoleTypeFmt[] = "%08x\n";
 static char sOSRegisterVersionFmt[] = "%s\n";
-static void* __OSSavedRegionEnd;
-static void* __OSSavedRegionStart;
-BOOL __OSInIPL;
 OSTime __OSStartTime;
+BOOL __OSInIPL;
+void* __OSSavedRegionStart;
+void* __OSSavedRegionEnd;
+BOOL __OSIsGcam;
 
 // prototypes
 static void __OSInitFPRs(void);
@@ -76,10 +75,6 @@ void __OSDBINTSTART(void);
 void __OSDBINTEND(void);
 void __OSDBJUMPSTART(void);
 void __OSDBJUMPEND(void);
-
-u32 __OSIsDebuggerPresent(void) {
-    return *(u32*)OSPhysicalToCached(0x40);
-}
 
 /* clang-format off */
 asm void __OSFPRInit(void) {
@@ -167,14 +162,6 @@ skip_ps_init:
     mtfsf 0xff, f0
     blr
     // clang-format on
-}
-
-static void DisableWriteGatherPipe(void) {
-    u32 hid2;
-
-    hid2 = PPCMfhid2();
-    hid2 &= ~0x40000000;
-    PPCMthid2(hid2);
 }
 
 u32 OSGetConsoleType(void) {
@@ -287,7 +274,7 @@ void OSInit(void) {
         __OSThreadInit();
         __OSInitAudioSystem();
 
-        DisableWriteGatherPipe();
+        PPCMthid2(PPCMfhid2() & ~0x40000000);
 
         if (!__OSInIPL) {
             __OSInitMemoryProtection();
@@ -461,7 +448,7 @@ static void OSExceptionInit(void) {
     // downloading the text segments
     *opCodeAddr = oldOpCode;
     
-    DBPrintf("Exceptions initialized...\n");
+    DBPrintf("Exceptions initialized...\n\0");
 }
 
 asm void __OSDBIntegrator(void) {

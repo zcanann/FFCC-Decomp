@@ -1402,6 +1402,7 @@ db/db.c:
 os/OS.c:
 	.text       start:0x8017B694 end:0x8017C180
 	.data       start:0x80216770 end:0x80216968
+	.bss        start:0x8030BB80 end:0x8030BBD0
 	.sdata      start:0x8032EA80 end:0x8032EA90
 	.sbss       start:0x8032EF20 end:0x8032EF60
 

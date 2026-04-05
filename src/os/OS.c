@@ -4,8 +4,6 @@
 #include <dolphin/si.h>
 #include <dolphin/db.h>
 
-#include "dolphin/os/__os.h"
-
 #define NOP 0x60000000
 
 #ifndef __GEKKO__
@@ -15,6 +13,18 @@
 // external functions
 extern void EnableMetroTRKInterrupts(void);
 extern void __OSInitMemoryProtection(void);
+extern void __OSCacheInit(void);
+extern void __OSContextInit(void);
+extern OSTime __OSGetSystemTime(void);
+extern void __OSInitAudioSystem(void);
+extern void __OSInitSram(void);
+extern void __OSInitSystemCall(void);
+extern void __OSInterruptInit(void);
+extern void __OSModuleInit(void);
+extern void __OSResetSWInterruptHandler(s16 exception, OSContext* context);
+extern __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler);
+extern void __OSThreadInit(void);
+extern void __OSUnhandledException(__OSException exception, OSContext* context, u32 dsisr, u32 dar);
 extern BOOL __DBIsExceptionMarked(__OSException exception);
 
 #define DB_EXCEPTIONRET_OFFSET 0xC
@@ -72,7 +82,6 @@ void __OSEVSetNumber(void);
 void __OSExceptionVector(void);
 void __DBVECTOR(void);
 void __OSDBINTSTART(void);
-void __OSDBINTEND(void);
 void __OSDBJUMPSTART(void);
 void __OSDBJUMPEND(void);
 
@@ -397,10 +406,10 @@ static void OSExceptionInit(void) {
     if (*(u32*)destAddr == 0) // Lomem should be zero cleared only once by BS2
     {
         DBPrintf("Installing OSDBIntegrator\n");
-        memcpy(destAddr, (void*)__OSDBINTSTART, (u32)__OSDBINTEND - (u32)__OSDBINTSTART);
-        DCFlushRangeNoSync(destAddr, (u32)__OSDBINTEND - (u32)__OSDBINTSTART);
+        memcpy(destAddr, (void*)__OSDBINTSTART, (u32)__OSDBJUMPSTART - (u32)__OSDBINTSTART);
+        DCFlushRangeNoSync(destAddr, (u32)__OSDBJUMPSTART - (u32)__OSDBINTSTART);
         __sync();
-        ICInvalidateRange(destAddr, (u32)__OSDBINTEND - (u32)__OSDBINTSTART);
+        ICInvalidateRange(destAddr, (u32)__OSDBJUMPSTART - (u32)__OSDBINTSTART);
     }
     
     // Copy the right vector into the table
@@ -451,9 +460,8 @@ static void OSExceptionInit(void) {
     DBPrintf("Exceptions initialized...\n\0");
 }
 
-asm void __OSDBIntegrator(void) {
+static asm void __OSDBIntegrator(void) {
     nofralloc
-entry __OSDBIntegrator
 entry __OSDBINTSTART
     li      r5, OS_DBINTERFACE_ADDR
     mflr    r3
@@ -464,7 +472,6 @@ entry __OSDBINTSTART
     li      r3, 0x30 // MSR_IR | MSR_DR     // turn on memory addressing
     mtmsr   r3
     blr
-entry __OSDBINTEND
 }
 
 asm void __OSDBJump(void) {

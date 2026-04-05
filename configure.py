@@ -787,8 +787,8 @@ config.libs = [
     DolphinLib(
         "ar",
         [
-            Object(Matching, "ar/ar.c"),
-            Object(Matching, "ar/arq.c"),
+            Object(NonMatching, "ar/ar.c"),
+            Object(NonMatching, "ar/arq.c"),
         ],
     ),
     DolphinLib(

@@ -6,11 +6,11 @@
 #include "dolphin/si/__si.h"
 
 #if DEBUG
-const char* __PADVersion = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
+static const char s___PADVersion[] = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
 #else
-extern const char lbl_80217BB0[];
-const char* __PADVersion = lbl_80217BB0;
+static const char s___PADVersion[] = "<< Dolphin SDK - PAD\trelease build: Sep  5 2002 05:34:02 (0x2301) >>";
 #endif
+const char* __PADVersion = s___PADVersion;
 
 #define PAD_ALL                                                                                                        \
     (                      \

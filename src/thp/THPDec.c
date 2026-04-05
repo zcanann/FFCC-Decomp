@@ -1,6 +1,13 @@
 #include <dolphin/thp.h>
 #include <dolphin/base/PPCArch.h>
 
+#ifdef DEBUG
+static const char s___THPVersion[] = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";
+#else
+static const char s___THPVersion[] = "<< Dolphin SDK - THP\trelease build: Aug 27 2002 20:42:01 >>";
+#endif
+const char* __THPVersion = s___THPVersion;
+
 static THPHuffmanTab *Ydchuff ATTRIBUTE_ALIGN(32);
 static THPHuffmanTab *Udchuff ATTRIBUTE_ALIGN(32);
 static THPHuffmanTab *Vdchuff ATTRIBUTE_ALIGN(32);
@@ -11,24 +18,17 @@ static f32 __THPIDCTWorkspace[64] ATTRIBUTE_ALIGN(32);
 static u8 *__THPHuffmanBits;
 static u8 *__THPHuffmanSizeTab;
 static u16 *__THPHuffmanCodeTab;
+THPSample *Gbase ATTRIBUTE_ALIGN(32);
+u32 Gwid ATTRIBUTE_ALIGN(32);
+f32 *Gq ATTRIBUTE_ALIGN(32);
 static u8 *__THPLCWork512[3];
 static u8 *__THPLCWork640[3];
-static THPCoeff *__THPMCUBuffer[6];
-static u8 *__THPWorkArea;
-THPFileInfo *__THPInfo;
-u32 __THPOldGQR6;
 u32 __THPOldGQR5;
-f32 *Gq ATTRIBUTE_ALIGN(32);
-u32 Gwid ATTRIBUTE_ALIGN(32);
-THPSample *Gbase ATTRIBUTE_ALIGN(32);
+u32 __THPOldGQR6;
+static u8 *__THPWorkArea;
+static THPCoeff *__THPMCUBuffer[6];
+THPFileInfo *__THPInfo;
 static BOOL __THPInitFlag;
-
-#ifdef DEBUG
-const char* __THPVersion = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";
-#else
-extern const char __THPVersionString[];
-const char* __THPVersion = __THPVersionString;
-#endif
 
 #define THPROUNDUP(a, b) ((((s32)(a)) + ((s32)(b)-1L)) / ((s32)(b)))
 

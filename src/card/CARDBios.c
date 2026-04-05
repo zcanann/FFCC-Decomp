@@ -3,12 +3,12 @@
 #include "dolphin/card/__card.h"
 
 #if DEBUG
-const char* __CARDVersion = "<< Dolphin SDK - CARD\tdebug build: Apr  5 2004 03:56:53 (0x2301) >>";
-u32 __CARDFreq = 0;
+static const char s___CARDVersion[] = "<< Dolphin SDK - CARD\tdebug build: Apr  5 2004 03:56:53 (0x2301) >>";
 #else
-extern const char gCARDVersionString[];
-const char* __CARDVersion = gCARDVersionString;
+static const char s___CARDVersion[] = "<< Dolphin SDK - CARD\trelease build: Sep  5 2002 05:35:20 (0x2301) >>";
 #endif
+const char* __CARDVersion = s___CARDVersion;
+u32 __CARDFreq = EXI_FREQ_16M;
 
 CARDControl __CARDBlock[2];
 

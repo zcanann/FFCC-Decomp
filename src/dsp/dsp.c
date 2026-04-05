@@ -4,17 +4,18 @@
 
 #include "dolphin/dsp/__dsp.h"
 
-#define BUILD_DATE "Apr  5 2004"
 #if DEBUG
+#define BUILD_DATE "Apr  5 2004"
 #define BUILD_TIME "03:56:49"
 #else
-#define BUILD_TIME "04:15:32"
+#define BUILD_DATE "Sep  5 2002"
+#define BUILD_TIME "05:35:13"
 #endif
 
 #ifdef DEBUG
 const char* __DSPVersion = "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>";
 #else
-const char* __DSPVersion = "<< Dolphin SDK - DSP\trelease build: Apr  5 2004 04:15:32 (0x2301) >>";
+const char* __DSPVersion = "<< Dolphin SDK - DSP\trelease build: Sep  5 2002 05:35:13 (0x2301) >>";
 #endif
 
 extern DSPTaskInfo* __DSP_rude_task;

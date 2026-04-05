@@ -13185,6 +13185,7 @@ s_ReplyStr = .bss:0x8030BA88; // type:object size:0x80
 g_GoOutMenu = .bss:0x8030BB08; // type:object size:0x50
 s_CmakeInfo = .bss:0x8030BB58; // type:object size:0x28 data:byte
 DriveInfo = .bss:0x8030BB80; // type:object size:0x20 scope:local
+DriveBlock = .bss:0x8030BBA0; // type:object size:0x30 scope:local
 __OSErrorTable = .bss:0x8030BBD0; // type:object size:0x44 scope:global data:4byte
 FatalParam = .bss:0x8030BC20; // type:object size:0x20
 Scb = .bss:0x8030BC40; // type:object size:0x54 scope:global data:4byte

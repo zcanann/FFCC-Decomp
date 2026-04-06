@@ -7,15 +7,23 @@
 #if DEBUG
 #define BUILD_DATE "Apr  5 2004"
 #define BUILD_TIME "03:56:49"
-#else
-#define BUILD_DATE "Sep  5 2002"
-#define BUILD_TIME "05:35:13"
-#endif
-
-#ifdef DEBUG
 const char* __DSPVersion = "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>";
+#define DSP_INIT_BUILD_DATE_MSG "DSPInit(): Build Date: %s %s\n"
 #else
-const char* __DSPVersion = "<< Dolphin SDK - DSP\trelease build: Sep  5 2002 05:35:13 (0x2301) >>";
+typedef struct DSPStrings {
+    char version[0x45];
+    char _pad0[3];
+    char initMsg[0x1E];
+    char _pad1[2];
+    char buildDate[0xC];
+    char buildTime[0x9];
+} DSPStrings;
+
+extern const DSPStrings sDSPStrings;
+const char* __DSPVersion = sDSPStrings.version;
+#define BUILD_DATE sDSPStrings.buildDate
+#define BUILD_TIME sDSPStrings.buildTime
+#define DSP_INIT_BUILD_DATE_MSG sDSPStrings.initMsg
 #endif
 
 extern DSPTaskInfo* __DSP_rude_task;
@@ -60,7 +68,7 @@ void DSPInit(void) {
     BOOL old;
     u16 tmp;
 
-    __DSP_debug_printf("DSPInit(): Build Date: %s %s\n", BUILD_DATE, BUILD_TIME);
+    __DSP_debug_printf(DSP_INIT_BUILD_DATE_MSG, BUILD_DATE, BUILD_TIME);
 
     if (__DSP_init_flag == 1)
         return;

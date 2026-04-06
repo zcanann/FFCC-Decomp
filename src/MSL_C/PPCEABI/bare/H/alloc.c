@@ -427,6 +427,7 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         block_or_1 = block_val | 1;
 
         was_free = !(old_tag & 2);
+        old_size = old_tag & ~7;
         was_alloc = !was_free;
 
         start->block = (Block*)block_or_1;
@@ -435,8 +436,6 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         if (old_tag & 4) {
             start->size |= 4;
         }
-
-        old_size = old_tag & ~7;
 
         if (was_alloc) {
             start->size |= 2;
@@ -651,17 +650,18 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
         head->prev_ = b;
         b->client_size_ = fix_size;
 
-        for (k = 0; k < num_subblocks - 1; ++k) {
-            FixSubBlock* np;
-
-            p->block_ = b;
-            np = (FixSubBlock*)((char*)p + sub_size);
-            p->next_ = np;
-            p = np;
+        {
+            char* cp = (char*)p;
+            char* np;
+            for (k = 0; k < num_subblocks - 1; ++k) {
+                np = cp + sub_size;
+                ((FixSubBlock*)cp)->block_ = b;
+                ((FixSubBlock*)cp)->next_ = (FixSubBlock*)np;
+                cp = np;
+            }
+            ((FixSubBlock*)cp)->block_ = b;
+            ((FixSubBlock*)cp)->next_ = 0;
         }
-
-        p->block_ = b;
-        p->next_ = 0;
         b->start_ = (FixSubBlock*)((char*)b + 0x14);
         b->n_allocated_ = 0;
         fs->head_ = b;

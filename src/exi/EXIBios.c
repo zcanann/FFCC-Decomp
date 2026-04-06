@@ -41,12 +41,6 @@ enum {
 #if DEBUG
 const char* __EXIVersion = "<< Dolphin SDK - EXI\tdebug build: Apr  5 2004 03:55:29 (0x2301) >>";
 #else
-static u32 sExiSdkStringOffsetsA[] = {
-    0x0, 0x1F, 0x3B, 0x5A, 0x78, 0x97, 0xB5, 0xD4, 0xF3, 0x111, 0x130, 0x14E,
-};
-static u32 sExiSdkStringOffsetsB[] = {
-    0x0, 0x1F, 0x3C, 0x5B, 0x79, 0x98, 0xB6, 0xD5, 0xF4, 0x112, 0x131, 0x14F,
-};
 char gEXIStringTable[] =
     "<< Dolphin SDK - EXI\trelease build: Mar 11 2003 11:19:00 (0x2301) >>\0\0\0\0"
     "Memory Card 59\0\0"
@@ -62,7 +56,6 @@ char gEXIStringTable[] =
     "Stream Hanger\0\0\0"
     "IS-DOL-VIEWER\0\0\0\0\0\0";
 const char* __EXIVersion = gEXIStringTable;
-static u32 sExiSdataPad = 0;
 #endif
 
 static EXIControl Ecb[3];
@@ -103,7 +96,7 @@ static void SetExiInterruptMask(s32 chan, EXIControl* exi) {
     }
 }
 
-static void CompleteTransfer(s32 chan) {
+static inline void CompleteTransfer(s32 chan) {
     EXIControl* exi;
     u8* buf;
     u32 data;
@@ -118,7 +111,7 @@ static void CompleteTransfer(s32 chan) {
             if ((len = exi->immLen) != 0) {
                 buf = exi->immBuf;
                 data = __EXIRegs[(chan * 5) + 4];
-                for(i = 0; i < len; i++) {
+                for (i = 0; i < len; i++) {
                     *buf++ = data >> ((3 - i) * 8);
                 }
             }
@@ -300,13 +293,6 @@ EXICallback EXISetExiCallback(s32 chan, EXICallback exiCallback) {
     return prev;
 }
 
-void EXIProbeReset() {
-    __EXIProbeStartTime[0] = __EXIProbeStartTime[1] = 0;
-    Ecb[0].idTime = Ecb[1].idTime = 0;
-    __EXIProbe(0);
-    __EXIProbe(1);
-}
-
 static int __EXIProbe(s32 chan) {
     EXIControl* exi;
     BOOL enabled;
@@ -378,7 +364,7 @@ s32 EXIProbeEx(s32 chan) {
     return -1;
 }
 
-static int __EXIAttach(s32 chan, EXICallback extCallback) {
+static inline int __EXIAttach(s32 chan, EXICallback extCallback) {
     EXIControl* exi;
     BOOL enabled;
 
@@ -440,45 +426,6 @@ int EXIDetach(s32 chan) {
 
     exi->state &= ~STATE_ATTACHED;
     __OSMaskInterrupts(0x500000U >> (chan * 3));
-
-    OSRestoreInterrupts(enabled);
-    return 1;
-}
-
-int EXISelectSD(s32 chan, u32 dev, u32 freq) {
-    EXIControl* exi;
-    u32 cpr;
-    BOOL enabled;
-
-    exi = &Ecb[chan];
-
-    ASSERTLINE(908, 0 <= chan && chan < MAX_CHAN);
-    ASSERTLINE(909, chan == 0 && dev < MAX_DEV || dev == 0);
-    ASSERTLINE(910, freq < MAX_FREQ);
-    ASSERTLINE(911, !(exi->state & STATE_SELECTED));
-
-    enabled = OSDisableInterrupts();
-    if ((exi->state & STATE_SELECTED) || ((chan != 2) && (((dev == 0) && !(exi->state & STATE_ATTACHED) && (EXIProbe(chan) == 0)) || !(exi->state & STATE_LOCKED) || (exi->dev != dev)))) {
-        OSRestoreInterrupts(enabled);
-        return 0;
-    }
-
-    exi->state |= STATE_SELECTED;
-    cpr = __EXIRegs[(chan * 5)];
-    cpr &= 0x405;
-    cpr |= freq * 0x10;
-    __EXIRegs[(chan * 5)] = cpr;
-
-    if (exi->state & STATE_ATTACHED) {
-        switch (chan) {
-        case 0:
-            __OSMaskInterrupts(0x100000U);
-            break;
-        case 1:
-            __OSMaskInterrupts(0x20000U);
-            break;
-        }
-    }
 
     OSRestoreInterrupts(enabled);
     return 1;
@@ -658,7 +605,10 @@ void EXIInit() {
     EXIGetID(0, 2, &IDSerialPort1);
 
     if (__OSInIPL) {
-        EXIProbeReset();
+        __EXIProbeStartTime[0] = __EXIProbeStartTime[1] = 0;
+        Ecb[0].idTime = Ecb[1].idTime = 0;
+        __EXIProbe(0);
+        __EXIProbe(1);
     } else if (EXIGetID(0, 0, &id) && id == 0x7010000) {
         __OSEnableBarnacle(1, 0);
     } else if (EXIGetID(1, 0, &id) && id == 0x7010000) {
@@ -814,100 +764,6 @@ s32 EXIGetID(s32 chan, u32 dev, u32* id) {
     }
 
     return 1;
-}
-
-s32 EXIGetType(s32 chan, u32 dev, u32* type) {
-    u32 _type;
-    s32 probe;
-
-    probe = EXIGetID(chan, dev, &_type);
-
-    if (!probe) {
-        return probe;
-    }
-
-    switch (_type & ~0xFF) {
-    case 0x04020300:
-    case EXI_ETHER:
-    case 0x04020100:
-    case EXI_MIC:
-        *type = (_type & ~0xFF);
-        return probe;
-    default:
-        switch (_type & ~0xFFFF) {
-        case 0x00000000:
-            if (!(_type & 0x3803)) {
-                switch (_type & 0xFC) {
-                case EXI_MEMORY_CARD_59:
-                case EXI_MEMORY_CARD_123:
-                case EXI_MEMORY_CARD_251:
-                case EXI_MEMORY_CARD_507:
-                case EXI_MEMORY_CARD_1019:
-                case EXI_MEMORY_CARD_2043:
-                    *type = _type & 0xFC;
-                    return probe;    
-                }
-            }
-            break;
-        case EXI_IS_VIEWER:
-            *type = EXI_IS_VIEWER;
-            return probe;                
-        }
-
-        *type = _type;
-        return probe;
-    }
-}
-
-char* EXIGetTypeString(u32 type) {
-    switch (type) {
-    case EXI_MEMORY_CARD_59:
-        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_59];
-    case EXI_MEMORY_CARD_123:
-        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_123];
-    case EXI_MEMORY_CARD_251:
-        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_251];
-    case EXI_MEMORY_CARD_507:
-        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_507];
-    case EXI_MEMORY_CARD_1019:
-        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_1019];
-    case EXI_MEMORY_CARD_2043:
-        return (char*)&gEXIStringTable[EXI_STRING_MEMORY_CARD_2043];
-    case EXI_USB_ADAPTER:
-        return (char*)&gEXIStringTable[EXI_STRING_USB_ADAPTER];
-    case EXI_NPDP_GDEV:
-        return NULL;
-    case EXI_MODEM:
-        return NULL;
-    case EXI_MARLIN:
-        return NULL;
-    case EXI_AD16:
-        return NULL;
-    case EXI_RS232C:
-        return NULL;
-    case 0x80000020:
-    case 0x80000080:
-    case 0x80000040:
-    case 0x80000008:
-    case 0x80000010:
-    case 0x80000004:
-        return (char*)&gEXIStringTable[EXI_STRING_NET_CARD];
-    case EXI_ETHER_VIEWER:
-        return (char*)&gEXIStringTable[EXI_STRING_ARTIST_ETHER];
-    case 0x4020100:
-    case 0x4020300:
-    case EXI_ETHER:
-    case 0x4220000:
-        return (char*)&gEXIStringTable[EXI_STRING_BROADBAND_ADAPTER];
-    case EXI_MIC:
-        return NULL;
-    case EXI_STREAM_HANGER:
-        return (char*)&gEXIStringTable[EXI_STRING_STREAM_HANGER];
-    case EXI_IS_VIEWER:
-        return (char*)&gEXIStringTable[EXI_STRING_IS_DOL_VIEWER];
-    default:
-        return NULL;
-    }
 }
 
 #pragma scheduling reset

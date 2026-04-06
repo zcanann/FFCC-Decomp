@@ -717,7 +717,7 @@ config.libs = [
     DolphinLib(
         "exi",
         [
-            Object(NonMatching, "exi/EXIBios.c"),
+            Object(Matching, "exi/EXIBios.c"),
             Object(Matching, "exi/EXIUart.c"),
         ],
     ),

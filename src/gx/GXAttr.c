@@ -3,7 +3,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-#define CHECK_ATTRPTR(line, attrPtr) ASSERTMSGLINE(line, (attrPtr) != NULL, "GXSetVtxDescv: attrPtr is NULL")
 #define CHECK_ATTRNAME(line, attr)   ASSERTMSGLINE(line, (attr) >= GX_VA_PNMTXIDX, "GXSetVtxDesc: Invalid vertex attribute name")
 #define CHECK_ATTRNAME2(line, attr)  ASSERTMSGLINE(line, (attr) <= GX_VA_TEX7 || (attr) == GX_VA_NBT, "GXSetVtxDesc: Invalid vertex attribute name")
 #define CHECK_ATTRNAME3(line, attr)  ASSERTMSGLINE(line, (attr) >= GX_VA_PNMTXIDX && (attr) < GX_VA_MAX_ATTR, "GXSetVtxDesc: Invalid vertex attribute name")
@@ -106,26 +105,6 @@ void GXSetVtxDesc(GXAttr attr, GXAttrType type) {
     __GXData->dirtyState |= 8;
 }
 
-void GXSetVtxDescv(const GXVtxDescList *attrPtr) {
-    CHECK_GXBEGIN(306, "GXSetVtxDescv");
-    CHECK_ATTRPTR(307, attrPtr);
-
-    while (attrPtr->attr != GX_VA_NULL) {
-        CHECK_ATTRNAME(311, attrPtr->attr);
-        CHECK_ATTRNAME2(314, attrPtr->attr);
-        CHECK_ATTRTYPE(317, attrPtr->type);
-        SETVCDATTR(attrPtr->attr, attrPtr->type);
-        attrPtr++;
-    }
-
-    if (__GXData->hasNrms || __GXData->hasBiNrms) {
-        OLD_SET_REG_FIELD(326, __GXData->vcdLo, 2, 11, __GXData->nrmType);
-    } else {
-        OLD_SET_REG_FIELD(326, __GXData->vcdLo, 2, 11, 0);
-    }
-    __GXData->dirtyState |= 8;
-}
-
 void __GXSetVCD(void) {
     GX_WRITE_U8(8);
     GX_WRITE_U8(0x50);
@@ -184,58 +163,6 @@ void __GXCalculateVLim(void) {
         vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 14)];
         __GXData->vLim = vlm;
     }
-}
-
-void GXGetVtxDesc(GXAttr attr, GXAttrType* type) {
-    u32 cpType;
-
-    CHECK_GXBEGIN(458, "GXGetVtxDesc");
-    CHECK_ATTRNAME3(460, attr);
-
-    switch (attr) {
-    case GX_VA_PNMTXIDX:   cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 0); break;
-    case GX_VA_TEX0MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 1); break;
-    case GX_VA_TEX1MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 2); break;
-    case GX_VA_TEX2MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 3); break;
-    case GX_VA_TEX3MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 4); break;
-    case GX_VA_TEX4MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 5); break;
-    case GX_VA_TEX5MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 6); break;
-    case GX_VA_TEX6MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 7); break;
-    case GX_VA_TEX7MTXIDX: cpType = GET_REG_FIELD(__GXData->vcdLo, 1, 8); break;
-    case GX_VA_POS:        cpType = GET_REG_FIELD(__GXData->vcdLo, 2, 9); break;
-    case GX_VA_NRM:        cpType = __GXData->hasNrms ? GET_REG_FIELD(__GXData->vcdLo, 2, 11) : 0; break;
-    case GX_VA_NBT:        cpType = __GXData->hasBiNrms ? GET_REG_FIELD(__GXData->vcdLo, 2, 11) : 0; break;
-    case GX_VA_CLR0:       cpType = GET_REG_FIELD(__GXData->vcdLo, 2, 13); break;
-    case GX_VA_CLR1:       cpType = GET_REG_FIELD(__GXData->vcdLo, 2, 15); break;
-    case GX_VA_TEX0:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 0);  break;
-    case GX_VA_TEX1:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 2);  break;
-    case GX_VA_TEX2:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 4);  break;
-    case GX_VA_TEX3:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 6);  break;
-    case GX_VA_TEX4:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 8);  break;
-    case GX_VA_TEX5:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 10); break;
-    case GX_VA_TEX6:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 12); break;
-    case GX_VA_TEX7:       cpType = GET_REG_FIELD(__GXData->vcdHi, 2, 14); break;
-    default: cpType = 0; break;
-    }
-    *type = cpType;
-}
-
-void GXGetVtxDescv(GXVtxDescList* vcd) {
-    GXAttr attr;
-
-    CHECK_GXBEGIN(511, "GXGetVtxDescv");
-    CHECK_ATTRPTR(513, vcd);
-
-    for (attr = GX_VA_PNMTXIDX; attr <= GX_VA_TEX7; attr++) {
-        vcd[attr].attr = attr;
-        GXGetVtxDesc(attr, &vcd[attr].type);
-    }
-
-    vcd[attr].attr = GX_VA_NBT;
-    GXGetVtxDesc(GX_VA_NBT, &vcd[attr].type);
-
-    attr++;
-    vcd[attr].attr = GX_VA_NULL;
 }
 
 void GXClearVtxDesc(void) {
@@ -517,126 +444,6 @@ void __GXSetVAT(void) {
     }
 
     __GXData->dirtyVAT = 0;
-}
-
-static inline u8 GetFracForNrm(GXCompType type) {
-    u8 frac;
-
-    switch (type) {
-    case GX_S8:
-        frac = 6;
-        break;
-    case GX_S16:
-        frac = 14;
-        break;
-    default:
-    case GX_U16:
-        frac = 0;
-        break;
-    }
-
-    return frac;
-}
-
-void GXGetVtxAttrFmt(GXVtxFmt fmt, GXAttr attr, GXCompCnt* cnt, GXCompType* type, u8* frac) {
-    u32* va;
-    u32* vb;
-    u32* vc;
-
-    CHECK_GXBEGIN(833, "GXGetVtxAttrFmt");
-    CHECK_VTXFMT(834, fmt);
-
-    va = &__GXData->vatA[fmt];
-    vb = &__GXData->vatB[fmt];
-    vc = &__GXData->vatC[fmt];
-
-    switch (attr) {
-    case GX_VA_POS:
-        *cnt  = GET_REG_FIELD(*va, 1, 0);
-        *type = GET_REG_FIELD(*va, 3, 1);
-        *frac = (u8)(*va >> 4) & 0x1F;  // GET_REG_FIELD(*va, 5, 4)
-        return;
-    case GX_VA_NRM:
-    case GX_VA_NBT:
-        *cnt = GET_REG_FIELD(*va, 1, 9);
-        if (*cnt == GX_TEX_ST && (u8)(*va >> 0x1F) != 0) {
-            *cnt = GX_NRM_NBT3;
-        }
-        *type = GET_REG_FIELD(*va, 3, 10);
-        *frac = GetFracForNrm(*type);
-        return;
-    case GX_VA_CLR0:
-        *cnt  = GET_REG_FIELD(*va, 1, 13);
-        *type = GET_REG_FIELD(*va, 3, 14);
-        *frac = 0;
-        return;
-    case GX_VA_CLR1:
-        *cnt  = GET_REG_FIELD(*va, 1, 17);
-        *type = GET_REG_FIELD(*va, 3, 18);
-        *frac = 0;
-        return;
-    case GX_VA_TEX0:
-        *cnt  = GET_REG_FIELD(*va, 1, 21);
-        *type = GET_REG_FIELD(*va, 3, 22);
-        *frac = (u8)(*va >> 0x19) & 0x1F;
-        return;
-    case GX_VA_TEX1:
-        *cnt  = GET_REG_FIELD(*vb, 1, 0);
-        *type = GET_REG_FIELD(*vb, 3, 1);
-        *frac = (u8)(*vb >> 4) & 0x1F;
-        return;
-    case GX_VA_TEX2:
-        *cnt  = GET_REG_FIELD(*vb, 1, 9);
-        *type = GET_REG_FIELD(*vb, 3, 10);
-        *frac = (u8)(*vb >> 0xD) & 0x1F;
-        return;
-    case GX_VA_TEX3:
-        *cnt  = GET_REG_FIELD(*vb, 1, 18);
-        *type = GET_REG_FIELD(*vb, 3, 19);
-        *frac = (u8)(*vb >> 0x16) & 0x1F;
-        return;
-    case GX_VA_TEX4:
-        *cnt  = GET_REG_FIELD(*vb, 1, 27);
-        *type = GET_REG_FIELD(*vb, 3, 28);
-        *frac = GET_REG_FIELD(*vc, 5, 0);
-        return;
-    case GX_VA_TEX5:
-        *cnt = GET_REG_FIELD(*vc, 1, 5);
-        *type = GET_REG_FIELD(*vc, 3, 6);
-        *frac = (u8)(*vc >> 9) & 0x1F;
-        return;
-    case GX_VA_TEX6:
-        *cnt = GET_REG_FIELD(*vc, 1, 14);
-        *type = GET_REG_FIELD(*vc, 3, 15);
-        *frac = (u8)(*vc >> 0x12) & 0x1F;
-        return;
-    case GX_VA_TEX7:
-        *cnt  = GET_REG_FIELD(*vc, 1, 23);
-        *type = GET_REG_FIELD(*vc, 3, 24);
-        *frac = (int)(*vc >> 0x1B);
-        return;
-    default:
-        *cnt = GX_TEX_ST;
-        *type = GX_RGB565;
-        *frac = 0;
-        return;
-    }
-}
-
-void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList* vat) {
-    GXAttr attr;
-
-    CHECK_GXBEGIN(930, "GXGetVtxAttrFmtv");
-    CHECK_LISTPTR(931, vat);
-    CHECK_VTXFMT(932, fmt);
-
-    for (attr = GX_VA_POS; attr <= GX_VA_TEX7; attr++) {
-        vat->attr = attr;
-        GXGetVtxAttrFmt(fmt, attr, &vat->cnt, &vat->type, &vat->frac);
-        vat++;
-    }
-
-    vat->attr = GX_VA_NULL;
 }
 
 void GXSetArray(GXAttr attr, void* base_ptr, u8 stride) {

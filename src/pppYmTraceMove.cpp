@@ -73,7 +73,6 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
-	Vec local_8c;
 	Vec local_ec;
 	Quaternion local_60;
 	Quaternion local_70;
@@ -93,6 +92,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppCopyVector(local_20, work->m_direction);
 		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
+		Vec local_8c;
 		u8* ownerBytes = (u8*)owner;
 		Vec local_74;
 
@@ -102,18 +102,22 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppSubVector(local_20, local_8c, pppMngSt->m_position);
 
 		local_20.y = local_20.y + param_2->m_payload;
-		local_74 = local_20;
+		local_74.x = local_20.x;
+		local_74.y = local_20.y;
+		local_74.z = local_20.z;
 		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_74);
 
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
 
-		if ((local_2c.x == kPppYmTraceMoveZero) && (local_2c.y == kPppYmTraceMoveZero) &&
-		    (local_2c.z == kPppYmTraceMoveZero)) {
+		if ((kPppYmTraceMoveZero == local_2c.x) && (kPppYmTraceMoveZero == local_2c.y) &&
+		    (kPppYmTraceMoveZero == local_2c.z)) {
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
-		local_74 = local_2c;
+		local_74.x = local_2c.x;
+		local_74.y = local_2c.y;
+		local_74.z = local_2c.z;
 		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_74);
 	}
 

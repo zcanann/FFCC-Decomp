@@ -66,6 +66,7 @@ static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpre
 
 CLightPcs LightPcs;
 static char s_p_light_cpp[] = "p_light.cpp";
+static _GXColor sAmbientColor;
 
 static inline double U32ToDouble(unsigned int value)
 {
@@ -737,12 +738,8 @@ void CLightPcs::SetAmbient(_GXColor color)
  */
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
-    _GXColor color;
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-    color.a = (u8)(int)((double)FLOAT_8032fc7c * (double)alpha);
-    GXSetChanAmbColor((GXChannelID)2, color);
+    sAmbientColor.a = (u8)(int)((double)FLOAT_8032fc7c * (double)alpha);
+    GXSetChanAmbColor((GXChannelID)2, sAmbientColor);
 }
 
 /*

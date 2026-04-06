@@ -989,7 +989,7 @@ config.libs = [
                 ),
             ),
             Object(Matching, "MSL_C/PPCEABI/bare/H/misc_io.c", mw_version="GC/2.6"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/printf.c"),
+            Object(NonMatching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/signal.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/string.c"),

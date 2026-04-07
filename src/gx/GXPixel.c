@@ -88,18 +88,18 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
         u32 c_hex = *(u32*)&c;
 
         fog0 = 0;
-        OLD_SET_REG_FIELD(0, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
-        OLD_SET_REG_FIELD(0, fog0, 8, 11, (a_hex >> 23) & 0xFF);
-        OLD_SET_REG_FIELD(0, fog0, 1, 19, (a_hex >> 31));
-        OLD_SET_REG_FIELD(0, fog0, 8, 24, 0xEE);
+        SET_REG_FIELD(0, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
+        SET_REG_FIELD(0, fog0, 8, 11, (a_hex >> 23) & 0xFF);
+        SET_REG_FIELD(0, fog0, 1, 19, (a_hex >> 31));
+        SET_REG_FIELD(0, fog0, 8, 24, 0xEE);
 
         fog3 = 0;
-        OLD_SET_REG_FIELD(0, fog3, 11, 0, (c_hex >> 12) & 0x7FF);
-        OLD_SET_REG_FIELD(0, fog3, 8, 11, (c_hex >> 23) & 0xFF);
-        OLD_SET_REG_FIELD(0, fog3, 1, 19, (c_hex >> 31));
-        OLD_SET_REG_FIELD(0, fog3, 1, 20, proj);
-        OLD_SET_REG_FIELD(0, fog3, 3, 21, fsel);
-        OLD_SET_REG_FIELD(0, fog3, 8, 24, 0xF1);
+        SET_REG_FIELD(0, fog3, 11, 0, (c_hex >> 12) & 0x7FF);
+        SET_REG_FIELD(0, fog3, 8, 11, (c_hex >> 23) & 0xFF);
+        SET_REG_FIELD(0, fog3, 1, 19, (c_hex >> 31));
+        SET_REG_FIELD(0, fog3, 1, 20, proj);
+        SET_REG_FIELD(0, fog3, 3, 21, fsel);
+        SET_REG_FIELD(0, fog3, 8, 24, 0xF1);
     }
 
     fogclr = (u32)color.b;

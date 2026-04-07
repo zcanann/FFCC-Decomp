@@ -965,7 +965,7 @@ void VISet3D(BOOL threeD) {
     enabled = OSDisableInterrupts();
     HorVer.threeD = threeD;
     reg = regs[1];
-    OLD_SET_REG_FIELD(2355, reg, 1, 3, HorVer.threeD);
+    SET_REG_FIELD(2355, reg, 1, 3, HorVer.threeD);
     regs[1] = reg;
     MARK_CHANGED(1);
     setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
@@ -1243,8 +1243,8 @@ void __VISetLatchMode(u32 mode) {
     u32 reg;
 
     reg = __VIRegs[1];
-    OLD_SET_REG_FIELD(2834, reg, 2, 4, mode);
-    OLD_SET_REG_FIELD(2835, reg, 2, 6, mode);
+    SET_REG_FIELD(2834, reg, 2, 4, mode);
+    SET_REG_FIELD(2835, reg, 2, 6, mode);
     __VIRegs[1] = reg;
 }
 

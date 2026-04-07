@@ -3,6 +3,11 @@
 
 #include "dolphin/gx/__gx.h"
 
+#define SOME_SET_REG_MACRO(reg, size, shift, val)                                                   \
+	do {                                                                                            \
+		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
+	} while (0);
+
 extern f32 sqrtf(f32);
 
 const f32 GXPixel_ZeroF = 0.0f;
@@ -15,11 +20,11 @@ const f32 GXPixel_FogMantissaScale = 8388638.0f;
 const f64 GXPixel_IntToDoubleBias = 4503601774854144.0;
 
 void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
+    u32 fogclr;
     u32 fog0;
     u32 fog1;
     u32 fog2;
     u32 fog3;
-    u32 fogclr;
     f32 A;
     f32 B;
     f32 B_mant;
@@ -29,6 +34,8 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     u32 B_expn;
     u32 b_m;
     u32 b_s;
+    u32 a_hex;
+    u32 c_hex;
     u32 fsel;
     u32 proj;
 
@@ -83,29 +90,28 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
         fog2 = (b_s & 0x00FFFFFF) | 0xF0000000;
     }
 
-    {
-        u32 a_hex = *(u32*)&a;
-        u32 c_hex = *(u32*)&c;
+    a_hex = *(u32*)&a;
+    c_hex = *(u32*)&c;
 
-        fog0 = 0;
-        SET_REG_FIELD(0, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
-        SET_REG_FIELD(0, fog0, 8, 11, (a_hex >> 23) & 0xFF);
-        SET_REG_FIELD(0, fog0, 1, 19, (a_hex >> 31));
-        SET_REG_FIELD(0, fog0, 8, 24, 0xEE);
+    fog0 = 0;
+    SET_REG_FIELD(0, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
+    SET_REG_FIELD(0, fog0, 8, 11, (a_hex >> 23) & 0xFF);
+    SET_REG_FIELD(0, fog0, 1, 19, (a_hex >> 31));
+    SET_REG_FIELD(0, fog0, 8, 24, 0xEE);
 
-        fog3 = 0;
-        SET_REG_FIELD(0, fog3, 11, 0, (c_hex >> 12) & 0x7FF);
-        SET_REG_FIELD(0, fog3, 8, 11, (c_hex >> 23) & 0xFF);
-        SET_REG_FIELD(0, fog3, 1, 19, (c_hex >> 31));
-        SET_REG_FIELD(0, fog3, 1, 20, proj);
-        SET_REG_FIELD(0, fog3, 3, 21, fsel);
-        SET_REG_FIELD(0, fog3, 8, 24, 0xF1);
-    }
+    fog3 = 0;
+    SET_REG_FIELD(0, fog3, 11, 0, (c_hex >> 12) & 0x7FF);
+    SET_REG_FIELD(0, fog3, 8, 11, (c_hex >> 23) & 0xFF);
+    SET_REG_FIELD(0, fog3, 1, 19, (c_hex >> 31));
+    SET_REG_FIELD(0, fog3, 1, 20, proj);
+    SET_REG_FIELD(0, fog3, 3, 21, fsel);
+    SET_REG_FIELD(0, fog3, 8, 24, 0xF1);
 
-    fogclr = (u32)color.b;
-    fogclr |= (u32)color.g << 8;
-    fogclr |= (u32)color.r << 16;
-    fogclr = (fogclr & 0x00FFFFFF) | 0xF2000000;
+    fogclr = 0;
+    SET_REG_FIELD(0, fogclr, 8, 0, color.b);
+    SET_REG_FIELD(0, fogclr, 8, 8, color.g);
+    SET_REG_FIELD(0, fogclr, 8, 16, color.r);
+    SET_REG_FIELD(0, fogclr, 8, 24, 0xF2);
 
     GX_WRITE_RAS_REG(fog0);
     GX_WRITE_RAS_REG(fog1);
@@ -200,16 +206,16 @@ void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor ds
     blend_en = type == GX_BM_BLEND || type == GX_BM_SUBTRACT;
 #endif
 
-    SET_REG_FIELD(389, reg, 1, 11, (type == GX_BM_SUBTRACT));
+    SOME_SET_REG_MACRO(reg, 1, 11, (type == GX_BM_SUBTRACT));
 #if DEBUG
-    SET_REG_FIELD(392, reg, 1, 0, blend_en);
+    SOME_SET_REG_MACRO(reg, 1, 0, blend_en);
 #else
-    SET_REG_FIELD(392, reg, 1, 0, type);
+    SOME_SET_REG_MACRO(reg, 1, 0, type);
 #endif
-    SET_REG_FIELD(393, reg, 1, 1, (type == GX_BM_LOGIC));
-    SET_REG_FIELD(394, reg, 4, 12, op);
-    SET_REG_FIELD(395, reg, 3, 8, src_factor);
-    SET_REG_FIELD(396, reg, 3, 5, dst_factor);
+    SOME_SET_REG_MACRO(reg, 1, 1, (type == GX_BM_LOGIC));
+    SOME_SET_REG_MACRO(reg, 4, 12, op);
+    SOME_SET_REG_MACRO(reg, 3, 8, src_factor);
+    SOME_SET_REG_MACRO(reg, 3, 5, dst_factor);
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cmode0 = reg;
@@ -222,7 +228,7 @@ void GXSetColorUpdate(GXBool update_enable) {
 
     reg = __GXData->cmode0;
 
-    SET_REG_FIELD(421, reg, 1, 3, update_enable);
+    SOME_SET_REG_MACRO(reg, 1, 3, update_enable);
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cmode0 = reg;
@@ -235,7 +241,7 @@ void GXSetAlphaUpdate(GXBool update_enable) {
 
     reg = __GXData->cmode0;
 
-    SET_REG_FIELD(434, reg, 1, 4, update_enable);
+    SOME_SET_REG_MACRO(reg, 1, 4, update_enable);
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cmode0 = reg;
@@ -248,9 +254,9 @@ void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
 
     reg = __GXData->zmode;
 
-    SET_REG_FIELD(462, reg, 1, 0, compare_enable);
-    SET_REG_FIELD(463, reg, 3, 1, func);
-    SET_REG_FIELD(464, reg, 1, 4, update_enable);
+    SOME_SET_REG_MACRO(reg, 1, 0, compare_enable);
+    SOME_SET_REG_MACRO(reg, 3, 1, func);
+    SOME_SET_REG_MACRO(reg, 1, 4, update_enable);
     GX_WRITE_RAS_REG(reg);
 
     __GXData->zmode = reg;
@@ -307,7 +313,7 @@ void GXSetDither(GXBool dither) {
 
     reg = __GXData->cmode0;
 
-    SET_REG_FIELD(559, reg, 1, 2, dither);
+    SOME_SET_REG_MACRO(reg, 1, 2, dither);
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cmode0 = reg;
@@ -320,8 +326,8 @@ void GXSetDstAlpha(GXBool enable, u8 alpha) {
 
     reg = __GXData->cmode1;
 
-    SET_REG_FIELD(584, reg, 8, 0, alpha);
-    SET_REG_FIELD(585, reg, 1, 8, enable);
+    SOME_SET_REG_MACRO(reg, 8, 0, alpha);
+    SOME_SET_REG_MACRO(reg, 1, 8, enable);
     GX_WRITE_RAS_REG(reg);
 
     __GXData->cmode1 = reg;

@@ -8,17 +8,6 @@
 		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
 	} while (0);
 
-extern f32 sqrtf(f32);
-
-const f32 GXPixel_ZeroF = 0.0f;
-const f32 GXPixel_OneF = 1.0f;
-const f32 GXPixel_HalfF = 0.5f;
-const f64 GXPixel_OneD = 1.0;
-const f32 GXPixel_TwoF = 2.0f;
-const f64 GXPixel_HalfD = 0.5;
-const f32 GXPixel_FogMantissaScale = 8388638.0f;
-const f64 GXPixel_IntToDoubleBias = 4503601774854144.0;
-
 void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     u32 fogclr;
     u32 fog0;
@@ -44,7 +33,7 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
 
     CHECK_GXBEGIN(138, "GXSetFog");
 
-    ASSERTMSGLINE(140, farz >= GXPixel_ZeroF, "GXSetFog: The farz should be positive value");
+    ASSERTMSGLINE(140, farz >= 0.0f, "GXSetFog: The farz should be positive value");
     ASSERTMSGLINE(141, farz >= nearz, "GXSetFog: The farz should be larger than nearz");
 
     fsel = type & 7;
@@ -52,18 +41,18 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     
     if (proj) {
         if (farz == nearz || endz == startz) {
-            a = GXPixel_ZeroF;
-            c = GXPixel_ZeroF;
+            a = 0.0f;
+            c = 0.0f;
         } else {
-            A = (GXPixel_OneF / (endz - startz));
+            A = (1.0f / (endz - startz));
             a = A * (farz - nearz);
             c = A * (startz - nearz);
         }
     } else {
         if (farz == nearz || endz == startz) {
-            A = GXPixel_ZeroF;
-            B = GXPixel_HalfF;
-            C = GXPixel_ZeroF;
+            A = 0.0f;
+            B = 0.5f;
+            C = 0.0f;
         } else {
             A = (farz * nearz) / ((farz - nearz) * (endz - startz));
             B = farz / (farz - nearz);
@@ -72,17 +61,17 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
 
         B_mant = B;
         B_expn = 0;
-        while (B_mant > GXPixel_OneD) {
-            B_mant /= GXPixel_TwoF;
+        while (B_mant > 1.0) {
+            B_mant /= 2.0f;
             B_expn++;
         }
-        while (B_mant > GXPixel_ZeroF && B_mant < GXPixel_HalfD) {
-            B_mant *= GXPixel_TwoF;
+        while (B_mant > 0.0f && B_mant < 0.5) {
+            B_mant *= 2.0f;
             B_expn--;
         }
 
         a = A / (f32) (1 << (B_expn + 1));
-        b_m = GXPixel_FogMantissaScale * B_mant;
+        b_m = 8388638.0f * B_mant;
         b_s = B_expn + 1;
         c = C;
 
@@ -122,46 +111,6 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     __GXData->bpSentNot = 0;
 }
 
-void GXSetFogColor(GXColor color) {
-    u32 rgba;
-    u32 fogclr = 0xF2000000;
-
-    rgba = *(u32*)&color;
-    SET_REG_FIELD(250, fogclr, 24, 0, rgba >> 8);
-    GX_WRITE_RAS_REG(fogclr);
-    __GXData->bpSentNot = 0;
-}
-
-void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4]) {
-    f32 xi;
-    f32 iw;
-    f32 rangeVal;
-    f32 nearZ;
-    f32 sideX;
-    u32 i;
-
-    CHECK_GXBEGIN(275, "GXInitFogAdjTable");
-    ASSERTMSGLINE(276, table != NULL, "GXInitFogAdjTable: table pointer is null");
-    ASSERTMSGLINE(277, width <= 640, "GXInitFogAdjTable: invalid width value");
-
-    if (GXPixel_ZeroF == projmtx[3][3]) {
-        nearZ = projmtx[2][3] / (projmtx[2][2] - GXPixel_OneF);
-        sideX = nearZ / projmtx[0][0];
-    } else {
-        sideX = GXPixel_OneF / projmtx[0][0];
-        nearZ = 1.73205f * sideX;
-    }
-
-    iw = GXPixel_TwoF / width;
-    for (i = 0; i < 10; i++) {
-        xi = (i + 1) << 5;
-        xi *= iw;
-        xi *= sideX;
-        rangeVal = sqrtf(GXPixel_OneF + ((xi * xi) / (nearZ * nearZ)));
-        table->r[i] = (u32)(256.0f * rangeVal) & 0xFFF;
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801a5bd8
@@ -172,24 +121,27 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
  * JP Size: TODO
  */
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
-    u32 fogRangeReg;
-    u32 fogRangeRegK;
     u32 i;
+    u32 fogRangeRegK;
+    u32 fogRangeReg;
 
     CHECK_GXBEGIN(331, "GXSetFogRangeAdj");
 
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
         for (i = 0; i < 10; i += 2) {
-            fogRangeRegK = (table->r[i] & 0xFFF) | ((u32)table->r[i + 1] << 12);
-            fogRangeRegK = (fogRangeRegK & 0x00FFFFFF) | ((0xE9 + (i >> 1)) << 24);
+            fogRangeRegK = 0;
+            SET_REG_FIELD(0, fogRangeRegK, 12, 0, table->r[i]);
+            SET_REG_FIELD(0, fogRangeRegK, 12, 12, table->r[i + 1]);
+            SET_REG_FIELD(0, fogRangeRegK, 8, 24, (i >> 1) + 0xE9);
             GX_WRITE_RAS_REG(fogRangeRegK);
         }
     }
 
-    fogRangeReg = (center + 342) & 0xFFFFFBFF;
-    fogRangeReg |= (u32)(u8)enable << 10;
-    fogRangeReg = (fogRangeReg & 0x00FFFFFF) | 0xE8000000;
+    fogRangeReg = 0;
+    SET_REG_FIELD(0, fogRangeReg, 10, 0, center + 342);
+    SET_REG_FIELD(0, fogRangeReg, 1, 10, enable);
+    SET_REG_FIELD(0, fogRangeReg, 8, 24, 0xE8);
     GX_WRITE_RAS_REG(fogRangeReg);
     __GXData->bpSentNot = 0;
 }

@@ -107,9 +107,9 @@ void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
 
     switch (spot_func) {
     case GX_SP_FLAT:
+        a0 = -1000.0f * cr;
         a1 = 1000.0f;
         a2 = 0.0f;
-        a0 = -1000.0f * cr;
         break;
     case GX_SP_COS:
         a2 = 0.0f;

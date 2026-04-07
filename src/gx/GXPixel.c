@@ -83,21 +83,28 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
         fog2 = (b_s & 0x00FFFFFF) | 0xF0000000;
     }
 
-    fog0 = ((*(u32*)&a >> 12) & 0x7FF);
-    fog0 |= ((*(u32*)&a >> 12) & 0x7F800);
-    fog0 |= ((*(u32*)&a >> 12) & 0x80000);
-    fog0 |= 0xEE000000;
+    {
+        u32 a_hex = *(u32*)&a;
+        u32 c_hex = *(u32*)&c;
 
-    fog3 = ((*(u32*)&c >> 12) & 0x7FF);
-    fog3 |= ((*(u32*)&c >> 12) & 0x7F800);
-    fog3 |= ((*(u32*)&c >> 12) & 0x80000);
-    fog3 |= (proj << 20);
-    fog3 |= (fsel << 21);
-    fog3 |= 0xF1000000;
+        fog0 = 0;
+        OLD_SET_REG_FIELD(0, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
+        OLD_SET_REG_FIELD(0, fog0, 8, 11, (a_hex >> 23) & 0xFF);
+        OLD_SET_REG_FIELD(0, fog0, 1, 19, (a_hex >> 31));
+        OLD_SET_REG_FIELD(0, fog0, 8, 24, 0xEE);
 
-    fogclr = (u32)color.r << 16;
+        fog3 = 0;
+        OLD_SET_REG_FIELD(0, fog3, 11, 0, (c_hex >> 12) & 0x7FF);
+        OLD_SET_REG_FIELD(0, fog3, 8, 11, (c_hex >> 23) & 0xFF);
+        OLD_SET_REG_FIELD(0, fog3, 1, 19, (c_hex >> 31));
+        OLD_SET_REG_FIELD(0, fog3, 1, 20, proj);
+        OLD_SET_REG_FIELD(0, fog3, 3, 21, fsel);
+        OLD_SET_REG_FIELD(0, fog3, 8, 24, 0xF1);
+    }
+
+    fogclr = (u32)color.b;
     fogclr |= (u32)color.g << 8;
-    fogclr |= color.b;
+    fogclr |= (u32)color.r << 16;
     fogclr = (fogclr & 0x00FFFFFF) | 0xF2000000;
 
     GX_WRITE_RAS_REG(fog0);

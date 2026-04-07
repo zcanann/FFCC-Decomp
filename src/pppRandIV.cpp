@@ -57,13 +57,19 @@ void pppRandIV(void* param1, void* param2, void* param3)
     } else {
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
-    
+
     target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
 
     {
         f32 randValue = *valuePtr;
         target[0] += (s32)((f32)in->field8 * randValue - (f32)in->field8);
+    }
+    {
+        f32 randValue = *valuePtr;
         target[1] += (s32)((f32)in->fieldC * randValue - (f32)in->fieldC);
+    }
+    {
+        f32 randValue = *valuePtr;
         target[2] += (s32)((f32)in->field10 * randValue - (f32)in->field10);
     }
 }

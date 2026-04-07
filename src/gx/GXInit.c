@@ -7,9 +7,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-#undef SET_REG_FIELD
-#define SET_REG_FIELD OLD_SET_REG_FIELD
-
 #if DEBUG
 static const char s___GXVersion[] = "<< Dolphin SDK - GX\tdebug build: Apr  5 2004 03:55:13 (0x2301) >>";
 #else

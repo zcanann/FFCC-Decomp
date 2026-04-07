@@ -377,8 +377,8 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
     u32 msLoc1;
     u32 msLoc2;
     u32 msLoc3;
-    u32 coeff0 = 0x53595000;
-    u32 coeff1 = 0x54000015;
+    u32 coeff0;
+    u32 coeff1;
 
     CHECK_GXBEGIN(1641, "GXSetCopyFilter");
 
@@ -427,14 +427,17 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
     GX_WRITE_RAS_REG(msLoc3);
 
     if (vf != 0) {
-        coeff0 = 0x53000000 | (vfilter[0] & 0x3F);
+        coeff0 = 0x53000000 | vfilter[0];
         coeff0 = (coeff0 & ~0xFC0) | ((u32)vfilter[1] << 6);
         coeff0 = (coeff0 & ~0x3F000) | ((u32)vfilter[2] << 12);
         coeff0 = (coeff0 & ~0xFC0000) | ((u32)vfilter[3] << 18);
 
-        coeff1 = 0x54000000 | (vfilter[4] & 0x3F);
+        coeff1 = 0x54000000 | vfilter[4];
         coeff1 = (coeff1 & ~0xFC0) | ((u32)vfilter[5] << 6);
         coeff1 = (coeff1 & ~0x3F000) | ((u32)vfilter[6] << 12);
+    } else {
+        coeff0 = 0x53595000;
+        coeff1 = 0x54000015;
     }
 
     GX_WRITE_RAS_REG(coeff0);

@@ -153,13 +153,22 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             0x7f);
         drop = work->drops;
         for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
+            float minX;
+            float maxX;
+            float minZ;
+            float maxZ;
+
             randA = rand();
             randB = rand();
             unitA = FLOAT_80331020 * (float)randA;
             unitB = FLOAT_80331020 * (float)randB;
-            drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
+            maxX = rain->maxX;
+            minX = rain->minX;
+            maxZ = rain->maxZ;
+            minZ = rain->minZ;
+            drop->posX = unitA * (maxX - minX) + minX;
             drop->posY = rain->maxY;
-            drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
+            drop->posZ = unitB * (maxZ - minZ) + minZ;
             drop->dirX = -param_2->m_initWOrk;
             drop->dirY = rain->driftY;
             drop->dirZ = -param_2->m_arg3;
@@ -196,14 +205,23 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         drop->posY -= rain->driftY;
         drop->posZ = -(drop->dirZ * work->moveY - drop->posZ);
         drop->life--;
-        if (drop->life < 1) {
+        if (drop->life <= 0) {
+            float minX;
+            float maxX;
+            float minZ;
+            float maxZ;
+
             randA = rand();
             randB = rand();
             unitA = FLOAT_80331020 * (float)randA;
             unitB = FLOAT_80331020 * (float)randB;
-            drop->posX = unitA * (rain->maxX - rain->minX) + rain->minX;
+            maxX = rain->maxX;
+            minX = rain->minX;
+            maxZ = rain->maxZ;
+            minZ = rain->minZ;
+            drop->posX = unitA * (maxX - minX) + minX;
             drop->posY = rain->maxY;
-            drop->posZ = unitB * (rain->maxZ - rain->minZ) + rain->minZ;
+            drop->posZ = unitB * (maxZ - minZ) + minZ;
             drop->dirX = -param_2->m_initWOrk;
             drop->dirY = rain->driftY;
             drop->dirZ = -param_2->m_arg3;

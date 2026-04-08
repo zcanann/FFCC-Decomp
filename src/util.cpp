@@ -188,16 +188,20 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	PSVECSubtract(&p3, &p1, &tan1);
 	PSVECScale(&tan1, &tan1, scale);
 
-	float t2 = t * t;
-	float t3 = t2 * t;
-	float h10 = t - ((kUtilHermiteCoeff2 * t2) - t3);
-	float h11 = t3 - t2;
-	float h00 = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
-	float h01 = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
+	float hermite[4] = {0.0f, 1.0f, 0.0f, 0.0f};
+	float t2;
+	float t3;
 
-	out.x = (h10 * tan0.x) + (h11 * tan1.x) + (h00 * p1.x) + (h01 * p2.x);
-	out.y = (h10 * tan0.y) + (h11 * tan1.y) + (h00 * p1.y) + (h01 * p2.y);
-	out.z = (h10 * tan0.z) + (h11 * tan1.z) + (h00 * p1.z) + (h01 * p2.z);
+	t2 = t * t;
+	t3 = t2 * t;
+	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
+	hermite[1] = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
+	hermite[2] = t - ((kUtilHermiteCoeff2 * t2) - t3);
+	hermite[3] = t3 - t2;
+
+	out.x = (hermite[1] * p2.x) + (hermite[0] * p1.x) + (hermite[2] * tan0.x) + (hermite[3] * tan1.x);
+	out.y = (hermite[1] * p2.y) + (hermite[0] * p1.y) + (hermite[2] * tan0.y) + (hermite[3] * tan1.y);
+	out.z = (hermite[1] * p2.z) + (hermite[0] * p1.z) + (hermite[2] * tan0.z) + (hermite[3] * tan1.z);
 }
 
 /*

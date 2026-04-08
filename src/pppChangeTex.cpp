@@ -137,38 +137,30 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
 	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
-	int vertexArray;
+	int displayListIdx;
 	int* displayListPtr;
 	int dlArrayBase;
 	int dlOffset;
-	int initTevBits;
-	int drawTevBits;
-	void** meshColorArrays;
+	void* meshColorArrays;
 	void* meshColorArray;
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
 	if (*(u8*)((char*)param_3 + 0x14) != 0) {
-		meshColorArrays = *(void***)((char*)param_2 + 0xc);
+		meshColorArrays = *(void**)((char*)param_2 + 0xC);
 		dlOffset = *(int*)((char*)param_2 + 0x1c);
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
-			meshColorArray = meshColorArrays[meshIdx];
+			meshColorArray = *(void**)((u8*)meshColorArrays + meshIdx * 4);
 			if (meshColorArray != 0) {
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
-				initTevBits = 0xade0f;
-				drawTevBits = 0xace0f;
-				vertexArray = meshData->m_displayListCount - 1;
-				dlOffset = vertexArray * 4;
-				while (vertexArray >= 0) {
-					dlArrayBase = ((int*)*(int*)((char*)param_2 + 0x10))[meshIdx];
-					*(int*)(MaterialManRaw() + 0x48) = initTevBits;
-					*(int*)(MaterialManRaw() + 0x128) = 0;
-					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
-					*(int*)(MaterialManRaw() + 0x130) = 0;
+				displayListIdx = meshData->m_displayListCount - 1;
+				dlOffset = displayListIdx * 4;
+				while (displayListIdx >= 0) {
+					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
 					*(int*)(MaterialManRaw() + 0x44) = -1;
 					*(char*)(MaterialManRaw() + 0x4c) = 0xff;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
@@ -179,17 +171,20 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 					*(int*)(MaterialManRaw() + 0x58) = 0;
 					*(int*)(MaterialManRaw() + 0x5c) = 0;
 					*(char*)(MaterialManRaw() + 0x208) = 0;
-					*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 					*(int*)(MaterialManRaw() + 0x128) = 0;
 					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
-					*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
+					*(int*)(MaterialManRaw() + 0x48) = 0xade0f;
+					*(int*)(MaterialManRaw() + 0x128) = 0;
+					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
+					*(int*)(MaterialManRaw() + 0x130) = 0;
+					*(int*)(MaterialManRaw() + 0x40) = 0xade0f;
 					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
 					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
 					dlOffset -= 4;
-					vertexArray -= 1;
+					displayListIdx -= 1;
 					displayList += 1;
 				}
 			}

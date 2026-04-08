@@ -141,44 +141,41 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 	int* displayListPtr;
 	int dlArrayBase;
 	int dlOffset;
-	int fullWord;
+	int initTevBits;
 	int drawTevBits;
-	u8 fullByte;
-	void* meshColorArrays;
+	void** meshColorArrays;
 	void* meshColorArray;
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
 	if (*(u8*)((char*)param_3 + 0x14) != 0) {
-		meshColorArrays = *(void**)((char*)param_2 + 0xc);
+		meshColorArrays = *(void***)((char*)param_2 + 0xc);
 		dlOffset = *(int*)((char*)param_2 + 0x1c);
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
-			meshColorArray = *(void**)((u8*)meshColorArrays + meshIdx * 4);
+			meshColorArray = meshColorArrays[meshIdx];
 			if (meshColorArray != 0) {
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
+				initTevBits = 0xade0f;
 				drawTevBits = 0xace0f;
-				fullWord = -1;
-				drawTevBits |= 0x1000;
-				fullByte = 0xff;
 				vertexArray = meshData->m_displayListCount - 1;
 				dlOffset = vertexArray * 4;
 				while (vertexArray >= 0) {
-					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
-					*(int*)(MaterialManRaw() + 0x48) = 0xace0f;
+					dlArrayBase = ((int*)*(int*)((char*)param_2 + 0x10))[meshIdx];
+					*(int*)(MaterialManRaw() + 0x48) = initTevBits;
 					*(int*)(MaterialManRaw() + 0x128) = 0;
 					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
-					*(int*)(MaterialManRaw() + 0x44) = fullWord;
-					*(char*)(MaterialManRaw() + 0x4c) = fullByte;
+					*(int*)(MaterialManRaw() + 0x44) = -1;
+					*(char*)(MaterialManRaw() + 0x4c) = 0xff;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
 					*(int*)(MaterialManRaw() + 0x120) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x124) = 0;
-					*(char*)(MaterialManRaw() + 0x205) = fullByte;
-					*(char*)(MaterialManRaw() + 0x206) = fullByte;
+					*(char*)(MaterialManRaw() + 0x205) = 0xff;
+					*(char*)(MaterialManRaw() + 0x206) = 0xff;
 					*(int*)(MaterialManRaw() + 0x58) = 0;
 					*(int*)(MaterialManRaw() + 0x5c) = 0;
 					*(char*)(MaterialManRaw() + 0x208) = 0;

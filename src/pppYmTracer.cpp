@@ -210,6 +210,7 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
  */
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
+    _pppPObject* baseObj;
     TracerMngRaw* mng;
     TracerWork* work;
     TRACE_POLYGON* entries;
@@ -223,6 +224,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         return;
     }
 
+    baseObj = (_pppPObject*)pppYmTracer;
     work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_3->m_serializedDataOffsets);
     entries = work->entries;
     maxCount = *(u16*)(param_2->m_payload + 4);
@@ -249,7 +251,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         }
     }
 
-    if (param_2->m_graphId == ((s32*)pppYmTracer)[0]) {
+    if (param_2->m_graphId == baseObj->m_graphId) {
         if (param_2->m_initWOrk == -1) {
             valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
         } else {
@@ -316,11 +318,9 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         }
 
         {
-            pppFMATRIX local = *(pppFMATRIX*)((u8*)pppYmTracer + 4);
-            pppFMATRIX world = pppMngStPtr->m_matrix;
             pppFMATRIX result;
 
-            pppMulMatrix(result, world, local);
+            pppMulMatrix(result, pppMngStPtr->m_matrix, baseObj->m_localMatrix);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }

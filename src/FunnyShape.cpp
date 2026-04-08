@@ -406,7 +406,7 @@ void CFunnyShape::Update()
  */
 void CFunnyShape::Render()
 {
-    if ((Ptr(this, 0x60D4)[0] == 0) || (AnimData(this) == 0)) {
+    if ((*reinterpret_cast<s8*>(Ptr(this, 0x60D4)) == 0) || (AnimData(this) == 0)) {
         return;
     }
 
@@ -491,13 +491,13 @@ void CFunnyShape::RenderTexture()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    const u32 color = *reinterpret_cast<const u32*>(&DAT_8032fd5c);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
 
     const u8* texData = reinterpret_cast<const u8*>(PtrAt(this, 0x6054));
     const s16 width = *reinterpret_cast<const s16*>(texData + 4);
     const s16 height = *reinterpret_cast<const s16*>(texData + 6);
-    const u32 color = *reinterpret_cast<const u32*>(&DAT_8032fd5c);
     GXSetViewport(FLOAT_8032fd98, FLOAT_8032fd98, static_cast<float>(width), static_cast<float>(height),
                   FLOAT_8032fd6c, FLOAT_8032fd74);
 

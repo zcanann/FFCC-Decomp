@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/symbols_shared.h"
 
@@ -20,8 +21,12 @@ extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__4CRefFv(void*, int);
+extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void Destroy__6CCharaFv(void*);
+extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
 extern "C" unsigned char MiniGamePcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
@@ -413,12 +418,31 @@ void CCharaPcs::createLoad()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079fd4
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::destroy()
 {
-	// TODO
+    Reset(static_cast<RESET>(1));
+    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
+    gCharaPartWorkPtr = 0;
+
+    if (*reinterpret_cast<void**>(Ptr(this, 0x4C)) != 0) {
+        __dt__Q29CCharaPcs7CHandleFv(*reinterpret_cast<void**>(Ptr(this, 0x4C)), 1);
+        *reinterpret_cast<void**>(Ptr(this, 0x4C)) = 0;
+    }
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xCC)));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD0)));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD8)));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xDC)));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xE0)));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD4)));
+    Destroy__6CCharaFv(&Chara);
 }
 
 /*

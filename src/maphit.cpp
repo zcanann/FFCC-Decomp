@@ -197,7 +197,7 @@ CMapHit::CMapHit()
 CMapHit::~CMapHit()
 {
     if (m_vertices != 0) {
-        delete[] m_vertices;
+        operator delete(m_vertices);
         m_vertices = 0;
     }
 

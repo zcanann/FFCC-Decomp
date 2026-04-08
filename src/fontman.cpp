@@ -186,9 +186,9 @@ CFont::~CFont()
 {
 	if (texturePtr != 0) {
 		int* texture = reinterpret_cast<int*>(texturePtr);
-		int refCount = texture[1];
-		texture[1] = refCount - 1;
-		if ((refCount - 1 == 0) && (texture != 0)) {
+		int nextRefCount = texture[1] - 1;
+		texture[1] = nextRefCount;
+		if ((nextRefCount == 0) && (texture != 0)) {
 			(*(void (**)(int*, int))(*texture + 8))(texture, 1);
 		}
 		texturePtr = 0;

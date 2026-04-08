@@ -21,7 +21,6 @@ extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsig
 extern float FLOAT_80330ee0;
 extern float FLOAT_80330ee4;
 extern "C" int rand(void);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 struct LocationTitleWork {
     void* m_particles;
@@ -42,7 +41,7 @@ struct LocationTitleParticle {
     s16 m_pad;
 };
 
-static const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
+char s_pppLocationTitle_cpp_801DB510[] = "pppLocationTitle.cpp";
 
 /*
  * --INFO--
@@ -141,9 +140,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         LocationTitleParticle* particle;
         float zero;
 
-        work->m_particles =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(param_2->m_maxCount * sizeof(LocationTitleParticle),
-                                                  pppEnvStPtr->m_stagePtr, s_pppLocationTitle_cpp, 0x6d);
+        work->m_particles = pppMemAlloc(param_2->m_maxCount * sizeof(LocationTitleParticle),
+                                        pppEnvStPtr->m_stagePtr, s_pppLocationTitle_cpp_801DB510, 0x6d);
         particle = (LocationTitleParticle*)work->m_particles;
         zero = FLOAT_80330ee0;
 

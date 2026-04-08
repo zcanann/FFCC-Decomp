@@ -105,11 +105,11 @@ struct YmMiasmaParticleState {
 };
 
 struct YmMiasmaRenderStep {
-    u8 m_pad0[4];
-    u16 m_dataValIndex;
-    u8 m_pad6[6];
+    u32 m_graphId;
+    s32 m_dataValIndex;
+    u8 m_pad8[4];
     u16 m_particleCount;
-    u8 m_pad0E[0x24];
+    u8 m_pad0E[0x10];
     u8 m_blendMode;
     u8 m_pad33[0x41];
     u8 m_drawEnvA;

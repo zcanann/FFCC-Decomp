@@ -15,7 +15,7 @@ extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
-extern "C" void* PTR_PTR_s_CMapTexAnim_801ea9a4[];
+extern "C" void* PTR_PTR_s_CMapTexAnim[];
 extern "C" {
 char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
 char s_SetMapTexAnim_MaterialIdNotFound[];
@@ -140,7 +140,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
             if (ref != 0) {
                 __ct__4CRefFv(ref);
-                *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim_801ea9a4;
+                *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim;
                 *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x2C) = 0;
                 *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x30) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x40) = 0;
@@ -387,7 +387,7 @@ CMapTexAnim::~CMapTexAnim()
 {
     unsigned char* const p = reinterpret_cast<unsigned char*>(this);
 
-    *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim_801ea9a4;
+    *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
 
     __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
     *reinterpret_cast<void**>(p + 0x20) = 0;

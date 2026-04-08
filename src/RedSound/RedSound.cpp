@@ -34,6 +34,7 @@ static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char s_redSoundAMemorySettingErrorFmt[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogErrorColor[] = "\x1B[7;31m";
 static const char sRedSoundLogReset[] = "\x1B[0m";
+static const char sRedSoundLogInfoColor[] = "\x1B[4;34m";
 static const char s_redSoundArNotInitializedFmt[] = "%s\"AR\" was not initialized.%s\n";
 static const char s_redSoundInitOkFmt[] = "%s%sSound Driver Initialize OK.%s\n";
 static const char s_redSoundInitErrorFmt[] = "%s%sSound Driver Initialize ERROR !!%s\n";
@@ -168,7 +169,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		gRedDriver.Init();
 
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("%s%sSound Driver Initialize OK.%s\n", "\x1B[7;34mSound\x1B[0m:", "\x1B[4;34m",
+			OSReport("%s%sSound Driver Initialize OK.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogInfoColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}

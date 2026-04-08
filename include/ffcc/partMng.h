@@ -386,7 +386,7 @@ public:
     void pppPartInit();
 
     void pppInitEnv(_pppEnvSt*, _pppDataHead*, unsigned int);
-    void pppFileRead(char*, unsigned long&, void*, int);
+    void* pppFileRead(char*, unsigned long&, void*, int);
     void LoadPartNoSyncCalc();
     int pppLoadPtx(const char*, int, int, void*, int);
 

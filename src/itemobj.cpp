@@ -861,12 +861,12 @@ void CGItemObj::statPot()
 void CGItemObj::onFrameAlways()
 {
 	unsigned char* self = (unsigned char*)this;
-	unsigned int countdown = *(unsigned int*)(self + 0x568);
+	unsigned int countdown = *(unsigned int*)(self + 0x56C);
 
 	if (countdown != 0) {
 		unsigned int next = countdown - 1;
-		*(unsigned int*)(self + 0x568) = next & ~((int)next >> 0x1F);
-		*(float*)(self + 0x144) = *(float*)(self + 0x56C) * (float)(8 - *(int*)(self + 0x568)) * FLOAT_80331b68;
+		*(unsigned int*)(self + 0x56C) = next & ~((int)next >> 0x1F);
+		*(float*)(self + 0x144) = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C)) * FLOAT_80331b68;
 	}
 
 	if (*(int*)(self + 0x500) == 0xA) {

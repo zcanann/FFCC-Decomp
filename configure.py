@@ -985,8 +985,9 @@ config.libs = [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/mbstring.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/mem.c"),
             Object(
-                NonMatching,
+                Matching,
                 "MSL_C/PPCEABI/bare/H/mem_funcs.c",
+                mw_version="GC/2.0",
                 cflags=replace_flag_prefix(
                     cflags_msl,
                     "-inline ",

@@ -893,17 +893,20 @@ CCharaPcs::CHandle::~CHandle()
  */
 void CCharaPcs::CHandle::Add()
 {
-    if (m_next == nullptr && m_previous == nullptr)
-	{
-		CCharaPcs::CHandle* head = *reinterpret_cast<CCharaPcs::CHandle**>(
-			reinterpret_cast<char*>(&CharaPcs) + 0x4C);
+    if (m_next != nullptr) {
+        return;
+    }
+    if (m_previous != nullptr) {
+        return;
+    }
 
-		m_previous = head;
-		m_next = head->m_next;
+    CCharaPcs::CHandle* head =
+        (*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(&CharaPcs) + 0x4C))->m_previous;
 
-		head->m_next->m_previous = this;
-		head->m_next = this;
-	}
+    m_previous = head;
+    m_next = head->m_next;
+    head->m_next->m_previous = this;
+    head->m_next = this;
 }
 
 /*

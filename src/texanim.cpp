@@ -612,9 +612,11 @@ CTexAnimSet::CTexAnimSet()
 #pragma dont_inline on
 CTexAnimSet::~CTexAnimSet()
 {
-    *reinterpret_cast<void**>(this) = __vt__11CTexAnimSet;
-    reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8))->ReleaseAndRemoveAll();
-    reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8))->~CPtrArray<CTexAnim*>();
+    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
+
+    self->vtable = __vt__11CTexAnimSet;
+    self->texAnims.ReleaseAndRemoveAll();
+    self->texAnims.~CPtrArray<CTexAnim*>();
     __dt__4CRefFv(this, 0);
 }
 #pragma dont_inline reset

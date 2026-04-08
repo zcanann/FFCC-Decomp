@@ -296,7 +296,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		if (emptyHistory) {
 			Vec* points = work->m_points;
 			for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-				points[i] = points[0];
+				pppCopyVector(points[i], points[0]);
 			}
 		}
 	}

@@ -119,9 +119,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
 		float projectedX = work->m_projectedX;
-		int projectedXInt = (int)projectedX;
-		zAtPixel = 0;
 		float projectedY = work->m_projectedY;
+		zAtPixel = 0;
+		int projectedXInt = (int)projectedX;
 		int projectedYInt = (int)projectedY;
 		u8 flareWidth = unkB->m_arg3;
 		u32 halfWidth = (u32)(flareWidth >> 1);
@@ -150,11 +150,10 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			work->m_alpha = 0xff;
 		} else {
 			u32 scaledAlpha = (u8)work->m_alpha * (0xFF / sampleCount);
-			u8 alpha = (u8)scaledAlpha;
 
-			work->m_alpha = alpha;
-			if (alpha < 0x100) {
-				work->m_alpha = alpha;
+			work->m_alpha = (u8)scaledAlpha;
+			if ((u8)scaledAlpha <= 0xFF) {
+				work->m_alpha = (u8)scaledAlpha;
 			} else {
 				work->m_alpha = 0xff;
 			}

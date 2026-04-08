@@ -30,8 +30,6 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
-extern "C" void* pppPartInit__8CPartMngFv(CPartMng* partMng, const char* filePath, unsigned long* fileSize, void* readBuffer, unsigned long readBufferSize);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
@@ -137,6 +135,19 @@ struct CPtrArrayBare {
     void* m_items;
     CMemory::CStage* m_stage;
     int m_growCapacity;
+};
+
+struct CPartMngLoadState {
+    unsigned char m_unk0[0x236F4];
+    unsigned int m_partAMemBase;
+    unsigned int m_partAMemCursor;
+    unsigned int m_partLoadCacheParam;
+    unsigned int m_partChunkIndex;
+    unsigned int m_asyncHandleCount;
+    int m_partLoadMode;
+    unsigned int m_partChunkSize[16];
+    unsigned int m_partChunkChecksum[16];
+    CFile::CHandle* m_partAsyncBusy[16];
 };
 
 /*
@@ -2786,25 +2797,20 @@ void CPartMng::pppPartDead()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng)
-{
-	char* pppMngSt = reinterpret_cast<char*>(partMng);
-	int i = 0;
-
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(partMng) + 0x8) = 0;
-	do {
-		int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
-		if (baseTime != -0x1000 && baseTime < 0) {
-			_pppInitPart(reinterpret_cast<_pppMngSt*>(pppMngSt));
-		}
-		pppMngSt += 0x158;
-		i++;
-	} while (i < 0x180);
-}
-
 void CPartMng::pppPartInit()
 {
-    pppPartInit__8CPartMngFv2(this);
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    int i = 0;
+
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
+    do {
+        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        if (baseTime != -0x1000 && baseTime < 0) {
+            _pppInitPart(reinterpret_cast<_pppMngSt*>(pppMngSt));
+        }
+        pppMngSt += 0x158;
+        i++;
+    } while (i < 0x180);
 }
 
 /*
@@ -2822,9 +2828,50 @@ void CPartMng::pppInitEnv(_pppEnvSt*, _pppDataHead*, unsigned int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppFileRead(char*, unsigned long&, void*, int)
+void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readBuffer, int readBufferSize)
 {
-	// TODO
+    CPartMngLoadState* loadState = reinterpret_cast<CPartMngLoadState*>(this);
+    CFile::CHandle* fileHandle;
+
+    if (loadState->m_partLoadMode == 1) {
+        fileSize = loadState->m_partChunkSize[loadState->m_partChunkIndex];
+        readBuffer = File.m_readBuffer;
+        if (fileSize == 0) {
+            readBuffer = 0;
+        } else {
+            Memory.CopyFromAMemorySync(
+                File.m_readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), (fileSize + 0x1f) & ~0x1f);
+            loadState->m_partAMemCursor += fileSize;
+            CheckSum__FPvi(readBuffer, fileSize);
+            loadState->m_partChunkIndex++;
+        }
+    } else if (readBuffer == 0 && (fileHandle = File.Open(filePath, 0, CFile::PRI_LOW), fileHandle == 0)) {
+        readBuffer = 0;
+    } else if (loadState->m_partLoadMode == 3) {
+        File.ReadASync(fileHandle);
+        readBuffer = reinterpret_cast<void*>(1);
+        loadState->m_partAsyncBusy[loadState->m_asyncHandleCount] = fileHandle;
+        loadState->m_asyncHandleCount++;
+    } else {
+        if (readBuffer == 0) {
+            fileSize = File.GetLength(fileHandle);
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
+            readBuffer = File.m_readBuffer;
+            File.Close(fileHandle);
+        } else {
+            fileSize = readBufferSize;
+        }
+        if (loadState->m_partLoadMode == 2) {
+            Memory.CopyToAMemorySync(readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), fileSize);
+            loadState->m_partChunkSize[loadState->m_partChunkIndex] = fileSize;
+            loadState->m_partChunkChecksum[loadState->m_partChunkIndex] = CheckSum__FPvi(readBuffer, fileSize);
+            loadState->m_partChunkIndex++;
+            loadState->m_partAMemCursor += fileSize;
+        }
+    }
+
+    return readBuffer;
 }
 
 /*
@@ -2893,7 +2940,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     }
 
     unsigned long fileSize = 0;
-    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, readBuffer, readBufferSize);
+    void* fileData = pppFileRead(path, fileSize, readBuffer, readBufferSize);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
             System.Printf("CAN NOT READ[%s]!!\n", path);
@@ -2983,7 +3030,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         System.Printf("ReadPmd fn=[%s]\n", path);
     }
 
-    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, 0, 0);
+    void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
             System.Printf("CAN NOT READ[%s]!!\n", path);
@@ -3102,7 +3149,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         System.Printf("ReadPan fn=[%s]\n", path);
     }
 
-    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, 0, 0);
+    void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
             System.Printf("CAN NOT READ[%s]!!\n", path);
@@ -3215,7 +3262,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
     }
 
     unsigned long pdtSize = 0;
-    void* pdtData = pppPartInit__8CPartMngFv(this, pdtPath, &pdtSize, readBuffer, readBufferSize);
+    void* pdtData = pppFileRead(pdtPath, pdtSize, readBuffer, readBufferSize);
     if (pdtData == 0) {
         pdtSlot->m_pppDataHead = 0;
         if (System.m_execParam != 0) {

@@ -39,7 +39,6 @@ extern "C" int pppGetFreeDataMng__8CPartMngFv(CPartMng*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
 extern "C" int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
-extern "C" void pppPartInit__8CPartMngFv2(CPartMng*);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void AssertCache__13CAmemCacheSetFv(void*);
@@ -619,7 +618,7 @@ void CPartPcs::calcInit()
 		g_par_calc_prof.ProfStart();
 		g_par_draw_prof.ProfStart();
 	}
-	pppPartInit__8CPartMngFv2(&PartMng);
+	PartMng.pppPartInit();
 }
 
 /*

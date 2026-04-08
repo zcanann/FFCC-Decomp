@@ -2520,9 +2520,7 @@ void CFlatRuntime2::initAllFinished()
 void CFlatRuntime2::reqFinished(int reqNo, CFlatRuntime::CObject* object)
 {
 	if (reqNo == 0xF) {
-		typedef void (*ReqFinishFn)(CFlatRuntime::CObject*);
-		ReqFinishFn fn = *reinterpret_cast<ReqFinishFn*>(*reinterpret_cast<u8**>(object) + 0x10);
-		fn(object);
+		reinterpret_cast<CGBaseObj*>(object)->InitFinished();
 	}
 }
 

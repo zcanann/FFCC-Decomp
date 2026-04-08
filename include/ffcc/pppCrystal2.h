@@ -36,8 +36,7 @@ struct pppCrystal2UnkB {
     s32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[8];
-    f32 m_perspectiveScale;
+    u8 m_payload[12];
 };
 
 struct pppCrystal2UnkC {

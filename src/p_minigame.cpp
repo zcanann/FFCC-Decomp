@@ -136,9 +136,9 @@ void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaThreadSleep(long long)
+void GbaThreadSleep(long long ticks)
 {
-	// TODO
+    MiniGameThreadSleepTicks((OSTime)ticks);
 }
 
 /*
@@ -297,32 +297,12 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
         while (self[0x649C] != 0)
         {
-            MiniGameAlarm alarm;
-
-            OSCreateAlarm(&alarm.alarm);
-            OSSetAlarmTag(&alarm.alarm, 1);
-            OSThread* currentThread = OSGetCurrentThread();
-            alarm.thread = currentThread;
-
-            BOOL interruptLevel = OSDisableInterrupts();
-            OSSetAlarm(&alarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-            OSSuspendThread(currentThread);
-            OSRestoreInterrupts(interruptLevel);
+            GbaThreadSleep((OS_BUS_CLOCK / 4000) * 100);
         }
 
         while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
         {
-            MiniGameAlarm alarm;
-
-            OSCreateAlarm(&alarm.alarm);
-            OSSetAlarmTag(&alarm.alarm, 1);
-            OSThread* currentThread = OSGetCurrentThread();
-            alarm.thread = currentThread;
-
-            BOOL interruptLevel = OSDisableInterrupts();
-            OSSetAlarm(&alarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-            OSSuspendThread(currentThread);
-            OSRestoreInterrupts(interruptLevel);
+            GbaThreadSleep((OS_BUS_CLOCK / 4000) * 100);
         }
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)

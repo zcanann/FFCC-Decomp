@@ -3,76 +3,13 @@
 
 #include "dolphin/gx/__gx.h"
 
-GXRenderModeObj GXNtsc240Ds = {
-    1,
-    640, 240, 240,
-    40, 0,
-    640, 480,
-    0,
-    0,
-    0,
-    { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 },
-    { 0, 0, 21, 22, 21, 0, 0 }
-};
-
-GXRenderModeObj GXNtsc240DsAa = {
-    1, 640, 240, 240, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 }
-};
-
-GXRenderModeObj GXNtsc240Int = {
-    0, 640, 240, 240, 40, 0, 640, 480, 0, 1, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 }
-};
-
-GXRenderModeObj GXNtsc240IntAa = {
-    0, 640, 240, 240, 40, 0, 640, 480, 0, 1, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 }
-};
-
 GXRenderModeObj GXNtsc480IntDf = {
     0, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 }
 };
 
-GXRenderModeObj GXNtsc480Int = {
-    0, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 }
-};
-
-GXRenderModeObj GXNtsc480IntAa = {
-    0, 640, 242, 480, 40, 0, 640, 480, 1, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 }
-};
-
-GXRenderModeObj GXNtsc480Prog = {
-    2, 640, 480, 480, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 }
-};
-
-GXRenderModeObj GXNtsc480ProgSoft = {
-    2, 640, 480, 480, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 }
-};
-
-GXRenderModeObj GXNtsc480ProgAa = {
-    2, 640, 242, 480, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 }
-};
-
-GXRenderModeObj GXMpal240Ds = {9, 640, 240, 240, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXMpal240DsAa = {9, 640, 240, 240, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXMpal240Int = {8, 640, 240, 240, 40, 0, 640, 480, 0, 1, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXMpal240IntAa = {8, 640, 240, 240, 40, 0, 640, 480, 0, 1, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
 GXRenderModeObj GXMpal480IntDf = {8, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 } };
-GXRenderModeObj GXMpal480Int = {8, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXMpal480IntAa = {8, 640, 242, 480, 40, 0, 640, 480, 1, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 } };
-GXRenderModeObj GXPal264Ds = {5, 640, 264, 264, 40, 11, 640, 528, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXPal264DsAa = {5, 640, 264, 264, 40, 11, 640, 528, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXPal264Int = {4, 640, 264, 264, 40, 23, 640, 528, 0, 1, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXPal264IntAa = {4, 640, 264, 264, 40, 23, 640, 528, 0, 1, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
 GXRenderModeObj GXPal528IntDf = {4, 640, 528, 528, 40, 23, 640, 528, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 } };
-GXRenderModeObj GXPal528Int = {4, 640, 528, 528, 40, 23, 640, 528, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXPal524IntAa = {4, 640, 264, 524, 40, 23, 640, 524, 1, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 } };
-GXRenderModeObj GXEurgb60Hz240Ds = {21, 640, 240, 240, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXEurgb60Hz240DsAa = {21, 640, 240, 240, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXEurgb60Hz240Int = {20, 640, 240, 240, 40, 0, 640, 480, 0, 1, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXEurgb60Hz240IntAa = {20, 640, 240, 240, 40, 0, 640, 480, 0, 1, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
 GXRenderModeObj GXEurgb60Hz480IntDf = {20, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 } };
-GXRenderModeObj GXEurgb60Hz480Int = {20, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
-GXRenderModeObj GXEurgb60Hz480IntAa = {20, 640, 242, 480, 40, 0, 640, 480, 1, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 } };
-GXRenderModeObj GXRmHW = {1, 320, 240, 240, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
 
 void GXAdjustForOverscan(const GXRenderModeObj* rmin, GXRenderModeObj* rmout, u16 hor, u16 ver) {
     u16 hor2 = hor * 2;
@@ -175,15 +112,17 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
     }
 
     __GXData->cpTexZ = (fmt & _GX_TF_ZTF) == _GX_TF_ZTF;
-    peTexFmtH = peTexFmt;
-    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFFF7) | (peTexFmtH & 8);
+    peTexFmtH = (peTexFmt >> 3) & 1;
+    !peTexFmt;
+    SET_REG_FIELD(0, __GXData->cpTex, 1, 3, peTexFmtH);
+    peTexFmt = peTexFmt & 7;
     __GetImageTileCount(fmt, wd, ht, &rowTiles, &colTiles, &cmpTiles);
 
     __GXData->cpTexStride = 0;
-    __GXData->cpTexStride = (__GXData->cpTexStride & 0xFFFFFC00) | (rowTiles * cmpTiles);
-    __GXData->cpTexStride = (__GXData->cpTexStride & 0x00FFFFFF) | 0x4D000000;
-    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFDFF) | ((u32)mipmap << 9);
-    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFF8F) | (peTexFmt << 4);
+    SET_REG_FIELD(0, __GXData->cpTexStride, 10, 0, rowTiles * cmpTiles);
+    SET_REG_FIELD(0, __GXData->cpTexStride, 8, 24, 0x4D);
+    SET_REG_FIELD(0, __GXData->cpTex, 1, 9, mipmap);
+    SET_REG_FIELD(0, __GXData->cpTex, 3, 4, peTexFmt);
 }
 
 /*
@@ -248,7 +187,7 @@ void GXSetCopyClamp(GXFBClamp clamp) {
     gxData->cpTex = reg;
 }
 
-static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
+static inline u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
     u32 count;
     u32 realHt;
     u32 iScaleD;
@@ -273,14 +212,6 @@ static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
     }
 
     return realHt;
-}
-
-u16 GXGetNumXfbLines(u16 efbHeight, f32 yScale) {
-    u32 iScale;
-    ASSERTMSGLINE(1486, yScale >= 1.0f, "GXGetNumXfbLines: Vertical scale must be >= 1.0");
-
-    iScale = (u32)(256.0f / yScale) & 0x1FF;
-    return __GXGetNumXfbLines(efbHeight, iScale);
 }
 
 f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
@@ -500,8 +431,9 @@ static void __GXVerifCopy(void* dest, u8 clear) {
  */
 void GXCopyDisp(void* dest, GXBool clear) {
     u32 reg;
-    u32 peCtrl;
-    GXBool disablePeCtrl;
+    u32 tempPeCtrl;
+    u32 phyAddr;
+    u8 changePeCtrl;
 
     CHECK_GXBEGIN(1833, "GXCopyDisp");
 
@@ -511,34 +443,37 @@ void GXCopyDisp(void* dest, GXBool clear) {
 
     if (clear) {
         reg = __GXData->zmode;
-        reg = (reg & ~1) | 1;
-        reg = (reg & ~0xE) | 0xE;
+        SET_REG_FIELD(0, reg, 1, 0, 1);
+        SET_REG_FIELD(0, reg, 3, 1, 7);
         GX_WRITE_RAS_REG(reg);
 
         reg = __GXData->cmode0;
-        reg &= 0xFFFFFFFC;
+        SET_REG_FIELD(0, reg, 1, 0, 0);
+        SET_REG_FIELD(0, reg, 1, 1, 0);
         GX_WRITE_RAS_REG(reg);
     }
 
-    disablePeCtrl = FALSE;
-    if (clear || ((__GXData->peCtrl & 7) == 3)) {
-        peCtrl = __GXData->peCtrl;
-        if (((peCtrl >> 6) & 1) == 1) {
-            disablePeCtrl = TRUE;
-            GX_WRITE_RAS_REG(peCtrl & 0xFFFFFFBF);
-        }
+    changePeCtrl = FALSE;
+    if ((clear || (u32)GET_REG_FIELD(__GXData->peCtrl, 3, 0) == 3) && (u32)GET_REG_FIELD(__GXData->peCtrl, 1, 6) == 1) {
+        changePeCtrl = TRUE;
+        tempPeCtrl = __GXData->peCtrl;
+        SET_REG_FIELD(0, tempPeCtrl, 1, 6, 0);
+        GX_WRITE_RAS_REG(tempPeCtrl);
     }
 
     GX_WRITE_RAS_REG(__GXData->cpDispSrc);
     GX_WRITE_RAS_REG(__GXData->cpDispSize);
     GX_WRITE_RAS_REG(__GXData->cpDispStride);
 
-    reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
+    phyAddr = (u32)dest & 0x3FFFFFFF;
+    reg = 0;
+    SET_REG_FIELD(0, reg, 21, 0, phyAddr >> 5);
+    SET_REG_FIELD(0, reg, 8, 24, 0x4B);
     GX_WRITE_RAS_REG(reg);
 
-    __GXData->cpDisp = (__GXData->cpDisp & 0xFFFFF7FF) | ((u32)clear << 11);
-    __GXData->cpDisp = (__GXData->cpDisp & 0xFFFFBFFF) | 0x4000;
-    __GXData->cpDisp = (__GXData->cpDisp & 0x00FFFFFF) | 0x52000000;
+    SET_REG_FIELD(0, __GXData->cpDisp, 1, 11, clear);
+    SET_REG_FIELD(0, __GXData->cpDisp, 1, 14, 1);
+    SET_REG_FIELD(0, __GXData->cpDisp, 8, 24, 0x52);
     GX_WRITE_RAS_REG(__GXData->cpDisp);
 
     if (clear) {
@@ -546,7 +481,7 @@ void GXCopyDisp(void* dest, GXBool clear) {
         GX_WRITE_RAS_REG(__GXData->cmode0);
     }
 
-    if (disablePeCtrl) {
+    if (changePeCtrl) {
         GX_WRITE_RAS_REG(__GXData->peCtrl);
     }
 
@@ -556,6 +491,7 @@ void GXCopyDisp(void* dest, GXBool clear) {
 void GXCopyTex(void* dest, GXBool clear) {
     u32 reg;
     u32 tempPeCtrl;
+    u32 phyAddr;
     u8 changePeCtrl;
 
     CHECK_GXBEGIN(1916, "GXCopyTex");
@@ -565,12 +501,13 @@ void GXCopyTex(void* dest, GXBool clear) {
 #endif
     if (clear != 0) {
         reg = __GXData->zmode;
-        reg = (reg & ~1) | 1;
-        reg = (reg & ~0xE) | 0xE;
+        SET_REG_FIELD(0, reg, 1, 0, 1);
+        SET_REG_FIELD(0, reg, 3, 1, 7);
         GX_WRITE_RAS_REG(reg);
 
         reg = __GXData->cmode0;
-        reg &= 0xFFFFFFFC;
+        SET_REG_FIELD(0, reg, 1, 0, 0);
+        SET_REG_FIELD(0, reg, 1, 1, 0);
         GX_WRITE_RAS_REG(reg);
     }
 
@@ -595,12 +532,15 @@ void GXCopyTex(void* dest, GXBool clear) {
     GX_WRITE_RAS_REG(__GXData->cpTexSize);
     GX_WRITE_RAS_REG(__GXData->cpTexStride);
 
-    reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
+    phyAddr = (u32)dest & 0x3FFFFFFF;
+    reg = 0;
+    SET_REG_FIELD(0, reg, 21, 0, phyAddr >> 5);
+    SET_REG_FIELD(0, reg, 8, 24, 0x4B);
     GX_WRITE_RAS_REG(reg);
 
-    __GXData->cpTex = (__GXData->cpTex & 0xFFFFF7FF) | ((u32)clear << 11);
-    __GXData->cpTex &= 0xFFFFBFFF;
-    __GXData->cpTex = (__GXData->cpTex & 0x00FFFFFF) | 0x52000000;
+    SET_REG_FIELD(0, __GXData->cpTex, 1, 11, clear);
+    SET_REG_FIELD(0, __GXData->cpTex, 1, 14, 0);
+    SET_REG_FIELD(0, __GXData->cpTex, 8, 24, 0x52);
     GX_WRITE_RAS_REG(__GXData->cpTex);
 
     if (clear != 0) {
@@ -624,11 +564,4 @@ void GXClearBoundingBox(void) {
     reg = 0x560003FF;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
-}
-
-void GXReadBoundingBox(u16* left, u16* top, u16* right, u16* bottom) {
-    *left = GX_GET_PE_REG(8);
-    *top = GX_GET_PE_REG(10);
-    *right = GX_GET_PE_REG(9);
-    *bottom = GX_GET_PE_REG(11);
 }

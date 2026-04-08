@@ -98,6 +98,18 @@ struct CTexAnimRefDataStorage
     CPtrArray<CTexAnimSeq*> texAnimSeqs;
 };
 
+struct CTexAnimSeqStorage
+{
+    void* vtable;
+    int refCount;
+    char name[0x100];
+    unsigned int totalFrames;
+    int keyCount;
+    unsigned char flags;
+    unsigned char pad111[3];
+    unsigned int* keys;
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -909,24 +921,27 @@ void CTexAnimSet::AddFrame()
  */
 void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(texAnims->GetSize()); i++) {
-        CTexAnim* texAnim = (*texAnims)[i];
-        CPtrArray<CTexAnimSeq*>* seqs =
-            reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(*reinterpret_cast<void**>(Ptr(texAnim, 8)), 0x110));
-        unsigned int seqIdx = 0;
+    for (unsigned int texAnimIndex = 0; texAnimIndex < static_cast<unsigned int>(self->texAnims.GetSize());
+         texAnimIndex++) {
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
+        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
+        int seqIndex = -1;
 
-        for (; seqIdx < static_cast<unsigned int>(seqs->GetSize()); seqIdx++) {
-            if (strcmp(name, reinterpret_cast<char*>(Ptr((*seqs)[seqIdx], 8))) == 0) {
+        for (unsigned int i = 0; i < static_cast<unsigned int>(refData->texAnimSeqs.GetSize()); i++) {
+            CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[i]);
+
+            if (strcmp(name, seq->name) == 0) {
+                seqIndex = static_cast<int>(i);
                 break;
             }
         }
 
-        if (seqIdx < static_cast<unsigned int>(seqs->GetSize())) {
-            S32At(texAnim, 0x0C) = static_cast<int>(seqIdx);
-            F32At(texAnim, 0x10) = frame;
-            S32At(texAnim, 0x14) = static_cast<int>(mode);
+        if (seqIndex >= 0) {
+            texAnim->unk0C = seqIndex;
+            texAnim->unk10 = frame;
+            texAnim->unk14 = static_cast<int>(mode);
             return;
         }
     }

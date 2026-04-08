@@ -160,15 +160,13 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
-				drawTevBits = 0xace0f;
+				drawTevBits = 0xade0f;
 				fullWord = -1;
-				drawTevBits |= 0x1000;
 				fullByte = 0xff;
 				vertexArray = meshData->m_displayListCount - 1;
 				dlOffset = vertexArray * 4;
 				while (vertexArray >= 0) {
 					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
-					*(int*)(MaterialManRaw() + 0x48) = 0xace0f;
 					*(int*)(MaterialManRaw() + 0x128) = 0;
 					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x130) = 0;

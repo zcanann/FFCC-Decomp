@@ -2413,11 +2413,12 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    int pauseFlag = (pause != 0);
-    CRedSound* redSound = RedSound(this);
-    SePause__9CRedSoundFii(redSound, -1, pauseFlag);
-    StreamPause__9CRedSoundFii(redSound, -1, pauseFlag);
-    SoundData(this).m_pauseAllSe = pause;
+    u8* self = reinterpret_cast<u8*>(this);
+    int pauseFlag = (-pause | pause) >> 31;
+
+    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, pauseFlag);
+    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, pauseFlag);
+    reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe = pause;
 }
 
 /*

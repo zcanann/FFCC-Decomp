@@ -662,7 +662,7 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
             ((FixSubBlock*)cp)->block_ = b;
             ((FixSubBlock*)cp)->next_ = 0;
         }
-        b->start_ = (FixSubBlock*)((char*)b + 0x14);
+        b->start_ = p;
         b->n_allocated_ = 0;
         fs->head_ = b;
     }

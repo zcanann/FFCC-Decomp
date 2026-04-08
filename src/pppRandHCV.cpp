@@ -65,10 +65,23 @@ void pppRandHCV(void* p1, void* p2, void* p3)
 
     {
         f32 scale = *randomValue;
-        target[0] += (s16)((f32)params->field8 * scale - (f32)params->field8);
-        target[1] += (s16)((f32)params->fieldA * scale - (f32)params->fieldA);
-        target[2] += (s16)((f32)params->fieldC * scale - (f32)params->fieldC);
-        target[3] += (s16)((f32)params->fieldE * scale - (f32)params->fieldE);
+
+        {
+            s16 baseValue = params->field8;
+            target[0] += (s16)((f32)baseValue * scale - (f32)baseValue);
+        }
+        {
+            s16 baseValue = params->fieldA;
+            target[1] += (s16)((f32)baseValue * scale - (f32)baseValue);
+        }
+        {
+            s16 baseValue = params->fieldC;
+            target[2] += (s16)((f32)baseValue * scale - (f32)baseValue);
+        }
+        {
+            s16 baseValue = params->fieldE;
+            target[3] += (s16)((f32)baseValue * scale - (f32)baseValue);
+        }
     }
 }
 

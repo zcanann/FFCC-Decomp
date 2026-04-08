@@ -87,14 +87,20 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             Mtx identityMtx;
             Vec cameraDelta;
             pppColumValue* values = frameWork->m_values;
+            float baseX;
+            float baseY;
+            float baseZ;
             float lengthXY;
             float segmentStep;
             float drawScale;
 
             PSMTXIdentity(identityMtx);
-            cameraDelta.x = ppvCameraMatrix0[0][3] - positionWork->m_position.x;
-            cameraDelta.y = ppvCameraMatrix0[1][3] - positionWork->m_position.y;
-            cameraDelta.z = ppvCameraMatrix0[2][3] + positionWork->m_position.z;
+            baseX = positionWork->m_position.x;
+            baseY = positionWork->m_position.y;
+            baseZ = positionWork->m_position.z;
+            cameraDelta.x = ppvCameraMatrix0[0][3] - baseX;
+            cameraDelta.y = ppvCameraMatrix0[1][3] - baseY;
+            cameraDelta.z = ppvCameraMatrix0[2][3] + baseZ;
 
             lengthXY = sqrtf(cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y);
             if (0.0f < lengthXY) {
@@ -116,8 +122,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 float fadeAmount;
                 float positionScale = segmentStep * values->m_positionScale;
 
-                center.x = positionWork->m_position.x + positionScale * (cameraDelta.x * (float)(i + 1));
-                center.y = positionWork->m_position.y + positionScale * (cameraDelta.y * (float)(i + 1));
+                center.x = baseX + positionScale * (cameraDelta.x * (float)(i + 1));
+                center.y = baseY + positionScale * (cameraDelta.y * (float)(i + 1));
                 center.z = 0.0f;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);

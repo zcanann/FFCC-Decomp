@@ -80,6 +80,7 @@ CFunnyShapePcsTableInit s_funnyShapePcsTableInit;
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
+static int frameCount;
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -355,14 +356,12 @@ void CFunnyShapePcs::drawViewer()
 {
     Mtx44 ortho;
     Mtx view;
-    u8* self = reinterpret_cast<u8*>(this);
-    CFunnyShape* funnyShape = reinterpret_cast<CFunnyShape*>(self + 0x50);
+    CFunnyShape* funnyShape = FunnyShape(this);
     Vec eye = {0.0f, 0.0f, 0.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    static char s_funnyShapeFmt[] = "FunnyShape %c";
-    static char s_spinner[] = "|/-\\";
-    static int frameCount;
+    static const char s_funnyShapeFmt[] = "FunnyShape %c";
+    static const char s_spinner[] = "|/-\\";
 
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
@@ -375,13 +374,13 @@ void CFunnyShapePcs::drawViewer()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    if ((self[0x6178] & 1) != 0) {
+    if ((Ptr(this, 0x6178)[0] & 1) != 0) {
         funnyShape->RenderTexture();
     }
-    if ((self[0x6178] & 4) != 0) {
+    if ((Ptr(this, 0x6178)[0] & 4) != 0) {
         funnyShape->RenderShape();
     }
-    if ((self[0x6178] & 8) != 0) {
+    if ((Ptr(this, 0x6178)[0] & 8) != 0) {
         funnyShape->Render();
     }
 
@@ -391,7 +390,7 @@ void CFunnyShapePcs::drawViewer()
     }
 
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
-    Graphic.Printf(s_funnyShapeFmt, s_spinner[(frameCount >> 4) & 3]);
+    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), s_spinner[(frameCount >> 4) & 3]);
 }
 
 /*

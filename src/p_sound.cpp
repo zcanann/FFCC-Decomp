@@ -6,69 +6,32 @@ CSoundPcs SoundPcs;
 
 /*
  * --INFO--
- * PAL Address: 0x800d880c
- * PAL Size: 188b
+ * PAL Address: 0x800d8710
+ * PAL Size: 60b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSoundPcs::Init()
+void CSoundPcs::draw()
 {
+    if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
+        Sound.Draw();
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800d8804
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSoundPcs::Quit()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d87f0
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CSoundPcs::GetTable(unsigned long index)
-{
-    return (int)(reinterpret_cast<unsigned char*>(m_table__9CSoundPcs) + (index * 0x15C));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d87ec
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSoundPcs::create()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d87c4
+ * PAL Address: 0x800d874c
  * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSoundPcs::createLoad()
+void CSoundPcs::calc()
 {
-    Sound.LoadBlock();
+    Sound.Frame();
 }
 
 /*
@@ -90,30 +53,67 @@ void CSoundPcs::destroy()
 
 /*
  * --INFO--
- * PAL Address: 0x800d874c
+ * PAL Address: 0x800d87c4
  * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSoundPcs::calc()
+void CSoundPcs::createLoad()
 {
-    Sound.Frame();
+    Sound.LoadBlock();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800d8710
- * PAL Size: 60b
+ * PAL Address: 0x800d87ec
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSoundPcs::draw()
+void CSoundPcs::create()
 {
-    if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
-        Sound.Draw();
-    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d87f0
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CSoundPcs::GetTable(unsigned long index)
+{
+    return (int)(reinterpret_cast<unsigned char*>(m_table__9CSoundPcs) + (index * 0x15C));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d8804
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSoundPcs::Quit()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d880c
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSoundPcs::Init()
+{
 }

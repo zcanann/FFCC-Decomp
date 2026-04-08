@@ -830,29 +830,29 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  */
 void CTexAnimSet::AddFrame()
 {
+    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     unsigned int i = 0;
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
 
-    while (i < (unsigned int)texAnims->GetSize()) {
-        CTexAnim* texAnim = (*texAnims)[i];
-        CPtrArray<CTexAnimSeq*>* seqArray = reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(texAnim, 0x110));
-        CTexAnimSeq* seq = (*seqArray)[S32At(texAnim, 0x0C)];
-        unsigned char flags = U8At(seq, 0x110);
+    while (i < static_cast<unsigned int>(self->texAnims.GetSize())) {
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
+        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
+        CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[texAnim->unk0C]);
+        unsigned char flags = seq->flags;
         float frameStep = FLOAT_8032fb3c;
 
         if ((flags & 0x80) != 0) {
             frameStep = FLOAT_8032fb4c;
         }
 
-        if (((flags & 0x40) == 0) || (FLOAT_8032fb3c != F32At(texAnim, 0x10)) || (Math.Rand(0x1E) == 0)) {
-            float currentFrame = (float)fmod((double)F32At(texAnim, 0x10), (double)(float)U32At(seq, 0x108));
-            int keyCount = S32At(seq, 0x10C);
-            unsigned int* keyData = reinterpret_cast<unsigned int*>(Ptr(seq, 0x114));
+        if (((flags & 0x40) == 0) || (FLOAT_8032fb3c != texAnim->unk10) || (Math.Rand(0x1E) == 0)) {
+            float currentFrame = (float)fmod((double)texAnim->unk10, (double)(float)seq->totalFrames);
+            int keyCount = seq->keyCount;
+            unsigned int* keyData = seq->keys;
             unsigned int keyIndex = 0;
             unsigned int lastKeyIndex = keyCount - 1;
 
             while (keyCount != 0) {
-                float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[0xC] : U32At(seq, 0x108));
+                float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[0xC] : seq->totalFrames);
                 unsigned int* nextKeyData = keyData;
 
                 if (keyIndex < lastKeyIndex) {
@@ -870,7 +870,7 @@ void CTexAnimSet::AddFrame()
                     Vec v1;
                     PSVECScale(reinterpret_cast<Vec*>(keyData + 9), &v0, FLOAT_8032fb3c - t);
                     PSVECScale(reinterpret_cast<Vec*>(nextKeyData + 9), &v1, t);
-                    PSVECAdd(&v0, &v1, reinterpret_cast<Vec*>(Ptr(texAnim, 0x18)));
+                    PSVECAdd(&v0, &v1, reinterpret_cast<Vec*>(&texAnim->unk18));
 
                     if ((flags & 0x80) == 0) {
                         U32At(texAnim, 0x18) = keyData[9];
@@ -884,26 +884,26 @@ void CTexAnimSet::AddFrame()
                 keyCount = keyCount - 1;
             }
 
-            if (S32At(texAnim, 0x14) != -3) {
-                F32At(texAnim, 0x10) = F32At(texAnim, 0x10) + frameStep;
-                if ((float)U32At(seq, 0x108) <= F32At(texAnim, 0x10)) {
-                    int mode = S32At(texAnim, 0x14);
+            if (texAnim->unk14 != -3) {
+                texAnim->unk10 = texAnim->unk10 + frameStep;
+                if ((float)seq->totalFrames <= texAnim->unk10) {
+                    int mode = texAnim->unk14;
                     if (mode == -1) {
-                        F32At(texAnim, 0x10) = (float)U32At(seq, 0x108);
+                        texAnim->unk10 = (float)seq->totalFrames;
                     } else if (mode >= 0) {
-                        S32At(texAnim, 0x0C) = mode;
-                        S32At(texAnim, 0x14) = -2;
+                        texAnim->unk0C = mode;
+                        texAnim->unk14 = -2;
                     }
-                    F32At(texAnim, 0x10) = F32At(texAnim, 0x10) - (float)U32At(seq, 0x108);
+                    texAnim->unk10 = texAnim->unk10 - (float)seq->totalFrames;
                 }
             }
         }
 
-        seq = (*seqArray)[S32At(texAnim, 0x0C)];
-        if ((U8At(seq, 0x110) & 0x40) != 0) {
-            F32At(this, 0x24) = F32At(texAnim, 0x20);
+        seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[texAnim->unk0C]);
+        if ((seq->flags & 0x40) != 0) {
+            self->unk24 = texAnim->unk20;
         } else {
-            F32At(this, 0x24) = FLOAT_8032fb38;
+            self->unk24 = FLOAT_8032fb38;
         }
 
         i = i + 1;

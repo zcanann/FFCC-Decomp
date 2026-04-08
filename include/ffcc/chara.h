@@ -9,6 +9,7 @@ class CChunkFile;
 class CTextureSet;
 class CMemory;
 class CTexAnimSet;
+class SRT;
 struct Vec;
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
@@ -32,6 +33,8 @@ public:
 		CAnim();
 		~CAnim();
 
+		void Create(void*, CMemory::CStage*);
+		void InitQuantize();
         void SetAmemAddress(int);
         void GetBankSize();
         void GetAmemAddress();
@@ -48,6 +51,8 @@ public:
 		CAnimNode();
 		~CAnimNode();
 
+		void Create(CChunkFile&);
+		void Interp(CChara::CAnim*, SRT*, float);
 		void IsScale();
 	};
 

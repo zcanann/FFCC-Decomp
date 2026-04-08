@@ -1,4 +1,4 @@
-#include "ffcc/chara_anim.h"
+#include "ffcc/chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"

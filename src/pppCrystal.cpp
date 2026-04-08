@@ -220,14 +220,15 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	float texW;
 	float texH;
 	s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-	u8* workDataBase = (u8*)pppCrystal + serializedDataOffsets[2] + 0x80;
+	s32 dataValIndex = param_2->m_dataValIndex;
+	CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + serializedDataOffsets[2] + 0x80);
 	u8* colorDataBase = (u8*)pppCrystal + serializedDataOffsets[1] + 0x80;
 
-	if (param_2->m_dataValIndex == 0xFFFF) {
+	if (dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	pppModelSt* model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+	pppModelSt* model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
 	int indirectTex = 0;
 	int texSlot = 0;
 	int baseTex = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, texSlot);
@@ -253,6 +254,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 		colorDataBase + 8, (u8*)pppCrystal + 0x40, param_2->m_arg3,
 		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
 
+	Mtx lightMtx;
 	Mtx texMtx = {
 		{ DAT_801db5b8, DAT_801db5bc, DAT_801db5c0, DAT_801db5c4 },
 		{ DAT_801db5c8, DAT_801db5cc, DAT_801db5d0, DAT_801db5d4 },
@@ -276,7 +278,6 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetNumTexGens(3);
 	GXSetNumTevStages(3);
 
-	Mtx lightMtx;
 	if ((int)Game.m_currentSceneId == 7) {
 		C_MTXLightPerspective(
 			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
@@ -307,7 +308,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 0);
 	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
 	if (param_2->m_payload[0] == 1) {
-		GXLoadTexObj((_GXTexObj*)(*(u32*)(workDataBase + 4)), GX_TEXMAP1);
+		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
 	} else {
 		GXLoadTexObj((_GXTexObj*)(indirectTex + 0x28), GX_TEXMAP1);
 	}

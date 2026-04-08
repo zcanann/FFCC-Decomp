@@ -514,8 +514,9 @@ static const char s_italianTownName[] = "TipaItalia";
  */
 void CGame::Create()
 {
-    int mapVariant;
     int mapId;
+    int mapVariant;
+    const char* townName = s_defaultTownName;
 
     m_nextScript.m_flags = 1;
     clearWork();
@@ -530,10 +531,9 @@ void CGame::Create()
     m_gameWork.m_chaliceElement = 1;
 
     if (m_gameWork.m_languageId == 3) {
-        strcpy(m_gameWork.m_townName, s_italianTownName);
-    } else {
-        strcpy(m_gameWork.m_townName, s_defaultTownName);
+        townName = s_italianTownName;
     }
+    strcpy(m_gameWork.m_townName, townName);
 
     m_gameWork.m_gameInitFlag = 1;
 
@@ -543,8 +543,8 @@ void CGame::Create()
     }
 
     if (m_newGameFlag == 0) {
-        mapVariant = m_currentMapVariantId;
         mapId = m_currentMapId;
+        mapVariant = m_currentMapVariantId;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
         System.MapChanging(mapId, mapVariant);

@@ -274,7 +274,7 @@ int CGPrgObj::isLoopAnim()
 {
 	unsigned char animFlags = m_animFlagBits.m_animFlags;
 
-	if ((static_cast<signed char>(animFlags << 1) < 0) ||
+	if ((static_cast<signed char>((animFlags << 1) | (animFlags >> 7)) < 0) ||
 	    (static_cast<signed char>(animFlags) < 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}

@@ -629,6 +629,7 @@ pppVtMime.cpp:
 	extab       start:0x800071D8 end:0x800071E8
 	extabindex  start:0x8000D174 end:0x8000D18C
 	.text       start:0x80065034 end:0x80065350
+	.rodata     start:0x801D8520 end:0x801D8530
 
 pppDrawMatrix.cpp:
 	extab       start:0x800071E8 end:0x800071F0

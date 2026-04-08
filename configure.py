@@ -811,7 +811,12 @@ config.libs = [
             Object(Matching, "axfx/axfx.c"),
             Object(NonMatching, "axfx/chorus.c"),
             Object(Matching, "axfx/delay.c"),
-            Object(NonMatching, "axfx/reverb_hi.c"),
+            Object(NonMatching, "axfx/reverb_hi.c",
+                cflags=replace_flag_prefix(
+                    replace_flag_prefix(cflags_base, "-fp_contract ", ""),
+                    "-fp ", "-fp fmadd"
+                ),
+            ),
             Object(NonMatching, "axfx/reverb_hi_4ch.c"),
             Object(
                 NonMatching,

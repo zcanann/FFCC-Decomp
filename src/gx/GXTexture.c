@@ -1204,46 +1204,22 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
  * JP Size: TODO
  */
 static void __SetSURegs(int tmap, int tcoord) {
-    GXData* gx;
-    u8* coordBase;
-    u8* mapBase;
-    u32 image0;
-    u32 mode0;
-    u32 reg;
-    u32 wrapS;
-    u32 wrapT;
-    u32* suTs0;
-    u32* suTs1;
+    u32 w;
+    u32 h;
+    u8 s_bias;
+    u8 t_bias;
 
-    gx = __GXData;
-    coordBase = (u8*)gx + ((u32)tcoord << 2);
-    mapBase = (u8*)gx + ((u32)tmap << 2);
-    suTs0 = (u32*)(coordBase + 0xB8);
-    suTs1 = (u32*)(coordBase + 0xD8);
-    image0 = *(u32*)(mapBase + 0x45C);
-    mode0 = *(u32*)(mapBase + 0x47C);
-    wrapS = 1 - (mode0 & 3);
-    wrapT = 1 - ((mode0 >> 2) & 3);
-
-    reg = *suTs0 & 0xFFFF0000;
-    reg |= image0 & 0x3FF;
-    *suTs0 = reg;
-
-    reg = *suTs1 & 0xFFFF0000;
-    reg |= (image0 >> 10) & 0x3FF;
-    *suTs1 = reg;
-
-    reg = *suTs0 & 0xFFFEFFFF;
-    reg |= (__cntlzw(wrapS) & 0x20) << 11;
-    *suTs0 = reg;
-
-    reg = *suTs1 & 0xFFFEFFFF;
-    reg |= (__cntlzw(wrapT) & 0x20) << 11;
-    *suTs1 = reg;
-
-    GX_WRITE_RAS_REG(*suTs0);
-    GX_WRITE_RAS_REG(*suTs1);
-    gx->bpSentNot = 0;
+    w = GET_REG_FIELD(__GXData->tImage0[tmap], 10, 0);
+    h = GET_REG_FIELD(__GXData->tImage0[tmap], 10, 10);
+    SET_REG_FIELD(2089, __GXData->suTs0[tcoord], 16, 0, w);
+    SET_REG_FIELD(2090, __GXData->suTs1[tcoord], 16, 0, h);
+    s_bias = GET_REG_FIELD(__GXData->tMode0[tmap], 2, 0) == 1;
+    t_bias = GET_REG_FIELD(__GXData->tMode0[tmap], 2, 2) == 1;
+    SET_REG_FIELD(2096, __GXData->suTs0[tcoord], 1, 16, s_bias);
+    SET_REG_FIELD(2097, __GXData->suTs1[tcoord], 1, 16, t_bias);
+    GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
+    GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
+    __GXData->bpSentNot = 0;
 }
 
 void __GXSetSUTexRegs(void) {

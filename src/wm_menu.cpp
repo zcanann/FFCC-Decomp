@@ -1280,9 +1280,9 @@ void CMenuPcs::CalcGoOutSelCharInit()
 void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const menuCharaAnims = *reinterpret_cast<unsigned char**>(bytes + 0x844);
+	int* const menuCharaAnims = *reinterpret_cast<int**>(bytes + 0x844);
 
-	reinterpret_cast<int*>(menuCharaAnims + charaIndex * 0x14 + 4)[0] = animIndex;
+	menuCharaAnims[charaIndex * 5 + 1] = animIndex;
 }
 
 /*

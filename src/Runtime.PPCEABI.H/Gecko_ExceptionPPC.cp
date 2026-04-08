@@ -695,8 +695,10 @@ static inline int ExPPC_IsInSpecification(const char* extype, const ex_specifica
 extern void __unexpected(CatchInfo* catchinfo)
 {
 	static const char unexpectedTypes[] = "!bad_exception!!\0!std::bad_exception!!";
-	const char* stdBadExceptionType = unexpectedTypes + sizeof("!bad_exception!!");
+	const char* stdBadExceptionType = unexpectedTypes;
 	const ex_specification* unexp = (const ex_specification*)catchinfo->stacktop;
+
+	stdBadExceptionType += sizeof("!bad_exception!!");
 
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 

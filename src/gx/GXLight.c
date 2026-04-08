@@ -173,8 +173,8 @@ void GXInitLightDistAttn(GXLightObj* lt_obj, f32 ref_dist, f32 ref_br, GXDistAtt
         break;
     case GX_DA_MEDIUM:
         k0 = 1.0f;
-        k1 = (0.5f * (1.0f - ref_br)) / (ref_br * ref_dist);
-        k2 = (0.5f * (1.0f - ref_br)) / (ref_br * ref_dist * ref_dist);
+        k1 = (1.0f - ref_br) / (2.0f * ref_br * ref_dist);
+        k2 = (1.0f - ref_br) / (2.0f * ref_br * ref_dist * ref_dist);
         break;
     case GX_DA_STEEP:
         k0 = 1.0f;

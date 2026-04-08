@@ -1024,81 +1024,83 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, float us, float vs, float angle)
 {
-    if (0.0f >= w || 0.0f >= h) {
-        return;
+    if ((0.0f < w) && (0.0f < h)) {
+        float u0;
+        float u1;
+        float v0;
+        float v1;
+        float x0;
+        float y0;
+        float x1;
+        float y1;
+
+        if ((attr & 8) == 0) {
+            u0 = u + 0.5f;
+            u1 = (u + w) - 0.5f;
+        } else {
+            u1 = u + 0.5f;
+            u0 = (u + w) - 0.5f;
+        }
+
+        if ((attr & 4) == 0) {
+            v0 = v + 0.5f;
+            v1 = (v + h) - 0.5f;
+        } else {
+            v1 = v + 0.5f;
+            v0 = (v1 + h) - 0.5f;
+        }
+
+        x0 = x;
+        if ((attr & 1) != 0) {
+            x0 = -((w * us) * 0.5f - x);
+        }
+
+        y0 = y;
+        if ((attr & 2) != 0) {
+            y0 = -((h * vs) * 0.5f - y);
+        }
+
+        x1 = x0 + (w * us);
+        y1 = y0 + (h * vs);
+
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        if (0.0f != angle) {
+            float s = static_cast<float>(sin(angle));
+            float c = static_cast<float>(cos(angle));
+            float xtl = ((x0 - x) * c) + x;
+            float ytl = ((x0 - x) * s) + y;
+            float tx0 = (y0 - y) * s;
+            float ty0 = (y0 - y) * c;
+            float xtr = ((x1 - x) * c) + x;
+            float ytr = ((x1 - x) * s) + y;
+            float tx1 = (y1 - y) * s;
+            float ty1 = (y1 - y) * c;
+
+            GXPosition3f32(xtl - tx0, ytl + ty0, 0.0f);
+            GXTexCoord2f32(u0, v0);
+
+            GXPosition3f32(xtr - tx0, ytr + ty0, 0.0f);
+            GXTexCoord2f32(u1, v0);
+
+            GXPosition3f32(xtl - tx1, ytl + ty1, 0.0f);
+            GXTexCoord2f32(u0, v1);
+
+            GXPosition3f32(xtr - tx1, ytr + ty1, 0.0f);
+            GXTexCoord2f32(u1, v1);
+        } else {
+            GXPosition3f32(x0, y0, 0.0f);
+            GXTexCoord2f32(u0, v0);
+
+            GXPosition3f32(x1, y0, 0.0f);
+            GXTexCoord2f32(u1, v0);
+
+            GXPosition3f32(x0, y1, 0.0f);
+            GXTexCoord2f32(u0, v1);
+
+            GXPosition3f32(x1, y1, 0.0f);
+            GXTexCoord2f32(u1, v1);
+        }
     }
-
-    float u0;
-    float u1;
-    if ((attr & 8) == 0) {
-        u0 = u + 0.5f;
-        u1 = (u + w) - 0.5f;
-    } else {
-        u1 = u + 0.5f;
-        u0 = (u + w) - 0.5f;
-    }
-
-    float v0;
-    float v1;
-    if ((attr & 4) == 0) {
-        v0 = v + 0.5f;
-        v1 = (v + h) - 0.5f;
-    } else {
-        v1 = v + 0.5f;
-        v0 = (v1 + h) - 0.5f;
-    }
-
-    float x0 = x;
-    if ((attr & 1) != 0) {
-        x0 = -((w * us) * 0.5f - x);
-    }
-    float y0 = y;
-    if ((attr & 2) != 0) {
-        y0 = -((h * vs) * 0.5f - y);
-    }
-
-    const float x1 = x0 + (w * us);
-    const float y1 = y0 + (h * vs);
-
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    if (0.0f == angle) {
-        GXPosition3f32(x0, y0, 0.0f);
-        GXTexCoord2f32(u0, v0);
-
-        GXPosition3f32(x1, y0, 0.0f);
-        GXTexCoord2f32(u1, v0);
-
-        GXPosition3f32(x0, y1, 0.0f);
-        GXTexCoord2f32(u0, v1);
-
-        GXPosition3f32(x1, y1, 0.0f);
-        GXTexCoord2f32(u1, v1);
-        return;
-    }
-
-    const float s = static_cast<float>(sin(angle));
-    const float c = static_cast<float>(cos(angle));
-
-    const float xtl = ((x0 - x) * c) + x;
-    const float ytl = ((x0 - x) * s) + y;
-    const float tx0 = (y0 - y) * s;
-    const float ty0 = (y0 - y) * c;
-    const float xtr = ((x1 - x) * c) + x;
-    const float ytr = ((x1 - x) * s) + y;
-    const float tx1 = (y1 - y) * s;
-    const float ty1 = (y1 - y) * c;
-
-    GXPosition3f32(xtl - tx0, ytl + ty0, 0.0f);
-    GXTexCoord2f32(u0, v0);
-
-    GXPosition3f32(xtr - tx0, ytr + ty0, 0.0f);
-    GXTexCoord2f32(u1, v0);
-
-    GXPosition3f32(xtl - tx1, ytl + ty1, 0.0f);
-    GXTexCoord2f32(u0, v1);
-
-    GXPosition3f32(xtr - tx1, ytr + ty1, 0.0f);
-    GXTexCoord2f32(u1, v1);
 }
 
 /*
@@ -1112,94 +1114,91 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, _GXColor* colors, float us, float vs, float angle)
 {
-    if (0.0f >= w || 0.0f >= h) {
-        return;
+    if ((0.0f < w) && (0.0f < h)) {
+        float u0;
+        float u1;
+        float v0;
+        float v1;
+        float x0;
+        float y0;
+        float x1;
+        float y1;
+
+        if ((attr & 8) == 0) {
+            u0 = u + 0.5f;
+            u1 = (u + w) - 0.5f;
+        } else {
+            u1 = u + 0.5f;
+            u0 = (u + w) - 0.5f;
+        }
+
+        if ((attr & 4) == 0) {
+            v0 = v + 0.5f;
+            v1 = (v + h) - 0.5f;
+        } else {
+            v1 = v + 0.5f;
+            v0 = (v1 + h) - 0.5f;
+        }
+
+        x0 = x;
+        if ((attr & 1) != 0) {
+            x0 = -((w * us) * 0.5f - x);
+        }
+
+        y0 = y;
+        if ((attr & 2) != 0) {
+            y0 = -((h * vs) * 0.5f - y);
+        }
+
+        x1 = x0 + (w * us);
+        y1 = y0 + (h * vs);
+
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        if (0.0f != angle) {
+            float s = static_cast<float>(sin(angle));
+            float c = static_cast<float>(cos(angle));
+            float xtl = ((x0 - x) * c) + x;
+            float ytl = ((x0 - x) * s) + y;
+            float tx0 = (y0 - y) * s;
+            float ty0 = (y0 - y) * c;
+            float xtr = ((x1 - x) * c) + x;
+            float ytr = ((x1 - x) * s) + y;
+            float tx1 = (y1 - y) * s;
+            float ty1 = (y1 - y) * c;
+
+            GXPosition3f32(xtl - tx0, ytl + ty0, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
+            GXTexCoord2f32(u0, v0);
+
+            GXPosition3f32(xtr - tx0, ytr + ty0, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
+            GXTexCoord2f32(u1, v0);
+
+            GXPosition3f32(xtl - tx1, ytl + ty1, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
+            GXTexCoord2f32(u0, v1);
+
+            GXPosition3f32(xtr - tx1, ytr + ty1, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
+            GXTexCoord2f32(u1, v1);
+        } else {
+            GXPosition3f32(x, y, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
+            GXTexCoord2f32(u0, v0);
+
+            GXPosition3f32(x1, y, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
+            GXTexCoord2f32(u1, v0);
+
+            GXPosition3f32(x, y1, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
+            GXTexCoord2f32(u0, v1);
+
+            GXPosition3f32(x1, y1, 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
+            GXTexCoord2f32(u1, v1);
+        }
     }
-
-    float u0;
-    float u1;
-    if ((attr & 8) == 0) {
-        u0 = u + 0.5f;
-        u1 = (u + w) - 0.5f;
-    } else {
-        u1 = u + 0.5f;
-        u0 = (u + w) - 0.5f;
-    }
-
-    float v0;
-    float v1;
-    if ((attr & 4) == 0) {
-        v0 = v + 0.5f;
-        v1 = (v + h) - 0.5f;
-    } else {
-        v1 = v + 0.5f;
-        v0 = (v1 + h) - 0.5f;
-    }
-
-    float x0 = x;
-    if ((attr & 1) != 0) {
-        x0 = -((w * us) * 0.5f - x);
-    }
-    float y0 = y;
-    if ((attr & 2) != 0) {
-        y0 = -((h * vs) * 0.5f - y);
-    }
-
-    const float x1 = x0 + (w * us);
-    const float y1 = y0 + (h * vs);
-
-    const u32 c0 = *reinterpret_cast<u32*>(&colors[0]);
-    const u32 c1 = *reinterpret_cast<u32*>(&colors[1]);
-    const u32 c2 = *reinterpret_cast<u32*>(&colors[2]);
-    const u32 c3 = *reinterpret_cast<u32*>(&colors[3]);
-
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    if (0.0f == angle) {
-        GXPosition3f32(x, y, 0.0f);
-        GXColor1u32(c0);
-        GXTexCoord2f32(u0, v0);
-
-        GXPosition3f32(x1, y, 0.0f);
-        GXColor1u32(c1);
-        GXTexCoord2f32(u1, v0);
-
-        GXPosition3f32(x, y1, 0.0f);
-        GXColor1u32(c2);
-        GXTexCoord2f32(u0, v1);
-
-        GXPosition3f32(x1, y1, 0.0f);
-        GXColor1u32(c3);
-        GXTexCoord2f32(u1, v1);
-        return;
-    }
-
-    const float s = static_cast<float>(sin(angle));
-    const float c = static_cast<float>(cos(angle));
-
-    const float xtl = ((x0 - x) * c) + x;
-    const float ytl = ((x0 - x) * s) + y;
-    const float tx0 = (y0 - y) * s;
-    const float ty0 = (y0 - y) * c;
-    const float xtr = ((x1 - x) * c) + x;
-    const float ytr = ((x1 - x) * s) + y;
-    const float tx1 = (y1 - y) * s;
-    const float ty1 = (y1 - y) * c;
-
-    GXPosition3f32(xtl - tx0, ytl + ty0, 0.0f);
-    GXColor1u32(c0);
-    GXTexCoord2f32(u0, v0);
-
-    GXPosition3f32(xtr - tx0, ytr + ty0, 0.0f);
-    GXColor1u32(c1);
-    GXTexCoord2f32(u1, v0);
-
-    GXPosition3f32(xtl - tx1, ytl + ty1, 0.0f);
-    GXColor1u32(c2);
-    GXTexCoord2f32(u0, v1);
-
-    GXPosition3f32(xtr - tx1, ytr + ty1, 0.0f);
-    GXColor1u32(c3);
-    GXTexCoord2f32(u1, v1);
 }
 
 /*

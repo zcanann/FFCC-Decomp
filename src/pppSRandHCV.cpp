@@ -99,27 +99,26 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
 	s32 color_offset = in->field4;
-	s16* target_colors;
-	if (color_offset == -1) {
-		target_colors = (s16*)gPppDefaultValueBuffer;
-	} else {
-		target_colors = (s16*)(base + color_offset + 0x80);
-	}
+	s16* target_colors = (color_offset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
 
 	{
-		s16 color = target_colors[0];
-		target_colors[0] = color + (s8)((f32)in->field8 * target[0] - (f32)in->field8);
+		s16 base = in->field8;
+		s8 delta = (s8)((f32)base * target[0] - (f32)base);
+		target_colors[0] += delta;
 	}
 	{
-		s16 color = target_colors[1];
-		target_colors[1] = color + (s8)((f32)in->fieldA * target[1] - (f32)in->fieldA);
+		s16 base = in->fieldA;
+		s8 delta = (s8)((f32)base * target[1] - (f32)base);
+		target_colors[1] += delta;
 	}
 	{
-		s16 color = target_colors[2];
-		target_colors[2] = color + (s8)((f32)in->fieldC * target[2] - (f32)in->fieldC);
+		s16 base = in->fieldC;
+		s8 delta = (s8)((f32)base * target[2] - (f32)base);
+		target_colors[2] += delta;
 	}
 	{
-		s16 color = target_colors[3];
-		target_colors[3] = color + (s8)((f32)in->fieldE * target[3] - (f32)in->fieldE);
+		s16 base = in->fieldE;
+		s8 delta = (s8)((f32)base * target[3] - (f32)base);
+		target_colors[3] += delta;
 	}
 }

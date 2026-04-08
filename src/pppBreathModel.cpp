@@ -371,106 +371,137 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     groupTable = *(int**)((unsigned char*)vBreathModel + 0x3C);
     maxParticleCount = *(int*)((unsigned char*)vBreathModel + 0x40);
 
-    if ((gPppCalcDisabled != 0) || (*(int*)((unsigned char*)pBreathModel + 0xC) == 0xFFFF)) {
-        return;
-    }
+    if ((gPppCalcDisabled == 0) && (*(int*)((unsigned char*)pBreathModel + 0xC) != 0xFFFF)) {
+        *(short*)((unsigned char*)vBreathModel + 0x44) = *(short*)((unsigned char*)vBreathModel + 0x44) + 1;
 
-    *(short*)((unsigned char*)vBreathModel + 0x44) = *(short*)((unsigned char*)vBreathModel + 0x44) + 1;
+        for (i = 0; i < maxParticleCount; i++) {
+            if (*(short*)(particleData + 0x50) < 1) {
+                float zero = kPppBreathModelZero;
 
-    for (i = 0; i < maxParticleCount; i++) {
-        if (*(short*)(particleData + 0x50) < 1) {
-            groupTableWork = *(int*)((unsigned char*)vBreathModel + 0x3C);
-            for (foundGroup = 0; foundGroup < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
-                 foundGroup++) {
-                for (foundSlot = 0;
-                     foundSlot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-                     foundSlot++) {
-                    if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)foundSlot)) {
-                        found = true;
-                        goto found_index;
+                groupTableWork = *(int*)((unsigned char*)vBreathModel + 0x3C);
+                for (foundGroup = 0;
+                     foundGroup < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
+                     foundGroup++) {
+                    for (foundSlot = 0;
+                         foundSlot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+                         foundSlot++) {
+                        if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)foundSlot)) {
+                            found = true;
+                            goto found_index;
+                        }
+                    }
+                    groupTableWork += 0x5C;
+                }
+                found = false;
+                foundSlot = -1;
+                foundGroup = -1;
+
+            found_index:
+                if (found) {
+                    *(unsigned char*)(groupTable[(int)foundGroup * 0x17 + 1] + (int)foundSlot) = 0xFF;
+                }
+
+                if ((int)foundGroup != -1) {
+                    int slot = 0;
+                    int group = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)foundGroup * 0x5C;
+                    unsigned int slotCount = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+
+                    while (slotCount != 0) {
+                        if ((*(signed char*)(*(int*)(group + 4) + slot) != -1) ||
+                            (*(signed char*)(*(int*)(group + 8) + slot) != 1)) {
+                            found = false;
+                            goto group_checked;
+                        }
+                        slot++;
+                        slotCount--;
+                    }
+                    found = true;
+
+                group_checked:
+                    if (found) {
+                        int* groupData = groupTable + (int)foundGroup * 0x17;
+                        for (slot = 0; slot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+                             slot++) {
+                            *(unsigned char*)(groupData[2] + slot) = 0xFF;
+                            groupData[5] = (int)zero;
+                            groupData[4] = (int)zero;
+                            groupData[3] = (int)zero;
+                            groupData[8] = (int)zero;
+                            groupData[7] = (int)zero;
+                            groupData[6] = (int)zero;
+                            groupData[9] = (int)zero;
+                        }
+                        groupData[0] = 0;
                     }
                 }
-                groupTableWork += 0x5C;
-            }
-            found = false;
-            foundSlot = -1;
-            foundGroup = -1;
 
-        found_index:
-            if (found) {
-                *(unsigned char*)(groupTable[(int)foundGroup * 0x17 + 1] + (int)foundSlot) = 0xFF;
-            }
+                if ((*(unsigned short*)((unsigned char*)pBreathModel + 0x1E) <=
+                     *(unsigned short*)((unsigned char*)vBreathModel + 0x44)) &&
+                    (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1C))) {
+                    BirthParticle(pppObject, vBreathModel, pBreathModel, vColor, (_PARTICLE_DATA*)particleData,
+                                  (Mtx*)particleWmat, (_PARTICLE_COLOR*)particleColor);
+                    found = true;
+                    spawnCount += 1;
+                    for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); j++) {
+                        int* group = groupTable + j * 0x17;
+                        int k;
 
-            if (foundGroup != -1) {
-                IsDeadGroupBreath(pBreathModel, vBreathModel, foundGroup);
-            }
-
-            if ((*(unsigned short*)((unsigned char*)pBreathModel + 0x1E) <=
-                 *(unsigned short*)((unsigned char*)vBreathModel + 0x44)) &&
-                (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1C))) {
-                BirthParticle(pppObject, vBreathModel, pBreathModel, vColor, (_PARTICLE_DATA*)particleData,
-                              (Mtx*)particleWmat, (_PARTICLE_COLOR*)particleColor);
-                spawnCount += 1;
-                found = true;
-                for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); j++) {
-                    int* group = groupTable + j * 0x17;
-                    int k;
-
-                    for (k = 0; k < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10); k++) {
-                        if ((*(signed char*)(group[1] + k) == -1) && (*(signed char*)(group[2] + k) == -1)) {
-                            *(signed char*)(group[1] + k) = (signed char)i;
-                            found = false;
-                            *(unsigned char*)(group[2] + k) = 1;
+                        for (k = 0; k < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10); k++) {
+                            if ((*(signed char*)(group[1] + k) == -1) && (*(signed char*)(group[2] + k) == -1)) {
+                                *(signed char*)(group[1] + k) = (signed char)i;
+                                found = false;
+                                *(unsigned char*)(group[2] + k) = 1;
+                            }
+                            if (!found) {
+                                break;
+                            }
                         }
                         if (!found) {
                             break;
                         }
                     }
-                    if (!found) {
-                        break;
-                    }
                 }
+            } else {
+                UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+                    vBreathModel, pBreathModel, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
             }
-        } else {
-            UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                vBreathModel, pBreathModel, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
+
+            if (particleWmat != NULL) {
+                particleWmat += 0x30;
+            }
+            if (particleColor != NULL) {
+                particleColor += 0x20;
+            }
+            particleData += 0x98;
         }
 
-        particleData += 0x98;
-        if (particleWmat != NULL) {
-            particleWmat += 0x30;
+        if (spawnCount > 0) {
+            *(short*)((unsigned char*)vBreathModel + 0x44) = 0;
         }
-        if (particleColor != NULL) {
-            particleColor += 0x20;
-        }
-    }
 
-    if (spawnCount > 0) {
-        *(short*)((unsigned char*)vBreathModel + 0x44) = 0;
-    }
-
-    for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
-        int* group = groupTable + i * 0x17;
-        if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
-            unitVelocity.x = kPppBreathModelZero;
-            unitVelocity.y = kPppBreathModelZero;
-            unitVelocity.z = FLOAT_80330F80;
-            group[9] = *(int*)((unsigned char*)pBreathModel + 0x14);
-            group[5] = 0;
-            group[4] = 0;
-            group[3] = 0;
-            pppCopyVector(*(Vec*)(group + 6), unitVelocity);
-            PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
-            group[0] = 1;
+        for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
+            int* group = groupTable + i * 0x17;
+            if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
+                unitVelocity.x = kPppBreathModelZero;
+                unitVelocity.y = kPppBreathModelZero;
+                unitVelocity.z = FLOAT_80330F80;
+                group[9] = *(int*)((unsigned char*)pBreathModel + 0x14);
+                group[5] = 0;
+                group[4] = 0;
+                group[3] = 0;
+                pppCopyVector(*(Vec*)(group + 6), unitVelocity);
+                PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
+                group[0] = 1;
+            }
         }
-    }
 
-    for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
-        if (*groupTable != 0) {
-            PSVECScale((Vec*)(groupTable + 6), &stepVelocity, (float)groupTable[9]);
-            PSVECAdd(&stepVelocity, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
+        for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
+            if (*groupTable != 0) {
+                PSVECScale((Vec*)(groupTable + 6), &stepVelocity, (float)groupTable[9]);
+                PSVECAdd(&stepVelocity, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
+            }
+            groupTable += 0x17;
         }
-        groupTable += 0x17;
     }
 }
 

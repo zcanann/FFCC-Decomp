@@ -185,11 +185,12 @@ CFont::CFont()
 CFont::~CFont()
 {
 	if (texturePtr != 0) {
-		int* texture = reinterpret_cast<int*>(texturePtr);
-		int nextRefCount = texture[1] - 1;
-		texture[1] = nextRefCount;
-		if ((nextRefCount == 0) && (texture != 0)) {
-			(*(void (**)(int*, int))(*texture + 8))(texture, 1);
+		CTexture* texture = texturePtr;
+		int* textureRef = reinterpret_cast<int*>(texture);
+		int nextRefCount = textureRef[1] - 1;
+		textureRef[1] = nextRefCount;
+		if (nextRefCount == 0) {
+			delete texture;
 		}
 		texturePtr = 0;
 	}

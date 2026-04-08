@@ -61,9 +61,14 @@ void Init__9CLightPcsFv(void*);
 void Init__7CMapPcsFv(void*);
 void Init__18CMaterialEditorPcsFv(void*);
 void Init__14CFunnyShapePcsFv(void*);
+void Init__10CCameraPcsFv(void*);
 void Init__7CUSBPcsFv(void*);
 void Init__7CGbaPcsFv(void*);
 void Init__11CDbgMenuPcsFv(void*);
+void Init__9CCharaPcsFv(void*);
+void Init__8CMenuPcsFv(void*);
+void Init__6CCharaFv(void*);
+void Init__6CMcPcsFv(void*);
 int sprintf(char*, const char*, ...);
 int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
 void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
@@ -298,18 +303,18 @@ void CGame::Init()
         break;
     }
 
-    CameraPcs.Init();
+    Init__10CCameraPcsFv(&CameraPcs);
     Init__11CGraphicPcsFv(&GraphicsPcs);
-    gChara.Init();
+    Init__6CCharaFv(&gChara);
     Init__9CLightPcsFv(&LightPcs);
-    CharaPcs.Init();
+    Init__9CCharaPcsFv(&CharaPcs);
     Init__7CMapPcsFv(&MapPcs);
     Init__18CMaterialEditorPcsFv(&MaterialEditorPcs);
     Init__14CFunnyShapePcsFv(&FunnyShapePcs);
     Init__7CUSBPcsFv(&USBPcs);
-    MenuPcs.Init();
+    Init__8CMenuPcsFv(&MenuPcs);
     Init__7CGbaPcsFv(&GbaPcs);
-    GetMcPcsSingleton()->Init();
+    Init__6CMcPcsFv(GetMcPcsSingleton());
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_mainStageName), 0);

@@ -996,8 +996,10 @@ CTexAnim::~CTexAnim()
     int* refData = reinterpret_cast<int*>(*reinterpret_cast<void**>(Ptr(this, 8)));
     if (refData != 0) {
         int refCount = refData[1];
-        refData[1] = refCount - 1;
-        if ((refCount - 1 == 0) && (refData != 0)) {
+        int nextRefCount = refCount - 1;
+
+        refData[1] = nextRefCount;
+        if ((nextRefCount == 0) && (refData != 0)) {
             (*(void (**)(int*, int))(*refData + 8))(refData, 1);
         }
         *reinterpret_cast<void**>(Ptr(this, 8)) = 0;
@@ -1122,7 +1124,9 @@ CTexAnim::CRefData::~CRefData()
     refData->vtable = __vt__Q28CTexAnim8CRefData;
     int* material = reinterpret_cast<int*>(refData->material);
     if (material != 0) {
-        const int nextRefCount = material[1] - 1;
+        int refCount = material[1];
+        int nextRefCount = refCount - 1;
+
         material[1] = nextRefCount;
         if ((nextRefCount == 0) && (material != 0)) {
             (*(void (**)(int*, int))(*material + 8))(material, 1);

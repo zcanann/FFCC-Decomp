@@ -617,7 +617,7 @@ config.libs = [
             Object(NonMatching, "pppVertexApLc.cpp"),
             Object(NonMatching, "pppVertexApMtx.cpp"),
             Object(Matching, "pppVertexAttend.cpp"),
-            Object(NonMatching, "pppVtMime.cpp"),
+            Object(Matching, "pppVtMime.cpp"),
             Object(Matching, "pppWDrawMatrix.cpp"),
             Object(Matching, "pppWDrawMatrixFront.cpp"),
             Object(Matching, "pppWDrawMatrixFrontLoop.cpp"),

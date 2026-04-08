@@ -10,7 +10,7 @@ typedef struct FSTEntry {
 } FSTEntry;
 
 BOOL FirstRead;
-u32 LastLength;
+volatile BOOL LastCommandWasRead;
 volatile u32 NextCommandNumber;
 
 static OSBootInfo* BootInfo;

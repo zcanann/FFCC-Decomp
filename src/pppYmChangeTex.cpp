@@ -366,7 +366,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	state->m_value1 = state->m_value1 + state->m_value2;
 	state->m_value0 = state->m_value0 + state->m_value1;
-	if (step->m_graphId == *(u32*)&ymChangeTex->field0_0x0) {
+	if (step->m_graphId == ((s32*)ymChangeTex)[0]) {
 		state->m_value0 = state->m_value0 + step->m_initWOrk;
 		state->m_value1 = state->m_value1 + step->m_stepValue;
 		state->m_value2 = state->m_value2 + step->m_arg3;

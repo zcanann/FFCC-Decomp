@@ -555,13 +555,12 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
             YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
-            long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+            long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
             Vec worldPos;
             GXColor amb;
-            u8 blend = step->m_blendMode;
 
             pppUnitMatrix(model);
             model.value[2][2] = state->m_speed;
@@ -585,16 +584,16 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             model.value[2][3] = worldPos.z;
 
             pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, blend, 0, 1, 1, 0);
+                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
 
             amb.r = state->m_color.m_r;
             amb.g = state->m_color.m_g;
             amb.b = state->m_color.m_b;
             amb.a = state->m_color.m_a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppSetBlendMode(blend);
+            pppSetBlendMode(step->m_blendMode);
             pppDrawShp__FPlsP12CMaterialSetUc(
-                shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, blend);
+                *shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);

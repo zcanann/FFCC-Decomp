@@ -1193,8 +1193,8 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
 	                    (-obj[0x2D56] | obj[0x2D56]) >> 31);
 
 	OSWaitSemaphore(accessSemaphores + actualChannel);
-	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x32);
-	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x34);
+	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x36);
+	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x38);
 	OSSignalSemaphore(accessSemaphores + actualChannel);
 }
 

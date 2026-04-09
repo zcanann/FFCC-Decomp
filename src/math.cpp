@@ -10,6 +10,8 @@ extern "C" float kNegOneF;
 extern "C" double DOUBLE_8032F778;
 extern "C" float FLOAT_8032F780;
 extern "C" float FLOAT_8032F788;
+extern "C" float FLOAT_8032F758;
+extern "C" float FLOAT_8032F75C;
 extern "C" float kRandSignedScaleF;
 extern "C" float kRandScaleF;
 
@@ -980,9 +982,9 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
     float dt = t - x[low];
     float dx = x[low + 1] - x[low];
 
-    return dt * (dt * (0.5f * sd0 + (dt * (secondDerivatives[low + 1] - sd0)) / dx) -
-                 (dx * (0.33333334f * sd0 + secondDerivatives[low + 1]) -
-                  (y[low + 1] - y[low]) / dx)) +
+    return dt * (dt * (FLOAT_8032F758 * sd0 + (dt * (secondDerivatives[low + 1] - sd0)) / dx) +
+                 -(dx * (FLOAT_8032F75C * sd0 + secondDerivatives[low + 1]) -
+                   (y[low + 1] - y[low]) / dx)) +
            y[low];
 }
 

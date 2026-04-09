@@ -75,49 +75,6 @@ typedef struct ActionIterator {
 static ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
-extern "C" const char s_bad_exception[] = "bad_exception\0\0\0exception\0\0\0\0\0\0";
-
-namespace std {
-
-class exception {
-public:
-	virtual ~exception();
-	virtual const char* what() const;
-};
-
-class bad_exception : public exception {
-public:
-	virtual ~bad_exception();
-	virtual const char* what() const;
-};
-
-/*
- * --INFO--
- * PAL Address: 0x801b0f08
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bad_exception::~bad_exception() {}
-
-/*
- * --INFO--
- * PAL Address: 0x801b1ae4
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-const char* bad_exception::what() const {
-	return s_bad_exception;
-}
-
-} // namespace std
-
-using std::bad_exception;
 
 /**
  * @note Address: 0x800C2374
@@ -687,6 +644,40 @@ static inline int ExPPC_IsInSpecification(const char* extype, const ex_specifica
 
 	return 0;
 }
+
+extern "C" const char s_bad_exception[];
+
+using std::bad_exception;
+
+extern "C" const char s_bad_exception[] = "bad_exception\0\0\0exception\0\0\0\0\0\0";
+
+namespace std {
+
+/*
+ * --INFO--
+ * PAL Address: 0x801b0f08
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bad_exception::~bad_exception() {}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801b1ae4
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+const char* bad_exception::what() const {
+	return s_bad_exception;
+}
+
+} // namespace std
 
 /**
  * @note Address: N/A

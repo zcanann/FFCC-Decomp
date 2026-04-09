@@ -1,6 +1,7 @@
 #include "ffcc/texanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/materialman.h"
+#include "ffcc/ref.h"
 #include "ffcc/system.h"
 #include "ffcc/math.h"
 
@@ -1010,14 +1011,15 @@ CTexAnim::CTexAnim()
 CTexAnim::~CTexAnim()
 {
     *reinterpret_cast<void**>(this) = __vt__8CTexAnim;
-    int* refData = reinterpret_cast<int*>(*reinterpret_cast<void**>(Ptr(this, 8)));
+    CRef* refData = reinterpret_cast<CRef*>(*reinterpret_cast<void**>(Ptr(this, 8)));
     if (refData != 0) {
-        int refCount = refData[1];
+        int* refDataWords = reinterpret_cast<int*>(refData);
+        int refCount = refDataWords[1];
         int nextRefCount = refCount - 1;
 
-        refData[1] = nextRefCount;
-        if ((nextRefCount == 0) && (refData != 0)) {
-            (*(void (**)(int*, int))(*refData + 8))(refData, 1);
+        refDataWords[1] = nextRefCount;
+        if (nextRefCount == 0) {
+            delete refData;
         }
         *reinterpret_cast<void**>(Ptr(this, 8)) = 0;
     }

@@ -15,6 +15,8 @@ extern float FLOAT_80330610;
 extern float FLOAT_80330614;
 extern float FLOAT_80330618;
 extern float FLOAT_8033061c;
+extern float FLOAT_80330620;
+extern float FLOAT_80330624;
 extern float FLOAT_8033062c;
 extern float FLOAT_80330630;
 
@@ -304,11 +306,11 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
 		projected[i].y = FLOAT_80330618 - projected[i].y / FLOAT_8033061c;
 	}
 
-	maxX = projected[0].x;
-	maxY = projected[0].y;
-	minX = projected[0].x;
-	minY = projected[0].y;
-	for (i = 1; i < 4; i++) {
+	maxX = FLOAT_80330624;
+	maxY = FLOAT_80330624;
+	minX = FLOAT_80330620;
+	minY = FLOAT_80330620;
+	for (i = 0; i < 4; i++) {
 		if (maxX < projected[i].x) {
 			maxX = projected[i].x;
 		}

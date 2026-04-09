@@ -71,7 +71,8 @@ CFlatRuntime::CFlatRuntime()
  */
 CFlatRuntime::~CFlatRuntime()
 {
-	Quit();
+	*reinterpret_cast<void***>(this) = __vt__12CFlatRuntime;
+	reinterpret_cast<CFlatRuntimeLifecycleProxy*>(this)->Quit();
 }
 
 /*

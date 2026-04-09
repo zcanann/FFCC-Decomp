@@ -491,7 +491,7 @@ void CFunnyShape::RenderTexture()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    const u32 color = *reinterpret_cast<const u32*>(&DAT_8032fd5c);
+    GXColor color = DAT_8032fd5c;
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(PtrAt(this, 0x6014)), GX_TEXMAP0);
 
@@ -513,25 +513,25 @@ void CFunnyShape::RenderTexture()
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd74;
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd80;
     GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = color;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.f32 = FLOAT_8032fd6c;
 }

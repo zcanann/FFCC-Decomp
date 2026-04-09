@@ -649,7 +649,8 @@ extern "C" const char s_bad_exception[];
 
 using std::bad_exception;
 
-extern "C" const char s_bad_exception[] = "bad_exception\0\0\0exception\0\0\0\0\0\0";
+extern "C" const char s_bad_exception[] = "bad_exception";
+static const char s_exception[]        = "exception";
 
 namespace std {
 

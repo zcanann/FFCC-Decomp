@@ -2435,11 +2435,7 @@ void CCaravanWork::BackupTutorialItem(int mode)
 void CCaravanWork::UniteComList(int startIdx, int count, int cmdId)
 {
 	for (int i = 0; i < count; i++) {
-		int value = -1;
-		if (i == 0) {
-			value = cmdId;
-		}
-		m_commandListExtra[startIdx + i] = value;
+		m_commandListExtra[startIdx + i] = (i == 0) ? cmdId : -1;
 	}
 
 	if ((m_weaponIdx >= startIdx) && (m_weaponIdx < (startIdx + count))) {

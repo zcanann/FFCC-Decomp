@@ -227,7 +227,7 @@ char s_pppYmMelt_cpp_801DA048[] = "pppYmMelt.cpp";
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
     int colorOffset;
-    int grid;
+    int gridCount;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -236,18 +236,20 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
     colorOffset = offsets->m_serializedDataOffsets[1];
     YmMeltColorWork* colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
-    grid = *(u16*)((u8*)&ctrl->m_initWOrk + 2) + 1;
+    gridCount = *(u16*)((u8*)&ctrl->m_initWOrk + 2) + 1;
+    int vertexCount = gridCount * gridCount;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
         work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp_801DA048,
+            (unsigned long)vertexCount * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp_801DA048,
             0xA9);
 
-        YmMeltVertex* vertex = work->m_vertexData;
+        YmMeltVertex* vertexBase = work->m_vertexData;
+        YmMeltVertex* vertex = vertexBase;
         int angleSeed = rand();
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
-        work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
+        work->m_phaseOffset = angleSeed - angleSeed / phaseDiv * phaseDiv;
         s16 phaseOffset = work->m_phaseOffset;
         float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
         float step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
@@ -255,21 +257,23 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         Mtx rotMtx;
 
         for (float z = -halfWidth; z <= halfWidth; z += step) {
+            YmMeltVertex* rowVertex = vertex;
             for (float x = -halfWidth; x <= halfWidth; x += step) {
-                vertex->m_position.x = x;
-                vertex->m_position.y = kPppYmMeltZero;
-                vertex->m_position.z = z;
+                rowVertex->m_position.x = x;
+                rowVertex->m_position.y = kPppYmMeltZero;
+                rowVertex->m_position.z = z;
 
                 if (phaseOffset != 0) {
                     PSMTXRotRad(rotMtx, 'y', rot);
-                    PSMTXMultVec(rotMtx, &vertex->m_position, &vertex->m_position);
+                    PSMTXMultVec(rotMtx, &rowVertex->m_position, &rowVertex->m_position);
                 }
 
+                rowVertex++;
                 vertex++;
             }
         }
 
-        CalcPolygonHeight((VERTEX_DATA*)ctrl, work->m_vertexData, (_GXColor*)&colorWork->m_color, matrixY);
+        CalcPolygonHeight((VERTEX_DATA*)ctrl, vertexBase, (_GXColor*)&colorWork->m_color, matrixY);
     }
 
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;

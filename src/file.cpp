@@ -491,10 +491,9 @@ void CFile::kick()
  */
 CFile::CHandle* CFile::CheckQueue()
 {
-    CHandle* sentinel = &m_fileHandle;
-    CHandle* handle = sentinel->m_previous;
+    CHandle* handle = m_fileHandle.m_previous;
 
-    while (handle != sentinel)
+    do
     {
         if (handle->m_completionStatus == 2)
         {
@@ -516,17 +515,24 @@ CFile::CHandle* CFile::CheckQueue()
             else
             {
                 handle->m_completionStatus = 4;
+                handle = handle->m_previous;
             }
         }
-        else if (handle->m_completionStatus == 3)
+        else
         {
-            return handle;
+            if (handle->m_completionStatus == 3)
+            {
+                return handle;
+            }
+
+            handle = handle->m_previous;
         }
 
-        handle = handle->m_previous;
-    }
-
-    return 0;
+        if (handle == &m_fileHandle)
+        {
+            return 0;
+        }
+    } while (true);
 }
 
 /*

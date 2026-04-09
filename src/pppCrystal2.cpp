@@ -207,7 +207,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             work->m_refractionTexObj = (GXTexObj*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 0x20, pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xB5);
             GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
-                         (u16)textureInfo->m_height, GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+                         (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
         }
     }
 }

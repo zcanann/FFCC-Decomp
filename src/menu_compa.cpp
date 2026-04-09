@@ -15,6 +15,7 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float,
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern CMenuPcs MenuPcs;
 
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
@@ -404,7 +405,7 @@ bool CMenuPcs::CompaClose()
 void CMenuPcs::CompaDraw()
 {
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	int scriptFood = Game.m_scriptFoodBase[0];
 	short* compaList = this->compaList;
@@ -423,8 +424,8 @@ void CMenuPcs::CompaDraw()
 			float uvScale = *reinterpret_cast<float*>(entry + 10);
 
 			if (i < 3) {
-				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 1);
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
 				GXColor colors[4] = {
 					{0xFF, 0xFF, 0xFF, 0xFF},
@@ -445,13 +446,13 @@ void CMenuPcs::CompaDraw()
 								tileH = 24.0f;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								this, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u, v,
+								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, fillW, tileH, u, v,
 								colors, uvScale, 1.0f, 0.0f);
 							yStep += 24.0f;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							this, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v,
+							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, fillW, h, u, v,
 							colors, uvScale, 1.0f, 0.0f);
 					}
 
@@ -475,23 +476,23 @@ void CMenuPcs::CompaDraw()
 								tileH = 24.0f;
 							}
 							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								this, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH, u, v,
+								&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, yStep, remainW, tileH, u, v,
 								fadeColors, uvScale, 1.0f, 0.0f);
 							yStep += 24.0f;
 						}
 					} else {
 						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							this, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
+							&MenuPcs, static_cast<unsigned long>(*reinterpret_cast<int*>(entry + 0xC)), x, y, remainW, h, u, v,
 							fadeColors, uvScale, 1.0f, 0.0f);
 					}
 				}
 
-				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 			} else {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 			}
 		}
 
@@ -503,7 +504,7 @@ void CMenuPcs::CompaDraw()
 
 	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(globalAlpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x3A);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x3A);
 
 	int familyCount = 2;
 	for (int i = 0; i < 5; i++) {
@@ -517,7 +518,7 @@ void CMenuPcs::CompaDraw()
 
 	for (int i = 0; i < familyCount; i++) {
 		DrawRect__8CMenuPcsFUlfffffffff(
-			this, 0,
+			&MenuPcs, 0,
 			static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x10),
 			static_cast<float>(*reinterpret_cast<short*>(menuData + 0xA) + 0x40 + i * 0x28),
 			12.0f, 24.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);

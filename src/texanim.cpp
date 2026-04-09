@@ -968,10 +968,11 @@ void CTexAnimSet::SetTexGen()
         const float fVar2 = FLOAT_8032fb38;
         int* material = reinterpret_cast<int*>(refData->material);
         if (material != 0) {
-            const unsigned int uVar1 = U32At(texAnim, 0x1C);
+            const float texGenS = F32At(texAnim, 0x18);
+            const float texGenT = F32At(texAnim, 0x1C);
             material = material + (refData->texSrtIndex * 5);
-            U32At(material, 0x50) = U32At(texAnim, 0x18);
-            U32At(material, 0x54) = uVar1;
+            F32At(material, 0x50) = texGenS;
+            F32At(material, 0x54) = texGenT;
             F32At(material, 0x58) = fVar2;
             F32At(material, 0x5C) = fVar2;
             if (fVar2 == F32At(material, 0x58)) {

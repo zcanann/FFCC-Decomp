@@ -31,7 +31,7 @@ extern double DOUBLE_80331858;
 
 static char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
-struct TraceEntry {
+struct TRACE_POLYGON {
     Vec pos;
     float pad0;
     Vec targetPos;
@@ -47,7 +47,7 @@ struct TracerWork {
     float pad1c;
     float* initWork;
     float* arg3Work;
-    TraceEntry* entries;
+    TRACE_POLYGON* entries;
     u16 visibleCount;
     u16 pad2e;
     u16 alphaStep;
@@ -70,6 +70,42 @@ union PackedColor {
     u32 value;
     u8 bytes[4];
 };
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void initTracePolygon(pppYmTracer2*, TRACE_POLYGON& poly)
+{
+    poly.pos.x = FLOAT_80331840;
+    poly.pos.y = FLOAT_80331840;
+    poly.pos.z = FLOAT_80331840;
+    poly.targetPos.x = FLOAT_80331840;
+    poly.targetPos.y = FLOAT_80331840;
+    poly.targetPos.z = FLOAT_80331840;
+    poly.color[0] = 0;
+    poly.color[1] = 0;
+    poly.color[2] = 0;
+    poly.color[3] = 0;
+    poly.active = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
+{
+    dst->active = src->active;
+    pppCopyVector(dst->pos, src->pos);
+    pppCopyVector(dst->targetPos, src->targetPos);
+    dst->color[0] = src->color[0];
+    dst->color[1] = src->color[1];
+    dst->color[2] = src->color[2];
+    dst->color[3] = src->color[3];
+}
 
 /*
  * --INFO--
@@ -159,9 +195,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     s32 iVar8;
     s16 visibleCount;
     u32 i;
-    TraceEntry* entries;
-    TraceEntry* entry;
-    TraceEntry* dest;
+    TRACE_POLYGON* entries;
+    TRACE_POLYGON* entry;
     TracerWork* work;
     Vec local_a8;
     Vec local_9c;
@@ -199,21 +234,11 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     if (work->entries == nullptr) {
         useFallback = true;
         work->alphaStep = (u16)param_2->m_payload[8] / *(u16*)(param_2->m_payload + 6);
-        work->entries = (TraceEntry*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
 
-        fVar2 = FLOAT_80331840;
-        pfVar6 = (float*)work->entries;
         for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar8++) {
-            *(u8*)(pfVar6 + 8) = 0;
-            *(u8*)((u8*)pfVar6 + 0x1f) = 0;
-            pfVar6[2] = fVar2;
-            pfVar6[1] = fVar2;
-            *pfVar6 = fVar2;
-            pfVar6[6] = fVar2;
-            pfVar6[5] = fVar2;
-            pfVar6[4] = fVar2;
-            pfVar6 += 10;
+            initTracePolygon(pppYmTracer2, work->entries[iVar8]);
         }
     }
 
@@ -226,20 +251,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         pfVar6 = (float*)(entries + iVar8);
 
         for (; (s32)i <= iVar8; iVar8--) {
-            *(u8*)(pfVar6 + 0x12) = *(u8*)(pfVar6 + 8);
-            local_a8.x = *pfVar6;
-            dest = entries + (iVar8 + 1);
-            local_a8.y = pfVar6[1];
-            local_a8.z = pfVar6[2];
-            pppCopyVector(dest->pos, local_a8);
-            local_9c.x = pfVar6[4];
-            local_9c.y = pfVar6[5];
-            local_9c.z = pfVar6[6];
-            pppCopyVector(dest->targetPos, local_9c);
-            *(u8*)(pfVar6 + 0x11) = *(u8*)(pfVar6 + 7);
-            *(u8*)((u8*)pfVar6 + 0x45) = *(u8*)((u8*)pfVar6 + 0x1d);
-            *(u8*)((u8*)pfVar6 + 0x46) = *(u8*)((u8*)pfVar6 + 0x1e);
-            *(u8*)((u8*)pfVar6 + 0x47) = *(u8*)((u8*)pfVar6 + 0x1f);
+            copyPolygonData(entries + (iVar8 + 1), entries + iVar8);
             pfVar6 -= 10;
         }
 
@@ -284,7 +296,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     if (useFallback) {
-        TraceEntry* pFallback = entries;
+        TRACE_POLYGON* pFallback = entries;
 
         for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
             local_84.x = entries->pos.x;
@@ -326,7 +338,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 {
     u8* colorData;
     TracerWork* work;
-    TraceEntry* poly;
+    TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
     CTexture* texture;
     s32 colorOffset;
@@ -391,7 +403,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (count - 1) * 4);
 
                 for (i = 0; i < (u32)(count - 1); i++) {
-                    TraceEntry* next = poly + 1;
+                    TRACE_POLYGON* next = poly + 1;
 
                     uTop = (f32)((f64)(s32)i * (f64)uvStep);
                     uBottom = (f32)((f64)(s32)(i + 1) * (f64)uvStep);

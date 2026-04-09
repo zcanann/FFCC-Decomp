@@ -6,10 +6,17 @@
 #include <dolphin/mtx.h>
 
 class CChunkFile;
+class CMaterialSet;
 class CTextureSet;
 class CMemory;
 class CTexAnimSet;
 struct Vec;
+
+struct CCharaModelData
+{
+    u8 _pad0[0x24];
+    CMaterialSet* m_materialSet;
+};
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec*, Vec*, Vec*, float);
@@ -111,11 +118,14 @@ public:
 		void CalcFurColor();
 		void InitMogFurTex();
 		int GetDispIndex(CChara::CNode*);
-        void GetMatrix();
-        void GetMatrix(float(*)[4]);
+		void GetMatrix();
+		void GetMatrix(float(*)[4]);
 
 	private:
-		u8 _padB4[0xB4];
+		u8 _pad0[0xA4];
+		CCharaModelData* m_data;
+		u8 _padA8[8];
+		CTextureSet* m_texSet;
 		float m_curFrame;
 		CAnim* m_anim;
 		float m_time;

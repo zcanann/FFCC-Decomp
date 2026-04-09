@@ -929,7 +929,7 @@ config.libs = [
                 NonMatching,
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
                 mw_version="GC/2.6",
-                extra_cflags=["-inline auto,deferred", "-char signed", "-RTTI on", "-sdata 0", "-sdata2 0"],
+                extra_cflags=["-inline auto,deferred", "-char signed", "-RTTI on"],
             ),
             Object(
                 Matching,
@@ -1078,7 +1078,7 @@ config.libs = [
             ),
             Object(Matching, "TRK_MINNOW_DOLPHIN/targcont.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/targimpl.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/targimpl.c", mw_version="GC/1.3.2r"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/targsupp.s"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/UDP_Stubs.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/usr_put.c"),

@@ -210,42 +210,26 @@ CFunnyShapePcs::~CFunnyShapePcs()
  */
 void CFunnyShapePcs::Init()
 {
-    int state0;
-    int state1;
-    int state2;
-    f32 ndcMin;
-    f32 viewportOrigin;
+    GXColor* colors = reinterpret_cast<GXColor*>(m_viewerState);
+    Vec* positions = reinterpret_cast<Vec*>(&m_viewerState[0x10]);
 
-    m_viewerState[0] = 0x7F;
-    state0 = 0x3F & -((__cntlzw(0) >> 5) & 1);
-    m_viewerState[1] = 0x7F;
-    m_viewerState[2] = 0x7F;
-    m_viewerState[3] = 0xFF;
-    state1 = 0x3F & -((__cntlzw(1) >> 5) & 1);
-    viewportOrigin = kFunnyShapeViewportOrigin;
-    m_viewerState[4] = state0;
-    ndcMin = kFunnyShapeNdcMin;
-    m_viewerState[5] = state0;
-    m_viewerState[6] = state0;
-    state2 = 0x3F & -((__cntlzw(2) >> 5) & 1);
-    m_viewerState[7] = 0xFF;
-    *reinterpret_cast<f32*>(&m_viewerState[0x10]) = viewportOrigin;
-    *reinterpret_cast<f32*>(&m_viewerState[0x14]) = viewportOrigin;
-    *reinterpret_cast<f32*>(&m_viewerState[0x18]) = ndcMin;
-    m_viewerState[8] = state1;
-    m_viewerState[9] = state1;
-    m_viewerState[10] = state1;
-    m_viewerState[11] = 0xFF;
-    *reinterpret_cast<f32*>(&m_viewerState[0x1C]) = viewportOrigin;
-    *reinterpret_cast<f32*>(&m_viewerState[0x20]) = viewportOrigin;
-    *reinterpret_cast<f32*>(&m_viewerState[0x24]) = ndcMin;
-    m_viewerState[12] = state2;
-    m_viewerState[13] = state2;
-    m_viewerState[14] = state2;
-    m_viewerState[15] = 0xFF;
-    *reinterpret_cast<f32*>(&m_viewerState[0x28]) = viewportOrigin;
-    *reinterpret_cast<f32*>(&m_viewerState[0x2C]) = viewportOrigin;
-    *reinterpret_cast<f32*>(&m_viewerState[0x30]) = ndcMin;
+    colors[0].r = 0x7F;
+    colors[0].g = 0x7F;
+    colors[0].b = 0x7F;
+    colors[0].a = 0xFF;
+
+    for (int i = 0; i < 3; i++) {
+        u8 shade = (i == 0) ? 0x3F : 0;
+
+        colors[i + 1].r = shade;
+        colors[i + 1].g = shade;
+        colors[i + 1].b = shade;
+        colors[i + 1].a = 0xFF;
+
+        positions[i].x = kFunnyShapeViewportOrigin;
+        positions[i].y = kFunnyShapeViewportOrigin;
+        positions[i].z = kFunnyShapeNdcMin;
+    }
 }
 
 /*

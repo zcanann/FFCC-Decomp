@@ -10,6 +10,7 @@ extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, uns
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__7CVectorFv(void*);
+extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
 
 /*
  * --INFO--
@@ -806,7 +807,27 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
  */
 void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 {
-	*(void**)((u8*)this + 0xB0) = texSet;
+	CTextureSet* oldTexSet = m_texSet;
+
+	if (texSet != oldTexSet) {
+		if (oldTexSet != 0) {
+			int* refData = reinterpret_cast<int*>(oldTexSet);
+			int refCount = refData[1] - 1;
+			refData[1] = refCount;
+			if ((refCount == 0) && (oldTexSet != 0)) {
+				(*(void (**)(void*, int))(*refData + 8))(oldTexSet, 1);
+			}
+			m_texSet = 0;
+		}
+		m_texSet = texSet;
+		if (m_texSet != 0) {
+			int* refData = reinterpret_cast<int*>(m_texSet);
+			refData[1] = refData[1] + 1;
+		}
+	}
+	if (m_data->m_materialSet != 0) {
+		SetTextureSet__12CMaterialSetFP11CTextureSet(m_data->m_materialSet, m_texSet);
+	}
 }
 
 /*

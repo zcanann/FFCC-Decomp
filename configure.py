@@ -929,7 +929,7 @@ config.libs = [
                 NonMatching,
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
                 mw_version="GC/2.6",
-                extra_cflags=["-inline auto,deferred", "-char signed", "-RTTI on", "-sdata 0", "-sdata2 0"],
+                extra_cflags=["-inline auto,deferred", "-char signed", "-RTTI on"],
             ),
             Object(
                 Matching,

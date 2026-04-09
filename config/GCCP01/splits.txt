@@ -2009,6 +2009,7 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	.rodata     start:0x801E6EB0 end:0x801E6F48
 	.data       start:0x8021D070 end:0x8021D158
 	.bss        start:0x8032B400 end:0x8032B40C
+	.sdata      start:0x8032EBF8 end:0x8032EC08
 
 Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801B1AF0 end:0x801B1C60

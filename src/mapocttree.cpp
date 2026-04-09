@@ -160,7 +160,7 @@ COctTree::~COctTree()
 	COctNode* rootNode = m_nodePool;
 
 	if (rootNode != 0) {
-		__dla__FPv(rootNode);
+		delete[] rootNode;
 		m_nodePool = 0;
 	}
 

@@ -835,7 +835,6 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 void MixAudio(short* output, short* input, unsigned long samples)
 {
     u16 volume;
-    f32 curVolume;
     s32 mixedSample;
     s16* audioPtr;
     u32 availableSamples;
@@ -857,12 +856,12 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
                 audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
                 for (i = availableSamples; i != 0; i--) {
-                    curVolume = SimpleControl.unk_C8;
                     if (SimpleControl.unk_D0 != 0) {
                         SimpleControl.unk_D0 -= 1;
-                        curVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                        SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    } else {
+                        SimpleControl.unk_C4 = SimpleControl.unk_C8;
                     }
-                    SimpleControl.unk_C4 = curVolume;
                     volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                     mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
@@ -890,11 +889,9 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 samples -= availableSamples;
                 SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample -= availableSamples;
                 SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr = audioPtr;
-                if (SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample == 0) {
-                    SimpleControl.audioPlayIndex += 1;
-                    if (SimpleControl.audioPlayIndex > 2) {
-                        SimpleControl.audioPlayIndex = 0;
-                    }
+                if ((SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample == 0) &&
+                    ((SimpleControl.audioPlayIndex += 1) > 2)) {
+                    SimpleControl.audioPlayIndex = 0;
                 }
             } while (samples != 0);
         }
@@ -913,12 +910,12 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
             audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
             for (i = availableSamples; i != 0; i--) {
-                curVolume = SimpleControl.unk_C8;
                 if (SimpleControl.unk_D0 != 0) {
                     SimpleControl.unk_D0 -= 1;
-                    curVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                } else {
+                    SimpleControl.unk_C4 = SimpleControl.unk_C8;
                 }
-                SimpleControl.unk_C4 = curVolume;
                 volume = gTHPSimpleVolumeTable[static_cast<s32>(SimpleControl.unk_C4)];
 
                 mixedSample = static_cast<s32>(*input) +
@@ -949,11 +946,9 @@ void MixAudio(short* output, short* input, unsigned long samples)
             samples -= availableSamples;
             SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample -= availableSamples;
             SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr = audioPtr;
-            if (SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample == 0) {
-                SimpleControl.audioPlayIndex += 1;
-                if (SimpleControl.audioPlayIndex > 2) {
-                    SimpleControl.audioPlayIndex = 0;
-                }
+            if ((SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample == 0) &&
+                ((SimpleControl.audioPlayIndex += 1) > 2)) {
+                SimpleControl.audioPlayIndex = 0;
             }
         } while (samples != 0);
     }

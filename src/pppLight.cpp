@@ -252,13 +252,9 @@ void pppLight(void* param1, void* param2, void* param3)
 
 				light.m_type = 1;
 				targetIndex = step->targetIndex;
-				if (targetIndex == 0xFFFFFFFF) {
-					obj = gPppDefaultValueBuffer;
-				} else {
-					pppLightTarget* targetTable =
-						(pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable;
-					obj = targetTable[targetIndex].obj;
-				}
+				obj = (targetIndex == 0xFFFFFFFF)
+					? gPppDefaultValueBuffer
+					: ((pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable)[targetIndex].obj;
 
 					light.m_targetPosition.x = *(f32*)(obj + 0x1c);
 					light.m_targetPosition.y = *(f32*)(obj + 0x2c);

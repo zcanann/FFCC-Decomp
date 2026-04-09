@@ -36,7 +36,7 @@ struct CAnimFields {
 	unsigned char m_quantizeZ;
 	unsigned char _padD;
 	unsigned short m_nodeCount;
-	short m_frameCount;
+	unsigned short m_frameCount;
 	CChara::CAnimNode* m_nodes;
 	unsigned int m_interpOffset;
 	unsigned int m_bankSize;
@@ -275,7 +275,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 						anim.m_quantizeZ = chunkFile.Get4();
 					} else if ((int)chunk.m_id < 0x494E464F) {
 						if (chunk.m_id == 0x4652414D) {
-							anim.m_frameCount = static_cast<short>(static_cast<int>(chunkFile.Get4()));
+							anim.m_frameCount = static_cast<unsigned short>(static_cast<int>(chunkFile.Get4()));
 						} else if (((int)chunk.m_id < 0x4652414D) && (chunk.m_id == 0x42414E4B)) {
 							anim.m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
 							anim.m_bank = __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
@@ -420,18 +420,18 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	CAnimNodeFields& node = AnimNode(this);
 
 	if (animFields.m_bank == 0) {
-		do {
+		while (animFields.m_bank == 0) {
 			animFields.m_bank = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
 			    &Memory, animFields.m_bankSize, animFields.m_stage, s_charaAnimSourceFile, 0x160, 1);
 
 			if (animFields.m_bank != 0) {
 				break;
 			}
-		} while (TryReleaseAnimBank__9CCharaPcsFi(&CharaPcs, animFields.m_bankSize) != 0);
-
-		if (animFields.m_bank == 0) {
-			return;
+			if (TryReleaseAnimBank__9CCharaPcsFi(&CharaPcs, animFields.m_bankSize) == 0) {
+				return;
+			}
 		}
+
 	}
 
 	SetGroup__7CMemoryFPvi(&Memory, animFields.m_bank, 1);

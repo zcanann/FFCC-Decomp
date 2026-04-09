@@ -82,19 +82,18 @@ typedef struct mem_pool_obj {
 
 } mem_pool_obj;
 
-mem_pool_obj __malloc_pool;
 static int initialized = 0;
 
 static SubBlock* SubBlock_merge_prev(SubBlock*, SubBlock**);
 static void SubBlock_merge_next(SubBlock*, SubBlock**);
-Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);
-void Block_construct(Block* block, unsigned long size);
-SubBlock* Block_subBlock(Block* block, unsigned long requested_size);
-void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size);
-void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size);
-void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr);
-void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size);
-void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
+static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);
+static void Block_construct(Block* block, unsigned long size);
+static SubBlock* Block_subBlock(Block* block, unsigned long requested_size);
+static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size);
+static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size);
+static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr);
+static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size);
+static void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
 
 static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 
@@ -133,7 +132,7 @@ static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
     (_sb = (SubBlock*)((char*)(ths) + 16)),                                                        \
         SubBlock_is_free(_sb) && SubBlock_size(_sb) == Block_size((ths)) - 24
 
-void __sys_free();
+void __sys_free(void*);
 void* __sys_alloc(unsigned long size);
 
 static inline SubBlock* SubBlock_merge_prev(SubBlock* ths, SubBlock** start) {
@@ -257,7 +256,7 @@ static inline __mem_pool* get_malloc_pool(void) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void Block_construct(Block* block, unsigned long size) {
+static void Block_construct(Block* block, unsigned long size) {
     SubBlock* sb;
 
     block->size = size | 3;
@@ -281,7 +280,7 @@ void Block_construct(Block* block, unsigned long size) {
  * JP Address: TODO
  * JP Size: TODO
  */
-SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
+static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     SubBlock* sb;
     SubBlock* start;
     unsigned long sb_size;
@@ -400,7 +399,7 @@ SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
  * JP Address: TODO
  * JP Size: TODO
  */
-Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
+static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
     Block* block;
     unsigned long aligned_size;
 
@@ -429,7 +428,7 @@ Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
     return block;
 }
 
-void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     Block* block;
     Block* current_block;
     void* result;
@@ -481,7 +480,7 @@ done:
  * JP Address: TODO
  * JP Size: TODO
  */
-void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
+static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
     Block* current_block;
     SubBlock* result;
 
@@ -514,7 +513,7 @@ found:
     return (char*)result + 8;
 }
 
-void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
+static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
     SubBlock* sb = SubBlock_from_pointer(ptr);
     SubBlock* _sb;
 
@@ -527,7 +526,7 @@ void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
     }
 }
 
-void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     unsigned long i = 0;
     FixStart* fs;
 
@@ -632,7 +631,7 @@ void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     }
 }
 
-void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
+static void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
     unsigned long i = 0;
     FixSubBlock* p;
     FixBlock* b;

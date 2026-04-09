@@ -104,12 +104,8 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
             pppFMATRIX outMatrix;
-            pppFMATRIX ownerMatrix;
-            pppFMATRIX partMatrix;
 
-            partMatrix = tailObj->m_obj.m_localMatrix;
-            ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
-            pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
+            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
             pos.z = outMatrix.value[2][3];
@@ -136,12 +132,8 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
         pppFMATRIX outMatrix;
-        pppFMATRIX ownerMatrix;
-        pppFMATRIX partMatrix;
 
-        partMatrix = tailObj->m_obj.m_localMatrix;
-        ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
-        pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
+        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];

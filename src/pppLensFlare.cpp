@@ -99,10 +99,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 				double d;
 				u32 u[2];
 			} alphaScaleBits;
+			float alphaValue;
 
 			alphaScaleBits.u[0] = 0x43300000;
 			alphaScaleBits.u[1] = sourceAlpha;
-			alphaScale = (float)((float)(alphaScaleBits.d - kPppLensFlareUnusedDouble) * kPppLensFlareAlphaScale);
+			alphaValue = (float)(alphaScaleBits.d - kPppLensFlareUnusedDouble);
+			alphaScale = alphaValue * kPppLensFlareAlphaScale;
 		}
 
 		GXGetViewportv(viewport);
@@ -160,10 +162,10 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		if ((u8)work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			u32 scaledAlpha = (u8)work->m_alpha * (0xFF / sampleCount);
+			int scaledAlpha = (u8)work->m_alpha * (0xFF / sampleCount);
 
 			work->m_alpha = (u8)scaledAlpha;
-			if ((u8)scaledAlpha <= 0xFF) {
+			if ((int)(u8)scaledAlpha <= 0xFF) {
 				work->m_alpha = (u8)scaledAlpha;
 			} else {
 				work->m_alpha = 0xff;
@@ -175,11 +177,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 				double d;
 				u32 u[2];
 			} finalAlphaBits;
+			float finalAlpha;
 
 			finalAlphaBits.u[0] = 0x43300000;
 			finalAlphaBits.u[1] = (u8)work->m_alpha;
-			work->m_alpha =
-				(u8)(int)((float)(finalAlphaBits.d - kPppLensFlareUnusedDouble) * alphaScale);
+			finalAlpha = (float)(finalAlphaBits.d - kPppLensFlareUnusedDouble);
+			work->m_alpha = (u8)(int)(finalAlpha * alphaScale);
 		}
 		if (unkB->m_dataValIndex != 0xffff) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);

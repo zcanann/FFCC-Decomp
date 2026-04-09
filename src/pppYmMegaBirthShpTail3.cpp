@@ -13,7 +13,7 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
-extern int rand();
+extern "C" int rand(void);
 extern pppFMATRIX g_matUnit3;
 
 static char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";

@@ -8,14 +8,14 @@ struct pppLocationTitle {
     u32 m_unk0;
     u32 m_unk4;
     u32 m_unk8;
-    u32 m_graphId;
+    s32 m_graphId;
     pppFMATRIX m_localMatrix;
     char m_pad[0x54];
     void* field_0x88;
 };
 
 struct pppLocationTitleUnkB {
-    u32 m_graphId;
+    s32 m_graphId;
     s32 m_dataValIndex;
     u16 m_initWOrk;
     u16 m_maxCount;

@@ -1185,17 +1185,18 @@ void GbaQueue::SetRadarType()
  */
 void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
 {
-	unsigned int actualChannel;
+	int actualChannel;
+	OSSemaphore* semaphore;
 	char* obj = reinterpret_cast<char*>(this);
+	signed char connectedFlag = obj[0x2D56];
 
-	actualChannel = static_cast<unsigned int>(channel) &
-	                ~static_cast<unsigned int>(
-	                    (-obj[0x2D56] | obj[0x2D56]) >> 31);
+	actualChannel = channel & ~((-connectedFlag | connectedFlag) >> 31);
+	semaphore = accessSemaphores + actualChannel;
 
-	OSWaitSemaphore(accessSemaphores + actualChannel);
+	OSWaitSemaphore(semaphore);
 	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x36);
 	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x38);
-	OSSignalSemaphore(accessSemaphores + actualChannel);
+	OSSignalSemaphore(semaphore);
 }
 
 /*

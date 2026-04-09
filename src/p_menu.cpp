@@ -565,28 +565,28 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
             ReleaseRefObject(*reinterpret_cast<void**>(self + 0xFC));
             *reinterpret_cast<void**>(self + 0xFC) = nullptr;
 
-            for (int i = 0; i < 10; i++) {
-                u8* slot = self + 0x1E4 + i * 4;
-                ReleaseRefObject(*reinterpret_cast<void**>(slot));
-                *reinterpret_cast<void**>(slot) = nullptr;
+            void** slot = reinterpret_cast<void**>(self + 0x1E4);
+            for (int i = 0; i < 10; i++, slot++) {
+                ReleaseRefObject(*slot);
+                *slot = nullptr;
             }
 
-            for (int i = 0; i < 2; i++) {
-                u8* slot = self + 0x154 + i * 4;
-                ReleaseRefObject(*reinterpret_cast<void**>(slot));
-                *reinterpret_cast<void**>(slot) = nullptr;
+            slot = reinterpret_cast<void**>(self + 0x154);
+            for (int i = 0; i < 2; i++, slot++) {
+                ReleaseRefObject(*slot);
+                *slot = nullptr;
             }
 
-            for (int i = 0; i < 4; i++) {
-                u8* slot = self + 0x13C + i * 4;
-                ReleaseRefObject(*reinterpret_cast<void**>(slot));
-                *reinterpret_cast<void**>(slot) = nullptr;
+            slot = reinterpret_cast<void**>(self + 0x13C);
+            for (int i = 0; i < 4; i++, slot++) {
+                ReleaseRefObject(*slot);
+                *slot = nullptr;
             }
 
-            for (int i = 0; i < 12; i++) {
-                u8* slot = self + 0x10C + i * 4;
-                ReleaseRefObject(*reinterpret_cast<void**>(slot));
-                *reinterpret_cast<void**>(slot) = nullptr;
+            slot = reinterpret_cast<void**>(self + 0x10C);
+            for (int i = 0; i < 12; i++, slot++) {
+                ReleaseRefObject(*slot);
+                *slot = nullptr;
             }
 
             destroySingleMenu__8CMenuPcsFv(this);

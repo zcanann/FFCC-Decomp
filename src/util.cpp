@@ -510,13 +510,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     Mtx44 orthoMtx;
     Mtx44 screenMtx;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    float indMtx[2][3] = {
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-    };
-
-    float x2 = x + width;
-    float y2 = y + height;
+    float indMtx[2][3];
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -534,9 +528,10 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
@@ -552,7 +547,10 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetNumTexGens(0);
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+
+    float x2 = x + width;
+    float y2 = y + height;
 
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);

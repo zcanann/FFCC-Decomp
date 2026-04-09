@@ -3802,7 +3802,8 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
  */
 void GbaQueue::ClrChgHitFlg(int channel)
 {
-	int flag = reinterpret_cast<signed char*>(this)[0x2D56];
+	unsigned char flagByte = reinterpret_cast<unsigned char*>(this)[0x2D56];
+	int flag = static_cast<signed char>(flagByte);
 	unsigned int actualChannel =
 	    static_cast<unsigned int>(channel) & ~static_cast<unsigned int>((-flag | flag) >> 31);
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;

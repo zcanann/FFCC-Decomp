@@ -676,7 +676,7 @@ static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void
  * @note Address: N/A
  * @note Size: 0x88
  */
-static inline int ExPPC_IsInSpecification(const char* extype, const ex_specification* spec)
+static inline int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 {
 	int i, offset;
 
@@ -696,7 +696,7 @@ extern void __unexpected(CatchInfo* catchinfo)
 {
 	static const char unexpectedTypes[] = "!bad_exception!!\0!std::bad_exception!!";
 	const char* stdBadExceptionType = unexpectedTypes;
-	const ex_specification* unexp = (const ex_specification*)catchinfo->stacktop;
+	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
 
 	stdBadExceptionType += sizeof("!bad_exception!!");
 
@@ -705,13 +705,13 @@ extern void __unexpected(CatchInfo* catchinfo)
 	try {
 		std::unexpected();
 	} catch (...) {
-		if (ExPPC_IsInSpecification((const char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
+		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
-		if (ExPPC_IsInSpecification(unexpectedTypes, unexp)) {
+		if (ExPPC_IsInSpecification((char*)unexpectedTypes, unexp)) {
 			throw std::bad_exception();
 		}
-		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
+		if (ExPPC_IsInSpecification((char*)stdBadExceptionType, unexp)) {
 			throw std::bad_exception();
 		}
 	}

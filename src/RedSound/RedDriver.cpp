@@ -91,6 +91,7 @@ void* DAT_8032f3d4;
 void* DAT_8032f3d8;
 void* DAT_8032f3dc;
 void* DAT_8032f3f4;
+int DAT_8032f3f8;
 void* DAT_8032f3fc;
 unsigned int* DAT_8032f444;
 void* DAT_8032f450;

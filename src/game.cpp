@@ -1424,7 +1424,11 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 
     if (count > 1) {
         char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
-        name = itemTable[itemIndex * 5 + 3];
+        if (count > 1) {
+            name = itemTable[itemIndex * 5 + 3];
+        } else {
+            name = itemTable[itemIndex * 5 + 1];
+        }
 
         sprintf(out, s_numNameFmt, count, name);
     } else {
@@ -1521,7 +1525,11 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 
     if (count > 1) {
         char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
-        name = monTable[monIndex * 5 + 3];
+        if (count > 1) {
+            name = monTable[monIndex * 5 + 3];
+        } else {
+            name = monTable[monIndex * 5 + 1];
+        }
 
         sprintf(out, s_numNameFmt, count, name);
     } else {

@@ -1,8 +1,42 @@
+#define _EXCEPTION  // Block exception.h — local class definitions needed for inline dtor inlining
+
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include "PowerPC_EABI_Support/Runtime/Gecko_ExceptionPPC.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
-#include "PowerPC_EABI_Support/Runtime/exception.h"
+
+namespace std {
+
+class exception {
+public:
+	virtual ~exception() {}
+	virtual const char* what() const;
+};
+
+class bad_exception : public exception {
+public:
+	virtual ~bad_exception();
+	virtual const char* what() const;
+};
+
+typedef void (*unexpected_handler)();
+unexpected_handler set_unexpected(unexpected_handler handler);
+void unexpected();
+
+typedef void (*terminate_handler)();
+terminate_handler set_terminate(terminate_handler handler);
+void terminate();
+
+} // namespace std
+
+using std::bad_exception;
+using std::exception;
+using std::terminate;
+using std::terminate_handler;
+using std::set_terminate;
+using std::unexpected;
+using std::unexpected_handler;
+using std::set_unexpected;
 
 #pragma force_active on
 
@@ -649,8 +683,7 @@ extern "C" const char s_bad_exception[];
 
 using std::bad_exception;
 
-extern "C" const char s_bad_exception[] = "bad_exception";
-static const char s_exception[]        = "exception";
+extern "C" const char s_bad_exception[] = "bad_exception\0\0\0exception\0\0\0\0\0\0";
 
 namespace std {
 

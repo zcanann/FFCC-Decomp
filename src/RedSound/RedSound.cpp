@@ -21,7 +21,6 @@ extern "C" {
 // RedSound global linkage that is shared across Red* units.
 CRedDriver gRedDriver;
 int DAT_8032e17c[0x40];
-int DAT_8032f3f8;
 u8 DAT_8032f4a8;
 int DAT_8032f4ac;
 u32* DAT_8032f4b0;

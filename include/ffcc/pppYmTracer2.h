@@ -8,7 +8,7 @@ struct TRACE_POLYGON;
 
 struct pppYmTracer2UnkB {
     s32 m_graphId;
-    u32 m_dataValIndex;
+    s32 m_dataValIndex;
     s32 m_initWOrk;
     s32 m_stepValue;
     s32 m_arg3;
@@ -23,6 +23,9 @@ struct pppYmTracer2UnkC {
 struct pppYmTracer2 {
     u8 _pad[0x80];
 };
+
+void initTracePolygon(pppYmTracer2*, TRACE_POLYGON&);
+void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);
 
 #ifdef __cplusplus
 extern "C" {

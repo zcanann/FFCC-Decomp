@@ -352,10 +352,10 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = *(u32*)(CFlat + 0x12A4) != 0;
 			break;
 		case 0x65:
-			menu->m_state = *(signed char*)(CFlat + 0x12E4) < 0;
+			menu->m_state = (((s8)*(u8*)(CFlat + 0x12E4)) >> 7) != 0;
 			break;
 		case 0x66:
-			menu->m_state = ((*(u8*)(CFlat + 0x12E4) >> 3) & 1) != 0;
+			menu->m_state = (((s8)(*(u8*)(CFlat + 0x12E4) << 4)) >> 7) != 0;
 			break;
 		case 0x67:
 			menu->m_state = (m_dbgFlags >> 0) & 1;
@@ -527,7 +527,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
 		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-		_GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+		_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 		m_currentVtxFmt = 1;
 	}
 
@@ -611,85 +611,28 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	if (m_currentVtxFmt != 0) {
-		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		m_currentVtxFmt = 0;
 	}
 
-	u32 mainColor = 0xFFFFFFFF;
+	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	if ((flags & 2) != 0) {
-		mainColor = 0x000000FF;
+		mainColor.r = 0;
+		mainColor.g = 0;
+		mainColor.b = 0;
 	}
 
 	if ((flags & 4) != 0) {
-		u32 smallFont = flags & 1;
-		u32 centered = flags & 8;
-		u32 shadowColor = 0x000000FF;
-		int fontSize;
-		short drawX = (short)(x - 1);
-		short drawY = (short)y;
-
-		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
-		fontSize = 10;
-		if (smallFont != 0) {
-			fontSize = 8;
-		}
-		if (centered != 0) {
-			int textLen = strlen(text);
-			drawX = (short)(drawX - (short)((u32)(fontSize * textLen) >> 1));
-			drawY = (short)(y - (short)(fontSize >> 1));
-		}
-		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
-
-		drawY = (short)(y + 1);
-		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
-		fontSize = 10;
-		if (smallFont != 0) {
-			fontSize = 8;
-		}
-		drawX = (short)x;
-		if (centered != 0) {
-			int textLen = strlen(text);
-			drawX = (short)(x - (short)((u32)(fontSize * textLen) >> 1));
-			drawY = (short)(drawY - (short)(fontSize >> 1));
-		}
-		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
-
-		drawX = (short)(x + 1);
-		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
-		fontSize = 10;
-		if (smallFont != 0) {
-			fontSize = 8;
-		}
-		drawY = (short)y;
-		if (centered != 0) {
-			int textLen = strlen(text);
-			drawX = (short)(drawX - (short)((u32)(fontSize * textLen) >> 1));
-			drawY = (short)(y - (short)(fontSize >> 1));
-		}
-		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
-
-		drawY = (short)(y - 1);
-		changeVtxFmt(0);
-		GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&shadowColor));
-		fontSize = 10;
-		if (smallFont != 0) {
-			fontSize = 8;
-		}
-		drawX = (short)x;
-		if (centered != 0) {
-			int textLen = strlen(text);
-			drawX = (short)(x - (short)((u32)(fontSize * textLen) >> 1));
-			drawY = (short)(drawY - (short)(fontSize >> 1));
-		}
-		Graphic.DrawDebugStringDirect(drawX, drawY, text, (short)fontSize);
+		int shadowFlags = (flags & ~4) | 2;
+		drawFont(shadowFlags, x - 1, y, text);
+		drawFont(shadowFlags, x, y + 1, text);
+		drawFont(shadowFlags, x + 1, y, text);
+		drawFont(shadowFlags, x, y - 1, text);
 	}
 
-	GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(&mainColor));
+	GXSetChanMatColor(GX_COLOR0A0, mainColor);
 
 	int fontSize = 10;
 	if ((flags & 1) != 0) {

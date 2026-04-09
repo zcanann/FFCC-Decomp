@@ -11,7 +11,7 @@ int* gRedAMemoryBlockList;
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
-const char sRedMemoryLogSuffixB[] = "\x1b[0m";
+const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
 const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
 const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 

@@ -274,7 +274,7 @@ int CGPrgObj::isLoopAnim()
 {
 	unsigned char animFlags = m_animFlagBits.m_animFlags;
 
-	if ((static_cast<signed char>(animFlags << 1) < 0) ||
+	if ((static_cast<signed char>((animFlags << 1) | (animFlags >> 7)) < 0) ||
 	    (static_cast<signed char>(animFlags) < 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}
@@ -455,18 +455,26 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
+	CGPrgObj* self = this;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector basePos(self->m_worldPosition);
+	CVector deltaPos;
 	float targetRot;
+	float deltaX;
+	float zero;
+	float deltaZ;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos),
+	              reinterpret_cast<Vec*>(&deltaPos));
+	deltaX = deltaPos.x;
+	zero = FLOAT_80331BD4;
+	deltaZ = deltaPos.z;
+	if (deltaX == zero || deltaZ == zero) {
 		targetRot = FLOAT_80331BD4;
 	} else {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
-	m_rotTargetY = targetRot;
+	self->m_rotTargetY = targetRot;
 }
 
 /*
@@ -480,21 +488,27 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
  */
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
+	CGPrgObj* self = this;
 	float targetRot;
-	Vec* basePosVec;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector basePos(self->m_worldPosition);
+	CVector deltaPos;
+	float deltaX;
+	float zero;
+	float deltaZ;
 
-	basePosVec = reinterpret_cast<Vec*>(&basePos);
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
-	if (deltaPos.x == 0.0f || deltaPos.z == 0.0f) {
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos),
+	              reinterpret_cast<Vec*>(&deltaPos));
+	deltaX = deltaPos.x;
+	zero = FLOAT_80331BD4;
+	deltaZ = deltaPos.z;
+	if (deltaX == zero || deltaZ == zero) {
 		targetRot = FLOAT_80331BD4;
 	} else {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
 
-	Math.DstRot(m_rotBaseY, FLOAT_80331BD8 + targetRot);
+	Math.DstRot(self->m_rotBaseY, FLOAT_80331BD8 + targetRot);
 }
 
 /*

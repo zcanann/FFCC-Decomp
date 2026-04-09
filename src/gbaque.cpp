@@ -1193,8 +1193,8 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
 	                    (-obj[0x2D56] | obj[0x2D56]) >> 31);
 
 	OSWaitSemaphore(accessSemaphores + actualChannel);
-	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x32);
-	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x34);
+	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x36);
+	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x38);
 	OSSignalSemaphore(accessSemaphores + actualChannel);
 }
 
@@ -3802,14 +3802,14 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
  */
 void GbaQueue::ClrChgHitFlg(int channel)
 {
-	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-reinterpret_cast<signed char*>(this)[0x2D56] |
-	                                                        reinterpret_cast<signed char*>(this)[0x2D56]) >>
-	                                                       31);
-	OSSemaphore* semaphore = AccessSemaphoreAt(this, actualChannel);
+	unsigned char flag = reinterpret_cast<unsigned char*>(this)[0x2D56];
+	unsigned int actualChannel =
+	    static_cast<unsigned int>(channel) &
+	    ~static_cast<unsigned int>((-static_cast<signed char>(flag) | static_cast<signed char>(flag)) >> 31);
+	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 	OSWaitSemaphore(semaphore);
-	obj[0x2D54] = static_cast<unsigned char>(obj[0x2D54] & ~(1U << actualChannel));
+	obj[0x2D54] = obj[0x2D54] & ~(1U << actualChannel);
 	OSSignalSemaphore(semaphore);
 }
 
@@ -4008,26 +4008,27 @@ void GbaQueue::OpenMenu(int, int, int)
  */
 void GbaQueue::SetPauseMode(int mode)
 {
-	int i;
-	OSSemaphore* semaphoreIter;
-
-	i = 0;
-	semaphoreIter = accessSemaphores;
-	do {
-		OSWaitSemaphore(semaphoreIter);
-		i++;
-		semaphoreIter++;
-	} while (i < 4);
+	{
+		OSSemaphore* waitSemaphore = accessSemaphores;
+		int waitIndex = 0;
+		do {
+			OSWaitSemaphore(waitSemaphore);
+			waitIndex++;
+			waitSemaphore++;
+		} while (waitIndex < 4);
+	}
 
 	m_pauseMode = static_cast<char>(mode);
 
-	i = 0;
-	semaphoreIter = accessSemaphores;
-	do {
-		OSSignalSemaphore(semaphoreIter);
-		i++;
-		semaphoreIter++;
-	} while (i < 4);
+	{
+		int signalIndex = 0;
+		OSSemaphore* signalSemaphore = accessSemaphores;
+		do {
+			OSSignalSemaphore(signalSemaphore);
+			signalIndex++;
+			signalSemaphore++;
+		} while (signalIndex < 4);
+	}
 }
 
 /*

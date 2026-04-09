@@ -53,6 +53,7 @@ extern float FLOAT_803308ec;
 extern float FLOAT_803308f0;
 extern float FLOAT_803308f4;
 extern float FLOAT_803308f8;
+extern double DOUBLE_80330900;
 extern float FLOAT_80330908;
 extern float FLOAT_8033090c;
 extern float FLOAT_80330910;
@@ -777,24 +778,34 @@ void CMesMenu::onScriptChanged(char*, int)
  */
 void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, int unk3)
 {
+    float fVar1;
+    unsigned int uVar2;
+    bool bVar3;
+    double dVar4;
+
+    fVar1 = FLOAT_803308d8;
     *(float*)((char*)this + 0x3D78) = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D74) = FLOAT_803308d8;
+    *(float*)((char*)this + 0x3D74) = fVar1;
     *(int*)((char*)this + 0x08) = 1;
     *(int*)((char*)this + 0x3DA4) = 0;
     *(unsigned int*)((char*)this + 0x3D8C) = (unsigned int)flags;
 
+    dVar4 = DOUBLE_80330900;
+    fVar1 = FLOAT_803308dc;
     if (*(int*)((char*)this + 0x18) < 4) {
         SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
         *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
-        *(float*)((char*)this + 0x3DA0) = FLOAT_803308e4;
+        fVar1 = FLOAT_803308e4;
+        *(float*)((char*)this + 0x3DA0) = fVar1;
     } else {
         *(float*)((char*)this + 0x3D6C) = (float)x;
         *(float*)((char*)this + 0x3D70) = (float)y;
         *(int*)((char*)this + 0x3D88) = 1;
-        *(float*)((char*)this + 0x3D9C) = FLOAT_803308dc;
-        *(float*)((char*)this + 0x3DA0) = FLOAT_803308dc;
+        uVar2 = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
+        *(float*)((char*)this + 0x3D9C) = fVar1;
+        *(float*)((char*)this + 0x3DA0) = fVar1;
         *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)(-(flags >> 1 & 1) & 0x1C);
-        *(unsigned int*)((char*)this + 0x3D54) = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
+        *(unsigned int*)((char*)this + 0x3D54) = uVar2;
     }
 
     *(int*)((char*)this + 0x3D90) = unk1;
@@ -802,12 +813,18 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(int*)((char*)this + 0x3D98) = unk3;
     Set__4CMesFPci((char*)this + 0x1C, script, flags & 0x20);
 
+    fVar1 = FLOAT_803308e8;
     *(float*)((char*)this + 0x3D7C) = FLOAT_803308e8 * *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3CC0);
-    *(float*)((char*)this + 0x3D80) = FLOAT_803308e8 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
+    *(float*)((char*)this + 0x3D80) = fVar1 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
 
+    fVar1 = FLOAT_803308ec;
     if (*(int*)((char*)this + 0x18) < 4) {
-        if ((flags & 0x100) == 0 && *(float*)((char*)this + 0x3D7C) < FLOAT_803308f0) {
-            *(float*)((char*)this + 0x3D7C) = FLOAT_803308f0;
+        if ((flags & 0x100) == 0) {
+            fVar1 = *(float*)((char*)this + 0x3D7C);
+            if (fVar1 < FLOAT_803308f0) {
+                fVar1 = FLOAT_803308f0;
+            }
+            *(float*)((char*)this + 0x3D7C) = fVar1;
         }
     } else if ((flags & 8) == 0) {
         if ((flags & 0x8000) != 0) {
@@ -815,32 +832,34 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         }
     } else {
         *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
-        *(float*)((char*)this + 0x3D70) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+        *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
     }
 
-    float posY;
-    unsigned int index = (unsigned int)*(int*)((char*)this + 0x18);
-    if ((int)index < 4) {
-        if ((index & 2) == 0) {
-            posY = FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
-                   *(float*)((char*)this + 0x3D78);
+    uVar2 = (unsigned int)*(int*)((char*)this + 0x18);
+    if ((int)uVar2 < 4) {
+        if ((uVar2 & 2) == 0) {
+            dVar4 = (double)(FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
+                             *(float*)((char*)this + 0x3D78));
         } else {
-            posY = (*(float*)((char*)this + 0x3DA0) + (*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
-                    *(float*)((char*)this + 0x3D78)) -
-                   *(float*)((char*)this + 0x3D80);
+            dVar4 = (double)((*(float*)((char*)this + 0x3DA0) + (*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
+                              *(float*)((char*)this + 0x3D78)) -
+                             *(float*)((char*)this + 0x3D80));
         }
     } else {
-        posY = *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78);
+        dVar4 = (double)(*(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78));
     }
 
-    float posX;
-    if ((int)index < 4 && (index & 1) != 0) {
-        posX = (*(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) -
-               *(float*)((char*)this + 0x3D7C);
-    } else {
-        posX = *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
+    bVar3 = false;
+    if (((int)uVar2 < 4) && ((uVar2 & 1) != 0)) {
+        bVar3 = true;
     }
-    SetPosition__4CMesFff((char*)this + 0x1C, posX, posY);
+    if (bVar3) {
+        fVar1 = (*(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) -
+                *(float*)((char*)this + 0x3D7C);
+    } else {
+        fVar1 = *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
+    }
+    SetPosition__4CMesFff((char*)this + 0x1C, fVar1, (float)dVar4);
 
     *(unsigned int*)((char*)this + 0x0C) = ((unsigned int)flags >> 4) & 1;
     *(int*)((char*)this + 0x10) = 0;

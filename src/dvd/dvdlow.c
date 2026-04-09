@@ -8,7 +8,7 @@
 
 extern BOOL FirstRead;
 static volatile BOOL StopAtNextInt = FALSE;
-extern u32 LastLength;
+static u32 LastLength = 0;
 static DVDLowCallback Callback = NULL;
 static DVDLowCallback ResetCoverCallback = NULL;
 static volatile OSTime LastResetEnd = 0;
@@ -17,9 +17,9 @@ static volatile BOOL WaitingCoverClose = FALSE;
 static volatile BOOL Breaking = FALSE;
 static volatile u32 WorkAroundType = 0;
 static u32 WorkAroundSeekLocation = 0;
+static u32 LastReadIssued = 0;
 static volatile OSTime LastReadFinished = 0;
-static OSTime LastReadIssued = 0;
-static volatile BOOL LastCommandWasRead = FALSE;
+extern volatile BOOL LastCommandWasRead;
 extern volatile u32 NextCommandNumber;
 
 typedef struct {
@@ -205,7 +205,7 @@ static void Read(void* address, u32 length, u32 offset, DVDLowCallback callback)
 	Callback = callback;
 	StopAtNextInt = FALSE;
 	LastCommandWasRead = TRUE;
-	LastReadIssued = __OSGetSystemTime();
+	*(OSTime*)&LastReadIssued = __OSGetSystemTime();
 
 	__DIRegs[2] = 0xa8000000;
 	__DIRegs[3] = offset / 4;
@@ -341,7 +341,7 @@ BOOL DVDLowSeek(u32 offset, DVDLowCallback callback) {
 }
 
 BOOL DVDLowWaitCoverClose(DVDLowCallback callback) {
-	ResetCoverCallback = callback;
+	Callback = callback;
 	WaitingCoverClose = TRUE;
 	StopAtNextInt = FALSE;
 	__DIRegs[1] = 2;
@@ -494,8 +494,8 @@ BOOL DVDLowBreak(void) {
 DVDLowCallback DVDLowClearCallback(void) {
 	DVDLowCallback old;
 	__DIRegs[1] = 0;
-	old = ResetCoverCallback;
-	ResetCoverCallback = NULL;
+	old = Callback;
+	Callback = NULL;
 	return old;
 }
 

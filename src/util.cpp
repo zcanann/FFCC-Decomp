@@ -188,16 +188,20 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	PSVECSubtract(&p3, &p1, &tan1);
 	PSVECScale(&tan1, &tan1, scale);
 
-	float t2 = t * t;
-	float t3 = t2 * t;
-	float h10 = t - ((kUtilHermiteCoeff2 * t2) - t3);
-	float h11 = t3 - t2;
-	float h00 = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
-	float h01 = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
+	float hermite[4] = {0.0f, 1.0f, 0.0f, 0.0f};
+	float t2;
+	float t3;
 
-	out.x = (h10 * tan0.x) + (h11 * tan1.x) + (h00 * p1.x) + (h01 * p2.x);
-	out.y = (h10 * tan0.y) + (h11 * tan1.y) + (h00 * p1.y) + (h01 * p2.y);
-	out.z = (h10 * tan0.z) + (h11 * tan1.z) + (h00 * p1.z) + (h01 * p2.z);
+	t2 = t * t;
+	t3 = t2 * t;
+	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
+	hermite[1] = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
+	hermite[2] = t - ((kUtilHermiteCoeff2 * t2) - t3);
+	hermite[3] = t3 - t2;
+
+	out.x = (hermite[1] * p2.x) + (hermite[0] * p1.x) + (hermite[2] * tan0.x) + (hermite[3] * tan1.x);
+	out.y = (hermite[1] * p2.y) + (hermite[0] * p1.y) + (hermite[2] * tan0.y) + (hermite[3] * tan1.y);
+	out.z = (hermite[1] * p2.z) + (hermite[0] * p1.z) + (hermite[2] * tan0.z) + (hermite[3] * tan1.z);
 }
 
 /*
@@ -506,13 +510,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     Mtx44 orthoMtx;
     Mtx44 screenMtx;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    float indMtx[2][3] = {
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-    };
-
-    float x2 = x + width;
-    float y2 = y + height;
+    float indMtx[2][3];
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -530,9 +528,10 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
     GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
@@ -548,7 +547,10 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetNumTexGens(0);
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+
+    float x2 = x + width;
+    float y2 = y + height;
 
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);

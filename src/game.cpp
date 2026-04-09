@@ -61,9 +61,14 @@ void Init__9CLightPcsFv(void*);
 void Init__7CMapPcsFv(void*);
 void Init__18CMaterialEditorPcsFv(void*);
 void Init__14CFunnyShapePcsFv(void*);
+void Init__10CCameraPcsFv(void*);
 void Init__7CUSBPcsFv(void*);
 void Init__7CGbaPcsFv(void*);
 void Init__11CDbgMenuPcsFv(void*);
+void Init__9CCharaPcsFv(void*);
+void Init__8CMenuPcsFv(void*);
+void Init__6CCharaFv(void*);
+void Init__6CMcPcsFv(void*);
 int sprintf(char*, const char*, ...);
 int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
 void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
@@ -298,18 +303,18 @@ void CGame::Init()
         break;
     }
 
-    CameraPcs.Init();
+    Init__10CCameraPcsFv(&CameraPcs);
     Init__11CGraphicPcsFv(&GraphicsPcs);
-    gChara.Init();
+    Init__6CCharaFv(&gChara);
     Init__9CLightPcsFv(&LightPcs);
-    CharaPcs.Init();
+    Init__9CCharaPcsFv(&CharaPcs);
     Init__7CMapPcsFv(&MapPcs);
     Init__18CMaterialEditorPcsFv(&MaterialEditorPcs);
     Init__14CFunnyShapePcsFv(&FunnyShapePcs);
     Init__7CUSBPcsFv(&USBPcs);
-    MenuPcs.Init();
+    Init__8CMenuPcsFv(&MenuPcs);
     Init__7CGbaPcsFv(&GbaPcs);
-    GetMcPcsSingleton()->Init();
+    Init__6CMcPcsFv(GetMcPcsSingleton());
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_mainStageName), 0);
@@ -1415,15 +1420,18 @@ CGPartyObj* CGame::GetPartyObj(int index)
  */
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
-    if (count > 1) {
-        char* itemName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 3];
+    char* name;
 
-        sprintf(out, s_numNameFmt, count, itemName);
+    if (count > 1) {
+        char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
+        name = itemTable[itemIndex * 5 + 3];
+
+        sprintf(out, s_numNameFmt, count, name);
     } else {
         char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = itemTable[itemIndex * 5];
-        char* itemName = itemTable[itemIndex * 5 + 1];
+        name = itemTable[itemIndex * 5 + 1];
 
         if (strlen(prefix) != 0) {
             unsigned char languageId = m_gameWork.m_languageId;
@@ -1437,7 +1445,7 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
             separator = s_nameSep;
         }
 
-        sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
+        sprintf(out, s_nameJoinFmt, prefix, separator, name);
     }
     return out;
 }
@@ -1509,15 +1517,18 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
-    if (count > 1) {
-        char* monName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 3];
+    char* name;
 
-        sprintf(out, s_numNameFmt, count, monName);
+    if (count > 1) {
+        char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
+        name = monTable[monIndex * 5 + 3];
+
+        sprintf(out, s_numNameFmt, count, name);
     } else {
         char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
         unsigned char hasSeparator = 0;
         char* prefix = monTable[monIndex * 5];
-        char* monName = monTable[monIndex * 5 + 1];
+        name = monTable[monIndex * 5 + 1];
 
         if (strlen(prefix) != 0) {
             unsigned char languageId = m_gameWork.m_languageId;
@@ -1531,7 +1542,7 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
             separator = s_nameSep;
         }
 
-        sprintf(out, s_nameJoinFmt, prefix, separator, monName);
+        sprintf(out, s_nameJoinFmt, prefix, separator, name);
     }
     return out;
 }

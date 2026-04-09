@@ -21,7 +21,6 @@ extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsig
 extern float FLOAT_80330ee0;
 extern float FLOAT_80330ee4;
 extern "C" int rand(void);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 struct LocationTitleWork {
     void* m_particles;
@@ -42,7 +41,13 @@ struct LocationTitleParticle {
     s16 m_pad;
 };
 
-static const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
+struct LocationTitleColorBlock {
+    u32 m_pad0;
+    u32 m_pad4;
+    u32 m_color;
+};
+
+char s_pppLocationTitle_cpp_801DB510[] = "pppLocationTitle.cpp";
 
 /*
  * --INFO--
@@ -107,7 +112,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     int colorOffset;
     s32* serializedOffsets;
     LocationTitleWork* work;
-    u8* colorSrc;
+    LocationTitleColorBlock* colorData;
     int graphFrame;
     long* shapeTable;
     LocationTitleParticle* particles;
@@ -120,7 +125,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     serializedOffset = serializedOffsets[0];
     colorOffset = serializedOffsets[1];
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
-    colorSrc = (u8*)pppLocationTitle + 0x88 + colorOffset;
+    colorData = (LocationTitleColorBlock*)((u8*)pppLocationTitle + 0x80 + colorOffset);
     rand();
 
     if (param_2->m_dataValIndex == 0xFFFF) {
@@ -141,9 +146,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         LocationTitleParticle* particle;
         float zero;
 
-        work->m_particles =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(param_2->m_maxCount * sizeof(LocationTitleParticle),
-                                                  pppEnvStPtr->m_stagePtr, s_pppLocationTitle_cpp, 0x6d);
+        work->m_particles = pppMemAlloc(param_2->m_maxCount * sizeof(LocationTitleParticle),
+                                        pppEnvStPtr->m_stagePtr, s_pppLocationTitle_cpp_801DB510, 0x6d);
         particle = (LocationTitleParticle*)work->m_particles;
         zero = FLOAT_80330ee0;
 
@@ -155,7 +159,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_pos.x = zero;
             particle->m_pos.y = zero;
             particle->m_pos.z = zero;
-            memcpy(&particle->m_color, colorSrc, 4);
+            memcpy(&particle->m_color, &colorData->m_color, 4);
             particle->m_shapeUnk = 0;
             particle->m_frame = work->m_cur;
             randomValue = rand();
@@ -174,27 +178,22 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
         if (graphFrame >= (int)param_2->m_spawnFrame) {
             pppFMATRIX resultMatrix;
-            int count;
-            LocationTitleParticle* particle;
 
             pppMulMatrix(resultMatrix, pppMngStPtr->m_matrix, pppLocationTitle->m_localMatrix);
 
-            count = work->m_count;
-            particle = &particles[count];
-            particle->m_pos.x = resultMatrix.value[0][3];
-            particle->m_pos.y = resultMatrix.value[1][3];
-            particle->m_pos.z = resultMatrix.value[2][3];
+            particles[work->m_count].m_pos.x = resultMatrix.value[0][3];
+            particles[work->m_count].m_pos.y = resultMatrix.value[1][3];
+            particles[work->m_count].m_pos.z = resultMatrix.value[2][3];
 
-            if (count < 1) {
-                particle->m_frame = work->m_cur;
-                memcpy(&particle->m_color, colorSrc, 4);
+            if (work->m_count < 1) {
+                particles[work->m_count].m_frame = work->m_cur;
+                memcpy(&particles[work->m_count].m_color, &colorData->m_color, 4);
             } else {
-                particle = &particles[count - 1];
-                particle->m_frame = work->m_cur;
-                memcpy(&particle->m_color, colorSrc, 4);
+                particles[work->m_count - 1].m_frame = work->m_cur;
+                memcpy(&particles[work->m_count - 1].m_color, &colorData->m_color, 4);
             }
 
-            work->m_count = count + 1;
+            work->m_count++;
 
             if (work->m_count > 1) {
                 Vec subVec;
@@ -239,7 +238,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                     LocationTitleParticle* dst = &particles[startIndex + i + 1];
 
                     pppCopyVector(dst->m_pos, *interpIt);
-                    memcpy(&dst->m_color, colorSrc, 4);
+                    memcpy(&dst->m_color, &colorData->m_color, 4);
                     dst->m_frame = work->m_cur;
                     interpIt++;
                 }

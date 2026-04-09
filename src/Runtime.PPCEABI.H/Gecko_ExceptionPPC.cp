@@ -2,6 +2,7 @@
 #include "PowerPC_EABI_Support/Runtime/Gecko_ExceptionPPC.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
+#include "PowerPC_EABI_Support/Runtime/exception.h"
 
 #pragma force_active on
 
@@ -74,7 +75,7 @@ typedef struct ActionIterator {
 static ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
-extern "C" char s_bad_exception[];
+extern "C" const char s_bad_exception[] = "bad_exception\0\0\0exception\0\0\0\0\0\0";
 
 namespace std {
 
@@ -89,9 +90,6 @@ public:
 	virtual ~bad_exception();
 	virtual const char* what() const;
 };
-
-void unexpected();
-void terminate();
 
 /*
  * --INFO--
@@ -118,6 +116,8 @@ const char* bad_exception::what() const {
 }
 
 } // namespace std
+
+using std::bad_exception;
 
 /**
  * @note Address: 0x800C2374
@@ -314,7 +314,7 @@ static exaction_type ExPPC_NextAction(ActionIterator* iter)
 			ExPPC_FindExceptionRecord(return_addr, &iter->info);
 
 			if (iter->info.exception_record == 0) {
-				std::terminate();
+				terminate();
 			}
 
 			iter->current_SP = callers_SP;
@@ -366,7 +366,7 @@ static exaction_type ExPPC_NextAction(ActionIterator* iter)
 				    += sizeof(ex_specification) + ((ex_specification*)iter->info.action_pointer)->specs * sizeof(void*);
 				break;
 			default:
-				std::terminate();
+				terminate();
 			}
 		}
 
@@ -703,19 +703,19 @@ extern void __unexpected(CatchInfo* catchinfo)
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 
 	try {
-		std::unexpected();
+		unexpected();
 	} catch (...) {
 		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
-		if (ExPPC_IsInSpecification((char*)unexpectedTypes, unexp)) {
-			throw std::bad_exception();
+		if (ExPPC_IsInSpecification(unexpectedTypes, unexp)) {
+			throw bad_exception();
 		}
-		if (ExPPC_IsInSpecification((char*)stdBadExceptionType, unexp)) {
-			throw std::bad_exception();
+		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
+			throw bad_exception();
 		}
 	}
-	std::terminate();
+	terminate();
 }
 
 /**

@@ -2125,73 +2125,63 @@ void CFlatRuntime2::drawLayer(
 void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	float one = 1.0f;
 	u8 clear3[3] = { 0, 0, 0 };
-	int seNo = -1;
-	int sePacked = 0x00000100;
-	int seParam = 0;
-	int seDelay = 0x1E;
-	int seFrame = -1;
-	int paramNo = 0;
-	int paramId = 0;
-	int ex0 = 0;
-	int ex1 = 0;
-	int ex2 = 0;
-	int ex3 = 0;
-	int ex4 = 0;
-	int ex5 = 0;
-	int ex6 = 0;
-	int ex7 = 0;
+	int zero = 0;
+	int minusOne = -1;
+	int frameDelay = 0x1E;
+	float one = 1.0f;
+	u16 soundEffectFlags = 0;
+	u8 soundEffectStartedOnce = 1;
 
-	ParticleWorkPosPtr(this) = 0;
-	ParticleWorkPosVecPtr(this) = 0;
-	ParticleWorkScalePtr(this) = 0;
-	ParticleWorkTargetPtr(this) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
-	ParticleWorkBind(this) = 0;
-	ParticleWorkTrace(this) = 0;
-	ParticleWorkColor0(this) = 0;
-	ParticleWorkColor1(this) = 0;
-	ParticleWorkSpeed(this) = one;
-	ParticleWorkColorLerp(this) = one;
+	*reinterpret_cast<void**>(runtime + 0x16CC) = 0;
+	*reinterpret_cast<void**>(runtime + 0x16D0) = 0;
+	*reinterpret_cast<void**>(runtime + 0x16D4) = 0;
+	*reinterpret_cast<void**>(runtime + 0x16D8) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = zero;
+	*reinterpret_cast<void**>(runtime + 0x16E0) = 0;
+	*reinterpret_cast<void**>(runtime + 0x16E4) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16E8) = zero;
+	*reinterpret_cast<int*>(runtime + 0x16EC) = zero;
+	*reinterpret_cast<float*>(runtime + 0x16F0) = one;
+	*reinterpret_cast<float*>(runtime + 0x16F4) = one;
 	runtime[0x16F8] = 0;
 	memcpy(runtime + 0x16F9, clear3, sizeof(clear3));
-	*reinterpret_cast<int*>(runtime + 0x16FC) = seNo;
-	*reinterpret_cast<int*>(runtime + 0x1700) = sePacked;
-	*reinterpret_cast<int*>(runtime + 0x1704) = seParam;
-	*reinterpret_cast<int*>(runtime + 0x1708) = seDelay;
-	*reinterpret_cast<int*>(runtime + 0x170C) = seFrame;
-	*reinterpret_cast<int*>(runtime + 0x1710) = paramNo;
-	*reinterpret_cast<int*>(runtime + 0x1714) = paramId;
-	*reinterpret_cast<int*>(runtime + 0x1718) = ex0;
-	*reinterpret_cast<int*>(runtime + 0x171C) = ex1;
-	*reinterpret_cast<int*>(runtime + 0x1720) = ex2;
-	*reinterpret_cast<int*>(runtime + 0x1724) = ex3;
-	*reinterpret_cast<int*>(runtime + 0x1728) = ex4;
-	*reinterpret_cast<int*>(runtime + 0x172C) = ex5;
-	*reinterpret_cast<int*>(runtime + 0x1730) = ex6;
-	*reinterpret_cast<int*>(runtime + 0x1734) = ex7;
+	*reinterpret_cast<int*>(runtime + 0x16FC) = minusOne;
+	*reinterpret_cast<u16*>(runtime + 0x1700) = soundEffectFlags;
+	runtime[0x1702] = soundEffectStartedOnce;
+	runtime[0x1703] = 0;
+	*reinterpret_cast<int*>(runtime + 0x1704) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1708) = frameDelay;
+	*reinterpret_cast<int*>(runtime + 0x170C) = minusOne;
+	*reinterpret_cast<int*>(runtime + 0x1710) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1714) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1718) = zero;
+	*reinterpret_cast<int*>(runtime + 0x171C) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1720) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1724) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1728) = zero;
+	*reinterpret_cast<int*>(runtime + 0x172C) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1730) = zero;
+	*reinterpret_cast<int*>(runtime + 0x1734) = zero;
 
 	runtime[0x16F8] = 1;
-	ParticleWorkNoHi(this) = workNo >> 8;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
-	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
-
-	ParticleWorkPosX(this) = pos.x;
-	ParticleWorkPosY(this) = pos.y;
-	ParticleWorkPosZ(this) = pos.z;
-	ParticleWorkPosAngle(this) = 0.0f;
-	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
-	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
-
-	ParticleWorkScaleX(this) = scale;
-	ParticleWorkScaleY(this) = scale;
-	ParticleWorkScaleZ(this) = scale;
-	ParticleWorkScalePtr(this) = &ParticleWorkScaleX(this);
+	*reinterpret_cast<int*>(runtime + 0x1738) = workNo >> 8;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = zero;
+	*reinterpret_cast<unsigned int*>(runtime + 0x173C) = static_cast<unsigned int>(workNo) & 0xFF;
+	*reinterpret_cast<float*>(runtime + 0x1740) = pos.x;
+	*reinterpret_cast<float*>(runtime + 0x1744) = pos.y;
+	*reinterpret_cast<float*>(runtime + 0x1748) = pos.z;
+	*reinterpret_cast<float*>(runtime + 0x1750) = 0.0f;
+	*reinterpret_cast<float**>(runtime + 0x16CC) = reinterpret_cast<float*>(runtime + 0x1740);
+	*reinterpret_cast<float**>(runtime + 0x16D0) = reinterpret_cast<float*>(runtime + 0x174C);
+	*reinterpret_cast<float*>(runtime + 0x1760) = scale;
+	*reinterpret_cast<float*>(runtime + 0x175C) = scale;
+	*reinterpret_cast<float*>(runtime + 0x1758) = scale;
+	*reinterpret_cast<float**>(runtime + 0x16D4) = reinterpret_cast<float*>(runtime + 0x1758);
 
 	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
-		&PartMng, ParticleWorkNoHi(this), ParticleWorkNoLo(this),
-		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
+		&PartMng, *reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
+		reinterpret_cast<PPPCREATEPARAM*>(runtime + 0x16CC), 1);
 }
 
 /*
@@ -2530,9 +2520,7 @@ void CFlatRuntime2::initAllFinished()
 void CFlatRuntime2::reqFinished(int reqNo, CFlatRuntime::CObject* object)
 {
 	if (reqNo == 0xF) {
-		typedef void (*ReqFinishFn)(CFlatRuntime::CObject*);
-		ReqFinishFn fn = *reinterpret_cast<ReqFinishFn*>(*reinterpret_cast<u8**>(object) + 0x10);
-		fn(object);
+		reinterpret_cast<CGBaseObj*>(object)->InitFinished();
 	}
 }
 

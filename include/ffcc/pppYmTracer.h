@@ -5,7 +5,7 @@
 
 struct pppYmTracerUnkB {
     s32 m_graphId;
-    u32 m_dataValIndex;
+    s32 m_dataValIndex;
     s32 m_initWOrk;
     s32 m_stepValue;
     s32 m_arg3;

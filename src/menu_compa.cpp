@@ -205,8 +205,6 @@ void CMenuPcs::CompaInit0()
  */
 bool CMenuPcs::CompaOpen()
 {
-	float zero;
-	double one;
 	short* anim;
 	int finished;
 	int count;
@@ -228,16 +226,15 @@ bool CMenuPcs::CompaOpen()
 
 	if (0 < count) {
 		do {
-			zero = FLOAT_80332ff8;
+			float zero = FLOAT_80332ff8;
 			if (*reinterpret_cast<int*>(anim + 0x12) <= currentTime) {
-				if (currentTime < *reinterpret_cast<int*>(anim + 0x12) + *reinterpret_cast<int*>(anim + 0x14)) {
+				if (*reinterpret_cast<int*>(anim + 0x12) + *reinterpret_cast<int*>(anim + 0x14) > currentTime) {
 					*reinterpret_cast<int*>(anim + 0x10) = *reinterpret_cast<int*>(anim + 0x10) + 1;
-					one = DOUBLE_80333008;
 					*reinterpret_cast<float*>(anim + 8) =
 						(float)((DOUBLE_80333008 / (double)*reinterpret_cast<int*>(anim + 0x14)) *
 							(double)*reinterpret_cast<int*>(anim + 0x10));
 					if ((*reinterpret_cast<unsigned int*>(anim + 0x16) & 2) == 0) {
-						zero = (float)((one / (double)*reinterpret_cast<int*>(anim + 0x14)) *
+						zero = (float)((DOUBLE_80333008 / (double)*reinterpret_cast<int*>(anim + 0x14)) *
 							(double)*reinterpret_cast<int*>(anim + 0x10));
 						*reinterpret_cast<float*>(anim + 0x18) =
 							(*reinterpret_cast<float*>(anim + 0x1c) - (float)*anim) * zero;

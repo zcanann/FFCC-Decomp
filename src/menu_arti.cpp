@@ -407,23 +407,17 @@ unsigned int CMenuPcs::ArtiOpen()
 	remaining = count;
 	if (0 < (int)count) {
 		do {
-			dVar3 = DOUBLE_80332fe0;
 			ratio = FLOAT_80332fa8;
 			if (*(int*)(entry + 0x12) <= frame) {
 				if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
 					*(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
 					dVar2 = DOUBLE_80332fb0;
-					*(float*)(entry + 8) = (float)((DOUBLE_80332fb0 /
-					                               ((double)(int)*(unsigned int*)(entry + 0x14) - dVar3)) *
-					                              ((double)(int)*(unsigned int*)(entry + 0x10) - dVar3));
+					*(float*)(entry + 8) =
+					    (float)((DOUBLE_80332fb0 / (double)*(int*)(entry + 0x14)) * (double)*(int*)(entry + 0x10));
 					if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
-						ratio = (float)((dVar2 /
-						                ((double)(int)*(unsigned int*)(entry + 0x14) - dVar3)) *
-						               ((double)(int)*(unsigned int*)(entry + 0x10) - dVar3));
-						*(float*)(entry + 0x18) =
-						    (*(float*)(entry + 0x1c) - (float)((double)(int)*entry - dVar3)) * ratio;
-						*(float*)(entry + 0x1a) =
-						    (*(float*)(entry + 0x1e) - (float)((double)(int)entry[1] - dVar3)) * ratio;
+						ratio = (float)((dVar2 / (double)*(int*)(entry + 0x14)) * (double)*(int*)(entry + 0x10));
+						*(float*)(entry + 0x18) = (*(float*)(entry + 0x1c) - (float)*entry) * ratio;
+						*(float*)(entry + 0x1a) = (*(float*)(entry + 0x1e) - (float)entry[1]) * ratio;
 					}
 				} else {
 					finished = finished + 1;
@@ -479,27 +473,19 @@ unsigned int CMenuPcs::ArtiClose()
 	int count = artiList[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
 	int frame;
-	float zeroF;
-	double biasD;
-	double oneD;
 
 	artiState[0x11]++;
 	frame = artiState[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {
-		biasD = DOUBLE_80332fe0;
-		zeroF = FLOAT_80332fa8;
+		float zeroF = FLOAT_80332fa8;
 		if (anim->startFrame <= frame) {
 			if (frame < anim->startFrame + anim->duration) {
 				anim->step++;
-				oneD = DOUBLE_80332fb0;
-				anim->alpha = (float)-(((DOUBLE_80332fb0 / ((double)(unsigned int)anim->duration - biasD)) *
-				                        ((double)(unsigned int)anim->step - biasD)) -
-				                       DOUBLE_80332fb0);
+				double oneD = DOUBLE_80332fb0;
+				anim->alpha = (float)-((DOUBLE_80332fb0 / (double)anim->duration) * (double)anim->step - DOUBLE_80332fb0);
 				if ((anim->flags & 2) == 0) {
-					float ratio = (float)-(((oneD / ((double)(unsigned int)anim->duration - biasD)) *
-					                        ((double)(unsigned int)anim->step - biasD)) -
-					                       oneD);
+					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
 					anim->dx = (anim->targetX - (float)anim->x) * ratio;
 					anim->dy = (anim->targetY - (float)anim->y) * ratio;
 				}

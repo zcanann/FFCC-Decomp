@@ -24,6 +24,8 @@ public:
     ~CPtrArray();
 
     int Add(T item);
+    int GetSize();
+    T GetAt(unsigned long index);
     void RemoveAll();
     T operator[](unsigned long index);
     void SetStage(CMemory::CStage* stage);
@@ -705,9 +707,9 @@ void CMapAnim::Calc(long frame)
     int nodeCount;
     int i;
 
-    nodeCount = GetSize__26CPtrArray_P12CMapAnimNode_Fv(this);
+    nodeCount = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->GetSize();
     for (i = 0; i < nodeCount; i = i + 1) {
-        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
+        CMapAnimNode* node = (*reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this))[i];
         node->Interp(frame);
     }
 }

@@ -85,15 +85,15 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     Math.RandF();
 
     if (*(char*)(breath + 0x22) != '\0') {
-        *(float*)(particle + 0x68) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
-        *(unsigned char*)(particle + 0x39) = *(unsigned char*)(breath + 0x22);
+        *(float*)(particle + 0x88) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+        *(unsigned char*)(particle + 0x54) = *(unsigned char*)(breath + 0x22);
     }
     if (*(char*)(breath + 0x23) != '\0') {
-        *(unsigned char*)(particle + 0x3D) = *(unsigned char*)(breath + 0x23);
+        *(unsigned char*)(particle + 0x55) = *(unsigned char*)(breath + 0x23);
     }
 
-    *(float*)(particle + 0x68) = *(float*)(breath + 0x90);
-    *(float*)(particle + 0x6C) = *(float*)(breath + 0x94);
+    *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
+    *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
     if (*(unsigned char*)(breath + 0xC1) != 0) {
         *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * Math.RandF();
         flags = *(unsigned char*)(breath + 0xC1);
@@ -108,17 +108,17 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
 
     flags = *(unsigned char*)(breath + 0xC1);
     if (flags & 4) {
-        *(float*)(particle + 0x68) += *(float*)(particle + 0x60);
+        *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
     }
     if (flags & 8) {
-        *(float*)(particle + 0x6C) += *(float*)(particle + 0x60);
+        *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
     }
 
-    while (*(float*)(particle + 0x68) >= 6.2831855f) {
-        *(float*)(particle + 0x68) -= 6.2831855f;
+    while (*(float*)(particle + 0x58) >= 6.2831855f) {
+        *(float*)(particle + 0x58) -= 6.2831855f;
     }
-    while (*(float*)(particle + 0x68) < 0.0f) {
-        *(float*)(particle + 0x68) += 6.2831855f;
+    while (*(float*)(particle + 0x58) < 0.0f) {
+        *(float*)(particle + 0x58) += 6.2831855f;
     }
 
     *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
@@ -210,10 +210,10 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     workMtx[1][3] = kPppBreathModelZero;
     workMtx[2][3] = kPppBreathModelZero;
 
-    *(float*)(particle + 0x0C) = kPppBreathModelZero;
-    *(float*)(particle + 0x10) = kPppBreathModelZero;
-    *(float*)(particle + 0x14) = 1.0f;
-    dir = (Vec*)(particle + 0x0C);
+    *(float*)(particle + 0x3C) = kPppBreathModelZero;
+    *(float*)(particle + 0x40) = kPppBreathModelZero;
+    *(float*)(particle + 0x44) = FLOAT_80330F80;
+    dir = (Vec*)(particle + 0x3C);
     PSMTXMultVec(workMtx, dir, dir);
     PSVECNormalize(dir, dir);
 
@@ -235,9 +235,9 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
     PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
     PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, workMtx);
 
-    *(float*)(particle + 0x0C) = kPppBreathModelZero;
-    *(float*)(particle + 0x10) = kPppBreathModelZero;
-    *(float*)(particle + 0x14) = 1.0f;
+    *(float*)(particle + 0x3C) = kPppBreathModelZero;
+    *(float*)(particle + 0x40) = kPppBreathModelZero;
+    *(float*)(particle + 0x44) = FLOAT_80330F80;
 }
 
 /*

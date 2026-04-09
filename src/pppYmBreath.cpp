@@ -20,6 +20,7 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern float FLOAT_80330c80;
 extern float FLOAT_80330c84;
+extern float FLOAT_80330c90;
 extern double DOUBLE_80330c88;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
@@ -335,132 +336,133 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     groupTable = *(int**)((unsigned char*)vYmBreath + 0x3C);
     maxParticleCount = *(int*)((unsigned char*)vYmBreath + 0x40);
 
-    if ((gPppCalcDisabled != 0) || (*(int*)((unsigned char*)pYmBreath + 0xC) == 0xFFFF)) {
-        return;
-    }
+    if ((gPppCalcDisabled == 0) && (*(int*)((unsigned char*)pYmBreath + 0xC) != 0xFFFF)) {
+        *(short*)((unsigned char*)vYmBreath + 0x44) = *(short*)((unsigned char*)vYmBreath + 0x44) + 1;
 
-    *(short*)((unsigned char*)vYmBreath + 0x44) = *(short*)((unsigned char*)vYmBreath + 0x44) + 1;
-
-    for (i = 0; i < maxParticleCount; i++) {
-        if (*(short*)(particleData + 0x50) < 1) {
-            groupTableWork = *(int*)((unsigned char*)vYmBreath + 0x3C);
-            for (foundGroup = 0; foundGroup < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
-                 foundGroup++) {
-                for (foundSlot = 0;
-                     foundSlot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
-                     foundSlot++) {
-                    if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)foundSlot)) {
-                        found = true;
-                        goto found_index;
+        for (i = 0; i < maxParticleCount; i++) {
+            if (*(short*)(particleData + 0x50) >= 1) {
+                UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor,
+                               (_PARTICLE_COLOR*)particleColor);
+                pppCalcFrameShape(*(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4),
+                                  *(short*)(particleData + 0x58), *(short*)(particleData + 0x5A),
+                                  *(short*)(particleData + 0x56), *(short*)((unsigned char*)pYmBreath + 0x10));
+            } else {
+                groupTableWork = *(int*)((unsigned char*)vYmBreath + 0x3C);
+                for (foundGroup = 0;
+                     foundGroup < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14);
+                     foundGroup++) {
+                    for (foundSlot = 0;
+                         foundSlot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
+                         foundSlot++) {
+                        if ((int)(short)i == (int)*(signed char*)(*(int*)(groupTableWork + 4) + (int)foundSlot)) {
+                            found = true;
+                            goto found_index;
+                        }
                     }
+                    groupTableWork += 0x5C;
                 }
-                groupTableWork += 0x5C;
-            }
-            found = false;
-            foundSlot = -1;
-            foundGroup = -1;
+                found = false;
+                foundSlot = -1;
+                foundGroup = -1;
 
-        found_index:
-            if (found) {
-                *(unsigned char*)(groupTable[(int)foundGroup * 0x17 + 1] + (int)foundSlot) = 0xFF;
-            }
-
-            if (foundGroup != -1) {
-                float zero = 0.0f;
-                int* group = groupTable + (int)foundGroup * 0x17;
-
-                found = true;
-                for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); j++) {
-                    if ((*(signed char*)(group[1] + j) != -1) || (*(signed char*)(group[2] + j) != 1)) {
-                        found = false;
-                        break;
-                    }
-                }
-
+            found_index:
                 if (found) {
-                    for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); j++) {
-                        *(unsigned char*)(group[2] + j) = 0xFF;
-                        group[5] = (int)zero;
-                        group[4] = (int)zero;
-                        group[3] = (int)zero;
-                        group[8] = (int)zero;
-                        group[7] = (int)zero;
-                        group[6] = (int)zero;
-                        group[9] = (int)zero;
-                    }
-                    group[0] = 0;
+                    *(unsigned char*)(groupTable[(int)foundGroup * 0x17 + 1] + (int)foundSlot) = 0xFF;
                 }
-            }
 
-            if ((*(unsigned short*)((unsigned char*)pYmBreath + 0x22) <= *(unsigned short*)((unsigned char*)vYmBreath + 0x44)) &&
-                (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x20))) {
-                BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (_PARTICLE_DATA*)particleData, (Mtx*)particleWmat,
-                              (_PARTICLE_COLOR*)particleColor);
-                spawnCount += 1;
-                found = true;
+                if (foundGroup != -1) {
+                    float zero = FLOAT_80330c80;
+                    int* group = groupTable + (int)foundGroup * 0x17;
 
-                for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); j++) {
-                    int* group = groupTable + j * 0x17;
-                    int k;
-
-                    for (k = 0; k < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); k++) {
-                        if ((*(signed char*)(group[1] + k) == -1) && (*(signed char*)(group[2] + k) == -1)) {
-                            *(signed char*)(group[1] + k) = (signed char)i;
+                    found = true;
+                    for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); j++) {
+                        if ((*(signed char*)(group[1] + j) != -1) || (*(signed char*)(group[2] + j) != 1)) {
                             found = false;
-                            *(unsigned char*)(group[2] + k) = 1;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12); j++) {
+                            *(unsigned char*)(group[2] + j) = 0xFF;
+                            group[5] = (int)zero;
+                            group[4] = (int)zero;
+                            group[3] = (int)zero;
+                            group[8] = (int)zero;
+                            group[7] = (int)zero;
+                            group[6] = (int)zero;
+                            group[9] = (int)zero;
+                        }
+                        group[0] = 0;
+                    }
+                }
+
+                if ((*(unsigned short*)((unsigned char*)pYmBreath + 0x22) <=
+                     *(unsigned short*)((unsigned char*)vYmBreath + 0x44)) &&
+                    (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x20))) {
+                    BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (_PARTICLE_DATA*)particleData,
+                                  (Mtx*)particleWmat, (_PARTICLE_COLOR*)particleColor);
+                    spawnCount += 1;
+                    found = true;
+
+                    for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); j++) {
+                        int* group = groupTable + j * 0x17;
+                        int k;
+
+                        for (k = 0; k < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
+                             k++) {
+                            if ((*(signed char*)(group[1] + k) == -1) && (*(signed char*)(group[2] + k) == -1)) {
+                                *(signed char*)(group[1] + k) = (signed char)i;
+                                found = false;
+                                *(unsigned char*)(group[2] + k) = 1;
+                            }
+                            if (!found) {
+                                break;
+                            }
                         }
                         if (!found) {
                             break;
                         }
                     }
-                    if (!found) {
-                        break;
-                    }
                 }
             }
-        } else {
-            UpdateParticle(vYmBreath, pYmBreath, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
-            pppCalcFrameShape(
-                *(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)(particleData + 0x58),
-                *(short*)(particleData + 0x5A), *(short*)(particleData + 0x56),
-                *(short*)((unsigned char*)pYmBreath + 0x10));
+
+            if (particleWmat != NULL) {
+                particleWmat += 0x30;
+            }
+            if (particleColor != NULL) {
+                particleColor += 0x20;
+            }
+            particleData += 0x98;
         }
 
-        particleData += 0x98;
-        if (particleWmat != NULL) {
-            particleWmat += 0x30;
+        if (spawnCount > 0) {
+            *(short*)((unsigned char*)vYmBreath + 0x44) = 0;
         }
-        if (particleColor != NULL) {
-            particleColor += 0x20;
-        }
-    }
 
-    if (spawnCount > 0) {
-        *(short*)((unsigned char*)vYmBreath + 0x44) = 0;
-    }
-
-    for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
-        int* group = groupTable + i * 0x17;
-        if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
-            unitVelocity.x = 0.0f;
-            unitVelocity.y = 0.0f;
-            unitVelocity.z = 1.0f;
-            group[9] = *(int*)((unsigned char*)pYmBreath + 0x18);
-            group[5] = 0;
-            group[4] = 0;
-            group[3] = 0;
-            pppCopyVector(*(Vec*)(group + 6), unitVelocity);
-            PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
-            group[0] = 1;
+        for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
+            int* group = groupTable + i * 0x17;
+            if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
+                unitVelocity.x = FLOAT_80330c80;
+                unitVelocity.y = FLOAT_80330c80;
+                unitVelocity.z = FLOAT_80330c90;
+                group[9] = *(int*)((unsigned char*)pYmBreath + 0x18);
+                group[5] = 0;
+                group[4] = 0;
+                group[3] = 0;
+                pppCopyVector(*(Vec*)(group + 6), unitVelocity);
+                PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
+                group[0] = 1;
+            }
         }
-    }
 
-    for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
-        if (*groupTable != 0) {
-            PSVECScale((Vec*)(groupTable + 6), &stepVelocity, (float)groupTable[9]);
-            PSVECAdd(&stepVelocity, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
+        for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x14); i++) {
+            if (*groupTable != 0) {
+                PSVECScale((Vec*)(groupTable + 6), &stepVelocity, (float)groupTable[9]);
+                PSVECAdd(&stepVelocity, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
+            }
+            groupTable += 0x17;
         }
-        groupTable += 0x17;
     }
 }
 

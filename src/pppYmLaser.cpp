@@ -187,14 +187,18 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Mtx tempMtx;
 	bool emptyHistory;
 
-	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 1)) {
-		work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
-		emptyHistory = (work->m_points == 0);
+	if ((gPppCalcDisabled != 0) || (step->m_stepValue == 0xFFFF)) {
+		return;
+	}
 
-	if (emptyHistory) {
+	work = (pppYmLaserWork*)((u8*)laser + 0x80 + data->m_serializedDataOffsets[2]);
+	emptyHistory = false;
+
+	if (work->m_points == 0) {
 		work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			(u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, s_pppYmLaser_cpp, 0x5d);
 		memset(work->m_points, 0, (u32)step->m_payload[0x1e] * 0xc);
+		emptyHistory = true;
 	}
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
@@ -271,33 +275,30 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 
 		if (step->m_payload[0x3c] == 0) {
 			u8* hitFrame = &work->m_hitFrame;
-			bool canCreate = (u8)step->m_payload[0x1d] <= *hitFrame;
-			if (canCreate) {
+			if (*hitFrame >= step->m_payload[0x1d]) {
 				*hitFrame = 0;
+				if (hit && step->m_arg3 != -1) {
+					u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
+					if (dataVals != 0) {
+						int created =
+							pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
+						*(void**)(created + 4) = laser;
+						Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
+						createdPos->x = points[i].x;
+						createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+						createdPos->z = points[i].z;
+					}
+				}
 			} else {
 				(*hitFrame)++;
-			}
-
-			if (canCreate && hit && step->m_arg3 != -1) {
-				u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
-				int created;
-				if (dataVals != 0) {
-					created = pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-					*(void**)(created + 4) = laser;
-					Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
-					createdPos->x = points[i].x;
-					createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
-					createdPos->z = points[i].z;
-				}
 			}
 		}
 	}
 
-		if (emptyHistory) {
-			Vec* points = work->m_points;
-			for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-				points[i] = points[0];
-			}
+	if (emptyHistory) {
+		Vec* points = work->m_points;
+		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+			pppCopyVector(points[i], points[0]);
 		}
 	}
 }
@@ -401,7 +402,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	GXColor1u32(color);
 	GXTexCoord2f32(FLOAT_80330de0, work->m_length);
 
-	if (step->m_stepValue != 0) {
+	if (step->m_stepValue != 0xFFFF) {
 		long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
 		pppUnitMatrix(shapeMtx);
 		shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;

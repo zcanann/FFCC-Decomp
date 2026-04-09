@@ -8,9 +8,7 @@
 
 void __copy_longs_aligned(void* dst, const void* src, size_t n)
 {
-	unsigned long i, v1, v2;
-	unsigned long* ls;
-	unsigned long* ld;
+	unsigned long i;
 
 	i = (-(unsigned long)dst) & 3;
 
@@ -25,41 +23,32 @@ void __copy_longs_aligned(void* dst, const void* src, size_t n)
 		while (--i);
 	}
 
-	ls = ((unsigned long*)(cps + 1)) - 1;
-	ld = ((unsigned long*)(cpd + 1)) - 1;
+	lps = ((unsigned long*)(cps + 1)) - 1;
+	lpd = ((unsigned long*)(cpd + 1)) - 1;
 
 	i = n >> 5;
 
 	if (i)
 		do {
-			v1    = ls[2];
-			ld[1] = ls[1];
-			v2    = ls[3];
-			ld[2] = v1;
-			v1    = ls[4];
-			ld[3] = v2;
-			v2    = ls[5];
-			ld[4] = v1;
-			v1    = ls[6];
-			ld[5] = v2;
-			v2    = ls[7];
-			ld[6] = v1;
-			ls += 8;
-			v1    = *ls;
-			ld[7] = v2;
-			ld += 8;
-			*ld = v1;
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
 		} while (--i);
 
 	i = (n & 31) >> 2;
 
 	if (i)
 		do
-			*++ld = *++ls;
+			deref_auto_inc(lpd) = deref_auto_inc(lps);
 		while (--i);
 
-	cps = ((unsigned char*)(ls + 1)) - 1;
-	cpd = ((unsigned char*)(ld + 1)) - 1;
+	cps = ((unsigned char*)(lps + 1)) - 1;
+	cpd = ((unsigned char*)(lpd + 1)) - 1;
 
 	n &= 3;
 
@@ -73,7 +62,7 @@ void __copy_longs_aligned(void* dst, const void* src, size_t n)
 
 void __copy_longs_rev_aligned(void* dst, const void* src, size_t n)
 {
-	unsigned long i, v1, v2;
+	unsigned long i;
 
 	cps = ((unsigned char*)src) + n;
 	cpd = ((unsigned char*)dst) + n;
@@ -92,24 +81,14 @@ void __copy_longs_rev_aligned(void* dst, const void* src, size_t n)
 
 	if (i)
 		do {
-			v1      = lps[-1];
-			v2      = lps[-2];
-			lpd[-1] = v1;
-			v1      = lps[-3];
-			lpd[-2] = v2;
-			v2      = lps[-4];
-			lpd[-3] = v1;
-			v1      = lps[-5];
-			lpd[-4] = v2;
-			v2      = lps[-6];
-			lpd[-5] = v1;
-			v1      = lps[-7];
-			lpd[-6] = v2;
-			lps -= 8;
-			v2      = *lps;
-			lpd[-7] = v1;
-			lpd -= 8;
-			*lpd = v2;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
+			*--lpd = *--lps;
 		} while (--i);
 
 	i = (n & 31) >> 2;

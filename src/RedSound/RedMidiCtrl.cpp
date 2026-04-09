@@ -1880,10 +1880,11 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u8* command = (u8*)((int*)track)[0];
+	u32* trackData = (u32*)track;
+	u8* command = (u8*)trackData[0];
 
-	((int*)track)[0] = (int)(command + 1);
-	((int*)track)[0x1d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
+	trackData[0] = (u32)(command + 1);
+	trackData[0x1d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
 }
 
 /*
@@ -2074,10 +2075,11 @@ void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u8* command = (u8*)((int*)track)[0];
+	u32* trackData = (u32*)track;
+	u8* command = (u8*)trackData[0];
 
-	((int*)track)[0] = (int)(command + 1);
-	((int*)track)[0x25] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
+	trackData[0] = (u32)(command + 1);
+	trackData[0x25] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
 }
 
 /*
@@ -2242,10 +2244,11 @@ void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
  */
 void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u8* command = (u8*)((int*)track)[0];
+	u32* trackData = (u32*)track;
+	u8* command = (u8*)trackData[0];
 
-	((int*)track)[0] = (int)(command + 1);
-	((int*)track)[0x2d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
+	trackData[0] = (u32)(command + 1);
+	trackData[0x2d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
 }
 
 /*

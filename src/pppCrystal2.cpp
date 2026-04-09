@@ -19,16 +19,6 @@ extern float FLOAT_80331fdc;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-static inline float CameraPerspectiveFov()
-{
-    return CameraPcs._252_4_;
-}
-
-static inline Mtx& CameraMatrix()
-{
-    return CameraPcs.m_cameraMatrix;
-}
-
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 
@@ -217,7 +207,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             work->m_refractionTexObj = (GXTexObj*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 0x20, pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xB5);
             GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
-                         (u16)textureInfo->m_height, GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+                         (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
         }
     }
 }
@@ -280,16 +270,16 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
 
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, object->m_localMatrix.value, cameraMtx);
-        if (Game.m_currentSceneId == 7) {
-            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, param_2->m_perspectiveScale,
-                                  -param_2->m_perspectiveScale,
+        if ((int)Game.m_currentSceneId == 7) {
+            f32 perspectiveScale = param_2->m_perspectiveScale;
+            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
                                   FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(ppvCameraMatrix02, cameraMtx, tmpMtx);
         } else {
-            C_MTXLightPerspective(lightMtx, CameraPerspectiveFov(), FLOAT_80331fd8, param_2->m_perspectiveScale,
-                                  -param_2->m_perspectiveScale,
+            f32 perspectiveScale = param_2->m_perspectiveScale;
+            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
                                   FLOAT_80331fdc, FLOAT_80331fdc);
-            PSMTXConcat(CameraMatrix(), cameraMtx, tmpMtx);
+            PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);
         PSMTXInverse(tmpMtx, normalMtx);

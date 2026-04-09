@@ -185,11 +185,12 @@ CFont::CFont()
 CFont::~CFont()
 {
 	if (texturePtr != 0) {
-		int* texture = reinterpret_cast<int*>(texturePtr);
-		int refCount = texture[1];
-		texture[1] = refCount - 1;
-		if ((refCount - 1 == 0) && (texture != 0)) {
-			(*(void (**)(int*, int))(*texture + 8))(texture, 1);
+		CTexture* texture = texturePtr;
+		int* textureRef = reinterpret_cast<int*>(texture);
+		int nextRefCount = textureRef[1] - 1;
+		textureRef[1] = nextRefCount;
+		if (nextRefCount == 0) {
+			delete texture;
 		}
 		texturePtr = 0;
 	}
@@ -729,8 +730,6 @@ float CFont::GetWidth(char* text)
  */
 float CFont::GetWidth(unsigned short ch)
 {
-	unsigned char flags;
-	unsigned int drawWidth;
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
 	unsigned short* glyph = glyphBucket + 1;
 	int count = static_cast<int>(*glyphBucket);
@@ -757,7 +756,9 @@ found_glyph:
 	}
 
 found_fallback:
-	flags = renderFlags;
+	unsigned char flags = renderFlags;
+	unsigned int drawWidth;
+
 	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | static_cast<unsigned int>(flags >> 5)) < 0) {
 		drawWidth = static_cast<unsigned int>(m_glyphWidth);
 	} else {

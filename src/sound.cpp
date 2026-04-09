@@ -49,7 +49,7 @@ extern "C" void __dt__9CRedSoundFv(void*, short);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
 extern "C" void SetSoundMode__9CRedSoundFi(CRedSound*, int);
-extern "C" int Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
+extern "C" void Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
 extern "C" void End__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);
@@ -97,6 +97,10 @@ extern "C" void SetReverb__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetSeBlockData__9CRedSoundFiPv(CRedSound*, int, void*);
+extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -108,6 +112,8 @@ extern char DAT_801db190[];
 extern char DAT_801db1d8[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
+extern char s_CSound_80330ce0[];
+extern char s_sound_cpp_801db2d4[];
 extern char s_soundNoFreeWaveWarn_801DB0BC[];
 extern char s_soundNoFreeSeGroupWarn_801DB0E4[];
 
@@ -131,9 +137,9 @@ struct CLine {
 
 struct CSoundLayout {
     u32 m_redSoundWord0;
-    void* m_stage;
+    CMemory::CStage* m_stage;
     CFile::CHandle* m_waveFile;
-    void* m_aramBuffer;
+    u8* m_aramBuffer;
     int m_waveLoadMode;
     int m_waveRemain;
     int m_waveOffset;
@@ -143,7 +149,7 @@ struct CSoundLayout {
     int m_seCount;
     u8 m_seWork[0x1400];
     u8 m_lineWork[0xE60];
-    void* m_streamBuffer;
+    u8* m_streamBuffer;
     CFile::CHandle* m_streamFile;
     int m_streamOffset;
     int m_streamID;
@@ -416,12 +422,11 @@ void CSound::Init()
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
     CSoundLayout& sound = SoundData(this);
-
-    CMemory::CStage* stage = Memory.CreateStage(0xA4000, s_soundStageName, 0);
+    CMemory::CStage* stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
     sound.m_stage = stage;
 
-    sound.m_aramBuffer = new (stage, s_soundSourceName, 0x2E) u8[0x80000];
-    sound.m_streamBuffer = new (stage, s_soundSourceName, 0x2F) u8[0x20000];
+    sound.m_aramBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(0x80000, stage, s_sound_cpp_801db2d4, 0x2E));
+    sound.m_streamBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(0x20000, stage, s_sound_cpp_801db2d4, 0x2F));
 
     sound.m_bgmMasterVolume = 0x7F;
     sound.m_seMasterVolume = 0x7F;
@@ -514,19 +519,19 @@ void CSound::Quit()
 
     End__9CRedSoundFv(redSound);
 
-    void*& streamBuffer = sound.m_streamBuffer;
+    u8*& streamBuffer = sound.m_streamBuffer;
     if (streamBuffer != 0) {
-        delete[] reinterpret_cast<u8*>(streamBuffer);
+        __dla__FPv(streamBuffer);
         streamBuffer = 0;
     }
 
-    void*& aramBuffer = sound.m_aramBuffer;
+    u8*& aramBuffer = sound.m_aramBuffer;
     if (aramBuffer != 0) {
-        delete[] reinterpret_cast<u8*>(aramBuffer);
+        __dla__FPv(aramBuffer);
         aramBuffer = 0;
     }
 
-    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(sound.m_stage));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, sound.m_stage);
 }
 
 /*
@@ -2413,11 +2418,12 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    int pauseFlag = (pause != 0);
-    CRedSound* redSound = RedSound(this);
-    SePause__9CRedSoundFii(redSound, -1, pauseFlag);
-    StreamPause__9CRedSoundFii(redSound, -1, pauseFlag);
-    SoundData(this).m_pauseAllSe = pause;
+    u8* self = reinterpret_cast<u8*>(this);
+    int pauseFlag = (-pause | pause) >> 31;
+
+    SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, pauseFlag);
+    StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(self + 8), -1, pauseFlag);
+    reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe = pause;
 }
 
 /*

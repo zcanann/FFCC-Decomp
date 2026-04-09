@@ -137,20 +137,17 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
 	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
-	int vertexArray;
+	int displayListIdx;
 	int* displayListPtr;
 	int dlArrayBase;
 	int dlOffset;
-	int fullWord;
-	int drawTevBits;
-	u8 fullByte;
 	void* meshColorArrays;
 	void* meshColorArray;
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
 	if (*(u8*)((char*)param_3 + 0x14) != 0) {
-		meshColorArrays = *(void**)((char*)param_2 + 0xc);
+		meshColorArrays = *(void**)((char*)param_2 + 0xC);
 		dlOffset = *(int*)((char*)param_2 + 0x1c);
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
@@ -160,39 +157,34 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
-				drawTevBits = 0xace0f;
-				fullWord = -1;
-				drawTevBits |= 0x1000;
-				fullByte = 0xff;
-				vertexArray = meshData->m_displayListCount - 1;
-				dlOffset = vertexArray * 4;
-				while (vertexArray >= 0) {
+				displayListIdx = meshData->m_displayListCount - 1;
+				dlOffset = displayListIdx * 4;
+				while (displayListIdx >= 0) {
 					dlArrayBase = *(int*)(meshIdx * 4 + *(int*)((char*)param_2 + 0x10));
-					*(int*)(MaterialManRaw() + 0x48) = 0xace0f;
-					*(int*)(MaterialManRaw() + 0x128) = 0;
-					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
-					*(int*)(MaterialManRaw() + 0x130) = 0;
-					*(int*)(MaterialManRaw() + 0x44) = fullWord;
-					*(char*)(MaterialManRaw() + 0x4c) = fullByte;
+					*(int*)(MaterialManRaw() + 0x44) = -1;
+					*(char*)(MaterialManRaw() + 0x4c) = 0xff;
 					*(int*)(MaterialManRaw() + 0x11c) = 0;
 					*(int*)(MaterialManRaw() + 0x120) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x124) = 0;
-					*(char*)(MaterialManRaw() + 0x205) = fullByte;
-					*(char*)(MaterialManRaw() + 0x206) = fullByte;
+					*(char*)(MaterialManRaw() + 0x205) = 0xff;
+					*(char*)(MaterialManRaw() + 0x206) = 0xff;
 					*(int*)(MaterialManRaw() + 0x58) = 0;
 					*(int*)(MaterialManRaw() + 0x5c) = 0;
 					*(char*)(MaterialManRaw() + 0x208) = 0;
-					*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
 					*(int*)(MaterialManRaw() + 0x128) = 0;
 					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
-					*(int*)(MaterialManRaw() + 0x40) = drawTevBits;
+					*(int*)(MaterialManRaw() + 0x48) = 0xade0f;
+					*(int*)(MaterialManRaw() + 0x128) = 0;
+					*(int*)(MaterialManRaw() + 0x12c) = 0x1e;
+					*(int*)(MaterialManRaw() + 0x130) = 0;
+					*(int*)(MaterialManRaw() + 0x40) = 0xade0f;
 					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
 					    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), displayList->m_material, 0, 0);
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
 					dlOffset -= 4;
-					vertexArray -= 1;
+					displayListIdx -= 1;
 					displayList += 1;
 				}
 			}
@@ -346,7 +338,6 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	u8 payload = step->m_payload[0];
 	int colorOffset = data->m_serializedDataOffsets[1];
 	ChangeTexWork* work = (ChangeTexWork*)((u8*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
 
@@ -384,7 +375,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		*(void**)(model + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 	}
 
-	if (payload == 0) {
+	if (step->m_payload[0] == 0) {
 		return;
 	}
 
@@ -442,13 +433,25 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	if (gPppInConstructor == 0) {
+		union {
+			double d;
+			u32 u[2];
+		} splitScale;
+		union {
+			double d;
+			u32 u[2];
+		} alphaScale;
 		float currentValue = work->m_value0 * (work->m_bboxMax.y - work->m_bboxMin.y) + work->m_bboxMin.y;
-		short splitY = (short)(int)(currentValue * (float)((double)(1 << *(int*)(*(int*)(model0 + 0xA4) + 0x34)) - DOUBLE_80332030));
+
+		splitScale.u[0] = 0x43300000;
+		splitScale.u[1] = (1 << *(int*)(*(int*)(model0 + 0xA4) + 0x34)) ^ 0x80000000;
+		short splitY = (short)(int)(currentValue * (float)(splitScale.d - DOUBLE_80332030));
 		if (work->m_cachedValue != currentValue) {
 			work->m_cachedValue = currentValue;
 
-			double d = (double)*((u8*)changeTex + colorOffset + 0x8B);
-			double alphaBase = (double)(FLOAT_80332028 * ((float)(d - DOUBLE_80332038) / FLOAT_80332028));
+			alphaScale.u[0] = 0x43300000;
+			alphaScale.u[1] = (u8)*((u8*)changeTex + colorOffset + 0x8B);
+			double alphaBase = (double)(FLOAT_80332028 * ((float)(alphaScale.d - DOUBLE_80332038) / FLOAT_80332028));
 
 			int arrayOffset = 0;
 			meshList = *(int*)(model0 + 0xAC);
@@ -460,17 +463,17 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				for (unsigned int v = 0; v < vertCount; v++) {
 					short y = *(short*)(*(int*)(meshList + 0xC) + pointOffset + 2);
 
-					if (payload == 1) {
+					if (step->m_payload[0] == 1) {
 						if (y < splitY) {
-							*(unsigned char*)(colorPtr + 3) = (unsigned char)(int)alphaBase;
+							*(char*)(colorPtr + 3) = (char)(int)alphaBase;
 						} else {
-							*(unsigned char*)(colorPtr + 3) = 0;
+							*(char*)(colorPtr + 3) = 0;
 						}
-					} else if (payload == 2) {
+					} else if (step->m_payload[0] == 2) {
 						if (splitY < y) {
-							*(unsigned char*)(colorPtr + 3) = (unsigned char)(int)alphaBase;
+							*(char*)(colorPtr + 3) = (char)(int)alphaBase;
 						} else {
-							*(unsigned char*)(colorPtr + 3) = 0;
+							*(char*)(colorPtr + 3) = 0;
 						}
 					}
 

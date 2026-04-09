@@ -1672,10 +1672,12 @@ void CGMonObj::calcBranchFuncTetsukyojin(int)
 void CGMonObj::damagedFuncGigasLoad()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	if (*reinterpret_cast<int*>(mon + 0x6B4) == 0) {
+	if (*reinterpret_cast<int*>(mon + 0x6D0) == 0) {
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 4, 0, 0);
-		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(CFlat + 4840) = 1;
+	} else {
+		return;
 	}
 }
 

@@ -25,7 +25,7 @@ extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
-static int GetGraphFrameFromId(u32 graphId)
+static int GetGraphFrameFromId(s32 graphId)
 {
     return (int)graphId / 0x1000;
 }
@@ -62,9 +62,10 @@ struct LocationTitle2AnimRaw {
 };
 
 struct LocationTitle2ModelRaw {
-    u8 m_pad[0xA4];
-    LocationTitle2AnimRaw* m_anim;
+    u8 m_pad0[0xA8];
     u8* m_nodes;
+    u8 m_padA8[0x24];
+    LocationTitle2AnimRaw* m_anim;
 };
 
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
@@ -159,6 +160,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     if (work->m_particles == 0) {
         LocationTitle2Particle* particles;
         CGObject* owner;
+        CCharaPcs::CHandle* handle;
         CChara::CModel* model;
         LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
@@ -172,9 +174,13 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         particles = (LocationTitle2Particle*)work->m_particles;
 
         owner = (CGObject*)pppMngStPtr->m_owner;
+        handle = 0;
         model = 0;
-        if ((owner != 0) && (owner->m_charaModelHandle != 0)) {
-            model = owner->m_charaModelHandle->m_model;
+        if (owner->m_charaModelHandle != 0) {
+            handle = owner->m_charaModelHandle;
+        }
+        if (handle != 0) {
+            model = handle->m_model;
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;

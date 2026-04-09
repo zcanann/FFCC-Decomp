@@ -383,6 +383,8 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
+        Vec tailScale;
+
         work->m_maxParticles = *(u16*)((u8*)&param->m_matrix + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             work->m_maxParticles * 0x1b8, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail2_cpp_801d9c68, 0x30e);
@@ -404,7 +406,13 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             }
         }
 
-        pppNormalize(work->m_tailScaleDirection, param->m_directionTail);
+        work->m_tailScaleDirection.x = param->m_directionTail.x;
+        work->m_tailScaleDirection.y = param->m_directionTail.y;
+        work->m_tailScaleDirection.z = param->m_directionTail.z;
+        tailScale.x = work->m_tailScaleDirection.x;
+        tailScale.y = work->m_tailScaleDirection.y;
+        tailScale.z = work->m_tailScaleDirection.z;
+        pppNormalize(work->m_tailScaleDirection, tailScale);
     }
 
     if (work->m_particles == 0) {
@@ -423,40 +431,46 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
 
     switch (paramPayload[0x18]) {
     default:
-        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
+    {
+        pppFMATRIX emitterMatrix = pppMngStPtr->m_matrix;
+
+        pppCopyMatrix(work->m_emitterMatrix, emitterMatrix);
         break;
+    }
     case 1:
     case 3:
     case 5:
     case 7:
     case 9:
     {
-        Vec col;
+        Vec firstCol;
+        Vec secondCol;
+        Vec thirdCol;
 
         PSMTXIdentity(work->m_emitterMatrix.value);
-        col.x = work->m_emitterMatrix.value[0][0];
-        col.y = work->m_emitterMatrix.value[1][0];
-        col.z = work->m_emitterMatrix.value[2][0];
-        PSVECScale(&col, &col, pppMngStPtr->m_scale.x);
-        work->m_emitterMatrix.value[0][0] = col.x;
-        work->m_emitterMatrix.value[1][0] = col.y;
-        work->m_emitterMatrix.value[2][0] = col.z;
+        firstCol.x = work->m_emitterMatrix.value[0][0];
+        firstCol.y = work->m_emitterMatrix.value[1][0];
+        firstCol.z = work->m_emitterMatrix.value[2][0];
+        PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][0] = firstCol.x;
+        work->m_emitterMatrix.value[1][0] = firstCol.y;
+        work->m_emitterMatrix.value[2][0] = firstCol.z;
 
-        col.x = work->m_emitterMatrix.value[0][1];
-        col.y = work->m_emitterMatrix.value[1][1];
-        col.z = work->m_emitterMatrix.value[2][1];
-        PSVECScale(&col, &col, pppMngStPtr->m_scale.y);
-        work->m_emitterMatrix.value[0][1] = col.x;
-        work->m_emitterMatrix.value[1][1] = col.y;
-        work->m_emitterMatrix.value[2][1] = col.z;
+        secondCol.x = work->m_emitterMatrix.value[0][1];
+        secondCol.y = work->m_emitterMatrix.value[1][1];
+        secondCol.z = work->m_emitterMatrix.value[2][1];
+        PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][1] = secondCol.x;
+        work->m_emitterMatrix.value[1][1] = secondCol.y;
+        work->m_emitterMatrix.value[2][1] = secondCol.z;
 
-        col.x = work->m_emitterMatrix.value[0][2];
-        col.y = work->m_emitterMatrix.value[1][2];
-        col.z = work->m_emitterMatrix.value[2][2];
-        PSVECScale(&col, &col, pppMngStPtr->m_scale.z);
-        work->m_emitterMatrix.value[0][2] = col.x;
-        work->m_emitterMatrix.value[1][2] = col.y;
-        work->m_emitterMatrix.value[2][2] = col.z;
+        thirdCol.x = work->m_emitterMatrix.value[0][2];
+        thirdCol.y = work->m_emitterMatrix.value[1][2];
+        thirdCol.z = work->m_emitterMatrix.value[2][2];
+        PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][2] = thirdCol.x;
+        work->m_emitterMatrix.value[1][2] = thirdCol.y;
+        work->m_emitterMatrix.value[2][2] = thirdCol.z;
 
         work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
         work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;

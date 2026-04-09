@@ -239,7 +239,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
-        param_2->m_payloadByte28, param_2->m_payloadByte29, (u8)(param_2->m_payloadByte2C == 0), 1, 0);
+        param_2->m_payloadByte28, param_2->m_payloadByte29, !param_2->m_payloadByte2C, 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);

@@ -95,6 +95,7 @@ struct CTexAnimRefDataStorage
     int refCount;
     char name[0x100];
     void* material;
+    int texSrtIndex;
     CPtrArray<CTexAnimSeq*> texAnimSeqs;
 };
 
@@ -661,17 +662,17 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 }
                 *reinterpret_cast<void**>((int)texAnim + 8) = 0;
             }
-            void* refData = __nw__FUlPQ27CMemory6CStagePci(300, stage, s_texanim_cpp_801d7adc, 0xD3);
+            CTexAnimRefDataStorage* refData = static_cast<CTexAnimRefDataStorage*>(
+                __nw__FUlPQ27CMemory6CStagePci(300, stage, s_texanim_cpp_801d7adc, 0xD3));
             if (refData != 0) {
                 __ct__4CRefFv(refData);
                 *reinterpret_cast<void**>(refData) = __vt__Q28CTexAnim8CRefData;
-                __ct__25CPtrArray_P11CTexAnimSeq_Fv((void*)((int)refData + 0x110));
-                *reinterpret_cast<void**>((int)refData + 0x108) = 0;
-                *reinterpret_cast<int*>((int)refData + 0x10C) = 0;
+                __ct__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs);
+                refData->material = 0;
+                refData->texSrtIndex = 0;
             }
             *reinterpret_cast<void**>((int)texAnim + 8) = refData;
-            reinterpret_cast<CPtrArray<CTexAnimSeq*>*>((int)(*reinterpret_cast<void**>((int)texAnim + 8)) + 0x110)
-                ->SetStage(stage);
+            refData->texAnimSeqs.SetStage(stage);
 
             chunkFile.PushChunk();
             while ((int)chunkFile.GetNextChunk(chunk) != 0) {
@@ -712,12 +713,10 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         }
                     }
                     chunkFile.PopChunk();
-                    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>((int)*reinterpret_cast<void**>((int)texAnim + 8) + 0x110)
-                        ->Add(seq);
+                    refData->texAnimSeqs.Add(seq);
                 } else if (((int)chunk.m_id < 0x53455120) && (chunk.m_id == 0x4E414D45)) {
-                    *reinterpret_cast<unsigned char**>((int)*reinterpret_cast<void**>((int)texAnim + 8) + 0x10C) =
-                        (unsigned char*)chunk.m_arg0;
-                    strcpy((char*)((int)*reinterpret_cast<void**>((int)texAnim + 8) + 8), chunkFile.GetString());
+                    refData->texSrtIndex = chunk.m_arg0;
+                    strcpy(refData->name, chunkFile.GetString());
                 }
             }
             chunkFile.PopChunk();
@@ -792,20 +791,19 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        int* current = reinterpret_cast<int*>(refData->material);
+        int* material = reinterpret_cast<int*>(refData->material);
 
-        if (current != 0) {
-            int refCount = current[1];
+        if (material != 0) {
+            int refCount = material[1];
             int nextRefCount = refCount - 1;
 
-            current[1] = nextRefCount;
-            if ((nextRefCount == 0) && (current != 0)) {
-                (*(void (**)(int*, int))(*current + 8))(current, 1);
+            material[1] = nextRefCount;
+            if ((nextRefCount == 0) && (material != 0)) {
+                (*(void (**)(int*, int))(*material + 8))(material, 1);
             }
             refData->material = 0;
         }
@@ -813,9 +811,10 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
         if (materialSet != 0) {
             int materialIndex = static_cast<int>(materialSet->Find(refData->name));
             if (materialIndex >= 0) {
-                refData->material = (*materials)[static_cast<unsigned long>(materialIndex)];
-                current = reinterpret_cast<int*>(refData->material);
-                current[1] = current[1] + 1;
+                refData->material =
+                    (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<unsigned long>(materialIndex)];
+                material = reinterpret_cast<int*>(refData->material);
+                material[1] = material[1] + 1;
             }
         }
     }
@@ -960,29 +959,30 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
  */
 void CTexAnimSet::SetTexGen()
 {
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(texAnims->GetSize()); i++) {
-        CTexAnim* texAnim = (*texAnims)[i];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
+        CTexAnimRefDataStorage* refData =
+            reinterpret_cast<CTexAnimRefDataStorage*>(*reinterpret_cast<void**>(Ptr(texAnim, 8)));
         const float fVar2 = FLOAT_8032fb38;
-        void* refData = *reinterpret_cast<void**>(Ptr(texAnim, 8));
-        int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>(Ptr(refData, 0x108)));
+        int* material = reinterpret_cast<int*>(refData->material);
         if (material != 0) {
             const unsigned int uVar1 = U32At(texAnim, 0x1C);
-            int* texSrt = material + (S32At(refData, 0x10C) * 5);
-            U32At(texSrt, 0x50) = U32At(texAnim, 0x18);
-            U32At(texSrt, 0x54) = uVar1;
-            F32At(texSrt, 0x58) = fVar2;
-            F32At(texSrt, 0x5C) = fVar2;
-            if (fVar2 == F32At(texSrt, 0x58)) {
-                U8At(texSrt, 0x4C) = 0;
+            material = material + (refData->texSrtIndex * 5);
+            U32At(material, 0x50) = U32At(texAnim, 0x18);
+            U32At(material, 0x54) = uVar1;
+            F32At(material, 0x58) = fVar2;
+            F32At(material, 0x5C) = fVar2;
+            if (fVar2 == F32At(material, 0x58)) {
+                U8At(material, 0x4C) = 0;
             } else {
-                U8At(texSrt, 0x4C) = 1;
+                U8At(material, 0x4C) = 1;
             }
-            if (FLOAT_8032fb38 == F32At(texSrt, 0x5C)) {
-                U8At(texSrt, 0x4D) = 0;
+            if (FLOAT_8032fb38 == F32At(material, 0x5C)) {
+                U8At(material, 0x4D) = 0;
             } else {
-                U8At(texSrt, 0x4D) = 1;
+                U8At(material, 0x4D) = 1;
             }
         }
     }

@@ -79,6 +79,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	Quaternion local_70;
 	Quaternion local_80;
 	Vec local_e0;
+	Vec directionSource;
+	Vec previousDirectionSource;
 
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
@@ -94,7 +96,6 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
 		u8* ownerBytes = (u8*)owner;
-		Vec local_74;
 
 		local_8c.x = *(f32*)(ownerBytes + 0x15c);
 		local_8c.y = *(f32*)(ownerBytes + 0x160);
@@ -102,8 +103,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppSubVector(local_20, local_8c, pppMngSt->m_position);
 
 		local_20.y = local_20.y + param_2->m_payload;
-		local_74 = local_20;
-		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_74);
+		directionSource = local_20;
+		pppNormalize__FR3Vec3Vec((float*)&local_20, &directionSource);
 
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
@@ -113,8 +114,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
-		local_74 = local_2c;
-		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_74);
+		previousDirectionSource = local_2c;
+		pppNormalize__FR3Vec3Vec((float*)&local_2c, &previousDirectionSource);
 	}
 
 	local_60.x = local_20.x;

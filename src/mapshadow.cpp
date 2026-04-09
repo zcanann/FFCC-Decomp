@@ -13,7 +13,6 @@ public:
 	T operator[](unsigned long index);
 };
 
-extern const float FLOAT_8032fce0 = 1.0f;
 extern const double DOUBLE_8032fce8;
 extern const float FLOAT_8032fcf0;
 
@@ -98,17 +97,13 @@ void CMapShadow::Draw()
  */
 void CMapShadow::Calc()
 {
-	float fVar1;
-	
-	fVar1 = 1.0f;
 	m_lightMtx[0][3] = m_lightMtx[0][3] + m_scrollStepX;
-	if (m_lightMtx[0][3] > fVar1) {
-		m_lightMtx[0][3] = m_lightMtx[0][3] - fVar1;
+	if (m_lightMtx[0][3] > 1.0f) {
+		m_lightMtx[0][3] = m_lightMtx[0][3] - 1.0f;
 	}
-	fVar1 = 1.0f;
 	m_lightMtx[1][3] = m_lightMtx[1][3] + m_scrollStepY;
-	if (m_lightMtx[1][3] > fVar1) {
-		m_lightMtx[1][3] = m_lightMtx[1][3] - fVar1;
+	if (m_lightMtx[1][3] > 1.0f) {
+		m_lightMtx[1][3] = m_lightMtx[1][3] - 1.0f;
 	}
 }
 

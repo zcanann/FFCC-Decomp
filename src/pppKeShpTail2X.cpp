@@ -146,11 +146,14 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         u8* shape = (u8*)*shapeTable;
         KeShpTail2XShapeFrame* frameEntry;
         s16 frameDuration;
+        u16 shapeFrame;
 
-        work->m_shapePrevFrame = work->m_shapeFrame;
+        shapeFrame = work->m_shapeFrame;
+        work->m_shapePrevFrame = shapeFrame;
 
         work->m_frameAcc += step->m_frameStep;
-        frameEntry = (KeShpTail2XShapeFrame*)(shape + 0x10) + work->m_shapeFrame;
+        frameEntry =
+            reinterpret_cast<KeShpTail2XShapeFrame*>(shape + ((u32)shapeFrame << 3) + 0x10);
         frameDuration = frameEntry->m_duration;
         if (work->m_frameAcc >= frameDuration) {
             work->m_frameAcc -= frameDuration;

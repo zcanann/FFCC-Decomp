@@ -4007,26 +4007,27 @@ void GbaQueue::OpenMenu(int, int, int)
  */
 void GbaQueue::SetPauseMode(int mode)
 {
-	int i;
-	OSSemaphore* semaphoreIter;
-
-	i = 0;
-	semaphoreIter = accessSemaphores;
-	do {
-		OSWaitSemaphore(semaphoreIter);
-		i++;
-		semaphoreIter++;
-	} while (i < 4);
+	{
+		OSSemaphore* waitSemaphore = accessSemaphores;
+		int waitIndex = 0;
+		do {
+			OSWaitSemaphore(waitSemaphore);
+			waitIndex++;
+			waitSemaphore++;
+		} while (waitIndex < 4);
+	}
 
 	m_pauseMode = static_cast<char>(mode);
 
-	i = 0;
-	semaphoreIter = accessSemaphores;
-	do {
-		OSSignalSemaphore(semaphoreIter);
-		i++;
-		semaphoreIter++;
-	} while (i < 4);
+	{
+		int signalIndex = 0;
+		OSSemaphore* signalSemaphore = accessSemaphores;
+		do {
+			OSSignalSemaphore(signalSemaphore);
+			signalIndex++;
+			signalSemaphore++;
+		} while (signalIndex < 4);
+	}
 }
 
 /*

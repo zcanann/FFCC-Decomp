@@ -212,34 +212,41 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 {
     pppYmDeformationMdlLayout* modelObject = (pppYmDeformationMdlLayout*)pppYmDeformationMdl;
     YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
-    int textureIndex = 0;
-
-    if (param_2->m_dataValIndex == 0xFFFF) {
-        return;
-    }
-
-    YmDeformationMdlColorInfo* colorInfo =
-        (YmDeformationMdlColorInfo*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x80);
-    Mtx texMtx;
-    Mtx cameraMtx;
+    pppYmDeformationMdlUnkB* renderParams = param_2;
+    YmDeformationMdlColorInfo* colorInfo;
+    Mtx indWarpMtx;
     Mtx44 screenMtx;
+    Mtx cameraMtx;
+    Mtx texMtx;
     Mtx rotMtx;
     Mtx resetRotMtx;
+    float indMtx[2][3];
+    float resetIndMtx[2][3];
+    int textureIndex = 0;
     int left;
     int top;
     int width;
     int height;
     int backTexture;
-    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
-    int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    pppModelSt* model;
+    int textureBase;
 
-    PSMTXIdentity(rotMtx);
+    if (renderParams->m_dataValIndex == 0xFFFF) {
+        return;
+    }
+
+    colorInfo = (YmDeformationMdlColorInfo*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x80);
+    model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[renderParams->m_dataValIndex];
+    textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+
+    PSMTXIdentity(indWarpMtx);
     pppSetBlendMode(0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
-        param_2->m_payloadByte28, param_2->m_payloadByte29, !param_2->m_payloadByte2C, 1, 0);
+        &colorInfo->m_color, &modelObject->m_modelMatrix, renderParams->m_payload4, renderParams->m_payloadByte2B,
+        renderParams->m_payloadByte2A, renderParams->m_payloadByte28, renderParams->m_payloadByte29,
+        (u8)(renderParams->m_payloadByte2C == 0), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -253,11 +260,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7, 4);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-    pppSetBlendMode(param_2->m_payloadByte28);
-    if (param_2->m_payloadByte28 == 0) {
+    pppSetBlendMode(renderParams->m_payloadByte28);
+    if (renderParams->m_payloadByte28 == 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
     }
-    if (param_2->m_payloadByte28 == 3) {
+    if (renderParams->m_payloadByte28 == 3) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 1);
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
     }
@@ -303,8 +310,6 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         }
 
         PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)state->m_angle);
-        float indMtx[2][3];
-        float resetIndMtx[2][3];
         float indScale = state->m_values[0];
         indMtx[0][0] = rotMtx[0][0] * indScale;
         indMtx[0][1] = rotMtx[0][1] * indScale;

@@ -1,5 +1,5 @@
 Final Fantasy Crystal Chronicles Decompilation
-[![Build Status]][actions] [![Progress]][progress site] [![DOL Progress]][progress site]
+[![Build Status]][actions] [![Progress]][progress site]
 ===============================
 [Build Status]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml/badge.svg
 [actions]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml

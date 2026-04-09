@@ -75,10 +75,10 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	Vec local_2c;
 	Vec local_8c;
 	Vec local_ec;
+	Vec local_e0;
 	Quaternion local_60;
 	Quaternion local_70;
 	Quaternion local_80;
-	Vec local_e0;
 	Vec directionSource;
 	Vec previousDirectionSource;
 

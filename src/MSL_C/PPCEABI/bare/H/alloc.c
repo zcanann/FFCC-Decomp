@@ -87,9 +87,14 @@ static int initialized = 0;
 
 static SubBlock* SubBlock_merge_prev(SubBlock*, SubBlock**);
 static void SubBlock_merge_next(SubBlock*, SubBlock**);
-static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);
-static void Block_construct(Block* block, unsigned long size);
-static SubBlock* Block_subBlock(Block* block, unsigned long requested_size);
+Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);
+void Block_construct(Block* block, unsigned long size);
+SubBlock* Block_subBlock(Block* block, unsigned long requested_size);
+void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size);
+void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size);
+void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr);
+void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size);
+void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
 
 static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 
@@ -228,19 +233,6 @@ static inline Block* __unlink(__mem_pool_obj* pool_obj, Block* bp) {
     return result;
 }
 
-static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
-    SubBlock* sb = SubBlock_from_pointer(ptr);
-    SubBlock* _sb;
-
-    Block* bp = SubBlock_block(sb);
-    Block_link(bp, sb);
-
-    if (Block_empty(bp)) {
-        __unlink(pool_obj, bp);
-        __sys_free(bp);
-    }
-}
-
 inline void __init_pool_obj(__mem_pool* pool_obj) {
     memset(pool_obj, 0, sizeof(__mem_pool_obj));
 }
@@ -256,100 +248,6 @@ static inline __mem_pool* get_malloc_pool(void) {
     return &protopool;
 }
 
-void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
-    unsigned long i = 0;
-    FixSubBlock* p;
-    FixBlock* b;
-    FixStart* fs;
-
-    while (size > fix_pool_sizes[i]) {
-        ++i;
-    }
-
-    fs = &pool_obj->fix_start[i];
-    p = FixSubBlock_from_pointer(ptr);
-    b = p->block_;
-
-    if (b->start_ == 0 && fs->head_ != b) {
-        if (fs->tail_ == b) {
-            fs->head_ = fs->head_->prev_;
-            fs->tail_ = fs->tail_->prev_;
-        } else {
-            b->prev_->next_ = b->next_;
-            b->next_->prev_ = b->prev_;
-            b->next_ = fs->head_;
-            b->prev_ = b->next_->prev_;
-            b->prev_->next_ = b;
-            b->next_->prev_ = b;
-            fs->head_ = b;
-        }
-    }
-
-    p->next_ = b->start_;
-    b->start_ = p;
-
-    if (--b->n_allocated_ == 0) {
-        if (fs->head_ == b) {
-            fs->head_ = b->next_;
-        }
-
-        if (fs->tail_ == b) {
-            fs->tail_ = b->prev_;
-        }
-
-        b->prev_->next_ = b->next_;
-        b->next_->prev_ = b->prev_;
-
-        if (fs->head_ == b) {
-            fs->head_ = 0;
-        }
-
-        if (fs->tail_ == b) {
-            fs->tail_ = 0;
-        }
-
-        deallocate_from_var_pools(pool_obj, b);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801B27F4
- * PAL Size: 180b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
-    Block* block;
-    unsigned long aligned_size;
-
-    aligned_size = (size + 0x1FUL) & 0xFFFFFFF8;
-    if (aligned_size < 0x10000) {
-        aligned_size = 0x10000;
-    }
-
-    block = (Block*)__sys_alloc(aligned_size);
-    if (block == 0) {
-        return 0;
-    }
-
-    Block_construct(block, aligned_size);
-    if (pool_obj->start_ != 0) {
-        block->prev = pool_obj->start_->prev;
-        block->prev->next = block;
-        block->next = pool_obj->start_;
-        pool_obj->start_->prev = block;
-        pool_obj->start_ = block;
-    } else {
-        pool_obj->start_ = block;
-        block->prev = block;
-        block->next = block;
-    }
-    return block;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801B2A8C
@@ -359,7 +257,7 @@ static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
  * JP Address: TODO
  * JP Size: TODO
  */
-static void Block_construct(Block* block, unsigned long size) {
+void Block_construct(Block* block, unsigned long size) {
     SubBlock* sb;
 
     block->size = size | 3;
@@ -383,7 +281,7 @@ static void Block_construct(Block* block, unsigned long size) {
  * JP Address: TODO
  * JP Size: TODO
  */
-static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
+SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     SubBlock* sb;
     SubBlock* start;
     unsigned long sb_size;
@@ -493,7 +391,45 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     return start;
 }
 
-static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+/*
+ * --INFO--
+ * PAL Address: 0x801B27F4
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
+    Block* block;
+    unsigned long aligned_size;
+
+    aligned_size = (size + 0x1FUL) & 0xFFFFFFF8;
+    if (aligned_size < 0x10000) {
+        aligned_size = 0x10000;
+    }
+
+    block = (Block*)__sys_alloc(aligned_size);
+    if (block == 0) {
+        return 0;
+    }
+
+    Block_construct(block, aligned_size);
+    if (pool_obj->start_ != 0) {
+        block->prev = pool_obj->start_->prev;
+        block->prev->next = block;
+        block->next = pool_obj->start_;
+        pool_obj->start_->prev = block;
+        pool_obj->start_ = block;
+    } else {
+        pool_obj->start_ = block;
+        block->prev = block;
+        block->next = block;
+    }
+    return block;
+}
+
+void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     Block* block;
     Block* current_block;
     void* result;
@@ -545,7 +481,7 @@ done:
  * JP Address: TODO
  * JP Size: TODO
  */
-static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
+void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
     Block* current_block;
     SubBlock* result;
 
@@ -577,7 +513,21 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
 found:
     return (char*)result + 8;
 }
-static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+
+void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
+    SubBlock* sb = SubBlock_from_pointer(ptr);
+    SubBlock* _sb;
+
+    Block* bp = SubBlock_block(sb);
+    Block_link(bp, sb);
+
+    if (Block_empty(bp)) {
+        __unlink(pool_obj, bp);
+        __sys_free(bp);
+    }
+}
+
+void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     unsigned long i = 0;
     FixStart* fs;
 
@@ -682,6 +632,62 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
     }
 }
 
+void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
+    unsigned long i = 0;
+    FixSubBlock* p;
+    FixBlock* b;
+    FixStart* fs;
+
+    while (size > fix_pool_sizes[i]) {
+        ++i;
+    }
+
+    fs = &pool_obj->fix_start[i];
+    p = FixSubBlock_from_pointer(ptr);
+    b = p->block_;
+
+    if (b->start_ == 0 && fs->head_ != b) {
+        if (fs->tail_ == b) {
+            fs->head_ = fs->head_->prev_;
+            fs->tail_ = fs->tail_->prev_;
+        } else {
+            b->prev_->next_ = b->next_;
+            b->next_->prev_ = b->prev_;
+            b->next_ = fs->head_;
+            b->prev_ = b->next_->prev_;
+            b->prev_->next_ = b;
+            b->next_->prev_ = b;
+            fs->head_ = b;
+        }
+    }
+
+    p->next_ = b->start_;
+    b->start_ = p;
+
+    if (--b->n_allocated_ == 0) {
+        if (fs->head_ == b) {
+            fs->head_ = b->next_;
+        }
+
+        if (fs->tail_ == b) {
+            fs->tail_ = b->prev_;
+        }
+
+        b->prev_->next_ = b->next_;
+        b->next_->prev_ = b->prev_;
+
+        if (fs->head_ == b) {
+            fs->head_ = 0;
+        }
+
+        if (fs->tail_ == b) {
+            fs->tail_ = 0;
+        }
+
+        deallocate_from_var_pools(pool_obj, b);
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x801b1f30
@@ -719,15 +725,6 @@ void* __pool_alloc(__mem_pool* pool, unsigned long size) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void* malloc(size_t size) {
-    void* ptr;
-
-    __begin_critical_region(malloc_pool_access);
-    ptr = __pool_alloc(get_malloc_pool(), size);
-    __end_critical_region(malloc_pool_access);
-    return ptr;
-}
-
 void __pool_free(__mem_pool* pool, void* ptr) {
     __mem_pool_obj* pool_obj;
     unsigned long size;
@@ -744,6 +741,24 @@ void __pool_free(__mem_pool* pool, void* ptr) {
     } else {
         deallocate_from_var_pools(pool_obj, ptr);
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801b1e5c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* malloc(size_t size) {
+    void* ptr;
+
+    __begin_critical_region(malloc_pool_access);
+    ptr = __pool_alloc(get_malloc_pool(), size);
+    __end_critical_region(malloc_pool_access);
+    return ptr;
 }
 
 void free(void* ptr) {

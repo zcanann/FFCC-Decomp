@@ -2,6 +2,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
+extern float FLOAT_803304F8;
+
 struct pppKeZCrctShpObject {
     char _pad00[0x10];
     pppFMATRIX m_localMatrix;
@@ -37,9 +39,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
 
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
-    zeroVec.z = 0.0f;
+    zeroVec.x = FLOAT_803304F8;
+    zeroVec.y = FLOAT_803304F8;
+    zeroVec.z = FLOAT_803304F8;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);

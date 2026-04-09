@@ -2486,14 +2486,16 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	CCaravanWork* artifactWork = this;
+	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
+	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	unsigned short* artifact = &m_artifacts[0];
 	int hpMax = 0;
 	int artifactIndex = 0;
 	int count = 0x32;
 
 	while (count != 0) {
-		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[0] > 0)) {
-			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[0]);
+		if ((artifactIndex < 0x60) && ((short)artifact[0] > 0)) {
+			unsigned short* artifactData = artifactDataBase + (artifact[0] * 0x24);
 			unsigned short artifactType = artifactData[0];
 
 			if (artifactType == 0xDB) {
@@ -2511,8 +2513,8 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 		}
 
 		artifactIndex++;
-		if ((artifactIndex < 0x60) && ((short)artifactWork->m_artifacts[1] > 0)) {
-			unsigned short* artifactData = GetItemDataPtr((short)artifactWork->m_artifacts[1]);
+		if ((artifactIndex < 0x60) && ((short)artifact[1] > 0)) {
+			unsigned short* artifactData = artifactDataBase + (artifact[1] * 0x24);
 			unsigned short artifactType = artifactData[0];
 
 			if (artifactType == 0xDB) {
@@ -2529,12 +2531,12 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 			}
 		}
 
-		artifactWork = (CCaravanWork*)&artifactWork->m_objType;
+		artifact += 2;
 		artifactIndex++;
 		count--;
 	}
 
-	hpMax += *(unsigned short*)(Game.unkCFlatData0[0] + m_baseDataIndex * 0x1D0 + 6);
+	hpMax += baseData[3];
 	if (hpMax > 0xF) {
 		return 0x10;
 	}

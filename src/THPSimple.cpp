@@ -48,8 +48,6 @@ struct THPSimpleControl {
 };
 
 THPSimpleControl SimpleControl;
-static THPVideoInfo sVideoInfoWork;
-static THPAudioInfo sAudioInfoWork;
 static u8 sReadBuffer[0x40];
 s32 gTHPSimpleInitialized;
 s32 gTHPSimpleSoundBufferIndex;
@@ -195,8 +193,8 @@ s32 THPSimpleOpen(const char* path)
         return 0;
     }
 
-    memset(&sVideoInfoWork, 0, 0xC);
-    memset(&sAudioInfoWork, 0, 0x10);
+    memset(&SimpleControl.videoInfo, 0, sizeof(THPVideoInfo));
+    memset(&SimpleControl.audioInfo, 0, sizeof(THPAudioInfo));
 
     if (!DVDOpen(path, &SimpleControl.fileInfo)) {
         return 0;

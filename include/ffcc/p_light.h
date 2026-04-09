@@ -49,7 +49,7 @@ public:
         void* m_part;             // 0x64
         u8 m_bumpShade[4];        // 0x68
         GXLightObj m_gxLightObj;  // 0x6C
-        u32 m_unkAC;              // 0xAC
+        float m_unkAC;            // 0xAC
     };
     class CBumpLight
         : public CLight

@@ -455,6 +455,16 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
  * Address:	TODO
  * Size:	TODO
  */
+CAStar::CATemp::CATemp()
+{
+	memset(this, 0, sizeof(*this));
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CAStar::calcAStar()
 {
 	memset(m_routeTable, 0, sizeof(m_routeTable));
@@ -993,21 +1003,6 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	return 0;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CAStar::CATemp::CATemp()
-{
-	memset(this, 0, sizeof(*this));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 float CAStar::CAPos::CalcLength(CAStar::CAPos& other)
 {
 	return PSVECDistance(&this->m_position, &other.m_position);

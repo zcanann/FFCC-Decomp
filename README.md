@@ -4,7 +4,6 @@ Final Fantasy Crystal Chronicles Decompilation
 [Build Status]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml/badge.svg
 [actions]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml
 [Progress]: https://decomp.dev/zcanann/FFCC-Decomp.svg?mode=shield&measure=code&label=Code&category=all
-[DOL Progress]: https://decomp.dev/zcanann/FFCC-Decomp.svg?mode=shield&measure=code&label=DOL&category=dol
 [progress site]: https://decomp.dev/zcanann/FFCC-Decomp
 This is the decompilation for Final Fantasy Crystal Chronicles for the Nintendo GameCube.
 

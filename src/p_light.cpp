@@ -382,124 +382,33 @@ void CLightPcs::Clear()
  */
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
-    u32* src = reinterpret_cast<u32*>(light);
-    u32 w0 = src[0];
-    u32 w1 = src[1];
-    u32 w2 = src[2];
-    u32 w3 = src[3];
-    u32 w4 = src[4];
-    u32 w5 = src[5];
-    u32 w6 = src[6];
-    float radius = reinterpret_cast<float*>(src)[7];
-    u32 w11 = src[11];
-    u32 w12 = src[12];
-    u32 w13 = src[13];
-    u32 w14 = src[14];
-    u32 w15 = src[15];
-    u32 w16 = src[16];
-    u32 w17 = src[17];
-    u32 w18 = src[18];
-    float intensity = reinterpret_cast<float*>(src)[10];
-    u8 c4d = *(reinterpret_cast<u8*>(src) + 0x4d);
-    u8 c4e = *(reinterpret_cast<u8*>(src) + 0x4e);
-    u8 c4c = *(reinterpret_cast<u8*>(src) + 0x4c);
-    u8 c4f = *(reinterpret_cast<u8*>(src) + 0x4f);
-    int colorR = src[20];
-    int colorG = src[21];
-    int colorB = src[22];
-    u32 w23 = src[23];
-    u32 w25 = src[25];
-    u32 w26 = src[26];
-    u32 w27 = src[27];
-    u32 w28 = src[28];
-    u32 w29 = src[29];
-    u32 w30 = src[30];
-    u32 w31 = src[31];
-    u32 w32 = src[32];
-    u32 w33 = src[33];
-    u32 w34 = src[34];
-    u32 w35 = src[35];
-    u32 w36 = src[36];
-    u32 w37 = src[37];
-    u32 w38 = src[38];
-    u32 w39 = src[39];
-    u32 w40 = src[40];
-    u32 w41 = src[41];
-    u32 w42 = src[42];
-    float maxDist = reinterpret_cast<float*>(src)[8];
+    CLight sceneLight = *light;
+    float attenRadius = sceneLight.m_attenRadius;
+    u8* targetEnable = reinterpret_cast<u8*>(&sceneLight.m_targetEnableMask);
 
-    if (FLOAT_8032fc10 <= reinterpret_cast<float*>(src)[8]) {
-        maxDist = radius;
+    if (FLOAT_8032fc10 <= sceneLight.m_attenFalloff) {
+        sceneLight.m_attenFalloff = attenRadius;
     }
 
-    float absRadius = radius;
-    if (radius < FLOAT_8032fc14) {
-        absRadius = -radius;
+    if (attenRadius < FLOAT_8032fc14) {
+        attenRadius = -attenRadius;
     }
-    absRadius = absRadius * FLOAT_8032fc18;
+    sceneLight.m_range = attenRadius * FLOAT_8032fc18 * sceneLight.m_radius;
 
-    u32 colorMask = 0x01010101;
-    if (colorR == 0) {
-        colorMask = 0x00010101;
+    sceneLight.m_targetEnableMask = 0x01010101;
+    if (*(u32*)&sceneLight.m_targetColor[0] == 0) {
+        targetEnable[0] = 0;
     }
-    if (colorG == 0) {
-        colorMask = (colorMask & 0xFF0000FF) | ((colorMask >> 8) & 0x0000FF00);
+    if (*(u32*)&sceneLight.m_targetColor[1] == 0) {
+        targetEnable[1] = 0;
     }
-    if (colorB == 0) {
-        colorMask = (colorMask & 0xFFFF00FF) | ((colorMask >> 16) & 0x000000FF);
+    if (*(u32*)&sceneLight.m_targetColor[2] == 0) {
+        targetEnable[2] = 0;
     }
 
-    int index = m_sceneLightCount;
-    m_sceneLightCount = index + 1;
-
-    u32* dst = reinterpret_cast<u32*>(&m_sceneLights[index]);
-    dst[0] = w0;
-    dst[1] = w1;
-    dst[2] = w2;
-    dst[3] = w3;
-    dst[4] = w4;
-    dst[5] = w5;
-    dst[6] = w6;
-    reinterpret_cast<float*>(dst)[7] = radius;
-    reinterpret_cast<float*>(dst)[8] = maxDist;
-    reinterpret_cast<float*>(dst)[9] = absRadius * intensity;
-    reinterpret_cast<float*>(dst)[10] = intensity;
-    dst[11] = w11;
-    dst[12] = w12;
-    dst[13] = w13;
-    dst[14] = w14;
-    dst[15] = w15;
-    dst[16] = w16;
-    dst[17] = w17;
-    dst[18] = w18;
-    *(reinterpret_cast<u8*>(dst) + 0x4c) = c4c;
-    *(reinterpret_cast<u8*>(dst) + 0x4d) = c4d;
-    *(reinterpret_cast<u8*>(dst) + 0x4e) = c4e;
-    *(reinterpret_cast<u8*>(dst) + 0x4f) = c4f;
-    dst[20] = colorR;
-    dst[21] = colorG;
-    dst[22] = colorB;
-    dst[23] = w23;
-    dst[24] = colorMask;
-    dst[25] = w25;
-    dst[26] = w26;
-    dst[27] = w27;
-    dst[28] = w28;
-    dst[29] = w29;
-    dst[30] = w30;
-    dst[31] = w31;
-    dst[32] = w32;
-    dst[33] = w33;
-    dst[34] = w34;
-    dst[35] = w35;
-    dst[36] = w36;
-    dst[37] = w37;
-    dst[38] = w38;
-    dst[39] = w39;
-    dst[40] = w40;
-    dst[41] = w41;
-    dst[42] = w42;
-    reinterpret_cast<float*>(dst)[43] = radius * radius;
+    sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
+    m_sceneLights[m_sceneLightCount] = sceneLight;
+    m_sceneLightCount += 1;
 }
 
 /*

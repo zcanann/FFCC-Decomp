@@ -105,11 +105,10 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     _pppMngSt* pppMngSt = pppMngStPtr;
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
-    f32 zero = gPppYmMoveParabolaZero;
 
-    work->m_acceleration = zero;
-    work->m_velocity = zero;
-    work->m_distance = zero;
+    work->m_acceleration = 0.0f;
+    work->m_velocity = 0.0f;
+    work->m_distance = 0.0f;
     work->m_frame = 1;
 
     if ((s32)Game.m_currentSceneId == 7) {

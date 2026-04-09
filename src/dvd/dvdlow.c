@@ -17,7 +17,7 @@ static volatile BOOL WaitingCoverClose = FALSE;
 static volatile BOOL Breaking = FALSE;
 static volatile u32 WorkAroundType = 0;
 static u32 WorkAroundSeekLocation = 0;
-static u32 LastReadIssued = 0;
+static volatile u32 LastReadIssued = 0;
 static volatile OSTime LastReadFinished = 0;
 extern volatile BOOL LastCommandWasRead;
 extern volatile u32 NextCommandNumber;

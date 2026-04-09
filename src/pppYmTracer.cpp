@@ -402,34 +402,40 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
  */
 void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
+    u8* colorData;
     TracerWork* work;
     TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
     CTexture* texture;
     s32 i;
-    s32 serializedOffset0;
-    s32 serializedOffset1;
+    s32 dataOffset;
+    s32 colorOffset;
+    s32 dataValIndex;
     PackedColor colorTop;
     PackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
-    int textureIndex;
+    int textureIndex[2];
 
-    serializedOffset0 = *param_3->m_serializedDataOffsets;
-    serializedOffset1 = param_3->m_serializedDataOffsets[1];
-    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + serializedOffset0);
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+    dataOffset = *param_3->m_serializedDataOffsets;
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    work = (TracerWork*)((u8*)pppYmTracer + 0x80 + dataOffset);
+    colorData = (u8*)pppYmTracer + 0x80 + colorOffset;
+    poly = work->entries;
+    dataValIndex = param_2->m_dataValIndex;
+    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
 
-    if (param_2->m_dataValIndex != 0xFFFF) {
+    if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix02, FLOAT_803306e8,
+            colorData + 8, (void*)&ppvCameraMatrix02, FLOAT_803306e8,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-        textureIndex = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        textureIndex[0] = 0;
+        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
+                                                                     textureIndex[0]);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
@@ -448,7 +454,6 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
             uvStep = FLOAT_803306ec / (f32)work->count;
             GXSetCullMode(GX_CULL_NONE);
-            poly = work->entries;
 
             for (i = 0; i < (s32)(work->count - 1); i++) {
                 if (((poly->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&

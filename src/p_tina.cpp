@@ -72,6 +72,7 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 extern char DAT_801ead4c[];
 extern char DAT_801d81d4[];
 extern char s_p_tina_rodata_801d7ee0[];
+extern char s_p_tina_cpp_801d8008[];
 extern char s_CPartPcs_801d7f54[];
 extern char s_CPartPcs_dat_801d810c[];
 extern char s_CPartPcs_amem_801d811c[];
@@ -797,15 +798,15 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x308);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x308);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
-    OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x30f);
-    OSStopStopwatch(&g_par_draw_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x30f);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }
 
@@ -820,15 +821,15 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x31a);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x31a);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
-    OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x322);
-    OSStopStopwatch(&g_par_draw_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x322);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }
 

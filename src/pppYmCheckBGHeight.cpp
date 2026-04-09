@@ -8,7 +8,7 @@
 
 
 extern "C" {
-    int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
+    int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
     void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }

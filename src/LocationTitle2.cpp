@@ -164,7 +164,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         LocationTitle2Particle* particles;
         LocationTitle2MngRaw* mng;
         CGObject* owner;
-        CCharaPcs::CHandle* modelHandle;
         CChara::CModel* model;
         LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
@@ -258,6 +257,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
                 interpIt = interp;
                 for (int i = 0; i < inserted; i++) {
+                    Vec interpPos;
                     LocationTitle2Particle* dst;
 
                     dst = &particles[startIndex + i + 1];

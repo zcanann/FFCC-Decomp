@@ -407,10 +407,10 @@ void CMapAnimNode::Interp(int frame)
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
                 unsigned int endFrame;
 
-                if (nextIndex == 0) {
-                    endFrame = next->frame + loopFrameCount;
-                } else {
+                if (nextIndex != 0) {
                     endFrame = next->frame;
+                } else {
+                    endFrame = next->frame + loopFrameCount;
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -455,12 +455,12 @@ void CMapAnimNode::Interp(int frame)
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
                 unsigned int endFrame;
 
-                if (nextIndex == 0) {
+                if (nextIndex != 0) {
+                    endFrame = next->frame;
+                } else {
                     endFrame =
                         next->frame +
                         static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
-                } else {
-                    endFrame = next->frame;
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -505,12 +505,12 @@ void CMapAnimNode::Interp(int frame)
                 CMapAnimNodeTrackKey* next = keys + nextIndex;
                 unsigned int endFrame;
 
-                if (nextIndex == 0) {
+                if (nextIndex != 0) {
+                    endFrame = next->frame;
+                } else {
                     endFrame =
                         next->frame +
                         static_cast<unsigned int>((nodeData->mapAnim->endFrame - nodeData->mapAnim->startFrame) + 1);
-                } else {
-                    endFrame = next->frame;
                 }
 
                 unsigned int currentFrame = current->frame;

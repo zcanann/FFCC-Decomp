@@ -454,42 +454,48 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	register float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) == 0) {
-			*outData = 0.0f;
-		} else if ((flags & 3) == 1) {
-			i2f_5(outData, inData);
-			inData++;
+		if ((flags & 3) != 0) {
+			if ((flags & 3) == 1) {
+				i2f_5(outData, inData);
+				inData++;
+			} else {
+				i2f2_5(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
+				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			}
 		} else {
-			i2f2_5(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
-			inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			*outData = 0.0f;
 		}
 		flags >>= 2;
 		outData++;
 	}
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) == 0) {
-			*outData = 0.0f;
-		} else if ((flags & 3) == 1) {
-			i2f_6(outData, inData);
-			inData++;
+		if ((flags & 3) != 0) {
+			if ((flags & 3) == 1) {
+				i2f_6(outData, inData);
+				inData++;
+			} else {
+				i2f2_6(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
+				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			}
 		} else {
-			i2f2_6(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
-			inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			*outData = 0.0f;
 		}
 		flags >>= 2;
 		outData++;
 	}
 
 	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) == 0) {
+		if ((flags & 3) != 0) {
+			if ((flags & 3) == 1) {
+				i2f_7(outData, inData);
+				inData++;
+			} else {
+				i2f2_7(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
+				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
+			}
+		} else {
 			*outData = 1.0f;
-		} else if ((flags & 3) == 1) {
-			i2f_7(outData, inData);
-			inData++;
-		} else {
-			i2f2_7(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameOffset), frameFrac);
-			inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (animFields.m_frameCount + 1) * 2);
 		}
 		flags >>= 2;
 		outData++;

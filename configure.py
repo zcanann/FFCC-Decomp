@@ -448,7 +448,11 @@ config.libs = [
             Object(NonMatching, "menu_compa.cpp"),
             Object(NonMatching, "menu_equip.cpp"),
             Object(NonMatching, "menu_favo.cpp"),
-            Object(NonMatching, "menu_item.cpp"),
+            Object(
+                NonMatching,
+                "menu_item.cpp",
+                cflags=replace_flag_prefix(cflags_game_cpp_exceptions, "-inline ", "-inline auto,deferred"),
+            ),
             Object(NonMatching, "menu_letter.cpp"),
             Object(NonMatching, "menu_lst.cpp"),
             Object(NonMatching, "menu_money.cpp"),

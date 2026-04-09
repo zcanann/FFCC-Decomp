@@ -104,115 +104,117 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         return;
     }
 
-    if (state->countdown == 0) {
-        int count;
-        VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
-        VertexApEntry* entry;
-        Vec* points = *(Vec**)((u8*)parent + 0x70);
-        entry = &env->entries[data->entryIndex];
-
-        if (points == 0) {
-            u32* srcTable = *(u32**)((u8*)env + 0x8);
-            VertexApSource* src = *(VertexApSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
-            points = src->points;
-        }
-
-        count = data->spawnCount;
-
-        switch (data->mode) {
-        case 0:
-            while (count-- != 0) {
-                if (state->index >= entry->maxValue) {
-                    state->index = 0;
-                }
-
-                u16 outValue = state->index;
-                u16* vertexIndices = entry->vertexIndices;
-                state->index++;
-                u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
-
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
-                    _pppPObject* child;
-                    _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
-                    Vec pos;
-                    Vec* dst;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(pppMngStPtr, childData);
-                        *(void**)((u8*)child + 0x4) = parent;
-                    }
-
-                    pos.x = x;
-                    pos.y = y;
-                    pos.z = z;
-                    PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-                    dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-
-                    if (data->useWorldMtx == 0) {
-                        dst->x = pos.x;
-                        dst->y = pos.y;
-                        dst->z = pos.z;
-                    } else {
-                        PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, dst);
-                    }
-                }
-            }
-            break;
-        case 1:
-            while (count-- != 0) {
-                f32 randValue = Math.RandF();
-                f32 maxValue = (f32)entry->maxValue;
-                int outValue = (int)(randValue * maxValue);
-                u16* vertexIndices = entry->vertexIndices;
-                u16 vertexIndex = vertexIndices[outValue];
-                Vec* vertex = &points[vertexIndex];
-                f32 x = vertex->x;
-                f32 y = vertex->y;
-                f32 z = vertex->z;
-
-                if ((data->childId + 0x10000) != 0xFFFF) {
-                    s32 childId = data->childId;
-                    _pppPObject* child;
-                    _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
-                    Vec pos;
-                    Vec* dst;
-
-                    if (childData == 0) {
-                        child = 0;
-                    } else {
-                        child = pppCreatePObject(pppMngStPtr, childData);
-                        *(void**)((u8*)child + 0x4) = parent;
-                    }
-
-                    pos.x = x;
-                    pos.y = y;
-                    pos.z = z;
-                    PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-                    dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-
-                    if (data->useWorldMtx == 0) {
-                        dst->x = pos.x;
-                        dst->y = pos.y;
-                        dst->z = pos.z;
-                    } else {
-                        PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, dst);
-                    }
-                }
-            }
-            break;
-        }
-
-        state->countdown = data->spawnDelay;
+    if (state->countdown != 0) {
+        state->countdown--;
+        return;
     }
 
+    int count;
+    VertexApEnv* env = (VertexApEnv*)pppEnvStPtr;
+    VertexApEntry* entry;
+    Vec* points = *(Vec**)((u8*)parent + 0x70);
+    entry = &env->entries[data->entryIndex];
+
+    if (points == 0) {
+        u32* srcTable = *(u32**)((u8*)env + 0x8);
+        VertexApSource* src = *(VertexApSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
+        points = src->points;
+    }
+
+    count = data->spawnCount;
+
+    switch (data->mode) {
+    case 0:
+        while (count-- != 0) {
+            if (state->index >= entry->maxValue) {
+                state->index = 0;
+            }
+
+            u16 outValue = state->index;
+            u16* vertexIndices = entry->vertexIndices;
+            state->index++;
+            u16 vertexIndex = vertexIndices[outValue];
+            Vec* vertex = &points[vertexIndex];
+            f32 x = vertex->x;
+            f32 y = vertex->y;
+            f32 z = vertex->z;
+
+            if ((data->childId + 0x10000) != 0xFFFF) {
+                s32 childId = data->childId;
+                _pppPObject* child;
+                _pppPDataVal* childData =
+                    (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                Vec pos;
+                Vec* dst;
+
+                if (childData == 0) {
+                    child = 0;
+                } else {
+                    child = pppCreatePObject(pppMngStPtr, childData);
+                    *(void**)((u8*)child + 0x4) = parent;
+                }
+
+                pos.x = x;
+                pos.y = y;
+                pos.z = z;
+                PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
+                dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+
+                if (data->useWorldMtx == 0) {
+                    dst->x = pos.x;
+                    dst->y = pos.y;
+                    dst->z = pos.z;
+                } else {
+                    PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, dst);
+                }
+            }
+        }
+        break;
+    case 1:
+        while (count-- != 0) {
+            f32 randValue = Math.RandF();
+            f32 maxValue = (f32)entry->maxValue;
+            int outValue = (int)(randValue * maxValue);
+            u16* vertexIndices = entry->vertexIndices;
+            u16 vertexIndex = vertexIndices[outValue];
+            Vec* vertex = &points[vertexIndex];
+            f32 x = vertex->x;
+            f32 y = vertex->y;
+            f32 z = vertex->z;
+
+            if ((data->childId + 0x10000) != 0xFFFF) {
+                s32 childId = data->childId;
+                _pppPObject* child;
+                _pppPDataVal* childData =
+                    (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+                Vec pos;
+                Vec* dst;
+
+                if (childData == 0) {
+                    child = 0;
+                } else {
+                    child = pppCreatePObject(pppMngStPtr, childData);
+                    *(void**)((u8*)child + 0x4) = parent;
+                }
+
+                pos.x = x;
+                pos.y = y;
+                pos.z = z;
+                PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
+                dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+
+                if (data->useWorldMtx == 0) {
+                    dst->x = pos.x;
+                    dst->y = pos.y;
+                    dst->z = pos.z;
+                } else {
+                    PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, dst);
+                }
+            }
+        }
+        break;
+    }
+
+    state->countdown = data->spawnDelay;
     state->countdown--;
 }

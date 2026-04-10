@@ -86,6 +86,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XWork* work;
     KeShpTail2XObject* tailObj;
     Vec pos;
+    Vec historyPos ATTRIBUTE_ALIGN(8);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -96,8 +97,6 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     work = (KeShpTail2XWork*)((u8*)obj + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0] + 0x80);
 
     if (tailObj->m_obj.m_graphId == 0) {
-        Vec historyPos ATTRIBUTE_ALIGN(8);
-
         if (step->m_worldSpaceMode == 0) {
             pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
             pos.y = tailObj->m_obj.m_localMatrix.value[1][3];

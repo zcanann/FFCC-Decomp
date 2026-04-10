@@ -74,7 +74,8 @@ void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
 
     uvLayout = (CMapMeshUVLayout*)model;
     uvByteOffset = 0;
-    for (i = uvByteOffset; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+    i = 0;
+    for (; i < (s32)(u16)uvLayout->m_uvCount; i++) {
         if (perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
             perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
         }
@@ -112,6 +113,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
     pppModelSt* model;
+    f32 per;
 
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
     work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
@@ -121,8 +123,9 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     OSReport(DAT_801d9c54);
 
     model = (pppModelSt*)GetMapMeshTable()[0];
-    work->m_perU = FLOAT_8033054c;
-    work->m_perV = work->m_perU;
+    per = FLOAT_8033054c;
+    work->m_perU = per;
+    work->m_perV = per;
 
     if (model != NULL) {
         SetUpPerUV(model, work->m_perU, work->m_perV);

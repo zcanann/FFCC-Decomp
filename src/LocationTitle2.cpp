@@ -160,7 +160,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     if (work->m_particles == 0) {
         LocationTitle2Particle* particles;
         CGObject* owner;
-        CCharaPcs::CHandle* handle;
         CChara::CModel* model;
         LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
@@ -174,13 +173,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         particles = (LocationTitle2Particle*)work->m_particles;
 
         owner = (CGObject*)pppMngStPtr->m_owner;
-        handle = 0;
         model = 0;
         if (owner->m_charaModelHandle != 0) {
-            handle = owner->m_charaModelHandle;
-        }
-        if (handle != 0) {
-            model = handle->m_model;
+            model = owner->m_charaModelHandle->m_model;
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
@@ -254,13 +249,11 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
                 interpIt = interp;
                 for (int i = 0; i < inserted; i++) {
-                    Vec interpPos;
                     LocationTitle2Particle* dst;
 
                     dst = &particles[startIndex + i + 1];
                     interpIt->z = (float)((double)interpIt->z + zOffset);
-                    interpPos = *interpIt;
-                    pppCopyVector(dst->m_pos, interpPos);
+                    pppCopyVector(dst->m_pos, *interpIt);
                     memcpy(&dst->m_color, &colorData->m_color, 4);
                     dst->m_pad0 = 0;
                     dst->m_shape = 0;

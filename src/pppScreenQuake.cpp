@@ -62,17 +62,19 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
  */
 void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
 {
+    float val = kPppScreenQuakeZero;
+
     CameraPcs.SetQuakeParameter(
         0,
         0,
         0,
         0,
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
+        val,
+        val,
+        val,
+        val,
+        val,
+        val,
         1);
 }
 

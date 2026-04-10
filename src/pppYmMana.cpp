@@ -1000,78 +1000,81 @@ void MakeWave(Vec*, unsigned short*, float*, Vec&, float, float)
  */
 int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size)
 {
-    float fVar1;
-    float fVar2;
-    float fVar3;
-    float fVar4;
-    float fVar5;
-    int iVar7;
-    short sVar8;
-    short sVar10;
-    float* pfVar11;
-    int iVar12;
-    float* pfVar13;
-    float* pfVar14;
-    unsigned int uVar15;
-    unsigned int uVar16;
-    int iVar17;
-    double dVar18;
+    float zero;
+    float normalY;
+    float radius;
+    float step;
+    float uvStep;
+    float x;
+    float z;
+    float rowUv;
+    int indexOffset;
+    int quadIndex;
+    int rowBase;
+    float* positions;
+    int rowCount;
+    float* normals;
+    float* uvs;
+    int colCount;
+    int pairCount;
 
-    fVar5 = FLOAT_80330e58;
-    fVar4 = FLOAT_80330e4c;
-    uVar16 = 0;
-    dVar18 = (double)FLOAT_80330e6c;
-    fVar1 = (float)((double)size * (double)FLOAT_80330e5c);
-    for (fVar3 = fVar1; -fVar1 <= fVar3; fVar3 = fVar3 - (float)((double)size * dVar18)) {
-        uVar15 = 0;
-        pfVar11 = reinterpret_cast<float*>(positionsInOut);
-        pfVar13 = reinterpret_cast<float*>(normalsOut);
-        pfVar14 = reinterpret_cast<float*>(uvOut);
-        for (fVar2 = -fVar1; fVar2 <= fVar1; fVar2 = fVar2 + (float)((double)size * dVar18)) {
-            *pfVar11 = fVar2;
-            positionsInOut = reinterpret_cast<Vec*>(pfVar11 + 3);
-            pfVar11[1] = fVar4;
-            uVar15 = uVar15 + 1;
-            normalsOut = reinterpret_cast<Vec*>(pfVar13 + 3);
-            uvOut = reinterpret_cast<Vec2d*>(pfVar14 + 2);
-            pfVar11[2] = fVar3;
-            pfVar11 = pfVar11 + 3;
-            *pfVar13 = fVar4;
-            pfVar13[1] = fVar5;
-            pfVar13[2] = fVar4;
-            pfVar13 = pfVar13 + 3;
-            *pfVar14 = (float)((double)(int)(uVar15 - 1) * dVar18);
-            pfVar14[1] = (float)((double)(int)uVar16 * dVar18);
-            pfVar14 = pfVar14 + 2;
+    normalY = FLOAT_80330e58;
+    zero = FLOAT_80330e4c;
+    rowCount = 0;
+    uvStep = FLOAT_80330e6c;
+    step = size * uvStep;
+    radius = size * FLOAT_80330e5c;
+    for (z = radius; -radius <= z; z -= step) {
+        colCount = 0;
+        rowUv = static_cast<float>(rowCount) * uvStep;
+        positions = reinterpret_cast<float*>(positionsInOut);
+        normals = reinterpret_cast<float*>(normalsOut);
+        uvs = reinterpret_cast<float*>(uvOut);
+        for (x = -radius; x <= radius; x += step) {
+            *positions = x;
+            positionsInOut = reinterpret_cast<Vec*>(positions + 3);
+            positions[1] = zero;
+            colCount = colCount + 1;
+            normalsOut = reinterpret_cast<Vec*>(normals + 3);
+            uvOut = reinterpret_cast<Vec2d*>(uvs + 2);
+            positions[2] = z;
+            positions = positions + 3;
+            *normals = zero;
+            normals[1] = normalY;
+            normals[2] = zero;
+            normals = normals + 3;
+            *uvs = static_cast<float>(colCount - 1) * uvStep;
+            uvs[1] = rowUv;
+            uvs = uvs + 2;
         }
-        uVar16 = uVar16 + 1;
+        rowCount = rowCount + 1;
     }
-    iVar7 = 0;
-    iVar12 = 0;
-    sVar10 = 0;
+    indexOffset = 0;
+    rowCount = 0;
+    rowBase = 0;
     do {
-        iVar17 = 8;
-        sVar8 = sVar10;
+        pairCount = 8;
+        quadIndex = rowBase;
         do {
-            *(short*)((char*)indicesOut + iVar7) = sVar8;
-            *(short*)((char*)indicesOut + iVar7 + 2) = sVar8 + 1;
-            *(short*)((char*)indicesOut + iVar7 + 4) = sVar8 + 0x12;
-            *(short*)((char*)indicesOut + iVar7 + 6) = sVar8 + 0x12;
-            *(short*)((char*)indicesOut + iVar7 + 8) = sVar8 + 0x11;
-            *(short*)((char*)indicesOut + iVar7 + 10) = sVar8;
-            *(short*)((char*)indicesOut + iVar7 + 0xC) = sVar8 + 1;
-            *(short*)((char*)indicesOut + iVar7 + 0xE) = sVar8 + 2;
-            *(short*)((char*)indicesOut + iVar7 + 0x10) = sVar8 + 0x13;
-            *(short*)((char*)indicesOut + iVar7 + 0x12) = sVar8 + 0x13;
-            *(short*)((char*)indicesOut + iVar7 + 0x14) = sVar8 + 0x12;
-            *(short*)((char*)indicesOut + iVar7 + 0x16) = sVar8 + 1;
-            sVar8 = sVar8 + 2;
-            iVar7 = iVar7 + 0x18;
-            iVar17 = iVar17 + -1;
-        } while (iVar17 != 0);
-        iVar12 = iVar12 + 1;
-        sVar10 = sVar10 + 0x11;
-    } while (iVar12 < 0x10);
+            *(short*)((char*)indicesOut + indexOffset) = (short)quadIndex;
+            *(short*)((char*)indicesOut + indexOffset + 2) = (short)(quadIndex + 1);
+            *(short*)((char*)indicesOut + indexOffset + 4) = (short)(quadIndex + 0x12);
+            *(short*)((char*)indicesOut + indexOffset + 6) = (short)(quadIndex + 0x12);
+            *(short*)((char*)indicesOut + indexOffset + 8) = (short)(quadIndex + 0x11);
+            *(short*)((char*)indicesOut + indexOffset + 10) = (short)quadIndex;
+            *(short*)((char*)indicesOut + indexOffset + 0xC) = (short)(quadIndex + 1);
+            *(short*)((char*)indicesOut + indexOffset + 0xE) = (short)(quadIndex + 2);
+            *(short*)((char*)indicesOut + indexOffset + 0x10) = (short)(quadIndex + 0x13);
+            *(short*)((char*)indicesOut + indexOffset + 0x12) = (short)(quadIndex + 0x13);
+            *(short*)((char*)indicesOut + indexOffset + 0x14) = (short)(quadIndex + 0x12);
+            *(short*)((char*)indicesOut + indexOffset + 0x16) = (short)(quadIndex + 1);
+            quadIndex = quadIndex + 2;
+            indexOffset = indexOffset + 0x18;
+            pairCount = pairCount + -1;
+        } while (pairCount != 0);
+        rowCount = rowCount + 1;
+        rowBase = rowBase + 0x11;
+    } while (rowCount < 0x10);
     return 1;
 }
 

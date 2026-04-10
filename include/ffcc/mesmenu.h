@@ -17,7 +17,7 @@ public:
     void DrawHeart(float, float, float, float);
     void onScriptChanging(char*);
     void onScriptChanged(char*, int);
-    void Open(char*, int, int, int, int, int, int);
+    void Open(char*, unsigned int, unsigned int, unsigned int, int, int, int);
     void CloseRequest(int);
     void close(int);
     void SetPos(float, float);

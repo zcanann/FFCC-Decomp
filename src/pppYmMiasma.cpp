@@ -457,7 +457,6 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
     int i;
     PARTICLE_DATA* particle;
     Vec matrixPos;
-    Vec oldPos;
     Vec delta;
     union {
         unsigned long long ull;
@@ -531,13 +530,12 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
     matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
     matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
     matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
-    oldPos = work->m_prevPosition;
 
-    pppSubVector(delta, matrixPos, oldPos);
-    if ((double)PSVECDistance(&matrixPos, &work->m_prevPosition) == (double)FLOAT_80330644) {
-        work->m_prevPositionChanged = 0;
-    } else {
+    pppSubVector(delta, matrixPos, work->m_prevPosition);
+    if (PSVECDistance(&matrixPos, &work->m_prevPosition) != FLOAT_80330644) {
         work->m_prevPositionChanged = 0xff;
+    } else {
+        work->m_prevPositionChanged = 0;
     }
 
     pppCopyVector(work->m_prevPosition, matrixPos);

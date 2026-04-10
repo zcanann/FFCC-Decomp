@@ -61,23 +61,25 @@ void main(int argc, char** argv)
  */
 void game(int argc, char** argv)
 {
-    int i;
-    int copyScriptName;
-    int parseLanguage;
+    char c;
+    bool copyScriptName;
+    bool parseLanguage;
+    int cmp;
     char** argument;
+    int i;
 
     Game.Init();
     strcpy(Game.m_startScriptName, kDefaultScriptName);
 
     if (argc != 0) {
-        copyScriptName = 0;
-        parseLanguage = 0;
+        copyScriptName = false;
+        parseLanguage = false;
         for (i = 1, argument = argv + 1; i < argc; i++, argument++) {
             if (copyScriptName) {
                 strcpy(Game.m_startScriptName, *argument);
-                copyScriptName = 0;
+                copyScriptName = false;
             } else if (parseLanguage) {
-                int cmp = strcmp(*argument, kLanguageArgUs);
+                cmp = strcmp(*argument, kLanguageArgUs);
                 if (cmp == 0) {
                     Game.m_gameWork.m_languageId = 1;
                 } else {
@@ -108,17 +110,17 @@ void game(int argc, char** argv)
                         }
                     }
                 }
-                parseLanguage = 0;
+                parseLanguage = false;
             } else {
-                char c = (*argument)[0];
+                c = (*argument)[0];
                 if ((c == '-') || (c == '/')) {
                     c = (*argument)[1];
                     switch (c) {
                     case 'f':
-                        copyScriptName = 1;
+                        copyScriptName = true;
                         break;
                     case 'l':
-                        parseLanguage = 1;
+                        parseLanguage = true;
                         break;
                     }
                 }

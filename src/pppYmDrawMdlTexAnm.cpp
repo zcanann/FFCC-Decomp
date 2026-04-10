@@ -259,10 +259,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     pppYmDrawMdlTexAnmColorBlock* colorBlock;
     pppModelSt* model;
     pppFMATRIX matrix0;
-    pppFMATRIX matrix1;
     pppFMATRIX matrix2;
-    pppFMATRIX matrix3;
-    pppFMATRIX matrix4;
     u8* initBytes;
     u8* stepBytes;
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
@@ -273,15 +270,11 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 
     colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
 
-    pppUnitMatrix(matrix4);
-    matrix2 = matrix4;
+    pppUnitMatrix(matrix2);
     matrix2.value[2][2] *= FLOAT_80330548;
 
-    matrix1 = ymDrawMdlTexAnm->m_localMatrix;
-    pppMulMatrix(matrix0, matrix1, matrix2);
-
-    matrix3 = *(pppFMATRIX*)&ppvCameraMatrix02;
-    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, matrix3, matrix0);
+    pppMulMatrix(matrix0, ymDrawMdlTexAnm->m_localMatrix, matrix2);
+    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix0, matrix0);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;

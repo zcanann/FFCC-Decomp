@@ -159,66 +159,66 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     Vec translation;
+    Quaternion resultQuat;
     Quaternion axisQuat;
     Quaternion meshQuat;
-    Quaternion resultQuat;
     float axisX;
     float axisY;
     float axisZ;
     Vec gravityAdd;
     Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
     Vec cameraPos;
-    Vec cameraRefPos;
     Vec cameraOffset;
     Vec cameraForward;
     Vec screenOffset;
-    Vec4d clipInput;
     Vec4d clipOutput;
+    Vec4d clipInput;
     Mtx invTransMtx;
-    Mtx quatMtx;
     Mtx transMtx;
+    Mtx quatMtx;
     Mtx meshMtx;
     Mtx44 screenMtx;
     Mtx invCameraMtx;
     Mtx cameraMtx;
+    ScreenBreakMeshRef* mesh;
 
-    cameraRefPos.x = CameraPosX();
-    cameraRefPos.y = CameraPosY();
-    cameraRefPos.z = CameraPosZ();
     cameraForward.x = CameraDirX();
     cameraForward.y = CameraDirY();
     cameraForward.z = CameraDirZ();
+    cameraPos.x = CameraPosX();
+    cameraPos.y = CameraPosY();
+    cameraPos.z = CameraPosZ();
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), screenMtx);
 
-    PSVECCrossProduct(&cameraForward, &basis, &cameraPos);
-    PSVECNormalize(&cameraPos, &cameraPos);
+    PSVECCrossProduct(&cameraForward, &basis, &cameraOffset);
+    PSVECNormalize(&cameraOffset, &cameraOffset);
 
-    cameraOffset.x = *(float*)((u8*)param_2 + 0x18) * cameraPos.x + cameraRefPos.x;
-    cameraOffset.y = cameraRefPos.y;
-    cameraOffset.z = *(float*)((u8*)param_2 + 0x18) * cameraPos.z + cameraRefPos.z;
+    screenOffset.x = *(float*)((u8*)param_2 + 0x18) * cameraOffset.x + cameraPos.x;
+    screenOffset.y = cameraPos.y;
+    screenOffset.z = *(float*)((u8*)param_2 + 0x18) * cameraOffset.z + cameraPos.z;
 
-    PSMTXMultVec(cameraMtx, &cameraOffset, (Vec*)&clipInput);
+    PSMTXMultVec(cameraMtx, &screenOffset, (Vec*)&clipInput);
     clipInput.w = FLOAT_80331cd0;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &clipInput, &clipOutput);
 
-    screenOffset.x = clipOutput.x * cameraForward.x;
-    screenOffset.y = clipOutput.x * cameraForward.y;
-    screenOffset.z = clipOutput.x * cameraForward.z;
-    PSVECAdd(&cameraRefPos, &screenOffset, &screenOffset);
+    translation.x = clipOutput.x * cameraForward.x;
+    translation.y = clipOutput.x * cameraForward.y;
+    translation.z = clipOutput.x * cameraForward.z;
+    PSVECAdd(&cameraPos, &translation, &translation);
 
     PSMTXInverse(cameraMtx, invCameraMtx);
     PSMTXConcat(invCameraMtx, modelView->m_drawMtx, modelView->m_drawMtx);
-    modelView->m_drawMtx[0][3] = screenOffset.x;
-    modelView->m_drawMtx[1][3] = screenOffset.y;
-    modelView->m_drawMtx[2][3] = screenOffset.z;
+    modelView->m_drawMtx[0][3] = translation.x;
+    modelView->m_drawMtx[1][3] = translation.y;
+    modelView->m_drawMtx[2][3] = translation.z;
 
+    mesh = modelView->m_meshes;
     if (*(float*)((u8*)param_3 + 0x30) != 0.0f) {
         PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }
 
-    ScreenBreakMeshRef* mesh = modelView->m_meshes;
     for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
         if (*((char*)pieceData + 0x38) != '\0') {
             u8* node = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0);
@@ -257,13 +257,13 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 
             pieceData[0xC] += FLOAT_80331cd0;
 
-            translation.x = invTransMtx[0][3];
-            translation.y = invTransMtx[1][3];
-            translation.z = invTransMtx[2][3];
-            PSVECAdd((Vec*)(pieceData + 3), &translation, &translation);
-            invTransMtx[0][3] = translation.x;
-            invTransMtx[1][3] = translation.y;
-            invTransMtx[2][3] = translation.z;
+            screenOffset.x = invTransMtx[0][3];
+            screenOffset.y = invTransMtx[1][3];
+            screenOffset.z = invTransMtx[2][3];
+            PSVECAdd((Vec*)(pieceData + 3), &screenOffset, &screenOffset);
+            invTransMtx[0][3] = screenOffset.x;
+            invTransMtx[1][3] = screenOffset.y;
+            invTransMtx[2][3] = screenOffset.z;
             PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
         }
 

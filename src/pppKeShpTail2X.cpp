@@ -86,6 +86,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XWork* work;
     KeShpTail2XObject* tailObj;
     Vec pos;
+    Vec historyPos ATTRIBUTE_ALIGN(8);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -96,8 +97,6 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     work = (KeShpTail2XWork*)((u8*)obj + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0] + 0x80);
 
     if (tailObj->m_obj.m_graphId == 0) {
-        Vec historyPos ATTRIBUTE_ALIGN(8);
-
         if (step->m_worldSpaceMode == 0) {
             pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
             pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
@@ -145,18 +144,15 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* shape = (u8*)*shapeTable;
         KeShpTail2XShapeFrame* frameEntry;
-        s16 frameDuration;
         u16 shapeFrame;
 
         shapeFrame = work->m_shapeFrame;
         work->m_shapePrevFrame = shapeFrame;
 
         work->m_frameAcc += step->m_frameStep;
-        frameEntry =
-            reinterpret_cast<KeShpTail2XShapeFrame*>(shape + ((u32)shapeFrame << 3) + 0x10);
-        frameDuration = frameEntry->m_duration;
-        if (work->m_frameAcc >= frameDuration) {
-            work->m_frameAcc -= frameDuration;
+        frameEntry = reinterpret_cast<KeShpTail2XShapeFrame*>(shape + ((u32)shapeFrame << 3) + 0x10);
+        if (work->m_frameAcc >= frameEntry->m_duration) {
+            work->m_frameAcc -= frameEntry->m_duration;
             work->m_shapeFrame++;
             if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
                 if ((frameEntry->m_flags & 0x80) != 0) {

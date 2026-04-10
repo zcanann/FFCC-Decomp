@@ -50,43 +50,6 @@ void TRKRestoreExtended1Block(void);
 int InitMetroTRKCommTable(int);
 void TRK_board_display(char*);
 
-int gdev_cc_initialize(void* flagOut, __OSInterruptHandler handler);
-int gdev_cc_shutdown(void);
-int gdev_cc_open(void);
-int gdev_cc_close(void);
-int gdev_cc_read(u8* dest, int size);
-int gdev_cc_write(const u8* src, int size);
-int gdev_cc_pre_continue(void);
-int gdev_cc_post_stop(void);
-int gdev_cc_peek(void);
-int gdev_cc_initinterrupts(void);
-
-int udp_cc_initialize(void);
-int udp_cc_shutdown(void);
-int udp_cc_open(void);
-int udp_cc_close(void);
-int udp_cc_read(u8* dest, int size);
-int udp_cc_write(const u8* src, int size);
-int udp_cc_pre_continue(void);
-int udp_cc_post_stop(void);
-int udp_cc_peek(void);
-int udp_cc_initinterrupts(void);
-
-#define DDH_ERR_NOT_INITIALIZED     -0x2711
-#define DDH_ERR_ALREADY_INITIALIZED -0x2715
-#define DDH_ERR_READ_ERROR          -0x2719
-
-int ddh_cc_initialize(void* flagOut, __OSInterruptHandler handler);
-int ddh_cc_shutdown(void);
-int ddh_cc_open(void);
-int ddh_cc_close(void);
-int ddh_cc_read(u8* dest, int size);
-int ddh_cc_write(const u8* src, int size);
-int ddh_cc_pre_continue(void);
-int ddh_cc_post_stop(void);
-int ddh_cc_peek(void);
-int ddh_cc_initinterrupts(void);
-
 void TRKConstructEvent(TRKEvent* event, NubEventType eventType);
 void TRKDestructEvent(TRKEvent* event);
 DSError TRKPostEvent(TRKEvent* event);

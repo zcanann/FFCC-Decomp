@@ -378,8 +378,8 @@ void CFunnyShape::Update()
 
                 if (noSpread != 0) {
                     work->frame = 0;
-                    work->x = FLOAT_8032fd6c;
                     work->y = FLOAT_8032fd6c;
+                    work->x = FLOAT_8032fd6c;
                 }
             }
 

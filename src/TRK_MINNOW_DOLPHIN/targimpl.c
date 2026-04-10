@@ -176,8 +176,8 @@ DSError TRKValidMemory32(const void* addr, size_t length,
 {
     DSError err;
     u32 start;
-    u32 end;
     u32 upperEnd;
+    u32 end;
     int i;
 
     start = (u32)addr;

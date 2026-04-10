@@ -378,42 +378,34 @@ s32 THPSimpleSetBuffer(u8* buffer)
 
     frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
     SimpleControl.readBuffer[0].mPtr = buffer;
-    SimpleControl.readBuffer[0].mFrameNumber = 0;
     SimpleControl.readBuffer[0].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[1].mPtr = buffer;
-    SimpleControl.readBuffer[1].mFrameNumber = 0;
     SimpleControl.readBuffer[1].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[2].mPtr = buffer;
-    SimpleControl.readBuffer[2].mFrameNumber = 0;
     SimpleControl.readBuffer[2].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[3].mPtr = buffer;
-    SimpleControl.readBuffer[3].mFrameNumber = 0;
     SimpleControl.readBuffer[3].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[4].mPtr = buffer;
-    SimpleControl.readBuffer[4].mFrameNumber = 0;
     SimpleControl.readBuffer[4].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[5].mPtr = buffer;
-    SimpleControl.readBuffer[5].mFrameNumber = 0;
     SimpleControl.readBuffer[5].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[6].mPtr = buffer;
-    SimpleControl.readBuffer[6].mFrameNumber = 0;
     SimpleControl.readBuffer[6].mIsValid = 0;
     buffer += frameBufferSize;
 
     SimpleControl.readBuffer[7].mPtr = buffer;
-    SimpleControl.readBuffer[7].mFrameNumber = 0;
     SimpleControl.readBuffer[7].mIsValid = 0;
     buffer += frameBufferSize;
 

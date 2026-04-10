@@ -8,13 +8,6 @@
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
-const float FLOAT_80330af4 = 1.0f;
-const float FLOAT_80330b08 = 0.5f;
-const float FLOAT_80330b0c = 0.017453292f;
-const float FLOAT_80330b10 = -2000.0f;
-const float FLOAT_80330b14 = 10000000000.0f;
-const float FLOAT_80330b18 = -10000000000.0f;
-
 extern "C" {
 int rand(void);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
@@ -67,6 +60,17 @@ struct Vec2d {
     f32 y;
 };
 
+struct CMapCylinderRaw {
+    Vec m_bottom;
+    Vec m_direction;
+    f32 m_radius;
+    f32 m_height;
+    Vec m_top;
+    Vec m_direction2;
+    f32 m_radius2;
+    f32 m_height2;
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -101,7 +105,7 @@ extern "C" void CalcPolygonHeight(
     float expand;
     Vec worldBase;
     Vec rayDirection;
-    CMapCylinder cylinder;
+    CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
     u8* colorBytes = (u8*)color;
 
@@ -330,7 +334,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorWork->m_color, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
+        &colorWork->m_color, &ppvCameraMatrix02, kPppYmMeltZero, ctrl->m_payload[0x19],
         ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
     pppSetBlendMode(*(u8*)&ctrl->m_arg3);
 

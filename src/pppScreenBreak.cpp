@@ -151,35 +151,36 @@ void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
-    u8* mesh = *(u8**)((u8*)model + 0xAC);
-    Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
-    Vec cameraForward;
-    Vec cameraPos;
-    Vec cameraRefPos;
-    Vec cameraOffset;
-    Vec screenOffset;
-    Vec gravityAdd;
-    Vec axis;
     Vec translation;
-    Vec4d clipInput;
-    Vec4d clipOutput;
     Quaternion axisQuat;
     Quaternion meshQuat;
     Quaternion resultQuat;
-    Mtx cameraMtx;
-    Mtx invCameraMtx;
-    Mtx meshMtx;
-    Mtx transMtx;
+    float axisX;
+    float axisY;
+    float axisZ;
+    Vec gravityAdd;
+    Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
+    Vec cameraPos;
+    Vec cameraRefPos;
+    Vec cameraOffset;
+    Vec cameraForward;
+    Vec screenOffset;
+    Vec4d clipInput;
+    Vec4d clipOutput;
     Mtx invTransMtx;
     Mtx quatMtx;
+    Mtx transMtx;
+    Mtx meshMtx;
     Mtx44 screenMtx;
+    Mtx invCameraMtx;
+    Mtx cameraMtx;
 
-    cameraForward.x = CameraDirX();
-    cameraForward.y = CameraDirY();
-    cameraForward.z = CameraDirZ();
     cameraRefPos.x = CameraPosX();
     cameraRefPos.y = CameraPosY();
     cameraRefPos.z = CameraPosZ();
+    cameraForward.x = CameraDirX();
+    cameraForward.y = CameraDirY();
+    cameraForward.z = CameraDirZ();
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), screenMtx);
@@ -210,6 +211,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
         PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }
 
+    u8* mesh = *(u8**)((u8*)model + 0xAC);
     for (u32 i = 0; i < *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC); i++) {
         if (*((char*)pieceData + 0x38) != '\0') {
             u8* node = *(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)(mesh + 8) + 0x5C) * 0xC0);
@@ -226,10 +228,10 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             transMtx[2][3] = pieceData[11];
             PSMTXInverse(transMtx, invTransMtx);
 
-            axis.x = pieceData[6];
-            axis.y = pieceData[7];
-            axis.z = pieceData[8];
-            C_QUATRotAxisRad(&axisQuat, &axis, pieceData[0xD]);
+            axisX = pieceData[6];
+            axisY = pieceData[7];
+            axisZ = pieceData[8];
+            C_QUATRotAxisRad(&axisQuat, (Vec*)&axisX, pieceData[0xD]);
             PSMTXQuat(quatMtx, &axisQuat);
             C_QUATMtx(&meshQuat, meshMtx);
             PSQUATMultiply(&axisQuat, &meshQuat, &resultQuat);

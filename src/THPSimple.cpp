@@ -111,7 +111,6 @@ void _kami_DVDREAD(DVDFileInfo*, void*, long, long)
 s32 THPSimpleInit(s32 audioMixMode)
 {
     u32 interruptState;
-    s16* workBuffer;
 
     File.CheckQueue();
     memset(&SimpleControl, 0, sizeof(SimpleControl));
@@ -122,10 +121,10 @@ s32 THPSimpleInit(s32 audioMixMode)
     }
 
     interruptState = OSDisableInterrupts();
+    gTHPSimpleAudioSystem = audioMixMode;
     gTHPSimpleSoundBufferIndex = 0;
     gTHPSimpleCurAudioBuffer = (s16*)NULL;
     gTHPSimpleLastAudioBuffer = (s16*)NULL;
-    gTHPSimpleAudioSystem = audioMixMode;
     gTHPSimpleOldAIDCallback = AIRegisterDMACallback(THPAudioMixCallback);
 
     if ((gTHPSimpleOldAIDCallback == NULL) && (gTHPSimpleAudioSystem != 0)) {
@@ -139,8 +138,7 @@ s32 THPSimpleInit(s32 audioMixMode)
     if (gTHPSimpleAudioSystem == 0) {
         memset(WorkBuffer_32_, 0, 0x500);
         DCFlushRange(WorkBuffer_32_, 0x500);
-        workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280);
-        AIInitDMA((u32)workBuffer, 0x280);
+        AIInitDMA((u32)(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280), 0x280);
         AIStartDMA();
     }
 

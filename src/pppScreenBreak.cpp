@@ -182,15 +182,15 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Mtx cameraMtx;
     ScreenBreakMeshRef* mesh;
 
-    cameraForward.x = CameraDirX();
-    cameraForward.y = CameraDirY();
-    cameraForward.z = CameraDirZ();
-    cameraPos.x = CameraPosX();
-    cameraPos.y = CameraPosY();
-    cameraPos.z = CameraPosZ();
+    cameraForward.x = CameraPcs._236_4_;
+    cameraForward.y = CameraPcs._240_4_;
+    cameraForward.z = CameraPcs._244_4_;
+    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.y = CameraPcs._228_4_;
+    cameraPos.z = CameraPcs._232_4_;
 
-    PSMTXCopy(CameraMatrix(), cameraMtx);
-    PSMTX44Copy(CameraScreenMatrix(), screenMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
     PSVECCrossProduct(&cameraForward, &basis, &cameraOffset);
     PSVECNormalize(&cameraOffset, &cameraOffset);

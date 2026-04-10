@@ -73,14 +73,14 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
-	Vec local_8c;
-	Vec local_ec;
-	Vec local_e0;
+	Vec local_50;
 	Quaternion local_60;
 	Quaternion local_70;
 	Quaternion local_80;
-	Vec directionSource;
-	Vec previousDirectionSource;
+	Vec local_8c;
+	Vec local_98;
+	Vec local_ec;
+	Vec local_f8;
 
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
@@ -101,10 +101,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_8c.y = *(f32*)(ownerBytes + 0x160);
 		local_8c.z = *(f32*)(ownerBytes + 0x164);
 		pppSubVector(local_20, local_8c, pppMngSt->m_position);
-
 		local_20.y = local_20.y + param_2->m_payload;
-		directionSource = local_20;
-		pppNormalize__FR3Vec3Vec((float*)&local_20, &directionSource);
+		pppCopyVector(local_50, local_20);
+		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_50);
 
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
@@ -114,8 +113,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
-		previousDirectionSource = local_2c;
-		pppNormalize__FR3Vec3Vec((float*)&local_2c, &previousDirectionSource);
+		pppCopyVector(local_98, local_2c);
+		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_98);
 	}
 
 	local_60.x = local_20.x;
@@ -129,11 +128,11 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
 	PSQUATNormalize(&local_80, &local_80);
 
-	local_e0.x = local_80.x;
-	local_e0.y = local_80.y;
-	local_e0.z = local_80.z;
-	PSVECScale(&local_e0, &local_e0, work->m_distance * pppMngSt->m_scale);
-	pppAddVector(local_ec, local_e0, pppMngSt->m_position);
+	local_f8.x = local_80.x;
+	local_f8.y = local_80.y;
+	local_f8.z = local_80.z;
+	PSVECScale(&local_f8, &local_f8, work->m_distance * pppMngSt->m_scale);
+	pppAddVector(local_ec, local_f8, pppMngSt->m_position);
 	pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
 	pppCopyVector(pppMngSt->m_position, local_ec);
 

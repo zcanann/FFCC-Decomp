@@ -9,8 +9,6 @@
 #include "ffcc/util.h"
 #include "ffcc/math.h"
 
-#include <string.h>
-
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
@@ -443,9 +441,12 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         1, 0, 0, 0, 0);
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
 
-    memcpy(&drawColor, &colorData->m_color, sizeof(drawColor));
-    GXSetChanMatColor(GX_COLOR0A0, drawColor);
+    GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&colorData->m_color));
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    drawColor.r = colorData->m_color.rgba[0];
+    drawColor.g = colorData->m_color.rgba[1];
+    drawColor.b = colorData->m_color.rgba[2];
+    drawColor.a = colorData->m_color.rgba[3];
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);

@@ -97,6 +97,15 @@ static inline MenuLstList* GetMenuLstListStruct(CMenuPcs* menu)
 	return GetMenuLstMembers(menu).m_lstData;
 }
 
+static inline unsigned char* GetMenuLstPadPtr()
+{
+	unsigned char* padPtr = reinterpret_cast<unsigned char*>(&Pad);
+	if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
+		padPtr += 0x54;
+	}
+	return padPtr;
+}
+
 } // namespace
 
 /*
@@ -269,9 +278,8 @@ int CMenuPcs::MLstOpen()
  */
 void CMenuPcs::MLstCtrl()
 {
-	MenuLstMembers& members = GetMenuLstMembers(this);
 	bool blocked;
-	bool resetAnim;
+	float one;
 	unsigned short press;
 	unsigned short hold;
 	unsigned int itemCount;
@@ -280,76 +288,77 @@ void CMenuPcs::MLstCtrl()
 	int startFrame;
 	int offset;
 	unsigned int chunkCount;
-	int menuState;
+	MenuLstState* state;
+	MenuLstList* list;
 
+	state = GetMenuLstStateStruct(this);
+	list = GetMenuLstListStruct(this);
 	blocked = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		press = 0;
 	} else {
-		press = Pad._8_2_;
+		press = *(unsigned short*)(GetMenuLstPadPtr() + 8);
 	}
 
 	blocked = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+		hold = *(unsigned short*)(GetMenuLstPadPtr() + 0x14);
 	}
 
 	if (hold == 0) {
-		resetAnim = false;
+		blocked = false;
 	} else {
-		menuState = reinterpret_cast<int>(members.m_lstState);
 		if ((hold & 0x48) == 0) {
 			if ((hold & 0x24) != 0) {
-				if (*(short*)(menuState + 0x26) < 8) {
-					*(short*)(menuState + 0x26) = *(short*)(menuState + 0x26) + 1;
+				if (state->cursor < 8) {
+					state->cursor = state->cursor + 1;
 				} else {
-					*(short*)(menuState + 0x26) = 0;
+					state->cursor = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else {
-			if (*(short*)(menuState + 0x26) == 0) {
-				*(short*)(menuState + 0x26) = 8;
+			if (state->cursor == 0) {
+				state->cursor = 8;
 			} else {
-				*(short*)(menuState + 0x26) = *(short*)(menuState + 0x26) - 1;
+				state->cursor = state->cursor - 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 
 		if ((hold & 0x6c) == 0) {
-			if ((press & 0x100) == 0) {
-				if ((press & 0x200) == 0) {
-					resetAnim = false;
-				} else {
-					*(char*)(reinterpret_cast<int>(members.m_lstState) + 0xD) = (char)0xFF;
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-					resetAnim = true;
-				}
-			} else {
+			if ((press & 0x100) != 0) {
 				Sound.PlaySe(2, 0x40, 0x7f, 0);
-				resetAnim = true;
+				blocked = true;
+			} else if ((press & 0x200) != 0) {
+				state->closeRequested = 0xFF;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
+				blocked = true;
+			} else {
+				blocked = false;
 			}
 		} else {
-			resetAnim = false;
+			blocked = false;
 		}
 	}
 
-	if (!resetAnim) {
+	one = 1.0f;
+	if (!blocked) {
 		return;
 	}
 
-	item = reinterpret_cast<int>(members.m_lstData) + 8;
-	for (i = 0; (itemCount = (unsigned int)members.m_lstData->count), i < (int)itemCount; i++) {
-		*(float*)(item + 0x10) = 1.0f;
-		*(float*)(item + 0x14) = 1.0f;
+	item = reinterpret_cast<int>(list) + 8;
+	for (i = 0; (itemCount = (unsigned int)list->count), i < (int)itemCount; i++) {
+		*(float*)(item + 0x10) = one;
+		*(float*)(item + 0x14) = one;
 		item += 0x40;
 	}
 
@@ -359,28 +368,28 @@ void CMenuPcs::MLstCtrl()
 		chunkCount = itemCount >> 3;
 		if (chunkCount != 0) {
 			do {
-				item = reinterpret_cast<int>(members.m_lstData) + offset + 8;
+				item = reinterpret_cast<int>(list) + offset + 8;
 				*(int*)(item + 0x24) = startFrame;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0x38;
+				item = reinterpret_cast<int>(list) + offset - 0x38;
 				*(int*)(item + 0x24) = startFrame + 1;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0x78;
+				item = reinterpret_cast<int>(list) + offset - 0x78;
 				*(int*)(item + 0x24) = startFrame + 2;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0xB8;
+				item = reinterpret_cast<int>(list) + offset - 0xB8;
 				*(int*)(item + 0x24) = startFrame + 3;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0xF8;
+				item = reinterpret_cast<int>(list) + offset - 0xF8;
 				*(int*)(item + 0x24) = startFrame + 4;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0x138;
+				item = reinterpret_cast<int>(list) + offset - 0x138;
 				*(int*)(item + 0x24) = startFrame + 5;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0x178;
+				item = reinterpret_cast<int>(list) + offset - 0x178;
 				*(int*)(item + 0x24) = startFrame + 6;
 				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(members.m_lstData) + offset - 0x1B8;
+				item = reinterpret_cast<int>(list) + offset - 0x1B8;
 				offset -= 0x200;
 				*(int*)(item + 0x24) = startFrame + 7;
 				startFrame += 8;
@@ -390,13 +399,13 @@ void CMenuPcs::MLstCtrl()
 
 			itemCount &= 7;
 			if (itemCount == 0) {
-				*(short*)(reinterpret_cast<int>(members.m_lstState) + 0x22) = 0;
+				state->frame = 0;
 				return;
 			}
 		}
 
 		do {
-			item = reinterpret_cast<int>(members.m_lstData) + offset + 8;
+			item = reinterpret_cast<int>(list) + offset + 8;
 			offset -= 0x40;
 			*(int*)(item + 0x24) = startFrame;
 			startFrame++;
@@ -405,7 +414,7 @@ void CMenuPcs::MLstCtrl()
 		} while (itemCount != 0);
 	}
 
-	*(short*)(reinterpret_cast<int>(members.m_lstState) + 0x22) = 0;
+	state->frame = 0;
 }
 
 /*
@@ -417,7 +426,7 @@ void CMenuPcs::MLstCtrl()
  * JP Address: TODO  
  * JP Size: TODO
  */
-void CMenuPcs::MLstClose()
+int CMenuPcs::MLstClose()
 {
 	float fVar1;
 	int iVar5;
@@ -488,19 +497,21 @@ void CMenuPcs::MLstClose()
 				} while (uVar8 != 0);
 				uVar6 = uVar6 & 7;
 				if (uVar6 == 0) {
-					return;
+					return 1;
 				}
 			}
-			do {
-				entry->startFrame = 0;
-				entry->duration = 1;
-				entry->alpha = fVar1;
-				entry++;
-				uVar6 = uVar6 - 1;
-			} while (uVar6 != 0);
-		}
-		return;
+				do {
+					entry->startFrame = 0;
+					entry->duration = 1;
+					entry->alpha = fVar1;
+					entry++;
+					uVar6 = uVar6 - 1;
+				} while (uVar6 != 0);
+			}
+		return 1;
 	}
+
+	return 0;
 }
 
 /*

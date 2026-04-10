@@ -1181,18 +1181,19 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
     state->m_partLoadCacheParam = loadCacheParam;
     state->m_partChunkIndex = 0;
     state->m_asyncHandleCount = 0;
+    state->m_partLoadMode = 0;
 
-    if (loadCacheParam == 0) {
-        state->m_partLoadMode = 0;
-    } else if (mode == 1) {
-        state->m_partLoadMode = 2;
-    } else if (mode == 2) {
-        state->m_partLoadMode = 3;
-        for (int i = 0; i < 0x10; i++) {
-            state->m_partAsyncBusy[i] = 0;
+    if (loadCacheParam != 0) {
+        if (mode == 1) {
+            state->m_partLoadMode = 2;
+        } else if (mode == 2) {
+            state->m_partLoadMode = 3;
+            for (int i = 0; i < 0x10; i++) {
+                state->m_partAsyncBusy[i] = 0;
+            }
+        } else {
+            state->m_partLoadMode = 1;
         }
-    } else {
-        state->m_partLoadMode = 1;
     }
 
     LoadFieldPdt0(mapId, floorId);

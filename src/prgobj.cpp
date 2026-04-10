@@ -429,15 +429,13 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
  */
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
-	float targetRot;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
 	CVector deltaPos;
+	float targetRot = FLOAT_80331BD4;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
-	if (deltaPos.x == FLOAT_80331BD4 || deltaPos.z == FLOAT_80331BD4) {
-		targetRot = 0.0f;
-	} else {
+	if (deltaPos.x != FLOAT_80331BD4 && deltaPos.z != FLOAT_80331BD4) {
 		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
@@ -455,26 +453,17 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	CGPrgObj* self = this;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(self->m_worldPosition);
+	CVector basePos(m_worldPosition);
 	CVector deltaPos;
-	float targetRot;
-	float deltaX;
-	float zero;
-	float deltaZ;
+	float targetRot = FLOAT_80331BD4;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos),
 	              reinterpret_cast<Vec*>(&deltaPos));
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (deltaX == zero || deltaZ == zero) {
-		targetRot = FLOAT_80331BD4;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	if (deltaPos.x != FLOAT_80331BD4 && deltaPos.z != FLOAT_80331BD4) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
-	self->m_rotTargetY = targetRot;
+	m_rotTargetY = targetRot;
 }
 
 /*
@@ -488,27 +477,18 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
  */
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
-	CGPrgObj* self = this;
-	float targetRot;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(self->m_worldPosition);
+	CVector basePos(m_worldPosition);
 	CVector deltaPos;
-	float deltaX;
-	float zero;
-	float deltaZ;
+	float targetRot = FLOAT_80331BD4;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos),
 	              reinterpret_cast<Vec*>(&deltaPos));
-	deltaX = deltaPos.x;
-	zero = FLOAT_80331BD4;
-	deltaZ = deltaPos.z;
-	if (deltaX == zero || deltaZ == zero) {
-		targetRot = FLOAT_80331BD4;
-	} else {
-		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
+	if (deltaPos.x != FLOAT_80331BD4 && deltaPos.z != FLOAT_80331BD4) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
-	Math.DstRot(self->m_rotBaseY, FLOAT_80331BD8 + targetRot);
+	Math.DstRot(m_rotBaseY, FLOAT_80331BD8 + targetRot);
 }
 
 /*

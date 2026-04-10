@@ -171,42 +171,52 @@ int CCameraPcs::GetTable(unsigned long tableIndex)
  */
 void CCameraPcs::create()
 {
-    u8* self = reinterpret_cast<u8*>(this);
+    float value5c = FLOAT_8032fa5c;
     float zero = FLOAT_8032fa34;
+    float value18 = FLOAT_8032fa18;
+    float valueb0 = FLOAT_8032fab0;
 
-    *reinterpret_cast<float*>(self + 0xDC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xD8) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xD4) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF8) = FLOAT_8032fa18;
-    *reinterpret_cast<float*>(self + 0x43C) = FLOAT_8032fa5c;
-    *reinterpret_cast<float*>(self + 0x440) = FLOAT_8032fab0;
-    *reinterpret_cast<float*>(self + 0xFC) = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(self + 0x100) = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(self + 0x104) = FLOAT_8032fab8;
-    *reinterpret_cast<s32*>(self + 0x444) = 0;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xDC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xD8) = zero;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xD4) = zero;
 
-    PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x34));
+    float valueb4 = FLOAT_8032fab4;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xF8) = value18;
 
-    *reinterpret_cast<float*>(self + 0x42C) = FLOAT_8032fa38;
-    *reinterpret_cast<float*>(self + 0x430) = FLOAT_8032fab8;
-    *reinterpret_cast<s32*>(self + 0x434) = 1;
-    *reinterpret_cast<s32*>(self + 0x438) = 0;
-    *reinterpret_cast<s32*>(self + 0x494) = 0;
-    *reinterpret_cast<s32*>(self + 0x498) = 0;
-    *reinterpret_cast<float*>(self + 0x4AC) = zero;
-    *reinterpret_cast<float*>(self + 0x4A8) = zero;
-    *reinterpret_cast<float*>(self + 0x4A4) = zero;
-    *reinterpret_cast<float*>(self + 0x4B8) = zero;
-    *reinterpret_cast<float*>(self + 0x4B4) = zero;
-    *reinterpret_cast<float*>(self + 0x4B0) = zero;
-    *reinterpret_cast<s16*>(self + 0x4BC) = 0;
-    *reinterpret_cast<s16*>(self + 0x4BE) = 0;
-    *reinterpret_cast<s16*>(self + 0x4C0) = 0;
-    *reinterpret_cast<s16*>(self + 0x4C2) = 0;
-    *reinterpret_cast<s16*>(self + 0x4A0) = 0;
-    *reinterpret_cast<s16*>(self + 0x49E) = 0;
-    *reinterpret_cast<s16*>(self + 0x49C) = 0;
-    self[0x490] = 0;
+    float value8c = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x43C) = value5c;
+
+    float valueb8 = FLOAT_8032fab8;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x440) = valueb0;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xFC) = valueb4;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x100) = value8c;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x104) = valueb8;
+    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x444) = 0;
+
+    PSMTXIdentity(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(this) + 0x34));
+
+    valueb4 = FLOAT_8032fab8;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x42C) = FLOAT_8032fa38;
+    value18 = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x430) = valueb4;
+    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x434) = 1;
+    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x438) = 0;
+    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x494) = 0;
+    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x498) = 0;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4AC) = value18;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4A8) = value18;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4A4) = value18;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B8) = value18;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B4) = value18;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B0) = value18;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4BC) = 0;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4BE) = 0;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4C0) = 0;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4C2) = 0;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4A0) = 0;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x49E) = 0;
+    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x49C) = 0;
+    *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x490) = 0;
 }
 
 /*

@@ -2484,51 +2484,30 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 {
 	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
 	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
-	unsigned short* artifact = &m_artifacts[0];
 	int hpMax = 0;
 	int artifactIndex = 0;
 	int count = 0x32;
 
 	while (count != 0) {
-		if ((artifactIndex < 0x60) && ((short)artifact[0] > 0)) {
-			unsigned short* artifactData = artifactDataBase + (artifact[0] * 0x24);
+		if ((artifactIndex < 0x60) && ((short)m_artifacts[artifactIndex] > 0)) {
+			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex] * 0x24);
 			unsigned short artifactType = artifactData[0];
 
-			if (artifactType == 0xDB) {
-			} else if (artifactType < 0xDB) {
-				if (artifactType == 0xB6) {
-				} else if (artifactType < 0xB6) {
-					if (artifactType == 0x9F) {
-					}
-				} else if (artifactType == 0xCC) {
-				}
-			} else if (artifactType == 0xE4) {
+			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
 				hpMax += artifactData[3];
-			} else if ((artifactType < 0xE4) && (artifactType == 0xDF)) {
 			}
 		}
 
-		artifactIndex++;
-		if ((artifactIndex < 0x60) && ((short)artifact[1] > 0)) {
-			unsigned short* artifactData = artifactDataBase + (artifact[1] * 0x24);
+		if (((artifactIndex + 1) < 0x60) && ((short)m_artifacts[artifactIndex + 1] > 0)) {
+			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex + 1] * 0x24);
 			unsigned short artifactType = artifactData[0];
 
-			if (artifactType == 0xDB) {
-			} else if (artifactType < 0xDB) {
-				if (artifactType == 0xB6) {
-				} else if (artifactType < 0xB6) {
-					if (artifactType == 0x9F) {
-					}
-				} else if (artifactType == 0xCC) {
-				}
-			} else if (artifactType == 0xE4) {
+			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
 				hpMax += artifactData[3];
-			} else if ((artifactType < 0xE4) && (artifactType == 0xDF)) {
 			}
 		}
 
-		artifact += 2;
-		artifactIndex++;
+		artifactIndex += 2;
 		count--;
 	}
 

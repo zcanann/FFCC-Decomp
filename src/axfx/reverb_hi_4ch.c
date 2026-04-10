@@ -5,15 +5,16 @@
 #include "dolphin/axfx/__axfx.h"
 
 extern f32 powf(f32 x, f32 y);
+extern const f32 lbl_80333808;
 
-static const f32 axfx_reverb_hi_dpl2_f32_0 = 0.0f;
+extern const f32 axfx_reverb_hi_dpl2_f32_0;
 static const f32 axfx_reverb_hi_dpl2_f32_1 = 1.0f;
-static const f32 axfx_reverb_hi_dpl2_f32_0p01 = 0.01f;
-static const f32 axfx_reverb_hi_dpl2_f32_10 = 10.0f;
-static const f32 axfx_reverb_hi_dpl2_f32_0p1 = 0.1f;
-static const f32 axfx_reverb_hi_dpl2_f32_32000 = 32000.0f;
+extern const f32 axfx_reverb_hi_dpl2_f32_0p01;
+extern const f32 axfx_reverb_hi_dpl2_f32_10;
+extern const f32 axfx_reverb_hi_dpl2_f32_0p1;
+extern const f32 axfx_reverb_hi_dpl2_f32_32000;
 static const f32 axfx_reverb_hi_dpl2_f32_0p05 = 0.05f;
-static const f32 axfx_reverb_hi_dpl2_f32_0p8 = 0.8f;
+extern const f32 axfx_reverb_hi_dpl2_f32_0p8;
 static s32 axfx_reverb_hi_dpl2_lens[10] = {
     0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1, 0x00000095,
     0x0000002F, 0x00000049, 0x00000043, 0x00000047, 0x00000000,
@@ -140,14 +141,14 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
                   time >= axfx_reverb_hi_dpl2_f32_0p01 && time <= axfx_reverb_hi_dpl2_f32_10 &&
                   mix >= axfx_reverb_hi_dpl2_f32_0 && mix <= axfx_reverb_hi_dpl2_f32_1 &&
                   damping >= axfx_reverb_hi_dpl2_f32_0 && damping <= axfx_reverb_hi_dpl2_f32_1 &&
-                  preDelay >= axfx_reverb_hi_dpl2_f32_0 && preDelay <= axfx_reverb_hi_dpl2_f32_0p1,
+                  preDelay >= axfx_reverb_hi_dpl2_f32_0 && preDelay <= lbl_80333808,
                   "The value of specified parameter is out of range.");
 
     if ((coloration < axfx_reverb_hi_dpl2_f32_0) || (coloration > axfx_reverb_hi_dpl2_f32_1)
      || (time < axfx_reverb_hi_dpl2_f32_0p01) || (time > axfx_reverb_hi_dpl2_f32_10)
      || (mix < axfx_reverb_hi_dpl2_f32_0) || (mix > axfx_reverb_hi_dpl2_f32_1)
      || (damping < axfx_reverb_hi_dpl2_f32_0) || (damping > axfx_reverb_hi_dpl2_f32_1)
-     || (preDelay < axfx_reverb_hi_dpl2_f32_0) || (preDelay > axfx_reverb_hi_dpl2_f32_0p1)) {
+     || (preDelay < axfx_reverb_hi_dpl2_f32_0) || (preDelay > lbl_80333808)) {
         return 0;
     }
 

@@ -66,6 +66,28 @@ static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(pppYmDr
     return (pppYmDrawMdlTexAnmColorBlock*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[0]);
 }
 
+void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
+{
+    CMapMeshUVLayout* uvLayout;
+    s32 uvByteOffset;
+    s32 i;
+
+    uvLayout = (CMapMeshUVLayout*)model;
+    for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+        if (perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
+            perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
+        }
+
+        if (perV < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)) {
+            perV = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
+        }
+
+        uvByteOffset += 4;
+    }
+
+    OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, perU, perV);
+}
+
 void pppUnitMatrix(pppFMATRIX&);
 void pppMulMatrix(pppFMATRIX&, pppFMATRIX, pppFMATRIX);
 
@@ -88,9 +110,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
-    int i;
-    s32 uvByteOffset;
-    CMapMeshUVLayout* uvLayout;
+    pppModelSt* model;
 
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
     work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
@@ -99,24 +119,12 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     OSReport(DAT_801d9c54);
 
-    uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0];
+    model = (pppModelSt*)GetMapMeshTable()[0];
     work->m_perU = FLOAT_8033054c;
     work->m_perV = work->m_perU;
 
-    if (uvLayout != NULL) {
-        for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            if (work->m_perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
-                work->m_perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
-            }
-
-            if (work->m_perV < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)) {
-                work->m_perV = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
-            }
-
-            uvByteOffset += 4;
-        }
-
-        OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, work->m_perU, work->m_perV);
+    if (model != NULL) {
+        SetUpPerUV(model, work->m_perU, work->m_perV);
     }
 }
 
@@ -206,17 +214,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
             return;
         }
 
-        uvLayout = (CMapMeshUVLayout*)mapMesh;
-        for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            if (work->m_perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
-                work->m_perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
-            }
-            if (work->m_perV < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2)) {
-                work->m_perV = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset + 2);
-            }
-            uvByteOffset += 4;
-        }
-        OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, work->m_perU, work->m_perV);
+        SetUpPerUV((pppModelSt*)mapMesh, work->m_perU, work->m_perV);
     }
 
     uvLayout = (CMapMeshUVLayout*)mapMesh;

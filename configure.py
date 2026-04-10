@@ -1099,7 +1099,6 @@ config.libs = [
                     "-fp_contract on",
                     "-str reuse",
                     "-multibyte",
-                    "-i reference_projects/pikmin2/include",
                     "-i include",
                     f"-i build/{config.version}/include",
                     "-DBUILD_VERSION=1",

@@ -107,22 +107,21 @@ struct ItemFlatData {
  */
 void CMenuPcs::ItemInit()
 {
+    short sVar1;
     float fVar2;
     float fVar3;
     float fVar4;
     int iVar5;
-    s16 sVar6;
-    s16 sVar7;
-    s16* psVar8;
+    short sVar6;
+    short sVar7;
+    short* psVar8;
     int iVar9;
     int iVar10;
     int iVar11;
-    s16* itemState = reinterpret_cast<s16*>(itemMenuState);
-    s16* itemList = this->itemList;
 
-    memset(itemList, 0, 0x1008);
+    memset(this->itemList, 0, 0x1008);
     fVar2 = FLOAT_80332e64;
-    iVar5 = (int)itemList + 8;
+    iVar5 = (int)this->itemList + 8;
     iVar10 = 8;
     do {
         *(float*)(iVar5 + 0x14) = fVar2;
@@ -133,10 +132,10 @@ void CMenuPcs::ItemInit()
         *(float*)(iVar5 + 0x154) = fVar2;
         *(float*)(iVar5 + 0x194) = fVar2;
         *(float*)(iVar5 + 0x1D4) = fVar2;
-        iVar5 += 0x200;
-        iVar10 -= 1;
+        iVar5 = iVar5 + 0x200;
+        iVar10 = iVar10 + -1;
     } while (iVar10 != 0);
-    iVar5 = (int)itemList;
+    iVar5 = (int)this->itemList;
     *(int*)(iVar5 + 0x24) = 0x2E;
     *(s16*)(iVar5 + 8) = 0x68;
     *(s16*)(iVar5 + 0xA) = 0x28;
@@ -155,7 +154,7 @@ void CMenuPcs::ItemInit()
     *(int*)(iVar5 + 0x2C) = 5;
     *(int*)(iVar5 + 0x30) = 5;
     iVar5 = 0x100;
-    iVar10 = (int)itemList;
+    iVar10 = (int)this->itemList;
     *(int*)(iVar10 + 0x64) = 0x47;
     *(s16*)(iVar10 + 0x48) = 0x50;
     *(s16*)(iVar10 + 0x4A) = 0xE;
@@ -166,7 +165,7 @@ void CMenuPcs::ItemInit()
     *(float*)(iVar10 + 0x5C) = fVar3;
     *(int*)(iVar10 + 0x6C) = 0;
     *(int*)(iVar10 + 0x70) = 5;
-    iVar10 = (int)itemList;
+    iVar10 = (int)this->itemList;
     *(int*)(iVar10 + 0xA4) = 0x47;
     *(s16*)(iVar10 + 0x88) = 0x55;
     *(s16*)(iVar10 + 0x8C) = 0x30;
@@ -177,7 +176,7 @@ void CMenuPcs::ItemInit()
     *(float*)(iVar10 + 0x9C) = fVar4;
     *(int*)(iVar10 + 0xAC) = 0;
     *(int*)(iVar10 + 0xB0) = 5;
-    iVar10 = (int)itemList;
+    iVar10 = (int)this->itemList;
     *(int*)(iVar10 + 0xF4) = 2;
     *(int*)(iVar10 + 0xE4) = 0x2E;
     *(s16*)(iVar10 + 0xC8) = 0x50;
@@ -188,17 +187,17 @@ void CMenuPcs::ItemInit()
     *(float*)(iVar10 + 0xD4) = fVar2;
     *(int*)(iVar10 + 0xEC) = 0;
     *(int*)(iVar10 + 0xF0) = 5;
-    iVar10 = (int)itemList;
+    iVar10 = (int)this->itemList;
     iVar11 = 4;
     do {
-        psVar8 = (s16*)((int)itemList + iVar5 + 8);
+        psVar8 = (short*)((int)this->itemList + iVar5 + 8);
         psVar8[0x16] = 0;
         psVar8[0x17] = 2;
         psVar8[0xE] = 0;
         psVar8[0xF] = 0x37;
         sVar7 = sVar7 + 2;
         *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
-        s16 sVar1 = sVar6 + 0x20;
+        sVar1 = sVar6 + 0x20;
         psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar6;
         psVar8[2] = 200;
         psVar8[3] = 0x28;
@@ -209,8 +208,8 @@ void CMenuPcs::ItemInit()
         psVar8[0x14] = 0;
         psVar8[0x15] = 5;
         iVar9 = iVar5 + 0x48;
-        iVar5 += 0x80;
-        psVar8 = (s16*)((int)itemList + iVar9);
+        iVar5 = iVar5 + 0x80;
+        psVar8 = (short*)((int)this->itemList + iVar9);
         psVar8[0x16] = 0;
         psVar8[0x17] = 2;
         psVar8[0xE] = 0;
@@ -226,11 +225,11 @@ void CMenuPcs::ItemInit()
         psVar8[0x13] = 7;
         psVar8[0x14] = 0;
         psVar8[0x15] = 5;
-        iVar11 -= 1;
+        iVar11 = iVar11 + -1;
     } while (iVar11 != 0);
-    *itemList = sVar7;
-    *(s16*)((int)itemState + 0x26) = 0;
-    *(u8*)((int)itemState + 0xB) = 1;
+    *this->itemList = sVar7;
+    *(short*)((int)this->itemMenuState + 0x26) = 0;
+    *(u8*)((int)this->itemMenuState + 0xB) = 1;
 }
 
 /*
@@ -345,55 +344,56 @@ void CMenuPcs::ItemInit1()
  */
 bool CMenuPcs::ItemOpen()
 {
-    int count;
-    int finished;
-    int step;
-    int remaining;
-    MenuItemOpenAnim* anim;
-    s16* itemState = reinterpret_cast<s16*>(itemMenuState);
-    s16* itemList;
+    float fVar1;
+    double dVar2;
+    double dVar3;
+    short* psVar4;
+    int iVar5;
+    int iVar6;
+    int iVar7;
+    int iVar8;
 
-    if (*(char*)((int)itemState + 0xB) == '\0') {
+    if (*(char*)((int)this->itemMenuState + 0xB) == '\0') {
         SingLifeInit(-1);
         ItemInit();
     }
 
-    itemState = reinterpret_cast<s16*>(itemMenuState);
-    itemList = this->itemList;
-    finished = 0;
-    itemState[0x11] = itemState[0x11] + 1;
-    count = (int)*itemList;
-    anim = (MenuItemOpenAnim*)(itemList + 4);
-    step = (int)itemState[0x11];
-    remaining = count;
-
-    if (0 < count) {
+    iVar5 = 0;
+    *(short*)((int)this->itemMenuState + 0x22) = *(short*)((int)this->itemMenuState + 0x22) + 1;
+    iVar6 = (int)*this->itemList;
+    psVar4 = this->itemList + 4;
+    iVar7 = (int)*(short*)((int)this->itemMenuState + 0x22);
+    iVar8 = iVar6;
+    if (0 < iVar6) {
         do {
-            float t = FLOAT_80332e60;
-            if (anim->startFrame <= step) {
-                if (step < anim->startFrame + anim->duration) {
-                    double scale = DOUBLE_80332e68;
-
-                    anim->frame = anim->frame + 1;
-                    anim->progress = (float)((scale / (double)anim->duration) * (double)anim->frame);
-
-                    if ((anim->flags & 2) == 0) {
-                        t = (float)((scale / (double)anim->duration) * (double)anim->frame);
-                        anim->dx = (anim->targetX - (float)anim->x) * t;
-                        anim->dy = (anim->targetY - (float)anim->y) * t;
+            dVar3 = DOUBLE_80332ea0;
+            fVar1 = FLOAT_80332e60;
+            if (*(int*)(psVar4 + 0x12) <= iVar7) {
+                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+                    dVar2 = DOUBLE_80332e68;
+                    *(float*)(psVar4 + 8) =
+                        (float)((DOUBLE_80332e68 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10));
+                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+                        fVar1 =
+                            (float)((dVar2 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10));
+                        *(float*)(psVar4 + 0x18) =
+                            (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
+                        *(float*)(psVar4 + 0x1A) =
+                            (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
                     }
                 } else {
-                    finished = finished + 1;
-                    anim->progress = FLOAT_80332e64;
-                    anim->dx = t;
-                    anim->dy = t;
+                    iVar5 = iVar5 + 1;
+                    *(float*)(psVar4 + 8) = FLOAT_80332e64;
+                    *(float*)(psVar4 + 0x18) = fVar1;
+                    *(float*)(psVar4 + 0x1A) = fVar1;
                 }
             }
-            anim = anim + 1;
-            remaining = remaining - 1;
-        } while (remaining != 0);
+            psVar4 = psVar4 + 0x20;
+            iVar8 = iVar8 + -1;
+        } while (iVar8 != 0);
     }
-    return count == finished;
+    return iVar6 == iVar5;
 }
 
 /*

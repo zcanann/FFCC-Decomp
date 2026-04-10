@@ -101,8 +101,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 		count = data->spawnCount;
 
-		switch (data->mode) {
-		case 0:
+		if (data->mode == 0) {
 			while (count-- != 0) {
 				if (state->index >= entry->maxValue) {
 					state->index = 0;
@@ -151,54 +150,54 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					}
 				}
 			}
-			break;
-		case 1:
-			while (count-- != 0) {
-				f32 randValue = Math.RandF();
-				f32 maxValue = (f32)entry->maxValue;
-				int outValue = (int)(randValue * maxValue);
-				u16* vertexIndices = entry->vertexIndices;
-				u16 vertexIndex = vertexIndices[outValue];
-				Vec* vertex = &points[vertexIndex];
-				f32 x = vertex->x;
-				f32 y = vertex->y;
-				f32 z = vertex->z;
+		} else {
+			if (data->mode == 1) {
+				while (count-- != 0) {
+					f32 randValue = Math.RandF();
+					f32 maxValue = (f32)entry->maxValue;
+					int outValue = (int)(randValue * maxValue);
+					u16* vertexIndices = entry->vertexIndices;
+					u16 vertexIndex = vertexIndices[outValue];
+					Vec* vertex = &points[vertexIndex];
+					f32 x = vertex->x;
+					f32 y = vertex->y;
+					f32 z = vertex->z;
 
-				if ((data->childId + 0x10000) != 0xFFFF) {
-					_pppPDataVal* childData =
-						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
-					Vec worldPos;
-					Vec pos;
-					Mtx* outMtx;
-					_pppPObject* child;
+					if ((data->childId + 0x10000) != 0xFFFF) {
+						_pppPDataVal* childData =
+							(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (data->childId << 4));
+						Vec worldPos;
+						Vec pos;
+						Mtx* outMtx;
+						_pppPObject* child;
 
-					if (childData == 0) {
-						child = 0;
-					} else {
-						child = pppCreatePObject(pppMngStPtr, childData);
-						*(void**)((u8*)child + 0x4) = parent;
-					}
+						if (childData == 0) {
+							child = 0;
+						} else {
+							child = pppCreatePObject(pppMngStPtr, childData);
+							*(void**)((u8*)child + 0x4) = parent;
+						}
 
-					pos.x = x;
-					pos.y = y;
-					pos.z = z;
-					PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-					outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
-					if (data->useWorldMtx == 0) {
-						PSMTXIdentity(*outMtx);
-						(*outMtx)[0][3] = pos.x;
-						(*outMtx)[1][3] = pos.y;
-						(*outMtx)[2][3] = pos.z;
-					} else {
-						PSMTXCopy(pppMngStPtr->m_matrix.value, *outMtx);
-						PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, &worldPos);
-						(*outMtx)[0][3] = worldPos.x;
-						(*outMtx)[1][3] = worldPos.y;
-						(*outMtx)[2][3] = worldPos.z;
+						pos.x = x;
+						pos.y = y;
+						pos.z = z;
+						PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
+						outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
+						if (data->useWorldMtx == 0) {
+							PSMTXIdentity(*outMtx);
+							(*outMtx)[0][3] = pos.x;
+							(*outMtx)[1][3] = pos.y;
+							(*outMtx)[2][3] = pos.z;
+						} else {
+							PSMTXCopy(pppMngStPtr->m_matrix.value, *outMtx);
+							PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, &worldPos);
+							(*outMtx)[0][3] = worldPos.x;
+							(*outMtx)[1][3] = worldPos.y;
+							(*outMtx)[2][3] = worldPos.z;
+						}
 					}
 				}
 			}
-			break;
 		}
 		state->countdown = data->spawnDelay;
 	}

@@ -1655,13 +1655,10 @@ void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_ChannelAlloc(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData;
-    unsigned char* command;
+    unsigned char* command = *(unsigned char**)track;
 
-    trackData = (int*)track;
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    *(unsigned char*)((char*)control + 0x490) = *command;
+    *(unsigned char**)track = command + 1;
+    *((unsigned char*)control + 0x490) = *command;
 }
 
 /*

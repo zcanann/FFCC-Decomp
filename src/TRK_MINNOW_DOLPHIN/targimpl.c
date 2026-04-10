@@ -174,15 +174,13 @@ asm void ReadFPSCR(register f64* fpscr) {
 DSError TRKValidMemory32(const void* addr, size_t length,
                          ValidMemoryOptions readWriteable)
 {
-    DSError err;
+    DSError err = DS_InvalidMemory;
     u32 start;
-    u32 upperEnd;
     u32 end;
     int i;
 
     start = (u32)addr;
     end = start + ((u32)length - 1);
-    err = DS_InvalidMemory;
 
     if (end < start) {
         return DS_InvalidMemory;
@@ -199,6 +197,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
             } else {
                 err = DS_NoError;
                 if (start < (u32)gTRKMemMap[i].start) {
+                    u32 upperEnd;
                     const memRange* range;
 
                     range = &gTRKMemMap[0];
@@ -231,6 +230,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                     }
                 }
                 if ((err == DS_NoError) && (end > (u32)gTRKMemMap[i].end)) {
+                    u32 upperEnd;
                     const memRange* range;
 
                     range = &gTRKMemMap[0];

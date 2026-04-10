@@ -453,30 +453,23 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
+	struct WorkState {
+		int m_backBuffer;
+		int m_pad0;
+		int m_pad1;
+		s16 m_angle;
+		u8 m_direction;
+		u8 m_pad2;
+		float m_scale;
+		float m_values[5];
+	};
+
 	int textureIndex = 0;
-	u8* work = (u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2];
-	float local_134;
-	float local_130;
-	float local_12c;
-	float local_128;
-	float local_124;
-	float local_120;
-	float local_11c;
-	float local_118;
-	float local_e4;
-	float local_e0;
-	float local_dc;
-	float local_d8;
-	float local_d4;
-	float local_d0;
-	float local_cc;
-	float local_c8;
-	float local_c4;
-	float local_c0;
-	float local_bc;
-	float local_b8;
+	WorkState* work = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	Mtx rotMtx;
 	float indMtx[2][3];
+	Vec vertices[4];
+	Vec2d uvs[4];
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
@@ -503,17 +496,15 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
 		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_ITW_0, GX_ITM_1);
 
-		s16* angle = (s16*)(work + 0xc);
-		if ((*angle == 0) || (*angle == 0x168)) {
-			*angle = 1;
+		if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
+			work->m_angle = 1;
 		}
 
-		PSMTXRotRad(rotMtx, 'z', FLOAT_803305f0 * (float)*angle);
-		float scale = *(float*)(work + 0x10);
-		indMtx[0][0] = rotMtx[0][0] * scale;
-		indMtx[0][1] = rotMtx[0][1] * scale;
-		indMtx[1][0] = rotMtx[1][0] * scale;
-		indMtx[1][1] = rotMtx[1][1] * scale;
+		PSMTXRotRad(rotMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
+		indMtx[0][0] = rotMtx[0][0] * work->m_scale;
+		indMtx[0][1] = rotMtx[0][1] * work->m_scale;
+		indMtx[1][0] = rotMtx[1][0] * work->m_scale;
+		indMtx[1][1] = rotMtx[1][1] * work->m_scale;
 		indMtx[0][2] = kPppYmDeformationShpZero;
 		indMtx[1][2] = kPppYmDeformationShpZero;
 		GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
@@ -521,46 +512,45 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		if (param_2->m_splitMode == 0) {
 			float quadSize = (float)param_2->m_size;
 			if (param_2->m_orientation == 0) {
-				local_e4 = -quadSize;
-				local_dc = kPppYmDeformationShpZero;
-				local_d0 = kPppYmDeformationShpZero;
-				local_c4 = kPppYmDeformationShpZero;
-				local_b8 = kPppYmDeformationShpZero;
-				local_e0 = quadSize;
-				local_d8 = quadSize;
-				local_d4 = quadSize;
-				local_cc = quadSize;
-				local_c8 = -quadSize;
-				local_c0 = -quadSize;
-				local_bc = -quadSize;
+				vertices[0].x = -quadSize;
+				vertices[0].y = quadSize;
+				vertices[0].z = kPppYmDeformationShpZero;
+				vertices[1].x = quadSize;
+				vertices[1].y = quadSize;
+				vertices[1].z = kPppYmDeformationShpZero;
+				vertices[2].x = quadSize;
+				vertices[2].y = -quadSize;
+				vertices[2].z = kPppYmDeformationShpZero;
+				vertices[3].x = -quadSize;
+				vertices[3].y = -quadSize;
+				vertices[3].z = kPppYmDeformationShpZero;
 			} else if (param_2->m_orientation == 1) {
-				local_e4 = -quadSize;
-				local_e0 = kPppYmDeformationShpZero;
-				local_d4 = kPppYmDeformationShpZero;
-				local_c8 = kPppYmDeformationShpZero;
-				local_bc = kPppYmDeformationShpZero;
-				local_dc = -quadSize;
-				local_d8 = quadSize;
-				local_d0 = -quadSize;
-				local_cc = quadSize;
-				local_c4 = quadSize;
-				local_c0 = -quadSize;
-				local_b8 = quadSize;
+				vertices[0].x = -quadSize;
+				vertices[0].y = kPppYmDeformationShpZero;
+				vertices[0].z = -quadSize;
+				vertices[1].x = quadSize;
+				vertices[1].y = kPppYmDeformationShpZero;
+				vertices[1].z = -quadSize;
+				vertices[2].x = quadSize;
+				vertices[2].y = kPppYmDeformationShpZero;
+				vertices[2].z = quadSize;
+				vertices[3].x = -quadSize;
+				vertices[3].y = kPppYmDeformationShpZero;
+				vertices[3].z = quadSize;
 			} else {
 				DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 				return;
 			}
 
-			local_134 = kPppYmDeformationShpZero;
-			local_130 = kPppYmDeformationShpZero;
-			local_12c = FLOAT_803305f8;
-			local_128 = kPppYmDeformationShpZero;
-			local_124 = FLOAT_803305f8;
-			local_120 = FLOAT_803305f8;
-			local_11c = kPppYmDeformationShpZero;
-			local_118 = FLOAT_803305f8;
-			RenderDeformationShape(
-				(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
+			uvs[0].x = kPppYmDeformationShpZero;
+			uvs[0].y = kPppYmDeformationShpZero;
+			uvs[1].x = FLOAT_803305f8;
+			uvs[1].y = kPppYmDeformationShpZero;
+			uvs[2].x = FLOAT_803305f8;
+			uvs[2].y = FLOAT_803305f8;
+			uvs[3].x = kPppYmDeformationShpZero;
+			uvs[3].y = FLOAT_803305f8;
+			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 		} else {
 			float size = (float)param_2->m_size;
 			float split = (float)param_2->m_splitSize;
@@ -568,164 +558,160 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			float uvRemainder = FLOAT_803305f8 - uvSplit;
 
 			if (param_2->m_orientation == 0) {
-				local_e4 = -size;
-				local_e0 = -split;
-				local_d8 = -split;
-				local_d4 = -split;
-				local_cc = -split;
-				local_c8 = split;
-				local_c0 = -size;
-				local_bc = split;
-				local_dc = kPppYmDeformationShpZero;
-				local_d0 = kPppYmDeformationShpZero;
-				local_c4 = kPppYmDeformationShpZero;
-				local_b8 = kPppYmDeformationShpZero;
+				vertices[0].x = -size;
+				vertices[0].y = -split;
+				vertices[0].z = kPppYmDeformationShpZero;
+				vertices[1].x = -split;
+				vertices[1].y = -split;
+				vertices[1].z = kPppYmDeformationShpZero;
+				vertices[2].x = -split;
+				vertices[2].y = split;
+				vertices[2].z = kPppYmDeformationShpZero;
+				vertices[3].x = -size;
+				vertices[3].y = split;
+				vertices[3].z = kPppYmDeformationShpZero;
 			} else if (param_2->m_orientation == 1) {
-				local_e4 = -size;
-				local_dc = -split;
-				local_d8 = -split;
-				local_d0 = -split;
-				local_cc = -split;
-				local_c4 = split;
-				local_c0 = -size;
-				local_b8 = split;
-				local_e0 = kPppYmDeformationShpZero;
-				local_d4 = kPppYmDeformationShpZero;
-				local_c8 = kPppYmDeformationShpZero;
-				local_bc = kPppYmDeformationShpZero;
+				vertices[0].x = -size;
+				vertices[0].y = kPppYmDeformationShpZero;
+				vertices[0].z = -split;
+				vertices[1].x = -split;
+				vertices[1].y = kPppYmDeformationShpZero;
+				vertices[1].z = -split;
+				vertices[2].x = -split;
+				vertices[2].y = kPppYmDeformationShpZero;
+				vertices[2].z = split;
+				vertices[3].x = -size;
+				vertices[3].y = kPppYmDeformationShpZero;
+				vertices[3].z = split;
 			} else {
 				DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 				return;
 			}
 
-			local_134 = kPppYmDeformationShpZero;
-			local_11c = kPppYmDeformationShpZero;
-			local_12c = uvSplit;
-			local_128 = uvSplit;
-			local_124 = uvSplit;
-			local_118 = uvRemainder;
-			local_130 = kPppYmDeformationShpZero;
-			local_120 = uvRemainder;
-			RenderDeformationShape(
-				(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
+			uvs[0].x = kPppYmDeformationShpZero;
+			uvs[0].y = kPppYmDeformationShpZero;
+			uvs[1].x = uvSplit;
+			uvs[1].y = kPppYmDeformationShpZero;
+			uvs[2].x = uvSplit;
+			uvs[2].y = uvRemainder;
+			uvs[3].x = kPppYmDeformationShpZero;
+			uvs[3].y = uvRemainder;
+			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 
 			if (param_2->m_orientation == 0) {
-				local_e4 = split;
-				local_e0 = -split;
-				local_d8 = size;
-				local_d4 = -split;
-				local_cc = size;
-				local_c8 = split;
-				local_c0 = split;
-				local_bc = split;
-				local_dc = kPppYmDeformationShpZero;
-				local_d0 = kPppYmDeformationShpZero;
-				local_c4 = kPppYmDeformationShpZero;
-				local_b8 = kPppYmDeformationShpZero;
+				vertices[0].x = split;
+				vertices[0].y = -split;
+				vertices[0].z = kPppYmDeformationShpZero;
+				vertices[1].x = size;
+				vertices[1].y = -split;
+				vertices[1].z = kPppYmDeformationShpZero;
+				vertices[2].x = size;
+				vertices[2].y = split;
+				vertices[2].z = kPppYmDeformationShpZero;
+				vertices[3].x = split;
+				vertices[3].y = split;
+				vertices[3].z = kPppYmDeformationShpZero;
 			} else {
-				local_e4 = split;
-				local_dc = -split;
-				local_d8 = size;
-				local_d0 = -split;
-				local_cc = size;
-				local_c4 = split;
-				local_c0 = split;
-				local_b8 = split;
-				local_e0 = kPppYmDeformationShpZero;
-				local_d4 = kPppYmDeformationShpZero;
-				local_c8 = kPppYmDeformationShpZero;
-				local_bc = kPppYmDeformationShpZero;
+				vertices[0].x = split;
+				vertices[0].y = kPppYmDeformationShpZero;
+				vertices[0].z = -split;
+				vertices[1].x = size;
+				vertices[1].y = kPppYmDeformationShpZero;
+				vertices[1].z = -split;
+				vertices[2].x = size;
+				vertices[2].y = kPppYmDeformationShpZero;
+				vertices[2].z = split;
+				vertices[3].x = split;
+				vertices[3].y = kPppYmDeformationShpZero;
+				vertices[3].z = split;
 			}
 
-			local_130 = uvSplit;
-			local_134 = FLOAT_803305f8;
-			local_12c = uvRemainder;
-			local_128 = uvSplit;
-			local_124 = uvRemainder;
-			local_120 = uvRemainder;
-			local_11c = FLOAT_803305f8;
-			local_118 = uvRemainder;
-			RenderDeformationShape(
-				(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
+			uvs[0].x = FLOAT_803305f8;
+			uvs[0].y = uvSplit;
+			uvs[1].x = uvRemainder;
+			uvs[1].y = uvSplit;
+			uvs[2].x = uvRemainder;
+			uvs[2].y = uvRemainder;
+			uvs[3].x = FLOAT_803305f8;
+			uvs[3].y = uvRemainder;
+			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 
 			if (param_2->m_splitMode == 1) {
 				if (param_2->m_orientation == 0) {
-					local_e4 = -size;
-					local_e0 = -size;
-					local_d8 = size;
-					local_d4 = -size;
-					local_cc = size;
-					local_c8 = -split;
-					local_c0 = -size;
-					local_bc = -split;
-					local_dc = kPppYmDeformationShpZero;
-					local_d0 = kPppYmDeformationShpZero;
-					local_c4 = kPppYmDeformationShpZero;
-					local_b8 = kPppYmDeformationShpZero;
+					vertices[0].x = -size;
+					vertices[0].y = -size;
+					vertices[0].z = kPppYmDeformationShpZero;
+					vertices[1].x = size;
+					vertices[1].y = -size;
+					vertices[1].z = kPppYmDeformationShpZero;
+					vertices[2].x = size;
+					vertices[2].y = -split;
+					vertices[2].z = kPppYmDeformationShpZero;
+					vertices[3].x = -size;
+					vertices[3].y = -split;
+					vertices[3].z = kPppYmDeformationShpZero;
 				} else if (param_2->m_orientation == 1) {
-					local_e4 = -size;
-					local_dc = -size;
-					local_d8 = size;
-					local_d0 = -size;
-					local_cc = size;
-					local_c4 = -split;
-					local_c0 = -size;
-					local_b8 = -split;
-					local_e0 = kPppYmDeformationShpZero;
-					local_d4 = kPppYmDeformationShpZero;
-					local_c8 = kPppYmDeformationShpZero;
-					local_bc = kPppYmDeformationShpZero;
+					vertices[0].x = -size;
+					vertices[0].y = kPppYmDeformationShpZero;
+					vertices[0].z = -size;
+					vertices[1].x = size;
+					vertices[1].y = kPppYmDeformationShpZero;
+					vertices[1].z = -size;
+					vertices[2].x = size;
+					vertices[2].y = kPppYmDeformationShpZero;
+					vertices[2].z = -split;
+					vertices[3].x = -size;
+					vertices[3].y = kPppYmDeformationShpZero;
+					vertices[3].z = -split;
 				}
 
-				local_134 = kPppYmDeformationShpZero;
-				local_130 = kPppYmDeformationShpZero;
-				local_12c = FLOAT_803305f8;
-				local_128 = kPppYmDeformationShpZero;
-				local_124 = FLOAT_803305f8;
-				local_120 = uvSplit;
-				local_11c = kPppYmDeformationShpZero;
-				local_118 = uvSplit;
-				RenderDeformationShape(
-					(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
+				uvs[0].x = kPppYmDeformationShpZero;
+				uvs[0].y = kPppYmDeformationShpZero;
+				uvs[1].x = FLOAT_803305f8;
+				uvs[1].y = kPppYmDeformationShpZero;
+				uvs[2].x = FLOAT_803305f8;
+				uvs[2].y = uvSplit;
+				uvs[3].x = kPppYmDeformationShpZero;
+				uvs[3].y = uvSplit;
+				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 
 				if (param_2->m_orientation == 0) {
-					local_e4 = split;
-					local_e0 = -size;
-					local_d8 = size;
-					local_d4 = -size;
-					local_cc = size;
-					local_c8 = size;
-					local_c0 = split;
-					local_bc = size;
-					local_dc = kPppYmDeformationShpZero;
-					local_d0 = kPppYmDeformationShpZero;
-					local_c4 = kPppYmDeformationShpZero;
-					local_b8 = kPppYmDeformationShpZero;
+					vertices[0].x = split;
+					vertices[0].y = -size;
+					vertices[0].z = kPppYmDeformationShpZero;
+					vertices[1].x = size;
+					vertices[1].y = -size;
+					vertices[1].z = kPppYmDeformationShpZero;
+					vertices[2].x = size;
+					vertices[2].y = size;
+					vertices[2].z = kPppYmDeformationShpZero;
+					vertices[3].x = split;
+					vertices[3].y = size;
+					vertices[3].z = kPppYmDeformationShpZero;
 				} else if (param_2->m_orientation == 1) {
-					local_e4 = split;
-					local_dc = -size;
-					local_d8 = size;
-					local_d0 = -size;
-					local_cc = size;
-					local_c4 = size;
-					local_c0 = split;
-					local_b8 = size;
-					local_e0 = kPppYmDeformationShpZero;
-					local_d4 = kPppYmDeformationShpZero;
-					local_c8 = kPppYmDeformationShpZero;
-					local_bc = kPppYmDeformationShpZero;
+					vertices[0].x = split;
+					vertices[0].y = kPppYmDeformationShpZero;
+					vertices[0].z = -size;
+					vertices[1].x = size;
+					vertices[1].y = kPppYmDeformationShpZero;
+					vertices[1].z = -size;
+					vertices[2].x = size;
+					vertices[2].y = kPppYmDeformationShpZero;
+					vertices[2].z = size;
+					vertices[3].x = split;
+					vertices[3].y = kPppYmDeformationShpZero;
+					vertices[3].z = size;
 				}
 
-				local_134 = kPppYmDeformationShpZero;
-				local_130 = uvRemainder;
-				local_12c = FLOAT_803305f8;
-				local_128 = uvRemainder;
-				local_124 = FLOAT_803305f8;
-				local_120 = FLOAT_803305f8;
-				local_11c = kPppYmDeformationShpZero;
-				local_118 = FLOAT_803305f8;
-				RenderDeformationShape(
-					(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
+				uvs[0].x = kPppYmDeformationShpZero;
+				uvs[0].y = uvRemainder;
+				uvs[1].x = FLOAT_803305f8;
+				uvs[1].y = uvRemainder;
+				uvs[2].x = FLOAT_803305f8;
+				uvs[2].y = FLOAT_803305f8;
+				uvs[3].x = kPppYmDeformationShpZero;
+				uvs[3].y = FLOAT_803305f8;
+				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 			}
 		}
 	}

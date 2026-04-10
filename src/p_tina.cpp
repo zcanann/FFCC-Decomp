@@ -1176,12 +1176,8 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
 {
     CPartMngState* state = GetPartMngState();
 
-    state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
-    state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
-    state->m_partLoadCacheParam = loadCacheParam;
     state->m_partChunkIndex = 0;
     state->m_asyncHandleCount = 0;
-
     if (loadCacheParam == 0) {
         state->m_partLoadMode = 0;
     } else if (mode == 1) {
@@ -1195,6 +1191,9 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
         state->m_partLoadMode = 1;
     }
 
+    state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
+    state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
+    state->m_partLoadCacheParam = loadCacheParam;
     LoadFieldPdt0(mapId, floorId);
 }
 

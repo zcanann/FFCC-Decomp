@@ -692,11 +692,15 @@ int CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsi
 {
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
-    g_hit_t_min = s_large_pos;
-    gMapHitFace = 0;
-    g_hit_edge_idx_min = -1;
 
-    return CheckHitFaceCylinder(mask);
+    int faceOffset = 0;
+    for (int i = 0; i < static_cast<int>(m_faceCount); i++) {
+        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        CheckHitFaceCylinder(mask);
+        faceOffset += 0x50;
+    }
+
+    return 0;
 }
 
 /*

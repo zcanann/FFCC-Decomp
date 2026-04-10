@@ -722,28 +722,29 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
 {
     CLight* light = &m_diffuseLights[idx];
     Mtx cam;
-    Vec tmp;
     Vec lightDir;
-
-    lightDir.x = CameraDirX();
-    lightDir.y = CameraDirY();
-    lightDir.z = CameraDirZ();
+    float dirX = CameraDirX();
+    float dirY = CameraDirY();
+    float dirZ = CameraDirZ();
 
     if (mode == 0) {
-        lightDir.x = dir->x;
-        lightDir.y = dir->y;
-        lightDir.z = dir->z;
+        dirX = dir->x;
+        dirY = dir->y;
+        dirZ = dir->z;
     }
 
     GXInitLightColor(&light->m_gxLightObj, color);
     PSMTXCopy(CameraMatrix(), cam);
 
-    tmp.x = FLOAT_8032fc70 * -lightDir.x;
-    tmp.y = FLOAT_8032fc70 * -lightDir.y;
-    tmp.z = FLOAT_8032fc70 * -lightDir.z;
-    PSMTXMultVec(cam, &tmp, &tmp);
-    GXInitLightPos(&light->m_gxLightObj, tmp.x, tmp.y, tmp.z);
+    lightDir.x = FLOAT_8032fc70 * -dirX;
+    lightDir.y = FLOAT_8032fc70 * -dirY;
+    lightDir.z = FLOAT_8032fc70 * -dirZ;
+    PSMTXMultVec(cam, &lightDir, &lightDir);
+    GXInitLightPos(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 
+    lightDir.x = dirX;
+    lightDir.y = dirY;
+    lightDir.z = dirZ;
     PSMTXMultVecSR(cam, &lightDir, &lightDir);
     GXInitLightDir(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 

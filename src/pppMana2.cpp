@@ -964,34 +964,37 @@ void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
 extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
     Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5, float)
 {
-    float radius;
-    float x;
-    float z;
     float zero;
     float normalY;
-    int indexOffset;
-    short quadIndex;
-    short rowBase;
+    float radius;
+    float step;
+    float uvStep;
+    float x;
+    float z;
+    float rowUv;
     float* pos;
-    int rowCount;
     float* normal;
     float* uv;
-    unsigned int colCount;
-    unsigned int row;
+    int colCount;
+    int rowCount;
+    int indexOffset;
+    int quadIndex;
+    int rowBase;
     int pairCount;
-    double uvStep;
 
     normalY = FLOAT_803318a0;
     zero = FLOAT_80331898;
-    row = 0;
-    uvStep = (double)FLOAT_803318A8;
-    radius = (float)((double)param_5 * (double)FLOAT_803318a4);
-    for (z = radius; -radius <= z; z = z - (float)((double)param_5 * uvStep)) {
+    rowCount = 0;
+    uvStep = FLOAT_803318A8;
+    step = param_5 * uvStep;
+    radius = param_5 * FLOAT_803318a4;
+    for (z = radius; -radius <= z; z -= step) {
         colCount = 0;
+        rowUv = static_cast<float>(rowCount) * uvStep;
         pos = reinterpret_cast<float*>(param_1);
         normal = reinterpret_cast<float*>(param_2);
         uv = reinterpret_cast<float*>(param_3);
-        for (x = -radius; x <= radius; x = x + (float)((double)param_5 * uvStep)) {
+        for (x = -radius; x <= radius; x += step) {
             *pos = x;
             param_1 = reinterpret_cast<Vec*>(pos + 3);
             pos[1] = zero;
@@ -1004,11 +1007,11 @@ extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
             normal[1] = normalY;
             normal[2] = zero;
             normal = normal + 3;
-            *uv = (float)((double)(int)(colCount - 1) * uvStep);
-            uv[1] = (float)((double)(int)row * uvStep);
+            *uv = static_cast<float>(colCount - 1) * uvStep;
+            uv[1] = rowUv;
             uv = uv + 2;
         }
-        row = row + 1;
+        rowCount = rowCount + 1;
     }
     indexOffset = 0;
     rowCount = 0;
@@ -1017,18 +1020,18 @@ extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
         pairCount = 8;
         quadIndex = rowBase;
         do {
-            *(short*)((char*)param_4 + indexOffset) = quadIndex;
-            *(short*)((char*)param_4 + indexOffset + 2) = quadIndex + 1;
-            *(short*)((char*)param_4 + indexOffset + 4) = quadIndex + 0x12;
-            *(short*)((char*)param_4 + indexOffset + 6) = quadIndex + 0x12;
-            *(short*)((char*)param_4 + indexOffset + 8) = quadIndex + 0x11;
-            *(short*)((char*)param_4 + indexOffset + 10) = quadIndex;
-            *(short*)((char*)param_4 + indexOffset + 0xC) = quadIndex + 1;
-            *(short*)((char*)param_4 + indexOffset + 0xE) = quadIndex + 2;
-            *(short*)((char*)param_4 + indexOffset + 0x10) = quadIndex + 0x13;
-            *(short*)((char*)param_4 + indexOffset + 0x12) = quadIndex + 0x13;
-            *(short*)((char*)param_4 + indexOffset + 0x14) = quadIndex + 0x12;
-            *(short*)((char*)param_4 + indexOffset + 0x16) = quadIndex + 1;
+            *(short*)((char*)param_4 + indexOffset) = (short)quadIndex;
+            *(short*)((char*)param_4 + indexOffset + 2) = (short)(quadIndex + 1);
+            *(short*)((char*)param_4 + indexOffset + 4) = (short)(quadIndex + 0x12);
+            *(short*)((char*)param_4 + indexOffset + 6) = (short)(quadIndex + 0x12);
+            *(short*)((char*)param_4 + indexOffset + 8) = (short)(quadIndex + 0x11);
+            *(short*)((char*)param_4 + indexOffset + 10) = (short)quadIndex;
+            *(short*)((char*)param_4 + indexOffset + 0xC) = (short)(quadIndex + 1);
+            *(short*)((char*)param_4 + indexOffset + 0xE) = (short)(quadIndex + 2);
+            *(short*)((char*)param_4 + indexOffset + 0x10) = (short)(quadIndex + 0x13);
+            *(short*)((char*)param_4 + indexOffset + 0x12) = (short)(quadIndex + 0x13);
+            *(short*)((char*)param_4 + indexOffset + 0x14) = (short)(quadIndex + 0x12);
+            *(short*)((char*)param_4 + indexOffset + 0x16) = (short)(quadIndex + 1);
             quadIndex = quadIndex + 2;
             indexOffset = indexOffset + 0x18;
             pairCount = pairCount + -1;

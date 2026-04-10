@@ -1296,34 +1296,36 @@ void CGame::LoadFinished()
  */
 int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
-    int iVar5 =
+    int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-    if (2 < iVar5) {
-        iVar5 = 2;
+    if (2 < stage) {
+        stage = 2;
     }
 
-    s16 stageBase = s_bossArtifactStartTable[iVar5];
-    iVar5 = (int)((float)(u32)amount * s_ratio[ratioIndex]);
+    s16 stageBase = s_bossArtifactStartTable[stage];
+    u32 amountUnsigned = amount;
+    int scaledAmount = (int)((float)amountUnsigned * s_ratio[ratioIndex]);
 
-    s16 local_38[4];
-    memset(local_38, 0, 8);
+    u16 thresholds[4];
+    memset(thresholds, 0, 8);
 
-    u32 uVar2 = Game.m_bossArtifactBase;
+    u32 bossArtifactBase = Game.m_bossArtifactBase;
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
-    int iVar6 = 3;
-    int iVar4 = Game.m_bossArtifactBase + stageIndex * 0x168;
+    int artifactRank = 3;
+    int stageOffset = Game.m_bossArtifactBase + stageIndex * 0x168;
 
-    local_38[1] = *(s16*)(iVar4 + 0x162);
-    local_38[2] = *(s16*)(iVar4 + 0x164);
-    local_38[3] = *(s16*)(iVar4 + 0x166);
+    thresholds[1] = *(u16*)(stageOffset + 0x162);
+    thresholds[2] = *(u16*)(stageOffset + 0x164);
+    thresholds[3] = *(u16*)(stageOffset + 0x166);
 
-    if (((iVar5 < local_38[3]) && (iVar6 = 2, iVar5 < local_38[2])) && (iVar6 = 1, iVar5 < local_38[1])) {
-        iVar6 = 0;
+    if (((scaledAmount < (s16)thresholds[3]) && (artifactRank = 2, scaledAmount < (s16)thresholds[2])) &&
+        (artifactRank = 1, scaledAmount < (s16)thresholds[1])) {
+        artifactRank = 0;
     }
 
-    iVar5 = rand();
-    return uVar2 + stageIndex * 0x168 + 0x20 +
-           ((int)stageBase + (iVar5 - (iVar5 / (iVar6 + 1)) * (iVar6 + 1))) * 8;
+    scaledAmount = rand();
+    return bossArtifactBase + stageIndex * 0x168 + 0x20 +
+           ((int)stageBase + (scaledAmount - (scaledAmount / (artifactRank + 1)) * (artifactRank + 1))) * 8;
 }
 
 /*

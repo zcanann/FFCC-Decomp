@@ -247,14 +247,11 @@ void pppLight(void* param1, void* param2, void* param3)
 				light.m_spotScale = kPppLightDefaultCosAtten;
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
-				u32 targetIndex;
-				unsigned char* obj;
-
 				light.m_type = 1;
-				targetIndex = step->targetIndex;
-				if (targetIndex == 0xFFFFFFFF) {
-					obj = gPppDefaultValueBuffer;
-				} else {
+				u32 targetIndex = step->targetIndex;
+				unsigned char* obj = gPppDefaultValueBuffer;
+
+				if (targetIndex != 0xFFFFFFFF) {
 					pppLightTarget* targetTable =
 						(pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable;
 					obj = targetTable[targetIndex].obj;

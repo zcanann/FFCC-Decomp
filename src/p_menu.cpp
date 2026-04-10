@@ -25,7 +25,6 @@
 
 CMenuPcs MenuPcs;
 u8 gMenuProcessTable[0x15C];
-extern const f32 kMenuInitOne = 1.0f;
 static const char kMenuPcsStageName[] = "CMenuPcs";
 static const char kPMenuSourceFile[] = "p_menu.cpp";
 

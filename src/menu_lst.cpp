@@ -21,9 +21,9 @@ namespace {
 
 struct MenuLstState {
 	unsigned char pad_0000[0xB];
-	unsigned char initialized;
-	unsigned char pad_000C;
-	unsigned char closeRequested;
+	char initialized;
+	char pad_000C;
+	char closeRequested;
 	unsigned char pad_000E[2];
 	short mode;
 	unsigned char pad_0012[0x10];

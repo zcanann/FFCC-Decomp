@@ -237,8 +237,18 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(param_2->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
 
+        fVar2 = FLOAT_80331840;
+        pfVar6 = (float*)work->entries;
         for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar8++) {
-            initTracePolygon(pppYmTracer2, work->entries[iVar8]);
+            *(u8*)(pfVar6 + 8) = 0;
+            *(u8*)((u8*)pfVar6 + 0x1f) = 0;
+            pfVar6[2] = fVar2;
+            pfVar6[1] = fVar2;
+            pfVar6[0] = fVar2;
+            pfVar6[6] = fVar2;
+            pfVar6[5] = fVar2;
+            pfVar6[4] = fVar2;
+            pfVar6 += 10;
         }
     }
 

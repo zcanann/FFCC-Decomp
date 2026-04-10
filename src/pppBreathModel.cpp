@@ -375,7 +375,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         *(short*)((unsigned char*)vBreathModel + 0x44) = *(short*)((unsigned char*)vBreathModel + 0x44) + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
-            if (*(short*)(particleData + 0x50) < 1) {
+            if (*(short*)(particleData + 0x50) >= 1) {
+                UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+                    vBreathModel, pBreathModel, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
+            } else {
                 float zero = kPppBreathModelZero;
 
                 groupTableWork = *(int*)((unsigned char*)vBreathModel + 0x3C);
@@ -461,9 +464,6 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                         }
                     }
                 }
-            } else {
-                UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                    vBreathModel, pBreathModel, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
             }
 
             if (particleWmat != NULL) {

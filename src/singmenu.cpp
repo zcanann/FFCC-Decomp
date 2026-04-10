@@ -1050,47 +1050,53 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
 void CMenuPcs::SingleCalcFadeIn()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(self + 0x850);
-
-    if (fadeState->active == 0) {
+    if (*(short*)(*reinterpret_cast<int*>(self + 0x850) + 4) == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
-        memset(fadeState, 0, sizeof(SingleFadeState));
+        memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
 
-        int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) * 10;
-        fadeState->entries[0].startFrame = 0;
-        fadeState->entries[0].duration = 10;
-        fadeState->entries[1].startFrame = phase;
-        fadeState->entries[1].duration = 10;
-        fadeState->entries[2].startFrame = phase;
-        fadeState->entries[2].duration = 10;
-        fadeState->entries[3].startFrame = phase;
-        fadeState->entries[3].duration = 10;
+        int fadePtr = *reinterpret_cast<int*>(self + 0x850);
+        int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
+        *(int*)(fadePtr + 0x2C) = 0;
+        *(int*)(fadePtr + 0x30) = 10;
 
-        fadeState->count = 4;
-        fadeState->active = 1;
-        fadeState->done = 0;
+        fadePtr = *reinterpret_cast<int*>(self + 0x850);
+        *(int*)(fadePtr + 0x6C) = phase;
+        *(int*)(fadePtr + 0x70) = 10;
+
+        fadePtr = *reinterpret_cast<int*>(self + 0x850);
+        *(int*)(fadePtr + 0xAC) = phase;
+        *(int*)(fadePtr + 0xB0) = 10;
+
+        fadePtr = *reinterpret_cast<int*>(self + 0x850);
+        *(int*)(fadePtr + 0xEC) = phase;
+        *(int*)(fadePtr + 0xF0) = 10;
+
+        **reinterpret_cast<short**>(self + 0x850) = 4;
+        *(short*)(*reinterpret_cast<int*>(self + 0x850) + 6) = 0;
+        *(short*)(*reinterpret_cast<int*>(self + 0x850) + 4) = 1;
     }
 
     int completed = 0;
-    int ctrlState = *reinterpret_cast<int*>(self + 0x82C);
-    ++(*reinterpret_cast<s16*>(ctrlState + 0x22));
+    *(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = *(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22) + 1;
 
-    int totalEntries = static_cast<int>(fadeState->count);
-    int frame = static_cast<int>(*reinterpret_cast<s16*>(ctrlState + 0x22));
-    for (int i = 0; i < totalEntries; i++) {
-        SingleFadeEntry* entry = &fadeState->entries[i];
-        int start = entry->startFrame;
-        int duration = entry->duration;
-        if (start <= frame) {
-            if (frame < start + duration) {
-                int elapsed = ++entry->elapsed;
-                entry->alpha =
-                    static_cast<float>((DOUBLE_80332980 / static_cast<double>(duration)) * static_cast<double>(elapsed));
-            } else {
-                completed++;
-                entry->alpha = FLOAT_80332934;
+    int count = (int)**reinterpret_cast<short**>(self + 0x850);
+    short* entry = *reinterpret_cast<short**>(self + 0x850) + 4;
+    int frame = (int)*(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22);
+    if (0 < count) {
+        do {
+            if (*(int*)(entry + 0x12) <= frame) {
+                if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
+                    *(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
+                    *(float*)(entry + 8) = static_cast<float>((DOUBLE_80332980 / (double)*(int*)(entry + 0x14)) *
+                                                              (double)*(int*)(entry + 0x10));
+                } else {
+                    completed = completed + 1;
+                    *(float*)(entry + 8) = FLOAT_80332934;
+                }
             }
-        }
+            entry = entry + 0x20;
+            count = count - 1;
+        } while (count != 0);
     }
 
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
@@ -1115,8 +1121,8 @@ void CMenuPcs::SingleCalcFadeIn()
     CalcMatrix__Q26CChara6CModelFv(model);
     CalcSkin__Q26CChara6CModelFv(model);
 
-    if (totalEntries == completed) {
-        fadeState->done = 1;
+    if (**reinterpret_cast<short**>(self + 0x850) == completed) {
+        (*reinterpret_cast<short**>(self + 0x850))[3] = 1;
     }
 }
 

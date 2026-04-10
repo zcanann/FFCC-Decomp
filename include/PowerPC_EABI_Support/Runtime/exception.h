@@ -5,18 +5,6 @@
 
 namespace std {
 
-class exception {
-public:
-	virtual ~exception();
-	virtual const char* what() const;
-};
-
-class bad_exception : public exception {
-public:
-	virtual ~bad_exception();
-	virtual const char* what() const;
-};
-
 typedef void (*unexpected_handler)();
 unexpected_handler set_unexpected(unexpected_handler handler);
 void unexpected();
@@ -27,8 +15,6 @@ void terminate();
 
 } // namespace std
 
-using std::bad_exception;
-using std::exception;
 using std::terminate;
 using std::terminate_handler;
 using std::set_terminate;

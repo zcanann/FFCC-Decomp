@@ -1038,7 +1038,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/CircleBuffer.c", mw_version="GC/2.6"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c", mw_version="GC/2.6"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(
                 NonMatching,
@@ -1057,7 +1057,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msg.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msgbuf.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/msghndlr.c", mw_version="GC/2.6"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/msghndlr.c", mw_version="GC/2.6"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/mslsupp.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mutex_TRK.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c", mw_version="GC/2.6"),
@@ -1066,7 +1066,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(
-                Matching,
+                NonMatching,
                 "TRK_MINNOW_DOLPHIN/serpoll.c",
                 mw_version="GC/2.6",
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
@@ -1077,7 +1077,7 @@ config.libs = [
                 mw_version="GC/2.6",
             ),
             Object(Matching, "TRK_MINNOW_DOLPHIN/targcont.c"),
-            Object(Matching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
             Object(
                 NonMatching,
                 "TRK_MINNOW_DOLPHIN/targimpl.c",

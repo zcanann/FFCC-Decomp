@@ -1,7 +1,6 @@
 #ifndef METROTRK_PORTABLE_MAINLOOP_H
 #define METROTRK_PORTABLE_MAINLOOP_H
 
-
-void TRKNubMainLoop(void);
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 #endif /* METROTRK_PORTABLE_MAINLOOP_H */

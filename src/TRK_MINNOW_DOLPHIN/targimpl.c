@@ -3,8 +3,8 @@
 #include "PowerPC_EABI_Support/MetroTRK/trkenum.h"
 #include "PowerPC_EABI_Support/MetroTRK/dstypes.h"
 #include "PowerPC_EABI_Support/MetroTRK/memmap.h"
-
-extern void TRKUARTInterruptHandler(void); // should probably go in a header
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk.h"
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk_glue.h"
 
 typedef struct StopInfo_PPC {
 	u32 PC;

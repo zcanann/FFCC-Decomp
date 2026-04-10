@@ -1,8 +1,6 @@
 #ifndef METROTRK_PORTABLE_MWTRACE_H
 #define METROTRK_PORTABLE_MWTRACE_H
 
-#include "dolphin/types.h"
-
-void MWTRACE(u8, char*, ...);
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 #endif /* METROTRK_PORTABLE_MWTRACE_H */

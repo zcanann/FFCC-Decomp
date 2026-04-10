@@ -416,7 +416,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
-    int textureIndex[2];
+    int textureIndex;
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
@@ -433,9 +433,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-        textureIndex[0] = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
-                                                                     textureIndex[0]);
+        textureIndex = 0;
+        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);

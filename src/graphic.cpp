@@ -1271,12 +1271,13 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
  */
 void CGraphic::SetFogColor(_GXColor color)
 {
-    u8 c1 = color.g;
-    u8 c0 = color.r;
+    const u8* colorBytes = reinterpret_cast<const u8*>(&color);
+    u8 c0 = colorBytes[0];
+    u8 c1 = colorBytes[1];
     U8At(this, 0x7200) = c0;
-    c0 = color.b;
+    c0 = colorBytes[2];
     U8At(this, 0x7201) = c1;
-    c1 = color.a;
+    c1 = colorBytes[3];
     U8At(this, 0x7202) = c0;
     U8At(this, 0x7203) = c1;
 }

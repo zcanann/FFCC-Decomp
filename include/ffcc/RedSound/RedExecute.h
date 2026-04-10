@@ -27,7 +27,7 @@ void _VoiceEnvelopeCheck();
 void SetVoiceVolumeMix(RedVoiceDATA*, int, int);
 void _VolumeExecute(RedVoiceDATA*, int);
 void _PitchExecute(RedVoiceDATA*);
-void _WaveSplitSelect(RedWaveDATA*, RedNoteDATA*);
+RedWaveDATA* _WaveSplitSelect(RedWaveDATA*, RedNoteDATA*);
 void _VoiceDataAsign(RedTrackDATA*, RedVoiceDATA*, RedNoteDATA*, int*);
 RedVoiceDATA* _VoiceDataSelect(RedTrackDATA*, RedNoteDATA*, int*);
 void SetVoiceAccess(RedTrackDATA*, int);

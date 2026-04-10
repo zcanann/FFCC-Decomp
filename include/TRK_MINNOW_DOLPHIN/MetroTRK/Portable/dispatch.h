@@ -1,7 +1,7 @@
 #ifndef METROTRK_PORTABLE_DISPATCH_H
 #define METROTRK_PORTABLE_DISPATCH_H
 
-#include "dolphin/types.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,8 +21,6 @@ extern "C" {
 #define TRK_DISPATCH_CMD_CONTINUE       24 /* Continue debugging */
 #define TRK_DISPATCH_CMD_STEP           25 /* Step through an instruction */
 #define TRK_DISPATCH_CMD_STOP           26 /* Stop the debugger */
-
-typedef struct TRKBuffer TRKBuffer;
 
 BOOL TRKDispatchMessage(TRKBuffer* buffer);
 

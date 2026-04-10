@@ -3,13 +3,11 @@
  * Description:
  */
 
-#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msg.h"
-#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 /* 8036CFD8-8036D01C 367918 0044+00 0/0 6/6 0/0 .text            TRKMessageSend */
-DSError TRKMessageSend(TRK_Msg* msg) {
-    DSError write_err = TRKWriteUARTN(&msg->m_msg, msg->m_msgLength);
-    MWTRACE(1, "MessageSend : cc_write returned %ld\n", write_err);
+DSError TRKMessageSend(TRKBuffer* msg) {
+    DSError writeErr = TRKWriteUARTN(&msg->data, msg->length);
+    MWTRACE(1, "MessageSend : cc_write returned %ld\n", writeErr);
     return DS_NoError;
 }

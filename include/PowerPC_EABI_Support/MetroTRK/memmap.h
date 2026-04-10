@@ -1,7 +1,7 @@
 #ifndef METROTRK_MEMMAP_H
 #define METROTRK_MEMMAP_H
 
-#include "PowerPC_EABI_Support/MetroTRK/targimpl_trk.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 typedef struct memRange {
 	u8* start;

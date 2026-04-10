@@ -1,8 +1,6 @@
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/mpc_7xx_603e.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 
-extern u8 gTRKRestoreFlags[9 + 3 /* padding */];
-
 asm void TRKSaveExtended1Block()
 {
 #ifdef __MWERKS__ // clang-format off

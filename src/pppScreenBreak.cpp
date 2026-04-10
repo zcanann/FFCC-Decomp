@@ -46,6 +46,8 @@ struct ScreenBreakDisplayList {
 struct ScreenBreakMeshData {
     u8 _pad0[0x50];
     ScreenBreakDisplayList* m_displayLists;
+    u8 _pad54[0x8];
+    s32 m_nodeIndex;
 };
 
 struct ScreenBreakMeshRef {
@@ -55,14 +57,18 @@ struct ScreenBreakMeshRef {
 };
 
 struct ScreenBreakModelData {
-    u8 _pad0[0x24];
+    u8 _pad0[0xC];
+    u32 m_meshCount;
+    u8 _pad10[0x14];
     CMaterialSet* m_materialSet;
 };
 
 struct ScreenBreakModelView {
-    u8 _pad0[0xA4];
+    u8 _pad0[0x38];
+    Mtx m_drawMtx;
+    u8 _pad78[0x2C];
     ScreenBreakModelData* m_data;
-    u8 _padA8[0x4];
+    u8* m_nodes;
     ScreenBreakMeshRef* m_meshes;
 };
 
@@ -150,6 +156,7 @@ void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
  */
 int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
+    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     Vec translation;
     Quaternion axisQuat;
@@ -202,19 +209,19 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     PSVECAdd(&cameraRefPos, &screenOffset, &screenOffset);
 
     PSMTXInverse(cameraMtx, invCameraMtx);
-    PSMTXConcat(invCameraMtx, *(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)model + 0x38));
-    (*(Mtx*)((u8*)model + 0x38))[0][3] = screenOffset.x;
-    (*(Mtx*)((u8*)model + 0x38))[1][3] = screenOffset.y;
-    (*(Mtx*)((u8*)model + 0x38))[2][3] = screenOffset.z;
+    PSMTXConcat(invCameraMtx, modelView->m_drawMtx, modelView->m_drawMtx);
+    modelView->m_drawMtx[0][3] = screenOffset.x;
+    modelView->m_drawMtx[1][3] = screenOffset.y;
+    modelView->m_drawMtx[2][3] = screenOffset.z;
 
     if (*(float*)((u8*)param_3 + 0x30) != 0.0f) {
         PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }
 
-    u8* mesh = *(u8**)((u8*)model + 0xAC);
-    for (u32 i = 0; i < *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC); i++) {
+    ScreenBreakMeshRef* mesh = modelView->m_meshes;
+    for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
         if (*((char*)pieceData + 0x38) != '\0') {
-            u8* node = *(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)(mesh + 8) + 0x5C) * 0xC0);
+            u8* node = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0);
             u8* nodeMtx = node + 0xC;
 
             *(float*)(node + 0x18) = 0.0f;
@@ -260,7 +267,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
         }
 
-        mesh += 0x14;
+        mesh++;
         pieceData += 0xF;
     }
 

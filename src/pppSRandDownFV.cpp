@@ -35,12 +35,12 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
     u8* self = (u8*)param2;
     PppSRandDownFVParam2* cfg = (PppSRandDownFVParam2*)param1;
     PppSRandDownFVParam3* info = (PppSRandDownFVParam3*)param3;
-    f32* randVec;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
+    f32* randVec;
     s32 currentIndex = *(s32*)(self + 0xC);
     if (currentIndex == 0) {
         randVec = (f32*)(self + *info->fieldC + 0x80);

@@ -11,7 +11,11 @@ extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__8CFontMan[];
 extern "C" void* __vt__5CFont[];
+extern "C" char ARRAY_802ea170[];
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
@@ -25,6 +29,22 @@ Mtx44Ptr GetScreenMatrix()
 {
     return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
 }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800930e0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_fontman_cpp(void)
+{
+    *reinterpret_cast<void**>(&FontMan) = __vt__8CManager;
+    *reinterpret_cast<void**>(&FontMan) = __vt__8CFontMan;
+    __register_global_object(&FontMan, reinterpret_cast<void*>(__dt__8CFontManFv), ARRAY_802ea170);
 }
 
 /*

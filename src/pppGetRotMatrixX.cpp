@@ -1,3 +1,4 @@
+#include "ffcc/ppp_constants.h"
 #include "ffcc/pppGetRotMatrixX.h"
 
 /*
@@ -11,10 +12,11 @@
  */
 void pppGetRotMatrixX(pppFMATRIX& mtx, long angle)
 {
+    unsigned int tableAngle = angle;
     float one = 1.0f;
     float zero = 0.0f;
-    float sinValue = *(float*)((unsigned char*)ppvSinTbl + (angle & 0xFFFC));
-    float cosValue = *(float*)((unsigned char*)ppvSinTbl + ((angle + 0x4000) & 0xFFFC));
+    float sinValue = *(float*)((unsigned char*)gPppTrigTable + (tableAngle & 0xFFFC));
+    float cosValue = *(float*)((unsigned char*)gPppTrigTable + ((tableAngle + 0x4000) & 0xFFFC));
 
     mtx.value[0][0] = one;
     mtx.value[0][1] = zero;

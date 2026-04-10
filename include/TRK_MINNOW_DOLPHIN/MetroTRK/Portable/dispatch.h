@@ -22,8 +22,6 @@ extern "C" {
 #define TRK_DISPATCH_CMD_STEP           25 /* Step through an instruction */
 #define TRK_DISPATCH_CMD_STOP           26 /* Stop the debugger */
 
-BOOL TRKDispatchMessage(TRKBuffer* buffer);
-
 #ifdef __cplusplus
 }
 #endif

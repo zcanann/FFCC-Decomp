@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-DSError TRKRequestSend(TRKBuffer* msgBuf, int* bufferId, u32 p1, u32 p2, int p3);
 DSError TRKSuppAccessFile(u32 file_handle, u8* data, size_t* count,
                           DSIOResult* io_result, BOOL needReply, BOOL read);
 DSError HandleOpenFileSupportRequest(const char* path, u8 replyError, u32* param_3,

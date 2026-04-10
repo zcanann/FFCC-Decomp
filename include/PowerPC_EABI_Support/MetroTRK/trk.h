@@ -143,7 +143,6 @@ void ReserveEXI2Port(void);
 void MWTRACE(u8, char*, ...);
 
 DSError TRKRequestSend(TRKBuffer* msgBuf, int* bufferId, u32 p1, u32 p2, int p3);
-u32 TRKAccessFile(u32, u32, u32*, u8*);
 
 DSError TRK_main(void);
 UARTError InitializeUART(UARTBaudRate baudRate);

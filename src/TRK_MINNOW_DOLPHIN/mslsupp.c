@@ -1,6 +1,5 @@
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
-#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/targsupp.h"
 
 DSIOResult __read_file(u32 handle, u8* buffer, u32* count, void* ref_con);

@@ -199,12 +199,14 @@ DSError TRKValidMemory32(const void* addr, size_t length,
             } else {
                 err = DS_NoError;
                 if (start < (u32)gTRKMemMap[i].start) {
-                    upperEnd = (u32)gTRKMemMap[i].start - start;
-                    upperEnd += start - 1;
+                    const memRange* range;
+
+                    range = &gTRKMemMap[0];
+                    upperEnd = (u32)range->start - 1;
                     err = DS_InvalidMemory;
                     if ((start <= upperEnd)
-                        && (start <= (u32)gTRKMemMap[i].end)
-                        && (upperEnd >= (u32)gTRKMemMap[i].start)) {
+                        && (start <= (u32)range->end)
+                        && (upperEnd >= (u32)range->start)) {
                         if (((readWriteable == VALIDMEM_Readable)
                              && !gTRKMemMap[i].readable)
                             || ((readWriteable == VALIDMEM_Writeable)
@@ -229,11 +231,14 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                     }
                 }
                 if ((err == DS_NoError) && (end > (u32)gTRKMemMap[i].end)) {
+                    const memRange* range;
+
+                    range = &gTRKMemMap[0];
                     upperEnd = end - (u32)gTRKMemMap[i].end;
                     upperEnd += (u32)gTRKMemMap[i].end - 1;
                     err = DS_InvalidMemory;
-                    if (((u32)gTRKMemMap[i].end <= upperEnd)
-                        && ((u32)gTRKMemMap[i].start <= upperEnd)) {
+                    if (!((upperEnd < (u32)range->end)
+                        || (upperEnd < (u32)range->start))) {
                         if (((readWriteable == VALIDMEM_Readable)
                              && !gTRKMemMap[i].readable)
                             || ((readWriteable == VALIDMEM_Writeable)

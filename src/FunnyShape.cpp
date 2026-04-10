@@ -577,13 +577,14 @@ void CFunnyShape::RenderShape()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     GXColor chanColor = DAT_8032fd60;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
-    GXColor matColor = chanColor;
+    GXColor matColor = DAT_8032fd60;
     GXSetChanMatColor(GX_COLOR0, matColor);
 
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010));
-    Vec2d offset;
-    offset.x = FLOAT_8032fd90;
-    offset.y = FLOAT_8032fd94;
+    Vec2d offsetCopy;
+    offsetCopy.x = 480.0f;
+    offsetCopy.y = 336.0f;
+    Vec2d offset = offsetCopy;
     RenderShape(shape, offset, 0.0f);
 }
 

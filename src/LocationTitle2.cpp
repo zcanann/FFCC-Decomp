@@ -291,9 +291,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 {
     int serializedOffset;
     LocationTitle2Work* work;
-    LocationTitle2Particle* particle;
     long** shapeTable;
     int graphFrame;
+    LocationTitle2Particle* particle;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
@@ -302,9 +302,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         return;
     }
 
-    particle = (LocationTitle2Particle*)work->m_particles;
     shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
     graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
+    particle = (LocationTitle2Particle*)work->m_particles;
 
     pppSetBlendMode(unkB->m_blendMode);
 
@@ -336,6 +336,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
         if ((lookNorm.z == 0.0f) && (side.z == 0.0f)) {
             side.x = 1.0f;
+            side.y = 0.0f;
             side.z = 0.0f;
             up.x = 0.0f;
             up.y = 0.0f;

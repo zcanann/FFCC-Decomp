@@ -227,7 +227,7 @@ DSError TRKValidMemory32(const void* addr, size_t length,
                         }
                     }
                 }
-                if ((err == DS_NoError) && ((u32)gTRKMemMap[i].end < end)) {
+                if ((err == DS_NoError) && (end > (u32)gTRKMemMap[i].end)) {
                     err = DS_InvalidMemory;
                     end = (start + (u32)length) - 2;
                     if (((u32)gTRKMemMap[i].end <= end)

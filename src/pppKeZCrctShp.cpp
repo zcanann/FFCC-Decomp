@@ -49,14 +49,14 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
 
     mode = stepData->m_mode;
 
-    if (mode == 0) {
+    if (mode == 1) {
+        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
+    } else if (mode == 0) {
         transformedPos.x += stepData->m_offset.x;
         transformedPos.y += stepData->m_offset.y;
         transformedPos.z += stepData->m_offset.z;
         pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
-    } else if (mode == 1) {
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
-    } else if (mode == 2) {
+    } else if (mode < 3) {
         pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
         zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
         zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;

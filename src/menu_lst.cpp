@@ -429,6 +429,7 @@ void CMenuPcs::MLstCtrl()
 int CMenuPcs::MLstClose()
 {
 	float fVar1;
+	double dVar3;
 	int iVar5;
 	unsigned int uVar6;
 	int iVar7;
@@ -445,11 +446,12 @@ int CMenuPcs::MLstClose()
 	uVar8 = uVar6;
 	if (0 < (int)uVar6) {
 		do {
+			dVar3 = 0.0;
 			if (entry->startFrame <= iVar7) {
 				if (iVar7 < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
-					entry->alpha = (float)(1.0 - ((1.0 / (double)entry->duration) * (double)entry->timer));
-					if (entry->alpha < 0.0f) {
+					entry->alpha = (float)-((1.0 / (double)entry->duration) * (double)entry->timer - 1.0);
+					if ((double)entry->alpha < dVar3) {
 						entry->alpha = 0.0f;
 					}
 				} else {

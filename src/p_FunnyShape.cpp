@@ -395,7 +395,7 @@ void CFunnyShapePcs::drawViewer()
     }
 
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
-    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), s_spinner[(frameCount >> 4) & 3]);
+    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), s_spinner[(frameCount >> 4) % 4]);
 }
 
 /*

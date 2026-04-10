@@ -67,8 +67,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     KeShpTail3XStep* step;
     KeShpTail3XWork* work;
     Vec pos;
-    Vec temp;
-    Vec historyPos;
+    Vec historyPos ATTRIBUTE_ALIGN(8);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -85,13 +84,9 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
             pos.y = obj->pppPObject.m_localMatrix.value[1][3];
             pos.z = obj->pppPObject.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppFMATRIX ownerMatrix;
-            pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
 
-            partMatrix = obj->pppPObject.m_localMatrix;
-            ownerMatrix = pppMngStPtr->m_matrix;
-            pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
+            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
             pos.z = outMatrix.value[2][3];
@@ -101,8 +96,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         Vec* history = work->m_posHistory;
         s32 i = 0x1c;
         do {
-            temp = historyPos;
-            pppCopyVector(*history, temp);
+            pppCopyVector(*history, historyPos);
             history++;
             i--;
         } while (i > 0);
@@ -118,20 +112,15 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppFMATRIX ownerMatrix;
-        pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;
 
-        partMatrix = obj->pppPObject.m_localMatrix;
-        ownerMatrix = pppMngStPtr->m_matrix;
-        pppMulMatrix(outMatrix, ownerMatrix, partMatrix);
+        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];
     }
 
-    temp = pos;
-    pppCopyVector(work->m_posHistory[work->m_head], temp);
+    pppCopyVector(work->m_posHistory[work->m_head], pos);
 
     work->m_values[8] += work->m_values[0xc];
     work->m_values[0] += work->m_values[8];

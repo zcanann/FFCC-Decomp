@@ -73,7 +73,8 @@ void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
     s32 i;
 
     uvLayout = (CMapMeshUVLayout*)model;
-    for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+    uvByteOffset = 0;
+    for (i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
         if (perU < (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset)) {
             perU = (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset);
         }

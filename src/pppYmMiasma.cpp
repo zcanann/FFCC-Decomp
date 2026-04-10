@@ -32,19 +32,21 @@ extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
 struct VYmMiasma {
-    void* m_particles;
-    float m_unknown4;
-    float m_unknown8;
-    float m_unknownC;
+    PARTICLE_DATA* m_particles;
+    float m_speedDecay;
+    u8 m_emitTimer;
+    u8 m_pad09[7];
     Vec m_impulse;
     float m_radius;
+    float m_radiusVelocity;
+    float m_radiusAcceleration;
     Vec m_prevPosition;
-    u8 m_emitTimer;
+    u8 m_prevPositionChanged;
     u8 m_pad35[3];
 };
 
 struct PYmMiasma {
-    u32 m_flags;
+    u32 m_graphId;
     s32 m_dataValIndex;
     s16 m_shapeFrameStep;
     s16 m_pad0A;
@@ -114,6 +116,19 @@ struct YmMiasmaRenderStep {
     u8 m_pad33[0x41];
     u8 m_drawEnvA;
     u8 m_drawEnvB;
+};
+
+struct YmMiasmaFrameStep : PYmMiasma {
+    u8 m_pad54[4];
+    float m_radiusDelta;
+    float m_radiusVelocity;
+    float m_radiusAcceleration;
+    u8 m_emitInterval;
+    u8 m_pad65;
+    s16 m_baseAngle;
+    s16 m_angleRange;
+    u8 m_pad6A[2];
+    float m_speedDecayStep;
 };
 
 /*
@@ -328,7 +343,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + state->m_speedDecay * particleData->m_matrix[1][2];
     state->m_speedDecay = state->m_speedDecay - pYmMiasma->m_speedDecay;
 
-    if (vData->m_unknown4 != FLOAT_80330644 && state->m_hasImpulse == 0) {
+    if (vData->m_speedDecay != FLOAT_80330644 && state->m_hasImpulse == 0) {
         impulse = vData->m_impulse;
         PSVECScale(&impulse, &impulse, state->m_speedDecay);
         currentPos.x = particleData->m_matrix[0][0];
@@ -437,12 +452,10 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
     static char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
-    u8* step = (u8*)param_2;
-    u8* workBytes;
-    float* work;
+    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
+    VYmMiasma* work;
     int i;
-    u8* particle;
-    int count;
+    PARTICLE_DATA* particle;
     Vec matrixPos;
     Vec oldPos;
     Vec delta;
@@ -455,33 +468,31 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         return;
     }
 
-    workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
-    work = (float*)workBytes;
+    work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
-    if (*(int*)step == *(int*)pppYmMiasma_) {
-        work[7] = work[7] + *(float*)(step + 0x58);
-        work[8] = work[8] + *(float*)(step + 0x5c);
-        work[9] = work[9] + *(float*)(step + 0x60);
+    if (step->m_graphId == *(u32*)pppYmMiasma_) {
+        work->m_radius = work->m_radius + step->m_radiusDelta;
+        work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
+        work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;
     }
 
-    count = (int)*(u16*)(step + 0xc);
-    if (*(u32*)workBytes == 0) {
-        *(u32*)workBytes = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)count * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
-        particle = (u8*)(u32) * (u32*)workBytes;
-        for (i = 0; i < count; i++) {
-            InitParticleData((VYmMiasma*)workBytes, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (PARTICLE_DATA*)particle);
-            particle += 0x50;
+    if (work->m_particles == 0) {
+        work->m_particles = (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
+        particle = work->m_particles;
+        for (i = 0; i < step->m_particleCount; i++) {
+            InitParticleData(work, (_pppPObject*)pppYmMiasma_, step, particle);
+            particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
         }
     }
 
-    workBytes[8] = (u8)(workBytes[8] + 1);
-    work[1] = work[1] - *(float*)(step + 0x6c);
-    if (work[1] < FLOAT_80330644) {
-        work[1] = FLOAT_80330644;
+    work->m_emitTimer = work->m_emitTimer + 1;
+    work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
+    if (work->m_speedDecay < FLOAT_80330644) {
+        work->m_speedDecay = FLOAT_80330644;
     }
 
-    if (*(u8*)(step + 0x64) < workBytes[8]) {
+    if (step->m_emitInterval < work->m_emitTimer) {
         int r;
         s16 angleDelta;
         u32 signBit;
@@ -489,49 +500,47 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         u32 local_28;
         u32 uStack_24;
 
-        workBytes[8] = 0;
-        work[1] = *(float*)(step + 0x18);
+        work->m_emitTimer = 0;
+        work->m_speedDecay = step->m_unk18;
 
         r = rand();
-        angleDelta = (s16)r - (s16)(r / (int)*(s16*)(step + 0x68)) * *(s16*)(step + 0x68);
+        angleDelta = (s16)r - (s16)(r / (int)step->m_angleRange) * step->m_angleRange;
         signBit = (u32)(int)angleDelta >> 31;
         if ((((int)angleDelta & 1U) ^ signBit) == signBit) {
             angleDelta = -angleDelta;
         }
 
         local_28 = 0x43300000;
-        uStack_24 = (u32)(s16)(angleDelta + *(s16*)(step + 0x66)) ^ 0x80000000;
+        uStack_24 = (u32)(s16)(angleDelta + step->m_baseAngle) ^ 0x80000000;
         temp.ull = ((unsigned long long)local_28 << 32) | (unsigned long long)uStack_24;
         angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(temp.d - DOUBLE_80330648)) / FLOAT_80330654);
-        work[4] = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
-        work[5] = FLOAT_80330644;
-        work[6] = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
+        work->m_impulse.x = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
+        work->m_impulse.y = FLOAT_80330644;
+        work->m_impulse.z = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
     }
 
-    work[8] = work[8] + work[9];
-    work[7] = work[7] + work[8];
+    work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
+    work->m_radius = work->m_radius + work->m_radiusVelocity;
 
-    particle = (u8*)(u32) * (u32*)workBytes;
-    for (i = 0; i < count; i++) {
-        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (PARTICLE_DATA*)particle);
-        particle += 0x50;
+    particle = work->m_particles;
+    for (i = 0; i < step->m_particleCount; i++) {
+        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
+        particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
     }
 
     matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
     matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
     matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
-    oldPos.x = work[10];
-    oldPos.y = work[11];
-    oldPos.z = work[12];
+    oldPos = work->m_prevPosition;
 
     pppSubVector(delta, matrixPos, oldPos);
-    if ((double)PSVECDistance(&matrixPos, (Vec*)(work + 10)) == (double)FLOAT_80330644) {
-        workBytes[0x34] = 0;
+    if ((double)PSVECDistance(&matrixPos, &work->m_prevPosition) == (double)FLOAT_80330644) {
+        work->m_prevPositionChanged = 0;
     } else {
-        workBytes[0x34] = 0xff;
+        work->m_prevPositionChanged = 0xff;
     }
 
-    pppCopyVector(*(Vec*)(work + 10), matrixPos);
+    pppCopyVector(work->m_prevPosition, matrixPos);
 }
 
 /*

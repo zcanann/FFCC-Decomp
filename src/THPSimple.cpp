@@ -518,8 +518,8 @@ void __THPSimpleDVDCallback(long result, DVDFileInfo*)
 s32 THPSimplePreLoad(s32 loop)
 {
     s32 status;
-    u32 i;
     u32 readCount;
+    u32 i;
 
     if ((SimpleControl.isOpen == 0) || (SimpleControl.isPreLoaded != 0)) {
         return 0;
@@ -531,9 +531,10 @@ s32 THPSimplePreLoad(s32 loop)
     }
 
     for (i = 0; i < readCount; i++) {
-        while ((status = DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
-                                          SimpleControl.readSize, SimpleControl.readOffset,
-                                          static_cast<DVDCallback>(0), 2)) == 0) {
+        THPReadBuffer* readBuffer = &SimpleControl.readBuffer[SimpleControl.readIndex];
+
+        while ((status = DVDReadAsyncPrio(&SimpleControl.fileInfo, readBuffer->mPtr, SimpleControl.readSize,
+                                          SimpleControl.readOffset, static_cast<DVDCallback>(0), 2)) == 0) {
             status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
             if ((status == 0xB) || ((status - 4U) < 3) || (status == -1)) {
                 File.DrawError(SimpleControl.fileInfo, status);
@@ -548,9 +549,9 @@ s32 THPSimplePreLoad(s32 loop)
         }
 
         SimpleControl.readOffset += SimpleControl.readSize;
-        SimpleControl.readSize = *reinterpret_cast<s32*>(SimpleControl.readBuffer[SimpleControl.readIndex].mPtr);
-        SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
-        SimpleControl.readBuffer[SimpleControl.readIndex].mFrameNumber = SimpleControl.curAudioTrack;
+        SimpleControl.readSize = *reinterpret_cast<s32*>(readBuffer->mPtr);
+        readBuffer->mIsValid = 1;
+        readBuffer->mFrameNumber = SimpleControl.curAudioTrack;
         SimpleControl.curAudioTrack++;
         SimpleControl.readIndex = (SimpleControl.readIndex + 1) & 7;
 

@@ -60,8 +60,8 @@ extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 
-static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static char s_ptrarray_grow_error_801D79D8[] = "CPtrArray grow error";
+static char s_collection_ptrarray_h_801D79F4[] = "collection_ptrarray.h";
 static char s_textureman_cpp[] = "textureman.cpp";
 static char s_error_width_height[] = "Error width %d, height %d\n";
 
@@ -356,13 +356,13 @@ int CPtrArray<CTexture*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(s_ptrarray_grow_error_801D79D8);
             }
             m_size = m_size << 1;
         }
 
         newItems = (CTexture**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h_801D79F4, 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }

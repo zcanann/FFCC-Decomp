@@ -311,6 +311,10 @@ cflags_game_cpp_exceptions = replace_flag_prefix(
     cflags_game, "-Cpp_exceptions ", "-Cpp_exceptions on"
 )
 
+cflags_game_cpp_exceptions_fmadd = replace_flag_prefix(
+    cflags_fmadd, "-Cpp_exceptions ", "-Cpp_exceptions on"
+)
+
 
 def redsound_flags_from_profile(profile: str) -> List[str]:
     base = list(cflags_game)
@@ -503,7 +507,7 @@ config.libs = [
             Object(NonMatching, "pppConstrainCameraDir2.cpp"),
             Object(Matching, "pppConstrainCameraForLoc.cpp"),
             Object(NonMatching, "pppCorona.cpp"),
-            Object(NonMatching, "pppCrystal.cpp"),
+            Object(NonMatching, "pppCrystal.cpp", cflags=cflags_game_cpp_exceptions_fmadd),
             Object(NonMatching, "pppCrystal2.cpp"),
             Object(Matching, "pppDrawMatrix.cpp"),
             Object(Matching, "pppDrawMatrixFront.cpp"),

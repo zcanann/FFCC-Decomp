@@ -2,7 +2,6 @@
 #include "PowerPC_EABI_Support/Runtime/Gecko_ExceptionPPC.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
-#include "PowerPC_EABI_Support/Runtime/exception.h"
 
 #pragma force_active on
 
@@ -75,6 +74,22 @@ typedef struct ActionIterator {
 static ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
+
+namespace std {
+
+class exception {
+public:
+	virtual ~exception() {}
+	virtual const char* what() const;
+};
+
+class bad_exception : public exception {
+public:
+	virtual ~bad_exception();
+	virtual const char* what() const;
+};
+
+} // namespace std
 
 /**
  * @note Address: 0x800C2374

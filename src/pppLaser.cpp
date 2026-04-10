@@ -232,7 +232,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
     Mtx charaMtx;
     Mtx tempMtx;
 
-    if ((gPppCalcDisabled != 0) || (step->m_stepValue == 1)) {
+    if ((gPppCalcDisabled != 0) || (step->m_stepValue == 0xFFFF)) {
         return;
     }
 

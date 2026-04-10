@@ -150,12 +150,6 @@ static inline void ReleaseRef(void** slot)
     }
 }
 
-static inline void AddRef(void* ref)
-{
-    if (ref != 0) {
-        reinterpret_cast<RefObject*>(ref)->refCount = reinterpret_cast<RefObject*>(ref)->refCount + 1;
-    }
-}
 }
 
 /*
@@ -635,9 +629,8 @@ CTexAnimSet::~CTexAnimSet()
 void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>((int)this + 8);
 
-    texAnims->SetStage(stage);
+    reinterpret_cast<CPtrArray<CTexAnim*>*>((int)this + 8)->SetStage(stage);
     chunkFile.PushChunk();
     while ((int)chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == 0x54414E4D) {
@@ -721,7 +714,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 }
             }
             chunkFile.PopChunk();
-            texAnims->Add(texAnim);
+            reinterpret_cast<CPtrArray<CTexAnim*>*>((int)this + 8)->Add(texAnim);
         }
     }
     chunkFile.PopChunk();
@@ -749,7 +742,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
     }
 
     dup->texAnims.SetStage(stage);
-    for (unsigned long i = 0; i < static_cast<unsigned long>(self->texAnims.GetSize()); i++) {
+    for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* src = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
             __nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0xF4));
@@ -766,7 +759,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
         }
 
         copy->refData = src->refData;
-        AddRef(copy->refData);
+        reinterpret_cast<RefObject*>(copy->refData)->refCount = reinterpret_cast<RefObject*>(copy->refData)->refCount + 1;
         copy->unk0C = src->unk0C;
         copy->unk10 = src->unk10;
         copy->unk14 = src->unk14;

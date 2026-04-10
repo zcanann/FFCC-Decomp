@@ -104,6 +104,21 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
+
+struct MapObjAttachAttr
+{
+    void* vtable;
+    int type;
+    char name[1];
+};
+
+struct MapObjAttachObj
+{
+    char pad_00[0x0C];
+    CMapHit* mapHit;
+    char pad_10[0xDC];
+    MapObjAttachAttr* attr;
+};
 }
 
 /*
@@ -1708,35 +1723,43 @@ void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
  */
 void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-    int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
-    unsigned char* mapObj = Ptr(this, 0x954);
-    unsigned char* mapObjEnd = mapObj + (mapObjCount * 0xF0);
+    MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954));
 
     while (true) {
-        while (mapObj < mapObjEnd) {
-            unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-            if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == 3) {
-                break;
-            }
-            mapObj += 0xF0;
+        unsigned int remaining = static_cast<unsigned int>(
+            (reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0)) -
+                mapObj));
+
+        if (mapObj < reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0))) {
+            do {
+                if (mapObj->attr != 0 && mapObj->attr->type == 3) {
+                    goto found;
+                }
+                mapObj++;
+                remaining--;
+            } while (remaining != 0);
         }
 
-        if (mapObj >= mapObjEnd) {
+        mapObj = 0;
+found:
+        if (mapObj == 0) {
             return;
         }
 
-        unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-        if (strcmp(mapHitName, reinterpret_cast<char*>(mapObjAtr + 8)) == 0) {
-            *reinterpret_cast<CMapHit**>(mapObj + 0xC) = mapHit;
+        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
+            mapObj->mapHit = mapHit;
 
+            MapObjAttachAttr* mapObjAtr = mapObj->attr;
             if (mapObjAtr != 0) {
-                void (**vtable)(void*, int) = reinterpret_cast<void (**)(void*, int)>(*reinterpret_cast<void**>(mapObjAtr));
-                vtable[2](mapObjAtr, 1);
-                *reinterpret_cast<unsigned char**>(mapObj + 0xEC) = 0;
+                if (mapObjAtr != 0) {
+                    typedef void (*MapObjAtrDtor)(MapObjAttachAttr*, int);
+                    reinterpret_cast<MapObjAtrDtor*>(*reinterpret_cast<void***>(mapObjAtr))[2](mapObjAtr, 1);
+                }
+                mapObj->attr = 0;
             }
         }
 
-        mapObj += 0xF0;
+        mapObj++;
     }
 }
 

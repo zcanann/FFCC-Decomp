@@ -44,7 +44,7 @@ extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
-extern "C" void* __vt__8CManager;
+extern "C" void* __vt__8CManager[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
@@ -107,16 +107,17 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
+    volatile void** base = reinterpret_cast<volatile void**>(self);
 
-    *reinterpret_cast<void**>(self) = &__vt__8CManager;
-    *reinterpret_cast<void**>(self) = &__vt__8CProcess;
-    *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
+    *base = __vt__8CManager;
+    *base = &__vt__8CProcess;
+    *base = __vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(self + 0x3C);
     __ct__11CFunnyShapeFv(self + 0x50);
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
-    __register_global_object(&FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
+    __register_global_object(&FunnyShapePcs, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
 
     CopyFunnyShapePcsTable();
 }

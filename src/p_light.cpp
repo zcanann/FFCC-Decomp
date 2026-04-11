@@ -288,11 +288,11 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
     u32 i = 0;
 
     do {
-        bool hasTexture = *reinterpret_cast<void**>(light + 0x1cf0) != 0;
-
-        if (hasTexture) {
+        void* texture = *reinterpret_cast<void**>(light + 0x1cf0);
+        if (texture != 0) {
+            bool hasTexture = texture != 0;
             if (hasTexture) {
-                Free__7CMemoryFPv(&Memory, *reinterpret_cast<void**>(light + 0x1cf0));
+                Free__7CMemoryFPv(&Memory, texture);
                 *reinterpret_cast<void**>(light + 0x1cf0) = 0;
             }
 

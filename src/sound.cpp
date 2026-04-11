@@ -1821,7 +1821,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
 int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float farDistance, int fadeFrames)
 {
     if (soundId < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         CSoundLayout& sound = SoundData(this);
         u8* se = sound.m_seWork;
@@ -1853,7 +1853,7 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
 
                 int sePlayId;
                 if (soundId < 0) {
-                    Printf__7CSystemFPce(&System, s_soundErrorFmt);
+                    Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                     sePlayId = -1;
                 } else if (soundId < 4000) {
                     int bank = soundId / 1000 + (soundId >> 31);
@@ -1869,7 +1869,8 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
                 } else {
                     const u32 fade = static_cast<u32>(fadeFrames);
                     const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
-                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, soundId, pan, firstVolume, 0);
+                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, soundId, pan,
+                                                        firstVolume, 0);
                     if (fade != 0) {
                         SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
                     }

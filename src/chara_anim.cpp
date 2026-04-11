@@ -301,37 +301,42 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 						while (chunkFile.GetNextChunk(nodeChunk)) {
 							if (nodeChunk.m_id == 0x4E414D45) {
 								strcpy(node.m_name, chunkFile.GetString());
-							} else if (((int)nodeChunk.m_id < 0x4E414D45) && (nodeChunk.m_id == 0x44415441)) {
-								int i = 0;
-								int shift = 0;
-								do {
-									int type = (int)chunkFile.Get4();
-									int mode;
+							} else if ((int)nodeChunk.m_id < 0x4E414D45) {
+								if (nodeChunk.m_id == 0x44415441) {
+									int i = 0;
+									int shift = 0;
+									do {
+										int type = (int)chunkFile.Get4();
+										int mode;
 
-									if (type == 0) {
-										mode = 0;
-									} else if (type == 1) {
-										mode = 1;
-									} else {
-										mode = 2;
-									}
+										if (type == 0) {
+											mode = 0;
+										} else if (type == 1) {
+											mode = 1;
+										} else {
+											mode = 2;
+										}
 
-									unsigned int dataOffset = chunkFile.Get4();
-									if (i == 0) {
-										node.m_dataOffset = dataOffset;
-									}
+										unsigned int dataOffset = chunkFile.Get4();
+										if (i == 0) {
+											node.m_dataOffset = dataOffset;
+										}
 
-									node.m_flags = (((node.m_flags >> 0xD) & 0x3FFFF) | ((mode << shift) & 0x3FFFFU)) << 0xD |
-									               (node.m_flags & 0x80001FFF);
+										unsigned int nodeFlags = node.m_flags;
+										node.m_flags =
+										    (((nodeFlags >> 0xD) & 0x3FFFF) | ((mode << shift) & 0x3FFFFU)) << 0xD |
+										    (nodeFlags & 0x80001FFF);
 
-									if ((5 < i) && (type != 0)) {
-										*reinterpret_cast<unsigned char*>(&node.m_flags) =
-										    (*reinterpret_cast<unsigned char*>(&node.m_flags) & 0x7F) | 0x80;
-									}
+										if ((5 < i) && (type != 0)) {
+											unsigned char flags = *reinterpret_cast<unsigned char*>(&node.m_flags);
+											*reinterpret_cast<unsigned char*>(&node.m_flags) =
+											    static_cast<unsigned char>(__rlwimi(flags, 1, 7, 24, 24));
+										}
 
-									i++;
-									shift += 2;
-								} while (i < 9);
+										i++;
+										shift += 2;
+									} while (i < 9);
+								}
 							}
 						}
 						chunkFile.PopChunk();

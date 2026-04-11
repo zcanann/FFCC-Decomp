@@ -417,11 +417,10 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
     u8 baseAlpha = dataSet[0xB];
     *(u8*)(state + 2) = dataSet[8];
+    double alphaScale = (double)baseAlpha / FLOAT_803311e0;
     *((u8*)state + 9) = dataSet[9];
     *((u8*)state + 10) = dataSet[0xA];
     *((u8*)state + 11) = baseAlpha;
-
-    double alphaScale = (double)baseAlpha / FLOAT_803311e0;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
         param_2->m_stepValue, pppEmission_, param_2->m_graphId,

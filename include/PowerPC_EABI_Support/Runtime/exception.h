@@ -5,8 +5,17 @@
 
 namespace std {
 
-class exception;
-class bad_exception;
+class exception {
+public:
+	virtual ~exception();
+	virtual const char* what() const;
+};
+
+class bad_exception : public exception {
+public:
+	virtual ~bad_exception();
+	virtual const char* what() const;
+};
 
 typedef void (*unexpected_handler)();
 unexpected_handler set_unexpected(unexpected_handler handler);

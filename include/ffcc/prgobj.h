@@ -27,7 +27,7 @@ public:
     void changeStat(int, int, int);
     void changeSubStat(int subState);
     void addSubStat();
-    void reqAnim(int, int, int);
+    void reqAnim(int, signed char, signed char);
     int isLoopAnim();
     int isLoopAnimDirect();
     int playSe3D(int, int, int, int, Vec*);

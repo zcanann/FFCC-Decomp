@@ -192,16 +192,16 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
             while (i < colAnmCount) {
                 if (colAnmData->ptr != (void*)0) {
                     __dla__FPv(colAnmData->ptr);
-                    colAnmData->ptr = 0;
+                    colAnmData->ptr = (void*)0;
                 }
                 colAnmData = colAnmData + 1;
                 i = i + 1;
             }
             if (listItem->colAnmData != (ZCANMGRP*)0) {
                 __dla__FPv(listItem->colAnmData);
-                listItem->colAnmData = 0;
+                listItem->colAnmData = (ZCANMGRP*)0;
             }
-            listItem->colAnmData = 0;
+            listItem->colAnmData = (ZCANMGRP*)0;
         }
         __dl__FPv(listItem);
     }

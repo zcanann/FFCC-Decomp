@@ -77,12 +77,6 @@ typedef void (*DeleteFunc)(void*);
 
 namespace std {
 
-class exception {
-public:
-	virtual ~exception() {}
-	virtual const char* what() const;
-};
-
 class bad_exception : public exception {
 public:
 	virtual ~bad_exception();

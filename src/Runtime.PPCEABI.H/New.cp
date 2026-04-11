@@ -1,4 +1,5 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
+#include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/New.h"
 
 inline void operator delete(void* arg0) throw() {
@@ -8,12 +9,6 @@ inline void operator delete(void* arg0) throw() {
 }
 
 namespace std {
-
-class exception {
-public:
-    virtual ~exception();
-    virtual const char* what() const;
-};
 
 /*
  * --INFO--

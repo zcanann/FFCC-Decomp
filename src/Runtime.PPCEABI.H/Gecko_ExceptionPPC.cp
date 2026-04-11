@@ -630,12 +630,13 @@ static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void
  * @note Address: N/A
  * @note Size: 0x88
  */
-static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
+static int ExPPC_IsInSpecification(const char* extype, const ex_specification* spec)
 {
-	s32 i, offset;
+	int i;
+	s32 offset;
 
 	for (i = 0; i < spec->specs; i++) {
-		if (__throw_catch_compare(extype, spec->spec[i], &offset))
+		if (__throw_catch_compare(extype, (const char*)spec->spec[i], &offset))
 			return 1;
 	}
 
@@ -645,6 +646,8 @@ static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 using std::bad_exception;
 
 namespace std {
+
+bad_exception::bad_exception() {}
 
 bad_exception::~bad_exception() {}
 
@@ -656,20 +659,24 @@ bad_exception::~bad_exception() {}
  */
 extern void __unexpected(CatchInfo* catchinfo)
 {
-	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
+	static const char unexpectedTypes[] = "!bad_exception!!\0!std::bad_exception!!";
+	const char* stdBadExceptionType = unexpectedTypes;
+	const ex_specification* unexp = (const ex_specification*)catchinfo->stacktop;
+
+	stdBadExceptionType += sizeof("!bad_exception!!");
 
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 
 	try {
 		unexpected();
 	} catch (...) {
-		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
+		if (ExPPC_IsInSpecification((const char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
-		if (ExPPC_IsInSpecification("!bad_exception!!", unexp)) {
+		if (ExPPC_IsInSpecification(unexpectedTypes, unexp)) {
 			throw bad_exception();
 		}
-		if (ExPPC_IsInSpecification("!std::bad_exception!!", unexp)) {
+		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
 			throw bad_exception();
 		}
 	}

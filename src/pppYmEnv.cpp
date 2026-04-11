@@ -57,6 +57,11 @@ struct GraphValueState {
     s32 graphId;
 };
 
+struct Vec2d {
+    float x;
+    float y;
+};
+
 struct PartMngEditRaw {
     u8 m_pad00[0x23554];
     void* m_recvBuff;
@@ -800,8 +805,16 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     Graphic.SetViewport();
 
     if (mode != 0) {
-        gUtil.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, 0, 0, 0, (GXBlendFactor)4,
-                                       (GXBlendFactor)5);
+        Vec2d uvMin;
+        Vec2d uvMax;
+
+        uvMin.x = 1.0f;
+        uvMin.y = 0.0f;
+        uvMax.x = 0.0f;
+        uvMax.y = 1.0f;
+
+        gUtil.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax, 0, (GXBlendFactor)4,
+                                (GXBlendFactor)5);
         Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
     }
 }

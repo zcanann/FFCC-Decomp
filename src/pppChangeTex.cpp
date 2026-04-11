@@ -339,11 +339,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	int colorOffset = serializedDataOffsets[1];
-	int workOffset = serializedDataOffsets[2];
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + workOffset + 0x80);
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + serializedDataOffsets[2] + 0x80);
+	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(
+	    GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0));
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 	    step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, &work->m_value0, &work->m_value1, &work->m_value2,
@@ -456,6 +454,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		double d;
 		u32 u[2];
 	} alphaScale;
+	int colorOffset = serializedDataOffsets[1];
+
 	alphaScale.u[0] = 0x43300000;
 	alphaScale.u[1] = (u8)*((u8*)changeTex + colorOffset + 0x8B);
 	double alphaBase = (double)(FLOAT_80332028 * ((float)(alphaScale.d - DOUBLE_80332038) / FLOAT_80332028));
@@ -466,8 +466,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		int pointOffset = 0;
 		int colorBase = *(int*)(work->m_meshColorArrays + arrayOffset);
 		int colorPtr = colorBase;
-		unsigned int vertCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x14);
-		for (unsigned int v = 0; v < vertCount; v++) {
+		unsigned int vertCount;
+		for (unsigned int v = 0; (vertCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x14), v < vertCount); v++) {
 			if (step->m_payload[0] == 1) {
 				if (*(short*)(*(int*)(meshList + 0xC) + pointOffset + 2) < splitY) {
 					*(char*)(colorPtr + 3) = (char)(int)alphaBase;

@@ -645,11 +645,17 @@ static int ExPPC_IsInSpecification(const char* extype, const ex_specification* s
 
 using std::bad_exception;
 
+extern "C" const char s_bad_exception[] = "bad_exception";
+
 namespace std {
 
 bad_exception::bad_exception() {}
 
 bad_exception::~bad_exception() {}
+
+const char* bad_exception::what() const {
+	return s_bad_exception;
+}
 
 } // namespace std
 

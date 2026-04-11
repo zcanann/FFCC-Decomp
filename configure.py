@@ -835,7 +835,7 @@ config.libs = [
         "axart",
         [
             Object(NonMatching, "axart/axart.c"),
-            Object(NonMatching, "axart/axart3d.c"),
+            Object(Matching, "axart/axart3d.c"),
         ],
     ),
     DolphinLib(
@@ -1071,7 +1071,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
             Object(
-                NonMatching,
+                Matching,
                 "TRK_MINNOW_DOLPHIN/serpoll.c",
                 mw_version="GC/2.6",
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
@@ -1082,7 +1082,7 @@ config.libs = [
                 mw_version="GC/2.6",
             ),
             Object(Matching, "TRK_MINNOW_DOLPHIN/targcont.c"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
+            Object(Matching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
             Object(
                 NonMatching,
                 "TRK_MINNOW_DOLPHIN/targimpl.c",

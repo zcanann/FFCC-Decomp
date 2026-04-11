@@ -428,88 +428,85 @@ void CMenuPcs::MLstCtrl()
  */
 int CMenuPcs::MLstClose()
 {
-	float fVar1;
-	double dVar3;
-	int iVar5;
-	unsigned int uVar6;
-	int iVar7;
-	unsigned int uVar8;
+	float zero;
+	int completedItems;
 	MenuLstEntry* entry;
-	MenuLstState* state = GetMenuLstStateStruct(this);
-	MenuLstList* list = GetMenuLstListStruct(this);
+	unsigned int itemCount;
+	int currentFrame;
+	unsigned int count;
 
-	iVar5 = 0;
-	state->frame = state->frame + 1;
-	uVar6 = (unsigned int)list->count;
-	entry = list->entries;
-	iVar7 = (int)state->frame;
-	uVar8 = uVar6;
-	if (0 < (int)uVar6) {
+	completedItems = 0;
+	GetMenuLstStateStruct(this)->frame = GetMenuLstStateStruct(this)->frame + 1;
+	itemCount = (unsigned int)GetMenuLstListStruct(this)->count;
+	entry = GetMenuLstListStruct(this)->entries;
+	currentFrame = (int)GetMenuLstStateStruct(this)->frame;
+	count = itemCount;
+	if ((int)itemCount > 0) {
 		do {
-			dVar3 = 0.0;
-			if (entry->startFrame <= iVar7) {
-				if (iVar7 < entry->startFrame + entry->duration) {
+			if (entry->startFrame <= currentFrame) {
+				if (currentFrame < entry->startFrame + entry->duration) {
 					entry->timer = entry->timer + 1;
 					entry->alpha = (float)-((1.0 / (double)entry->duration) * (double)entry->timer - 1.0);
-					if ((double)entry->alpha < dVar3) {
+					if ((double)entry->alpha < 0.0) {
 						entry->alpha = 0.0f;
 					}
 				} else {
-					iVar5 = iVar5 + 1;
+					completedItems++;
 					entry->alpha = 0.0f;
 				}
 			}
 			entry++;
-			uVar8 = uVar8 - 1;
-		} while (uVar8 != 0);
+			count--;
+		} while (count != 0);
 	}
-	fVar1 = 0.0f;
-	if (list->count == iVar5) {
-		entry = list->entries;
-		if (0 < (int)uVar6) {
-			uVar8 = uVar6 >> 3;
-			if (uVar8 != 0) {
+	zero = 0.0f;
+	if (GetMenuLstListStruct(this)->count == completedItems) {
+		entry = GetMenuLstListStruct(this)->entries;
+		if ((int)itemCount > 0) {
+			count = itemCount >> 3;
+			if (count != 0) {
 				do {
 					entry[0].startFrame = 0;
 					entry[0].duration = 1;
-					entry[0].alpha = fVar1;
+					entry[0].alpha = zero;
 					entry[1].startFrame = 0;
 					entry[1].duration = 1;
-					entry[1].alpha = fVar1;
+					entry[1].alpha = zero;
 					entry[2].startFrame = 0;
 					entry[2].duration = 1;
-					entry[2].alpha = fVar1;
+					entry[2].alpha = zero;
 					entry[3].startFrame = 0;
 					entry[3].duration = 1;
-					entry[3].alpha = fVar1;
+					entry[3].alpha = zero;
 					entry[4].startFrame = 0;
 					entry[4].duration = 1;
-					entry[4].alpha = fVar1;
+					entry[4].alpha = zero;
 					entry[5].startFrame = 0;
 					entry[5].duration = 1;
-					entry[5].alpha = fVar1;
+					entry[5].alpha = zero;
 					entry[6].startFrame = 0;
 					entry[6].duration = 1;
-					entry[6].alpha = fVar1;
+					entry[6].alpha = zero;
 					entry[7].startFrame = 0;
 					entry[7].duration = 1;
-					entry[7].alpha = fVar1;
+					entry[7].alpha = zero;
 					entry += 8;
-					uVar8 = uVar8 - 1;
-				} while (uVar8 != 0);
-				uVar6 = uVar6 & 7;
-				if (uVar6 == 0) {
+					count--;
+				} while (count != 0);
+				itemCount &= 7;
+				if (itemCount == 0) {
 					return 1;
 				}
 			}
-				do {
-					entry->startFrame = 0;
-					entry->duration = 1;
-					entry->alpha = fVar1;
-					entry++;
-					uVar6 = uVar6 - 1;
-				} while (uVar6 != 0);
-			}
+
+			do {
+				entry->startFrame = 0;
+				entry->duration = 1;
+				entry->alpha = zero;
+				entry++;
+				itemCount--;
+			} while (itemCount != 0);
+		}
 		return 1;
 	}
 

@@ -1307,12 +1307,18 @@ void CMenuPcs::SetColor(CColor& color)
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
     char path[0x108];
-    u8* self = reinterpret_cast<u8*>(this);
-    CFont** fontSlot = reinterpret_cast<CFont**>(self + 0x100 + fontNo * 4);
-    CFont* font = *fontSlot;
+    int slot = fontNo * 4 + 0x100;
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + slot);
+
     if (font != 0) {
-        ReleaseRefObject(font);
-        *fontSlot = 0;
+        u32* raw = reinterpret_cast<u32*>(font);
+        int refCount = static_cast<int>(raw[1]);
+        int nextRefCount = refCount - 1;
+        raw[1] = static_cast<u32>(nextRefCount);
+        if (refCount - 1 == 0) {
+            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(font, 1);
+        }
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + slot) = 0;
     }
 
     sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.GetLangString(), fileName);
@@ -1336,16 +1342,18 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
     for (int i = 0; i < 0x10; i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(self + 0x100 + slotOffset) + 0x34);
         _GXColor out = texture->GetTlutColor(i);
+
         if (i < 9) {
             out.r = color.r;
             out.g = color.g;
             out.b = color.b;
         } else {
             float blend = 1.0f - static_cast<float>(i - 9) / 10.0f;
-            out.r = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.r)) * blend);
-            out.g = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.g)) * blend);
-            out.b = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.b)) * blend);
+            out.r = static_cast<u8>(245.5f - (245.0f - static_cast<float>(color.r)) * blend);
+            out.g = static_cast<u8>(245.5f - (245.0f - static_cast<float>(color.g)) * blend);
+            out.b = static_cast<u8>(245.5f - (245.0f - static_cast<float>(color.b)) * blend);
         }
+
         texture->SetTlutColor(i, out);
     }
 

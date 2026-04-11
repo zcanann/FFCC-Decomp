@@ -416,7 +416,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
-    int textureIndex[2];
+    u16 count;
+    u32 format;
+    int textureIndex;
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
@@ -429,13 +431,13 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorData + 8, (void*)&ppvCameraMatrix02, FLOAT_803306e8,
+            (void*)(colorData + 8), (void*)&ppvCameraMatrix02, FLOAT_803306e8,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-        textureIndex[0] = 0;
+        textureIndex = 0;
         texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
-                                                                     textureIndex[0]);
+                                                                     textureIndex);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
@@ -447,23 +449,24 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            u32 format = (u32)texture->m_format;
+            format = (u32)texture->m_format;
             if ((format == 8) || (format == 9)) {
                 SetUpPaletteEnv(texture);
             }
 
-            uvStep = FLOAT_803306ec / (f32)work->count;
+            count = work->count;
+            uvStep = FLOAT_803306ec / (f32)((f64)count - DOUBLE_803306F0);
             GXSetCullMode(GX_CULL_NONE);
 
-            for (i = 0; i < (s32)(work->count - 1); i++) {
+            for (i = 0; i < (s32)(count - 1); i++) {
                 if (((poly->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
                      (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
                      (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
                      (FLOAT_803306e8 != (poly + 1)->to.x) && (FLOAT_803306e8 != (poly + 1)->to.y) &&
                      (FLOAT_803306e8 != (poly + 1)->to.z) && (FLOAT_803306e8 != (poly + 1)->from.x) &&
                      (FLOAT_803306e8 != (poly + 1)->from.y) && (FLOAT_803306e8 != (poly + 1)->from.z))) {
-                    uTop = (f32)i * uvStep;
-                    uBottom = (f32)(i + 1) * uvStep;
+                    uTop = (f32)((f64)i * (f64)uvStep);
+                    uBottom = (f32)((f64)(i + 1) * (f64)uvStep);
                     colorTop.value = DAT_803306e0;
                     colorBottom.value = DAT_803306e4;
                     colorTop.bytes[3] = poly->alpha;

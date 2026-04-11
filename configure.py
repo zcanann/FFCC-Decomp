@@ -924,7 +924,11 @@ config.libs = [
             Object(Matching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
             Object(Matching, "Runtime.PPCEABI.H/__va_arg.c"),
             Object(Matching, "Runtime.PPCEABI.H/CPlusLibPPC.cp"),
-            Object(NonMatching, "Runtime.PPCEABI.H/GCN_mem_alloc.c"),
+            Object(
+                Matching,
+                "Runtime.PPCEABI.H/GCN_mem_alloc.c",
+                cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
+            ),
             Object(
                 NonMatching,
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
@@ -944,7 +948,7 @@ config.libs = [
                 cflags=replace_flag_prefix(cflags_runtime, "-RTTI ", "-RTTI on"),
             ),
             Object(
-                NonMatching,
+                Matching,
                 "Runtime.PPCEABI.H/NMWException.cp",
                 extra_cflags=["-inline auto,deferred"],
             ),

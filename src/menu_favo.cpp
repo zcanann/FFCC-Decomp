@@ -27,6 +27,26 @@ struct FavoFlatData
 	FavoFlatTableEntry table[8];
 };
 
+struct FavoOpenAnim {
+	short x;
+	short y;
+	short w;
+	short h;
+	float u;
+	float v;
+	float alpha;
+	float scale;
+	int tex;
+	int step;
+	int startFrame;
+	int duration;
+	unsigned int flags;
+	float dx;
+	float dy;
+	float targetX;
+	float targetY;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8016343c
@@ -510,46 +530,32 @@ unsigned int CMenuPcs::FavoCtrl()
  */
 bool CMenuPcs::FavoClose()
 {
-	short* entry;
-	int finished;
-	int count;
-	int frame;
-	int remaining;
+	int finished = 0;
+	singMenuState->frame++;
 
-	finished = 0;
-	singMenuState->frame = singMenuState->frame + 1;
-	count = (int)*favoList;
-	entry = favoList + 4;
-	frame = (int)singMenuState->frame;
-	remaining = count;
-	while (0 < remaining) {
-		float zero = FLOAT_80333040;
+	int count = favoList[0];
+	FavoOpenAnim* anim = reinterpret_cast<FavoOpenAnim*>((unsigned char*)favoList + 8);
+	int frame = singMenuState->frame;
 
-		if (*(int*)(entry + 0x12) <= frame) {
-			if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
-				int duration;
-				int progress;
-				float alpha;
-
-				*(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
-				duration = *(int*)(entry + 0x14);
-				progress = *(int*)(entry + 0x10);
-				alpha = (float)(1.0 - (double)progress / (double)duration);
-				*(float*)(entry + 8) = alpha;
-				if ((*(unsigned int*)(entry + 0x16) & 2) == 0) {
-					zero = alpha;
-					*(float*)(entry + 0x18) = (*(float*)(entry + 0x1c) - (float)entry[0]) * zero;
-					*(float*)(entry + 0x1a) = (*(float*)(entry + 0x1e) - (float)entry[1]) * zero;
-				}
+	for (int i = 0; i < count; i++, anim++) {
+		float zeroF = FLOAT_80333040;
+		if (anim->startFrame <= frame) {
+			if (!(frame < anim->startFrame + anim->duration)) {
+				finished++;
+				anim->alpha = FLOAT_80333040;
+				anim->dx = zeroF;
+				anim->dy = zeroF;
 			} else {
-				finished = finished + 1;
-				*(float*)(entry + 8) = FLOAT_80333040;
-				*(float*)(entry + 0x18) = zero;
-				*(float*)(entry + 0x1a) = zero;
+				anim->step++;
+				double oneD = DOUBLE_80333050;
+				anim->alpha = (float)-((DOUBLE_80333050 / (double)anim->duration) * (double)anim->step - DOUBLE_80333050);
+				if ((anim->flags & 2) == 0) {
+					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
+					anim->dx = (anim->targetX - (float)anim->x) * ratio;
+					anim->dy = (anim->targetY - (float)anim->y) * ratio;
+				}
 			}
 		}
-		entry = entry + 0x20;
-		remaining = remaining + -1;
 	}
 
 	return count == finished;

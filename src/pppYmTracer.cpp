@@ -43,6 +43,12 @@ struct TracerMngRaw {
     TracerDataValue* dataValues;
 };
 
+struct TracerEnvRaw {
+    CMemory::CStage* stagePtr;
+    CMaterialSet* materialSetPtr;
+    CMapMesh** mapMeshPtr;
+};
+
 static float* resolveTracerWorkValue(s32 valueIndex, s32 workOffset)
 {
     if (valueIndex == -1) {
@@ -211,6 +217,7 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
     _pppPObject* baseObj;
+    TracerEnvRaw* env;
     TracerMngRaw* mng;
     TracerWork* work;
     TRACE_POLYGON* entries;
@@ -225,6 +232,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     }
 
     baseObj = (_pppPObject*)pppYmTracer;
+    env = reinterpret_cast<TracerEnvRaw*>(pppEnvStPtr);
     work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_3->m_serializedDataOffsets);
     entries = work->entries;
     maxCount = *(u16*)(param_2->m_payload + 4);
@@ -233,7 +241,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         alpha = param_2->m_payload[8];
         decay = (u8)((u16)alpha / *(u16*)(param_2->m_payload + 6));
         entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * sizeof(TRACE_POLYGON),
-                                                                         pppEnvStPtr->m_stagePtr,
+                                                                         env->stagePtr,
                                                                          s_pppYmTracer_cpp_801d9ce0, 0xEB);
         work->entries = entries;
         fVar3 = FLOAT_803306e8;
@@ -403,6 +411,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
     u8* colorData;
+    TracerEnvRaw* env;
     TracerWork* work;
     TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
@@ -420,11 +429,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
+    env = reinterpret_cast<TracerEnvRaw*>(pppEnvStPtr);
     work = (TracerWork*)((u8*)pppYmTracer + 0x80 + dataOffset);
     colorData = (u8*)pppYmTracer + 0x80 + colorOffset;
     poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
+    mapMesh = env->mapMeshPtr[dataValIndex];
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
@@ -434,8 +444,8 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
         textureIndex[0] = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
-                                                                     textureIndex[0]);
+        texture =
+            (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, env->materialSetPtr, textureIndex[0]);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);

@@ -2040,7 +2040,7 @@ found_entry:
 _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 {
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
         return 0;
     }
 
@@ -2065,7 +2065,7 @@ found_entry:
     if (found != 0) {
         const int playId = *reinterpret_cast<int*>(found + 8);
         if (playId < 0) {
-            Printf__7CSystemFPce(&System, s_soundErrorFmt, fadeFrames, ret);
+            Printf__7CSystemFPce(&System, s_soundMinusOneFmt, fadeFrames, ret);
         } else {
             SeFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), playId, fadeFrames);
         }

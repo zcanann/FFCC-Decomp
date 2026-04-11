@@ -3152,7 +3152,6 @@ CMaterialSet::~CMaterialSet()
         }
     }
 
-    materials->RemoveAll();
     materials->~CPtrArray<CMaterial*>();
     __dt__4CRefFv(this, 0);
 }
@@ -3168,16 +3167,17 @@ CMaterialSet::~CMaterialSet()
  */
 CMaterialSet::CMaterialSet()
 {
+    CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
-
-    *reinterpret_cast<unsigned long*>(Ptr(this, 0x0C)) = 0;
-    *reinterpret_cast<unsigned long*>(Ptr(this, 0x10)) = 0;
-    *reinterpret_cast<unsigned long*>(Ptr(this, 0x14)) = 0x10;
-    *reinterpret_cast<void**>(Ptr(this, 0x18)) = 0;
-    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x1C)) =
-        MaterialMan.GetMemoryStage();
-    *reinterpret_cast<int*>(Ptr(this, 0x20)) = 1;
+    materials->m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
+    materials->m_size = 0;
+    materials->m_numItems = 0;
+    materials->m_defaultSize = 0x10;
+    materials->m_items = 0;
+    materials->m_stage = MaterialMan.GetMemoryStage();
+    materials->m_growCapacity = 1;
 }
 
 /*

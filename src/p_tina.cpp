@@ -22,7 +22,7 @@ extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
 }
-static char s_tinaSourceName[] = "p_tina.cpp";
+static char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
 static char s_tinaPrioTimeFmt[] = "prioTime:%d prio:%d pdtID:%2d fp:%08x\n";
 static char s_tinaTitleFmt[] = "Tina :%c\n";
 static char s_tinaCalcFmt[] = "clc :%f / max :%f\n";
@@ -55,6 +55,9 @@ extern "C" void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void pppSetRendMatrix__8CPartMngFv(CPartMng*);
 extern "C" void pppDraw__8CPartMngFv(CPartMng*);
+extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+extern "C" void Start__10CStopWatchFv(void*);
+extern "C" void Stop__10CStopWatchFv(void*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
     char*,
@@ -807,15 +810,15 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x308);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_tina_cpp_801d8008, 0x308);
+    Start__10CStopWatchFv(&g_par_draw_prof);
+    Start__10CStopWatchFv(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
-    OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x30f);
-    OSStopStopwatch(&g_par_draw_prof);
+    Stop__10CStopWatchFv(&g_par_calc_prof);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_tina_cpp_801d8008, 0x30f);
+    Stop__10CStopWatchFv(&g_par_draw_prof);
     pppClearDrawEnv();
 }
 
@@ -830,15 +833,15 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x31a);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_tina_cpp_801d8008, 0x31a);
+    Start__10CStopWatchFv(&g_par_draw_prof);
+    Start__10CStopWatchFv(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
-    OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x322);
-    OSStopStopwatch(&g_par_draw_prof);
+    Stop__10CStopWatchFv(&g_par_calc_prof);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_tina_cpp_801d8008, 0x322);
+    Stop__10CStopWatchFv(&g_par_draw_prof);
     pppClearDrawEnv();
 }
 
@@ -1056,14 +1059,14 @@ void CPartPcs::drawAfterViewer()
 {
 	int frameSign;
 
-	Graphic._WaitDrawDone(s_tinaSourceName, 0x3f1);
+	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
 	OSStartStopwatch(&g_par_draw_prof);
 	OSStartStopwatch(&g_par_calc_prof);
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	OSStopStopwatch(&g_par_calc_prof);
-	Graphic._WaitDrawDone(s_tinaSourceName, 0x3fb);
+	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
 	OSStopStopwatch(&g_par_draw_prof);
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();

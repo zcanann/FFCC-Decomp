@@ -153,7 +153,7 @@ static int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
  * @note Address: N/A
  * @note Size: 0x204
  */
-static void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
+void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
 {
 	FragmentInfo* fragment;
 	FragmentInfo frag;
@@ -248,14 +248,14 @@ static exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
 	return ((ex_destroylocal*)iter->info.action_pointer)->action & EXACTION_MASK;
 }
 
-static exaction_type ExPPC_NextAction(ActionIterator* iter);
-static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher);
+exaction_type ExPPC_NextAction(ActionIterator* iter);
+void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher);
 
 /**
  * @note Address: N/A
  * @note Size: 0x1C0
  */
-static char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
+char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
 {
 	char *SP, *callers_SP;
 	f64* FPR_save_area;
@@ -451,15 +451,11 @@ bad_exception::~bad_exception() {}
 const char* bad_exception::what() const;
 } // namespace std
 
-static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
-                                          "!std::exception!!std::bad_exception!!\0\0\0"
-                                          "!std::bad_exception!!\0\0";
-extern "C" const char s_std_bad_exception[] = "std::bad_exception";
-extern "C" const char s_std_exception[] = "std::exception";
-extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
-const char* std::bad_exception::what() const { return s_bad_exception; }
+extern "C" const char s_std_bad_exception[];
+extern "C" const char s_std_exception[];
+extern "C" const char s_bad_exception[0x20];
 
-extern "C" void* __RTTI__Q23std9exception[];
+extern "C" void* __RTTI__Q23std9exception_gecko[];
 extern "C" void* s_bad_exception_rtti[];
 extern "C" void* __RTTI__Q23std13bad_exception[];
 
@@ -477,14 +473,16 @@ extern "C" void* __vt__Q23std13bad_exception[];
  */
 extern void __unexpected(CatchInfo* catchinfo)
 {
-	const char* badExceptionType = unexpectedTypes;
-	const char* stdExceptionBadExceptionType;
-	const char* stdBadExceptionType;
+	static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
+	                                          "!std::exception!!std::bad_exception!!\0\0\0"
+	                                          "!std::bad_exception!!\0\0";
+	char* badExceptionType = (char*)unexpectedTypes;
+	char* stdExceptionBadExceptionType;
+	char* stdBadExceptionType;
 	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
 
 	stdExceptionBadExceptionType = badExceptionType;
 	stdExceptionBadExceptionType += sizeof("!bad_exception!!\0\0\0");
-
 	stdBadExceptionType = stdExceptionBadExceptionType;
 	stdBadExceptionType += sizeof("!std::exception!!std::bad_exception!!\0\0");
 
@@ -498,12 +496,12 @@ extern void __unexpected(CatchInfo* catchinfo)
 		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
-		if (ExPPC_IsInSpecification((char*)badExceptionType, unexp)) {
+		if (ExPPC_IsInSpecification(badExceptionType, unexp)) {
 			badException.vtable = __vt__Q23std9exception;
 			badException.vtable = __vt__Q23std13bad_exception;
 			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
 		}
-		if (ExPPC_IsInSpecification((char*)stdBadExceptionType, unexp)) {
+		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
 			BadExceptionStorage stdBadException;
 
 			stdBadException.vtable = __vt__Q23std9exception;
@@ -514,11 +512,16 @@ extern void __unexpected(CatchInfo* catchinfo)
 	terminate();
 }
 
+extern "C" const char s_std_bad_exception[] = "std::bad_exception";
+extern "C" const char s_std_exception[] = "std::exception";
+extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
+const char* std::bad_exception::what() const { return s_bad_exception; }
+
 /**
  * @note Address: N/A
  * @note Size: 0x104
  */
-asm static void ExPPC_LongJump(register ThrowContext* context, register void* newRTOC, register void* newPC)
+asm void ExPPC_LongJump(register ThrowContext* context, register void* newRTOC, register void* newPC)
 {
 #ifdef __MWERKS__ // clang-format off
 	nofralloc
@@ -637,7 +640,7 @@ static void ExPPC_HandleUnexpected(ThrowContext* context, MWExceptionInfo* info,
  * @note Address: N/A
  * @note Size: 0x410
  */
-static void ExPPC_ThrowHandler(ThrowContext* context)
+void ExPPC_ThrowHandler(ThrowContext* context)
 {
 	ActionIterator iter;
 	MWExceptionInfo info;
@@ -781,7 +784,7 @@ static void ExPPC_ThrowHandler(ThrowContext* context)
  * @note Address: N/A
  * @note Size: 0x50C
  */
-static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher)
+void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher)
 {
 	exaction_type action;
 
@@ -890,7 +893,7 @@ static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void
  * @note Address: N/A
  * @note Size: 0x1C0
  */
-static exaction_type ExPPC_NextAction(ActionIterator* iter)
+exaction_type ExPPC_NextAction(ActionIterator* iter)
 {
 	exaction_type action;
 
@@ -975,8 +978,8 @@ static exaction_type ExPPC_NextAction(ActionIterator* iter)
 	}
 }
 
-extern "C" void* __RTTI__Q23std9exception[]       = { (void*)s_std_exception, 0 };
-extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception, 0, 0 };
+extern "C" void* __RTTI__Q23std9exception_gecko[] = { (void*)s_std_exception, 0 };
+extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception_gecko, 0, 0 };
 extern "C" void* __RTTI__Q23std13bad_exception[] = { (void*)s_std_bad_exception, s_bad_exception_rtti };
 
 /**

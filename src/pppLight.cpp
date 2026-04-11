@@ -54,7 +54,7 @@ struct PppLightStep {
 
 struct PppLightMngProgramInfo {
 	u8 unk0[0xD4];
-	u32 programInfoTable;
+	pppLightTarget* programInfoTable;
 };
 
 extern "C" {
@@ -247,18 +247,12 @@ void pppLight(void* param1, void* param2, void* param3)
 				light.m_spotScale = kPppLightDefaultCosAtten;
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
-				u32 targetIndex;
 				unsigned char* obj;
 
 				light.m_type = 1;
-				targetIndex = step->targetIndex;
-				if (targetIndex == 0xFFFFFFFF) {
-					obj = gPppDefaultValueBuffer;
-				} else {
-					pppLightTarget* targetTable =
-						(pppLightTarget*)((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable;
-					obj = targetTable[targetIndex].obj;
-				}
+				obj = (step->targetIndex == 0xFFFFFFFF)
+						  ? &gPppDefaultValueBuffer[0]
+						  : ((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable[step->targetIndex].obj;
 
 					light.m_targetPosition.x = *(f32*)(obj + 0x1c);
 					light.m_targetPosition.y = *(f32*)(obj + 0x2c);

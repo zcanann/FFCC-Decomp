@@ -38,12 +38,12 @@ void pppSRandFV(void* param1, void* param2, void* param3)
     u8* self = (u8*)param2;
     PppSRandFVParam2* cfg = (PppSRandFVParam2*)param1;
     PppSRandFVParam3* info = (PppSRandFVParam3*)param3;
-    f32* randVec;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
+    f32* randVec;
     s32 currentIndex = *(s32*)(self + 0xC);
     if (currentIndex == 0) {
         randVec = (f32*)(self + *info->fieldC + 0x80);
@@ -51,10 +51,10 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + Math.RandF();
+                f32 random = Math.RandF();
+                value = value + random;
             } else {
-                f32 scale = kPppSRandFVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandFVSingleSampleScale;
             }
             randVec[0] = value;
         }
@@ -63,10 +63,10 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + Math.RandF();
+                f32 random = Math.RandF();
+                value = value + random;
             } else {
-                f32 scale = kPppSRandFVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandFVSingleSampleScale;
             }
             randVec[1] = value;
         }
@@ -75,10 +75,10 @@ void pppSRandFV(void* param1, void* param2, void* param3)
             u8 flag = cfg->field18;
             f32 value = Math.RandF();
             if (flag != 0) {
-                value = value + Math.RandF();
+                f32 random = Math.RandF();
+                value = value + random;
             } else {
-                f32 scale = kPppSRandFVSingleSampleScale;
-                value = value * scale;
+                value = value * kPppSRandFVSingleSampleScale;
             }
             randVec[2] = value;
         }

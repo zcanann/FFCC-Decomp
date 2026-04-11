@@ -950,39 +950,28 @@ void _DmaCallback(unsigned long)
 int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5, void (*param_6)(void*), void* param_7)
 {
     unsigned int interrupt;
-    void* baseAddr;
-    void** queuePtr;
+    int* queueBase;
+    int** queuePtr;
     unsigned int entryID;
     unsigned int size;
     unsigned int chunkSize;
     int* queueEntry;
+    int* queueEnd;
     int* nextEntry;
 
     interrupt = OSDisableInterrupts();
-    if ((param_1 & 0xffff7fff) == 0) {
-        baseAddr = RedDriverStreamDmaQueue();
-        queuePtr = &DAT_8032f3e0[1];
+    if ((param_1 & 0xffff7fff) != 0) {
+        queuePtr = (int**)&DAT_8032f3e0[0];
+        queueBase = RedDriverMainDmaQueue();
     } else {
-        queuePtr = &DAT_8032f3e0[0];
-        baseAddr = RedDriverMainDmaQueue();
+        queueBase = RedDriverStreamDmaQueue();
+        queuePtr = (int**)&DAT_8032f3e0[1];
     }
-    queueEntry = (int*)*queuePtr;
+    queueEntry = *queuePtr;
     entryID = GetMyEntryID();
     size = (unsigned int)(param_5 + 0x1f) & 0xffffffe0;
-    if ((DAT_8032f43c == 0) && ((param_1 & 0x8000) == 0)) {
-        queueEntry[0] = entryID;
-        queueEntry[1] = param_2;
-        queueEntry[2] = param_3;
-        queueEntry[3] = param_4;
-        queueEntry[4] = size;
-        queueEntry[5] = (int)param_6;
-        queueEntry[6] = (int)param_7;
-        nextEntry = queueEntry + 7;
-        if ((int*)baseAddr + 0x380 <= nextEntry) {
-            nextEntry = (int*)baseAddr;
-        }
-        *queuePtr = nextEntry;
-    } else {
+    if ((DAT_8032f43c != 0) || ((param_1 & 0x8000) != 0)) {
+        queueEnd = queueBase + 0x380;
         do {
             chunkSize = size;
             if ((int)size > 0x40000) {
@@ -1003,11 +992,25 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
                 queueEntry[5] = 0;
             }
             queueEntry += 7;
-            if ((int*)baseAddr + 0x380 <= queueEntry) {
-                queueEntry = (int*)baseAddr;
+            if (queueEnd <= queueEntry) {
+                queueEntry = queueBase;
             }
         } while ((int)size > 0);
         *queuePtr = queueEntry;
+    } else {
+        nextEntry = queueEntry + 7;
+        queueEnd = queueBase + 0x380;
+        queueEntry[0] = entryID;
+        queueEntry[1] = param_2;
+        queueEntry[2] = param_3;
+        queueEntry[3] = param_4;
+        queueEntry[4] = size;
+        queueEntry[5] = (int)param_6;
+        queueEntry[6] = (int)param_7;
+        if (queueEnd <= nextEntry) {
+            nextEntry = queueBase;
+        }
+        *queuePtr = nextEntry;
     }
     OSSignalSemaphore(&DAT_8032ddd8);
     OSRestoreInterrupts(interrupt);

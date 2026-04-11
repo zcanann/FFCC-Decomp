@@ -38,6 +38,16 @@ struct pppBreathModel {
     unsigned char _pad[8];
 };
 
+struct BreathParticleGroup {
+    int active;
+    signed char* particleIndices;
+    unsigned char* particleStates;
+    Vec position;
+    Vec direction;
+    float speed;
+    Mtx matrix;
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -356,8 +366,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     int k;
     int group;
     int groupTableWork;
-    int* groupTable;
-    int* groupData;
+    BreathParticleGroup* groupTable;
+    BreathParticleGroup* groupData;
     unsigned char* particleData;
     unsigned char* particleWmat;
     unsigned char* particleColor;
@@ -371,7 +381,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     particleData = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x30);
     particleWmat = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x34);
     particleColor = (unsigned char*)*(void**)((unsigned char*)vBreathModel + 0x38);
-    groupTable = *(int**)((unsigned char*)vBreathModel + 0x3C);
+    groupTable = *(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C);
     maxParticleCount = *(int*)((unsigned char*)vBreathModel + 0x40);
 
     if ((gPppCalcDisabled == 0) && (*(int*)((unsigned char*)pBreathModel + 0xC) != 0xFFFF)) {
@@ -404,7 +414,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
             found_index:
                 if (found) {
-                    *(unsigned char*)(groupTable[(int)foundGroup * 0x17 + 1] + (int)foundSlot) = 0xFF;
+                    groupTable[(int)foundGroup].particleIndices[(int)foundSlot] = -1;
                 }
 
                 if ((int)foundGroup != -1) {
@@ -427,18 +437,18 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
                 group_checked:
                     if (found) {
-                        groupData = groupTable + (int)foundGroup * 0x17;
+                        groupData = &groupTable[(int)foundGroup];
                         for (slot = 0; slot < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10); slot++) {
-                            *(unsigned char*)(groupData[2] + slot) = 0xFF;
-                            groupData[5] = (int)zero;
-                            groupData[4] = (int)zero;
-                            groupData[3] = (int)zero;
-                            groupData[8] = (int)zero;
-                            groupData[7] = (int)zero;
-                            groupData[6] = (int)zero;
-                            groupData[9] = (int)zero;
+                            groupData->particleStates[slot] = 0xFF;
+                            groupData->position.x = zero;
+                            groupData->position.y = zero;
+                            groupData->position.z = zero;
+                            groupData->direction.x = zero;
+                            groupData->direction.y = zero;
+                            groupData->direction.z = zero;
+                            groupData->speed = zero;
                         }
-                        groupData[0] = 0;
+                        groupData->active = 0;
                     }
                 }
 
@@ -452,10 +462,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     groupData = groupTable;
                     for (j = 0; j < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); j++) {
                         for (k = 0; k < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10); k++) {
-                            if ((*(signed char*)(groupData[1] + k) == -1) && (*(signed char*)(groupData[2] + k) == -1)) {
-                                *(signed char*)(groupData[1] + k) = (signed char)i;
+                            if ((groupData->particleIndices[k] == -1) && (groupData->particleStates[k] == 0xFF)) {
+                                groupData->particleIndices[k] = (signed char)i;
                                 found = false;
-                                *(unsigned char*)(groupData[2] + k) = 1;
+                                groupData->particleStates[k] = 1;
                             }
                             if (!found) {
                                 break;
@@ -464,7 +474,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                         if (!found) {
                             break;
                         }
-                        groupData += 0x17;
+                        groupData += 1;
                     }
                 }
             }
@@ -484,27 +494,27 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
         groupData = groupTable;
         for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
-            if ((groupData[0] != 1) && (*(signed char*)groupData[1] != -1) && (*(signed char*)groupData[2] == 1)) {
+            if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 unitVelocity.x = kPppBreathModelZero;
                 unitVelocity.y = kPppBreathModelZero;
                 unitVelocity.z = FLOAT_80330F80;
-                groupData[9] = *(int*)((unsigned char*)pBreathModel + 0x14);
-                pppCopyVector(*(Vec*)(groupData + 6), unitVelocity);
-                groupData[5] = 0;
-                groupData[4] = 0;
-                groupData[3] = 0;
-                PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(groupData + 0xB));
-                groupData[0] = 1;
+                groupData->speed = *(float*)((unsigned char*)pBreathModel + 0x14);
+                pppCopyVector(groupData->direction, unitVelocity);
+                groupData->position.x = 0.0f;
+                groupData->position.y = 0.0f;
+                groupData->position.z = 0.0f;
+                PSMTXCopy(*(Mtx*)pppMngStPtr, groupData->matrix);
+                groupData->active = 1;
             }
-            groupData += 0x17;
+            groupData += 1;
         }
 
         for (i = 0; i < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12); i++) {
-            if (*groupTable != 0) {
-                PSVECScale((Vec*)(groupTable + 6), &stepVelocity, (float)groupTable[9]);
-                PSVECAdd(&stepVelocity, (Vec*)(groupTable + 3), (Vec*)(groupTable + 3));
+            if (groupTable->active != 0) {
+                PSVECScale(&groupTable->direction, &stepVelocity, groupTable->speed);
+                PSVECAdd(&stepVelocity, &groupTable->position, &groupTable->position);
             }
-            groupTable += 0x17;
+            groupTable += 1;
         }
     }
 }
@@ -948,13 +958,13 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
 void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
 {
     int i;
-    int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)groupIndex * 0x5C;
     bool isDead = true;
     float zero = kPppBreathModelZero;
-    int* groupData = (int*)groupTable;
+    BreathParticleGroup* groupData =
+        &(*(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C))[(int)groupIndex];
 
     for (i = 0; i < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); i++) {
-        if ((*(signed char*)(groupData[1] + i) != -1) || (*(signed char*)(groupData[2] + i) != 1)) {
+        if ((groupData->particleIndices[i] != -1) || (groupData->particleStates[i] != 1)) {
             isDead = false;
             break;
         }
@@ -962,16 +972,16 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
 
     if (isDead) {
         for (i = 0; i < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); i++) {
-            *(unsigned char*)(groupData[2] + i) = 0xFF;
-            groupData[3] = (int)zero;
-            groupData[4] = (int)zero;
-            groupData[5] = (int)zero;
-            groupData[6] = (int)zero;
-            groupData[7] = (int)zero;
-            groupData[8] = (int)zero;
-            groupData[9] = (int)zero;
+            groupData->particleStates[i] = 0xFF;
+            groupData->position.x = zero;
+            groupData->position.y = zero;
+            groupData->position.z = zero;
+            groupData->direction.x = zero;
+            groupData->direction.y = zero;
+            groupData->direction.z = zero;
+            groupData->speed = zero;
         }
-        groupData[0] = 0;
+        groupData->active = 0;
     }
 }
 
@@ -1010,11 +1020,11 @@ void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel
 {
     short slotIndex;
     short groupIndex;
-    int* groupArray;
+    BreathParticleGroup* groupArray;
 
     SearchIndex(pBreathModel, vBreathModel, slotIndex, groupIndex, particleIndex);
     if (groupIndex != -1) {
-        groupArray = *(int**)((unsigned char*)vBreathModel + 0x3C);
-        *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
+        groupArray = *(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C);
+        groupArray[groupIndex].particleIndices[slotIndex] = -1;
     }
 }

@@ -340,9 +340,12 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	int colorOffset = data->m_serializedDataOffsets[1];
 	ChangeTexWork* work = (ChangeTexWork*)((u8*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
-
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+	void* handle1;
+	void* handle2;
+	int model;
+	int meshList;
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 	    step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, &work->m_value0, &work->m_value1, &work->m_value2,
@@ -354,13 +357,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	*(pppChangeTexUnkB**)(model0 + 0xE8) = step;
 	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
 	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
-
 	work->m_texture = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
-
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
-
-	int model;
+	handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
+	handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
 	if ((handle1 != 0) && ((model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model != 0)) {
 		*(ChangeTexWork**)(model + 0xE4) = work;
 		*(pppChangeTexUnkB**)(model + 0xE8) = step;
@@ -379,13 +378,13 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	int texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
-	if (texObj == 0) {
+	model = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	if (model == 0) {
 		return;
 	}
-	work->m_texture = texObj;
+	work->m_texture = model;
 
-	int meshList = *(int*)(model0 + 0xAC);
+	meshList = *(int*)(model0 + 0xAC);
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
 		work->m_cachedValue = FLOAT_80332020;
 		work->m_meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -442,25 +441,23 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 			u32 u[2];
 		} alphaScale;
 		float currentValue = work->m_value0 * (work->m_bboxMax.y - work->m_bboxMin.y) + work->m_bboxMin.y;
+		int arrayOffset;
 
 		splitScale.u[0] = 0x43300000;
 		splitScale.u[1] = (1 << *(int*)(*(int*)(model0 + 0xA4) + 0x34)) ^ 0x80000000;
 		short splitY = (short)(int)(currentValue * (float)(splitScale.d - DOUBLE_80332030));
 		if (work->m_cachedValue != currentValue) {
 			work->m_cachedValue = currentValue;
-
 			alphaScale.u[0] = 0x43300000;
 			alphaScale.u[1] = (u8)*((u8*)changeTex + colorOffset + 0x8B);
 			double alphaBase = (double)(FLOAT_80332028 * ((float)(alphaScale.d - DOUBLE_80332038) / FLOAT_80332028));
-
-			int arrayOffset = 0;
+			arrayOffset = 0;
 			meshList = *(int*)(model0 + 0xAC);
 			for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)(model0 + 0xA4) + 0xC); meshIdx++) {
 				int pointOffset = 0;
 				int colorBase = *(int*)(work->m_meshColorArrays + arrayOffset);
 				int colorPtr = colorBase;
-				unsigned int vertCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x14);
-				for (unsigned int v = 0; v < vertCount; v++) {
+				for (unsigned int v = 0; v < *(unsigned int*)(*(int*)(meshList + 8) + 0x14); v++) {
 					short y = *(short*)(*(int*)(meshList + 0xC) + pointOffset + 2);
 
 					if (step->m_payload[0] == 1) {
@@ -481,7 +478,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 					colorPtr += 4;
 				}
 
-				DCFlushRange((void*)colorBase, vertCount << 2);
+				DCFlushRange((void*)colorBase, *(unsigned int*)(*(int*)(meshList + 8) + 0x14) << 2);
 				arrayOffset += 4;
 				meshList += 0x14;
 			}

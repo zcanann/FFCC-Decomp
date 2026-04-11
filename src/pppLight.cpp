@@ -248,7 +248,7 @@ void pppLight(void* param1, void* param2, void* param3)
 				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
 			} else {
 				u32 targetIndex;
-				unsigned char* obj;
+				register unsigned char* obj;
 
 				light.m_type = 1;
 				targetIndex = step->targetIndex;

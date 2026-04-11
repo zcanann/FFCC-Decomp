@@ -12,8 +12,4 @@ namespace std {
 
 exception::~exception() {}
 
-const char* exception::what() const {
-	return "exception";
-}
-
 } // namespace std

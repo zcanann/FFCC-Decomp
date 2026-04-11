@@ -71,16 +71,24 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	pppYmTraceMoveWork* work =
 		(pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
 	void* owner = pppMngSt->m_owner;
-	Vec local_20;
-	Vec local_2c;
-	Vec local_50;
-	Quaternion local_60;
-	Quaternion local_70;
-	Quaternion local_80;
-	Vec local_8c;
-	Vec local_98;
-	Vec local_ec;
-	Vec local_f8;
+	Vec previousDirectionNormalizeInput;
+	Vec previousDirectionCopyInput;
+	Vec previousPosition;
+	Vec positionForPreviousDirection;
+	Vec directionCopyInput;
+	Vec directionNormalizeInput;
+	Vec currentPosition;
+	Vec ownerPosition;
+	Vec scaledDirection;
+	Vec directionCopy;
+	Quaternion blendedDirection;
+	Quaternion previousDirectionQuat;
+	Quaternion directionQuat;
+	Vec scaledOffset;
+	Vec nextPosition;
+	Vec ownerPositionRaw;
+	Vec previousDirection;
+	Vec direction;
 
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
@@ -92,51 +100,62 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	}
 
 	if (owner == nullptr) {
-		pppCopyVector(local_20, work->m_direction);
-		pppCopyVector(local_2c, work->m_previousDirection);
+		pppCopyVector(direction, work->m_direction);
+		pppCopyVector(previousDirection, work->m_previousDirection);
 	} else {
 		u8* ownerBytes = (u8*)owner;
 
-		local_8c.x = *(f32*)(ownerBytes + 0x15c);
-		local_8c.y = *(f32*)(ownerBytes + 0x160);
-		local_8c.z = *(f32*)(ownerBytes + 0x164);
-		pppSubVector(local_20, local_8c, pppMngSt->m_position);
-		local_20.y = local_20.y + param_2->m_payload;
-		pppCopyVector(local_50, local_20);
-		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_50);
+		ownerPositionRaw.x = *(f32*)(ownerBytes + 0x15c);
+		ownerPositionRaw.y = *(f32*)(ownerBytes + 0x160);
+		ownerPositionRaw.z = *(f32*)(ownerBytes + 0x164);
+		pppCopyVector(ownerPosition, ownerPositionRaw);
+		pppCopyVector(currentPosition, pppMngSt->m_position);
+		pppSubVector(direction, ownerPosition, currentPosition);
+		direction.y = direction.y + param_2->m_payload;
+		pppCopyVector(directionNormalizeInput, direction);
+		pppNormalize__FR3Vec3Vec((float*)&direction, &directionNormalizeInput);
 
-		pppCopyVector(work->m_direction, local_20);
-		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
+		pppCopyVector(directionCopyInput, direction);
+		pppCopyVector(work->m_direction, directionCopyInput);
+		pppCopyVector(positionForPreviousDirection, pppMngSt->m_position);
+		pppCopyVector(previousPosition, pppMngSt->m_previousPosition);
+		pppSubVector(previousDirection, positionForPreviousDirection, previousPosition);
 
-		if ((local_2c.x == kPppYmTraceMoveZero) && (local_2c.y == kPppYmTraceMoveZero) &&
-		    (local_2c.z == kPppYmTraceMoveZero)) {
-			pppCopyVector(local_2c, work->m_previousDirection);
+		if ((previousDirection.x == kPppYmTraceMoveZero) &&
+		    (previousDirection.y == kPppYmTraceMoveZero) &&
+		    (previousDirection.z == kPppYmTraceMoveZero)) {
+			pppCopyVector(previousDirectionCopyInput, work->m_previousDirection);
+			pppCopyVector(previousDirection, previousDirectionCopyInput);
 		}
 
-		pppCopyVector(local_98, local_2c);
-		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_98);
+		pppCopyVector(previousDirectionNormalizeInput, previousDirection);
+		pppNormalize__FR3Vec3Vec((float*)&previousDirection, &previousDirectionNormalizeInput);
 	}
 
-	local_60.x = local_20.x;
-	local_60.y = local_20.y;
-	local_60.z = local_20.z;
-	local_60.w = kPppYmTraceMoveOne;
-	local_70.x = local_2c.x;
-	local_70.y = local_2c.y;
-	local_70.z = local_2c.z;
-	local_70.w = kPppYmTraceMoveOne;
-	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
-	PSQUATNormalize(&local_80, &local_80);
+	previousDirectionQuat.x = previousDirection.x;
+	previousDirectionQuat.y = previousDirection.y;
+	previousDirectionQuat.z = previousDirection.z;
+	previousDirectionQuat.w = kPppYmTraceMoveOne;
+	directionQuat.x = direction.x;
+	directionQuat.y = direction.y;
+	directionQuat.z = direction.z;
+	directionQuat.w = kPppYmTraceMoveOne;
+	C_QUATLerp(&previousDirectionQuat, &directionQuat, &blendedDirection, param_2->m_dataValIndex);
+	PSQUATNormalize(&blendedDirection, &blendedDirection);
 
-	local_f8.x = local_80.x;
-	local_f8.y = local_80.y;
-	local_f8.z = local_80.z;
-	PSVECScale(&local_f8, &local_f8, work->m_distance * pppMngSt->m_scale);
-	pppAddVector(local_ec, local_f8, pppMngSt->m_position);
-	pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
-	pppCopyVector(pppMngSt->m_position, local_ec);
+	scaledOffset.x = blendedDirection.x;
+	scaledOffset.y = blendedDirection.y;
+	scaledOffset.z = blendedDirection.z;
+	pppCopyVector(scaledDirection, scaledOffset);
+	PSVECScale(&scaledDirection, &scaledDirection, work->m_distance * pppMngSt->m_scale);
+	pppCopyVector(currentPosition, pppMngSt->m_position);
+	pppAddVector(nextPosition, scaledDirection, currentPosition);
+	pppCopyVector(previousPosition, pppMngSt->m_position);
+	pppCopyVector(pppMngSt->m_previousPosition, previousPosition);
+	pppCopyVector(directionCopy, nextPosition);
+	pppCopyVector(pppMngSt->m_position, directionCopy);
 
-	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
-	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
-	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
+	pppMngStPtr->m_matrix.value[0][3] = nextPosition.x;
+	pppMngStPtr->m_matrix.value[1][3] = nextPosition.y;
+	pppMngStPtr->m_matrix.value[2][3] = nextPosition.z;
 }

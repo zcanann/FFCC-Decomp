@@ -3,8 +3,6 @@
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
 
-#pragma force_active on
-
 #define RETURN_ADDRESS 4
 
 union MWE_GeckoVector64 {
@@ -117,7 +115,7 @@ void __unregister_fragment(int fragmentID)
  * @note Address: N/A
  * @note Size: 0x88
  */
-static inline int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
+static int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
 {
 	ProcessInfo* f;
 	int i;
@@ -220,7 +218,7 @@ static void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
  * @note Address: N/A
  * @note Size: 0x18
  */
-static inline s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
+static s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
 {
 	f64* FPR_save_area;
 	s32* GPR_save_area;
@@ -238,7 +236,7 @@ static inline s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
  * @note Address: N/A
  * @note Size: 0x20
  */
-static inline exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
+static exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
 {
 	if (iter->info.action_pointer == 0) {
 		return EXACTION_ENDOFLIST;
@@ -388,13 +386,13 @@ static char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
  * @note Address: N/A
  * @note Size: 0x3C
  */
-static inline void ExPPC_DestroyLocal(ThrowContext* context, const ex_destroylocal* ex) { DTORCALL_COMPLETE(ex->dtor, context->FP + ex->local); }
+static void ExPPC_DestroyLocal(ThrowContext* context, const ex_destroylocal* ex) { DTORCALL_COMPLETE(ex->dtor, context->FP + ex->local); }
 
 /**
  * @note Address: N/A
  * @note Size: 0x74
  */
-static inline void ExPPC_DestroyLocalCond(ThrowContext* context, const ex_destroylocalcond* ex)
+static void ExPPC_DestroyLocalCond(ThrowContext* context, const ex_destroylocalcond* ex)
 {
 	int cond = ex_destroylocalcond_GetRegCond(ex->dlc_field) ? (local_cond_type)context->GPR[ex->cond]
 	                                                         : *(local_cond_type*)(context->FP + ex->cond);
@@ -408,7 +406,7 @@ static inline void ExPPC_DestroyLocalCond(ThrowContext* context, const ex_destro
  * @note Address: N/A
  * @note Size: 0x58
  */
-static inline void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_destroylocalpointer* ex)
+static void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_destroylocalpointer* ex)
 {
 	void* pointer
 	    = ex_destroylocalpointer_GetRegPointer(ex->dlp_field) ? (void*)context->GPR[ex->pointer] : *(void**)(context->FP + ex->pointer);
@@ -420,7 +418,7 @@ static inline void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_des
  * @note Address: N/A
  * @note Size: 0x84
  */
-static inline void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destroylocalarray* ex)
+static void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destroylocalarray* ex)
 {
 	char* ptr = context->FP + ex->localarray;
 	s32 n    = ex->elements;
@@ -436,7 +434,7 @@ static inline void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destr
  * @note Address: N/A
  * @note Size: 0x64
  */
-static inline void ExPPC_DestroyMember(ThrowContext* context, const ex_destroymember* ex)
+static void ExPPC_DestroyMember(ThrowContext* context, const ex_destroymember* ex)
 {
 	char* objectptr
 	    = ex_destroymember_GetRegPointer(ex->dm_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -448,7 +446,7 @@ static inline void ExPPC_DestroyMember(ThrowContext* context, const ex_destroyme
  * @note Address: N/A
  * @note Size: 0x64
  */
-static inline void ExPPC_DestroyBase(ThrowContext* context, const ex_destroymember* ex)
+static void ExPPC_DestroyBase(ThrowContext* context, const ex_destroymember* ex)
 {
 	char* objectptr
 	    = ex_destroymember_GetRegPointer(ex->dm_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -460,7 +458,7 @@ static inline void ExPPC_DestroyBase(ThrowContext* context, const ex_destroymemb
  * @note Address: N/A
  * @note Size: 0x98
  */
-static inline void ExPPC_DestroyMemberCond(ThrowContext* context, const ex_destroymembercond* ex)
+static void ExPPC_DestroyMemberCond(ThrowContext* context, const ex_destroymembercond* ex)
 {
 	char* objectptr
 	    = ex_destroymembercond_GetRegPointer(ex->dmc_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -476,7 +474,7 @@ static inline void ExPPC_DestroyMemberCond(ThrowContext* context, const ex_destr
  * @note Address: N/A
  * @note Size: 0xAC
  */
-static inline void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_destroymemberarray* ex)
+static void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_destroymemberarray* ex)
 {
 	char* ptr
 	    = ex_destroymemberarray_GetRegPointer(ex->dma_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -495,7 +493,7 @@ static inline void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_dest
  * @note Address: N/A
  * @note Size: 0x54
  */
-static inline void ExPPC_DeletePointer(ThrowContext* context, const ex_deletepointer* ex)
+static void ExPPC_DeletePointer(ThrowContext* context, const ex_deletepointer* ex)
 {
 	char* objectptr
 	    = ex_deletepointer_GetRegPointer(ex->dp_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -507,7 +505,7 @@ static inline void ExPPC_DeletePointer(ThrowContext* context, const ex_deletepoi
  * @note Address: N/A
  * @note Size: 0x8C
  */
-static inline void ExPPC_DeletePointerCond(ThrowContext* context, const ex_deletepointercond* ex)
+static void ExPPC_DeletePointerCond(ThrowContext* context, const ex_deletepointercond* ex)
 {
 	char* objectptr
 	    = ex_deletepointercond_GetRegPointer(ex->dpc_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -632,7 +630,7 @@ static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void
  * @note Address: N/A
  * @note Size: 0x88
  */
-static inline int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
+static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 {
 	s32 i, offset;
 
@@ -786,7 +784,7 @@ asm static void ExPPC_LongJump(register ThrowContext* context, register void* ne
  * @note Address: N/A
  * @note Size: 0x84
  */
-static inline void ExPPC_HandleUnexpected(ThrowContext* context, MWExceptionInfo* info, ex_specification* unexp)
+static void ExPPC_HandleUnexpected(ThrowContext* context, MWExceptionInfo* info, ex_specification* unexp)
 {
 	CatchInfo* catchinfo;
 

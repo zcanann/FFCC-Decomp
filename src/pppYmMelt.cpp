@@ -8,12 +8,12 @@
 #include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
-const float FLOAT_80330af4 = 1.0f;
-const float FLOAT_80330b08 = 0.5f;
-const float FLOAT_80330b0c = 0.017453292f;
-const float FLOAT_80330b10 = -2000.0f;
-const float FLOAT_80330b14 = 10000000000.0f;
-const float FLOAT_80330b18 = -10000000000.0f;
+extern const float FLOAT_80330af4;
+extern const float FLOAT_80330b08;
+extern const float FLOAT_80330b0c;
+extern const float FLOAT_80330b10;
+extern const float FLOAT_80330b14;
+extern const float FLOAT_80330b18;
 
 extern "C" {
 int rand(void);

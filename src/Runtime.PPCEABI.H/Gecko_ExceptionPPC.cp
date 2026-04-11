@@ -8,14 +8,14 @@
 #define RETURN_ADDRESS 4
 
 union MWE_GeckoVector64 {
-	double d;
-	float f[2];
+	f64 d;
+	f32 f[2];
 };
 
 typedef union MWE_GeckoVector64 MWE_GeckoVector64;
 
 struct GeckoFPRContext {
-	double d;
+	f64 d;
 	MWE_GeckoVector64 v;
 };
 
@@ -23,8 +23,8 @@ typedef struct GeckoFPRContext GeckoFPRContext;
 
 typedef struct ThrowContext {
 	GeckoFPRContext FPR[32];
-	int GPR[32];
-	int CR;
+	s32 GPR[32];
+	s32 CR;
 	char* SP;
 	char* FP;
 	char* throwSP;
@@ -67,7 +67,7 @@ typedef struct ActionIterator {
 	MWExceptionInfo info;
 	char* current_SP;
 	char* current_FP;
-	int current_R31;
+	s32 current_R31;
 } ActionIterator;
 
 #define MAXFRAGMENTS 1
@@ -158,7 +158,7 @@ static void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
 	FragmentInfo frag;
 	ExceptionTableIndex *exceptionindex, *p;
 	u32 returnoffset;
-	int i, m, n;
+	s32 i, m, n;
 
 	info->exception_record = 0;
 	info->action_pointer   = 0;
@@ -220,16 +220,16 @@ static void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
  * @note Address: N/A
  * @note Size: 0x18
  */
-static inline int ExPPC_PopR31(char* SP, MWExceptionInfo* info)
+static inline s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
 {
-	double* FPR_save_area;
-	int* GPR_save_area;
+	f64* FPR_save_area;
+	s32* GPR_save_area;
 	int saved_GPRs, saved_FPRs;
 
 	saved_FPRs    = ET_GetSavedFPRs(info->exception_record->et_field);
-	FPR_save_area = (double*)(SP - saved_FPRs * 8);
+	FPR_save_area = (f64*)(SP - saved_FPRs * 8);
 	saved_GPRs    = ET_GetSavedGPRs(info->exception_record->et_field);
-	GPR_save_area = (int*)FPR_save_area;
+	GPR_save_area = (s32*)FPR_save_area;
 
 	return GPR_save_area[-1];
 }
@@ -343,8 +343,8 @@ static exaction_type ExPPC_NextAction(ActionIterator* iter)
 static char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
 {
 	char *SP, *callers_SP;
-	double* FPR_save_area;
-	int* GPR_save_area;
+	f64* FPR_save_area;
+	s32* GPR_save_area;
 	int saved_GPRs, saved_FPRs;
 	GeckoFPRContext* Vector_save_area;
 	int i, j;
@@ -355,9 +355,9 @@ static char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
 
 	if (ET_HasElfVector(info->exception_record->et_field)) {
 		Vector_save_area = (GeckoFPRContext*)(callers_SP - saved_FPRs * 16);
-		FPR_save_area    = (double*)Vector_save_area;
+		FPR_save_area    = (f64*)Vector_save_area;
 	} else {
-		FPR_save_area = (double*)(callers_SP - saved_FPRs * 8);
+		FPR_save_area = (f64*)(callers_SP - saved_FPRs * 8);
 	}
 
 	if (ET_HasElfVector(info->exception_record->et_field)) {
@@ -373,7 +373,7 @@ static char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
 	}
 
 	saved_GPRs    = ET_GetSavedGPRs(info->exception_record->et_field);
-	GPR_save_area = (int*)FPR_save_area;
+	GPR_save_area = (s32*)FPR_save_area;
 	GPR_save_area -= saved_GPRs;
 
 	for (i = 32 - saved_GPRs, j = 0; i < 32; ++i, ++j) {
@@ -423,8 +423,8 @@ static inline void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_des
 static inline void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destroylocalarray* ex)
 {
 	char* ptr = context->FP + ex->localarray;
-	int n    = ex->elements;
-	int size = ex->element_size;
+	s32 n    = ex->elements;
+	s32 size = ex->element_size;
 
 	for (ptr = ptr + size * n; n > 0; n--) {
 		ptr -= size;
@@ -480,8 +480,8 @@ static inline void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_dest
 {
 	char* ptr
 	    = ex_destroymemberarray_GetRegPointer(ex->dma_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
-	int n    = ex->elements;
-	int size = ex->element_size;
+	s32 n    = ex->elements;
+	s32 size = ex->element_size;
 
 	ptr += ex->offset;
 
@@ -650,26 +650,8 @@ extern "C" const char s_bad_exception[] = "bad_exception";
 
 namespace std {
 
-/*
- * --INFO--
- * PAL Address: 0x801b0f08
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 bad_exception::~bad_exception() {}
 
-/*
- * --INFO--
- * PAL Address: 0x801b1ae4
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 const char* bad_exception::what() const {
 	return s_bad_exception;
 }

@@ -10,15 +10,6 @@ inline void operator delete(void* arg0) throw() {
 
 namespace std {
 
-/*
- * --INFO--
- * PAL Address: 0x801AF7FC
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 const char* exception::what() const {
     return "exception";
 }

@@ -134,10 +134,6 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     RainWork* work;
     RainDrop* drop;
     RainParam* rain;
-    float unitA;
-    float unitB;
-    float lengthDelta;
-    s16 lifeJitter;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -157,6 +153,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float maxX;
             float minZ;
             float maxZ;
+            float unitA;
+            float unitB;
+            float lengthDelta;
+            s16 lifeJitter;
 
             randA = rand();
             randB = rand();
@@ -210,6 +210,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float maxX;
             float minZ;
             float maxZ;
+            float unitA;
+            float unitB;
+            float lengthDelta;
+            s16 lifeJitter;
 
             randA = rand();
             randB = rand();
@@ -322,28 +326,28 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
     tex1 = FLOAT_8033101c;
-    {
-        RainDrop* currentDrop = drop;
-        for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++, currentDrop++) {
-            float x = baseX + currentDrop->posX;
-            float y = baseY + currentDrop->posY;
-            float z = baseZ + currentDrop->posZ;
+    i = 0;
+    while (i < (int)(u32)param_2->m_dataValIndex) {
+        float x = baseX + drop->posX;
+        float y = baseY + drop->posY;
+        float z = baseZ + drop->posZ;
 
-            PSVECScale((Vec*)&currentDrop->dirX, &segment, currentDrop->length);
-            GXWGFifo.f32 = x;
-            GXWGFifo.f32 = y;
-            GXWGFifo.f32 = z;
-            GXWGFifo.u32 = *(u32*)(colorBase + 8);
-            GXWGFifo.f32 = tex0;
-            GXWGFifo.f32 = tex0;
+        PSVECScale((Vec*)&drop->dirX, &segment, drop->length);
+        GXWGFifo.f32 = x;
+        drop++;
+        i++;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = z;
+        GXWGFifo.u32 = *(u32*)(colorBase + 8);
+        GXWGFifo.f32 = tex0;
+        GXWGFifo.f32 = tex0;
 
-            GXWGFifo.f32 = x + segment.x;
-            GXWGFifo.f32 = y + segment.y;
-            GXWGFifo.f32 = z + segment.z;
-            GXWGFifo.u32 = *(u32*)(colorBase + 8);
-            GXWGFifo.f32 = tex1;
-            GXWGFifo.f32 = tex1;
-        }
+        GXWGFifo.f32 = x + segment.x;
+        GXWGFifo.f32 = y + segment.y;
+        GXWGFifo.f32 = z + segment.z;
+        GXWGFifo.u32 = *(u32*)(colorBase + 8);
+        GXWGFifo.f32 = tex1;
+        GXWGFifo.f32 = tex1;
     }
     GXSetLineWidth(8, GX_TO_ZERO);
 }

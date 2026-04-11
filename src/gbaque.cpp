@@ -1709,26 +1709,15 @@ void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
  */
 void GbaQueue::GetCaravanName(char* outName)
 {
-	int i;
-	OSSemaphore* semaphoreIter;
-
-	i = 0;
-	semaphoreIter = (OSSemaphore*)this;
-	do {
-		OSWaitSemaphore(semaphoreIter);
-		i++;
-		semaphoreIter++;
-	} while (i < 4);
+	for (int i = 0; i < 4; i++) {
+		OSWaitSemaphore(accessSemaphores + i);
+	}
 
 	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, 0x80);
 
-	i = 0;
-	semaphoreIter = (OSSemaphore*)this;
-	do {
-		OSSignalSemaphore(semaphoreIter);
-		i++;
-		semaphoreIter++;
-	} while (i < 4);
+	for (int i = 0; i < 4; i++) {
+		OSSignalSemaphore(accessSemaphores + i);
+	}
 }
 
 /*

@@ -162,17 +162,15 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Quaternion resultQuat;
     Quaternion axisQuat;
     Quaternion meshQuat;
-    float axisX;
-    float axisY;
-    float axisZ;
+    Vec axis;
     Vec gravityAdd;
     Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
-    Vec cameraPos;
-    Vec cameraOffset;
-    Vec cameraForward;
     Vec screenOffset;
     Vec4d clipOutput;
     Vec4d clipInput;
+    Vec cameraPos;
+    Vec cameraOffset;
+    Vec cameraForward;
     Mtx invTransMtx;
     Mtx transMtx;
     Mtx quatMtx;
@@ -235,10 +233,10 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             transMtx[2][3] = pieceData[11];
             PSMTXInverse(transMtx, invTransMtx);
 
-            axisX = pieceData[6];
-            axisY = pieceData[7];
-            axisZ = pieceData[8];
-            C_QUATRotAxisRad(&axisQuat, (Vec*)&axisX, pieceData[0xD]);
+            axis.x = pieceData[6];
+            axis.y = pieceData[7];
+            axis.z = pieceData[8];
+            C_QUATRotAxisRad(&axisQuat, &axis, pieceData[0xD]);
             PSMTXQuat(quatMtx, &axisQuat);
             C_QUATMtx(&meshQuat, meshMtx);
             PSQUATMultiply(&axisQuat, &meshQuat, &resultQuat);

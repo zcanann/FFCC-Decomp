@@ -2,7 +2,6 @@
 #define _NMWEXCEPTION
 
 #include "types.h"
-#include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
 
 #ifdef __cplusplus
@@ -17,7 +16,7 @@ typedef struct CatchInfo {
 	void* typeinfo;
 	void* dtor;
 	void* sublocation;
-	int pointercopy;
+	s32 pointercopy;
 	void* stacktop;
 } CatchInfo;
 
@@ -32,7 +31,7 @@ extern void __destroy_global_chain(void);
 
 extern void __end__catch(CatchInfo* catchinfo);
 extern void __throw(char* throwtype, void* location, void* dtor);
-extern char __throw_catch_compare(const char* throwtype, const char* catchtype, int* offset_result);
+extern char __throw_catch_compare(const char* throwtype, const char* catchtype, s32* offset_result);
 extern void __unexpected(CatchInfo* catchinfo);
 
 extern int __register_fragment(struct __eti_init_info* info, char* TOC);

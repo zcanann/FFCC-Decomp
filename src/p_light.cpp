@@ -119,47 +119,45 @@ CLightPcs::CLightPcs()
  */
 void CLightPcs::Init()
 {
+    float fVar1;
+    float fVar2;
+    unsigned char bVar3;
+    unsigned int uVar4;
+    unsigned int uVar5;
+
     m_mapLightColor[0].r = 0x3F;
-
-    unsigned int z0 = __cntlzw(0);
-
+    uVar4 = __cntlzw(0);
     m_mapLightColor[0].g = 0x3F;
-
-    float f1 = FLOAT_8032fc14;
-
+    fVar1 = FLOAT_8032fc14;
     m_mapLightColor[0].b = 0x3F;
-
-    float f2 = FLOAT_8032fc2c;
-    unsigned int z1 = __cntlzw(1);
-    unsigned char v = static_cast<unsigned char>(-((z0 >> 5) & 1)) & 0x3F;
-
+    fVar2 = FLOAT_8032fc2c;
+    uVar5 = __cntlzw(1);
+    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar4 >> 5) & 1)) & 0x3F;
     m_mapLightColor[0].a = 0xFF;
-    m_mapLightColor[1].r = v;
-
-    unsigned int z2 = __cntlzw(2);
-
-    m_mapLightColor[1].g = v;
-    m_mapLightColor[1].b = v;
-    v = static_cast<unsigned char>(-((z1 >> 5) & 1)) & 0x3F;
+    m_mapLightColor[1].r = bVar3;
+    uVar4 = __cntlzw(2);
+    m_mapLightColor[1].g = bVar3;
+    m_mapLightColor[1].b = bVar3;
+    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar5 >> 5) & 1)) & 0x3F;
     m_mapLightColor[1].a = 0xFF;
-    m_mapLightParams[0] = f1;
-    m_mapLightParams[1] = f1;
-    m_mapLightParams[2] = f2;
-    m_mapLightColor[2].r = v;
-    m_mapLightColor[2].g = v;
-    m_mapLightColor[2].b = v;
-    v = static_cast<unsigned char>(-((z2 >> 5) & 1)) & 0x3F;
+    m_mapLightParams[0] = fVar1;
+    m_mapLightParams[1] = fVar1;
+    m_mapLightParams[2] = fVar2;
+    m_mapLightColor[2].r = bVar3;
+    m_mapLightColor[2].g = bVar3;
+    m_mapLightColor[2].b = bVar3;
+    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar4 >> 5) & 1)) & 0x3F;
     m_mapLightColor[2].a = 0xFF;
-    m_mapLightParams[3] = f1;
-    m_mapLightParams[4] = f1;
-    m_mapLightParams[5] = f2;
-    m_mapLightColor[3].r = v;
-    m_mapLightColor[3].g = v;
-    m_mapLightColor[3].b = v;
+    m_mapLightParams[3] = fVar1;
+    m_mapLightParams[4] = fVar1;
+    m_mapLightParams[5] = fVar2;
+    m_mapLightColor[3].r = bVar3;
+    m_mapLightColor[3].g = bVar3;
+    m_mapLightColor[3].b = bVar3;
     m_mapLightColor[3].a = 0xFF;
-    m_mapLightParams[6] = f1;
-    m_mapLightParams[7] = f1;
-    m_mapLightParams[8] = f2;
+    m_mapLightParams[6] = fVar1;
+    m_mapLightParams[7] = fVar1;
+    m_mapLightParams[8] = fVar2;
 }
 
 /*

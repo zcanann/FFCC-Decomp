@@ -140,9 +140,9 @@ CFunnyShape::CFunnyShape()
 {
     PtrAt(this, 0x6010) = 0;
     memset(this, 0, 0x6000);
-    memset(Ptr(this, 0x6000), 0, 0x10);
     memset(Ptr(this, 0x60D8), 0, 0x10);
-    memset(Ptr(this, 0x6014), 0, 0x40);
+    memset(Ptr(this, 0x6000), 0, 0x10);
+    memset(Ptr(this, 0x60E8), 0, 0x40);
 
     CFunnyShape* p = this;
     for (s32 i = 2; i != 0; i--) {

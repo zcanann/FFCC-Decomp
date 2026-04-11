@@ -48,6 +48,8 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 	int, int, int, int, int);
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
 	int, int, int, int, int, int);
+void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
+void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
@@ -370,8 +372,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	halfWidth = work->m_halfWidth;
 	length = work->m_length;
 
-	pppMulMatrix(modelView, pppMngStPtr->m_matrix, baseObj->m_localMatrix);
-	pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix0, modelView);
+	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &baseObj->m_localMatrix);
+	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix0, &modelView);
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
@@ -404,7 +406,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 	if (step->m_stepValue != 0xFFFF) {
 		long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
-		pppUnitMatrix(shapeMtx);
+		pppUnitMatrix__FR10pppFMATRIX(&shapeMtx);
 		shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
 		shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
 		shapeMtx.value[2][2] = shapeMtx.value[0][0];

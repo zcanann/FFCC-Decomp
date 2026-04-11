@@ -529,6 +529,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int colorOffset;
     int* dataOffsets;
     unsigned char* work;
+    VColor* color;
     int* groupData;
     Mtx* particleWMat;
     Mtx* particleMtx;
@@ -556,6 +557,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     dataOffsets = offsets->m_serializedDataOffsets;
     colorOffset = dataOffsets[1];
     work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0];
+    color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
 
     if (*(void**)(work + 0x30) == NULL) {
         int maxParticleCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1A);
@@ -615,15 +617,14 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     }
 
     PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)work);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), (VBreathModel*)work, pBreathModel,
-                      (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset));
+    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), (VBreathModel*)work, pBreathModel, color);
 
     particleWMat = *(Mtx**)(work + 0x34);
     groupData = *(int**)(work + 0x3C);
     for (groupIndex = 0; groupIndex < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
          groupIndex++) {
         slotCount = (unsigned int)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
-        groupTable = *(int*)(work + 0x3C) + groupIndex * 0x5C;
+        groupTable = (int)groupData;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
             if ((*(signed char*)(*(int*)(groupTable + 4) + slotIndex) == -1) ||
                 (*(signed char*)(*(int*)(groupTable + 8) + slotIndex) != 1)) {

@@ -229,7 +229,6 @@ static PppPdtSlotRaw* GetPartMngPdtSlots()
  */
 CPartPcs::~CPartPcs()
 {
-    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4)->~CUSBStreamData();
 }
 
 /*

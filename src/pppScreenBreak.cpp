@@ -88,6 +88,7 @@ struct pppScreenBreakUnkC {
 };
 
 static const float FLOAT_80331cc0 = 2.0f;
+static const float FLOAT_80331cc4 = 0.0f;
 static const float FLOAT_80331cc8 = 0.3f;
 static const float FLOAT_80331ccc = -0.5f;
 static const float FLOAT_80331cd0 = 1.0f;
@@ -158,6 +159,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 {
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
+    float zero = FLOAT_80331cc4;
     Vec translation;
     Quaternion resultQuat;
     Quaternion axisQuat;
@@ -213,7 +215,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     modelView->m_drawMtx[2][3] = translation.z;
 
     mesh = modelView->m_meshes;
-    if (*(float*)((u8*)param_3 + 0x30) != 0.0f) {
+    if (*(float*)((u8*)param_3 + 0x30) != zero) {
         PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }
 
@@ -222,9 +224,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             u8* node = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0);
             u8* nodeMtx = node + 0xC;
 
-            *(float*)(node + 0x18) = 0.0f;
-            *(float*)(node + 0x28) = 0.0f;
-            *(float*)(node + 0x38) = 0.0f;
+            *(float*)(node + 0x18) = zero;
+            *(float*)(node + 0x28) = zero;
+            *(float*)(node + 0x38) = zero;
 
             PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
             PSMTXIdentity(transMtx);
@@ -248,7 +250,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
                            FLOAT_80331cf4 * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
             pieceData[5] -= pieceData[2];
 
-            if (*(float*)((u8*)param_3 + 0x30) != 0.0f) {
+            if (*(float*)((u8*)param_3 + 0x30) != zero) {
                 pieceData[3] += gravityAdd.x;
                 pieceData[5] += gravityAdd.z;
             }
@@ -407,7 +409,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     const double dVar19 = (double)FLOAT_80331cc8;
     const double dVar20 = (double)FLOAT_80331cd0;
     const double dVar21 = (double)FLOAT_80331cd4;
-    const double dVar22 = 0.0;
+    const double dVar22 = (double)FLOAT_80331cc4;
     const double dVar24 = (double)FLOAT_80331cc0;
     const double dVar25 = (double)FLOAT_80331cd8;
     S16Vec local_e8;

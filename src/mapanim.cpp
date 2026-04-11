@@ -426,8 +426,8 @@ void CMapAnimNode::Interp(int frame)
                         t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
                     }
 
-                    PSVECScale(&current->value, &currentScaled, t);
-                    PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                    PSVECScale(&current->value, &currentScaled, 1.0f - t);
+                    PSVECScale(&next->value, &nextScaled, t);
                     PSVECAdd(&currentScaled, &nextScaled, out);
                     break;
                 }
@@ -476,8 +476,8 @@ void CMapAnimNode::Interp(int frame)
                         t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
                     }
 
-                    PSVECScale(&current->value, &currentScaled, t);
-                    PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                    PSVECScale(&current->value, &currentScaled, 1.0f - t);
+                    PSVECScale(&next->value, &nextScaled, t);
                     PSVECAdd(&currentScaled, &nextScaled, out);
                     break;
                 }
@@ -526,8 +526,8 @@ void CMapAnimNode::Interp(int frame)
                         t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
                     }
 
-                    PSVECScale(&current->value, &currentScaled, t);
-                    PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                    PSVECScale(&current->value, &currentScaled, 1.0f - t);
+                    PSVECScale(&next->value, &nextScaled, t);
                     PSVECAdd(&currentScaled, &nextScaled, out);
                     break;
                 }

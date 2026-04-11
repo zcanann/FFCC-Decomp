@@ -153,74 +153,6 @@ static int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
 
 #pragma exceptions on
 
-/**
- * @note Address: N/A
- * @note Size: 0x204
- */
-void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
-{
-	FragmentInfo* fragment;
-	FragmentInfo frag;
-	ExceptionTableIndex *exceptionindex, *p;
-	u32 returnoffset;
-	s32 i, m, n;
-
-	info->exception_record = 0;
-	info->action_pointer   = 0;
-
-	if ((ExPPC_FindExceptionFragment(returnaddr, &frag)) == 0)
-		return;
-	fragment = &frag;
-
-	info->code_section = fragment->code_start;
-	info->data_section = fragment->data_start;
-	info->TOC          = fragment->TOC;
-
-	returnoffset   = returnaddr - fragment->code_start;
-	exceptionindex = fragment->exception_start;
-	for (i = 0, n = fragment->exception_end - fragment->exception_start;;) {
-		if (i > n)
-			return;
-		p = &exceptionindex[m = (i + n) / 2];
-
-		if (returnoffset < p->functionoffset) {
-			n = m - 1;
-		} else if (returnoffset > p->functionoffset + ETI_GetFunctionSize(p->eti_field)) {
-			i = m + 1;
-		} else
-			break;
-	}
-	info->current_function = fragment->code_start + p->functionoffset;
-	info->exception_record = ETI_GetDirectStore(p->eti_field) ? (ExceptionTableSmall*)(&p->exceptionoffset)
-	                                                          : (ExceptionTableSmall*)(fragment->data_start + p->exceptionoffset);
-
-	returnoffset -= p->functionoffset;
-
-	if (ET_IsLargeTable(info->exception_record->et_field)) {
-		ExceptionTableLarge* etl = (ExceptionTableLarge*)info->exception_record;
-		ExceptionRangeLarge* erl;
-
-		for (erl = etl->ranges; erl->start != 0; erl++) {
-			u32 range_end = erl->start + (erl->size * 4);
-
-			if (erl->start <= returnoffset && range_end >= returnoffset) {
-				info->action_pointer = (char*)etl + erl->action;
-				break;
-			}
-		}
-	} else {
-		ExceptionTableSmall* ets = (ExceptionTableSmall*)info->exception_record;
-		ExceptionRangeSmall* ers;
-
-		for (ers = ets->ranges; ers->start != 0; ers++) {
-			if (ers->start <= returnoffset && ers->end >= returnoffset) {
-				info->action_pointer = (char*)ets + ers->action;
-				break;
-			}
-		}
-	}
-}
-
 #pragma exceptions off
 
 /**
@@ -256,54 +188,6 @@ static exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
 
 exaction_type ExPPC_NextAction(ActionIterator* iter);
 void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher);
-
-/**
- * @note Address: N/A
- * @note Size: 0x248
- */
-char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
-{
-	char *SP, *callers_SP;
-	f64* FPR_save_area;
-	s32* GPR_save_area;
-	int saved_GPRs, saved_FPRs;
-	GeckoFPRContext* Vector_save_area;
-	int i, j;
-
-	SP         = context->SP;
-	callers_SP = *(char**)SP;
-	saved_FPRs = ET_GetSavedFPRs(info->exception_record->et_field);
-
-	if (ET_HasElfVector(info->exception_record->et_field)) {
-		Vector_save_area = (GeckoFPRContext*)(callers_SP - saved_FPRs * 16);
-		FPR_save_area    = (f64*)Vector_save_area;
-	} else {
-		FPR_save_area = (f64*)(callers_SP - saved_FPRs * 8);
-	}
-
-	if (ET_HasElfVector(info->exception_record->et_field)) {
-		for (i = 32 - saved_FPRs, j = 0; i < 32; ++i, ++j) {
-			context->FPR[i].v.f[0] = Vector_save_area[j].v.f[0];
-			context->FPR[i].v.f[1] = Vector_save_area[j].v.f[1];
-			context->FPR[i].d      = Vector_save_area[j].d;
-		}
-	} else {
-		for (i = 32 - saved_FPRs, j = 0; i < 32; ++i, ++j) {
-			context->FPR[i].d = FPR_save_area[j];
-		}
-	}
-
-	saved_GPRs    = ET_GetSavedGPRs(info->exception_record->et_field);
-	GPR_save_area = (s32*)FPR_save_area;
-	GPR_save_area -= saved_GPRs;
-
-	for (i = 32 - saved_GPRs, j = 0; i < 32; ++i, ++j) {
-		context->GPR[i] = GPR_save_area[j];
-	}
-
-	context->SP = callers_SP;
-	return *(char**)(callers_SP + RETURN_ADDRESS);
-}
 
 /**
  * @note Address: N/A
@@ -454,76 +338,8 @@ static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 
 #pragma exceptions on
 
-namespace std {
-bad_exception::~bad_exception() {}
-const char* bad_exception::what() const;
-} // namespace std
-
-extern "C" const char s_std_bad_exception[];
-extern "C" const char s_std_exception[];
-extern "C" const char s_bad_exception[0x20];
-
-extern "C" void* __RTTI__Q23std9exception_gecko[];
-extern "C" void* s_bad_exception_rtti[];
-extern "C" void* __RTTI__Q23std13bad_exception[];
-
-struct BadExceptionStorage {
-	void* vtable;
-};
-
-extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
-extern "C" void* __vt__Q23std9exception[];
-extern "C" void* __vt__Q23std13bad_exception[];
-
-/**
- * @note Address: N/A
- * @note Size: 0x1B4
- */
-extern void __unexpected(CatchInfo* catchinfo)
-{
-	static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
-	                                          "!std::exception!!std::bad_exception!!\0\0\0"
-	                                          "!std::bad_exception!!\0\0";
-	char* badExceptionType = (char*)unexpectedTypes;
-	char* stdExceptionBadExceptionType;
-	char* stdBadExceptionType;
-	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
-
-	stdExceptionBadExceptionType = badExceptionType;
-	stdExceptionBadExceptionType += sizeof("!bad_exception!!\0\0\0");
-	stdBadExceptionType = stdExceptionBadExceptionType;
-	stdBadExceptionType += sizeof("!std::exception!!std::bad_exception!!\0\0");
-
-#pragma exception_magic // allow access to __exception_magic in try/catch blocks
-
-	try {
-		unexpected();
-	} catch (...) {
-		BadExceptionStorage badException;
-
-		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
-			throw;
-		}
-		if (ExPPC_IsInSpecification(badExceptionType, unexp)) {
-			badException.vtable = __vt__Q23std9exception;
-			badException.vtable = __vt__Q23std13bad_exception;
-			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
-		}
-		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
-			BadExceptionStorage stdBadException;
-
-			stdBadException.vtable = __vt__Q23std9exception;
-			stdBadException.vtable = __vt__Q23std13bad_exception;
-			__throw((char*)stdExceptionBadExceptionType, &stdBadException, __dt__Q23std13bad_exceptionFv);
-		}
-	}
-	terminate();
-}
-
-extern "C" const char s_std_bad_exception[] = "std::bad_exception";
-extern "C" const char s_std_exception[] = "std::exception";
-extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
-const char* std::bad_exception::what() const { return s_bad_exception; }
+char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info);
+void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info);
 
 /**
  * @note Address: N/A
@@ -621,6 +437,17 @@ asm void ExPPC_LongJump(register ThrowContext* context, register void* newRTOC, 
 	stw r3, 0(SP)
 	blr
 #endif // clang-format on
+}
+
+/**
+ * @note Address: N/A
+ * @note Size: 0x44
+ */
+void __end__catch(CatchInfo* catchinfo)
+{
+	if (catchinfo->location && catchinfo->dtor) {
+		DTORCALL_COMPLETE(catchinfo->dtor, catchinfo->location);
+	}
 }
 
 #pragma exceptions off
@@ -794,6 +621,188 @@ void ExPPC_ThrowHandler(ThrowContext* context)
 
 /**
  * @note Address: N/A
+ * @note Size: 0x144
+ */
+asm void __throw(char* throwtype, void* location, void* dtor)
+{
+#ifdef __MWERKS__ // clang-format off
+	ThrowContext throwcontext;
+
+	fralloc
+
+	stmw r13, throwcontext.GPR[13]
+
+	stfd fp14, throwcontext.FPR[14].d
+	la r3, throwcontext.FPR[14].v
+	psq_stx fp14, 0, r3,0,0
+
+	stfd fp15, throwcontext.FPR[15].d
+	la r3, throwcontext.FPR[15].v
+	psq_stx fp15, 0, r3, 0, 0
+
+	stfd fp16, throwcontext.FPR[16].d
+	la r3, throwcontext.FPR[16].v
+	psq_stx fp16, 0, r3, 0, 0
+
+	stfd fp17, throwcontext.FPR[17].d
+	la r3, throwcontext.FPR[17].v
+	psq_stx fp17, 0, r3, 0, 0
+
+	stfd fp18, throwcontext.FPR[18].d
+	la r3, throwcontext.FPR[18].v
+	psq_stx fp18, 0, r3, 0, 0
+
+	stfd fp19, throwcontext.FPR[19].d
+	la r3, throwcontext.FPR[19].v
+	psq_stx fp19, 0, r3, 0, 0
+
+	stfd fp20, throwcontext.FPR[20].d
+	la r3, throwcontext.FPR[20].v
+	psq_stx fp20, 0, r3, 0, 0
+
+	stfd fp21, throwcontext.FPR[21].d
+	la r3, throwcontext.FPR[21].v
+	psq_stx fp21, 0, r3, 0, 0
+
+	stfd fp22, throwcontext.FPR[22].d
+	la r3, throwcontext.FPR[22].v
+	psq_stx fp22, 0, r3, 0, 0
+
+	stfd fp23, throwcontext.FPR[23].d
+	la r3, throwcontext.FPR[23].v
+	psq_stx fp23, 0, r3, 0, 0
+
+	stfd fp24, throwcontext.FPR[24].d
+	la r3, throwcontext.FPR[24].v
+	psq_stx fp24, 0, r3, 0, 0
+
+	stfd fp25, throwcontext.FPR[25].d
+	la r3, throwcontext.FPR[25].v
+	psq_stx fp25, 0, r3, 0, 0
+
+	stfd fp26, throwcontext.FPR[26].d
+	la r3, throwcontext.FPR[26].v
+	psq_stx fp26, 0, r3, 0, 0
+
+	stfd fp27, throwcontext.FPR[27].d
+	la r3, throwcontext.FPR[27].v
+	psq_stx fp27, 0, r3, 0, 0
+
+	stfd fp28, throwcontext.FPR[28].d
+	la r3, throwcontext.FPR[28].v
+	psq_stx fp28, 0, r3, 0, 0
+
+	stfd fp29, throwcontext.FPR[29].d
+	la r3, throwcontext.FPR[29].v
+	psq_stx fp29, 0, r3, 0, 0
+
+	stfd fp30, throwcontext.FPR[30].d
+	la r3, throwcontext.FPR[30].v
+	psq_stx fp30, 0, r3, 0, 0
+
+	stfd fp31, throwcontext.FPR[31].d
+	la r3, throwcontext.FPR[31].v
+	psq_stx fp31, 0, r3, 0, 0
+
+
+	mfcr r3
+	stw	r3, throwcontext.CR;
+
+	lwz r3, 0(sp)
+	lwz r4, RETURN_ADDRESS(r3)
+	stw r3, throwcontext.SP;
+	stw r3, throwcontext.throwSP;
+	stw r4, throwcontext.returnaddr;
+
+	lwz r3,throwtype
+	stw r3, throwcontext.throwtype
+	lwz r3,location
+	stw r3, throwcontext.location
+	lwz r3,dtor
+	stw r3, throwcontext.dtor
+	la r3, throwcontext
+	bl ExPPC_ThrowHandler
+	nop
+	frfree
+	blr
+#endif // clang-format on
+}
+
+#pragma exceptions on
+
+extern "C" const char s_std_bad_exception[];
+extern "C" const char s_std_exception[];
+extern "C" const char s_bad_exception[0x20];
+
+extern "C" void* __RTTI__Q23std9exception_gecko[];
+extern "C" void* s_bad_exception_rtti[];
+extern "C" void* __RTTI__Q23std13bad_exception[];
+
+struct BadExceptionStorage {
+	void* vtable;
+};
+
+extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
+extern "C" void* __vt__Q23std9exception[];
+extern "C" void* __vt__Q23std13bad_exception[];
+
+/**
+ * @note Address: N/A
+ * @note Size: 0x1B4
+ */
+extern void __unexpected(CatchInfo* catchinfo)
+{
+	static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
+	                                          "!std::exception!!std::bad_exception!!\0\0\0"
+	                                          "!std::bad_exception!!\0\0";
+	char* badExceptionType = (char*)unexpectedTypes;
+	char* stdExceptionBadExceptionType;
+	char* stdBadExceptionType;
+	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
+
+	stdExceptionBadExceptionType = badExceptionType;
+	stdExceptionBadExceptionType += sizeof("!bad_exception!!\0\0\0");
+	stdBadExceptionType = stdExceptionBadExceptionType;
+	stdBadExceptionType += sizeof("!std::exception!!std::bad_exception!!\0\0");
+
+#pragma exception_magic // allow access to __exception_magic in try/catch blocks
+
+	try {
+		unexpected();
+	} catch (...) {
+		BadExceptionStorage badException;
+
+		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
+			throw;
+		}
+		if (ExPPC_IsInSpecification(badExceptionType, unexp)) {
+			badException.vtable = __vt__Q23std9exception;
+			badException.vtable = __vt__Q23std13bad_exception;
+			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
+		}
+		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
+			BadExceptionStorage stdBadException;
+
+			stdBadException.vtable = __vt__Q23std9exception;
+			stdBadException.vtable = __vt__Q23std13bad_exception;
+			__throw((char*)stdExceptionBadExceptionType, &stdBadException, __dt__Q23std13bad_exceptionFv);
+		}
+	}
+	terminate();
+}
+
+namespace std {
+bad_exception::~bad_exception() {}
+const char* bad_exception::what() const;
+} // namespace std
+
+extern "C" const char s_std_bad_exception[] = "std::bad_exception";
+extern "C" const char s_std_exception[] = "std::exception";
+extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
+const char* std::bad_exception::what() const { return s_bad_exception; }
+
+/**
+ * @note Address: N/A
  * @note Size: 0x50C
  */
 void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher)
@@ -903,6 +912,54 @@ void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catch
 
 /**
  * @note Address: N/A
+ * @note Size: 0x248
+ */
+char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
+{
+	char *SP, *callers_SP;
+	f64* FPR_save_area;
+	s32* GPR_save_area;
+	int saved_GPRs, saved_FPRs;
+	GeckoFPRContext* Vector_save_area;
+	int i, j;
+
+	SP         = context->SP;
+	callers_SP = *(char**)SP;
+	saved_FPRs = ET_GetSavedFPRs(info->exception_record->et_field);
+
+	if (ET_HasElfVector(info->exception_record->et_field)) {
+		Vector_save_area = (GeckoFPRContext*)(callers_SP - saved_FPRs * 16);
+		FPR_save_area    = (f64*)Vector_save_area;
+	} else {
+		FPR_save_area = (f64*)(callers_SP - saved_FPRs * 8);
+	}
+
+	if (ET_HasElfVector(info->exception_record->et_field)) {
+		for (i = 32 - saved_FPRs, j = 0; i < 32; ++i, ++j) {
+			context->FPR[i].v.f[0] = Vector_save_area[j].v.f[0];
+			context->FPR[i].v.f[1] = Vector_save_area[j].v.f[1];
+			context->FPR[i].d      = Vector_save_area[j].d;
+		}
+	} else {
+		for (i = 32 - saved_FPRs, j = 0; i < 32; ++i, ++j) {
+			context->FPR[i].d = FPR_save_area[j];
+		}
+	}
+
+	saved_GPRs    = ET_GetSavedGPRs(info->exception_record->et_field);
+	GPR_save_area = (s32*)FPR_save_area;
+	GPR_save_area -= saved_GPRs;
+
+	for (i = 32 - saved_GPRs, j = 0; i < 32; ++i, ++j) {
+		context->GPR[i] = GPR_save_area[j];
+	}
+
+	context->SP = callers_SP;
+	return *(char**)(callers_SP + RETURN_ADDRESS);
+}
+
+/**
+ * @note Address: N/A
  * @note Size: 0x1C0
  */
 exaction_type ExPPC_NextAction(ActionIterator* iter)
@@ -990,126 +1047,75 @@ exaction_type ExPPC_NextAction(ActionIterator* iter)
 	}
 }
 
+/**
+ * @note Address: N/A
+ * @note Size: 0x204
+ */
+void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
+{
+	FragmentInfo* fragment;
+	FragmentInfo frag;
+	ExceptionTableIndex *exceptionindex, *p;
+	u32 returnoffset;
+	s32 i, m, n;
+
+	info->exception_record = 0;
+	info->action_pointer   = 0;
+
+	if ((ExPPC_FindExceptionFragment(returnaddr, &frag)) == 0)
+		return;
+	fragment = &frag;
+
+	info->code_section = fragment->code_start;
+	info->data_section = fragment->data_start;
+	info->TOC          = fragment->TOC;
+
+	returnoffset   = returnaddr - fragment->code_start;
+	exceptionindex = fragment->exception_start;
+	for (i = 0, n = fragment->exception_end - fragment->exception_start;;) {
+		if (i > n)
+			return;
+		p = &exceptionindex[m = (i + n) / 2];
+
+		if (returnoffset < p->functionoffset) {
+			n = m - 1;
+		} else if (returnoffset > p->functionoffset + ETI_GetFunctionSize(p->eti_field)) {
+			i = m + 1;
+		} else
+			break;
+	}
+	info->current_function = fragment->code_start + p->functionoffset;
+	info->exception_record = ETI_GetDirectStore(p->eti_field) ? (ExceptionTableSmall*)(&p->exceptionoffset)
+	                                                          : (ExceptionTableSmall*)(fragment->data_start + p->exceptionoffset);
+
+	returnoffset -= p->functionoffset;
+
+	if (ET_IsLargeTable(info->exception_record->et_field)) {
+		ExceptionTableLarge* etl = (ExceptionTableLarge*)info->exception_record;
+		ExceptionRangeLarge* erl;
+
+		for (erl = etl->ranges; erl->start != 0; erl++) {
+			u32 range_end = erl->start + (erl->size * 4);
+
+			if (erl->start <= returnoffset && range_end >= returnoffset) {
+				info->action_pointer = (char*)etl + erl->action;
+				break;
+			}
+		}
+	} else {
+		ExceptionTableSmall* ets = (ExceptionTableSmall*)info->exception_record;
+		ExceptionRangeSmall* ers;
+
+		for (ers = ets->ranges; ers->start != 0; ers++) {
+			if (ers->start <= returnoffset && ers->end >= returnoffset) {
+				info->action_pointer = (char*)ets + ers->action;
+				break;
+			}
+		}
+	}
+}
+
 extern "C" void* __RTTI__Q23std9exception_gecko[] = { (void*)s_std_exception, 0 };
 extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception_gecko, 0, 0 };
 extern "C" void* __RTTI__Q23std13bad_exception[] = { (void*)s_std_bad_exception, s_bad_exception_rtti };
 
-/**
- * @note Address: N/A
- * @note Size: 0x44
- */
-void __end__catch(CatchInfo* catchinfo)
-{
-	if (catchinfo->location && catchinfo->dtor) {
-		DTORCALL_COMPLETE(catchinfo->dtor, catchinfo->location);
-	}
-}
-
-/**
- * @note Address: N/A
- * @note Size: 0x144
- */
-asm void __throw(char* throwtype, void* location, void* dtor)
-{
-#ifdef __MWERKS__ // clang-format off
-	ThrowContext throwcontext;
-
-	fralloc
-
-	stmw r13, throwcontext.GPR[13]
-
-	stfd fp14, throwcontext.FPR[14].d
-	la r3, throwcontext.FPR[14].v
-	psq_stx fp14, 0, r3,0,0
-
-	stfd fp15, throwcontext.FPR[15].d
-	la r3, throwcontext.FPR[15].v
-	psq_stx fp15, 0, r3, 0, 0
-
-	stfd fp16, throwcontext.FPR[16].d
-	la r3, throwcontext.FPR[16].v
-	psq_stx fp16, 0, r3, 0, 0
-
-	stfd fp17, throwcontext.FPR[17].d
-	la r3, throwcontext.FPR[17].v
-	psq_stx fp17, 0, r3, 0, 0
-
-	stfd fp18, throwcontext.FPR[18].d
-	la r3, throwcontext.FPR[18].v
-	psq_stx fp18, 0, r3, 0, 0
-
-	stfd fp19, throwcontext.FPR[19].d
-	la r3, throwcontext.FPR[19].v
-	psq_stx fp19, 0, r3, 0, 0
-
-	stfd fp20, throwcontext.FPR[20].d
-	la r3, throwcontext.FPR[20].v
-	psq_stx fp20, 0, r3, 0, 0
-
-	stfd fp21, throwcontext.FPR[21].d
-	la r3, throwcontext.FPR[21].v
-	psq_stx fp21, 0, r3, 0, 0
-
-	stfd fp22, throwcontext.FPR[22].d
-	la r3, throwcontext.FPR[22].v
-	psq_stx fp22, 0, r3, 0, 0
-
-	stfd fp23, throwcontext.FPR[23].d
-	la r3, throwcontext.FPR[23].v
-	psq_stx fp23, 0, r3, 0, 0
-
-	stfd fp24, throwcontext.FPR[24].d
-	la r3, throwcontext.FPR[24].v
-	psq_stx fp24, 0, r3, 0, 0
-
-	stfd fp25, throwcontext.FPR[25].d
-	la r3, throwcontext.FPR[25].v
-	psq_stx fp25, 0, r3, 0, 0
-
-	stfd fp26, throwcontext.FPR[26].d
-	la r3, throwcontext.FPR[26].v
-	psq_stx fp26, 0, r3, 0, 0
-
-	stfd fp27, throwcontext.FPR[27].d
-	la r3, throwcontext.FPR[27].v
-	psq_stx fp27, 0, r3, 0, 0
-
-	stfd fp28, throwcontext.FPR[28].d
-	la r3, throwcontext.FPR[28].v
-	psq_stx fp28, 0, r3, 0, 0
-
-	stfd fp29, throwcontext.FPR[29].d
-	la r3, throwcontext.FPR[29].v
-	psq_stx fp29, 0, r3, 0, 0
-
-	stfd fp30, throwcontext.FPR[30].d
-	la r3, throwcontext.FPR[30].v
-	psq_stx fp30, 0, r3, 0, 0
-
-	stfd fp31, throwcontext.FPR[31].d
-	la r3, throwcontext.FPR[31].v
-	psq_stx fp31, 0, r3, 0, 0
-
-
-	mfcr r3
-	stw	r3, throwcontext.CR;
-
-	lwz r3, 0(sp)
-	lwz r4, RETURN_ADDRESS(r3)
-	stw r3, throwcontext.SP;
-	stw r3, throwcontext.throwSP;
-	stw r4, throwcontext.returnaddr;
-
-	lwz r3,throwtype
-	stw r3, throwcontext.throwtype
-	lwz r3,location
-	stw r3, throwcontext.location
-	lwz r3,dtor
-	stw r3, throwcontext.dtor
-	la r3, throwcontext
-	bl ExPPC_ThrowHandler
-	nop
-	frfree
-	blr
-#endif // clang-format on
-}

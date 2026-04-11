@@ -754,7 +754,7 @@ config.libs = [
         [
             Object(NonMatching, "dvd/dvd.c"),
             Object(Matching, "dvd/dvderror.c"),
-            Object(NonMatching, "dvd/dvdFatal.c"),
+            Object(Matching, "dvd/dvdFatal.c"),
             Object(NonMatching, "dvd/dvdfs.c"),
             Object(Matching, "dvd/dvdidutils.c"),
             Object(NonMatching, "dvd/dvdlow.c"),

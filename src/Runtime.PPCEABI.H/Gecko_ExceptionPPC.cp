@@ -114,6 +114,8 @@ void __unregister_fragment(int fragmentID)
 	}
 }
 
+#pragma exceptions off
+
 /**
  * @note Address: N/A
  * @note Size: 0x88
@@ -148,6 +150,8 @@ static int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
 
 	return 0;
 }
+
+#pragma exceptions on
 
 /**
  * @note Address: N/A
@@ -217,6 +221,8 @@ void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
 	}
 }
 
+#pragma exceptions off
+
 /**
  * @note Address: N/A
  * @note Size: 0x18
@@ -253,7 +259,7 @@ void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catch
 
 /**
  * @note Address: N/A
- * @note Size: 0x1C0
+ * @note Size: 0x248
  */
 char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
 {
@@ -446,6 +452,8 @@ static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 	return 0;
 }
 
+#pragma exceptions on
+
 namespace std {
 bad_exception::~bad_exception() {}
 const char* bad_exception::what() const;
@@ -615,6 +623,8 @@ asm void ExPPC_LongJump(register ThrowContext* context, register void* newRTOC, 
 #endif // clang-format on
 }
 
+#pragma exceptions off
+
 /**
  * @note Address: N/A
  * @note Size: 0x84
@@ -635,6 +645,8 @@ static void ExPPC_HandleUnexpected(ThrowContext* context, MWExceptionInfo* info,
 
 	ExPPC_LongJump(context, info->TOC, info->current_function + unexp->pcoffset);
 }
+
+#pragma exceptions on
 
 /**
  * @note Address: N/A

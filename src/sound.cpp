@@ -2067,7 +2067,7 @@ found_entry:
         if (playId < 0) {
             Printf__7CSystemFPce(&System, s_soundErrorFmt, fadeFrames, ret);
         } else {
-            SeFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), playId, fadeFrames);
+            SeFadeOut__9CRedSoundFii(RedSound(this), playId, fadeFrames);
         }
         *found &= 0x7F;
     }

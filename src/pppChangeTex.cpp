@@ -482,7 +482,14 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				arrayOffset += 4;
 				meshList += 0x14;
 			}
+
+			pointOffset += 6;
+			colorPtr += 4;
 		}
+
+		DCFlushRange((void*)colorBase, vertCount << 2);
+		arrayOffset += 4;
+		meshList += 0x14;
 	}
 }
 

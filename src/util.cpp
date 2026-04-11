@@ -317,55 +317,53 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
  */
 void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
-    Vec* pos1Ptr = &pos1;
-    Vec* pos2Ptr = &pos2;
-    u32* colorPtr = reinterpret_cast<u32*>(&color);
+    u32 rgba = *reinterpret_cast<u32*>(&color);
+    float u0;
+    float v0;
     float u1;
     float v1;
-    float u2;
-    float v2;
 
     if (uv1 == NULL || uv2 == NULL) {
-        u1 = kUtilZero;
-        v1 = kUtilZero;
-        u2 = kUtilOne;
-        v2 = kUtilOne;
+        u0 = kUtilZero;
+        u1 = kUtilOne;
+        v0 = u0;
+        v1 = u1;
     } else {
-        u1 = uv1->x;
-        v1 = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
+        u0 = uv1->x;
+        v0 = uv1->y;
+        u1 = uv2->x;
+        v1 = uv2->y;
     }
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 
-    GXWGFifo.f32 = pos1Ptr->x;
-    GXWGFifo.f32 = pos1Ptr->y;
-    GXWGFifo.f32 = pos1Ptr->z;
-    GXWGFifo.u32 = *colorPtr;
+    GXWGFifo.f32 = pos1.x;
+    GXWGFifo.f32 = pos1.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u0;
+    GXWGFifo.f32 = v0;
+
+    GXWGFifo.f32 = pos2.x;
+    GXWGFifo.f32 = pos1.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v0;
+
+    GXWGFifo.f32 = pos2.x;
+    GXWGFifo.f32 = pos2.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
 
-    GXWGFifo.f32 = pos2Ptr->x;
-    GXWGFifo.f32 = pos1Ptr->y;
-    GXWGFifo.f32 = pos1Ptr->z;
-    GXWGFifo.u32 = *colorPtr;
-    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = pos1.x;
+    GXWGFifo.f32 = pos2.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = pos2Ptr->x;
-    GXWGFifo.f32 = pos2Ptr->y;
-    GXWGFifo.f32 = pos1Ptr->z;
-    GXWGFifo.u32 = *colorPtr;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-
-    GXWGFifo.f32 = pos1Ptr->x;
-    GXWGFifo.f32 = pos2Ptr->y;
-    GXWGFifo.f32 = pos1Ptr->z;
-    GXWGFifo.u32 = *colorPtr;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
 }
 
 /*

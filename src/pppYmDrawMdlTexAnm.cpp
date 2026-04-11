@@ -23,8 +23,7 @@ struct CMapMeshUVLayout {
 };
 
 struct pppYmDrawMdlTexAnmObject {
-    s32 m_graphId;
-    pppFMATRIX m_localMatrix;
+    _pppPObject m_object;
     u8 _pad34[0xC];
     pppFMATRIX m_modelViewMatrix;
     Vec* m_drawMatrixPtr;
@@ -275,8 +274,8 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     pppUnitMatrix(matrix2);
     matrix2.value[2][2] *= FLOAT_80330548;
 
-    pppMulMatrix(matrix0, ymDrawMdlTexAnm->m_localMatrix, matrix2);
-    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix0, matrix0);
+    pppMulMatrix(matrix0, ymDrawMdlTexAnm->m_object.m_localMatrix, matrix2);
+    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix02, matrix0);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;

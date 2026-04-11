@@ -455,9 +455,8 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	CGPrgObj* self = this;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(self->m_worldPosition);
+	CVector basePos(m_worldPosition);
 	CVector deltaPos;
 	float targetRot;
 	float deltaX;
@@ -469,12 +468,12 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	deltaX = deltaPos.x;
 	zero = FLOAT_80331BD4;
 	deltaZ = deltaPos.z;
-	if (deltaX == zero || deltaZ == zero) {
+	if (zero == deltaX || zero == deltaZ) {
 		targetRot = FLOAT_80331BD4;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
-	self->m_rotTargetY = targetRot;
+	m_rotTargetY = targetRot;
 }
 
 /*

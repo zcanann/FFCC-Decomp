@@ -148,12 +148,11 @@ void calc(
 	VRyjMegaBirth* work, PRyjMegaBirth* param, _PARTICLE_DATA* particle, VColor* vColor,
 	_PARTICLE_COLOR* colorData)
 {
-	s32 alpha;
+	u32 alpha;
 	u8* paramPayload;
 	u8* particlePayload;
 	u8 fadeOutFrames;
 	u8 fadeInFrames;
-	float particleAngle;
 	Vec step;
 
 	alpha = vColor->m_alpha;
@@ -188,16 +187,14 @@ void calc(
 				*(float*)(paramPayload + 0x98) + *(float*)(particlePayload + 0x3C);
 	}
 
-	particleAngle = *(float*)(particlePayload + 0x28);
-	while (FLOAT_8033045c <= particleAngle)
+	while (FLOAT_8033045c <= *(float*)(particlePayload + 0x28))
 	{
-		particleAngle = particleAngle - FLOAT_80330458;
+		*(float*)(particlePayload + 0x28) = *(float*)(particlePayload + 0x28) - FLOAT_80330458;
 	}
-	while (particleAngle < FLOAT_80330460)
+	while (*(float*)(particlePayload + 0x28) < FLOAT_80330460)
 	{
-		particleAngle = particleAngle + FLOAT_80330458;
+		*(float*)(particlePayload + 0x28) = *(float*)(particlePayload + 0x28) + FLOAT_80330458;
 	}
-	*(float*)(particlePayload + 0x28) = particleAngle;
 
 	*(float*)(particlePayload + 0x40) = *(float*)(particlePayload + 0x40) + *(float*)(particlePayload + 0x48);
 	*(float*)(particlePayload + 0x44) = *(float*)(particlePayload + 0x44) + *(float*)(particlePayload + 0x4C);
@@ -244,8 +241,8 @@ void calc(
 		*(s16*)(particlePayload + 0x22) = *(s16*)(particlePayload + 0x22) - 1;
 	}
 
-	fadeOutFrames = *(u8*)(particlePayload + 0x59);
 	*(u8*)(particlePayload + 0x58) = *(u8*)(particlePayload + 0x58) + 1;
+	fadeOutFrames = *(u8*)(particlePayload + 0x59);
 	if ((fadeOutFrames != 0) && (*(u8*)(particlePayload + 0x58) <= fadeOutFrames))
 	{
 		*(float*)(particlePayload + 0x5C) =

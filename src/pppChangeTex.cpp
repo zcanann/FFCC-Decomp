@@ -338,8 +338,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	int colorOffset = data->m_serializedDataOffsets[1];
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+	s32* serializedDataOffsets = data->m_serializedDataOffsets;
+	int colorOffset = serializedDataOffsets[1];
+	int workOffset = serializedDataOffsets[2];
+	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + workOffset + 0x80);
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
 

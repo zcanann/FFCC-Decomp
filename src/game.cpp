@@ -776,26 +776,18 @@ void CGame::CheckScriptChange()
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if (m_nextScript.m_flags != 0) {
-        CGame::CGameWork* gameWork;
-        const char* townName = &DAT_8032f6ac;
-
-        gameWork = &Game.m_gameWork;
+        CGame* game = &Game;
 
         Printf__7CSystemFPce(&System, &DAT_8032f6a0);
-        System.Printf(const_cast<char*>(DAT_801d6214));
+        Printf__7CSystemFPce(&System, DAT_801d6214);
         Printf__7CSystemFPce(&System, &DAT_8032f6a0);
 
-        memset(&gameWork->m_gameDataStartMarker, 0, 0x13E1);
-        memset(gameWork->m_wmBackupParams, 0xFF, sizeof(gameWork->m_wmBackupParams));
+        memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+        memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
-        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) = 1;
-        gameWork->m_chaliceElement = 1;
-
-        if (gameWork->m_languageId == 3) {
-            townName = &DAT_8032f6a4;
-        }
-
-        strcpy(gameWork->m_townName, townName);
+        *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
+        game->m_gameWork.m_chaliceElement = 1;
+        strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
         ResetNewGame__13CFlatRuntime2Fv(CFlat);
         InitFurTexBuffer__6CCharaFv(&Chara);
         m_nextScript.m_flags = 0;

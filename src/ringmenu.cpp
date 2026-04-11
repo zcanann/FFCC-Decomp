@@ -27,6 +27,14 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, flo
 extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
 extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
@@ -423,25 +431,33 @@ void CRingMenu::onCalc()
  */
 void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	const int* cmdNameTable =
-		reinterpret_cast<const int*>(reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
-	const bool isBossStage = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19);
-
+	float fVar1;
+	bool reverseDir;
+	float clampedAlpha;
+	int tlut;
+	int* cmdNameTable;
 	int commandLabel;
-	if (isBossStage) {
+	double waveX;
+	double waveY;
+	double textWidth;
+	double textHeight;
+	unsigned char colorStorage[4];
+
+	cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		commandLabel = cmdNameTable[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
-		int indexOffset = 9;
+		tlut = 9;
 		if (cmdIndex == 0) {
-			indexOffset = 1;
+			tlut = 1;
 		}
-		commandLabel = cmdNameTable[indexOffset];
+		commandLabel = cmdNameTable[tlut];
 	} else {
 		commandLabel = _GetWeaponAttrib__12CCaravanWorkFi(caravanWork, cmdIndex);
 	}
 
-	int tlut = 7;
-	if (isBossStage) {
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		tlut = 7;
 		if (cmdIndex == 2) {
 			tlut = 4;
 		} else if (cmdIndex < 2) {
@@ -450,58 +466,57 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 			} else if (cmdIndex >= 0) {
 				tlut = 1;
 			}
+		} else if (cmdIndex == 4) {
+			tlut = 7;
 		} else if (cmdIndex < 4) {
-			if (cmdIndex != 4) {
-				tlut = 6;
-			}
+			tlut = 6;
 		}
-	} else if (cmdIndex != 0) {
-		tlut = 4;
+		SetTlut__5CFontFi(font, tlut);
+	} else if (cmdIndex == 0) {
+		SetTlut__5CFontFi(font, 7);
+	} else {
+		SetTlut__5CFontFi(font, 4);
 	}
-	font->SetTlut(tlut);
 
-	const double sinAngle = sin(static_cast<double>(angle));
-	const double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sinAngle));
-	bool reverseDir = false;
+	waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
+	reverseDir = false;
 	if ((state == 0) || (state == 3)) {
 		reverseDir = true;
 	}
-	int sign = 1;
+
+	waveY = 1.0;
 	if (reverseDir) {
-		sign = -1;
+		waveY = -1.0;
 	}
-	double waveY = static_cast<double>(static_cast<float>(sign) * FLOAT_80330a40 * static_cast<float>(sinAngle));
-	if (isBossStage) {
+	waveY = static_cast<double>(static_cast<float>(waveY) * FLOAT_80330a40 * static_cast<float>(sin(static_cast<double>(angle))));
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
 	}
 
-	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
+	SetScale__5CFontFf(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)), font);
+	textWidth = static_cast<double>(GetWidth__5CFontFPc(font, reinterpret_cast<const char*>(commandLabel)));
+	fVar1 = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
 
-	double textWidth = static_cast<double>(font->GetWidth(commandLabel));
-	float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
-	double textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
-	float clampedAlpha = FLOAT_803309c0;
-	if ((FLOAT_803309c0 <= alphaRange) && ((clampedAlpha = alphaRange), (FLOAT_803309cc < alphaRange))) {
+	clampedAlpha = FLOAT_803309c0;
+	if ((FLOAT_803309c0 <= fVar1) && ((clampedAlpha = fVar1), (FLOAT_803309cc < fVar1))) {
 		clampedAlpha = FLOAT_803309cc;
 	}
 
 	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
-	unsigned char colorStorage[4];
 	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
-	font->SetColor(*color);
-	const float textX = static_cast<float>(
-		waveX + -(static_cast<double>(static_cast<float>(textWidth * static_cast<double>(FLOAT_803309c4) -
-		                                                static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) +
-		                                                                                       static_cast<double>(posX)))))));
-	const float textY = FLOAT_80330a40 +
-	                    static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(textHeight * static_cast<double>(FLOAT_803309c4) -
-	                                                                                         static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) +
-	                                                                                                                            static_cast<double>(posY)))))));
-
-	font->SetPosX(textX);
-	font->SetPosY(textY);
-	font->SetPosZ(FLOAT_803309c0);
-	font->Draw(commandLabel);
+	SetColor__5CFontF8_GXColor(font, color);
+	SetPosX__5CFontFf(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
+		textWidth * static_cast<double>(FLOAT_803309c4) -
+		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))), font);
+	SetPosY__5CFontFf(
+		FLOAT_80330a40 +
+			static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(
+				textHeight * static_cast<double>(FLOAT_803309c4) -
+				static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) + static_cast<double>(posY))))))),
+		font);
+	SetPosZ__5CFontFf(FLOAT_803309c0, font);
+	Draw__5CFontFPc(font, reinterpret_cast<const char*>(commandLabel));
 }
 
 /*

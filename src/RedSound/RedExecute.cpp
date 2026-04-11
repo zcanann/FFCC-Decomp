@@ -27,7 +27,9 @@ struct RedReverbDATA {
  */
 u8 GetRandomData()
 {
-    return (u8)DAT_8021dcce[DAT_8032f4a8++];
+    u8 value = (u8)DAT_8021dcce[DAT_8032f4a8];
+    DAT_8032f4a8 = DAT_8032f4a8 + 1;
+    return value;
 }
 
 /*

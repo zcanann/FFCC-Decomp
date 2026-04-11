@@ -44,13 +44,17 @@ unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
 void Quit__11CDbgMenuPcsFv(void*);
+void Quit__6CMcPcsFv(void*);
 void Quit__7CGbaPcsFv(void*);
+void Quit__8CMenuPcsFv(void*);
 void Quit__7CUSBPcsFv(void*);
+void Quit__6CCharaFv(void*);
 void Quit__9CLightPcsFv(void*);
 void Quit__7CMapPcsFv(void*);
 void Quit__18CMaterialEditorPcsFv(void*);
 void Quit__14CFunnyShapePcsFv(void*);
 void Quit__11CGraphicPcsFv(void*);
+void Quit__10CCameraPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
 void pppDeleteAll__8CPartMngFv(void*);
 void pppDestroyAll__8CPartMngFv(void*);
@@ -351,18 +355,18 @@ void CGame::Quit()
 
 	Memory.DestroyStage(m_mainStage);
 	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
-	GetMcPcsSingleton()->Quit();
+	Quit__6CMcPcsFv(GetMcPcsSingleton());
 	Quit__7CGbaPcsFv(&GbaPcs);
-	MenuPcs.Quit();
+	Quit__8CMenuPcsFv(&MenuPcs);
 	Quit__7CUSBPcsFv(&USBPcs);
-	gChara.Quit();
+	Quit__6CCharaFv(&Chara);
 	CharaPcs.Quit();
 	Quit__9CLightPcsFv(&LightPcs);
 	Quit__7CMapPcsFv(&MapPcs);
 	Quit__18CMaterialEditorPcsFv(&MaterialEditorPcs);
 	Quit__14CFunnyShapePcsFv(&FunnyShapePcs);
 	Quit__11CGraphicPcsFv(&GraphicsPcs);
-	CameraPcs.Quit();
+	Quit__10CCameraPcsFv(&CameraPcs);
 }
 
 /*

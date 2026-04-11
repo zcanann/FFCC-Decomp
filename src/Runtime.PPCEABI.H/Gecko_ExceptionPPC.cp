@@ -656,7 +656,6 @@ static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
 extern "C" const char s_std_bad_exception[] = "std::bad_exception";
 extern "C" const char s_std_exception[] = "std::exception";
 extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
-
 const char* std::bad_exception::what() const { return s_bad_exception; }
 
 struct BadExceptionStorage {
@@ -700,9 +699,11 @@ extern void __unexpected(CatchInfo* catchinfo)
 			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
 		}
 		if (ExPPC_IsInSpecification((char*)stdBadExceptionType, unexp)) {
-			badException.vtable = __vt__Q23std9exception;
-			badException.vtable = __vt__Q23std13bad_exception;
-			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
+			BadExceptionStorage stdBadException;
+
+			stdBadException.vtable = __vt__Q23std9exception;
+			stdBadException.vtable = __vt__Q23std13bad_exception;
+			__throw((char*)stdExceptionBadExceptionType, &stdBadException, __dt__Q23std13bad_exceptionFv);
 		}
 	}
 	terminate();

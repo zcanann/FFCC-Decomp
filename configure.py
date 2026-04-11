@@ -517,7 +517,7 @@ config.libs = [
             Object(Matching, "pppDrawShape.cpp"),
             Object(Matching, "pppDrawShape2.cpp"),
             Object(NonMatching, "pppEmission.cpp"),
-            Object(NonMatching, "pppEraseCharaParts.cpp"),
+            Object(Matching, "pppEraseCharaParts.cpp"),
             Object(Matching, "pppFilter.cpp"),
             Object(Matching, "pppFovAdjustMatrix.cpp"),
             Object(NonMatching, "pppGetRotMatrixX.cpp"),

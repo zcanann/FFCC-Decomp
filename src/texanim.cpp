@@ -738,7 +738,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
     if (dup != 0) {
         __ct__4CRefFv(dup);
         dup->vtable = __vt__11CTexAnimSet;
-        new (&dup->texAnims) CPtrArray<CTexAnim*>();
+        __ct__21CPtrArray_P8CTexAnim_Fv(&dup->texAnims);
         dup->unk24 = FLOAT_8032fb38;
     }
 

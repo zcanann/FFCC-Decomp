@@ -3504,11 +3504,13 @@ int GbaQueue::GetArtifactData(int, unsigned char*)
  */
 int GbaQueue::GetUseItemFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
+	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
+	int result;
 	OSWaitSemaphore(accessSemaphores + channel);
-	char value = obj[channel * 0xDC + 0x44F];
+	char value = compatibilityStr[channel * 0xDC + 0x1F];
+	result = static_cast<int>(value);
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<int>(value);
+	return result;
 }
 
 /*

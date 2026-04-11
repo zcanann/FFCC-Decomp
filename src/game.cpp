@@ -525,7 +525,7 @@ void CGame::Create()
 {
     int mapId;
     int mapVariant;
-    const char* townName = s_defaultTownName;
+    char scriptName[256];
 
     m_nextScript.m_flags = 1;
     clearWork();
@@ -538,16 +538,13 @@ void CGame::Create()
     m_gameWork.m_scriptSysVal2 = 0;
     m_gameWork.m_scriptSysVal3 = 1;
     m_gameWork.m_chaliceElement = 1;
-
-    if (m_gameWork.m_languageId == 3) {
-        townName = s_italianTownName;
-    }
-    strcpy(m_gameWork.m_townName, townName);
+    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? s_italianTownName : s_defaultTownName);
 
     m_gameWork.m_gameInitFlag = 1;
 
     if (strlen(m_startScriptName) != 0) {
-        strcpy(m_nextScript.m_name, m_startScriptName);
+        strcpy(scriptName, m_startScriptName);
+        memcpy(m_nextScript.m_name, scriptName, sizeof(scriptName));
         m_newGameFlag = 1;
     }
 

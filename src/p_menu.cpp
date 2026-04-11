@@ -1307,15 +1307,22 @@ void CMenuPcs::SetColor(CColor& color)
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
     char path[0x108];
+    char* language;
     u8* self = reinterpret_cast<u8*>(this);
     CFont** fontSlot = reinterpret_cast<CFont**>(self + 0x100 + fontNo * 4);
     CFont* font = *fontSlot;
     if (font != 0) {
-        ReleaseRefObject(font);
+        u32* raw = reinterpret_cast<u32*>(font);
+        int refCount = static_cast<int>(raw[1]);
+        raw[1] = static_cast<u32>(refCount - 1);
+        if (refCount - 1 == 0) {
+            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(font, 1);
+        }
         *fontSlot = 0;
     }
 
-    sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.GetLangString(), fileName);
+    language = GetLangString__5CGameFv(&Game);
+    sprintf(path, s_dvd__smenu__s_fnt_801d9da0, language, fileName);
     loadFont(2, path, fontNo + 2, -1);
 }
 

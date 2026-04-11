@@ -43,12 +43,12 @@ void CGQuadObj::onDraw()
         GXLoadPosMtxImm(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
-        CGQuadObj* self = this;
         int i = 0;
+        CGQuadObj* self = this;
 
         while (i < (int)(u32)m_vertexCount) {
-            int next = i + 1;
             QuadVertex* vertex = self->m_vertices;
+            int next = i + 1;
 
             i++;
 
@@ -59,7 +59,6 @@ void CGQuadObj::onDraw()
             next = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
             GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
             GXPosition3f32(vertex->x, m_yBase, vertex->z);
-
             self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
             GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex->z);
         }

@@ -248,98 +248,12 @@ static exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
 	return ((ex_destroylocal*)iter->info.action_pointer)->action & EXACTION_MASK;
 }
 
+static exaction_type ExPPC_NextAction(ActionIterator* iter);
+static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher);
+
 /**
  * @note Address: N/A
  * @note Size: 0x1C0
- */
-static exaction_type ExPPC_NextAction(ActionIterator* iter)
-{
-	exaction_type action;
-
-	for (;;) {
-		if (iter->info.action_pointer == 0 || ((action = ((ex_destroylocal*)iter->info.action_pointer)->action) & EXACTION_ENDBIT) != 0) {
-			char *return_addr, *callers_SP;
-
-			callers_SP = *(char**)iter->current_SP;
-
-			if (ET_GetSavedGPRs(iter->info.exception_record->et_field)) {
-				iter->current_R31 = ExPPC_PopR31(callers_SP, &iter->info);
-			}
-
-			return_addr = *(char**)(callers_SP + RETURN_ADDRESS);
-
-			ExPPC_FindExceptionRecord(return_addr, &iter->info);
-
-			if (iter->info.exception_record == 0) {
-				terminate();
-			}
-
-			iter->current_SP = callers_SP;
-			iter->current_FP = (ET_GetHasFramePtr(iter->info.exception_record->et_field)) ? (char*)iter->current_R31 : iter->current_SP;
-
-			if (iter->info.action_pointer == 0)
-				continue;
-		} else {
-			switch (action) {
-			case EXACTION_DESTROYLOCAL:
-				iter->info.action_pointer += sizeof(ex_destroylocal);
-				break;
-			case EXACTION_DESTROYLOCALCOND:
-				iter->info.action_pointer += sizeof(ex_destroylocalcond);
-				break;
-			case EXACTION_DESTROYLOCALPOINTER:
-				iter->info.action_pointer += sizeof(ex_destroylocalpointer);
-				break;
-			case EXACTION_DESTROYLOCALARRAY:
-				iter->info.action_pointer += sizeof(ex_destroylocalarray);
-				break;
-			case EXACTION_DESTROYBASE:
-			case EXACTION_DESTROYMEMBER:
-				iter->info.action_pointer += sizeof(ex_destroymember);
-				break;
-			case EXACTION_DESTROYMEMBERCOND:
-				iter->info.action_pointer += sizeof(ex_destroymembercond);
-				break;
-			case EXACTION_DESTROYMEMBERARRAY:
-				iter->info.action_pointer += sizeof(ex_destroymemberarray);
-				break;
-			case EXACTION_DELETEPOINTER:
-				iter->info.action_pointer += sizeof(ex_deletepointer);
-				break;
-			case EXACTION_DELETEPOINTERCOND:
-				iter->info.action_pointer += sizeof(ex_deletepointercond);
-				break;
-			case EXACTION_CATCHBLOCK:
-				iter->info.action_pointer += sizeof(ex_catchblock);
-				break;
-			case EXACTION_CATCHBLOCK_32:
-				iter->info.action_pointer += sizeof(ex_catchblock_32);
-				break;
-			case EXACTION_ACTIVECATCHBLOCK:
-				iter->info.action_pointer += sizeof(ex_activecatchblock);
-				break;
-			case EXACTION_SPECIFICATION:
-				iter->info.action_pointer
-				    += sizeof(ex_specification) + ((ex_specification*)iter->info.action_pointer)->specs * sizeof(void*);
-				break;
-			default:
-				terminate();
-			}
-		}
-
-		action = ((ex_destroylocal*)iter->info.action_pointer)->action & EXACTION_MASK;
-
-		if (action == EXACTION_BRANCH) {
-			iter->info.action_pointer = ((char*)iter->info.exception_record) + ((ex_branch*)iter->info.action_pointer)->target;
-			action                    = ((ex_destroylocal*)iter->info.action_pointer)->action & EXACTION_MASK;
-		}
-		return action;
-	}
-}
-
-/**
- * @note Address: N/A
- * @note Size: 0x248
  */
 static char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info)
 {
@@ -520,119 +434,6 @@ static void ExPPC_DeletePointerCond(ThrowContext* context, const ex_deletepointe
 	}
 }
 
-/**
- * @note Address: N/A
- * @note Size: 0x50C
- */
-static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher)
-{
-	exaction_type action;
-
-#pragma exception_terminate
-
-	for (;;) {
-		if (info->action_pointer == 0) {
-			char* return_addr;
-
-			return_addr = ExPPC_PopStackFrame(context, info);
-			ExPPC_FindExceptionRecord(return_addr, info);
-
-			if (info->exception_record == 0) {
-				terminate();
-			}
-
-			context->FP = (ET_GetHasFramePtr(info->exception_record->et_field)) ? (char*)context->GPR[31] : context->SP;
-			continue;
-		}
-
-		action = ((ex_destroylocal*)info->action_pointer)->action;
-
-		switch (action & EXACTION_MASK) {
-		case EXACTION_BRANCH:
-			info->action_pointer = ((char*)info->exception_record) + ((ex_branch*)info->action_pointer)->target;
-			break;
-		case EXACTION_DESTROYLOCAL:
-			ExPPC_DestroyLocal(context, (ex_destroylocal*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroylocal);
-			break;
-		case EXACTION_DESTROYLOCALCOND:
-			ExPPC_DestroyLocalCond(context, (ex_destroylocalcond*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroylocalcond);
-			break;
-		case EXACTION_DESTROYLOCALPOINTER:
-			ExPPC_DestroyLocalPointer(context, (ex_destroylocalpointer*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroylocalpointer);
-			break;
-		case EXACTION_DESTROYLOCALARRAY:
-			ExPPC_DestroyLocalArray(context, (ex_destroylocalarray*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroylocalarray);
-			break;
-		case EXACTION_DESTROYBASE:
-			ExPPC_DestroyBase(context, (ex_destroymember*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroymember);
-			break;
-		case EXACTION_DESTROYMEMBER:
-			ExPPC_DestroyMember(context, (ex_destroymember*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroymember);
-			break;
-		case EXACTION_DESTROYMEMBERCOND:
-			ExPPC_DestroyMemberCond(context, (ex_destroymembercond*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroymembercond);
-			break;
-		case EXACTION_DESTROYMEMBERARRAY:
-			ExPPC_DestroyMemberArray(context, (ex_destroymemberarray*)info->action_pointer);
-			info->action_pointer += sizeof(ex_destroymemberarray);
-			break;
-		case EXACTION_DELETEPOINTER:
-			ExPPC_DeletePointer(context, (ex_deletepointer*)info->action_pointer);
-			info->action_pointer += sizeof(ex_deletepointer);
-			break;
-		case EXACTION_DELETEPOINTERCOND:
-			ExPPC_DeletePointerCond(context, (ex_deletepointercond*)info->action_pointer);
-			info->action_pointer += sizeof(ex_deletepointercond);
-			break;
-		case EXACTION_CATCHBLOCK:
-			if (catcher == (void*)info->action_pointer)
-				return;
-			info->action_pointer += sizeof(ex_catchblock);
-			break;
-		case EXACTION_CATCHBLOCK_32:
-			if (catcher == (void*)info->action_pointer)
-				return;
-			info->action_pointer += sizeof(ex_catchblock_32);
-			break;
-		case EXACTION_ACTIVECATCHBLOCK: {
-			CatchInfo* catchinfo;
-
-			catchinfo = (CatchInfo*)(context->FP + ((ex_activecatchblock*)info->action_pointer)->cinfo_ref);
-
-			if (catchinfo->dtor) {
-				if (context->location == catchinfo->location) {
-					context->dtor = catchinfo->dtor;
-				} else {
-					DTORCALL_COMPLETE(catchinfo->dtor, catchinfo->location);
-				}
-			}
-			info->action_pointer += sizeof(ex_activecatchblock);
-		} break;
-		case EXACTION_SPECIFICATION:
-			if (catcher == (void*)info->action_pointer)
-				return;
-			info->action_pointer += sizeof(ex_specification) + ((ex_specification*)info->action_pointer)->specs * sizeof(void*);
-			break;
-		default:
-			terminate();
-		}
-
-		if (action & EXACTION_ENDBIT)
-			info->action_pointer = 0;
-	}
-}
-
-/**
- * @note Address: N/A
- * @note Size: 0x88
- */
 static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 {
 	s32 i, offset;
@@ -973,6 +774,204 @@ static void ExPPC_ThrowHandler(ThrowContext* context)
 		}
 
 		ExPPC_LongJump(context, info.TOC, info.current_function + catchblock->catch_pcoffset);
+	}
+}
+
+/**
+ * @note Address: N/A
+ * @note Size: 0x50C
+ */
+static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catcher)
+{
+	exaction_type action;
+
+#pragma exception_terminate
+
+	for (;;) {
+		if (info->action_pointer == 0) {
+			char* return_addr;
+
+			return_addr = ExPPC_PopStackFrame(context, info);
+			ExPPC_FindExceptionRecord(return_addr, info);
+
+			if (info->exception_record == 0) {
+				terminate();
+			}
+
+			context->FP = (ET_GetHasFramePtr(info->exception_record->et_field)) ? (char*)context->GPR[31] : context->SP;
+			continue;
+		}
+
+		action = ((ex_destroylocal*)info->action_pointer)->action;
+
+		switch (action & EXACTION_MASK) {
+		case EXACTION_BRANCH:
+			info->action_pointer = ((char*)info->exception_record) + ((ex_branch*)info->action_pointer)->target;
+			break;
+		case EXACTION_DESTROYLOCAL:
+			ExPPC_DestroyLocal(context, (ex_destroylocal*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroylocal);
+			break;
+		case EXACTION_DESTROYLOCALCOND:
+			ExPPC_DestroyLocalCond(context, (ex_destroylocalcond*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroylocalcond);
+			break;
+		case EXACTION_DESTROYLOCALPOINTER:
+			ExPPC_DestroyLocalPointer(context, (ex_destroylocalpointer*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroylocalpointer);
+			break;
+		case EXACTION_DESTROYLOCALARRAY:
+			ExPPC_DestroyLocalArray(context, (ex_destroylocalarray*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroylocalarray);
+			break;
+		case EXACTION_DESTROYBASE:
+			ExPPC_DestroyBase(context, (ex_destroymember*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroymember);
+			break;
+		case EXACTION_DESTROYMEMBER:
+			ExPPC_DestroyMember(context, (ex_destroymember*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroymember);
+			break;
+		case EXACTION_DESTROYMEMBERCOND:
+			ExPPC_DestroyMemberCond(context, (ex_destroymembercond*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroymembercond);
+			break;
+		case EXACTION_DESTROYMEMBERARRAY:
+			ExPPC_DestroyMemberArray(context, (ex_destroymemberarray*)info->action_pointer);
+			info->action_pointer += sizeof(ex_destroymemberarray);
+			break;
+		case EXACTION_DELETEPOINTER:
+			ExPPC_DeletePointer(context, (ex_deletepointer*)info->action_pointer);
+			info->action_pointer += sizeof(ex_deletepointer);
+			break;
+		case EXACTION_DELETEPOINTERCOND:
+			ExPPC_DeletePointerCond(context, (ex_deletepointercond*)info->action_pointer);
+			info->action_pointer += sizeof(ex_deletepointercond);
+			break;
+		case EXACTION_CATCHBLOCK:
+			if (catcher == (void*)info->action_pointer)
+				return;
+			info->action_pointer += sizeof(ex_catchblock);
+			break;
+		case EXACTION_CATCHBLOCK_32:
+			if (catcher == (void*)info->action_pointer)
+				return;
+			info->action_pointer += sizeof(ex_catchblock_32);
+			break;
+		case EXACTION_ACTIVECATCHBLOCK: {
+			CatchInfo* catchinfo;
+
+			catchinfo = (CatchInfo*)(context->FP + ((ex_activecatchblock*)info->action_pointer)->cinfo_ref);
+
+			if (catchinfo->dtor) {
+				if (context->location == catchinfo->location) {
+					context->dtor = catchinfo->dtor;
+				} else {
+					DTORCALL_COMPLETE(catchinfo->dtor, catchinfo->location);
+				}
+			}
+			info->action_pointer += sizeof(ex_activecatchblock);
+		} break;
+		case EXACTION_SPECIFICATION:
+			if (catcher == (void*)info->action_pointer)
+				return;
+			info->action_pointer += sizeof(ex_specification) + ((ex_specification*)info->action_pointer)->specs * sizeof(void*);
+			break;
+		default:
+			terminate();
+		}
+
+		if (action & EXACTION_ENDBIT)
+			info->action_pointer = 0;
+	}
+}
+
+/**
+ * @note Address: N/A
+ * @note Size: 0x1C0
+ */
+static exaction_type ExPPC_NextAction(ActionIterator* iter)
+{
+	exaction_type action;
+
+	for (;;) {
+		if (iter->info.action_pointer == 0 || ((action = ((ex_destroylocal*)iter->info.action_pointer)->action) & EXACTION_ENDBIT) != 0) {
+			char *return_addr, *callers_SP;
+
+			callers_SP = *(char**)iter->current_SP;
+
+			if (ET_GetSavedGPRs(iter->info.exception_record->et_field)) {
+				iter->current_R31 = ExPPC_PopR31(callers_SP, &iter->info);
+			}
+
+			return_addr = *(char**)(callers_SP + RETURN_ADDRESS);
+
+			ExPPC_FindExceptionRecord(return_addr, &iter->info);
+
+			if (iter->info.exception_record == 0) {
+				terminate();
+			}
+
+			iter->current_SP = callers_SP;
+			iter->current_FP = (ET_GetHasFramePtr(iter->info.exception_record->et_field)) ? (char*)iter->current_R31 : iter->current_SP;
+
+			if (iter->info.action_pointer == 0)
+				continue;
+		} else {
+			switch (action) {
+			case EXACTION_DESTROYLOCAL:
+				iter->info.action_pointer += sizeof(ex_destroylocal);
+				break;
+			case EXACTION_DESTROYLOCALCOND:
+				iter->info.action_pointer += sizeof(ex_destroylocalcond);
+				break;
+			case EXACTION_DESTROYLOCALPOINTER:
+				iter->info.action_pointer += sizeof(ex_destroylocalpointer);
+				break;
+			case EXACTION_DESTROYLOCALARRAY:
+				iter->info.action_pointer += sizeof(ex_destroylocalarray);
+				break;
+			case EXACTION_DESTROYBASE:
+			case EXACTION_DESTROYMEMBER:
+				iter->info.action_pointer += sizeof(ex_destroymember);
+				break;
+			case EXACTION_DESTROYMEMBERCOND:
+				iter->info.action_pointer += sizeof(ex_destroymembercond);
+				break;
+			case EXACTION_DESTROYMEMBERARRAY:
+				iter->info.action_pointer += sizeof(ex_destroymemberarray);
+				break;
+			case EXACTION_DELETEPOINTER:
+				iter->info.action_pointer += sizeof(ex_deletepointer);
+				break;
+			case EXACTION_DELETEPOINTERCOND:
+				iter->info.action_pointer += sizeof(ex_deletepointercond);
+				break;
+			case EXACTION_CATCHBLOCK:
+				iter->info.action_pointer += sizeof(ex_catchblock);
+				break;
+			case EXACTION_CATCHBLOCK_32:
+				iter->info.action_pointer += sizeof(ex_catchblock_32);
+				break;
+			case EXACTION_ACTIVECATCHBLOCK:
+				iter->info.action_pointer += sizeof(ex_activecatchblock);
+				break;
+			case EXACTION_SPECIFICATION:
+				iter->info.action_pointer
+				    += sizeof(ex_specification) + ((ex_specification*)iter->info.action_pointer)->specs * sizeof(void*);
+				break;
+			default:
+				terminate();
+			}
+		}
+
+		action = ((ex_destroylocal*)iter->info.action_pointer)->action & EXACTION_MASK;
+
+		if (action == EXACTION_BRANCH) {
+			iter->info.action_pointer = ((char*)iter->info.exception_record) + ((ex_branch*)iter->info.action_pointer)->target;
+			action                    = ((ex_destroylocal*)iter->info.action_pointer)->action & EXACTION_MASK;
+		}
+		return action;
 	}
 }
 

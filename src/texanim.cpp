@@ -45,6 +45,7 @@ extern "C" void* __vt__11CTexAnimSeq[];
 extern "C" void* __vt__Q28CTexAnim8CRefData[];
 extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" void __ct__25CPtrArray_P11CTexAnimSeq_Fv(void*);
+extern "C" void __dt__25CPtrArray_P11CTexAnimSeq_Fv(void*, int);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
@@ -1144,7 +1145,7 @@ CTexAnim::CRefData::~CRefData()
         refData->material = 0;
     }
     refData->texAnimSeqs.ReleaseAndRemoveAll();
-    refData->texAnimSeqs.~CPtrArray<CTexAnimSeq*>();
+    __dt__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs, -1);
 
     __dt__4CRefFv(this, 0);
 }

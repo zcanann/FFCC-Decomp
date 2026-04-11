@@ -7,8 +7,9 @@ namespace std {
 
 class exception {
 public:
+	exception() { }
 	virtual ~exception();
-	virtual const char* what() const;
+	virtual const char* what() const { return "exception"; }
 };
 
 typedef void (*unexpected_handler)();

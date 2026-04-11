@@ -23,8 +23,4 @@ exception::~exception() {
     // Empty virtual destructor - compiler generates vtable setup
 }
 
-const char* exception::what() const {
-    return "exception";
-}
-
 } // namespace std

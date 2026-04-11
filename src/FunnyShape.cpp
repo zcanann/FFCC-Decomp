@@ -351,19 +351,17 @@ void CFunnyShape::Update()
 
                 s32 r = rand();
                 const s16 range = ShapeRange(this);
-                work->x = static_cast<float>(r - (r / range) * range);
+                work->x = static_cast<float>(r % range);
 
                 r = rand();
-                work->y = static_cast<float>(r - (r / range) * range);
+                work->y = static_cast<float>(r % range);
                 work->z = FLOAT_8032fd6c;
-                work->delay = 2;
+                work->delay = 0x200;
                 work->viewportY = FLOAT_8032fd6c;
                 work->viewportX = FLOAT_8032fd6c;
 
                 r = rand();
-                s32 q = r / 0x168 + (r >> 0x1F);
-                q = r + (q - (q >> 0x1F)) * -0x168;
-                work->angle = static_cast<float>(q);
+                work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
                 work->angle = (FLOAT_8032fda4 * work->angle) / FLOAT_8032fda8;
 
                 u32 u = static_cast<u32>(rand());

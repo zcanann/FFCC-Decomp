@@ -937,13 +937,13 @@ config.libs = [
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
             Object(
-                Matching,
+                NonMatching,
                 "Runtime.PPCEABI.H/New.cp",
                 mw_version="GC/2.6",
                 cflags=replace_flag_prefix(cflags_runtime, "-RTTI ", "-RTTI on"),
             ),
             Object(
-                Matching,
+                NonMatching,
                 "Runtime.PPCEABI.H/NMWException.cp",
                 extra_cflags=["-inline auto,deferred"],
             ),

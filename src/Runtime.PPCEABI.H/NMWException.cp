@@ -1,3 +1,4 @@
+#include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 
@@ -55,7 +56,7 @@ class __partial_array_destructor;
  * @note Address: 801afc28
  * @note Size: 556b
  */
-extern "C" char __throw_catch_compare(const char* throwtype, const char* catchtype, int* offset_result)
+extern "C" char __throw_catch_compare(const char* throwtype, const char* catchtype, s32* offset_result)
 {
 	const char *cptr1, *cptr2;
 

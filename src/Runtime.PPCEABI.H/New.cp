@@ -10,6 +10,15 @@ inline void operator delete(void* arg0) throw() {
 
 namespace std {
 
+class exception {
+public:
+    exception() {}
+    virtual ~exception();
+    virtual const char* what() const;
+};
+
+const char* exception::what() const { return "exception"; }
+
 exception::~exception() {}
 
 } // namespace std

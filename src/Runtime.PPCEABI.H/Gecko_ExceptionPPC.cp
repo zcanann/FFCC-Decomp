@@ -1,7 +1,10 @@
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
+#include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/Gecko_ExceptionPPC.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
+
+#pragma force_active on
 
 #define RETURN_ADDRESS 4
 
@@ -630,30 +633,41 @@ static void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void
  * @note Address: N/A
  * @note Size: 0x88
  */
-static int ExPPC_IsInSpecification(const char* extype, const ex_specification* spec)
+static inline int ExPPC_IsInSpecification(const char* extype, const ex_specification* spec)
 {
 	int i;
 	s32 offset;
 
 	for (i = 0; i < spec->specs; i++) {
-		if (__throw_catch_compare(extype, spec->spec[i], &offset))
+		if (__throw_catch_compare(extype, (const char*)spec->spec[i], &offset))
 			return 1;
 	}
 
 	return 0;
 }
 
-using std::bad_exception;
-
 namespace std {
-bad_exception::bad_exception() {}
+class exception {
+public:
+	virtual ~exception() {}
+	virtual const char* what() const;
+};
+
+class bad_exception : public exception {
+public:
+	virtual ~bad_exception();
+	virtual const char* what() const;
+};
+
 bad_exception::~bad_exception() {}
-const char* bad_exception::what() const { return "bad_exception"; }
+const char* bad_exception::what() const;
 } // namespace std
 
-extern "C" const char s_bad_exception_type[] = "!bad_exception!!";
-extern "C" const char s_std_bad_exception_type[] = "!std::bad_exception!!";
+extern "C" const char s_std_bad_exception[] = "std::bad_exception";
+extern "C" const char s_bad_exception[] = "bad_exception";
 static const char unexpectedTypes[] = "!bad_exception!!\0!std::bad_exception!!";
+
+const char* std::bad_exception::what() const { return s_bad_exception; }
 
 /**
  * @note Address: N/A
@@ -669,19 +683,19 @@ extern void __unexpected(CatchInfo* catchinfo)
 #pragma exception_magic // allow access to __exception_magic in try/catch blocks
 
 	try {
-		unexpected();
+		std::unexpected();
 	} catch (...) {
 		if (ExPPC_IsInSpecification((const char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
 		if (ExPPC_IsInSpecification(unexpectedTypes, unexp)) {
-			throw bad_exception();
+			throw std::bad_exception();
 		}
 		if (ExPPC_IsInSpecification(stdBadExceptionType, unexp)) {
-			throw bad_exception();
+			throw std::bad_exception();
 		}
 	}
-	terminate();
+	std::terminate();
 }
 
 /**

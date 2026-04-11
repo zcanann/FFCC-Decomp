@@ -1,3 +1,4 @@
+#include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 

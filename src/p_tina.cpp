@@ -996,22 +996,30 @@ void CPartPcs::GetParLocIdx(int index, Vec& location)
  */
 void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 {
-	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
 	float* colorValues = reinterpret_cast<float*>(&color);
 	float one = kPartColorIdentityOne;
 
-	GetMngStUserFloat0(pppMngSt) = colorValues[0];
-	GetMngStUserFloat1(pppMngSt) = colorValues[1];
-	GetMngStScaleFactor(pppMngSt) = colorValues[2];
-	GetMngStOwnerScale(pppMngSt) = colorValues[3];
+	pppMngSt->r = colorValues[0];
+	pppMngSt->g = colorValues[1];
+	pppMngSt->b = colorValues[2];
+	pppMngSt->a = colorValues[3];
 
 	if (one == colorValues[0] && one == colorValues[1] && one == colorValues[2] && one == colorValues[3]) {
-		GetMngStOwnerScaleMode(pppMngSt) = 0;
+		*(reinterpret_cast<u8*>(pppMngSt) + 0xB7) = 0;
 		return;
 	}
 
-	GetMngStOwnerScaleMode(pppMngSt) = 1;
-	GetMngStLockScaleFromOwner(pppMngSt) = 1;
+	*(reinterpret_cast<u8*>(pppMngSt) + 0xB7) = 1;
+	*(reinterpret_cast<u8*>(pppMngSt) + 0xB9) = 1;
 }
 
 /*
@@ -1188,9 +1196,10 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
     state->m_partLoadCacheParam = loadCacheParam;
     state->m_partChunkIndex = 0;
     state->m_asyncHandleCount = 0;
-    state->m_partLoadMode = 0;
-
-    if (loadCacheParam != 0) {
+    
+    if (loadCacheParam == 0) {
+        state->m_partLoadMode = 0;
+    } else {
         if (mode == 1) {
             state->m_partLoadMode = 2;
         } else if (mode == 2) {

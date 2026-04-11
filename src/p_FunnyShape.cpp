@@ -48,6 +48,7 @@ extern "C" void* __vt__8CManager;
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
+extern "C" char lbl_8032FD1C[];
 
 CFunnyShapePcs FunnyShapePcs;
 u8 ARRAY_8026D728[0xC];
@@ -76,7 +77,7 @@ void CopyFunnyShapePcsTable()
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
-static int frameCount;
+static const char s_funnyShapeFmt[] = "FunnyShape %c";
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -365,8 +366,8 @@ void CFunnyShapePcs::drawViewer()
     Vec eye = {0.0f, 0.0f, 0.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    static const char s_funnyShapeFmt[] = "FunnyShape %c";
-    static const char s_spinner[] = "|/-\\";
+    static char* s_spinner = lbl_8032FD1C;
+    static int frameCount = 0;
 
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);

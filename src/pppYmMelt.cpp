@@ -235,7 +235,6 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
     colorOffset = offsets->m_serializedDataOffsets[1];
-    YmMeltColorWork* colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
     gridCount = *(u16*)((u8*)&ctrl->m_initWOrk + 2) + 1;
     int vertexCount = gridCount * gridCount;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
@@ -253,27 +252,27 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         s16 phaseOffset = work->m_phaseOffset;
         float step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
         float rot = FLOAT_80330b0c * (f32)phaseOffset;
-        YmMeltVertex* vertex = vertexBase;
+        Vec* vertex = &vertexBase->m_position;
         Mtx rotMtx;
 
         for (float z = -halfWidth; z <= halfWidth; z += step) {
-            YmMeltVertex* rowVertex = vertex;
+            Vec* rowVertex = vertex;
             for (float x = -halfWidth; x <= halfWidth; x += step) {
-                rowVertex->m_position.x = x;
-                rowVertex->m_position.y = kPppYmMeltZero;
-                rowVertex->m_position.z = z;
+                rowVertex->x = x;
+                rowVertex->y = kPppYmMeltZero;
+                rowVertex->z = z;
 
                 if (phaseOffset != 0) {
                     PSMTXRotRad(rotMtx, 'y', rot);
-                    PSMTXMultVec(rotMtx, &rowVertex->m_position, &rowVertex->m_position);
+                    PSMTXMultVec(rotMtx, rowVertex, rowVertex);
                 }
 
-                rowVertex++;
-                vertex++;
+                rowVertex = (Vec*)((u8*)rowVertex + sizeof(YmMeltVertex));
+                vertex = (Vec*)((u8*)vertex + sizeof(YmMeltVertex));
             }
         }
 
-        CalcPolygonHeight((VERTEX_DATA*)ctrl, vertexBase, (_GXColor*)&colorWork->m_color, matrixY);
+        CalcPolygonHeight((VERTEX_DATA*)ctrl, vertexBase, (_GXColor*)((u8*)ymMelt + colorOffset + 0x88), matrixY);
     }
 
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;

@@ -116,13 +116,13 @@ struct EmissionState {
 
 struct EmissionParticle {
     float m_scale;
-    u16 m_alpha;
+    s16 m_alpha;
     u8 m_colorR;
     u8 m_colorG;
     u8 m_colorB;
     u8 m_colorA;
     s16 m_fieldA;
-    u16 m_fieldC;
+    s16 m_fieldC;
     u8 m_fieldE;
     u8 m_padF;
 };
@@ -405,26 +405,26 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    int* state = (int*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
+    EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(int**)(model + 0xE4) = state;
+    *(EmissionState**)(model + 0xE4) = state;
     *(pppEmissionUnkB**)(model + 0xE8) = param_2;
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
     u8 baseAlpha = dataSet[0xB];
-    *(u8*)(state + 2) = dataSet[8];
-    double alphaScale = (double)baseAlpha / FLOAT_803311e0;
-    *((u8*)state + 9) = dataSet[9];
-    *((u8*)state + 10) = dataSet[0xA];
-    *((u8*)state + 11) = baseAlpha;
+    state->m_colorR = dataSet[8];
+    double alphaScale = (double)((float)baseAlpha / FLOAT_803311e0);
+    state->m_colorG = dataSet[9];
+    state->m_colorB = dataSet[0xA];
+    state->m_colorA = baseAlpha;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
         param_2->m_stepValue, pppEmission_, param_2->m_graphId,
-        (float*)(state + 3), (float*)(state + 4), (float*)(state + 5),
+        &state->m_scale0, &state->m_scale1, &state->m_scale2,
         &param_2->m_arg3, (float*)param_2->m_payload);
 
     if (gPppInConstructor != 0) {
@@ -436,7 +436,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         return;
     }
 
-    state[1] = GetTexture__8CMapMeshFP12CMaterialSetRi(
+    state->m_texture = GetTexture__8CMapMeshFP12CMaterialSetRi(
         pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex],
         pppEnvStPtr->m_materialSetPtr,
         textureIndex);
@@ -445,15 +445,15 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     u8 particleCount = *(u8*)&param_2->m_initWOrk;
 
     if (payload[9] != 0) {
-        if (state[0] == 0) {
-            *((u8*)(state + 7)) = payload[0xB] / payload[0xC];
-            state[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        if (state->m_particles == 0) {
+            state->m_field1C = payload[0xB] / payload[0xC];
+            state->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)particleCount << 4,
                 pppEnvStPtr->m_stagePtr,
                 s_pppEmission_cpp_801db7e8,
                 0x16F);
 
-            float* particle = (float*)state[0];
+            EmissionParticle* particle = (EmissionParticle*)state->m_particles;
             for (u32 i = 0; i < particleCount; i++) {
                 Math.RandF(FLOAT_803311e4);
 
@@ -461,58 +461,58 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 s16 lifeJitter = (s16)(r % payload[0xD]);
                 s16 safeJitter = (lifeJitter > 0) ? lifeJitter : 1;
 
-                *(u16*)(particle + 3) = (u16)payload[0xF] + safeJitter;
+                particle->m_fieldC = payload[0xF] + safeJitter;
                 s16 fade = (u16)payload[0xC] + safeJitter;
-                *(s16*)((u8*)particle + 10) = *(s16*)(particle + 3) + safeJitter + fade;
+                particle->m_fieldA = particle->m_fieldC + safeJitter + fade;
 
                 float randOffset = Math.RandF(*(float*)(payload + 4));
-                particle[0] = ((float)i * randOffset) + FLOAT_803311e4;
-                *(u16*)(particle + 1) = 0;
-                *((u8*)particle + 0xE) = (u8)((int)payload[0xB] / (int)fade);
-                particle += 4;
+                particle->m_scale = ((float)i * randOffset) + FLOAT_803311e4;
+                particle->m_alpha = 0;
+                particle->m_fieldE = (u8)((int)payload[0xB] / (int)fade);
+                particle++;
             }
         }
 
-        float* particle = (float*)state[0];
+        EmissionParticle* particle = (EmissionParticle*)state->m_particles;
         for (int i = 0; i < particleCount; i++) {
             float randOffset = Math.RandF(*(float*)(payload + 4));
-            particle[0] = particle[0] + *(float*)(state + 3) + randOffset;
+            particle->m_scale = particle->m_scale + state->m_scale0 + randOffset;
 
-            if (*(s16*)(particle + 3) < 1) {
-                if (*(s16*)((u8*)particle + 10) < (s16)(u16)payload[0xC]) {
-                    *(u16*)(particle + 1) = (u16)(*(s16*)(particle + 1) - *((u8*)particle + 0xE));
+            if (particle->m_fieldC < 1) {
+                if (particle->m_fieldA < (s16)(u16)payload[0xC]) {
+                    particle->m_alpha = particle->m_alpha - particle->m_fieldE;
                 } else {
-                    *(u16*)(particle + 1) = (u16)payload[0xB];
+                    particle->m_alpha = payload[0xB];
                 }
             } else {
-                *(s16*)(particle + 3) = *(s16*)(particle + 3) - 1;
-                *(u16*)(particle + 1) = (u16)(*(s16*)(particle + 1) + (payload[0xB] / payload[0xF]));
+                particle->m_fieldC = particle->m_fieldC - 1;
+                particle->m_alpha = particle->m_alpha + (payload[0xB] / payload[0xF]);
             }
 
-            *(s16*)((u8*)particle + 10) = *(s16*)((u8*)particle + 10) - 1;
-            int alpha = (int)((double)*(s16*)(particle + 1) * alphaScale);
+            particle->m_fieldA = particle->m_fieldA - 1;
+            int alpha = (int)((double)(float)particle->m_alpha * alphaScale);
 
-            if (*(s16*)((u8*)particle + 10) < 1) {
+            if (particle->m_fieldA < 1) {
                 s16 jitter = 0;
                 if (payload[0xD] != 0) {
                     jitter = (s16)(rand() % payload[0xD]);
                 }
 
-                *(u16*)(particle + 3) = payload[0xF];
-                *(u16*)((u8*)particle + 10) = (u16)(payload[0xF] + payload[0xE] + jitter + payload[0xC]);
-                particle[0] = FLOAT_803311e4 + Math.RandF(*(float*)(payload + 4));
-                *(u16*)(particle + 1) = 0;
-                *((u8*)particle + 0xE) = payload[0xB] / payload[0xC];
+                particle->m_fieldC = payload[0xF];
+                particle->m_fieldA = payload[0xF] + payload[0xE] + jitter + payload[0xC];
+                particle->m_scale = FLOAT_803311e4 + Math.RandF(*(float*)(payload + 4));
+                particle->m_alpha = 0;
+                particle->m_fieldE = payload[0xB] / payload[0xC];
             }
 
-            *((u8*)particle + 6) = dataSet[8];
-            *((u8*)particle + 7) = dataSet[9];
-            *((u8*)particle + 8) = dataSet[0xA];
-            *((u8*)particle + 9) = (u8)alpha;
-            particle += 4;
+            particle->m_colorR = dataSet[8];
+            particle->m_colorG = dataSet[9];
+            particle->m_colorB = dataSet[0xA];
+            particle->m_colorA = (u8)alpha;
+            particle++;
         }
 
-        DCFlushRange(state + 2, 4);
+        DCFlushRange(&state->m_colorR, 4);
     }
 }
 

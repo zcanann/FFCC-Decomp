@@ -217,6 +217,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	for (u32 i = 0; i < (u32)step->m_payload[0x3a] + 1; i++) {
 		Vec* points = work->m_points;
 		int max = (int)step->m_payload[0x1e] - 2;
+		bool updatePoint = true;
 
 		for (int j = max; (int)i <= j; j--) {
 			localA = points[j];
@@ -238,10 +239,17 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 				(float)((double)(int)i - DOUBLE_80330dd8);
 			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f((float)t, pppMngStPtr, charaMtx) == 0) {
 				emptyHistory = true;
+				updatePoint = false;
 			} else {
 				PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
 				PSMTXMultVec(charaMtx, &localB, &points[i]);
 			}
+		} else {
+			updatePoint = false;
+		}
+
+		if (!updatePoint) {
+			continue;
 		}
 
 		localPos = work->m_origin;

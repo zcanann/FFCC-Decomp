@@ -49,6 +49,11 @@ static inline u32& U32At(CFunnyShape* self, u32 offset)
     return *reinterpret_cast<u32*>(Ptr(self, offset));
 }
 
+static inline u8& U8At(CFunnyShape* self, u32 offset)
+{
+    return *reinterpret_cast<u8*>(Ptr(self, offset));
+}
+
 static inline s16 S16At(const u8* p, u32 offset)
 {
     return *reinterpret_cast<const s16*>(p + offset);
@@ -140,8 +145,7 @@ CFunnyShape::CFunnyShape()
     memset(Ptr(this, 0x6014), 0, 0x40);
 
     CFunnyShape* p = this;
-    s32 i = 2;
-    do {
+    for (s32 i = 2; i != 0; i--) {
         PtrAt(p, 0x6094) = 0;
         PtrAt(p, 0x6014) = 0;
         PtrAt(p, 0x6054) = 0;
@@ -167,10 +171,9 @@ CFunnyShape::CFunnyShape()
         PtrAt(p, 0x6030) = 0;
         PtrAt(p, 0x6070) = 0;
         p = reinterpret_cast<CFunnyShape*>(Ptr(p, 0x20));
-        i--;
-    } while (i != 0);
+    }
 
-    U32At(this, 0x60D4) = 0;
+    U8At(this, 0x60D4) = 0;
 }
 
 /*

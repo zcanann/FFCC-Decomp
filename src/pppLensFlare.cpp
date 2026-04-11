@@ -98,11 +98,13 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		} alphaBits;
 		int projectedXInt;
 		int projectedYInt;
+		float alphaFloat;
 		float alphaScale;
 
 		alphaBits.u[0] = 0x43300000;
 		alphaBits.u[1] = sourceAlpha;
-		alphaScale = (float)(alphaBits.d - kPppLensFlareUnusedDouble) * kPppLensFlareAlphaScale;
+		alphaFloat = (float)(alphaBits.d - kPppLensFlareUnusedDouble);
+		alphaScale = alphaFloat * kPppLensFlareAlphaScale;
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
@@ -169,7 +171,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 		alphaBits.u[0] = 0x43300000;
 		alphaBits.u[1] = (u8)work->m_alpha;
-		work->m_alpha = (u8)(int)((float)(alphaBits.d - kPppLensFlareUnusedDouble) * alphaScale);
+		alphaFloat = (float)(alphaBits.d - kPppLensFlareUnusedDouble);
+		work->m_alpha = (u8)(int)(alphaFloat * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,

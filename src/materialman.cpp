@@ -2364,7 +2364,7 @@ void CMaterialMan::ErrorTexMapIdCur()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void* dtor_8003C49C(void* material, short shouldDelete)
+extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial* material, short shouldDelete)
 {
     if (material != 0) {
         __destroy_arr(Ptr(material, 0x10), (void*)__dt__10CTexScrollFv, 0x14, 4);

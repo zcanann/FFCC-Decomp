@@ -854,7 +854,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[0][0] = groupScale;
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
-                PSMTXConcat(*(Mtx*)(particleWMat + firstParticle * 0x30), object->m_localMatrix.value, worldMtx);
+                PSMTXConcat(*(Mtx*)(*(unsigned char**)(work + 0x34) + firstParticle * 0x30), object->m_localMatrix.value,
+                            worldMtx);
                 PSMTXConcat(ppvCameraMatrix0, worldMtx, worldMtx);
                 PSMTXMultVec(worldMtx, (Vec*)(groupPtr + 0x0C), &pos);
                 sphereMtx[0][3] = pos.x;

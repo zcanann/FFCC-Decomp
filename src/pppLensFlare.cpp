@@ -84,28 +84,25 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		float projY = pppMngStPtr->m_matrix.value[1][3];
 		float projZ = pppMngStPtr->m_matrix.value[2][3];
 		u32 zAtPixel;
-		float projection[7];
-		float viewport[6];
-		Mtx cameraMtx;
-		Vec cameraPos;
-		Vec cameraLookAt;
-		Vec lookDir;
-		Vec objectPos;
 		Vec cameraToObject;
+		Vec objectPos;
+		Vec lookDir;
+		Vec cameraLookAt;
+		Vec cameraPos;
+		float viewport[6];
+		float projection[7];
+		Mtx cameraMtx;
+		union {
+			double d;
+			u32 u[2];
+		} alphaBits;
+		int projectedXInt;
+		int projectedYInt;
 		float alphaScale;
 
-		{
-			union {
-				double d;
-				u32 u[2];
-			} alphaScaleBits;
-			float alphaValue;
-
-			alphaScaleBits.u[0] = 0x43300000;
-			alphaScaleBits.u[1] = sourceAlpha;
-			alphaValue = (float)(alphaScaleBits.d - kPppLensFlareUnusedDouble);
-			alphaScale = alphaValue * kPppLensFlareAlphaScale;
-		}
+		alphaBits.u[0] = 0x43300000;
+		alphaBits.u[1] = sourceAlpha;
+		alphaScale = (float)(alphaBits.d - kPppLensFlareUnusedDouble) * kPppLensFlareAlphaScale;
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
@@ -131,10 +128,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		float projectedX = work->m_projectedX;
-		float projectedY = work->m_projectedY;
-		int projectedXInt = (int)projectedX;
-		int projectedYInt = (int)projectedY;
+		projectedXInt = (int)work->m_projectedX;
+		projectedYInt = (int)work->m_projectedY;
 		zAtPixel = 0;
 		u8 flareWidth = unkB->m_arg3;
 		u32 halfWidth = (u32)(flareWidth >> 1);
@@ -172,18 +167,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
-		{
-			union {
-				double d;
-				u32 u[2];
-			} finalAlphaBits;
-			float finalAlpha;
-
-			finalAlphaBits.u[0] = 0x43300000;
-			finalAlphaBits.u[1] = (u8)work->m_alpha;
-			finalAlpha = (float)(finalAlphaBits.d - kPppLensFlareUnusedDouble);
-			work->m_alpha = (u8)(int)(finalAlpha * alphaScale);
-		}
+		alphaBits.u[0] = 0x43300000;
+		alphaBits.u[1] = (u8)work->m_alpha;
+		work->m_alpha = (u8)(int)((float)(alphaBits.d - kPppLensFlareUnusedDouble) * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
 			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,

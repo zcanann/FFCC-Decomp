@@ -14,7 +14,7 @@ public:
 
 class bad_exception : public exception {
 public:
-	bad_exception() { }
+	bad_exception();
 	virtual ~bad_exception();
 	virtual const char* what() const;
 };

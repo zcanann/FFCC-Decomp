@@ -114,7 +114,6 @@ struct ArtiOpenAnim {
 	float v;
 	float alpha;
 	float scale;
-	int stepMax;
 	int tex;
 	int step;
 	int startFrame;
@@ -465,22 +464,24 @@ int CMenuPcs::ArtiCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMenuPcs::ArtiClose()
+bool CMenuPcs::ArtiClose()
 {
-	s16* artiState = GetArtiState(this);
-	s16* artiList = GetArtiList(this);
 	int finished = 0;
-	int count = artiList[0];
-	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
-	int frame;
+	GetArtiState(this)[0x11]++;
 
-	artiState[0x11]++;
-	frame = artiState[0x11];
+	int count = GetArtiList(this)[0];
+	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
+	int frame = GetArtiState(this)[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {
 		float zeroF = FLOAT_80332fa8;
 		if (anim->startFrame <= frame) {
-			if (frame < anim->startFrame + anim->duration) {
+			if (!(frame < anim->startFrame + anim->duration)) {
+				finished++;
+				anim->alpha = FLOAT_80332fa8;
+				anim->dx = zeroF;
+				anim->dy = zeroF;
+			} else {
 				anim->step++;
 				double oneD = DOUBLE_80332fb0;
 				anim->alpha = (float)-((DOUBLE_80332fb0 / (double)anim->duration) * (double)anim->step - DOUBLE_80332fb0);
@@ -489,16 +490,11 @@ unsigned int CMenuPcs::ArtiClose()
 					anim->dx = (anim->targetX - (float)anim->x) * ratio;
 					anim->dy = (anim->targetY - (float)anim->y) * ratio;
 				}
-			} else {
-				finished++;
-				anim->alpha = FLOAT_80332fa8;
-				anim->dx = zeroF;
-				anim->dy = zeroF;
 			}
 		}
 	}
 
-	return (unsigned int)(count == finished);
+	return count == finished;
 }
 
 /*

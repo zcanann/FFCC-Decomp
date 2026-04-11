@@ -659,6 +659,14 @@ extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
 
 const char* std::bad_exception::what() const { return s_bad_exception; }
 
+struct BadExceptionStorage {
+	void* vtable;
+};
+
+extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
+extern "C" void* __vt__Q23std9exception[];
+extern "C" void* __vt__Q23std13bad_exception[];
+
 /**
  * @note Address: N/A
  * @note Size: 0x1B4
@@ -681,14 +689,20 @@ extern void __unexpected(CatchInfo* catchinfo)
 	try {
 		unexpected();
 	} catch (...) {
+		BadExceptionStorage badException;
+
 		if (ExPPC_IsInSpecification((char*)((CatchInfo*)&__exception_magic)->typeinfo, unexp)) {
 			throw;
 		}
 		if (ExPPC_IsInSpecification((char*)badExceptionType, unexp)) {
-			throw std::bad_exception();
+			badException.vtable = __vt__Q23std9exception;
+			badException.vtable = __vt__Q23std13bad_exception;
+			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
 		}
 		if (ExPPC_IsInSpecification((char*)stdBadExceptionType, unexp)) {
-			throw std::bad_exception();
+			badException.vtable = __vt__Q23std9exception;
+			badException.vtable = __vt__Q23std13bad_exception;
+			__throw((char*)stdExceptionBadExceptionType, &badException, __dt__Q23std13bad_exceptionFv);
 		}
 	}
 	terminate();

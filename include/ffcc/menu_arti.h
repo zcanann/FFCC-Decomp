@@ -8,7 +8,7 @@ public:
     void ArtiInit1();
     unsigned int ArtiOpen();
     int ArtiCtrl();
-    unsigned int ArtiClose();
+    bool ArtiClose();
     void ArtiDraw();
     int ArtiCtrlCur();
 };

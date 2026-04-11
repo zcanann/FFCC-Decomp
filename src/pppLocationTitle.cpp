@@ -186,12 +186,12 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particles[work->m_count].m_pos.y = resultMatrix.value[1][3];
             particles[work->m_count].m_pos.z = resultMatrix.value[2][3];
 
-            if (work->m_count < 1) {
-                particles[work->m_count].m_frame = work->m_cur;
-                memcpy(&particles[work->m_count].m_color, &colorData->m_color, 4);
-            } else {
+            if (work->m_count >= 1) {
                 particles[work->m_count - 1].m_frame = work->m_cur;
                 memcpy(&particles[work->m_count - 1].m_color, &colorData->m_color, 4);
+            } else {
+                particles[work->m_count].m_frame = work->m_cur;
+                memcpy(&particles[work->m_count].m_color, &colorData->m_color, 4);
             }
 
             work->m_count++;

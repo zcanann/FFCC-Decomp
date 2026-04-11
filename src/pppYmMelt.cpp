@@ -226,44 +226,58 @@ char s_pppYmMelt_cpp_801DA048[] = "pppYmMelt.cpp";
 
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
+    s16 phaseWork;
     int colorOffset;
     int gridCount;
+    int vertexCount;
+    int angleSeed;
+    YmMeltWork* work;
+    YmMeltColorWork* colorWork;
+    YmMeltVertex* vertexBase;
+    YmMeltVertex* vertex;
+    YmMeltVertex* rowVertex;
+    float matrixY;
+    float halfWidth;
+    float step;
+    float rot;
+    float x;
+    float z;
+    Mtx rotMtx;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
+    work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
     colorOffset = offsets->m_serializedDataOffsets[1];
-    YmMeltColorWork* colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
+    colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
     gridCount = *(u16*)((u8*)&ctrl->m_initWOrk + 2) + 1;
-    int vertexCount = gridCount * gridCount;
-    float matrixY = pppMngStPtr->m_matrix.value[1][3];
+    vertexCount = gridCount * gridCount;
+    matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
         work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (unsigned long)vertexCount * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp_801DA048,
             0xA9);
 
-        YmMeltVertex* vertexBase = work->m_vertexData;
-        int angleSeed = rand();
-        s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
-        work->m_phaseOffset = angleSeed - angleSeed / phaseDiv * phaseDiv;
-        float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
-        s16 phaseOffset = work->m_phaseOffset;
-        float step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
-        float rot = FLOAT_80330b0c * (f32)phaseOffset;
-        YmMeltVertex* vertex = vertexBase;
-        Mtx rotMtx;
+        vertexBase = work->m_vertexData;
+        angleSeed = rand();
+        phaseWork = *(s16*)((u8*)&ctrl->m_arg3 + 2);
+        work->m_phaseOffset = angleSeed - angleSeed / phaseWork * phaseWork;
+        halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
+        phaseWork = work->m_phaseOffset;
+        step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
+        rot = FLOAT_80330b0c * (f32)phaseWork;
+        vertex = vertexBase;
 
-        for (float z = -halfWidth; z <= halfWidth; z += step) {
-            YmMeltVertex* rowVertex = vertex;
-            for (float x = -halfWidth; x <= halfWidth; x += step) {
+        for (z = -halfWidth; z <= halfWidth; z += step) {
+            rowVertex = vertex;
+            for (x = -halfWidth; x <= halfWidth; x += step) {
                 rowVertex->m_position.x = x;
                 rowVertex->m_position.y = kPppYmMeltZero;
                 rowVertex->m_position.z = z;
 
-                if (phaseOffset != 0) {
+                if (phaseWork != 0) {
                     PSMTXRotRad(rotMtx, 'y', rot);
                     PSMTXMultVec(rotMtx, &rowVertex->m_position, &rowVertex->m_position);
                 }

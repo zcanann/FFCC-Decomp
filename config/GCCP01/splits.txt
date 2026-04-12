@@ -1711,6 +1711,7 @@ card/CARDBios.c:
 	.data       start:0x8021C1C0 end:0x8021C1D0
 	.bss        start:0x80327540 end:0x80327780
 	.sdata      start:0x8032EB70 end:0x8032EB78
+	.sbss       start:0x8032F2E0 end:0x8032F2E2
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48

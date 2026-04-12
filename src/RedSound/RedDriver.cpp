@@ -2182,10 +2182,6 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             DAT_8032daac.waveSize = 0;
         }
     }
-
-    DAT_8032daac.slot = slot;
-    DAT_8032daac.waveID = waveID;
-    DAT_8032daac.waveData = waveData;
     OSSignalSemaphore(&DAT_8032daa0);
 }
 

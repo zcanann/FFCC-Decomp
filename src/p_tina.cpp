@@ -1129,15 +1129,13 @@ unsigned int CPartPcs::IsLoadPartCompleted()
  */
 void LoadFieldPdt0(int mapId, int floorId)
 {
-    CPartMngState* loadState = GetPartMngState();
-    PppPdtSlotRaw* pdtSlots = GetPartMngPdtSlots();
     int pdtSlot;
     char path[1024];
 
     DAT_8032ed3c = 0;
     DAT_8032ed38 = 0;
 
-    if (loadState->m_partLoadMode != 3) {
+    if (GetPartMngState()->m_partLoadMode != 3) {
         pppReleasePdt__8CPartMngFi(&PartMng, 0);
         pppReleasePdt__8CPartMngFi(&PartMng, 6);
         pppReleasePdt__8CPartMngFi(&PartMng, 7);
@@ -1151,17 +1149,18 @@ void LoadFieldPdt0(int mapId, int floorId)
     pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
     if (pdtSlot != 0) {
         pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
-        if ((pdtSlot != 0) && (loadState->m_partLoadMode != 2) && (loadState->m_partLoadMode != 3)) {
+        if ((pdtSlot != 0) && (GetPartMngState()->m_partLoadMode != 2) && (GetPartMngState()->m_partLoadMode != 3)) {
             _pppDataHead* pppDataHead;
             PPPCREATEPARAM* createParam;
             int checkOff;
             int i;
 
-            pppDataHead = pdtSlots[0].m_pppDataHead;
+            pppDataHead = GetPartMngPdtSlots()[0].m_pppDataHead;
             createParam = PartMng.pppGetDefaultCreateParam();
             checkOff = 0;
             for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
-                if (*reinterpret_cast<int*>(&pdtSlots[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) != -0x1000) {
+                if (*reinterpret_cast<int*>(&GetPartMngPdtSlots()[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) !=
+                    -0x1000) {
                     pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, createParam, 0);
                 }
                 checkOff += 0x60;

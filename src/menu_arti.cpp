@@ -114,6 +114,7 @@ struct ArtiOpenAnim {
 	float v;
 	float alpha;
 	float scale;
+	int unk;
 	int tex;
 	int step;
 	int startFrame;

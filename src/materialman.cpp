@@ -2976,10 +2976,11 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
 
             *reinterpret_cast<int*>(material + 0x24) = -0xACE10;
             *reinterpret_cast<void**>(material + 0x28) = 0;
-            *reinterpret_cast<unsigned short*>(material + 0x18) = 1;
+            *reinterpret_cast<unsigned short*>(material + 0x18) = 0;
             *reinterpret_cast<float*>(material + 0x30) = 1.0f;
             *reinterpret_cast<float*>(material + 0x2C) = 1.0f;
             material[0xA7] = 0;
+            *reinterpret_cast<unsigned short*>(material + 0x18) = 1;
             *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 

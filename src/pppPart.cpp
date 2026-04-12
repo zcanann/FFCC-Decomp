@@ -1325,7 +1325,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 					scale = *(float*)(ownerBytes + 0x4B0);
 				}
 				pppMngStView->m_ownerScale = scale;
-				if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
+				if (DOUBLE_8032fdf0 == (double)pppMngStView->m_ownerScale) {
 					pppMngStView->m_useOwnerScaleSign = 1;
 				} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
 					pppMngStView->m_useOwnerScaleSign = 0;
@@ -1383,7 +1383,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 						scale = *(float*)(ownerBytes + 0x4B0);
 					}
 					pppMngStView->m_ownerScale = scale;
-					if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
+					if (DOUBLE_8032fdf0 == (double)pppMngStView->m_ownerScale) {
 						pppMngStView->m_useOwnerScaleSign = 1;
 					} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
 						pppMngStView->m_useOwnerScaleSign = 0;
@@ -1476,7 +1476,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 						scale = *(float*)(ownerBytes + 0x4B0);
 					}
 					pppMngStView->m_ownerScale = scale;
-					if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
+					if (DOUBLE_8032fdf0 == (double)pppMngStView->m_ownerScale) {
 						pppMngStView->m_useOwnerScaleSign = 1;
 					} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
 						pppMngStView->m_useOwnerScaleSign = 0;
@@ -1533,7 +1533,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 						scale = *(float*)(ownerBytes + 0x4B0);
 					}
 					pppMngStView->m_ownerScale = scale;
-					if (kScaleConstA == (double)pppMngStView->m_ownerScale) {
+					if (DOUBLE_8032fdf0 == (double)pppMngStView->m_ownerScale) {
 						pppMngStView->m_useOwnerScaleSign = 1;
 					} else if (DOUBLE_8032fe00 == (double)pppMngStView->m_ownerScale) {
 						pppMngStView->m_useOwnerScaleSign = 0;

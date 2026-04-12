@@ -863,7 +863,7 @@ config.libs = [
             Object(Matching, "card/CARDRead.c"),
             Object(Matching, "card/CARDStat.c"),
             Object(Matching, "card/CARDUnlock.c"),
-            Object(NonMatching, "card/CARDWrite.c"),
+            Object(Matching, "card/CARDWrite.c"),
         ],
     ),
     DolphinLib(

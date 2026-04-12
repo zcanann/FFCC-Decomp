@@ -695,16 +695,16 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
 #pragma dont_inline on
 void _ExecuteCommand()
 {
-	int* executePos = (int*)DAT_8032f3d8;
-	int* readPos = (int*)DAT_8032f3dc;
+	unsigned int* executePos = (unsigned int*)DAT_8032f3d8;
+	unsigned int* readPos = (unsigned int*)DAT_8032f3dc;
 
 	while (executePos != readPos) {
 		if (*readPos != 0) {
-			((void (*)(int*))(*readPos))(readPos + 1);
+			((void (*)(int*))(*readPos))((int*)(readPos + 1));
 		}
 		readPos += 8;
-		if (readPos == (int*)DAT_8032f3d4 + 0x800) {
-			readPos = (int*)DAT_8032f3d4;
+		if (readPos == (unsigned int*)DAT_8032f3d4 + 0x800) {
+			readPos = (unsigned int*)DAT_8032f3d4;
 		}
 	}
 

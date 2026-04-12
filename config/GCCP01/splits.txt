@@ -1764,6 +1764,7 @@ gx/GXInit.c:
 	.bss        start:0x80327780 end:0x80327CF8
 	.sdata      start:0x8032EB88 end:0x8032EB90
 	.sbss       start:0x8032F2E8 end:0x8032F310
+	.sdata2     start:0x80333828 end:0x80333850
 
 gx/GXFifo.c:
 	.text       start:0x801A02C8 end:0x801A0B10

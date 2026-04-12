@@ -398,10 +398,14 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         while (x < grid) {
             u32 idx0 = x + z * stride;
             u32 idx1 = x + (z + 1) * stride;
-            YmMeltVertex* p0Data = &work->m_vertexData[idx1];
-            YmMeltVertex* p1Data = &work->m_vertexData[idx0];
-            YmMeltVertex* p2Data = &work->m_vertexData[idx0 + 1];
-            YmMeltVertex* p3Data = &work->m_vertexData[idx1 + 1];
+            float* p0Data = (float*)&work->m_vertexData[idx1];
+            float* p1Data = (float*)&work->m_vertexData[idx0];
+            float* p2Data = (float*)&work->m_vertexData[idx0 + 1];
+            float* p3Data = (float*)&work->m_vertexData[idx1 + 1];
+            Vec p0;
+            Vec p1;
+            Vec p2;
+            Vec p3;
             Vec vtx0;
             Vec vtx1;
             Vec vtx2;
@@ -413,10 +417,22 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             float c2 = drawColor;
             float c3 = drawColor;
 
-            pppCopyVector(vtx0, p0Data->m_position);
-            pppCopyVector(vtx1, p1Data->m_position);
-            pppCopyVector(vtx2, p2Data->m_position);
-            pppCopyVector(vtx3, p3Data->m_position);
+            p0.x = p0Data[0];
+            p0.y = p0Data[1];
+            p0.z = p0Data[2];
+            pppCopyVector(vtx0, p0);
+            p1.x = p1Data[0];
+            p1.y = p1Data[1];
+            p1.z = p1Data[2];
+            pppCopyVector(vtx1, p1);
+            p2.x = p2Data[0];
+            p2.y = p2Data[1];
+            p2.z = p2Data[2];
+            pppCopyVector(vtx2, p2);
+            p3.x = p3Data[0];
+            p3.y = p3Data[1];
+            p3.z = p3Data[2];
+            pppCopyVector(vtx3, p3);
 
             vtx0.y += worldY;
             vtx1.y += worldY;
@@ -434,17 +450,17 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
                 vtx3.z = phaseLerp * (worldZ - vtx3.z) + vtx3.z;
             }
 
-            if (p0Data->m_color.m_bytes[3] == 0) {
-                c0 = p0Data->m_color.m_colorValue;
+            if (*(u8*)((u8*)p0Data + 0xF) == 0) {
+                c0 = p0Data[3];
             }
-            if (p1Data->m_color.m_bytes[3] == 0) {
-                c1 = p1Data->m_color.m_colorValue;
+            if (*(u8*)((u8*)p1Data + 0xF) == 0) {
+                c1 = p1Data[3];
             }
-            if (p2Data->m_color.m_bytes[3] == 0) {
-                c2 = p2Data->m_color.m_colorValue;
+            if (*(u8*)((u8*)p2Data + 0xF) == 0) {
+                c2 = p2Data[3];
             }
-            if (p3Data->m_color.m_bytes[3] == 0) {
-                c3 = p3Data->m_color.m_colorValue;
+            if (*(u8*)((u8*)p3Data + 0xF) == 0) {
+                c3 = p3Data[3];
             }
 
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);

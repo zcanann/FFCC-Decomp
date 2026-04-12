@@ -13839,7 +13839,6 @@ WaitingCoverClose = .sbss:0x8032F034; // type:object size:0x4 scope:local data:4
 Breaking = .sbss:0x8032F038; // type:object size:0x4 scope:local data:4byte
 WorkAroundType = .sbss:0x8032F03C; // type:object size:0x4 scope:local data:4byte
 WorkAroundSeekLocation = .sbss:0x8032F040; // type:object size:0x4 scope:local data:4byte
-gap_04_8032F044_sbss = .sbss:0x8032F044; // type:object size:0x4 data:4byte
 LastReadFinished = .sbss:0x8032F048; // type:object size:0x8 scope:local data:4byte
 LastReadIssued = .sbss:0x8032F050; // type:object size:0x8 scope:local data:4byte
 LastCommandWasRead = .sbss:0x8032F058; // type:object size:0x4 scope:local data:4byte

@@ -909,8 +909,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
-	CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+	CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 	CMapCylinderRaw cyl;
 
 	cyl.m_top.x = kPolyGroupAabbMax;
@@ -949,8 +949,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
 	if ((AStar.m_flags & 1) == 0)
 	{
-		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CMapCylinderRaw cyl;
 
 		cyl.m_top.x = kPolyGroupAabbMax;
@@ -975,8 +975,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	}
 	else
 	{
-		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CMapCylinderRaw cyl;
 
 		cyl.m_top.x = kPolyGroupAabbMax;

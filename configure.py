@@ -800,7 +800,7 @@ config.libs = [
             Object(Matching, "ax/AXCL.c"),
             Object(Matching, "ax/AXOut.c"),
             Object(Matching, "ax/AXProf.c"),
-            Object(NonMatching, "ax/AXSPB.c"),
+            Object(Matching, "ax/AXSPB.c"),
             Object(Matching, "ax/AXVPB.c"),
             Object(Matching, "ax/AXComp.c"),
         ],

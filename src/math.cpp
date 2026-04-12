@@ -10,6 +10,7 @@ extern "C" float kNegOneF;
 extern "C" double DOUBLE_8032F778;
 extern "C" float FLOAT_8032F780;
 extern "C" float FLOAT_8032F788;
+extern "C" float FLOAT_8032F748;
 extern "C" float FLOAT_8032F758;
 extern "C" float FLOAT_8032F75C;
 extern "C" float kRandSignedScaleF;
@@ -1119,10 +1120,12 @@ float CMath::DstRot(float from, float to)
     float clamped;
     if (dot < -1.0f) {
         clamped = -1.0f;
-    } else if (dot > 1.0f) {
-        clamped = 1.0f;
     } else {
-        clamped = dot;
+        if (FLOAT_8032F748 < dot) {
+            clamped = FLOAT_8032F748;
+        } else {
+            clamped = dot;
+        }
     }
 
     float angle = (float)acos((double)clamped);

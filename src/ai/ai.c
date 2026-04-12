@@ -11,7 +11,7 @@ const char* __AIVersion = "<< Dolphin SDK - AI\tdebug build: Apr  5 2004 03:56:1
 const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34:25 (0x2301) >>";
 #endif
 
-extern AISCallback __AIS_Callback;
+static AISCallback __AIS_Callback;
 static AIDCallback __AID_Callback;
 static u8* __CallbackStack;
 static u8* __OldStack;
@@ -19,9 +19,9 @@ static BOOL __AI_init_flag;
 static BOOL __AID_Active;
 static OSTime bound_32KHz;
 static OSTime bound_48KHz;
-static OSTime min_wait;
-static OSTime max_wait;
-static OSTime buffer;
+OSTime min_wait;
+OSTime max_wait;
+OSTime buffer;
 
 typedef struct {
     OSTime t_start;
@@ -35,18 +35,12 @@ typedef struct {
 STRUCT_TIMELOG profile;
 #endif
 
-OSTime __ai_src_time_end;
-OSTime __ai_src_time_start;
-
 // prototypes
-void __AI_DEBUG_set_stream_sample_rate(u32 rate);
-STRUCT_TIMELOG* __ai_src_get_time(void);
-
-static void __AI_set_stream_sample_rate(u32 rate);
-static void __AIDHandler(__OSInterrupt interrupt, OSContext* context);
-static void __AISHandler(__OSInterrupt interrupt, OSContext* context);
-static void __AICallbackStackSwitch(void* cb);
-static void __AI_SRC_INIT(void);
+void __AI_set_stream_sample_rate(u32 rate);
+void __AIDHandler(__OSInterrupt interrupt, OSContext* context);
+void __AISHandler(__OSInterrupt interrupt, OSContext* context);
+void __AICallbackStackSwitch(void* cb);
+void __AI_SRC_INIT(void);
 
 AIDCallback AIRegisterDMACallback(AIDCallback callback) {
     AIDCallback old_callback;
@@ -70,10 +64,6 @@ void AIInitDMA(u32 start_addr, u32 length) {
     OSRestoreInterrupts(old);
 }
 
-BOOL AIGetDMAEnableFlag(void) {
-    return (__DSPRegs[27] & (1 << 15)) >> 15;
-}
-
 void AIStartDMA(void) {
     __DSPRegs[27] = __DSPRegs[27] | 0x8000;
 }
@@ -82,47 +72,8 @@ void AIStopDMA(void) {
     __DSPRegs[27] = __DSPRegs[27] & ~0x8000;
 }
 
-u32 AIGetDMABytesLeft(void) {
-    return (__DSPRegs[29] & 0x7FFF) << 5;
-}
-
 u32 AIGetDMAStartAddr(void) {
     return ((__DSPRegs[24] << 16) & 0x03FF0000) |  (__DSPRegs[25] & 0xFFE0);
-}
-
-u32 AIGetDMALength(void) {
-    return (__DSPRegs[27] & 0x7FFF) << 5;
-}
-
-BOOL AICheckInit(void) {
-    return __AI_init_flag;
-}
-
-AISCallback AIRegisterStreamCallback(AISCallback callback) {
-    AISCallback old_callback;
-    BOOL old;
-
-    old_callback = __AIS_Callback;
-    old = OSDisableInterrupts();
-    __AIS_Callback = callback;
-    OSRestoreInterrupts(old);
-    return old_callback;
-}
-
-u32 AIGetStreamSampleCount(void) {
-    return __AIRegs[2];
-}
-
-void AIResetStreamSampleCount(void) {
-    __AIRegs[0] = (__AIRegs[0] & ~0x20) | 0x20;
-}
-
-void AISetStreamTrigger(u32 trigger) {
-    __AIRegs[3] = trigger;
-}
-
-u32 AIGetStreamTrigger(void) {
-    return __AIRegs[3];
 }
 
 void AISetStreamPlayState(u32 state) {
@@ -186,21 +137,7 @@ u32 AIGetDSPSampleRate(void) {
     return GET_REG_FIELD(__AIRegs[0], 1, 6) ^ 1;
 }
 
-void AISetStreamSampleRate(u32 rate) {
-    if (rate == AI_SAMPLERATE_48KHZ) {
-        __AI_set_stream_sample_rate(rate);
-        return;
-    }
-#if DEBUG
-    OSReport("AISetStreamSampleRate(): OBSOLETED. Only 48KHz streaming from disk is supported!\n");
-#endif
-}
-
-void __AI_DEBUG_set_stream_sample_rate(u32 rate) {
-    __AI_set_stream_sample_rate(rate);
-}
-
-static void __AI_set_stream_sample_rate(u32 rate) {
+void __AI_set_stream_sample_rate(u32 rate) {
     BOOL old;
     u32 play_state;
     u8 vol_left;
@@ -259,8 +196,8 @@ void AIInit(u8* stack) {
         buffer = OSNanosecondsToTicks(3000);
         AISetStreamVolRight(0);
         AISetStreamVolLeft(0);
-        AISetStreamTrigger(0);
-        AIResetStreamSampleCount();
+        __AIRegs[3] = 0;
+        __AIRegs[0] = (__AIRegs[0] & ~0x20) | 0x20;
         __AI_set_stream_sample_rate(AI_SAMPLERATE_48KHZ);
         AISetDSPSampleRate(AI_SAMPLERATE_32KHZ);
 #if DEBUG
@@ -284,7 +221,7 @@ void AIReset(void) {
     __AI_init_flag = FALSE;
 }
 
-static void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
+void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
 
     __AIRegs[0] |= 8;
@@ -297,7 +234,7 @@ static void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
-static void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
+void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
     u16 tmp;
 
@@ -319,7 +256,7 @@ static void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
-static asm void __AICallbackStackSwitch(register void* cb) {
+asm void __AICallbackStackSwitch(register void* cb) {
     nofralloc
     mflr r0
     stw r0, 0x4(r1)
@@ -404,10 +341,3 @@ void __AI_SRC_INIT(void) {
 #endif
 }
 
-STRUCT_TIMELOG* __ai_src_get_time(void) {
-#if DEBUG
-    return &profile;
-#else
-    return NULL;
-#endif
-}

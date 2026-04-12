@@ -121,32 +121,6 @@ char* strcat(char* dst, const char* src, size_t n)
 	return dst;
 }
 
-char* strncat(char* dst, const char* src, size_t n)
-{
-	char* srcPtr = (char*)src - 1;
-	char* dstPtr = (char*)dst - 1; 
-	char* endPtr;
-	char c;
-
-	// Find end of dst string
-	do {
-		endPtr = dstPtr;
-		dstPtr = endPtr + 1;
-	} while (endPtr[1] != '\0');
-
-	// Copy up to n chars from src to end of dst
-	n++;
-	while (--n) {
-		srcPtr = srcPtr + 1;
-		c = *srcPtr;
-		endPtr = endPtr + 1;
-		*endPtr = c;
-		if (c == '\0') break;
-	}
-
-	return dst;
-}
-
 int strcmp(const char* str1, const char* str2)
 {
 	register unsigned char* left  = (unsigned char*)str1;
@@ -277,32 +251,6 @@ char* strrchr(const char* str, int c)
 	return chr ? NULL : (char*)p;
 }
 
-char* strstr(const char* str, const char* pat)
-{
-	const unsigned char* s1 = (const unsigned char*)str - 1;
-	const unsigned char* p1 = (const unsigned char*)pat - 1;
-	unsigned long firstc, c1, c2;
-
-	if ((pat == 0) || (!(firstc = *++p1))) {
-		return (char*)str;
-	}
-
-	while (c1 = *++s1) {
-		if (c1 == firstc) {
-			const unsigned char* s2 = s1 - 1;
-			const unsigned char* p2 = p1 - 1;
-
-			while ((c1 = *++s2) == (c2 = *++p2) && c1)
-				;
-
-			if (!c2)
-				return (char*)s1;
-		}
-	}
-
-	return NULL;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801b8c58
@@ -364,4 +312,30 @@ char* strtok(char* str, const char* delim)
 	}
 
 	return tokenStart;
+}
+
+char* strstr(const char* str, const char* pat)
+{
+	const unsigned char* s1 = (const unsigned char*)str - 1;
+	const unsigned char* p1 = (const unsigned char*)pat - 1;
+	unsigned long firstc, c1, c2;
+
+	if ((pat == 0) || (!(firstc = *++p1))) {
+		return (char*)str;
+	}
+
+	while (c1 = *++s1) {
+		if (c1 == firstc) {
+			const unsigned char* s2 = s1 - 1;
+			const unsigned char* p2 = p1 - 1;
+
+			while ((c1 = *++s2) == (c2 = *++p2) && c1)
+				;
+
+			if (!c2)
+				return (char*)s1;
+		}
+	}
+
+	return NULL;
 }

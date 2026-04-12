@@ -9,10 +9,6 @@ typedef struct FSTEntry {
     /* 0x08 */ unsigned int nextEntryOrLength;
 } FSTEntry;
 
-BOOL FirstRead;
-volatile BOOL LastCommandWasRead;
-volatile u32 NextCommandNumber;
-
 static OSBootInfo* BootInfo;
 static FSTEntry* FstStart;
 char* FstStringStart;

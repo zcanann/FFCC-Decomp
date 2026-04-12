@@ -1544,17 +1544,17 @@ mtx/quat.c:
 dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0
 	.bss        start:0x8030C950 end:0x8030CA20
-	.sbss       start:0x8032F018 end:0x8032F054
+	.sbss       start:0x8032F018 end:0x8032F060
 
 dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
-	.sbss       start:0x8032F054 end:0x8032F074
+	.sbss       start:0x8032F060 end:0x8032F074
 
 dvd/dvd.c:
 	.text       start:0x80188A70 end:0x8018B16C
 	.data       start:0x802175F0 end:0x80217728
 	.bss        start:0x8030CA20 end:0x8030CAB8
-	.sbss       start:0x8032F074 end:0x8032F0D0
+	.sbss       start:0x8032F074 end:0x8032F0C8
 
 dvd/dvdqueue.c:
 	.text       start:0x8018B16C end:0x8018B364
@@ -1569,13 +1569,13 @@ dvd/dvdidutils.c:
 
 dvd/dvdFatal.c:
 	.text       start:0x8018B5F4 end:0x8018B624
-	.sbss       start:0x8032F0D0 end:0x8032F0D4
+	.sbss       start:0x8032F0C8 end:0x8032F0CC
 
 dvd/fstload.c:
 	.text       start:0x8018B624 end:0x8018B864
 	.data       start:0x80217770 end:0x802177E0
 	.bss        start:0x8030CAD8 end:0x8030CB48
-	.sbss       start:0x8032F0D4 end:0x8032F0E0
+	.sbss       start:0x8032F0D0 end:0x8032F0E0
 
 vi/vi.c:
 	.text       start:0x8018B864 end:0x8018D298
@@ -1593,13 +1593,13 @@ pad/Pad.c:
 	.data       start:0x80217BF8 end:0x80217C08
 	.bss        start:0x8030CC90 end:0x8030CCE0
 	.sdata      start:0x8032EB18 end:0x8032EB38
-	.sbss       start:0x8032F134 end:0x8032F164
+	.sbss       start:0x8032F150 end:0x8032F178
 
 ai/ai.c:
 	.text       start:0x8018EE04 end:0x8018F710
-	.data       start:0x80217C08 end:0x80217C50
-	.sdata      start:0x8032EB38 end:0x8032EB40
-	.sbss       start:0x8032F164 end:0x8032F1B0
+	.data       start:0x80217C08 end:0x80217C4C
+	.sdata      start:0x8032EB38 end:0x8032EB3C
+	.sbss       start:0x8032F178 end:0x8032F1B8
 
 ar/ar.c:
 	.text       start:0x8018F710 end:0x801911E8
@@ -1630,6 +1630,7 @@ ax/AXAux.c:
 ax/AXCL.c:
 	.text       start:0x80191F7C end:0x801926B4
 	.bss        start:0x8030FAE0 end:0x803100E0
+	.sbss       start:0x8032F228 end:0x8032F240
 
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0
@@ -1639,6 +1640,7 @@ ax/AXOut.c:
 ax/AXSPB.c:
 	.text       start:0x80192DA0 end:0x80193268
 	.bss        start:0x80314900 end:0x80314940
+	.sbss       start:0x8032F270 end:0x8032F28C
 
 ax/AXVPB.c:
 	.text       start:0x80193268 end:0x80193E28
@@ -1651,6 +1653,7 @@ ax/AXComp.c:
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
+	.sbss       start:0x8032F2A0 end:0x8032F2B0
 
 axfx/reverb_hi.c:
 	.text       start:0x80193E70 end:0x80194F34
@@ -1683,6 +1686,7 @@ axart/axart.c:
 
 axart/axart3d.c:
 	.text       start:0x80197A0C end:0x80197A1C
+	.sbss       start:0x8032F2B8 end:0x8032F2C0
 
 dsp/dsp.c:
 	.text       start:0x80197A1C end:0x80197CAC
@@ -1801,6 +1805,7 @@ gx/GXStubs.c:
 
 gx/GXDisplayList.c:
 	.text       start:0x801A5FF8 end:0x801A6204
+	.bss        start:0x80327CF8 end:0x80328214
 	.sbss       start:0x8032F348 end:0x8032F34C
 
 gx/GXTransform.c:
@@ -1929,13 +1934,14 @@ TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x801AE0D4 end:0x801AE62C
 	.rodata     start:0x801E6BA0 end:0x801E6CA4
 	.data       start:0x8021D038 end:0x8021D060
-	.bss        start:0x8032A6B0 end:0x8032A6C0
+	.bss        start:0x8032A6B0 end:0x8032A6B8
 
 TRK_MINNOW_DOLPHIN/targcont.c:
 	.text       start:0x801AE62C end:0x801AE660
 
 TRK_MINNOW_DOLPHIN/target_options.c:
 	.text       start:0x801AE660 end:0x801AE67C
+	.bss        start:0x8032A6B8 end:0x8032A6B9
 
 TRK_MINNOW_DOLPHIN/mslsupp.c:
 	.text       start:0x801AE67C end:0x801AECBC

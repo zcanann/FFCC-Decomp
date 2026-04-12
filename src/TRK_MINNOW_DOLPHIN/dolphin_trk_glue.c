@@ -6,7 +6,7 @@
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 volatile u8 TRK_Use_BBA = 0;
-u64 gTRKReserved = 0;
+BOOL _MetroTRK_Has_Framing = FALSE;
 int ddh_cc_initinterrupts(void);
 int ddh_cc_initialize(void*, __OSInterruptHandler);
 int ddh_cc_shutdown(void);

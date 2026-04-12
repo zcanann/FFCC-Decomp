@@ -283,10 +283,11 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset;
+    int graphId;
     LocationTitle2Work* work;
+    LocationTitle2Particle* particle;
     long** shapeTable;
     int graphFrame;
-    LocationTitle2Particle* particle;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
@@ -295,9 +296,10 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         return;
     }
 
-    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-    graphFrame = GetGraphFrameFromId(locationTitle->m_graphId);
     particle = (LocationTitle2Particle*)work->m_particles;
+    graphId = locationTitle->m_graphId;
+    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+    graphFrame = GetGraphFrameFromId(graphId);
 
     pppSetBlendMode(unkB->m_blendMode);
 
@@ -355,7 +357,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         Mtx model;
         Vec transformedPos;
 
-        if ((int)particle->m_frame >= graphFrame) {
+        if (graphFrame <= (int)particle->m_frame) {
             transformedPos.x = transformedPos.y = transformedPos.z = 0.0f;
             PSMTXIdentity(model);
             model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];

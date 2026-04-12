@@ -48,7 +48,7 @@ unsigned int PTR_s_CMapPcs_GAME__801e8ad8[0x414 / sizeof(unsigned int)];
 
 unsigned int s_mapRelProfile0__7CMapPcs;
 unsigned int s_mapRelProfile1__7CMapPcs;
-unsigned int s_mapRelProfile2__7CMapPcs;
+unsigned int s_mapRelProfile2__7CMapPcs[2];
 unsigned int s_loadedStageNo__7CMapPcs;
 unsigned int s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;

@@ -13952,7 +13952,6 @@ __AXClWrite = .sbss:0x8032F22C; // type:object size:0x4 scope:local data:4byte
 __AXCommandListCycles = .sbss:0x8032F230; // type:object size:0x4 scope:local data:4byte
 __AXCompressor = .sbss:0x8032F234; // type:object size:0x4 scope:local data:4byte
 __AXClMode = .sbss:0x8032F238; // type:object size:0x4 scope:global data:4byte
-gap_04_8032F23C_sbss = .sbss:0x8032F23C; // type:object size:0x4 data:4byte
 __AXOutFrame = .sbss:0x8032F240; // type:object size:0x4 data:4byte
 __AXOutDspReady = .sbss:0x8032F244; // type:object size:0x4 data:4byte
 __AXOsTime = .sbss:0x8032F248; // type:object size:0x8 data:4byte

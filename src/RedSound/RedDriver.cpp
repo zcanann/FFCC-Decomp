@@ -14,6 +14,13 @@
 
 struct RedMusicHEAD;
 struct RedSeSepHEAD;
+struct RedWaveHEAD {
+    char magic[2];
+    short waveID;
+    int dataSize;
+    int regionCount;
+    int sampleCount;
+};
 
 extern "C" {
     void __dl__FPv(void*);
@@ -2162,21 +2169,19 @@ void CRedDriver::ClearWaveBank(int param_1)
  */
 void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 {
-    char* waveHeader;
-
     while (DAT_8032f460 != 0) {
         RedSleep(0);
     }
 
     DAT_8032daac.waveSize = waveSize;
-    waveHeader = (char*)waveData;
     if (waveSize == -1) {
-        if ((waveHeader[0] == 'W') && (waveHeader[1] == 'D')) {
-            DAT_8032daac.waveSize = *(int*)(waveHeader + 4) +
-                                    (((*(int*)(waveHeader + 8) * 4) + 0x3fU) & 0xffffffc0) +
-                                    (*(int*)(waveHeader + 0xc) * 0x60) + 0x20;
-        }
-        else {
+        RedWaveHEAD* const waveHeader = (RedWaveHEAD*)waveData;
+
+        if ((waveHeader->magic[0] == 'W') && (waveHeader->magic[1] == 'D')) {
+            DAT_8032daac.waveSize =
+                waveHeader->dataSize + (((waveHeader->regionCount * 4) + 0x3fU) & 0xffffffc0) +
+                (waveHeader->sampleCount * 0x60) + 0x20;
+        } else {
             DAT_8032daac.waveSize = 0;
         }
     }

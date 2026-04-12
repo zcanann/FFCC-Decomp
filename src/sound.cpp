@@ -112,6 +112,7 @@ extern char DAT_801db190[];
 extern char DAT_801db1d8[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
+extern char s_dvd_sound_stream_strpct04d_str_801DB110[];
 extern char s_CSound_80330ce0[];
 extern char s_sound_cpp_801db2d4[];
 extern char s_soundNoFreeWaveWarn_801DB0BC[];
@@ -2272,7 +2273,7 @@ void CSound::LoadStream(int streamID)
         sound.m_streamPlaying = 0;
 
         char streamPath[268];
-        sprintf(streamPath, "dvd/sound/stream/str_%04d.str", streamID);
+        sprintf(streamPath, s_dvd_sound_stream_strpct04d_str_801DB110, streamID);
         streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
         if (streamFile != 0) {
             streamFile->m_chunkSize = 0x20000;
@@ -2304,7 +2305,7 @@ void CSound::PlayStreamASync()
 {
     char streamPath[268];
     CSoundLayout& sound = SoundData(this);
-    sprintf(streamPath, "dvd/sound/stream/str_%04d.str", sound.m_streamWaveID);
+    sprintf(streamPath, s_dvd_sound_stream_strpct04d_str_801DB110, sound.m_streamWaveID);
 
     sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
     if (sound.m_streamFile == 0) {

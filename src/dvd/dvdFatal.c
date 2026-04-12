@@ -3,6 +3,8 @@
 
 #include "dolphin/dvd/__dvd.h"
 
+u32 MotorState_8032F0D0;
+
 static void (*FatalFunc)();
 
 const char* Japanese =

@@ -1,53 +1,23 @@
-# AGENTS.md - Agent Runbook (FFCC-Decomp)
+# AGENTS_NEW.md - Agent Runbook (FFCC-Decomp)
 
-This file is the canonical, step-by-step runbook for automated contributions to **FFCC-Decomp**.
+This is the concise runbook for automated contributions to **FFCC-Decomp**.
 
-Goal: maximize throughput on overall progress by editing C/C++ source, improving data and linkage where possible, rebuilding, diffing, and submitting clean PRs when net progress is real.
+Goal: maximize real progress by improving C/C++ source, linkage, headers, types, data layout, and adjacent code where needed, then rebuilding, diffing, and submitting clean PRs only when the result is both better and plausible.
 
-## Ghidra Decompilation Reference
-WARNING: Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
+## Source Of Truth
+- **Objdiff is the source of truth** for progress.
+- **Ghidra is a guide**, mainly for addresses, sizes, and rough function shape.
+- Function names from shipped Metrowerks symbols are usually correct. Parameters from Ghidra may not be.
 
-In other words, function parameters can be wrong in Ghidra, unless there is Metrowerks mangling in the function name to indicate the true parameters.
+Useful references:
+- Ghidra decomp: `resources/ghidra-decomp-1-31-2026/`
+- PAL map: `orig/GCCP01/game.MAP`
+- EN map: `orig/GCCE01/game.MAP`
+- Symbol extractor: `python3 tools/extract_symbols.py <object>.o`
 
-### Decomp Resources
-- **Current decomp location**: `resources/ghidra-decomp-1-31-2026/`
-- **File naming format**: `{PAL_VERSION_ADDRESS}_{METROWERKS_MANGLED_FUNCTION_NAME}`
-- **Purpose**: Aid in debugging and reverse engineering
+When updating functions, keep the version header block:
 
-### Symbol Files
-The EN and PAL versions accidentally shipped with build logs, containing symbol names in mangled Metrowerks format for data sections and function names. High level symbols only, not granular.
-
-#### PAL Release (Metrowerks Release Build)
-- **Location**: `orig/GCCP01/game.MAP`
-- **Note**: Contains Metrowerks Release build output from a prior build
-- **Important**: Addresses do not match current decomp, but function symbols have ~99% accuracy
-
-#### EN Release (Debug Build)
-- **Location**: `orig/GCCE01/game.MAP`
-- **Note**: Contains old Debug build symbols
-- **Cross-reference**: Can be used for any version (e.g., EN symbols to aid PAL decompilation)
-
-### Symbol File Usage
-Symbol files are helpful for determining:
-- Class hierarchies
-- Function arguments and parameters
-- Global variables (especially .bss section data)
-- Function relationships and dependencies
-To avoid loading massive MAP files (1-3MB), use the symbol extraction script when you need a deeper dive.
-NOTE: `tools/agent_select_target.py` already includes symbol summaries for each random target, so this step is optional.
-
-**Example usage (manual, optional):**
-```sh
-python3 tools/extract_symbols.py ME_USB_process.o     # Everything for this object file
-python3 tools/extract_symbols.py chunkfile.o          # All functions, globals, sections
-```
-
-This outputs only relevant symbol information instead of having to sift through MBs of data.
-
-### Function Documentation Format
-When updating functions, include version-specific address and size information:
-
-```
+```c
 /*
  * --INFO--
  * PAL Address: 0x80001234
@@ -59,204 +29,112 @@ When updating functions, include version-specific address and size information:
  */
 ```
 
-**Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
+## Preconditions
+Skip setup unless the repo is not already prepared.
 
-**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. For large functions, even small incremental gains in match score can be considered valuable progress.
-
-**Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet.
-
-**Key relationships:** Unit -> Object file -> Source file. Use symbols for context, Ghidra decomp for low match score functions.
-
-## Preconditions (one-time setup)
-Skip the preconditions step unless errors are encountered indicating lack of initial setup.
-
-### 0) Repo + assets
-- Repo directory (default location):
-  - `~/Documents/projects/FFCC-Decomp`
-- Required assets are **not** in git. Your owner will have already given you the original files locally:
-  - `orig/GCCP01/...` (at minimum `orig/GCCP01/sys/main.dol`).
-
-### 1) Tooling
-- Install ninja:
-  ```sh
-  brew install ninja
-  ```
-- Project will download required helper tools during build (DTK, wibo, etc.)
-
-### 2) Configure PAL build
-From repo root:
 ```sh
 python3 configure.py --version GCCP01
-```
-Note: GCCP01 is PAL, which is the only version we are working on currently. Do not attempt to swtich versions.
-
-### 3) Build once
-```sh
 ninja
-```
-Success criteria: build completes and verifies:
-- `build/GCCP01/main.dol: OK`
-
-### 4) Objdiff CLI (required for automation)
-The CLI tool can be downloaded into the repo. **Use v3.6.1+ for JSON oneshot mode**:
-```sh
 python3 tools/download_tool.py objdiff-cli tools/objdiff-cli --tag v3.6.1
-```
-Or download manually:
-```sh
-curl -L https://github.com/encounter/objdiff/releases/download/v3.6.1/objdiff-cli-macos-arm64 -o tools/objdiff-cli
-chmod +x tools/objdiff-cli
-```
-Verify:
-```sh
-tools/objdiff-cli --version  # Should show v3.6.1+
+tools/objdiff-cli --version
 ```
 
----
+PAL (`GCCP01`) is the only active target.
 
-## The contribution loop (repeatable)
-This is likely the starting point for the agent.
+## Contribution Loop
 
-### Step 1 - Select Target & Gather Context (automated)
-Run the selector once. It prints random viable targets across multiple buckets (code opportunities and data opportunities) with symbol summaries.
-
+### 1. Select a target
 ```sh
 python3 tools/agent_select_target.py
 ```
 
-**Example output (abridged):**
-```
-TARGET BUCKETS:
-Code opportunities (3)
- 1. Unit: main/pppMove (code 0.0%, data 0.00%)
-    Source: src/pppMove.cpp
-    Object: pppMove.o
-    Targets:
-      - pppMoveCon (0.0% match, 36b)
-      - pppMove (0.0% match, 156b)
-Data opportunities (3)
+### 2. Branch from clean `main`
+```sh
+git checkout main
+git pull origin main
+git checkout -b pr/<unit>/$(date -u +%s)
 ```
 
-WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. `configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.
+If local changes exist from a prior run, assume they should be discarded unless told otherwise.
 
-Important rules:
-- Consider extern as forbidden going forward. Try to actually link things.
-- EXTAB IS NOT IMPORTANT RIGHT NOW. MATCHING EXTAB AT THE COST OF CODE IS NOT PERMITTED.
-- Manually declaring sections (ie __declspec(section ".ctors")) IS FORBIDDEN. This is a hack, you should be trying to actually declare things such that the constructor is generated. PRs will be closed without merge that violate this rule.
-- Real member access rather than hard coded pointer offsets.
-- Do not do retarded hacks to get things to match that will be resolved automatically (ie hard coding an address, or changing a variable name to lbl_{xyz} to force a temporary output match).
-- Update `config/GCCP01/symbols.txt` rather than trying to conform to incoherent symbols like `lbl_{ADDRESS}`, or `fn_{ADDRESS}`. Addresses do NOT belong in symbol names (especially when we go cross-version to JP/EN).
-- Prefer defining things rather than using extern as a hack.
+### 3. Work the target, then work outward
+Start from the selected mismatched function or data, but do not stay artificially narrow if the real blocker is adjacent.
 
-DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
+Agents are explicitly allowed, and expected, to go on a **crusade around the target** when it helps matching:
+- fix headers, forward declarations, and includes
+- correct function signatures and class layouts
+- replace `extern` hacks with real definitions and linkage where practical
+- fix signedness, typedefs, enums, constants, and ABI-relevant types
+- replace hard-coded offsets with real member variables and member access
+- repair nearby structs, globals, constructors, vtables, and helper functions
+- update `config/GCCP01/symbols.txt` when symbol naming is the real issue
+- adjust `configure.py` flags when flags are the blocker, not the source
+- reference .MAP files for trying to figure out how sdata, bss, etc sections may be set up
 
-### Step 2 - Create branch: `git checkout -b pr/<unit>/$(date -u +%s)`
+Do not optimize only for the named symbol if the surrounding code is what prevents a real match.
 
-IF LOCAL CHANGES EXIST FROM A PRIOR RUN, ASSUME THEY ARE TO BE DISCARDED -- OTHERWISE THEY WOULD HAVE BEEN COMITTED.
+### 4. Build
+```sh
+ninja
+```
 
-### Step 3 - Edit source files in `src/` and `include/`
-Make critical changes changes: types, signedness, struct layout, control flow, constants, linkage/declaration cleanup, and (when justified) `configure.py` flag adjustments. Our goal is to match the source code, so getting the data and structs matching are CRITICAL to making the code coherent.
-
-### Step 4 - Build: `ninja`
-
-### Step 5 - Analyze with objdiff
+### 5. Diff
 ```sh
 build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol> > diff_result.json
 ```
-Parse JSON to assess real assembly improvements vs formatting changes.
 
-### Step 6 - Check overall progress with `ninja` output
-Treat code, data, and linked progress as first-class outcomes. Extab progress at the cost of code matching should not be considered success, and these PRs will be declined.
+### 6. Evaluate net progress
+Treat these as first-class wins:
+- code match
+- data match
+- linkage progress
+- cleaner, more correct declarations that unblock future matching
 
-### Step 7 - Decide whether to create PR (net progress + plausibility)
-Net improvement is **necessary but not sufficient**.
+Small local regressions are acceptable if they unlock larger real gains nearby.
 
-Make a PR only if **both** are true:
+### 7. Create a PR only if both are true
+**A) Real net progress**
+- objdiff or build output improved in code, data, or linkage
+- gains are real, not formatting, renames, or temporary hacks
 
-**A) Net progress improves meaningfully**
-- objdiff/build output shows real improvement in one or more of: code match, data match, linkage progress
-- Using extern rather than real linkage to artifically inflate match scores is prohibited. This is only acceptable for 1st pass at a function.
-- minor regressions are acceptable when outweighed by larger gains in other categories (for example, small code byte loss for substantial data/linkage gain)
-- improvements should be real, not just formatting/renames
-- The PR should feel like it is a step in the direction of recovering the original code.
+**B) Plausible original source**
+- the code looks like something the FFCC developers could have written
+- types, fields, control flow, and linkage are more coherent than before
 
-**B) The resulting C/C++ is plausible original source**
-The goal is to match what the **original FFCC authors likely wrote**, not merely to coax the compiler.
+### 8. Submit
+```sh
+git commit -m "Descriptive message"
+git push -u origin HEAD
+gh pr create --title "..." --body "..."
+```
 
-Reject/avoid changes that look like "compiler coaxing," e.g.:
-- contrived temporaries and reordering that a human wouldn't naturally write
-- intentionally odd sequencing unless there's strong evidence
-- using hardcoded offsets to objects instead of making member variables
-- changes that preserve output but reduce readability without a clear original-source rationale
-- **explanatory comments that add no real information** (e.g., "Plausible original behavior: ...")
+PRs should summarize:
+- what changed
+- which units or symbols improved
+- before/after evidence
+- why the result is plausible source, not compiler coaxing
 
-Even if code with hardcoded offsets like `(this + 0x28)` currently matches, it should be corrected to proper types and member-variable access as soon as practical.
+## Critical Rules
+- Prefer defining & linking things over using `extern` as a crutch.
+- If its not clear where something is defined, try using the .MAP files.
+- Do not manually force sections like `__declspec(section ".ctors")`.
+- Do not manually write dtor/ctor/sinit functions that are likley generated.
+- Do not hardcode addresses or use fake `lbl_` / `fn_` names to chase output.
+- Use real member access instead of pointer-offset tricks.
+- Keep code clean: no junk comments, no analysis debris, no commented-out experiments.
+- Notes belong in the agent workspace, not the project tree.
+- Branch from `main`, never from another PR branch.
+- When in doubt, bias towards what the actual source code looked like.
 
-Prefer changes that are source-plausible:
-- fixing signedness / types to match ABI expectations
-- using idiomatic control flow the codebase uses elsewhere
-- removing obviously redundant variables/branches
-- matching struct/field semantics (names and meaning)
+## Operating Principle
+Do not treat the selected symbol as a tiny sandbox. Treat it as the center of a dependency cluster.
 
-EXCEPTION: If making a first pass at a large function, mangled code is tolerable.
+If matching the target requires fixing adjacent linkage, includes, headers, structs, globals, constructors, or helper functions, do that work. Recovering coherent original source is the goal, not narrowly editing one function while leaving the surrounding code obviously wrong.
 
-### Step 8 - Create Pull Request (if net improvement is real + plausible)
-
-**Required steps to create PR:**
-1. **Commit changes**: `git commit -m "Descriptive message"`
-2. **Push branch**: `git push -u origin HEAD`
-3. **Create PR**: `gh pr create --title "..." --body "..."`
-
-**PR description must include:**
-- **Summary**: What changed (types/control flow/constants/etc.)
-- **Units/functions improved**: Which unit(s)/symbol(s) and their improvement metrics
-- **Progress evidence**: Before/after code/data/linkage metrics, including any accepted regressions and why they were acceptable
-- **Plausibility rationale**: Why the new code represents *plausible original source* (not just "score went up")
-- **Technical details**: Key insights from objdiff analysis, implementation approach
-
----
-
-## Critical Automation Rules
-
-**Follow these rules to avoid contaminated PRs and cleanup work:**
-
-### Branch Management - ALWAYS FROM MAIN!
-- **ALWAYS branch from `main`**, never from existing PRs
-- Before creating new branch: `git checkout main && git pull origin main`
-- Branch naming: `pr/<unit>/$(date -u +%s)` (example: `pr/main/pppMove/1739481600`)
-- **Why this matters**: Branching from PRs creates dependency chains that contaminate later PRs with unmerged changes
-
-### Code Quality - Clean Source Only!
-- **NO junk comments** in submitted code (no original assembly, no debug notes)
-- **NO commented-out code** unless specifically needed
-- Code should look like **plausible original source** that a game developer would write, unless making an early attempt at a complex function
-- **Why this matters**: PRs should contain production-quality code, not analysis artifacts
-
-### Pre-Submit Checklist
-Before creating any FFCC-Decomp PR:
-1. Branched from clean `main`?
-2. All notes written to agent workspace (not project directory)?  
-3. Code is clean (no assembly comments, debug prints, extern hacks to increase match score, etc.)?
-5. Real net improvement achieved across code/data/linkage (with any regressions justified)?
-6. Build passes with `ninja`?
-
-### If You Break These Rules
-- **Stop immediately** and fix the issues
-- Clean up the branch/PR before continuing
-- Update your automation scripts to prevent recurrence
-- Document the fix in your memory files
-
-**These rules exist because overnight automation created several contaminated PRs that required manual cleanup. Following them keeps the project clean and maintainable.**
-
----
-
-## Automation workflow
-
-1. **Select target**: `python3 tools/agent_select_target.py`
-2. **Symbols are included** in the selector output (manual extract is optional)  
-3. **Create branch from clean main**: `git checkout main && git pull origin main && git checkout -b pr/<unit>/$(date -u +%s)`
-4. **Update state files** (in agent workspace, not project directory)
-5. **Edit source** (use Ghidra decomp for low-match functions)
-6. **Build**: `ninja`
-7. **Analyze**: `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`
-8. **If real net improvement**: commit, push, create PR with technical details
+## Minimal Workflow
+1. `python3 tools/agent_select_target.py`
+2. Branch from clean `main`
+3. Fix the target and any adjacent blockers
+4. `ninja`
+5. `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`
+6. If net progress is real and plausible, commit, push, and open a PR

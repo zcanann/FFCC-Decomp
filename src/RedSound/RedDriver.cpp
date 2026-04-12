@@ -2168,8 +2168,12 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedSleep(0);
     }
 
-    DAT_8032daac.waveSize = waveSize;
     waveHeader = (char*)waveData;
+    DAT_8032daac.slot = slot;
+    DAT_8032daac.waveID = waveID;
+    DAT_8032daac.waveData = waveData;
+    DAT_8032daac.waveSize = waveSize;
+
     if (waveSize == -1) {
         if ((waveHeader[0] == 'W') && (waveHeader[1] == 'D')) {
             DAT_8032daac.waveSize = *(int*)(waveHeader + 4) +
@@ -2180,10 +2184,6 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             DAT_8032daac.waveSize = 0;
         }
     }
-
-    DAT_8032daac.slot = slot;
-    DAT_8032daac.waveID = waveID;
-    DAT_8032daac.waveData = waveData;
     OSSignalSemaphore(&DAT_8032daa0);
 }
 

@@ -1274,18 +1274,17 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
  */
 int CPartPcs::LoadMenuPdt(char* fileName)
 {
-    char* language;
     int pdtSlotIndex;
     int loaded;
     CMemory::CStage* stage;
-    char path[256];
+    char path[0x108];
 
-    language = GetLangString__5CGameFv(&Game);
-    sprintf(path, s_dvd__smenu__s_801d7fb0, language, fileName);
+    sprintf(path, s_dvd__smenu__s_801d7fb0, GetLangString__5CGameFv(&Game), fileName);
 
-    stage = reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xEC));
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xF4));
+    } else {
+        stage = reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xEC));
     }
 
     m_usbStreamData.m_stageLoad = stage;

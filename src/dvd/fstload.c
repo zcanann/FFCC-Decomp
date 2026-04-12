@@ -6,7 +6,7 @@
 
 static u8 bb2Buf[63];
 
-static u32 status;
+static u32 MotorState;
 static DVDBB2* bb2;
 static DVDDiskID* idTmp;
 
@@ -15,13 +15,13 @@ static void cb(s32 result, DVDCommandBlock* block);
 
 static void cb(s32 result, DVDCommandBlock* block) {
     if (result > 0) {
-        switch(status) {
+        switch(MotorState) {
         case 0:
-            status = 1;
+            MotorState = 1;
             DVDReadAbsAsyncForBS(block, bb2, 0x20, 0x420, cb);
             return;
         case 1:
-            status = 2;
+            MotorState = 2;
             DVDReadAbsAsyncForBS(block, bb2->FSTAddress, (bb2->FSTLength + 0x1F) & 0xFFFFFFE0, bb2->FSTPosition, cb);
         default:
             return;
@@ -31,7 +31,7 @@ static void cb(s32 result, DVDCommandBlock* block) {
     if (result == -1) {
         return;
     } else if (result == -4) {
-        status = 0;
+        MotorState = 0;
         DVDReset();
         DVDReadDiskID(block, idTmp, cb);
     }

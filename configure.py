@@ -841,7 +841,7 @@ config.libs = [
     DolphinLib(
         "dsp",
         [
-            Object(NonMatching, "dsp/dsp.c"),
+            Object(Matching, "dsp/dsp.c"),
             Object(Matching, "dsp/dsp_debug.c"),
             Object(Matching, "dsp/dsp_task.c"),
         ],

@@ -182,22 +182,32 @@ void CPad::Frame()
 			int* replayFrames = reinterpret_cast<int*>(replay + 8);
 			if (*replayFrames < 0x1A5E0)
 			{
+				int replayPadOffset = 0;
+				int replayJoyBusOffset = 0;
+				PADStatus* statusPtr = status;
+				u16* joyBusPtr = joyBusData;
 				for (int i = 0; i < 4; i++)
 				{
-					u8* dst = replay + *replayFrames * 0x40 + i * 0x0C + 0x0C;
-					u16* dstJoyBus = reinterpret_cast<u16*>(replay + *replayFrames * 0x40 + i * 4 + 0x3C);
-					*reinterpret_cast<u16*>(dst) = status[i].button;
-					*reinterpret_cast<s8*>(dst + 2) = status[i].stickX;
-					*reinterpret_cast<s8*>(dst + 3) = status[i].stickY;
-					*reinterpret_cast<s8*>(dst + 4) = status[i].substickX;
-					*reinterpret_cast<s8*>(dst + 5) = status[i].substickY;
-					dst[6] = status[i].triggerLeft;
-					dst[7] = status[i].triggerRight;
-					dst[8] = status[i].analogA;
-					dst[9] = status[i].analogB;
-					*reinterpret_cast<s8*>(dst + 10) = status[i].err;
-					dstJoyBus[0] = joyBusData[i * 2];
-					dstJoyBus[1] = joyBusData[i * 2 + 1];
+					u16 joyBus0 = joyBusPtr[0];
+					u16 joyBus1 = joyBusPtr[1];
+					u8* dst = replay + *replayFrames * 0x40 + replayPadOffset + 0x0C;
+					*reinterpret_cast<u16*>(dst) = statusPtr->button;
+					*reinterpret_cast<s8*>(dst + 2) = statusPtr->stickX;
+					*reinterpret_cast<s8*>(dst + 3) = statusPtr->stickY;
+					*reinterpret_cast<s8*>(dst + 4) = statusPtr->substickX;
+					*reinterpret_cast<s8*>(dst + 5) = statusPtr->substickY;
+					dst[6] = statusPtr->triggerLeft;
+					dst[7] = statusPtr->triggerRight;
+					dst[8] = statusPtr->analogA;
+					dst[9] = statusPtr->analogB;
+					*reinterpret_cast<s8*>(dst + 10) = statusPtr->err;
+					u16* dstJoyBus = reinterpret_cast<u16*>(replay + *replayFrames * 0x40 + replayJoyBusOffset + 0x3C);
+					dstJoyBus[0] = joyBus0;
+					dstJoyBus[1] = joyBus1;
+					statusPtr++;
+					replayPadOffset += 0x0C;
+					joyBusPtr += 2;
+					replayJoyBusOffset += 4;
 				}
 
 				(*replayFrames)++;
@@ -206,27 +216,35 @@ void CPad::Frame()
 		}
 		else if (frameIndex < 0x1A5E0)
 		{
+			int replayPadOffset = 0;
+			int replayJoyBusOffset = 0;
+			PADStatus* statusPtr = status;
+			u16* joyBusPtr = joyBusData;
 			for (int i = 0; i < 4; i++)
 			{
-				u16 originalButtons = status[i].button;
-				const u8* src = replay + frameIndex * 0x40 + i * 0x0C + 0x0C;
-				const u16* replayJoyBus = reinterpret_cast<const u16*>(replay + frameIndex * 0x40 + i * 4 + 0x3C);
-				status[i].button = *reinterpret_cast<const u16*>(src);
-				status[i].stickX = *reinterpret_cast<const s8*>(src + 2);
-				status[i].stickY = *reinterpret_cast<const s8*>(src + 3);
-				status[i].substickX = *reinterpret_cast<const s8*>(src + 4);
-				status[i].substickY = *reinterpret_cast<const s8*>(src + 5);
-				status[i].triggerLeft = src[6];
-				status[i].triggerRight = src[7];
-				status[i].analogA = src[8];
-				status[i].analogB = src[9];
-				status[i].err = *reinterpret_cast<const s8*>(src + 10);
-				joyBusData[i * 2] = replayJoyBus[0];
-				joyBusData[i * 2 + 1] = replayJoyBus[1];
+				u16 originalButtons = statusPtr->button;
+				const u8* src = replay + frameIndex * 0x40 + replayPadOffset + 0x0C;
+				const u16* replayJoyBus = reinterpret_cast<const u16*>(replay + frameIndex * 0x40 + replayJoyBusOffset + 0x3C);
+				statusPtr->button = *reinterpret_cast<const u16*>(src);
+				statusPtr->stickX = *reinterpret_cast<const s8*>(src + 2);
+				statusPtr->stickY = *reinterpret_cast<const s8*>(src + 3);
+				statusPtr->substickX = *reinterpret_cast<const s8*>(src + 4);
+				statusPtr->substickY = *reinterpret_cast<const s8*>(src + 5);
+				statusPtr->triggerLeft = src[6];
+				statusPtr->triggerRight = src[7];
+				statusPtr->analogA = src[8];
+				statusPtr->analogB = src[9];
+				statusPtr->err = *reinterpret_cast<const s8*>(src + 10);
+				joyBusPtr[0] = replayJoyBus[0];
+				joyBusPtr[1] = replayJoyBus[1];
 				if ((originalButtons & PAD_TRIGGER_Z) != 0)
 				{
-					status[i].button = static_cast<u16>(status[i].button | originalButtons);
+					statusPtr->button = static_cast<u16>(statusPtr->button | originalButtons);
 				}
+				statusPtr++;
+				replayPadOffset += 0x0C;
+				joyBusPtr += 2;
+				replayJoyBusOffset += 4;
 			}
 		}
 	}

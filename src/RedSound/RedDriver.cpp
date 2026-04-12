@@ -746,13 +746,9 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
 #pragma dont_inline on
 unsigned int GetMyEntryID()
 {
-    unsigned int entryID = DAT_8032f3bc + 1;
-
-    DAT_8032f3bc = entryID;
-    entryID = DAT_8032f3bc & 0x7fffffff;
-    DAT_8032f3bc = entryID;
+    DAT_8032f3bc = (DAT_8032f3bc + 1) & 0x7fffffff;
     if (DAT_8032f3bc == 0) {
-        DAT_8032f3bc = DAT_8032f3bc + 1;
+        DAT_8032f3bc = 1;
     }
     return DAT_8032f3bc;
 }

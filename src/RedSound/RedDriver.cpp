@@ -2162,21 +2162,23 @@ void CRedDriver::ClearWaveBank(int param_1)
  */
 void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 {
-    char* waveHeader;
+    while (true) {
+        if (DAT_8032f460 == 0) {
+            break;
+        }
 
-    while (DAT_8032f460 != 0) {
         RedSleep(0);
     }
 
     DAT_8032daac.waveSize = waveSize;
-    waveHeader = (char*)waveData;
     if (waveSize == -1) {
+        char* waveHeader = (char*)waveData;
+
         if ((waveHeader[0] == 'W') && (waveHeader[1] == 'D')) {
             DAT_8032daac.waveSize = *(int*)(waveHeader + 4) +
                                     (((*(int*)(waveHeader + 8) * 4) + 0x3fU) & 0xffffffc0) +
                                     (*(int*)(waveHeader + 0xc) * 0x60) + 0x20;
-        }
-        else {
+        } else {
             DAT_8032daac.waveSize = 0;
         }
     }

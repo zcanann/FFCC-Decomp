@@ -1129,9 +1129,7 @@ unsigned int CPartPcs::IsLoadPartCompleted()
  */
 void LoadFieldPdt0(int mapId, int floorId)
 {
-    CPartMngState* loadState = GetPartMngState();
-    PppPdtSlotRaw* pdtSlots = GetPartMngPdtSlots();
-    int pdtSlot;
+    CPartMngState* loadState = reinterpret_cast<CPartMngState*>(&PartMng);
     char path[1024];
 
     DAT_8032ed3c = 0;
@@ -1148,24 +1146,19 @@ void LoadFieldPdt0(int mapId, int floorId)
     PartPcs.m_usbStreamData.m_fieldLoadReq = 1;
 
     sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
-    pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
-    if (pdtSlot != 0) {
-        pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
-        if ((pdtSlot != 0) && (loadState->m_partLoadMode != 2) && (loadState->m_partLoadMode != 3)) {
-            _pppDataHead* pppDataHead;
-            PPPCREATEPARAM* createParam;
-            int checkOff;
-            int i;
+    int pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
+    if ((pdtSlot != 0) && ((pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0)) != 0) &&
+        (loadState->m_partLoadMode != 2) && (loadState->m_partLoadMode != 3)) {
+        PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(&PartMng) + 0x22E18);
+        _pppDataHead* pppDataHead = pdtSlots[0].m_pppDataHead;
+        PPPCREATEPARAM* createParam = PartMng.pppGetDefaultCreateParam();
+        int checkOff = 0;
 
-            pppDataHead = pdtSlots[0].m_pppDataHead;
-            createParam = PartMng.pppGetDefaultCreateParam();
-            checkOff = 0;
-            for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
-                if (*reinterpret_cast<int*>(&pdtSlots[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) != -0x1000) {
-                    pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, createParam, 0);
-                }
-                checkOff += 0x60;
+        for (int i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
+            if (*reinterpret_cast<int*>(&pdtSlots[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) != -0x1000) {
+                pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, createParam, 0);
             }
+            checkOff += 0x60;
         }
     }
 }

@@ -5,10 +5,7 @@
 
 static AXVPB* __AXStackHead[AX_PRIORITY_STACKS];
 static AXVPB* __AXStackTail[AX_PRIORITY_STACKS];
-
-AXVPB* __AXCallbackStack_8032F200;
-
-#define __AXCallbackStack __AXCallbackStack_8032F200
+static AXVPB* __AXCallbackStack;
 
 static u32 __AXCheckStacks(void) {
     u32 i;

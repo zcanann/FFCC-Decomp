@@ -1062,7 +1062,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msg.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/msgbuf.c"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/msghndlr.c", mw_version="GC/2.6"),
+            Object(Matching, "TRK_MINNOW_DOLPHIN/msghndlr.c", mw_version="GC/2.6"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mslsupp.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/mutex_TRK.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c", mw_version="GC/2.6"),

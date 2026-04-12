@@ -908,11 +908,11 @@ config.libs = [
             Object(Matching, "gba/GBARead.c"),
             Object(Matching, "gba/GBAWrite.c"),
             Object(Matching, "gba/GBAXfer.c"),
-            Object(
-                NonMatching,
-                "gba/GBAKey.c",
-                cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
-            ),
+                Object(
+                    Matching,
+                    "gba/GBAKey.c",
+                    cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto"),
+                ),
         ],
     ),
     {

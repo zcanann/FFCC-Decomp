@@ -1838,6 +1838,7 @@ gba/GBAGetProcessStatus.c:
 
 gba/GBAJoyBoot.c:
 	.text       start:0x801A7870 end:0x801A877C
+	.data       start:0x8021CB48 end:0x8021CB78
 
 gba/GBARead.c:
 	.text       start:0x801A877C end:0x801A88DC
@@ -1850,6 +1851,7 @@ gba/GBAXfer.c:
 
 gba/GBAKey.c:
 	.text       start:0x801A8D9C end:0x801A9004
+	.data       start:0x8021CB78 end:0x8021CF20
 
 TRK_MINNOW_DOLPHIN/mainloop.c:
 	.text       start:0x801A9004 end:0x801A90FC

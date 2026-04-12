@@ -267,9 +267,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     s16 decayCount;
     Vec basePos;
     Vec delta;
-    Vec impulse;
     Vec worldPos;
-    long* shape;
 
     frameCount = state->m_fadeFrames;
     if (frameCount > 0) {
@@ -335,7 +333,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         pppCopyVector(basePos, worldPos);
     }
 
-    pppSubVector(delta, basePos, worldPos);
+    pppSubVector(delta, worldPos, basePos);
     if (pppVectorLength__F3Vec(&delta) < (vData->m_radius - pYmMiasma->m_minDistance)) {
         state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
         state->m_hasImpulse = 1;
@@ -351,13 +349,16 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     state->m_speedDecay = state->m_speedDecay - pYmMiasma->m_speedDecay;
 
     if (vData->m_speedDecay != FLOAT_80330644 && state->m_hasImpulse == 0) {
+        Vec impulse;
+
         impulse = vData->m_impulse;
         PSVECScale(&impulse, &impulse, state->m_speedDecay);
         pppAddVector(*(Vec*)particleData, *(Vec*)particleData, impulse);
     }
 
     if ((u16)pYmMiasma->m_dataValIndex != 0xffff) {
-        shape = (*(long***)pppEnvStPtr->m_particleColors)[pYmMiasma->m_dataValIndex];
+        long* shape = (*(long***)pppEnvStPtr->m_particleColors)[pYmMiasma->m_dataValIndex];
+
         pppCalcFrameShape(shape, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,
             (short)pYmMiasma->m_shapeFrameStep);
     }

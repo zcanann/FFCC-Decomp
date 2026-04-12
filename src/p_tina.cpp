@@ -1275,8 +1275,8 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
  */
 int CPartPcs::LoadMenuPdt(char* fileName)
 {
-    int pdtSlotIndex;
     char* language;
+    int pdtSlotIndex;
     int loaded;
     CMemory::CStage* stage;
     CPartMngState* state;

@@ -306,7 +306,8 @@ void CFunnyShape::InitAnmWork()
         r = rand();
         s32 q = r / 0x168 + (r >> 0x1F);
         q = r + (q - (q >> 0x1F)) * -0x168;
-        work->angle = (angleMul * static_cast<float>(q)) / angleDiv;
+        work->angle = static_cast<float>(q);
+        work->angle = (angleMul * work->angle) / angleDiv;
 
         u32 u = static_cast<u32>(rand());
         if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {

@@ -118,14 +118,15 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
 
     {
-        f32 tableAngle = (32768.0f * (0.017453292f * work->m_angle)) / 3.1415927f;
+        f32 tableAngle =
+            (gPppYmMoveCircleAngleToTableScale * (gPppYmMoveCircleAngleScale * work->m_angle)) / gPppYmMoveCircleTableDivisor;
         tableIndex = (s32)tableAngle;
     }
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
     cosAngle = *(f32*)((u8*)gPppTrigTable + ((tableIndex + 0x4000) & 0xFFFC));
     radiusX = work->m_radius * cosAngle;
     radiusZ = work->m_radius * -sinAngle;
-    nextPos.y = 0.0f;
+    nextPos.y = gPppYmMoveCircleZero;
     nextPos.x = radiusX;
     nextPos.z = radiusZ;
     nextPos.x += work->m_center.x;

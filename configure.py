@@ -757,9 +757,9 @@ config.libs = [
             Object(Matching, "dvd/dvdFatal.c"),
             Object(NonMatching, "dvd/dvdfs.c"),
             Object(Matching, "dvd/dvdidutils.c"),
-            Object(NonMatching, "dvd/dvdlow.c"),
+            Object(Matching, "dvd/dvdlow.c"),
             Object(Matching, "dvd/dvdqueue.c"),
-            Object(NonMatching, "dvd/fstload.c"),
+            Object(Matching, "dvd/fstload.c"),
         ],
     ),
     DolphinLib(
@@ -795,8 +795,8 @@ config.libs = [
         "ax",
         [
             Object(Matching, "ax/AX.c"),
-            Object(NonMatching, "ax/AXAlloc.c"),
-            Object(NonMatching, "ax/AXAux.c"),
+            Object(Matching, "ax/AXAlloc.c"),
+            Object(Matching, "ax/AXAux.c"),
             Object(Matching, "ax/AXCL.c"),
             Object(Matching, "ax/AXOut.c"),
             Object(Matching, "ax/AXProf.c"),
@@ -841,9 +841,9 @@ config.libs = [
     DolphinLib(
         "dsp",
         [
-            Object(NonMatching, "dsp/dsp.c"),
+            Object(Matching, "dsp/dsp.c"),
             Object(Matching, "dsp/dsp_debug.c"),
-            Object(NonMatching, "dsp/dsp_task.c"),
+            Object(Matching, "dsp/dsp_task.c"),
         ],
     ),
     DolphinLib(
@@ -873,7 +873,7 @@ config.libs = [
             Object(NonMatching, "gx/GXBump.c"),
             Object(Matching, "gx/GXDisplayList.c"),
             Object(Matching, "gx/GXFifo.c"),
-            Object(NonMatching, "gx/GXFrameBuf.c"),
+            Object(Matching, "gx/GXFrameBuf.c"),
             Object(Matching, "gx/GXGeometry.c"),
             Object(NonMatching, "gx/GXInit.c", extra_cflags=["-opt nopeephole"]),
             Object(
@@ -889,7 +889,7 @@ config.libs = [
             Object(Matching, "gx/GXTev.c"),
             Object(Matching, "gx/GXTexture.c"),
             Object(
-                NonMatching,
+                Matching,
                 "gx/GXTransform.c",
                 cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
             ),
@@ -970,7 +970,7 @@ config.libs = [
             ),
             Object(Matching, "MSL_C/PPCEABI/bare/H/ansi_files.c", mw_version="GC/2.7"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.0"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/buffer_io.c"),
+            Object(Matching, "MSL_C/PPCEABI/bare/H/buffer_io.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/gamecube.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/ctype.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/direct_io.c"),

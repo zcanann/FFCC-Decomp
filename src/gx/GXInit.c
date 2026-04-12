@@ -20,17 +20,15 @@ GXData* const __GXData = &gxData;
 const GXColor GXInit_ClearColor = {64, 64, 64, 255};
 const GXColor GXInit_BlackColor = {0, 0, 0, 0};
 const GXColor GXInit_WhiteColor = {255, 255, 255, 255};
-const f32 GXInit_ZeroF = 0.0f;
-const f32 GXInit_OneF = 1.0f;
-const f32 GXInit_PointOneF = 0.1f;
+extern const f32 GXInit_ZeroF;
+extern const f32 GXInit_OneF;
+extern const f32 GXInit_PointOneF;
 const f64 GXInit_IntToFloatBias = 4503599627370496.0;
 
-// these remain file-scope in the target object
+u32 resetFuncRegistered;
 u32 calledOnce;
 OSTime time;
 u32 peCount;
-u32 resetFuncRegistered;
-
 void* __memReg;
 void* __peReg;
 void* __cpReg;
@@ -515,3 +513,7 @@ void __GXInitGX(void) {
     GXSetGPMetric(GX_PERF0_NONE, GX_PERF1_NONE);
     GXClearGPMetric();
 }
+
+const f32 GXInit_ZeroF = 0.0f;
+const f32 GXInit_OneF = 1.0f;
+const f32 GXInit_PointOneF = 0.1f;

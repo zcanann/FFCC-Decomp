@@ -19,8 +19,6 @@ static int __AXDSPDoneFlag;
 
 static volatile u32 __AXDebugSteppingMode;
 static OSThreadQueue __AXOutThreadQueue;
-s32 __AXSpbAR;
-s32 __AXSpbAL;
 
 // prototypes
 static void __AXDSPInitCallback(void* task);

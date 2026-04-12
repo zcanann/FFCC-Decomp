@@ -1,54 +1,92 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ansi_files.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/buffer_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 
 void* malloc(size_t size);
 
-int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
+inline void __convert_from_newlines(unsigned char* p, size_t* n) { }
+
+void __prep_buffer(FILE* file)
 {
-	int ioresult;
-	unsigned char* buffer_start;
-	
 	file->buffer_ptr = file->buffer;
 	file->buffer_length = file->buffer_size;
 	file->buffer_length -= file->position & file->buffer_alignment;
 	file->buffer_position = file->position;
-	
+}
+
+int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
+{
+	int ioresult;
+	unsigned char* buffer_start;
+
+	__prep_buffer(file);
+
 	if (mode == 1) {
 		file->buffer_length = file->buffer_size;
 	}
-	
+
 	ioresult = (*file->read_fn)(file->handle, file->buffer, &file->buffer_length, file->idle_fn);
-	
+
 	if (ioresult == 2) {
 		file->buffer_length = 0;
 	}
-	
+
 	if (bytes_loaded != NULL) {
 		*bytes_loaded = file->buffer_length;
 	}
-	
+
 	if (ioresult != 0) {
 		return ioresult;
 	}
 
-	{
+	file->position += file->buffer_length;
+
+	if (!file->file_mode.binary_io) {
 		int i;
-		file->position += file->buffer_length;
-		if (!file->file_mode.binary_io) {
-			buffer_start = file->buffer;
-			for (i = file->buffer_length; i != 0; i--) {
-				unsigned char c = *buffer_start;
-				buffer_start++;
-				if (c == '\n') {
-					file->position++;
-				}
+
+		buffer_start = file->buffer;
+		for (i = file->buffer_length; i != 0; i--) {
+			unsigned char c = *buffer_start;
+			buffer_start++;
+			if (c == '\n') {
+				file->position++;
 			}
 		}
 	}
-	
+
 	return 0;
+}
+
+int __flush_buffer(FILE* file, size_t* bytes_flushed)
+{
+	size_t buffer_len;
+	int ioresult;
+
+	buffer_len = file->buffer_ptr - file->buffer;
+
+	if (buffer_len) {
+		file->buffer_length = buffer_len;
+
+		if (!file->file_mode.binary_io)
+			__convert_from_newlines(file->buffer, &file->buffer_length);
+
+		ioresult = (*file->write_fn)(file->handle, file->buffer,
+		                             &file->buffer_length, file->idle_fn);
+
+		if (bytes_flushed)
+			*bytes_flushed = file->buffer_length;
+
+		if (ioresult)
+			return ioresult;
+
+		file->position += file->buffer_length;
+	}
+
+	__prep_buffer(file);
+
+	return __no_io_error;
 }
 
 /*
@@ -114,44 +152,4 @@ int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 
 	__end_critical_region(2);
 	return 0;
-}
-
-void __prep_buffer(FILE* file)
-{
-	file->buffer_ptr    = file->buffer;
-	file->buffer_length = file->buffer_size;
-	file->buffer_length -= file->position & file->buffer_alignment;
-	file->buffer_position = file->position;
-}
-
-void __convert_from_newlines(unsigned char* p, size_t* n) { }
-
-int __flush_buffer(FILE* file, size_t* bytes_flushed)
-{
-	size_t buffer_len;
-	int ioresult;
-
-	buffer_len = file->buffer_ptr - file->buffer;
-
-	if (buffer_len) {
-		file->buffer_length = buffer_len;
-
-		if (!file->file_mode.binary_io)
-			__convert_from_newlines(file->buffer, &file->buffer_length);
-
-		ioresult = (*file->write_fn)(file->handle, file->buffer,
-		                             &file->buffer_length, file->idle_fn);
-
-		if (bytes_flushed)
-			*bytes_flushed = file->buffer_length;
-
-		if (ioresult)
-			return ioresult;
-
-		file->position += file->buffer_length;
-	}
-
-	__prep_buffer(file);
-
-	return __no_io_error;
 }

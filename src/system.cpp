@@ -77,6 +77,11 @@ CSystem::CSystem()
 void CSystem::Init()
 {
     CFile::CHandle* fileHandle;
+    CFile* file;
+    char* emptyString;
+    char* mapName;
+    char* stageName;
+    char* sourceName;
     int mapSize;
     int offset;
     int chunkSize;
@@ -115,6 +120,11 @@ void CSystem::Init()
     m_mapStage = (CStage*)0;
     m_mapBuffer = (void*)0;
     m_mapSize = 0;
+    stageName = const_cast<char*>(s_cSystem);
+    sourceName = const_cast<char*>(s_system_cpp);
+    mapName = const_cast<char*>(s_gamePalM_map);
+    emptyString = const_cast<char*>("");
+    file = &File;
 
     OSSetErrorHandler(0, (OSErrorHandler)errorHandler);
     OSSetErrorHandler(1, (OSErrorHandler)errorHandler);
@@ -128,13 +138,13 @@ void CSystem::Init()
 
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
-        m_mapStage = (CStage*)Memory.CreateStage(0x400000, const_cast<char*>(s_cSystem), 1);
-        fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
+        m_mapStage = (CStage*)Memory.CreateStage(0x400000, stageName, 1);
+        fileHandle = file->Open(mapName, 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
-            mapSize = File.GetLength(fileHandle);
+            mapSize = file->GetLength(fileHandle);
             m_mapSize = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, sourceName, 0x123) unsigned char[mapSize];
             offset = 0;
             for (; mapSize != 0; mapSize -= chunkSize)
             {
@@ -146,14 +156,14 @@ void CSystem::Init()
 
                 fileHandle->m_chunkSize = chunkSize;
                 fileHandle->m_currentOffset = offset;
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
-                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, chunkSize);
+                file->Read(fileHandle);
+                file->SyncCompleted(fileHandle);
+                memcpy((unsigned char*)m_mapBuffer + offset, file->m_readBuffer, chunkSize);
 
                 offset += chunkSize;
             }
-            File.Close(fileHandle);
-            Printf(const_cast<char*>(""));
+            file->Close(fileHandle);
+            Printf(emptyString);
         }
     }
 }

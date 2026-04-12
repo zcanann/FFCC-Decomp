@@ -7,7 +7,6 @@
 #include "ffcc/symbols_shared.h"
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
-const float FLOAT_8033101c = 1.0f;
 const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
 static char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
@@ -321,7 +320,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
-    tex1 = FLOAT_8033101c;
+    tex1 = 1.0f;
     {
         RainDrop* currentDrop = drop;
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++, currentDrop++) {

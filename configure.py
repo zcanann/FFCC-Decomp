@@ -871,7 +871,7 @@ config.libs = [
         [
             Object(Matching, "gx/GXAttr.c"),
             Object(NonMatching, "gx/GXBump.c"),
-            Object(NonMatching, "gx/GXDisplayList.c"),
+            Object(Matching, "gx/GXDisplayList.c"),
             Object(Matching, "gx/GXFifo.c"),
             Object(NonMatching, "gx/GXFrameBuf.c"),
             Object(Matching, "gx/GXGeometry.c"),

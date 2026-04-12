@@ -1575,7 +1575,7 @@ dvd/fstload.c:
 	.text       start:0x8018B624 end:0x8018B864
 	.data       start:0x80217770 end:0x802177E0
 	.bss        start:0x8030CAD8 end:0x8030CB48
-	.sbss       start:0x8032F0D4 end:0x8032F0E0
+	.sbss       start:0x8032F0D0 end:0x8032F0E0
 
 vi/vi.c:
 	.text       start:0x8018B864 end:0x8018D298
@@ -1802,6 +1802,7 @@ gx/GXStubs.c:
 
 gx/GXDisplayList.c:
 	.text       start:0x801A5FF8 end:0x801A6204
+	.bss        start:0x80327CF8 end:0x80328214
 	.sbss       start:0x8032F348 end:0x8032F34C
 
 gx/GXTransform.c:

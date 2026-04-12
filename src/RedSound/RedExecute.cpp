@@ -27,9 +27,9 @@ struct RedReverbDATA {
  */
 u8 GetRandomData()
 {
-    u8 value = (u8)DAT_8021dcce[DAT_8032f4a8];
+    u32 index = DAT_8032f4a8;
     DAT_8032f4a8 = DAT_8032f4a8 + 1;
-    return value;
+    return DAT_8021dcce[index];
 }
 
 /*
@@ -43,10 +43,10 @@ u8 GetRandomData()
  */
 int PitchCompute(int param_1, int param_2, int param_3, u32 param_4)
 {
-    u32 pitch;
-    int octaveAdjust;
     u32 noteBand;
     int value;
+    int octaveAdjust;
+    u32 pitch;
 
     octaveAdjust = 0;
     for (pitch = (param_1 >> 12) + param_2 + (param_3 >> 16); (int)pitch < 0; pitch += 0xC00) {
@@ -54,8 +54,9 @@ int PitchCompute(int param_1, int param_2, int param_3, u32 param_4)
     }
 
     noteBand = (pitch >> 8) & 0x7F;
-    octaveAdjust += noteBand / 12;
-    value = (int)((DAT_8021d7f0[noteBand % 12] >> (10 - octaveAdjust)) * DAT_8021d820[pitch & 0xFF]) >> 12;
+    value =
+        (int)((DAT_8021d7f0[noteBand % 12] >> (10 - (octaveAdjust + noteBand / 12))) * DAT_8021d820[pitch & 0xFF]) >>
+        12;
 
     if (param_4 != 0) {
         if ((int)param_4 < 1) {

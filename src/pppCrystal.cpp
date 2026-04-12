@@ -11,22 +11,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-static const float DAT_801db5b8 = 0.5f;
-static const float DAT_801db5bc = 0.0f;
-static const float DAT_801db5c0 = 0.0f;
-static const float DAT_801db5c4 = 0.5f;
-static const float DAT_801db5c8 = 0.0f;
-static const float DAT_801db5cc = -0.5f;
-static const float DAT_801db5d0 = 0.0f;
-static const float DAT_801db5d4 = 0.5f;
-static const float DAT_801db5d8 = 0.0f;
-static const float DAT_801db5dc = 0.0f;
-static const float DAT_801db5e0 = 0.0f;
-static const float DAT_801db5e4 = 1.0f;
-static const float DAT_801db5ec = 0.0f;
-static const float DAT_801db5f0 = 0.0f;
-static const float DAT_801db5f4 = 0.0f;
-static const float DAT_801db5fc = 0.0f;
 static const float FLOAT_80330fa8 = 32.0f;
 static const float FLOAT_80330fac = -0.5f;
 static const float FLOAT_80330fb0 = 640.0f;
@@ -53,6 +37,19 @@ int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, in
 }
 
 static char s_pppCrystalCpp[] = "pppCrystal.cpp";
+
+struct CrystalIndTexMtx {
+    float value[2][3];
+};
+
+struct CrystalTexMtx {
+    float value[3][4];
+};
+
+static const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
+
+static const CrystalTexMtx s_crystalTexMtxBase = {
+    {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
 /*
  * --INFO--
@@ -255,11 +252,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
 
 	Mtx lightMtx;
-	Mtx texMtx = {
-		{ DAT_801db5b8, DAT_801db5bc, DAT_801db5c0, DAT_801db5c4 },
-		{ DAT_801db5c8, DAT_801db5cc, DAT_801db5d0, DAT_801db5d4 },
-		{ DAT_801db5d8, DAT_801db5dc, DAT_801db5e0, DAT_801db5e4 },
-	};
+	CrystalTexMtx texMtx = s_crystalTexMtxBase;
 
 	if (param_2->m_payload[0] == 1) {
 		texW = FLOAT_80330fa8;
@@ -270,9 +263,9 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 		texH = (float)*(u32*)(indirectTex + 0x68);
 	}
 
-	float indMtx[2][3] = {};
-	indMtx[0][0] = ((FLOAT_80330fac * texW) / FLOAT_80330fb0) * param_2->m_stepValue;
-	indMtx[1][1] = ((FLOAT_80330fac * texH) / FLOAT_80330fb4) * param_2->m_stepValue;
+	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
+	indMtx.value[0][0] = ((FLOAT_80330fac * texW) / FLOAT_80330fb0) * param_2->m_stepValue;
+	indMtx.value[1][1] = ((FLOAT_80330fac * texH) / FLOAT_80330fb4) * param_2->m_stepValue;
 
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	GXSetNumTexGens(3);
@@ -286,7 +279,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 			lightMtx, CameraPcs._252_4_, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	}
 
-	GXLoadTexMtxImm(texMtx, 0x40, GX_MTX3x4);
+	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);
 	GXLoadTexMtxImm(lightMtx, 0x43, GX_MTX3x4);
 	GXSetTexCoordGen2((GXTexCoordID)0, GX_TG_MTX3x4, GX_TG_NRM, 0x3C, GX_TRUE, 0x40);
 	GXSetTexCoordGen2((GXTexCoordID)1, GX_TG_MTX3x4, GX_TG_POS, GX_PNMTX0, GX_FALSE, 0x43);
@@ -315,7 +308,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetNumIndStages(1);
 	GXSetIndTexOrder((GXIndTexStageID)0, (GXTexCoordID)0, (GXTexMapID)1);
 	GXSetIndTexCoordScale((GXIndTexStageID)0, GX_ITS_1, GX_ITS_1);
-	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx, 1);
+	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
 	GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_ST, GX_ITM_0, GX_ITW_OFF, GX_ITW_OFF, GX_FALSE, GX_FALSE,
 		GX_ITBA_OFF);
 	GXClearVtxDesc();
@@ -326,8 +319,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)pppCrystal + 0x70), 0);
 	GXSetNumIndStages(0);
 	GXSetTevDirect((GXTevStageID)0);
-	memset(indMtx, 0, sizeof(indMtx));
-	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx, 1);
+	memset(&indMtx, 0, sizeof(indMtx));
+	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
 }
 
 /*

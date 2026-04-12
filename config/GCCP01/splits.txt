@@ -2233,7 +2233,7 @@ RedSound/RedMemory.cpp:
 	extab       start:0x8000A5B8 end:0x8000A5F8
 	extabindex  start:0x80011CA4 end:0x80011D04
 	.text       start:0x801BFF34 end:0x801C05F8
-	.sbss       start:0x8032F490 end:0x8032F4A8
+	.sbss       start:0x8032F4A8 end:0x8032F4C0
 	.sdata2     start:0x80333D20 end:0x80333D30
 
 RedSound/RedEntry.cpp:
@@ -2245,6 +2245,7 @@ RedSound/RedExecute.cpp:
 	extab       start:0x8000A760 end:0x8000A880
 	extabindex  start:0x80011F20 end:0x800120D0
 	.text       start:0x801C2FC4 end:0x801C7478
+	.sbss       start:0x8032F4C0 end:0x8032F4D4
 
 RedSound/RedMidiCtrl.cpp:
 	extab       start:0x8000A880 end:0x8000AB00
@@ -2270,7 +2271,7 @@ RedSound/RedSound.cpp:
 	.ctors      start:0x801D5450 end:0x801D5454
 	.bss        start:0x8032E170 end:0x8032E280
 	.sdata      start:0x8032EC30 end:0x8032EC38
-	.sbss       start:0x8032F4A8 end:0x8032F4E0
+	.sbss       start:0x8032F4D8 end:0x8032F4E4
 	.sdata2     start:0x80333D98 end:0x80333DB0
 
 thp/THPDec.c:
@@ -2278,7 +2279,7 @@ thp/THPDec.c:
 	.rodata     start:0x801E8110 end:0x801E81A0
 	.bss        start:0x8032E280 end:0x8032E3B0
 	.sdata      start:0x8032EC38 end:0x8032EC3C
-	.sbss       start:0x8032F4E0 end:0x8032F5F8
+	.sbss       start:0x8032F500 end:0x8032F5F8
 	.sdata2     start:0x80333DB0 end:0x80333DCC
 
 thp/THPAudio.c:

@@ -2074,6 +2074,7 @@ MSL_C/PPCEABI/bare/H/FILE_POS.c:
 
 MSL_C/PPCEABI/bare/H/mbstring.c:
 	.text       start:0x801B6498 end:0x801B65B0
+	.sdata2     start:0x80333938 end:0x8033393C
 
 MSL_C/PPCEABI/bare/H/mem.c:
 	.init       start:0x8000540C end:0x80005544

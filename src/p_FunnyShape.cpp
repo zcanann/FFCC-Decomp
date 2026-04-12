@@ -76,6 +76,7 @@ void CopyFunnyShapePcsTable()
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
+static char* s_spinner = const_cast<char*>("|/-\\");
 static int frameCount;
 
 namespace {
@@ -367,7 +368,6 @@ void CFunnyShapePcs::drawViewer()
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
     static const char s_funnyShapeFmt[] = "FunnyShape %c";
-    static const char s_spinner[] = "|/-\\";
 
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);

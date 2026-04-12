@@ -1651,6 +1651,7 @@ ax/AXComp.c:
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
+	.sbss       start:0x8032F2A0 end:0x8032F2B0
 
 axfx/reverb_hi.c:
 	.text       start:0x80193E70 end:0x80194F34

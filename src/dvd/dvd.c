@@ -53,7 +53,8 @@ static int ResetRequired;
 static int CancelAllSyncComplete;
 static volatile u32 ResetCount;
 static BOOL FirstTimeInBootrom;
-static u32 MotorState;
+extern u32 MotorState_8032F0D0;
+#define MotorState MotorState_8032F0D0
 static int DVDInitialized;
 void (*LastState)(DVDCommandBlock*);
 

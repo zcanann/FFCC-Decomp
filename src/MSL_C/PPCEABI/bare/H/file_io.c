@@ -4,6 +4,39 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/FILE_POS.h"
 
+inline FILE* freopen(const char* name, const char* mode, FILE* file)
+{
+    file_modes modes;
+
+    __stdio_atexit();
+
+    if (!file) {
+        return NULL;
+    }
+
+    fclose(file);
+    clearerr(file);
+
+    if (!__get_file_modes(mode, &modes)) {
+        return NULL;
+    }
+
+    __init_file(file, modes, 0, 0x400);
+
+    if (__open_file(name, modes, &file->handle)) {
+        file->file_mode.file_kind = __closed_file;
+        if (file->file_state.free_buffer) {
+            free(file->buffer);
+        }
+        return NULL;
+    }
+    if (modes.io_mode & __append) {
+        fseek(file, 0, SEEK_END);
+    }
+
+    return file;
+}
+
 int fclose(FILE* file) {
     int flush_result, close_result;
 
@@ -63,48 +96,15 @@ int fflush(FILE* file) {
 
 FILE* fopen(const char* name, const char* mode)
 {
-	FILE* file;
-	
-	__begin_critical_region(stdin_access);
+    FILE* file;
 
-	file = (FILE*)__find_unopened_file();
-	__stdio_atexit();
-	if (!file) {
-		file = NULL;
-		goto done;
-	}
+    __begin_critical_region(stdin_access);
 
-	fclose(file);
-	clearerr(file);
+    file = freopen(name, mode, (FILE*)__find_unopened_file());
 
-	{
-		file_modes modes;
+    __end_critical_region(stdin_access);
 
-		if (!__get_file_modes(mode, &modes)) {
-			file = NULL;
-			goto done;
-		}
-
-		__init_file(file, modes, 0, 0x400);
-
-		if (__open_file(name, modes, &file->handle)) {
-			file->file_mode.file_kind = __closed_file;
-			if (file->file_state.free_buffer) {
-				free(file->buffer);
-			}
-			file = NULL;
-			goto done;
-		}
-
-		if (modes.io_mode & __append) {
-			fseek(file, 0, SEEK_END);
-		}
-	}
-
-done:
-	__end_critical_region(stdin_access);
-	
-	return(file);
+    return file;
 }
 
 /*

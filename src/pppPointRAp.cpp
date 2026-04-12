@@ -82,17 +82,17 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         float spinSin = *(float*)((u8*)trig + (angleB & 0xFFFC));
         float spinCos = *(float*)((u8*)trig + ((angleB + 0x4000) & 0xFFFC));
         float xOff = planarOff * spinSin;
-        float zOff = planarOff * spinCos;
+        planarOff = planarOff * spinCos;
         Vec* dstPos = (Vec*)((u8*)obj + payload->m_childPosOffset + 0x80);
         Vec* dstVel = (Vec*)((u8*)obj + payload->m_childVelocityOffset + 0x80);
 
         dstPos->x = srcPos->x + xOff;
         dstPos->y = srcPos->y + yOff;
-        dstPos->z = srcPos->z + zOff;
+        dstPos->z = srcPos->z + planarOff;
 
         dstVel->x = xOff * payload->m_speedScale;
         dstVel->y = yOff * payload->m_speedScale;
-        dstVel->z = zOff * payload->m_speedScale;
+        dstVel->z = planarOff * payload->m_speedScale;
 
         state[1] = payload->m_cooldown;
     }

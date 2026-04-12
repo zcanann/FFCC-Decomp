@@ -804,13 +804,12 @@ void CalcReflectionVector2(
     Vec cameraVector;
     Vec objSpacePos;
     Vec objSpaceNormal;
-    Vec reflectOut;
     Vec2d uv;
     Mtx nodeMtx;
     Mtx nodeRotMtx;
     Mtx cameraMtx;
-    u8* dl = (u8*)displayList;
-    u8* dlEnd;
+    u16* dl = (u16*)displayList;
+    u16* dlEnd;
     const double half = (double)FLOAT_803318a4;
 
     cameraPos.x = CameraWorldX();
@@ -840,28 +839,29 @@ void CalcReflectionVector2(
     PSMTXCopy(ppvCameraMatrix0, cameraMtx);
     PSMTXConcat(cameraMtx, matrix, cameraMtx);
 
-    dlEnd = dl + displayListSize;
+    dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
-        u8 drawFmt = dl[0];
-        u16 itemCount = *(u16*)(dl + 1);
+        u8 drawFmt = *(u8*)dl;
+        u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
 
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
 
-        dl += 3;
+        dl = (u16*)((u8*)dl + 3);
         for (i = 0; i < itemCount; i++) {
-            u16 posIndex = *(u16*)(dl + 0);
-            u16 normalIndex = *(u16*)(dl + 2);
-            u8* next = dl + 8;
+            u16 posIndex = dl[0];
+            u16 normalIndex = dl[1];
+            u16* next = dl + 4;
             int axis = 0;
             float maxAxis;
             float invAxis;
+            Vec* outVec;
             u8* clr;
 
             if ((drawFmt & 7) == 2) {
-                next = dl + 10;
+                next = dl + 5;
             }
 
             gUtil.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
@@ -871,14 +871,15 @@ void CalcReflectionVector2(
 
             PSVECSubtract(&objSpacePos, &cameraPos, &cameraVector);
             PSVECNormalize(&cameraVector, &cameraVector);
-            C_VECReflect(&cameraVector, &objSpaceNormal, &reflectOut);
+            outVec = &reflectionVec[posIndex];
+            C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
 
-            maxAxis = fabsf(reflectOut.x);
-            if (maxAxis < fabsf(reflectOut.y)) {
+            maxAxis = fabsf(outVec->x);
+            if (maxAxis < fabsf(outVec->y)) {
                 axis = 1;
-                maxAxis = fabsf(reflectOut.y);
+                maxAxis = fabsf(outVec->y);
             }
-            if (maxAxis < fabsf(reflectOut.z)) {
+            if (maxAxis < fabsf(outVec->z)) {
                 axis = 2;
             }
 
@@ -892,43 +893,43 @@ void CalcReflectionVector2(
             uv.y = (float)half;
 
             if (axis == 1) {
-                invAxis = FLOAT_803318b8 * reflectOut.y;
-                if (reflectOut.y < FLOAT_80331898) {
+                invAxis = FLOAT_803318b8 * outVec->y;
+                if (outVec->y < FLOAT_80331898) {
                     clr[1] = (u8)(clr[1] - 0x7F);
-                    uv.x = (float)((half - (double)(reflectOut.x / invAxis)) * (double)FLOAT_803318bc +
+                    uv.x = (float)((half - (double)(outVec->x / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318bc);
-                    uv.y = (float)((double)((float)(half + (double)(reflectOut.z / invAxis)) * FLOAT_803318bc) + half);
+                    uv.y = (float)((double)((float)(half + (double)(outVec->z / invAxis)) * FLOAT_803318bc) + half);
                 } else {
                     clr[1] = (u8)(clr[1] + 0x7F);
-                    uv.y = (float)((half + (double)(reflectOut.z / invAxis)) * (double)FLOAT_803318bc);
-                    uv.x = (float)((double)((float)(half + (double)(reflectOut.x / invAxis)) * FLOAT_803318bc) + half);
+                    uv.y = (float)((half + (double)(outVec->z / invAxis)) * (double)FLOAT_803318bc);
+                    uv.x = (float)((double)((float)(half + (double)(outVec->x / invAxis)) * FLOAT_803318bc) + half);
                 }
             } else if (axis == 0) {
-                invAxis = FLOAT_803318b8 * reflectOut.x;
-                if (reflectOut.x < FLOAT_80331898) {
+                invAxis = FLOAT_803318b8 * outVec->x;
+                if (outVec->x < FLOAT_80331898) {
                     clr[0] = (u8)(clr[0] - 0x7F);
-                    uv.x = (float)((half - (double)(reflectOut.z / invAxis)) * (double)FLOAT_803318bc +
+                    uv.x = (float)((half - (double)(outVec->z / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318c0);
-                    uv.y = (float)((half + (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                    uv.y = (float)((half + (double)(outVec->y / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318bc);
                 } else {
                     clr[0] = (u8)(clr[0] + 0x7F);
-                    uv.x = (float)((half - (double)(reflectOut.z / invAxis)) * (double)FLOAT_803318bc +
+                    uv.x = (float)((half - (double)(outVec->z / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318bc);
-                    uv.y = (float)((half - (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                    uv.y = (float)((half - (double)(outVec->y / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318bc);
                 }
             } else {
-                invAxis = FLOAT_803318b8 * reflectOut.z;
-                if (reflectOut.z < FLOAT_80331898) {
+                invAxis = FLOAT_803318b8 * outVec->z;
+                if (outVec->z < FLOAT_80331898) {
                     clr[2] = (u8)(clr[2] - 0x7F);
-                    uv.x = (float)((double)((float)(half + (double)(reflectOut.x / invAxis)) * FLOAT_803318bc) + half);
-                    uv.y = (float)((half + (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                    uv.x = (float)((double)((float)(half + (double)(outVec->x / invAxis)) * FLOAT_803318bc) + half);
+                    uv.y = (float)((half + (double)(outVec->y / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318bc);
                 } else {
                     clr[2] = (u8)(clr[2] + 0x7F);
-                    uv.x = (float)((half + (double)(reflectOut.x / invAxis)) * (double)FLOAT_803318bc);
-                    uv.y = (float)((half - (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                    uv.x = (float)((half + (double)(outVec->x / invAxis)) * (double)FLOAT_803318bc);
+                    uv.y = (float)((half - (double)(outVec->y / invAxis)) * (double)FLOAT_803318bc +
                                    (double)FLOAT_803318bc);
                 }
             }

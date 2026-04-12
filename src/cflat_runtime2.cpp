@@ -14,6 +14,7 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/ptrarray.h"
+#include "ffcc/quadobj.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
 #include <math.h>
@@ -618,6 +619,10 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj* obj)
 	self[0x38] &= 0xEF;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGQuadObj;
+}
+
+CGQuadObj::~CGQuadObj()
+{
 }
 
 /*

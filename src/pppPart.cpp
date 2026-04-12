@@ -55,6 +55,9 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
+extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
+extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
+extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
@@ -1744,9 +1747,28 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheLoadModel(short*, _pppDataHead*)
+void pppCacheLoadModel(short* modelList, _pppDataHead*)
 {
-	// TODO
+	short* modelIndices = modelList + 1;
+	short modelCount = *modelList;
+	u32 pppResSet = *reinterpret_cast<u32*>(pppMngStPtr->m_pppResSet);
+
+	for (short i = 0; i < modelCount; i++)
+	{
+		CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + modelIndices[i] * 4);
+		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
+
+		if (IsEnable__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex) == 0)
+		{
+			mapMesh->Ptr2Off();
+			*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
+			    GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
+			mapMesh->Off2Ptr();
+		}
+
+		AddRef__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex);
+		mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+	}
 }
 
 /*
@@ -1863,11 +1885,74 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		unsigned char m_pad;
 	};
 
-	pppMngStPtr = pppMngSt;
+	struct pppMngStStartRaw
+	{
+		void* m_pppResSet;
+		int m_partIndex;
+		Vec m_position;
+		int m_baseTime;
+		pppIVECTOR4 m_rotation;
+		int m_rotationSpeed;
+		int m_lifeEnd;
+		Vec m_scale;
+		int m_currentFrame;
+		int m_previousFrame;
+		int m_numControlPrograms;
+		float m_scaleFactor;
+		float m_ownerScale;
+		float m_userFloat0;
+		float m_userFloat1;
+		Vec m_savedPosition;
+		Vec m_previousPosition;
+		Vec m_paramVec0;
+		short m_kind;
+		short m_nodeIndex;
+		pppFMATRIX m_matrix;
+		unsigned char m_envColorR;
+		unsigned char m_envColorG;
+		unsigned char m_envColorB;
+		unsigned char m_envColorA;
+		int m_spawnedCount;
+		int m_previousFrame2;
+		int m_numPrograms;
+		int m_reservedB8;
+		unsigned int m_objHitMask;
+		unsigned int m_cylinderAttribute;
+		_pppPObjLink* m_objHead;
+		pppProgramSetDefRaw* m_programSetHead;
+		pppPDataValRaw* m_pDataVals;
+		void** m_controlTable;
+		void* m_programTable;
+		void* m_owner;
+		void* m_lookTarget;
+		CChara::CNode* m_bindNode;
+		unsigned char m_mode;
+		unsigned char m_stopRequested;
+		unsigned char m_isFinished;
+		unsigned char m_matrixMode;
+		unsigned char m_hitBgFlag;
+		unsigned char m_slotVisible;
+		unsigned char m_ownerFacing;
+		unsigned char m_drawVariant;
+		unsigned char m_rotationOrder;
+		unsigned char m_drawPass;
+		signed char m_drawSubType;
+		unsigned char m_useOwnerScaleSign;
+		unsigned char m_ownerFlagsInitialized;
+		unsigned char m_nodeScaleInitialized;
+		unsigned char m_fieldF2;
+		unsigned char m_mapTexLoaded;
+		unsigned char m_hasMapRef;
+		unsigned char m_fpBillboard;
+		unsigned char m_prio;
+		short m_frameCounter;
+	};
 
-	unsigned char* mngBytes = (unsigned char*)pppMngSt;
-	*(int*)(mngBytes + 0x24) = (int)pdt[0];
-	*(unsigned char*)(mngBytes + 0xF4) = (unsigned char)pdt[1];
+	pppMngStPtr = pppMngSt;
+	pppMngStStartRaw* mng = (pppMngStStartRaw*)pppMngSt;
+
+	mng->m_lifeEnd = (int)pdt[0];
+	mng->m_mode = (unsigned char)pdt[1];
 
 	short* modelList = (short*)((unsigned char*)pdt + pdt[4]);
 	short* shapeList = (short*)((unsigned char*)pdt + pdt[5]);
@@ -1875,9 +1960,9 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	if (Game.m_currentSceneId != 7) {
 		pppCacheLoadModel(modelList, (_pppDataHead*)pdt);
 		pppCacheLoadShape(shapeList, (_pppDataHead*)pdt);
-		*(unsigned char*)(mngBytes + 0xF5) = 1;
+		mng->m_mapTexLoaded = 1;
 	}
-	*(unsigned char*)(mngBytes + 0xE6) = 0;
+	mng->m_isFinished = 0;
 
 	int controlOffset = (int)pdt[2];
 	int programOffset = (int)pdt[3];
@@ -1885,30 +1970,30 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	int programCount = *(int*)((unsigned char*)pdt + programOffset);
 	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
 
-	*(int*)(mngBytes + 0xB4) = controlCount;
-	*(int*)(mngBytes + 0xB8) = programCount;
-	*(void**)(mngBytes + 0xCC) = (void*)((int*)((unsigned char*)pdt + controlOffset) + 1);
-	*(void**)(mngBytes + 0xD0) = (void*)((int*)((unsigned char*)pdt + programOffset) + 1);
+	mng->m_numControlPrograms = controlCount;
+	mng->m_numPrograms = programCount;
+	mng->m_controlTable = (void**)(((int*)((unsigned char*)pdt + controlOffset)) + 1);
+	mng->m_programTable = (void*)(((int*)((unsigned char*)pdt + programOffset)) + 1);
 
 	pppPDataValRaw* pDataVals = 0;
 	if (programCount > 0) {
 		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr, (char*)"pppPart.cpp", 0x585);
 	}
-	*(void**)(mngBytes + 0xC8) = pDataVals;
+	mng->m_pDataVals = pDataVals;
 
 	if (programSet->m_next != 0) {
-		*(void**)(mngBytes + 0xD4) = 0;
+		mng->m_programSetHead = 0;
 	}
 
-	*(int*)(mngBytes + 0x34) = 0;
+	mng->m_currentFrame = 0;
 	if (programCount == 0) {
-		*(void**)(mngBytes + 0xD4) = 0;
+		mng->m_programSetHead = 0;
 	} else {
-		*(void**)(mngBytes + 0xD4) = programSet;
+		mng->m_programSetHead = programSet;
 	}
 
-	*(_pppPObjLink**)(mngBytes + 0xC4) = 0;
-	*(int*)(mngBytes + 0xAC) = 0;
+	mng->m_objHead = 0;
+	mng->m_spawnedCount = 0;
 
 	if (pDataVals != 0) {
 		unsigned char index = 0;
@@ -1928,7 +2013,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (runControlPrograms != 0) {
 		int entryOffset = 0;
-		unsigned char* controlTable = *(unsigned char**)(mngBytes + 0xCC);
+		unsigned char* controlTable = (unsigned char*)mng->m_controlTable;
 		for (int i = 0; i < controlCount; i++) {
 			unsigned char* controlEntry = *(unsigned char**)(controlTable + entryOffset);
 			if (controlEntry != 0) {

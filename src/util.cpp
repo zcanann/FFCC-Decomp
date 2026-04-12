@@ -961,41 +961,63 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
  */
 void CUtil::SetPaletteEnv(CTexture* texture)
 {
-    GXColor tevColor1;
     GXColor tevColor2;
+    GXColor tevColor3;
 
     GXSetNumTevStages(3);
     GXSetNumTexGens(1);
-    *reinterpret_cast<u32*>(&tevColor1) = 0xFFFF0000;
-    *reinterpret_cast<u32*>(&tevColor2) = 0x0000FFFF;
-    GXSetTevColor(GX_TEVREG1, tevColor1);
-    GXSetTevColor(GX_TEVREG2, tevColor2);
+    *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
+    *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
+    GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
+    GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
 
-    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_ALPHA, GX_CH_ALPHA);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(static_cast<_GXTevSwapSel>(1), static_cast<_GXTevColorChan>(0),
+                           static_cast<_GXTevColorChan>(3), static_cast<_GXTevColorChan>(3),
+                           static_cast<_GXTevColorChan>(3));
+    _GXSetTevSwapModeTable(static_cast<_GXTevSwapSel>(2), static_cast<_GXTevColorChan>(2),
+                           static_cast<_GXTevColorChan>(2), static_cast<_GXTevColorChan>(2),
+                           static_cast<_GXTevColorChan>(3));
 
     GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    _GXSetTevColorIn(static_cast<_GXTevStageID>(0), static_cast<_GXTevColorArg>(0xF),
+                     static_cast<_GXTevColorArg>(8), static_cast<_GXTevColorArg>(4),
+                     static_cast<_GXTevColorArg>(0xF));
+    _GXSetTevColorOp(static_cast<_GXTevStageID>(0), static_cast<_GXTevOp>(0), static_cast<_GXTevBias>(0),
+                     static_cast<_GXTevScale>(0), 0, static_cast<_GXTevRegID>(0));
+    _GXSetTevSwapMode(static_cast<_GXTevStageID>(0), static_cast<_GXTevSwapSel>(0), static_cast<_GXTevSwapSel>(1));
+    _GXSetTevOrder(static_cast<_GXTevStageID>(0), static_cast<_GXTexCoordID>(0), static_cast<_GXTexMapID>(0),
+                   static_cast<_GXChannelID>(0xFF));
 
     GXSetTevDirect(GX_TEVSTAGE1);
-    _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C2, GX_CC_CPREV);
-    _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
-    _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
-    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP2);
-    _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
+    _GXSetTevColorIn(static_cast<_GXTevStageID>(1), static_cast<_GXTevColorArg>(0xF),
+                     static_cast<_GXTevColorArg>(8), static_cast<_GXTevColorArg>(6),
+                     static_cast<_GXTevColorArg>(0));
+    _GXSetTevAlphaIn(static_cast<_GXTevStageID>(1), static_cast<_GXTevAlphaArg>(7),
+                     static_cast<_GXTevAlphaArg>(6), static_cast<_GXTevAlphaArg>(4),
+                     static_cast<_GXTevAlphaArg>(7));
+    _GXSetTevColorOp(static_cast<_GXTevStageID>(1), static_cast<_GXTevOp>(0), static_cast<_GXTevBias>(0),
+                     static_cast<_GXTevScale>(0), 1, static_cast<_GXTevRegID>(0));
+    _GXSetTevAlphaOp(static_cast<_GXTevStageID>(1), static_cast<_GXTevOp>(0), static_cast<_GXTevBias>(0),
+                     static_cast<_GXTevScale>(0), 1, static_cast<_GXTevRegID>(0));
+    _GXSetTevSwapMode(static_cast<_GXTevStageID>(1), static_cast<_GXTevSwapSel>(0), static_cast<_GXTevSwapSel>(2));
+    _GXSetTevOrder(static_cast<_GXTevStageID>(1), static_cast<_GXTexCoordID>(0), static_cast<_GXTexMapID>(1),
+                   static_cast<_GXChannelID>(0xFF));
 
     GXSetTevDirect(GX_TEVSTAGE2);
-    _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
-    _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
-    _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
-    _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevColorIn(static_cast<_GXTevStageID>(2), static_cast<_GXTevColorArg>(0xF),
+                     static_cast<_GXTevColorArg>(0), static_cast<_GXTevColorArg>(0xA),
+                     static_cast<_GXTevColorArg>(0xF));
+    _GXSetTevAlphaIn(static_cast<_GXTevStageID>(2), static_cast<_GXTevAlphaArg>(7),
+                     static_cast<_GXTevAlphaArg>(0), static_cast<_GXTevAlphaArg>(5),
+                     static_cast<_GXTevAlphaArg>(7));
+    _GXSetTevColorOp(static_cast<_GXTevStageID>(2), static_cast<_GXTevOp>(0), static_cast<_GXTevBias>(0),
+                     static_cast<_GXTevScale>(0), 1, static_cast<_GXTevRegID>(0));
+    _GXSetTevAlphaOp(static_cast<_GXTevStageID>(2), static_cast<_GXTevOp>(0), static_cast<_GXTevBias>(0),
+                     static_cast<_GXTevScale>(0), 1, static_cast<_GXTevRegID>(0));
+    _GXSetTevSwapMode(static_cast<_GXTevStageID>(2), static_cast<_GXTevSwapSel>(0), static_cast<_GXTevSwapSel>(0));
+    _GXSetTevOrder(static_cast<_GXTevStageID>(2), static_cast<_GXTexCoordID>(0xFF),
+                   static_cast<_GXTexMapID>(0xFF), static_cast<_GXChannelID>(4));
 
     GXInitTexObjTlut(&texture->m_texObj, GX_TLUT0);
     GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);

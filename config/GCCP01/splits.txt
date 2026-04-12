@@ -1703,6 +1703,8 @@ dsp/dsp_debug.c:
 
 dsp/dsp_task.c:
 	.text       start:0x80197CFC end:0x80198580
+	.data       start:0x8021C038 end:0x8021C178
+	.sbss       start:0x8032F2C8 end:0x8032F2E0
 
 card/CARDBios.c:
 	.text       start:0x80198580 end:0x801998E8

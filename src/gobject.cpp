@@ -1819,10 +1819,8 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
         int nodeIndex = SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName);
         if (nodeIndex >= 0) {
             int weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
-            int setFlag = 1;
-            weaponFlags = __rlwimi(weaponFlags, setFlag, 0, 31, 31);
+            weaponFlags = weaponFlags | 1;
             *reinterpret_cast<u8*>(&m_weaponNodeFlags) = static_cast<u8>(weaponFlags);
-
             m_attachOwner = owner;
             m_attachNode = nodeIndex;
             m_attachLocal.x = attachLocal->x;

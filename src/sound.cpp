@@ -2089,25 +2089,27 @@ found_entry:
 int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
 {
     int ret;
-
+    char* se;
+    char* found;
+    int count;
+    
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
         ret = 0;
     } else {
-        char* se = reinterpret_cast<char*>(this) + 0x2C;
-        char* found;
+        se = reinterpret_cast<char*>(this) + 0x2C;
         ret = 0;
-        int count = 0x20;
+        count = 0x20;
         do {
-            if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 ((found = se + 0x28), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-                ((found = se + 0x50), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+            if (((((*se < '\0') && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                  ((found = se + 0x28), *found < '\0' && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+                 ((found = se + 0x50), *found < '\0' && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
+                ((se[0x78] < '\0' && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
                 goto found_entry;
             }
             ret += 3;
             se += 0xA0;
-            count--;
+            count = count + -1;
         } while (count != 0);
         found = 0;
 found_entry:

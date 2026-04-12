@@ -101,7 +101,7 @@ extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long,
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
+extern "C" int Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -2091,8 +2091,7 @@ int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
     int ret;
 
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
-        ret = 0;
+        ret = Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         char* se = reinterpret_cast<char*>(this) + 0x2C;
         char* found;

@@ -9,6 +9,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern float FLOAT_80330dac;
+extern "C" int __cntlzw(unsigned int);
 
 struct pppCVECTOR {
     u8 rgba[4];
@@ -47,16 +48,6 @@ struct _pppEnvStYmDeformationMdl {
     CMapMesh** m_mapMeshPtr;
 };
 extern _pppEnvStYmDeformationMdl* pppEnvStPtr;
-
-static inline Mtx& CameraMatrix()
-{
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
-}
-
-static inline Mtx44& CameraScreenMatrix()
-{
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
-}
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
@@ -212,7 +203,6 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 {
     pppYmDeformationMdlLayout* modelObject = (pppYmDeformationMdlLayout*)pppYmDeformationMdl;
     YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
-    pppYmDeformationMdlUnkB* renderParams = param_2;
     YmDeformationMdlColorInfo* colorInfo;
     Mtx indWarpMtx;
     Mtx44 screenMtx;
@@ -223,20 +213,18 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     float indMtx[2][3];
     float resetIndMtx[2][3];
     int textureIndex = 0;
-    int left;
-    int top;
-    int width;
-    int height;
+    int backBufferRect[3];
+    int backBufferHeight;
     int backTexture;
     pppModelSt* model;
     int textureBase;
 
-    if (renderParams->m_dataValIndex == 0xFFFF) {
+    if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
     colorInfo = (YmDeformationMdlColorInfo*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x80);
-    model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[renderParams->m_dataValIndex];
+    model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
     textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
 
     PSMTXIdentity(indWarpMtx);
@@ -244,9 +232,8 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorInfo->m_color, &modelObject->m_modelMatrix, renderParams->m_payload4, renderParams->m_payloadByte2B,
-        renderParams->m_payloadByte2A, renderParams->m_payloadByte28, renderParams->m_payloadByte29,
-        (u8)(renderParams->m_payloadByte2C == 0), 1, 0);
+        &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
+        param_2->m_payloadByte28, param_2->m_payloadByte29, (u8)((u32)__cntlzw((u32)param_2->m_payloadByte2C) >> 5), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -260,11 +247,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7, 4);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-    pppSetBlendMode(renderParams->m_payloadByte28);
-    if (renderParams->m_payloadByte28 == 0) {
+    pppSetBlendMode(param_2->m_payloadByte28);
+    if (param_2->m_payloadByte28 == 0) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 1);
     }
-    if (renderParams->m_payloadByte28 == 3) {
+    if (param_2->m_payloadByte28 == 3) {
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 1);
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
     }
@@ -277,18 +264,18 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     GXSetVtxDesc((GXAttr)11, GX_INDEX16);
     GXSetVtxDesc((GXAttr)13, GX_INDEX16);
 
-    left = 0;
-    top = 0;
-    width = 0x280;
-    height = 0x1c0;
-    backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
+    backBufferRect[0] = 0x280;
+    backBufferRect[2] = 0;
+    backBufferRect[1] = 0;
+    backBufferHeight = 0x1c0;
+    backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, backBufferRect[2], backBufferRect[1], backBufferRect[0], backBufferHeight, 0);
     if (backTexture != 0) {
         PSMTXIdentity(texMtx);
-        PSMTX44Copy(CameraScreenMatrix(), screenMtx);
-        PSMTXCopy(CameraMatrix(), cameraMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-        texMtx[0][0] = screenMtx[0][0] * (2.0f / (float)width);
-        texMtx[1][1] = screenMtx[1][1] * -(2.0f / (float)height);
+        texMtx[0][0] = screenMtx[0][0] * (2.0f / (float)backBufferRect[0]);
+        texMtx[1][1] = screenMtx[1][1] * -(2.0f / (float)backBufferHeight);
         texMtx[1][0] = screenMtx[1][0];
         texMtx[2][0] = screenMtx[2][0];
         texMtx[0][1] = screenMtx[0][1];

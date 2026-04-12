@@ -1544,11 +1544,11 @@ mtx/quat.c:
 dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0
 	.bss        start:0x8030C950 end:0x8030CA20
-	.sbss       start:0x8032F018 end:0x8032F054
+	.sbss       start:0x8032F018 end:0x8032F060
 
 dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
-	.sbss       start:0x8032F054 end:0x8032F074
+	.sbss       start:0x8032F060 end:0x8032F074
 
 dvd/dvd.c:
 	.text       start:0x80188A70 end:0x8018B16C
@@ -1630,6 +1630,7 @@ ax/AXAux.c:
 ax/AXCL.c:
 	.text       start:0x80191F7C end:0x801926B4
 	.bss        start:0x8030FAE0 end:0x803100E0
+	.sbss       start:0x8032F228 end:0x8032F240
 
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0

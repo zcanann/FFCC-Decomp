@@ -1,7 +1,5 @@
 #include <dolphin.h>
 #include <dolphin/ar.h>
-#include "dolphin/fake_tgmath.h"
-
 #include "dolphin/ar/__ar.h"
 
 #ifdef DEBUG
@@ -10,22 +8,21 @@ const char* __ARVersion = "<< Dolphin SDK - AR\tdebug build: Apr  5 2004 03:56:1
 const char* __ARVersion = "<< Dolphin SDK - AR\trelease build: Sep  5 2002 05:34:27 (0x2301) >>";
 #endif
 
-static void (*__AR_Callback)();
-static u32 __AR_Size;
-static u32 __AR_InternalSize;
-static u32 __AR_ExpansionSize;
-static u32 __AR_StackPointer;
-static u32 __AR_FreeBlocks;
-static u32*  __AR_BlockLength;
-static BOOL __AR_init_flag;
+BOOL __AR_init_flag = FALSE;
+u32* __AR_BlockLength = NULL;
+u32 __AR_FreeBlocks = 0;
+u32 __AR_StackPointer = 0;
+u32 __AR_ExpansionSize = 0;
+u32 __AR_InternalSize = 0;
+u32 __AR_Size = 0;
+void (*__AR_Callback)() = NULL;
 
 // prototypes
-static void __ARHandler(__OSInterrupt exception, OSContext* context);
-static void __ARWaitForDMA(void);
-static void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length);
-static void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length);
-static void __ARChecksize(void);
-static void __ARClearArea(u32 start_addr, u32 length);
+void __ARHandler(__OSInterrupt exception, OSContext* context);
+static inline void __ARWaitForDMA(void);
+static inline void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length);
+static inline void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length);
+void __ARChecksize(void);
 
 ARQCallback ARRegisterDMACallback(ARQCallback callback) {
     ARQCallback old_callback;
@@ -65,38 +62,6 @@ void ARStartDMA(u32 type, u32 mainmem_addr, u32 aram_addr, u32 length) {
     OSRestoreInterrupts(old);
 }
 
-u32 ARAlloc(u32 length) {
-    u32 tmp;
-    BOOL old;
-
-    old = OSDisableInterrupts();
-    ASSERTMSGLINE(430, !(length & 0x1F), "ARAlloc(): length is not multiple of 32bytes!");
-    ASSERTMSGLINE(434, length <= (__AR_Size - __AR_StackPointer), "ARAlloc(): Out of ARAM!");
-    ASSERTMSGLINE(435, __AR_FreeBlocks, "ARAlloc(): No more free blocks!");
-
-    tmp = __AR_StackPointer;
-    __AR_StackPointer += length;
-    *__AR_BlockLength = length;
-    __AR_BlockLength += 1;
-    __AR_FreeBlocks -= 1;
-    OSRestoreInterrupts(old);
-    return tmp;
-}
-
-u32 ARFree(u32* length) {
-    BOOL old;
-
-    old = OSDisableInterrupts();
-    __AR_BlockLength -= 1;
-    if (length) {
-        *length = *__AR_BlockLength;
-    }
-    __AR_StackPointer -= *__AR_BlockLength;
-    __AR_FreeBlocks += 1;
-    OSRestoreInterrupts(old);
-    return __AR_StackPointer;
-}
-
 BOOL ARCheckInit(void) {
     return __AR_init_flag;
 }
@@ -129,52 +94,7 @@ u32 ARInit(u32* stack_index_addr, u32 num_entries) {
     return __AR_StackPointer;
 }
 
-void ARReset(void) {
-    __AR_init_flag = FALSE;
-}
-
-void ARSetSize(void) {
-#ifdef DEBUG
-    OSReport("ARSetSize(): I don't do anything anymore!\n");
-#endif
-}
-
-u32 ARGetBaseAddress(void) {
-    return 0x4000;
-}
-
-u32 ARGetSize(void) {
-    return __AR_Size;
-}
-
-u32 ARGetInternalSize(void) {
-    return __AR_InternalSize;
-}
-
-void ARClear(u32 flag) {
-    switch (flag) {
-    case 0:
-        if (__AR_InternalSize != 0) {
-            __ARClearArea(0, __AR_InternalSize);
-        }
-        return;
-    case 1:
-        if (__AR_InternalSize != 0) {
-            __ARClearArea(0x4000, __AR_InternalSize - 0x4000);
-        }
-        break;
-    case 2:
-        if (__AR_InternalSize != 0 && __AR_ExpansionSize != 0) {
-            __ARClearArea(__AR_InternalSize, __AR_ExpansionSize);
-        }
-        break;
-    default:
-        ASSERTMSGLINE(774, 0, "ARClear(): Unknown flag.\n");
-        break;
-    }
-}
-
-static void __ARHandler(__OSInterrupt exception, OSContext* context) {
+void __ARHandler(__OSInterrupt exception, OSContext* context) {
     OSContext exceptionContext;
     u16 tmp;
 
@@ -202,11 +122,11 @@ u16 __ARGetInterruptStatus(void) {
     return __DSPRegs[5] & 0x20;
 }
 
-static void __ARWaitForDMA(void) {
+static inline void __ARWaitForDMA(void) {
     while (__DSPRegs[5] & 0x200);
 }
 
-static void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
+static inline void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
 	// Main mem address
 	__DSPRegs[DSP_ARAM_DMA_MM_HI] = (u16)((__DSPRegs[DSP_ARAM_DMA_MM_HI] & ~0x03ff) | (u16)(mmem_addr >> 16));
 	__DSPRegs[DSP_ARAM_DMA_MM_LO] = (u16)((__DSPRegs[DSP_ARAM_DMA_MM_LO] & ~0xffe0) | (u16)(mmem_addr & 0xffff));
@@ -225,7 +145,7 @@ static void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
     __ARClearInterrupt();
 }
 
-static void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
+static inline void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
 	// Main mem address
 	__DSPRegs[DSP_ARAM_DMA_MM_HI] = (u16)((__DSPRegs[DSP_ARAM_DMA_MM_HI] & ~0x03ff) | (u16)(mmem_addr >> 16));
 	__DSPRegs[DSP_ARAM_DMA_MM_LO] = (u16)((__DSPRegs[DSP_ARAM_DMA_MM_LO] & ~0xffe0) | (u16)(mmem_addr & 0xffff));
@@ -244,7 +164,7 @@ static void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
     __ARClearInterrupt();
 }
 
-static void __ARChecksize(void) {
+void __ARChecksize(void) {
     u8 test_data_pad[63];
     u8 dummy_data_pad[63];
     u8 buffer_pad[63];
@@ -413,34 +333,4 @@ static void __ARChecksize(void) {
 
     *(u32*)OSPhysicalToUncached(0x00D0) = ARAM_size;
     __AR_Size = ARAM_size;
-}
-
-static void __ARClearArea(u32 start_addr, u32 length) {
-    u8 zero_buffer[2079];
-    u8* ptr;
-    u32 curr_addr;
-    u32 curr_len;
-    u32 end_addr;
-    u32 remainder;
-
-    ASSERTMSGLINE(0x529, !(start_addr & 0x1F), "__ARClearArea(): Destination address not 32-byte aligned.\n");
-    ASSERTMSGLINE(0x52A, !(length & 0x1F), "__ARClearArea(): Length not multiple of 32 bytes.\n");
-
-    ptr = (u8*)(OSRoundUp32B((u32)(zero_buffer)));
-
-    do {} while(!(__DSPRegs[11] & 1));
-
-    memset(ptr, 0, 0x800);
-    DCFlushRange(ptr, 0x800);
-
-    curr_addr = start_addr;
-    end_addr = start_addr + length;
-
-    while (curr_addr < end_addr) {
-        remainder = end_addr - curr_addr;
- 
-        curr_len = OSRoundUp32B(remainder < 0x800 ? remainder : 0x800);
-        __ARWriteDMA((u32)ptr, curr_addr, curr_len);
-        curr_addr += curr_len;
-    }
 }

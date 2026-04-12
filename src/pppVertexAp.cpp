@@ -120,15 +120,12 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         count = data->spawnCount;
 
         switch (data->mode) {
-        case 0:
+        case 1:
             while (count-- != 0) {
-                if (state->index >= entry->maxValue) {
-                    state->index = 0;
-                }
-
-                u16 outValue = state->index;
+                f32 randValue = Math.RandF();
+                f32 maxValue = (f32)entry->maxValue;
+                int outValue = (int)(randValue * maxValue);
                 u16* vertexIndices = entry->vertexIndices;
-                state->index++;
                 u16 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -166,12 +163,15 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 }
             }
             break;
-        case 1:
+        case 0:
             while (count-- != 0) {
-                f32 randValue = Math.RandF();
-                f32 maxValue = (f32)entry->maxValue;
-                int outValue = (int)(randValue * maxValue);
+                if (state->index >= entry->maxValue) {
+                    state->index = 0;
+                }
+
+                u16 outValue = state->index;
                 u16* vertexIndices = entry->vertexIndices;
+                state->index++;
                 u16 vertexIndex = vertexIndices[outValue];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;

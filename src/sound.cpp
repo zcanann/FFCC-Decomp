@@ -136,6 +136,21 @@ struct CLine {
     float totalLength;
 };
 
+class CSound::CSe3D {
+public:
+    s8 m_flags;
+    u8 m_volume;
+    u8 m_pan;
+    s8 m_lineIndex;
+    int m_handle;
+    int m_playId;
+    int m_soundId;
+    float m_nearDistance;
+    float m_farDistance;
+    Vec m_position;
+    int m_group;
+};
+
 struct CSoundLayout {
     u32 m_redSoundWord0;
     CMemory::CStage* m_stage;
@@ -2136,19 +2151,19 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
     if (se3dHandle < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        char* se = reinterpret_cast<char*>(this) + 0x2C;
-        char* found;
+        CSe3D* se = reinterpret_cast<CSe3D*>(reinterpret_cast<u8*>(this) + 0x2C);
+        CSe3D* found;
         int remaining = 0x20;
 
         do {
-            if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 ((found = se + 0x28), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-                ((found = se + 0x50), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
-                (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+            if ((((se[0].m_flags < 0) && (found = &se[0], se[0].m_handle == se3dHandle)) ||
+                 ((se[1].m_flags < 0) && (found = &se[1], se[1].m_handle == se3dHandle))) ||
+                ((se[2].m_flags < 0) && (found = &se[2], se[2].m_handle == se3dHandle)) ||
+                ((se[3].m_flags < 0) && (found = &se[3], se[3].m_handle == se3dHandle))) {
                 goto found_entry;
             }
 
-            se += 0xA0;
+            se += 4;
             remaining--;
         } while (remaining != 0);
 
@@ -2156,7 +2171,7 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
 
 found_entry:
         if (found != 0) {
-            SePitch__9CRedSoundFiii(RedSound(this), *reinterpret_cast<int*>(found + 8), pitch << 8, frames);
+            SePitch__9CRedSoundFiii(RedSound(this), found->m_playId, pitch << 8, frames);
         }
     }
 }

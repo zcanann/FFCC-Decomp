@@ -463,89 +463,54 @@ unsigned int CMenuPcs::TmpArtiClose()
 	float fVar1;
 	double dVar2;
 	double dVar3;
-	short *psVar4;
+	TmpArtiEntry* entry;
 	int iVar5;
 	unsigned int uVar6;
 	int iVar7;
 	unsigned int uVar8;
+	TmpArtiState* state = GetTmpArtiStateStruct(this);
+	TmpArtiList* list = GetTmpArtiListStruct(this);
 	
 	iVar5 = 0;
-	*(short *)(GetTmpArtiStateBase(this) + 0x22) = *(short *)(GetTmpArtiStateBase(this) + 0x22) + 1;
-	uVar6 = (unsigned int)*GetTmpArtiList(this);
-	psVar4 = GetTmpArtiList(this) + 4;
-	iVar7 = (int)*(short *)(GetTmpArtiStateBase(this) + 0x22);
+	state->frame = state->frame + 1;
+	uVar6 = (unsigned int)list->count;
+	entry = list->entries;
+	iVar7 = (int)state->frame;
 	uVar8 = uVar6;
 	
 	if (0 < (int)uVar6) {
 		do {
 			dVar2 = DOUBLE_80332f40;
-			if (*(int *)(psVar4 + 0x12) <= iVar7) {
-				if (iVar7 < *(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14)) {
-					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
+			if (entry->startFrame <= iVar7) {
+				if (iVar7 < entry->startFrame + entry->duration) {
+					entry->timer = entry->timer + 1;
 					dVar3 = DOUBLE_80332f50;
-					*(float *)(psVar4 + 8) =
-					    (float)-((DOUBLE_80332f48 /
-					              ((double)(int)*(unsigned int *)(psVar4 + 0x14) - dVar2)) *
-					             ((double)(int)*(unsigned int *)(psVar4 + 0x10) - dVar2) -
-					             DOUBLE_80332f48);
-					if ((double)*(float *)(psVar4 + 8) < dVar3) {
-						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
+					entry->alpha =
+					    (float)-((DOUBLE_80332f48 / ((double)entry->duration - dVar2)) *
+					             ((double)entry->timer - dVar2) - DOUBLE_80332f48);
+					if ((double)entry->alpha < dVar3) {
+						entry->alpha = FLOAT_80332f2c;
 					}
 				}
 				else {
 					iVar5 = iVar5 + 1;
-					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
+					entry->alpha = FLOAT_80332f2c;
 				}
 			}
-			psVar4 = psVar4 + 0x20;
+			entry = entry + 1;
 			uVar8 = uVar8 - 1;
 		} while (uVar8 != 0);
 	}
 	
 	fVar1 = FLOAT_80332f2c;
-	if (*GetTmpArtiList(this) == iVar5) {
-		psVar4 = GetTmpArtiList(this) + 4;
+	if (list->count == iVar5) {
+		entry = list->entries;
 		if (0 < (int)uVar6) {
-			uVar8 = uVar6 >> 3;
-			if (uVar8 != 0) {
-				do {
-					*(int *)(psVar4 + 0x12) = 0;
-					*(int *)(psVar4 + 0x14) = 1;
-					*(float *)(psVar4 + 8) = fVar1;
-					*(int *)(psVar4 + 0x32) = 0;
-					*(int *)(psVar4 + 0x34) = 1;
-					*(float *)(psVar4 + 0x28) = fVar1;
-					*(int *)(psVar4 + 0x52) = 0;
-					*(int *)(psVar4 + 0x54) = 1;
-					*(float *)(psVar4 + 0x48) = fVar1;
-					*(int *)(psVar4 + 0x72) = 0;
-					*(int *)(psVar4 + 0x74) = 1;
-					*(float *)(psVar4 + 0x68) = fVar1;
-					*(int *)(psVar4 + 0x92) = 0;
-					*(int *)(psVar4 + 0x94) = 1;
-					*(float *)(psVar4 + 0x88) = fVar1;
-					*(int *)(psVar4 + 0xb2) = 0;
-					*(int *)(psVar4 + 0xb4) = 1;
-					*(float *)(psVar4 + 0xa8) = fVar1;
-					*(int *)(psVar4 + 0xd2) = 0;
-					*(int *)(psVar4 + 0xd4) = 1;
-					*(float *)(psVar4 + 200) = fVar1;
-					*(int *)(psVar4 + 0xf2) = 0;
-					*(int *)(psVar4 + 0xf4) = 1;
-					*(float *)(psVar4 + 0xe8) = fVar1;
-					psVar4 = psVar4 + 0x100;
-					uVar8 = uVar8 - 1;
-				} while (uVar8 != 0);
-				uVar6 = uVar6 & 7;
-				if (uVar6 == 0) {
-					return 1;
-				}
-			}
 			do {
-				*(int *)(psVar4 + 0x12) = 0;
-				*(int *)(psVar4 + 0x14) = 1;
-				*(float *)(psVar4 + 8) = fVar1;
-				psVar4 = psVar4 + 0x20;
+				entry->startFrame = 0;
+				entry->duration = 1;
+				entry->alpha = fVar1;
+				entry = entry + 1;
 				uVar6 = uVar6 - 1;
 			} while (uVar6 != 0);
 		}

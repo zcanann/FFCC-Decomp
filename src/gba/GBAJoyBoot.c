@@ -1,6 +1,6 @@
 #include "dolphin/gba/GBAPriv.h"
 
-static volatile u8 D54[] = {
+static volatile u8 D54[48] = {
     0x18, 0xFC, 0xC0, 0x80, 0x7f, 0x40, 0x3f, 0x01, 0x00, 0x2f, 0x2f, 0x20, 0x43, 0x6f, 0x64,
     0x65, 0x64, 0x20, 0x62, 0x79, 0x20, 0x4b, 0x61, 0x77, 0x61, 0x73, 0x65, 0x64, 0x6f, 0x00,
     0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0xAC, 0xC4, 0xF8, 0x08, 0x10, 0xBF, 0x18,
@@ -9,8 +9,7 @@ static volatile u8 D54[] = {
 static void F23(s32 chan, s32 ret);
 static void F25(s32 chan, s32 ret);
 static void F27(s32 chan, s32 ret);
-static void F29(s32 chan, s32 ret);
-static void F104(s32 chan, s32 ret);
+static inline void F104(s32 chan, s32 ret);
 void __GBAX01(s32 chan, s32 ret);
 static void F31(s32 chan, s32 ret);
 static void F33(s32 chan, s32 ret);
@@ -18,7 +17,7 @@ static void F35(s32 chan, s32 ret);
 static void F37(s32 chan, s32 ret);
 static void F39(s32 chan, s32 ret);
 
-static u32 F72(u32 crc, u32 src, vu8* keyp) {
+static inline u32 F72(u32 crc, u32 src, vu8* keyp) {
     int i;  // r31
     int poly =
         (keyp[0x13] << 8) + ((keyp[0x15] + (keyp[0x18] - (keyp[0x18] << 4))) - keyp[0x10]);  // r30
@@ -36,14 +35,14 @@ static u32 F72(u32 crc, u32 src, vu8* keyp) {
     return crc;
 }
 
-static u32 F95(u32 src, vu8* keyp) {
+static inline u32 F95(u32 src, vu8* keyp) {
     src = (src * ((keyp[3] << keyp[0x16]) |
                   ((keyp[1] | (keyp[4] << keyp[0x11])) | (keyp[4] << keyp[0x18])))) -
           (keyp[7] - keyp[6]);
     return src;
 }
 
-static void F104(s32 chan, s32 ret) {
+static inline void F104(s32 chan, s32 ret) {
     GBABootInfo* bootInfo;
     GBACallback callback;
 
@@ -54,19 +53,6 @@ static void F104(s32 chan, s32 ret) {
         bootInfo->callback = NULL;
         callback(chan, ret);
     }
-}
-
-static void F29(s32 chan, s32 ret) {
-    GBAControl* gba = &__GBA[chan];
-    GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
-
-    if (ret == GBA_READY) {
-        __GBAX02(chan, bootInfo->readbuf);
-    } else {
-        F104(chan, ret);
-    }
-
-    gba->ret = ret;
 }
 
 s32 GBAJoyBootAsync(s32 chan, s32 paletteColor, s32 paletteSpeed, u8* programp, s32 length,
@@ -135,6 +121,8 @@ static void F25(s32 chan, s32 ret) {
     gba->ret = ret;
 }
 
+static void F29(s32 chan, s32 ret);
+
 static void F27(s32 chan, s32 ret) {
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
@@ -144,6 +132,19 @@ static void F27(s32 chan, s32 ret) {
     }
 
     if (ret != GBA_READY || (ret = GBAReadAsync(chan, bootInfo->readbuf, bootInfo->status, F29))) {
+        F104(chan, ret);
+    }
+
+    gba->ret = ret;
+}
+
+static void F29(s32 chan, s32 ret) {
+    GBAControl* gba = &__GBA[chan];
+    GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
+
+    if (ret == GBA_READY) {
+        __GBAX02(chan, bootInfo->readbuf);
+    } else {
         F104(chan, ret);
     }
 

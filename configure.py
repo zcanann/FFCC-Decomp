@@ -904,7 +904,7 @@ config.libs = [
         [
             Object(Matching, "gba/GBA.c"),
             Object(Matching, "gba/GBAGetProcessStatus.c"),
-            Object(NonMatching, "gba/GBAJoyBoot.c"),
+            Object(Matching, "gba/GBAJoyBoot.c"),
             Object(Matching, "gba/GBARead.c"),
             Object(Matching, "gba/GBAWrite.c"),
             Object(Matching, "gba/GBAXfer.c"),

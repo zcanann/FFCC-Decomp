@@ -1194,7 +1194,6 @@ pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
 	extabindex  start:0x800107EC end:0x80010804
 	.text       start:0x8012B24C end:0x8012B4A8
-	.sdata2     start:0x80333858 end:0x80333860
 
 pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784
@@ -1785,6 +1784,7 @@ gx/GXGeometry.c:
 gx/GXFrameBuf.c:
 	.text       start:0x801A27D4 end:0x801A34F0
 	.data       start:0x8021C620 end:0x8021C710
+	.sdata2     start:0x80333850 end:0x80333860
 
 gx/GXLight.c:
 	.text       start:0x801A34F0 end:0x801A3B78

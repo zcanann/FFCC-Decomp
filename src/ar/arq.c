@@ -13,12 +13,12 @@ static ARQRequest* __ARQRequestQueueHi;
 static ARQRequest* __ARQRequestTailHi;
 static ARQRequest* __ARQRequestQueueLo;
 static ARQRequest* __ARQRequestTailLo;
-static ARQRequest* __ARQRequestPendingHi;
-static ARQRequest* __ARQRequestPendingLo;
-static ARQCallback __ARQCallbackHi;
-static ARQCallback __ARQCallbackLo;
-static u32 __ARQChunkSize;
-static BOOL __ARQ_init_flag;
+BOOL __ARQ_init_flag;
+u32 __ARQChunkSize;
+ARQCallback __ARQCallbackLo;
+ARQCallback __ARQCallbackHi;
+ARQRequest* __ARQRequestPendingLo;
+ARQRequest* __ARQRequestPendingHi;
 
 static inline void __ARQPopTaskQueueHi(void) {
     if (__ARQRequestQueueHi) {

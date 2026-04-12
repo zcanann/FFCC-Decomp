@@ -41,32 +41,24 @@ u8 GetRandomData()
  * JP Address: TODO
  * JP Size: TODO
  */
-int PitchCompute(int param_1, int param_2, int param_3, int param_4)
+int PitchCompute(int param_1, int param_2, int param_3, u32 param_4)
 {
-    int pitch;
+    u32 pitch;
     int octaveAdjust;
-    int noteBand;
-    int octave;
-    int note;
+    u32 noteBand;
     int value;
 
-    pitch = (param_1 >> 12) + param_2 + (param_3 >> 16);
     octaveAdjust = 0;
-    if (pitch < 0) {
-        do {
-            pitch = pitch + 0xC00;
-            octaveAdjust = octaveAdjust - 1;
-        } while (pitch < 0);
+    for (pitch = (param_1 >> 12) + param_2 + (param_3 >> 16); (int)pitch < 0; pitch += 0xC00) {
+        octaveAdjust += -1;
     }
 
     noteBand = (pitch >> 8) & 0x7F;
-    octave = noteBand / 12;
-    octaveAdjust = octaveAdjust + octave;
-    note = noteBand - (octave * 12);
-    value = (int)((DAT_8021d7f0[note] >> (10 - octaveAdjust)) * DAT_8021d820[pitch & 0xFF]) >> 12;
+    octaveAdjust += noteBand / 12;
+    value = (int)((DAT_8021d7f0[noteBand % 12] >> (10 - octaveAdjust)) * DAT_8021d820[pitch & 0xFF]) >> 12;
 
     if (param_4 != 0) {
-        if (param_4 <= 0) {
+        if ((int)param_4 < 1) {
             value = (int)(value * (param_4 & 0xFF)) >> 8;
         } else {
             value = value + ((int)(value * (param_4 + 1)) >> 7);

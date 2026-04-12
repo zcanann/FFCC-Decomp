@@ -419,10 +419,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             Vec vtx3;
             float u0 = uvMin.x + (f32)x * uStep;
             float u1 = uvMin.x + (f32)(x + 1) * uStep;
-            float c0 = drawColor;
-            float c1 = drawColor;
-            float c2 = drawColor;
-            float c3 = drawColor;
+            float colorValue;
 
             pppCopyVector(vtx0, p0Data->m_position);
             pppCopyVector(vtx1, p1Data->m_position);
@@ -445,30 +442,36 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
                 vtx3.z = phaseLerp * (worldZ - vtx3.z) + vtx3.z;
             }
 
+            colorValue = drawColor;
             if (p0Data->m_color.m_bytes[3] == 0) {
-                c0 = p0Data->m_color.m_colorValue;
+                colorValue = p0Data->m_color.m_colorValue;
             }
-            if (p1Data->m_color.m_bytes[3] == 0) {
-                c1 = p1Data->m_color.m_colorValue;
-            }
-            if (p2Data->m_color.m_bytes[3] == 0) {
-                c2 = p2Data->m_color.m_colorValue;
-            }
-            if (p3Data->m_color.m_bytes[3] == 0) {
-                c3 = p3Data->m_color.m_colorValue;
-            }
-
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);
-            GXColor1u32(*(u32*)&c0);
+            GXColor1u32(*(u32*)&colorValue);
             GXTexCoord2f32(u0, v1);
+
+            colorValue = drawColor;
+            if (p1Data->m_color.m_bytes[3] == 0) {
+                colorValue = p1Data->m_color.m_colorValue;
+            }
             GXPosition3f32(vtx1.x, vtx1.y, vtx1.z);
-            GXColor1u32(*(u32*)&c1);
+            GXColor1u32(*(u32*)&colorValue);
             GXTexCoord2f32(u0, v0);
+
+            colorValue = drawColor;
+            if (p2Data->m_color.m_bytes[3] == 0) {
+                colorValue = p2Data->m_color.m_colorValue;
+            }
             GXPosition3f32(vtx2.x, vtx2.y, vtx2.z);
-            GXColor1u32(*(u32*)&c2);
+            GXColor1u32(*(u32*)&colorValue);
             GXTexCoord2f32(u1, v0);
+
+            colorValue = drawColor;
+            if (p3Data->m_color.m_bytes[3] == 0) {
+                colorValue = p3Data->m_color.m_colorValue;
+            }
             GXPosition3f32(vtx3.x, vtx3.y, vtx3.z);
-            GXColor1u32(*(u32*)&c3);
+            GXColor1u32(*(u32*)&colorValue);
             GXTexCoord2f32(u1, v1);
             x++;
         }

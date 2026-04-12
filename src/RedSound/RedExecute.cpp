@@ -41,7 +41,7 @@ u8 GetRandomData()
  * JP Address: TODO
  * JP Size: TODO
  */
-int PitchCompute(int param_1, int param_2, int param_3, u32 param_4)
+int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 {
     u32 pitch;
     int octaveAdjust;

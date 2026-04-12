@@ -265,13 +265,11 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     s16 frameCount;
     s16 decayCount;
-    Vec particlePos;
-    Vec worldPos;
     Vec basePos;
     Vec delta;
     Vec impulse;
-    Vec currentPos;
-    long** shapeTable;
+    Vec worldPos;
+    long* shape;
 
     frameCount = state->m_fadeFrames;
     if (frameCount > 0) {
@@ -325,10 +323,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         InitParticleData(vData, pppPObject, pYmMiasma, particleData);
     }
 
-    particlePos.x = particleData->m_matrix[0][0];
-    particlePos.y = particleData->m_matrix[0][1];
-    particlePos.z = particleData->m_matrix[0][2];
-    pppCopyVector(worldPos, particlePos);
+    pppCopyVector(worldPos, *(Vec*)particleData);
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
     if ((s32)Game.m_currentSceneId != 7) {
@@ -341,7 +336,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     pppSubVector(delta, basePos, worldPos);
-    if (pppVectorLength__F3Vec(&delta) < vData->m_radius - pYmMiasma->m_minDistance) {
+    if (pppVectorLength__F3Vec(&delta) < (vData->m_radius - pYmMiasma->m_minDistance)) {
         state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
         state->m_hasImpulse = 1;
     }
@@ -358,19 +353,12 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     if (vData->m_speedDecay != FLOAT_80330644 && state->m_hasImpulse == 0) {
         impulse = vData->m_impulse;
         PSVECScale(&impulse, &impulse, state->m_speedDecay);
-        currentPos.x = particleData->m_matrix[0][0];
-        currentPos.y = particleData->m_matrix[0][1];
-        currentPos.z = particleData->m_matrix[0][2];
-        pppAddVector(*(Vec*)particleData, currentPos, impulse);
+        pppAddVector(*(Vec*)particleData, *(Vec*)particleData, impulse);
     }
 
     if ((u16)pYmMiasma->m_dataValIndex != 0xffff) {
-        shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
-        pppCalcFrameShape(
-            shapeTable[pYmMiasma->m_dataValIndex],
-            state->m_shapeCurrentFrame,
-            state->m_shapeDrawFrame,
-            state->m_shapeFrameTime,
+        shape = (*(long***)pppEnvStPtr->m_particleColors)[pYmMiasma->m_dataValIndex];
+        pppCalcFrameShape(shape, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,
             (short)pYmMiasma->m_shapeFrameStep);
     }
 }

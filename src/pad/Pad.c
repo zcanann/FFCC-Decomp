@@ -50,7 +50,6 @@ static PADStatus Origin[4];
 
 u32 PrintDebugPalCaution_message;
 u32 __PADSpec;
-AISCallback __AIS_Callback;
 
 // prototypes
 static void PADTypeAndStatusCallback(s32 chan, u32 type);

@@ -1611,7 +1611,7 @@ ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
 	.data       start:0x80217C98 end:0x80217CE0
 	.sdata      start:0x8032EB48 end:0x8032EB4C
-	.sbss       start:0x8032F1D8 end:0x8032F200
+	.sbss       start:0x8032F1D8 end:0x8032F1E8
 
 ax/AX.c:
 	.text       start:0x801915A4 end:0x80191614
@@ -1621,17 +1621,17 @@ ax/AX.c:
 ax/AXAlloc.c:
 	.text       start:0x80191614 end:0x80191ADC
 	.bss        start:0x8030CCE0 end:0x8030CDE0
-	.sbss       start:0x8032F200 end:0x8032F204
+	.sbss       start:0x8032F1E8 end:0x8032F1EC
 
 ax/AXAux.c:
 	.text       start:0x80191ADC end:0x80191F7C
 	.bss        start:0x8030CDE0 end:0x8030FAE0
-	.sbss       start:0x8032F204 end:0x8032F228
+	.sbss       start:0x8032F1F0 end:0x8032F224
 
 ax/AXCL.c:
 	.text       start:0x80191F7C end:0x801926B4
 	.bss        start:0x8030FAE0 end:0x803100E0
-	.sbss       start:0x8032F228 end:0x8032F240
+	.sbss       start:0x8032F228 end:0x8032F23C
 
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0

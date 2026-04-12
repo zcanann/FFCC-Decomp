@@ -2131,49 +2131,30 @@ found_entry:
 void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
 {
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
-        return;
-    }
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
+    } else {
+        char* se = reinterpret_cast<char*>(this) + 0x2C;
+        char* found;
+        int remaining = 0x20;
 
-    s8* se = reinterpret_cast<s8*>(this) + 0x2C;
-    s8* found = 0;
-    int remaining = 0x20;
-    while (remaining != 0) {
-        found = se;
-        if ((se[0] < 0) && (*reinterpret_cast<int*>(se + 4) == se3dHandle)) {
-            break;
-        }
+        do {
+            if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 ((found = se + 0x28), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+                ((found = se + 0x50), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
+                (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+                goto found_entry;
+            }
 
-        found = se + 0x28;
-        u8 secondMatched = 0;
-        if ((se[0x28] < 0) && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) {
-            secondMatched = 1;
-        }
-        if (secondMatched != 0) {
-            break;
-        }
+            se += 0xA0;
+            remaining--;
+        } while (remaining != 0);
 
-        found = se + 0x50;
-        u8 thirdMatched = 0;
-        if ((se[0x50] < 0) && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) {
-            thirdMatched = 1;
-        }
-        if (thirdMatched != 0) {
-            break;
-        }
-
-        if ((se[0x78] < 0) && (*reinterpret_cast<int*>(se + 0x7C) == se3dHandle)) {
-            found = se + 0x78;
-            break;
-        }
-
-        remaining--;
-        se += 0xA0;
         found = 0;
-    }
 
-    if (found != 0) {
-        SePitch__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(found + 8), pitch << 8, frames);
+found_entry:
+        if (found != 0) {
+            SePitch__9CRedSoundFiii(RedSound(this), *reinterpret_cast<int*>(found + 8), pitch << 8, frames);
+        }
     }
 }
 

@@ -26,10 +26,11 @@ void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+    void*, long, float&, float&, float&, float, float&, float&);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
+int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(_pppMngSt*, float, Mtx);
 int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
@@ -204,11 +205,11 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	}
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		*(float*)(step->m_payload + 0x10), baseObj, step->m_graphId, &work->m_halfWidth, &work->_unk14, &work->_unk18,
-		(float*)(step->m_payload + 0x14), (float*)(step->m_payload + 0x18));
+		baseObj, step->m_graphId, work->m_halfWidth, work->_unk14, work->_unk18, *(float*)(step->m_payload + 0x10),
+		*(float*)(step->m_payload + 0x14), *(float*)(step->m_payload + 0x18));
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		*(float*)(step->m_payload + 4), baseObj, step->m_graphId, &work->m_speed, &work->_unk8, &work->_unkC,
-		(float*)(step->m_payload + 8), (float*)(step->m_payload + 0xc));
+		baseObj, step->m_graphId, work->m_speed, work->_unk8, work->_unkC, *(float*)(step->m_payload + 4),
+		*(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
 	pppCalcFrameShape(
 		*(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeB,
@@ -236,7 +237,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		} else if (!emptyHistory) {
 			double t = (FLOAT_80330de0 / (float)((double)(int)(step->m_payload[0x3a] + 1) - DOUBLE_80330dd8)) *
 				(float)((double)(int)i - DOUBLE_80330dd8);
-			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f((float)t, pppMngStPtr, charaMtx) == 0) {
+			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, (float)t, charaMtx) == 0) {
 				emptyHistory = true;
 			} else {
 				PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);

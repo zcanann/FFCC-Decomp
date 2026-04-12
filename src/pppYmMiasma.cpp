@@ -106,6 +106,18 @@ struct YmMiasmaParticleState {
     s16 m_shapeDrawFrame;
 };
 
+struct YmMiasmaRenderParticleState {
+    Vec m_position;
+    u8 m_pad0C[0x14];
+    YmMiasmaParticleColor m_color;
+    u8 m_pad28[0x10];
+    s16 m_shapeAngle;
+    u8 m_pad3A[6];
+    float m_speed;
+    u8 m_pad44[0xA];
+    s16 m_shapeDrawFrame;
+};
+
 struct YmMiasmaRenderStep {
     u32 m_graphId;
     s32 m_dataValIndex;
@@ -561,7 +573,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
 
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
-            YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
+            YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
             long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
@@ -579,7 +591,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             scaleMatrix = model;
             pppMulMatrix(model, rotMatrix, scaleMatrix);
 
-            pppCopyVector(worldPos, *(Vec*)particleData);
+            pppCopyVector(worldPos, state->m_position);
             if (Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {

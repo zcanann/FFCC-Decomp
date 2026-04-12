@@ -9,19 +9,9 @@
 
 #define GDEV_BUF_SIZE (0x500)
 
-typedef struct GdevRecvCB {
-    CircleBuffer cb;
-    u32 reserved;
-} GdevRecvCB;
-
-typedef struct GdevInitFlag {
-    BOOL value;
-    u32 reserved;
-} GdevInitFlag;
-
-static GdevRecvCB gRecvCB;
+static CircleBuffer gRecvCB;
 static u8 gRecvBuf[GDEV_BUF_SIZE] ATTRIBUTE_ALIGN(32);
-static GdevInitFlag gIsInitialized;
+static BOOL gIsInitialized;
 
 static const char gdev_cc_write_not_initialized[] = "cc not initialized\n";
 static const char gdev_cc_write_output_data[] = "cc_write : Output data 0x%08x %ld bytes\n";
@@ -40,68 +30,106 @@ static const char gdev_cc_initialize_done_calling_exi2_init[] = "DONE CALLING EX
  * JP Address: TODO
  * JP Size: TODO
  */
-int gdev_cc_initinterrupts(void)
+int gdev_cc_initialize(void* inputPendingPtrRef, __OSInterruptHandler monitorCallback)
 {
-    DBInitInterrupts();
+    MWTRACE(1, (char*)gdev_cc_initialize_calling_exi2_init);
+    DBInitComm(inputPendingPtrRef, monitorCallback);
+    MWTRACE(1, (char*)gdev_cc_initialize_done_calling_exi2_init);
+    CircleBufferInitialize(&gRecvCB, gRecvBuf, GDEV_BUF_SIZE);
     return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801AF2D4
- * PAL Size: 112b
+ * PAL Address: 0x801AF56C
+ * PAL Size: 8b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int gdev_cc_peek(void)
+int gdev_cc_shutdown()
 {
-    int poll;
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AF548
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int gdev_cc_open()
+{
+    if (gIsInitialized) {
+        return GDEV_ERR_ALREADY_INITIALIZED;
+    }
+
+    gIsInitialized = TRUE;
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AF540
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int gdev_cc_close()
+{
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AF44C
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int gdev_cc_read(u8* data, int size)
+{
     u8 buff[GDEV_BUF_SIZE];
+    int originalDataSize;
+    u32 result;
+    int expectedDataSize;
+    int poll;
 
-    poll = DBQueryData();
-    if (poll <= 0) {
-        return 0;
+    result = 0;
+    if (!gIsInitialized) {
+        return GDEV_ERR_NOT_INITIALIZED;
     }
 
-    if (DBRead(buff, poll) == 0) {
-        CircleBufferWriteBytes(&gRecvCB.cb, buff, poll);
+    MWTRACE(1, (char*)gdev_cc_read_expected_packet_size, size, size);
+
+    originalDataSize = size;
+    expectedDataSize = size;
+    while ((u32)CBGetBytesAvailableForRead(&gRecvCB) < expectedDataSize) {
+        result = 0;
+        poll = DBQueryData();
+        if (poll != 0) {
+            result = DBRead(buff, expectedDataSize);
+            if (result == 0) {
+                CircleBufferWriteBytes(&gRecvCB, buff, poll);
+            }
+        }
+    }
+
+    if (result == 0) {
+        CircleBufferReadBytes(&gRecvCB, data, originalDataSize);
     } else {
-        return GDEV_ERR_READ_ERROR;
+        MWTRACE(8, (char*)gdev_cc_read_error, result);
     }
 
-    return poll;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801AF344
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int gdev_cc_post_stop(void)
-{
-    DBOpen();
-    return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801AF368
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int gdev_cc_pre_continue(void)
-{
-    DBClose();
-    return 0;
+    return result;
 }
 
 /*
@@ -122,7 +150,7 @@ int gdev_cc_write(const u8* bytes, int length)
     hexCopy = (u32)bytes;
     n_copy = length;
 
-    if (gIsInitialized.value == FALSE) {
+    if (gIsInitialized == FALSE) {
         MWTRACE(8, (char*)gdev_cc_write_not_initialized);
         return GDEV_ERR_NOT_INITIALIZED;
     }
@@ -145,111 +173,73 @@ int gdev_cc_write(const u8* bytes, int length)
 
 /*
  * --INFO--
- * PAL Address: 0x801AF44C
- * PAL Size: 244b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int gdev_cc_read(u8* data, int size)
-{
-    u8 buff[GDEV_BUF_SIZE];
-    int originalDataSize;
-    u32 result;
-    int expectedDataSize;
-    int poll;
-
-    result = 0;
-    if (!gIsInitialized.value) {
-        return GDEV_ERR_NOT_INITIALIZED;
-    }
-
-    MWTRACE(1, (char*)gdev_cc_read_expected_packet_size, size, size);
-
-    originalDataSize = size;
-    expectedDataSize = size;
-    while ((u32)CBGetBytesAvailableForRead(&gRecvCB.cb) < expectedDataSize) {
-        result = 0;
-        poll = DBQueryData();
-        if (poll != 0) {
-            result = DBRead(buff, expectedDataSize);
-            if (result == 0) {
-                CircleBufferWriteBytes(&gRecvCB.cb, buff, poll);
-            }
-        }
-    }
-
-    if (result == 0) {
-        CircleBufferReadBytes(&gRecvCB.cb, data, originalDataSize);
-    } else {
-        MWTRACE(8, (char*)gdev_cc_read_error, result);
-    }
-
-    return result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801AF540
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int gdev_cc_close(void)
-{
-    return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801AF548
+ * PAL Address: 0x801AF368
  * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int gdev_cc_open(void)
+int gdev_cc_pre_continue()
 {
-    if (gIsInitialized.value) {
-        return GDEV_ERR_ALREADY_INITIALIZED;
+    DBClose();
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AF344
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int gdev_cc_post_stop()
+{
+    DBOpen();
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AF2D4
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int gdev_cc_peek()
+{
+    int poll;
+    u8 buff[GDEV_BUF_SIZE];
+
+    poll = DBQueryData();
+    if (poll <= 0) {
+        return 0;
     }
 
-    gIsInitialized.value = TRUE;
-    return 0;
+    if (DBRead(buff, poll) == 0) {
+        CircleBufferWriteBytes(&gRecvCB, buff, poll);
+    } else {
+        return GDEV_ERR_READ_ERROR;
+    }
+
+    return poll;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801AF56C
- * PAL Size: 8b
+ * PAL Address: 0x801AF2B0
+ * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int gdev_cc_shutdown(void)
+int gdev_cc_initinterrupts()
 {
-    return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801AF574
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int gdev_cc_initialize(void* inputPendingPtrRef, __OSInterruptHandler monitorCallback)
-{
-    MWTRACE(1, (char*)gdev_cc_initialize_calling_exi2_init);
-    DBInitComm(inputPendingPtrRef, monitorCallback);
-    MWTRACE(1, (char*)gdev_cc_initialize_done_calling_exi2_init);
-    CircleBufferInitialize(&gRecvCB.cb, gRecvBuf, GDEV_BUF_SIZE);
+    DBInitInterrupts();
     return 0;
 }

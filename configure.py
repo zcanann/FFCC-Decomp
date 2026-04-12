@@ -1051,7 +1051,7 @@ config.libs = [
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
             ),
             Object(
-                NonMatching,
+                Matching,
                 "TRK_MINNOW_DOLPHIN/main_gdev.c",
                 mw_version="GC/1.3.2",
                 cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],

@@ -355,15 +355,13 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     s32 dataOffset;
     s32 dataValIndex;
     u32 i;
-    u16 count;
     PackedColor colorTop;
     PackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
     f32 alphaScale;
-    u32 format;
-    int textureIndex;
+    int textureIndex[2];
 
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
@@ -380,9 +378,10 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
-        textureIndex = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
-        if (texture != nullptr) {
+        textureIndex[0] = 0;
+        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
+                                                                     textureIndex[0]);
+        if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
             GXSetNumTexGens(1);
@@ -393,7 +392,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
             _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-            format = (u32)texture->m_format;
+            u32 format = (u32)texture->m_format;
             if ((format == 8) || (format == 9)) {
                 SetUpPaletteEnv(texture);
             }
@@ -404,15 +403,14 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
             }
 
-            count = work->visibleCount;
-            uvStep = FLOAT_80331844 / (f32)((f64)count - DOUBLE_80331850);
+            uvStep = FLOAT_80331844 / (f32)((f64)work->visibleCount - DOUBLE_80331850);
             GXSetCullMode(GX_CULL_NONE);
 
-            if (count > 1) {
+            if (work->visibleCount > 1) {
                 alphaScale = (f32)colorData[0x0B] / FLOAT_80331848;
-                GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (count - 1) * 4);
+                GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
-                for (i = 0; i < (u32)(count - 1); i++) {
+                for (i = 0; i < (u32)(work->visibleCount - 1); i++) {
                     TRACE_POLYGON* next = poly + 1;
 
                     uTop = (f32)((f64)(s32)i * (f64)uvStep);

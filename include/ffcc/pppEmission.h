@@ -25,8 +25,8 @@ struct pppEmission {
 struct pppEmissionUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u8 _pad0[2];
+    u8 m_initWOrk;
+    u8 _pad8[3];
     f32 m_stepValue;
     f32 m_arg3;
     u8 m_payload[0x20];
@@ -56,4 +56,3 @@ void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*);
 #endif
 
 #endif // _PPPEMISSION_H_
-

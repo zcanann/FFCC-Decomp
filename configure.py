@@ -889,7 +889,7 @@ config.libs = [
             Object(Matching, "gx/GXTev.c"),
             Object(Matching, "gx/GXTexture.c"),
             Object(
-                NonMatching,
+                Matching,
                 "gx/GXTransform.c",
                 cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
             ),

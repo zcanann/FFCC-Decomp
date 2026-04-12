@@ -67,6 +67,17 @@ struct Vec2d {
     f32 y;
 };
 
+struct CMapCylinderRaw {
+    Vec m_bottom;
+    Vec m_direction;
+    f32 m_radius;
+    f32 m_height;
+    Vec m_top;
+    Vec m_direction2;
+    f32 m_radius2;
+    f32 m_height2;
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -94,20 +105,20 @@ extern "C" void CalcPolygonHeight(
 {
     int i;
     int pointCount;
-    float savedY;
+    float previousY;
     float zero;
     float rayY;
     float top;
     float expand;
     Vec worldBase;
     Vec rayDirection;
-    CMapCylinder cylinder;
+    CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
     u8* colorBytes = (u8*)color;
 
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
-    savedY = pppMngStPtr->m_savedPosition.y;
+    previousY = pppMngStPtr->m_previousPosition.y;
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
@@ -142,24 +153,24 @@ extern "C" void CalcPolygonHeight(
         cylinder.m_height2 = expand;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) == 0) {
-            vertex->m_position.y = savedY;
-            if (vertexData->m_hideWhenNoGround != 0) {
-                vertex->m_color.m_bytes[0] = 0;
-                vertex->m_color.m_bytes[1] = 0;
-                vertex->m_color.m_bytes[2] = 0;
-                vertex->m_color.m_bytes[3] = 0;
-            }
-        } else {
+                &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &vertex->m_position);
-            if ((savedY - vertexData->m_maxDropDistance) > vertex->m_position.y) {
-                vertex->m_position.y = savedY;
+            if ((previousY - vertexData->m_maxDropDistance) > vertex->m_position.y) {
+                vertex->m_position.y = previousY;
                 if (vertexData->m_hideWhenNoGround != 0) {
                     vertex->m_color.m_bytes[0] = 0;
                     vertex->m_color.m_bytes[1] = 0;
                     vertex->m_color.m_bytes[2] = 0;
                     vertex->m_color.m_bytes[3] = 0;
                 }
+            }
+        } else {
+            vertex->m_position.y = previousY;
+            if (vertexData->m_hideWhenNoGround != 0) {
+                vertex->m_color.m_bytes[0] = 0;
+                vertex->m_color.m_bytes[1] = 0;
+                vertex->m_color.m_bytes[2] = 0;
+                vertex->m_color.m_bytes[3] = 0;
             }
         }
 

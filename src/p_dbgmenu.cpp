@@ -439,30 +439,32 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 	static char sStateOff[] = "OFF";
 	static char sStateUnknown[] = "?";
 	CDM* head = menu;
+
 	do {
 		m_currentMenu = menu;
 		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 480.0f, 0.0f, 1.0f);
 
-		s32 type = menu->m_type;
+		int type = menu->m_type;
 		if (type == 2) {
-			s32 state = menu->m_state;
-			drawWindow(((-state | state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
-			char* stateText = sStateUnknown;
-			if (state == 1) {
+			drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+			char* stateText;
+			if (menu->m_state == 1) {
 				stateText = sStateOn;
-			} else if (state == 0) {
-				stateText = sStateOff;
+			} else {
+				stateText = sStateUnknown;
+				if (menu->m_state == 0) {
+					stateText = sStateOff;
+				}
 			}
 			drawFont(9, 0x10, 8, stateText);
 		} else if (type < 2) {
 			if (type == 0) {
 				drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
-			} else if (type == 1) {
+			} else if (type >= 0) {
 				drawFont(menu->m_y, 0, 0, menu->m_text);
 			}
 		} else if (type < 4) {
-			s32 state = menu->m_state;
-			drawWindow(((-state | state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+			drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
 		}
 
 		menu = menu->m_next;

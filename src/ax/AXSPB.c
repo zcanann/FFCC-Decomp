@@ -5,8 +5,8 @@
 
 static AXSPB __AXStudio ATTRIBUTE_ALIGN(32);
 
-extern s32 __AXSpbAL;
-extern s32 __AXSpbAR;
+static s32 __AXSpbAL;
+static s32 __AXSpbAR;
 static s32 __AXSpbAS;
 static s32 __AXSpbAAL;
 static s32 __AXSpbAAR;

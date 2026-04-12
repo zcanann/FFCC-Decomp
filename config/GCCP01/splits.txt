@@ -1635,12 +1635,12 @@ ax/AXCL.c:
 ax/AXOut.c:
 	.text       start:0x801926B4 end:0x80192DA0
 	.bss        start:0x803100E0 end:0x803148E8
-	.sbss       start:0x8032F240 end:0x8032F270
+	.sbss       start:0x8032F240 end:0x8032F268
 
 ax/AXSPB.c:
 	.text       start:0x80192DA0 end:0x80193268
 	.bss        start:0x80314900 end:0x80314940
-	.sbss       start:0x8032F270 end:0x8032F28C
+	.sbss       start:0x8032F268 end:0x8032F28C
 
 ax/AXVPB.c:
 	.text       start:0x80193268 end:0x80193E28

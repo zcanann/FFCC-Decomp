@@ -182,7 +182,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 
         u8 mode = step->m_payload[9];
         if (mode == 0) {
-            for (u32 i = 0; i < (u8)step->m_initWOrk; i++) {
+            for (u32 i = 0; i < step->m_initWOrk; i++) {
                 float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
                 Mtx objMtx;
                 Mtx viewMtx;
@@ -234,7 +234,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
             }
         } else if (mode == 1) {
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
-            for (int i = 0; i < (int)(u8)step->m_initWOrk; i++) {
+            for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = particle->m_scale;
                 Mtx objMtx;
                 Mtx viewMtx;
@@ -407,7 +407,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
-    u8 particleCount = *(u8*)&param_2->m_initWOrk;
+    u8 particleCount = param_2->m_initWOrk;
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);

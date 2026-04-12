@@ -101,6 +101,7 @@ asm void InitMetroTRK()
 	blr
 initCommTableSuccess:
 	b TRK_main //Jump to TRK_main
+	blr
 #endif // clang-format on
 }
 
@@ -113,6 +114,7 @@ initCommTableSuccess:
  * JP Address: TODO
  * JP Size: TODO
  */
+__declspec(weak) void InitMetroTRK_BBA(void);
 asm void InitMetroTRK_BBA(void)
 {
 #ifdef __MWERKS__ // clang-format off
@@ -159,55 +161,6 @@ initCommTableSuccessBBA:
 #endif // clang-format on
 }
 
-void EnableMetroTRKInterrupts(void) { EnableEXI2Interrupts(); }
-
-u32 TRKTargetTranslate(u32 param_0)
-{
-	if (param_0 >= gTRKDBAT3StartAddress) {
-		if ((param_0 < gTRKDBAT3StartAddress + 0x4000)
-		    && ((gTRKCPUState.Extended1.DBAT3U & 3) != 0)) {
-			return param_0;
-		}
-	}
-
-	if ((param_0 >= 0x7E000000) && (param_0 <= 0x80000000)) {
-		return param_0;
-	}
-
-	return param_0 & 0x3FFFFFFF | 0x80000000;
-}
-
-extern u8 gTRKInterruptVectorTable[];
-
-void TRK_copy_vector(u32 offset)
-{
-	void* destPtr = (void*)TRKTargetTranslate(offset);
-	TRK_memcpy(destPtr, gTRKInterruptVectorTable + offset, 0x100);
-	TRK_flush_cache(destPtr, 0x100);
-}
-
-void __TRK_copy_vectors(void)
-{
-	int i;
-	u32 mask;
-
-	mask = *(u32*)TRKTargetTranslate(0x44);
-
-	for (i = 0; i <= 14; ++i) {
-		if ((mask & (1 << i)) && i != 4) {
-			TRK_copy_vector(gTRKExceptionVectorOffsets[i]);
-		}
-	}
-}
-
-DSError TRKInitializeTarget()
-{
-	gTRKState.isStopped = TRUE;
-	gTRKState.msr       = __TRK_get_MSR();
-	gTRKDBAT3StartAddress = 0xE0000000;
-	return DS_NoError;
-}
-
 static inline void dataCacheBlockInvalidate(register void* param_1)
 {
 #ifdef __MWERKS__
@@ -236,11 +189,93 @@ static inline void dataCacheBlockFlushIndexed(register u32 offset, register void
 #endif
 }
 
-static inline void trkSync(void)
+void EnableMetroTRKInterrupts(void) { EnableEXI2Interrupts(); }
+
+u32 TRKTargetTranslate(u32 param_0)
 {
-#ifdef __MWERKS__
-	asm { sync }
-#endif
+	if (param_0 >= gTRKDBAT3StartAddress && param_0 < gTRKDBAT3StartAddress + 0x4000) {
+		if ((gTRKCPUState.Extended1.DBAT3U & 3) != 0) {
+			return param_0;
+		}
+	}
+
+	if ((param_0 >= 0x7E000000) && (param_0 <= 0x80000000)) {
+		return param_0;
+	}
+
+	return param_0 & 0x3FFFFFFF | 0x80000000;
+}
+
+extern u8 gTRKInterruptVectorTable[];
+
+void __TRK_copy_vectors(void)
+{
+	u32 r3 = gTRKDBAT3StartAddress;
+	u32* isrOffsetPtr;
+	int i;
+	u32 r29;
+
+	if (r3 <= 0x44 && r3 + 0x4000 > 0x44 && gTRKCPUState.Extended1.DBAT3U & 3) {
+		r3 = 0x44;
+	} else {
+		r3 = EXCEPTIONMASK_ADDR;
+	}
+
+	i            = 0;
+	r29          = *(u32*)r3;
+	isrOffsetPtr = gTRKExceptionVectorOffsets;
+
+	do {
+		if ((r29 & (1 << i)) && i != 4) {
+			void* destPtr = (void*)TRKTargetTranslate(isrOffsetPtr[i]);
+			TRK_memcpy(destPtr, gTRKInterruptVectorTable + isrOffsetPtr[i], 0x100);
+			TRK_flush_cache(destPtr, 0x100);
+		}
+
+		i++;
+	} while (i <= 14);
+}
+
+DSError TRKInitializeTarget()
+{
+	gTRKState.isStopped     = TRUE;
+	gTRKState.msr           = __TRK_get_MSR();
+	gTRKDBAT3StartAddress   = 0xE0000000;
+	return DS_NoError;
+}
+
+void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
+{
+	u32 alignedAddress;
+	u32 uVar1;
+	u16 sVar3;
+	u16 sVar4;
+	u32 i;
+
+	if ((param_2 < 0x4000) || (param_2 + *param_3 > 0x8000000)) {
+		return;
+	}
+
+	alignedAddress = param_2 & 0xFFFFFFE0;
+	uVar1 = *param_3 + (param_2 & 0x1F);
+	uVar1 = OSRoundUp32B(uVar1);
+
+	for (i = 0; i < uVar1; i += 0x20) {
+		dataCacheBlockInvalidateIndexed(i, (void*)param_1);
+	}
+
+	do {
+		i = ARGetDMAStatus();
+	} while (i != 0);
+	sVar3 = __ARGetInterruptStatus();
+	__ARClearInterrupt();
+	ARStartDMA(1, param_1, alignedAddress, uVar1);
+	do {
+		sVar4 = __ARGetInterruptStatus();
+	} while (sVar4 == 0);
+	if (sVar3 == 0) {
+		__ARClearInterrupt();
+	}
 }
 
 void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
@@ -313,40 +348,6 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	if (!r) {
 		while (!__ARGetInterruptStatus()) { }
 
-		__ARClearInterrupt();
-	}
-}
-
-void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
-{
-	u32 alignedAddress;
-	u32 uVar1;
-	u16 sVar3;
-	u16 sVar4;
-	u32 i;
-
-	if ((param_2 < 0x4000) || (param_2 + *param_3 > 0x8000000)) {
-		return;
-	}
-
-	alignedAddress = param_2 & 0xFFFFFFE0;
-	uVar1 = *param_3 + (param_2 & 0x1F);
-	uVar1 = OSRoundUp32B(uVar1);
-
-	for (i = 0; i < uVar1; i += 0x20) {
-		dataCacheBlockInvalidateIndexed(i, (void*)param_1);
-	}
-
-	do {
-		i = ARGetDMAStatus();
-	} while (i != 0);
-	sVar3 = __ARGetInterruptStatus();
-	__ARClearInterrupt();
-	ARStartDMA(1, param_1, alignedAddress, uVar1);
-	do {
-		sVar4 = __ARGetInterruptStatus();
-	} while (sVar4 == 0);
-	if (sVar3 == 0) {
 		__ARClearInterrupt();
 	}
 }

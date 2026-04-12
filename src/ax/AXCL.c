@@ -10,6 +10,7 @@ static u16* __AXClWrite;
 static u32 __AXCommandListCycles;
 static u32 __AXCompressor;
 u32 __AXClMode;
+u32 gap_04_8032F23C_sbss;
 
 u32 __AXGetCommandListCycles(void) {
     return __AXCommandListCycles;

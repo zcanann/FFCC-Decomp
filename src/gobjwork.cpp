@@ -1887,10 +1887,13 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 		return;
 	}
 
-	groupedCount = 1;
-	if (Game.m_gameWork.m_menuStageMode != 0) {
+	if (Game.m_gameWork.m_menuStageMode == 0) {
+		groupedCount = 1;
+	} else {
 		short* slotRef = m_commandListExtra + cmdListIdx;
-		if (slotRef[0] != 0) {
+		if (slotRef[0] == 0) {
+			groupedCount = 1;
+		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (cmdListIdx >= 0) {
@@ -1905,9 +1908,9 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 			}
 
 			groupedCount = 1;
-			scanCount = m_numCmdListSlots - (topIdx + 1);
+			scanCount = static_cast<short>(m_numCmdListSlots) - (topIdx + 1);
 			slotRef = m_commandListExtra + topIdx + 1;
-			if ((topIdx + 1) < m_numCmdListSlots) {
+			if ((topIdx + 1) < static_cast<short>(m_numCmdListSlots)) {
 				do {
 					if (slotRef[0] != -1) {
 						break;
@@ -1921,7 +1924,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	if (groupedCount == 1) {
-		isSelected = (((unsigned int)__cntlzw(cmdListIdx - m_currentCmdListIndex)) >> 5) & 0xFF;
+		isSelected = (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
 		return;
 	}
 
@@ -1939,8 +1942,8 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 	}
 
 	unsigned int selected = 0;
-	if ((cmdListIdx <= m_currentCmdListIndex) &&
-		(m_currentCmdListIndex <= (cmdListIdx + groupedCount - 1))) {
+	if ((cmdListIdx <= static_cast<short>(m_currentCmdListIndex)) &&
+		(static_cast<short>(m_currentCmdListIndex) <= (cmdListIdx + groupedCount - 1))) {
 		selected = 1;
 	}
 	isSelected = selected;

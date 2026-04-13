@@ -30,14 +30,20 @@ const char* __PADVersion = s___PADVersion;
  *   `SamplingCallback`) is enough to resolve every cross-unit undefined except
  *   the OnReset2 local static `recalibrated$401`
  * - on the current main-based SDK branch, exporting those shared globals still
- *   does not reproduce target Pad.o layout: the rebuilt object keeps local
+ *   does not reproduce target Pad.o layout: the rebuilt object kept local
  *   `BarrelBits` and `recalibrated$400` ahead of the exported globals, and a
- *   declaration-order probe did not change that
+ *   declaration-order probe stayed flat
  * - the extracted target Pad.o exports `Initialized`, `EnabledBits`,
  *   `ResettingBits`, `RecalibrateBits`, `WaitingBits`, `CheckingBits`,
  *   `PendingBits`, `SamplingCallback`, and `recalibrated$401` as global sbss
  *   objects, while the rebuilt source Pad.o still emits the corresponding
  *   state as local/static bindings (`recalibrated$400` in source)
+ * - PAL and EN maps both agree GCCP01's Pad.c sbss run does not include
+ *   `BarrelBits`; wrapping that declaration in `#ifndef VERSION_GCCP01` is
+ *   keepable and removes the extra dead local slot from the rebuilt source Pad.o
+ * - promoting Pad.c after that cleanup still fails final linkage for a more
+ *   specific reason: ai.o imports `recalibrated$401`, while the rebuilt source
+ *   Pad.o still emits `recalibrated$400`
  * - shared Dolphin reference Pad.c copies still keep these globals `static`, so
  *   the target FFCC binding shape is currently a repo-specific divergence that
  *   cannot be justified from source-family references alone
@@ -77,7 +83,9 @@ static u32 RecalibrateBits;
 static u32 WaitingBits;
 static u32 CheckingBits;
 static u32 PendingBits;
+#ifndef VERSION_GCCP01
 static u32 BarrelBits;
+#endif
 
 static u32 Type[4];
 static PADStatus Origin[4];

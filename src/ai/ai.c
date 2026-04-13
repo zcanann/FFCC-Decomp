@@ -31,6 +31,10 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   max_wait / buffer
  * - promoting ai.c with that exact rebuilt layout still fails final main.dol,
  *   so the remaining blocker is no longer the visible AI .sbss ordering itself
+ * - a fresh pad/Pad.c probe narrowed one of those hidden dependencies further:
+ *   when Pad.c is promoted after removing the dead GCCP01 BarrelBits slot, the
+ *   target ai.o still imports `recalibrated$401` specifically, while the
+ *   rebuilt source Pad.o emits `recalibrated$400`
  *
  * Why this is not keepable yet:
  * - the only source shape that produced the target .sbss order was not plausible

@@ -4,6 +4,26 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/FILE_POS.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in fopen():
+ * - target wants the canonical file_modes stack slot at r1+0x8
+ * - current source still compiles with the canonical slot at r1+0x10
+ * - __init_file then receives a copied word from r1+0xC
+ * - __open_file then receives a copied word from the alternate slot
+ *
+ * Probes already tried here without a keepable win:
+ * - function-scope vs inner-scope file_modes local
+ * - local declaration reordering
+ * - local __open_file prototype tweaks
+ * - explicit memcpy/copy probes
+ * - lvalue cast probes on the by-value calls
+ *
+ * So far this looks like a MWCC stack-layout / by-value-struct source-shape issue,
+ * not a control-flow mismatch.
+ */
+
 inline FILE* freopen(const char* name, const char* mode, FILE* file)
 {
     file_modes modes;

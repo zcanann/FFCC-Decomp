@@ -84,6 +84,35 @@ typedef struct mem_pool_obj {
 
 static int initialized = 0;
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - Block_subBlock and allocate_from_fixed_pools are the only remaining code
+ *   mismatches in alloc.c
+ * - the failure mode is expression / register-shape sensitive, not missing
+ *   control flow or data structure recovery
+ *
+ * Most useful probe so far:
+ * - a direct rewrite of Block_subBlock toward the literal Ghidra shape
+ *   regressed badly instead of improving
+ * - the existing struct-based source is therefore already closer to the
+ *   original MWCC output than the more mechanical decomp translation
+ * - typed/local-order probes in allocate_from_fixed_pools were also not enough
+ *   on their own; one explicit start/cursor split for the fixed-subblock chain
+ *   regressed sharply instead of improving
+ * - a follow-up cleanup that removed the local pool_sizes/head/tail temporaries
+ *   and wrote the ring links directly through fs->head_/fs->tail_ also held
+ *   completely flat, so those convenience locals are not the remaining issue
+ *
+ * Why this matters:
+ * - further work here should stay surgical and preserve the current high-level
+ *   structure
+ * - allocate_from_fixed_pools still looks closest to a real win, with the
+ *   remaining mismatch concentrated in the fixed-subblock chain setup loop and
+ *   nearby temporaries
+ */
+
 static SubBlock* SubBlock_merge_prev(SubBlock*, SubBlock**);
 static void SubBlock_merge_next(SubBlock*, SubBlock**);
 static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);

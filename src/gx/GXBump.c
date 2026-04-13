@@ -3,6 +3,8 @@
 
 #include "dolphin/gx/__gx.h"
 
+extern const f32 GXIndTexMtxScale1024;
+
 #if DEBUG
 #define GX_WRITE_SOME_REG5(a, b) \
 do { \
@@ -38,8 +40,6 @@ void GXSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTe
 }
 #pragma dont_inline reset
 
-const f32 GXSetIndTexMtx_Scale1024 = 1024.0f;
-
 void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) {
     u32 reg0;
     u32 reg1;
@@ -72,24 +72,24 @@ void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) 
     mtx_id = (GXIndTexMtxID)(mtx_id * 3);
     scale_exp += 17;
 
-    mtx[0][0] = (s32)(GXSetIndTexMtx_Scale1024 * offset[0][0]);
-    mtx[1][0] = (s32)(GXSetIndTexMtx_Scale1024 * offset[1][0]);
+    mtx[0][0] = (s32)(GXIndTexMtxScale1024 * offset[0][0]);
+    mtx[1][0] = (s32)(GXIndTexMtxScale1024 * offset[1][0]);
     reg0 = mtx[0][0] & 0x7FF;
     reg0 = (reg0 & 0xFFC007FF) | ((mtx[1][0] & 0x7FF) << 11);
     reg0 = (reg0 & 0xFF3FFFFF) | (((u32)(s8)scale_exp & 3) << 22);
     reg0 = (reg0 & 0x00FFFFFF) | ((mtx_id + 6) << 24);
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg0);
 
-    mtx[0][1] = (s32)(GXSetIndTexMtx_Scale1024 * offset[0][1]);
-    mtx[1][1] = (s32)(GXSetIndTexMtx_Scale1024 * offset[1][1]);
+    mtx[0][1] = (s32)(GXIndTexMtxScale1024 * offset[0][1]);
+    mtx[1][1] = (s32)(GXIndTexMtxScale1024 * offset[1][1]);
     reg1 = mtx[0][1] & 0x7FF;
     reg1 = (reg1 & 0xFFC007FF) | ((mtx[1][1] & 0x7FF) << 11);
     reg1 = (reg1 & 0xFF3FFFFF) | (((u32)(s8)scale_exp & 0xC) << 20);
     reg1 = (reg1 & 0x00FFFFFF) | ((mtx_id + 7) << 24);
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg1);
 
-    mtx[0][2] = (s32)(GXSetIndTexMtx_Scale1024 * offset[0][2]);
-    mtx[1][2] = (s32)(GXSetIndTexMtx_Scale1024 * offset[1][2]);
+    mtx[0][2] = (s32)(GXIndTexMtxScale1024 * offset[0][2]);
+    mtx[1][2] = (s32)(GXIndTexMtxScale1024 * offset[1][2]);
     reg2 = mtx[0][2] & 0x7FF;
     reg2 = (reg2 & 0xFFC007FF) | ((mtx[1][2] & 0x7FF) << 11);
     reg2 = (reg2 & 0xFF3FFFFF) | (((u32)(s8)scale_exp & 0x30) << 18);
@@ -200,107 +200,9 @@ void GXSetTevIndWarp(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u8 signe
     GXSetTevIndirect(tev_stage, ind_stage, GX_ITF_8, (signed_offset != 0) ? GX_ITB_STU : GX_ITB_NONE, matrix_sel, wrap, wrap, GX_FALSE, GX_FALSE, GX_ITBA_OFF);
 }
 
-void GXSetTevIndTile(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u16 tilesize_s,
-    u16 tilesize_t, u16 tilespacing_s, u16 tilespacing_t, GXIndTexFormat format,
-    GXIndTexMtxID matrix_sel, GXIndTexBiasSel bias_sel, GXIndTexAlphaSel alpha_sel)
-{
-    GXIndTexWrap wrap_s;
-    GXIndTexWrap wrap_t;
-    f32 mtx[2][3];
-
-    CHECK_GXBEGIN(429, "GXSetTevIndTile");
-    ASSERTMSGLINE(430, tev_stage < GX_MAX_TEVSTAGE, "GXSetTevIndTile: Invalid tev stage id");
-    ASSERTMSGLINE(431, ind_stage < GX_MAX_INDTEXSTAGE, "GXSetTevIndTile: Invalid indirect stage id");
-
-    switch (tilesize_s) {
-    case 256:
-        wrap_s = GX_ITW_256;
-        break;
-    case 128:
-        wrap_s = GX_ITW_128;
-        break;
-    case 64:
-        wrap_s = GX_ITW_64;
-        break;
-    case 32:
-        wrap_s = GX_ITW_32;
-        break;
-    case 16:
-        wrap_s = GX_ITW_16;
-        break;
-    default:
-        ASSERTMSGLINE(440, 0, "GXSetTevIndTile: Invalid tilesize for S coordinate");
-        wrap_s = GX_ITW_OFF;
-        break;
-    }
-
-    switch (tilesize_t) {
-    case 256:
-        wrap_t = GX_ITW_256;
-        break;
-    case 128:
-        wrap_t = GX_ITW_128;
-        break;
-    case 64:
-        wrap_t = GX_ITW_64;
-        break;
-    case 32:
-        wrap_t = GX_ITW_32;
-        break;
-    case 16:
-        wrap_t = GX_ITW_16;
-        break;
-    default:
-        ASSERTMSGLINE(452, 0, "GXSetTevIndTile: Invalid tilesize for T coordinate");
-        wrap_t = GX_ITW_OFF;
-        break;
-    }
-
-    mtx[0][0] = tilespacing_s / 1024.0f;
-    mtx[0][1] = mtx[0][2] = 0.0f;
-    mtx[1][1] = tilespacing_t / 1024.0f;
-    mtx[1][0] = mtx[1][2] = 0.0f;
-    GXSetIndTexMtx(matrix_sel, mtx, 10);
-    GXSetTevIndirect(tev_stage, ind_stage, format, bias_sel, matrix_sel, wrap_s, wrap_t, GX_FALSE, GX_TRUE, alpha_sel);
-}
-
-void GXSetTevIndBumpST(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTexMtxID matrix_sel) {
-    GXIndTexMtxID sm;
-    GXIndTexMtxID tm;
-
-    CHECK_GXBEGIN(492, "GXSetTevIndBumpST");
-
-    switch (matrix_sel) {
-    case GX_ITM_0:
-        sm = GX_ITM_S0;
-        tm = GX_ITM_T0;
-        break;
-    case GX_ITM_1:
-        sm = GX_ITM_S1;
-        tm = GX_ITM_T1;
-        break;
-    case GX_ITM_2:
-        sm = GX_ITM_S2;
-        tm = GX_ITM_T2;
-        break;
-    default:
-        ASSERTMSGLINE(509, 0, "GXSetTevIndBumpST: Invalid matrix selection");
-        break;
-    }
-
-    GXSetTevIndirect(tev_stage, ind_stage, GX_ITF_8, GX_ITB_ST, sm, GX_ITW_0, GX_ITW_0, GX_FALSE, GX_FALSE, GX_ITBA_OFF);
-    GXSetTevIndirect(tev_stage + 1, ind_stage, GX_ITF_8, GX_ITB_ST, tm, GX_ITW_0, GX_ITW_0, GX_TRUE, GX_FALSE, GX_ITBA_OFF);
-    GXSetTevIndirect(tev_stage + 2, ind_stage, GX_ITF_8, GX_ITB_NONE, GX_ITM_OFF, GX_ITW_OFF, GX_ITW_OFF, GX_TRUE, GX_FALSE, GX_ITBA_OFF);
-}
-
 void GXSetTevIndBumpXYZ(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTexMtxID matrix_sel) {
     CHECK_GXBEGIN(561, "GXSetTevIndBumpXYZ");
     GXSetTevIndirect(tev_stage, ind_stage, GX_ITF_8, GX_ITB_STU, matrix_sel, GX_ITW_OFF, GX_ITW_OFF, GX_FALSE, GX_FALSE, GX_ITBA_OFF);
-}
-
-void GXSetTevIndRepeat(GXTevStageID tev_stage) {
-    CHECK_GXBEGIN(590, "GXSetTevIndRepeat");
-    GXSetTevIndirect(tev_stage, GX_INDTEXSTAGE0, GX_ITF_8, GX_ITB_NONE, GX_ITM_OFF, GX_ITW_0, GX_ITW_0, GX_TRUE, GX_FALSE, GX_ITBA_OFF);
 }
 
 void __GXUpdateBPMask(void) {
@@ -335,13 +237,6 @@ void __GXUpdateBPMask(void) {
     }
 
     __GXData->bpMask = (__GXData->bpMask & 0xFFFFFF00) | mask;
-    GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->bpMask);
-    __GXData->bpSentNot = 0;
-}
-
-void __GXSetIndirectMask(u32 mask) {
-    SET_REG_FIELD(664, __GXData->bpMask, 8, ~0xFF, mask);
-
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->bpMask);
     __GXData->bpSentNot = 0;
 }

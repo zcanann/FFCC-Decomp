@@ -26,7 +26,7 @@ struct VertexApMtxData
 	s16 entryIndex;
 	u8 spawnCount;
 	u8 spawnDelay;
-	u8 mode;
+	s8 mode;
 	u8 useWorldMtx;
 	u8 unkA[0x2];
 	u32 childId;

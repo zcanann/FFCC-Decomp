@@ -745,6 +745,22 @@ extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
 extern "C" void* __vt__Q23std9exception[];
 extern "C" void* __vt__Q23std13bad_exception[];
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - __unexpected is the only remaining code mismatch in Gecko_ExceptionPPC.cp
+ * - the live object already matches the surrounding extab / .rodata / .data
+ *   layout, so the remaining miss looks like a tiny source-shape or
+ *   exception-metadata detail rather than missing control flow
+ *
+ * Most useful result so far:
+ * - current objdiff keeps __unexpected at 99.45% with the rest of the unit
+ *   already matching
+ * - this should be treated as a narrow follow-up target, not a unit that wants
+ *   a broad runtime rewrite
+ */
+
 /**
  * @note Address: N/A
  * @note Size: 0x1B4

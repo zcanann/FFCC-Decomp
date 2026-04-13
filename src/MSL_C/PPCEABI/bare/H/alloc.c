@@ -104,6 +104,9 @@ static int initialized = 0;
  * - a follow-up cleanup that removed the local pool_sizes/head/tail temporaries
  *   and wrote the ring links directly through fs->head_/fs->tail_ also held
  *   completely flat, so those convenience locals are not the remaining issue
+ * - replacing the local __msize_inline(block) use with the explicit fixed-pool
+ *   vs var-pool branch also held completely flat, so the msize source spelling
+ *   is not what drives the remaining register mismatch
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

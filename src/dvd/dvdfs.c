@@ -216,6 +216,11 @@ BOOL DVDClose(DVDFileInfo* fileInfo) {
  *   objdiff score at all
  * - that rules out the obvious "fewer locals / single-exit return" rewrite as
  *   the fix for this unit
+ * - a follow-up DVDGetCurrentDir probe that used a shared BOOL result plus a
+ *   ghidra-style shared return also left the tail mismatch unchanged
+ * - a follow-up entryToPath probe that scoped parentName / dst / remaining
+ *   down into the two copy blocks also held completely flat, so shortening the
+ *   visible local lifetimes is not enough to change the register shape here
  */
 
 static u32 entryToPath(u32 entry, char* path, u32 maxlen) {

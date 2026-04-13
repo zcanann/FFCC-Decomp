@@ -133,11 +133,6 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     RainWork* work;
     RainDrop* drop;
     RainParam* rain;
-    float unitA;
-    float unitB;
-    float lengthDelta;
-    s16 lifeJitter;
-
     if (gPppCalcDisabled != 0) {
         return;
     }
@@ -156,6 +151,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float maxX;
             float minZ;
             float maxZ;
+            float unitA;
+            float unitB;
+            float lengthDelta;
+            s16 lifeJitter;
 
             randA = rand();
             randB = rand();
@@ -209,6 +208,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float maxX;
             float minZ;
             float maxZ;
+            float unitA;
+            float unitB;
+            float lengthDelta;
+            s16 lifeJitter;
 
             randA = rand();
             randB = rand();

@@ -35,10 +35,10 @@ struct PppSRandFVParam3 {
 
 void pppSRandFV(void* param1, void* param2, void* param3)
 {
+    f32* randVec;
     u8* self = (u8*)param2;
     PppSRandFVParam2* cfg = (PppSRandFVParam2*)param1;
     PppSRandFVParam3* info = (PppSRandFVParam3*)param3;
-    f32* randVec;
 
     if (gPppCalcDisabled != 0) {
         return;

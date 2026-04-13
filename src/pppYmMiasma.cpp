@@ -22,7 +22,6 @@ extern float FLOAT_80330658;
 extern double DOUBLE_80330648;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern float pppVectorLength__F3Vec(Vec*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
@@ -331,7 +330,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     pppSubVector(delta, worldPos, basePos);
-    if (pppVectorLength__F3Vec(&delta) < (vData->m_radius - pYmMiasma->m_minDistance)) {
+    if (pppVectorLength(delta) < (vData->m_radius - pYmMiasma->m_minDistance)) {
         state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
         state->m_hasImpulse = 1;
     }

@@ -89,87 +89,82 @@ void _InitGxFunc()
 	int iVar8 = 0;
 	int iVar10 = 0;
 	int iVar9 = 0;
-	int* puVar2 = (int*)s_GXSetTevOrder_Reg;
-	int* colorIn = (int*)s_GXSetTevColorIn_Reg;
-	int* alphaIn = (int*)s_GXSetTevAlphaIn_Reg;
-	int* colorOp = (int*)s_GXSetTevColorOp_Reg;
-	int* alphaOp = (int*)s_GXSetTevAlphaOp_Reg;
-	int* swapMode = (int*)s_GXSetTevSwapMode_Reg;
+	u8* puVar2 = (u8*)s_GXSetTevOrder_Reg;
 
 	for (int iVar13 = 2; iVar13 != 0; iVar13--) {
 		int iVar3 = iVar1 + 1;
 		int iVar4 = iVar1 + 2;
 
-		colorOp[iVar9 / 4] = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar9) = -1;
 
 		int iVar6 = iVar1 + 4;
 
-		alphaOp[iVar9 / 4] = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar9) = -1;
 
 		int iVar5 = iVar1 + 3;
 
-		swapMode[iVar10 / 4] = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar10) = -1;
 
 		int iVar7 = iVar1 + 5;
 
-		colorIn[iVar8 / 4] = -1;
-		alphaIn[iVar8 / 4] = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar8) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar8) = -1;
 
 		int iVar12 = iVar1 + 6;
 
-		puVar2[0] = -1;
+		*(int*)puVar2 = -1;
 
 		int iVar11 = iVar1 + 7;
 
-		swapMode[iVar3 * 2] = -1;
-		colorIn[iVar3 * 4] = -1;
-		alphaIn[iVar3 * 4] = -1;
-		colorOp[iVar3 * 5] = -1;
-		alphaOp[iVar3 * 5] = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar3 * 8) = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar3 * 0x10) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar3 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar3 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar3 * 0x14) = -1;
 
 		iVar1 += 8;
-		puVar2[3] = -1;
+		*(int*)(puVar2 + 0xC) = -1;
 		iVar10 += 0x40;
 
-		colorIn[iVar4 * 4] = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar4 * 0x10) = -1;
 		iVar9 += 0xA0;
 		iVar8 += 0x80;
-		alphaIn[iVar4 * 4] = -1;
-		colorOp[iVar4 * 5] = -1;
-		alphaOp[iVar4 * 5] = -1;
-		swapMode[iVar4 * 2] = -1;
-		puVar2[6] = -1;
-		colorIn[iVar5 * 4] = -1;
-		alphaIn[iVar5 * 4] = -1;
-		colorOp[iVar5 * 5] = -1;
-		alphaOp[iVar5 * 5] = -1;
-		swapMode[iVar5 * 2] = -1;
-		puVar2[9] = -1;
-		colorIn[iVar6 * 4] = -1;
-		alphaIn[iVar6 * 4] = -1;
-		colorOp[iVar6 * 5] = -1;
-		alphaOp[iVar6 * 5] = -1;
-		swapMode[iVar6 * 2] = -1;
-		puVar2[12] = -1;
-		colorIn[iVar7 * 4] = -1;
-		alphaIn[iVar7 * 4] = -1;
-		colorOp[iVar7 * 5] = -1;
-		alphaOp[iVar7 * 5] = -1;
-		swapMode[iVar7 * 2] = -1;
-		puVar2[15] = -1;
-		colorIn[iVar12 * 4] = -1;
-		alphaIn[iVar12 * 4] = -1;
-		colorOp[iVar12 * 5] = -1;
-		alphaOp[iVar12 * 5] = -1;
-		swapMode[iVar12 * 2] = -1;
-		puVar2[18] = -1;
-		puVar2[21] = -1;
-		puVar2 = (int*)((char*)puVar2 + 0x60);
-		colorIn[iVar11 * 4] = -1;
-		alphaIn[iVar11 * 4] = -1;
-		colorOp[iVar11 * 5] = -1;
-		alphaOp[iVar11 * 5] = -1;
-		swapMode[iVar11 * 2] = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar4 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar4 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar4 * 0x14) = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar4 * 8) = -1;
+		*(int*)(puVar2 + 0x18) = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar5 * 0x10) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar5 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar5 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar5 * 0x14) = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar5 * 8) = -1;
+		*(int*)(puVar2 + 0x24) = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar6 * 0x10) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar6 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar6 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar6 * 0x14) = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar6 * 8) = -1;
+		*(int*)(puVar2 + 0x30) = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar7 * 0x10) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar7 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar7 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar7 * 0x14) = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar7 * 8) = -1;
+		*(int*)(puVar2 + 0x3C) = -1;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar12 * 0x10) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar12 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar12 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar12 * 0x14) = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar12 * 8) = -1;
+		*(int*)(puVar2 + 0x48) = -1;
+		*(int*)(puVar2 + 0x54) = -1;
+		puVar2 += 0x60;
+		*(int*)(s_GXSetTevColorIn_Reg + iVar11 * 0x10) = -1;
+		*(int*)(s_GXSetTevAlphaIn_Reg + iVar11 * 0x10) = -1;
+		*(int*)(s_GXSetTevColorOp_Reg + iVar11 * 0x14) = -1;
+		*(int*)(s_GXSetTevAlphaOp_Reg + iVar11 * 0x14) = -1;
+		*(int*)(s_GXSetTevSwapMode_Reg + iVar11 * 8) = -1;
 	}
 
 	*(int*)&s_GXSetTevSwapModeTable_Reg[0] = -1;

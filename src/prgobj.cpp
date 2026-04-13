@@ -293,9 +293,14 @@ int CGPrgObj::isLoopAnim()
  */
 int CGPrgObj::isLoopAnimDirect()
 {
-	signed char directFlag = m_animFlagBits.bits.m_animDirect;
+	struct RequestedFlagView {
+		signed char requestedFlag : 1;
+		signed char : 7;
+	};
 
-	if ((directFlag != 0) || (IsLoopAnim(2) == 0)) {
+	signed char requestedFlag = reinterpret_cast<RequestedFlagView*>(&m_animFlagBits.m_animFlags)->requestedFlag;
+
+	if ((requestedFlag != 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}
 

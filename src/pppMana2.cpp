@@ -98,6 +98,14 @@ void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlend
 void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
 }
 
+static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
+static void UpdateWaterMesh(VMana2* mana2);
+static void RenderWaterMesh(VMana2* mana2);
+static void CalculateNormal(VMana2* mana2);
+static void CalcWaterReflectionVector(
+    Vec* reflectionVec, Vec* positions, Vec* normals, long count, Vec waterOrigin, float (*matrix)[4], _GXColor* color,
+    Vec2d* texCoord);
+
 /*
  * --INFO--
  * PAL Address: 0x80108db0
@@ -962,8 +970,7 @@ void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
-    Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5, float)
+static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5)
 {
     float zero;
     float normalY;
@@ -1053,7 +1060,7 @@ extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
  * JP Address: TODO
  * JP Size: TODO
  */
-void UpdateWaterMesh(VMana2* mana2)
+static void UpdateWaterMesh(VMana2* mana2)
 {
     u8* work;
     float* waterHeightA;
@@ -1120,7 +1127,7 @@ void UpdateWaterMesh(VMana2* mana2)
     origin.x = *(float*)(work + 0x8C);
     origin.y = *(float*)(work + 0x9C);
     origin.z = *(float*)(work + 0xAC);
-    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, &origin,
+    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
                               (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
 }
 
@@ -1133,7 +1140,7 @@ void UpdateWaterMesh(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RenderWaterMesh(VMana2* mana2)
+static void RenderWaterMesh(VMana2* mana2)
 {
     u8* work = (u8*)mana2;
     u16* indices = *(u16**)(work + 0x50);
@@ -1255,7 +1262,7 @@ void RenderWaterMesh(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CalculateNormal(VMana2* mana2)
+static void CalculateNormal(VMana2* mana2)
 {
     Vec* positions;
     Vec* normals;
@@ -1312,7 +1319,7 @@ void CalculateNormal(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP5Vec2d2(
+static void CalcWaterReflectionVector(
     Vec* reflectionVec,
     Vec* positions,
     Vec* normals,
@@ -1320,8 +1327,7 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
     Vec waterOrigin,
     float (*matrix)[4],
     _GXColor* color,
-    Vec2d* texCoord,
-    Vec2d*)
+    Vec2d* texCoord)
 {
     Vec cameraPos;
     Vec objPos;

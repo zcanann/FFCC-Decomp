@@ -8,31 +8,6 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/vi/__vi.h"
 
-/*
- * SDK note: remove this block once linkage is resolved.
- *
- * 2026-04-13:
- * - Using the PAL/EN maps plus the live object metadata showed that the current
- *   SDK split had over-attributed vi/vi.c's .data window and swallowed the
- *   neighboring PAD release-version string.
- * - Trimming config/GCCP01/splits.txt so vi/vi.c .data ends at 0x80217BB0
- *   moved main/vi/vi to 100% code/data and created the expected auto data gap.
- * - Promoting vi/vi.c to Matching still failed final main.dol checksum, so the
- *   remaining blocker is hidden-linkage-level rather than the visible code/data
- *   ownership for this split.
- * - A later PAL-map / source-object cross-check showed the vi .sbss seam was
- *   also short by 0x0C on this branch: the source-built vi.o still emits
- *   PrintDebugPalCaution's guard plus file-scope PositionCallback/timingExtra
- *   at the tail, so widening vi/vi.c .sbss from 0x8032F134 to 0x8032F140 and
- *   naming those two tail statics is keepable and matches the built source
- *   object more closely.
- * - With that .sbss seam fixed, promoting vi/vi.c to Matching now fails for a
- *   narrower reason: the extracted Pad.o imports PositionCallback_8032F138 and
- *   timingExtra_8032F13C as globals, while the shared Dolphin source family
- *   still spells both as static vi.c locals. So the remaining blocker is the
- *   vi/pad small-data ownership/binding seam, not vi function bodies.
- */
-
 #ifdef DEBUG
 const char* __VIVersion = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
 #else
@@ -1115,8 +1090,8 @@ u32 VIGetDTVStatus(void) {
     return dtvStatus & 1;
 }
 
-static void (*PositionCallback)(s16, s16);
-static VITiming* timingExtra;
+VITiming* timingExtra;
+void (*PositionCallback)(s16, s16);
 
 VITiming* __VISetExtraTiming(VITiming* t) {
     VITiming* old = timingExtra;

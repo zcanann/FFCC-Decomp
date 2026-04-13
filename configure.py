@@ -775,7 +775,7 @@ config.libs = [
             Object(Matching, "vi/gpioexi.c"),
             Object(Matching, "vi/i2c.c"),
             Object(Matching, "vi/initphilips.c"),
-            Object(NonMatching, "vi/vi.c"),
+            Object(Matching, "vi/vi.c"),
         ],
     ),
     DolphinLib(

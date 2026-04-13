@@ -199,28 +199,26 @@ void CFlatData::Create(void* filePtr)
 
 					if (chunk.m_version >= 1)
 					{
-						char* charPtr;
-						char** stringIndex;
-						int indexOffset;
+						int numStrings;
 						int iVar6;
 						int iVar7;
-						int iVar8;
+						int indexOffset;
+						int stringBase;
 
-						iVar10 = chunkFile.Get4();
-						m_data[m_dataCount].m_numStrings = iVar10;
-						stringIndex = (char**)new (Game.m_mainStage, s_cflat_data_cpp, 0x4C) unsigned char[iVar10 << 2];
-						m_data[m_dataCount].m_strings = stringIndex;
-						charPtr = new (Game.m_mainStage, s_cflat_data_cpp, 0x4D) char[iVar10];
-						m_data[m_dataCount].m_stringBuf = charPtr;
+						numStrings = chunkFile.Get4();
+						m_data[m_dataCount].m_numStrings = numStrings;
+						m_data[m_dataCount].m_strings = new (Game.m_mainStage, s_cflat_data_cpp, 0x4C) char*[numStrings];
+						m_data[m_dataCount].m_stringBuf = new (Game.m_mainStage, s_cflat_data_cpp, 0x4D) char[numStrings];
 
-						memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), iVar10);
-						iVar10 = (int)chunkFile.GetAddress();
+						memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), numStrings);
+						stringBase = (int)chunkFile.GetAddress();
 						indexOffset = 0;
 
 						for (iVar7 = 0; (iVar1 = m_dataCount, iVar7 < m_data[iVar1].m_numStrings); iVar7++)
 						{
 							iVar6 = (int)chunkFile.GetAddress();
-							*(char**)((int)m_data[iVar1].m_strings + indexOffset) = m_data[iVar1].m_stringBuf + (iVar6 - iVar10);
+							*(char**)((int)m_data[iVar1].m_strings + indexOffset) =
+								m_data[iVar1].m_stringBuf + (iVar6 - stringBase);
 							chunkFile.GetString();
 							indexOffset += 4;
 						}
@@ -269,11 +267,9 @@ void CFlatData::Create(void* filePtr)
 				{
 					int iVar7;
 					int iVar8;
-					char* charPtr;
 
 					m_mesCount = chunk.m_arg0;
-					charPtr = new (Game.m_mainStage, s_cflat_data_cpp, 0x76) char[chunk.m_size];
-					m_mesBuffer = charPtr;
+					m_mesBuffer = new (Game.m_mainStage, s_cflat_data_cpp, 0x76) char[chunk.m_size];
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					iVar10 = (int)chunkFile.GetAddress();

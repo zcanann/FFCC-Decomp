@@ -13,6 +13,29 @@ extern const char s___PADVersion[];
 #endif
 const char* __PADVersion = s___PADVersion;
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - Pad.c is now a hidden-link blocker rather than a visible code/data one
+ *
+ * Most useful verified results so far:
+ * - the older local source hack `PrintDebugPalCaution_message` did not belong
+ *   in Pad.c; removing it is keepable and matches both the shared Dolphin pad
+ *   sources and the rebuilt source Pad.o, which no longer emits that extra
+ *   sbss global
+ * - even after that cleanup, promoting pad/Pad.c to Matching still fails final
+ *   linkage on pad-state globals rather than function bodies
+ * - the extracted target Pad.o exports `Initialized`, `EnabledBits`,
+ *   `ResettingBits`, `RecalibrateBits`, `WaitingBits`, `CheckingBits`,
+ *   `PendingBits`, `SamplingCallback`, and `recalibrated$401` as global sbss
+ *   objects, while the rebuilt source Pad.o still emits the corresponding
+ *   state as local/static bindings (`recalibrated$400` in source)
+ * - those globals are imported by OS.o and ai.o when pad/Pad.c is promoted, so
+ *   the remaining blocker is the pad/ai/os small-data binding seam, not the
+ *   Pad.c function text
+ */
+
 #define PAD_ALL                                                                                                        \
     (                      \
         PAD_BUTTON_LEFT  | \
@@ -48,7 +71,6 @@ static u32 BarrelBits;
 static u32 Type[4];
 static PADStatus Origin[4];
 
-u32 PrintDebugPalCaution_message;
 u32 __PADSpec;
 
 // prototypes

@@ -228,10 +228,8 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
  */
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    s32 dataValIndex = param_2->m_dataValIndex;
-    Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + serializedDataOffsets[2] + 0x80);
-    pppCrystal2ColorBlock* colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + serializedDataOffsets[1] + 0x80);
+    s32 dataOffset = param_3->m_serializedDataOffsets[2];
+    s32 colorOffset = param_3->m_serializedDataOffsets[1];
     pppCrystal2RenderObject* object;
     pppModelSt* model;
     int sourceTex;
@@ -245,9 +243,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
     Mtx lightMtx;
     Crystal2TexMtx texMtx;
 
-    if (dataValIndex != 0xFFFF) {
+    if (param_2->m_dataValIndex != 0xFFFF) {
+        Crystal2Work* work;
+        pppCrystal2ColorBlock* colorBlock;
+
         sourceTex = 0;
-        model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
+        model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
         textureIndex = 0;
         GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (param_2->m_payload[0] == 0) {
@@ -259,6 +260,8 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
                 textureIndex);
         }
 
+        work = (Crystal2Work*)((u8*)pppCrystal2 + dataOffset + 0x80);
+        colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + colorOffset + 0x80);
         pppSetBlendMode(0);
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);

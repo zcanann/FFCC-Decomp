@@ -18,6 +18,14 @@ static const float FLOAT_80330fb4 = 448.0f;
 static const float FLOAT_80330fb8 = 33.3f;
 static const float FLOAT_80330fbc = 1.3333334f;
 static const float FLOAT_80330fc0 = 0.5f;
+static const float FLOAT_80330fd0 = 2.0f;
+static const float FLOAT_80330fd4 = -1.0f;
+static const float FLOAT_80330fd8 = 1.0f;
+static const float FLOAT_80330ff8 = 0.8f;
+static const double DOUBLE_80331000 = 1.0;
+static const float FLOAT_80331008 = 4.0f;
+static const float FLOAT_8033100c = 128.0f;
+static const float FLOAT_80331010 = 127.0f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
@@ -144,14 +152,19 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 			}
 
 			if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
+				CrystalRefractionMap* textureInfo;
+				u32 textureSize;
+				float stepX;
+				float stepY;
+				float yCoord;
 				u32 y;
 				u32 x;
 
 				work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					sizeof(CrystalRefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
 
-				CrystalRefractionMap* textureInfo = work->m_refractionMap;
-				u32 textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+				textureInfo = work->m_refractionMap;
+				textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
 				textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xAC);
 				textureInfo->m_format = GX_TF_IA8;
@@ -160,35 +173,35 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				textureInfo->m_imageCount = 0x100;
 				textureInfo->m_bufferSize = textureSize;
 
-				const float start = -1.0f;
-				const float stepX = 2.0f / (float)(textureInfo->m_width - 1);
-				const float stepY = 2.0f / (float)(textureInfo->m_height - 1);
-				float yCoord = start;
+				stepX = FLOAT_80330fd0 / (float)(textureInfo->m_width - 1);
+				stepY = FLOAT_80330fd0 / (float)(textureInfo->m_height - 1);
+				yCoord = FLOAT_80330fd4;
 
 				for (y = 0; y < (u32)textureInfo->m_height; y++) {
-					float xCoord = start;
 					float ySq = yCoord * yCoord;
+					float xCoord = FLOAT_80330fd4;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
 						float magnitude = xCoord * xCoord + ySq;
-						if (magnitude > 1.0f) {
+						if (magnitude > FLOAT_80330fd8) {
 							magnitude = sqrtf(magnitude);
-						} else if (magnitude < 0.0f) {
-							magnitude = 0.0f;
+						} else if (!(magnitude >= 0.0f)) {
+							magnitude = NAN;
 						}
 
-						if (magnitude > 0.8f) {
-							magnitude = 0.8f;
+						if (magnitude > FLOAT_80330ff8) {
+							magnitude = FLOAT_80330ff8;
 						}
 
-						magnitude = 4.0f * (magnitude * (float)fmod(magnitude, 1.0));
-						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
+						double modulation = fmod(magnitude, DOUBLE_80331000);
+						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
+						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
 						u8* pixel = (u8*)((u32)textureInfo->m_imageData +
 							(y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
 							(x & 0x1FFFFFFC) * 8 +
 							((x & 3) + (y & 3) * 4) * 2);
 						pixel[0] = nx;
-						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
+						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
 						xCoord += stepX;
 						pixel[1] = ny;
 					}

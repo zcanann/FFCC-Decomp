@@ -292,69 +292,97 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
 
             const float minInit = FLOAT_8032F930;
             const float maxInit = FLOAT_8032F934;
+            int offset = 0;
             U16At(this, 0x0) = static_cast<unsigned short>(chunk.m_size / 0xC);
             S32At(this, 0x2C) = static_cast<int>(Align32(S32At(this, 0x24)));
-            F32At(this, 0x14) = minInit;
-            F32At(this, 0x10) = minInit;
             F32At(this, 0xC) = minInit;
-            F32At(this, 0x20) = maxInit;
-            F32At(this, 0x1C) = maxInit;
+            F32At(this, 0x10) = minInit;
+            F32At(this, 0x14) = minInit;
             F32At(this, 0x18) = maxInit;
+            F32At(this, 0x1C) = maxInit;
+            F32At(this, 0x20) = maxInit;
             cursor = S32At(this, 0x2C) + chunk.m_size;
 
-            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x0)); i++) {
-                float* vert = reinterpret_cast<float*>(S32At(this, 0x2C) + i * 0xC);
-                vert[0] = reader.GetF4();
-                vert[1] = reader.GetF4();
-                vert[2] = reader.GetF4();
+            for (int i = 0; i < static_cast<int>(U16At(this, 0x0)); i++) {
+                float value = reader.GetF4();
+                *reinterpret_cast<float*>(S32At(this, 0x2C) + offset) = value;
+                value = reader.GetF4();
+                *reinterpret_cast<float*>(S32At(this, 0x2C) + offset + 4) = value;
+                value = reader.GetF4();
+                *reinterpret_cast<float*>(S32At(this, 0x2C) + offset + 8) = value;
 
-                if (F32At(this, 0xC) > vert[0]) {
-                    F32At(this, 0xC) = vert[0];
+                float* vert = reinterpret_cast<float*>(S32At(this, 0x2C) + offset);
+                value = vert[0];
+                if (value > F32At(this, 0xC)) {
+                    value = F32At(this, 0xC);
                 }
-                if (F32At(this, 0x10) > vert[1]) {
-                    F32At(this, 0x10) = vert[1];
+                F32At(this, 0xC) = value;
+
+                value = vert[1];
+                if (value > F32At(this, 0x10)) {
+                    value = F32At(this, 0x10);
                 }
-                if (F32At(this, 0x14) > vert[2]) {
-                    F32At(this, 0x14) = vert[2];
+                F32At(this, 0x10) = value;
+
+                value = vert[2];
+                if (value > F32At(this, 0x14)) {
+                    value = F32At(this, 0x14);
                 }
-                if (F32At(this, 0x18) < vert[0]) {
-                    F32At(this, 0x18) = vert[0];
+                F32At(this, 0x14) = value;
+
+                value = vert[0];
+                if (value < F32At(this, 0x18)) {
+                    value = F32At(this, 0x18);
                 }
-                if (F32At(this, 0x1C) < vert[1]) {
-                    F32At(this, 0x1C) = vert[1];
+                F32At(this, 0x18) = value;
+
+                value = vert[1];
+                if (value < F32At(this, 0x1C)) {
+                    value = F32At(this, 0x1C);
                 }
-                if (F32At(this, 0x20) < vert[2]) {
-                    F32At(this, 0x20) = vert[2];
+                F32At(this, 0x1C) = value;
+
+                value = vert[2];
+                if (value < F32At(this, 0x20)) {
+                    value = F32At(this, 0x20);
                 }
+                F32At(this, 0x20) = value;
+
+                offset += 0xC;
             }
         } else if (chunk.m_id == 0x4E4F524D) {
             U16At(this, 0x2) = static_cast<unsigned short>(chunk.m_size / 6);
             S32At(this, 0x30) = static_cast<int>(Align32(cursor));
             cursor = S32At(this, 0x30) + chunk.m_size;
 
-            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x2)); i++) {
-                unsigned short* norm = reinterpret_cast<unsigned short*>(S32At(this, 0x30) + i * 6);
+            int offset = 0;
+            for (int i = 0; i < static_cast<int>(U16At(this, 0x2)); i++) {
+                unsigned short* norm = reinterpret_cast<unsigned short*>(S32At(this, 0x30) + offset);
                 norm[0] = reader.Get2();
                 norm[1] = reader.Get2();
                 norm[2] = reader.Get2();
+                offset += 6;
             }
         } else if (chunk.m_id == 0x55562020) {
             U16At(this, 0x6) = static_cast<unsigned short>(chunk.m_size >> 2);
             S32At(this, 0x38) = static_cast<int>(Align32(cursor));
             cursor = S32At(this, 0x38) + chunk.m_size;
 
-            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x6)); i++) {
-                unsigned short* uv = reinterpret_cast<unsigned short*>(S32At(this, 0x38) + i * 4);
+            int offset = 0;
+            for (int i = 0; i < static_cast<int>(U16At(this, 0x6)); i++) {
+                unsigned short* uv = reinterpret_cast<unsigned short*>(S32At(this, 0x38) + offset);
                 uv[0] = reader.Get2();
                 uv[1] = reader.Get2();
+                offset += 4;
             }
         } else if (chunk.m_id == 0x434F4C52) {
             U16At(this, 0x8) = static_cast<unsigned short>(chunk.m_size >> 2);
             S32At(this, 0x3C) = static_cast<int>(Align32(cursor));
             cursor = S32At(this, 0x3C) + chunk.m_size;
 
-            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x8)); i++) {
-                unsigned char* rgba = reinterpret_cast<unsigned char*>(S32At(this, 0x3C) + i * 4);
+            int offset = 0;
+            for (int i = 0; i < static_cast<int>(U16At(this, 0x8)); i++) {
+                unsigned char* rgba = reinterpret_cast<unsigned char*>(S32At(this, 0x3C) + offset);
                 rgba[0] = reader.Get1();
                 rgba[1] = reader.Get1();
                 rgba[2] = reader.Get1();
@@ -364,6 +392,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                     rgba[1] = static_cast<unsigned char>(rgba[1] >> 1);
                     rgba[2] = static_cast<unsigned char>(rgba[2] >> 1);
                 }
+                offset += 4;
             }
         } else if (chunk.m_id == 0x424F4646) {
             float x = reader.GetF4();

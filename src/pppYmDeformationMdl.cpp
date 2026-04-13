@@ -93,26 +93,6 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void SetUpIndWarp(VYmDeformationMdl*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void DisableIndWarp()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d20c0
  * PAL Size: 64b
  * EN Address: TODO
@@ -122,7 +102,7 @@ void DisableIndWarp()
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
 {
-    float fVar1 = 1.0f; // FLOAT_80330dac equivalent 
+    float fVar1 = FLOAT_80330dac;
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     
     *puVar2 = 0;
@@ -143,14 +123,14 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
     float value = FLOAT_80330dac;
-    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + param_2->m_serializedDataOffsets[2] + 0x80);
+    float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    state->m_values[1] = FLOAT_80330dac;
-    state->m_values[0] = value;
-    state->m_scale = value;
-    state->m_values[4] = value;
-    state->m_values[3] = value;
-    state->m_values[2] = value;
+    state[3] = FLOAT_80330dac;
+    state[2] = value;
+    state[1] = value;
+    state[6] = value;
+    state[5] = value;
+    state[4] = value;
 }
 
 /*
@@ -344,14 +324,4 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
         pppInitBlendMode();
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
 }

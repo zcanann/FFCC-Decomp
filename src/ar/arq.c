@@ -38,6 +38,19 @@
  *   `arq -> AXAlloc -> AXAux -> ...` small-data chain coherently in one pass,
  *   instead of extending arq.c in isolation and leaving the borrowed-tail
  *   ownership intact
+ * - a later full config probe did exactly that through the early TRK/MSL/Odemu
+ *   tail, using source statics plus the PAL map to re-anchor the `.sbss`
+ *   windows coherently; it failed before compile at the split stage instead of
+ *   in ARQ itself
+ * - the first hard failure from that probe was at the GX/TRK seam:
+ *   once `GXMisc`/`GBA`/`serpoll` were shifted forward, DTK still resolved
+ *   `gTRKInputPendingPtr` at the stale old address `0x8032F358`, causing an
+ *   overlap with `FinishQueue`
+ * - so the remaining blocker is broader than just the visible ARQ/AX windows:
+ *   there is at least one second stale tail authority (symbol attribution,
+ *   split ownership, or both) that still pins the later TRK/MSL region to the
+ *   pre-shift layout, and that needs to be identified before another coherent
+ *   `.sbss` re-split attempt is likely to land
  */
 
 #ifdef DEBUG

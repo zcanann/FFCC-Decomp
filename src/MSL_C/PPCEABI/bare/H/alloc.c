@@ -129,6 +129,10 @@ static int initialized = 0;
  *   advanced a single typed FixSubBlock* cursor through p->next_ regressed
  *   sharply (95.11% -> 85.92%), so the remaining blocker is not "just use the
  *   direct typed cursor and seed start_ earlier" either
+ * - dropping the separate fix_size local and writing client_size_/sub_size
+ *   directly from fix_pool_sizes[i] regressed slightly (95.11% -> 94.92%), so
+ *   that explicit fix_size temporary is still closer to target than the more
+ *   direct indexing spelling
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

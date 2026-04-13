@@ -204,22 +204,44 @@ BOOL DVDClose(DVDFileInfo* fileInfo) {
 
 static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
     char* name;
-    u32 i;
+    char* parentName;
+    char* dst;
     u32 loc;
+    u32 remaining;
+    u32 parent;
 
     if (entry == 0) {
         return 0;
     }
 
     name = FstStringStart + stringOff(entry);
-    loc = entryToPath(parentDir(entry), path, maxlen);
-    if (loc == maxlen) {
-        return loc;
+    parent = parentDir(entry);
+    if (parent == 0) {
+        loc = 0;
+    } else {
+        parentName = FstStringStart + stringOff(parent);
+        loc = entryToPath(parentDir(parent), path, maxlen);
+        if (loc != maxlen) {
+            path[loc++] = '/';
+            remaining = maxlen - loc;
+            dst = path + loc;
+            while ((remaining != 0) && (*parentName != '\0')) {
+                remaining--;
+                *dst++ = *parentName++;
+            }
+            loc = loc + ((maxlen - loc) - remaining);
+        }
     }
 
-    path[loc++] = '/';
-    for (i = maxlen - loc; (i > 0) && (*name != '\0'); i--) {
-        path[loc++] = *name++;
+    if (loc != maxlen) {
+        path[loc++] = '/';
+        remaining = maxlen - loc;
+        dst = path + loc;
+        while ((remaining != 0) && (*name != '\0')) {
+            remaining--;
+            *dst++ = *name++;
+        }
+        loc = loc + ((maxlen - loc) - remaining);
     }
 
     return loc;
@@ -227,19 +249,21 @@ static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     u32 loc;
+    u32 currentDirEntry;
 
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
 
     ASSERTMSG1LINE(622, (s32)sDvdfsCurrentDirEntry >= 0 && sDvdfsCurrentDirEntry < MaxEntryNum, "DVDConvertEntrynumToPath: specified entrynum(%d) is out of range  ", sDvdfsCurrentDirEntry);
     ASSERTMSGLINE(629, entryIsDir(sDvdfsCurrentDirEntry), "DVDConvertEntrynumToPath: cannot convert an entry num for a file to path  ");
 
-    loc = entryToPath(sDvdfsCurrentDirEntry, path, maxlen);
+    currentDirEntry = sDvdfsCurrentDirEntry;
+    loc = entryToPath(currentDirEntry, path, maxlen);
     if (loc == maxlen) {
         path[maxlen - 1] = '\0';
         return FALSE;
     }
 
-    if (entryIsDir(sDvdfsCurrentDirEntry)) {
+    if (entryIsDir(currentDirEntry)) {
         if (loc == maxlen - 1) {
             path[loc] = '\0';
             return FALSE;

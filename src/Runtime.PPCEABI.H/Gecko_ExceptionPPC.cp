@@ -757,6 +757,11 @@ extern "C" void* __vt__Q23std13bad_exception[];
  * Most useful result so far:
  * - current objdiff keeps __unexpected at 99.45% with the rest of the unit
  *   already matching
+ * - the live/target diff is specifically the second inlined
+ *   ExPPC_IsInSpecification compare site for badExceptionType
+ * - obvious pointer-shape probes there stayed flat: re-seeding
+ *   badExceptionType through another local, const/register variants, and
+ *   explicit cast/+0/&[0] call spellings did not dislodge the addi-vs-mr miss
  * - this should be treated as a narrow follow-up target, not a unit that wants
  *   a broad runtime rewrite
  */

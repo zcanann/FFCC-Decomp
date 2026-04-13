@@ -23,16 +23,16 @@
  *   reference_projects/super_mario_strikers and twilight_princess and found
  *   that `__DVDThreadQueue` / `__DVDLongFileNameFlag` belong in dvdfs.c, not
  *   dvd.c; moving those definitions to dvdfs.c and extending the dvdfs `.sbss`
- *   split through `0x8032F080` keeps the baseline build green and makes the
- *   extracted dvd.o `.sbss` head rebase from the bogus exported globals back to
- *   the source-style `executing` chain
- * - even after that seam correction, promoting dvd/dvd.c to Matching still
- *   failed final checksum, and the remaining source-vs-target object mismatch
- *   narrowed to the later dvd.c `.sbss` tail (`CancelAllSyncComplete`,
- *   `ResetCount`, `MotorState` before `DVDInitialized` / `LastState`)
- * - so the next real dvd.c pass should stay focused on that remaining `.sbss`
- *   tail metadata/ownership issue, not on the already-identified
- *   `__DVDThreadQueue` / `__DVDLongFileNameFlag` seam
+ *   split through `0x8032F080` is now landed on this branch
+ * - that seam fix removes the stale `dvd/dvd.c .sbss` alignment warning and
+ *   makes the raw compiled dvd.o start its `.sbss` at `executing` instead of
+ *   the bogus exported queue globals
+ * - even after landing that seam correction, promoting dvd/dvd.c to Matching
+ *   still failed final checksum on this branch
+ * - so the remaining blocker is no longer the `__DVDThreadQueue` /
+ *   `__DVDLongFileNameFlag` seam itself; future work should stay focused on
+ *   the later hidden-link metadata in dvd.c rather than reopening that head
+ *   ownership split
  */
 
 // externs
@@ -61,9 +61,6 @@ static DVDBB2 BB2;
 static DVDDiskID CurrDiskID;
 static DVDCommandBlock DummyCommandBlock;
 static OSAlarm ResetAlarm;
-
-u32 __DVDLongFileNameFlag;
-OSThreadQueue __DVDThreadQueue;
 
 static DVDCommandBlock* executing;
 static DVDDiskID* IDShouldBe;

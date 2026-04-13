@@ -13,7 +13,9 @@ static OSBootInfo* BootInfo;
 static FSTEntry* FstStart;
 char* FstStringStart;
 static u32 MaxEntryNum;
-u32 sDvdfsCurrentDirEntry;
+static u32 currentDirectory;
+u32 __DVDLongFileNameFlag;
+OSThreadQueue __DVDThreadQueue;
 
 /*
  * TODO: Remove this note block once linkage has been resolved.
@@ -31,10 +33,13 @@ u32 sDvdfsCurrentDirEntry;
  * - a later cross-check against the shared Dolphin reference sources found
  *   that `__DVDThreadQueue` / `__DVDLongFileNameFlag` are authored in dvdfs.c,
  *   not dvd.c; moving those definitions here and extending the dvdfs `.sbss`
- *   window through `0x8032F080` keeps the baseline build green
- * - that seam correction does improve the extracted dvd/dvdfs object ownership
- *   story, but it is not sufficient on its own to make either dvdfs.c or
- *   dvd.c safely linkable yet
+ *   window through `0x8032F080` is now landed on this branch
+ * - the PAL/EN maps also call `0x8032F070` local `currentDirectory`, so this
+ *   unit now spells that slot as a local `currentDirectory` instead of the
+ *   older exported-style `sDvdfsCurrentDirEntry`
+ * - even with both of those ownership fixes in place, promoting dvdfs.c to
+ *   Matching still breaks final checksum, so the hidden-link blocker is
+ *   narrower now but not resolved yet
  *
  * Why this matters:
  * - more source churn in entryToPath / DVDGetCurrentDir is unlikely to help on
@@ -95,7 +100,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
     
     ASSERTMSGLINE(318, pathPtr, "DVDConvertPathToEntrynum(): null pointer is specified  ");
     
-    dirLookAt = sDvdfsCurrentDirEntry;
+    dirLookAt = currentDirectory;
     
     while (1) {
         if (*pathPtr == '\0') {
@@ -291,7 +296,7 @@ static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
-    return DVDConvertEntrynumToPath((s32)sDvdfsCurrentDirEntry, path, maxlen);
+    return DVDConvertEntrynumToPath((s32)currentDirectory, path, maxlen);
 }
 
 BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio) {

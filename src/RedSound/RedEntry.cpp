@@ -51,6 +51,8 @@ static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 extern "C" {
 	void* RedNew__Fi(int);
 	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
+	void WaveHistoryAdd__9CRedEntryFi(CRedEntry*, int);
+	void WaveHistoryDelete__9CRedEntryFi(CRedEntry*, int);
 	int SearchWaveSequence__9CRedEntryFi(CRedEntry*, int);
 }
 
@@ -721,44 +723,39 @@ int CRedEntry::ReentryWaveData(int waveNo)
  */
 void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 {
-	if (mode == 0) {
-		bool used = false;
+	int* entry = (int*)this;
+	bool used;
+	int seq;
+	int* track;
 
+	if (mode == 0) {
+		used = false;
 		if ((*(short*)((char*)DAT_8032f3f0 + 0x48e) != 0) && (*(int*)((char*)DAT_8032f3f0 + 0x47c) == waveNo)) {
 			used = true;
 		}
-
 		if ((*(short*)((char*)DAT_8032f3f0 + 0x922) != 0) && (*(int*)((char*)DAT_8032f3f0 + 0x910) == waveNo)) {
 			used = true;
 		}
-
 		if (!used) {
-			int* track = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+			track = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
 			do {
-				if ((*track != 0) && (track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
+				if (((*track != 0) && (track[6] != 0)) && (*(short*)(track[6] + 2) == waveNo)) {
 					used = true;
 					break;
 				}
 				track += 0x55;
 			} while (track < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
 		}
-
-		int seq = SearchWaveSequence(waveNo);
-		if ((!used) && (0xf < seq)) {
-			int* history = (int*)(*(int*)this + seq * 0x10);
-			if (history[1] == 0) {
-				WaveHistoryAdd(0x14);
-				history[1] = 0x14;
-			}
+		if (((!used) && (seq = SearchWaveSequence__9CRedEntryFi(this, waveNo), 0xf < seq)) &&
+		    (*(int*)(*entry + seq * 0x10 + 4) == 0)) {
+			WaveHistoryAdd__9CRedEntryFi(this, 0x14);
+			*(int*)(*entry + seq * 0x10 + 4) = 0x14;
 		}
 	} else {
-		int seq = SearchWaveSequence(waveNo);
-		if (0xf < seq) {
-			int* history = (int*)(*(int*)this + seq * 0x10);
-			if (history[1] != 0) {
-				WaveHistoryDelete(history[1]);
-				history[1] = 0;
-			}
+		seq = SearchWaveSequence__9CRedEntryFi(this, waveNo);
+		if ((0xf < seq) && (*(int*)(*entry + seq * 0x10 + 4) != 0)) {
+			WaveHistoryDelete__9CRedEntryFi(this, *(int*)(*entry + seq * 0x10 + 4));
+			*(int*)(*entry + seq * 0x10 + 4) = 0;
 		}
 	}
 }

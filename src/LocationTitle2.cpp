@@ -320,22 +320,22 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         cameraPos.z = CameraPcs._232_4_;
 
         PSVECSubtract(&cameraPos, &matrixPos, &look);
-        if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {
+        if ((look.x == FLOAT_80330f48) && (look.y == FLOAT_80330f48) && (look.z == FLOAT_80330f48)) {
             return;
         }
 
         PSVECNormalize(&look, &lookNorm);
         side.x = lookNorm.z;
-        side.y = 0.0f;
+        side.y = FLOAT_80330f48;
         side.z = -lookNorm.x;
 
-        if ((lookNorm.z == 0.0f) && (side.z == 0.0f)) {
-            side.x = 1.0f;
-            side.y = 0.0f;
-            side.z = 0.0f;
-            up.x = 0.0f;
-            up.y = 0.0f;
-            up.z = 1.0f;
+        if ((lookNorm.z == FLOAT_80330f48) && (side.z == FLOAT_80330f48)) {
+            side.x = FLOAT_80330f4c;
+            side.y = FLOAT_80330f48;
+            side.z = FLOAT_80330f48;
+            up.x = FLOAT_80330f48;
+            up.y = FLOAT_80330f48;
+            up.z = FLOAT_80330f4c;
         } else {
             PSVECNormalize(&side, &side);
             PSVECCrossProduct(&lookNorm, &side, &up);
@@ -358,7 +358,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         Vec transformedPos;
 
         if (graphFrame <= (int)particle->m_frame) {
-            transformedPos.x = transformedPos.y = transformedPos.z = 0.0f;
+            transformedPos.x = FLOAT_80330f48;
+            transformedPos.y = FLOAT_80330f48;
+            transformedPos.z = FLOAT_80330f48;
             PSMTXIdentity(model);
             model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];
             model[1][1] = pppMngStPtr->m_scale.y * locationTitle->m_localMatrix.value[1][1];
@@ -371,7 +373,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             model[1][3] = transformedPos.y;
             model[2][3] = transformedPos.z;
 
-            pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 1, 1, 1);
+            pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, FLOAT_80330f48, 0, 0, 0, 0, 1, 1, 1);
             GXSetCullMode(GX_CULL_NONE);
             GXSetColorUpdate(GX_FALSE);
             GXLoadPosMtxImm(model, 0);

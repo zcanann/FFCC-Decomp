@@ -26,6 +26,9 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   double, added the target-style local 0.1f bound for Modify, and relabeled
  *   the 0.3f / 0.6f / external i2f-magic tail accordingly; that moved .sdata2
  *   from 92.85714% to 96.0% and nudged .text to 99.47125%
+ * - removing the inner parentheses from `0.05f + (0.8f * rv->damping)` held
+ *   completely flat, so the remaining damping-expression miss is not just the
+ *   obvious precedence spelling
  * - the remaining miss is now concentrated in the damping rewrite in Create and
  *   Modify: the target still folds `1.0f - (0.05f + 0.8f * damping)` into a
  *   slightly different instruction shape than the current source

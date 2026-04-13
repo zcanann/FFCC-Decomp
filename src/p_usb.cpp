@@ -7,11 +7,12 @@
 #include "types.h"
 
 CUSBPcs USBPcs;
-char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
+char s_usbReadPollInitialized;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
+extern "C" const char s_p_usb_cpp_801D6D08[];
 u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
 u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
 u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
@@ -20,27 +21,8 @@ u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
 };
 static const char s_usbRootPath[] = "plot/kmitsuru/";
-static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CUSBPcs::CUSBPcs()
-{
-    m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
-    m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
-    m_table__7CUSBPcs[3] = m_table_desc0__7CUSBPcs[2];
-    m_table__7CUSBPcs[4] = m_table_desc1__7CUSBPcs[0];
-    m_table__7CUSBPcs[5] = m_table_desc1__7CUSBPcs[1];
-    m_table__7CUSBPcs[6] = m_table_desc1__7CUSBPcs[2];
-    m_table__7CUSBPcs[7] = m_table_desc2__7CUSBPcs[0];
-    m_table__7CUSBPcs[8] = m_table_desc2__7CUSBPcs[1];
-    m_table__7CUSBPcs[9] = m_table_desc2__7CUSBPcs[2];
-}
 
 /*
  * --INFO--

@@ -62,6 +62,13 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   functions and changing Modify's range check back to a direct `0.1f`
  *   literal was also completely flat, so this unit is not blocked on that
  *   last visible source-family spelling difference either
+ * - the extracted target object really does carry a standalone global
+ *   `reverb_hi_4ch_value0_1` symbol after the local `@111`..`@120` pool, but
+ *   simply promoting `reverb_hi_4ch_value0_1 / 0_3 / 0_6` to plain file-scope
+ *   `const` front-loads them to the start of `.sdata2` (`0x0 / 0x4 / 0x8`),
+ *   regresses section match from 96.0% to 74.07%, and drops
+ *   `ReverbHICreateDpl2` from 99.40% to 99.16%; so "make value0_1 global"
+ *   alone is not the fix
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

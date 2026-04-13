@@ -37,7 +37,7 @@ void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int);
+void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
 int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
@@ -323,7 +323,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
                     &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
-                    (int)((u32)baseObj->m_graphId >> 12));
+                    (int)((u32)baseObj->m_graphId >> 12), &points[i]);
                 work->m_spawnEnabled = 0;
             }
             if (work->m_spawnEnabled != 0) {

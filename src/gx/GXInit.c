@@ -37,6 +37,8 @@ extern const f32 GXInit_PointOneF;
  * Probes already tried here without a keepable win:
  * - moving GXInit_IntToFloatBias between the top and bottom constant groups
  * - reordering GXInit_ZeroF / GXInit_OneF / GXInit_PointOneF
+ * - forcing fbWidth / xfbHeight / efbHeight through explicit f32 locals before
+ *   GXSetViewport / GXSetDispCopyYScale
  * - nearby MWCC flag / version probes from earlier passes
  *
  * What those probes ruled out:

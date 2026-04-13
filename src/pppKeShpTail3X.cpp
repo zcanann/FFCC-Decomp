@@ -9,6 +9,14 @@
 
 extern "C" int rand(void);
 
+extern "C" {
+int __cntlzw(unsigned int);
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char,
+                                                               unsigned char, unsigned char, unsigned char,
+                                                               unsigned char, unsigned char);
+void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
+}
+
 struct KeShpTail3XStep {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -49,9 +57,10 @@ struct KeShpTail3XWork {
     u8 m_initialized;
 };
 
-extern "C" {
-int __cntlzw(unsigned int);
-}
+struct KeShpTail3XObject {
+    u8 _pad0[0xc];
+    _pppPObject m_obj;
+};
 
 /*
  * --INFO--
@@ -182,8 +191,10 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XOffsets* offsets = (KeShpTail3XOffsets*)param_3;
+    KeShpTail3XObject* tailObj = (KeShpTail3XObject*)obj;
     KeShpTail3XWork* work;
     long** shapeTable;
+    long* shapeEntry;
     u8* shapeData;
     u8 count;
     float alphaMul;
@@ -204,6 +215,12 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     Vec pos;
     Vec nextPos;
     Vec seg;
+    _pppMngSt* mng;
+    float envDepth;
+    float drawScale;
+    float segDx;
+    float segDy;
+    float segDz;
     u16 rng;
     int life;
     u16 shapeSetCount;
@@ -221,51 +238,49 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float segBaseZ;
     u8 currentIndex;
     u8 nextIndex;
+    u8 zEnable;
 
     if (step->m_dataValIndex == -1) {
         return;
     }
+
     count = step->m_drawCount;
     if (count == 0) {
         return;
     }
 
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
-    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-    if (shapeTable == NULL) {
-        return;
-    }
-    shapeData = (u8*)*shapeTable;
-    if (shapeData == NULL) {
-        return;
-    }
-
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / 128.0f;
+    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
     colorR = (float)(work->m_values[0] >> 7);
     colorG = (float)(work->m_values[1] >> 7);
     colorB = (float)(work->m_values[2] >> 7);
     colorA = (float)(work->m_values[3] >> 7) * alphaMul;
-    if (invCountMinusOne != 0.0f) {
+
+    if (invCountMinusOne != kPppKeShpTail2XZero) {
         colorStepR = (colorR - (float)(work->m_values[4] >> 7)) / invCountMinusOne;
         colorStepG = (colorG - (float)(work->m_values[5] >> 7)) / invCountMinusOne;
         colorStepB = (colorB - (float)(work->m_values[6] >> 7)) / invCountMinusOne;
         colorStepA = (colorA - ((float)(work->m_values[7] >> 7) * alphaMul)) / invCountMinusOne;
     } else {
-        colorStepR = 0.0f;
-        colorStepG = 0.0f;
-        colorStepB = 0.0f;
-        colorStepA = 0.0f;
+        colorStepR = kPppKeShpTail2XZero;
+        colorStepG = kPppKeShpTail2XZero;
+        colorStepB = kPppKeShpTail2XZero;
+        colorStepA = kPppKeShpTail2XZero;
     }
 
-    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
+    mng = (_pppMngSt*)pppMngStPtr;
+    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+    shapeData = (u8*)*shapeTable;
+
+    pppCopyMatrix(localBase, tailObj->m_obj.m_localMatrix);
     pppUnitMatrix(drawMtx);
 
     shapeScale = (float)step->m_stepValue;
     shapeScaleStep = ((float)step->m_stepValue - (float)step->m_arg3) / invCountMinusOne;
-    trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
+    trailStep = step->m_stepDistance * mng->m_scale.x;
     trailStepDelta = trailStep * (shapeScaleStep / (float)step->m_stepValue);
-    if (trailStep == 0.0f) {
+    if (trailStep == kPppKeShpTail2XZero) {
         return;
     }
 
@@ -282,24 +297,26 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
     pos = work->m_posHistory[currentIndex];
     nextPos = work->m_posHistory[nextIndex];
-    seg.x = nextPos.x - pos.x;
-    seg.y = nextPos.y - pos.y;
-    seg.z = nextPos.z - pos.z;
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
-    zeroVec.z = 0.0f;
+    segDx = nextPos.x - pos.x;
+    segDy = nextPos.y - pos.y;
+    segDz = nextPos.z - pos.z;
+    seg.x = segDx;
+    seg.y = segDy;
+    seg.z = segDz;
+    zeroVec.x = kPppKeShpTail2XZero;
+    zeroVec.y = kPppKeShpTail2XZero;
+    zeroVec.z = kPppKeShpTail2XZero;
     segLen = PSVECDistance(&zeroVec, &seg);
-    segCursor = 0.0f;
     segRemain = segLen;
+    segCursor = kPppKeShpTail2XZero;
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;
 
 draw_loop:
     while (count != 0) {
-        int shapeEntry;
-        float envDepth = 0.0f;
-        float drawScale = shapeScale;
+        envDepth = kPppKeShpTail2XZero;
+        drawScale = shapeScale;
 
         if (step->m_useRandomShape != 0) {
             u32 lcg = (u32)rng * 0x80du + 7u;
@@ -307,10 +324,10 @@ draw_loop:
             drawScale *= -((((float)rng / 65535.0f) * step->m_randomScale) - 1.0f);
             {
                 u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
-                shapeEntry = (int)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
+                shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
             }
         } else {
-            shapeEntry = (int)shapeData;
+            shapeEntry = (long*)shapeData;
         }
 
         pos.x = segBaseX;
@@ -318,8 +335,8 @@ draw_loop:
         pos.z = segBaseZ;
 
         if (step->m_worldSpaceMode == 0) {
-            PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * pppMngStPtr->m_scale.x,
-                            drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
+            PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * mng->m_scale.x, drawScale * mng->m_scale.y,
+                            drawScale * mng->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, obj->field_0x40);
@@ -329,9 +346,9 @@ draw_loop:
             PSMTXCopy(obj->field_0x40.value, drawMtx.value);
         } else if (step->m_worldSpaceMode == 1) {
             pppUnitMatrix(drawMtx);
-            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
-            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
-            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
+            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * mng->m_scale.x);
+            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * mng->m_scale.y);
+            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * mng->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, drawMtx);
@@ -347,8 +364,9 @@ draw_loop:
         if (step->m_useEnvDepth != 0) {
             envDepth = step->m_envDepth;
         }
-        pppSetDrawEnv((pppCVECTOR*)0, &drawMtx, envDepth, 0, step->m_drawA, step->m_blendMode, 0,
-                      (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5), 1, 0);
+        zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
+        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx, envDepth, 0, step->m_drawA,
+                                                                  step->m_blendMode, 0, zEnable, 1, 0);
         GXLoadPosMtxImm(drawMtx.value, 0);
 
         {
@@ -362,7 +380,7 @@ draw_loop:
         }
 
         pppSetBlendMode(step->m_blendMode);
-        pppDrawShp((tagOAN3_SHAPE*)shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+        pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
         count--;
         if (count == 0) {
@@ -384,9 +402,9 @@ draw_loop:
             goto advance_segment;
         }
 
-        pos.x = seg.x * (segCursor / segLen) + segBaseX;
-        pos.y = seg.y * (segCursor / segLen) + segBaseY;
-        pos.z = seg.z * (segCursor / segLen) + segBaseZ;
+        pos.x = segDx * (segCursor / segLen) + segBaseX;
+        pos.y = segDy * (segCursor / segLen) + segBaseY;
+        pos.z = segDz * (segCursor / segLen) + segBaseZ;
         segCursor += trailLen;
         segRemain -= trailLen;
         segBaseX = pos.x;
@@ -406,9 +424,12 @@ advance_segment:
         pos = nextPos;
         trailLen = segCursor - segLen;
         nextPos = work->m_posHistory[nextIndex];
-        seg.x = nextPos.x - pos.x;
-        seg.y = nextPos.y - pos.y;
-        seg.z = nextPos.z - pos.z;
+        segDx = nextPos.x - pos.x;
+        segDy = nextPos.y - pos.y;
+        segDz = nextPos.z - pos.z;
+        seg.x = segDx;
+        seg.y = segDy;
+        seg.z = segDz;
         segLen = PSVECDistance(&zeroVec, &seg);
         segCursor = trailLen;
         segRemain += segLen;

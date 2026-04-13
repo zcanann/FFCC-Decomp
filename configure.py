@@ -1156,7 +1156,7 @@ config.libs = [
         "cflags": cflags_thp,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "thp/THPDec.c"),
+            Object(Matching, "thp/THPDec.c"),
             Object(Matching, "thp/THPAudio.c"),
         ],
     },

@@ -125,6 +125,10 @@ static int initialized = 0;
  *   immediately after __msize_inline(block), then using that b local for the
  *   empty-ring initialization, also held completely flat; that early b/p
  *   lifetime is not what drives the current register mismatch
+ * - a follow-up probe that stored b->start_ before the chain loop and then
+ *   advanced a single typed FixSubBlock* cursor through p->next_ regressed
+ *   sharply (95.11% -> 85.92%), so the remaining blocker is not "just use the
+ *   direct typed cursor and seed start_ earlier" either
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

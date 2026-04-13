@@ -138,10 +138,18 @@ static int initialized = 0;
  *   loop and the final start_ store held completely flat, so the missing
  *   `addi r?, r3, 0x14` shape in the current diff is not fixed by just
  *   collapsing that local
+ * - reordering the fixed-pool setup so `num_subblocks` is computed from the
+ *   direct `(fix_size + 4)` expression before assigning the reusable
+ *   `sub_size` temporary also held completely flat, so that source-order seam
+ *   is not enough on its own to recover the target register flow
  * - a Block_subBlock follow-up that stopped carrying block_val/block_or_1 and
  *   instead wrote `start->block = (((unsigned long)start->block & ~1) | 1);`
  *   then reused `start->block` for new_sb->block also held completely flat, so
  *   that shared block-tag value is not the remaining register-lifetime blocker
+ * - spelling the first fixed-subblock base as `(FixSubBlock*)(b + 1)` instead
+ *   of `(FixSubBlock*)((char*)b + 0x14)` regressed slightly
+ *   (95.11% -> 94.81%), so the current raw-byte base expression is still
+ *   closer to target than the cleaner typed-step spelling
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

@@ -293,9 +293,9 @@ int CGPrgObj::isLoopAnim()
  */
 int CGPrgObj::isLoopAnimDirect()
 {
-	signed char directFlag = m_animFlagBits.bits.m_animDirect;
+	signed char requestedFlag = m_animFlagBits.bits.m_animRequested;
 
-	if ((directFlag != 0) || (IsLoopAnim(2) == 0)) {
+	if ((requestedFlag != 0) || (IsLoopAnim(2) == 0)) {
 		return 0;
 	}
 

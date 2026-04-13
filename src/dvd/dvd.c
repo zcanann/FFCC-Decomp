@@ -5,6 +5,22 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/dvd/__dvd.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - main/dvd/dvd is currently a hidden-linkage blocker rather than a visible
+ *   objdiff blocker
+ *
+ * Most useful probe so far:
+ * - on this branch, flipping dvd/dvd.c from NonMatching to Matching while the
+ *   unit still reports 100% code/data/function match causes the final
+ *   build/GCCP01/main.dol checksum to fail immediately
+ * - that means any remaining issue here is outside the visible unit diff and
+ *   should be treated as object ownership / linkage metadata / neighboring
+ *   section attribution work, not source control-flow cleanup
+ */
+
 // externs
 extern void __DVDPrintFatalMessage();
 extern int DVDCompareDiskID(const struct DVDDiskID * id1 /* r29 */, const struct DVDDiskID * id2 /* r30 */);

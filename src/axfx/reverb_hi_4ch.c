@@ -4,6 +4,26 @@
 
 #include "dolphin/axfx/__axfx.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - ReverbHICreateDpl2 and ReverbHIModifyDpl2 are still almost entirely down to
+ *   stack-slot / temporary-lifetime / constant-binding shape rather than missing
+ *   control flow
+ *
+ * Most useful probes so far:
+ * - the shared Dolphin source copies in reference_projects/super_mario_strikers
+ *   and reference_projects/twilight_princess agree on two obvious shape
+ *   differences from this file: no separate timeFactor local in Create and no
+ *   block-scoped damp temporary in either function
+ * - applying exactly those reference-style cleanups here held completely flat in
+ *   objdiff for both ReverbHICreateDpl2 and ReverbHIModifyDpl2, so those
+ *   temporary lifetimes are not the remaining blocker
+ * - current diffs still cluster around frame size / spill slots and sdata2
+ *   constant identity, so future work should stay focused there
+ */
+
 extern f32 powf(f32 x, f32 y);
 
 static const f32 axfx_reverb_hi_dpl2_f32_0 = 0.0f;

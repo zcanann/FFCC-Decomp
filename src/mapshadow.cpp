@@ -44,7 +44,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 			if ((octTreeMask & (1U << i)) == 0) {
 				continue;
 			}
-			shadow = (*mapShadowArray)[i];
+			shadow = mapShadowArray->operator[](i);
 			if ((shadow->m_targetEnabled[(int)mapShadow] == 0) || (shadow->m_materialMode != 0)) {
 				continue;
 			}

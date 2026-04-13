@@ -24,15 +24,26 @@ const char* __PADVersion = s___PADVersion;
  *   in Pad.c; removing it is keepable and matches both the shared Dolphin pad
  *   sources and the rebuilt source Pad.o, which no longer emits that extra
  *   sbss global
- * - even after that cleanup, promoting pad/Pad.c to Matching still fails final
- *   linkage on pad-state globals rather than function bodies
+ * - a tighter follow-up probe showed that removing `static` from the shared
+ *   pad-state globals (`Initialized`, `EnabledBits`, `ResettingBits`,
+ *   `RecalibrateBits`, `WaitingBits`, `CheckingBits`, `PendingBits`,
+ *   `SamplingCallback`) is enough to resolve every cross-unit undefined except
+ *   the OnReset2 local static `recalibrated$401`
+ * - on the current main-based SDK branch, exporting those shared globals still
+ *   does not reproduce target Pad.o layout: the rebuilt object keeps local
+ *   `BarrelBits` and `recalibrated$400` ahead of the exported globals, and a
+ *   declaration-order probe did not change that
  * - the extracted target Pad.o exports `Initialized`, `EnabledBits`,
  *   `ResettingBits`, `RecalibrateBits`, `WaitingBits`, `CheckingBits`,
  *   `PendingBits`, `SamplingCallback`, and `recalibrated$401` as global sbss
  *   objects, while the rebuilt source Pad.o still emits the corresponding
  *   state as local/static bindings (`recalibrated$400` in source)
+ * - shared Dolphin reference Pad.c copies still keep these globals `static`, so
+ *   the target FFCC binding shape is currently a repo-specific divergence that
+ *   cannot be justified from source-family references alone
  * - those globals are imported by OS.o and ai.o when pad/Pad.c is promoted, so
- *   the remaining blocker is the pad/ai/os small-data binding seam, not the
+ *   the remaining blocker is now specifically the exported-vs-local identity of
+ *   that `recalibrated` static plus the broader pad/ai/os small-data seam, not
  *   Pad.c function text
  */
 

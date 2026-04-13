@@ -48,6 +48,16 @@ OSThreadQueue __DVDThreadQueue;
  *   regressed SDK matched code and still left the compiled source object with
  *   extra local helper symbols, so that target-asm shape is not recovered by
  *   a naive C rewrite alone
+ * - a later symbol-table comparison made that more specific: target dvdfs.o
+ *   does not carry separate `isSame`, `myStrncpy`, or
+ *   `DVDConvertEntrynumToPath` symbols at all, while the rebuilt source object
+ *   still does
+ * - removing exactly those three helper symbols with a focused inline rewrite
+ *   shrank source `.text` from `0x9CC` to `0x7D8` and moved function starts
+ *   toward target (`DVDConvertPathToEntrynum 0xD8 -> 0x38`,
+ *   `DVDFastOpen 0x3CC -> 0x314`, `DVDGetCurrentDir 0x818 -> 0x5A8`), but the
+ *   actual body matches regressed, so helper elimination alone is still not
+ *   the real fix
  * - even with both of those ownership fixes in place, promoting dvdfs.c to
  *   Matching still breaks final checksum, so the hidden-link blocker is
  *   narrower now but not resolved yet

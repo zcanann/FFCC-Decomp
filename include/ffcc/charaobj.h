@@ -89,6 +89,9 @@ public:
 	void enableDamageCol(int);
 
 	int m_attackAnimId;
+	int m_unk554;
+	int m_unk558;
+	int m_unk55C;
 	int m_itemId;
 	int m_particleSlots[0x16];
 	float m_targetDist;

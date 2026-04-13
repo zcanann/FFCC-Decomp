@@ -267,198 +267,212 @@ void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
  */
 int CBound::CheckFrustum0(CBound& outBound)
 {
-    float fVar1;
-    float fVar2;
-    unsigned int uVar3;
-    int iVar4;
-    unsigned int uVar5;
-    int iVar6;
-    unsigned int uVar7;
-    int iVar8;
-    double dVar9;
-    double dVar10;
-    float* param_1 = reinterpret_cast<float*>(this);
-    float* param_2 = reinterpret_cast<float*>(&outBound);
-    Vec local_48;
-    Vec local_3c;
+    float maxInit;
+    float minInit;
+    unsigned int clipMask;
+    int zIndex;
+    unsigned int insideMask;
+    int yIndex;
+    unsigned int outsideMask;
+    int xIndex;
+    double viewZ;
+    double zero;
+    float* inBound = reinterpret_cast<float*>(this);
+    float* clipBound = reinterpret_cast<float*>(&outBound);
+    Vec transformed;
+    Vec vertex;
 
-    fVar2 = -3.40282347e38f;
-    fVar1 = 3.40282347e38f;
-    param_2[2] = 3.40282347e38f;
-    param_2[1] = fVar1;
-    *param_2 = fVar1;
-    param_2[5] = fVar2;
-    param_2[4] = fVar2;
-    param_2[3] = fVar2;
-    if (!((s_f_vpos.x <= param_1[3] && s_f_vpos.y <= param_1[4] && s_f_vpos.z <= param_1[5]) &&
-          (*param_1 <= s_f_vpos.x && param_1[1] <= s_f_vpos.y && param_1[2] <= s_f_vpos.z))) {
-        dVar10 = (double)0.0f;
-        uVar5 = 0xF;
-        uVar7 = 0;
-        iVar8 = 0;
+    maxInit = 3.40282347e38f;
+    minInit = -3.40282347e38f;
+    clipBound[2] = maxInit;
+    clipBound[1] = maxInit;
+    clipBound[0] = maxInit;
+    clipBound[5] = minInit;
+    clipBound[4] = minInit;
+    clipBound[3] = minInit;
+
+    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
+        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
+        xIndex = 0;
         do {
-            if (iVar8 == 0) {
-                local_3c.x = *param_1;
+            if (xIndex == 0) {
+                vertex.x = inBound[0];
             } else {
-                local_3c.x = param_1[3];
+                vertex.x = inBound[3];
             }
-            iVar6 = 0;
+            yIndex = 0;
             do {
-                if (iVar6 == 0) {
-                    local_3c.y = param_1[1];
+                if (yIndex == 0) {
+                    vertex.y = inBound[1];
                 } else {
-                    local_3c.y = param_1[4];
+                    vertex.y = inBound[4];
                 }
-                iVar4 = 0;
+                zIndex = 0;
                 do {
-                    if (iVar4 == 0) {
-                        local_3c.z = param_1[2];
+                    if (zIndex == 0) {
+                        vertex.z = inBound[2];
                     } else {
-                        local_3c.z = param_1[5];
+                        vertex.z = inBound[5];
                     }
-                    PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
-                    fVar1 = local_48.x;
-                    if (*param_2 < local_48.x) {
-                        fVar1 = *param_2;
+                    PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
+
+                    maxInit = transformed.x;
+                    if (clipBound[0] < transformed.x) {
+                        maxInit = clipBound[0];
                     }
-                    *param_2 = fVar1;
-                    fVar1 = local_48.y;
-                    if (param_2[1] < local_48.y) {
-                        fVar1 = param_2[1];
+                    clipBound[0] = maxInit;
+
+                    maxInit = transformed.y;
+                    if (clipBound[1] < transformed.y) {
+                        maxInit = clipBound[1];
                     }
-                    param_2[1] = fVar1;
-                    fVar1 = local_48.z;
-                    if (param_2[2] < local_48.z) {
-                        fVar1 = param_2[2];
+                    clipBound[1] = maxInit;
+
+                    maxInit = transformed.z;
+                    if (clipBound[2] < transformed.z) {
+                        maxInit = clipBound[2];
                     }
-                    param_2[2] = fVar1;
-                    fVar1 = local_48.x;
-                    if (local_48.x < param_2[3]) {
-                        fVar1 = param_2[3];
+                    clipBound[2] = maxInit;
+
+                    maxInit = transformed.x;
+                    if (transformed.x < clipBound[3]) {
+                        maxInit = clipBound[3];
                     }
-                    param_2[3] = fVar1;
-                    fVar1 = local_48.y;
-                    if (local_48.y < param_2[4]) {
-                        fVar1 = param_2[4];
+                    clipBound[3] = maxInit;
+
+                    maxInit = transformed.y;
+                    if (transformed.y < clipBound[4]) {
+                        maxInit = clipBound[4];
                     }
-                    param_2[4] = fVar1;
-                    fVar1 = local_48.z;
-                    if (local_48.z < param_2[5]) {
-                        fVar1 = param_2[5];
+                    clipBound[4] = maxInit;
+
+                    maxInit = transformed.z;
+                    if (transformed.z < clipBound[5]) {
+                        maxInit = clipBound[5];
                     }
-                    param_2[5] = fVar1;
-                    dVar9 = (double)local_48.z;
-                    if (dVar9 <= dVar10) {
-                        if ((double)local_48.x <= -dVar9) {
-                            if (dVar9 <= (double)local_48.x) {
-                                uVar3 = 0;
-                            } else {
-                                uVar3 = 2;
-                            }
-                        } else {
-                            uVar3 = 1;
-                        }
-                        if ((double)local_48.y <= -dVar9) {
-                            if ((double)local_48.y < dVar9) {
-                                uVar3 = uVar3 | 8;
-                            }
-                        } else {
-                            uVar3 = uVar3 | 4;
-                        }
-                    } else {
-                        if ((double)local_48.x <= -dVar9) {
-                            if (dVar9 <= (double)local_48.x) {
-                                uVar3 = 0x10;
-                            } else {
-                                uVar3 = 0x12;
-                            }
-                        } else {
-                            uVar3 = 0x11;
-                        }
-                        if ((double)local_48.y <= -dVar9) {
-                            if ((double)local_48.y < dVar9) {
-                                uVar3 = uVar3 | 0x18;
-                            }
-                        } else {
-                            uVar3 = uVar3 | 0x14;
-                        }
-                    }
-                    iVar4 = iVar4 + 1;
-                    uVar5 = uVar5 & uVar3;
-                    uVar7 = uVar7 | uVar3;
-                } while (iVar4 < 2);
-                iVar6 = iVar6 + 1;
-            } while (iVar6 < 2);
-            iVar8 = iVar8 + 1;
-        } while (iVar8 < 2);
-        if (uVar5 == 0) {
-            uVar5 = (unsigned int)__cntlzw(uVar7);
-            iVar8 = (int)(uVar5 >> 5) + 1;
-        } else {
-            iVar8 = 0;
-        }
-    } else {
-        iVar8 = 0;
-        do {
-            if (iVar8 == 0) {
-                local_3c.x = *param_1;
-            } else {
-                local_3c.x = param_1[3];
-            }
-            iVar6 = 0;
-            do {
-                if (iVar6 == 0) {
-                    local_3c.y = param_1[1];
-                } else {
-                    local_3c.y = param_1[4];
-                }
-                iVar4 = 0;
-                do {
-                    if (iVar4 == 0) {
-                        local_3c.z = param_1[2];
-                    } else {
-                        local_3c.z = param_1[5];
-                    }
-                    PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
-                    fVar1 = local_48.x;
-                    if (*param_2 < local_48.x) {
-                        fVar1 = *param_2;
-                    }
-                    *param_2 = fVar1;
-                    fVar1 = local_48.y;
-                    if (param_2[1] < local_48.y) {
-                        fVar1 = param_2[1];
-                    }
-                    param_2[1] = fVar1;
-                    fVar1 = local_48.z;
-                    if (param_2[2] < local_48.z) {
-                        fVar1 = param_2[2];
-                    }
-                    param_2[2] = fVar1;
-                    fVar1 = local_48.x;
-                    if (local_48.x < param_2[3]) {
-                        fVar1 = param_2[3];
-                    }
-                    param_2[3] = fVar1;
-                    fVar1 = local_48.y;
-                    if (local_48.y < param_2[4]) {
-                        fVar1 = param_2[4];
-                    }
-                    param_2[4] = fVar1;
-                    fVar1 = local_48.z;
-                    if (local_48.z < param_2[5]) {
-                        fVar1 = param_2[5];
-                    }
-                    iVar4 = iVar4 + 1;
-                    param_2[5] = fVar1;
-                } while (iVar4 < 2);
-                iVar6 = iVar6 + 1;
-            } while (iVar6 < 2);
-            iVar8 = iVar8 + 1;
-        } while (iVar8 < 2);
-        iVar8 = 1;
+                    clipBound[5] = maxInit;
+                    zIndex = zIndex + 1;
+                } while (zIndex < 2);
+                yIndex = yIndex + 1;
+            } while (yIndex < 2);
+            xIndex = xIndex + 1;
+        } while (xIndex < 2);
+        return 1;
     }
-    return iVar8;
+
+    zero = 0.0;
+    insideMask = 0xF;
+    outsideMask = 0;
+    xIndex = 0;
+    do {
+        if (xIndex == 0) {
+            vertex.x = inBound[0];
+        } else {
+            vertex.x = inBound[3];
+        }
+        yIndex = 0;
+        do {
+            if (yIndex == 0) {
+                vertex.y = inBound[1];
+            } else {
+                vertex.y = inBound[4];
+            }
+            zIndex = 0;
+            do {
+                if (zIndex == 0) {
+                    vertex.z = inBound[2];
+                } else {
+                    vertex.z = inBound[5];
+                }
+                PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
+
+                maxInit = transformed.x;
+                if (clipBound[0] < transformed.x) {
+                    maxInit = clipBound[0];
+                }
+                clipBound[0] = maxInit;
+
+                maxInit = transformed.y;
+                if (clipBound[1] < transformed.y) {
+                    maxInit = clipBound[1];
+                }
+                clipBound[1] = maxInit;
+
+                maxInit = transformed.z;
+                if (clipBound[2] < transformed.z) {
+                    maxInit = clipBound[2];
+                }
+                clipBound[2] = maxInit;
+
+                maxInit = transformed.x;
+                if (transformed.x < clipBound[3]) {
+                    maxInit = clipBound[3];
+                }
+                clipBound[3] = maxInit;
+
+                maxInit = transformed.y;
+                if (transformed.y < clipBound[4]) {
+                    maxInit = clipBound[4];
+                }
+                clipBound[4] = maxInit;
+
+                maxInit = transformed.z;
+                if (transformed.z < clipBound[5]) {
+                    maxInit = clipBound[5];
+                }
+                clipBound[5] = maxInit;
+
+                viewZ = (double)transformed.z;
+                if (viewZ <= zero) {
+                    if ((double)transformed.x <= -viewZ) {
+                        if (viewZ <= (double)transformed.x) {
+                            clipMask = 0;
+                        } else {
+                            clipMask = 2;
+                        }
+                    } else {
+                        clipMask = 1;
+                    }
+                    if ((double)transformed.y <= -viewZ) {
+                        if ((double)transformed.y < viewZ) {
+                            clipMask = clipMask | 8;
+                        }
+                    } else {
+                        clipMask = clipMask | 4;
+                    }
+                } else {
+                    if ((double)transformed.x <= -viewZ) {
+                        if (viewZ <= (double)transformed.x) {
+                            clipMask = 0x10;
+                        } else {
+                            clipMask = 0x12;
+                        }
+                    } else {
+                        clipMask = 0x11;
+                    }
+                    if ((double)transformed.y <= -viewZ) {
+                        if ((double)transformed.y < viewZ) {
+                            clipMask = clipMask | 0x18;
+                        }
+                    } else {
+                        clipMask = clipMask | 0x14;
+                    }
+                }
+                zIndex = zIndex + 1;
+                insideMask = insideMask & clipMask;
+                outsideMask = outsideMask | clipMask;
+            } while (zIndex < 2);
+            yIndex = yIndex + 1;
+        } while (yIndex < 2);
+        xIndex = xIndex + 1;
+    } while (xIndex < 2);
+
+    if (insideMask != 0) {
+        return 0;
+    }
+
+    insideMask = (unsigned int)__cntlzw(outsideMask);
+    return (int)(insideMask >> 5) + 1;
 }
 
 /*
@@ -472,108 +486,106 @@ int CBound::CheckFrustum0(CBound& outBound)
  */
 int CBound::CheckFrustum0(float farPlane)
 {
-    unsigned int uVar1;
-    int iVar2;
-    unsigned int uVar3;
-    int iVar4;
-    unsigned int uVar5;
-    int iVar6;
-    double dVar7;
-    double dVar8;
-    double dVar9;
-    float* param_1 = reinterpret_cast<float*>(this);
-    Vec local_48;
-    Vec local_3c;
+    unsigned int clipMask;
+    int zIndex;
+    unsigned int insideMask;
+    int yIndex;
+    unsigned int outsideMask;
+    int xIndex;
+    float farthestZ;
+    float zero;
+    float* inBound = reinterpret_cast<float*>(this);
+    Vec vertex;
+    Vec transformed;
 
-    if ((param_1[3] >= s_f_vpos.x) && (param_1[4] >= s_f_vpos.y) && (param_1[5] >= s_f_vpos.z) &&
-        (s_f_vpos.x >= *param_1) && (s_f_vpos.y >= param_1[1]) && (s_f_vpos.z >= param_1[2])) {
+    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
+        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
         return 1;
     }
 
-    dVar8 = (double)FLOAT_8032F780;
-    dVar9 = (double)kZeroF;
-    uVar3 = 0xF;
-    uVar5 = 0;
-    iVar6 = 0;
+    farthestZ = FLOAT_8032F780;
+    zero = kZeroF;
+    insideMask = 0xF;
+    outsideMask = 0;
+    xIndex = 0;
     do {
-        if (iVar6 == 0) {
-            local_3c.x = *param_1;
+        if (xIndex == 0) {
+            vertex.x = inBound[0];
         } else {
-            local_3c.x = param_1[3];
+            vertex.x = inBound[3];
         }
-        iVar4 = 0;
+        yIndex = 0;
         do {
-            if (iVar4 == 0) {
-                local_3c.y = param_1[1];
+            if (yIndex == 0) {
+                vertex.y = inBound[1];
             } else {
-                local_3c.y = param_1[4];
+                vertex.y = inBound[4];
             }
-            iVar2 = 0;
+            zIndex = 0;
             do {
-                if (iVar2 == 0) {
-                    local_3c.z = param_1[2];
+                if (zIndex == 0) {
+                    vertex.z = inBound[2];
                 } else {
-                    local_3c.z = param_1[5];
+                    vertex.z = inBound[5];
                 }
-                PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
-                dVar7 = (double)local_48.z;
-                if (dVar8 < dVar7) {
-                    dVar8 = dVar7;
+                PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
+                if (farthestZ < transformed.z) {
+                    farthestZ = transformed.z;
                 }
-                if (dVar7 <= dVar9) {
-                    if ((double)local_48.x <= -dVar7) {
-                        if (dVar7 <= (double)local_48.x) {
-                            uVar1 = 0;
+                if (transformed.z <= zero) {
+                    if (transformed.x <= -transformed.z) {
+                        if (transformed.x < transformed.z) {
+                            clipMask = 2;
                         } else {
-                            uVar1 = 2;
+                            clipMask = 0;
                         }
                     } else {
-                        uVar1 = 1;
+                        clipMask = 1;
                     }
-                    if ((double)local_48.y <= -dVar7) {
-                        if ((double)local_48.y < dVar7) {
-                            uVar1 = uVar1 | 8;
+                    if (transformed.y <= -transformed.z) {
+                        if (transformed.z <= transformed.y) {
+                            clipMask = clipMask | 8;
                         }
                     } else {
-                        uVar1 = uVar1 | 4;
+                        clipMask = clipMask | 4;
                     }
                 } else {
-                    if ((double)local_48.x <= -dVar7) {
-                        if (dVar7 <= (double)local_48.x) {
-                            uVar1 = 0x10;
+                    if (transformed.x <= -transformed.z) {
+                        if (transformed.x < transformed.z) {
+                            clipMask = 0x12;
                         } else {
-                            uVar1 = 0x12;
+                            clipMask = 0x10;
                         }
                     } else {
-                        uVar1 = 0x11;
+                        clipMask = 0x11;
                     }
-                    if ((double)local_48.y <= -dVar7) {
-                        if ((double)local_48.y < dVar7) {
-                            uVar1 = uVar1 | 0x18;
+                    if (transformed.y <= -transformed.z) {
+                        if (transformed.z <= transformed.y) {
+                            clipMask = clipMask | 0x18;
                         }
                     } else {
-                        uVar1 = uVar1 | 0x14;
+                        clipMask = clipMask | 0x14;
                     }
                 }
-                iVar2 = iVar2 + 1;
-                uVar3 = uVar3 & uVar1;
-                uVar5 = uVar5 | uVar1;
-            } while (iVar2 < 2);
-            iVar4 = iVar4 + 1;
-        } while (iVar4 < 2);
-        iVar6 = iVar6 + 1;
-    } while (iVar6 < 2);
-    if ((double)farPlane <= dVar8) {
-        if (uVar3 == 0) {
-            uVar3 = (unsigned int)__cntlzw(uVar5);
-            iVar6 = (int)(uVar3 >> 5) + 1;
-        } else {
-            iVar6 = 0;
+                zIndex = zIndex + 1;
+                insideMask = insideMask & clipMask;
+                outsideMask = outsideMask | clipMask;
+            } while (zIndex < 2);
+            yIndex = yIndex + 1;
+        } while (yIndex < 2);
+        xIndex = xIndex + 1;
+    } while (xIndex < 2);
+
+    if (farPlane <= farthestZ) {
+        if (insideMask != 0) {
+            return 0;
         }
-    } else {
-        iVar6 = 0;
+
+        insideMask = (unsigned int)__cntlzw(outsideMask);
+        return (int)(insideMask >> 5) + 1;
     }
-    return iVar6;
+
+    return 0;
 }
 
 /*

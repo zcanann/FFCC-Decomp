@@ -1663,6 +1663,7 @@ ax/AXProf.c:
 axfx/reverb_hi.c:
 	.text       start:0x80193E70 end:0x80194F34
 	.data       start:0x8021B760 end:0x8021B780
+	.sdata2     start:0x80333750 end:0x80333798
 
 axfx/reverb_std.c:
 	.text       start:0x80194F34 end:0x80195B30
@@ -1671,6 +1672,7 @@ axfx/reverb_std.c:
 axfx/chorus.c:
 	.text       start:0x80195B30 end:0x80196518
 	.data       start:0x8021B790 end:0x8021BF90
+	.sdata2     start:0x803337D8 end:0x803337E0
 
 axfx/delay.c:
 	.text       start:0x80196518 end:0x801969C4

@@ -816,7 +816,7 @@ config.libs = [
         "axfx",
         [
             Object(Matching, "axfx/axfx.c"),
-            Object(NonMatching, "axfx/chorus.c"),
+            Object(Matching, "axfx/chorus.c"),
             Object(Matching, "axfx/delay.c"),
             Object(NonMatching, "axfx/reverb_hi.c",
                 cflags=replace_flag_prefix(

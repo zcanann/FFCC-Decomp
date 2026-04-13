@@ -54,10 +54,10 @@ public:
     union AnimFlags {
         unsigned char m_animFlags; // 0x544-0x548
         struct Bits {
-            unsigned char m_animRequested : 1;
-            unsigned char m_animLoop : 1;
-            unsigned char m_animDirect : 1;
-            unsigned char m_animFlagsUnused : 5;
+            signed char m_animRequested : 1;
+            signed char m_animLoop : 1;
+            signed char m_animDirect : 1;
+            signed char m_animFlagsUnused : 5;
         } bits;
     } m_animFlagBits;
     int m_reqAnimId;       // 0x548

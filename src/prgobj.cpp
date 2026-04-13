@@ -253,7 +253,7 @@ void CGPrgObj::addSubStat()
 void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
 	signed char loopFlag = loop;
-	unsigned char directFlag = direct;
+	signed char directFlag = direct;
 
 	m_animFlagBits.bits.m_animRequested = 1;
 	m_reqAnimId = animId;

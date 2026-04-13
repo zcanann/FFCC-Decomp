@@ -762,6 +762,9 @@ extern "C" void* __vt__Q23std13bad_exception[];
  * - obvious pointer-shape probes there stayed flat: re-seeding
  *   badExceptionType through another local, const/register variants, and
  *   explicit cast/+0/&[0] call spellings did not dislodge the addi-vs-mr miss
+ * - a fresh recheck on the current SDK branch no longer reproduced that exact
+ *   narrow 99.45% state cleanly; local-static / exception-metadata mismatches
+ *   around unexpectedTypes and the bad_exception throw setup are visible again
  * - this should be treated as a narrow follow-up target, not a unit that wants
  *   a broad runtime rewrite
  */

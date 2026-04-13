@@ -44,6 +44,7 @@ struct pppColumUnkB {
 };
 
 struct pppColumUnkC {
+    u8 _pad[0xC];
     s32* m_serializedDataOffsets;
 };
 

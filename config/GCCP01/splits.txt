@@ -1711,6 +1711,7 @@ card/CARDBios.c:
 	.data       start:0x8021C1C0 end:0x8021C1D0
 	.bss        start:0x80327540 end:0x80327780
 	.sdata      start:0x8032EB70 end:0x8032EB78
+	.sbss       start:0x8032F2E0 end:0x8032F2E2
 
 card/CARDUnlock.c:
 	.text       start:0x801998E8 end:0x8019AB48
@@ -1837,6 +1838,7 @@ gba/GBAGetProcessStatus.c:
 
 gba/GBAJoyBoot.c:
 	.text       start:0x801A7870 end:0x801A877C
+	.data       start:0x8021CB48 end:0x8021CB78
 
 gba/GBARead.c:
 	.text       start:0x801A877C end:0x801A88DC
@@ -1849,6 +1851,7 @@ gba/GBAXfer.c:
 
 gba/GBAKey.c:
 	.text       start:0x801A8D9C end:0x801A9004
+	.data       start:0x8021CB78 end:0x8021CF20
 
 TRK_MINNOW_DOLPHIN/mainloop.c:
 	.text       start:0x801A9004 end:0x801A90FC
@@ -2073,6 +2076,7 @@ MSL_C/PPCEABI/bare/H/FILE_POS.c:
 
 MSL_C/PPCEABI/bare/H/mbstring.c:
 	.text       start:0x801B6498 end:0x801B65B0
+	.sdata2     start:0x80333938 end:0x8033393C
 
 MSL_C/PPCEABI/bare/H/mem.c:
 	.init       start:0x8000540C end:0x80005544

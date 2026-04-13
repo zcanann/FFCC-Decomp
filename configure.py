@@ -849,7 +849,7 @@ config.libs = [
     DolphinLib(
         "card",
         [
-            Object(NonMatching, "card/CARDBios.c"),
+            Object(Matching, "card/CARDBios.c"),
             Object(Matching, "card/CARDBlock.c"),
             Object(Matching, "card/CARDCheck.c"),
             Object(Matching, "card/CARDCreate.c"),
@@ -863,7 +863,7 @@ config.libs = [
             Object(Matching, "card/CARDRead.c"),
             Object(Matching, "card/CARDStat.c"),
             Object(Matching, "card/CARDUnlock.c"),
-            Object(NonMatching, "card/CARDWrite.c"),
+            Object(Matching, "card/CARDWrite.c"),
         ],
     ),
     DolphinLib(
@@ -904,15 +904,15 @@ config.libs = [
         [
             Object(Matching, "gba/GBA.c"),
             Object(Matching, "gba/GBAGetProcessStatus.c"),
-            Object(NonMatching, "gba/GBAJoyBoot.c"),
+            Object(Matching, "gba/GBAJoyBoot.c"),
             Object(Matching, "gba/GBARead.c"),
             Object(Matching, "gba/GBAWrite.c"),
             Object(Matching, "gba/GBAXfer.c"),
-            Object(
-                NonMatching,
-                "gba/GBAKey.c",
-                cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
-            ),
+                Object(
+                    Matching,
+                    "gba/GBAKey.c",
+                    cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto"),
+                ),
         ],
     ),
     {
@@ -988,7 +988,7 @@ config.libs = [
             Object(Matching, "MSL_C/PPCEABI/bare/H/k_sin.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/k_tan.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/math_ppc.c"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/mbstring.c"),
+            Object(Matching, "MSL_C/PPCEABI/bare/H/mbstring.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/mem.c"),
             Object(
                 Matching,

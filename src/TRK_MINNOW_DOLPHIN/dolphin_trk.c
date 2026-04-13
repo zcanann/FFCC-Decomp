@@ -101,7 +101,6 @@ asm void InitMetroTRK()
 	blr
 initCommTableSuccess:
 	b TRK_main //Jump to TRK_main
-	blr
 #endif // clang-format on
 }
 

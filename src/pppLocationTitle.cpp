@@ -260,13 +260,13 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int serializedOffset;
-    int graphId;
+    u32 graphId;
     LocationTitleWork* work;
     int graphFrame;
     int fadeDivisor;
     LocationTitleParticle* particle;
-    LocationTitleParticle* particles;
     long** shapeTable;
+    const float zero = 0.0f;
 
     serializedOffset = *param_3->m_serializedDataOffsets;
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
@@ -276,17 +276,14 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     }
 
     graphId = pppLocationTitle->m_graphId;
-    graphFrame = GetGraphFrameFromId(graphId);
     fadeDivisor = -1;
-    particles = (LocationTitleParticle*)work->m_particles;
-    shapeTable =
-        *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    graphFrame = ((int)graphId >> 0xC) + (u32)((int)graphId < 0 && (graphId & 0xFFF) != 0);
+    particle = (LocationTitleParticle*)work->m_particles;
+    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
     }
-
-    particle = particles;
 
     for (int i = 0; i < work->m_count; i++) {
         Mtx model;
@@ -302,7 +299,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         model[1][3] = worldPos.y;
         model[2][3] = worldPos.z;
 
-        pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
+        pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, zero, 0, 0, 0, 0, 0, 1, 0);
 
         if (fadeDivisor >= 0) {
             u8 alpha;

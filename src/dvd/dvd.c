@@ -27,12 +27,18 @@
  * - that seam fix removes the stale `dvd/dvd.c .sbss` alignment warning and
  *   makes the raw compiled dvd.o start its `.sbss` at `executing` instead of
  *   the bogus exported queue globals
+ * - dropping the totally unused local globals `ResetCount` / `MotorState`
+ *   makes the raw dvd.o tail collapse to the map-backed
+ *   `FirstTimeInBootrom` / `DVDInitialized` / `LastState` shape
  * - even after landing that seam correction, promoting dvd/dvd.c to Matching
- *   still failed final checksum on this branch
+ *   still failed final checksum while dvdfs.c stayed NonMatching
+ * - however, when both dvd.c and dvdfs.c are promoted together on this branch,
+ *   objdiff finally marks dvd.c itself fully complete again while dvdfs.c
+ *   still fails final linkage
  * - so the remaining blocker is no longer the `__DVDThreadQueue` /
- *   `__DVDLongFileNameFlag` seam itself; future work should stay focused on
- *   the later hidden-link metadata in dvd.c rather than reopening that head
- *   ownership split
+ *   `__DVDLongFileNameFlag` seam or the stale dvd.c tail locals themselves;
+ *   future work should bias toward dvdfs.c's hidden-link metadata before
+ *   reopening dvd.c again
  */
 
 // externs
@@ -78,9 +84,7 @@ static u32 LastError;
 static volatile s32 NumInternalRetry;
 static int ResetRequired;
 static int CancelAllSyncComplete;
-static volatile u32 ResetCount;
 static BOOL FirstTimeInBootrom;
-static u32 MotorState;
 static int DVDInitialized;
 void (*LastState)(DVDCommandBlock*);
 

@@ -98,6 +98,12 @@ static int initialized = 0;
  *   regressed badly instead of improving
  * - the existing struct-based source is therefore already closer to the
  *   original MWCC output than the more mechanical decomp translation
+ * - typed/local-order probes in allocate_from_fixed_pools were also not enough
+ *   on their own; one explicit start/cursor split for the fixed-subblock chain
+ *   regressed sharply instead of improving
+ * - a follow-up cleanup that removed the local pool_sizes/head/tail temporaries
+ *   and wrote the ring links directly through fs->head_/fs->tail_ also held
+ *   completely flat, so those convenience locals are not the remaining issue
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

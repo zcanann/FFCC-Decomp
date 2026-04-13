@@ -23,6 +23,29 @@ const GXColor GXInit_WhiteColor = {255, 255, 255, 255};
 extern const f32 GXInit_ZeroF;
 extern const f32 GXInit_OneF;
 extern const f32 GXInit_PointOneF;
+
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - baseline source already reports 100% in objdiff, but promoting GXInit.c still
+ *   breaks final main.dol linkage
+ * - the remaining mismatch is in constant-source binding, not control flow
+ * - live MWCC keeps emitting a local anonymous .sdata2 double @371 and binds both
+ *   lfd sites to it instead of the authored GXInit_IntToFloatBias symbol
+ *
+ * Probes already tried here without a keepable win:
+ * - moving GXInit_IntToFloatBias between the top and bottom constant groups
+ * - reordering GXInit_ZeroF / GXInit_OneF / GXInit_PointOneF
+ * - nearby MWCC flag / version probes from earlier passes
+ *
+ * What those probes ruled out:
+ * - declaration placement alone can move the float / double layout in .sdata2
+ * - but it still does not stop MWCC from materializing @371
+ * - so the remaining work is recovering the exact original constant-source shape
+ *   that makes the two lfd sites bind directly to GXInit_IntToFloatBias
+ */
+
 const f64 GXInit_IntToFloatBias = 4503599627370496.0;
 
 u32 resetFuncRegistered;

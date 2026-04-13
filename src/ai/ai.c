@@ -11,6 +11,31 @@ const char* __AIVersion = "<< Dolphin SDK - AI\tdebug build: Apr  5 2004 03:56:1
 const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34:25 (0x2301) >>";
 #endif
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - baseline source already reports 100% in objdiff, but promoting ai.c still
+ *   breaks final main.dol linkage
+ * - the visible source-side issue is the AI state globals in .sbss
+ * - target wants them exported and laid out in the exact PAL-map order
+ * - current plausible source still compiles them as local-binding statics
+ *
+ * Most useful probe so far:
+ * - exporting the AI state globals and declaring them in reverse source order
+ *   makes MWCC emit the exact target .sbss layout
+ * - that confirms the layout lever is declaration / binding shape, not control flow
+ *
+ * Why this is not keepable yet:
+ * - the only source shape that produced the target .sbss order was not plausible
+ *   original code
+ * - promoting that probe still failed final linkage anyway
+ * - the extracted target ai.o also carries PAD-side undefineds such as
+ *   CheckingBits / PendingBits / SamplingCallback / __PADSpec
+ * - so there is still at least one hidden object-attribution / linkage issue
+ *   beyond the visible .sbss layout mismatch
+ */
+
 static AISCallback __AIS_Callback;
 static AIDCallback __AID_Callback;
 static u8* __CallbackStack;

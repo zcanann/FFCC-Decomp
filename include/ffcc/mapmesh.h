@@ -16,7 +16,7 @@ class CMapMesh
 public:
     CMapMesh();
     ~CMapMesh();
-    
+
     void Destroy();
     void Ptr2Off();
     void Off2Ptr();

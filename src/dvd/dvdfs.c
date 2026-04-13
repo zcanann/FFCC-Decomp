@@ -15,6 +15,27 @@ char* FstStringStart;
 static u32 MaxEntryNum;
 u32 sDvdfsCurrentDirEntry;
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - dvdfs.c is currently a hidden-link blocker rather than a visible source
+ *   mismatch
+ *
+ * Most useful verified result so far:
+ * - current objdiff on this branch shows the unit at 100% code/data again
+ * - flipping configure.py from NonMatching to Matching still breaks final
+ *   main.dol checksum, so this is not a safe promotion yet
+ * - that means the remaining issue is object/linkage-level shape outside the
+ *   visible function-body diffs we have been chasing
+ *
+ * Why this matters:
+ * - more source churn in entryToPath / DVDGetCurrentDir is unlikely to help on
+ *   its own until the hidden-link cause is identified
+ * - future work here should focus on split ownership / object metadata /
+ *   neighboring attribution, not just local C cleanup
+ */
+
 // prototypes
 static BOOL isSame(const char* path, const char* string);
 static u32 myStrncpy(char* dest, char* src, u32 maxlen);

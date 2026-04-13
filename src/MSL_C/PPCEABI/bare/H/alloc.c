@@ -117,6 +117,10 @@ static int initialized = 0;
  *   used by the shared MSL source in super_mario_strikers also held completely
  *   flat, so that small source-order difference is not what drives the split-path
  *   register mismatch
+ * - a follow-up attempt to mirror the Ghidra/object shape more directly by
+ *   spelling out the 8-at-a-time fixed-subblock chain setup in
+ *   allocate_from_fixed_pools regressed badly (95.11% -> 60.69%), so the
+ *   remaining blocker is not "just force the visible unrolled loop" either
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

@@ -10,6 +10,18 @@
  * this branch makes mwldeppc hang past the 30s build timeout and leave a
  * zero-byte main.elf behind. That points to a hidden link/config blocker
  * rather than a remaining visible code or data mismatch.
+ *
+ * Fresh narrowed result on the current latest-main SDK branch:
+ * - the bad behavior is still real; a fresh Matching flip reproduced the same
+ *   past-timeout linker hang instead of a clean checksum failure
+ * - current raw rebuilt `OS.o` and target `OS.o` disagree at the three
+ *   boot-time pad-spec accesses in `OSInit`: source still relocates them
+ *   through `__PADSpec`, while target relocates the same sites through
+ *   `RecalibrateBits`
+ * - because the source C at those sites is plainly the pad-spec initialization
+ *   path, that mismatch looks more like stale small-data symbol attribution at
+ *   the pad/os seam than a real control-flow or arithmetic problem inside
+ *   `OS.c`
  */
 
 #define NOP 0x60000000

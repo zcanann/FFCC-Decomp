@@ -2,6 +2,22 @@
 #include "dolphin/mtx.h"
 #include "ffcc/symbols_shared.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - quat.c reports 100% code/data in objdiff, but promoting it to Matching on
+ *   the latest main-based SDK branch still fails the final main.dol checksum
+ *
+ * Most useful result so far:
+ * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
+ *   vec.c, and quat.c, and all four failed in the exact same way: configure
+ *   succeeds, link completes, and only the final checksum check fails
+ * - that makes this look like a shared hidden-link / metadata seam in the mtx
+ *   library cluster rather than a remaining visible source mismatch in this
+ *   file's body
+ */
+
 float acosf(float x);
 
 float sinf(float x);

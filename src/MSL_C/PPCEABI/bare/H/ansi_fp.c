@@ -2,6 +2,19 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/limits.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/float.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - ansi_fp.c reports 100% code/data in objdiff, but promoting it to Matching
+ *   on the latest main-based SDK branch still fails the final main.dol checksum
+ *
+ * Most useful result so far:
+ * - a fresh Matching flip on this branch rebuilt cleanly through link and only
+ *   failed at the final checksum stage, so the remaining issue is hidden
+ *   object/linkage metadata rather than visible function or constant mismatch
+ */
+
 static int __count_trailing_zerol(unsigned long x) {
     int result = 0;
     int bits_not_checked = sizeof(unsigned long) * CHAR_BIT;

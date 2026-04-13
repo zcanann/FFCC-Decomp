@@ -816,7 +816,7 @@ config.libs = [
         "axfx",
         [
             Object(Matching, "axfx/axfx.c"),
-            Object(NonMatching, "axfx/chorus.c"),
+            Object(Matching, "axfx/chorus.c"),
             Object(Matching, "axfx/delay.c"),
             Object(NonMatching, "axfx/reverb_hi.c",
                 cflags=replace_flag_prefix(
@@ -1091,7 +1091,7 @@ config.libs = [
             Object(Matching, "TRK_MINNOW_DOLPHIN/targcont.c"),
             Object(Matching, "TRK_MINNOW_DOLPHIN/target_options.c", mw_version="GC/2.6"),
             Object(
-                NonMatching,
+                Matching,
                 "TRK_MINNOW_DOLPHIN/targimpl.c",
                 mw_version="GC/2.6",
                 cflags=[

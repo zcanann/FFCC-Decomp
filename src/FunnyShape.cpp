@@ -366,13 +366,13 @@ void CFunnyShape::Update()
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
                 work->angle = (FLOAT_8032fda4 * work->angle) / FLOAT_8032fda8;
 
-                u32 u = static_cast<u32>(rand());
-                if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
+                r = rand();
+                if ((r % 2) != 0) {
                     work->x *= FLOAT_8032fd80;
                 }
 
-                u = static_cast<u32>(rand());
-                if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
+                r = rand();
+                if ((r % 2) != 0) {
                     work->y *= FLOAT_8032fd80;
                 }
 

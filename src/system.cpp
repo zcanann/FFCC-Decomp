@@ -328,17 +328,17 @@ void CSystem::ExecScenegraph()
 
                 if (((trigger | held) & 0x1000) != 0)
                 {
-                    if (m_scenegraphStepMode == 2)
+                    if (System.m_scenegraphStepMode == 2)
                     {
                         Sound.PauseAllSe(0);
-                        m_scenegraphStepMode = 0;
+                        System.m_scenegraphStepMode = 0;
                         GbaQue.ClrShopMode();
                         GbaQue.SetPauseMode(0);
                     }
                     else if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
                     {
                         Sound.PauseAllSe(1);
-                        m_scenegraphStepMode = 2;
+                        System.m_scenegraphStepMode = 2;
                         GbaQue.SetPauseMode(1);
                     }
                 }

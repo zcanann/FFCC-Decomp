@@ -252,13 +252,10 @@ void CGPrgObj::addSubStat()
  */
 void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
-	signed char loopFlag = loop;
-	unsigned char directFlag = direct;
-
-	m_animFlagBits.bits.m_animRequested = 1;
+	m_animFlagBits.m_animFlags = (m_animFlagBits.m_animFlags & 0x7f) | 0x80;
 	m_reqAnimId = animId;
-	m_animFlagBits.bits.m_animLoop = loopFlag;
-	m_animFlagBits.bits.m_animDirect = directFlag;
+	m_animFlagBits.m_animFlags = ((unsigned char)((signed char)loop << 6) & 0x40) | (m_animFlagBits.m_animFlags & 0xbf);
+	m_animFlagBits.m_animFlags = ((unsigned char)((signed char)direct << 5) & 0x20) | (m_animFlagBits.m_animFlags & 0xdf);
 }
 
 /*

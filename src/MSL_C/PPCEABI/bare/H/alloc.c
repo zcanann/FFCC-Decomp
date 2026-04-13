@@ -133,6 +133,15 @@ static int initialized = 0;
  *   directly from fix_pool_sizes[i] regressed slightly (95.11% -> 94.92%), so
  *   that explicit fix_size temporary is still closer to target than the more
  *   direct indexing spelling
+ * - removing the separate typed p local in allocate_from_fixed_pools and
+ *   deriving the `+0x14` subblock base directly from `b` both for the chain
+ *   loop and the final start_ store held completely flat, so the missing
+ *   `addi r?, r3, 0x14` shape in the current diff is not fixed by just
+ *   collapsing that local
+ * - a Block_subBlock follow-up that stopped carrying block_val/block_or_1 and
+ *   instead wrote `start->block = (((unsigned long)start->block & ~1) | 1);`
+ *   then reused `start->block` for new_sb->block also held completely flat, so
+ *   that shared block-tag value is not the remaining register-lifetime blocker
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level
@@ -380,7 +389,6 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         new_sb = (SubBlock*)((char*)start + requested_size);
         block_val = (unsigned long)start->block & ~1;
         block_or_1 = block_val | 1;
-
         was_free = !(old_tag & 2);
         old_size = old_tag & ~7;
         was_alloc = !was_free;
@@ -650,7 +658,6 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
         tail = fs->tail_;
         num_subblocks = (msize - 0x14) / sub_size;
         p = (FixSubBlock*)((char*)b + 0x14);
-
         b->prev_ = tail;
         b->next_ = head;
         tail->next_ = b;

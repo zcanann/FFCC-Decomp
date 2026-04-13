@@ -53,6 +53,11 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   (Create stayed 99.40129%, Modify stayed 97.29508%), so the remaining miss
  *   is now the nearby temporary/register lifetime around that block rather
  *   than the arithmetic opcode shape itself
+ * - matching the shared reference-project spelling more literally by adding
+ *   the outer parentheses around `rv->damping = (1.0f - (...))` in both
+ *   functions and changing Modify's range check back to a direct `0.1f`
+ *   literal was also completely flat, so this unit is not blocked on that
+ *   last visible source-family spelling difference either
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

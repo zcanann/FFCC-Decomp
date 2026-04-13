@@ -21,6 +21,13 @@
  * - extending that split immediately ran into the neighboring stale AX/GX
  *   handoff chain, so the real next step here is fixing the whole `.sbss`
  *   boundary cluster around `arq.c`, not rewriting the C
+ * - a full pass on that cluster confirmed the old PAL map is still useful for
+ *   the early AR/AX/GX window, but it stops being safe to trust verbatim once
+ *   the chain reaches the later TRK/MSL/Odemu/RedSound tail in this repo state
+ * - the keepable lesson from that failed split pass is that the early
+ *   `.sbss` ownership really is stale here, but the tail needs to be
+ *   re-anchored against the current build's actual symbol identities and total
+ *   section size instead of copied straight from the old PAL addresses
  */
 
 #ifdef DEBUG

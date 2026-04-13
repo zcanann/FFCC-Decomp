@@ -409,53 +409,40 @@ void CMenuPcs::FavoInit0()
  */
 bool CMenuPcs::FavoOpen()
 {
-	float fVar1;
-	double dVar2;
-	double dVar3;
-	short* psVar4;
-	int iVar5;
-	int iVar6;
-	int iVar7;
-	int iVar8;
+	int finished = 0;
 
 	if (singMenuState->initialized == 0) {
 		FavoInit();
 	}
 
-	iVar5 = 0;
-	singMenuState->frame = singMenuState->frame + 1;
-	iVar6 = (int)*favoList;
-	psVar4 = favoList + 4;
-	iVar7 = (int)singMenuState->frame;
-	iVar8 = iVar6;
-	if (0 < iVar6) {
-		do {
-			dVar3 = DOUBLE_80333078;
-			fVar1 = FLOAT_80333040;
-			if (*(int*)(psVar4 + 0x12) <= iVar7) {
-				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
-					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-					dVar2 = DOUBLE_80333050;
-					*(float*)(psVar4 + 8) = (float)((DOUBLE_80333050 / (double)*(int*)(psVar4 + 0x14)) *
-					                                (double)*(int*)(psVar4 + 0x10));
-					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-						fVar1 = (float)((dVar2 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10));
-						*(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1c) - (float)psVar4[0]) * fVar1;
-						*(float*)(psVar4 + 0x1a) = (*(float*)(psVar4 + 0x1e) - (float)psVar4[1]) * fVar1;
-					}
-				} else {
-					iVar5 = iVar5 + 1;
-					*(float*)(psVar4 + 8) = FLOAT_80333048;
-					*(float*)(psVar4 + 0x18) = fVar1;
-					*(float*)(psVar4 + 0x1a) = fVar1;
+	singMenuState->frame++;
+
+	int count = favoList[0];
+	FavoOpenAnim* anim = reinterpret_cast<FavoOpenAnim*>((unsigned char*)favoList + 8);
+	int frame = singMenuState->frame;
+
+	for (int i = 0; i < count; i++, anim++) {
+		float zeroF = FLOAT_80333040;
+		if (anim->startFrame <= frame) {
+			if (!(frame < anim->startFrame + anim->duration)) {
+				finished++;
+				anim->alpha = FLOAT_80333048;
+				anim->dx = zeroF;
+				anim->dy = zeroF;
+			} else {
+				anim->step++;
+				double oneD = DOUBLE_80333050;
+				anim->alpha = (float)((DOUBLE_80333050 / (double)anim->duration) * (double)anim->step);
+				if ((anim->flags & 2) == 0) {
+					float ratio = (float)((oneD / (double)anim->duration) * (double)anim->step);
+					anim->dx = (anim->targetX - (float)anim->x) * ratio;
+					anim->dy = (anim->targetY - (float)anim->y) * ratio;
 				}
 			}
-			psVar4 = psVar4 + 0x20;
-			iVar8 = iVar8 + -1;
-		} while (iVar8 != 0);
+		}
 	}
 
-	return iVar6 == iVar5;
+	return count == finished;
 }
 
 /*

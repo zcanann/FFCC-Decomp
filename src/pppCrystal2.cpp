@@ -151,14 +151,19 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
 
         if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
+            Crystal2RefractionMap* textureInfo;
+            u32 textureSize;
+            float stepX;
+            float stepY;
+            float yCoord;
             u32 y;
             u32 x;
 
             work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);
 
-            Crystal2RefractionMap* textureInfo = work->m_refractionMap;
-            u32 textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+            textureInfo = work->m_refractionMap;
+            textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
             textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xAD);
             textureInfo->m_format = GX_TF_IA8;
@@ -167,21 +172,21 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             textureInfo->m_imageCount = 0x100;
             textureInfo->m_bufferSize = textureSize;
 
-            const float start = -1.0f;
-            const float stepX = 2.0f / (float)(textureInfo->m_width - 1);
-            const float stepY = 2.0f / (float)(textureInfo->m_height - 1);
-            float yCoord = start;
+            stepX = 2.0f / (float)(textureInfo->m_width - 1);
+            stepY = 2.0f / (float)(textureInfo->m_height - 1);
+            yCoord = -1.0f;
 
             for (y = 0; y < (u32)textureInfo->m_height; y++) {
-                float xCoord = start;
                 float ySq = yCoord * yCoord;
+                float xCoord = -1.0f;
 
                 for (x = 0; x < (u32)textureInfo->m_width; x++) {
                     float magnitude = xCoord * xCoord + ySq;
+
                     if (magnitude > 1.0f) {
                         magnitude = sqrtf(magnitude);
-                    } else if (magnitude < 0.0f) {
-                        magnitude = 0.0f;
+                    } else if (!(magnitude >= 0.0f)) {
+                        magnitude = NAN;
                     }
 
                     if (magnitude > 0.8f) {
@@ -223,11 +228,11 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
  */
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
-    pppCrystal2RenderObject* object = (pppCrystal2RenderObject*)pppCrystal2;
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     s32 dataValIndex = param_2->m_dataValIndex;
     Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + serializedDataOffsets[2] + 0x80);
     pppCrystal2ColorBlock* colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + serializedDataOffsets[1] + 0x80);
+    pppCrystal2RenderObject* object;
     pppModelSt* model;
     int sourceTex;
     _GXTexObj backTexObj;
@@ -258,7 +263,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            &colorBlock->m_color, &object->m_drawMatrix, param_2->m_arg3,
+            &colorBlock->m_color, (pppFMATRIX*)((u8*)pppCrystal2 + 0x40), param_2->m_arg3,
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
@@ -268,6 +273,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         indTexMtx.value[1][1] = indTexMtx.value[0][0];
         texMtx = s_crystal2TexMtxBase;
 
+        object = (pppCrystal2RenderObject*)pppCrystal2;
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, object->m_localMatrix.value, cameraMtx);
         if ((int)Game.m_currentSceneId == 7) {

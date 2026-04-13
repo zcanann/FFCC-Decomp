@@ -45,6 +45,7 @@ extern "C" void* __vt__11CTexAnimSeq[];
 extern "C" void* __vt__Q28CTexAnim8CRefData[];
 extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" void __ct__25CPtrArray_P11CTexAnimSeq_Fv(void*);
+extern "C" void __dt__21CPtrArray_P8CTexAnim_Fv(void*, int);
 extern "C" void __dt__25CPtrArray_P11CTexAnimSeq_Fv(void*, int);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
@@ -613,7 +614,7 @@ CTexAnimSet::~CTexAnimSet()
 
     self->vtable = __vt__11CTexAnimSet;
     self->texAnims.ReleaseAndRemoveAll();
-    self->texAnims.~CPtrArray<CTexAnim*>();
+    __dt__21CPtrArray_P8CTexAnim_Fv(&self->texAnims, -1);
     __dt__4CRefFv(this, 0);
 }
 #pragma dont_inline reset

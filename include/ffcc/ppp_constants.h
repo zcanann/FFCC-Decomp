@@ -10,11 +10,6 @@ extern float gPppPointRApSpinScale;
 extern float gPppScaleLoopAutoZero;
 
 extern float gPppYmMoveCircleTurnSpan;
-extern float gPppYmMoveCircleZero;
-extern float gPppYmMoveCircleAngleScale;
-extern float gPppYmMoveCircleAngleToTableScale;
-extern float gPppYmMoveCircleTableDivisor;
-extern float gPppYmMoveCircleOne;
 extern float gPppYmMoveCircleRadToAngleScale;
 
 extern float gPppYmMoveParabolaYOffsetStep;

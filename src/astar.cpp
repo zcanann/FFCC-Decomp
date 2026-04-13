@@ -469,9 +469,9 @@ void CAStar::calcAStar()
 {
 	memset(m_routeTable, 0, sizeof(m_routeTable));
 
-	for (int from = 0; from < 64; ++from)
+	for (int to = 0; to < 64; ++to)
 	{
-		for (int to = 0; to < 64; ++to)
+		for (int from = 0; from < 64; ++from)
 		{
 			if (from == to)
 			{
@@ -494,7 +494,7 @@ void CAStar::calcAStar()
 				{
 					unsigned char portalIndex = m_bestPath.m_path[i];
 
-					m_routeTable[current][0][1] = portalIndex;
+					m_routeTable[current][to][1] = portalIndex;
 
 					unsigned int next = m_portals[portalIndex].m_groupA;
 
@@ -503,7 +503,7 @@ void CAStar::calcAStar()
 						next = m_portals[portalIndex].m_groupB;
 					}
 
-					m_routeTable[current][0][0] = static_cast<unsigned char>(next);
+					m_routeTable[current][to][0] = static_cast<unsigned char>(next);
 
 					System.Printf("%d ", static_cast<int>(next));
 

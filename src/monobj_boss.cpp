@@ -16,7 +16,7 @@ extern "C" int calcBranchFuncDefault__8CGMonObjFi(CGMonObj*, int);
 extern "C" void aiTargetAttackRomMon__8CGMonObjFi(CGMonObj*, int);
 extern "C" void aiTarget__8CGMonObjFv(CGMonObj*);
 extern "C" void _aiSeq__8CGMonObjFiiiiii(CGMonObj*, int, int, int, int, int, int);
-extern "C" void reqAnim__8CGPrgObjFiii(void*, int, int, int);
+extern "C" void reqAnim__8CGPrgObjFicc(void*, int, char, char);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
 extern "C" int isLoopAnim__8CGPrgObjFv(void*);
@@ -195,7 +195,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			*(int*)(SoundBuffer + 0x4f0) = (soundStep + 1) & 3;
-			reqAnim__8CGPrgObjFiii(self, 0xc, 0, 0);
+			reqAnim__8CGPrgObjFicc(self, 0xc, 0, 0);
 
 			int pdtIndex = -1;
 			u8* charaModelHandle = *(u8**)(self + 0xf8);
@@ -249,7 +249,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 				animId = 0x13;
 			}
 
-			reqAnim__8CGPrgObjFiii(self, animId, 0, 0);
+			reqAnim__8CGPrgObjFicc(self, animId, 0, 0);
 			u16 scriptScale = *(u16*)(*(u8**)(self + 0x7c) + 0xd4);
 			float moveMagnitude =
 			    *(float*)(self + 0x690) *
@@ -439,7 +439,7 @@ void CGMonObj::frameStatFuncGolem()
 	          in_f31 = (double)FLOAT_80331d2c;
 	        }
 	      }
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,1,1,0);
+	      reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,1,1,0);
 	      dVar3 = (double)getTargetRot__8CGPrgObjFP8CGPrgObj
 	                                ((CGPrgObj *)gMonObj,
 	                                 Game.m_partyObjArr[*(int *)&gMonObj->field_0x6c4]);
@@ -602,7 +602,7 @@ void CGMonObj::frameStatFuncOrcKing()
 	      putParticle__8CGPrgObjFiiP8CGObjectfi
 	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x18,
 	                 *(int *)&gMonObj->field_0x58c,&gMonObj->gObject,0x8cc0);
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xf,0,0);
+	      reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0xf,0,0);
 	      SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x10,0);
 	      SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x15,4);
 	    }
@@ -870,7 +870,7 @@ void CGMonObj::frameStatFuncSaw()
 	    iVar1 = *(int *)&gMonObj->field_0x52c;
 	    if (iVar1 == 0) {
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,10,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,10,0,0);
 	        pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
 	        if (pCVar2 == (CRef *)0x0) {
 	          iVar1 = -1;
@@ -895,7 +895,7 @@ void CGMonObj::frameStatFuncSaw()
 	    else if (iVar1 == 1) {
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
 	        *(undefined4 *)&gMonObj->field_0x560 = 0x495;
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,1,1,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,1,1,0);
 	      }
 	      if (*(int *)&gMonObj->field_0x530 == 0x19) {
 	        resetIgnoreHit__10CGCharaObjFv(gMonObj);
@@ -910,7 +910,7 @@ void CGMonObj::frameStatFuncSaw()
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
 	        (**(code **)((int)(gMonObj->gObject).base_object.object.m_vtable + 0x90))(gMonObj,0,0,0);
 	        gMonObj->field_0x6c0 = 0;
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xb,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0xb,0,0);
 	        endPSlotBit__10CGCharaObjFi(gMonObj,1);
 	        playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x1c52d,0x32,0x96,0,0);
 	      }
@@ -1028,7 +1028,7 @@ void CGMonObj::frameStatFuncLKShooter()
 	  iVar2 = *(int *)&gMonObj->field_0x520;
 	  if (iVar2 == 0x65) {
 	    if (*(int *)&gMonObj->field_0x528 == 0) {
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xffffffff,0,0);
+	      reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0xffffffff,0,0);
 	      rotTarget__8CGMonObjFif((double)FLOAT_80331da4,gMonObj,*(undefined4 *)&gMonObj->field_0x6c4);
 	    }
 	    if (((int)((uint)(byte)m_aiWork__8CGMonObj._0_1_ << 0x18) < 0) ||
@@ -1190,7 +1190,7 @@ void CGMonObj::frameStatFuncDragonZombie()
 	  iVar1 = *(int *)&gMonObj->field_0x520;
 	  if (iVar1 == 0x65) {
 	    if (*(int *)&gMonObj->field_0x528 == 0) {
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xf,0,0);
+	      reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0xf,0,0);
 	      playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x987a,0x32,0x96,0,0);
 	    }
 	    iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
@@ -1769,7 +1769,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 	    }
 	    else if (iVar2 == 1) {
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x1a,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0x1a,0,0);
 	      }
 	      else {
 	        iVar2 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
@@ -1779,7 +1779,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 	      }
 	    }
 	    else if ((iVar2 == 2) && (*(int *)&gMonObj->field_0x530 == 0)) {
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x1b,1,0);
+	      reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0x1b,1,0);
 	    }
 	  }
 	  return;
@@ -1990,7 +1990,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	    if (iVar1 == 0) {
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
 	        damageDelete__10CGCharaObjFv();
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 3 + 0x1c,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 3 + 0x1c,0,0);
 	      }
 	      else {
 	        iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
@@ -2003,7 +2003,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
 	        m_boss__8CGMonObj._92_1_ = m_boss__8CGMonObj._92_1_ & 0x7f | 0x80;
 	        m_boss__8CGMonObj._96_4_ = 1;
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 3 + 0x1d,1,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 3 + 0x1d,1,0);
 	      }
 	      else if (-1 < (int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x18)) {
 	        changeSubStat__8CGPrgObjFi((CGPrgObj *)gMonObj,2);
@@ -2011,7 +2011,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	    }
 	    else if (iVar1 == 2) {
 	      if (*(int *)&gMonObj->field_0x530 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 3 + 0x1e,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 3 + 0x1e,0,0);
 	        playSe3D__8CGPrgObjFiiiiP3Vec
 	                  ((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 2 + 0x11d34,0x32,0x96,0,0);
 	      }
@@ -2040,7 +2040,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	      }
 	      else if (*(int *)&gMonObj->field_0x52c == 1) {
 	        if (*(int *)&gMonObj->field_0x530 == 0) {
-	          reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ + 0x16,0,0);
+	          reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ + 0x16,0,0);
 	          playSe3D__8CGPrgObjFiiiiP3Vec
 	                    ((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ * 2 + 0x11d35,0x32,0x96,0,0);
 	        }
@@ -2061,7 +2061,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	        changeStat__8CGPrgObjFiii
 	                  (*(CGPrgObj **)(&m_boss__8CGMonObj.field_0x48 + m_boss__8CGMonObj._88_4_ * 4),0x65
 	                   ,0,0);
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ + 0x25,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,m_boss__8CGMonObj._88_4_ + 0x25,0,0);
 	        CFlat._4836_1_ = CFlat._4836_1_ & 0xdf | 0x20;
 	        CFlat._4840_4_ = CFlat._4840_4_ + 1;
 	      }
@@ -2082,7 +2082,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	    }
 	  }
 	  else if ((iVar1 < 0x69) && (*(int *)&gMonObj->field_0x528 == 0)) {
-	    reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x35,1,0);
+	    reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0x35,1,0);
 	  }
 	  return;
 	}
@@ -2407,7 +2407,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 	  pvVar2 = (gMonObj->gObject).m_scriptHandle[4];
 	  if (iVar1 == 0x66) {
 	    if (*(int *)&gMonObj->field_0x528 == 0) {
-	      reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xc,0,0);
+	      reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0xc,0,0);
 	    }
 	    else {
 	      iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
@@ -2420,7 +2420,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 	  else if (iVar1 < 0x66) {
 	    if (iVar1 == 100) {
 	      if (*(int *)&gMonObj->field_0x528 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,10,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,10,0,0);
 	      }
 	      else {
 	        iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);
@@ -2432,7 +2432,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 	    }
 	    else if (99 < iVar1) {
 	      if (*(int *)&gMonObj->field_0x528 == 0) {
-	        reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0xd,0,0);
+	        reqAnim__8CGPrgObjFicc((CGPrgObj *)gMonObj,0xd,0,0);
 	      }
 	      else {
 	        iVar1 = isLoopAnim__8CGPrgObjFv((CGPrgObj *)gMonObj);

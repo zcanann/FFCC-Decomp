@@ -250,15 +250,19 @@ void CGPrgObj::addSubStat()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPrgObj::reqAnim(int animId, int loop, int direct)
+void CGPrgObj::reqAnim(int animId, char loop, char direct)
 {
-	signed char loopFlag = loop;
-	unsigned char directFlag = direct;
+	unsigned char animFlags = m_animFlagBits.m_animFlags;
 
-	m_animFlagBits.bits.m_animRequested = 1;
+	animFlags = (animFlags & 0x7f) | 0x80;
+	m_animFlagBits.m_animFlags = animFlags;
 	m_reqAnimId = animId;
-	m_animFlagBits.bits.m_animLoop = loopFlag;
-	m_animFlagBits.bits.m_animDirect = directFlag;
+	animFlags = m_animFlagBits.m_animFlags;
+	animFlags = (((int)loop << 6) & 0x40) | (animFlags & 0xbf);
+	m_animFlagBits.m_animFlags = animFlags;
+	animFlags = m_animFlagBits.m_animFlags;
+	animFlags = (((int)direct << 5) & 0x20) | (animFlags & 0xdf);
+	m_animFlagBits.m_animFlags = animFlags;
 }
 
 /*

@@ -78,7 +78,7 @@ extern "C" {
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 		int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStChangeTex*);
 		void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 		void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
@@ -338,14 +338,15 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	int colorOffset = data->m_serializedDataOffsets[1];
-	ChangeTexWork* work = (ChangeTexWork*)((char*)&changeTex->field0_0x0 + data->m_serializedDataOffsets[2] + 0x80);
+	s32* serializedDataOffsets = data->m_serializedDataOffsets;
+	int colorOffset = serializedDataOffsets[1];
+	ChangeTexWork* work = (ChangeTexWork*)((char*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(
 	    GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0));
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-	    step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, &work->m_value0, &work->m_value1, &work->m_value2,
-	    &step->m_stepValue, &step->m_arg3);
+	    &changeTex->field0_0x0, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
+	    step->m_stepValue, step->m_arg3);
 
 	work->m_charaObj = pppMngStPtr->m_charaObj;
 	work->m_context = pppEnvStPtr;

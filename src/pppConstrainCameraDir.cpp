@@ -2,8 +2,12 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
-#include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
+
+static const float kPppConstrainCameraDirScaleBase = 1.0f;
+static const float kPppConstrainCameraDirDistanceBase = 25.0f;
+static const float kPppConstrainCameraDirScaleMul = 1.3333f;
+static const float kPppConstrainCameraDirInitScale = 0.0f;
 
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }

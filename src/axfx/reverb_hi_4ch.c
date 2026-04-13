@@ -47,6 +47,12 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   did force the separate ops, but regressed hard overall
  *   (Create 99.40% -> 97.85%, Modify 97.30% -> 93.36%), so the remaining
  *   blocker is not "just spell out the three statements" either
+ * - a narrower `f32 damp = 0.8f * rv->damping; rv->damping = 1.0f - (0.05f +
+ *   damp);` probe also forced the exact target-side `fmuls` + `fadds` +
+ *   `fsubs` sequence in both functions, but still held completely flat
+ *   (Create stayed 99.40129%, Modify stayed 97.29508%), so the remaining miss
+ *   is now the nearby temporary/register lifetime around that block rather
+ *   than the arithmetic opcode shape itself
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

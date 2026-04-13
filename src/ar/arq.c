@@ -28,6 +28,16 @@
  *   `.sbss` ownership really is stale here, but the tail needs to be
  *   re-anchored against the current build's actual symbol identities and total
  *   section size instead of copied straight from the old PAL addresses
+ * - a follow-up read of the currently extracted target objects showed why this
+ *   keeps stalling: under the stale split layout, AX-side units are currently
+ *   "borrowing" ARQ state to satisfy their own .sbss sizes
+ *   (`__ARQRequestPendingHi` lands in AXAlloc; `__ARQCallbackHi` /
+ *   `__ARQCallbackLo` / `__ARQChunkSize` / `__ARQ_init_flag` land in AXAux),
+ *   so fixing arq.c is not a one-endpoint edit
+ * - that makes the real next step more specific: re-split the whole
+ *   `arq -> AXAlloc -> AXAux -> ...` small-data chain coherently in one pass,
+ *   instead of extending arq.c in isolation and leaving the borrowed-tail
+ *   ownership intact
  */
 
 #ifdef DEBUG

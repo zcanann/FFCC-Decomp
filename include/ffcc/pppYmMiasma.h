@@ -4,7 +4,7 @@
 #include <dolphin/types.h>
 
 struct pppYmMiasma {
-    u32 field0_0x0;
+    s32 field0_0x0;
 };
 struct pppYmMiasmaUnkB;
 struct pppYmMiasmaUnkC {
@@ -37,4 +37,3 @@ void pppRenderYmMiasma(pppYmMiasma*, pppYmMiasmaUnkB*, pppYmMiasmaUnkC*);
 #endif
 
 #endif // _FFCC_PPP_YMMIASMA_H_
-

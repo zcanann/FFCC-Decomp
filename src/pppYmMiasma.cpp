@@ -46,7 +46,7 @@ struct VYmMiasma {
 };
 
 struct PYmMiasma {
-    u32 m_graphId;
+    s32 m_graphId;
     s32 m_dataValIndex;
     s16 m_shapeFrameStep;
     s16 m_pad0A;
@@ -119,7 +119,7 @@ struct YmMiasmaRenderParticleState {
 };
 
 struct YmMiasmaRenderStep {
-    u32 m_graphId;
+    s32 m_graphId;
     s32 m_dataValIndex;
     u8 m_pad8[4];
     u16 m_particleCount;
@@ -439,8 +439,8 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    void** workPtr = (void**)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    void* heap = *workPtr;
+    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    void* heap = work->m_particles;
 
     if (heap != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage(heap);
@@ -472,7 +472,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
     work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
-    if (step->m_graphId == *(u32*)pppYmMiasma_) {
+    if (step->m_graphId == pppYmMiasma_->field0_0x0) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
         work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
         work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;

@@ -35,6 +35,11 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  * - reordering the sum to `1.0f - ((0.8f * rv->damping) + 0.05f)` also stayed
  *   completely flat; MWCC still emitted separate `fmuls` + `fadds` instead of
  *   the target `fmadds`
+ * - forcing the named local `reverb_hi_4ch_value0_1` through every visible
+ *   `preDelay <= 0.1f` / `preDelay > 0.1f` check in Create and Modify was also
+ *   completely flat: the built object still emitted the same `0x30` .sdata2
+ *   with no extra local float symbol between `@120` and the `0.3f` / `0.6f`
+ *   tail
  * - the remaining miss is now concentrated in the damping rewrite in Create and
  *   Modify rather than sdata2 ownership: the target still folds
  *   `1.0f - (0.05f + 0.8f * damping)` into a slightly different instruction

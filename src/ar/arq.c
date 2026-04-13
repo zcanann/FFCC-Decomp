@@ -3,6 +3,19 @@
 
 #include "dolphin/ar/__ar.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - arq.c is already 100% code/data complete in objdiff, but promoting it to
+ *   Matching still fails the final main.dol checksum
+ *
+ * Most useful result so far:
+ * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
+ *   failed at the final checksum stage, so the remaining issue is hidden
+ *   object/linkage shape rather than visible C or data mismatch
+ */
+
 #ifdef DEBUG
 const char* __ARQVersion = "<< Dolphin SDK - ARQ\tdebug build: Apr  5 2004 03:56:20 (0x2301) >>";
 #else

@@ -32,8 +32,8 @@ struct PppSRandUpFVParam3 {
  */
 void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
-    PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param1;
     u8* self = (u8*)param2;
+    PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param1;
     PppSRandUpFVParam3* info = (PppSRandUpFVParam3*)param3;
 
     if (gPppCalcDisabled != 0) {

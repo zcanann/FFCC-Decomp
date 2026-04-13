@@ -769,6 +769,10 @@ extern "C" void* __vt__Q23std13bad_exception[];
  *   (`char* compareBadExceptionType = badExceptionType`) held completely flat,
  *   so the remaining addi-vs-mr choice is not fixed by a simple extra pointer
  *   copy in source
+ * - collapsing `stdExceptionBadExceptionType` / `stdBadExceptionType` into
+ *   direct offset initializers instead of stepwise assignments was also
+ *   completely flat, so the remaining addi-vs-mr choice is not fixed by that
+ *   simpler pointer setup either
  * - this should be treated as a narrow follow-up target, not a unit that wants
  *   a broad runtime rewrite
  */

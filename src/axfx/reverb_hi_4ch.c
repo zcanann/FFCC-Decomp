@@ -39,6 +39,10 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   completely flat: the built object still emitted the same `0x30` .sdata2
  *   with no extra local float symbol between `@120` and the `0.3f` / `0.6f`
  *   tail
+ * - even promoting `reverb_hi_4ch_value0_1` / `0_3` / `0_6` from `static const`
+ *   to plain file-scope `const` was completely flat on the fresh branch: MWCC
+ *   still folded `0.1f` into the earlier local pool, kept source `.sdata2` at
+ *   0x30 bytes, and did not materialize the target-style extra `0.1f` symbol
  * - a follow-up retest on the fresh branch corrected the stale assumption about
  *   contraction: for these damping blocks the target actually keeps separate
  *   `fmuls` + `fadds` + `fsubs`, while the baseline source is the one that

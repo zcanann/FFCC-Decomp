@@ -13,7 +13,9 @@ static OSBootInfo* BootInfo;
 static FSTEntry* FstStart;
 char* FstStringStart;
 static u32 MaxEntryNum;
-u32 sDvdfsCurrentDirEntry;
+static u32 currentDirectory;
+u32 __DVDLongFileNameFlag;
+OSThreadQueue __DVDThreadQueue;
 
 /*
  * TODO: Remove this note block once linkage has been resolved.
@@ -31,10 +33,34 @@ u32 sDvdfsCurrentDirEntry;
  * - a later cross-check against the shared Dolphin reference sources found
  *   that `__DVDThreadQueue` / `__DVDLongFileNameFlag` are authored in dvdfs.c,
  *   not dvd.c; moving those definitions here and extending the dvdfs `.sbss`
- *   window through `0x8032F080` keeps the baseline build green
- * - that seam correction does improve the extracted dvd/dvdfs object ownership
- *   story, but it is not sufficient on its own to make either dvdfs.c or
- *   dvd.c safely linkable yet
+ *   window through `0x8032F080` is now landed on this branch
+ * - the PAL/EN maps also call `0x8032F070` local `currentDirectory`, so this
+ *   unit now spells that slot as a local `currentDirectory` instead of the
+ *   older exported-style `sDvdfsCurrentDirEntry`
+ * - the raw compiled dvdfs.o now also confirms that symbol shape directly:
+ *   `BootInfo` / `FstStart` / `MaxEntryNum` / `currentDirectory` are local,
+ *   while `FstStringStart` / `__DVDLongFileNameFlag` / `__DVDThreadQueue`
+ *   stay global, matching the map ownership pattern
+ * - a direct source-shape pass toward the target asm was not keepable:
+ *   replacing the literal string uses with named statics, inlining the
+ *   `isSame` / `myStrncpy` / `DVDConvertEntrynumToPath` helpers into their
+ *   callers, and giving `entryToPath` / `cbForReadAsync` external linkage
+ *   regressed SDK matched code and still left the compiled source object with
+ *   extra local helper symbols, so that target-asm shape is not recovered by
+ *   a naive C rewrite alone
+ * - a later symbol-table comparison made that more specific: target dvdfs.o
+ *   does not carry separate `isSame`, `myStrncpy`, or
+ *   `DVDConvertEntrynumToPath` symbols at all, while the rebuilt source object
+ *   still does
+ * - removing exactly those three helper symbols with a focused inline rewrite
+ *   shrank source `.text` from `0x9CC` to `0x7D8` and moved function starts
+ *   toward target (`DVDConvertPathToEntrynum 0xD8 -> 0x38`,
+ *   `DVDFastOpen 0x3CC -> 0x314`, `DVDGetCurrentDir 0x818 -> 0x5A8`), but the
+ *   actual body matches regressed, so helper elimination alone is still not
+ *   the real fix
+ * - even with both of those ownership fixes in place, promoting dvdfs.c to
+ *   Matching still breaks final checksum, so the hidden-link blocker is
+ *   narrower now but not resolved yet
  *
  * Why this matters:
  * - more source churn in entryToPath / DVDGetCurrentDir is unlikely to help on
@@ -95,7 +121,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
     
     ASSERTMSGLINE(318, pathPtr, "DVDConvertPathToEntrynum(): null pointer is specified  ");
     
-    dirLookAt = sDvdfsCurrentDirEntry;
+    dirLookAt = currentDirectory;
     
     while (1) {
         if (*pathPtr == '\0') {
@@ -291,7 +317,7 @@ static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
-    return DVDConvertEntrynumToPath((s32)sDvdfsCurrentDirEntry, path, maxlen);
+    return DVDConvertEntrynumToPath((s32)currentDirectory, path, maxlen);
 }
 
 BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio) {

@@ -18,20 +18,17 @@ static f32 __THPIDCTWorkspace[64] ATTRIBUTE_ALIGN(32);
 static u8 *__THPHuffmanBits;
 static u8 *__THPHuffmanSizeTab;
 static u16 *__THPHuffmanCodeTab;
-u32 thpDecSbssPadding0;
-u32 thpDecSbssPadding1;
-u32 thpDecSbssPadding2;
-THPSample *Gbase ATTRIBUTE_ALIGN(32);
-u32 Gwid ATTRIBUTE_ALIGN(32);
-f32 *Gq ATTRIBUTE_ALIGN(32);
-u32 __THPOldGQR5;
-u32 __THPOldGQR6;
-u8 *__THPWorkArea;
-THPFileInfo *__THPInfo;
-BOOL __THPInitFlag;
+static THPSample *Gbase ATTRIBUTE_ALIGN(32);
+static u32 Gwid ATTRIBUTE_ALIGN(32);
+static f32 *Gq ATTRIBUTE_ALIGN(32);
 static u8 *__THPLCWork512[3];
 static u8 *__THPLCWork640[3];
+static u32 __THPOldGQR5;
+static u32 __THPOldGQR6;
+static u8 *__THPWorkArea;
 static THPCoeff *__THPMCUBuffer[6];
+static THPFileInfo *__THPInfo;
+static BOOL __THPInitFlag;
 
 #define THPROUNDUP(a, b) ((((s32)(a)) + ((s32)(b)-1L)) / ((s32)(b)))
 

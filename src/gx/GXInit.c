@@ -37,6 +37,8 @@ extern const f32 GXInit_PointOneF;
  * Probes already tried here without a keepable win:
  * - moving GXInit_IntToFloatBias between the top and bottom constant groups
  * - reordering GXInit_ZeroF / GXInit_OneF / GXInit_PointOneF
+ * - matching the target-visible bottom constant order exactly as
+ *   `GXInit_OneF / GXInit_ZeroF / GXInit_PointOneF / GXInit_IntToFloatBias`
  * - forcing fbWidth / xfbHeight / efbHeight through explicit f32 locals before
  *   GXSetViewport / GXSetDispCopyYScale
  * - replacing the implicit u16->f32 casts with a local GXInitU16ToF32 helper
@@ -47,6 +49,10 @@ extern const f32 GXInit_PointOneF;
  * What those probes ruled out:
  * - declaration placement alone can move the float / double layout in .sdata2
  * - but it still does not stop MWCC from materializing @371
+ * - even the exact target-order bottom constant cluster stayed completely flat:
+ *   MWCC still emitted `GXInit_IntToFloatBias` at `0x10`, local `@371` at
+ *   `0x18`, then `GXInit_ZeroF / GXInit_OneF / GXInit_PointOneF` at
+ *   `0x20 / 0x24 / 0x28`
  * - even an explicit named-bias conversion helper still compiled with a fresh
  *   anonymous local bias constant and regressed the unit
  * - a fresh merged-tree retest still fails final main.dol linkage when

@@ -13,6 +13,46 @@ extern const char s___PADVersion[];
 #endif
 const char* __PADVersion = s___PADVersion;
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - Pad.c is now a hidden-link blocker rather than a visible code/data one
+ *
+ * Most useful verified results so far:
+ * - the older local source hack `PrintDebugPalCaution_message` did not belong
+ *   in Pad.c; removing it is keepable and matches both the shared Dolphin pad
+ *   sources and the rebuilt source Pad.o, which no longer emits that extra
+ *   sbss global
+ * - a tighter follow-up probe showed that removing `static` from the shared
+ *   pad-state globals (`Initialized`, `EnabledBits`, `ResettingBits`,
+ *   `RecalibrateBits`, `WaitingBits`, `CheckingBits`, `PendingBits`,
+ *   `SamplingCallback`) is enough to resolve every cross-unit undefined except
+ *   the OnReset2 local static `recalibrated$401`
+ * - on the current main-based SDK branch, exporting those shared globals still
+ *   does not reproduce target Pad.o layout: the rebuilt object kept local
+ *   `BarrelBits` and `recalibrated$400` ahead of the exported globals, and a
+ *   declaration-order probe stayed flat
+ * - the extracted target Pad.o exports `Initialized`, `EnabledBits`,
+ *   `ResettingBits`, `RecalibrateBits`, `WaitingBits`, `CheckingBits`,
+ *   `PendingBits`, `SamplingCallback`, and `recalibrated$401` as global sbss
+ *   objects, while the rebuilt source Pad.o still emits the corresponding
+ *   state as local/static bindings (`recalibrated$400` in source)
+ * - PAL and EN maps both agree GCCP01's Pad.c sbss run does not include
+ *   `BarrelBits`; wrapping that declaration in `#ifndef VERSION_GCCP01` is
+ *   keepable and removes the extra dead local slot from the rebuilt source Pad.o
+ * - promoting Pad.c after that cleanup still fails final linkage for a more
+ *   specific reason: ai.o imports `recalibrated$401`, while the rebuilt source
+ *   Pad.o still emits `recalibrated$400`
+ * - shared Dolphin reference Pad.c copies still keep these globals `static`, so
+ *   the target FFCC binding shape is currently a repo-specific divergence that
+ *   cannot be justified from source-family references alone
+ * - those globals are imported by OS.o and ai.o when pad/Pad.c is promoted, so
+ *   the remaining blocker is now specifically the exported-vs-local identity of
+ *   that `recalibrated` static plus the broader pad/ai/os small-data seam, not
+ *   Pad.c function text
+ */
+
 #define PAD_ALL                                                                                                        \
     (                      \
         PAD_BUTTON_LEFT  | \
@@ -43,12 +83,13 @@ static u32 RecalibrateBits;
 static u32 WaitingBits;
 static u32 CheckingBits;
 static u32 PendingBits;
+#ifndef VERSION_GCCP01
 static u32 BarrelBits;
+#endif
 
 static u32 Type[4];
 static PADStatus Origin[4];
 
-u32 PrintDebugPalCaution_message;
 u32 __PADSpec;
 
 // prototypes

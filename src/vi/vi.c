@@ -8,20 +8,6 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/vi/__vi.h"
 
-/*
- * SDK note: remove this block once linkage is resolved.
- *
- * 2026-04-13:
- * - Using the PAL/EN maps plus the live object metadata showed that the current
- *   SDK split had over-attributed vi/vi.c's .data window and swallowed the
- *   neighboring PAD release-version string.
- * - Trimming config/GCCP01/splits.txt so vi/vi.c .data ends at 0x80217BB0
- *   moved main/vi/vi to 100% code/data and created the expected auto data gap.
- * - Promoting vi/vi.c to Matching still failed final main.dol checksum, so the
- *   remaining blocker is hidden-linkage-level rather than the visible code/data
- *   ownership for this split.
- */
-
 #ifdef DEBUG
 const char* __VIVersion = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
 #else
@@ -1104,8 +1090,8 @@ u32 VIGetDTVStatus(void) {
     return dtvStatus & 1;
 }
 
-static void (*PositionCallback)(s16, s16);
-static VITiming* timingExtra;
+VITiming* timingExtra;
+void (*PositionCallback)(s16, s16);
 
 VITiming* __VISetExtraTiming(VITiming* t) {
     VITiming* old = timingExtra;

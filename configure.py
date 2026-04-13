@@ -775,7 +775,7 @@ config.libs = [
             Object(Matching, "vi/gpioexi.c"),
             Object(Matching, "vi/i2c.c"),
             Object(Matching, "vi/initphilips.c"),
-            Object(NonMatching, "vi/vi.c"),
+            Object(Matching, "vi/vi.c"),
         ],
     ),
     DolphinLib(
@@ -841,7 +841,7 @@ config.libs = [
     DolphinLib(
         "axart",
         [
-            Object(NonMatching, "axart/axart.c"),
+            Object(Matching, "axart/axart.c"),
             Object(Matching, "axart/axart3d.c"),
         ],
     ),
@@ -1156,7 +1156,7 @@ config.libs = [
         "cflags": cflags_thp,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "thp/THPDec.c"),
+            Object(Matching, "thp/THPDec.c"),
             Object(Matching, "thp/THPAudio.c"),
         ],
     },

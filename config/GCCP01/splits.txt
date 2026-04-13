@@ -1550,14 +1550,14 @@ dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
 	.data       start:0x80217470 end:0x802175A8
 	.sdata      start:0x8032EAD8 end:0x8032EAE0
-	.sbss       start:0x8032F060 end:0x8032F074
+	.sbss       start:0x8032F060 end:0x8032F080
 
 dvd/dvd.c:
 	.text       start:0x80188A70 end:0x8018B16C
 	.data       start:0x802175A8 end:0x80217728
 	.bss        start:0x8030CA20 end:0x8030CAB8
 	.sdata      start:0x8032EAE0 end:0x8032EAF8
-	.sbss       start:0x8032F074 end:0x8032F0C8
+	.sbss       start:0x8032F080 end:0x8032F0C8
 
 dvd/dvdqueue.c:
 	.text       start:0x8018B16C end:0x8018B364
@@ -1586,7 +1586,7 @@ vi/vi.c:
 	.data       start:0x802177E0 end:0x80217BB0
 	.bss        start:0x8030CB48 end:0x8030CC90
 	.sdata      start:0x8032EB08 end:0x8032EB11
-	.sbss       start:0x8032F0E0 end:0x8032F134
+	.sbss       start:0x8032F0E0 end:0x8032F140
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC
@@ -1690,6 +1690,8 @@ mix/mix.c:
 
 axart/axart.c:
 	.text       start:0x80197978 end:0x80197A0C
+	.sbss       start:0x8032F2B0 end:0x8032F2B4
+	.sdata2     start:0x80333820 end:0x80333828
 
 axart/axart3d.c:
 	.text       start:0x80197A0C end:0x80197A1C

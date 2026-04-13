@@ -25,6 +25,24 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  * - exporting the AI state globals and declaring them in reverse source order
  *   makes MWCC emit the exact target .sbss layout
  * - that confirms the layout lever is declaration / binding shape, not control flow
+ * - on the current main-based SDK branch that exact layout is:
+ *   __AIS_Callback / __AID_Callback / __CallbackStack / __OldStack /
+ *   __AI_init_flag / __AID_Active / bound_32KHz / bound_48KHz / min_wait /
+ *   max_wait / buffer
+ * - promoting ai.c with that exact rebuilt layout still fails final main.dol,
+ *   so the remaining blocker is no longer the visible AI .sbss ordering itself
+ * - on the current latest-main SDK branch, declaration order alone no longer
+ *   reproduces that exported layout; the source needed explicit zero
+ *   initializers on the reverse-ordered globals to make MWCC export all eleven
+ *   ai-state symbols in the exact target order
+ * - even with that exact .sbss shape, promoting ai.c still failed final
+ *   checksum, and objdiff reopened a small relocation-identity seam in
+ *   AIRegisterDMACallback against target-side PAD imports rather than ai-local
+ *   state
+ * - a fresh pad/Pad.c probe narrowed one of those hidden dependencies further:
+ *   when Pad.c is promoted after removing the dead GCCP01 BarrelBits slot, the
+ *   target ai.o still imports `recalibrated$401` specifically, while the
+ *   rebuilt source Pad.o emits `recalibrated$400`
  *
  * Why this is not keepable yet:
  * - the only source shape that produced the target .sbss order was not plausible

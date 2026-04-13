@@ -51,6 +51,17 @@
  *   split ownership, or both) that still pins the later TRK/MSL region to the
  *   pre-shift layout, and that needs to be identified before another coherent
  *   `.sbss` re-split attempt is likely to land
+ * - on the current latest-main SDK branch, a narrower re-split through the
+ *   early AX chain made it much farther before failing: `arq -> AXAlloc ->
+ *   AXAux -> AXCL -> AXOut -> AXSPB -> AXVPB` all lined up cleanly against the
+ *   PAL-map local ordering and the extracted object symbols
+ * - the first hard conflict now shows up at `AXProf`: this repo still has a
+ *   live `.sbss 0x8032F2A0..0x8032F2B0` split there, which overlaps the
+ *   PAL-backed `AXSPB 0x8032F280..0x8032F2A4` / `AXVPB 0x8032F2A8..0x8032F2B4`
+ *   windows before the map's later `AXProf 0x8032F2B8..0x8032F2C8`
+ * - that makes `AXProf` the current earliest trustworthy cutoff for the old
+ *   PAL `.sbss` guidance on this branch: the ARQ/AX tail before it still looks
+ *   stale, but the later ownership chain has already diverged by that point
  */
 
 #ifdef DEBUG

@@ -78,9 +78,9 @@ extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short 
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 static const char s_funnyShapeSpinnerText[] = "|/-\\";
 char* gFunnyShapeSpinnerText = 0;
-unsigned char gFunnyShapeSpinnerTextInitialized = 0;
+bool gFunnyShapeSpinnerTextInitialized = false;
 int gFunnyShapeSpinnerFrame = 0;
-unsigned char gFunnyShapeSpinnerFrameInitialized = 0;
+bool gFunnyShapeSpinnerFrameInitialized = false;
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -394,13 +394,13 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    if (gFunnyShapeSpinnerTextInitialized == 0) {
+    if (!gFunnyShapeSpinnerTextInitialized) {
         gFunnyShapeSpinnerText = const_cast<char*>(s_funnyShapeSpinnerText);
-        gFunnyShapeSpinnerTextInitialized = 1;
+        gFunnyShapeSpinnerTextInitialized = true;
     }
-    if (gFunnyShapeSpinnerFrameInitialized == 0) {
+    if (!gFunnyShapeSpinnerFrameInitialized) {
         gFunnyShapeSpinnerFrame = 0;
-        gFunnyShapeSpinnerFrameInitialized = 1;
+        gFunnyShapeSpinnerFrameInitialized = true;
     }
 
     gFunnyShapeSpinnerFrame++;
@@ -411,9 +411,7 @@ void CFunnyShapePcs::drawViewer()
     frameSign = gFunnyShapeSpinnerFrame >> 31;
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
     Graphic.Printf(const_cast<char*>(s_funnyShapeFmt),
-                   gFunnyShapeSpinnerText[(frameSign * 4 |
-                                           static_cast<unsigned int>((gFunnyShapeSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 30) -
-                                          frameSign]);
+                   gFunnyShapeSpinnerText[((gFunnyShapeSpinnerFrame >> 4) + frameSign) % 4 - frameSign]);
 }
 
 /*

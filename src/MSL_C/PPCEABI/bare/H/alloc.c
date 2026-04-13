@@ -142,6 +142,10 @@ static int initialized = 0;
  *   direct `(fix_size + 4)` expression before assigning the reusable
  *   `sub_size` temporary also held completely flat, so that source-order seam
  *   is not enough on its own to recover the target register flow
+ * - a fresh objdiff pass on latest main showed the first
+ *   allocate_from_fixed_pools diffs already start at the `__msize_inline`
+ *   decode / empty-ring setup boundary before the unrolled fixed-subblock
+ *   chain, so future probes should not overfocus on just the chain body
  * - a Block_subBlock follow-up that stopped carrying block_val/block_or_1 and
  *   instead wrote `start->block = (((unsigned long)start->block & ~1) | 1);`
  *   then reused `start->block` for new_sb->block also held completely flat, so

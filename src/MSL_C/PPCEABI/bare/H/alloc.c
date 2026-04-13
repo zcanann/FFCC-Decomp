@@ -113,6 +113,10 @@ static int initialized = 0;
  * - switching the fixed-subblock chain loop from raw char* temporaries to typed
  *   FixSubBlock* cursor/next temporaries also held completely flat, so the
  *   remaining mismatch is not just the cursor typing inside that loop
+ * - moving the local old_size capture in Block_subBlock down to the same spot
+ *   used by the shared MSL source in super_mario_strikers also held completely
+ *   flat, so that small source-order difference is not what drives the split-path
+ *   register mismatch
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

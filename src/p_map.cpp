@@ -283,44 +283,43 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
 {
     char* mapMng = reinterpret_cast<char*>(&MapMng);
     unsigned int value = 0;
+    int count = 2;
 
-    for (int count = 2; count != 0; count--) {
+    while (true) {
         if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A30) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A34) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A38) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A3C) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A40) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A44) != 0) {
             return (unsigned long long)value;
         }
-        mapMng += 4;
-        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A2C) != 0) {
-            return (unsigned long long)value;
+        if (*reinterpret_cast<CFile::CHandle**>(mapMng + 0x22A48) != 0) {
+            break;
         }
-        mapMng += 4;
+
+        mapMng += 0x20;
         value += 7;
+        count--;
+        if (count == 0) {
+            return ((unsigned long long)1 << 32) | value;
+        }
     }
 
-    return ((unsigned long long)1 << 32) | value;
+    return (unsigned long long)value;
 }
 
 /*

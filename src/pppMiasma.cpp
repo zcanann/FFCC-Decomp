@@ -278,8 +278,67 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
                                    GX_TF_RGBA8, 0);
         if (step->m_payload[0x1D] != 0) {
             gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex2, 0, yOffset, texWidth, texHeight, i4TexSize + rgba8TexSize,
-                                       GX_LINEAR, GX_TF_RGBA8, 0);
+            GXClearVtxDesc();
+            GXSetVtxDesc((GXAttr)9, GX_INDEX8);
+            GXSetVtxDesc((GXAttr)10, GX_INDEX8);
+            GXSetVtxDesc((GXAttr)0xB, GX_INDEX8);
+            GXSetVtxDesc((GXAttr)0xD, GX_INDEX8);
+
+            meshColor = *(u8**)((u8*)model + 0x3C);
+            meshColor[0] = 0xFF;
+            meshColor[1] = 0xFF;
+            meshColor[2] = 0xFF;
+            meshColor[3] = 0xFF;
+            colorRaw = *(u32*)meshColor;
+            GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
+            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
+            GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+            GXLoadPosMtxImm(*(Mtx*)((u8*)pppMiasma + 0x40), 0);
+            GXSetNumTevStages(1);
+            GXSetNumTexGens(0);
+            GXSetTevDirect(GX_TEVSTAGE0);
+            pppInitBlendMode();
+            pppSetBlendMode(1);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+
+            radius = FLOAT_80331940 - step->m_stepValue;
+            PSMTXScale(scaleMtx, radius, radius, radius);
+            PSMTXConcat(scaleMtx, *(Mtx*)((u8*)pppMiasma + 4), localMtx);
+            PSMTXConcat(ppvWorldMatrix, localMtx, *(Mtx*)((u8*)pppMiasma + 0x40));
+            GXLoadPosMtxImm(*(Mtx*)((u8*)pppMiasma + 0x40), 0);
+
+            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+                0, 0xF, 0xF, 0xF, 0xC);
+            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+                0, 7, 7, 7, 6);
+            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+
+            if (inFarZone) {
+                Graphic.SetDrawDoneDebugData(0x36);
+                pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)pppMiasma + 0x70), 0);
+                Graphic.SetDrawDoneDebugData(0x37);
+            }
+
+            GXSetTevDirect(GX_TEVSTAGE0);
+            pppInitBlendMode();
+            pppSetBlendMode(2);
+            GXSetCullMode(GX_CULL_BACK);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+                0, 0xF, 0xF, 0xF, 0xC);
+            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+                0, 7, 7, 7, 6);
+            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+
+            Graphic.SetDrawDoneDebugData(0x38);
+            pppDrawMesh__FP10pppModelStP3Veci(model, *(Vec**)((u8*)pppMiasma + 0x70), 0);
+            Graphic.SetDrawDoneDebugData(0x39);
+
+            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex2, 0, yOffset, texWidth, texHeight,
+                                       i4TexSize + rgba8TexSize, GX_LINEAR, GX_TF_RGBA8, 0);
         }
 
         Graphic.SetViewport();

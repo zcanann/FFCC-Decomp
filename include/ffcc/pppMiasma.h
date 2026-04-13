@@ -3,9 +3,6 @@
 
 #include <dolphin/types.h>
 
-struct Vec;
-struct _pppPObject;
-
 typedef struct {
     u8 m_pad_0x0[0xc];
     s32 m_graphId;
@@ -33,9 +30,6 @@ typedef struct {
     u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
 } pppMiasmaCtrl;
-
-void CalcSphereRadius(Vec*, unsigned short);
-void CreateScaleMatrix(_pppPObject*, float);
 
 #ifdef __cplusplus
 extern "C" {

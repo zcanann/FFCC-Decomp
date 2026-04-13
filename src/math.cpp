@@ -9,6 +9,7 @@ extern "C" float kZeroF;
 extern "C" float kNegOneF;
 extern "C" double DOUBLE_8032F778;
 extern "C" float FLOAT_8032F780;
+extern "C" float FLOAT_8032F784;
 extern "C" float FLOAT_8032F788;
 extern "C" float FLOAT_8032F758;
 extern "C" float FLOAT_8032F75C;
@@ -282,17 +283,17 @@ int CBound::CheckFrustum0(CBound& outBound)
     Vec local_48;
     Vec local_3c;
 
-    fVar2 = -3.40282347e38f;
-    fVar1 = 3.40282347e38f;
-    param_2[2] = 3.40282347e38f;
+    fVar2 = FLOAT_8032F788;
+    fVar1 = FLOAT_8032F784;
+    param_2[2] = FLOAT_8032F784;
     param_2[1] = fVar1;
     *param_2 = fVar1;
     param_2[5] = fVar2;
     param_2[4] = fVar2;
     param_2[3] = fVar2;
-    if (!((s_f_vpos.x <= param_1[3] && s_f_vpos.y <= param_1[4] && s_f_vpos.z <= param_1[5]) &&
-          (*param_1 <= s_f_vpos.x && param_1[1] <= s_f_vpos.y && param_1[2] <= s_f_vpos.z))) {
-        dVar10 = (double)0.0f;
+    if ((((param_1[3] < s_f_vpos.x) || (param_1[4] < s_f_vpos.y)) || (param_1[5] < s_f_vpos.z)) ||
+        (((s_f_vpos.x < *param_1) || (s_f_vpos.y < param_1[1])) || (s_f_vpos.z < param_1[2]))) {
+        dVar10 = (double)kZeroF;
         uVar5 = 0xF;
         uVar7 = 0;
         iVar8 = 0;

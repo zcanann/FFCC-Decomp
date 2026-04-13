@@ -4,6 +4,8 @@
 
 #include "dolphin/axfx/__axfx.h"
 
+extern const double reverb_hi_4ch_handle_i2fMagic;
+
 /*
  * TODO: Remove this note block once linkage has been resolved.
  *
@@ -20,11 +22,13 @@
  * - those cleanups were flat before the unit owned its target-style .sdata2,
  *   but became real progress once reverb_hi_4ch.c claimed .sdata2
  *   0x803337E0..0x80333818 and the handle-side constant labels were corrected
- * - with that ownership fixed, ReverbHICreateDpl2 now reaches 99.92233 and
- *   ReverbHIModifyDpl2 reaches 99.803276
- * - the remaining miss is now much narrower: both functions still carry a
- *   uniform +0x08 stack frame / spill-slot shift against target, so future work
- *   should stay focused on the last local-lifetime or frame-shape difference
+ * - a follow-up constant-ownership cleanup removed the bogus local handle-side
+ *   double, added the target-style local 0.1f bound for Modify, and relabeled
+ *   the 0.3f / 0.6f / external i2f-magic tail accordingly; that moved .sdata2
+ *   from 92.85714% to 96.0% and nudged .text to 99.47125%
+ * - the remaining miss is now concentrated in the damping rewrite in Create and
+ *   Modify: the target still folds `1.0f - (0.05f + 0.8f * damping)` into a
+ *   slightly different instruction shape than the current source
  */
 
 extern f32 powf(f32 x, f32 y);
@@ -33,6 +37,10 @@ static s32 axfx_reverb_hi_dpl2_lens[10] = {
     0x000006FD, 0x000007CF, 0x0000091D, 0x000001B1, 0x00000095,
     0x0000002F, 0x00000049, 0x00000043, 0x00000047, 0x00000000,
 };
+
+const static f32 reverb_hi_4ch_value0_1 = 0.1f;
+const static f32 reverb_hi_4ch_value0_3 = 0.3f;
+const static f32 reverb_hi_4ch_value0_6 = 0.6f;
 
 static inline void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
@@ -156,7 +164,7 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
      || (time < 0.01f) || (time > 10.0f)
      || (mix < 0.0f) || (mix > 1.0f)
      || (damping < 0.0f) || (damping > 1.0f)
-     || (preDelay < 0.0f) || (preDelay > 0.1f)) {
+     || (preDelay < 0.0f) || (preDelay > reverb_hi_4ch_value0_1)) {
         return 0;
     }
 
@@ -186,10 +194,6 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
 }
 
 
-const static f32 reverb_hi_4ch_value0_6 = 0.6f;
-const static f32 reverb_hi_4ch_value0_3 = 0.3f;
-const static double reverb_hi_4ch_i2fMagic = 4503601774854144.0;
-
 asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DPL2* rv, register s32 k) {
     nofralloc
 	stwu r1, -0xc0(r1)
@@ -212,8 +216,8 @@ asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DP
 	lfs f6, reverb_hi_4ch_value0_3@l(r31)
 	lis r31, reverb_hi_4ch_value0_6@ha
 	lfs f9, reverb_hi_4ch_value0_6@l(r31)
-	lis r31, reverb_hi_4ch_i2fMagic@ha
-	lfd f5, reverb_hi_4ch_i2fMagic@l(r31)
+	lis r31, reverb_hi_4ch_handle_i2fMagic@ha
+	lfd f5, reverb_hi_4ch_handle_i2fMagic@l(r31)
 	lfs f2, AXFX_REVHI_WORK_DPL2.allPassCoeff(rv)
 	lfs f15, AXFX_REVHI_WORK_DPL2.damping(rv)
 	lfs f8, AXFX_REVHI_WORK_DPL2.level(rv)

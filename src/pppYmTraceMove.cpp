@@ -31,29 +31,6 @@ struct pppYmTraceMoveMngStRaw {
 
 /*
  * --INFO--
- * PAL Address: 0x800d4bd0
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
-{
-	pppYmTraceMoveWork* work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
-	f32 zero;
-
-	pppSubVector(work->m_previousDirection, pppMngSt->m_paramVec0, pppMngSt->m_basePosition);
-	pppCopyVector(work->m_direction, work->m_previousDirection);
-	zero = kPppYmTraceMoveZero;
-	work->m_acceleration = zero;
-	work->m_velocity = zero;
-	work->m_distance = zero;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d4828
  * PAL Size: 936b
  * EN Address: TODO
@@ -139,4 +116,27 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
 	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
 	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d4bd0
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
+{
+	pppYmTraceMoveWork* work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
+	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
+	f32 zero;
+
+	pppSubVector(work->m_previousDirection, pppMngSt->m_paramVec0, pppMngSt->m_basePosition);
+	pppCopyVector(work->m_direction, work->m_previousDirection);
+	zero = kPppYmTraceMoveZero;
+	work->m_acceleration = zero;
+	work->m_velocity = zero;
+	work->m_distance = zero;
 }

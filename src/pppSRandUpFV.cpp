@@ -32,9 +32,8 @@ struct PppSRandUpFVParam3 {
  */
 void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
-    f32* randVec;
-    u8* self = (u8*)param2;
     PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param1;
+    u8* self = (u8*)param2;
     PppSRandUpFVParam3* info = (PppSRandUpFVParam3*)param3;
 
     if (gPppCalcDisabled != 0) {
@@ -42,6 +41,7 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
     }
 
     s32 currentIndex = *(s32*)(self + 0xC);
+    f32* randVec;
     if (currentIndex == 0) {
         randVec = (f32*)(self + *info->fieldC + 0x80);
 

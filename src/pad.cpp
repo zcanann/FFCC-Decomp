@@ -130,167 +130,198 @@ void CPad::Quit()
  */
 void CPad::Frame()
 {
-	PADStatus status[4];
-	u16 joyBusData[8];
-	u16* joyBusDataPtr;
-	u16* statusAsU16;
-	u16* padStateBase;
-	u16* padStateCursor;
-	u16* statusCursor;
-	u16* joyBusCursor;
-	char* self = reinterpret_cast<char*>(this);
+	float fVar2;
+	float fVar3;
+	double dVar4;
+	double dVar5;
+	int iVar6;
+	u16 uVar1;
+	u16 uVar8;
+	u16* puVar7;
+	s8 cVar9;
+	u16* puVar10;
+	int iVar11;
+	u16* puVar12;
+	u16* puVar13;
+	int iVar14;
+	u32 uVar15;
+	u32 uVar16;
+	u32 uVar17;
+	u16* puVar18;
+	int iVar19;
+	u16 local_98[8];
+	u16 local_88[24];
+	u8* self = reinterpret_cast<u8*>(this);
 
-	PADRead(status);
-	PADClamp(status);
-	memcpy(BYTE_ARRAY_8024430c, status, 0x30);
-
+	PADRead(reinterpret_cast<PADStatus*>(local_88));
+	PADClamp(reinterpret_cast<PADStatus*>(local_88));
+	memcpy(BYTE_ARRAY_8024430c, local_88, 0x30);
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
-	joyBusDataPtr = joyBusData;
-	for (int i = 0; i < 4; i++)
+	uVar17 = 0;
+	puVar18 = local_98;
+	puVar7 = puVar18;
+	do
 	{
-		int probe = SIProbe(i);
-		int leading = __cntlzw(0x40000 - probe);
-		*reinterpret_cast<u8*>(joyBusDataPtr) =
-			static_cast<u8>(((leading << 2) & 0x80) | (*reinterpret_cast<u8*>(joyBusDataPtr) & 0x7F));
-
-		u16 ctrlMode = static_cast<u16>(Joybus.GetCtrlMode(i));
-		joyBusDataPtr[0] = static_cast<u16>((ctrlMode & 0x3FFF) | (joyBusDataPtr[0] & 0xC000));
-
-		int setBit = 0;
-		if ((static_cast<s8>(*reinterpret_cast<u8*>(joyBusDataPtr)) < 0) && ((joyBusDataPtr[0] & 0x3FFF) == 0))
+		iVar6 = SIProbe(uVar17);
+		iVar6 = __cntlzw(0x40000 - iVar6);
+		*reinterpret_cast<u8*>(puVar7) =
+			static_cast<u8>(((iVar6 << 2) & 0x80) | (*reinterpret_cast<u8*>(puVar7) & 0x7F));
+		uVar8 = Joybus.GetCtrlMode(uVar17);
+		iVar6 = 0;
+		*puVar7 = static_cast<u16>((uVar8 & 0x3FFF) | (*puVar7 & 0xC000));
+		if ((static_cast<s8>(*reinterpret_cast<u8*>(puVar7)) < 0) && ((*puVar7 & 0x3FFF) == 0))
 		{
-			setBit = 1;
+			iVar6 = 1;
 		}
-		*reinterpret_cast<u8*>(joyBusDataPtr) =
-			static_cast<u8>((setBit << 6) | (*reinterpret_cast<u8*>(joyBusDataPtr) & 0xBF));
-
-		joyBusDataPtr[1] = 0;
-		if (static_cast<s8>(*reinterpret_cast<u8*>(joyBusDataPtr)) < 0)
+		*reinterpret_cast<u8*>(puVar7) =
+			static_cast<u8>((iVar6 << 6) | (*reinterpret_cast<u8*>(puVar7) & 0xBF));
+		puVar7[1] = 0;
+		if (static_cast<s8>(*reinterpret_cast<u8*>(puVar7)) < 0)
 		{
-			joyBusDataPtr[1] = static_cast<u16>(Joybus.GetPadData(i));
+			uVar8 = Joybus.GetPadData(uVar17);
+			puVar7[1] = uVar8;
 		}
-		joyBusDataPtr += 2;
-	}
+		uVar17 = uVar17 + 1;
+		puVar7 = puVar7 + 2;
+	} while (uVar17 < 4);
 
-	if ((*reinterpret_cast<u32*>(self + 0x1B0) != 0) && (*reinterpret_cast<s32*>(self + 0x1BC) >= 0))
+	iVar6 = reinterpret_cast<int>(_1b0_4_);
+	if ((iVar6 != 0) && ((iVar14 = _1bc_4_), -1 < iVar14))
 	{
-		u8* replay = *reinterpret_cast<u8**>(self + 0x1B0);
-		s32 frameIndex = *reinterpret_cast<s32*>(self + 0x1BC);
-		int* replayFlags = reinterpret_cast<int*>(replay + 4);
-		if (*replayFlags != 0)
+		if (*reinterpret_cast<int*>(iVar6 + 4) == 0)
 		{
-			int* replayFrames = reinterpret_cast<int*>(replay + 8);
-			if (*replayFrames < 0x1A5E0)
+			if (iVar14 < 0x1A5E0)
 			{
-				int replayPadOffset = 0;
-				int replayJoyBusOffset = 0;
-				PADStatus* statusPtr = status;
-				u16* joyBusPtr = joyBusData;
-				for (int i = 0; i < 4; i++)
+				iVar6 = 0;
+				iVar19 = 0;
+				puVar7 = local_88;
+				puVar13 = local_98;
+				iVar11 = 4;
+				do
 				{
-					u16 joyBus0 = joyBusPtr[0];
-					u16 joyBus1 = joyBusPtr[1];
-					u8* dst = replay + *replayFrames * 0x40 + replayPadOffset + 0x0C;
-					*reinterpret_cast<u16*>(dst) = statusPtr->button;
-					*reinterpret_cast<s8*>(dst + 2) = statusPtr->stickX;
-					*reinterpret_cast<s8*>(dst + 3) = statusPtr->stickY;
-					*reinterpret_cast<s8*>(dst + 4) = statusPtr->substickX;
-					*reinterpret_cast<s8*>(dst + 5) = statusPtr->substickY;
-					dst[6] = statusPtr->triggerLeft;
-					dst[7] = statusPtr->triggerRight;
-					dst[8] = statusPtr->analogA;
-					dst[9] = statusPtr->analogB;
-					*reinterpret_cast<s8*>(dst + 10) = statusPtr->err;
-					u16* dstJoyBus = reinterpret_cast<u16*>(replay + *replayFrames * 0x40 + replayJoyBusOffset + 0x3C);
-					dstJoyBus[0] = joyBus0;
-					dstJoyBus[1] = joyBus1;
-					statusPtr++;
-					replayPadOffset += 0x0C;
-					joyBusPtr += 2;
-					replayJoyBusOffset += 4;
-				}
-
-				(*replayFrames)++;
-				*reinterpret_cast<int*>(_1b0_4_) += 0x40;
+					uVar8 = *puVar7;
+					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar6 + 0x0C);
+					*puVar7 = *puVar10;
+					*reinterpret_cast<u8*>(puVar7 + 1) = *reinterpret_cast<u8*>(puVar10 + 1);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 3);
+					*reinterpret_cast<u8*>(puVar7 + 2) = *reinterpret_cast<u8*>(puVar10 + 2);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 5);
+					*reinterpret_cast<u8*>(puVar7 + 3) = *reinterpret_cast<u8*>(puVar10 + 3);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 7);
+					*reinterpret_cast<u8*>(puVar7 + 4) = *reinterpret_cast<u8*>(puVar10 + 4);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 9);
+					*reinterpret_cast<u8*>(puVar7 + 5) = *reinterpret_cast<u8*>(puVar10 + 5);
+					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar19 + 0x3C);
+					uVar1 = puVar10[1];
+					*puVar13 = *puVar10;
+					puVar13[1] = uVar1;
+					if ((uVar8 & PAD_TRIGGER_Z) != 0)
+					{
+						*puVar7 = static_cast<u16>(*puVar7 | uVar8);
+					}
+					puVar7 = puVar7 + 6;
+					iVar6 = iVar6 + 0x0C;
+					iVar19 = iVar19 + 4;
+					puVar13 = puVar13 + 2;
+					iVar11 = iVar11 + -1;
+				} while (iVar11 != 0);
 			}
 		}
-		else if (frameIndex < 0x1A5E0)
+		else if (*reinterpret_cast<int*>(iVar6 + 8) < 0x1A5E0)
 		{
-			int replayPadOffset = 0;
-			int replayJoyBusOffset = 0;
-			PADStatus* statusPtr = status;
-			u16* joyBusPtr = joyBusData;
-			for (int i = 0; i < 4; i++)
+			iVar6 = 0;
+			iVar14 = 0;
+			puVar7 = local_88;
+			puVar13 = local_98;
+			iVar19 = 4;
+			do
 			{
-				u16 originalButtons = statusPtr->button;
-				const u8* src = replay + frameIndex * 0x40 + replayPadOffset + 0x0C;
-				const u16* replayJoyBus = reinterpret_cast<const u16*>(replay + frameIndex * 0x40 + replayJoyBusOffset + 0x3C);
-				statusPtr->button = *reinterpret_cast<const u16*>(src);
-				statusPtr->stickX = *reinterpret_cast<const s8*>(src + 2);
-				statusPtr->stickY = *reinterpret_cast<const s8*>(src + 3);
-				statusPtr->substickX = *reinterpret_cast<const s8*>(src + 4);
-				statusPtr->substickY = *reinterpret_cast<const s8*>(src + 5);
-				statusPtr->triggerLeft = src[6];
-				statusPtr->triggerRight = src[7];
-				statusPtr->analogA = src[8];
-				statusPtr->analogB = src[9];
-				statusPtr->err = *reinterpret_cast<const s8*>(src + 10);
-				joyBusPtr[0] = replayJoyBus[0];
-				joyBusPtr[1] = replayJoyBus[1];
-				if ((originalButtons & PAD_TRIGGER_Z) != 0)
-				{
-					statusPtr->button = static_cast<u16>(statusPtr->button | originalButtons);
-				}
-				statusPtr++;
-				replayPadOffset += 0x0C;
-				joyBusPtr += 2;
-				replayJoyBusOffset += 4;
-			}
+				uVar8 = *puVar13;
+				uVar1 = puVar13[1];
+				iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar6;
+				iVar6 = iVar6 + 0x0C;
+				puVar13 = puVar13 + 2;
+				puVar12 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x0C);
+				*puVar12 = *puVar7;
+				*reinterpret_cast<u8*>(puVar12 + 1) = *reinterpret_cast<u8*>(puVar7 + 1);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
+				*reinterpret_cast<u8*>(puVar12 + 2) = *reinterpret_cast<u8*>(puVar7 + 2);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
+				*reinterpret_cast<u8*>(puVar12 + 3) = *reinterpret_cast<u8*>(puVar7 + 3);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
+				*reinterpret_cast<u8*>(puVar12 + 4) = *reinterpret_cast<u8*>(puVar7 + 4);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
+				puVar10 = puVar7 + 5;
+				puVar7 = puVar7 + 6;
+				*reinterpret_cast<u8*>(puVar12 + 5) = *reinterpret_cast<u8*>(puVar10);
+				iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
+				iVar14 = iVar14 + 4;
+				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x3C);
+				*puVar10 = uVar8;
+				puVar10[1] = uVar1;
+				iVar19 = iVar19 + -1;
+			} while (iVar19 != 0);
+			*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) =
+				*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) + 1;
+			*reinterpret_cast<int*>(_1b0_4_) = *reinterpret_cast<int*>(_1b0_4_) + 0x40;
 		}
 	}
 
-	u32 missingGbaMask = 0;
-	statusAsU16 = reinterpret_cast<u16*>(status);
-	for (u32 i = 0; i < 4; i++)
+	puVar13 = local_88;
+	puVar10 = reinterpret_cast<u16*>(self + 0x154);
+	uVar16 = 0;
+	uVar17 = 0;
+	puVar7 = puVar13;
+	do
 	{
-		s8 err = *reinterpret_cast<s8*>(statusAsU16 + 5);
-		u32 padMask = 0x80000000u >> i;
+		cVar9 = *reinterpret_cast<s8*>(puVar7 + 5);
+		uVar15 = 0x80000000 >> uVar17;
+		if (cVar9 == -1)
+		{
+			cVar9 = Joybus.GBAReady(uVar17);
+			if (cVar9 == 0)
+			{
+				uVar16 = uVar16 | uVar15;
+			}
+			_1a8_4_ = _1a8_4_ & ~uVar15;
+		}
+		else if (cVar9 < -1)
+		{
+			if (cVar9 == -3)
+			{
+				_1a8_4_ = _1a8_4_ | uVar15;
+			}
+			else if (-4 < cVar9)
+			{
+				_1a8_4_ = _1a8_4_ & ~uVar15;
+			}
+		}
+		else if (cVar9 < 1)
+		{
+			_1a8_4_ = _1a8_4_ | uVar15;
+		}
+		uVar17 = uVar17 + 1;
+		puVar7 = puVar7 + 6;
+	} while (uVar17 < 4);
 
-		if (err == -1)
-		{
-			if (Joybus.GBAReady(i) == 0)
-			{
-				missingGbaMask |= padMask;
-			}
-			*reinterpret_cast<u32*>(self + 0x1A8) &= ~padMask;
-		}
-		else if (err < -1)
-		{
-			if (err == -3)
-			{
-				*reinterpret_cast<u32*>(self + 0x1A8) |= padMask;
-			}
-			else if (err > -4)
-			{
-				*reinterpret_cast<u32*>(self + 0x1A8) &= ~padMask;
-			}
-		}
-		else if (err < 1)
-		{
-			*reinterpret_cast<u32*>(self + 0x1A8) |= padMask;
-		}
-		statusAsU16 += 6;
-	}
-
-	if ((missingGbaMask & 0xF0000000) != 0)
+	if ((uVar16 & 0xF0000000) != 0)
 	{
-		PADReset(missingGbaMask & 0xF0000000);
+		PADReset(uVar16 & 0xF0000000);
 	}
 
-	padStateBase = reinterpret_cast<u16*>(self + 0x154);
-	*reinterpret_cast<u16*>(self + 0x1A0) = *reinterpret_cast<u16*>(self + 0x154);
+	fVar2 = FLOAT_8032f820;
+	*reinterpret_cast<u16*>(self + 0x1A0) = *puVar10;
+	uVar17 = 0;
 	*reinterpret_cast<u16*>(self + 0x158) = 0;
-	*reinterpret_cast<u16*>(self + 0x154) = 0;
+	*puVar10 = 0;
 	*reinterpret_cast<u16*>(self + 0x1A2) = *reinterpret_cast<u16*>(self + 0x156);
 	*reinterpret_cast<u16*>(self + 0x15A) = 0;
 	*reinterpret_cast<u16*>(self + 0x156) = 0;
@@ -301,281 +332,286 @@ void CPad::Frame()
 	*reinterpret_cast<u16*>(self + 0x160) = 0;
 	*reinterpret_cast<u16*>(self + 0x164) = 0;
 	*reinterpret_cast<u16*>(self + 0x162) = 0;
-	*reinterpret_cast<s8*>(self + 0x16B) = 0;
-	*reinterpret_cast<s8*>(self + 0x16A) = 0;
-	*reinterpret_cast<s8*>(self + 0x169) = 0;
-	*reinterpret_cast<s8*>(self + 0x168) = 0;
+	*reinterpret_cast<u8*>(self + 0x16B) = 0;
+	*reinterpret_cast<u8*>(self + 0x16A) = 0;
+	*reinterpret_cast<u8*>(self + 0x169) = 0;
+	*reinterpret_cast<u8*>(self + 0x168) = 0;
 	*reinterpret_cast<u8*>(self + 0x167) = 0;
 	*reinterpret_cast<u8*>(self + 0x166) = 0;
-	*reinterpret_cast<float*>(self + 0x180) = FLOAT_8032f820;
-	*reinterpret_cast<float*>(self + 0x17C) = FLOAT_8032f820;
-	*reinterpret_cast<float*>(self + 0x178) = FLOAT_8032f820;
-	*reinterpret_cast<float*>(self + 0x174) = FLOAT_8032f820;
-	*reinterpret_cast<float*>(self + 0x170) = FLOAT_8032f820;
-	*reinterpret_cast<float*>(self + 0x16C) = FLOAT_8032f820;
+	*reinterpret_cast<float*>(self + 0x180) = fVar2;
+	*reinterpret_cast<float*>(self + 0x17C) = fVar2;
+	*reinterpret_cast<float*>(self + 0x178) = fVar2;
+	*reinterpret_cast<float*>(self + 0x174) = fVar2;
+	*reinterpret_cast<float*>(self + 0x170) = fVar2;
+	*reinterpret_cast<float*>(self + 0x16C) = fVar2;
 	*reinterpret_cast<u16*>(self + 0x188) = 0;
 	*reinterpret_cast<u16*>(self + 0x186) = 0;
 	*reinterpret_cast<u16*>(self + 0x184) = 0;
 	*reinterpret_cast<u32*>(self + 0x198) = 0;
-
-	statusCursor = reinterpret_cast<u16*>(status);
-	joyBusCursor = joyBusData;
-	char* padInfo = self;
-	for (u32 pad = 0; pad < 4; pad++)
+	iVar6 = reinterpret_cast<int>(self);
+	do
 	{
-		padStateCursor = padStateBase;
-		u16* playerButtons = reinterpret_cast<u16*>(padInfo + 4);
-		for (int pass = 0; pass < 2; pass++)
+		puVar12 = reinterpret_cast<u16*>(iVar6 + 4);
+		iVar14 = 0;
+		iVar19 = 2;
+		puVar7 = puVar10;
+		do
 		{
-			if ((pass != 0) || (*reinterpret_cast<s8*>(statusCursor + 5) != -3))
+			if ((iVar14 != 0) || (*reinterpret_cast<s8*>(puVar13 + 5) != -3))
 			{
-				playerButtons[0x26] = *reinterpret_cast<u16*>(padInfo + 0x34) | *playerButtons;
-
-				if (pass == 0)
+				puVar12[0x26] = static_cast<u16>(*reinterpret_cast<u16*>(iVar6 + 0x34) | *puVar12);
+				if (iVar14 == 0)
 				{
-					u16 ctrlPacked = *joyBusCursor;
-					*reinterpret_cast<u16*>(padInfo + 0xC) = *reinterpret_cast<u16*>(padInfo + 0xE);
-					*reinterpret_cast<s8*>(padInfo + 0x44) = *reinterpret_cast<s8*>(statusCursor + 5);
-					*reinterpret_cast<u32*>(padInfo + 0x54) = (__cntlzw(1 - (ctrlPacked & 0x3FFF)) >> 5) & 0xFF;
-					*reinterpret_cast<u32*>(padInfo + 0x48) = 0;
-					*reinterpret_cast<u32*>(padInfo + 0x3C) = 0;
-					*reinterpret_cast<u32*>(padInfo + 0x40) = 0;
-
-					if ((*reinterpret_cast<s8*>(padInfo + 0x44) == 0) || ((ctrlPacked & 0x4000) != 0))
+					uVar8 = *puVar18;
+					*reinterpret_cast<u16*>(iVar6 + 0x0C) = *reinterpret_cast<u16*>(iVar6 + 0x0E);
+					uVar16 = (__cntlzw(1 - (uVar8 & 0x3FFF)) >> 5) & 0xFF;
+					*reinterpret_cast<s8*>(iVar6 + 0x44) = *reinterpret_cast<s8*>(puVar13 + 5);
+					*reinterpret_cast<u32*>(iVar6 + 0x54) = uVar16;
+					*reinterpret_cast<u32*>(iVar6 + 0x48) = 0;
+					*reinterpret_cast<u32*>(iVar6 + 0x3C) = 0;
+					*reinterpret_cast<u32*>(iVar6 + 0x40) = 0;
+					if ((*reinterpret_cast<s8*>(iVar6 + 0x44) == 0) || (((*reinterpret_cast<u8*>(puVar18) >> 6) & 1) != 0))
 					{
-						if ((ctrlPacked & 0x4000) == 0)
+						if (((*reinterpret_cast<u8*>(puVar18) >> 6) & 1) == 0)
 						{
-							*playerButtons = *statusCursor;
+							*puVar12 = *puVar13;
 						}
 						else
 						{
-							*playerButtons = joyBusCursor[1];
+							*puVar12 = puVar18[1];
 						}
-
-						if (*reinterpret_cast<u8*>(statusCursor + 3) > 99)
+						if (*reinterpret_cast<u8*>(puVar13 + 3) > 99)
 						{
-							*playerButtons |= 0x40;
+							*puVar12 = static_cast<u16>(*puVar12 | PAD_TRIGGER_L);
 						}
-						if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(statusCursor) + 7) > 99)
+						if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 7) > 99)
 						{
-							*playerButtons |= 0x20;
+							*puVar12 = static_cast<u16>(*puVar12 | PAD_TRIGGER_R);
 						}
-
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
-							s8 stickX = *reinterpret_cast<s8*>(padInfo + 0x18);
-							s8 stickY = *reinterpret_cast<s8*>(padInfo + 0x19);
-							int absX = stickX < 0 ? -stickX : stickX;
-							int absY = stickY < 0 ? -stickY : stickY;
-							if ((*reinterpret_cast<s32*>(self + 0x1C8) <= absX) || (*reinterpret_cast<s32*>(self + 0x1C8) <= absY))
+							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) >> 0x1F;
+							if ((_1c8_4_ <= static_cast<u32>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16)) ||
+								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) >> 0x1F),
+								 (_1c8_4_ <= static_cast<u32>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16))))
 							{
-								*playerButtons &= 0xFFF0;
-								*reinterpret_cast<u32*>(padInfo + 0x40) = 1;
-								if (*reinterpret_cast<s32*>(self + 0x1C8) <= stickX)
+								*puVar12 = static_cast<u16>(*puVar12 & 0xFFF0);
+								*reinterpret_cast<u32*>(iVar6 + 0x40) = 1;
+								if (_1c8_4_ <= static_cast<u32>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
 								{
-									*playerButtons |= 2;
+									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_RIGHT);
 								}
-								if (stickX <= -*reinterpret_cast<s32*>(self + 0x1C8))
+								if (static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) <= -static_cast<int>(_1c8_4_))
 								{
-									*playerButtons |= 1;
+									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_LEFT);
 								}
-								if (*reinterpret_cast<s32*>(self + 0x1C8) <= stickY)
+								if (_1c8_4_ <= static_cast<u32>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
 								{
-									*playerButtons |= 8;
+									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_UP);
 								}
-								if (stickY <= -*reinterpret_cast<s32*>(self + 0x1C8))
+								if (static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) <= -static_cast<int>(_1c8_4_))
 								{
-									*playerButtons |= 4;
+									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_DOWN);
 								}
 							}
 						}
-
-						*reinterpret_cast<u32*>(padInfo + 0x48) |= 1;
-						*reinterpret_cast<s8*>(padInfo + 0x18) = *reinterpret_cast<s8*>(statusCursor + 1);
-						*reinterpret_cast<u16*>(padInfo + 0xE) = 0;
-						if (*reinterpret_cast<s8*>(padInfo + 0x18) < 0)
+						*reinterpret_cast<u32*>(iVar6 + 0x48) = *reinterpret_cast<u32*>(iVar6 + 0x48) | 1;
+						*reinterpret_cast<u8*>(iVar6 + 0x18) = *reinterpret_cast<u8*>(puVar13 + 1);
+						*reinterpret_cast<u16*>(iVar6 + 0x0E) = 0;
+						if (*reinterpret_cast<s8*>(iVar6 + 0x18) < 0)
 						{
-							*reinterpret_cast<u16*>(padInfo + 0xE) |= 1;
+							*reinterpret_cast<u16*>(iVar6 + 0x0E) = *reinterpret_cast<u16*>(iVar6 + 0x0E) | 1;
 						}
-						if (*reinterpret_cast<s8*>(padInfo + 0x18) > 0)
+						if (0 < *reinterpret_cast<s8*>(iVar6 + 0x18))
 						{
-							*reinterpret_cast<u16*>(padInfo + 0xE) |= 2;
+							*reinterpret_cast<u16*>(iVar6 + 0x0E) = *reinterpret_cast<u16*>(iVar6 + 0x0E) | 2;
 						}
-
-						*reinterpret_cast<s8*>(padInfo + 0x19) = *reinterpret_cast<s8*>(reinterpret_cast<u8*>(statusCursor) + 3);
-						if (*reinterpret_cast<s8*>(padInfo + 0x19) < 0)
+						*reinterpret_cast<u8*>(iVar6 + 0x19) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 3);
+						if (*reinterpret_cast<s8*>(iVar6 + 0x19) < 0)
 						{
-							*reinterpret_cast<u16*>(padInfo + 0xE) |= 4;
+							*reinterpret_cast<u16*>(iVar6 + 0x0E) = *reinterpret_cast<u16*>(iVar6 + 0x0E) | 4;
 						}
-						if (*reinterpret_cast<s8*>(padInfo + 0x19) > 0)
+						if (0 < *reinterpret_cast<s8*>(iVar6 + 0x19))
 						{
-							*reinterpret_cast<u16*>(padInfo + 0xE) |= 8;
+							*reinterpret_cast<u16*>(iVar6 + 0x0E) = *reinterpret_cast<u16*>(iVar6 + 0x0E) | 8;
 						}
-
-						*reinterpret_cast<s8*>(padInfo + 0x1A) = *reinterpret_cast<s8*>(statusCursor + 2);
-						*reinterpret_cast<s8*>(padInfo + 0x1B) = *reinterpret_cast<s8*>(reinterpret_cast<u8*>(statusCursor) + 5);
-						*reinterpret_cast<u8*>(padInfo + 0x16) = *reinterpret_cast<u8*>(statusCursor + 3);
-						*reinterpret_cast<u8*>(padInfo + 0x17) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(statusCursor) + 7);
-
-						*reinterpret_cast<float*>(padInfo + 0x24) =
-							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x18)) * FLOAT_8032f824;
-						*reinterpret_cast<float*>(padInfo + 0x28) =
-							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x19)) * FLOAT_8032f824;
-						*reinterpret_cast<float*>(padInfo + 0x2C) =
-							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x1A)) * FLOAT_8032f824;
-						*reinterpret_cast<float*>(padInfo + 0x30) =
-							static_cast<float>(*reinterpret_cast<s8*>(padInfo + 0x1B)) * FLOAT_8032f824;
-						*reinterpret_cast<float*>(padInfo + 0x1C) =
-							static_cast<float>(*reinterpret_cast<u8*>(padInfo + 0x16)) / FLOAT_8032f828;
-						*reinterpret_cast<float*>(padInfo + 0x20) =
-							static_cast<float>(*reinterpret_cast<u8*>(padInfo + 0x17)) / FLOAT_8032f828;
+						dVar4 = DOUBLE_8032f830;
+						dVar5 = DOUBLE_8032f838;
+						fVar2 = FLOAT_8032f824;
+						fVar3 = FLOAT_8032f828;
+						*reinterpret_cast<u8*>(iVar6 + 0x1A) = *reinterpret_cast<u8*>(puVar13 + 2);
+						*reinterpret_cast<u8*>(iVar6 + 0x1B) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 5);
+						*reinterpret_cast<u8*>(iVar6 + 0x16) = *reinterpret_cast<u8*>(puVar13 + 3);
+						*reinterpret_cast<u8*>(iVar6 + 0x17) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 7);
+						*reinterpret_cast<float*>(iVar6 + 0x24) =
+							static_cast<float>(static_cast<double>(*reinterpret_cast<s8*>(iVar6 + 0x18))) * fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x28) =
+							static_cast<float>(static_cast<double>(*reinterpret_cast<s8*>(iVar6 + 0x19))) * fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x2C) =
+							static_cast<float>(static_cast<double>(*reinterpret_cast<s8*>(iVar6 + 0x1A))) * fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x30) =
+							static_cast<float>(static_cast<double>(*reinterpret_cast<s8*>(iVar6 + 0x1B))) * fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x1C) =
+							static_cast<float>(static_cast<double>(*reinterpret_cast<u8*>(iVar6 + 0x16))) / fVar3;
+						*reinterpret_cast<float*>(iVar6 + 0x20) =
+							static_cast<float>(static_cast<double>(*reinterpret_cast<u8*>(iVar6 + 0x17))) / fVar3;
+						static_cast<void>(dVar4);
+						static_cast<void>(dVar5);
 					}
 					else
 					{
-						*playerButtons = 0;
-						*reinterpret_cast<s8*>(padInfo + 0x18) = 0;
-						*reinterpret_cast<s8*>(padInfo + 0x19) = 0;
-						*reinterpret_cast<s8*>(padInfo + 0x1A) = 0;
-						*reinterpret_cast<s8*>(padInfo + 0x1B) = 0;
-						*reinterpret_cast<u8*>(padInfo + 0x16) = 0;
-						*reinterpret_cast<u8*>(padInfo + 0x17) = 0;
-						*reinterpret_cast<float*>(padInfo + 0x24) = FLOAT_8032f820;
-						*reinterpret_cast<float*>(padInfo + 0x28) = FLOAT_8032f820;
-						*reinterpret_cast<float*>(padInfo + 0x2C) = FLOAT_8032f820;
-						*reinterpret_cast<float*>(padInfo + 0x30) = FLOAT_8032f820;
-						*reinterpret_cast<float*>(padInfo + 0x1C) = FLOAT_8032f820;
-						*reinterpret_cast<float*>(padInfo + 0x20) = FLOAT_8032f820;
+						*puVar12 = 0;
+						fVar2 = FLOAT_8032f820;
+						*reinterpret_cast<u8*>(iVar6 + 0x18) = 0;
+						*reinterpret_cast<u8*>(iVar6 + 0x19) = 0;
+						*reinterpret_cast<u8*>(iVar6 + 0x1A) = 0;
+						*reinterpret_cast<u8*>(iVar6 + 0x1B) = 0;
+						*reinterpret_cast<u8*>(iVar6 + 0x16) = 0;
+						*reinterpret_cast<u8*>(iVar6 + 0x17) = 0;
+						*reinterpret_cast<float*>(iVar6 + 0x24) = fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x28) = fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x2C) = fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x30) = fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x1C) = fVar2;
+						*reinterpret_cast<float*>(iVar6 + 0x20) = fVar2;
 					}
 				}
-				else if ((*joyBusCursor & 0x8000) != 0)
+				else if (static_cast<s8>(*reinterpret_cast<u8*>(puVar18)) < 0)
 				{
-					*reinterpret_cast<u32*>(padInfo + 0x48) |= 1;
-					*playerButtons = joyBusCursor[1];
+					uVar8 = puVar18[1];
+					*reinterpret_cast<u32*>(iVar6 + 0x48) = *reinterpret_cast<u32*>(iVar6 + 0x48) | 1;
+					*puVar12 = uVar8;
 				}
-
-				playerButtons[2] = *playerButtons & (playerButtons[0x26] ^ *playerButtons);
-				if (pass == 0)
+				puVar12[2] = static_cast<u16>(*puVar12 & (puVar12[0x26] ^ *puVar12));
+				if (iVar14 == 0)
 				{
-					*reinterpret_cast<u16*>(padInfo + 0x12) = playerButtons[0x26] & (playerButtons[0x26] ^ *playerButtons);
-					*reinterpret_cast<u16*>(padInfo + 0x10) = *reinterpret_cast<u16*>(padInfo + 0xE) &
-						(*reinterpret_cast<u16*>(padInfo + 0xC) ^ *reinterpret_cast<u16*>(padInfo + 0xE));
-					*reinterpret_cast<u16*>(padInfo + 0x14) = playerButtons[0x26] & *playerButtons & 0x1F7F;
-					if (*reinterpret_cast<s16*>(padInfo + 0x14) == 0)
+					*reinterpret_cast<u16*>(iVar6 + 0x12) =
+						static_cast<u16>(puVar12[0x26] & (puVar12[0x26] ^ *puVar12));
+					*reinterpret_cast<u16*>(iVar6 + 0x10) =
+						static_cast<u16>(*reinterpret_cast<u16*>(iVar6 + 0x0E) &
+						                 (*reinterpret_cast<u16*>(iVar6 + 0x0C) ^ *reinterpret_cast<u16*>(iVar6 + 0x0E)));
+					*reinterpret_cast<u16*>(iVar6 + 0x14) = static_cast<u16>(puVar12[0x26] & *puVar12 & 0x1F7F);
+					if (*reinterpret_cast<s16*>(iVar6 + 0x14) == 0)
 					{
-						*reinterpret_cast<u32*>(padInfo + 0x4C) = 0;
+						*reinterpret_cast<u32*>(iVar6 + 0x4C) = 0;
 					}
 					else
 					{
-						(*reinterpret_cast<u32*>(padInfo + 0x4C))++;
-						if ((*reinterpret_cast<u32*>(padInfo + 0x4C) < 0x10) ||
-							((*reinterpret_cast<u32*>(padInfo + 0x4C) & 1) != 0))
+						*reinterpret_cast<int*>(iVar6 + 0x4C) = *reinterpret_cast<int*>(iVar6 + 0x4C) + 1;
+						if (*reinterpret_cast<u32*>(iVar6 + 0x4C) < 0x10)
 						{
-							*reinterpret_cast<u16*>(padInfo + 0x14) = 0;
+							*reinterpret_cast<u16*>(iVar6 + 0x14) = 0;
+						}
+						else if ((*reinterpret_cast<u32*>(iVar6 + 0x4C) & 1) != 0)
+						{
+							*reinterpret_cast<u16*>(iVar6 + 0x14) = 0;
 						}
 					}
-
-					*reinterpret_cast<u16*>(padInfo + 0x14) |= playerButtons[2];
-					if (*reinterpret_cast<u32*>(padInfo + 0x3C) == 0)
+					*reinterpret_cast<u16*>(iVar6 + 0x14) =
+						static_cast<u16>(*reinterpret_cast<u16*>(iVar6 + 0x14) | puVar12[2]);
+					if (*reinterpret_cast<int*>(iVar6 + 0x3C) == 0)
 					{
-						*reinterpret_cast<u16*>(padInfo + 0x38) = 0;
-						*reinterpret_cast<u16*>(padInfo + 0x36) = 0;
-						*reinterpret_cast<u16*>(padInfo + 0x34) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x38) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x36) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x34) = 0;
 					}
 					else
 					{
-						*reinterpret_cast<u16*>(padInfo + 0x34) = *playerButtons;
-						*reinterpret_cast<u16*>(padInfo + 0x36) = playerButtons[2];
-						*reinterpret_cast<u16*>(padInfo + 0x38) = *reinterpret_cast<u16*>(padInfo + 0x14);
-						*reinterpret_cast<u16*>(padInfo + 0xE) = 0;
-						*reinterpret_cast<u16*>(padInfo + 0x10) = 0;
-						*reinterpret_cast<u16*>(padInfo + 0x14) = 0;
-						playerButtons[2] = 0;
-						*reinterpret_cast<u16*>(padInfo + 0x12) = 0;
-						*playerButtons = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x34) = *puVar12;
+						*reinterpret_cast<u16*>(iVar6 + 0x36) = puVar12[2];
+						*reinterpret_cast<u16*>(iVar6 + 0x38) = *reinterpret_cast<u16*>(iVar6 + 0x14);
+						*reinterpret_cast<u16*>(iVar6 + 0x0E) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x10) = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x14) = 0;
+						puVar12[2] = 0;
+						*reinterpret_cast<u16*>(iVar6 + 0x12) = 0;
+						*puVar12 = 0;
 					}
 				}
-
-				padStateCursor[2] |= playerButtons[2];
-				padStateCursor[0] |= *playerButtons;
-				if (pass == 0)
+				puVar7[2] = static_cast<u16>(puVar7[2] | puVar12[2]);
+				*puVar7 = static_cast<u16>(*puVar7 | *puVar12);
+				if (iVar14 == 0)
 				{
-					*reinterpret_cast<u32*>(self + 0x18C) |= *reinterpret_cast<u32*>(padInfo + 0x3C);
-					*reinterpret_cast<u32*>(self + 0x190) |= *reinterpret_cast<u32*>(padInfo + 0x40);
-					*reinterpret_cast<u16*>(self + 0x162) |= *reinterpret_cast<u16*>(padInfo + 0x12);
-					*reinterpret_cast<u16*>(self + 0x15E) |= *reinterpret_cast<u16*>(padInfo + 0xE);
-					*reinterpret_cast<u16*>(self + 0x160) |= *reinterpret_cast<u16*>(padInfo + 0x10);
-					*reinterpret_cast<u16*>(self + 0x164) |= *reinterpret_cast<u16*>(padInfo + 0x14);
-					*reinterpret_cast<u16*>(self + 0x186) |= *reinterpret_cast<u16*>(padInfo + 0x36);
-					*reinterpret_cast<u16*>(self + 0x184) |= *reinterpret_cast<u16*>(padInfo + 0x34);
-					*reinterpret_cast<u16*>(self + 0x188) |= *reinterpret_cast<u16*>(padInfo + 0x38);
-
-					s8 lx = *reinterpret_cast<s8*>(padInfo + 0x18);
-					s8 curLx = *reinterpret_cast<s8*>(self + 0x168);
-					s32 absCurLx = curLx < 0 ? -curLx : curLx;
-					s32 absLx = lx < 0 ? -lx : lx;
-					if (absCurLx < absLx)
+					*reinterpret_cast<u32*>(self + 0x18C) =
+						*reinterpret_cast<u32*>(self + 0x18C) | *reinterpret_cast<u32*>(iVar6 + 0x3C);
+					*reinterpret_cast<u32*>(self + 0x190) =
+						*reinterpret_cast<u32*>(self + 0x190) | *reinterpret_cast<u32*>(iVar6 + 0x40);
+					*reinterpret_cast<u16*>(self + 0x162) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x162) | *reinterpret_cast<u16*>(iVar6 + 0x12));
+					*reinterpret_cast<u16*>(self + 0x15E) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x15E) | *reinterpret_cast<u16*>(iVar6 + 0x0E));
+					*reinterpret_cast<u16*>(self + 0x160) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x160) | *reinterpret_cast<u16*>(iVar6 + 0x10));
+					*reinterpret_cast<u16*>(self + 0x164) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x164) | *reinterpret_cast<u16*>(iVar6 + 0x14));
+					*reinterpret_cast<u16*>(self + 0x186) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x186) | *reinterpret_cast<u16*>(iVar6 + 0x36));
+					*reinterpret_cast<u16*>(self + 0x184) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x184) | *reinterpret_cast<u16*>(iVar6 + 0x34));
+					*reinterpret_cast<u16*>(self + 0x188) =
+						static_cast<u16>(*reinterpret_cast<u16*>(self + 0x188) | *reinterpret_cast<u16*>(iVar6 + 0x38));
+					cVar9 = *reinterpret_cast<s8*>(iVar6 + 0x18);
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x168)) >> 0x1F;
+					uVar16 = static_cast<int>(cVar9) >> 0x1F;
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x168))) - uVar15) <
+					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x168) = lx;
-						*reinterpret_cast<float*>(self + 0x174) = *reinterpret_cast<float*>(padInfo + 0x24);
+						*reinterpret_cast<s8*>(self + 0x168) = cVar9;
+						*reinterpret_cast<float*>(self + 0x174) = *reinterpret_cast<float*>(iVar6 + 0x24);
 					}
-
-					s8 ly = *reinterpret_cast<s8*>(padInfo + 0x19);
-					s8 curLy = *reinterpret_cast<s8*>(self + 0x169);
-					s32 absCurLy = curLy < 0 ? -curLy : curLy;
-					s32 absLy = ly < 0 ? -ly : ly;
-					if (absCurLy < absLy)
+					cVar9 = *reinterpret_cast<s8*>(iVar6 + 0x19);
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x169)) >> 0x1F;
+					uVar16 = static_cast<int>(cVar9) >> 0x1F;
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x169))) - uVar15) <
+					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x169) = ly;
-						*reinterpret_cast<float*>(self + 0x178) = *reinterpret_cast<float*>(padInfo + 0x28);
+						*reinterpret_cast<s8*>(self + 0x169) = cVar9;
+						*reinterpret_cast<float*>(self + 0x178) = *reinterpret_cast<float*>(iVar6 + 0x28);
 					}
-
-					s8 rx = *reinterpret_cast<s8*>(padInfo + 0x1A);
-					s8 curRx = *reinterpret_cast<s8*>(self + 0x16A);
-					s32 absCurRx = curRx < 0 ? -curRx : curRx;
-					s32 absRx = rx < 0 ? -rx : rx;
-					if (absCurRx < absRx)
+					cVar9 = *reinterpret_cast<s8*>(iVar6 + 0x1A);
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x16A)) >> 0x1F;
+					uVar16 = static_cast<int>(cVar9) >> 0x1F;
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x16A))) - uVar15) <
+					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x16A) = rx;
-						*reinterpret_cast<float*>(self + 0x17C) = *reinterpret_cast<float*>(padInfo + 0x2C);
+						*reinterpret_cast<s8*>(self + 0x16A) = cVar9;
+						*reinterpret_cast<float*>(self + 0x17C) = *reinterpret_cast<float*>(iVar6 + 0x2C);
 					}
-
-					s8 ry = *reinterpret_cast<s8*>(padInfo + 0x1B);
-					s8 curRy = *reinterpret_cast<s8*>(self + 0x16B);
-					s32 absCurRy = curRy < 0 ? -curRy : curRy;
-					s32 absRy = ry < 0 ? -ry : ry;
-					if (absCurRy < absRy)
+					cVar9 = *reinterpret_cast<s8*>(iVar6 + 0x1B);
+					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(self + 0x16B)) >> 0x1F;
+					uVar16 = static_cast<int>(cVar9) >> 0x1F;
+					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(self + 0x16B))) - uVar15) <
+					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
 					{
-						*reinterpret_cast<s8*>(self + 0x16B) = ry;
-						*reinterpret_cast<float*>(self + 0x180) = *reinterpret_cast<float*>(padInfo + 0x30);
+						*reinterpret_cast<s8*>(self + 0x16B) = cVar9;
+						*reinterpret_cast<float*>(self + 0x180) = *reinterpret_cast<float*>(iVar6 + 0x30);
 					}
-
-					if (*reinterpret_cast<u8*>(self + 0x166) < *reinterpret_cast<u8*>(padInfo + 0x16))
+					if (*reinterpret_cast<u8*>(self + 0x166) < *reinterpret_cast<u8*>(iVar6 + 0x16))
 					{
-						*reinterpret_cast<u8*>(self + 0x166) = *reinterpret_cast<u8*>(padInfo + 0x16);
-						*reinterpret_cast<float*>(self + 0x16C) = *reinterpret_cast<float*>(padInfo + 0x1C);
+						*reinterpret_cast<u8*>(self + 0x166) = *reinterpret_cast<u8*>(iVar6 + 0x16);
+						*reinterpret_cast<float*>(self + 0x16C) = *reinterpret_cast<float*>(iVar6 + 0x1C);
 					}
-
-					if (*reinterpret_cast<u8*>(self + 0x167) < *reinterpret_cast<u8*>(padInfo + 0x17))
+					if (*reinterpret_cast<u8*>(self + 0x167) < *reinterpret_cast<u8*>(iVar6 + 0x17))
 					{
-						*reinterpret_cast<u8*>(self + 0x167) = *reinterpret_cast<u8*>(padInfo + 0x17);
-						*reinterpret_cast<float*>(self + 0x170) = *reinterpret_cast<float*>(padInfo + 0x20);
+						*reinterpret_cast<u8*>(self + 0x167) = *reinterpret_cast<u8*>(iVar6 + 0x17);
+						*reinterpret_cast<float*>(self + 0x170) = *reinterpret_cast<float*>(iVar6 + 0x20);
 					}
 				}
 			}
+			puVar12 = puVar12 + 1;
+			puVar7 = puVar7 + 1;
+			iVar14 = iVar14 + 1;
+			iVar19 = iVar19 + -1;
+		} while (iVar19 != 0);
+		uVar17 = uVar17 + 1;
+		puVar13 = puVar13 + 6;
+		puVar18 = puVar18 + 2;
+		iVar6 = iVar6 + 0x54;
+	} while (uVar17 < 4);
 
-			playerButtons++;
-			padStateCursor++;
-		}
-
-		statusCursor += 6;
-		joyBusCursor += 2;
-		padInfo += 0x54;
-		padStateBase += 2;
-	}
-
-	if (*reinterpret_cast<s32*>(self + 0x1BC) >= 0)
+	if (-1 < _1bc_4_)
 	{
-		(*reinterpret_cast<s32*>(self + 0x1BC))++;
+		_1bc_4_ = _1bc_4_ + 1;
 	}
 }
 

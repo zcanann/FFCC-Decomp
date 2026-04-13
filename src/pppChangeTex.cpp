@@ -339,8 +339,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	u8* colorData = (u8*)&changeTex->field0_0x0 + serializedDataOffsets[1] + 0x80;
-	ChangeTexWork* work = (ChangeTexWork*)((u8*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
+	int colorOffset = serializedDataOffsets[1];
+	ChangeTexWork* work = (ChangeTexWork*)((char*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(
 	    GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0));
 
@@ -457,7 +457,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	} alphaScale;
 
 	alphaScale.u[0] = 0x43300000;
-	alphaScale.u[1] = colorData[0xB];
+	alphaScale.u[1] = (u8)*((u8*)changeTex + colorOffset + 0x8B);
 	double alphaBase = (double)(FLOAT_80332028 * ((float)(alphaScale.d - DOUBLE_80332038) / FLOAT_80332028));
 
 	int arrayOffset = 0;

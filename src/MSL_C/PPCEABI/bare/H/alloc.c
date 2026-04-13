@@ -110,6 +110,9 @@ static int initialized = 0;
  * - a follow-up Block_subBlock cleanup that removed the separate was_alloc
  *   temporary and folded those writes under if (!was_free) also held
  *   completely flat, so that second boolean lifetime is not the key blocker
+ * - switching the fixed-subblock chain loop from raw char* temporaries to typed
+ *   FixSubBlock* cursor/next temporaries also held completely flat, so the
+ *   remaining mismatch is not just the cursor typing inside that loop
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

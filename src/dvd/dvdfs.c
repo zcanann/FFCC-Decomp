@@ -221,6 +221,9 @@ BOOL DVDClose(DVDFileInfo* fileInfo) {
  * - a follow-up entryToPath probe that scoped parentName / dst / remaining
  *   down into the two copy blocks also held completely flat, so shortening the
  *   visible local lifetimes is not enough to change the register shape here
+ * - switching the two copy tails from the remaining-based loc recompute to
+ *   `loc = (u32)(dst - path)` also held completely flat, so the tail update
+ *   arithmetic is not the specific source spelling driving the mismatch
  */
 
 static u32 entryToPath(u32 entry, char* path, u32 maxlen) {

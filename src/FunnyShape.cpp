@@ -13,25 +13,27 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" s32 rand();
 
-static const GXColor DAT_8032fd58 = {0x80, 0x80, 0x80, 0x80};
-static const GXColor DAT_8032fd5c = {0x80, 0x80, 0x80, 0x80};
-static const GXColor DAT_8032fd60 = {0x80, 0x80, 0x80, 0x80};
-static const double DOUBLE_8032fd88 = 4503601774854144.0;
-static const float FLOAT_8032fd64 = 1000.0f;
-static const float FLOAT_8032fd68 = -1000.0f;
-static const float FLOAT_8032fd6c = 0.0f;
-static const float FLOAT_8032fd70 = 2.0f;
-static const float FLOAT_8032fd74 = 1.0f;
-static const float FLOAT_8032fd78 = 4096.0f;
-static const float FLOAT_8032fd7c = 0.5f;
-static const float FLOAT_8032fd80 = -1.0f;
-static const float FLOAT_8032fd90 = 480.0f;
-static const float FLOAT_8032fd94 = 336.0f;
-static const float FLOAT_8032fd98 = 20.0f;
-static const float FLOAT_8032fd9c = 320.0f;
-static const float FLOAT_8032fda0 = 224.0f;
-static const float FLOAT_8032fda4 = 3.140000104904175f;
-static const float FLOAT_8032fda8 = 180.0f;
+extern "C" {
+extern const GXColor DAT_8032fd58;
+extern const GXColor DAT_8032fd5c;
+extern const GXColor DAT_8032fd60;
+extern const double DOUBLE_8032fd88;
+extern const float FLOAT_8032fd64;
+extern const float FLOAT_8032fd68;
+extern const float FLOAT_8032fd6c;
+extern const float FLOAT_8032fd70;
+extern const float FLOAT_8032fd74;
+extern const float FLOAT_8032fd78;
+extern const float FLOAT_8032fd7c;
+extern const float FLOAT_8032fd80;
+extern const float FLOAT_8032fd90;
+extern const float FLOAT_8032fd94;
+extern const float FLOAT_8032fd98;
+extern const float FLOAT_8032fd9c;
+extern const float FLOAT_8032fda0;
+extern const float FLOAT_8032fda4;
+extern const float FLOAT_8032fda8;
+}
 
 namespace {
 static inline u8* Ptr(CFunnyShape* self, u32 offset)
@@ -577,16 +579,15 @@ void CFunnyShape::RenderShape()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor color = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0, color);
-    GXSetChanMatColor(GX_COLOR0, color);
+    GXColor ambColor = DAT_8032fd60;
+    GXSetChanAmbColor(GX_COLOR0, ambColor);
 
-    Vec2d offsetCopy;
+    GXColor matColor = ambColor;
+    GXSetChanMatColor(GX_COLOR0, matColor);
+
     Vec2d offset;
-    offsetCopy.x = FLOAT_8032fd90;
-    offsetCopy.y = FLOAT_8032fd94;
-    offset.x = offsetCopy.x;
-    offset.y = offsetCopy.y;
+    offset.x = FLOAT_8032fd90;
+    offset.y = FLOAT_8032fd94;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010));
     RenderShape(shape, offset, 0.0f);
 }

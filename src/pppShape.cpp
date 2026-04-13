@@ -5,6 +5,7 @@
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
+extern double DOUBLE_80330110;
 extern float FLOAT_80330108;
 
 void pppSetBlendMode(unsigned char);
@@ -17,6 +18,18 @@ extern "C" {
 }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
+static inline float S16ToFloat(short value)
+{
+    union {
+        unsigned long long u;
+        double d;
+    } conv;
+
+    conv.u = 0x4330000000000000ULL |
+             static_cast<unsigned long long>(static_cast<unsigned int>(static_cast<int>(value)) ^ 0x80000000U);
+    return static_cast<float>(conv.d - DOUBLE_80330110);
+}
 
 class CMaterial;
 
@@ -306,10 +319,10 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
     float* maxUvF = (float*)&maxUv;
     const float uvScale = FLOAT_80330108;
 
-    minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * uvScale;
-    minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * uvScale;
-    maxUvF[0] = (float)*(short*)(shapeEntry + 0x3b) * uvScale;
-    maxUvF[1] = (float)*(short*)(shapeEntry + 0x3d) * uvScale;
+    minUvF[0] = S16ToFloat(*(short*)(shapeEntry + 0x13)) * uvScale;
+    minUvF[1] = S16ToFloat(*(short*)(shapeEntry + 0x15)) * uvScale;
+    maxUvF[0] = S16ToFloat(*(short*)(shapeEntry + 0x3b)) * uvScale;
+    maxUvF[1] = S16ToFloat(*(short*)(shapeEntry + 0x3d)) * uvScale;
 }
 
 /*

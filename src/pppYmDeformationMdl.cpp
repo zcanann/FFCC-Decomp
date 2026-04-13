@@ -8,7 +8,13 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern float FLOAT_80330dac;
+static const float FLOAT_80330d98 = 2.0f;
+static const float FLOAT_80330d9c = 2.0f;
+static const float FLOAT_80330da0 = 0.0f;
+static const float FLOAT_80330da4 = 1.0f;
+static const float FLOAT_80330da8 = 0.017453292f;
+static const float FLOAT_80330dac = 0.0f;
+static const double DOUBLE_80330db0 = 4503601774854144.0;
 
 struct pppCVECTOR {
     u8 rgba[4];
@@ -31,7 +37,8 @@ struct YmDeformationMdlState {
     s16 m_angle;
     u8 m_direction;
     u8 m_pad;
-    float m_values[6];
+    float m_scale;
+    float m_values[5];
 };
 
 struct pppYmDeformationMdlLayout {
@@ -135,15 +142,15 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    float fVar1 = FLOAT_80330dac;
-    u8* state = (u8*)pppYmDeformationMdl_ + param_2->m_serializedDataOffsets[2] + 0x80;
+    float value = FLOAT_80330dac;
+    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + param_2->m_serializedDataOffsets[2] + 0x80);
 
-    *(float*)(state + 0x0C) = FLOAT_80330dac;
-    *(float*)(state + 0x08) = fVar1;
-    *(float*)(state + 0x04) = fVar1;
-    *(float*)(state + 0x18) = fVar1;
-    *(float*)(state + 0x14) = fVar1;
-    *(float*)(state + 0x10) = fVar1;
+    state->m_values[1] = FLOAT_80330dac;
+    state->m_values[0] = value;
+    state->m_scale = value;
+    state->m_values[4] = value;
+    state->m_values[3] = value;
+    state->m_values[2] = value;
 }
 
 /*
@@ -244,7 +251,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
-        param_2->m_payloadByte28, param_2->m_payloadByte29, (u8)(param_2->m_payloadByte2C == 0), 1, 0);
+        param_2->m_payloadByte28, param_2->m_payloadByte29, param_2->m_payloadByte2C == 0, 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -285,15 +292,15 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         PSMTX44Copy(CameraScreenMatrix(), screenMtx);
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
-        texMtx[0][0] = screenMtx[0][0] * (2.0f / (float)width);
-        texMtx[1][1] = screenMtx[1][1] * -(2.0f / (float)height);
+        texMtx[0][0] = screenMtx[0][0] * (FLOAT_80330d98 / (float)width);
+        texMtx[1][1] = screenMtx[1][1] * -(FLOAT_80330d9c / (float)height);
         texMtx[1][0] = screenMtx[1][0];
         texMtx[2][0] = screenMtx[2][0];
         texMtx[0][1] = screenMtx[0][1];
         texMtx[2][1] = screenMtx[2][1];
-        texMtx[0][2] = 0.0f;
-        texMtx[1][2] = 0.0f;
-        texMtx[2][2] = 1.0f;
+        texMtx[0][2] = FLOAT_80330da0;
+        texMtx[1][2] = FLOAT_80330da0;
+        texMtx[2][2] = FLOAT_80330da4;
         PSMTXConcat(texMtx, modelObject->m_modelMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -307,13 +314,12 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
             state->m_angle = 1;
         }
 
-        PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)state->m_angle);
-        float indScale = state->m_values[0];
-        indMtx[0][0] = rotMtx[0][0] * indScale;
-        indMtx[0][1] = rotMtx[0][1] * indScale;
+        PSMTXRotRad(rotMtx, 'z', FLOAT_80330da8 * (float)state->m_angle);
+        indMtx[0][0] = rotMtx[0][0] * state->m_scale;
+        indMtx[0][1] = rotMtx[0][1] * state->m_scale;
         indMtx[0][2] = FLOAT_80330dac;
-        indMtx[1][0] = rotMtx[1][0] * indScale;
-        indMtx[1][1] = rotMtx[1][1] * indScale;
+        indMtx[1][0] = rotMtx[1][0] * state->m_scale;
+        indMtx[1][1] = rotMtx[1][1] * state->m_scale;
         indMtx[1][2] = FLOAT_80330dac;
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 

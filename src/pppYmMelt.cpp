@@ -249,6 +249,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     YmMeltVertex* rowVertex;
     float matrixY;
     float halfWidth;
+    float minCoord;
     float step;
     float rot;
     float x;
@@ -276,14 +277,15 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         phaseWork = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         work->m_phaseOffset = angleSeed - angleSeed / phaseWork * phaseWork;
         halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
+        minCoord = -halfWidth;
         phaseWork = work->m_phaseOffset;
         step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);
         rot = FLOAT_80330b0c * (f32)phaseWork;
         vertex = vertexBase;
 
-        for (z = -halfWidth; z <= halfWidth; z += step) {
+        for (z = minCoord; z <= halfWidth; z += step) {
             rowVertex = vertex;
-            for (x = -halfWidth; x <= halfWidth; x += step) {
+            for (x = minCoord; x <= halfWidth; x += step) {
                 rowVertex->m_position.x = x;
                 rowVertex->m_position.y = kPppYmMeltZero;
                 rowVertex->m_position.z = z;

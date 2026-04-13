@@ -1402,17 +1402,17 @@ void CRedDriver::End()
 #pragma optimization_level 4
 int CRedDriver::GetProgramTime()
 {
-    int value;
     volatile int sum;
+    int* end;
     int* p;
 
     sum = 0;
+    end = DAT_8032f3cc + 100;
     p = DAT_8032f3cc;
     do {
-        value = *p;
-        p = p + 1;
-        sum = sum + value;
-    } while (p < DAT_8032f3cc + 100);
+        sum += *p;
+        p++;
+    } while (p < end);
     return sum;
 }
 #pragma optimization_level 0

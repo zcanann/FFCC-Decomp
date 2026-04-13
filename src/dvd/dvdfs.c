@@ -203,23 +203,46 @@ BOOL DVDClose(DVDFileInfo* fileInfo) {
 }
 
 static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
-    char* name;
-    u32 i;
     u32 loc;
+    u32 next;
+    char* parentName;
+    char* name;
+    char* dst;
 
     if (entry == 0) {
         return 0;
     }
 
+    loc = parentDir(entry);
     name = FstStringStart + stringOff(entry);
-    loc = entryToPath(parentDir(entry), path, maxlen);
-    if (loc == maxlen) {
-        return loc;
+    if (loc == 0) {
+        loc = 0;
+    } else {
+        parentName = FstStringStart + stringOff(loc);
+        loc = entryToPath(parentDir(loc), path, maxlen);
+        if (loc != maxlen) {
+            next = loc + 1;
+            path[loc] = '/';
+            dst = path + next;
+            loc = maxlen - next;
+            while ((loc != 0) && (*parentName != '\0')) {
+                loc--;
+                *dst++ = *parentName++;
+            }
+            loc = next + ((maxlen - next) - loc);
+        }
     }
 
-    path[loc++] = '/';
-    for (i = maxlen - loc; (i > 0) && (*name != '\0'); i--) {
-        path[loc++] = *name++;
+    if (loc != maxlen) {
+        next = loc + 1;
+        path[loc] = '/';
+        dst = path + next;
+        loc = maxlen - next;
+        while ((loc != 0) && (*name != '\0')) {
+            loc--;
+            *dst++ = *name++;
+        }
+        loc = next + ((maxlen - next) - loc);
     }
 
     return loc;
@@ -227,19 +250,21 @@ static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     u32 loc;
+    u32 entry;
 
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
 
     ASSERTMSG1LINE(622, (s32)sDvdfsCurrentDirEntry >= 0 && sDvdfsCurrentDirEntry < MaxEntryNum, "DVDConvertEntrynumToPath: specified entrynum(%d) is out of range  ", sDvdfsCurrentDirEntry);
     ASSERTMSGLINE(629, entryIsDir(sDvdfsCurrentDirEntry), "DVDConvertEntrynumToPath: cannot convert an entry num for a file to path  ");
 
-    loc = entryToPath(sDvdfsCurrentDirEntry, path, maxlen);
+    entry = sDvdfsCurrentDirEntry;
+    loc = entryToPath(entry, path, maxlen);
     if (loc == maxlen) {
         path[maxlen - 1] = '\0';
         return FALSE;
     }
 
-    if (entryIsDir(sDvdfsCurrentDirEntry)) {
+    if (entryIsDir(entry)) {
         if (loc == maxlen - 1) {
             path[loc] = '\0';
             return FALSE;

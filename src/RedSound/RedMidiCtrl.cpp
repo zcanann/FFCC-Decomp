@@ -12,7 +12,7 @@ void* memset(void*, int, unsigned long);
 int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
 
-int PTR_SineSwing__Fi_8021e9d0[] = {
+int PTR_SineSwing__Fi[] = {
     (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
     (int)RandomSwing, (int)DutySwing,     (int)DutySwing, (int)DutySwing,
     (int)SineSwingR, (int)TriangleSwingR, (int)SawSwingR, (int)DutySwingR,
@@ -1733,7 +1733,7 @@ void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrac
     }
 
     trackData[0x1e] = 0x100000 / depth;
-    trackData[0x1d] = PTR_SineSwing__Fi_8021e9d0[*(unsigned char*)(trackData[0] + 2) & 0xf];
+    trackData[0x1d] = PTR_SineSwing__Fi[*(unsigned char*)(trackData[0] + 2) & 0xf];
     *(short*)((int)trackData + 0x8e) = 0;
     *(short*)(trackData + 0x23) = 0;
     trackData[0] = trackData[0] + 3;
@@ -1881,7 +1881,7 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 	u8* command = (u8*)trackData[0];
 
 	trackData[0] = (u32)(command + 1);
-	trackData[0x1d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
+	trackData[0x1d] = PTR_SineSwing__Fi[*command & 0xf];
 }
 
 /*
@@ -1926,7 +1926,7 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		rateDivisor = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
 	}
 	trackData[0x26] = 0x100000 / rateDivisor;
-	trackData[0x25] = PTR_SineSwing__Fi_8021e9d0[*(unsigned char*)(trackData[0] + 2) & 0xf];
+	trackData[0x25] = PTR_SineSwing__Fi[*(unsigned char*)(trackData[0] + 2) & 0xf];
 	*(short*)((int)trackData + 0xae) = 0;
 	*(short*)(trackData + 0x2b) = 0;
 	trackData[0] += 3;
@@ -2076,7 +2076,7 @@ void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 	u8* command = (u8*)trackData[0];
 
 	trackData[0] = (u32)(command + 1);
-	trackData[0x25] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
+	trackData[0x25] = PTR_SineSwing__Fi[*command & 0xf];
 }
 
 /*
@@ -2118,7 +2118,7 @@ void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 		rate = *(u8*)(trackData[0] + 1);
 	}
 	trackData[0x2e] = 0x100000 / rate;
-	trackData[0x2d] = PTR_SineSwing__Fi_8021e9d0[*(u8*)(trackData[0] + 2) & 0xf];
+	trackData[0x2d] = PTR_SineSwing__Fi[*(u8*)(trackData[0] + 2) & 0xf];
 	*(u16*)((u8*)trackData + 0xd2) = 0;
 	*(u16*)(trackData + 0x34) = 0;
 	trackData[0x32] = 0;
@@ -2245,7 +2245,7 @@ void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 	u8* command = (u8*)trackData[0];
 
 	trackData[0] = (u32)(command + 1);
-	trackData[0x2d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
+	trackData[0x2d] = PTR_SineSwing__Fi[*command & 0xf];
 }
 
 /*

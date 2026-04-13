@@ -556,11 +556,11 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             System.Printf(s_drawErrorFmt, errorCode);
         }
 
-        CFont* font = MenuPcs.GetFont22();
+        CFont* font = *(CFont**)((char*)&MenuPcs + 0xF8);
         bool usingFallbackFont = (font == 0);
         if (usingFallbackFont)
         {
-            font = *(CFont**)((char*)&FontMan + 8);
+            font = FontMan.m_font;
         }
 
         if (font == 0)

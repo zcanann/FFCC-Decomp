@@ -86,7 +86,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         if (positionWork->m_alpha != 0) {
             Mtx identityMtx;
             Vec cameraDelta;
-            pppColumValue* values = frameWork->m_values;
             float baseX;
             float baseY;
             float baseZ;
@@ -108,6 +107,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             }
 
             pppInitBlendMode();
+            pppColumValue* values = frameWork->m_values;
             segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
             drawScale = 0.0f;
 

@@ -51,6 +51,18 @@ const char* __PADVersion = s___PADVersion;
  *   the remaining blocker is now specifically the exported-vs-local identity of
  *   that `recalibrated` static plus the broader pad/ai/os small-data seam, not
  *   Pad.c function text
+ * - a fresh latest-main probe confirmed the extra `.sbss` word before
+ *   `SamplingCallback` is not just the authored `CmdTypeAndStatus`
+ *   declaration: even after removing that declaration from source, MWCC still
+ *   emits a local `CmdTypeAndStatus` symbol in the same slot, so that word is
+ *   compiler-generated in the current source shape
+ * - another probe exporting the shared pad-state globals plus
+ *   `SamplingCallback` narrowed the link failure much further: with Pad.c
+ *   promoted, every cross-unit undefined disappeared except
+ *   `recalibrated$401` from ai.o
+ * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
+ *   declarations here, so there is no simple file-scope alias escape hatch for
+ *   that last symbol identity
  */
 
 #define PAD_ALL                                                                                                        \

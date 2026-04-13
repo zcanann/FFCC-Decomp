@@ -10,6 +10,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
+#include "ffcc/sound.h"
 #include "types.h"
 #include <dolphin/mtx.h>
 #include <string.h>
@@ -57,6 +58,8 @@ extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
 static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
+static char s__s__d____3f___801d7ba4[] = "%s(%d) %.3f%%";
+static char s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
 
 /*
  * --INFO--
@@ -363,15 +366,12 @@ void CGraphicPcs::drawBar()
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
-    bool drawText = false;
+    int padState = 0;
     if (!useDebugPad) {
-        const int padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + 0x60);
-        if ((padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000)) {
-            drawText = true;
-        }
-    } else {
-        drawText = true;
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + 0x60);
     }
+    const bool drawText = (padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000);
 
     const u32 backColor = DAT_8032fb74;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -392,43 +392,66 @@ void CGraphicPcs::drawBar()
     CSystem::COrder* order = System.GetFirstOrder();
     float x = 0.0f;
     int hue = 0;
+    u32 y = 0x10;
     for (int i = 0; i < orderCount && order != NULL; i++) {
         const float width = (100.0f * order->m_lastTime) / 16.666666f;
         const u32 rgb = Math.Hsb2Rgb(orderCount > 0 ? (hue / orderCount) : 0, 100, 100);
+        const float y0 = drawText ? static_cast<float>(y) : ((order->m_priority == 0x26) ? 456.0f : 464.0f);
+        const float y1 = drawText ? static_cast<float>(y + 8) : ((order->m_priority == 0x26) ? 464.0f : 456.0f);
 
         if (order->m_priority == 0x26) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, 456.0f, 0.0f);
+            GXPosition3f32(x, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width, 456.0f, 0.0f);
+            GXPosition3f32(x + width, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + width, 464.0f, 0.0f);
+            GXPosition3f32(x + width, y1, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, 464.0f, 0.0f);
+            GXPosition3f32(x, y1, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(0, 2);
             x += width;
         } else if (order->m_priority != 0x27) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, 464.0f, 0.0f);
+            GXPosition3f32(x, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width, 464.0f, 0.0f);
+            GXPosition3f32(x + width, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + width, 456.0f, 0.0f);
+            GXPosition3f32(x + width, y1, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, 456.0f, 0.0f);
+            GXPosition3f32(x, y1, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(0, 2);
             x += width;
         }
 
+        if (i == orderCount - 1) {
+            const float soundWidth = (100.0f * Sound.GetPerformance()) / 16.666666f;
+            const u32 soundColor = Math.Hsb2Rgb(0, 100, 100);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(x, drawText ? static_cast<float>(y) : 456.0f, 0.0f);
+            GXColor1u32(soundColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(x + soundWidth, drawText ? static_cast<float>(y) : 456.0f, 0.0f);
+            GXColor1u32(soundColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(x + soundWidth, drawText ? static_cast<float>(y + 8) : 464.0f, 0.0f);
+            GXColor1u32(soundColor);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(x, drawText ? static_cast<float>(y + 8) : 464.0f, 0.0f);
+            GXColor1u32(soundColor);
+            GXTexCoord2u16(0, 2);
+        }
+
         order = System.GetNextOrder(order);
+        y += 8;
         hue += 0x168;
     }
 
@@ -464,6 +487,33 @@ void CGraphicPcs::drawBar()
 
     if (drawText) {
         Graphic.InitDebugString();
+
+        order = System.GetFirstOrder();
+        x = 0.0f;
+        y = 0x10;
+        for (int i = 0; i < orderCount && order != NULL; i++) {
+            const float width = (100.0f * order->m_lastTime) / 16.666666f;
+
+            if (order->m_priority != 0x27) {
+                char debugString[260];
+                sprintf(debugString, s__s__d____3f___801d7ba4, order->m_debugName, order->m_insertIndex, order->m_lastTime);
+
+                if (order->m_priority == 0x17) {
+                    char extraString[256];
+                    sprintf(extraString, s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4,
+                            *reinterpret_cast<float*>(&CFlat[4920]), *reinterpret_cast<float*>(&CFlat[4924]),
+                            *reinterpret_cast<float*>(&CFlat[4928]), *reinterpret_cast<float*>(&CFlat[4932]),
+                            *reinterpret_cast<float*>(&CFlat[4936]), *reinterpret_cast<float*>(&CFlat[72]));
+                    strcat(debugString, extraString, sizeof(debugString));
+                }
+
+                Graphic.DrawDebugStringDirect(static_cast<u32>(x + 1.0f), y, debugString, 8);
+                x += width;
+            }
+
+            order = System.GetNextOrder(order);
+            y += 8;
+        }
     }
 }
 

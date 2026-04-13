@@ -10,7 +10,14 @@
  * - on this branch, flipping e_pow.c from NonMatching to Matching while the
  *   unit still reports 100% code/data/function match causes the final
  *   build/GCCP01/main.dol checksum to fail immediately
- * - any remaining issue here should be treated as object-level linkage or
+ *
+ * Narrowed state:
+ * - the fdlibm local constant ownership now matches the source family much
+ *   better: bp/dp_h/dp_l are modeled as local .rodata, and the main .sdata2
+ *   run is back to local @319-@353-style constants instead of exported
+ *   DOUBLE_80333Axx globals
+ * - even after that symbol/locality cleanup, promoting e_pow.c still fails the
+ *   final checksum, so the remaining blocker is narrower hidden linkage /
  *   neighboring ownership work, not function-body cleanup inside __ieee754_pow
  */
 /*

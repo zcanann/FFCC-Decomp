@@ -121,6 +121,10 @@ static int initialized = 0;
  *   spelling out the 8-at-a-time fixed-subblock chain setup in
  *   allocate_from_fixed_pools regressed badly (95.11% -> 60.69%), so the
  *   remaining blocker is not "just force the visible unrolled loop" either
+ * - moving the local FixBlock* cast and first FixSubBlock* base pointer up to
+ *   immediately after __msize_inline(block), then using that b local for the
+ *   empty-ring initialization, also held completely flat; that early b/p
+ *   lifetime is not what drives the current register mismatch
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

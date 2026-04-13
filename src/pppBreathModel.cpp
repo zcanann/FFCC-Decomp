@@ -270,20 +270,20 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
+    unsigned char* color = (unsigned char*)particleColor;
     unsigned int alpha = (unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
     Vec step;
 
-    if (particleColor != NULL) {
-        float* color = (float*)particleColor;
-        color[0] += color[4];
-        color[1] += color[5];
-        color[2] += color[6];
-        color[3] += color[7];
-        color[4] += *(float*)(breath + 0x38);
-        color[5] += *(float*)(breath + 0x3C);
-        color[6] += *(float*)(breath + 0x40);
-        color[7] += *(float*)(breath + 0x44);
-        alpha += (unsigned int)(int)color[3];
+    if (color != NULL) {
+        *(float*)(color + 0x00) += *(float*)(color + 0x10);
+        *(float*)(color + 0x04) += *(float*)(color + 0x14);
+        *(float*)(color + 0x08) += *(float*)(color + 0x18);
+        *(float*)(color + 0x0C) += *(float*)(color + 0x1C);
+        *(float*)(color + 0x10) += *(float*)(breath + 0x38);
+        *(float*)(color + 0x14) += *(float*)(breath + 0x3C);
+        *(float*)(color + 0x18) += *(float*)(breath + 0x40);
+        *(float*)(color + 0x1C) += *(float*)(breath + 0x44);
+        alpha += (unsigned int)(int)*(float*)(color + 0x0C);
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
@@ -345,10 +345,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
 
     if ((*(char*)(particle + 0x55) != '\0') &&
         ((int)*(short*)(particle + 0x50) <= (int)*(char*)(particle + 0x55))) {
-        unsigned int fadeFrames = (unsigned int)*(unsigned char*)(breath + 0x23);
-        if (fadeFrames != 0) {
-            *(float*)(particle + 0x88) += (float)alpha / (float)fadeFrames;
-        }
+        *(float*)(particle + 0x88) += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
     }
 }
 

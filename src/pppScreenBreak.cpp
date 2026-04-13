@@ -160,19 +160,19 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     float zero = FLOAT_80331cc4;
-    Vec translation;
+    Quaternion meshQuat;
     Quaternion resultQuat;
     Quaternion axisQuat;
-    Quaternion meshQuat;
     Vec axis;
     Vec gravityAdd;
     Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
+    Vec cameraOffset;
     Vec screenOffset;
     Vec4d clipOutput;
     Vec4d clipInput;
     Vec cameraPos;
-    Vec cameraOffset;
     Vec cameraForward;
+    Vec translation;
     Mtx invTransMtx;
     Mtx transMtx;
     Mtx quatMtx;
@@ -221,12 +221,11 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 
     for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
         if (*((char*)pieceData + 0x38) != '\0') {
-            u8* node = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0);
-            u8* nodeMtx = node + 0xC;
+            u8* nodeMtx = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0) + 0x14;
 
-            *(float*)(node + 0x18) = zero;
-            *(float*)(node + 0x28) = zero;
-            *(float*)(node + 0x38) = zero;
+            *(float*)(nodeMtx + 0xC) = zero;
+            *(float*)(nodeMtx + 0x1C) = zero;
+            *(float*)(nodeMtx + 0x2C) = zero;
 
             PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
             PSMTXIdentity(transMtx);

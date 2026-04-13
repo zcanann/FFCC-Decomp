@@ -77,6 +77,16 @@ struct CBoundHack {
     u32 p5;
 };
 
+struct CMapMngAsyncLoadState {
+    void* m_mapLoadStart;
+    void* m_mapLoadCursor;
+    unsigned int m_mapLoadSize;
+    int m_asyncReadIndex;
+    int m_asyncOpenIndex;
+    int m_mapReadMode;
+    CFile::CHandle* m_asyncHandles[16];
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -176,6 +186,8 @@ void CMapPcs::LoadMap(char*, void*, unsigned long, unsigned char)
  */
 void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSize, unsigned char mode)
 {
+    CMapMngAsyncLoadState* asyncLoadState =
+        reinterpret_cast<CMapMngAsyncLoadState*>(reinterpret_cast<char*>(&MapMng) + 0x22994);
     unsigned int prevStageNo = s_loadedStageNo__7CMapPcs;
     unsigned int prevMapNo = s_loadedMapNo__7CMapPcs;
     Vec unusedVec;
@@ -192,22 +204,37 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         MapMng.SetDrawRangeMapObj(DrawRangeDefault);
     }
 
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
+    asyncLoadState->m_asyncReadIndex = 0;
+    asyncLoadState->m_asyncOpenIndex = 0;
     if (mapSize == 0) {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+        asyncLoadState->m_mapReadMode = 0;
     } else if (mode == 1) {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 2;
+        asyncLoadState->m_mapReadMode = 2;
     } else if (mode == 2) {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 3;
-        memset(reinterpret_cast<char*>(&MapMng) + 0x22A2C, 0, 0x40);
+        asyncLoadState->m_mapReadMode = 3;
+        asyncLoadState->m_asyncHandles[0] = 0;
+        asyncLoadState->m_asyncHandles[1] = 0;
+        asyncLoadState->m_asyncHandles[2] = 0;
+        asyncLoadState->m_asyncHandles[3] = 0;
+        asyncLoadState->m_asyncHandles[4] = 0;
+        asyncLoadState->m_asyncHandles[5] = 0;
+        asyncLoadState->m_asyncHandles[6] = 0;
+        asyncLoadState->m_asyncHandles[7] = 0;
+        asyncLoadState->m_asyncHandles[8] = 0;
+        asyncLoadState->m_asyncHandles[9] = 0;
+        asyncLoadState->m_asyncHandles[10] = 0;
+        asyncLoadState->m_asyncHandles[11] = 0;
+        asyncLoadState->m_asyncHandles[12] = 0;
+        asyncLoadState->m_asyncHandles[13] = 0;
+        asyncLoadState->m_asyncHandles[14] = 0;
+        asyncLoadState->m_asyncHandles[15] = 0;
     } else {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 1;
+        asyncLoadState->m_mapReadMode = 1;
     }
 
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = mapPtr;
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = mapPtr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = static_cast<unsigned int>(mapSize);
+    asyncLoadState->m_mapLoadStart = mapPtr;
+    asyncLoadState->m_mapLoadCursor = mapPtr;
+    asyncLoadState->m_mapLoadSize = static_cast<unsigned int>(mapSize);
 
     MapMng.ReadMtx(mapPath);
     MapMng.ReadMpl(mapPath);

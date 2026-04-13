@@ -36,10 +36,6 @@ struct pppColumPositionWork {
     u8 m_alpha;
 };
 
-static inline int* GetColumSerializedDataOffsets(void* param) {
-    return *(int**)((char*)param + 0xc);
-}
-
 static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {
@@ -70,7 +66,7 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
  */
 void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
-    int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     pppColumFrameWork* frameWork = (pppColumFrameWork*)((u8*)column + serializedDataOffsets[3] + 0x80);
     pppColumPositionWork* positionWork = (pppColumPositionWork*)((u8*)column + serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
@@ -86,7 +82,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         if (positionWork->m_alpha != 0) {
             Mtx identityMtx;
             Vec cameraDelta;
-            pppColumValue* values = frameWork->m_values;
             float baseX;
             float baseY;
             float baseZ;
@@ -108,6 +103,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             }
 
             pppInitBlendMode();
+            pppColumValue* values = frameWork->m_values;
             segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
             drawScale = 0.0f;
 
@@ -192,13 +188,13 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
  */
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
-    int* serializedDataOffsets;
+    s32* serializedDataOffsets;
     pppColumValue* values;
     pppColumFrameWork* work;
     int i;
 
     if (gPppCalcDisabled == 0) {
-        serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+        serializedDataOffsets = param_3->m_serializedDataOffsets;
         work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -242,7 +238,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
  */
 void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
 {
-    int* serializedDataOffsets = GetColumSerializedDataOffsets(param_2);
+    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     char* work = (char*)column + 0x80 + serializedDataOffsets[3];
 
     if (*(CMemory::CStage**)(work + 8) != 0) {
@@ -262,7 +258,7 @@ void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
  */
 void pppConstructColum(pppColum *column, pppColumUnkC *param_2)
 {
-    int* serializedDataOffsets = GetColumSerializedDataOffsets(param_2);
+    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     unsigned short *puVar1 = (unsigned short *)((char*)column + 0x80 + serializedDataOffsets[3]);
     puVar1[2] = 0;
     puVar1[1] = 0;

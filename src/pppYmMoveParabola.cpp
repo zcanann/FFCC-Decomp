@@ -48,7 +48,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     Vec newPosition;
     Vec direction;
     if ((s32)Game.m_currentSceneId == 7) {
-        f32 zero = gPppYmMoveParabolaZero;
+        f32 zero = 0.0f;
         f32 yOffset = gPppYmMoveParabolaYOffsetStep;
 
         direction.x = yOffset;

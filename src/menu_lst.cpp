@@ -326,20 +326,18 @@ void CMenuPcs::MLstCtrl()
 	if (hold == 0) {
 		blocked = false;
 	} else {
-		if ((hold & 0x48) == 0) {
-			if ((hold & 0x24) != 0) {
-				if (state->cursor < 8) {
-					state->cursor = state->cursor + 1;
-				} else {
-					state->cursor = 0;
-				}
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			}
-		} else {
+		if ((hold & 0x48) != 0) {
 			if (state->cursor == 0) {
 				state->cursor = 8;
 			} else {
 				state->cursor = state->cursor - 1;
+			}
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else if ((hold & 0x24) != 0) {
+			if (state->cursor < 8) {
+				state->cursor = state->cursor + 1;
+			} else {
+				state->cursor = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}

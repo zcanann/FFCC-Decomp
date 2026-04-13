@@ -41,6 +41,13 @@ OSThreadQueue __DVDThreadQueue;
  *   `BootInfo` / `FstStart` / `MaxEntryNum` / `currentDirectory` are local,
  *   while `FstStringStart` / `__DVDLongFileNameFlag` / `__DVDThreadQueue`
  *   stay global, matching the map ownership pattern
+ * - a direct source-shape pass toward the target asm was not keepable:
+ *   replacing the literal string uses with named statics, inlining the
+ *   `isSame` / `myStrncpy` / `DVDConvertEntrynumToPath` helpers into their
+ *   callers, and giving `entryToPath` / `cbForReadAsync` external linkage
+ *   regressed SDK matched code and still left the compiled source object with
+ *   extra local helper symbols, so that target-asm shape is not recovered by
+ *   a naive C rewrite alone
  * - even with both of those ownership fixes in place, promoting dvdfs.c to
  *   Matching still breaks final checksum, so the hidden-link blocker is
  *   narrower now but not resolved yet

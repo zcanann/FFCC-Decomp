@@ -41,9 +41,12 @@ static s32 axfx_reverb_hi_dpl2_lens[10] = {
     0x0000002F, 0x00000049, 0x00000043, 0x00000047, 0x00000000,
 };
 
-const static f32 reverb_hi_4ch_value0_1 = 0.1f;
-const static f32 reverb_hi_4ch_value0_3 = 0.3f;
-const static f32 reverb_hi_4ch_value0_6 = 0.6f;
+const f32 reverb_hi_4ch_value0_1 = 0.1f;
+const f32 reverb_hi_4ch_value0_3 = 0.3f;
+const f32 reverb_hi_4ch_value0_6 = 0.6f;
+const f32 axfx_reverb_hi_dpl2_f32_0p05 = 0.05f;
+const f32 axfx_reverb_hi_dpl2_f32_0p8 = 0.8f;
+const f32 axfx_reverb_hi_dpl2_f32_1 = 1.0f;
 
 static inline void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
@@ -118,11 +121,15 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p05) {
+        rv->damping = axfx_reverb_hi_dpl2_f32_0p05;
     }
 
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = axfx_reverb_hi_dpl2_f32_0p8 * rv->damping;
+
+        rv->damping = axfx_reverb_hi_dpl2_f32_1 - (axfx_reverb_hi_dpl2_f32_0p05 + damp);
+    }
 
     if (0.0f != preDelay) {
         rv->preDelayTime = 32000.0f * preDelay;
@@ -174,10 +181,14 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (rv->damping < axfx_reverb_hi_dpl2_f32_0p05) {
+        rv->damping = axfx_reverb_hi_dpl2_f32_0p05;
     }
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = axfx_reverb_hi_dpl2_f32_0p8 * rv->damping;
+
+        rv->damping = axfx_reverb_hi_dpl2_f32_1 - (axfx_reverb_hi_dpl2_f32_0p05 + damp);
+    }
 
     for (i = 0; i < 12; i++) {
         DLdeleteDpl2(&rv->AP[i]);

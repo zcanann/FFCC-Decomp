@@ -56,9 +56,8 @@ CVector::CVector(const Vec& vec)
 	float x = vec.x;
 	float y = vec.y;
 	this->x = x;
-	float z = vec.z;
 	this->y = y;
-	this->z = z;
+	this->z = vec.z;
 }
 
 /*

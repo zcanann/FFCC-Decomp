@@ -107,6 +107,9 @@ static int initialized = 0;
  * - replacing the local __msize_inline(block) use with the explicit fixed-pool
  *   vs var-pool branch also held completely flat, so the msize source spelling
  *   is not what drives the remaining register mismatch
+ * - a follow-up Block_subBlock cleanup that removed the separate was_alloc
+ *   temporary and folded those writes under if (!was_free) also held
+ *   completely flat, so that second boolean lifetime is not the key blocker
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

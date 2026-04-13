@@ -4,6 +4,26 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/FILE_POS.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in fopen():
+ * - target wants the canonical file_modes stack slot at r1+0x8
+ * - current source still compiles with the canonical slot at r1+0x10
+ * - __init_file then receives a copied word from r1+0xC
+ * - __open_file then receives a copied word from the alternate slot
+ *
+ * Probes already tried here without a keepable win:
+ * - function-scope vs inner-scope file_modes local
+ * - local declaration reordering
+ * - local __open_file prototype tweaks
+ * - explicit memcpy/copy probes
+ * - lvalue cast probes on the by-value calls
+ *
+ * So far this looks like a MWCC stack-layout / by-value-struct source-shape issue,
+ * not a control-flow mismatch.
+ */
+
 int fclose(FILE* file) {
     int flush_result, close_result;
 
@@ -66,27 +86,27 @@ FILE* fopen(const char* name, const char* mode)
 	FILE* file;
 	
 	__begin_critical_region(stdin_access);
-
+	
 	file = (FILE*)__find_unopened_file();
 	__stdio_atexit();
 	if (!file) {
 		file = NULL;
 		goto done;
 	}
-
+	
 	fclose(file);
 	clearerr(file);
 
 	{
 		file_modes modes;
-
+		
 		if (!__get_file_modes(mode, &modes)) {
 			file = NULL;
 			goto done;
 		}
-
+		
 		__init_file(file, modes, 0, 0x400);
-
+		
 		if (__open_file(name, modes, &file->handle)) {
 			file->file_mode.file_kind = __closed_file;
 			if (file->file_state.free_buffer) {
@@ -95,12 +115,12 @@ FILE* fopen(const char* name, const char* mode)
 			file = NULL;
 			goto done;
 		}
-
+		
 		if (modes.io_mode & __append) {
 			fseek(file, 0, SEEK_END);
 		}
 	}
-
+	
 done:
 	__end_critical_region(stdin_access);
 	

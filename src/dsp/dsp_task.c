@@ -5,8 +5,6 @@
 
 #include "dolphin/dsp/__dsp.h"
 
-static u32 t0, t1, t2;  // unused
-
 DSPTaskInfo* __DSP_curr_task;
 DSPTaskInfo* __DSP_first_task;
 DSPTaskInfo* __DSP_last_task;

@@ -20,6 +20,17 @@
  * - Promoting vi/vi.c to Matching still failed final main.dol checksum, so the
  *   remaining blocker is hidden-linkage-level rather than the visible code/data
  *   ownership for this split.
+ * - A later PAL-map / source-object cross-check showed the vi .sbss seam was
+ *   also short by 0x0C on this branch: the source-built vi.o still emits
+ *   PrintDebugPalCaution's guard plus file-scope PositionCallback/timingExtra
+ *   at the tail, so widening vi/vi.c .sbss from 0x8032F134 to 0x8032F140 and
+ *   naming those two tail statics is keepable and matches the built source
+ *   object more closely.
+ * - With that .sbss seam fixed, promoting vi/vi.c to Matching now fails for a
+ *   narrower reason: the extracted Pad.o imports PositionCallback_8032F138 and
+ *   timingExtra_8032F13C as globals, while the shared Dolphin source family
+ *   still spells both as static vi.c locals. So the remaining blocker is the
+ *   vi/pad small-data ownership/binding seam, not vi function bodies.
  */
 
 #ifdef DEBUG

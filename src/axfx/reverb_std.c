@@ -4,6 +4,27 @@
 
 #include "dolphin/axfx/__axfx.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - `reverb_std.c` now reports effectively-complete code/data on this branch,
+ *   but it is still not safely linkable as Matching
+ *
+ * Most useful result so far:
+ * - after the AXFX local-constant ownership cleanup that made `chorus.c`
+ *   linkable, a fresh Matching flip for `reverb_std.c` also rebuilt cleanly up
+ *   to the final `main.dol` checksum and then failed there
+ * - `ReverbSTDCreate` and the `.sdata2` run are now 100% in objdiff, so the
+ *   remaining blocker is no longer the visible constant pool or the main setup
+ *   path
+ * - current visible text miss is down to a tiny non-create tail seam elsewhere
+ *   in the unit, and the promotion result shows there is still hidden
+ *   object/linkage metadata work beyond that
+ * - so the next pass here should treat `reverb_std.c` as another post-seam
+ *   hidden-link target, not as a broad source rewrite candidate
+ */
+
 extern f32 powf(f32 x, f32 y);
 extern const f32 axfx_reverb_std_handle_f32_0p3;
 extern const f32 axfx_reverb_std_handle_f32_0p6;

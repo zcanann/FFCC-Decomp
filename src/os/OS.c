@@ -4,6 +4,14 @@
 #include <dolphin/si.h>
 #include <dolphin/db.h>
 
+/*
+ * SDK note: remove this block once linkage has been resolved.
+ * This unit is currently 100% in objdiff, but flipping os/OS.c to Matching on
+ * this branch makes mwldeppc hang past the 30s build timeout and leave a
+ * zero-byte main.elf behind. That points to a hidden link/config blocker
+ * rather than a remaining visible code or data mismatch.
+ */
+
 #define NOP 0x60000000
 
 #ifndef __GEKKO__

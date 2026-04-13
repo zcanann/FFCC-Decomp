@@ -1097,6 +1097,8 @@ gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
 	extabindex  start:0x8000FD00 end:0x8000FD84
 	.text       start:0x80102FB4 end:0x801035DC
+	.bss        start:0x802FF450 end:0x802FFA70
+	.sbss       start:0x8032EE40 end:0x8032EE48
 
 pppYmTracer2.cpp:
 	extab       start:0x8000907C end:0x80009094

@@ -177,7 +177,11 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp += 0.05f;
+        rv->damping = 1.0f - damp;
+    }
 
     for (i = 0; i < 12; i++) {
         DLdeleteDpl2(&rv->AP[i]);

@@ -534,16 +534,16 @@ int CBound::CheckFrustum0(float farPlane)
                 }
                 if (transformed.z <= zero) {
                     if (transformed.x <= -transformed.z) {
-                        if (transformed.x < transformed.z) {
-                            clipMask = 2;
-                        } else {
+                        if (transformed.z <= transformed.x) {
                             clipMask = 0;
+                        } else {
+                            clipMask = 2;
                         }
                     } else {
                         clipMask = 1;
                     }
                     if (transformed.y <= -transformed.z) {
-                        if (transformed.z <= transformed.y) {
+                        if (transformed.y < transformed.z) {
                             clipMask = clipMask | 8;
                         }
                     } else {
@@ -551,16 +551,16 @@ int CBound::CheckFrustum0(float farPlane)
                     }
                 } else {
                     if (transformed.x <= -transformed.z) {
-                        if (transformed.x < transformed.z) {
-                            clipMask = 0x12;
-                        } else {
+                        if (transformed.z <= transformed.x) {
                             clipMask = 0x10;
+                        } else {
+                            clipMask = 0x12;
                         }
                     } else {
                         clipMask = 0x11;
                     }
                     if (transformed.y <= -transformed.z) {
-                        if (transformed.z <= transformed.y) {
+                        if (transformed.y < transformed.z) {
                             clipMask = clipMask | 0x18;
                         }
                     } else {
@@ -746,19 +746,20 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 {
     (void)math;
 
-    bool hit;
     Vec local_60;
     Vec local_6c;
     Vec local_78;
     Vec local_84;
-    float scaledInner = innerRadius + scale;
-    float scaleY = scaledInner / (outerRadius + scale);
-    float scaleSq = scaledInner * scaledInner;
+    float scaleSq = innerRadius + scale;
+    float scaleY = scaleSq / (outerRadius + scale);
     float dot;
     float proj;
     float lenSq;
     float discriminant;
     float root;
+    bool hit;
+
+    scaleSq = scaleSq * scaleSq;
 
     PSVECSubtract(origin, ellipseScale, &local_60);
     local_78.y = local_60.y * scaleY;

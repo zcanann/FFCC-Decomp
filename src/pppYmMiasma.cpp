@@ -330,7 +330,9 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
     } else {
-        pppCopyVector(basePos, worldPos);
+        basePos.x = worldPos.x;
+        basePos.y = worldPos.y;
+        basePos.z = worldPos.z;
     }
 
     pppSubVector(delta, worldPos, basePos);
@@ -356,7 +358,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         pppAddVector(*(Vec*)particleData, *(Vec*)particleData, impulse);
     }
 
-    if ((u16)pYmMiasma->m_dataValIndex != 0xffff) {
+    if (pYmMiasma->m_dataValIndex != 0xffff) {
         long* shape = (*(long***)pppEnvStPtr->m_particleColors)[pYmMiasma->m_dataValIndex];
 
         pppCalcFrameShape(shape, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,

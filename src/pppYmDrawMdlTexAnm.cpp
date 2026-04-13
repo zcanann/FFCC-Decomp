@@ -164,8 +164,7 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
                 (s16)(int)-(((f32)frameU * work->m_perV) -
                             (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV));
         }
-
-        DCFlushRange(uvLayout->m_uvPairs, uvLayout->m_uvCount * 4);
+        DCFlushRange(uvLayout->m_uvPairs, (uvLayout->m_uvCount & 0xFFFF) << 2);
     }
 
     work->m_frame = 0;
@@ -239,7 +238,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
         uvByteOffset += 4;
     }
 
-    DCFlushRange(uvLayout->m_uvPairs, uvLayout->m_uvCount * 4);
+    DCFlushRange(uvLayout->m_uvPairs, (uvLayout->m_uvCount & 0xFFFF) << 2);
 
     if (work->m_frame >= (u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8))) {
         work->m_frame = 0;

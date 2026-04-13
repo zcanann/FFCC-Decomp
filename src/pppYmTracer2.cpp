@@ -35,7 +35,10 @@ struct TRACE_POLYGON {
     Vec pos;
     float pad0;
     Vec targetPos;
-    u8 color[4];
+    u8 colorR;
+    u8 colorG;
+    u8 colorB;
+    u8 alpha;
     u8 active;
     u8 pad1[7];
 };
@@ -84,10 +87,10 @@ void initTracePolygon(pppYmTracer2*, TRACE_POLYGON& poly)
     poly.targetPos.x = FLOAT_80331840;
     poly.targetPos.y = FLOAT_80331840;
     poly.targetPos.z = FLOAT_80331840;
-    poly.color[0] = 0;
-    poly.color[1] = 0;
-    poly.color[2] = 0;
-    poly.color[3] = 0;
+    poly.colorR = 0;
+    poly.colorG = 0;
+    poly.colorB = 0;
+    poly.alpha = 0;
     poly.active = 0;
 }
 
@@ -101,10 +104,10 @@ void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
     dst->active = src->active;
     pppCopyVector(dst->pos, src->pos);
     pppCopyVector(dst->targetPos, src->targetPos);
-    dst->color[0] = src->color[0];
-    dst->color[1] = src->color[1];
-    dst->color[2] = src->color[2];
-    dst->color[3] = src->color[3];
+    dst->colorR = src->colorR;
+    dst->colorG = src->colorG;
+    dst->colorB = src->colorB;
+    dst->alpha = src->alpha;
 }
 
 /*
@@ -283,9 +286,9 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         fVar2 = work->arg3Work[2];
         work->targetPos.z = fVar2;
         entry->targetPos.z = fVar2;
-        entry->color[0] = colorData[8];
-        entry->color[1] = colorData[9];
-        entry->color[2] = colorData[10];
+        entry->colorR = colorData[8];
+        entry->colorG = colorData[9];
+        entry->colorB = colorData[10];
 
         if (i == 0) {
             PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppYmTracer2)->m_localMatrix.value, MStack_78);
@@ -325,9 +328,9 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
         alpha = (u16)param_2->m_payload[8] - (s16)iVar4 * work->alphaStep;
         if ((alpha < 0) || (entries->active == 0)) {
-            entries->color[3] = 0;
+            entries->alpha = 0;
         } else if (entries->active != 0) {
-            entries->color[3] = (u8)alpha;
+            entries->alpha = (u8)alpha;
             visibleCount++;
         }
         entries++;
@@ -349,14 +352,14 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     u8* colorData;
     TracerWork* work;
     TRACE_POLYGON* poly;
+    CMapMesh* mapMesh;
     CTexture* texture;
+    s32 i;
     s32 dataOffset;
     s32 colorOffset;
     s32 dataValIndex;
-    CMapMesh* mapMesh;
     PackedColor colorTop;
     PackedColor colorBottom;
-    u32 i;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -378,8 +381,9 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
         textureIndex[0] = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex[0]);
-        if (texture != nullptr) {
+        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(
+            mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex[0]);
+        if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
             GXSetNumTexGens(1);
@@ -409,7 +413,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
-                for (i = 0; i < (u32)(work->visibleCount - 1); i++) {
+                for (i = 0; i < (s32)(work->visibleCount - 1); i++) {
                     TRACE_POLYGON* next = poly + 1;
 
                     uTop = (f32)((f64)(s32)i * (f64)uvStep);
@@ -424,14 +428,14 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
                     colorTop.value = 0;
                     colorBottom.value = 0;
-                    colorTop.bytes[0] = poly->color[0];
-                    colorTop.bytes[1] = poly->color[1];
-                    colorTop.bytes[2] = poly->color[2];
-                    colorTop.bytes[3] = (u8)(alphaScale * (f64)poly->color[3]);
-                    colorBottom.bytes[0] = next->color[0];
-                    colorBottom.bytes[1] = next->color[1];
-                    colorBottom.bytes[2] = next->color[2];
-                    colorBottom.bytes[3] = (u8)(alphaScale * (f64)next->color[3]);
+                    colorTop.bytes[0] = poly->colorR;
+                    colorTop.bytes[1] = poly->colorG;
+                    colorTop.bytes[2] = poly->colorB;
+                    colorTop.bytes[3] = (u8)(alphaScale * (f64)poly->alpha);
+                    colorBottom.bytes[0] = next->colorR;
+                    colorBottom.bytes[1] = next->colorG;
+                    colorBottom.bytes[2] = next->colorB;
+                    colorBottom.bytes[3] = (u8)(alphaScale * (f64)next->alpha);
 
                     GXPosition3f32(poly->targetPos.x, poly->targetPos.y, poly->targetPos.z);
                     GXColor1u32(colorTop.value);

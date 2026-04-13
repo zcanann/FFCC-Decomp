@@ -17,7 +17,9 @@ u32 sDvdfsCurrentDirEntry;
 
 // prototypes
 static BOOL isSame(const char* path, const char* string);
+static u32 myStrncpy(char* dest, char* src, u32 maxlen);
 static u32 entryToPath(u32 entry, char* path, u32 maxlen);
+static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen);
 static void cbForReadAsync(s32 result, DVDCommandBlock* block);
 
 void __DVDFSInit(void) {
@@ -202,84 +204,52 @@ BOOL DVDClose(DVDFileInfo* fileInfo) {
     return TRUE;
 }
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - entryToPath and DVDGetCurrentDir are still the only code mismatches in
- *   dvdfs.c
- * - the remaining miss looks like stack / register allocation in the recursive
- *   path-copy loops, not missing logic recovery
- *
- * Most useful probe so far:
- * - rewriting both functions toward the direct Ghidra shape did not move the
- *   objdiff score at all
- * - that rules out the obvious "fewer locals / single-exit return" rewrite as
- *   the fix for this unit
- */
+static u32 myStrncpy(char* dest, char* src, u32 maxlen) {
+    u32 i = maxlen;
+
+    while ((i > 0) && (*src != 0)) {
+        *dest++ = *src++;
+        i--;
+    }
+
+    return (maxlen - i);
+}
 
 static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
     char* name;
-    char* parentName;
-    char* dst;
     u32 loc;
-    u32 remaining;
-    u32 parent;
 
     if (entry == 0) {
         return 0;
-    } else {
-        name = FstStringStart + stringOff(entry);
-        parent = parentDir(entry);
-        if (parent == 0) {
-            loc = 0;
-        } else {
-            parentName = FstStringStart + stringOff(parent);
-            loc = entryToPath(parentDir(parent), path, maxlen);
-            if (loc != maxlen) {
-                path[loc++] = '/';
-                remaining = maxlen - loc;
-                dst = path + loc;
-                while ((remaining != 0) && (*parentName != '\0')) {
-                    remaining--;
-                    *dst++ = *parentName++;
-                }
-                loc = loc + ((maxlen - loc) - remaining);
-            }
-        }
-
-        if (loc != maxlen) {
-            path[loc++] = '/';
-            remaining = maxlen - loc;
-            dst = path + loc;
-            while ((remaining != 0) && (*name != '\0')) {
-                remaining--;
-                *dst++ = *name++;
-            }
-            loc = loc + ((maxlen - loc) - remaining);
-        }
     }
+
+    name = FstStringStart + stringOff(entry);
+    loc = entryToPath(parentDir(entry), path, maxlen);
+
+    if (loc == maxlen) {
+        return loc;
+    }
+
+    *(path + loc++) = '/';
+    loc += myStrncpy(path + loc, name, maxlen - loc);
 
     return loc;
 }
 
-BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
-    u32 currentDirEntry;
+static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
     u32 loc;
+    
+    ASSERTMSG1LINE(622, (entrynum >= 0) && ((u32)entrynum < MaxEntryNum), "DVDConvertEntrynumToPath: specified entrynum(%d) is out of range  ", entrynum);
+    ASSERTMSG1LINE(624, maxlen > 1, "DVDConvertEntrynumToPath: maxlen should be more than 1 (%d is specified)", maxlen);
+    ASSERTMSGLINE(629, entryIsDir(entrynum), "DVDConvertEntrynumToPath: cannot convert an entry num for a file to path  ");
 
-    ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
-
-    ASSERTMSG1LINE(622, (s32)sDvdfsCurrentDirEntry >= 0 && sDvdfsCurrentDirEntry < MaxEntryNum, "DVDConvertEntrynumToPath: specified entrynum(%d) is out of range  ", sDvdfsCurrentDirEntry);
-    ASSERTMSGLINE(629, entryIsDir(sDvdfsCurrentDirEntry), "DVDConvertEntrynumToPath: cannot convert an entry num for a file to path  ");
-
-    currentDirEntry = sDvdfsCurrentDirEntry;
-    loc = entryToPath(currentDirEntry, path, maxlen);
+    loc = entryToPath((u32)entrynum, path, maxlen);
     if (loc == maxlen) {
         path[maxlen - 1] = '\0';
         return FALSE;
     }
 
-    if (entryIsDir(currentDirEntry)) {
+    if (entryIsDir(entrynum)) {
         if (loc == maxlen - 1) {
             path[loc] = '\0';
             return FALSE;
@@ -289,6 +259,11 @@ BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
 
     path[loc] = '\0';
     return TRUE;
+}
+
+BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
+    ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
+    return DVDConvertEntrynumToPath((s32)sDvdfsCurrentDirEntry, path, maxlen);
 }
 
 BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio) {

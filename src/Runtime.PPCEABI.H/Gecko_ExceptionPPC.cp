@@ -745,6 +745,30 @@ extern "C" void __dt__Q23std13bad_exceptionFv(std::bad_exception*, s16);
 extern "C" void* __vt__Q23std9exception[];
 extern "C" void* __vt__Q23std13bad_exception[];
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - __unexpected is the only remaining code mismatch in Gecko_ExceptionPPC.cp
+ * - the live object already matches the surrounding extab / .rodata / .data
+ *   layout, so the remaining miss looks like a tiny source-shape or
+ *   exception-metadata detail rather than missing control flow
+ *
+ * Most useful result so far:
+ * - current objdiff keeps __unexpected at 99.45% with the rest of the unit
+ *   already matching
+ * - the live/target diff is specifically the second inlined
+ *   ExPPC_IsInSpecification compare site for badExceptionType
+ * - obvious pointer-shape probes there stayed flat: re-seeding
+ *   badExceptionType through another local, const/register variants, and
+ *   explicit cast/+0/&[0] call spellings did not dislodge the addi-vs-mr miss
+ * - a fresh recheck on the current SDK branch no longer reproduced that exact
+ *   narrow 99.45% state cleanly; local-static / exception-metadata mismatches
+ *   around unexpectedTypes and the bad_exception throw setup are visible again
+ * - this should be treated as a narrow follow-up target, not a unit that wants
+ *   a broad runtime rewrite
+ */
+
 /**
  * @note Address: N/A
  * @note Size: 0x1B4

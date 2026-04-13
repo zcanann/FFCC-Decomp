@@ -1,5 +1,19 @@
 /* @(#)e_pow.c 1.3 95/01/18 */
 /*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - main/MSL_C/PPCEABI/bare/H/e_pow is currently another hidden-linkage
+ *   blocker rather than a visible objdiff blocker
+ *
+ * Most useful probe so far:
+ * - on this branch, flipping e_pow.c from NonMatching to Matching while the
+ *   unit still reports 100% code/data/function match causes the final
+ *   build/GCCP01/main.dol checksum to fail immediately
+ * - any remaining issue here should be treated as object-level linkage or
+ *   neighboring ownership work, not function-body cleanup inside __ieee754_pow
+ */
+/*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
  *

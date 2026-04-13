@@ -37,11 +37,18 @@ extern const f32 GXInit_PointOneF;
  * Probes already tried here without a keepable win:
  * - moving GXInit_IntToFloatBias between the top and bottom constant groups
  * - reordering GXInit_ZeroF / GXInit_OneF / GXInit_PointOneF
+ * - forcing fbWidth / xfbHeight / efbHeight through explicit f32 locals before
+ *   GXSetViewport / GXSetDispCopyYScale
+ * - replacing the implicit u16->f32 casts with a local GXInitU16ToF32 helper
+ *   that explicitly built the 0x43300000 double words and subtracted
+ *   GXInit_IntToFloatBias
  * - nearby MWCC flag / version probes from earlier passes
  *
  * What those probes ruled out:
  * - declaration placement alone can move the float / double layout in .sdata2
  * - but it still does not stop MWCC from materializing @371
+ * - even an explicit named-bias conversion helper still compiled with a fresh
+ *   anonymous local bias constant and regressed the unit
  * - so the remaining work is recovering the exact original constant-source shape
  *   that makes the two lfd sites bind directly to GXInit_IntToFloatBias
  */

@@ -104,6 +104,19 @@ static int initialized = 0;
  * - a follow-up cleanup that removed the local pool_sizes/head/tail temporaries
  *   and wrote the ring links directly through fs->head_/fs->tail_ also held
  *   completely flat, so those convenience locals are not the remaining issue
+ * - replacing the local __msize_inline(block) use with the explicit fixed-pool
+ *   vs var-pool branch also held completely flat, so the msize source spelling
+ *   is not what drives the remaining register mismatch
+ * - a follow-up Block_subBlock cleanup that removed the separate was_alloc
+ *   temporary and folded those writes under if (!was_free) also held
+ *   completely flat, so that second boolean lifetime is not the key blocker
+ * - switching the fixed-subblock chain loop from raw char* temporaries to typed
+ *   FixSubBlock* cursor/next temporaries also held completely flat, so the
+ *   remaining mismatch is not just the cursor typing inside that loop
+ * - moving the local old_size capture in Block_subBlock down to the same spot
+ *   used by the shared MSL source in super_mario_strikers also held completely
+ *   flat, so that small source-order difference is not what drives the split-path
+ *   register mismatch
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

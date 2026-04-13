@@ -202,6 +202,22 @@ BOOL DVDClose(DVDFileInfo* fileInfo) {
     return TRUE;
 }
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - entryToPath and DVDGetCurrentDir are still the only code mismatches in
+ *   dvdfs.c
+ * - the remaining miss looks like stack / register allocation in the recursive
+ *   path-copy loops, not missing logic recovery
+ *
+ * Most useful probe so far:
+ * - rewriting both functions toward the direct Ghidra shape did not move the
+ *   objdiff score at all
+ * - that rules out the obvious "fewer locals / single-exit return" rewrite as
+ *   the fix for this unit
+ */
+
 static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
     char* name;
     char* parentName;
@@ -212,44 +228,44 @@ static u32 entryToPath(u32 entry, char* path, u32 maxlen) {
 
     if (entry == 0) {
         return 0;
-    }
-
-    name = FstStringStart + stringOff(entry);
-    parent = parentDir(entry);
-    if (parent == 0) {
-        loc = 0;
     } else {
-        parentName = FstStringStart + stringOff(parent);
-        loc = entryToPath(parentDir(parent), path, maxlen);
+        name = FstStringStart + stringOff(entry);
+        parent = parentDir(entry);
+        if (parent == 0) {
+            loc = 0;
+        } else {
+            parentName = FstStringStart + stringOff(parent);
+            loc = entryToPath(parentDir(parent), path, maxlen);
+            if (loc != maxlen) {
+                path[loc++] = '/';
+                remaining = maxlen - loc;
+                dst = path + loc;
+                while ((remaining != 0) && (*parentName != '\0')) {
+                    remaining--;
+                    *dst++ = *parentName++;
+                }
+                loc = loc + ((maxlen - loc) - remaining);
+            }
+        }
+
         if (loc != maxlen) {
             path[loc++] = '/';
             remaining = maxlen - loc;
             dst = path + loc;
-            while ((remaining != 0) && (*parentName != '\0')) {
+            while ((remaining != 0) && (*name != '\0')) {
                 remaining--;
-                *dst++ = *parentName++;
+                *dst++ = *name++;
             }
             loc = loc + ((maxlen - loc) - remaining);
         }
-    }
-
-    if (loc != maxlen) {
-        path[loc++] = '/';
-        remaining = maxlen - loc;
-        dst = path + loc;
-        while ((remaining != 0) && (*name != '\0')) {
-            remaining--;
-            *dst++ = *name++;
-        }
-        loc = loc + ((maxlen - loc) - remaining);
     }
 
     return loc;
 }
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
-    u32 loc;
     u32 currentDirEntry;
+    u32 loc;
 
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
 

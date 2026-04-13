@@ -407,7 +407,6 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
-    u8 particleCount = param_2->m_initWOrk;
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -447,13 +446,13 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         if (state->m_particles == 0) {
             state->m_field1C = payload[0xB] / payload[0xC];
             state->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (unsigned long)particleCount << 4,
+                (unsigned long)param_2->m_initWOrk << 4,
                 pppEnvStPtr->m_stagePtr,
                 s_pppEmission_cpp_801db7e8,
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
-            for (u32 i = 0; i < particleCount; i++) {
+            for (u32 i = 0; i < param_2->m_initWOrk; i++) {
                 Math.RandF(FLOAT_803311e4);
 
                 s16 lifeJitter = (s16)(rand() % payload[0xD]);
@@ -470,7 +469,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         }
 
         EmissionParticle* particle = (EmissionParticle*)state->m_particles;
-        for (int i = 0; i < particleCount; i++) {
+        for (int i = 0; i < param_2->m_initWOrk; i++) {
             particle->m_scale = particle->m_scale + (state->m_scale0 + Math.RandF(*(float*)(payload + 4)));
 
             if (particle->m_fieldC > 0) {

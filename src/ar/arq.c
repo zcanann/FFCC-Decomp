@@ -14,6 +14,13 @@
  * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
  *   failed at the final checksum stage, so the remaining issue is hidden
  *   object/linkage shape rather than visible C or data mismatch
+ * - a follow-up PAL-map check showed the current split config is also stale in
+ *   this neighborhood: arq.c should own `.sbss 0x8032F1D8..0x8032F200` through
+ *   `__ARQ_init_flag`, but `splits.txt` currently cuts the unit off at
+ *   `0x8032F1E8`
+ * - extending that split immediately ran into the neighboring stale AX/GX
+ *   handoff chain, so the real next step here is fixing the whole `.sbss`
+ *   boundary cluster around `arq.c`, not rewriting the C
  */
 
 #ifdef DEBUG

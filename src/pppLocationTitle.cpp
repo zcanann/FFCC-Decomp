@@ -7,11 +7,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-static int GetGraphFrameFromId(s32 graphId)
-{
-    return graphId / 0x1000;
-}
-
 extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float,
                                                                        unsigned char, unsigned char,
                                                                        unsigned char, unsigned char,
@@ -20,9 +15,10 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int rand(void);
-
-const float FLOAT_80330ee0 = 0.0f;
-const float FLOAT_80330ee4 = 1.0f;
+extern float FLOAT_80330ee0;
+extern float FLOAT_80330EE4;
+extern double DOUBLE_80330EE8;
+extern char s_pppLocationTitle_cpp_801DB510[];
 
 struct LocationTitleWork {
     void* m_particles;
@@ -47,8 +43,6 @@ struct LocationTitleColorBlock {
     u8 m_pad[8];
     GXColor m_color;
 };
-
-static const char s_pppLocationTitle_cpp_801DB510[] = "pppLocationTitle.cpp";
 
 /*
  * --INFO--
@@ -150,8 +144,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             param_2->m_maxCount * sizeof(LocationTitleParticle), pppEnvStPtr->m_stagePtr,
             (char*)s_pppLocationTitle_cpp_801DB510, 0x6d);
-        particle = (LocationTitleParticle*)work->m_particles;
         zero = FLOAT_80330ee0;
+        particle = (LocationTitleParticle*)work->m_particles;
 
         for (int i = 0; i < param_2->m_maxCount; i++) {
             int randomValue;
@@ -177,7 +171,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     particles = (LocationTitleParticle*)work->m_particles;
 
     if (work->m_count + 1 < param_2->m_maxCount) {
-        graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
+        graphFrame = pppLocationTitle->m_graphId / 0x1000;
         if (graphFrame >= (int)param_2->m_spawnFrame) {
             pppFMATRIX resultMatrix;
 
@@ -203,25 +197,25 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                 u8 stepCount;
                 int startIndex;
                 int inserted;
-                double stepScale;
-                LocationTitleParticle* startParticle;
+                float stepScale;
+                Vec* startPos;
                 Vec* interpIt;
 
                 stepCount = param_2->m_stepCount;
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
-                startParticle = &particles[startIndex];
-                stepScale = (double)(FLOAT_80330ee4 / (float)(stepCount + 1));
+                startPos = &particles[startIndex].m_pos;
+                stepScale = FLOAT_80330EE4 / (float)(stepCount + 1);
                 interpIt = interp;
-                PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &subVec);
+                PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
 
                 for (int i = 0; i < stepCount; i++) {
                     Vec scaled;
                     float t;
 
-                    t = (float)(stepScale * (double)(i + 1));
+                    t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
-                    PSVECAdd(&startParticle->m_pos, &scaled, interpIt);
+                    PSVECAdd(startPos, &scaled, interpIt);
                     inserted++;
                     work->m_count++;
 
@@ -275,7 +269,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         return;
     }
 
-    graphFrame = GetGraphFrameFromId(pppLocationTitle->m_graphId);
+    graphFrame = pppLocationTitle->m_graphId / 0x1000;
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =

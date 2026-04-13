@@ -76,8 +76,11 @@ void CopyFunnyShapePcsTable()
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
-static char* s_spinner = const_cast<char*>("|/-\\");
-static int frameCount;
+static const char s_funnyShapeSpinnerText[] = "|/-\\";
+char* gFunnyShapeSpinnerText = 0;
+unsigned char gFunnyShapeSpinnerTextInitialized = 0;
+int gFunnyShapeSpinnerFrame = 0;
+unsigned char gFunnyShapeSpinnerFrameInitialized = 0;
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -362,6 +365,7 @@ void CFunnyShapePcs::calcViewer()
  */
 void CFunnyShapePcs::drawViewer()
 {
+    int frameSign;
     Mtx44 ortho;
     Mtx view;
     Vec eye = {0.0f, 0.0f, 0.0f};
@@ -390,13 +394,26 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    frameCount++;
-    if (frameCount > 100000) {
-        frameCount = 0;
+    if (gFunnyShapeSpinnerTextInitialized == 0) {
+        gFunnyShapeSpinnerText = const_cast<char*>(s_funnyShapeSpinnerText);
+        gFunnyShapeSpinnerTextInitialized = 1;
+    }
+    if (gFunnyShapeSpinnerFrameInitialized == 0) {
+        gFunnyShapeSpinnerFrame = 0;
+        gFunnyShapeSpinnerFrameInitialized = 1;
     }
 
+    gFunnyShapeSpinnerFrame++;
+    if (gFunnyShapeSpinnerFrame > 100000) {
+        gFunnyShapeSpinnerFrame = 0;
+    }
+
+    frameSign = gFunnyShapeSpinnerFrame >> 31;
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
-    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), s_spinner[(frameCount >> 4) % 4]);
+    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt),
+                   gFunnyShapeSpinnerText[(frameSign * 4 |
+                                           static_cast<unsigned int>((gFunnyShapeSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 30) -
+                                          frameSign]);
 }
 
 /*

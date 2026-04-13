@@ -32,25 +32,6 @@ static u32 gTRKExceptionVectorOffsets[15] = { PPC_SystemReset,
 	                               PPC_ThermalManagementInterrupt };
 
 /*
- * TODO: Remove this note block once InitMetroTRK has been resolved.
- *
- * Current blocker in this unit:
- * - only InitMetroTRK is still visibly mismatched; the rest of dolphin_trk.c is
- *   already linkable
- *
- * Most useful verified result so far:
- * - removing the trailing `blr` after `b TRK_main` makes InitMetroTRK itself
- *   reach 100% in objdiff, but it also collapses the real 4-byte gap between
- *   InitMetroTRK and the weak InitMetroTRK_BBA stub
- * - that shifts the following .text symbol layout (`InitMetroTRK_BBA` and every
- *   later function move 4 bytes earlier), and final `main.dol` checksum fails
- * - so the remaining visible InitMetroTRK mismatch is not "just delete the dead
- *   branch tail"; the target object genuinely wants the extra 4-byte text slot
- *   after InitMetroTRK, and the real fix has to preserve that surrounding text
- *   layout while still matching the function body
- */
-
-/*
  * --INFO--
  * PAL Address: 0x800053E0
  * PAL Size: 44b

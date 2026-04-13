@@ -61,10 +61,23 @@ struct pppCrystal2ColorBlock {
     pppCVECTOR m_color;
 };
 
+union Crystal2FloatBits {
+    float value;
+    unsigned long bits;
+};
+
 static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
+
+static inline bool Crystal2IsNaN(float value)
+{
+    Crystal2FloatBits bits;
+
+    bits.value = value;
+    return (bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0;
+}
 
 /*
  * --INFO--
@@ -185,7 +198,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
 
                     if (magnitude > 1.0f) {
                         magnitude = sqrtf(magnitude);
-                    } else if (!(magnitude >= 0.0f)) {
+                    } else if (Crystal2IsNaN(magnitude)) {
                         magnitude = NAN;
                     }
 

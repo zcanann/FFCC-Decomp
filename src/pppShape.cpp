@@ -304,7 +304,7 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
     int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
     float* minUvF = (float*)&minUv;
     float* maxUvF = (float*)&maxUv;
-    const float uvScale = FLOAT_80330108;
+    const float uvScale = 1.0f / 4096.0f;
 
     minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * uvScale;
     minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * uvScale;

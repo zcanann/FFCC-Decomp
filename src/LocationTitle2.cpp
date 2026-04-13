@@ -20,9 +20,6 @@ extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 // External data references
-extern float FLOAT_80330f48;
-extern float FLOAT_80330f4c;
-extern double DOUBLE_80330f58;
 extern char DAT_80330f50[];
 
 static int GetGraphFrameFromId(s32 graphId)
@@ -84,7 +81,7 @@ extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTit
     LocationTitle2Work* work;
     f32 value;
 
-    value = FLOAT_80330f48;
+    value = 0.0f;
     work = (LocationTitle2Work*)((char*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;
@@ -164,7 +161,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
         u8* node;
-        double zOffset;
+        float zOffset;
 
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
@@ -181,7 +178,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         modelRaw = (LocationTitle2ModelRaw*)model;
         nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
-        zOffset = (double)FLOAT_80330f4c;
+        zOffset = 1.0f;
 
         for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
@@ -194,7 +191,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             particles[work->m_count].m_pos.x = nodeMtx[0][3];
             particles[work->m_count].m_pos.y = nodeMtx[1][3];
             particles[work->m_count].m_pos.z = nodeMtx[2][3];
-            particles[work->m_count].m_pos.z = (float)((double)particles[work->m_count].m_pos.z + zOffset);
+            particles[work->m_count].m_pos.z += zOffset;
             memcpy(&particles[work->m_count].m_color, &colorData->m_color, 4);
             particles[work->m_count].m_pad0 = 0;
             particles[work->m_count].m_shape = 0;
@@ -215,7 +212,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 u8 stepCount;
                 int startIndex;
                 int inserted;
-                double stepScale;
+                float stepScale;
                 LocationTitle2Particle* startParticle;
                 Vec* interpIt;
 
@@ -223,7 +220,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
-                stepScale = (double)(FLOAT_80330f4c / (float)(stepCount + 1));
+                stepScale = 1.0f / (float)(stepCount + 1);
                 interpIt = interp;
                 PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &stepDir);
 
@@ -231,7 +228,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     Vec scaled;
                     float t;
 
-                    t = (float)(stepScale * (double)(i + 1));
+                    t = stepScale * (float)(i + 1);
                     PSVECScale(&stepDir, &scaled, t);
                     PSVECAdd(&startParticle->m_pos, &scaled, interpIt);
                     inserted++;
@@ -252,7 +249,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     LocationTitle2Particle* dst;
 
                     dst = &particles[startIndex + i + 1];
-                    interpIt->z = (float)((double)interpIt->z + zOffset);
+                    interpIt->z += zOffset;
                     pppCopyVector(dst->m_pos, *interpIt);
                     memcpy(&dst->m_color, &colorData->m_color, 4);
                     dst->m_pad0 = 0;
@@ -267,7 +264,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
         }
 
-        SetFrame__Q26CChara6CModelFf(FLOAT_80330f48, model);
+        SetFrame__Q26CChara6CModelFf(0.0f, model);
     }
 }
 

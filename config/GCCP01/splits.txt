@@ -1583,7 +1583,7 @@ dvd/fstload.c:
 
 vi/vi.c:
 	.text       start:0x8018B864 end:0x8018D298
-	.data       start:0x802177E0 end:0x80217BF8
+	.data       start:0x802177E0 end:0x80217BB0
 	.bss        start:0x8030CB48 end:0x8030CC90
 	.sdata      start:0x8032EB08 end:0x8032EB11
 	.sbss       start:0x8032F0E0 end:0x8032F134

@@ -49,8 +49,13 @@ extern const f32 GXInit_PointOneF;
  * - but it still does not stop MWCC from materializing @371
  * - even an explicit named-bias conversion helper still compiled with a fresh
  *   anonymous local bias constant and regressed the unit
- * - so the remaining work is recovering the exact original constant-source shape
- *   that makes the two lfd sites bind directly to GXInit_IntToFloatBias
+ * - a fresh merged-tree retest still fails final main.dol linkage when
+ *   gx/GXInit.c is promoted to Matching, so this is still a real hidden-link
+ *   blocker and not just a stale pre-merge artifact
+ * - raw object metadata still carries both local @371 and global
+ *   GXInit_IntToFloatBias in .sdata2, which means the remaining work is still
+ *   recovering the exact original constant-source shape that prevents MWCC from
+ *   materializing the extra local bias symbol in the first place
  */
 
 const f64 GXInit_IntToFloatBias = 4503599627370496.0;

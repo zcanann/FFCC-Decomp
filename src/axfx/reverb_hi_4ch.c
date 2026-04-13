@@ -26,12 +26,46 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   double, added the target-style local 0.1f bound for Modify, and relabeled
  *   the 0.3f / 0.6f / external i2f-magic tail accordingly; that moved .sdata2
  *   from 92.85714% to 96.0% and nudged .text to 99.47125%
+ * - the built source object now already carries the target-style local .sdata2
+ *   layout for these functions (`@111`..`@120`, 0x30 bytes total), so the
+ *   remaining gap is no longer constant ownership inside reverb_hi_4ch.o
  * - removing the inner parentheses from `0.05f + (0.8f * rv->damping)` held
  *   completely flat, so the remaining damping-expression miss is not just the
  *   obvious precedence spelling
- * - the remaining miss is now concentrated in the damping rewrite in Create and
- *   Modify: the target still folds `1.0f - (0.05f + 0.8f * damping)` into a
- *   slightly different instruction shape than the current source
+ * - reordering the sum to `1.0f - ((0.8f * rv->damping) + 0.05f)` also stayed
+ *   completely flat
+ * - forcing the named local `reverb_hi_4ch_value0_1` through every visible
+ *   `preDelay <= 0.1f` / `preDelay > 0.1f` check in Create and Modify was also
+ *   completely flat: the built object still emitted the same `0x30` .sdata2
+ *   with no extra local float symbol between `@120` and the `0.3f` / `0.6f`
+ *   tail
+ * - even promoting `reverb_hi_4ch_value0_1` / `0_3` / `0_6` from `static const`
+ *   to plain file-scope `const` was completely flat on the fresh branch: MWCC
+ *   still folded `0.1f` into the earlier local pool, kept source `.sdata2` at
+ *   0x30 bytes, and did not materialize the target-style extra `0.1f` symbol
+ * - a follow-up retest on the fresh branch corrected the stale assumption about
+ *   contraction: for these damping blocks the target actually keeps separate
+ *   `fmuls` + `fadds` + `fsubs`, while the baseline source is the one that
+ *   contracts to `fmadds`
+ * - an explicit stepwise rewrite through repeated `rv->damping = ...` updates
+ *   did force the separate ops, but regressed hard overall
+ *   (Create 99.40% -> 97.85%, Modify 97.30% -> 93.36%), so the remaining
+ *   blocker is not "just spell out the three statements" either
+ * - a narrower `f32 damp = 0.8f * rv->damping; rv->damping = 1.0f - (0.05f +
+ *   damp);` probe also forced the exact target-side `fmuls` + `fadds` +
+ *   `fsubs` sequence in both functions, but still held completely flat
+ *   (Create stayed 99.40129%, Modify stayed 97.29508%), so the remaining miss
+ *   is now the nearby temporary/register lifetime around that block rather
+ *   than the arithmetic opcode shape itself
+ * - matching the shared reference-project spelling more literally by adding
+ *   the outer parentheses around `rv->damping = (1.0f - (...))` in both
+ *   functions and changing Modify's range check back to a direct `0.1f`
+ *   literal was also completely flat, so this unit is not blocked on that
+ *   last visible source-family spelling difference either
+ * - the remaining miss is still concentrated in the damping rewrite in Create
+ *   and Modify rather than sdata2 ownership, but the next probe should bias
+ *   toward preserving the target load/order shape without the heavy repeated
+ *   store/reload lifetime introduced by the naive stepwise form
  */
 
 extern f32 powf(f32 x, f32 y);

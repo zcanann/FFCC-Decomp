@@ -121,6 +121,35 @@ static int initialized = 0;
  *   spelling out the 8-at-a-time fixed-subblock chain setup in
  *   allocate_from_fixed_pools regressed badly (95.11% -> 60.69%), so the
  *   remaining blocker is not "just force the visible unrolled loop" either
+ * - moving the local FixBlock* cast and first FixSubBlock* base pointer up to
+ *   immediately after __msize_inline(block), then using that b local for the
+ *   empty-ring initialization, also held completely flat; that early b/p
+ *   lifetime is not what drives the current register mismatch
+ * - a follow-up probe that stored b->start_ before the chain loop and then
+ *   advanced a single typed FixSubBlock* cursor through p->next_ regressed
+ *   sharply (95.11% -> 85.92%), so the remaining blocker is not "just use the
+ *   direct typed cursor and seed start_ earlier" either
+ * - dropping the separate fix_size local and writing client_size_/sub_size
+ *   directly from fix_pool_sizes[i] regressed slightly (95.11% -> 94.92%), so
+ *   that explicit fix_size temporary is still closer to target than the more
+ *   direct indexing spelling
+ * - removing the separate typed p local in allocate_from_fixed_pools and
+ *   deriving the `+0x14` subblock base directly from `b` both for the chain
+ *   loop and the final start_ store held completely flat, so the missing
+ *   `addi r?, r3, 0x14` shape in the current diff is not fixed by just
+ *   collapsing that local
+ * - reordering the fixed-pool setup so `num_subblocks` is computed from the
+ *   direct `(fix_size + 4)` expression before assigning the reusable
+ *   `sub_size` temporary also held completely flat, so that source-order seam
+ *   is not enough on its own to recover the target register flow
+ * - a Block_subBlock follow-up that stopped carrying block_val/block_or_1 and
+ *   instead wrote `start->block = (((unsigned long)start->block & ~1) | 1);`
+ *   then reused `start->block` for new_sb->block also held completely flat, so
+ *   that shared block-tag value is not the remaining register-lifetime blocker
+ * - spelling the first fixed-subblock base as `(FixSubBlock*)(b + 1)` instead
+ *   of `(FixSubBlock*)((char*)b + 0x14)` regressed slightly
+ *   (95.11% -> 94.81%), so the current raw-byte base expression is still
+ *   closer to target than the cleaner typed-step spelling
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level
@@ -368,7 +397,6 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         new_sb = (SubBlock*)((char*)start + requested_size);
         block_val = (unsigned long)start->block & ~1;
         block_or_1 = block_val | 1;
-
         was_free = !(old_tag & 2);
         old_size = old_tag & ~7;
         was_alloc = !was_free;
@@ -638,7 +666,6 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
         tail = fs->tail_;
         num_subblocks = (msize - 0x14) / sub_size;
         p = (FixSubBlock*)((char*)b + 0x14);
-
         b->prev_ = tail;
         b->next_ = head;
         tail->next_ = b;

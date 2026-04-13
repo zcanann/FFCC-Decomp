@@ -3,6 +3,56 @@
 
 #include "dolphin/ar/__ar.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - arq.c is already 100% code/data complete in objdiff, but promoting it to
+ *   Matching still fails the final main.dol checksum
+ *
+ * Most useful result so far:
+ * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
+ *   failed at the final checksum stage, so the remaining issue is hidden
+ *   object/linkage shape rather than visible C or data mismatch
+ * - a follow-up PAL-map check showed the current split config is also stale in
+ *   this neighborhood: arq.c should own `.sbss 0x8032F1D8..0x8032F200` through
+ *   `__ARQ_init_flag`, but `splits.txt` currently cuts the unit off at
+ *   `0x8032F1E8`
+ * - extending that split immediately ran into the neighboring stale AX/GX
+ *   handoff chain, so the real next step here is fixing the whole `.sbss`
+ *   boundary cluster around `arq.c`, not rewriting the C
+ * - a full pass on that cluster confirmed the old PAL map is still useful for
+ *   the early AR/AX/GX window, but it stops being safe to trust verbatim once
+ *   the chain reaches the later TRK/MSL/Odemu/RedSound tail in this repo state
+ * - the keepable lesson from that failed split pass is that the early
+ *   `.sbss` ownership really is stale here, but the tail needs to be
+ *   re-anchored against the current build's actual symbol identities and total
+ *   section size instead of copied straight from the old PAL addresses
+ * - a follow-up read of the currently extracted target objects showed why this
+ *   keeps stalling: under the stale split layout, AX-side units are currently
+ *   "borrowing" ARQ state to satisfy their own .sbss sizes
+ *   (`__ARQRequestPendingHi` lands in AXAlloc; `__ARQCallbackHi` /
+ *   `__ARQCallbackLo` / `__ARQChunkSize` / `__ARQ_init_flag` land in AXAux),
+ *   so fixing arq.c is not a one-endpoint edit
+ * - that makes the real next step more specific: re-split the whole
+ *   `arq -> AXAlloc -> AXAux -> ...` small-data chain coherently in one pass,
+ *   instead of extending arq.c in isolation and leaving the borrowed-tail
+ *   ownership intact
+ * - a later full config probe did exactly that through the early TRK/MSL/Odemu
+ *   tail, using source statics plus the PAL map to re-anchor the `.sbss`
+ *   windows coherently; it failed before compile at the split stage instead of
+ *   in ARQ itself
+ * - the first hard failure from that probe was at the GX/TRK seam:
+ *   once `GXMisc`/`GBA`/`serpoll` were shifted forward, DTK still resolved
+ *   `gTRKInputPendingPtr` at the stale old address `0x8032F358`, causing an
+ *   overlap with `FinishQueue`
+ * - so the remaining blocker is broader than just the visible ARQ/AX windows:
+ *   there is at least one second stale tail authority (symbol attribution,
+ *   split ownership, or both) that still pins the later TRK/MSL region to the
+ *   pre-shift layout, and that needs to be identified before another coherent
+ *   `.sbss` re-split attempt is likely to land
+ */
+
 #ifdef DEBUG
 const char* __ARQVersion = "<< Dolphin SDK - ARQ\tdebug build: Apr  5 2004 03:56:20 (0x2301) >>";
 #else

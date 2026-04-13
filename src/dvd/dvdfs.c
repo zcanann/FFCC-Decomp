@@ -28,6 +28,13 @@ u32 sDvdfsCurrentDirEntry;
  *   main.dol checksum, so this is not a safe promotion yet
  * - that means the remaining issue is object/linkage-level shape outside the
  *   visible function-body diffs we have been chasing
+ * - a later cross-check against the shared Dolphin reference sources found
+ *   that `__DVDThreadQueue` / `__DVDLongFileNameFlag` are authored in dvdfs.c,
+ *   not dvd.c; moving those definitions here and extending the dvdfs `.sbss`
+ *   window through `0x8032F080` keeps the baseline build green
+ * - that seam correction does improve the extracted dvd/dvdfs object ownership
+ *   story, but it is not sufficient on its own to make either dvdfs.c or
+ *   dvd.c safely linkable yet
  *
  * Why this matters:
  * - more source churn in entryToPath / DVDGetCurrentDir is unlikely to help on

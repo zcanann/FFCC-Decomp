@@ -32,21 +32,20 @@ struct PppSRandDownFVParam3 {
  */
 void pppSRandDownFV(void* param1, void* param2, void* param3)
 {
-    u8* self = (u8*)param2;
-    PppSRandDownFVParam2* cfg = (PppSRandDownFVParam2*)param1;
-    PppSRandDownFVParam3* info = (PppSRandDownFVParam3*)param3;
+    u8* base = (u8*)param1;
+    PppSRandDownFVParam2* in = (PppSRandDownFVParam2*)param2;
+    PppSRandDownFVParam3* out = (PppSRandDownFVParam3*)param3;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    f32* randVec;
-    s32 currentIndex = *(s32*)(self + 0xC);
-    if (currentIndex == 0) {
-        randVec = (f32*)(self + *info->fieldC + 0x80);
+    f32* target;
+    if (*(s32*)(base + 0xC) == 0) {
+        target = (f32*)(base + *out->fieldC + 0x80);
 
         {
-            u8 flag = cfg->field18;
+            u8 flag = in->field18;
             f32 value = -Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -54,11 +53,11 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
                 f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
             }
-            randVec[0] = value;
+            target[0] = value;
         }
 
         {
-            u8 flag = cfg->field18;
+            u8 flag = in->field18;
             f32 value = -Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -66,11 +65,11 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
                 f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
             }
-            randVec[1] = value;
+            target[1] = value;
         }
 
         {
-            u8 flag = cfg->field18;
+            u8 flag = in->field18;
             f32 value = -Math.RandF();
             if (flag != 0) {
                 f32 random = Math.RandF();
@@ -78,27 +77,28 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
                 f32 scale = kPppSRandDownFVDualSampleScale;
                 value = blend * scale;
             }
-            randVec[2] = value;
+            target[2] = value;
         }
     } else {
-        if (cfg->field0 != currentIndex) {
+        if (in->field0 != *(s32*)(base + 0xC)) {
             return;
         }
-        randVec = (f32*)(self + *info->fieldC + 0x80);
+        target = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    f32* target = (cfg->field4 == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
+    s32 valueOffset = in->field4;
+    f32* valueBuffer = (valueOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + valueOffset + 0x80);
 
     {
-        f32 value = cfg->field8 * randVec[0];
-        target[0] = target[0] + value;
+        f32 value = in->field8 * target[0];
+        valueBuffer[0] = valueBuffer[0] + value;
     }
     {
-        f32 value = cfg->fieldC * randVec[1];
-        target[1] = target[1] + value;
+        f32 value = in->fieldC * target[1];
+        valueBuffer[1] = valueBuffer[1] + value;
     }
     {
-        f32 value = cfg->field10 * randVec[2];
-        target[2] = target[2] + value;
+        f32 value = in->field10 * target[2];
+        valueBuffer[2] = valueBuffer[2] + value;
     }
 }

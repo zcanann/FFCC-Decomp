@@ -1,6 +1,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/fontman.h"
 #include "ffcc/linkage.h"
+#include "ffcc/monobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_minigame.h"
@@ -25,6 +26,36 @@ unsigned char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
 extern const float kOneF32;
 extern const float kHalfF32;
+}
+
+static void CharaObjEndSlots(CGCharaObj* charaObj, unsigned int slotMask)
+{
+	for (int i = 0; i < 0x16; i++) {
+		if ((slotMask & (1U << i)) != 0) {
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, charaObj->m_particleSlots[i], 1);
+		}
+	}
+}
+
+static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
+{
+	if (charaObj->m_charaModelHandle == 0 || charaObj->m_charaModelHandle->m_pdtLoadRef == 0) {
+		return -1;
+	}
+	return reinterpret_cast<int*>(charaObj->m_charaModelHandle->m_pdtLoadRef)[2];
+}
+
+static float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
+{
+	if (!isMon || script9 == 0) {
+		return 1.0f;
+	}
+	return static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
+}
+
+static void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int particleNo, int slot, float scale)
+{
+	charaObj->putParticle(particleNo, slot, static_cast<CGObject*>(charaObj), 20.0f * charaObj->m_attackColRadius * scale, 0);
 }
 
 /*
@@ -688,17 +719,167 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj*, int)
  */
 void CGCharaObj::setSta(int staIndex, int value)
 {
-	if (m_scriptHandle == 0) {
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	if (script == 0) {
 		return;
 	}
-	if (staIndex < 0 || staIndex >= 0x27) {
-		return;
+
+	unsigned int cid = GetCID();
+	bool isMon = (cid & 0xAD) == 0xAD;
+	unsigned char* script9 = (m_scriptHandle[9] != 0) ? reinterpret_cast<unsigned char*>(m_scriptHandle[9]) : 0;
+	bool isIceJ = isMon && script9 != 0 && *reinterpret_cast<short*>(script9 + 0xFC) == 0xB;
+
+	int current = *reinterpret_cast<short*>(script + 0x3E + (staIndex * 2));
+	value &= ~(value >> 31);
+
+	if (current == 0) {
+		if (value != 0) {
+			switch (staIndex) {
+				case 0:
+					CharaObjEndSlots(this, 0x4);
+					if (isIceJ) {
+						putParticleBindTrace((CharaObjGetModelPdtNo(this) << 8) | 0x15, m_particleSlots[2], this, 1.0f, 0);
+					} else {
+						putParticle(0x10A, m_particleSlots[2], this, 20.0f * m_attackColRadius, 0);
+					}
+					if (isMon) {
+						reinterpret_cast<CGMonObj*>(this)->setIceJEffect(0);
+					}
+					break;
+				case 1:
+					CharaObjEndSlots(this, 0x40);
+					if (isIceJ) {
+						putParticle((CharaObjGetModelPdtNo(this) << 8) | 0x14, m_particleSlots[6], this, 1.0f, 0);
+					} else {
+						putParticle(0x12A, m_particleSlots[6], this, 20.0f * m_attackColRadius, 0);
+					}
+					break;
+				case 2:
+					m_castTimeTick = 0;
+					CharaObjEndSlots(this, 0x80000);
+					putParticleBindTrace(0x10C, m_particleSlots[19], this, 20.0f * m_attackColRadius, 0);
+					break;
+				case 3:
+					CharaObjEndSlots(this, 0x40000);
+					putParticleBindTrace(0x10D, m_particleSlots[18], this, 20.0f * m_attackColRadius, 0);
+					break;
+				case 4:
+					CharaObjEndSlots(this, 0x80);
+					if (isIceJ) {
+						putParticle((CharaObjGetModelPdtNo(this) << 8) | 0x17, m_particleSlots[7], this, 1.0f, 0);
+					} else {
+						putParticle(0x130, m_particleSlots[7], this, 20.0f * m_attackColRadius, 0);
+					}
+					break;
+				case 6:
+					CharaObjEndSlots(this, 0x100000);
+					putParticleBindTrace(0x107, m_particleSlots[20], this, 20.0f * m_attackColRadius, 0);
+					break;
+				case 7: {
+					CharaObjEndSlots(this, 0x8000);
+					int particleNo = isMon ? 0x170 : 0x114;
+					putParticle(particleNo, m_particleSlots[15], this, 20.0f * m_attackColRadius, 0);
+					break;
+				}
+				case 8: {
+					CharaObjEndSlots(this, 0x2000);
+					int particleNo = (isMon ? 0x16E : 0x112) | 0x100;
+					CharaObjPutMonsterScaledParticle(this, particleNo, m_particleSlots[13], CharaObjGetMonsterScale(script9, isMon));
+					break;
+				}
+				case 9: {
+					CharaObjEndSlots(this, 0x4000);
+					int particleNo = (isMon ? 0x16C : 0x110) | 0x100;
+					CharaObjPutMonsterScaledParticle(this, particleNo, m_particleSlots[14], CharaObjGetMonsterScale(script9, isMon));
+					break;
+				}
+				case 10:
+					if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0) {
+						reinterpret_cast<CGMonObj*>(this)->flyDown();
+					}
+					break;
+				case 0x1B:
+					CharaObjEndSlots(this, 0x400);
+					putParticle(0x11C, m_particleSlots[10], this, 1.0f, 0x1290D);
+					break;
+				case 0x1C:
+					if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
+						reinterpret_cast<CGMonObj*>(this)->undeadOff();
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	} else {
+		switch (staIndex) {
+			case 0:
+				CharaObjEndSlots(this, 0x4);
+				if (isIceJ) {
+					putParticle((CharaObjGetModelPdtNo(this) << 8) | 0x16, 0, this, 1.0f, 0);
+				} else {
+					putParticle(0x10B, 0, this, 20.0f * m_attackColRadius, 0);
+				}
+				playSe3D(0x16, 0x32, 0x96, 0, 0);
+				if (isMon) {
+					reinterpret_cast<CGMonObj*>(this)->setIceJEffect(1);
+				}
+				break;
+			case 1:
+				CharaObjEndSlots(this, 0x40);
+				break;
+			case 2:
+				CharaObjEndSlots(this, 0x80000);
+				break;
+			case 3:
+				CharaObjEndSlots(this, 0x40000);
+				putParticle(0x10E, 0, this, 20.0f * m_attackColRadius, 0);
+				playSe3D(0x3A, 0x32, 0x96, 0, 0);
+				break;
+			case 4:
+				CharaObjEndSlots(this, 0x80);
+				break;
+			case 6:
+				CharaObjEndSlots(this, 0x100000);
+				break;
+			case 7: {
+				CharaObjEndSlots(this, 0x8000);
+				int particleNo = (isMon ? 0x171 : 0x115) | 0x100;
+				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius, 0);
+				break;
+			}
+			case 8: {
+				CharaObjEndSlots(this, 0x2000);
+				int particleNo = (isMon ? 0x16F : 0x113) | 0x100;
+				CharaObjPutMonsterScaledParticle(this, particleNo, 0, CharaObjGetMonsterScale(script9, isMon));
+				break;
+			}
+			case 9: {
+				CharaObjEndSlots(this, 0x4000);
+				int particleNo = (isMon ? 0x16D : 0x111) | 0x100;
+				CharaObjPutMonsterScaledParticle(this, particleNo, 0, CharaObjGetMonsterScale(script9, isMon));
+				break;
+			}
+			case 10:
+				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0 &&
+					*reinterpret_cast<short*>(script + 0x1C) != 0) {
+					reinterpret_cast<CGMonObj*>(this)->flyUp();
+				}
+				break;
+			case 0x1B:
+				CharaObjEndSlots(this, 0x400);
+				break;
+			case 0x1C:
+				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
+					reinterpret_cast<CGMonObj*>(this)->undeadOn();
+				}
+				break;
+			default:
+				break;
+		}
 	}
-	if (value < 0) {
-		value = 0;
-	}
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) =
-		static_cast<short>(value);
+
+	*reinterpret_cast<short*>(script + 0x3E + (staIndex * 2)) = static_cast<short>(value);
 }
 
 /*

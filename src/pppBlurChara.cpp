@@ -366,29 +366,36 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
     int textureBase = 0;
-    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
-    BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
     int textureIndex;
-    int objPosBase;
-    _GXTexObj smallBackTex;
-    _GXColor drawColor;
-    Mtx identityMtx;
-    Mtx cameraMtx;
-    Mtx44 projection;
-    Mtx44 screenMtx;
-    Vec cameraPos;
-    Vec cameraTarget;
-    Vec cameraDir;
-    Vec objPos;
+    int objectBase;
+    double depth;
+    float quadMinX;
+    float quadMinY;
+    float quadMinZ;
+    float quadMaxX;
+    float quadMaxY;
+    float quadMaxZ;
     Vec4d inVec;
     Vec4d outVec;
+    Vec cameraTarget;
+    Vec objPos;
+    Vec cameraPos;
+    Vec cameraDir;
     float viewport[6];
     float gxProjection[7];
+    _GXTexObj smallBackTex;
+    Vec quadA;
+    Vec quadB;
+    Mtx44 screenMtx;
+    Mtx44 projection;
+    Mtx cameraMtx;
+    Mtx identityMtx;
+    BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
+    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
+    _GXColor drawColor;
     float projX;
     float projY;
     float projZ;
-    Vec quadA;
-    Vec quadB;
 
     if (param_2->m_textureMode == 1) {
         textureIndex = 0;
@@ -406,16 +413,16 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, 0, FLOAT_80331030, param_2->m_alpha, 0, 0,
                                                                0, 1, 1, 0);
-    objPosBase = texData->m_objPosBase;
+    objectBase = texData->m_objPosBase;
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraPcs._224_4_;
-    cameraPos.y = FLOAT_80331030;
-    cameraPos.z = CameraPcs._232_4_;
     cameraTarget.x = CameraPcs._212_4_;
     cameraTarget.y = FLOAT_80331030;
     cameraTarget.z = CameraPcs._220_4_;
+    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.y = FLOAT_80331030;
+    cameraPos.z = CameraPcs._232_4_;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = FLOAT_80331030;
 
@@ -424,9 +431,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXIdentity(identityMtx);
 
-    objPos.x = *(float*)(objPosBase + 0x15C);
-    objPos.y = *(float*)(objPosBase + 0x160);
-    objPos.z = *(float*)(objPosBase + 0x164);
+    objPos.x = *(float*)(objectBase + 0x15C);
+    objPos.y = *(float*)(objectBase + 0x160);
+    objPos.z = *(float*)(objectBase + 0x164);
 
     GXProject(cameraPos.x + objPos.x, FLOAT_80331030, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);
@@ -488,13 +495,13 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    float depth = (float)PSVECDistance(&cameraPos, &objPos);
-    depth -= param_2->m_stepValue;
+    depth = (double)PSVECDistance(&cameraPos, &objPos);
+    depth = (double)(float)(depth - (double)param_2->m_stepValue);
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
-    inVec.z = -depth;
+    inVec.z = (float)-depth;
     inVec.w = FLOAT_8033103c;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 
@@ -502,12 +509,18 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         outVec.z = outVec.z / outVec.w;
     }
 
-    quadB.x = -param_2->m_arg3;
-    quadA.x = -(FLOAT_80331044 * param_2->m_arg3);
-    quadA.y = FLOAT_80331048 + (FLOAT_80331044 * param_2->m_arg3);
-    quadA.z = outVec.z;
-    quadB.y = FLOAT_8033104c + param_2->m_arg3;
-    quadB.z = outVec.z;
+    quadMaxX = -param_2->m_arg3;
+    quadMinX = -(FLOAT_80331044 * param_2->m_arg3);
+    quadMinY = FLOAT_80331048 + (FLOAT_80331044 * param_2->m_arg3);
+    quadMinZ = outVec.z;
+    quadMaxY = FLOAT_8033104c + param_2->m_arg3;
+    quadMaxZ = outVec.z;
+    quadA.x = quadMinX;
+    quadA.y = quadMinY;
+    quadA.z = quadMinZ;
+    quadB.x = quadMaxX;
+    quadB.y = quadMaxY;
+    quadB.z = quadMaxZ;
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);
 

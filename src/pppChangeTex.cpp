@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
+#include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -61,8 +62,7 @@ extern float FLOAT_80332020;
 extern float FLOAT_80332028;
 extern double DOUBLE_80332030;
 extern double DOUBLE_80332038;
-extern char DAT_80332024[];
-extern char gUtil[];
+extern char DAT_80332024;
 char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -338,8 +338,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + serializedDataOffsets[2] + 0x80);
+	int colorOffset = data->m_serializedDataOffsets[1];
+	ChangeTexWork* work = (ChangeTexWork*)((char*)&changeTex->field0_0x0 + data->m_serializedDataOffsets[2] + 0x80);
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(
 	    GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0));
 
@@ -396,9 +396,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)(model0 + 0xA4) + 0xC); meshIdx++) {
 			int meshHdr = *(int*)(meshList + 8);
-			if (strcmp((char*)meshHdr, DAT_80332024) == 0) {
+			if (strcmp((char*)meshHdr, &DAT_80332024) == 0) {
 				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-				    gUtil, &work->m_bboxMin, &work->m_bboxMax, *(void**)(meshList + 0xC), *(unsigned long*)(meshHdr + 0x14),
+				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, *(void**)(meshList + 0xC), *(unsigned long*)(meshHdr + 0x14),
 				    *(unsigned long*)(*(int*)(model0 + 0xA4) + 0x34));
 			}
 
@@ -416,7 +416,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				*(int*)*dlEntry = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x18D);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
+				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				dlEntry = dlEntry - 1;
 				dlInfo = dlInfo + 3;
 			}
@@ -454,7 +454,6 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		double d;
 		u32 u[2];
 	} alphaScale;
-	int colorOffset = serializedDataOffsets[1];
 
 	alphaScale.u[0] = 0x43300000;
 	alphaScale.u[1] = (u8)*((u8*)changeTex + colorOffset + 0x8B);

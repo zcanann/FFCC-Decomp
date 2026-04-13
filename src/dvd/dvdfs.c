@@ -37,6 +37,10 @@ OSThreadQueue __DVDThreadQueue;
  * - the PAL/EN maps also call `0x8032F070` local `currentDirectory`, so this
  *   unit now spells that slot as a local `currentDirectory` instead of the
  *   older exported-style `sDvdfsCurrentDirEntry`
+ * - the raw compiled dvdfs.o now also confirms that symbol shape directly:
+ *   `BootInfo` / `FstStart` / `MaxEntryNum` / `currentDirectory` are local,
+ *   while `FstStringStart` / `__DVDLongFileNameFlag` / `__DVDThreadQueue`
+ *   stay global, matching the map ownership pattern
  * - even with both of those ownership fixes in place, promoting dvdfs.c to
  *   Matching still breaks final checksum, so the hidden-link blocker is
  *   narrower now but not resolved yet

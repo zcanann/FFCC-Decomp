@@ -5,47 +5,6 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/dvd/__dvd.h"
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - main/dvd/dvd is currently a hidden-linkage blocker rather than a visible
- *   objdiff blocker
- *
- * Most useful probe so far:
- * - on this branch, flipping dvd/dvd.c from NonMatching to Matching while the
- *   unit still reports 100% code/data/function match causes the final
- *   build/GCCP01/main.dol checksum to fail immediately
- * - that means any remaining issue here is outside the visible unit diff and
- *   should be treated as object ownership / linkage metadata / neighboring
- *   section attribution work, not source control-flow cleanup
- * - a later probe cross-checked the shared Dolphin sources in
- *   reference_projects/super_mario_strikers and twilight_princess and found
- *   that `__DVDThreadQueue` / `__DVDLongFileNameFlag` belong in dvdfs.c, not
- *   dvd.c; moving those definitions to dvdfs.c and extending the dvdfs `.sbss`
- *   split through `0x8032F080` is now landed on this branch
- * - that seam fix removes the stale `dvd/dvd.c .sbss` alignment warning and
- *   makes the raw compiled dvd.o start its `.sbss` at `executing` instead of
- *   the bogus exported queue globals
- * - dropping the totally unused local globals `ResetCount` / `MotorState`
- *   makes the raw dvd.o tail collapse to the map-backed
- *   `FirstTimeInBootrom` / `DVDInitialized` / `LastState` shape
- * - even after landing that seam correction, promoting dvd/dvd.c to Matching
- *   still failed final checksum while dvdfs.c stayed NonMatching
- * - however, when both dvd.c and dvdfs.c are promoted together on this branch,
- *   objdiff finally marks dvd.c itself fully complete again while dvdfs.c
- *   still fails final linkage
- * - so the remaining blocker is no longer the `__DVDThreadQueue` /
- *   `__DVDLongFileNameFlag` seam or the stale dvd.c tail locals themselves;
- *   future work should bias toward dvdfs.c's hidden-link metadata before
- *   reopening dvd.c again
- * - fresh retest after the keepable `dvdfs.c -> Matching` landing confirms
- *   dvd.c was not just waiting on that neighbor after all: promoting dvd/dvd.c
- *   alone still links and then fails the final main.dol checksum immediately
- * - that moves dvd.c back into the true checksum-only hidden-link bucket, even
- *   on the corrected dvdfs baseline
- */
-
 // externs
 extern void __DVDPrintFatalMessage();
 extern int DVDCompareDiskID(const struct DVDDiskID * id1 /* r29 */, const struct DVDDiskID * id2 /* r30 */);
@@ -59,7 +18,6 @@ static char s___DVDVersion[] = "<< Dolphin SDK - DVD\trelease build: Oct 29 2002
 
 const char* __DVDVersion = s___DVDVersion;
 
-static char s_dvd_c[] = "dvd.c";
 static char s_load_fst[] = "load fst\n";
 static char s_DVDChangeDiskFSTTooBig[] = "DVDChangeDisk(): FST in the new disc is too big.   ";
 
@@ -67,6 +25,8 @@ static BOOL autoInvalidation = TRUE;
 
 static void defaultOptionalCommandChecker(DVDCommandBlock*, DVDCommandCheckerCallback);
 static DVDCommandChecker checkOptionalCommand = defaultOptionalCommandChecker;
+
+static char s_dvd_c[] = "dvd.c";
 
 static DVDBB2 BB2;
 static DVDDiskID CurrDiskID;

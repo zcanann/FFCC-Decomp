@@ -66,6 +66,17 @@ const char* __PADVersion = s___PADVersion;
  *   `SamplingCallback` narrowed the link failure much further: with Pad.c
  *   promoted, every cross-unit undefined disappeared except
  *   `recalibrated$401` from ai.o
+ * - a fresh latest-main config cleanup made that last local-static name less
+ *   misleading: the PAL map suffix is not stable (`recalibrated$397` there),
+ *   so renaming the GCCP01 symbol at `0x8032F170` from `$401` to `$400` is
+ *   keepable and makes extracted ai.o now ask for the same local-static name
+ *   the rebuilt source Pad.o emits
+ * - that leaves only the real exported pad-state globals plus the OS-side
+ *   `RecalibrateBits` import as unresolved when Pad.c is promoted
+ * - a reverse-order GCCP01 export probe confirmed MWCC does reverse these
+ *   file-scope globals exactly as expected, but it still emits the
+ *   function-local `recalibrated$400` ahead of them and shifts the whole run
+ *   by 4 bytes, so simply exporting the pad-state globals is not enough yet
  * - a fresh latest-main follow-up showed a naive GCCP01 export probe is not
  *   keepable: removing `static` from those pad-state globals and
  *   `SamplingCallback` does resolve the undefined set, but MWCC then lays the

@@ -33,6 +33,17 @@
  *   writes), so the target-side `RecalibrateBits` binding is almost certainly
  *   a seam/ownership artifact rather than something the current C body is
  *   spelling incorrectly
+ * - a fresh GCCP01-only seam probe then forced source `OS.o` to bind those
+ *   same three accesses through `RecalibrateBits` and exported only that one
+ *   symbol from Pad.c; the rebuilt `OS.o` undefineds then matched target, but
+ *   promoting `os/OS.c` still reproduced the old >30s linker hang and the
+ *   Pad-side object layout regressed (`RecalibrateBits` moved to the tail of
+ *   the source Pad.o `.sbss` run, after local `SamplingCallback` and
+ *   `recalibrated$400`)
+ * - that means the visible `OSInit` relocation identity is a real symptom,
+ *   but fixing just that one symbol is not sufficient to make `OS.c`
+ *   linkable; the broader pad/ai/os small-data binding seam is still the
+ *   blocker
  */
 
 #define NOP 0x60000000

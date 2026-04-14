@@ -1222,7 +1222,7 @@ void CGMonObj::frameStatFuncDragonZombie()
 int CGMonObj::calcBranchFuncDragonZombie(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	return (*reinterpret_cast<int*>(mon + 0x6B4) != 0) ? 1 : 0;
+	return (*reinterpret_cast<int*>(mon + 0x6D0) != 0) ? 1 : 0;
 }
 
 /*
@@ -2946,7 +2946,7 @@ void CGMonObj::frameStatFuncLastBoss()
 int CGMonObj::calcBranchFuncLastBoss(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	return (*reinterpret_cast<int*>(mon + 0x6B4) != 0) ? 1 : 0;
+	return (*reinterpret_cast<int*>(mon + 0x6D0) != 0) ? 1 : 0;
 }
 
 /*

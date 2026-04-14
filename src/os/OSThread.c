@@ -15,6 +15,9 @@
  *   `DefaultThread` really does change the rebuilt object layout, but it
  *   regressed the unit instead of fixing the early `__OSThreadInit` address
  *   arithmetic block
+ * - rewriting `__OSThreadInit` to use direct `DefaultThread` field accesses
+ *   instead of the local `thread = &DefaultThread` alias was completely flat;
+ *   MWCC still emitted the same early `RunQueue`-relative address arithmetic
  * - that means the remaining seam is not just "make DefaultThread the first
  *   local bss object"; there is still a deeper source or type-layout mismatch
  *   in this init path

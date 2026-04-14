@@ -749,10 +749,10 @@ extern "C" void* __vt__Q23std13bad_exception[];
  * TODO: Remove this note block once linkage has been resolved.
  *
  * Current blocker in this unit:
- * - __unexpected is the only remaining code mismatch in Gecko_ExceptionPPC.cp
- * - the live object already matches the surrounding extab / .rodata / .data
- *   layout, so the remaining miss looks like a tiny source-shape or
- *   exception-metadata detail rather than missing control flow
+ * - Gecko_ExceptionPPC.cp now rebuilds at 100% code/data on latest main, but
+ *   flipping the unit to `Matching` still fails final main.dol checksum
+ * - that means this unit is now a pure hidden-link / object-metadata blocker;
+ *   the remaining miss is no longer in visible source code shape
  *
  * Most useful result so far:
  * - current latest-main source does now match __unexpected at 100% again: the

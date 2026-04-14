@@ -35,6 +35,10 @@
  *   relocating its callback load/store through `min_wait_8032F1A0` instead of
  *   source `__AR_Callback`, i.e. the same uniform `0x18`-early small-data
  *   drift already seen at the pad/ai/os seam extends into `ai -> ar` as well
+ * - a follow-up pair probe then showed that hard break is internal to the
+ *   `ai/ar` pair itself: promoting `ai.c + ar.c` together from that same
+ *   local-scope metadata baseline links cleanly and only fails at the final
+ *   checksum, so the next outward seam is later than `ar.c`
  */
 
 #ifdef DEBUG

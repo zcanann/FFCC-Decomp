@@ -70,6 +70,10 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   its callback load/store to `min_wait_8032F1A0` instead of source
  *   `__AR_Callback`, which is the same uniform `0x18`-early small-data drift
  *   seen earlier at the pad/ai and ai/os seams
+ * - a follow-up pair probe also showed those new undefineds are internal to
+ *   the `ai -> ar` pair rather than the next outward boundary: promoting
+ *   `ai.c + ar.c` together from that same local-scope metadata baseline links
+ *   all the way through and only fails at the final main.dol checksum
  * - a fresh current-branch retest of the older "export every AI state symbol"
  *   idea did move the rebuilt object, but not in a keepable direction:
  *   explicit zero-initialized non-static declarations for all eleven AI state

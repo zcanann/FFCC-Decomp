@@ -7,8 +7,6 @@
 #include "types.h"
 
 CUSBPcs USBPcs;
-char s_usbReadPollInitialized;
-int s_usbReadPollFrameCounter;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
@@ -161,17 +159,20 @@ void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
  */
 void CUSBPcs::mccReadData()
 { 
-	if (s_usbReadPollInitialized == '\0')
+    static int testloop;
+    static char init;
+
+	if (init == '\0')
 	{
-		s_usbReadPollFrameCounter = 0;
-		s_usbReadPollInitialized = '\x01';
+		testloop = 0;
+		init = '\x01';
 	}
 
-	s_usbReadPollFrameCounter = s_usbReadPollFrameCounter + 1;
+	testloop = testloop + 1;
 
-	if (4 < s_usbReadPollFrameCounter)
+	if (4 < testloop)
 	{
-		s_usbReadPollFrameCounter = 0;
+		testloop = 0;
 		goto read_usb;
 	end:
 		return;

@@ -29,37 +29,63 @@ extern "C" unsigned int __cvt_fp2unsigned(double);
 
 /*
  * --INFO--
- * PAL Address: 0x800dec14
- * PAL Size: 72b
+ * PAL Address: 0x800de718
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
+void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
-	char* work = (char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80;
+	int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
+	int colorOffset = ctrlTable->m_serializedDataOffsets[1];
+	u8* objBytes = (u8*)obj;
+	u8* shapeBase = objBytes + shapeOffset + 0x80;
+	u8* colorBase = objBytes + colorOffset + 0x80;
+	s32 dataValIndex = unkB->m_dataValIndex;
 
-	float initValue = kPppLensFlareZero;
+	if (dataValIndex != 0xFFFF) {
+		long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+		if (shapeBase[0x32] != 0) {
+			pppCVECTOR local_70;
+			Vec local_60;
+			Mtx local_54;
+			float scale;
 
-	*((float*)(work + 0x18)) = initValue;
-	*((float*)(work + 0x14)) = initValue;
-	*((float*)(work + 0x10)) = initValue;
-	*((float*)(work + 0x28)) = initValue;
-	*((float*)(work + 0x24)) = initValue;
-	*((float*)(work + 0x20)) = initValue;
+			PSMTXIdentity(local_54);
+			scale = *(float*)&unkB->m_stepValue;
+			local_54[0][0] = (pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40)) * scale;
+			local_54[1][1] = (pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54)) * scale;
+			local_54[2][2] = (pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68)) * scale;
 
-	*((short*)(work + 0x30)) = 0;
-	*((short*)(work + 0x2e)) = 0;
-	*((short*)(work + 0x2c)) = 0;
-	*(work + 0x32) = 0;
-	*((float*)(work + 0x34)) = initValue;
-}
+			local_60.x = pppMngStPtr->m_matrix.value[0][3];
+			local_60.y = pppMngStPtr->m_matrix.value[1][3];
+			local_60.z = pppMngStPtr->m_matrix.value[2][3];
 
-/*
- * --INFO--
- * PAL Address: 0x800dec10
- * PAL Size: 4b
- */
-void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
-{
-	return;
+			PSMTXMultVec(ppvCameraMatrix02, &local_60, &local_60);
+
+			local_54[0][3] = local_60.x;
+			local_54[1][3] = local_60.y;
+			local_54[2][3] = local_60.z;
+
+			pppCopyVector(*(Vec*)(shapeBase + 0x20), local_60);
+
+			GXLoadPosMtxImm(local_54, 0);
+
+			local_70.rgba[0] = colorBase[8];
+			local_70.rgba[1] = colorBase[9];
+			local_70.rgba[2] = colorBase[10];
+			local_70.rgba[3] = shapeBase[0x32];
+
+			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, kPppLensFlareZero, unkB->m_payload[0], unkB->m_unk13, unkB->m_unk12, 0,
+						  1, 1, 0);
+
+			pppSetBlendMode(unkB->m_unk12);
+			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, unkB->m_unk12);
+			pppSetBlendMode(3);
+		}
+	}
 }
 
 /*
@@ -172,61 +198,35 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 /*
  * --INFO--
- * PAL Address: 0x800de718
- * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * PAL Address: 0x800dec10
+ * PAL Size: 4b
  */
-void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
+void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
 {
-	int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
-	int colorOffset = ctrlTable->m_serializedDataOffsets[1];
-	u8* objBytes = (u8*)obj;
-	u8* shapeBase = objBytes + shapeOffset + 0x80;
-	u8* colorBase = objBytes + colorOffset + 0x80;
-	s32 dataValIndex = unkB->m_dataValIndex;
+	return;
+}
 
-	if (dataValIndex != 0xFFFF) {
-		long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
-		if (shapeBase[0x32] != 0) {
-			pppCVECTOR local_70;
-			Vec local_60;
-			Mtx local_54;
-			float scale;
+/*
+ * --INFO--
+ * PAL Address: 0x800dec14
+ * PAL Size: 72b
+ */
+void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
+{
+	char* work = (char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80;
 
-			PSMTXIdentity(local_54);
-			scale = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = (pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40)) * scale;
-			local_54[1][1] = (pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54)) * scale;
-			local_54[2][2] = (pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68)) * scale;
+	float initValue = kPppLensFlareZero;
 
-			local_60.x = pppMngStPtr->m_matrix.value[0][3];
-			local_60.y = pppMngStPtr->m_matrix.value[1][3];
-			local_60.z = pppMngStPtr->m_matrix.value[2][3];
+	*((float*)(work + 0x18)) = initValue;
+	*((float*)(work + 0x14)) = initValue;
+	*((float*)(work + 0x10)) = initValue;
+	*((float*)(work + 0x28)) = initValue;
+	*((float*)(work + 0x24)) = initValue;
+	*((float*)(work + 0x20)) = initValue;
 
-			PSMTXMultVec(ppvCameraMatrix02, &local_60, &local_60);
-
-			local_54[0][3] = local_60.x;
-			local_54[1][3] = local_60.y;
-			local_54[2][3] = local_60.z;
-
-			pppCopyVector(*(Vec*)(shapeBase + 0x20), local_60);
-
-			GXLoadPosMtxImm(local_54, 0);
-
-			local_70.rgba[0] = colorBase[8];
-			local_70.rgba[1] = colorBase[9];
-			local_70.rgba[2] = colorBase[10];
-			local_70.rgba[3] = shapeBase[0x32];
-
-			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, kPppLensFlareZero, unkB->m_payload[0], unkB->m_unk13, unkB->m_unk12, 0,
-						  1, 1, 0);
-
-			pppSetBlendMode(unkB->m_unk12);
-			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, unkB->m_unk12);
-			pppSetBlendMode(3);
-		}
-	}
+	*((short*)(work + 0x30)) = 0;
+	*((short*)(work + 0x2e)) = 0;
+	*((short*)(work + 0x2c)) = 0;
+	*(work + 0x32) = 0;
+	*((float*)(work + 0x34)) = initValue;
 }

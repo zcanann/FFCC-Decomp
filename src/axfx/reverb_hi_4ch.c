@@ -90,6 +90,13 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   did nudge Modify from 99.54918% to 99.59016%, but MWCC duplicated the
  *   whole constant run and blew `.sdata2` out from `0x38` to `0x60`, so that
  *   spelling is not keepable
+ * - a tighter follow-up also ruled out the simplest symbol-identity fix:
+ *   making only `reverb_hi_4ch_value0_1` a plain file-scope `const` while
+ *   leaving the already-correct `0.3f` / `0.6f` tail alone was completely
+ *   flat; rebuilt source `reverb_hi_4ch.o` stayed at `.sdata2 0x30` instead
+ *   of growing to the target `.sdata2 0x38`, so MWCC still folded the `0.1f`
+ *   bound into the earlier local pool instead of materializing the missing
+ *   standalone float symbol
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

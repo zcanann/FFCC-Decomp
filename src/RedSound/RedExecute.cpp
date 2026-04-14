@@ -49,14 +49,16 @@ u8 GetRandomData()
  */
 int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 {
-    u32 pitch;
+    int pitch;
     int octaveAdjust;
-    u32 noteBand;
+    int noteBand;
     int value;
 
     octaveAdjust = 0;
-    for (pitch = (param_1 >> 12) + param_2 + (param_3 >> 16); (int)pitch < 0; pitch += 0xC00) {
-        octaveAdjust += -1;
+    pitch = (param_1 >> 12) + param_2 + (param_3 >> 16);
+    while (pitch < 0) {
+        pitch += 0xC00;
+        octaveAdjust -= 1;
     }
 
     noteBand = (pitch >> 8) & 0x7F;
@@ -64,10 +66,10 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
     value = (int)((DAT_8021d7f0[noteBand % 12] >> (10 - octaveAdjust)) * DAT_8021d820[pitch & 0xFF]) >> 12;
 
     if (param_4 != 0) {
-        if ((int)param_4 < 1) {
-            value = (int)(value * (param_4 & 0xFF)) >> 8;
-        } else {
+        if (param_4 > 0) {
             value = value + ((int)(value * (param_4 + 1)) >> 7);
+        } else {
+            value = (int)(value * (param_4 & 0xFF)) >> 8;
         }
     }
 

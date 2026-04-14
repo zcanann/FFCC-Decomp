@@ -1,4 +1,5 @@
 #include "ffcc/pppYmChangeTex.h"
+#include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include <string.h>
@@ -55,13 +56,16 @@ extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern float DAT_80330e10;
 extern char gUtil[];
-char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
+char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.c";
 extern double DOUBLE_80330e08;
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
 extern float FLOAT_80330e00;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
+CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
+CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
 
 extern "C" {
 	int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
@@ -73,8 +77,6 @@ extern "C" {
 	void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 	void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
-	void GXCallDisplayList(void*, unsigned int);
-	void GXSetArray(unsigned int, void*, unsigned char);
 }
 
 /*
@@ -115,32 +117,32 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
 	pppYmChangeTexState* state = (pppYmChangeTexState*)((char*)ymChangeTex + serializedDataOffsets[2] + 0x80);
-	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(
-	    GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0));
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_charaObj, 0);
+	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
 	state->m_charaObj = pppMngStPtr->m_charaObj;
 	state->m_context = pppEnvStPtr;
-	*(pppYmChangeTexState**)(model0 + 0xE4) = state;
-	*(pppYmChangeTexStep**)(model0 + 0xE8) = step;
-	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+	*(pppYmChangeTexState**)((char*)model0 + 0xE4) = state;
+	*(pppYmChangeTexStep**)((char*)model0 + 0xE8) = step;
+	*(void**)((char*)model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
+	*(void**)((char*)model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
 	state->m_texture = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
 
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 2);
-	int model;
-	if ((handle1 != 0) && ((model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model != 0)) {
-		*(pppYmChangeTexState**)(model + 0xE4) = state;
-		*(pppYmChangeTexStep**)(model + 0xE8) = step;
-		*(void**)(model + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-		*(void**)(model + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr((CGObject*)state->m_charaObj, 1);
+	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr((CGObject*)state->m_charaObj, 2);
+	CChara::CModel* model;
+	if ((handle1 != 0) && ((model = GetCharaModelPtr(handle1)), model != 0)) {
+		*(pppYmChangeTexState**)((char*)model + 0xE4) = state;
+		*(pppYmChangeTexStep**)((char*)model + 0xE8) = step;
+		*(void**)((char*)model + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
+		*(void**)((char*)model + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
 	}
 
-	if ((handle2 != 0) && ((model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model != 0)) {
-		*(pppYmChangeTexState**)(model + 0xE4) = state;
-		*(pppYmChangeTexStep**)(model + 0xE8) = step;
-		*(void**)(model + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-		*(void**)(model + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+	if ((handle2 != 0) && ((model = GetCharaModelPtr(handle2)), model != 0)) {
+		*(pppYmChangeTexState**)((char*)model + 0xE4) = state;
+		*(pppYmChangeTexStep**)((char*)model + 0xE8) = step;
+		*(void**)((char*)model + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
+		*(void**)((char*)model + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
 	}
 
 	if (step->m_payload[0] == 0) {
@@ -161,16 +163,16 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 	state->m_texture = texObj;
 
-	int meshList = *(int*)(model0 + 0xAC);
+	int meshList = *(int*)((char*)model0 + 0xAC);
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
 		state->m_meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		    *(int*)(*(int*)(model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x15D);
+		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x15D);
 		state->m_displayListArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		    *(int*)(*(int*)(model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x160);
+		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x160);
 
 		int* meshColorArrays = (int*)state->m_meshColorArrays;
 		int arrayOffset = 0;
-		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)(model0 + 0xA4) + 0xC); meshIdx++) {
+		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 			*(int*)(state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			    *(int*)(*(int*)(meshList + 8) + 0x4C) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x168);
 
@@ -205,13 +207,13 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		u32 u[2];
 	} frameScale;
 	frameScale.u[0] = 0x43300000;
-	frameScale.u[1] = ((1 << *(int*)(*(int*)(model0 + 0xA4) + 0x34)) ^ 0x80000000);
+	frameScale.u[1] = ((1 << *(int*)(*(int*)((char*)model0 + 0xA4) + 0x34)) ^ 0x80000000);
 
-	int curMesh = *(int*)(model0 + 0xAC);
+	int curMesh = *(int*)((char*)model0 + 0xAC);
 	int frame = (int)(state->m_value0 * (float)(frameScale.d - DOUBLE_80330e08));
 	short frameShort = (short)frame;
 	Mtx modelMtx;
-	PSMTXCopy(*(Mtx*)(model0 + 0x68), modelMtx);
+	PSMTXCopy(*(Mtx*)((char*)model0 + 0x68), modelMtx);
 
 	unsigned char fallbackAlpha;
 	char negativeRamp;
@@ -224,7 +226,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 
 	int meshOffset = 0;
-	for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)(model0 + 0xA4) + 0xC); meshIdx++) {
+	for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 		int pointOffset = 0;
 		int vertColors = *(int*)(state->m_meshColorArrays + meshOffset);
 		for (unsigned int v = 0; v < *(unsigned int*)(*(int*)(curMesh + 8) + 0x14); v++) {
@@ -402,7 +404,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 			meshColorArray = *(void**)((u8*)meshColorArrays + meshIdx * 4);
 			if (meshColorArray != 0) {
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
-				GXSetArray(0xb, meshColorArray, 4);
+				GXSetArray((_GXAttr)0xb, meshColorArray, (unsigned char)4);
 
 				if ((*(u8*)((char*)param_3 + 0x14) == 2) || (*(u8*)((char*)param_3 + 0x14) == 3)) {
 					*(int*)(MaterialManRaw() + 0xd0) = 0;

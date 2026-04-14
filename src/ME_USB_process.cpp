@@ -14,7 +14,6 @@
 #define BSWAP32(val) ((u32)(((u32)(val) << 24) | (((u32)(val) & 0xff00) << 8) | (((u32)(val) & 0xff0000) >> 8) | ((u32)(val) >> 24)))
 
 extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
-extern "C" void* GetRsdItem__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory* memory, unsigned long size, CMemory::CStage* stage, char* file, int line, int align);
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
@@ -37,16 +36,6 @@ struct ViewerSRT {
     float scaleX;
     float scaleY;
     float scaleZ;
-};
-
-struct RSDITEM {
-    u32 countA;
-    u32 countB;
-    u32 countC;
-    void* ptrC;
-    void* ptr10;
-    void* ptr14;
-    void* ptr18;
 };
 
 static inline u8* Ptr(CMaterialEditorPcs* self, u32 offset)
@@ -82,11 +71,6 @@ static inline char& S8At(CMaterialEditorPcs* self, u32 offset)
 static inline CMemory::CStage* MaterialEditorStage()
 {
     return MaterialEditorPcs.m_stage;
-}
-
-static inline RSDITEM* GetRsdItem(CMaterialEditorPcs* self)
-{
-    return *reinterpret_cast<RSDITEM**>(GetRsdItem__18CMaterialEditorPcsFv(self));
 }
 
 static inline u32 TextureIndex(CMaterialEditorPcs* self)
@@ -144,7 +128,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         ViewerSRT srt;
         Vec minPos;
         Vec maxPos;
-        RSDITEM* rsdItem = GetRsdItem(materialEditorPcs);
+        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u32 dataSize = size * 0xC;
         float* xyzData;
@@ -191,7 +175,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x12: {
-        RSDITEM* rsdItem = GetRsdItem(materialEditorPcs);
+        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u32 dataSize = size * 0xC;
         float* xyzData;
@@ -225,7 +209,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x13: {
-        RSDITEM* rsdItem = GetRsdItem(materialEditorPcs);
+        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u32 dataSize = size * 0x70;
 
@@ -391,7 +375,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x31: {
-        RSDITEM* rsdItem = GetRsdItem(materialEditorPcs);
+        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u8* dstBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, size, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));

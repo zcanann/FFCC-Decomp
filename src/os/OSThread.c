@@ -3,6 +3,23 @@
 
 #include "dolphin/os/__os.h"
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - OSThread.c still has real text mismatches, with the first sustained miss in
+ *   `__OSThreadInit` rather than a pure checksum-only hidden-link failure.
+ *
+ * Most useful result so far:
+ * - swapping the file-scope declaration order of `IdleThread` and
+ *   `DefaultThread` really does change the rebuilt object layout, but it
+ *   regressed the unit instead of fixing the early `__OSThreadInit` address
+ *   arithmetic block
+ * - that means the remaining seam is not just "make DefaultThread the first
+ *   local bss object"; there is still a deeper source or type-layout mismatch
+ *   in this init path
+ */
+
 #define ENQUEUE_THREAD(thread, queue, link)       \
     do {                                          \
         OSThread* __prev = (queue)->tail; \

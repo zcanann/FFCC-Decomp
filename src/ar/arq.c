@@ -14,6 +14,9 @@
  * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
  *   failed at the final checksum stage, so the remaining issue is hidden
  *   object/linkage shape rather than visible C or data mismatch
+ * - promoting `ar.c` and `arq.c` together on the latest main-based SDK branch
+ *   still only fails at the final checksum, so `arq.c` is not just waiting on
+ *   `ar.c` to become linkable first
  * - a follow-up PAL-map check showed the current split config is also stale in
  *   this neighborhood: arq.c should own `.sbss 0x8032F1D8..0x8032F200` through
  *   `__ARQ_init_flag`, but `splits.txt` currently cuts the unit off at

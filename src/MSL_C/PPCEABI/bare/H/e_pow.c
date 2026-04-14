@@ -16,6 +16,9 @@
  *   better: bp/dp_h/dp_l are modeled as local .rodata, and the main .sdata2
  *   run is back to local @319-@353-style constants instead of exported
  *   DOUBLE_80333Axx globals
+ * - promoting `e_pow.c` together with the other nearby MSL runtime holdout
+ *   `ansi_fp.c` still only fails at the final checksum, so the remaining seam
+ *   is not just "promote the adjacent math runtime pair together"
  * - even after that symbol/locality cleanup, promoting e_pow.c still fails the
  *   final checksum, so the remaining blocker is narrower hidden linkage /
  *   neighboring ownership work, not function-body cleanup inside __ieee754_pow

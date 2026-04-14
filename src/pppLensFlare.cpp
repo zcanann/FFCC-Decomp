@@ -86,9 +86,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		u32 zAtPixel;
 		Vec cameraToObject;
 		Vec objectPos;
-		Vec lookDir;
-		Vec cameraLookAt;
 		Vec cameraPos;
+		Vec cameraLookAt;
+		Vec lookDir;
 		float viewport[6];
 		float projection[7];
 		Mtx cameraMtx;

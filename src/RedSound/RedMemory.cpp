@@ -2,12 +2,12 @@
 #include "ffcc/RedSound/RedGlobals.h"
 #include <dolphin/os.h>
 
-int m_DataBuffer;
-int m_ADataBuffer;
-int m_DataBufferSize;
-int m_ADataBufferSize;
-int* m_MemoryBank;
-int* m_AMemoryBank;
+static int m_DataBuffer;
+static int m_ADataBuffer;
+static int m_DataBufferSize;
+static int m_ADataBufferSize;
+static int* m_MemoryBank;
+static int* m_AMemoryBank;
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";

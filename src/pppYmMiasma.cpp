@@ -160,12 +160,11 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     u32 randomValue;
     int shapeRandom;
     short shapeCount;
-    long* shapeTable;
+    long** shapeTable;
     float randomHeight;
     float radiusJitter;
     float randomScale;
     Vec basePos;
-    Vec particlePos;
     Vec normalizedPos;
     u32 angleBase;
     u32 signBit;
@@ -180,10 +179,9 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     randomValue = rand();
     temp.ull = (0x4330000000000000ULL | (u32)(randomValue ^ 0x80000000));
     randomScale = FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648);
-    shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
-    shapeTable = (long*)*shapeTable;
+    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
     shapeRandom = rand();
-    shapeCount = *(short*)((u8*)shapeTable + 6);
+    shapeCount = *(short*)((u8*)*shapeTable + 6);
     angle = (u32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
     shapeCount = (short)(shapeRandom - (shapeRandom / (int)shapeCount) * shapeCount);
     state->m_shapeDrawFrame = shapeCount;
@@ -209,10 +207,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         basePos.x = pppMngStPtr->m_matrix.value[0][3];
         basePos.y = pppMngStPtr->m_matrix.value[1][3];
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
-        particlePos.x = particleData->m_matrix[0][0];
-        particlePos.y = particleData->m_matrix[0][1];
-        particlePos.z = particleData->m_matrix[0][2];
-        pppAddVector(*(Vec*)particleData, particlePos, basePos);
+        pppAddVector(*(Vec*)particleData, *(Vec*)particleData->m_matrix[0], basePos);
     }
     state->m_lifeFrames = (short)(pYmMiasma->m_lifeBase + (randomValue - (randomValue / pYmMiasma->m_lifeRange) * pYmMiasma->m_lifeRange));
     state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;

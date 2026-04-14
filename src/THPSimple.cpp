@@ -550,7 +550,7 @@ s32 THPSimplePreLoad(s32 loop)
         SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid = 1;
         SimpleControl.readBuffer[SimpleControl.readIndex].mFrameNumber = SimpleControl.curAudioTrack;
         SimpleControl.curAudioTrack++;
-        SimpleControl.readIndex = (SimpleControl.readIndex + 1) & 7;
+        SimpleControl.readIndex = (SimpleControl.readIndex + 1) % 8;
 
         if (((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) &&
             (SimpleControl.isLooping == 1)) {

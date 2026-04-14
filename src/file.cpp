@@ -551,15 +551,17 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
     do
     {
-        if (System.m_execParam != 0)
+        if ((unsigned int)System.m_execParam >= 1)
         {
             System.Printf(s_drawErrorFmt, errorCode);
         }
 
-        CFont* font = MenuPcs.GetFont22();
-        bool usingFallbackFont = (font == 0);
-        if (usingFallbackFont)
+        CMenuPcs* menuPcs = &MenuPcs;
+        CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menuPcs) + 0xF8);
+        int usingFallbackFont = 0;
+        if (font == 0)
         {
+            usingFallbackFont = 1;
             font = FontMan.m_font;
         }
 
@@ -571,8 +573,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         Graphic._WaitDrawDone(s_fileCpp, 0x2CC);
 
-        bool compactLayout = (!usingFallbackFont && Graphic.m_scratchTextureBuffer != 0);
-        if (compactLayout)
+        int compactLayout = 0;
+        if (usingFallbackFont == 0 && Graphic.m_scratchTextureBuffer != 0)
+        {
+            compactLayout = 1;
+        }
+
+        if (compactLayout != 0)
         {
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
@@ -590,7 +597,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         font->SetMargin(0.0f);
         font->SetZMode(0, 0);
         font->SetColor(CColor(255, 255, 255, 255).color);
-        font->SetTlut(usingFallbackFont ? -1 : 7);
+        font->SetTlut(usingFallbackFont != 0 ? -1 : 7);
         font->DrawInit();
 
         int msgIndex = 0;
@@ -616,7 +623,11 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         unsigned int language = Game.m_gameWork.m_languageId;
         const char* const* lines = s_diskErrorText[msgIndex][language];
-        unsigned int baseY = compactLayout ? 0x20 : 200;
+        unsigned int baseY = 200;
+        if (compactLayout != 0)
+        {
+            baseY = 0x20;
+        }
 
         if (strlen(lines[2]) == 0)
         {
@@ -647,7 +658,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         font->DrawQuit();
 
-        if (compactLayout)
+        if (compactLayout != 0)
         {
             GXSetDispCopySrc(0, 0, 0x280, 0x70);
             GXSetDispCopyDst(0x280, 0x70);
@@ -674,7 +685,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             VIWaitForRetrace();
         }
 
-        if (compactLayout)
+        if (compactLayout != 0)
         {
             gUtil.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                            GX_BL_INVSRCALPHA);

@@ -2396,16 +2396,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
  */
 void CCaravanWork::BackupTutorialItem(int mode)
 {
-	if (mode == 0) {
-		memcpy(m_inventoryItems, m_backupInventoryBlock, 0x148);
-		m_inventoryItemCount = m_backupInventoryItemCount;
-		memcpy(m_commandListInventorySlotRef, m_backupCommandListInventorySlotRef, 0x10);
-		memcpy(m_commandListExtra, m_backupCmdlistExtra, 0x10);
-		memcpy(m_equipment, m_backupEquipment, 8);
-		m_gil = m_backupGil;
-		m_currentCmdListIndex = m_backupCurrentCmdListIndex;
-		m_weaponIdx = m_backupWeaponIdx;
-	} else {
+	if (mode != 0) {
 		memcpy(m_backupInventoryBlock, m_inventoryItems, 0x148);
 		memset(m_inventoryItems, 0xFF, 0x148);
 		m_backupInventoryItemCount = m_inventoryItemCount;
@@ -2422,6 +2413,15 @@ void CCaravanWork::BackupTutorialItem(int mode)
 		m_currentCmdListIndex = 0;
 		m_backupWeaponIdx = m_weaponIdx;
 		m_weaponIdx = 0;
+	} else {
+		memcpy(m_inventoryItems, m_backupInventoryBlock, 0x148);
+		m_inventoryItemCount = m_backupInventoryItemCount;
+		memcpy(m_commandListInventorySlotRef, m_backupCommandListInventorySlotRef, 0x10);
+		memcpy(m_commandListExtra, m_backupCmdlistExtra, 0x10);
+		memcpy(m_equipment, m_backupEquipment, 8);
+		m_gil = m_backupGil;
+		m_currentCmdListIndex = m_backupCurrentCmdListIndex;
+		m_weaponIdx = m_backupWeaponIdx;
 	}
 }
 

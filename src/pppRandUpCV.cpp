@@ -63,19 +63,23 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         f32 scale = *valuePtr;
         {
             s8 baseValue = in->delta[0];
-            target[0] = (u8)(target[0] + (s32)((f32)baseValue * scale));
+            f32 scaledValue = (f32)baseValue;
+            target[0] = (u8)(target[0] + (s32)(scaledValue * scale));
         }
         {
             s8 baseValue = in->delta[1];
-            target[1] = (u8)(target[1] + (s32)((f32)baseValue * scale));
+            f32 scaledValue = (f32)baseValue;
+            target[1] = (u8)(target[1] + (s32)(scaledValue * scale));
         }
         {
             s8 baseValue = in->delta[2];
-            target[2] = (u8)(target[2] + (s32)((f32)baseValue * scale));
+            f32 scaledValue = (f32)baseValue;
+            target[2] = (u8)(target[2] + (s32)(scaledValue * scale));
         }
         {
             s8 baseValue = in->delta[3];
-            target[3] = (u8)(target[3] + (s32)((f32)baseValue * scale));
+            f32 scaledValue = (f32)baseValue;
+            target[3] = (u8)(target[3] + (s32)(scaledValue * scale));
         }
     }
 }

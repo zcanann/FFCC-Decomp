@@ -440,7 +440,6 @@ void CFunnyShape::Render()
     GXColor matColor = chanColor;
     GXSetChanMatColor(GX_COLOR0, matColor);
 
-    CFunnyShapeAnmWork* work = AnmWork(this);
     s32 count;
     if ((ShapeFlags(this) & 0x80) != 0) {
         count = ShapeCount(this);
@@ -448,12 +447,19 @@ void CFunnyShape::Render()
         count = 1;
     }
 
+    const f32 baseX = FLOAT_8032fd9c;
+    CFunnyShapeAnmWork* work = AnmWork(this);
+    const f32 baseY = FLOAT_8032fda0;
+
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
-        const s16 shapeOffset = *reinterpret_cast<s16*>(animData + 0x10 + work->frame * 8);
-        pos.x = FLOAT_8032fd9c + work->x;
-        pos.y = FLOAT_8032fda0 + work->y;
+        const s16* shapeOffsets = reinterpret_cast<const s16*>(animData + 0x10);
+        pos.x = baseX;
+        pos.y = baseY;
+        pos.x += work->x;
+        const s16 shapeOffset = shapeOffsets[work->frame * 4];
+        pos.y += work->y;
         RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, work->angle);
         work++;
     }

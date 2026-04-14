@@ -140,6 +140,18 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated
  *   store/reload lifetime introduced by the naive stepwise form
+ * - two more narrow lifetime probes both failed cleanly on the current branch:
+ *   switching to direct initializer form
+ *   (`f32 dampBias = 0.05f; f32 dampMul = 0.8f * rv->damping;`) left Create
+ *   flat at `99.902916%` and made Modify worse (`99.902916% -> 99.7541%`),
+ *   while separate declarations followed by assignments
+ *   (`f32 dampMul; f32 dampBias; dampMul = 0.8f; dampBias = 0.05f;`) regressed
+ *   both functions (`99.902916% -> 99.82524%` in Create,
+ *   `99.902916% -> 99.59836%` in Modify)
+ * - both of those probes still emitted the same four register-argument
+ *   mismatches in the damping block (`fmuls`, `lfs 1.0f`, `fadds`, `fsubs`),
+ *   so simple declaration/initializer lifetime tweaks are not enough to force
+ *   the target's `f1 -> f2 -> f0` value flow
  */
 
 extern f32 powf(f32 x, f32 y);

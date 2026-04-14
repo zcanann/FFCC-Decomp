@@ -22,6 +22,11 @@
  * - even after that symbol/locality cleanup, promoting e_pow.c still fails the
  *   final checksum, so the remaining blocker is narrower hidden linkage /
  *   neighboring ownership work, not function-body cleanup inside __ieee754_pow
+ * - a fresh visible-code probe on the latest branch found one objdiff
+ *   relocation mismatch at the `y == 0.5` fast path (`sqrt` vs
+ *   `__ieee754_sqrt`), but simply changing the source call to `sqrt(x)` was
+ *   not the fix: the rebuilt object still relocated to `__ieee754_sqrt` via
+ *   the inline wrapper and regressed overall unit match badly
  */
 /*
  * ====================================================

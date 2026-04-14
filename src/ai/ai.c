@@ -11,94 +11,6 @@ const char* __AIVersion = "<< Dolphin SDK - AI\tdebug build: Apr  5 2004 03:56:1
 const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34:25 (0x2301) >>";
 #endif
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - baseline source already reports 100% in objdiff, but promoting ai.c still
- *   breaks final main.dol linkage
- * - the visible source-side issue is the AI state globals in .sbss
- * - target wants them exported and laid out in the exact PAL-map order
- * - current plausible source still compiles them as local-binding statics
- *
- * Most useful probe so far:
- * - exporting the AI state globals and declaring them in reverse source order
- *   makes MWCC emit the exact target .sbss layout
- * - that confirms the layout lever is declaration / binding shape, not control flow
- * - on the current main-based SDK branch that exact layout is:
- *   __AIS_Callback / __AID_Callback / __CallbackStack / __OldStack /
- *   __AI_init_flag / __AID_Active / bound_32KHz / bound_48KHz / min_wait /
- *   max_wait / buffer
- * - promoting ai.c with that exact rebuilt layout still fails final main.dol,
- *   so the remaining blocker is no longer the visible AI .sbss ordering itself
- * - on the current latest-main SDK branch, declaration order alone no longer
- *   reproduces that exported layout; the source needed explicit zero
- *   initializers on the reverse-ordered globals to make MWCC export all eleven
- *   ai-state symbols in the exact target order
- * - even with that exact .sbss shape, promoting ai.c still failed final
- *   checksum, and objdiff reopened a small relocation-identity seam in
- *   AIRegisterDMACallback against target-side PAD imports rather than ai-local
- *   state
- * - a keepable follow-up on this branch did fix the visible AI global tail:
- *   declaring the three non-static OSTime globals as `buffer`, `max_wait`,
- *   then `min_wait` makes MWCC lay them out in the target PAL-map order
- *   `min_wait / max_wait / buffer` without affecting the rest of the unit
- * - promoting ai.c after that tail fix still fails only at the final
- *   main.dol checksum, so the remaining blocker is now even more clearly the
- *   hidden pad/ai/os symbol-binding seam rather than the visible ai-local tail
- * - a fresh pad/Pad.c probe narrowed one of those hidden dependencies further:
- *   when Pad.c is promoted after removing the dead GCCP01 BarrelBits slot, the
- *   target ai.o still imports `recalibrated$401` specifically, while the
- *   rebuilt source Pad.o emits `recalibrated$400`
- * - a direct current-branch disassembly read finally exposed the deeper shape
- *   of that seam: target `ai.o`'s sbss-bound relocations are uniformly `0x18`
- *   earlier than the rebuilt source object, so obvious ai-local references
- *   land on the preceding pad symbols in the extracted target object
- *   (`__AI_init_flag -> recalibrated$400`, `__AIS_Callback -> WaitingBits`,
- *   `__AID_Callback -> CheckingBits`, `__CallbackStack -> PendingBits`,
- *   `__AID_Active -> __PADSpec`, `__OldStack -> SamplingCallback`, etc.)
- * - because that same exact `0x18` early drift also shows up in `OS.o`'s
- *   `OSInit` pad-state accesses, this now looks like a coherent small-data
- *   seam / extracted-symbol-identity problem across the whole pad/ai/os
- *   cluster, not a plausible source rewrite inside `ai.c`
- * - a fresh map-backed metadata probe extended that same seam one unit later:
- *   marking the Pad.c state block and AI callback/timing tail local in
- *   `symbols.txt` to match the EN map makes `ai.c -> Matching` fail much
- *   earlier with `ar.o` undefineds on `min_wait_8032F1A0`,
- *   `max_wait_8032F1A8`, and `buffer_8032F1B0`
- * - direct objdiff on that probe shows target `ARRegisterDMACallback` binding
- *   its callback load/store to `min_wait_8032F1A0` instead of source
- *   `__AR_Callback`, which is the same uniform `0x18`-early small-data drift
- *   seen earlier at the pad/ai and ai/os seams
- * - a follow-up pair probe also showed those new undefineds are internal to
- *   the `ai -> ar` pair rather than the next outward boundary: promoting
- *   `ai.c + ar.c` together from that same local-scope metadata baseline links
- *   all the way through and only fails at the final main.dol checksum
- * - a fresh current-branch retest of the older "export every AI state symbol"
- *   idea did move the rebuilt object, but not in a keepable direction:
- *   explicit zero-initialized non-static declarations for all eleven AI state
- *   globals flipped source `.sbss` into the reverse-declared exported order
- *   `buffer / max_wait / min_wait / bound_48KHz / bound_32KHz /
- *   __AID_Active / __AI_init_flag / __OldStack / __CallbackStack /
- *   __AID_Callback / __AIS_Callback`
- * - that export-all probe nudged the visible text match slightly upward
- *   (`99.62867% -> 99.64594%`), but `ai.c -> Matching` still only failed at
- *   the final checksum and did not resolve the remaining pad-side relocation
- *   identities in `AIRegisterDMACallback`
- * - so on latest main this is still not an authored-source fix; it only
- *   proves the linker blocker is deeper than whether the AI state symbols are
- *   local or global
- *
- * Why this is not keepable yet:
- * - the only source shape that produced the target .sbss order was not plausible
- *   original code
- * - promoting that probe still failed final linkage anyway
- * - the extracted target ai.o also carries PAD-side undefineds such as
- *   CheckingBits / PendingBits / SamplingCallback / __PADSpec
- * - so there is still at least one hidden object-attribution / linkage issue
- *   beyond the visible .sbss layout mismatch
- */
-
 static AISCallback __AIS_Callback;
 static AIDCallback __AID_Callback;
 static u8* __CallbackStack;
@@ -428,4 +340,3 @@ void __AI_SRC_INIT(void) {
     profile.t_end = OSGetTime();
 #endif
 }
-

@@ -16,6 +16,12 @@ struct RedReverbDATA {
     int kind;
 };
 
+u8 DAT_8032f4a8;
+int DAT_8032f4ac;
+u32* DAT_8032f4b0;
+u32 DAT_8032f4b4;
+int* DAT_8032f4b8;
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4

@@ -21,11 +21,6 @@ extern "C" {
 // RedSound global linkage that is shared across Red* units.
 CRedDriver gRedDriver;
 int DAT_8032e17c[0x41];
-u8 DAT_8032f4a8;
-int DAT_8032f4ac;
-u32* DAT_8032f4b0;
-u32 DAT_8032f4b4;
-int* DAT_8032f4b8;
 volatile unsigned int DAT_8032f4c4;
 volatile int DAT_8032f4c8;
 static const char s_redSoundMemorySettingErrorFmt[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";

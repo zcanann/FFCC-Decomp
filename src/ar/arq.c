@@ -31,6 +31,11 @@
  *   `.sbss` ownership really is stale here, but the tail needs to be
  *   re-anchored against the current build's actual symbol identities and total
  *   section size instead of copied straight from the old PAL addresses
+ * - a later RedSound reclaim pass confirmed that distinction: the current
+ *   build really can move the stale handoff forward through `RedDriver` /
+ *   `RedMemory` and expose the missing `RedExecute` `.sbss`, but the old PAL
+ *   tail end past `RedSound` is too stale to apply literally because the live
+ *   `.sbss` still tops out at the current THPDec window
  * - a follow-up read of the currently extracted target objects showed why this
  *   keeps stalling: under the stale split layout, AX-side units are currently
  *   "borrowing" ARQ state to satisfy their own .sbss sizes

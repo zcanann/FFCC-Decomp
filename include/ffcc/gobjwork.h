@@ -130,7 +130,7 @@ public:
     int GetArtifactIncludeHpMax();
 
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
-    short m_inventoryItemCount;                 // 0x00B4
+    unsigned short m_inventoryItemCount;        // 0x00B4
     unsigned short m_inventoryItems[64];        // 0x00B6
     unsigned short m_artifacts[96];             // 0x0136
     unsigned short m_treasures[4];              // 0x01F6
@@ -142,7 +142,7 @@ public:
     short m_currentCmdListIndex;                // 0x0224
     short m_weaponIdx;                          // 0x0226
     short m_backupEquipment[4];                 // 0x0228
-    short m_backupInventoryItemCount;           // 0x0230
+    unsigned short m_backupInventoryItemCount;  // 0x0230
     unsigned char m_backupInventoryBlock[328];  // 0x0232
     unsigned char m_backupTreasureFlags;        // 0x037A
     unsigned char m_backupMoneyFlags;           // 0x037B

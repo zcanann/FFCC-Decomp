@@ -16,6 +16,10 @@
  *   exception::~exception() in this file
  * - compile this unit with -RTTI off
  * - that drops the extra private RTTI blob while preserving the target code shape
+ * - a fresh follow-up naming the two string literals directly in namespace std
+ *   is not keepable: MWCC duplicates `"std::exception"` into a second local
+ *   rodata blob and grows `.rodata` from `0x1A` to `0x2B` instead of matching
+ *   the target's padded `0x20` layout
  *
  * Why this is not keepable yet:
  * - promoting that probe to Matching still failed final main.dol checksum

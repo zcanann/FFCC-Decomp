@@ -32,8 +32,6 @@ extern "C" void* __ct__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void Add__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(void*, int, unsigned long, unsigned long, unsigned long, int, int, int);
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
@@ -41,8 +39,7 @@ extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
                                      float scale, float innerRadius, float outerRadius)
 {
-    return CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(&Math, outPos, outT, origin, vector, ellipseScale,
-                                                                  scale, innerRadius, outerRadius);
+    return Math.CrossCheckSphereVector(outPos, outT, origin, vector, ellipseScale, scale, innerRadius, outerRadius);
 }
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);

@@ -69,6 +69,17 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   regresses section match from 96.0% to 74.07%, and drops
  *   `ReverbHICreateDpl2` from 99.40% to 99.16%; so "make value0_1 global"
  *   alone is not the fix
+ * - a newer keepable probe did find the right arithmetic shape without the old
+ *   stack-lifetime regression: rewriting the damping normalization through a
+ *   local `f32 damp`, then `damp = 0.05f + damp`, then
+ *   `rv->damping = 1.0f - damp` forces the target-style separate
+ *   `fmuls` / `fadds` / `fsubs` chain in both functions and moves
+ *   `ReverbHICreateDpl2` from 99.40129% to 99.83819% and
+ *   `ReverbHIModifyDpl2` from 97.29508% to 99.54918%
+ * - after that keepable rewrite, the remaining function-body gap is down to a
+ *   tiny register-allocation seam inside the same damping block plus the older
+ *   `reverb_hi_4ch_value0_1` symbol-identity mismatch in Modify's range check;
+ *   no broader control-flow difference remains there
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated
@@ -162,8 +173,11 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp = 0.05f + damp;
+        rv->damping = 1.0f - damp;
+    }
 
     if (0.0f != preDelay) {
         rv->preDelayTime = 32000.0f * preDelay;
@@ -218,7 +232,11 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp = 0.05f + damp;
+        rv->damping = 1.0f - damp;
+    }
 
     for (i = 0; i < 12; i++) {
         DLdeleteDpl2(&rv->AP[i]);

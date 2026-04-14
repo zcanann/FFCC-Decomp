@@ -787,7 +787,7 @@ void CGraphicPcs::drawScreenFade()
         GXSetNumIndStages(0);
         GXSetTevDirect(GX_TEVSTAGE0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
         GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
@@ -811,20 +811,6 @@ void CGraphicPcs::drawScreenFade()
         if (slot == 3) {
             const int barHeight = (int)(448.0f * fadeWave);
             const int barEdge = (int)(32.0f * fadeWave);
-
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(0.0f, 0.0f, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 0);
-            GXPosition3f32(640.0f, 0.0f, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 0);
-            GXPosition3f32(640.0f, 480.0f, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(2, 2);
-            GXPosition3f32(0.0f, 480.0f, 0.0f);
-            GXColor1u32(*(u32*)&baseColor);
-            GXTexCoord2u16(0, 2);
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(0.0f, 0.0f, 0.0f);

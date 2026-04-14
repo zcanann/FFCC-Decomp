@@ -10,51 +10,22 @@
  *   the latest main-based SDK branch still fails the final main.dol checksum
  *
  * Most useful result so far:
- * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
- *   vec.c, and quat.c, and all four failed in the exact same way: configure
- *   succeeds, link completes, and only the final checksum check fails
- * - promoting all four mtx units together on the latest main-based SDK branch
- *   still fails only at the final checksum, so the hidden-link seam is not
- *   resolved by treating the cluster as a single promote-together island
- * - that makes this look like a shared hidden-link / metadata seam in the mtx
- *   library cluster rather than a remaining visible source mismatch in this
- *   file's body
- * - a fresh object-extent audit explains that seam more concretely: rebuilt
- *   source `quat.o` is `0x0624` bytes of `.text` plus local `.rodata` /
- *   `.sdata2`, while the extracted target `quat.o` is only `0x056C` bytes of
- *   `.text` and imports the constant pool from outside
- * - that means `quat.c -> Matching` is not blocked by the visible matched
- *   functions in this file; it is blocked because GCCP01's final linked object
- *   keeps only the linked subset through `C_QUATSlerp`, while current source
- *   still emits the full SDK object
+ * - PAL map audit shows GCCP01 only links `PSQUATMultiply`,
+ *   `PSQUATNormalize`, `C_QUATRotAxisRad`, `C_QUATMtx`, `C_QUATLerp`, and
+ *   `C_QUATSlerp`; the other authored quaternion helpers are marked UNUSED
+ * - after trimming those PAL-unused helpers and forcing a clean rebuild,
+ *   source `quat.o` drops to the exact target `.text` extent `0x056C`
+ * - promoting `quat.c` after that subset trim still fails only at the final
+ *   checksum, so the remaining blocker is no longer the extra helper bodies
+ *   in this file
+ * - that makes this another mtx-cluster hidden-link seam after the linked
+ *   subset has been recovered, not a visible mismatch in the kept functions
  */
 
 float acosf(float x);
 
 float sinf(float x);
 float cosf(float x);
-
-void C_QUATAdd(const Quaternion *p, const Quaternion *q, Qtrn *r)
-{
-    r->x = p->x + q->x;
-    r->y = p->y + q->y;
-    r->z = p->z + q->z;
-    r->w = p->w + q->w;
-}
-
-void PSQUATAdd(register const Quaternion *p, register const Quaternion *q, register Quaternion *r)
-{
-    asm {
-      psq_l f0, 0x0(r3), 0, 0
-      psq_l f1, 0x0(r4), 0, 0
-      ps_add f0, f0, f1
-      psq_st f0, 0x0(r5), 0, 0
-      psq_l f0, 0x8(r3), 0, 0
-      psq_l f1, 0x8(r4), 0, 0
-      ps_add f0, f0, f1
-      psq_st f0, 0x8(r5), 0, 0
-    }
-}
 
 void PSQUATMultiply(register const Quaternion *a, register const Quaternion *b, register Quaternion *ab)
 {
@@ -113,37 +84,6 @@ void PSQUATNormalize(const register Quaternion *src, register Quaternion *unit)
             psq_st   vv1, 0(unit), 0, 0;
             psq_st   vv2, 8(unit), 0, 0;
         }
-    }
-}
-
-void PSQUATInverse(const register Quaternion *src, register Quaternion *inv)
-{
-    register f32 vv1, vv2, vv3, vv4;
-    register f32 vv5, vv6, vv7, vv8, vv9, vvA, vvB;
-    register f32 vvC = 1.0F;
-    asm {
-        psq_l       vv1, 0(src), 0, 0;
-        ps_mul      vv5, vv1, vv1;
-        psq_l       vv2, 8(src), 0, 0;
-        ps_madd     vv5, vv2, vv2, vv5;
-        ps_add      vvA, vvC, vvC;
-        ps_sum0     vv5, vv5, vv5, vv5;
-        fres        vv7, vv5;
-        ps_neg      vv6, vv5;
-        ps_nmsub    vv9, vv5, vv7, vvA;
-        ps_mul      vv7, vv7, vv9;
-        ps_sel vv7, vv6, vvC, vv7
-        b           loc1;
-    loc0:
-        fmr         vv7, vvC;
-    loc1:
-        ps_neg      vv8, vv7;
-        ps_muls1    vv4, vv7, vv2;
-        ps_muls0    vv1, vv1, vv8;
-        psq_st      vv4, 12(inv), 1, 0;
-        ps_muls0    vv3, vv2, vv8;
-        psq_st      vv1, 0(inv), 0, 0;
-        psq_st      vv3, 8(inv), 1, 0;
     }
 }
 

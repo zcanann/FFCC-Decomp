@@ -10,23 +10,16 @@
  *   the latest main-based SDK branch still fails the final main.dol checksum
  *
  * Most useful result so far:
- * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
- *   vec.c, and quat.c, and all four failed in the exact same way: configure
- *   succeeds, link completes, and only the final checksum check fails
- * - promoting all four mtx units together on the latest main-based SDK branch
- *   still fails only at the final checksum, so the hidden-link seam is not
- *   resolved by treating the cluster as a single promote-together island
- * - that makes this look like a shared hidden-link / metadata seam in the mtx
- *   library cluster rather than a remaining visible source mismatch in this
- *   file's body
- * - a fresh object-extent audit explains that seam more concretely: rebuilt
- *   source `vec.o` is `0x0448` bytes of `.text` plus `0x38` of local
- *   `.sdata2`, while the extracted target `vec.o` is only `0x02B0` bytes of
- *   `.text`
- * - that means `vec.c -> Matching` is not blocked by the visible matched
- *   functions here; it is blocked because GCCP01's final linked object only
- *   keeps the smaller subset through `PSVECDistance`, while current source
- *   still emits the full SDK object
+ * - PAL map audit shows GCCP01 only links the PS helpers plus `C_VECReflect`;
+ *   the authored C helpers like `C_VECScale` and `C_VECHalfAngle` are marked
+ *   UNUSED there and should not survive in the final linked subset
+ * - after trimming those PAL-unused helpers and forcing a clean rebuild,
+ *   source `vec.o` drops to the exact target `.text` extent `0x02B0`
+ * - promoting `vec.c` after that subset trim still fails only at the final
+ *   checksum, so the remaining blocker is no longer the extra helper bodies
+ *   in this file
+ * - that makes this another mtx-cluster hidden-link seam after the linked
+ *   subset has been recovered, not a visible mismatch in the kept functions
  */
 
 #define R_RET fp1
@@ -87,16 +80,6 @@ asm void PSVECScale(register const Vec *src, register Vec *dst, register f32 sca
     psq_st       f0, 8(dst), 1, 0
     blr 
 #endif // clang-format on
-}
-
-void C_VECScale(const Vec *src, Vec *dst, f32 scale)
-{
-    f32 s;
-
-    s = 1.0f / sqrtf(src->z * src->z + src->x * src->x + src->y * src->y);
-    dst->x = src->x * s;
-    dst->y = src->y * s;
-    dst->z = src->z * s;
 }
 
 void PSVECNormalize(const register Vec *vec1, register Vec *ret)
@@ -199,32 +182,6 @@ asm void PSVECCrossProduct(register const Vec *a, register const Vec *b, registe
     psq_st         f10, 4(axb), 0, 0
     blr 
 #endif // clang-format on
-}
-
-void C_VECHalfAngle(const Vec *a, const Vec *b, Vec *half)
-{
-    Vec a0;
-    Vec b0;
-    Vec ab;
-
-    a0.x = -a->x;
-    a0.y = -a->y;
-    a0.z = -a->z;
-
-    b0.x = -b->x;
-    b0.y = -b->y;
-    b0.z = -b->z;
-
-    VECNormalize(&a0, &a0);
-    VECNormalize(&b0, &b0);
-    VECAdd(&a0, &b0, &ab);
-
-    if (VECDotProduct(&ab, &ab) > 0.0f) {
-        VECNormalize(&ab, half);
-    }
-    else {
-        *half = ab;
-    }
 }
 
 void C_VECReflect(const Vec *src, const Vec *normal, Vec *dst)

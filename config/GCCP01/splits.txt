@@ -1588,7 +1588,7 @@ vi/vi.c:
 	.data       start:0x802177E0 end:0x80217BB0
 	.bss        start:0x8030CB48 end:0x8030CC90
 	.sdata      start:0x8032EB08 end:0x8032EB11
-	.sbss       start:0x8032F0E0 end:0x8032F140
+	.sbss       start:0x8032F0E0 end:0x8032F138
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC
@@ -1599,25 +1599,25 @@ pad/Pad.c:
 	.data       start:0x80217BF8 end:0x80217C08
 	.bss        start:0x8030CC90 end:0x8030CCE0
 	.sdata      start:0x8032EB18 end:0x8032EB38
-	.sbss       start:0x8032F150 end:0x8032F178
+	.sbss       start:0x8032F138 end:0x8032F160
 
 ai/ai.c:
 	.text       start:0x8018EE04 end:0x8018F710
 	.data       start:0x80217C08 end:0x80217C4C
 	.sdata      start:0x8032EB38 end:0x8032EB3C
-	.sbss       start:0x8032F178 end:0x8032F1B8
+	.sbss       start:0x8032F160 end:0x8032F1A0
 
 ar/ar.c:
 	.text       start:0x8018F710 end:0x801911E8
 	.data       start:0x80217C50 end:0x80217C98
 	.sdata      start:0x8032EB40 end:0x8032EB48
-	.sbss       start:0x8032F1B8 end:0x8032F1D8
+	.sbss       start:0x8032F1A0 end:0x8032F1C0
 
 ar/arq.c:
 	.text       start:0x801911E8 end:0x801915A4
 	.data       start:0x80217C98 end:0x80217CE0
 	.sdata      start:0x8032EB48 end:0x8032EB4C
-	.sbss       start:0x8032F1D8 end:0x8032F1E8
+	.sbss       start:0x8032F1C0 end:0x8032F1E8
 
 ax/AX.c:
 	.text       start:0x801915A4 end:0x80191614

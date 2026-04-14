@@ -1,45 +1,6 @@
 #include <dolphin.h>
 #include <dolphin/ar.h>
-
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - ar.c reports 100% code/data in objdiff, but promoting it to Matching still
- *   fails the final main.dol checksum on the latest main-based SDK branch.
- *
- * Most useful result so far:
- * - promoting `ar.c` by itself or together with `arq.c` rebuilds cleanly
- *   through link and only fails at the final checksum stage
- * - that means `ar.c` is not just blocked on `arq.c` promotion; the remaining
- *   issue is a broader hidden-link / metadata seam in the AR neighborhood
- */
 #include "dolphin/ar/__ar.h"
-
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - ar.c is already 100% code/data complete in objdiff, but promoting it to
- *   Matching still fails the final main.dol checksum
- *
- * Most useful result so far:
- * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
- *   failed at the final checksum stage, so the remaining issue is hidden
- *   object/linkage shape rather than visible C or data mismatch
- * - a fresh map-backed metadata probe on the neighboring AI tail made that
- *   hidden seam concrete: marking `ai.c`'s callback/timing tail local and then
- *   promoting `ai.c` makes `ar.o` fail to link on `min_wait_8032F1A0`,
- *   `max_wait_8032F1A8`, and `buffer_8032F1B0`
- * - direct objdiff on that probe shows target `ARRegisterDMACallback`
- *   relocating its callback load/store through `min_wait_8032F1A0` instead of
- *   source `__AR_Callback`, i.e. the same uniform `0x18`-early small-data
- *   drift already seen at the pad/ai/os seam extends into `ai -> ar` as well
- * - a follow-up pair probe then showed that hard break is internal to the
- *   `ai/ar` pair itself: promoting `ai.c + ar.c` together from that same
- *   local-scope metadata baseline links cleanly and only fails at the final
- *   checksum, so the next outward seam is later than `ar.c`
- */
 
 #ifdef DEBUG
 const char* __ARVersion = "<< Dolphin SDK - AR\tdebug build: Apr  5 2004 03:56:19 (0x2301) >>";
@@ -47,14 +8,14 @@ const char* __ARVersion = "<< Dolphin SDK - AR\tdebug build: Apr  5 2004 03:56:1
 const char* __ARVersion = "<< Dolphin SDK - AR\trelease build: Sep  5 2002 05:34:27 (0x2301) >>";
 #endif
 
-BOOL __AR_init_flag = FALSE;
-u32* __AR_BlockLength = NULL;
-u32 __AR_FreeBlocks = 0;
-u32 __AR_StackPointer = 0;
-u32 __AR_ExpansionSize = 0;
-u32 __AR_InternalSize = 0;
-u32 __AR_Size = 0;
 void (*__AR_Callback)() = NULL;
+u32 __AR_Size = 0;
+u32 __AR_InternalSize = 0;
+u32 __AR_ExpansionSize = 0;
+u32 __AR_StackPointer = 0;
+u32 __AR_FreeBlocks = 0;
+u32* __AR_BlockLength = NULL;
+BOOL __AR_init_flag = FALSE;
 
 // prototypes
 void __ARHandler(__OSInterrupt exception, OSContext* context);

@@ -788,14 +788,14 @@ config.libs = [
     DolphinLib(
         "ai",
         [
-            Object(NonMatching, "ai/ai.c"),
+            Object(Matching, "ai/ai.c"),
         ],
     ),
     DolphinLib(
         "ar",
         [
-            Object(NonMatching, "ar/ar.c"),
-            Object(NonMatching, "ar/arq.c"),
+            Object(Matching, "ar/ar.c"),
+            Object(Matching, "ar/arq.c"),
         ],
     ),
     DolphinLib(

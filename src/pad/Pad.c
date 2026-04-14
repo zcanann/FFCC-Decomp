@@ -107,6 +107,11 @@ const char* __PADVersion = s___PADVersion;
  * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
  *   declarations here, so there is no simple file-scope alias escape hatch for
  *   that last symbol identity
+ * - a fresh retest on the current branch re-confirmed that point from the
+ *   cleanest baseline: even dropping `static` only from the shared pad-state
+ *   globals plus `SamplingCallback` leaves rebuilt `Pad.o` emitting them as
+ *   local `b` symbols, so ordinary file-scope linkage keywords are still not
+ *   enough to recover target Pad.o's exported binding shape
  * - a fresh PAL-map cross-check confirms the current GCCP01 small-data order
  *   from `Initialized` through `__PADSpec`, plus the AI tail
  *   `min_wait / max_wait / buffer`, already matches the expected ownership and

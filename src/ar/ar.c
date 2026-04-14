@@ -27,6 +27,18 @@
  * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
  *   failed at the final checksum stage, so the remaining issue is hidden
  *   object/linkage shape rather than visible C or data mismatch
+ * - a fresh map-backed metadata probe on the neighboring AI tail made that
+ *   hidden seam concrete: marking `ai.c`'s callback/timing tail local and then
+ *   promoting `ai.c` makes `ar.o` fail to link on `min_wait_8032F1A0`,
+ *   `max_wait_8032F1A8`, and `buffer_8032F1B0`
+ * - direct objdiff on that probe shows target `ARRegisterDMACallback`
+ *   relocating its callback load/store through `min_wait_8032F1A0` instead of
+ *   source `__AR_Callback`, i.e. the same uniform `0x18`-early small-data
+ *   drift already seen at the pad/ai/os seam extends into `ai -> ar` as well
+ * - a follow-up pair probe then showed that hard break is internal to the
+ *   `ai/ar` pair itself: promoting `ai.c + ar.c` together from that same
+ *   local-scope metadata baseline links cleanly and only fails at the final
+ *   checksum, so the next outward seam is later than `ar.c`
  */
 
 #ifdef DEBUG

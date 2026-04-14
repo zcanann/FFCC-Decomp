@@ -61,6 +61,33 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   `OSInit` pad-state accesses, this now looks like a coherent small-data
  *   seam / extracted-symbol-identity problem across the whole pad/ai/os
  *   cluster, not a plausible source rewrite inside `ai.c`
+ * - a fresh map-backed metadata probe extended that same seam one unit later:
+ *   marking the Pad.c state block and AI callback/timing tail local in
+ *   `symbols.txt` to match the EN map makes `ai.c -> Matching` fail much
+ *   earlier with `ar.o` undefineds on `min_wait_8032F1A0`,
+ *   `max_wait_8032F1A8`, and `buffer_8032F1B0`
+ * - direct objdiff on that probe shows target `ARRegisterDMACallback` binding
+ *   its callback load/store to `min_wait_8032F1A0` instead of source
+ *   `__AR_Callback`, which is the same uniform `0x18`-early small-data drift
+ *   seen earlier at the pad/ai and ai/os seams
+ * - a follow-up pair probe also showed those new undefineds are internal to
+ *   the `ai -> ar` pair rather than the next outward boundary: promoting
+ *   `ai.c + ar.c` together from that same local-scope metadata baseline links
+ *   all the way through and only fails at the final main.dol checksum
+ * - a fresh current-branch retest of the older "export every AI state symbol"
+ *   idea did move the rebuilt object, but not in a keepable direction:
+ *   explicit zero-initialized non-static declarations for all eleven AI state
+ *   globals flipped source `.sbss` into the reverse-declared exported order
+ *   `buffer / max_wait / min_wait / bound_48KHz / bound_32KHz /
+ *   __AID_Active / __AI_init_flag / __OldStack / __CallbackStack /
+ *   __AID_Callback / __AIS_Callback`
+ * - that export-all probe nudged the visible text match slightly upward
+ *   (`99.62867% -> 99.64594%`), but `ai.c -> Matching` still only failed at
+ *   the final checksum and did not resolve the remaining pad-side relocation
+ *   identities in `AIRegisterDMACallback`
+ * - so on latest main this is still not an authored-source fix; it only
+ *   proves the linker blocker is deeper than whether the AI state symbols are
+ *   local or global
  *
  * Why this is not keepable yet:
  * - the only source shape that produced the target .sbss order was not plausible

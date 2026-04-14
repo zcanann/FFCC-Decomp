@@ -95,6 +95,12 @@
  *   branch it keeps running at least into the early RedSound region, and the
  *   next honest re-split attempt needs to treat that later non-SDK seam as the
  *   real cutoff instead of stopping at TRK or Odemu
+ * - a fresh cluster probe from the corrected AI small-data baseline also
+ *   showed `arq.c` is not the next outward dependency from `ai/ar`: promoting
+ *   `ai.c + ar.c + arq.c` together still links cleanly and only fails at the
+ *   final checksum, so the new `min_wait / max_wait / buffer` undefineds
+ *   exposed by `ai.c` alone are contained inside the `ai/ar` pair rather than
+ *   spilling into `arq.c`
  */
 
 #ifdef DEBUG

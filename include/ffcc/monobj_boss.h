@@ -14,7 +14,7 @@ public:
 
     void damagedFuncGolem();
     void changeStatFuncGolem(int);
-    void calcBranchFuncGolem(int);
+    int calcBranchFuncGolem(int);
     void frameStatFuncGolem();
 
     void changeStatFuncArmstrong(int);
@@ -26,7 +26,7 @@ public:
     void alwaysFuncOrcKing();
     void moveFrameFuncOrcKing();
     void moveCancelFuncOrcKing();
-    void calcBranchFuncOrcKing(int);
+    int calcBranchFuncOrcKing(int);
 
     void cancelStatFuncGoblinKing();
     void frameStatFuncGoblinKing();
@@ -44,7 +44,7 @@ public:
     void changeStatFuncDragonZombie(int);
     void cancelStatFuncDragonZombie();
     void frameStatFuncDragonZombie();
-    void calcBranchFuncDragonZombie(int);
+    int calcBranchFuncDragonZombie(int);
 
     void changeStatFuncCaveWorm(int);
     void cancelStatFuncCaveWorm();
@@ -53,12 +53,12 @@ public:
     void changeStatFuncLich(int);
     void cancelStatFuncLich();
     void frameStatFuncLich();
-    void calcBranchFuncLich(int);
+    int calcBranchFuncLich(int);
 
     void changeStatFuncTetsukyojin(int);
     void cancelStatFuncTetsukyojin();
     void frameStatFuncTetsukyojin();
-    void calcBranchFuncTetsukyojin(int);
+    int calcBranchFuncTetsukyojin(int);
 
     void damagedFuncGigasLoad();
     void tgtFuncGigasLoad(int);
@@ -99,7 +99,7 @@ public:
     void changeStatFuncLastBoss(int);
     void cancelStatFuncLastBoss();
     void frameStatFuncLastBoss();
-    void calcBranchFuncLastBoss(int);
+    int calcBranchFuncLastBoss(int);
     void logicFuncLastBoss();
 
     void teleport(int, int, int, int, int, int, int, int, int, Vec*, int&, Vec&);

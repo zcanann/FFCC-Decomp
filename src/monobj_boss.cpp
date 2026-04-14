@@ -329,11 +329,11 @@ void CGMonObj::changeStatFuncGolem(int stat)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncGolem(int)
+int CGMonObj::calcBranchFuncGolem(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned int branch = 0;
+	int branch = 0;
 	if (*reinterpret_cast<int*>(mon + 0x6D0) == 1) {
 		branch = 2;
 	} else {
@@ -342,7 +342,7 @@ void CGMonObj::calcBranchFuncGolem(int)
 			branch = 1;
 		}
 	}
-	*reinterpret_cast<int*>(mon + 0x6C4) = static_cast<int>(branch);
+	return branch;
 }
 
 /*
@@ -746,10 +746,9 @@ void CGMonObj::moveCancelFuncOrcKing()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncOrcKing(int)
+int CGMonObj::calcBranchFuncOrcKing(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
 	int branch = 0;
 	if (script != 0 && script[7] < (script[0x1A / 2] / 5)) {
@@ -757,7 +756,7 @@ void CGMonObj::calcBranchFuncOrcKing(int)
 	} else {
 		branch = calcBranchFuncDefault__8CGMonObjFi(this, 1);
 	}
-	*reinterpret_cast<int*>(mon + 0x6C4) = branch;
+	return branch;
 }
 
 /*
@@ -1220,11 +1219,10 @@ void CGMonObj::frameStatFuncDragonZombie()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncDragonZombie(int)
+int CGMonObj::calcBranchFuncDragonZombie(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
-	*reinterpret_cast<int*>(mon + 0x6C4) = (branch != 0) ? 1 : 0;
+	return (*reinterpret_cast<int*>(mon + 0x6B4) != 0) ? 1 : 0;
 }
 
 /*
@@ -1422,10 +1420,10 @@ void CGMonObj::frameStatFuncLich()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncLich(int)
+int CGMonObj::calcBranchFuncLich(int)
 {
 	const int flatFlags = *reinterpret_cast<int*>(CFlat + 4840);
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = ((flatFlags >> 1) & 1) ^ 1;
+	return ((flatFlags >> 1) & 1) ^ 1;
 }
 
 /*
@@ -1654,10 +1652,16 @@ void CGMonObj::frameStatFuncTetsukyojin()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncTetsukyojin(int)
+int CGMonObj::calcBranchFuncTetsukyojin(int)
 {
 	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4);
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = (branch > 0) - (branch < 0);
+	if (branch > 0) {
+		return 1;
+	}
+	if (branch < 0) {
+		return -1;
+	}
+	return 0;
 }
 
 /*
@@ -2939,11 +2943,10 @@ void CGMonObj::frameStatFuncLastBoss()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncLastBoss(int)
+int CGMonObj::calcBranchFuncLastBoss(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
-	*reinterpret_cast<int*>(mon + 0x6C4) = (branch != 0) ? 1 : 0;
+	return (*reinterpret_cast<int*>(mon + 0x6B4) != 0) ? 1 : 0;
 }
 
 /*

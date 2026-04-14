@@ -6,6 +6,32 @@
 
 #define DVD_WATYPE_MAX 2
 
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - dvdlow.c is not currently missing obvious authored state; the remaining
+ *   issue is more likely section ownership / symbol attribution than source
+ *   variables
+ *
+ * Most useful verified result so far:
+ * - shared Dolphin-family sources in reference_projects/* already use the
+ *   authored state set we have here: `WorkAroundSeekLocation`,
+ *   `LastReadFinished`, and `LastReadIssued` all exist without any extra
+ *   `LastReadPadding`-style variable
+ * - current raw rebuilt `build/GCCP01/src/dvd/dvdlow.o` already matches the
+ *   extracted target `build/GCCP01/obj/dvd/dvdlow.o` at `.sbss` size `0x48`
+ * - the extracted target object's only extra names in that window are
+ *   synthetic `gap_04_8032F044_sbss` and `gap_08_8030C98C_bss`, so blindly
+ *   adding a new source variable just to fill those slots would be a hack,
+ *   not recovered authored source
+ * - a follow-up probe deleting `gap_04_8032F044_sbss` from `symbols.txt` was
+ *   completely unhelpful: the extractor simply regenerated a synthetic gap
+ *   name for the same slot, so this is not fixable by just hiding that symbol
+ * - if this unit needs follow-up, it should start from target object
+ *   ownership/binding around those gap symbols rather than padding out the C
+ */
+
 static BOOL FirstRead = TRUE;
 static volatile BOOL StopAtNextInt = FALSE;
 static u32 LastLength = 0;

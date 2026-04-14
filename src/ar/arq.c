@@ -14,6 +14,9 @@
  * - a fresh Matching flip on the current SDK branch rebuilt cleanly and only
  *   failed at the final checksum stage, so the remaining issue is hidden
  *   object/linkage shape rather than visible C or data mismatch
+ * - promoting `ar.c` and `arq.c` together on the latest main-based SDK branch
+ *   still only fails at the final checksum, so `arq.c` is not just waiting on
+ *   `ar.c` to become linkable first
  * - a follow-up PAL-map check showed the current split config is also stale in
  *   this neighborhood: arq.c should own `.sbss 0x8032F1D8..0x8032F200` through
  *   `__ARQ_init_flag`, but `splits.txt` currently cuts the unit off at
@@ -28,6 +31,11 @@
  *   `.sbss` ownership really is stale here, but the tail needs to be
  *   re-anchored against the current build's actual symbol identities and total
  *   section size instead of copied straight from the old PAL addresses
+ * - a later RedSound reclaim pass confirmed that distinction: the current
+ *   build really can move the stale handoff forward through `RedDriver` /
+ *   `RedMemory` and expose the missing `RedExecute` `.sbss`, but the old PAL
+ *   tail end past `RedSound` is too stale to apply literally because the live
+ *   `.sbss` still tops out at the current THPDec window
  * - a follow-up read of the currently extracted target objects showed why this
  *   keeps stalling: under the stale split layout, AX-side units are currently
  *   "borrowing" ARQ state to satisfy their own .sbss sizes
@@ -55,13 +63,38 @@
  *   early AX chain made it much farther before failing: `arq -> AXAlloc ->
  *   AXAux -> AXCL -> AXOut -> AXSPB -> AXVPB` all lined up cleanly against the
  *   PAL-map local ordering and the extracted object symbols
- * - the first hard conflict now shows up at `AXProf`: this repo still has a
- *   live `.sbss 0x8032F2A0..0x8032F2B0` split there, which overlaps the
- *   PAL-backed `AXSPB 0x8032F280..0x8032F2A4` / `AXVPB 0x8032F2A8..0x8032F2B4`
- *   windows before the map's later `AXProf 0x8032F2B8..0x8032F2C8`
+ * - re-running that exact bounded re-split on the current branch still fails
+ *   immediately in DTK at the same place: once `AXVPB` is moved to the
+ *   object-backed `.sbss 0x8032F2A8..0x8032F2B4` window, the unchanged live
+ *   `AXProf` split at `.sbss 0x8032F2A0..0x8032F2B0` overlaps it before any
+ *   compile step happens
  * - that makes `AXProf` the current earliest trustworthy cutoff for the old
  *   PAL `.sbss` guidance on this branch: the ARQ/AX tail before it still looks
  *   stale, but the later ownership chain has already diverged by that point
+ * - a fresh latest-main comparison against the PAL map shows the stale `+0x18`
+ *   drift actually continues cleanly past `AXProf` as well: `axart`,
+ *   `axart3d`, `dsp`, `dsp_task`, `CARDBios`, `GXInit`, `GXMisc`,
+ *   `GXDisplayList`, `GBA`, `serpoll`, and `TRK main` are all still sitting
+ *   0x18 early in `splits.txt`
+ * - that means the current "AXProf cutoff" is only the earliest compile-time
+ *   overlap in the live config, not the true end of the stale map-aligned
+ *   chain; the next coherent re-split attempt should expect to carry that
+ *   shifted ownership much farther forward before a real post-TRK seam appears
+ * - a bounded re-split probe that actually shifted that whole chain forward
+ *   through `TRK main` proved the next hard live seam is even later: DTK
+ *   rejected the moved `GBA.c` window because unchanged `main_gdev.c` still
+ *   owned `.sbss 0x8032F368..0x8032F370`, so the stale `+0x18` drift clearly
+ *   continues at least through `TRK main_gdev` on this branch
+ * - extending that same current-build `+0x18` shift farther through
+ *   `global_destructor_chain`, `abort_exit`, the recovered `errno.c`,
+ *   `uart_console_io_gcn`, and `DebuggerDriver` pushed the first DTK overlap
+ *   to `RedSound/RedDriver.cpp`: the moved `DebuggerDriver` window wanted
+ *   `.sbss 0x8032F3B8..0x8032F3D0`, but unchanged `RedDriver.cpp` was still
+ *   anchored at `.sbss 0x8032F3B8..0x8032F490`
+ * - so the stale ownership drift is broader than the SDK-only tail; on this
+ *   branch it keeps running at least into the early RedSound region, and the
+ *   next honest re-split attempt needs to treat that later non-SDK seam as the
+ *   real cutoff instead of stopping at TRK or Odemu
  */
 
 #ifdef DEBUG

@@ -66,6 +66,24 @@ const char* __PADVersion = s___PADVersion;
  *   `SamplingCallback` narrowed the link failure much further: with Pad.c
  *   promoted, every cross-unit undefined disappeared except
  *   `recalibrated$401` from ai.o
+ * - a fresh latest-main config cleanup made that last local-static name less
+ *   misleading: the PAL map suffix is not stable (`recalibrated$397` there),
+ *   so renaming the GCCP01 symbol at `0x8032F170` from `$401` to `$400` is
+ *   keepable and makes extracted ai.o now ask for the same local-static name
+ *   the rebuilt source Pad.o emits
+ * - that leaves only the real exported pad-state globals plus the OS-side
+ *   `RecalibrateBits` import as unresolved when Pad.c is promoted
+ * - a narrower GCCP01-only export probe showed `RecalibrateBits` itself is the
+ *   key seam symbol: exporting just that one global is enough to let the
+ *   current `ai.c + Pad.c` Matching pair reach a final checksum miss instead
+ *   of a hard link error
+ * - that same probe is still not keepable by itself, because adding `OS.c`
+ *   back on top of the pair reproduces the old >30s linker hang; so the
+ *   cluster is closer, but `OS.c` still has a remaining hidden-link problem
+ * - a reverse-order GCCP01 export probe confirmed MWCC does reverse these
+ *   file-scope globals exactly as expected, but it still emits the
+ *   function-local `recalibrated$400` ahead of them and shifts the whole run
+ *   by 4 bytes, so simply exporting the pad-state globals is not enough yet
  * - a fresh latest-main follow-up showed a naive GCCP01 export probe is not
  *   keepable: removing `static` from those pad-state globals and
  *   `SamplingCallback` does resolve the undefined set, but MWCC then lays the
@@ -74,6 +92,10 @@ const char* __PADVersion = s___PADVersion;
  * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
  *   declarations here, so there is no simple file-scope alias escape hatch for
  *   that last symbol identity
+ * - a fresh PAL-map cross-check confirms the current GCCP01 small-data order
+ *   from `Initialized` through `__PADSpec`, plus the AI tail
+ *   `min_wait / max_wait / buffer`, already matches the expected ownership and
+ *   ordering; the remaining pad/ai/os seam is not just stale symbols.txt names
  */
 
 #define PAD_ALL                                                                                                        \

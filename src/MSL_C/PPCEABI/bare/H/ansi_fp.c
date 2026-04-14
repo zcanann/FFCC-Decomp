@@ -13,6 +13,9 @@
  * - a fresh Matching flip on this branch rebuilt cleanly through link and only
  *   failed at the final checksum stage, so the remaining issue is hidden
  *   object/linkage metadata rather than visible function or constant mismatch
+ * - promoting `ansi_fp.c` and `e_pow.c` together on the latest main-based SDK
+ *   branch still only fails at the final checksum, so `ansi_fp.c` is not just
+ *   waiting on the adjacent pow runtime unit to become linkable first
  */
 
 static int __count_trailing_zerol(unsigned long x) {

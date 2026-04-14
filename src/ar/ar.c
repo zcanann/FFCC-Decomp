@@ -1,5 +1,19 @@
 #include <dolphin.h>
 #include <dolphin/ar.h>
+
+/*
+ * TODO: Remove this note block once linkage has been resolved.
+ *
+ * Current blocker in this unit:
+ * - ar.c reports 100% code/data in objdiff, but promoting it to Matching still
+ *   fails the final main.dol checksum on the latest main-based SDK branch.
+ *
+ * Most useful result so far:
+ * - promoting `ar.c` by itself or together with `arq.c` rebuilds cleanly
+ *   through link and only fails at the final checksum stage
+ * - that means `ar.c` is not just blocked on `arq.c` promotion; the remaining
+ *   issue is a broader hidden-link / metadata seam in the AR neighborhood
+ */
 #include "dolphin/ar/__ar.h"
 
 /*

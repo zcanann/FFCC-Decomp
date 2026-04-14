@@ -13,9 +13,20 @@
  * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
  *   vec.c, and quat.c, and all four failed in the exact same way: configure
  *   succeeds, link completes, and only the final checksum check fails
+ * - promoting all four mtx units together on the latest main-based SDK branch
+ *   still fails only at the final checksum, so the hidden-link seam is not
+ *   resolved by treating the cluster as a single promote-together island
  * - that makes this look like a shared hidden-link / metadata seam in the mtx
  *   library cluster rather than a remaining visible source mismatch in this
  *   file's body
+ * - a fresh object-extent audit explains that seam more concretely: rebuilt
+ *   source `vec.o` is `0x0448` bytes of `.text` plus `0x38` of local
+ *   `.sdata2`, while the extracted target `vec.o` is only `0x02B0` bytes of
+ *   `.text`
+ * - that means `vec.c -> Matching` is not blocked by the visible matched
+ *   functions here; it is blocked because GCCP01's final linked object only
+ *   keeps the smaller subset through `PSVECDistance`, while current source
+ *   still emits the full SDK object
  */
 
 #define R_RET fp1

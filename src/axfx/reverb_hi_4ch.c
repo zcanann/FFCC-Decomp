@@ -69,6 +69,27 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   regresses section match from 96.0% to 74.07%, and drops
  *   `ReverbHICreateDpl2` from 99.40% to 99.16%; so "make value0_1 global"
  *   alone is not the fix
+ * - a newer keepable probe did find the right arithmetic shape without the old
+ *   stack-lifetime regression: rewriting the damping normalization through a
+ *   local `f32 damp`, then `damp = 0.05f + damp`, then
+ *   `rv->damping = 1.0f - damp` forces the target-style separate
+ *   `fmuls` / `fadds` / `fsubs` chain in both functions and moves
+ *   `ReverbHICreateDpl2` from 99.40129% to 99.83819% and
+ *   `ReverbHIModifyDpl2` from 97.29508% to 99.54918%
+ * - after that keepable rewrite, the remaining function-body gap is down to a
+ *   tiny register-allocation seam inside the same damping block plus the older
+ *   `reverb_hi_4ch_value0_1` symbol-identity mismatch in Modify's range check;
+ *   no broader control-flow difference remains there
+ * - a follow-up probe that kept the same `damp` temporary but moved the
+ *   `0.05f` clamp onto the local before the final store was completely flat;
+ *   `ReverbHICreateDpl2` stayed at 99.83819%, so the remaining seam is not
+ *   just "avoid the early rv->damping store" either
+ * - a newer probe tested the odd GCCP01-looking possibility from the current
+ *   extracted target object that only `ReverbHIModifyDpl2` wants a `100.0f`
+ *   preDelay upper bound instead of the shared Dolphin-family `0.1f`; that
+ *   did nudge Modify from 99.54918% to 99.59016%, but MWCC duplicated the
+ *   whole constant run and blew `.sdata2` out from `0x38` to `0x60`, so that
+ *   spelling is not keepable
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated
@@ -162,8 +183,11 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp = 0.05f + damp;
+        rv->damping = 1.0f - damp;
+    }
 
     if (0.0f != preDelay) {
         rv->preDelayTime = 32000.0f * preDelay;
@@ -218,7 +242,11 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    rv->damping = 1.0f - (0.05f + (0.8f * rv->damping));
+    {
+        f32 damp = 0.8f * rv->damping;
+        damp = 0.05f + damp;
+        rv->damping = 1.0f - damp;
+    }
 
     for (i = 0; i < 12; i++) {
         DLdeleteDpl2(&rv->AP[i]);

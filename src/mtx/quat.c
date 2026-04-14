@@ -13,9 +13,20 @@
  * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
  *   vec.c, and quat.c, and all four failed in the exact same way: configure
  *   succeeds, link completes, and only the final checksum check fails
+ * - promoting all four mtx units together on the latest main-based SDK branch
+ *   still fails only at the final checksum, so the hidden-link seam is not
+ *   resolved by treating the cluster as a single promote-together island
  * - that makes this look like a shared hidden-link / metadata seam in the mtx
  *   library cluster rather than a remaining visible source mismatch in this
  *   file's body
+ * - a fresh object-extent audit explains that seam more concretely: rebuilt
+ *   source `quat.o` is `0x0624` bytes of `.text` plus local `.rodata` /
+ *   `.sdata2`, while the extracted target `quat.o` is only `0x056C` bytes of
+ *   `.text` and imports the constant pool from outside
+ * - that means `quat.c -> Matching` is not blocked by the visible matched
+ *   functions in this file; it is blocked because GCCP01's final linked object
+ *   keeps only the linked subset through `C_QUATSlerp`, while current source
+ *   still emits the full SDK object
  */
 
 float acosf(float x);

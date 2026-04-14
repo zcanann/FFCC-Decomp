@@ -11,9 +11,21 @@
  * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
  *   vec.c, and quat.c, and all four failed in the exact same way: configure
  *   succeeds, link completes, and only the final checksum check fails
+ * - promoting all four mtx units together on the latest main-based SDK branch
+ *   still fails only at the final checksum, so the hidden-link seam is not
+ *   resolved by treating the cluster as a single promote-together island
  * - that makes this look like a shared hidden-link / metadata seam in the mtx
  *   library cluster rather than a remaining visible source mismatch in this
  *   file's body
+ * - a fresh object-extent audit explains that seam more concretely: rebuilt
+ *   source `mtx.o` is `0x1CA4` bytes of `.text`, while the extracted target
+ *   `mtx.o` is only `0x0A3C`; source still emits the full SDK object plus
+ *   local `Unit01` / `.sdata2` constants, while the target slice on GCCP01 is
+ *   only the linked subset that imports those constants from outside
+ * - that means `mtx.c -> Matching` is not blocked by its visible matched
+ *   functions anymore; it is blocked because this repo still models the full
+ *   library source file where GCCP01's final linked object only keeps the
+ *   subset through `C_MTXLightOrtho`
  */
 
 static f32 Unit01[] = { 0.0f, 1.0f };

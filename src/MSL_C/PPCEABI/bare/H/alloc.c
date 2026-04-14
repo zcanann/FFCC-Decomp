@@ -159,6 +159,10 @@ static int initialized = 0;
  *   of `(FixSubBlock*)((char*)b + 0x14)` regressed slightly
  *   (95.11% -> 94.81%), so the current raw-byte base expression is still
  *   closer to target than the cleaner typed-step spelling
+ * - a newer "target-looking" probe that combined `msize -= 0x14`, a separate
+ *   `start = (FixSubBlock*)((char*)block + 0x14)` base, and a single advancing
+ *   typed `p` cursor loop held completely flat, so that exact setup/order/
+ *   cursor combination is not the remaining lever either
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

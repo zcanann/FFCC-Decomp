@@ -13,6 +13,26 @@ static Mtx g_matUnit;
 
 static char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
 
+static inline float* f32_at(void* base, s32 off)
+{
+	return (float*)((u8*)base + off);
+}
+
+static inline s16* s16_at(void* base, s32 off)
+{
+	return (s16*)((u8*)base + off);
+}
+
+static inline u16* u16_at(void* base, s32 off)
+{
+	return (u16*)((u8*)base + off);
+}
+
+static inline u8* u8_at(void* base, s32 off)
+{
+	return (u8*)base + off;
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -148,12 +168,9 @@ void calc(
 	VRyjMegaBirth* work, PRyjMegaBirth* param, _PARTICLE_DATA* particle, VColor* vColor,
 	_PARTICLE_COLOR* colorData)
 {
-	s32 alpha;
+	u32 alpha;
 	u8* paramPayload;
 	u8* particlePayload;
-	u8 fadeOutFrames;
-	u8 fadeInFrames;
-	float particleAngle;
 	Vec step;
 
 	alpha = vColor->m_alpha;
@@ -166,97 +183,95 @@ void calc(
 		colorData->m_color[1] = colorData->m_color[1] + colorData->m_colorFrameDeltas[1];
 		colorData->m_color[2] = colorData->m_color[2] + colorData->m_colorFrameDeltas[2];
 		colorData->m_color[3] = colorData->m_color[3] + colorData->m_colorFrameDeltas[3];
-		colorData->m_colorFrameDeltas[0] = colorData->m_colorFrameDeltas[0] + param->m_colorDeltaAdd[0];
-		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + param->m_colorDeltaAdd[1];
-		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + param->m_colorDeltaAdd[2];
-		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + param->m_colorDeltaAdd[3];
-			alpha = alpha + (s32)colorData->m_color[3];
-			if (0xFF < alpha)
-			{
-				alpha = 0xFF;
-			}
-	}
-
-	*(float*)(particlePayload + 0x28) = *(float*)(particlePayload + 0x28) + *(float*)(particlePayload + 0x2C);
-	if ((paramPayload[0x8B] & 0x10) == 0)
-	{
-		*(float*)(particlePayload + 0x2C) = *(float*)(particlePayload + 0x2C) + *(float*)(paramPayload + 0x98);
-	}
-	else
-	{
-		*(float*)(particlePayload + 0x2C) = *(float*)(particlePayload + 0x2C) +
-				*(float*)(paramPayload + 0x98) + *(float*)(particlePayload + 0x3C);
-	}
-
-	particleAngle = *(float*)(particlePayload + 0x28);
-	while (FLOAT_8033045c <= particleAngle)
-	{
-		particleAngle = particleAngle - FLOAT_80330458;
-	}
-	while (particleAngle < FLOAT_80330460)
-	{
-		particleAngle = particleAngle + FLOAT_80330458;
-	}
-	*(float*)(particlePayload + 0x28) = particleAngle;
-
-	*(float*)(particlePayload + 0x40) = *(float*)(particlePayload + 0x40) + *(float*)(particlePayload + 0x48);
-	*(float*)(particlePayload + 0x44) = *(float*)(particlePayload + 0x44) + *(float*)(particlePayload + 0x4C);
-
-	if ((paramPayload[0x8A] & 0x10) == 0)
-	{
-		*(float*)(particlePayload + 0x48) = *(float*)(particlePayload + 0x48) + *(float*)(paramPayload + 0x84);
-		*(float*)(particlePayload + 0x4C) = *(float*)(particlePayload + 0x4C) + *(float*)(paramPayload + 0x88);
-	}
-	else
-	{
-		*(float*)(particlePayload + 0x48) = *(float*)(particlePayload + 0x48) +
-			*(float*)(paramPayload + 0x84) + *(float*)(particlePayload + 0x50);
-		*(float*)(particlePayload + 0x4C) = *(float*)(particlePayload + 0x4C) +
-			*(float*)(paramPayload + 0x88) + *(float*)(particlePayload + 0x54);
-	}
-
-	*(float*)(particlePayload + 0x58) = *(float*)(particlePayload + 0x58) + *(float*)(paramPayload + 0xA8);
-	if ((s8)paramPayload[0x8E] == 0)
-	{
-		if ((*(float*)(paramPayload + 0xAC) <= kPppRyjMegaBirthZero) || (kPppRyjMegaBirthZero <= *(float*)(paramPayload + 0xA8)))
+		colorData->m_colorFrameDeltas[0] = colorData->m_colorFrameDeltas[0] + *f32_at(paramPayload, 0x3C);
+		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + *f32_at(paramPayload, 0x40);
+		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + *f32_at(paramPayload, 0x44);
+		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + *f32_at(paramPayload, 0x48);
+		alpha = alpha + (u32)(s32)colorData->m_color[3];
+		if (alpha > 0xFF)
 		{
-			if ((*(float*)(paramPayload + 0xAC) < kPppRyjMegaBirthZero) &&
-				((kPppRyjMegaBirthZero < *(float*)(paramPayload + 0xA8)) &&
-				 (kPppRyjMegaBirthZero < *(float*)(particlePayload + 0x58))))
-			{
-				*(float*)(particlePayload + 0x58) = kPppRyjMegaBirthZero;
-			}
-		}
-		else if (*(float*)(particlePayload + 0x58) < kPppRyjMegaBirthZero)
-		{
-			*(float*)(particlePayload + 0x58) = kPppRyjMegaBirthZero;
+			alpha = 0xFF;
 		}
 	}
 
-	*(float*)(particlePayload + 0x60) = *(float*)(particlePayload + 0x60) + *(float*)(paramPayload + 0xB4);
-	PSVECScale((Vec*)(particlePayload + 0x30), &step, *(float*)(particlePayload + 0x58));
+	*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + *f32_at(particlePayload, 0x2C);
+	if ((paramPayload[0xEB] & 0x10) == 0)
+	{
+		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(paramPayload, 0x98);
+	}
+	else
+	{
+		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(paramPayload, 0x98);
+		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(particlePayload, 0x30);
+	}
+
+	while (FLOAT_8033045c <= *f32_at(particlePayload, 0x28))
+	{
+		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - FLOAT_80330458;
+	}
+	while (*f32_at(particlePayload, 0x28) < FLOAT_80330460)
+	{
+		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + FLOAT_80330458;
+	}
+
+	*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x3C);
+	*f32_at(particlePayload, 0x38) = *f32_at(particlePayload, 0x38) + *f32_at(particlePayload, 0x40);
+	if ((paramPayload[0xEA] & 0x10) == 0)
+	{
+		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(paramPayload, 0x70);
+		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(paramPayload, 0x74);
+	}
+	else
+	{
+		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(paramPayload, 0x70);
+		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(particlePayload, 0x44);
+		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(paramPayload, 0x74);
+		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(particlePayload, 0x48);
+	}
+
+	*f32_at(particlePayload, 0x4C) = *f32_at(particlePayload, 0x4C) + *f32_at(paramPayload, 0xC4);
+	if (paramPayload[0xEE] == 0)
+	{
+		if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
+		    (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)))
+		{
+			if (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C))
+			{
+				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
+			}
+		}
+		else if ((*f32_at(paramPayload, 0xC0) > kPppRyjMegaBirthZero) &&
+		         (kPppRyjMegaBirthZero > *f32_at(paramPayload, 0xC4)) &&
+		         (*f32_at(particlePayload, 0x4C) < kPppRyjMegaBirthZero))
+		{
+			*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
+		}
+	}
+
+	*f32_at(particlePayload, 0x50) = *f32_at(particlePayload, 0x50) + *f32_at(paramPayload, 0xD0);
+	PSVECScale((Vec*)(particlePayload + 0x10), &step, *f32_at(particlePayload, 0x4C));
 	PSVECAdd(&step, (Vec*)particlePayload, (Vec*)particlePayload);
-	PSVECScale(&work->m_accelerationAxis, &step, *(float*)(particlePayload + 0x60));
+	PSVECScale(&work->m_accelerationAxis, &step, *f32_at(particlePayload, 0x50));
 	PSVECAdd((Vec*)particlePayload, &step, (Vec*)particlePayload);
 
-	if (*(s16*)(paramPayload + 0x96) != 0)
+	if (*u16_at(paramPayload, 0x26) != 0)
 	{
-		*(s16*)(particlePayload + 0x22) = *(s16*)(particlePayload + 0x22) - 1;
+		*s16_at(particlePayload, 0x22) = *s16_at(particlePayload, 0x22) - 1;
 	}
 
-	fadeOutFrames = *(u8*)(particlePayload + 0x59);
-	*(u8*)(particlePayload + 0x58) = *(u8*)(particlePayload + 0x58) + 1;
-	if ((fadeOutFrames != 0) && (*(u8*)(particlePayload + 0x58) <= fadeOutFrames))
+	*u8_at(particlePayload, 0x58) = *u8_at(particlePayload, 0x58) + 1;
+	if ((*u8_at(particlePayload, 0x59) != 0) &&
+	    (*u8_at(particlePayload, 0x58) <= *u8_at(particlePayload, 0x59)))
 	{
-		*(float*)(particlePayload + 0x5C) =
-			*(float*)(particlePayload + 0x5C) - ((float)alpha / (float)fadeOutFrames);
+		*f32_at(particlePayload, 0x54) =
+			*f32_at(particlePayload, 0x54) - ((float)alpha / (float)*u8_at(particlePayload, 0x59));
 	}
 
-	fadeInFrames = *(u8*)(particlePayload + 0x5A);
-	if ((fadeInFrames != 0) && (*(u16*)(particlePayload + 0x22) <= fadeInFrames))
+	if ((*u8_at(particlePayload, 0x5A) != 0) &&
+	    (*u16_at(particlePayload, 0x22) <= *u8_at(particlePayload, 0x5A)))
 	{
-		*(float*)(particlePayload + 0x5C) =
-			*(float*)(particlePayload + 0x5C) + ((float)alpha / (float)*(u8*)(paramPayload + 0x8D));
+		*f32_at(particlePayload, 0x54) =
+			*f32_at(particlePayload, 0x54) + ((float)alpha / (float)paramPayload[0x29]);
 	}
 }
 

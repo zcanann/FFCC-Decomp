@@ -74,11 +74,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         nextY = pppMngStPtr->m_matrix.value[1][3];
         finalY = nextY;
         cylinder.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
-        cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_bottom.y = nextY + param_2->m_unk0x4;
-        cylinder.m_direction.x = zero;
-        cylinder.m_direction.y = probeY;
-        cylinder.m_direction.z = zero;
+        cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
+        cylinder.m_direction = direction;
         cylinder.m_radius = zero;
         cylinder.m_height = probeY;
         cylinder.m_top.x = zero;

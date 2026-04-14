@@ -45,7 +45,24 @@ struct BreathParticleGroup {
     Vec position;
     Vec direction;
     float speed;
+    float scale;
     Mtx matrix;
+};
+
+struct VBreathModel {
+    Mtx matrix;
+    _PARTICLE_DATA* particleData;
+    Mtx* particleWMat;
+    _PARTICLE_COLOR* particleColor;
+    BreathParticleGroup* particleGroups;
+    int maxParticleCount;
+    short particleTimer;
+    short _pad46;
+    Vec direction;
+    short groupCount;
+    short particleCountPerGroup;
+    unsigned char _unk58;
+    unsigned char _pad59[3];
 };
 
 /*
@@ -903,49 +920,51 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
  * --INFO--
  * PAL Address: 0x800db094
  * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
-    unsigned char* work = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
-    void** particleData = (void**)(work + 0x30);
+    VBreathModel* work =
+        (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
+    BreathParticleGroup* group;
+    int i;
 
-    if (particleData[0] != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(particleData[0]);
-        particleData[0] = NULL;
+    if (work->particleData != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(work->particleData);
+        work->particleData = 0;
     }
 
-    if (particleData[1] != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(particleData[1]);
-        particleData[1] = NULL;
+    if (work->particleWMat != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(work->particleWMat);
+        work->particleWMat = 0;
     }
 
-    if (particleData[2] != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(particleData[2]);
-        particleData[2] = NULL;
+    if (work->particleColor != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(work->particleColor);
+        work->particleColor = 0;
     }
 
-    if (particleData[3] != NULL) {
-        int i;
-        unsigned char* group = (unsigned char*)particleData[3];
-
-        for (i = 0; i < *(short*)(work + 0x54); i++) {
-            void** groupData = (void**)(group + 4);
-
-            if (groupData[0] != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(groupData[0]);
-                groupData[0] = NULL;
+    group = work->particleGroups;
+    if (group != NULL) {
+        for (i = 0; i < work->groupCount; i++) {
+            if (group->particleIndices != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
+                group->particleIndices = 0;
             }
 
-            if (groupData[1] != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(groupData[1]);
-                groupData[1] = NULL;
+            if (group->particleStates != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
+                group->particleStates = 0;
             }
 
-            group += 0x5C;
+            group++;
         }
 
-        pppHeapUseRate__FPQ27CMemory6CStage(particleData[3]);
-        particleData[3] = NULL;
+        pppHeapUseRate__FPQ27CMemory6CStage(work->particleGroups);
+        work->particleGroups = 0;
     }
 }
 

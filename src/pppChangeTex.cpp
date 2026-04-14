@@ -339,8 +339,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	u8* colorData = (u8*)&changeTex->field0_0x0 + serializedDataOffsets[1] + 0x80;
 	ChangeTexWork* work = (ChangeTexWork*)((u8*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
+	u8* colorData = (u8*)&changeTex->field0_0x0 + serializedDataOffsets[1] + 0x80;
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(
 	    GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0));
 

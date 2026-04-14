@@ -61,6 +61,20 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   `OSInit` pad-state accesses, this now looks like a coherent small-data
  *   seam / extracted-symbol-identity problem across the whole pad/ai/os
  *   cluster, not a plausible source rewrite inside `ai.c`
+ * - a fresh current-branch retest of the older "export every AI state symbol"
+ *   idea did move the rebuilt object, but not in a keepable direction:
+ *   explicit zero-initialized non-static declarations for all eleven AI state
+ *   globals flipped source `.sbss` into the reverse-declared exported order
+ *   `buffer / max_wait / min_wait / bound_48KHz / bound_32KHz /
+ *   __AID_Active / __AI_init_flag / __OldStack / __CallbackStack /
+ *   __AID_Callback / __AIS_Callback`
+ * - that export-all probe nudged the visible text match slightly upward
+ *   (`99.62867% -> 99.64594%`), but `ai.c -> Matching` still only failed at
+ *   the final checksum and did not resolve the remaining pad-side relocation
+ *   identities in `AIRegisterDMACallback`
+ * - so on latest main this is still not an authored-source fix; it only
+ *   proves the linker blocker is deeper than whether the AI state symbols are
+ *   local or global
  *
  * Why this is not keepable yet:
  * - the only source shape that produced the target .sbss order was not plausible

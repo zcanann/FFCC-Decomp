@@ -1594,7 +1594,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	memoryBank = DAT_8032f480.GetMainBankAddress();
 	bufferTop = nextAddress + DAT_8032f480.GetMainBufferSize();
 	bankEntry = memoryBank;
-	seBlockBase = DAT_8032e12c;
+	seBlockBase = (int*)DAT_8032e12c;
 
 	do {
 		if (bankEntry[1] != 0) {

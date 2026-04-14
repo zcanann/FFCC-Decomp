@@ -22,7 +22,7 @@ extern int DAT_8021e1d0[];
 extern int DAT_8021ec10[];
 extern CRedEntry DAT_8032e154;
 extern OSSemaphore DAT_8032e120;
-extern int DAT_8032e12c[];
+extern void* DAT_8032e12c[];
 extern int DAT_8032e17c[];
 extern unsigned int DAT_8032ec30;
 extern int DAT_8032f3c0;

@@ -128,7 +128,7 @@ OSSemaphore DAT_8032ddd8;
 ARQRequest DAT_8032dde4;
 OSThread DAT_8032de08;
 OSSemaphore DAT_8032e120;
-int DAT_8032e12c[4];
+void* DAT_8032e12c[4];
 CRedMemory DAT_8032f480;
 CRedEntry DAT_8032e154;
 
@@ -423,25 +423,24 @@ void _SetMusicPhraseStop(int* param_1)
  */
 void _SetSeBlockData(int* param_1)
 {
-    u32 index;
+    u32 index = (u32)*param_1 & 3;
     u8* seBlockData;
 
-    index = (u32)*param_1 & 3;
-    if (((void**)DAT_8032e12c)[*param_1 & 3] != 0) {
-        RedDelete__FPv(((void**)DAT_8032e12c)[index]);
-        ((void**)DAT_8032e12c)[index] = 0;
+    if (DAT_8032e12c[*param_1 & 3] != 0) {
+        RedDelete__FPv(DAT_8032e12c[index]);
+        DAT_8032e12c[index] = 0;
     }
 
     if (param_1[1] != 0) {
         seBlockData = (u8*)param_1[1];
-        seBlockData[0] = 0x53;
+        *seBlockData = 0x53;
         seBlockData[1] = 0x65;
         seBlockData[2] = 0x42;
         seBlockData[3] = 0x6c;
         seBlockData[4] = 0x6f;
-        seBlockData[5] = 0x63;
+        seBlockData[5] = 99;
         seBlockData[6] = 0x6b;
-        ((u8**)DAT_8032e12c)[index] = seBlockData;
+        DAT_8032e12c[index] = seBlockData;
     }
 }
 

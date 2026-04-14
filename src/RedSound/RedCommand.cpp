@@ -484,7 +484,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 	int playSeId = seId;
 
 	if (DAT_8032e12c[bankIndex] != 0) {
-		int bankData = DAT_8032e12c[bankIndex];
+		int bankData = (int)DAT_8032e12c[bankIndex];
 		int playNo = seNo + (bankIndex << 9);
 		short count = *(short*)(bankData + 10);
 

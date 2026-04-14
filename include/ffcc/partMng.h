@@ -215,7 +215,7 @@ struct _pppEnvSt
 {
     CMemory::CStage* m_stagePtr;    // 0x0
     CMaterialSet* m_materialSetPtr; // 0x4
-    CMapMesh* m_mapMeshPtr;         // 0x8
+    CMapMesh** m_mapMeshPtr;        // 0x8
     _pppColor m_particleColors[10];  // 0xc
     unsigned int m_mngStCount;      // 0x34
     unsigned int m_debugCounter;    // 0x38

@@ -912,6 +912,8 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 	CMapCylinderRaw cyl;
+	unsigned int* topWords = reinterpret_cast<unsigned int*>(&top);
+	unsigned int* baseWords = reinterpret_cast<unsigned int*>(&base);
 
 	cyl.m_top.x = kPolyGroupAabbMax;
 	cyl.m_top.y = kPolyGroupAabbMax;
@@ -919,12 +921,12 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_direction2.x = kPolyGroupAabbMin;
 	cyl.m_direction2.y = kPolyGroupAabbMin;
 	cyl.m_direction2.z = kPolyGroupAabbMin;
-	cyl.m_bottom.x = top.x;
-	cyl.m_bottom.y = top.y;
-	cyl.m_bottom.z = top.z;
-	cyl.m_direction.x = base.x;
-	cyl.m_direction.y = base.y;
-	cyl.m_direction.z = base.z;
+	reinterpret_cast<unsigned int*>(&cyl.m_bottom)[0] = topWords[0];
+	reinterpret_cast<unsigned int*>(&cyl.m_bottom)[1] = topWords[1];
+	reinterpret_cast<unsigned int*>(&cyl.m_bottom)[2] = topWords[2];
+	reinterpret_cast<unsigned int*>(&cyl.m_direction)[0] = baseWords[0];
+	reinterpret_cast<unsigned int*>(&cyl.m_direction)[1] = baseWords[1];
+	reinterpret_cast<unsigned int*>(&cyl.m_direction)[2] = baseWords[2];
 	cyl.m_radius = kPolyGroupBaseZ;
 
 	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),

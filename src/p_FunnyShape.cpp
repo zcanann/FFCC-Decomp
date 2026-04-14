@@ -52,27 +52,6 @@ extern "C" void* __vt__14CFunnyShapePcs[];
 CFunnyShapePcs FunnyShapePcs;
 u8 ARRAY_8026D728[0xC];
 
-namespace {
-void CopyFunnyShapePcsTable()
-{
-    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__14CFunnyShapePcs);
-
-    dst[1] = m_table_desc0__14CFunnyShapePcs[0];
-    dst[2] = m_table_desc0__14CFunnyShapePcs[1];
-    dst[3] = m_table_desc0__14CFunnyShapePcs[2];
-    dst[4] = m_table_desc1__14CFunnyShapePcs[0];
-    dst[5] = m_table_desc1__14CFunnyShapePcs[1];
-    dst[6] = m_table_desc1__14CFunnyShapePcs[2];
-    dst[7] = m_table_desc2__14CFunnyShapePcs[0];
-    dst[8] = m_table_desc2__14CFunnyShapePcs[1];
-    dst[9] = m_table_desc2__14CFunnyShapePcs[2];
-    dst[12] = m_table_desc3__14CFunnyShapePcs[0];
-    dst[13] = m_table_desc3__14CFunnyShapePcs[1];
-    dst[14] = m_table_desc3__14CFunnyShapePcs[2];
-}
-
-} // namespace
-
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
@@ -121,9 +100,21 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     __ct__11CFunnyShapeFv(self + 0x50);
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
-    __register_global_object(&FunnyShapePcs, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
+    __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
 
-    CopyFunnyShapePcsTable();
+    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__14CFunnyShapePcs);
+    table[1] = m_table_desc0__14CFunnyShapePcs[0];
+    table[2] = m_table_desc0__14CFunnyShapePcs[1];
+    table[3] = m_table_desc0__14CFunnyShapePcs[2];
+    table[4] = m_table_desc1__14CFunnyShapePcs[0];
+    table[5] = m_table_desc1__14CFunnyShapePcs[1];
+    table[6] = m_table_desc1__14CFunnyShapePcs[2];
+    table[7] = m_table_desc2__14CFunnyShapePcs[0];
+    table[8] = m_table_desc2__14CFunnyShapePcs[1];
+    table[9] = m_table_desc2__14CFunnyShapePcs[2];
+    table[12] = m_table_desc3__14CFunnyShapePcs[0];
+    table[13] = m_table_desc3__14CFunnyShapePcs[1];
+    table[14] = m_table_desc3__14CFunnyShapePcs[2];
 }
 
 template <class T>

@@ -84,6 +84,12 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   `0.05f` clamp onto the local before the final store was completely flat;
  *   `ReverbHICreateDpl2` stayed at 99.83819%, so the remaining seam is not
  *   just "avoid the early rv->damping store" either
+ * - a newer probe tested the odd GCCP01-looking possibility from the current
+ *   extracted target object that only `ReverbHIModifyDpl2` wants a `100.0f`
+ *   preDelay upper bound instead of the shared Dolphin-family `0.1f`; that
+ *   did nudge Modify from 99.54918% to 99.59016%, but MWCC duplicated the
+ *   whole constant run and blew `.sdata2` out from `0x38` to `0x60`, so that
+ *   spelling is not keepable
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

@@ -66,6 +66,15 @@
  * - that makes `AXProf` the current earliest trustworthy cutoff for the old
  *   PAL `.sbss` guidance on this branch: the ARQ/AX tail before it still looks
  *   stale, but the later ownership chain has already diverged by that point
+ * - a fresh latest-main comparison against the PAL map shows the stale `+0x18`
+ *   drift actually continues cleanly past `AXProf` as well: `axart`,
+ *   `axart3d`, `dsp`, `dsp_task`, `CARDBios`, `GXInit`, `GXMisc`,
+ *   `GXDisplayList`, `GBA`, `serpoll`, and `TRK main` are all still sitting
+ *   0x18 early in `splits.txt`
+ * - that means the current "AXProf cutoff" is only the earliest compile-time
+ *   overlap in the live config, not the true end of the stale map-aligned
+ *   chain; the next coherent re-split attempt should expect to carry that
+ *   shifted ownership much farther forward before a real post-TRK seam appears
  */
 
 #ifdef DEBUG

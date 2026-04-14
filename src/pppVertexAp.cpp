@@ -216,3 +216,17 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
     state->countdown--;
 }
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void apea(_pppPObject*, PVertexAp*, Vec*)
+{
+    // Intentionally empty.
+}

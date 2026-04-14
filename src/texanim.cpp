@@ -114,6 +114,17 @@ struct CTexAnimSeqStorage
     unsigned int* keys;
 };
 
+struct CTexScrollStorage
+{
+    unsigned char type0;
+    unsigned char type1;
+    unsigned char pad[2];
+    float u0;
+    float v0;
+    float u1;
+    float v1;
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -965,27 +976,26 @@ void CTexAnimSet::SetTexGen()
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-        CTexAnimRefDataStorage* refData =
-            reinterpret_cast<CTexAnimRefDataStorage*>(*reinterpret_cast<void**>(Ptr(texAnim, 8)));
+        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
         const float fVar2 = FLOAT_8032fb38;
         int* material = reinterpret_cast<int*>(refData->material);
         if (material != 0) {
+            CTexScrollStorage* texScroll = reinterpret_cast<CTexScrollStorage*>(Ptr(material, 0x4C)) + refData->texSrtIndex;
             const float texGenS = F32At(texAnim, 0x18);
             const float texGenT = F32At(texAnim, 0x1C);
-            material = material + (refData->texSrtIndex * 5);
-            F32At(material, 0x50) = texGenS;
-            F32At(material, 0x54) = texGenT;
-            F32At(material, 0x58) = fVar2;
-            F32At(material, 0x5C) = fVar2;
-            if (fVar2 == F32At(material, 0x58)) {
-                U8At(material, 0x4C) = 0;
+            texScroll->u0 = texGenS;
+            texScroll->v0 = texGenT;
+            texScroll->u1 = fVar2;
+            texScroll->v1 = fVar2;
+            if (fVar2 == texScroll->u1) {
+                texScroll->type0 = 0;
             } else {
-                U8At(material, 0x4C) = 1;
+                texScroll->type0 = 1;
             }
-            if (FLOAT_8032fb38 == F32At(material, 0x5C)) {
-                U8At(material, 0x4D) = 0;
+            if (FLOAT_8032fb38 == texScroll->v1) {
+                texScroll->type1 = 0;
             } else {
-                U8At(material, 0x4D) = 1;
+                texScroll->type1 = 1;
             }
         }
     }

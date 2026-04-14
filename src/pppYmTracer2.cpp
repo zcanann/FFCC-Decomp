@@ -371,7 +371,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
     poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
+    mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);

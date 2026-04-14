@@ -145,25 +145,28 @@ void RedDelete(int address)
 	if (address == 0) {
 		return;
 	}
-	
+
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockPtr = gRedMainMemoryBlockList;
-	
-	if (blockPtr) {
-		while (blockPtr[1] != 0 && blockPtr < gRedMainMemoryBlockList + 0x800) {
-			if (blockPtr[0] == address) {
-				unsigned int moveCount = (int)gRedMainMemoryBlockList + (0x2000 - (int)(blockPtr + 2));
-				int entryCount = (int)moveCount / 8;
+	int* blockList = gRedMainMemoryBlockList;
+
+	if (blockList != 0) {
+		int* blockEnd = blockList + 0x800;
+		int* blockPtr = blockList;
+
+		do {
+			if (*blockPtr == address) {
+				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
+
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(gRedMainMemoryBlockList + 0x7FE, 0, 8);
+					memset(blockList + 0x7FE, 0, 8);
 				}
 				break;
 			}
 			blockPtr += 2;
-		}
+		} while (blockPtr[1] != 0 && blockPtr < blockEnd);
 	}
-	
+
 	OSRestoreInterrupts(interrupts);
 }
 
@@ -289,25 +292,28 @@ void RedDeleteA(int address)
 	if (address == 0) {
 		return;
 	}
-	
+
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockPtr = gRedAMemoryBlockList;
-	
-	if (blockPtr) {
-		while (blockPtr[1] != 0 && blockPtr < gRedAMemoryBlockList + 0x800) {
-			if (blockPtr[0] == address) {
-				unsigned int moveCount = (int)gRedAMemoryBlockList + (0x2000 - (int)(blockPtr + 2));
-				int entryCount = (int)moveCount / 8;
+	int* blockList = gRedAMemoryBlockList;
+
+	if (blockList != 0) {
+		int* blockEnd = blockList + 0x800;
+		int* blockPtr = blockList;
+
+		do {
+			if (*blockPtr == address) {
+				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
+
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
-					memset(gRedAMemoryBlockList + 0x7FE, 0, 8);
+					memset(blockList + 0x7FE, 0, 8);
 				}
 				break;
 			}
 			blockPtr += 2;
-		}
+		} while (blockPtr[1] != 0 && blockPtr < blockEnd);
 	}
-	
+
 	OSRestoreInterrupts(interrupts);
 }
 

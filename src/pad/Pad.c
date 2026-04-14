@@ -89,6 +89,16 @@ const char* __PADVersion = s___PADVersion;
  *   `SamplingCallback` does resolve the undefined set, but MWCC then lays the
  *   exported sbss symbols backward from target and puts `recalibrated$400` at
  *   the front of the run instead of after `SamplingCallback`
+ * - a narrower follow-up on the current branch tested the even simpler source
+ *   shape directly: drop `static` from `ResettingChan` / `XPatchBits` /
+ *   `AnalogMode`, the shared pad-state globals, `SamplingCallback`, and the
+ *   helper functions target Pad.o already exports (`UpdateOrigin`,
+ *   `PADOriginCallback`, `PADOriginUpdateCallback`, `PADProbeCallback`,
+ *   `PADTypeAndStatusCallback`, `PADReceiveCheckCallback`, `OnReset2`, and
+ *   `SamplingHandler`)
+ * - MWCC 1.2.5n still emitted all of those symbols as local bindings in the
+ *   rebuilt source Pad.o, so plain C linkage keywords alone are not the lever
+ *   that makes target Pad.o export them
  * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
  *   declarations here, so there is no simple file-scope alias escape hatch for
  *   that last symbol identity

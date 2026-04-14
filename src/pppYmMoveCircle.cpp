@@ -26,52 +26,6 @@ struct pppYmMoveCircleWork {
 
 /*
  * --INFO--
- * PAL Address: 0x800d183c
- * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
-{
-    const f32 kZero = 0.0f;
-    const f32 kOne = 1.0f;
-    Vec tempUp;
-    Vec temp1;
-    _pppMngSt* pppMngSt;
-    s32 offset;
-    pppYmMoveCircleWork* work;
-
-    pppMngSt = pppMngStPtr;
-    offset = offsetData->m_serializedDataOffsets[0];
-    work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
-
-    tempUp.x = kOne;
-    tempUp.y = kZero;
-    tempUp.z = kZero;
-
-    PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
-    PSVECNormalize(&temp1, &temp1);
-
-    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos((double)PSVECDotProduct(&tempUp, &temp1));
-
-    if ((temp1.x <= kZero && temp1.z >= kZero) || (temp1.x >= kZero && temp1.z >= kZero)) {
-        work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;
-    }
-
-    work->m_radiusStepStep = kZero;
-    work->m_radiusStep = kZero;
-    work->m_radius = kZero;
-    work->m_angleStepStepStep = kZero;
-    work->m_angleStepStep = kZero;
-    work->m_angleStep = kZero;
-    pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
-    work->m_hasInit = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d160c
  * PAL Size: 560b
  * EN Address: TODO
@@ -143,4 +97,50 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     *(f32*)((u8*)pppMngStPtr + 0x94) = nextPos.y;
     *(f32*)((u8*)pppMngStPtr + 0xA4) = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d183c
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
+{
+    const f32 kZero = 0.0f;
+    const f32 kOne = 1.0f;
+    Vec tempUp;
+    Vec temp1;
+    _pppMngSt* pppMngSt;
+    s32 offset;
+    pppYmMoveCircleWork* work;
+
+    pppMngSt = pppMngStPtr;
+    offset = offsetData->m_serializedDataOffsets[0];
+    work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
+
+    tempUp.x = kOne;
+    tempUp.y = kZero;
+    tempUp.z = kZero;
+
+    PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
+    PSVECNormalize(&temp1, &temp1);
+
+    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos((double)PSVECDotProduct(&tempUp, &temp1));
+
+    if ((temp1.x <= kZero && temp1.z >= kZero) || (temp1.x >= kZero && temp1.z >= kZero)) {
+        work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;
+    }
+
+    work->m_radiusStepStep = kZero;
+    work->m_radiusStep = kZero;
+    work->m_radius = kZero;
+    work->m_angleStepStepStep = kZero;
+    work->m_angleStepStep = kZero;
+    work->m_angleStep = kZero;
+    pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
+    work->m_hasInit = 0;
 }

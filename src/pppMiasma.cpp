@@ -44,6 +44,8 @@ void GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, s32);
+void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
+void RenderQuadTex2__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -175,8 +177,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     PppMiasmaRenderStep* step;
     pppModelSt* model;
     s16* work;
-    u8 packedWork[4];
-    u32 packedColor;
+    GXColor packedWorkColor;
+    GXColor packedColor;
     Vec managerPos;
     Vec cameraPos;
     float radius;
@@ -223,11 +225,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         step->m_payload[0x1e] = 0xFE;
     }
 
-    packedColor = *(u32*)((u8*)pppMiasma + 0x88 + colorOffset);
-    packedWork[0] = (u8)(work[0] >> 7);
-    packedWork[1] = (u8)(work[1] >> 7);
-    packedWork[2] = (u8)(work[2] >> 7);
-    packedWork[3] = (u8)(work[3] >> 7);
+    packedColor = *(GXColor*)((u8*)pppMiasma + 0x88 + colorOffset);
+    packedWorkColor.r = (u8)(work[0] >> 7);
+    packedWorkColor.g = (u8)(work[1] >> 7);
+    packedWorkColor.b = (u8)(work[2] >> 7);
+    packedWorkColor.a = (u8)(work[3] >> 7);
 
     texWidth = (int)FLOAT_80331928;
     texHeight = (int)FLOAT_8033192c;
@@ -440,7 +442,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             stepColor.a = tevAlphaScale;
             GXSetTevKColor((GXTevKColorID)0, stepColor);
             pppSetBlendMode(0);
-            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&packedColor);
+            GXSetChanMatColor(GX_COLOR0A0, packedColor);
             GXSetNumTexGens(2);
             _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
                 1, tevSwapChannel, tevSwapChannel, tevSwapChannel, tevSwapChannel);
@@ -506,7 +508,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             pppInitBlendMode();
             pppSetBlendMode(0);
             if ((u8)step->m_arg3 != 2) {
-                gUtil.RenderQuadTex2(quadA, quadB, *(GXColor*)&packedColor, 0, 0);
+                RenderQuadTex2__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&gUtil, &quadA, &quadB, packedColor, 0, 0);
             }
         }
 
@@ -529,7 +531,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             drawColor.b = 0xFF;
             drawColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&drawColor);
-            workColor = *(GXColor*)packedWork;
+            workColor = packedWorkColor;
             GXSetChanMatColor(GX_COLOR0A0, workColor);
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
             GXSetNumChans(1);
@@ -610,7 +612,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             quadB.x = FLOAT_80331928;
             quadB.y = (float)yOffset + FLOAT_8033192c;
             quadB.z = FLOAT_8033193c;
-            gUtil.RenderQuad(quadA, quadB, *(GXColor*)packedWork, 0, 0);
+            RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&gUtil, &quadA, &quadB, packedWorkColor, 0, 0);
         }
 
         gUtil.InitConstantRegister();

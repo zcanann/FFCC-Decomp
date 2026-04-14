@@ -43,29 +43,27 @@ void CGQuadObj::onDraw()
         GXLoadPosMtxImm(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
+        QuadVertex* vertex1;
+        QuadVertex* vertex2;
         CGQuadObj* current = this;
         int i = 0;
 
         while (i < (int)(u32)m_vertexCount) {
             int next = i + 1;
-            QuadVertex* vertex;
-            QuadVertex* vertex2;
 
-            i++;
-
-            vertex = current->m_vertices;
-            GXPosition3f32(vertex->x, m_yBase, vertex->z);
+            i = i + 1;
+            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
             next = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
             GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
-            GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex->z);
+            GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
             next = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
             GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
-            GXPosition3f32(vertex->x, m_yBase, vertex->z);
+            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
 
             vertex2 = current->m_vertices;
-            vertex = current->m_vertices;
+            vertex1 = current->m_vertices;
             current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(current) + sizeof(QuadVertex));
-            GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex2->z);
+            GXPosition3f32(vertex1->x, m_yBase + m_yHeight, vertex2->z);
         }
     }
 }

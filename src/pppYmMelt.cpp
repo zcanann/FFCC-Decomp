@@ -88,16 +88,6 @@ struct YmMeltMngStView {
     pppFMATRIX m_matrix;
 };
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void InitPolygonData(PYmMelt*, VERTEX_DATA*, short)
-{
-	// TODO
-}
-
 #define CalcPolygonHeight CalcPolygonHeight__FP7PYmMeltP11VERTEX_DATAP8_GXColorf
 extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float);
 
@@ -235,6 +225,8 @@ void pppDestructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
     }
 }
 
+extern "C" char s_pppYmMelt_cpp_801DA048[];
+
 /*
  * --INFO--
  * PAL Address: 0x800A5A40
@@ -244,7 +236,6 @@ void pppDestructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-char s_pppYmMelt_cpp_801DA048[] = "pppYmMelt.cpp";
 
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {

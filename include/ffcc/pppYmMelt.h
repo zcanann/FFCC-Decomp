@@ -36,8 +36,6 @@ struct YmMeltCtrl {
     u8 m_payload[0x20];
 };
 
-void InitPolygonData(PYmMelt*, VERTEX_DATA*, short);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

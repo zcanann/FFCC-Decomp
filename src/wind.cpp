@@ -462,9 +462,6 @@ found:
 		return -1;
 	}
 
-	float centerX = pos->x;
-	float centerZ = pos->z;
-
 	obj->type = 1;
 	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
@@ -483,12 +480,12 @@ found:
 	obj->radius = radius;
 	obj->radiusSq = radius * radius;
 
-	obj->centerX = centerX;
-	obj->centerZ = centerZ;
-	obj->minX = centerX - radius;
-	obj->minZ = centerZ - radius;
-	obj->maxX = centerX + radius;
-	obj->maxZ = centerZ + radius;
+	obj->centerX = pos->x;
+	obj->centerZ = pos->z;
+	obj->minX = pos->x - radius;
+	obj->minZ = pos->z - radius;
+	obj->maxX = pos->x + radius;
+	obj->maxZ = pos->z + radius;
 
 	return obj->id;
 }

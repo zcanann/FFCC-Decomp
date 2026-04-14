@@ -2051,6 +2051,9 @@ MSL_C/PPCEABI/bare/H/alloc.c:
 	.bss        start:0x8032B510 end:0x8032B548
 	.sbss       start:0x8032F388 end:0x8032F390
 
+MSL_C/PPCEABI/bare/H/errno.c:
+	.sbss       start:0x8032F390 end:0x8032F398
+
 MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x801B2CC4 end:0x801B2FD4
 	.data       start:0x8021D158 end:0x8021D298

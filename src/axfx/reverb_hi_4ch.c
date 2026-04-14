@@ -97,11 +97,21 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   of growing to the target `.sdata2 0x38`, so MWCC still folded the `0.1f`
  *   bound into the earlier local pool instead of materializing the missing
  *   standalone float symbol
+ * - the stale invented `axfx_reverb_hi_dpl2_f32_*` / `i2f_magic` names are no
+ *   longer part of the live blocker on this branch: the target-side `.sdata2`
+ *   ownership is now reclaimed back to local `@112`..`@121`, which collapses
+ *   the remaining visible code seam to just the six instructions in the
+ *   damping normalization block
  * - on the current branch, removing `reverb_hi_4ch_value0_1` entirely and
  *   switching Modify back to a direct `0.1f` literal was also completely flat:
  *   `ReverbHIModifyDpl2` stayed at 99.59016% and `.sdata2` stayed at 88.88889%,
  *   so the remaining miss is not just the named-vs-literal `0.1f` choice in
  *   Modify either
+ * - a follow-up attempt to seed the local accumulator as `f32 damp = 0.05f;`
+ *   then `damp += 0.8f * rv->damping;` regressed badly: MWCC materialized a
+ *   fresh earlier local constant, renumbered the whole local `.sdata2` run
+ *   (`@111`..), shifted the nearby branch target, and dropped the function to
+ *   roughly 99.01%, so the target does not want that accumulator-first shape
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

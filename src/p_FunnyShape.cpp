@@ -78,9 +78,9 @@ extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short 
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 static const char s_funnyShapeSpinnerText[] = "|/-\\";
 char* gFunnyShapeSpinnerText = 0;
-bool gFunnyShapeSpinnerTextInitialized = false;
+s8 gFunnyShapeSpinnerTextInitialized = 0;
 int gFunnyShapeSpinnerFrame = 0;
-bool gFunnyShapeSpinnerFrameInitialized = false;
+s8 gFunnyShapeSpinnerFrameInitialized = 0;
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)

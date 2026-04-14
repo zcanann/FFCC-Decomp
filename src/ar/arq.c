@@ -75,6 +75,11 @@
  *   overlap in the live config, not the true end of the stale map-aligned
  *   chain; the next coherent re-split attempt should expect to carry that
  *   shifted ownership much farther forward before a real post-TRK seam appears
+ * - a bounded re-split probe that actually shifted that whole chain forward
+ *   through `TRK main` proved the next hard live seam is even later: DTK
+ *   rejected the moved `GBA.c` window because unchanged `main_gdev.c` still
+ *   owned `.sbss 0x8032F368..0x8032F370`, so the stale `+0x18` drift clearly
+ *   continues at least through `TRK main_gdev` on this branch
  */
 
 #ifdef DEBUG

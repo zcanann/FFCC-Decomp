@@ -39,10 +39,10 @@ const char* __PADVersion = s___PADVersion;
  *   objects, while the rebuilt source Pad.o still emits the corresponding
  *   state as local/static bindings (`recalibrated$400` in source)
  * - PAL and EN maps both agree GCCP01's Pad.c sbss run does not include
- *   `BarrelBits`; wrapping that declaration in `#ifndef VERSION_GCCP01` is
- *   keepable and removes the extra dead local slot from the rebuilt source Pad.o
- * - PAL also marks `CmdTypeAndStatus` as `UNUSED`; wrapping that declaration
- *   in `#ifndef VERSION_GCCP01` is likewise keepable and collapses rebuilt
+ *   `BarrelBits`; deleting that dead declaration outright is keepable and
+ *   removes the extra local slot from the rebuilt source Pad.o
+ * - PAL also marks `CmdTypeAndStatus` as `UNUSED`; deleting that dead
+ *   declaration outright is likewise keepable and collapses rebuilt
  *   source Pad.o back to the exact map / target sbss order through
  *   `SamplingCallback`, `recalibrated$400`, and `__PADSpec`
  * - promoting Pad.c after that cleanup still fails final linkage for a more
@@ -138,9 +138,6 @@ static u32 RecalibrateBits;
 static u32 WaitingBits;
 static u32 CheckingBits;
 static u32 PendingBits;
-#ifndef VERSION_GCCP01
-static u32 BarrelBits;
-#endif
 
 static u32 Type[4];
 static PADStatus Origin[4];
@@ -168,16 +165,10 @@ static u8 ClampU8(u8 var, u8 org);
 void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static BOOL OnReset2(BOOL f);
 void __PADDisableXPatch(void);
-#ifndef VERSION_GCCP01
-BOOL __PADDisableRumble(BOOL disable);
-#endif
 
 typedef void (*SPECCallback)(s32, PADStatus*, u32*);
 static SPECCallback MakeStatus = SPEC2_MakeStatus;
 
-#ifndef VERSION_GCCP01
-static u32 CmdTypeAndStatus;
-#endif
 static u32 CmdReadOrigin = 0x41000000;
 static u32 CmdCalibrate = 0x42000000;
 static u32 CmdProbeDevice[4];
@@ -921,32 +912,3 @@ BOOL __PADDisableRecalibration(BOOL disable) {
     return prev;
 }
 
-#ifndef VERSION_GCCP01
-BOOL __PADDisableRumble(BOOL disable) {
-    BOOL enabled;
-    BOOL prev;
-    u8 bits;
-
-    enabled = OSDisableInterrupts();
-    prev = (__gUnknown800030E3 & 0x20) ? TRUE : FALSE;
-    bits = __gUnknown800030E3 & (u8)~0x20;
-    __gUnknown800030E3 = bits;
-    if (disable) {
-        __gUnknown800030E3 = bits | 0x20;
-    }
-    OSRestoreInterrupts(enabled);
-    return prev;
-}
-
-BOOL PADIsBarrel(s32 chan) {
-    if (chan < 0 || chan >= 4) {
-        return FALSE;
-    }
-
-    if (BarrelBits & (PAD_CHAN0_BIT >> chan)) {
-        return TRUE;
-    }
-    
-    return FALSE;
-}
-#endif

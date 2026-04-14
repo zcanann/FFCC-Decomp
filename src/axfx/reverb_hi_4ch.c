@@ -97,6 +97,11 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   of growing to the target `.sdata2 0x38`, so MWCC still folded the `0.1f`
  *   bound into the earlier local pool instead of materializing the missing
  *   standalone float symbol
+ * - on the current branch, removing `reverb_hi_4ch_value0_1` entirely and
+ *   switching Modify back to a direct `0.1f` literal was also completely flat:
+ *   `ReverbHIModifyDpl2` stayed at 99.59016% and `.sdata2` stayed at 88.88889%,
+ *   so the remaining miss is not just the named-vs-literal `0.1f` choice in
+ *   Modify either
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

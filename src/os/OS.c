@@ -40,6 +40,11 @@
  *   Pad-side object layout regressed (`RecalibrateBits` moved to the tail of
  *   the source Pad.o `.sbss` run, after local `SamplingCallback` and
  *   `recalibrated$400`)
+ * - a fresh current-branch retest confirms the cluster boundary more sharply:
+ *   with `Pad.c + ai.c` promoted and only `RecalibrateBits` exported, the
+ *   build now gets all the way to a final checksum miss; adding `OS.c` on top
+ *   of that exact probe is the step that still drives `mwldeppc` past the
+ *   30s timeout and leaves a zero-byte `main.elf`
  * - that means the visible `OSInit` relocation identity is a real symptom,
  *   but fixing just that one symbol is not sufficient to make `OS.c`
  *   linkable; the broader pad/ai/os small-data binding seam is still the

@@ -77,6 +77,11 @@ const char* __PADVersion = s___PADVersion;
  *   key seam symbol: exporting just that one global is enough to let the
  *   current `ai.c + Pad.c` Matching pair reach a final checksum miss instead
  *   of a hard link error
+ * - a fresh current-branch retest tightened that result further: with
+ *   `Pad.c + ai.c` promoted, exporting only `RecalibrateBits` is still enough
+ *   to get the build all the way through link/dol and fail only at the final
+ *   checksum, so that single symbol really is the remaining producer-side
+ *   gate between the old undefined set and a plain hidden-link miss
  * - that same probe is still not keepable by itself, because adding `OS.c`
  *   back on top of the pair reproduces the old >30s linker hang; so the
  *   cluster is closer, but `OS.c` still has a remaining hidden-link problem

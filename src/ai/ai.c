@@ -39,6 +39,13 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   checksum, and objdiff reopened a small relocation-identity seam in
  *   AIRegisterDMACallback against target-side PAD imports rather than ai-local
  *   state
+ * - a keepable follow-up on this branch did fix the visible AI global tail:
+ *   declaring the three non-static OSTime globals as `buffer`, `max_wait`,
+ *   then `min_wait` makes MWCC lay them out in the target PAL-map order
+ *   `min_wait / max_wait / buffer` without affecting the rest of the unit
+ * - promoting ai.c after that tail fix still fails only at the final
+ *   main.dol checksum, so the remaining blocker is now even more clearly the
+ *   hidden pad/ai/os symbol-binding seam rather than the visible ai-local tail
  * - a fresh pad/Pad.c probe narrowed one of those hidden dependencies further:
  *   when Pad.c is promoted after removing the dead GCCP01 BarrelBits slot, the
  *   target ai.o still imports `recalibrated$401` specifically, while the
@@ -62,9 +69,9 @@ static BOOL __AI_init_flag;
 static BOOL __AID_Active;
 static OSTime bound_32KHz;
 static OSTime bound_48KHz;
-OSTime min_wait;
-OSTime max_wait;
 OSTime buffer;
+OSTime max_wait;
+OSTime min_wait;
 
 typedef struct {
     OSTime t_start;

@@ -365,7 +365,6 @@ void CFunnyShapePcs::calcViewer()
  */
 void CFunnyShapePcs::drawViewer()
 {
-    int frameSign;
     Mtx44 ortho;
     Mtx view;
     Vec eye = {0.0f, 0.0f, 0.0f};
@@ -408,10 +407,12 @@ void CFunnyShapePcs::drawViewer()
         gFunnyShapeSpinnerFrame = 0;
     }
 
-    frameSign = gFunnyShapeSpinnerFrame >> 31;
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
-    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt),
-                   gFunnyShapeSpinnerText[((gFunnyShapeSpinnerFrame >> 4) + frameSign) % 4 - frameSign]);
+    {
+        int frame = gFunnyShapeSpinnerFrame >> 4;
+        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt),
+                       gFunnyShapeSpinnerText[(frame + (frame >> 31)) % 4 - (frame >> 31)]);
+    }
 }
 
 /*

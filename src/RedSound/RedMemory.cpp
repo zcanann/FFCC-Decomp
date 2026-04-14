@@ -201,20 +201,19 @@ int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int alignedSize;
 	unsigned int moveCount;
-	int result;
 	unsigned int interrupts;
-	int iVar5;
-	int iVar6;
-	int iVar7;
-	int iVar8;
+	int result;
+	int rangeStart;
+	int currentAddress;
+	int gap;
+	int maxGap;
 	int* bestBlock;
 	int* blockPtr;
-	int* scanPtr;
 
-	if (size < 1 || m_AMemoryBank == (int*)0 || m_ADataBuffer == 0) {
+	if ((size < 1) || (m_AMemoryBank == 0) || (m_ADataBuffer == 0)) {
 		return 0;
 	}
-	if (m_AMemoryBank[0x7FF] >= 1) {
+	if (m_AMemoryBank[0x7FF] > 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
@@ -223,53 +222,57 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	interrupts = OSDisableInterrupts();
-	iVar6 = m_ADataBuffer + offset;
+	rangeStart = m_ADataBuffer + offset;
 	if (maxSize == 0) {
 		maxSize = m_ADataBufferSize;
 	}
-	maxSize = maxSize - offset;
-	alignedSize = size + 0x1FU & 0xFFFFFFE0;
-	iVar7 = -1;
-	bestBlock = (int*)0;
-	for (blockPtr = m_AMemoryBank; (blockPtr[1] != 0 && *blockPtr < iVar6); blockPtr = blockPtr + 2) {
+	maxSize -= offset;
+	alignedSize = (size + 0x1F) & 0xFFFFFFE0;
+	result = rangeStart;
+	maxGap = maxSize;
+	bestBlock = 0;
+
+	for (blockPtr = m_AMemoryBank; (blockPtr[1] != 0) && (*blockPtr < rangeStart); blockPtr += 2) {
 	}
-	iVar5 = maxSize;
-	result = iVar6;
-	iVar8 = iVar6;
-	scanPtr = blockPtr;
+
 	if (blockPtr[1] != 0) {
-		for (; scanPtr[1] != 0 && scanPtr < m_AMemoryBank + 0x800; scanPtr = scanPtr + 2) {
-			if (iVar8 < iVar6 + maxSize) {
-				if ((int)(iVar8 + alignedSize) <= *scanPtr) {
-					iVar7 = iVar8;
-					bestBlock = scanPtr;
-					if (*scanPtr - iVar8 < iVar5) {
-						iVar5 = *scanPtr - iVar8;
+		currentAddress = rangeStart;
+		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
+			if (currentAddress < rangeStart + maxSize) {
+				if ((int)(currentAddress + alignedSize) <= *blockPtr) {
+					gap = *blockPtr - currentAddress;
+					if (gap < maxGap) {
+						maxGap = gap;
 					}
+					result = currentAddress;
+					bestBlock = blockPtr;
 				}
 			} else {
-				scanPtr = m_AMemoryBank + 0x800;
+				blockPtr = m_AMemoryBank + 0x800;
 			}
-			iVar8 = *scanPtr + scanPtr[1];
+			currentAddress = blockPtr[0] + blockPtr[1];
 		}
-		result = iVar7;
-		blockPtr = bestBlock;
-		if (((scanPtr[1] == 0 && scanPtr < m_AMemoryBank + 0x800) &&
-		     (iVar7 = (iVar6 + maxSize) - iVar8, (int)alignedSize <= iVar7)) &&
-		    iVar7 < iVar5) {
-			result = iVar8;
-			blockPtr = scanPtr;
+
+		if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
+		    (gap = (rangeStart + maxSize) - currentAddress, (int)alignedSize <= gap) &&
+		    (gap < maxGap)) {
+			result = currentAddress;
+			bestBlock = blockPtr;
 		}
+	} else {
+		bestBlock = blockPtr;
 	}
-	if (blockPtr == (int*)0 || (unsigned int)(iVar6 + maxSize) < result + alignedSize) {
+
+	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + alignedSize)) {
 		OSRestoreInterrupts(interrupts);
 		return 0;
 	}
-	if (0 < blockPtr[1]) {
-		moveCount = (int)m_AMemoryBank + (0x2000 - (int)(blockPtr + 2));
-		iVar6 = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
-		if (0 < iVar6) {
-			memmove(blockPtr + 2, blockPtr, iVar6 * 8);
+
+	blockPtr = bestBlock;
+	if (blockPtr[1] > 0) {
+		moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+		if ((int)moveCount > 0) {
+			memmove(blockPtr + 2, blockPtr, moveCount * 8);
 		}
 	}
 	*blockPtr = result;

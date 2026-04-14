@@ -27,6 +27,10 @@
  *   `__ieee754_sqrt`), but simply changing the source call to `sqrt(x)` was
  *   not the fix: the rebuilt object still relocated to `__ieee754_sqrt` via
  *   the inline wrapper and regressed overall unit match badly
+ * - a follow-up declaration-only probe also held completely flat: adding a
+ *   plain local `extern double sqrt(double);` after the MSL headers still left
+ *   rebuilt `e_pow.o` calling `__ieee754_sqrt`, so the remaining relocation
+ *   identity mismatch is deeper than ordinary prototype visibility
  */
 /*
  * ====================================================

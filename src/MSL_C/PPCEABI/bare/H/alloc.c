@@ -163,12 +163,22 @@ static int initialized = 0;
  *   `start = (FixSubBlock*)((char*)block + 0x14)` base, and a single advancing
  *   typed `p` cursor loop held completely flat, so that exact setup/order/
  *   cursor combination is not the remaining lever either
+ * - another follow-up that removed the separate `msize` / `sub_size` locals,
+ *   front-loaded `p = (FixSubBlock*)((char*)b + 0x14)`, and computed
+ *   `num_subblocks` directly from `__msize_inline(block)` and `fix_size + 4`
+ *   also held completely flat, so that more target-looking decode/order
+ *   combination is not enough either
  * - a fresh late-tail `.sbss` audit also ruled out one tempting map-only
  *   cleanup: although the old PAL/EN maps only expose local `init$193` in
  *   alloc.c, the current extracted GCCP01 target `alloc.o` still carries a
  *   separate local `initialized` alongside `init$57` and `protopool$56`; so
  *   deleting the file-scope `initialized` regresses the live object on this
  *   branch and is not a keepable reclaim
+ * - a very small Block_subBlock probe that only swapped the two obvious stores
+ *   to `start` (`start->size = requested_size;` before the tagged
+ *   `start->block = ...`) was actively wrong: it dropped
+ *   `allocate_from_fixed_pools` from `95.11%` to `73.65%` through shared code
+ *   motion, so the target definitely does not want that assignment order
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

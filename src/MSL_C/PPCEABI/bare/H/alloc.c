@@ -163,6 +163,12 @@ static int initialized = 0;
  *   `start = (FixSubBlock*)((char*)block + 0x14)` base, and a single advancing
  *   typed `p` cursor loop held completely flat, so that exact setup/order/
  *   cursor combination is not the remaining lever either
+ * - a fresh late-tail `.sbss` audit also ruled out one tempting map-only
+ *   cleanup: although the old PAL/EN maps only expose local `init$193` in
+ *   alloc.c, the current extracted GCCP01 target `alloc.o` still carries a
+ *   separate local `initialized` alongside `init$57` and `protopool$56`; so
+ *   deleting the file-scope `initialized` regresses the live object on this
+ *   branch and is not a keepable reclaim
  *
  * Why this matters:
  * - further work here should stay surgical and preserve the current high-level

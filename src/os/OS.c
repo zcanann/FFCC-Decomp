@@ -27,6 +27,12 @@
  *   `RecalibrateBits` export in Pad.c, the build gets past the old undefineds
  *   and then `os/OS.c` as Matching is the step that still drives mwldeppc past
  *   the 30s timeout
+ * - a direct disassembly read of the rebuilt source `OS.o` confirmed those
+ *   three `OSInit` accesses really do bind to `__PADSpec` in the object
+ *   (`stw/lwz/stw __PADSpec@sda21` around the `0x30E8/0x30E9` boot-memory
+ *   writes), so the target-side `RecalibrateBits` binding is almost certainly
+ *   a seam/ownership artifact rather than something the current C body is
+ *   spelling incorrectly
  */
 
 #define NOP 0x60000000

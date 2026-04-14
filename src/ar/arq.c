@@ -58,10 +58,11 @@
  *   early AX chain made it much farther before failing: `arq -> AXAlloc ->
  *   AXAux -> AXCL -> AXOut -> AXSPB -> AXVPB` all lined up cleanly against the
  *   PAL-map local ordering and the extracted object symbols
- * - the first hard conflict now shows up at `AXProf`: this repo still has a
- *   live `.sbss 0x8032F2A0..0x8032F2B0` split there, which overlaps the
- *   PAL-backed `AXSPB 0x8032F280..0x8032F2A4` / `AXVPB 0x8032F2A8..0x8032F2B4`
- *   windows before the map's later `AXProf 0x8032F2B8..0x8032F2C8`
+ * - re-running that exact bounded re-split on the current branch still fails
+ *   immediately in DTK at the same place: once `AXVPB` is moved to the
+ *   object-backed `.sbss 0x8032F2A8..0x8032F2B4` window, the unchanged live
+ *   `AXProf` split at `.sbss 0x8032F2A0..0x8032F2B0` overlaps it before any
+ *   compile step happens
  * - that makes `AXProf` the current earliest trustworthy cutoff for the old
  *   PAL `.sbss` guidance on this branch: the ARQ/AX tail before it still looks
  *   stale, but the later ownership chain has already diverged by that point

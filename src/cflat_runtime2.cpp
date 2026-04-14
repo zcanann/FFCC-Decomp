@@ -638,7 +638,7 @@ extern "C" void __ct__9CGBaseObjFv(CGBaseObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	self[0x38] &= 0xEF;
+	self[0x38] = self[0x38] & 0xEF;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 }
 

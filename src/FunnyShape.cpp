@@ -19,7 +19,7 @@ extern GXColor DAT_8032fd60;
 static const double DOUBLE_8032fd88 = 4503601774854144.0;
 static const float FLOAT_8032fd64 = 1000.0f;
 static const float FLOAT_8032fd68 = -1000.0f;
-static const float FLOAT_8032fd6c = 0.0f;
+extern float FLOAT_8032fd6c;
 static const float FLOAT_8032fd70 = 2.0f;
 extern float FLOAT_8032fd74;
 static const float FLOAT_8032fd78 = 4096.0f;
@@ -582,8 +582,10 @@ void CFunnyShape::RenderShape()
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     GXColor color = DAT_8032fd60;
-    GXSetChanAmbColor(GX_COLOR0, color);
-    GXSetChanMatColor(GX_COLOR0, color);
+    GXColor matColor = color;
+    GXColor chanColor = color;
+    GXSetChanAmbColor(GX_COLOR0, chanColor);
+    GXSetChanMatColor(GX_COLOR0, matColor);
 
     Vec2d offsetCopy;
     Vec2d offset;
@@ -592,7 +594,7 @@ void CFunnyShape::RenderShape()
     offset.x = offsetCopy.x;
     offset.y = offsetCopy.y;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010));
-    RenderShape(shape, offset, 0.0f);
+    RenderShape(shape, offset, FLOAT_8032fd6c);
 }
 
 /*

@@ -19,6 +19,14 @@
  * - that makes this look like a shared hidden-link / metadata seam in the mtx
  *   library cluster rather than a remaining visible source mismatch in this
  *   file's body
+ * - a fresh object-extent audit explains that seam more concretely: rebuilt
+ *   source `mtx44.o` is `0x1600` bytes of `.text` plus a local `mtxUnit`
+ *   `.data` blob and `0x2C` of `.sdata2`, while the extracted target
+ *   `mtx44.o` is only `0x06D4` bytes of `.text`
+ * - that means `mtx44.c -> Matching` is not blocked by the visible matched
+ *   functions in this file; it is blocked because GCCP01's final linked object
+ *   only keeps the smaller subset through `C_MTX44Inverse`, while current
+ *   source still emits the full SDK object
  */
 
 static f32 mtxUnit[] = {0.0f, 1.0f, 0.5f, 3.0f};

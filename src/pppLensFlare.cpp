@@ -180,10 +180,10 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			int scaledAlpha = (u8)work->m_alpha * (0xFF / sampleCount);
 
 			work->m_alpha = (u8)scaledAlpha;
-			if ((int)(u8)scaledAlpha <= 0xFF) {
-				work->m_alpha = (u8)scaledAlpha;
-			} else {
+			if (0xFF < (int)(u8)scaledAlpha) {
 				work->m_alpha = 0xff;
+			} else {
+				work->m_alpha = (u8)scaledAlpha;
 			}
 		}
 

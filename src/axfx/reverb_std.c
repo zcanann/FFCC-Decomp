@@ -18,11 +18,23 @@
  * - `ReverbSTDCreate` and the `.sdata2` run are now 100% in objdiff, so the
  *   remaining blocker is no longer the visible constant pool or the main setup
  *   path
- * - current visible text miss is down to a tiny non-create tail seam elsewhere
- *   in the unit, and the promotion result shows there is still hidden
- *   object/linkage metadata work beyond that
- * - so the next pass here should treat `reverb_std.c` as another post-seam
- *   hidden-link target, not as a broad source rewrite candidate
+ * - PAL map also shows four tiny helpers here as `UNUSED`: `DLsetdelay`,
+ *   `DLcreate`, `DLdelete`, and `ReverbSTDCallback`
+ * - a direct source rewrite that deleted those helper bodies and inlined their
+ *   logic proved the idea is only half-right: rebuilt `reverb_std.o` shrank
+ *   past target from `0x0D34` all the way down to `0x0B4C`, while target is
+ *   `0x0BFC`
+ * - that means the remaining extent gap is not solved by simply deleting the
+ *   helper code; GCCP01 still wants some of that logic present in the live
+ *   object shape even though those helper symbols do not survive as named
+ *   functions
+ * - a reference-project follow-up also ruled out the obvious shared Dolphin
+ *   failure-handling path: restoring the common `DLcreate(...) == 0` /
+ *   `ReverbSTDFree(rv); return 0;` checks from Strikers / Twilight Princess
+ *   regressed overall SDK match while leaving raw source `reverb_std.o`
+ *   section sizes unchanged at `.text 0x0D34 / .sdata2 0x28`
+ * - so the next pass here should treat `reverb_std.c` as a helper-emission
+ *   shaping problem, not as a broad source rewrite candidate
  */
 
 extern f32 powf(f32 x, f32 y);

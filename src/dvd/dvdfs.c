@@ -11,63 +11,11 @@ typedef struct FSTEntry {
 
 static OSBootInfo* BootInfo;
 static FSTEntry* FstStart;
-char* FstStringStart;
+static char* FstStringStart;
 static u32 MaxEntryNum;
-static u32 currentDirectory;
-u32 __DVDLongFileNameFlag;
+static u32 currentDirectory = 0;
+u32 __DVDLongFileNameFlag = 0;
 OSThreadQueue __DVDThreadQueue;
-
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - dvdfs.c is currently a hidden-link blocker rather than a visible source
- *   mismatch
- *
- * Most useful verified result so far:
- * - current objdiff on this branch shows the unit at 100% code/data again
- * - flipping configure.py from NonMatching to Matching still breaks final
- *   main.dol checksum, so this is not a safe promotion yet
- * - that means the remaining issue is object/linkage-level shape outside the
- *   visible function-body diffs we have been chasing
- * - a later cross-check against the shared Dolphin reference sources found
- *   that `__DVDThreadQueue` / `__DVDLongFileNameFlag` are authored in dvdfs.c,
- *   not dvd.c; moving those definitions here and extending the dvdfs `.sbss`
- *   window through `0x8032F080` is now landed on this branch
- * - the PAL/EN maps also call `0x8032F070` local `currentDirectory`, so this
- *   unit now spells that slot as a local `currentDirectory` instead of the
- *   older exported-style `sDvdfsCurrentDirEntry`
- * - the raw compiled dvdfs.o now also confirms that symbol shape directly:
- *   `BootInfo` / `FstStart` / `MaxEntryNum` / `currentDirectory` are local,
- *   while `FstStringStart` / `__DVDLongFileNameFlag` / `__DVDThreadQueue`
- *   stay global, matching the map ownership pattern
- * - a direct source-shape pass toward the target asm was not keepable:
- *   replacing the literal string uses with named statics, inlining the
- *   `isSame` / `myStrncpy` / `DVDConvertEntrynumToPath` helpers into their
- *   callers, and giving `entryToPath` / `cbForReadAsync` external linkage
- *   regressed SDK matched code and still left the compiled source object with
- *   extra local helper symbols, so that target-asm shape is not recovered by
- *   a naive C rewrite alone
- * - a later symbol-table comparison made that more specific: target dvdfs.o
- *   does not carry separate `isSame`, `myStrncpy`, or
- *   `DVDConvertEntrynumToPath` symbols at all, while the rebuilt source object
- *   still does
- * - removing exactly those three helper symbols with a focused inline rewrite
- *   shrank source `.text` from `0x9CC` to `0x7D8` and moved function starts
- *   toward target (`DVDConvertPathToEntrynum 0xD8 -> 0x38`,
- *   `DVDFastOpen 0x3CC -> 0x314`, `DVDGetCurrentDir 0x818 -> 0x5A8`), but the
- *   actual body matches regressed, so helper elimination alone is still not
- *   the real fix
- * - even with both of those ownership fixes in place, promoting dvdfs.c to
- *   Matching still breaks final checksum, so the hidden-link blocker is
- *   narrower now but not resolved yet
- *
- * Why this matters:
- * - more source churn in entryToPath / DVDGetCurrentDir is unlikely to help on
- *   its own until the hidden-link cause is identified
- * - future work here should focus on split ownership / object metadata /
- *   neighboring attribution, not just local C cleanup
- */
 
 // prototypes
 static BOOL isSame(const char* path, const char* string);

@@ -21,6 +21,14 @@
  * - that means the remaining seam is not just "make DefaultThread the first
  *   local bss object"; there is still a deeper source or type-layout mismatch
  *   in this init path
+ * - a broader PAL-map trim probe was also flat: deleting every map-`UNUSED`
+ *   public API body in this file plus `OSCheckActiveThreads`, and pruning the
+ *   matching declarations from `OSThread.h`, left rebuilt `OSThread.o`
+ *   completely unchanged
+ * - shared Dolphin `OSThread.c` copies in `reference_projects/*` still ship
+ *   those APIs in source too, so the current blocker is not "dead PAL-only
+ *   functions are bloating the object"; it remains inside the live emitted
+ *   subset around `__OSThreadInit` and its surviving helpers
  */
 
 #define ENQUEUE_THREAD(thread, queue, link)       \

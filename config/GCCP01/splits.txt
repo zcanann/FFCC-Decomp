@@ -1514,7 +1514,7 @@ si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
 	.data       start:0x802172C0 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
-	.sdata      start:0x8032EAC0 end:0x8032EAD0
+	.sdata      start:0x8032EAC0 end:0x8032EAC8
 	.sbss       start:0x8032F000 end:0x8032F00C
 
 si/SISamplingRate.c:
@@ -1524,6 +1524,8 @@ si/SISamplingRate.c:
 
 mtx/mtx.c:
 	.text       start:0x801859B8 end:0x801863F4
+	.sdata      start:0x8032EAC8 end:0x8032EAD0
+	.sdata2     start:0x803336E0 end:0x803336FC
 
 mtx/mtxvec.c:
 	.text       start:0x801863F4 end:0x80186528
@@ -1684,7 +1686,7 @@ axfx/axfx.c:
 axfx/reverb_hi_4ch.c:
 	.text       start:0x80196A20 end:0x80197958
 	.data       start:0x8021BF90 end:0x8021BFB8
-	.sdata2     start:0x803337E0 end:0x80333818
+	.sdata2     start:0x803337E0 end:0x80333814
 
 mix/mix.c:
 	.text       start:0x80197958 end:0x80197978

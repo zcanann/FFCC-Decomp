@@ -39,6 +39,11 @@
  *   `__DVDLongFileNameFlag` seam or the stale dvd.c tail locals themselves;
  *   future work should bias toward dvdfs.c's hidden-link metadata before
  *   reopening dvd.c again
+ * - fresh retest after the keepable `dvdfs.c -> Matching` landing confirms
+ *   dvd.c was not just waiting on that neighbor after all: promoting dvd/dvd.c
+ *   alone still links and then fails the final main.dol checksum immediately
+ * - that moves dvd.c back into the true checksum-only hidden-link bucket, even
+ *   on the corrected dvdfs baseline
  */
 
 // externs

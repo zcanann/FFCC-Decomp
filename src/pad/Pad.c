@@ -39,10 +39,10 @@ const char* __PADVersion = s___PADVersion;
  *   objects, while the rebuilt source Pad.o still emits the corresponding
  *   state as local/static bindings (`recalibrated$400` in source)
  * - PAL and EN maps both agree GCCP01's Pad.c sbss run does not include
- *   `BarrelBits`; wrapping that declaration in `#ifndef VERSION_GCCP01` is
- *   keepable and removes the extra dead local slot from the rebuilt source Pad.o
- * - PAL also marks `CmdTypeAndStatus` as `UNUSED`; wrapping that declaration
- *   in `#ifndef VERSION_GCCP01` is likewise keepable and collapses rebuilt
+ *   `BarrelBits`; deleting that dead declaration outright is keepable and
+ *   removes the extra local slot from the rebuilt source Pad.o
+ * - PAL also marks `CmdTypeAndStatus` as `UNUSED`; deleting that dead
+ *   declaration outright is likewise keepable and collapses rebuilt
  *   source Pad.o back to the exact map / target sbss order through
  *   `SamplingCallback`, `recalibrated$400`, and `__PADSpec`
  * - promoting Pad.c after that cleanup still fails final linkage for a more
@@ -77,6 +77,11 @@ const char* __PADVersion = s___PADVersion;
  *   key seam symbol: exporting just that one global is enough to let the
  *   current `ai.c + Pad.c` Matching pair reach a final checksum miss instead
  *   of a hard link error
+ * - a fresh current-branch retest tightened that result further: with
+ *   `Pad.c + ai.c` promoted, exporting only `RecalibrateBits` is still enough
+ *   to get the build all the way through link/dol and fail only at the final
+ *   checksum, so that single symbol really is the remaining producer-side
+ *   gate between the old undefined set and a plain hidden-link miss
  * - that same probe is still not keepable by itself, because adding `OS.c`
  *   back on top of the pair reproduces the old >30s linker hang; so the
  *   cluster is closer, but `OS.c` still has a remaining hidden-link problem
@@ -89,6 +94,16 @@ const char* __PADVersion = s___PADVersion;
  *   `SamplingCallback` does resolve the undefined set, but MWCC then lays the
  *   exported sbss symbols backward from target and puts `recalibrated$400` at
  *   the front of the run instead of after `SamplingCallback`
+ * - a narrower follow-up on the current branch tested the even simpler source
+ *   shape directly: drop `static` from `ResettingChan` / `XPatchBits` /
+ *   `AnalogMode`, the shared pad-state globals, `SamplingCallback`, and the
+ *   helper functions target Pad.o already exports (`UpdateOrigin`,
+ *   `PADOriginCallback`, `PADOriginUpdateCallback`, `PADProbeCallback`,
+ *   `PADTypeAndStatusCallback`, `PADReceiveCheckCallback`, `OnReset2`, and
+ *   `SamplingHandler`)
+ * - MWCC 1.2.5n still emitted all of those symbols as local bindings in the
+ *   rebuilt source Pad.o, so plain C linkage keywords alone are not the lever
+ *   that makes target Pad.o export them
  * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
  *   declarations here, so there is no simple file-scope alias escape hatch for
  *   that last symbol identity
@@ -96,6 +111,15 @@ const char* __PADVersion = s___PADVersion;
  *   from `Initialized` through `__PADSpec`, plus the AI tail
  *   `min_wait / max_wait / buffer`, already matches the expected ownership and
  *   ordering; the remaining pad/ai/os seam is not just stale symbols.txt names
+ * - a raw current-branch object read sharpened the seam again: the rebuilt
+ *   target-side relocations in both `OS.o` and `ai.o` are shifted a uniform
+ *   `0x18` earlier against the live source objects, so those consumers are now
+ *   resolving obvious ai/pad locals onto the preceding pad tail
+ *   (`RecalibrateBits` / `WaitingBits` / `CheckingBits` / `PendingBits` /
+ *   `SamplingCallback` / `recalibrated$400` / `__PADSpec`) as a block rather
+ *   than disagreeing at one isolated symbol
+ * - that makes this cluster look more like a coherent extracted small-data
+ *   identity drift than a one-off bad declaration inside Pad.c
  */
 
 #define PAD_ALL                                                                                                        \
@@ -128,9 +152,6 @@ static u32 RecalibrateBits;
 static u32 WaitingBits;
 static u32 CheckingBits;
 static u32 PendingBits;
-#ifndef VERSION_GCCP01
-static u32 BarrelBits;
-#endif
 
 static u32 Type[4];
 static PADStatus Origin[4];
@@ -158,16 +179,10 @@ static u8 ClampU8(u8 var, u8 org);
 void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static BOOL OnReset2(BOOL f);
 void __PADDisableXPatch(void);
-#ifndef VERSION_GCCP01
-BOOL __PADDisableRumble(BOOL disable);
-#endif
 
 typedef void (*SPECCallback)(s32, PADStatus*, u32*);
 static SPECCallback MakeStatus = SPEC2_MakeStatus;
 
-#ifndef VERSION_GCCP01
-static u32 CmdTypeAndStatus;
-#endif
 static u32 CmdReadOrigin = 0x41000000;
 static u32 CmdCalibrate = 0x42000000;
 static u32 CmdProbeDevice[4];
@@ -911,32 +926,3 @@ BOOL __PADDisableRecalibration(BOOL disable) {
     return prev;
 }
 
-#ifndef VERSION_GCCP01
-BOOL __PADDisableRumble(BOOL disable) {
-    BOOL enabled;
-    BOOL prev;
-    u8 bits;
-
-    enabled = OSDisableInterrupts();
-    prev = (__gUnknown800030E3 & 0x20) ? TRUE : FALSE;
-    bits = __gUnknown800030E3 & (u8)~0x20;
-    __gUnknown800030E3 = bits;
-    if (disable) {
-        __gUnknown800030E3 = bits | 0x20;
-    }
-    OSRestoreInterrupts(enabled);
-    return prev;
-}
-
-BOOL PADIsBarrel(s32 chan) {
-    if (chan < 0 || chan >= 4) {
-        return FALSE;
-    }
-
-    if (BarrelBits & (PAD_CHAN0_BIT >> chan)) {
-        return TRUE;
-    }
-    
-    return FALSE;
-}
-#endif

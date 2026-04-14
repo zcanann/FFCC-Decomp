@@ -78,80 +78,6 @@ Mtx ppvWorldMatrixWood;
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
 
-struct PppMngStPartView {
-    void* m_pppResSet;
-    int m_partIndex;
-    Vec m_position;
-    int m_baseTime;
-    pppIVECTOR4 m_rotation;
-    int m_rotationSpeed;
-    int m_lifeEnd;
-    Vec m_scale;
-    int m_currentFrame;
-    int m_previousFrame;
-    int m_numControlPrograms;
-    float m_scaleFactor;
-    float m_ownerScale;
-    float m_userFloat0;
-    float m_userFloat1;
-    Vec m_savedPosition;
-    Vec m_previousPosition;
-    Vec m_paramVec0;
-    short m_kind;
-    short m_nodeIndex;
-    pppFMATRIX m_matrix;
-    unsigned char m_envColorR;
-    unsigned char m_envColorG;
-    unsigned char m_envColorB;
-    unsigned char m_envColorA;
-    int m_prioTime;
-    int m_previousFrame2;
-    int m_numPrograms;
-    int m_reservedB8;
-    unsigned int m_objHitMask;
-    unsigned int m_cylinderAttribute;
-    unsigned char m_pppPObjLinkHead[8];
-    void* m_pDataValList;
-    void* m_unknownD0;
-    void* m_unknownD4;
-    void* m_owner;
-    void* m_lookTarget;
-    CChara::CNode* m_bindNode;
-    unsigned char m_endRequested;
-    unsigned char m_stopRequested;
-    unsigned char m_isFinished;
-    unsigned char m_matrixMode;
-    unsigned char m_hitBgFlag;
-    unsigned char m_slotVisible;
-    unsigned char m_ownerFacing;
-    unsigned char m_drawVariant;
-    unsigned char m_rotationOrder;
-    unsigned char m_drawPass;
-    signed char m_drawSubType;
-    unsigned char m_useOwnerScaleSign;
-    unsigned char m_ownerFlagsInitialized;
-    unsigned char m_nodeScaleInitialized;
-    unsigned char m_fieldF2;
-    unsigned char m_padF3[2];
-    unsigned char m_mapTexLoaded;
-    unsigned char m_hasMapRef;
-    unsigned char m_fpBillboard;
-    unsigned char m_prio;
-    short m_frameCounter;
-    unsigned char m_padFB[3];
-    unsigned int m_paramA;
-    unsigned int m_paramB;
-    float m_cullRadiusSq;
-    float m_cullRadius;
-    float m_cullYOffset;
-    float m_sortDepth;
-    unsigned short m_field118;
-    short m_mapObjIndex;
-    PPPSEST m_soundEffectData;
-    PPPIFPARAM m_hitParams;
-    short m_hitObjectIds[0x10];
-};
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
@@ -1262,7 +1188,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
  */
 void pppSetMatrix(_pppMngSt* pppMngSt)
 {
-	PppMngStPartView* pppMngStView = reinterpret_cast<PppMngStPartView*>(pppMngSt);
+	_pppMngSt* pppMngStView = pppMngSt;
 	// 1) Build local rotation matrix into pppMngStPtr->m_matrix
 	switch (pppMngStView->m_rotationOrder) {
 	case 0:
@@ -1550,29 +1476,9 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
 				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngStView->m_bindNode);
 
-			Vec col0;
-			Vec col1;
-			Vec col2;
-
-			col0.x = nodeMtx[0][0];
-			col0.y = nodeMtx[1][0];
-			col0.z = nodeMtx[2][0];
-
-			col1.x = nodeMtx[0][1];
-			col1.y = nodeMtx[1][1];
-			col1.z = nodeMtx[2][1];
-
-			col2.x = nodeMtx[0][2];
-			col2.y = nodeMtx[1][2];
-			col2.z = nodeMtx[2][2];
-
-			PSVECNormalize(&col0, &col0);
-			PSVECNormalize(&col1, &col1);
-			PSVECNormalize(&col2, &col2);
-
-			nodeMtx[0][0] = col0.x; nodeMtx[1][0] = col0.y; nodeMtx[2][0] = col0.z;
-			nodeMtx[0][1] = col1.x; nodeMtx[1][1] = col1.y; nodeMtx[2][1] = col1.z;
-			nodeMtx[0][2] = col2.x; nodeMtx[1][2] = col2.y; nodeMtx[2][2] = col2.z;
+			PSVECNormalize(reinterpret_cast<Vec*>(&nodeMtx[0][0]), reinterpret_cast<Vec*>(&nodeMtx[0][0]));
+			PSVECNormalize(reinterpret_cast<Vec*>(&nodeMtx[1][0]), reinterpret_cast<Vec*>(&nodeMtx[1][0]));
+			PSVECNormalize(reinterpret_cast<Vec*>(&nodeMtx[2][0]), reinterpret_cast<Vec*>(&nodeMtx[2][0]));
 
 			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
 
@@ -1668,7 +1574,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
  */
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	PppMngStPartView* pppMngStView = reinterpret_cast<PppMngStPartView*>(pppMngSt);
+	_pppMngSt* pppMngStView = pppMngSt;
 	Vec local_a8;
 	Vec local_9c;
 	Vec local_90;

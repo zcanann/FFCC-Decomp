@@ -166,28 +166,35 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
-    int handle = (int)GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
-    _GXColor white;
+    GXColor white;
     unsigned int width;
     unsigned int height;
+    float widthFloat;
+    float heightFloat;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
     width = (unsigned int)FLOAT_80331050;
     height = (unsigned int)FLOAT_80331054;
+    widthFloat = (float)(int)width;
+    heightFloat = (float)(int)height;
 
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
-    *reinterpret_cast<u32*>(&white) = 0xFFFFFFFF;
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
     posA.z = FLOAT_80331030;
-    posB.x = (float)width;
-    posB.y = (float)height;
+    posB.x = widthFloat;
+    posB.y = heightFloat;
     posB.z = FLOAT_80331030;
 
     gUtil.BeginQuadEnv();
@@ -200,7 +207,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     rawModel->m_afterDrawModelCallback = 0;
-    Draw__Q29CCharaPcs7CHandleFi((void*)handle, 0);
+    Draw__Q29CCharaPcs7CHandleFi(handle, 0);
     rawModel->m_beforeMeshLockCallback = 0;
     rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
 

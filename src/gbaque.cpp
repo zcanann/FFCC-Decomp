@@ -41,6 +41,10 @@ extern "C" int AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
+
+extern CMenuPcs MenuPcs;
 
 struct GbaFlatDataTableEntryView
 {
@@ -72,6 +76,16 @@ struct GbaQueueFlagView
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
+}
+
+static inline unsigned short SwapU16(unsigned short value)
+{
+	return static_cast<unsigned short>((value << 8) | (value >> 8));
+}
+
+static inline unsigned int SwapU32(unsigned int value)
+{
+	return (value << 24) | ((value >> 8 & 0xFF) << 16) | ((value >> 16 & 0xFF) << 8) | (value >> 24);
 }
 
 static char s_gbaque_cpp[] = "gbaque.cpp";
@@ -131,8 +145,8 @@ void GbaQueue::Init()
 	memset(obj + 0x2A74, 0, 0x80);
 	memset(obj + 0x2B00, 0, 0x188);
 	memset(obj + 0x2C8E, 0, 8);
-	memset(cmakeInfo, 0, 0x80);
-	memset(obj + 0x2D40, 0xFF, 0x10);
+	memset(obj + 0x2CB2, 0, 0x80);
+	memset(obj + 0x2D44, 0xFF, 0x10);
 
 	i = 0;
 	osSemaphore = this;
@@ -144,29 +158,29 @@ void GbaQueue::Init()
 
 	*reinterpret_cast<unsigned int*>(obj + 0x448) = 0xFF;
 	*reinterpret_cast<unsigned int*>(obj + 0x444) = 0xFF;
-	*reinterpret_cast<unsigned int*>(obj + 0x44C) = 0;
+	obj[0x44C] = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x44E) = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x450) = 0;
 
-	obj[0x2C94] = 0;
+	obj[0x2AFC] = 0;
 	obj[0x2C88] = 0;
 	obj[0x2C89] = 0;
 	obj[0x2D38] = 0;
 	obj[0x2D39] = 0;
-	obj[0x2CCA] = 0;
-	obj[0x2CCB] = 0;
-	obj[0x2CCC] = 0;
-	obj[0x2CCD] = 0;
-	obj[0x2CDE] = 0;
-	obj[0x2CE8] = 0;
-	obj[0x2CE9] = 0;
-	obj[0x2CFA] = 0;
-	obj[0x2D04] = 0;
-	obj[0x2D14] = 0;
+	obj[0x2D3A] = 0;
+	obj[0x2D3B] = 0;
+	obj[0x2D3C] = 0;
+	obj[0x2D3D] = 0;
+	obj[0x2D37] = 0;
+	obj[0x2CB1] = 0;
+	obj[0x2CB0] = 0;
+	obj[0x2D36] = 0;
+	obj[0x2D3E] = 0;
+	obj[0x2D3F] = 0;
 	obj[0x2AF4] = 0;
-	obj[0x2D42] = 0;
+	obj[0x2D40] = 0;
 	obj[0x2D41] = 0xF;
-	obj[0x2D43] = 0;
+	obj[0x2D42] = 0;
 	obj[0x2D54] = 0;
 	obj[0x2D55] = 0;
 	obj[0x2D56] = 0;
@@ -184,7 +198,7 @@ void GbaQueue::Init()
 	obj[0x2C96] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2C9C) = 0;
 	obj[0x2CAC] = 0;
-	obj[0x2D30] = 0;
+	obj[0x2C8A] = 0;
 	obj[0x2D32] = 1;
 	obj[0x2C97] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA0) = 0;
@@ -1664,12 +1678,83 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE56C
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetTreasurePos(int, unsigned int*, int*)
+void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 {
-	// TODO
+	char localMapItems[0x140];
+	char* obj;
+	char* localEntry;
+	char* prevEntry;
+	unsigned char* outPtr;
+	short baseX;
+	short baseZ;
+	int count;
+	int i;
+
+	obj = reinterpret_cast<char*>(this);
+
+	if (obj[0x2D56] != 0) {
+		channel = 0;
+	}
+
+	OSWaitSemaphore(accessSemaphores + channel);
+
+	baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48A);
+	baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
+	memcpy(localMapItems, obj + 0x2434, sizeof(localMapItems));
+
+	localEntry = localMapItems;
+	for (i = 0; i < static_cast<unsigned char>(obj[0x2AF4]); i++) {
+		int localX = static_cast<int>(*reinterpret_cast<short*>(localEntry + 8)) - static_cast<int>(baseX);
+		int localZ = static_cast<int>(*reinterpret_cast<short*>(localEntry + 10)) - static_cast<int>(baseZ);
+
+		*reinterpret_cast<short*>(localEntry + 8) = static_cast<short>(localX);
+		*reinterpret_cast<short*>(localEntry + 10) = static_cast<short>(localZ);
+
+		if ((localX < 0 ? -localX : localX) < 0x50 && (localZ < 0 ? -localZ : localZ) < 0x40) {
+			localEntry[0] = 1;
+		} else {
+			localEntry[8] = -1;
+			localEntry[9] = -1;
+			localEntry[10] = -1;
+			localEntry[11] = -1;
+			localEntry[0] = 0;
+		}
+
+		if (localEntry[2] == 0 || obj[channel + 0x2D32] != 3) {
+			localEntry[0] = 0;
+		}
+
+		localEntry += 0x14;
+	}
+
+	count = 0;
+	localEntry = localMapItems;
+	prevEntry = obj + channel * 0x140 + 0x2574;
+	outPtr = reinterpret_cast<unsigned char*>(outData);
+	for (i = 0; i < static_cast<unsigned char>(obj[0x2AF4]); i++) {
+		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
+			count++;
+			outPtr[0] = 0x21;
+			outPtr[1] = static_cast<unsigned char>(i + 0x40) | (static_cast<unsigned char>(localEntry[0]) << 7);
+			outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
+			outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
+			outPtr += 4;
+		}
+
+		localEntry += 0x14;
+		prevEntry += 0x14;
+	}
+
+	*outCount = count;
+	memcpy(obj + channel * 0x140 + 0x2574, localMapItems, sizeof(localMapItems));
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -1722,12 +1807,49 @@ void GbaQueue::GetCaravanName(char* outName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CDFC0
+ * PAL Size: 832b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetItemAll(int, unsigned char*)
+int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char localPlayerData[0xDC];
+	unsigned short itemList[0x40];
+	int i;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	for (i = 0; i < 0x40; i++) {
+		itemList[i] = SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0x3A + i * 2));
+	}
+	memcpy(outData, itemList, sizeof(itemList));
+
+	*reinterpret_cast<unsigned int*>(outData + 0x80) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x24));
+	*reinterpret_cast<unsigned int*>(outData + 0x84) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x28));
+	*reinterpret_cast<unsigned int*>(outData + 0x88) = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x2C));
+
+	for (i = 0; i < 4; i++) {
+		*reinterpret_cast<unsigned short*>(outData + 0x8C + i * 2) =
+			SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xBA + i * 2));
+	}
+
+	outData[0x94] = localPlayerData[0xD7];
+	outData[0x95] = localPlayerData[0xD8];
+	outData[0x96] = localPlayerData[0xD9];
+	outData[0x97] = localPlayerData[0xDA];
+
+	for (i = 0; i < 8; i++) {
+		*reinterpret_cast<unsigned short*>(outData + 0x98 + i * 2) =
+			SwapU16(*reinterpret_cast<unsigned short*>(localPlayerData + 0xC2 + i * 2));
+	}
+
+	outData[0xA8] = localPlayerData[0xD3];
+	return 0xA9;
 }
 
 /*
@@ -2835,22 +2957,111 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CBB04
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetCmdData(int, unsigned char*)
+void GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
-	// TODO
+	unsigned char localPlayerData[0xDC];
+	unsigned char count;
+	unsigned char* writePtr;
+	int i;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	count = 0;
+	writePtr = outData + 4;
+
+	outData[0] = 0;
+	outData[1] = 0;
+	outData[2] = 0;
+	outData[3] = 0;
+
+	for (i = 0; i < 0x40; i++) {
+		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + i * 2);
+		if ((GetItemType__8CMenuPcsFii(&MenuPcs, itemId, 1) == 1) &&
+		    (GetItemIcon__8CMenuPcsFi(&MenuPcs, itemId) == (localPlayerData[0xDA] & 3))) {
+			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+
+			*reinterpret_cast<unsigned short*>(writePtr + 0) =
+				SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
+			*reinterpret_cast<unsigned short*>(writePtr + 2) =
+				SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
+			*reinterpret_cast<unsigned short*>(writePtr + 4) =
+				SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
+			*reinterpret_cast<unsigned short*>(writePtr + 6) = 0;
+
+			writePtr += 8;
+			count++;
+		}
+	}
+
+	outData[0] = count;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CB968
+ * PAL Size: 412b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetEquipData(int, unsigned char*)
+int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char localPlayerData[0xDC];
+	unsigned char equipIndices[0x40];
+	unsigned int indexBytes;
+	unsigned char equipCount;
+	unsigned char* writePtr;
+	int i;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
+	memcpy(outData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x52B, 4);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	memset(equipIndices, 0xFF, sizeof(equipIndices));
+	equipCount = 0;
+	for (i = 0; i < 0x40; i++) {
+		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + i * 2);
+		if (itemId >= 0 && itemId < 0x9F) {
+			equipIndices[equipCount] = static_cast<unsigned char>(i);
+			equipCount++;
+		}
+	}
+
+	indexBytes = static_cast<unsigned int>(equipCount) + 1;
+	if ((indexBytes & 3) != 0) {
+		indexBytes = (((indexBytes >> 2) + 1) * 4);
+	}
+
+	outData[4] = equipCount;
+	memcpy(outData + 5, equipIndices, indexBytes - 1);
+
+	writePtr = outData + 4 + indexBytes;
+	for (i = 0; i < equipCount; i++) {
+		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
+		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+
+		*reinterpret_cast<unsigned short*>(writePtr + 0) =
+			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
+		*reinterpret_cast<unsigned short*>(writePtr + 2) =
+			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
+		*reinterpret_cast<unsigned short*>(writePtr + 4) =
+			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
+		*reinterpret_cast<unsigned short*>(writePtr + 6) = 0;
+		writePtr += 8;
+	}
+
+	return static_cast<int>((writePtr - outData));
 }
 
 /*

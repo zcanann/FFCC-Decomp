@@ -8,8 +8,24 @@
 #include <Dolphin/mtx.h>
 
 struct Vec;
-struct RSDLISTITEM;
 struct ZCANMGRP;
+
+struct RSDITEM {
+    u32 countA;
+    u32 countB;
+    u32 countC;
+    void* ptrC;
+    void* ptr10;
+    void* ptr14;
+    void* ptr18;
+};
+
+struct RSDLISTITEM {
+    RSDITEM* rsdItem;
+    ZCANMGRP* colAnmData;
+    int colAnmCount;
+    int flag;
+};
 
 extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
@@ -48,7 +64,7 @@ public:
     int SetRsdFlag();
     void GetRsdItemR();
     int SetRsdIndex();
-    void GetRsdItem();
+    RSDLISTITEM* GetRsdItem();
 
     CMemory::CStage* m_stage; // 0x04
     unsigned char _pad08[0x7C];

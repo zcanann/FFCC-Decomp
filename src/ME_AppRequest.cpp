@@ -11,29 +11,12 @@ void* memset(void*, int, unsigned int);
 
 static const char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
 
-struct RSDITEM {
-    int unk0;
-    int unk4;
-    int unk8;
-    void* ptrC;
-    void* ptr10;
-    void* ptr14;
-    void* ptr18;
-};
-
 struct ZCANMGRP {
     void* ptr;
     int unk4;
     int unk8;
     int unkC;
     int unk10;
-};
-
-struct RSDLISTITEM {
-    RSDITEM* rsdItem;
-    ZCANMGRP* colAnmData;
-    int colAnmCount;
-    int flag;
 };
 
 static inline CMemory::CStage* MaterialEditorStage()
@@ -50,11 +33,11 @@ static inline CMemory::CStage* MaterialEditorStage()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMaterialEditorPcs::GetRsdItem()
+RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 {
     ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xC8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x9C);
-    list->GetDataIdx(index);
+    return reinterpret_cast<RSDLISTITEM*>(list->GetDataIdx(index));
 }
 
 /*

@@ -696,12 +696,12 @@ group_ready:
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
+    BreathModelRenderStep* step;
     _pppPObject* object;
     int i;
     int dataOffset;
     int colorOffset;
     int maxParticleCount;
-    int graphId;
     int groupCount;
     int slotCount;
     unsigned char* base;
@@ -717,6 +717,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     unsigned char colorA;
     Mtx worldMtx;
 
+    step = (BreathModelRenderStep*)pBreathModel;
     dataOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     object = (_pppPObject*)breathModel;
@@ -726,19 +727,18 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     particleWMat = *(unsigned char**)(work + 0x34);
     particleColor = *(float**)(work + 0x38);
     maxParticleCount = *(int*)(work + 0x40);
-    graphId = *(int*)((unsigned char*)pBreathModel + 0x00);
 
-    if (graphId == -1) {
+    if (step->m_stepValue == 0xFFFF) {
         return;
     }
 
-    model = (pppModelSt*)(*(void***)(pppEnvStPtr + 8))[graphId];
+    model = (pppModelSt*)(*(void***)(pppEnvStPtr + 8))[step->m_stepValue];
     pppInitBlendMode();
-    pppSetBlendMode(*(unsigned char*)((unsigned char*)pBreathModel + 4));
+    pppSetBlendMode(step->m_payload[4]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(base + colorOffset, NULL, 0.0f, 0xFF, 0xFF,
-                                                               *(unsigned char*)((unsigned char*)pBreathModel + 4), 0xFF, 0xFF,
-                                                               1, 0xFF);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(step->m_payload + 0xB0, NULL, 0.0f, step->m_payload[0xB6],
+                                                               step->m_payload[0xB5], step->m_payload[4], step->m_payload[0xB7],
+                                                               step->m_payload[0xB8], 1, step->m_payload[0xB9]);
 
     colorR = *(unsigned char*)(base + colorOffset + 0);
     colorG = *(unsigned char*)(base + colorOffset + 1);
@@ -820,8 +820,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     }
 
     if ((CFlatFlags & 0x200000) != 0) {
-        groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
-        slotCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x10);
+        groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)&step->m_arg3 + 2);
+        slotCount = (int)(unsigned short)*(unsigned short*)&step->m_arg3;
         groupPtr = *(unsigned char**)(work + 0x3C);
 
         for (i = 0; i < groupCount; i++) {

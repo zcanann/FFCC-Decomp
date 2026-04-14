@@ -6,6 +6,10 @@
 #include "dolphin/mtx.h"
 #include "math.h"
 
+extern float DAT_80330D80;
+extern float DAT_80330D84;
+extern float DAT_80330D88;
+
 struct pppYmMoveCircleWork {
     f32 m_angle;
     f32 m_angleStep;
@@ -50,7 +54,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
+    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos((double)PSVECDotProduct(&tempUp, &temp1));
 
     if ((temp1.x <= kZero && temp1.z >= kZero) || (temp1.x >= kZero && temp1.z >= kZero)) {
         work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;
@@ -118,7 +122,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
 
     {
-        f32 tableAngle = (32768.0f * (0.017453292f * work->m_angle)) / 3.1415927f;
+        f32 tableAngle = (DAT_80330D80 * (DAT_80330D84 * work->m_angle)) / DAT_80330D88;
         tableIndex = (s32)tableAngle;
     }
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));

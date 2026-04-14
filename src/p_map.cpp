@@ -87,6 +87,8 @@ struct CMapMngAsyncLoadState {
     int m_asyncReadIndex;
     int m_asyncOpenIndex;
     int m_mapReadMode;
+    int m_fileSizes[16];
+    unsigned int m_fileChecksums[16];
     CFile::CHandle* m_asyncHandles[16];
 };
 

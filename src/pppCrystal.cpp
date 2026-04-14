@@ -213,6 +213,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > FLOAT_80330fd8) {
 							magnitude = sqrtf(magnitude);
+						} else if (magnitude < 0.0f) {
+							magnitude = NAN;
 						} else if (CrystalIsNaN(magnitude)) {
 							magnitude = NAN;
 						}

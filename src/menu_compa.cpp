@@ -206,55 +206,55 @@ void CMenuPcs::CompaInit0()
  */
 bool CMenuPcs::CompaOpen()
 {
-	short* anim;
-	int finished;
-	int count;
-	int currentTime;
-	int remaining;
-	CompaMenuState* compaState = this->compaMenuState;
-	short* compaList = this->compaList;
+    float fVar1;
+    double dVar2;
+    double dVar3;
+    short* psVar4;
+    int iVar5;
+    int iVar6;
+    int iVar7;
+    int iVar8;
 
-	if (compaState->initialized == '\0') {
-		CompaInit();
-	}
+    if (*(char*)((int)this->compaMenuState + 0xB) == '\0') {
+        CompaInit();
+    }
 
-	finished = 0;
-	compaState->frame = compaState->frame + 1;
-	count = (int)*compaList;
-	anim = compaList + 4;
-	currentTime = (int)compaState->frame;
-	remaining = count;
-
-	if (0 < count) {
-		do {
-			float zero = FLOAT_80332ff8;
-			if (*reinterpret_cast<int*>(anim + 0x12) <= currentTime) {
-				if (*reinterpret_cast<int*>(anim + 0x12) + *reinterpret_cast<int*>(anim + 0x14) > currentTime) {
-					*reinterpret_cast<int*>(anim + 0x10) = *reinterpret_cast<int*>(anim + 0x10) + 1;
-					*reinterpret_cast<float*>(anim + 8) =
-						(float)((DOUBLE_80333008 / (double)*reinterpret_cast<int*>(anim + 0x14)) *
-							(double)*reinterpret_cast<int*>(anim + 0x10));
-					if ((*reinterpret_cast<unsigned int*>(anim + 0x16) & 2) == 0) {
-						zero = (float)((DOUBLE_80333008 / (double)*reinterpret_cast<int*>(anim + 0x14)) *
-							(double)*reinterpret_cast<int*>(anim + 0x10));
-						*reinterpret_cast<float*>(anim + 0x18) =
-							(*reinterpret_cast<float*>(anim + 0x1c) - (float)*anim) * zero;
-						*reinterpret_cast<float*>(anim + 0x1a) =
-							(*reinterpret_cast<float*>(anim + 0x1e) - (float)anim[1]) * zero;
-					}
-				} else {
-					finished += 1;
-					*reinterpret_cast<float*>(anim + 8) = FLOAT_80333000;
-					*reinterpret_cast<float*>(anim + 0x18) = zero;
-					*reinterpret_cast<float*>(anim + 0x1a) = zero;
-				}
-			}
-			anim += 0x20;
-			remaining += -1;
-		} while (remaining != 0);
-	}
-
-	return count == finished;
+    iVar5 = 0;
+    *(short*)((int)this->compaMenuState + 0x22) = *(short*)((int)this->compaMenuState + 0x22) + 1;
+    iVar6 = (int)*this->compaList;
+    psVar4 = this->compaList + 4;
+    iVar7 = (int)*(short*)((int)this->compaMenuState + 0x22);
+    iVar8 = iVar6;
+    if (0 < iVar6) {
+        do {
+            dVar3 = DOUBLE_80333030;
+            fVar1 = FLOAT_80332ff8;
+            if (*(int*)(psVar4 + 0x12) <= iVar7) {
+                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+                    dVar2 = DOUBLE_80333008;
+                    *(float*)(psVar4 + 8) =
+                        (float)((DOUBLE_80333008 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10));
+                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+                        fVar1 =
+                            (float)((dVar2 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10));
+                        *(float*)(psVar4 + 0x18) =
+                            (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
+                        *(float*)(psVar4 + 0x1A) =
+                            (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
+                    }
+                } else {
+                    iVar5 = iVar5 + 1;
+                    *(float*)(psVar4 + 8) = FLOAT_80333000;
+                    *(float*)(psVar4 + 0x18) = fVar1;
+                    *(float*)(psVar4 + 0x1A) = fVar1;
+                }
+            }
+            psVar4 = psVar4 + 0x20;
+            iVar8 = iVar8 + -1;
+        } while (iVar8 != 0);
+    }
+    return iVar6 == iVar5;
 }
 
 /*
@@ -354,43 +354,50 @@ void CMenuPcs::CompaCtrl()
  */
 bool CMenuPcs::CompaClose()
 {
-	int finished;
-	double one;
-	double base;
-	CompaMenuState* compaState = this->compaMenuState;
-	CompaOpenAnimList* compaList = reinterpret_cast<CompaOpenAnimList*>(this->compaList);
-	short time = static_cast<short>(compaState->frame + 1);
-	compaState->frame = time;
+    int iVar5;
+    int iVar6;
+    int iVar7;
+    int iVar8;
+    short* psVar4;
 
-	int entryCount = static_cast<int>(compaList->count);
-	short currentTime = compaState->frame;
-	finished = 0;
-	CompaOpenAnim* entry = compaList->entries;
-	for (int i = 0; i < entryCount; ++i) {
-		float zero = FLOAT_80332ff8;
-		if (entry->startFrame <= currentTime) {
-			if (currentTime < entry->startFrame + entry->duration) {
-				entry->frame = entry->frame + 1;
-				base = DOUBLE_80333030;
-				one = DOUBLE_80333008;
-				entry->alpha = (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame -
-					DOUBLE_80333008);
-				if ((entry->flags & 2) == 0) {
-					zero = (float)-((one / (double)entry->duration) * (double)entry->frame - one);
-					entry->dx = (entry->targetX - (float)entry->x) * zero;
-					entry->dy = (entry->targetY - (float)entry->y) * zero;
-				}
-			} else {
-				finished += 1;
-				entry->alpha = FLOAT_80332ff8;
-				entry->dx = zero;
-				entry->dy = zero;
-			}
-		}
-		entry++;
-	}
+    iVar5 = 0;
+    *(short*)((int)this->compaMenuState + 0x22) = *(short*)((int)this->compaMenuState + 0x22) + 1;
+    iVar6 = (int)*this->compaList;
+    psVar4 = this->compaList + 4;
+    iVar7 = (int)*(short*)((int)this->compaMenuState + 0x22);
+    iVar8 = iVar6;
+    if (0 < iVar6) {
+        do {
+            double dVar3 = DOUBLE_80333030;
+            float fVar1 = FLOAT_80332ff8;
+            if (*(int*)(psVar4 + 0x12) <= iVar7) {
+                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+                    double dVar2 = DOUBLE_80333008;
+                    *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+                    *(float*)(psVar4 + 8) =
+                        (float)-((DOUBLE_80333008 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10) -
+                                 DOUBLE_80333008);
+                    if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+                        fVar1 =
+                            (float)-((dVar2 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10) - dVar2);
+                        *(float*)(psVar4 + 0x18) =
+                            (*(float*)(psVar4 + 0x1C) - (float)*psVar4) * fVar1;
+                        *(float*)(psVar4 + 0x1A) =
+                            (*(float*)(psVar4 + 0x1E) - (float)psVar4[1]) * fVar1;
+                    }
+                } else {
+                    iVar5 = iVar5 + 1;
+                    *(float*)(psVar4 + 8) = FLOAT_80332ff8;
+                    *(float*)(psVar4 + 0x18) = fVar1;
+                    *(float*)(psVar4 + 0x1A) = fVar1;
+                }
+            }
+            psVar4 = psVar4 + 0x20;
+            iVar8 = iVar8 + -1;
+        } while (iVar8 != 0);
+    }
 
-	return entryCount == finished;
+    return iVar6 == iVar5;
 }
 
 /*

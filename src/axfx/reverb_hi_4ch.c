@@ -80,6 +80,10 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   tiny register-allocation seam inside the same damping block plus the older
  *   `reverb_hi_4ch_value0_1` symbol-identity mismatch in Modify's range check;
  *   no broader control-flow difference remains there
+ * - a follow-up probe that kept the same `damp` temporary but moved the
+ *   `0.05f` clamp onto the local before the final store was completely flat;
+ *   `ReverbHICreateDpl2` stayed at 99.83819%, so the remaining seam is not
+ *   just "avoid the early rv->damping store" either
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

@@ -61,6 +61,15 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   `OSInit` pad-state accesses, this now looks like a coherent small-data
  *   seam / extracted-symbol-identity problem across the whole pad/ai/os
  *   cluster, not a plausible source rewrite inside `ai.c`
+ * - a fresh map-backed metadata probe extended that same seam one unit later:
+ *   marking the Pad.c state block and AI callback/timing tail local in
+ *   `symbols.txt` to match the EN map makes `ai.c -> Matching` fail much
+ *   earlier with `ar.o` undefineds on `min_wait_8032F1A0`,
+ *   `max_wait_8032F1A8`, and `buffer_8032F1B0`
+ * - direct objdiff on that probe shows target `ARRegisterDMACallback` binding
+ *   its callback load/store to `min_wait_8032F1A0` instead of source
+ *   `__AR_Callback`, which is the same uniform `0x18`-early small-data drift
+ *   seen earlier at the pad/ai and ai/os seams
  * - a fresh current-branch retest of the older "export every AI state symbol"
  *   idea did move the rebuilt object, but not in a keepable direction:
  *   explicit zero-initialized non-static declarations for all eleven AI state

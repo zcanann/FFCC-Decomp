@@ -4,66 +4,6 @@
 #include <dolphin/si.h>
 #include <dolphin/db.h>
 
-/*
- * SDK note: remove this block once linkage has been resolved.
- * This unit is currently 100% in objdiff, but flipping os/OS.c to Matching on
- * this branch makes mwldeppc hang past the 30s build timeout and leave a
- * zero-byte main.elf behind. That points to a hidden link/config blocker
- * rather than a remaining visible code or data mismatch.
- *
- * Fresh narrowed result on the current latest-main SDK branch:
- * - the bad behavior is still real; a fresh Matching flip reproduced the same
- *   past-timeout linker hang instead of a clean checksum failure
- * - current raw rebuilt `OS.o` and target `OS.o` disagree at the three
- *   boot-time pad-spec accesses in `OSInit`: source still relocates them
- *   through `__PADSpec`, while target relocates the same sites through
- *   `RecalibrateBits`
- * - because the source C at those sites is plainly the pad-spec initialization
- *   path, that mismatch looks more like stale small-data symbol attribution at
- *   the pad/os seam than a real control-flow or arithmetic problem inside
- *   `OS.c`
- * - a fresh cluster probe on latest main tightened that conclusion further:
- *   with `ai.c` and `Pad.c` both promoted plus a temporary GCCP01-only
- *   `RecalibrateBits` export in Pad.c, the build gets past the old undefineds
- *   and then `os/OS.c` as Matching is the step that still drives mwldeppc past
- *   the 30s timeout
- * - a direct disassembly read of the rebuilt source `OS.o` confirmed those
- *   three `OSInit` accesses really do bind to `__PADSpec` in the object
- *   (`stw/lwz/stw __PADSpec@sda21` around the `0x30E8/0x30E9` boot-memory
- *   writes), so the target-side `RecalibrateBits` binding is almost certainly
- *   a seam/ownership artifact rather than something the current C body is
- *   spelling incorrectly
- * - a fresh GCCP01-only seam probe then forced source `OS.o` to bind those
- *   same three accesses through `RecalibrateBits` and exported only that one
- *   symbol from Pad.c; the rebuilt `OS.o` undefineds then matched target, but
- *   promoting `os/OS.c` still reproduced the old >30s linker hang and the
- *   Pad-side object layout regressed (`RecalibrateBits` moved to the tail of
- *   the source Pad.o `.sbss` run, after local `SamplingCallback` and
- *   `recalibrated$400`)
- * - a fresh current-branch retest confirms the cluster boundary more sharply:
- *   with `Pad.c + ai.c` promoted and only `RecalibrateBits` exported, the
- *   build now gets all the way to a final checksum miss; adding `OS.c` on top
- *   of that exact probe is the step that still drives `mwldeppc` past the
- *   30s timeout and leaves a zero-byte `main.elf`
- * - a raw disassembly comparison on this branch made the symbol drift more
- *   concrete: target `OS.o`'s three `OSInit` pad-state relocations are not
- *   random, they are exactly `0x18` earlier than the rebuilt source sites
- *   (`RecalibrateBits` instead of source `__PADSpec` at all three accesses)
- * - that same exact `0x18` early shift also shows up in target `ai.o`'s
- *   sbss-bound relocations, which means the current extracted target
- *   symbol identities around the `pad -> ai` seam are drifting as a block,
- *   not just at one isolated `OSInit` site
- * - that means the visible `OSInit` relocation identity is a real symptom,
- *   but fixing just that one symbol is not sufficient to make `OS.c`
- *   linkable; the broader pad/ai/os small-data binding seam is still the
- *   blocker
- * - a fresh visible-data probe on the current branch also ruled out the
- *   simplest format-string ownership cleanup: replacing the lone
- *   `OSReport(sOSConsoleTypeFmt, consoleType)` use with a direct `"%08x\n"`
- *   literal left `OSInit` completely flat, and MWCC still emitted a local
- *   `sOSConsoleTypeFmt` symbol in rebuilt `OS.o` anyway
- */
-
 #define NOP 0x60000000
 
 #ifndef __GEKKO__
@@ -119,6 +59,7 @@ extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 static OSBootInfo* BootInfo;
 static u32* BI2DebugFlag;
 static u32 BI2DebugFlagHolder;
+__declspec(weak) BOOL __OSIsGcam = FALSE;
 static f64 ZeroF;
 static f32 ZeroPS[2];
 static BOOL AreWeInitialized;
@@ -129,7 +70,6 @@ OSTime __OSStartTime;
 BOOL __OSInIPL;
 void* __OSSavedRegionStart;
 void* __OSSavedRegionEnd;
-BOOL __OSIsGcam;
 
 // prototypes
 static void __OSInitFPRs(void);

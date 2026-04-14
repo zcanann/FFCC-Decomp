@@ -31,7 +31,7 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + objOffset + 0x80);
 
     if (objData->id == pointData->id) {
-        u8* vecPtr;
+        register u8* vecPtr;
 
         if ((objData->field_4 + 0x10000) == 0xFFFF) {
             vecPtr = (u8*)gPppDefaultValueBuffer;

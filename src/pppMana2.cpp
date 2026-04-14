@@ -980,14 +980,14 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     float x;
     float z;
     float rowUv;
-    float* pos;
-    float* normal;
-    float* uv;
-    int colCount;
-    int rowCount;
     int indexOffset;
     int quadIndex;
     int rowBase;
+    float* positions;
+    int rowCount;
+    float* normals;
+    float* uvs;
+    int colCount;
     int pairCount;
 
     normalY = FLOAT_803318a0;
@@ -999,25 +999,25 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     for (z = radius; -radius <= z; z -= step) {
         colCount = 0;
         rowUv = static_cast<float>(rowCount) * uvStep;
-        pos = reinterpret_cast<float*>(param_1);
-        normal = reinterpret_cast<float*>(param_2);
-        uv = reinterpret_cast<float*>(param_3);
+        positions = reinterpret_cast<float*>(param_1);
+        normals = reinterpret_cast<float*>(param_2);
+        uvs = reinterpret_cast<float*>(param_3);
         for (x = -radius; x <= radius; x += step) {
-            *pos = x;
-            param_1 = reinterpret_cast<Vec*>(pos + 3);
-            pos[1] = zero;
+            *positions = x;
+            param_1 = reinterpret_cast<Vec*>(positions + 3);
+            positions[1] = zero;
             colCount = colCount + 1;
-            param_2 = reinterpret_cast<Vec*>(normal + 3);
-            param_3 = reinterpret_cast<Vec2d*>(uv + 2);
-            pos[2] = z;
-            pos = pos + 3;
-            *normal = zero;
-            normal[1] = normalY;
-            normal[2] = zero;
-            normal = normal + 3;
-            *uv = static_cast<float>(colCount - 1) * uvStep;
-            uv[1] = rowUv;
-            uv = uv + 2;
+            param_2 = reinterpret_cast<Vec*>(normals + 3);
+            param_3 = reinterpret_cast<Vec2d*>(uvs + 2);
+            positions[2] = z;
+            positions = positions + 3;
+            *normals = zero;
+            normals[1] = normalY;
+            normals[2] = zero;
+            normals = normals + 3;
+            *uvs = static_cast<float>(colCount - 1) * uvStep;
+            uvs[1] = rowUv;
+            uvs = uvs + 2;
         }
         rowCount = rowCount + 1;
     }
@@ -1047,7 +1047,6 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
         rowCount = rowCount + 1;
         rowBase = rowBase + 0x11;
     } while (rowCount < 0x10);
-
     return 1;
 }
 

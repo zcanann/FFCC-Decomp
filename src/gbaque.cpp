@@ -131,8 +131,8 @@ void GbaQueue::Init()
 	memset(obj + 0x2A74, 0, 0x80);
 	memset(obj + 0x2B00, 0, 0x188);
 	memset(obj + 0x2C8E, 0, 8);
-	memset(cmakeInfo, 0, 0x80);
-	memset(obj + 0x2D40, 0xFF, 0x10);
+	memset(obj + 0x2CB2, 0, 0x80);
+	memset(obj + 0x2D44, 0xFF, 0x10);
 
 	i = 0;
 	osSemaphore = this;
@@ -144,29 +144,29 @@ void GbaQueue::Init()
 
 	*reinterpret_cast<unsigned int*>(obj + 0x448) = 0xFF;
 	*reinterpret_cast<unsigned int*>(obj + 0x444) = 0xFF;
-	*reinterpret_cast<unsigned int*>(obj + 0x44C) = 0;
+	obj[0x44C] = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x44E) = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x450) = 0;
 
-	obj[0x2C94] = 0;
+	obj[0x2AFC] = 0;
 	obj[0x2C88] = 0;
 	obj[0x2C89] = 0;
 	obj[0x2D38] = 0;
 	obj[0x2D39] = 0;
-	obj[0x2CCA] = 0;
-	obj[0x2CCB] = 0;
-	obj[0x2CCC] = 0;
-	obj[0x2CCD] = 0;
-	obj[0x2CDE] = 0;
-	obj[0x2CE8] = 0;
-	obj[0x2CE9] = 0;
-	obj[0x2CFA] = 0;
-	obj[0x2D04] = 0;
-	obj[0x2D14] = 0;
+	obj[0x2D3A] = 0;
+	obj[0x2D3B] = 0;
+	obj[0x2D3C] = 0;
+	obj[0x2D3D] = 0;
+	obj[0x2D37] = 0;
+	obj[0x2CB1] = 0;
+	obj[0x2CB0] = 0;
+	obj[0x2D36] = 0;
+	obj[0x2D3E] = 0;
+	obj[0x2D3F] = 0;
 	obj[0x2AF4] = 0;
-	obj[0x2D42] = 0;
+	obj[0x2D40] = 0;
 	obj[0x2D41] = 0xF;
-	obj[0x2D43] = 0;
+	obj[0x2D42] = 0;
 	obj[0x2D54] = 0;
 	obj[0x2D55] = 0;
 	obj[0x2D56] = 0;
@@ -184,7 +184,7 @@ void GbaQueue::Init()
 	obj[0x2C96] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2C9C) = 0;
 	obj[0x2CAC] = 0;
-	obj[0x2D30] = 0;
+	obj[0x2C8A] = 0;
 	obj[0x2D32] = 1;
 	obj[0x2C97] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA0) = 0;

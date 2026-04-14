@@ -54,7 +54,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
+    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos((double)PSVECDotProduct(&tempUp, &temp1));
 
     if ((temp1.x <= kZero && temp1.z >= kZero) || (temp1.x >= kZero && temp1.z >= kZero)) {
         work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;

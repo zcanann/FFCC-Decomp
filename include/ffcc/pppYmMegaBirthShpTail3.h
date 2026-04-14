@@ -18,12 +18,12 @@ struct pppYmMegaBirthShpTail3
 struct VYmMegaBirthShpTail3
 {
     pppFMATRIX m_emitterMatrix;   // 0x0
-    _PARTICLE_DATA* m_particles;  // 0x30
-    _PARTICLE_WMAT* m_wmats;      // 0x34
-    _PARTICLE_COLOR* m_colors;    // 0x38
-    unsigned int m_maxParticles;  // 0x3c
-    unsigned int m_lifeLimit;     // 0x40
-    Vec m_tailScaleDirection;     // 0x44
+    Vec m_tailScaleDirection;     // 0x30
+    _PARTICLE_DATA* m_particles;  // 0x3c
+    _PARTICLE_WMAT* m_wmats;      // 0x40
+    _PARTICLE_COLOR* m_colors;    // 0x44
+    unsigned int m_maxParticles;  // 0x48
+    unsigned int m_lifeLimit;     // 0x4c
 };
 
 struct PYmMegaBirthShpTail3 : _PARTICLE_DATA
@@ -36,10 +36,6 @@ struct pppYmMegaBirthShpTail3UnkC
     u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
 };
-
-// Helper functions  
-void pppScaleVectorXYZ(float scale, Vec* result, const Vec* input);
-void pppAddVector(_PARTICLE_DATA* particle, Vec* dest, const Vec* src);
 
 void get_rand(void);
 void S4ToF32(pppFVECTOR4*, short*);
@@ -62,4 +58,3 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail
 #endif
 
 #endif // _FFCC_PPP_YMMEGABIRTHSHPTAIL3_H_
-

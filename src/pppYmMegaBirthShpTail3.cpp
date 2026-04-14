@@ -380,10 +380,12 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     VYmMegaBirthShpTail3* work;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = (VYmMegaBirthShpTail3*)((u8*)object + 8 + offsets->m_serializedDataOffsets[2]);
-    paramPayload = (u8*)&param->m_matrix;
+    work = (VYmMegaBirthShpTail3*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
+    paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
+        Vec tailScale;
+
         work->m_maxParticles = *(u16*)(paramPayload + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2db);
@@ -398,10 +400,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
         }
 
         work->m_tailScaleDirection = param->m_directionTail;
-        PSVECNormalize(&work->m_tailScaleDirection, &work->m_tailScaleDirection);
+        tailScale = work->m_tailScaleDirection;
+        pppNormalize(work->m_tailScaleDirection, tailScale);
     }
 
-    hasRequiredMemory = (work->m_particles != 0) && (work->m_wmats != 0);
+    hasRequiredMemory = false;
+    if (work->m_particles != 0) {
+        hasRequiredMemory = work->m_wmats != 0;
+    }
     if (!hasRequiredMemory) {
         return;
     }
@@ -464,21 +470,48 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
     switch (*(paramPayload + 0x12)) {
     default:
-        PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_emitterMatrix.value);
+        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
         break;
     case 1:
     case 3:
     case 5:
     case 7:
     case 9:
+    {
+        Vec firstCol;
+        Vec secondCol;
+        Vec thirdCol;
+
         PSMTXIdentity(work->m_emitterMatrix.value);
-        work->m_emitterMatrix.value[0][0] = pppMngStPtr->m_scale.x;
-        work->m_emitterMatrix.value[1][1] = pppMngStPtr->m_scale.x;
-        work->m_emitterMatrix.value[2][2] = pppMngStPtr->m_scale.x;
+        firstCol.x = work->m_emitterMatrix.value[0][0];
+        firstCol.y = work->m_emitterMatrix.value[1][0];
+        firstCol.z = work->m_emitterMatrix.value[2][0];
+        PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][0] = firstCol.x;
+        work->m_emitterMatrix.value[1][0] = firstCol.y;
+        work->m_emitterMatrix.value[2][0] = firstCol.z;
+
+        secondCol.x = work->m_emitterMatrix.value[0][1];
+        secondCol.y = work->m_emitterMatrix.value[1][1];
+        secondCol.z = work->m_emitterMatrix.value[2][1];
+        PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][1] = secondCol.x;
+        work->m_emitterMatrix.value[1][1] = secondCol.y;
+        work->m_emitterMatrix.value[2][1] = secondCol.z;
+
+        thirdCol.x = work->m_emitterMatrix.value[0][2];
+        thirdCol.y = work->m_emitterMatrix.value[1][2];
+        thirdCol.z = work->m_emitterMatrix.value[2][2];
+        PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
+        work->m_emitterMatrix.value[0][2] = thirdCol.x;
+        work->m_emitterMatrix.value[1][2] = thirdCol.y;
+        work->m_emitterMatrix.value[2][2] = thirdCol.z;
+
         work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
         work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
         work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
         break;
+    }
     }
 
     worldMat = work->m_wmats;

@@ -22,6 +22,11 @@
  *   path, that mismatch looks more like stale small-data symbol attribution at
  *   the pad/os seam than a real control-flow or arithmetic problem inside
  *   `OS.c`
+ * - a fresh cluster probe on latest main tightened that conclusion further:
+ *   with `ai.c` and `Pad.c` both promoted plus a temporary GCCP01-only
+ *   `RecalibrateBits` export in Pad.c, the build gets past the old undefineds
+ *   and then `os/OS.c` as Matching is the step that still drives mwldeppc past
+ *   the 30s timeout
  */
 
 #define NOP 0x60000000

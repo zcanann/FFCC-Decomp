@@ -73,6 +73,13 @@ const char* __PADVersion = s___PADVersion;
  *   the rebuilt source Pad.o emits
  * - that leaves only the real exported pad-state globals plus the OS-side
  *   `RecalibrateBits` import as unresolved when Pad.c is promoted
+ * - a narrower GCCP01-only export probe showed `RecalibrateBits` itself is the
+ *   key seam symbol: exporting just that one global is enough to let the
+ *   current `ai.c + Pad.c` Matching pair reach a final checksum miss instead
+ *   of a hard link error
+ * - that same probe is still not keepable by itself, because adding `OS.c`
+ *   back on top of the pair reproduces the old >30s linker hang; so the
+ *   cluster is closer, but `OS.c` still has a remaining hidden-link problem
  * - a reverse-order GCCP01 export probe confirmed MWCC does reverse these
  *   file-scope globals exactly as expected, but it still emits the
  *   function-local `recalibrated$400` ahead of them and shifts the whole run

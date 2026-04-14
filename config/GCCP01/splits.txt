@@ -1514,7 +1514,7 @@ si/SIBios.c:
 	.text       start:0x80184060 end:0x801858B0
 	.data       start:0x802172C0 end:0x802173D8
 	.bss        start:0x8030C750 end:0x8030C950
-	.sdata      start:0x8032EAC0 end:0x8032EAD0
+	.sdata      start:0x8032EAC0 end:0x8032EAC8
 	.sbss       start:0x8032F000 end:0x8032F00C
 
 si/SISamplingRate.c:
@@ -1524,6 +1524,8 @@ si/SISamplingRate.c:
 
 mtx/mtx.c:
 	.text       start:0x801859B8 end:0x801863F4
+	.sdata      start:0x8032EAC8 end:0x8032EAD0
+	.sdata2     start:0x803336E0 end:0x803336FC
 
 mtx/mtxvec.c:
 	.text       start:0x801863F4 end:0x80186528

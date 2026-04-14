@@ -41,11 +41,6 @@ static __OSInterruptHandler RDSTHandler[4];
 static BOOL InputBufferValid[4];
 static u32 InputBuffer[4][2];
 static volatile u32 InputBufferVcount[4];
-typedef union FloatPair {
-    u64 align;
-    f32 values[2];
-} FloatPair;
-FloatPair Unit01 = { 0x000000003F800000ULL };
 
 u32 __PADFixBits;
 
@@ -65,6 +60,11 @@ u32 __PADFixBits;
  *   cmdTypeAndStatus$374 plus __PADFixBits
  * - target SIInterruptHandler still relocates through cmdTypeAndStatus$78 at
  *   0x8032F000, which sits just outside the SIBios-owned .sbss window
+ * - a separate current-branch source cleanup was real here: the older
+ *   file-scope `Unit01` float-pair blob did not belong in GCCP01 SIBios at
+ *   all. Shared Dolphin reference sources omit it, extracted target SIBios.o
+ *   does not emit it, and removing it cleanly unblocked the reclaimed
+ *   `mtx/mtx.c` `.sdata` ownership work
  *
  * Why this is not keepable yet:
  * - a plain Matching flip pulls the whole live .sbss shape into the unit and

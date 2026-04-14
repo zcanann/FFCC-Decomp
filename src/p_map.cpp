@@ -64,6 +64,9 @@ extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
+static unsigned char ARRAY_80268768[0xC];
+static unsigned char ARRAY_80268774[0xC];
+static unsigned char ARRAY_80268780[0xC];
 
 struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);
@@ -270,22 +273,22 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
         if (static_cast<unsigned int>(System.m_execParam) > 2U) {
             CMemory::CStage* mapStage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
-            int heapUnuse = mapStage->GetHeapUnuse();
-            int heapUnuseKB =
-                (heapUnuse >> 10) + static_cast<int>((heapUnuse < 0) && ((heapUnuse & 0x3FF) != 0));
+            unsigned int heapUnuse = mapStage->GetHeapUnuse();
 
             Printf__7CSystemFPce(
                 &System,
                 s__________________________________801d7734,
                 mapPath,
-                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0xC),
-                *reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                heapUnuseKB);
+                (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
+                (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
+                ((int)heapUnuse >> 10) +
+                    (unsigned int)(((int)heapUnuse < 0) && ((heapUnuse & 0x3FF) != 0)));
         }
 
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
-        if (mapLightHolderArr[1].GetSize() != 0) {
+        int mapLightHolderCount = mapLightHolderArr[1].GetSize();
+        if (mapLightHolderCount != 0) {
             mapLightHolderArr[1][0]->GetLightHolder(
                 reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&CameraPcs) + 0x1E0), static_cast<Vec*>(0));
         }
@@ -954,11 +957,11 @@ extern "C" void __sinit_p_map_cpp(void)
 	dst[0x340 / 4] = m_table_desc23__7CMapPcs[2];
 
 	__register_global_object(&s_mapRelProfile0__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
-                             reinterpret_cast<unsigned char*>(&MapPcs) + 0x188);
+                             ARRAY_80268768);
 	__register_global_object(&s_mapRelProfile1__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
-                             reinterpret_cast<unsigned char*>(&MapPcs) + 0x194);
+                             ARRAY_80268774);
 	__register_global_object(&s_mapRelProfile2__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
-                             reinterpret_cast<unsigned char*>(&MapPcs) + 0x1A0);
+                             ARRAY_80268780);
 }
 
 /*

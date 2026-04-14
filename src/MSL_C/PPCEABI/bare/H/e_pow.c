@@ -1,38 +1,5 @@
 /* @(#)e_pow.c 1.3 95/01/18 */
 /*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - main/MSL_C/PPCEABI/bare/H/e_pow is currently another hidden-linkage
- *   blocker rather than a visible objdiff blocker
- *
- * Most useful probe so far:
- * - on this branch, flipping e_pow.c from NonMatching to Matching while the
- *   unit still reports 100% code/data/function match causes the final
- *   build/GCCP01/main.dol checksum to fail immediately
- *
- * Narrowed state:
- * - the fdlibm local constant ownership now matches the source family much
- *   better: bp/dp_h/dp_l are modeled as local .rodata, and the main .sdata2
- *   run is back to local @319-@353-style constants instead of exported
- *   DOUBLE_80333Axx globals
- * - promoting `e_pow.c` together with the other nearby MSL runtime holdout
- *   `ansi_fp.c` still only fails at the final checksum, so the remaining seam
- *   is not just "promote the adjacent math runtime pair together"
- * - even after that symbol/locality cleanup, promoting e_pow.c still fails the
- *   final checksum, so the remaining blocker is narrower hidden linkage /
- *   neighboring ownership work, not function-body cleanup inside __ieee754_pow
- * - a fresh visible-code probe on the latest branch found one objdiff
- *   relocation mismatch at the `y == 0.5` fast path (`sqrt` vs
- *   `__ieee754_sqrt`), but simply changing the source call to `sqrt(x)` was
- *   not the fix: the rebuilt object still relocated to `__ieee754_sqrt` via
- *   the inline wrapper and regressed overall unit match badly
- * - a follow-up declaration-only probe also held completely flat: adding a
- *   plain local `extern double sqrt(double);` after the MSL headers still left
- *   rebuilt `e_pow.o` calling `__ieee754_sqrt`, so the remaining relocation
- *   identity mismatch is deeper than ordinary prototype visibility
- */
-/*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
  *
@@ -90,7 +57,14 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/errno.h"
-#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
+
+extern double __fabs(double);
+inline double fabs(double f) { return __fabs(f); }
+
+#ifndef NAN
+#define NAN (*(float*)__float_nan)
+extern unsigned long __float_nan[];
+#endif
 
 #ifdef __STDC__
 static const double 
@@ -190,7 +164,7 @@ ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
 	    if(hy==0x40000000) return x*x; /* y is  2 */
 	    if(hy==0x3fe00000) {	/* y is  0.5 */
 		if(hx>=0)	/* x >= +0 */
-		return __ieee754_sqrt(x);
+		return sqrt(x);
 	    }
 	}
 

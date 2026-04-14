@@ -565,7 +565,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(int*)(p + 0x5EC) = -1;
     *(int*)(p + 0x5C8) = 1;
 
-    sprintf(pathBuf, s_no_texture____801da7e8 + 0x17C, *reinterpret_cast<unsigned int*>(USBPcs.m_rootPath));
+    sprintf(pathBuf, s_no_texture____801da7e8 + 0x17C, USBPcs.m_rootPath);
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
         File.Read(fileHandle);

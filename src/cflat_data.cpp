@@ -72,12 +72,39 @@ void CFlatData::Destroy()
  */
 void CFlatData::Create(void* filePtr)
 {
-	CFlatData* flatData;
+	struct DataEntryLayout
+	{
+		unsigned int m_size;
+		void* m_data;
+		int m_numStrings;
+		char** m_strings;
+		char* m_stringBuf;
+	};
+
+	struct TableEntryLayout
+	{
+		int m_numEntries;
+		char** m_strings;
+		char* m_stringBuf;
+	};
+
+	struct FlatDataLayout
+	{
+		int m_dataCount;
+		DataEntryLayout m_data[5];
+		int m_tableCount;
+		TableEntryLayout m_tabl[8];
+		int m_mesCount;
+		char* m_mesBuffer;
+		char* m_mesPtr[1122];
+	};
+
+	FlatDataLayout* flatData;
 	int iVar1;
 	int iVar10;
 
-	flatData = this;
-	for (iVar10 = 0; iVar10 < m_dataCount; iVar10++)
+	flatData = (FlatDataLayout*)this;
+	for (iVar10 = 0; iVar10 < ((FlatDataLayout*)this)->m_dataCount; iVar10++)
 	{
 		if (flatData->m_data[0].m_data != nullptr)
 		{
@@ -94,12 +121,12 @@ void CFlatData::Create(void* filePtr)
 			operator delete(flatData->m_data[0].m_stringBuf);
 			flatData->m_data[0].m_stringBuf = (char*)nullptr;
 		}
-		flatData = (CFlatData*)&flatData->m_data[0].m_stringBuf;
+		flatData = (FlatDataLayout*)&flatData->m_data[0].m_stringBuf;
 	}
-	m_dataCount = 0;
+	((FlatDataLayout*)this)->m_dataCount = 0;
 
-	flatData = this;
-	for (iVar10 = 0; iVar10 < m_tableCount; iVar10++)
+	flatData = (FlatDataLayout*)this;
+	for (iVar10 = 0; iVar10 < ((FlatDataLayout*)this)->m_tableCount; iVar10++)
 	{
 		if (flatData->m_tabl[0].m_strings != nullptr)
 		{
@@ -111,16 +138,16 @@ void CFlatData::Create(void* filePtr)
 			operator delete(flatData->m_tabl[0].m_stringBuf);
 			flatData->m_tabl[0].m_stringBuf = (char*)nullptr;
 		}
-		flatData = (CFlatData*)&flatData->m_data[0].m_numStrings;
+		flatData = (FlatDataLayout*)&flatData->m_data[0].m_numStrings;
 	}
-	m_tableCount = 0;
+	((FlatDataLayout*)this)->m_tableCount = 0;
 
-	if (m_mesBuffer != nullptr)
+	if (((FlatDataLayout*)this)->m_mesBuffer != nullptr)
 	{
-		operator delete(m_mesBuffer);
-		m_mesBuffer = (char*)nullptr;
+		operator delete(((FlatDataLayout*)this)->m_mesBuffer);
+		((FlatDataLayout*)this)->m_mesBuffer = (char*)nullptr;
 	}
-	m_mesCount = 0;
+	((FlatDataLayout*)this)->m_mesCount = 0;
 
 	CChunkFile chunkFile(filePtr);
 	CChunkFile::CChunk chunk;
@@ -143,8 +170,8 @@ void CFlatData::Create(void* filePtr)
 					{
 						int numStrings;
 						int iVar6;
-						int iVar7;
 						int indexOffset;
+						int iVar7;
 						int stringBase;
 
 						numStrings = chunkFile.Get4();
@@ -191,16 +218,14 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
 					stringBase = (int)chunkFile.GetAddress();
-					iVar7 = 0;
 					indexOffset = 0;
-					while (iVar7 < m_tabl[m_tableCount].m_numEntries)
+					for (iVar7 = 0; (iVar1 = m_tableCount, iVar7 < m_tabl[iVar1].m_numEntries); iVar7++)
 					{
 						iVar6 = (int)chunkFile.GetAddress();
-						*(char**)((int)m_tabl[m_tableCount].m_strings + indexOffset) =
-							m_tabl[m_tableCount].m_stringBuf + (iVar6 - stringBase);
+						*(char**)((int)m_tabl[iVar1].m_strings + indexOffset) =
+							m_tabl[iVar1].m_stringBuf + (iVar6 - stringBase);
 						chunkFile.GetString();
 						indexOffset += 4;
-						iVar7++;
 					}
 					m_tableCount++;
 					break;
@@ -215,13 +240,13 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					iVar10 = (int)chunkFile.GetAddress();
-					flatData = this;
+					flatData = (FlatDataLayout*)this;
 					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
 						iVar8 = (int)chunkFile.GetAddress();
-						flatData->m_mesPtr[0] = m_mesBuffer + (iVar8 - iVar10);
+						flatData->m_mesPtr[0] = m_mesBuffer + iVar8 - iVar10;
 						chunkFile.GetString();
-						flatData = (CFlatData*)flatData->m_data;
+						flatData = (FlatDataLayout*)flatData->m_data;
 					}
 					break;
 				}

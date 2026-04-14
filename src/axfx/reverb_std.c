@@ -28,6 +28,11 @@
  *   helper code; GCCP01 still wants some of that logic present in the live
  *   object shape even though those helper symbols do not survive as named
  *   functions
+ * - a reference-project follow-up also ruled out the obvious shared Dolphin
+ *   failure-handling path: restoring the common `DLcreate(...) == 0` /
+ *   `ReverbSTDFree(rv); return 0;` checks from Strikers / Twilight Princess
+ *   regressed overall SDK match while leaving raw source `reverb_std.o`
+ *   section sizes unchanged at `.text 0x0D34 / .sdata2 0x28`
  * - so the next pass here should treat `reverb_std.c` as a helper-emission
  *   shaping problem, not as a broad source rewrite candidate
  */

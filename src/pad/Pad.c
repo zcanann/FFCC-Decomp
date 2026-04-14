@@ -92,6 +92,10 @@ const char* __PADVersion = s___PADVersion;
  * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
  *   declarations here, so there is no simple file-scope alias escape hatch for
  *   that last symbol identity
+ * - a fresh PAL-map cross-check confirms the current GCCP01 small-data order
+ *   from `Initialized` through `__PADSpec`, plus the AI tail
+ *   `min_wait / max_wait / buffer`, already matches the expected ownership and
+ *   ordering; the remaining pad/ai/os seam is not just stale symbols.txt names
  */
 
 #define PAD_ALL                                                                                                        \

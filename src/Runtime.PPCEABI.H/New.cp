@@ -23,6 +23,9 @@
  *
  * Why this is not keepable yet:
  * - promoting that probe to Matching still failed final main.dol checksum
+ * - promoting New.cp together with Gecko_ExceptionPPC.cp on latest main still
+ *   fails only at the final checksum, so this is not just one unresolved
+ *   exception-runtime cluster seam between those two units
  * - so there is still at least one remaining object-shape / linkage detail beyond
  *   the obvious duplicate RTTI emission
  */

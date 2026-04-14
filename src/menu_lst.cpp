@@ -538,6 +538,7 @@ void CMenuPcs::MLstDraw()
 			float w = (float)item->width;
 			float h = (float)item->height;
 			float alpha = item->alpha;
+			float z = item->z;
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(255.0f * alpha)};
@@ -549,14 +550,14 @@ void CMenuPcs::MLstDraw()
 				v += h;
 			}
 
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, 0.0f, v, item->z, item->z, 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, 0.0f, v, z, z, 0.0f);
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5c);
 			v = 0.0f;
 			if ((menuMode == 1) && (i == state->cursor)) {
 				v += h;
 			}
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, -((48.0f * 1.5f) - (float)item->x), (float)item->y - 6.0f, 48.0f, 48.0f, 0.0f, v, item->z, item->z, 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x - 72.0f, y - 6.0f, 48.0f, 48.0f, 0.0f, v, z, z, 0.0f);
 		}
 		item++;
 	}
@@ -576,7 +577,7 @@ void CMenuPcs::MLstDraw()
 		GetWidth__5CFontFPc(font, text);
 
 		float textX = (float)(item->x + 0x28);
-		float textY = (float)(item->y - 3);
+		float textY = (float)(item->y + 3) - 6.0f;
 		if ((menuMode == 1) && (i == state->cursor)) {
 			textX += 6.0f;
 		}
@@ -591,7 +592,8 @@ void CMenuPcs::MLstDraw()
 	DrawInit__8CMenuPcsFv(this);
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &list->entries[state->cursor];
-		int cursorY = (int)((float)curItem->y + (((float)curItem->height - 32.0f) * 1.5f));
+		float cursorYOffset = ((float)curItem->height - 32.0f) + ((float)curItem->height * 0.5f);
+		int cursorY = (int)((float)curItem->y + cursorYOffset);
 		int cursorX = (int)((float)curItem->x - 56.0f + (float)(System.m_frameCounter & 7));
 		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, 1.0f);
 	}

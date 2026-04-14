@@ -1,6 +1,5 @@
 #include "dolphin/mtx.h"
 #include "ffcc/symbols_shared.h"
-#include "math.h"
 
 /*
  * TODO: Remove this note block once linkage has been resolved.

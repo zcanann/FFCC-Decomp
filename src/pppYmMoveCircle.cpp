@@ -19,6 +19,15 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
+struct pppYmMoveCircleMngStRaw {
+    char m_pad00[0x08];
+    Vec m_position;
+    char m_pad14[0x34];
+    Vec m_previousPosition;
+    char m_pad54[0x30];
+    pppFMATRIX m_matrix;
+};
+
 
 /*
  * --INFO--
@@ -35,11 +44,11 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     const f32 kOne = 1.0f;
     Vec tempUp;
     Vec temp1;
-    _pppMngSt* pppMngSt;
+    pppYmMoveCircleMngStRaw* pppMngSt;
     s32 offset;
     pppYmMoveCircleWork* work;
 
-    pppMngSt = pppMngStPtr;
+    pppMngSt = (pppYmMoveCircleMngStRaw*)pppMngStPtr;
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
@@ -77,15 +86,18 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
  */
 extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleStep* stepData, pppYmMoveCircleOffsets* offsetData)
 {
+    const f32 kZero = 0.0f;
+    const f32 kTurnSpan = 360.0f;
+    const f32 kTrigScale = 32768.0f;
+    const f32 kDegToRad = 0.017453292f;
+    const f32 kPi = 3.1415927f;
     pppYmMoveCircleWork* work;
     int* serializedDataOffsets;
-    u8* pppMngSt;
+    _pppMngSt* pppMngSt;
     Vec nextPos;
     s32 tableIndex;
     f32 sinAngle;
     f32 cosAngle;
-    f32 radiusX;
-    f32 radiusZ;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -93,7 +105,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 
     serializedDataOffsets = offsetData->m_serializedDataOffsets;
     work = (pppYmMoveCircleWork*)((u8*)basePtr + serializedDataOffsets[0] + 0x80);
-    pppMngSt = (u8*)pppMngStPtr;
+    pppMngSt = pppMngStPtr;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -110,33 +122,25 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
     work->m_angle += work->m_angleStep;
 
-    if (work->m_angle > 360.0f) {
-        work->m_angle -= 360.0f;
+    if (work->m_angle > kTurnSpan) {
+        work->m_angle -= kTurnSpan;
     }
-    if (work->m_angle < 0.0f) {
-        work->m_angle += 360.0f;
+    if (work->m_angle < kZero) {
+        work->m_angle += kTurnSpan;
     }
 
-    {
-        f32 tableAngle = (32768.0f * (0.017453292f * work->m_angle)) / 3.1415927f;
-        tableIndex = (s32)tableAngle;
-    }
+    tableIndex = (s32)(((kTrigScale * work->m_angle) * kDegToRad) / kPi);
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
     cosAngle = *(f32*)((u8*)gPppTrigTable + ((tableIndex + 0x4000) & 0xFFFC));
-    radiusX = work->m_radius * cosAngle;
-    radiusZ = work->m_radius * -sinAngle;
-    nextPos.y = 0.0f;
-    nextPos.x = radiusX;
-    nextPos.z = radiusZ;
-    nextPos.x += work->m_center.x;
-    nextPos.y = *(f32*)(pppMngSt + 0xC);
-    nextPos.z += work->m_center.z;
+    nextPos.x = (work->m_radius * cosAngle) + work->m_center.x;
+    nextPos.y = pppMngSt->m_position.y;
+    nextPos.z = (work->m_radius * -sinAngle) + work->m_center.z;
 
-    pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
-    pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
+    pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
+    pppCopyVector(pppMngSt->m_position, nextPos);
 
-    *(f32*)((u8*)pppMngStPtr + 0x84) = nextPos.x;
-    *(f32*)((u8*)pppMngStPtr + 0x94) = nextPos.y;
-    *(f32*)((u8*)pppMngStPtr + 0xA4) = nextPos.z;
+    pppMngSt->m_matrix.value[0][3] = nextPos.x;
+    pppMngSt->m_matrix.value[1][3] = nextPos.y;
+    pppMngSt->m_matrix.value[2][3] = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }

@@ -198,6 +198,8 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
 
                     if (magnitude > 1.0f) {
                         magnitude = sqrtf(magnitude);
+                    } else if (magnitude < 0.0f) {
+                        magnitude = NAN;
                     } else if (Crystal2IsNaN(magnitude)) {
                         magnitude = NAN;
                     }

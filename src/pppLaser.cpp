@@ -3,6 +3,9 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/symbols_shared.h"
@@ -31,16 +34,10 @@ void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);
 void* GetPartyObj__5CGameFi(CGame*, int);
 void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
-void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
-void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
-void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
-int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
 int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
-void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
@@ -226,7 +223,7 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
+extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
     LaserWork* work;
@@ -254,16 +251,12 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
         memset(work->m_points, 0, (u32)step->m_payload[0x1e] * sizeof(Vec));
     }
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-        *(float*)(step->m_payload + 0x10), baseObj, step->m_graphId, &work->m_halfWidth, &work->m_graphValue2,
-        &work->m_graphValue3,
-        (float*)(step->m_payload + 0x14), (float*)(step->m_payload + 0x18));
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-        *(float*)(step->m_payload + 4), baseObj, step->m_graphId, &work->m_lengthStep, &work->m_graphValue0,
-        &work->m_graphValue1,
-        (float*)(step->m_payload + 8), (float*)(step->m_payload + 0xc));
+    CalcGraphValue(baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+        *(float*)(step->m_payload + 0x10), *(float*)(step->m_payload + 0x14), *(float*)(step->m_payload + 0x18));
+    CalcGraphValue(baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+        *(float*)(step->m_payload + 4), *(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
-    pppCalcFrameShape__FPlRsRsRss(
+    pppCalcFrameShape(
         *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
         work->m_shapeArg2, work->m_shapeArg0, *(short*)(step->m_payload + 0x2c));
 
@@ -273,7 +266,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
 
         for (int j = max; (int)i <= j; j--) {
             localA = points[j];
-            pppCopyVector__FR3Vec3Vec(&points[j + 1], &localA);
+            pppCopyVector(points[j + 1], localA);
         }
 
         localB.x = kPppLaserZero;
@@ -289,7 +282,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
         } else if (!resetPoints) {
             double denom = ((double)(int)step->m_payload[0x3a] + 1.0) - DOUBLE_80333440;
             double t = (FLOAT_80333448 / (float)denom) * ((double)(int)i - DOUBLE_80333440);
-            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f((float)t, pppMngStPtr, charaMtx) == 0) {
+            if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
                 resetPoints = true;
             } else {
                 PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
@@ -302,7 +295,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
         }
 
         localPos = work->m_origin;
-        pppSubVector__FR3Vec3Vec3Vec(&localA, &points[i], &localPos);
+        pppSubVector(localA, points[i], localPos);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
 
         cyl.m_bottom = localPos;
@@ -337,7 +330,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
         }
 
         if (step->m_payload[0x3b] == 0) {
-            pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(
+            pppHitCylinderSendSystem(
                 pppMngStPtr, &work->m_origin, &localA, pppMngStPtr->m_ownerScale * *(float*)(step->m_payload + 0x24),
                 *(float*)(step->m_payload + 0x20));
         }
@@ -367,7 +360,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
     if (resetPoints) {
         Vec* points = work->m_points;
         for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-            pppCopyVector__FR3Vec3Vec(&points[i], &points[0]);
+            pppCopyVector(points[i], points[0]);
         }
     }
 }
@@ -381,7 +374,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _ppp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
+extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
     _pppPObject* baseObj = (_pppPObject*)pppLaser;

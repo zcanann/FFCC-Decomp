@@ -363,45 +363,36 @@ void CMenuPcs::MLstCtrl()
 		return;
 	}
 
-	item = reinterpret_cast<int>(list) + 8;
 	for (i = 0; (itemCount = (unsigned int)list->count), i < (int)itemCount; i++) {
-		*(float*)(item + 0x10) = one;
-		*(float*)(item + 0x14) = one;
-		item += 0x40;
+		MenuLstEntry* entry = &list->entries[i];
+		entry->s = one;
+		entry->t = one;
 	}
 
 	startFrame = 0;
-	offset = ((int)itemCount - 1) * 0x40;
+	offset = (int)itemCount - 1;
 	if (-1 < (int)(itemCount - 1)) {
 		chunkCount = itemCount >> 3;
 		if (chunkCount != 0) {
 			do {
-				item = reinterpret_cast<int>(list) + offset + 8;
-				*(int*)(item + 0x24) = startFrame;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0x38;
-				*(int*)(item + 0x24) = startFrame + 1;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0x78;
-				*(int*)(item + 0x24) = startFrame + 2;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0xB8;
-				*(int*)(item + 0x24) = startFrame + 3;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0xF8;
-				*(int*)(item + 0x24) = startFrame + 4;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0x138;
-				*(int*)(item + 0x24) = startFrame + 5;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0x178;
-				*(int*)(item + 0x24) = startFrame + 6;
-				*(int*)(item + 0x28) = 4;
-				item = reinterpret_cast<int>(list) + offset - 0x1B8;
-				offset -= 0x200;
-				*(int*)(item + 0x24) = startFrame + 7;
+				list->entries[offset].startFrame = startFrame;
+				list->entries[offset].duration = 4;
+				list->entries[offset - 1].startFrame = startFrame + 1;
+				list->entries[offset - 1].duration = 4;
+				list->entries[offset - 2].startFrame = startFrame + 2;
+				list->entries[offset - 2].duration = 4;
+				list->entries[offset - 3].startFrame = startFrame + 3;
+				list->entries[offset - 3].duration = 4;
+				list->entries[offset - 4].startFrame = startFrame + 4;
+				list->entries[offset - 4].duration = 4;
+				list->entries[offset - 5].startFrame = startFrame + 5;
+				list->entries[offset - 5].duration = 4;
+				list->entries[offset - 6].startFrame = startFrame + 6;
+				list->entries[offset - 6].duration = 4;
+				list->entries[offset - 7].startFrame = startFrame + 7;
 				startFrame += 8;
-				*(int*)(item + 0x28) = 4;
+				list->entries[offset - 7].duration = 4;
+				offset -= 8;
 				chunkCount--;
 			} while (chunkCount != 0);
 
@@ -413,11 +404,10 @@ void CMenuPcs::MLstCtrl()
 		}
 
 		do {
-			item = reinterpret_cast<int>(list) + offset + 8;
-			offset -= 0x40;
-			*(int*)(item + 0x24) = startFrame;
+			list->entries[offset].startFrame = startFrame;
 			startFrame++;
-			*(int*)(item + 0x28) = 4;
+			list->entries[offset].duration = 4;
+			offset--;
 			itemCount--;
 		} while (itemCount != 0);
 	}

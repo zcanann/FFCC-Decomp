@@ -498,85 +498,76 @@ int CBound::CheckFrustum0(float farPlane)
     Vec vertex;
     Vec transformed;
 
-    if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
-        return 1;
-    }
-
-    farthestZ = FLOAT_8032F780;
-    zero = kZeroF;
-    insideMask = 0xF;
-    outsideMask = 0;
-    xIndex = 0;
-    do {
-        if (xIndex == 0) {
-            vertex.x = inBound[0];
-        } else {
-            vertex.x = inBound[3];
-        }
-        yIndex = 0;
+    if ((inBound[3] < s_f_vpos.x) || (inBound[4] < s_f_vpos.y) || (inBound[5] < s_f_vpos.z) ||
+        (s_f_vpos.x < inBound[0]) || (s_f_vpos.y < inBound[1]) || (s_f_vpos.z < inBound[2])) {
+        farthestZ = FLOAT_8032F780;
+        zero = kZeroF;
+        insideMask = 0xF;
+        outsideMask = 0;
+        xIndex = 0;
         do {
-            if (yIndex == 0) {
-                vertex.y = inBound[1];
+            if (xIndex == 0) {
+                vertex.x = inBound[0];
             } else {
-                vertex.y = inBound[4];
+                vertex.x = inBound[3];
             }
-            zIndex = 0;
+            yIndex = 0;
             do {
-                if (zIndex == 0) {
-                    vertex.z = inBound[2];
+                if (yIndex == 0) {
+                    vertex.y = inBound[1];
                 } else {
-                    vertex.z = inBound[5];
+                    vertex.y = inBound[4];
                 }
-                PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
-                if (farthestZ < transformed.z) {
-                    farthestZ = transformed.z;
-                }
-                if (transformed.z <= zero) {
-                    if (transformed.x <= -transformed.z) {
-                        if (transformed.z <= transformed.x) {
-                            clipMask = 0;
-                        } else {
-                            clipMask = 2;
-                        }
+                zIndex = 0;
+                do {
+                    if (zIndex == 0) {
+                        vertex.z = inBound[2];
                     } else {
-                        clipMask = 1;
+                        vertex.z = inBound[5];
                     }
-                    if (transformed.y <= -transformed.z) {
-                        if (transformed.y < transformed.z) {
-                            clipMask = clipMask | 8;
-                        }
-                    } else {
-                        clipMask = clipMask | 4;
+                    PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
+                    if (farthestZ < transformed.z) {
+                        farthestZ = transformed.z;
                     }
-                } else {
-                    if (transformed.x <= -transformed.z) {
-                        if (transformed.z <= transformed.x) {
-                            clipMask = 0x10;
-                        } else {
+                    if (zero < transformed.z) {
+                        if (-transformed.z < transformed.x) {
+                            clipMask = 0x11;
+                        } else if (transformed.x < transformed.z) {
                             clipMask = 0x12;
+                        } else {
+                            clipMask = 0x10;
                         }
-                    } else {
-                        clipMask = 0x11;
-                    }
-                    if (transformed.y <= -transformed.z) {
-                        if (transformed.y < transformed.z) {
+                        if (-transformed.z < transformed.y) {
+                            clipMask = clipMask | 0x14;
+                        } else if (transformed.y < transformed.z) {
                             clipMask = clipMask | 0x18;
                         }
                     } else {
-                        clipMask = clipMask | 0x14;
+                        if (-transformed.z < transformed.x) {
+                            clipMask = 1;
+                        } else if (transformed.x < transformed.z) {
+                            clipMask = 2;
+                        } else {
+                            clipMask = 0;
+                        }
+                        if (-transformed.z < transformed.y) {
+                            clipMask = clipMask | 4;
+                        } else if (transformed.y < transformed.z) {
+                            clipMask = clipMask | 8;
+                        }
                     }
-                }
-                zIndex = zIndex + 1;
-                insideMask = insideMask & clipMask;
-                outsideMask = outsideMask | clipMask;
-            } while (zIndex < 2);
-            yIndex = yIndex + 1;
-        } while (yIndex < 2);
-        xIndex = xIndex + 1;
-    } while (xIndex < 2);
+                    zIndex = zIndex + 1;
+                    insideMask = insideMask & clipMask;
+                    outsideMask = outsideMask | clipMask;
+                } while (zIndex < 2);
+                yIndex = yIndex + 1;
+            } while (yIndex < 2);
+            xIndex = xIndex + 1;
+        } while (xIndex < 2);
 
-    if (farPlane <= farthestZ) {
+        if (farthestZ < farPlane) {
+            return 0;
+        }
         if (insideMask != 0) {
             return 0;
         }
@@ -585,7 +576,7 @@ int CBound::CheckFrustum0(float farPlane)
         return (int)(insideMask >> 5) + 1;
     }
 
-    return 0;
+    return 1;
 }
 
 /*

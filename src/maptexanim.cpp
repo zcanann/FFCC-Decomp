@@ -255,7 +255,7 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     }
 
     const float frameFloat = F32At(this, 0x1C);
-    const unsigned int frameIndex = static_cast<unsigned int>(frameFloat);
+    const int frameIndex = static_cast<int>(frameFloat);
     const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), (frameIndex & 0xFFFF) * 2);
     void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
     SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), TextureAt(textureSet, textureIndex));
@@ -271,7 +271,7 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     }
 
     if (U8At(this, 0x14) != 0) {
-        unsigned int nextFrame = (frameIndex + 1) & 0xFFFF;
+        int nextFrame = (frameIndex + 1) & 0xFFFF;
         if (static_cast<float>(U16At(this, 0xC)) <= static_cast<float>(frameIndex + 1)) {
             nextFrame = 0;
         }

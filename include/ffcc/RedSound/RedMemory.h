@@ -2,12 +2,6 @@
 #define _FFCC_REDSOUND_REDMEMORY_H
 
 extern int gRedMemoryDebugEnabled;
-extern int m_DataBuffer;
-extern int m_ADataBuffer;
-extern int m_DataBufferSize;
-extern int m_ADataBufferSize;
-extern int* m_MemoryBank;
-extern int* m_AMemoryBank;
 
 extern const char sRedMemoryLogPrefix[];
 extern const char sRedMemoryLogSuffixA[];

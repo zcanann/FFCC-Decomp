@@ -78,6 +78,16 @@ struct CMapCylinderRaw {
     f32 m_height2;
 };
 
+struct YmMeltMngStView {
+    u8 _pad0[0x58];
+    Vec m_previousPosition;
+    Vec m_paramVec0;
+    s16 m_kind;
+    s16 m_nodeIndex;
+    u32 _pad74;
+    pppFMATRIX m_matrix;
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -114,11 +124,12 @@ extern "C" void CalcPolygonHeight(
     Vec rayDirection;
     CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
+    YmMeltMngStView* mngSt = reinterpret_cast<YmMeltMngStView*>(pppMngStPtr);
     u8* colorBytes = (u8*)color;
 
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
-    previousY = pppMngStPtr->m_previousPosition.y;
+    previousY = mngSt->m_previousPosition.y;
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
@@ -131,9 +142,9 @@ extern "C" void CalcPolygonHeight(
         vertex->m_color.m_bytes[2] = colorBytes[2];
         vertex->m_color.m_bytes[3] = colorBytes[3];
 
-        worldBase.x = pppMngStPtr->m_matrix.value[0][3];
-        worldBase.y = pppMngStPtr->m_matrix.value[1][3] + vertexData->m_collisionYOffset;
-        worldBase.z = pppMngStPtr->m_matrix.value[2][3];
+        worldBase.x = mngSt->m_matrix.value[0][3];
+        worldBase.y = mngSt->m_matrix.value[1][3] + vertexData->m_collisionYOffset;
+        worldBase.z = mngSt->m_matrix.value[2][3];
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
         rayDirection.x = zero;

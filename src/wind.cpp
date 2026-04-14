@@ -20,6 +20,11 @@ static inline MtxPtr GetCameraMatrix()
     return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
 }
 
+static inline s8 GetWindActiveFlag(const WindObject* obj)
+{
+    return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
+}
+
 const float FLOAT_80330ef0 = 0.0f;
 const float FLOAT_80330ef4 = 0.0001f;
 const float FLOAT_80330ef8 = 1.0f;
@@ -311,49 +316,49 @@ int CWind::AddAmbient(float dir, float speed)
 	s8 active;
 
 	for (int blocks = 4; blocks != 0; blocks--) {
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active == 0) {
 			goto found;
 		}
@@ -403,49 +408,49 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 	s8 active;
 
 	for (int blocks = 4; blocks != 0; blocks--) {
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active == 0) {
 			goto found;
 		}
@@ -510,49 +515,49 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 	s8 active;
 
 	do {
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active != 0) {
 			obj++;
 		} else {
 			goto found;
 		}
-		active = static_cast<s8>(obj->flags & 0x80);
+		active = GetWindActiveFlag(obj);
 		if (active == 0) {
 			goto found;
 		}

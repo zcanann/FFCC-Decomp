@@ -739,11 +739,6 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
  */
 void CGraphicPcs::drawScreenFade()
 {
-    struct CameraForFade {
-        float _padding0[58];
-        Mtx m_cameraMatrix;
-        Mtx44 m_screenMatrix;
-    };
     struct ScreenFadeObjPos {
         char _padding0[0x15C];
         float x;
@@ -753,21 +748,20 @@ void CGraphicPcs::drawScreenFade()
 
     Mtx44 orthoMtx;
     Mtx cameraMtx;
-    Mtx44 screenMtx;
+    Mtx screenMtx;
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
     C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
-    CameraForFade& cameraPcs = *reinterpret_cast<CameraForFade*>(&CameraPcs);
-    PSMTXCopy(cameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, screenMtx);
     screenMtx[3][0] = 0.0f;
     screenMtx[3][1] = 0.0f;
     screenMtx[3][2] = 0.0f;
     screenMtx[3][3] = 1.0f;
-    PSMTX44Copy(cameraPcs.m_screenMatrix, worldScreenMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
     PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
 
     GXClearVtxDesc();
@@ -1049,6 +1043,6 @@ void CGraphicPcs::drawScreenFade()
         GXTexCoord2u16(0, 2);
     }
 
-    PSMTX44Copy(cameraPcs.m_screenMatrix, orthoMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
     GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }

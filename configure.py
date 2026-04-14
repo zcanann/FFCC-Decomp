@@ -759,7 +759,7 @@ config.libs = [
     DolphinLib(
         "dvd",
         [
-            Object(NonMatching, "dvd/dvd.c"),
+            Object(Matching, "dvd/dvd.c"),
             Object(Matching, "dvd/dvderror.c"),
             Object(Matching, "dvd/dvdFatal.c"),
             Object(Matching, "dvd/dvdfs.c"),

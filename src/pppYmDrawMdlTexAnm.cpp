@@ -66,7 +66,7 @@ static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(pppYmDr
     return (pppYmDrawMdlTexAnmColorBlock*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[0]);
 }
 
-void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
+static inline void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
 {
     CMapMeshUVLayout* uvLayout;
     s32 uvByteOffset;
@@ -99,78 +99,44 @@ void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 fl
 
 /*
  * --INFO--
- * PAL Address: 0x8008aa84
- * PAL Size: 316b
+ * PAL Address: 8008a38c
+ * PAL Size: 632b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
+void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
-    pppYmDrawMdlTexAnmWork* work;
+    pppYmDrawMdlTexAnmColorBlock* colorBlock;
     pppModelSt* model;
-    f32 per;
-
+    pppFMATRIX matrix0;
+    pppFMATRIX matrix2;
+    u8* initBytes;
+    u8* stepBytes;
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
-    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
-    work->m_frame = 0;
-    work->m_wait = 0x200;
-
-    OSReport(DAT_801d9c54);
-
-    model = (pppModelSt*)GetMapMeshTable()[0];
-    per = FLOAT_8033054c;
-    work->m_perU = per;
-    work->m_perV = per;
-
-    if (model != NULL) {
-        SetUpPerUV(model, work->m_perU, work->m_perV);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 8008a93c
- * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
-{
-    pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
-    pppYmDrawMdlTexAnmWork* work;
-    CMapMeshUVLayout* uvLayout;
-    s32 uvByteOffset;
-    s32 frameU;
-    s32 i;
-
-    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
-    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
-    if ((work->m_frame != 0) && ((uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0]) != NULL)) {
-        for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            s32 uvByteOffsetV = uvByteOffset + 2;
-            frameU = work->m_frame / work->m_tilesU;
-            s32 frameModU = work->m_frame - frameU * work->m_tilesU;
-
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
-                (s16)(int)-(((f32)frameModU * work->m_perU) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset));
-            uvByteOffset += 4;
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV) =
-                (s16)(int)-(((f32)frameU * work->m_perV) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV));
-        }
-        DCFlushRange(uvLayout->m_uvPairs, (uvLayout->m_uvCount & 0xFFFF) << 2);
+    model = (pppModelSt*)GetMapMeshTable()[step->m_dataValIndex];
+    if (model == NULL) {
+        return;
     }
 
-    work->m_frame = 0;
-    work->m_tilesV = 0;
-    work->m_tilesU = 0;
-    work->m_wait = 0x200;
+    colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
+
+    pppUnitMatrix(matrix2);
+    matrix2.value[2][2] *= FLOAT_80330548;
+
+    pppMulMatrix(matrix0, ymDrawMdlTexAnm->m_localMatrix, matrix2);
+    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix02, matrix0);
+
+    initBytes = (u8*)&step->m_initWOrk;
+    stepBytes = (u8*)&step->m_stepValue;
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorBlock->m_color, &ymDrawMdlTexAnm->m_modelViewMatrix,
+                                                               step->m_arg3, step->m_payload[0xC], initBytes[2], initBytes[1],
+                                                               initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
+
+    pppSetBlendMode(initBytes[1]);
+    pppDrawMesh__FP10pppModelStP3Veci(model, ymDrawMdlTexAnm->m_drawMatrixPtr, 1);
 }
 
 /*
@@ -247,43 +213,77 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
 
 /*
  * --INFO--
- * PAL Address: 8008a38c
- * PAL Size: 632b
+ * PAL Address: 8008a93c
+ * PAL Size: 328b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
+void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
-    pppYmDrawMdlTexAnmColorBlock* colorBlock;
-    pppModelSt* model;
-    pppFMATRIX matrix0;
-    pppFMATRIX matrix2;
-    u8* initBytes;
-    u8* stepBytes;
+    pppYmDrawMdlTexAnmWork* work;
+    CMapMeshUVLayout* uvLayout;
+    s32 uvByteOffset;
+    s32 frameU;
+    s32 i;
+
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
-    model = (pppModelSt*)GetMapMeshTable()[step->m_dataValIndex];
-    if (model == NULL) {
-        return;
+    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
+    if ((work->m_frame != 0) && ((uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0]) != NULL)) {
+        for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
+            s32 uvByteOffsetV = uvByteOffset + 2;
+            frameU = work->m_frame / work->m_tilesU;
+            s32 frameModU = work->m_frame - frameU * work->m_tilesU;
+
+            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
+                (s16)(int)-(((f32)frameModU * work->m_perU) -
+                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset));
+            uvByteOffset += 4;
+            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV) =
+                (s16)(int)-(((f32)frameU * work->m_perV) -
+                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV));
+        }
+        DCFlushRange(uvLayout->m_uvPairs, (uvLayout->m_uvCount & 0xFFFF) << 2);
     }
 
-    colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
+    work->m_frame = 0;
+    work->m_tilesV = 0;
+    work->m_tilesU = 0;
+    work->m_wait = 0x200;
+}
 
-    pppUnitMatrix(matrix2);
-    matrix2.value[2][2] *= FLOAT_80330548;
+/*
+ * --INFO--
+ * PAL Address: 0x8008aa84
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
+{
+    pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
+    pppYmDrawMdlTexAnmWork* work;
+    pppModelSt* model;
+    f32 per;
 
-    pppMulMatrix(matrix0, ymDrawMdlTexAnm->m_localMatrix, matrix2);
-    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix02, matrix0);
+    ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
+    work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
+    work->m_frame = 0;
+    work->m_wait = 0x200;
 
-    initBytes = (u8*)&step->m_initWOrk;
-    stepBytes = (u8*)&step->m_stepValue;
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorBlock->m_color, &ymDrawMdlTexAnm->m_modelViewMatrix,
-                                                               step->m_arg3, step->m_payload[0xC], initBytes[2], initBytes[1],
-                                                               initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
+    OSReport(DAT_801d9c54);
 
-    pppSetBlendMode(initBytes[1]);
-    pppDrawMesh__FP10pppModelStP3Veci(model, ymDrawMdlTexAnm->m_drawMatrixPtr, 1);
+    model = (pppModelSt*)GetMapMeshTable()[0];
+    per = FLOAT_8033054c;
+    work->m_perU = per;
+    work->m_perV = per;
+
+    if (model != NULL) {
+        SetUpPerUV(model, work->m_perU, work->m_perV);
+    }
 }
 }

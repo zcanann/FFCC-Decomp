@@ -782,7 +782,7 @@ config.libs = [
         "pad",
         [
             Object(Matching, "pad/Padclamp.c"),
-            Object(NonMatching, "pad/Pad.c"),
+            Object(Matching, "pad/Pad.c"),
         ],
     ),
     DolphinLib(

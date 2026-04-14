@@ -734,7 +734,7 @@ extern "C" const char s_std_bad_exception[];
 extern "C" const char s_std_exception[];
 extern "C" const char s_bad_exception[0x20];
 
-extern "C" void* __RTTI__Q23std9exception[];
+extern "C" void* __RTTI__Q23std9exception_gecko[];
 extern "C" void* s_bad_exception_rtti[];
 extern "C" void* __RTTI__Q23std13bad_exception[];
 struct BadExceptionStorage {
@@ -1141,7 +1141,7 @@ void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
 	}
 }
 
-extern "C" void* __RTTI__Q23std9exception[]       = { (void*)s_std_exception, 0 };
-extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception, 0, 0 };
+extern "C" void* __RTTI__Q23std9exception_gecko[] = { (void*)s_std_exception, 0 };
+extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception_gecko, 0, 0 };
 extern "C" void* __RTTI__Q23std13bad_exception[] = { (void*)s_std_bad_exception, s_bad_exception_rtti };
 

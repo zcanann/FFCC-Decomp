@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/mtx.h>
-#include <math.h>
+
+float tanf(float x);
 
 /*
  * TODO: Remove this note block once linkage has been resolved.

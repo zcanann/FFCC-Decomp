@@ -41,6 +41,14 @@
  *   should treat it like the other linked-subset recoveries and bias toward
  *   inlining / trimming PAL-unused helper bodies rather than padding or
  *   section-name hacks
+ * - a fresh object-table comparison also exposed one especially awkward seam:
+ *   rebuilt source `dvdlow.o` still defines `__DVDLowTestAlarm`, but the
+ *   extracted target `dvdlow.o` no longer carries that symbol even though
+ *   target `dvd.o` still imports it via `__DVDTestAlarm`
+ * - that makes `__DVDLowTestAlarm` look more like a linked-subset /
+ *   extracted-object attribution artifact than a simple "move this function
+ *   to another C file" source fix, so follow-up here should stay cautious and
+ *   avoid blind symbol shuffling
  * - if this unit needs follow-up, it should start from target object
  *   ownership/binding around those gap symbols rather than padding out the C
  */

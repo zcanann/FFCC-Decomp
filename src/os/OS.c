@@ -57,6 +57,11 @@
  *   but fixing just that one symbol is not sufficient to make `OS.c`
  *   linkable; the broader pad/ai/os small-data binding seam is still the
  *   blocker
+ * - a fresh visible-data probe on the current branch also ruled out the
+ *   simplest format-string ownership cleanup: replacing the lone
+ *   `OSReport(sOSConsoleTypeFmt, consoleType)` use with a direct `"%08x\n"`
+ *   literal left `OSInit` completely flat, and MWCC still emitted a local
+ *   `sOSConsoleTypeFmt` symbol in rebuilt `OS.o` anyway
  */
 
 #define NOP 0x60000000

@@ -9,6 +9,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/pad.h"
+#include "ffcc/vector.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -1077,24 +1078,24 @@ void CRingMenu::DrawIcon()
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
 	Mtx cameraMtx;
-	PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMtx);
+	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-	Vec offset;
-	offset.x = FLOAT_803309c0;
-	offset.y = FLOAT_803309c4 * partyObj->unk_0x188;
-	offset.z = FLOAT_803309c0;
-
-	Vec worldPos;
-	PSVECAdd(&partyObj->m_worldPosition, &offset, &worldPos);
+	CVector offset(FLOAT_803309c0, FLOAT_803309c4 * partyObj->unk_0x188, FLOAT_803309c0);
+	CVector baseWorldPos(partyObj->m_worldPosition);
+	CVector worldPos;
+	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
 
 	Vec viewPos;
-	PSMTXMultVec(cameraMtx, &worldPos, &viewPos);
-	if (viewPos.z < FLOAT_803309c8) {
+	viewPos.x = worldPos.x;
+	viewPos.y = worldPos.y;
+	viewPos.z = worldPos.z;
+	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
+	if (FLOAT_803309c8 < viewPos.z) {
 		viewPos.z = FLOAT_803309c8;
 	}
 
 	Mtx44 screenMtx;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48), screenMtx);
+	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	Vec4d clipPos;
 	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(0, screenMtx, &viewPos, &clipPos);
 

@@ -712,17 +712,10 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 {
     unsigned int result = 0;
 
-    if ((m_screenFade[0].m_invert != 0) || (m_screenFade[0].m_timer != 0)) {
-        result = 1;
-    }
-    if ((m_screenFade[1].m_invert != 0) || (m_screenFade[1].m_timer != 0)) {
-        result |= 2;
-    }
-    if ((m_screenFade[2].m_invert != 0) || (m_screenFade[2].m_timer != 0)) {
-        result |= 4;
-    }
-    if ((m_screenFade[3].m_invert != 0) || (m_screenFade[3].m_timer != 0)) {
-        result |= 8;
+    for (int i = 0; i < 4; i++) {
+        if ((m_screenFade[i].m_invert != 0) || (m_screenFade[i].m_timer != 0)) {
+            result |= 1U << i;
+        }
     }
 
     return result;

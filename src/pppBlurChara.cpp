@@ -360,11 +360,11 @@ struct BlurCharaTexData {
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
-    int textureBase = 0;
-    int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
+    int texDataOffset = param_3->m_serializedDataOffsets[2];
     BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
     BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
+    int textureBase = 0;
     int textureIndex;
     int objPosBase;
     _GXTexObj smallBackTex;

@@ -4,9 +4,9 @@
 #include "ffcc/fontman.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
@@ -556,7 +556,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             System.Printf(s_drawErrorFmt, errorCode);
         }
 
-        CFont* font = *(CFont**)((char*)&MenuPcs + 0xF8);
+        CFont* font = MenuPcs.GetFont22();
         bool usingFallbackFont = (font == 0);
         if (usingFallbackFont)
         {
@@ -571,14 +571,14 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         Graphic._WaitDrawDone(s_fileCpp, 0x2CC);
 
-        bool compactLayout = (!usingFallbackFont && gRenderScratchTextureBuffer != 0);
+        bool compactLayout = (!usingFallbackFont && Graphic.m_scratchTextureBuffer != 0);
         if (compactLayout)
         {
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
+            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
             gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
-            memcpy((void*)((char*)gRenderScratchTextureBuffer + 0x46000), (void*)((char*)gRenderEmbedFrameBuffer + 0x34800), 0x29400);
-            DCFlushRange((void*)((char*)gRenderScratchTextureBuffer + 0x46000), 0x29400);
+            memcpy((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), (void*)((char*)Graphic.m_frameBuffer + 0x34800), 0x29400);
+            DCFlushRange((void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), 0x29400);
         }
         else
         {
@@ -651,13 +651,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         {
             GXSetDispCopySrc(0, 0, 0x280, 0x70);
             GXSetDispCopyDst(0x280, 0x70);
-            GXCopyDisp((void*)((char*)gRenderEmbedFrameBuffer + 0x34800), GX_FALSE);
+            GXCopyDisp((void*)((char*)Graphic.m_frameBuffer + 0x34800), GX_FALSE);
         }
         else
         {
             GXSetDispCopySrc(0, 0, 0x280, 0x1C0);
             GXSetDispCopyDst(0x280, 0x1C0);
-            GXCopyDisp(gRenderEmbedFrameBuffer, GX_FALSE);
+            GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
         Graphic._WaitDrawDone(s_fileCpp, 0x329);
@@ -678,13 +678,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         {
             gUtil.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                            GX_BL_INVSRCALPHA);
-            memcpy((void*)((char*)gRenderEmbedFrameBuffer + 0x34800), (void*)((char*)gRenderScratchTextureBuffer + 0x46000), 0x29400);
-            DCFlushRange((void*)((char*)gRenderEmbedFrameBuffer + 0x34800), 0x29400);
+            memcpy((void*)((char*)Graphic.m_frameBuffer + 0x34800), (void*)((char*)Graphic.m_scratchTextureBuffer + 0x46000), 0x29400);
+            DCFlushRange((void*)((char*)Graphic.m_frameBuffer + 0x34800), 0x29400);
         }
         else
         {
             gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
-            GXCopyDisp(gRenderEmbedFrameBuffer, GX_FALSE);
+            GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
         Graphic._WaitDrawDone(s_fileCpp, 0x35B);

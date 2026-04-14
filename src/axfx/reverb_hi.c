@@ -3,28 +3,6 @@
 #include <dolphin/axfx.h>
 #include "dolphin/axfx/__axfx.h"
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - the current AXFX constant-ownership seam fix is real, but `reverb_hi.c`
- *   is still not safely linkable as Matching on this branch
- *
- * Most useful result so far:
- * - after moving the local `.sdata2` ownership back into `reverb_hi.c` and
- *   `chorus.c`, `ReverbHICreate` and `AXFXReverbHiCallback` now hit 100% in
- *   objdiff and a fresh Matching flip for `reverb_hi.c` rebuilt cleanly up to
- *   the final `main.dol` checksum
- * - the remaining visible diff is no longer in the function bodies; it is the
- *   `.sdata2` tail only
- * - current source still emits one extra local 8-byte double between `@128`
- *   and `i2fMagic`, while the target object wants that slot absent and then
- *   the later `i2fMagic` / `value1_0` / `value0_3` / `value0_6` / `@213`
- *   locals immediately after `@128`
- * - so the next real pass here should stay focused on that one remaining local
- *   constant identity / ordering issue rather than rewriting the C bodies
- */
-
 extern f32 powf(f32 x, f32 y);
 
 // prototypes
@@ -161,7 +139,7 @@ static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
 				  mix >= 0.0f && mix <= 1.0f &&
 				  crosstalk >= 0.0f && crosstalk <= 1.0f &&
 				  damping >= 0.0f && damping <= 1.0f &&
-				  preDelay >= 0.0f && preDelay <= 0.1f,
+				  preDelay >= 0.0f && preDelay <= 100.0f,
 				  "The value of specified parameter is out of range.");
 
     if ((coloration < 0.0f) || (coloration > 1.0f)
@@ -169,7 +147,7 @@ static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
      || (mix < 0.0f) || (mix > 1.0f)
      || (crosstalk < 0.0f) || (crosstalk > 1.0f)
      || (damping < 0.0f) || (damping > 1.0f)
-     || (preDelay < 0.0f) || (preDelay > 0.1f)) {
+     || (preDelay < 0.0f) || (preDelay > 100.0f)) {
         return 0;
     }
 

@@ -499,7 +499,7 @@ int CBound::CheckFrustum0(float farPlane)
     Vec transformed;
 
     if ((s_f_vpos.x <= inBound[3]) && (s_f_vpos.y <= inBound[4]) && (s_f_vpos.z <= inBound[5]) &&
-        (inBound[0] <= s_f_vpos.x) && (inBound[1] <= s_f_vpos.y) && (inBound[2] <= s_f_vpos.z)) {
+        (s_f_vpos.x >= inBound[0]) && (s_f_vpos.y >= inBound[1]) && (s_f_vpos.z >= inBound[2])) {
         return 1;
     }
 

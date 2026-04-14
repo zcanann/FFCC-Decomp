@@ -80,6 +80,16 @@
  *   rejected the moved `GBA.c` window because unchanged `main_gdev.c` still
  *   owned `.sbss 0x8032F368..0x8032F370`, so the stale `+0x18` drift clearly
  *   continues at least through `TRK main_gdev` on this branch
+ * - extending that same current-build `+0x18` shift farther through
+ *   `global_destructor_chain`, `abort_exit`, the recovered `errno.c`,
+ *   `uart_console_io_gcn`, and `DebuggerDriver` pushed the first DTK overlap
+ *   to `RedSound/RedDriver.cpp`: the moved `DebuggerDriver` window wanted
+ *   `.sbss 0x8032F3B8..0x8032F3D0`, but unchanged `RedDriver.cpp` was still
+ *   anchored at `.sbss 0x8032F3B8..0x8032F490`
+ * - so the stale ownership drift is broader than the SDK-only tail; on this
+ *   branch it keeps running at least into the early RedSound region, and the
+ *   next honest re-split attempt needs to treat that later non-SDK seam as the
+ *   real cutoff instead of stopping at TRK or Odemu
  */
 
 #ifdef DEBUG

@@ -55,7 +55,7 @@ extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern float DAT_80330e10;
 extern char gUtil[];
-char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
+char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.c";
 extern double DOUBLE_80330e08;
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;

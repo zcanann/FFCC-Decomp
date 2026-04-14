@@ -678,13 +678,14 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
             fs->tail_ = (FixBlock*)block;
         }
 
-        fix_size = pool_sizes[i];
-        sub_size = fix_size + 4;
         b = (FixBlock*)block;
-        head = fs->head_;
-        tail = fs->tail_;
-        num_subblocks = (msize - 0x14) / sub_size;
+        fix_size = pool_sizes[i];
         p = (FixSubBlock*)((char*)b + 0x14);
+        msize -= 0x14;
+        tail = fs->tail_;
+        head = fs->head_;
+        sub_size = fix_size + 4;
+        num_subblocks = msize / sub_size;
         b->prev_ = tail;
         b->next_ = head;
         tail->next_ = b;

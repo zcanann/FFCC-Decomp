@@ -166,25 +166,22 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
+    int handle = (int)GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
     _GXColor white;
-    int width;
-    int height;
+    unsigned int width;
+    unsigned int height;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (int)FLOAT_80331050;
-    height = (int)FLOAT_80331054;
+    width = (unsigned int)FLOAT_80331050;
+    height = (unsigned int)FLOAT_80331054;
 
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
+    *reinterpret_cast<u32*>(&white) = 0xFFFFFFFF;
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
@@ -203,7 +200,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     rawModel->m_afterDrawModelCallback = 0;
-    Draw__Q29CCharaPcs7CHandleFi(handle, 0);
+    Draw__Q29CCharaPcs7CHandleFi((void*)handle, 0);
     rawModel->m_beforeMeshLockCallback = 0;
     rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
 
@@ -363,11 +360,11 @@ struct BlurCharaTexData {
  */
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
+    int textureBase = 0;
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
-    int textureBase = 0;
-    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
     BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
+    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
     int textureIndex;
     int objPosBase;
     _GXTexObj smallBackTex;
@@ -404,8 +401,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, 0, FLOAT_80331030, param_2->m_alpha, 0, 0,
-                                                               0, 1, 1, 0);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030,
+                                                               param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
     PSMTXIdentity(identityMtx);

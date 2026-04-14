@@ -26,7 +26,7 @@
  *   functions anymore; it is blocked because this repo still models the full
  *   library source file where GCCP01's final linked object only keeps the
  *   subset through `C_MTXLightOrtho`
- * - a PAL-map-backed GCCP01 trim is keepable here: wrapping every function the
+ * - a PAL-map-backed GCCP01 trim is keepable here: removing every function the
  *   map marks `UNUSED` shrinks rebuilt source `mtx.o` down to the exact target
  *   `.text` extent `0x0A3C` while preserving the still-linked subset through
  *   `C_MTXLightOrtho`
@@ -52,21 +52,6 @@ extern f32 sinf(f32);
 extern f32 cosf(f32);
 extern f32 tanf(f32);
 
-#ifndef VERSION_GCCP01
-void C_MTXIdentity(Mtx mtx)
-{
-    mtx[0][0] = 1.0f;
-    mtx[0][1] = 0.0f;
-    mtx[0][2] = 0.0f;
-    mtx[1][0] = 0.0f;
-    mtx[1][1] = 1.0f;
-    mtx[1][2] = 0.0f;
-    mtx[2][0] = 0.0f;
-    mtx[2][1] = 0.0f;
-    mtx[2][2] = 1.0f;
-}
-#endif
-
 #ifdef GEKKO
 void PSMTXIdentity(register Mtx m)
 {
@@ -86,31 +71,6 @@ void PSMTXIdentity(register Mtx m)
     psq_st c_10, 40(m), 0, 0
   }
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXCopy(const Mtx src, Mtx dst)
-{
-
-    if (src == dst) {
-        return;
-    }
-
-    dst[0][0] = src[0][0];
-    dst[0][1] = src[0][1];
-    dst[0][2] = src[0][2];
-    dst[0][3] = src[0][3];
-
-    dst[1][0] = src[1][0];
-    dst[1][1] = src[1][1];
-    dst[1][2] = src[1][2];
-    dst[1][3] = src[1][3];
-
-    dst[2][0] = src[2][0];
-    dst[2][1] = src[2][1];
-    dst[2][2] = src[2][2];
-    dst[2][3] = src[2][3];
 }
 #endif
 
@@ -135,41 +95,6 @@ asm void PSMTXCopy(const register Mtx src, register Mtx dst)
 
   blr
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXConcat(const Mtx a, const Mtx b, Mtx ab)
-{
-    Mtx mTmp;
-    MtxPtr m;
-
-    if ((ab == a) || (ab == b)) {
-        m = mTmp;
-    }
-
-    else {
-        m = ab;
-    }
-
-    m[0][0] = a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0];
-    m[0][1] = a[0][0] * b[0][1] + a[0][1] * b[1][1] + a[0][2] * b[2][1];
-    m[0][2] = a[0][0] * b[0][2] + a[0][1] * b[1][2] + a[0][2] * b[2][2];
-    m[0][3] = a[0][0] * b[0][3] + a[0][1] * b[1][3] + a[0][2] * b[2][3] + a[0][3];
-
-    m[1][0] = a[1][0] * b[0][0] + a[1][1] * b[1][0] + a[1][2] * b[2][0];
-    m[1][1] = a[1][0] * b[0][1] + a[1][1] * b[1][1] + a[1][2] * b[2][1];
-    m[1][2] = a[1][0] * b[0][2] + a[1][1] * b[1][2] + a[1][2] * b[2][2];
-    m[1][3] = a[1][0] * b[0][3] + a[1][1] * b[1][3] + a[1][2] * b[2][3] + a[1][3];
-
-    m[2][0] = a[2][0] * b[0][0] + a[2][1] * b[1][0] + a[2][2] * b[2][0];
-    m[2][1] = a[2][0] * b[0][1] + a[2][1] * b[1][1] + a[2][2] * b[2][1];
-    m[2][2] = a[2][0] * b[0][2] + a[2][1] * b[1][2] + a[2][2] * b[2][2];
-    m[2][3] = a[2][0] * b[0][3] + a[2][1] * b[1][3] + a[2][2] * b[2][3] + a[2][3];
-
-    if (m == mTmp) {
-        C_MTXCopy(mTmp, ab);
-    }
 }
 #endif
 
@@ -274,171 +199,6 @@ asm void PSMTXConcat(const register Mtx mA, const register Mtx mB, register Mtx 
 }
 #endif
 
-#ifndef VERSION_GCCP01
-void C_MTXConcatArray(const Mtx a, const Mtx *srcBase, Mtx *dstBase, u32 count)
-{
-    u32 i;
-    for (i = 0; i < count; i++) {
-        C_MTXConcat(a, *srcBase, *dstBase);
-
-        srcBase++;
-        dstBase++;
-    }
-}
-#endif
-
-#ifdef GEKKO
-#if (defined(__MWERKS__) && defined(_DEBUG))
-#pragma global_optimizer on
-#pragma optimization_level 1
-#endif
-
-#ifndef VERSION_GCCP01
-void PSMTXConcatArray(const register Mtx a, const register Mtx *srcBase, register Mtx *dstBase, register u32 count)
-{
-    register f32 va0, va1, va2, va3, va4, va5;
-    register f32 vb0, vb1, vb2, vb3, vb4, vb5;
-    register f32 vd0, vd1, vd2, vd3, vd4, vd5;
-    register f32 u01;
-    register f32 *u01Ptr = Unit01;
-
-    // clang-format off
-  asm
-  {
-    psq_l       va0, 0(a), 0, 0
-    psq_l       va1, 8(a), 0, 0
-    psq_l       va2, 16(a), 0, 0
-    psq_l       va3, 24(a), 0, 0
-    subi        count, count, 1
-    psq_l       va4, 32(a), 0, 0
-    psq_l       va5, 40(a), 0, 0
-    mtctr       count
-    psq_l       u01, 0(u01Ptr), 0, 0
-
-    psq_l       vb0, 0(srcBase), 0, 0
-    psq_l       vb2, 16(srcBase), 0, 0
-
-    ps_muls0    vd0, vb0, va0
-    ps_muls0    vd2, vb0, va2
-    ps_muls0    vd4, vb0, va4
-
-    psq_l       vb4, 32(srcBase), 0, 0
-
-    ps_madds1   vd0, vb2, va0, vd0
-    ps_madds1   vd2, vb2, va2, vd2
-    ps_madds1   vd4, vb2, va4, vd4
-
-    psq_l       vb1, 8(srcBase), 0, 0
-
-    ps_madds0   vd0, vb4, va1, vd0
-    ps_madds0   vd2, vb4, va3, vd2
-    ps_madds0   vd4, vb4, va5, vd4
-
-    psq_l       vb3, 24(srcBase), 0, 0
-    psq_st      vd0, 0(dstBase), 0, 0
-
-    ps_muls0    vd1, vb1, va0
-    ps_muls0    vd3, vb1, va2
-    ps_muls0    vd5, vb1, va4
-
-    psq_l       vb5, 40(srcBase), 0, 0
-    psq_st      vd2, 16(dstBase), 0, 0    
-    ps_madds1   vd1, vb3, va0, vd1
-    ps_madds1   vd3, vb3, va2, vd3
-    ps_madds1   vd5, vb3, va4, vd5
-
-_loop:
-    addi        srcBase, srcBase, sizeof(Mtx)
-    ps_madds0   vd1, vb5, va1, vd1
-    ps_madds0   vd3, vb5, va3, vd3
-    ps_madds0   vd5, vb5, va5, vd5
-    psq_l       vb0, 0(srcBase), 0, 0
-    psq_st      vd4, 32(dstBase), 0, 0
-    ps_madd     vd1, u01, va1, vd1
-    ps_madd     vd3, u01, va3, vd3
-    ps_madd     vd5, u01, va5, vd5
-    psq_l       vb2, 16(srcBase), 0, 0
-    psq_st      vd1, 8(dstBase), 0, 0
-    ps_muls0    vd0, vb0, va0
-    ps_muls0    vd2, vb0, va2
-    ps_muls0    vd4, vb0, va4
-    psq_l       vb4, 32(srcBase), 0, 0
-    psq_st      vd3, 24(dstBase), 0, 0
-    ps_madds1   vd0, vb2, va0, vd0
-    ps_madds1   vd2, vb2, va2, vd2
-    ps_madds1   vd4, vb2, va4, vd4
-    psq_l       vb1, 8(srcBase), 0, 0
-    psq_st      vd5, 40(dstBase), 0, 0
-    addi        dstBase, dstBase, sizeof(Mtx)
-
-    ps_madds0   vd0, vb4, va1, vd0
-    ps_madds0   vd2, vb4, va3, vd2
-    ps_madds0   vd4, vb4, va5, vd4
-    psq_l       vb3, 24(srcBase), 0, 0
-    psq_st      vd0, 0(dstBase), 0, 0
-    ps_muls0    vd1, vb1, va0
-    ps_muls0    vd3, vb1, va2
-    ps_muls0    vd5, vb1, va4
-    psq_l       vb5, 40(srcBase), 0, 0
-    psq_st      vd2, 16(dstBase), 0, 0
-    ps_madds1   vd1, vb3, va0, vd1
-    ps_madds1   vd3, vb3, va2, vd3
-    ps_madds1   vd5, vb3, va4, vd5
-    bdnz        _loop
-    psq_st      vd4, 32(dstBase), 0, 0
-    ps_madds0   vd1, vb5, va1, vd1
-    ps_madds0   vd3, vb5, va3, vd3
-    ps_madds0   vd5, vb5, va5, vd5
-    ps_madd     vd1, u01, va1, vd1
-    ps_madd     vd3, u01, va3, vd3
-    ps_madd     vd5, u01, va5, vd5
-    psq_st      vd1, 8(dstBase), 0, 0
-    psq_st      vd3, 24(dstBase), 0, 0
-    psq_st      vd5, 40(dstBase), 0, 0
-  }
-    // clang-format on
-}
-#endif
-
-#if (defined(__MWERKS__) && defined(_DEBUG))
-#pragma optimization_level 0
-#pragma global_optimizer reset
-#endif
-
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXTranspose(const Mtx src, Mtx xPose)
-{
-    Mtx mTmp;
-    MtxPtr m;
-
-    if (src == xPose) {
-        m = mTmp;
-    }
-    else {
-        m = xPose;
-    }
-
-    m[0][0] = src[0][0];
-    m[0][1] = src[1][0];
-    m[0][2] = src[2][0];
-    m[0][3] = 0.0f;
-    m[1][0] = src[0][1];
-    m[1][1] = src[1][1];
-    m[1][2] = src[2][1];
-    m[1][3] = 0.0f;
-    m[2][0] = src[0][2];
-    m[2][1] = src[1][2];
-    m[2][2] = src[2][2];
-    m[2][3] = 0.0f;
-
-    if (m == mTmp) {
-        C_MTXCopy(mTmp, xPose);
-    }
-}
-#endif
-
 #ifdef GEKKO
 void PSMTXTranspose(const register Mtx src, register Mtx xPose)
 {
@@ -468,53 +228,6 @@ void PSMTXTranspose(const register Mtx src, register Mtx xPose)
     stfs        row0b, 40(xPose) 
   }
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-u32 C_MTXInverse(const Mtx src, Mtx inv)
-{
-    Mtx mTmp;
-    MtxPtr m;
-    f32 det;
-
-    if (src == inv) {
-        m = mTmp;
-    }
-    else {
-        m = inv;
-    }
-
-    det = src[0][0] * src[1][1] * src[2][2] + src[0][1] * src[1][2] * src[2][0] + src[0][2] * src[1][0] * src[2][1]
-        - src[2][0] * src[1][1] * src[0][2] - src[1][0] * src[0][1] * src[2][2] - src[0][0] * src[2][1] * src[1][2];
-
-    if (det == 0.0f) {
-        return 0;
-    }
-
-    det = 1.0f / det;
-
-    m[0][0] = (src[1][1] * src[2][2] - src[2][1] * src[1][2]) * det;
-    m[0][1] = -(src[0][1] * src[2][2] - src[2][1] * src[0][2]) * det;
-    m[0][2] = (src[0][1] * src[1][2] - src[1][1] * src[0][2]) * det;
-
-    m[1][0] = -(src[1][0] * src[2][2] - src[2][0] * src[1][2]) * det;
-    m[1][1] = (src[0][0] * src[2][2] - src[2][0] * src[0][2]) * det;
-    m[1][2] = -(src[0][0] * src[1][2] - src[1][0] * src[0][2]) * det;
-
-    m[2][0] = (src[1][0] * src[2][1] - src[2][0] * src[1][1]) * det;
-    m[2][1] = -(src[0][0] * src[2][1] - src[2][0] * src[0][1]) * det;
-    m[2][2] = (src[0][0] * src[1][1] - src[1][0] * src[0][1]) * det;
-
-    m[0][3] = -m[0][0] * src[0][3] - m[0][1] * src[1][3] - m[0][2] * src[2][3];
-    m[1][3] = -m[1][0] * src[0][3] - m[1][1] * src[1][3] - m[1][2] * src[2][3];
-    m[2][3] = -m[2][0] * src[0][3] - m[2][1] * src[1][3] - m[2][2] * src[2][3];
-
-    if (m == mTmp) {
-        C_MTXCopy(mTmp, inv);
-    }
-
-    return 1;
 }
 #endif
 
@@ -591,128 +304,6 @@ _regular:
 }
 #endif
 
-#ifndef VERSION_GCCP01
-u32 C_MTXInvXpose(const Mtx src, Mtx invX)
-{
-    Mtx mTmp;
-    MtxPtr m;
-    f32 det;
-
-    if (src == invX) {
-        m = mTmp;
-    }
-    else {
-        m = invX;
-    }
-
-    det = src[0][0] * src[1][1] * src[2][2] + src[0][1] * src[1][2] * src[2][0] + src[0][2] * src[1][0] * src[2][1]
-        - src[2][0] * src[1][1] * src[0][2] - src[1][0] * src[0][1] * src[2][2] - src[0][0] * src[2][1] * src[1][2];
-
-    if (det == 0.0f) {
-        return 0;
-    }
-
-    det = 1.0f / det;
-
-    m[0][0] = (src[1][1] * src[2][2] - src[2][1] * src[1][2]) * det;
-    m[0][1] = -(src[1][0] * src[2][2] - src[2][0] * src[1][2]) * det;
-    m[0][2] = (src[1][0] * src[2][1] - src[2][0] * src[1][1]) * det;
-
-    m[1][0] = -(src[0][1] * src[2][2] - src[2][1] * src[0][2]) * det;
-    m[1][1] = (src[0][0] * src[2][2] - src[2][0] * src[0][2]) * det;
-    m[1][2] = -(src[0][0] * src[2][1] - src[2][0] * src[0][1]) * det;
-
-    m[2][0] = (src[0][1] * src[1][2] - src[1][1] * src[0][2]) * det;
-    m[2][1] = -(src[0][0] * src[1][2] - src[1][0] * src[0][2]) * det;
-    m[2][2] = (src[0][0] * src[1][1] - src[1][0] * src[0][1]) * det;
-
-    m[0][3] = 0.0F;
-    m[1][3] = 0.0F;
-    m[2][3] = 0.0F;
-
-    if (m == mTmp) {
-        C_MTXCopy(mTmp, invX);
-    }
-
-    return 1;
-}
-#endif
-
-#ifdef GEKKO
-#ifndef VERSION_GCCP01
-asm u32 PSMTXInvXpose(const register Mtx src, register Mtx invX)
-{
-    // clang-format off
-  nofralloc
-
-  psq_l       fp0, 0(src), 1, 0
-  psq_l       fp1, 4(src), 0, 0
-  psq_l       fp2, 16(src), 1, 0
-  ps_merge10  fp6, fp1, fp0
-  psq_l       fp3, 20(src), 0, 0
-  psq_l       fp4, 32(src), 1, 0
-  ps_merge10  fp7, fp3, fp2
-  psq_l       fp5, 36(src), 0, 0
-  ps_mul      fp11, fp3, fp6
-  ps_merge10  fp8, fp5, fp4
-  ps_mul      fp13, fp5, fp7
-  ps_msub     fp11, fp1, fp7, fp11
-  ps_mul      fp12, fp1, fp8
-  ps_msub     fp13, fp3, fp8, fp13
-  ps_msub     fp12, fp5, fp6, fp12
-  ps_mul      fp10, fp3, fp4
-  ps_mul      fp9,  fp0, fp5
-  ps_mul      fp8,  fp1, fp2
-  ps_msub     fp10, fp2, fp5, fp10
-  ps_msub     fp9,  fp1, fp4, fp9
-  ps_msub     fp8,  fp0, fp3, fp8
-  ps_mul      fp7, fp0, fp13
-  ps_sub      fp1, fp1, fp1
-  ps_madd     fp7, fp2, fp12, fp7
-  ps_madd     fp7, fp4, fp11, fp7
-  ps_cmpo0    cr0, fp7, fp1
-  bne         _regular
-  addi        r3, 0, 0
-  blr
-
-_regular:
-  fres        fp0, fp7
-  psq_st      fp1,  12(invX), 1, 0
-  ps_add      fp6, fp0, fp0
-  ps_mul      fp5, fp0, fp0
-  psq_st      fp1,  28(invX), 1, 0
-  ps_nmsub    fp0, fp7, fp5, fp6
-  psq_st      fp1,  44(invX), 1, 0
-  ps_muls0    fp13, fp13, fp0
-  ps_muls0    fp12, fp12, fp0
-  ps_muls0    fp11, fp11, fp0
-  psq_st      fp13,  0(invX), 0, 0
-  psq_st      fp12,  16(invX), 0, 0
-  ps_muls0    fp10, fp10, fp0
-  ps_muls0    fp9,  fp9,  fp0
-  psq_st      fp11,  32(invX), 0, 0
-  psq_st      fp10,  8(invX), 1, 0
-  ps_muls0    fp8,  fp8,  fp0
-  addi        r3, 0, 1
-  psq_st      fp9,   24(invX), 1, 0
-  psq_st      fp8,   40(invX), 1, 0
-  blr
-    // clang-format on
-}
-#endif
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXRotRad(Mtx m, char axis, f32 rad)
-{
-
-    f32 sinA, cosA;
-    sinA = sinf(rad);
-    cosA = cosf(rad);
-    C_MTXRotTrig(m, axis, sinA, cosA);
-}
-#endif
-
 #ifdef GEKKO
 void PSMTXRotRad(Mtx m, char axis, f32 rad)
 {
@@ -722,65 +313,6 @@ void PSMTXRotRad(Mtx m, char axis, f32 rad)
     cosA = cosf(rad);
 
     PSMTXRotTrig(m, axis, sinA, cosA);
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXRotTrig(Mtx m, char axis, f32 sinA, f32 cosA)
-{
-    switch (axis) {
-
-        case 'x':
-        case 'X':
-            m[0][0] = 1.0f;
-            m[0][1] = 0.0f;
-            m[0][2] = 0.0f;
-            m[0][3] = 0.0f;
-            m[1][0] = 0.0f;
-            m[1][1] = cosA;
-            m[1][2] = -sinA;
-            m[1][3] = 0.0f;
-            m[2][0] = 0.0f;
-            m[2][1] = sinA;
-            m[2][2] = cosA;
-            m[2][3] = 0.0f;
-            break;
-
-        case 'y':
-        case 'Y':
-            m[0][0] = cosA;
-            m[0][1] = 0.0f;
-            m[0][2] = sinA;
-            m[0][3] = 0.0f;
-            m[1][0] = 0.0f;
-            m[1][1] = 1.0f;
-            m[1][2] = 0.0f;
-            m[1][3] = 0.0f;
-            m[2][0] = -sinA;
-            m[2][1] = 0.0f;
-            m[2][2] = cosA;
-            m[2][3] = 0.0f;
-            break;
-
-        case 'z':
-        case 'Z':
-            m[0][0] = cosA;
-            m[0][1] = -sinA;
-            m[0][2] = 0.0f;
-            m[0][3] = 0.0f;
-            m[1][0] = sinA;
-            m[1][1] = cosA;
-            m[1][2] = 0.0f;
-            m[1][3] = 0.0f;
-            m[2][0] = 0.0f;
-            m[2][1] = 0.0f;
-            m[2][2] = 1.0f;
-            m[2][3] = 0.0f;
-            break;
-
-        default:
-            break;
-    }
 }
 #endif
 
@@ -860,46 +392,6 @@ _end:
     // clang-format on
 }
 
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXRotAxisRad(Mtx m, const Vec *axis, f32 rad)
-{
-    Vec vN;
-    f32 s, c;
-    f32 t;
-    f32 x, y, z;
-    f32 xSq, ySq, zSq;
-
-    s = sinf(rad);
-    c = cosf(rad);
-    t = 1.0f - c;
-
-    C_VECNormalize(axis, &vN);
-
-    x = vN.x;
-    y = vN.y;
-    z = vN.z;
-
-    xSq = x * x;
-    ySq = y * y;
-    zSq = z * z;
-
-    m[0][0] = (t * xSq) + (c);
-    m[0][1] = (t * x * y) - (s * z);
-    m[0][2] = (t * x * z) + (s * y);
-    m[0][3] = 0.0f;
-
-    m[1][0] = (t * x * y) + (s * z);
-    m[1][1] = (t * ySq) + (c);
-    m[1][2] = (t * y * z) - (s * x);
-    m[1][3] = 0.0f;
-
-    m[2][0] = (t * x * z) - (s * y);
-    m[2][1] = (t * y * z) + (s * x);
-    m[2][2] = (t * zSq) + (c);
-    m[2][3] = 0.0f;
-}
 #endif
 
 #ifdef GEKKO
@@ -1000,24 +492,6 @@ void PSMTXRotAxisRad(register Mtx m, const Vec *axis, register f32 rad)
 
 #endif
 
-#ifndef VERSION_GCCP01
-void C_MTXTrans(Mtx m, f32 xT, f32 yT, f32 zT)
-{
-    m[0][0] = 1.0f;
-    m[0][1] = 0.0f;
-    m[0][2] = 0.0f;
-    m[0][3] = xT;
-    m[1][0] = 0.0f;
-    m[1][1] = 1.0f;
-    m[1][2] = 0.0f;
-    m[1][3] = yT;
-    m[2][0] = 0.0f;
-    m[2][1] = 0.0f;
-    m[2][2] = 1.0f;
-    m[2][3] = zT;
-}
-#endif
-
 #ifdef GEKKO
 void PSMTXTrans(register Mtx m, register f32 xT, register f32 yT, register f32 zT)
 {
@@ -1038,27 +512,6 @@ void PSMTXTrans(register Mtx m, register f32 xT, register f32 yT, register f32 z
     stfs        c1,      0(m)
   }
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXTransApply(const Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT)
-{
-    if (src != dst) {
-        dst[0][0] = src[0][0];
-        dst[0][1] = src[0][1];
-        dst[0][2] = src[0][2];
-        dst[1][0] = src[1][0];
-        dst[1][1] = src[1][1];
-        dst[1][2] = src[1][2];
-        dst[2][0] = src[2][0];
-        dst[2][1] = src[2][1];
-        dst[2][2] = src[2][2];
-    }
-
-    dst[0][3] = src[0][3] + xT;
-    dst[1][3] = src[1][3] + yT;
-    dst[2][3] = src[2][3] + zT;
 }
 #endif
 
@@ -1090,24 +543,6 @@ asm void PSMTXTransApply(const register Mtx src, register Mtx dst, register f32 
 }
 #endif
 
-#ifndef VERSION_GCCP01
-void C_MTXScale(Mtx m, f32 xS, f32 yS, f32 zS)
-{
-    m[0][0] = xS;
-    m[0][1] = 0.0f;
-    m[0][2] = 0.0f;
-    m[0][3] = 0.0f;
-    m[1][0] = 0.0f;
-    m[1][1] = yS;
-    m[1][2] = 0.0f;
-    m[1][3] = 0.0f;
-    m[2][0] = 0.0f;
-    m[2][1] = 0.0f;
-    m[2][2] = zS;
-    m[2][3] = 0.0f;
-}
-#endif
-
 #ifdef GEKKO
 void PSMTXScale(register Mtx m, register f32 xS, register f32 yS, register f32 zS)
 {
@@ -1125,26 +560,6 @@ void PSMTXScale(register Mtx m, register f32 xS, register f32 yS, register f32 z
     stfs        c0,     44(m)
   }
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXScaleApply(const Mtx src, Mtx dst, f32 xS, f32 yS, f32 zS)
-{
-    dst[0][0] = src[0][0] * xS;
-    dst[0][1] = src[0][1] * xS;
-    dst[0][2] = src[0][2] * xS;
-    dst[0][3] = src[0][3] * xS;
-
-    dst[1][0] = src[1][0] * yS;
-    dst[1][1] = src[1][1] * yS;
-    dst[1][2] = src[1][2] * yS;
-    dst[1][3] = src[1][3] * yS;
-
-    dst[2][0] = src[2][0] * zS;
-    dst[2][1] = src[2][1] * zS;
-    dst[2][2] = src[2][2] * zS;
-    dst[2][3] = src[2][3] * zS;
 }
 #endif
 
@@ -1176,43 +591,6 @@ asm void PSMTXScaleApply(const register Mtx src, register Mtx dst, register f32 
   psq_st      fp2, 40(dst),       0, 0
   blr
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXQuat(Mtx m, const Quaternion *q)
-{
-
-    f32 s, xs, ys, zs, wx, wy, wz, xx, xy, xz, yy, yz, zz;
-    s = 2.0f / ((q->x * q->x) + (q->y * q->y) + (q->z * q->z) + (q->w * q->w));
-
-    xs = q->x * s;
-    ys = q->y * s;
-    zs = q->z * s;
-    wx = q->w * xs;
-    wy = q->w * ys;
-    wz = q->w * zs;
-    xx = q->x * xs;
-    xy = q->x * ys;
-    xz = q->x * zs;
-    yy = q->y * ys;
-    yz = q->y * zs;
-    zz = q->z * zs;
-
-    m[0][0] = 1.0f - (yy + zz);
-    m[0][1] = xy - wz;
-    m[0][2] = xz + wy;
-    m[0][3] = 0.0f;
-
-    m[1][0] = xy + wz;
-    m[1][1] = 1.0f - (xx + zz);
-    m[1][2] = yz - wx;
-    m[1][3] = 0.0f;
-
-    m[2][0] = xz - wy;
-    m[2][1] = yz + wx;
-    m[2][2] = 1.0f - (xx + yy);
-    m[2][3] = 0.0f;
 }
 #endif
 
@@ -1268,33 +646,6 @@ void PSMTXQuat(register Mtx m, const register Quaternion *q)
     psq_st      tmp9, 32(m), 0, 0
   }
     // clang-format on
-}
-#endif
-
-#ifndef VERSION_GCCP01
-void C_MTXReflect(Mtx m, const Vec *p, const Vec *n)
-{
-    f32 vxy, vxz, vyz, pdotn;
-
-    vxy = -2.0f * n->x * n->y;
-    vxz = -2.0f * n->x * n->z;
-    vyz = -2.0f * n->y * n->z;
-    pdotn = 2.0f * C_VECDotProduct(p, n);
-
-    m[0][0] = 1.0f - 2.0f * n->x * n->x;
-    m[0][1] = vxy;
-    m[0][2] = vxz;
-    m[0][3] = pdotn * n->x;
-
-    m[1][0] = vxy;
-    m[1][1] = 1.0f - 2.0f * n->y * n->y;
-    m[1][2] = vyz;
-    m[1][3] = pdotn * n->y;
-
-    m[2][0] = vxz;
-    m[2][1] = vyz;
-    m[2][2] = 1.0f - 2.0f * n->z * n->z;
-    m[2][3] = pdotn * n->z;
 }
 #endif
 

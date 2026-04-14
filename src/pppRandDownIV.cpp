@@ -62,7 +62,12 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
     f32 scale = *valuePtr;
 
-    target[0] += (s32)((f32)in->field8 * scale);
-    target[1] += (s32)((f32)in->fieldC * scale);
-    target[2] += (s32)((f32)in->field10 * scale);
+    s32 value0 = target[0];
+    target[0] = value0 + (s32)((f32)in->field8 * scale);
+
+    s32 value1 = target[1];
+    target[1] = value1 + (s32)((f32)in->fieldC * scale);
+
+    s32 value2 = target[2];
+    target[2] = value2 + (s32)((f32)in->field10 * scale);
 }

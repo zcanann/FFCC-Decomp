@@ -2,12 +2,12 @@
 #include "ffcc/RedSound/RedGlobals.h"
 #include <dolphin/os.h>
 
-int gRedMainMemoryBase;
-int gRedAMemoryBase;
-int gRedMainMemorySize;
-int gRedAMemorySize;
-int* gRedMainMemoryBlockList;
-int* gRedAMemoryBlockList;
+int m_DataBuffer;
+int m_ADataBuffer;
+int m_DataBufferSize;
+int m_ADataBufferSize;
+int* m_MemoryBank;
+int* m_AMemoryBank;
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
@@ -80,12 +80,12 @@ int RedNew(int param_1)
 		return 0;
 	}
 
-	blockList = gRedMainMemoryBlockList;
+	blockList = m_MemoryBank;
 	if (blockList == 0) {
 		return 0;
 	}
 
-	address = gRedMainMemoryBase;
+	address = m_DataBuffer;
 	if (address == 0) {
 		return 0;
 	}
@@ -105,7 +105,7 @@ int RedNew(int param_1)
 				break;
 			}
 
-			if ((unsigned int)(address + alignedSize) <= (unsigned int)(gRedMainMemoryBase + gRedMainMemorySize)) {
+			if ((unsigned int)(address + alignedSize) <= (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
 				if (slot[1] > 0) {
 					moveCount = (int)blockList + (0x2000 - (int)(slot + 2));
 					entryCount = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
@@ -147,7 +147,7 @@ void RedDelete(int address)
 	}
 
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = gRedMainMemoryBlockList;
+	int* blockList = m_MemoryBank;
 
 	if (blockList != 0) {
 		int* blockEnd = blockList + 0x800;
@@ -211,10 +211,10 @@ int RedNewA(int size, int offset, int maxSize)
 	int* blockPtr;
 	int* scanPtr;
 
-	if (size < 1 || gRedAMemoryBlockList == (int*)0 || gRedAMemoryBase == 0) {
+	if (size < 1 || m_AMemoryBank == (int*)0 || m_ADataBuffer == 0) {
 		return 0;
 	}
-	if (gRedAMemoryBlockList[0x7FF] >= 1) {
+	if (m_AMemoryBank[0x7FF] >= 1) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
@@ -223,22 +223,22 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	interrupts = OSDisableInterrupts();
-	iVar6 = gRedAMemoryBase + offset;
+	iVar6 = m_ADataBuffer + offset;
 	if (maxSize == 0) {
-		maxSize = gRedAMemorySize;
+		maxSize = m_ADataBufferSize;
 	}
 	maxSize = maxSize - offset;
 	alignedSize = size + 0x1FU & 0xFFFFFFE0;
 	iVar7 = -1;
 	bestBlock = (int*)0;
-	for (blockPtr = gRedAMemoryBlockList; (blockPtr[1] != 0 && *blockPtr < iVar6); blockPtr = blockPtr + 2) {
+	for (blockPtr = m_AMemoryBank; (blockPtr[1] != 0 && *blockPtr < iVar6); blockPtr = blockPtr + 2) {
 	}
 	iVar5 = maxSize;
 	result = iVar6;
 	iVar8 = iVar6;
 	scanPtr = blockPtr;
 	if (blockPtr[1] != 0) {
-		for (; scanPtr[1] != 0 && scanPtr < gRedAMemoryBlockList + 0x800; scanPtr = scanPtr + 2) {
+		for (; scanPtr[1] != 0 && scanPtr < m_AMemoryBank + 0x800; scanPtr = scanPtr + 2) {
 			if (iVar8 < iVar6 + maxSize) {
 				if ((int)(iVar8 + alignedSize) <= *scanPtr) {
 					iVar7 = iVar8;
@@ -248,13 +248,13 @@ int RedNewA(int size, int offset, int maxSize)
 					}
 				}
 			} else {
-				scanPtr = gRedAMemoryBlockList + 0x800;
+				scanPtr = m_AMemoryBank + 0x800;
 			}
 			iVar8 = *scanPtr + scanPtr[1];
 		}
 		result = iVar7;
 		blockPtr = bestBlock;
-		if (((scanPtr[1] == 0 && scanPtr < gRedAMemoryBlockList + 0x800) &&
+		if (((scanPtr[1] == 0 && scanPtr < m_AMemoryBank + 0x800) &&
 		     (iVar7 = (iVar6 + maxSize) - iVar8, (int)alignedSize <= iVar7)) &&
 		    iVar7 < iVar5) {
 			result = iVar8;
@@ -266,7 +266,7 @@ int RedNewA(int size, int offset, int maxSize)
 		return 0;
 	}
 	if (0 < blockPtr[1]) {
-		moveCount = (int)gRedAMemoryBlockList + (0x2000 - (int)(blockPtr + 2));
+		moveCount = (int)m_AMemoryBank + (0x2000 - (int)(blockPtr + 2));
 		iVar6 = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
 		if (0 < iVar6) {
 			memmove(blockPtr + 2, blockPtr, iVar6 * 8);
@@ -294,7 +294,7 @@ void RedDeleteA(int address)
 	}
 
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = gRedAMemoryBlockList;
+	int* blockList = m_AMemoryBank;
 
 	if (blockList != 0) {
 		int* blockEnd = blockList + 0x800;
@@ -351,14 +351,14 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	bankSize += 0x1FU;
 	bankSize &= 0xFFFFFFE0;
 
-	gRedMainMemoryBlockList = (int*)param1;
-	gRedMainMemorySize = param2 - (bankSize * 2);
-	gRedAMemoryBlockList = (int*)((int)gRedMainMemoryBlockList + bankSize);
-	gRedMainMemoryBase = (int)gRedAMemoryBlockList + bankSize;
-	memset(gRedMainMemoryBlockList, 0, bankSize);
-	memset(gRedAMemoryBlockList, 0, bankSize);
-	gRedAMemoryBase = param3;
-	gRedAMemorySize = param4;
+	m_MemoryBank = (int*)param1;
+	m_DataBufferSize = param2 - (bankSize * 2);
+	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
+	m_DataBuffer = (int)m_AMemoryBank + bankSize;
+	memset(m_MemoryBank, 0, bankSize);
+	memset(m_AMemoryBank, 0, bankSize);
+	m_ADataBuffer = param3;
+	m_ADataBufferSize = param4;
 }
 #pragma optimization_level 4
 
@@ -373,7 +373,7 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
  */
 int CRedMemory::GetMainBufferAddress()
 {
-	return gRedMainMemoryBase;
+	return m_DataBuffer;
 }
 
 /*
@@ -387,7 +387,7 @@ int CRedMemory::GetMainBufferAddress()
  */
 int CRedMemory::GetMainBufferSize()
 {
-	return gRedMainMemorySize;
+	return m_DataBufferSize;
 }
 
 /*
@@ -401,7 +401,7 @@ int CRedMemory::GetMainBufferSize()
  */
 int* CRedMemory::GetMainBankAddress()
 {
-	return gRedMainMemoryBlockList;
+	return m_MemoryBank;
 }
 
 /*
@@ -415,7 +415,7 @@ int* CRedMemory::GetMainBankAddress()
  */
 int CRedMemory::GetABufferAddress()
 {
-	return gRedAMemoryBase;
+	return m_ADataBuffer;
 }
 
 /*
@@ -429,7 +429,7 @@ int CRedMemory::GetABufferAddress()
  */
 int CRedMemory::GetABufferSize()
 {
-	return gRedAMemorySize;
+	return m_ADataBufferSize;
 }
 
 /*
@@ -443,5 +443,5 @@ int CRedMemory::GetABufferSize()
  */
 int* CRedMemory::GetABankAddress()
 {
-	return gRedAMemoryBlockList;
+	return m_AMemoryBank;
 }

@@ -16,11 +16,11 @@ struct RedReverbDATA {
     int kind;
 };
 
-u8 DAT_8032f4a8;
-int DAT_8032f4ac;
-u32* DAT_8032f4b0;
-u32 DAT_8032f4b4;
-int* DAT_8032f4b8;
+u8 m_RandomIndex;
+int p_ReverbData;
+u32* p_ReverbSize;
+u32 m_ChangeStatus;
+int* p_SkipKeyOn;
 
 /*
  * --INFO--
@@ -33,8 +33,8 @@ int* DAT_8032f4b8;
  */
 u8 GetRandomData()
 {
-    u8 value = (u8)DAT_8021dcce[DAT_8032f4a8];
-    DAT_8032f4a8 = DAT_8032f4a8 + 1;
+    u8 value = (u8)DAT_8021dcce[m_RandomIndex];
+    m_RandomIndex = m_RandomIndex + 1;
     return value;
 }
 
@@ -99,8 +99,8 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
 void ReverbAreaAlloc(unsigned long size)
 {
     unsigned long alignedSize = ((u32)size + 0x1F) & ~0x1F;
-    DAT_8032f4b0[0] += (u32)size;
-    DAT_8032f4b0[1] += (u32)alignedSize;
+    p_ReverbSize[0] += (u32)size;
+    p_ReverbSize[1] += (u32)alignedSize;
     RedNew((int)size);
 }
 
@@ -130,9 +130,9 @@ void ReverbAreaFree(void* param_1)
  */
 void InitReverb()
 {
-    DAT_8032f4ac = RedNew(0x18);
-    memset((void*)DAT_8032f4ac, 0, 0x18);
-    DAT_8032f4b0 = (u32*)RedNew(4);
+    p_ReverbData = RedNew(0x18);
+    memset((void*)p_ReverbData, 0, 0x18);
+    p_ReverbSize = (u32*)RedNew(4);
 }
 
 /*
@@ -207,8 +207,8 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
 
     if (result != 1) {
-        DAT_8032f4b0[0] = 0;
-        DAT_8032f4b0[1] = 0;
+        p_ReverbSize[0] = 0;
+        p_ReverbSize[1] = 0;
     }
 }
 
@@ -223,7 +223,7 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
  */
 void _ClearReverb(int bank)
 {
-    RedReverbDATA* reverb = (RedReverbDATA*)(DAT_8032f4ac + (bank & 1) * 0xC);
+    RedReverbDATA* reverb = (RedReverbDATA*)(p_ReverbData + (bank & 1) * 0xC);
     if (reverb->callback == 0) {
         return;
     }
@@ -270,22 +270,22 @@ int* SetReverb(int bank, int kind, int* params)
     RedReverbDATA* reverb;
     int result;
 
-    DAT_8032f4b0[0] = 0;
-    DAT_8032f4b0[1] = 0;
+    p_ReverbSize[0] = 0;
+    p_ReverbSize[1] = 0;
 
     if (kind == 0) {
         _ClearReverb(bank);
-        return (int*)DAT_8032f4b0;
+        return (int*)p_ReverbSize;
     }
 
     if (kind > 5) {
         return 0;
     }
 
-    reverb = (RedReverbDATA*)(DAT_8032f4ac + (bank & 1) * 0xC);
+    reverb = (RedReverbDATA*)(p_ReverbData + (bank & 1) * 0xC);
     if ((reverb->callback != nullptr) && (reverb->kind == kind)) {
         _SetReverbData(reverb, params);
-        return (int*)DAT_8032f4b0;
+        return (int*)p_ReverbSize;
     }
 
     _ClearReverb(bank);
@@ -373,11 +373,11 @@ int* SetReverb(int bank, int kind, int* params)
         }
     }
     else {
-        DAT_8032f4b0[0] = 0;
-        DAT_8032f4b0[1] = 0;
+        p_ReverbSize[0] = 0;
+        p_ReverbSize[1] = 0;
     }
 
-    return (int*)DAT_8032f4b0;
+    return (int*)p_ReverbSize;
 }
 
 /*
@@ -1797,7 +1797,7 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
     do {
         if (*track != 0) {
             int step = frames;
-            DAT_8032f4b4 = 0;
+            m_ChangeStatus = 0;
             if (track[0x42] < frames) {
                 step = track[0x42];
             }
@@ -1843,11 +1843,11 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
                 }
             }
 
-            if (DAT_8032f4b4 != 0) {
+            if (m_ChangeStatus != 0) {
                 int* voice = (int*)DAT_8032f444;
                 do {
                     if ((int*)*voice == track) {
-                        voice[0x2E] = DAT_8032f4b4;
+                        voice[0x2E] = m_ChangeStatus;
                     }
                     voice += 0x30;
                 } while (voice < (int*)DAT_8032f444 + 0xC00);
@@ -2014,7 +2014,7 @@ void _SkipMusicEntry()
     u8 temp[0xC];
 
     if (*(int*)((u8*)DAT_8032f3f0 + 0xD98) >= 0) {
-        src = DAT_8032f4b8;
+        src = p_SkipKeyOn;
         dst = (int*)DAT_8032f3fc;
         do {
             if ((*src != 0) && (*dst == 0)) {
@@ -2024,12 +2024,12 @@ void _SkipMusicEntry()
             }
             src += 2;
             dst += 2;
-        } while (src < DAT_8032f4b8 + 0x80);
+        } while (src < p_SkipKeyOn + 0x80);
 
-        src = DAT_8032f4b8 + 0x80;
+        src = p_SkipKeyOn + 0x80;
         for (dst = (int*)DAT_8032f3fc + 0x80; (dst < (int*)DAT_8032f3fc + 0x100) && (*dst != 0); dst += 2) {
         }
-        while ((dst < (int*)DAT_8032f3fc + 0x100) && (src < DAT_8032f4b8 + 0x100)) {
+        while ((dst < (int*)DAT_8032f3fc + 0x100) && (src < p_SkipKeyOn + 0x100)) {
             if (*src != 0) {
                 *dst = *src;
                 dst[1] = src[1];
@@ -2039,10 +2039,10 @@ void _SkipMusicEntry()
             src += 2;
         }
 
-        src = DAT_8032f4b8 + 0x100;
+        src = p_SkipKeyOn + 0x100;
         for (dst = (int*)DAT_8032f3fc + 0x100; (dst < (int*)DAT_8032f3fc + 0x180) && (*dst != 0); dst += 2) {
         }
-        while ((dst < (int*)DAT_8032f3fc + 0x180) && (src < DAT_8032f4b8 + 0x180)) {
+        while ((dst < (int*)DAT_8032f3fc + 0x180) && (src < p_SkipKeyOn + 0x180)) {
             if (*src != 0) {
                 *dst = *src;
                 dst[1] = src[1];
@@ -2066,7 +2066,7 @@ void _SkipMusicEntry()
         *(int*)((u8*)DAT_8032f3f0 + 0xD98) = -1;
     }
 
-    RedDelete(DAT_8032f4b8);
+    RedDelete(p_SkipKeyOn);
     DAT_8032f470 = 0;
 }
 
@@ -2094,16 +2094,16 @@ void MusicSkipFunction()
     u32* puVar9;
 
     do {
-        DAT_8032f4b8 = (int*)RedNew(0x600);
-        if (DAT_8032f4b8 == 0) {
+        p_SkipKeyOn = (int*)RedNew(0x600);
+        if (p_SkipKeyOn == 0) {
             RedSleep(10000);
         }
         iVar4 = (int)DAT_8032f3f0;
-    } while (DAT_8032f4b8 == 0);
+    } while (p_SkipKeyOn == 0);
 
     puVar9 = (u32*)((u8*)DAT_8032f3f0 + 0x928);
-    memset(DAT_8032f4b8, 0, 0x600);
-    iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)DAT_8032f4b8, 1);
+    memset(p_SkipKeyOn, 0, 0x600);
+    iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)p_SkipKeyOn, 1);
     while (true) {
         if ((iVar5 != 0) || ((*(u32*)(iVar4 + 0xd94) & 1) == 0)) {
             break;
@@ -2127,7 +2127,7 @@ void MusicSkipFunction()
             puVar8[9] = *(u32*)(iVar7 + iVar3 + 0x300);
             puVar8 += 0x55;
         } while (uVar6 != 0);
-        iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)DAT_8032f4b8, 1);
+        iVar5 = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)puVar9, (RedKeyOnDATA*)p_SkipKeyOn, 1);
     }
     DAT_8032f470 = 1;
 }
@@ -2343,7 +2343,7 @@ void _SeMidiNoteExecute(
                     KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
                 }
 
-                DAT_8032f4b4 = 0;
+                m_ChangeStatus = 0;
                 while ((*track != 0) && (track[0x42] < 1)) {
                     int delta;
                     unsigned char* cmd;
@@ -2377,8 +2377,8 @@ void _SeMidiNoteExecute(
                     }
                 }
 
-                if (DAT_8032f4b4 != 0) {
-                    ((int*)((u8*)DAT_8032f444 + (s8)((u8*)track)[0x14E] * 0xC0))[0x2E] = DAT_8032f4b4;
+                if (m_ChangeStatus != 0) {
+                    ((int*)((u8*)DAT_8032f444 + (s8)((u8*)track)[0x14E] * 0xC0))[0x2E] = m_ChangeStatus;
                 }
             }
         }

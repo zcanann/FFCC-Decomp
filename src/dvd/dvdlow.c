@@ -28,6 +28,19 @@
  * - a follow-up probe deleting `gap_04_8032F044_sbss` from `symbols.txt` was
  *   completely unhelpful: the extractor simply regenerated a synthetic gap
  *   name for the same slot, so this is not fixable by just hiding that symbol
+ * - a fresh PAL-map / current-object cross-check on this branch exposed the
+ *   bigger missing lever: source `dvdlow.c` still compiles the full PAL SDK
+ *   object text size `0x129c`, while the extracted linked target slice is only
+ *   `0xdfc`
+ * - that lines up with the PAL map marking a long list of local helpers as
+ *   `UNUSED` in the linked subset (`ProcessNextCommand`, `SetTimeoutAlarm`,
+ *   `AudioBufferOn`, `HitCache`, `DoJustRead`, `WaitBeforeRead`,
+ *   `DVDLowSetResetCoverCallback`, `DoBreak`, `AlarmHandlerForBreak`,
+ *   `SetBreakAlarm`, `DVDLowGetCoverStatus`)
+ * - so this unit is not just a fake-gap problem after all; the next real pass
+ *   should treat it like the other linked-subset recoveries and bias toward
+ *   inlining / trimming PAL-unused helper bodies rather than padding or
+ *   section-name hacks
  * - if this unit needs follow-up, it should start from target object
  *   ownership/binding around those gap symbols rather than padding out the C
  */

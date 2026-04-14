@@ -7,7 +7,7 @@
 class CGbaPcs : public CProcess
 {
 public:
-    CGbaPcs();
+    inline CGbaPcs();
 	
     void Init();
     void Quit();

@@ -949,7 +949,7 @@ config.libs = [
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
             Object(
-                NonMatching,
+                Matching,
                 "Runtime.PPCEABI.H/New.cp",
                 mw_version="GC/2.6",
                 cflags=replace_flag_prefix(cflags_runtime, "-RTTI ", "-RTTI on"),

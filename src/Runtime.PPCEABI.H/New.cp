@@ -1,6 +1,13 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
-#include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/New.h"
+
+namespace std {
+class exception {
+public:
+    virtual ~exception();
+    virtual const char* what() const;
+};
+} // namespace std
 
 /*
  * TODO: Remove this note block once linkage has been resolved.
@@ -36,7 +43,12 @@ inline void operator delete(void* arg0) throw() {
     }
 }
 
+extern "C" const char s_std_exception_new[] = "std::exception";
+extern "C" const char s_exception[] = "exception";
+extern "C" void* __RTTI__Q23std9exception[] = { (void*)s_std_exception_new, 0 };
+
 namespace std {
-const char* exception::what() const { return "exception"; }
+exception::~exception() {}
+const char* exception::what() const { return s_exception; }
 
 } // namespace std

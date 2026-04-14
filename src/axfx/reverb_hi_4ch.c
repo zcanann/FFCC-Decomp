@@ -112,6 +112,16 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   fresh earlier local constant, renumbered the whole local `.sdata2` run
  *   (`@111`..), shifted the nearby branch target, and dropped the function to
  *   roughly 99.01%, so the target does not want that accumulator-first shape
+ * - rewriting the same two-local form with explicit assignments
+ *   (`dampMul = rv->damping * dampMul; dampBias = dampBias + dampMul;`) is
+ *   also wrong for GCCP01: it inflates both functions' stack frames by 8 bytes
+ *   and drops them into the ~99.43% range, so the remaining seam is not just
+ *   whether the multiply/add are spelled as compound assignments
+ * - a narrower follow-up that only changed the multiply spelling to
+ *   `dampMul = dampMul * rv->damping;` while keeping the same two-local shape
+ *   was completely flat: MWCC emitted the exact same four remaining FP
+ *   mismatches as the compound-assignment form, so that last seam is below the
+ *   level of ordinary destination-operand C spelling
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated
@@ -206,9 +216,11 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
         rv->damping = 0.05f;
     }
     {
-        f32 damp = 0.8f * rv->damping;
-        damp = 0.05f + damp;
-        rv->damping = 1.0f - damp;
+        f32 dampMul = 0.8f;
+        f32 dampBias = 0.05f;
+        dampMul *= rv->damping;
+        dampBias += dampMul;
+        rv->damping = 1.0f - dampBias;
     }
 
     if (0.0f != preDelay) {
@@ -265,9 +277,11 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
         rv->damping = 0.05f;
     }
     {
-        f32 damp = 0.8f * rv->damping;
-        damp = 0.05f + damp;
-        rv->damping = 1.0f - damp;
+        f32 dampMul = 0.8f;
+        f32 dampBias = 0.05f;
+        dampMul *= rv->damping;
+        dampBias += dampMul;
+        rv->damping = 1.0f - dampBias;
     }
 
     for (i = 0; i < 12; i++) {

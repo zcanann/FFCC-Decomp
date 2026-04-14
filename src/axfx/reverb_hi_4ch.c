@@ -102,6 +102,14 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   ownership is now reclaimed back to local `@112`..`@121`, which collapses
  *   the remaining visible code seam to just the six instructions in the
  *   damping normalization block
+ * - a newer object-table read corrected the stale `reverb_hi_4ch_value0_1`
+ *   assumption: the target tail at `0x80333808` is actually `100.0f`, not
+ *   `0.1f`, while `0.3f` / `0.6f` stay at `0x8033380C` / `0x80333810`
+ * - moving the trailing named constants to late file-scope `const`
+ *   definitions is the real lever that makes MWCC emit the target-style
+ *   global tail after the local `@111`..`@120` pool; once that is done, the
+ *   remaining `.sdata2` miss is just the anonymous final `0x4` zero gap
+ *   before the next unit rather than the named constants themselves
  * - on the current branch, removing `reverb_hi_4ch_value0_1` entirely and
  *   switching Modify back to a direct `0.1f` literal was also completely flat:
  *   `ReverbHIModifyDpl2` stayed at 99.59016% and `.sdata2` stayed at 88.88889%,
@@ -135,9 +143,9 @@ static s32 axfx_reverb_hi_dpl2_lens[10] = {
     0x0000002F, 0x00000049, 0x00000043, 0x00000047, 0x00000000,
 };
 
-const static f32 reverb_hi_4ch_value0_1 = 0.1f;
-const static f32 reverb_hi_4ch_value0_3 = 0.3f;
-const static f32 reverb_hi_4ch_value0_6 = 0.6f;
+extern const f32 reverb_hi_4ch_value100_0;
+extern const f32 reverb_hi_4ch_value0_3;
+extern const f32 reverb_hi_4ch_value0_6;
 
 static inline void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
@@ -266,7 +274,7 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
      || (time < 0.01f) || (time > 10.0f)
      || (mix < 0.0f) || (mix > 1.0f)
      || (damping < 0.0f) || (damping > 1.0f)
-     || (preDelay < 0.0f) || (preDelay > reverb_hi_4ch_value0_1)) {
+     || (preDelay < 0.0f) || (preDelay > reverb_hi_4ch_value100_0)) {
         return 0;
     }
 
@@ -734,3 +742,7 @@ void AXFXReverbHiCallbackDpl2(AXFX_BUFFERUPDATE_DPL2* bufferUpdate, AXFX_REVERBH
         HandleReverbDpl2(bufferUpdate->Rs, &reverb->rv, 3);
     }
 }
+
+const f32 reverb_hi_4ch_value100_0 = 100.0f;
+const f32 reverb_hi_4ch_value0_3 = 0.3f;
+const f32 reverb_hi_4ch_value0_6 = 0.6f;

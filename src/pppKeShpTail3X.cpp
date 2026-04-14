@@ -21,8 +21,8 @@ struct KeShpTail3XStep {
     s32 m_graphId;
     s32 m_dataValIndex;
     s32 m_initWork;
-    s32 m_stepValue;
-    s32 m_arg3;
+    float m_stepValue;
+    float m_arg3;
     float m_randomScale;
     float m_stepDistance;
     u8 m_drawCount;
@@ -284,11 +284,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         return;
     }
 
-    rng = work->m_rand;
-    life = work->m_shapeData;
-    shapeSetCount = *(u16*)(shapeData + 0x12);
-    shapeCount = *(s16*)(shapeData + 6);
-
     currentIndex = work->m_head;
     nextIndex = currentIndex + 1;
     if (currentIndex == 0x1b) {
@@ -312,6 +307,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;
+
+    life = work->m_shapeData;
+    shapeSetCount = *(u16*)(shapeData + 0x12);
+    rng = work->m_rand;
+    shapeCount = *(s16*)(shapeData + 6);
 
 draw_loop:
     while (count != 0) {
@@ -354,7 +354,7 @@ draw_loop:
                 pppCopyMatrix(tmpMtx, drawMtx);
                 pppMulMatrix(drawMtx, rotMtx, tmpMtx);
             }
-            PSMTXMultVec(ppvCameraMatrix0, &pos, &pos);
+            PSMTXMultVec(ppvCameraMatrix02, &pos, &pos);
         }
 
         drawMtx.value[0][3] = pos.x;

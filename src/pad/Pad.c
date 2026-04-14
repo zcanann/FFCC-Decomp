@@ -41,9 +41,15 @@ const char* __PADVersion = s___PADVersion;
  * - PAL and EN maps both agree GCCP01's Pad.c sbss run does not include
  *   `BarrelBits`; wrapping that declaration in `#ifndef VERSION_GCCP01` is
  *   keepable and removes the extra dead local slot from the rebuilt source Pad.o
+ * - PAL also marks `CmdTypeAndStatus` as `UNUSED`; wrapping that declaration
+ *   in `#ifndef VERSION_GCCP01` is likewise keepable and collapses rebuilt
+ *   source Pad.o back to the exact map / target sbss order through
+ *   `SamplingCallback`, `recalibrated$400`, and `__PADSpec`
  * - promoting Pad.c after that cleanup still fails final linkage for a more
- *   specific reason: ai.o imports `recalibrated$401`, while the rebuilt source
- *   Pad.o still emits `recalibrated$400`
+ *   specific reason: OS.o wants `RecalibrateBits`, and ai.o wants
+ *   `WaitingBits` / `CheckingBits` / `PendingBits` / `SamplingCallback` plus
+ *   `recalibrated$401`, while the rebuilt source Pad.o still emits those pad
+ *   state globals as local/static bindings
  * - shared Dolphin reference Pad.c copies still keep these globals `static`, so
  *   the target FFCC binding shape is currently a repo-specific divergence that
  *   cannot be justified from source-family references alone
@@ -60,6 +66,11 @@ const char* __PADVersion = s___PADVersion;
  *   `SamplingCallback` narrowed the link failure much further: with Pad.c
  *   promoted, every cross-unit undefined disappeared except
  *   `recalibrated$401` from ai.o
+ * - a fresh latest-main follow-up showed a naive GCCP01 export probe is not
+ *   keepable: removing `static` from those pad-state globals and
+ *   `SamplingCallback` does resolve the undefined set, but MWCC then lays the
+ *   exported sbss symbols backward from target and puts `recalibrated$400` at
+ *   the front of the run instead of after `SamplingCallback`
  * - MWCC 1.2.5n also rejects `asm("recalibrated$401")` on C variable
  *   declarations here, so there is no simple file-scope alias escape hatch for
  *   that last symbol identity
@@ -132,7 +143,9 @@ BOOL __PADDisableRumble(BOOL disable);
 typedef void (*SPECCallback)(s32, PADStatus*, u32*);
 static SPECCallback MakeStatus = SPEC2_MakeStatus;
 
+#ifndef VERSION_GCCP01
 static u32 CmdTypeAndStatus;
+#endif
 static u32 CmdReadOrigin = 0x41000000;
 static u32 CmdCalibrate = 0x42000000;
 static u32 CmdProbeDevice[4];

@@ -755,26 +755,19 @@ extern "C" void* __vt__Q23std13bad_exception[];
  *   exception-metadata detail rather than missing control flow
  *
  * Most useful result so far:
- * - current objdiff keeps __unexpected at 99.45% with the rest of the unit
- *   already matching
- * - the live/target diff is specifically the second inlined
- *   ExPPC_IsInSpecification compare site for badExceptionType
- * - obvious pointer-shape probes there stayed flat: re-seeding
- *   badExceptionType through another local, const/register variants, and
- *   explicit cast/+0/&[0] call spellings did not dislodge the addi-vs-mr miss
- * - on the current SDK branch that narrow state is reproduced again: the live /
- *   target diff is back down to one instruction at the second compare, with the
- *   source still emitting `addi r3, r30, 0` where the target wants `mr r3, r30`
- * - forcing that compare through a dedicated local
- *   (`char* compareBadExceptionType = badExceptionType`) held completely flat,
- *   so the remaining addi-vs-mr choice is not fixed by a simple extra pointer
- *   copy in source
- * - collapsing `stdExceptionBadExceptionType` / `stdBadExceptionType` into
- *   direct offset initializers instead of stepwise assignments was also
- *   completely flat, so the remaining addi-vs-mr choice is not fixed by that
- *   simpler pointer setup either
- * - this should be treated as a narrow follow-up target, not a unit that wants
- *   a broad runtime rewrite
+ * - current latest-main source does now match __unexpected at 100% again: the
+ *   keepable fix was to seed `stdExceptionBadExceptionType` from
+ *   `unexpectedTypes`, then derive `badExceptionType` back from that pointer
+ *   instead of initializing `badExceptionType` directly from the array base
+ * - that source shape changes only the one live instruction seam at the second
+ *   ExPPC_IsInSpecification compare, turning source `addi r3, r30, 0` into the
+ *   target `mr r3, r30`
+ * - a fresh Matching flip on this fixed source still fails final main.dol
+ *   checksum, so the remaining blocker is no longer C code shape inside
+ *   `__unexpected`; it is hidden object/linkage metadata elsewhere in the unit
+ * - older flat probes are still worth remembering: a dedicated
+ *   `compareBadExceptionType` local and fully collapsed direct-offset pointer
+ *   initializers both stayed flat before the winning pointer-derivation shape
  */
 
 /**
@@ -786,13 +779,15 @@ extern void __unexpected(CatchInfo* catchinfo)
 	static const char unexpectedTypes[0x54] = "!bad_exception!!\0\0\0\0"
 	                                          "!std::exception!!std::bad_exception!!\0\0\0"
 	                                          "!std::bad_exception!!\0\0";
-	char* badExceptionType = (char*)unexpectedTypes;
+	char* badExceptionType;
 	char* stdExceptionBadExceptionType;
 	char* stdBadExceptionType;
 	ex_specification* unexp = (ex_specification*)catchinfo->stacktop;
 
-	stdExceptionBadExceptionType = badExceptionType;
+	stdExceptionBadExceptionType = (char*)unexpectedTypes;
 	stdExceptionBadExceptionType += sizeof("!bad_exception!!\0\0\0");
+	badExceptionType = stdExceptionBadExceptionType;
+	badExceptionType -= sizeof("!bad_exception!!\0\0\0");
 	stdBadExceptionType = stdExceptionBadExceptionType;
 	stdBadExceptionType += sizeof("!std::exception!!std::bad_exception!!\0\0");
 

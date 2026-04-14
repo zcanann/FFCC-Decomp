@@ -37,6 +37,10 @@
  *   text-only slice
  * - after those fixes, promoting `mtx.c` no longer hangs or exposes a broad
  *   section mismatch; it now gets all the way to a plain final checksum miss
+ * - that cluster-level result still holds after later PAL-backed trims in
+ *   `mtx44.c`, `vec.c`, and `quat.c`: promoting all four mtx units together
+ *   still fails only at the final checksum, so the remaining seam is no
+ *   longer the obvious linked-subset recovery in those files
  * - a follow-up probe making `Unit01` non-static in source did not change the
  *   rebuilt object binding at all, so the remaining blocker is not just that
  *   one declaration spelling

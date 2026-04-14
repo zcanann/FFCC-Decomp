@@ -13,6 +13,9 @@
  * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
  *   vec.c, and quat.c, and all four failed in the exact same way: configure
  *   succeeds, link completes, and only the final checksum check fails
+ * - promoting all four mtx units together on the latest main-based SDK branch
+ *   still fails only at the final checksum, so the hidden-link seam is not
+ *   resolved by treating the cluster as a single promote-together island
  * - that makes this look like a shared hidden-link / metadata seam in the mtx
  *   library cluster rather than a remaining visible source mismatch in this
  *   file's body

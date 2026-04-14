@@ -130,6 +130,12 @@ extern const double reverb_hi_4ch_handle_i2fMagic;
  *   was completely flat: MWCC emitted the exact same four remaining FP
  *   mismatches as the compound-assignment form, so that last seam is below the
  *   level of ordinary destination-operand C spelling
+ * - two more surgical destination-register probes were both worse: forcing a
+ *   third `dampOne = 1.0f` local or rewriting the final step as
+ *   `rv->damping = 1.0f; rv->damping -= dampBias;` both inflated the frame /
+ *   spill shape and dropped Create/Modify back to about 99.83%, so the
+ *   target-side `f1/f0/f2` register flow is not recoverable just by making
+ *   the final `1.0f` source more explicit in C
  * - the remaining miss is still concentrated in the damping rewrite in Create
  *   and Modify rather than sdata2 ownership, but the next probe should bias
  *   toward preserving the target load/order shape without the heavy repeated

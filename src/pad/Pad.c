@@ -111,6 +111,15 @@ const char* __PADVersion = s___PADVersion;
  *   from `Initialized` through `__PADSpec`, plus the AI tail
  *   `min_wait / max_wait / buffer`, already matches the expected ownership and
  *   ordering; the remaining pad/ai/os seam is not just stale symbols.txt names
+ * - a raw current-branch object read sharpened the seam again: the rebuilt
+ *   target-side relocations in both `OS.o` and `ai.o` are shifted a uniform
+ *   `0x18` earlier against the live source objects, so those consumers are now
+ *   resolving obvious ai/pad locals onto the preceding pad tail
+ *   (`RecalibrateBits` / `WaitingBits` / `CheckingBits` / `PendingBits` /
+ *   `SamplingCallback` / `recalibrated$400` / `__PADSpec`) as a block rather
+ *   than disagreeing at one isolated symbol
+ * - that makes this cluster look more like a coherent extracted small-data
+ *   identity drift than a one-off bad declaration inside Pad.c
  */
 
 #define PAD_ALL                                                                                                        \

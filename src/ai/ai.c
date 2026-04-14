@@ -50,6 +50,17 @@ const char* __AIVersion = "<< Dolphin SDK - AI\trelease build: Sep  5 2002 05:34
  *   when Pad.c is promoted after removing the dead GCCP01 BarrelBits slot, the
  *   target ai.o still imports `recalibrated$401` specifically, while the
  *   rebuilt source Pad.o emits `recalibrated$400`
+ * - a direct current-branch disassembly read finally exposed the deeper shape
+ *   of that seam: target `ai.o`'s sbss-bound relocations are uniformly `0x18`
+ *   earlier than the rebuilt source object, so obvious ai-local references
+ *   land on the preceding pad symbols in the extracted target object
+ *   (`__AI_init_flag -> recalibrated$400`, `__AIS_Callback -> WaitingBits`,
+ *   `__AID_Callback -> CheckingBits`, `__CallbackStack -> PendingBits`,
+ *   `__AID_Active -> __PADSpec`, `__OldStack -> SamplingCallback`, etc.)
+ * - because that same exact `0x18` early drift also shows up in `OS.o`'s
+ *   `OSInit` pad-state accesses, this now looks like a coherent small-data
+ *   seam / extracted-symbol-identity problem across the whole pad/ai/os
+ *   cluster, not a plausible source rewrite inside `ai.c`
  *
  * Why this is not keepable yet:
  * - the only source shape that produced the target .sbss order was not plausible

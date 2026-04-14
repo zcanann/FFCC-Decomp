@@ -45,6 +45,14 @@
  *   build now gets all the way to a final checksum miss; adding `OS.c` on top
  *   of that exact probe is the step that still drives `mwldeppc` past the
  *   30s timeout and leaves a zero-byte `main.elf`
+ * - a raw disassembly comparison on this branch made the symbol drift more
+ *   concrete: target `OS.o`'s three `OSInit` pad-state relocations are not
+ *   random, they are exactly `0x18` earlier than the rebuilt source sites
+ *   (`RecalibrateBits` instead of source `__PADSpec` at all three accesses)
+ * - that same exact `0x18` early shift also shows up in target `ai.o`'s
+ *   sbss-bound relocations, which means the current extracted target
+ *   symbol identities around the `pad -> ai` seam are drifting as a block,
+ *   not just at one isolated `OSInit` site
  * - that means the visible `OSInit` relocation identity is a real symptom,
  *   but fixing just that one symbol is not sufficient to make `OS.c`
  *   linkable; the broader pad/ai/os small-data binding seam is still the

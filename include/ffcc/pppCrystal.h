@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPPCRYSTAL_H_
 #define _FFCC_PPPCRYSTAL_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/gx.h>
 #include <dolphin/types.h>
 
@@ -21,21 +23,10 @@ struct CrystalWork {
 };
 
 struct pppCrystal {
-    union {
-        void* ptr;
-        struct {
-            u32 m_graphId;
-        };
-    } field0_0x0;
-    
-    // Fields based on Ghidra decomp usage
-    char pad[0x3C];
-    float field_0x40;  // Used as pppFMATRIX* in render
-    char pad2[0x2C];
-    void* field_0x70;  // Used as Vec* in render
-    char pad3[0x10];
-    void* field_0x84;  // Used for texture in render
-    float field_0x88; // Used as pppCVECTOR* in render
+    _pppPObject m_object;   // 0x0
+    u8 m_pad34[0x4C];       // 0x34
+    CrystalWork m_work;     // 0x80
+    u8 m_color[4];          // 0x88
 };
 
 struct pppCrystalUnkB {

@@ -1285,7 +1285,7 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
  */
 void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 {
-    Vec local_vec = gUtilUpVector;
+    Vec local_vec = {0.0f, 1.0f, 0.0f};
 
     PSVECCrossProduct(&param_4, &local_vec, param_2);
     PSVECNormalize(param_2, param_2);

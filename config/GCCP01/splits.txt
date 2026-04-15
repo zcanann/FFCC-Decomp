@@ -1491,6 +1491,7 @@ os/OSThread.c:
 	.text       start:0x801809F4 end:0x80181BF8
 	.bss        start:0x8030BC98 end:0x8030C690
 	.sdata      start:0x8032EAB0 end:0x8032EAB4
+	.sbss       start:0x8032EFD0 end:0x8032EFE0
 
 os/OSTime.c:
 	.text       start:0x80181BF8 end:0x8018201C

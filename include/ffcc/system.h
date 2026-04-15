@@ -43,8 +43,6 @@ public:
     };
 
 public:
-    CSystem();
-
     void Init();
     void Quit();
     void Printf(char*, ...);

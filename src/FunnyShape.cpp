@@ -16,7 +16,7 @@ extern "C" s32 rand();
 static const GXColor DAT_8032fd58 = {0x80, 0x80, 0x80, 0x80};
 static const GXColor DAT_8032fd5c = {0x80, 0x80, 0x80, 0x80};
 extern GXColor DAT_8032fd60;
-static const double DOUBLE_8032fd88 = 4503601774854144.0;
+extern const double DOUBLE_8032fd88;
 static const float FLOAT_8032fd64 = 1000.0f;
 static const float FLOAT_8032fd68 = -1000.0f;
 extern float FLOAT_8032fd6c;
@@ -30,8 +30,8 @@ extern float FLOAT_8032fd94;
 extern float FLOAT_8032fd98;
 static const float FLOAT_8032fd9c = 320.0f;
 static const float FLOAT_8032fda0 = 224.0f;
-static const float FLOAT_8032fda4 = 3.140000104904175f;
-static const float FLOAT_8032fda8 = 180.0f;
+extern const float FLOAT_8032fda4;
+extern const float FLOAT_8032fda8;
 
 namespace {
 static inline u8* Ptr(CFunnyShape* self, u32 offset)

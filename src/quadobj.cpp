@@ -50,16 +50,18 @@ void CGQuadObj::onDraw()
 
         while (i < (int)(u32)m_vertexCount) {
             int next = i + 1;
+            u32 count;
 
             i = i + 1;
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
-            next = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            count = m_vertexCount;
+            next = next - (next / (int)count) * count;
             GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
             GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
-            next = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            count = m_vertexCount;
+            next = next - (next / (int)count) * count;
             GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
             GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
-
             vertex2 = current->m_vertices;
             vertex1 = current->m_vertices;
             current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(current) + sizeof(QuadVertex));

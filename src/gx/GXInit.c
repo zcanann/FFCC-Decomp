@@ -392,6 +392,10 @@ GXFifoObj* GXInit(void* base, u32 size) {
 void __GXInitGX(void) {
     GXRenderModeObj* rmode;
     float identity_mtx[3][4];
+    union {
+        f64 f[2];
+        u32 u[4];
+    } dim_convert;
     GXColor clear = GXInit_ClearColor;
     GXColor black = GXInit_BlackColor;
     GXColor white = GXInit_WhiteColor;
@@ -457,21 +461,12 @@ void __GXInitGX(void) {
     GXLoadTexMtxImm(identity_mtx, GX_IDENTITY, GX_MTX3x4);
     GXLoadTexMtxImm(identity_mtx, GX_PTIDENTITY, GX_MTX3x4);
     {
-        union {
-            f64 f;
-            u32 u[2];
-        } fb_width;
-        union {
-            f64 f;
-            u32 u[2];
-        } xfb_height;
-
-        fb_width.u[1] = rmode->fbWidth;
-        xfb_height.u[1] = rmode->xfbHeight;
-        fb_width.u[0] = 0x43300000;
-        xfb_height.u[0] = 0x43300000;
-        GXSetViewport(GXInit_ZeroF, GXInit_ZeroF, (f32)(fb_width.f - GXInit_IntToFloatBias),
-                      (f32)(xfb_height.f - GXInit_IntToFloatBias), GXInit_ZeroF, GXInit_OneF);
+        dim_convert.u[3] = rmode->fbWidth;
+        dim_convert.u[1] = rmode->xfbHeight;
+        dim_convert.u[2] = 0x43300000;
+        dim_convert.u[0] = 0x43300000;
+        GXSetViewport(GXInit_ZeroF, GXInit_ZeroF, (f32)(dim_convert.f[1] - GXInit_IntToFloatBias),
+                      (f32)(dim_convert.f[0] - GXInit_IntToFloatBias), GXInit_ZeroF, GXInit_OneF);
     }
     GXSetProjectionv(GXDefaultProjData);
     GXSetCoPlanar(GX_DISABLE);
@@ -551,20 +546,11 @@ void __GXInitGX(void) {
     GXSetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
     GXSetDispCopyDst(rmode->fbWidth, rmode->efbHeight);
     {
-        union {
-            f64 f;
-            u32 u[2];
-        } xfb_height;
-        union {
-            f64 f;
-            u32 u[2];
-        } efb_height;
-
-        xfb_height.u[1] = rmode->xfbHeight;
-        efb_height.u[1] = rmode->efbHeight;
-        xfb_height.u[0] = 0x43300000;
-        efb_height.u[0] = 0x43300000;
-        GXSetDispCopyYScale((f32)((xfb_height.f - GXInit_IntToFloatBias) / (efb_height.f - GXInit_IntToFloatBias)));
+        dim_convert.u[1] = rmode->xfbHeight;
+        dim_convert.u[3] = rmode->efbHeight;
+        dim_convert.u[0] = 0x43300000;
+        dim_convert.u[2] = 0x43300000;
+        GXSetDispCopyYScale((f32)((dim_convert.f[0] - GXInit_IntToFloatBias) / (dim_convert.f[1] - GXInit_IntToFloatBias)));
     }
     GXSetCopyClamp((GXFBClamp)(GX_CLAMP_TOP | GX_CLAMP_BOTTOM));
     GXSetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);

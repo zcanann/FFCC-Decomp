@@ -20,9 +20,10 @@ GXData* const __GXData = &gxData;
 const GXColor GXInit_ClearColor = {64, 64, 64, 255};
 const GXColor GXInit_BlackColor = {0, 0, 0, 0};
 const GXColor GXInit_WhiteColor = {255, 255, 255, 255};
-extern const f32 GXInit_ZeroF;
 extern const f32 GXInit_OneF;
+extern const f32 GXInit_ZeroF;
 extern const f32 GXInit_PointOneF;
+extern const f64 GXInit_IntToFloatBias;
 
 /*
  * TODO: Remove this note block once linkage has been resolved.
@@ -63,8 +64,6 @@ extern const f32 GXInit_PointOneF;
  *   recovering the exact original constant-source shape that prevents MWCC from
  *   materializing the extra local bias symbol in the first place
  */
-
-const f64 GXInit_IntToFloatBias = 4503599627370496.0;
 
 u32 resetFuncRegistered;
 u32 calledOnce;
@@ -457,7 +456,20 @@ void __GXInitGX(void) {
     GXSetCurrentMtx(GX_PNMTX0);
     GXLoadTexMtxImm(identity_mtx, GX_IDENTITY, GX_MTX3x4);
     GXLoadTexMtxImm(identity_mtx, GX_PTIDENTITY, GX_MTX3x4);
-    GXSetViewport(GXInit_ZeroF, GXInit_ZeroF, rmode->fbWidth, rmode->xfbHeight, GXInit_ZeroF, GXInit_OneF);
+    {
+        union {
+            f64 f;
+            u32 u[2];
+        } fb_width, xfb_height;
+        f64 bias = *(const volatile f64*)&GXInit_IntToFloatBias;
+
+        fb_width.u[0] = 0x43300000;
+        fb_width.u[1] = rmode->fbWidth;
+        xfb_height.u[0] = 0x43300000;
+        xfb_height.u[1] = rmode->xfbHeight;
+        GXSetViewport(
+            GXInit_ZeroF, GXInit_ZeroF, (f32)(fb_width.f - bias), (f32)(xfb_height.f - bias), GXInit_ZeroF, GXInit_OneF);
+    }
     GXSetProjectionv(GXDefaultProjData);
     GXSetCoPlanar(GX_DISABLE);
     GXSetCullMode(GX_CULL_BACK);
@@ -535,7 +547,19 @@ void __GXInitGX(void) {
 
     GXSetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
     GXSetDispCopyDst(rmode->fbWidth, rmode->efbHeight);
-    GXSetDispCopyYScale((f32)(rmode->xfbHeight) / (f32)(rmode->efbHeight));
+    {
+        union {
+            f64 f;
+            u32 u[2];
+        } xfb_height, efb_height;
+        f64 bias = *(const volatile f64*)&GXInit_IntToFloatBias;
+
+        xfb_height.u[0] = 0x43300000;
+        xfb_height.u[1] = rmode->xfbHeight;
+        efb_height.u[0] = 0x43300000;
+        efb_height.u[1] = rmode->efbHeight;
+        GXSetDispCopyYScale((f32)((xfb_height.f - bias) / (efb_height.f - bias)));
+    }
     GXSetCopyClamp((GXFBClamp)(GX_CLAMP_TOP | GX_CLAMP_BOTTOM));
     GXSetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
     GXSetDispCopyGamma(GX_GM_1_0);
@@ -555,6 +579,7 @@ void __GXInitGX(void) {
     GXClearGPMetric();
 }
 
-const f32 GXInit_ZeroF = 0.0f;
 const f32 GXInit_OneF = 1.0f;
+const f32 GXInit_ZeroF = 0.0f;
 const f32 GXInit_PointOneF = 0.1f;
+const f64 GXInit_IntToFloatBias = 4503599627370496.0;

@@ -24,7 +24,7 @@ s32 THPSimplePreLoad(s32);
 void THPSimpleAudioStart(void);
 void THPSimpleAudioStop(void);
 s32 THPSimpleLoadStop(void);
-s32 THPSimpleDecode(s32);
+s32 THPSimpleDecode(u32);
 void CheckPrefetch();
 void VideoDecode(unsigned char*);
 s32 THPSimpleDrawCurrentFrame(GXRenderModeObj*, int, int, int, int);

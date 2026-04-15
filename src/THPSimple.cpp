@@ -649,11 +649,17 @@ s32 THPSimpleLoadStop(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-s32 THPSimpleDecode(s32 audioTrack)
+s32 THPSimpleDecode(u32 audioTrack)
 {
     s32 status;
     s32 decodeResult;
     u32 interruptState;
+    s32* compSizeTable;
+    u8* compData;
+    THPSimpleControl* compControl;
+    u32 i;
+    u32 sampleCount;
+    u32 lock;
 
     interruptState = OSDisableInterrupts();
     if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0) &&
@@ -689,12 +695,13 @@ restore_interrupts_1:
         return 2;
     }
 
-    u32* compSizeTable = reinterpret_cast<u32*>(SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8);
-    u8* compData = SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8 + SimpleControl.compInfo.mNumComponents * 4;
+    compSizeTable = reinterpret_cast<s32*>(SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8);
+    compData = SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + SimpleControl.compInfo.mNumComponents * 4 + 8;
+    compControl = &SimpleControl;
 
     if (SimpleControl.hasAudio == 0) {
-        for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-            if (SimpleControl.compInfo.mFrameComp[i] == 0) {
+        for (i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
+            if (compControl->compInfo.mFrameComp[0] == 0) {
                 decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
                                               reinterpret_cast<void*>(SimpleControl.unk_9C));
                 if (decodeResult != 0) {
@@ -702,22 +709,24 @@ restore_interrupts_1:
                 }
                 SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
             }
-            compData += compSizeTable[i];
+            compData += *compSizeTable;
+            compSizeTable++;
+            compControl = reinterpret_cast<THPSimpleControl*>(reinterpret_cast<u8*>(compControl) + 1);
         }
     } else {
-        if ((audioTrack < 0) || (static_cast<u32>(audioTrack) >= SimpleControl.audioInfo.mSndNumTracks)) {
+        if ((static_cast<s32>(audioTrack) < 0) || (SimpleControl.audioInfo.mSndNumTracks <= audioTrack)) {
             return 4;
         }
         if (SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample != 0) {
             return 3;
         }
 
-        for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-            if (SimpleControl.compInfo.mFrameComp[i] == 1) {
-                u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
-                                             compData + compSizeTable[i] * audioTrack, 0);
-                u32 lock = OSDisableInterrupts();
-                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
+        for (i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
+            if (compControl->compInfo.mFrameComp[0] == 1) {
+                sampleCount = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
+                                             compData + *compSizeTable * audioTrack, 0);
+                lock = OSDisableInterrupts();
+                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = sampleCount;
                 SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
                     SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
                 OSRestoreInterrupts(lock);
@@ -725,7 +734,7 @@ restore_interrupts_1:
                 if (SimpleControl.audioDecodeIndex > 2) {
                     SimpleControl.audioDecodeIndex = 0;
                 }
-            } else if (SimpleControl.compInfo.mFrameComp[i] == 0) {
+            } else if (compControl->compInfo.mFrameComp[0] == 0) {
                 decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
                                               reinterpret_cast<void*>(SimpleControl.unk_9C));
                 if (decodeResult != 0) {
@@ -733,7 +742,9 @@ restore_interrupts_1:
                 }
                 SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
             }
-            compData += compSizeTable[i];
+            compData += *compSizeTable;
+            compSizeTable++;
+            compControl = reinterpret_cast<THPSimpleControl*>(reinterpret_cast<u8*>(compControl) + 1);
         }
     }
 

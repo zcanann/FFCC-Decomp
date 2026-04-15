@@ -84,8 +84,8 @@ asm void PSVECScale(register const Vec *src, register Vec *dst, register f32 sca
 void PSVECNormalize(const register Vec *vec1, register Vec *ret)
 {
 #ifdef __MWERKS__ // clang-format off
-	register f32 half  = 0.5f;
-	register f32 three = 3.0f;
+	register f32 half  = kVecInvSqrtHalfConst;
+	register f32 three = kVecInvSqrtThreeConst;
 	register f32 xx_zz, xx_yy;
 	register f32 square_sum;
 	register f32 ret_sqrt;

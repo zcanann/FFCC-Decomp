@@ -471,11 +471,8 @@ unsigned int CMenuPcs::FavoCtrl()
 	if (activeInput) {
 		press = 0;
 	} else {
-		unsigned int port = 0;
-
 		__cntlzw((unsigned int)Pad._448_4_);
-		port &= ~((int)~(Pad._448_4_ - (int)port | (int)port - Pad._448_4_) >> 0x1f);
-		press = *(unsigned short*)((unsigned char*)&Pad + port * 0x54 + 8);
+		press = Pad._8_2_;
 	}
 
 	if (press == 0) {

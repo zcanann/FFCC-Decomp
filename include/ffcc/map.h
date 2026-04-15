@@ -52,6 +52,9 @@ public:
 class CMapMng
 {
 public:
+    // Placeholder storage for the full map manager until concrete members are recovered.
+    unsigned char m_raw[0x22A7C];
+
     ~CMapMng();
     CMapMng();
 	

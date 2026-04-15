@@ -8,14 +8,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-static const float FLOAT_80330d98 = 2.0f;
-static const float FLOAT_80330d9c = 2.0f;
-static const float FLOAT_80330da0 = 0.0f;
-static const float FLOAT_80330da4 = 1.0f;
-static const float FLOAT_80330da8 = 0.017453292f;
-static const float kPppYmDeformationMdlZero = 0.0f;
-static const double DOUBLE_80330db0 = 4503601774854144.0;
-
 struct pppCVECTOR {
     u8 rgba[4];
 };
@@ -104,7 +96,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
 {
     u8 direction = 1;
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = kPppYmDeformationMdlZero;
+    float fVar1 = 0.0f;
 
     *puVar2 = 0;
     *(u8*)(puVar2 + 1) = direction;
@@ -278,15 +270,15 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         PSMTX44Copy(CameraScreenMatrix(), screenMtx);
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
-        texMtx[0][0] = screenMtx[0][0] * (FLOAT_80330d98 / (float)width);
-        texMtx[1][1] = screenMtx[1][1] * -(FLOAT_80330d9c / (float)height);
         texMtx[1][0] = screenMtx[1][0];
         texMtx[2][0] = screenMtx[2][0];
         texMtx[0][1] = screenMtx[0][1];
         texMtx[2][1] = screenMtx[2][1];
-        texMtx[0][2] = FLOAT_80330da0;
-        texMtx[1][2] = FLOAT_80330da0;
-        texMtx[2][2] = FLOAT_80330da4;
+        texMtx[0][2] = 0.0f;
+        texMtx[1][2] = 0.0f;
+        texMtx[2][2] = 1.0f;
+        texMtx[0][0] = screenMtx[0][0] * (2.0f / (float)width);
+        texMtx[1][1] = screenMtx[1][1] * -(2.0f / (float)height);
         PSMTXConcat(texMtx, modelObject->m_modelMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -300,13 +292,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
             state->m_angle = 1;
         }
 
-        PSMTXRotRad(rotMtx, 'z', FLOAT_80330da8 * (float)state->m_angle);
+        PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)state->m_angle);
         indMtx[0][0] = rotMtx[0][0] * state->m_scale;
         indMtx[0][1] = rotMtx[0][1] * state->m_scale;
-        indMtx[0][2] = kPppYmDeformationMdlZero;
+        indMtx[0][2] = 0.0f;
         indMtx[1][0] = rotMtx[1][0] * state->m_scale;
         indMtx[1][1] = rotMtx[1][1] * state->m_scale;
-        indMtx[1][2] = kPppYmDeformationMdlZero;
+        indMtx[1][2] = 0.0f;
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
         GXLoadTexObj((_GXTexObj*)backTexture, GX_TEXMAP0);
@@ -317,13 +309,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetNumIndStages(0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-        PSMTXRotRad(resetRotMtx, 'z', kPppYmDeformationMdlZero);
-        resetIndMtx[0][0] = kPppYmDeformationMdlZero;
-        resetIndMtx[0][1] = kPppYmDeformationMdlZero;
-        resetIndMtx[0][2] = kPppYmDeformationMdlZero;
-        resetIndMtx[1][0] = kPppYmDeformationMdlZero;
-        resetIndMtx[1][1] = kPppYmDeformationMdlZero;
-        resetIndMtx[1][2] = kPppYmDeformationMdlZero;
+        PSMTXRotRad(resetRotMtx, 'z', 0.0f);
+        resetIndMtx[0][0] = 0.0f;
+        resetIndMtx[0][1] = 0.0f;
+        resetIndMtx[0][2] = 0.0f;
+        resetIndMtx[1][0] = 0.0f;
+        resetIndMtx[1][1] = 0.0f;
+        resetIndMtx[1][2] = 0.0f;
         GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);

@@ -717,7 +717,7 @@ config.libs = [
             Object(Matching, "os/OSSemaphore.c"),
             Object(Matching, "os/OSStopwatch.c"),
             Object(Matching, "os/OSSync.c"),
-            Object(NonMatching, "os/OSThread.c"),
+            Object(Matching, "os/OSThread.c"),
             Object(Matching, "os/OSTime.c"),
         ],
     ),

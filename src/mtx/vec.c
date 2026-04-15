@@ -1,7 +1,5 @@
 #include <math.h>
 #include "dolphin/mtx.h"
-extern const f32 kVecInvSqrtHalfConst;
-extern const f32 kVecInvSqrtThreeConst;
 
 #define R_RET fp1
 #define FP2 fp2
@@ -166,28 +164,40 @@ f32 C_VECMag(const Vec* v)
     return sqrtf(C_VECSquareMag(v));
 }
 
-asm f32 PSVECMag(const register Vec *v)
+f32 PSVECMag(const register Vec *v)
 {
 #ifdef __MWERKS__ // clang-format off
-	nofralloc
-    lfs         f4, kVecInvSqrtHalfConst(r2)
-    psq_l       f0, 0(v), 0, 0
-    ps_mul      f0, f0, f0
-    lfs         f1, 8(v)
-    fsubs       f2, f4, f4
-    ps_madd     f1, f1, f1, f0
-    ps_sum0     f1, f1, f0, f0
-    fcmpu       cr0, f1, f2
-    beq         lbl_PSVECMag_ret
-    frsqrte     f0, f1
-    lfs         f3, kVecInvSqrtThreeConst(r2)
-    fmuls       f2, f0, f0
-    fmuls       f0, f0, f4
-    fnmsubs     f2, f2, f1, f3
-    fmuls       f0, f2, f0
-    fmuls       f1, f1, f0
-lbl_PSVECMag_ret:
-    blr
+    register f32 vxy, vzz;
+    register f32 sqmag, rmag;
+    register f32 nwork0, nwork1;
+    register f32 c_three, c_half, c_zero;
+
+    c_half = 0.5f;
+
+    asm {
+        psq_l vxy, 0(v), 0, 0
+        ps_mul vxy, vxy, vxy
+        lfs vzz, 8(v)
+        fsubs c_zero, c_half, c_half
+        ps_madd sqmag, vzz, vzz, vxy
+        ps_sum0 sqmag, sqmag, vxy, vxy
+        fcmpu cr0, sqmag, c_zero
+        beq lbl_PSVECMag_ret
+        frsqrte rmag, sqmag
+    }
+
+    c_three = 3.0f;
+
+    asm {
+        fmuls nwork0, rmag, rmag
+        fmuls nwork1, rmag, c_half
+        fnmsubs nwork0, nwork0, sqmag, c_three
+        fmuls rmag, nwork0, nwork1
+        fmuls sqmag, sqmag, rmag
+    lbl_PSVECMag_ret:
+    }
+
+    return sqmag;
 #endif // clang-format on
 }
 
@@ -337,31 +347,46 @@ f32 C_VECDistance(const Vec* a, const Vec* b)
     return sqrtf(C_VECSquareDistance(a, b));
 }
 
-asm f32 PSVECDistance(register const Vec *a, register const Vec *b)
+f32 PSVECDistance(register const Vec *a, register const Vec *b)
 {
 #ifdef __MWERKS__ // clang-format off
-	nofralloc
-    psq_l       f0, 4(a), 0, 0
-    psq_l       f1, 4(b), 0, 0
-    ps_sub      f2, f0, f1
-    psq_l       f0, 0(a), 0, 0
-    psq_l       f1, 0(b), 0, 0
-    ps_mul      f2, f2, f2
-    ps_sub      f0, f0, f1
-    lfs         f3, kVecInvSqrtHalfConst(r2)
-    ps_madd     f1, f0, f0, f2
-    fsubs       f0, f3, f3
-    ps_sum0     f1, f1, f2, f2
-    fcmpu       cr0, f0, f1
-    beq         lbl_PSVECDistance_ret
-    lfs         f4, kVecInvSqrtThreeConst(r2)
-    frsqrte     f0, f1
-    fmuls       f2, f0, f0
-    fmuls       f0, f0, f3
-    fnmsubs     f2, f2, f1, f4
-    fmuls       f0, f2, f0
-    fmuls       f1, f1, f0
-lbl_PSVECDistance_ret:
-    blr
+    register f32 v0yz, v1yz, v0xy, v1xy, dyz, dxy;
+    register f32 sqdist, rdist;
+    register f32 nwork0, nwork1;
+    register f32 c_half, c_three, c_zero;
+
+    asm {
+        psq_l v0yz, 4(a), 0, 0
+        psq_l v1yz, 4(b), 0, 0
+        ps_sub dyz, v0yz, v1yz
+        psq_l v0xy, 0(a), 0, 0
+        psq_l v1xy, 0(b), 0, 0
+        ps_mul dyz, dyz, dyz
+        ps_sub dxy, v0xy, v1xy
+    }
+
+    c_half = 0.5f;
+
+    asm {
+        ps_madd sqdist, dxy, dxy, dyz
+        fsubs c_zero, c_half, c_half
+        ps_sum0 sqdist, sqdist, dyz, dyz
+        fcmpu cr0, c_zero, sqdist
+        beq lbl_PSVECDistance_ret
+    }
+
+    c_three = 3.0f;
+
+    asm {
+        frsqrte rdist, sqdist
+        fmuls nwork0, rdist, rdist
+        fmuls nwork1, rdist, c_half
+        fnmsubs nwork0, nwork0, sqdist, c_three
+        fmuls rdist, nwork0, nwork1
+        fmuls sqdist, sqdist, rdist
+    lbl_PSVECDistance_ret:
+    }
+
+    return sqdist;
 #endif // clang-format on
 }

@@ -8,7 +8,7 @@ u32 __CARDFreq = 0;
 #else
 extern const char gCARDVersionString[];
 const char* __CARDVersion = gCARDVersionString;
-u32 __CARDFreq = EXI_FREQ_16M;
+u32 __CARDFreq = 0;
 #endif
 
 CARDControl __CARDBlock[2];

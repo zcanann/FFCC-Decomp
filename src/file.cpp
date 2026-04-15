@@ -33,7 +33,7 @@ static char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
 static char s_closeWarnFmt[] = "Close: %s";
 static char s_readWarnFmt[] = "Read: %s (%u)";
 
-static const char* s_diskErrorText[4][6][3] = {
+static const char* l_tError[4][6][3] = {
     {
         {"Disk read error.", "Please check the Game Disc.", ""},
         {"Erreur de lecture du disque.", "Veuillez verifier le disque.", ""},
@@ -622,7 +622,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         }
 
         unsigned int language = Game.m_gameWork.m_languageId;
-        const char* const* lines = s_diskErrorText[msgIndex][language];
+        const char* const* lines = l_tError[msgIndex][language];
         unsigned int baseY = 200;
         if (compactLayout != 0)
         {

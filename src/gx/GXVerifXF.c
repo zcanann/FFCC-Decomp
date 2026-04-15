@@ -116,28 +116,28 @@ static void CheckCTGColors(void) {
 
 static GXBool __GXVertexPacketHas(GXAttr attr) {
     switch (attr) {
-    case GX_VA_POS:        return GET_REG_FIELD(__GXData->vcdLo, 2, 9) != 0;
-    case GX_VA_NRM:        return __GXData->hasNrms ? GET_REG_FIELD(__GXData->vcdLo, 2, 11) != 0 : GX_FALSE;
-    case GX_VA_NBT:        return __GXData->hasBiNrms ? GET_REG_FIELD(__GXData->vcdLo, 2, 11) != 0 : GX_FALSE;
-    case GX_VA_CLR0:       return GET_REG_FIELD(__GXData->vcdLo, 2, 13) != 0;
-    case GX_VA_CLR1:       return GET_REG_FIELD(__GXData->vcdLo, 2, 15) != 0;
-    case GX_VA_TEX0:       return GET_REG_FIELD(__GXData->vcdHi, 2, 0) != 0;
-    case GX_VA_TEX1:       return GET_REG_FIELD(__GXData->vcdHi, 2, 2) != 0;
-    case GX_VA_TEX2:       return GET_REG_FIELD(__GXData->vcdHi, 2, 4) != 0;
-    case GX_VA_TEX3:       return GET_REG_FIELD(__GXData->vcdHi, 2, 6) != 0;
-    case GX_VA_TEX4:       return GET_REG_FIELD(__GXData->vcdHi, 2, 8) != 0;
-    case GX_VA_TEX5:       return GET_REG_FIELD(__GXData->vcdHi, 2, 10) != 0;
-    case GX_VA_TEX6:       return GET_REG_FIELD(__GXData->vcdHi, 2, 12) != 0;
-    case GX_VA_TEX7:       return GET_REG_FIELD(__GXData->vcdHi, 2, 14) != 0;
-    case GX_VA_PNMTXIDX:   return GET_REG_FIELD(__GXData->vcdLo, 1, 0) != 0;
-    case GX_VA_TEX0MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 1) != 0;
-    case GX_VA_TEX1MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 2) != 0;
-    case GX_VA_TEX2MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 3) != 0;
-    case GX_VA_TEX3MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 4) != 0;
-    case GX_VA_TEX4MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 5) != 0;
-    case GX_VA_TEX5MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 6) != 0;
-    case GX_VA_TEX6MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 7) != 0;
-    case GX_VA_TEX7MTXIDX: return GET_REG_FIELD(__GXData->vcdLo, 1, 8) != 0;
+    case GX_VA_POS:        return GET_REG_FIELD(gx->vcdLo, 2, 9) != 0;
+    case GX_VA_NRM:        return gx->hasNrms ? GET_REG_FIELD(gx->vcdLo, 2, 11) != 0 : GX_FALSE;
+    case GX_VA_NBT:        return gx->hasBiNrms ? GET_REG_FIELD(gx->vcdLo, 2, 11) != 0 : GX_FALSE;
+    case GX_VA_CLR0:       return GET_REG_FIELD(gx->vcdLo, 2, 13) != 0;
+    case GX_VA_CLR1:       return GET_REG_FIELD(gx->vcdLo, 2, 15) != 0;
+    case GX_VA_TEX0:       return GET_REG_FIELD(gx->vcdHi, 2, 0) != 0;
+    case GX_VA_TEX1:       return GET_REG_FIELD(gx->vcdHi, 2, 2) != 0;
+    case GX_VA_TEX2:       return GET_REG_FIELD(gx->vcdHi, 2, 4) != 0;
+    case GX_VA_TEX3:       return GET_REG_FIELD(gx->vcdHi, 2, 6) != 0;
+    case GX_VA_TEX4:       return GET_REG_FIELD(gx->vcdHi, 2, 8) != 0;
+    case GX_VA_TEX5:       return GET_REG_FIELD(gx->vcdHi, 2, 10) != 0;
+    case GX_VA_TEX6:       return GET_REG_FIELD(gx->vcdHi, 2, 12) != 0;
+    case GX_VA_TEX7:       return GET_REG_FIELD(gx->vcdHi, 2, 14) != 0;
+    case GX_VA_PNMTXIDX:   return GET_REG_FIELD(gx->vcdLo, 1, 0) != 0;
+    case GX_VA_TEX0MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 1) != 0;
+    case GX_VA_TEX1MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 2) != 0;
+    case GX_VA_TEX2MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 3) != 0;
+    case GX_VA_TEX3MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 4) != 0;
+    case GX_VA_TEX4MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 5) != 0;
+    case GX_VA_TEX5MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 6) != 0;
+    case GX_VA_TEX6MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 7) != 0;
+    case GX_VA_TEX7MTXIDX: return GET_REG_FIELD(gx->vcdLo, 1, 8) != 0;
     default:
         return GX_FALSE;
     }

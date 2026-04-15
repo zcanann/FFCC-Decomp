@@ -2,6 +2,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/textureman.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
@@ -354,7 +355,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     float uStep;
     float vStep;
     float phaseLerp;
-    float drawColor;
+    u32 drawColor;
     float worldX;
     float worldY;
     float worldZ;
@@ -369,7 +370,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        &colorWork->m_color, &ppvCameraMatrix0, kPppYmMeltZero, ctrl->m_payload[0x19],
+        &colorWork->m_color, &ppvCameraMatrix02, kPppYmMeltZero, ctrl->m_payload[0x19],
         ctrl->m_payload[0x18], *(u8*)&ctrl->m_arg3, 2, 1, 1, 0);
     pppSetBlendMode(*(u8*)&ctrl->m_arg3);
 
@@ -389,7 +390,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         return;
     }
 
-    GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
@@ -398,12 +399,13 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
+    u32 format = (u32)texture->m_format;
+    if ((format == 8) || (format == 9)) {
         SetUpPaletteEnv(texture);
     }
 
     phaseLerp = FLOAT_80330af4 - work->m_phase;
-    drawColor = colorWork->m_colorValue;
+    drawColor = *(u32*)&colorWork->m_color;
     worldX = pppMngStPtr->m_matrix.value[0][3];
     worldY = pppMngStPtr->m_matrix.value[1][3];
     worldZ = pppMngStPtr->m_matrix.value[2][3];
@@ -433,7 +435,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             Vec vtx3;
             float u0 = uvMin.x + (f32)x * uStep;
             float u1 = uvMin.x + (f32)(x + 1) * uStep;
-            float colorValue;
+            u32 colorValue;
 
             pppCopyVector(vtx0, p0Data->m_position);
             pppCopyVector(vtx1, p1Data->m_position);
@@ -458,40 +460,40 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
             colorValue = drawColor;
             if (p0Data->m_color.m_bytes[3] == 0) {
-                colorValue = p0Data->m_color.m_colorValue;
+                colorValue = p0Data->m_color.m_rawColor;
             }
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);
-            GXColor1u32(*(u32*)&colorValue);
+            GXColor1u32(colorValue);
             GXTexCoord2f32(u0, v1);
 
             colorValue = drawColor;
             if (p1Data->m_color.m_bytes[3] == 0) {
-                colorValue = p1Data->m_color.m_colorValue;
+                colorValue = p1Data->m_color.m_rawColor;
             }
             GXPosition3f32(vtx1.x, vtx1.y, vtx1.z);
-            GXColor1u32(*(u32*)&colorValue);
+            GXColor1u32(colorValue);
             GXTexCoord2f32(u0, v0);
 
             colorValue = drawColor;
             if (p2Data->m_color.m_bytes[3] == 0) {
-                colorValue = p2Data->m_color.m_colorValue;
+                colorValue = p2Data->m_color.m_rawColor;
             }
             GXPosition3f32(vtx2.x, vtx2.y, vtx2.z);
-            GXColor1u32(*(u32*)&colorValue);
+            GXColor1u32(colorValue);
             GXTexCoord2f32(u1, v0);
 
             colorValue = drawColor;
             if (p3Data->m_color.m_bytes[3] == 0) {
-                colorValue = p3Data->m_color.m_colorValue;
+                colorValue = p3Data->m_color.m_rawColor;
             }
             GXPosition3f32(vtx3.x, vtx3.y, vtx3.z);
-            GXColor1u32(*(u32*)&colorValue);
+            GXColor1u32(colorValue);
             GXTexCoord2f32(u1, v1);
             x++;
         }
     }
 
-    if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
+    if ((format == 8) || (format == 9)) {
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     }
 }

@@ -21,6 +21,7 @@ extern const f32 kVecInvSqrtThreeConst;
 extern const f32 kQuatNormalizeEpsilon;
 extern const f32 kQuatHalf;
 extern const f32 kQuatNormalizeThree;
+extern const s32 DAT_801E6600[];
 extern unsigned int gGbaStatusWordTriplet0[];
 extern unsigned int gGbaStatusWordTriplet1[];
 extern unsigned int gGbaStatusWordTriplet2[];

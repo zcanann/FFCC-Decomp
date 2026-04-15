@@ -120,8 +120,15 @@ void C_QUATMtx(Quaternion *r, const Mtx m)
 {
     f32 vv0, vv1;
     s32 i, j, k;
-    s32 idx[3] = { 1, 2, 0 };
+    const s32* idx_src;
+    s32 idx[3];
     f32 vec[3];
+
+    idx_src = DAT_801E6600;
+    idx[0] = idx_src[0];
+    idx[1] = idx_src[1];
+    idx[2] = idx_src[2];
+
     vv0 = m[0][0] + m[1][1] + m[2][2];
     if (vv0 > 0.0f) {
         vv1 = (f32)sqrtf(vv0 + 1.0f);

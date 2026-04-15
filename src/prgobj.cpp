@@ -430,8 +430,8 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
-	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
+	CVector targetPos(target->m_worldPosition);
 	Vec deltaPos;
 	Vec* basePosVec = reinterpret_cast<Vec*>(&basePos);
 
@@ -456,8 +456,8 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
+	CVector targetPos(target->m_worldPosition);
 	Vec deltaPos;
 	float targetRot;
 	float deltaX;
@@ -490,8 +490,8 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
 	CGPrgObj* self = this;
 	float targetRot;
-	CVector targetPos(target->m_worldPosition);
 	CVector basePos(self->m_worldPosition);
+	CVector targetPos(target->m_worldPosition);
 	Vec deltaPos;
 	float deltaX;
 	float zero;

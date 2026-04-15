@@ -44,10 +44,11 @@ extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
-extern "C" void* __vt__8CManager[];
+extern "C" void* __vt__8CManager;
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
+extern "C" char lbl_8032FD1C[];
 
 CFunnyShapePcs FunnyShapePcs;
 u8 ARRAY_8026D728[0xC];
@@ -76,11 +77,7 @@ void CopyFunnyShapePcsTable()
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
-static const char s_funnyShapeSpinnerText[] = "|/-\\";
-char* gFunnyShapeSpinnerText = 0;
-s8 gFunnyShapeSpinnerTextInitialized = 0;
-int gFunnyShapeSpinnerFrame = 0;
-s8 gFunnyShapeSpinnerFrameInitialized = 0;
+static const char s_funnyShapeFmt[] = "FunnyShape %c";
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -112,7 +109,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
 
-    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = &__vt__8CManager;
     *reinterpret_cast<void**>(self) = &__vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
@@ -120,7 +117,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     __ct__11CFunnyShapeFv(self + 0x50);
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
-    __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
+    __register_global_object(&FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 
     CopyFunnyShapePcsTable();
 }
@@ -369,7 +366,8 @@ void CFunnyShapePcs::drawViewer()
     Vec eye = {0.0f, 0.0f, 0.0f};
     Vec at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    static const char s_funnyShapeFmt[] = "FunnyShape %c";
+    static char* s_spinner = lbl_8032FD1C;
+    static int frameCount = 0;
 
     C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
@@ -392,26 +390,13 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    if (!gFunnyShapeSpinnerTextInitialized) {
-        gFunnyShapeSpinnerText = const_cast<char*>(s_funnyShapeSpinnerText);
-        gFunnyShapeSpinnerTextInitialized = true;
-    }
-    if (!gFunnyShapeSpinnerFrameInitialized) {
-        gFunnyShapeSpinnerFrame = 0;
-        gFunnyShapeSpinnerFrameInitialized = true;
-    }
-
-    gFunnyShapeSpinnerFrame++;
-    if (gFunnyShapeSpinnerFrame > 100000) {
-        gFunnyShapeSpinnerFrame = 0;
+    frameCount++;
+    if (frameCount > 100000) {
+        frameCount = 0;
     }
 
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
-    {
-        int frame = gFunnyShapeSpinnerFrame >> 4;
-        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt),
-                       gFunnyShapeSpinnerText[(frame + (frame >> 31)) % 4 - (frame >> 31)]);
-    }
+    Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), s_spinner[(frameCount >> 4) % 4]);
 }
 
 /*

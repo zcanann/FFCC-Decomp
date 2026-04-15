@@ -4,7 +4,14 @@
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_usb.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const f32 kFunnyShapeNdcMax;
+extern const f32 kFunnyShapeNdcMin;
+extern const f32 kFunnyShapeOrthoFarZ;
+extern const f32 kFunnyShapeViewportOrigin;
+extern const f32 kFunnyShapeViewportWidth;
+extern const f32 kFunnyShapeViewportHeight;
+}
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/mtx.h"
 

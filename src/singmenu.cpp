@@ -11,7 +11,20 @@
 #include "ffcc/linkage.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/sound.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern u8 gSingMenuItemIconByType[];
+extern char* gSingMenuTextTableEn[];
+extern char* gSingMenuTextTableDe[];
+extern char* gSingMenuTextTableIt[];
+extern char* gSingMenuTextTableFr[];
+extern char* gSingMenuTextTableEs[];
+extern char* gSingMenuHairTableFr[];
+extern char* gSingMenuAttrTableEn[];
+extern char* gSingMenuAttrTableDe[];
+extern char* gSingMenuAttrTableIt[];
+extern char* gSingMenuAttrTableFr[];
+extern char* gSingMenuAttrTableEs[];
+}
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include <dolphin/gx.h>

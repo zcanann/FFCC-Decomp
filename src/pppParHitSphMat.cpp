@@ -3,7 +3,9 @@
 #include "ffcc/linkage.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppParHitSphMatZero;
+}
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

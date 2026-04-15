@@ -2,7 +2,9 @@
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include "ffcc/gxfunc.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const f32 kThpDrawLodBias;
+}
 
 static const GXColorS10 sTevColor = {-90, 0, -114, 135};
 static const GXColor sKColor0 = {0, 0, 226, 88};

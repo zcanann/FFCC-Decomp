@@ -5,7 +5,10 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppYmMeltZero;
+extern int gPppCalcDisabled;
+}
 #include "dolphin/mtx.h"
 
 extern const float FLOAT_80330af4;

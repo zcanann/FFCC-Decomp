@@ -1,7 +1,11 @@
 #include "ffcc/pppChangeTex.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppChangeTexInit;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+}
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <string.h>

@@ -2,7 +2,13 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppYmCheckBGHeightAxisZero;
+extern const float kPppYmCheckBGHeightProbeDirY;
+extern const float kPppYmCheckBGHeightCylinderScale;
+extern const float kPppYmCheckBGHeightCylinderOffset;
+extern int gPppCalcDisabled;
+}
 
 #include <dolphin/types.h>
 

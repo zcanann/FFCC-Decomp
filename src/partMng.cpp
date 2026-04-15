@@ -18,7 +18,14 @@
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/linkage.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+extern float gPartScreenMatrixRow2X;
+extern float gPartScreenMatrixRow2Y;
+extern float gPartScreenMatrixRow2W;
+extern int gPppHeapUseRateWords[3];
+}
 #include "ffcc/stopwatch.h"
 
 #include <string.h>

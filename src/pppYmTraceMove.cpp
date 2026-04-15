@@ -1,5 +1,9 @@
 #include "ffcc/pppYmTraceMove.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppYmTraceMoveZero;
+extern const float kPppYmTraceMoveOne;
+extern int gPppCalcDisabled;
+}
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 

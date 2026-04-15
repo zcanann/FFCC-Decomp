@@ -9,7 +9,9 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
 #include "ffcc/system.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kMapOctTreeDefaultOffsetZ;
+}
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 const float kOctTreeBoundMinInit = 10000000000.0f;

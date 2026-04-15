@@ -109,10 +109,9 @@ void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 fl
 void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
-    pppYmDrawMdlTexAnmColorBlock* colorBlock;
     pppModelSt* model;
-    pppFMATRIX matrix0;
-    pppFMATRIX matrix2;
+    pppYmDrawMdlTexAnmColorBlock* colorBlock;
+    pppFMATRIX matrix;
     u8* initBytes;
     u8* stepBytes;
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
@@ -123,11 +122,11 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 
     colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
 
-    pppUnitMatrix(matrix2);
-    matrix2.value[2][2] *= FLOAT_80330548;
+    pppUnitMatrix(matrix);
+    matrix.value[2][2] *= FLOAT_80330548;
 
-    pppMulMatrix(matrix0, ymDrawMdlTexAnm->m_localMatrix, matrix2);
-    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix02, matrix0);
+    pppMulMatrix(matrix, ymDrawMdlTexAnm->m_localMatrix, matrix);
+    pppMulMatrix(ymDrawMdlTexAnm->m_modelViewMatrix, *(pppFMATRIX*)&ppvCameraMatrix02, matrix);
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;

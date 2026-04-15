@@ -1,56 +1,35 @@
 #include "dolphin/mtx.h"
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - mtx.c reports 100% code/data in objdiff, but promoting it to Matching on
- *   the latest main-based SDK branch still fails the final main.dol checksum
- *
- * Most useful result so far:
- * - the same one-at-a-time Matching probe was repeated for mtx.c, mtx44.c,
- *   vec.c, and quat.c, and all four failed in the exact same way: configure
- *   succeeds, link completes, and only the final checksum check fails
- * - promoting all four mtx units together on the latest main-based SDK branch
- *   still fails only at the final checksum, so the hidden-link seam is not
- *   resolved by treating the cluster as a single promote-together island
- * - that makes this look like a shared hidden-link / metadata seam in the mtx
- *   library cluster rather than a remaining visible source mismatch in this
- *   file's body
- * - a fresh object-extent audit explains that seam more concretely: rebuilt
- *   source `mtx.o` is `0x1CA4` bytes of `.text`, while the extracted target
- *   `mtx.o` is only `0x0A3C`; source still emits the full SDK object plus
- *   local `Unit01` / `.sdata2` constants, while the target slice on GCCP01 is
- *   only the linked subset that imports those constants from outside
- * - that means `mtx.c -> Matching` is not blocked by its visible matched
- *   functions anymore; it is blocked because this repo still models the full
- *   library source file where GCCP01's final linked object only keeps the
- *   subset through `C_MTXLightOrtho`
- * - a PAL-map-backed GCCP01 trim is keepable here: removing every function the
- *   map marks `UNUSED` shrinks rebuilt source `mtx.o` down to the exact target
- *   `.text` extent `0x0A3C` while preserving the still-linked subset through
- *   `C_MTXLightOrtho`
- * - reclaiming the adjacent `Unit01` `.sdata` window and the `0x1C` `.sdata2`
- *   constant run back into `mtx/mtx.c`, plus removing the stray source-side
- *   `Unit01` blob from `si/SIBios.c`, also makes the extracted target
- *   `mtx.o` finally carry `.sdata 0x8` and `.sdata2 0x1C` instead of a
- *   text-only slice
- * - after those fixes, promoting `mtx.c` no longer hangs or exposes a broad
- *   section mismatch; it now gets all the way to a plain final checksum miss
- * - that cluster-level result still holds after later PAL-backed trims in
- *   `mtx44.c`, `vec.c`, and `quat.c`: promoting all four mtx units together
- *   still fails only at the final checksum, so the remaining seam is no
- *   longer the obvious linked-subset recovery in those files
- * - a follow-up probe making `Unit01` non-static in source did not change the
- *   rebuilt object binding at all, so the remaining blocker is not just that
- *   one declaration spelling
- */
-
 static f32 Unit01[] = { 0.0f, 1.0f };
 
 extern f32 sinf(f32);
 extern f32 cosf(f32);
 extern f32 tanf(f32);
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void C_MTXIdentity(Mtx m)
+{
+    m[0][0] = 1.0f;
+    m[0][1] = 0.0f;
+    m[0][2] = 0.0f;
+    m[0][3] = 0.0f;
+    m[1][0] = 0.0f;
+    m[1][1] = 1.0f;
+    m[1][2] = 0.0f;
+    m[1][3] = 0.0f;
+    m[2][0] = 0.0f;
+    m[2][1] = 0.0f;
+    m[2][2] = 1.0f;
+    m[2][3] = 0.0f;
+}
 
 #ifdef GEKKO
 void PSMTXIdentity(register Mtx m)

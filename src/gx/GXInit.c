@@ -460,15 +460,18 @@ void __GXInitGX(void) {
         union {
             f64 f;
             u32 u[2];
-        } fb_width, xfb_height;
-        f64 bias = *(const volatile f64*)&GXInit_IntToFloatBias;
+        } fb_width;
+        union {
+            f64 f;
+            u32 u[2];
+        } xfb_height;
 
-        fb_width.u[0] = 0x43300000;
         fb_width.u[1] = rmode->fbWidth;
-        xfb_height.u[0] = 0x43300000;
         xfb_height.u[1] = rmode->xfbHeight;
-        GXSetViewport(
-            GXInit_ZeroF, GXInit_ZeroF, (f32)(fb_width.f - bias), (f32)(xfb_height.f - bias), GXInit_ZeroF, GXInit_OneF);
+        fb_width.u[0] = 0x43300000;
+        xfb_height.u[0] = 0x43300000;
+        GXSetViewport(GXInit_ZeroF, GXInit_ZeroF, (f32)(fb_width.f - GXInit_IntToFloatBias),
+                      (f32)(xfb_height.f - GXInit_IntToFloatBias), GXInit_ZeroF, GXInit_OneF);
     }
     GXSetProjectionv(GXDefaultProjData);
     GXSetCoPlanar(GX_DISABLE);
@@ -551,14 +554,17 @@ void __GXInitGX(void) {
         union {
             f64 f;
             u32 u[2];
-        } xfb_height, efb_height;
-        f64 bias = *(const volatile f64*)&GXInit_IntToFloatBias;
+        } xfb_height;
+        union {
+            f64 f;
+            u32 u[2];
+        } efb_height;
 
-        xfb_height.u[0] = 0x43300000;
         xfb_height.u[1] = rmode->xfbHeight;
-        efb_height.u[0] = 0x43300000;
         efb_height.u[1] = rmode->efbHeight;
-        GXSetDispCopyYScale((f32)((xfb_height.f - bias) / (efb_height.f - bias)));
+        xfb_height.u[0] = 0x43300000;
+        efb_height.u[0] = 0x43300000;
+        GXSetDispCopyYScale((f32)((xfb_height.f - GXInit_IntToFloatBias) / (efb_height.f - GXInit_IntToFloatBias)));
     }
     GXSetCopyClamp((GXFBClamp)(GX_CLAMP_TOP | GX_CLAMP_BOTTOM));
     GXSetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);

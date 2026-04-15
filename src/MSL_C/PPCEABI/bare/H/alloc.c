@@ -416,19 +416,17 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
         SubBlock* new_sb;
         unsigned long old_tag;
         unsigned long old_size;
-        unsigned long block_val;
         unsigned long block_or_1;
-        int was_free;
         int was_alloc;
+        int was_free;
         unsigned long new_size;
 
         old_tag = start->size;
         new_sb = (SubBlock*)((char*)start + requested_size);
-        block_val = (unsigned long)start->block & ~1;
-        block_or_1 = block_val | 1;
-        was_free = !(old_tag & 2);
         old_size = old_tag & ~7;
-        was_alloc = !was_free;
+        block_or_1 = ((unsigned long)start->block & ~1) | 1;
+        was_alloc = old_tag & 2;
+        was_free = !was_alloc;
 
         start->block = (Block*)block_or_1;
         start->size = requested_size;

@@ -8,11 +8,10 @@
 #include "dolphin/gx/__gx.h"
 
 #if DEBUG
-static const char s___GXVersion[] = "<< Dolphin SDK - GX\tdebug build: Apr  5 2004 03:55:13 (0x2301) >>";
+const char* __GXVersion = "<< Dolphin SDK - GX\tdebug build: Feb  7 2003 04:01:13 (0x2301) >>";
 #else
-extern const char s___GXVersion[];
+const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: Feb  7 2003 04:01:13 (0x2301) >>";
 #endif
-const char* __GXVersion = s___GXVersion;
 
 static GXData gxData;
 GXData* const gx = &gxData;

@@ -749,10 +749,10 @@ config.libs = [
         "objects": [
             Object(Matching, "mtx/mtx.c", cflags=[*replace_flag_prefix(cflags_fmadd, "-fp ", "-fp hardware"), "-DGEKKO"]),
             Object(Matching, "mtx/mtxvec.c"),
-            Object(NonMatching, "mtx/mtx44.c"),
+            Object(Matching, "mtx/mtx44.c"),
             Object(Matching, "mtx/mtx44vec.c"),
-            Object(NonMatching, "mtx/vec.c"),
-            Object(NonMatching, "mtx/quat.c"),
+            Object(Matching, "mtx/vec.c"),
+            Object(Matching, "mtx/quat.c"),
             Object(Matching, "mtx/psmtx.c"),
         ],
     },

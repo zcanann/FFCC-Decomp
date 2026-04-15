@@ -1,8 +1,5 @@
 #include "dolphin/math.h"
 #include "dolphin/mtx.h"
-extern const f32 kQuatNormalizeEpsilon;
-extern const f32 kQuatHalf;
-extern const f32 kQuatNormalizeThree;
 
 float sqrtf(float x);
 float sinf(float x);
@@ -195,9 +192,9 @@ void PSQUATNormalize(const register Quaternion *src, register Quaternion *unit)
         register f32 vv1, vv2, vv3;
         register f32 vv4, vv5, vv6;
         register f32 vv7, vv8;
-        register f32 vv9 = kQuatNormalizeEpsilon;
-        register f32 vvA = kQuatHalf;
-        register f32 vvB = kQuatNormalizeThree;
+        register f32 vv9 = 0.00001f;
+        register f32 vvA = 0.5f;
+        register f32 vvB = 3.0f;
         asm
         {
             psq_l    vv1, 0(src), 0, 0;
@@ -377,8 +374,8 @@ void C_QUATRotAxisRad(Quaternion *q, const Vec *axis, f32 rad)
     tmp = rad;
     PSVECNormalize(axis, &dst);
 
-    tmp2 = kQuatHalf * tmp;
-    tmp3 = sinf(kQuatHalf * tmp);
+    tmp2 = 0.5f * tmp;
+    tmp3 = sinf(0.5f * tmp);
     tmp = tmp3;
     tmp3 = cosf(tmp2);
 

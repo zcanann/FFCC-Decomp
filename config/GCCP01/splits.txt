@@ -1532,15 +1532,19 @@ mtx/mtxvec.c:
 
 mtx/mtx44.c:
 	.text       start:0x80186528 end:0x80186BFC
+	.sdata2     start:0x80333700 end:0x80333718
 
 mtx/mtx44vec.c:
 	.text       start:0x80186BFC end:0x80186C74
 
 mtx/vec.c:
 	.text       start:0x80186C74 end:0x80186F24
+	.sdata2     start:0x80333718 end:0x80333728
 
 mtx/quat.c:
 	.text       start:0x80186F24 end:0x80187490
+	.rodata     start:0x801E6600 end:0x801E6610
+	.sdata2     start:0x80333728 end:0x80333750
 
 dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0

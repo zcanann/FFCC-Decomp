@@ -10,7 +10,13 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern unsigned int gGbaStatusWordTriplet0[];
+extern unsigned int gGbaStatusWordTriplet1[];
+extern unsigned int gGbaStatusWordTriplet2[];
+extern unsigned int gGbaStatusWordTriplet3[];
+extern unsigned int gGbaStatusWordTable[];
+}
 #include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>

@@ -1,7 +1,9 @@
 #include "ffcc/vector.h"
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kVectorZero;
+}
 
 /*
  * --INFO--

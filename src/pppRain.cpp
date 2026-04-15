@@ -4,7 +4,11 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppRainTexCoordBase;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+}
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 const float FLOAT_80331020 = 3.0518509e-05f;

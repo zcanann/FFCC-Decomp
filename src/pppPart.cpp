@@ -20,7 +20,11 @@
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
 #include "ffcc/pppShape.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+extern float gPartScreenMatrixRow2W;
+}
 #include "ffcc/gxfunc.h"
 
 #include <string.h>

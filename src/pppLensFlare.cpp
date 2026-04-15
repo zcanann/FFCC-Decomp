@@ -4,7 +4,13 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppLensFlareZero;
+extern const float kPppLensFlareAlphaScale;
+extern const float kPppLensFlareCameraToObjectScale;
+extern const float kPppLensFlareDepthToZScale;
+extern int gPppCalcDisabled;
+}
 
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>

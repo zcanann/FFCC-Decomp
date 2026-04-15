@@ -3,7 +3,11 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppYmDeformationShpZero;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+}
 #include "ffcc/util.h"
 
 #include <dolphin/gx.h>

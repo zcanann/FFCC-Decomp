@@ -2,7 +2,10 @@
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppYmMegaBirthShpTail3Zero;
+extern int gPppCalcDisabled;
+}
 #include "dolphin/mtx.h"
 #include <string.h>
 

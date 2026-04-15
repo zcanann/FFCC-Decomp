@@ -4,7 +4,10 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/linkage.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const f32 kPppYmLaserOne;
+extern int gPppCalcDisabled;
+}
 #include "ffcc/util.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"

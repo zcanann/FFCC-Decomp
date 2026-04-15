@@ -9,7 +9,25 @@
 #include "ffcc/p_usb.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/system.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern u8* gCharaPartWorkPtr;
+extern const double kCharaViewerColorCenterBias;
+extern const float kCharaViewerZero;
+extern const float kCharaViewerGridMax;
+extern const float kCharaViewerUnitStep;
+extern const float kCharaViewerGridSpacing;
+extern const float kCharaViewerGridMin;
+extern const double kCharaViewerColorWhiteBias;
+extern const float kCharaViewerFineStep;
+extern const float kCharaViewerLerpScale;
+extern char kCharaViewerDefaultModelPath[];
+extern const float kCharaViewerLightPosX;
+extern const float kCharaViewerLightPosY;
+extern const float kCharaViewerLightPosZ;
+extern const float kCharaViewerLightTargetX;
+extern const float kCharaViewerLightTargetY;
+extern const float kCharaViewerLightTargetZ;
+}
 #include "ffcc/textureman.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"

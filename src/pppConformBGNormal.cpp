@@ -4,7 +4,15 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/gobject.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const f32 kPppConformBgNormalZero;
+extern const f32 kPppConformBgNormalOne;
+extern const f32 kPppConformBgNormalDownRayY;
+extern const f32 kPppConformBgNormalCylinderRadius;
+extern const f32 kPppConformBgNormalCylinderHeight;
+extern const f32 kPppConformBgNormalGroundSnapLimit;
+extern int gPppCalcDisabled;
+}
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include <math.h>

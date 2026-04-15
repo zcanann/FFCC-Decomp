@@ -2,7 +2,10 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppConstrainCameraForLocZero;
+extern int gPppCalcDisabled;
+}
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 

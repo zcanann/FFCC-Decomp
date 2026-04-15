@@ -8,7 +8,10 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const f32 kPppLaserZero;
+extern int gPppCalcDisabled;
+}
 #include "ffcc/util.h"
 
 #include <string.h>

@@ -2,7 +2,10 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/textureman.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern int gPppCalcDisabled;
+extern u8 gPppDefaultValueBuffer[];
+}
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 

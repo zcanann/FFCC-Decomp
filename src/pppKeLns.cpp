@@ -1,7 +1,9 @@
 #include "ffcc/pppKeLns.h"
 #include "ffcc/KeLns.h"
 #include "dolphin/types.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppKeLnsZero;
+}
 
 /*
  * --INFO--

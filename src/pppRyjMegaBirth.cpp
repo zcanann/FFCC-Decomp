@@ -1,6 +1,9 @@
 #include "ffcc/pppRyjMegaBirth.h"
 #include "ffcc/math.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppRyjMegaBirthZero;
+extern int gPppCalcDisabled;
+}
 #include <string.h>
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);

@@ -2,7 +2,12 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppShape.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppKeShpTail2XZero;
+extern const float kPppKeShpTail2XAlphaScale;
+extern const float kPppKeShpTail3XOne;
+extern int gPppCalcDisabled;
+}
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>

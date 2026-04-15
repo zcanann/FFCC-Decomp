@@ -747,7 +747,7 @@ config.libs = [
         "cflags": [*cflags_fmadd, "-DGEKKO"],
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "mtx/mtx.c", cflags=[*replace_flag_prefix(cflags_fmadd, "-fp ", "-fp hardware"), "-DGEKKO"]),
+            Object(Matching, "mtx/mtx.c", cflags=[*replace_flag_prefix(cflags_fmadd, "-fp ", "-fp hardware"), "-DGEKKO"]),
             Object(Matching, "mtx/mtxvec.c"),
             Object(NonMatching, "mtx/mtx44.c"),
             Object(Matching, "mtx/mtx44vec.c"),

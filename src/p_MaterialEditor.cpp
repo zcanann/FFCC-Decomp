@@ -3,7 +3,16 @@
 #include "ffcc/ME_USB_process.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern char* gDebugSpinnerText;
+extern unsigned char gDebugSpinnerTextInitialized;
+extern int gDebugSpinnerFrame;
+extern unsigned char gDebugSpinnerFrameInitialized;
+extern const float kMaterialEditorControlMaxInit;
+extern const float kMaterialEditorControlMinInit;
+extern unsigned int kMaterialEditorDefaultColorRgba;
+extern char sMaterialEditorSpinnerText[];
+}
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>

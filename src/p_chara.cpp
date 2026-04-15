@@ -6,7 +6,9 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern u8* gCharaPartWorkPtr;
+}
 
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>

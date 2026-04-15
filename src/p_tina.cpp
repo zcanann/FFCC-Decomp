@@ -8,7 +8,16 @@
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/stopwatch.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern int gPppHeapUseRateWords[3];
+extern char* gDebugSpinnerText;
+extern unsigned char gDebugSpinnerTextInitialized;
+extern int gDebugSpinnerFrame;
+extern unsigned char gDebugSpinnerFrameInitialized;
+extern char sDebugSpinnerText[];
+extern const float kPppHeapUseRateDivisor;
+extern const float kPartColorIdentityOne;
+}
 #include "ffcc/linkage.h"
 #include "ffcc/USBStreamData.h"
 #include <string.h>

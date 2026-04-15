@@ -2,7 +2,13 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppCoronaViewDirX;
+extern const float kPppCoronaViewDirY;
+extern const float kPppCoronaViewDirZ;
+extern const float kPppCoronaDistanceScaleBase;
+extern int gPppCalcDisabled;
+}
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

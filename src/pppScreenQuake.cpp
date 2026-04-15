@@ -2,7 +2,10 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppScreenQuakeZero;
+extern int gPppCalcDisabled;
+}
 
 
 /*

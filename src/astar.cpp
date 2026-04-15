@@ -9,7 +9,11 @@
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern char kAStarGroupDebugFormat[];
+extern char kAStarGroupDebugLabel[];
+extern char kAStarPortalDebugFormat[];
+}
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 

@@ -4,7 +4,10 @@
 #include "ffcc/partMng.h"
 #include "ffcc/textureman.h"
 #include "ffcc/pppYmEnv.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern int gPppCalcDisabled;
+extern u8 gPppDefaultValueBuffer[];
+}
 #include "ffcc/util.h"
 
 #include <dolphin/gx.h>

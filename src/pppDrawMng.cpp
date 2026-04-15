@@ -6,7 +6,10 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppDrawDepthScaleNear;
+extern const float kPppDrawDepthScaleFar;
+}
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);

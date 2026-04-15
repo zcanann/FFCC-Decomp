@@ -1,5 +1,8 @@
 #include "ffcc/pppAccele.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppAcceleZero;
+extern int gPppCalcDisabled;
+}
 
 
 /*

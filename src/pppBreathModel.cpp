@@ -3,7 +3,10 @@
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppBreathModelZero;
+extern int gPppCalcDisabled;
+}
 #include "ffcc/pppPart.h"
 #include <string.h>
 

@@ -4,7 +4,15 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern const float kPppLightZero;
+extern const float kPppLightOne;
+extern const float kPppLightDefaultCosAtten;
+extern const float kPppLightSpotScale;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+extern u8 gPppDefaultValueBuffer[];
+}
 #include "dolphin/mtx.h"
 
 struct pppLightTarget {

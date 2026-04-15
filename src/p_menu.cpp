@@ -14,7 +14,13 @@
 #include "ffcc/pad.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
-#include "ffcc/symbols_shared.h"
+extern "C" {
+extern unsigned char gMenuProcessTable[];
+extern const f32 kMenuInitOne;
+extern const f32 kMenuOrthoBottom;
+extern const f32 kMenuOrthoRight;
+extern const f32 kMenuOrthoFar;
+}
 #include "ffcc/textureman.h"
 #include "ffcc/fontman.h"
 

@@ -232,6 +232,7 @@ void CFlatData::Create(void* filePtr)
 				}
 				case 0x4D455320: // 'MES '
 				{
+					char** mesPtr;
 					int iVar7;
 					int iVar8;
 
@@ -240,13 +241,13 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					iVar10 = (int)chunkFile.GetAddress();
-					flatData = (FlatDataLayout*)this;
+					mesPtr = m_mesPtr;
 					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
 						iVar8 = (int)chunkFile.GetAddress();
-						flatData->m_mesPtr[0] = m_mesBuffer + iVar8 - iVar10;
+						*mesPtr = m_mesBuffer + (iVar8 - iVar10);
 						chunkFile.GetString();
-						flatData = (FlatDataLayout*)flatData->m_data;
+						mesPtr++;
 					}
 					break;
 				}

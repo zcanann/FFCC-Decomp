@@ -13,7 +13,7 @@ static const float FLOAT_80330d9c = 2.0f;
 static const float FLOAT_80330da0 = 0.0f;
 static const float FLOAT_80330da4 = 1.0f;
 static const float FLOAT_80330da8 = 0.017453292f;
-static const float kPppYmDeformationMdlZero = 0.0f;
+static const float FLOAT_80330dac = 0.0f;
 static const double DOUBLE_80330db0 = 4503601774854144.0;
 
 struct pppCVECTOR {
@@ -104,7 +104,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
 {
     u8 direction = 1;
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = kPppYmDeformationMdlZero;
+    float fVar1 = FLOAT_80330dac;
 
     *puVar2 = 0;
     *(u8*)(puVar2 + 1) = direction;
@@ -127,7 +127,6 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    extern float FLOAT_80330dac;
     float value = FLOAT_80330dac;
     float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
@@ -303,10 +302,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         PSMTXRotRad(rotMtx, 'z', FLOAT_80330da8 * (float)state->m_angle);
         indMtx[0][0] = rotMtx[0][0] * state->m_scale;
         indMtx[0][1] = rotMtx[0][1] * state->m_scale;
-        indMtx[0][2] = kPppYmDeformationMdlZero;
+        indMtx[0][2] = FLOAT_80330dac;
         indMtx[1][0] = rotMtx[1][0] * state->m_scale;
         indMtx[1][1] = rotMtx[1][1] * state->m_scale;
-        indMtx[1][2] = kPppYmDeformationMdlZero;
+        indMtx[1][2] = FLOAT_80330dac;
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
         GXLoadTexObj((_GXTexObj*)backTexture, GX_TEXMAP0);
@@ -317,13 +316,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetNumIndStages(0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-        PSMTXRotRad(resetRotMtx, 'z', kPppYmDeformationMdlZero);
-        resetIndMtx[0][0] = kPppYmDeformationMdlZero;
-        resetIndMtx[0][1] = kPppYmDeformationMdlZero;
-        resetIndMtx[0][2] = kPppYmDeformationMdlZero;
-        resetIndMtx[1][0] = kPppYmDeformationMdlZero;
-        resetIndMtx[1][1] = kPppYmDeformationMdlZero;
-        resetIndMtx[1][2] = kPppYmDeformationMdlZero;
+        PSMTXRotRad(resetRotMtx, 'z', FLOAT_80330dac);
+        resetIndMtx[0][0] = FLOAT_80330dac;
+        resetIndMtx[0][1] = FLOAT_80330dac;
+        resetIndMtx[0][2] = FLOAT_80330dac;
+        resetIndMtx[1][0] = FLOAT_80330dac;
+        resetIndMtx[1][1] = FLOAT_80330dac;
+        resetIndMtx[1][2] = FLOAT_80330dac;
         GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);

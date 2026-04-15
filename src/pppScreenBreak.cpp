@@ -159,13 +159,13 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 {
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
-    float zero = FLOAT_80331cc4;
+    float zero = 0.0f;
     Quaternion meshQuat;
     Quaternion resultQuat;
     Quaternion axisQuat;
     Vec axis;
     Vec gravityAdd;
-    Vec basis = { DAT_801dd4b0, DAT_801dd4b4, DAT_801dd4b8 };
+    Vec basis = { 0.0f, 1.0f, 0.0f };
     Vec cameraOffset;
     Vec screenOffset;
     Vec4d clipOutput;
@@ -200,7 +200,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     screenOffset.z = *(float*)((u8*)param_2 + 0x18) * cameraOffset.z + cameraPos.z;
 
     PSMTXMultVec(cameraMtx, &screenOffset, (Vec*)&clipInput);
-    clipInput.w = FLOAT_80331cd0;
+    clipInput.w = 1.0f;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &clipInput, &clipOutput);
 
     translation.x = clipOutput.x * cameraForward.x;
@@ -245,8 +245,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             PSMTXConcat(quatMtx, transMtx, (float(*)[4])nodeMtx);
 
             pieceData[3] -= pieceData[0];
-            pieceData[4] = pieceData[1] * pieceData[0xC] -
-                           FLOAT_80331cf4 * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
+            pieceData[4] = pieceData[1] * pieceData[0xC] - 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
             pieceData[5] -= pieceData[2];
 
             if (*(float*)((u8*)param_3 + 0x30) != zero) {
@@ -254,7 +253,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
                 pieceData[5] += gravityAdd.z;
             }
 
-            pieceData[0xC] += FLOAT_80331cd0;
+            pieceData[0xC] += 1.0f;
 
             screenOffset.x = invTransMtx[0][3];
             screenOffset.y = invTransMtx[1][3];
@@ -710,8 +709,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 
-    float sx = FLOAT_80331cc0 * value[6];
-    float sy = FLOAT_80331cc0 * value[7];
+    float sx = 2.0f * value[6];
+    float sy = 2.0f * value[7];
     u8* piece = (u8*)*(void**)&value[3];
     for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
         switch (param_2->m_initWOrk) {

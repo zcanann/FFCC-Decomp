@@ -694,7 +694,7 @@ config.libs = [
                 source="os/__ppc_eabi_init.cpp",
                 cflags=replace_flag_prefix(cflags_base, "-inline ", "-inline auto,deferred"),
             ),
-            Object(NonMatching, "os/OS.c"),
+            Object(Matching, "os/OS.c"),
             Object(Matching, "os/OSAddress.c"),
             Object(Matching, "os/OSAlarm.c"),
             Object(Matching, "os/OSAlloc.c"),

@@ -89,7 +89,6 @@ void __OSDBJUMPEND(void);
 asm void __OSFPRInit(void) {
     // clang-format off
     nofralloc
-entry __OSFPRInit
 
     mfmsr r3
     ori r3, r3, 0x2000
@@ -476,7 +475,6 @@ entry __OSDBINTSTART
 
 asm void __OSDBJump(void) {
     nofralloc
-entry __OSDBJump
 entry __OSDBJUMPSTART
     bla     OS_DBJUMPPOINT_ADDR
 entry __OSDBJUMPEND

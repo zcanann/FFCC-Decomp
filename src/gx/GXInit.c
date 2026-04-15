@@ -14,8 +14,6 @@ extern const char s___GXVersion[];
 #endif
 const char* __GXVersion = s___GXVersion;
 
-static GXFifoObj FifoObj;
-
 static GXData gxData;
 GXData* const gx = &gxData;
 
@@ -142,6 +140,8 @@ static int __GXShutdown(BOOL final)
 
     return 1;
 }
+
+GXFifoObj FifoObj;
 
 GXFifoObj* GXInit(void* base, u32 size)
 {

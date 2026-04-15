@@ -56,13 +56,14 @@ public:
     void drawViewer();
 
     void CreateBoundaryBox(Vec&, Vec&, long, const Vec*);
+    RSDITEM* GetReadRsd();
     void SetUSBData();
     void ResetRsdList(ZLIST*);
     void DeleteRsdItem(RSDLISTITEM*);
     void DeleteColAnmData(ZCANMGRP**, int);
     int AddRsdList(ZLIST*);
     int SetRsdFlag();
-    void GetRsdItemR();
+    RSDLISTITEM* GetRsdItemR();
     int SetRsdIndex();
     RSDLISTITEM* GetRsdItem();
 

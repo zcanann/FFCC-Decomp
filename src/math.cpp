@@ -731,12 +731,9 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
-    float innerRadius, float outerRadius)
+int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
+                                  float innerRadius, float outerRadius)
 {
-    (void)math;
-
     Vec local_60;
     Vec local_6c;
     Vec local_78;

@@ -606,33 +606,33 @@ found:
 void CWind::ChangePower(int id, float power)
 {
     WindObject* obj = m_objects;
-    int blocks = 8;
+    s8 active;
 
-    do {
-        s8 active = static_cast<s8>(obj->flags & 0x80);
+    for (int blocks = 8; blocks != 0; blocks--) {
+        active = GetWindActiveFlag(obj);
         if (active != 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        active = static_cast<s8>(obj->flags & 0x80);
+        active = GetWindActiveFlag(obj);
         if (active != 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        active = static_cast<s8>(obj->flags & 0x80);
+        active = GetWindActiveFlag(obj);
         if (active != 0 && id == obj->id) {
             goto found;
         }
         obj++;
 
-        active = static_cast<s8>(obj->flags & 0x80);
+        active = GetWindActiveFlag(obj);
         if (active != 0 && id == obj->id) {
             goto found;
         }
         obj++;
-    } while (--blocks != 0);
+    }
 
     obj = 0;
 

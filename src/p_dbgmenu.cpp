@@ -525,17 +525,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
  */
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
-	if (m_currentVtxFmt != 1) {
-		GXClearVtxDesc();
-		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-		GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-		_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-		m_currentVtxFmt = 1;
-	}
+	changeVtxFmt(1);
 
 	if ((flags & 1) == 0) {
 		const u32* borderColors = gDbgMenuWindowBorderColors;
@@ -616,12 +606,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
  */
 void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
-	if (m_currentVtxFmt != 0) {
-		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-		_GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-		m_currentVtxFmt = 0;
-	}
+	changeVtxFmt(0);
 
 	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	if ((flags & 2) != 0) {

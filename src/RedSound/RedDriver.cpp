@@ -231,7 +231,7 @@ void _SetReverbDepth(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 4
+#pragma optimization_level 0
 void _SetMusicData(int* param_1)
 {
     SetMusicData__9CRedEntryFP12RedMusicHEAD(&DAT_8032e154, (RedMusicHEAD*)*param_1);

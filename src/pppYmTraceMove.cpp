@@ -7,10 +7,6 @@ extern int gPppCalcDisabled;
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
-extern "C" {
-void pppNormalize__FR3Vec3Vec(float*, Vec*);
-}
-
 struct pppYmTraceMoveWork {
 	Vec m_direction;
 	u32 _pad0C;
@@ -54,12 +50,10 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
-	Vec local_50;
 	Quaternion local_60;
 	Quaternion local_70;
 	Quaternion local_80;
 	Vec local_8c;
-	Vec local_98;
 	Vec local_ec;
 	Vec local_f8;
 
@@ -83,8 +77,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		local_8c.z = *(f32*)(ownerBytes + 0x164);
 		pppSubVector(local_20, local_8c, pppMngSt->m_position);
 		local_20.y = local_20.y + param_2->m_payload;
-		pppCopyVector(local_50, local_20);
-		pppNormalize__FR3Vec3Vec((float*)&local_20, &local_50);
+		pppNormalize(local_20, local_20);
 
 		pppCopyVector(work->m_direction, local_20);
 		pppSubVector(local_2c, pppMngSt->m_position, pppMngSt->m_previousPosition);
@@ -94,8 +87,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 			pppCopyVector(local_2c, work->m_previousDirection);
 		}
 
-		pppCopyVector(local_98, local_2c);
-		pppNormalize__FR3Vec3Vec((float*)&local_2c, &local_98);
+		pppNormalize(local_2c, local_2c);
 	}
 
 	local_60.x = local_20.x;

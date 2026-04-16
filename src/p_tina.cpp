@@ -1298,7 +1298,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     int pdtSlotIndex;
     int loaded;
     CMemory::CStage* stage;
-    char path[0x108];
+    char path[0x100];
 
     sprintf(path, s_dvd__smenu__s_801d7fb0, GetLangString__5CGameFv(&Game), fileName);
 

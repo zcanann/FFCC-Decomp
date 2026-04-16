@@ -592,9 +592,9 @@ void CSystem::Quit()
 void CSystem::Init()
 {
     CFile::CHandle* fileHandle;
-    int mapSize;
-    int offset;
-    int chunkSize;
+    unsigned int mapSize;
+    unsigned int offset;
+    unsigned int chunkSize;
 
     m_initialized = 1;
     m_currentOrder = (COrder*)0;

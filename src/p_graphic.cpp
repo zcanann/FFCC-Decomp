@@ -61,6 +61,8 @@ static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
 static char s__s__d____3f___801d7ba4[] = "%s(%d) %.3f%%";
 static char s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
 
+static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
+
 /*
  * --INFO--
  * Address:	TODO
@@ -597,21 +599,20 @@ void CGraphicPcs::setViewport()
  */
 void CGraphicPcs::preDrawEnvInit()
 {
-    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-    *(u32*)(materialMan + 0x48) = 0x000ACE0F;
-    *(u32*)(materialMan + 0x44) = 0xFFFFFFFF;
-    *(u8*)(materialMan + 0x4C) = 0xFF;
-    *(u32*)(materialMan + 0x128) = 0;
-    *(u32*)(materialMan + 0x11C) = 0;
-    *(u32*)(materialMan + 0x12C) = 0x1E;
-    *(u32*)(materialMan + 0x120) = 0x1E;
-    *(u32*)(materialMan + 0x130) = 0;
-    *(u32*)(materialMan + 0x124) = 0;
-    *(u8*)(materialMan + 0x205) = 0xFF;
-    *(u8*)(materialMan + 0x206) = 0xFF;
-    *(u32*)(materialMan + 0x58) = 0;
-    *(u32*)(materialMan + 0x5C) = 0;
-    *(u8*)(materialMan + 0x208) = 0;
+    *(u32*)(MaterialManRaw() + 0x48) = 0x000ACE0F;
+    *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
+    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+    *(u32*)(MaterialManRaw() + 0x128) = 0;
+    *(u32*)(MaterialManRaw() + 0x11C) = 0;
+    *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
+    *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
+    *(u32*)(MaterialManRaw() + 0x130) = 0;
+    *(u32*)(MaterialManRaw() + 0x124) = 0;
+    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+    *(u32*)(MaterialManRaw() + 0x58) = 0;
+    *(u32*)(MaterialManRaw() + 0x5C) = 0;
+    *(u8*)(MaterialManRaw() + 0x208) = 0;
 }
 
 /*

@@ -824,7 +824,11 @@ config.libs = [
                     "-fp ", "-fp fmadd"
                 ),
             ),
-            Object(NonMatching, "axfx/reverb_hi_4ch.c"),
+            Object(
+                Matching,
+                "axfx/reverb_hi_4ch.c",
+                cflags=replace_flag_prefix(cflags_base, "-fp_contract ", "-fp_contract off"),
+            ),
             Object(
                 Matching,
                 "axfx/reverb_std.c",

@@ -16,7 +16,7 @@ extern "C" s32 rand();
 static const GXColor DAT_8032fd58 = {0x80, 0x80, 0x80, 0x80};
 static const GXColor DAT_8032fd5c = {0x80, 0x80, 0x80, 0x80};
 extern GXColor DAT_8032fd60;
-extern const double DOUBLE_8032fd88;
+const double DOUBLE_8032fd88 = 4503601774854144.0;
 static const float FLOAT_8032fd64 = 1000.0f;
 static const float FLOAT_8032fd68 = -1000.0f;
 extern float FLOAT_8032fd6c;

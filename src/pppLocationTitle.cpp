@@ -260,12 +260,12 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int serializedOffset;
-    int graphId;
-    LocationTitleWork* work;
-    int graphFrame;
+    u32 graphId;
     int fadeDivisor;
-    LocationTitleParticle* particle;
+    int graphFrame;
+    LocationTitleWork* work;
     LocationTitleParticle* particles;
+    LocationTitleParticle* particle;
     long** shapeTable;
 
     serializedOffset = *param_3->m_serializedDataOffsets;
@@ -276,11 +276,11 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     }
 
     graphId = pppLocationTitle->m_graphId;
-    graphFrame = GetGraphFrameFromId(graphId);
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =
         *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    graphFrame = ((int)graphId >> 12) + (u32)((int)graphId < 0 && (graphId & 0xFFF) != 0);
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);

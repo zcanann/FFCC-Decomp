@@ -898,7 +898,9 @@ void CMesMenu::CloseRequest(int closeReason)
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
-                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                int menuIndex = *(int*)((char*)this + 0x18);
+                void** ringMenuSlots = (void**)((char*)&MenuPcs + 0x13C);
+                SetFade__9CRingMenuFi(ringMenuSlots[menuIndex], 1);
             }
         } else {
             *(int*)((char*)this + 0x0C) = 2;

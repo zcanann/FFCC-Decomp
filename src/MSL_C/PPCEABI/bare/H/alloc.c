@@ -188,10 +188,13 @@ static unsigned char initialized = 0;
  *   nearby temporaries
  */
 
+static void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc);
+static SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz);
 static SubBlock* SubBlock_merge_prev(SubBlock*, SubBlock**);
 static void SubBlock_merge_next(SubBlock*, SubBlock**);
 static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);
 static void Block_construct(Block* block, unsigned long size);
+static void Block_unlink(Block* block, SubBlock* sb);
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size);
 static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size);
 static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size);
@@ -226,6 +229,8 @@ static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 
 #define FixBlock_client_size(ths) ((ths)->client_size_)
 #define FixSubBlock_size(ths) (FixBlock_client_size((ths)->block_))
+#define FixSubBlock_construct(ths, block, next) \
+    (((FixSubBlock*)(ths))->block_ = (block), ((FixSubBlock*)(ths))->next_ = (next))
 
 #define classify(ptr) (*(unsigned long*)((char*)(ptr) - sizeof(unsigned long)) & 1)
 #define __msize_inline(ptr)                                                                        \
@@ -375,6 +380,67 @@ static void Block_construct(Block* block, unsigned long size) {
     Block_link(block, sb);
 }
 
+static inline void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc) {
+    ths->block = (Block*)((unsigned long)bp | 0x1);
+    ths->size = size;
+    if (prev_alloc) {
+        ths->size |= 0x4;
+    }
+    if (this_alloc) {
+        ths->size |= 0x2;
+        *(unsigned long*)((char*)ths + size) |= 0x4;
+    } else {
+        *(unsigned long*)((char*)ths + size - sizeof(unsigned long)) = size;
+    }
+}
+
+static inline SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz) {
+    unsigned long origsize;
+    int isfree;
+    int isprevalloc;
+    SubBlock* np;
+    Block* bp;
+
+    origsize = SubBlock_size(ths);
+    isfree = SubBlock_is_free(ths);
+    isprevalloc = ths->size & 0x04;
+    np = (SubBlock*)((char*)ths + sz);
+    bp = SubBlock_block(ths);
+
+    SubBlock_construct(ths, sz, bp, isprevalloc, !isfree);
+    SubBlock_construct(np, origsize - sz, bp, !isfree, !isfree);
+    if (isfree) {
+        np->next = ths->next;
+        np->next->prev = np;
+        np->prev = ths;
+        ths->next = np;
+    }
+    return np;
+}
+
+static inline void Block_unlink(Block* block, SubBlock* sb) {
+    SubBlock** st;
+    unsigned long tag;
+    unsigned long tag_size;
+
+    tag = sb->size;
+    sb->size = tag | 2;
+    tag_size = tag & ~7;
+    *(unsigned long*)((char*)sb + tag_size) |= 4;
+
+    st = &Block_start(block);
+    if (*st == sb) {
+        *st = sb->next;
+    }
+    if (*st == sb) {
+        *st = 0;
+        block->max_size = 0;
+    } else {
+        sb->next->prev = sb->prev;
+        sb->prev->next = sb->next;
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x801B28A8
@@ -413,82 +479,11 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     }
 
     if (sb_size - requested_size >= 0x50) {
-        SubBlock* new_sb;
-        unsigned long old_tag;
-        unsigned long old_size;
-        unsigned long block_val;
-        unsigned long block_or_1;
-        int was_free;
-        int was_alloc;
-        unsigned long new_size;
-
-        old_tag = start->size;
-        new_sb = (SubBlock*)((char*)start + requested_size);
-        block_val = (unsigned long)start->block & ~1;
-        block_or_1 = block_val | 1;
-        was_free = !(old_tag & 2);
-        old_size = old_tag & ~7;
-        was_alloc = !was_free;
-
-        start->block = (Block*)block_or_1;
-        start->size = requested_size;
-
-        if (old_tag & 4) {
-            start->size |= 4;
-        }
-
-        if (was_alloc) {
-            start->size |= 2;
-            new_sb->size |= 4;
-        } else {
-            *(unsigned long*)((char*)new_sb - 4) = requested_size;
-        }
-
-        new_sb->block = (Block*)block_or_1;
-        new_size = old_size - requested_size;
-        new_sb->size = new_size;
-
-        if (was_alloc) {
-            new_sb->size |= 4;
-        }
-
-        if (was_alloc) {
-            new_sb->size |= 2;
-            *(unsigned long*)((char*)new_sb + new_size) |= 4;
-        } else {
-            *(unsigned long*)((char*)new_sb + new_size - 4) = new_size;
-        }
-
-        if (was_free) {
-            new_sb->next = start->next;
-            new_sb->next->prev = new_sb;
-            new_sb->prev = start;
-            start->next = new_sb;
-        }
+        SubBlock_split(start, requested_size);
     }
 
-    {
-        unsigned long tag;
-        unsigned long tag_size;
-
-        Block_start(block) = start->next;
-
-        tag = start->size;
-        start->size = tag | 2;
-        tag_size = tag & ~7;
-        *(unsigned long*)((char*)start + tag_size) |= 4;
-
-        if (Block_start(block) == start) {
-            Block_start(block) = start->next;
-        }
-        if (Block_start(block) == start) {
-            Block_start(block) = 0;
-            block->max_size = 0;
-        } else {
-            start->next->prev = start->prev;
-            start->prev->next = start->next;
-        }
-    }
+    Block_start(block) = start->next;
+    Block_unlink(block, start);
 
     return start;
 }
@@ -629,6 +624,33 @@ static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
     }
 }
 
+static inline void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, unsigned long index, FixSubBlock* chunk, unsigned long chunk_size) {
+    unsigned long fixSubBlock_size;
+    unsigned long n;
+    char* p;
+    unsigned long k;
+    char* np;
+
+    ths->prev_ = prev;
+    ths->next_ = next;
+    prev->next_ = ths;
+    next->prev_ = ths;
+    ths->client_size_ = fix_pool_sizes[index];
+    p = (char*)chunk;
+    ths->start_ = chunk;
+    fixSubBlock_size = fix_pool_sizes[index] + 4;
+    n = chunk_size / fixSubBlock_size;
+    for (k = 0; k < n - 1; k++) {
+        np = p + fixSubBlock_size;
+        ((FixSubBlock*)p)->block_ = ths;
+        ((FixSubBlock*)p)->next_ = (FixSubBlock*)np;
+        p = np;
+    }
+    ((FixSubBlock*)p)->block_ = ths;
+    ((FixSubBlock*)p)->next_ = 0;
+    ths->n_allocated_ = 0;
+}
+
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     unsigned long i = 0;
     FixStart* fs;
@@ -646,14 +668,6 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
         void* block;
         unsigned long max_free_size;
         unsigned long msize;
-        unsigned long fix_size;
-        unsigned long sub_size;
-        unsigned long num_subblocks;
-        FixBlock* b;
-        FixBlock* head;
-        FixBlock* tail;
-        FixSubBlock* p;
-        unsigned long k;
 
         if (n > 0x100) {
             n = 0x100;
@@ -688,34 +702,8 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
             fs->tail_ = (FixBlock*)block;
         }
 
-        fix_size = pool_sizes[i];
-        sub_size = fix_size + 4;
-        b = (FixBlock*)block;
-        head = fs->head_;
-        tail = fs->tail_;
-        num_subblocks = (msize - 0x14) / sub_size;
-        p = (FixSubBlock*)((char*)b + 0x14);
-        b->prev_ = tail;
-        b->next_ = head;
-        tail->next_ = b;
-        head->prev_ = b;
-        b->client_size_ = fix_size;
-
-        {
-            char* cp = (char*)p;
-            char* np;
-            for (k = 0; k < num_subblocks - 1; ++k) {
-                np = cp + sub_size;
-                ((FixSubBlock*)cp)->block_ = b;
-                ((FixSubBlock*)cp)->next_ = (FixSubBlock*)np;
-                cp = np;
-            }
-            ((FixSubBlock*)cp)->block_ = b;
-            ((FixSubBlock*)cp)->next_ = 0;
-        }
-        b->start_ = p;
-        b->n_allocated_ = 0;
-        fs->head_ = b;
+        FixBlock_construct((FixBlock*)block, fs->tail_, fs->head_, i, (FixSubBlock*)((char*)block + 0x14), msize - 0x14);
+        fs->head_ = (FixBlock*)block;
     }
 
     {

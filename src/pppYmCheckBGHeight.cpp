@@ -21,13 +21,11 @@ extern "C" {
 
 struct CMapCylinderRaw {
     Vec m_bottom;
+    u8 m_pad0C[0x0C];
     Vec m_direction;
     f32 m_radius;
-    f32 m_height;
     Vec m_top;
     Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
 };
 
 /*
@@ -80,21 +78,18 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         nextY = pppMngStPtr->m_matrix.value[1][3];
         finalY = nextY;
         cylinder.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
-        cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_bottom.y = nextY + param_2->m_unk0x4;
+        cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_direction.x = zero;
         cylinder.m_direction.y = probeY;
         cylinder.m_direction.z = zero;
         cylinder.m_radius = zero;
-        cylinder.m_height = probeY;
-        cylinder.m_top.x = zero;
-        cylinder.m_top.y = zero;
+        cylinder.m_top.x = scale;
+        cylinder.m_top.y = scale;
         cylinder.m_top.z = scale;
-        cylinder.m_direction2.x = scale;
-        cylinder.m_direction2.y = scale;
+        cylinder.m_direction2.x = offset;
+        cylinder.m_direction2.y = offset;
         cylinder.m_direction2.z = offset;
-        cylinder.m_radius2 = offset;
-        cylinder.m_height2 = offset;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {

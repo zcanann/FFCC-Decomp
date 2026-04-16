@@ -4,44 +4,12 @@
 
 #include "dolphin/axfx/__axfx.h"
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - `reverb_std.c` now reports effectively-complete code/data on this branch,
- *   but it is still not safely linkable as Matching
- *
- * Most useful result so far:
- * - after the AXFX local-constant ownership cleanup that made `chorus.c`
- *   linkable, a fresh Matching flip for `reverb_std.c` also rebuilt cleanly up
- *   to the final `main.dol` checksum and then failed there
- * - `ReverbSTDCreate` and the `.sdata2` run are now 100% in objdiff, so the
- *   remaining blocker is no longer the visible constant pool or the main setup
- *   path
- * - PAL map also shows four tiny helpers here as `UNUSED`: `DLsetdelay`,
- *   `DLcreate`, `DLdelete`, and `ReverbSTDCallback`
- * - a direct source rewrite that deleted those helper bodies and inlined their
- *   logic proved the idea is only half-right: rebuilt `reverb_std.o` shrank
- *   past target from `0x0D34` all the way down to `0x0B4C`, while target is
- *   `0x0BFC`
- * - that means the remaining extent gap is not solved by simply deleting the
- *   helper code; GCCP01 still wants some of that logic present in the live
- *   object shape even though those helper symbols do not survive as named
- *   functions
- * - a reference-project follow-up also ruled out the obvious shared Dolphin
- *   failure-handling path: restoring the common `DLcreate(...) == 0` /
- *   `ReverbSTDFree(rv); return 0;` checks from Strikers / Twilight Princess
- *   regressed overall SDK match while leaving raw source `reverb_std.o`
- *   section sizes unchanged at `.text 0x0D34 / .sdata2 0x28`
- * - so the next pass here should treat `reverb_std.c` as a helper-emission
- *   shaping problem, not as a broad source rewrite candidate
- */
-
 extern f32 powf(f32 x, f32 y);
 extern const f32 axfx_reverb_std_handle_f32_0p3;
 extern const f32 axfx_reverb_std_handle_f32_0p6;
 extern const double axfx_reverb_std_handle_i2f_magic;
 extern const s32 sReverbStdDelayLengths[4];
+extern const f32 FLOAT_803337C0;
 
 static const f32 axfx_reverb_std_f32_0 = 0.0f;
 static const f32 axfx_reverb_std_f32_0p01 = 0.01f;
@@ -53,23 +21,23 @@ static const f32 axfx_reverb_std_f32_10 = 10.0f;
 static const f32 axfx_reverb_std_f32_32000 = 32000.0f;
 
 // prototypes
-static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
-static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length);
-static void DLdelete(AXFX_REVSTD_DELAYLINE* dl);
+static inline void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag);
+static inline int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length);
+static inline void DLdelete(AXFX_REVSTD_DELAYLINE* dl);
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay);
 static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay);
 static void HandleReverb2(s32* sptr, AXFX_REVSTD_WORK* rv);
-static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv);
+static inline void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv);
 static void ReverbSTDFree(AXFX_REVSTD_WORK* rv);
 
-static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag) {
+static inline void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
     while (dl->outPoint < 0) {
         dl->outPoint += dl->length;
     }
 }
 
-static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length) {
+static inline int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length) {
     dl->length = (max_length * 4);
     dl->inputs = __AXFXAlloc(max_length * 4);
 	ASSERTMSGLINE(49, dl->inputs, "Can't allocate the memory.");
@@ -82,7 +50,7 @@ static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length) {
 	return 1;
 }
 
-static void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
+static inline void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
@@ -177,7 +145,7 @@ static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
      || (time < axfx_reverb_std_f32_0p01) || (time > axfx_reverb_std_f32_10)
      || (mix < axfx_reverb_std_f32_0) || (mix > axfx_reverb_std_f32_1)
      || (damping < axfx_reverb_std_f32_0) || (damping > axfx_reverb_std_f32_1)
-     || (predelay < axfx_reverb_std_f32_0) || (predelay > axfx_reverb_std_f32_0p1)) {
+     || (predelay < axfx_reverb_std_f32_0) || (predelay > FLOAT_803337C0)) {
         return 0;
     }
 
@@ -467,7 +435,7 @@ L_0000090C:
 	blr
 }
 
-static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv) {
+static inline void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv) {
     HandleReverb2(left, rv);
 }
 

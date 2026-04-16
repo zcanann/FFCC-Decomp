@@ -6,154 +6,6 @@
 
 extern const double reverb_hi_4ch_handle_i2fMagic;
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - ReverbHICreateDpl2 and ReverbHIModifyDpl2 are still almost entirely down to
- *   stack-slot / temporary-lifetime / constant-binding shape rather than missing
- *   control flow
- *
- * Most useful probes so far:
- * - the shared Dolphin source copies in reference_projects/super_mario_strikers
- *   and reference_projects/twilight_princess agree on two obvious shape
- *   differences from this file: no separate timeFactor local in Create and no
- *   block-scoped damp temporary in either function
- * - those cleanups were flat before the unit owned its target-style .sdata2,
- *   but became real progress once reverb_hi_4ch.c claimed .sdata2
- *   0x803337E0..0x80333818 and the handle-side constant labels were corrected
- * - a follow-up constant-ownership cleanup removed the bogus local handle-side
- *   double, added the target-style local 0.1f bound for Modify, and relabeled
- *   the 0.3f / 0.6f / external i2f-magic tail accordingly; that moved .sdata2
- *   from 92.85714% to 96.0% and nudged .text to 99.47125%
- * - the built source object now already carries the target-style local .sdata2
- *   layout for these functions (`@111`..`@120`, 0x30 bytes total), so the
- *   remaining gap is no longer constant ownership inside reverb_hi_4ch.o
- * - removing the inner parentheses from `0.05f + (0.8f * rv->damping)` held
- *   completely flat, so the remaining damping-expression miss is not just the
- *   obvious precedence spelling
- * - reordering the sum to `1.0f - ((0.8f * rv->damping) + 0.05f)` also stayed
- *   completely flat
- * - forcing the named local `reverb_hi_4ch_value0_1` through every visible
- *   `preDelay <= 0.1f` / `preDelay > 0.1f` check in Create and Modify was also
- *   completely flat: the built object still emitted the same `0x30` .sdata2
- *   with no extra local float symbol between `@120` and the `0.3f` / `0.6f`
- *   tail
- * - even promoting `reverb_hi_4ch_value0_1` / `0_3` / `0_6` from `static const`
- *   to plain file-scope `const` was completely flat on the fresh branch: MWCC
- *   still folded `0.1f` into the earlier local pool, kept source `.sdata2` at
- *   0x30 bytes, and did not materialize the target-style extra `0.1f` symbol
- * - a follow-up retest on the fresh branch corrected the stale assumption about
- *   contraction: for these damping blocks the target actually keeps separate
- *   `fmuls` + `fadds` + `fsubs`, while the baseline source is the one that
- *   contracts to `fmadds`
- * - an explicit stepwise rewrite through repeated `rv->damping = ...` updates
- *   did force the separate ops, but regressed hard overall
- *   (Create 99.40% -> 97.85%, Modify 97.30% -> 93.36%), so the remaining
- *   blocker is not "just spell out the three statements" either
- * - a narrower `f32 damp = 0.8f * rv->damping; rv->damping = 1.0f - (0.05f +
- *   damp);` probe also forced the exact target-side `fmuls` + `fadds` +
- *   `fsubs` sequence in both functions, but still held completely flat
- *   (Create stayed 99.40129%, Modify stayed 97.29508%), so the remaining miss
- *   is now the nearby temporary/register lifetime around that block rather
- *   than the arithmetic opcode shape itself
- * - matching the shared reference-project spelling more literally by adding
- *   the outer parentheses around `rv->damping = (1.0f - (...))` in both
- *   functions and changing Modify's range check back to a direct `0.1f`
- *   literal was also completely flat, so this unit is not blocked on that
- *   last visible source-family spelling difference either
- * - the extracted target object really does carry a standalone global
- *   `reverb_hi_4ch_value0_1` symbol after the local `@111`..`@120` pool, but
- *   simply promoting `reverb_hi_4ch_value0_1 / 0_3 / 0_6` to plain file-scope
- *   `const` front-loads them to the start of `.sdata2` (`0x0 / 0x4 / 0x8`),
- *   regresses section match from 96.0% to 74.07%, and drops
- *   `ReverbHICreateDpl2` from 99.40% to 99.16%; so "make value0_1 global"
- *   alone is not the fix
- * - a newer keepable probe did find the right arithmetic shape without the old
- *   stack-lifetime regression: rewriting the damping normalization through a
- *   local `f32 damp`, then `damp = 0.05f + damp`, then
- *   `rv->damping = 1.0f - damp` forces the target-style separate
- *   `fmuls` / `fadds` / `fsubs` chain in both functions and moves
- *   `ReverbHICreateDpl2` from 99.40129% to 99.83819% and
- *   `ReverbHIModifyDpl2` from 97.29508% to 99.54918%
- * - after that keepable rewrite, the remaining function-body gap is down to a
- *   tiny register-allocation seam inside the same damping block plus the older
- *   `reverb_hi_4ch_value0_1` symbol-identity mismatch in Modify's range check;
- *   no broader control-flow difference remains there
- * - a follow-up probe that kept the same `damp` temporary but moved the
- *   `0.05f` clamp onto the local before the final store was completely flat;
- *   `ReverbHICreateDpl2` stayed at 99.83819%, so the remaining seam is not
- *   just "avoid the early rv->damping store" either
- * - a newer probe tested the odd GCCP01-looking possibility from the current
- *   extracted target object that only `ReverbHIModifyDpl2` wants a `100.0f`
- *   preDelay upper bound instead of the shared Dolphin-family `0.1f`; that
- *   did nudge Modify from 99.54918% to 99.59016%, but MWCC duplicated the
- *   whole constant run and blew `.sdata2` out from `0x38` to `0x60`, so that
- *   spelling is not keepable
- * - a tighter follow-up also ruled out the simplest symbol-identity fix:
- *   making only `reverb_hi_4ch_value0_1` a plain file-scope `const` while
- *   leaving the already-correct `0.3f` / `0.6f` tail alone was completely
- *   flat; rebuilt source `reverb_hi_4ch.o` stayed at `.sdata2 0x30` instead
- *   of growing to the target `.sdata2 0x38`, so MWCC still folded the `0.1f`
- *   bound into the earlier local pool instead of materializing the missing
- *   standalone float symbol
- * - the stale invented `axfx_reverb_hi_dpl2_f32_*` / `i2f_magic` names are no
- *   longer part of the live blocker on this branch: the target-side `.sdata2`
- *   ownership is now reclaimed back to local `@112`..`@121`, which collapses
- *   the remaining visible code seam to just the six instructions in the
- *   damping normalization block
- * - a newer object-table read corrected the stale `reverb_hi_4ch_value0_1`
- *   assumption: the target tail at `0x80333808` is actually `100.0f`, not
- *   `0.1f`, while `0.3f` / `0.6f` stay at `0x8033380C` / `0x80333810`
- * - moving the trailing named constants to late file-scope `const`
- *   definitions is the real lever that makes MWCC emit the target-style
- *   global tail after the local `@111`..`@120` pool; once that is done, the
- *   remaining `.sdata2` miss is just the anonymous final `0x4` zero gap
- *   before the next unit rather than the named constants themselves
- * - on the current branch, removing `reverb_hi_4ch_value0_1` entirely and
- *   switching Modify back to a direct `0.1f` literal was also completely flat:
- *   `ReverbHIModifyDpl2` stayed at 99.59016% and `.sdata2` stayed at 88.88889%,
- *   so the remaining miss is not just the named-vs-literal `0.1f` choice in
- *   Modify either
- * - a follow-up attempt to seed the local accumulator as `f32 damp = 0.05f;`
- *   then `damp += 0.8f * rv->damping;` regressed badly: MWCC materialized a
- *   fresh earlier local constant, renumbered the whole local `.sdata2` run
- *   (`@111`..), shifted the nearby branch target, and dropped the function to
- *   roughly 99.01%, so the target does not want that accumulator-first shape
- * - rewriting the same two-local form with explicit assignments
- *   (`dampMul = rv->damping * dampMul; dampBias = dampBias + dampMul;`) is
- *   also wrong for GCCP01: it inflates both functions' stack frames by 8 bytes
- *   and drops them into the ~99.43% range, so the remaining seam is not just
- *   whether the multiply/add are spelled as compound assignments
- * - a narrower follow-up that only changed the multiply spelling to
- *   `dampMul = dampMul * rv->damping;` while keeping the same two-local shape
- *   was completely flat: MWCC emitted the exact same four remaining FP
- *   mismatches as the compound-assignment form, so that last seam is below the
- *   level of ordinary destination-operand C spelling
- * - two more surgical destination-register probes were both worse: forcing a
- *   third `dampOne = 1.0f` local or rewriting the final step as
- *   `rv->damping = 1.0f; rv->damping -= dampBias;` both inflated the frame /
- *   spill shape and dropped Create/Modify back to about 99.83%, so the
- *   target-side `f1/f0/f2` register flow is not recoverable just by making
- *   the final `1.0f` source more explicit in C
- * - the remaining miss is still concentrated in the damping rewrite in Create
- *   and Modify rather than sdata2 ownership, but the next probe should bias
- *   toward preserving the target load/order shape without the heavy repeated
- *   store/reload lifetime introduced by the naive stepwise form
- * - two more narrow lifetime probes both failed cleanly on the current branch:
- *   switching to direct initializer form
- *   (`f32 dampBias = 0.05f; f32 dampMul = 0.8f * rv->damping;`) left Create
- *   flat at `99.902916%` and made Modify worse (`99.902916% -> 99.7541%`),
- *   while separate declarations followed by assignments
- *   (`f32 dampMul; f32 dampBias; dampMul = 0.8f; dampBias = 0.05f;`) regressed
- *   both functions (`99.902916% -> 99.82524%` in Create,
- *   `99.902916% -> 99.59836%` in Modify)
- * - both of those probes still emitted the same four register-argument
- *   mismatches in the damping block (`fmuls`, `lfs 1.0f`, `fadds`, `fsubs`),
- *   so simple declaration/initializer lifetime tweaks are not enough to force
- *   the target's `f1 -> f2 -> f0` value flow
- */
-
 extern f32 powf(f32 x, f32 y);
 
 static s32 axfx_reverb_hi_dpl2_lens[10] = {
@@ -241,11 +93,7 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    {
-        f32 dampMul = 0.8f * rv->damping;
-        f32 dampBias = 0.05f + dampMul;
-        rv->damping = 1.0f - dampBias;
-    }
+    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
 
     if (0.0f != preDelay) {
         rv->preDelayTime = 32000.0f * preDelay;
@@ -300,11 +148,7 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     if (rv->damping < 0.05f) {
         rv->damping = 0.05f;
     }
-    {
-        f32 dampMul = 0.8f * rv->damping;
-        f32 dampBias = 0.05f + dampMul;
-        rv->damping = 1.0f - dampBias;
-    }
+    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
 
     for (i = 0; i < 12; i++) {
         DLdeleteDpl2(&rv->AP[i]);

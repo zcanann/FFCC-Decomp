@@ -956,6 +956,7 @@ pppVertexApMtx.cpp:
 	extab       start:0x80008A94 end:0x80008A9C
 	extabindex  start:0x8000F4A8 end:0x8000F4B4
 	.text       start:0x800D2250 end:0x800D25E0
+	.sdata2     start:0x80330DD0 end:0x80330DD8
 
 pppSDrawMatrix.cpp:
 	extab       start:0x80008A9C end:0x80008AA4

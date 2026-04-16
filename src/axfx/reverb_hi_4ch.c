@@ -242,10 +242,8 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
         rv->damping = 0.05f;
     }
     {
-        f32 dampMul = 0.8f;
-        f32 dampBias = 0.05f;
-        dampMul *= rv->damping;
-        dampBias += dampMul;
+        f32 dampMul = 0.8f * rv->damping;
+        f32 dampBias = 0.05f + dampMul;
         rv->damping = 1.0f - dampBias;
     }
 
@@ -303,10 +301,8 @@ static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
         rv->damping = 0.05f;
     }
     {
-        f32 dampMul = 0.8f;
-        f32 dampBias = 0.05f;
-        dampMul *= rv->damping;
-        dampBias += dampMul;
+        f32 dampMul = 0.8f * rv->damping;
+        f32 dampBias = 0.05f + dampMul;
         rv->damping = 1.0f - dampBias;
     }
 

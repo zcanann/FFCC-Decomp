@@ -291,7 +291,7 @@ void StreamStop(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
+int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
 	int* streamData = (int*)_SearchEmptyStreamData();
 	if (streamData != (int*)0) {
@@ -317,7 +317,7 @@ void StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_
 			if (gRedMemoryDebugEnabled != 0) {
 				fflush(&DAT_8021d1a8);
 			}
-			return;
+			return param_1;
 		}
 
 		*(short*)((int)param_2 + 0x42) = (short)*(char*)((int)param_2 + 0x1000);
@@ -409,6 +409,7 @@ void StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_
 		streamData[0x4a] = 0x1000;
 		streamData[0x44] = 3;
 	}
+	return param_1;
 }
 
 /*

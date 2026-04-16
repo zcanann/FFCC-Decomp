@@ -4,8 +4,6 @@
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/__ppc_eabi_linker.h"
 
-#pragma force_active on
-
 #define RETURN_ADDRESS 4
 
 union MWE_GeckoVector64 {
@@ -79,48 +77,13 @@ typedef void (*DeleteFunc)(void*);
 /**
  * @note Address: 0x800C2374
  * @note Size: 0x34
- */
-int __register_fragment(struct __eti_init_info* info, char* TOC)
-{
-
-	ProcessInfo* f = fragmentinfo;
-	int i;
-
-	for (i = 0; i < MAXFRAGMENTS; i++, f++) {
-		if (f->active == 0) {
-			f->exception_info = info;
-			f->TOC            = TOC;
-			f->active         = 1;
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-/**
- * @note Address: 0x800C2340
- * @note Size: 0x34
- */
-void __unregister_fragment(int fragmentID)
-{
-	ProcessInfo* f;
-
-	if (fragmentID >= 0 && fragmentID < MAXFRAGMENTS) {
-		f                 = &fragmentinfo[fragmentID];
-		f->exception_info = 0;
-		f->TOC            = 0;
-		f->active         = 0;
-	}
-}
-
 #pragma exceptions off
 
 /**
  * @note Address: N/A
  * @note Size: 0x88
  */
-static int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
+static inline int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
 {
 	ProcessInfo* f;
 	int i;
@@ -159,7 +122,7 @@ static int ExPPC_FindExceptionFragment(char* returnaddr, FragmentInfo* frag)
  * @note Address: N/A
  * @note Size: 0x18
  */
-static s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
+static inline s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
 {
 	f64* FPR_save_area;
 	s32* GPR_save_area;
@@ -177,7 +140,7 @@ static s32 ExPPC_PopR31(char* SP, MWExceptionInfo* info)
  * @note Address: N/A
  * @note Size: 0x20
  */
-static exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
+static inline exaction_type ExPPC_CurrentAction(const ActionIterator* iter)
 {
 	if (iter->info.action_pointer == 0) {
 		return EXACTION_ENDOFLIST;
@@ -193,13 +156,13 @@ void ExPPC_UnwindStack(ThrowContext* context, MWExceptionInfo* info, void* catch
  * @note Address: N/A
  * @note Size: 0x3C
  */
-static void ExPPC_DestroyLocal(ThrowContext* context, const ex_destroylocal* ex) { DTORCALL_COMPLETE(ex->dtor, context->FP + ex->local); }
+static inline void ExPPC_DestroyLocal(ThrowContext* context, const ex_destroylocal* ex) { DTORCALL_COMPLETE(ex->dtor, context->FP + ex->local); }
 
 /**
  * @note Address: N/A
  * @note Size: 0x74
  */
-static void ExPPC_DestroyLocalCond(ThrowContext* context, const ex_destroylocalcond* ex)
+static inline void ExPPC_DestroyLocalCond(ThrowContext* context, const ex_destroylocalcond* ex)
 {
 	int cond = ex_destroylocalcond_GetRegCond(ex->dlc_field) ? (local_cond_type)context->GPR[ex->cond]
 	                                                         : *(local_cond_type*)(context->FP + ex->cond);
@@ -213,7 +176,7 @@ static void ExPPC_DestroyLocalCond(ThrowContext* context, const ex_destroylocalc
  * @note Address: N/A
  * @note Size: 0x58
  */
-static void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_destroylocalpointer* ex)
+static inline void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_destroylocalpointer* ex)
 {
 	void* pointer
 	    = ex_destroylocalpointer_GetRegPointer(ex->dlp_field) ? (void*)context->GPR[ex->pointer] : *(void**)(context->FP + ex->pointer);
@@ -225,7 +188,7 @@ static void ExPPC_DestroyLocalPointer(ThrowContext* context, const ex_destroyloc
  * @note Address: N/A
  * @note Size: 0x84
  */
-static void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destroylocalarray* ex)
+static inline void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destroylocalarray* ex)
 {
 	char* ptr = context->FP + ex->localarray;
 	s32 n    = ex->elements;
@@ -241,7 +204,7 @@ static void ExPPC_DestroyLocalArray(ThrowContext* context, const ex_destroylocal
  * @note Address: N/A
  * @note Size: 0x64
  */
-static void ExPPC_DestroyMember(ThrowContext* context, const ex_destroymember* ex)
+static inline void ExPPC_DestroyMember(ThrowContext* context, const ex_destroymember* ex)
 {
 	char* objectptr
 	    = ex_destroymember_GetRegPointer(ex->dm_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -253,7 +216,7 @@ static void ExPPC_DestroyMember(ThrowContext* context, const ex_destroymember* e
  * @note Address: N/A
  * @note Size: 0x64
  */
-static void ExPPC_DestroyBase(ThrowContext* context, const ex_destroymember* ex)
+static inline void ExPPC_DestroyBase(ThrowContext* context, const ex_destroymember* ex)
 {
 	char* objectptr
 	    = ex_destroymember_GetRegPointer(ex->dm_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -265,7 +228,7 @@ static void ExPPC_DestroyBase(ThrowContext* context, const ex_destroymember* ex)
  * @note Address: N/A
  * @note Size: 0x98
  */
-static void ExPPC_DestroyMemberCond(ThrowContext* context, const ex_destroymembercond* ex)
+static inline void ExPPC_DestroyMemberCond(ThrowContext* context, const ex_destroymembercond* ex)
 {
 	char* objectptr
 	    = ex_destroymembercond_GetRegPointer(ex->dmc_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -281,7 +244,7 @@ static void ExPPC_DestroyMemberCond(ThrowContext* context, const ex_destroymembe
  * @note Address: N/A
  * @note Size: 0xAC
  */
-static void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_destroymemberarray* ex)
+static inline void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_destroymemberarray* ex)
 {
 	char* ptr
 	    = ex_destroymemberarray_GetRegPointer(ex->dma_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -300,7 +263,7 @@ static void ExPPC_DestroyMemberArray(ThrowContext* context, const ex_destroymemb
  * @note Address: N/A
  * @note Size: 0x54
  */
-static void ExPPC_DeletePointer(ThrowContext* context, const ex_deletepointer* ex)
+static inline void ExPPC_DeletePointer(ThrowContext* context, const ex_deletepointer* ex)
 {
 	char* objectptr
 	    = ex_deletepointer_GetRegPointer(ex->dp_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -312,7 +275,7 @@ static void ExPPC_DeletePointer(ThrowContext* context, const ex_deletepointer* e
  * @note Address: N/A
  * @note Size: 0x8C
  */
-static void ExPPC_DeletePointerCond(ThrowContext* context, const ex_deletepointercond* ex)
+static inline void ExPPC_DeletePointerCond(ThrowContext* context, const ex_deletepointercond* ex)
 {
 	char* objectptr
 	    = ex_deletepointercond_GetRegPointer(ex->dpc_field) ? (char*)context->GPR[ex->objectptr] : *(char**)(context->FP + ex->objectptr);
@@ -324,7 +287,7 @@ static void ExPPC_DeletePointerCond(ThrowContext* context, const ex_deletepointe
 	}
 }
 
-static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
+static inline int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 {
 	s32 i, offset;
 
@@ -340,6 +303,7 @@ static int ExPPC_IsInSpecification(char* extype, ex_specification* spec)
 
 char* ExPPC_PopStackFrame(ThrowContext* context, MWExceptionInfo* info);
 void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info);
+void ExPPC_ThrowHandler(ThrowContext* context);
 
 /**
  * @note Address: N/A
@@ -443,6 +407,113 @@ asm void ExPPC_LongJump(register ThrowContext* context, register void* newRTOC, 
  * @note Address: N/A
  * @note Size: 0x44
  */
+asm void __throw(char* throwtype, void* location, void* dtor)
+{
+#ifdef __MWERKS__ // clang-format off
+	ThrowContext throwcontext;
+
+	fralloc
+
+	stmw r13, throwcontext.GPR[13]
+
+	stfd fp14, throwcontext.FPR[14].d
+	la r3, throwcontext.FPR[14].v
+	psq_stx fp14, 0, r3,0,0
+
+	stfd fp15, throwcontext.FPR[15].d
+	la r3, throwcontext.FPR[15].v
+	psq_stx fp15, 0, r3, 0, 0
+
+	stfd fp16, throwcontext.FPR[16].d
+	la r3, throwcontext.FPR[16].v
+	psq_stx fp16, 0, r3, 0, 0
+
+	stfd fp17, throwcontext.FPR[17].d
+	la r3, throwcontext.FPR[17].v
+	psq_stx fp17, 0, r3, 0, 0
+
+	stfd fp18, throwcontext.FPR[18].d
+	la r3, throwcontext.FPR[18].v
+	psq_stx fp18, 0, r3, 0, 0
+
+	stfd fp19, throwcontext.FPR[19].d
+	la r3, throwcontext.FPR[19].v
+	psq_stx fp19, 0, r3, 0, 0
+
+	stfd fp20, throwcontext.FPR[20].d
+	la r3, throwcontext.FPR[20].v
+	psq_stx fp20, 0, r3, 0, 0
+
+	stfd fp21, throwcontext.FPR[21].d
+	la r3, throwcontext.FPR[21].v
+	psq_stx fp21, 0, r3, 0, 0
+
+	stfd fp22, throwcontext.FPR[22].d
+	la r3, throwcontext.FPR[22].v
+	psq_stx fp22, 0, r3, 0, 0
+
+	stfd fp23, throwcontext.FPR[23].d
+	la r3, throwcontext.FPR[23].v
+	psq_stx fp23, 0, r3, 0, 0
+
+	stfd fp24, throwcontext.FPR[24].d
+	la r3, throwcontext.FPR[24].v
+	psq_stx fp24, 0, r3, 0, 0
+
+	stfd fp25, throwcontext.FPR[25].d
+	la r3, throwcontext.FPR[25].v
+	psq_stx fp25, 0, r3, 0, 0
+
+	stfd fp26, throwcontext.FPR[26].d
+	la r3, throwcontext.FPR[26].v
+	psq_stx fp26, 0, r3, 0, 0
+
+	stfd fp27, throwcontext.FPR[27].d
+	la r3, throwcontext.FPR[27].v
+	psq_stx fp27, 0, r3, 0, 0
+
+	stfd fp28, throwcontext.FPR[28].d
+	la r3, throwcontext.FPR[28].v
+	psq_stx fp28, 0, r3, 0, 0
+
+	stfd fp29, throwcontext.FPR[29].d
+	la r3, throwcontext.FPR[29].v
+	psq_stx fp29, 0, r3, 0, 0
+
+	stfd fp30, throwcontext.FPR[30].d
+	la r3, throwcontext.FPR[30].v
+	psq_stx fp30, 0, r3, 0, 0
+
+	stfd fp31, throwcontext.FPR[31].d
+	la r3, throwcontext.FPR[31].v
+	psq_stx fp31, 0, r3, 0, 0
+
+
+	mfcr r3
+	stw	r3, throwcontext.CR;
+
+	lwz r3, 0(sp)
+	lwz r4, RETURN_ADDRESS(r3)
+	stw r3, throwcontext.SP;
+	stw r3, throwcontext.throwSP;
+	stw r4, throwcontext.returnaddr;
+
+	lwz r3,throwtype
+	stw r3, throwcontext.throwtype
+	lwz r3,location
+	stw r3, throwcontext.location
+	lwz r3,dtor
+	stw r3, throwcontext.dtor
+	la r3, throwcontext
+	bl ExPPC_ThrowHandler
+	nop
+	frfree
+	blr
+#endif // clang-format on
+}
+
+#pragma exceptions on
+
 void __end__catch(CatchInfo* catchinfo)
 {
 	if (catchinfo->location && catchinfo->dtor) {
@@ -456,7 +527,7 @@ void __end__catch(CatchInfo* catchinfo)
  * @note Address: N/A
  * @note Size: 0x84
  */
-static void ExPPC_HandleUnexpected(ThrowContext* context, MWExceptionInfo* info, ex_specification* unexp)
+static inline void ExPPC_HandleUnexpected(ThrowContext* context, MWExceptionInfo* info, ex_specification* unexp)
 {
 	CatchInfo* catchinfo;
 
@@ -623,113 +694,6 @@ void ExPPC_ThrowHandler(ThrowContext* context)
  * @note Address: N/A
  * @note Size: 0x144
  */
-asm void __throw(char* throwtype, void* location, void* dtor)
-{
-#ifdef __MWERKS__ // clang-format off
-	ThrowContext throwcontext;
-
-	fralloc
-
-	stmw r13, throwcontext.GPR[13]
-
-	stfd fp14, throwcontext.FPR[14].d
-	la r3, throwcontext.FPR[14].v
-	psq_stx fp14, 0, r3,0,0
-
-	stfd fp15, throwcontext.FPR[15].d
-	la r3, throwcontext.FPR[15].v
-	psq_stx fp15, 0, r3, 0, 0
-
-	stfd fp16, throwcontext.FPR[16].d
-	la r3, throwcontext.FPR[16].v
-	psq_stx fp16, 0, r3, 0, 0
-
-	stfd fp17, throwcontext.FPR[17].d
-	la r3, throwcontext.FPR[17].v
-	psq_stx fp17, 0, r3, 0, 0
-
-	stfd fp18, throwcontext.FPR[18].d
-	la r3, throwcontext.FPR[18].v
-	psq_stx fp18, 0, r3, 0, 0
-
-	stfd fp19, throwcontext.FPR[19].d
-	la r3, throwcontext.FPR[19].v
-	psq_stx fp19, 0, r3, 0, 0
-
-	stfd fp20, throwcontext.FPR[20].d
-	la r3, throwcontext.FPR[20].v
-	psq_stx fp20, 0, r3, 0, 0
-
-	stfd fp21, throwcontext.FPR[21].d
-	la r3, throwcontext.FPR[21].v
-	psq_stx fp21, 0, r3, 0, 0
-
-	stfd fp22, throwcontext.FPR[22].d
-	la r3, throwcontext.FPR[22].v
-	psq_stx fp22, 0, r3, 0, 0
-
-	stfd fp23, throwcontext.FPR[23].d
-	la r3, throwcontext.FPR[23].v
-	psq_stx fp23, 0, r3, 0, 0
-
-	stfd fp24, throwcontext.FPR[24].d
-	la r3, throwcontext.FPR[24].v
-	psq_stx fp24, 0, r3, 0, 0
-
-	stfd fp25, throwcontext.FPR[25].d
-	la r3, throwcontext.FPR[25].v
-	psq_stx fp25, 0, r3, 0, 0
-
-	stfd fp26, throwcontext.FPR[26].d
-	la r3, throwcontext.FPR[26].v
-	psq_stx fp26, 0, r3, 0, 0
-
-	stfd fp27, throwcontext.FPR[27].d
-	la r3, throwcontext.FPR[27].v
-	psq_stx fp27, 0, r3, 0, 0
-
-	stfd fp28, throwcontext.FPR[28].d
-	la r3, throwcontext.FPR[28].v
-	psq_stx fp28, 0, r3, 0, 0
-
-	stfd fp29, throwcontext.FPR[29].d
-	la r3, throwcontext.FPR[29].v
-	psq_stx fp29, 0, r3, 0, 0
-
-	stfd fp30, throwcontext.FPR[30].d
-	la r3, throwcontext.FPR[30].v
-	psq_stx fp30, 0, r3, 0, 0
-
-	stfd fp31, throwcontext.FPR[31].d
-	la r3, throwcontext.FPR[31].v
-	psq_stx fp31, 0, r3, 0, 0
-
-
-	mfcr r3
-	stw	r3, throwcontext.CR;
-
-	lwz r3, 0(sp)
-	lwz r4, RETURN_ADDRESS(r3)
-	stw r3, throwcontext.SP;
-	stw r3, throwcontext.throwSP;
-	stw r4, throwcontext.returnaddr;
-
-	lwz r3,throwtype
-	stw r3, throwcontext.throwtype
-	lwz r3,location
-	stw r3, throwcontext.location
-	lwz r3,dtor
-	stw r3, throwcontext.dtor
-	la r3, throwcontext
-	bl ExPPC_ThrowHandler
-	nop
-	frfree
-	blr
-#endif // clang-format on
-}
-
-#pragma exceptions on
-
 extern "C" const char s_std_bad_exception[];
 extern "C" const char s_std_exception[];
 extern "C" const char s_bad_exception[0x20];
@@ -825,7 +789,6 @@ const char* bad_exception::what() const;
 extern "C" const char s_std_bad_exception[] = "std::bad_exception";
 extern "C" const char s_std_exception[] = "std::exception";
 extern "C" const char s_bad_exception[0x20] = "bad_exception\0\0\0exception";
-const char* std::bad_exception::what() const { return s_bad_exception; }
 
 /**
  * @note Address: N/A
@@ -1141,7 +1104,46 @@ void ExPPC_FindExceptionRecord(char* returnaddr, MWExceptionInfo* info)
 	}
 }
 
+/**
+ * @note Address: 0x800C2340
+ * @note Size: 0x34
+ */
+void __unregister_fragment(int fragmentID)
+{
+	ProcessInfo* f;
+
+	if (fragmentID >= 0 && fragmentID < MAXFRAGMENTS) {
+		f                 = &fragmentinfo[fragmentID];
+		f->exception_info = 0;
+		f->TOC            = 0;
+		f->active         = 0;
+	}
+}
+
+/**
+ * @note Address: 0x800C2374
+ * @note Size: 0x34
+ */
+int __register_fragment(struct __eti_init_info* info, char* TOC)
+{
+
+	ProcessInfo* f = fragmentinfo;
+	int i;
+
+	for (i = 0; i < MAXFRAGMENTS; i++, f++) {
+		if (f->active == 0) {
+			f->exception_info = info;
+			f->TOC            = TOC;
+			f->active         = 1;
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+const char* std::bad_exception::what() const { return s_bad_exception; }
+
 extern "C" void* __RTTI__Q23std9exception_gecko[] = { (void*)s_std_exception, 0 };
 extern "C" void* s_bad_exception_rtti[]           = { __RTTI__Q23std9exception_gecko, 0, 0 };
 extern "C" void* __RTTI__Q23std13bad_exception[] = { (void*)s_std_bad_exception, s_bad_exception_rtti };
-

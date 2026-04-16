@@ -17,7 +17,7 @@ extern const float kMapOctTreeDefaultOffsetZ;
 const float kOctTreeBoundMinInit = 10000000000.0f;
 const float kOctTreeBoundMaxInit = -10000000000.0f;
 const float kOctTreeCylinderPad = 1.0f;
-static unsigned long s_clearFlagMask;
+unsigned long s_clearFlagMask;
 struct CBoundRaw
 {
     CBoundRaw()

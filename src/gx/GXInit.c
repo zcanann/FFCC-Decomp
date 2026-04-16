@@ -16,10 +16,10 @@ const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: Feb  7 2003 04:01
 static GXData gxData;
 GXData* const gx = &gxData;
 
-void* __piReg;
-void* __cpReg;
-void* __peReg;
-void* __memReg;
+void* __piReg = NULL;
+void* __cpReg = NULL;
+void* __peReg = NULL;
+void* __memReg = NULL;
 
 #if DEBUG
 GXBool __GXinBegin;
@@ -147,6 +147,7 @@ GXFifoObj* GXInit(void* base, u32 size)
     u32 i;
     u32 reg;
     u32 freqBase;
+    u8 stackPadding[8];
 
     static u32 resetFuncRegistered;
 

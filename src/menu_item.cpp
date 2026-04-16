@@ -227,9 +227,9 @@ void CMenuPcs::ItemInit()
         psVar8[0x15] = 5;
         iVar11 = iVar11 + -1;
     } while (iVar11 != 0);
-    *this->itemList = sVar7;
-    *(short*)((int)this->itemMenuState + 0x26) = 0;
-    *(u8*)((int)this->itemMenuState + 0xB) = 1;
+    this->itemList->count = sVar7;
+    this->itemMenuState->selectedIndex = 0;
+    this->itemMenuState->initialized = 1;
 }
 
 /*
@@ -308,8 +308,8 @@ void CMenuPcs::ItemInit1()
     *(int*)(listBase + 0x2EC) = 0;
     *(int*)(listBase + 0x2F0) = 5;
 
-    count = (unsigned int)*this->itemList;
-    anim = reinterpret_cast<MenuItemOpenAnim*>((int)this->itemList + 8);
+    count = (unsigned int)this->itemList->count;
+    anim = this->itemList->anims;
     if (0 < (int)count) {
         blocks = count >> 3;
         if (blocks != 0) {
@@ -374,8 +374,8 @@ bool CMenuPcs::ItemOpen()
 
     iVar5 = 0;
     *(short*)((int)this->itemMenuState + 0x22) = *(short*)((int)this->itemMenuState + 0x22) + 1;
-    iVar6 = (int)*this->itemList;
-    psVar4 = this->itemList + 4;
+    iVar6 = (int)*(short*)this->itemList;
+    psVar4 = (short*)((int)this->itemList + 8);
     iVar7 = (int)*(short*)((int)this->itemMenuState + 0x22);
     iVar8 = iVar6;
     if (0 < iVar6) {
@@ -469,14 +469,13 @@ bool CMenuPcs::ItemClose()
     int step;
     int remaining;
     MenuItemOpenAnim* anim;
-    s16* itemState = reinterpret_cast<s16*>(itemMenuState);
-    s16* itemList = this->itemList;
+    ItemMenuState* itemState = this->itemMenuState;
 
     finished = 0;
-    itemState[0x11] = itemState[0x11] + 1;
-    count = (int)*itemList;
-    anim = (MenuItemOpenAnim*)(itemList + 4);
-    step = (int)itemState[0x11];
+    itemState->frame = itemState->frame + 1;
+    count = (int)this->itemList->count;
+    anim = this->itemList->anims;
+    step = (int)itemState->frame;
     remaining = count;
 
     if (0 < count) {
@@ -527,14 +526,14 @@ void CMenuPcs::ItemDraw()
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
     int caravanWork = Game.m_scriptFoodBase[0];
-    s16* itemState = reinterpret_cast<s16*>(itemMenuState);
-    s16* itemList = this->itemList;
-    s16 listState = itemState[8];
-    s16 mode = itemState[0x18];
+    ItemMenuState* itemState = this->itemMenuState;
+    ItemMenuAnimList* itemList = this->itemList;
+    s16 listState = itemState->listState;
+    s16 mode = itemState->mode;
     int letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
     int drawIndex = 0;
-    int count = itemList[0];
-    s16* entry = (s16*)((u8*)itemList + 8);
+    int count = itemList->count;
+    s16* entry = reinterpret_cast<s16*>(itemList->anims);
 
     for (int i = 0; i < count; i++, entry += 0x20) {
         int tex = *(int*)(entry + 0xE);
@@ -588,7 +587,7 @@ void CMenuPcs::ItemDraw()
         } else {
             float itemAlpha = alpha;
             if (tex == 0x37) {
-                int menuIndex = drawIndex + itemState[0x1A];
+                int menuIndex = drawIndex + itemState->scroll;
                 if (menuIndex > 0x3F) {
                     menuIndex -= 0x40;
                 }
@@ -605,7 +604,7 @@ void CMenuPcs::ItemDraw()
                     itemAlpha = (float)((double)DOUBLE_80332e78 * (double)alpha);
                 }
 
-                if (tex == 0x37 && drawIndex == itemState[0x13]) {
+                if (tex == 0x37 && drawIndex == itemState->selectedIndex) {
                     v += h;
                 }
                 drawIndex++;
@@ -624,8 +623,8 @@ void CMenuPcs::ItemDraw()
     listFont->SetScale(FLOAT_80332e84);
     listFont->DrawInit();
 
-    s16* listStart = (s16*)((u8*)itemList + 8);
-    int listCount = itemList[0];
+    s16* listStart = reinterpret_cast<s16*>(itemList->anims);
+    int listCount = itemList->count;
     for (int i = 0; i < listCount; i++, listStart += 0x20) {
         if (*(int*)(listStart + 0xE) == 0x37) {
             break;
@@ -635,7 +634,7 @@ void CMenuPcs::ItemDraw()
     const ItemFlatData* flatData = reinterpret_cast<const ItemFlatData*>(&Game.m_cFlatDataArr[1]);
     s16* textEntry = listStart;
     for (int i = 0; i < 8; i++, textEntry += 0x20) {
-        int menuIndex = i + itemState[0x1A];
+        int menuIndex = i + itemState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
         }
@@ -646,7 +645,7 @@ void CMenuPcs::ItemDraw()
         s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
         if (itemId > 0) {
             const char* text = flatData->table[0].index[itemId * 5 + 4];
-            int selectedIndex = itemState[0x13] + itemState[0x1A];
+            int selectedIndex = itemState->selectedIndex + itemState->scroll;
             if (selectedIndex > 0x3F) {
                 selectedIndex -= 0x40;
             }
@@ -666,7 +665,7 @@ void CMenuPcs::ItemDraw()
 
     s16* iconEntry = listStart;
     for (int i = 0; i < 8; i++, iconEntry += 0x20) {
-        int menuIndex = i + itemState[0x1A];
+        int menuIndex = i + itemState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
         }
@@ -680,33 +679,33 @@ void CMenuPcs::ItemDraw()
     }
 
     if (listState == 1) {
-        float mark = CalcListPos__8CMenuPcsFiii(this, itemState[0x1A], 0x40, 1);
+        float mark = CalcListPos__8CMenuPcsFiii(this, itemState->scroll, 0x40, 1);
         if (mark > FLOAT_80332e60) {
-            DrawListPosMark__8CMenuPcsFfff(this, (float)itemList[4], (float)itemList[5], mark);
+            DrawListPosMark__8CMenuPcsFfff(this, (float)itemList->anims[0].x, (float)itemList->anims[0].y, mark);
         }
     }
 
     if (mode == 1) {
         DrawSingWin__8CMenuPcsFs(this, -1);
-        if (itemState[9] == 1) {
-            DrawSingWinMess__8CMenuPcsFiii(this, 0, (int)*((char*)itemState + 9), 0);
+        if (itemState->optionFrame == 1) {
+            DrawSingWinMess__8CMenuPcsFiii(this, 0, (int)itemState->optionFlags, 0);
         }
     }
 
     s16* cursorEntry = listStart;
-    if ((mode == 0 && listState == 1) || (mode != 0 && itemState[9] == 1)) {
+    if ((mode == 0 && listState == 1) || (mode != 0 && itemState->optionFrame == 1)) {
         float cursorX;
         float cursorY;
 
         if (mode == 0) {
-            cursorEntry += itemState[0x13] * 0x20;
+            cursorEntry += itemState->selectedIndex * 0x20;
             cursorX = (float)(cursorEntry[0] - 0x14);
             cursorY = (float)((float)(cursorEntry[3] - 0x20) * (float)DOUBLE_80332e78 + (float)cursorEntry[1]);
         } else {
             s16* singWindow = this->singWindowInfo;
             cursorX = (float)singWindow[0];
             cursorY = (float)(singWindow[1] + 0x20);
-            cursorY += (float)(itemState[0x14] * SingWinMessHeight__8CMenuPcsFv(this));
+            cursorY += (float)(itemState->optionIndex * SingWinMessHeight__8CMenuPcsFv(this));
         }
 
         int cursorAnim = (int)System.m_frameCounter & 7;

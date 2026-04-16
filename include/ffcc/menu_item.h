@@ -2,19 +2,31 @@
 #define _FFCC_MENU_ITEM_H_
 
 class CFont;
+struct ItemMenuAnimList;
 
 struct ItemMenuState
 {
-    char pad_00[0x0B];
+    char pad_00[0x09];
+    unsigned char optionFlags;
+    char pad_0a;
     char initialized;
     char pad_0c;
     char closeRequested;
-    char pad_0e[0x10];
+    char pad_0e[0x2];
+    short listState;
+    short optionFrame;
+    short optionIndex;
+    char pad_16[0x8];
     short cursorMove;
     char pad_20[0x2];
     short frame;
     char pad_24[0x2];
     short selectedIndex;
+    short subMenuIndex;
+    char pad_2a[0x6];
+    short mode;
+    short prevMode;
+    short scroll;
 };
 
 class CMenuPcs
@@ -38,7 +50,7 @@ public:
     char pad_830[0x18];
     short* singWindowInfo;
     int unk84c;
-    short* itemList;
+    ItemMenuAnimList* itemList;
     char pad_854[0x104];
 };
 

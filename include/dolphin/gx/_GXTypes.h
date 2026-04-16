@@ -130,7 +130,7 @@ do { \
     GX_WRITE_U32(c); \
     regAddr = addr; \
     if (regAddr >= 0 && regAddr < 4) { \
-        __GXData->indexBase[regAddr] = c; \
+        gx->indexBase[regAddr] = c; \
     } \
 } while (0)
 #else
@@ -151,7 +151,7 @@ do { \
     GX_WRITE_U32(c); \
     regAddr = addr; \
     if (regAddr >= 0 && regAddr < 4) { \
-        __GXData->indexStride[regAddr] = c; \
+        gx->indexStride[regAddr] = c; \
     } \
 } while (0)
 #else
@@ -221,7 +221,7 @@ void __GXSetGenMode(void);
 void __GXInitGX();
 void __GXInitRevisionBits(void);
 
-typedef struct __GXData_struct {
+typedef struct gx_struct {
     u16 vNumNot;
     u16 bpSentNot;
     u16 vNum;
@@ -267,8 +267,8 @@ typedef struct __GXData_struct {
     u32 cpTex;
     u8 cpTexZ;
     u32 genMode;
-    GXTexRegion TexRegions0[8];
-    GXTexRegion TexRegions1[4];
+    GXTexRegion TexRegions[8];
+    GXTexRegion TexRegionsCI[4];
     u32 nextTexRgn;
     u32 nextTexRgnCI;
     GXTlutRegion TlutRegions[20];
@@ -311,7 +311,7 @@ typedef struct __GXData_struct {
     u32 dirtyState;
 } GXData;
 
-extern GXData* const __GXData;
+extern GXData* const gx;
 extern void* __memReg;
 extern void* __peReg;
 extern void* __cpReg;

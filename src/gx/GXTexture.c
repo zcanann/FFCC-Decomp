@@ -671,18 +671,18 @@ void GXLoadTexObjPreLoaded(GXTexObj* obj, GXTexRegion* region, GXTexMapID id) {
     GX_WRITE_RAS_REG(t->image3);
 
     if (!(t->flags & 2)) {
-        ASSERTMSGLINEV(1287, __GXData->tlutRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj/PreLoaded");
-        tlr = (__GXTlutRegionInt*)__GXData->tlutRegionCallback(t->tlutName);
+        ASSERTMSGLINEV(1287, gx->tlutRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj/PreLoaded");
+        tlr = (__GXTlutRegionInt*)gx->tlutRegionCallback(t->tlutName);
         ASSERTMSGLINEV(1289, tlr, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTexObj/PreLoaded");
 
         tlr->tlutObj.tlut = (tlr->tlutObj.tlut & 0x00FFFFFF) | ((u32)GXTexTlutIds[id] << 24);
         GX_WRITE_RAS_REG(tlr->tlutObj.tlut);
     }
 
-    __GXData->tImage0[id] = t->image0;
-    __GXData->tMode0[id] = t->mode0;
-    __GXData->dirtyState |= 1;
-    __GXData->bpSentNot = 0;
+    gx->tImage0[id] = t->image0;
+    gx->tMode0[id] = t->mode0;
+    gx->dirtyState |= 1;
+    gx->bpSentNot = 0;
 }
 
 void GXLoadTexObj(GXTexObj* obj, GXTexMapID id) {
@@ -690,8 +690,8 @@ void GXLoadTexObj(GXTexObj* obj, GXTexMapID id) {
 
     CHECK_GXBEGIN(1318, "GXLoadTexObj");
     ASSERTMSGLINEV(1319, id < 8, "%s: invalid texture map ID", "GXLoadTexObj");
-    ASSERTMSGLINEV(1324, ((GXDataCallbacksView*)__GXData)->texRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj");
-    r = ((GXDataCallbacksView*)__GXData)->texRegionCallback(obj, id);
+    ASSERTMSGLINEV(1324, ((GXDataCallbacksView*)gx)->texRegionCallback, "%s: Tex/Tlut Region Callback not set", "GXLoadTexObj");
+    r = ((GXDataCallbacksView*)gx)->texRegionCallback(obj, id);
     ASSERTMSGLINEV(1326, r, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTexObj");
     GXLoadTexObjPreLoaded(obj, r, id);
 }
@@ -745,7 +745,7 @@ void GXLoadTlut(GXTlutObj* tlut_obj, u32 tlut_name) {
     __GXTlutRegionInt* r;
     u32 tlut_offset;
     __GXTlutObjInt* t = (__GXTlutObjInt*)tlut_obj;
-    GXDataCallbacksView* callbacks = (GXDataCallbacksView*)__GXData;
+    GXDataCallbacksView* callbacks = (GXDataCallbacksView*)gx;
 
     ASSERTMSGLINE(1432, tlut_obj, "TLut Object Pointer is null");
     CHECK_GXBEGIN(1434, "GXLoadTlut");
@@ -984,7 +984,7 @@ void GXInvalidateTexAll(void) {
 }
 
 GXTexRegionCallback GXSetTexRegionCallback(GXTexRegionCallback f) {
-    GXTexRegionCallback* callback = (GXTexRegionCallback*)((u8*)__GXData + 0x410);
+    GXTexRegionCallback* callback = (GXTexRegionCallback*)((u8*)gx + 0x410);
     GXTexRegionCallback oldcb = *callback;
 
     *callback = f;
@@ -992,7 +992,7 @@ GXTexRegionCallback GXSetTexRegionCallback(GXTexRegionCallback f) {
 }
 
 GXTlutRegionCallback GXSetTlutRegionCallback(GXTlutRegionCallback f) {
-    GXTlutRegionCallback* callback = (GXTlutRegionCallback*)((u8*)__GXData + 0x414);
+    GXTlutRegionCallback* callback = (GXTlutRegionCallback*)((u8*)gx + 0x414);
     GXTlutRegionCallback oldcb = *callback;
 
     *callback = f;
@@ -1157,40 +1157,40 @@ void GXPreLoadEntireTexture(GXTexObj* tex_obj, GXTexRegion* region) {
 void GXSetTexCoordScaleManually(GXTexCoordID coord, GXBool enable, u16 ss, u16 ts) {
     CHECK_GXBEGIN(1989, "GXSetTexCoordScaleManually");
     ASSERTMSGLINEV(1991, coord < GX_MAX_TEXCOORD, "%s: bad texcoord specified", "GXSetTexCoordScaleManually");
-    __GXData->tcsManEnab = (__GXData->tcsManEnab & ~(1 << coord)) | (enable << coord);
+    gx->tcsManEnab = (gx->tcsManEnab & ~(1 << coord)) | (enable << coord);
 
     if (enable) {
-        SET_REG_FIELD(1997, __GXData->suTs0[coord], 16, 0, (u16)(ss - 1));
-        SET_REG_FIELD(1998, __GXData->suTs1[coord], 16, 0, (u16)(ts - 1));
-        GX_WRITE_RAS_REG(__GXData->suTs0[coord]);
-        GX_WRITE_RAS_REG(__GXData->suTs1[coord]);
-        __GXData->bpSentNot = 0;
+        SET_REG_FIELD(1997, gx->suTs0[coord], 16, 0, (u16)(ss - 1));
+        SET_REG_FIELD(1998, gx->suTs1[coord], 16, 0, (u16)(ts - 1));
+        GX_WRITE_RAS_REG(gx->suTs0[coord]);
+        GX_WRITE_RAS_REG(gx->suTs1[coord]);
+        gx->bpSentNot = 0;
     }
 }
 
 void GXSetTexCoordCylWrap(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
     CHECK_GXBEGIN(2023, "GXSetTexCoordCylWrap");
     ASSERTMSGLINEV(2025, coord < GX_MAX_TEXCOORD, "%s: bad texcoord specified", "GXSetTexCoordCylWrap");
-    SET_REG_FIELD(2027, __GXData->suTs0[coord], 1, 17, s_enable);
-    SET_REG_FIELD(2028, __GXData->suTs1[coord], 1, 17, t_enable);
+    SET_REG_FIELD(2027, gx->suTs0[coord], 1, 17, s_enable);
+    SET_REG_FIELD(2028, gx->suTs1[coord], 1, 17, t_enable);
 
-    if (__GXData->tcsManEnab & (1 << coord)) {
-        GX_WRITE_RAS_REG(__GXData->suTs0[coord]);
-        GX_WRITE_RAS_REG(__GXData->suTs1[coord]);
-        __GXData->bpSentNot = 0;
+    if (gx->tcsManEnab & (1 << coord)) {
+        GX_WRITE_RAS_REG(gx->suTs0[coord]);
+        GX_WRITE_RAS_REG(gx->suTs1[coord]);
+        gx->bpSentNot = 0;
     }
 }
 
 void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
     CHECK_GXBEGIN(2054, "GXSetTexCoordBias");
     ASSERTMSGLINEV(2056, coord < GX_MAX_TEXCOORD, "%s: bad texcoord specified", "GXSetTexCoordBias");
-    SET_REG_FIELD(2058, __GXData->suTs0[coord], 1, 16, s_enable);
-    SET_REG_FIELD(2059, __GXData->suTs1[coord], 1, 16, t_enable);
+    SET_REG_FIELD(2058, gx->suTs0[coord], 1, 16, s_enable);
+    SET_REG_FIELD(2059, gx->suTs1[coord], 1, 16, t_enable);
 
-    if (__GXData->tcsManEnab & (1 << coord)) {
-        GX_WRITE_RAS_REG(__GXData->suTs0[coord]);
-        GX_WRITE_RAS_REG(__GXData->suTs1[coord]);
-        __GXData->bpSentNot = 0;
+    if (gx->tcsManEnab & (1 << coord)) {
+        GX_WRITE_RAS_REG(gx->suTs0[coord]);
+        GX_WRITE_RAS_REG(gx->suTs1[coord]);
+        gx->bpSentNot = 0;
     }
 }
 
@@ -1209,17 +1209,17 @@ static void __SetSURegs(int tmap, int tcoord) {
     u8 s_bias;
     u8 t_bias;
 
-    w = GET_REG_FIELD(__GXData->tImage0[tmap], 10, 0);
-    h = GET_REG_FIELD(__GXData->tImage0[tmap], 10, 10);
-    SET_REG_FIELD(2089, __GXData->suTs0[tcoord], 16, 0, w);
-    SET_REG_FIELD(2090, __GXData->suTs1[tcoord], 16, 0, h);
-    s_bias = GET_REG_FIELD(__GXData->tMode0[tmap], 2, 0) == 1;
-    t_bias = GET_REG_FIELD(__GXData->tMode0[tmap], 2, 2) == 1;
-    SET_REG_FIELD(2096, __GXData->suTs0[tcoord], 1, 16, s_bias);
-    SET_REG_FIELD(2097, __GXData->suTs1[tcoord], 1, 16, t_bias);
-    GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
-    GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
-    __GXData->bpSentNot = 0;
+    w = GET_REG_FIELD(gx->tImage0[tmap], 10, 0);
+    h = GET_REG_FIELD(gx->tImage0[tmap], 10, 10);
+    SET_REG_FIELD(2089, gx->suTs0[tcoord], 16, 0, w);
+    SET_REG_FIELD(2090, gx->suTs1[tcoord], 16, 0, h);
+    s_bias = GET_REG_FIELD(gx->tMode0[tmap], 2, 0) == 1;
+    t_bias = GET_REG_FIELD(gx->tMode0[tmap], 2, 2) == 1;
+    SET_REG_FIELD(2096, gx->suTs0[tcoord], 1, 16, s_bias);
+    SET_REG_FIELD(2097, gx->suTs1[tcoord], 1, 16, t_bias);
+    GX_WRITE_RAS_REG(gx->suTs0[tcoord]);
+    GX_WRITE_RAS_REG(gx->suTs1[tcoord]);
+    gx->bpSentNot = 0;
 }
 
 void __GXSetSUTexRegs(void) {
@@ -1231,44 +1231,44 @@ void __GXSetSUTexRegs(void) {
     u32 coord;
     u32* ptref;
 
-    if (__GXData->tcsManEnab != 0xFF) {
-        nStages = GET_REG_FIELD(__GXData->genMode, 4, 10) + 1;
-        nIndStages = GET_REG_FIELD(__GXData->genMode, 3, 16);
+    if (gx->tcsManEnab != 0xFF) {
+        nStages = GET_REG_FIELD(gx->genMode, 4, 10) + 1;
+        nIndStages = GET_REG_FIELD(gx->genMode, 3, 16);
         for (i = 0; i < nIndStages; i++) {
             switch (i) {
             case 0:
-                tmap = GET_REG_FIELD(__GXData->iref, 3, 0);
-                coord = GET_REG_FIELD(__GXData->iref, 3, 3);
+                tmap = GET_REG_FIELD(gx->iref, 3, 0);
+                coord = GET_REG_FIELD(gx->iref, 3, 3);
                 break;
             case 1:
-                tmap = GET_REG_FIELD(__GXData->iref, 3, 6);
-                coord = GET_REG_FIELD(__GXData->iref, 3, 9);
+                tmap = GET_REG_FIELD(gx->iref, 3, 6);
+                coord = GET_REG_FIELD(gx->iref, 3, 9);
                 break;
             case 2:
-                tmap = GET_REG_FIELD(__GXData->iref, 3, 12);
-                coord = GET_REG_FIELD(__GXData->iref, 3, 15);
+                tmap = GET_REG_FIELD(gx->iref, 3, 12);
+                coord = GET_REG_FIELD(gx->iref, 3, 15);
                 break;
             case 3:
-                tmap = GET_REG_FIELD(__GXData->iref, 3, 18);
-                coord = GET_REG_FIELD(__GXData->iref, 3, 21);
+                tmap = GET_REG_FIELD(gx->iref, 3, 18);
+                coord = GET_REG_FIELD(gx->iref, 3, 21);
                 break;
             }
-            if (!(__GXData->tcsManEnab & (1 << coord))) {
+            if (!(gx->tcsManEnab & (1 << coord))) {
                 __SetSURegs(tmap, coord);
             }
         }
 
         i = 0;
         for (i = 0; i < nStages; i++) {
-            ptref = &__GXData->tref[i / 2];
-            map = __GXData->texmapId[i];
+            ptref = &gx->tref[i / 2];
+            map = gx->texmapId[i];
             tmap = map & 0xFFFFFEFF;
             if (i & 1) {
                 coord = GET_REG_FIELD(*ptref, 3, 15);
             } else {
                 coord = GET_REG_FIELD(*ptref, 3, 3);
             }
-            if ((tmap != 0xFF) && !(__GXData->tcsManEnab & (1 << coord)) && (__GXData->tevTcEnab & (1 << i))) {
+            if ((tmap != 0xFF) && !(gx->tcsManEnab & (1 << coord)) && (gx->tevTcEnab & (1 << i))) {
                 __SetSURegs(tmap, coord);
             }
         }
@@ -1276,8 +1276,8 @@ void __GXSetSUTexRegs(void) {
 }
 
 void __GXGetSUTexSize(GXTexCoordID coord, u16* width, u16* height) {
-    *width = (u16)__GXData->suTs0[coord] + 1;
-    *height = (u16)__GXData->suTs1[coord] + 1;
+    *width = (u16)gx->suTs0[coord] + 1;
+    *height = (u16)gx->suTs1[coord] + 1;
 }
 
 void __GXSetTmemConfig(u32 config) {

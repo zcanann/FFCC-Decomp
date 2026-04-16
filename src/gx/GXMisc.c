@@ -14,20 +14,20 @@ static OSThreadQueue FinishQueue;
 void GXSetMisc(GXMiscToken token, u32 val) {
     switch (token) {
     case GX_MT_XF_FLUSH:
-        __GXData->vNum = val;
-        __GXData->vNumNot = !__GXData->vNum;
-        __GXData->bpSentNot = 1;
+        gx->vNum = val;
+        gx->vNumNot = !gx->vNum;
+        gx->bpSentNot = 1;
 
-        if (__GXData->vNum != 0) {
-            __GXData->dirtyState |= 8;
+        if (gx->vNum != 0) {
+            gx->dirtyState |= 8;
         }
         break;
     case GX_MT_DL_SAVE_CONTEXT:
-        ASSERTMSGLINE(223, !__GXData->inDispList, "GXSetMisc: Cannot change DL context setting while making a display list");
-        __GXData->dlSaveContext = (val != 0);
+        ASSERTMSGLINE(223, !gx->inDispList, "GXSetMisc: Cannot change DL context setting while making a display list");
+        gx->dlSaveContext = (val != 0);
         break;
     case GX_MT_ABORT_WAIT_COPYOUT:
-        __GXData->abtWaitPECopy = (val != 0);
+        gx->abtWaitPECopy = (val != 0);
         break;
     case GX_MT_NULL:
         break;
@@ -41,7 +41,7 @@ void GXSetMisc(GXMiscToken token, u32 val) {
 
 void GXFlush(void) {
     CHECK_GXBEGIN(270, "GXFlush");
-    if (__GXData->dirtyState) {
+    if (gx->dirtyState) {
         __GXSetDirtyState();
     }
     
@@ -87,7 +87,7 @@ static void __GXAbortWaitPECopyDone(void) {
 }
 
 void __GXAbort(void) {
-    if (__GXData->abtWaitPECopy && GXGetGPFifo() != (GXFifoObj*)NULL) {
+    if (gx->abtWaitPECopy && GXGetGPFifo() != (GXFifoObj*)NULL) {
         __GXAbortWaitPECopyDone();
     }
 
@@ -103,7 +103,7 @@ void GXAbortFrame(void) {
     if (GXGetGPFifo() != (GXFifoObj*)NULL) {
         __GXCleanGPFifo();
         __GXInitRevisionBits();
-        __GXData->dirtyState = 0;
+        gx->dirtyState = 0;
         GXFlush();
     }
 }
@@ -122,7 +122,7 @@ void GXSetDrawSync(u16 token) {
     GX_WRITE_RAS_REG(reg);
     GXFlush();
     OSRestoreInterrupts(enabled);
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 u16 GXReadDrawSync(void) {
@@ -163,8 +163,8 @@ void GXDrawDone(void) {
 
 void GXPixModeSync(void) {
     CHECK_GXBEGIN(601, "GXPixModeSync");
-    GX_WRITE_RAS_REG(__GXData->peCtrl);
-    __GXData->bpSentNot = 0;
+    GX_WRITE_RAS_REG(gx->peCtrl);
+    gx->bpSentNot = 0;
 }
 
 void GXTexModeSync(void) {
@@ -173,14 +173,14 @@ void GXTexModeSync(void) {
     CHECK_GXBEGIN(625, "GXTexModeSync");
     reg = 0x63000000;
     GX_WRITE_RAS_REG(reg);
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 #if DEBUG
 void __GXBypass(u32 reg) {
     CHECK_GXBEGIN(647, "__GXBypass");
     GX_WRITE_RAS_REG(reg);
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 u16 __GXReadPEReg(u32 reg) {

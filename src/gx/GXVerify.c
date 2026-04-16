@@ -268,15 +268,15 @@ char __gxvDummyStr[256];
 static void __GXVerifyGlobal(void) {}
 
 static void __GXVerifyCP(GXVtxFmt fmt) {
-    u32 nrmCnt = GET_REG_FIELD(__GXData->vatA[fmt], 1, 9);
+    u32 nrmCnt = GET_REG_FIELD(gx->vatA[fmt], 1, 9);
     
     if (__gxVerif->verifyLevel >= GX_WARN_SEVERE) {
-        if (__GXData->hasNrms && nrmCnt != 0) {
+        if (gx->hasNrms && nrmCnt != 0) {
             if (__gxVerif->verifyLevel >= __gxvWarnLev[GXWARN_INVALID_VTX_FMT]) {
                 __GX_WARNF(GXWARN_INVALID_VTX_FMT, "GX_NRM_XYZ");
             }            
         }
-        else if (__GXData->hasBiNrms && nrmCnt != 1) {
+        else if (gx->hasBiNrms && nrmCnt != 1) {
             if (__gxVerif->verifyLevel >= __gxvWarnLev[GXWARN_INVALID_VTX_FMT]) {
                 __GX_WARNF(GXWARN_INVALID_VTX_FMT, "GX_NRM_NBT or GX_NRM_NBT3");
             } 

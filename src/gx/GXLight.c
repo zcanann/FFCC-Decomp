@@ -408,7 +408,7 @@ void GXLoadLightObjImm(const GXLightObj* lt_obj, GXLightID light) {
     PushLight(lt_obj, (void*)GXFIFO_ADDR);
 #endif
 
-    __GXData->bpSentNot = 1;
+    gx->bpSentNot = 1;
 }
 
 void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light) {
@@ -437,7 +437,7 @@ void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light) {
 #if DEBUG
     __GXShadowIndexState(7, reg);
 #endif
-    __GXData->bpSentNot = 1;
+    gx->bpSentNot = 1;
 }
 
 #define GXCOLOR_AS_U32(color) (*((u32*)&(color)))
@@ -450,21 +450,21 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
 
     switch (chan) {
     case GX_COLOR0:
-        reg = __GXData->ambColor[GX_COLOR0] & 0xFF;
+        reg = gx->ambColor[GX_COLOR0] & 0xFF;
         reg |= GXCOLOR_AS_U32(amb_color) & 0xFFFFFF00;
         colIdx = 0;
         break;
     case GX_COLOR1:
-        reg = __GXData->ambColor[GX_COLOR1] & 0xFF;
+        reg = gx->ambColor[GX_COLOR1] & 0xFF;
         reg |= GXCOLOR_AS_U32(amb_color) & 0xFFFFFF00;
         colIdx = 1;
         break;
     case GX_ALPHA0:
-        reg = (__GXData->ambColor[GX_COLOR0] & ~0xFF) | amb_color.a;
+        reg = (gx->ambColor[GX_COLOR0] & ~0xFF) | amb_color.a;
         colIdx = 0;
         break;
     case GX_ALPHA1:
-        reg = (__GXData->ambColor[GX_COLOR1] & ~0xFF) | amb_color.a;
+        reg = (gx->ambColor[GX_COLOR1] & ~0xFF) | amb_color.a;
         colIdx = 1;
         break;
     case GX_COLOR0A0:
@@ -481,8 +481,8 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
     }
 
     GX_WRITE_XF_REG(colIdx + 10, reg);
-    __GXData->bpSentNot = 1;
-    __GXData->ambColor[colIdx] = reg;
+    gx->bpSentNot = 1;
+    gx->ambColor[colIdx] = reg;
 }
 
 void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
@@ -493,21 +493,21 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
 
     switch (chan) {
     case GX_COLOR0:
-        reg = __GXData->matColor[GX_COLOR0] & 0xFF;
+        reg = gx->matColor[GX_COLOR0] & 0xFF;
         reg |= GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00;
         colIdx = 0;
         break;
     case GX_COLOR1:
-        reg = __GXData->matColor[GX_COLOR1] & 0xFF;
+        reg = gx->matColor[GX_COLOR1] & 0xFF;
         reg |= GXCOLOR_AS_U32(mat_color) & 0xFFFFFF00;
         colIdx = 1;
         break;
     case GX_ALPHA0:
-        reg = (__GXData->matColor[GX_COLOR0] & ~0xFF) | mat_color.a;
+        reg = (gx->matColor[GX_COLOR0] & ~0xFF) | mat_color.a;
         colIdx = 0;
         break;
     case GX_ALPHA1:
-        reg = (__GXData->matColor[GX_COLOR1] & ~0xFF) | mat_color.a;
+        reg = (gx->matColor[GX_COLOR1] & ~0xFF) | mat_color.a;
         colIdx = 1;
         break;
     case GX_COLOR0A0:
@@ -524,8 +524,8 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
     }
 
     GX_WRITE_XF_REG(colIdx + 12, reg);
-    __GXData->bpSentNot = 1;
-    __GXData->matColor[colIdx] = reg;
+    gx->bpSentNot = 1;
+    gx->matColor[colIdx] = reg;
 }
 
 void GXSetNumChans(u8 nChans) {
@@ -535,7 +535,7 @@ void GXSetNumChans(u8 nChans) {
     CHECK_GXBEGIN(857, "GXSetNumChans");
     ASSERTMSGLINE(858, nChans <= 2, "GXSetNumChans: nChans > 2");
 
-    data = __GXData;
+    data = gx;
     n = nChans;
     data->genMode = (data->genMode & ~0x70) | (n << 4);
     GX_WRITE_U8(0x10);
@@ -584,5 +584,5 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorS
         GX_WRITE_XF_REG(17, reg);
     }
 
-    __GXData->bpSentNot = 1;
+    gx->bpSentNot = 1;
 }

@@ -48,30 +48,30 @@ static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data) {
     case 4:
         break;
     case 5:
-        __GXData->vcdLo = data;
+        gx->vcdLo = data;
         break;
     case 6:
-        __GXData->vcdHi = data;
+        gx->vcdHi = data;
         break;
     case 7:
-        __GXData->vatA[vatIdx & 0xFF] = data;
+        gx->vatA[vatIdx & 0xFF] = data;
         break;
     case 8:
-        __GXData->vatB[vatIdx & 0xFF] = data;
+        gx->vatB[vatIdx & 0xFF] = data;
         break;
     case 9:
-        __GXData->vatC[vatIdx & 0xFF] = data;
+        gx->vatC[vatIdx & 0xFF] = data;
         break;
     case 10:
         idx = vatIdx - 0x15;
         if ((idx >= 0) && (idx < 4)) {
-            __GXData->indexBase[idx] = data;
+            gx->indexBase[idx] = data;
         }
         break;
     case 11:
         idx = vatIdx - 0x15;
         if ((idx >= 0) && (idx < 4)) {
-            __GXData->indexStride[idx] = data;
+            gx->indexStride[idx] = data;
         }
         break;
     default:
@@ -86,14 +86,14 @@ static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data) {
 static void __ReconstVtxStatus(u8 vatIdx) {
     u32 vat;
 
-    if (GET_REG_FIELD(__GXData->vcdLo, 2, 11) & 3) {
-        vat = __GXData->vatA[vatIdx];
+    if (GET_REG_FIELD(gx->vcdLo, 2, 11) & 3) {
+        vat = gx->vatA[vatIdx];
         if ((vat >> 9) & 1) {
-            __GXData->hasNrms = 0;
-            __GXData->hasBiNrms = 1;
+            gx->hasNrms = 0;
+            gx->hasBiNrms = 1;
         } else {
-            __GXData->hasNrms = 1;
-            __GXData->hasBiNrms = 0;
+            gx->hasNrms = 1;
+            gx->hasBiNrms = 0;
         }
     }
 }
@@ -108,26 +108,26 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
 
     switch (attrIdx) {
     case 0:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 0) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 0) ? 1 : 0;
     case 1:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 1) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 1) ? 1 : 0;
     case 2:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 2) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 2) ? 1 : 0;
     case 3:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 3) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 3) ? 1 : 0;
     case 4:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 4) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 4) ? 1 : 0;
     case 5:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 5) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 5) ? 1 : 0;
     case 6:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 6) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 6) ? 1 : 0;
     case 7:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 7) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 7) ? 1 : 0;
     case 8:
-        return GET_REG_FIELD(__GXData->vcdLo, 1, 8) ? 1 : 0;
+        return GET_REG_FIELD(gx->vcdLo, 1, 8) ? 1 : 0;
     case 9:
-        vcd = __GXData->vcdLo;
-        vat = __GXData->vatA[vatIdx & 0xFF];
+        vcd = gx->vcdLo;
+        vat = gx->vatA[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 9)) {
         case 0:
             return 0;
@@ -140,8 +140,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 10:
-        vcd = __GXData->vcdLo;
-        vat = __GXData->vatA[vatIdx & 0xFF];
+        vcd = gx->vcdLo;
+        vat = gx->vatA[vatIdx & 0xFF];
 
         switch (GET_REG_FIELD(vcd, 2, 11)) {
         case 0:
@@ -170,7 +170,7 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 11:
-        switch (GET_REG_FIELD(__GXData->vcdLo, 2, 13)) {
+        switch (GET_REG_FIELD(gx->vcdLo, 2, 13)) {
         case 0:
             return 0;
         case 2:
@@ -178,12 +178,12 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         case 3:
             return 2;
         case 1:
-            vat = __GXData->vatA[vatIdx];
+            vat = gx->vatA[vatIdx];
             return clrCompSize[(vat >> 14) & 7];
         }
         break;
     case 12:
-        switch (GET_REG_FIELD(__GXData->vcdLo, 2, 15)) {
+        switch (GET_REG_FIELD(gx->vcdLo, 2, 15)) {
         case 0:
             return 0;
         case 2:
@@ -191,13 +191,13 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         case 3:
             return 2;
         case 1:
-            vat = __GXData->vatA[vatIdx];
+            vat = gx->vatA[vatIdx];
             return clrCompSize[(vat >> 18) & 7];
         }
         break;
     case 13:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatA[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatA[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 0)) {
         case 0:
             return 0;
@@ -210,8 +210,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 14:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatB[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatB[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 2)) {
         case 0:
             return 0;
@@ -224,8 +224,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 15:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatB[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatB[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 4)) {
         case 0:
             return 0;
@@ -238,8 +238,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 16:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatB[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatB[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 6)) {
         case 0:
             return 0;
@@ -252,8 +252,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 17:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatB[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatB[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 8)) {
         case 0:
             return 0;
@@ -266,8 +266,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 18:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatC[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatC[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 10)) {
         case 0:
             return 0;
@@ -280,8 +280,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 19:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatC[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatC[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 12)) {
         case 0:
             return 0;
@@ -294,8 +294,8 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
         }
         break;
     case 20:
-        vcd = __GXData->vcdHi;
-        vat = __GXData->vatC[vatIdx & 0xFF];
+        vcd = gx->vcdHi;
+        vat = gx->vatC[vatIdx & 0xFF];
         switch (GET_REG_FIELD(vcd, 2, 14)) {
         case 0:
             return 0;
@@ -437,8 +437,8 @@ void __GXShadowIndexState(u32 idx_reg, u32 reg_data) {
     u32 i;
 
     i = idx_reg - 4;
-    basePtr = OSPhysicalToCached(__GXData->indexBase[i]);
-    stride = __GXData->indexStride[i];
+    basePtr = OSPhysicalToCached(gx->indexBase[i]);
+    stride = gx->indexStride[i];
     addr = reg_data & 0xFFF;
     cnt = (reg_data >> 12) & 0xF;
     index = reg_data >> 16;
@@ -460,15 +460,15 @@ void __GXPrintShadowState(void) {
     u32 j;
 
     OSReport("CP State:\n");
-    OSReport("\tvcdLo = 0x%x\n", __GXData->vcdLo);
-    OSReport("\tvcdHi = 0x%x\n", __GXData->vcdHi);
-    OSReport("\thasBiNrms = 0x%x\n", __GXData->hasBiNrms);
+    OSReport("\tvcdLo = 0x%x\n", gx->vcdLo);
+    OSReport("\tvcdHi = 0x%x\n", gx->vcdHi);
+    OSReport("\thasBiNrms = 0x%x\n", gx->hasBiNrms);
 
     for (i = 0; i < 8; i++) {
         OSReport("\tVertex Format %d:\n", i);
-        OSReport("\t\tvatA = 0x%x\n", __GXData->vatA[i]);
-        OSReport("\t\tvatB = 0x%x\n", __GXData->vatB[i]);
-        OSReport("\t\tvatC = 0x%x\n", __GXData->vatC[i]);
+        OSReport("\t\tvatA = 0x%x\n", gx->vatA[i]);
+        OSReport("\t\tvatB = 0x%x\n", gx->vatB[i]);
+        OSReport("\t\tvatC = 0x%x\n", gx->vatC[i]);
     }
 
     OSReport("\n-------------------------------------\n");

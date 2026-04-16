@@ -1500,6 +1500,10 @@ os/OSTime.c:
 os/__ppc_eabi_init.c:
 	.text       start:0x8018201C end:0x801820B0
 
+dolphin/os/__start.c:
+	.init       start:0x80003100 end:0x80003400
+	.sbss       start:0x8032EFE0 end:0x8032EFE8
+
 exi/EXIBios.c:
 	.text       start:0x801820B0 end:0x80183A8C
 	.data       start:0x802171B0 end:0x802172C0
@@ -1774,9 +1778,9 @@ card/CARDNet.c:
 
 gx/GXInit.c:
 	.text       start:0x8019EF44 end:0x801A02C8
-	.data       start:0x8021C3C4 end:0x8021C4C0
+	.data       start:0x8021C380 end:0x8021C4C0
 	.bss        start:0x80327780 end:0x80327CF8
-	.sdata      start:0x8032EB88 end:0x8032EB90
+	.sdata      start:0x8032EB88 end:0x8032EB8C
 	.sbss       start:0x8032F2E8 end:0x8032F310
 	.sdata2     start:0x80333828 end:0x80333850
 
@@ -1787,7 +1791,7 @@ gx/GXFifo.c:
 gx/GXAttr.c:
 	.text       start:0x801A0B10 end:0x801A1C80
 	.data       start:0x8021C4C0 end:0x8021C620
-	.sdata      start:0x8032EB90 end:0x8032EBA0
+	.sdata      start:0x8032EB8C end:0x8032EBA0
 
 gx/GXMisc.c:
 	.text       start:0x801A1C80 end:0x801A2424
@@ -1919,9 +1923,6 @@ TRK_MINNOW_DOLPHIN/notify.c:
 
 TRK_MINNOW_DOLPHIN/flush_cache.c:
 	.text       start:0x801ABA2C end:0x801ABA64
-
-dolphin/os/__start.c:
-	.init       start:0x80003100 end:0x80003400
 
 dolphin/os/__ppc_eabi_init.cpp:
 	.init       start:0x80003400 end:0x80003458

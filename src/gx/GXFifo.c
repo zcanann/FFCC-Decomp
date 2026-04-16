@@ -67,11 +67,11 @@ static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
 
 static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
-    u32 reg = __GXData->cpEnable;
+    u32 reg = gx->cpEnable;
 
     reg &= ~0x20;
-    __GXData->cpEnable = reg;
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    gx->cpEnable = reg;
+    GX_SET_CP_REG(1, gx->cpEnable);
     if (BreakPointCB != NULL) {
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
@@ -82,14 +82,14 @@ static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
 }
 
 static void GXCPInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
-    __GXData->cpStatus = GX_GET_CP_REG(0);
-    if (GET_REG_FIELD(__GXData->cpEnable, 1, 3) && GET_REG_FIELD(__GXData->cpStatus, 1, 1)) {
+    gx->cpStatus = GX_GET_CP_REG(0);
+    if (GET_REG_FIELD(gx->cpEnable, 1, 3) && GET_REG_FIELD(gx->cpStatus, 1, 1)) {
         GXUnderflowHandler(interrupt, context);
     }
-    if (GET_REG_FIELD(__GXData->cpEnable, 1, 2) && GET_REG_FIELD(__GXData->cpStatus, 1, 0)) {
+    if (GET_REG_FIELD(gx->cpEnable, 1, 2) && GET_REG_FIELD(gx->cpStatus, 1, 0)) {
         GXOverflowHandler(interrupt, context);
     }
-    if (GET_REG_FIELD(__GXData->cpEnable, 1, 5) && GET_REG_FIELD(__GXData->cpStatus, 1, 4)) {
+    if (GET_REG_FIELD(gx->cpEnable, 1, 5) && GET_REG_FIELD(gx->cpStatus, 1, 4)) {
         GXBreakPointHandler(interrupt, context);
     }
 }
@@ -223,11 +223,11 @@ void GXSetGPFifo(GXFifoObj* fifo) {
     }
 
 #if SDK_REVISION >= 2
-    stbtmp = __GXData->cpEnable;
+    stbtmp = gx->cpEnable;
     SET_REG_FIELD(0, stbtmp, 1, 1, 0);
     SET_REG_FIELD(0, stbtmp, 1, 5, 0);
     GX_SET_CP_REG(1, stbtmp);
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    GX_SET_CP_REG(1, gx->cpEnable);
 #endif
     __GXWriteFifoIntReset(1, 1);
     __GXFifoReadEnable();
@@ -331,12 +331,12 @@ void GXSaveGPFifo(GXFifoObj* fifo) {
 }
 
 void GXGetGPStatus(GXBool* overhi, GXBool* underlow, GXBool* readIdle, GXBool* cmdIdle, GXBool* brkpt) {
-    __GXData->cpStatus = GX_GET_CP_REG(0);
-    *overhi   = GET_REG_FIELD(__GXData->cpStatus, 1, 0);
-    *underlow = (int)GET_REG_FIELD(__GXData->cpStatus, 1, 1);
-    *readIdle = (int)GET_REG_FIELD(__GXData->cpStatus, 1, 2);
-    *cmdIdle  = (int)GET_REG_FIELD(__GXData->cpStatus, 1, 3);
-    *brkpt    = (int)GET_REG_FIELD(__GXData->cpStatus, 1, 4);
+    gx->cpStatus = GX_GET_CP_REG(0);
+    *overhi   = GET_REG_FIELD(gx->cpStatus, 1, 0);
+    *underlow = (int)GET_REG_FIELD(gx->cpStatus, 1, 1);
+    *readIdle = (int)GET_REG_FIELD(gx->cpStatus, 1, 2);
+    *cmdIdle  = (int)GET_REG_FIELD(gx->cpStatus, 1, 3);
+    *brkpt    = (int)GET_REG_FIELD(gx->cpStatus, 1, 4);
 }
 
 void GXGetFifoStatus(GXFifoObj* fifo, GXBool* overhi, GXBool* underflow, u32* fifoCount, GXBool* cpuWrite, GXBool* gpRead, GXBool* fifowrap) {
@@ -422,13 +422,13 @@ void GXEnableBreakPt(void* break_pt) {
     GX_SET_CP_REG(30, (u32)break_pt);
     GX_SET_CP_REG(31, ((u32)break_pt >> 16) & 0x3FFF);
 #if SDK_REVISION >= 2
-    SOME_SET_REG_MACRO(__GXData->cpEnable, 1, 1, 0);
-    SOME_SET_REG_MACRO(__GXData->cpEnable, 1, 5, 0);
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    SOME_SET_REG_MACRO(gx->cpEnable, 1, 1, 0);
+    SOME_SET_REG_MACRO(gx->cpEnable, 1, 5, 0);
+    GX_SET_CP_REG(1, gx->cpEnable);
 #endif
-    SOME_SET_REG_MACRO(__GXData->cpEnable, 1, 1, 1);
-    SOME_SET_REG_MACRO(__GXData->cpEnable, 1, 5, 1);
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    SOME_SET_REG_MACRO(gx->cpEnable, 1, 1, 1);
+    SOME_SET_REG_MACRO(gx->cpEnable, 1, 5, 1);
+    GX_SET_CP_REG(1, gx->cpEnable);
     __GXCurrentBP = break_pt;
     __GXFifoReadEnable();
     OSRestoreInterrupts(enabled);
@@ -437,9 +437,9 @@ void GXEnableBreakPt(void* break_pt) {
 void GXDisableBreakPt(void) {
     BOOL enabled = OSDisableInterrupts();
 
-    SOME_SET_REG_MACRO(__GXData->cpEnable, 1, 1, 0);
-    SOME_SET_REG_MACRO(__GXData->cpEnable, 1, 5, 0);
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    SOME_SET_REG_MACRO(gx->cpEnable, 1, 1, 0);
+    SOME_SET_REG_MACRO(gx->cpEnable, 1, 5, 0);
+    GX_SET_CP_REG(1, gx->cpEnable);
     __GXCurrentBP = NULL;
     OSRestoreInterrupts(enabled);
 }
@@ -454,17 +454,17 @@ void __GXFifoInit(void) {
 }
 
 static void __GXFifoReadEnable(void) {
-    u32 reg = __GXData->cpEnable;
+    u32 reg = gx->cpEnable;
 
     reg &= ~1;
     reg |= 1;
-    __GXData->cpEnable = reg;
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    gx->cpEnable = reg;
+    GX_SET_CP_REG(1, gx->cpEnable);
 }
 
 static void __GXFifoReadDisable(void) {
-    __GXData->cpEnable &= ~1;
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    gx->cpEnable &= ~1;
+    GX_SET_CP_REG(1, gx->cpEnable);
 }
 
 static void __GXFifoLink(u8 en) {
@@ -476,14 +476,14 @@ static void __GXFifoLink(u8 en) {
     } else {
         enable = 0;
     }
-    reg = __GXData->cpEnable;
+    reg = gx->cpEnable;
     reg = (reg & ~0x10) | (enable << 4);
-    __GXData->cpEnable = reg;
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    gx->cpEnable = reg;
+    GX_SET_CP_REG(1, gx->cpEnable);
 }
 
 static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
-    GXData* data = __GXData;
+    GXData* data = gx;
 
     data->cpEnable = (data->cpEnable & ~4) | ((u32)(u8)hiWatermarkEn << 2);
     data->cpEnable = (data->cpEnable & ~8) | ((u32)(u8)loWatermarkEn << 3);
@@ -491,7 +491,7 @@ static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
 }
 
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {
-    GXData* data = __GXData;
+    GXData* data = gx;
 
     data->cpClr = (data->cpClr & ~1) | (u32)(u8)hiWatermarkClr;
     data->cpClr = (data->cpClr & ~2) | ((u32)(u8)loWatermarkClr << 1);

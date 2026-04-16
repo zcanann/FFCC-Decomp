@@ -48,64 +48,64 @@ void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp,
 void GXSetProjection(const Mtx44 mtx, GXProjectionType type) {
     CHECK_GXBEGIN(295, "GXSetProjection");
 
-    __GXData->projType = type;
-    __GXData->projMtx[0] = mtx[0][0];
-    __GXData->projMtx[2] = mtx[1][1];
-    __GXData->projMtx[4] = mtx[2][2];
-    __GXData->projMtx[5] = mtx[2][3];
+    gx->projType = type;
+    gx->projMtx[0] = mtx[0][0];
+    gx->projMtx[2] = mtx[1][1];
+    gx->projMtx[4] = mtx[2][2];
+    gx->projMtx[5] = mtx[2][3];
     if (type == GX_ORTHOGRAPHIC) {
-        __GXData->projMtx[1] = mtx[0][3];
-        __GXData->projMtx[3] = mtx[1][3];
+        gx->projMtx[1] = mtx[0][3];
+        gx->projMtx[3] = mtx[1][3];
     } else {
-        __GXData->projMtx[1] = mtx[0][2];
-        __GXData->projMtx[3] = mtx[1][2];
+        gx->projMtx[1] = mtx[0][2];
+        gx->projMtx[3] = mtx[1][2];
     }
 
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x00061020);
-    GX_WRITE_F32(__GXData->projMtx[0]);
-    GX_WRITE_F32(__GXData->projMtx[1]);
-    GX_WRITE_F32(__GXData->projMtx[2]);
-    GX_WRITE_F32(__GXData->projMtx[3]);
-    GX_WRITE_F32(__GXData->projMtx[4]);
-    GX_WRITE_F32(__GXData->projMtx[5]);
-    GX_WRITE_U32(__GXData->projType);
-    __GXData->bpSentNot = 1;
+    GX_WRITE_F32(gx->projMtx[0]);
+    GX_WRITE_F32(gx->projMtx[1]);
+    GX_WRITE_F32(gx->projMtx[2]);
+    GX_WRITE_F32(gx->projMtx[3]);
+    GX_WRITE_F32(gx->projMtx[4]);
+    GX_WRITE_F32(gx->projMtx[5]);
+    GX_WRITE_U32(gx->projType);
+    gx->bpSentNot = 1;
 }
 
 void GXSetProjectionv(const f32* ptr) {
     CHECK_GXBEGIN(339, "GXSetProjectionv");
 
-    __GXData->projType = (u32)ptr[0];
-    __GXData->projMtx[0] = ptr[1];
-    __GXData->projMtx[1] = ptr[2];
-    __GXData->projMtx[2] = ptr[3];
-    __GXData->projMtx[3] = ptr[4];
-    __GXData->projMtx[4] = ptr[5];
-    __GXData->projMtx[5] = ptr[6];
+    gx->projType = (u32)ptr[0];
+    gx->projMtx[0] = ptr[1];
+    gx->projMtx[1] = ptr[2];
+    gx->projMtx[2] = ptr[3];
+    gx->projMtx[3] = ptr[4];
+    gx->projMtx[4] = ptr[5];
+    gx->projMtx[5] = ptr[6];
 
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x00061020);
-    GX_WRITE_F32(__GXData->projMtx[0]);
-    GX_WRITE_F32(__GXData->projMtx[1]);
-    GX_WRITE_F32(__GXData->projMtx[2]);
-    GX_WRITE_F32(__GXData->projMtx[3]);
-    GX_WRITE_F32(__GXData->projMtx[4]);
-    GX_WRITE_F32(__GXData->projMtx[5]);
-    GX_WRITE_U32(__GXData->projType);
-    __GXData->bpSentNot = 1;
+    GX_WRITE_F32(gx->projMtx[0]);
+    GX_WRITE_F32(gx->projMtx[1]);
+    GX_WRITE_F32(gx->projMtx[2]);
+    GX_WRITE_F32(gx->projMtx[3]);
+    GX_WRITE_F32(gx->projMtx[4]);
+    GX_WRITE_F32(gx->projMtx[5]);
+    GX_WRITE_U32(gx->projType);
+    gx->bpSentNot = 1;
 }
 
 void GXGetProjectionv(f32* ptr) {
     ASSERTMSGLINE(370, ptr, "GXGet*: invalid null pointer");
 
-    ptr[0] = (f32)__GXData->projType;
-    ptr[1] = __GXData->projMtx[0];
-    ptr[2] = __GXData->projMtx[1];
-    ptr[3] = __GXData->projMtx[2];
-    ptr[4] = __GXData->projMtx[3];
-    ptr[5] = __GXData->projMtx[4];
-    ptr[6] = __GXData->projMtx[5];
+    ptr[0] = (f32)gx->projType;
+    ptr[1] = gx->projMtx[0];
+    ptr[2] = gx->projMtx[1];
+    ptr[3] = gx->projMtx[2];
+    ptr[4] = gx->projMtx[3];
+    ptr[5] = gx->projMtx[4];
+    ptr[6] = gx->projMtx[5];
 }
 
 #define qr0 0
@@ -240,7 +240,7 @@ void GXLoadNrmMtxImm(const Mtx mtx, u32 id) {
 
 void GXSetCurrentMtx(u32 id) {
     CHECK_GXBEGIN(708, "GXSetCurrentMtx");
-    __GXData->matIdxA = (__GXData->matIdxA & 0xFFFFFFC0) | id;
+    gx->matIdxA = (gx->matIdxA & 0xFFFFFFC0) | id;
     __GXSetMatrixIndex(0);
 }
 
@@ -321,15 +321,15 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     zmax = 1.6777215e7f * farz;
     sz = zmax - zmin;
     oz = zmax;
-    __GXData->vpLeft = left;
-    __GXData->vpTop = top;
-    __GXData->vpWd = wd;
-    __GXData->vpHt = ht;
-    __GXData->vpNearz = nearz;
-    __GXData->vpFarz = farz;
+    gx->vpLeft = left;
+    gx->vpTop = top;
+    gx->vpWd = wd;
+    gx->vpHt = ht;
+    gx->vpNearz = nearz;
+    gx->vpFarz = farz;
 
-    if (__GXData->fgRange != 0) {
-        __GXSetRange(nearz, __GXData->fgSideX);
+    if (gx->fgRange != 0) {
+        __GXSetRange(nearz, gx->fgSideX);
     }
 
     reg = 0x5101A;
@@ -341,7 +341,7 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     GX_WRITE_XF_REG_F(29, ox);
     GX_WRITE_XF_REG_F(30, oy);
     GX_WRITE_XF_REG_F(31, oz);
-    __GXData->bpSentNot = 1;
+    gx->bpSentNot = 1;
 }
 
 #pragma dont_inline reset
@@ -353,12 +353,12 @@ void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
 void GXGetViewportv(f32* vp) {
     ASSERTMSGLINE(968, vp, "GXGet*: invalid null pointer");
 
-    vp[0] = __GXData->vpLeft;
-    vp[1] = __GXData->vpTop;
-    vp[2] = __GXData->vpWd;
-    vp[3] = __GXData->vpHt;
-    vp[4] = __GXData->vpNearz;
-    vp[5] = __GXData->vpFarz;
+    vp[0] = gx->vpLeft;
+    vp[1] = gx->vpTop;
+    vp[2] = gx->vpWd;
+    vp[3] = gx->vpHt;
+    vp[4] = gx->vpNearz;
+    vp[5] = gx->vpFarz;
 }
 
 void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
@@ -378,14 +378,14 @@ void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
     right = (leftOrigin + wd) - 1;
     bottom = (topOrigin + ht) - 1;
 
-    __GXData->suScis0 = (__GXData->suScis0 & 0xFFFFF800) | topOrigin;
-    __GXData->suScis0 = (__GXData->suScis0 & 0xFF800FFF) | (leftOrigin << 12);
-    __GXData->suScis1 = (__GXData->suScis1 & 0xFFFFF800) | bottom;
-    __GXData->suScis1 = (__GXData->suScis1 & 0xFF800FFF) | (right << 12);
+    gx->suScis0 = (gx->suScis0 & 0xFFFFF800) | topOrigin;
+    gx->suScis0 = (gx->suScis0 & 0xFF800FFF) | (leftOrigin << 12);
+    gx->suScis1 = (gx->suScis1 & 0xFFFFF800) | bottom;
+    gx->suScis1 = (gx->suScis1 & 0xFF800FFF) | (right << 12);
 
-    GX_WRITE_RAS_REG(__GXData->suScis0);
-    GX_WRITE_RAS_REG(__GXData->suScis1);
-    __GXData->bpSentNot = 0;
+    GX_WRITE_RAS_REG(gx->suScis0);
+    GX_WRITE_RAS_REG(gx->suScis1);
+    gx->bpSentNot = 0;
 }
 
 /*
@@ -412,22 +412,22 @@ void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
     reg = ((u32)x_off | (u32)y_off) & 0x00FFFFFF;
     reg |= 0x59000000;
     GX_WRITE_RAS_REG(reg);
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 void GXSetClipMode(GXClipMode mode) {
     CHECK_GXBEGIN(1151, "GXSetClipMode");
     GX_WRITE_XF_REG(5, mode);
-    __GXData->bpSentNot = 1;
+    gx->bpSentNot = 1;
 }
 
 void __GXSetMatrixIndex(GXAttr matIdxAttr) {
     if (matIdxAttr < GX_VA_TEX4MTXIDX) {
-        GX_WRITE_SOME_REG4(8, 0x30, __GXData->matIdxA, -12);
-        GX_WRITE_XF_REG(24, __GXData->matIdxA);
+        GX_WRITE_SOME_REG4(8, 0x30, gx->matIdxA, -12);
+        GX_WRITE_XF_REG(24, gx->matIdxA);
     } else {
-        GX_WRITE_SOME_REG4(8, 0x40, __GXData->matIdxB, -12);
-        GX_WRITE_XF_REG(25, __GXData->matIdxB);
+        GX_WRITE_SOME_REG4(8, 0x40, gx->matIdxB, -12);
+        GX_WRITE_XF_REG(25, gx->matIdxB);
     }
-    __GXData->bpSentNot = 1;
+    gx->bpSentNot = 1;
 }

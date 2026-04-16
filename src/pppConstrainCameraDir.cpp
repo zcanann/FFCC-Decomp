@@ -4,11 +4,6 @@
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
-static const float kPppConstrainCameraDirScaleBase = 1.0f;
-static const float kPppConstrainCameraDirDistanceBase = 25.0f;
-static const float kPppConstrainCameraDirScaleMul = 1.3333f;
-static const float kPppConstrainCameraDirInitScale = 0.0f;
-
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
 static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
@@ -30,7 +25,7 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = kPppConstrainCameraDirInitScale;
+    float uVar1 = 0.0f;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -48,7 +43,7 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = kPppConstrainCameraDirInitScale;
+    float uVar1 = 0.0f;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -100,14 +95,13 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPosX();
             float cameraPosY = CameraPosY();
             float cameraPosZ = CameraPosZ();
-            float distanceBase = kPppConstrainCameraDirDistanceBase;
-            float scale = ((CameraDistance() - distanceBase) / distanceBase) + kPppConstrainCameraDirScaleBase;
-            
+            float scale = ((CameraDistance() - 25.0f) / 25.0f) + 1.0f;
+
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
-            
-            pppMngSt->m_scale.x = kPppConstrainCameraDirScaleMul * scale;
+
+            pppMngSt->m_scale.x = 1.3333f * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = kPppConstrainCameraDirScaleBase;
+            pppMngSt->m_scale.z = 1.0f;
             
             Mtx MStack_e8;
             PSMTXScale(MStack_e8, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -119,10 +113,12 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             PSMTXConcat(MStack_e8, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
             
             if (flags[0] != 0) {
-                float graphValue = value[0];
-                pppMngStPtr->m_matrix.value[0][3] = cameraDirX * graphValue + cameraPosX;
-                pppMngStPtr->m_matrix.value[1][3] = cameraDirY * graphValue + cameraPosY;
-                pppMngStPtr->m_matrix.value[2][3] = cameraDirZ * graphValue + cameraPosZ;
+                float resultZ = cameraDirZ * value[0] + cameraPosZ;
+                float resultY = cameraDirY * value[0] + cameraPosY;
+                float resultX = cameraDirX * value[0] + cameraPosX;
+                pppMngStPtr->m_matrix.value[0][3] = resultX;
+                pppMngStPtr->m_matrix.value[1][3] = resultY;
+                pppMngStPtr->m_matrix.value[2][3] = resultZ;
             }
             
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);

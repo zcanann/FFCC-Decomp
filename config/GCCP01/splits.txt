@@ -2071,6 +2071,7 @@ MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x801B2FD4 end:0x801B4F28
 	.rodata     start:0x801E6FD8 end:0x801E70B5
 	.data       start:0x8021D298 end:0x8021D3BC
+	.sdata2     start:0x80333930 end:0x80333938
 
 MSL_C/PPCEABI/bare/H/buffer_io.c:
 	.text       start:0x801B4F28 end:0x801B5294

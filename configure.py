@@ -978,7 +978,7 @@ config.libs = [
             ),
             Object(Matching, "MSL_C/PPCEABI/bare/H/errno.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/ansi_files.c", mw_version="GC/2.7"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.7"),
+            Object(Matching, "MSL_C/PPCEABI/bare/H/ansi_fp.c", mw_version="GC/2.7"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/buffer_io.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/gamecube.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/ctype.c"),

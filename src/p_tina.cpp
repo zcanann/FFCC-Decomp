@@ -1303,9 +1303,9 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     sprintf(path, s_dvd__smenu__s_801d7fb0, GetLangString__5CGameFv(&Game), fileName);
 
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xF4));
+        stage = MenuPcs.m_stageF4;
     } else {
-        stage = reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xEC));
+        stage = MenuPcs.m_menuStage;
     }
 
     m_usbStreamData.m_stageLoad = stage;

@@ -184,10 +184,10 @@ void CMenuPcs::Init()
     int i;
     int* cardChannel;
 
-    *reinterpret_cast<void**>(self + 0xEC) = nullptr;
-    *reinterpret_cast<void**>(self + 0xF0) = nullptr;
-    *reinterpret_cast<void**>(self + 0xF4) = nullptr;
-    memset(self + 0xF8, 0, 0x14);
+    m_menuStage = 0;
+    m_stageF0 = 0;
+    m_stageF4 = 0;
+    memset(m_fonts, 0, sizeof(m_fonts));
     memset(self + 0x14C, 0, 0x40);
     memset(self + 0x18C, 0, 0x1A4);
     memset(self + 0x04, 0, 0x1C);
@@ -297,8 +297,7 @@ void CMenuPcs::create()
         menuHeapSize -= GetInternal22Size__8CFontManFv(&FontMan);
     }
 
-    *reinterpret_cast<CMemory::CStage**>(self + 0xEC) =
-        Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
+    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
     *reinterpret_cast<int*>(self + 0x740) = -1;
 
     memset(self + 0x14C, 0, 0x40);
@@ -316,7 +315,7 @@ void CMenuPcs::create()
             File.SyncCompleted(fileHandle);
 
             void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
-                                                                     : *reinterpret_cast<void**>(self + 0xEC);
+                                                                     : m_menuStage;
 
             CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(kPMenuSourceFile), 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
@@ -367,12 +366,12 @@ void CMenuPcs::destroy()
         *reinterpret_cast<void**>(slot) = nullptr;
     }
 
-    ReleaseRefObject(*reinterpret_cast<void**>(self + 0xf8));
-    *reinterpret_cast<void**>(self + 0xf8) = nullptr;
+    ReleaseRefObject(m_fonts[0]);
+    m_fonts[0] = 0;
 
-    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(self + 0xec));
+    Memory.DestroyStage(m_menuStage);
     if (*(self + 0x859) != 0) {
-        *reinterpret_cast<void**>(self + 0xf0) = nullptr;
+        m_stageF0 = 0;
         *(self + 0x859) = 0;
     }
 }
@@ -389,12 +388,11 @@ void CMenuPcs::destroy()
 void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
-    u8* self = reinterpret_cast<u8*>(this);
-    CMemory::CStage* menuStage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
-    CFont** fontSlot = reinterpret_cast<CFont**>(self + 0xF8 + slot * 4);
+    CMemory::CStage* menuStage = m_menuStage;
+    CFont** fontSlot = &m_fonts[slot];
 
     if (type == 1) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
+        stage = m_stageF0;
     } else if (type < 1) {
         if (type >= 0) {
             stage = menuStage;

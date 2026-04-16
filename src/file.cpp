@@ -556,8 +556,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             System.Printf(s_drawErrorFmt, errorCode);
         }
 
-        CMenuPcs* menuPcs = &MenuPcs;
-        CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menuPcs) + 0xF8);
+        CFont* font = MenuPcs.m_fonts[0];
         int usingFallbackFont = 0;
         if (font == 0)
         {

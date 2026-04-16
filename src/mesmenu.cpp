@@ -745,11 +745,16 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  */
 void CMesMenu::onScriptChanging(char*)
 {
+    int menuIndex;
+    void** ringMenuSlots;
+
     Set__4CMesFPci((char*)this + 0x1C, 0, 0);
     *(int*)((char*)this + 0x0C) = 4;
     *(int*)((char*)this + 0x08) = 0;
-    if (*(int*)((char*)this + 0x18) < 4) {
-        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+    menuIndex = *(int*)((char*)this + 0x18);
+    if (menuIndex < 4) {
+        ringMenuSlots = (void**)((char*)&MenuPcs + 0x13C);
+        SetFade__9CRingMenuFi(ringMenuSlots[menuIndex], 1);
     }
 }
 

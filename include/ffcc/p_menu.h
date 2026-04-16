@@ -1,6 +1,7 @@
 #ifndef _FFCC_P_MENU_H_
 #define _FFCC_P_MENU_H_
 
+#include "ffcc/memory.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/system.h"
 
@@ -255,6 +256,12 @@ public:
     void AlphaNormal();
     void AlphaAdd();
     void GetFontWorld();
+
+    unsigned char m_pad04[0xEC - 0x04];
+    CMemory::CStage* m_menuStage;
+    CMemory::CStage* m_stageF0;
+    CMemory::CStage* m_stageF4;
+    CFont* m_fonts[5];
 };
 
 extern CMenuPcs MenuPcs;

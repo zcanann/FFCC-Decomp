@@ -224,6 +224,19 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
  * Address: TODO
  * Size: TODO
  */
+CFunnyShapePcs::CFunnyShapePcs()
+{
+    __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x3C);
+    __ct__11CFunnyShapeFv(reinterpret_cast<unsigned char*>(this) + 0x50);
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(reinterpret_cast<unsigned char*>(this) + 0x61BC);
+    __ct__22CPtrArray_P9_GXTexObj_Fv(reinterpret_cast<unsigned char*>(this) + 0x61D8);
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
 CFunnyShapePcs::~CFunnyShapePcs()
 {
     reinterpret_cast<CPtrArray<_GXTexObj*>*>(reinterpret_cast<u8*>(this) + 0x61D8)->~CPtrArray<_GXTexObj*>();

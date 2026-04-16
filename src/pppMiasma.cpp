@@ -38,10 +38,10 @@ struct PppMiasmaRenderStep {
     s32 m_graphId;
     s32 m_dataValIndex;
     u16 m_initWOrk;
-    u16 m_pad;
+    u8 m_pad0A[2];
     float m_stepValue;
-    s32 m_arg3;
-    u8* m_payload;
+    u8 m_arg3;
+    u8 m_payload[0x1F];
 };
 
 struct PppMiasmaRaw {
@@ -50,6 +50,16 @@ struct PppMiasmaRaw {
     u8 m_pad34[0xC];
     pppFMATRIX m_drawMatrix;
     Vec* m_meshPoints;
+};
+
+struct pppCVector {
+    u8 m_rgba[4];
+};
+
+union PackedMiasmaColor {
+    GXColor color;
+    u32 raw;
+    u8 bytes[4];
 };
 
 static inline PppMiasmaRaw* GetMiasmaRaw(pppMiasma* pppMiasma)
@@ -169,8 +179,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     PppMiasmaRenderStep* step;
     pppModelSt* model;
     s16* work;
-    u8 packedWork[4];
-    u32 packedColor;
+    PackedMiasmaColor packedWork;
+    PackedMiasmaColor packedColor;
     Vec managerPos;
     Vec cameraPos;
     float radius;
@@ -186,8 +196,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     u32 colorRaw;
     u16 i;
     u32 slice;
-    u8 tevSwapChannel;
-    u8 tevAlphaScale;
+    int tevSwapChannel;
+    int tevAlphaScale;
     bool inFarZone;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
@@ -195,10 +205,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     Mtx scaleMtx;
     Mtx localMtx;
     Mtx44 screenMtx;
-    GXColor drawColor;
-    GXColor workColor;
+    pppCVector drawColor;
     GXColor stepColor;
     u8* meshColor;
+    u8* payload;
+    u8 arg3;
+    u8 initWork;
     Vec quadA;
     Vec quadB;
 
@@ -209,20 +221,23 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     work = (s16*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
     colorOffset = param_3->m_serializedDataOffsets[1];
     radiusScale = *(float*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[3]);
+    payload = step->m_payload;
+    arg3 = step->m_arg3;
+    initWork = (u8)step->m_initWOrk;
 
     textureIndex = 0;
     model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex]);
     GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
 
-    if (step->m_payload[0x1e] == 0xFF) {
-        step->m_payload[0x1e] = 0xFE;
+    if (payload[0x1E] == 0xFF) {
+        payload[0x1E] = 0xFE;
     }
 
-    packedColor = *(u32*)((u8*)pppMiasma + 0x88 + colorOffset);
-    packedWork[0] = (u8)(work[0] >> 7);
-    packedWork[1] = (u8)(work[1] >> 7);
-    packedWork[2] = (u8)(work[2] >> 7);
-    packedWork[3] = (u8)(work[3] >> 7);
+    packedColor.raw = *(u32*)((u8*)pppMiasma + 0x88 + colorOffset);
+    packedWork.bytes[0] = (u8)(work[0] >> 7);
+    packedWork.bytes[1] = (u8)(work[1] >> 7);
+    packedWork.bytes[2] = (u8)(work[2] >> 7);
+    packedWork.bytes[3] = (u8)(work[3] >> 7);
 
     texWidth = (int)FLOAT_80331928;
     texHeight = (int)FLOAT_8033192c;
@@ -264,10 +279,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
 
     inFarZone = (FLOAT_80331938 + maxRadius) <= PSVECDistance(&cameraPos, &managerPos);
 
-    drawColor.r = inFarZone ? 0 : 0xFF;
-    drawColor.g = drawColor.r;
-    drawColor.b = drawColor.r;
-    drawColor.a = 0xFF;
+    drawColor.m_rgba[0] = inFarZone ? 0 : 0xFF;
+    drawColor.m_rgba[1] = drawColor.m_rgba[0];
+    drawColor.m_rgba[2] = drawColor.m_rgba[0];
+    drawColor.m_rgba[3] = 0xFF;
 
     for (slice = 0; slice < 2; slice++) {
         yOffset = (int)((float)slice * FLOAT_8033192c);
@@ -275,7 +290,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
         GXSetScissor(0, yOffset, (u32)FLOAT_80331928, (u32)FLOAT_8033192c);
 
-        gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
+        gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.m_rgba);
 
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             &drawColor, &miasma->m_drawMatrix, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
@@ -348,8 +363,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
 
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize, GX_LINEAR,
                                    GX_TF_RGBA8, 0);
-        if (step->m_payload[0x1D] != 0) {
-            gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
+        if (payload[0x1D] != 0) {
+            gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.m_rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX8);
             GXSetVtxDesc((GXAttr)10, GX_INDEX8);
@@ -419,23 +434,23 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 
-        if ((u8)step->m_initWOrk == 0) {
+        if (initWork == 0) {
             tevSwapChannel = 0;
-        } else if ((u8)step->m_initWOrk == 1) {
+        } else if (initWork == 1) {
             tevSwapChannel = 1;
         } else {
             tevSwapChannel = 2;
         }
 
-        if ((u8)step->m_arg3 != 2) {
-            tevAlphaScale = step->m_payload[0x1e];
+        if (arg3 != 2) {
+            tevAlphaScale = payload[0x1E];
             stepColor.r = tevAlphaScale;
             stepColor.g = tevAlphaScale;
             stepColor.b = tevAlphaScale;
             stepColor.a = tevAlphaScale;
             GXSetTevKColor((GXTevKColorID)0, stepColor);
             pppSetBlendMode(0);
-            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&packedColor);
+            GXSetChanMatColor(GX_COLOR0A0, packedColor.color);
             GXSetNumTexGens(2);
             _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
                 1, tevSwapChannel, tevSwapChannel, tevSwapChannel, tevSwapChannel);
@@ -500,15 +515,15 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
 
             pppInitBlendMode();
             pppSetBlendMode(0);
-            if ((u8)step->m_arg3 != 2) {
-                gUtil.RenderQuadTex2(quadA, quadB, *(GXColor*)&packedColor, 0, 0);
+            if (arg3 != 2) {
+                gUtil.RenderQuadTex2(quadA, quadB, packedColor.color, 0, 0);
             }
         }
 
         gUtil.InitConstantRegister();
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
-        if ((u8)step->m_arg3 != 1) {
+        if (arg3 != 1) {
             GXSetTevDirect((GXTevStageID)0);
             GXLoadTexObj(&backRgba8Tex, GX_TEXMAP0);
             GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -519,17 +534,16 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
 
             pppInitBlendMode();
             pppSetBlendMode(1);
-            drawColor.r = 0xFF;
-            drawColor.g = 0xFF;
-            drawColor.b = 0xFF;
-            drawColor.a = 0xFF;
-            GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&drawColor);
-            workColor = *(GXColor*)packedWork;
-            GXSetChanMatColor(GX_COLOR0A0, workColor);
+            drawColor.m_rgba[0] = 0xFF;
+            drawColor.m_rgba[1] = 0xFF;
+            drawColor.m_rgba[2] = 0xFF;
+            drawColor.m_rgba[3] = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)drawColor.m_rgba);
+            GXSetChanMatColor(GX_COLOR0A0, packedWork.color);
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
             GXSetNumChans(1);
 
-            if (step->m_payload[0x1D] == 0) {
+            if (payload[0x1D] == 0) {
                 GXSetTevDirect((GXTevStageID)0);
                 GXLoadTexObj(&backRgba8Tex, GX_TEXMAP0);
                 _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
@@ -557,9 +571,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
                 _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 0, 5, 7);
 
                 tevAlphaScale = 0;
-                if (step->m_payload[0x1C] == 1) {
+                if (payload[0x1C] == 1) {
                     tevAlphaScale = 1;
-                } else if (step->m_payload[0x1C] == 2) {
+                } else if (payload[0x1C] == 2) {
                     tevAlphaScale = 2;
                 }
                 _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, tevAlphaScale, 1, 0);
@@ -589,9 +603,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
                 _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
                 _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 0, 5, 7);
                 tevAlphaScale = 0;
-                if (step->m_payload[0x1C] == 1) {
+                if (payload[0x1C] == 1) {
                     tevAlphaScale = 1;
-                } else if (step->m_payload[0x1C] == 2) {
+                } else if (payload[0x1C] == 2) {
                     tevAlphaScale = 2;
                 }
                 _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, tevAlphaScale, 1, 0);
@@ -605,7 +619,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             quadB.x = FLOAT_80331928;
             quadB.y = (float)yOffset + FLOAT_8033192c;
             quadB.z = FLOAT_8033193c;
-            gUtil.RenderQuad(quadA, quadB, *(GXColor*)packedWork, 0, 0);
+            gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }
 
         gUtil.InitConstantRegister();

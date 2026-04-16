@@ -50,12 +50,12 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
-	Quaternion local_60;
-	Quaternion local_70;
-	Quaternion local_80;
 	Vec local_8c;
 	Vec local_ec;
 	Vec local_f8;
+	Quaternion local_60;
+	Quaternion local_70;
+	Quaternion local_80;
 
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;

@@ -260,13 +260,12 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int serializedOffset;
-    int graphId;
+    u32 graphId;
     LocationTitleWork* work;
     int graphFrame;
     int fadeDivisor;
     LocationTitleParticle* particle;
-    LocationTitleParticle* particles;
-    long** shapeTable;
+    long* shapeTable;
 
     serializedOffset = *param_3->m_serializedDataOffsets;
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
@@ -278,17 +277,15 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     graphId = pppLocationTitle->m_graphId;
     graphFrame = GetGraphFrameFromId(graphId);
     fadeDivisor = -1;
-    particles = (LocationTitleParticle*)work->m_particles;
-    shapeTable =
-        *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    particle = (LocationTitleParticle*)work->m_particles;
+    shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
         fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
     }
 
-    particle = particles;
-
     for (int i = 0; i < work->m_count; i++) {
+        GXColor color;
         Mtx model;
         Vec worldPos;
 
@@ -302,21 +299,18 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         model[1][3] = worldPos.y;
         model[2][3] = worldPos.z;
 
-        pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
+        pppSetDrawEnv((pppCVECTOR*)&particle->m_color, (pppFMATRIX*)0, FLOAT_80330ee0, 0, 0, 0, 0, 0, 1, 0);
 
         if (fadeDivisor >= 0) {
-            u8 alpha;
-            int fadeStep;
-
-            alpha = ((u8*)&particle->m_color)[3];
-            fadeStep = alpha / fadeDivisor;
-            ((u8*)&particle->m_color)[3] = (u8)(alpha - fadeStep);
+            u8 alpha = ((u8*)&particle->m_color)[3];
+            ((u8*)&particle->m_color)[3] = (u8)(alpha - (alpha / fadeDivisor));
         }
 
-        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
+        color = *(GXColor*)&particle->m_color;
+        GXSetChanMatColor(GX_COLOR0A0, color);
         GXLoadPosMtxImm(model, 0);
         pppSetBlendMode(param_2->m_blendMode);
-        pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, param_2->m_blendMode);
+        pppDrawShp(shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, param_2->m_blendMode);
         particle++;
     }
 }

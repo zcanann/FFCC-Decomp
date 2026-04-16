@@ -29,6 +29,12 @@ extern unsigned long __float_nan[];
 extern unsigned long __float_huge[];
 extern unsigned long __float_max[];
 extern unsigned long __float_epsilon[];
+extern unsigned long __double_max[];
+extern unsigned long __double_huge[];
+extern unsigned long __double_min[];
+
+#define DBL_MAX  (*(double*)__double_max)
+#define DBL_MIN  (*(double*)__double_min)
 
 inline int __fpclassifyf(float __value)
 {

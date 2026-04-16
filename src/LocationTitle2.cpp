@@ -153,7 +153,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         Mtx model;
         Vec transformedPos;
 
-        if (graphFrame <= (int)particle->m_frame) {
+        if ((int)particle->m_frame >= graphFrame) {
             transformedPos.x = transformedPos.y = transformedPos.z = 0.0f;
             PSMTXIdentity(model);
             model[0][0] = pppMngStPtr->m_scale.x * locationTitle->m_localMatrix.value[0][0];

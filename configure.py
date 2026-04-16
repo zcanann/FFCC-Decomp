@@ -937,7 +937,7 @@ config.libs = [
                 cflags=replace_flag_prefix(cflags_runtime, "-Cpp_exceptions ", "-Cpp_exceptions off"),
             ),
             Object(
-                Matching,
+                NonMatching,
                 "Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp",
                 cflags=replace_flag_prefix(cflags_runtime, "-inline ", "-inline auto,deferred"),
                 mw_version="GC/2.7",

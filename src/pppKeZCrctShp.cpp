@@ -37,9 +37,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
 
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.x = 0.0f;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);

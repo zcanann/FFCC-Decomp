@@ -20,7 +20,10 @@ extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 // External data references
-extern char DAT_80330f50[];
+extern char DAT_80330f50;
+extern f32 FLOAT_80330f48;
+extern f32 FLOAT_80330f4c;
+extern f64 DOUBLE_80330f58;
 
 static int GetGraphFrameFromId(s32 graphId)
 {
@@ -63,6 +66,11 @@ struct LocationTitle2ModelRaw {
     u8* m_nodes;
     u8 m_padA8[0x24];
     LocationTitle2AnimRaw* m_anim;
+};
+
+struct LocationTitle2MngRaw {
+    u8 m_pad[0xDC];
+    CGObject* m_owner;
 };
 
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
@@ -231,7 +239,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     if (work->m_particles == 0) {
         LocationTitle2Particle* particles;
         CGObject* owner;
-        CCharaPcs::CHandle* handle;
         CChara::CModel* model;
         LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
@@ -244,22 +251,18 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
 
-        owner = (CGObject*)pppMngStPtr->m_owner;
-        handle = 0;
-        if (owner->m_charaModelHandle != 0) {
-            handle = owner->m_charaModelHandle;
-        }
+        owner = ((LocationTitle2MngRaw*)pppMngStPtr)->m_owner;
         model = 0;
-        if (handle != 0) {
-            model = handle->m_model;
+        if (owner->m_charaModelHandle != 0) {
+            model = owner->m_charaModelHandle->m_model;
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);
+        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, &DAT_80330f50);
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
-        zOffset = 1.0f;
+        zOffset = FLOAT_80330f4c;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (int frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
@@ -299,7 +302,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
-                stepScale = 1.0f / (float)(stepCount + 1);
+                stepScale = FLOAT_80330f4c / (float)(stepCount + 1);
                 interpIt = interp;
                 PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &stepDir);
 
@@ -343,7 +346,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
         }
 
-        SetFrame__Q26CChara6CModelFf(0.0f, model);
+        SetFrame__Q26CChara6CModelFf(FLOAT_80330f48, model);
     }
 }
 
@@ -384,7 +387,7 @@ extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTit
     LocationTitle2Work* work;
     f32 value;
 
-    value = 0.0f;
+    value = FLOAT_80330f48;
     work = (LocationTitle2Work*)((char*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;

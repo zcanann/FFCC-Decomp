@@ -82,7 +82,7 @@ typedef struct mem_pool_obj {
 
 } mem_pool_obj;
 
-static unsigned char initialized = 0;
+static int initialized = 0;
 
 /*
  * TODO: Remove this note block once linkage has been resolved.
@@ -343,9 +343,9 @@ inline void __init_pool_obj(__mem_pool* pool_obj) {
 static inline __mem_pool* get_malloc_pool(void) {
     static __mem_pool protopool;
     static unsigned char init = 0;
-    if (!initialized) {
+    if (!init) {
         __init_pool_obj(&protopool);
-        initialized = 1;
+        init = 1;
     }
 
     return &protopool;

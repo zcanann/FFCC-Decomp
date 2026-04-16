@@ -84,109 +84,6 @@ typedef struct mem_pool_obj {
 
 static unsigned char initialized = 0;
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - Block_subBlock and allocate_from_fixed_pools are the only remaining code
- *   mismatches in alloc.c
- * - the failure mode is expression / register-shape sensitive, not missing
- *   control flow or data structure recovery
- *
- * Most useful probe so far:
- * - a direct rewrite of Block_subBlock toward the literal Ghidra shape
- *   regressed badly instead of improving
- * - the existing struct-based source is therefore already closer to the
- *   original MWCC output than the more mechanical decomp translation
- * - typed/local-order probes in allocate_from_fixed_pools were also not enough
- *   on their own; one explicit start/cursor split for the fixed-subblock chain
- *   regressed sharply instead of improving
- * - a follow-up cleanup that removed the local pool_sizes/head/tail temporaries
- *   and wrote the ring links directly through fs->head_/fs->tail_ also held
- *   completely flat, so those convenience locals are not the remaining issue
- * - replacing the local __msize_inline(block) use with the explicit fixed-pool
- *   vs var-pool branch also held completely flat, so the msize source spelling
- *   is not what drives the remaining register mismatch
- * - a follow-up Block_subBlock cleanup that removed the separate was_alloc
- *   temporary and folded those writes under if (!was_free) also held
- *   completely flat, so that second boolean lifetime is not the key blocker
- * - switching the fixed-subblock chain loop from raw char* temporaries to typed
- *   FixSubBlock* cursor/next temporaries also held completely flat, so the
- *   remaining mismatch is not just the cursor typing inside that loop
- * - moving the local old_size capture in Block_subBlock down to the same spot
- *   used by the shared MSL source in super_mario_strikers also held completely
- *   flat, so that small source-order difference is not what drives the split-path
- *   register mismatch
- * - a follow-up attempt to mirror the Ghidra/object shape more directly by
- *   spelling out the 8-at-a-time fixed-subblock chain setup in
- *   allocate_from_fixed_pools regressed badly (95.11% -> 60.69%), so the
- *   remaining blocker is not "just force the visible unrolled loop" either
- * - moving the local FixBlock* cast and first FixSubBlock* base pointer up to
- *   immediately after __msize_inline(block), then using that b local for the
- *   empty-ring initialization, also held completely flat; that early b/p
- *   lifetime is not what drives the current register mismatch
- * - a follow-up probe that stored b->start_ before the chain loop and then
- *   advanced a single typed FixSubBlock* cursor through p->next_ regressed
- *   sharply (95.11% -> 85.92%), so the remaining blocker is not "just use the
- *   direct typed cursor and seed start_ earlier" either
- * - dropping the separate fix_size local and writing client_size_/sub_size
- *   directly from fix_pool_sizes[i] regressed slightly (95.11% -> 94.92%), so
- *   that explicit fix_size temporary is still closer to target than the more
- *   direct indexing spelling
- * - removing the separate typed p local in allocate_from_fixed_pools and
- *   deriving the `+0x14` subblock base directly from `b` both for the chain
- *   loop and the final start_ store held completely flat, so the missing
- *   `addi r?, r3, 0x14` shape in the current diff is not fixed by just
- *   collapsing that local
- * - reordering the fixed-pool setup so `num_subblocks` is computed from the
- *   direct `(fix_size + 4)` expression before assigning the reusable
- *   `sub_size` temporary also held completely flat, so that source-order seam
- *   is not enough on its own to recover the target register flow
- * - a fresh objdiff pass on latest main showed the first
- *   allocate_from_fixed_pools diffs already start at the `__msize_inline`
- *   decode / empty-ring setup boundary before the unrolled fixed-subblock
- *   chain, so future probes should not overfocus on just the chain body
- * - reordering that setup block to mirror the Ghidra/object value flow more
- *   literally (`b`, then `fix_size`, then `head`, then `p`, then `sub_size`,
- *   then `tail`, then `num_subblocks`) also held completely flat, so the
- *   remaining mismatch is not just the visible assignment order around the
- *   `__msize_inline` result either
- * - a Block_subBlock follow-up that stopped carrying block_val/block_or_1 and
- *   instead wrote `start->block = (((unsigned long)start->block & ~1) | 1);`
- *   then reused `start->block` for new_sb->block also held completely flat, so
- *   that shared block-tag value is not the remaining register-lifetime blocker
- * - spelling the first fixed-subblock base as `(FixSubBlock*)(b + 1)` instead
- *   of `(FixSubBlock*)((char*)b + 0x14)` regressed slightly
- *   (95.11% -> 94.81%), so the current raw-byte base expression is still
- *   closer to target than the cleaner typed-step spelling
- * - a newer "target-looking" probe that combined `msize -= 0x14`, a separate
- *   `start = (FixSubBlock*)((char*)block + 0x14)` base, and a single advancing
- *   typed `p` cursor loop held completely flat, so that exact setup/order/
- *   cursor combination is not the remaining lever either
- * - another follow-up that removed the separate `msize` / `sub_size` locals,
- *   front-loaded `p = (FixSubBlock*)((char*)b + 0x14)`, and computed
- *   `num_subblocks` directly from `__msize_inline(block)` and `fix_size + 4`
- *   also held completely flat, so that more target-looking decode/order
- *   combination is not enough either
- * - a fresh late-tail `.sbss` audit also ruled out one tempting map-only
- *   cleanup: although the old PAL/EN maps only expose local `init$193` in
- *   alloc.c, the current extracted GCCP01 target `alloc.o` still carries a
- *   separate local `initialized` alongside `init$57` and `protopool$56`; so
- *   deleting the file-scope `initialized` regresses the live object on this
- *   branch and is not a keepable reclaim
- * - a very small Block_subBlock probe that only swapped the two obvious stores
- *   to `start` (`start->size = requested_size;` before the tagged
- *   `start->block = ...`) was actively wrong: it dropped
- *   `allocate_from_fixed_pools` from `95.11%` to `73.65%` through shared code
- *   motion, so the target definitely does not want that assignment order
- *
- * Why this matters:
- * - further work here should stay surgical and preserve the current high-level
- *   structure
- * - allocate_from_fixed_pools still looks closest to a real win, with the
- *   remaining mismatch concentrated in the fixed-subblock chain setup loop and
- *   nearby temporaries
- */
 
 static void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc);
 static SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz);
@@ -463,29 +360,29 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     }
 
     sb = start;
-    sb_size = SubBlock_size(start);
+    sb_size = SubBlock_size(sb);
     max_size = sb_size;
 
     while (sb_size < requested_size) {
-        start = start->next;
-        sb_size = SubBlock_size(start);
+        sb = sb->next;
+        sb_size = SubBlock_size(sb);
         if (max_size < sb_size) {
             max_size = sb_size;
         }
-        if (start == sb) {
+        if (sb == start) {
             block->max_size = max_size;
             return 0;
         }
     }
 
     if (sb_size - requested_size >= 0x50) {
-        SubBlock_split(start, requested_size);
+        SubBlock_split(sb, requested_size);
     }
 
-    Block_start(block) = start->next;
-    Block_unlink(block, start);
+    Block_start(block) = sb->next;
+    Block_unlink(block, sb);
 
-    return start;
+    return sb;
 }
 
 /*
@@ -636,10 +533,10 @@ static inline void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* n
     prev->next_ = ths;
     next->prev_ = ths;
     ths->client_size_ = fix_pool_sizes[index];
-    p = (char*)chunk;
-    ths->start_ = chunk;
     fixSubBlock_size = fix_pool_sizes[index] + 4;
     n = chunk_size / fixSubBlock_size;
+    ths->start_ = chunk;
+    p = (char*)chunk;
     for (k = 0; k < n - 1; k++) {
         np = p + fixSubBlock_size;
         ((FixSubBlock*)p)->block_ = ths;

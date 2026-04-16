@@ -348,9 +348,9 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     if (pYmMiasma->m_dataValIndex != 0xffff) {
-        long* shape = (*(long***)pppEnvStPtr->m_particleColors)[pYmMiasma->m_dataValIndex];
+        long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
 
-        pppCalcFrameShape(shape, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,
+        pppCalcFrameShape(*shapeTable, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,
             (short)pYmMiasma->m_shapeFrameStep);
     }
 }

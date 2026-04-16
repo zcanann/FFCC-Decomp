@@ -20,6 +20,11 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 
 class CMaterial;
 
+struct Vec2d {
+    float x;
+    float y;
+};
+
 template <class T>
 class CPtrArray
 {
@@ -302,14 +307,17 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
 {
     int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
     int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
-    float* minUvF = (float*)&minUv;
-    float* maxUvF = (float*)&maxUv;
     const float uvScale = FLOAT_80330108;
+    float uvValue;
 
-    minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * uvScale;
-    minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * uvScale;
-    maxUvF[0] = (float)*(short*)(shapeEntry + 0x3b) * uvScale;
-    maxUvF[1] = (float)*(short*)(shapeEntry + 0x3d) * uvScale;
+    uvValue = (float)*(short*)(shapeEntry + 0x13);
+    minUv.x = uvValue * uvScale;
+    uvValue = (float)*(short*)(shapeEntry + 0x15);
+    minUv.y = uvValue * uvScale;
+    uvValue = (float)*(short*)(shapeEntry + 0x3b);
+    maxUv.x = uvValue * uvScale;
+    uvValue = (float)*(short*)(shapeEntry + 0x3d);
+    maxUv.y = uvValue * uvScale;
 }
 
 /*

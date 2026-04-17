@@ -274,11 +274,13 @@ p_tina.cpp:
 	extabindex  start:0x8000C910 end:0x8000CA9C
 	.text       start:0x80051F38 end:0x80053D04
 	.ctors      start:0x801D5404 end:0x801D5408
+	.sbss       start:0x8032ED50 end:0x8032ED68
 
 pppPart.cpp:
 	extab       start:0x80006D48 end:0x80006E80
 	extabindex  start:0x8000CA9C end:0x8000CC70
 	.text       start:0x80053D04 end:0x80057794
+	.sbss       start:0x8032ED68 end:0x8032ED70
 
 partMng.cpp:
 	extab       start:0x80006E80 end:0x80007020

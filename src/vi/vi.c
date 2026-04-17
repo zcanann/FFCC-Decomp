@@ -131,6 +131,13 @@ static u32 FBSet;
 
 // prototypes
 static u32 getCurrentFieldEvenOdd(void);
+void __VIEnableRawPositionInterrupt(s16 x, s16 y, void (*callback)(s16, s16));
+void (*__VIDisableRawPositionInterrupt())(s16, s16);
+void __VIDisplayPositionToXY(u32 hct, u32 vct, s16* x, s16* y);
+void __VISetLatchMode(u32 mode);
+int __VIGetLatch0Position(s16* px, s16* py);
+int __VIGetLatch1Position(s16* px, s16* py);
+int __VIGetLatchPosition(u32 port, s16* px, s16* py);
 
 
 static u32 getEncoderType(void) {
@@ -969,6 +976,20 @@ u32 VIGetRetraceCount(void) {
     return retraceCount;
 }
 
+static void GetCurrentDisplayPosition(u32* hct, u32* vct) {
+    u32 hcount, vcount0, vcount;
+    vcount = __VIRegs[VI_VERT_COUNT] & 0x7FF;
+
+    do {
+        vcount0 = vcount;
+        hcount = __VIRegs[VI_HORIZ_COUNT] & 0x7FF;
+        vcount = __VIRegs[VI_VERT_COUNT] & 0x7FF;
+    } while (vcount0 != vcount);
+
+    *hct = hcount;
+    *vct = vcount;
+}
+
 inline static u32 getCurrentHalfLine(void) {
     u32 hcount;
     u32 vcount0;
@@ -1044,6 +1065,22 @@ u32 VIGetTvFormat(void) {
     return format;
 }
 
+u32 VIGetScanMode(void) {
+    u32 scanMode;
+    BOOL enabled = OSDisableInterrupts();
+
+    if ((u32)(__VIRegs[54] & 1) == 1) {
+        scanMode = 2;
+    } else if (!((__VIRegs[1] & (1 << 2)) >> 2)) {
+        scanMode = 0;
+    } else {
+        scanMode = 1;
+    }
+    
+    OSRestoreInterrupts(enabled);
+    return scanMode;
+}
+
 u32 VIGetDTVStatus(void) {
     u32 dtvStatus;
     BOOL enabled = OSDisableInterrupts();
@@ -1051,6 +1088,16 @@ u32 VIGetDTVStatus(void) {
     dtvStatus = __VIRegs[55] & 3;
     OSRestoreInterrupts(enabled);
     return dtvStatus & 1;
+}
+
+VITiming* timingExtra;
+void (*PositionCallback)(s16, s16);
+
+VITiming* __VISetExtraTiming(VITiming* t) {
+    VITiming* old = timingExtra;
+
+    timingExtra = t;
+    return old;
 }
 
 void __VISetAdjustingValues(s16 x, s16 y) {
@@ -1078,4 +1125,171 @@ void __VIGetAdjustingValues(s16* x, s16* y) {
     *x = displayOffsetH;
     *y = displayOffsetV;
     OSRestoreInterrupts(enabled);
+}
+
+// DEBUG NONMATCHING - wrong reg use, equivalent
+void __VIEnableRawPositionInterrupt(s16 x, s16 y, void (*callback)(s16, s16)) {
+    BOOL enabled;
+    u32 halfLine;
+    u32 halfLineOff;
+
+    enabled = OSDisableInterrupts();
+    __VIRegs[29] = x + 1U;
+    __VIRegs[31] = x + 1U;
+
+    if (HorVer.nonInter == 0) {
+        if (y & 1) {
+            halfLineOff = CurrTiming->prbEven + ((CurrTiming->equ * 3) + CurrTiming->nhlines);
+            __VIRegs[30] = (((halfLineOff / 2) + (y / 2)) + 1) | 0x1000;
+        } else {
+            halfLineOff = CurrTiming->prbOdd + (CurrTiming->equ * 3);
+            __VIRegs[28] = (((halfLineOff / 2) + (y / 2)) + 1) | 0x1000;
+        }
+    } else if (HorVer.nonInter == 1) {
+        ASSERTLINE(2702, (y & 1) == 0);
+        halfLine = CurrTiming->prbOdd + ((CurrTiming->equ * 3)) + y;
+        __VIRegs[28] = ((halfLine / 2) + 1) | 0x1000;
+        __VIRegs[30] = (((halfLine + CurrTiming->nhlines) / 2) + 1) | 0x1000;
+    } else if (HorVer.nonInter == 2) {
+        halfLine = CurrTiming->prbOdd + ((CurrTiming->equ * 3)) + y;
+        __VIRegs[28] = (halfLine + 1) | 0x1000;
+        __VIRegs[30] = 0;
+    }
+
+    PositionCallback = callback;
+    OSRestoreInterrupts(enabled);
+}
+
+void (*__VIDisableRawPositionInterrupt())(s16, s16) {
+    BOOL enabled;
+    void (*old)(s16, s16);
+
+    enabled = OSDisableInterrupts();
+    __VIRegs[28] = 0;
+    __VIRegs[30] = 0;
+
+    old = PositionCallback;
+    PositionCallback = 0;
+    OSRestoreInterrupts(enabled);
+    return old;
+}
+
+void __VIDisplayPositionToXY(u32 hct, u32 vct, s16* x, s16* y) {
+    u32 halfLine = ((vct - 1) << 1) + ((hct - 1) / CurrTiming->hlw);
+
+    if (HorVer.nonInter == VI_INTERLACE) {
+        if (halfLine < CurrTiming->nhlines) {
+            if (halfLine < CurrTiming->equ * 3 + CurrTiming->prbOdd) {
+                *y = -1;
+            } else if (halfLine >= CurrTiming->nhlines - CurrTiming->psbOdd) {
+                *y = -1;
+            } else {
+                *y = (s16)((halfLine - CurrTiming->equ * 3 - CurrTiming->prbOdd) & ~1);
+            }
+        } else {
+            halfLine -= CurrTiming->nhlines;
+
+            if (halfLine < CurrTiming->equ * 3 + CurrTiming->prbEven) {
+                *y = -1;
+            } else if (halfLine >= CurrTiming->nhlines - CurrTiming->psbEven) {
+                *y = -1;
+            } else {
+                *y = (s16)(((halfLine - CurrTiming->equ * 3 - CurrTiming->prbEven) & ~1) + 1);
+            }
+        }
+    } else if (HorVer.nonInter == VI_NON_INTERLACE) {
+        if (halfLine >= CurrTiming->nhlines) {
+            halfLine -= CurrTiming->nhlines;
+        }
+
+        if (halfLine < CurrTiming->equ * 3 + CurrTiming->prbOdd) {
+            *y = -1;
+        } else if (halfLine >= CurrTiming->nhlines - CurrTiming->psbOdd) {
+            *y = -1;
+        } else {
+            *y = (s16)((halfLine - CurrTiming->equ * 3 - CurrTiming->prbOdd) & ~1);
+        }
+    } else if (HorVer.nonInter == VI_PROGRESSIVE) {
+        if (halfLine < CurrTiming->nhlines) {
+            if (halfLine < CurrTiming->equ * 3 + CurrTiming->prbOdd) {
+                *y = -1;
+            } else if (halfLine >= CurrTiming->nhlines - CurrTiming->psbOdd) {
+                *y = -1;
+            } else {
+                *y = (s16)(halfLine - CurrTiming->equ * 3 - CurrTiming->prbOdd);
+            }
+        } else {
+            halfLine -= CurrTiming->nhlines;
+
+            if (halfLine < CurrTiming->equ * 3 + CurrTiming->prbEven) {
+                *y = -1;
+            } else if (halfLine >= CurrTiming->nhlines - CurrTiming->psbEven) {
+                *y = -1;
+            } else
+                *y = (s16)((halfLine - CurrTiming->equ * 3 - CurrTiming->prbEven) & ~1);
+        }
+    }
+
+    *x = (s16)(hct - 1);
+}
+
+void __VIGetCurrentPosition(s16* x, s16* y) {
+    u32 hcount, vcount;
+    GetCurrentDisplayPosition(&hcount, &vcount);
+    __VIDisplayPositionToXY(hcount, vcount, x, y);
+}
+
+void __VISetLatchMode(u32 mode) {
+    u32 reg;
+
+    reg = __VIRegs[1];
+    SET_REG_FIELD(2834, reg, 2, 4, mode);
+    SET_REG_FIELD(2835, reg, 2, 6, mode);
+    __VIRegs[1] = reg;
+}
+
+#pragma dont_inline on
+int __VIGetLatch0Position(s16* px, s16* py) {
+    u32 hcount;
+    u32 vcount;
+
+    if (((__VIRegs[32] & 0x8000) >> 15) != 0) {
+        vcount = __VIRegs[32] & 0x7FF;
+        hcount = __VIRegs[33] & 0x7FF;
+        __VIRegs[32] = 0;
+        __VIRegs[33] = 0;
+        __VIDisplayPositionToXY(hcount, vcount, px, py);
+        return 1;
+    }
+
+    *px = *py = -1;
+    return 0;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+int __VIGetLatch1Position(s16* px, s16* py) {
+    u32 hcount;
+    u32 vcount;
+
+    if (((__VIRegs[34] & 0x8000) >> 15) != 0) {
+        vcount = __VIRegs[34] & 0x7FF;
+        hcount = __VIRegs[35] & 0x7FF;
+        __VIRegs[34] = 0;
+        __VIRegs[35] = 0;
+        __VIDisplayPositionToXY(hcount, vcount, px, py);
+        return 1;
+    }
+
+    *px = *py = -1;
+    return 0;
+}
+#pragma dont_inline reset
+
+int __VIGetLatchPosition(u32 port, s16* px, s16* py) {
+    if (port == 0) {
+        return __VIGetLatch0Position(px, py);
+    } else {
+        return __VIGetLatch1Position(px, py);
+    }
 }

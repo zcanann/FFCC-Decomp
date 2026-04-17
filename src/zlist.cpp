@@ -2,7 +2,7 @@
 
 #include "ffcc/p_MaterialEditor.h"
 
-char s_zlist_cpp_801d7dc0[] = "zlist.cpp";
+static const char s_zlist_cpp_801d7dc0[] = "zlist.cpp";
 
 /*
  * --INFO--
@@ -73,7 +73,7 @@ void* ZLIST::GetDataNext(_ZLISTITEM** it)
  */
 bool ZLIST::AddTail(void* data)
 {
-	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, s_zlist_cpp_801d7dc0, 0x107) _ZLISTITEM;
+	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, const_cast<char*>(s_zlist_cpp_801d7dc0), 0x107) _ZLISTITEM;
 
 	if (newItem == (_ZLISTITEM*)nullptr)
 	{

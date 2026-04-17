@@ -82,7 +82,7 @@ typedef struct mem_pool_obj {
 
 } mem_pool_obj;
 
-static unsigned char initialized = 0;
+static int initialized = 0;
 
 
 static void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc);
@@ -249,9 +249,9 @@ static void __init_pool_obj(__mem_pool* pool_obj) {
 static __mem_pool* get_malloc_pool(void) {
     static __mem_pool protopool;
     static unsigned char init = 0;
-    if (!initialized) {
+    if (!init) {
         __init_pool_obj(&protopool);
-        initialized = 1;
+        init = 1;
     }
 
     return &protopool;

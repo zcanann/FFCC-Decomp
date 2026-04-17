@@ -20,7 +20,7 @@ extern unsigned int m_table_desc2__8CMenuPcs[];
 extern unsigned int m_table_desc3__8CMenuPcs[];
 extern unsigned int m_table_desc4__8CMenuPcs[];
 extern unsigned int m_table_desc5__8CMenuPcs[];
-extern unsigned char gMenuProcessTable[];
+extern unsigned int m_table__8CMenuPcs[];
 
 struct McListInfo
 {
@@ -65,7 +65,7 @@ public:
     CMenuPcs()
     {
         unsigned int* mcCtrl = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x20);
-        unsigned int* table = reinterpret_cast<unsigned int*>(gMenuProcessTable);
+        unsigned int* table = m_table__8CMenuPcs;
 
         mcCtrl[0] = 0;
         mcCtrl[1] = 0;
@@ -262,6 +262,7 @@ public:
     CMemory::CStage* m_stageF0;
     CMemory::CStage* m_stageF4;
     CFont* m_fonts[5];
+    unsigned char m_pad10C[0x8A0 - 0x10C];
 };
 
 extern CMenuPcs MenuPcs;

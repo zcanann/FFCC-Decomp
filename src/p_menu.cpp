@@ -15,7 +15,6 @@
 #include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
 extern "C" {
-extern unsigned char gMenuProcessTable[];
 extern const f32 kMenuInitOne;
 extern const f32 kMenuOrthoBottom;
 extern const f32 kMenuOrthoRight;
@@ -29,8 +28,8 @@ extern const f32 kMenuOrthoFar;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-CMenuPcs MenuPcs;
-u8 gMenuProcessTable[0x15C];
+static unsigned char ARRAY_802ea1a0[0xC];
+CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
 static const char kMenuPcsStageName[] = "CMenuPcs";
 static const char kPMenuSourceFile[] = "p_menu.cpp";
 
@@ -47,10 +46,9 @@ struct MenuFontTlutPalette
     _GXColor shadow;
     _GXColor highlight;
 };
-
-u8 ARRAY_802ea1a0[0x20];
 extern void* __vt__8CManager;
 extern "C" void* __vt__8CMenuPcs[];
+extern unsigned int m_table__8CMenuPcs[];
 extern int DAT_8020ef9c[];
 extern u8 sMenuFontShadeTable[];
 extern u8 sMenuFontPrimaryAlphaTable[];
@@ -147,7 +145,7 @@ extern "C" void __sinit_p_menu_cpp(void)
 
     __register_global_object(&MenuPcs, reinterpret_cast<void*>(__dt__8CMenuPcsFv), ARRAY_802ea1a0);
 
-    unsigned int* table = reinterpret_cast<unsigned int*>(gMenuProcessTable);
+    unsigned int* table = m_table__8CMenuPcs;
     table[1] = m_table_desc0__8CMenuPcs[0];
     table[2] = m_table_desc0__8CMenuPcs[1];
     table[3] = m_table_desc0__8CMenuPcs[2];
@@ -271,9 +269,7 @@ void CMenuPcs::Quit()
  */
 int CMenuPcs::GetTable(unsigned long index)
 {
-    unsigned char* table = gMenuProcessTable;
-    unsigned long offset = index * 0x15c;
-    return (int)(table + offset);
+    return reinterpret_cast<int>(m_table__8CMenuPcs + index * 0x57);
 }
 
 /*

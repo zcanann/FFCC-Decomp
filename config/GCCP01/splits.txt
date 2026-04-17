@@ -37,6 +37,7 @@ graphic.cpp:
 	extabindex  start:0x8000AFFC end:0x8000B1DC
 	.text       start:0x80016400 end:0x80019F88
 	.ctors      start:0x801D53AC end:0x801D53B0
+	.bss        start:0x80230E48 end:0x8023C4D8
 	.sbss       start:0x8032EC48 end:0x8032EC4C
 
 main.cpp:
@@ -118,6 +119,7 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
+	.bss        start:0x80245640 end:0x802456CC
 	.sdata      start:0x8032E8B0 end:0x8032E8B8
 
 mapmesh.cpp:
@@ -207,6 +209,7 @@ p_light.cpp:
 	extabindex  start:0x8000C520 end:0x8000C610
 	.text       start:0x80047E00 end:0x8004A4A0
 	.ctors      start:0x801D53F8 end:0x801D53FC
+	.data       start:0x801EA430 end:0x801EA484
 	.bss        start:0x80268F88 end:0x8026D338
 
 mapanim.cpp:
@@ -222,6 +225,7 @@ p_MaterialEditor.cpp:
 	extabindex  start:0x8000C6AC end:0x8000C70C
 	.text       start:0x8004B21C end:0x8004C71C
 	.ctors      start:0x801D53FC end:0x801D5400
+	.bss        start:0x8026D338 end:0x8026D724
 
 mapshadow.cpp:
 	extab       start:0x80006AAC end:0x80006AC4
@@ -841,6 +845,7 @@ p_menu.cpp:
 	extabindex  start:0x8000DF6C end:0x8000E0A4
 	.text       start:0x80093E78 end:0x800977D8
 	.ctors      start:0x801D541C end:0x801D5420
+	.bss        start:0x802EA1A0 end:0x802EAA60
 
 p_gba.cpp:
 	extab       start:0x80007CE0 end:0x80007D20
@@ -879,6 +884,7 @@ ringmenu.cpp:
 	extab       start:0x80007F78 end:0x80007FC8
 	extabindex  start:0x8000E44C end:0x8000E4C4
 	.text       start:0x800A2DD4 end:0x800A538C
+	.data       start:0x8020FAE8 end:0x8020FB0C
 
 pppYmMelt.cpp:
 	extab       start:0x80007FC8 end:0x80007FE8
@@ -895,6 +901,8 @@ joybus.cpp:
 	extabindex  start:0x8000E500 end:0x8000E8D8
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
+	.bss        start:0x802EAAB0 end:0x802F2600
+	.sbss       start:0x8032EDB8 end:0x8032EDBC
 
 cflat_r2system.cpp:
 	extab       start:0x80008280 end:0x80008338
@@ -1238,7 +1246,7 @@ p_dbgmenu.cpp:
 	extabindex  start:0x80010810 end:0x800108AC
 	.text       start:0x8012B710 end:0x8012D3FC
 	.ctors      start:0x801D5440 end:0x801D5444
-	.bss        start:0x80306708 end:0x80309178
+	.bss        start:0x80306708 end:0x80309174
 
 pppChangeBGColor.cpp:
 	.text       start:0x8012D3FC end:0x8012D458

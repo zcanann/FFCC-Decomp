@@ -67,7 +67,7 @@ p_usb.cpp:
 	.text       start:0x8001FF6C end:0x80020494
 	.ctors      start:0x801D53BC end:0x801D53C0
 	.rodata     start:0x801D6D14 end:0x801D6D28
-	.data       start:0x801E8690 end:0x801E8854
+	.data       start:0x801E8690 end:0x801E8818
 	.bss        start:0x80244028 end:0x8024413C
 	.sbss       start:0x8032EC68 end:0x8032EC70
 
@@ -76,6 +76,7 @@ pad.cpp:
 	extabindex  start:0x8000B4AC end:0x8000B4D0
 	.text       start:0x80020494 end:0x800211D4
 	.ctors      start:0x801D53C0 end:0x801D53C4
+	.data       start:0x801E8818 end:0x801E8838
 	.bss        start:0x80244140 end:0x8024430C
 
 stopwatch.cpp:
@@ -89,6 +90,7 @@ system.cpp:
 	extabindex  start:0x8000B53C end:0x8000B5D8
 	.text       start:0x8002147C end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
+	.data       start:0x801E8838 end:0x801E8898
 	.bss        start:0x80244340 end:0x802455C0
 
 usb.cpp:
@@ -1792,7 +1794,7 @@ gx/GXFifo.c:
 gx/GXAttr.c:
 	.text       start:0x801A0B10 end:0x801A1C80
 	.data       start:0x8021C4C0 end:0x8021C620
-	.sdata      start:0x8032EB8C end:0x8032EBA0
+	.sdata      start:0x8032EB90 end:0x8032EB9C
 
 gx/GXMisc.c:
 	.text       start:0x801A1C80 end:0x801A2424

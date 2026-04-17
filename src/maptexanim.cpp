@@ -7,9 +7,6 @@
 class CMaterial;
 
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
-extern "C" void ReadJun__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
-extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
-extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -20,14 +17,49 @@ extern "C" {
 char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
 char s_SetMapTexAnim_MaterialIdNotFound[];
 }
-extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
-extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
-extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" float FLOAT_8032fd38;
 extern "C" float FLOAT_8032fd48;
 extern "C" float FLOAT_8032fd4c;
 
 namespace {
+struct CMapKeyFrameFields
+{
+    unsigned char m_mode;
+    unsigned char m_junCount;
+    unsigned char m_keyCount;
+    unsigned char m_loop;
+    unsigned char m_isRun;
+    unsigned char m_pad05[3];
+    int m_currentFrame;
+    int m_startFrame;
+    int m_endFrame;
+    int m_frameCount;
+    unsigned char* m_junTable;
+    float* m_keyFrame;
+    float* m_keyValue;
+    float* m_splineTable;
+};
+
+struct CMapTexAnimFields
+{
+    void* m_vtable;
+    int m_refCount;
+    short m_materialIndex;
+    short m_textureSlot;
+    short m_frameCount;
+    short m_startFrame;
+    short m_endFrame;
+    short m_materialId;
+    unsigned char m_usesBlendTexture;
+    unsigned char m_usesKeyFrame;
+    unsigned char m_wrapMode;
+    unsigned char m_pad17;
+    float m_frameStep;
+    float m_currentFrame;
+    unsigned short* m_frameTable;
+    CMapKeyFrameFields m_keyFrame;
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -95,9 +127,14 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
     }
 }
 
-static inline CMapKeyFrame* KeyFrame(CMapTexAnim* anim)
+static inline CMapTexAnimFields* Fields(CMapTexAnim* anim)
 {
-    return reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(anim) + 0x24);
+    return reinterpret_cast<CMapTexAnimFields*>(anim);
+}
+
+static inline CMapKeyFrame* KeyFrame(CMapTexAnimFields* anim)
+{
+    return reinterpret_cast<CMapKeyFrame*>(&anim->m_keyFrame);
 }
 }
 
@@ -124,14 +161,15 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
                 0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
             if (ref != 0) {
+                CMapTexAnimFields* anim = Fields(ref);
                 __ct__4CRefFv(ref);
                 *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim;
-                ref->m_keyJun = 0;
-                ref->m_keyFrameData = 0;
-                ref->m_keyKeyData = 0;
-                ref->m_keyUnknown = 0;
-                ref->m_keyFrame[3] = 1;
-                ref->m_keyFrame[4] = 0;
+                anim->m_keyFrame.m_junTable = 0;
+                anim->m_keyFrame.m_keyFrame = 0;
+                anim->m_keyFrame.m_keyValue = 0;
+                anim->m_keyFrame.m_splineTable = 0;
+                anim->m_keyFrame.m_loop = 1;
+                anim->m_keyFrame.m_isRun = 0;
                 ref->m_frameTable = 0;
                 ref->m_frameStep = FLOAT_8032fd48;
                 ref->m_currentFrame = FLOAT_8032fd4c;
@@ -163,18 +201,14 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
 
             chunkFile.Get4();
             chunkFile.Get4();
-            void* frameTable = __nwa__FUlPQ27CMemory6CStagePci(
+            unsigned short* frameTable = reinterpret_cast<unsigned short*>(__nwa__FUlPQ27CMemory6CStagePci(
                 static_cast<unsigned long>(ref->m_frameCount << 1),
                 *reinterpret_cast<CMemory::CStage**>(&MapMng),
-                s_maptexanim_cpp_801d7ec4, 0x3B);
+                s_maptexanim_cpp_801d7ec4, 0x3B));
             ref->m_frameTable = frameTable;
 
-            int i = 0;
-            int offset = 0;
-            while (i < ref->m_frameCount) {
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(frameTable) + offset) = chunkFile.Get2();
-                i++;
-                offset += 2;
+            for (int i = 0; i < ref->m_frameCount; i++) {
+                frameTable[i] = chunkFile.Get2();
             }
 
             short count = m_count;
@@ -182,13 +216,13 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             m_anims[count] = ref;
             break;
         case 0x4A554E20:
-            ReadJun__12CMapKeyFrameFR10CChunkFilei(KeyFrame(ref), &chunkFile, static_cast<char>(chunk.m_arg0));
+            KeyFrame(Fields(ref))->ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
             break;
         case 0x4652414D:
-            ReadFrame__12CMapKeyFrameFR10CChunkFilei(KeyFrame(ref), &chunkFile);
+            KeyFrame(Fields(ref))->ReadFrame(chunkFile, chunk.m_arg0);
             break;
         case 0x4B455920:
-            ReadKey__12CMapKeyFrameFR10CChunkFilei(KeyFrame(ref), &chunkFile, static_cast<char>(chunk.m_arg0));
+            KeyFrame(Fields(ref))->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
             ref->m_usesKeyFrame = 1;
             break;
         }
@@ -207,74 +241,74 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
  */
 void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 {
-    if (U8At(this, 0x15) != 0) {
-        CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(Ptr(this, 0x24));
-        if (IsRun__12CMapKeyFrameFv(keyFrame) != 0) {
+    CMapTexAnimFields* anim = Fields(this);
+
+    if (anim->m_usesKeyFrame != 0) {
+        CMapKeyFrame* keyFrame = KeyFrame(anim);
+        if (keyFrame->IsRun() != 0) {
             int keyFrameIndex = 0;
             int keyFrameIndexNext = 0;
             float blend = 0.0f;
-            int reachedFrame = Get__12CMapKeyFrameFRiRiRf(keyFrame, &keyFrameIndex, &keyFrameIndexNext, &blend);
+            int reachedFrame = keyFrame->Get(keyFrameIndex, keyFrameIndexNext, blend);
 
             if (reachedFrame == 0) {
-                const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndex * 2);
+                const unsigned short textureIndex = anim->m_frameTable[keyFrameIndex];
                 void* texture = TextureAt(textureSet, textureIndex);
-                void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
-                SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), texture);
+                void* material = MaterialAt(materialSet, static_cast<unsigned long>(anim->m_materialIndex));
+                SetMaterialTextureSlot(material, static_cast<unsigned long>(anim->m_textureSlot), texture);
 
-                if (U8At(this, 0x14) != 0) {
-                    const unsigned short nextTextureIndex =
-                        U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndexNext * 2);
+                if (anim->m_usesBlendTexture != 0) {
+                    const unsigned short nextTextureIndex = anim->m_frameTable[keyFrameIndexNext];
                     void* nextTexture = TextureAt(textureSet, nextTextureIndex);
-                    SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), nextTexture);
+                    SetMaterialTextureSlot(material, static_cast<unsigned long>(anim->m_textureSlot + 1), nextTexture);
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
             } else {
-                const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndex * 2);
+                const unsigned short textureIndex = anim->m_frameTable[keyFrameIndex];
                 void* texture = TextureAt(textureSet, textureIndex);
-                void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
-                SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), texture);
+                void* material = MaterialAt(materialSet, static_cast<unsigned long>(anim->m_materialIndex));
+                SetMaterialTextureSlot(material, static_cast<unsigned long>(anim->m_textureSlot), texture);
 
-                if (U8At(this, 0x14) != 0) {
-                    const unsigned short nextTextureIndex =
-                        U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndexNext * 2);
+                if (anim->m_usesBlendTexture != 0) {
+                    const unsigned short nextTextureIndex = anim->m_frameTable[keyFrameIndexNext];
                     void* nextTexture = TextureAt(textureSet, nextTextureIndex);
-                    SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), nextTexture);
+                    SetMaterialTextureSlot(material, static_cast<unsigned long>(anim->m_textureSlot + 1), nextTexture);
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * blend);
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
             }
 
-            Calc__12CMapKeyFrameFv(keyFrame);
+            keyFrame->Calc();
         }
         return;
     }
 
-    const float frameFloat = F32At(this, 0x1C);
+    const float frameFloat = anim->m_currentFrame;
     const int frameIndex = static_cast<int>(frameFloat);
-    const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), (frameIndex & 0xFFFF) * 2);
-    void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
-    SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), TextureAt(textureSet, textureIndex));
+    const unsigned short textureIndex = anim->m_frameTable[frameIndex & 0xFFFF];
+    void* material = MaterialAt(materialSet, static_cast<unsigned long>(anim->m_materialIndex));
+    SetMaterialTextureSlot(material, static_cast<unsigned long>(anim->m_textureSlot), TextureAt(textureSet, textureIndex));
 
-    F32At(this, 0x1C) = F32At(this, 0x1C) + F32At(this, 0x18);
-    const float endFrame = static_cast<float>(U16At(this, 0x10));
-    if (endFrame <= F32At(this, 0x1C)) {
-        if (U8At(this, 0x16) == 0) {
-            F32At(this, 0x1C) = endFrame;
+    anim->m_currentFrame = anim->m_currentFrame + anim->m_frameStep;
+    const float endFrame = static_cast<float>(anim->m_endFrame);
+    if (endFrame <= anim->m_currentFrame) {
+        if (anim->m_wrapMode == 0) {
+            anim->m_currentFrame = endFrame;
         } else {
-            F32At(this, 0x1C) = F32At(this, 0x1C) - static_cast<float>(U16At(this, 0x10) - U16At(this, 0xE));
+            anim->m_currentFrame =
+                anim->m_currentFrame - static_cast<float>(anim->m_endFrame - anim->m_startFrame);
         }
     }
 
-    if (U8At(this, 0x14) != 0) {
+    if (anim->m_usesBlendTexture != 0) {
         int nextFrame = (frameIndex + 1) & 0xFFFF;
-        if (static_cast<float>(U16At(this, 0xC)) <= static_cast<float>(frameIndex + 1)) {
+        if (static_cast<float>(anim->m_frameCount) <= static_cast<float>(frameIndex + 1)) {
             nextFrame = 0;
         }
 
-        const unsigned short nextTextureIndex =
-            U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), nextFrame * 2);
-        SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), TextureAt(textureSet, nextTextureIndex));
+        const unsigned short nextTextureIndex = anim->m_frameTable[nextFrame];
+        SetMaterialTextureSlot(material, static_cast<unsigned long>(anim->m_textureSlot + 1), TextureAt(textureSet, nextTextureIndex));
         *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
             static_cast<char>(FLOAT_8032fd38 * (frameFloat - static_cast<float>(frameIndex & 0xFFFF)));
         *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;

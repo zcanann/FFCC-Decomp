@@ -139,6 +139,7 @@ mapobj.cpp:
 	extab       start:0x80005EC8 end:0x80005FB0
 	extabindex  start:0x8000B860 end:0x8000B9BC
 	.text       start:0x800287D0 end:0x8002C704
+	.data       start:0x801E88E4 end:0x801E8950
 	.sdata      start:0x8032E8B8 end:0x8032E8BC
 
 mapocttree.cpp:

@@ -32,6 +32,7 @@ game.cpp:
 	.text       start:0x80013E70 end:0x80016400
 	.ctors      start:0x801D53A8 end:0x801D53AC
 	.data       start:0x801E8320 end:0x801E83FC
+	.bss        start:0x8021EEB4 end:0x80230E48
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
 	.sbss       start:0x8032EC40 end:0x8032EC45
 	.sdata2     start:0x8032F768 end:0x8032F7A8
@@ -1387,6 +1388,7 @@ monobj_table.cpp:
 	extabindex  start:0x80010EDC end:0x80010EE8
 	.text       start:0x801433B8 end:0x801453F4
 	.ctors      start:0x801D5448 end:0x801D544C
+	.data       start:0x802129B0 end:0x802140F0
 
 singmenu.cpp:
 	extab       start:0x80009C14 end:0x80009D04

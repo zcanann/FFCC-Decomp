@@ -124,8 +124,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		Mtx cameraMtx;
 		float projection[7];
 		float viewport[6];
-		int projectedXInt;
 		int projectedYInt;
+		int projectedXInt;
 		float alphaScale;
 
 		alphaScale = (float)sourceAlpha * kPppLensFlareAlphaScale;
@@ -154,14 +154,14 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		projectedXInt = (int)work->m_projectedX;
 		projectedYInt = (int)work->m_projectedY;
+		projectedXInt = (int)work->m_projectedX;
 		zAtPixel = 0;
 		u8 flareWidth = unkB->m_arg3;
 		u32 halfWidth = (u32)(flareWidth >> 1);
 		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
-		u32 y0 = (u32)(projectedYInt & 0xFFFF);
 		u32 x0 = (u32)(projectedXInt & 0xFFFF);
+		u32 y0 = (u32)(projectedYInt & 0xFFFF);
 		s16 stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
 
 		for (u32 y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stepSize) {
@@ -183,7 +183,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		if ((u8)work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			int scaledAlpha = (u8)work->m_alpha * (0xFF / sampleCount);
+			u8 alpha = (u8)work->m_alpha;
+			int scaledAlpha = alpha * (0xFF / sampleCount);
 
 			work->m_alpha = (u8)scaledAlpha;
 			if (0xFF < (int)(u8)scaledAlpha) {

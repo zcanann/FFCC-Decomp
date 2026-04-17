@@ -64,6 +64,8 @@ struct Vec2d {
     float y;
 };
 
+static const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
+
 struct pppYmManaOffsetsRaw {
     u8 _pad0[0xc];
     s32* m_serializedDataOffsets;
@@ -524,7 +526,7 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     *(u32*)(model + 0xE8) = 0;
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
-    _WaitDrawDone__8CGraphicFPci(&Graphic, (char*)"pppYmMana.cpp", 0x2CE);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppYmMana_cpp), 0x2CE);
     *(u32*)(MaterialManRaw() + 0x208) = 0;
     *(u32*)(MaterialManRaw() + 0x220) = 0;
 
@@ -733,28 +735,28 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     InitTexObj__8CTextureFv((void*)work[0x20]);
 
     if (work[0x1E] == 0) {
-        work[0x1E] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x38F);
+        work[0x1E] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x38F);
     }
     if (work[10] == 0) {
-        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x395);
+        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x395);
     }
     if (work[11] == 0) {
-        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x399);
+        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x399);
     }
 
     texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     if (work[12] == 0) {
-        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3A1);
+        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A1);
     }
     if (work[13] == 0) {
-        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3A3);
+        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A3);
     }
 
     GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
     if (work[8] == 0) {
-        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3B0);
+        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3B0);
     }
     dstBuffer = (void*)work[8];
     texList = &work[2];
@@ -767,7 +769,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     }
 
     if (work[9] == 0) {
-        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3CB);
+        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3CB);
         genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
     }
 }

@@ -159,6 +159,8 @@ struct CFlatDataView
     CFlatDataTableEntryView m_tabl[8];
 };
 
+CGame Game;
+
 // Uninitialized
 unsigned char GameDtorChain[0x10];
 static float FLOAT_8032ec40;

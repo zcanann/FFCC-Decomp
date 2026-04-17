@@ -90,14 +90,14 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 		pppNormalize(local_2c, local_2c);
 	}
 
-	local_60.x = local_20.x;
-	local_60.y = local_20.y;
-	local_60.z = local_20.z;
-	local_60.w = kPppYmTraceMoveOne;
 	local_70.x = local_2c.x;
 	local_70.y = local_2c.y;
 	local_70.z = local_2c.z;
 	local_70.w = kPppYmTraceMoveOne;
+	local_60.x = local_20.x;
+	local_60.y = local_20.y;
+	local_60.z = local_20.z;
+	local_60.w = local_70.w;
 	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
 	PSQUATNormalize(&local_80, &local_80);
 

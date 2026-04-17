@@ -895,6 +895,7 @@ joybus.cpp:
 	extabindex  start:0x8000E500 end:0x8000E8D8
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
+	.sbss       start:0x8032EDB8 end:0x8032EDBC
 
 cflat_r2system.cpp:
 	extab       start:0x80008280 end:0x80008338

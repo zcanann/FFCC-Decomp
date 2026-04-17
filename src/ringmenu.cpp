@@ -241,6 +241,7 @@ CRingMenu::~CRingMenu()
  */
 void CRingMenu::Create()
 {
+	typedef void (*VFunc)(void*);
 	register short shouldDelete;
 	asm {
 		mr shouldDelete, r4
@@ -251,7 +252,7 @@ void CRingMenu::Create()
 	}
 
 	*reinterpret_cast<void***>(this) = __vt__9CRingMenu;
-	reinterpret_cast<void (*)(CRingMenu*)>(reinterpret_cast<void**>(this)[4])(this);
+	(*(VFunc*)((unsigned char*)*(void***)this + 0x10))(this);
 	__dt__5CMenuFv(this, 0);
 	if (0 < shouldDelete) {
 		__dl__FPv(this);

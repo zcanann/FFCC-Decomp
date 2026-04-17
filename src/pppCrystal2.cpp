@@ -17,7 +17,7 @@ extern float FLOAT_80331fd4;
 extern float FLOAT_80331fd8;
 extern float FLOAT_80331fdc;
 extern "C" unsigned int __cvt_fp2unsigned(double);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -37,7 +37,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
                                                                                            int);
 }
 
-static char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
+static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 struct Crystal2IndTexMtx {
     f32 value[2][3];

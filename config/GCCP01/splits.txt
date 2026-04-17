@@ -107,6 +107,7 @@ util.cpp:
 	.text       start:0x80022724 end:0x80024E60
 	.ctors      start:0x801D53CC end:0x801D53D0
 	.data       start:0x801E88C4 end:0x801E88D4
+	.sbss       start:0x8032EC70 end:0x8032EC74
 
 maphit.cpp:
 	extab       start:0x80005E00 end:0x80005E60
@@ -835,6 +836,7 @@ p_gba.cpp:
 	.text       start:0x800977D8 end:0x80097AC8
 	.ctors      start:0x801D5420 end:0x801D5424
 	.sbss       start:0x8032EDA8 end:0x8032EDB0
+	.sdata2     start:0x80330870 end:0x80330878
 
 cflat_data.cpp:
 	extab       start:0x80007D20 end:0x80007D38
@@ -1315,6 +1317,7 @@ menu_cmd.cpp:
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
 	.bss        start:0x8030BA48 end:0x8030BA54
+	.sbss       start:0x8032EEC8 end:0x8032EECC
 
 shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54
@@ -1341,6 +1344,7 @@ menu_money.cpp:
 	extabindex  start:0x80011338 end:0x80011374
 	.text       start:0x8015E37C end:0x8015FA28
 	.bss        start:0x8030BA58 end:0x8030BA68
+	.sbss       start:0x8032EEE0 end:0x8032EEE4
 
 menu_arti.cpp:
 	extab       start:0x80009F1C end:0x80009F54

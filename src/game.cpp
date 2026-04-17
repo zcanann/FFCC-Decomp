@@ -1069,7 +1069,7 @@ void CGame::Draw2()
  */
 void CGame::Draw3()
 {
-	gCFlatRuntime2.Frame(0, 2);
+	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 2);
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	    CFlat, 0, 1, 5, 0, 0, 0);
 }

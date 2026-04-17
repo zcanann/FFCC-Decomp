@@ -149,9 +149,9 @@ static void ReleaseRef(void* object)
     }
 }
 
-static char s_materialman_cpp[] = "materialman.cpp";
-static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_materialman_cpp[] = "materialman.cpp";
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
 struct RawPtrArray {
     void** vtable;
@@ -208,7 +208,7 @@ static CMaterial* AllocMaterial()
             &Memory,
             0xA8,
             MaterialMan.GetMemoryStage(),
-            s_materialman_cpp,
+            const_cast<char*>(s_materialman_cpp),
             0xCFF,
             0));
     if (material == 0) {
@@ -248,7 +248,7 @@ static CMapKeyFrame* AllocMapKeyFrame(int line)
     CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(__nw__FUlPQ27CMemory6CStagePci(
         0x28,
         MaterialMan.GetMemoryStage(),
-        s_materialman_cpp,
+        const_cast<char*>(s_materialman_cpp),
         line));
     if (keyFrame != 0) {
         memset(keyFrame, 0, 0x28);
@@ -333,7 +333,7 @@ int CPtrArray<CMaterial*>::setSize(unsigned long size)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
@@ -343,7 +343,7 @@ int CPtrArray<CMaterial*>::setSize(unsigned long size)
                 &Memory,
                 m_size << 2,
                 m_stage,
-                s_collection_ptrarray_h,
+                const_cast<char*>(s_collection_ptrarray_h),
                 0xFA,
                 0));
         if (newItems == 0) {
@@ -2953,7 +2953,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             unsigned char* material = reinterpret_cast<unsigned char*>(
                 _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                     &Memory, 0xA8, *reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
-                    s_materialman_cpp, 0xEE4, 0));
+                    const_cast<char*>(s_materialman_cpp), 0xEE4, 0));
             if (material != 0) {
                 __ct__4CRefFv(material);
                 *reinterpret_cast<void**>(material) = __vt__9CMaterial;

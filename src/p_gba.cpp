@@ -13,7 +13,7 @@ extern unsigned int gGbaStatusWordTable[];
 #include <dolphin/gba/GBA.h>
 
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
-char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
+const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
 
 /*
  * --INFO--
@@ -126,7 +126,7 @@ void CGbaPcs::create()
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
 	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
-		System.Printf(s_JoyBus__LoadBin___error_801d9de0);
+		System.Printf(const_cast<char*>(s_JoyBus__LoadBin___error_801d9de0));
 	}
 	Joybus.ThreadInit();
 }

@@ -867,6 +867,7 @@ p_gba.cpp:
 	extabindex  start:0x8000E0A4 end:0x8000E104
 	.text       start:0x800977D8 end:0x80097AC8
 	.ctors      start:0x801D5420 end:0x801D5424
+	.data       start:0x8020F494 end:0x8020F4C8
 	.sbss       start:0x8032EDA8 end:0x8032EDB0
 	.sdata2     start:0x80330870 end:0x80330878
 

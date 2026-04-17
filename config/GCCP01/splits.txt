@@ -171,6 +171,7 @@ textureman.cpp:
 	.text       start:0x8003A5FC end:0x8003C1B8
 	.ctors      start:0x801D53E4 end:0x801D53E8
 	.sbss       start:0x8032ECE0 end:0x8032ECE8
+	.sdata2     start:0x8032FAE0 end:0x8032FAF8
 
 materialman.cpp:
 	extab       start:0x80006534 end:0x80006754

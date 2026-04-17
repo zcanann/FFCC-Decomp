@@ -150,6 +150,7 @@ static void ReleaseRef(void* object)
 }
 
 static const char s_materialman_cpp[] = "materialman.cpp";
+static const char s_material_stage_name[] = "material";
 static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static const char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
@@ -437,7 +438,8 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) = Memory.CreateStage(0x20000, "material", 0);
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) =
+	    Memory.CreateStage(0x20000, const_cast<char*>(s_material_stage_name), 0);
 	*Ptr(this, 0x204) = 0x30;
 }
 

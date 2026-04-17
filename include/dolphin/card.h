@@ -220,11 +220,14 @@ typedef struct CARDStat {
 #define CARDSetCommentAddress(stat, addr) ((stat)->commentAddr = (u32)(addr))
 #define CARDGetFileNo(fileInfo) ((fileInfo)->fileNo)
 
-extern u32 __CARDFreq;
-
 #if DEBUG
+extern u32 __CARDFreq;
 #define CARDFreq __CARDFreq
 #else
+typedef struct CARDFreqData {
+    u32 value;
+} CARDFreqData;
+extern CARDFreqData __CARDFreq;
 #define CARDFreq EXI_FREQ_16M
 #endif
 

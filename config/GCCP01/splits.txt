@@ -1163,6 +1163,7 @@ THPSimple.cpp:
 	extab       start:0x800090B4 end:0x80009114
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
+	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:
 	extab       start:0x80009114 end:0x8000912C

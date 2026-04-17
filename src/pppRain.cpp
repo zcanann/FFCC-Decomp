@@ -144,12 +144,14 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     rain = (RainParam*)param_2->m_payload;
     work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
+        float* dropData;
+
         work->drops = (RainDrop*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppRain_cpp_801DB610),
             0x7f);
-        drop = work->drops;
+        dropData = (float*)work->drops;
         for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
             float minX;
             float maxX;
@@ -168,28 +170,28 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             minX = rain->minX;
             maxZ = rain->maxZ;
             minZ = rain->minZ;
-            drop->posX = unitA * (maxX - minX) + minX;
-            drop->posY = rain->maxY;
-            drop->posZ = unitB * (maxZ - minZ) + minZ;
-            drop->dirX = -param_2->m_initWOrk;
-            drop->dirY = rain->driftY;
-            drop->dirZ = -param_2->m_arg3;
-            PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
+            dropData[0] = unitA * (maxX - minX) + minX;
+            dropData[1] = rain->maxY;
+            dropData[2] = unitB * (maxZ - minZ) + minZ;
+            dropData[3] = -param_2->m_initWOrk;
+            dropData[4] = rain->driftY;
+            dropData[5] = -param_2->m_arg3;
+            PSVECNormalize((Vec*)(dropData + 3), (Vec*)(dropData + 3));
 
             lengthDelta = unitA * rain->lengthRand;
-            drop->length = rain->lengthBase;
+            dropData[6] = rain->lengthBase;
             if (randA % 2 != 0) {
                 lengthDelta = -lengthDelta;
             }
-            drop->length += lengthDelta;
+            dropData[6] += lengthDelta;
 
-            drop->life = (s16)rain->lifeBase;
+            *(s16*)(dropData + 7) = (s16)rain->lifeBase;
             lifeJitter = (s16)(randA % rain->lifeRange);
             if (randA % 2 != 0) {
                 lifeJitter = -lifeJitter;
             }
-            drop->life = (s16)(drop->life + lifeJitter);
-            drop++;
+            *(s16*)(dropData + 7) = (s16)(*(s16*)(dropData + 7) + lifeJitter);
+            dropData += 8;
         }
     }
 
@@ -208,6 +210,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         drop->posZ = -(drop->dirZ * work->moveY - drop->posZ);
         drop->life--;
         if (drop->life <= 0) {
+            float* dropData;
             float minX;
             float maxX;
             float minZ;
@@ -219,33 +222,34 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
             randA = rand();
             randB = rand();
+            dropData = (float*)drop;
             unitA = FLOAT_80331020 * (float)randA;
             unitB = FLOAT_80331020 * (float)randB;
             maxX = rain->maxX;
             minX = rain->minX;
             maxZ = rain->maxZ;
             minZ = rain->minZ;
-            drop->posX = unitA * (maxX - minX) + minX;
-            drop->posY = rain->maxY;
-            drop->posZ = unitB * (maxZ - minZ) + minZ;
-            drop->dirX = -param_2->m_initWOrk;
-            drop->dirY = rain->driftY;
-            drop->dirZ = -param_2->m_arg3;
-            PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
+            dropData[0] = unitA * (maxX - minX) + minX;
+            dropData[1] = rain->maxY;
+            dropData[2] = unitB * (maxZ - minZ) + minZ;
+            dropData[3] = -param_2->m_initWOrk;
+            dropData[4] = rain->driftY;
+            dropData[5] = -param_2->m_arg3;
+            PSVECNormalize((Vec*)(dropData + 3), (Vec*)(dropData + 3));
 
             lengthDelta = unitA * rain->lengthRand;
-            drop->length = rain->lengthBase;
+            dropData[6] = rain->lengthBase;
             if (randA % 2 != 0) {
                 lengthDelta = -lengthDelta;
             }
-            drop->length += lengthDelta;
+            dropData[6] += lengthDelta;
 
-            drop->life = (s16)rain->lifeBase;
+            *(s16*)(dropData + 7) = (s16)rain->lifeBase;
             lifeJitter = (s16)(randA % rain->lifeRange);
             if (randA % 2 != 0) {
                 lifeJitter = -lifeJitter;
             }
-            drop->life = (s16)(drop->life + lifeJitter);
+            *(s16*)(dropData + 7) = (s16)(*(s16*)(dropData + 7) + lifeJitter);
         }
         drop++;
     }

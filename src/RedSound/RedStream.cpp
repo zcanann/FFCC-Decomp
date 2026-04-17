@@ -31,27 +31,25 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
 unsigned int _SearchEmptyStreamData()
 {
 	unsigned int streamData = (unsigned int)DAT_8032f438;
-	unsigned int streamDataEnd = streamData + 0x4c0;
 
-	for (;;) {
+	do {
 		if (*(int*)(streamData + 0x10c) == 0) {
-			break;
+			return streamData;
 		}
-
 		streamData += 0x130;
-		if (streamDataEnd <= streamData) {
-			streamData = 0;
-			break;
-		}
-	}
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 
-	return streamData;
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb980
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 #pragma dont_inline on
 void _StreamStop(RedStreamDATA* streamData)

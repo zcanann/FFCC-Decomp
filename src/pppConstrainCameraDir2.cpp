@@ -5,6 +5,9 @@
 extern "C" {
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
+extern float FLOAT_803331e0;
+extern float FLOAT_803331e4;
+extern float FLOAT_803331e8;
 }
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
@@ -46,13 +49,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             float cameraPosX = CameraPcs._224_4_;
             float cameraPosY = CameraPcs._228_4_;
             float cameraPosZ = CameraPcs._232_4_;
-            float scale = ((CameraPcs._252_4_ - 25.0f) / 25.0f) + 1.0f;
+            float scale = FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4);
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 
-            pppMngSt->m_scale.x = 1.3333f * scale;
+            pppMngSt->m_scale.x = FLOAT_803331e8 * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = 1.0f;
+            pppMngSt->m_scale.z = FLOAT_803331e0;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -72,8 +75,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                 resultPos.z = cameraDir.z * *value + resultPos.z;
             }
 
-            float localY = param_1->m_object.m_localMatrix.value[1][3];
-            float localX = param_1->m_object.m_localMatrix.value[0][3];
+            float localX = param_1->m_pppPObject.m_localMatrix.value[0][3];
+            float localY = param_1->m_pppPObject.m_localMatrix.value[1][3];
 
             Vec direct0;
             Vec direct1;

@@ -92,6 +92,7 @@ public:
     void* m_frameBuffer;
     void* m_scratchTextureBuffer;
     void* m_savedFrameBuffer;
+    u8 _pad_0x71F0_to_0x7373[0x184];
 };
 
 extern CGraphic Graphic;

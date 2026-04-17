@@ -37,6 +37,7 @@ graphic.cpp:
 	extabindex  start:0x8000AFFC end:0x8000B1DC
 	.text       start:0x80016400 end:0x80019F88
 	.ctors      start:0x801D53AC end:0x801D53B0
+	.bss        start:0x80230E48 end:0x8023C4D8
 	.sbss       start:0x8032EC48 end:0x8032EC4C
 
 main.cpp:

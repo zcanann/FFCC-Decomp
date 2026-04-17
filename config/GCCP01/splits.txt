@@ -30,12 +30,14 @@ game.cpp:
 	extabindex  start:0x8000AE4C end:0x8000AFFC
 	.text       start:0x80013E70 end:0x80016400
 	.ctors      start:0x801D53A8 end:0x801D53AC
+	.sdata      start:0x8032E6B8 end:0x8032E6D0
 
 graphic.cpp:
 	extab       start:0x800057E0 end:0x80005920
 	extabindex  start:0x8000AFFC end:0x8000B1DC
 	.text       start:0x80016400 end:0x80019F88
 	.ctors      start:0x801D53AC end:0x801D53B0
+	.sbss       start:0x8032EC48 end:0x8032EC4C
 
 main.cpp:
 	extab       start:0x80005920 end:0x80005930
@@ -54,6 +56,7 @@ memory.cpp:
 	.text       start:0x8001C2F0 end:0x8001FE74
 	.ctors      start:0x801D53B4 end:0x801D53B8
 	.bss        start:0x8023C888 end:0x80244028
+	.sbss       start:0x8032EC58 end:0x8032EC60
 
 p_sample.cpp:
 	extab       start:0x80005BDC end:0x80005BE4
@@ -70,6 +73,7 @@ p_usb.cpp:
 	.rodata     start:0x801D6D14 end:0x801D6D28
 	.data       start:0x801E8690 end:0x801E8818
 	.bss        start:0x80244028 end:0x8024413C
+	.sdata      start:0x8032E838 end:0x8032E840
 	.sbss       start:0x8032EC68 end:0x8032EC70
 
 pad.cpp:
@@ -114,6 +118,7 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
+	.sdata      start:0x8032E8B0 end:0x8032E8B8
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -124,6 +129,7 @@ mapobj.cpp:
 	extab       start:0x80005EC8 end:0x80005FB0
 	extabindex  start:0x8000B860 end:0x8000B9BC
 	.text       start:0x800287D0 end:0x8002C704
+	.sdata      start:0x8032E8B8 end:0x8032E8BC
 
 mapocttree.cpp:
 	extab       start:0x80005FB0 end:0x80006068
@@ -684,6 +690,7 @@ chara.cpp:
 	extabindex  start:0x8000D4C8 end:0x8000D69C
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
+	.sdata      start:0x8032E8BC end:0x8032E8C0
 
 p_chara.cpp:
 	extab       start:0x800075E0 end:0x80007838

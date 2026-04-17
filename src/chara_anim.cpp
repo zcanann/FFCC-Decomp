@@ -6,14 +6,11 @@
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <string.h>
 
-extern "C" void __ct__4CRefFv(void*);
-extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);
 extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
-extern "C" char __vt__Q26CChara5CAnim[];
 extern "C" char s_charaAnimSourceFile[];
 extern "C" char s_charaAnimAllocWarn[];
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
@@ -179,8 +176,6 @@ CChara::CAnim::CAnim()
 {
 	CAnimFields& anim = Anim(this);
 
-	__ct__4CRefFv(this);
-	anim.m_vtable = __vt__Q26CChara5CAnim;
 	anim.m_nodeCount = 0;
 	anim.m_nodes = 0;
 	anim.m_bank = 0;
@@ -210,8 +205,6 @@ CChara::CAnim::~CAnim()
 {
 	CAnimFields& anim = Anim(this);
 
-	anim.m_vtable = __vt__Q26CChara5CAnim;
-
 	if (anim.m_nodes != 0) {
 		__destroy_new_array(anim.m_nodes, (ConstructorDestructor)__dt__Q26CChara9CAnimNodeFv);
 		anim.m_nodes = 0;
@@ -221,8 +214,6 @@ CChara::CAnim::~CAnim()
 		__dla__FPv(anim.m_bank);
 		anim.m_bank = 0;
 	}
-
-	__dt__4CRefFv(this, 0);
 }
 
 /*

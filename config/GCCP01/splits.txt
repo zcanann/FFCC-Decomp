@@ -207,6 +207,7 @@ p_light.cpp:
 	extabindex  start:0x8000C520 end:0x8000C610
 	.text       start:0x80047E00 end:0x8004A4A0
 	.ctors      start:0x801D53F8 end:0x801D53FC
+	.data       start:0x801EA430 end:0x801EA484
 	.bss        start:0x80268F88 end:0x8026D338
 
 mapanim.cpp:

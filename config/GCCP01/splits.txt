@@ -143,6 +143,7 @@ map.cpp:
 	extabindex  start:0x8000BAD0 end:0x8000BD70
 	.text       start:0x8002F45C end:0x80034988
 	.ctors      start:0x801D53D8 end:0x801D53DC
+	.bss        start:0x80245758 end:0x802681E0
 
 p_map.cpp:
 	extab       start:0x80006304 end:0x80006374
@@ -950,6 +951,7 @@ sound.cpp:
 	extabindex  start:0x8000EC68 end:0x8000EEFC
 	.text       start:0x800C4FD8 end:0x800C8A8C
 	.ctors      start:0x801D542C end:0x801D5430
+	.bss        start:0x802F26C4 end:0x802F49B0
 
 gbaque.cpp:
 	extab       start:0x800086CC end:0x80008A64

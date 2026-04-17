@@ -50,6 +50,7 @@ static const char s__s_Entry_Items____d_801e7dfd[] = "%s   Entry Items = %d\n";
 
 extern "C" {
 	void* RedNew__Fi(int);
+	void __dl__FPv(void*);
 	int WaveDelete__9CRedEntryFP14RedHistoryBANK(CRedEntry*, RedHistoryBANK*);
 	void WaveHistoryAdd__9CRedEntryFi(CRedEntry*, int);
 	void WaveHistoryDelete__9CRedEntryFi(CRedEntry*, int);
@@ -71,10 +72,17 @@ CRedEntry::CRedEntry()
  * Address:	TODO
  * Size:	TODO
  */
-CRedEntry::~CRedEntry()
+#pragma optimization_level 0
+extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete)
 {
-	// TODO
+	if (redEntry != 0) {
+		if (0 < shouldDelete) {
+			__dl__FPv(redEntry);
+		}
+	}
+	return redEntry;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

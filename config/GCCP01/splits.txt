@@ -258,11 +258,13 @@ ME_AppRequest.cpp:
 	extab       start:0x80006AD4 end:0x80006AFC
 	extabindex  start:0x8000C748 end:0x8000C784
 	.text       start:0x8004DCE8 end:0x8004DFD0
+	.rodata     start:0x801D7DA8 end:0x801D7DC0
 
 zlist.cpp:
 	extab       start:0x80006AFC end:0x80006B14
 	extabindex  start:0x8000C784 end:0x8000C7A8
 	.text       start:0x8004DFD0 end:0x8004E210
+	.rodata     start:0x801D7DC0 end:0x801D7DD0
 
 p_FunnyShape.cpp:
 	extab       start:0x80006B14 end:0x80006BB0
@@ -281,6 +283,7 @@ maptexanim.cpp:
 	extab       start:0x80006BB8 end:0x80006BE0
 	extabindex  start:0x8000C844 end:0x8000C880
 	.text       start:0x8004F910 end:0x800503FC
+	.rodata     start:0x801D7EC4 end:0x801D7ED4
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0
@@ -1027,6 +1030,7 @@ pppYmLaser.cpp:
 	extab       start:0x80008AA4 end:0x80008AC4
 	extabindex  start:0x8000F4C0 end:0x8000F4F0
 	.text       start:0x800D2614 end:0x800D3818
+	.rodata     start:0x801DB4B0 end:0x801DB4C0
 
 pppSpMatrix.cpp:
 	extab       start:0x80008AC4 end:0x80008ACC
@@ -1037,6 +1041,7 @@ pppYmChangeTex.cpp:
 	extab       start:0x80008ACC end:0x80008AF4
 	extabindex  start:0x8000F4FC end:0x8000F538
 	.text       start:0x800D3854 end:0x800D4278
+	.rodata     start:0x801DB4C0 end:0x801DB4D8
 
 pppYmMoveParabola.cpp:
 	extab       start:0x80008AF4 end:0x80008B04
@@ -1057,6 +1062,7 @@ pppYmMana.cpp:
 	extab       start:0x80008B1C end:0x80008B94
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
+	.rodata     start:0x801DB4D8 end:0x801DB4E8
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC
@@ -1091,6 +1097,7 @@ LocationTitle2.cpp:
 	extab       start:0x80008C1C end:0x80008C34
 	extabindex  start:0x8000F6F4 end:0x8000F718
 	.text       start:0x800DA0B4 end:0x800DA93C
+	.rodata     start:0x801DB588 end:0x801DB5A0
 
 pppDrawShape2.cpp:
 	extab       start:0x80008C34 end:0x80008C3C
@@ -1116,11 +1123,13 @@ pppRain.cpp:
 	extab       start:0x80008C94 end:0x80008CAC
 	extabindex  start:0x8000F7A8 end:0x8000F7CC
 	.text       start:0x800DD424 end:0x800DDAF8
+	.rodata     start:0x801DB610 end:0x801DB620
 
 pppBlurChara.cpp:
 	extab       start:0x80008CAC end:0x80008CDC
 	extabindex  start:0x8000F7CC end:0x8000F814
 	.text       start:0x800DDAF8 end:0x800DE718
+	.rodata     start:0x801DB620 end:0x801DB638
 
 pppLensFlare.cpp:
 	extab       start:0x80008CDC end:0x80008CEC
@@ -1131,6 +1140,7 @@ pppColum.cpp:
 	extab       start:0x80008CEC end:0x80008D04
 	extabindex  start:0x8000F82C end:0x8000F850
 	.text       start:0x800DEC5C end:0x800DF320
+	.rodata     start:0x801DB638 end:0x801DB648
 
 pppCorona.cpp:
 	extab       start:0x80008D04 end:0x80008D14
@@ -1191,6 +1201,7 @@ pppMana2.cpp:
 	extab       start:0x8000912C end:0x8000918C
 	extabindex  start:0x8000FE8C end:0x8000FF1C
 	.text       start:0x8010617C end:0x801091D4
+	.rodata     start:0x801DC4E0 end:0x801DC4F0
 
 pppConformBGNormal.cpp:
 	extab       start:0x8000918C end:0x80009194
@@ -1451,6 +1462,7 @@ cmake.cpp:
 	extab       start:0x8000A07C end:0x8000A12C
 	extabindex  start:0x80011584 end:0x8001168C
 	.text       start:0x8016CD3C end:0x8017474C
+	.rodata     start:0x801E3038 end:0x801E3048
 
 menu_lst.cpp:
 	extab       start:0x8000A12C end:0x8000A14C
@@ -1461,6 +1473,7 @@ pppLaser.cpp:
 	extab       start:0x8000A14C end:0x8000A16C
 	extabindex  start:0x800116BC end:0x800116EC
 	.text       start:0x801754E0 end:0x8017683C
+	.rodata     start:0x801E3048 end:0x801E3058
 
 MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC

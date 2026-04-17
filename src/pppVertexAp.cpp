@@ -209,8 +209,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 }
             }
             break;
-        default:
-            break;
         }
 
         state->countdown = data->spawnDelay;

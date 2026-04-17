@@ -15,6 +15,11 @@ Useful references:
 - EN map: `orig/GCCE01/game.MAP`
 - Symbol extractor: `python3 tools/extract_symbols.py <object>.o`
 
+Useful tooling:
+- `python3 tools/agent_select_target.py` picks code/data targets and shows PAL/EN symbol hints.
+- `python3 tools/map/claim_doctor.py [source.cpp]` compares current compiled section sizes, current claims, and PAL/EN MAP ownership hints.
+- `python3 tools/map_symbols_to_files.py` groups currently unclaimed PAL symbols by MAP-attributed object file.
+
 When updating functions, keep the version header block:
 
 ```c

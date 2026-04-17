@@ -1551,7 +1551,7 @@ mtx/vec.c:
 
 mtx/quat.c:
 	.text       start:0x80186F24 end:0x80187490
-	.rodata     start:0x801E6600 end:0x801E6610
+	.rodata     start:0x801E6600 end:0x801E660C
 	.sdata2     start:0x80333728 end:0x80333750
 
 dvd/dvdlow.c:

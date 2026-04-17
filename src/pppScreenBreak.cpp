@@ -370,16 +370,6 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8012da2c
  * PAL Size: 1020b
  * EN Address: TODO

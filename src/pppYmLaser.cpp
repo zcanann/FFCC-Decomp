@@ -57,7 +57,7 @@ void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
-static char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
+static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
@@ -202,7 +202,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 
 	if (work->m_points == 0) {
 		work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			(u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, s_pppYmLaser_cpp, 0x5d);
+			(u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
 		memset(work->m_points, 0, (u32)step->m_payload[0x1e] * 0xc);
 		emptyHistory = true;
 	}

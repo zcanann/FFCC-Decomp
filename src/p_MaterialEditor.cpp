@@ -26,10 +26,33 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
-static char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
+static const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
+static unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
-static char s_MaterialEditor[] = "MaterialEditor=%c";
+
+struct MaterialEditorTableInit {
+    MaterialEditorTableInit()
+    {
+        unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
+
+        dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
+        dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
+        dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
+        dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
+        dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
+        dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
+        dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
+        dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
+        dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
+        dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
+        dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
+        dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
+    }
+};
+
+static MaterialEditorTableInit sMaterialEditorTableInit;
+static const char s_MaterialEditor[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -242,7 +265,7 @@ void CMaterialEditorPcs::createViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, s_CMaterialEditorPcs_801D7D34, 0));
+        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs_801D7D34), 0));
     GXColor clear;
     float fVar1;
 

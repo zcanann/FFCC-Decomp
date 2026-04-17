@@ -30,7 +30,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
-static char s_pppBreathModel_cpp[] = "pppBreathModel.c";
+static const char s_pppBreathModel_cpp[] = "pppBreathModel.c";
 
 struct pppBreathModelUnkC {
     unsigned char _pad[0xC];
@@ -581,39 +581,41 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
         *(void**)(work + 0x30) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), pppEnvStPtr->m_stagePtr,
-                                                  s_pppBreathModel_cpp, 0x257);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x257);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(maxParticleCount * 0x98));
         }
 
         *(void**)(work + 0x34) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), pppEnvStPtr->m_stagePtr,
-                                                  s_pppBreathModel_cpp, 0x25d);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(maxParticleCount * 0x30));
         }
 
         *(void**)(work + 0x38) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), pppEnvStPtr->m_stagePtr,
-                                                  s_pppBreathModel_cpp, 0x263);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x263);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(maxParticleCount * 0x20));
         }
 
         *(void**)(work + 0x3C) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), pppEnvStPtr->m_stagePtr,
-                                                  s_pppBreathModel_cpp, 0x269);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x269);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0, (unsigned long)(particleGroups * 0x5C));
 
             groupTable = (int*)*(void**)(work + 0x3C);
             for (i = 0; i < particleGroups; i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppBreathModel_cpp, 0x274);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp),
+                    0x274);
                 memset((void*)groupTable[1], 0xFF, (unsigned long)particlePerGroup);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppBreathModel_cpp, 0x277);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp),
+                    0x277);
                 memset((void*)groupTable[2], 0xFF, (unsigned long)particlePerGroup);
                 groupTable[0] = 0;
                 groupTable += 0x17;

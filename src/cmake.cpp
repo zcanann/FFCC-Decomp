@@ -91,7 +91,7 @@ extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
 extern "C" {
-char s_cmake_cpp_801e3038[] = "cmake.cpp";
+static const char s_cmake_cpp_801e3038[] = "cmake.cpp";
 }
 
 static inline void* MenuPcsVoid()
@@ -1716,7 +1716,8 @@ void CMenuPcs::calcVillageMenu()
 
         void* stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
         int& villageWork = MenuS32(this, 0x830);
-        villageWork = reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, s_cmake_cpp_801e3038, 0xCB3));
+        villageWork =
+            reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3));
         memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
         MenuS16(this, 0x86C) = 1;
     }

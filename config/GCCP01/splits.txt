@@ -32,6 +32,7 @@ game.cpp:
 	.text       start:0x80013E70 end:0x80016400
 	.ctors      start:0x801D53A8 end:0x801D53AC
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
+	.sbss       start:0x8032EC40 end:0x8032EC45
 	.sdata2     start:0x8032F768 end:0x8032F7A8
 
 graphic.cpp:
@@ -52,6 +53,7 @@ math.cpp:
 	extabindex  start:0x8000B1F4 end:0x8000B2CC
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
+	.data       start:0x801E8450 end:0x801E8470
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC
@@ -66,6 +68,7 @@ p_sample.cpp:
 	extabindex  start:0x8000B434 end:0x8000B440
 	.text       start:0x8001FE74 end:0x8001FF6C
 	.ctors      start:0x801D53B8 end:0x801D53BC
+	.data       start:0x801E8630 end:0x801E8688
 	.sbss       start:0x8032EC60 end:0x8032EC64
 
 p_usb.cpp:
@@ -160,13 +163,17 @@ p_camera.cpp:
 	extabindex  start:0x8000BE18 end:0x8000BF08
 	.text       start:0x80036290 end:0x8003A5FC
 	.ctors      start:0x801D53E0 end:0x801D53E4
+	.data       start:0x801E9AE0 end:0x801E9B24
+	.sbss       start:0x8032ECD8 end:0x8032ECD9
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
 	extabindex  start:0x8000BF08 end:0x8000C07C
 	.text       start:0x8003A5FC end:0x8003C1B8
 	.ctors      start:0x801D53E4 end:0x801D53E8
+	.data       start:0x801E9B40 end:0x801E9B8C
 	.sbss       start:0x8032ECE0 end:0x8032ECE8
+	.sdata2     start:0x8032FAE0 end:0x8032FAF8
 
 materialman.cpp:
 	extab       start:0x80006534 end:0x80006754
@@ -184,6 +191,7 @@ texanim.cpp:
 	extab       start:0x8000675C end:0x80006850
 	extabindex  start:0x8000C2C8 end:0x8000C3DC
 	.text       start:0x80043D70 end:0x80045178
+	.data       start:0x801E9C3C end:0x801E9C90
 
 p_graphic.cpp:
 	extab       start:0x80006850 end:0x800068A8
@@ -197,6 +205,7 @@ p_game.cpp:
 	extabindex  start:0x8000C460 end:0x8000C508
 	.text       start:0x80047930 end:0x80047C9C
 	.ctors      start:0x801D53F0 end:0x801D53F4
+	.data       start:0x801EA09C end:0x801EA0D0
 	.sbss       start:0x8032ED00 end:0x8032ED04
 
 p_system.cpp:
@@ -204,6 +213,7 @@ p_system.cpp:
 	extabindex  start:0x8000C508 end:0x8000C520
 	.text       start:0x80047C9C end:0x80047E00
 	.ctors      start:0x801D53F4 end:0x801D53F8
+	.data       start:0x801EA0F4 end:0x801EA290
 	.sbss       start:0x8032ED08 end:0x8032ED0C
 
 p_light.cpp:
@@ -227,6 +237,7 @@ p_MaterialEditor.cpp:
 	extabindex  start:0x8000C6AC end:0x8000C70C
 	.text       start:0x8004B21C end:0x8004C71C
 	.ctors      start:0x801D53FC end:0x801D5400
+	.data       start:0x801EA634 end:0x801EA668
 	.bss        start:0x8026D338 end:0x8026D724
 
 mapshadow.cpp:
@@ -238,6 +249,7 @@ ME_USB_process.cpp:
 	extab       start:0x80006AC4 end:0x80006AD4
 	extabindex  start:0x8000C730 end:0x8000C748
 	.text       start:0x8004CA08 end:0x8004DCE8
+	.data       start:0x801EA668 end:0x801EA778
 
 ME_AppRequest.cpp:
 	extab       start:0x80006AD4 end:0x80006AFC
@@ -254,6 +266,7 @@ p_FunnyShape.cpp:
 	extabindex  start:0x8000C7A8 end:0x8000C838
 	.text       start:0x8004E210 end:0x8004EB4C
 	.ctors      start:0x801D5400 end:0x801D5404
+	.data       start:0x801EA914 end:0x801EA948
 	.bss        start:0x8026D728 end:0x80273928
 
 FS_USB_Process.cpp:
@@ -699,6 +712,7 @@ chara.cpp:
 	extabindex  start:0x8000D4C8 end:0x8000D69C
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
+	.data       start:0x801FCD18 end:0x801FCD38
 	.sdata      start:0x8032E8BC end:0x8032E8C0
 
 p_chara.cpp:
@@ -717,6 +731,7 @@ gobject.cpp:
 	extab       start:0x80007850 end:0x80007988
 	extabindex  start:0x8000D9CC end:0x8000DBA0
 	.text       start:0x8007BE40 end:0x80082278
+	.data       start:0x801FD360 end:0x801FD3A4
 
 pppRyjMegaBirth.cpp:
 	extab       start:0x80007988 end:0x800079C0
@@ -830,6 +845,7 @@ fontman.cpp:
 	extabindex  start:0x8000DE64 end:0x8000DF3C
 	.text       start:0x80091E58 end:0x8009312C
 	.ctors      start:0x801D5418 end:0x801D541C
+	.data       start:0x8020EDC8 end:0x8020EDF8
 	.bss        start:0x802EA170 end:0x802EA188
 
 pppYmTracer.cpp:
@@ -847,6 +863,7 @@ p_menu.cpp:
 	extabindex  start:0x8000DF6C end:0x8000E0A4
 	.text       start:0x80093E78 end:0x800977D8
 	.ctors      start:0x801D541C end:0x801D5420
+	.data       start:0x8020F2C4 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 
 p_gba.cpp:
@@ -854,6 +871,7 @@ p_gba.cpp:
 	extabindex  start:0x8000E0A4 end:0x8000E104
 	.text       start:0x800977D8 end:0x80097AC8
 	.ctors      start:0x801D5420 end:0x801D5424
+	.data       start:0x8020F494 end:0x8020F4C8
 	.sbss       start:0x8032EDA8 end:0x8032EDB0
 	.sdata2     start:0x80330870 end:0x80330878
 
@@ -925,6 +943,7 @@ chara_anim.cpp:
 	extab       start:0x80008390 end:0x800083C0
 	extabindex  start:0x8000EA40 end:0x8000EA88
 	.text       start:0x800BF620 end:0x800BFE78
+	.data       start:0x80210534 end:0x80210540
 
 pppYmBreath.cpp:
 	extab       start:0x800083C0 end:0x800083F8
@@ -1041,6 +1060,7 @@ p_sound.cpp:
 	extabindex  start:0x8000F628 end:0x8000F664
 	.text       start:0x800D8710 end:0x800D88C8
 	.ctors      start:0x801D5434 end:0x801D5438
+	.data       start:0x8021071C end:0x80210750
 	.sbss       start:0x8032EDE0 end:0x8032EDE4
 
 pppYmLookOn.cpp:
@@ -1140,6 +1160,7 @@ gxfunc.cpp:
 	extabindex  start:0x8000FD00 end:0x8000FD84
 	.text       start:0x80102FB4 end:0x801035DC
 	.bss        start:0x802FF450 end:0x802FFA70
+	.sbss       start:0x8032EE40 end:0x8032EE42
 
 pppYmTracer2.cpp:
 	extab       start:0x8000907C end:0x80009094
@@ -1155,6 +1176,7 @@ THPSimple.cpp:
 	extab       start:0x800090B4 end:0x80009114
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
+	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:
 	extab       start:0x80009114 end:0x8000912C
@@ -1213,11 +1235,14 @@ p_mc.cpp:
 	extabindex  start:0x800105C4 end:0x800105DC
 	.text       start:0x80124998 end:0x80124B78
 	.ctors      start:0x801D5438 end:0x801D543C
+	.data       start:0x80211F28 end:0x80211F4C
+	.sbss       start:0x8032EE88 end:0x8032EE8D
 
 itemobj.cpp:
 	extab       start:0x8000960C end:0x8000968C
 	extabindex  start:0x800105DC end:0x8001069C
 	.text       start:0x80124B78 end:0x80127008
+	.sbss       start:0x8032EE90 end:0x8032EE94
 
 prgobj.cpp:
 	extab       start:0x8000968C end:0x8000970C

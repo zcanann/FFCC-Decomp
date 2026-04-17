@@ -56,7 +56,7 @@ extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern float DAT_80330e10;
 extern char gUtil[];
-char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.c";
+static const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.c";
 extern double DOUBLE_80330e08;
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
@@ -166,26 +166,29 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	int meshList = *(int*)((char*)model0 + 0xAC);
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
 		state->m_meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x15D);
+		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
+		    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x15D);
 		state->m_displayListArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x160);
+		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
+		    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x160);
 
 		int* meshColorArrays = (int*)state->m_meshColorArrays;
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 			*(int*)(state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			    *(int*)(*(int*)(meshList + 8) + 0x4C) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x168);
+			    *(int*)(*(int*)(meshList + 8) + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
+			    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x168);
 
 			int dlIdx = *(int*)(*(int*)(meshList + 8) + 0x4C) - 1;
 			int* dlInfo = (int*)(*(int*)(*(int*)(meshList + 8) + 0x50));
 			int* dlEntry = (int*)(*(int*)(state->m_displayListArrays + arrayOffset) + dlIdx * 4);
 			for (; -1 < dlIdx; dlIdx = dlIdx - 1) {
 				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-				    8, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x172);
+				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x172);
 				*dlEntry = dlPair;
 				*(int*)(*dlEntry + 4) = *dlInfo;
 				*(int*)*dlEntry = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-				    *dlInfo, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x174);
+				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x174);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
 				ReWriteDisplayList__5CUtilFPvUlUl(gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				DCFlushRange(*(void**)*dlEntry, (unsigned long)dlInfo[0]);
@@ -194,7 +197,8 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			}
 
 			*meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			    *(int*)(*(int*)(meshList + 8) + 0x14) << 2, pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x17F);
+			    *(int*)(*(int*)(meshList + 8) + 0x14) << 2, pppEnvStPtr->m_stagePtr,
+			    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x17F);
 			memset((void*)*meshColorArrays, 0xFF, *(int*)(*(int*)(meshList + 8) + 0x14) << 2);
 			arrayOffset = arrayOffset + 4;
 			meshColorArrays = meshColorArrays + 1;

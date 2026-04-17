@@ -2,6 +2,7 @@
 #define _FFCC_CHARA_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/ref.h"
 
 #include <dolphin/mtx.h>
 
@@ -34,7 +35,7 @@ public:
 		void Create(CChunkFile&, CMemory::CStage*);
 	};
 
-	class CAnim
+	class CAnim : public CRef
 	{
 		CAnim();
 		~CAnim();

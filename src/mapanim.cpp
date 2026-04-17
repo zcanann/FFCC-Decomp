@@ -47,9 +47,9 @@ extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
 extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
 extern "C" int Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(CPtrArray<CMapAnimKeyDt*>*, CMapAnimKeyDt*);
 
-static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error[] = "CPtrArray grow error";
-static char s_mapanim_cpp[] = "mapanim.cpp";
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_mapanim_cpp[] = "mapanim.cpp";
 
 /*
  * --INFO--
@@ -166,13 +166,13 @@ int CPtrArray<CMapAnimNode*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapAnimNode**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }
@@ -230,13 +230,13 @@ int CPtrArray<CMapAnimKeyDt*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapAnimKeyDt**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }
@@ -262,6 +262,12 @@ struct CMapAnimNodeTrackKey
 
 struct CMapAnimNodeTrack
 {
+    unsigned int count;
+    CMapAnimNodeTrackKey* keys;
+};
+class CMapAnimKey
+{
+public:
     unsigned int count;
     CMapAnimNodeTrackKey* keys;
 };
@@ -546,9 +552,48 @@ void CMapAnimNode::Interp(int frame)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
+void CMapAnimNode::interp(Vec* out, CMapAnimKey* key, int frameInLoop, int loopFrameCount)
 {
-	// TODO
+    unsigned int keyCount = key->count;
+    CMapAnimNodeTrackKey* current = key->keys;
+
+    if (keyCount == 1) {
+        *out = current[0].value;
+        return;
+    }
+
+    int i = 0;
+    for (unsigned int remaining = keyCount; remaining != 0; remaining--) {
+        unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(keyCount <= i + 1U);
+        CMapAnimNodeTrackKey* next = key->keys + nextIndex;
+        unsigned int endFrame;
+
+        if (nextIndex == 0) {
+            endFrame = next->frame + loopFrameCount;
+        } else {
+            endFrame = next->frame;
+        }
+
+        unsigned int currentFrame = current->frame;
+        if ((currentFrame <= (unsigned int)frameInLoop) && (frameInLoop < (int)endFrame)) {
+            int frameRange = endFrame - currentFrame;
+            float t = 0.0f;
+            Vec currentScaled;
+            Vec nextScaled;
+
+            if (frameRange != 0) {
+                t = (float)(frameInLoop - (int)currentFrame) / (float)frameRange;
+            }
+
+            PSVECScale(&current->value, &currentScaled, t);
+            PSVECScale(&next->value, &nextScaled, 1.0f - t);
+            PSVECAdd(&currentScaled, &nextScaled, out);
+            break;
+        }
+
+        current++;
+        i++;
+    }
 }
 
 /*
@@ -642,7 +687,8 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             reinterpret_cast<int*>(this)[8] = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
             item = static_cast<int*>(
-                __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0xC2));
+                __nw__FUlPQ27CMemory6CStagePci(
+                    0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0xC2));
             if (item != 0) {
                 item[2] = 0;
             }
@@ -655,7 +701,8 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
                 } else if (innerChunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
-                        __nw__FUlPQ27CMemory6CStagePci(0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x4C));
+                        __nw__FUlPQ27CMemory6CStagePci(
+                            0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x4C));
                     if (keyData != 0) {
                         *reinterpret_cast<int*>(keyData + 0x4) = 0;
                         *reinterpret_cast<int*>(keyData + 0xC) = 0;
@@ -669,19 +716,28 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     *reinterpret_cast<unsigned int*>(item[2]) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x4) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
-                            *reinterpret_cast<int*>(item[2]) << 4, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x4F));
+                            *reinterpret_cast<int*>(item[2]) << 4,
+                            *reinterpret_cast<CMemory::CStage**>(&MapMng),
+                            const_cast<char*>(s_mapanim_cpp),
+                            0x4F));
                     memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x4)), chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x524F5420) {
                     *reinterpret_cast<unsigned int*>(item[2] + 0x8) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0xC) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
-                            *reinterpret_cast<int*>(item[2] + 0x8) << 4, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x55));
+                            *reinterpret_cast<int*>(item[2] + 0x8) << 4,
+                            *reinterpret_cast<CMemory::CStage**>(&MapMng),
+                            const_cast<char*>(s_mapanim_cpp),
+                            0x55));
                     memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0xC)), chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x5343414C) {
                     *reinterpret_cast<unsigned int*>(item[2] + 0x10) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x14) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
-                            *reinterpret_cast<int*>(item[2] + 0x10) << 4, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapanim_cpp, 0x5B));
+                            *reinterpret_cast<int*>(item[2] + 0x10) << 4,
+                            *reinterpret_cast<CMemory::CStage**>(&MapMng),
+                            const_cast<char*>(s_mapanim_cpp),
+                            0x5B));
                     memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x14)), chunkFile.GetAddress(), innerChunkSize);
                 }
             }

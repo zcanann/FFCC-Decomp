@@ -49,12 +49,14 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 RSDITEM* CMaterialEditorPcs::GetReadRsd()
 {
     ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xC8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x9C);
     return reinterpret_cast<RSDLISTITEM*>(list->GetDataIdx(index))->rsdItem;
 }
+#endif
 
 /*
  * --INFO--
@@ -148,6 +150,7 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount)
 {
     ZCANMGRP* entry = *colAnmData;
@@ -166,6 +169,7 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
         *colAnmData = (ZCANMGRP*)0;
     }
 }
+#endif
 
 /*
  * --INFO--
@@ -176,6 +180,7 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
 {
     RSDITEM* rsdItem = listItem->rsdItem;
@@ -204,6 +209,7 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
     DeleteColAnmData(&listItem->colAnmData, listItem->colAnmCount);
     __dl__FPv(listItem);
 }
+#endif
 
 /*
  * --INFO--
@@ -214,12 +220,14 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
 {
     ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
     return reinterpret_cast<RSDLISTITEM*>(list->GetDataIdx(index));
 }
+#endif
 
 /*
  * --INFO--

@@ -699,6 +699,7 @@ p_chara.cpp:
 	extabindex  start:0x8000D69C end:0x8000D9A8
 	.text       start:0x80073AF4 end:0x8007BB90
 	.ctors      start:0x801D5414 end:0x801D5418
+	.bss        start:0x802E9958 end:0x802EA080
 
 pppDrawMng.cpp:
 	extab       start:0x80007838 end:0x80007850
@@ -822,6 +823,7 @@ fontman.cpp:
 	extabindex  start:0x8000DE64 end:0x8000DF3C
 	.text       start:0x80091E58 end:0x8009312C
 	.ctors      start:0x801D5418 end:0x801D541C
+	.bss        start:0x802EA170 end:0x802EA188
 
 pppYmTracer.cpp:
 	extab       start:0x80007BF0 end:0x80007C08
@@ -954,6 +956,7 @@ gbaque.cpp:
 	extabindex  start:0x8000EEFC end:0x8000F460
 	.text       start:0x800C8A8C end:0x800D160C
 	.ctors      start:0x801D5430 end:0x801D5434
+	.bss        start:0x802F49B0 end:0x802F7720
 
 pppYmMoveCircle.cpp:
 	extab       start:0x80008A64 end:0x80008A74
@@ -1299,6 +1302,7 @@ astar.cpp:
 	extabindex  start:0x80010E34 end:0x80010EC4
 	.text       start:0x80141550 end:0x80143098
 	.ctors      start:0x801D5444 end:0x801D5448
+	.bss        start:0x80309178 end:0x8030B62C
 
 pppConstrainCameraDir.cpp:
 	extab       start:0x80009BFC end:0x80009C04

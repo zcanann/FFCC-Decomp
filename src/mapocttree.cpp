@@ -100,7 +100,7 @@ extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsig
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" const char s_m_node_pctd_m_meshtype_pctd_801D7268[];
 
-static char s_mapocttree_cpp[] = "mapocttree.cpp";
+static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 
 namespace {
 static inline unsigned char* Ptr(void* ptr, unsigned int offset)
@@ -215,7 +215,8 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             }
 
             rootNode = __nwa__FUlPQ27CMemory6CStagePci(
-                nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapocttree_cpp, 0x59);
+                nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp),
+                0x59);
             m_nodePool = reinterpret_cast<COctNode*>(
                 __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount));
             break;

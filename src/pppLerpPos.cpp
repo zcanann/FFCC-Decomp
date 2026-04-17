@@ -28,7 +28,7 @@ void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 }
 extern float FLOAT_80331bf8;
 extern float FLOAT_80331bfc;
-char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
+static const char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
 
 /*
  * --INFO--
@@ -55,7 +55,8 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
         historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + iVar2);
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr, s_pppLerpPos_cpp_801dd418,
+                (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppLerpPos_cpp_801dd418),
                 0x37);
 
             for (iVar7 = 0; iVar7 < (s32)(u8)param_2->m_dataValIndex; iVar7 = iVar7 + 1) {

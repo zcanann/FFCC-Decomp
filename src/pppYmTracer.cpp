@@ -32,7 +32,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 }
 
-static char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
+static const char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
 
 struct TracerDataValue {
     u32 unk0;
@@ -237,7 +237,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         decay = (u8)((u16)alpha / *(u16*)(param_2->m_payload + 6));
         entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * sizeof(TRACE_POLYGON),
                                                                          pppEnvStPtr->m_stagePtr,
-                                                                         s_pppYmTracer_cpp_801d9ce0, 0xEB);
+                                                                         const_cast<char*>(s_pppYmTracer_cpp_801d9ce0),
+                                                                         0xEB);
         work->entries = entries;
         fVar3 = FLOAT_803306e8;
 

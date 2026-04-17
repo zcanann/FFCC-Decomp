@@ -343,7 +343,7 @@ void CChara::ChangeMogMode(int mogMode)
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
+static const char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
 extern "C" void makeFurTex__6CCharaFv();
 
 static inline unsigned short PackFurTexel(int r, int g, int b, int a)
@@ -463,7 +463,7 @@ void CChara::CModel::InitMogFurTex()
 
 	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
-		_WaitDrawDone__8CGraphicFPci(&Graphic, s_chara_fur_cpp_801db72c, 0x506);
+		_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
 
 		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
@@ -688,7 +688,8 @@ extern "C" void freeFurTex__6CCharaFv()
 extern "C" void makeFurTex__6CCharaFv()
 {
 	if (gMogFurTexBuffer == 0) {
-		gMogFurTexBuffer = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x20000, 0, s_chara_fur_cpp_801db72c, 0xE9, 0);
+		gMogFurTexBuffer = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			&Memory, 0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
 	}
 	if (gMogFurTexBuffer == 0) {
 		return;

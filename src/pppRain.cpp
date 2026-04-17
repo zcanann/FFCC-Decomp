@@ -13,7 +13,7 @@ extern unsigned char gPppInConstructor;
 #include "dolphin/gx.h"
 const float FLOAT_80331020 = 3.0518509e-05f;
 const double DOUBLE_80331028 = 4503601774854144.0;
-static char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
+static const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {
 int rand(void);
@@ -147,7 +147,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         work->drops = (RainDrop*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
-            s_pppRain_cpp_801DB610,
+            const_cast<char*>(s_pppRain_cpp_801DB610),
             0x7f);
         drop = work->drops;
         for (i = 0; i < (int)param_2->m_dataValIndex; i++) {

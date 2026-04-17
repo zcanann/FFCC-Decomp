@@ -9,9 +9,8 @@ extern "C" void __dl__FPv(void*);
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::onScriptChanged(char*, int)
+void CMenu::onScriptChanging(char*)
 {
-	// TODO
 }
 
 /*
@@ -19,8 +18,9 @@ void CMenu::onScriptChanged(char*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::onScriptChanging(char*)
+void CMenu::onScriptChanged(char*, int)
 {
+	// TODO
 }
 
 /*

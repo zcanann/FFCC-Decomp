@@ -442,7 +442,7 @@ config.libs = [
             Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"]),
             Object(NonMatching, "memory.cpp"),
             Object(NonMatching, "memorycard.cpp"),
-            Object(NonMatching, "menu.cpp"),
+            Object(Matching, "menu.cpp"),
             Object(NonMatching, "menu_arti.cpp"),
             Object(NonMatching, "menu_cmd.cpp"),
             Object(NonMatching, "menu_compa.cpp"),

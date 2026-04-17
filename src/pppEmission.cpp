@@ -173,12 +173,13 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
+    u8* materialMan = MaterialManRaw();
+    MtxPtr cameraMatrix = CameraMatrix();
     EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
     if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
-        int textureInfo = state->m_texture;
         pppInitBlendMode();
         pppSetBlendMode(step->m_payload[8]);
-        *(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
+        *(int*)(materialMan + 0xD0) = state->m_texture + 0x28;
 
         u8 mode = step->m_payload[9];
         if (mode == 0) {
@@ -188,27 +189,27 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 Mtx viewMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraMatrix(), viewMtx);
+                PSMTXCopy(cameraMatrix, viewMtx);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
 
                 int remaining = meshData->m_displayListCount;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (--remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x44) = -1;
-                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x11C) = 0;
-                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x124) = 0;
-                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x58) = 0;
-                    *(int*)(MaterialManRaw() + 0x5C) = 0;
-                    *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
+                    *(int*)(materialMan + 0x44) = -1;
+                    *(u8*)(materialMan + 0x4C) = 0xFF;
+                    *(int*)(materialMan + 0x11C) = 0;
+                    *(int*)(materialMan + 0x120) = 0x1E;
+                    *(int*)(materialMan + 0x124) = 0;
+                    *(u8*)(materialMan + 0x205) = 0xFF;
+                    *(u8*)(materialMan + 0x206) = 0xFF;
+                    *(int*)(materialMan + 0x58) = 0;
+                    *(int*)(materialMan + 0x5C) = 0;
+                    *(u8*)(materialMan + 0x208) = 0;
+                    *(int*)(materialMan + 0x48) = 0xECE0F;
+                    *(int*)(materialMan + 0x128) = 0;
+                    *(int*)(materialMan + 0x12C) = 0x1E;
+                    *(int*)(materialMan + 0x130) = 0;
+                    *(int*)(materialMan + 0x40) = 0xECE0F;
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
                         &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
 
@@ -217,7 +218,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
+                        PSMTXCopy((float(*)[4])(materialMan + 0xE8), texMtx);
                         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
                         if (texMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
@@ -240,28 +241,28 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 Mtx viewMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraMatrix(), viewMtx);
+                PSMTXCopy(cameraMatrix, viewMtx);
                 PSMTXConcat(viewMtx, objMtx, objMtx);
                 GXLoadPosMtxImm(objMtx, 0);
 
                 int remaining = meshData->m_displayListCount;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (--remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x44) = -1;
-                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x11C) = 0;
-                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x124) = 0;
-                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x58) = 0;
-                    *(int*)(MaterialManRaw() + 0x5C) = 0;
-                    *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
+                    *(int*)(materialMan + 0x44) = -1;
+                    *(u8*)(materialMan + 0x4C) = 0xFF;
+                    *(int*)(materialMan + 0x11C) = 0;
+                    *(int*)(materialMan + 0x120) = 0x1E;
+                    *(int*)(materialMan + 0x124) = 0;
+                    *(u8*)(materialMan + 0x205) = 0xFF;
+                    *(u8*)(materialMan + 0x206) = 0xFF;
+                    *(int*)(materialMan + 0x58) = 0;
+                    *(int*)(materialMan + 0x5C) = 0;
+                    *(u8*)(materialMan + 0x208) = 0;
+                    *(int*)(materialMan + 0x48) = 0xECE0F;
+                    *(int*)(materialMan + 0x128) = 0;
+                    *(int*)(materialMan + 0x12C) = 0x1E;
+                    *(int*)(materialMan + 0x130) = 0;
+                    *(int*)(materialMan + 0x40) = 0xECE0F;
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
                         &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
 
@@ -270,7 +271,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
+                        PSMTXCopy((float(*)[4])(materialMan + 0xE8), texMtx);
                         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
                         if (texMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
@@ -416,7 +417,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
     u8 baseAlpha = dataSet[0xB];
-    float alphaScale = (float)baseAlpha / FLOAT_803311e0;
+    double alphaScale = (float)baseAlpha / FLOAT_803311e0;
     state->m_colorR = dataSet[8];
     state->m_colorG = dataSet[9];
     state->m_colorB = dataSet[0xA];
@@ -484,7 +485,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             }
 
             particle->m_fieldA = particle->m_fieldA - 1;
-            int alpha = (int)((float)particle->m_alpha * alphaScale);
+            int alpha = (int)((double)particle->m_alpha * alphaScale);
 
             if (particle->m_fieldA < 1) {
                 s16 jitter = 0;

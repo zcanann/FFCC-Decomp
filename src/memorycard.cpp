@@ -1795,61 +1795,69 @@ void CMemoryCardMan::DecodeData()
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
     int charSlot = 0;
-    
-    do {
-        char* charData = (char*)saveDat + charSlot * 0x9c0;
-        
-        // Check if character slot is active
-        if (*(int*)(charData + 0x1a84) != 0)
+
+    do
+    {
+        if (*(int*)((char*)saveDat + 0x1A84) != 0)
         {
             short equippedItems[4];
-            int itemSlot = 0x45;
+            int itemSlot = 0;
             int accessoryCount = 0x49;
-            
-            // Process equipped accessory slots (items 0x45-0x48)
-            do {
-                if (itemSlot > 0x44) {
-                    int bitShift = itemSlot >> 0x1f;
-                    unsigned int bitMask = 1 << ((bitShift * 0x20 | (unsigned int)(itemSlot * 0x8000000 + bitShift) >> 0x1b) - bitShift);
-                    
-                    if ((*(unsigned int*)(charData + (itemSlot >> 5) * 4 + 0x158c) & bitMask) == 0) {
+
+            do
+            {
+                if (itemSlot > 0x44)
+                {
+                    int bitShift = itemSlot >> 0x1F;
+                    if ((*(unsigned int*)((char*)saveDat + (itemSlot >> 5) * 4 + 0x158C) &
+                         1 << ((bitShift * 0x20 | (unsigned int)(itemSlot * 0x8000000 + bitShift) >> 0x1B) - bitShift)) == 0)
+                    {
                         equippedItems[itemSlot - 0x45] = -1;
-                    } else {
-                        equippedItems[itemSlot - 0x45] = itemSlot + 0x9f;
+                    }
+                    else
+                    {
+                        equippedItems[itemSlot - 0x45] = (short)itemSlot + 0x9F;
                     }
                 }
+
                 itemSlot++;
                 accessoryCount--;
-            } while (accessoryCount != 0);
-            
-            // Calculate total HP bonus from equipped accessories
+            }
+            while (accessoryCount != 0);
+
             unsigned int totalHpBonus = 0;
-            unsigned int itemData = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC5B8);
-            
-            if (equippedItems[0] >= 0) {
+            int itemData = *reinterpret_cast<int*>((char*)&Game + 0xC5B8);
+
+            if (equippedItems[0] >= 0)
+            {
                 totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);
             }
-            if (equippedItems[1] >= 0) {
+            if (equippedItems[1] >= 0)
+            {
                 totalHpBonus += *(unsigned short*)(itemData + equippedItems[1] * 0x48 + 6);
             }
-            if (equippedItems[2] >= 0) {
+            if (equippedItems[2] >= 0)
+            {
                 totalHpBonus += *(unsigned short*)(itemData + equippedItems[2] * 0x48 + 6);
             }
-            if (equippedItems[3] >= 0) {
+            if (equippedItems[3] >= 0)
+            {
                 totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
             }
-            
-            // Calculate final HP max (base 8 + bonuses, capped at 16)
-            unsigned short finalHpMax = 16;
-            if (totalHpBonus + 8 < 16) {
-                finalHpMax = totalHpBonus + 8;
+
+            unsigned short finalHpMax = 0x10;
+            if (totalHpBonus + 8 < 0x10)
+            {
+                finalHpMax = (unsigned short)(totalHpBonus + 8);
             }
-            
-            // Store calculated HP max in save data
-            *(unsigned short*)(charData + 0x14d6) = finalHpMax;
+
+            *(unsigned short*)((char*)saveDat + 0x14D6) = finalHpMax;
         }
+
         charSlot++;
-    } while (charSlot < 8);
+        saveDat = (Mc::SaveDat*)((char*)saveDat + 0x9C0);
+    }
+    while (charSlot < 8);
 }
 
 /*

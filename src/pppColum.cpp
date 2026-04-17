@@ -120,7 +120,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             cameraDelta.z = ppvCameraMatrix0[2][3] + *(float*)(positionBase + 0x18);
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
-            if (lengthXY > 1.0f) {
+            if (lengthXY > 0.0f) {
                 lengthXY = sqrtf(lengthXY);
             } else if (lengthXY < 0.0f) {
                 lengthXY = NAN;

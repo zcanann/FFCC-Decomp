@@ -977,7 +977,6 @@ config.libs = [
             Object(
                 NonMatching,
                 "MSL_C/PPCEABI/bare/H/alloc.c",
-                extra_cflags=["-inline noauto"],
                 mw_version="GC/2.7",
             ),
             Object(Matching, "MSL_C/PPCEABI/bare/H/errno.c"),

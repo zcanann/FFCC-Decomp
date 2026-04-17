@@ -676,19 +676,20 @@ void CPartPcs::calc()
  */
 void CPartPcs::calcViewer()
 {
-    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 4);
+    unsigned int packetCode;
 
-    OSStartStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     PartMng.pppEditBeforeCalc();
     PartMng.pppEditPartCalc();
-    OSStopStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
 
     mccReadData__7CUSBPcsFv(&USBPcs);
-    if (usbStream->IsUSBStreamDataDone()) {
-        if (usbStream->m_packetCode != 0) {
-            PartMng.pppDataRcv(usbStream->m_packetCode, reinterpret_cast<char*>(usbStream->m_data), usbStream->m_sizeBytes);
+    if (m_usbStreamData.IsUSBStreamDataDone()) {
+        packetCode = m_usbStreamData.m_packetCode;
+        if (packetCode != 0) {
+            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
         }
-        usbStream->SetUSBStreamDataDone();
+        m_usbStreamData.SetUSBStreamDataDone();
     }
 }
 

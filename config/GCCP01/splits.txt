@@ -841,6 +841,7 @@ fontman.cpp:
 	extabindex  start:0x8000DE64 end:0x8000DF3C
 	.text       start:0x80091E58 end:0x8009312C
 	.ctors      start:0x801D5418 end:0x801D541C
+	.data       start:0x8020EDC8 end:0x8020EDF8
 	.bss        start:0x802EA170 end:0x802EA188
 
 pppYmTracer.cpp:

@@ -1,5 +1,6 @@
 #include "dolphin/math.h"
 #include "dolphin/mtx.h"
+#include "dolphin/os.h"
 
 float sqrtf(float x);
 float sinf(float x);

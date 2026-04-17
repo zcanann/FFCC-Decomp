@@ -72,7 +72,6 @@ extern CRedMemory DAT_8032f480;
 extern u8 m_RandomIndex;
 extern int p_ReverbData;
 extern u32* p_ReverbSize;
-extern u32 m_VoiceChangeStatus;
 extern u32 m_ChangeStatus;
 extern int* p_SkipKeyOn;
 extern CRedDriver gRedDriver;

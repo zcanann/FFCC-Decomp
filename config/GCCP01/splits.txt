@@ -199,6 +199,7 @@ p_game.cpp:
 	extabindex  start:0x8000C460 end:0x8000C508
 	.text       start:0x80047930 end:0x80047C9C
 	.ctors      start:0x801D53F0 end:0x801D53F4
+	.data       start:0x801EA09C end:0x801EA0D0
 	.sbss       start:0x8032ED00 end:0x8032ED04
 
 p_system.cpp:
@@ -256,6 +257,7 @@ p_FunnyShape.cpp:
 	extabindex  start:0x8000C7A8 end:0x8000C838
 	.text       start:0x8004E210 end:0x8004EB4C
 	.ctors      start:0x801D5400 end:0x801D5404
+	.data       start:0x801EA914 end:0x801EA948
 	.bss        start:0x8026D728 end:0x80273928
 
 FS_USB_Process.cpp:
@@ -849,6 +851,7 @@ p_menu.cpp:
 	extabindex  start:0x8000DF6C end:0x8000E0A4
 	.text       start:0x80093E78 end:0x800977D8
 	.ctors      start:0x801D541C end:0x801D5420
+	.data       start:0x8020F2C4 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 
 p_gba.cpp:
@@ -1043,6 +1046,7 @@ p_sound.cpp:
 	extabindex  start:0x8000F628 end:0x8000F664
 	.text       start:0x800D8710 end:0x800D88C8
 	.ctors      start:0x801D5434 end:0x801D5438
+	.data       start:0x8021071C end:0x80210750
 	.sbss       start:0x8032EDE0 end:0x8032EDE4
 
 pppYmLookOn.cpp:

@@ -606,40 +606,42 @@ void THPSimpleAudioStop(void)
  */
 s32 THPSimpleLoadStop(void)
 {
-    if ((SimpleControl.isOpen == 0) || (SimpleControl.isBufferSet != 0)) {
-        return 0;
+    if (SimpleControl.isOpen != 0) {
+        if (SimpleControl.isBufferSet == 0) {
+            SimpleControl.isPreLoaded = 0;
+            if (SimpleControl.isReadFrameAsync != 0) {
+                DVDCancel(&SimpleControl.fileInfo.cb);
+                SimpleControl.isReadFrameAsync = 0;
+            }
+
+            SimpleControl.readBuffer[0].mIsValid = 0;
+            SimpleControl.readBuffer[1].mIsValid = 0;
+            SimpleControl.readBuffer[2].mIsValid = 0;
+            SimpleControl.readBuffer[3].mIsValid = 0;
+            SimpleControl.readBuffer[4].mIsValid = 0;
+            SimpleControl.readBuffer[5].mIsValid = 0;
+            SimpleControl.readBuffer[6].mIsValid = 0;
+            SimpleControl.readBuffer[7].mIsValid = 0;
+            SimpleControl.audioBuffer[0].mValidSample = 0;
+            SimpleControl.audioBuffer[1].mValidSample = 0;
+            SimpleControl.audioBuffer[2].mValidSample = 0;
+
+            SimpleControl.curFrame = -1;
+            SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
+            SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
+            SimpleControl.readIndex = 0;
+            SimpleControl.curAudioTrack = 0;
+            SimpleControl.readError = 0;
+            SimpleControl.readFrame = 0;
+            SimpleControl.audioDecodeIndex = 0;
+            SimpleControl.audioPlayIndex = 0;
+            SimpleControl.unk_C4 = SimpleControl.unk_C8;
+            SimpleControl.unk_D0 = 0;
+            return 1;
+        }
     }
 
-    SimpleControl.isPreLoaded = 0;
-    if (SimpleControl.isReadFrameAsync != 0) {
-        DVDCancel(&SimpleControl.fileInfo.cb);
-        SimpleControl.isReadFrameAsync = 0;
-    }
-
-    SimpleControl.readBuffer[0].mIsValid = 0;
-    SimpleControl.readBuffer[1].mIsValid = 0;
-    SimpleControl.readBuffer[2].mIsValid = 0;
-    SimpleControl.readBuffer[3].mIsValid = 0;
-    SimpleControl.readBuffer[4].mIsValid = 0;
-    SimpleControl.readBuffer[5].mIsValid = 0;
-    SimpleControl.readBuffer[6].mIsValid = 0;
-    SimpleControl.readBuffer[7].mIsValid = 0;
-    SimpleControl.audioBuffer[0].mValidSample = 0;
-    SimpleControl.audioBuffer[1].mValidSample = 0;
-    SimpleControl.audioBuffer[2].mValidSample = 0;
-
-    SimpleControl.curFrame = -1;
-    SimpleControl.readOffset = static_cast<s32>(SimpleControl.header.mMovieDataOffsets);
-    SimpleControl.readSize = static_cast<s32>(SimpleControl.header.mFirstFrameSize);
-    SimpleControl.readIndex = 0;
-    SimpleControl.curAudioTrack = 0;
-    SimpleControl.readError = 0;
-    SimpleControl.readFrame = 0;
-    SimpleControl.audioDecodeIndex = 0;
-    SimpleControl.audioPlayIndex = 0;
-    SimpleControl.unk_C4 = SimpleControl.unk_C8;
-    SimpleControl.unk_D0 = 0;
-    return 1;
+    return 0;
 }
 
 /*

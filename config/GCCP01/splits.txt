@@ -302,6 +302,7 @@ p_tina.cpp:
 	.text       start:0x80051F38 end:0x80053D04
 	.ctors      start:0x801D5404 end:0x801D5408
 	.sbss       start:0x8032ED50 end:0x8032ED68
+	.sdata2     start:0x8032FDC8 end:0x8032FDD8
 
 pppPart.cpp:
 	extab       start:0x80006D48 end:0x80006E80
@@ -967,6 +968,7 @@ memorycard.cpp:
 	extabindex  start:0x8000EADC end:0x8000EC38
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
+	.rodata     start:0x801DAA0C end:0x801DAE0C
 	.bss        start:0x802F2628 end:0x802F26C4
 
 pppWDrawMatrixLoop.cpp:

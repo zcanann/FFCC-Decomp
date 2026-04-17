@@ -170,25 +170,25 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
-    GXColor white;
-    unsigned int width;
-    unsigned int height;
+    GXColor quadColor;
+    int width;
+    int height;
     float widthFloat;
     float heightFloat;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (unsigned int)FLOAT_80331050;
-    height = (unsigned int)FLOAT_80331054;
-    widthFloat = (float)(int)width;
-    heightFloat = (float)(int)height;
+    width = (int)FLOAT_80331050;
+    height = (int)FLOAT_80331054;
+    widthFloat = (float)width;
+    heightFloat = (float)height;
 
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
+    quadColor.r = 0;
+    quadColor.g = 0;
+    quadColor.b = 0;
+    quadColor.a = 0xFF;
 
     posA.x = FLOAT_80331030;
     posA.y = FLOAT_80331030;
@@ -199,7 +199,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     gUtil.BeginQuadEnv();
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
-    gUtil.RenderQuadNoTex(posA, posB, white);
+    gUtil.RenderQuadNoTex(posA, posB, quadColor);
     gUtil.EndQuadEnv();
 
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
@@ -235,9 +235,13 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         posB.x = FLOAT_80331050 - (FLOAT_80331044 * offsetY);
         posB.y = FLOAT_80331054 - offsetY;
         posB.z = FLOAT_80331030;
+        quadColor.r = 0xFF;
+        quadColor.g = 0xFF;
+        quadColor.b = 0xFF;
+        quadColor.a = 0xFF;
 
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
-        gUtil.RenderQuad(posA, posB, white, 0, 0);
+        gUtil.RenderQuad(posA, posB, quadColor, 0, 0);
         gUtil.EndQuadEnv();
 
         Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);

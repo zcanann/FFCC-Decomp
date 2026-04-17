@@ -878,7 +878,7 @@ extern "C" void __sinit_p_map_cpp(void)
 
 	volatile void** base = reinterpret_cast<volatile void**>(&MapPcs);
 	*base = &__vt__8CManager;
-	*base = &__vt__8CProcess;
+	*base = __vt__8CProcess;
 	*base = __vt__7CMapPcs;
 
 	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;

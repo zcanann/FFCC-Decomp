@@ -132,7 +132,7 @@ extern "C" void __sinit_p_menu_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&MenuPcs);
     *reinterpret_cast<void**>(self) = &__vt__8CManager;
-    *reinterpret_cast<void**>(self) = &__vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__8CMenuPcs;
 
     u32* mcCtrl = reinterpret_cast<u32*>(self + 0x20);

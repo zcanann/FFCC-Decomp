@@ -120,7 +120,7 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = &__vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
     __ct__14CUSBStreamDataFv(self + 0x3C);

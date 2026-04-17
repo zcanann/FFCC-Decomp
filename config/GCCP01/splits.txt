@@ -60,6 +60,7 @@ p_sample.cpp:
 	extabindex  start:0x8000B434 end:0x8000B440
 	.text       start:0x8001FE74 end:0x8001FF6C
 	.ctors      start:0x801D53B8 end:0x801D53BC
+	.sbss       start:0x8032EC60 end:0x8032EC64
 
 p_usb.cpp:
 	extab       start:0x80005BE4 end:0x80005C2C
@@ -128,6 +129,7 @@ mapocttree.cpp:
 	extabindex  start:0x8000B9BC end:0x8000BAD0
 	.text       start:0x8002C704 end:0x8002F45C
 	.ctors      start:0x801D53D4 end:0x801D53D8
+	.bss        start:0x802456F0 end:0x80245754
 
 map.cpp:
 	extab       start:0x80006068 end:0x80006304
@@ -159,6 +161,7 @@ materialman.cpp:
 	extabindex  start:0x8000C07C end:0x8000C2BC
 	.text       start:0x8003C1B8 end:0x80043D10
 	.ctors      start:0x801D53E8 end:0x801D53EC
+	.bss        start:0x80268C70 end:0x80268E8C
 
 ref.cpp:
 	extab       start:0x80006754 end:0x8000675C
@@ -182,12 +185,14 @@ p_game.cpp:
 	extabindex  start:0x8000C460 end:0x8000C508
 	.text       start:0x80047930 end:0x80047C9C
 	.ctors      start:0x801D53F0 end:0x801D53F4
+	.sbss       start:0x8032ED00 end:0x8032ED04
 
 p_system.cpp:
 	extab       start:0x80006918 end:0x80006928
 	extabindex  start:0x8000C508 end:0x8000C520
 	.text       start:0x80047C9C end:0x80047E00
 	.ctors      start:0x801D53F4 end:0x801D53F8
+	.sbss       start:0x8032ED08 end:0x8032ED0C
 
 p_light.cpp:
 	extab       start:0x80006928 end:0x800069C8
@@ -907,6 +912,7 @@ memorycard.cpp:
 	extabindex  start:0x8000EADC end:0x8000EC38
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
+	.bss        start:0x802F2628 end:0x802F26C4
 
 pppWDrawMatrixLoop.cpp:
 	extab       start:0x800084E0 end:0x800084E8
@@ -1009,6 +1015,7 @@ p_sound.cpp:
 	extabindex  start:0x8000F628 end:0x8000F664
 	.text       start:0x800D8710 end:0x800D88C8
 	.ctors      start:0x801D5434 end:0x801D5438
+	.sbss       start:0x8032EDE0 end:0x8032EDE4
 
 pppYmLookOn.cpp:
 	extab       start:0x80008BBC end:0x80008BC4
@@ -1106,6 +1113,7 @@ gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
 	extabindex  start:0x8000FD00 end:0x8000FD84
 	.text       start:0x80102FB4 end:0x801035DC
+	.bss        start:0x802FF450 end:0x802FFA70
 
 pppYmTracer2.cpp:
 	extab       start:0x8000907C end:0x80009094
@@ -1306,6 +1314,7 @@ menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
+	.bss        start:0x8030BA48 end:0x8030BA54
 
 shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54

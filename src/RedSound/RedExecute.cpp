@@ -22,6 +22,9 @@ u32* p_ReverbSize;
 u32 m_ChangeStatus;
 int* p_SkipKeyOn;
 
+extern int m_ADataBuffer;
+extern int m_DataBufferSize;
+
 /*
  * --INFO--
  * PAL Address: 0x801c2fc4
@@ -132,9 +135,12 @@ void ReverbAreaFree(void* param_1)
  */
 void InitReverb()
 {
-    p_ReverbData = RedNew(0x18);
-    memset((void*)p_ReverbData, 0, 0x18);
-    p_ReverbSize = (u32*)RedNew(4);
+    int reverbData;
+
+    m_ADataBuffer = RedNew(0x18);
+    reverbData = m_ADataBuffer;
+    memset((void*)reverbData, 0, 0x18);
+    m_DataBufferSize = RedNew(4);
 }
 
 /*

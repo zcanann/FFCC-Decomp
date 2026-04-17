@@ -1244,7 +1244,7 @@ p_dbgmenu.cpp:
 	extabindex  start:0x80010810 end:0x800108AC
 	.text       start:0x8012B710 end:0x8012D3FC
 	.ctors      start:0x801D5440 end:0x801D5444
-	.bss        start:0x80306708 end:0x80309178
+	.bss        start:0x80306708 end:0x80309174
 
 pppChangeBGColor.cpp:
 	.text       start:0x8012D3FC end:0x8012D458

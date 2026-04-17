@@ -126,8 +126,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             if (ref != 0) {
                 __ct__4CRefFv(ref);
                 *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim;
-                *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x2C) = 0;
-                *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x30) = 0;
+                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x3C) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x40) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x44) = 0;
                 *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x48) = 0;
@@ -172,8 +171,12 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 s_maptexanim_cpp_801d7ec4, 0x3B);
             *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x20) = frameTable;
 
-            for (int i = 0; i < *reinterpret_cast<short*>(reinterpret_cast<int>(ref) + 0xC); i++) {
-                reinterpret_cast<unsigned short*>(frameTable)[i] = chunkFile.Get2();
+            int i = 0;
+            int offset = 0;
+            while (i < *reinterpret_cast<short*>(reinterpret_cast<int>(ref) + 0xC)) {
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(frameTable) + offset) = chunkFile.Get2();
+                i++;
+                offset += 2;
             }
 
             short count = *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8);

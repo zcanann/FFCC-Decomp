@@ -170,7 +170,6 @@ void CFlatData::Create(void* filePtr)
 					{
 						int numStrings;
 						int iVar6;
-						int indexOffset;
 						int iVar7;
 						int stringBase;
 
@@ -181,15 +180,12 @@ void CFlatData::Create(void* filePtr)
 
 						memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), numStrings);
 						stringBase = (int)chunkFile.GetAddress();
-						indexOffset = 0;
 
 						for (iVar7 = 0; (iVar1 = m_dataCount, iVar7 < m_data[iVar1].m_numStrings); iVar7++)
 						{
 							iVar6 = (int)chunkFile.GetAddress();
-							*(char**)((int)m_data[iVar1].m_strings + indexOffset) =
-								m_data[iVar1].m_stringBuf + (iVar6 - stringBase);
+							m_data[iVar1].m_strings[iVar7] = m_data[iVar1].m_stringBuf + (iVar6 - stringBase);
 							chunkFile.GetString();
-							indexOffset += 4;
 						}
 					}
 					else
@@ -207,7 +203,6 @@ void CFlatData::Create(void* filePtr)
 					char** stringIndex;
 					int iVar6;
 					int iVar7;
-					int indexOffset;
 					int stringBase;
 
 					m_tabl[m_tableCount].m_numEntries = chunk.m_arg0;
@@ -218,21 +213,17 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
 					stringBase = (int)chunkFile.GetAddress();
-					indexOffset = 0;
 					for (iVar7 = 0; (iVar1 = m_tableCount, iVar7 < m_tabl[iVar1].m_numEntries); iVar7++)
 					{
 						iVar6 = (int)chunkFile.GetAddress();
-						*(char**)((int)m_tabl[iVar1].m_strings + indexOffset) =
-							m_tabl[iVar1].m_stringBuf + (iVar6 - stringBase);
+						m_tabl[iVar1].m_strings[iVar7] = m_tabl[iVar1].m_stringBuf + (iVar6 - stringBase);
 						chunkFile.GetString();
-						indexOffset += 4;
 					}
 					m_tableCount++;
 					break;
 				}
 				case 0x4D455320: // 'MES '
 				{
-					char** mesPtr;
 					int iVar7;
 					int iVar8;
 
@@ -241,13 +232,11 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					iVar10 = (int)chunkFile.GetAddress();
-					mesPtr = m_mesPtr;
 					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
 						iVar8 = (int)chunkFile.GetAddress();
-						*mesPtr = m_mesBuffer + (iVar8 - iVar10);
+						m_mesPtr[iVar7] = m_mesBuffer + (iVar8 - iVar10);
 						chunkFile.GetString();
-						mesPtr++;
 					}
 					break;
 				}

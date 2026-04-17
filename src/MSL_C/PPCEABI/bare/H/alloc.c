@@ -141,7 +141,11 @@ static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 void __sys_free(void*);
 void* __sys_alloc(unsigned long size);
 
-static inline SubBlock* SubBlock_merge_prev(SubBlock* ths, SubBlock** start) {
+static unsigned long __msize(void* ptr) {
+    return __msize_inline(ptr);
+}
+
+static SubBlock* SubBlock_merge_prev(SubBlock* ths, SubBlock** start) {
     unsigned long prevsz;
     SubBlock* p;
 
@@ -161,7 +165,7 @@ static inline SubBlock* SubBlock_merge_prev(SubBlock* ths, SubBlock** start) {
     return ths;
 }
 
-static inline void SubBlock_merge_next(SubBlock* pBlock, SubBlock** pStart) {
+static void SubBlock_merge_next(SubBlock* pBlock, SubBlock** pStart) {
     SubBlock* next_sub_block;
     unsigned long this_cur_size;
 
@@ -196,7 +200,7 @@ static inline void SubBlock_merge_next(SubBlock* pBlock, SubBlock** pStart) {
     }
 }
 
-inline void Block_link(Block* ths, SubBlock* sb) {
+static void Block_link(Block* ths, SubBlock* sb) {
     SubBlock** st;
     SubBlock_set_free(sb);
     st = &Block_start(ths);
@@ -218,7 +222,7 @@ inline void Block_link(Block* ths, SubBlock* sb) {
         ths->max_size = SubBlock_size(*st);
 }
 
-static inline Block* __unlink(__mem_pool_obj* pool_obj, Block* bp) {
+static Block* __unlink(__mem_pool_obj* pool_obj, Block* bp) {
     Block* result = bp->next;
     if (result == bp) {
         result = 0;
@@ -238,11 +242,11 @@ static inline Block* __unlink(__mem_pool_obj* pool_obj, Block* bp) {
     return result;
 }
 
-inline void __init_pool_obj(__mem_pool* pool_obj) {
+static void __init_pool_obj(__mem_pool* pool_obj) {
     memset(pool_obj, 0, sizeof(__mem_pool_obj));
 }
 
-static inline __mem_pool* get_malloc_pool(void) {
+static __mem_pool* get_malloc_pool(void) {
     static __mem_pool protopool;
     static unsigned char init = 0;
     if (!initialized) {
@@ -277,7 +281,7 @@ static void Block_construct(Block* block, unsigned long size) {
     Block_link(block, sb);
 }
 
-static inline void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc) {
+static void SubBlock_construct(SubBlock* ths, unsigned long size, Block* bp, int prev_alloc, int this_alloc) {
     ths->block = (Block*)((unsigned long)bp | 0x1);
     ths->size = size;
     if (prev_alloc) {
@@ -291,7 +295,7 @@ static inline void SubBlock_construct(SubBlock* ths, unsigned long size, Block* 
     }
 }
 
-static inline SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz) {
+static SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz) {
     unsigned long origsize;
     int isfree;
     int isprevalloc;
@@ -315,7 +319,7 @@ static inline SubBlock* SubBlock_split(SubBlock* ths, unsigned long sz) {
     return np;
 }
 
-static inline void Block_unlink(Block* block, SubBlock* sb) {
+static void Block_unlink(Block* block, SubBlock* sb) {
     SubBlock** st;
     unsigned long tag;
     unsigned long tag_size;
@@ -385,6 +389,20 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     return sb;
 }
 
+static void link(__mem_pool_obj* pool_obj, Block* bp) {
+    if (pool_obj->start_ != 0) {
+        bp->prev = pool_obj->start_->prev;
+        bp->prev->next = bp;
+        bp->next = pool_obj->start_;
+        pool_obj->start_->prev = bp;
+        pool_obj->start_ = bp;
+    } else {
+        pool_obj->start_ = bp;
+        bp->prev = bp;
+        bp->next = bp;
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x801B27F4
@@ -409,17 +427,7 @@ static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
     }
 
     Block_construct(block, aligned_size);
-    if (pool_obj->start_ != 0) {
-        block->prev = pool_obj->start_->prev;
-        block->prev->next = block;
-        block->next = pool_obj->start_;
-        pool_obj->start_->prev = block;
-        pool_obj->start_ = block;
-    } else {
-        pool_obj->start_ = block;
-        block->prev = block;
-        block->next = block;
-    }
+    link(pool_obj, block);
     return block;
 }
 
@@ -521,7 +529,7 @@ static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
     }
 }
 
-static inline void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, unsigned long index, FixSubBlock* chunk, unsigned long chunk_size) {
+static void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, unsigned long index, FixSubBlock* chunk, unsigned long chunk_size) {
     unsigned long fixSubBlock_size;
     unsigned long n;
     char* p;
@@ -547,7 +555,6 @@ static inline void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* n
     ((FixSubBlock*)p)->next_ = 0;
     ths->n_allocated_ = 0;
 }
-
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     unsigned long i = 0;
     FixStart* fs;
@@ -751,4 +758,77 @@ void free(void* ptr) {
     __begin_critical_region(malloc_pool_access);
     __pool_free(get_malloc_pool(), ptr);
     __end_critical_region(malloc_pool_access);
+}
+
+void* __pool_alloc_clear(__mem_pool* pool, unsigned long size) {
+    void* ptr = __pool_alloc(pool, size);
+    if (ptr != 0) {
+        memset(ptr, 0, size);
+    }
+    return ptr;
+}
+
+void __pool_free_all(__mem_pool* pool) {
+    __mem_pool_obj* pool_obj = (__mem_pool_obj*)pool;
+    Block* block;
+    Block* next;
+
+    if (pool_obj->start_ == 0) {
+        return;
+    }
+
+    block = pool_obj->start_;
+    do {
+        next = block->next;
+        __sys_free(block);
+        block = next;
+    } while (block != pool_obj->start_);
+
+    memset(pool_obj, 0, sizeof(__mem_pool_obj));
+}
+
+void __pool_realloc(__mem_pool* pool, void* ptr, unsigned long size) {
+    // UNUSED FUNCTION
+}
+
+void __malloc_free_all(void) {
+    __begin_critical_region(malloc_pool_access);
+    __pool_free_all(get_malloc_pool());
+    __end_critical_region(malloc_pool_access);
+    initialized = 0;
+}
+
+void* calloc(size_t count, size_t size) {
+    void* ptr;
+    unsigned long total = count * size;
+
+    __begin_critical_region(malloc_pool_access);
+    ptr = __pool_alloc(get_malloc_pool(), total);
+    __end_critical_region(malloc_pool_access);
+
+    if (ptr != 0) {
+        memset(ptr, 0, total);
+    }
+    return ptr;
+}
+
+void* realloc(void* ptr, size_t size) {
+    // UNUSED FUNCTION
+    return 0;
+}
+
+static void SubBlock_report(SubBlock* sb) {
+    // UNUSED FUNCTION
+}
+
+static void Block_report(Block* block) {
+    // UNUSED FUNCTION
+}
+
+void __report_on_pool_heap(__mem_pool* pool) {
+    // UNUSED FUNCTION
+}
+
+void __report_on_heap(void) {
+    // UNUSED FUNCTION
 }

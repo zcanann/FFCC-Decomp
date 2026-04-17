@@ -14,7 +14,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dl__FPv(void*);
 extern "C" void* PTR_PTR_s_CMapTexAnim[];
 extern "C" {
-char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
+static const char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
 char s_SetMapTexAnim_MaterialIdNotFound[];
 }
 extern "C" float FLOAT_8032fd38;
@@ -159,7 +159,8 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
         switch (chunk.m_id) {
         case 0x54414E4D:
             ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
+                0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maptexanim_cpp_801d7ec4),
+                0x24));
             if (ref != 0) {
                 CMapTexAnimFields* anim = Fields(ref);
                 __ct__4CRefFv(ref);
@@ -204,7 +205,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             unsigned short* frameTable = reinterpret_cast<unsigned short*>(__nwa__FUlPQ27CMemory6CStagePci(
                 static_cast<unsigned long>(ref->m_frameCount << 1),
                 *reinterpret_cast<CMemory::CStage**>(&MapMng),
-                s_maptexanim_cpp_801d7ec4, 0x3B));
+                const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B));
             ref->m_frameTable = frameTable;
 
             for (int i = 0; i < ref->m_frameCount; i++) {

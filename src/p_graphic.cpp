@@ -30,7 +30,7 @@ extern "C" void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawBar__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void setViewport__11CGraphicPcsFv(CGraphicPcs*);
-char s_CGraphicPcs_801D7B80[] = "CGraphicPcs";
+const char s_CGraphicPcs_801D7B80[] = "CGraphicPcs";
 
 u32 m_table_desc0__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
 u32 m_table_desc1__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
@@ -43,7 +43,7 @@ u32 m_table_desc7__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw
 u32 m_table_desc8__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCopy__11CGraphicPcsFv)};
 u32 m_table_desc9__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(setViewport__11CGraphicPcsFv)};
 u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
-    reinterpret_cast<u32>(s_CGraphicPcs_801D7B80), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
+    reinterpret_cast<u32>(const_cast<char*>(s_CGraphicPcs_801D7B80)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
     0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
 };
 
@@ -57,9 +57,9 @@ extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
-static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
-static char s__s__d____3f___801d7ba4[] = "%s(%d) %.3f%%";
-static char s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
+static const char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
+static const char s__s__d____3f___801d7ba4[] = "%s(%d) %.3f%%";
+static const char s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
@@ -229,7 +229,7 @@ void CGraphicPcs::drawBegin()
  */
 void CGraphicPcs::drawWait()
 {
-	Graphic._WaitDrawDone(s_p_graphic_cpp_801d7c10, 0xDA);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_graphic_cpp_801d7c10), 0xDA);
 }
 
 /*
@@ -498,11 +498,11 @@ void CGraphicPcs::drawBar()
 
             if (order->m_priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, s__s__d____3f___801d7ba4, order->m_debugName, order->m_insertIndex, order->m_lastTime);
+                sprintf(debugString, const_cast<char*>(s__s__d____3f___801d7ba4), order->m_debugName, order->m_insertIndex, order->m_lastTime);
 
                 if (order->m_priority == 0x17) {
                     char extraString[256];
-                    sprintf(extraString, s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4,
+                    sprintf(extraString, const_cast<char*>(s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4),
                             *reinterpret_cast<float*>(&CFlat[4920]), *reinterpret_cast<float*>(&CFlat[4924]),
                             *reinterpret_cast<float*>(&CFlat[4928]), *reinterpret_cast<float*>(&CFlat[4932]),
                             *reinterpret_cast<float*>(&CFlat[4936]), *reinterpret_cast<float*>(&CFlat[72]));

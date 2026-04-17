@@ -219,12 +219,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
         Vec candidate = line->points[i];
         float distanceSq = PSVECSquareDistance(&candidate, queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
-            float distance = distanceSq;
-            if (distanceSq <= kLineSegmentMinT) {
-                distance = NAN;
-            } else {
-                distance = (float)sqrt(distanceSq);
-            }
+            float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
                 bestPos = candidate;
@@ -238,12 +233,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
             candidate = line->points[i + 1];
             distanceSq = PSVECSquareDistance(&candidate, queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
-                float distance = distanceSq;
-                if (distanceSq <= kLineSegmentMinT) {
-                    distance = NAN;
-                } else {
-                    distance = (float)sqrt(distanceSq);
-                }
+                float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
                     bestPos = candidate;

@@ -124,8 +124,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		Mtx cameraMtx;
 		float projection[7];
 		float viewport[6];
-		int projectedYInt;
 		int projectedXInt;
+		int projectedYInt;
 		float alphaScale;
 
 		alphaScale = (float)sourceAlpha * kPppLensFlareAlphaScale;
@@ -154,8 +154,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		projectedYInt = (int)work->m_projectedY;
 		projectedXInt = (int)work->m_projectedX;
+		projectedYInt = (int)work->m_projectedY;
 		zAtPixel = 0;
 		u8 flareWidth = unkB->m_arg3;
 		u32 halfWidth = (u32)(flareWidth >> 1);
@@ -178,12 +178,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 			}
 		}
 
+		u8 alpha = work->m_alpha;
 		int sampleCount = (int)unkB->m_count + 1;
 		sampleCount *= sampleCount;
-		if ((u8)work->m_alpha == sampleCount) {
+		if (alpha == sampleCount) {
 			work->m_alpha = 0xff;
 		} else {
-			u8 alpha = (u8)work->m_alpha;
 			int scaledAlpha = alpha * (0xFF / sampleCount);
 
 			work->m_alpha = (u8)scaledAlpha;

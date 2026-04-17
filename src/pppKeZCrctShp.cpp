@@ -37,9 +37,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
 
-    zeroVec.z = 0.0f;
-    zeroVec.y = 0.0f;
     zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);
@@ -54,13 +54,25 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
         transformedPos.y += stepData->m_offset.y;
         transformedPos.z += stepData->m_offset.z;
         pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
+
+        transformMatrix.value[0][3] = transformedPos.x;
+        transformMatrix.value[1][3] = transformedPos.y;
+        transformMatrix.value[2][3] = transformedPos.z;
     } else if (mode == 1) {
         pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
+
+        transformMatrix.value[0][3] = zeroVec.x;
+        transformMatrix.value[1][3] = zeroVec.y;
+        transformMatrix.value[2][3] = zeroVec.z;
     } else if (mode == 2) {
         pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
         zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
         zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;
         zeroVec.z += stepData->m_offset.z * pppMngStPtr->m_scale.z;
         pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix02, zeroVec);
+
+        transformMatrix.value[0][3] = zeroVec.x;
+        transformMatrix.value[1][3] = zeroVec.y;
+        transformMatrix.value[2][3] = zeroVec.z;
     }
 }

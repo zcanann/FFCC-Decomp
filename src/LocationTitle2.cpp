@@ -381,10 +381,11 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
  */
 extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC)
 {
+    extern float FLOAT_80330f48;
     LocationTitle2Work* work;
     f32 value;
 
-    value = 0.0f;
+    value = FLOAT_80330f48;
     work = (LocationTitle2Work*)((char*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;

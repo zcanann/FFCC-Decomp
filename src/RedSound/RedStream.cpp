@@ -30,20 +30,22 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  */
 unsigned int _SearchEmptyStreamData()
 {
-	register RedStreamDATA* streamData;
+	unsigned int streamData = (unsigned int)DAT_8032f438;
+	unsigned int streamDataEnd = streamData + 0x4c0;
 
-	streamData = (RedStreamDATA*)DAT_8032f438;
-	do {
-		if (*(int*)((int)streamData + 0x10c) == 0) {
+	for (;;) {
+		if (*(int*)(streamData + 0x10c) == 0) {
 			break;
 		}
-		streamData = (RedStreamDATA*)((int)streamData + 0x130);
-	} while ((unsigned int)streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 
-	if ((unsigned int)streamData < (unsigned int)DAT_8032f438 + 0x4c0) {
-		return (unsigned int)streamData;
+		streamData += 0x130;
+		if (streamDataEnd <= streamData) {
+			streamData = 0;
+			break;
+		}
 	}
-	return 0;
+
+	return streamData;
 }
 
 /*

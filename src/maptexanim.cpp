@@ -217,13 +217,13 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             m_anims[count] = ref;
             break;
         case 0x4A554E20:
-            KeyFrame(Fields(ref))->ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+            KeyFrame(Fields(ref))->ReadJun(chunkFile, chunk.m_arg0);
             break;
         case 0x4652414D:
             KeyFrame(Fields(ref))->ReadFrame(chunkFile, chunk.m_arg0);
             break;
         case 0x4B455920:
-            KeyFrame(Fields(ref))->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+            KeyFrame(Fields(ref))->ReadKey(chunkFile, chunk.m_arg0);
             ref->m_usesKeyFrame = 1;
             break;
         }

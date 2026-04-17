@@ -163,6 +163,7 @@ p_camera.cpp:
 	extabindex  start:0x8000BE18 end:0x8000BF08
 	.text       start:0x80036290 end:0x8003A5FC
 	.ctors      start:0x801D53E0 end:0x801D53E4
+	.data       start:0x801E9AE0 end:0x801E9B24
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534

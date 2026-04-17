@@ -249,9 +249,9 @@ static void __init_pool_obj(__mem_pool* pool_obj) {
 static __mem_pool* get_malloc_pool(void) {
     static __mem_pool protopool;
     static unsigned char init = 0;
-    if (!init) {
+    if (!*(unsigned char*)&initialized) {
         __init_pool_obj(&protopool);
-        init = 1;
+        *(unsigned char*)&initialized = 1;
     }
 
     return &protopool;
@@ -532,6 +532,7 @@ static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
 static void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, unsigned long index, FixSubBlock* chunk, unsigned long chunk_size) {
     unsigned long fixSubBlock_size;
     unsigned long n;
+    FixSubBlock* start;
     char* p;
     unsigned long k;
     char* np;
@@ -543,8 +544,9 @@ static void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, un
     ths->client_size_ = fix_pool_sizes[index];
     fixSubBlock_size = fix_pool_sizes[index] + 4;
     n = chunk_size / fixSubBlock_size;
-    ths->start_ = chunk;
-    p = (char*)chunk;
+    start = chunk;
+    ths->start_ = start;
+    p = (char*)((char*)ths + 0x14);
     for (k = 0; k < n - 1; k++) {
         np = p + fixSubBlock_size;
         ((FixSubBlock*)p)->block_ = ths;

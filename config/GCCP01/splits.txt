@@ -1317,6 +1317,8 @@ pppScreenBreak.cpp:
 	extab       start:0x800097EC end:0x80009834
 	extabindex  start:0x800108AC end:0x80010918
 	.text       start:0x8012D458 end:0x8012E5DC
+	.rodata     start:0x801DD4BC end:0x801DD4E8
+	.data       start:0x802127A0 end:0x802127BC
 
 monobj_boss.cpp:
 	extab       start:0x80009834 end:0x80009A34

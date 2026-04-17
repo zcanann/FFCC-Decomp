@@ -120,21 +120,6 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
-        case 0x4B455920:
-            ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
-                static_cast<char>(chunk.m_arg0));
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x15) = 1;
-            break;
-        case 0x4A554E20:
-            ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
-                static_cast<char>(chunk.m_arg0));
-            break;
-        case 0x4652414D:
-            ReadFrame__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile);
-            break;
         case 0x54414E4D:
             ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
                 0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
@@ -194,6 +179,21 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             short count = *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8);
             *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8) = count + 1;
             AnimAt(this, count) = ref;
+            break;
+        case 0x4A554E20:
+            ReadJun__12CMapKeyFrameFR10CChunkFilei(
+                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
+                static_cast<char>(chunk.m_arg0));
+            break;
+        case 0x4652414D:
+            ReadFrame__12CMapKeyFrameFR10CChunkFilei(
+                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile);
+            break;
+        case 0x4B455920:
+            ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
+                static_cast<char>(chunk.m_arg0));
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x15) = 1;
             break;
         }
     }

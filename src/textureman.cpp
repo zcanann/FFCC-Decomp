@@ -59,6 +59,11 @@ extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmem
 extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
+extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
+extern "C" void __dt__21CPtrArray_P8CTexture_Fv(void*, int);
+extern "C" void SetDefaultSize__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
+extern "C" void SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(void*, CMemory::CStage*);
+extern "C" void ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(void*);
 
 static char s_ptrarray_grow_error_801D79D8[] = "CPtrArray grow error";
 static char s_collection_ptrarray_h_801D79F4[] = "collection_ptrarray.h";
@@ -159,6 +164,7 @@ CPtrArray<CTexture*>::CPtrArray()
 template <>
 CPtrArray<CTexture*>::~CPtrArray()
 {
+    m_vtable = __vt__8CPtrArrayIP8CTexture;
     RemoveAll();
 }
 
@@ -1102,7 +1108,9 @@ CTextureSet::CTextureSet()
 {
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
-    Textures(this)->SetStage(TextureMan.m_memoryStage);
+    __ct__21CPtrArray_P8CTexture_Fv(Textures(this));
+    SetDefaultSize__21CPtrArray_P8CTexture_FUl(Textures(this), 0x10);
+    SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(Textures(this), TextureMan.m_memoryStage);
 }
 
 /*
@@ -1110,9 +1118,19 @@ CTextureSet::CTextureSet()
  * Address:	TODO
  * Size:	TODO
  */
-CTextureSet::~CTextureSet()
+extern "C" CTextureSet* __dt__11CTextureSetFv(CTextureSet* textureSet, short shouldDelete)
 {
-	// TODO
+    if (textureSet != 0) {
+        *reinterpret_cast<void**>(textureSet) = __vt__11CTextureSet;
+        ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(Textures(textureSet));
+        __dt__21CPtrArray_P8CTexture_Fv(Textures(textureSet), -1);
+        __dt__4CRefFv(textureSet, 0);
+        if (shouldDelete > 0) {
+            __dl__FPv(textureSet);
+        }
+    }
+
+    return textureSet;
 }
 
 /*

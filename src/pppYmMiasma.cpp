@@ -47,8 +47,7 @@ struct VYmMiasma {
 struct PYmMiasma {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s16 m_shapeFrameStep;
-    s16 m_pad0A;
+    s32 m_shapeFrameStep;
     u16 m_particleCount;
     u16 m_pad0E;
     float m_baseSpeed;
@@ -254,21 +253,24 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     s16 frameCount;
     s16 decayCount;
+    s16 alpha;
     Vec basePos;
-    Vec delta;
     Vec worldPos;
 
     frameCount = state->m_fadeFrames;
     if (frameCount > 0) {
-        state->m_color.m_a =
-            state->m_color.m_a + (u8)(pYmMiasma->m_colorStartA - state->m_color.m_a) / frameCount;
+        alpha = state->m_color.m_a;
+        alpha = alpha + (pYmMiasma->m_colorStartA - alpha) / frameCount;
+        state->m_color.m_a = alpha;
         state->m_fadeFrames = state->m_fadeFrames - 1;
     }
 
     decayCount = state->m_colorDecayFrames;
-    if (state->m_lifeFrames <= decayCount && state->m_hasImpulse == 0) {
-        state->m_color.m_a = state->m_color.m_a - (state->m_color.m_a / decayCount);
-        state->m_colorDecayFrames = state->m_colorDecayFrames - 1;
+    if (state->m_lifeFrames <= decayCount) {
+        if (state->m_hasImpulse == 0) {
+            state->m_color.m_a = state->m_color.m_a - (state->m_color.m_a / decayCount);
+            state->m_colorDecayFrames = state->m_colorDecayFrames - 1;
+        }
     }
 
     if (state->m_hasImpulse != 0) {
@@ -319,13 +321,11 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
     } else {
-        basePos.x = worldPos.x;
-        basePos.y = worldPos.y;
-        basePos.z = worldPos.z;
+        basePos = worldPos;
     }
 
-    pppSubVector(delta, worldPos, basePos);
-    if (pppVectorLength(delta) < (vData->m_radius - pYmMiasma->m_minDistance)) {
+    pppSubVector(basePos, worldPos, basePos);
+    if (pppVectorLength(basePos) < (vData->m_radius - pYmMiasma->m_minDistance)) {
         state->m_speedDecay = state->m_speedDecay + pYmMiasma->m_gravity;
         state->m_hasImpulse = 1;
     }
@@ -339,12 +339,14 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + state->m_speedDecay * particleData->m_matrix[1][2];
     state->m_speedDecay = state->m_speedDecay - pYmMiasma->m_speedDecay;
 
-    if (vData->m_speedDecay != FLOAT_80330644 && state->m_hasImpulse == 0) {
-        Vec impulse;
+    if (vData->m_speedDecay != FLOAT_80330644) {
+        if (state->m_hasImpulse == 0) {
+            Vec impulse;
 
-        impulse = vData->m_impulse;
-        PSVECScale(&impulse, &impulse, state->m_speedDecay);
-        pppAddVector(*(Vec*)particleData, *(Vec*)particleData, impulse);
+            impulse = vData->m_impulse;
+            PSVECScale(&impulse, &impulse, state->m_speedDecay);
+            pppAddVector(*(Vec*)particleData, *(Vec*)particleData, impulse);
+        }
     }
 
     if (pYmMiasma->m_dataValIndex != 0xffff) {

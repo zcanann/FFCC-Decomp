@@ -923,13 +923,15 @@ int MusicPlay(int musicId, int volume, int mode)
 	int musicBank = SearchMusicBank__9CRedEntryFi(&DAT_8032e154, musicId);
 
 	if (musicBank != 0) {
-		int musicHead = *(int*)(musicBank + 8);
-		int waveHead = SearchWaveBase__9CRedEntryFi(&DAT_8032e154, (int)*(short*)(musicHead + 6));
+		RedMusicHEAD* musicHead = *(RedMusicHEAD**)(musicBank + 8);
+		RedWaveHeadWD* waveHead =
+		    (RedWaveHeadWD*)SearchWaveBase__9CRedEntryFi(&DAT_8032e154, *(short*)((char*)musicHead + 6));
+
 		if (waveHead == 0) {
 			return -1;
 		}
 
-		_MusicPlayStart((RedMusicHEAD*)musicHead, (RedWaveHeadWD*)waveHead, musicId, volume, mode);
+		_MusicPlayStart(musicHead, waveHead, musicId, volume, mode);
 	}
 
 	return 0;
@@ -947,7 +949,7 @@ int MusicPlay(int musicId, int volume, int mode)
 void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
 	int step;
-	unsigned int* music = (unsigned int*)DAT_8032f3f0;
+	int* music = (int*)DAT_8032f3f0;
 
 	if (volume != 0) {
 		volume = (((volume + 1) * 4) - 1) * 0x1000;
@@ -961,16 +963,15 @@ void SetMusicVolume(int seId, int volume, int duration, int mode)
 	}
 
 	do {
-		int* musicI = (int*)music;
-		if ((seId == -1) || (seId == (int)music[0x11c]) || ((int)music[0x11c] < 0)) {
+		if ((seId == -1) || (seId == music[0x11c]) || (music[0x11c] < 0)) {
 			if (mode == 1) {
-				musicI[0x116] = -musicI[0x115] / step;
-				musicI[0x117] = step;
+				music[0x116] = -music[0x115] / step;
+				music[0x117] = step;
 			} else {
-				musicI[8] = (((unsigned int)volume | 0x800U) - music[7]) / step;
-				musicI[9] = step;
+				music[8] = (((unsigned int)volume | 0x800U) - (unsigned int)music[7]) / (unsigned int)step;
+				music[9] = step;
 			}
 		}
 		music += 0x125;
-	} while (music < (unsigned int*)((char*)DAT_8032f3f0 + 0xdbc));
+	} while ((unsigned int)music < (unsigned int)DAT_8032f3f0 + 0xdbc);
 }

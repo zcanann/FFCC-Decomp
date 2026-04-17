@@ -42,6 +42,7 @@ graphic.cpp:
 	extabindex  start:0x8000AFFC end:0x8000B1DC
 	.text       start:0x80016400 end:0x80019F88
 	.ctors      start:0x801D53AC end:0x801D53B0
+	.data       start:0x801E83FC end:0x801E8450
 	.bss        start:0x80230E48 end:0x8023C4D8
 	.sbss       start:0x8032EC48 end:0x8032EC4C
 
@@ -288,6 +289,7 @@ maptexanim.cpp:
 	extabindex  start:0x8000C844 end:0x8000C880
 	.text       start:0x8004F910 end:0x800503FC
 	.rodata     start:0x801D7EC4 end:0x801D7ED4
+	.data       start:0x801EA9A4 end:0x801EA9B0
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0

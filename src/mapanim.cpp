@@ -265,6 +265,12 @@ struct CMapAnimNodeTrack
     unsigned int count;
     CMapAnimNodeTrackKey* keys;
 };
+class CMapAnimKey
+{
+public:
+    unsigned int count;
+    CMapAnimNodeTrackKey* keys;
+};
 
 struct CMapAnimNodeTracks
 {
@@ -546,9 +552,48 @@ void CMapAnimNode::Interp(int frame)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
+void CMapAnimNode::interp(Vec* out, CMapAnimKey* key, int frameInLoop, int loopFrameCount)
 {
-	// TODO
+    unsigned int keyCount = key->count;
+    CMapAnimNodeTrackKey* current = key->keys;
+
+    if (keyCount == 1) {
+        *out = current[0].value;
+        return;
+    }
+
+    int i = 0;
+    for (unsigned int remaining = keyCount; remaining != 0; remaining--) {
+        unsigned int nextIndex = (i + 1U) & ~-(unsigned int)(keyCount <= i + 1U);
+        CMapAnimNodeTrackKey* next = key->keys + nextIndex;
+        unsigned int endFrame;
+
+        if (nextIndex == 0) {
+            endFrame = next->frame + loopFrameCount;
+        } else {
+            endFrame = next->frame;
+        }
+
+        unsigned int currentFrame = current->frame;
+        if ((currentFrame <= (unsigned int)frameInLoop) && (frameInLoop < (int)endFrame)) {
+            int frameRange = endFrame - currentFrame;
+            float t = 0.0f;
+            Vec currentScaled;
+            Vec nextScaled;
+
+            if (frameRange != 0) {
+                t = (float)(frameInLoop - (int)currentFrame) / (float)frameRange;
+            }
+
+            PSVECScale(&current->value, &currentScaled, t);
+            PSVECScale(&next->value, &nextScaled, 1.0f - t);
+            PSVECAdd(&currentScaled, &nextScaled, out);
+            break;
+        }
+
+        current++;
+        i++;
+    }
 }
 
 /*

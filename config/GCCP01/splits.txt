@@ -24,6 +24,7 @@ file.cpp:
 	.text       start:0x80012BAC end:0x80013D70
 	.ctors      start:0x801D53A4 end:0x801D53A8
 	.bss        start:0x8021ED40 end:0x8021EEB0
+	.sdata2     start:0x8032F6E8 end:0x8032F710
 
 game.cpp:
 	extab       start:0x80005688 end:0x800057E0
@@ -31,6 +32,7 @@ game.cpp:
 	.text       start:0x80013E70 end:0x80016400
 	.ctors      start:0x801D53A8 end:0x801D53AC
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
+	.sdata2     start:0x8032F768 end:0x8032F7A8
 
 graphic.cpp:
 	extab       start:0x800057E0 end:0x80005920

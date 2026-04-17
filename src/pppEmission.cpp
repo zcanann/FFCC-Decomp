@@ -32,7 +32,7 @@ extern float FLOAT_803311e4;
 extern float FLOAT_803311f8;
 extern double DOUBLE_803311e8;
 extern double DOUBLE_803311f0;
-char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
+static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
@@ -377,7 +377,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     *(u32*)(model + 0xFC) = 0;
     *(u32*)(model + 0x104) = 0;
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_pppEmission_cpp_801db7e8, 0x118);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
     if (stage != (CMemory::CStage*)0) {
         pppHeapUseRate__FPQ27CMemory6CStage(stage);
@@ -448,7 +448,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             state->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)param_2->m_initWOrk << 4,
                 pppEnvStPtr->m_stagePtr,
-                s_pppEmission_cpp_801db7e8,
+                const_cast<char*>(s_pppEmission_cpp_801db7e8),
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;

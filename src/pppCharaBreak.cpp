@@ -22,7 +22,7 @@ extern struct _pppEnvSt {
 } *pppEnvStPtr;
 extern char gUtil[];
 class CMaterialMan;
-char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
+static const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;
@@ -752,7 +752,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
  */
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_pppCharaBreak_cpp_801dd690, 0x319);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
 
     int dataOffset = data->m_serializedDataOffsets[2];
     u8* model = *(u8**)((u8*)charaBreak + 0xC0 + dataOffset);
@@ -882,7 +882,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
         work->m_meshBuffers = pppMemAlloc__FUlPQ27CMemory6CStagePci(meshCount << 2, pppEnvStPtr->m_stagePtr,
-                                                                     s_pppCharaBreak_cpp_801dd690, 0x3D0);
+                                                                     const_cast<char*>(s_pppCharaBreak_cpp_801dd690),
+                                                                     0x3D0);
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
@@ -905,7 +906,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             }
 
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x3E9);
+                meshData->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
+                const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
             if (((u32*)work->m_meshBuffers)[i] == 0) {
                 goto fail;
             }
@@ -924,7 +926,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                 int* dlEntries = (int*)(((u32*)work->m_meshBuffers)[i] + ((displayListCount - 1) << 2));
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     CharaBreakDisplayListPair* dlPair = (CharaBreakDisplayListPair*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                        0x10, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x3FC);
+                        0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
                     *dlEntries = (int)dlPair;
                     if (dlPair == NULL) {
                         goto fail;
@@ -935,7 +937,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     dlPair->m_polygonData = 0;
                     dlPair->m_displayListSize = displayList->m_size;
                     dlPair->m_rewrittenDisplayList = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                        dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x40B);
+                        dlPair->m_displayListSize, pppEnvStPtr->m_stagePtr,
+                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x40B);
                     if (dlPair->m_rewrittenDisplayList == NULL) {
                         goto fail;
                     }
@@ -945,7 +948,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
                     dlPair->m_polygonCount = (u16)GetNumPolygonFromDL__5CUtilFPvUl(gUtil, dlPair->m_rewrittenDisplayList);
                     dlPair->m_polygonData = (POLYGON_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                        dlPair->m_polygonCount * 0x34, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x423);
+                        dlPair->m_polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
+                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);
                     if (dlPair->m_polygonData == NULL) {
                         goto fail;
                     }

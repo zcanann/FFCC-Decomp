@@ -32,6 +32,7 @@ game.cpp:
 	.text       start:0x80013E70 end:0x80016400
 	.ctors      start:0x801D53A8 end:0x801D53AC
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
+	.sbss       start:0x8032EC40 end:0x8032EC45
 	.sdata2     start:0x8032F768 end:0x8032F7A8
 
 graphic.cpp:
@@ -1148,6 +1149,7 @@ gxfunc.cpp:
 	extabindex  start:0x8000FD00 end:0x8000FD84
 	.text       start:0x80102FB4 end:0x801035DC
 	.bss        start:0x802FF450 end:0x802FFA70
+	.sbss       start:0x8032EE40 end:0x8032EE42
 
 pppYmTracer2.cpp:
 	extab       start:0x8000907C end:0x80009094
@@ -1227,6 +1229,7 @@ itemobj.cpp:
 	extab       start:0x8000960C end:0x8000968C
 	extabindex  start:0x800105DC end:0x8001069C
 	.text       start:0x80124B78 end:0x80127008
+	.sbss       start:0x8032EE90 end:0x8032EE94
 
 prgobj.cpp:
 	extab       start:0x8000968C end:0x8000970C

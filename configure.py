@@ -975,7 +975,7 @@ config.libs = [
         "objects": [
             Object(Matching, "MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(
-                NonMatching,
+                Matching,
                 "MSL_C/PPCEABI/bare/H/alloc.c",
                 mw_version="GC/2.7",
             ),

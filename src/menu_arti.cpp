@@ -284,94 +284,106 @@ void CMenuPcs::ArtiInit()
  */
 void CMenuPcs::ArtiInit1()
 {
-	float alpha;
-	ArtiOpenAnim* anims;
-	unsigned int count;
-	unsigned int blocks;
+	float fVar1;
+	int iVar2;
+	short* psVar3;
+	unsigned int uVar4;
+	unsigned int uVar5;
 
-	anims = reinterpret_cast<ArtiOpenAnim*>(GetArtiList(this) + 4);
-	anims[0].tex = 0x2e;
-	anims[0].startFrame = 2;
-	anims[0].duration = 5;
-	anims[1].tex = 0x44;
-	anims[1].startFrame = 7;
-	anims[1].duration = 5;
-	anims[2].tex = 0x44;
-	anims[2].startFrame = 7;
-	anims[2].duration = 5;
-	anims[3].flags = 2;
-	anims[3].tex = 0x2e;
-	anims[3].startFrame = 7;
-	anims[3].duration = 5;
-	anims[4].flags = 2;
-	anims[4].tex = 0x37;
-	anims[4].startFrame = 0;
-	anims[4].duration = 5;
-	anims[5].flags = 2;
-	anims[5].tex = 0x37;
-	anims[5].startFrame = 0;
-	anims[5].duration = 5;
-	anims[6].flags = 2;
-	anims[6].tex = 0x37;
-	anims[6].startFrame = 0;
-	anims[6].duration = 5;
-	anims[7].flags = 2;
-	anims[7].tex = 0x37;
-	alpha = FLOAT_80332fac;
-	anims[7].startFrame = 0;
-	anims[7].duration = 5;
-	anims[8].flags = 2;
-	anims[8].tex = 0x37;
-	anims[8].startFrame = 0;
-	anims[8].duration = 5;
-	anims[9].flags = 2;
-	anims[9].tex = 0x37;
-	anims[9].startFrame = 0;
-	anims[9].duration = 5;
-	anims[10].flags = 2;
-	anims[10].tex = 0x37;
-	anims[10].startFrame = 0;
-	anims[10].duration = 5;
-	anims[11].flags = 2;
-	anims[11].tex = 0x37;
-	anims[11].startFrame = 0;
-	anims[11].duration = 5;
-
-	count = (unsigned int)*GetArtiList(this);
-	if (0 < (int)count) {
-		blocks = count >> 3;
-		if (blocks != 0) {
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x24) = 0x2e;
+	*(int*)(iVar2 + 0x2c) = 2;
+	*(int*)(iVar2 + 0x30) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 100) = 0x44;
+	*(int*)(iVar2 + 0x6c) = 7;
+	*(int*)(iVar2 + 0x70) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0xa4) = 0x44;
+	*(int*)(iVar2 + 0xac) = 7;
+	*(int*)(iVar2 + 0xb0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0xf4) = 2;
+	*(int*)(iVar2 + 0xe4) = 0x2e;
+	*(int*)(iVar2 + 0xec) = 7;
+	*(int*)(iVar2 + 0xf0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x134) = 2;
+	*(int*)(iVar2 + 0x124) = 0x37;
+	*(int*)(iVar2 + 300) = 0;
+	*(int*)(iVar2 + 0x130) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x174) = 2;
+	*(int*)(iVar2 + 0x164) = 0x37;
+	*(int*)(iVar2 + 0x16c) = 0;
+	*(int*)(iVar2 + 0x170) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x1b4) = 2;
+	*(int*)(iVar2 + 0x1a4) = 0x37;
+	*(int*)(iVar2 + 0x1ac) = 0;
+	*(int*)(iVar2 + 0x1b0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 500) = 2;
+	*(int*)(iVar2 + 0x1e4) = 0x37;
+	fVar1 = FLOAT_80332fac;
+	*(int*)(iVar2 + 0x1ec) = 0;
+	*(int*)(iVar2 + 0x1f0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x234) = 2;
+	*(int*)(iVar2 + 0x224) = 0x37;
+	*(int*)(iVar2 + 0x22c) = 0;
+	*(int*)(iVar2 + 0x230) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x274) = 2;
+	*(int*)(iVar2 + 0x264) = 0x37;
+	*(int*)(iVar2 + 0x26c) = 0;
+	*(int*)(iVar2 + 0x270) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x2b4) = 2;
+	*(int*)(iVar2 + 0x2a4) = 0x37;
+	*(int*)(iVar2 + 0x2ac) = 0;
+	*(int*)(iVar2 + 0x2b0) = 5;
+	iVar2 = GetArtiListBase(this);
+	*(int*)(iVar2 + 0x2f4) = 2;
+	*(int*)(iVar2 + 0x2e4) = 0x37;
+	*(int*)(iVar2 + 0x2ec) = 0;
+	*(int*)(iVar2 + 0x2f0) = 5;
+	uVar4 = (unsigned int)*GetArtiList(this);
+	psVar3 = GetArtiList(this) + 4;
+	if (0 < (int)uVar4) {
+		uVar5 = uVar4 >> 3;
+		if (uVar5 != 0) {
 			do {
-				anims[0].step = 0;
-				anims[0].alpha = alpha;
-				anims[1].step = 0;
-				anims[1].alpha = alpha;
-				anims[2].step = 0;
-				anims[2].alpha = alpha;
-				anims[3].step = 0;
-				anims[3].alpha = alpha;
-				anims[4].step = 0;
-				anims[4].alpha = alpha;
-				anims[5].step = 0;
-				anims[5].alpha = alpha;
-				anims[6].step = 0;
-				anims[6].alpha = alpha;
-				anims[7].step = 0;
-				anims[7].alpha = alpha;
-				anims += 8;
-				blocks--;
-			} while (blocks != 0);
-			count &= 7;
-			if (count == 0) {
+				*(int*)(psVar3 + 0x10) = 0;
+				*(float*)(psVar3 + 8) = fVar1;
+				*(int*)(psVar3 + 0x30) = 0;
+				*(float*)(psVar3 + 0x28) = fVar1;
+				*(int*)(psVar3 + 0x50) = 0;
+				*(float*)(psVar3 + 0x48) = fVar1;
+				*(int*)(psVar3 + 0x70) = 0;
+				*(float*)(psVar3 + 0x68) = fVar1;
+				*(int*)(psVar3 + 0x90) = 0;
+				*(float*)(psVar3 + 0x88) = fVar1;
+				*(int*)(psVar3 + 0xb0) = 0;
+				*(float*)(psVar3 + 0xa8) = fVar1;
+				*(int*)(psVar3 + 0xd0) = 0;
+				*(float*)(psVar3 + 200) = fVar1;
+				*(int*)(psVar3 + 0xf0) = 0;
+				*(float*)(psVar3 + 0xe8) = fVar1;
+				psVar3 = psVar3 + 0x100;
+				uVar5 = uVar5 - 1;
+			} while (uVar5 != 0);
+			uVar4 = uVar4 & 7;
+			if (uVar4 == 0) {
 				return;
 			}
 		}
 		do {
-			anims->step = 0;
-			anims->alpha = alpha;
-			anims++;
-			count--;
-		} while (count != 0);
+			*(int*)(psVar3 + 0x10) = 0;
+			*(float*)(psVar3 + 8) = fVar1;
+			psVar3 = psVar3 + 0x20;
+			uVar4 = uVar4 - 1;
+		} while (uVar4 != 0);
 	}
 }
 

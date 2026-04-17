@@ -328,7 +328,8 @@ unsigned int pppFreeMngStPrioForData()
 	};
 
 	pppMngStPrioData* selectedMngSt = 0;
-	pppMngStPrioData* pppMngStBase = reinterpret_cast<pppMngStPrioData*>(&PartMng);
+	pppMngStPrioData* pppMngStBase =
+	    reinterpret_cast<pppMngStPrioData*>(reinterpret_cast<char*>(&PartMng) + 0x2A18);
 	unsigned int selectedPrioTime = 0;
 	unsigned char selectedPrio = 1;
 	int index = 0;
@@ -391,7 +392,7 @@ unsigned int pppFreeMngStPrioForData()
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
 			(int)selectedMngSt->m_nodeIndex,
-			(int)selectedMngSt->m_kind * 0x38 + -0x7fd672e8);
+			reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38));
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(stringBase + 0x2f4);

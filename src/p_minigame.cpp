@@ -21,6 +21,32 @@ unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 unsigned char m_table__12CMiniGamePcs[0x15C];
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
+static const char s_miniGameSourceName[] = "p_minigame.cpp";
+static const char s_miniGameSourceLineFmt[] = "%s %d\n";
+static const char s_miniGameConnectedLineFmt[] = "isConnectedLine=%d,Line=%d\n";
+static const char s_miniGameRetryFmt[] = "retry=%d chan=%d\n";
+static const char s_miniGameContextRecvFmt[] = "chan=%d step=%d contextRecvOffset=%d\n";
+static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%d\n";
+static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n";
+static const char s_miniGameRecvStatusFmt[] = "ret=%d status=0x%02x step=%d contextRecvOffset=%d\n";
+static const char s_miniGameSetPortFmt[] = "chan=%d MG_GBA_THREAD_MSG_SETPORT line=%d\n";
+static const char s_miniGameManagerFileFmt[] = "%s/mgr%02d.bin";
+static const char s_miniGameManagerSpFileFmt[] = "%s/mgrsp%02d.bin";
+static const char s_miniGameManagerDir[] = "dvd/minigame";
+static const char s_miniGameFileInfoFmt[] = "MINIGAME FILE=%s SPFILE=%s\n";
+static const char s_miniGameSeparator[] = "--------------------------------\n";
+static const char s_miniGameRaceResultFmt[] = "P%d = %d\n";
+static const char s_miniGameContinueText[] = "MINI GAME CONTINUE\n";
+static const char s_miniGameMgrEndStartText[] = "CallMiniGameParam MGR_CALL_MGR_END:START\n";
+static const char s_miniGameMgrEndEndText[] = "CallMiniGameParam MGR_CALL_MGR_END:END\n";
+static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
+static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
+static const char s_miniGameEnd2222Text[] = "MiniGameEnd 2222\n";
+static const char s_miniGameEndBannerText[] = "     MINI GAME END \n";
+static const char s_miniGamePadRaceResultFmt[] = "GBA PADCODE RACE RESULT play=%d r=%d\n";
+static const char s_miniGamePadRaceEndText[] = "GBA PADCODE RACE END\n";
+static const char s_miniGamePadMgrEndText[] = "GBA PADCODE MGR END\n";
+static const char s_miniGamePadMgrContinueText[] = "GBA PADCODE MGR CONTINUE\n";
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
@@ -331,9 +357,9 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     CMemory::CStage* stageLoad =
         reinterpret_cast<CMemory::CStage*>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x20);
     *reinterpret_cast<void**>(self + 0x1354) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, "p_minigame.cpp", 0xF1);
+        __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1);
     *reinterpret_cast<void**>(self + 0x135C) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, "p_minigame.cpp", 0xF2);
+        __nwa__FUlPQ27CMemory6CStagePci(0x40000, stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2);
 
     *reinterpret_cast<unsigned int*>(self + 0x1364) = OSGetTick();
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x1354) + 200) =
@@ -778,7 +804,7 @@ retry_loop:
         param[0xBF] = 3;
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x234);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x234);
         }
         param[0xC4] = 0;
         goto receive_message;
@@ -786,7 +812,7 @@ retry_loop:
 
     if (MiniGameThreadTimedOut(startTime, timeoutTicks))
     {
-        Printf__7CSystemFPce(&System, "retry=%d chan=%d\n", retryLine, channel);
+        Printf__7CSystemFPce(&System, s_miniGameRetryFmt, retryLine, channel);
         if (ret != 3)
         {
             ret = 1;
@@ -794,7 +820,7 @@ retry_loop:
         param[0xBF] = static_cast<unsigned char>(ret);
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x241);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x241);
         }
         param[0xC4] = 0;
         goto receive_message;
@@ -807,7 +833,7 @@ retry_loop:
     case 2:
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x248);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x248);
         }
         param[0xC4] = 0;
         param[0xBF] = static_cast<unsigned char>(GBAReset(channel, param + 0xC0));
@@ -815,7 +841,7 @@ retry_loop:
     case 3:
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x24F);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x24F);
         }
         param[0xC4] = 0;
         ret = GBAReset(channel, param + 0xC0);
@@ -831,7 +857,7 @@ retry_loop:
     case 4:
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x25D);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x25D);
         }
         param[0xC4] = 0;
         ret = GBAGetStatus(channel, param + 0xC0);
@@ -859,7 +885,7 @@ retry_loop:
         }
         goto comm_fail;
     case 5:
-        Printf__7CSystemFPce(&System, "chan=%d step=%d contextRecvOffset=%d\n", channel, step, contextRecvOffset);
+        Printf__7CSystemFPce(&System, s_miniGameContextRecvFmt, channel, step, contextRecvOffset);
         if (contextRecvOffset > 0x5F)
         {
             retryLine = 0x27A;
@@ -893,7 +919,7 @@ retry_loop:
                     retryLine = 0x2BF;
                     goto retry_loop;
                 }
-                Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x2A1);
+                Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x2A1);
             }
             else
             {
@@ -917,19 +943,19 @@ retry_loop:
                     retryLine = 0x2BF;
                     goto retry_loop;
                 }
-                Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x2B2);
+                Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x2B2);
             }
         }
         else
         {
-            Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x27F);
+            Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x27F);
         }
         goto comm_fail;
     case 6:
         ret = 1;
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x2C3);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x2C3);
         }
         param[0xC4] = 0;
         *reinterpret_cast<int*>(param + 0x9C) = 1;
@@ -958,7 +984,7 @@ retry_loop:
     case 7:
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x2DC);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x2DC);
         }
         param[0xC4] = 0;
         *reinterpret_cast<int*>(param + 0x9C) = 1;
@@ -1076,7 +1102,7 @@ retry_loop:
     case 8:
         if (param[0xC4] != 0)
         {
-            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x312);
+            Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x312);
         }
         param[0xC4] = 0;
         *reinterpret_cast<int*>(param + 0x9C) = 1;
@@ -1170,7 +1196,7 @@ retry_loop:
                 ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
                 if (ret != 0)
                 {
-                    Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x33C);
+                    Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x33C);
                     goto comm_fail;
                 }
                 startTime = OSGetTime();
@@ -1195,7 +1221,7 @@ retry_loop:
                     ret = GBARead(channel, param + 0xA0, param + 0xC0);
                     if (ret != 0 || ((*reinterpret_cast<unsigned int*>(param + 0xA0) >> 24) != 0x20))
                     {
-                        Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x372);
+                        Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x372);
                         goto comm_fail;
                     }
                     retryLine = 0x376;
@@ -1209,7 +1235,7 @@ retry_loop:
             MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 100) >> 3);
             if (MiniGameThreadTimedOut(startTime, (OS_BUS_CLOCK / 4000) * 200))
             {
-                Printf__7CSystemFPce(&System, "GBA_JSTAT_FLAGS_MASK retry chan=%d\n", channel);
+                Printf__7CSystemFPce(&System, s_miniGameFlagsRetryFmt, channel);
                 command = 0x10000000;
                 GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
                 startTime = OSGetTime();
@@ -1237,12 +1263,12 @@ retry_loop:
             }
             if (MiniGameThreadTimedOut(startTime, (OS_BUS_CLOCK / 4000) * 200))
             {
-                Printf__7CSystemFPce(&System, "GBA_JSTAT_PSF1 retry chan=%d\n", channel);
+                Printf__7CSystemFPce(&System, s_miniGamePsf1RetryFmt, channel);
                 command = 0x70000000;
                 ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
                 if (ret != 0)
                 {
-                    Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x397);
+                    Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x397);
                     goto comm_fail;
                 }
                 startTime = OSGetTime();
@@ -1261,12 +1287,12 @@ retry_loop:
             step++;
             goto retry_loop;
         }
-        Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x3AC);
+        Printf__7CSystemFPce(&System, s_miniGameSourceLineFmt, s_miniGameSourceName, 0x3AC);
         goto comm_fail;
     }
 
 comm_fail:
-    Printf__7CSystemFPce(&System, "ret=%d status=0x%02x step=%d contextRecvOffset=%d\n", ret,
+    Printf__7CSystemFPce(&System, s_miniGameRecvStatusFmt, ret,
                          param[0xC0] & GBA_JSTAT_FLAGS_MASK, step, contextRecvOffset);
     if (ret == 0)
     {
@@ -1275,7 +1301,7 @@ comm_fail:
     param[0xBF] = static_cast<unsigned char>(ret);
     if (param[0xC4] != 0)
     {
-        Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x287);
+        Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x287);
     }
     param[0xC4] = 0;
     goto receive_message;
@@ -1312,7 +1338,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
     if (paramBytes[0xC4] != 0)
     {
-        Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x3E1);
+        Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x3E1);
     }
     paramBytes[0xC4] = 0;
     paramBytes[0xC6] = 0;
@@ -1331,9 +1357,9 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
             if (paramBytes[0xC4] != 0)
             {
-                Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x3FC);
+                Printf__7CSystemFPce(&System, s_miniGameConnectedLineFmt, channel, 0x3FC);
             }
-            Printf__7CSystemFPce(&System, "chan=%d MG_GBA_THREAD_MSG_SETPORT line=%d\n", channel, 0x403);
+            Printf__7CSystemFPce(&System, s_miniGameSetPortFmt, channel, 0x403);
             OSSendMessage(reinterpret_cast<OSMessageQueue*>(paramBytes), reinterpret_cast<OSMessage>(5), 1);
         }
         else
@@ -1443,12 +1469,12 @@ void CMiniGamePcs::calc(void)
             char managerFile[260];
             char managerSpFile[256];
 
-            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame", self[0x1350]);
-            sprintf(managerSpFile, "%s/mgrsp%02d.bin", "dvd/minigame", self[0x1350]);
+            sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, self[0x1350]);
+            sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, self[0x1350]);
 
             if ((unsigned int)System.m_execParam > 2)
             {
-                Printf__7CSystemFPce(&System, "MINIGAME FILE=%s SPFILE=%s\n", managerFile, managerSpFile);
+                Printf__7CSystemFPce(&System, s_miniGameFileInfoFmt, managerFile, managerSpFile);
             }
 
             MiniGameGo(managerFile, managerSpFile);
@@ -1467,12 +1493,12 @@ void CMiniGamePcs::calc(void)
     {
         int raceEndStack[3];
 
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, s_miniGameSeparator);
         for (int i = 0; i < 4; i++)
         {
-            Printf__7CSystemFPce(&System, "P%d = %d\n", i + 1, static_cast<int>(self[0x6498 + i]));
+            Printf__7CSystemFPce(&System, s_miniGameRaceResultFmt, i + 1, static_cast<int>(self[0x6498 + i]));
         }
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, s_miniGameSeparator);
 
         raceEndStack[0] = 0x3000;
         raceEndStack[1] = 0;
@@ -1492,7 +1518,7 @@ void CMiniGamePcs::calc(void)
         self[0x649B] = 0xFF;
         if ((unsigned int)System.m_execParam > 2)
         {
-            Printf__7CSystemFPce(&System, "MINI GAME CONTINUE\n");
+            Printf__7CSystemFPce(&System, s_miniGameContinueText);
         }
 
         continueStack[0] = 0x3002;
@@ -1510,7 +1536,7 @@ void CMiniGamePcs::calc(void)
 
     if (System.m_execParam != 0)
     {
-        Printf__7CSystemFPce(&System, "CallMiniGameParam MGR_CALL_MGR_END:START\n");
+        Printf__7CSystemFPce(&System, s_miniGameMgrEndStartText);
     }
 
     {
@@ -1524,8 +1550,8 @@ void CMiniGamePcs::calc(void)
 
     if (System.m_execParam != 0)
     {
-        Printf__7CSystemFPce(&System, "CallMiniGameParam MGR_CALL_MGR_END:END\n");
-        Printf__7CSystemFPce(&System, "MiniGameEnd 0000\n");
+        Printf__7CSystemFPce(&System, s_miniGameMgrEndEndText);
+        Printf__7CSystemFPce(&System, s_miniGameEnd0000Text);
     }
 
     if (*reinterpret_cast<void**>(self + 0x1354) != 0)
@@ -1577,17 +1603,17 @@ void CMiniGamePcs::calc(void)
     self[0x134B] = 0xF;
     if (System.m_execParam != 0)
     {
-        Printf__7CSystemFPce(&System, "MiniGameEnd 1111\n");
+        Printf__7CSystemFPce(&System, s_miniGameEnd1111Text);
     }
 
     Joybus.RestartThread();
 
     if (System.m_execParam != 0)
     {
-        Printf__7CSystemFPce(&System, "MiniGameEnd 2222\n");
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
-        Printf__7CSystemFPce(&System, "     MINI GAME END \n");
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, s_miniGameEnd2222Text);
+        Printf__7CSystemFPce(&System, s_miniGameSeparator);
+        Printf__7CSystemFPce(&System, s_miniGameEndBannerText);
+        Printf__7CSystemFPce(&System, s_miniGameSeparator);
     }
 
     self[0x6495] = 0;
@@ -1611,49 +1637,49 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
     switch (codeType) {
     case 0x1000:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "GBA PADCODE RACE RESULT play=%d r=%d\n", player, padCode & 0xFF);
+            Printf__7CSystemFPce(&System, s_miniGamePadRaceResultFmt, player, padCode & 0xFF);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         self[0x6498 + player] = static_cast<unsigned char>(padCode);
         break;
     case 0x1100:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "GBA PADCODE RACE END\n");
+            Printf__7CSystemFPce(&System, s_miniGamePadRaceEndText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         self[0x6496] = 1;
         break;
     case 0x1200:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "GBA PADCODE MGR END\n");
+            Printf__7CSystemFPce(&System, s_miniGamePadMgrEndText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         self[0x6495] = 1;
         break;
     case 0x1300:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "GBA PADCODE MGR CONTINUE\n");
+            Printf__7CSystemFPce(&System, s_miniGamePadMgrContinueText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_miniGameSeparator);
         }
         self[0x6497] = 1;
         break;

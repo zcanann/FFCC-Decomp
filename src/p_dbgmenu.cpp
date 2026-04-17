@@ -17,6 +17,31 @@ extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
 extern u32 gDbgMenuWindowBorderColors[4];
 extern u32 gDbgMenuWindowFillColors[2];
+extern "C" {
+extern const char lbl_80331C18[];
+extern const char lbl_80331C20[];
+extern const char lbl_80331C28[];
+extern const char lbl_80331C30[];
+extern const char lbl_80331C34[];
+extern const char lbl_80331C3C[];
+extern const char lbl_80331C44[];
+extern const char lbl_80331C4C[];
+extern const char lbl_80331C54[];
+extern const char lbl_80331C5C[];
+extern const char lbl_80331C64[];
+extern const char lbl_80331C6C[];
+extern const char lbl_80331C70[];
+extern const char lbl_80331C78[];
+extern const char lbl_80331C80[];
+extern const char s_DISPPRINT_801DD434[];
+extern const char s_COLCHECK_801DD440[];
+extern const char s_PARTICLE_801DD44C[];
+extern const char s_SOUND_INFO_801DD458[];
+extern const char s_PART_HEAP_801DD464[];
+extern const char s_CHARA_INFO_801DD470[];
+extern const char s_ITEM_WEAPON_801DD47C[];
+extern const char s_SMITH_MASTER_801DD488[];
+}
 
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
@@ -34,16 +59,16 @@ struct DbgMenuDef {
 };
 
 const char s_Debug_80331c90[] = "Debug";
-static u32 s_windowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
-static u32 s_windowFillColors[2] = {0xFFFFFF80, 0x00000080};
 
 DbgMenuDef PTR_DAT_80212524[] = {
-    { "MENU", 100, 2, 1 }, { "SHOUKI", 101, 2, 1 },      { "MARK", 102, 2, 1 },       { "BAR", 103, 2, 1 },
-    { "SPEED", 104, 2, 1 }, { "MUTEKI", 105, 2, 1 },      { "FOLLOW", 106, 2, 1 },     { "DISPPRINT", 107, 2, 1 },
-    { "COMBO", 108, 2, 1 }, { "PAUSE", 109, 2, 1 },       { "BATTLE", 110, 2, 1 },     { "ANALOG", 111, 2, 1 },
-    { "COLCHECK", 112, 2, 1 }, { "A*", 113, 2, 1 },       { "PARTICLE", 114, 2, 1 },   { "PRINTF", 115, 2, 1 },
-    { "SOUND_INFO", 116, 3, 1 }, { "SHADOW", 117, 2, 1 }, { "PART_HEAP", 118, 2, 1 },  { "CHARA_INFO", 119, 3, 1 },
-    { "ITEM_WEAPON", 120, 2, 1 }, { "SMITH_MASTER", 121, 2, 1 }, { "CHARA", 122, 2, 1 },
+    { lbl_80331C18, 100, 2, 1 },      { lbl_80331C20, 101, 2, 1 },      { lbl_80331C28, 102, 2, 1 },
+    { lbl_80331C30, 103, 2, 1 },      { lbl_80331C34, 104, 2, 1 },      { lbl_80331C3C, 105, 2, 1 },
+    { lbl_80331C44, 106, 2, 1 },      { s_DISPPRINT_801DD434, 107, 2, 1 },
+    { lbl_80331C4C, 108, 2, 1 },      { lbl_80331C54, 109, 2, 1 },      { lbl_80331C5C, 110, 2, 1 },
+    { lbl_80331C64, 111, 2, 1 },      { s_COLCHECK_801DD440, 112, 2, 1 }, { lbl_80331C6C, 113, 2, 1 },
+    { s_PARTICLE_801DD44C, 114, 2, 1 }, { lbl_80331C70, 115, 2, 1 },    { s_SOUND_INFO_801DD458, 116, 3, 1 },
+    { lbl_80331C78, 117, 2, 1 },      { s_PART_HEAP_801DD464, 118, 2, 1 }, { s_CHARA_INFO_801DD470, 119, 3, 1 },
+    { s_ITEM_WEAPON_801DD47C, 120, 2, 1 }, { s_SMITH_MASTER_801DD488, 121, 2, 1 }, { lbl_80331C80, 122, 2, 1 },
 };
 
 /*

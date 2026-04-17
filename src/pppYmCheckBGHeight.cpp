@@ -3,15 +3,10 @@
 #include "ffcc/maphit.h"
 #include "ffcc/pppPart.h"
 extern "C" {
-extern const float kPppYmCheckBGHeightAxisZero;
-extern const float kPppYmCheckBGHeightProbeDirY;
-extern const float kPppYmCheckBGHeightCylinderScale;
-extern const float kPppYmCheckBGHeightCylinderOffset;
 extern int gPppCalcDisabled;
 }
 
 #include <dolphin/types.h>
-
 
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
@@ -67,10 +62,10 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        zero = kPppYmCheckBGHeightAxisZero;
-        probeY = kPppYmCheckBGHeightProbeDirY;
-        scale = kPppYmCheckBGHeightCylinderScale;
-        offset = kPppYmCheckBGHeightCylinderOffset;
+        zero = 0.0f;
+        probeY = -2000.0f;
+        scale = 10000000000.0f;
+        offset = -10000000000.0f;
         direction.x = zero;
         direction.y = probeY;
         direction.z = zero;

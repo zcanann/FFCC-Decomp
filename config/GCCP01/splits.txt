@@ -124,6 +124,7 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
+	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456CC
 	.sdata      start:0x8032E8B0 end:0x8032E8B8
 
@@ -143,6 +144,7 @@ mapocttree.cpp:
 	extabindex  start:0x8000B9BC end:0x8000BAD0
 	.text       start:0x8002C704 end:0x8002F45C
 	.ctors      start:0x801D53D4 end:0x801D53D8
+	.rodata     start:0x801D72EC end:0x801D7300
 	.bss        start:0x802456F0 end:0x80245754
 
 map.cpp:
@@ -228,6 +230,7 @@ mapanim.cpp:
 	extab       start:0x800069C8 end:0x80006A44
 	extabindex  start:0x8000C610 end:0x8000C6AC
 	.text       start:0x8004A4A0 end:0x8004B1D0
+	.rodata     start:0x801D7CB8 end:0x801D7CF8
 
 maplight.cpp:
 	.text       start:0x8004B1D0 end:0x8004B21C

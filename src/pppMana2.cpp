@@ -19,6 +19,8 @@ struct Vec2d {
     float y;
 };
 
+static const char s_pppMana2_cpp[] = "pppMana2.cpp";
+
 extern char s_Render_Mana2___801dc4d0[];
 extern float FLOAT_803318fc;
 extern float FLOAT_80331898;
@@ -523,28 +525,28 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     work[0x1F] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x2C), pppEnvStPtr);
 
     if (work[0x1D] == 0) {
-        work[0x1D] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x1D7);
+        work[0x1D] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7);
     }
     if (work[10] == 0) {
-        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x1DD);
+        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1DD);
     }
     if (work[11] == 0) {
-        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x1E1);
+        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E1);
     }
 
     texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     if (work[12] == 0) {
-        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x1E9);
+        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E9);
     }
     if (work[13] == 0) {
-        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x1EB);
+        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1EB);
     }
 
     GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
     if (work[8] == 0) {
-        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x1F6);
+        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6);
     }
     dstBuffer = (void*)work[8];
     texList = &work[2];
@@ -560,7 +562,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     InitTexObj__8CTextureFv((void*)work[0x1F]);
 
     if (work[9] == 0) {
-        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, (char*)"pppMana2.cpp", 0x211);
+        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);
         genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
     }
 }

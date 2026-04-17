@@ -942,7 +942,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	for (;;)
 	{
 		newObj = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			&Memory, allocSize, stage, (char*)"pppPart.cpp", 0x305, 1);
+			&Memory, allocSize, stage, const_cast<char*>(s_pppPart_cpp), 0x305, 1);
 		if (newObj != 0)
 		{
 			break;
@@ -1977,7 +1977,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	pppPDataValRaw* pDataVals = 0;
 	if (programCount > 0) {
-		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr, (char*)"pppPart.cpp", 0x585);
+		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr,
+		                                        const_cast<char*>(s_pppPart_cpp), 0x585);
 	}
 	mng->m_pDataVals = pDataVals;
 

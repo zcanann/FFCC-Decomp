@@ -27,6 +27,7 @@ static const float kPolyGroupAabbMax = 1.0e10f;  // FLOAT_80332094
 static const float kPolyGroupAabbMin = -1.0e10f; // FLOAT_80332098
 static const float kInfiniteCost = 10000000.0f;  // FLOAT_8033209c
 static const float kDrawAStarSphereRadius = 5.0f;
+static const char kAStarCostDebugFormat[] = "%d->%d=%.5fm ";
 
 struct CMapCylinderRaw
 {
@@ -490,7 +491,7 @@ void CAStar::calcAStar()
 
 			if (m_bestPath.m_cost < kInfiniteCost)
 			{
-				System.Printf("%d->%d=%.5fm ", from, to, m_bestPath.m_cost);
+				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
 
 				int current = from;
 

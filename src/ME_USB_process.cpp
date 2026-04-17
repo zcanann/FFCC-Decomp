@@ -15,15 +15,15 @@
 
 extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void __dla__FPv(void* ptr);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory* memory, unsigned long size, CMemory::CStage* stage, char* file, int line, int align);
-extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory* memory, unsigned long size, CMemory::CStage* stage, const char* file, int line, int align);
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void ResetRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
 extern "C" int AddRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
 extern "C" void SetRsdIndex__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void SetRsdFlag__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 
-static char s_ME_USB_process_cpp_801d7d78[] = "ME_USB_process.cpp";
-static char s_MemAlloc_Error____size__d_801d7d8c[] = "MemAlloc Error : size=%d";
+static const char s_ME_USB_process_cpp_801d7d78[] = "ME_USB_process.cpp";
+static const char s_MemAlloc_Error____size__d_801d7d8c[] = "MemAlloc Error : size=%d";
 
 namespace {
 struct ViewerSRT {

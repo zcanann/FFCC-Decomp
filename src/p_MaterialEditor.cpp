@@ -26,7 +26,7 @@ extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
-static char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
+static const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
 static unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
@@ -52,7 +52,7 @@ struct MaterialEditorTableInit {
 };
 
 static MaterialEditorTableInit sMaterialEditorTableInit;
-static char s_MaterialEditor[] = "MaterialEditor=%c";
+static const char s_MaterialEditor[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -265,7 +265,7 @@ void CMaterialEditorPcs::createViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, s_CMaterialEditorPcs_801D7D34, 0));
+        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs_801D7D34), 0));
     GXColor clear;
     float fVar1;
 

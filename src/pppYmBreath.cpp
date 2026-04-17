@@ -48,7 +48,7 @@ struct YmBreathParticleGroup {
     Mtx matrix;
 };
 
-static char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
+static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--
@@ -551,39 +551,41 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 
         *(void**)(work + 0x30) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), pppEnvStPtr->m_stagePtr,
-                                                  s_pppYmBreath_cpp, 0x243);
+                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x243);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(maxParticleCount * 0x98));
         }
 
         *(void**)(work + 0x34) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), pppEnvStPtr->m_stagePtr,
-                                                  s_pppYmBreath_cpp, 0x249);
+                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x249);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(maxParticleCount * 0x30));
         }
 
         *(void**)(work + 0x38) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), pppEnvStPtr->m_stagePtr,
-                                                  s_pppYmBreath_cpp, 0x24F);
+                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x24F);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(maxParticleCount * 0x20));
         }
 
         *(void**)(work + 0x3C) =
             pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), pppEnvStPtr->m_stagePtr,
-                                                  s_pppYmBreath_cpp, 0x255);
+                                                  const_cast<char*>(s_pppYmBreath_cpp), 0x255);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0, (unsigned long)(particleGroups * 0x5C));
 
             groupTable = (int*)*(void**)(work + 0x3C);
             for (i = 0; i < particleGroups; i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppYmBreath_cpp, 0x260);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp),
+                    0x260);
                 memset((void*)groupTable[1], 0xFF, (unsigned long)particlePerGroup);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, s_pppYmBreath_cpp, 0x263);
+                    (unsigned long)particlePerGroup, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmBreath_cpp),
+                    0x263);
                 memset((void*)groupTable[2], 0xFF, (unsigned long)particlePerGroup);
                 groupTable[0] = 0;
                 groupTable += 0x17;

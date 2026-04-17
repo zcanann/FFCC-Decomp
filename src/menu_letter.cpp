@@ -102,6 +102,8 @@ int DAT_8032eef8 = 0;
 int DAT_8032eefc = 0;
 int DAT_8032ef00 = 0;
 char s_ReplyStr[0x80];
+static const char s_menu_letter_cpp[] = "menu_letter.cpp";
+static const char s_letterItemInfoFmt[] = "%s%d%s%s";
 
 struct FlatDataTableView {
 	int m_numEntries;
@@ -480,7 +482,7 @@ int CMenuPcs::LetterCtrl()
 					int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
 					int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
 					if (Game.m_gameWork.m_languageId == 2) {
-						sprintf(info, "%s%d%s%s",
+						sprintf(info, s_letterItemInfoFmt,
 							GetMenuStr__8CMenuPcsFi(this, 0x23),
 							value,
 							GetMenuStr__8CMenuPcsFi(this, 0x24),
@@ -921,11 +923,11 @@ bool CMenuPcs::LetterReplyWinOpen()
 		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 		char* srcText = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-			0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x323));
+			0x400, stage, const_cast<char*>(s_menu_letter_cpp), 0x323));
 		stage = *reinterpret_cast<CMemory::CStage**>(
 			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 		char* workText = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-			0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x325));
+			0x400, stage, const_cast<char*>(s_menu_letter_cpp), 0x325));
 
 		memset(srcText, 0, 0x400);
 		memset(workText, 0, 0x400);
@@ -1339,11 +1341,11 @@ void CMenuPcs::LetterMessDraw()
 	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 	char* srcText =
-	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x535));
+	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>(s_menu_letter_cpp), 0x535));
 	stage = *reinterpret_cast<CMemory::CStage**>(
 	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 	char* workText =
-	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x537));
+	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>(s_menu_letter_cpp), 0x537));
 
 	memset(srcText, 0, 0x400);
 	memset(workText, 0, 0x400);
@@ -1625,11 +1627,11 @@ int CMenuPcs::LetterCtrlCur()
 				CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 				char* srcText = reinterpret_cast<char*>(
-				    __nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x65E));
+				    __nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>(s_menu_letter_cpp), 0x65E));
 				stage = *reinterpret_cast<CMemory::CStage**>(
 				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
 				char* workText = reinterpret_cast<char*>(
-				    __nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x660));
+				    __nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>(s_menu_letter_cpp), 0x660));
 				memset(srcText, 0, 0x400);
 				memset(workText, 0, 0x400);
 

@@ -33,7 +33,7 @@ struct DbgMenuDef {
     u32 actionFlags;
 };
 
-char s_Debug_80331c90[] = "Debug";
+const char s_Debug_80331c90[] = "Debug";
 static u32 s_windowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
 static u32 s_windowFillColors[2] = {0xFFFFFF80, 0x00000080};
 
@@ -435,9 +435,9 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
  */
 void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 {
-	static char sStateOn[] = "ON";
-	static char sStateOff[] = "OFF";
-	static char sStateUnknown[] = "?";
+	static const char sStateOn[] = "ON";
+	static const char sStateOff[] = "OFF";
+	static const char sStateUnknown[] = "?";
 	CDM* head = menu;
 
 	do {
@@ -458,7 +458,7 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 		} else {
 			drawWindow(((-menu->m_state | menu->m_state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
 
-			char* stateText;
+			const char* stateText;
 			if (menu->m_state == 1) {
 				stateText = sStateOn;
 			} else {
@@ -468,7 +468,7 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 				}
 			}
 
-			drawFont(9, 0x10, 8, stateText);
+			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
 		}
 
 		menu = menu->m_next;
@@ -711,7 +711,7 @@ void CDbgMenuPcs::Add()
     rootParam.m_unk28 = 0;
     rootParam.m_unk2C = 0;
     rootParam.m_unk30 = 0;
-    rootParam.m_text = s_Debug_80331c90;
+    rootParam.m_text = const_cast<char*>(s_Debug_80331c90);
 
     param.m_type = rootParam.m_type;
     param.m_flags = rootParam.m_flags;

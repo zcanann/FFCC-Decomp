@@ -49,7 +49,7 @@ static inline bool ColumIsNaN(float value)
     return (bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0;
 }
 
-static char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
+static const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -221,7 +221,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
-                s_pppColum_cpp_801DB638, 0x7d);
+                const_cast<char*>(s_pppColum_cpp_801DB638), 0x7d);
 
             values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {

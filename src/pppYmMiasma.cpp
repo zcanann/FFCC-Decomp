@@ -445,7 +445,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
-    static char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
+    static const char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
     YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     VYmMiasma* work;
     int i;
@@ -471,7 +471,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
     if (work->m_particles == 0) {
         work->m_particles = (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
+            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr, const_cast<char*>(sPppYmMiasmaCpp),
+            0x18d);
         particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {
             InitParticleData(work, (_pppPObject*)pppYmMiasma_, step, particle);

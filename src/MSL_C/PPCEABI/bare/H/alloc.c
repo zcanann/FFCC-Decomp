@@ -529,12 +529,11 @@ static void deallocate_from_var_pools(__mem_pool_obj* pool_obj, void* ptr) {
     }
 }
 
-static void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, unsigned long index, FixSubBlock* chunk, unsigned long chunk_size) {
+static void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, unsigned long index, FixSubBlock* chunk,
+                               unsigned long chunk_size) {
     unsigned long fixSubBlock_size;
     unsigned long n;
-    char* p;
     unsigned long k;
-    char* np;
 
     ths->prev_ = prev;
     ths->next_ = next;
@@ -543,18 +542,23 @@ static void FixBlock_construct(FixBlock* ths, FixBlock* prev, FixBlock* next, un
     ths->client_size_ = fix_pool_sizes[index];
     fixSubBlock_size = fix_pool_sizes[index] + 4;
     n = chunk_size / fixSubBlock_size;
-    ths->start_ = chunk;
-    p = (char*)chunk;
-    for (k = 0; k < n - 1; k++) {
-        np = p + fixSubBlock_size;
+    {
+        char* p = (char*)chunk;
+        char* np;
+
+        for (k = 0; k < n - 1; k++) {
+            np = p + fixSubBlock_size;
+            ((FixSubBlock*)p)->block_ = ths;
+            ((FixSubBlock*)p)->next_ = (FixSubBlock*)np;
+            p = np;
+        }
         ((FixSubBlock*)p)->block_ = ths;
-        ((FixSubBlock*)p)->next_ = (FixSubBlock*)np;
-        p = np;
+        ((FixSubBlock*)p)->next_ = 0;
     }
-    ((FixSubBlock*)p)->block_ = ths;
-    ((FixSubBlock*)p)->next_ = 0;
+    ths->start_ = (FixSubBlock*)((char*)ths + 0x14);
     ths->n_allocated_ = 0;
 }
+
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     unsigned long i = 0;
     FixStart* fs;

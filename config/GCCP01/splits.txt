@@ -119,6 +119,7 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
+	.bss        start:0x80245640 end:0x802456CC
 	.sdata      start:0x8032E8B0 end:0x8032E8B8
 
 mapmesh.cpp:

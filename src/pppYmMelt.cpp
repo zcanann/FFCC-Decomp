@@ -78,8 +78,6 @@ struct CMapCylinderRaw {
     f32 m_height;
     Vec m_top;
     Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
 };
 
 /*
@@ -153,8 +151,6 @@ extern "C" void CalcPolygonHeight(
         cylinder.m_direction2.x = expand;
         cylinder.m_direction2.y = expand;
         cylinder.m_direction2.z = expand;
-        cylinder.m_radius2 = expand;
-        cylinder.m_height2 = expand;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {

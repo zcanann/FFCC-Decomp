@@ -2,13 +2,14 @@
 #define _FFCC_CHARA_ANIM_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/ref.h"
 
 class CChunkFile;
 class SRT;
 
 class CChara
 {
-	class CAnim
+	class CAnim : public CRef
 	{
 		CAnim();
 		~CAnim();

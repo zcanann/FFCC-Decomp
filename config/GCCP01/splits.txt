@@ -53,6 +53,7 @@ math.cpp:
 	extabindex  start:0x8000B1F4 end:0x8000B2CC
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
+	.data       start:0x801E8450 end:0x801E8470
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC
@@ -706,6 +707,7 @@ chara.cpp:
 	extabindex  start:0x8000D4C8 end:0x8000D69C
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
+	.data       start:0x801FCD18 end:0x801FCD38
 	.sdata      start:0x8032E8BC end:0x8032E8C0
 
 p_chara.cpp:

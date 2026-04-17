@@ -414,33 +414,40 @@ CMapTexAnim::CMapTexAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapTexAnim::~CMapTexAnim()
+extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim* anim, short shouldDelete)
 {
-    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
+    if (anim != 0) {
+        unsigned char* const p = reinterpret_cast<unsigned char*>(anim);
 
-    *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
+        *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
 
-    __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
-    *reinterpret_cast<void**>(p + 0x20) = 0;
+        __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
+        *reinterpret_cast<void**>(p + 0x20) = 0;
 
-    if ((reinterpret_cast<int>(this) + 0x24) != 0) {
-        if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
-            *reinterpret_cast<void**>(p + 0x3C) = 0;
+        if ((reinterpret_cast<int>(anim) + 0x24) != 0) {
+            if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
+                *reinterpret_cast<void**>(p + 0x3C) = 0;
+            }
+            if (*reinterpret_cast<void**>(p + 0x40) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x40));
+                *reinterpret_cast<void**>(p + 0x40) = 0;
+            }
+            if (*reinterpret_cast<void**>(p + 0x44) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x44));
+                *reinterpret_cast<void**>(p + 0x44) = 0;
+            }
+            if (*reinterpret_cast<void**>(p + 0x48) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x48));
+                *reinterpret_cast<void**>(p + 0x48) = 0;
+            }
         }
-        if (*reinterpret_cast<void**>(p + 0x40) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x40));
-            *reinterpret_cast<void**>(p + 0x40) = 0;
-        }
-        if (*reinterpret_cast<void**>(p + 0x44) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x44));
-            *reinterpret_cast<void**>(p + 0x44) = 0;
-        }
-        if (*reinterpret_cast<void**>(p + 0x48) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x48));
-            *reinterpret_cast<void**>(p + 0x48) = 0;
+
+        __dt__4CRefFv(anim, 0);
+        if (shouldDelete > 0) {
+            __dl__FPv(anim);
         }
     }
 
-    __dt__4CRefFv(this, 0);
+    return anim;
 }

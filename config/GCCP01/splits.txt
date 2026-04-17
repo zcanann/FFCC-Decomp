@@ -31,6 +31,7 @@ game.cpp:
 	extabindex  start:0x8000AE4C end:0x8000AFFC
 	.text       start:0x80013E70 end:0x80016400
 	.ctors      start:0x801D53A8 end:0x801D53AC
+	.data       start:0x801E8320 end:0x801E83FC
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
 	.sbss       start:0x8032EC40 end:0x8032EC45
 	.sdata2     start:0x8032F768 end:0x8032F7A8
@@ -1316,6 +1317,7 @@ bonus_menu.cpp:
 	extab       start:0x80009A34 end:0x80009AC4
 	extabindex  start:0x80010C18 end:0x80010CF0
 	.text       start:0x80133108 end:0x8013E294
+	.rodata     start:0x801DD5C0 end:0x801DD5D0
 	.sbss       start:0x8032EEA8 end:0x8032EEB8
 
 pppScreenBlur.cpp:

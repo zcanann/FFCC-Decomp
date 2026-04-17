@@ -30,28 +30,26 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  */
 unsigned int _SearchEmptyStreamData()
 {
-	unsigned int streamData = (unsigned int)DAT_8032f438;
-	unsigned int streamDataEnd = streamData + 0x4c0;
+	unsigned int streamData = (unsigned int)DAT_8032f420;
 
-	for (;;) {
+	do {
 		if (*(int*)(streamData + 0x10c) == 0) {
-			break;
+			return streamData;
 		}
-
 		streamData += 0x130;
-		if (streamDataEnd <= streamData) {
-			streamData = 0;
-			break;
-		}
-	}
+	} while (streamData < (unsigned int)DAT_8032f420 + 0x4c0);
 
-	return streamData;
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb980
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 #pragma dont_inline on
 void _StreamStop(RedStreamDATA* streamData)
@@ -274,14 +272,14 @@ void StreamStop(int param_1)
 {
 	unsigned int streamData;
 
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)DAT_8032f420;
 	do {
 		volatile int* streamID = (int*)(streamData + 0x10c);
 		if ((*streamID != 0) && ((param_1 == -1) || (param_1 == *streamID))) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)DAT_8032f420 + 0x4c0);
 }
 
 /*
@@ -440,7 +438,7 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 		volume = ((volume + 1) * 0x100 - 1) * 0x1000 | 0x800;
 	}
 
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)DAT_8032f420;
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
 		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
@@ -453,7 +451,7 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 			}
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)DAT_8032f420 + 0x4c0);
 }
 
 /*
@@ -469,7 +467,7 @@ void StreamPause(int param_1, int param_2)
 {
 	unsigned int streamData;
 
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)DAT_8032f420;
 	if (gRedMemoryDebugEnabled != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
@@ -477,7 +475,7 @@ void StreamPause(int param_1, int param_2)
 			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
 		}
 		fflush(__files + 1);
-		streamData = (unsigned int)DAT_8032f438;
+		streamData = (unsigned int)DAT_8032f420;
 	}
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
@@ -506,7 +504,7 @@ void StreamPause(int param_1, int param_2)
 			}
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)DAT_8032f420 + 0x4c0);
 }
 
 /*
@@ -520,9 +518,9 @@ void StreamPause(int param_1, int param_2)
  */
 void StreamControl()
 {
-	extern void* DAT_8032f438;
+	extern int* DAT_8032f420;
 
-	unsigned int streamData = (unsigned int)DAT_8032f438;
+	unsigned int streamData = (unsigned int)DAT_8032f420;
 	do {
 		if (*(int*)(streamData + 0x110) == 1) {
 			int voiceData = *(int*)(streamData + 4);
@@ -596,5 +594,5 @@ void StreamControl()
 		}
 
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)DAT_8032f420 + 0x4c0);
 }

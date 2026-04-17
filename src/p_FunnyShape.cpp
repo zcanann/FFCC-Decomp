@@ -429,8 +429,7 @@ void CFunnyShapePcs::drawViewer()
     GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
     {
         int frame = gFunnyShapeSpinnerFrame >> 4;
-        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt),
-                       gFunnyShapeSpinnerText[(frame + (frame >> 31)) % 4 - (frame >> 31)]);
+        Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), gFunnyShapeSpinnerText[frame % 4]);
     }
 }
 

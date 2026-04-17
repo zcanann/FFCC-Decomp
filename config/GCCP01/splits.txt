@@ -224,6 +224,7 @@ p_MaterialEditor.cpp:
 	extabindex  start:0x8000C6AC end:0x8000C70C
 	.text       start:0x8004B21C end:0x8004C71C
 	.ctors      start:0x801D53FC end:0x801D5400
+	.bss        start:0x8026D338 end:0x8026D724
 
 mapshadow.cpp:
 	extab       start:0x80006AAC end:0x80006AC4

@@ -40,7 +40,23 @@ struct pppFMATRIX {
 class CMaterialEditorPcs : public CProcess
 {
 public:
-    CMaterialEditorPcs() {}
+    CMaterialEditorPcs()
+    {
+        unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
+
+        dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
+        dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
+        dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
+        dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
+        dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
+        dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
+        dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
+        dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
+        dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
+        dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
+        dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
+        dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
+    }
     ~CMaterialEditorPcs();
 
     void Init();
@@ -100,6 +116,7 @@ public:
     Vec field268_0x15c; // 0x15C
     unsigned char _pad168[0xA4];
     pppFMATRIX m_unkMatrix; // 0x20C
+    unsigned char _pad23C[0x3E0 - 0x23C];
 };
 
 extern CMaterialEditorPcs MaterialEditorPcs;

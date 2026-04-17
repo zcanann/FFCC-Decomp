@@ -840,6 +840,7 @@ pppYmMiasma.cpp:
 	extab       start:0x80007B28 end:0x80007B50
 	extabindex  start:0x8000DE10 end:0x8000DE4C
 	.text       start:0x800907C4 end:0x8009159C
+	.rodata     start:0x801D9CA8 end:0x801D9CB8
 
 pppYmDeformationScreen.cpp:
 	extab       start:0x80007B50 end:0x80007B60
@@ -916,6 +917,7 @@ pppYmMelt.cpp:
 	extab       start:0x80007FC8 end:0x80007FE8
 	extabindex  start:0x8000E4C4 end:0x8000E4F4
 	.text       start:0x800A538C end:0x800A5FCC
+	.rodata     start:0x801DA048 end:0x801DA058
 
 pppYmCallBack.cpp:
 	extab       start:0x80007FE8 end:0x80007FF0
@@ -955,6 +957,7 @@ pppYmBreath.cpp:
 	extab       start:0x800083C0 end:0x800083F8
 	extabindex  start:0x8000EA88 end:0x8000EADC
 	.text       start:0x800BFE78 end:0x800C17B8
+	.rodata     start:0x801DA9B0 end:0x801DA9C0
 
 memorycard.cpp:
 	extab       start:0x800083F8 end:0x800084E0
@@ -1151,6 +1154,7 @@ chara_fur.cpp:
 	extab       start:0x80008D14 end:0x80008D84
 	extabindex  start:0x8000F868 end:0x8000F910
 	.text       start:0x800DF618 end:0x800E46DC
+	.rodata     start:0x801DB72C end:0x801DB740
 	.bss        start:0x802FF3D8 end:0x802FF408
 
 pppYmEnv.cpp:
@@ -1162,6 +1166,7 @@ pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4
 	extabindex  start:0x8000F958 end:0x8000F9A0
 	.text       start:0x800E6060 end:0x800E6B98
+	.rodata     start:0x801DB7E8 end:0x801DB7F8
 
 wm_menu.cpp:
 	extab       start:0x80008DE4 end:0x80009024
@@ -1179,6 +1184,7 @@ pppYmTracer2.cpp:
 	extab       start:0x8000907C end:0x80009094
 	extabindex  start:0x8000FD84 end:0x8000FDA8
 	.text       start:0x801035DC end:0x80103EC0
+	.rodata     start:0x801DC4B8 end:0x801DC4D0
 
 pppEraseCharaParts.cpp:
 	extab       start:0x80009094 end:0x800090B4
@@ -1276,6 +1282,7 @@ pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
 	extabindex  start:0x800107EC end:0x80010804
 	.text       start:0x8012B24C end:0x8012B4A8
+	.rodata     start:0x801DD418 end:0x801DD428
 
 pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784
@@ -1332,11 +1339,13 @@ pppChangeTex.cpp:
 	extab       start:0x80009B24 end:0x80009B4C
 	extabindex  start:0x80010D80 end:0x80010DBC
 	.text       start:0x8013EF94 end:0x8013F9D0
+	.rodata     start:0x801DD660 end:0x801DD678
 
 pppCharaBreak.cpp:
 	extab       start:0x80009B4C end:0x80009B84
 	extabindex  start:0x80010DBC end:0x80010E10
 	.text       start:0x8013F9D0 end:0x80141204
+	.rodata     start:0x801DD690 end:0x801DD6A8
 
 pppCallBackDistance.cpp:
 	extab       start:0x80009B84 end:0x80009B94

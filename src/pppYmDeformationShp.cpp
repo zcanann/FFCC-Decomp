@@ -36,6 +36,33 @@ struct Vec4d {
 	float w;
 };
 
+struct pppCVECTOR {
+	u8 rgba[4];
+};
+
+struct YmDeformationShpColorInfo {
+	u32 m_unk0;
+	u32 m_unk4;
+	pppCVECTOR m_color;
+};
+
+struct YmDeformationShpState {
+	int m_backBuffer;
+	int m_pad0;
+	int m_pad1;
+	s16 m_angle;
+	u8 m_direction;
+	u8 m_pad2;
+	float m_scale;
+	float m_values[5];
+};
+
+struct pppYmDeformationShpLayout {
+	u8 m_pad0[0x40];
+	Mtx m_modelMatrix;
+	u8 m_pad70[0x10];
+};
+
 struct _pppEnvStYmDeformationShp {
 	void* m_stagePtr;
 	CMaterialSet* m_materialSetPtr;
@@ -142,19 +169,20 @@ void oddToEven(float&)
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	float value = kPppYmDeformationShpZero;
-	u32* state = (u32*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	YmDeformationShpState* state =
+		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	state[0] = 0;
-	state[1] = 0;
-	state[2] = 0;
-	*(u16*)(state + 3) = 0;
-	*(u8*)((u8*)state + 0xe) = 1;
-	((f32*)state)[6] = value;
-	((f32*)state)[5] = value;
-	((f32*)state)[4] = value;
-	((f32*)state)[9] = value;
-	((f32*)state)[8] = value;
-	((f32*)state)[7] = value;
+	state->m_backBuffer = 0;
+	state->m_pad0 = 0;
+	state->m_pad1 = 0;
+	state->m_angle = 0;
+	state->m_direction = 1;
+	state->m_values[1] = value;
+	state->m_values[0] = value;
+	state->m_scale = value;
+	state->m_values[4] = value;
+	state->m_values[3] = value;
+	state->m_values[2] = value;
 }
 
 /*
@@ -168,25 +196,16 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, ppp
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
-	struct WorkState {
-		u32 m_data0;
-		u32 m_data1;
-		u32 m_data2;
-		u16 m_angle;
-		u8 m_direction;
-		u8 m_pad;
-		float m_values[6];
-	};
-
 	float value = kPppYmDeformationShpZero;
-	WorkState* state = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	YmDeformationShpState* state =
+		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	state->m_values[2] = kPppYmDeformationShpZero;
-	state->m_values[1] = value;
+	state->m_values[1] = kPppYmDeformationShpZero;
 	state->m_values[0] = value;
-	state->m_values[5] = value;
+	state->m_scale = value;
 	state->m_values[4] = value;
 	state->m_values[3] = value;
+	state->m_values[2] = value;
 }
 
 /*
@@ -214,44 +233,34 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*)
  */
 void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	struct FrameState {
-		u32 m_data0;
-		u32 m_data1;
-		u32 m_data2;
-		s16 m_angle;
-		u8 m_direction;
-		u8 m_pad;
-		float m_values[6];
-	};
-
-	FrameState* state;
+	YmDeformationShpState* state;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	state = (FrameState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	state = (YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
 	CalcGraphValue(
-		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_values[0], state->m_values[1],
-		state->m_values[2], param_2->m_payload[0], param_2->m_payload[1], param_2->m_payload[2]);
+		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
+		param_2->m_payload[0], param_2->m_payload[1], param_2->m_payload[2]);
 	CalcGraphValue(
-		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_values[3], state->m_values[4],
-		state->m_values[5], param_2->m_payload[3], param_2->m_payload[4], param_2->m_payload[5]);
+		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
+		param_2->m_payload[3], param_2->m_payload[4], param_2->m_payload[5]);
 
 	if (gPppInConstructor != 0) {
 		return;
 	}
 
 	if (state->m_direction != 0) {
-		int step = (int)state->m_values[3];
+		int step = (int)state->m_values[2];
 
 		state->m_angle = state->m_angle + step;
 		if (state->m_angle > param_2->m_payload3) {
 			state->m_direction = 0;
 		}
 	} else {
-		int step = (int)state->m_values[3];
+		int step = (int)state->m_values[2];
 
 		state->m_angle = state->m_angle - step;
 		if ((int)state->m_angle < -(int)param_2->m_payload3) {
@@ -457,19 +466,10 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	struct WorkState {
-		int m_backBuffer;
-		int m_pad0;
-		int m_pad1;
-		s16 m_angle;
-		u8 m_direction;
-		u8 m_pad2;
-		float m_scale;
-		float m_values[5];
-	};
-
 	int textureIndex = 0;
-	WorkState* work = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
+	YmDeformationShpState* work =
+		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	Mtx rotMtx;
 	float indMtx[2][3];
 	Vec vertices[4];
@@ -477,7 +477,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
-		int colorOffset = param_3->m_serializedDataOffsets[1];
+		YmDeformationShpColorInfo* colorInfo =
+			(YmDeformationShpColorInfo*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[1]);
 		int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
 			env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
@@ -485,8 +486,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-			(u8*)pppYmDeformationShp_ + 0x88 + colorOffset, (u8*)pppYmDeformationShp_ + 0x40, param_2->m_drawZ, param_2->m_alpha, 0, 0, 0, 1,
-			1, 0);
+			&colorInfo->m_color, &obj->m_modelMatrix, param_2->m_drawZ, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
 
 		GXSetNumTevStages(1);
 		GXSetNumTexGens(2);

@@ -160,8 +160,7 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* pa
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
 	if (gPppCalcDisabled == 0) {
-		pppCrystalRenderObject* object = (pppCrystalRenderObject*)pppCrystal;
-		CrystalWork* work = (CrystalWork*)((u8*)object + param_3->m_serializedDataOffsets[2] + 0x80);
+		CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 
 		if (param_2->m_dataValIndex != 0xFFFF) {
 			CMapMesh** mapMeshTable = (CMapMesh**)pppEnvStPtr->m_mapMeshPtr;
@@ -182,6 +181,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 			if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
 				CrystalRefractionMap* textureInfo;
 				u32 textureSize;
+				int widthMinusOne;
+				int heightMinusOne;
 				float stepX;
 				float stepY;
 				float yCoord;
@@ -200,38 +201,44 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				textureInfo->m_height = 0x20;
 				textureInfo->m_imageCount = 0x100;
 				textureInfo->m_bufferSize = textureSize;
+				widthMinusOne = textureInfo->m_width - 1;
+				heightMinusOne = textureInfo->m_height - 1;
 
-				stepX = FLOAT_80330fd0 / (float)(textureInfo->m_width - 1);
-				stepY = FLOAT_80330fd0 / (float)(textureInfo->m_height - 1);
-				yCoord = FLOAT_80330fd4;
+				stepX = 2.0f / (float)widthMinusOne;
+				stepY = 2.0f / (float)heightMinusOne;
+				yCoord = -1.0f;
 
 				for (y = 0; y < (u32)textureInfo->m_height; y++) {
 					float ySq = yCoord * yCoord;
-					float xCoord = FLOAT_80330fd4;
+					float xCoord = -1.0f;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
 						float magnitude = xCoord * xCoord + ySq;
-						if (magnitude > FLOAT_80330fd8) {
+						if (magnitude > 1.0f) {
 							magnitude = sqrtf(magnitude);
-						} else if (magnitude < 0.0f) {
-							magnitude = NAN;
-						} else if (CrystalIsNaN(magnitude)) {
-							magnitude = NAN;
+						} else {
+							if (magnitude >= 0.0f) {
+								if (CrystalIsNaN(magnitude)) {
+									magnitude = NAN;
+								}
+							} else {
+								magnitude = NAN;
+							}
 						}
 
-						if (magnitude > FLOAT_80330ff8) {
-							magnitude = FLOAT_80330ff8;
+						if (magnitude > 0.8f) {
+							magnitude = 0.8f;
 						}
 
-						double modulation = fmod(magnitude, DOUBLE_80331000);
-						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
-						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
+						double modulation = fmod((double)magnitude, 1.0);
+						magnitude = 4.0f * (magnitude * (float)modulation);
+						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
 						u8* pixel = (u8*)((u32)textureInfo->m_imageData +
 							(y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
 							(x & 0x1FFFFFFC) * 8 +
 							((x & 3) + (y & 3) * 4) * 2);
 						pixel[0] = nx;
-						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
+						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
 						xCoord += stepX;
 						pixel[1] = ny;
 					}

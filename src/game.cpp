@@ -162,7 +162,6 @@ struct CFlatDataView
 CGame Game;
 
 // Uninitialized
-unsigned char GameDtorChain[0x10];
 static float FLOAT_8032ec40;
 static bool BOOL_8032ec44;
 
@@ -178,68 +177,6 @@ static bool BOOL_8032ec44;
 int CGBaseObj::GetCID()
 {
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80016220
- * PAL Size: 312b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_game_cpp(void)
-{
-    CGame* game = &Game;
-    const char* townName;
-
-    *reinterpret_cast<void**>(game) = __vt__8CManager;
-    *reinterpret_cast<void**>(game) = __vt__5CGame;
-    memset(reinterpret_cast<unsigned char*>(game) + 0xF, 0, 0x13E1);
-    memset(reinterpret_cast<unsigned char*>(game) + 0x20, 0xFF, 0x10);
-
-    *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
-    game->m_gameWork.m_chaliceElement = 1;
-
-    townName = &DAT_8032f6ac;
-    if (game->m_gameWork.m_languageId == 3) {
-        townName = &DAT_8032f6a4;
-    }
-    strcpy(game->m_gameWork.m_townName, townName);
-    game->m_gameWork.m_gameInitFlag = 1;
-
-    __construct_array(
-        game->m_caravanWorkArr,
-        reinterpret_cast<ConstructorDestructor>(__ct__12CCaravanWorkFv),
-        reinterpret_cast<ConstructorDestructor>(__dt__12CCaravanWorkFv),
-        0xC30,
-        9
-    );
-    __construct_array(
-        game->m_monWorkArr,
-        reinterpret_cast<ConstructorDestructor>(__ct__8CMonWorkFv),
-        reinterpret_cast<ConstructorDestructor>(__dt__8CMonWorkFv),
-        0x110,
-        0x40
-    );
-
-    game->m_partyMinZ = FLOAT_8032f688;
-    game->m_partyMinY = FLOAT_8032f688;
-    game->m_partyMinX = FLOAT_8032f688;
-    game->m_partyMaxZ = FLOAT_8032f68c;
-    game->m_partyMaxY = FLOAT_8032f68c;
-    game->m_partyMaxX = FLOAT_8032f68c;
-
-    __construct_array(
-        game->m_cFlatDataArr,
-        reinterpret_cast<ConstructorDestructor>(__ct__9CFlatDataFv),
-        reinterpret_cast<ConstructorDestructor>(__dt__9CFlatDataFv),
-        0x14D4,
-        4
-    );
-
-    __register_global_object(&Game, reinterpret_cast<void*>(__dt__5CGameFv), GameDtorChain);
 }
 
 /*

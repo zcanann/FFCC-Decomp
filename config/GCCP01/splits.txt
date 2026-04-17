@@ -852,6 +852,7 @@ fontman.cpp:
 	extabindex  start:0x8000DE64 end:0x8000DF3C
 	.text       start:0x80091E58 end:0x8009312C
 	.ctors      start:0x801D5418 end:0x801D541C
+	.rodata     start:0x801D9CB8 end:0x801D9CD0
 	.data       start:0x8020EDC8 end:0x8020EDF8
 	.bss        start:0x802EA170 end:0x802EA188
 
@@ -859,6 +860,7 @@ pppYmTracer.cpp:
 	extab       start:0x80007BF0 end:0x80007C08
 	extabindex  start:0x8000DF3C end:0x8000DF60
 	.text       start:0x8009312C end:0x80093D04
+	.rodata     start:0x801D9CE0 end:0x801D9CF0
 
 pppParHitSph.cpp:
 	extab       start:0x80007C08 end:0x80007C10
@@ -1116,6 +1118,7 @@ pppBreathModel.cpp:
 	extab       start:0x80008C44 end:0x80008C7C
 	extabindex  start:0x8000F730 end:0x8000F784
 	.text       start:0x800DB094 end:0x800DC9A0
+	.rodata     start:0x801DB5A0 end:0x801DB5B8
 
 pppCrystal.cpp:
 	extab       start:0x80008C7C end:0x80008C94

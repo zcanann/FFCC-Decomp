@@ -163,7 +163,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             if (ref != 0) {
                 CMapTexAnimFields* anim = Fields(ref);
                 __ct__4CRefFv(ref);
-                *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim;
+                *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim;
                 anim->m_keyFrame.m_junTable = 0;
                 anim->m_keyFrame.m_keyFrame = 0;
                 anim->m_keyFrame.m_keyValue = 0;

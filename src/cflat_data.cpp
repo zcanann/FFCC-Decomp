@@ -99,46 +99,46 @@ void CFlatData::Create(void* filePtr)
 		char* m_mesPtr[1122];
 	};
 
-	FlatDataLayout* flatData;
-	int iVar1;
 	int iVar10;
+	FlatDataLayout* dataIter;
+	FlatDataLayout* tableIter;
 
-	flatData = (FlatDataLayout*)this;
+	dataIter = (FlatDataLayout*)this;
 	for (iVar10 = 0; iVar10 < ((FlatDataLayout*)this)->m_dataCount; iVar10++)
 	{
-		if (flatData->m_data[0].m_data != nullptr)
+		if (dataIter->m_data[0].m_data != nullptr)
 		{
-			operator delete(flatData->m_data[0].m_data);
-			flatData->m_data[0].m_data = nullptr;
+			operator delete(dataIter->m_data[0].m_data);
+			dataIter->m_data[0].m_data = nullptr;
 		}
-		if (flatData->m_data[0].m_strings != nullptr)
+		if (dataIter->m_data[0].m_strings != nullptr)
 		{
-			operator delete(flatData->m_data[0].m_strings);
-			flatData->m_data[0].m_strings = (char**)nullptr;
+			operator delete(dataIter->m_data[0].m_strings);
+			dataIter->m_data[0].m_strings = (char**)nullptr;
 		}
-		if (flatData->m_data[0].m_stringBuf != nullptr)
+		if (dataIter->m_data[0].m_stringBuf != nullptr)
 		{
-			operator delete(flatData->m_data[0].m_stringBuf);
-			flatData->m_data[0].m_stringBuf = (char*)nullptr;
+			operator delete(dataIter->m_data[0].m_stringBuf);
+			dataIter->m_data[0].m_stringBuf = (char*)nullptr;
 		}
-		flatData = (FlatDataLayout*)&flatData->m_data[0].m_stringBuf;
+		dataIter = (FlatDataLayout*)&dataIter->m_data[0].m_stringBuf;
 	}
 	((FlatDataLayout*)this)->m_dataCount = 0;
 
-	flatData = (FlatDataLayout*)this;
+	tableIter = (FlatDataLayout*)this;
 	for (iVar10 = 0; iVar10 < ((FlatDataLayout*)this)->m_tableCount; iVar10++)
 	{
-		if (flatData->m_tabl[0].m_strings != nullptr)
+		if (tableIter->m_tabl[0].m_strings != nullptr)
 		{
-			operator delete(flatData->m_tabl[0].m_strings);
-			flatData->m_tabl[0].m_strings = (char**)nullptr;
+			operator delete(tableIter->m_tabl[0].m_strings);
+			tableIter->m_tabl[0].m_strings = (char**)nullptr;
 		}
-		if (flatData->m_tabl[0].m_stringBuf != nullptr)
+		if (tableIter->m_tabl[0].m_stringBuf != nullptr)
 		{
-			operator delete(flatData->m_tabl[0].m_stringBuf);
-			flatData->m_tabl[0].m_stringBuf = (char*)nullptr;
+			operator delete(tableIter->m_tabl[0].m_stringBuf);
+			tableIter->m_tabl[0].m_stringBuf = (char*)nullptr;
 		}
-		flatData = (FlatDataLayout*)&flatData->m_data[0].m_numStrings;
+		tableIter = (FlatDataLayout*)&tableIter->m_data[0].m_numStrings;
 	}
 	((FlatDataLayout*)this)->m_tableCount = 0;
 
@@ -168,9 +168,10 @@ void CFlatData::Create(void* filePtr)
 
 					if (chunk.m_version >= 1)
 					{
-						int numStrings;
+						int iVar1;
 						int iVar6;
 						int iVar7;
+						int numStrings;
 						int stringBase;
 
 						numStrings = chunkFile.Get4();
@@ -184,7 +185,7 @@ void CFlatData::Create(void* filePtr)
 						for (iVar7 = 0; (iVar1 = m_dataCount, iVar7 < m_data[iVar1].m_numStrings); iVar7++)
 						{
 							iVar6 = (int)chunkFile.GetAddress();
-							m_data[iVar1].m_strings[iVar7] = m_data[iVar1].m_stringBuf + (iVar6 - stringBase);
+							m_data[iVar1].m_strings[iVar7] = (char*)((int)m_data[iVar1].m_stringBuf + (iVar6 - stringBase));
 							chunkFile.GetString();
 						}
 					}
@@ -201,6 +202,7 @@ void CFlatData::Create(void* filePtr)
 				case 0x5441424C: // 'TABL'
 				{
 					char** stringIndex;
+					int iVar1;
 					int iVar6;
 					int iVar7;
 					int stringBase;
@@ -216,7 +218,7 @@ void CFlatData::Create(void* filePtr)
 					for (iVar7 = 0; (iVar1 = m_tableCount, iVar7 < m_tabl[iVar1].m_numEntries); iVar7++)
 					{
 						iVar6 = (int)chunkFile.GetAddress();
-						m_tabl[iVar1].m_strings[iVar7] = m_tabl[iVar1].m_stringBuf + (iVar6 - stringBase);
+						m_tabl[iVar1].m_strings[iVar7] = (char*)((int)m_tabl[iVar1].m_stringBuf + (iVar6 - stringBase));
 						chunkFile.GetString();
 					}
 					m_tableCount++;
@@ -235,7 +237,7 @@ void CFlatData::Create(void* filePtr)
 					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
 						iVar8 = (int)chunkFile.GetAddress();
-						m_mesPtr[iVar7] = m_mesBuffer + (iVar8 - iVar10);
+						m_mesPtr[iVar7] = (char*)((int)m_mesBuffer + (iVar8 - iVar10));
 						chunkFile.GetString();
 					}
 					break;

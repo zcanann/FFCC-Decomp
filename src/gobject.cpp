@@ -110,9 +110,9 @@ static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
-static char s_gobject_cpp[] = "gobject.cpp";
-static char s_l_item[] = "l_item";
-static char s_r_item[] = "r_item";
+static const char s_gobject_cpp[] = "gobject.cpp";
+static const char s_l_item[] = "l_item";
+static const char s_r_item[] = "r_item";
 static const float  sAnimFrameOffset = 1.0f;  // FLOAT_80330338
 static const double sLoopBias = 1.2;   // DOUBLE_80330378
 static const float  sZeroFloat = 0.0f;  // FLOAT_80330350
@@ -2189,7 +2189,8 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
         m_charaModelHandle = 0;
     }
 
-    void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(0x194, Game.m_mainStage, s_gobject_cpp, 0xA01);
+    void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
+        0x194, Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA01);
     if (handle != 0) {
         handle = __ct__Q29CCharaPcs7CHandleFv(handle);
     }
@@ -2217,7 +2218,8 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
 
     if (itemId > 0) {
         void* handle =
-            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(0x194, Game.m_mainStage, s_gobject_cpp, 0xA11);
+            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
+                0x194, Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA11);
         if (handle != 0) {
             handle = __ct__Q29CCharaPcs7CHandleFv(handle);
         }
@@ -2233,7 +2235,8 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
             m_weaponModelHandle, 4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant),
             textureVariant, -1, 0, 1);
-        m_weaponAttachNode = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, s_r_item);
+        m_weaponAttachNode =
+            SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, const_cast<char*>(s_r_item));
     }
 }
 
@@ -2255,7 +2258,8 @@ void CGObject::LoadShield(int itemId)
 
     if (itemId > 0) {
         void* handle =
-            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(0x194, Game.m_mainStage, s_gobject_cpp, 0xA23);
+            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
+                0x194, Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA23);
         if (handle != 0) {
             handle = __ct__Q29CCharaPcs7CHandleFv(handle);
         }

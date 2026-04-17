@@ -279,10 +279,10 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short sho
  */
 void CFunnyShape::InitAnmWork()
 {
-    const float zero = FLOAT_8032fd6c;
+    const float zero = 0.0f;
     const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
-    const float angleMul = FLOAT_8032fda4;
-    const float angleDiv = FLOAT_8032fda8;
+    const float angleMul = 3.14f;
+    const float angleDiv = 180.0f;
     CFunnyShapeAnmWork* work = AnmWork(this);
 
     for (s32 i = 0; i < 0x200; i++) {
@@ -343,6 +343,7 @@ void CFunnyShape::Update()
     }
 
     CFunnyShapeAnmWork* work = AnmWork(this);
+    const float zero = 0.0f;
     const u8 noSpread = static_cast<u8>(((ShapeFlags(this) >> 7) & 1) ^ 1);
     for (s32 i = 0; i < ShapeCount(this); i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
@@ -357,10 +358,10 @@ void CFunnyShape::Update()
 
                 r = rand();
                 work->y = static_cast<float>(r % range);
-                work->z = FLOAT_8032fd6c;
+                work->z = zero;
                 work->delay = 0x200;
-                work->viewportY = FLOAT_8032fd6c;
-                work->viewportX = FLOAT_8032fd6c;
+                work->viewportY = zero;
+                work->viewportX = zero;
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
@@ -378,8 +379,8 @@ void CFunnyShape::Update()
 
                 if (noSpread != 0) {
                     work->frame = 0;
-                    work->y = FLOAT_8032fd6c;
-                    work->x = FLOAT_8032fd6c;
+                    work->y = zero;
+                    work->x = zero;
                 }
             }
 

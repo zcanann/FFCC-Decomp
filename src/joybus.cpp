@@ -15,7 +15,6 @@ JoyBus Joybus;
 
 int DAT_8032edb8 = 0;
 extern "C" void __dt__6JoyBusFv(void*);
-unsigned char ARRAY_802eaab0[0x10];
 
 extern const unsigned short JoyBusCrcTable[256] =
 {
@@ -131,7 +130,47 @@ unsigned int CSystem::GetCounter()
  */
 JoyBus::JoyBus()
 {
-	// TODO
+    m_threadRunningMask = 0;
+    m_binLoaded = false;
+    m_fileBaseA_dup = 0;
+    m_fileBaseB_dup = 0;
+    m_gbaBootImage = 0;
+    m_fileBaseA = 0;
+    m_fileBaseB = 0;
+
+    for (int i = 0; i < 4; i++)
+    {
+        m_letterBuffer[i] = 0;
+        m_letterSizeArr[i] = 0;
+    }
+
+    strcpy(m_pathBuf, "dvd_gba/");
+    strcat(m_pathBuf, "ffcc_cli.bin", 128UL);
+
+    memset(m_sendBuffer, 0, 0x4000);
+    memset(m_stageFlags, 0, 8);
+    memset(m_cmdQueueData, 0, 0x400);
+    memset(m_recvQueueEntriesArr, 0, 0x400);
+    memset(m_threadParams, 0, 0xF0);
+    memset(m_perThreadTemp, 0, 0x60);
+    memset(m_recvBuffer, 0, 0x1020);
+
+    m_mapId = 0xFF;
+    m_stageId = 0xFF;
+
+    for (int i = 0; i < 4; i++)
+    {
+        m_threadParams[i].m_gbaStatus = 1;
+        m_threadParams[i].m_padType = 0x40;
+        m_cmdCount[i] = 0;
+        m_secCmdCount[i] = 0;
+        OSInitSemaphore(&m_accessSemaphores[i], 1);
+        m_ctrlModeArr[i] = 0;
+        m_nextModeTypeArr[i] = 0;
+        m_modeXArr[i] = 0;
+        m_stateCodeArr[i] = 0xFF;
+        m_stateFlagArr[i] = 0;
+    }
 }
 
 /*
@@ -6586,78 +6625,3 @@ int CFile::IsDiskError()
 	return m_isDiskError;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800b2728
- * PAL Size: 456b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_joybus_cpp()
-{
-    // NOTE: This __sinit is compiler-generated from global variable initialization.
-    // To match, replace with proper constructors or initializer expressions, then
-    // delete this function so the compiler auto-generates it.
-
-    JoyBus* threadParamBase;
-    JoyBus* cmdCountBase;
-    JoyBus* semBase;
-    JoyBus* stateBase;
-    int i;
-
-    Joybus.m_threadRunningMask = 0;
-    Joybus.m_binLoaded = false;
-    Joybus.m_fileBaseA_dup = 0;
-    Joybus.m_fileBaseB_dup = 0;
-    Joybus.m_gbaBootImage = 0;
-    Joybus.m_fileBaseA = 0;
-    Joybus.m_fileBaseB = 0;
-    
-    for (i = 0; i < 4; i++)
-    {
-        Joybus.m_letterBuffer[i] = 0;
-        Joybus.m_letterSizeArr[i] = 0;
-    }
-
-    strcpy(Joybus.m_pathBuf, "dvd_gba/");
-    strcat(Joybus.m_pathBuf, "ffcc_cli.bin", 128UL);
-
-    memset((void*)0x802ec7d0, 0, 0x4000);
-    memset((void*)0x802f08f0, 0, 8);
-    memset((void*)0x802f08f8, 0, 0x400);
-    memset((void*)0x802f0cf8, 0, 0x400);
-    memset((void*)0x802f07d0, 0, 0xf0);
-    memset((void*)0x802f1160, 0, 0x60);
-    memset((void*)0x802eab40, 0, 0x1020);
-    
-    Joybus.m_mapId = 0xff;
-    Joybus.m_stageId = 0xff;
-
-    threadParamBase = &Joybus;
-    cmdCountBase = &Joybus;
-    semBase = &Joybus;
-    stateBase = &Joybus;
-    i = 0;
-    do
-    {
-        threadParamBase->m_threadParams[0].m_gbaStatus = 1;
-        threadParamBase->m_threadParams[0].m_padType = 0x40;
-        cmdCountBase->m_cmdCount[0] = 0;
-        cmdCountBase->m_secCmdCount[0] = 0;
-        OSInitSemaphore(semBase->m_accessSemaphores, 1);
-        stateBase->m_ctrlModeArr[0] = 0;
-        i = i + 1;
-        threadParamBase = reinterpret_cast<JoyBus*>(threadParamBase->m_pathBuf + 0x3c);
-        stateBase->m_nextModeTypeArr[0] = 0;
-        cmdCountBase = reinterpret_cast<JoyBus*>(cmdCountBase->m_pathBuf + 4);
-        semBase = reinterpret_cast<JoyBus*>(semBase->m_pathBuf + 0xc);
-        stateBase->m_modeXArr[0] = 0;
-        stateBase->m_stateCodeArr[0] = 0xff;
-        stateBase->m_stateFlagArr[0] = 0;
-        stateBase = reinterpret_cast<JoyBus*>(stateBase->m_pathBuf + 1);
-    } while (i < 4);
-
-    __register_global_object(&Joybus, reinterpret_cast<void*>(__dt__6JoyBusFv), ARRAY_802eaab0);
-}

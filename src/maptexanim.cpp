@@ -58,11 +58,6 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
     return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
 }
 
-static inline CMapTexAnim*& AnimAt(CMapTexAnimSet* self, int index)
-{
-    return *reinterpret_cast<CMapTexAnim**>(reinterpret_cast<unsigned char*>(self) + 0xC + (index * 4));
-}
-
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
     return (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<int>(index)];
@@ -99,6 +94,11 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
         numTexture = static_cast<unsigned short>(slotIndex + 1);
     }
 }
+
+static inline CMapKeyFrame* KeyFrame(CMapTexAnim* anim)
+{
+    return reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(anim) + 0x24);
+}
 }
 
 /*
@@ -114,8 +114,8 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
 {
     CMapTexAnim* ref = 0;
     CChunkFile::CChunk chunk;
-    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<int>(this) + 0x10C) = materialSet;
-    *reinterpret_cast<CTextureSet**>(reinterpret_cast<int>(this) + 0x110) = textureSet;
+    m_materialSet = materialSet;
+    m_textureSet = textureSet;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
@@ -126,77 +126,70 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             if (ref != 0) {
                 __ct__4CRefFv(ref);
                 *reinterpret_cast<void**>(ref) = *PTR_PTR_s_CMapTexAnim;
-                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x3C) = 0;
-                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x40) = 0;
-                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x44) = 0;
-                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x48) = 0;
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x27) = 1;
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x28) = 0;
-                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x20) = 0;
-                *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x18) = FLOAT_8032fd48;
-                *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x1C) = FLOAT_8032fd4c;
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x14) = 0;
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x15) = 0;
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x12) = 0xFFFF;
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x16) = 1;
+                ref->m_keyJun = 0;
+                ref->m_keyFrameData = 0;
+                ref->m_keyKeyData = 0;
+                ref->m_keyUnknown = 0;
+                ref->m_keyFrame[3] = 1;
+                ref->m_keyFrame[4] = 0;
+                ref->m_frameTable = 0;
+                ref->m_frameStep = FLOAT_8032fd48;
+                ref->m_currentFrame = FLOAT_8032fd4c;
+                ref->m_usesBlendTexture = 0;
+                ref->m_usesKeyFrame = 0;
+                ref->m_materialId = -1;
+                ref->m_wrapMode = 1;
             }
 
-            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 8) = chunkFile.Get2();
-            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xA) = chunkFile.Get2();
-            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xC) = chunkFile.Get2();
-            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x10) =
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xC);
-            *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x1C) =
-                static_cast<float>(static_cast<short>(chunkFile.Get2()));
-            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xE) = 0;
-            *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x18) = chunkFile.GetF4();
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x14) = chunkFile.Get1();
+            ref->m_materialIndex = chunkFile.Get2();
+            ref->m_textureSlot = chunkFile.Get2();
+            ref->m_frameCount = chunkFile.Get2();
+            ref->m_endFrame = ref->m_frameCount;
+            ref->m_currentFrame = static_cast<float>(static_cast<short>(chunkFile.Get2()));
+            ref->m_startFrame = 0;
+            ref->m_frameStep = chunkFile.GetF4();
+            ref->m_usesBlendTexture = chunkFile.Get1();
             chunkFile.Get1();
             chunkFile.Get1();
             chunkFile.Get1();
 
             if (chunk.m_version == 0) {
                 chunkFile.Get4();
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x12) = 0xFFFF;
+                ref->m_materialId = -1;
             } else {
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x12) = chunkFile.Get2();
+                ref->m_materialId = chunkFile.Get2();
                 chunkFile.Get2();
             }
 
             chunkFile.Get4();
             chunkFile.Get4();
             void* frameTable = __nwa__FUlPQ27CMemory6CStagePci(
-                static_cast<unsigned long>(*reinterpret_cast<short*>(reinterpret_cast<int>(ref) + 0xC) << 1),
+                static_cast<unsigned long>(ref->m_frameCount << 1),
                 *reinterpret_cast<CMemory::CStage**>(&MapMng),
                 s_maptexanim_cpp_801d7ec4, 0x3B);
-            *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x20) = frameTable;
+            ref->m_frameTable = frameTable;
 
             int i = 0;
             int offset = 0;
-            while (i < *reinterpret_cast<short*>(reinterpret_cast<int>(ref) + 0xC)) {
+            while (i < ref->m_frameCount) {
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(frameTable) + offset) = chunkFile.Get2();
                 i++;
                 offset += 2;
             }
 
-            short count = *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8);
-            *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8) = count + 1;
-            AnimAt(this, count) = ref;
+            short count = m_count;
+            m_count = count + 1;
+            m_anims[count] = ref;
             break;
         case 0x4A554E20:
-            ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
-                static_cast<char>(chunk.m_arg0));
+            ReadJun__12CMapKeyFrameFR10CChunkFilei(KeyFrame(ref), &chunkFile, static_cast<char>(chunk.m_arg0));
             break;
         case 0x4652414D:
-            ReadFrame__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile);
+            ReadFrame__12CMapKeyFrameFR10CChunkFilei(KeyFrame(ref), &chunkFile);
             break;
         case 0x4B455920:
-            ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
-                static_cast<char>(chunk.m_arg0));
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x15) = 1;
+            ReadKey__12CMapKeyFrameFR10CChunkFilei(KeyFrame(ref), &chunkFile, static_cast<char>(chunk.m_arg0));
+            ref->m_usesKeyFrame = 1;
             break;
         }
     }

@@ -164,6 +164,7 @@ p_camera.cpp:
 	.text       start:0x80036290 end:0x8003A5FC
 	.ctors      start:0x801D53E0 end:0x801D53E4
 	.data       start:0x801E9AE0 end:0x801E9B24
+	.sbss       start:0x8032ECD8 end:0x8032ECD9
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
@@ -940,6 +941,7 @@ chara_anim.cpp:
 	extab       start:0x80008390 end:0x800083C0
 	extabindex  start:0x8000EA40 end:0x8000EA88
 	.text       start:0x800BF620 end:0x800BFE78
+	.data       start:0x80210534 end:0x80210540
 
 pppYmBreath.cpp:
 	extab       start:0x800083C0 end:0x800083F8

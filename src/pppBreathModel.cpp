@@ -48,6 +48,7 @@ struct BreathParticleGroup {
     Vec position;
     Vec direction;
     float speed;
+    float scale;
     Mtx matrix;
 };
 

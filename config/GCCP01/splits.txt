@@ -167,6 +167,7 @@ p_map.cpp:
 	extabindex  start:0x8000BD70 end:0x8000BE18
 	.text       start:0x80034988 end:0x80036290
 	.ctors      start:0x801D53DC end:0x801D53E0
+	.data       start:0x801E89B8 end:0x801E9030
 
 p_camera.cpp:
 	extab       start:0x80006374 end:0x80006414
@@ -1244,6 +1245,7 @@ THPSimple.cpp:
 	extab       start:0x800090B4 end:0x80009114
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
+	.data       start:0x802111E8 end:0x802112E8
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:

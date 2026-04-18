@@ -422,16 +422,6 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapTexAnim::CMapTexAnim()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80050320
  * PAL Size: 220b
  * EN Address: TODO

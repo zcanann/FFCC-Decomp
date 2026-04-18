@@ -30,7 +30,6 @@ private:
 class CMapTexAnim : public CRef
 {
 public:
-    CMapTexAnim();
     ~CMapTexAnim();
     void Calc(CMaterialSet*, CTextureSet*);
     void SetMapTexAnim(int, int, int);

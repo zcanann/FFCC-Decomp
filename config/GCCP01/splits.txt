@@ -65,6 +65,7 @@ memory.cpp:
 	extabindex  start:0x8000B2CC end:0x8000B434
 	.text       start:0x8001C2F0 end:0x8001FE74
 	.ctors      start:0x801D53B4 end:0x801D53B8
+	.rodata     start:0x801D6690 end:0x801D68D0
 	.data       start:0x801E8488 end:0x801E84A8
 	.bss        start:0x8023C888 end:0x80244028
 	.sbss       start:0x8032EC58 end:0x8032EC60
@@ -82,7 +83,7 @@ p_usb.cpp:
 	extabindex  start:0x8000B440 end:0x8000B4AC
 	.text       start:0x8001FF6C end:0x80020494
 	.ctors      start:0x801D53BC end:0x801D53C0
-	.rodata     start:0x801D6D14 end:0x801D6D28
+	.rodata     start:0x801D6D08 end:0x801D6D20
 	.data       start:0x801E8690 end:0x801E8818
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E838 end:0x8032E840
@@ -116,6 +117,8 @@ usb.cpp:
 	extabindex  start:0x8000B5D8 end:0x8000B5FC
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
+	.rodata     start:0x801D6F9C end:0x801D7058
+	.data       start:0x801E88A4 end:0x801E88C4
 	.bss        start:0x802455C0 end:0x80245640
 
 util.cpp:
@@ -336,6 +339,7 @@ partMng.cpp:
 	extabindex  start:0x8000CC70 end:0x8000CEE0
 	.text       start:0x80057794 end:0x8005F71C
 	.ctors      start:0x801D5408 end:0x801D540C
+	.rodata     start:0x801D8230 end:0x801D8380
 	.bss        start:0x80275EE8 end:0x80299F30
 	.sbss       start:0x8032ED68 end:0x8032ED84
 
@@ -745,6 +749,7 @@ cflat_runtime2.cpp:
 	extabindex  start:0x8000D2F4 end:0x8000D4C8
 	.text       start:0x80069B08 end:0x8006EB04
 	.ctors      start:0x801D540C end:0x801D5410
+	.data       start:0x801FCAE4 end:0x801FCB7C
 	.bss        start:0x80299F40 end:0x802E79A0
 	.sbss       start:0x8032ED98 end:0x8032EDA0
 
@@ -1022,7 +1027,7 @@ memorycard.cpp:
 	extabindex  start:0x8000EADC end:0x8000EC38
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
-	.rodata     start:0x801DAA0C end:0x801DAE0C
+	.rodata     start:0x801DAA0C end:0x801DAF40
 	.data       start:0x8021054C end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 
@@ -1338,12 +1343,14 @@ itemobj.cpp:
 	extab       start:0x8000960C end:0x8000968C
 	extabindex  start:0x800105DC end:0x8001069C
 	.text       start:0x80124B78 end:0x80127008
+	.data       start:0x80211F50 end:0x80211FE4
 	.sbss       start:0x8032EE90 end:0x8032EE94
 
 prgobj.cpp:
 	extab       start:0x8000968C end:0x8000970C
 	extabindex  start:0x8001069C end:0x8001075C
 	.text       start:0x80127008 end:0x80127B54
+	.data       start:0x80211FE4 end:0x80212060
 
 pppBindOnlyPos.cpp:
 	.text       start:0x80127B54 end:0x80127B74
@@ -1477,6 +1484,7 @@ menu_cmd.cpp:
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
 	.rodata     start:0x801DE910 end:0x801DEAD4
+	.data       start:0x80214D28 end:0x80214DF0
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
 
@@ -1538,7 +1546,7 @@ goout.cpp:
 	extab       start:0x8000A01C end:0x8000A06C
 	extabindex  start:0x800114F4 end:0x8001156C
 	.text       start:0x80168130 end:0x8016C9E8
-	.rodata     start:0x801DF264 end:0x801DF27C
+	.rodata     start:0x801DF264 end:0x801DF9B0
 	.bss        start:0x8030BB08 end:0x8030BB58
 	.sbss       start:0x8032EF08 end:0x8032EF0C
 

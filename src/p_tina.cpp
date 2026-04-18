@@ -1078,14 +1078,14 @@ void CPartPcs::drawAfterViewer()
 	int frameSign;
 
 	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
-	OSStartStopwatch(&g_par_draw_prof);
-	OSStartStopwatch(&g_par_calc_prof);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
-	OSStopStopwatch(&g_par_calc_prof);
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
 	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
-	OSStopStopwatch(&g_par_draw_prof);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 

@@ -21,37 +21,39 @@ unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 unsigned char m_table__12CMiniGamePcs[0x15C];
 static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
-static const char s_miniGameSourceName[] = "p_minigame.cpp";
-static const char s_miniGameSourceLineFmt[] = "%s %d\n";
-static const char s_miniGameConnectedLineFmt[] = "isConnectedLine=%d,Line=%d\n";
-static const char s_miniGameRetryFmt[] = "retry=%d chan=%d\n";
-static const char s_miniGameContextRecvFmt[] = "chan=%d step=%d contextRecvOffset=%d\n";
-static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%d\n";
-static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n";
-static const char s_miniGameRecvStatusFmt[] = "ret=%d status=0x%02x step=%d contextRecvOffset=%d\n";
-static const char s_miniGameSetPortFmt[] = "chan=%d MG_GBA_THREAD_MSG_SETPORT line=%d\n";
-static const char s_miniGameManagerFileFmt[] = "%s/mgr%02d.bin";
-static const char s_miniGameManagerSpFileFmt[] = "%s/mgrsp%02d.bin";
-static const char s_miniGameManagerDir[] = "dvd/minigame";
-static const char s_miniGameFileInfoFmt[] = "MINIGAME FILE=%s SPFILE=%s\n";
-static const char s_miniGameSeparator[] = "--------------------------------\n";
-static const char s_miniGameRaceResultFmt[] = "P%d = %d\n";
-static const char s_miniGameContinueText[] = "MINI GAME CONTINUE\n";
-static const char s_miniGameMgrEndStartText[] = "CallMiniGameParam MGR_CALL_MGR_END:START\n";
-static const char s_miniGameMgrEndEndText[] = "CallMiniGameParam MGR_CALL_MGR_END:END\n";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
 static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
 static const char s_miniGameEnd2222Text[] = "MiniGameEnd 2222\n";
-static const char s_miniGameEndBannerText[] = "     MINI GAME END \n";
-static const char s_miniGamePadRaceResultFmt[] = "GBA PADCODE RACE RESULT play=%d r=%d\n";
-static const char s_miniGamePadRaceEndText[] = "GBA PADCODE RACE END\n";
-static const char s_miniGamePadMgrEndText[] = "GBA PADCODE MGR END\n";
-static const char s_miniGamePadMgrContinueText[] = "GBA PADCODE MGR CONTINUE\n";
+static const char s_miniGamePadRaceResultFmt[] = "GBA_PADCODE_RACE_RESULT  play=%d  result=%d\n";
+static const char s_miniGamePadRaceEndText[] = "GBA_PADCODE_RACE_END\n";
+static const char s_miniGamePadMgrEndText[] = "GBA_PADCODE_MGR_END\n";
+static const char s_miniGamePadMgrContinueText[] = "GBA_PADCODE_MGR_CONTINUE\n";
+static const char s_miniGameManagerFileFmt[] = "%s/mgr%02d.bin";
+static const char s_miniGameManagerDir[] = "dvd/minigame/mgr";
+static const char s_miniGameManagerSpFileFmt[] = "%s/mgrsp%02d.bin";
+static const char s_miniGameFileInfoFmt[] = "\n\nMINIGAME FILE=%s  SPFILE=%s\n\n\n";
+static const char s_miniGameRaceHeader[] = "\n\n===================================================\n\n\nm_IsRaceEnd\n";
+static const char s_miniGameRaceResultFmt[] = "    P%d = %d\n";
+static const char s_miniGameSeparator[] = "\n\n==================================================\n";
+static const char s_miniGameContinueText[] = "\n\nMINI GAME CONTINUE\n\n";
+static const char s_miniGameMgrEndStartText[] = "CallMiniGameParam  MGR_CALL_MGR_END\n";
+static const char s_miniGameMgrEndEndText[] = "CallMiniGameParam  MGR_CALL_MGR_END OK!!!\n";
+static const char s_miniGameEndBannerText[] = "\x83\x7E\x83\x6A\x83\x51\x81\x5B\x83\x80\x8F\x49\x97\xB9\n";
+static const char s_miniGameConnectedLineFmt[] = "isConnectedLine Chan=%d  Line = %d\n";
+static const char s_miniGameSetPortFmt[] = "chan=%d  MG_GBA_THREAD_MSG_SETPORT_ct=%d\n";
+static const char s_miniGameRetryFmt[] = "retry=%d  chan=%d\n";
+static const char s_miniGameContextRecvFmt[] = "chan=%d  step=%d  contextRecvOffset=%d\n";
+static const char s_miniGameSourceLineFmt[] = "%s : %d\n";
+static const char s_miniGameSourceName[] = "p_minigame.cpp";
+static const char s_miniGameRecvStatusFmt[] = "ret=%d  status=0x%02x  step=%d  contextRecvOffset=%d\n";
+static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%d\n";
+static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n\0\0";
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void* flatRuntime, int object, int a, int b, int c, void* inStack, void* outStack);
+extern char DAT_801ead4c[];
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
@@ -1493,7 +1495,7 @@ void CMiniGamePcs::calc(void)
     {
         int raceEndStack[3];
 
-        Printf__7CSystemFPce(&System, s_miniGameSeparator);
+        Printf__7CSystemFPce(&System, s_miniGameRaceHeader);
         for (int i = 0; i < 4; i++)
         {
             Printf__7CSystemFPce(&System, s_miniGameRaceResultFmt, i + 1, static_cast<int>(self[0x6498 + i]));
@@ -1611,9 +1613,9 @@ void CMiniGamePcs::calc(void)
     if (System.m_execParam != 0)
     {
         Printf__7CSystemFPce(&System, s_miniGameEnd2222Text);
-        Printf__7CSystemFPce(&System, s_miniGameSeparator);
+        Printf__7CSystemFPce(&System, DAT_801ead4c);
         Printf__7CSystemFPce(&System, s_miniGameEndBannerText);
-        Printf__7CSystemFPce(&System, s_miniGameSeparator);
+        Printf__7CSystemFPce(&System, DAT_801ead4c);
     }
 
     self[0x6495] = 0;
@@ -1637,49 +1639,49 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
     switch (codeType) {
     case 0x1000:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadRaceResultFmt, player, padCode & 0xFF);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         self[0x6498 + player] = static_cast<unsigned char>(padCode);
         break;
     case 0x1100:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadRaceEndText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         self[0x6496] = 1;
         break;
     case 0x1200:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadMgrEndText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         self[0x6495] = 1;
         break;
     case 0x1300:
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             Printf__7CSystemFPce(&System, s_miniGamePadMgrContinueText);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            Printf__7CSystemFPce(&System, s_miniGameSeparator);
+            Printf__7CSystemFPce(&System, DAT_801ead4c);
         }
         self[0x6497] = 1;
         break;

@@ -103,8 +103,8 @@ static const float DAT_801dd4c4 = 0.0f;
 static const float DAT_801dd4b0 = 0.0f;
 static const float DAT_801dd4b4 = 1.0f;
 static const float DAT_801dd4b8 = 0.0f;
-static char s_f999_root_801dd4c8[] = "f999_root";
-char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
+static const char s_f999_root_801dd4c8[] = "f999_root";
+static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 static const float FLOAT_80331cf4 = 0.5f;
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
@@ -691,10 +691,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     void* pieceStorage = *(void**)&value[3];
     if (pieceStorage == NULL) {
         pieceStorage = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
-                                                             s_pppScreenBreak_cpp_801dd4d4, 0x25E);
+                                                             const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
         *(void**)&value[3] = pieceStorage;
         *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
-                                                                    s_pppScreenBreak_cpp_801dd4d4, 0x25F);
+                                                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
         InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
@@ -776,7 +776,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
+    SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, const_cast<char*>(s_f999_root_801dd4c8));
 
     if (value[0x24] == 0) {
         Graphic.GetBackBufferRect2(

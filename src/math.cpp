@@ -731,34 +731,36 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
-                                  float innerRadius, float outerRadius)
+extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
+    float innerRadius, float outerRadius)
 {
-    Vec local_60;
-    Vec local_6c;
-    Vec local_78;
-    Vec local_84;
-    float scaleSq = innerRadius + scale;
-    float scaleY = scaleSq / (outerRadius + scale);
-    float dot;
-    float proj;
-    float lenSq;
-    float discriminant;
-    float root;
+    (void)math;
     bool hit;
+    float fVar1;
+    double dVar6;
+    double dVar7;
+    double dVar8;
+    double dVar9;
+    double dVar10;
+    Vec local_84;
+    Vec local_78;
+    Vec local_6c;
+    Vec local_60;
 
-    scaleSq = scaleSq * scaleSq;
-
+    dVar8 = (double)(float)(innerRadius + scale);
+    dVar10 = (double)(float)(dVar8 / (double)(float)(outerRadius + scale));
     PSVECSubtract(origin, ellipseScale, &local_60);
-    local_78.y = local_60.y * scaleY;
+    dVar9 = (double)(float)(dVar8 * dVar8);
+    local_78.y = (float)((double)local_60.y * dVar10);
     local_6c.x = vector->x;
-    local_6c.y = vector->y * scaleY;
+    local_6c.y = (float)((double)vector->y * dVar10);
     local_6c.z = vector->z;
     local_78.x = local_60.x;
     local_78.z = local_60.z;
     local_60.y = local_78.y;
-    dot = PSVECDotProduct(&local_78, &local_78);
-    if (dot < scaleSq) {
+    dVar8 = (double)PSVECDotProduct(&local_78, &local_78);
+    if (dVar8 < dVar9) {
         if (outT != NULL) {
             *outT = 0.0f;
         }
@@ -769,24 +771,25 @@ int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* origin, Vec* ve
         }
         hit = true;
     } else {
-        proj = PSVECDotProduct(&local_6c, &local_78);
-        if (0.0f < proj) {
+        dVar6 = (double)PSVECDotProduct(&local_6c, &local_78);
+        if (0.0 < dVar6) {
             hit = false;
         } else {
-            lenSq = PSVECDotProduct(&local_6c, &local_6c);
-            discriminant = proj * proj - lenSq * (dot - scaleSq);
-            if (discriminant < 0.0f) {
+            dVar7 = (double)PSVECDotProduct(&local_6c, &local_6c);
+            fVar1 = (float)(dVar6 * dVar6 - (double)(float)(dVar7 * (double)(float)(dVar8 - dVar9)));
+            dVar8 = (double)fVar1;
+            if (dVar8 < 0.0) {
                 hit = false;
             } else {
-                root = -proj - sqrtf(discriminant);
-                if ((root <= 0.0f) || (lenSq < root)) {
+                dVar8 = (double)(float)(-dVar6 - (double)sqrtf(fVar1));
+                if ((dVar8 <= 0.0) || (dVar7 < dVar8)) {
                     hit = false;
                 } else {
                     if (outT != NULL) {
-                        *outT = root / lenSq;
+                        *outT = (float)(dVar8 / dVar7);
                     }
                     if (outPos != NULL) {
-                        PSVECScale(&local_6c, &local_84, root / lenSq);
+                        PSVECScale(&local_6c, &local_84, (float)(dVar8 / dVar7));
                         PSVECAdd(&local_60, &local_84, outPos);
                     }
                     hit = true;
@@ -798,7 +801,7 @@ int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* origin, Vec* ve
     if (hit) {
         if (outPos != NULL) {
             PSVECSubtract(outPos, &local_60, outPos);
-            outPos->y = outPos->y / scaleY;
+            outPos->y = (float)((double)outPos->y / dVar10);
             PSVECAdd(outPos, origin, outPos);
         }
         return 1;

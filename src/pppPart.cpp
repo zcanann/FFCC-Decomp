@@ -30,10 +30,14 @@ extern float gPartScreenMatrixRow2W;
 
 #include <string.h>
 
+extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
+
 static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
                                      float scale, float innerRadius, float outerRadius)
 {
-    return Math.CrossCheckSphereVector(outPos, outT, origin, vector, ellipseScale, scale, innerRadius, outerRadius);
+    return CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(&Math, outPos, outT, origin, vector, ellipseScale,
+                                                                  scale, innerRadius, outerRadius);
 }
 
 static const float kPppZero = 0.0; // FLOAT_8032fddc

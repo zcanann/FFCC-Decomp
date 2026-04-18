@@ -558,8 +558,6 @@ int CTextureMan::SetTextureTev(CTexture* texture)
  */
 CTexture::CTexture()
 {
-    __ct__4CRefFv(this);
-    *reinterpret_cast<void**>(this) = __vt__8CTexture;
     m_maxLod = 0;
     m_imageData = 0;
     m_tlutData = 0;

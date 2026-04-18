@@ -1085,6 +1085,7 @@ pppYmChangeTex.cpp:
 	extabindex  start:0x8000F4FC end:0x8000F538
 	.text       start:0x800D3854 end:0x800D4278
 	.rodata     start:0x801DB4C0 end:0x801DB4D8
+	.sdata2     start:0x80330DD8 end:0x80330DE0
 
 pppYmMoveParabola.cpp:
 	extab       start:0x80008AF4 end:0x80008B04

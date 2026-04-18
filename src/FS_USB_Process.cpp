@@ -20,6 +20,14 @@ extern "C" void __dla__FPv(void* ptr);
 namespace {
 static char s_FS_USB_Process_cpp[] = "FS_USB_Process.c";
 
+struct CUSBStreamDataHeader {
+    u8* m_data;
+    int m_headerReady;
+    int m_dataReady;
+    u32 m_sizeBytes;
+    u32 m_packetCode;
+};
+
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset) {
     return reinterpret_cast<u8*>(self) + offset;
 }
@@ -44,12 +52,12 @@ static inline void*& PtrAt(CFunnyShapePcs* self, u32 offset) {
     return *reinterpret_cast<void**>(Ptr(self, offset));
 }
 
-static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self) {
-    return reinterpret_cast<CUSBStreamData*>(Ptr(self, 0x8));
+static inline CUSBStreamDataHeader* UsbStream(CFunnyShapePcs* self) {
+    return reinterpret_cast<CUSBStreamDataHeader*>(Ptr(self, 0x3C));
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
-    return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x1C));
+    return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x50));
 }
 }
 
@@ -60,11 +68,11 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
  */
 void CFunnyShapePcs::SetUSBData()
 {
-    CUSBStreamData* usb = UsbStream(this);
+    CUSBStreamDataHeader* usb = UsbStream(this);
     CFunnyShape* funny = FunnyShape(this);
-    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4));
+    CMemory::CStage* stage = m_viewerStage;
 
-    switch (*reinterpret_cast<u32*>(Ptr(this, 0x4C))) {
+    switch (usb->m_packetCode) {
     case 4:
         U32At(this, 0x61B8) = 1;
         funny->ClearTextureData();

@@ -32,32 +32,34 @@ typedef struct RandCVCtx {
 void pppRandCV(void* param1, void* param2, void* param3)
 {
     u8* base = (u8*)param1;
-    RandCVParams* params = (RandCVParams*)param2;
+    RandCVParams* in = (RandCVParams*)param2;
     RandCVCtx* ctx = (RandCVCtx*)param3;
-    f32* valuePtr;
-
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    if (params->index == *(s32*)(base + 0xC)) {
+    float* target;
+
+    if (in->index == *(s32*)(base + 0xC)) {
+        target = (float*)(base + *ctx->outputOffset + 0x80);
+
         f32 value = Math.RandF();
-        if (params->flag != 0) {
+        if (in->flag != 0) {
             value += Math.RandF();
         } else {
-            value *= kPppRandCVSingleSampleScale;
+            float scale = kPppRandCVSingleSampleScale;
+            value = value * scale;
         }
-
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
-        *valuePtr = value;
-    } else if (params->index != *(s32*)(base + 0xC)) {
-        return;
+        target[0] = value;
     } else {
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        if (in->index != *(s32*)(base + 0xC)) {
+            return;
+        }
+        target = (float*)(base + *ctx->outputOffset + 0x80);
     }
 
     u8* targetColor;
-    s32 colorOffset = params->colorOffset;
+    s32 colorOffset = in->colorOffset;
     if (colorOffset == -1) {
         targetColor = gPppDefaultValueBuffer;
     } else {
@@ -65,23 +67,23 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     {
-        f32 scale = *valuePtr;
+        f32 scale = target[0];
 
         {
             u8 color = targetColor[0];
-            targetColor[0] = color + (s8)((f32)params->delta[0] * scale - (f32)params->delta[0]);
+            targetColor[0] = color + (s8)((f32)in->delta[0] * scale - (f32)in->delta[0]);
         }
         {
             u8 color = targetColor[1];
-            targetColor[1] = color + (s8)((f32)params->delta[1] * scale - (f32)params->delta[1]);
+            targetColor[1] = color + (s8)((f32)in->delta[1] * scale - (f32)in->delta[1]);
         }
         {
             u8 color = targetColor[2];
-            targetColor[2] = color + (s8)((f32)params->delta[2] * scale - (f32)params->delta[2]);
+            targetColor[2] = color + (s8)((f32)in->delta[2] * scale - (f32)in->delta[2]);
         }
         {
             u8 color = targetColor[3];
-            targetColor[3] = color + (s8)((f32)params->delta[3] * scale - (f32)params->delta[3]);
+            targetColor[3] = color + (s8)((f32)in->delta[3] * scale - (f32)in->delta[3]);
         }
     }
 }

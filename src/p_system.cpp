@@ -3,10 +3,10 @@
 #include "ffcc/p_dbgmenu.h"
 
 CSystemPcs SystemPcs;
-char s_CSystemPcs_801D7C48[] = "CSystemPcs";
+const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CSystemPcs_801D7C48), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CSystemPcs_801D7C48)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
 };
 
 /*

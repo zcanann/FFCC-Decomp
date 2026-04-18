@@ -320,6 +320,7 @@ pppPart.cpp:
 	extab       start:0x80006D48 end:0x80006E80
 	extabindex  start:0x8000CA9C end:0x8000CC70
 	.text       start:0x80053D04 end:0x80057794
+	.bss        start:0x80273A68 end:0x80275EE8
 	.sbss       start:0x8032ED50 end:0x8032ED68
 
 partMng.cpp:
@@ -327,7 +328,7 @@ partMng.cpp:
 	extabindex  start:0x8000CC70 end:0x8000CEE0
 	.text       start:0x80057794 end:0x8005F71C
 	.ctors      start:0x801D5408 end:0x801D540C
-	.bss        start:0x80275EE8 end:0x80299F40
+	.bss        start:0x80275EE8 end:0x80299F30
 	.sbss       start:0x8032ED68 end:0x8032ED84
 
 pppGetRotMatrixXYZ.cpp:

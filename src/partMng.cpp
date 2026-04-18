@@ -43,12 +43,11 @@ extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
 extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
-float ppvCameraMatrix02[3][4];
-float ppvChrScl[4];
-Mtx ppvUnitMatrix;
-Vec ppvZeroVector;
+extern Mtx ppvCameraMatrix02;
+extern float ppvChrScl[4];
+extern Mtx ppvUnitMatrix;
+extern Vec ppvZeroVector;
 }
-CAmemCacheSet ppvAmemCacheSet;
 extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;

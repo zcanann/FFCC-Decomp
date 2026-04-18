@@ -178,7 +178,7 @@ struct CUSBStreamDataRaw {
     int m_headerReady;
     int m_dataReady;
     unsigned int m_sizeBytes;
-    unsigned int m_packetCode;
+    int m_packetCode;
     void* m_stageDefault;
     void* m_stageLoad;
     void* m_stageAmem;
@@ -675,7 +675,7 @@ void CPartPcs::calc()
  */
 void CPartPcs::calcViewer()
 {
-    unsigned int packetCode;
+    int packetCode;
 
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     PartMng.pppEditBeforeCalc();
@@ -840,14 +840,14 @@ void CPartPcs::drawShadowViewer()
 void CPartPcs::drawViewer()
 {
     Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x31a);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
-    OSStopStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
     Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x322);
-    OSStopStopwatch(&g_par_draw_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }
 
@@ -1246,7 +1246,7 @@ void loadPdtPtx(char*, void*, int, void*, int, int)
 int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
 {
     int pdtSlotIndex;
-    char path[260];
+    char path[256];
 
     if (variant == 0) {
         sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);

@@ -640,7 +640,7 @@ config.libs = [
             Object(NonMatching, "pppYmMiasma.cpp"),
             Object(NonMatching, "pppYmMoveCircle.cpp"),
             Object(NonMatching, "pppYmMoveParabola.cpp"),
-            Object(NonMatching, "pppYmTraceMove.cpp"),
+            Object(Matching, "pppYmTraceMove.cpp"),
             Object(NonMatching, "pppYmTracer.cpp"),
             Object(NonMatching, "pppYmTracer2.cpp"),
             Object(NonMatching, "prgobj.cpp"),

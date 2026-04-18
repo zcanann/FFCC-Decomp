@@ -18,7 +18,7 @@ public:
     int m_headerReady;                 // 0x4
     int m_dataReady;                   // 0x8
     unsigned int m_sizeBytes;          // 0xc
-    unsigned int m_packetCode;         // 0x10
+    int m_packetCode;                  // 0x10
     CMemory::CStage* m_stageDefault;   // 0x14
     CMemory::CStage* m_stageLoad;      // 0x18
     CMemory::CStage* m_stageAmem;      // 0x1c

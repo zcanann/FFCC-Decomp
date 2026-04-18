@@ -4198,12 +4198,98 @@ unsigned int GbaQueue::GetControllerMode()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800D4E50
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::OpenMenu(int, int, int)
+void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	GbaQueue* queue = &GbaQue;
+	char* queueObj = reinterpret_cast<char*>(queue);
+	int i;
+	int retries;
+	unsigned int isSingleMode;
+	OSSemaphore* semaphoreIter;
+
+	if (menuId == 999) {
+		i = 0;
+		semaphoreIter = accessSemaphores;
+		do {
+			OSWaitSemaphore(semaphoreIter);
+			i++;
+			semaphoreIter++;
+		} while (i < 4);
+
+		obj[0x2D57] = 1;
+
+		i = 0;
+		semaphoreIter = accessSemaphores;
+		do {
+			OSSignalSemaphore(semaphoreIter);
+			i++;
+			semaphoreIter++;
+		} while (i < 4);
+
+		for (i = 0; i < 4; i++) {
+			retries = 0;
+			do {
+				if (Joybus.SetMType(i, 4) == 0) {
+					break;
+				}
+				retries++;
+			} while (retries < 10);
+		}
+		return;
+	}
+
+	retries = 0;
+	do {
+		if (Joybus.SetOpenMenu(channel, static_cast<char>(menuId)) == 0) {
+			break;
+		}
+		retries++;
+	} while (retries < 10);
+
+	OSSemaphore* semaphore = queue->accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	char menuStageMode = queueObj[0x2D56];
+	isSingleMode =
+		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
+		 5) &
+		0xFFU;
+	OSSignalSemaphore(semaphore);
+
+	if (isSingleMode == 0) {
+		retries = 0;
+		do {
+			if (Joybus.SetCtrlMode(channel, controlMode) == 0) {
+				return;
+			}
+			retries++;
+		} while (retries < 10);
+		return;
+	}
+
+	OSWaitSemaphore(semaphore);
+	menuStageMode = queueObj[0x2D56];
+	isSingleMode =
+		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
+		 5) &
+		0xFFU;
+	OSSignalSemaphore(semaphore);
+	if (isSingleMode == 0 && channel == 1 && menuId == 0) {
+		retries = 0;
+		do {
+			if (Joybus.SetCtrlMode(channel, 0) == 0) {
+				return;
+			}
+			retries++;
+		} while (retries < 10);
+	}
 }
 
 /*

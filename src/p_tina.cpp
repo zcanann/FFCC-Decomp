@@ -97,13 +97,11 @@ extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
 extern char s_dvd__smenu__s_801d7fb0[];
 extern char s_dvd_tina_mon_m_03d_801d7fc0[];
 extern char s_dvd_tina_mon_m_03d__c_801d7fd4[];
-unsigned char ARRAY_80273968[0xC];
-unsigned char ARRAY_802739e8[0xC];
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;
-CProfile g_par_calc_prof(0);
-CProfile g_par_draw_prof(0);
+CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
+CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {

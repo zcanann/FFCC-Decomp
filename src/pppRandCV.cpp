@@ -34,7 +34,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     RandCVParams* params = (RandCVParams*)param2;
     RandCVCtx* ctx = (RandCVCtx*)param3;
-    f32* valuePtr;
+    f32* target;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -48,16 +48,16 @@ void pppRandCV(void* param1, void* param2, void* param3)
             value *= kPppRandCVSingleSampleScale;
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
-        *valuePtr = value;
+        target = (f32*)(base + *ctx->outputOffset + 0x80);
+        target[0] = value;
     } else if (params->index != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        target = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    u8* targetColor;
     s32 colorOffset = params->colorOffset;
+    u8* targetColor;
     if (colorOffset == -1) {
         targetColor = gPppDefaultValueBuffer;
     } else {
@@ -65,7 +65,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     {
-        f32 scale = *valuePtr;
+        f32 scale = target[0];
 
         {
             u8 color = targetColor[0];

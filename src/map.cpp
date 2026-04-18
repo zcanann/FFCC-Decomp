@@ -19,6 +19,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMapMng MapMng;
+char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dl__FPv(void*);

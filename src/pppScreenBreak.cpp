@@ -667,11 +667,12 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
-    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(float**)(model + 0xE4) = value;
-    *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
+    u8* colorSource = reinterpret_cast<u8*>(&pppScreenBreak->field_0x88) + serializedDataOffsets[0];
+    CCharaPcs::CHandle* handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(*(CGObject**)((u8*)pppMngStPtr + 0xD8), 0);
+    CChara::CModel* model = (CChara::CModel*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    u8* modelRaw = reinterpret_cast<u8*>(model);
+    *(float**)(modelRaw + 0xE4) = value;
+    *(pppScreenBreakUnkB**)(modelRaw + 0xE8) = param_2;
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -685,21 +686,19 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
                                                  param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
-    void* pieceStorage = *(void**)&value[3];
-    if (pieceStorage == NULL) {
-        pieceStorage = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
-                                                             const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
-        *(void**)&value[3] = pieceStorage;
+    if (*(void**)&value[3] == NULL) {
+        *(void**)&value[3] = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(modelRaw + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
+                                                                   const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
         *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
-                                                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
-        InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
+                                                                   const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
+        InitPieceData(model, (PScreenBreak*)param_2, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 
     float sx = FLOAT_80331cc0 * value[6];
     float sy = FLOAT_80331cc0 * value[7];
     u8* piece = (u8*)*(void**)&value[3];
-    for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
+    for (u32 i = 0; i < *(u32*)(*(u8**)(modelRaw + 0xA4) + 0xC); i++) {
         switch (param_2->m_initWOrk) {
         case 0:
             piece[0x38] = 1;
@@ -710,8 +709,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 2:
-            float pieceY = *(float*)(piece + 0x28);
-            if (-pieceY > value[7] - (*value * sy)) {
+            if (-*(float*)(piece + 0x28) > value[7] - (*value * sy)) {
                 piece[0x38] = 1;
             }
             break;
@@ -721,8 +719,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             }
             break;
         case 4:
-            float pieceX = *(float*)(piece + 0x24);
-            if (-pieceX > value[6] - (*value * sx)) {
+            if (-*(float*)(piece + 0x24) > value[6] - (*value * sx)) {
                 piece[0x38] = 1;
             }
             break;
@@ -731,8 +728,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             sy = value[7];
             float x = *value * sx;
             float y = *value * sy;
-            float pieceX = *(float*)(piece + 0x24);
-            if ((x >= pieceX) && (-pieceX <= x) &&
+            if ((x >= *(float*)(piece + 0x24)) && (-*(float*)(piece + 0x24) <= x) &&
                 (y >= *(float*)(piece + 0x28)) && (-*(float*)(piece + 0x28) <= y)) {
                 piece[0x38] = 1;
             }

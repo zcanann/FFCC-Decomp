@@ -4,6 +4,10 @@
 
 CUSB USB;
 
+static const char s_usbCallbackMissingFmt[] = "CUSB.AddMessageCallback: イベント関数は登録されていません。\n";
+static const char s_usbCallbackDuplicateFmt[] = "CUSB.AddMessageCallback: 同じイベント関数が既に登録されています。\n";
+static const char s_usbCallbackFullFmt[] = "CUSB.AddMessageCallback: イベント関数が追加できません。\n";
+
 /*
  * --INFO--
  * Address:\tTODO
@@ -38,7 +42,7 @@ void CUSB::RemoveMessageCallback(MessageCallback callback)
 
     if (i == 8U)
     {
-        System.Printf("CUSB.AddMessageCallback: イベント関数は登録されていません。\n");
+        System.Printf(const_cast<char*>(s_usbCallbackMissingFmt));
     }
 }
 
@@ -62,7 +66,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 		{
 			if (callbackEntry->m_callback == callback)
 			{
-				System.Printf("CUSB.AddMessageCallback: 同じイベント関数が既に登録されています。\n");
+				System.Printf(const_cast<char*>(s_usbCallbackDuplicateFmt));
 				break;
 			}
 			continue;
@@ -76,7 +80,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 
 	if (i == 8U)
 	{
-		System.Printf("CUSB.AddMessageCallback: イベント関数が追加できません。\n");
+		System.Printf(const_cast<char*>(s_usbCallbackFullFmt));
 	}
 }
 

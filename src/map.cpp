@@ -94,10 +94,15 @@ extern "C" void SetLink__7CMapObjFv();
 extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
-static char s_map_cpp[] = "map.cpp";
-static char s_CMapMng_mapmng[] = "CMapMng.mapmng";
-static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_map_cpp[] = "map.cpp";
+static const char s_CMapMng_mapmng[] = "CMapMng.mapmng";
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
+static const char s_mapMplPathFmt[] = "%s_%d.mpl";
+static const char s_mapReadOpenErrorFmt[] = "CAN NOT READ OPEN %s";
+static const char s_mapReadMplFmt[] = "ReadMpl fn %s";
+static const char s_mapReadErrorFmt[] = "CAN NOT READ %s";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -455,13 +460,13 @@ bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapLightHolder**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return false;
         }
@@ -714,13 +719,13 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(s_ptrarray_grow_error);
+                System.Printf(const_cast<char*>(s_ptrarray_grow_error));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CMapAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0);
         if (newItems == 0) {
             return false;
         }
@@ -1303,7 +1308,7 @@ void CMapKeyFrame::ReadJun(CChunkFile& chunkFile, int count)
     *reinterpret_cast<unsigned char*>(Ptr(this, 1)) = static_cast<unsigned char>(count);
     *reinterpret_cast<void**>(Ptr(this, 0x18)) = __nwa__FUlPQ27CMemory6CStagePci(
         static_cast<unsigned long>(*reinterpret_cast<unsigned char*>(Ptr(this, 1))),
-        *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xC1);
+        *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xC1);
 
     for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 1))); i++) {
         (*reinterpret_cast<unsigned char**>(Ptr(this, 0x18)))[i] = chunkFile.Get1();
@@ -1339,10 +1344,10 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
     *reinterpret_cast<unsigned char*>(Ptr(this, 2)) = static_cast<unsigned char>(count);
     *reinterpret_cast<void**>(Ptr(this, 0x1C)) = __nwa__FUlPQ27CMemory6CStagePci(
         static_cast<unsigned long>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) << 2),
-        *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xD5);
+        *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xD5);
     *reinterpret_cast<void**>(Ptr(this, 0x20)) = __nwa__FUlPQ27CMemory6CStagePci(
         static_cast<unsigned long>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) << 2),
-        *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xD6);
+        *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xD6);
 
     for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))); i++) {
         reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C)))[i] = chunkFile.GetF4();
@@ -1353,7 +1358,7 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
         *reinterpret_cast<void**>(Ptr(this, 0x24)) = __nwa__FUlPQ27CMemory6CStagePci(
             static_cast<unsigned long>(
                 (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) & 0xFF) << 2),
-            *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xDE);
+            *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xDE);
         MakeSpline1Dtable__5CMathFiPfPfPf(&Math, static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) - 1,
             reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20))),
             reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C))),
@@ -1391,7 +1396,7 @@ void CMapMng::Create()
     *reinterpret_cast<unsigned int*>(Ptr(this, 0x22A6C)) = 0;
     *reinterpret_cast<unsigned int*>(Ptr(this, 0x228E8)) = 0;
 
-    CMemory::CStage* stage = Memory.CreateStage(0x540000, s_CMapMng_mapmng, 0);
+    CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_CMapMng_mapmng), 0);
     *reinterpret_cast<CMemory::CStage**>(this) = stage;
 
     reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0))->SetStage(stage);
@@ -1957,7 +1962,8 @@ void CMapMng::ReadMtx(char* mapName)
     if (*reinterpret_cast<int*>(self + 0x229A8) != 2 && *reinterpret_cast<int*>(self + 0x229A8) != 3) {
         CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0x0);
         CTextureSet* textureSet =
-            static_cast<CTextureSet*>(__nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, s_map_cpp, 0x3A9));
+            static_cast<CTextureSet*>(
+                __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, const_cast<char*>(s_map_cpp), 0x3A9));
         if (textureSet != 0) {
             textureSet = __ct__11CTextureSetFv(textureSet);
         }
@@ -1965,7 +1971,7 @@ void CMapMng::ReadMtx(char* mapName)
     }
 
     while (true) {
-        sprintf(path, "%s_%d.mtx", mapName, loadIndex);
+        sprintf(path, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
         bool exists = false;
         if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
@@ -2077,7 +2083,7 @@ void CMapMng::ReadMpl(char* mapName)
 
     while (true) {
         char path[256];
-        sprintf(path, "%s_%d.mpl", mapName, loadIndex);
+        sprintf(path, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         bool canRead = false;
         const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
@@ -2097,7 +2103,7 @@ void CMapMng::ReadMpl(char* mapName)
             }
             if (loadIndex == 0) {
                 if (System.m_execParam != 0) {
-                    System.Printf("CAN NOT READ OPEN %s", path);
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), path);
                 }
                 return;
             }
@@ -2105,7 +2111,7 @@ void CMapMng::ReadMpl(char* mapName)
         }
 
         if (static_cast<unsigned int>(System.m_execParam) > 2) {
-            System.Printf("ReadMpl fn %s", path);
+            System.Printf(const_cast<char*>(s_mapReadMplFmt), path);
         }
 
         void* filePtr = File.m_readBuffer;
@@ -2150,7 +2156,7 @@ void CMapMng::ReadMpl(char* mapName)
 
         if (filePtr == 0) {
             if (System.m_execParam != 0) {
-                System.Printf("CAN NOT READ %s", path);
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), path);
             }
             return;
         }
@@ -2297,7 +2303,7 @@ void CMapMng::ReadOtm(char* mapName)
             if (chunk.m_id == 0x4C495448) {
                 CMapLightHolder* light = reinterpret_cast<CMapLightHolder*>(
                     _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                        &Memory, 0x10, *reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x4D3, 0));
+                        &Memory, 0x10, *reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x4D3, 0));
                 if (light != 0) {
                     unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
                     lightRaw[0] = chunkFile.Get1();
@@ -2334,7 +2340,7 @@ void CMapMng::ReadOtm(char* mapName)
 
                 if (chunk.m_id == 0x41534554) {
                     CMapTexAnimSet* texAnimSet =
-                        new (*reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x49A) CMapTexAnimSet();
+                        new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
                     *reinterpret_cast<CMapTexAnimSet**>(self + 0x213DC) = texAnimSet;
                     if (texAnimSet != 0) {
                         texAnimSet->Create(
@@ -2346,7 +2352,7 @@ void CMapMng::ReadOtm(char* mapName)
                 }
 
                 if (chunk.m_id == 0x414E494D) {
-                    CMapAnim* mapAnim = new (*reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x4BF) CMapAnim();
+                    CMapAnim* mapAnim = new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
                     if (mapAnim != 0) {
                         mapAnim->ReadOtmAnim(chunkFile);
                         reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC)->Add(mapAnim);
@@ -2378,7 +2384,7 @@ void CMapMng::ReadOtm(char* mapName)
 
                 if (chunk.m_id == 0x4D534554) {
                     CMaterialSet* materialSet =
-                        new (*reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x482) CMaterialSet();
+                        new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
                     *reinterpret_cast<CMaterialSet**>(self + 0x213D4) = materialSet;
                     if (materialSet != 0) {
                         reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)

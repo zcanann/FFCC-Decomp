@@ -28,7 +28,6 @@ extern "C" char __vt_CProcess[];
 
 static const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
-static unsigned char ARRAY_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 
 struct MaterialEditorTableInit {

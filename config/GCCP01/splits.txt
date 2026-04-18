@@ -106,6 +106,7 @@ system.cpp:
 	.ctors      start:0x801D53C4 end:0x801D53C8
 	.data       start:0x801E8838 end:0x801E8898
 	.bss        start:0x80244340 end:0x802455C0
+	.sdata2     start:0x8032F868 end:0x8032F874
 
 usb.cpp:
 	extab       start:0x80005D18 end:0x80005D30
@@ -152,6 +153,7 @@ mapocttree.cpp:
 	.rodata     start:0x801D72EC end:0x801D7300
 	.bss        start:0x802456F0 end:0x80245754
 	.sbss       start:0x8032ECA8 end:0x8032ECB8
+	.sdata2     start:0x8032F938 end:0x8032F944
 
 map.cpp:
 	extab       start:0x80006068 end:0x80006304
@@ -747,6 +749,7 @@ p_chara.cpp:
 	.text       start:0x80073AF4 end:0x8007BB90
 	.ctors      start:0x801D5414 end:0x801D5418
 	.bss        start:0x802E9958 end:0x802EA080
+	.sdata2     start:0x80330140 end:0x80330148
 
 pppDrawMng.cpp:
 	extab       start:0x80007838 end:0x80007850
@@ -984,6 +987,7 @@ chara_anim.cpp:
 	extabindex  start:0x8000EA40 end:0x8000EA88
 	.text       start:0x800BF620 end:0x800BFE78
 	.data       start:0x80210534 end:0x80210540
+	.sdata2     start:0x80330C68 end:0x80330C78
 
 pppYmBreath.cpp:
 	extab       start:0x800083C0 end:0x800083F8

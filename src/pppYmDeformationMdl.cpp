@@ -85,6 +85,38 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void DisableIndWarp(void)
+{
+    Mtx resetRotMtx;
+    float resetIndMtx[2][3];
+
+    GXSetTevDirect((GXTevStageID)1);
+    GXSetNumIndStages(0);
+    GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
+
+    PSMTXRotRad(resetRotMtx, 'z', 0.0f);
+    resetIndMtx[0][0] = 0.0f;
+    resetIndMtx[0][1] = 0.0f;
+    resetIndMtx[0][2] = 0.0f;
+    resetIndMtx[1][0] = 0.0f;
+    resetIndMtx[1][1] = 0.0f;
+    resetIndMtx[1][2] = 0.0f;
+    GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
+
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    pppInitBlendMode();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800d20c0
  * PAL Size: 64b
  * EN Address: TODO

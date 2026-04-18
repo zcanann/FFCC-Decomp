@@ -14,12 +14,12 @@
 
 CMemory Memory;
 
-static char s_memory_cpp[] = "memory.cpp";
-static char s_heapWalkerTitle[] = "---- Heap Walker ----\n";
-static char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
-static char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
-static char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
-static char s_drawHeapTitleFmt[] = "%4d %4d %4d";
+static const char s_memory_cpp[] = "memory.cpp";
+static const char s_heapWalkerTitle[] = "---- Heap Walker ----\n";
+static const char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
+static const char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
+static const char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
+static const char s_drawHeapTitleFmt[] = "%4d %4d %4d";
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
@@ -59,7 +59,7 @@ extern unsigned int DAT_801d64e4;
 long long DAT_8032ec58;
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
-extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
     void*, int, int, int, int, int, void (*)(void*), void*);
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
@@ -152,7 +152,7 @@ static void stageDestroyInternal(CMemory::CStage* stage)
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
     if (file == (char*)nullptr) {
-        file = s_memory_cpp;
+        file = const_cast<char*>(s_memory_cpp);
     }
     return stage->alloc(size, file, line, 0);
 }
@@ -169,7 +169,7 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
     if (file == (char*)nullptr) {
-        file = s_memory_cpp;
+        file = const_cast<char*>(s_memory_cpp);
     }
     return stage->alloc(size, file, line, 0);
 }
@@ -724,7 +724,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     if (mode == 2) {
                         void* block = reinterpret_cast<CStage*>(
                                           *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x778C))
-                                          ->alloc(0x810, s_memory_cpp, 0x228, 0);
+                                          ->alloc(0x810, const_cast<char*>(s_memory_cpp), 0x228, 0);
                         *reinterpret_cast<int*>(stageBytes + 0x110) =
                             reinterpret_cast<int>(__construct_new_array(block, 0, 0, 0x40, 0x20));
                         *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
@@ -1523,7 +1523,7 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage*, CMemory::CStage* st
         *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
 
         int count = *reinterpret_cast<int*>(bytes + 0x3C);
-        void* block = stage->alloc(count * 0x1C + 0x10, s_memory_cpp, 0x787, 0);
+        void* block = stage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp), 0x787, 0);
         void* table = __construct_new_array(
             block, reinterpret_cast<ConstructorDestructor>(__ct__10CAmemCacheFv),
             reinterpret_cast<ConstructorDestructor>(__dt__10CAmemCacheFv), 0x1C, count);
@@ -1780,7 +1780,8 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
     if (dmaCopy == 0) {
         while (true) {
             entry[1] = reinterpret_cast<unsigned int>(
-                reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(self))->alloc(allocSize, s_memory_cpp, 0x807, 1));
+                reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(self))->alloc(
+                    allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1));
             if (entry[1] != 0) {
                 break;
             }
@@ -2047,7 +2048,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(bytes + 0x00);
-        int allocated = reinterpret_cast<int>(stage->alloc(size, s_memory_cpp, 0x86D, 1));
+        int allocated = reinterpret_cast<int>(stage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
         if (allocated != 0) {
             operator delete(reinterpret_cast<void*>(allocated));
             return;

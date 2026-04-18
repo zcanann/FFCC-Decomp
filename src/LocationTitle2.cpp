@@ -20,7 +20,7 @@ extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 // External data references
-extern char DAT_80330f50[];
+extern char DAT_80330f50;
 
 static int GetGraphFrameFromId(s32 graphId)
 {
@@ -255,7 +255,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);
+        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, &DAT_80330f50);
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
@@ -281,8 +281,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             particles[work->m_count].m_scaleZ = locationTitle->m_localMatrix.value[2][2];
             work->m_count++;
 
-            if (unkB->m_maxCount <= (u16)(work->m_count + 1U)) {
-                return;
+            {
+                u16 nextCount = work->m_count + 1;
+
+                if (unkB->m_maxCount <= nextCount) {
+                    return;
+                }
             }
 
             if (work->m_count > 1) {
@@ -313,8 +317,12 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     inserted++;
                     work->m_count++;
 
-                    if (unkB->m_maxCount <= (u16)(work->m_count + 1U)) {
-                        break;
+                    {
+                        u16 nextCount = work->m_count + 1;
+
+                        if (unkB->m_maxCount <= nextCount) {
+                            break;
+                        }
                     }
 
                     interpIt++;

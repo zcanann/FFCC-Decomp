@@ -70,7 +70,7 @@ struct pppCrystalColorBlock {
 
 union CrystalFloatBits {
     float value;
-    unsigned long bits;
+    u32 bits;
 };
 
 static const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
@@ -174,8 +174,7 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* pa
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
 	if (gPppCalcDisabled == 0) {
-		pppCrystalRenderObject* object = (pppCrystalRenderObject*)pppCrystal;
-		CrystalWork* work = (CrystalWork*)((u8*)object + param_3->m_serializedDataOffsets[2] + 0x80);
+		CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
 
 		if (param_2->m_dataValIndex != 0xFFFF) {
 			CMapMesh** mapMeshTable = (CMapMesh**)pppEnvStPtr->m_mapMeshPtr;
@@ -207,7 +206,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 				textureInfo = work->m_refractionMap;
 				textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
-				textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+				textureInfo->m_imageData = (u8*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xAC);
 				textureInfo->m_format = GX_TF_IA8;
 				textureInfo->m_width = 0x20;
@@ -240,10 +239,10 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 						double modulation = fmod(magnitude, DOUBLE_80331000);
 						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
 						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
-						u8* pixel = (u8*)((u32)textureInfo->m_imageData +
+						u8* pixel = textureInfo->m_imageData +
 							(y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
 							(x & 0x1FFFFFFC) * 8 +
-							((x & 3) + (y & 3) * 4) * 2);
+							((x & 3) + (y & 3) * 4) * 2;
 						pixel[0] = nx;
 						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
 						xCoord += stepX;

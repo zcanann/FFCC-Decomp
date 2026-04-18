@@ -480,46 +480,37 @@ void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	struct LetterSlot {
-		union {
-			unsigned int words32[3];
-			unsigned short words16[6];
-			unsigned char bytes[12];
-		};
-	};
-
 	unsigned int stack[2];
-	LetterSlot* letter = reinterpret_cast<LetterSlot*>(m_letter0) + letterIdx;
+	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
+	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
+	unsigned int* words32 = reinterpret_cast<unsigned int*>(letter);
 
-	stack[0] = (letter->words16[0] >> 2) & 0x1FF;
-	stack[1] = (letter->words32[0] >> 9) & 0x1FF;
+	stack[0] = (words16[0] >> 2) & 0x1FF;
+	stack[1] = (words32[0] >> 9) & 0x1FF;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = letter->words16[2];
-	CMes::m_tempVar[1] = letter->words16[3];
-	CMes::m_tempVar[2] = letter->words16[4];
-	CMes::m_tempVar[3] = letter->words16[5];
-	CMes::m_tempVar[4] = (letter->words16[0] >> 2) & 0x1FF;
-	CMes::m_tempVar[5] = (letter->words32[0] >> 9) & 0x1FF;
+	CMes::m_tempVar[0] = words16[2];
+	CMes::m_tempVar[1] = words16[3];
+	CMes::m_tempVar[2] = words16[4];
+	CMes::m_tempVar[3] = words16[5];
+	CMes::m_tempVar[4] = (words16[0] >> 2) & 0x1FF;
+	CMes::m_tempVar[5] = (words32[0] >> 9) & 0x1FF;
 
-	if (((letter->bytes[0] >> 3) & 1) == 0) {
-		CMes::m_tempVar[6] = letter->words16[1] & 0x1FF;
+	if (((letter[0] >> 3) & 1) == 0) {
+		CMes::m_tempVar[6] = words16[1] & 0x1FF;
 	} else {
 		CMes::m_tempVar[6] = 0;
 	}
 
-	if (((letter->bytes[0] >> 3) & 1) == 0) {
+	if (((letter[0] >> 3) & 1) == 0) {
 		CMes::m_tempVar[7] = 0;
 	} else {
-		CMes::m_tempVar[7] = (letter->words16[1] & 0x1FF) * 100;
+		CMes::m_tempVar[7] = (words16[1] & 0x1FF) * 100;
 	}
 
-	CMes::m_tempVar[0x20] = m_saveSlot;
-	CMes::m_tempVar[0x21] = m_partyIndex;
-	CMes::m_tempVar[0x22] = m_isLoadingFlag;
-	CMes::m_tempVar[0x23] = m_miscFlags;
-	letter->bytes[0] = (letter->bytes[0] & 0x7F) | 0x80;
+	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&m_saveSlot);
+	letter[0] = (letter[0] & 0x7F) | 0x80;
 }
 
 /*
@@ -2491,18 +2482,36 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 		if ((artifactIndex < 0x60) && ((short)m_artifacts[artifactIndex] > 0)) {
 			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex] * 0x24);
 			unsigned short artifactType = artifactData[0];
+			unsigned short artifactValue = artifactData[3];
 
-			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
-				hpMax += artifactData[3];
+			switch (artifactType) {
+			case 0x9F:
+			case 0xB6:
+			case 0xCC:
+			case 0xDB:
+			case 0xDF:
+				break;
+			case 0xE4:
+				hpMax += artifactValue;
+				break;
 			}
 		}
 
 		if (((artifactIndex + 1) < 0x60) && ((short)m_artifacts[artifactIndex + 1] > 0)) {
 			unsigned short* artifactData = artifactDataBase + ((short)m_artifacts[artifactIndex + 1] * 0x24);
 			unsigned short artifactType = artifactData[0];
+			unsigned short artifactValue = artifactData[3];
 
-			if ((artifactType != 0xDB) && (artifactType > 0xDA) && (artifactType == 0xE4)) {
-				hpMax += artifactData[3];
+			switch (artifactType) {
+			case 0x9F:
+			case 0xB6:
+			case 0xCC:
+			case 0xDB:
+			case 0xDF:
+				break;
+			case 0xE4:
+				hpMax += artifactValue;
+				break;
 			}
 		}
 

@@ -664,6 +664,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     YmBreathRenderStep* step;
     int workOffset;
     int colorOffset;
+    unsigned char* work;
+    unsigned char* color;
     Vec* source;
     Mtx* matrixList;
     float* colorDelta;
@@ -680,11 +682,13 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     step = (YmBreathRenderStep*)pYmBreath;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    source = *(Vec**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x30);
-    matrixList = *(Mtx**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x34);
-    colorDelta = *(float**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x38);
-    groupData = *(int**)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x3C);
-    groupCount = *(int*)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x40);
+    work = reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + workOffset;
+    color = reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset;
+    source = *(Vec**)(work + 0x30);
+    matrixList = *(Mtx**)(work + 0x34);
+    colorDelta = *(float**)(work + 0x38);
+    groupData = *(int**)(work + 0x3C);
+    groupCount = *(int*)(work + 0x40);
 
     if (step->m_stepValue == 0xFFFF) {
         return;
@@ -696,10 +700,10 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         step->m_payload + 0xB0, 0, 0.0f, step->m_payload[0xB6], step->m_payload[0xB5], step->m_payload[8], 0, 1, 1, 0);
 
-    colorR = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 0);
-    colorG = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 1);
-    colorB = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 2);
-    colorA = *(reinterpret_cast<unsigned char*>(ymBreath) + 8 + colorOffset + 3);
+    colorR = color[0];
+    colorG = color[1];
+    colorB = color[2];
+    colorA = color[3];
 
     for (i = 0; i < groupCount; i++) {
         if (*(short*)&source[2].z > 0) {
@@ -829,8 +833,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 sphereMtx[1][1] = scale;
                 sphereMtx[2][2] = scale;
 
-                PSMTXConcat(*(Mtx*)(*(int*)(reinterpret_cast<unsigned char*>(ymBreath) + 8 + workOffset + 0x34) +
-                                    firstParticle * 0x30),
+                PSMTXConcat(*(Mtx*)(*(int*)(work + 0x34) + firstParticle * 0x30),
                             object->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);

@@ -131,7 +131,9 @@ extern "C" char* PTR_s_Spitzschopf_802146c0[];
 extern "C" char* PTR_s_Ciuffo_ribelle_80214740[];
 extern "C" char* PTR_s_Remolino_80214840[];
 extern "C" unsigned char DAT_80214a50[];
-extern "C" char s_DynamicMessStr[];
+extern "C" {
+char s_DynamicMessStr[0x404];
+}
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);

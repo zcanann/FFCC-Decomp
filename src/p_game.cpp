@@ -1,5 +1,12 @@
 #include "ffcc/p_game.h"
 
+extern char s_CGamePcs_801D7C20[];
+
+unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(s_CGamePcs_801D7C20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
+    0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
+};
+
 CGamePcs GamePcs;
 
 /*

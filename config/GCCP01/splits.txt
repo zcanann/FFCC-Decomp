@@ -977,6 +977,7 @@ cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350
 	extabindex  start:0x8000E9EC end:0x8000EA10
 	.text       start:0x800BA2FC end:0x800BD848
+	.sdata2     start:0x80330C10 end:0x80330C18
 
 p_chara_viewer.cpp:
 	extab       start:0x80008350 end:0x80008390

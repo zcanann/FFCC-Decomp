@@ -81,6 +81,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+int __cntlzw(unsigned int);
 }
 
 /*
@@ -195,6 +196,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
+    extern float FLOAT_80330dac;
     pppYmDeformationMdlLayout* modelObject = (pppYmDeformationMdlLayout*)pppYmDeformationMdl;
     YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
     YmDeformationMdlColorInfo* colorInfo;
@@ -229,7 +231,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
-        param_2->m_payloadByte28, param_2->m_payloadByte29, param_2->m_payloadByte2C == 0, 1, 0);
+        param_2->m_payloadByte28, param_2->m_payloadByte29, (u8)((u32)__cntlzw((u8)param_2->m_payloadByte2C) >> 5), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -309,13 +311,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetNumIndStages(0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-        PSMTXRotRad(resetRotMtx, 'z', 0.0f);
-        resetIndMtx[0][0] = 0.0f;
-        resetIndMtx[0][1] = 0.0f;
-        resetIndMtx[0][2] = 0.0f;
-        resetIndMtx[1][0] = 0.0f;
-        resetIndMtx[1][1] = 0.0f;
-        resetIndMtx[1][2] = 0.0f;
+        PSMTXRotRad(resetRotMtx, 'z', FLOAT_80330dac);
+        resetIndMtx[0][0] = FLOAT_80330dac;
+        resetIndMtx[0][1] = FLOAT_80330dac;
+        resetIndMtx[0][2] = FLOAT_80330dac;
+        resetIndMtx[1][0] = FLOAT_80330dac;
+        resetIndMtx[1][1] = FLOAT_80330dac;
+        resetIndMtx[1][2] = FLOAT_80330dac;
         GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);

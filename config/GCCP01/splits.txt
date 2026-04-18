@@ -135,6 +135,7 @@ mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
 	extabindex  start:0x8000B7C4 end:0x8000B860
 	.text       start:0x80027774 end:0x800287D0
+	.sdata2     start:0x8032F930 end:0x8032F938
 
 mapobj.cpp:
 	extab       start:0x80005EC8 end:0x80005FB0
@@ -150,6 +151,7 @@ mapocttree.cpp:
 	.ctors      start:0x801D53D4 end:0x801D53D8
 	.rodata     start:0x801D72EC end:0x801D7300
 	.bss        start:0x802456F0 end:0x80245754
+	.sbss       start:0x8032ECA8 end:0x8032ECB8
 
 map.cpp:
 	extab       start:0x80006068 end:0x80006304
@@ -773,6 +775,7 @@ pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08
 	extabindex  start:0x8000DC54 end:0x8000DC60
 	.text       start:0x80087EF0 end:0x800880F0
+	.sdata2     start:0x80330500 end:0x80330504
 
 pppKeShpTail.cpp:
 	extab       start:0x80007A08 end:0x80007A10
@@ -783,6 +786,7 @@ pppKeZCrctShp.cpp:
 	extab       start:0x80007A10 end:0x80007A18
 	extabindex  start:0x8000DC6C end:0x8000DC78
 	.text       start:0x8008821C end:0x80088698
+	.sdata2     start:0x80330504 end:0x80330508
 
 pppKeShpTail2X.cpp:
 	extab       start:0x80007A18 end:0x80007A38

@@ -1,6 +1,9 @@
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppGetRotMatrixX.h"
 
+extern const float kPppGetRotMatrixXOne = 1.0f;
+extern const float kPppGetRotMatrixXZero = 0.0f;
+
 /*
  * --INFO--
  * PAL Address: 0x8005f794

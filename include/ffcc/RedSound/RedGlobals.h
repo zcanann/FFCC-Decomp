@@ -3,6 +3,7 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "dolphin/os.h"
+#include "ffcc/RedSound/RedStream.h"
 #include "types.h"
 
 class CRedDriver;
@@ -52,7 +53,7 @@ extern int* DAT_8032f428;
 extern int DAT_8032f42c;
 extern int DAT_8032f430;
 extern int DAT_8032f434;
-extern void* DAT_8032f438;
+extern RedStreamDATA* DAT_8032f438;
 extern int DAT_8032f43c;
 extern int DAT_8032f440;
 extern unsigned int* DAT_8032f444;

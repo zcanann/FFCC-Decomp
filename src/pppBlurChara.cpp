@@ -365,9 +365,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 {
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
-    int textureBase = 0;
-    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
     BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
+    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
+    int textureBase = 0;
     int textureIndex;
     int objPosBase;
     _GXTexObj smallBackTex;
@@ -443,10 +443,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&colorData->m_color));
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    drawColor.r = colorData->m_color.rgba[0];
-    drawColor.g = colorData->m_color.rgba[1];
-    drawColor.b = colorData->m_color.rgba[2];
-    drawColor.a = colorData->m_color.rgba[3];
+    drawColor = *reinterpret_cast<_GXColor*>(&colorData->m_color);
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);

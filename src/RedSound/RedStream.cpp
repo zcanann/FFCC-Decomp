@@ -28,16 +28,17 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int _SearchEmptyStreamData()
+RedStreamDATA* _SearchEmptyStreamData()
 {
-	unsigned int streamData = (unsigned int)DAT_8032f438;
+	RedStreamDATA* streamData = DAT_8032f438;
+	RedStreamDATA* streamDataEnd = DAT_8032f438 + 4;
 
 	do {
-		if (*(int*)(streamData + 0x10c) == 0) {
+		if (streamData->m_streamId == 0) {
 			return streamData;
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+		streamData++;
+	} while (streamData < streamDataEnd);
 
 	return 0;
 }
@@ -518,8 +519,6 @@ void StreamPause(int param_1, int param_2)
  */
 void StreamControl()
 {
-	extern void* DAT_8032f438;
-
 	unsigned int streamData = (unsigned int)DAT_8032f438;
 	do {
 		if (*(int*)(streamData + 0x110) == 1) {

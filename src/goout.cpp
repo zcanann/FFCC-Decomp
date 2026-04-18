@@ -83,40 +83,45 @@ static unsigned short GetGoOutInputMask()
     return static_cast<unsigned short>(Pad._8_2_);
 }
 
+static const char sSlotAErrorText1[] = "The Memory Card in Slot A contains";
+static const char sSlotAErrorText2[] = "no save data for your current game";
+static const char sSlotAErrorText3[] = "or contains corrupt data. Please";
+static const char sSlotAErrorText4[] = "insert a Memory Card containing";
+static const char sSlotAErrorText5[] = "valid save data into Slot A.";
 static const char* const sSlotAErrorLine1[5] = {
-    "The Memory Card in Slot A contains",
-    "The Memory Card in Slot A contains",
-    "The Memory Card in Slot A contains",
-    "The Memory Card in Slot A contains",
-    "The Memory Card in Slot A contains",
+    sSlotAErrorText1,
+    sSlotAErrorText1,
+    sSlotAErrorText1,
+    sSlotAErrorText1,
+    sSlotAErrorText1,
 };
 static const char* const sSlotAErrorLine2[5] = {
-    "no save data for your current game",
-    "no save data for your current game",
-    "no save data for your current game",
-    "no save data for your current game",
-    "no save data for your current game",
+    sSlotAErrorText2,
+    sSlotAErrorText2,
+    sSlotAErrorText2,
+    sSlotAErrorText2,
+    sSlotAErrorText2,
 };
 static const char* const sSlotAErrorLine3[5] = {
-    "or contains corrupt data. Please",
-    "or contains corrupt data. Please",
-    "or contains corrupt data. Please",
-    "or contains corrupt data. Please",
-    "or contains corrupt data. Please",
+    sSlotAErrorText3,
+    sSlotAErrorText3,
+    sSlotAErrorText3,
+    sSlotAErrorText3,
+    sSlotAErrorText3,
 };
 static const char* const sSlotAErrorLine4[5] = {
-    "insert a Memory Card containing",
-    "insert a Memory Card containing",
-    "insert a Memory Card containing",
-    "insert a Memory Card containing",
-    "insert a Memory Card containing",
+    sSlotAErrorText4,
+    sSlotAErrorText4,
+    sSlotAErrorText4,
+    sSlotAErrorText4,
+    sSlotAErrorText4,
 };
 static const char* const sSlotAErrorLine5[5] = {
-    "valid save data into Slot A.",
-    "valid save data into Slot A.",
-    "valid save data into Slot A.",
-    "valid save data into Slot A.",
-    "valid save data into Slot A.",
+    sSlotAErrorText5,
+    sSlotAErrorText5,
+    sSlotAErrorText5,
+    sSlotAErrorText5,
+    sSlotAErrorText5,
 };
 static const char sEmptyLine[] = "";
 static const char sImportNeedsSaveLine1[] = "This game has not been saved.";

@@ -27,12 +27,12 @@ extern const float kLineSegmentMaxT;
 extern const float kLineBoundsInitMin;
 extern const float kLineBoundsInitMax;
 
-static char s_soundStageName[] = "CSound";
-static char s_soundSourceName[] = "sound.cpp";
-static char s_soundErrorFmt[] = "Sound\n";
-static char s_soundMinusOneFmt[] = "Sound: -1\n";
-static char s_soundLineOutOfRangeFmt[] = "CSound(%d)\n";
-static char s_soundLineTableFullFmt[] = "CSound(%d+)\n";
+static const char s_soundStageName[] = "CSound";
+static const char s_soundSourceName[] = "sound.cpp";
+static const char s_soundErrorFmt[] = "Sound\n";
+static const char s_soundMinusOneFmt[] = "Sound: -1\n";
+static const char s_soundLineOutOfRangeFmt[] = "CSound(%d)\n";
+static const char s_soundLineTableFullFmt[] = "CSound(%d+)\n";
 
 extern float FLOAT_80330ce8;
 extern float FLOAT_80330cf4;
@@ -101,7 +101,7 @@ extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long,
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);

@@ -23,6 +23,7 @@ file.cpp:
 	extabindex  start:0x8000AD98 end:0x8000AE4C
 	.text       start:0x80012BAC end:0x80013D70
 	.ctors      start:0x801D53A4 end:0x801D53A8
+	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
 	.sdata2     start:0x8032F6E8 end:0x8032F710
 
@@ -64,6 +65,7 @@ memory.cpp:
 	extabindex  start:0x8000B2CC end:0x8000B434
 	.text       start:0x8001C2F0 end:0x8001FE74
 	.ctors      start:0x801D53B4 end:0x801D53B8
+	.data       start:0x801E8488 end:0x801E84A8
 	.bss        start:0x8023C888 end:0x80244028
 	.sbss       start:0x8032EC58 end:0x8032EC60
 
@@ -169,6 +171,7 @@ p_map.cpp:
 	.text       start:0x80034988 end:0x80036290
 	.ctors      start:0x801D53DC end:0x801D53E0
 	.data       start:0x801E89B8 end:0x801E9030
+	.bss        start:0x802685E0 end:0x80268790
 
 p_camera.cpp:
 	extab       start:0x80006374 end:0x80006414
@@ -935,6 +938,8 @@ mes.cpp:
 	extab       start:0x80007D38 end:0x80007D78
 	extabindex  start:0x8000E128 end:0x8000E188
 	.text       start:0x800981F0 end:0x8009B3B4
+	.data       start:0x8020F758 end:0x8020FA00
+	.bss        start:0x802EAA60 end:0x802EAAB0
 
 menu.cpp:
 	extab       start:0x80007D78 end:0x80007DA0
@@ -983,11 +988,13 @@ cflat_r2system.cpp:
 	extab       start:0x80008280 end:0x80008338
 	extabindex  start:0x8000E8D8 end:0x8000E9EC
 	.text       start:0x800B28F0 end:0x800BA2FC
+	.data       start:0x80210174 end:0x80210378
 
 cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350
 	extabindex  start:0x8000E9EC end:0x8000EA10
 	.text       start:0x800BA2FC end:0x800BD848
+	.data       start:0x80210378 end:0x80210534
 	.sdata2     start:0x80330C10 end:0x80330C18
 
 p_chara_viewer.cpp:
@@ -1014,6 +1021,7 @@ memorycard.cpp:
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
 	.rodata     start:0x801DAA0C end:0x801DAE0C
+	.data       start:0x8021054C end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 
 pppWDrawMatrixLoop.cpp:
@@ -1227,6 +1235,7 @@ wm_menu.cpp:
 	extabindex  start:0x8000F9A0 end:0x8000FD00
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
+	.data       start:0x80210FDC end:0x802111E8
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
@@ -1299,17 +1308,20 @@ charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
+	.data       start:0x802112E8 end:0x80211498
 	.sbss       start:0x8032EE68 end:0x8032EE70
 
 monobj.cpp:
 	extab       start:0x800092E4 end:0x8000944C
 	extabindex  start:0x80010120 end:0x8001033C
 	.text       start:0x80112D54 end:0x8011A574
+	.data       start:0x80211498 end:0x802116A4
 
 partyobj.cpp:
 	extab       start:0x8000944C end:0x800095FC
 	extabindex  start:0x8001033C end:0x800105C4
 	.text       start:0x8011A574 end:0x80124998
+	.data       start:0x802116A4 end:0x80211848
 
 p_mc.cpp:
 	extab       start:0x800095FC end:0x8000960C
@@ -1459,6 +1471,7 @@ menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
+	.rodata     start:0x801DE910 end:0x801DEAD4
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
 

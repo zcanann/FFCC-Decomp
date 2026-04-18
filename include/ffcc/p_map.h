@@ -48,7 +48,6 @@ private:
     s32 m_drawEnabled;                   // 0x180
     u8 m_useStoredViewMtx;               // 0x184
     u8 m_pad185[3];                      // 0x185
-    u8 _pad188[0x1B0 - 0x188];           // 0x188
 };
 
 extern CMapPcs MapPcs;

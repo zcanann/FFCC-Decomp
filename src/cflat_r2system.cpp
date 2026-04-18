@@ -47,6 +47,8 @@ void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char gMapHitDrawMode;
 }
 
+static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
+
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
     stack[-1].m_word = *value;
@@ -266,7 +268,7 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if ((unsigned int)System.m_execParam > 2U) {
-        Printf__7CSystemFPce(&System, "SetMiniGameParam no 0x%04x data[%d]\n", id, value);
+        Printf__7CSystemFPce(&System, s_setMiniGameParamFmt, id, value);
     }
 
     if (id == 0x1202) {

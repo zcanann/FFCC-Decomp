@@ -36,10 +36,9 @@ extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
 class CRelProfile
 {
 public:
-    ~CRelProfile();
-
-private:
-    u32 m_unused;
+    u32 m_relIndex;
+    u32 m_stageIndex;
+    u32 m_mapIndex;
 };
 
 unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
@@ -85,9 +84,9 @@ unsigned int PTR_s_CMapPcs_GAME__801e8ad8[3][0x414 / 3 / sizeof(unsigned int)] =
 
 CRelProfile s_mapRelProfile0__7CMapPcs;
 CRelProfile s_mapRelProfile1__7CMapPcs;
-CRelProfile s_mapRelProfile2__7CMapPcs[2];
-unsigned int s_loadedStageNo__7CMapPcs;
-unsigned int s_loadedMapNo__7CMapPcs;
+CRelProfile s_mapRelProfile2__7CMapPcs;
+unsigned short s_loadedStageNo__7CMapPcs;
+unsigned short s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
@@ -296,13 +295,13 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 {
     CMapMngAsyncLoadState* asyncLoadState =
         reinterpret_cast<CMapMngAsyncLoadState*>(reinterpret_cast<char*>(&MapMng) + 0x22994);
-    unsigned int prevStageNo = s_loadedStageNo__7CMapPcs;
-    unsigned int prevMapNo = s_loadedMapNo__7CMapPcs;
+    unsigned short prevStageNo = s_loadedStageNo__7CMapPcs;
+    unsigned short prevMapNo = s_loadedMapNo__7CMapPcs;
     Vec unusedVec;
     char mapPath[0x104];
 
-    s_loadedStageNo__7CMapPcs = static_cast<unsigned int>(stageNo);
-    s_loadedMapNo__7CMapPcs = static_cast<unsigned int>(mapNo);
+    s_loadedStageNo__7CMapPcs = static_cast<unsigned short>(stageNo);
+    s_loadedMapNo__7CMapPcs = static_cast<unsigned short>(mapNo);
     sprintf(mapPath, s_dvd_map_stg_03d_map_03d_801d7844, stageNo, mapNo);
 
     if (mode != 2) {
@@ -964,15 +963,3 @@ void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
 	// TODO
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80036254
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CRelProfile::~CRelProfile()
-{
-}

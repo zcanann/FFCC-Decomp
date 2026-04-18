@@ -57,6 +57,9 @@ extern "C" MonAiFuncTable funcsRamoe;
 extern "C" MonAiFuncTable funcsLastBoss;
 extern "C" MonAiFuncTable funcsLKShooter;
 
+static const char s_monObjAiStateFmt[] = "%d:%c %d:%c";
+static const char s_monObjDistanceFmt[] = "%d %d %d";
+
 /*
  * --INFO--
  * PAL Address: 0x8011A4CC
@@ -1324,7 +1327,8 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 			aiChar = (aiState & 0x7FFF) + 0x40;
 		}
 
-		sprintf(text, "%d:%c %d:%c", (int)object->m_scriptHandle[2], aiChar, *reinterpret_cast<int*>(mon + 0x6D0), targetChar);
+		sprintf(text, s_monObjAiStateFmt, (int)object->m_scriptHandle[2], aiChar,
+		        *reinterpret_cast<int*>(mon + 0x6D0), targetChar);
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
 		font->SetPosY(posY);
 		font->SetPosZ(posZ);
@@ -1338,7 +1342,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
 		int spawnDist = static_cast<int>(PSVECDistance(reinterpret_cast<Vec*>(mon + 0x6F8), &object->m_worldPosition));
-		sprintf(text, "%d %d %d", targetDist, spawnDist, chaseRange);
+		sprintf(text, s_monObjDistanceFmt, targetDist, spawnDist, chaseRange);
 		font->SetPosX(posX - static_cast<float>(font->GetWidth(text)) * 0.5f);
 		font->SetPosY(posY);
 		font->SetPosZ(posZ);

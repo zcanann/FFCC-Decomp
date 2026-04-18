@@ -18,7 +18,7 @@ struct Vec;
 
 extern int gCFlatRuntime2DebugDrawOverflowFrame;
 extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
-extern char sCFlatRuntime2DebugDrawOverflowMsg[];
+extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
 extern unsigned char CFlat[0x10440];
 extern u32 CFlatFlags;
 extern Mtx gFlatPosMtx;

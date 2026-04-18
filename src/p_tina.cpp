@@ -31,12 +31,12 @@ extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
 }
-static char s_tinaSourceName[] = "p_tina.cpp";
-static char s_tinaPrioTimeFmt[] = "prioTime:%d prio:%d pdtID:%2d fp:%08x\n";
-static char s_tinaTitleFmt[] = "Tina :%c\n";
-static char s_tinaCalcFmt[] = "clc :%f / max :%f\n";
-static char s_tinaDrawFmt[] = "drw :%f / max :%f\n";
-static char s_tinaHeapFmt[] = "hpm :%f / max :%f\n";
+extern "C" char s_p_tina_cpp_801d8008[];
+extern "C" char s_tina_title_fmt_801d8014[];
+extern "C" char s_tina_calc_fmt_801d8020[];
+extern "C" char s_tina_draw_fmt_801d8038[];
+extern "C" char s_tina_heap_fmt_801d8050[];
+extern "C" char s_tina_prio_time_fmt_801d81a0[];
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
@@ -102,7 +102,8 @@ unsigned char ARRAY_802739e8[0xC];
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;
-pppDrawMng ppvDrawMng;
+CProfile g_par_calc_prof(0);
+CProfile g_par_draw_prof(0);
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {
@@ -387,7 +388,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(
-			stringBase + 0x2c0,
+			s_tina_prio_time_fmt_801d81a0,
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
@@ -817,14 +818,14 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x308);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x308);
     OSStartStopwatch(&g_par_draw_prof);
     OSStartStopwatch(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
     OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x30f);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x30f);
     OSStopStopwatch(&g_par_draw_prof);
     pppClearDrawEnv();
 }
@@ -840,14 +841,14 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x31a);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x31a);
     OSStartStopwatch(&g_par_draw_prof);
     OSStartStopwatch(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
     OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_tinaSourceName, 0x322);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x322);
     OSStopStopwatch(&g_par_draw_prof);
     pppClearDrawEnv();
 }
@@ -1078,14 +1079,14 @@ void CPartPcs::drawAfterViewer()
 {
 	int frameSign;
 
-	Graphic._WaitDrawDone(s_tinaSourceName, 0x3f1);
+	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
 	OSStartStopwatch(&g_par_draw_prof);
 	OSStartStopwatch(&g_par_calc_prof);
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	OSStopStopwatch(&g_par_calc_prof);
-	Graphic._WaitDrawDone(s_tinaSourceName, 0x3fb);
+	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
 	OSStopStopwatch(&g_par_draw_prof);
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
@@ -1102,7 +1103,7 @@ void CPartPcs::drawAfterViewer()
 	gDebugSpinnerFrame++;
 	frameSign = gDebugSpinnerFrame >> 0x1f;
 	Graphic.Printf(
-		s_tinaTitleFmt,
+		s_tina_title_fmt_801d8014,
 		(int)(char)gDebugSpinnerText[(frameSign * 4 |
 								 (unsigned int)((gDebugSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
@@ -1110,11 +1111,11 @@ void CPartPcs::drawAfterViewer()
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		s_tinaCalcFmt, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
+		s_tina_calc_fmt_801d8020, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		s_tinaDrawFmt, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
+		s_tina_draw_fmt_801d8038, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		s_tinaHeapFmt,
+		s_tina_heap_fmt_801d8050,
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }

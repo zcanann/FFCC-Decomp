@@ -126,7 +126,7 @@ void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicO
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
-char s_pppBlurChara_cpp_801DB620[] = "pppBlurChara.cpp";
+static const char s_pppBlurChara_cpp_801DB620[] = "pppBlurChara.cpp";
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
     return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
@@ -331,9 +331,9 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
         work->m_captureBuffer = reinterpret_cast<void*>(
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr, s_pppBlurChara_cpp_801DB620, 0xD5));
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD5));
         work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, s_pppBlurChara_cpp_801DB620, 0xD7));
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
 
         *(pppBlurCharaWork**)(model + 0xE4) = work;
         *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;
@@ -365,9 +365,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 {
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
-    int textureBase = 0;
-    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
     BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
+    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
+    int textureBase = 0;
     int textureIndex;
     int objPosBase;
     _GXTexObj smallBackTex;
@@ -443,10 +443,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&colorData->m_color));
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    drawColor.r = colorData->m_color.rgba[0];
-    drawColor.g = colorData->m_color.rgba[1];
-    drawColor.b = colorData->m_color.rgba[2];
-    drawColor.a = colorData->m_color.rgba[3];
+    drawColor = *reinterpret_cast<_GXColor*>(&colorData->m_color);
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);

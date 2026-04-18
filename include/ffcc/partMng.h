@@ -269,35 +269,36 @@ struct _pppMngSt
     int m_reservedB8;                  // 0xB8
     unsigned int m_objHitMask;         // 0xBC
     unsigned int m_cylinderAttribute;  // 0xC0
-    unsigned char m_pObjList[0xC];     // 0xC4
+    unsigned char m_pObjList[8];       // 0xC4
     void* m_pDataValList;              // 0xCC
     void* m_controlProgramTable;       // 0xD0
     void* m_programInfoTable;          // 0xD4
-    void* m_programControlArray;       // 0xD8
-    void* m_owner;                     // 0xDC
-    void* m_lookTarget;                // 0xE0
-    CChara::CNode* m_bindNode;         // 0xE4
-    unsigned char m_mode;              // 0xE8
-    unsigned char m_particleEnded;     // 0xE9
-    unsigned char m_isFinished;        // 0xEA
-    unsigned char m_matrixMode;        // 0xEB
-    unsigned char m_hitBgFlag;         // 0xEC
-    unsigned char m_slotVisible;       // 0xED
-    unsigned char m_ownerFacing;       // 0xEE
-    unsigned char m_drawVariant;       // 0xEF
-    unsigned char m_rotationOrder;     // 0xF0
-    unsigned char m_drawPass;          // 0xF1
-    signed char m_drawSubType;         // 0xF2
-    unsigned char m_useOwnerScaleSign; // 0xF3
-    unsigned char m_ownerFlagsInitialized; // 0xF4
-    unsigned char m_nodeScaleInitialized;  // 0xF5
-    unsigned char m_fieldF6;           // 0xF6
-    unsigned char m_mapTexLoaded;      // 0xF7
-    unsigned char m_hasMapRef;         // 0xF8
-    unsigned char m_fpBillboard;       // 0xF9
-    unsigned char m_prio;              // 0xFA
-    short m_frameCounter;              // 0xFB
-    unsigned char m_padFD[3];          // 0xFD
+    void* m_owner;                     // 0xD8
+    void* m_lookTarget;                // 0xDC
+    CChara::CNode* m_bindNode;         // 0xE0
+    unsigned char m_mode;              // 0xE4
+    unsigned char m_particleEnded;     // 0xE5
+    unsigned char m_isFinished;        // 0xE6
+    unsigned char m_matrixMode;        // 0xE7
+    unsigned char m_hitBgFlag;         // 0xE8
+    unsigned char m_slotVisible;       // 0xE9
+    unsigned char m_ownerFacing;       // 0xEA
+    unsigned char m_drawVariant;       // 0xEB
+    unsigned char m_rotationOrder;     // 0xEC
+    unsigned char m_drawPass;          // 0xED
+    signed char m_drawSubType;         // 0xEE
+    unsigned char m_useOwnerScaleSign; // 0xEF
+    unsigned char m_ownerFlagsInitialized; // 0xF0
+    unsigned char m_nodeScaleInitialized;  // 0xF1
+    unsigned char m_fieldF2;           // 0xF2
+    unsigned char m_padF3[2];          // 0xF3
+    unsigned char m_mapTexLoaded;      // 0xF5
+    unsigned char m_hasMapRef;         // 0xF6
+    unsigned char m_fpBillboard;       // 0xF7
+    unsigned char m_prio;              // 0xF8
+    unsigned char m_padF9;             // 0xF9
+    short m_frameCounter;              // 0xFA
+    unsigned char m_padFC[4];          // 0xFC
     unsigned int m_paramA;             // 0x100
     unsigned int m_paramB;             // 0x104
     float m_cullRadiusSq;              // 0x108

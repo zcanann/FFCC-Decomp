@@ -17,7 +17,7 @@ extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
 
-static char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
+static const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
 
 static inline float* f32_at(void* base, s32 off)
 {
@@ -99,14 +99,14 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     if (*(void**)(work + 0xC) == 0) {
         *(u32*)(work + 0x18) = *(u16*)(payload + 0x20);
         *(void**)(work + 0xC) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            *(u32*)(work + 0x18) * 0xA0, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0x8D);
+            *(u32*)(work + 0x18) * 0xA0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
         if (*(void**)(work + 0xC) != 0) {
             memset(*(void**)(work + 0xC), 0, *(u32*)(work + 0x18) * 0xA0);
         }
 
         if (*(u8*)(payload + 0x136) != 0) {
             *(void**)(work + 0x10) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) * 0x30, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0x97);
+                *(u32*)(work + 0x18) * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
             if (*(void**)(work + 0x10) != 0) {
                 memset(*(void**)(work + 0x10), 0, *(u32*)(work + 0x18) * 0x30);
             }
@@ -114,7 +114,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
         if (*(u8*)(payload + 0x131) != 0) {
             *(void**)(work + 0x14) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) << 5, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0xA2);
+                *(u32*)(work + 0x18) << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
             if (*(void**)(work + 0x14) != 0) {
                 memset(*(void**)(work + 0x14), 0, *(u32*)(work + 0x18) << 5);
             }

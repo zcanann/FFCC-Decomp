@@ -19,7 +19,7 @@ extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, uns
 extern "C" int rand(void);
 extern pppFMATRIX g_matUnit3;
 
-static char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
+static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 
 /*
  * --INFO--
@@ -391,13 +391,13 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
         work->m_maxParticles = *(u16*)(paramPayload + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2db);
+            work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2db);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * 0x1f8);
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2e3);
+            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2e3);
         if (work->m_wmats != 0) {
             memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
         }

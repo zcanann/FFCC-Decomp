@@ -19,7 +19,7 @@ CPad Pad;
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
 extern "C" {
-unsigned char BYTE_ARRAY_8024430c[0x34] = {};
+unsigned char g_pad[0x30];
 }
 extern "C" float FLOAT_8032f820;
 extern "C" float FLOAT_8032f824;
@@ -156,7 +156,7 @@ void CPad::Frame()
 
 	PADRead(reinterpret_cast<PADStatus*>(local_88));
 	PADClamp(reinterpret_cast<PADStatus*>(local_88));
-	memcpy(BYTE_ARRAY_8024430c, local_88, 0x30);
+	memcpy(g_pad, local_88, 0x30);
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
 	uVar17 = 0;
 	puVar18 = local_98;

@@ -49,10 +49,10 @@ public:
     void ExecScenegraph();
     unsigned int AddScenegraph(CProcess*, int);
     void RemoveScenegraph(CProcess*, int);
-    virtual void ScriptChanging(char*);
-    virtual void ScriptChanged(char*, int);
-    virtual void MapChanging(int, int);
-    virtual void MapChanged(int, int, int);
+    void ScriptChanging(char*);
+    void ScriptChanged(char*, int);
+    void MapChanging(int, int);
+    void MapChanged(int, int, int);
     COrder* GetFirstOrder();
     COrder* GetNextOrder(COrder*);
     COrder* GetOrder(int);

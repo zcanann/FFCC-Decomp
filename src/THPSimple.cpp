@@ -609,7 +609,7 @@ s32 THPSimpleLoadStop(void)
     if (SimpleControl.isOpen != 0) {
         if (SimpleControl.isBufferSet == 0) {
             SimpleControl.isPreLoaded = 0;
-            if (SimpleControl.isReadFrameAsync != 0) {
+            if (SimpleControl.isReadFrameAsync != 0U) {
                 DVDCancel(&SimpleControl.fileInfo.cb);
                 SimpleControl.isReadFrameAsync = 0;
             }

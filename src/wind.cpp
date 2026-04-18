@@ -260,7 +260,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                     if (obj->type == 2) {
                         if (d < (double)obj->radiusSq) {
                             yRand = (double)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio);
-                            d = (double)sqrtf((float)d);
+                            d = sqrt(d);
                             inv = (double)(float)(yRand / d);
                             out->x = (float)(nx * inv + (double)out->x);
                             yRand = (double)Math.RandF();

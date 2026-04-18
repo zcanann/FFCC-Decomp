@@ -19,32 +19,44 @@
 CMapPcs MapPcs;
 extern void* __vt__8CManager;
 extern "C" void* __vt__7CMapPcs[];
+extern "C" void create__7CMapPcsFv(CMapPcs*);
+extern "C" void destroy__7CMapPcsFv(CMapPcs*);
+extern "C" void calcInit__7CMapPcsFv(CMapPcs*);
+extern "C" void calc__7CMapPcsFv(CMapPcs*);
+extern "C" void calcViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawShadow__7CMapPcsFv(CMapPcs*);
+extern "C" void drawBefore__7CMapPcsFv(CMapPcs*);
+extern "C" void draw__7CMapPcsFv(CMapPcs*);
+extern "C" void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawAfter__7CMapPcsFv(CMapPcs*);
+extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void createViewer__7CMapPcsFv(CMapPcs*);
 
-unsigned int m_table_desc0__7CMapPcs[3];
-unsigned int m_table_desc1__7CMapPcs[3];
-unsigned int m_table_desc2__7CMapPcs[3];
-unsigned int m_table_desc3__7CMapPcs[3];
-unsigned int m_table_desc4__7CMapPcs[3];
-unsigned int m_table_desc5__7CMapPcs[3];
-unsigned int m_table_desc6__7CMapPcs[3];
-unsigned int m_table_desc7__7CMapPcs[3];
-unsigned int m_table_desc8__7CMapPcs[3];
-unsigned int m_table_desc9__7CMapPcs[3];
-unsigned int m_table_desc10__7CMapPcs[3];
-unsigned int m_table_desc11__7CMapPcs[3];
-unsigned int m_table_desc12__7CMapPcs[3];
-unsigned int m_table_desc13__7CMapPcs[3];
-unsigned int m_table_desc14__7CMapPcs[3];
-unsigned int m_table_desc15__7CMapPcs[3];
-unsigned int m_table_desc16__7CMapPcs[3];
-unsigned int m_table_desc17__7CMapPcs[3];
-unsigned int m_table_desc18__7CMapPcs[3];
-unsigned int m_table_desc19__7CMapPcs[3];
-unsigned int m_table_desc20__7CMapPcs[3];
-unsigned int m_table_desc21__7CMapPcs[3];
-unsigned int m_table_desc22__7CMapPcs[3];
-unsigned int m_table_desc23__7CMapPcs[3];
-unsigned int PTR_s_CMapPcs_GAME__801e8ad8[0x414 / sizeof(unsigned int)];
+unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
+unsigned int m_table_desc1__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int m_table_desc2__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int m_table_desc3__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
+unsigned int m_table_desc4__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int m_table_desc5__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
+unsigned int m_table_desc6__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
+unsigned int m_table_desc7__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
+unsigned int m_table_desc8__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+unsigned int m_table_desc9__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int m_table_desc10__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int m_table_desc11__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+unsigned int m_table_desc12__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int m_table_desc13__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+unsigned int m_table_desc14__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+unsigned int m_table_desc15__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+unsigned int m_table_desc16__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+unsigned int m_table_desc17__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int m_table_desc18__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int m_table_desc19__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+unsigned int m_table_desc20__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int m_table_desc21__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+unsigned int m_table_desc22__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+unsigned int m_table_desc23__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
 unsigned int s_mapRelProfile0__7CMapPcs;
 unsigned int s_mapRelProfile1__7CMapPcs;
@@ -55,6 +67,9 @@ extern const float DrawRangeDefault;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+extern "C" const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs(GAME)";
+extern "C" const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs(VIEWER)";
+extern "C" const char s_CMapPcs_PART_801D7700[] = "CMapPcs(PART)";
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
 extern "C" const char s__________________________________801d7734[];
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
@@ -67,6 +82,28 @@ extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColo
 static unsigned char ARRAY_80268768[0xC];
 static unsigned char ARRAY_80268774[0xC];
 static unsigned char ARRAY_80268780[0xC];
+
+#define MAP_PCS_TABLE_BLOCK(name) \
+    reinterpret_cast<unsigned int>(const_cast<char*>(name)), 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+    0x14, 0, 0, 0, 0, \
+    0x1E, 0, 0, 0, 0, \
+    0x2F, 1, 0, 0, 0, \
+    0x35, 1, 0, 0, 0, \
+    0x37, 1, 0, 0, 0, \
+    0x3F, 1, \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+unsigned int m_table__7CMapPcs[0x414 / sizeof(unsigned int)] = {
+    MAP_PCS_TABLE_BLOCK(s_CMapPcs_GAME_801D76E0),
+    MAP_PCS_TABLE_BLOCK(s_CMapPcs_VIEWER_801D76F0),
+    MAP_PCS_TABLE_BLOCK(s_CMapPcs_PART_801D7700),
+};
+
+#undef MAP_PCS_TABLE_BLOCK
 
 struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);
@@ -129,7 +166,7 @@ void CMapPcs::Quit()
  */
 int CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return (int)(PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57);
+	return (int)(m_table__7CMapPcs + tableIndex * 0x57);
 }
 
 /*
@@ -872,16 +909,12 @@ void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
  */
 extern "C" void __sinit_p_map_cpp(void)
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
 	volatile void** base = reinterpret_cast<volatile void**>(&MapPcs);
 	*base = &__vt__8CManager;
 	*base = __vt__8CProcess;
 	*base = __vt__7CMapPcs;
 
-	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;
+	unsigned int* dst = m_table__7CMapPcs;
 
 	dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
 	dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];

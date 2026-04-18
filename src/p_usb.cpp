@@ -16,7 +16,7 @@ u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7
 u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
 u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
 char s_CUSBPcs_8032f810[] = "CUSBPcs";
-u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
+u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
     reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
 };
 static const char s_usbRootPath[] = "plot/kmitsuru/";

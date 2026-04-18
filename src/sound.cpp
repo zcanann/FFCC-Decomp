@@ -33,6 +33,11 @@ static const char s_soundErrorFmt[] = "Sound\n";
 static const char s_soundMinusOneFmt[] = "Sound: -1\n";
 static const char s_soundLineOutOfRangeFmt[] = "CSound(%d)\n";
 static const char s_soundLineTableFullFmt[] = "CSound(%d+)\n";
+static const char s_soundWavePathFmt[] = "dvd/sound/wave/wave_%04d.wd";
+static const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se_%03d.seb";
+static const char s_soundMusicPathFmt[] = "dvd/sound/music/music_%03d.bgm";
+static const char s_soundSeSepPathFmt[] = "dvd/sound/se_sep/se_%06d.sep";
+static const char s_soundLoadSeFmt[] = "CSound::LoadSe[%d]\n";
 
 extern float FLOAT_80330ce8;
 extern float FLOAT_80330cf4;
@@ -701,7 +706,7 @@ void CSound::Realloc(int isMinMemoryMode)
         redSound->SetWaveData(-1, 0, 0);
 
         char wavePath[256];
-        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 0);
+        sprintf(wavePath, s_soundWavePathFmt, 0);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
             sound.m_waveRemain = File.GetLength(waveFile);
@@ -724,7 +729,7 @@ void CSound::Realloc(int isMinMemoryMode)
         redSound->SetWaveData(-1, 0, 0);
 
         char wavePath[256];
-        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 500);
+        sprintf(wavePath, s_soundWavePathFmt, 500);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
             sound.m_waveRemain = File.GetLength(waveFile);
@@ -740,7 +745,7 @@ void CSound::Realloc(int isMinMemoryMode)
 
     for (int i = 0; i < 4; i++) {
         char sePath[260];
-        sprintf(sePath, "dvd/sound/se/block/se_%03d.seb", i);
+        sprintf(sePath, s_soundSeBlockPathFmt, i);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
@@ -1078,7 +1083,7 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
         SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
 
         char wavePath[260];
-        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", waveNo);
+        sprintf(wavePath, s_soundWavePathFmt, waveNo);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
             sound.m_waveRemain = File.GetLength(waveFile);
@@ -1149,7 +1154,7 @@ void CSound::LoadBgm(int bgmId)
         Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else if (ReentryMusicData__9CRedSoundFi(redSound, bgmId) == -1) {
         char musicPath[256];
-        sprintf(musicPath, "dvd/sound/music/music_%03d.bgm", bgmId);
+        sprintf(musicPath, s_soundMusicPathFmt, bgmId);
 
         CFile::CHandle* handle = File.Open(musicPath, 0, CFile::PRI_LOW);
         if (handle != 0) {
@@ -1365,7 +1370,7 @@ void CSound::LoadSe(int seId)
         Printf__7CSystemFPce(&System, s_soundErrorFmt);
     } else if (ReentrySeSepData__9CRedSoundFi(redSound, seId) == -1) {
         char sePath[264];
-        sprintf(sePath, "dvd/sound/se_sep/se_%06d.sep", seId);
+        sprintf(sePath, s_soundSeSepPathFmt, seId);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
@@ -1373,7 +1378,7 @@ void CSound::LoadSe(int seId)
             SetSeSepData__9CRedSoundFPv(redSound, File.m_readBuffer);
             File.Close(handle);
             if (System.m_execParam != 0) {
-                Printf__7CSystemFPce(&System, "CSound::LoadSe[%d]\n", seId);
+                Printf__7CSystemFPce(&System, s_soundLoadSeFmt, seId);
             }
         }
     }
@@ -1427,7 +1432,7 @@ void CSound::LoadWave(int waveId)
                 SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
 
                 char wavePath[260];
-                sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", waveId);
+                sprintf(wavePath, s_soundWavePathFmt, waveId);
                 waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
 
                 if (waveFile != 0) {

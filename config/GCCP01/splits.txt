@@ -987,7 +987,7 @@ joybus.cpp:
 	extabindex  start:0x8000E500 end:0x8000E8D8
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
-	.rodata     start:0x801DA0A4 end:0x801DA2A4
+	.rodata     start:0x801DA0A4 end:0x801DA3E4
 	.bss        start:0x802EAAB0 end:0x802F2600
 	.sbss       start:0x8032EDB8 end:0x8032EDBC
 

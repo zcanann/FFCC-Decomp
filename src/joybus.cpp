@@ -99,6 +99,20 @@ extern const unsigned short JoyBusCrcTable[256] =
     0x2E93, 0x3EB2, 0x0ED1, 0x1EF0
 };
 
+static const char s_dvd_gba_dir_underscore[] = "dvd_gba/";
+static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
+static const char s_joybus_cpp[] = "joybus.cpp";
+static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation";
+static const char s_dvd_gba_dir[] = "dvd/gba/";
+static const char s_objdat_spt[] = "objdat.spt";
+static const char s_not_found_error_fmt[] = "Error: %s not found";
+static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
+static const char s_thread_init_end_nl[] = "JoyBus::ThreadInit end\n";
+static const char s_recv_type_mismatch_warn_fmt[] = "(%d):%s(%d): Warning: Recv data type mismatch";
+static const char s_send_ppos_bad_state_fmt[] = "JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n";
+static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
+static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
+
 inline unsigned int MakeJoyCmd32(unsigned char op, unsigned char a, unsigned char b, unsigned char c)
 {
     return  (static_cast<unsigned int>(op) << 24) | (static_cast<unsigned int>(a)  << 16) | (static_cast<unsigned int>(b)  << 8)  | static_cast<unsigned int>(c);
@@ -144,8 +158,8 @@ JoyBus::JoyBus()
         m_letterSizeArr[i] = 0;
     }
 
-    strcpy(m_pathBuf, "dvd_gba/");
-    strcat(m_pathBuf, "ffcc_cli.bin", 128UL);
+    strcpy(m_pathBuf, const_cast<char*>(s_dvd_gba_dir_underscore));
+    strcat(m_pathBuf, const_cast<char*>(s_ffcc_cli_bin), 128UL);
 
     memset(m_sendBuffer, 0, 0x4000);
     memset(m_stageFlags, 0, 8);
@@ -235,22 +249,22 @@ void JoyBus::CreateInit()
 
         if (m_gbaBootImage == 0 && System.m_execParam != 0)
         {
-            System.Printf("%s(%d): Error: memory allocation",
-                "joybus.cpp", 0x126);
+            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt),
+                const_cast<char*>(s_joybus_cpp), 0x126);
         }
     }
 
     char path[140];
-    strcpy(path, "dvd/gba/");
+    strcpy(path, const_cast<char*>(s_dvd_gba_dir));
 
     // MWCC PPC requires 3-arg strcat
-    strcat(path, "objdat.spt", 131UL);
+    strcat(path, const_cast<char*>(s_objdat_spt), 131UL);
 
     CFile::CHandle* file = File.Open(path, 0, CFile::PRI_LOW);
 
     if (!file && System.m_execParam > 1)
     {
-        System.Printf("Error: %s not found", path);
+        System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
     }
 
     File.Read(file);
@@ -266,7 +280,7 @@ void JoyBus::CreateInit()
 
         if (m_fileBaseA == (unsigned int*)nullptr && System.m_execParam != 0)
         {
-            System.Printf("%s(%d): Error: memory allocation", "joybus.cpp", 0x13A);
+            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x13A);
         }
     }
 
@@ -282,7 +296,7 @@ void JoyBus::CreateInit()
 
         if (m_fileBaseB == 0 && System.m_execParam != 0)
         {
-            System.Printf("%s(%d): Error: memory allocation", "joybus.cpp", 0x146);
+            System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x146);
         }
     }
 	
@@ -299,7 +313,7 @@ void JoyBus::CreateInit()
 
             if (m_letterBuffer[i] == 0 && System.m_execParam != 0)
             {
-                System.Printf("%s(%d): Error: memory allocation", "joybus.cpp", 0x155);
+                System.Printf(const_cast<char*>(s_mem_alloc_error_fmt), const_cast<char*>(s_joybus_cpp), 0x155);
             }
 
             m_letterSizeArr[i] = 0;
@@ -406,7 +420,7 @@ int JoyBus::LoadBin()
         {
             if ((unsigned int)System.m_execParam > 1)
             {
-                System.Printf("Error: %s not found", (char*)this);
+                System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)this);
             }
 
             result = -1;
@@ -512,8 +526,8 @@ int JoyBus::LoadMap(int stageId, int mapId)
     char path[132];
     char tmp[16];
 
-    strcpy(path, "dvd/gba/");
-    sprintf(tmp, "m%02d_%d.mcd", stageId, mapId);
+    strcpy(path, const_cast<char*>(s_dvd_gba_dir));
+    sprintf(tmp, const_cast<char*>(s_map_filename_fmt), stageId, mapId);
     strcat(path, tmp, 132UL);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
@@ -522,7 +536,7 @@ int JoyBus::LoadMap(int stageId, int mapId)
     {
         if ((unsigned int)System.m_execParam > 1)
         {
-            System.Printf("Error: %s not found", path);
+            System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
         }
         return -1;
     }
@@ -979,7 +993,7 @@ void JoyBus::ThreadInit()
 
     if ((unsigned int)System.m_execParam >= 2u)
     {
-        System.Printf("JoyBus::ThreadInit end\n");
+        System.Printf(const_cast<char*>(s_thread_init_end_nl));
     }
 }
 
@@ -1464,7 +1478,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 {
                     if (static_cast<unsigned int>(System.m_execParam) > 1u)
                     {
-                        System.Printf("(%d):%s(%d): Warning: Recv data type mismatch", port, "joybus.cpp", 0x1079);
+                        System.Printf(const_cast<char*>(s_recv_type_mismatch_warn_fmt), port, const_cast<char*>(s_joybus_cpp), 0x1079);
                     }
 
                     OSWaitSemaphore(&m_accessSemaphores[port]);
@@ -3201,7 +3215,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         {
             signed char cnt = (signed char)m_cmdBuffer[port];
 
-            System.Printf("JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n", port, (int)cnt);
+            System.Printf(const_cast<char*>(s_send_ppos_bad_state_fmt), port, (int)cnt);
         }
 
         m_cmdBuffer[port] = 0;
@@ -6218,7 +6232,7 @@ void JoyBus::RestartThread()
         if (file == 0)
         {
             if ((unsigned int)System.m_execParam > 1)
-                System.Printf("Error: %s not found", (char*)&Joybus);
+                System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)&Joybus);
 
             err = -1;
         }
@@ -6296,7 +6310,7 @@ void JoyBus::RestartThread()
 
     if (err != 0 && (unsigned int)System.m_execParam > 1)
 	{
-        System.Printf("JoyBus::LoadBin() error");
+        System.Printf(const_cast<char*>(s_load_bin_error));
 	}
 
     memset((void*)0x802F07D0, 0, 0xF0);
@@ -6334,7 +6348,7 @@ void JoyBus::RestartThread()
     }
 
     if ((unsigned int)System.m_execParam > 1)
-        System.Printf("JoyBus::ThreadInit end");
+        System.Printf(const_cast<char*>(s_thread_init_end));
 }
 
 /*

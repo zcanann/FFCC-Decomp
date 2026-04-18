@@ -1234,6 +1234,7 @@ wm_menu.cpp:
 	extabindex  start:0x8000F9A0 end:0x8000FD00
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
+	.data       start:0x80210FDC end:0x802111E8
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
@@ -1306,17 +1307,20 @@ charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
+	.data       start:0x802112E8 end:0x80211498
 	.sbss       start:0x8032EE68 end:0x8032EE70
 
 monobj.cpp:
 	extab       start:0x800092E4 end:0x8000944C
 	extabindex  start:0x80010120 end:0x8001033C
 	.text       start:0x80112D54 end:0x8011A574
+	.data       start:0x80211498 end:0x802116A4
 
 partyobj.cpp:
 	extab       start:0x8000944C end:0x800095FC
 	extabindex  start:0x8001033C end:0x800105C4
 	.text       start:0x8011A574 end:0x80124998
+	.data       start:0x802116A4 end:0x80211848
 
 p_mc.cpp:
 	extab       start:0x800095FC end:0x8000960C

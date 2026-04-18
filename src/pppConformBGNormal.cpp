@@ -18,12 +18,6 @@ const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
 #include "dolphin/gx.h"
 #include <math.h>
 
-struct ConformState {
-    Vec m_normal;
-    u8 m_initialized;
-    u8 _pad[3];
-};
-
 struct ConformCylinderQuery {
     Vec m_pos;
     Vec m_fieldC;
@@ -94,18 +88,19 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 ownerY;
     _pppMngSt* pppMngSt;
     s32 hitFound;
-    ConformState* state;
     CGObject* owner;
     f64 trigValue;
     Quaternion local_1ac;
     Quaternion local_19c;
     Quaternion local_18c;
+    Vec* stateNormal;
     Vec local_170;
     Vec local_164;
     Vec local_158;
     Vec local_14c;
     Vec local_140;
     s32 dataOffset;
+    u8* stateInitialized;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -118,7 +113,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
     dataOffset = *param3->m_serializedDataOffsets;
-    state = (ConformState*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
+    stateNormal = (Vec*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
+    stateInitialized = (u8*)&stateNormal[1].x;
 
     if ((Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
@@ -179,27 +175,27 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             }
 
-            if (state->m_initialized == 0) {
-                state->m_initialized = 1;
-                state->m_normal.x = local_164.x;
-                state->m_normal.y = local_164.y;
-                state->m_normal.z = local_164.z;
+            if (*stateInitialized == 0) {
+                *stateInitialized = 1;
+                stateNormal->x = local_164.x;
+                stateNormal->y = local_164.y;
+                stateNormal->z = local_164.z;
             }
 
-            local_18c.x = state->m_normal.x;
-            local_18c.y = state->m_normal.y;
-            local_18c.z = state->m_normal.z;
+            local_18c.x = stateNormal->x;
+            local_18c.y = stateNormal->y;
+            local_18c.z = stateNormal->z;
             local_18c.w = kPppConformBgNormalOne;
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
             local_19c.w = kPppConformBgNormalOne;
             C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
-            state->m_normal.x = local_1ac.x;
-            state->m_normal.y = local_1ac.y;
-            state->m_normal.z = local_1ac.z;
+            stateNormal->x = local_1ac.x;
+            stateNormal->y = local_1ac.y;
+            stateNormal->z = local_1ac.z;
 
-            PSVECNormalize(&state->m_normal, &local_158);
+            PSVECNormalize(stateNormal, &local_158);
 
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
                 trigValue = sin((f64)owner->m_rotBaseY);

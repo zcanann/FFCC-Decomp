@@ -25,15 +25,15 @@ extern char s_openWarnFmt[];
 
 CFile File;
 
-static char s_fileCpp[] = "file.cpp";
-static char s_cFile[] = "CFile";
-static char s_drawErrorFmt[] = "CFile::drawError %d";
-static char s_queueWarnAnyFmt[] = "BackAllFilesToQueue: %s";
-static char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
-static char s_closeWarnFmt[] = "Close: %s";
-static char s_readWarnFmt[] = "Read: %s (%u)";
+static const char s_fileCpp[] = "file.cpp";
+static const char s_cFile[] = "CFile";
+static const char s_drawErrorFmt[] = "CFile::drawError %d";
+static const char s_queueWarnAnyFmt[] = "BackAllFilesToQueue: %s";
+static const char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
+static const char s_closeWarnFmt[] = "Close: %s";
+static const char s_readWarnFmt[] = "Read: %s (%u)";
 
-static const char* l_tError[4][6][3] = {
+static const char* const l_tError[4][6][3] = {
     {
         {"Disk read error.", "Please check the Game Disc.", ""},
         {"Erreur de lecture du disque.", "Veuillez verifier le disque.", ""},
@@ -91,12 +91,14 @@ void CFile::CHandle::Reset()
 void CFile::Init()
 {
     DVDInit();
-    m_allocStage = CreateStage__7CMemoryFUlPci(&Memory, 0x10ac00, s_cFile, 0);
+    m_allocStage = CreateStage__7CMemoryFUlPci(&Memory, 0x10ac00, const_cast<char*>(s_cFile), 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
-    m_readBuffer = __nwa__FUlPQ27CMemory6CStagePci(0x100000, (CMemory::CStage*)m_allocStage, s_fileCpp, 0x2b);
+    m_readBuffer =
+        __nwa__FUlPQ27CMemory6CStagePci(0x100000, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2b);
     m_handlePoolHead.m_currentOffset = (u32)__construct_new_array(
-        __nwa__FUlPQ27CMemory6CStagePci(sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, s_fileCpp, 0x2e),
+        __nwa__FUlPQ27CMemory6CStagePci(
+            sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
         0, 0, sizeof(CHandle), 0x80);
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
@@ -300,12 +302,12 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
         {
             if ((unsigned int)System.m_execParam >= 2)
             {
-                System.Printf(s_queueWarnTargetFmt, inFlight->m_name, fileHandle->m_name);
+                System.Printf(const_cast<char*>(s_queueWarnTargetFmt), inFlight->m_name, fileHandle->m_name);
             }
         }
         else if ((unsigned int)System.m_execParam >= 3)
         {
-            System.Printf(s_queueWarnAnyFmt, inFlight->m_name);
+            System.Printf(const_cast<char*>(s_queueWarnAnyFmt), inFlight->m_name);
         }
 
         inFlight->m_completionStatus = 1;
@@ -329,7 +331,7 @@ void CFile::Read(CFile::CHandle* fileHandle)
 	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
 	if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
 	{
-		System.Printf(s_readWarnFmt, fileHandle->m_name, readSize);
+		System.Printf(const_cast<char*>(s_readWarnFmt), fileHandle->m_name, readSize);
 	}
 	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
 	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
@@ -394,7 +396,7 @@ void CFile::Close(CFile::CHandle* fileHandle)
 {
 	if ((fileHandle->m_completionStatus == 2) && (2 <= (unsigned int)System.m_execParam))
 	{
-		System.Printf(s_closeWarnFmt, fileHandle->m_name);
+		System.Printf(const_cast<char*>(s_closeWarnFmt), fileHandle->m_name);
 	}
 
 	DVDClose(&fileHandle->m_dvdFileInfo);
@@ -465,7 +467,7 @@ void CFile::kick()
 
             if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
             {
-                System.Printf(s_readWarnFmt, handle->m_name, readSize);
+                System.Printf(const_cast<char*>(s_readWarnFmt), handle->m_name, readSize);
             }
 
             DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
@@ -549,7 +551,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
     {
         if ((unsigned int)System.m_execParam >= 1)
         {
-            System.Printf(s_drawErrorFmt, errorCode);
+            System.Printf(const_cast<char*>(s_drawErrorFmt), errorCode);
         }
 
         CFont* font = MenuPcs.m_fonts[0];
@@ -566,7 +568,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             return;
         }
 
-        Graphic._WaitDrawDone(s_fileCpp, 0x2CC);
+        Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x2CC);
 
         int compactLayout = 0;
         if (usingFallbackFont == 0 && Graphic.m_scratchTextureBuffer != 0)
@@ -666,10 +668,10 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
-        Graphic._WaitDrawDone(s_fileCpp, 0x329);
+        Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x329);
         Graphic.SetStdDispCopySrc();
         Graphic.SetStdDispCopyDst();
-        Graphic._WaitDrawDone(s_fileCpp, 0x32D);
+        Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x32D);
         VIWaitForRetrace();
         Sound.PauseDiscError(1);
         VISetBlack(FALSE);
@@ -693,7 +695,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             GXCopyDisp(Graphic.m_frameBuffer, GX_FALSE);
         }
 
-        Graphic._WaitDrawDone(s_fileCpp, 0x35B);
+        Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x35B);
         m_fatalDiskErrorFlag = 0;
 
         int status = DVDGetCommandBlockStatus(&info.cb);

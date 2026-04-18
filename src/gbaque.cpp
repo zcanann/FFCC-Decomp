@@ -94,14 +94,14 @@ static inline unsigned int SwapU32(unsigned int value)
 	return (value << 24) | ((value >> 8 & 0xFF) << 16) | ((value >> 16 & 0xFF) << 8) | (value >> 24);
 }
 
-static char s_gbaque_cpp[] = "gbaque.cpp";
-static char s_mem_alloc_error[] = "%s[%d] Error! memory allocation.\n";
-static char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
-static char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
-static char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
-static char s_cmake_name_crc_error[] = "%s[%d] Error! ChkCMakeName() crc.\n";
-static char s_cmake_favorite_crc_error[] = "%s[%d] Error! CMakeFavorite() crc.\n";
-static char s_unknown_mapobj_type_error[] = "Error! Unknown mapobj type = %d.\n";
+static const char s_gbaque_cpp[] = "gbaque.cpp";
+static const char s_mem_alloc_error[] = "%s[%d] Error! memory allocation.\n";
+static const char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
+static const char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
+static const char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
+static const char s_cmake_name_crc_error[] = "%s[%d] Error! ChkCMakeName() crc.\n";
+static const char s_cmake_favorite_crc_error[] = "%s[%d] Error! CMakeFavorite() crc.\n";
+static const char s_unknown_mapobj_type_error[] = "Error! Unknown mapobj type = %d.\n";
 extern float FLOAT_80330D54;
 
 /*
@@ -1922,32 +1922,32 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
 		return;
 	}
 
-	char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x800, Game.m_mainStage, s_gbaque_cpp, 0x7A7));
+char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x7A7));
 	if (npcNameBuf == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x7A9);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x7A9);
 		}
 		return;
 	}
 	memset(npcNameBuf, 0, 0x800);
 
-	char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x1800, Game.m_mainStage, s_gbaque_cpp, 0x7B1));
+char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x1800, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x7B1));
 	if (subjectNameBuf == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x7B3);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x7B3);
 		}
 		__dla__FPv(npcNameBuf);
 		return;
 	}
 	memset(subjectNameBuf, 0, 0x1800);
 
-	unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x4000, Game.m_mainStage, s_gbaque_cpp, 0x7BB));
+unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x4000, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x7BB));
 	if (letterEntryBuf == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x7BD);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x7BD);
 		}
 		__dla__FPv(subjectNameBuf);
 		__dla__FPv(npcNameBuf);
@@ -1991,7 +1991,7 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
 
 		if (matchedNpc == -1) {
 			if (npcCount > 0x7F && System.m_execParam != 0) {
-				Printf__7CSystemFPce(&System, s_npc_max_over, s_gbaque_cpp, 0x7DC);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
 			}
 
 			char tempName[0x20];
@@ -2008,7 +2008,7 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
 
 		if (matchedSubject == -1) {
 			if (subjectCount > 0xFF && System.m_execParam != 0) {
-				Printf__7CSystemFPce(&System, s_subject_max_over, s_gbaque_cpp, 0x7F0);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
 			}
 
 			char tempSubject[0x20];
@@ -2044,7 +2044,7 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
 					flags |= 0x10;
 					entryWrite[0] = (value << 24) | ((value >> 8) << 16);
 				} else if (System.m_execParam != 0) {
-					Printf__7CSystemFPce(&System, s_letter_data_error, s_gbaque_cpp, 0x810, channel, i);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
 				}
 			}
 		} else if (value != 0) {
@@ -2093,21 +2093,21 @@ void GbaQueue::MakeLetterList(int channel, char* outData)
  */
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
-    char* srcText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-        0x400, Game.m_mainStage, s_gbaque_cpp, 0x859));
+char* srcText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x859));
     if (srcText == 0) {
         if (System.m_execParam != 0) {
-            Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x85B);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x85B);
         }
         return -1;
     }
     memset(srcText, 0, 0x400);
 
-    char* workText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-        0x400, Game.m_mainStage, s_gbaque_cpp, 0x862));
+char* workText = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0x862));
     if (workText == 0) {
         if (System.m_execParam != 0) {
-            Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x864);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0x864);
         }
         __dla__FPv(srcText);
         return -1;
@@ -2299,7 +2299,7 @@ void GbaQueue::LoadMapObj()
 					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
 					mapObjWork[0] = static_cast<unsigned char>(count + 1);
 				} else if (System.m_execParam > 1) {
-					Printf__7CSystemFPce(&System, s_unknown_mapobj_type_error, objType);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_unknown_mapobj_type_error), objType);
 				}
 			}
 
@@ -2710,7 +2710,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		OSSignalSemaphore(semaphore);
 	} else {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_cmake_name_crc_error, s_gbaque_cpp, 0xAD3);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
 		}
 		Joybus.SendResult(channel, 1, resultCode, 0);
 	}
@@ -2888,7 +2888,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		OSSignalSemaphore(semaphore);
 	} else {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_cmake_favorite_crc_error, s_gbaque_cpp, 0xBDC);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp), 0xBDC);
 		}
 		Joybus.SendResult(channel, 1, resultCode, 0);
 	}
@@ -3173,21 +3173,21 @@ void GbaQueue::SmithEnd(int)
  */
 void GbaQueue::MakeBuyData(int channel, char* outData)
 {
-	char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x400, Game.m_mainStage, s_gbaque_cpp, 0xD79));
+char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xD79));
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xD7B);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xD7B);
 		}
 		return;
 	}
 	memset(itemNameScratch, 0, 0x400);
 
-	char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x400, Game.m_mainStage, s_gbaque_cpp, 0xD82));
+char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xD82));
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xD84);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xD84);
 		}
 		__dla__FPv(itemNameScratch);
 		return;
@@ -3276,21 +3276,21 @@ void GbaQueue::MakeBuyData(int channel, char* outData)
  */
 void GbaQueue::MakeSellData(int channel, char* outData)
 {
-	char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x400, Game.m_mainStage, s_gbaque_cpp, 0xDD5));
+char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xDD5));
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xDD7);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xDD7);
 		}
 		return;
 	}
 	memset(itemNameScratch, 0, 0x400);
 
-	char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-		0x400, Game.m_mainStage, s_gbaque_cpp, 0xDDE));
+char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+0x400, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xDDE));
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xDE0);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xDE0);
 		}
 		__dla__FPv(itemNameScratch);
 		return;
@@ -3386,10 +3386,10 @@ void GbaQueue::MakeSellData(int channel, char* outData)
 void GbaQueue::MakeSmithData(int channel, char* outData)
 {
 	unsigned char* smithIndices = static_cast<unsigned char*>(
-		__nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, s_gbaque_cpp, 0xE41));
+__nwa__FUlPQ27CMemory6CStagePci(0x40, Game.m_mainStage, const_cast<char*>(s_gbaque_cpp), 0xE41));
 	if (smithIndices == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xE43);
+Printf__7CSystemFPce(&System, const_cast<char*>(s_mem_alloc_error), const_cast<char*>(s_gbaque_cpp), 0xE43);
 		}
 		return;
 	}

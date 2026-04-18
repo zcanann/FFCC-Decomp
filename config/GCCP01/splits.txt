@@ -342,7 +342,7 @@ pppGetRotMatrixXYZ.cpp:
 
 pppGetRotMatrixX.cpp:
 	.text       start:0x8005F794 end:0x8005F7F0
-	.sdata2     start:0x8032FDD8 end:0x8032FDE0
+	.sdata2     start:0x8032FEB0 end:0x8032FEB8
 
 pppGetRotMatrixXZY.cpp:
 	extab       start:0x80007028 end:0x80007030
@@ -351,7 +351,7 @@ pppGetRotMatrixXZY.cpp:
 
 pppGetRotMatrixY.cpp:
 	.text       start:0x8005F868 end:0x8005F8C4
-	.sdata2     start:0x8032FDE0 end:0x8032FDE8
+	.sdata2     start:0x8032FEB8 end:0x8032FEC0
 
 pppGetRotMatrixYXZ.cpp:
 	extab       start:0x80007030 end:0x80007038
@@ -365,7 +365,7 @@ pppGetRotMatrixYZX.cpp:
 
 pppGetRotMatrixZ.cpp:
 	.text       start:0x8005F9B4 end:0x8005FA10
-	.sdata2     start:0x8032FDE8 end:0x8032FDF0
+	.sdata2     start:0x8032FEC0 end:0x8032FEC8
 
 pppGetRotMatrixZXY.cpp:
 	extab       start:0x80007040 end:0x80007048

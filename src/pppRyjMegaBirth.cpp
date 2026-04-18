@@ -391,19 +391,19 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
  */
 void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMegaBirthOffsets* offsets)
 {
-	bool hasRequiredMemory;
+	s8 hasRequiredMemory;
+	VColor* objectColor;
 	u8* particleDataBytes;
-	s32 colorOffset;
 	VRyjMegaBirth* work;
 
 	particleDataBytes = (u8*)particleData;
-	colorOffset = offsets->m_serializedDataOffsets[1];
+	objectColor = (VColor*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[1]);
 	work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
 
 	if (work->m_particleBlock == NULL)
 	{
 		work->m_numParticles = *(u16*)(particleDataBytes + 0x20);
-		work->m_particleBlock = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
 		if (work->m_particleBlock != NULL)
 		{
@@ -438,20 +438,20 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 
 	if (work->m_particleBlock == NULL)
 	{
-		hasRequiredMemory = false;
+		hasRequiredMemory = 0;
 	}
 	else if (((particleDataBytes[0xEC] == 1) || (particleDataBytes[0xEC] == 2)) &&
 	         (work->m_worldMatrixBlock == NULL))
 	{
-		hasRequiredMemory = false;
+		hasRequiredMemory = 0;
 	}
 	else if ((particleDataBytes[0xE9] == 0) || (work->m_colorBlock != NULL))
 	{
-		hasRequiredMemory = true;
+		hasRequiredMemory = 1;
 	}
 	else
 	{
-		hasRequiredMemory = false;
+		hasRequiredMemory = 0;
 	}
 
 	if (hasRequiredMemory)
@@ -476,7 +476,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 			break;
 		}
 
-		calc_particle(pObject, work, particleData, (VColor*)((u8*)pObject + 0x80 + colorOffset));
+		calc_particle(pObject, work, particleData, objectColor);
 	}
 }
 
@@ -535,10 +535,10 @@ void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 	work->m_particleBlock = 0;
 	work->m_worldMatrixBlock = 0;
 	work->m_colorBlock = 0;
-	work->m_meshData = 0;
 	work->m_numParticles = 0;
 	work->m_emitTimer = 0;
-	work->m_numParticles = 10000;
+	work->m_unused4E = 0;
+	work->m_emitTimer = 10000;
 
 	PSMTXIdentity(g_matUnit);
 }

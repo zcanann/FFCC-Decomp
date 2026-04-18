@@ -1022,34 +1022,27 @@ void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int new
 		newCommandId = -1;
 	}
 
-	int slot8 = buttonGroupIndex * 8;
-	int currentCommand = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot8 + 0x20);
+	const int currentCommand = RingMenuInt(this, 0x20 + buttonGroupIndex * 8);
 
 	if (currentCommand == newCommandId) {
 		return;
 	}
 
 	if (((currentCommand >= 0) && (newCommandId < 0)) || ((currentCommand < 0) && (newCommandId >= 0))) {
-		int slot12 = buttonGroupIndex * 12;
-		int* timer2 = reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot12 + 0x40);
-		*timer2 = 8 - *timer2;
+		RingMenuInt(this, 0x40 + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x40 + buttonGroupIndex * 12);
 	}
 
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot8 + 0x24) = currentCommand;
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot8 + 0x20) = newCommandId;
-
-	int slot12 = buttonGroupIndex * 12;
-	char* self = reinterpret_cast<char*>(this);
-	int* timer0 = reinterpret_cast<int*>(self + slot12 + 0x38);
-	*reinterpret_cast<int*>(self + slot12 + 0x3c) = 8 - *timer0;
-	*timer0 = 8 - *timer0;
+	RingMenuInt(this, 0x24 + buttonGroupIndex * 8) = currentCommand;
+	RingMenuInt(this, 0x20 + buttonGroupIndex * 8) = newCommandId;
+	RingMenuInt(this, 0x3C + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x38 + buttonGroupIndex * 12);
+	RingMenuInt(this, 0x38 + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x38 + buttonGroupIndex * 12);
 
 	if (buttonGroupIndex != 2) {
 		return;
 	}
 
-	*reinterpret_cast<int*>(self + 0x60) = *reinterpret_cast<int*>(self + 0x5c);
-	*reinterpret_cast<int*>(self + 0x5c) = newRotation;
+	RingMenuInt(this, 0x60) = RingMenuInt(this, 0x5C);
+	RingMenuInt(this, 0x5C) = newRotation;
 }
 
 /*

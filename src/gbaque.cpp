@@ -10,29 +10,12 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"
-extern "C" {
-extern unsigned int gGbaStatusWordTriplet0[];
-extern unsigned int gGbaStatusWordTriplet1[];
-extern unsigned int gGbaStatusWordTriplet2[];
-extern unsigned int gGbaStatusWordTriplet3[];
-extern unsigned int gGbaStatusWordTable[];
-}
 #include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
 
 GbaQueue GbaQue;
-
-unsigned int gGbaStatusWordTriplet0[] = {0x00000000, 0xFFFFFFFF, 0x80097918};
-unsigned int gGbaStatusWordTriplet1[] = {0x00000000, 0xFFFFFFFF, 0x800978D4};
-unsigned int gGbaStatusWordTriplet2[] = {0x00000000, 0xFFFFFFFF, 0x8009788C};
-unsigned int gGbaStatusWordTriplet3[] = {0x00000000, 0xFFFFFFFF, 0x80097888};
-unsigned int gGbaStatusWordTable[0x57] = {
-    0x80330870, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000023, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000045, 0x00000001,
-};
 
 extern "C" int rand(void);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);

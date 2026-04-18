@@ -12491,6 +12491,7 @@ gGbaStatusWordTriplet3 = .data:0x8020F31C; // type:object size:0xC data:4byte
 gGbaStatusWordTable = .data:0x8020F328; // type:object size:0x15C
 lbl_8020F484 = .data:0x8020F484; // type:object size:0xC
 lbl_8020F490 = .data:0x8020F490; // type:object size:0x4
+lbl_8020F494 = .data:0x8020F494; // type:object size:0x10
 __vt__7CGbaPcs = .data:0x8020F4A4; // type:object size:0x24
 jumptable_8020F4C8 = .data:0x8020F4C8; // type:object size:0x8C scope:local
 jumptable_8020F554 = .data:0x8020F554; // type:object size:0x158 scope:local

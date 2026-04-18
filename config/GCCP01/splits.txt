@@ -278,6 +278,7 @@ p_FunnyShape.cpp:
 	.ctors      start:0x801D5400 end:0x801D5404
 	.data       start:0x801EA914 end:0x801EA948
 	.bss        start:0x8026D728 end:0x80273928
+	.sbss       start:0x8032ED28 end:0x8032ED35
 
 FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8

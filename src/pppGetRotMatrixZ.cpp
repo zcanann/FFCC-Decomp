@@ -1,16 +1,22 @@
+#include "ffcc/ppp_constants.h"
 #include "ffcc/pppGetRotMatrixZ.h"
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005F9B4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppGetRotMatrixZ(pppFMATRIX& mtx, long angle)
-{    
-	float zero = 0.0f;
-	float one = 1.0f;
-	float sinValue = *(float*)((unsigned char*)ppvSinTbl + (angle & 0xFFFC));
-	float cosValue = *(float*)((unsigned char*)ppvSinTbl + ((angle + 0x4000) & 0xFFFC));
+{
+    unsigned int tableAngle = angle;
+    float one = 1.0f;
+    float zero = 0.0f;
+    float sinValue = *(float*)((unsigned char*)gPppTrigTable + (tableAngle & 0xFFFC));
+    float cosValue = *(float*)((unsigned char*)gPppTrigTable + ((tableAngle + 0x4000) & 0xFFFC));
 
     mtx.value[0][0] = cosValue;
     mtx.value[0][1] = -sinValue;

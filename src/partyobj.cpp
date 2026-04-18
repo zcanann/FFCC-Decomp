@@ -53,7 +53,7 @@ struct GhostPartyWork {
 	int auraParticle;
 };
 
-static GhostPartyWork sGhostPartyWork = {};
+static GhostPartyWork sGhostPartyWork;
 
 struct PartyObjOverlay {
 	unsigned char partyFlags;

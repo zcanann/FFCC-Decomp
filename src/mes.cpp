@@ -23,7 +23,7 @@ extern float FLOAT_803308ac;
 extern float FLOAT_803308b0;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
-int CMes::m_tempVar[0x14] = {};
+int CMes::m_tempVar[0x14];
 extern "C" int toupper(int);
 extern "C" int tolower(int);
 

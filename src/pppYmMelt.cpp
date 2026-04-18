@@ -78,6 +78,8 @@ struct CMapCylinderRaw {
     f32 m_height;
     Vec m_top;
     Vec m_direction2;
+    f32 m_radius2;
+    f32 m_height2;
 };
 
 /*

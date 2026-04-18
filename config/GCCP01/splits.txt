@@ -751,11 +751,14 @@ pppRyjMegaBirth.cpp:
 	extab       start:0x80007988 end:0x800079C0
 	extabindex  start:0x8000DBA0 end:0x8000DBF4
 	.text       start:0x80082278 end:0x800841E4
+	.rodata     start:0x801D9C00 end:0x801D9C14
+	.bss        start:0x802EA080 end:0x802EA0B0
 
 pppRyjMegaBirthModel.cpp:
 	extab       start:0x800079C0 end:0x80007A00
 	extabindex  start:0x8000DBF4 end:0x8000DC54
 	.text       start:0x800841E4 end:0x80087EF0
+	.rodata     start:0x801D9C18 end:0x801D9C31
 
 pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08
@@ -803,11 +806,13 @@ pppYmMegaBirthShpTail2.cpp:
 	extab       start:0x80007A80 end:0x80007AB0
 	extabindex  start:0x8000DD14 end:0x8000DD5C
 	.text       start:0x8008ACC4 end:0x8008CA98
+	.rodata     start:0x801D9C68 end:0x801D9C83
 
 pppYmMegaBirthShpTail3.cpp:
 	extab       start:0x80007AB0 end:0x80007AE0
 	extabindex  start:0x8000DD5C end:0x8000DDA4
 	.text       start:0x8008CA98 end:0x8008ECA0
+	.rodata     start:0x801D9C88 end:0x801D9CA3
 
 pppKeLns.cpp:
 	extab       start:0x80007AE0 end:0x80007AE8
@@ -1185,6 +1190,7 @@ wm_menu.cpp:
 	extab       start:0x80008DE4 end:0x80009024
 	extabindex  start:0x8000F9A0 end:0x8000FD00
 	.text       start:0x800E6B98 end:0x80102FB4
+	.rodata     start:0x801DC418 end:0x801DC424
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C

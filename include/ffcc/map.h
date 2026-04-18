@@ -35,6 +35,21 @@ public:
     void ReadJun(CChunkFile&, int);
     void ReadFrame(CChunkFile&, int);
     void ReadKey(CChunkFile&, int);
+
+    unsigned char m_mode;      // 0x00
+    unsigned char m_junCount;  // 0x01
+    unsigned char m_keyCount;  // 0x02
+    unsigned char m_loop;      // 0x03
+    unsigned char m_isRun;     // 0x04
+    unsigned char m_pad05[3];  // 0x05
+    int m_currentFrame;        // 0x08
+    int m_startFrame;          // 0x0C
+    int m_endFrame;            // 0x10
+    int m_frameCount;          // 0x14
+    unsigned char* m_junTable; // 0x18
+    float* m_keyFrame;         // 0x1C
+    float* m_keyValue;         // 0x20
+    float* m_splineTable;      // 0x24
 };
 
 class CMapIdGrp

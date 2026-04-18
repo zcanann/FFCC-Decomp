@@ -248,17 +248,14 @@ CMapKeyFrame::~CMapKeyFrame()
  */
 float CMapKeyFrame::Get()
 {
-    const int keyCount = static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2)));
-    const int currentFrame = *reinterpret_cast<int*>(Ptr(this, 8));
-    float* keyValue = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20)));
-    float* keyFrame = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C)));
-    float* splineTable = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x24)));
-
-    if (*reinterpret_cast<unsigned char*>(Ptr(this, 0)) == 1) {
-        return Spline1D__5CMathFifPfPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame, splineTable);
+    if (m_mode == 1) {
+        return Spline1D__5CMathFifPfPfPf(
+            &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame,
+            m_splineTable);
     }
-    if (*reinterpret_cast<unsigned char*>(Ptr(this, 0)) == 0) {
-        return Line1D__5CMathFifPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame);
+    if (m_mode == 0) {
+        return Line1D__5CMathFifPfPf(
+            &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     }
     return 0.0f;
 }
@@ -1207,47 +1204,42 @@ CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
  */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
-    const unsigned char mode = *reinterpret_cast<unsigned char*>(Ptr(this, 0));
-    const int keyCount = static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2)));
-    const int currentFrame = *reinterpret_cast<int*>(Ptr(this, 8));
-    unsigned char* junTable = *reinterpret_cast<unsigned char**>(Ptr(this, 0x18));
-    float* keyFrame = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C)));
-    float* keyValue = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20)));
-    float* splineTable = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x24)));
-
-    if (mode == 1) {
-        blend = Spline1D__5CMathFifPfPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame, splineTable);
-    } else if (mode == 0) {
-        blend = Line1D__5CMathFifPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame);
+    if (m_mode == 1) {
+        blend = Spline1D__5CMathFifPfPfPf(
+            &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame,
+            m_splineTable);
+    } else if (m_mode == 0) {
+        blend =
+            Line1D__5CMathFifPfPf(&Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     } else {
         blend = 0.0f;
-        key0 = junTable[0];
+        key0 = m_junTable[0];
         key1 = key0;
         return 0;
     }
 
     if (blend > 0.0f) {
-        const float junMax = static_cast<float>(*reinterpret_cast<unsigned char*>(Ptr(this, 1)) - 1);
+        const float junMax = static_cast<float>(m_junCount - 1);
         if (blend < junMax) {
             key0 = static_cast<int>(blend);
             key1 = static_cast<int>(1.0f + blend);
             blend = blend - static_cast<float>(key0);
-            key0 = junTable[key0];
+            key0 = m_junTable[key0];
             if (blend == 0.0f) {
                 key1 = key0;
                 return 0;
             }
-            key1 = junTable[key1];
+            key1 = m_junTable[key1];
             return 1;
         }
 
-        key0 = junTable[*reinterpret_cast<unsigned char*>(Ptr(this, 1)) - 1];
+        key0 = m_junTable[m_junCount - 1];
         key1 = key0;
         blend = 1.0f;
         return 0;
     }
 
-    key0 = junTable[0];
+    key0 = m_junTable[0];
     key1 = key0;
     blend = 0.0f;
     return 0;
@@ -1260,27 +1252,21 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
  */
 void CMapKeyFrame::Calc()
 {
-    int& currentFrame = *reinterpret_cast<int*>(Ptr(this, 8));
-    const int startFrame = *reinterpret_cast<int*>(Ptr(this, 0xC));
-    const int endFrame = *reinterpret_cast<int*>(Ptr(this, 0x10));
-    unsigned char& loop = *reinterpret_cast<unsigned char*>(Ptr(this, 3));
-    unsigned char& isRun = *reinterpret_cast<unsigned char*>(Ptr(this, 4));
-
-    currentFrame++;
-    if (currentFrame <= endFrame) {
+    m_currentFrame++;
+    if (m_currentFrame <= m_endFrame) {
         return;
     }
-    if (startFrame == endFrame) {
-        isRun = 0;
+    if (m_startFrame == m_endFrame) {
+        m_isRun = 0;
         return;
     }
-    if (loop != 0) {
-        currentFrame = startFrame;
+    if (m_loop != 0) {
+        m_currentFrame = m_startFrame;
         return;
     }
 
-    currentFrame = endFrame;
-    isRun = 0;
+    m_currentFrame = m_endFrame;
+    m_isRun = 0;
 }
 
 /*

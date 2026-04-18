@@ -19,7 +19,7 @@ extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
-extern unsigned char Chara[];
+extern unsigned char DAT_802E78E0[];
 extern CCharaPcs CharaPcs;
 
 namespace {
@@ -273,11 +273,13 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 							chunkFile.Get(anim.m_bank, chunk.m_size);
 
 							Memory.CopyToAMemorySync(
-								    anim.m_bank, reinterpret_cast<void*>(S32At(Chara, 8308) + S32At((void*)S32At(Chara, 8284), 8)),
-									    anim.m_bankSize);
+							    anim.m_bank,
+							    reinterpret_cast<void*>(
+							        S32At(DAT_802E78E0, 8308) + S32At((void*)S32At(DAT_802E78E0, 8284), 8)),
+							    anim.m_bankSize);
 
-									anim.m_bankAddress = S32At(Chara, 8308);
-									S32At(Chara, 8308) = S32At(Chara, 8308) + anim.m_bankSize;
+							anim.m_bankAddress = S32At(DAT_802E78E0, 8308);
+							S32At(DAT_802E78E0, 8308) = S32At(DAT_802E78E0, 8308) + anim.m_bankSize;
 							if (anim.m_bank != 0) {
 								__dl__FPv(anim.m_bank);
 								anim.m_bank = 0;
@@ -363,7 +365,7 @@ void CChara::CAnim::InitQuantize()
 	unsigned long qy = ((unsigned long)anim.m_quantizeY << 0x18) | 0x70000 | ((unsigned long)anim.m_quantizeY << 8) | 7;
 	unsigned long qz = ((unsigned long)anim.m_quantizeZ << 0x18) | 0x70000 | ((unsigned long)anim.m_quantizeZ << 8) | 7;
 
-	gqrInit__6CCharaFUlUlUl(Chara, qx, qy, qz);
+	gqrInit__6CCharaFUlUlUl(DAT_802E78E0, qx, qy, qz);
 }
 
 /*
@@ -428,13 +430,13 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 			}
 		}
 
+		SetGroup__7CMemoryFPvi(&Memory, animFields.m_bank, 1);
+		CopyFromAMemorySync__7CMemoryFPvPvUl(
+		    &Memory, animFields.m_bank,
+		    reinterpret_cast<void*>(
+		        animFields.m_bankAddress + S32At(reinterpret_cast<void*>(S32At(DAT_802E78E0, 8284)), 8)),
+		    animFields.m_bankSize);
 	}
-
-	SetGroup__7CMemoryFPvi(&Memory, animFields.m_bank, 1);
-	CopyFromAMemorySync__7CMemoryFPvPvUl(
-	    &Memory, animFields.m_bank,
-	    reinterpret_cast<void*>(animFields.m_bankAddress + S32At(reinterpret_cast<void*>(S32At(Chara, 8284)), 8)),
-	    animFields.m_bankSize);
 
 	int frameInt = static_cast<int>(frame);
 	animFields.m_lastFrame = 0;

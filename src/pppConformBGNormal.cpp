@@ -7,12 +7,13 @@
 extern "C" {
 extern const f32 kPppConformBgNormalZero;
 extern const f32 kPppConformBgNormalOne;
-extern const f32 kPppConformBgNormalDownRayY;
-extern const f32 kPppConformBgNormalCylinderRadius;
-extern const f32 kPppConformBgNormalCylinderHeight;
-extern const f32 kPppConformBgNormalGroundSnapLimit;
 extern int gPppCalcDisabled;
 }
+
+const f32 kPppConformBgNormalDownRayY = -2000.0f;
+const f32 kPppConformBgNormalCylinderRadius = 10000000000.0f;
+const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
+const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include <math.h>

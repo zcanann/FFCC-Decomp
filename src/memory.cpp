@@ -20,6 +20,15 @@ static const char s_heapWalkerUseFmt[] = "Use  :%5dKB  %s\n";
 static const char s_heapWalkerUnuseFmt[] = "Unuse:%5dKB\n";
 static const char s_heapWalkerTotalFmt[] = "Total:%5dKB  Use:%5dKB  Unuse:%5dKB\n";
 static const char s_drawHeapTitleFmt[] = "%4d %4d %4d";
+static const char s_heapWalkerBanner[] = "***** HEAP WALKER *****\n";
+static const char s_heapWalkerStageNameFmt[] = "Stage Name : %s\n";
+static const char s_heapWalkerHeaderFmt[] = " No Flag Level  Size  Total  Address   Top      Tail     Source\n";
+static const char s_heapWalkerSeparator[] = "-----------------------------------------------------------------\n";
+static const char s_heapWalkerEntryFmt[] = "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n";
+static const char s_heapWalkerUseUnuseFmt[] = "USE  : %d  UNUSE : %d\n";
+static const char s_amemCacheAddRefFmt[] = "amemCacheSet AddRef over %d\n";
+static const char s_amemCacheSeparator[] = "--------------------------------\n";
+static const char s_refCntCompareBanner[] = "---------- RefCnt0 Compare ----------\n";
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
@@ -1129,12 +1138,10 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     }
 
     if (flag == -1) {
-        Printf__7CSystemFPce(&System, "***** HEAP WALKER *****\n");
-        Printf__7CSystemFPce(&System, "Stage Name : %s\n", stageGetSourceName(this));
-        Printf__7CSystemFPce(&System,
-                             " No Flag Level  Size  Total  Address   Top      Tail     Source\n");
-        Printf__7CSystemFPce(&System,
-                             "-----------------------------------------------------------------\n");
+        Printf__7CSystemFPce(&System, s_heapWalkerBanner);
+        Printf__7CSystemFPce(&System, s_heapWalkerStageNameFmt, stageGetSourceName(this));
+        Printf__7CSystemFPce(&System, s_heapWalkerHeaderFmt);
+        Printf__7CSystemFPce(&System, s_heapWalkerSeparator);
     }
 
     int totalSize = 0;
@@ -1153,9 +1160,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             int size = blockTail - top;
             if (size != 0) {
                 if ((flag & 1) != 0) {
-                    Printf__7CSystemFPce(&System,
-                                         "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n",
-                                         freeCount, "FREE", 0, size, totalSize, 0, 0, "-------", 0);
+                    Printf__7CSystemFPce(
+                        &System, s_heapWalkerEntryFmt, freeCount, "FREE", 0, size, totalSize, 0, 0, "-------", 0);
                 }
                 usedSize += size;
                 totalSize += size;
@@ -1166,7 +1172,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
                 if ((flag & 2) != 0) {
                     Printf__7CSystemFPce(
-                        &System, "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n", usedCount, "USED",
+                        &System, s_heapWalkerEntryFmt, usedCount, "USED",
                         *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
                         *reinterpret_cast<int*>(node + 4), 0, reinterpret_cast<char*>(node + 0x1A),
                         *reinterpret_cast<unsigned short*>(node + 0x18));
@@ -1192,9 +1198,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                     unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
                     int index = isUsed ? usedCount : freeCount;
                     Printf__7CSystemFPce(
-                        &System, "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n", index, kind, level,
-                        *reinterpret_cast<int*>(node + 0x10), totalSize, node + 0x40,
-                        *reinterpret_cast<int*>(node + 4), source, line);
+                        &System, s_heapWalkerEntryFmt, index, kind, level, *reinterpret_cast<int*>(node + 0x10),
+                        totalSize, node + 0x40, *reinterpret_cast<int*>(node + 4), source, line);
                 }
             }
 
@@ -1214,9 +1219,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     }
 
     if (flag == -1) {
-        Printf__7CSystemFPce(&System,
-                             "-----------------------------------------------------------------\n");
-        Printf__7CSystemFPce(&System, "USE  : %d  UNUSE : %d\n", freeSize, usedSize);
+        Printf__7CSystemFPce(&System, s_heapWalkerSeparator);
+        Printf__7CSystemFPce(&System, s_heapWalkerUseUnuseFmt, freeSize, usedSize);
     }
 
     return freeSize;
@@ -1931,7 +1935,7 @@ void CAmemCacheSet::AddRef(short index)
     *reinterpret_cast<short*>(entry + 0x0C) += 1;
     if (*reinterpret_cast<short*>(entry + 0x0C) == -1) {
         if (System.m_execParam > 2) {
-            Printf__7CSystemFPce(&System, "amemCacheSet AddRef over %d\n", static_cast<int>(index));
+            Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt, static_cast<int>(index));
         }
 
         int count = *reinterpret_cast<int*>(bytes + 0x3C);
@@ -1952,7 +1956,7 @@ void CAmemCacheSet::AddRef(short index)
         }
 
         if (System.m_execParam > 2) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
         void (*overflowHook)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
@@ -1982,7 +1986,7 @@ void CAmemCacheSet::Release(short index)
 
     if (*reinterpret_cast<short*>(tableBase + static_cast<int>(index) * 0x1C + 0x0C) == -1) {
         if (System.m_execParam > 2) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
         int offset = 0;
@@ -2000,7 +2004,7 @@ void CAmemCacheSet::Release(short index)
         }
 
         if (System.m_execParam > 2) {
-            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, s_amemCacheSeparator);
         }
 
         void (*onUnderflow)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
@@ -2204,7 +2208,7 @@ void CAmemCacheSet::RefCnt0Compare()
     unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, "---------- RefCnt0 Compare ----------\n");
+        Printf__7CSystemFPce(&System, s_refCntCompareBanner);
     }
 
     int count = *reinterpret_cast<int*>(bytes + 0x3C);
@@ -2222,7 +2226,7 @@ void CAmemCacheSet::RefCnt0Compare()
     }
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 }
 
@@ -2240,7 +2244,7 @@ void CAmemCacheSet::AssertCache()
     unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 
     int count = *reinterpret_cast<int*>(bytes + 0x3C);
@@ -2259,7 +2263,7 @@ void CAmemCacheSet::AssertCache()
     }
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, s_amemCacheSeparator);
     }
 }
 

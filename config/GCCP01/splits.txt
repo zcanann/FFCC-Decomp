@@ -219,7 +219,7 @@ p_game.cpp:
 	extabindex  start:0x8000C460 end:0x8000C508
 	.text       start:0x80047930 end:0x80047C9C
 	.ctors      start:0x801D53F0 end:0x801D53F4
-	.data       start:0x801EA09C end:0x801EA0D0
+	.data       start:0x801E9F2C end:0x801EA0D0
 	.sbss       start:0x8032ED00 end:0x8032ED04
 
 p_system.cpp:

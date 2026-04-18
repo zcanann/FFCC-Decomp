@@ -719,6 +719,7 @@ pppShape.cpp:
 	extab       start:0x80007208 end:0x80007248
 	extabindex  start:0x8000D1BC end:0x8000D21C
 	.text       start:0x80065678 end:0x80065CAC
+	.sdata2     start:0x80330110 end:0x80330118
 
 cflat_runtime.cpp:
 	extab       start:0x80007248 end:0x80007310
@@ -1329,6 +1330,7 @@ pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784
 	extabindex  start:0x80010804 end:0x80010810
 	.text       start:0x8012B4A8 end:0x8012B710
+	.sdata2     start:0x80331C08 end:0x80331C18
 
 p_dbgmenu.cpp:
 	extab       start:0x80009784 end:0x800097EC

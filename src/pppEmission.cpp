@@ -170,18 +170,15 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
 
-    EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
-    EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    EmissionMeshData* meshData = ((EmissionModelView*)model)->m_meshes[meshIndex].m_data;
     if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
-        int textureInfo = state->m_texture;
         pppInitBlendMode();
         pppSetBlendMode(step->m_payload[8]);
-        *(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
+        *(int*)(MaterialManRaw() + 0xD0) = state->m_texture + 0x28;
 
-        u8 mode = step->m_payload[9];
-        if (mode == 0) {
+        if (step->m_payload[9] == 0) {
             for (u32 i = 0; i < step->m_initWOrk; i++) {
                 float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
                 Mtx objMtx;
@@ -210,18 +207,17 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
+                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
 
-                    u8 texMode = step->m_payload[10];
-                    if (texMode == 0) {
+                    if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         Mtx texMtx;
                         PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
                         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
-                        if (texMode == 1) {
+                        if (step->m_payload[10] == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-                        } else if (texMode == 2) {
+                        } else if (step->m_payload[10] == 2) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
                         }
                     }
@@ -232,7 +228,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     displayList++;
                 }
             }
-        } else if (mode == 1) {
+        } else if (step->m_payload[9] == 1) {
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = particle->m_scale;
@@ -263,18 +259,17 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
+                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
 
-                    u8 texMode = step->m_payload[10];
-                    if (texMode == 0) {
+                    if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         Mtx texMtx;
                         PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
                         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
-                        if (texMode == 1) {
+                        if (step->m_payload[10] == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-                        } else if (texMode == 2) {
+                        } else if (step->m_payload[10] == 2) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
                         }
                     }

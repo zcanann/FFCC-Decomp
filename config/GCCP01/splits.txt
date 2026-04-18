@@ -1055,6 +1055,7 @@ sound.cpp:
 	.text       start:0x800C4FD8 end:0x800C8A8C
 	.ctors      start:0x801D542C end:0x801D5430
 	.bss        start:0x802F26C4 end:0x802F49B0
+	.sdata2     start:0x80330CE0 end:0x80330D20
 
 gbaque.cpp:
 	extab       start:0x800086CC end:0x80008A64

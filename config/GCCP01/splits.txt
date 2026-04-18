@@ -1274,24 +1274,25 @@ pppMana2.cpp:
 	extabindex  start:0x8000FE8C end:0x8000FF1C
 	.text       start:0x8010617C end:0x801091D4
 	.rodata     start:0x801DC4E0 end:0x801DC4F0
+	.sdata2     start:0x80331898 end:0x80331910
 
 pppConformBGNormal.cpp:
 	extab       start:0x8000918C end:0x80009194
 	extabindex  start:0x8000FF1C end:0x8000FF28
 	.text       start:0x801091D4 end:0x80109810
-	.sdata2     start:0x80331898 end:0x803318A8
+	.sdata2     start:0x80331910 end:0x80331928
 
 pppAlignmentScale.cpp:
 	extab       start:0x80009194 end:0x8000919C
 	extabindex  start:0x8000FF28 end:0x8000FF34
 	.text       start:0x80109810 end:0x80109930
-	.sdata2     start:0x803318A8 end:0x803318B0
+	.sdata2     start:0x80331928 end:0x80331930
 
 pppMiasma.cpp:
 	extab       start:0x8000919C end:0x800091B4
 	extabindex  start:0x8000FF34 end:0x8000FF58
 	.text       start:0x80109930 end:0x8010B150
-	.sdata2     start:0x803318B0 end:0x803318C0
+	.sdata2     start:0x80331930 end:0x80331958
 
 baseobj.cpp:
 	extab       start:0x800091B4 end:0x800091E4
@@ -1302,7 +1303,7 @@ quadobj.cpp:
 	extab       start:0x800091E4 end:0x800091EC
 	extabindex  start:0x8000FFA0 end:0x8000FFAC
 	.text       start:0x8010B2A4 end:0x8010B660
-	.sdata2     start:0x80331958 end:0x8033195C
+	.sdata2     start:0x80331958 end:0x80331968
 
 charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
@@ -1310,18 +1311,21 @@ charaobj.cpp:
 	.text       start:0x8010B660 end:0x80112D54
 	.data       start:0x802112E8 end:0x80211498
 	.sbss       start:0x8032EE68 end:0x8032EE70
+	.sdata2     start:0x80331968 end:0x803319C8
 
 monobj.cpp:
 	extab       start:0x800092E4 end:0x8000944C
 	extabindex  start:0x80010120 end:0x8001033C
 	.text       start:0x80112D54 end:0x8011A574
 	.data       start:0x80211498 end:0x802116A4
+	.sdata2     start:0x803319C8 end:0x80331A58
 
 partyobj.cpp:
 	extab       start:0x8000944C end:0x800095FC
 	extabindex  start:0x8001033C end:0x800105C4
 	.text       start:0x8011A574 end:0x80124998
 	.data       start:0x802116A4 end:0x80211848
+	.sdata2     start:0x80331A58 end:0x80331B18
 
 p_mc.cpp:
 	extab       start:0x800095FC end:0x8000960C
@@ -1330,17 +1334,20 @@ p_mc.cpp:
 	.ctors      start:0x801D5438 end:0x801D543C
 	.data       start:0x80211F28 end:0x80211F4C
 	.sbss       start:0x8032EE88 end:0x8032EE8D
+	.sdata2     start:0x80331B18 end:0x80331B20
 
 itemobj.cpp:
 	extab       start:0x8000960C end:0x8000968C
 	extabindex  start:0x800105DC end:0x8001069C
 	.text       start:0x80124B78 end:0x80127008
 	.sbss       start:0x8032EE90 end:0x8032EE94
+	.sdata2     start:0x80331B20 end:0x80331BD0
 
 prgobj.cpp:
 	extab       start:0x8000968C end:0x8000970C
 	extabindex  start:0x8001069C end:0x8001075C
 	.text       start:0x80127008 end:0x80127B54
+	.sdata2     start:0x80331BD0 end:0x80331C08
 
 pppBindOnlyPos.cpp:
 	.text       start:0x80127B54 end:0x80127B74

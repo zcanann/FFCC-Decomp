@@ -217,13 +217,13 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             m_anims[count] = ref;
             break;
         case 0x4A554E20:
-            KeyFrame(Fields(ref))->ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+            KeyFrame(Fields(ref))->ReadJun(chunkFile, chunk.m_arg0);
             break;
         case 0x4652414D:
             KeyFrame(Fields(ref))->ReadFrame(chunkFile, chunk.m_arg0);
             break;
         case 0x4B455920:
-            KeyFrame(Fields(ref))->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+            KeyFrame(Fields(ref))->ReadKey(chunkFile, chunk.m_arg0);
             ref->m_usesKeyFrame = 1;
             break;
         }
@@ -414,33 +414,40 @@ CMapTexAnim::CMapTexAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapTexAnim::~CMapTexAnim()
+extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim* anim, short shouldDelete)
 {
-    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
+    if (anim != 0) {
+        unsigned char* const p = reinterpret_cast<unsigned char*>(anim);
 
-    *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
+        *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
 
-    __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
-    *reinterpret_cast<void**>(p + 0x20) = 0;
+        __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
+        *reinterpret_cast<void**>(p + 0x20) = 0;
 
-    if ((reinterpret_cast<int>(this) + 0x24) != 0) {
-        if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
-            *reinterpret_cast<void**>(p + 0x3C) = 0;
+        if ((reinterpret_cast<int>(anim) + 0x24) != 0) {
+            if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
+                *reinterpret_cast<void**>(p + 0x3C) = 0;
+            }
+            if (*reinterpret_cast<void**>(p + 0x40) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x40));
+                *reinterpret_cast<void**>(p + 0x40) = 0;
+            }
+            if (*reinterpret_cast<void**>(p + 0x44) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x44));
+                *reinterpret_cast<void**>(p + 0x44) = 0;
+            }
+            if (*reinterpret_cast<void**>(p + 0x48) != 0) {
+                __dl__FPv(*reinterpret_cast<void**>(p + 0x48));
+                *reinterpret_cast<void**>(p + 0x48) = 0;
+            }
         }
-        if (*reinterpret_cast<void**>(p + 0x40) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x40));
-            *reinterpret_cast<void**>(p + 0x40) = 0;
-        }
-        if (*reinterpret_cast<void**>(p + 0x44) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x44));
-            *reinterpret_cast<void**>(p + 0x44) = 0;
-        }
-        if (*reinterpret_cast<void**>(p + 0x48) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(p + 0x48));
-            *reinterpret_cast<void**>(p + 0x48) = 0;
+
+        __dt__4CRefFv(anim, 0);
+        if (shouldDelete > 0) {
+            __dl__FPv(anim);
         }
     }
 
-    __dt__4CRefFv(this, 0);
+    return anim;
 }

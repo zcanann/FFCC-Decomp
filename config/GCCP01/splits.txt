@@ -42,6 +42,7 @@ graphic.cpp:
 	extabindex  start:0x8000AFFC end:0x8000B1DC
 	.text       start:0x80016400 end:0x80019F88
 	.ctors      start:0x801D53AC end:0x801D53B0
+	.data       start:0x801E83FC end:0x801E8450
 	.bss        start:0x80230E48 end:0x8023C4D8
 	.sbss       start:0x8032EC48 end:0x8032EC4C
 
@@ -139,6 +140,7 @@ mapobj.cpp:
 	extab       start:0x80005EC8 end:0x80005FB0
 	extabindex  start:0x8000B860 end:0x8000B9BC
 	.text       start:0x800287D0 end:0x8002C704
+	.data       start:0x801E88E4 end:0x801E8950
 	.sdata      start:0x8032E8B8 end:0x8032E8BC
 
 mapocttree.cpp:
@@ -287,6 +289,7 @@ maptexanim.cpp:
 	extabindex  start:0x8000C844 end:0x8000C880
 	.text       start:0x8004F910 end:0x800503FC
 	.rodata     start:0x801D7EC4 end:0x801D7ED4
+	.data       start:0x801EA9A4 end:0x801EA9B0
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0
@@ -303,6 +306,7 @@ p_tina.cpp:
 	extabindex  start:0x8000C910 end:0x8000CA9C
 	.text       start:0x80051F38 end:0x80053D04
 	.ctors      start:0x801D5404 end:0x801D5408
+	.data       start:0x801EAD94 end:0x801EADC8
 	.sbss       start:0x8032ED50 end:0x8032ED68
 	.sdata2     start:0x8032FDC8 end:0x8032FDD8
 
@@ -912,6 +916,7 @@ gobjwork.cpp:
 	extab       start:0x80007E04 end:0x80007F78
 	extabindex  start:0x8000E23C end:0x8000E44C
 	.text       start:0x8009E1C0 end:0x800A2DD4
+	.data       start:0x8020FA18 end:0x8020FA8C
 
 ringmenu.cpp:
 	extab       start:0x80007F78 end:0x80007FC8
@@ -1285,6 +1290,7 @@ p_minigame.cpp:
 	extabindex  start:0x8001075C end:0x800107EC
 	.text       start:0x80127B74 end:0x8012B24C
 	.ctors      start:0x801D543C end:0x801D5440
+	.data       start:0x80212314 end:0x80212398
 
 pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
@@ -1311,6 +1317,8 @@ pppScreenBreak.cpp:
 	extab       start:0x800097EC end:0x80009834
 	extabindex  start:0x800108AC end:0x80010918
 	.text       start:0x8012D458 end:0x8012E5DC
+	.rodata     start:0x801DD4BC end:0x801DD4E8
+	.data       start:0x802127A0 end:0x802127BC
 
 monobj_boss.cpp:
 	extab       start:0x80009834 end:0x80009A34

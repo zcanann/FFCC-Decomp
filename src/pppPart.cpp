@@ -73,12 +73,6 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
 
-Mtx ppvCameraMatrix0;
-Mtx ppvWorldMatrix;
-Mtx ppvWorldMatrixWood;
-float ppvScreenMatrix[10][4];
-float ppvScreenMatrix0[4][4];
-pppDrawMng ppvDrawMng;
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
 extern "C" {
@@ -87,6 +81,17 @@ float gPartScreenMatrixRow2Y = 0.0f;
 float gPartScreenMatrixRow2W = 0.0f;
 int DAT_8032ED64 = 0;
 }
+pppDrawMng ppvDrawMng;
+Mtx ppvCameraMatrix0;
+Mtx ppvCameraMatrix02;
+Mtx ppvWorldMatrix;
+float ppvWorldMatrixWood[6][4];
+float ppvScreenMatrix0[4][4];
+float ppvScreenMatrix[10][4];
+float ppvChrScl[4];
+Mtx ppvUnitMatrix;
+Vec ppvZeroVector;
+CAmemCacheSet ppvAmemCacheSet;
 
 struct PppMngStPartView {
     void* m_pppResSet;

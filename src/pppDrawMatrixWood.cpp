@@ -27,7 +27,7 @@ void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
     *(float*)(p + 0x5C) = *(float*)(p + 0x2C);
     *(float*)(p + 0x6C) = *(float*)(p + 0x3C);
 
-    PSMTXConcat(ppvWorldMatrixWood, *(Mtx*)(p + 0x40), *(Mtx*)(p + 0x40));
+    PSMTXConcat(reinterpret_cast<Mtx&>(ppvWorldMatrixWood), *(Mtx*)(p + 0x40), *(Mtx*)(p + 0x40));
 }
 
 

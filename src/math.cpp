@@ -18,9 +18,9 @@ extern "C" float kRandScaleF;
 CMath Math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
-static float s_hSpline[128];
-static float s_wSpline[128];
-static float s_dSpline[128];
+static float s_hSpline[65];
+static float s_wSpline[65];
+static float s_dSpline[65];
 
 struct Vec4d {
     float x;

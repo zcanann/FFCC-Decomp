@@ -19,36 +19,73 @@
 CMapPcs MapPcs;
 extern void* __vt__8CManager;
 extern "C" void* __vt__7CMapPcs[];
+extern "C" void create__7CMapPcsFv(CMapPcs*);
+extern "C" void destroy__7CMapPcsFv(CMapPcs*);
+extern "C" void calcInit__7CMapPcsFv(CMapPcs*);
+extern "C" void calc__7CMapPcsFv(CMapPcs*);
+extern "C" void drawShadow__7CMapPcsFv(CMapPcs*);
+extern "C" void drawBefore__7CMapPcsFv(CMapPcs*);
+extern "C" void draw__7CMapPcsFv(CMapPcs*);
+extern "C" void drawAfter__7CMapPcsFv(CMapPcs*);
+extern "C" void createViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void calcViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
 
-unsigned int m_table_desc0__7CMapPcs[3];
-unsigned int m_table_desc1__7CMapPcs[3];
-unsigned int m_table_desc2__7CMapPcs[3];
-unsigned int m_table_desc3__7CMapPcs[3];
-unsigned int m_table_desc4__7CMapPcs[3];
-unsigned int m_table_desc5__7CMapPcs[3];
-unsigned int m_table_desc6__7CMapPcs[3];
-unsigned int m_table_desc7__7CMapPcs[3];
-unsigned int m_table_desc8__7CMapPcs[3];
-unsigned int m_table_desc9__7CMapPcs[3];
-unsigned int m_table_desc10__7CMapPcs[3];
-unsigned int m_table_desc11__7CMapPcs[3];
-unsigned int m_table_desc12__7CMapPcs[3];
-unsigned int m_table_desc13__7CMapPcs[3];
-unsigned int m_table_desc14__7CMapPcs[3];
-unsigned int m_table_desc15__7CMapPcs[3];
-unsigned int m_table_desc16__7CMapPcs[3];
-unsigned int m_table_desc17__7CMapPcs[3];
-unsigned int m_table_desc18__7CMapPcs[3];
-unsigned int m_table_desc19__7CMapPcs[3];
-unsigned int m_table_desc20__7CMapPcs[3];
-unsigned int m_table_desc21__7CMapPcs[3];
-unsigned int m_table_desc22__7CMapPcs[3];
-unsigned int m_table_desc23__7CMapPcs[3];
-unsigned int PTR_s_CMapPcs_GAME__801e8ad8[0x414 / sizeof(unsigned int)];
+class CRelProfile
+{
+public:
+    ~CRelProfile();
 
-unsigned int s_mapRelProfile0__7CMapPcs;
-unsigned int s_mapRelProfile1__7CMapPcs;
-unsigned int s_mapRelProfile2__7CMapPcs[2];
+private:
+    u32 m_unused;
+};
+
+unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
+unsigned int m_table_desc1__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int m_table_desc2__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int m_table_desc3__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
+unsigned int m_table_desc4__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int m_table_desc5__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
+unsigned int m_table_desc6__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
+unsigned int m_table_desc7__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
+unsigned int m_table_desc8__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+unsigned int m_table_desc9__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int m_table_desc10__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int m_table_desc11__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+unsigned int m_table_desc12__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int m_table_desc13__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+unsigned int m_table_desc14__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+unsigned int m_table_desc15__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+unsigned int m_table_desc16__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+unsigned int m_table_desc17__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int m_table_desc18__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int m_table_desc19__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+unsigned int m_table_desc20__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int m_table_desc21__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+unsigned int m_table_desc22__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+unsigned int m_table_desc23__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+
+const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs_GAME";
+const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs_VIEWER";
+const char s_CMapPcs_PART_801D7700[] = "CMapPcs_PART";
+
+unsigned int PTR_s_CMapPcs_GAME__801e8ad8[3][0x414 / 3 / sizeof(unsigned int)] = {
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_GAME_801D76E0)), 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0, 0x37, 1, 0, 0, 0,
+     0x3F, 1},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_VIEWER_801D76F0)), 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0, 0x37, 1, 0, 0, 0,
+     0x3F, 1},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_PART_801D7700)), 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0, 0x37, 1, 0, 0, 0,
+     0x3F, 1},
+};
+
+CRelProfile s_mapRelProfile0__7CMapPcs;
+CRelProfile s_mapRelProfile1__7CMapPcs;
+CRelProfile s_mapRelProfile2__7CMapPcs[2];
 unsigned int s_loadedStageNo__7CMapPcs;
 unsigned int s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;
@@ -62,14 +99,7 @@ extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 extern "C" void __dl__FPv(void*);
-extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
-static unsigned char ARRAY_80268768[0xC];
-static unsigned char ARRAY_80268774[0xC];
-static unsigned char ARRAY_80268780[0xC];
-
-struct CRelProfile;
-extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);
 
 struct CBoundHack {
     u32 p0;
@@ -99,7 +129,80 @@ struct CMapMngAsyncLoadState {
  */
 CMapPcs::CMapPcs()
 {
-	// TODO
+    unsigned int* dst = &PTR_s_CMapPcs_GAME__801e8ad8[0][0];
+
+    dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
+    dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];
+    dst[0x00C / 4] = m_table_desc0__7CMapPcs[2];
+    dst[0x010 / 4] = m_table_desc1__7CMapPcs[0];
+    dst[0x014 / 4] = m_table_desc1__7CMapPcs[1];
+    dst[0x018 / 4] = m_table_desc1__7CMapPcs[2];
+    dst[0x01C / 4] = m_table_desc2__7CMapPcs[0];
+    dst[0x020 / 4] = m_table_desc2__7CMapPcs[1];
+    dst[0x024 / 4] = m_table_desc2__7CMapPcs[2];
+    dst[0x030 / 4] = m_table_desc3__7CMapPcs[0];
+    dst[0x034 / 4] = m_table_desc3__7CMapPcs[1];
+    dst[0x038 / 4] = m_table_desc3__7CMapPcs[2];
+    dst[0x044 / 4] = m_table_desc4__7CMapPcs[0];
+    dst[0x048 / 4] = m_table_desc4__7CMapPcs[1];
+    dst[0x04C / 4] = m_table_desc4__7CMapPcs[2];
+    dst[0x058 / 4] = m_table_desc5__7CMapPcs[0];
+    dst[0x05C / 4] = m_table_desc5__7CMapPcs[1];
+    dst[0x060 / 4] = m_table_desc5__7CMapPcs[2];
+    dst[0x06C / 4] = m_table_desc6__7CMapPcs[0];
+    dst[0x070 / 4] = m_table_desc6__7CMapPcs[1];
+    dst[0x074 / 4] = m_table_desc6__7CMapPcs[2];
+    dst[0x080 / 4] = m_table_desc7__7CMapPcs[0];
+    dst[0x084 / 4] = m_table_desc7__7CMapPcs[1];
+    dst[0x088 / 4] = m_table_desc7__7CMapPcs[2];
+    dst[0x160 / 4] = m_table_desc8__7CMapPcs[0];
+    dst[0x164 / 4] = m_table_desc8__7CMapPcs[1];
+    dst[0x168 / 4] = m_table_desc8__7CMapPcs[2];
+    dst[0x16C / 4] = m_table_desc9__7CMapPcs[0];
+    dst[0x170 / 4] = m_table_desc9__7CMapPcs[1];
+    dst[0x174 / 4] = m_table_desc9__7CMapPcs[2];
+    dst[0x178 / 4] = m_table_desc10__7CMapPcs[0];
+    dst[0x17C / 4] = m_table_desc10__7CMapPcs[1];
+    dst[0x180 / 4] = m_table_desc10__7CMapPcs[2];
+    dst[0x18C / 4] = m_table_desc11__7CMapPcs[0];
+    dst[0x190 / 4] = m_table_desc11__7CMapPcs[1];
+    dst[0x194 / 4] = m_table_desc11__7CMapPcs[2];
+    dst[0x1A0 / 4] = m_table_desc12__7CMapPcs[0];
+    dst[0x1A4 / 4] = m_table_desc12__7CMapPcs[1];
+    dst[0x1A8 / 4] = m_table_desc12__7CMapPcs[2];
+    dst[0x1B4 / 4] = m_table_desc13__7CMapPcs[0];
+    dst[0x1B8 / 4] = m_table_desc13__7CMapPcs[1];
+    dst[0x1BC / 4] = m_table_desc13__7CMapPcs[2];
+    dst[0x1C8 / 4] = m_table_desc14__7CMapPcs[0];
+    dst[0x1CC / 4] = m_table_desc14__7CMapPcs[1];
+    dst[0x1D0 / 4] = m_table_desc14__7CMapPcs[2];
+    dst[0x1DC / 4] = m_table_desc15__7CMapPcs[0];
+    dst[0x1E0 / 4] = m_table_desc15__7CMapPcs[1];
+    dst[0x1E4 / 4] = m_table_desc15__7CMapPcs[2];
+    dst[0x2BC / 4] = m_table_desc16__7CMapPcs[0];
+    dst[0x2C0 / 4] = m_table_desc16__7CMapPcs[1];
+    dst[0x2C4 / 4] = m_table_desc16__7CMapPcs[2];
+    dst[0x2C8 / 4] = m_table_desc17__7CMapPcs[0];
+    dst[0x2CC / 4] = m_table_desc17__7CMapPcs[1];
+    dst[0x2D0 / 4] = m_table_desc17__7CMapPcs[2];
+    dst[0x2D4 / 4] = m_table_desc18__7CMapPcs[0];
+    dst[0x2D8 / 4] = m_table_desc18__7CMapPcs[1];
+    dst[0x2DC / 4] = m_table_desc18__7CMapPcs[2];
+    dst[0x2E8 / 4] = m_table_desc19__7CMapPcs[0];
+    dst[0x2EC / 4] = m_table_desc19__7CMapPcs[1];
+    dst[0x2F0 / 4] = m_table_desc19__7CMapPcs[2];
+    dst[0x2FC / 4] = m_table_desc20__7CMapPcs[0];
+    dst[0x300 / 4] = m_table_desc20__7CMapPcs[1];
+    dst[0x304 / 4] = m_table_desc20__7CMapPcs[2];
+    dst[0x310 / 4] = m_table_desc21__7CMapPcs[0];
+    dst[0x314 / 4] = m_table_desc21__7CMapPcs[1];
+    dst[0x318 / 4] = m_table_desc21__7CMapPcs[2];
+    dst[0x324 / 4] = m_table_desc22__7CMapPcs[0];
+    dst[0x328 / 4] = m_table_desc22__7CMapPcs[1];
+    dst[0x32C / 4] = m_table_desc22__7CMapPcs[2];
+    dst[0x338 / 4] = m_table_desc23__7CMapPcs[0];
+    dst[0x33C / 4] = m_table_desc23__7CMapPcs[1];
+    dst[0x340 / 4] = m_table_desc23__7CMapPcs[2];
 }
 
 /*
@@ -129,7 +232,7 @@ void CMapPcs::Quit()
  */
 int CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return (int)(PTR_s_CMapPcs_GAME__801e8ad8 + tableIndex * 0x57);
+	return reinterpret_cast<int>(PTR_s_CMapPcs_GAME__801e8ad8[tableIndex]);
 }
 
 /*
@@ -863,111 +966,6 @@ void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
 
 /*
  * --INFO--
- * PAL Address: 0x80035e84
- * PAL Size: 976b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_map_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup and
-    // m_table_desc copying into the class constructor, then delete this function.
-    // The compiler will auto-generate __sinit from the global object declaration.
-
-	volatile void** base = reinterpret_cast<volatile void**>(&MapPcs);
-	*base = &__vt__8CManager;
-	*base = __vt__8CProcess;
-	*base = __vt__7CMapPcs;
-
-	unsigned int* dst = PTR_s_CMapPcs_GAME__801e8ad8;
-
-	dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
-	dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];
-	dst[0x00C / 4] = m_table_desc0__7CMapPcs[2];
-	dst[0x010 / 4] = m_table_desc1__7CMapPcs[0];
-	dst[0x014 / 4] = m_table_desc1__7CMapPcs[1];
-	dst[0x018 / 4] = m_table_desc1__7CMapPcs[2];
-	dst[0x01C / 4] = m_table_desc2__7CMapPcs[0];
-	dst[0x020 / 4] = m_table_desc2__7CMapPcs[1];
-	dst[0x024 / 4] = m_table_desc2__7CMapPcs[2];
-	dst[0x030 / 4] = m_table_desc3__7CMapPcs[0];
-	dst[0x034 / 4] = m_table_desc3__7CMapPcs[1];
-	dst[0x038 / 4] = m_table_desc3__7CMapPcs[2];
-	dst[0x044 / 4] = m_table_desc4__7CMapPcs[0];
-	dst[0x048 / 4] = m_table_desc4__7CMapPcs[1];
-	dst[0x04C / 4] = m_table_desc4__7CMapPcs[2];
-	dst[0x058 / 4] = m_table_desc5__7CMapPcs[0];
-	dst[0x05C / 4] = m_table_desc5__7CMapPcs[1];
-	dst[0x060 / 4] = m_table_desc5__7CMapPcs[2];
-	dst[0x06C / 4] = m_table_desc6__7CMapPcs[0];
-	dst[0x070 / 4] = m_table_desc6__7CMapPcs[1];
-	dst[0x074 / 4] = m_table_desc6__7CMapPcs[2];
-	dst[0x080 / 4] = m_table_desc7__7CMapPcs[0];
-	dst[0x084 / 4] = m_table_desc7__7CMapPcs[1];
-	dst[0x088 / 4] = m_table_desc7__7CMapPcs[2];
-	dst[0x160 / 4] = m_table_desc8__7CMapPcs[0];
-	dst[0x164 / 4] = m_table_desc8__7CMapPcs[1];
-	dst[0x168 / 4] = m_table_desc8__7CMapPcs[2];
-
-	dst[0x16C / 4] = m_table_desc9__7CMapPcs[0];
-	dst[0x170 / 4] = m_table_desc9__7CMapPcs[1];
-	dst[0x174 / 4] = m_table_desc9__7CMapPcs[2];
-	dst[0x178 / 4] = m_table_desc10__7CMapPcs[0];
-	dst[0x17C / 4] = m_table_desc10__7CMapPcs[1];
-	dst[0x180 / 4] = m_table_desc10__7CMapPcs[2];
-	dst[0x18C / 4] = m_table_desc11__7CMapPcs[0];
-	dst[0x190 / 4] = m_table_desc11__7CMapPcs[1];
-	dst[0x194 / 4] = m_table_desc11__7CMapPcs[2];
-	dst[0x1A0 / 4] = m_table_desc12__7CMapPcs[0];
-	dst[0x1A4 / 4] = m_table_desc12__7CMapPcs[1];
-	dst[0x1A8 / 4] = m_table_desc12__7CMapPcs[2];
-	dst[0x1B4 / 4] = m_table_desc13__7CMapPcs[0];
-	dst[0x1B8 / 4] = m_table_desc13__7CMapPcs[1];
-	dst[0x1BC / 4] = m_table_desc13__7CMapPcs[2];
-	dst[0x1C8 / 4] = m_table_desc14__7CMapPcs[0];
-	dst[0x1CC / 4] = m_table_desc14__7CMapPcs[1];
-	dst[0x1D0 / 4] = m_table_desc14__7CMapPcs[2];
-	dst[0x1DC / 4] = m_table_desc15__7CMapPcs[0];
-	dst[0x1E0 / 4] = m_table_desc15__7CMapPcs[1];
-	dst[0x1E4 / 4] = m_table_desc15__7CMapPcs[2];
-	dst[0x2BC / 4] = m_table_desc16__7CMapPcs[0];
-	dst[0x2C0 / 4] = m_table_desc16__7CMapPcs[1];
-	dst[0x2C4 / 4] = m_table_desc16__7CMapPcs[2];
-	dst[0x2C8 / 4] = m_table_desc17__7CMapPcs[0];
-	dst[0x2CC / 4] = m_table_desc17__7CMapPcs[1];
-	dst[0x2D0 / 4] = m_table_desc17__7CMapPcs[2];
-	dst[0x2D4 / 4] = m_table_desc18__7CMapPcs[0];
-	dst[0x2D8 / 4] = m_table_desc18__7CMapPcs[1];
-	dst[0x2DC / 4] = m_table_desc18__7CMapPcs[2];
-	dst[0x2E8 / 4] = m_table_desc19__7CMapPcs[0];
-	dst[0x2EC / 4] = m_table_desc19__7CMapPcs[1];
-	dst[0x2F0 / 4] = m_table_desc19__7CMapPcs[2];
-
-	dst[0x2FC / 4] = m_table_desc20__7CMapPcs[0];
-	dst[0x300 / 4] = m_table_desc20__7CMapPcs[1];
-	dst[0x304 / 4] = m_table_desc20__7CMapPcs[2];
-	dst[0x310 / 4] = m_table_desc21__7CMapPcs[0];
-	dst[0x314 / 4] = m_table_desc21__7CMapPcs[1];
-	dst[0x318 / 4] = m_table_desc21__7CMapPcs[2];
-	dst[0x324 / 4] = m_table_desc22__7CMapPcs[0];
-	dst[0x328 / 4] = m_table_desc22__7CMapPcs[1];
-	dst[0x32C / 4] = m_table_desc22__7CMapPcs[2];
-	dst[0x338 / 4] = m_table_desc23__7CMapPcs[0];
-	dst[0x33C / 4] = m_table_desc23__7CMapPcs[1];
-	dst[0x340 / 4] = m_table_desc23__7CMapPcs[2];
-
-	__register_global_object(&s_mapRelProfile0__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
-                             ARRAY_80268768);
-	__register_global_object(&s_mapRelProfile1__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
-                             ARRAY_80268774);
-	__register_global_object(&s_mapRelProfile2__7CMapPcs, reinterpret_cast<void*>(__dt__11CRelProfileFv),
-                             ARRAY_80268780);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80036254
  * PAL Size: 60b
  * EN Address: TODO
@@ -975,11 +973,6 @@ extern "C" void __sinit_p_map_cpp(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete)
+CRelProfile::~CRelProfile()
 {
-	if ((self != 0) && (shouldDelete > 0))
-	{
-		__dl__FPv(self);
-	}
-	return self;
 }

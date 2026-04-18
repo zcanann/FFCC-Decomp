@@ -429,12 +429,32 @@ public:
 
     unsigned char m_unk0[0x2A18];
     _pppMngSt m_pppMng[0x60];
+    unsigned char m_unkAB18[0x18300];
+
+    struct PppPdtSlot
+    {
+        _pppDataHead* m_pppDataHead;      // 0x00
+        unsigned int m_envFields[5];      // 0x04
+        char m_name[0x20];                // 0x18
+    }; // Size 0x38
+
+    PppPdtSlot m_pdtSlots[0x18];          // 0x22E18
+    unsigned char m_unk23358[0x39C];      // 0x23358
+    unsigned int m_partAMemBase;          // 0x236F4
+    unsigned int m_partAMemCursor;        // 0x236F8
+    unsigned int m_partLoadCacheParam;    // 0x236FC
+    unsigned int m_partChunkIndex;        // 0x23700
+    unsigned int m_asyncHandleCount;      // 0x23704
+    int m_partLoadMode;                   // 0x23708
+    unsigned char m_unk2370C[0x80];       // 0x2370C
+    unsigned int m_partAsyncBusy[16];     // 0x2378C
+    unsigned char m_unk237CC[0x80C];      // 0x237CC
 };
 
 extern Mtx ppvCameraMatrix0;
 extern Mtx ppvCameraMatrix02;
 extern Mtx ppvWorldMatrix;
-extern Mtx ppvWorldMatrixWood;
+extern float ppvWorldMatrixWood[6][4];
 extern float ppvScreenMatrix[10][4];
 extern float ppvScreenMatrix0[4][4];
 extern float ppvSinTbl[];

@@ -45,10 +45,7 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     if (in->field0 == *(s32*)(base + 0xC)) {
         f32 value = -Math.RandF();
         if (in->field10 != 0) {
-            f32 random = Math.RandF();
-            f32 blend = value - random;
-            f32 scale = kPppRandDownHCVDualSampleScale;
-            value = blend * scale;
+            value = (value - Math.RandF()) * kPppRandDownHCVDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -61,22 +58,11 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
 
     target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);
 
-    f32 scale = *valuePtr;
-
     {
-        s16 baseValue = in->field8;
-        target[0] = (s16)(target[0] + (s32)((f32)baseValue * scale));
-    }
-    {
-        s16 baseValue = in->fieldA;
-        target[1] = (s16)(target[1] + (s32)((f32)baseValue * scale));
-    }
-    {
-        s16 baseValue = in->fieldC;
-        target[2] = (s16)(target[2] + (s32)((f32)baseValue * scale));
-    }
-    {
-        s16 baseValue = in->fieldE;
-        target[3] = (s16)(target[3] + (s32)((f32)baseValue * scale));
+        f32 scale = *valuePtr;
+        target[0] = (s16)(target[0] + (s32)((f32)in->field8 * scale));
+        target[1] = (s16)(target[1] + (s32)((f32)in->fieldA * scale));
+        target[2] = (s16)(target[2] + (s32)((f32)in->fieldC * scale));
+        target[3] = (s16)(target[3] + (s32)((f32)in->fieldE * scale));
     }
 }

@@ -39,11 +39,11 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     PppRandUpIVParam2* in = (PppRandUpIVParam2*)param2;
     PppRandUpIVParam3* out = (PppRandUpIVParam3*)param3;
-    f32 value;
+    s32* target;
     f32* valuePtr;
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        value = Math.RandF();
+        f32 value = Math.RandF();
         if (in->field18 != 0) {
             f32 randValue = value + Math.RandF();
             f32 scale = kPppRandUpIVDualSampleScale;
@@ -52,17 +52,15 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
+    } else if (in->field0 != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (in->field0 != *(s32*)(base + 0xC)) {
-            return;
-        }
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
-    f32 scale = *valuePtr;
+    target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
 
-    target[0] += (s32)((f32)in->field8 * scale);
-    target[1] += (s32)((f32)in->fieldC * scale);
-    target[2] += (s32)((f32)in->field10 * scale);
+    target[0] += (s32)((f32)in->field8 * *valuePtr);
+    target[1] += (s32)((f32)in->fieldC * *valuePtr);
+    target[2] += (s32)((f32)in->field10 * *valuePtr);
 }

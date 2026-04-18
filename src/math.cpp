@@ -18,9 +18,9 @@ extern "C" float kRandScaleF;
 CMath Math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
-static float s_hSpline[128];
-static float s_wSpline[128];
-static float s_dSpline[128];
+static float s_hSpline[65];
+static float s_wSpline[65];
+static float s_dSpline[65];
 
 struct Vec4d {
     float x;
@@ -1052,9 +1052,10 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
         rgba[2] = (unsigned char)val;
     } else {
         int low = (0xFF - sat) * val;
-        low = low / 0xFF + (low >> 31);
         int sector = hue / 0x3C + (hue >> 31);
         int delta;
+
+        low = low / 0xFF + (low >> 31);
 
         low -= low >> 31;
         sector -= sector >> 31;

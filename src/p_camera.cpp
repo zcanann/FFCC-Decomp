@@ -21,6 +21,40 @@
 
 CCameraPcs CameraPcs;
 
+extern "C" void create__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroy__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calc__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createChara__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyChara__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcChara__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createMap__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyMap__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcMap__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createFunnyShape__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyFunnyShape__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcFunnyShape__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createPart__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyPart__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcPart__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createFullShadow__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyFullShadow__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowBegin__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowEnd__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
+extern "C" void SetFullScreenShadow__10CCameraPcsFPA4_fl(CCameraPcs*);
+extern "C" void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
+
+const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs_GAME";
+const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs_CHARA";
+const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs_MAP";
+const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs_MATERIALEDITOR";
+const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs_FUNNYSHAPE";
+const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs_PART";
+const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs_SHADOW";
+
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
@@ -67,32 +101,40 @@ extern double DOUBLE_8032fa28;
 extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
 unsigned char DAT_8032ecd8;
-unsigned int PTR_s_CCameraPcs_GAME__801e915c[(0x15C / sizeof(unsigned int)) * 25];
-unsigned int m_table_desc0__10CCameraPcs[3];
-unsigned int m_table_desc1__10CCameraPcs[3];
-unsigned int m_table_desc2__10CCameraPcs[3];
-unsigned int m_table_desc3__10CCameraPcs[3];
-unsigned int m_table_desc4__10CCameraPcs[3];
-unsigned int m_table_desc5__10CCameraPcs[3];
-unsigned int m_table_desc6__10CCameraPcs[3];
-unsigned int m_table_desc7__10CCameraPcs[3];
-unsigned int m_table_desc8__10CCameraPcs[3];
-unsigned int m_table_desc9__10CCameraPcs[3];
-unsigned int m_table_desc10__10CCameraPcs[3];
-unsigned int m_table_desc11__10CCameraPcs[3];
-unsigned int m_table_desc12__10CCameraPcs[3];
-unsigned int m_table_desc13__10CCameraPcs[3];
-unsigned int m_table_desc14__10CCameraPcs[3];
-unsigned int m_table_desc15__10CCameraPcs[3];
-unsigned int m_table_desc16__10CCameraPcs[3];
-unsigned int m_table_desc17__10CCameraPcs[3];
-unsigned int m_table_desc18__10CCameraPcs[3];
-unsigned int m_table_desc19__10CCameraPcs[3];
-unsigned int m_table_desc20__10CCameraPcs[3];
-unsigned int m_table_desc21__10CCameraPcs[3];
-unsigned int m_table_desc22__10CCameraPcs[3];
-unsigned int m_table_desc23__10CCameraPcs[3];
-unsigned int m_table_desc24__10CCameraPcs[3];
+unsigned int m_table_desc0__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
+unsigned int m_table_desc1__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
+unsigned int m_table_desc2__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
+unsigned int m_table_desc3__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createChara__10CCameraPcsFv)};
+unsigned int m_table_desc4__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyChara__10CCameraPcsFv)};
+unsigned int m_table_desc5__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcChara__10CCameraPcsFv)};
+unsigned int m_table_desc6__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMap__10CCameraPcsFv)};
+unsigned int m_table_desc7__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMap__10CCameraPcsFv)};
+unsigned int m_table_desc8__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMap__10CCameraPcsFv)};
+unsigned int m_table_desc9__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMaterialEditor__10CCameraPcsFv)};
+unsigned int m_table_desc10__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMaterialEditor__10CCameraPcsFv)};
+unsigned int m_table_desc11__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMaterialEditor__10CCameraPcsFv)};
+unsigned int m_table_desc12__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFunnyShape__10CCameraPcsFv)};
+unsigned int m_table_desc13__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFunnyShape__10CCameraPcsFv)};
+unsigned int m_table_desc14__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcFunnyShape__10CCameraPcsFv)};
+unsigned int m_table_desc15__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createPart__10CCameraPcsFv)};
+unsigned int m_table_desc16__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyPart__10CCameraPcsFv)};
+unsigned int m_table_desc17__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcPart__10CCameraPcsFv)};
+unsigned int m_table_desc18__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFullShadow__10CCameraPcsFv)};
+unsigned int m_table_desc19__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFullShadow__10CCameraPcsFv)};
+unsigned int m_table_desc20__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowBegin__10CCameraPcsFv)};
+unsigned int m_table_desc21__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
+unsigned int m_table_desc22__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
+unsigned int m_table_desc23__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(SetFullScreenShadow__10CCameraPcsFPA4_fl)};
+unsigned int m_table_desc24__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
+unsigned int PTR_s_CCameraPcs_GAME__801e915c[7][0x15C / sizeof(unsigned int)] = {
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_GAME_801D7860)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4, 0, 0, 0, 0x3D, 0x1},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_CHARA_801D7874)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_MAP_801D7888)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_MATERIALEDITOR_801D7898)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_FUNNYSHAPE_801D78B4)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_PART_801D78CC)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
+    {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_SHADOW_801D78E0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x2E, 0x1, 0, 0, 0, 0x32, 0x1, 0, 0, 0, 0x39, 0x1, 0, 0, 0, 0x43, 0x1}
+};
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
@@ -161,7 +203,7 @@ void CCameraPcs::Quit()
  */
 int CCameraPcs::GetTable(unsigned long tableIndex)
 {
-	return (int)(PTR_s_CCameraPcs_GAME__801e915c + tableIndex * 0x57);
+	return reinterpret_cast<int>(PTR_s_CCameraPcs_GAME__801e915c[tableIndex]);
 }
 
 /*

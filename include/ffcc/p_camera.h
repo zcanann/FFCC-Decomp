@@ -15,7 +15,7 @@ class CGObject;
 class CPad;
 class CColor;
 
-extern unsigned int PTR_s_CCameraPcs_GAME__801e915c[];
+extern unsigned int PTR_s_CCameraPcs_GAME__801e915c[][0x15C / sizeof(unsigned int)];
 extern unsigned int m_table_desc0__10CCameraPcs[];
 extern unsigned int m_table_desc1__10CCameraPcs[];
 extern unsigned int m_table_desc2__10CCameraPcs[];
@@ -64,7 +64,7 @@ public:
         *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x424) = FLOAT_8032fa7c;
         *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x428) = FLOAT_8032fa7c;
 
-        unsigned int* dst = PTR_s_CCameraPcs_GAME__801e915c;
+        unsigned int* dst = &PTR_s_CCameraPcs_GAME__801e915c[0][0];
         dst[0x004 / 4] = m_table_desc0__10CCameraPcs[0];
         dst[0x008 / 4] = m_table_desc0__10CCameraPcs[1];
         dst[0x00C / 4] = m_table_desc0__10CCameraPcs[2];
@@ -232,6 +232,7 @@ public:
     float _244_4_;
     float _248_4_;
     float _252_4_;
+    u8 _pad100[0x4C8 - 0x100];
 };
 
 extern CCameraPcs CameraPcs;

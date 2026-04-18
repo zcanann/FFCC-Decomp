@@ -230,7 +230,7 @@ p_system.cpp:
 	extabindex  start:0x8000C508 end:0x8000C520
 	.text       start:0x80047C9C end:0x80047E00
 	.ctors      start:0x801D53F4 end:0x801D53F8
-	.data       start:0x801EA0F4 end:0x801EA290
+	.data       start:0x801EA0F4 end:0x801EA294
 	.sbss       start:0x8032ED08 end:0x8032ED0C
 
 p_light.cpp:

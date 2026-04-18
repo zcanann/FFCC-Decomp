@@ -26,9 +26,14 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     Vec scaledY;
     Vec scaledZ;
     Vec transformedPos;
+    Vec branchPos;
     Vec zeroVec;
+    pppFMATRIX cameraMatrix;
+    pppFMATRIX managerMatrix;
+    pppFMATRIX worldMatrixMode1;
+    pppFMATRIX worldMatrixMode0;
     pppFMATRIX transformMatrix;
-    u8 mode;
+    const f32 zero = 0.0f;
 
     (void)ctrlTable;
 
@@ -37,9 +42,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
 
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
-    zeroVec.z = 0.0f;
+    zeroVec.x = zero;
+    zeroVec.y = zero;
+    zeroVec.z = zero;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);
@@ -47,29 +52,31 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     transformedPos.y *= stepData->m_positionScale.y;
     transformedPos.z *= stepData->m_positionScale.z;
 
-    mode = stepData->m_mode;
-
-    if (mode == 0) {
-        transformedPos.x += stepData->m_offset.x;
-        transformedPos.y += stepData->m_offset.y;
-        transformedPos.z += stepData->m_offset.z;
-        pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
+    if (stepData->m_mode == 0) {
+        branchPos.x = transformedPos.x + stepData->m_offset.x;
+        branchPos.y = transformedPos.y + stepData->m_offset.y;
+        branchPos.z = transformedPos.z + stepData->m_offset.z;
+        worldMatrixMode0 = *(pppFMATRIX*)&ppvWorldMatrix;
+        pppApplyMatrix(transformedPos, worldMatrixMode0, branchPos);
 
         transformMatrix.value[0][3] = transformedPos.x;
         transformMatrix.value[1][3] = transformedPos.y;
         transformMatrix.value[2][3] = transformedPos.z;
-    } else if (mode == 1) {
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, transformedPos);
+    } else if (stepData->m_mode == 1) {
+        worldMatrixMode1 = *(pppFMATRIX*)&ppvWorldMatrix;
+        pppApplyMatrix(zeroVec, worldMatrixMode1, transformedPos);
 
         transformMatrix.value[0][3] = zeroVec.x;
         transformMatrix.value[1][3] = zeroVec.y;
         transformMatrix.value[2][3] = zeroVec.z;
-    } else if (mode == 2) {
-        pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
-        zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
-        zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;
-        zeroVec.z += stepData->m_offset.z * pppMngStPtr->m_scale.z;
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix02, zeroVec);
+    } else if (stepData->m_mode == 2) {
+        managerMatrix = pppMngStPtr->m_matrix;
+        pppApplyMatrix(zeroVec, managerMatrix, transformedPos);
+        branchPos.x = stepData->m_offset.x * pppMngStPtr->m_scale.x + zeroVec.x;
+        branchPos.y = stepData->m_offset.y * pppMngStPtr->m_scale.y + zeroVec.y;
+        branchPos.z = stepData->m_offset.z * pppMngStPtr->m_scale.z + zeroVec.z;
+        cameraMatrix = *(pppFMATRIX*)&ppvCameraMatrix02;
+        pppApplyMatrix(zeroVec, cameraMatrix, branchPos);
 
         transformMatrix.value[0][3] = zeroVec.x;
         transformMatrix.value[1][3] = zeroVec.y;

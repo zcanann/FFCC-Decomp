@@ -227,125 +227,117 @@ CChara::CAnim::~CAnim()
  */
 void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
-	CAnimFields& anim = Anim(this);
 	CChunkFile chunkFile(data);
 	CChunkFile::CChunk chunk;
+	CChunkFile::CChunk nodeChunk;
 
-	anim.m_stage = stage;
+	m_stage = stage;
 
-	while (true) {
-		do {
-			if (!chunkFile.GetNextChunk(chunk)) {
-				return;
-			}
-		} while (chunk.m_id != 0x43484120);
-
+	while (chunkFile.GetNextChunk(chunk)) {
+		if (chunk.m_id != 0x43484120) {
+			continue;
+		}
 		if (chunk.m_arg0 < 2) {
-			break;
+			if ((unsigned int)System.m_execParam >= 2) {
+				System.Printf(s_charaAnimAllocWarn);
+			}
+			return;
 		}
 
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
-			if (chunk.m_id == 0x414E494D) {
-				anim.m_nodeCount = static_cast<unsigned short>(chunk.m_arg0);
-				unsigned short nodeCount = anim.m_nodeCount;
-
-				void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
-				    (unsigned long)nodeCount * 0x18 + 0x10, stage, s_charaAnimSourceFile, 0x5F);
-				nodeArray = __construct_new_array(
-				    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
-				    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, nodeCount);
-				anim.m_nodes = reinterpret_cast<CChara::CAnimNode*>(nodeArray);
-
-				int nodeOffset = 0;
-				chunkFile.PushChunk();
-				while (chunkFile.GetNextChunk(chunk)) {
-					if (chunk.m_id == 0x494E464F) {
-						anim.m_quantizeX = chunkFile.Get4();
-						anim.m_quantizeY = chunkFile.Get4();
-						anim.m_quantizeZ = chunkFile.Get4();
-					} else if ((int)chunk.m_id < 0x494E464F) {
-						if (chunk.m_id == 0x4652414D) {
-							anim.m_frameCount = static_cast<unsigned short>(static_cast<int>(chunkFile.Get4()));
-						} else if (((int)chunk.m_id < 0x4652414D) && (chunk.m_id == 0x42414E4B)) {
-							anim.m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
-							anim.m_bank = __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
-							chunkFile.Get(anim.m_bank, chunk.m_size);
-
-							Memory.CopyToAMemorySync(
-							    anim.m_bank,
-							    reinterpret_cast<void*>(
-							        S32At(DAT_802E78E0, 8308) + S32At((void*)S32At(DAT_802E78E0, 8284), 8)),
-							    anim.m_bankSize);
-
-							anim.m_bankAddress = S32At(DAT_802E78E0, 8308);
-							S32At(DAT_802E78E0, 8308) = S32At(DAT_802E78E0, 8308) + anim.m_bankSize;
-							if (anim.m_bank != 0) {
-								__dl__FPv(anim.m_bank);
-								anim.m_bank = 0;
-							}
-						}
-					} else if (chunk.m_id == 0x4E4F4445) {
-						CAnimNodeFields& node = *reinterpret_cast<CAnimNodeFields*>(Ptr(anim.m_nodes, nodeOffset));
-						CChunkFile::CChunk nodeChunk;
-						nodeOffset += 0x18;
-
-						chunkFile.PushChunk();
-						while (chunkFile.GetNextChunk(nodeChunk)) {
-							if (nodeChunk.m_id == 0x4E414D45) {
-								strcpy(node.m_name, chunkFile.GetString());
-							} else if ((int)nodeChunk.m_id < 0x4E414D45) {
-								if (nodeChunk.m_id == 0x44415441) {
-									int i = 0;
-									int shift = 0;
-									do {
-										int type = (int)chunkFile.Get4();
-										int mode;
-
-										if (type == 0) {
-											mode = 0;
-										} else if (type == 1) {
-											mode = 1;
-										} else {
-											mode = 2;
-										}
-
-										unsigned int dataOffset = chunkFile.Get4();
-										if (i == 0) {
-											node.m_dataOffset = dataOffset;
-										}
-
-										unsigned int nodeFlags = node.m_flags;
-										node.m_flags =
-										    (((nodeFlags >> 0xD) & 0x3FFFF) | ((mode << shift) & 0x3FFFFU)) << 0xD |
-										    (nodeFlags & 0x80001FFF);
-
-										if ((5 < i) && (type != 0)) {
-											unsigned char flags = *reinterpret_cast<unsigned char*>(&node.m_flags);
-											*reinterpret_cast<unsigned char*>(&node.m_flags) =
-											    static_cast<unsigned char>(__rlwimi(flags, 1, 7, 24, 24));
-										}
-
-										i++;
-										shift += 2;
-									} while (i < 9);
-								}
-							}
-						}
-						chunkFile.PopChunk();
-					} else if (((int)chunk.m_id < 0x4E4F4445) && (chunk.m_id == 0x494E5450)) {
-						anim.m_interp = static_cast<char>(chunk.m_arg0);
-						anim.m_interpOffset = chunkFile.Get4();
-					}
-				}
-				chunkFile.PopChunk();
+			if (chunk.m_id != 0x414E494D) {
+				continue;
 			}
+
+			m_nodeCount = static_cast<unsigned short>(chunk.m_arg0);
+			unsigned short nodeCount = m_nodeCount;
+
+			void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
+			    (unsigned long)nodeCount * 0x18 + 0x10, stage, s_charaAnimSourceFile, 0x5F);
+			nodeArray = __construct_new_array(
+			    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
+			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, nodeCount);
+			m_nodes = reinterpret_cast<CChara::CAnimNode*>(nodeArray);
+
+			int nodeOffset = 0;
+			chunkFile.PushChunk();
+			while (chunkFile.GetNextChunk(chunk)) {
+				if (chunk.m_id == 0x494E464F) {
+					m_quantizeX = static_cast<unsigned char>(chunkFile.Get4());
+					m_quantizeY = static_cast<unsigned char>(chunkFile.Get4());
+					m_quantizeZ = static_cast<unsigned char>(chunkFile.Get4());
+				} else if ((int)chunk.m_id < 0x494E464F) {
+					if (chunk.m_id == 0x4652414D) {
+						m_frameCount = static_cast<unsigned short>(chunkFile.Get4());
+					} else if (((int)chunk.m_id < 0x4652414D) && (chunk.m_id == 0x42414E4B)) {
+						m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
+						m_bank = __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
+						chunkFile.Get(m_bank, chunk.m_size);
+
+						Memory.CopyToAMemorySync(
+						    m_bank,
+						    reinterpret_cast<void*>(
+						        S32At(DAT_802E78E0, 8308) + S32At(reinterpret_cast<void*>(S32At(DAT_802E78E0, 8284)), 8)),
+						    m_bankSize);
+
+						m_bankAddress = S32At(DAT_802E78E0, 8308);
+						S32At(DAT_802E78E0, 8308) = m_bankAddress + m_bankSize;
+						if (m_bank != 0) {
+							__dl__FPv(m_bank);
+							m_bank = 0;
+						}
+					}
+				} else if (chunk.m_id == 0x4E4F4445) {
+					CAnimNode* node = reinterpret_cast<CAnimNode*>(reinterpret_cast<unsigned char*>(m_nodes) + nodeOffset);
+					nodeOffset += 0x18;
+
+					chunkFile.PushChunk();
+					while (chunkFile.GetNextChunk(nodeChunk)) {
+						if (nodeChunk.m_id == 0x4E414D45) {
+							strcpy(node->m_name, chunkFile.GetString());
+						} else if (((int)nodeChunk.m_id < 0x4E414D45) && (nodeChunk.m_id == 0x44415441)) {
+							int i = 0;
+							int shift = 0;
+							do {
+								int type = chunkFile.Get4();
+								int mode;
+
+								if (type == 0) {
+									mode = 0;
+								} else if (type == 1) {
+									mode = 1;
+								} else {
+									mode = 2;
+								}
+
+								unsigned int dataOffset = chunkFile.Get4();
+								if (i == 0) {
+									node->m_dataOffset = dataOffset;
+								}
+
+								node->m_flags = static_cast<unsigned int>(
+								    __rlwimi(static_cast<int>(node->m_flags), (node->m_flags >> 0xD) | (mode << shift), 13, 1, 18));
+
+								if ((5 < i) && (type != 0)) {
+									*reinterpret_cast<unsigned char*>(&node->m_flags) =
+									    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&node->m_flags), 1, 7, 24, 24));
+								}
+
+								i++;
+								shift += 2;
+							} while (i < 9);
+						}
+					}
+					chunkFile.PopChunk();
+				} else if (((int)chunk.m_id < 0x4E4F4445) && (chunk.m_id == 0x494E5450)) {
+					m_interp = static_cast<char>(chunk.m_arg0);
+					m_interpOffset = chunkFile.Get4();
+				}
+			}
+			chunkFile.PopChunk();
 		}
 		chunkFile.PopChunk();
-	}
-
-	if ((unsigned int)System.m_execParam >= 2) {
-		System.Printf(s_charaAnimAllocWarn);
 	}
 }
 

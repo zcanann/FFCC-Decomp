@@ -33,7 +33,7 @@ static const char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
 static const char s_closeWarnFmt[] = "Close: %s";
 static const char s_readWarnFmt[] = "Read: %s (%u)";
 
-static const char* const l_tError[4][6][3] = {
+static char* l_tError[4][6][3] = {
     {
         {"Disk read error.", "Please check the Game Disc.", ""},
         {"Erreur de lecture du disque.", "Veuillez verifier le disque.", ""},

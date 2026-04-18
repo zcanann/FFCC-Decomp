@@ -11,12 +11,12 @@ struct VRyjMegaBirth
 {
     Mtx m_worldMatrix;
     Vec m_accelerationAxis;
-    Vec* m_particleBlock;
+    _PARTICLE_DATA* m_particleBlock;
     PARTICLE_WMAT* m_worldMatrixBlock;
     _PARTICLE_COLOR* m_colorBlock;
-    void* m_meshData;
-    u16 m_numParticles;
+    s32 m_numParticles;
     u16 m_emitTimer;
+    u16 m_unused4E;
 };
 
 struct PRyjMegaBirthOffsets

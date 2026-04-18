@@ -1,9 +1,6 @@
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppGetRotMatrixY.h"
 
-extern const float kPppGetRotMatrixYZero = 0.0f;
-extern const float kPppGetRotMatrixYOne = 1.0f;
-
 /*
  * --INFO--
  * PAL Address: 0x8005f868
@@ -15,22 +12,24 @@ extern const float kPppGetRotMatrixYOne = 1.0f;
  */
 void pppGetRotMatrixY(pppFMATRIX& mtx, long angle)
 {
+    const float kZero = 0.0f;
+    const float kOne = 1.0f;
     unsigned int tableAngle = angle;
     float sinValue = *(float*)((unsigned char*)gPppTrigTable + (angle & 0xFFFC));
     float cosValue = *(float*)((unsigned char*)gPppTrigTable + ((tableAngle + 0x4000) & 0xFFFC));
 
     mtx.value[0][0] = cosValue;
-    mtx.value[0][1] = kPppGetRotMatrixYZero;
+    mtx.value[0][1] = kZero;
     mtx.value[0][2] = sinValue;
-    mtx.value[0][3] = kPppGetRotMatrixYZero;
+    mtx.value[0][3] = kZero;
 
-    mtx.value[1][0] = kPppGetRotMatrixYZero;
-    mtx.value[1][1] = kPppGetRotMatrixYOne;
-    mtx.value[1][2] = kPppGetRotMatrixYZero;
-    mtx.value[1][3] = kPppGetRotMatrixYZero;
+    mtx.value[1][0] = kZero;
+    mtx.value[1][1] = kOne;
+    mtx.value[1][2] = kZero;
+    mtx.value[1][3] = kZero;
 
     mtx.value[2][0] = -sinValue;
-    mtx.value[2][1] = kPppGetRotMatrixYZero;
+    mtx.value[2][1] = kZero;
     mtx.value[2][2] = cosValue;
-    mtx.value[2][3] = kPppGetRotMatrixYZero;
+    mtx.value[2][3] = kZero;
 }

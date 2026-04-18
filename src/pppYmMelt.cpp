@@ -75,11 +75,8 @@ struct CMapCylinderRaw {
     Vec m_bottom;
     Vec m_direction;
     f32 m_radius;
-    f32 m_height;
     Vec m_top;
     Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
 };
 
 /*
@@ -116,6 +113,7 @@ extern "C" void CalcPolygonHeight(
     float expand;
     Vec worldBase;
     Vec rayDirection;
+    Vec localPosition;
     CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
     u8* colorBytes = (u8*)color;
@@ -138,26 +136,34 @@ extern "C" void CalcPolygonHeight(
         worldBase.x = pppMngStPtr->m_matrix.value[0][3];
         worldBase.y = pppMngStPtr->m_matrix.value[1][3] + vertexData->m_collisionYOffset;
         worldBase.z = pppMngStPtr->m_matrix.value[2][3];
-        pppAddVector(vertex->m_position, vertex->m_position, worldBase);
-
         rayDirection.x = zero;
         rayDirection.y = rayY;
         rayDirection.z = zero;
-        cylinder.m_bottom = vertex->m_position;
-        cylinder.m_direction = rayDirection;
-        cylinder.m_radius = zero;
-        cylinder.m_height = zero;
+        localPosition = vertex->m_position;
+        pppAddVector(vertex->m_position, localPosition, worldBase);
+
         cylinder.m_top.x = top;
         cylinder.m_top.y = top;
         cylinder.m_top.z = top;
         cylinder.m_direction2.x = expand;
         cylinder.m_direction2.y = expand;
         cylinder.m_direction2.z = expand;
+        cylinder.m_bottom = vertex->m_position;
+        cylinder.m_direction = rayDirection;
+        cylinder.m_radius = zero;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
+                &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) == 0) {
+            vertex->m_position.y = previousY;
+            if (vertexData->m_hideWhenNoGround != 0) {
+                vertex->m_color.m_bytes[0] = 0;
+                vertex->m_color.m_bytes[1] = 0;
+                vertex->m_color.m_bytes[2] = 0;
+                vertex->m_color.m_bytes[3] = 0;
+            }
+        } else {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &vertex->m_position);
-            if ((previousY - vertexData->m_maxDropDistance) > vertex->m_position.y) {
+            if (vertex->m_position.y < (previousY - vertexData->m_maxDropDistance)) {
                 vertex->m_position.y = previousY;
                 if (vertexData->m_hideWhenNoGround != 0) {
                     vertex->m_color.m_bytes[0] = 0;
@@ -165,14 +171,6 @@ extern "C" void CalcPolygonHeight(
                     vertex->m_color.m_bytes[2] = 0;
                     vertex->m_color.m_bytes[3] = 0;
                 }
-            }
-        } else {
-            vertex->m_position.y = previousY;
-            if (vertexData->m_hideWhenNoGround != 0) {
-                vertex->m_color.m_bytes[0] = 0;
-                vertex->m_color.m_bytes[1] = 0;
-                vertex->m_color.m_bytes[2] = 0;
-                vertex->m_color.m_bytes[3] = 0;
             }
         }
 

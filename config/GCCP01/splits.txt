@@ -295,6 +295,7 @@ maptexanim.cpp:
 	.text       start:0x8004F910 end:0x800503FC
 	.rodata     start:0x801D7EC4 end:0x801D7ED4
 	.data       start:0x801EA9A4 end:0x801EA9B0
+	.sdata2     start:0x8032FCD0 end:0x8032FCDC
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0

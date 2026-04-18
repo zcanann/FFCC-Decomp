@@ -1185,7 +1185,7 @@ void LoadFieldPdt0(int mapId, int floorId)
                     -0x1000) {
                     pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, createParam, 0);
                 }
-                checkOff += 0x60;
+                checkOff += 0x30;
             }
         }
     }

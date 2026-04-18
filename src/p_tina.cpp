@@ -178,7 +178,7 @@ struct CUSBStreamDataRaw {
     int m_headerReady;
     int m_dataReady;
     unsigned int m_sizeBytes;
-    unsigned int m_packetCode;
+    int m_packetCode;
     void* m_stageDefault;
     void* m_stageLoad;
     void* m_stageAmem;
@@ -675,7 +675,7 @@ void CPartPcs::calc()
  */
 void CPartPcs::calcViewer()
 {
-    unsigned int packetCode;
+    int packetCode;
 
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     PartMng.pppEditBeforeCalc();

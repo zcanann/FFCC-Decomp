@@ -938,6 +938,7 @@ mes.cpp:
 	extab       start:0x80007D38 end:0x80007D78
 	extabindex  start:0x8000E128 end:0x8000E188
 	.text       start:0x800981F0 end:0x8009B3B4
+	.data       start:0x8020F758 end:0x8020FA00
 	.bss        start:0x802EAA60 end:0x802EAAB0
 
 menu.cpp:

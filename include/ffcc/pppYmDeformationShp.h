@@ -37,7 +37,7 @@ void setVertexPos(Vec*, char, float, float, float, float);
 void setVertexUV(Vec2d*, float, float, float, float);
 void calcScreenPos(Vec4d&, Vec&, float (*)[4], float (*)[4]);
 void oddToEven(float&);
-void RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
+int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 #ifdef __cplusplus
 extern "C" {

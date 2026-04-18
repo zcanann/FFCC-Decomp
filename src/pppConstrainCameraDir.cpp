@@ -8,56 +8,6 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
 /*
  * --INFO--
- * PAL Address: 801432bc
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
-{
-    float uVar1 = 0.0f;
-    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
-    puVar2[2] = uVar1;
-    puVar2[1] = uVar1;
-    puVar2[0] = uVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 80143298
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
-{
-    float uVar1 = 0.0f;
-    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
-    puVar2[2] = uVar1;
-    puVar2[1] = uVar1;
-    puVar2[0] = uVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 80143294
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
-{
-    return;
-}
-
-/*
- * --INFO--
  * PAL Address: 80143098
  * PAL Size: 508b
  * EN Address: TODO
@@ -116,4 +66,54 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80143294
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
+{
+    return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80143298
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
+{
+    float uVar1 = 0.0f;
+    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
+    puVar2[2] = uVar1;
+    puVar2[1] = uVar1;
+    puVar2[0] = uVar1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 801432bc
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
+{
+    float uVar1 = 0.0f;
+    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
+    puVar2[2] = uVar1;
+    puVar2[1] = uVar1;
+    puVar2[0] = uVar1;
 }

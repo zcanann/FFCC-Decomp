@@ -219,7 +219,7 @@ p_game.cpp:
 	extabindex  start:0x8000C460 end:0x8000C508
 	.text       start:0x80047930 end:0x80047C9C
 	.ctors      start:0x801D53F0 end:0x801D53F4
-	.data       start:0x801EA09C end:0x801EA0D0
+	.data       start:0x801E9F2C end:0x801EA0D0
 	.sbss       start:0x8032ED00 end:0x8032ED04
 
 p_system.cpp:
@@ -342,7 +342,7 @@ pppGetRotMatrixXYZ.cpp:
 
 pppGetRotMatrixX.cpp:
 	.text       start:0x8005F794 end:0x8005F7F0
-	.sdata2     start:0x8032FDD8 end:0x8032FDE0
+	.sdata2     start:0x8032FEB0 end:0x8032FEB8
 
 pppGetRotMatrixXZY.cpp:
 	extab       start:0x80007028 end:0x80007030
@@ -351,7 +351,7 @@ pppGetRotMatrixXZY.cpp:
 
 pppGetRotMatrixY.cpp:
 	.text       start:0x8005F868 end:0x8005F8C4
-	.sdata2     start:0x8032FDE0 end:0x8032FDE8
+	.sdata2     start:0x8032FEB8 end:0x8032FEC0
 
 pppGetRotMatrixYXZ.cpp:
 	extab       start:0x80007030 end:0x80007038
@@ -365,7 +365,7 @@ pppGetRotMatrixYZX.cpp:
 
 pppGetRotMatrixZ.cpp:
 	.text       start:0x8005F9B4 end:0x8005FA10
-	.sdata2     start:0x8032FDE8 end:0x8032FDF0
+	.sdata2     start:0x8032FEC0 end:0x8032FEC8
 
 pppGetRotMatrixZXY.cpp:
 	extab       start:0x80007040 end:0x80007048
@@ -1453,6 +1453,7 @@ singmenu.cpp:
 	extab       start:0x80009C14 end:0x80009D04
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
+	.bss        start:0x8030B644 end:0x8030BA48
 
 menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94

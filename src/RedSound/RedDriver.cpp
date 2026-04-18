@@ -104,7 +104,7 @@ unsigned int* DAT_8032f444;
 void* DAT_8032f450;
 void* DAT_8032f474;
 int* DAT_8032f428;
-void* DAT_8032f438;
+RedStreamDATA* DAT_8032f438;
 void* DAT_8032f464;
 void* DAT_8032f45c;
 void* DAT_8032f46c;
@@ -1328,7 +1328,7 @@ void CRedDriver::Init()
     DAT_8032f428 = (int*)RedNew__Fi(0x10);
     DAT_8032f428[0] = -1;
     DAT_8032f424 = 0;
-    DAT_8032f438 = RedNew__Fi(0x4c0);
+    DAT_8032f438 = (RedStreamDATA*)RedNew__Fi(0x4c0);
     memset(DAT_8032f438, 0, 0x4c0);
     DAT_8032f43c = 0;
     memset(&gRedDriverSyncBuffer, 0, 0x1c00);

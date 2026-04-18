@@ -57,6 +57,7 @@ math.cpp:
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
 	.data       start:0x801E8450 end:0x801E8470
+	.bss        start:0x8023C4D8 end:0x8023C884
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC

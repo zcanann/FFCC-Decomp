@@ -1323,6 +1323,7 @@ partyobj.cpp:
 	extabindex  start:0x8001033C end:0x800105C4
 	.text       start:0x8011A574 end:0x80124998
 	.data       start:0x802116A4 end:0x80211848
+	.bss        start:0x80300268 end:0x80300318
 
 p_mc.cpp:
 	extab       start:0x800095FC end:0x8000960C
@@ -1352,6 +1353,7 @@ p_minigame.cpp:
 	.text       start:0x80127B74 end:0x8012B24C
 	.ctors      start:0x801D543C end:0x801D5440
 	.data       start:0x80212314 end:0x80212398
+	.bss        start:0x803065AC end:0x80306708
 
 pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C

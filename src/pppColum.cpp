@@ -41,14 +41,6 @@ union ColumFloatBits {
     unsigned long bits;
 };
 
-static inline bool ColumIsNaN(float value)
-{
-    ColumFloatBits bits;
-
-    bits.value = value;
-    return (bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0;
-}
-
 static const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {
@@ -65,7 +57,7 @@ void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void pppGetShapePos__FPlsR3VecR3Veci(long*, short, Vec&, Vec&, int);
 void pppGetShapeUV__FPlsR5Vec2dR5Vec2di(long*, short, Vec2d&, Vec2d&, int);
-void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
+void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec, Vec, GXColor, Vec2d*, Vec2d*);
 }
 
 /*
@@ -88,12 +80,12 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
             *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        GXColor quadColor;
         pppCVector color;
         int texture;
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionBase[0x32] != 0) {
+            float* cameraMatrix = &ppvCameraMatrix0[0][0];
             Vec shapePosA;
             Vec shapePosB;
             Vec center;
@@ -102,11 +94,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             Mtx identityMtx;
             Vec2d uvA;
             Vec2d uvB;
-            float centerZ;
             float baseX;
             float baseY;
-            float dist;
-            float fadeAmount;
             float lengthXY;
             float segmentStep;
             float drawScale;
@@ -115,16 +104,26 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             PSMTXIdentity(identityMtx);
             baseX = *(float*)(positionBase + 0x10);
             baseY = *(float*)(positionBase + 0x14);
-            cameraDelta.x = ppvCameraMatrix0[0][3] - baseX;
-            cameraDelta.y = ppvCameraMatrix0[1][3] - baseY;
-            cameraDelta.z = ppvCameraMatrix0[2][3] + *(float*)(positionBase + 0x18);
+            cameraDelta.x = cameraMatrix[3] - baseX;
+            cameraDelta.y = cameraMatrix[7] - baseY;
+            cameraDelta.z = cameraMatrix[11] + *(float*)(positionBase + 0x18);
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
             if (lengthXY > 0.0f) {
                 lengthXY = sqrtf(lengthXY);
-            } else if (lengthXY < 0.0f) {
-                lengthXY = NAN;
-            } else if (ColumIsNaN(lengthXY)) {
+            } else {
+                ColumFloatBits bits;
+
+                if (lengthXY < 0.0f) {
+                    lengthXY = NAN;
+                } else {
+                    bits.value = lengthXY;
+                    if ((bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0) {
+                        lengthXY = NAN;
+                    }
+                }
+            }
+            if (lengthXY < 0.0f) {
                 lengthXY = NAN;
             }
             if (lengthXY > 0.0f) {
@@ -135,26 +134,29 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             values = *(pppColumValue**)(frameBase + 8);
             segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
             drawScale = 0.0f;
-            centerZ = 0.0f;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
+                float index = (float)(i + 1);
+                u8 alpha = positionBase[0x32];
 
-                center.x = baseX + positionScale * (cameraDelta.x * (float)(i + 1));
-                center.y = baseY + positionScale * (cameraDelta.y * (float)(i + 1));
-                center.z = centerZ;
+                center.z = 0.0f;
+                center.x = baseX + positionScale * (cameraDelta.x * index);
+                center.y = baseY + positionScale * (cameraDelta.y * index);
 
                 PSVECSubtract(&center, (Vec*)(positionBase + 0x10), &offset);
-                dist = PSVECMag(&offset);
+                {
+                    float dist = PSVECMag(&offset);
+                    float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
 
-                color.m_rgba[3] = positionBase[0x32];
-                fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
-                if (dist < *(float*)(param_2->m_payload + 0x10) && 0.0f < fadeAmount) {
-                    color.m_rgba[3] = (u8)((float)color.m_rgba[3] * fadeAmount);
+                    if (dist < *(float*)(param_2->m_payload + 0x10) && 0.0f < fadeAmount) {
+                        alpha = (u8)((float)alpha * fadeAmount);
+                    }
                 }
                 color.m_rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
                 color.m_rgba[1] = *((u8*)&param_2->m_stepValue + 1) + values->m_colorG;
                 color.m_rgba[2] = *((u8*)&param_2->m_stepValue + 2) + values->m_colorB;
+                color.m_rgba[3] = alpha;
 
                 pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
                     &color, NULL, 0.0f, (u8)param_2->m_payload[0x15], (u8)param_2->m_payload[0x14],
@@ -182,13 +184,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     PSVECAdd(&shapePosA, &center, &shapePosA);
                     PSVECAdd(&shapePosB, &center, &shapePosB);
 
-                    quadColor.r = color.m_rgba[0];
-                    quadColor.g = color.m_rgba[1];
-                    quadColor.b = color.m_rgba[2];
-                    quadColor.a = color.m_rgba[3];
-
                     RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(
-                        &gUtil, &shapePosA, &shapePosB, quadColor, &uvA, &uvB);
+                        &gUtil, shapePosA, shapePosB, *(GXColor*)color.m_rgba, &uvA, &uvB);
                 }
 
                 EndQuadEnv__5CUtilFv(&gUtil);

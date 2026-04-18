@@ -5,8 +5,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/gobject.h"
 extern "C" {
-extern const f32 kPppConformBgNormalZero;
-extern const f32 kPppConformBgNormalOne;
+extern const f32 kPppConformBgNormalZero = 0.0f;
+extern const f32 kPppConformBgNormalOne = 1.0f;
 extern int gPppCalcDisabled;
 }
 

@@ -737,6 +737,7 @@ cflat_runtime.cpp:
 	extab       start:0x80007248 end:0x80007310
 	extabindex  start:0x8000D21C end:0x8000D2F4
 	.text       start:0x80065CAC end:0x80069B08
+	.data       start:0x801FC9F0 end:0x801FCAE4
 
 cflat_runtime2.cpp:
 	extab       start:0x80007310 end:0x80007480

@@ -102,7 +102,8 @@ unsigned char ARRAY_802739e8[0xC];
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;
-pppDrawMng ppvDrawMng;
+CProfile g_par_calc_prof(0);
+CProfile g_par_draw_prof(0);
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {

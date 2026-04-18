@@ -19,6 +19,7 @@
 #include "ffcc/pppGetRotMatrixYZX.h"
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
+#include "ffcc/pppDrawMng.h"
 #include "ffcc/pppShape.h"
 extern "C" {
 extern int gPppCalcDisabled;
@@ -75,8 +76,17 @@ extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
 Mtx ppvCameraMatrix0;
 Mtx ppvWorldMatrix;
 Mtx ppvWorldMatrixWood;
+float ppvScreenMatrix[10][4];
+float ppvScreenMatrix0[4][4];
+pppDrawMng ppvDrawMng;
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
+extern "C" {
+float gPartScreenMatrixRow2X = 0.0f;
+float gPartScreenMatrixRow2Y = 0.0f;
+float gPartScreenMatrixRow2W = 0.0f;
+int DAT_8032ED64 = 0;
+}
 
 struct PppMngStPartView {
     void* m_pppResSet;

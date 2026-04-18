@@ -73,9 +73,9 @@ static inline CMemory::CStage* MaterialEditorStage()
     return MaterialEditorPcs.m_stage;
 }
 
-static inline u32 TextureIndex(CMaterialEditorPcs* self)
+static inline int TextureIndex(CMaterialEditorPcs* self)
 {
-    return static_cast<u32>(static_cast<unsigned char>(S8At(self, 0x3BC)));
+    return static_cast<int>(S8At(self, 0x3BC));
 }
 }
 
@@ -257,7 +257,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x20: {
-        u32 textureIndex = TextureIndex(materialEditorPcs);
+        int textureIndex = TextureIndex(materialEditorPcs);
         u32 size = usb.m_sizeBytes;
         s16* headerBuffer = static_cast<s16*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, size, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));

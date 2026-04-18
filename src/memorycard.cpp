@@ -1060,7 +1060,6 @@ void CMemoryCardMan::SetLoadData()
  */
 unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
-    unsigned char byte;
     int count;
     unsigned char* ptr;
     unsigned int crc;
@@ -1076,18 +1075,16 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     ptr = data;
     while (--count >= 0)
     {
-        byte = *ptr;
-        ptr++;
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        ptr += 1;
     }
 
     ptr = data + 0x20;
     count = 0x8BB0;
     while (--count >= 0)
     {
-        byte = *ptr;
-        ptr++;
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        ptr += 1;
     }
 
     return ~crc;

@@ -65,6 +65,7 @@ memory.cpp:
 	extabindex  start:0x8000B2CC end:0x8000B434
 	.text       start:0x8001C2F0 end:0x8001FE74
 	.ctors      start:0x801D53B4 end:0x801D53B8
+	.data       start:0x801E8488 end:0x801E84A8
 	.bss        start:0x8023C888 end:0x80244028
 	.sbss       start:0x8032EC58 end:0x8032EC60
 

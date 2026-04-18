@@ -29,6 +29,8 @@ static const char s_heapWalkerUseUnuseFmt[] = "USE  : %d  UNUSE : %d\n";
 static const char s_amemCacheAddRefFmt[] = "amemCacheSet AddRef over %d\n";
 static const char s_amemCacheSeparator[] = "--------------------------------\n";
 static const char s_refCntCompareBanner[] = "---------- RefCnt0 Compare ----------\n";
+static const char s_amemCacheEntryFmt[] = "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n";
+static const char s_amemCacheEntryPaddedFmt[] = "%03d %s type:%d RefCnt:%d prio:%d data:%08x\n";
 extern char DAT_801d6648[];
 extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
@@ -1947,7 +1949,7 @@ void CAmemCacheSet::AddRef(short index)
                 if (System.m_execParam > 2) {
                     const char* useType = (current[0x0E] == 0) ? "FREE" : "USE";
                     Printf__7CSystemFPce(
-                        &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                        &System, s_amemCacheEntryFmt, i, useType,
                         static_cast<int>(current[0x0F]), *reinterpret_cast<short*>(current + 0x0C),
                         *reinterpret_cast<int*>(current + 0x10), data);
                 }
@@ -1996,7 +1998,7 @@ void CAmemCacheSet::Release(short index)
             if (((*reinterpret_cast<unsigned char*>(cache + 3) != 0) || (*cache != 0)) && (System.m_execParam > 2)) {
                 const char* useType = (*reinterpret_cast<unsigned char*>(cache + 3) != 0) ? "USE" : "FREE";
                 Printf__7CSystemFPce(
-                    &System, "%03d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                    &System, s_amemCacheEntryPaddedFmt, i, useType,
                     static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(cache) + 0x0F)),
                     *reinterpret_cast<short*>(cache + 3), cache[4], *cache);
             }
@@ -2218,7 +2220,7 @@ void CAmemCacheSet::RefCnt0Compare()
         if ((entry[0x0E] != 0 && *reinterpret_cast<short*>(entry + 0x0C) != 0) && System.m_execParam > 2) {
             const char* useType = (entry[0x0E] == 0) ? "FREE" : "USE";
             Printf__7CSystemFPce(
-                &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType, static_cast<int>(entry[0x0F]),
+                &System, s_amemCacheEntryFmt, i, useType, static_cast<int>(entry[0x0F]),
                 *reinterpret_cast<short*>(entry + 0x0C), *reinterpret_cast<int*>(entry + 0x10),
                 *reinterpret_cast<int*>(entry + 0x00));
         }
@@ -2255,7 +2257,7 @@ void CAmemCacheSet::AssertCache()
         if ((entry[0x0E] != 0 || data != 0) && System.m_execParam > 2) {
             const char* useType = (entry[0x0E] == 0) ? "FREE" : "USE";
             Printf__7CSystemFPce(
-                &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                &System, s_amemCacheEntryFmt, i, useType,
                 static_cast<int>(entry[0x0F]), *reinterpret_cast<short*>(entry + 0x0C),
                 *reinterpret_cast<int*>(entry + 0x10), data);
         }

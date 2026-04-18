@@ -21,6 +21,8 @@ extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
 
+static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
+
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a54;
 extern float FLOAT_80331a74;
@@ -2586,8 +2588,8 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	const int targetState = *reinterpret_cast<int*>(self + 0x668);
 	const int alive = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
-	sprintf(text, "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d",
-	        commandMode, m_lastStateId, m_subState, m_subFrame, alive, targetState, sGhostPartyWork.mood);
+	sprintf(text, s_partyObjStateFmt, commandMode, m_lastStateId, m_subState, m_subFrame, alive, targetState,
+	        sGhostPartyWork.mood);
 
 	float width = static_cast<float>(font->GetWidth(text));
 	font->SetPosX(x - width * 0.5f);

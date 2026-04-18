@@ -171,13 +171,13 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 anim->m_keyFrame.m_splineTable = 0;
                 anim->m_keyFrame.m_loop = 1;
                 anim->m_keyFrame.m_isRun = 0;
-                ref->m_frameTable = 0;
-                ref->m_frameStep = FLOAT_8032fd48;
-                ref->m_currentFrame = FLOAT_8032fd4c;
-                ref->m_usesBlendTexture = 0;
-                ref->m_usesKeyFrame = 0;
-                ref->m_materialId = -1;
-                ref->m_wrapMode = 1;
+                anim->m_frameTable = 0;
+                anim->m_frameStep = FLOAT_8032fd48;
+                anim->m_currentFrame = FLOAT_8032fd4c;
+                anim->m_usesBlendTexture = 0;
+                anim->m_usesKeyFrame = 0;
+                anim->m_materialId = -1;
+                anim->m_wrapMode = 1;
             }
 
             ref->m_materialIndex = chunkFile.Get2();
@@ -208,8 +208,9 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B));
             ref->m_frameTable = frameTable;
 
-            for (int i = 0; i < ref->m_frameCount; i++) {
-                frameTable[i] = chunkFile.Get2();
+            unsigned short* frame = frameTable;
+            for (int i = 0; i < ref->m_frameCount; i++, frame++) {
+                *frame = chunkFile.Get2();
             }
 
             short count = m_count;
@@ -318,12 +319,36 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapTexAnim::SetMapTexAnim(int, int, int)
+void CMapTexAnim::SetMapTexAnim(int frameStart, int frameEnd, int wrapMode)
 {
-	// TODO
+    CMapTexAnimFields* anim = Fields(this);
+    int end = frameEnd;
+
+    if (anim->m_usesKeyFrame != 0) {
+        anim->m_keyFrame.m_startFrame = frameStart;
+        anim->m_keyFrame.m_currentFrame = frameStart;
+        if (frameEnd > anim->m_keyFrame.m_frameCount) {
+            end = anim->m_keyFrame.m_frameCount;
+        }
+        anim->m_keyFrame.m_endFrame = end;
+        anim->m_keyFrame.m_loop = static_cast<unsigned char>(wrapMode);
+        anim->m_keyFrame.m_isRun = 1;
+    } else {
+        anim->m_startFrame = static_cast<short>(frameStart);
+        anim->m_currentFrame = static_cast<float>(static_cast<short>(frameStart));
+        if (frameEnd > anim->m_frameCount) {
+            end = anim->m_frameCount;
+        }
+        anim->m_endFrame = static_cast<short>(end);
+        anim->m_wrapMode = static_cast<unsigned char>(wrapMode);
+    }
 }
 
 /*

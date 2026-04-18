@@ -1,6 +1,7 @@
 #ifndef _FFCC_MAPTEXANIM_H_
 #define _FFCC_MAPTEXANIM_H_
 
+#include "ffcc/map.h"
 #include "ffcc/ref.h"
 
 class CChunkFile;
@@ -49,12 +50,8 @@ private:
     unsigned char m_pad17;
     float m_frameStep;
     float m_currentFrame;
-    void* m_frameTable;
-    unsigned char m_keyFrame[0x18];
-    void* m_keyJun;
-    void* m_keyFrameData;
-    void* m_keyKeyData;
-    void* m_keyUnknown;
+    unsigned short* m_frameTable;
+    CMapKeyFrame m_keyFrame;
 };
 
 #endif // _FFCC_MAPTEXANIM_H_

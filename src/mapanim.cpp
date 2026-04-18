@@ -38,6 +38,8 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__8CPtrArrayIP12CMapAnimNode[];
+extern "C" CMapAnimKeyDt* __ct__13CMapAnimKeyDtFv(CMapAnimKeyDt*);
+extern "C" CMapAnimNode* __ct__12CMapAnimNodeFv(CMapAnimNode*);
 extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
 extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
     CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
@@ -311,7 +313,24 @@ struct CMapAnimNodeData
  */
 CMapAnimKeyDt::CMapAnimKeyDt()
 {
-	// TODO
+    struct CMapAnimKeyDtData
+    {
+        unsigned int positionCount;
+        CMapAnimNodeTrackKey* position;
+        unsigned int rotationCount;
+        CMapAnimNodeTrackKey* rotation;
+        unsigned int scaleCount;
+        CMapAnimNodeTrackKey* scale;
+    };
+
+    CMapAnimKeyDtData* keyData = reinterpret_cast<CMapAnimKeyDtData*>(this);
+
+    keyData->positionCount = 0;
+    keyData->position = 0;
+    keyData->rotationCount = 0;
+    keyData->rotation = 0;
+    keyData->scaleCount = 0;
+    keyData->scale = 0;
 }
 
 /*
@@ -358,7 +377,11 @@ CMapAnimKeyDt::~CMapAnimKeyDt()
  */
 CMapAnimNode::CMapAnimNode()
 {
-	// TODO
+    CMapAnimNodeData* nodeData = reinterpret_cast<CMapAnimNodeData*>(this);
+
+    nodeData->node = 0;
+    nodeData->mapAnim = 0;
+    nodeData->tracks = 0;
 }
 
 /*
@@ -687,12 +710,9 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             reinterpret_cast<int*>(this)[7] = static_cast<int>(chunkFile.Get4());
             reinterpret_cast<int*>(this)[8] = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
-            item = static_cast<int*>(
+            item = reinterpret_cast<int*>(__ct__12CMapAnimNodeFv(static_cast<CMapAnimNode*>(
                 __nw__FUlPQ27CMemory6CStagePci(
-                    0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0xC2));
-            if (item != 0) {
-                item[2] = 0;
-            }
+                    0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0xC2))));
             item[1] = reinterpret_cast<int>(this);
 
             chunkFile.PushChunk();
@@ -701,14 +721,9 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     nodeIdx = static_cast<int>(chunkFile.Get4());
                     item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
                 } else if (innerChunkId == 0x5452414E) {
-                    keyData = reinterpret_cast<int>(
+                    keyData = reinterpret_cast<int>(__ct__13CMapAnimKeyDtFv(reinterpret_cast<CMapAnimKeyDt*>(
                         __nw__FUlPQ27CMemory6CStagePci(
-                            0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x4C));
-                    if (keyData != 0) {
-                        *reinterpret_cast<int*>(keyData + 0x4) = 0;
-                        *reinterpret_cast<int*>(keyData + 0xC) = 0;
-                        *reinterpret_cast<int*>(keyData + 0x14) = 0;
-                    }
+                            0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x4C))));
 
                     item[2] = keyData;
                     Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(

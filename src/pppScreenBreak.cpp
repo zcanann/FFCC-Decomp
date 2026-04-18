@@ -696,8 +696,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 
-    float sx = 2.0f * value[6];
-    float sy = 2.0f * value[7];
+    float sx = FLOAT_80331cc0 * value[6];
+    float sy = FLOAT_80331cc0 * value[7];
     u8* piece = (u8*)*(void**)&value[3];
     for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
         switch (param_2->m_initWOrk) {

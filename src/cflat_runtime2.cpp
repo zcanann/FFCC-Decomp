@@ -93,7 +93,12 @@ extern "C" void copy__8CGObjectFv(CGObject*);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
-char sCFlatRuntime2DebugDrawOverflowMsg[] = "CFlatRuntime2::AddDebugDrawCC overflow\n";
+const char sCFlatRuntime2DebugDrawOverflowMsg[] = "CFlatRuntime2::AddDebugDrawCC overflow\n";
+static const char sCFlatRuntime2FileNameFmt[] = "dvd:/%s.cft";
+static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd:/%s.cft_dbg";
+static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
+static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
+static const char sCFlatRuntime2TexturePathFmt[] = "dvd:/%s/%s.tex";
 
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
@@ -1142,7 +1147,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 int CFlatRuntime2::Load(char* fileName)
 {
 	char path[0x100];
-	sprintf(path, "dvd:/%s.cft", fileName);
+	sprintf(path, sCFlatRuntime2FileNameFmt, fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle == 0) {
@@ -1160,7 +1165,7 @@ int CFlatRuntime2::Load(char* fileName)
 	if (needDebugData(this) != 0) {
 		int debugChunk = 0;
 		for (int debugIndex = 0;; debugIndex++) {
-			sprintf(path, "dvd:/%s.cft_dbg", fileName);
+			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);
 			if (debugIndex != 0) {
 				sprintf(path, "%s%d", path, debugIndex);
 			}
@@ -1184,7 +1189,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 	resetChangeScript();
 	if (System.m_execParam > 2) {
-		Printf__7CSystemFPce(&System, "CFlatRuntime2::Load\n");
+		Printf__7CSystemFPce(&System, sCFlatRuntime2LoadMsg);
 	}
 	return 1;
 }
@@ -1522,7 +1527,7 @@ void CFlatRuntime2::Calc()
 				*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
 			}
 
-			textureSet = new (Game.m_mainStage, "cflat_runtime2.cpp", 0x335) CTextureSet;
+			textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
 			*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
 			if (textureSet != 0) {
 				textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
@@ -1749,7 +1754,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 	}
 
 	if (gCFlatRuntime2DebugDrawOverflowFrame != static_cast<int>(System.m_frameCounter)) {
-		printf(&sCFlatRuntime2DebugDrawOverflowMsg[0]);
+		printf(sCFlatRuntime2DebugDrawOverflowMsg);
 		gCFlatRuntime2DebugDrawOverflowFrame = System.m_frameCounter;
 	}
 }
@@ -1867,14 +1872,14 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game), fileName);
+	sprintf(path, sCFlatRuntime2TexturePathFmt, GetLangString__5CGameFv(&Game), fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
 		File.Read(fileHandle);
 		File.SyncCompleted(fileHandle);
 
-		textureSet = new (Game.m_mainStage, "cflat_runtime2.cpp", 0x4F4) CTextureSet;
+		textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
 		*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
 		if (textureSet != 0) {
 			textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
@@ -1923,7 +1928,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game), fileName);
+	sprintf(path, sCFlatRuntime2TexturePathFmt, GetLangString__5CGameFv(&Game), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	*reinterpret_cast<CFile::CHandle**>(layer + 8) = fileHandle;

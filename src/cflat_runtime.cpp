@@ -10,7 +10,6 @@ void __dl__FPv(void*);
 void __dla__FPv(void*);
 void __ct__Q212CFlatRuntime6CClassFv(void*);
 void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
-char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
 char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
@@ -21,6 +20,9 @@ double fmod(double, double);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
+
+static const char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
+
 static void appendString(char* dst, const char* src)
 {
 	while (*dst != '\0') {
@@ -86,8 +88,10 @@ void CFlatRuntime::Init()
 	GetStageFn getStage = reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11]);
 
 	m_permanentVarValues = static_cast<u8*>(
-	    __nwa__FUlPQ27CMemory6CStagePci(0x3000, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2A));
-	m_initScratchA = __nwa__FUlPQ27CMemory6CStagePci(0x14880, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2B);
+	    __nwa__FUlPQ27CMemory6CStagePci(
+	        0x3000, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2A));
+	m_initScratchA = __nwa__FUlPQ27CMemory6CStagePci(
+	    0x14880, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2B);
 }
 
 /*
@@ -309,7 +313,7 @@ void CFlatRuntime::Create(void* filePtr)
 
 				void* classMem =
 				    __nwa__FUlPQ27CMemory6CStagePci(classCount * 0x22C + 0x10, getStage(this),
-				                                    s_cflat_runtime_cpp_801d8ef8, 0x9E);
+				                                    const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x9E);
 				*reinterpret_cast<void**>(self + 0x18) =
 				    __construct_new_array(classMem, reinterpret_cast<void*>(__ct__Q212CFlatRuntime6CClassFv),
 				                          0, 0x22C, classCount);
@@ -351,7 +355,7 @@ void CFlatRuntime::Create(void* filePtr)
 				const int funcCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x1C) = funcCount;
 				*reinterpret_cast<void**>(self + 0x20) = __nwa__FUlPQ27CMemory6CStagePci(
-				    funcCount * 0x50, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0xD9);
+				    funcCount * 0x50, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0xD9);
 
 				int funcIndex = 0;
 				int funcOffset = 0;
@@ -381,7 +385,7 @@ void CFlatRuntime::Create(void* filePtr)
 								funcBase[0xD] = 0;
 							} else {
 								funcBase[0xD] = reinterpret_cast<int>(__nwa__FUlPQ27CMemory6CStagePci(
-								    chunk.m_size, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x109));
+								    chunk.m_size, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x109));
 								memcpy(reinterpret_cast<void*>(funcBase[0xD]), chunkFile.GetAddress(),
 								       chunk.m_size);
 							}
@@ -406,7 +410,7 @@ void CFlatRuntime::Create(void* filePtr)
 				const int variableCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x24) = variableCount;
 				*reinterpret_cast<void**>(self + 0x28) = __nwa__FUlPQ27CMemory6CStagePci(
-				    variableCount << 2, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x96);
+				    variableCount << 2, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x96);
 
 				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
 				for (int i = 0; i < variableCount; i++) {
@@ -422,9 +426,9 @@ void CFlatRuntime::Create(void* filePtr)
 				const int strCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x30) = strCount;
 				*reinterpret_cast<void**>(self + 0x34) = __nwa__FUlPQ27CMemory6CStagePci(
-				    strCount << 1, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x121);
+				    strCount << 1, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x121);
 				*reinterpret_cast<void**>(self + 0x38) = __nwa__FUlPQ27CMemory6CStagePci(
-				    chunk.m_size, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x122);
+				    chunk.m_size, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x122);
 
 				memcpy(*reinterpret_cast<void**>(self + 0x38), chunkFile.GetAddress(), chunk.m_size);
 				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
@@ -442,9 +446,9 @@ void CFlatRuntime::Create(void* filePtr)
 				const int fstrCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x3C) = fstrCount;
 				*reinterpret_cast<void**>(self + 0x40) = __nwa__FUlPQ27CMemory6CStagePci(
-				    fstrCount << 1, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x12F);
+				    fstrCount << 1, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x12F);
 				*reinterpret_cast<void**>(self + 0x44) = __nwa__FUlPQ27CMemory6CStagePci(
-				    chunk.m_size, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x130);
+				    chunk.m_size, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x130);
 
 				memcpy(*reinterpret_cast<void**>(self + 0x44), chunkFile.GetAddress(), chunk.m_size);
 				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
@@ -519,7 +523,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 											    *reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset
 											                            + 0x38)
 											        << 3,
-											    getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x181);
+											    getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x181);
 										memcpy(
 											*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C),
 											chunkFile.GetAddress(), chunk.m_size);

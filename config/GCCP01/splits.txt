@@ -1021,6 +1021,7 @@ memorycard.cpp:
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
 	.rodata     start:0x801DAA0C end:0x801DAE0C
+	.data       start:0x8021054C end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 
 pppWDrawMatrixLoop.cpp:
@@ -1470,6 +1471,7 @@ menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
+	.rodata     start:0x801DE910 end:0x801DEAD4
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
 

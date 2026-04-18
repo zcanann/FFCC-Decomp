@@ -83,8 +83,8 @@ void CFontMan::Init()
 	if (font != 0) {
 		__ct__4CRefFv(font);
 		*reinterpret_cast<void**>(font) = __vt__5CFont;
-		font->texturePtr = 0;
 		font->m_glyphData = 0;
+		font->texturePtr = 0;
 		font->posX = 0.0f;
 		font->posY = 0.0f;
 		font->posZ = 0.0f;
@@ -156,8 +156,8 @@ unsigned long CFontMan::GetInternal22Size()
  */
 CFont::CFont()
 {
-	texturePtr = 0;
 	m_glyphData = 0;
+	texturePtr = 0;
 	margin = 0.0f;
 	posZ = 0.0f;
 	posY = 0.0f;

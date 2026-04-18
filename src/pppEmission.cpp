@@ -51,7 +51,7 @@ void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, un
 void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
 
@@ -418,9 +418,9 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     state->m_colorA = baseAlpha;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-        param_2->m_stepValue, pppEmission_, param_2->m_graphId,
-        &state->m_scale0, &state->m_scale1, &state->m_scale2,
-        &param_2->m_arg3, (float*)param_2->m_payload);
+        pppEmission_, param_2->m_graphId,
+        state->m_scale0, state->m_scale1, state->m_scale2,
+        param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
     if (gPppInConstructor != 0) {
         return;

@@ -11,7 +11,8 @@ class CRedEntry;
 class CRedMemory;
 
 extern int gRedCommandHandlerTable[];
-extern FILE DAT_8021d1a8;
+extern FILE __files[];
+#define DAT_8021d1a8 (__files[1])
 extern u32 DAT_8021d7f0[];
 extern int DAT_8021d820[];
 extern int DAT_8021dc20[];

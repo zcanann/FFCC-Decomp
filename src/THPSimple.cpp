@@ -289,15 +289,12 @@ s32 THPSimpleOpen(const char* path)
 s32 THPSimpleClose(void)
 {
     if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
-        switch (SimpleControl.hasAudio) {
-        case 0:
+        if (SimpleControl.hasAudio == 0) {
             if (SimpleControl.isBufferSet == 1) {
                 return 0;
             }
-            break;
-        default:
+        } else {
             SimpleControl.isBufferSet = 0;
-            break;
         }
 
         if (SimpleControl.isReadFrameAsync != 0) {

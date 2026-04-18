@@ -27,6 +27,8 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
+extern float FLOAT_803333F0;
+
 namespace {
 
 struct MenuLstState {
@@ -107,13 +109,24 @@ static inline MenuLstList* GetMenuLstListStruct(CMenuPcs* menu)
 	return GetMenuLstMembers(menu).m_lstData;
 }
 
-static inline unsigned char* GetMenuLstPadPtr()
+static inline short* GetMenuLstState(CMenuPcs* menu)
 {
-	unsigned char* padPtr = reinterpret_cast<unsigned char*>(&Pad);
-	if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
-		padPtr += 0x54;
-	}
-	return padPtr;
+	return reinterpret_cast<short*>(GetMenuLstStateStruct(menu));
+}
+
+static inline short* GetMenuLstList(CMenuPcs* menu)
+{
+	return reinterpret_cast<short*>(GetMenuLstListStruct(menu));
+}
+
+static inline int GetMenuLstStateBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetMenuLstState(menu));
+}
+
+static inline int GetMenuLstListBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetMenuLstList(menu));
 }
 
 } // namespace
@@ -293,16 +306,12 @@ void CMenuPcs::MLstCtrl()
 	unsigned short press;
 	unsigned short hold;
 	unsigned int itemCount;
+	unsigned int chunkCount;
+	int entryBase;
 	int i;
-	int item;
 	int startFrame;
 	int offset;
-	unsigned int chunkCount;
-	MenuLstState* state;
-	MenuLstList* list;
 
-	state = GetMenuLstStateStruct(this);
-	list = GetMenuLstListStruct(this);
 	blocked = false;
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
@@ -310,7 +319,11 @@ void CMenuPcs::MLstCtrl()
 	if (blocked) {
 		press = 0;
 	} else {
-		press = *(unsigned short*)(GetMenuLstPadPtr() + 8);
+		unsigned char* padPtr = reinterpret_cast<unsigned char*>(&Pad);
+		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
+			padPtr += 0x54;
+		}
+		press = *(unsigned short*)(padPtr + 8);
 	}
 
 	blocked = false;
@@ -320,24 +333,28 @@ void CMenuPcs::MLstCtrl()
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = *(unsigned short*)(GetMenuLstPadPtr() + 0x14);
+		unsigned char* padPtr = reinterpret_cast<unsigned char*>(&Pad);
+		if ((__cntlzw((unsigned int)Pad._448_4_) & 0x20) == 0) {
+			padPtr += 0x54;
+		}
+		hold = *(unsigned short*)(padPtr + 0x14);
 	}
 
 	if (hold == 0) {
 		blocked = false;
 	} else {
 		if ((hold & 0x48) != 0) {
-			if (state->cursor == 0) {
-				state->cursor = 8;
+			if (*(short*)(GetMenuLstStateBase(this) + 0x26) == 0) {
+				*(unsigned short*)(GetMenuLstStateBase(this) + 0x26) = 8;
 			} else {
-				state->cursor = state->cursor - 1;
+				*(short*)(GetMenuLstStateBase(this) + 0x26) = *(short*)(GetMenuLstStateBase(this) + 0x26) - 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 0x24) != 0) {
-			if (state->cursor < 8) {
-				state->cursor = state->cursor + 1;
+			if (*(short*)(GetMenuLstStateBase(this) + 0x26) < 8) {
+				*(short*)(GetMenuLstStateBase(this) + 0x26) = *(short*)(GetMenuLstStateBase(this) + 0x26) + 1;
 			} else {
-				state->cursor = 0;
+				*(unsigned short*)(GetMenuLstStateBase(this) + 0x26) = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
@@ -347,7 +364,7 @@ void CMenuPcs::MLstCtrl()
 				Sound.PlaySe(2, 0x40, 0x7f, 0);
 				blocked = true;
 			} else if ((press & 0x200) != 0) {
-				state->closeRequested = 0xFF;
+				*(unsigned char*)(GetMenuLstStateBase(this) + 0xD) = 0xFF;
 				Sound.PlaySe(3, 0x40, 0x7f, 0);
 				blocked = true;
 			} else {
@@ -358,61 +375,73 @@ void CMenuPcs::MLstCtrl()
 		}
 	}
 
-	one = 1.0f;
+	one = FLOAT_803333F0;
 	if (!blocked) {
 		return;
 	}
 
-	for (i = 0; (itemCount = (unsigned int)list->count), i < (int)itemCount; i++) {
-		MenuLstEntry* entry = &list->entries[i];
-		entry->s = one;
-		entry->t = one;
+	entryBase = GetMenuLstListBase(this) + 8;
+	for (i = 0; (itemCount = (unsigned int)*GetMenuLstList(this)), i < (int)itemCount; i++) {
+		*(float*)(entryBase + 0x10) = one;
+		*(float*)(entryBase + 0x14) = one;
+		entryBase += 0x40;
 	}
 
 	startFrame = 0;
-	offset = (int)itemCount - 1;
+	offset = ((int)itemCount - 1) * 0x40;
 	if (-1 < (int)(itemCount - 1)) {
 		chunkCount = itemCount >> 3;
 		if (chunkCount != 0) {
 			do {
-				list->entries[offset].startFrame = startFrame;
-				list->entries[offset].duration = 4;
-				list->entries[offset - 1].startFrame = startFrame + 1;
-				list->entries[offset - 1].duration = 4;
-				list->entries[offset - 2].startFrame = startFrame + 2;
-				list->entries[offset - 2].duration = 4;
-				list->entries[offset - 3].startFrame = startFrame + 3;
-				list->entries[offset - 3].duration = 4;
-				list->entries[offset - 4].startFrame = startFrame + 4;
-				list->entries[offset - 4].duration = 4;
-				list->entries[offset - 5].startFrame = startFrame + 5;
-				list->entries[offset - 5].duration = 4;
-				list->entries[offset - 6].startFrame = startFrame + 6;
-				list->entries[offset - 6].duration = 4;
-				list->entries[offset - 7].startFrame = startFrame + 7;
+				int entryPtr = GetMenuLstListBase(this) + offset + 8;
+				*(int*)(entryPtr + 0x24) = startFrame;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = GetMenuLstListBase(this) + offset - 0x38;
+				*(int*)(entryPtr + 0x24) = startFrame + 1;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = GetMenuLstListBase(this) + offset - 0x78;
+				*(int*)(entryPtr + 0x24) = startFrame + 2;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = GetMenuLstListBase(this) + offset - 0xb8;
+				*(int*)(entryPtr + 0x24) = startFrame + 3;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = GetMenuLstListBase(this) + offset - 0xf8;
+				*(int*)(entryPtr + 0x24) = startFrame + 4;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = GetMenuLstListBase(this) + offset - 0x138;
+				*(int*)(entryPtr + 0x24) = startFrame + 5;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = GetMenuLstListBase(this) + offset - 0x178;
+				*(int*)(entryPtr + 0x24) = startFrame + 6;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
+				entryPtr = offset - 0x1b8;
+				offset -= 0x200;
+				entryPtr = GetMenuLstListBase(this) + entryPtr;
+				*(int*)(entryPtr + 0x24) = startFrame + 7;
 				startFrame += 8;
-				list->entries[offset - 7].duration = 4;
-				offset -= 8;
+				*(unsigned int*)(entryPtr + 0x28) = 4;
 				chunkCount--;
 			} while (chunkCount != 0);
 
 			itemCount &= 7;
 			if (itemCount == 0) {
-				state->frame = 0;
+				*(unsigned short*)(GetMenuLstStateBase(this) + 0x22) = 0;
 				return;
 			}
 		}
 
 		do {
-			list->entries[offset].startFrame = startFrame;
+			int entryPtr = offset + 8;
+			offset -= 0x40;
+			entryPtr = GetMenuLstListBase(this) + entryPtr;
+			*(int*)(entryPtr + 0x24) = startFrame;
 			startFrame++;
-			list->entries[offset].duration = 4;
-			offset--;
+			*(unsigned int*)(entryPtr + 0x28) = 4;
 			itemCount--;
 		} while (itemCount != 0);
 	}
 
-	state->frame = 0;
+	*(unsigned short*)(GetMenuLstStateBase(this) + 0x22) = 0;
 }
 
 /*

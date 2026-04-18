@@ -1,5 +1,6 @@
 #include "ffcc/pppYmDeformationShp.h"
 #include "ffcc/graphic.h"
+#include "ffcc/math.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
@@ -278,7 +279,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
  * JP Address: TODO
  * JP Size: TODO
  */
-void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
+int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
 	const f32 (*objMtx)[4] = (const f32(*)[4])((u8*)obj + 4);
 	Vec4d projected[4];
@@ -311,7 +312,7 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
 		clipPos.y = worldPos.y;
 		clipPos.z = worldPos.z;
 		clipPos.w = FLOAT_803305f8;
-		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(0, ppvScreenMatrix, &clipPos, &projected[i]);
+		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, ppvScreenMatrix, &clipPos, &projected[i]);
 		projected[i].x = projected[i].x / projected[i].w;
 		projected[i].y = projected[i].y / projected[i].w;
 		projected[i].z = projected[i].z / projected[i].w;
@@ -359,7 +360,7 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
 	pppSetBlendMode(3);
 	*(int*)work = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
 	if (*(int*)work == 0) {
-		return;
+		return 0;
 	}
 
 	PSMTXIdentity(texMtx);
@@ -453,6 +454,8 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
 		GXTexCoord2f32(uvs[i].x, uvs[i].y);
 		GXTexCoord2f32(uvs[i].x, uvs[i].y);
 	}
+
+	return 1;
 }
 
 /*

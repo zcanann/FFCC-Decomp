@@ -1351,7 +1351,8 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 
     if (*reinterpret_cast<unsigned char*>(Ptr(this, 0)) == 1) {
         *reinterpret_cast<void**>(Ptr(this, 0x24)) = __nwa__FUlPQ27CMemory6CStagePci(
-            static_cast<unsigned long>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) << 2),
+            static_cast<unsigned long>(
+                (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) & 0xFF) << 2),
             *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xDE);
         MakeSpline1Dtable__5CMathFiPfPfPf(&Math, static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) - 1,
             reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20))),

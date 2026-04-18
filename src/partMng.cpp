@@ -43,8 +43,6 @@ extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
 extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
-float ppvScreenMatrix[10][4];
-float ppvScreenMatrix0[4][4];
 float ppvCameraMatrix02[3][4];
 float ppvChrScl[4];
 Mtx ppvUnitMatrix;
@@ -107,16 +105,11 @@ extern "C" void* __nw__9CMaterialFUlPQ27CMemory6CStagePci(unsigned long, CMemory
 extern "C" CMaterial* __ct__9CMaterialFv(CMaterial*);
 extern "C" void Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(CMaterial*, unsigned long, unsigned long);
 extern "C" void AddMaterial__12CMaterialSetFP9CMateriali(CMaterialSet*, CMaterial*, int);
-CProfile g_par_calc_prof(0);
-CProfile g_par_draw_prof(0);
 PPPCREATEPARAM g_dcp;
 extern "C" {
 unsigned char DAT_8032ed68 = 0;
 int DAT_8032ed6c = 0;
 int DAT_8032ed74 = 0;
-float gPartScreenMatrixRow2X = 0.0f;
-float gPartScreenMatrixRow2Y = 0.0f;
-float gPartScreenMatrixRow2W = 0.0f;
 unsigned char gPppInConstructor = 0;
 unsigned char gPppInSubFrameCalc = 0;
 int DAT_8032ed7c = 0;

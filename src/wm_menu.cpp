@@ -96,7 +96,7 @@ char gWmMenuCursorY[2];
 int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
-char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
+static const char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 extern char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[];
 

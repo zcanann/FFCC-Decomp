@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-void randchar(char, float);
-void randf(unsigned char);
+char randchar(char, float);
+float randf(unsigned char);
 void pppSRandDownCV(void* param1, void* param2, void* param3);
 
 #ifdef __cplusplus

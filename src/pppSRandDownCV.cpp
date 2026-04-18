@@ -119,9 +119,9 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
  * Address: TODO
  * Size: TODO
  */
-void randchar(char, float)
+char randchar(char base, float value)
 {
-    // TODO
+    return (char)((f32)base * value);
 }
 
 /*
@@ -129,7 +129,19 @@ void randchar(char, float)
  * Address: TODO
  * Size: TODO
  */
-void randf(unsigned char)
+float randf(unsigned char flag)
 {
-    // TODO
+    float value;
+
+    value = -Math.RandF();
+    if (flag != 0) {
+        float random;
+        float blend;
+
+        random = Math.RandF();
+        blend = value - random;
+        value = blend * kPppSRandDownCVDualSampleScale;
+    }
+
+    return value;
 }

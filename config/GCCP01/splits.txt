@@ -57,6 +57,7 @@ math.cpp:
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
 	.data       start:0x801E8450 end:0x801E8470
+	.bss        start:0x8023C4D8 end:0x8023C884
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC
@@ -738,6 +739,7 @@ cflat_runtime2.cpp:
 	extabindex  start:0x8000D2F4 end:0x8000D4C8
 	.text       start:0x80069B08 end:0x8006EB04
 	.ctors      start:0x801D540C end:0x801D5410
+	.bss        start:0x80299F40 end:0x802E79A0
 	.sbss       start:0x8032ED98 end:0x8032EDA0
 
 chara.cpp:
@@ -747,6 +749,7 @@ chara.cpp:
 	.ctors      start:0x801D5410 end:0x801D5414
 	.data       start:0x801FCD18 end:0x801FCD38
 	.sdata      start:0x8032E8BC end:0x8032E8C0
+	.sbss       start:0x8032EDA0 end:0x8032EDA8
 
 p_chara.cpp:
 	extab       start:0x800075E0 end:0x80007838
@@ -971,6 +974,7 @@ joybus.cpp:
 	extabindex  start:0x8000E500 end:0x8000E8D8
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
+	.rodata     start:0x801DA0A4 end:0x801DA2A4
 	.bss        start:0x802EAAB0 end:0x802F2600
 	.sbss       start:0x8032EDB8 end:0x8032EDBC
 
@@ -1246,6 +1250,7 @@ THPSimple.cpp:
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
+	.bss        start:0x802FFA80 end:0x80300134
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:

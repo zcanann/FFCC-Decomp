@@ -2033,18 +2033,12 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
  */
 void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	float fVar1;
-	float fVar2;
+	float minValue;
+	float maxValue;
 	float radiusPad;
 	Mtx inverseMtx;
-	CMapHit* mapHit;
 
-	if (m_type != 2) {
-		return;
-	}
-
-	mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
-	if (mapHit == 0) {
+	if ((m_type != 2) || (*reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC) == 0)) {
 		return;
 	}
 
@@ -2057,36 +2051,34 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 	s_cyl.m_top.y = cylinder->m_top.y;
 	radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
 
-	fVar1 = s_cyl.m_direction.x;
-	fVar2 = s_cyl.m_bottom.x;
-	if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
-		fVar1 = s_cyl.m_bottom.x;
-		fVar2 = s_cyl.m_direction.x;
+	minValue = s_cyl.m_direction.x;
+	maxValue = s_cyl.m_bottom.x;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.x;
+		maxValue = s_cyl.m_direction.x;
 	}
-	s_cyl.m_direction2.z = fVar2 + radiusPad;
-	s_cyl.m_top.z = fVar1 - radiusPad;
+	s_cyl.m_direction2.z = maxValue + radiusPad;
+	s_cyl.m_top.z = minValue - radiusPad;
 
-	fVar1 = s_cyl.m_direction.y;
-	fVar2 = s_cyl.m_bottom.y;
-	if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
-		fVar1 = s_cyl.m_bottom.y;
-		fVar2 = s_cyl.m_direction.y;
+	minValue = s_cyl.m_direction.y;
+	maxValue = s_cyl.m_bottom.y;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.y;
+		maxValue = s_cyl.m_direction.y;
 	}
-	s_cyl.m_radius2 = fVar2 + radiusPad;
-	s_cyl.m_direction2.x = fVar1 - radiusPad;
+	s_cyl.m_radius2 = maxValue + radiusPad;
+	s_cyl.m_direction2.x = minValue - radiusPad;
 
-	fVar1 = s_cyl.m_direction.z;
-	fVar2 = s_cyl.m_bottom.z;
-	if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
-		fVar1 = s_cyl.m_bottom.z;
-		fVar2 = s_cyl.m_direction.z;
+	minValue = s_cyl.m_direction.z;
+	maxValue = s_cyl.m_bottom.z;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.z;
+		maxValue = s_cyl.m_direction.z;
 	}
-	s_cyl.m_height2 = fVar2 + radiusPad;
-	s_cyl.m_direction2.y = fVar1 - radiusPad;
+	s_cyl.m_height2 = maxValue + radiusPad;
+	s_cyl.m_direction2.y = minValue - radiusPad;
 	s_checkHitCylinderMask = flag;
 	CheckHitCylinderNear_r(m_nodePool);
-
-	return;
 }
 
 /*

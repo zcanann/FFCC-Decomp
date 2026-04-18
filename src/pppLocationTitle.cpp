@@ -44,11 +44,6 @@ struct LocationTitleColorBlock {
     GXColor m_color;
 };
 
-static int GetGraphFrameFromId(s32 graphId)
-{
-    return (int)graphId / 0x1000;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d92cc
@@ -260,7 +255,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int serializedOffset;
-    int graphId;
     LocationTitleWork* work;
     int graphFrame;
     int fadeDivisor;
@@ -275,8 +269,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         return;
     }
 
-    graphId = pppLocationTitle->m_graphId;
-    graphFrame = GetGraphFrameFromId(graphId);
+    graphFrame = pppLocationTitle->m_graphId / 0x1000;
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =

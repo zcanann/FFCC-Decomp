@@ -78,12 +78,26 @@ static const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.
 static const CrystalTexMtx s_crystalTexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
-static inline bool CrystalIsNaN(float value)
+static inline int CrystalFpClassify(float value)
 {
     CrystalFloatBits bits;
 
     bits.value = value;
-    return (bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0;
+    switch (bits.bits & 0x7F800000) {
+    case 0x7F800000:
+        if ((bits.bits & 0x007FFFFF) != 0) {
+            return 1;
+        }
+        return 2;
+
+    case 0:
+        if ((bits.bits & 0x007FFFFF) != 0) {
+            return 5;
+        }
+        return 3;
+    }
+
+    return 4;
 }
 
 /*
@@ -215,7 +229,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 							magnitude = sqrtf(magnitude);
 						} else if (magnitude < 0.0f) {
 							magnitude = NAN;
-						} else if (CrystalIsNaN(magnitude)) {
+						} else if (CrystalFpClassify(magnitude) == 1) {
 							magnitude = NAN;
 						}
 

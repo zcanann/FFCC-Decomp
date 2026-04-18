@@ -15,10 +15,6 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int rand(void);
-extern float FLOAT_80330ee0;
-extern float FLOAT_80330EE4;
-extern double DOUBLE_80330EE8;
-extern char s_pppLocationTitle_cpp_801DB510[];
 
 struct LocationTitleWork {
     void* m_particles;
@@ -58,7 +54,7 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTi
     LocationTitleWork* work;
     f32 value;
 
-    value = FLOAT_80330ee0;
+    value = 0.0f;
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + *param_2->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;
@@ -143,8 +139,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             param_2->m_maxCount * sizeof(LocationTitleParticle), pppEnvStPtr->m_stagePtr,
-            (char*)s_pppLocationTitle_cpp_801DB510, 0x6d);
-        zero = FLOAT_80330ee0;
+            const_cast<char*>("pppLocationTitle.cpp"), 0x6d);
+        zero = 0.0f;
         particle = (LocationTitleParticle*)work->m_particles;
 
         for (int i = 0; i < param_2->m_maxCount; i++) {
@@ -205,7 +201,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
-                stepScale = FLOAT_80330EE4 / (float)(stepCount + 1);
+                stepScale = 1.0f / (float)(stepCount + 1);
                 interpIt = interp;
                 PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
 

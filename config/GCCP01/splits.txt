@@ -96,7 +96,7 @@ pad.cpp:
 	.text       start:0x80020494 end:0x800211D4
 	.ctors      start:0x801D53C0 end:0x801D53C4
 	.data       start:0x801E8818 end:0x801E8838
-	.bss        start:0x80244140 end:0x8024430C
+	.bss        start:0x80244140 end:0x8024433C
 
 stopwatch.cpp:
 	extab       start:0x80005C44 end:0x80005CA0
@@ -138,6 +138,7 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456CC
 	.sdata      start:0x8032E8B0 end:0x8032E8B8
+	.sbss2      start:0x80333DE0 end:0x80333DE8
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -187,6 +188,7 @@ p_camera.cpp:
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C70
 	.sbss       start:0x8032ECD8 end:0x8032ECD9
+	.sbss2      start:0x80333DE8 end:0x80333DEC
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
@@ -937,6 +939,7 @@ p_menu.cpp:
 	.data       start:0x8020F2C4 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata2     start:0x803307F8 end:0x80330870
+	.sbss2      start:0x80333DEC end:0x80333DF0
 
 p_gba.cpp:
 	extab       start:0x80007CE0 end:0x80007D20
@@ -1147,6 +1150,7 @@ pppYmMana.cpp:
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
+	.sbss2      start:0x80333DF0 end:0x80333DF4
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC
@@ -1205,6 +1209,8 @@ pppCrystal.cpp:
 	extab       start:0x80008C7C end:0x80008C94
 	extabindex  start:0x8000F784 end:0x8000F7A8
 	.text       start:0x800DC9A0 end:0x800DD424
+	.rodata     start:0x801DB5B8 end:0x801DB610
+	.sdata2     start:0x80330F58 end:0x80330FD0
 
 pppRain.cpp:
 	extab       start:0x80008C94 end:0x80008CAC
@@ -1246,6 +1252,7 @@ pppYmEnv.cpp:
 	extabindex  start:0x8000F910 end:0x8000F958
 	.text       start:0x800E46DC end:0x800E6060
 	.rodata     start:0x801DB750 end:0x801DB7E8
+	.sbss2      start:0x80333DF4 end:0x80333DF8
 
 pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4
@@ -1259,6 +1266,8 @@ wm_menu.cpp:
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
 	.data       start:0x80210FDC end:0x802111E8
+	.sbss       start:0x8032EE1C end:0x8032EE34
+	.sbss2      start:0x80333DF8 end:0x80333E00
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
@@ -1284,6 +1293,7 @@ THPSimple.cpp:
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
 	.bss        start:0x802FFA80 end:0x80300134
+	.sdata      start:0x8032E8C0 end:0x8032E8C4
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:
@@ -1450,6 +1460,7 @@ pppCrystal2.cpp:
 	extab       start:0x80009B0C end:0x80009B24
 	extabindex  start:0x80010D5C end:0x80010D80
 	.text       start:0x8013E694 end:0x8013EF94
+	.rodata     start:0x801DD608 end:0x801DD660
 
 pppChangeTex.cpp:
 	extab       start:0x80009B24 end:0x80009B4C
@@ -1503,6 +1514,7 @@ singmenu.cpp:
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
 	.data       start:0x802140F0 end:0x80214A50
+	.data       start:0x80214A50 end:0x80214D24
 	.bss        start:0x8030B644 end:0x8030BA48
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
 
@@ -1520,6 +1532,7 @@ shopmenu.cpp:
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
 	.data       start:0x8021589C end:0x80215914
+	.sbss       start:0x8032EED0 end:0x8032EED4
 
 menu_item.cpp:
 	extab       start:0x80009E54 end:0x80009E8C

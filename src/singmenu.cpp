@@ -56,6 +56,23 @@ struct SingleFadeState
     SingleFadeEntry entries[64];
 };
 
+struct SingMenuStaticMessageInfo
+{
+    int lineCount;
+    s16 textIds[8];
+};
+
+struct SingMenuTextureRef
+{
+    int textureSetIndex;
+    char* textureName;
+};
+
+struct SingMenuSoloNameTable
+{
+    char* entries[9];
+};
+
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -99,9 +116,6 @@ extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
 extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
-extern "C" char* PTR_s_solo1_80214b18[];
-extern "C" char* PTR_s_solo2_80214a8c[];
-extern "C" int DAT_80214ab0;
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
@@ -130,7 +144,6 @@ extern "C" char* PTR_s_Cowlick[];
 extern "C" char* PTR_s_Spitzschopf[];
 extern "C" char* PTR_s_Ciuffo_ribelle[];
 extern "C" char* PTR_s_Remolino[];
-extern "C" unsigned char DAT_80214a50[];
 extern "C" {
 extern char lbl_803320D8[];
 extern char lbl_803320E0[];
@@ -215,6 +228,71 @@ extern char lbl_803326F8[];
 extern char lbl_80332700[];
 extern char lbl_80332708[];
 extern char lbl_80332710[];
+extern char lbl_80332718[];
+extern char lbl_80332720[];
+extern char lbl_80332728[];
+extern char lbl_80332730[];
+extern char lbl_80332738[];
+extern char lbl_80332740[];
+extern char lbl_80332748[];
+extern char lbl_80332750[];
+extern char lbl_80332758[];
+extern char lbl_80332760[];
+extern char lbl_80332768[];
+extern char lbl_80332770[];
+extern char lbl_80332778[];
+extern char lbl_80332780[];
+extern char lbl_80332788[];
+extern char lbl_80332790[];
+extern char lbl_80332798[];
+extern char lbl_803327A0[];
+extern char lbl_803327A8[];
+extern char lbl_803327B0[];
+extern char lbl_803327B8[];
+extern char lbl_803327C0[];
+extern char lbl_803327C8[];
+extern char lbl_803327D0[];
+extern char lbl_803327D8[];
+extern char lbl_803327E0[];
+extern char lbl_803327E8[];
+extern char lbl_803327F0[];
+extern char lbl_803327F8[];
+extern char lbl_80332800[];
+extern char lbl_80332808[];
+extern char lbl_80332810[];
+extern char lbl_80332818[];
+extern char lbl_80332820[];
+extern char lbl_80332828[];
+extern char lbl_80332830[];
+extern char lbl_80332838[];
+extern char lbl_80332840[];
+extern char lbl_80332848[];
+extern char lbl_80332850[];
+extern char lbl_80332858[];
+extern char lbl_80332860[];
+extern char lbl_80332868[];
+extern char lbl_80332870[];
+extern char lbl_80332878[];
+extern char lbl_80332880[];
+extern char lbl_80332888[];
+extern char lbl_80332890[];
+extern char lbl_80332898[];
+extern char lbl_803328A0[];
+extern char lbl_803328A8[];
+extern char lbl_803328B0[];
+extern char lbl_803328B8[];
+extern char lbl_803328C0[];
+extern char lbl_803328C8[];
+extern char lbl_803328D0[];
+extern char lbl_803328D8[];
+extern char lbl_803328E0[];
+extern char lbl_803328E8[];
+extern char lbl_803328F0[];
+extern char lbl_803328F8[];
+extern char lbl_80332900[];
+extern char lbl_80332908[];
+extern char lbl_80332910[];
+extern char s_sololetter_801DE8A4[];
 extern char s_Blacksmith_801DD718[];
 extern char s_Fisherman_801DD724[];
 extern char s_Merchant_801DD730[];
@@ -669,6 +747,50 @@ extern "C" {
 char s_DynamicMessStr[0x404];
 }
 
+extern "C" SingMenuStaticMessageInfo DAT_80214a50[] = {
+    {4, {14, 15, 16, 3, 0, 0, 0, 0}},
+    {2, {15, 3, 0, 0, 0, 0, 0, 0}},
+    {4, {30, 31, 32, 3, 0, 0, 0, 0}},
+};
+
+extern "C" SingMenuSoloNameTable PTR_s_solo2_80214a8c = {
+    {lbl_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
+};
+
+extern "C" SingMenuTextureRef DAT_80214ab0[] = {
+    {4, lbl_80332720},
+    {4, lbl_80332728},
+    {4, lbl_80332730},
+    {4, lbl_80332738},
+    {4, lbl_80332740},
+    {4, lbl_80332748},
+    {4, lbl_80332750},
+    {4, lbl_80332758},
+    {4, lbl_80332760},
+    {4, lbl_80332768},
+    {4, lbl_80332770},
+    {4, lbl_80332778},
+    {4, lbl_80332780},
+};
+
+extern "C" SingMenuSoloNameTable PTR_s_solo1_80214b18 = {
+    {lbl_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
+};
+
+extern "C" SingMenuTextureRef DAT_80214b3c[] = {
+    {5, lbl_80332718}, {5, lbl_80332788}, {5, lbl_80332790}, {5, lbl_80332798}, {5, lbl_803327A0},
+    {5, lbl_803327A8}, {5, lbl_803327B0}, {5, lbl_803327B8}, {5, lbl_803327C0}, {5, lbl_803327C8},
+    {5, lbl_803327D0}, {5, lbl_803327D8}, {5, lbl_803327E0}, {5, lbl_803327E8}, {5, lbl_803327F0},
+    {5, lbl_803327F8}, {5, lbl_80332800}, {5, lbl_80332808}, {5, lbl_80332810}, {5, lbl_80332818},
+    {5, lbl_80332820}, {5, lbl_80332828}, {5, lbl_80332830}, {5, lbl_80332838}, {5, lbl_80332840},
+    {5, lbl_80332848}, {5, lbl_80332850}, {5, lbl_80332858}, {5, lbl_80332860}, {5, lbl_80332868},
+    {5, lbl_80332870}, {5, lbl_80332878}, {5, lbl_80332880}, {5, lbl_80332888}, {5, lbl_80332890},
+    {5, lbl_80332898}, {5, lbl_803328A0}, {5, lbl_803328A8}, {5, lbl_803328B0}, {5, lbl_803328B8},
+    {5, lbl_803328C0}, {5, lbl_803328C8}, {5, lbl_803328D0}, {5, lbl_803328D8}, {5, lbl_803328E0},
+    {5, lbl_803328E8}, {5, lbl_803328F0}, {5, lbl_803328F8}, {5, lbl_80332900}, {5, lbl_80332908},
+    {6, lbl_80332910},
+};
+
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose__8CMenuPcsFv(CMenuPcs*);
@@ -741,7 +863,7 @@ CFile::CHandle* gSingMenuAsyncFileHandle;
 int gSingMenuAsyncLoadCompleted;
 int gSingMenuHasScriptFoodBase;
 int gSingMenuForcedSelection;
-extern int DAT_80214b3c[];
+extern "C" SingMenuTextureRef DAT_80214b3c[];
 extern float DAT_801dd708[];
 extern float DAT_801dd6f8[];
 float FLOAT_8032ea78 = 1.0f;
@@ -863,7 +985,7 @@ void CMenuPcs::createSingleMenu()
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-                this, PTR_s_solo2_80214a8c, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
+                this, PTR_s_solo2_80214a8c.entries, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
@@ -1212,7 +1334,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
                 char* language = GetLangString__5CGameFv(&Game);
-                sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18[loadIndex]);
+                sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
                 *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
@@ -1249,14 +1371,14 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x85C) < 2) {
                 gSingMenuAsyncLoadCompleted = 0;
             } else {
-                int* mapping = DAT_80214b3c;
+                SingMenuTextureRef* mapping = DAT_80214b3c;
                 for (int i = 0; i < 0x33; i++) {
-                    CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping[0] * 4);
-                    int texIdx = Find__11CTextureSetFPc(set, reinterpret_cast<char*>(mapping[1]));
+                    CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
+                    int texIdx = Find__11CTextureSetFPc(set, mapping->textureName);
                     CTexture* tex = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(set) + 8))[static_cast<unsigned long>(texIdx)];
                     *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;
-                    mapping += 2;
+                    ++mapping;
                 }
                 gSingMenuAsyncLoadCompleted = 1;
             }
@@ -2421,20 +2543,19 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetColor(color);
 
     int lineCount = AStar.m_bestPath.m_pathLength;
+    const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
     if (useDynamic == 0) {
-        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+        lineCount = staticMessage.lineCount;
     }
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;
-    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
-        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        short textId = staticMessage.textIds[i];
         int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }
-        staticInfo += 2;
         dynamicText += 0x80;
     }
 
@@ -2449,11 +2570,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int lineStep = lineHeight + 3;
 
     dynamicText = s_DynamicMessStr;
-    staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
         font->SetTlut(((activeMask & (1 << i)) != 0) + 8);
 
-        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        short textId = staticMessage.textIds[i];
         const char* text = GetSingWinMessage(textId, dynamicText, useDynamic);
         if (strlen(text) != 0) {
             char lineBuffer[128];
@@ -2463,7 +2583,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             font->Draw(lineBuffer);
         }
 
-        staticInfo += 2;
         dynamicText += 0x80;
         y += static_cast<float>(lineStep);
     }
@@ -2488,20 +2607,19 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetScale(FLOAT_8032ea78);
 
     int lineCount = AStar.m_bestPath.m_pathLength;
+    const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
     if (useDynamic == 0) {
-        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+        lineCount = staticMessage.lineCount;
     }
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;
-    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
-        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        short textId = staticMessage.textIds[i];
         int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }
-        staticInfo += 2;
         dynamicText += 0x80;
     }
 

@@ -15,6 +15,7 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int rand(void);
+extern float FLOAT_80330ee0;
 
 struct LocationTitleWork {
     void* m_particles;
@@ -56,7 +57,7 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTi
     LocationTitleWork* work;
     f32 value;
 
-    value = 0.0f;
+    value = FLOAT_80330ee0;
     work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + *param_2->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;

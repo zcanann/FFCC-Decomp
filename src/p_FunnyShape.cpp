@@ -315,7 +315,7 @@ void CFunnyShapePcs::Quit()
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(m_table__14CFunnyShapePcs + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__14CFunnyShapePcs) + index * 0x15C);
 }
 
 /*

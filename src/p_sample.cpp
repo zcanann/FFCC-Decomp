@@ -1,5 +1,29 @@
 #include "ffcc/p_sample.h"
 
+extern char s_CSamplePcs_801D6CC8[];
+
+CSamplePcsTable m_table__10CSamplePcs = {
+    s_CSamplePcs_801D6CC8,
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x10,
+        0,
+        0,
+        0,
+        0,
+        0x10,
+        1,
+    },
+};
+
 CSamplePcs SamplePcs;
 
 /*
@@ -41,7 +65,7 @@ void CSamplePcs::Quit()
  */
 int CSamplePcs::GetTable(unsigned long index)
 {
-	return (int)(m_table__10CSamplePcs + index * 0x15C);
+	return (int)(reinterpret_cast<unsigned char*>(&m_table__10CSamplePcs) + index * 0x15C);
 }
 
 /*
@@ -111,7 +135,7 @@ void CSamplePcs::func1()
  */
 inline CSamplePcs::CSamplePcs()
 {
-	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__10CSamplePcs);
+	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__10CSamplePcs);
 	const unsigned int* desc0 = m_table_desc0__10CSamplePcs;
 	const unsigned int* desc1 = m_table_desc1__10CSamplePcs;
 	const unsigned int* desc2 = m_table_desc2__10CSamplePcs;

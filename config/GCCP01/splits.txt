@@ -1285,6 +1285,7 @@ wm_menu.cpp:
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
 	.data       start:0x80210FDC end:0x802111E8
+	.bss        start:0x802FF408 end:0x802FF450
 	.sbss       start:0x8032EE1C end:0x8032EE34
 	.sdata2     start:0x8033111C end:0x803311A8
 	.sbss2      start:0x80333DF8 end:0x80333E00
@@ -1649,6 +1650,7 @@ cmake.cpp:
 	extabindex  start:0x80011584 end:0x8001168C
 	.text       start:0x8016CD3C end:0x8017474C
 	.rodata     start:0x801E3038 end:0x801E3048
+	.bss        start:0x8030BB58 end:0x8030BB80
 	.sdata2     start:0x80333580 end:0x80333614
 
 menu_lst.cpp:

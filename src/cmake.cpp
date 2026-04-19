@@ -94,6 +94,16 @@ extern "C" {
 static const char s_cmake_cpp_801e3038[] = "cmake.cpp";
 }
 
+struct CmakeInfo {
+    char m_name[0x12];
+    signed char m_tribe;
+    signed char m_hair;
+    signed char m_unknown14;
+    signed char m_job;
+};
+
+static CmakeInfo s_CmakeInfo;
+
 static inline void* MenuPcsVoid()
 {
     return &MenuPcs;

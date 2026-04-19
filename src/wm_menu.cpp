@@ -102,6 +102,8 @@ extern char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[];
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
+static Vec s_RingOrgPos;
+static Vec s_MMenuPos[5];
 
 static void releaseRefCounted(void** refObj)
 {

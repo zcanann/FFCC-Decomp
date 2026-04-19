@@ -446,7 +446,7 @@ void CFile::LockBuffer()
 			break;
 		}
 
-		SyncCompleted(fileHandle);
+		fileHandle->SyncCompleted();
 
 		fileHandle->m_completionStatus = 1;
 	}
@@ -472,7 +472,7 @@ void CFile::Read(CFile::CHandle* fileHandle)
 	}
 	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
 	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
-	SyncCompleted(fileHandle);
+	fileHandle->SyncCompleted();
 }
 
 #pragma dont_inline on

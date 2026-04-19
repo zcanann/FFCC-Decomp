@@ -2,9 +2,9 @@
 #include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
 
-extern const char* PTR_s_The_data_is_corrupt__80215bd8[];
-extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[];
-extern const char* PTR_s_I_dati_sono_danneggiati__80215bf8[];
+extern const char* PTR_s_The_data_is_corrupt_[];
+extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[];
+extern const char* PTR_s_I_dati_sono_danneggiati_[];
 extern const char* s_McStr_es[];
 extern const char* s_McStr_fr[];
 
@@ -211,15 +211,12 @@ int CMenuPcs::GetYesNoXPos(int right)
  */
 int CMenuPcs::GetWinMess(int index)
 {
-    int winMessTable = reinterpret_cast<int>(s_WinMessTable);
     int languageId = Game.m_gameWork.m_languageId;
-    int offset;
+
     if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
-        offset = index * 0x14;
-        return winMessTable + offset;
+        return reinterpret_cast<int>(&s_WinMessTable[index]);
     }
-    offset = index * 0x14;
-    return winMessTable + offset;
+    return reinterpret_cast<int>(&s_WinMessTable[index]);
 }
 
 /*
@@ -312,15 +309,15 @@ const char* CMenuPcs::GetMcStr(int index)
 
     switch (languageId) {
     case 2:
-        return PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[index];
+        return PTR_s_Der_Spielstand_ist_fehlerhaft_[index];
     case 3:
-        return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
+        return PTR_s_I_dati_sono_danneggiati_[index];
     case 4:
         return s_McStr_es[index];
     case 5:
         return s_McStr_fr[index];
     case 1:
     default:
-        return PTR_s_The_data_is_corrupt__80215bd8[index];
+        return PTR_s_The_data_is_corrupt_[index];
     }
 }

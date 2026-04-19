@@ -22,11 +22,6 @@ extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 // External data references
 extern char DAT_80330f50;
 
-static int GetGraphFrameFromId(s32 graphId)
-{
-    return (int)graphId / 0x1000;
-}
-
 struct LocationTitle2Work {
     void* m_particles;
     u16 m_count;
@@ -95,7 +90,10 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     particle = (LocationTitle2Particle*)work->m_particles;
     graphId = locationTitle->m_graphId;
     shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-    graphFrame = GetGraphFrameFromId(graphId);
+    graphFrame = graphId >> 12;
+    if ((graphId < 0) && ((graphId & 0xFFF) != 0)) {
+        graphFrame++;
+    }
 
     pppSetBlendMode(unkB->m_blendMode);
 

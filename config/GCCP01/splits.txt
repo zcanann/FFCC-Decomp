@@ -182,6 +182,7 @@ p_camera.cpp:
 	extabindex  start:0x8000BE18 end:0x8000BF08
 	.text       start:0x80036290 end:0x8003A5FC
 	.ctors      start:0x801D53E0 end:0x801D53E4
+	.rodata     start:0x801D7860 end:0x801D78F4
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C70
 	.sbss       start:0x8032ECD8 end:0x8032ECD9
@@ -1063,6 +1064,7 @@ gbaque.cpp:
 	extabindex  start:0x8000EEFC end:0x8000F460
 	.text       start:0x800C8A8C end:0x800D160C
 	.ctors      start:0x801D5430 end:0x801D5434
+	.rodata     start:0x801DB370 end:0x801DB4AF
 	.bss        start:0x802F49B0 end:0x802F7720
 
 pppYmMoveCircle.cpp:

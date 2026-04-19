@@ -47,13 +47,13 @@ extern "C" void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
 extern "C" void SetFullScreenShadow__10CCameraPcsFPA4_fl(CCameraPcs*);
 extern "C" void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
 
-const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs_GAME";
-const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs_CHARA";
-const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs_MAP";
-const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs_MATERIALEDITOR";
-const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs_FUNNYSHAPE";
-const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs_PART";
-const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs_SHADOW";
+const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
+const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
+const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
+const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
+const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
+const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
+const char s_CCameraPcs_SHADOW_801D78E0[20] = "CCameraPcs(SHADOW)";
 
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;

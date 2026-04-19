@@ -12649,6 +12649,7 @@ m_table_desc2__11CDbgMenuPcs = .data:0x802123B0; // type:object size:0xC data:4b
 m_table_desc3__11CDbgMenuPcs = .data:0x802123BC; // type:object size:0xC data:4byte
 m_table__11CDbgMenuPcs = .data:0x802123C8; // type:object size:0x15C
 PTR_DAT_80212524 = .data:0x80212524; // type:object size:0xD0 data:4byte
+lbl_802125F4 = .data:0x802125F4; // type:object size:0xA0
 gDbgMenuWindowBorderColors = .data:0x80212694; // type:object size:0x10 data:4byte
 lbl_802126A4 = .data:0x802126A4; // type:object size:0xC
 lbl_802126B0 = .data:0x802126B0; // type:object size:0x14

@@ -157,7 +157,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		AIInit(0);
 		AXInit();
 		AXARTInit();
-		DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
+        DAT_8032f468.Init((int)param_2, param_3, param_4, param_5);
 		DAT_8032e154.Init();
 		Start();
 		gRedDriver.Init();

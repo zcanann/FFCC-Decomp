@@ -328,7 +328,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	unsigned int selected = 0;
 	int maxBankSize = 0;
 	int* entry = (int*)this;
-	int aBase = DAT_8032f480.GetABufferAddress();
+    int aBase = DAT_8032f468.GetABufferAddress();
 	offset += aBase;
 	maxSize += aBase;
 	unsigned int history = (unsigned int)entry[0] + 0x100;
@@ -792,9 +792,9 @@ void CRedEntry::DisplayWaveInfo()
 		int maxFreeSize = 0;
 		int totalSize = 0;
 		int entryWave = 0;
-		int aBufferAddress = DAT_8032f480.GetABufferAddress();
-		int* aBankAddress = (int*)DAT_8032f480.GetABankAddress();
-		int aBufferEnd = aBufferAddress + DAT_8032f480.GetABufferSize();
+        int aBufferAddress = DAT_8032f468.GetABufferAddress();
+        int* aBankAddress = (int*)DAT_8032f468.GetABankAddress();
+        int aBufferEnd = aBufferAddress + DAT_8032f468.GetABufferSize();
 
 		int* bank = aBankAddress;
 		do {
@@ -844,10 +844,10 @@ void CRedEntry::DisplayWaveInfo()
 			bank += 2;
 		} while (bank < aBankAddress + 0x800);
 
-		int aBase = DAT_8032f480.GetABufferAddress();
-		int aSize = DAT_8032f480.GetABufferSize();
+        int aBase = DAT_8032f468.GetABufferAddress();
+        int aSize = DAT_8032f468.GetABufferSize();
 		if (maxFreeSize < (aBase + aSize) - aBufferAddress) {
-			maxFreeSize = (aBase + DAT_8032f480.GetABufferSize()) - aBufferAddress;
+            maxFreeSize = (aBase + DAT_8032f468.GetABufferSize()) - aBufferAddress;
 		}
 
 		OSReport(DAT_80333d4f, DAT_801e7905);
@@ -1598,9 +1598,9 @@ void CRedEntry::DisplayMMemoryInfo()
 	maxFreeSize = 0;
 	totalSize = 0;
 	entryCount = 0;
-	nextAddress = DAT_8032f480.GetMainBufferAddress();
-	memoryBank = DAT_8032f480.GetMainBankAddress();
-	bufferTop = nextAddress + DAT_8032f480.GetMainBufferSize();
+    nextAddress = DAT_8032f468.GetMainBufferAddress();
+    memoryBank = DAT_8032f468.GetMainBankAddress();
+    bufferTop = nextAddress + DAT_8032f468.GetMainBufferSize();
 	bankEntry = memoryBank;
 	seBlockBase = (int*)DAT_8032e12c;
 
@@ -1686,7 +1686,7 @@ void CRedEntry::DisplayMMemoryInfo()
 		bankEntry += 2;
 	} while (bankEntry < memoryBank + 0x800);
 
-	freeSize = (DAT_8032f480.GetMainBufferAddress() + DAT_8032f480.GetMainBufferSize()) - nextAddress;
+    freeSize = (DAT_8032f468.GetMainBufferAddress() + DAT_8032f468.GetMainBufferSize()) - nextAddress;
 	if (maxFreeSize < freeSize) {
 		maxFreeSize = freeSize;
 	}

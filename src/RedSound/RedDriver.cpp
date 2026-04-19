@@ -78,7 +78,7 @@ int DAT_8032f414;
 int DAT_8032f404;
 int DAT_8032f410;
 int DAT_8032f40c;
-int DAT_8032f468;
+int gRedDriverStatus;
 int DAT_8032f484;
 int DAT_8032f434;
 int DAT_8032f430;
@@ -129,7 +129,7 @@ ARQRequest DAT_8032dde4;
 OSThread DAT_8032de08;
 OSSemaphore DAT_8032e120;
 void* DAT_8032e12c[4];
-CRedMemory DAT_8032f480;
+CRedMemory DAT_8032f468;
 CRedEntry DAT_8032e154;
 
 static inline RedDriverSyncState& RedDriverSync()
@@ -908,7 +908,7 @@ void _DMACheckProcess()
         fflush(&DAT_8021d1a8);
 
         semCount = OSGetSemaphoreCount(&DAT_8032ddd8);
-        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", DAT_8032f468, semCount, DAT_8032f484,
+        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", gRedDriverStatus, semCount, DAT_8032f484,
                  DAT_8032f488[0]);
         fflush(&DAT_8021d1a8);
     }
@@ -937,7 +937,7 @@ void _DMACheckProcess()
  */
 void _DmaCallback(unsigned long)
 {
-    DAT_8032f468 = 0;
+    gRedDriverStatus = 0;
 }
 
 /*
@@ -1087,7 +1087,7 @@ void _DmaExecute()
             DAT_8032f488[0] = 2;
             piVar6 = 0;
             if (*piVar7 != 0) {
-                DAT_8032f468 = 1;
+                gRedDriverStatus = 1;
                 if (piVar7[1] == 0) {
                     DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
                     iVar3 = piVar7[2];
@@ -1111,7 +1111,7 @@ void _DmaExecute()
         } while (piVar6 == 0);
         while (piVar6 != 0) {
             DAT_8032f488[0] = 7;
-            if (DAT_8032f468 == 0) {
+            if (gRedDriverStatus == 0) {
                 DAT_8032f488[0] = 8;
                 if (piVar6[5] != 0) {
                     uVar1 = OSDisableInterrupts();
@@ -1257,7 +1257,7 @@ void CRedDriver::Init()
     DAT_8032f404 = 0;
     DAT_8032f410 = 0;
     DAT_8032f40c = 0;
-    DAT_8032f468 = 0;
+    gRedDriverStatus = 0;
     DAT_8032f42c = 0;
     DAT_8032f434 = 0x1ff;
     DAT_8032f430 = 0x1ff;

@@ -11,6 +11,10 @@ extern unsigned char gPppInConstructor;
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
+extern "C" const float FLOAT_80333574 = 64.0f;
+extern "C" const float FLOAT_80333578 = 0.8f;
+extern "C" const float FLOAT_8033357C = 56.0f;
+
 void pppSetFpMatrix(_pppMngSt*);
 
 /*
@@ -72,8 +76,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                 resultPos.z = cameraDir.z * *value + resultPos.z;
             }
 
-            float localY = param_1->m_object.m_localMatrix.value[1][3];
             float localX = param_1->m_object.m_localMatrix.value[0][3];
+            float localY = param_1->m_object.m_localMatrix.value[1][3];
 
             Vec direct0;
             Vec direct1;

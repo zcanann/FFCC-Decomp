@@ -2319,9 +2319,7 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 	register short keyTranspose = *(short*)((char*)track + 0x142);
 
 	((int*)track)[0] = (int)(command + 1);
-	register int keyTransposeDelta = *command << 8;
-	register int keyTransposeResult = keyTranspose + keyTransposeDelta;
-	*(short*)((char*)track + 0x142) = keyTransposeResult;
+	*(short*)((char*)track + 0x142) = keyTranspose + (*command << 8);
 	m_ChangeStatus |= 1;
 }
 

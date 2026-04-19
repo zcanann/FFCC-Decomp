@@ -1677,6 +1677,7 @@ wmm_str.cpp:
 	extab       start:0x8000A1CC end:0x8000A1DC
 	extabindex  start:0x8001177C end:0x80011794
 	.text       start:0x8017AF14 end:0x8017B494
+	.data       start:0x80215BD8 end:0x8021645C
 	.data       start:0x8021645C end:0x80216758
 	.sdata2     start:0x803336A0 end:0x803336AC
 

@@ -5,8 +5,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/gobject.h"
 extern "C" {
-extern const f32 kPppConformBgNormalZero = 0.0f;
-extern const f32 kPppConformBgNormalOne = 1.0f;
+static const f32 kPppConformBgNormalZero = 0.0f;
+static const f32 kPppConformBgNormalOne = 1.0f;
 extern int gPppCalcDisabled;
 }
 
@@ -63,7 +63,7 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _p
 
     serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
     pfVar2 = (f32*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
-    scale = kPppConformBgNormalZero;
+    scale = 0.0f;
     pfVar2[2] = scale;
     pfVar2[1] = scale;
     pfVar2[0] = scale;

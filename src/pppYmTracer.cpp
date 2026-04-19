@@ -460,7 +460,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             GXSetCullMode(GX_CULL_NONE);
 
             for (i = 0; i < (s32)(work->count - 1); i++) {
-                if (((poly->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
+                if ((((poly + 1)->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
                      (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
                      (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
                      (FLOAT_803306e8 != (poly + 1)->to.x) && (FLOAT_803306e8 != (poly + 1)->to.y) &&

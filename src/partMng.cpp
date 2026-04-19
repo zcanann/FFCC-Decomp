@@ -2521,6 +2521,21 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
  */
 void CPartMng::pppDrawIdx(int partIndex)
 {
+    struct PppMngStDrawIdxRaw {
+        void* m_pppResSet;                   // 0x00
+        unsigned char m_pad04[0x14 - 0x4];
+        int m_baseTime;                      // 0x14
+        unsigned char m_pad18[0x78 - 0x18];
+        pppFMATRIX m_matrix;                 // 0x78
+        unsigned char m_padA8[0xE8 - 0xA8];
+        unsigned char m_deleteRequested;     // 0xE8
+        unsigned char m_padE9[0x108 - 0xE9];
+        float m_cullRadiusSq;                // 0x108
+        float m_cullRadius;                  // 0x10C
+        float m_cullYOffset;                 // 0x110
+        float m_sortDepth;                   // 0x114
+    };
+
     Mtx invCamera;
     Vec cameraPos;
     Vec partPos;
@@ -2532,8 +2547,9 @@ void CPartMng::pppDrawIdx(int partIndex)
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(reinterpret_cast<unsigned char*>(this) + 0x2A18) + partIndex;
-    if (mng->m_mode != 0) {
+    PppMngStDrawIdxRaw* mng =
+        reinterpret_cast<PppMngStDrawIdxRaw*>(reinterpret_cast<unsigned char*>(this) + 0x2A18 + partIndex * 0x158);
+    if (mng->m_deleteRequested != 0) {
         return;
     }
     if (mng->m_baseTime == -0x1000) {
@@ -2546,7 +2562,7 @@ void CPartMng::pppDrawIdx(int partIndex)
     partPos.x = mng->m_matrix.value[0][3];
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
-    pppMngStPtr = mng;
+    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
 
     if ((double)mng->m_cullRadiusSq != 0.0) {
         PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
@@ -2567,9 +2583,9 @@ void CPartMng::pppDrawIdx(int partIndex)
     PSMTXMultVec(ppvCameraMatrix02, &partPos, &viewPos);
     mng->m_sortDepth = viewPos.z;
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-    pppMngStPtr = mng;
-    pppSetFpMatrix(mng);
-    _pppDrawPart__FP9_pppMngSt(mng);
+    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+    pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+    _pppDrawPart__FP9_pppMngSt(reinterpret_cast<_pppMngSt*>(mng));
 }
 
 /*
@@ -3697,14 +3713,6 @@ int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam,
  * JP Address: TODO
  * JP Size: TODO
  */
-struct PppMngLifecycleState {
-    unsigned char m_pad00[0xE4];
-    unsigned char m_endRequested;
-    unsigned char m_stopRequested;
-    unsigned char m_padE6[0x36];
-    PPPSEST m_soundEffectData;
-};
-
 void CPartMng::pppGetFreeSlot()
 {
     char* self = reinterpret_cast<char*>(this);
@@ -3735,7 +3743,7 @@ void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
         if (baseTime != -0x1000 && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
             if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(pppMngSt + 0x137) & 1) == 0) {
                 if (baseTime < 0) {
-                    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+                    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe8) = 1;
                     pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
                                                      reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
                 } else {
@@ -3802,14 +3810,25 @@ void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
  */
 void CPartMng::pppDeletePart(int index)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this) + (index * 0x158) + 0x2A18;
+    struct PppMngLifecycleState {
+        void* m_pppResSet;                   // 0x00
+        unsigned char m_pad04[0x14 - 0x4];
+        int m_baseTime;                      // 0x14
+        unsigned char m_pad18[0xE8 - 0x18];
+        unsigned char m_deleteRequested;     // 0xE8
+        unsigned char m_padE9[0x11C - 0xE9];
+        PPPSEST m_soundEffectData;           // 0x11C
+    };
 
-    if (*reinterpret_cast<int*>(pppMngSt + 0x14) < 0) {
-        *reinterpret_cast<unsigned char*>(pppMngSt + 0xE8) = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(
-            reinterpret_cast<_pppMngSt*>(pppMngSt), reinterpret_cast<PPPSEST*>(pppMngSt + 0x11C));
+    PppMngLifecycleState* mng = reinterpret_cast<PppMngLifecycleState*>(
+        reinterpret_cast<unsigned char*>(this) + 0x2A18 + index * 0x158);
+    int baseTime = mng->m_baseTime;
+
+    if (baseTime < 0) {
+        mng->m_deleteRequested = 1;
+        pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
     } else {
-        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+        mng->m_baseTime = -0x1000;
     }
 }
 
@@ -3820,10 +3839,18 @@ void CPartMng::pppDeletePart(int index)
  */
 void CPartMng::pppEndPart(int index)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this) + (index * 0x158) + 0x2A18;
-    *reinterpret_cast<unsigned char*>(pppMngSt + 0xE5) = 1;
-    pppStopSe__FP9_pppMngStP7PPPSEST(
-        reinterpret_cast<_pppMngSt*>(pppMngSt), reinterpret_cast<PPPSEST*>(pppMngSt + 0x11C));
+    struct PppMngLifecycleState {
+        unsigned char m_pad00[0xE5];
+        unsigned char m_stopRequested;       // 0xE5
+        unsigned char m_padE6[0x11C - 0xE6];
+        PPPSEST m_soundEffectData;           // 0x11C
+    };
+
+    PppMngLifecycleState* mng = reinterpret_cast<PppMngLifecycleState*>(
+        reinterpret_cast<unsigned char*>(this) + 0x2A18 + index * 0x158);
+
+    mng->m_stopRequested = 1;
+    pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
 }
 
 /*

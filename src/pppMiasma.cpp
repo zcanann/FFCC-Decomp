@@ -10,11 +10,12 @@
 
 extern float FLOAT_80331928;
 extern float FLOAT_8033192c;
-extern float FLOAT_80331930;
-extern float FLOAT_80331934;
-extern float FLOAT_80331938;
-extern float FLOAT_8033193c;
-extern float FLOAT_80331940;
+extern const float FLOAT_80331930 = -1000.0f;
+extern const float FLOAT_80331934 = 1200.0f;
+extern const float FLOAT_80331938 = 10.0f;
+extern const float FLOAT_8033193c = 0.0f;
+extern const float FLOAT_80331940 = 1.0f;
+extern const double DOUBLE_80331948 = 4503601774854144.0;
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);

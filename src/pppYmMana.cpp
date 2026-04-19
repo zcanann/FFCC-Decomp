@@ -99,6 +99,7 @@ void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlend
     void* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
     _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
 void Draw__Q29CCharaPcs7CHandleFi(CCharaPcs::CHandle* handle, int drawType);
+void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
@@ -675,10 +676,12 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     u32* work;
     void* dstBuffer;
     u32* texList;
+    s32 meshData;
     void* handle;
     s32 model;
     CGObject* gObject;
     s32 i;
+    u32 meshIndex;
     s32 setupOffset;
 
     if (gPppCalcDisabled != 0) {
@@ -771,6 +774,107 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3CB);
         genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
+    }
+
+    meshData = *(s32*)(model + 0xAC);
+    if (work[0xF] == 0 && work[0x10] == 0 && work[0x12] == 0) {
+        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
+            s32 meshShape = *(s32*)(meshData + 8);
+            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+
+            if (((type == 1) && strcmp((char*)meshShape, DAT_80330e88) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, DAT_80330e90) == 0) ||
+                ((type == 3) && strcmp((char*)meshShape, DAT_80330e98) == 0)) {
+                if (work[0x19] == 0) {
+                    work[0x19] =
+                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppYmMana_cpp), 1000);
+                    memset((void*)work[0x19], 0, *(s32*)(meshShape + 0x14) * 0xC);
+                }
+                if (work[0x1A] == 0) {
+                    work[0x1A] =
+                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppYmMana_cpp), 0x3F1);
+                    memset((void*)work[0x1A], 0xFF, *(s32*)(meshShape + 0x14) << 2);
+                }
+                if (work[0x1B] == 0) {
+                    s32 texCoordSize = *(s32*)(meshShape + 0x14) * 6;
+                    work[0x1B] = (u32)pppMemAlloc(texCoordSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA);
+                    work[0x1C] = (u32)pppMemAlloc(texCoordSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB);
+                    memset((void*)work[0x1B], 0, texCoordSize);
+                    memset((void*)work[0x1C], 0, texCoordSize);
+                }
+
+                work[0x18] = (u32)pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
+                                              const_cast<char*>(s_pppYmMana_cpp), 0x407);
+                u32* dlInfo = *(u32**)(meshShape + 0x50);
+                s32 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
+                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+                    *(u32*)(work[0x18] + dlOffset) =
+                        (u32)pppMemAlloc(dlInfo[0], pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x411);
+                    *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
+                    work[0x3C] = dlInfo[0];
+                    memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
+                    DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
+                    ReWriteDisplayList__5CUtilFPvUlUl((void*)gUtil, (void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 3);
+                    dlOffset -= 4;
+                    dlInfo += 3;
+                }
+            }
+
+            if (((type == 1) && strcmp((char*)meshShape, DAT_80330ea0) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, DAT_80330ea8) == 0)) {
+                work[0xF] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x427);
+                work[0x10] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x428);
+                work[0x17] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x429);
+                work[0x15] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42A);
+                work[0x16] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42B);
+                work[0x12] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42C);
+                work[0x13] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42D);
+                work[0x14] = (u32)pppMemAlloc(0xC00, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42E);
+                work[0x11] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42F);
+                memset((void*)work[0x12], 0, 0x484);
+                memset((void*)work[0x13], 0, 0x484);
+                CreateWaterMesh((Vec*)work[0xF], (Vec*)work[0x10], (Vec2d*)work[0x15], (unsigned short*)work[0x14],
+                                *(float*)((u8*)param_2 + 0x2C));
+            }
+
+            meshData += 0x14;
+        }
+    }
+
+    if ((*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) && work[0x12] != 0) {
+        *(u32*)(work[0x12] + 0x240) = *(u32*)((u8*)param_2 + 0x34);
+    }
+
+    if (*(u8*)((u8*)param_2 + 0x1C) != 0) {
+        if (*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) {
+            UpdateWaterMesh((VYmMana*)work);
+        }
+
+        meshData = *(s32*)(model + 0xAC);
+        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
+            s32 meshShape = *(s32*)(meshData + 8);
+            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+
+            if (((type == 1) && strcmp((char*)meshShape, DAT_80330e88) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, DAT_80330e90) == 0) ||
+                ((type == 3) && strcmp((char*)meshShape, DAT_80330e98) == 0)) {
+                s32 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
+                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+                    CalcReflectionVector2(
+                        (Vec*)work[0x19], *(S16Vec**)(meshShape + 0x18), *(S16Vec**)(meshShape + 0x20),
+                        *(s32*)(meshShape + 0x14), *(u32*)(*(s32*)(model + 0xA4) + 0x34),
+                        *(u32*)(*(s32*)(model + 0xA4) + 0x38), (float(*)[4])(model + 8),
+                        *(void**)(work[0x18] + dlOffset), work[0x3C], (_GXColor*)work[0x1A], (S16Vec2d*)work[0x1B],
+                        (S16Vec2d*)work[0x1C], (CChara::CNode*)(*(s32*)(model + 0xA8) + *(s32*)(meshShape + 0x5C) * 0xC0),
+                        pppYmMana, (VYmMana*)work);
+                    dlOffset -= 4;
+                }
+            }
+
+            meshData += 0x14;
+        }
     }
 }
 

@@ -21,8 +21,6 @@ PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
 
 static const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
-static pppFMATRIX g_matKeep;
-static pppFMATRIX g_matTmp;
 
 static inline float* f32_at(void* base, s32 off)
 {
@@ -425,7 +423,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
     (void)stepData;
     (void)ctrlTable;
     // Keep the original file-scope matrix scratch live until the draw path is restored.
-    PSMTXCopy(g_matKeep.value, g_matTmp.value);
+    PSMTXCopy(g_matKeep, g_matTmp);
 }
 
 /*
@@ -510,9 +508,9 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         PSMTXConcat(pppMngStPtr->m_matrix.value, model.value, model.value);
     }
 
-    PSMTXCopy(model.value, g_matKeep.value);
-    PSMTXConcat(ppvCameraMatrix0, model.value, g_matTmp.value);
-    PSMTXCopy(g_matTmp.value, out.value);
+    PSMTXCopy(model.value, g_matKeep);
+    PSMTXConcat(ppvCameraMatrix0, model.value, g_matTmp);
+    PSMTXCopy(g_matTmp, out.value);
 
     if (copyOut != 0) {
         PSMTXCopy(out.value, mtxB.value);

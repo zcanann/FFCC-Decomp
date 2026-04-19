@@ -68,6 +68,11 @@ struct SingMenuTextureRef
     char* textureName;
 };
 
+struct SingMenuSoloNameTable
+{
+    char* entries[9];
+};
+
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -237,6 +242,56 @@ extern char lbl_80332768[];
 extern char lbl_80332770[];
 extern char lbl_80332778[];
 extern char lbl_80332780[];
+extern char lbl_80332788[];
+extern char lbl_80332790[];
+extern char lbl_80332798[];
+extern char lbl_803327A0[];
+extern char lbl_803327A8[];
+extern char lbl_803327B0[];
+extern char lbl_803327B8[];
+extern char lbl_803327C0[];
+extern char lbl_803327C8[];
+extern char lbl_803327D0[];
+extern char lbl_803327D8[];
+extern char lbl_803327E0[];
+extern char lbl_803327E8[];
+extern char lbl_803327F0[];
+extern char lbl_803327F8[];
+extern char lbl_80332800[];
+extern char lbl_80332808[];
+extern char lbl_80332810[];
+extern char lbl_80332818[];
+extern char lbl_80332820[];
+extern char lbl_80332828[];
+extern char lbl_80332830[];
+extern char lbl_80332838[];
+extern char lbl_80332840[];
+extern char lbl_80332848[];
+extern char lbl_80332850[];
+extern char lbl_80332858[];
+extern char lbl_80332860[];
+extern char lbl_80332868[];
+extern char lbl_80332870[];
+extern char lbl_80332878[];
+extern char lbl_80332880[];
+extern char lbl_80332888[];
+extern char lbl_80332890[];
+extern char lbl_80332898[];
+extern char lbl_803328A0[];
+extern char lbl_803328A8[];
+extern char lbl_803328B0[];
+extern char lbl_803328B8[];
+extern char lbl_803328C0[];
+extern char lbl_803328C8[];
+extern char lbl_803328D0[];
+extern char lbl_803328D8[];
+extern char lbl_803328E0[];
+extern char lbl_803328E8[];
+extern char lbl_803328F0[];
+extern char lbl_803328F8[];
+extern char lbl_80332900[];
+extern char lbl_80332908[];
+extern char lbl_80332910[];
 extern char s_sololetter_801DE8A4[];
 extern char s_Blacksmith_801DD718[];
 extern char s_Fisherman_801DD724[];
@@ -698,16 +753,8 @@ extern "C" SingMenuStaticMessageInfo DAT_80214a50[] = {
     {4, {30, 31, 32, 3, 0, 0, 0, 0}},
 };
 
-extern "C" char* PTR_s_solo2_80214a8c[] = {
-    lbl_80332718,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
+extern "C" SingMenuSoloNameTable PTR_s_solo2_80214a8c = {
+    {lbl_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
 extern "C" SingMenuTextureRef DAT_80214ab0[] = {
@@ -726,16 +773,22 @@ extern "C" SingMenuTextureRef DAT_80214ab0[] = {
     {4, lbl_80332780},
 };
 
-extern "C" char* PTR_s_solo1_80214b18[] = {
-    lbl_80332720,
-    s_sololetter_801DE8A4,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
+extern "C" SingMenuSoloNameTable PTR_s_solo1_80214b18 = {
+    {lbl_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
+};
+
+extern "C" SingMenuTextureRef DAT_80214b3c[] = {
+    {5, lbl_80332718}, {5, lbl_80332788}, {5, lbl_80332790}, {5, lbl_80332798}, {5, lbl_803327A0},
+    {5, lbl_803327A8}, {5, lbl_803327B0}, {5, lbl_803327B8}, {5, lbl_803327C0}, {5, lbl_803327C8},
+    {5, lbl_803327D0}, {5, lbl_803327D8}, {5, lbl_803327E0}, {5, lbl_803327E8}, {5, lbl_803327F0},
+    {5, lbl_803327F8}, {5, lbl_80332800}, {5, lbl_80332808}, {5, lbl_80332810}, {5, lbl_80332818},
+    {5, lbl_80332820}, {5, lbl_80332828}, {5, lbl_80332830}, {5, lbl_80332838}, {5, lbl_80332840},
+    {5, lbl_80332848}, {5, lbl_80332850}, {5, lbl_80332858}, {5, lbl_80332860}, {5, lbl_80332868},
+    {5, lbl_80332870}, {5, lbl_80332878}, {5, lbl_80332880}, {5, lbl_80332888}, {5, lbl_80332890},
+    {5, lbl_80332898}, {5, lbl_803328A0}, {5, lbl_803328A8}, {5, lbl_803328B0}, {5, lbl_803328B8},
+    {5, lbl_803328C0}, {5, lbl_803328C8}, {5, lbl_803328D0}, {5, lbl_803328D8}, {5, lbl_803328E0},
+    {5, lbl_803328E8}, {5, lbl_803328F0}, {5, lbl_803328F8}, {5, lbl_80332900}, {5, lbl_80332908},
+    {6, lbl_80332910},
 };
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
@@ -810,7 +863,7 @@ CFile::CHandle* gSingMenuAsyncFileHandle;
 int gSingMenuAsyncLoadCompleted;
 int gSingMenuHasScriptFoodBase;
 int gSingMenuForcedSelection;
-extern int DAT_80214b3c[];
+extern "C" SingMenuTextureRef DAT_80214b3c[];
 extern float DAT_801dd708[];
 extern float DAT_801dd6f8[];
 float FLOAT_8032ea78 = 1.0f;
@@ -932,7 +985,7 @@ void CMenuPcs::createSingleMenu()
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-                this, PTR_s_solo2_80214a8c, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
+                this, PTR_s_solo2_80214a8c.entries, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
@@ -1281,7 +1334,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
                 char* language = GetLangString__5CGameFv(&Game);
-                sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18[loadIndex]);
+                sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
                 *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
@@ -1318,14 +1371,14 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x85C) < 2) {
                 gSingMenuAsyncLoadCompleted = 0;
             } else {
-                int* mapping = DAT_80214b3c;
+                SingMenuTextureRef* mapping = DAT_80214b3c;
                 for (int i = 0; i < 0x33; i++) {
-                    CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping[0] * 4);
-                    int texIdx = Find__11CTextureSetFPc(set, reinterpret_cast<char*>(mapping[1]));
+                    CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
+                    int texIdx = Find__11CTextureSetFPc(set, mapping->textureName);
                     CTexture* tex = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(set) + 8))[static_cast<unsigned long>(texIdx)];
                     *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;
-                    mapping += 2;
+                    ++mapping;
                 }
                 gSingMenuAsyncLoadCompleted = 1;
             }

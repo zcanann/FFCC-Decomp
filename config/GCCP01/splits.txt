@@ -1510,7 +1510,7 @@ singmenu.cpp:
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
 	.data       start:0x802140F0 end:0x80214A50
-	.data       start:0x80214A50 end:0x80214A8C
+	.data       start:0x80214A50 end:0x80214D24
 	.bss        start:0x8030B644 end:0x8030BA48
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
 

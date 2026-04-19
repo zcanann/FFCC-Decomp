@@ -588,7 +588,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     const float firstRingSin = (float)sin(firstLat);
     const float firstRingCos = (float)cos(firstLat);
 
-    GXBegin(GX_TRIANGLEFAN, (GXVtxFmt)vtxFmt, rings + 2);
+    GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, rings + 2);
     GXPosition3f32(kZero, kZero, kOne);
     GXNormal3f32(kZero, kZero, kOne);
 
@@ -618,7 +618,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
             break;
         }
 
-        GXBegin(GX_TRIANGLESTRIP, (GXVtxFmt)vtxFmt, ringVertexCount * 2);
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
         for (unsigned int i = 0; i <= rings; i++) {
             const float lon = (2.0f * kPi * (float)i) / (float)rings;
             const float lonSin = (float)sin(lon);

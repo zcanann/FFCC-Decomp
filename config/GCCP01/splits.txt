@@ -26,7 +26,7 @@ file.cpp:
 	.rodata     start:0x801D5480 end:0x801D5FC0
 	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
-	.sdata2     start:0x8032F6E8 end:0x8032F720
+	.sdata2     start:0x8032F600 end:0x8032F638
 
 game.cpp:
 	extab       start:0x80005688 end:0x800057E0
@@ -37,7 +37,7 @@ game.cpp:
 	.bss        start:0x8021EEB4 end:0x80230E48
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
 	.sbss       start:0x8032EC40 end:0x8032EC45
-	.sdata2     start:0x8032F768 end:0x8032F7A8
+	.sdata2     start:0x8032F660 end:0x8032F6A0
 
 graphic.cpp:
 	extab       start:0x800057E0 end:0x80005920
@@ -52,6 +52,7 @@ main.cpp:
 	extab       start:0x80005920 end:0x80005930
 	extabindex  start:0x8000B1DC end:0x8000B1F4
 	.text       start:0x80019F88 end:0x8001A230
+	.sdata2     start:0x8032F718 end:0x8032F738
 
 math.cpp:
 	extab       start:0x80005930 end:0x800059C0
@@ -60,6 +61,7 @@ math.cpp:
 	.ctors      start:0x801D53B0 end:0x801D53B4
 	.data       start:0x801E8450 end:0x801E8470
 	.bss        start:0x8023C4D8 end:0x8023C884
+	.sdata2     start:0x8032F740 end:0x8032F798
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC
@@ -76,7 +78,7 @@ p_sample.cpp:
 	extabindex  start:0x8000B434 end:0x8000B440
 	.text       start:0x8001FE74 end:0x8001FF6C
 	.ctors      start:0x801D53B8 end:0x801D53BC
-	.data       start:0x801E8630 end:0x801E8688
+	.data       start:0x801E84C8 end:0x801E867C
 	.sbss       start:0x8032EC60 end:0x8032EC64
 
 p_usb.cpp:
@@ -218,6 +220,7 @@ texanim.cpp:
 	extabindex  start:0x8000C2C8 end:0x8000C3DC
 	.text       start:0x80043D70 end:0x80045178
 	.data       start:0x801E9C18 end:0x801E9C90
+	.sdata2     start:0x8032FB38 end:0x8032FB64
 
 p_graphic.cpp:
 	extab       start:0x80006850 end:0x800068A8
@@ -834,6 +837,7 @@ pppKeShpTail3X.cpp:
 	extab       start:0x80007A38 end:0x80007A50
 	extabindex  start:0x8000DCA8 end:0x8000DCCC
 	.text       start:0x8008922C end:0x8008A38C
+	.sdata2     start:0x80330520 end:0x80330540
 
 pppYmDrawMdlTexAnm.cpp:
 	extab       start:0x80007A50 end:0x80007A70
@@ -940,7 +944,7 @@ p_menu.cpp:
 	extabindex  start:0x8000DF6C end:0x8000E0A4
 	.text       start:0x80093E78 end:0x800977D8
 	.ctors      start:0x801D541C end:0x801D5420
-	.data       start:0x8020F2C4 end:0x8020F2F8
+	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata2     start:0x803307F8 end:0x80330870
 	.sbss2      start:0x80333DEC end:0x80333DF0
@@ -982,6 +986,7 @@ gobjwork.cpp:
 	extabindex  start:0x8000E23C end:0x8000E44C
 	.text       start:0x8009E1C0 end:0x800A2DD4
 	.data       start:0x8020FA00 end:0x8020FAC8
+	.sdata2     start:0x803309A8 end:0x803309B8
 
 ringmenu.cpp:
 	extab       start:0x80007F78 end:0x80007FC8
@@ -1090,6 +1095,7 @@ pppYmMoveCircle.cpp:
 	extab       start:0x80008A64 end:0x80008A74
 	extabindex  start:0x8000F460 end:0x8000F478
 	.text       start:0x800D160C end:0x800D1968
+	.sdata2     start:0x80330D78 end:0x80330D98
 
 pppDrawMatrixFrontLnr.cpp:
 	extab       start:0x80008A74 end:0x80008A7C
@@ -1280,6 +1286,7 @@ wm_menu.cpp:
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
 	.data       start:0x80210FDC end:0x802111E8
+	.bss        start:0x802FF408 end:0x802FF450
 	.sbss       start:0x8032EE1C end:0x8032EE34
 	.sdata2     start:0x8033111C end:0x803311A8
 	.sbss2      start:0x80333DF8 end:0x80333E00
@@ -1644,6 +1651,7 @@ cmake.cpp:
 	extabindex  start:0x80011584 end:0x8001168C
 	.text       start:0x8016CD3C end:0x8017474C
 	.rodata     start:0x801E3038 end:0x801E3048
+	.bss        start:0x8030BB58 end:0x8030BB80
 	.sdata2     start:0x80333580 end:0x80333614
 
 menu_lst.cpp:

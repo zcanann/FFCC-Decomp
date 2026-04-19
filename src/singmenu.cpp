@@ -56,6 +56,18 @@ struct SingleFadeState
     SingleFadeEntry entries[64];
 };
 
+struct SingMenuStaticMessageInfo
+{
+    int lineCount;
+    s16 textIds[8];
+};
+
+struct SingMenuTextureRef
+{
+    int textureSetIndex;
+    char* textureName;
+};
+
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -99,9 +111,6 @@ extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
 extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
-extern "C" char* PTR_s_solo1_80214b18[];
-extern "C" char* PTR_s_solo2_80214a8c[];
-extern "C" int DAT_80214ab0;
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
@@ -130,7 +139,6 @@ extern "C" char* PTR_s_Cowlick[];
 extern "C" char* PTR_s_Spitzschopf[];
 extern "C" char* PTR_s_Ciuffo_ribelle[];
 extern "C" char* PTR_s_Remolino[];
-extern "C" unsigned char DAT_80214a50[];
 extern "C" {
 extern char lbl_803320D8[];
 extern char lbl_803320E0[];
@@ -215,6 +223,21 @@ extern char lbl_803326F8[];
 extern char lbl_80332700[];
 extern char lbl_80332708[];
 extern char lbl_80332710[];
+extern char lbl_80332718[];
+extern char lbl_80332720[];
+extern char lbl_80332728[];
+extern char lbl_80332730[];
+extern char lbl_80332738[];
+extern char lbl_80332740[];
+extern char lbl_80332748[];
+extern char lbl_80332750[];
+extern char lbl_80332758[];
+extern char lbl_80332760[];
+extern char lbl_80332768[];
+extern char lbl_80332770[];
+extern char lbl_80332778[];
+extern char lbl_80332780[];
+extern char s_sololetter_801DE8A4[];
 extern char s_Blacksmith_801DD718[];
 extern char s_Fisherman_801DD724[];
 extern char s_Merchant_801DD730[];
@@ -668,6 +691,52 @@ extern "C" char* gSingMenuAttrTableEs[] = {
 extern "C" {
 char s_DynamicMessStr[0x404];
 }
+
+extern "C" SingMenuStaticMessageInfo DAT_80214a50[] = {
+    {4, {14, 15, 16, 3, 0, 0, 0, 0}},
+    {2, {15, 3, 0, 0, 0, 0, 0, 0}},
+    {4, {30, 31, 32, 3, 0, 0, 0, 0}},
+};
+
+extern "C" char* PTR_s_solo2_80214a8c[] = {
+    lbl_80332718,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
+
+extern "C" SingMenuTextureRef DAT_80214ab0[] = {
+    {4, lbl_80332720},
+    {4, lbl_80332728},
+    {4, lbl_80332730},
+    {4, lbl_80332738},
+    {4, lbl_80332740},
+    {4, lbl_80332748},
+    {4, lbl_80332750},
+    {4, lbl_80332758},
+    {4, lbl_80332760},
+    {4, lbl_80332768},
+    {4, lbl_80332770},
+    {4, lbl_80332778},
+    {4, lbl_80332780},
+};
+
+extern "C" char* PTR_s_solo1_80214b18[] = {
+    lbl_80332720,
+    s_sololetter_801DE8A4,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -2421,20 +2490,19 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetColor(color);
 
     int lineCount = AStar.m_bestPath.m_pathLength;
+    const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
     if (useDynamic == 0) {
-        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+        lineCount = staticMessage.lineCount;
     }
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;
-    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
-        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        short textId = staticMessage.textIds[i];
         int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }
-        staticInfo += 2;
         dynamicText += 0x80;
     }
 
@@ -2449,11 +2517,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int lineStep = lineHeight + 3;
 
     dynamicText = s_DynamicMessStr;
-    staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
         font->SetTlut(((activeMask & (1 << i)) != 0) + 8);
 
-        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        short textId = staticMessage.textIds[i];
         const char* text = GetSingWinMessage(textId, dynamicText, useDynamic);
         if (strlen(text) != 0) {
             char lineBuffer[128];
@@ -2463,7 +2530,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             font->Draw(lineBuffer);
         }
 
-        staticInfo += 2;
         dynamicText += 0x80;
         y += static_cast<float>(lineStep);
     }
@@ -2488,20 +2554,19 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetScale(FLOAT_8032ea78);
 
     int lineCount = AStar.m_bestPath.m_pathLength;
+    const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
     if (useDynamic == 0) {
-        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+        lineCount = staticMessage.lineCount;
     }
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;
-    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
     for (int i = 0; i < lineCount; i++) {
-        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        short textId = staticMessage.textIds[i];
         int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }
-        staticInfo += 2;
         dynamicText += 0x80;
     }
 

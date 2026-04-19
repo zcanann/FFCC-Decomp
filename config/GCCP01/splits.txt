@@ -169,7 +169,7 @@ map.cpp:
 	.text       start:0x8002F45C end:0x80034988
 	.ctors      start:0x801D53D8 end:0x801D53DC
 	.data       start:0x801E896C end:0x801E89B4
-	.bss        start:0x80245758 end:0x802681E0
+	.bss        start:0x80245758 end:0x802685E0
 
 p_map.cpp:
 	extab       start:0x80006304 end:0x80006374

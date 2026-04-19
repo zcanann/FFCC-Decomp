@@ -1429,12 +1429,86 @@ void GbaQueue::LoadPlayerStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CED98
+ * PAL Size: 472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::LoadEnemyStat()
 {
-	// TODO
+	unsigned char localEnemyData[0x500];
+	unsigned int* enemyObjPtrs;
+	unsigned int* enemyWorkPtrs;
+	GbaQueue* semaphoreIter;
+	int i;
+
+	memset(localEnemyData, 0, sizeof(localEnemyData));
+
+	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
+		unsigned char* enemyEntry = localEnemyData;
+		enemyObjPtrs = &Game.m_scriptWork[0][0][0];
+		enemyWorkPtrs = &Game.m_scriptWork[2][0][0];
+
+		for (i = 0; i < 0x40; i++) {
+			if (enemyObjPtrs[i] == 0) {
+				enemyEntry[3] = 0;
+			} else {
+				CGObject* enemyObj = reinterpret_cast<CGObject*>(enemyObjPtrs[i]);
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
+				const int enemyDataBase = Game.unkCFlatData0[1] + enemyWork->m_baseDataIndex * 0x1D0;
+				const short enemyKind = *reinterpret_cast<short*>(enemyDataBase + 0x10C);
+				typedef int (*IsDispRadarFn)(CGObject*);
+				const int isDispRadar = reinterpret_cast<IsDispRadarFn>((*reinterpret_cast<void***>(enemyObj))[0xB])(enemyObj);
+
+				if (enemyKind == 10) {
+					enemyEntry[1] = 1;
+				} else if (enemyKind == 0xB) {
+					enemyEntry[1] = 3;
+				} else {
+					enemyEntry[1] = 2;
+				}
+
+				enemyEntry[3] = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
+				*reinterpret_cast<unsigned short*>(enemyEntry + 4) = enemyWork->m_hp;
+				*reinterpret_cast<unsigned short*>(enemyEntry + 6) = enemyWork->m_maxHp;
+				enemyEntry[2] = static_cast<unsigned char>((-isDispRadar | isDispRadar) >> 31);
+				*reinterpret_cast<unsigned short*>(enemyEntry + 0xC) =
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x510);
+				*reinterpret_cast<unsigned short*>(enemyEntry + 0xE) =
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x512);
+				*reinterpret_cast<unsigned short*>(enemyEntry + 0x10) =
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x514);
+				*reinterpret_cast<unsigned short*>(enemyEntry + 0x12) =
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x516);
+				*reinterpret_cast<short*>(enemyEntry + 8) =
+				    static_cast<short>(enemyObj->m_worldPosition.x / FLOAT_80330D54);
+				*reinterpret_cast<short*>(enemyEntry + 0xA) =
+				    static_cast<short>(enemyObj->m_worldPosition.z / FLOAT_80330D54);
+			}
+
+			enemyEntry += 0x14;
+		}
+	}
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	memcpy(reinterpret_cast<char*>(this) + 0xB34, localEnemyData, sizeof(localEnemyData));
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
 }
 
 /*
@@ -2779,12 +2853,65 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CC1B8
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ChkCMakeJob(int, unsigned int)
+void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	unsigned char jobType = static_cast<unsigned char>(value >> 8);
+	unsigned char resultCode = static_cast<unsigned char>(value >> 16);
+	int cmakeOffset = channel * 0x20;
+	OSSemaphore* semaphore = accessSemaphores + channel;
+
+	if (jobType == 0xFF) {
+		OSWaitSemaphore(semaphore);
+		obj[0x2CD1 + cmakeOffset] = static_cast<char>(0xFF);
+		OSSignalSemaphore(semaphore);
+		return;
+	}
+
+	bool foundDuplicate = false;
+	for (int i = 0; i < 4; i++) {
+		OSWaitSemaphore(accessSemaphores + i);
+	}
+
+	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
+	for (int i = 0; i < 4; i++) {
+		int otherOffset = i * 0x20;
+		if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
+		    (static_cast<unsigned char>(obj[0x2CD1 + otherOffset]) == jobType)) {
+			Joybus.SendResult(channel, 1, resultCode, 0);
+			foundDuplicate = true;
+			break;
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		OSSignalSemaphore(accessSemaphores + i);
+	}
+
+	if (foundDuplicate) {
+		return;
+	}
+
+	for (int i = 0; i < 8; i++) {
+		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
+		if ((i != playerSlot) && (caravanWork->m_shopState != 0) && (caravanWork->m_caravanLocalFlags == 0) &&
+		    (static_cast<unsigned char>(caravanWork->unk_0x3ac) == jobType)) {
+			Joybus.SendResult(channel, 1, resultCode, 0);
+			return;
+		}
+	}
+
+	Joybus.SendResult(channel, 0, resultCode, 0);
+	OSWaitSemaphore(semaphore);
+	obj[0x2CD1 + cmakeOffset] = static_cast<char>(jobType);
+	OSSignalSemaphore(semaphore);
 }
 
 /*
@@ -4014,12 +4141,117 @@ void GbaQueue::ClrChgRadarMode(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C98C0
+ * PAL Size: 816b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetScouterInfo(int, unsigned char*)
+int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char localScouterInfo[0x200];
+	unsigned int* enemyWorkPtrs = &Game.m_scriptWork[2][0][0];
+
+	memset(localScouterInfo, 0xFF, sizeof(localScouterInfo));
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	{
+		unsigned char* scouterEntry = localScouterInfo;
+		unsigned char* enemyEntry = reinterpret_cast<unsigned char*>(this) + 0xB34;
+
+		for (int i = 0; i < 0x40; i++) {
+			scouterEntry[0] = enemyEntry[3];
+			if (scouterEntry[0] != 0) {
+				CMonWork* enemyWork = reinterpret_cast<CMonWork*>(enemyWorkPtrs[i]);
+				const int enemyDataBase = Game.unkCFlatData0[1] + static_cast<unsigned char>(enemyEntry[3]) * 0x1D0;
+				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);
+				const short form0 = *reinterpret_cast<short*>(enemyDataBase + 0xF0);
+
+				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = SwapU16(enemyWork->m_maxHp);
+
+				if (*reinterpret_cast<short*>(enemyEntry + 0xE) < 1) {
+					const unsigned short scouterValue = *reinterpret_cast<unsigned short*>(enemyEntry + 0xC);
+					if ((static_cast<short>(scouterValue) < 1) || ((scouterValue & 0xC000) == 0x4000)) {
+						scouterEntry[6] = 0;
+						scouterEntry[7] = 0;
+					} else {
+						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = SwapU16(scouterValue);
+					}
+				} else {
+					scouterEntry[6] = 0xFF;
+					scouterEntry[7] = 0xFF;
+				}
+
+				if ((enemyFlags & 5) == 5) {
+					scouterEntry[1] = 0;
+				} else if ((enemyFlags & 4) == 0) {
+					if ((enemyFlags & 1) == 0) {
+						if ((form0 == 0) && (*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 0) &&
+						    (*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 0)) {
+							scouterEntry[1] = 3;
+						} else if ((form0 == 3) && (*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 3) &&
+						           (*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 3)) {
+							if (*reinterpret_cast<short*>(enemyDataBase + 0xC) == 0x10) {
+								scouterEntry[1] = 0xE;
+							} else {
+								scouterEntry[1] = 4;
+							}
+						} else {
+							unsigned int statusCount = 0;
+
+							if (form0 == 0) {
+								scouterEntry[1] = 5;
+								statusCount = 1;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF0) == 3) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 6;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 0) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 7;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF2) == 3) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 8;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 0) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 9;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF4) == 3) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 10;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF6) == 0) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 11;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xF8) == 0) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 12;
+								statusCount++;
+							}
+							if ((*reinterpret_cast<short*>(enemyDataBase + 0xFA) == 3) && (statusCount < 3)) {
+								scouterEntry[statusCount + 1] = 13;
+							}
+						}
+					} else {
+						scouterEntry[1] = 2;
+					}
+				} else {
+					scouterEntry[1] = 1;
+				}
+			}
+
+			enemyEntry += 0x14;
+			scouterEntry += 8;
+		}
+	}
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	memcpy(outData, localScouterInfo, sizeof(localScouterInfo));
+	return sizeof(localScouterInfo);
 }
 
 /*

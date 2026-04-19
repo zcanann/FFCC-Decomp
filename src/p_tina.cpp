@@ -881,14 +881,14 @@ void CPartPcs::draw()
 void CPartPcs::drawShadowViewer()
 {
     Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x308);
-    OSStartStopwatch(&g_par_draw_prof);
-    OSStartStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
-    OSStopStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
     Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x30f);
-    OSStopStopwatch(&g_par_draw_prof);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }
 

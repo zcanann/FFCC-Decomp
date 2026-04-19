@@ -788,6 +788,7 @@ pppRyjMegaBirth.cpp:
 	extabindex  start:0x8000DBA0 end:0x8000DBF4
 	.text       start:0x80082278 end:0x800841E4
 	.rodata     start:0x801D9C00 end:0x801D9C14
+	.data       start:0x801FD3A8 end:0x801FD3D0
 	.bss        start:0x802EA080 end:0x802EA0B0
 
 pppRyjMegaBirthModel.cpp:
@@ -846,12 +847,14 @@ pppYmMegaBirthShpTail2.cpp:
 	extabindex  start:0x8000DD14 end:0x8000DD5C
 	.text       start:0x8008ACC4 end:0x8008CA98
 	.rodata     start:0x801D9C68 end:0x801D9C83
+	.data       start:0x801FD3D0 end:0x801FD3F8
 
 pppYmMegaBirthShpTail3.cpp:
 	extab       start:0x80007AB0 end:0x80007AE0
 	extabindex  start:0x8000DD5C end:0x8000DDA4
 	.text       start:0x8008CA98 end:0x8008ECA0
 	.rodata     start:0x801D9C88 end:0x801D9CA3
+	.data       start:0x801FD3F8 end:0x801FD420
 
 pppKeLns.cpp:
 	extab       start:0x80007AE0 end:0x80007AE8
@@ -1505,6 +1508,7 @@ shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
+	.data       start:0x8021589C end:0x80215914
 
 menu_item.cpp:
 	extab       start:0x80009E54 end:0x80009E8C

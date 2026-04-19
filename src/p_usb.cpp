@@ -6,7 +6,6 @@
 #include "string.h"
 #include "types.h"
 
-CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
@@ -19,8 +18,8 @@ char s_CUSBPcs_8032f810[] = "CUSBPcs";
 u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
     reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
 };
-static const char s_usbRootPath[] = "plot/kmitsuru/";
 static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
+static const char s_usbRootPath[] = "plot/kmitsuru/";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
@@ -29,7 +28,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
  * Address:	TODO
  * Size:	TODO
  */
-CUSBPcs::CUSBPcs()
+inline CUSBPcs::CUSBPcs()
 {
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
     m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
@@ -261,3 +260,5 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     }
     return result;
 }
+
+CUSBPcs USBPcs;

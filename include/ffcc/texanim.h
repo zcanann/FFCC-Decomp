@@ -35,9 +35,9 @@ public:
 
     void Create(CChunkFile&, CMemory::CStage*);
     void Interp(float, Vec&);
-    void GetTotalFrame();
-    void GetName();
-    void IsChin();
+    unsigned int GetTotalFrame();
+    char* GetName();
+    int IsChin();
 };
 
 class CTexAnim
@@ -54,14 +54,14 @@ public:
     ~CTexAnim();
 
     void Create(CChunkFile&, CMemory::CStage*);
-    void Duplicate(CMemory::CStage*);
+    CTexAnim* Duplicate(CMemory::CStage*);
     void AttachMaterialSet(CMaterialSet*);
     void AddFrame(float);
-    void Find(char*);
+    int Find(char*);
     void Change(int, float, CTexAnimSet::ANIM_TYPE);
     void SetTexGen();
-    void IsChin();
-    void GetChin();
+    int IsChin();
+    float GetChin();
 };
 
 #endif // _FFCC_PPP_TEXANIM_H_

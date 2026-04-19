@@ -2,7 +2,9 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/p_camera.h"
 extern "C" {
-extern unsigned char gFontResArchiveData[];
+unsigned char g_tFont22[0x10D40] ATTRIBUTE_ALIGN(32) = {
+#include "src/font_res_archive.inc"
+};
 }
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include <dolphin/mtx.h>
@@ -219,7 +221,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
 
     m_usesEmbeddedData = static_cast<unsigned char>((filePtr == 0) && (stage == 0));
     if (m_usesEmbeddedData != 0) {
-        filePtr = gFontResArchiveData;
+        filePtr = g_tFont22;
     }
 
     chunkFile.SetBuf(filePtr);

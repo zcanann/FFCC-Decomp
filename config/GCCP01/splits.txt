@@ -926,7 +926,7 @@ fontman.cpp:
 	.text       start:0x80091E58 end:0x8009312C
 	.ctors      start:0x801D5418 end:0x801D541C
 	.rodata     start:0x801D9CB8 end:0x801D9CD0
-	.data       start:0x8020EDC8 end:0x8020EDF8
+	.data       start:0x801FE080 end:0x8020EDF8
 	.bss        start:0x802EA170 end:0x802EA188
 
 pppYmTracer.cpp:

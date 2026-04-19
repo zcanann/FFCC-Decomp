@@ -722,10 +722,11 @@ int CCaravanWork::AddItem(int itemId, int* inventorySlotOut)
 	}
 
 	for (unsigned int i = 0; i < 0x40; i++) {
-		if (m_inventoryItems[i] == 0xFFFF) {
-			m_inventoryItems[i] = (unsigned short)itemId;
-			m_inventoryItemCount = (short)(m_inventoryItemCount + 1);
-			Joybus.SetItem(m_joybusCaravanId, (unsigned char)i, (short)itemId);
+		short item = m_inventoryItems[i];
+		if (item == -1) {
+			m_inventoryItems[i] = static_cast<short>(itemId);
+			m_inventoryItemCount = m_inventoryItemCount + 1;
+			Joybus.SetItem(m_joybusCaravanId, static_cast<unsigned char>(i), static_cast<short>(itemId));
 			if (inventorySlotOut != 0) {
 				*inventorySlotOut = i;
 			}

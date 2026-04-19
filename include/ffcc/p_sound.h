@@ -7,14 +7,14 @@ extern unsigned int m_table_desc0__9CSoundPcs[];
 extern unsigned int m_table_desc1__9CSoundPcs[];
 extern unsigned int m_table_desc2__9CSoundPcs[];
 extern unsigned int m_table_desc3__9CSoundPcs[];
-extern unsigned char m_table__9CSoundPcs[];
+extern unsigned int m_table__9CSoundPcs[];
 
 class CSoundPcs : public CProcess
 {
 public:
     CSoundPcs()
     {
-        unsigned int* table = reinterpret_cast<unsigned int*>(m_table__9CSoundPcs);
+        unsigned int* table = m_table__9CSoundPcs;
         const unsigned int* desc0 = m_table_desc0__9CSoundPcs;
         const unsigned int* desc1 = m_table_desc1__9CSoundPcs;
         const unsigned int* desc2 = m_table_desc2__9CSoundPcs;

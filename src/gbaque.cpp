@@ -1057,13 +1057,15 @@ unsigned int GbaQueue::GetStageFlg(int channel)
  */
 void GbaQueue::ClrStageFlg(int channel)
 {
-	unsigned char bitMask;
-	char* obj = reinterpret_cast<char*>(this);
+	unsigned int bitMask;
+	unsigned char channelMask;
+	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	bitMask = static_cast<unsigned char>(1 << channel);
-	obj[0x44C] = static_cast<char>(obj[0x44C] & ~bitMask);
-	obj[0x2C89] = static_cast<char>(obj[0x2C89] | bitMask);
+	bitMask = 1U << channel;
+	channelMask = static_cast<unsigned char>(bitMask);
+	obj[0x44C] = static_cast<unsigned char>(obj[0x44C] & ~channelMask);
+	m_chgScouFlags = static_cast<unsigned char>(m_chgScouFlags | channelMask);
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

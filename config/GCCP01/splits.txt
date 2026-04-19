@@ -327,6 +327,7 @@ p_tina.cpp:
 	extabindex  start:0x8000C910 end:0x8000CA9C
 	.text       start:0x80051F38 end:0x80053D04
 	.ctors      start:0x801D5404 end:0x801D5408
+	.data       start:0x801EA9B0 end:0x801EAD94
 	.data       start:0x801EAD94 end:0x801EADC8
 	.bss        start:0x80273928 end:0x80273A68
 	.sbss       start:0x8032ED38 end:0x8032ED50

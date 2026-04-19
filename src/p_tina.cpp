@@ -40,6 +40,21 @@ extern "C" char s_tina_prio_time_fmt_801d81a0[];
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
+extern "C" void create__8CPartPcsFv(CPartPcs*);
+extern "C" void destroy__8CPartPcsFv(CPartPcs*);
+extern "C" void calcInit__8CPartPcsFv(CPartPcs*);
+extern "C" void calc__8CPartPcsFv(CPartPcs*);
+extern "C" void calcDead__8CPartPcsFv(CPartPcs*);
+extern "C" void ClearOt__8CPartPcsFv(CPartPcs*);
+extern "C" void drawShadow__8CPartPcsFv(CPartPcs*);
+extern "C" void drawCharaBefore__8CPartPcsFv(CPartPcs*);
+extern "C" void draw__8CPartPcsFv(CPartPcs*);
+extern "C" void drawAfter__8CPartPcsFv(CPartPcs*);
+extern "C" void createViewer__8CPartPcsFv(CPartPcs*);
+extern "C" void calcViewer__8CPartPcsFv(CPartPcs*);
+extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
+extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
+extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" void pppLoadPmd__8CPartMngFPCc(CPartMng*, const char*);
@@ -81,6 +96,8 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 extern char DAT_801ead4c[];
 extern char DAT_801d81d4[];
 extern char s_p_tina_rodata_801d7ee0[];
+extern char s_CPartPcs_GAME_801D7F2C[];
+extern char s_CPartPcs_PART_VIEWER_801D7F3C[];
 extern char s_CPartPcs_801d7f54[];
 extern char s_CPartPcs_dat_801d810c[];
 extern char s_CPartPcs_amem_801d811c[];
@@ -97,6 +114,54 @@ extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
 extern char s_dvd__smenu__s_801d7fb0[];
 extern char s_dvd_tina_mon_m_03d_801d7fc0[];
 extern char s_dvd_tina_mon_m_03d__c_801d7fd4[];
+extern char lbl_8032E69C[];
+unsigned int m_table_desc0__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
+unsigned int m_table_desc1__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+unsigned int m_table_desc2__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+unsigned int m_table_desc3__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
+unsigned int m_table_desc4__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+unsigned int m_table_desc5__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+unsigned int m_table_desc6__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
+unsigned int m_table_desc7__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
+unsigned int m_table_desc8__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
+unsigned int m_table_desc9__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
+unsigned int m_table_desc10__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
+unsigned int m_table_desc11__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+unsigned int m_table_desc12__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+unsigned int m_table_desc13__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
+unsigned int m_table_desc14__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+unsigned int m_table_desc15__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+unsigned int m_table_desc16__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
+unsigned int m_table_desc17__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
+unsigned int m_table_desc18__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
+unsigned int m_table__8CPartPcs[0x2B8 / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(s_CPartPcs_GAME_801D7F2C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
+    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000038,
+    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040,
+    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    reinterpret_cast<unsigned int>(s_CPartPcs_PART_VIEWER_801D7F3C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
+    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E,
+    0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000
+};
+char DAT_801ead4c[0x38] =
+    "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
+    "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
+    "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
+    "\x81\x9A\x81\x99\x0A";
+unsigned int lbl_801EAD84[4] = {
+    reinterpret_cast<unsigned int>(lbl_8032E69C), 0x00000000, 0x00000000, reinterpret_cast<unsigned int>(lbl_8032E69C)
+};
 int DAT_8032ed38;
 int DAT_8032ed3c;
 CPartPcs PartPcs;

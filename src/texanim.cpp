@@ -625,7 +625,7 @@ CTexAnimSet::~CTexAnimSet()
 
     self->vtable = __vt__11CTexAnimSet;
     self->texAnims.ReleaseAndRemoveAll();
-    self->texAnims.CPtrArray<CTexAnim*>::~CPtrArray();
+    __dt__21CPtrArray_P8CTexAnim_Fv(&self->texAnims, -1);
     __dt__4CRefFv(this, 0);
 }
 #pragma dont_inline reset

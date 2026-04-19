@@ -6,10 +6,6 @@
 #include "dolphin/mtx.h"
 #include "math.h"
 
-extern float DAT_80330D80;
-extern float DAT_80330D84;
-extern float DAT_80330D88;
-
 struct pppYmMoveCircleWork {
     f32 m_angle;
     f32 m_angleStep;
@@ -76,7 +72,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
 
     {
-        f32 tableAngle = (DAT_80330D80 * (DAT_80330D84 * work->m_angle)) / DAT_80330D88;
+        f32 tableAngle = (32768.0f * work->m_angle) / 360.0f;
         tableIndex = (s32)tableAngle;
     }
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));

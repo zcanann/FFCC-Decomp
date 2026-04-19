@@ -805,6 +805,7 @@ pppRyjMegaBirthModel.cpp:
 	extabindex  start:0x8000DBF4 end:0x8000DC54
 	.text       start:0x800841E4 end:0x80087EF0
 	.rodata     start:0x801D9C18 end:0x801D9C31
+	.bss        start:0x802EA0B0 end:0x802EA110
 
 pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08

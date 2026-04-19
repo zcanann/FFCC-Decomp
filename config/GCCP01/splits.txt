@@ -26,7 +26,7 @@ file.cpp:
 	.rodata     start:0x801D5480 end:0x801D5FC0
 	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
-	.sdata2     start:0x8032F6E8 end:0x8032F720
+	.sdata2     start:0x8032F600 end:0x8032F638
 
 game.cpp:
 	extab       start:0x80005688 end:0x800057E0
@@ -37,7 +37,7 @@ game.cpp:
 	.bss        start:0x8021EEB4 end:0x80230E48
 	.sdata      start:0x8032E6B8 end:0x8032E6D0
 	.sbss       start:0x8032EC40 end:0x8032EC45
-	.sdata2     start:0x8032F768 end:0x8032F7A8
+	.sdata2     start:0x8032F660 end:0x8032F6A0
 
 graphic.cpp:
 	extab       start:0x800057E0 end:0x80005920
@@ -52,6 +52,7 @@ main.cpp:
 	extab       start:0x80005920 end:0x80005930
 	extabindex  start:0x8000B1DC end:0x8000B1F4
 	.text       start:0x80019F88 end:0x8001A230
+	.sdata2     start:0x8032F718 end:0x8032F738
 
 math.cpp:
 	extab       start:0x80005930 end:0x800059C0
@@ -981,6 +982,7 @@ gobjwork.cpp:
 	extabindex  start:0x8000E23C end:0x8000E44C
 	.text       start:0x8009E1C0 end:0x800A2DD4
 	.data       start:0x8020FA18 end:0x8020FA8C
+	.sdata2     start:0x803309A8 end:0x803309B8
 
 ringmenu.cpp:
 	extab       start:0x80007F78 end:0x80007FC8

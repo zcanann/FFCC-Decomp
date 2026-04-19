@@ -352,8 +352,7 @@ void CPartPcs::onScriptChanging(char*)
  */
 int CPartPcs::GetTable(unsigned long index)
 {
-	unsigned long offset = index * 0x15c;
-	return (int)(m_table__8CPartPcs + offset);
+	return (int)&m_table__8CPartPcs[index * 0x57];
 }
 
 /*

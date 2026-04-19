@@ -16,7 +16,7 @@ unsigned int gGbaStatusWordTable[0x57] = {
 };
 
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
-const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";
+const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
 
 /*
  * --INFO--

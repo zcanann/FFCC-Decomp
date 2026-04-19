@@ -10,7 +10,7 @@ extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
 extern "C" void __dl__FPv(void*);
-extern "C" const char* GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 
 struct CMenuPcsGoOutLayout
@@ -1601,5 +1601,3 @@ void CGoOutMenu::EndMemCardProc()
 {
 	// TODO
 }
-
-

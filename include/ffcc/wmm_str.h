@@ -8,7 +8,7 @@ class CMenuPcs
 public:
     const char* GetMcStr(int);
     const char* const* GetMcWinMessBuff(int);
-    const char* GetWinMess(int);
+    int GetWinMess(int);
     int GetYesNoXPos(int);
     int GetSlotABXPos(int);
 

@@ -209,14 +209,17 @@ int CMenuPcs::GetYesNoXPos(int right)
  * JP Address: TODO
  * JP Size: TODO
  */
-const char* CMenuPcs::GetWinMess(int index)
+int CMenuPcs::GetWinMess(int index)
 {
+    int winMessTable = reinterpret_cast<int>(s_WinMessTable);
     int languageId = Game.m_gameWork.m_languageId;
-    const char* winMessTable = reinterpret_cast<const char*>(s_WinMessTable);
+    int offset;
     if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
-        return &winMessTable[index * 0x14];
+        offset = index * 0x14;
+        return winMessTable + offset;
     }
-    return &winMessTable[index * 0x14];
+    offset = index * 0x14;
+    return winMessTable + offset;
 }
 
 /*

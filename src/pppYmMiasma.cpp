@@ -315,13 +315,15 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     pppCopyVector(worldPos, *(Vec*)particleData);
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
-    if ((s32)Game.m_currentSceneId != 7) {
+    if ((s32)Game.m_currentSceneId == 7) {
+        basePos.x = worldPos.x;
+        basePos.y = worldPos.y;
+        basePos.z = worldPos.z;
+    } else {
         basePos.x = pppMngStPtr->m_matrix.value[0][3];
         basePos.y = pppMngStPtr->m_matrix.value[1][3];
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
-    } else {
-        basePos = worldPos;
     }
 
     pppSubVector(basePos, worldPos, basePos);

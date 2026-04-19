@@ -84,7 +84,7 @@ void CMcPcs::Quit()
  */
 int CMcPcs::GetTable(unsigned long index)
 {
-	return (int)(m_table__6CMcPcs + (index * 0x15c));
+	return (int)(reinterpret_cast<unsigned char*>(m_table__6CMcPcs) + (index * 0x15c));
 }
 
 /*

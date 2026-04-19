@@ -12543,6 +12543,7 @@ m_table_desc3__9CSoundPcs = .data:0x802105A4; // type:object size:0xC data:4byte
 m_table__9CSoundPcs = .data:0x802105B0; // type:object size:0x15C
 lbl_8021070C = .data:0x8021070C; // type:object size:0xC
 lbl_80210718 = .data:0x80210718; // type:object size:0x4
+lbl_8021071C = .data:0x8021071C; // type:object size:0x10
 __vt__9CSoundPcs = .data:0x8021072C; // type:object size:0x24
 lbl_80210750 = .data:0x80210750; // type:object size:0xDC
 DAT_8021082c = .data:0x8021082C; // type:object size:0xA8 data:4byte

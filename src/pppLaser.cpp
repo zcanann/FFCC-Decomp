@@ -238,6 +238,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     Mtx charaMtx;
     Mtx tempMtx;
 
+    bool emptyHistory;
+
     if ((gPppCalcDisabled != 0) || (step->m_stepValue == 1)) {
         return;
     }
@@ -247,12 +249,12 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         return;
     }
 
-    bool resetPoints = (work->m_points == 0);
-    if (resetPoints) {
+    emptyHistory = false;
+    if (work->m_points == 0) {
         work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (u32)step->m_payload[0x1e] * sizeof(Vec), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp),
-            0x7d);
-        memset(work->m_points, 0, (u32)step->m_payload[0x1e] * sizeof(Vec));
+            (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
+        memset(work->m_points, 0, (u32)step->m_payload[0x1e] * 0xc);
+        emptyHistory = true;
     }
 
     CalcGraphValue(baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
@@ -283,18 +285,18 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_origin.y = tempMtx[1][3];
             work->m_origin.z = tempMtx[2][3];
             PSMTXMultVec(tempMtx, &localB, points);
-        } else if (!resetPoints) {
-            double denom = ((double)(int)step->m_payload[0x3a] + 1.0) - DOUBLE_80333440;
-            double t = (FLOAT_80333448 / (float)denom) * ((double)(int)i - DOUBLE_80333440);
+        } else if (!emptyHistory) {
+            double t = (FLOAT_80333448 / (float)((double)(int)(step->m_payload[0x3a] + 1) - DOUBLE_80333440)) *
+                (float)((double)(int)i - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix(pppMngStPtr, (float)t, charaMtx) == 0) {
-                resetPoints = true;
+                emptyHistory = true;
             } else {
                 PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
                 PSMTXMultVec(charaMtx, &localB, &points[i]);
             }
         }
 
-        if ((i != 0) && resetPoints) {
+        if ((i != 0) && emptyHistory) {
             continue;
         }
 
@@ -348,13 +350,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                     if (dataVals != 0) {
                         int created =
                             pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-                        if (created != 0) {
-                            *(struct pppLaser**)(created + 4) = pppLaser;
-                            Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
-                            createdPos->x = points[i].x;
-                            createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
-                            createdPos->z = points[i].z;
-                        }
+                        *(struct pppLaser**)(created + 4) = pppLaser;
+                        Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
+                        createdPos->x = points[i].x;
+                        createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+                        createdPos->z = points[i].z;
                     }
                 }
             } else {
@@ -363,7 +363,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
     }
 
-    if (resetPoints) {
+    if (emptyHistory) {
         Vec* points = work->m_points;
         for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
             pppCopyVector(points[i], points[0]);

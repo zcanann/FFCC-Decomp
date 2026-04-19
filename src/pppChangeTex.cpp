@@ -50,8 +50,8 @@ struct ChangeTexWork {
 	float m_value0;
 	float m_value1;
 	float m_value2;
-	int* m_meshColorArrays;
-	int* m_displayListArrays;
+	int m_meshColorArrays;
+	int m_displayListArrays;
 	int _pad14;
 	CGObject* m_charaObj;
 	int m_texture;
@@ -352,8 +352,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	ChangeTexWork* work = (ChangeTexWork*)((u8*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
 	u8* colorData = (u8*)&changeTex->field0_0x0 + serializedDataOffsets[1] + 0x80;
+	ChangeTexWork* work = (ChangeTexWork*)((u8*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_charaObj, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
@@ -401,14 +401,14 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	int meshList = *(int*)((char*)model0 + 0xAC);
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
 		work->m_cachedValue = FLOAT_80332020;
-		work->m_meshColorArrays = (int*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x163);
-		work->m_displayListArrays = (int*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_displayListArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x166);
 
-		int* meshColorArrays = work->m_meshColorArrays;
+		int* meshColorArrays = (int*)work->m_meshColorArrays;
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 			int meshHdr = *(int*)(meshList + 8);
@@ -418,13 +418,13 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				    *(unsigned long*)(*(int*)((char*)model0 + 0xA4) + 0x34));
 			}
 
-			work->m_displayListArrays[arrayOffset >> 2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			*(int*)(work->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			    *(int*)(*(int*)(meshList + 8) + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
 			    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x181);
 
 			int dlIdx = *(int*)(*(int*)(meshList + 8) + 0x4C) - 1;
 			int* dlInfo = (int*)(*(int*)(*(int*)(meshList + 8) + 0x50));
-			int* dlEntry = (int*)(work->m_displayListArrays[arrayOffset >> 2] + dlIdx * 4);
+			int* dlEntry = (int*)(*(int*)(work->m_displayListArrays + arrayOffset) + dlIdx * 4);
 			for (; -1 < dlIdx; dlIdx = dlIdx - 1) {
 				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x18B);
@@ -476,7 +476,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	meshList = *(int*)((char*)model0 + 0xAC);
 	for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 		int pointOffset = 0;
-		int colorBase = work->m_meshColorArrays[arrayOffset >> 2];
+		int colorBase = *(int*)(work->m_meshColorArrays + arrayOffset);
 		int colorPtr = colorBase;
 		unsigned int vertCount;
 		for (unsigned int v = 0; (vertCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x14), v < vertCount); v++) {

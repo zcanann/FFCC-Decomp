@@ -19,6 +19,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMapMng MapMng;
+char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dl__FPv(void*);
@@ -1939,7 +1940,6 @@ void CMapMng::InitMapShadow()
 void CMapMng::ReadMtx(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    char path[256];
     int loadIndex = 0;
     int append = 0;
 
@@ -1957,13 +1957,13 @@ void CMapMng::ReadMtx(char* mapName)
     }
 
     while (true) {
-        sprintf(path, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
+        sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
         bool exists = false;
         if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
             exists = true;
         } else {
-            CFile::CHandle* openProbe = File.Open(path, 0, CFile::PRI_LOW);
+            CFile::CHandle* openProbe = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
             if (openProbe != 0) {
                 File.Close(openProbe);
                 exists = true;
@@ -1983,7 +1983,7 @@ void CMapMng::ReadMtx(char* mapName)
             CheckSum__FPvi(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
+            CFile::CHandle* handle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
             if (handle == 0) {
                 filePtr = 0;
             } else {
@@ -2068,15 +2068,14 @@ void CMapMng::ReadMpl(char* mapName)
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
 
     while (true) {
-        char path[256];
-        sprintf(path, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
+        sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         bool canRead = false;
         const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
         if (readMode == 1) {
             canRead = true;
         } else {
-            CFile::CHandle* existsHandle = File.Open(path, 0, CFile::PRI_LOW);
+            CFile::CHandle* existsHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
             if (existsHandle != 0) {
                 File.Close(existsHandle);
                 canRead = true;
@@ -2089,7 +2088,7 @@ void CMapMng::ReadMpl(char* mapName)
             }
             if (loadIndex == 0) {
                 if (System.m_execParam != 0) {
-                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), path);
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
                 }
                 return;
             }
@@ -2097,7 +2096,7 @@ void CMapMng::ReadMpl(char* mapName)
         }
 
         if (static_cast<unsigned int>(System.m_execParam) > 2) {
-            System.Printf(const_cast<char*>(s_mapReadMplFmt), path);
+            System.Printf(const_cast<char*>(s_mapReadMplFmt), g_StrTmp);
         }
 
         void* filePtr = File.m_readBuffer;
@@ -2111,7 +2110,7 @@ void CMapMng::ReadMpl(char* mapName)
             CheckSum__FPvi(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+            CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
             if (fileHandle == 0) {
                 filePtr = 0;
             } else {
@@ -2142,7 +2141,7 @@ void CMapMng::ReadMpl(char* mapName)
 
         if (filePtr == 0) {
             if (System.m_execParam != 0) {
-                System.Printf(const_cast<char*>(s_mapReadErrorFmt), path);
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
             }
             return;
         }
@@ -2206,12 +2205,11 @@ void CMapMng::ReadMpl(char* mapName)
 void CMapMng::ReadOtm(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    char path[64];
     CFile::CHandle* fileHandle = 0;
     void* filePtr = File.m_readBuffer;
 
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
-    sprintf(path, "%s", mapName);
+    sprintf(g_StrTmp, "%s", mapName);
     *reinterpret_cast<int*>(self + 0x22A6C) = 0;
 
     const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
@@ -2225,7 +2223,7 @@ void CMapMng::ReadOtm(char* mapName)
         CheckSum__FPvi(File.m_readBuffer, size);
         readIndex += 1;
     } else {
-        fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+        fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (readMode == 3) {

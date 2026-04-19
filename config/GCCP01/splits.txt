@@ -26,7 +26,7 @@ file.cpp:
 	.rodata     start:0x801D5480 end:0x801D5FC0
 	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
-	.sdata2     start:0x8032F6E8 end:0x8032F710
+	.sdata2     start:0x8032F6E8 end:0x8032F720
 
 game.cpp:
 	extab       start:0x80005688 end:0x800057E0
@@ -1183,7 +1183,7 @@ wind.cpp:
 	extabindex  start:0x8000F6A0 end:0x8000F6F4
 	.text       start:0x800D92FC end:0x800DA0B4
 	.bss        start:0x802F7720 end:0x802FF3A8
-	.sdata2     start:0x80330EE0 end:0x80330F58
+	.sdata2     start:0x80330EE0 end:0x80330F60
 
 LocationTitle2.cpp:
 	extab       start:0x80008C1C end:0x80008C34
@@ -1212,14 +1212,14 @@ pppCrystal.cpp:
 	extabindex  start:0x8000F784 end:0x8000F7A8
 	.text       start:0x800DC9A0 end:0x800DD424
 	.rodata     start:0x801DB5B8 end:0x801DB610
-	.sdata2     start:0x80330F58 end:0x80330FD0
+	.sdata2     start:0x80330F60 end:0x80330FD4
 
 pppRain.cpp:
 	extab       start:0x80008C94 end:0x80008CAC
 	extabindex  start:0x8000F7A8 end:0x8000F7CC
 	.text       start:0x800DD424 end:0x800DDAF8
 	.rodata     start:0x801DB610 end:0x801DB620
-	.sdata2     start:0x80330FD0 end:0x80330FE8
+	.sdata2     start:0x80330FD4 end:0x80330FE8
 
 pppBlurChara.cpp:
 	extab       start:0x80008CAC end:0x80008CDC

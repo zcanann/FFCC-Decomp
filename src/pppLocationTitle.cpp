@@ -177,7 +177,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particles[work->m_count].m_pos.y = resultMatrix.value[1][3];
             particles[work->m_count].m_pos.z = resultMatrix.value[2][3];
 
-            if (work->m_count >= 1) {
+            if ((int)(work->m_count - 1) >= 0) {
                 particles[work->m_count - 1].m_frame = work->m_cur;
                 memcpy(&particles[work->m_count - 1].m_color, &colorData->m_color, 4);
             } else {
@@ -215,8 +215,12 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                     inserted++;
                     work->m_count++;
 
-                    if (param_2->m_maxCount <= (u16)(work->m_count + 1)) {
-                        break;
+                    {
+                        u16 nextCount = work->m_count + 1;
+
+                        if (param_2->m_maxCount <= nextCount) {
+                            break;
+                        }
                     }
 
                     interpIt++;

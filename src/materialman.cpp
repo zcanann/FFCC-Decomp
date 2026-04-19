@@ -468,7 +468,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = *Ptr(material, 0xA1);
-    if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x141704) == 0)) {
+    if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x141704) == 0)) {
         fogEnable = 0;
     }
 

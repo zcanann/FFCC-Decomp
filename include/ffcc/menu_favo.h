@@ -61,6 +61,7 @@ public:
     SingMenuState* singMenuState;
     char pad_830[0x18];
     short* singWindowInfo;
+    char pad_84c[0x4];
     short* favoList;
     char pad_854[0x100];
 };

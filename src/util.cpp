@@ -377,47 +377,61 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
  */
 void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
-	float u1, v1, u2, v2;
-	
-	// Default UV coordinates if null
-	
-	if (uv1 == NULL || uv2 == NULL) {
-		u1 = kUtilZero;  // 0.0f
-		v1 = kUtilZero;  // 0.0f
-		u2 = kUtilOne;  // 1.0f
-		v2 = kUtilOne;  // 1.0f
-	} else {
-		u1 = uv1->x;
-		v1 = uv1->y;
-		u2 = uv2->x;
-		v2 = uv2->y;
-	}
-	
-	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-	
-	// Vertex 1: pos1.x, pos1.y, pos1.z, color, u1,v1, u1,v1
-	GXPosition3f32(pos1.x, pos1.y, pos1.z);
-	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(u1, v1);  // TEX0
-	GXTexCoord2f32(u1, v1);  // TEX1
-	
-	// Vertex 2: pos2.x, pos1.y, pos1.z, color, u2,v1, u2,v1
-	GXPosition3f32(pos2.x, pos1.y, pos1.z);
-	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(u2, v1);  // TEX0
-	GXTexCoord2f32(u2, v1);  // TEX1
-	
-	// Vertex 3: pos2.x, pos2.y, pos1.z, color, u2,v2, u2,v2
-	GXPosition3f32(pos2.x, pos2.y, pos1.z);
-	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(u2, v2);  // TEX0
-	GXTexCoord2f32(u2, v2);  // TEX1
-	
-	// Vertex 4: pos1.x, pos2.y, pos1.z, color, u1,v2, u1,v2
-	GXPosition3f32(pos1.x, pos2.y, pos1.z);
-	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(u1, v2);  // TEX0
-	GXTexCoord2f32(u1, v2);  // TEX1
+    float u1;
+    float v1;
+    float u2;
+    float v2;
+    u32 rgba = *reinterpret_cast<u32*>(&color);
+
+    if (uv1 == NULL || uv2 == NULL) {
+        u1 = kUtilZero;
+        v1 = u1;
+        u2 = kUtilOne;
+        v2 = u2;
+    } else {
+        u1 = uv1->x;
+        v1 = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
+    }
+
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+
+    GXWGFifo.f32 = pos1.x;
+    GXWGFifo.f32 = pos1.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v1;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v1;
+
+    GXWGFifo.f32 = pos2.x;
+    GXWGFifo.f32 = pos1.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v1;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v1;
+
+    GXWGFifo.f32 = pos2.x;
+    GXWGFifo.f32 = pos2.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v2;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v2;
+
+    GXWGFifo.f32 = pos1.x;
+    GXWGFifo.f32 = pos2.y;
+    GXWGFifo.f32 = pos1.z;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v2;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v2;
 }
 
 /*

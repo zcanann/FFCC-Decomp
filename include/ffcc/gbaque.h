@@ -163,7 +163,10 @@ private:
     unsigned char m_letterFlags;      // 0x2C89
     unsigned char _pad2C8A[0x36];     // 0x2C8A
     char cmakeInfo[4][0x20];          // 0x2CC0
-    unsigned char _pad2D40[0x17];     // 0x2D40
+    unsigned char _pad2D40[0x14];     // 0x2D40
+    unsigned char m_chgHitFlags;      // 0x2D54
+    unsigned char m_chgScouFlags;     // 0x2D55
+    unsigned char _pad2D56[0x1];      // 0x2D56
     char m_controllerMode;            // 0x2D57
     unsigned char _pad2D58[0x3];      // 0x2D58
     char m_pauseMode;                 // 0x2D5B

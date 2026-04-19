@@ -138,6 +138,7 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456CC
 	.sdata      start:0x8032E8B0 end:0x8032E8B8
+	.sbss2      start:0x80333DE0 end:0x80333DE8
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -187,6 +188,7 @@ p_camera.cpp:
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C70
 	.sbss       start:0x8032ECD8 end:0x8032ECD9
+	.sbss2      start:0x80333DE8 end:0x80333DEC
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
@@ -937,6 +939,7 @@ p_menu.cpp:
 	.data       start:0x8020F2C4 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata2     start:0x803307F8 end:0x80330870
+	.sbss2      start:0x80333DEC end:0x80333DF0
 
 p_gba.cpp:
 	extab       start:0x80007CE0 end:0x80007D20
@@ -1147,6 +1150,7 @@ pppYmMana.cpp:
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
+	.sbss2      start:0x80333DF0 end:0x80333DF4
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC
@@ -1246,6 +1250,7 @@ pppYmEnv.cpp:
 	extabindex  start:0x8000F910 end:0x8000F958
 	.text       start:0x800E46DC end:0x800E6060
 	.rodata     start:0x801DB750 end:0x801DB7E8
+	.sbss2      start:0x80333DF4 end:0x80333DF8
 
 pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4
@@ -1259,6 +1264,7 @@ wm_menu.cpp:
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
 	.data       start:0x80210FDC end:0x802111E8
+	.sbss2      start:0x80333DF8 end:0x80333E00
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C

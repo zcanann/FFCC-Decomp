@@ -22,6 +22,8 @@ extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 
 extern float FLOAT_80333000;
 extern float FLOAT_80332ff8;
+extern float FLOAT_80333038;
+extern float FLOAT_8033303c;
 extern double DOUBLE_80333008;
 extern double DOUBLE_80333030;
 
@@ -87,7 +89,7 @@ void CMenuPcs::CompaInit()
 	int compaState = (int)this->compaMenuState;
 
 	memset(compaList, 0, 0x1008);
-	fVar1 = 1.0f;
+	fVar1 = FLOAT_80333000;
 	iVar4 = (int)compaList + 8;
 	iVar5 = 8;
 	do {
@@ -108,9 +110,9 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
 	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 10) = 0x30;
-	fVar1 = 0.0f;
+	fVar1 = FLOAT_80332ff8;
 	*reinterpret_cast<short*>(iVar4 + 0xc) = 0x198;
-	fVar2 = 1.0f;
+	fVar2 = FLOAT_80333000;
 	*reinterpret_cast<short*>(iVar4 + 0xe) = 0x18;
 	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
 	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -154,8 +156,8 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0xec) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0xf0) = 5;
 
-	fVar3 = 6.0f;
-	fVar2 = -13.0f;
+	fVar3 = FLOAT_8033303c;
+	fVar2 = FLOAT_80333038;
 	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 0x108) = 0x15;

@@ -35,7 +35,7 @@ extern unsigned int m_table_desc15__8CPartPcs[];
 extern unsigned int m_table_desc16__8CPartPcs[];
 extern unsigned int m_table_desc17__8CPartPcs[];
 extern unsigned int m_table_desc18__8CPartPcs[];
-extern unsigned char m_table__8CPartPcs[];
+extern unsigned int m_table__8CPartPcs[];
 
 class CPartPcs : public CProcess
 {

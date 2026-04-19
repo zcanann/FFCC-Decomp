@@ -19,7 +19,7 @@ public:
 extern unsigned int m_table_desc0__6CMcPcs[];
 extern unsigned int m_table_desc1__6CMcPcs[];
 extern unsigned int m_table_desc2__6CMcPcs[];
-extern unsigned char m_table__6CMcPcs[];
+extern unsigned int m_table__6CMcPcs[];
 extern unsigned char sMcPcsSingletonData[];
 extern unsigned char* gMcPcsSingletonPtr;
 

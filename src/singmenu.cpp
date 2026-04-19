@@ -111,7 +111,7 @@ extern "C" char* PTR_DAT_8021422c;
 extern "C" char* PTR_s_Clavat_80214110[];
 extern "C" char* PTR_s_Clavat_802140f0[];
 extern "C" char* PTR_s_Clavat_80214100[];
-extern "C" char* PTR_s_Clavate_80214130[];
+extern "C" char* PTR_s_Clavate[];
 extern "C" char* PTR_s_Clavat_80214120[];
 extern "C" char* PTR_s_Maschio_802143e4[];
 extern "C" char* PTR_DAT_80214304[];
@@ -121,16 +121,550 @@ extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
 extern "C" int DAT_802381a7;
-extern "C" char* PTR_s_Blacksmith_80214140[];
-extern "C" char* PTR_s_Schmied_80214160[];
-extern "C" char* PTR_s_Fabbri_80214180[];
-extern "C" char* PTR_s_Forgeron_802141a0[];
-extern "C" char* PTR_s_Herrero_802141c0[];
-extern "C" char* PTR_s_Cowlick_80214640[];
-extern "C" char* PTR_s_Spitzschopf_802146c0[];
-extern "C" char* PTR_s_Ciuffo_ribelle_80214740[];
-extern "C" char* PTR_s_Remolino_80214840[];
+extern "C" char* PTR_s_Blacksmith[];
+extern "C" char* PTR_s_Schmied[];
+extern "C" char* PTR_s_Fabbri[];
+extern "C" char* PTR_s_Forgeron[];
+extern "C" char* PTR_s_Herrero[];
+extern "C" char* PTR_s_Cowlick[];
+extern "C" char* PTR_s_Spitzschopf[];
+extern "C" char* PTR_s_Ciuffo_ribelle[];
+extern "C" char* PTR_s_Remolino[];
 extern "C" unsigned char DAT_80214a50[];
+extern "C" {
+extern char lbl_803320D8[];
+extern char lbl_803320E0[];
+extern char lbl_803320E8[];
+extern char lbl_803320F0[];
+extern char lbl_803320F8[];
+extern char lbl_80332100[];
+extern char lbl_80332108[];
+extern char lbl_80332110[];
+extern char lbl_80332118[];
+extern char lbl_80332120[];
+extern char lbl_80332128[];
+extern char lbl_80332130[];
+extern char lbl_80332138[];
+extern char lbl_80332140[];
+extern char lbl_80332148[];
+extern char lbl_80332150[];
+extern char lbl_80332158[];
+extern char lbl_80332160[];
+extern char lbl_80332168[];
+extern char lbl_80332170[];
+extern char lbl_80332178[];
+extern char lbl_80332180[];
+extern char lbl_80332188[];
+extern char lbl_80332190[];
+extern char lbl_80332198[];
+extern char lbl_803321A0[];
+extern char lbl_803321A8[];
+extern char lbl_803321B0[];
+extern char lbl_803321B8[];
+extern char lbl_80332574[];
+extern char lbl_8033257C[];
+extern char lbl_80332584[];
+extern char lbl_80332588[];
+extern char lbl_80332590[];
+extern char lbl_80332598[];
+extern char lbl_803325A0[];
+extern char lbl_803325A8[];
+extern char lbl_803325B0[];
+extern char lbl_803325B8[];
+extern char lbl_803325C0[];
+extern char lbl_803325C8[];
+extern char lbl_803325D0[];
+extern char lbl_803325D8[];
+extern char lbl_803325E0[];
+extern char lbl_803325E8[];
+extern char lbl_803325F0[];
+extern char lbl_803325F8[];
+extern char lbl_80332600[];
+extern char lbl_80332608[];
+extern char lbl_8033260C[];
+extern char lbl_80332614[];
+extern char lbl_8033261C[];
+extern char lbl_80332624[];
+extern char lbl_8033262C[];
+extern char lbl_80332634[];
+extern char lbl_80332638[];
+extern char lbl_80332640[];
+extern char lbl_80332648[];
+extern char lbl_80332650[];
+extern char lbl_80332658[];
+extern char lbl_80332660[];
+extern char lbl_80332668[];
+extern char lbl_80332670[];
+extern char lbl_80332678[];
+extern char lbl_80332680[];
+extern char lbl_80332688[];
+extern char lbl_80332690[];
+extern char lbl_80332698[];
+extern char lbl_803326A0[];
+extern char lbl_803326A8[];
+extern char lbl_803326B0[];
+extern char lbl_803326B8[];
+extern char lbl_803326C0[];
+extern char lbl_803326C8[];
+extern char lbl_803326D0[];
+extern char lbl_803326D8[];
+extern char lbl_803326E0[];
+extern char lbl_803326E8[];
+extern char lbl_803326F0[];
+extern char lbl_803326F8[];
+extern char lbl_80332700[];
+extern char lbl_80332708[];
+extern char lbl_80332710[];
+extern char s_Blacksmith_801DD718[];
+extern char s_Fisherman_801DD724[];
+extern char s_Merchant_801DD730[];
+extern char s_Alchemist_801DD73C[];
+extern char s_Schneider_801DD748[];
+extern char s_Agricoltori_801DD760[];
+extern char s_Allevatori_801DD76C[];
+extern char s_Pescatori_801DD778[];
+extern char s_Mercanti_801DD784[];
+extern char s_Alchimisti_801DD790[];
+extern char s_Forgeron_801DD79C[];
+extern char s_Tailleur_801DD7A8[];
+extern char s_Marchand_801DD7B4[];
+extern char s_Alchimiste_801DD7C0[];
+extern char s_Campesino_801DD7CC[];
+extern char s_Granjero_801DD7D8[];
+extern char s_Molinero_801DD7E4[];
+extern char s_Pescador_801DD7F0[];
+extern char s_Comerciante_801DD7FC[];
+extern char s_Alquimista_801DD808[];
+extern char s_Headband_801DDD60[];
+extern char s_Long_Hair_801DDD6C[];
+extern char s_Short_Hair_801DDD78[];
+extern char s_Dark_Coat_801DDD84[];
+extern char s_White_Cap_801DDD90[];
+extern char s_Bare_Head_801DDD9C[];
+extern char s_Horned_Helm_801DDDA8[];
+extern char s_Steel_Visor_801DDDB4[];
+extern char s_Bucket_Head_801DDDC0[];
+extern char s_Blue_Armor_801DDDCC[];
+extern char s_Red_Mask_801DDDD8[];
+extern char s_One_Horn_801DDDE4[];
+extern char s_Long_Beak_801DDDF0[];
+extern char s_Black_Mage_801DDDFC[];
+extern char s_Heart_Top_801DDE08[];
+extern char s_Shark_Eyes_801DDE14[];
+extern char s_Bandanna_801DDE20[];
+extern char s_Raccoon_Tail_801DDE2C[];
+extern char s_Owl_Head_801DDE3C[];
+extern char s_Spitzschopf_801DDE48[];
+extern char s_Stirnband_801DDE54[];
+extern char s_Kopftuch_801DDE60[];
+extern char s_lange_Haare_801DDE6C[];
+extern char s_kurze_Haare_801DDE78[];
+extern char s_mittellang_801DDE84[];
+extern char s_Spitzhelm_801DDEA0[];
+extern char s_Eisenmaske_801DDEAC[];
+extern char s_Topfhelm_801DDEB8[];
+extern char s_Ritterin_801DDEC4[];
+extern char s_Augenmaske_801DDED0[];
+extern char s_Gitterhelm_801DDEDC[];
+extern char s_Knollhelm_801DDEE8[];
+extern char s_Schleife_801DDF00[];
+extern char s_Wolfkopf_801DDF0C[];
+extern char s_Otterschwanz_801DDF24[];
+extern char s_Katzenbein_801DDF34[];
+extern char s_Eulenkopf_801DDF40[];
+extern char s_Ciuffo_ribelle_801DDF4C[];
+extern char s_Naturale_801DDF5C[];
+extern char s_Cappello_801DDF68[];
+extern char s_Capelli_lunghi_801DDF74[];
+extern char s_Capelli_corti_801DDF84[];
+extern char s_Giacca_scura_801DDF94[];
+extern char s_Pettinato_801DDFA4[];
+extern char s_Elmo_di_corno_801DDFB0[];
+extern char s_Elmo_d_acciaio_801DDFC0[];
+extern char s_Pettinata_801DDFD0[];
+extern char s_Elegante_801DDFDC[];
+extern char s_Mascherina_801DDFE8[];
+extern char s_Monocorno_801DDFF4[];
+extern char s_Irregolare_801DE000[];
+extern char s_Becco_lungo_801DE00C[];
+extern char s_Mago_nero_801DE018[];
+extern char s_Tulipano_801DE024[];
+extern char s_Cucchiaio_801DE030[];
+extern char s_Occhi_rapaci_801DE03C[];
+extern char s_Procione_801DE04C[];
+extern char s_Testa_di_gufo_801DE058[];
+extern char s_Unicorne_801DE080[];
+extern char s_Long_bec_801DE08C[];
+extern char s_Mage_noir_801DE098[];
+extern char s_Remolino_801DE0B0[];
+extern char s_Cabello_Largo_801DE0BC[];
+extern char s_Cabello_Corto_801DE0CC[];
+extern char s_Chaqueta_Osc_801DE0DC[];
+extern char s_Gorro_Blanco_801DE0EC[];
+extern char s_Cabeza_Aire_801DE0FC[];
+extern char s_Yelmo_Cuerno_801DE108[];
+extern char s_Cabeza_Balde_801DE128[];
+extern char s_Un_Cuerno_801DE148[];
+extern char s_Zarandeado_801DE154[];
+extern char s_Pico_Largo_801DE160[];
+extern char s_Magia_Negra_801DE16C[];
+extern char s_Cresta_Coraz_801DE178[];
+extern char s_Cola_Mapache_801DE198[];
+extern char s_Resist_fire_801DE1B4[];
+extern char s_Resist_cold_801DE1C0[];
+extern char s_Resist_lightning_801DE1CC[];
+extern char s_Resist_slow_801DE1E0[];
+extern char s_Resist_prlysis_801DE1EC[];
+extern char s_Resist_poison_801DE1FC[];
+extern char s_Resist_curses_801DE20C[];
+extern char s_Resist_petrif_801DE21C[];
+extern char s_Casting_time_801DE22C[];
+extern char s_Charge_time_801DE23C[];
+extern char s_Spell_duration_801DE248[];
+extern char s_Resist_miasma_801DE258[];
+extern char s_Long_spell_range_801DE268[];
+extern char s_Long_focus_attks_801DE27C[];
+extern char s_Focus_attacks_801DE290[];
+extern char s_Spell_damage_801DE2A0[];
+extern char s_Cannot_be_stunned_801DE2B0[];
+extern char s_Feuer_Res_801DE2C4[];
+extern char s_Eis_Resist_801DE2D0[];
+extern char s_Blitz_Res_801DE2E0[];
+extern char s_Gemach_R_801DE2EC[];
+extern char s_Stopp_Res_801DE2F8[];
+extern char s_Gift_Res_801DE304[];
+extern char s_Fluch_Res_801DE310[];
+extern char s_Stein_Res_801DE31C[];
+extern char s_Z_laden_801DE328[];
+extern char s_Sammeln_801DE334[];
+extern char s_Z_Wirkungszeit_801DE340[];
+extern char s_Miasma_R_plus_801DE354[];
+extern char s_Z_Reichw_plus_801DE360[];
+extern char s_SA_Reichw_plus_801DE370[];
+extern char s_Spezialattacke_801DE380[];
+extern char s_Zauber_Schaden_801DE390[];
+extern char s_Standfest_801DE3A0[];
+extern char s_Antifuoco_801DE3AC[];
+extern char s_Antigelo_801DE3B8[];
+extern char s_Antituono_801DE3C4[];
+extern char s_Antislow_801DE3D0[];
+extern char s_Antistop_801DE3DC[];
+extern char s_Antiveleno_801DE3E8[];
+extern char s_Antimalediz_801DE3F4[];
+extern char s_Antipietrif_801DE404[];
+extern char s_Carica_magia_801DE414[];
+extern char s_Carica_attacchi_801DE424[];
+extern char s_Durata_magie_801DE434[];
+extern char s_Antimiasma_801DE444[];
+extern char s_Portata_magie_801DE450[];
+extern char s_Portata_Super_Att_801DE460[];
+extern char s_Rigenerazione_801DE474[];
+extern char s_Super_Attacchi_801DE484[];
+extern char s_Danno_Magico_801DE494[];
+extern char s_Antistordimento_801DE4A4[];
+extern char s_Anti_Feu_801DE4B4[];
+extern char s_Anti_Glace_801DE4C0[];
+extern char s_Anti_Foudre_801DE4CC[];
+extern char s_Anti_Somni_801DE4D8[];
+extern char s_Anti_Stop_801DE4E4[];
+extern char s_Anti_Poison_801DE4F0[];
+extern char s_Tps_de_lancem_801DE51C[];
+extern char s_Tps_de_charge_801DE52C[];
+extern char s_Anti_Miasme_801DE548[];
+extern char s_Super_attaques_801DE57C[];
+extern char s_Anti_fuego_801DE5B0[];
+extern char s_Anti_rayos_801DE5C8[];
+extern char s_Anti_Freno_801DE5D4[];
+extern char s_Anti_Paro_801DE5E0[];
+extern char s_Anti_veneno_801DE5EC[];
+extern char s_Anti_maldic_801DE5F8[];
+extern char s_Anti_petrif_801DE608[];
+extern char s_Tiempo_lanzam_801DE618[];
+extern char s_Tiempo_carga_801DE628[];
+extern char s_Durac_hechiz_801DE638[];
+extern char s_Anti_miasma_801DE648[];
+extern char s_Alcance_hechiz_801DE654[];
+extern char s_Alc_superataq_801DE664[];
+extern char s_Revitalia_801DE674[];
+extern char s_Superataque_801DE680[];
+extern char s_No_se_aturde_801DE69C[];
+extern char lbl_801DD754[];
+extern char lbl_801DDE90[];
+extern char lbl_801DDEF4[];
+extern char lbl_801DDF18[];
+extern char lbl_801DE068[];
+extern char lbl_801DE074[];
+extern char lbl_801DE0A4[];
+extern char lbl_801DE118[];
+extern char lbl_801DE138[];
+extern char lbl_801DE188[];
+extern char lbl_801DE1A8[];
+extern char lbl_801DE4FC[];
+extern char lbl_801DE50C[];
+extern char lbl_801DE53C[];
+extern char lbl_801DE554[];
+extern char lbl_801DE568[];
+extern char lbl_801DE58C[];
+extern char lbl_801DE59C[];
+extern char lbl_801DE5BC[];
+extern char lbl_801DE68C[];
+extern char lbl_803321BC[], lbl_803321C0[], lbl_803321C4[], lbl_803321CC[];
+extern char lbl_803321D0[], lbl_803321D8[], lbl_803321E0[], lbl_803321E8[];
+extern char lbl_803321F0[], lbl_803321F8[], lbl_80332200[], lbl_80332208[];
+extern char lbl_8033220C[], lbl_80332214[], lbl_8033221C[], lbl_80332224[];
+extern char lbl_8033222C[], lbl_80332230[], lbl_80332234[], lbl_80332238[];
+extern char lbl_80332240[], lbl_80332248[], lbl_80332250[], lbl_80332258[];
+extern char lbl_80332260[], lbl_80332264[], lbl_8033226C[], lbl_80332274[];
+extern char lbl_8033227C[], lbl_80332284[], lbl_8033228C[], lbl_80332294[];
+extern char lbl_8033229C[], lbl_803322A4[], lbl_803322AC[], lbl_803322B4[];
+extern char lbl_803322B8[], lbl_803322C0[], lbl_803322C4[], lbl_803322CC[];
+extern char lbl_803322D4[], lbl_803322DC[], lbl_803322E4[], lbl_803322E8[];
+extern char lbl_803322F0[], lbl_803322F8[], lbl_80332300[], lbl_80332308[];
+extern char lbl_8033230C[], lbl_80332314[], lbl_8033231C[], lbl_80332324[];
+extern char lbl_8033232C[], lbl_80332330[], lbl_80332338[], lbl_80332340[];
+extern char lbl_80332348[], lbl_80332350[], lbl_80332358[], lbl_80332360[];
+extern char lbl_80332368[], lbl_80332370[], lbl_80332378[], lbl_80332380[];
+extern char lbl_80332384[], lbl_8033238C[], lbl_80332394[], lbl_8033239C[];
+extern char lbl_803323A4[], lbl_803323AC[], lbl_803323B4[], lbl_803323BC[];
+extern char lbl_803323C4[], lbl_803323CC[], lbl_803323D4[], lbl_803323DC[];
+extern char lbl_803323E4[], lbl_803323EC[], lbl_803323F4[], lbl_803323FC[];
+extern char lbl_80332404[], lbl_80332408[], lbl_8033240C[], lbl_80332414[];
+extern char lbl_8033241C[], lbl_80332424[], lbl_8033242C[], lbl_80332434[];
+extern char lbl_8033243C[], lbl_80332444[], lbl_8033244C[], lbl_80332454[];
+extern char lbl_8033245C[], lbl_80332464[], lbl_8033246C[], lbl_80332474[];
+extern char lbl_8033247C[], lbl_80332484[], lbl_8033248C[], lbl_80332494[];
+extern char lbl_8033249C[], lbl_803324A4[], lbl_803324AC[], lbl_803324B4[];
+extern char lbl_803324BC[], lbl_803324C4[], lbl_803324C8[], lbl_803324D0[];
+extern char lbl_803324D8[], lbl_803324E0[], lbl_803324E8[], lbl_803324F0[];
+extern char lbl_803324F8[], lbl_80332500[], lbl_80332508[], lbl_80332510[];
+extern char lbl_80332518[], lbl_80332520[], lbl_80332528[], lbl_80332530[];
+extern char lbl_80332534[], lbl_8033253C[], lbl_80332544[], lbl_8033254C[];
+extern char lbl_80332554[], lbl_8033255C[], lbl_80332564[], lbl_8033256C[];
+extern char s_Strength_801DD814[], s_Memories_801DD820[], s_Send_item_801DD82C[], s_Send_gil_801DD838[];
+extern char s_Send_nothing_801DD844[], s_Proceed_801DD854[], s_Take_out_801DD860[], s_the_reply_801DD86C[];
+extern char s_Include_801DD878[], s_Family_Trade_801DD884[], s_Command_List_801DD894[], s_Artefacts_801DD8A4[];
+extern char s_Treasures_801DD8B0[], s_Favourites_801DD8BC[], s_Abbrechen_801DD8C8[], s_Erinnerungen_801DD8D4[];
+extern char s_Angreifen_801DD8E4[], s_Verteidigen_801DD8F0[], s_Kombinieren_801DD8FC[], s_Benutzen_801DD914[];
+extern char s_Wegwerfen_801DD920[], s_Weiblich_801DD944[], s_Alle_Rassen_801DD950[], s_Schwester_801DD95C[];
+extern char s_kl_Bruder_801DD968[], s_kl_Schwester_801DD974[], s_Liste_erhaltener_Briefe_801DD984[], s_herausholen_801DD9D0[];
+extern char s_die_Antwort_801DD9E0[], s_schicken_801DD9F0[], s_Geschlecht_801DDA14[], s_Elterlicher_Beruf_801DDA20[];
+extern char s_Kommandoliste_801DDA34[], s_Artefakte_801DDA5C[], s_Geborgtes_801DDA68[], s_Geschmack_801DDA74[];
+extern char s_Distruggi_801DDA80[], s_Fratello_801DDA8C[], s_Invia_oggetto_801DDA98[], s_Invia_guil_801DDAA8[];
+extern char s_Non_inviare_nulla_801DDAB4[], s_Vuoi_procedere_801DDAC8[], s_Vuoi_prendere_801DDAD8[], s_Vuoi_rispondere_a_801DDAE8[];
+extern char s_Allegato_801DDAFC[], s_Conferma_801DDB08[], s_Mestiere_801DDB14[], s_Lista_Comandi_801DDB20[];
+extern char s_Equipaggiamento_801DDB30[], s_Manufatti_801DDB40[], s_Preferiti_801DDB4C[], s_Famiglia_801DDB58[];
+extern char s_Souvenirs_801DDB70[], s_Attaquer_801DDB7C[], s_Fusionner_801DDB94[], s_Utiliser_801DDBA0[];
+extern char s_Masculin_801DDBB8[], s_Envoyer_un_objet_801DDBC4[], s_Envoyer_des_gils_801DDBD8[], s_Ne_rien_envoyer_801DDBEC[];
+extern char s_Continuer_801DDBFC[], s_Prendre_801DDC08[], s_Joindre_801DDC2C[], s_Confirmer_801DDC38[];
+extern char s_Commandes_801DDC44[], s_Cancelar_801DDC5C[], s_Memorias_801DDC68[], s_Defender_801DDC74[];
+extern char s_Fusionar_801DDC80[], s_Utilizar_801DDC8C[], s_Descartar_801DDC98[], s_Destruir_801DDCA4[];
+extern char s_Enviar_objeto_801DDCB0[], s_Enviar_guiles_801DDCC0[], s_No_enviar_nada_801DDCD0[], s_Enviar_la_respuesta_a_801DDCF8[];
+extern char s_Incluir_801DDD10[], s_Confirmar_801DDD1C[], s_Oficio_familiar_801DDD28[], s_Comandos_801DDD3C[];
+extern char s_Artefactos_801DDD48[], s_Favoritos_801DDD54[];
+extern char lbl_801DD908[], lbl_801DD92C[], lbl_801DD938[], lbl_801DD99C[], lbl_801DD9B0[], lbl_801DD9C0[];
+extern char lbl_801DD9FC[], lbl_801DDA08[], lbl_801DDA44[], lbl_801DDA50[], lbl_801DDB64[], lbl_801DDB88[];
+extern char lbl_801DDBAC[], lbl_801DDC14[], lbl_801DDC20[], lbl_801DDC50[], lbl_801DDCE0[], lbl_801DDCEC[];
+}
+extern "C" char* PTR_s_Clavat_802140f0[] = {
+    lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
+};
+extern "C" char* PTR_s_Clavat_80214100[] = {
+    lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
+};
+extern "C" char* PTR_s_Clavat_80214110[] = {
+    lbl_803320D8, lbl_803320F8, lbl_803320E8, lbl_80332100,
+};
+extern "C" char* PTR_s_Clavat_80214120[] = {
+    lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
+};
+extern "C" char* PTR_s_Clavate[] = {
+    lbl_80332108, lbl_80332110, lbl_80332118, lbl_80332120,
+};
+extern "C" char* PTR_s_Blacksmith[] = {
+    s_Blacksmith_801DD718, lbl_80332128, lbl_80332130, lbl_80332138,
+    lbl_80332140, s_Fisherman_801DD724, s_Merchant_801DD730, s_Alchemist_801DD73C,
+};
+extern "C" char* PTR_s_Schmied[] = {
+    lbl_80332148, s_Schneider_801DD748, lbl_80332150, lbl_801DD754,
+    lbl_80332158, lbl_80332160, lbl_80332168, s_Alchemist_801DD73C,
+};
+extern "C" char* PTR_s_Fabbri[] = {
+    lbl_80332170, lbl_80332178, s_Agricoltori_801DD760, s_Allevatori_801DD76C,
+    lbl_80332180, s_Pescatori_801DD778, s_Mercanti_801DD784, s_Alchimisti_801DD790,
+};
+extern "C" char* PTR_s_Forgeron[] = {
+    s_Forgeron_801DD79C, s_Tailleur_801DD7A8, lbl_80332188, lbl_80332190,
+    lbl_80332198, lbl_803321A0, s_Marchand_801DD7B4, s_Alchimiste_801DD7C0,
+};
+extern "C" char* PTR_s_Herrero[] = {
+    lbl_803321A8, lbl_803321B0, s_Campesino_801DD7CC, s_Granjero_801DD7D8,
+    s_Molinero_801DD7E4, s_Pescador_801DD7F0, s_Comerciante_801DD7FC, s_Alquimista_801DD808,
+};
+extern "C" char* gSingMenuTextTableEn[] = {
+    lbl_803321B8, lbl_803321BC, lbl_803321C0, lbl_803321C4,
+    lbl_803321CC, s_Strength_801DD814, lbl_803321D0, lbl_803321D8,
+    s_Memories_801DD820, lbl_803321E0, lbl_803321E8, lbl_803321F0,
+    lbl_803321F8, lbl_80332200, lbl_80332208, lbl_8033220C,
+    lbl_80332214, lbl_8033221C, lbl_80332224, lbl_8033222C,
+    lbl_80332230, lbl_80332234, lbl_80332238, lbl_80332240,
+    lbl_80332248, lbl_80332250, lbl_80332248, lbl_80332250,
+    lbl_803321B8, lbl_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
+    s_Send_nothing_801DD844, s_Proceed_801DD854, s_Take_out_801DD860, lbl_80332260,
+    lbl_80332260, lbl_80332264, s_the_reply_801DD86C, lbl_803321B8,
+    s_Include_801DD878, lbl_8033226C, lbl_80332274, lbl_8033227C,
+    lbl_80332284, s_Family_Trade_801DD884, s_Command_List_801DD894, lbl_8033228C,
+    lbl_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, lbl_8033229C,
+    s_Favourites_801DD8BC, lbl_803322A4, lbl_80332258, lbl_803322AC,
+};
+extern "C" char* gSingMenuTextTableDe[] = {
+    lbl_803321B8, lbl_803322B4, lbl_803322B8, s_Abbrechen_801DD8C8,
+    lbl_803322C0, lbl_803322C4, lbl_803322CC, lbl_803322D4,
+    s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, lbl_803322DC,
+    s_Kombinieren_801DD8FC, lbl_801DD908, s_Benutzen_801DD914, s_Wegwerfen_801DD920,
+    lbl_801DD92C, lbl_801DD938, s_Weiblich_801DD944, s_Alle_Rassen_801DD950,
+    lbl_80332230, lbl_803322E4, lbl_803322E8, lbl_803322F0,
+    lbl_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
+    lbl_803321B8, s_Liste_erhaltener_Briefe_801DD984, lbl_801DD99C, lbl_801DD9B0,
+    lbl_801DD9C0, lbl_80332300, s_herausholen_801DD9D0, lbl_80332308,
+    lbl_80332260, lbl_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
+    lbl_801DD9FC, lbl_801DDA08, lbl_80332274, s_Geschlecht_801DDA14,
+    lbl_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, lbl_801DDA44,
+    lbl_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, lbl_80332314,
+    s_Geschmack_801DDA74, lbl_8033231C, lbl_80332324, s_Abbrechen_801DD8C8,
+};
+extern "C" char* gSingMenuTextTableIt[] = {
+    lbl_803321B8, lbl_8033232C, lbl_803321C0, lbl_80332330,
+    lbl_80332338, lbl_80332340, lbl_80332348, lbl_80332350,
+    lbl_80332358, lbl_80332360, lbl_80332348, lbl_80332368,
+    lbl_80332370, lbl_80332378, lbl_80332380, lbl_80332384,
+    s_Distruggi_801DDA80, lbl_8033238C, lbl_80332394, lbl_8033239C,
+    lbl_80332230, lbl_80332234, lbl_803323A4, lbl_803323AC,
+    s_Fratello_801DDA8C, lbl_803323B4, s_Fratello_801DDA8C, lbl_803323B4,
+    lbl_803321B8, lbl_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
+    s_Non_inviare_nulla_801DDAB4, s_Vuoi_procedere_801DDAC8, s_Vuoi_prendere_801DDAD8, lbl_80332260,
+    lbl_80332260, lbl_803323C4, s_Vuoi_rispondere_a_801DDAE8, lbl_803321B8,
+    s_Allegato_801DDAFC, s_Conferma_801DDB08, lbl_803323CC, lbl_803323D4,
+    lbl_803323DC, s_Mestiere_801DDB14, s_Lista_Comandi_801DDB20, lbl_803323E4,
+    s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, lbl_803323EC, lbl_803323F4,
+    s_Preferiti_801DDB4C, s_Famiglia_801DDB58, lbl_803323BC, lbl_803323FC,
+};
+extern "C" char* gSingMenuTextTableFr[] = {
+    lbl_803321B8, lbl_80332404, lbl_80332408, lbl_8033240C,
+    lbl_80332414, lbl_8033241C, lbl_801DDB64, lbl_803322D4,
+    s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, lbl_801DDB88, lbl_80332424,
+    s_Fusionner_801DDB94, lbl_8033242C, s_Utiliser_801DDBA0, lbl_80332434,
+    lbl_801DDBAC, s_Masculin_801DDBB8, lbl_8033243C, lbl_80332444,
+    lbl_80332230, lbl_80332234, lbl_8033244C, lbl_80332454,
+    lbl_8033245C, lbl_80332464, lbl_8033245C, lbl_80332464,
+    lbl_803321B8, lbl_8033246C, s_Envoyer_un_objet_801DDBC4, s_Envoyer_des_gils_801DDBD8,
+    s_Ne_rien_envoyer_801DDBEC, s_Continuer_801DDBFC, s_Prendre_801DDC08, lbl_80332260,
+    lbl_80332260, lbl_801DDC14, lbl_801DDC20, lbl_803321B8,
+    s_Joindre_801DDC2C, s_Confirmer_801DDC38, lbl_80332474, lbl_8033247C,
+    lbl_80332484, lbl_8033248C, s_Commandes_801DDC44, lbl_80332494,
+    lbl_8033249C, s_Artefacts_801DD8A4, lbl_803324A4, lbl_803324AC,
+    lbl_801DDC50, lbl_803324B4, lbl_8033246C, lbl_803324BC,
+};
+extern "C" char* gSingMenuTextTableEs[] = {
+    lbl_803321B8, lbl_803324C4, lbl_803321C0, s_Cancelar_801DDC5C,
+    lbl_803324C8, lbl_803324D0, lbl_803324D8, lbl_80332350,
+    s_Memorias_801DDC68, lbl_803324E0, s_Defender_801DDC74, lbl_803324E8,
+    s_Fusionar_801DDC80, lbl_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
+    s_Destruir_801DDCA4, lbl_803324F8, lbl_80332500, lbl_80332508,
+    lbl_80332510, lbl_80332234, lbl_803323A4, lbl_803323AC,
+    lbl_80332518, lbl_80332520, lbl_80332518, lbl_80332520,
+    lbl_803321B8, lbl_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
+    s_No_enviar_nada_801DDCD0, lbl_801DDCE0, lbl_801DDCEC, lbl_80332260,
+    lbl_80332260, lbl_80332530, s_Enviar_la_respuesta_a_801DDCF8, lbl_803321B8,
+    s_Incluir_801DDD10, s_Confirmar_801DDD1C, lbl_80332534, lbl_8033253C,
+    lbl_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, lbl_80332544,
+    lbl_8033254C, s_Artefactos_801DDD48, lbl_80332554, lbl_8033255C,
+    s_Favoritos_801DDD54, lbl_80332564, lbl_80332528, lbl_8033256C,
+};
+extern "C" char* PTR_s_Cowlick[] = {
+    lbl_80332574, lbl_8033257C, s_Headband_801DDD60, lbl_80332584,
+    s_Long_Hair_801DDD6C, s_Short_Hair_801DDD78, s_Dark_Coat_801DDD84, s_White_Cap_801DDD90,
+    s_Bare_Head_801DDD9C, s_Horned_Helm_801DDDA8, s_Steel_Visor_801DDDB4, s_Bucket_Head_801DDDC0,
+    s_Bare_Head_801DDD9C, s_Blue_Armor_801DDDCC, lbl_80332588, s_Red_Mask_801DDDD8,
+    s_One_Horn_801DDDE4, lbl_80332590, s_Long_Beak_801DDDF0, s_Black_Mage_801DDDFC,
+    lbl_80332598, lbl_803325A0, lbl_803325A8, s_Heart_Top_801DDE08,
+    lbl_803325B0, s_Shark_Eyes_801DDE14, s_Bandanna_801DDE20, s_Raccoon_Tail_801DDE2C,
+    lbl_803325B0, s_Raccoon_Tail_801DDE2C, s_Shark_Eyes_801DDE14, s_Owl_Head_801DDE3C,
+};
+extern "C" char* PTR_s_Spitzschopf[] = {
+    s_Spitzschopf_801DDE48, lbl_803325B8, s_Stirnband_801DDE54, s_Kopftuch_801DDE60,
+    s_lange_Haare_801DDE6C, s_kurze_Haare_801DDE78, s_mittellang_801DDE84, lbl_801DDE90,
+    lbl_803325C0, s_Spitzhelm_801DDEA0, s_Eisenmaske_801DDEAC, s_Topfhelm_801DDEB8,
+    lbl_803325C0, s_Ritterin_801DDEC4, lbl_803325C8, s_Augenmaske_801DDED0,
+    lbl_803325D0, s_Gitterhelm_801DDEDC, s_Knollhelm_801DDEE8, lbl_801DDEF4,
+    lbl_803325D8, lbl_803325E0, lbl_803325E8, s_Schleife_801DDF00,
+    s_Wolfkopf_801DDF0C, lbl_803325F0, lbl_801DDF18, s_Otterschwanz_801DDF24,
+    s_Katzenbein_801DDF34, s_Otterschwanz_801DDF24, lbl_803325F0, s_Eulenkopf_801DDF40,
+};
+extern "C" char* PTR_s_Ciuffo_ribelle[] = {
+    s_Ciuffo_ribelle_801DDF4C, s_Naturale_801DDF5C, lbl_803325F8, s_Cappello_801DDF68,
+    s_Capelli_lunghi_801DDF74, s_Capelli_corti_801DDF84, s_Giacca_scura_801DDF94, s_Cappello_801DDF68,
+    s_Pettinato_801DDFA4, s_Elmo_di_corno_801DDFB0, s_Elmo_d_acciaio_801DDFC0, lbl_80332600,
+    s_Pettinata_801DDFD0, lbl_80332608, s_Elegante_801DDFDC, s_Mascherina_801DDFE8,
+    s_Monocorno_801DDFF4, s_Irregolare_801DE000, s_Becco_lungo_801DE00C, s_Mago_nero_801DE018,
+    lbl_8033260C, s_Tulipano_801DE024, s_Cucchiaio_801DE030, lbl_80332614,
+    lbl_8033261C, s_Occhi_rapaci_801DE03C, lbl_80332624, s_Procione_801DE04C,
+    lbl_8033262C, s_Procione_801DE04C, s_Occhi_rapaci_801DE03C, s_Testa_di_gufo_801DE058,
+};
+extern "C" char* gSingMenuHairTableFr[] = {
+    lbl_80332634, lbl_80332638, lbl_80332640, lbl_80332648,
+    lbl_80332650, lbl_80332658, lbl_80332660, lbl_80332648,
+    lbl_801DE068, lbl_80332668, lbl_80332670, lbl_80332678,
+    lbl_801DE068, lbl_80332678, lbl_801DE074, lbl_80332680,
+    s_Unicorne_801DE080, lbl_80332688, s_Long_bec_801DE08C, s_Mage_noir_801DE098,
+    lbl_8033260C, lbl_80332690, lbl_801DE0A4, lbl_80332698,
+    lbl_803326A0, lbl_803326A8, lbl_80332624, lbl_803326B0,
+    lbl_803326B8, lbl_803326B0, lbl_803326A8, lbl_803326C0,
+};
+extern "C" char* PTR_s_Remolino[] = {
+    s_Remolino_801DE0B0, lbl_8033257C, lbl_803326C8, lbl_803326D0,
+    s_Cabello_Largo_801DE0BC, s_Cabello_Corto_801DE0CC, s_Chaqueta_Osc_801DE0DC, s_Gorro_Blanco_801DE0EC,
+    s_Cabeza_Aire_801DE0FC, s_Yelmo_Cuerno_801DE108, lbl_801DE118, s_Cabeza_Balde_801DE128,
+    s_Cabeza_Aire_801DE0FC, lbl_803326D8, s_Elegante_801DDFDC, lbl_801DE138,
+    s_Un_Cuerno_801DE148, s_Zarandeado_801DE154, s_Pico_Largo_801DE160, s_Magia_Negra_801DE16C,
+    lbl_803326E0, lbl_803326E8, lbl_803326F0, s_Cresta_Coraz_801DE178,
+    lbl_803326F8, lbl_801DE188, lbl_80332624, s_Cola_Mapache_801DE198,
+    lbl_803326F8, s_Cola_Mapache_801DE198, lbl_801DE188, lbl_801DE1A8,
+};
+extern "C" char* gSingMenuAttrTableEn[] = {
+    lbl_803321B8, s_Resist_fire_801DE1B4, s_Resist_cold_801DE1C0, s_Resist_lightning_801DE1CC,
+    s_Resist_slow_801DE1E0, s_Resist_prlysis_801DE1EC, s_Resist_poison_801DE1FC, s_Resist_curses_801DE20C,
+    s_Resist_petrif_801DE21C, s_Casting_time_801DE22C, s_Charge_time_801DE23C, s_Spell_duration_801DE248,
+    s_Spell_duration_801DE248, s_Resist_miasma_801DE258, s_Long_spell_range_801DE268, s_Long_focus_attks_801DE27C,
+    lbl_80332700, s_Focus_attacks_801DE290, s_Spell_damage_801DE2A0, s_Cannot_be_stunned_801DE2B0,
+};
+extern "C" char* gSingMenuAttrTableDe[] = {
+    lbl_803321B8, s_Feuer_Res_801DE2C4, s_Eis_Resist_801DE2D0, s_Blitz_Res_801DE2E0,
+    s_Gemach_R_801DE2EC, s_Stopp_Res_801DE2F8, s_Gift_Res_801DE304, s_Fluch_Res_801DE310,
+    s_Stein_Res_801DE31C, s_Z_laden_801DE328, s_Sammeln_801DE334, s_Z_Wirkungszeit_801DE340,
+    s_Z_Wirkungszeit_801DE340, s_Miasma_R_plus_801DE354, s_Z_Reichw_plus_801DE360, s_SA_Reichw_plus_801DE370,
+    lbl_80332708, s_Spezialattacke_801DE380, s_Zauber_Schaden_801DE390, s_Standfest_801DE3A0,
+};
+extern "C" char* gSingMenuAttrTableIt[] = {
+    lbl_803321B8, s_Antifuoco_801DE3AC, s_Antigelo_801DE3B8, s_Antituono_801DE3C4,
+    s_Antislow_801DE3D0, s_Antistop_801DE3DC, s_Antiveleno_801DE3E8, s_Antimalediz_801DE3F4,
+    s_Antipietrif_801DE404, s_Carica_magia_801DE414, s_Carica_attacchi_801DE424, s_Durata_magie_801DE434,
+    s_Durata_magie_801DE434, s_Antimiasma_801DE444, s_Portata_magie_801DE450, s_Portata_Super_Att_801DE460,
+    s_Rigenerazione_801DE474, s_Super_Attacchi_801DE484, s_Danno_Magico_801DE494, s_Antistordimento_801DE4A4,
+};
+extern "C" char* gSingMenuAttrTableFr[] = {
+    lbl_803321B8, s_Anti_Feu_801DE4B4, s_Anti_Glace_801DE4C0, s_Anti_Foudre_801DE4CC,
+    s_Anti_Somni_801DE4D8, s_Anti_Stop_801DE4E4, s_Anti_Poison_801DE4F0, lbl_801DE4FC,
+    lbl_801DE50C, s_Tps_de_lancem_801DE51C, s_Tps_de_charge_801DE52C, lbl_801DE53C,
+    lbl_801DE53C, s_Anti_Miasme_801DE548, lbl_801DE554, lbl_801DE568,
+    lbl_80332710, s_Super_attaques_801DE57C, lbl_801DE58C, lbl_801DE59C,
+};
+extern "C" char* gSingMenuAttrTableEs[] = {
+    lbl_803321B8, s_Anti_fuego_801DE5B0, lbl_801DE5BC, s_Anti_rayos_801DE5C8,
+    s_Anti_Freno_801DE5D4, s_Anti_Paro_801DE5E0, s_Anti_veneno_801DE5EC, s_Anti_maldic_801DE5F8,
+    s_Anti_petrif_801DE608, s_Tiempo_lanzam_801DE618, s_Tiempo_carga_801DE628, s_Durac_hechiz_801DE638,
+    s_Durac_hechiz_801DE638, s_Anti_miasma_801DE648, s_Alcance_hechiz_801DE654, s_Alc_superataq_801DE664,
+    s_Revitalia_801DE674, s_Superataque_801DE680, lbl_801DE68C, s_No_se_aturde_801DE69C,
+};
 extern "C" {
 char s_DynamicMessStr[0x404];
 }
@@ -2344,7 +2878,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
                 text = PTR_s_Clavat_80214100[raceType];
             }
         } else if (languageId == 5) {
-            text = PTR_s_Clavate_80214130[raceType];
+            text = PTR_s_Clavate[raceType];
         } else if (languageId < 5) {
             text = PTR_s_Clavat_80214120[raceType];
         } else {
@@ -2589,7 +3123,7 @@ static inline char* GetLanguageTableString(int index, char** englishTable, char*
 char* CMenuPcs::GetTribeStr(int index)
 {
     return GetLanguageTableString(index, PTR_s_Clavat_802140f0, PTR_s_Clavat_80214100, PTR_s_Clavat_80214110,
-                                  PTR_s_Clavat_80214120, PTR_s_Clavate_80214130);
+                                  PTR_s_Clavat_80214120, PTR_s_Clavate);
 }
 
 /*
@@ -2603,7 +3137,7 @@ char* CMenuPcs::GetTribeStr(int index)
  */
 char* CMenuPcs::GetJobStr(int index)
 {
-    return GetLanguageTableString(index, PTR_s_Blacksmith_80214140, PTR_s_Schmied_80214160, PTR_s_Fabbri_80214180, PTR_s_Forgeron_802141a0, PTR_s_Herrero_802141c0);
+    return GetLanguageTableString(index, PTR_s_Blacksmith, PTR_s_Schmied, PTR_s_Fabbri, PTR_s_Forgeron, PTR_s_Herrero);
 }
 
 /*
@@ -2617,7 +3151,7 @@ char* CMenuPcs::GetJobStr(int index)
  */
 char* CMenuPcs::GetHairStr(int index)
 {
-    return GetLanguageTableString(index, PTR_s_Cowlick_80214640, PTR_s_Spitzschopf_802146c0, PTR_s_Ciuffo_ribelle_80214740, gSingMenuHairTableFr, PTR_s_Remolino_80214840);
+    return GetLanguageTableString(index, PTR_s_Cowlick, PTR_s_Spitzschopf, PTR_s_Ciuffo_ribelle, gSingMenuHairTableFr, PTR_s_Remolino);
 }
 
 /*

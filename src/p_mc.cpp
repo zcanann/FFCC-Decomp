@@ -4,6 +4,23 @@
 extern "C" {
 extern unsigned char* gMcPcsSingletonPtr;
 }
+extern "C" void create__6CMcPcsFv(CMcPcs*);
+extern "C" void destroy__6CMcPcsFv(CMcPcs*);
+extern "C" void calc__6CMcPcsFv(CMcPcs*);
+extern char lbl_80331B10[];
+extern char lbl_8032E9D0[];
+extern char lbl_8032E9D8[];
+
+unsigned int m_table_desc0__6CMcPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__6CMcPcsFv)};
+unsigned int m_table_desc1__6CMcPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__6CMcPcsFv)};
+unsigned int m_table_desc2__6CMcPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__6CMcPcsFv)};
+unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(lbl_80331B10), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
+};
+unsigned int lbl_80211F08[3] = {reinterpret_cast<unsigned int>(lbl_8032E9D0), 0, 0};
+unsigned int lbl_80211F14[5] = {
+    reinterpret_cast<unsigned int>(lbl_8032E9D0), 0, reinterpret_cast<unsigned int>(lbl_8032E9D8), 0, 0
+};
 
 unsigned char* gMcPcsSingletonPtr = 0;
 

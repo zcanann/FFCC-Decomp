@@ -15,7 +15,7 @@ extern unsigned int m_table_desc0__14CFunnyShapePcs[];
 extern unsigned int m_table_desc1__14CFunnyShapePcs[];
 extern unsigned int m_table_desc2__14CFunnyShapePcs[];
 extern unsigned int m_table_desc3__14CFunnyShapePcs[];
-extern unsigned char m_table__14CFunnyShapePcs[];
+extern unsigned int m_table__14CFunnyShapePcs[];
 
 class CFunnyShapePcs : public CProcess
 {

@@ -15,10 +15,16 @@
 
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 
+extern "C" void create__9CLightPcsFv(CLightPcs*);
+extern "C" void destroy__9CLightPcsFv(CLightPcs*);
+extern "C" void calc__9CLightPcsFv(CLightPcs*);
+extern "C" void draw__9CLightPcsFv(CLightPcs*);
+extern "C" void MakeLightMap__9CLightPcsFv(CLightPcs*);
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
+extern char s_CLightPcs_801D7C70[];
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;
@@ -63,6 +69,16 @@ static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
+
+unsigned int m_table_desc0__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
+unsigned int m_table_desc1__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
+unsigned int m_table_desc2__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
+unsigned int m_table_desc3__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
+unsigned int m_table_desc4__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
+unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(s_CLightPcs_801D7C70), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
+    0, 0x2D, 1
+};
 
 CLightPcs LightPcs;
 static char s_p_light_cpp[] = "p_light.cpp";

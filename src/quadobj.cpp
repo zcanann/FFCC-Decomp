@@ -6,8 +6,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const float kQuadObjMaxBounds;
-extern const float kQuadObjMinBounds;
+static const float kQuadObjMaxBounds = 20.0f;
+static const float kQuadObjMinBounds = 1.0f;
 /*
  * --INFO--
  * Address:	TODO

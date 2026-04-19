@@ -2,15 +2,18 @@
 #include "ffcc/joybus.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/memory.h"
-extern "C" {
-extern unsigned int gGbaStatusWordTriplet0[];
-extern unsigned int gGbaStatusWordTriplet1[];
-extern unsigned int gGbaStatusWordTriplet2[];
-extern unsigned int gGbaStatusWordTriplet3[];
-extern unsigned int gGbaStatusWordTable[];
-}
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
+
+unsigned int gGbaStatusWordTriplet0[] = {0x00000000, 0xFFFFFFFF, 0x80097918};
+unsigned int gGbaStatusWordTriplet1[] = {0x00000000, 0xFFFFFFFF, 0x800978D4};
+unsigned int gGbaStatusWordTriplet2[] = {0x00000000, 0xFFFFFFFF, 0x8009788C};
+unsigned int gGbaStatusWordTriplet3[] = {0x00000000, 0xFFFFFFFF, 0x80097888};
+unsigned int gGbaStatusWordTable[0x57] = {
+    0x80330870, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000023, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000045, 0x00000001,
+};
 
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error.";

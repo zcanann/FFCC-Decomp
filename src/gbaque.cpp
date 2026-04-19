@@ -10,29 +10,12 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/partyobj.h"
-extern "C" {
-extern unsigned int gGbaStatusWordTriplet0[];
-extern unsigned int gGbaStatusWordTriplet1[];
-extern unsigned int gGbaStatusWordTriplet2[];
-extern unsigned int gGbaStatusWordTriplet3[];
-extern unsigned int gGbaStatusWordTable[];
-}
 #include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
 
 GbaQueue GbaQue;
-
-unsigned int gGbaStatusWordTriplet0[] = {0x00000000, 0xFFFFFFFF, 0x80097918};
-unsigned int gGbaStatusWordTriplet1[] = {0x00000000, 0xFFFFFFFF, 0x800978D4};
-unsigned int gGbaStatusWordTriplet2[] = {0x00000000, 0xFFFFFFFF, 0x8009788C};
-unsigned int gGbaStatusWordTriplet3[] = {0x00000000, 0xFFFFFFFF, 0x80097888};
-unsigned int gGbaStatusWordTable[0x57] = {
-    0x80330870, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000023, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000045, 0x00000001,
-};
 
 extern "C" int rand(void);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
@@ -95,13 +78,14 @@ static inline unsigned int SwapU32(unsigned int value)
 }
 
 static const char s_gbaque_cpp[] = "gbaque.cpp";
-static const char s_mem_alloc_error[] = "%s[%d] Error! memory allocation.\n";
-static const char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
-static const char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
-static const char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
-static const char s_cmake_name_crc_error[] = "%s[%d] Error! ChkCMakeName() crc.\n";
-static const char s_cmake_favorite_crc_error[] = "%s[%d] Error! CMakeFavorite() crc.\n";
-static const char s_unknown_mapobj_type_error[] = "Error! Unknown mapobj type = %d.\n";
+static const char s_mem_alloc_error[] = "%s(%d): Error: memory allocation error\n";
+static const char s_compatibility_data_error[] = "compatibility data error!!\n";
+static const char s_cmake_favorite_crc_error[] = "%s(%d): Error:CMakeFavorite() crc error!!\n";
+static const char s_cmake_name_crc_error[] = "%s(%d): Error:ChkCMakeName() crc error!!\n";
+static const char s_unknown_mapobj_type_error[] = "Error:Unknown mapobj type(%d)\n";
+static const char s_npc_max_over[] = "%s(%d): Error: NPC max over!!\n";
+static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
+static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
 extern float FLOAT_80330D54;
 
 /*
@@ -2937,9 +2921,67 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-int GbaQueue::GetCompatibility(int, unsigned char*)
+int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
-	return 0;
+	unsigned char compatibilityData[0x10];
+	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
+	unsigned char count = 2;
+	unsigned char* writePtr;
+	int outSize = 2;
+	int selectedCount = 0;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x524, sizeof(compatibilityData));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	outCompatibility[0] = compatibilityData[5];
+	if (compatibilityData[3] != 0) {
+		count++;
+	}
+	if (compatibilityData[4] != 0) {
+		count++;
+	}
+	if (compatibilityData[5] != 0) {
+		count++;
+	}
+	if (compatibilityData[6] != 0) {
+		count++;
+	}
+	if (compatibilityData[7] != 0) {
+		count++;
+	}
+
+	if ((count > 4) && (System.m_execParam != 0)) {
+		Printf__7CSystemFPce(&System, const_cast<char*>(s_compatibility_data_error));
+	}
+
+	outCompatibility[1] = count;
+	writePtr = outCompatibility + 2;
+	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
+		unsigned char slotValue = compatibilityData[slot];
+		if ((selectedCount < 2) || (slotValue != 0)) {
+			writePtr[0] = static_cast<unsigned char>(slot);
+			writePtr[1] = compatibilityData[slot + 8];
+			writePtr += 2;
+			outSize += 2;
+			selectedCount++;
+		}
+	}
+
+	selectedCount = 0;
+	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
+		unsigned char slotValue = compatibilityData[slot];
+		if ((selectedCount < 2) || (slotValue != 0)) {
+			char* src = flatData->m_tabl[2].m_strings[slotValue];
+			int len = strlen(src);
+			memcpy(writePtr, src, len + 1);
+			writePtr += len + 1;
+			outSize += len + 1;
+			selectedCount++;
+		}
+	}
+
+	return outSize;
 }
 
 /*

@@ -1266,6 +1266,7 @@ wm_menu.cpp:
 	.text       start:0x800E6B98 end:0x80102FB4
 	.rodata     start:0x801DC418 end:0x801DC424
 	.data       start:0x80210FDC end:0x802111E8
+	.sbss       start:0x8032EE1C end:0x8032EE34
 	.sbss2      start:0x80333DF8 end:0x80333E00
 
 gxfunc.cpp:
@@ -1531,6 +1532,7 @@ shopmenu.cpp:
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
 	.data       start:0x8021589C end:0x80215914
+	.sbss       start:0x8032EED0 end:0x8032EED4
 
 menu_item.cpp:
 	extab       start:0x80009E54 end:0x80009E8C

@@ -40,6 +40,8 @@ struct LocationTitleColorBlock {
     GXColor m_color;
 };
 
+static const char s_pppLocationTitle_cpp_801DB510[] = "pppLocationTitle.cpp";
+
 /*
  * --INFO--
  * PAL Address: 0x800d92cc
@@ -139,7 +141,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             param_2->m_maxCount * sizeof(LocationTitleParticle), pppEnvStPtr->m_stagePtr,
-            const_cast<char*>("pppLocationTitle.cpp"), 0x6d);
+            const_cast<char*>(s_pppLocationTitle_cpp_801DB510), 0x6d);
         zero = 0.0f;
         particle = (LocationTitleParticle*)work->m_particles;
 

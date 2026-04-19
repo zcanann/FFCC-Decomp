@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-extern u8 gGraphicDrawDoneRequest;
+extern u32 gGraphicDrawDoneRequest;
 extern u8 gGraphicDrawDoneRequestInit;
-extern u8 gGraphicDrawDonePartControlRequest;
+extern u32 gGraphicDrawDonePartControlRequest;
 extern u8 gGraphicDrawDonePartControlInit;
 extern _GXColor gGraphicDefaultClearColor;
 extern char sGraphicUnknownOrderName[];

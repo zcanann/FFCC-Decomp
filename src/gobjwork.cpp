@@ -1867,7 +1867,8 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
 {
 	unsigned int isInvalid = 0;
-	if ((cmdListIdx >= 2) && (m_commandListInventorySlotRef[cmdListIdx] == -1)) {
+	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
+	if ((cmdListIdx >= 2) && (slotRef == -1)) {
 		isInvalid = 1;
 	}
 
@@ -1877,12 +1878,13 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 		return;
 	}
 
+	int groupedCountLocal = 1;
 	if (Game.m_gameWork.m_menuStageMode == 0) {
-		groupedCount = 1;
+		groupedCountLocal = 1;
 	} else {
 		short* slotRef = m_commandListExtra + cmdListIdx;
 		if (slotRef[0] == 0) {
-			groupedCount = 1;
+			groupedCountLocal = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
@@ -1897,7 +1899,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 				} while (scanCount != 0);
 			}
 
-			groupedCount = 1;
+			groupedCountLocal = 1;
 			scanCount = static_cast<short>(m_numCmdListSlots) - (topIdx + 1);
 			slotRef = m_commandListExtra + topIdx + 1;
 			if ((topIdx + 1) < static_cast<short>(m_numCmdListSlots)) {
@@ -1905,7 +1907,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 					if (slotRef[0] != -1) {
 						break;
 					}
-					groupedCount++;
+					groupedCountLocal++;
 					slotRef++;
 					scanCount--;
 				} while (scanCount != 0);
@@ -1913,30 +1915,30 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSele
 		}
 	}
 
-	if (groupedCount == 1) {
+	groupedCount = groupedCountLocal;
+	if (groupedCountLocal == 1) {
 		isSelected = (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
-		return;
-	}
+	} else {
+		int scanCount = cmdListIdx + 1;
+		short* slotRef = m_commandListExtra + cmdListIdx;
+		if (cmdListIdx >= 0) {
+			do {
+				if (slotRef[0] != -1) {
+					break;
+				}
+				slotRef--;
+				cmdListIdx--;
+				scanCount--;
+			} while (scanCount != 0);
+		}
 
-	int scanCount = cmdListIdx + 1;
-	short* slotRef = m_commandListExtra + cmdListIdx;
-	if (cmdListIdx >= 0) {
-		do {
-			if (slotRef[0] != -1) {
-				break;
-			}
-			slotRef--;
-			cmdListIdx--;
-			scanCount--;
-		} while (scanCount != 0);
+		unsigned int selected = 0;
+		if ((cmdListIdx <= static_cast<short>(m_currentCmdListIndex)) &&
+			(static_cast<short>(m_currentCmdListIndex) <= (cmdListIdx + groupedCountLocal - 1))) {
+			selected = 1;
+		}
+		isSelected = selected;
 	}
-
-	unsigned int selected = 0;
-	if ((cmdListIdx <= static_cast<short>(m_currentCmdListIndex)) &&
-		(static_cast<short>(m_currentCmdListIndex) <= (cmdListIdx + groupedCount - 1))) {
-		selected = 1;
-	}
-	isSelected = selected;
 }
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)

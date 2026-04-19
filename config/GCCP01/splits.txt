@@ -944,7 +944,7 @@ p_menu.cpp:
 	extabindex  start:0x8000DF6C end:0x8000E0A4
 	.text       start:0x80093E78 end:0x800977D8
 	.ctors      start:0x801D541C end:0x801D5420
-	.data       start:0x8020F2C4 end:0x8020F2F8
+	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata2     start:0x803307F8 end:0x80330870
 	.sbss2      start:0x80333DEC end:0x80333DF0

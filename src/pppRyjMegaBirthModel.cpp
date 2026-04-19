@@ -18,6 +18,8 @@ extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
 
 static const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
+static pppFMATRIX g_matKeep;
+static pppFMATRIX g_matTmp;
 
 static inline float* f32_at(void* base, s32 off)
 {
@@ -419,7 +421,8 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
     (void)obj;
     (void)stepData;
     (void)ctrlTable;
-    // Decomp fill pass: draw path kept intentionally minimal until full renderer mapping is in place.
+    // Keep the original file-scope matrix scratch live until the draw path is restored.
+    PSMTXCopy(g_matKeep.value, g_matTmp.value);
 }
 
 /*
@@ -464,7 +467,6 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 
     u8* payload = (u8*)params;
     pppFMATRIX model;
-    pppFMATRIX tmp;
     Mtx scale;
 
     if (payload[0x2A] == 0) {
@@ -505,8 +507,9 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         PSMTXConcat(pppMngStPtr->m_matrix.value, model.value, model.value);
     }
 
-    PSMTXConcat(ppvCameraMatrix0, model.value, tmp.value);
-    PSMTXCopy(tmp.value, out.value);
+    PSMTXCopy(model.value, g_matKeep.value);
+    PSMTXConcat(ppvCameraMatrix0, model.value, g_matTmp.value);
+    PSMTXCopy(g_matTmp.value, out.value);
 
     if (copyOut != 0) {
         PSMTXCopy(out.value, mtxB.value);

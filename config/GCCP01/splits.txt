@@ -1515,7 +1515,7 @@ singmenu.cpp:
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
 	.data       start:0x802140F0 end:0x80214A50
-	.data       start:0x80214A50 end:0x80214D24
+	.data       start:0x80214A50 end:0x80214D58
 	.bss        start:0x8030B644 end:0x8030BA48
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
 
@@ -1524,7 +1524,7 @@ menu_cmd.cpp:
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
 	.rodata     start:0x801DE910 end:0x801DEAD4
-	.data       start:0x80214D28 end:0x80214DF0
+	.data       start:0x80214D58 end:0x80214E28
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
 

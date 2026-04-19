@@ -46,7 +46,7 @@ graphic.cpp:
 	.ctors      start:0x801D53AC end:0x801D53B0
 	.data       start:0x801E83FC end:0x801E8450
 	.bss        start:0x80230E48 end:0x8023C4D8
-	.sbss       start:0x8032EC48 end:0x8032EC4C
+	.sbss       start:0x8032EC48 end:0x8032EC55
 
 main.cpp:
 	extab       start:0x80005920 end:0x80005930
@@ -140,6 +140,7 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456CC
 	.sdata      start:0x8032E8B0 end:0x8032E8B8
+	.sbss       start:0x8032EC90 end:0x8032EC94
 	.sbss2      start:0x80333DE0 end:0x80333DE8
 
 mapmesh.cpp:
@@ -235,6 +236,7 @@ p_game.cpp:
 	extabindex  start:0x8000C460 end:0x8000C508
 	.text       start:0x80047930 end:0x80047C9C
 	.ctors      start:0x801D53F0 end:0x801D53F4
+	.data       start:0x801E9EC0 end:0x801E9F2C
 	.data       start:0x801E9F2C end:0x801EA0D0
 	.sbss       start:0x8032ED00 end:0x8032ED04
 
@@ -243,6 +245,7 @@ p_system.cpp:
 	extabindex  start:0x8000C508 end:0x8000C520
 	.text       start:0x80047C9C end:0x80047E00
 	.ctors      start:0x801D53F4 end:0x801D53F8
+	.data       start:0x801EA0D0 end:0x801EA0F4
 	.data       start:0x801EA0F4 end:0x801EA294
 	.sbss       start:0x8032ED08 end:0x8032ED0C
 
@@ -924,7 +927,7 @@ fontman.cpp:
 	.text       start:0x80091E58 end:0x8009312C
 	.ctors      start:0x801D5418 end:0x801D541C
 	.rodata     start:0x801D9CB8 end:0x801D9CD0
-	.data       start:0x8020EDC8 end:0x8020EDF8
+	.data       start:0x801FE080 end:0x8020EDF8
 	.bss        start:0x802EA170 end:0x802EA188
 
 pppYmTracer.cpp:
@@ -1677,6 +1680,7 @@ wmm_str.cpp:
 	extab       start:0x8000A1CC end:0x8000A1DC
 	extabindex  start:0x8001177C end:0x80011794
 	.text       start:0x8017AF14 end:0x8017B494
+	.data       start:0x80215BD8 end:0x8021645C
 	.data       start:0x8021645C end:0x80216758
 	.sdata2     start:0x803336A0 end:0x803336AC
 

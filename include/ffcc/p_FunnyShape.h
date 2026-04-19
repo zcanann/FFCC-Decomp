@@ -39,7 +39,18 @@ public:
     CMemory::CStage* m_viewerStage;        // 0x04
     u8 m_viewerState[0x34];                // 0x08
     u8 m_usbStreamDataStorage[0x14];       // 0x3C
-    u8 m_funnyShapeStorage[0x616C];        // 0x50
+    u8 m_funnyShapeStorage[0x6000];        // 0x50
+    OSFS_SHAPE_ST m_shape;                 // 0x6050
+    void* m_meshData;                      // 0x6060
+    void* m_texObjData[0x10];              // 0x6064
+    void* m_textureHeaders[0x10];          // 0x60A4
+    void* m_textureData[0x10];             // 0x60E4
+    s8 m_textureCount;                     // 0x6124
+    u8 m_textureCountPad[3];               // 0x6125
+    OSFS_ANM_ST m_anm;                     // 0x6128
+    FS_DISPLAY_STATUS m_displayCurrent;    // 0x6138
+    FS_DISPLAY_STATUS m_displayPending;    // 0x6178
+    u32 m_displayTextureEnabled;           // 0x61B8
     u8 m_texturePtrArrayStorage[0x1C];     // 0x61BC
     u8 m_gxTexObjPtrArrayStorage[0x1C];    // 0x61D8
 };

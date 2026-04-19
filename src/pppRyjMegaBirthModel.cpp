@@ -17,9 +17,6 @@ extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
 
-PARTICLE_WMAT g_matKeep;
-PARTICLE_WMAT g_matTmp;
-
 static const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
 static pppFMATRIX g_matKeep;
 static pppFMATRIX g_matTmp;

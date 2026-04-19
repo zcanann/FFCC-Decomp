@@ -1,12 +1,11 @@
 #include "ffcc/pppYmTraceMove.h"
 extern "C" {
+extern const float kPppYmTraceMoveZero;
+extern const float kPppYmTraceMoveOne;
 extern int gPppCalcDisabled;
 }
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
-
-static const float kPppYmTraceMoveZero = 0.0f;
-static const float kPppYmTraceMoveOne = 1.0f;
 
 struct pppYmTraceMoveWork {
 	Vec m_direction;

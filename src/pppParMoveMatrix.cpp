@@ -4,9 +4,6 @@
 
 #include <dolphin/mtx.h>
 
-static const float kPppParMoveMatrixZero = 0.0f;
-static const float kPppParMoveMatrixOne = 1.0f;
-
 /*
  * --INFO--
  * PAL Address: 0x800e092c
@@ -33,20 +30,20 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 	Vec* position = &pppMngSt->m_position;
 	PSVECSubtract(previousPosition, position, &local_44);
 	
-	if (((kPppParMoveMatrixZero != local_44.x) || (kPppParMoveMatrixZero != local_44.y)) || (kPppParMoveMatrixZero != local_44.z)) {
+	if (((gPppParMoveMatrixZero != local_44.x) || (gPppParMoveMatrixZero != local_44.y)) || (gPppParMoveMatrixZero != local_44.z)) {
 		PSVECNormalize(&local_44, &local_68);
 		local_50.x = local_68.z;
-		local_50.y = kPppParMoveMatrixZero;
+		local_50.y = gPppParMoveMatrixZero;
 		local_50.z = -local_68.x;
-		f32 zero = kPppParMoveMatrixZero;
+		f32 zero = gPppParMoveMatrixZero;
 		f32 axisZ = local_68.z;
 		if ((zero == axisZ) && (zero == local_50.z)) {
-			local_50.y = kPppParMoveMatrixZero;
-			local_50.x = kPppParMoveMatrixOne;
-			local_50.z = kPppParMoveMatrixZero;
-			local_5c.x = kPppParMoveMatrixZero;
-			local_5c.y = kPppParMoveMatrixZero;
-			local_5c.z = kPppParMoveMatrixOne;
+			local_50.y = gPppParMoveMatrixZero;
+			local_50.x = gPppParMoveMatrixOne;
+			local_50.z = gPppParMoveMatrixZero;
+			local_5c.x = gPppParMoveMatrixZero;
+			local_5c.y = gPppParMoveMatrixZero;
+			local_5c.z = gPppParMoveMatrixOne;
 		}
 		else {
 			PSVECNormalize(&local_50, &local_50);

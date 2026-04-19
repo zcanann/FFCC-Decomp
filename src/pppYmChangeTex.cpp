@@ -54,13 +54,13 @@ struct pppYmChangeTexState {
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
+extern float DAT_80330e10;
 extern char gUtil[];
 static const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
-static const float kPppYmChangeTexInit = 0.0f;
-static const float kPppYmChangeTexThresholdStart = 2.0f;
-static const float kPppYmChangeTexThresholdScale = 0.5f;
-static const float kPppYmChangeTexThresholdStep = 0.25f;
-static const double kPppYmChangeTexFrameBias = 4503601774854144.0;
+extern double DOUBLE_80330e08;
+extern float FLOAT_80330df8;
+extern float FLOAT_80330dfc;
+extern float FLOAT_80330e00;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
@@ -214,7 +214,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	frameScale.u[1] = ((1 << *(int*)(*(int*)((char*)model0 + 0xA4) + 0x34)) ^ 0x80000000);
 
 	int curMesh = *(int*)((char*)model0 + 0xAC);
-	int frame = (int)(state->m_value0 * (float)(frameScale.d - kPppYmChangeTexFrameBias));
+	int frame = (int)(state->m_value0 * (float)(frameScale.d - DOUBLE_80330e08));
 	short frameShort = (short)frame;
 	Mtx modelMtx;
 	PSMTXCopy(*(Mtx*)((char*)model0 + 0x68), modelMtx);
@@ -239,9 +239,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				*(unsigned char*)(vertColors + 3) = fallbackAlpha;
 			} else {
 				int level = 0;
-				float threshold = kPppYmChangeTexThresholdStart;
+				float threshold = FLOAT_80330df8;
 				for (int tries = 7; tries != 0; tries--) {
-					if (kPppYmChangeTexThresholdScale * threshold < (float)delta) {
+					if (FLOAT_80330dfc * threshold < (float)delta) {
 						if (negativeRamp == -1) {
 							*(char*)(vertColors + 3) = -1 - (char)(level << 4);
 						} else {
@@ -249,7 +249,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 						}
 						break;
 					}
-					threshold = threshold - kPppYmChangeTexThresholdStep;
+					threshold = threshold - FLOAT_80330e00;
 					level = level + 1;
 				}
 			}
@@ -361,7 +361,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
-	float init = kPppYmChangeTexInit;
+	float init = DAT_80330e10;
 	pppYmChangeTexState* state =
 	    (pppYmChangeTexState*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
 

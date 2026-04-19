@@ -557,7 +557,7 @@ CFile::CHandle* CFile::CheckQueue()
 {
     CHandle* handle = m_fileHandle.m_previous;
 
-    while (handle != &m_fileHandle)
+    do
     {
         if (handle->m_completionStatus == 2)
         {
@@ -575,7 +575,6 @@ CFile::CHandle* CFile::CheckQueue()
             else if (dvdStatus < 0)
             {
                 handle->m_completionStatus = 4;
-                handle = handle->m_previous;
             }
             else
             {
@@ -586,13 +585,13 @@ CFile::CHandle* CFile::CheckQueue()
         {
             return handle;
         }
-        else
-        {
-            handle = handle->m_previous;
-        }
-    }
 
-    return 0;
+        handle = handle->m_previous;
+        if (handle == &m_fileHandle)
+        {
+            return 0;
+        }
+    } while (true);
 }
 
 /*

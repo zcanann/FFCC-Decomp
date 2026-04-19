@@ -76,7 +76,10 @@ public:
     CMemory::CStage* m_stage; // 0x04
     unsigned char _pad08[0x7C];
     CUSBStreamData m_usbStream; // 0x84
-    unsigned char _padB4[0x14];
+    unsigned char _padB4[0x8];
+    u32 m_rsdIndex; // 0xBC
+    int m_rsdFlag; // 0xC0
+    int m_rsdListIndex; // 0xC4
 
     ZLIST m_zlist1; // 0xC8
     ZLIST m_zlist2; // 0xD8

@@ -2,7 +2,7 @@
 #define _PPP_RANDUPCV_H_
 
 #ifdef __cplusplus
-void randchar(char, float);
+char randchar(char, float);
 
 extern "C" {
 #endif

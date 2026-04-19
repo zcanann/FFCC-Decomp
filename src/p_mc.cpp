@@ -1,9 +1,7 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
-extern "C" {
-extern unsigned char* gMcPcsSingletonPtr;
-}
+extern "C" void* __vt__6CMcPcs[];
 extern "C" void create__6CMcPcsFv(CMcPcs*);
 extern "C" void destroy__6CMcPcsFv(CMcPcs*);
 extern "C" void calc__6CMcPcsFv(CMcPcs*);
@@ -21,8 +19,7 @@ unsigned int lbl_80211F08[3] = {reinterpret_cast<unsigned int>(lbl_8032E9D0), 0,
 unsigned int lbl_80211F14[5] = {
     reinterpret_cast<unsigned int>(lbl_8032E9D0), 0, reinterpret_cast<unsigned int>(lbl_8032E9D8), 0, 0
 };
-
-unsigned char* gMcPcsSingletonPtr = 0;
+unsigned char McPcs[sizeof(CMcPcs)];
 
 class McCtrl;
 
@@ -177,32 +174,30 @@ void CMcPcs::calc()
     }
 }
 
-namespace {
-struct CMcPcsInitializer {
-    CMcPcsInitializer()
-    {
-        unsigned int* table;
-        unsigned int* table0;
-        unsigned int* table1;
-        unsigned int* table2;
+/*
+ * --INFO--
+ * PAL Address: 0x80124af4
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_mc_cpp(void)
+{
+    unsigned int* desc0 = m_table_desc0__6CMcPcs;
+    unsigned int* desc1 = desc0 + 3;
+    unsigned int* desc2 = desc1 + 3;
+    unsigned int* table = desc2 + 3;
 
-        gMcPcsSingletonPtr = sMcPcsSingletonData;
-        table = (unsigned int*)m_table__6CMcPcs;
-        table0 = m_table_desc0__6CMcPcs;
-        table1 = m_table_desc1__6CMcPcs;
-        table2 = m_table_desc2__6CMcPcs;
-
-        table[1] = table0[0];
-        table[2] = table0[1];
-        table[3] = table0[2];
-        table[4] = table1[0];
-        table[5] = table1[1];
-        table[6] = table1[2];
-        table[7] = table2[0];
-        table[8] = table2[1];
-        table[9] = table2[2];
-    }
-};
-
-CMcPcsInitializer sMcPcsInitializer;
+    *reinterpret_cast<void**>(McPcs) = __vt__6CMcPcs;
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
 }

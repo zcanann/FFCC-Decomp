@@ -31,7 +31,7 @@ extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
 extern unsigned int m_table_desc3__18CMaterialEditorPcs[];
-extern unsigned char m_table__18CMaterialEditorPcs[];
+extern unsigned int m_table__18CMaterialEditorPcs[];
 
 struct pppFMATRIX {
     float value[3][4];

@@ -49,12 +49,29 @@ extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
+extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
+extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
+extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
+extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
 extern "C" void* __vt__8CManager[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
+extern char lbl_801D7DD0[];
+extern char lbl_8032E660[];
+
+unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
+unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
+unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
+unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(lbl_801D7DD0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0, 0x42, 1
+};
+unsigned int lbl_801EA904[4] = {
+    reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
+};
 
 CFunnyShapePcs FunnyShapePcs;
 u8 ARRAY_8026D728[0xC];

@@ -410,18 +410,18 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     PSMTXIdentity(identityMtx);
 
-    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.x = CameraWorldX();
     cameraPos.y = FLOAT_80331030;
-    cameraPos.z = CameraPcs._232_4_;
-    cameraTarget.x = CameraPcs._212_4_;
+    cameraPos.z = CameraWorldZ();
+    cameraTarget.x = CameraLookAtX();
     cameraTarget.y = FLOAT_80331030;
-    cameraTarget.z = CameraPcs._220_4_;
+    cameraTarget.z = CameraLookAtZ();
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = FLOAT_80331030;
 
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTXCopy(CameraMatrix(), cameraMtx);
     PSMTXIdentity(identityMtx);
 
     objPos.x = *(float*)(objPosBase + 0x15C);
@@ -491,7 +491,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     float depth = (float)PSVECDistance(&cameraPos, &objPos);
     depth -= param_2->m_stepValue;
 
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTX44Copy(CameraScreenMatrix(), screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
     inVec.z = -depth;

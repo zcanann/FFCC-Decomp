@@ -26,12 +26,76 @@ extern const char* s_McWinMessGroup1_it[];
 extern const char* s_McWinMessGroup1_es[];
 extern const char* s_McWinMessGroup1_fr[];
 
-extern const char s_WinMessTable[];
-extern const char* s_NoTextByLanguage[];
-extern const char* s_SlotBTextByLanguage[];
+extern const char lbl_803336B4[];
+extern const char lbl_803336B8[];
+extern const char lbl_803336C0[];
+extern const char lbl_803336C4[];
+extern const char s_Steckplatz_B_801E65E4[];
+extern const char s_Ranura_B_801E65F4[];
 
 extern const float FLOAT_803336CC;
 extern const double DOUBLE_803336D0;
+
+struct WinMessEntry
+{
+    unsigned int words[5];
+};
+
+static char* s_NoTextByLanguage[5] = {
+    (char*)lbl_803336B4,
+    (char*)lbl_803336B8,
+    (char*)lbl_803336B4,
+    (char*)lbl_803336C0,
+    (char*)lbl_803336B4,
+};
+
+static char* s_SlotBTextByLanguage[6] = {
+    (char*)lbl_803336C4,
+    (char*)s_Steckplatz_B_801E65E4,
+    (char*)lbl_803336C4,
+    (char*)lbl_803336C4,
+    (char*)s_Ranura_B_801E65F4,
+    0,
+};
+
+static WinMessEntry s_WinMessTable[36] = {
+    {{ 0x00000003, 0x00010000, 0x00020000, 0x00000000, 0x00000000 }},
+    {{ 0x00000002, 0x00030004, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000002, 0x00050006, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000002, 0x00070008, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000005, 0x0009000A, 0x000B000C, 0x000D0000, 0x00000000 }},
+    {{ 0x00000004, 0x000E000F, 0x0010000D, 0x00000000, 0x00000000 }},
+    {{ 0x00000004, 0x00110012, 0x00130014, 0x00000000, 0x00000000 }},
+    {{ 0x00000004, 0x00150016, 0x00170018, 0x00000000, 0x00000000 }},
+    {{ 0x00000004, 0x0019001A, 0x001B001C, 0x00000000, 0x00000000 }},
+    {{ 0x00000004, 0x001D001E, 0x001F0020, 0x00000000, 0x00000000 }},
+    {{ 0x00000005, 0x00210022, 0x00230024, 0x00250000, 0x00000000 }},
+    {{ 0x00000002, 0x00260027, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000002, 0x00280029, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000002, 0x002A002B, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x002C0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x002D0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x002E0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x002F0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000004, 0x00300031, 0x0032000D, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x00330000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x00340000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x00350000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x00360000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000003, 0x00010002, 0x00030000, 0x00000000, 0x00000000 }},
+    {{ 0x00000003, 0x00040005, 0x00060000, 0x00000000, 0x00000000 }},
+    {{ 0x00000003, 0x00070008, 0x00090000, 0x00000000, 0x00000000 }},
+    {{ 0x00000003, 0x000A000B, 0x000C0000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x000D0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x000E0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000003, 0x00140015, 0x00160000, 0x00000000, 0x00000000 }},
+    {{ 0x00000006, 0x00170018, 0x0019001A, 0x001B001C, 0x00000000 }},
+    {{ 0x00000001, 0x001D0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x001E0000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x00320000, 0x00000000, 0x00000000, 0x00000000 }},
+    {{ 0x00000001, 0x00320000, 0x00000000, 0x00000000, 0x00000000 }},
+};
 
 /*
  * --INFO--
@@ -148,10 +212,11 @@ int CMenuPcs::GetYesNoXPos(int right)
 const char* CMenuPcs::GetWinMess(int index)
 {
     int languageId = Game.m_gameWork.m_languageId;
+    const char* winMessTable = reinterpret_cast<const char*>(s_WinMessTable);
     if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
-        return &s_WinMessTable[index * 0x14];
+        return &winMessTable[index * 0x14];
     }
-    return &s_WinMessTable[index * 0x14];
+    return &winMessTable[index * 0x14];
 }
 
 /*

@@ -1558,6 +1558,7 @@ goout.cpp:
 	extabindex  start:0x800114F4 end:0x8001156C
 	.text       start:0x80168130 end:0x8016C9E8
 	.rodata     start:0x801DF264 end:0x801DF9B0
+	.data       start:0x80215B0C end:0x80215BD8
 	.bss        start:0x8030BB08 end:0x8030BB58
 	.sbss       start:0x8032EF08 end:0x8032EF0C
 
@@ -1600,6 +1601,7 @@ wmm_str.cpp:
 	extab       start:0x8000A1CC end:0x8000A1DC
 	extabindex  start:0x8001177C end:0x80011794
 	.text       start:0x8017AF14 end:0x8017B494
+	.data       start:0x8021645C end:0x80216758
 
 base/PPCArch.c:
 	.text       start:0x8017B494 end:0x8017B5A8

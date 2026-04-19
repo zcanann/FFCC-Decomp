@@ -78,7 +78,7 @@ p_sample.cpp:
 	extabindex  start:0x8000B434 end:0x8000B440
 	.text       start:0x8001FE74 end:0x8001FF6C
 	.ctors      start:0x801D53B8 end:0x801D53BC
-	.data       start:0x801E8630 end:0x801E8688
+	.data       start:0x801E84C8 end:0x801E867C
 	.sbss       start:0x8032EC60 end:0x8032EC64
 
 p_usb.cpp:

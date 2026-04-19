@@ -177,32 +177,34 @@ void CMcPcs::calc()
     }
 }
 
-namespace {
-struct CMcPcsInitializer {
-    CMcPcsInitializer()
-    {
-        unsigned int* table;
-        unsigned int* table0;
-        unsigned int* table1;
-        unsigned int* table2;
+/*
+ * --INFO--
+ * PAL Address: 0x80124AF4
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_mc_cpp(void)
+{
+    unsigned int* table;
+    unsigned int* table0;
+    unsigned int* table1;
+    unsigned int* table2;
 
-        gMcPcsSingletonPtr = sMcPcsSingletonData;
-        table = (unsigned int*)m_table__6CMcPcs;
-        table0 = m_table_desc0__6CMcPcs;
-        table1 = m_table_desc1__6CMcPcs;
-        table2 = m_table_desc2__6CMcPcs;
-
-        table[1] = table0[0];
-        table[2] = table0[1];
-        table[3] = table0[2];
-        table[4] = table1[0];
-        table[5] = table1[1];
-        table[6] = table1[2];
-        table[7] = table2[0];
-        table[8] = table2[1];
-        table[9] = table2[2];
-    }
-};
-
-CMcPcsInitializer sMcPcsInitializer;
+    table = m_table__6CMcPcs;
+    table0 = m_table_desc0__6CMcPcs;
+    table1 = m_table_desc1__6CMcPcs;
+    table2 = m_table_desc2__6CMcPcs;
+    gMcPcsSingletonPtr = sMcPcsSingletonData;
+    table[1] = table0[0];
+    table[2] = table0[1];
+    table[3] = table0[2];
+    table[4] = table1[0];
+    table[5] = table1[1];
+    table[6] = table1[2];
+    table[7] = table2[0];
+    table[8] = table2[1];
+    table[9] = table2[2];
 }

@@ -4,6 +4,31 @@
 
 /*
  * --INFO--
+ * PAL Address: 0x8005FF8C  
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppColorCon(void* param1, void* param2)
+{
+    struct PppColorOffsets {
+        u8 pad[0xC];
+        s32* m_serializedDataOffsets;
+    };
+
+    PppColorOffsets* offsets = (PppColorOffsets*)param2;
+    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + offsets->m_serializedDataOffsets[0] + 0x80);
+    
+    work->a = 0;
+    work->b = 0;
+    work->g = 0;
+    work->r = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8005FFB4
  * PAL Size: 416b
  * EN Address: TODO
@@ -48,29 +73,4 @@ void pppColor(void* param1, void* param2, void* param3)
     work->result.g = (u8)(work->g >> 7);
     work->result.b = (u8)(work->b >> 7);
     work->result.a = (u8)(work->a >> 7);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005FF8C  
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppColorCon(void* param1, void* param2)
-{
-    struct PppColorOffsets {
-        u8 pad[0xC];
-        s32* m_serializedDataOffsets;
-    };
-
-    PppColorOffsets* offsets = (PppColorOffsets*)param2;
-    _pppColorWork* work = (_pppColorWork*)((u8*)param1 + offsets->m_serializedDataOffsets[0] + 0x80);
-    
-    work->a = 0;
-    work->b = 0;
-    work->g = 0;
-    work->r = 0;
 }

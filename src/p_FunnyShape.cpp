@@ -76,27 +76,6 @@ unsigned int lbl_801EA904[4] = {
 CFunnyShapePcs FunnyShapePcs;
 u8 ARRAY_8026D728[0xC];
 
-namespace {
-void CopyFunnyShapePcsTable()
-{
-    unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__14CFunnyShapePcs);
-
-    dst[1] = m_table_desc0__14CFunnyShapePcs[0];
-    dst[2] = m_table_desc0__14CFunnyShapePcs[1];
-    dst[3] = m_table_desc0__14CFunnyShapePcs[2];
-    dst[4] = m_table_desc1__14CFunnyShapePcs[0];
-    dst[5] = m_table_desc1__14CFunnyShapePcs[1];
-    dst[6] = m_table_desc1__14CFunnyShapePcs[2];
-    dst[7] = m_table_desc2__14CFunnyShapePcs[0];
-    dst[8] = m_table_desc2__14CFunnyShapePcs[1];
-    dst[9] = m_table_desc2__14CFunnyShapePcs[2];
-    dst[12] = m_table_desc3__14CFunnyShapePcs[0];
-    dst[13] = m_table_desc3__14CFunnyShapePcs[1];
-    dst[14] = m_table_desc3__14CFunnyShapePcs[2];
-}
-
-} // namespace
-
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
@@ -135,6 +114,11 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
+    unsigned int* dst = m_table__14CFunnyShapePcs;
+    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
+    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
+    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
+    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
     *reinterpret_cast<void**>(self) = __vt__8CProcess;
@@ -145,8 +129,18 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
-
-    CopyFunnyShapePcsTable();
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
+    dst[12] = desc3[0];
+    dst[13] = desc3[1];
+    dst[14] = desc3[2];
 }
 
 template <class T>

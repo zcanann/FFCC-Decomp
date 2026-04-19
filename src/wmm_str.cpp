@@ -2,10 +2,10 @@
 #include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
 
-extern const char* PTR_s_The_data_is_corrupt_[];
-extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[];
-extern const char* PTR_s_I_dati_sono_danneggiati_[];
-extern const char* s_McStr_es[];
+extern const char* s_McStr_us[];
+extern const char* s_McStr_ge[];
+extern const char* s_McStr_it[];
+extern const char* s_McStr_sp[];
 extern const char* s_McStr_fr[];
 
 extern const char* s_McWinMessGroup0_en[];
@@ -309,15 +309,15 @@ const char* CMenuPcs::GetMcStr(int index)
 
     switch (languageId) {
     case 2:
-        return PTR_s_Der_Spielstand_ist_fehlerhaft_[index];
+        return s_McStr_ge[index];
     case 3:
-        return PTR_s_I_dati_sono_danneggiati_[index];
+        return s_McStr_it[index];
     case 4:
-        return s_McStr_es[index];
+        return s_McStr_sp[index];
     case 5:
         return s_McStr_fr[index];
     case 1:
     default:
-        return PTR_s_The_data_is_corrupt_[index];
+        return s_McStr_us[index];
     }
 }

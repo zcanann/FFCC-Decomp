@@ -1139,25 +1139,26 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
+	char* stringBase = s_p_tina_rodata_801d7ee0;
 	int frameSign;
 
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
-	OSStartStopwatch(&g_par_draw_prof);
-	OSStartStopwatch(&g_par_calc_prof);
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
-	OSStopStopwatch(&g_par_calc_prof);
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
-	OSStopStopwatch(&g_par_draw_prof);
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (gDebugSpinnerTextInitialized == 0) {
+	if ((signed char)gDebugSpinnerTextInitialized == 0) {
 		gDebugSpinnerText = sDebugSpinnerText;
 		gDebugSpinnerTextInitialized = 1;
 	}
-	if (gDebugSpinnerFrameInitialized == 0) {
+	if ((signed char)gDebugSpinnerFrameInitialized == 0) {
 		gDebugSpinnerFrame = 0;
 		gDebugSpinnerFrameInitialized = 1;
 	}
@@ -1165,7 +1166,7 @@ void CPartPcs::drawAfterViewer()
 	gDebugSpinnerFrame++;
 	frameSign = gDebugSpinnerFrame >> 0x1f;
 	Graphic.Printf(
-		s_tina_title_fmt_801d8014,
+		stringBase + 0x134,
 		(int)(char)gDebugSpinnerText[(frameSign * 4 |
 								 (unsigned int)((gDebugSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
@@ -1173,11 +1174,11 @@ void CPartPcs::drawAfterViewer()
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		s_tina_calc_fmt_801d8020, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
+		stringBase + 0x140, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		s_tina_draw_fmt_801d8038, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
+		stringBase + 0x158, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		s_tina_heap_fmt_801d8050,
+		stringBase + 0x170,
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }

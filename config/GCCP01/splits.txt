@@ -1472,6 +1472,7 @@ pppCrystal2.cpp:
 	extabindex  start:0x80010D5C end:0x80010D80
 	.text       start:0x8013E694 end:0x8013EF94
 	.rodata     start:0x801DD608 end:0x801DD660
+	.sdata2     start:0x80331FC0 end:0x80332008
 
 pppChangeTex.cpp:
 	extab       start:0x80009B24 end:0x80009B4C

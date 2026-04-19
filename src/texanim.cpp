@@ -936,29 +936,36 @@ void CTexAnimSet::AddFrame()
 void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
+    unsigned int texAnimIndex = 0;
 
-    for (unsigned int texAnimIndex = 0; texAnimIndex < static_cast<unsigned int>(self->texAnims.GetSize());
-         texAnimIndex++) {
-        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
-        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        int seqIndex = -1;
-
-        for (unsigned int i = 0; i < static_cast<unsigned int>(refData->texAnimSeqs.GetSize()); i++) {
-            CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[i]);
-
-            if (strcmp(name, seq->name) == 0) {
-                seqIndex = static_cast<int>(i);
-                break;
-            }
+    do {
+        unsigned int texAnimCount = self->texAnims.GetSize();
+        if (texAnimCount <= texAnimIndex) {
+            return;
         }
 
-        if (seqIndex >= 0) {
-            texAnim->unk0C = seqIndex;
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
+        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
+        unsigned int seqIndex = 0;
+
+        while (seqIndex < static_cast<unsigned int>(refData->texAnimSeqs.GetSize())) {
+            CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[seqIndex]);
+            if (strcmp(name, seq->name) == 0) {
+                break;
+            }
+            seqIndex = seqIndex + 1;
+        }
+
+        if (seqIndex < static_cast<unsigned int>(refData->texAnimSeqs.GetSize())) {
+            texAnim->unk0C = static_cast<int>(seqIndex);
             texAnim->unk10 = frame;
             texAnim->unk14 = static_cast<int>(mode);
             return;
         }
+
+        texAnimIndex = texAnimIndex + 1;
     }
+    while (true);
 }
 
 /*

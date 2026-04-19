@@ -1439,11 +1439,13 @@ pppScreenBreak.cpp:
 	.text       start:0x8012D458 end:0x8012E5DC
 	.rodata     start:0x801DD4BC end:0x801DD4E8
 	.data       start:0x802127A0 end:0x802127BC
+	.sdata2     start:0x80331C54 end:0x80331CA8
 
 monobj_boss.cpp:
 	extab       start:0x80009834 end:0x80009A34
 	extabindex  start:0x80010918 end:0x80010C18
 	.text       start:0x8012E5DC end:0x80133108
+	.sdata2     start:0x80331CA8 end:0x80331D10
 
 bonus_menu.cpp:
 	extab       start:0x80009A34 end:0x80009AC4
@@ -1451,6 +1453,7 @@ bonus_menu.cpp:
 	.text       start:0x80133108 end:0x8013E294
 	.rodata     start:0x801DD5C0 end:0x801DD5D0
 	.sbss       start:0x8032EEA8 end:0x8032EEB8
+	.sdata2     start:0x80331D10 end:0x80331D98
 
 pppScreenBlur.cpp:
 	extab       start:0x80009AC4 end:0x80009ADC
@@ -1502,6 +1505,7 @@ astar.cpp:
 	.text       start:0x80141550 end:0x80143098
 	.ctors      start:0x801D5444 end:0x801D5448
 	.bss        start:0x80309178 end:0x8030B62C
+	.sdata2     start:0x803320A0 end:0x803320C8
 
 pppConstrainCameraDir.cpp:
 	extab       start:0x80009BFC end:0x80009C04

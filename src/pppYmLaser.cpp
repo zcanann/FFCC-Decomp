@@ -529,10 +529,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 					(points[i].z == kPppYmLaserOne)) {
 					continue;
 				}
-				PSMTXIdentity(tempMtx);
-				tempMtx[0][0] = FLOAT_80330de8;
-				tempMtx[1][1] = FLOAT_80330de8;
-				tempMtx[2][2] = FLOAT_80330de8;
+				PSMTXScale(tempMtx, FLOAT_80330de8, FLOAT_80330de8, FLOAT_80330de8);
 				tempMtx[0][3] = points[i].x;
 				tempMtx[1][3] = points[i].y;
 				tempMtx[2][3] = points[i].z;
@@ -540,10 +537,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 				Graphic.DrawSphere(tempMtx, debugColor);
 			}
 
-			PSMTXIdentity(tempMtx);
-			tempMtx[0][0] = FLOAT_80330de8;
-			tempMtx[1][1] = FLOAT_80330de8;
-			tempMtx[2][2] = FLOAT_80330de8;
+			PSMTXScale(tempMtx, FLOAT_80330de8, FLOAT_80330de8, FLOAT_80330de8);
 			tempMtx[0][3] = work->m_origin.x;
 			tempMtx[1][3] = work->m_origin.y;
 			tempMtx[2][3] = work->m_origin.z;

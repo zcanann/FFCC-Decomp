@@ -257,16 +257,16 @@ void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
     void* handle;
-    int model;
+    BlurCharaModelRaw* rawModel;
 
     work->m_ownerObj = ownerObj;
     handle = GetCharaHandlePtr__FP8CGObjectl(ownerObj, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
 
-    *(void**)(model + 0x108) = (void*)BlurChara_AfterDrawModelCallback;
+    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
     work->m_captureBuffer = 0;
     work->m_smallTexObj = 0;
-    work->m_savedModelField = *(float*)(model + 0x9C);
+    work->m_savedModelField = rawModel->m_savedField;
 }
 
 /*
@@ -282,11 +282,11 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
 
-    *(int*)(model + 0x108) = 0;
-    *(int*)(model + 0xE4) = 0;
-    *(int*)(model + 0xE8) = 0;
+    rawModel->m_afterDrawModelCallback = 0;
+    rawModel->m_work = 0;
+    rawModel->m_renderData = 0;
 
     if ((CMemory::CStage*)work->m_captureBuffer != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_captureBuffer);
@@ -298,7 +298,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
         work->m_smallTexObj = 0;
     }
 
-    *(float*)(model + 0x9C) = work->m_savedModelField;
+    rawModel->m_savedField = work->m_savedModelField;
 }
 
 /*
@@ -314,7 +314,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 {
     pppBlurCharaWork* work;
     void* handle;
-    int model;
+    BlurCharaModelRaw* rawModel;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -322,10 +322,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 
     work = GetBlurWork(blurChara, param_3);
     handle = GetCharaHandlePtr__FP8CGObjectl(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
 
-    *(pppBlurCharaWork**)(model + 0xE4) = work;
-    *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;
+    rawModel->m_work = work;
+    rawModel->m_renderData = param_2;
 
     if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
@@ -335,9 +335,9 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
         work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
             pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
 
-        *(pppBlurCharaWork**)(model + 0xE4) = work;
-        *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;
-        *(void**)(model + 0xF4) = (void*)BlurChara_SetBeforeMeshLockEnvCallback;
+        rawModel->m_work = work;
+        rawModel->m_renderData = param_2;
+        rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     }
 }
 
@@ -370,20 +370,20 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     int textureBase = 0;
     int textureIndex;
     int objPosBase;
+    _GXTexObj smallBackTex;
+    _GXColor drawColor;
     Mtx identityMtx;
     Mtx cameraMtx;
     Mtx44 projection;
     Mtx44 screenMtx;
-    _GXTexObj smallBackTex;
-    float viewport[6];
-    float gxProjection[7];
+    Vec cameraTarget;
     Vec cameraPos;
     Vec objPos;
     Vec cameraDir;
-    Vec cameraTarget;
     Vec4d inVec;
     Vec4d outVec;
-    _GXColor drawColor;
+    float gxProjection[7];
+    float viewport[6];
     float projX;
     float projY;
     float projZ;
@@ -404,8 +404,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, 0, FLOAT_80331030, param_2->m_alpha, 0, 0,
-                                                               0, 1, 1, 0);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030,
+                                                               param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
     PSMTXIdentity(identityMtx);
@@ -443,7 +443,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&colorData->m_color));
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    drawColor = *reinterpret_cast<_GXColor*>(&colorData->m_color);
+    drawColor.r = colorData->m_color.rgba[0];
+    drawColor.g = colorData->m_color.rgba[1];
+    drawColor.b = colorData->m_color.rgba[2];
+    drawColor.a = colorData->m_color.rgba[3];
 
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);

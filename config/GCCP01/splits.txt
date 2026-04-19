@@ -23,6 +23,7 @@ file.cpp:
 	extabindex  start:0x8000AD98 end:0x8000AE4C
 	.text       start:0x80012BAC end:0x80013D70
 	.ctors      start:0x801D53A4 end:0x801D53A8
+	.rodata     start:0x801D5480 end:0x801D5FC0
 	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
 	.sdata2     start:0x8032F6E8 end:0x8032F710
@@ -1234,6 +1235,7 @@ pppYmEnv.cpp:
 	extab       start:0x80008D84 end:0x80008DB4
 	extabindex  start:0x8000F910 end:0x8000F958
 	.text       start:0x800E46DC end:0x800E6060
+	.rodata     start:0x801DB750 end:0x801DB7E8
 
 pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4

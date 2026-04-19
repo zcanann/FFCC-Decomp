@@ -9,7 +9,7 @@
 struct HSD_ImageBuffer;
 
 struct Crystal2RefractionMap {
-    void* m_imageData;
+    u8* m_imageData;
     GXTexFmt m_format;
     u32 m_width;
     u32 m_height;

@@ -63,7 +63,7 @@ struct pppCrystal2ColorBlock {
 
 union Crystal2FloatBits {
     float value;
-    unsigned long bits;
+    u32 bits;
 };
 
 static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
@@ -71,12 +71,26 @@ static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
-static inline bool Crystal2IsNaN(float value)
+static inline int Crystal2FpClassify(float value)
 {
     Crystal2FloatBits bits;
 
     bits.value = value;
-    return (bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0;
+    switch (bits.bits & 0x7F800000) {
+    case 0x7F800000:
+        if ((bits.bits & 0x007FFFFF) != 0) {
+            return 1;
+        }
+        return 2;
+
+    case 0:
+        if ((bits.bits & 0x007FFFFF) != 0) {
+            return 5;
+        }
+        return 3;
+    }
+
+    return 4;
 }
 
 /*
@@ -163,7 +177,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
     if (gPppCalcDisabled == 0) {
         Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
 
-        if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
+        if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
             Crystal2RefractionMap* textureInfo;
             u32 textureSize;
             float stepX;
@@ -177,7 +191,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
 
             textureInfo = work->m_refractionMap;
             textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
-            textureInfo->m_imageData = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            textureInfo->m_imageData = (u8*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
                 textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xAD);
             textureInfo->m_format = GX_TF_IA8;
             textureInfo->m_width = 0x20;
@@ -200,7 +214,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                         magnitude = sqrtf(magnitude);
                     } else if (magnitude < 0.0f) {
                         magnitude = NAN;
-                    } else if (Crystal2IsNaN(magnitude)) {
+                    } else if (Crystal2FpClassify(magnitude) == 1) {
                         magnitude = NAN;
                     }
 
@@ -209,10 +223,10 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                     }
 
                     u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
-                    u8* pixel = (u8*)((u32)textureInfo->m_imageData +
+                    u8* pixel = textureInfo->m_imageData +
                         (y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
                         (x & 0x1FFFFFFC) * 8 +
-                        ((x & 3) + (y & 3) * 4) * 2);
+                        ((x & 3) + (y & 3) * 4) * 2;
 
                     pixel[0] = nx;
                     u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));

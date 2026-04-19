@@ -1,25 +1,25 @@
 #include "ffcc/pppRandUpHCV.h"
 #include "ffcc/math.h"
-#include "dolphin/types.h"
+#include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
 const float kPppRandUpHCVDualSampleScale = 0.5f;
-static f64 const sPppRandUpHCVConvertBias = 4503601774854144.0;
+struct PppRandUpHCVParam2 {
+    s32 field0;
+    s32 field4;
+    s16 field8;
+    s16 fieldA;
+    s16 fieldC;
+    s16 fieldE;
+    u8 field10;
+};
 
-typedef struct RandUpHCVParams {
-    int index;
-    int colorOffset;
-    s16 delta[4];
-    u8 flag;
-    u8 pad[3];
-} RandUpHCVParams;
-
-typedef struct RandUpHCVCtx {
-    u8 _pad0[0xC];
-    s32* outputOffset;
-} RandUpHCVCtx;
+struct PppRandUpHCVParam3 {
+    u8 field0[0xC];
+    s32* fieldC;
+};
 
 /*
  * --INFO--
@@ -30,51 +30,53 @@ typedef struct RandUpHCVCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
+extern "C" void pppRandUpHCV(void* param1, void* param2, void* param3)
 {
+    u8* base = (u8*)param1;
+    PppRandUpHCVParam2* in = (PppRandUpHCVParam2*)param2;
+    PppRandUpHCVParam3* out = (PppRandUpHCVParam3*)param3;
+    s16* target;
+    f32* valuePtr;
+
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    u8* base = (u8*)p1;
-    RandUpHCVParams* params = (RandUpHCVParams*)p2;
-    RandUpHCVCtx* ctx = (RandUpHCVCtx*)p3;
-    f32* valuePtr;
-    if (params->index == *(int*)(base + 0xC)) {
+    if (in->field0 == *(s32*)(base + 0xC)) {
         f32 value = Math.RandF();
-        if (params->flag != 0) {
+        if (in->field10 != 0) {
             f32 random = Math.RandF();
             f32 blend = value + random;
             f32 scale = kPppRandUpHCVDualSampleScale;
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
-    } else if (params->index != *(int*)(base + 0xC)) {
+    } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     } else {
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s16* target = (params->colorOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + params->colorOffset + 0x80);
+    target = (in->field4 == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);
 
     f32 scale = *valuePtr;
 
     {
-        s16 base = params->delta[0];
-        target[0] = (s16)(target[0] + (int)((float)base * scale));
+        s16 baseValue = in->field8;
+        target[0] = (s16)(target[0] + (s32)((f32)baseValue * scale));
     }
     {
-        s16 base = params->delta[1];
-        target[1] = (s16)(target[1] + (int)((float)base * scale));
+        s16 baseValue = in->fieldA;
+        target[1] = (s16)(target[1] + (s32)((f32)baseValue * scale));
     }
     {
-        s16 base = params->delta[2];
-        target[2] = (s16)(target[2] + (int)((float)base * scale));
+        s16 baseValue = in->fieldC;
+        target[2] = (s16)(target[2] + (s32)((f32)baseValue * scale));
     }
     {
-        s16 base = params->delta[3];
-        target[3] = (s16)(target[3] + (int)((float)base * scale));
+        s16 baseValue = in->fieldE;
+        target[3] = (s16)(target[3] + (s32)((f32)baseValue * scale));
     }
 }

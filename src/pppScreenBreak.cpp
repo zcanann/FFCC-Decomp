@@ -165,6 +165,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Vec basis = { 0.0f, 1.0f, 0.0f };
     Vec cameraOffset;
     Vec screenOffset;
+    Vec invTransOffset;
     Vec4d clipOutput;
     Vec4d clipInput;
     Vec cameraPos;
@@ -252,13 +253,13 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 
             pieceData[0xC] += 1.0f;
 
-            screenOffset.x = invTransMtx[0][3];
-            screenOffset.y = invTransMtx[1][3];
-            screenOffset.z = invTransMtx[2][3];
-            PSVECAdd((Vec*)(pieceData + 3), &screenOffset, &screenOffset);
-            invTransMtx[0][3] = screenOffset.x;
-            invTransMtx[1][3] = screenOffset.y;
-            invTransMtx[2][3] = screenOffset.z;
+            invTransOffset.x = invTransMtx[0][3];
+            invTransOffset.y = invTransMtx[1][3];
+            invTransOffset.z = invTransMtx[2][3];
+            PSVECAdd((Vec*)(pieceData + 3), &invTransOffset, &invTransOffset);
+            invTransMtx[0][3] = invTransOffset.x;
+            invTransMtx[1][3] = invTransOffset.y;
+            invTransMtx[2][3] = invTransOffset.z;
             PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
         }
 

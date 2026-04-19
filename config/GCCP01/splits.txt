@@ -852,6 +852,7 @@ pppYmMegaBirthShpTail2.cpp:
 	.text       start:0x8008ACC4 end:0x8008CA98
 	.rodata     start:0x801D9C68 end:0x801D9C83
 	.data       start:0x801FD3D0 end:0x801FD3F8
+	.bss        start:0x802EA110 end:0x802EA140
 
 pppYmMegaBirthShpTail3.cpp:
 	extab       start:0x80007AB0 end:0x80007AE0
@@ -859,6 +860,7 @@ pppYmMegaBirthShpTail3.cpp:
 	.text       start:0x8008CA98 end:0x8008ECA0
 	.rodata     start:0x801D9C88 end:0x801D9CA3
 	.data       start:0x801FD3F8 end:0x801FD420
+	.bss        start:0x802EA140 end:0x802EA170
 
 pppKeLns.cpp:
 	extab       start:0x80007AE0 end:0x80007AE8

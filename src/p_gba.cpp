@@ -181,7 +181,7 @@ void CGbaPcs::Init()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline CGbaPcs::CGbaPcs()
+CGbaPcs::CGbaPcs()
 {
 	unsigned int* table = &gGbaStatusWordTable[1];
 	table[0] = gGbaStatusWordTriplet0[0];

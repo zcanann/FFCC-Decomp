@@ -6,7 +6,6 @@
 #include "string.h"
 #include "types.h"
 
-CUSBPcs USBPcs;
 char s_usbReadPollInitialized;
 int s_usbReadPollFrameCounter;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
@@ -15,12 +14,12 @@ extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 u32 m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__7CUSBPcsFv)};
 u32 m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__7CUSBPcsFv)};
 u32 m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(func__7CUSBPcsFv)};
-char s_CUSBPcs_8032f810[] = "CUSBPcs";
-u32 m_table__7CUSBPcs[0x15C / sizeof(u32)] = {
-    reinterpret_cast<u32>(s_CUSBPcs_8032f810), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
+const char s_CUSBPcs_8032f810[] = "CUSBPcs";
+u32 m_table__7CUSBPcs[0x11C / sizeof(u32)] = {
+    reinterpret_cast<u32>(const_cast<char*>(s_CUSBPcs_8032f810)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x12
 };
-static const char s_usbRootPath[] = "plot/kmitsuru/";
 static const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
+static const char s_usbRootPath[] = "plot/kmitsuru/";
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
@@ -29,7 +28,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
  * Address:	TODO
  * Size:	TODO
  */
-CUSBPcs::CUSBPcs()
+inline CUSBPcs::CUSBPcs()
 {
     m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
     m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
@@ -55,7 +54,7 @@ void CUSBPcs::Init()
 { 
     CMemory* memory = &Memory;
 
-	m_smallStage = memory->CreateStage(0x2000, s_CUSBPcs_8032f810, 0);
+	m_smallStage = memory->CreateStage(0x2000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_usbRootPath);
@@ -107,7 +106,7 @@ int CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, s_CUSBPcs_8032f810, 0);
+        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
@@ -261,3 +260,5 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     }
     return result;
 }
+
+CUSBPcs USBPcs;

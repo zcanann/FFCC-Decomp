@@ -35,9 +35,8 @@ static inline CMemory::CStage* MaterialEditorStage()
  */
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xC8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x9C);
-    return reinterpret_cast<RSDLISTITEM*>(list->GetDataIdx(index));
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(index));
 }
 
 /*
@@ -52,9 +51,8 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 #ifndef VERSION_GCCP01
 RSDITEM* CMaterialEditorPcs::GetReadRsd()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xC8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x9C);
-    return reinterpret_cast<RSDLISTITEM*>(list->GetDataIdx(index))->rsdItem;
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(index))->rsdItem;
 }
 #endif
 
@@ -69,9 +67,7 @@ RSDITEM* CMaterialEditorPcs::GetReadRsd()
  */
 int CMaterialEditorPcs::SetRsdIndex()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
-    unsigned int* rsd = reinterpret_cast<unsigned int*>(list->GetDataIdx(index));
+    unsigned int* rsd = reinterpret_cast<unsigned int*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 
     if (rsd == nullptr) {
         return 0;
@@ -80,7 +76,7 @@ int CMaterialEditorPcs::SetRsdIndex()
         return 0;
     }
 
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0xBC) = *rsd;
+    m_rsdIndex = *rsd;
     return 1;
 }
 
@@ -95,15 +91,13 @@ int CMaterialEditorPcs::SetRsdIndex()
  */
 int CMaterialEditorPcs::SetRsdFlag()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
-    int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
+    int* rsd = reinterpret_cast<int*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 
     if (rsd == 0) {
         return 0;
     }
 
-    rsd[3] = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC0);
+    rsd[3] = m_rsdFlag;
     return 1;
 }
 
@@ -223,9 +217,7 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
 #ifndef VERSION_GCCP01
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
-    return reinterpret_cast<RSDLISTITEM*>(list->GetDataIdx(index));
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 }
 #endif
 

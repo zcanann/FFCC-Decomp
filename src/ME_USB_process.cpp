@@ -404,10 +404,10 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         U32At(materialEditorPcs, 0xE8) = 0;
         break;
     case 0x40:
-        ResetRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, reinterpret_cast<ZLIST*>(Ptr(materialEditorPcs, 0xC8)));
+        ResetRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, &materialEditorPcs->m_zlist1);
         break;
     case 0x41:
-        AddRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, reinterpret_cast<ZLIST*>(Ptr(materialEditorPcs, 0xC8)));
+        AddRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, &materialEditorPcs->m_zlist1);
         break;
     case 0x42:
         memcpy(&usb.m_stageLoad, usb.m_data, 4);
@@ -416,10 +416,10 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         SetRsdIndex__18CMaterialEditorPcsFv(materialEditorPcs);
         break;
     case 0x43:
-        memcpy(Ptr(materialEditorPcs, 0xC0), usb.m_data, 4);
-        U32At(materialEditorPcs, 0xC0) = BSWAP32(U32At(materialEditorPcs, 0xC0));
+        memcpy(&materialEditorPcs->m_rsdFlag, usb.m_data, 4);
+        materialEditorPcs->m_rsdFlag = BSWAP32(materialEditorPcs->m_rsdFlag);
         SetRsdFlag__18CMaterialEditorPcsFv(materialEditorPcs);
-        DCStoreRange(Ptr(materialEditorPcs, 0xC0), 4);
+        DCStoreRange(&materialEditorPcs->m_rsdFlag, 4);
         break;
     }
 }

@@ -1153,11 +1153,13 @@ pppParMoveMatrix.cpp:
 	extab       start:0x80008B04 end:0x80008B0C
 	extabindex  start:0x8000F550 end:0x8000F55C
 	.text       start:0x800D467C end:0x800D4828
+	.sdata2     start:0x80330E38 end:0x80330E40
 
 pppYmTraceMove.cpp:
 	extab       start:0x80008B0C end:0x80008B1C
 	extabindex  start:0x8000F55C end:0x8000F574
 	.text       start:0x800D4828 end:0x800D4C7C
+	.sdata2     start:0x80330E40 end:0x80330E48
 
 pppYmMana.cpp:
 	extab       start:0x80008B1C end:0x80008B94

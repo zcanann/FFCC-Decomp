@@ -6,7 +6,13 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-extern double DOUBLE_80330E30;
+static const float kPppYmMoveParabolaYOffsetStep = 1.0f;
+static const float kPppYmMoveParabolaZero = 0.0f;
+static const float kPppYmMoveParabolaAngleScale = 32768.0f;
+static const float kPppYmMoveParabolaAngleDivisor = 180.0f;
+static const float kPppYmMoveParabolaGravityScale = 0.5f;
+static const float kPppYmMoveParabolaInitZero = 0.0f;
+static const double kPppYmMoveParabolaFrameBias = 4503599627370496.0;
 
 struct pppYmMoveParabolaWork {
     f32 m_distance;
@@ -44,12 +50,18 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         work->m_acceleration = work->m_acceleration + stepData->m_payload;
     }
 
-    f32 frameCount = (f32)work->m_frame;
+    union {
+        double d;
+        u32 u[2];
+    } frameScale;
+    frameScale.u[0] = 0x43300000;
+    frameScale.u[1] = work->m_frame;
+    f32 frameCount = (f32)(frameScale.d - kPppYmMoveParabolaFrameBias);
     Vec newPosition;
     Vec direction;
     if ((s32)Game.m_currentSceneId == 7) {
-        f32 zero = 0.0f;
-        f32 yOffset = gPppYmMoveParabolaYOffsetStep;
+        f32 zero = kPppYmMoveParabolaZero;
+        f32 yOffset = kPppYmMoveParabolaYOffsetStep;
 
         direction.x = yOffset;
         direction.y = zero;
@@ -61,12 +73,12 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     Vec normalizedSource = direction;
     pppNormalize(direction, normalizedSource);
 
-    s32 sinIndex = (s32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
+    s32 sinIndex = (s32)((kPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / kPppYmMoveParabolaAngleDivisor);
     f32 distance = work->m_distance;
     f32 xzScale = frameCount * (distance * *(f32*)((u8*)gPppTrigTable + ((sinIndex + 0x4000) & 0xFFFC)));
     newPosition.x = direction.x * xzScale;
     newPosition.y = (frameCount * (distance * *(f32*)((u8*)gPppTrigTable + (sinIndex & 0xFFFC)))) -
-                    ((gPppYmMoveParabolaGravityScale * stepData->m_initWOrk) * frameCount * frameCount);
+                    ((kPppYmMoveParabolaGravityScale * stepData->m_initWOrk) * frameCount * frameCount);
     newPosition.z = direction.z * xzScale;
     if ((s32)Game.m_currentSceneId == 7) {
         Vec basePosition = work->m_basePosition;
@@ -102,9 +114,9 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     pppYmMoveParabolaWork* work =
         (pppYmMoveParabolaWork*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
 
-    work->m_acceleration = 0.0f;
-    work->m_velocity = 0.0f;
-    work->m_distance = 0.0f;
+    work->m_acceleration = kPppYmMoveParabolaInitZero;
+    work->m_velocity = kPppYmMoveParabolaInitZero;
+    work->m_distance = kPppYmMoveParabolaInitZero;
     work->m_frame = 1;
 
     if ((s32)Game.m_currentSceneId == 7) {
@@ -118,6 +130,6 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 
         pppAddVector(work->m_basePosition, work->m_basePosition, matrixOffset);
         pppCopyVector(pppMngSt->m_paramVec0, work->m_basePosition);
-        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
+        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + kPppYmMoveParabolaYOffsetStep;
     }
 }

@@ -5,16 +5,17 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/p_camera.h"
 extern "C" {
-extern const float kPppLensFlareZero;
-extern const float kPppLensFlareAlphaScale;
-extern const float kPppLensFlareCameraToObjectScale;
-extern const float kPppLensFlareDepthToZScale;
 extern int gPppCalcDisabled;
 }
 
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
+
+static const float kPppLensFlareZero = 0.0f;
+static const float kPppLensFlareAlphaScale = 0.0078125f;
+static const float kPppLensFlareCameraToObjectScale = -1.0f;
+static const float kPppLensFlareDepthToZScale = 16777215.0f;
 
 struct LensFlareWork {
     u8 _pad00[0x10];

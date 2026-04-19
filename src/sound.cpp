@@ -392,35 +392,16 @@ extern "C" void CalcBound__9CLine2(CLine* line)
 
 /*
  * --INFO--
- * PAL Address: 0x800c8998
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_sound_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    unsigned char* sound = reinterpret_cast<unsigned char*>(&Sound);
-
-    *reinterpret_cast<void**>(sound) = __vt__6CSound;
-    __ct__9CRedSoundFv(sound + 8);
-    __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
-    __register_global_object(&Sound, __dt__6CSoundFv, &ARRAY_802f26c8);
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 CSound::CSound()
 {
-	// TODO
+    unsigned char* sound = reinterpret_cast<unsigned char*>(this);
+
+    *reinterpret_cast<void**>(sound) = __vt__6CSound;
+    __ct__9CRedSoundFv(sound + 8);
+    __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
 }
 
 /*

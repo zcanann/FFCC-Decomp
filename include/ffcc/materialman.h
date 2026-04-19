@@ -2,6 +2,7 @@
 #define _FFCC_MATERIALMAN_H_
 
 #include "ffcc/color.h"
+#include "ffcc/manager.h"
 #include "ffcc/mapshadow.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_light.h"
@@ -35,7 +36,7 @@ private:
     float m_v1;
 };
 
-class CMaterialMan
+class CMaterialMan : public CManager
 {
 public:
     enum TEV_BIT

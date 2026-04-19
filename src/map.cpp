@@ -54,10 +54,10 @@ extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
 extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
-extern "C" float kMapViewScaleXPrimary;
-extern "C" float kMapViewScaleY;
-extern "C" float kMapViewScaleZ;
-extern "C" float kMapViewScaleXSecondary;
+extern const float kMapViewScaleXPrimary = 0.73898232f;
+extern const float kMapViewScaleY = 0.88677877f;
+extern const float kMapViewScaleZ = 1.0f;
+extern const float kMapViewScaleXSecondary = 0.84455127f;
 extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" void SetDrawFlag__8COctTreeFv(void*);
@@ -75,19 +75,22 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 unsigned char DAT_8032ec88;
-extern float FLOAT_8032f9a0;
-extern float FLOAT_8032f9a4;
-extern float FLOAT_8032f9a8;
-extern float FLOAT_8032f9ac;
-extern float FLOAT_8032f988;
-extern float FLOAT_8032f98c;
-extern float FLOAT_8032f9bc;
+extern const float FLOAT_8032f988 = 1.0e15f;
+extern const float FLOAT_8032f98c = -1.0f;
+extern const float FLOAT_8032f9a0 = 0.0f;
+extern const float FLOAT_8032f9a4 = 0.0001f;
+extern const float FLOAT_8032f9a8 = -0.0001f;
+extern const float FLOAT_8032f9ac = 10.0f;
+extern const float FLOAT_8032F9B0 = 100000.0f;
+extern const float FLOAT_8032F9B4 = 360.0f;
+extern const float FLOAT_8032F9B8 = 5.0e-6f;
+extern const float FLOAT_8032f9bc = -0.1f;
 extern char DAT_801ead4c[];
 extern char DAT_801d7318[];
 extern char DAT_801d7350[];
 extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
-extern char DAT_8032f984[];
+extern const char DAT_8032f984[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
@@ -3068,7 +3071,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             System.Printf(DAT_801ead4c);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_8032f984);
+            System.Printf(const_cast<char*>(DAT_8032f984));
         }
     }
 }
@@ -3110,7 +3113,7 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
             System.Printf(DAT_801ead4c);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_8032f984);
+            System.Printf(const_cast<char*>(DAT_8032f984));
         }
     }
 }

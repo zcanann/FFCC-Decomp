@@ -68,22 +68,6 @@ extern float FLOAT_8032fb10;
 extern float FLOAT_8032fb14;
 extern float FLOAT_8032fb20;
 
-/*
- * --INFO--
- * PAL Address: 0x80043CCC
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_materialman_cpp(void)
-{
-    *reinterpret_cast<void**>(&MaterialMan) = __vt__8CManager;
-    *reinterpret_cast<void**>(&MaterialMan) = __vt__12CMaterialMan;
-    __ct__6CColorFv(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x213);
-}
-
 class CMapKeyFrame
 {
 public:
@@ -427,8 +411,8 @@ void getHsb(unsigned long)
  * Size:	TODO
  */
 CMaterialMan::CMaterialMan()
+    : m_color210()
 {
-	// TODO
 }
 
 /*

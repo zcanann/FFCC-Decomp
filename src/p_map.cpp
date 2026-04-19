@@ -39,6 +39,8 @@ public:
     u32 m_relIndex;
     u32 m_stageIndex;
     u32 m_mapIndex;
+
+    ~CRelProfile();
 };
 
 unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
@@ -120,6 +122,19 @@ struct CMapMngAsyncLoadState {
     unsigned int m_fileChecksums[16];
     CFile::CHandle* m_asyncHandles[16];
 };
+
+/*
+ * --INFO--
+ * PAL Address: 0x80036254
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRelProfile::~CRelProfile()
+{
+}
 
 /*
  * --INFO--
@@ -962,4 +977,3 @@ void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
 {
 	// TODO
 }
-

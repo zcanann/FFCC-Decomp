@@ -205,7 +205,7 @@ materialman.cpp:
 	extabindex  start:0x8000C07C end:0x8000C2BC
 	.text       start:0x8003C1B8 end:0x80043D10
 	.ctors      start:0x801D53E8 end:0x801D53EC
-	.bss        start:0x80268C70 end:0x80268E8C
+	.bss        start:0x80268C70 end:0x80268E90
 
 ref.cpp:
 	extab       start:0x80006754 end:0x8000675C

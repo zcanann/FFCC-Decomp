@@ -67,47 +67,55 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-    unsigned int count;
-    unsigned int* ptr;
-    unsigned int* alloc;
-    int connected;
+    unsigned int allocSize;
+    unsigned int byteCount;
+    unsigned int swappedCode;
+    unsigned int swappedElemCount;
+    unsigned int swappedByteCount;
+    unsigned int swappedZero;
+    unsigned int repeatedByteCount;
+    unsigned int* buffer;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
     int result;
 
-    count = (unsigned int)(elemSize * elemCount);
-    unsigned int value = (count + 0x5F) & ~0x1F;
+    byteCount = (unsigned int)(elemSize * elemCount);
+    allocSize = (byteCount + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    ptr = alloc = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
-        value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
-    alloc[1] = value;
-    unsigned int type = 4;
-    ptr[0] = type;
-    ptr[9] = Swap32((unsigned int)code);
-    ptr[10] = Swap32((unsigned int)elemCount);
-    ptr[12] = Swap32(count);
-    ptr[11] = Swap32(0);
-    ptr[8] = Swap32(count);
-    memcpy(ptr + 0x10, src, count);
+    buffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
+        allocSize, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
+    buffer[1] = allocSize;
+    buffer[0] = 4;
 
-    connected = USB.IsConnected();
-    if (connected == 0) {
+    swappedCode = (unsigned int)code;
+    buffer[9] = Swap32(swappedCode);
+    swappedElemCount = (unsigned int)elemCount;
+    buffer[10] = Swap32(swappedElemCount);
+    swappedByteCount = byteCount;
+    buffer[12] = Swap32(swappedByteCount);
+    swappedZero = 0;
+    buffer[11] = Swap32(swappedZero);
+    repeatedByteCount = byteCount;
+    buffer[8] = Swap32(repeatedByteCount);
+    memcpy(buffer + 0x10, src, byteCount);
+
+    if (USB.IsConnected() == 0) {
         result = 0;
     } else {
         stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
         dstBuffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
-            (ptr[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x19e);
-        memcpy(dstBuffer, ptr, (ptr[1] + 0x1F) & ~0x1F);
+            (buffer[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x19e);
+        memcpy(dstBuffer, buffer, (buffer[1] + 0x1F) & ~0x1F);
 
-        dstBuffer[0] = Swap32(ptr[0]);
-        dstBuffer[1] = Swap32(ptr[1]);
+        dstBuffer[0] = Swap32(buffer[0]);
+        dstBuffer[1] = Swap32(buffer[1]);
 
-        DCFlushRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
-        DCInvalidateRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
+        DCFlushRange(dstBuffer, (buffer[1] + 0x1F) & ~0x1F);
+        DCInvalidateRange(dstBuffer, (buffer[1] + 0x1F) & ~0x1F);
 
-        if (USB.Write(dstBuffer, (ptr[1] + 0x1F) & ~0x1F) == 0) {
+        if (USB.Write(dstBuffer, (buffer[1] + 0x1F) & ~0x1F) == 0) {
             delete[] dstBuffer;
             result = 0;
         } else if (USB.SendMessage(0, (MCCChannel)9) == 0) {
@@ -119,8 +127,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         }
     }
 
-    if (ptr != (unsigned int*)nullptr) {
-        delete[] ptr;
+    if (buffer != (unsigned int*)nullptr) {
+        delete[] buffer;
     }
     return result;
 }

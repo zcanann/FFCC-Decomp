@@ -69,11 +69,6 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int allocSize;
     unsigned int byteCount;
-    unsigned int swappedCode;
-    unsigned int swappedElemCount;
-    unsigned int swappedByteCount;
-    unsigned int swappedZero;
-    unsigned int repeatedByteCount;
     unsigned int* buffer;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
@@ -84,20 +79,15 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
     buffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
-        allocSize, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
+        allocSize, stage, const_cast<char*>(s_usbRootPath), 0x1ca);
     buffer[1] = allocSize;
     buffer[0] = 4;
 
-    swappedCode = (unsigned int)code;
-    buffer[9] = Swap32(swappedCode);
-    swappedElemCount = (unsigned int)elemCount;
-    buffer[10] = Swap32(swappedElemCount);
-    swappedByteCount = byteCount;
-    buffer[12] = Swap32(swappedByteCount);
-    swappedZero = 0;
-    buffer[11] = Swap32(swappedZero);
-    repeatedByteCount = byteCount;
-    buffer[8] = Swap32(repeatedByteCount);
+    buffer[9] = Swap32((unsigned int)code);
+    buffer[10] = Swap32((unsigned int)elemCount);
+    buffer[12] = Swap32(byteCount);
+    buffer[11] = Swap32(0);
+    buffer[8] = Swap32(byteCount);
     memcpy(buffer + 0x10, src, byteCount);
 
     if (USB.IsConnected() == 0) {
@@ -106,7 +96,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
         dstBuffer = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
-            (buffer[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x19e);
+            (buffer[1] + 0x1F) & ~0x1F, stage, const_cast<char*>(s_usbRootPath), 0x19e);
         memcpy(dstBuffer, buffer, (buffer[1] + 0x1F) & ~0x1F);
 
         dstBuffer[0] = Swap32(buffer[0]);

@@ -12353,6 +12353,7 @@ m_table_desc3__18CMaterialEditorPcs = .data:0x801EA4BC; // type:object size:0xC 
 m_table__18CMaterialEditorPcs = .data:0x801EA4C8; // type:object size:0x15C
 lbl_801EA624 = .data:0x801EA624; // type:object size:0xC
 lbl_801EA630 = .data:0x801EA630; // type:object size:0x4
+lbl_801EA634 = .data:0x801EA634; // type:object size:0x10
 __vt__18CMaterialEditorPcs = .data:0x801EA644; // type:object size:0x24
 jumptable_801EA668 = .data:0x801EA668; // type:object size:0x110 scope:local
 m_table_desc0__14CFunnyShapePcs = .data:0x801EA778; // type:object size:0xC data:4byte

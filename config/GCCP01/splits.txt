@@ -260,7 +260,8 @@ p_MaterialEditor.cpp:
 	extabindex  start:0x8000C6AC end:0x8000C70C
 	.text       start:0x8004B21C end:0x8004C71C
 	.ctors      start:0x801D53FC end:0x801D5400
-	.data       start:0x801EA634 end:0x801EA668
+	.rodata     start:0x801D7D18 end:0x801D7D78
+	.data       start:0x801EA498 end:0x801EA668
 	.bss        start:0x8026D338 end:0x8026D724
 
 mapshadow.cpp:

@@ -23,11 +23,26 @@ extern "C" void* __ct__14CUSBStreamDataFv(void* self);
 extern "C" void* __ct__5ZLISTFv(void* self);
 extern "C" ZLIST* __dt__5ZLISTFv(ZLIST* self, short shouldDelete);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
+extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
+extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
+extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
+extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
 
+static const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs(VIEWER)";
 static const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
+const char s_CManager_801D7D48[] = "CManager";
+const char s_CProcess_801D7D54[] = "CProcess";
 extern "C" void* __vt__18CMaterialEditorPcs[];
+unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table_desc3__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
+unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcs_VIEWER_801D7D18)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0,
+    0, 0, 0, 0x41, 1
+};
 CMaterialEditorPcs MaterialEditorPcs;
 
 struct MaterialEditorTableInit {
@@ -51,7 +66,7 @@ struct MaterialEditorTableInit {
 };
 
 static MaterialEditorTableInit sMaterialEditorTableInit;
-static const char s_MaterialEditor[] = "MaterialEditor=%c";
+static const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -248,7 +263,7 @@ void CMaterialEditorPcs::Quit()
  */
 int CMaterialEditorPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(m_table__18CMaterialEditorPcs + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__18CMaterialEditorPcs) + index * 0x15C);
 }
 
 /*
@@ -471,7 +486,7 @@ void CMaterialEditorPcs::drawViewer()
     gDebugSpinnerFrame = gDebugSpinnerFrame + 1;
     int sign = gDebugSpinnerFrame >> 31;
     int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)gDebugSpinnerText[idx]);
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)gDebugSpinnerText[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

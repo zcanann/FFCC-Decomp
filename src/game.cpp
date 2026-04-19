@@ -200,6 +200,12 @@ CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
  * Size:	TODO
  */
 CGame::CGame()
+    : m_partyMinX(FLOAT_8032f688)
+    , m_partyMinY(FLOAT_8032f688)
+    , m_partyMinZ(FLOAT_8032f688)
+    , m_partyMaxX(FLOAT_8032f68c)
+    , m_partyMaxY(FLOAT_8032f68c)
+    , m_partyMaxZ(FLOAT_8032f68c)
 {
 	// TODO
 }
@@ -1740,7 +1746,13 @@ void CGame::GetMonName(int, int)
  */
 CGame::CGameWork::CGameWork()
 {
-	// TODO
+    memset(&m_gameDataStartMarker, 0, 0x13E1);
+    memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
+
+    *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
+    m_chaliceElement = 1;
+    strcpy(m_townName, m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
+    m_gameInitFlag = 1;
 }
 
 template class CPtrArray<CMapLightHolder*>;

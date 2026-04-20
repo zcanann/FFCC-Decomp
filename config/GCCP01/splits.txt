@@ -1198,6 +1198,7 @@ pppLocationTitle.cpp:
 	extab       start:0x80008BCC end:0x80008BE4
 	extabindex  start:0x8000F67C end:0x8000F6A0
 	.text       start:0x800D8C1C end:0x800D92FC
+	.rodata     start:0x801DB510 end:0x801DB528
 	.sdata2     start:0x80330EE0 end:0x80330EF0
 
 wind.cpp:

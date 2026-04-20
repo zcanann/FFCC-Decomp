@@ -284,7 +284,8 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
     unsigned char* color = (unsigned char*)particleColor;
-    unsigned int alpha = (unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+    unsigned int alpha = vColor->m_alpha;
+    char frameCount;
     Vec step;
 
     if (color != NULL) {
@@ -338,7 +339,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
             if (*(float*)(particle + 0x8C) < 0.0f) {
                 *(float*)(particle + 0x8C) = 0.0f;
             }
-        } else if ((start < 0.0f) && (delta > 0.0f) && (0.0f < *(float*)(particle + 0x8C))) {
+        } else if ((start < 0.0f) && (0.0f < delta) && (0.0f < *(float*)(particle + 0x8C))) {
             *(float*)(particle + 0x8C) = 0.0f;
         }
     }
@@ -351,13 +352,13 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
     }
     *(unsigned char*)(particle + 0x90) += 1;
 
-    if ((*(char*)(particle + 0x54) != '\0') &&
-        ((int)(unsigned int)*(unsigned char*)(particle + 0x90) <= (int)*(char*)(particle + 0x54))) {
-        *(float*)(particle + 0x88) -= (float)alpha / (float)(unsigned int)*(unsigned char*)(particle + 0x54);
+    frameCount = *(char*)(particle + 0x54);
+    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)(particle + 0x90) <= (int)frameCount)) {
+        *(float*)(particle + 0x88) -= (float)alpha / (float)(unsigned int)(unsigned char)frameCount;
     }
 
-    if ((*(char*)(particle + 0x55) != '\0') &&
-        ((int)*(short*)(particle + 0x50) <= (int)*(char*)(particle + 0x55))) {
+    frameCount = *(char*)(particle + 0x55);
+    if ((frameCount != '\0') && ((int)*(short*)(particle + 0x50) <= (int)frameCount)) {
         *(float*)(particle + 0x88) += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
     }
 }
@@ -695,16 +696,15 @@ group_ready:
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
-    BreathModelRenderStep* step;
     _pppPObject* object;
+    BreathModelRenderStep* step;
     int i;
-    int dataOffset;
+    int workOffset;
     int colorOffset;
-    int maxParticleCount;
     int groupCount;
     int slotCount;
-    unsigned char* base;
     unsigned char* work;
+    unsigned char* color;
     unsigned char* particleData;
     unsigned char* particleWMat;
     unsigned char* groupPtr;
@@ -716,16 +716,16 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     unsigned char colorA;
     Mtx worldMtx;
 
-    step = (BreathModelRenderStep*)pBreathModel;
-    dataOffset = offsets->m_serializedDataOffsets[0];
-    colorOffset = offsets->m_serializedDataOffsets[1];
     object = (_pppPObject*)breathModel;
-    base = (unsigned char*)breathModel + 0x80;
-    work = base + dataOffset;
+    step = (BreathModelRenderStep*)pBreathModel;
+    workOffset = offsets->m_serializedDataOffsets[0];
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    work = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset;
+    color = reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset;
     particleData = *(unsigned char**)(work + 0x30);
     particleWMat = *(unsigned char**)(work + 0x34);
     particleColor = *(float**)(work + 0x38);
-    maxParticleCount = *(int*)(work + 0x40);
+    groupCount = *(int*)(work + 0x40);
 
     if (step->m_stepValue == 0xFFFF) {
         return;
@@ -739,12 +739,12 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                                                                step->m_payload[0xB5], step->m_payload[4], step->m_payload[0xB7],
                                                                step->m_payload[0xB8], 1, step->m_payload[0xB9]);
 
-    colorR = *(unsigned char*)(base + colorOffset + 0);
-    colorG = *(unsigned char*)(base + colorOffset + 1);
-    colorB = *(unsigned char*)(base + colorOffset + 2);
-    colorA = *(unsigned char*)(base + colorOffset + 3);
+    colorR = color[0];
+    colorG = color[1];
+    colorB = color[2];
+    colorA = color[3];
 
-    for (i = 0; i < maxParticleCount; i++) {
+    for (i = 0; i < groupCount; i++) {
         if (*(short*)(particleData + 0x50) > 0) {
             GXColor drawColor;
             Mtx scaledMtx;

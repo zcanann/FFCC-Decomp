@@ -19,6 +19,17 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
+struct pppYmMoveCircleMngStRaw {
+    u8 _pad00[0x08];
+    Vec m_position;
+    u8 _pad14[0x34];
+    Vec m_previousPosition;
+    f32 _pad54;
+    Vec m_basePosition;
+    u32 _pad64;
+    Vec m_paramVec0;
+};
+
 
 /*
  * --INFO--
@@ -32,7 +43,7 @@ struct pppYmMoveCircleWork {
 extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleStep* stepData, pppYmMoveCircleOffsets* offsetData)
 {
     pppYmMoveCircleWork* work;
-    _pppMngSt* pppMngSt;
+    pppYmMoveCircleMngStRaw* pppMngSt;
     Vec nextPos;
     s32 tableIndex;
     f32 sinAngle;
@@ -44,7 +55,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
 
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offsetData->m_serializedDataOffsets[0] + 0x80);
-    pppMngSt = pppMngStPtr;
+    pppMngSt = (pppYmMoveCircleMngStRaw*)pppMngStPtr;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -81,13 +92,13 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     nextPos.y = pppMngSt->m_position.y;
     nextPos.z += work->m_center.z;
 
-    pppCopyVector(*(Vec*)&pppMngSt->m_userFloat0, pppMngSt->m_position);
+    pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
     pppCopyVector(pppMngSt->m_position, nextPos);
 
     pppMngStPtr->m_matrix.value[0][3] = nextPos.x;
     pppMngStPtr->m_matrix.value[1][3] = nextPos.y;
     pppMngStPtr->m_matrix.value[2][3] = nextPos.z;
-    pppSetFpMatrix(pppMngSt);
+    pppSetFpMatrix(pppMngStPtr);
 }
 
 /*
@@ -105,11 +116,11 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     const f32 kOne = 1.0f;
     Vec tempUp;
     Vec temp1;
-    _pppMngSt* pppMngSt;
+    pppYmMoveCircleMngStRaw* pppMngSt;
     s32 offset;
     pppYmMoveCircleWork* work;
 
-    pppMngSt = pppMngStPtr;
+    pppMngSt = (pppYmMoveCircleMngStRaw*)pppMngStPtr;
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
@@ -117,7 +128,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     tempUp.y = kZero;
     tempUp.z = kZero;
 
-    PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
+    PSVECSubtract(&pppMngSt->m_paramVec0, &pppMngSt->m_basePosition, &temp1);
     PSVECNormalize(&temp1, &temp1);
 
     work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
@@ -132,6 +143,6 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     work->m_angleStepStepStep = kZero;
     work->m_angleStepStep = kZero;
     work->m_angleStep = kZero;
-    pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
+    pppCopyVector(work->m_center, pppMngSt->m_basePosition);
     work->m_hasInit = 0;
 }

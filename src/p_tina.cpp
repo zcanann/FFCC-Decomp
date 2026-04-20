@@ -11,9 +11,9 @@
 extern "C" {
 extern int gPppHeapUseRateWords[3];
 extern char* gDebugSpinnerText;
-extern unsigned char gDebugSpinnerTextInitialized;
+extern char gDebugSpinnerTextInitialized;
 extern int gDebugSpinnerFrame;
-extern unsigned char gDebugSpinnerFrameInitialized;
+extern char gDebugSpinnerFrameInitialized;
 extern char sDebugSpinnerText[];
 extern const float kPppHeapUseRateDivisor;
 extern const float kPartColorIdentityOne;
@@ -24,9 +24,9 @@ extern const float kPartColorIdentityOne;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 char* gDebugSpinnerText = 0;
-unsigned char gDebugSpinnerTextInitialized = 0;
+char gDebugSpinnerTextInitialized = 0;
 int gDebugSpinnerFrame = 0;
-unsigned char gDebugSpinnerFrameInitialized = 0;
+char gDebugSpinnerFrameInitialized = 0;
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
@@ -293,6 +293,74 @@ static CPartMngState* GetPartMngState()
 static PppPdtSlotRaw* GetPartMngPdtSlots()
 {
     return reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(&PartMng) + 0x22E18);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CPartPcs::CPartPcs()
+{
+	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
+
+	table[1] = m_table_desc0__8CPartPcs[0];
+	table[2] = m_table_desc0__8CPartPcs[1];
+	table[3] = m_table_desc0__8CPartPcs[2];
+	table[4] = m_table_desc1__8CPartPcs[0];
+	table[5] = m_table_desc1__8CPartPcs[1];
+	table[6] = m_table_desc1__8CPartPcs[2];
+	table[7] = m_table_desc2__8CPartPcs[0];
+	table[8] = m_table_desc2__8CPartPcs[1];
+	table[9] = m_table_desc2__8CPartPcs[2];
+	table[12] = m_table_desc3__8CPartPcs[0];
+	table[13] = m_table_desc3__8CPartPcs[1];
+	table[14] = m_table_desc3__8CPartPcs[2];
+	table[17] = m_table_desc4__8CPartPcs[0];
+	table[18] = m_table_desc4__8CPartPcs[1];
+	table[19] = m_table_desc4__8CPartPcs[2];
+	table[22] = m_table_desc5__8CPartPcs[0];
+	table[23] = m_table_desc5__8CPartPcs[1];
+	table[24] = m_table_desc5__8CPartPcs[2];
+	table[27] = m_table_desc6__8CPartPcs[0];
+	table[28] = m_table_desc6__8CPartPcs[1];
+	table[29] = m_table_desc6__8CPartPcs[2];
+	table[32] = m_table_desc7__8CPartPcs[0];
+	table[33] = m_table_desc7__8CPartPcs[1];
+	table[37] = m_table_desc8__8CPartPcs[1];
+	table[38] = m_table_desc8__8CPartPcs[2];
+	table[35] = m_table_desc7__8CPartPcs[2];
+	table[39] = m_table_desc8__8CPartPcs[0];
+	table[44] = m_table_desc9__8CPartPcs[1];
+	table[45] = m_table_desc9__8CPartPcs[2];
+	table[46] = m_table_desc9__8CPartPcs[0];
+	table[88] = m_table_desc10__8CPartPcs[0];
+	table[89] = m_table_desc10__8CPartPcs[1];
+	table[90] = m_table_desc10__8CPartPcs[2];
+	table[93] = m_table_desc11__8CPartPcs[0];
+	table[94] = m_table_desc11__8CPartPcs[1];
+	table[95] = m_table_desc11__8CPartPcs[2];
+	table[96] = m_table_desc12__8CPartPcs[0];
+	table[97] = m_table_desc12__8CPartPcs[1];
+	table[98] = m_table_desc12__8CPartPcs[2];
+	table[101] = m_table_desc13__8CPartPcs[0];
+	table[102] = m_table_desc13__8CPartPcs[1];
+	table[103] = m_table_desc13__8CPartPcs[2];
+	table[106] = m_table_desc14__8CPartPcs[0];
+	table[107] = m_table_desc14__8CPartPcs[1];
+	table[108] = m_table_desc14__8CPartPcs[2];
+	table[111] = m_table_desc15__8CPartPcs[0];
+	table[112] = m_table_desc15__8CPartPcs[1];
+	table[113] = m_table_desc15__8CPartPcs[2];
+	table[114] = m_table_desc16__8CPartPcs[0];
+	table[117] = m_table_desc17__8CPartPcs[0];
+	table[118] = m_table_desc17__8CPartPcs[1];
+	table[119] = m_table_desc17__8CPartPcs[2];
+	table[120] = m_table_desc16__8CPartPcs[1];
+	table[121] = m_table_desc16__8CPartPcs[2];
+	table[124] = m_table_desc18__8CPartPcs[0];
+	table[125] = m_table_desc18__8CPartPcs[1];
+	table[126] = m_table_desc18__8CPartPcs[2];
 }
 
 /*
@@ -1139,17 +1207,18 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
+	char* stringBase = s_p_tina_rodata_801d7ee0;
 	int frameSign;
 
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
-	OSStartStopwatch(&g_par_draw_prof);
-	OSStartStopwatch(&g_par_calc_prof);
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
-	OSStopStopwatch(&g_par_calc_prof);
-	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
-	OSStopStopwatch(&g_par_draw_prof);
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
@@ -1165,7 +1234,7 @@ void CPartPcs::drawAfterViewer()
 	gDebugSpinnerFrame++;
 	frameSign = gDebugSpinnerFrame >> 0x1f;
 	Graphic.Printf(
-		s_tina_title_fmt_801d8014,
+		stringBase + 0x134,
 		(int)(char)gDebugSpinnerText[(frameSign * 4 |
 								 (unsigned int)((gDebugSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
@@ -1173,11 +1242,11 @@ void CPartPcs::drawAfterViewer()
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		s_tina_calc_fmt_801d8020, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
+		stringBase + 0x140, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		s_tina_draw_fmt_801d8038, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
+		stringBase + 0x158, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		s_tina_heap_fmt_801d8050,
+		stringBase + 0x170,
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }

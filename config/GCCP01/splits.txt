@@ -772,6 +772,7 @@ cflat_runtime2.cpp:
 	extabindex  start:0x8000D2F4 end:0x8000D4C8
 	.text       start:0x80069B08 end:0x8006EB04
 	.ctors      start:0x801D540C end:0x801D5410
+	.rodata     start:0x801D8FA0 end:0x801D8FC4
 	.data       start:0x801FCAE4 end:0x801FCB7C
 	.bss        start:0x80299F40 end:0x802E79A0
 	.sbss       start:0x8032ED98 end:0x8032EDA0

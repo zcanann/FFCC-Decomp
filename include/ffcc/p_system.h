@@ -6,14 +6,21 @@
 extern unsigned int m_table_desc0__10CSystemPcs[];
 extern unsigned int m_table_desc1__10CSystemPcs[];
 extern unsigned int m_table_desc2__10CSystemPcs[];
-extern unsigned int m_table__10CSystemPcs[];
+
+struct CSystemPcsTable
+{
+    char* m_name;
+    unsigned int m_words[0x56];
+};
+
+extern CSystemPcsTable m_table__10CSystemPcs;
 
 class CSystemPcs : public CProcess
 {
 public:
     CSystemPcs()
     {
-        unsigned int* table = &m_table__10CSystemPcs[1];
+        unsigned int* table = m_table__10CSystemPcs.m_words;
         const unsigned int* desc0 = m_table_desc0__10CSystemPcs;
         const unsigned int* desc1 = m_table_desc1__10CSystemPcs;
         const unsigned int* desc2 = m_table_desc2__10CSystemPcs;

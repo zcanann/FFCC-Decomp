@@ -12,8 +12,11 @@ unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u
 unsigned int m_table_desc1__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
 unsigned int m_table_desc2__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
 
-unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CSystemPcs_801D7C48), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
+CSystemPcsTable m_table__10CSystemPcs = {
+    s_CSystemPcs_801D7C48,
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
+    }
 };
 
 /*
@@ -47,7 +50,7 @@ void CSystemPcs::Quit()
  */
 int CSystemPcs::GetTable(unsigned long index)
 {
-	unsigned char* table = reinterpret_cast<unsigned char*>(m_table__10CSystemPcs);
+	unsigned char* table = reinterpret_cast<unsigned char*>(&m_table__10CSystemPcs);
 	unsigned long offset = index * 0x15c;
 	return (int)(table + offset);
 }

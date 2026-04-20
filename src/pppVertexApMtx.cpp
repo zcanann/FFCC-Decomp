@@ -8,7 +8,7 @@
 struct VertexApMtxEntry
 {
 	s16 vertexSetIndex;
-	u16 maxValue;
+	s16 maxValue;
 	u16* vertexIndices;
 };
 
@@ -35,7 +35,7 @@ struct VertexApMtxData
 
 struct VertexApMtxState
 {
-	u16 index;
+	s16 index;
 	u16 countdown;
 };
 

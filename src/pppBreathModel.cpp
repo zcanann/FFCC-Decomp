@@ -283,21 +283,20 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
-    unsigned char* color = (unsigned char*)particleColor;
     unsigned int alpha = vColor->m_alpha;
     char frameCount;
     Vec step;
 
-    if (color != NULL) {
-        *(float*)(color + 0x00) += *(float*)(color + 0x10);
-        *(float*)(color + 0x04) += *(float*)(color + 0x14);
-        *(float*)(color + 0x08) += *(float*)(color + 0x18);
-        *(float*)(color + 0x0C) += *(float*)(color + 0x1C);
-        *(float*)(color + 0x10) += *(float*)(breath + 0x38);
-        *(float*)(color + 0x14) += *(float*)(breath + 0x3C);
-        *(float*)(color + 0x18) += *(float*)(breath + 0x40);
-        *(float*)(color + 0x1C) += *(float*)(breath + 0x44);
-        alpha += (unsigned int)(int)*(float*)(color + 0x0C);
+    if (particleColor != NULL) {
+        particleColor->m_color[0] += particleColor->m_colorFrameDeltas[0];
+        particleColor->m_color[1] += particleColor->m_colorFrameDeltas[1];
+        particleColor->m_color[2] += particleColor->m_colorFrameDeltas[2];
+        particleColor->m_color[3] += particleColor->m_colorFrameDeltas[3];
+        particleColor->m_colorFrameDeltas[0] += *(float*)(breath + 0x38);
+        particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x3C);
+        particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x40);
+        particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x44);
+        alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }

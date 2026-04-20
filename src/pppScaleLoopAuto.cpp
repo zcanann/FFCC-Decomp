@@ -104,7 +104,7 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
     work->m_angle += 360 / (s32)step->m_stepCount;
 
     {
-        s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 360.0f);
+        s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 180.0f);
         f32 sinVal = *(f32*)((u8*)gPppTrigTable + (tableAngle & 0xFFFC));
         f32 delta = (step->m_amplitude * sinVal) * step->m_scale;
 

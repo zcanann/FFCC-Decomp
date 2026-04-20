@@ -7,7 +7,7 @@
  */
 CColor3::CColor3(_GXColor& other)
 {
-	this->raw = *(u32*)&other;
+	*(u32*)&this->color = *(u32*)&other;
 }
 
 /*
@@ -17,7 +17,7 @@ CColor3::CColor3(_GXColor& other)
  */
 CColor3::CColor3(CColor3& other)
 {
-	this->raw = other.raw;
+	*(u32*)&this->color = *(u32*)&other.color;
 }
 
 /*
@@ -36,7 +36,7 @@ CColor3::CColor3()
  */
 CColor::CColor(_GXColor& other)
 {
-	this->raw = *(u32*)&other;
+	*(u32*)&this->color = *(u32*)&other;
 }
 
 /*
@@ -46,7 +46,7 @@ CColor::CColor(_GXColor& other)
  */
 CColor::CColor(CColor& other)
 {
-	this->raw = other.raw;
+	*(u32*)&this->color = *(u32*)&other.color;
 }
 
 /*

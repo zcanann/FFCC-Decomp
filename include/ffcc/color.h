@@ -12,10 +12,7 @@ public:
 	CColor(_GXColor& other);
 	operator _GXColor();
 
-	union {
-		GXColor color;
-		u32 raw;
-	};
+	GXColor color;
 };
 
 class CColor3
@@ -25,10 +22,7 @@ public:
 	CColor3(CColor3& other);
 	CColor3(_GXColor& other);
 
-	union {
-		GXColor color;
-		u32 raw;
-	};
+	GXColor color;
 };
 
 #endif // _FFCC_COLOR_H_

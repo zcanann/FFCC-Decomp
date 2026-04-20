@@ -113,8 +113,8 @@ private:
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
-    unsigned char m_pad209[0x0B];
-    CColor m_color214;                   // 0x214
+    unsigned char m_pad209[0x0A];
+    CColor m_color213;                   // 0x213
     CMemory::CStage* m_materialStage;    // 0x218
 };
 

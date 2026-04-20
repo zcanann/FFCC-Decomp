@@ -8,7 +8,7 @@
 struct VertexApMtxEntry
 {
 	s16 vertexSetIndex;
-	u16 maxValue;
+	s16 maxValue;
 	u16* vertexIndices;
 };
 

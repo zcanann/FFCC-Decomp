@@ -785,6 +785,7 @@ p_chara.cpp:
 	extabindex  start:0x8000D69C end:0x8000D9A8
 	.text       start:0x80073AF4 end:0x8007BB90
 	.ctors      start:0x801D5414 end:0x801D5418
+	.data       start:0x801FD284 end:0x801FD310
 	.bss        start:0x802E9958 end:0x802EA080
 	.sdata2     start:0x80330140 end:0x80330148
 
@@ -1016,6 +1017,7 @@ joybus.cpp:
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
 	.rodata     start:0x801DA0A4 end:0x801DA3E4
+	.data       start:0x8020FB10 end:0x8020FB2C
 	.bss        start:0x802EAAB0 end:0x802F2600
 	.sbss       start:0x8032EDB8 end:0x8032EDBC
 

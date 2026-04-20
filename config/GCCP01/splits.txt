@@ -91,6 +91,7 @@ p_usb.cpp:
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E838 end:0x8032E840
 	.sbss       start:0x8032EC68 end:0x8032EC70
+	.sdata2     start:0x8032F810 end:0x8032F818
 
 pad.cpp:
 	extab       start:0x80005C2C end:0x80005C44

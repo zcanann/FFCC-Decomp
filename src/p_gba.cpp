@@ -12,19 +12,32 @@ extern "C" void draw__7CGbaPcsFv(CGbaPcs*);
 extern const char s_CGbaPcs_80330870[];
 extern const char s_JoyBus__LoadBin___error_801d9de0[];
 
-unsigned int gGbaStatusWordTriplet0[] = {0x00000000, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
-unsigned int gGbaStatusWordTriplet1[] = {0x00000000, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
-unsigned int gGbaStatusWordTriplet2[] = {0x00000000, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
-unsigned int gGbaStatusWordTriplet3[] = {0x00000000, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
-unsigned int gGbaStatusWordTable[0x57] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CGbaPcs_80330870)), 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000023, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000045, 0x00000001,
-};
-
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
+
+CGbaPcsTable m_table__7CGbaPcs = {
+    const_cast<char*>(s_CGbaPcs_80330870),
+    {
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000023,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000045,
+        0x00000001,
+    },
+};
+
+CGbaPcs GbaPcs;
 
 /*
  * --INFO--
@@ -155,7 +168,7 @@ int CGbaPcs::GetTable(unsigned long tableIndex)
 {
 	unsigned long offset = tableIndex;
 	offset *= 0x15c;
-	return (int)(reinterpret_cast<unsigned char*>(gGbaStatusWordTable) + offset);
+	return (int)(reinterpret_cast<unsigned char*>(&m_table__7CGbaPcs) + offset);
 }
 
 /*
@@ -192,21 +205,24 @@ void CGbaPcs::Init()
  * JP Address: TODO
  * JP Size: TODO
  */
-CGbaPcs::CGbaPcs()
+inline CGbaPcs::CGbaPcs()
 {
-	unsigned int* table = &gGbaStatusWordTable[1];
-	table[0] = gGbaStatusWordTriplet0[0];
-	table[1] = gGbaStatusWordTriplet0[1];
-	table[2] = gGbaStatusWordTriplet0[2];
-	table[3] = gGbaStatusWordTriplet1[0];
-	table[4] = gGbaStatusWordTriplet1[1];
-	table[5] = gGbaStatusWordTriplet1[2];
-	table[6] = gGbaStatusWordTriplet2[0];
-	table[7] = gGbaStatusWordTriplet2[1];
-	table[8] = gGbaStatusWordTriplet2[2];
-	table[11] = gGbaStatusWordTriplet3[0];
-	table[12] = gGbaStatusWordTriplet3[1];
-	table[13] = gGbaStatusWordTriplet3[2];
-}
+	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__7CGbaPcs);
+	const unsigned int* desc0 = m_table_desc0__7CGbaPcs;
+	const unsigned int* desc1 = m_table_desc1__7CGbaPcs;
+	const unsigned int* desc2 = m_table_desc2__7CGbaPcs;
+	const unsigned int* desc3 = m_table_desc3__7CGbaPcs;
 
-CGbaPcs GbaPcs;
+	table[1] = desc0[0];
+	table[2] = desc0[1];
+	table[3] = desc0[2];
+	table[4] = desc1[0];
+	table[5] = desc1[1];
+	table[6] = desc1[2];
+	table[7] = desc2[0];
+	table[8] = desc2[1];
+	table[9] = desc2[2];
+	table[12] = desc3[0];
+	table[13] = desc3[1];
+	table[14] = desc3[2];
+}

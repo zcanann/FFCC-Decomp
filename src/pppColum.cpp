@@ -36,11 +36,6 @@ struct pppColumPositionWork {
     u8 m_alpha;
 };
 
-union ColumFloatBits {
-    float value;
-    unsigned long bits;
-};
-
 static const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
 extern "C" {
@@ -85,7 +80,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionBase[0x32] != 0) {
-            float* cameraMatrix = &ppvCameraMatrix0[0][0];
             Vec shapePosA;
             Vec shapePosB;
             Vec center;
@@ -104,29 +98,12 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             PSMTXIdentity(identityMtx);
             baseX = *(float*)(positionBase + 0x10);
             baseY = *(float*)(positionBase + 0x14);
-            cameraDelta.x = cameraMatrix[3] - baseX;
-            cameraDelta.y = cameraMatrix[7] - baseY;
-            cameraDelta.z = cameraMatrix[11] + *(float*)(positionBase + 0x18);
+            cameraDelta.x = ppvCameraMatrix0[0][3] - baseX;
+            cameraDelta.y = ppvCameraMatrix0[1][3] - baseY;
+            cameraDelta.z = ppvCameraMatrix0[2][3] + *(float*)(positionBase + 0x18);
 
-            lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
-            if (lengthXY > 0.0f) {
-                lengthXY = sqrtf(lengthXY);
-            } else {
-                ColumFloatBits bits;
-
-                if (lengthXY < 0.0f) {
-                    lengthXY = NAN;
-                } else {
-                    bits.value = lengthXY;
-                    if ((bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0) {
-                        lengthXY = NAN;
-                    }
-                }
-            }
-            if (lengthXY < 0.0f) {
-                lengthXY = NAN;
-            }
-            if (lengthXY > 0.0f) {
+            lengthXY = sqrtf(cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y);
+            if (0.0f < lengthXY) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
 
@@ -171,13 +148,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;
-                u8* frameData =
-                    (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (*(s16*)(frameBase + 2) * 8) + 0x10);
+                u8* frameData = (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (*(s16*)(frameBase + 2) * 8) + 0x10);
                 for (int j = 0; j < *(short*)(frameData + 2); j++) {
-                    pppGetShapePos__FPlsR3VecR3Veci(
-                        (long*)shapeSt->m_animData, *(s16*)(frameBase + 2), shapePosA, shapePosB, j);
-                    pppGetShapeUV__FPlsR5Vec2dR5Vec2di(
-                        (long*)shapeSt->m_animData, *(s16*)(frameBase + 2), uvA, uvB, j);
+                    pppGetShapePos__FPlsR3VecR3Veci((long*)shapeSt->m_animData, *(s16*)(frameBase + 2), shapePosA, shapePosB, j);
+                    pppGetShapeUV__FPlsR5Vec2dR5Vec2di((long*)shapeSt->m_animData, *(s16*)(frameBase + 2), uvA, uvB, j);
 
                     PSVECScale(&shapePosA, &shapePosA, drawScale);
                     PSVECScale(&shapePosB, &shapePosB, drawScale);

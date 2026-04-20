@@ -13,7 +13,7 @@ public:
     virtual ~CGObjWork();
 
     void Init(int, CRomWork*, int);
-    void CalcStatus();
+    virtual void CalcStatus();
 
     // void* vtable;                        // 0x0000
     int m_objType;                          // 0x0004
@@ -45,7 +45,7 @@ public:
     CMonWork();
 
     void Init(int, CRomWork*, int);
-    void CalcStatus();
+    virtual void CalcStatus();
     
     unsigned short unk_0xac[4];  // 0x00AC
     unsigned short unk_0xb4[14]; // 0x00B4
@@ -103,7 +103,7 @@ public:
     void SafeDeleteTempItem();
     void ClampStatus(short&, unsigned short&);
     void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
-    void CalcStatus();
+    virtual void CalcStatus();
     int CanPlayerUseItem();
     void ValidCmdList(int);
     int GetIdxCmdList();

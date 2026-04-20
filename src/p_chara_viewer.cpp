@@ -8,6 +8,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ptrarray.h"
+#include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 extern "C" {
 extern u8* gCharaPartWorkPtr;
@@ -108,6 +109,9 @@ static inline Mtx44Ptr GetScreenMatrix()
 {
     return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
 }
+
+static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
+static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
 
 /*
  * --INFO--
@@ -214,6 +218,10 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
             if (*(int*)(model + 0xB0) == 0) {
                 Printf__8CGraphicFPce(&Graphic, s_no_texture____801da7e8);
             } else {
+                CStopWatch watch(reinterpret_cast<char*>(-1));
+                System.DumpMapFile(&watch);
+                watch.Reset();
+                watch.Start();
                 SetFog__8CGraphicFii(&Graphic, 0, 0);
                 SetAmbient__9CLightPcsF8_GXColor(&LightPcs, p + 0xE8);
                 SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
@@ -232,8 +240,15 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
 
                 Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
                 DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
+                watch.Stop();
+                float cpuTime = watch.Get();
+                watch.Start();
+                _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_chara_viewer_cpp, 0x2A7);
+                watch.Stop();
                 if (i == 0) {
-                    _WaitDrawDone__8CGraphicFPci(&Graphic, s_no_texture____801da7e8 + 0x10, 0x2A7);
+                    float totalTime = watch.Get();
+                    float gpuTime = totalTime - cpuTime;
+                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, cpuTime, gpuTime, totalTime);
                 }
             }
         }

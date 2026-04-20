@@ -1190,19 +1190,21 @@ pppLocationTitle.cpp:
 	extab       start:0x80008BCC end:0x80008BE4
 	extabindex  start:0x8000F67C end:0x8000F6A0
 	.text       start:0x800D8C1C end:0x800D92FC
+	.sdata2     start:0x80330EE0 end:0x80330EF0
 
 wind.cpp:
 	extab       start:0x80008BE4 end:0x80008C1C
 	extabindex  start:0x8000F6A0 end:0x8000F6F4
 	.text       start:0x800D92FC end:0x800DA0B4
 	.bss        start:0x802F7720 end:0x802FF3A8
-	.sdata2     start:0x80330EE0 end:0x80330F60
+	.sdata2     start:0x80330EF0 end:0x80330F48
 
 LocationTitle2.cpp:
 	extab       start:0x80008C1C end:0x80008C34
 	extabindex  start:0x8000F6F4 end:0x8000F718
 	.text       start:0x800DA0B4 end:0x800DA93C
 	.rodata     start:0x801DB588 end:0x801DB5A0
+	.sdata2     start:0x80330F48 end:0x80330F60
 
 pppDrawShape2.cpp:
 	extab       start:0x80008C34 end:0x80008C3C

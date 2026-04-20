@@ -134,7 +134,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
 {
     u8 direction = 1;
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = 0.0f;
+    float fVar1 = FLOAT_80330dac;
 
     *puVar2 = 0;
     *(u8*)(puVar2 + 1) = direction;

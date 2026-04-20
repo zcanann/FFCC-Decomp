@@ -126,7 +126,7 @@ void CDbgMenuPcs::Quit()
  */
 int CDbgMenuPcs::GetTable(unsigned long index)
 {
-	return reinterpret_cast<int>(m_table__11CDbgMenuPcs + index * 0x15C);
+	return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__11CDbgMenuPcs) + index * 0x15C);
 }
 
 /*

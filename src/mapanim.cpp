@@ -306,16 +306,6 @@ struct CMapAnimNodeData
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapAnimKeyDt::CMapAnimKeyDt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8004ad98
  * PAL Size: 148b
  * EN Address: TODO
@@ -349,36 +339,6 @@ CMapAnimKeyDt::~CMapAnimKeyDt()
         __dla__FPv(keyData->scale);
         keyData->scale = 0;
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapAnimNode::CMapAnimNode()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapAnimNode::~CMapAnimNode()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapAnimNode::ReadOtmAnimNode(CChunkFile&, CMapAnim*)
-{
-	// TODO
 }
 
 /*
@@ -546,59 +506,6 @@ void CMapAnimNode::Interp(int frame)
     }
 
     nodeData->node->dirty = 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapAnimNode::interp(Vec* out, CMapAnimKey* key, int frameInLoop, int loopFrameCount)
-{
-    unsigned int keyCount = key->count;
-    CMapAnimNodeTrackKey* current = key->keys;
-    unsigned int frameInLoopUnsigned = static_cast<unsigned int>(frameInLoop);
-    unsigned int loopFrameCountUnsigned = static_cast<unsigned int>(loopFrameCount);
-
-    if (keyCount == 1) {
-        *out = current[0].value;
-        return;
-    }
-
-    unsigned int i = 0;
-    for (unsigned int remaining = keyCount; remaining != 0; remaining--) {
-        unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-        CMapAnimNodeTrackKey* next = key->keys + nextIndex;
-        unsigned int endFrame;
-
-        if (nextIndex == 0) {
-            endFrame = next->frame + loopFrameCountUnsigned;
-        } else {
-            endFrame = next->frame;
-        }
-
-        unsigned int currentFrame = current->frame;
-        if ((currentFrame <= frameInLoopUnsigned) && ((int)frameInLoopUnsigned < (int)endFrame)) {
-            unsigned int frameRange = endFrame - currentFrame;
-            float t;
-            Vec nextScaled;
-            Vec currentScaled;
-
-            if (frameRange == 0) {
-                t = 0.0f;
-            } else {
-                t = static_cast<float>(frameInLoopUnsigned - currentFrame) / static_cast<float>(frameRange);
-            }
-
-            PSVECScale(&current->value, &currentScaled, t);
-            PSVECScale(&next->value, &nextScaled, 1.0f - t);
-            PSVECAdd(&currentScaled, &nextScaled, out);
-            break;
-        }
-
-        current++;
-        i++;
-    }
 }
 
 /*

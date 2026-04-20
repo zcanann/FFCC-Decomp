@@ -282,7 +282,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
     VBreathModel*, PBreathModel* pBreathModel, _PARTICLE_DATA* particleData, VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
-    unsigned char* particle = (unsigned char*)particleData;
+    Vec* particle = reinterpret_cast<Vec*>(particleData);
     unsigned int alpha = vColor->m_alpha;
     char frameCount;
     Vec step;
@@ -302,63 +302,63 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
         }
     }
 
-    *(float*)(particle + 0x58) += *(float*)(particle + 0x5C);
+    particle[7].y += particle[7].z;
     if ((*(unsigned char*)(breath + 0xC1) & 0x10) == 0) {
-        *(float*)(particle + 0x5C) += *(float*)(breath + 0x98);
+        particle[7].z += *(float*)(breath + 0x98);
     } else {
-        *(float*)(particle + 0x5C) += *(float*)(breath + 0x98) + *(float*)(particle + 0x60);
+        particle[7].z = particle[7].z + *(float*)(breath + 0x98) + particle[8].x;
     }
 
-    while (*(float*)(particle + 0x58) >= 6.2831855f) {
-        *(float*)(particle + 0x58) -= 6.2831855f;
+    while (particle[7].y >= 6.2831855f) {
+        particle[7].y -= 6.2831855f;
     }
-    while (*(float*)(particle + 0x58) < 0.0f) {
-        *(float*)(particle + 0x58) += 6.2831855f;
+    while (particle[7].y < 0.0f) {
+        particle[7].y += 6.2831855f;
     }
 
-    *(float*)(particle + 0x64) += *(float*)(particle + 0x70);
-    *(float*)(particle + 0x68) += *(float*)(particle + 0x74);
-    *(float*)(particle + 0x6C) += *(float*)(particle + 0x78);
+    particle[8].y += particle[9].y;
+    particle[8].z += particle[9].z;
+    particle[9].x += particle[10].x;
 
     if ((*(unsigned char*)(breath + 0xC0) & 0x10) == 0) {
-        *(float*)(particle + 0x70) += *(float*)(breath + 0x70);
-        *(float*)(particle + 0x74) += *(float*)(breath + 0x74);
-        *(float*)(particle + 0x78) += *(float*)(breath + 0x78);
+        particle[9].y += *(float*)(breath + 0x70);
+        particle[9].z += *(float*)(breath + 0x74);
+        particle[10].x += *(float*)(breath + 0x78);
     } else {
-        *(float*)(particle + 0x70) += *(float*)(breath + 0x70) + *(float*)(particle + 0x7C);
-        *(float*)(particle + 0x74) += *(float*)(breath + 0x74) + *(float*)(particle + 0x80);
-        *(float*)(particle + 0x78) += *(float*)(breath + 0x78) + *(float*)(particle + 0x84);
+        particle[9].y = particle[9].y + *(float*)(breath + 0x70) + particle[10].y;
+        particle[9].z = particle[9].z + *(float*)(breath + 0x74) + particle[10].z;
+        particle[10].x = particle[10].x + *(float*)(breath + 0x78) + particle[11].x;
     }
 
-    *(float*)(particle + 0x8C) += *(float*)(breath + 0xA4);
+    particle[11].z += *(float*)(breath + 0xA4);
     if (*(char*)(breath + 0xC8) == '\0') {
         float start = *(float*)(breath + 0xA0);
         float delta = *(float*)(breath + 0xA4);
         if ((start > 0.0f) && (delta < 0.0f)) {
-            if (*(float*)(particle + 0x8C) < 0.0f) {
-                *(float*)(particle + 0x8C) = 0.0f;
+            if (particle[11].z < 0.0f) {
+                particle[11].z = 0.0f;
             }
-        } else if ((start < 0.0f) && (0.0f < delta) && (0.0f < *(float*)(particle + 0x8C))) {
-            *(float*)(particle + 0x8C) = 0.0f;
+        } else if ((start < 0.0f) && (0.0f < delta) && (0.0f < particle[11].z)) {
+            particle[11].z = 0.0f;
         }
     }
 
-    PSVECScale((Vec*)(particle + 0x3C), &step, *(float*)(particle + 0x8C));
-    PSVECAdd(&step, (Vec*)(particle + 0x30), (Vec*)(particle + 0x30));
+    PSVECScale(&particle[5], &step, particle[11].z);
+    PSVECAdd(&step, &particle[4], &particle[4]);
 
     if (*(short*)(breath + 0x20) != 0) {
-        *(short*)(particle + 0x50) -= 1;
+        *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
     }
-    *(unsigned char*)(particle + 0x90) += 1;
+    *(char*)&particle[12].x = *(char*)&particle[12].x + 1;
 
-    frameCount = *(char*)(particle + 0x54);
-    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)(particle + 0x90) <= (int)frameCount)) {
-        *(float*)(particle + 0x88) -= (float)alpha / (float)(unsigned int)(unsigned char)frameCount;
+    frameCount = *(char*)&particle[7].x;
+    if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[12].x <= (int)frameCount)) {
+        *(float*)&particle[11].y -= (float)alpha / (float)(unsigned int)(unsigned char)frameCount;
     }
 
-    frameCount = *(char*)(particle + 0x55);
-    if ((frameCount != '\0') && ((int)*(short*)(particle + 0x50) <= (int)frameCount)) {
-        *(float*)(particle + 0x88) += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
+    frameCount = *(char*)((unsigned char*)&particle[7].x + 1);
+    if ((frameCount != '\0') && ((int)*(short*)&particle[6].z <= (int)frameCount)) {
+        *(float*)&particle[11].y += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x23);
     }
 }
 

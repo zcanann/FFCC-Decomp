@@ -59,13 +59,13 @@ static const char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[] = "%c%c%c%c%c%c%c%c%c%c";
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
 static const u32 s_debug_bar_color = 0x808080FF;
-static char s_scenegraph_step_none[] = "";
-static char s_scenegraph_step_x8[] = "x8";
-static char s_scenegraph_step_x0[] = "x0";
-static char s_scenegraph_step_x1_8[] = "x1/8";
-static char s_scenegraph_step_x1_4[] = "x1/4";
-static char s_scenegraph_step_x1_2[] = "x1/2";
-static char* s_scenegraph_step_labels[] = {
+static const char s_scenegraph_step_none[] = "";
+static const char s_scenegraph_step_x8[] = "x8";
+static const char s_scenegraph_step_x0[] = "x0";
+static const char s_scenegraph_step_x1_8[] = "x1/8";
+static const char s_scenegraph_step_x1_4[] = "x1/4";
+static const char s_scenegraph_step_x1_2[] = "x1/2";
+static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_none,
     s_scenegraph_step_x8,
     s_scenegraph_step_x0,
@@ -287,7 +287,7 @@ void CGraphicPcs::drawEnd()
 		Graphic.InitDebugString();
 
 		if (System.m_scenegraphStepMode != 0) {
-			Graphic.DrawDebugStringDirect(0x10, 0x10, s_scenegraph_step_labels[System.m_scenegraphStepMode], 0xC);
+			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
 		}
 
 		if (Pad._448_4_ != -1) {

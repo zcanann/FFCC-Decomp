@@ -8,7 +8,7 @@
 struct VertexApMtxEntry
 {
 	s16 vertexSetIndex;
-	u16 maxValue;
+	s16 maxValue;
 	u16* vertexIndices;
 };
 
@@ -156,7 +156,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		case 1:
 			while (count-- != 0) {
 				f32 randValue = Math.RandF();
-				f32 maxValue = (f32)(u16)entry->maxValue;
+				f32 maxValue = (f32)entry->maxValue;
 				int outValue = (int)(randValue * maxValue);
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];

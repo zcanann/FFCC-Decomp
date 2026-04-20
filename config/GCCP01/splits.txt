@@ -72,6 +72,7 @@ memory.cpp:
 	.data       start:0x801E8488 end:0x801E84A8
 	.bss        start:0x8023C888 end:0x80244028
 	.sbss       start:0x8032EC58 end:0x8032EC60
+	.sdata2     start:0x8032F7D8 end:0x8032F7E8
 
 p_sample.cpp:
 	extab       start:0x80005BDC end:0x80005BE4
@@ -91,6 +92,7 @@ p_usb.cpp:
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E838 end:0x8032E840
 	.sbss       start:0x8032EC68 end:0x8032EC70
+	.sdata2     start:0x8032F810 end:0x8032F818
 
 pad.cpp:
 	extab       start:0x80005C2C end:0x80005C44
@@ -99,6 +101,7 @@ pad.cpp:
 	.ctors      start:0x801D53C0 end:0x801D53C4
 	.data       start:0x801E8818 end:0x801E8838
 	.bss        start:0x80244140 end:0x8024433C
+	.sdata2     start:0x8032F818 end:0x8032F840
 
 stopwatch.cpp:
 	extab       start:0x80005C44 end:0x80005CA0
@@ -286,6 +289,7 @@ ME_USB_process.cpp:
 	extab       start:0x80006AC4 end:0x80006AD4
 	extabindex  start:0x8000C730 end:0x8000C748
 	.text       start:0x8004CA08 end:0x8004DCE8
+	.rodata     start:0x801D7D78 end:0x801D7DA8
 	.data       start:0x801EA668 end:0x801EA778
 
 ME_AppRequest.cpp:
@@ -314,6 +318,7 @@ FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8
 	extabindex  start:0x8000C838 end:0x8000C844
 	.text       start:0x8004EB4C end:0x8004F910
+	.rodata     start:0x801D7E80 end:0x801D7E98
 	.data       start:0x801EA960 end:0x801EA994
 
 maptexanim.cpp:
@@ -761,6 +766,7 @@ cflat_runtime.cpp:
 	extab       start:0x80007248 end:0x80007310
 	extabindex  start:0x8000D21C end:0x8000D2F4
 	.text       start:0x80065CAC end:0x80069B08
+	.rodata     start:0x801D8EF8 end:0x801D8F10
 	.data       start:0x801FC9F0 end:0x801FCAE4
 
 cflat_runtime2.cpp:
@@ -768,6 +774,7 @@ cflat_runtime2.cpp:
 	extabindex  start:0x8000D2F4 end:0x8000D4C8
 	.text       start:0x80069B08 end:0x8006EB04
 	.ctors      start:0x801D540C end:0x801D5410
+	.rodata     start:0x801D8FA0 end:0x801D8FC4
 	.data       start:0x801FCAE4 end:0x801FCB7C
 	.bss        start:0x80299F40 end:0x802E79A0
 	.sbss       start:0x8032ED98 end:0x8032EDA0
@@ -869,6 +876,7 @@ pppYmMegaBirthShpTail2.cpp:
 	.rodata     start:0x801D9C68 end:0x801D9C83
 	.data       start:0x801FD3D0 end:0x801FD3F8
 	.bss        start:0x802EA110 end:0x802EA140
+	.sdata2     start:0x80330560 end:0x80330578
 
 pppYmMegaBirthShpTail3.cpp:
 	extab       start:0x80007AB0 end:0x80007AE0
@@ -1194,6 +1202,7 @@ pppLocationTitle.cpp:
 	extab       start:0x80008BCC end:0x80008BE4
 	extabindex  start:0x8000F67C end:0x8000F6A0
 	.text       start:0x800D8C1C end:0x800D92FC
+	.rodata     start:0x801DB510 end:0x801DB528
 	.sdata2     start:0x80330EE0 end:0x80330EF0
 
 wind.cpp:
@@ -1853,8 +1862,7 @@ dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0
 	.bss        start:0x8030C950 end:0x8030CA20
 	.sdata      start:0x8032EAD0 end:0x8032EAD4
-	.sbss       start:0x8032F018 end:0x8032F044
-	.sbss       start:0x8032F048 end:0x8032F060
+	.sbss       start:0x8032F018 end:0x8032F060
 
 dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
@@ -1896,8 +1904,7 @@ vi/vi.c:
 	.data       start:0x802177E0 end:0x80217BB0
 	.bss        start:0x8030CB48 end:0x8030CC90
 	.sdata      start:0x8032EB08 end:0x8032EB11
-	.sbss       start:0x8032F0E0 end:0x8032F114
-	.sbss       start:0x8032F118 end:0x8032F134
+	.sbss       start:0x8032F0E0 end:0x8032F138
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC

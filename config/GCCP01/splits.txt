@@ -182,6 +182,7 @@ map.cpp:
 	.ctors      start:0x801D53D8 end:0x801D53DC
 	.data       start:0x801E896C end:0x801E89B4
 	.bss        start:0x80245758 end:0x802685E0
+	.sbss       start:0x8032EC88 end:0x8032EC89
 	.sdata2     start:0x8032F984 end:0x8032FA00
 
 p_map.cpp:
@@ -1280,6 +1281,7 @@ pppBreathModel.cpp:
 	extabindex  start:0x8000F730 end:0x8000F784
 	.text       start:0x800DB094 end:0x800DC9A0
 	.rodata     start:0x801DB5A0 end:0x801DB5B8
+	.sdata2     start:0x8032F6E8 end:0x8032F710
 
 pppCrystal.cpp:
 	extab       start:0x80008C7C end:0x80008C94
@@ -1383,6 +1385,7 @@ THPSimple.cpp:
 	.bss        start:0x802FFA80 end:0x80300134
 	.sdata      start:0x8032E8C0 end:0x8032E8C4
 	.sbss       start:0x8032EE48 end:0x8032EE60
+	.sdata2     start:0x8032F710 end:0x8032F714
 
 THPDraw.cpp:
 	extab       start:0x80009114 end:0x8000912C
@@ -1486,12 +1489,14 @@ p_minigame.cpp:
 	.data       start:0x802121A8 end:0x80212398
 	.bss        start:0x803065AC end:0x80306708
 	.sbss       start:0x8032ED88 end:0x8032ED8C
+	.sdata2     start:0x8032F714 end:0x8032F718
 
 pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
 	extabindex  start:0x800107EC end:0x80010804
 	.text       start:0x8012B24C end:0x8012B4A8
 	.rodata     start:0x801DD418 end:0x801DD428
+	.sdata2     start:0x8032F798 end:0x8032F7A0
 
 pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784
@@ -1567,6 +1572,7 @@ pppCharaBreak.cpp:
 	extabindex  start:0x80010DBC end:0x80010E10
 	.text       start:0x8013F9D0 end:0x80141204
 	.rodata     start:0x801DD690 end:0x801DD6A8
+	.sdata2     start:0x8032F7A0 end:0x8032F7B0
 
 pppCallBackDistance.cpp:
 	extab       start:0x80009B84 end:0x80009B94

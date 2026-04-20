@@ -103,8 +103,8 @@ private:
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;

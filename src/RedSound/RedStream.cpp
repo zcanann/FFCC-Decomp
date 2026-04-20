@@ -31,13 +31,14 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
 RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = p_Stream;
+	RedStreamDATA* streamEnd = p_Stream + 4;
 
-	do {
+	while (streamData < streamEnd) {
 		if (streamData->m_streamId == 0) {
 			return streamData;
 		}
 		streamData++;
-	} while (streamData < p_Stream + 4);
+	}
 
 	return 0;
 }
@@ -270,16 +271,15 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
  */
 void StreamStop(int param_1)
 {
-	unsigned int streamData;
+	RedStreamDATA* streamData = p_Stream;
+	RedStreamDATA* streamEnd = p_Stream + 4;
 
-	streamData = (unsigned int)p_Stream;
-	do {
-		volatile int* streamID = (int*)(streamData + 0x10c);
-		if ((*streamID != 0) && ((param_1 == -1) || (param_1 == *streamID))) {
-			_StreamStop((RedStreamDATA*)streamData);
+	while (streamData < streamEnd) {
+		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
+			_StreamStop(streamData);
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4c0);
+		streamData++;
+	}
 }
 
 /*
@@ -425,7 +425,8 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 {
 	int stepCount;
 	unsigned int volume;
-	unsigned int streamData;
+	RedStreamDATA* streamData;
+	RedStreamDATA* streamEnd;
 
 	if (param_3 < 1) {
 		stepCount = 1;
@@ -438,20 +439,20 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 		volume = ((volume + 1) * 0x100 - 1) * 0x1000 | 0x800;
 	}
 
-	streamData = (unsigned int)p_Stream;
-	do {
-		if ((*(int*)(streamData + 0x10c) != 0) &&
-		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
+	streamData = p_Stream;
+	streamEnd = p_Stream + 4;
+	while (streamData < streamEnd) {
+		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
 			if (stepCount > 0) {
-				*(int*)(streamData + 0xf4) = (int)(volume - *(int*)(streamData + 0xf0)) / stepCount;
-				*(int*)(streamData + 0xf8) = stepCount;
+				*(int*)((u8*)streamData + 0xf4) = (int)(volume - *(int*)((u8*)streamData + 0xf0)) / stepCount;
+				*(int*)((u8*)streamData + 0xf8) = stepCount;
 			} else {
-				*(unsigned int*)(streamData + 0xf0) = volume;
-				*(int*)(streamData + 0xf8) = 0;
+				*(unsigned int*)((u8*)streamData + 0xf0) = volume;
+				*(int*)((u8*)streamData + 0xf8) = 0;
 			}
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4c0);
+		streamData++;
+	}
 }
 
 /*
@@ -465,9 +466,10 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
  */
 void StreamPause(int param_1, int param_2)
 {
-	unsigned int streamData;
+	RedStreamDATA* streamData;
+	RedStreamDATA* streamEnd;
 
-	streamData = (unsigned int)p_Stream;
+	streamData = p_Stream;
 	if (gRedMemoryDebugEnabled != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
@@ -475,24 +477,24 @@ void StreamPause(int param_1, int param_2)
 			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
 		}
 		fflush(__files + 1);
-		streamData = (unsigned int)p_Stream;
+		streamData = p_Stream;
 	}
-	do {
-		if ((*(int*)(streamData + 0x10c) != 0) &&
-		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
-			unsigned int voiceData = *(unsigned int*)(streamData + 4);
+	streamEnd = p_Stream + 4;
+	while (streamData < streamEnd) {
+		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
+			unsigned int voiceData = (unsigned int)streamData->m_voiceData;
 			if (param_2 == 1) {
 				if (*(void**)(voiceData + 0x14) != 0) {
 					*(int*)(voiceData + 0x9c) = 0;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
-					if (*(short*)(streamData + 0x2a) == 2) {
+					if (streamData->m_channelCount == 2) {
 						*(int*)(voiceData + 0x15c) = 0;
 						*(unsigned int*)(voiceData + 0x150) |= 0x10;
 					}
 				}
 			} else if (*(void**)(voiceData + 0x14) != 0) {
-				unsigned int pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)(streamData + 0x24), 0);
-				if (*(short*)(streamData + 0x2a) == 2) {
+				unsigned int pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
+				if (streamData->m_channelCount == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 					*(int*)(voiceData + 0x15c) = pitch;
@@ -503,8 +505,8 @@ void StreamPause(int param_1, int param_2)
 				}
 			}
 		}
-		streamData += 0x130;
-	} while (streamData < (unsigned int)p_Stream + 0x4c0);
+		streamData++;
+	}
 }
 
 /*

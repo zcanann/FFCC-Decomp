@@ -99,21 +99,14 @@ extern const char DAT_8032f698[];
 extern const char DAT_8032f6a0;
 extern const char DAT_8032f6a4;
 extern const char DAT_8032f6ac;
+extern const char lbl_8032F6B4[];
+extern const char s_dvd_pctscft_param_cfd_801D6054[];
+extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
+extern const char s_dvd_pctscft_mail_tbl_cfd_801D6080[];
+extern const char s_dvd_pctscft_newbattle_cfd_801D6098[];
+extern const char s_GameDebug_801D6284[];
 extern const s16 DAT_8032e3d0[];
-const char* s_localLangDirs[] = {
-    "jp/",
-    "uk/",
-    "gr/",
-    "it/",
-    "fr/",
-    "sp/",
-};
-const char* PTR_s_dvd__scft_param_cfd_801e8344[] = {
-    "dvd/%scft/param.cfd",
-    "dvd/%scft/c_system.cfd",
-    "dvd/%scft/mail_tbl.cfd",
-    "dvd/%scft/newbattle.cfd",
-};
+extern const char* s_localLangDirs[];
 int sprintf(char*, const char*, ...);
 int rand(void);
 void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);
@@ -137,12 +130,16 @@ const float FLOAT_8032f690 = 0.0;
 const float FLOAT_8032f694 = 0.001;
 static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
 float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
-static const char s_numNameFmt[] = "%d%s";
+const char* PTR_s_dvd__scft_param_cfd[] = {
+    s_dvd_pctscft_param_cfd_801D6054,
+    s_dvd_pctscft_c_system_cfd_801D6068,
+    s_dvd_pctscft_mail_tbl_cfd_801D6080,
+    s_dvd_pctscft_newbattle_cfd_801D6098,
+};
+static const char s_numNameFmt[] = "%d %s";
 static const char s_nameJoinFmt[] = "%s%s%s";
 static const char s_nameSep[] = " ";
 static const char s_nameNoSep[] = "";
-static const char s_mainStageName[] = "game_main";
-static const char s_debugStageName[] = "game_debug";
 
 struct CFlatDataTableEntryView
 {
@@ -266,9 +263,9 @@ void CGame::Init()
     Init__6CMcPcsFv(GetMcPcsSingleton());
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
 
-    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_mainStageName), 0);
+    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(lbl_8032F6B4), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
-        m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(s_debugStageName), 1);
+        m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(s_GameDebug_801D6284), 1);
     }
 
     m_sceneId = 4;
@@ -454,9 +451,6 @@ void CGame::Exec()
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
 }
 
-static const char s_defaultTownName[] = "Tipa";
-static const char s_italianTownName[] = "TipaItalia";
-
 /*
  * --INFO--
  * PAL Address: 0x80015610
@@ -483,7 +477,7 @@ void CGame::Create()
     m_gameWork.m_scriptSysVal2 = 0;
     m_gameWork.m_scriptSysVal3 = 1;
     m_gameWork.m_chaliceElement = 1;
-    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? s_italianTownName : s_defaultTownName);
+    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
 
     m_gameWork.m_gameInitFlag = 1;
 
@@ -899,7 +893,7 @@ void CGame::loadCfd()
         localLangDirs[4] = s_localLangDirs[4];
         localLangDirs[5] = s_localLangDirs[5];
 
-        sprintf(path, PTR_s_dvd__scft_param_cfd_801e8344[i], localLangDirs[m_gameWork.m_languageId]);
+        sprintf(path, PTR_s_dvd__scft_param_cfd[i], localLangDirs[m_gameWork.m_languageId]);
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 
         if (handle != nullptr)

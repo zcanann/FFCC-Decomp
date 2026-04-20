@@ -145,226 +145,243 @@ void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 
 /*
  * --INFO--
- * PAL Address: 0x8012e258
- * PAL Size: 900b
+ * PAL Address: 0x8012d458
+ * PAL Size: 168b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
+void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, pppScreenBreakUnkC* param_3)
 {
-    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
-    float* pieceData = *(float**)((u8*)param_2 + 0xC);
-    float zero = 0.0f;
-    Quaternion meshQuat;
-    Quaternion resultQuat;
-    Quaternion axisQuat;
-    Vec axis;
-    Vec gravityAdd;
-    Vec basis = { 0.0f, 1.0f, 0.0f };
-    Vec cameraOffset;
-    Vec screenOffset;
-    Vec invTransOffset;
-    Vec4d clipOutput;
-    Vec4d clipInput;
-    Vec cameraPos;
-    Vec cameraForward;
-    Vec translation;
-    Mtx invTransMtx;
-    Mtx transMtx;
-    Mtx quatMtx;
-    Mtx meshMtx;
-    Mtx44 screenMtx;
-    Mtx invCameraMtx;
-    Mtx cameraMtx;
-    ScreenBreakMeshRef* mesh;
+    s32 dataOffset = param_3->m_serializedDataOffsets[2];
+    u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, const_cast<char*>(s_f999_root_801dd4c8));
 
-    cameraForward.x = CameraPcs._236_4_;
-    cameraForward.y = CameraPcs._240_4_;
-    cameraForward.z = CameraPcs._244_4_;
-    cameraPos.x = CameraPcs._224_4_;
-    cameraPos.y = CameraPcs._228_4_;
-    cameraPos.z = CameraPcs._232_4_;
+    if (value[0x24] == 0) {
+        Graphic.GetBackBufferRect2(
+            Graphic.m_savedFrameBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
+        value[0x24] = 1;
+    }
+}
 
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-
-    PSVECCrossProduct(&cameraForward, &basis, &cameraOffset);
-    PSVECNormalize(&cameraOffset, &cameraOffset);
-
-    screenOffset.x = *(float*)((u8*)param_2 + 0x18) * cameraOffset.x + cameraPos.x;
-    screenOffset.y = cameraPos.y;
-    screenOffset.z = *(float*)((u8*)param_2 + 0x18) * cameraOffset.z + cameraPos.z;
-
-    PSMTXMultVec(cameraMtx, &screenOffset, (Vec*)&clipInput);
-    clipInput.w = 1.0f;
-    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &clipInput, &clipOutput);
-
-    translation.x = clipOutput.x * cameraForward.x;
-    translation.y = clipOutput.x * cameraForward.y;
-    translation.z = clipOutput.x * cameraForward.z;
-    PSVECAdd(&cameraPos, &translation, &translation);
-
-    PSMTXInverse(cameraMtx, invCameraMtx);
-    PSMTXConcat(invCameraMtx, modelView->m_drawMtx, modelView->m_drawMtx);
-    modelView->m_drawMtx[0][3] = translation.x;
-    modelView->m_drawMtx[1][3] = translation.y;
-    modelView->m_drawMtx[2][3] = translation.z;
-
-    mesh = modelView->m_meshes;
-    if (*(float*)((u8*)param_3 + 0x30) != zero) {
-        PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
+/*
+ * --INFO--
+ * PAL Address: 0x8012d500
+ * PAL Size: 880b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
+{
+    if (gPppCalcDisabled != 0) {
+        return;
     }
 
-    for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
-        if (*((char*)pieceData + 0x38) != '\0') {
-            u8* nodeMtx = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0) + 0x14;
+    if (GraphicScreenBreakBlurEnabled() != 0) {
+        SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
+    }
 
-            *(float*)(nodeMtx + 0xC) = zero;
-            *(float*)(nodeMtx + 0x1C) = zero;
-            *(float*)(nodeMtx + 0x2C) = zero;
+    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
+    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(float**)(model + 0xE4) = value;
+    *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
 
-            PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
-            PSMTXIdentity(transMtx);
-            transMtx[0][3] = pieceData[9];
-            transMtx[1][3] = pieceData[10];
-            transMtx[2][3] = pieceData[11];
-            PSMTXInverse(transMtx, invTransMtx);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-            axis.x = pieceData[6];
-            axis.y = pieceData[7];
-            axis.z = pieceData[8];
-            C_QUATRotAxisRad(&axisQuat, &axis, pieceData[0xD]);
-            PSMTXQuat(quatMtx, &axisQuat);
-            C_QUATMtx(&meshQuat, meshMtx);
-            PSQUATMultiply(&axisQuat, &meshQuat, &resultQuat);
-            PSMTXQuat(quatMtx, &resultQuat);
-            PSMTXConcat(quatMtx, transMtx, (float(*)[4])nodeMtx);
+    u8* color = (u8*)(value + 10);
+    color[0] = colorSource[8];
+    color[1] = colorSource[9];
+    color[2] = colorSource[10];
+    color[3] = colorSource[11];
+    DCFlushRange(value + 10, 4);
 
-            pieceData[3] -= pieceData[0];
-            pieceData[4] = pieceData[1] * pieceData[0xC] - 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
-            pieceData[5] -= pieceData[2];
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
+                                                 param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
-            if (*(float*)((u8*)param_3 + 0x30) != zero) {
-                pieceData[3] += gravityAdd.x;
-                pieceData[5] += gravityAdd.z;
+    void* pieceStorage = *(void**)&value[3];
+    if (pieceStorage == NULL) {
+        pieceStorage = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
+                                                             const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
+        *(void**)&value[3] = pieceStorage;
+        *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
+                                                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
+        InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
+        PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
+    }
+
+    float sx = FLOAT_80331cc0 * value[6];
+    float sy = FLOAT_80331cc0 * value[7];
+    u8* piece = (u8*)*(void**)&value[3];
+    for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
+        switch (param_2->m_initWOrk) {
+        case 0:
+            piece[0x38] = 1;
+            break;
+        case 1:
+            if (-*(float*)(piece + 0x28) < (*value * sy) - value[7]) {
+                piece[0x38] = 1;
             }
-
-            pieceData[0xC] += 1.0f;
-
-            invTransOffset.x = invTransMtx[0][3];
-            invTransOffset.y = invTransMtx[1][3];
-            invTransOffset.z = invTransMtx[2][3];
-            PSVECAdd((Vec*)(pieceData + 3), &invTransOffset, &invTransOffset);
-            invTransMtx[0][3] = invTransOffset.x;
-            invTransMtx[1][3] = invTransOffset.y;
-            invTransMtx[2][3] = invTransOffset.z;
-            PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
+            break;
+        case 2:
+            float pieceY = *(float*)(piece + 0x28);
+            if (-pieceY > value[7] - (*value * sy)) {
+                piece[0x38] = 1;
+            }
+            break;
+        case 3:
+            if (-*(float*)(piece + 0x24) < (*value * sx) + -value[6]) {
+                piece[0x38] = 1;
+            }
+            break;
+        case 4:
+            float pieceX = *(float*)(piece + 0x24);
+            if (-pieceX > value[6] - (*value * sx)) {
+                piece[0x38] = 1;
+            }
+            break;
+        case 5: {
+            sx = value[6];
+            sy = value[7];
+            float x = *value * sx;
+            float y = *value * sy;
+            float pieceX = *(float*)(piece + 0x24);
+            if ((x >= pieceX) && (-pieceX <= x) &&
+                (y >= *(float*)(piece + 0x28)) && (-*(float*)(piece + 0x28) <= y)) {
+                piece[0x38] = 1;
+            }
+            break;
         }
-
-        mesh++;
-        pieceData += 0xF;
+        case 6: {
+            sx = value[6];
+            float x = *value * sx;
+            sy = value[7];
+            float y = *value * sy;
+            if ((-*(float*)(piece + 0x24) >= sx - x) || (-*(float*)(piece + 0x24) <= -sx + x) ||
+                (-*(float*)(piece + 0x28) >= sy - y) || (-*(float*)(piece + 0x28) <= -sy + y)) {
+                piece[0x38] = 1;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        piece += 0x3C;
     }
 
-    return 1;
+    pppSetFpMatrix(pppMngStPtr);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012e130
- * PAL Size: 296b
+ * PAL Address: 0x8012d870
+ * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
+void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
-    GXColor colorStorage;
-    Vec lightDir;
-    GXLightObj lightObj;
-    u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float cameraOffset = FLOAT_80331ce8;
-    const float zero = 0.0f;
-
-    lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
-    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
-    lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
-    PSVECNormalize(&lightDir, &lightDir);
-
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, FLOAT_80331cd0, zero);
-    GXInitLightAttn(&lightObj, zero, zero, FLOAT_80331cd0, FLOAT_80331cec, zero, FLOAT_80331cf0);
-
-    GXInitLightColor(&lightObj,
-                     *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));
-    GXLoadLightObjImm(&lightObj, (GXLightID)1);
-    GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
-    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+    s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+    s32 dataOffset = serializedDataOffsets[2];
+    u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    u8* model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    if (model != 0) {
+        *(void**)(model + 0xF0) = NULL;
+        *(void**)(model + 0xFC) = NULL;
+        *(void**)(model + 0xF4) = NULL;
+        *(void**)(model + 0xE4) = NULL;
+        *(void**)(model + 0xE8) = NULL;
+        *(void**)(model + 0xEC) = NULL;
+    }
+    if (*(void**)(pppData + 0xC) != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(pppData + 0xC));
+        *(void**)(pppData + 0xC) = NULL;
+    }
+    if (*(void**)(pppData + 0x10) != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(pppData + 0x10));
+        *(void**)(pppData + 0x10) = NULL;
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012de28
- * PAL Size: 776b
+ * PAL Address: 0x8012d90c
+ * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
+void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
-    u8* work = (u8*)param_2;
-    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
-    ScreenBreakMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
-    ScreenBreakDisplayList* displayList = meshData->m_displayLists;
+    s32 dataOffset = param_2->m_serializedDataOffsets[2];
+    float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
+    float f = 0.0f;
+    value[2] = 0.0f;
+    value[1] = f;
+    *value = f;
+}
 
-    displayList += drawListIndex;
+/*
+ * --INFO--
+ * PAL Address: 0x8012d930
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
+{
+    s32 dataOffset = param_2->m_serializedDataOffsets[2];
+    u8* pppData = (u8*)pppScreenBreak + dataOffset + 0x80;
+    float* value = (float*)pppData;
+    void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    float f = 0.0f;
+    *(u32*)((u8*)gObject + 0x60) |= 0x40;
+    *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
+    *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
+    *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
+    *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;
+    *(void**)(pppData + 0xC) = NULL;
+    *(void**)(pppData + 0x10) = NULL;
+    value[8] = f;
+    value[7] = f;
+    value[6] = f;
+    value[2] = f;
+    value[1] = f;
+    value[0] = f;
+    *(u8*)(value + 9) = 0;
+    *(u8*)(value + 10) = 0xFF;
+    *((u8*)value + 0x29) = 0xFF;
+    *((u8*)value + 0x2A) = 0xFF;
+    *((u8*)value + 0x2B) = 0xFF;
+}
 
-    if (work[0x24] != 0) {
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
-        unsigned char colorStorage0[4];
-        unsigned char colorStorage1[4];
-
-        MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
-        GXSetArray((GXAttr)0xB, work + 0x28, 4);
-
-        if (*(u16*)((u8*)material + 0x18) == 1) {
-            GXSetNumChans(1);
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            GXSetTevKColor((GXTevKColorID)0,
-                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0)));
-            GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
-            GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
-            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 10, 0xE, 10, 0xF);
-            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0xC, 0, 0, 1, 0);
-            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 4, 5, 7);
-            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 0, 4);
-            GXSetTevKColor((GXTevKColorID)1,
-                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage1, 0x60, 0x60, 0x60, work[0x2B])));
-            GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
-            GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
-            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 0xE, 0, 0xF);
-            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
-            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 4, 5, 7);
-            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
-
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0, 0, 4);
-            GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1D);
-            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xF, 0xC, 8, 0);
-            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
-            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 6);
-            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
-
-            GXSetNumTevStages(3);
-            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-            GXLoadTexObj((_GXTexObj*)*(void**)(work + 0x10), (GXTexMapID)0);
-        }
-
-        GXCallDisplayList(displayList->m_data, displayList->m_size);
-    }
+/*
+ * --INFO--
+ * PAL Address: 0x8012da00
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+{
+    GXSetZMode(GX_TRUE, (GXCompare)7, GX_TRUE);
 }
 
 /*
@@ -545,241 +562,224 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
 /*
  * --INFO--
- * PAL Address: 0x8012da00
- * PAL Size: 44b
+ * PAL Address: 0x8012de28
+ * PAL Size: 776b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
-    GXSetZMode(GX_TRUE, (GXCompare)7, GX_TRUE);
-}
+    u8* work = (u8*)param_2;
+    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
+    ScreenBreakMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    ScreenBreakDisplayList* displayList = meshData->m_displayLists;
 
-/*
- * --INFO--
- * PAL Address: 0x8012d930
- * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
-{
-    s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    u8* pppData = (u8*)pppScreenBreak + dataOffset + 0x80;
-    float* value = (float*)pppData;
-    void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    float f = 0.0f;
-    *(u32*)((u8*)gObject + 0x60) |= 0x40;
-    *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
-    *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
-    *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
-    *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;
-    *(void**)(pppData + 0xC) = NULL;
-    *(void**)(pppData + 0x10) = NULL;
-    value[8] = f;
-    value[7] = f;
-    value[6] = f;
-    value[2] = f;
-    value[1] = f;
-    value[0] = f;
-    *(u8*)(value + 9) = 0;
-    *(u8*)(value + 10) = 0xFF;
-    *((u8*)value + 0x29) = 0xFF;
-    *((u8*)value + 0x2A) = 0xFF;
-    *((u8*)value + 0x2B) = 0xFF;
-}
+    displayList += drawListIndex;
 
-/*
- * --INFO--
- * PAL Address: 0x8012d90c
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
-{
-    s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
-    float f = 0.0f;
-    value[2] = 0.0f;
-    value[1] = f;
-    *value = f;
-}
+    if (work[0x24] != 0) {
+        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)modelView->m_data->m_materialSet + 8))[displayList->m_material];
+        unsigned char colorStorage0[4];
+        unsigned char colorStorage1[4];
 
-/*
- * --INFO--
- * PAL Address: 0x8012d870
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
-{
-    s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
-    s32 dataOffset = serializedDataOffsets[2];
-    u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    u8* model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    if (model != 0) {
-        *(void**)(model + 0xF0) = NULL;
-        *(void**)(model + 0xFC) = NULL;
-        *(void**)(model + 0xF4) = NULL;
-        *(void**)(model + 0xE4) = NULL;
-        *(void**)(model + 0xE8) = NULL;
-        *(void**)(model + 0xEC) = NULL;
-    }
-    if (*(void**)(pppData + 0xC) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(pppData + 0xC));
-        *(void**)(pppData + 0xC) = NULL;
-    }
-    if (*(void**)(pppData + 0x10) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(pppData + 0x10));
-        *(void**)(pppData + 0x10) = NULL;
-    }
-}
+        MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
+        GXSetArray((GXAttr)0xB, work + 0x28, 4);
 
-/*
- * --INFO--
- * PAL Address: 0x8012d500
- * PAL Size: 880b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
-{
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
+        if (*(u16*)((u8*)material + 0x18) == 1) {
+            GXSetNumChans(1);
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+            GXSetTevKColor((GXTevKColorID)0,
+                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage0, 0xA0, 0xA0, 0xA0, 0xA0)));
+            GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xC);
+            GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1C);
+            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 10, 0xE, 10, 0xF);
+            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0xC, 0, 0, 1, 0);
+            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 4, 5, 7);
+            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
 
-    if (GraphicScreenBreakBlurEnabled() != 0) {
-        SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicsPcs, 0, 0, 0, 0, 0, 0, 0);
-    }
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 0, 4);
+            GXSetTevKColor((GXTevKColorID)1,
+                           *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage1, 0x60, 0x60, 0x60, work[0x2B])));
+            GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
+            GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
+            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 0xE, 0, 0xF);
+            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
+            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 4, 5, 7);
+            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
 
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
-    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(float**)(model + 0xE4) = value;
-    *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0, 0, 4);
+            GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1D);
+            _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xF, 0xC, 8, 0);
+            _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
+            _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 6);
+            _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
 
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-
-    u8* color = (u8*)(value + 10);
-    color[0] = colorSource[8];
-    color[1] = colorSource[9];
-    color[2] = colorSource[10];
-    color[3] = colorSource[11];
-    DCFlushRange(value + 10, 4);
-
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
-                                                 param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
-
-    void* pieceStorage = *(void**)&value[3];
-    if (pieceStorage == NULL) {
-        pieceStorage = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
-                                                             const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
-        *(void**)&value[3] = pieceStorage;
-        *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
-                                                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
-        InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
-        PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
-    }
-
-    float sx = FLOAT_80331cc0 * value[6];
-    float sy = FLOAT_80331cc0 * value[7];
-    u8* piece = (u8*)*(void**)&value[3];
-    for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
-        switch (param_2->m_initWOrk) {
-        case 0:
-            piece[0x38] = 1;
-            break;
-        case 1:
-            if (-*(float*)(piece + 0x28) < (*value * sy) - value[7]) {
-                piece[0x38] = 1;
-            }
-            break;
-        case 2:
-            float pieceY = *(float*)(piece + 0x28);
-            if (-pieceY > value[7] - (*value * sy)) {
-                piece[0x38] = 1;
-            }
-            break;
-        case 3:
-            if (-*(float*)(piece + 0x24) < (*value * sx) + -value[6]) {
-                piece[0x38] = 1;
-            }
-            break;
-        case 4:
-            float pieceX = *(float*)(piece + 0x24);
-            if (-pieceX > value[6] - (*value * sx)) {
-                piece[0x38] = 1;
-            }
-            break;
-        case 5: {
-            sx = value[6];
-            sy = value[7];
-            float x = *value * sx;
-            float y = *value * sy;
-            float pieceX = *(float*)(piece + 0x24);
-            if ((x >= pieceX) && (-pieceX <= x) &&
-                (y >= *(float*)(piece + 0x28)) && (-*(float*)(piece + 0x28) <= y)) {
-                piece[0x38] = 1;
-            }
-            break;
+            GXSetNumTevStages(3);
+            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+            GXLoadTexObj((_GXTexObj*)*(void**)(work + 0x10), (GXTexMapID)0);
         }
-        case 6: {
-            sx = value[6];
-            float x = *value * sx;
-            sy = value[7];
-            float y = *value * sy;
-            if ((-*(float*)(piece + 0x24) >= sx - x) || (-*(float*)(piece + 0x24) <= -sx + x) ||
-                (-*(float*)(piece + 0x28) >= sy - y) || (-*(float*)(piece + 0x28) <= -sy + y)) {
-                piece[0x38] = 1;
-            }
-            break;
-        }
-        default:
-            break;
-        }
-        piece += 0x3C;
-    }
 
-    pppSetFpMatrix(pppMngStPtr);
+        GXCallDisplayList(displayList->m_data, displayList->m_size);
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012d458
- * PAL Size: 168b
+ * PAL Address: 0x8012e130
+ * PAL Size: 296b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, pppScreenBreakUnkC* param_3)
+void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
-    s32 dataOffset = param_3->m_serializedDataOffsets[2];
-    u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, const_cast<char*>(s_f999_root_801dd4c8));
+    GXColor colorStorage;
+    Vec lightDir;
+    GXLightObj lightObj;
+    u8* camera = reinterpret_cast<u8*>(&CameraPcs);
+    const float cameraOffset = FLOAT_80331ce8;
+    const float zero = 0.0f;
 
-    if (value[0x24] == 0) {
-        Graphic.GetBackBufferRect2(
-            Graphic.m_savedFrameBuffer, *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0, 0, (_GXTexFilter)1, (_GXTexFmt)4, 0);
-        value[0x24] = 1;
+    lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
+    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
+    lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
+    PSVECNormalize(&lightDir, &lightDir);
+
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, FLOAT_80331cd0, zero);
+    GXInitLightAttn(&lightObj, zero, zero, FLOAT_80331cd0, FLOAT_80331cec, zero, FLOAT_80331cf0);
+
+    GXInitLightColor(&lightObj,
+                     *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));
+    GXLoadLightObjImm(&lightObj, (GXLightID)1);
+    GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012e258
+ * PAL Size: 900b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
+{
+    ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
+    float* pieceData = *(float**)((u8*)param_2 + 0xC);
+    float zero = 0.0f;
+    Quaternion meshQuat;
+    Quaternion resultQuat;
+    Quaternion axisQuat;
+    Vec axis;
+    Vec gravityAdd;
+    Vec basis = { 0.0f, 1.0f, 0.0f };
+    Vec cameraOffset;
+    Vec screenOffset;
+    Vec invTransOffset;
+    Vec4d clipOutput;
+    Vec4d clipInput;
+    Vec cameraPos;
+    Vec cameraForward;
+    Vec translation;
+    Mtx invTransMtx;
+    Mtx transMtx;
+    Mtx quatMtx;
+    Mtx meshMtx;
+    Mtx44 screenMtx;
+    Mtx invCameraMtx;
+    Mtx cameraMtx;
+    ScreenBreakMeshRef* mesh;
+
+    cameraForward.x = CameraPcs._236_4_;
+    cameraForward.y = CameraPcs._240_4_;
+    cameraForward.z = CameraPcs._244_4_;
+    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.y = CameraPcs._228_4_;
+    cameraPos.z = CameraPcs._232_4_;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+
+    PSVECCrossProduct(&cameraForward, &basis, &cameraOffset);
+    PSVECNormalize(&cameraOffset, &cameraOffset);
+
+    screenOffset.x = *(float*)((u8*)param_2 + 0x18) * cameraOffset.x + cameraPos.x;
+    screenOffset.y = cameraPos.y;
+    screenOffset.z = *(float*)((u8*)param_2 + 0x18) * cameraOffset.z + cameraPos.z;
+
+    PSMTXMultVec(cameraMtx, &screenOffset, (Vec*)&clipInput);
+    clipInput.w = 1.0f;
+    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &clipInput, &clipOutput);
+
+    translation.x = clipOutput.x * cameraForward.x;
+    translation.y = clipOutput.x * cameraForward.y;
+    translation.z = clipOutput.x * cameraForward.z;
+    PSVECAdd(&cameraPos, &translation, &translation);
+
+    PSMTXInverse(cameraMtx, invCameraMtx);
+    PSMTXConcat(invCameraMtx, modelView->m_drawMtx, modelView->m_drawMtx);
+    modelView->m_drawMtx[0][3] = translation.x;
+    modelView->m_drawMtx[1][3] = translation.y;
+    modelView->m_drawMtx[2][3] = translation.z;
+
+    mesh = modelView->m_meshes;
+    if (*(float*)((u8*)param_3 + 0x30) != zero) {
+        PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }
+
+    for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
+        if (*((char*)pieceData + 0x38) != '\0') {
+            u8* nodeMtx = modelView->m_nodes + (mesh->m_data->m_nodeIndex * 0xC0) + 0x14;
+
+            *(float*)(nodeMtx + 0xC) = zero;
+            *(float*)(nodeMtx + 0x1C) = zero;
+            *(float*)(nodeMtx + 0x2C) = zero;
+
+            PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
+            PSMTXIdentity(transMtx);
+            transMtx[0][3] = pieceData[9];
+            transMtx[1][3] = pieceData[10];
+            transMtx[2][3] = pieceData[11];
+            PSMTXInverse(transMtx, invTransMtx);
+
+            axis.x = pieceData[6];
+            axis.y = pieceData[7];
+            axis.z = pieceData[8];
+            C_QUATRotAxisRad(&axisQuat, &axis, pieceData[0xD]);
+            PSMTXQuat(quatMtx, &axisQuat);
+            C_QUATMtx(&meshQuat, meshMtx);
+            PSQUATMultiply(&axisQuat, &meshQuat, &resultQuat);
+            PSMTXQuat(quatMtx, &resultQuat);
+            PSMTXConcat(quatMtx, transMtx, (float(*)[4])nodeMtx);
+
+            pieceData[3] -= pieceData[0];
+            pieceData[4] = pieceData[1] * pieceData[0xC] - 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
+            pieceData[5] -= pieceData[2];
+
+            if (*(float*)((u8*)param_3 + 0x30) != zero) {
+                pieceData[3] += gravityAdd.x;
+                pieceData[5] += gravityAdd.z;
+            }
+
+            pieceData[0xC] += 1.0f;
+
+            invTransOffset.x = invTransMtx[0][3];
+            invTransOffset.y = invTransMtx[1][3];
+            invTransOffset.z = invTransMtx[2][3];
+            PSVECAdd((Vec*)(pieceData + 3), &invTransOffset, &invTransOffset);
+            invTransMtx[0][3] = invTransOffset.x;
+            invTransMtx[1][3] = invTransOffset.y;
+            invTransMtx[2][3] = invTransOffset.z;
+            PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
+        }
+
+        mesh++;
+        pieceData += 0xF;
+    }
+
+    return 1;
 }

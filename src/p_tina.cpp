@@ -31,7 +31,7 @@ extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
 }
-extern "C" char s_p_tina_cpp_801d8008[];
+static const char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
 extern "C" char s_tina_title_fmt_801d8014[];
 extern "C" char s_tina_calc_fmt_801d8020[];
 extern "C" char s_tina_draw_fmt_801d8038[];
@@ -96,8 +96,8 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 extern char DAT_801ead4c[];
 extern char DAT_801d81d4[];
 extern char s_p_tina_rodata_801d7ee0[];
-extern char s_CPartPcs_GAME_801D7F2C[];
-extern char s_CPartPcs_PART_VIEWER_801D7F3C[];
+static const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs_GAME";
+static const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs_PART_VIEWER";
 extern char s_CPartPcs_801d7f54[];
 extern char s_CPartPcs_dat_801d810c[];
 extern char s_CPartPcs_amem_801d811c[];
@@ -135,7 +135,7 @@ unsigned int m_table_desc16__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<uns
 unsigned int m_table_desc17__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
 unsigned int m_table_desc18__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
 unsigned int m_table__8CPartPcs[0x2B8 / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CPartPcs_GAME_801D7F2C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_GAME_801D7F2C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
     0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000038,
@@ -144,7 +144,7 @@ unsigned int m_table__8CPartPcs[0x2B8 / sizeof(unsigned int)] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    reinterpret_cast<unsigned int>(s_CPartPcs_PART_VIEWER_801D7F3C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
     0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E,
@@ -948,14 +948,14 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x308);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x308);
     OSStartStopwatch(&g_par_draw_prof);
     OSStartStopwatch(&g_par_calc_prof);
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
     OSStopStopwatch(&g_par_calc_prof);
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x30f);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x30f);
     OSStopStopwatch(&g_par_draw_prof);
     pppClearDrawEnv();
 }
@@ -971,14 +971,14 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x31a);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x31a);
     reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x322);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x322);
     reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }

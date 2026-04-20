@@ -1697,7 +1697,7 @@ wmm_str.cpp:
 	.text       start:0x8017AF14 end:0x8017B494
 	.data       start:0x80215BD8 end:0x8021645C
 	.data       start:0x8021645C end:0x80216758
-	.sdata2     start:0x803336A0 end:0x803336AC
+	.sdata2     start:0x803336D8 end:0x803336E0
 
 base/PPCArch.c:
 	.text       start:0x8017B494 end:0x8017B5A8

@@ -1492,44 +1492,45 @@ void CAmemCache::SetData(void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CAmemCacheSet::Init(char* sourceName, CMemory::CStage*, CMemory::CStage* stage, int cacheCount,
+void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CStage* stage, int cacheCount,
                          unsigned char (*releaseCheck)(unsigned long), unsigned long releaseCheckArg,
                          unsigned char (*releaseAction)(unsigned long), unsigned long releaseActionArg,
                          unsigned char (*overflowHook)(unsigned long), unsigned long overflowHookArg)
 {
     unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 
-    strcpy(reinterpret_cast<char*>(bytes + 8), sourceName);
+    strcpy(reinterpret_cast<char*>(bytes), sourceName);
 
-    *reinterpret_cast<unsigned long*>(bytes + 0x40) = releaseActionArg;
-    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x44) =
-        reinterpret_cast<ConstructorDestructor>(overflowHook);
-    *reinterpret_cast<unsigned long*>(bytes + 0x48) = releaseCheckArg;
-    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x4C) =
+    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x40) =
         reinterpret_cast<ConstructorDestructor>(releaseAction);
-    *reinterpret_cast<unsigned long*>(bytes + 0x50) = overflowHookArg;
-    *reinterpret_cast<CMemory::CStage**>(bytes + 0x00) = stage;
-    *reinterpret_cast<int*>(bytes + 0x24) = cacheCount;
+    *reinterpret_cast<unsigned long*>(bytes + 0x44) = releaseActionArg;
+    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x48) =
+        reinterpret_cast<ConstructorDestructor>(releaseCheck);
+    *reinterpret_cast<unsigned long*>(bytes + 0x4C) = releaseCheckArg;
+    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x50) =
+        reinterpret_cast<ConstructorDestructor>(overflowHook);
+    *reinterpret_cast<unsigned long*>(bytes + 0x54) = overflowHookArg;
+    *reinterpret_cast<CMemory::CStage**>(bytes + 0x20) = rStage;
+    *reinterpret_cast<CMemory::CStage**>(bytes + 0x24) = stage;
 
-    if (cacheCount == 0) {
-        *reinterpret_cast<ConstructorDestructor*>(bytes + 0x3C) = 0;
+    if (stage == nullptr) {
+        *reinterpret_cast<int*>(bytes + 0x3C) = 0;
         *reinterpret_cast<unsigned long*>(bytes + 0x30) = 0;
         *reinterpret_cast<unsigned long*>(bytes + 0x28) = 0;
         *reinterpret_cast<unsigned long*>(bytes + 0x2C) = 0;
         *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
-        *reinterpret_cast<ConstructorDestructor*>(bytes + 0x58) = 0;
+        *reinterpret_cast<void**>(bytes + 0x58) = 0;
     } else {
-        *reinterpret_cast<ConstructorDestructor*>(bytes + 0x3C) =
-            reinterpret_cast<ConstructorDestructor>(releaseCheck);
-        unsigned long start = *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(cacheCount) + 8);
+        *reinterpret_cast<int*>(bytes + 0x3C) = cacheCount;
+        unsigned long start = *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(stage) + 8);
         *reinterpret_cast<unsigned long*>(bytes + 0x28) = start;
         *reinterpret_cast<unsigned long*>(bytes + 0x30) = start;
         *reinterpret_cast<unsigned long*>(bytes + 0x2C) =
-            *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(cacheCount) + 0x0C);
+            *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(stage) + 0x0C);
         *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
 
         int count = *reinterpret_cast<int*>(bytes + 0x3C);
-        void* block = stage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp), 0x787, 0);
+        void* block = rStage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp), 0x787, 0);
         void* table = __construct_new_array(
             block, reinterpret_cast<ConstructorDestructor>(__ct__10CAmemCacheFv),
             reinterpret_cast<ConstructorDestructor>(__dt__10CAmemCacheFv), 0x1C, count);

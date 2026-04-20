@@ -689,13 +689,16 @@ int CRedEntry::GetWaveBank(int waveNo)
  */
 int CRedEntry::SearchWaveBase(int waveNo)
 {
-	int* waveBank = (int*)*(int*)this;
+	int* waveBase = (int*)*(int*)this;
+	int* waveBank = waveBase;
+	int* waveBankEnd = waveBase + 0x100;
+
 	do {
 		if (waveNo == *waveBank) {
 			return waveBank[2];
 		}
 		waveBank += 4;
-	} while (waveBank < (int*)(*(int*)this + 0x400));
+	} while (waveBank < waveBankEnd);
 
 	return 0;
 }

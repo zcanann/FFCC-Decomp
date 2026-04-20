@@ -11,6 +11,7 @@
 #include "ffcc/file.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
@@ -534,7 +535,8 @@ void CGraphic::Thread()
                     } else if (drawSyncPart == 0x7FFE) {
                         System.Printf(DAT_801d63c0, PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else {
-                        System.Printf(DAT_801d6400, PtrAt(this, 0x7368), S32At(this, 0x736C), sGraphicUnknownOrderName);
+                        System.Printf(DAT_801d6400, PtrAt(this, 0x7368), S32At(this, 0x736C),
+                                      pppGetSysProgTable()[drawSyncPart].m_pppName);
                     }
                 }
 

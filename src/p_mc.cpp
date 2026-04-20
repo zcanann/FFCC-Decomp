@@ -11,9 +11,6 @@ extern char lbl_80331B10[];
 extern char lbl_8032E9D0[];
 extern char lbl_8032E9D8[];
 
-unsigned int m_table_desc0__6CMcPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__6CMcPcsFv)};
-unsigned int m_table_desc1__6CMcPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__6CMcPcsFv)};
-unsigned int m_table_desc2__6CMcPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__6CMcPcsFv)};
 unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(lbl_80331B10), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
 };

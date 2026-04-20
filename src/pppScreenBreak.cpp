@@ -87,22 +87,22 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
-static const float FLOAT_80331cc0 = 2.0f;
-static const float FLOAT_80331cc4 = 0.0f;
-static const float FLOAT_80331cc8 = 0.3f;
-static const float FLOAT_80331ccc = -0.5f;
-static const float FLOAT_80331cd0 = 1.0f;
-static const float FLOAT_80331cd4 = -1.0f;
-static const float FLOAT_80331cd8 = 0.017453292f;
-static const float FLOAT_80331ce8 = 30.0f;
-static const float FLOAT_80331cec = 4.0f;
-static const float FLOAT_80331cf0 = -3.0f;
+extern float FLOAT_80331cc0;
+static const float kPppScreenBreakDoubleScale = 2.0f;
+static const float kPppScreenBreakZero = 0.0f;
+static const float kPppScreenBreakRandRange = 0.3f;
+static const float kPppScreenBreakVelocityScale = -0.5f;
+static const float kPppScreenBreakOne = 1.0f;
+static const float kPppScreenBreakNegOne = -1.0f;
+static const float kPppScreenBreakDegreesToRadians = 0.017453292f;
+static const float kPppScreenBreakCameraOffset = 30.0f;
+static const float kPppScreenBreakLightAttn = 4.0f;
+static const float kPppScreenBreakLightBias = -3.0f;
 static const float DAT_801dd4b0 = 0.0f;
 static const float DAT_801dd4b4 = 1.0f;
 static const float DAT_801dd4b8 = 0.0f;
 static const char s_f999_root_801dd4c8[] = "f999_root";
 static const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
-static const float FLOAT_80331cf4 = 0.5f;
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
 static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
@@ -409,13 +409,13 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     Vec* inVec;
     s32 iVar16;
     double dVar17;
-    const double dVar18 = -(double)FLOAT_80331cc8;
-    const double dVar19 = (double)FLOAT_80331cc8;
-    const double dVar20 = (double)FLOAT_80331cd0;
-    const double dVar21 = (double)FLOAT_80331cd4;
-    const double dVar22 = (double)FLOAT_80331cc4;
-    const double dVar24 = (double)FLOAT_80331cc0;
-    const double dVar25 = (double)FLOAT_80331cd8;
+    const double dVar18 = -(double)kPppScreenBreakRandRange;
+    const double dVar19 = (double)kPppScreenBreakRandRange;
+    const double dVar20 = (double)kPppScreenBreakOne;
+    const double dVar21 = (double)kPppScreenBreakNegOne;
+    const double dVar22 = (double)kPppScreenBreakZero;
+    const double dVar24 = (double)kPppScreenBreakDoubleScale;
+    const double dVar25 = (double)kPppScreenBreakDegreesToRadians;
     S16Vec local_e8;
     S16Vec local_e0;
     S16Vec local_d8;
@@ -519,14 +519,14 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         local_e0.y = local_d8.y;
         local_d8.z = local_e0.z;
         ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, &local_e0, *(u32*)(modelData + 0x34));
-        PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
+        PSVECScale(inVec + 3, inVec + 3, kPppScreenBreakVelocityScale);
 
         dVar17 = (double)inVec[3].x;
         if (dVar19 < dVar17) {
-            dVar17 = (double)Math.RandF(FLOAT_80331cc8);
+            dVar17 = (double)Math.RandF(kPppScreenBreakRandRange);
         }
         if ((double)inVec[3].x < dVar18) {
-            dVar17 = -(double)Math.RandF(FLOAT_80331cc8);
+            dVar17 = -(double)Math.RandF(kPppScreenBreakRandRange);
         }
 
         inVec->x = (float)dVar17;
@@ -639,7 +639,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float cameraOffset = FLOAT_80331ce8;
+    const float cameraOffset = kPppScreenBreakCameraOffset;
     const float zero = 0.0f;
 
     lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
@@ -647,8 +647,8 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, FLOAT_80331cd0, zero);
-    GXInitLightAttn(&lightObj, zero, zero, FLOAT_80331cd0, FLOAT_80331cec, zero, FLOAT_80331cf0);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, kPppScreenBreakOne, zero);
+    GXInitLightAttn(&lightObj, zero, zero, kPppScreenBreakOne, kPppScreenBreakLightAttn, zero, kPppScreenBreakLightBias);
 
     GXInitLightColor(&lightObj,
                      *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));

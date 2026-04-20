@@ -15,9 +15,8 @@ CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
-extern u32 gDbgMenuWindowBorderColors[4];
-extern u32 gDbgMenuWindowFillColors[2];
 extern "C" {
+extern const char s_CDbgMenuPcs_801DD428[];
 extern const char lbl_80331C18[];
 extern const char lbl_80331C20[];
 extern const char lbl_80331C28[];
@@ -45,6 +44,10 @@ extern const char s_SMITH_MASTER_801DD488[];
 
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
+extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
+extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
+extern "C" void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
+extern "C" void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 extern "C" void CheckDriver__6CSoundFi(void*, int);
@@ -56,6 +59,14 @@ struct DbgMenuDef {
     u32 id;
     u32 actionType;
     u32 actionFlags;
+};
+
+u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
+    reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
 
 const char s_Debug_80331c90[] = "Debug";
@@ -70,6 +81,8 @@ DbgMenuDef PTR_DAT_80212524[] = {
     { lbl_80331C78, 117, 2, 1 },      { s_PART_HEAP_801DD464, 118, 2, 1 }, { s_CHARA_INFO_801DD470, 119, 3, 1 },
     { s_ITEM_WEAPON_801DD47C, 120, 2, 1 }, { s_SMITH_MASTER_801DD488, 121, 2, 1 }, { lbl_80331C80, 122, 2, 1 },
 };
+u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
+u32 gDbgMenuWindowFillColors[2] = {0xFFFFFF80, 0x00000080};
 
 /*
  * --INFO--

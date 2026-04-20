@@ -105,7 +105,6 @@ private:
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP9CMaterial;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;

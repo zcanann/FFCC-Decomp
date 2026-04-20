@@ -20,35 +20,33 @@ class CGamePcs : public CProcess
 public:
     CGamePcs()
     {
-        unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
-
-        dst[1] = m_table_desc0__8CGamePcs[0];
-        dst[2] = m_table_desc0__8CGamePcs[1];
-        dst[3] = m_table_desc0__8CGamePcs[2];
-        dst[4] = m_table_desc1__8CGamePcs[0];
-        dst[5] = m_table_desc1__8CGamePcs[1];
-        dst[6] = m_table_desc1__8CGamePcs[2];
-        dst[7] = m_table_desc2__8CGamePcs[0];
-        dst[8] = m_table_desc2__8CGamePcs[1];
-        dst[9] = m_table_desc2__8CGamePcs[2];
-        dst[12] = m_table_desc3__8CGamePcs[0];
-        dst[13] = m_table_desc3__8CGamePcs[1];
-        dst[14] = m_table_desc3__8CGamePcs[2];
-        dst[17] = m_table_desc4__8CGamePcs[0];
-        dst[18] = m_table_desc4__8CGamePcs[1];
-        dst[19] = m_table_desc4__8CGamePcs[2];
-        dst[22] = m_table_desc5__8CGamePcs[0];
-        dst[23] = m_table_desc5__8CGamePcs[1];
-        dst[24] = m_table_desc5__8CGamePcs[2];
-        dst[27] = m_table_desc6__8CGamePcs[0];
-        dst[28] = m_table_desc6__8CGamePcs[1];
-        dst[29] = m_table_desc6__8CGamePcs[2];
-        dst[32] = m_table_desc7__8CGamePcs[0];
-        dst[33] = m_table_desc7__8CGamePcs[1];
-        dst[34] = m_table_desc7__8CGamePcs[2];
-        dst[37] = m_table_desc8__8CGamePcs[0];
-        dst[38] = m_table_desc8__8CGamePcs[1];
-        dst[39] = m_table_desc8__8CGamePcs[2];
+        m_table__8CGamePcs[1] = m_table_desc0__8CGamePcs[0];
+        m_table__8CGamePcs[2] = m_table_desc0__8CGamePcs[1];
+        m_table__8CGamePcs[3] = m_table_desc0__8CGamePcs[2];
+        m_table__8CGamePcs[4] = m_table_desc1__8CGamePcs[0];
+        m_table__8CGamePcs[5] = m_table_desc1__8CGamePcs[1];
+        m_table__8CGamePcs[6] = m_table_desc1__8CGamePcs[2];
+        m_table__8CGamePcs[7] = m_table_desc2__8CGamePcs[0];
+        m_table__8CGamePcs[8] = m_table_desc2__8CGamePcs[1];
+        m_table__8CGamePcs[9] = m_table_desc2__8CGamePcs[2];
+        m_table__8CGamePcs[12] = m_table_desc3__8CGamePcs[0];
+        m_table__8CGamePcs[13] = m_table_desc3__8CGamePcs[1];
+        m_table__8CGamePcs[14] = m_table_desc3__8CGamePcs[2];
+        m_table__8CGamePcs[17] = m_table_desc4__8CGamePcs[0];
+        m_table__8CGamePcs[18] = m_table_desc4__8CGamePcs[1];
+        m_table__8CGamePcs[19] = m_table_desc4__8CGamePcs[2];
+        m_table__8CGamePcs[22] = m_table_desc5__8CGamePcs[0];
+        m_table__8CGamePcs[23] = m_table_desc5__8CGamePcs[1];
+        m_table__8CGamePcs[24] = m_table_desc5__8CGamePcs[2];
+        m_table__8CGamePcs[27] = m_table_desc6__8CGamePcs[0];
+        m_table__8CGamePcs[28] = m_table_desc6__8CGamePcs[1];
+        m_table__8CGamePcs[29] = m_table_desc6__8CGamePcs[2];
+        m_table__8CGamePcs[32] = m_table_desc7__8CGamePcs[0];
+        m_table__8CGamePcs[33] = m_table_desc7__8CGamePcs[1];
+        m_table__8CGamePcs[34] = m_table_desc7__8CGamePcs[2];
+        m_table__8CGamePcs[37] = m_table_desc8__8CGamePcs[0];
+        m_table__8CGamePcs[38] = m_table_desc8__8CGamePcs[1];
+        m_table__8CGamePcs[39] = m_table_desc8__8CGamePcs[2];
     }
 
     void Init();

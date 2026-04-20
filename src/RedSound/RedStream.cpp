@@ -30,19 +30,14 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  */
 RedStreamDATA* _SearchEmptyStreamData()
 {
-	u32 streamData = (u32)p_Stream;
-	u32 streamDataEnd = (u32)p_Stream + 0x4c0;
+	RedStreamDATA* streamData = p_Stream;
 
 	do {
-		if (*(int*)(streamData + 0x10c) == 0) {
-			return (RedStreamDATA*)streamData;
+		if (streamData->m_streamId == 0) {
+			return streamData;
 		}
-		streamData += 0x130;
-	} while (streamData < streamDataEnd);
-
-	if (streamData < streamDataEnd) {
-		return (RedStreamDATA*)streamData;
-	}
+		streamData++;
+	} while (streamData < p_Stream + 4);
 
 	return 0;
 }

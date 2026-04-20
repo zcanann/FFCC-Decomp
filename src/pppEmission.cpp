@@ -299,6 +299,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
         u8 field1C;
     };
 
+    float baseScale = FLOAT_803311f8;
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     int offset = serializedDataOffsets[2];
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
@@ -308,9 +309,9 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     state->field9 = 0x80;
     state->fieldA = 0x80;
     state->fieldB = 0x80;
-    state->field14 = 0.0f;
-    state->field10 = 0.0f;
-    state->fieldC = 0.0f;
+    state->field14 = baseScale;
+    state->field10 = baseScale;
+    state->fieldC = baseScale;
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);

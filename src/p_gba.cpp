@@ -183,30 +183,4 @@ void CGbaPcs::Init()
 	GBAInit();
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800979f4
- * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGbaPcs::CGbaPcs()
-{
-	unsigned int* table = &gGbaStatusWordTable[1];
-	table[0] = gGbaStatusWordTriplet0[0];
-	table[1] = gGbaStatusWordTriplet0[1];
-	table[2] = gGbaStatusWordTriplet0[2];
-	table[3] = gGbaStatusWordTriplet1[0];
-	table[4] = gGbaStatusWordTriplet1[1];
-	table[5] = gGbaStatusWordTriplet1[2];
-	table[6] = gGbaStatusWordTriplet2[0];
-	table[7] = gGbaStatusWordTriplet2[1];
-	table[8] = gGbaStatusWordTriplet2[2];
-	table[11] = gGbaStatusWordTriplet3[0];
-	table[12] = gGbaStatusWordTriplet3[1];
-	table[13] = gGbaStatusWordTriplet3[2];
-}
-
 CGbaPcs GbaPcs;

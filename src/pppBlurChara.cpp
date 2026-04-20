@@ -95,6 +95,7 @@ static inline Mtx44& CameraScreenMatrix()
 }
 
 extern "C" {
+unsigned int __cvt_fp2unsigned(double);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -199,7 +200,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     gUtil.EndQuadEnv();
 
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
-    GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
+    GXSetScissor(0, 0, __cvt_fp2unsigned((double)FLOAT_80331050), __cvt_fp2unsigned((double)FLOAT_80331054));
 
     rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     rawModel->m_afterDrawModelCallback = 0;

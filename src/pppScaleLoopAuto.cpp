@@ -3,6 +3,7 @@
 #include <dolphin/types.h>
 #include "ffcc/ppp_linkage.h"
 
+extern const float gPppScaleLoopAutoZero = 0.0f;
 
 struct pppScaleLoopAutoWork {
     float m_scale[3];

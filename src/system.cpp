@@ -55,6 +55,11 @@ struct CScenegraphDesc {
 static const char s_cSystem[] = "CSystem";
 static const char s_gamePalM_map[] = "gamePalM.map";
 static const char s_system_cpp[] = "system.cpp";
+static const char s_compilerMapLoaded[] =
+    "\203\122\203\223\203\160\203\103\203\211\202\314\155\141\160\217\356"
+    "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
+    "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
+    "\201\102\012";
 
 /*
  * --INFO--
@@ -669,7 +674,7 @@ void CSystem::Init()
                 mapSize -= chunkSize;
             }
             File.Close(fileHandle);
-            Printf(const_cast<char*>(""));
+            Printf(const_cast<char*>(s_compilerMapLoaded));
         }
     }
 }

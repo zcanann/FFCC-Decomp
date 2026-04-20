@@ -7,7 +7,7 @@ extern float gPppPointRApRandomAngleRange;
 extern float gPppPointRApRandomAngleBias;
 extern float gPppPointRApSpinScale;
 
-extern float gPppScaleLoopAutoZero;
+extern const float gPppScaleLoopAutoZero;
 
 extern float gPppYmMoveCircleTurnSpan;
 extern float gPppYmMoveCircleRadToAngleScale;

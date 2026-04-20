@@ -78,7 +78,7 @@ public:
 class CAmemCacheSet
 {
 public:
-    void Init(char*, CMemory::CStage*, CMemory::CStage*, int,
+    void Init(char*, CMemory::CStage* rStage, CMemory::CStage* stage, int,
               unsigned char (*)(unsigned long), unsigned long,
               unsigned char (*)(unsigned long), unsigned long,
               unsigned char (*)(unsigned long), unsigned long);

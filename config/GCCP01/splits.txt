@@ -318,6 +318,7 @@ FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8
 	extabindex  start:0x8000C838 end:0x8000C844
 	.text       start:0x8004EB4C end:0x8004F910
+	.rodata     start:0x801D7E80 end:0x801D7E98
 	.data       start:0x801EA960 end:0x801EA994
 
 maptexanim.cpp:

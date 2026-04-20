@@ -234,14 +234,21 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		int pointOffset = 0;
 		int vertColors = *(int*)(state->m_meshColorArrays + meshOffset);
 		for (unsigned int v = 0; v < *(unsigned int*)(*(int*)(curMesh + 8) + 0x14); v++) {
-			int delta = (int)frameShort - (int)*(short*)(*(int*)(curMesh + 0xC) + pointOffset + 2);
-			if (delta < 0) {
+			u32 delta = (int)frameShort - (int)*(short*)(*(int*)(curMesh + 0xC) + pointOffset + 2);
+			if ((int)delta < 0) {
 				*(unsigned char*)(vertColors + 3) = fallbackAlpha;
 			} else {
 				int level = 0;
 				float threshold = FLOAT_80330df8;
 				for (int tries = 7; tries != 0; tries--) {
-					if (FLOAT_80330dfc * threshold < (float)delta) {
+					union {
+						double d;
+						u32 u[2];
+					} deltaScale;
+					deltaScale.u[0] = 0x43300000;
+					deltaScale.u[1] = delta ^ 0x80000000;
+
+					if (FLOAT_80330dfc * threshold < (float)(deltaScale.d - DOUBLE_80330e08)) {
 						if (negativeRamp == -1) {
 							*(char*)(vertColors + 3) = -1 - (char)(level << 4);
 						} else {

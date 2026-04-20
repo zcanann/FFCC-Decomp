@@ -596,10 +596,10 @@ void CSystem::Quit()
  */
 void CSystem::Init()
 {
-    int chunkSize;
-    int mapSize;
-    int offset;
     CFile::CHandle* fileHandle;
+    unsigned int count;
+    unsigned int mapSize;
+    unsigned int offset;
 
     m_initialized = 1;
     m_currentOrder = (COrder*)0;
@@ -655,23 +655,21 @@ void CSystem::Init()
             mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
-            offset = 0;
-            while (mapSize != 0)
+            for (offset = 0; mapSize != 0; mapSize -= count)
             {
-                chunkSize = 0x100000;
+                count = 0x100000;
                 if (mapSize < 0x100000)
                 {
-                    chunkSize = mapSize;
+                    count = mapSize;
                 }
 
-                fileHandle->m_chunkSize = chunkSize;
+                fileHandle->m_chunkSize = count;
                 fileHandle->m_currentOffset = offset;
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, chunkSize);
+                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, count);
 
-                offset += chunkSize;
-                mapSize -= chunkSize;
+                offset += count;
             }
             File.Close(fileHandle);
             Printf(const_cast<char*>(s_compilerMapLoaded));

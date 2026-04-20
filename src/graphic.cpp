@@ -368,12 +368,8 @@ void CGraphic::SetStdPixelFmt()
  */
 void CGraphic::SetViewport()
 {
-    register void* renderMode = PtrAt(this, 0x71E0);
-    register u16 width = U16At(renderMode, 4);
-    register u16 height = U16At(renderMode, 6);
-
-    GXSetViewport(kGraphicZeroF, kGraphicZeroF, (f32)width, (f32)height, kGraphicZeroF, kGraphicOneF);
-    GXSetScissor(0, 0, width, height);
+    GXSetViewport(0.0f, 0.0f, (f32)U16At(PtrAt(this, 0x71E0), 4), (f32)U16At(PtrAt(this, 0x71E0), 6), 0.0f, 1.0f);
+    GXSetScissor(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
 }
 
 /*

@@ -11,9 +11,9 @@ extern const float gPppScaleLoopAutoZero;
 
 extern float gPppYmMoveCircleTurnSpan;
 extern float gPppYmMoveCircleZero;
-extern float gPppYmMoveCircleTrigScale;
-extern float gPppYmMoveCircleDegreesToRadians;
-extern float gPppYmMoveCirclePi;
+extern float gPppYmMoveCircleAngleScale;
+extern float gPppYmMoveCircleAngleToTableScale;
+extern float gPppYmMoveCircleTableDivisor;
 extern float gPppYmMoveCircleOne;
 extern float gPppYmMoveCircleRadToAngleScale;
 

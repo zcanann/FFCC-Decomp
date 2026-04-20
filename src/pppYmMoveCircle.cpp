@@ -4,7 +4,7 @@
 #include "ffcc/ppp_constants.h"
 #include "types.h"
 #include "dolphin/mtx.h"
-#include "math.h"
+#include "dolphin/math.h"
 
 struct pppYmMoveCircleWork {
     f32 m_angle;
@@ -18,6 +18,14 @@ struct pppYmMoveCircleWork {
     Vec m_center;
     u8 m_hasInit;
 };
+
+static const f32 kPppYmMoveCircleTurnSpan = 360.0f;
+static const f32 kPppYmMoveCircleZero = 0.0f;
+static const f32 kPppYmMoveCircleAngleScale = 32768.0f;
+static const f32 kPppYmMoveCircleAngleToTableScale = 0.017453292f;
+static const f32 kPppYmMoveCircleTableDivisor = 3.1415927f;
+static const f32 kPppYmMoveCircleOne = 1.0f;
+static const f32 kPppYmMoveCircleRadToAngleScale = 57.29578f;
 
 
 /*
@@ -64,20 +72,20 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
     work->m_angle += work->m_angleStep;
-    turnSpan = gPppYmMoveCircleTurnSpan;
+    turnSpan = kPppYmMoveCircleTurnSpan;
 
     if (work->m_angle > turnSpan) {
         work->m_angle -= turnSpan;
     }
-    if (work->m_angle < gPppYmMoveCircleZero) {
-        work->m_angle += gPppYmMoveCircleTurnSpan;
+    if (work->m_angle < kPppYmMoveCircleZero) {
+        work->m_angle += kPppYmMoveCircleTurnSpan;
     }
 
-    nextPos.y = gPppYmMoveCircleZero;
+    nextPos.y = kPppYmMoveCircleZero;
     {
         f32 tableAngle =
-            (gPppYmMoveCircleAngleScale * (gPppYmMoveCircleAngleToTableScale * work->m_angle)) /
-            gPppYmMoveCircleTableDivisor;
+            (kPppYmMoveCircleAngleScale * (kPppYmMoveCircleAngleToTableScale * work->m_angle)) /
+            kPppYmMoveCircleTableDivisor;
         tableIndex = (s32)tableAngle;
     }
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
@@ -110,8 +118,6 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
  */
 extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
 {
-    const f32 kZero = 0.0f;
-    const f32 kOne = 1.0f;
     Vec tempUp;
     Vec temp1;
     _pppMngSt* pppMngSt;
@@ -122,25 +128,26 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
-    tempUp.x = kOne;
-    tempUp.y = kZero;
-    tempUp.z = kZero;
+    tempUp.x = kPppYmMoveCircleOne;
+    tempUp.y = kPppYmMoveCircleZero;
+    tempUp.z = kPppYmMoveCircleZero;
 
     PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
+    work->m_angle = kPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
 
-    if ((temp1.x <= kZero && temp1.z >= kZero) || (temp1.x >= kZero && temp1.z >= kZero)) {
-        work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;
+    if ((temp1.x <= kPppYmMoveCircleZero && temp1.z >= kPppYmMoveCircleZero) ||
+        (temp1.x >= kPppYmMoveCircleZero && temp1.z >= kPppYmMoveCircleZero)) {
+        work->m_angle = kPppYmMoveCircleTurnSpan - work->m_angle;
     }
 
-    work->m_radiusStepStep = kZero;
-    work->m_radiusStep = kZero;
-    work->m_radius = kZero;
-    work->m_angleStepStepStep = kZero;
-    work->m_angleStepStep = kZero;
-    work->m_angleStep = kZero;
+    work->m_radiusStepStep = kPppYmMoveCircleZero;
+    work->m_radiusStep = kPppYmMoveCircleZero;
+    work->m_radius = kPppYmMoveCircleZero;
+    work->m_angleStepStepStep = kPppYmMoveCircleZero;
+    work->m_angleStepStep = kPppYmMoveCircleZero;
+    work->m_angleStep = kPppYmMoveCircleZero;
     pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
     work->m_hasInit = 0;
 }

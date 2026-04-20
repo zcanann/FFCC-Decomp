@@ -15,7 +15,7 @@ extern const char s_JoyBus__LoadBin___error_801d9de0[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
 
-CGbaPcsTable m_table__7CGbaPcs = {
+CGbaPcsTable gGbaStatusWordTable = {
     const_cast<char*>(s_CGbaPcs_80330870),
     {
         0x00000000,
@@ -168,7 +168,7 @@ int CGbaPcs::GetTable(unsigned long tableIndex)
 {
 	unsigned long offset = tableIndex;
 	offset *= 0x15c;
-	return (int)(reinterpret_cast<unsigned char*>(&m_table__7CGbaPcs) + offset);
+    return (int)(reinterpret_cast<unsigned char*>(&gGbaStatusWordTable) + offset);
 }
 
 /*
@@ -207,7 +207,7 @@ void CGbaPcs::Init()
  */
 inline CGbaPcs::CGbaPcs()
 {
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__7CGbaPcs);
+	unsigned int* table = reinterpret_cast<unsigned int*>(&gGbaStatusWordTable);
 	const unsigned int* desc0 = m_table_desc0__7CGbaPcs;
 	const unsigned int* desc1 = m_table_desc1__7CGbaPcs;
 	const unsigned int* desc2 = m_table_desc2__7CGbaPcs;

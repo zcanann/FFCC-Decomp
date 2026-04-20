@@ -39,6 +39,6 @@ extern unsigned int m_table_desc0__7CGbaPcs[];
 extern unsigned int m_table_desc1__7CGbaPcs[];
 extern unsigned int m_table_desc2__7CGbaPcs[];
 extern unsigned int m_table_desc3__7CGbaPcs[];
-extern CGbaPcsTable m_table__7CGbaPcs;
+extern CGbaPcsTable gGbaStatusWordTable;
 
 #endif // _FFCC_P_GBA_H_

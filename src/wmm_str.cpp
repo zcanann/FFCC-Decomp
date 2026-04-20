@@ -12,14 +12,33 @@ extern const char s_Ranura_B_801E65F4[];
 extern const float FLOAT_803336CC;
 extern const double DOUBLE_803336D0;
 
-#include "src/wmm_str_data.inc"
+extern const char* PTR_s_The_data_is_corrupt_[];
+extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[];
+extern const char* PTR_s_I_dati_sono_danneggiati_[];
+extern const char* s_McStr_es[];
+extern const char* s_McStr_fr[];
+extern const char* s_McWinMessGroup0_en[];
+extern const char* s_McWinMessGroup0_de[];
+extern const char* s_McWinMessGroup0_it[];
+extern const char* s_McWinMessGroup0_es[];
+extern const char* s_McWinMessGroup0_fr[];
+extern const char* s_McWinMessGroup1_en[];
+extern const char* s_McWinMessGroup1_de[];
+extern const char* s_McWinMessGroup1_it[];
+extern const char* s_McWinMessGroup1_es[];
+extern const char* s_McWinMessGroup1_fr[];
+extern const char* s_McWinMessGroup2_en[];
+extern const char* s_McWinMessGroup2_de[];
+extern const char* s_McWinMessGroup2_it[];
+extern const char* s_McWinMessGroup2_es[];
+extern const char* s_McWinMessGroup2_fr[];
 
 struct WinMessEntry
 {
     unsigned int words[5];
 };
 
-static char* s_NoTextByLanguage[5] = {
+char* s_NoTextByLanguage[5] = {
     (char*)lbl_803336B4,
     (char*)lbl_803336B8,
     (char*)lbl_803336B4,
@@ -27,7 +46,7 @@ static char* s_NoTextByLanguage[5] = {
     (char*)lbl_803336B4,
 };
 
-static char* s_SlotBTextByLanguage[6] = {
+char* s_SlotBTextByLanguage[6] = {
     (char*)lbl_803336C4,
     (char*)s_Steckplatz_B_801E65E4,
     (char*)lbl_803336C4,
@@ -36,7 +55,7 @@ static char* s_SlotBTextByLanguage[6] = {
     0,
 };
 
-static WinMessEntry s_WinMessTable[36] = {
+WinMessEntry s_WinMessTable[36] = {
     {{ 0x00000003, 0x00010000, 0x00020000, 0x00000000, 0x00000000 }},
     {{ 0x00000002, 0x00030004, 0x00000000, 0x00000000, 0x00000000 }},
     {{ 0x00000002, 0x00050006, 0x00000000, 0x00000000, 0x00000000 }},
@@ -299,3 +318,5 @@ const char* CMenuPcs::GetMcStr(int index)
         return PTR_s_The_data_is_corrupt_[index];
     }
 }
+
+#include "src/wmm_str_data.inc"

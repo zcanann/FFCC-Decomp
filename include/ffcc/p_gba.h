@@ -35,10 +35,10 @@ struct CGbaPcsTable
 };
 
 extern CGbaPcs GbaPcs;
-extern unsigned int m_table_desc0__7CGbaPcs[];
-extern unsigned int m_table_desc1__7CGbaPcs[];
-extern unsigned int m_table_desc2__7CGbaPcs[];
-extern unsigned int m_table_desc3__7CGbaPcs[];
-extern CGbaPcsTable m_table__7CGbaPcs;
+extern unsigned int gGbaStatusWordTriplet0[];
+extern unsigned int gGbaStatusWordTriplet1[];
+extern unsigned int gGbaStatusWordTriplet2[];
+extern unsigned int gGbaStatusWordTriplet3[];
+extern CGbaPcsTable gGbaStatusWordTable;
 
 #endif // _FFCC_P_GBA_H_

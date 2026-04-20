@@ -104,7 +104,7 @@ unsigned int* DAT_8032f444;
 void* DAT_8032f450;
 void* DAT_8032f474;
 int* DAT_8032f428;
-RedStreamDATA* DAT_8032f438;
+RedStreamDATA* p_Stream;
 void* DAT_8032f464;
 void* DAT_8032f45c;
 void* DAT_8032f46c;
@@ -1328,8 +1328,8 @@ void CRedDriver::Init()
     DAT_8032f428 = (int*)RedNew__Fi(0x10);
     DAT_8032f428[0] = -1;
     DAT_8032f424 = 0;
-    DAT_8032f438 = (RedStreamDATA*)RedNew__Fi(0x4c0);
-    memset(DAT_8032f438, 0, 0x4c0);
+    p_Stream = (RedStreamDATA*)RedNew__Fi(0x4c0);
+    memset(p_Stream, 0, 0x4c0);
     DAT_8032f43c = 0;
     memset(&gRedDriverSyncBuffer, 0, 0x1c00);
     DAT_8032f3e0[0] = RedDriverMainDmaQueue();
@@ -1982,7 +1982,7 @@ int CRedDriver::StreamPlayState(int param_1)
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)p_Stream;
 	do {
 		if ((*(int*)(streamData + 0x10C) != 0) &&
 		    ((param_1 == -1) || (*(int*)(streamData + 0x10C) == param_1))) {
@@ -1990,7 +1990,7 @@ int CRedDriver::StreamPlayState(int param_1)
 			break;
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4C0);
+	} while (streamData < (unsigned int)p_Stream + 0x4C0);
 
 	command = (int*)DAT_8032f3dc;
 	if (result == 0) {
@@ -2031,8 +2031,8 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
 	if (param_3 != 0) {
 		*param_3 = 0;
 	}
-	streamData = (unsigned int)DAT_8032f438;
-	while (streamData < (unsigned int)DAT_8032f438 + 0x4C0) {
+	streamData = (unsigned int)p_Stream;
+	while (streamData < (unsigned int)p_Stream + 0x4C0) {
 		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == param_1)) {
 			if (param_2 != 0) {
 				*param_2 = *(int*)(streamData + 0x11C);

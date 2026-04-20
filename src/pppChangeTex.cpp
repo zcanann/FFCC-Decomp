@@ -363,8 +363,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	u8* colorData = (u8*)&changeTex->field0_0x0 + serializedDataOffsets[1] + 0x80;
-	ChangeTexWork* work = (ChangeTexWork*)((u8*)&changeTex->field0_0x0 + serializedDataOffsets[2] + 0x80);
+	u8* base = (u8*)&changeTex->field0_0x0;
+	ChangeTexWork* work = (ChangeTexWork*)(base + serializedDataOffsets[2] + 0x80);
+	u8* colorData = base + serializedDataOffsets[1] + 0x80;
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_charaObj, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 

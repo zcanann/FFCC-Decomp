@@ -12,10 +12,11 @@ extern int gPppCalcDisabled;
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
 
-static const float kPppLensFlareZero = 0.0f;
-static const float kPppLensFlareAlphaScale = 0.0078125f;
-static const float kPppLensFlareCameraToObjectScale = -1.0f;
-static const float kPppLensFlareDepthToZScale = 16777215.0f;
+static const float FLOAT_80331060 = 0.0f;
+static const float FLOAT_80331064 = 0.0078125f;
+static const float FLOAT_80331068 = -1.0f;
+static const float FLOAT_8033106c = 16777215.0f;
+static const double DOUBLE_80331070 = 4503599627370496.0;
 
 struct LensFlareWork {
     u8 _pad00[0x10];
@@ -85,7 +86,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			local_70.rgba[2] = colorBase[10];
 			local_70.rgba[3] = shapeBase[0x32];
 
-			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, kPppLensFlareZero, unkB->m_payload[0], unkB->m_unk13, unkB->m_unk12, 0,
+			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, FLOAT_80331060, unkB->m_payload[0], unkB->m_unk13, unkB->m_unk12, 0,
 						  1, 1, 0);
 
 			pppSetBlendMode(unkB->m_unk12);
@@ -129,7 +130,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		int projectedYInt;
 		float alphaScale;
 
-		alphaScale = (float)sourceAlpha * kPppLensFlareAlphaScale;
+		alphaScale = (float)sourceAlpha * FLOAT_80331064;
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
@@ -150,7 +151,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		objectPos.y = pppMngStPtr->m_matrix.value[1][3];
 		objectPos.z = pppMngStPtr->m_matrix.value[2][3];
 		PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
-		PSVECScale(&cameraToObject, &cameraToObject, kPppLensFlareCameraToObjectScale);
+		PSVECScale(&cameraToObject, &cameraToObject, FLOAT_80331068);
 		PSVECNormalize(&lookDir, &lookDir);
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
@@ -160,7 +161,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		zAtPixel = 0;
 		u8 flareWidth = unkB->m_arg3;
 		u32 halfWidth = (u32)(flareWidth >> 1);
-		u32 z0 = __cvt_fp2unsigned((double)(kPppLensFlareDepthToZScale * work->m_projectedZ));
+		u32 z0 = __cvt_fp2unsigned((double)(FLOAT_8033106c * work->m_projectedZ));
 		u32 x0 = (u32)(projectedXInt & 0xFFFF);
 		u32 y0 = (u32)(projectedYInt & 0xFFFF);
 		s16 stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
@@ -223,7 +224,7 @@ void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
 	char* work = (char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80;
 
-	float initValue = kPppLensFlareZero;
+	float initValue = FLOAT_80331060;
 
 	*((float*)(work + 0x18)) = initValue;
 	*((float*)(work + 0x14)) = initValue;

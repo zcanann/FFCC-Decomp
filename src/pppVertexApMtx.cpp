@@ -8,7 +8,7 @@
 struct VertexApMtxEntry
 {
 	s16 vertexSetIndex;
-	u16 maxValue;
+	s16 maxValue;
 	u16* vertexIndices;
 };
 
@@ -208,20 +208,6 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	}
 
 	state->countdown--;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void apea(_pppPObject*, PVertexApMtx*, Vec*)
-{
-	// Intentionally empty.
 }
 
 /*

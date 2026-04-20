@@ -28,6 +28,17 @@ private:
     CMemory::CStage* m_stage;
 };
 
+struct CGbaPcsTable
+{
+    char* m_name;
+    unsigned int m_words[0x56];
+};
+
 extern CGbaPcs GbaPcs;
+extern unsigned int m_table_desc0__7CGbaPcs[];
+extern unsigned int m_table_desc1__7CGbaPcs[];
+extern unsigned int m_table_desc2__7CGbaPcs[];
+extern unsigned int m_table_desc3__7CGbaPcs[];
+extern CGbaPcsTable m_table__7CGbaPcs;
 
 #endif // _FFCC_P_GBA_H_

@@ -40,7 +40,6 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     f32 cosAngle;
     f32 radiusX;
     f32 radiusZ;
-    f32 turnSpan;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -64,10 +63,8 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
     work->m_angle += work->m_angleStep;
-    turnSpan = gPppYmMoveCircleTurnSpan;
-
-    if (work->m_angle > turnSpan) {
-        work->m_angle -= turnSpan;
+    if (work->m_angle > gPppYmMoveCircleTurnSpan) {
+        work->m_angle -= gPppYmMoveCircleTurnSpan;
     }
     if (work->m_angle < gPppYmMoveCircleZero) {
         work->m_angle += gPppYmMoveCircleTurnSpan;

@@ -55,7 +55,8 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
-extern "C" void* PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc[];
+extern "C" void __ct__22CPtrArray_P9CMaterial_Fv(void*);
+extern "C" void __dt__22CPtrArray_P9CMaterial_Fv(void*, int);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -79,31 +80,31 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
+    CPtrArray();
+    virtual ~CPtrArray();
+    int GetSize();
+    int Add(T item);
+    void RemoveAll();
+    void SetStage(CMemory::CStage* stage);
+    int setSize(unsigned long size);
+    void SetAt(unsigned long index, T item);
+    T operator[](unsigned long index);
+    T GetAt(unsigned long index);
+
+private:
     unsigned long m_numItems;
     unsigned long m_size;
     unsigned long m_defaultSize;
     T* m_items;
     CMemory::CStage* m_stage;
     int m_growCapacity;
-
-    CPtrArray();
-    int GetSize();
-    int Add(T item);
-    ~CPtrArray();
-    void RemoveAll();
-    void SetStage(CMemory::CStage* stage);
-    int setSize(unsigned long size);
-    void SetAt(unsigned long index, T item);
-    T operator[](unsigned long index);
 };
 
 template <>
 CPtrArray<CMaterial*>::CPtrArray()
 {
-    m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
-    m_size = 0;
     m_numItems = 0;
+    m_size = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -254,7 +255,6 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
-    m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
     RemoveAll();
 }
 
@@ -270,8 +270,7 @@ CPtrArray<CMaterial*>::~CPtrArray()
 extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
-        ptrArray->RemoveAll();
+        ptrArray->~CPtrArray<CMaterial*>();
         if (shouldDelete > 0) {
             __dl__FPv(ptrArray);
         }
@@ -351,6 +350,24 @@ template <>
 void CPtrArray<CMaterial*>::SetAt(unsigned long index, CMaterial* item)
 {
     m_items[index] = item;
+}
+
+template <>
+int CPtrArray<CMaterial*>::GetSize()
+{
+    return m_numItems;
+}
+
+template <>
+CMaterial* CPtrArray<CMaterial*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+template <>
+CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
+{
+    return m_items[index];
 }
 
 /*
@@ -3154,13 +3171,8 @@ CMaterialSet::CMaterialSet()
     CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
 
     *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
-    materials->m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
-    materials->m_size = 0;
-    materials->m_numItems = 0;
-    materials->m_defaultSize = 0x10;
-    materials->m_items = 0;
-    materials->m_stage = MaterialMan.GetMemoryStage();
-    materials->m_growCapacity = 1;
+    __ct__22CPtrArray_P9CMaterial_Fv(materials);
+    materials->SetStage(MaterialMan.GetMemoryStage());
 }
 
 /*

@@ -10,16 +10,8 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-
     CPtrArray();
-    ~CPtrArray();
+    virtual ~CPtrArray();
 
     bool Add(T item);
     void SetAt(unsigned long index, T item);
@@ -31,6 +23,14 @@ public:
     void SetDefaultSize(unsigned long defaultSize);
     int setSize(unsigned long newSize);
     T GetAt(unsigned long index);
+
+private:
+    unsigned long m_numItems;
+    unsigned long m_size;
+    unsigned long m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
 };
 
 extern "C" void __dl__FPv(void*);
@@ -144,9 +144,8 @@ static inline CTexture* AllocTexture()
 template <>
 CPtrArray<CTexture*>::CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP8CTexture;
-    m_size = 0;
     m_numItems = 0;
+    m_size = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -165,7 +164,6 @@ CPtrArray<CTexture*>::CPtrArray()
 template <>
 CPtrArray<CTexture*>::~CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP8CTexture;
     RemoveAll();
 }
 
@@ -181,8 +179,7 @@ CPtrArray<CTexture*>::~CPtrArray()
 extern "C" CPtrArray<CTexture*>* dtor_8003BE70(CPtrArray<CTexture*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = __vt__8CPtrArrayIP8CTexture;
-        ptrArray->RemoveAll();
+        ptrArray->~CPtrArray<CTexture*>();
         if (0 < param_2) {
             __dl__FPv(ptrArray);
         }
@@ -1121,7 +1118,6 @@ void CTexture::FlushExternalTlut(void*, int)
  */
 CTextureSet::CTextureSet()
 {
-    __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
     __ct__21CPtrArray_P8CTexture_Fv(Textures(this));
     SetDefaultSize__21CPtrArray_P8CTexture_FUl(Textures(this), 0x10);

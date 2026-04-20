@@ -30,15 +30,19 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  */
 RedStreamDATA* _SearchEmptyStreamData()
 {
-	RedStreamDATA* streamData = DAT_8032f438;
-	RedStreamDATA* streamDataEnd = DAT_8032f438 + 4;
+	u32 streamData = (u32)p_Stream;
+	u32 streamDataEnd = (u32)p_Stream + 0x4c0;
 
 	do {
-		if (streamData->m_streamId == 0) {
-			return streamData;
+		if (*(int*)(streamData + 0x10c) == 0) {
+			return (RedStreamDATA*)streamData;
 		}
-		streamData++;
+		streamData += 0x130;
 	} while (streamData < streamDataEnd);
+
+	if (streamData < streamDataEnd) {
+		return (RedStreamDATA*)streamData;
+	}
 
 	return 0;
 }
@@ -273,14 +277,14 @@ void StreamStop(int param_1)
 {
 	unsigned int streamData;
 
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)p_Stream;
 	do {
 		volatile int* streamID = (int*)(streamData + 0x10c);
 		if ((*streamID != 0) && ((param_1 == -1) || (param_1 == *streamID))) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)p_Stream + 0x4c0);
 }
 
 /*
@@ -439,7 +443,7 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 		volume = ((volume + 1) * 0x100 - 1) * 0x1000 | 0x800;
 	}
 
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)p_Stream;
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
 		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
@@ -452,7 +456,7 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 			}
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)p_Stream + 0x4c0);
 }
 
 /*
@@ -468,7 +472,7 @@ void StreamPause(int param_1, int param_2)
 {
 	unsigned int streamData;
 
-	streamData = (unsigned int)DAT_8032f438;
+	streamData = (unsigned int)p_Stream;
 	if (gRedMemoryDebugEnabled != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
@@ -476,7 +480,7 @@ void StreamPause(int param_1, int param_2)
 			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
 		}
 		fflush(__files + 1);
-		streamData = (unsigned int)DAT_8032f438;
+		streamData = (unsigned int)p_Stream;
 	}
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
@@ -505,7 +509,7 @@ void StreamPause(int param_1, int param_2)
 			}
 		}
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)p_Stream + 0x4c0);
 }
 
 /*
@@ -519,7 +523,7 @@ void StreamPause(int param_1, int param_2)
  */
 void StreamControl()
 {
-	unsigned int streamData = (unsigned int)DAT_8032f438;
+	unsigned int streamData = (unsigned int)p_Stream;
 	do {
 		if (*(int*)(streamData + 0x110) == 1) {
 			int voiceData = *(int*)(streamData + 4);
@@ -593,5 +597,5 @@ void StreamControl()
 		}
 
 		streamData += 0x130;
-	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+	} while (streamData < (unsigned int)p_Stream + 0x4c0);
 }

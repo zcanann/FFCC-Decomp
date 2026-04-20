@@ -398,7 +398,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
     u8 baseAlpha = dataSet[0xB];
-    float alphaScale = (float)baseAlpha / FLOAT_803311e0;
+    double alphaScale = (double)((float)baseAlpha / FLOAT_803311e0);
     state->m_colorR = dataSet[8];
     state->m_colorG = dataSet[9];
     state->m_colorB = dataSet[0xA];
@@ -466,7 +466,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             }
 
             particle->m_fieldA = particle->m_fieldA - 1;
-            int alpha = (int)((float)particle->m_alpha * alphaScale);
+            int alpha = (int)((double)particle->m_alpha * alphaScale);
 
             if (particle->m_fieldA < 1) {
                 s16 jitter = 0;

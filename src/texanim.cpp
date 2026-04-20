@@ -816,8 +816,9 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
     unsigned int texAnimIndex;
     unsigned int texAnimCount;
 
-    for (texAnimIndex = 0, texAnimCount = static_cast<unsigned int>(GetSize__21CPtrArray_P8CTexAnim_Fv(&self->texAnims));
-         texAnimIndex < texAnimCount; texAnimIndex = texAnimIndex + 1) {
+    for (texAnimIndex = 0;
+         ((texAnimCount = static_cast<unsigned int>(GetSize__21CPtrArray_P8CTexAnim_Fv(&self->texAnims))), texAnimIndex < texAnimCount);
+         texAnimIndex = texAnimIndex + 1) {
         CTexAnimStorage* texAnim =
             reinterpret_cast<CTexAnimStorage*>(__vc__21CPtrArray_P8CTexAnim_FUl(&self->texAnims, texAnimIndex));
         int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
@@ -834,8 +835,9 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 
         if ((materialSet != 0) &&
             ((materialIndex = static_cast<int>(materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8)))) >= 0)) {
-            *reinterpret_cast<CMaterial**>((int)texAnim->refData + 0x108) =
+            void* foundMaterial =
                 (*reinterpret_cast<CPtrArray<CMaterial*>*>((int)materialSet + 8))[static_cast<unsigned long>(materialIndex)];
+            *reinterpret_cast<void**>((int)texAnim->refData + 0x108) = foundMaterial;
             material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
             material[1] = material[1] + 1;
         }
@@ -956,25 +958,27 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 
         CTexAnimStorage* texAnim =
             reinterpret_cast<CTexAnimStorage*>(__vc__21CPtrArray_P8CTexAnim_FUl(&self->texAnims, texAnimIndex));
-        unsigned int seqIndex = 0;
+        unsigned int seqIndex;
+        unsigned int seqCount;
 
-        for (; seqIndex < static_cast<unsigned int>(GetSize__25CPtrArray_P11CTexAnimSeq_Fv(Ptr(texAnim->refData, 0x110)));
+        for (seqIndex = 0;
+             ((seqCount = static_cast<unsigned int>(GetSize__25CPtrArray_P11CTexAnimSeq_Fv(Ptr(texAnim->refData, 0x110)))),
+              seqIndex < seqCount);
              seqIndex = seqIndex + 1) {
             CTexAnimSeqStorage* seq =
                 reinterpret_cast<CTexAnimSeqStorage*>(__vc__25CPtrArray_P11CTexAnimSeq_FUl(Ptr(texAnim->refData, 0x110), seqIndex));
-
             if (strcmp(name, seq->name) == 0) {
-                break;
+                goto found;
             }
         }
-
-        if (seqIndex != static_cast<unsigned int>(GetSize__25CPtrArray_P11CTexAnimSeq_Fv(Ptr(texAnim->refData, 0x110)))) {
+        seqIndex = 0xFFFFFFFF;
+found:
+        if (-1 < static_cast<int>(seqIndex)) {
             texAnim->unk0C = static_cast<int>(seqIndex);
             texAnim->unk10 = frame;
             texAnim->unk14 = static_cast<int>(mode);
             return;
         }
-
         texAnimIndex = texAnimIndex + 1;
     } while (true);
 }

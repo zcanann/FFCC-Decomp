@@ -289,6 +289,7 @@ ME_USB_process.cpp:
 	extab       start:0x80006AC4 end:0x80006AD4
 	extabindex  start:0x8000C730 end:0x8000C748
 	.text       start:0x8004CA08 end:0x8004DCE8
+	.rodata     start:0x801D7D78 end:0x801D7DA8
 	.data       start:0x801EA668 end:0x801EA778
 
 ME_AppRequest.cpp:

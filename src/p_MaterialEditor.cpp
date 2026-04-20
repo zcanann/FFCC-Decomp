@@ -28,7 +28,6 @@ extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
-extern "C" char __vt_CProcess[];
 extern char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern char lbl_8032E648[];
 
@@ -41,32 +40,11 @@ unsigned int m_table_desc3__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpre
 unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(s_CMaterialEditorPcs_VIEWER_801D7D18), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
 };
-unsigned int lbl_801EA624[4] = {
-    reinterpret_cast<unsigned int>(lbl_8032E648), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E648)
+unsigned int lbl_801EA624[3] = {
+    reinterpret_cast<unsigned int>(lbl_8032E648), 0, reinterpret_cast<unsigned int>(lbl_8032E648)
 };
 CMaterialEditorPcs MaterialEditorPcs;
-
-struct MaterialEditorTableInit {
-    MaterialEditorTableInit()
-    {
-        unsigned int* dst = reinterpret_cast<unsigned int*>(m_table__18CMaterialEditorPcs);
-
-        dst[1] = m_table_desc0__18CMaterialEditorPcs[0];
-        dst[2] = m_table_desc0__18CMaterialEditorPcs[1];
-        dst[3] = m_table_desc0__18CMaterialEditorPcs[2];
-        dst[4] = m_table_desc1__18CMaterialEditorPcs[0];
-        dst[5] = m_table_desc1__18CMaterialEditorPcs[1];
-        dst[6] = m_table_desc1__18CMaterialEditorPcs[2];
-        dst[7] = m_table_desc2__18CMaterialEditorPcs[0];
-        dst[8] = m_table_desc2__18CMaterialEditorPcs[1];
-        dst[9] = m_table_desc2__18CMaterialEditorPcs[2];
-        dst[12] = m_table_desc3__18CMaterialEditorPcs[0];
-        dst[13] = m_table_desc3__18CMaterialEditorPcs[1];
-        dst[14] = m_table_desc3__18CMaterialEditorPcs[2];
-    }
-};
-
-static MaterialEditorTableInit sMaterialEditorTableInit;
+u8 lbl_8026D338[0xC];
 static const char s_MaterialEditor[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
@@ -86,6 +64,46 @@ static void WriteU32(void* base, unsigned int offset, unsigned int value) {
 
 static void WriteF32(void* base, unsigned int offset, float value) {
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004c588
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_MaterialEditor_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&MaterialEditorPcs);
+    unsigned int* dst = m_table__18CMaterialEditorPcs;
+    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
+    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
+    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
+    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x84);
+    __ct__5ZLISTFv(self + 0xC8);
+    __ct__5ZLISTFv(self + 0xD8);
+    __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
+    dst[12] = desc3[0];
+    dst[13] = desc3[1];
+    dst[14] = desc3[2];
 }
 
 /*

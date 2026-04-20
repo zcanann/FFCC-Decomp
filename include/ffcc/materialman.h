@@ -6,6 +6,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_light.h"
+#include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
 
@@ -117,7 +118,7 @@ private:
     CMemory::CStage* m_materialStage;    // 0x218
 };
 
-class CMaterial
+class CMaterial : public CRef
 {
 public:
     CMaterial();
@@ -136,7 +137,7 @@ public:
     void AddTextureIdx(int, int);
 };
 
-class CMaterialSet
+class CMaterialSet : public CRef
 {
 public:
     CMaterialSet();

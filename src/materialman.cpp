@@ -2475,7 +2475,6 @@ CMaterial::~CMaterial()
     }
 
     __destroy_arr(Ptr(this, 0x4C), (void*)__dt__10CTexScrollFv, 0x14, 4);
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -2489,7 +2488,6 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__9CMaterial;
     __construct_array(Ptr(this, 0x4C), __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
     memset(Ptr(this, 0x8), 0, 0x10);
@@ -3140,7 +3138,6 @@ CMaterialSet::~CMaterialSet()
     }
 
     materials->~CPtrArray<CMaterial*>();
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -3156,7 +3153,6 @@ CMaterialSet::CMaterialSet()
 {
     CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
 
-    __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
     materials->m_vtable = PTR_PTR_s_CPtrArray_P9CMaterial_801e9bfc;
     materials->m_size = 0;

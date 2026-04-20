@@ -137,7 +137,6 @@ util.cpp:
 	.ctors      start:0x801D53CC end:0x801D53D0
 	.data       start:0x801E88C4 end:0x801E88D4
 	.sbss       start:0x8032EC70 end:0x8032EC74
-	.sdata2     start:0x80330898 end:0x803308BE
 
 maphit.cpp:
 	extab       start:0x80005E00 end:0x80005E60
@@ -828,7 +827,6 @@ pppRyjMegaBirth.cpp:
 	.rodata     start:0x801D9C00 end:0x801D9C14
 	.data       start:0x801FD3A8 end:0x801FD3D0
 	.bss        start:0x802EA080 end:0x802EA0B0
-	.sdata2     start:0x80332A30 end:0x80332A40
 
 pppRyjMegaBirthModel.cpp:
 	extab       start:0x800079C0 end:0x80007A00
@@ -836,7 +834,6 @@ pppRyjMegaBirthModel.cpp:
 	.text       start:0x800841E4 end:0x80087EF0
 	.rodata     start:0x801D9C18 end:0x801D9C31
 	.bss        start:0x802EA0B0 end:0x802EA110
-	.sdata2     start:0x80332A40 end:0x80332A58
 
 pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08
@@ -891,7 +888,6 @@ pppYmMegaBirthShpTail2.cpp:
 	.rodata     start:0x801D9C68 end:0x801D9C83
 	.data       start:0x801FD3D0 end:0x801FD3F8
 	.bss        start:0x802EA110 end:0x802EA140
-	.sdata2     start:0x80332D54 end:0x80332D7C
 
 pppYmMegaBirthShpTail3.cpp:
 	extab       start:0x80007AB0 end:0x80007AE0
@@ -900,7 +896,6 @@ pppYmMegaBirthShpTail3.cpp:
 	.rodata     start:0x801D9C88 end:0x801D9CA3
 	.data       start:0x801FD3F8 end:0x801FD420
 	.bss        start:0x802EA140 end:0x802EA170
-	.sdata2     start:0x80332D8C end:0x80332DB8
 
 pppKeLns.cpp:
 	extab       start:0x80007AE0 end:0x80007AE8
@@ -921,7 +916,6 @@ pppYmDeformationShp.cpp:
 	extab       start:0x80007AF8 end:0x80007B10
 	extabindex  start:0x8000DDC8 end:0x8000DDEC
 	.text       start:0x8008EEC8 end:0x800905DC
-	.sdata2     start:0x80332DB8 end:0x80332DD0
 
 pppWDrawMatrix.cpp:
 	extab       start:0x80007B10 end:0x80007B18
@@ -937,20 +931,17 @@ pppParMoveLine.cpp:
 	extab       start:0x80007B20 end:0x80007B28
 	extabindex  start:0x8000DE04 end:0x8000DE10
 	.text       start:0x800906DC end:0x800907C4
-	.sdata2     start:0x80332DD0 end:0x80332DD4
 
 pppYmMiasma.cpp:
 	extab       start:0x80007B28 end:0x80007B50
 	extabindex  start:0x8000DE10 end:0x8000DE4C
 	.text       start:0x800907C4 end:0x8009159C
 	.rodata     start:0x801D9CA8 end:0x801D9CB8
-	.sdata2     start:0x80332DD4 end:0x80332DDC
 
 pppYmDeformationScreen.cpp:
 	extab       start:0x80007B50 end:0x80007B60
 	extabindex  start:0x8000DE4C end:0x8000DE64
 	.text       start:0x8009159C end:0x80091E58
-	.sdata2     start:0x80332DDC end:0x80332DF4
 
 fontman.cpp:
 	extab       start:0x80007B60 end:0x80007BF0
@@ -1059,7 +1050,6 @@ cflat_r2system.cpp:
 	extabindex  start:0x8000E8D8 end:0x8000E9EC
 	.text       start:0x800B28F0 end:0x800BA2FC
 	.data       start:0x80210174 end:0x80210378
-	.sdata2     start:0x80332F90 end:0x80332FC8
 
 cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350
@@ -1085,7 +1075,6 @@ pppYmBreath.cpp:
 	extabindex  start:0x8000EA88 end:0x8000EADC
 	.text       start:0x800BFE78 end:0x800C17B8
 	.rodata     start:0x801DA9B0 end:0x801DA9C0
-	.sdata2     start:0x80333078 end:0x803330A0
 
 memorycard.cpp:
 	extab       start:0x800083F8 end:0x800084E0
@@ -1203,7 +1192,6 @@ pppYmMana.cpp:
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
-	.sdata2     start:0x80333D5C end:0x80333D80
 	.sbss2      start:0x80333DF0 end:0x80333DF4
 
 p_sound.cpp:

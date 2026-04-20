@@ -411,7 +411,7 @@ void getHsb(unsigned long)
  * Size:	TODO
  */
 CMaterialMan::CMaterialMan()
-    : m_color210()
+    : m_color214()
 {
 }
 

@@ -240,7 +240,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     bool emptyHistory;
 
-    if ((gPppCalcDisabled != 0) || (step->m_stepValue == 1)) {
+    if ((gPppCalcDisabled != 0) || (step->m_stepValue == 0xFFFF)) {
         return;
     }
 
@@ -472,7 +472,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     GXColor1u32(color);
     GXTexCoord2f32(FLOAT_8033342c, work->m_length);
 
-    if (step->m_stepValue != 0) {
+    if (step->m_stepValue != 0xFFFF) {
         long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
         pppUnitMatrix__FR10pppFMATRIX(&shapeMtx);
         shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;

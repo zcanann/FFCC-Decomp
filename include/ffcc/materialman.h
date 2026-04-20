@@ -89,7 +89,7 @@ public:
     CMemory::CStage* GetMemoryStage();
 
 private:
-    unsigned char m_pad004[0x40];
+    unsigned char m_pad004[0x3C];
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
@@ -112,9 +112,8 @@ private:
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
-    unsigned char m_pad209[0x07];
-    CColor m_color210;                   // 0x210
-    unsigned char m_pad214[0x04];
+    unsigned char m_pad209[0x0B];
+    CColor m_color214;                   // 0x214
     CMemory::CStage* m_materialStage;    // 0x218
 };
 

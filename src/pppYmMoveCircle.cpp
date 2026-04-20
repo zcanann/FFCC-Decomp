@@ -93,9 +93,9 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
     pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
 
-    *(f32*)((u8*)pppMngStPtr + 0x84) = nextPos.x;
-    *(f32*)((u8*)pppMngStPtr + 0x94) = nextPos.y;
-    *(f32*)((u8*)pppMngStPtr + 0xA4) = nextPos.z;
+    *(f32*)(pppMngSt + 0x84) = nextPos.x;
+    *(f32*)(pppMngSt + 0x94) = nextPos.y;
+    *(f32*)(pppMngSt + 0xA4) = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }
 

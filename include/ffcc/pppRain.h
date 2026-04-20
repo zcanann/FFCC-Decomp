@@ -18,7 +18,30 @@ struct PRain {
     f32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[0x4C];
+    f32 m_unk14;
+    f32 m_moveYDelta;
+    f32 m_accelYDelta;
+    f32 m_accelZDelta;
+    f32 m_driftY;
+    u16 m_lifeBase;
+    u16 m_lifeRange;
+    u8 _pad2c[0x30 - 0x2C];
+    f32 m_minX;
+    f32 m_unk34;
+    f32 m_minZ;
+    f32 m_unk3c;
+    f32 m_maxX;
+    f32 m_maxY;
+    f32 m_maxZ;
+    u8 _pad4c[0x50 - 0x4C];
+    u8 m_lineWidth;
+    u8 _pad51[3];
+    f32 m_lengthBase;
+    f32 m_lengthRand;
+    u8 m_blendMode;
+    u8 m_fogIndex;
+    u8 m_lightTarget;
+    u8 _pad63;
 };
 
 struct RAIN_DATA {

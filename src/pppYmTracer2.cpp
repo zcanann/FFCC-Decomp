@@ -264,11 +264,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
 
     for (i = 0; (s32)i < (s32)(param_2->m_payload[9] + 1); i++) {
         iVar8 = *(u16*)(param_2->m_payload + 4) - 2;
-        pfVar6 = (float*)(entries + iVar8);
-
         for (; (s32)i <= iVar8; iVar8--) {
             copyPolygonData(entries + (iVar8 + 1), entries + iVar8);
-            pfVar6 -= 10;
         }
 
         fVar2 = work->initWork[0];

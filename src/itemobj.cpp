@@ -3,6 +3,7 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/math.h"
+#include "ffcc/partMng.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/vector.h"
@@ -58,6 +59,9 @@ extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, flo
 extern "C" void onFrame__8CGPrgObjFv(void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
+extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
+extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
+extern "C" void pppSetLocSlot__8CPartMngFiP3Vec(void*, int, Vec*);
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
 extern float FLOAT_80331b24;
@@ -81,8 +85,16 @@ extern float FLOAT_80331bb8;
 extern float FLOAT_80331bb0;
 extern float FLOAT_80331b9c;
 extern float FLOAT_80331bbc;
+extern float FLOAT_80331b78;
+extern float FLOAT_80331ba8;
+extern float FLOAT_80331bac;
+extern float FLOAT_80331bb4;
+extern float FLOAT_80331bc0;
+extern float FLOAT_80331bc4;
 extern float FLOAT_80331b68;
 extern double DOUBLE_80331ba0;
+extern double DOUBLE_80331b60;
+extern double DOUBLE_80331b70;
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
 extern char DAT_80331b7c[];
@@ -97,6 +109,11 @@ extern char DAT_801dcf34[];
 extern char DAT_801dcf58[];
 extern char DAT_801dcf64[];
 extern char DAT_801dd010[];
+extern char DAT_801dcfa4[];
+extern char DAT_801dcfc8[];
+extern char DAT_801dcfec[];
+extern char s_f051_root_801dceb4[];
+extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
 	int count;
@@ -453,13 +470,61 @@ void CGItemObj::onFrameStat()
 			}
 		}
 		break;
+	case 0x1F:
+		pppSetLocSlot__8CPartMngFiP3Vec(&PartMng, *(int*)(self + 0x55C), &prgObj->m_worldPosition);
+
+		if (*(int*)(self + 0x52C) == 1) {
+			if (*(int*)(self + 0x530) == 0x7D) {
+				EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+			}
+		} else if (*(int*)(self + 0x52C) == 0 && *(int*)(self + 0x530) == 0) {
+			int particleNoA;
+			int particleNoB;
+
+			if (*(int*)(self + 0x500) == 2) {
+				particleNoA = 0x19;
+				particleNoB = 0x1E;
+			} else {
+				particleNoA = 0x18;
+				particleNoB = 0x1D;
+			}
+
+			putParticle__8CGPrgObjFiiP3Vecfi(this, particleNoA | 0x100, 0, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
+			putParticle__8CGPrgObjFiiP3Vecfi(
+			    this, particleNoB | 0x100, *(int*)(self + 0x55C), &prgObj->m_worldPosition, FLOAT_80331b18, 0);
+			playSe3D__8CGPrgObjFiiiiP3Vec(this, 0x1A, 0x32, 0x96, 0, 0);
+			prgObj->m_displayFlags &= ~1;
+			prgObj->m_bgColMask &= 0xFFFFFFF1;
+			prgObj->m_moveOffset.z = zero;
+			prgObj->m_moveOffset.x = zero;
+			prgObj->m_bgColMask |= 0x80000;
+
+			CVector damageOffset(zero, zero, zero);
+			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, s_f051_root_801dceb4, FLOAT_80331b78, FLOAT_80331b78,
+			                                   reinterpret_cast<Vec*>(&damageOffset));
+			prgObj->m_damageColliders[1].m_localPosition.x = 9.0f;
+		}
+		break;
 	case 0x23:
+		if (*(int*)(self + 0x52C) == 1) {
+			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
+			if (handle != 0 && handle->m_model != 0) {
+				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);
+				model[0x10C] = (model[0x10C] & 0x7F) | 0x80;
+			}
+		}
+
 		if (*(int*)(self + 0x52c) == 1 && *(int*)(self + 0x530) < 9) {
 			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x530)) * FLOAT_80331b68));
 
 			prgObj->m_rotationZ = wobble;
 			prgObj->m_rotationY = wobble;
 			prgObj->m_rotationX = wobble;
+
+			if (*(int*)(self + 0x530) == 8) {
+				prgObj->m_bgColMask |= 0x80000;
+				changeStat__8CGPrgObjFiii(this, 0x24, 0, 0);
+			}
 		}
 		break;
 	case 0x24:
@@ -467,7 +532,121 @@ void CGItemObj::onFrameStat()
 		prgObj->m_moveOffset.y = zero;
 		prgObj->m_moveOffset.z = FLOAT_80331bb0;
 		prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331b50;
+
+		if (prgObj->m_worldPosition.y < FLOAT_80331b1c) {
+			prgObj->m_groundHitOffset.y += FLOAT_80331bb4 * prgObj->m_moveTimer;
+		} else if (FLOAT_80331bb8 < prgObj->m_worldPosition.y) {
+			prgObj->m_groundHitOffset.y = -(FLOAT_80331bb4 * prgObj->m_moveTimer - prgObj->m_groundHitOffset.y);
+		}
+
+		{
+			float timer = prgObj->m_moveTimer;
+			float minClamp = FLOAT_80331ba8 * -timer;
+			float maxClamp = FLOAT_80331ba8 * timer;
+			float current = prgObj->m_groundHitOffset.y;
+
+			if (minClamp <= current && current <= maxClamp) {
+				prgObj->m_groundHitOffset.y = current;
+			} else if (current < minClamp) {
+				prgObj->m_groundHitOffset.y = minClamp;
+			} else {
+				prgObj->m_groundHitOffset.y = maxClamp;
+			}
+		}
+
+		prgObj->m_groundHitOffset.x =
+		    -FLOAT_80331b50 * (prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
+		prgObj->m_groundHitOffset.z =
+		    -FLOAT_80331b50 * (prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
 		break;
+	case 0x25: {
+		CVector delta;
+		Vec monTarget = *reinterpret_cast<Vec*>(m_aiWork__8CGMonObj + 4);
+
+		prgObj->m_moveOffset.y = FLOAT_80331bb0;
+		prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331bbc;
+		PSVECSubtract(&monTarget, &prgObj->m_worldPosition, reinterpret_cast<Vec*>(&delta));
+
+		float distance = PSVECMag(reinterpret_cast<Vec*>(&delta));
+		if (distance < FLOAT_80331bb8) {
+			changeStat__8CGPrgObjFiii(this, 0x27, 0, 0);
+		} else if (distance <= zero) {
+			prgObj->m_groundHitOffset.z = zero;
+			prgObj->m_groundHitOffset.y = zero;
+			prgObj->m_groundHitOffset.x = zero;
+		} else {
+			float moveScale = FLOAT_80331bc0 * prgObj->m_moveTimer;
+
+			prgObj->m_groundHitOffset.x += FLOAT_80331bc4 * delta.x * moveScale;
+			prgObj->m_groundHitOffset.y += FLOAT_80331bc4 * delta.y * moveScale;
+			prgObj->m_groundHitOffset.z += FLOAT_80331bc4 * delta.z * moveScale;
+		}
+		break;
+	}
+	case 0x26:
+	case 0x27: {
+		int ownerSlot;
+		int pdtNo = -1;
+		int particleNo = (stateId == 0x26) ? 4 : 0x13;
+
+		prgObj->m_groundHitOffset.z = zero;
+		prgObj->m_groundHitOffset.y = zero;
+		prgObj->m_groundHitOffset.x = zero;
+
+		if (*(int*)(self + 0x528) == 0) {
+			prgObj->m_stepSlopeLimit = zero;
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+
+			CGObject* owner = *(CGObject**)(self + 0x550);
+			if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_pdtLoadRef != 0) {
+				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+			}
+
+			float particleScale =
+			    FLOAT_80331b50 * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
+			    FLOAT_80331b4c;
+			putParticle__8CGPrgObjFiiP8CGObjectfi(this, (pdtNo << 8) | particleNo, *(int*)(self + 0x55C), this,
+			                                      particleScale, (stateId == 0x26) ? 0x12908 : 0x12903);
+		} else if (*(int*)(self + 0x528) == 0xD) {
+			ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
+
+			if ((unsigned int)System.m_execParam > 2U) {
+				Printf__7CSystemFPce(&System, (stateId == 0x26) ? DAT_801dcfc8 : DAT_801dcfa4, ownerSlot);
+			}
+
+			*(int*)(SoundBuffer + ownerSlot * 4 + 0x4F4) = 0;
+			if (stateId == 0x26) {
+				CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, FLOAT_80331b20, 0);
+				if (newItem == 0) {
+					if ((unsigned int)System.m_execParam > 1U) {
+						Printf__7CSystemFPce(&System, DAT_801dcfec);
+					}
+				} else {
+					unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
+
+					*reinterpret_cast<float*>(newItemSelf + 0x168) = prgObj->m_worldPosition.x;
+					*reinterpret_cast<float*>(newItemSelf + 0x16C) = prgObj->m_worldPosition.y;
+					*reinterpret_cast<float*>(newItemSelf + 0x170) = prgObj->m_worldPosition.z;
+					newItem->m_worldPosition.x = *reinterpret_cast<float*>(newItemSelf + 0x168);
+					newItem->m_worldPosition.y = *reinterpret_cast<float*>(newItemSelf + 0x16C);
+					newItem->m_worldPosition.z = *reinterpret_cast<float*>(newItemSelf + 0x170);
+
+					CFlatRuntime::CStack stack;
+					stack.m_word = 1;
+					SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+					    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
+				}
+			} else {
+				CFlatRuntime::CStack stack;
+				stack.m_word = 0;
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
+			}
+
+			self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
+		}
+		break;
+	}
 	default:
 		break;
 	}

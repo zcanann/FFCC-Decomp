@@ -577,29 +577,36 @@ CTexture::CTexture()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CTexture* __dt__8CTextureFv(CTexture* texture, short shouldDelete)
+CTexture::~CTexture()
 {
-    if (texture != 0) {
-        *reinterpret_cast<void**>(texture) = __vt__8CTexture;
-        if (texture->m_usesExternalAddress == 0) {
-            if (texture->m_imageData != 0) {
-                __dla__FPv(texture->m_imageData);
-                texture->m_imageData = 0;
-            }
-            if (texture->m_tlutData != 0) {
-                __dla__FPv(texture->m_tlutData);
-                texture->m_tlutData = 0;
-            }
-        } else {
-            texture->m_imageData = 0;
-            texture->m_tlutData = 0;
+    if (m_usesExternalAddress == 0) {
+        if (m_imageData != 0) {
+            __dla__FPv(m_imageData);
+            m_imageData = 0;
         }
-        __dt__4CRefFv(texture, 0);
-        if (shouldDelete > 0) {
-            __dl__FPv(texture);
+        if (m_tlutData != 0) {
+            __dla__FPv(m_tlutData);
+            m_tlutData = 0;
         }
+    } else {
+        m_imageData = 0;
+        m_tlutData = 0;
     }
-    return texture;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003AD7C
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTextureSet::~CTextureSet()
+{
+    ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(Textures(this));
+    __dt__21CPtrArray_P8CTexture_Fv(Textures(this), -1);
 }
 
 /*
@@ -1125,30 +1132,6 @@ CTextureSet::CTextureSet()
  * --INFO--
  * Address:	TODO
  * Size:	TODO
- */
-extern "C" CTextureSet* __dt__11CTextureSetFv(CTextureSet* textureSet, short shouldDelete)
-{
-    if (textureSet != 0) {
-        *reinterpret_cast<void**>(textureSet) = __vt__11CTextureSet;
-        ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(Textures(textureSet));
-        __dt__21CPtrArray_P8CTexture_Fv(Textures(textureSet), -1);
-        __dt__4CRefFv(textureSet, 0);
-        if (shouldDelete > 0) {
-            __dl__FPv(textureSet);
-        }
-    }
-
-    return textureSet;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003A9AC
- * PAL Size: 712b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
  */
 void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {

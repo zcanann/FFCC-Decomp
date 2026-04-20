@@ -181,26 +181,16 @@ namespace {
 struct CMcPcsInitializer {
     CMcPcsInitializer()
     {
-        unsigned int* table;
-        unsigned int* table0;
-        unsigned int* table1;
-        unsigned int* table2;
-
         gMcPcsSingletonPtr = sMcPcsSingletonData;
-        table = (unsigned int*)m_table__6CMcPcs;
-        table0 = m_table_desc0__6CMcPcs;
-        table1 = m_table_desc1__6CMcPcs;
-        table2 = m_table_desc2__6CMcPcs;
-
-        table[1] = table0[0];
-        table[2] = table0[1];
-        table[3] = table0[2];
-        table[4] = table1[0];
-        table[5] = table1[1];
-        table[6] = table1[2];
-        table[7] = table2[0];
-        table[8] = table2[1];
-        table[9] = table2[2];
+        m_table__6CMcPcs[1] = m_table_desc0__6CMcPcs[0];
+        m_table__6CMcPcs[2] = m_table_desc0__6CMcPcs[1];
+        m_table__6CMcPcs[3] = m_table_desc0__6CMcPcs[2];
+        m_table__6CMcPcs[4] = m_table_desc1__6CMcPcs[0];
+        m_table__6CMcPcs[5] = m_table_desc1__6CMcPcs[1];
+        m_table__6CMcPcs[6] = m_table_desc1__6CMcPcs[2];
+        m_table__6CMcPcs[7] = m_table_desc2__6CMcPcs[0];
+        m_table__6CMcPcs[8] = m_table_desc2__6CMcPcs[1];
+        m_table__6CMcPcs[9] = m_table_desc2__6CMcPcs[2];
     }
 };
 

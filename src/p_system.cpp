@@ -2,19 +2,13 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
-extern "C" void create__10CSystemPcsFv(CSystemPcs*);
-extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
-extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
-
-CSystemPcs SystemPcs;
-char s_CSystemPcs_801D7C48[] = "CSystemPcs";
-unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
-unsigned int m_table_desc1__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
-unsigned int m_table_desc2__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
+const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CSystemPcs_801D7C48), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CSystemPcs_801D7C48)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x16, 0x8
 };
+
+CSystemPcs SystemPcs;
 
 /*
  * --INFO--

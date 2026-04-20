@@ -110,6 +110,11 @@ struct LaserWork {
     u8 m_spawnEnabled;
 };
 
+struct LaserColorData {
+    u8 m_pad0[8];
+    pppCVECTOR m_color;
+};
+
 /*
  * --INFO--
  * PAL Address: 801766ec
@@ -386,7 +391,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     _pppPObject* baseObj = (_pppPObject*)pppLaser;
     Vec* points;
     int colorOffset = param_3->m_serializedDataOffsets[1];
-    u8* colorData = (u8*)pppLaser + 0x80 + colorOffset;
+    LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
     LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
     u32 count;
     u32 i;
@@ -418,7 +423,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     pppSetBlendMode(step->m_payload[0x1c]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        colorData, &baseObj->m_localMatrix, kPppLaserZero, step->m_payload[0x39], step->m_payload[0x38],
+        &colorData->m_color, &baseObj->m_localMatrix, kPppLaserZero, step->m_payload[0x39], step->m_payload[0x38],
         step->m_payload[0x1c], 0, 1, 1, 0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
@@ -436,7 +441,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
     GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
-    color = *(u32*)colorData;
+    color = *(u32*)&colorData->m_color;
     halfWidth = work->m_halfWidth;
     length = work->m_length;
 

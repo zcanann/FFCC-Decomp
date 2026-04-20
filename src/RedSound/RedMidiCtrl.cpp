@@ -1822,17 +1822,19 @@ void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  */
 void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    unsigned int rateDivisor;
+	int* trackData = (int*)track;
+	int rate;
+	int rateDivisor;
 
-    if (*(char*)trackData[0] == '\0') {
-        rateDivisor = 0x100;
-    } else {
-        rateDivisor = (unsigned int)*(unsigned char*)trackData[0];
-    }
-    trackData[0x1e] = 0x100000 / rateDivisor;
-    *(short*)(trackData + 0x23) = 0;
-    trackData[0] += 1;
+	if (*(u8*)trackData[0] == 0) {
+		rate = 0x100;
+	} else {
+		rate = *(u8*)trackData[0];
+	}
+	rateDivisor = rate;
+	trackData[0x1e] = 0x100000 / rateDivisor;
+	*(short*)(trackData + 0x23) = 0;
+	trackData[0] += 1;
 }
 
 /*
@@ -2019,15 +2021,17 @@ void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  */
 void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u32 rate;
 	int* trackData = (int*)track;
+	int rate;
+	int rateDivisor;
 
-	if (*(char*)trackData[0] == '\0') {
+	if (*(u8*)trackData[0] == 0) {
 		rate = 0x100;
 	} else {
 		rate = *(u8*)trackData[0];
 	}
-	trackData[0x26] = 0x100000 / rate;
+	rateDivisor = rate;
+	trackData[0x26] = 0x100000 / rateDivisor;
 	*(short*)(trackData + 0x2b) = 0;
 	trackData[0] += 1;
 }
@@ -2187,18 +2191,20 @@ void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = reinterpret_cast<int*>(track);
-    u32 rate;
+	int* trackData = (int*)track;
+	int rate;
+	int rateDivisor;
 
-    if (*reinterpret_cast<char*>(trackData[0]) == '\0') {
-        rate = 0x100;
-    } else {
-        rate = *reinterpret_cast<unsigned char*>(trackData[0]);
-    }
+	if (*(u8*)trackData[0] == 0) {
+		rate = 0x100;
+	} else {
+		rate = *(u8*)trackData[0];
+	}
 
-    trackData[0x2e] = 0x100000 / rate;
-    *reinterpret_cast<short*>(trackData + 0x34) = 0;
-    trackData[0] += 1;
+	rateDivisor = rate;
+	trackData[0x2e] = 0x100000 / rateDivisor;
+	*(short*)(trackData + 0x34) = 0;
+	trackData[0] += 1;
 }
 
 /*

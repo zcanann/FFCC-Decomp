@@ -232,7 +232,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             break;
         case 2:
             float pieceY = *(float*)(piece + 0x28);
-            if (-pieceY > value[7] - (*value * sy)) {
+            if (-pieceY < value[7] - (*value * sy)) {
                 piece[0x38] = 1;
             }
             break;
@@ -243,7 +243,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             break;
         case 4:
             float pieceX = *(float*)(piece + 0x24);
-            if (-pieceX > value[6] - (*value * sx)) {
+            if (-pieceX < -((*value * sx) - value[6])) {
                 piece[0x38] = 1;
             }
             break;
@@ -253,8 +253,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             float x = *value * sx;
             float y = *value * sy;
             float pieceX = *(float*)(piece + 0x24);
-            if ((x >= pieceX) && (-pieceX <= x) &&
-                (y >= *(float*)(piece + 0x28)) && (-*(float*)(piece + 0x28) <= y)) {
+            if ((pieceX <= x) && (-pieceX <= x) &&
+                (*(float*)(piece + 0x28) <= y) && (-*(float*)(piece + 0x28) <= y)) {
                 piece[0x38] = 1;
             }
             break;
@@ -264,8 +264,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             float x = *value * sx;
             sy = value[7];
             float y = *value * sy;
-            if ((-*(float*)(piece + 0x24) >= sx - x) || (-*(float*)(piece + 0x24) <= -sx + x) ||
-                (-*(float*)(piece + 0x28) >= sy - y) || (-*(float*)(piece + 0x28) <= -sy + y)) {
+            if ((value[6] - x <= -*(float*)(piece + 0x24)) || (-*(float*)(piece + 0x24) <= -value[6] + x) ||
+                (value[7] - y <= -*(float*)(piece + 0x28)) || (-*(float*)(piece + 0x28) <= -value[7] + y)) {
                 piece[0x38] = 1;
             }
             break;

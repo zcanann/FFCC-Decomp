@@ -1862,8 +1862,7 @@ dvd/dvdlow.c:
 	.text       start:0x80187490 end:0x801882D0
 	.bss        start:0x8030C950 end:0x8030CA20
 	.sdata      start:0x8032EAD0 end:0x8032EAD4
-	.sbss       start:0x8032F018 end:0x8032F044
-	.sbss       start:0x8032F048 end:0x8032F060
+	.sbss       start:0x8032F018 end:0x8032F060
 
 dvd/dvdfs.c:
 	.text       start:0x801882D0 end:0x80188A70
@@ -1905,8 +1904,7 @@ vi/vi.c:
 	.data       start:0x802177E0 end:0x80217BB0
 	.bss        start:0x8030CB48 end:0x8030CC90
 	.sdata      start:0x8032EB08 end:0x8032EB11
-	.sbss       start:0x8032F0E0 end:0x8032F114
-	.sbss       start:0x8032F118 end:0x8032F134
+	.sbss       start:0x8032F0E0 end:0x8032F138
 
 pad/Padclamp.c:
 	.text       start:0x8018D298 end:0x8018D4DC

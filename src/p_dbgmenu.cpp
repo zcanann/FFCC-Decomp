@@ -126,7 +126,8 @@ void CDbgMenuPcs::Quit()
  */
 int CDbgMenuPcs::GetTable(unsigned long index)
 {
-	return reinterpret_cast<int>(m_table__11CDbgMenuPcs + index * 0x15C);
+	u32 offset = index * 0x15C;
+	return reinterpret_cast<int>((u8*)m_table__11CDbgMenuPcs + offset);
 }
 
 /*

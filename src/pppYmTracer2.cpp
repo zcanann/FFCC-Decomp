@@ -349,10 +349,10 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  */
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
-    u8* colorData;
     TracerWork* work;
-    TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
+    u8* colorData;
+    TRACE_POLYGON* poly;
     CTexture* texture;
     s32 i;
     s32 dataOffset;
@@ -362,7 +362,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     PackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
-    f32 uvStep;
+    f64 uvStep;
     int textureIndex[2];
 
     dataOffset = *param_3->m_serializedDataOffsets;
@@ -376,8 +376,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (void*)(colorData + 8), (void*)&ppvCameraMatrix02, FLOAT_80331840,
-            param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
+            colorData + 8, (void*)&ppvCameraMatrix02, FLOAT_80331840, param_2->m_payload[0xC], param_2->m_payload[0xB],
+            param_2->m_payload[10], 0, 1, 1, 0);
         SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
         textureIndex[0] = 0;
@@ -405,15 +405,17 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
             }
 
-            uvStep = FLOAT_80331844 / (f32)((f64)work->visibleCount - DOUBLE_80331850);
+            u16 visibleCount = work->visibleCount;
+
+            uvStep = (f64)(FLOAT_80331844 / (f32)visibleCount);
             GXSetCullMode(GX_CULL_NONE);
 
-            if (work->visibleCount > 1) {
+            if (visibleCount > 1) {
                 f64 alphaScale = (f32)colorData[0x0B] / FLOAT_80331848;
 
-                GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
+                GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (visibleCount - 1) * 4);
 
-                for (i = 0; i < (s32)(work->visibleCount - 1); i++) {
+                for (i = 0; i < (s32)(visibleCount - 1); i++) {
                     TRACE_POLYGON* next = poly + 1;
 
                     uTop = (f32)((f64)(s32)i * (f64)uvStep);
@@ -449,10 +451,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_80331844);
 
-                    poly = next;
-                    GXPosition3f32(poly->pos.x, poly->pos.y, poly->pos.z);
+                    GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_80331840);
+
+                    poly++;
                 }
             }
         }

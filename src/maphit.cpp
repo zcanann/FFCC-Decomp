@@ -9,6 +9,7 @@
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
 Vec g_hit_mvec;
+extern unsigned char DAT_8032ec88;
 
 namespace {
 static const char s_maphit_cpp[] = "maphit.cpp";
@@ -382,84 +383,80 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
  */
 int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
-    for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++) {
-        unsigned char* face = Ptr(m_faces, faceIndex * 0x50);
-        unsigned char groupIndex = face[0x47];
-        unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
-        unsigned long groupMask = *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + groupIndex * 0x14);
-        if ((groupMask & mask) == 0) {
-            continue;
-        }
-
-        float* boundsMin = reinterpret_cast<float*>(face + 0x10);
-        float* boundsMax = reinterpret_cast<float*>(face + 0x1C);
-
-        bool overlap = false;
-        if (g_hit_cyl.m_top.z <= boundsMin[0]) {
-            if (boundsMin[0] <= g_hit_cyl.m_top.z) {
-                overlap = true;
-            } else {
-                overlap = boundsMin[0] <= g_hit_cyl.m_direction2.z;
-            }
-        } else {
-            overlap = g_hit_cyl.m_top.z <= boundsMax[0];
-        }
-        if (!overlap) {
-            continue;
-        }
-
-        overlap = false;
-        if (g_hit_cyl.m_direction2.x <= boundsMin[1]) {
-            if (boundsMin[1] <= g_hit_cyl.m_direction2.x) {
-                overlap = true;
-            } else {
-                overlap = boundsMin[1] <= g_hit_cyl.m_radius2;
-            }
-        } else {
-            overlap = g_hit_cyl.m_direction2.x <= boundsMax[1];
-        }
-        if (!overlap) {
-            continue;
-        }
-
-        overlap = false;
-        if (g_hit_cyl.m_direction2.y <= boundsMin[2]) {
-            if (boundsMin[2] <= g_hit_cyl.m_direction2.y) {
-                overlap = true;
-            } else {
-                overlap = boundsMin[2] <= g_hit_cyl.m_height2;
-            }
-        } else {
-            overlap = g_hit_cyl.m_direction2.y <= boundsMax[2];
-        }
-        if (!overlap) {
-            continue;
-        }
-
-        Vec* normal = reinterpret_cast<Vec*>(face + 0x00);
-        Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl.m_radius);
-        float dot = PSVECDotProduct(hitDirection, normal);
-        if (dot >= 0.0f) {
-            continue;
-        }
-
-        float hitT;
-        float planeD = *reinterpret_cast<float*>(face + 0x0C);
-        float topY = g_hit_cyl.m_top.y;
-        float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
-        hitT = -((hitDot - (planeD + topY)) / dot);
-        if (hitT <= 0.0f || g_hit_t_min <= hitT) {
-            continue;
-        }
-
-        g_hit_t_min = hitT;
-        gMapHitFace = reinterpret_cast<CMapHitFace*>(face);
-        g_hit_edge_idx_min = -1;
-        g_hit_cyl_min = g_hit_cyl;
-        return 1;
+    unsigned char* face = reinterpret_cast<unsigned char*>(gMapHitFace);
+    unsigned char groupIndex = face[0x47];
+    unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
+    unsigned long groupMask = *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + groupIndex * 0x14);
+    if ((groupMask & mask) == 0) {
+        return 0;
     }
 
-    return 0;
+    float* boundsMin = reinterpret_cast<float*>(face + 0x10);
+    float* boundsMax = reinterpret_cast<float*>(face + 0x1C);
+
+    bool overlap = false;
+    if (g_hit_cyl.m_top.z <= boundsMin[0]) {
+        if (boundsMin[0] <= g_hit_cyl.m_top.z) {
+            overlap = true;
+        } else {
+            overlap = boundsMin[0] <= g_hit_cyl.m_direction2.z;
+        }
+    } else {
+        overlap = g_hit_cyl.m_top.z <= boundsMax[0];
+    }
+    if (!overlap) {
+        return 0;
+    }
+
+    overlap = false;
+    if (g_hit_cyl.m_direction2.x <= boundsMin[1]) {
+        if (boundsMin[1] <= g_hit_cyl.m_direction2.x) {
+            overlap = true;
+        } else {
+            overlap = boundsMin[1] <= g_hit_cyl.m_radius2;
+        }
+    } else {
+        overlap = g_hit_cyl.m_direction2.x <= boundsMax[1];
+    }
+    if (!overlap) {
+        return 0;
+    }
+
+    overlap = false;
+    if (g_hit_cyl.m_direction2.y <= boundsMin[2]) {
+        if (boundsMin[2] <= g_hit_cyl.m_direction2.y) {
+            overlap = true;
+        } else {
+            overlap = boundsMin[2] <= g_hit_cyl.m_height2;
+        }
+    } else {
+        overlap = g_hit_cyl.m_direction2.y <= boundsMax[2];
+    }
+    if (!overlap) {
+        return 0;
+    }
+
+    Vec* normal = reinterpret_cast<Vec*>(face + 0x00);
+    Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl.m_radius);
+    float dot = PSVECDotProduct(hitDirection, normal);
+    if (dot >= 0.0f) {
+        return 0;
+    }
+
+    float hitT;
+    float planeD = *reinterpret_cast<float*>(face + 0x0C);
+    float topY = g_hit_cyl.m_top.y;
+    float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
+    hitT = -((hitDot - (planeD + topY)) / dot);
+    if (hitT <= 0.0f || g_hit_t_min <= hitT) {
+        return 0;
+    }
+
+    g_hit_t_min = hitT;
+    g_hit_edge_idx_min = -1;
+    g_hit_cyl_min = g_hit_cyl;
+    DAT_8032ec88 = 1;
+    return 1;
 }
 
 /*
@@ -688,15 +685,18 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
  * Address:	TODO
  * Size:	TODO
  */
-int CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
+void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
 {
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
-    g_hit_t_min = s_large_pos;
-    gMapHitFace = 0;
-    g_hit_edge_idx_min = -1;
 
-    return CheckHitFaceCylinder(mask);
+    CMapHitFace* face = m_faces;
+    int faceOffset = 0;
+    for (int i = 0; i < m_faceCount; i++) {
+        gMapHitFace = reinterpret_cast<CMapHitFace*>(Ptr(face, faceOffset));
+        CheckHitFaceCylinder(mask);
+        faceOffset += 0x50;
+    }
 }
 
 /*

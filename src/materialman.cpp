@@ -55,6 +55,7 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__12CMaterialMan[];
 extern "C" void* __vt__12CMaterialSet[];
+extern "C" void* __vt__8CPtrArrayIP9CMaterial[];
 extern "C" void __ct__22CPtrArray_P9CMaterial_Fv(void*);
 extern "C" void __dt__22CPtrArray_P9CMaterial_Fv(void*, int);
 extern float FLOAT_8032faf0;
@@ -80,8 +81,9 @@ template <class T>
 class CPtrArray
 {
 public:
+    void** m_vtable;
     CPtrArray();
-    virtual ~CPtrArray();
+    ~CPtrArray();
     int GetSize();
     int Add(T item);
     void RemoveAll();
@@ -255,6 +257,7 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
+    m_vtable = __vt__8CPtrArrayIP9CMaterial;
     RemoveAll();
 }
 
@@ -270,7 +273,8 @@ CPtrArray<CMaterial*>::~CPtrArray()
 extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
 {
     if (ptrArray != 0) {
-        ptrArray->~CPtrArray<CMaterial*>();
+        ptrArray->m_vtable = __vt__8CPtrArrayIP9CMaterial;
+        ptrArray->RemoveAll();
         if (shouldDelete > 0) {
             __dl__FPv(ptrArray);
         }

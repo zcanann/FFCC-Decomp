@@ -472,9 +472,6 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
  */
 void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 {
-	static const char sStateOn[] = "ON";
-	static const char sStateOff[] = "OFF";
-	static const char sStateUnknown[] = "?";
 	CDM* head = menu;
 
 	do {
@@ -497,11 +494,11 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 			const char* stateText;
 			if (menu->m_state == 1) {
-				stateText = sStateOn;
+				stateText = "ON";
 			} else {
-				stateText = sStateUnknown;
+				stateText = "?";
 				if (menu->m_state == 0) {
-					stateText = sStateOff;
+					stateText = "OFF";
 				}
 			}
 

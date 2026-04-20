@@ -1455,8 +1455,10 @@ p_dbgmenu.cpp:
 	extabindex  start:0x80010810 end:0x800108AC
 	.text       start:0x8012B710 end:0x8012D3FC
 	.ctors      start:0x801D5440 end:0x801D5444
+	.rodata     start:0x801DD428 end:0x801DD498
 	.data       start:0x80212398 end:0x802127A0
 	.bss        start:0x80306708 end:0x80309174
+	.sdata      start:0x8032EA48 end:0x8032EA50
 	.sdata2     start:0x80331C18 end:0x80331C54
 
 pppChangeBGColor.cpp:

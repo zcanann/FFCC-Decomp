@@ -22,7 +22,7 @@ struct pppEmission {
     u8 field_0x8b;
 };
 
-struct pppEmissionUnkB {
+struct PEmission {
     s32 m_graphId;
     s32 m_dataValIndex;
     u8 m_initWOrk;
@@ -31,13 +31,14 @@ struct pppEmissionUnkB {
     f32 m_arg3;
     u8 m_payload[0x20];
 };
+typedef PEmission pppEmissionUnkB;
 
 struct pppEmissionUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
 
-void SetTexGenMode(pppEmission*);
+void SetTexGenMode(PEmission*);
 void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 

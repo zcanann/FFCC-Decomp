@@ -55,19 +55,6 @@ void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, fl
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800E6B98
- * PAL Size: 2b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void SetTexGenMode(pppEmission*) {
-    // TODO
-}
-
 struct EmissionDisplayList {
     u32 m_size;
     void* m_data;
@@ -516,6 +503,32 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
  */
 void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
     pppInitBlendMode();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetTexGenMode(PEmission* emission)
+{
+    if (emission->m_payload[10] == 0) {
+        GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+    } else {
+        Mtx texMtx;
+
+        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
+        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
+        if (emission->m_payload[10] == 1) {
+            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
+        } else if (emission->m_payload[10] == 2) {
+            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
+        }
+    }
 }
 
 /*

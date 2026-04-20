@@ -79,11 +79,11 @@ static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset;
-    int graphId;
-    LocationTitle2Work* work;
-    LocationTitle2Particle* particle;
-    long** shapeTable;
     int graphFrame;
+    int graphId;
+    long** shapeTable;
+    LocationTitle2Particle* particle;
+    LocationTitle2Work* work;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
     work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);

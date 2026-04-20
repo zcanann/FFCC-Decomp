@@ -406,10 +406,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
  */
 void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
-    u8* colorData;
     TracerWork* work;
-    TRACE_POLYGON* poly;
     CMapMesh* mapMesh;
+    u8* colorData;
+    TRACE_POLYGON* poly;
     CTexture* texture;
     s32 i;
     s32 dataOffset;
@@ -460,18 +460,20 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
             GXSetCullMode(GX_CULL_NONE);
 
             for (i = 0; i < (s32)(work->count - 1); i++) {
-                if ((((poly + 1)->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
-                     (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
-                     (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
-                     (FLOAT_803306e8 != (poly + 1)->to.x) && (FLOAT_803306e8 != (poly + 1)->to.y) &&
-                     (FLOAT_803306e8 != (poly + 1)->to.z) && (FLOAT_803306e8 != (poly + 1)->from.x) &&
-                     (FLOAT_803306e8 != (poly + 1)->from.y) && (FLOAT_803306e8 != (poly + 1)->from.z))) {
+                TRACE_POLYGON* next = poly + 1;
+
+                if ((next->life > 0) && (FLOAT_803306e8 != poly->to.x) && (FLOAT_803306e8 != poly->to.y) &&
+                    (FLOAT_803306e8 != poly->to.z) && (FLOAT_803306e8 != poly->from.x) &&
+                    (FLOAT_803306e8 != poly->from.y) && (FLOAT_803306e8 != poly->from.z) &&
+                    (FLOAT_803306e8 != next->to.x) && (FLOAT_803306e8 != next->to.y) &&
+                    (FLOAT_803306e8 != next->to.z) && (FLOAT_803306e8 != next->from.x) &&
+                    (FLOAT_803306e8 != next->from.y) && (FLOAT_803306e8 != next->from.z)) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
                     colorTop.value = DAT_803306e0;
                     colorBottom.value = DAT_803306e4;
                     colorTop.bytes[3] = poly->alpha;
-                    colorBottom.bytes[3] = (poly + 1)->alpha;
+                    colorBottom.bytes[3] = next->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
                     GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
@@ -482,11 +484,11 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                     GXColor1u32(colorTop.value);
                     GXTexCoord2f32(uTop, FLOAT_803306e8);
 
-                    GXPosition3f32((poly + 1)->to.x, (poly + 1)->to.y, (poly + 1)->to.z);
+                    GXPosition3f32(next->to.x, next->to.y, next->to.z);
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_803306ec);
 
-                    GXPosition3f32((poly + 1)->from.x, (poly + 1)->from.y, (poly + 1)->from.z);
+                    GXPosition3f32(next->from.x, next->from.y, next->from.z);
                     GXColor1u32(colorBottom.value);
                     GXTexCoord2f32(uBottom, FLOAT_803306e8);
                 }

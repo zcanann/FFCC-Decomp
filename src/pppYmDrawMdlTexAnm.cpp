@@ -110,17 +110,20 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppModelSt* model;
-    pppYmDrawMdlTexAnmColorBlock* colorBlock;
+    u8* colorBase;
     pppFMATRIX matrix;
     u8* initBytes;
     u8* stepBytes;
+    s32 colorOffset;
+
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
     model = (pppModelSt*)GetMapMeshTable()[step->m_dataValIndex];
     if (model == NULL) {
         return;
     }
 
-    colorBlock = GetYmDrawMdlTexAnmColorBlock(ymDrawMdlTexAnm, ctrl);
+    colorOffset = ctrl->m_serializedDataOffsets[0];
+    colorBase = (u8*)ymDrawMdlTexAnm + 0x80 + colorOffset;
 
     pppUnitMatrix(matrix);
     matrix.value[2][2] *= FLOAT_80330548;
@@ -130,7 +133,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorBlock->m_color, &ymDrawMdlTexAnm->m_modelViewMatrix,
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((pppCVECTOR*)(colorBase + 8), &ymDrawMdlTexAnm->m_modelViewMatrix,
                                                                step->m_arg3, step->m_payload[0xC], initBytes[2], initBytes[1],
                                                                initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
 

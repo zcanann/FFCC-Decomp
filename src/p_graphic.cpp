@@ -47,11 +47,6 @@ u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
     0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
 };
 
-extern char* PTR_DAT_801e9e64[];
-extern char DAT_8032fbf4[];
-extern char DAT_8032fbf8[];
-extern u32 DAT_8032fb74;
-extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
@@ -60,6 +55,24 @@ extern "C" float FLOAT_8032fc00;
 static const char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
 static const char s__s__d____3f___801d7ba4[] = "%s(%d) %.3f%%";
 static const char s_MOVE___1f___BG___1f___OBJ___1f___801d7bb4[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
+static const char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[] = "%c%c%c%c%c%c%c%c%c%c";
+static const char s_debug_pad_port_fmt[] = "%dP";
+static const char s_debug_frame_fmt[] = "%d";
+static const u32 s_debug_bar_color = 0x808080FF;
+static char s_scenegraph_step_none[] = "";
+static char s_scenegraph_step_x8[] = "x8";
+static char s_scenegraph_step_x0[] = "x0";
+static char s_scenegraph_step_x1_8[] = "x1/8";
+static char s_scenegraph_step_x1_4[] = "x1/4";
+static char s_scenegraph_step_x1_2[] = "x1/2";
+static char* s_scenegraph_step_labels[] = {
+    s_scenegraph_step_none,
+    s_scenegraph_step_x8,
+    s_scenegraph_step_x0,
+    s_scenegraph_step_x1_8,
+    s_scenegraph_step_x1_4,
+    s_scenegraph_step_x1_2,
+};
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
@@ -274,11 +287,11 @@ void CGraphicPcs::drawEnd()
 		Graphic.InitDebugString();
 
 		if (System.m_scenegraphStepMode != 0) {
-			Graphic.DrawDebugStringDirect(0x10, 0x10, PTR_DAT_801e9e64[System.m_scenegraphStepMode], 0xC);
+			Graphic.DrawDebugStringDirect(0x10, 0x10, s_scenegraph_step_labels[System.m_scenegraphStepMode], 0xC);
 		}
 
 		if (Pad._448_4_ != -1) {
-			sprintf(debugPadString, DAT_8032fbf4, Pad._448_4_ + 1);
+			sprintf(debugPadString, s_debug_pad_port_fmt, Pad._448_4_ + 1);
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
@@ -318,7 +331,7 @@ void CGraphicPcs::drawEnd()
 			x += 0x60;
 		}
 
-		sprintf(debugInputString, DAT_8032fbf8, System.m_frameCounter);
+		sprintf(debugInputString, s_debug_frame_fmt, System.m_frameCounter);
 		Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
 	}
 
@@ -375,7 +388,7 @@ void CGraphicPcs::drawBar()
     }
     const bool drawText = (padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000);
 
-    const u32 backColor = DAT_8032fb74;
+    const u32 backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 448.0f, 0.0f);
     GXColor1u32(backColor);

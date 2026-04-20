@@ -36,10 +36,6 @@ extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
 class CRelProfile
 {
 public:
-    u32 m_relIndex;
-    u32 m_stageIndex;
-    u32 m_mapIndex;
-
     ~CRelProfile();
 };
 
@@ -84,9 +80,9 @@ unsigned int PTR_s_CMapPcs_GAME__801e8ad8[3][0x414 / 3 / sizeof(unsigned int)] =
      0x3F, 1},
 };
 
-CRelProfile s_mapRelProfile0__7CMapPcs;
-CRelProfile s_mapRelProfile1__7CMapPcs;
-CRelProfile s_mapRelProfile2__7CMapPcs;
+CRelProfile g_hit_prof;
+CRelProfile g_map_calc_prof;
+CRelProfile g_map_draw_prof;
 unsigned short s_loadedStageNo__7CMapPcs;
 unsigned short s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;

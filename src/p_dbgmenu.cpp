@@ -15,32 +15,6 @@ CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
-extern "C" {
-extern const char s_CDbgMenuPcs_801DD428[];
-extern const char lbl_80331C18[];
-extern const char lbl_80331C20[];
-extern const char lbl_80331C28[];
-extern const char lbl_80331C30[];
-extern const char lbl_80331C34[];
-extern const char lbl_80331C3C[];
-extern const char lbl_80331C44[];
-extern const char lbl_80331C4C[];
-extern const char lbl_80331C54[];
-extern const char lbl_80331C5C[];
-extern const char lbl_80331C64[];
-extern const char lbl_80331C6C[];
-extern const char lbl_80331C70[];
-extern const char lbl_80331C78[];
-extern const char lbl_80331C80[];
-extern const char s_DISPPRINT_801DD434[];
-extern const char s_COLCHECK_801DD440[];
-extern const char s_PARTICLE_801DD44C[];
-extern const char s_SOUND_INFO_801DD458[];
-extern const char s_PART_HEAP_801DD464[];
-extern const char s_CHARA_INFO_801DD470[];
-extern const char s_ITEM_WEAPON_801DD47C[];
-extern const char s_SMITH_MASTER_801DD488[];
-}
 
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
@@ -60,6 +34,31 @@ struct DbgMenuDef {
     u32 actionType;
     u32 actionFlags;
 };
+
+static const char s_CDbgMenuPcs_801DD428[] = "CDbgMenuPcs";
+static const char lbl_80331C18[] = "MENU";
+static const char lbl_80331C20[] = "SHOUKI";
+static const char lbl_80331C28[] = "MARK";
+static const char lbl_80331C30[] = "BAR";
+static const char lbl_80331C34[] = "SPEED";
+static const char lbl_80331C3C[] = "MUTEKI";
+static const char lbl_80331C44[] = "FOLLOW";
+static const char s_DISPPRINT_801DD434[] = "DISPPRINT";
+static const char lbl_80331C4C[] = "COMBO";
+static const char lbl_80331C54[] = "PAUSE";
+static const char lbl_80331C5C[] = "BATTLE";
+static const char lbl_80331C64[] = "ANALOG";
+static const char s_COLCHECK_801DD440[] = "COLCHECK";
+static const char lbl_80331C6C[] = "A*";
+static const char s_PARTICLE_801DD44C[] = "PARTICLE";
+static const char lbl_80331C70[] = "PRINTF";
+static const char s_SOUND_INFO_801DD458[] = "SOUND INFO";
+static const char lbl_80331C78[] = "SHADOW";
+static const char s_PART_HEAP_801DD464[] = "PART HEAP";
+static const char s_CHARA_INFO_801DD470[] = "CHARA INFO";
+static const char s_ITEM_WEAPON_801DD47C[] = "ITEM WEAPON";
+static const char s_SMITH_MASTER_801DD488[] = "SMITH MASTER";
+static const char lbl_80331C80[] = "CHARA";
 
 u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
 u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};

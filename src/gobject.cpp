@@ -72,7 +72,7 @@ extern float FLOAT_80330424;
 extern float FLOAT_80330428;
 extern float FLOAT_8033042c;
 extern float FLOAT_80330430;
-extern "C" char s_l_item2[];
+char s_l_item2[] = "l_item2";
 
 struct Vec4d {
     float x;
@@ -114,8 +114,7 @@ static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
 static const char s_gobject_cpp[] = "gobject.cpp";
-static const char s_l_item[] = "l_item";
-static const char s_r_item[] = "r_item";
+char s_r_item[] = "r_item";
 static const float  sAnimFrameOffset = 1.0f;  // FLOAT_80330338
 static const double sLoopBias = 1.2;   // DOUBLE_80330378
 static const float  sZeroFloat = 0.0f;  // FLOAT_80330350
@@ -2918,9 +2917,9 @@ bool CGObject::IsDispRader()
  * Address:	TODO
  * Size:	TODO
  */
-int CGObject::onHit(int, CGObject*, int, Vec*)
+void CGObject::onHit(int, CGObject*, int, Vec*)
 {
-	return 0;
+	return;
 }
 
 /*

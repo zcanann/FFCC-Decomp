@@ -10,16 +10,8 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-
     CPtrArray();
-    ~CPtrArray();
+    virtual ~CPtrArray();
 
     bool Add(T item);
     void SetAt(unsigned long index, T item);
@@ -31,6 +23,14 @@ public:
     void SetDefaultSize(unsigned long defaultSize);
     int setSize(unsigned long newSize);
     T GetAt(unsigned long index);
+
+private:
+    unsigned long m_numItems;
+    unsigned long m_size;
+    unsigned long m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
 };
 
 extern "C" void __dl__FPv(void*);
@@ -144,9 +144,8 @@ static inline CTexture* AllocTexture()
 template <>
 CPtrArray<CTexture*>::CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP8CTexture;
-    m_size = 0;
     m_numItems = 0;
+    m_size = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -165,7 +164,6 @@ CPtrArray<CTexture*>::CPtrArray()
 template <>
 CPtrArray<CTexture*>::~CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP8CTexture;
     RemoveAll();
 }
 
@@ -181,8 +179,7 @@ CPtrArray<CTexture*>::~CPtrArray()
 extern "C" CPtrArray<CTexture*>* dtor_8003BE70(CPtrArray<CTexture*>* ptrArray, short param_2)
 {
     if (ptrArray != 0) {
-        ptrArray->m_vtable = __vt__8CPtrArrayIP8CTexture;
-        ptrArray->RemoveAll();
+        ptrArray->~CPtrArray<CTexture*>();
         if (0 < param_2) {
             __dl__FPv(ptrArray);
         }
@@ -577,29 +574,36 @@ CTexture::CTexture()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CTexture* __dt__8CTextureFv(CTexture* texture, short shouldDelete)
+CTexture::~CTexture()
 {
-    if (texture != 0) {
-        *reinterpret_cast<void**>(texture) = __vt__8CTexture;
-        if (texture->m_usesExternalAddress == 0) {
-            if (texture->m_imageData != 0) {
-                __dla__FPv(texture->m_imageData);
-                texture->m_imageData = 0;
-            }
-            if (texture->m_tlutData != 0) {
-                __dla__FPv(texture->m_tlutData);
-                texture->m_tlutData = 0;
-            }
-        } else {
-            texture->m_imageData = 0;
-            texture->m_tlutData = 0;
+    if (m_usesExternalAddress == 0) {
+        if (m_imageData != 0) {
+            __dla__FPv(m_imageData);
+            m_imageData = 0;
         }
-        __dt__4CRefFv(texture, 0);
-        if (shouldDelete > 0) {
-            __dl__FPv(texture);
+        if (m_tlutData != 0) {
+            __dla__FPv(m_tlutData);
+            m_tlutData = 0;
         }
+    } else {
+        m_imageData = 0;
+        m_tlutData = 0;
     }
-    return texture;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003AD7C
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTextureSet::~CTextureSet()
+{
+    ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(Textures(this));
+    __dt__21CPtrArray_P8CTexture_Fv(Textures(this), -1);
 }
 
 /*
@@ -1114,7 +1118,6 @@ void CTexture::FlushExternalTlut(void*, int)
  */
 CTextureSet::CTextureSet()
 {
-    __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__11CTextureSet;
     __ct__21CPtrArray_P8CTexture_Fv(Textures(this));
     SetDefaultSize__21CPtrArray_P8CTexture_FUl(Textures(this), 0x10);
@@ -1125,30 +1128,6 @@ CTextureSet::CTextureSet()
  * --INFO--
  * Address:	TODO
  * Size:	TODO
- */
-extern "C" CTextureSet* __dt__11CTextureSetFv(CTextureSet* textureSet, short shouldDelete)
-{
-    if (textureSet != 0) {
-        *reinterpret_cast<void**>(textureSet) = __vt__11CTextureSet;
-        ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(Textures(textureSet));
-        __dt__21CPtrArray_P8CTexture_Fv(Textures(textureSet), -1);
-        __dt__4CRefFv(textureSet, 0);
-        if (shouldDelete > 0) {
-            __dl__FPv(textureSet);
-        }
-    }
-
-    return textureSet;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003A9AC
- * PAL Size: 712b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
  */
 void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {

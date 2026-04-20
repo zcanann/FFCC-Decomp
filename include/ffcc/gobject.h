@@ -77,12 +77,12 @@ public:
     void SetAnimSlot(int, int);
     float CalcSafePos(int, CGObject*, Vec*);
     void PutDropItem();
-    bool IsDispRader();
-    int onHit(int, CGObject*, int, Vec*);
-    void onAnimPoint(int, int);
-    float onAlphaUpdate();
-    void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
-    void onDrawDebug(CFont*, float, float&, float);
+    virtual bool IsDispRader();
+    virtual void onHit(int, CGObject*, int, Vec*);
+    virtual void onAnimPoint(int, int);
+    virtual float onAlphaUpdate();
+    virtual void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
+    virtual void onDrawDebug(CFont*, float, float&, float);
 
     struct AttackCol
     {

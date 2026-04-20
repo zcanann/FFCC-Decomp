@@ -86,10 +86,6 @@ extern const float FLOAT_8032F9B4 = 360.0f;
 extern const float FLOAT_8032F9B8 = 5.0e-6f;
 extern const float FLOAT_8032f9bc = -0.1f;
 extern char DAT_801ead4c[];
-extern char DAT_801d7318[];
-extern char DAT_801d7350[];
-extern char DAT_801d7384[];
-extern char DAT_801d73c4[];
 extern const char DAT_8032f984[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
@@ -99,14 +95,33 @@ extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static const char s_map_cpp[] = "map.cpp";
-static const char s_CMapMng_mapmng[] = "CMapMng.mapmng";
-static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static const char s_ptrarray_grow_error[] = "CPtrArray grow error";
-static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
+static const char s_set_bg_camera_semi_trans_missing_fmt[] =
+    "SET_BG_CAMERA_SEMI_TRANS  mesh_id=%d  "
+    "\x82\xaa\x94\xad\x8c\xa9\x82\xc5\x82\xab\x82\xc8\x82\xa2\x81\x42\n";
+static const char s_set_bg_transparent_missing_fmt[] =
+    "SET_BG_TRANSPARENT  mesh_id=%d  "
+    "\x82\xaa\x94\xad\x8c\xa9\x82\xc5\x82\xab\x82\xc8\x82\xa2\x81\x42\n";
+static const char s_check_hit_cylinder_near_small_vec_fmt[] =
+    "CheckHitCylinderNear "
+    "\x93\x96\x82\xe8\x82\xc5\x83\x78\x83\x4e\x83\x67\x83\x8b\x82\xaa\x8f\xac\x82\xb3\x82\xb7\x82\xac\x82\xe9 "
+    "vec=(%f,%f,%f)\n";
+static const char s_check_hit_cylinder_small_vec_fmt[] =
+    "CheckHitCylinder "
+    "\x93\x96\x82\xe8\x82\xc5\x83\x78\x83\x4e\x83\x67\x83\x8b\x82\xaa\x8f\xac\x82\xb3\x82\xb7\x82\xac\x82\xe9 "
+    "vec=(%f,%f,%f)\n";
+static const char s_read_mid_fmt[] = "ReadMid fn=%s\n";
+static const char s_mapReadErrorFmt[] = "CAN NOT READ %s !!!!!!\n";
+static const char s_error_root_mapobj_not_found[] = "Error root mapobj not found\n";
 static const char s_mapMplPathFmt[] = "%s_%d.mpl";
-static const char s_mapReadOpenErrorFmt[] = "CAN NOT READ OPEN %s";
-static const char s_mapReadMplFmt[] = "ReadMpl fn %s";
-static const char s_mapReadErrorFmt[] = "CAN NOT READ %s";
+static const char s_mapReadOpenErrorFmt[] = "CAN NOT READ OPEN %s !!!!!!\n";
+static const char s_mapReadMplFmt[] = "ReadMpl fn=%s\n";
+static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
+static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
+static const char s_map_manager_label_block[] = "CMapMng.mapmng\0\0CMapObjAtr\0";
+static const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
+static const char s_ptrarray_grow_error[] =
+    "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\n";
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -1386,7 +1401,7 @@ void CMapMng::Create()
     *reinterpret_cast<unsigned int*>(Ptr(this, 0x22A6C)) = 0;
     *reinterpret_cast<unsigned int*>(Ptr(this, 0x228E8)) = 0;
 
-    CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_CMapMng_mapmng), 0);
+    CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
     *reinterpret_cast<CMemory::CStage**>(this) = stage;
 
     reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0))->SetStage(stage);
@@ -2829,7 +2844,8 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             System.Printf(DAT_801ead4c);
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
-            System.Printf(DAT_801d73c4, static_cast<double>(move->x), static_cast<double>(move->y), static_cast<double>(move->z));
+            System.Printf(const_cast<char*>(s_check_hit_cylinder_small_vec_fmt), static_cast<double>(move->x),
+                static_cast<double>(move->y), static_cast<double>(move->z));
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(DAT_801ead4c);
@@ -2882,7 +2898,8 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
             System.Printf(DAT_801ead4c);
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
-            System.Printf(DAT_801d7384, static_cast<double>(move->x), static_cast<double>(move->y), static_cast<double>(move->z));
+            System.Printf(const_cast<char*>(s_check_hit_cylinder_near_small_vec_fmt), static_cast<double>(move->x),
+                static_cast<double>(move->y), static_cast<double>(move->z));
         }
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(DAT_801ead4c);
@@ -3065,7 +3082,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             System.Printf(DAT_801ead4c);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_801d7350, id);
+            System.Printf(const_cast<char*>(s_set_bg_transparent_missing_fmt), id);
         }
         if (System.m_execParam >= 1) {
             System.Printf(DAT_801ead4c);
@@ -3107,7 +3124,7 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
             System.Printf(DAT_801ead4c);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(DAT_801d7318, id);
+            System.Printf(const_cast<char*>(s_set_bg_camera_semi_trans_missing_fmt), id);
         }
         if (System.m_execParam >= 1) {
             System.Printf(DAT_801ead4c);

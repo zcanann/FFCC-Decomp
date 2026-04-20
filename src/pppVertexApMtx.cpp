@@ -8,7 +8,7 @@
 struct VertexApMtxEntry
 {
 	s16 vertexSetIndex;
-	u16 maxValue;
+	s16 maxValue;
 	u16* vertexIndices;
 };
 
@@ -26,7 +26,7 @@ struct VertexApMtxData
 	s16 entryIndex;
 	u8 spawnCount;
 	u8 spawnDelay;
-	u8 mode;
+	s8 mode;
 	u8 useWorldMtx;
 	u8 unkA[0x2];
 	u32 childId;
@@ -104,7 +104,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		switch (data->mode) {
 		case 0:
 			while (count-- != 0) {
-				if (state->index >= entry->maxValue) {
+				if ((s32)state->index >= (s32)entry->maxValue) {
 					state->index = 0;
 				}
 
@@ -156,7 +156,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		case 1:
 			while (count-- != 0) {
 				f32 randValue = Math.RandF();
-				f32 maxValue = (f32)(u16)entry->maxValue;
+				f32 maxValue = (f32)entry->maxValue;
 				int outValue = (int)(randValue * maxValue);
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];

@@ -46,7 +46,6 @@ inline void SetPtrArrayDtorVtable(CPtrArray<T>*)
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
-extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
@@ -55,10 +54,8 @@ extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
-extern "C" void* __vt__8CManager[];
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
-extern "C" void* __vt__14CFunnyShapePcs[];
 extern char lbl_801D7DD0[];
 extern char lbl_8032E660[];
 
@@ -74,7 +71,6 @@ unsigned int lbl_801EA904[4] = {
 };
 
 CFunnyShapePcs FunnyShapePcs;
-u8 ARRAY_8026D728[0xC];
 
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
@@ -102,46 +98,6 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 }
 } // namespace
 
-/*
- * --INFO--
- * PAL Address: 0x8004e844
- * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_FunnyShape_cpp(void)
-{
-    u8* self = reinterpret_cast<u8*>(&FunnyShapePcs);
-    unsigned int* dst = m_table__14CFunnyShapePcs;
-    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
-    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
-    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
-    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
-
-    *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__8CProcess;
-    *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
-
-    __ct__14CUSBStreamDataFv(self + 0x3C);
-    __ct__11CFunnyShapeFv(self + 0x50);
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
-    __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
-    dst[12] = desc3[0];
-    dst[13] = desc3[1];
-    dst[14] = desc3[2];
-}
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
@@ -236,10 +192,28 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
  */
 CFunnyShapePcs::CFunnyShapePcs()
 {
+    unsigned int* dst = m_table__14CFunnyShapePcs;
+    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
+    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
+    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
+    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
+
     __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x3C);
     __ct__11CFunnyShapeFv(reinterpret_cast<unsigned char*>(this) + 0x50);
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(reinterpret_cast<unsigned char*>(this) + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(reinterpret_cast<unsigned char*>(this) + 0x61D8);
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
+    dst[12] = desc3[0];
+    dst[13] = desc3[1];
+    dst[14] = desc3[2];
 }
 
 /*

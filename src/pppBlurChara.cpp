@@ -137,210 +137,6 @@ static inline BlurCharaModelRaw* GetBlurCharaModelRaw(CChara::CModel* model)
     return reinterpret_cast<BlurCharaModelRaw*>(model);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800de6d8
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
-{
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    *(unsigned int*)(MaterialManRaw() + 0x48) |= 0x10000;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800de29c
- * PAL Size: 1084b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void* param_3)
-{
-    BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
-    pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
-    pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
-    _GXTexObj backTexObj;
-    Vec posA;
-    Vec posB;
-    _GXColor white;
-    int width;
-    int height;
-
-    GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (int)FLOAT_80331050;
-    height = (int)FLOAT_80331054;
-
-    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
-
-    gUtil.SetVtxFmt_POS_CLR();
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-
-    posA.x = FLOAT_80331030;
-    posA.y = FLOAT_80331030;
-    posA.z = FLOAT_80331030;
-    posB.x = (float)width;
-    posB.y = (float)height;
-    posB.z = FLOAT_80331030;
-
-    gUtil.BeginQuadEnv();
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
-    gUtil.RenderQuadNoTex(posA, posB, white);
-    gUtil.EndQuadEnv();
-
-    GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
-    GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
-
-    rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
-    rawModel->m_afterDrawModelCallback = 0;
-    Draw__Q29CCharaPcs7CHandleFi(handle, 0);
-    rawModel->m_beforeMeshLockCallback = 0;
-    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
-
-    Graphic.SetViewport();
-    GXSetScissor(0, 0, 0x280, 0x1C0);
-    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
-
-    if (renderData->m_afterDrawPass == 1) {
-        float offsetY = renderData->m_afterDrawOffsetY;
-
-        gUtil.RenderTextureQuad(-(FLOAT_80331044 * offsetY), -offsetY, FLOAT_80331050 + (FLOAT_80331044 * offsetY),
-                                FLOAT_80331054 + offsetY,
-                                work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-
-        gUtil.BeginQuadEnv();
-        gUtil.SetVtxFmt_POS_CLR_TEX();
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_MODULATE);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-        GXLoadTexObj(work->m_smallTexObj, GX_TEXMAP0);
-
-        posA.x = FLOAT_80331044 * offsetY;
-        posA.y = offsetY;
-        posA.z = FLOAT_80331030;
-        posB.x = FLOAT_80331050 - (FLOAT_80331044 * offsetY);
-        posB.y = FLOAT_80331054 - offsetY;
-        posB.z = FLOAT_80331030;
-
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
-        gUtil.RenderQuad(posA, posB, white, 0, 0);
-        gUtil.EndQuadEnv();
-
-        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
-    }
-
-    gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0, 0,
-                            GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800de22c
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
-{
-    pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
-    void* handle;
-    BlurCharaModelRaw* rawModel;
-
-    work->m_ownerObj = ownerObj;
-    handle = GetCharaHandlePtr__FP8CGObjectl(ownerObj, 0);
-    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
-
-    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
-    work->m_captureBuffer = 0;
-    work->m_smallTexObj = 0;
-    work->m_savedModelField = rawModel->m_savedField;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800de194
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
-{
-    pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
-    BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
-
-    rawModel->m_afterDrawModelCallback = 0;
-    rawModel->m_work = 0;
-    rawModel->m_renderData = 0;
-
-    if ((CMemory::CStage*)work->m_captureBuffer != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_captureBuffer);
-        work->m_captureBuffer = 0;
-    }
-
-    if ((CMemory::CStage*)work->m_smallTexObj != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_smallTexObj);
-        work->m_smallTexObj = 0;
-    }
-
-    rawModel->m_savedField = work->m_savedModelField;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800de0ac
- * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
-{
-    pppBlurCharaWork* work;
-    void* handle;
-    BlurCharaModelRaw* rawModel;
-
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
-
-    work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr__FP8CGObjectl(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj, 0);
-    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
-
-    rawModel->m_work = work;
-    rawModel->m_renderData = param_2;
-
-    if ((unsigned int)work->m_captureBuffer == 0) {
-        unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
-
-        work->m_captureBuffer = reinterpret_cast<void*>(
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD5));
-        work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
-
-        rawModel->m_work = work;
-        rawModel->m_renderData = param_2;
-        rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
-    }
-}
-
 struct BlurCharaColorData {
     u8 _pad0[8];
     pppCVECTOR m_color;
@@ -514,4 +310,208 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppInitBlendMode();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de0ac
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
+{
+    pppBlurCharaWork* work;
+    void* handle;
+    BlurCharaModelRaw* rawModel;
+
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
+
+    work = GetBlurWork(blurChara, param_3);
+    handle = GetCharaHandlePtr__FP8CGObjectl(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj, 0);
+    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
+
+    rawModel->m_work = work;
+    rawModel->m_renderData = param_2;
+
+    if ((unsigned int)work->m_captureBuffer == 0) {
+        unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
+
+        work->m_captureBuffer = reinterpret_cast<void*>(
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD5));
+        work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
+
+        rawModel->m_work = work;
+        rawModel->m_renderData = param_2;
+        rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de194
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
+{
+    pppBlurCharaWork* work = GetBlurWork(blurChara, data);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
+    BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
+
+    rawModel->m_afterDrawModelCallback = 0;
+    rawModel->m_work = 0;
+    rawModel->m_renderData = 0;
+
+    if ((CMemory::CStage*)work->m_captureBuffer != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_captureBuffer);
+        work->m_captureBuffer = 0;
+    }
+
+    if ((CMemory::CStage*)work->m_smallTexObj != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_smallTexObj);
+        work->m_smallTexObj = 0;
+    }
+
+    rawModel->m_savedField = work->m_savedModelField;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de22c
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
+{
+    pppBlurCharaWork* work = GetBlurWork(blurChara, data);
+    void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
+    void* handle;
+    BlurCharaModelRaw* rawModel;
+
+    work->m_ownerObj = ownerObj;
+    handle = GetCharaHandlePtr__FP8CGObjectl(ownerObj, 0);
+    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
+
+    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
+    work->m_captureBuffer = 0;
+    work->m_smallTexObj = 0;
+    work->m_savedModelField = rawModel->m_savedField;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de29c
+ * PAL Size: 1084b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void* param_3)
+{
+    BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
+    pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
+    pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
+    _GXTexObj backTexObj;
+    Vec posA;
+    Vec posB;
+    _GXColor white;
+    int width;
+    int height;
+
+    GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
+    width = (int)FLOAT_80331050;
+    height = (int)FLOAT_80331054;
+
+    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+    gUtil.SetVtxFmt_POS_CLR();
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
+
+    posA.x = FLOAT_80331030;
+    posA.y = FLOAT_80331030;
+    posA.z = FLOAT_80331030;
+    posB.x = (float)width;
+    posB.y = (float)height;
+    posB.z = FLOAT_80331030;
+
+    gUtil.BeginQuadEnv();
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
+    gUtil.RenderQuadNoTex(posA, posB, white);
+    gUtil.EndQuadEnv();
+
+    GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
+    GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
+
+    rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+    rawModel->m_afterDrawModelCallback = 0;
+    Draw__Q29CCharaPcs7CHandleFi(handle, 0);
+    rawModel->m_beforeMeshLockCallback = 0;
+    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
+
+    Graphic.SetViewport();
+    GXSetScissor(0, 0, 0x280, 0x1C0);
+    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
+
+    if (renderData->m_afterDrawPass == 1) {
+        float offsetY = renderData->m_afterDrawOffsetY;
+
+        gUtil.RenderTextureQuad(-(FLOAT_80331044 * offsetY), -offsetY, FLOAT_80331050 + (FLOAT_80331044 * offsetY),
+                                FLOAT_80331054 + offsetY,
+                                work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+        gUtil.BeginQuadEnv();
+        gUtil.SetVtxFmt_POS_CLR_TEX();
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_MODULATE);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+        GXLoadTexObj(work->m_smallTexObj, GX_TEXMAP0);
+
+        posA.x = FLOAT_80331044 * offsetY;
+        posA.y = offsetY;
+        posA.z = FLOAT_80331030;
+        posB.x = FLOAT_80331050 - (FLOAT_80331044 * offsetY);
+        posB.y = FLOAT_80331054 - offsetY;
+        posB.z = FLOAT_80331030;
+
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
+        gUtil.RenderQuad(posA, posB, white, 0, 0);
+        gUtil.EndQuadEnv();
+
+        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
+    }
+
+    gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0, 0,
+                            GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de6d8
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+{
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    *(unsigned int*)(MaterialManRaw() + 0x48) |= 0x10000;
 }

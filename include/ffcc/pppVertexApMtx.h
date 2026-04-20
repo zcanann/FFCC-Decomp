@@ -5,8 +5,6 @@ struct _pppPObject;
 class PVertexApMtx;
 struct Vec;
 
-void apea(_pppPObject*, PVertexApMtx*, Vec*);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

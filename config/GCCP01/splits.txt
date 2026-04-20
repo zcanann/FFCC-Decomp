@@ -263,6 +263,7 @@ mapanim.cpp:
 	extabindex  start:0x8000C610 end:0x8000C6AC
 	.text       start:0x8004A4A0 end:0x8004B1D0
 	.rodata     start:0x801D7CB8 end:0x801D7CF8
+	.sdata2     start:0x8032FC98 end:0x8032FCA8
 
 maplight.cpp:
 	.text       start:0x8004B1D0 end:0x8004B21C
@@ -313,6 +314,7 @@ FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8
 	extabindex  start:0x8000C838 end:0x8000C844
 	.text       start:0x8004EB4C end:0x8004F910
+	.data       start:0x801EA960 end:0x801EA994
 
 maptexanim.cpp:
 	extab       start:0x80006BB8 end:0x80006BE0
@@ -784,6 +786,7 @@ p_chara.cpp:
 	extabindex  start:0x8000D69C end:0x8000D9A8
 	.text       start:0x80073AF4 end:0x8007BB90
 	.ctors      start:0x801D5414 end:0x801D5418
+	.data       start:0x801FD284 end:0x801FD310
 	.bss        start:0x802E9958 end:0x802EA080
 	.sdata2     start:0x80330140 end:0x80330148
 
@@ -1015,6 +1018,7 @@ joybus.cpp:
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
 	.rodata     start:0x801DA0A4 end:0x801DA3E4
+	.data       start:0x8020FB10 end:0x8020FB2C
 	.bss        start:0x802EAAB0 end:0x802F2600
 	.sbss       start:0x8032EDB8 end:0x8032EDBC
 
@@ -1190,19 +1194,21 @@ pppLocationTitle.cpp:
 	extab       start:0x80008BCC end:0x80008BE4
 	extabindex  start:0x8000F67C end:0x8000F6A0
 	.text       start:0x800D8C1C end:0x800D92FC
+	.sdata2     start:0x80330EE0 end:0x80330EF0
 
 wind.cpp:
 	extab       start:0x80008BE4 end:0x80008C1C
 	extabindex  start:0x8000F6A0 end:0x8000F6F4
 	.text       start:0x800D92FC end:0x800DA0B4
 	.bss        start:0x802F7720 end:0x802FF3A8
-	.sdata2     start:0x80330EE0 end:0x80330F60
+	.sdata2     start:0x80330EF0 end:0x80330F48
 
 LocationTitle2.cpp:
 	extab       start:0x80008C1C end:0x80008C34
 	extabindex  start:0x8000F6F4 end:0x8000F718
 	.text       start:0x800DA0B4 end:0x800DA93C
 	.rodata     start:0x801DB588 end:0x801DB5A0
+	.sdata2     start:0x80330F48 end:0x80330F60
 
 pppDrawShape2.cpp:
 	extab       start:0x80008C34 end:0x80008C3C
@@ -1245,20 +1251,20 @@ pppLensFlare.cpp:
 	extab       start:0x80008CDC end:0x80008CEC
 	extabindex  start:0x8000F814 end:0x8000F82C
 	.text       start:0x800DE718 end:0x800DEC5C
-	.sdata2     start:0x80330FF0 end:0x80330FF8
+	.sdata2     start:0x80330FF0 end:0x80331008
 
 pppColum.cpp:
 	extab       start:0x80008CEC end:0x80008D04
 	extabindex  start:0x8000F82C end:0x8000F850
 	.text       start:0x800DEC5C end:0x800DF320
 	.rodata     start:0x801DB638 end:0x801DB648
-	.sdata2     start:0x80330FF8 end:0x80331038
+	.sdata2     start:0x80331008 end:0x80331048
 
 pppCorona.cpp:
 	extab       start:0x80008D04 end:0x80008D14
 	extabindex  start:0x8000F850 end:0x8000F868
 	.text       start:0x800DF320 end:0x800DF618
-	.sdata2     start:0x80331038 end:0x80331040
+	.sdata2     start:0x80331048 end:0x80331060
 
 chara_fur.cpp:
 	extab       start:0x80008D14 end:0x80008D84
@@ -1266,14 +1272,14 @@ chara_fur.cpp:
 	.text       start:0x800DF618 end:0x800E46DC
 	.rodata     start:0x801DB72C end:0x801DB740
 	.bss        start:0x802FF3D8 end:0x802FF408
-	.sdata2     start:0x80331040 end:0x803310A0
+	.sdata2     start:0x80331060 end:0x803310C0
 
 pppYmEnv.cpp:
 	extab       start:0x80008D84 end:0x80008DB4
 	extabindex  start:0x8000F910 end:0x8000F958
 	.text       start:0x800E46DC end:0x800E6060
 	.rodata     start:0x801DB750 end:0x801DB7E8
-	.sdata2     start:0x803310A0 end:0x80331100
+	.sdata2     start:0x803310C0 end:0x8033111C
 	.sbss2      start:0x80333DF4 end:0x80333DF8
 
 pppEmission.cpp:
@@ -1281,7 +1287,7 @@ pppEmission.cpp:
 	extabindex  start:0x8000F958 end:0x8000F9A0
 	.text       start:0x800E6060 end:0x800E6B98
 	.rodata     start:0x801DB7E8 end:0x801DB7F8
-	.sdata2     start:0x80331100 end:0x8033111C
+	.sdata2     start:0x8033111C end:0x80331134
 
 wm_menu.cpp:
 	extab       start:0x80008DE4 end:0x80009024
@@ -1291,7 +1297,7 @@ wm_menu.cpp:
 	.data       start:0x80210FDC end:0x802111E8
 	.bss        start:0x802FF408 end:0x802FF450
 	.sbss       start:0x8032EE1C end:0x8032EE34
-	.sdata2     start:0x8033111C end:0x803311A8
+	.sdata2     start:0x80331134 end:0x803311BC
 	.sbss2      start:0x80333DF8 end:0x80333E00
 
 gxfunc.cpp:

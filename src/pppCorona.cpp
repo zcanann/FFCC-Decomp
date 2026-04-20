@@ -3,15 +3,16 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern const float kPppCoronaViewDirX;
-extern const float kPppCoronaViewDirY;
-extern const float kPppCoronaViewDirZ;
-extern const float kPppCoronaDistanceScaleBase;
 extern int gPppCalcDisabled;
 }
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+
+static const float kPppCoronaViewDirX = 320.0f;
+static const float kPppCoronaViewDirY = 224.0f;
+static const float kPppCoronaViewDirZ = 0.0f;
+static const float kPppCoronaDistanceScaleBase = 1.0f;
 
 struct CoronaWork {
     s16 m_shapeX;

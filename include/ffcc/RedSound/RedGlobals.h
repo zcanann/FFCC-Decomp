@@ -53,7 +53,7 @@ extern int* DAT_8032f428;
 extern int DAT_8032f42c;
 extern int DAT_8032f430;
 extern int DAT_8032f434;
-extern RedStreamDATA* DAT_8032f438;
+extern RedStreamDATA* p_Stream;
 extern int DAT_8032f43c;
 extern int DAT_8032f440;
 extern unsigned int* DAT_8032f444;

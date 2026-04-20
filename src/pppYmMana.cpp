@@ -1399,40 +1399,131 @@ static void CalculateNormal(VYmMana* mana)
     Vec* positions = *(Vec**)((u8*)mana + 0x3C);
     Vec* normals = *(Vec**)((u8*)mana + 0x40);
     u16* indices = *(u16**)((u8*)mana + 0x50);
+    float zero;
+    float tailZero;
+    int cleared;
+    int chunkCount;
+    Vec* normalIt;
     Vec edgeA;
     Vec edgeB;
     Vec faceNormal;
 
-    for (int i = 0; i < 0x121; i++) {
-        normals[i].x = FLOAT_80330e4c;
-        normals[i].y = FLOAT_80330e4c;
-        normals[i].z = FLOAT_80330e4c;
+    zero = FLOAT_80330e4c;
+    cleared = 0;
+    chunkCount = 0x12;
+    normalIt = normals;
+
+    do {
+        normalIt[0].z = zero;
+        normalIt[0].y = zero;
+        normalIt[0].x = zero;
+        normalIt[1].z = zero;
+        normalIt[1].y = zero;
+        normalIt[1].x = zero;
+        normalIt[2].z = zero;
+        normalIt[2].y = zero;
+        normalIt[2].x = zero;
+        normalIt[3].z = zero;
+        normalIt[3].y = zero;
+        normalIt[3].x = zero;
+        normalIt[4].z = zero;
+        normalIt[4].y = zero;
+        normalIt[4].x = zero;
+        normalIt[5].z = zero;
+        normalIt[5].y = zero;
+        normalIt[5].x = zero;
+        normalIt[6].z = zero;
+        normalIt[6].y = zero;
+        normalIt[6].x = zero;
+        normalIt[7].z = zero;
+        normalIt[7].y = zero;
+        normalIt[7].x = zero;
+        normalIt[8].z = zero;
+        normalIt[8].y = zero;
+        normalIt[8].x = zero;
+        normalIt[9].z = zero;
+        normalIt[9].y = zero;
+        normalIt[9].x = zero;
+        normalIt[10].z = zero;
+        normalIt[10].y = zero;
+        normalIt[10].x = zero;
+        normalIt[11].z = zero;
+        normalIt[11].y = zero;
+        normalIt[11].x = zero;
+        normalIt[12].z = zero;
+        normalIt[12].y = zero;
+        normalIt[12].x = zero;
+        normalIt[13].z = zero;
+        normalIt[13].y = zero;
+        normalIt[13].x = zero;
+        normalIt[14].z = zero;
+        normalIt[14].y = zero;
+        normalIt[14].x = zero;
+        normalIt[15].z = zero;
+        normalIt[15].y = zero;
+        normalIt[15].x = zero;
+        tailZero = FLOAT_80330e4c;
+        cleared += 0x10;
+        normalIt += 0x10;
+        chunkCount--;
+    } while (chunkCount != 0);
+
+    chunkCount = 0x121 - cleared;
+    normalIt = normals + cleared;
+    if (cleared < 0x121) {
+        do {
+            normalIt->z = tailZero;
+            normalIt->y = tailZero;
+            normalIt->x = tailZero;
+            normalIt++;
+            chunkCount--;
+        } while (chunkCount != 0);
     }
 
-    for (int tri = 0; tri < 0x200; tri++) {
-        u16 idx0 = indices[0];
-        u16 idx1 = indices[1];
-        u16 idx2 = indices[2];
+    {
+        int tri = 0;
+        int indexOffset = 0;
 
-        edgeA.x = positions[idx1].x - positions[idx0].x;
-        edgeA.y = positions[idx1].y - positions[idx0].y;
-        edgeA.z = positions[idx1].z - positions[idx0].z;
+        do {
+            u16 idx0;
+            u32 idx1;
+            u32 idx2;
+            Vec* pos0;
+            Vec* pos1;
+            Vec* pos2;
 
-        edgeB.x = positions[idx2].x - positions[idx0].x;
-        edgeB.y = positions[idx2].y - positions[idx0].y;
-        edgeB.z = positions[idx2].z - positions[idx0].z;
+            idx0 = *(u16*)((u8*)indices + indexOffset);
+            idx1 = *(u16*)((u8*)indices + indexOffset + 2);
+            idx2 = *(u16*)((u8*)indices + indexOffset + 4);
+            pos0 = &positions[idx0];
+            indexOffset += 6;
+            pos1 = &positions[idx1];
+            edgeA.x = pos1->x - pos0->x;
+            pos2 = &positions[idx2];
+            edgeA.y = pos1->y - pos0->y;
+            edgeA.z = pos1->z - pos0->z;
+            edgeB.x = pos2->x - pos0->x;
+            edgeB.y = pos2->y - pos0->y;
+            edgeB.z = pos2->z - pos0->z;
 
-        PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
-        PSVECNormalize(&faceNormal, &faceNormal);
-        PSVECAdd(&normals[idx0], &faceNormal, &normals[idx0]);
-        PSVECAdd(&normals[idx1], &faceNormal, &normals[idx1]);
-        PSVECAdd(&normals[idx2], &faceNormal, &normals[idx2]);
-
-        indices += 3;
+            PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
+            PSVECNormalize(&faceNormal, &faceNormal);
+            PSVECAdd(&normals[idx0], &faceNormal, &normals[idx0]);
+            PSVECAdd(&normals[idx1], &faceNormal, &normals[idx1]);
+            PSVECAdd(&normals[idx2], &faceNormal, &normals[idx2]);
+            tri++;
+        } while (tri < 0x200);
     }
 
-    for (int i = 0; i < 0x121; i++) {
-        PSVECNormalize(&normals[i], &normals[i]);
+    {
+        int i = 0;
+        Vec* normal = normals;
+
+        do {
+            PSVECNormalize(normal, normal);
+            i++;
+            normal++;
+        } while (i < 0x121);
     }
 
     DCFlushRange(normals, 0xD8C);

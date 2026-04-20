@@ -206,14 +206,14 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		entry = list->entries;
 		iVar10 = 8;
 		do {
-			entry[0].alpha = fVar3;
-			entry[1].alpha = fVar3;
-			entry[2].alpha = fVar3;
-			entry[3].alpha = fVar3;
-			entry[4].alpha = fVar3;
-			entry[5].alpha = fVar3;
-			entry[6].alpha = fVar3;
-			entry[7].alpha = fVar3;
+			entry[0].z = fVar3;
+			entry[1].z = fVar3;
+			entry[2].z = fVar3;
+			entry[3].z = fVar3;
+			entry[4].z = fVar3;
+			entry[5].z = fVar3;
+			entry[6].z = fVar3;
+			entry[7].z = fVar3;
 			dVar5 = DOUBLE_80332f58;
 			dVar4 = DOUBLE_80332f40;
 			fVar2 = FLOAT_80332f2c;

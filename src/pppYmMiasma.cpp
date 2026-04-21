@@ -143,99 +143,236 @@ struct YmMiasmaFrameStep : PYmMiasma {
 
 /*
  * --INFO--
- * PAL Address: 0x80091234
- * PAL Size: 872b
+ * PAL Address: 0x800907c4
+ * PAL Size: 736b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
-    YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
-    u32 angle;
-    float trigCos;
-    float trigSin;
-    u32 randomValue;
-    int shapeRandom;
-    short shapeCount;
-    long** shapeTable;
-    float randomHeight;
-    float radiusJitter;
-    float randomScale;
-    Vec basePos;
-    Vec normalizedPos;
-    u32 angleBase;
-    u32 signBit;
-    float speedJitter;
+    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
+    PARTICLE_DATA* particleData = (PARTICLE_DATA*)(u32) * (u32*)workBytes;
+    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)param_2;
+    int i;
+
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+
+    for (i = 0; i < (int)step->m_particleCount; i++) {
+        if (step->m_dataValIndex != 0xffff) {
+            YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
+            long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+            pppFMATRIX model;
+            pppFMATRIX scaleMatrix;
+            pppFMATRIX rotMatrix;
+            Vec worldPos;
+            GXColor amb;
+
+            pppUnitMatrix(model);
+            model.value[2][2] = state->m_speed;
+            model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
+            model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
+            model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
+
+            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)(double)state->m_shapeAngle);
+            scaleMatrix = model;
+            pppMulMatrix(model, rotMatrix, scaleMatrix);
+
+            pppCopyVector(worldPos, state->m_position);
+            if (Game.m_currentSceneId == 7) {
+                PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+            } else {
+                PSMTXMultVec(ppvCameraMatrix02, &worldPos, &worldPos);
+            }
+
+            model.value[0][3] = worldPos.x;
+            model.value[1][3] = worldPos.y;
+            model.value[2][3] = worldPos.z;
+
+            pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+
+            amb.r = state->m_color.m_r;
+            amb.g = state->m_color.m_g;
+            amb.b = state->m_color.m_b;
+            amb.a = state->m_color.m_a;
+            GXSetChanAmbColor(GX_COLOR0A0, amb);
+            pppSetBlendMode(step->m_blendMode);
+            pppDrawShp__FPlsP12CMaterialSetUc(
+                *shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+        }
+
+        particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);
+    }
+}
+
+/*
+ * --INFO--
+ * Address:	80090aa4
+ * Size:	748b
+ */
+void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
+{
+    static const char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
+    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
+    VYmMiasma* work;
+    int i;
+    PARTICLE_DATA* particle;
+    Vec matrixPos;
+    Vec delta;
     union {
         unsigned long long ull;
         double d;
     } temp;
 
-    (void)pppPObject;
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
-    randomValue = rand();
-    temp.ull = (0x4330000000000000ULL | (u32)(randomValue ^ 0x80000000));
-    randomScale = FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648);
-    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
-    shapeRandom = rand();
-    shapeCount = *(short*)((u8*)*shapeTable + 6);
-    angle = (u32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
-    shapeCount = (short)(shapeRandom - (shapeRandom / (int)shapeCount) * shapeCount);
-    state->m_shapeDrawFrame = shapeCount;
-    state->m_shapeCurrentFrame = shapeCount;
-    trigCos = *(float*)((u8*)gPppTrigTable + (((u16)(angle + 0x4000) >> 2) << 2));
-    trigSin = *(float*)((u8*)gPppTrigTable + (((u16)angle >> 2) << 2));
-    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
-    radiusJitter = randomScale * pYmMiasma->m_radiusJitter;
-    trigCos = trigCos * (vYmMiasma->m_radius + radiusJitter);
-    particleData->m_matrix[0][0] = trigCos;
-    particleData->m_matrix[1][0] = trigCos;
-    randomHeight = Math.RandF(pYmMiasma->m_spawnHeightJitter);
-    particleData->m_matrix[0][1] = randomHeight;
-    particleData->m_matrix[1][1] = randomHeight;
-    trigCos = trigSin * (vYmMiasma->m_radius + radiusJitter);
-    particleData->m_matrix[0][2] = trigCos;
-    particleData->m_matrix[1][2] = trigCos;
-    normalizedPos.x = particleData->m_matrix[1][0];
-    normalizedPos.y = particleData->m_matrix[1][1];
-    normalizedPos.z = particleData->m_matrix[1][2];
-    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &normalizedPos);
-    if ((s32)Game.m_currentSceneId != 7) {
-        basePos.x = pppMngStPtr->m_matrix.value[0][3];
-        basePos.y = pppMngStPtr->m_matrix.value[1][3];
-        basePos.z = pppMngStPtr->m_matrix.value[2][3];
-        pppAddVector(*(Vec*)particleData, *(Vec*)particleData->m_matrix[0], basePos);
+    work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+
+    if (step->m_graphId == pppYmMiasma_->field0_0x0) {
+        work->m_radius = work->m_radius + step->m_radiusDelta;
+        work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
+        work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;
     }
-    state->m_lifeFrames = (short)(pYmMiasma->m_lifeBase + (randomValue - (randomValue / pYmMiasma->m_lifeRange) * pYmMiasma->m_lifeRange));
-    state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
-    state->m_color.m_g = (u16)pYmMiasma->m_colorStartG;
-    state->m_color.m_b = (u16)pYmMiasma->m_colorStartB;
-    state->m_color.m_a = 0;
-    state->m_colorStep.m_r = pYmMiasma->m_colorEndR >> 7;
-    state->m_colorStep.m_r = state->m_colorStep.m_r - (u16)pYmMiasma->m_colorStartR;
-    state->m_colorStep.m_r = state->m_colorStep.m_r / pYmMiasma->m_colorStepFrames;
-    state->m_colorStep.m_g = pYmMiasma->m_colorEndG >> 7;
-    state->m_colorStep.m_g = state->m_colorStep.m_g - (u16)pYmMiasma->m_colorStartG;
-    state->m_colorStep.m_g = state->m_colorStep.m_g / pYmMiasma->m_colorStepFrames;
-    state->m_colorStep.m_b = pYmMiasma->m_colorEndB >> 7;
-    state->m_colorStep.m_b = state->m_colorStep.m_b - (u16)pYmMiasma->m_colorStartB;
-    state->m_colorStep.m_b = state->m_colorStep.m_b / pYmMiasma->m_colorStepFrames;
-    state->m_colorStep.m_a = pYmMiasma->m_colorEndA >> 7;
-    state->m_colorStep.m_a = state->m_colorStep.m_a - (u16)pYmMiasma->m_colorStartA;
-    state->m_colorStep.m_a = state->m_colorStep.m_a / pYmMiasma->m_colorStepFrames;
-    state->m_speedDecay = pYmMiasma->m_initialSpeedDecay;
-    speedJitter = randomScale * pYmMiasma->m_speedVariance;
-    angleBase = (u32)(int)speedJitter;
-    signBit = angleBase >> 0x1f;
-    if (((angleBase & 1U) ^ signBit) != signBit) {
-        speedJitter = speedJitter * FLOAT_80330668;
+
+    if (work->m_particles == 0) {
+        work->m_particles = (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr, const_cast<char*>(sPppYmMiasmaCpp),
+            0x18d);
+        particle = work->m_particles;
+        for (i = 0; i < step->m_particleCount; i++) {
+            InitParticleData(work, (_pppPObject*)pppYmMiasma_, step, particle);
+            particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
+        }
     }
-    state->m_speed = pYmMiasma->m_baseSpeed + speedJitter;
-    state->m_fadeFrames = (u16)pYmMiasma->m_fadeFrames;
-    state->m_colorDecayFrames = (u16)pYmMiasma->m_colorDecayFrames;
-    state->m_hasImpulse = 0;
+
+    work->m_emitTimer = work->m_emitTimer + 1;
+    work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
+    if (work->m_speedDecay < FLOAT_80330644) {
+        work->m_speedDecay = FLOAT_80330644;
+    }
+
+    if (step->m_emitInterval < work->m_emitTimer) {
+        int r;
+        s16 angleDelta;
+        u32 signBit;
+        u32 angleIdx;
+        u32 local_28;
+        u32 uStack_24;
+
+        work->m_emitTimer = 0;
+        work->m_speedDecay = step->m_unk18;
+
+        r = rand();
+        angleDelta = (s16)r - (s16)(r / (int)step->m_angleRange) * step->m_angleRange;
+        signBit = (u32)(int)angleDelta >> 31;
+        if ((((int)angleDelta & 1U) ^ signBit) == signBit) {
+            angleDelta = -angleDelta;
+        }
+
+        local_28 = 0x43300000;
+        uStack_24 = (u32)(s16)(angleDelta + step->m_baseAngle) ^ 0x80000000;
+        temp.ull = ((unsigned long long)local_28 << 32) | (unsigned long long)uStack_24;
+        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(temp.d - DOUBLE_80330648)) / FLOAT_80330654);
+        work->m_impulse.x = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
+        work->m_impulse.y = FLOAT_80330644;
+        work->m_impulse.z = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
+    }
+
+    work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
+    work->m_radius = work->m_radius + work->m_radiusVelocity;
+
+    particle = work->m_particles;
+    for (i = 0; i < step->m_particleCount; i++) {
+        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
+        particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
+    }
+
+    matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
+    matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
+    matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+
+    pppSubVector(delta, matrixPos, work->m_prevPosition);
+    if (PSVECDistance(&matrixPos, &work->m_prevPosition) != FLOAT_80330644) {
+        work->m_prevPositionChanged = 0xff;
+    } else {
+        work->m_prevPositionChanged = 0;
+    }
+
+    pppCopyVector(work->m_prevPosition, matrixPos);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80090d90
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+{
+    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    void* heap = work->m_particles;
+
+    if (heap != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(heap);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80090dc8
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+{
+    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
+    float fVar1 = FLOAT_80330644;
+
+    *(float*)(workBytes + 0x1c) = FLOAT_80330644;
+    *(float*)(workBytes + 0x20) = fVar1;
+    *(float*)(workBytes + 0x24) = fVar1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80090dec
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+{
+    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
+    float fVar1;
+    float fVar2 = FLOAT_80330644;
+    float* work = (float*)workBytes;
+
+    fVar1 = FLOAT_80330658;
+
+    *(u32*)workBytes = 0;
+    work[7] = fVar2;
+    work[8] = fVar2;
+    work[9] = fVar2;
+    workBytes[8] = 0;
+    work[4] = fVar1;
+    work[5] = fVar2;
+    work[6] = fVar2;
+    work[0xc] = fVar2;
+    work[0xb] = fVar2;
+    work[10] = fVar2;
+    workBytes[0x34] = 0;
 }
 
 /*
@@ -359,245 +496,97 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
-{
-    // Basic rendering setup
-    if (!particleData) return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80090dec
- * PAL Size: 80b
+ * PAL Address: 0x80091234
+ * PAL Size: 872b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
-    float fVar1;
-    float fVar2 = FLOAT_80330644;
-    float* work = (float*)workBytes;
-
-    fVar1 = FLOAT_80330658;
-
-    *(u32*)workBytes = 0;
-    work[7] = fVar2;
-    work[8] = fVar2;
-    work[9] = fVar2;
-    workBytes[8] = 0;
-    work[4] = fVar1;
-    work[5] = fVar2;
-    work[6] = fVar2;
-    work[0xc] = fVar2;
-    work[0xb] = fVar2;
-    work[10] = fVar2;
-    workBytes[0x34] = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80090dc8
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
-{
-    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
-    float fVar1 = FLOAT_80330644;
-
-    *(float*)(workBytes + 0x1c) = FLOAT_80330644;
-    *(float*)(workBytes + 0x20) = fVar1;
-    *(float*)(workBytes + 0x24) = fVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80090d90
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
-{
-    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    void* heap = work->m_particles;
-
-    if (heap != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(heap);
-    }
-}
-
-/*
- * --INFO--
- * Address:	80090aa4
- * Size:	748b
- */
-void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
-{
-    static const char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
-    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
-    VYmMiasma* work;
-    int i;
-    PARTICLE_DATA* particle;
-    Vec matrixPos;
-    Vec delta;
+    YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
+    u32 angle;
+    float trigCos;
+    float trigSin;
+    u32 randomValue;
+    int shapeRandom;
+    short shapeCount;
+    long** shapeTable;
+    float randomHeight;
+    float radiusJitter;
+    float randomScale;
+    Vec basePos;
+    Vec normalizedPos;
+    u32 angleBase;
+    u32 signBit;
+    float speedJitter;
     union {
         unsigned long long ull;
         double d;
     } temp;
 
-    if (gPppCalcDisabled != 0) {
-        return;
+    (void)pppPObject;
+
+    randomValue = rand();
+    temp.ull = (0x4330000000000000ULL | (u32)(randomValue ^ 0x80000000));
+    randomScale = FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648);
+    shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+    shapeRandom = rand();
+    shapeCount = *(short*)((u8*)*shapeTable + 6);
+    angle = (u32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
+    shapeCount = (short)(shapeRandom - (shapeRandom / (int)shapeCount) * shapeCount);
+    state->m_shapeDrawFrame = shapeCount;
+    state->m_shapeCurrentFrame = shapeCount;
+    trigCos = *(float*)((u8*)gPppTrigTable + (((u16)(angle + 0x4000) >> 2) << 2));
+    trigSin = *(float*)((u8*)gPppTrigTable + (((u16)angle >> 2) << 2));
+    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
+    radiusJitter = randomScale * pYmMiasma->m_radiusJitter;
+    trigCos = trigCos * (vYmMiasma->m_radius + radiusJitter);
+    particleData->m_matrix[0][0] = trigCos;
+    particleData->m_matrix[1][0] = trigCos;
+    randomHeight = Math.RandF(pYmMiasma->m_spawnHeightJitter);
+    particleData->m_matrix[0][1] = randomHeight;
+    particleData->m_matrix[1][1] = randomHeight;
+    trigCos = trigSin * (vYmMiasma->m_radius + radiusJitter);
+    particleData->m_matrix[0][2] = trigCos;
+    particleData->m_matrix[1][2] = trigCos;
+    normalizedPos.x = particleData->m_matrix[1][0];
+    normalizedPos.y = particleData->m_matrix[1][1];
+    normalizedPos.z = particleData->m_matrix[1][2];
+    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &normalizedPos);
+    if ((s32)Game.m_currentSceneId != 7) {
+        basePos.x = pppMngStPtr->m_matrix.value[0][3];
+        basePos.y = pppMngStPtr->m_matrix.value[1][3];
+        basePos.z = pppMngStPtr->m_matrix.value[2][3];
+        pppAddVector(*(Vec*)particleData, *(Vec*)particleData->m_matrix[0], basePos);
     }
-
-    work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
-
-    if (step->m_graphId == pppYmMiasma_->field0_0x0) {
-        work->m_radius = work->m_radius + step->m_radiusDelta;
-        work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
-        work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;
+    state->m_lifeFrames = (short)(pYmMiasma->m_lifeBase + (randomValue - (randomValue / pYmMiasma->m_lifeRange) * pYmMiasma->m_lifeRange));
+    state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
+    state->m_color.m_g = (u16)pYmMiasma->m_colorStartG;
+    state->m_color.m_b = (u16)pYmMiasma->m_colorStartB;
+    state->m_color.m_a = 0;
+    state->m_colorStep.m_r = pYmMiasma->m_colorEndR >> 7;
+    state->m_colorStep.m_r = state->m_colorStep.m_r - (u16)pYmMiasma->m_colorStartR;
+    state->m_colorStep.m_r = state->m_colorStep.m_r / pYmMiasma->m_colorStepFrames;
+    state->m_colorStep.m_g = pYmMiasma->m_colorEndG >> 7;
+    state->m_colorStep.m_g = state->m_colorStep.m_g - (u16)pYmMiasma->m_colorStartG;
+    state->m_colorStep.m_g = state->m_colorStep.m_g / pYmMiasma->m_colorStepFrames;
+    state->m_colorStep.m_b = pYmMiasma->m_colorEndB >> 7;
+    state->m_colorStep.m_b = state->m_colorStep.m_b - (u16)pYmMiasma->m_colorStartB;
+    state->m_colorStep.m_b = state->m_colorStep.m_b / pYmMiasma->m_colorStepFrames;
+    state->m_colorStep.m_a = pYmMiasma->m_colorEndA >> 7;
+    state->m_colorStep.m_a = state->m_colorStep.m_a - (u16)pYmMiasma->m_colorStartA;
+    state->m_colorStep.m_a = state->m_colorStep.m_a / pYmMiasma->m_colorStepFrames;
+    state->m_speedDecay = pYmMiasma->m_initialSpeedDecay;
+    speedJitter = randomScale * pYmMiasma->m_speedVariance;
+    angleBase = (u32)(int)speedJitter;
+    signBit = angleBase >> 0x1f;
+    if (((angleBase & 1U) ^ signBit) != signBit) {
+        speedJitter = speedJitter * FLOAT_80330668;
     }
-
-    if (work->m_particles == 0) {
-        work->m_particles = (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr, const_cast<char*>(sPppYmMiasmaCpp),
-            0x18d);
-        particle = work->m_particles;
-        for (i = 0; i < step->m_particleCount; i++) {
-            InitParticleData(work, (_pppPObject*)pppYmMiasma_, step, particle);
-            particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
-        }
-    }
-
-    work->m_emitTimer = work->m_emitTimer + 1;
-    work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
-    if (work->m_speedDecay < FLOAT_80330644) {
-        work->m_speedDecay = FLOAT_80330644;
-    }
-
-    if (step->m_emitInterval < work->m_emitTimer) {
-        int r;
-        s16 angleDelta;
-        u32 signBit;
-        u32 angleIdx;
-        u32 local_28;
-        u32 uStack_24;
-
-        work->m_emitTimer = 0;
-        work->m_speedDecay = step->m_unk18;
-
-        r = rand();
-        angleDelta = (s16)r - (s16)(r / (int)step->m_angleRange) * step->m_angleRange;
-        signBit = (u32)(int)angleDelta >> 31;
-        if ((((int)angleDelta & 1U) ^ signBit) == signBit) {
-            angleDelta = -angleDelta;
-        }
-
-        local_28 = 0x43300000;
-        uStack_24 = (u32)(s16)(angleDelta + step->m_baseAngle) ^ 0x80000000;
-        temp.ull = ((unsigned long long)local_28 << 32) | (unsigned long long)uStack_24;
-        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(temp.d - DOUBLE_80330648)) / FLOAT_80330654);
-        work->m_impulse.x = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
-        work->m_impulse.y = FLOAT_80330644;
-        work->m_impulse.z = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
-    }
-
-    work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
-    work->m_radius = work->m_radius + work->m_radiusVelocity;
-
-    particle = work->m_particles;
-    for (i = 0; i < step->m_particleCount; i++) {
-        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
-        particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
-    }
-
-    matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
-    matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
-    matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
-
-    pppSubVector(delta, matrixPos, work->m_prevPosition);
-    if (PSVECDistance(&matrixPos, &work->m_prevPosition) != FLOAT_80330644) {
-        work->m_prevPositionChanged = 0xff;
-    } else {
-        work->m_prevPositionChanged = 0;
-    }
-
-    pppCopyVector(work->m_prevPosition, matrixPos);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800907c4
- * PAL Size: 736b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
-{
-    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
-    PARTICLE_DATA* particleData = (PARTICLE_DATA*)(u32) * (u32*)workBytes;
-    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)param_2;
-    int i;
-
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-
-    for (i = 0; i < (int)step->m_particleCount; i++) {
-        if (step->m_dataValIndex != 0xffff) {
-            YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-            pppFMATRIX model;
-            pppFMATRIX scaleMatrix;
-            pppFMATRIX rotMatrix;
-            Vec worldPos;
-            GXColor amb;
-
-            pppUnitMatrix(model);
-            model.value[2][2] = state->m_speed;
-            model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
-            model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
-            model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
-
-            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)(double)state->m_shapeAngle);
-            scaleMatrix = model;
-            pppMulMatrix(model, rotMatrix, scaleMatrix);
-
-            pppCopyVector(worldPos, state->m_position);
-            if (Game.m_currentSceneId == 7) {
-                PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
-            } else {
-                PSMTXMultVec(ppvCameraMatrix02, &worldPos, &worldPos);
-            }
-
-            model.value[0][3] = worldPos.x;
-            model.value[1][3] = worldPos.y;
-            model.value[2][3] = worldPos.z;
-
-            pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
-
-            amb.r = state->m_color.m_r;
-            amb.g = state->m_color.m_g;
-            amb.b = state->m_color.m_b;
-            amb.a = state->m_color.m_a;
-            GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppSetBlendMode(step->m_blendMode);
-            pppDrawShp__FPlsP12CMaterialSetUc(
-                *shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
-        }
-
-        particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);
-    }
+    state->m_speed = pYmMiasma->m_baseSpeed + speedJitter;
+    state->m_fadeFrames = (u16)pYmMiasma->m_fadeFrames;
+    state->m_colorDecayFrames = (u16)pYmMiasma->m_colorDecayFrames;
+    state->m_hasImpulse = 0;
 }

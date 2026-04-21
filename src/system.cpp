@@ -454,8 +454,8 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        CStopWatch watch(reinterpret_cast<char*>(-1));
-        DumpMapFile(&watch);
+        OSStopwatch watch;
+        reinterpret_cast<CSystem*>(&watch)->DumpMapFile(reinterpret_cast<void*>(-1));
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;
@@ -501,29 +501,29 @@ void CSystem::ExecScenegraph()
 
             if (skip == 0)
             {
-                watch.Reset();
-                watch.Start();
+                reinterpret_cast<CStopWatch*>(&watch)->Reset();
+                reinterpret_cast<CStopWatch*>(&watch)->Start();
                 if ((flags & 1) != 0)
                 {
                     Graphic.SetDrawDoneDebugData(-1);
                 }
                 __ptmf_scall(order->m_owner);
-                watch.Stop();
-                order->m_lastTime = watch.Get();
+                reinterpret_cast<CStopWatch*>(&watch)->Stop();
+                order->m_lastTime = reinterpret_cast<CStopWatch*>(&watch)->Get();
 
-                watch.Start();
+                reinterpret_cast<CStopWatch*>(&watch)->Start();
                 if ((perfTrigger & 1) != 0)
                 {
                     Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
-                watch.Stop();
+                reinterpret_cast<CStopWatch*>(&watch)->Stop();
                 if ((perfTrigger & 1) != 0)
                 {
-                    order->m_lastTime = watch.Get();
+                    order->m_lastTime = reinterpret_cast<CStopWatch*>(&watch)->Get();
                 }
-                totalTime += watch.Get();
+                totalTime += reinterpret_cast<CStopWatch*>(&watch)->Get();
             }
             else
             {

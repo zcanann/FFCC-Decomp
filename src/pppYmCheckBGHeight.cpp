@@ -39,8 +39,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     Vec direction;
     CMapCylinderRaw cylinder;
     Vec hitPos;
-    float nextY;
-    float finalY;
+    float currentY;
     float zero;
     float probeY;
     float scale;
@@ -59,9 +58,8 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         direction.y = probeY;
         direction.z = zero;
 
-        nextY = pppMngStPtr->m_matrix.value[1][3];
-        bottomY = nextY + param_2->m_unk0x4;
-        finalY = nextY;
+        currentY = pppMngStPtr->m_matrix.value[1][3];
+        bottomY = currentY + param_2->m_unk0x4;
         bottomX = pppMngStPtr->m_matrix.value[0][3];
         bottomZ = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_top.z = scale;
@@ -78,23 +76,17 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cylinder.m_direction.z = zero;
         cylinder.m_radius = zero;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if ((nextY - param_2->m_unk0xC) > hitPos.y) {
-                finalY = nextY;
-            } else {
-                nextY = hitPos.y + param_2->m_unk0x8;
-                finalY = nextY;
-            }
-        } else {
-            finalY = nextY;
+        if ((CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                 &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) &&
+            (CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos),
+             (currentY - param_2->m_unk0xC) <= hitPos.y)) {
+            currentY = hitPos.y + param_2->m_unk0x8;
         }
 
-        pppMngSt->m_position.y = finalY;
-        ((Vec*)((u8*)pppMngSt + 0x58))->y = finalY;
-        ((Vec*)((u8*)pppMngSt + 0x68))->y = finalY;
-        ((Vec*)((u8*)pppMngSt + 0x48))->y = finalY;
+        pppMngSt->m_position.y = currentY;
+        ((Vec*)((u8*)pppMngSt + 0x58))->y = currentY;
+        ((Vec*)((u8*)pppMngSt + 0x68))->y = currentY;
+        ((Vec*)((u8*)pppMngSt + 0x48))->y = currentY;
 
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;

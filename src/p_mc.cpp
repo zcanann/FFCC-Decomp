@@ -1,12 +1,7 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
-extern "C" {
-extern unsigned char* gMcPcsSingletonPtr;
-}
-extern "C" void create__6CMcPcsFv(CMcPcs*);
-extern "C" void destroy__6CMcPcsFv(CMcPcs*);
-extern "C" void calc__6CMcPcsFv(CMcPcs*);
+
 extern char lbl_80331B10[];
 extern char lbl_8032E9D0[];
 extern char lbl_8032E9D8[];
@@ -19,7 +14,7 @@ unsigned int lbl_80211F14[5] = {
     reinterpret_cast<unsigned int>(lbl_8032E9D0), 0, reinterpret_cast<unsigned int>(lbl_8032E9D8), 0, 0
 };
 
-unsigned char* gMcPcsSingletonPtr = 0;
+CMcPcs McPcs;
 
 class McCtrl;
 
@@ -172,36 +167,4 @@ void CMcPcs::calc()
             reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
         }
     }
-}
-
-namespace {
-struct CMcPcsInitializer {
-    CMcPcsInitializer()
-    {
-        static unsigned int initData[] = {
-            0,
-            0xFFFFFFFF,
-            reinterpret_cast<unsigned int>(create__6CMcPcsFv),
-            0,
-            0xFFFFFFFF,
-            reinterpret_cast<unsigned int>(destroy__6CMcPcsFv),
-            0,
-            0xFFFFFFFF,
-            reinterpret_cast<unsigned int>(calc__6CMcPcsFv),
-        };
-
-        gMcPcsSingletonPtr = sMcPcsSingletonData;
-        m_table__6CMcPcs[1] = initData[0];
-        m_table__6CMcPcs[2] = initData[1];
-        m_table__6CMcPcs[3] = initData[2];
-        m_table__6CMcPcs[4] = initData[3];
-        m_table__6CMcPcs[5] = initData[4];
-        m_table__6CMcPcs[6] = initData[5];
-        m_table__6CMcPcs[7] = initData[6];
-        m_table__6CMcPcs[8] = initData[7];
-        m_table__6CMcPcs[9] = initData[8];
-    }
-};
-
-CMcPcsInitializer sMcPcsInitializer;
 }

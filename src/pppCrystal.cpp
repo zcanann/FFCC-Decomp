@@ -44,8 +44,6 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 }
 
-static const char s_pppCrystalCpp[] = "pppCrystal.cpp";
-
 struct CrystalIndTexMtx {
     float value[2][3];
 };
@@ -73,10 +71,12 @@ union CrystalFloatBits {
     u32 bits;
 };
 
-static const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
-
 static const CrystalTexMtx s_crystalTexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
+
+static const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
+
+static const char s_pppCrystalCpp[] = "pppCrystal.cpp";
 
 static inline int CrystalFpClassify(float value)
 {

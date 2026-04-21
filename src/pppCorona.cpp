@@ -9,10 +9,10 @@ extern int gPppCalcDisabled;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const float kPppCoronaViewDirX = 320.0f;
-static const float kPppCoronaViewDirY = 224.0f;
-static const float kPppCoronaViewDirZ = 0.0f;
-static const float kPppCoronaDistanceScaleBase = 1.0f;
+static const float kPppCoronaScreenWidth = 640.0f;
+static const float kPppCoronaScreenHeight = 448.0f;
+static const float kPppCoronaScreenCenterX = 320.0f;
+static const float kPppCoronaScreenCenterY = 224.0f;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -34,40 +34,6 @@ struct CoronaVecWork {
     u8 _pad2[6];
     u8 m_alpha;
 };
-
-/*
- * --INFO--
- * PAL Address: 0x800df5e4
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
-{
-    float fVar1 = kPppCoronaViewDirZ;
-    u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
-    puVar2[2] = 0;
-    puVar2[1] = 0;
-    puVar2[0] = 0;
-    *(float*)(puVar2 + 8) = fVar1;
-    *(float*)(puVar2 + 6) = fVar1;
-    *(float*)(puVar2 + 4) = fVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800df5e0
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
-{
-}
 
 /*
  * --INFO--
@@ -104,16 +70,16 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
 
     PSMTXIdentity(mtx.value);
 
-    viewDir.x = kPppCoronaViewDirX;
-    viewDir.y = kPppCoronaViewDirY;
-    viewDir.z = kPppCoronaViewDirZ;
+    viewDir.x = kPppCoronaScreenWidth;
+    viewDir.y = kPppCoronaScreenHeight;
+    viewDir.z = kPppCoronaScreenCenterX;
     PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
     mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
     if (mag < param2->m_distRange) {
         distScale = param2->m_distMax - param2->m_distMin;
-        distScale *= kPppCoronaDistanceScaleBase - (mag / param2->m_distRange);
+        distScale *= kPppCoronaScreenCenterY - (mag / param2->m_distRange);
         scale = param2->m_distMin + distScale;
     }
 
@@ -133,7 +99,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     color.rgba[2] = param2->m_colorB;
     color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, kPppCoronaViewDirZ, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, kPppCoronaScreenCenterX, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
@@ -175,4 +141,38 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param
         work->m_scaleY += param2->m_addY;
         work->m_scaleZ += param2->m_addZ;
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800df5e0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800df5e4
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
+{
+    float fVar1 = kPppCoronaScreenCenterX;
+    u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
+    puVar2[2] = 0;
+    puVar2[1] = 0;
+    puVar2[0] = 0;
+    *(float*)(puVar2 + 8) = fVar1;
+    *(float*)(puVar2 + 6) = fVar1;
+    *(float*)(puVar2 + 4) = fVar1;
 }

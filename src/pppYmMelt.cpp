@@ -95,17 +95,17 @@ extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float)
 extern "C" void CalcPolygonHeight(
     VERTEX_DATA* vertexData, YmMeltVertex* vertexBuffer, _GXColor* color, float yOffset)
 {
-    int i;
     int pointCount;
-    float previousY;
-    float zero;
-    float rayY;
-    float top;
+    int i;
     float expand;
+    float top;
+    float rayY;
+    float zero;
+    float previousY;
     Vec rayDirection;
     Vec worldBase;
-    CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
+    CMapCylinderRaw cylinder;
     u8* colorBytes = (u8*)color;
 
     pointCount = vertexData->m_gridSize + 1;

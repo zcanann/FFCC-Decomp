@@ -10,7 +10,7 @@ extern "C" void draw0__8CGamePcsFv(CGamePcs*);
 extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
 
-char s_CGamePcs_801D7C20[] = "CGamePcs";
+static const char s_CGamePcs_801D7C20[] = "CGamePcs";
 unsigned int m_table_desc0__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
 unsigned int m_table_desc1__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};
 unsigned int m_table_desc2__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CGamePcsFv)};
@@ -22,7 +22,7 @@ unsigned int m_table_desc7__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int m_table_desc8__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc2__8CGamePcsFv)};
 
 unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CGamePcs_801D7C20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CGamePcs_801D7C20)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
     0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
 };
 

@@ -82,7 +82,7 @@ unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
 };
 
 CLightPcs LightPcs;
-static char s_p_light_cpp[] = "p_light.cpp";
+static const char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
 {
@@ -555,7 +555,8 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     *(char*)((char*)slot + 0xb3) = (char)count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    slot[45] = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, texSize * count, stage, s_p_light_cpp, 0x13b, 0);
+    slot[45] = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory, texSize * count, stage, const_cast<char*>(s_p_light_cpp), 0x13b, 0);
 
     int texOffset = 0;
     u32* texObj = slot;

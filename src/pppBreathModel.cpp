@@ -11,6 +11,9 @@ extern int gPppCalcDisabled;
 #include <string.h>
 
 const float FLOAT_80330F80 = -1.0f;
+const float FLOAT_80330F84 = 6.2831855f;
+const float FLOAT_80330F88 = 6.2831855f;
+const float FLOAT_80330F8C = 0.0f;
 
 struct pppModelSt;
 
@@ -287,7 +290,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     Vec* particle = reinterpret_cast<Vec*>(particleData);
-    unsigned int alpha = vColor->m_alpha;
+    int alpha = vColor->m_alpha;
     char frameCount;
     Vec step;
 
@@ -300,34 +303,34 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
         particleColor->m_colorFrameDeltas[1] += *(float*)(breath + 0x3C);
         particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x40);
         particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x44);
-        alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
-        if (0xFFU < alpha) {
+        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
+        if (alpha > 0xFF) {
             alpha = 0xFF;
         }
     }
 
     particle[7].y += particle[7].z;
-    if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
-        particle[7].z = (particle[7].z + *(float*)(breath + 0x98)) + particle[8].x;
+    if (*(unsigned char*)(breath + 0xC1) & 0x10) {
+        particle[7].z = *(float*)(breath + 0x98) + particle[8].x + particle[7].z;
     } else {
         particle[7].z += *(float*)(breath + 0x98);
     }
 
-    while (particle[7].y >= 6.2831855f) {
-        particle[7].y -= 6.2831855f;
+    while (particle[7].y >= FLOAT_80330F88) {
+        particle[7].y -= FLOAT_80330F84;
     }
-    while (particle[7].y < 0.0f) {
-        particle[7].y += 6.2831855f;
+    while (particle[7].y < FLOAT_80330F8C) {
+        particle[7].y += FLOAT_80330F84;
     }
 
     particle[8].y += particle[9].y;
     particle[8].z += particle[9].z;
     particle[9].x += particle[10].x;
 
-    if ((*(unsigned char*)(breath + 0xC0) & 0x10) != 0) {
-        particle[9].y = (particle[9].y + *(float*)(breath + 0x70)) + particle[10].y;
-        particle[9].z = (particle[9].z + *(float*)(breath + 0x74)) + particle[10].z;
-        particle[10].x = (particle[10].x + *(float*)(breath + 0x78)) + particle[11].x;
+    if (*(unsigned char*)(breath + 0xC0) & 0x10) {
+        particle[9].y = particle[9].y + *(float*)(breath + 0x70) + particle[10].y;
+        particle[9].z = particle[9].z + *(float*)(breath + 0x74) + particle[10].z;
+        particle[10].x = particle[10].x + *(float*)(breath + 0x78) + particle[11].x;
     } else {
         particle[9].y += *(float*)(breath + 0x70);
         particle[9].z += *(float*)(breath + 0x74);

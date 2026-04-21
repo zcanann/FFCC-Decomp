@@ -292,7 +292,7 @@ void CRingMenu::Destroy()
 double CRingMenu::GetDispCounter()
 {
 	const int displayCounter = RingMenuInt(this, 0x500);
-	return static_cast<double>(FLOAT_803309cc - FLOAT_80330a08 * static_cast<float>(displayCounter));
+	return static_cast<double>(FLOAT_803309cc - static_cast<float>(displayCounter) * FLOAT_80330a08);
 }
 
 /*

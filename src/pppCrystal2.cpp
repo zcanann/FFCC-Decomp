@@ -12,10 +12,10 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern float FLOAT_80331fd0;
-extern float FLOAT_80331fd4;
-extern float FLOAT_80331fd8;
-extern float FLOAT_80331fdc;
+static const float FLOAT_80331fd0 = -0.5f;
+static const float FLOAT_80331fd4 = 33.3f;
+static const float FLOAT_80331fd8 = 1.3333334f;
+static const float FLOAT_80331fdc = 0.5f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -36,8 +36,6 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int,
                                                                                            int);
 }
-
-static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 struct Crystal2IndTexMtx {
     f32 value[2][3];
@@ -70,6 +68,8 @@ static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {
 
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
+
+static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 static inline int Crystal2FpClassify(float value)
 {

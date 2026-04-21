@@ -275,8 +275,12 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, _PARTICLE_DATA*, Mtx*, _pppM
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800DBFD4
+ * PAL Size: 940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
     VBreathModel*, PBreathModel* pBreathModel, _PARTICLE_DATA* particleData, VColor* vColor, _PARTICLE_COLOR* particleColor)
@@ -297,16 +301,16 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
         particleColor->m_colorFrameDeltas[2] += *(float*)(breath + 0x40);
         particleColor->m_colorFrameDeltas[3] += *(float*)(breath + 0x44);
         alpha = (unsigned int)vColor->m_alpha + (int)particleColor->m_color[3];
-        if (alpha > 0xFF) {
+        if (0xFFU < alpha) {
             alpha = 0xFF;
         }
     }
 
     particle[7].y += particle[7].z;
-    if ((*(unsigned char*)(breath + 0xC1) & 0x10) == 0) {
-        particle[7].z += *(float*)(breath + 0x98);
+    if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
+        particle[7].z = (particle[7].z + *(float*)(breath + 0x98)) + particle[8].x;
     } else {
-        particle[7].z = particle[7].z + *(float*)(breath + 0x98) + particle[8].x;
+        particle[7].z += *(float*)(breath + 0x98);
     }
 
     while (particle[7].y >= 6.2831855f) {
@@ -320,33 +324,36 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
     particle[8].z += particle[9].z;
     particle[9].x += particle[10].x;
 
-    if ((*(unsigned char*)(breath + 0xC0) & 0x10) == 0) {
+    if ((*(unsigned char*)(breath + 0xC0) & 0x10) != 0) {
+        particle[9].y = (particle[9].y + *(float*)(breath + 0x70)) + particle[10].y;
+        particle[9].z = (particle[9].z + *(float*)(breath + 0x74)) + particle[10].z;
+        particle[10].x = (particle[10].x + *(float*)(breath + 0x78)) + particle[11].x;
+    } else {
         particle[9].y += *(float*)(breath + 0x70);
         particle[9].z += *(float*)(breath + 0x74);
         particle[10].x += *(float*)(breath + 0x78);
-    } else {
-        particle[9].y = particle[9].y + *(float*)(breath + 0x70) + particle[10].y;
-        particle[9].z = particle[9].z + *(float*)(breath + 0x74) + particle[10].z;
-        particle[10].x = particle[10].x + *(float*)(breath + 0x78) + particle[11].x;
     }
 
     particle[11].z += *(float*)(breath + 0xA4);
-    if (*(char*)(breath + 0xC8) == '\0') {
+    signed char clampScale = *(signed char*)(breath + 0xC8);
+    if (clampScale == 0) {
         float start = *(float*)(breath + 0xA0);
+        float zero = 0.0f;
         float delta = *(float*)(breath + 0xA4);
-        if ((start > 0.0f) && (delta < 0.0f)) {
-            if (particle[11].z < 0.0f) {
-                particle[11].z = 0.0f;
+        if ((start > zero) && (delta < zero)) {
+            if (particle[11].z < zero) {
+                particle[11].z = zero;
             }
-        } else if ((start < 0.0f) && (0.0f < delta) && (0.0f < particle[11].z)) {
-            particle[11].z = 0.0f;
+        } else if ((start < zero) && (zero < delta) && (zero < particle[11].z)) {
+            particle[11].z = zero;
         }
     }
 
     PSVECScale(&particle[5], &step, particle[11].z);
     PSVECAdd(&step, &particle[4], &particle[4]);
 
-    if (*(short*)(breath + 0x20) != 0) {
+    short life = *(short*)(breath + 0x20);
+    if (life != 0) {
         *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
     }
     *(char*)&particle[12].x = *(char*)&particle[12].x + 1;

@@ -147,7 +147,22 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 	memset(m_statusTimers + 3, 0, 0x4E);
-	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_statusValues[0] = 0xFFFF;
+	m_statusValues[1] = 0xFFFF;
+	m_statusValues[2] = 0xFFFF;
+	m_statusValues[3] = 0xFFFF;
+	m_statusValues[4] = 0xFFFF;
+	m_statusValues[5] = 0xFFFF;
+	m_statusValues[6] = 0xFFFF;
+	m_statusValues[7] = 0xFFFF;
+	m_statusValues[8] = 0xFFFF;
+	m_statusValues[9] = 0xFFFF;
+	m_statusValues[10] = 0xFFFF;
+	m_statusValues[11] = 0xFFFF;
+	m_statusValues[12] = 0xFFFF;
+	m_statusValues[13] = 0xFFFF;
+	m_statusValues[14] = 0xFFFF;
+	m_statusValues[15] = 0xFFFF;
 	m_hp = m_maxHp;
 }
 
@@ -345,7 +360,7 @@ void CCaravanWork::LoadFinished()
  */
 void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	short* romData = reinterpret_cast<short*>(romWork);
+	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 	int value = 0;
 
 	m_baseDataIndex = baseDataIndex;
@@ -356,10 +371,25 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_strength = romData[4];
 	m_magic = romData[5];
 	m_defense = romData[6];
-	m_romWorkPtr = reinterpret_cast<unsigned short*>(romData + 8);
+	m_romWorkPtr = romData + 8;
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 	memset(m_statusTimers + 3, 0, 0x4E);
-	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_statusValues[0] = 0xFFFF;
+	m_statusValues[1] = 0xFFFF;
+	m_statusValues[2] = 0xFFFF;
+	m_statusValues[3] = 0xFFFF;
+	m_statusValues[4] = 0xFFFF;
+	m_statusValues[5] = 0xFFFF;
+	m_statusValues[6] = 0xFFFF;
+	m_statusValues[7] = 0xFFFF;
+	m_statusValues[8] = 0xFFFF;
+	m_statusValues[9] = 0xFFFF;
+	m_statusValues[10] = 0xFFFF;
+	m_statusValues[11] = 0xFFFF;
+	m_statusValues[12] = 0xFFFF;
+	m_statusValues[13] = 0xFFFF;
+	m_statusValues[14] = 0xFFFF;
+	m_statusValues[15] = 0xFFFF;
 	m_hp = m_maxHp;
 	m_shopState = 1;
 

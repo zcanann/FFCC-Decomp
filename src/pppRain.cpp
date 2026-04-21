@@ -6,13 +6,14 @@
 #include "ffcc/pppPart.h"
 extern "C" {
 extern const float kPppRainTexCoordBase;
+extern const float FLOAT_8033101c;
+extern const float FLOAT_80331020;
+extern const double DOUBLE_80331028;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
-const float FLOAT_80331020 = 3.0518509e-05f;
-const double DOUBLE_80331028 = 4503601774854144.0;
 static const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {
@@ -170,6 +171,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float unitA;
             float unitB;
             float lengthDelta;
+            s16 lifeBase;
+            u16 lifeRange;
             int lifeJitter;
             int lifeRemainder;
 
@@ -179,10 +182,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             unitB = FLOAT_80331020 * (float)randB;
             maxX = param_2->m_maxX;
             minX = param_2->m_minX;
-            maxZ = param_2->m_maxZ;
-            minZ = param_2->m_minZ;
             dropData[0] = unitA * (maxX - minX) + minX;
             dropData[1] = param_2->m_maxY;
+            maxZ = param_2->m_maxZ;
+            minZ = param_2->m_minZ;
             dropData[2] = unitB * (maxZ - minZ) + minZ;
             dropData[3] = -param_2->m_initWOrk;
             dropData[4] = param_2->m_driftY;
@@ -194,8 +197,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
             dropData[6] += lengthDelta;
 
-            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
-            lifeRemainder = randA % param_2->m_lifeRange;
+            lifeRange = param_2->m_lifeRange;
+            lifeBase = param_2->m_lifeBase;
+            lifeRemainder = randA % lifeRange;
+            *(s16*)(dropData + 7) = lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;
@@ -228,6 +233,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float unitA;
             float unitB;
             float lengthDelta;
+            s16 lifeBase;
+            u16 lifeRange;
             int lifeJitter;
             int lifeRemainder;
 
@@ -238,10 +245,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             unitB = FLOAT_80331020 * (float)randB;
             maxX = param_2->m_maxX;
             minX = param_2->m_minX;
-            maxZ = param_2->m_maxZ;
-            minZ = param_2->m_minZ;
             dropData[0] = unitA * (maxX - minX) + minX;
             dropData[1] = param_2->m_maxY;
+            maxZ = param_2->m_maxZ;
+            minZ = param_2->m_minZ;
             dropData[2] = unitB * (maxZ - minZ) + minZ;
             dropData[3] = -param_2->m_initWOrk;
             dropData[4] = param_2->m_driftY;
@@ -253,8 +260,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
             dropData[6] += lengthDelta;
 
-            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
-            lifeRemainder = randA % param_2->m_lifeRange;
+            lifeRange = param_2->m_lifeRange;
+            lifeBase = param_2->m_lifeBase;
+            lifeRemainder = randA % lifeRange;
+            *(s16*)(dropData + 7) = lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;
@@ -269,7 +278,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         float posY;
         float posZ;
 
-        if (Game.m_currentSceneId == 7) {
+        if ((int)Game.m_currentSceneId == 7) {
             posX = ppvCameraMatrix02[0][3];
             posY = ppvCameraMatrix02[1][3];
             posZ = ppvCameraMatrix02[2][3];
@@ -326,3 +335,8 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
     puVar2[2] = fVar1;
     puVar2[1] = fVar1;
 }
+
+extern const float kPppRainTexCoordBase = 0.0f;
+extern const float FLOAT_8033101c = 1.0f;
+extern const float FLOAT_80331020 = 3.0518509e-05f;
+extern const double DOUBLE_80331028 = 4503601774854144.0;

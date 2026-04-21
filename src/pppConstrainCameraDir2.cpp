@@ -72,8 +72,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                 resultPos.z = cameraDir.z * *value + resultPos.z;
             }
 
-            float localX = param_1->m_object.m_localMatrix.value[0][3];
             float localY = param_1->m_object.m_localMatrix.value[1][3];
+            float localX = param_1->m_object.m_localMatrix.value[0][3];
 
             Vec direct0;
             Vec direct1;

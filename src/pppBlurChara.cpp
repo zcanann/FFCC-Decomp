@@ -424,13 +424,13 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
+    int width;
+    int height;
     void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
     _GXColor white;
-    int width;
-    int height;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
     width = (int)FLOAT_80331050;
@@ -467,14 +467,18 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     Graphic.SetViewport();
     GXSetScissor(0, 0, 0x280, 0x1C0);
-    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
+    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_I8, 0);
 
     if (renderData->m_afterDrawPass == 1) {
-        float offsetY = renderData->m_afterDrawOffsetY;
+        float scaledOffsetY;
+        {
+            float offsetY = renderData->m_afterDrawOffsetY;
+            scaledOffsetY = FLOAT_80331044 * offsetY;
 
-        gUtil.RenderTextureQuad(-(FLOAT_80331044 * offsetY), -offsetY, FLOAT_80331050 + (FLOAT_80331044 * offsetY),
-                                FLOAT_80331054 + offsetY,
-                                work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+            gUtil.RenderTextureQuad(-scaledOffsetY, -offsetY, FLOAT_80331050 + scaledOffsetY,
+                                    FLOAT_80331054 + offsetY,
+                                    work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+        }
 
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -488,10 +492,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         white.b = 0xFF;
         white.a = 0xFF;
 
-        posA.x = FLOAT_80331044 * offsetY;
+        float offsetY = renderData->m_afterDrawOffsetY;
+        posA.x = scaledOffsetY;
         posA.y = offsetY;
         posA.z = FLOAT_80331030;
-        posB.x = FLOAT_80331050 - (FLOAT_80331044 * offsetY);
+        posB.x = FLOAT_80331050 - scaledOffsetY;
         posB.y = FLOAT_80331054 - offsetY;
         posB.z = FLOAT_80331030;
 
@@ -499,7 +504,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         gUtil.RenderQuad(posA, posB, white, 0, 0);
         gUtil.EndQuadEnv();
 
-        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_I8, 0);
+        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_I8, 0);
     }
 
     gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0, 0,

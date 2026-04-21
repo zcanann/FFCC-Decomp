@@ -24,8 +24,6 @@ unsigned char g_pad[0x30];
 extern "C" float FLOAT_8032f820;
 extern "C" float FLOAT_8032f824;
 extern "C" float FLOAT_8032f828;
-extern "C" double DOUBLE_8032f830;
-extern "C" double DOUBLE_8032f838;
 
 static const char s_CPad[] = "CPad";
 static const char s_pad_cpp[] = "pad.cpp";
@@ -35,90 +33,6 @@ static const char s_replay_host_msg[] =
     "\x43\x50\x61\x64\x2E\x49\x6E\x69\x74\x3A\x20\x68\x6F\x73\x74\x82\xA9\x82\xE7\x96\xF1\x25\x64\x95\x62\x82\xCC"
     "\x83\x8A\x83\x76\x83\x8C\x83\x43\x83\x66\x81\x5B\x83\x5E\x82\xF0\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xDC\x82"
     "\xB5\x82\xBD\x81\x42\x0A";
-
-CPad::CPad()
-{
-	_1b4_4_ = 0;
-	_1b8_4_ = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80021008
- * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPad::Init()
-{
-	FILE* fp;
-	int frames;
-	int size;
-
-	PADInit();
-	memset(reinterpret_cast<char*>(this) + 4, 0, 0x1A4);
-	_1a8_4_ = 0;
-	_1ac_4_ = 0;
-	_1b0_4_ = 0;
-	_1bc_4_ = 0;
-	_1c0_4_ = 0xFFFFFFFF;
-	_1c8_4_ = 1;
-
-	if (System.IsGdev())
-	{
-		_1ac_4_ = Memory.CreateStage(0x800000, const_cast<char*>(s_CPad), 1);
-		if (_1ac_4_ != 0)
-		{
-			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), const_cast<char*>(s_pad_cpp), 0x54)
-				unsigned char[0x69780C];
-			if ((_1b4_4_ != 0) && ((fp = fopen(s_replay_dat, s_rb)) != 0))
-			{
-				fseek(fp, 0, 2);
-				size = ftell(fp);
-				fseek(fp, 0, 0);
-				fread(_1b0_4_, 1, size, fp);
-				fclose(fp);
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 0;
-				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
-				System.Printf(const_cast<char*>(s_replay_host_msg), frames / 30);
-			}
-			else
-			{
-				*reinterpret_cast<unsigned int*>(_1b0_4_) = 0xC;
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 8) = 0;
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 1;
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80020fb0
- * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPad::Quit()
-{
-	char* const base = reinterpret_cast<char*>(this);
-	void* replayBuf = *reinterpret_cast<void**>(base + 0x1B0);
-	if (replayBuf != nullptr)
-	{
-		operator delete[](replayBuf);
-		*reinterpret_cast<void**>(base + 0x1B0) = nullptr;
-	}
-
-	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(base + 0x1AC);
-	if (stage != nullptr)
-	{
-		Memory.DestroyStage(stage);
-	}
-}
 
 /*
  * --INFO--
@@ -133,8 +47,6 @@ void CPad::Frame()
 {
 	float fVar2;
 	float fVar3;
-	double dVar4;
-	double dVar5;
 	int iVar6;
 	u16 uVar1;
 	u16 uVar8;
@@ -150,7 +62,7 @@ void CPad::Frame()
 	u32 uVar17;
 	u16* puVar18;
 	int iVar19;
-	u16 local_98[8];
+	CPad::Gba local_98[4];
 	u16 local_88[24];
 	u8* self = reinterpret_cast<u8*>(this);
 
@@ -159,35 +71,24 @@ void CPad::Frame()
 	memcpy(g_pad, local_88, 0x30);
 	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
 	uVar17 = 0;
-	puVar18 = local_98;
-	puVar7 = puVar18;
+	puVar18 = reinterpret_cast<u16*>(local_98);
 	do
 	{
 		iVar6 = SIProbe(uVar17);
-		iVar6 = __cntlzw(0x40000 - iVar6);
-		*reinterpret_cast<u8*>(puVar7) =
-			static_cast<u8>(((iVar6 << 2) & 0x80) | (*reinterpret_cast<u8*>(puVar7) & 0x7F));
-		uVar8 = Joybus.GetCtrlMode(uVar17);
-		iVar6 = 0;
-		*puVar7 = static_cast<u16>((uVar8 & 0x3FFF) | (*puVar7 & 0xC000));
-		if (((*reinterpret_cast<u8*>(puVar7) & 0x80) != 0) && ((*puVar7 & 0x3FFF) == 0))
+		*reinterpret_cast<u8*>(&local_98[uVar17]) =
+			static_cast<u8>((__cntlzw(0x40000 - iVar6) << 2) | *reinterpret_cast<u8*>(&local_98[uVar17]));
+		local_98[uVar17].ctrlMode = Joybus.GetCtrlMode(uVar17);
+		local_98[uVar17].noController = local_98[uVar17].connected && (local_98[uVar17].ctrlMode == 0);
+		local_98[uVar17].button = 0;
+		if (local_98[uVar17].connected)
 		{
-			iVar6 = 1;
-		}
-		*reinterpret_cast<u8*>(puVar7) =
-			static_cast<u8>((iVar6 << 6) | (*reinterpret_cast<u8*>(puVar7) & 0xBF));
-		puVar7[1] = 0;
-		if ((*reinterpret_cast<u8*>(puVar7) & 0x80) != 0)
-		{
-			uVar8 = Joybus.GetPadData(uVar17);
-			puVar7[1] = uVar8;
+			local_98[uVar17].button = Joybus.GetPadData(uVar17);
 		}
 		uVar17 = uVar17 + 1;
-		puVar7 = puVar7 + 2;
 	} while (uVar17 < 4);
 
 	iVar6 = reinterpret_cast<int>(_1b0_4_);
-	if ((iVar6 != 0) && ((iVar14 = _1bc_4_), -1 < iVar14))
+	if ((iVar6 != 0) && ((iVar14 = _1bc_4_), iVar14 >= 0))
 	{
 		if (*reinterpret_cast<int*>(iVar6 + 4) != 0)
 		{
@@ -196,7 +97,7 @@ void CPad::Frame()
 				iVar6 = 0;
 				iVar14 = 0;
 				puVar7 = local_88;
-				puVar13 = local_98;
+				puVar13 = reinterpret_cast<u16*>(local_98);
 				iVar19 = 4;
 				do
 				{
@@ -239,7 +140,7 @@ void CPad::Frame()
 			iVar6 = 0;
 			iVar19 = 0;
 			puVar7 = local_88;
-			puVar13 = local_98;
+			puVar13 = reinterpret_cast<u16*>(local_98);
 			iVar11 = 4;
 			do
 			{
@@ -392,13 +293,13 @@ void CPad::Frame()
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) >> 0x1F;
-							if ((_1c8_4_ <= static_cast<u32>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16)) ||
+							if ((_1c8_4_ <= static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16)) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) >> 0x1F),
-								 (_1c8_4_ <= static_cast<u32>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16))))
+								 (_1c8_4_ <= static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16))))
 							{
 								*puVar12 = static_cast<u16>(*puVar12 & 0xFFF0);
 								*reinterpret_cast<u32*>(iVar6 + 0x40) = 1;
-								if (_1c8_4_ <= static_cast<u32>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
+								if (_1c8_4_ <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_RIGHT);
 								}
@@ -406,7 +307,7 @@ void CPad::Frame()
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_LEFT);
 								}
-								if (_1c8_4_ <= static_cast<u32>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
+								if (_1c8_4_ <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_UP);
 								}
@@ -436,8 +337,6 @@ void CPad::Frame()
 						{
 							*reinterpret_cast<u16*>(iVar6 + 0x0E) = *reinterpret_cast<u16*>(iVar6 + 0x0E) | 8;
 						}
-						dVar4 = DOUBLE_8032f830;
-						dVar5 = DOUBLE_8032f838;
 						fVar2 = FLOAT_8032f824;
 						fVar3 = FLOAT_8032f828;
 						*reinterpret_cast<u8*>(iVar6 + 0x1A) = *reinterpret_cast<u8*>(puVar13 + 2);
@@ -456,8 +355,6 @@ void CPad::Frame()
 							static_cast<float>(static_cast<double>(*reinterpret_cast<u8*>(iVar6 + 0x16))) / fVar3;
 						*reinterpret_cast<float*>(iVar6 + 0x20) =
 							static_cast<float>(static_cast<double>(*reinterpret_cast<u8*>(iVar6 + 0x17))) / fVar3;
-						static_cast<void>(dVar4);
-						static_cast<void>(dVar5);
 					}
 					else
 					{
@@ -618,14 +515,78 @@ void CPad::Frame()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: 0x80020fb0
+ * PAL Size: 88b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPad::SaveReplayData()
+void CPad::Quit()
 {
-	// TODO
+	char* const base = reinterpret_cast<char*>(this);
+	void* replayBuf = *reinterpret_cast<void**>(base + 0x1B0);
+	if (replayBuf != nullptr)
+	{
+		operator delete[](replayBuf);
+		*reinterpret_cast<void**>(base + 0x1B0) = nullptr;
+	}
+
+	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(base + 0x1AC);
+	if (stage != nullptr)
+	{
+		Memory.DestroyStage(stage);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80021008
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPad::Init()
+{
+	FILE* fp;
+	int frames;
+	int size;
+
+	PADInit();
+	memset(reinterpret_cast<char*>(this) + 4, 0, 0x1A4);
+	_1a8_4_ = 0;
+	_1ac_4_ = 0;
+	_1b0_4_ = 0;
+	_1bc_4_ = 0;
+	_1c0_4_ = 0xFFFFFFFF;
+	_1c8_4_ = 1;
+
+	if (System.IsGdev())
+	{
+		_1ac_4_ = Memory.CreateStage(0x800000, const_cast<char*>(s_CPad), 1);
+		if (_1ac_4_ != 0)
+		{
+			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), const_cast<char*>(s_pad_cpp), 0x54)
+				unsigned char[0x69780C];
+			if ((_1b4_4_ != 0) && ((fp = fopen(s_replay_dat, s_rb)) != 0))
+			{
+				fseek(fp, 0, 2);
+				size = ftell(fp);
+				fseek(fp, 0, 0);
+				fread(_1b0_4_, 1, size, fp);
+				fclose(fp);
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 0;
+				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
+				System.Printf(const_cast<char*>(s_replay_host_msg), frames / 30);
+			}
+			else
+			{
+				*reinterpret_cast<unsigned int*>(_1b0_4_) = 0xC;
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 8) = 0;
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 1;
+			}
+		}
+	}
 }

@@ -51,10 +51,11 @@ extern "C" int GetSize__21CPtrArray_P8CTexAnim_Fv(void*);
 extern "C" int GetSize__25CPtrArray_P11CTexAnimSeq_Fv(void*);
 extern "C" void* __vc__21CPtrArray_P8CTexAnim_FUl(void*, unsigned long);
 extern "C" void* __vc__25CPtrArray_P11CTexAnimSeq_FUl(void*, unsigned long);
+extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_Fv(void*, CMemory::CStage*);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
-static const char DAT_8032fb48[] = "";
+static const char DAT_8032fb48[] = "e1";
 const float FLOAT_8032fb38 = 0.0f;
 const float FLOAT_8032fb3c = 1.0f;
 const float FLOAT_8032fb4c = 1.25f;
@@ -693,7 +694,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 refData->texSrtIndex = 0;
             }
             *reinterpret_cast<void**>((int)texAnim + 8) = refData;
-            refData->texAnimSeqs.SetStage(stage);
+            SetStage__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs, stage);
 
             chunkFile.PushChunk();
             while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(middleChunkData)) != 0) {

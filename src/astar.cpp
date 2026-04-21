@@ -32,13 +32,11 @@ static const char kAStarCostDebugFormat[] = "%d->%d=%.5fm ";
 struct CMapCylinderRaw
 {
 	Vec m_bottom;
+	Vec m_unknown;
 	Vec m_direction;
 	float m_radius;
-	float m_height;
 	Vec m_top;
 	Vec m_direction2;
-	float m_radius2;
-	float m_height2;
 };
 
 CAStar AStar;

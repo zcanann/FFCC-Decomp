@@ -25,20 +25,6 @@ struct CMapCylinderRaw {
 
 /*
  * --INFO--
- * PAL Address: 0x800d8c18
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight*, struct pppYmCheckBGHeightUnkC*)
-{
-	return;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d8abc
  * PAL Size: 348b
  * EN Address: TODO
@@ -59,6 +45,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     float probeY;
     float scale;
     float offset;
+    float bottomX;
+    float bottomY;
+    float bottomZ;
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
@@ -71,20 +60,23 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         direction.z = zero;
 
         nextY = pppMngStPtr->m_matrix.value[1][3];
+        bottomY = nextY + param_2->m_unk0x4;
         finalY = nextY;
-        cylinder.m_bottom.x = pppMngStPtr->m_matrix.value[0][3];
-        cylinder.m_bottom.y = nextY + param_2->m_unk0x4;
-        cylinder.m_bottom.z = pppMngStPtr->m_matrix.value[2][3];
+        bottomX = pppMngStPtr->m_matrix.value[0][3];
+        bottomZ = pppMngStPtr->m_matrix.value[2][3];
+        cylinder.m_top.z = scale;
+        cylinder.m_top.y = scale;
+        cylinder.m_top.x = scale;
+        cylinder.m_direction2.z = offset;
+        cylinder.m_direction2.y = offset;
+        cylinder.m_direction2.x = offset;
+        cylinder.m_bottom.x = bottomX;
+        cylinder.m_bottom.y = bottomY;
+        cylinder.m_bottom.z = bottomZ;
         cylinder.m_direction.x = zero;
         cylinder.m_direction.y = probeY;
         cylinder.m_direction.z = zero;
         cylinder.m_radius = zero;
-        cylinder.m_top.x = scale;
-        cylinder.m_top.y = scale;
-        cylinder.m_top.z = scale;
-        cylinder.m_direction2.x = offset;
-        cylinder.m_direction2.y = offset;
-        cylinder.m_direction2.z = offset;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
@@ -112,4 +104,18 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     }
 
     return pppYmCheckBGHeight;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d8c18
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight*, struct pppYmCheckBGHeightUnkC*)
+{
+	return;
 }

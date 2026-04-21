@@ -10,14 +10,22 @@ class CPad : public CManager
 public:
     struct Gba
 	{
+        unsigned short connected : 1;
+        unsigned short noController : 1;
+        unsigned short ctrlMode : 14;
+        unsigned short button;
 	};
 
-    CPad();
+    CPad()
+    {
+        _1b4_4_ = 0;
+        _1b8_4_ = 0;
+    }
 
     void Init();
     void Quit();
     void Frame();
-    void SaveReplayData();
+    void SaveReplayData() {}
     unsigned short GetButtonDown(long);
     short _4_2_;
     short _6_2_;

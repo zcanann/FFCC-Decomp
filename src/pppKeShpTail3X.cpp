@@ -69,118 +69,61 @@ struct KeShpTail3XObject {
 
 /*
  * --INFO--
- * PAL Address: 0x80089da0
- * PAL Size: 1516b
+ * PAL Address: 0x8008922c
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
+void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
 {
-    KeShpTail3XStep* step;
-    KeShpTail3XWork* work;
-    Vec pos;
-    Vec historyPos ATTRIBUTE_ALIGN(8);
+    (void)obj;
+    (void)ctrlTable;
+}
 
-    if (gPppCalcDisabled != 0) {
-        return;
-    }
+/*
+ * --INFO--
+ * PAL Address: 0x80089230
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* param_2)
+{
+    unsigned char* anglePtr;
+    unsigned char* work;
+    int i;
+    float one;
 
-    step = (KeShpTail3XStep*)param_2;
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
+    work = (unsigned char*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
+    work[0x1c3] = 0;
+    work[0x1c2] = 0;
+    *(u16*)(work + 0x1bc) = 0;
+    *(u32*)(work + 0x1b8) = 0;
+    *(u16*)(work + 0x1c0) = (u16)rand();
+    memset(work, 0, 8);
+    memset(work + 8, 0, 8);
+    memset(work + 0x10, 0, 8);
+    memset(work + 0x18, 0, 8);
+    memset(work + 0x20, 0, 8);
+    memset(work + 0x28, 0, 8);
 
-    if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
-        work->m_initialized = 1;
-
-        if (step->m_worldSpaceMode == 0) {
-            pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-            pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-            pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-        } else if (step->m_worldSpaceMode == 1) {
-            pppFMATRIX outMatrix;
-
-            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
-            pos.x = outMatrix.value[0][3];
-            pos.y = outMatrix.value[1][3];
-            pos.z = outMatrix.value[2][3];
-        }
-
-        pppCopyVector(historyPos, pos);
-        Vec* history = work->m_posHistory;
-        s32 i = 0x1c;
-        do {
-            pppCopyVector(*history, historyPos);
-            history++;
-            i--;
-        } while (i > 0);
-    }
-
-    if (work->m_head == 0) {
-        work->m_head = 0x1c;
-    }
-    work->m_head--;
-
-    if (step->m_worldSpaceMode == 0) {
-        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-    } else if (step->m_worldSpaceMode == 1) {
-        pppFMATRIX outMatrix;
-
-        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
-        pos.x = outMatrix.value[0][3];
-        pos.y = outMatrix.value[1][3];
-        pos.z = outMatrix.value[2][3];
-    }
-
-    pppCopyVector(work->m_posHistory[work->m_head], pos);
-
-    work->m_values[8] += work->m_values[0xc];
-    work->m_values[0] += work->m_values[8];
-    work->m_values[9] += work->m_values[0xd];
-    work->m_values[1] += work->m_values[9];
-    work->m_values[10] += work->m_values[0xe];
-    work->m_values[2] += work->m_values[10];
-    work->m_values[0xb] += work->m_values[0xf];
-    work->m_values[3] += work->m_values[0xb];
-    work->m_values[0x10] += work->m_values[0x14];
-    work->m_values[4] += work->m_values[0x10];
-    work->m_values[0x11] += work->m_values[0x15];
-    work->m_values[5] += work->m_values[0x11];
-    work->m_values[0x12] += work->m_values[0x16];
-    work->m_values[6] += work->m_values[0x12];
-    work->m_values[0x13] += work->m_values[0x17];
-    work->m_values[7] += work->m_values[0x13];
-
-    if (obj->pppPObject.m_graphId == step->m_graphId) {
-        work->m_values[0] += step->m_valueSteps[0];
-        work->m_values[1] += step->m_valueSteps[1];
-        work->m_values[2] += step->m_valueSteps[2];
-        work->m_values[3] += step->m_valueSteps[3];
-        work->m_values[8] += step->m_valueSteps[8];
-        work->m_values[9] += step->m_valueSteps[9];
-        work->m_values[10] += step->m_valueSteps[10];
-        work->m_values[0xb] += step->m_valueSteps[11];
-        work->m_values[0xc] += step->m_valueSteps[12];
-        work->m_values[0xd] += step->m_valueSteps[13];
-        work->m_values[0xe] += step->m_valueSteps[14];
-        work->m_values[0xf] += step->m_valueSteps[15];
-        work->m_values[4] += step->m_valueSteps[4];
-        work->m_values[5] += step->m_valueSteps[5];
-        work->m_values[6] += step->m_valueSteps[6];
-        work->m_values[7] += step->m_valueSteps[7];
-        work->m_values[0x10] += step->m_valueSteps[16];
-        work->m_values[0x11] += step->m_valueSteps[17];
-        work->m_values[0x12] += step->m_valueSteps[18];
-        work->m_values[0x13] += step->m_valueSteps[19];
-        work->m_values[0x14] += step->m_valueSteps[20];
-        work->m_values[0x15] += step->m_valueSteps[21];
-        work->m_values[0x16] += step->m_valueSteps[22];
-        work->m_values[0x17] += step->m_valueSteps[23];
-    }
-
-    work->m_shapeData += step->m_initWork;
+    one = kPppKeShpTail3XOne;
+    i = 0;
+    anglePtr = work;
+    do {
+        s32 rnd = rand();
+        *(s16*)(anglePtr + 0x180) = (s16)(rnd - (rnd / 0x168) * 0x168);
+        anglePtr += 2;
+        *(float*)(work + 0x38) = one;
+        *(float*)(work + 0x34) = one;
+        *(float*)(work + 0x30) = one;
+        work += 0xc;
+        i++;
+    } while (i < 0x1c);
 }
 
 /*
@@ -444,70 +387,116 @@ advance_segment:
 
 /*
  * --INFO--
- * PAL Address: 0x80089230
- * PAL Size: 304b
+ * PAL Address: 0x80089da0
+ * PAL Size: 1516b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* param_2)
+void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
 {
-    unsigned char* anglePtr;
-    unsigned char* work;
-    int i;
-    float one;
+    KeShpTail3XStep* step;
+    KeShpTail3XWork* work;
+    Vec pos;
+    Vec historyPos ATTRIBUTE_ALIGN(8);
 
-    work = (unsigned char*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
-    work[0x1c3] = 0;
-    work[0x1c2] = 0;
-    *(u16*)(work + 0x1bc) = 0;
-    *(u32*)(work + 0x1b8) = 0;
-    *(u16*)(work + 0x1c0) = (u16)rand();
-    memset(work, 0, 8);
-    memset(work + 8, 0, 8);
-    memset(work + 0x10, 0, 8);
-    memset(work + 0x18, 0, 8);
-    memset(work + 0x20, 0, 8);
-    memset(work + 0x28, 0, 8);
+    if (gPppCalcDisabled != 0) {
+        return;
+    }
 
-    one = kPppKeShpTail3XOne;
-    i = 0;
-    anglePtr = work;
-    do {
-        s32 rnd = rand();
-        *(s16*)(anglePtr + 0x180) = (s16)(rnd - (rnd / 0x168) * 0x168);
-        anglePtr += 2;
-        *(float*)(work + 0x38) = one;
-        *(float*)(work + 0x34) = one;
-        *(float*)(work + 0x30) = one;
-        work += 0xc;
-        i++;
-    } while (i < 0x1c);
-}
+    step = (KeShpTail3XStep*)param_2;
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
 
-/*
- * --INFO--
- * PAL Address: 0x8008922c
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
-{
-	(void)obj;
-	(void)ctrlTable;
-	// TODO
-}
+    if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
+        work->m_initialized = 1;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void S4ToF32(pppFVECTOR4*, short*)
-{
-	// TODO
+        if (step->m_worldSpaceMode == 0) {
+            pos.x = obj->pppPObject.m_localMatrix.value[0][3];
+            pos.y = obj->pppPObject.m_localMatrix.value[1][3];
+            pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+        } else if (step->m_worldSpaceMode == 1) {
+            pppFMATRIX outMatrix;
+
+            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
+            pos.x = outMatrix.value[0][3];
+            pos.y = outMatrix.value[1][3];
+            pos.z = outMatrix.value[2][3];
+        }
+
+        pppCopyVector(historyPos, pos);
+        Vec* history = work->m_posHistory;
+        s32 i = 0x1c;
+        do {
+            pppCopyVector(*history, historyPos);
+            history++;
+            i--;
+        } while (i > 0);
+    }
+
+    if (work->m_head == 0) {
+        work->m_head = 0x1c;
+    }
+    work->m_head--;
+
+    if (step->m_worldSpaceMode == 0) {
+        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
+        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
+        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+    } else if (step->m_worldSpaceMode == 1) {
+        pppFMATRIX outMatrix;
+
+        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
+        pos.x = outMatrix.value[0][3];
+        pos.y = outMatrix.value[1][3];
+        pos.z = outMatrix.value[2][3];
+    }
+
+    pppCopyVector(work->m_posHistory[work->m_head], pos);
+
+    work->m_values[8] += work->m_values[0xc];
+    work->m_values[0] += work->m_values[8];
+    work->m_values[9] += work->m_values[0xd];
+    work->m_values[1] += work->m_values[9];
+    work->m_values[10] += work->m_values[0xe];
+    work->m_values[2] += work->m_values[10];
+    work->m_values[0xb] += work->m_values[0xf];
+    work->m_values[3] += work->m_values[0xb];
+    work->m_values[0x10] += work->m_values[0x14];
+    work->m_values[4] += work->m_values[0x10];
+    work->m_values[0x11] += work->m_values[0x15];
+    work->m_values[5] += work->m_values[0x11];
+    work->m_values[0x12] += work->m_values[0x16];
+    work->m_values[6] += work->m_values[0x12];
+    work->m_values[0x13] += work->m_values[0x17];
+    work->m_values[7] += work->m_values[0x13];
+
+    if (obj->pppPObject.m_graphId == step->m_graphId) {
+        work->m_values[0] += step->m_valueSteps[0];
+        work->m_values[1] += step->m_valueSteps[1];
+        work->m_values[2] += step->m_valueSteps[2];
+        work->m_values[3] += step->m_valueSteps[3];
+        work->m_values[8] += step->m_valueSteps[8];
+        work->m_values[9] += step->m_valueSteps[9];
+        work->m_values[10] += step->m_valueSteps[10];
+        work->m_values[0xb] += step->m_valueSteps[11];
+        work->m_values[0xc] += step->m_valueSteps[12];
+        work->m_values[0xd] += step->m_valueSteps[13];
+        work->m_values[0xe] += step->m_valueSteps[14];
+        work->m_values[0xf] += step->m_valueSteps[15];
+        work->m_values[4] += step->m_valueSteps[4];
+        work->m_values[5] += step->m_valueSteps[5];
+        work->m_values[6] += step->m_valueSteps[6];
+        work->m_values[7] += step->m_valueSteps[7];
+        work->m_values[0x10] += step->m_valueSteps[16];
+        work->m_values[0x11] += step->m_valueSteps[17];
+        work->m_values[0x12] += step->m_valueSteps[18];
+        work->m_values[0x13] += step->m_valueSteps[19];
+        work->m_values[0x14] += step->m_valueSteps[20];
+        work->m_values[0x15] += step->m_valueSteps[21];
+        work->m_values[0x16] += step->m_valueSteps[22];
+        work->m_values[0x17] += step->m_valueSteps[23];
+    }
+
+    work->m_shapeData += step->m_initWork;
 }

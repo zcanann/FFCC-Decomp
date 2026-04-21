@@ -16,13 +16,32 @@ char* PTR_DAT_8032e854 = sMcSaveFileName;
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern char sMemoryCardManagerName[];
-extern char sMemoryCardSourceFile[];
+static const char sMemoryCardManagerName[] = "CMemoryCardMan";
+static const char sMemoryCardSourceFile[] = "memorycard.cpp";
 extern char sMemoryAllocationError[];
+static const char s_icon_dat_801DA9E8[] = "icon.dat";
+static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
+char* PTR_s_icon_dat = const_cast<char*>(s_icon_dat_801DA9E8);
+char* PTR_s_FF_Crystal_Chronicles = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
 static const char sMemoryAllocationFmt[] = "%s(%d): Error: memory allocation";
 static const char sMemoryCardIconPathFmt[] = "dvd/%smenu/%s";
 static const char sMemoryCardOpenErrorFmt[] = "%s(%d): Error: %s open error";
 static const char sMemoryCardDataErrorFmt[] = "%s(%d): Error: [%s] data error";
+static const char DAT_801db044[] = {
+    0x43, 0x4D, 0x65, 0x6D, 0x6F, 0x72, 0x79, 0x43, 0x61, 0x72, 0x64, 0x4D,
+    0x61, 0x6E, 0x2E, 0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x61, 0x64,
+    0x57, 0x72, 0x69, 0x74, 0x65, 0x3A, 0x20, (char)0x83, 0x74, (char)0x83, 0x48,
+    (char)0x81, 0x5B, (char)0x83, (char)0x7D, (char)0x83, (char)0x62, (char)0x83, (char)0x67,
+    (char)0x82, (char)0xB5, (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, 0x42,
+    0x0A, 0x00, 0x00, 0x00, 0x00,
+};
+static const char DAT_801db07c[] = {
+    0x43, 0x4D, 0x65, 0x6D, 0x6F, 0x72, 0x79, 0x43, 0x61, 0x72, 0x64, 0x4D,
+    0x61, 0x6E, 0x2E, 0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x61, 0x64,
+    0x57, 0x72, 0x69, 0x74, 0x65, 0x3A, 0x20, (char)0x8E, (char)0xB8, (char)0x94, 0x73,
+    (char)0x82, (char)0xB5, (char)0xDC, (char)0x82, (char)0xB5, (char)0xBD, (char)0x81, 0x42,
+    0x0A, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
 static const char sMcFormatErrorFmt[] = "McFormat(%d) error(%d)";
 static const char sMcMountErrorFmt[] = "McMount(%d) error(%d)";
 static const char sMcCreateErrorFmt[] = "McCreate(%d) error(%d)";
@@ -111,8 +130,9 @@ void CMemoryCardMan::Init()
     m_currentSlot = -1;
     m_state = 0;
     m_saveBuffer = (char*)nullptr;
-    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(0x16000, sMemoryCardManagerName, 0));
-    m_mountWorkArea = new (reinterpret_cast<CMemory::CStage*>(m_stage), sMemoryCardSourceFile, 0x88) char[0xA000];
+    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(0x16000, const_cast<char*>(sMemoryCardManagerName), 0));
+    m_mountWorkArea =
+        new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x88) char[0xA000];
 
     m_currentSlot = -1;
 }
@@ -176,7 +196,7 @@ void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, i
 
             if ((result == -6 || result == -13) && isWrite == 0)
             {
-                System.Printf("%s", (char*)nullptr /* DAT_801db044 */);
+                System.Printf("%s", const_cast<char*>(DAT_801db044));
 
                 if (CARDFormat(1) < 0)
                 {
@@ -250,7 +270,7 @@ void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, i
     CARDUnmount(1);
 
     if (!success)
-        System.Printf("%s", (char*)nullptr /* DAT_801db07c */);
+        System.Printf("%s", const_cast<char*>(DAT_801db07c));
 }
 
 
@@ -426,11 +446,11 @@ void CMemoryCardMan::CreateMcBuff()
     if (m_saveBuffer == 0)
     {
         m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), sMemoryCardSourceFile, 0x2AB));
+            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            System.Printf(sMemoryAllocationError, sMemoryCardSourceFile, 0x2AD);
+            System.Printf(sMemoryAllocationError, const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
     }
 
@@ -512,7 +532,7 @@ void CMemoryCardMan::SetMcIconImage()
 
         if (m_saveBuffer == (char*)nullptr && System.m_execParam != 0)
         {
-            System.Printf(const_cast<char*>(sMemoryAllocationFmt), "" /* s_memorycard_cpp_801daea8 */, 0x2AD);
+            System.Printf(const_cast<char*>(sMemoryAllocationFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
 
         memset(m_saveBuffer, 0, 0xA000);
@@ -521,12 +541,12 @@ void CMemoryCardMan::SetMcIconImage()
     char path[136];
 
     const char* lang = (const char*) nullptr; // Game.GetLangString();
-    sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, "" /*PTR_s_icon_dat_8032e850*/);
+    sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, PTR_s_icon_dat);
     CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
 
     if (h == nullptr && System.m_execParam != 0)
     {
-        System.Printf(const_cast<char*>(sMemoryCardOpenErrorFmt), "" /* s_memorycard_cpp_801daea8 */, 0x2EF, path);
+        System.Printf(const_cast<char*>(sMemoryCardOpenErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2EF, path);
     }
 
     File.Read(h);
@@ -536,7 +556,7 @@ void CMemoryCardMan::SetMcIconImage()
 
     if (len != 0x2A00 && System.m_execParam != 0)
     {
-        System.Printf(const_cast<char*>(sMemoryCardDataErrorFmt), "" /* s_memorycard_cpp_801daea8 */, 0x2F6, path);
+        System.Printf(const_cast<char*>(sMemoryCardDataErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2F6, path);
     }
 
     memcpy(m_saveBuffer + 0x40, File.m_readBuffer, len);
@@ -581,8 +601,8 @@ void CMemoryCardMan::SetMcIconImage()
     m_cardStat.offsetIconTlut = 0x2840;
     m_cardStat.offsetIconTlut = 0x2A40;
 
-    size_t titleLen = strlen("" /* PTR_s_FF_Crystal_Chronicles_8032e858 */);
-    memcpy(m_saveBuffer, "" /*PTR_s_FF_Crystal_Chronicles_8032e858*/, titleLen);
+    size_t titleLen = strlen(PTR_s_FF_Crystal_Chronicles);
+    memcpy(m_saveBuffer, PTR_s_FF_Crystal_Chronicles, titleLen);
 }
 
 /*

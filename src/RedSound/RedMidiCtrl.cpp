@@ -1820,18 +1820,23 @@ void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u32 rate = 0x100;
+	int rate;
+	int divisor;
 
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)*(int*)track != 0) {
+		rate = *(u8*)*(int*)track;
+	} else {
+		rate = 0x100;
 	}
-	trackData[0x1e] = 0x100000 / rate;
-	*(short*)(trackData + 0x23) = 0;
-	trackData[0] += 1;
+	divisor = rate;
+	((int*)track)[0x1e] = 0x100000 / divisor;
+	*(short*)((int*)track + 0x23) = 0;
+	*(int*)track += 1;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2015,18 +2020,23 @@ void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u32 rate = 0x100;
+	int rate;
+	int divisor;
 
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)*(int*)track != 0) {
+		rate = *(u8*)*(int*)track;
+	} else {
+		rate = 0x100;
 	}
-	trackData[0x26] = 0x100000 / rate;
-	*(short*)(trackData + 0x2b) = 0;
-	trackData[0] += 1;
+	divisor = rate;
+	((int*)track)[0x26] = 0x100000 / divisor;
+	*(short*)((int*)track + 0x2b) = 0;
+	*(int*)track += 1;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2181,18 +2191,23 @@ void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u32 rate = 0x100;
+	int rate;
+	int divisor;
 
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)*(int*)track != 0) {
+		rate = *(u8*)*(int*)track;
+	} else {
+		rate = 0x100;
 	}
-	trackData[0x2e] = 0x100000 / rate;
-	*(short*)(trackData + 0x34) = 0;
-	trackData[0] += 1;
+	divisor = rate;
+	((int*)track)[0x2e] = 0x100000 / divisor;
+	*(short*)((int*)track + 0x34) = 0;
+	*(int*)track += 1;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

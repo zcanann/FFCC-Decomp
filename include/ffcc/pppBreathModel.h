@@ -17,9 +17,9 @@ typedef Mtx PARTICLE_WMAT;
 typedef _PARTICLE_COLOR PARTICLE_COLOR;
 
 void get_rand(void);
-void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, _PARTICLE_DATA*, Mtx*, _PARTICLE_COLOR*);
-void SetParticleMatrix(_pppPObject*, VBreathModel*, _PARTICLE_DATA*, Mtx*, _pppMngSt*);
-void UpdateParticle(VBreathModel*, PBreathModel*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
+void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*);
+void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 void UpdateAllParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*);
 void IsDeadGroupBreath(PBreathModel*, VBreathModel*, short);
 void SearchIndex(PBreathModel*, VBreathModel*, short&, short&, short);

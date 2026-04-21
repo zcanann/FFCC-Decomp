@@ -83,9 +83,9 @@ void get_rand()
  * JP Address: TODO
  * JP Size: TODO
  */
-void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, 
-                   VColor* vColor, _PARTICLE_DATA* particleData, Mtx* particleWmat, 
-                   _PARTICLE_COLOR* particleColor)
+extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VColorP13PARTICLE_DATAP13PARTICLE_WMATP14PARTICLE_COLOR(
+    _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
+    PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     unsigned char* particle = (unsigned char*)particleData;
@@ -271,7 +271,7 @@ void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathMo
  * Address:	TODO
  * Size:	TODO
  */
-void SetParticleMatrix(_pppPObject*, VBreathModel*, _PARTICLE_DATA*, Mtx*, _pppMngSt*)
+void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
 {
 	// TODO
 }
@@ -285,8 +285,8 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, _PARTICLE_DATA*, Mtx*, _pppM
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-    VBreathModel*, PBreathModel* pBreathModel, _PARTICLE_DATA* particleData, VColor* vColor, _PARTICLE_COLOR* particleColor)
+extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP6VColorP14PARTICLE_COLOR(
+    VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pBreathModel;
     Vec* particle = reinterpret_cast<Vec*>(particleData);
@@ -409,8 +409,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 
         for (i = 0; i < maxParticleCount; i++) {
             if (*(short*)(particleData + 0x50) >= 1) {
-                UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                    vBreathModel, pBreathModel, (_PARTICLE_DATA*)particleData, vColor, (_PARTICLE_COLOR*)particleColor);
+                UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP6VColorP14PARTICLE_COLOR(
+                    vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
             } else {
                 float zero = kPppBreathModelZero;
 
@@ -475,8 +475,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 if ((*(unsigned short*)((unsigned char*)pBreathModel + 0x1E) <=
                      *(unsigned short*)((unsigned char*)vBreathModel + 0x44)) &&
                     (spawnCount < (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x1C))) {
-                    BirthParticle(pppObject, vBreathModel, pBreathModel, vColor, (_PARTICLE_DATA*)particleData,
-                                  (Mtx*)particleWmat, (_PARTICLE_COLOR*)particleColor);
+                    BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VColorP13PARTICLE_DATAP13PARTICLE_WMATP14PARTICLE_COLOR(
+                        pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
+                        (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
                     found = true;
                     spawnCount += 1;
                     groupData = groupTable;

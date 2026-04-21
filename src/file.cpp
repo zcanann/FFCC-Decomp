@@ -142,469 +142,6 @@ void CFile::CHandle::Reset()
 
 /*
  * --INFO--
- * PAL Address: 0x80013bb8
- * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-
-void CFile::Init()
-{
-    DVDInit();
-    m_allocStage = CreateStage__7CMemoryFUlPci(&Memory, 0x10ac00, const_cast<char*>(s_cFile), 0);
-    m_fatalDiskErrorFlag = 0;
-    m_isDiskError = 0;
-    m_readBuffer =
-        __nwa__FUlPQ27CMemory6CStagePci(0x100000, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2b);
-    m_handlePoolHead.m_currentOffset = (u32)__construct_new_array(
-        __nwa__FUlPQ27CMemory6CStagePci(
-            sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
-        0, 0, sizeof(CHandle), 0x80);
-    m_fileHandle.m_next = &m_fileHandle;
-    m_fileHandle.m_previous = &m_fileHandle;
-    m_fileHandle.m_priority = PRI_SENTINEL;
-    m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
-
-    unsigned int handleIndex = 0;
-    int byteOffset = 0;
-    for (int blockCount = 0x20; blockCount != 0; blockCount--) {
-        CHandle* nextHandle;
-
-        if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
-        handleIndex++;
-
-        if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
-        handleIndex++;
-
-        if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
-        handleIndex++;
-
-        if (handleIndex == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
-        } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
-        }
-        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
-        handleIndex++;
-
-        byteOffset += 0x2B0;
-        handleIndex++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80013b48
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFile::Quit()
-{
-    if (m_readBuffer != 0) {
-        delete[] m_readBuffer;
-        m_readBuffer = 0;
-    }
-
-    u32 nextOffset = m_handlePoolHead.m_currentOffset;
-    if (nextOffset != 0) {
-        if (nextOffset != 0) {
-            __dla__FPv((void*)(nextOffset - 0x10));
-        }
-        m_handlePoolHead.m_currentOffset = 0;
-    }
-
-    Memory.DestroyStage((CMemory::CStage*)m_allocStage);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::Frame()
-{
-	kick();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-DVDDiskID* CFile::GetCurrentDiskID()
-{
-	return DVDGetCurrentDiskID();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80013968
- * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-
-CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
-{
-    if (Game.m_gameWork.m_gamePaused != 0)
-    {
-        pri = CFile::PRI_CRITICAL;
-    }
-
-    CHandle* end = m_fileHandle.m_previous;
-    CHandle* it = end;
-    CHandle* handle = 0;
-    DVDFileInfo fi;
-
-    while (it != end) {
-        if (pri < it->m_priority) {
-            break;
-        }
-        it = it->m_previous;
-    }
-
-    it = it->m_next;
-
-    s32 entry = DVDConvertPathToEntrynum(path);
-
-    if (entry != -1)
-	{
-        u32 length;
-
-        DVDFastOpen(entry, &fi);
-        length = fi.length;
-        handle = m_freeList;
-        m_freeList = handle->m_previous;
-        handle->m_previous = it;
-        handle->m_next = it->m_next;
-        it->m_next->m_previous = handle;
-        it->m_next = handle;
-        handle->m_priority = pri;
-        handle->m_userParam = userParam;
-        handle->m_length = length;
-        handle->m_completionStatus = 0;
-        handle->m_closedFlag = 0;
-        handle->m_flags = 0;
-        strcpy(handle->m_name, path);
-        handle->m_chunkSize = length;
-        handle->m_currentOffset = 0;
-        handle->m_nextOffset = 0;
-        fi.cb.userData = handle;
-        handle->m_dvdFileInfo = fi;
-	}
-
-    if (handle == 0 && (unsigned int)System.m_execParam >= 1)
-	{
-        System.Printf(const_cast<char*>(s_openWarnFmt), path);
-    }
-
-    return handle;
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CFile::GetLength(CFile::CHandle* fileHandle)
-{
-	return fileHandle->m_length;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#pragma dont_inline on
-void CFile::BackAllFilesToQueue(CHandle* fileHandle)
-{
-    CHandle* inFlight;
-
-    while (1)
-    {
-        inFlight = CheckQueue();
-        if (inFlight == 0)
-        {
-            break;
-        }
-
-        SyncCompleted(inFlight);
-
-        if (fileHandle != 0 && inFlight == fileHandle)
-        {
-            inFlight->m_completionStatus = 0;
-            continue;
-        }
-
-        if (fileHandle != 0)
-        {
-            if ((unsigned int)System.m_execParam >= 2)
-            {
-                System.Printf(const_cast<char*>(s_queueWarnTargetFmt), inFlight->m_name, fileHandle->m_name);
-            }
-        }
-        else if ((unsigned int)System.m_execParam >= 3)
-        {
-            System.Printf(const_cast<char*>(s_queueWarnAnyFmt), inFlight->m_name);
-        }
-
-        inFlight->m_completionStatus = 1;
-    }
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800137b0
- * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFile::Read(CFile::CHandle* fileHandle)
-{
-	BackAllFilesToQueue(fileHandle);
-	fileHandle->m_completionStatus = 2;
-	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
-	if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
-	{
-		System.Printf(const_cast<char*>(s_readWarnFmt), fileHandle->m_name, readSize);
-	}
-	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
-	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
-	SyncCompleted(fileHandle);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::LockBuffer()
-{
-	CFile::CHandle* fileHandle;
-
-	while(true)
-	{
-		fileHandle = CheckQueue();
-
-		if (fileHandle == 0)
-		{
-			break;
-		}
-
-		SyncCompleted(fileHandle);
-
-		fileHandle->m_completionStatus = 1;
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::UnlockBuffer()
-{
-	kick();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::ReadASync(CFile::CHandle* fileHandle)
-{
-	fileHandle->m_completionStatus = 1;
-	kick();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001366C
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFile::Close(CFile::CHandle* fileHandle)
-{
-	if ((fileHandle->m_completionStatus == 2) && (2 <= (unsigned int)System.m_execParam))
-	{
-		System.Printf(const_cast<char*>(s_closeWarnFmt), fileHandle->m_name);
-	}
-
-	DVDClose(&fileHandle->m_dvdFileInfo);
-
-	fileHandle->m_closedFlag = 1;
-	fileHandle->m_next->m_previous = fileHandle->m_previous;
-	fileHandle->m_previous->m_next = fileHandle->m_next;
-	fileHandle->m_previous = m_freeList;
-	m_freeList = fileHandle;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-bool CFile::IsCompleted(CFile::CHandle* fileHandle)
-{
-	if (fileHandle->m_completionStatus == 3)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::SyncCompleted(CFile::CHandle* fileHandle)
-{
-	while (fileHandle->m_completionStatus != 3)
-	{
-		kick();
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800134f4
- * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-void CFile::kick()
-{
-    CHandle* handle = CheckQueue();
-    if (handle != 0)
-    {
-        return;
-    }
-
-    handle = m_fileHandle.m_previous;
-    do
-    {
-        if ((Game.m_gameWork.m_gamePaused == 0 || handle->m_priority == PRI_CRITICAL)
-            && (handle->m_completionStatus == 1 || handle->m_completionStatus == 4))
-        {
-            u32 readSize;
-
-            handle->m_completionStatus = 2;
-            readSize = (handle->m_chunkSize + 0x1F) & ~0x1F;
-
-            if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
-            {
-                System.Printf(const_cast<char*>(s_readWarnFmt), handle->m_name, readSize);
-            }
-
-            DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
-            handle->m_nextOffset = handle->m_currentOffset + readSize;
-            if (handle->m_completionStatus != 3)
-            {
-                return;
-            }
-
-            kick();
-            return;
-        }
-
-        handle = handle->m_previous;
-    } while (handle != &m_fileHandle);
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CFile::CHandle* CFile::CheckQueue()
-{
-    CHandle* result = 0;
-    CHandle* handle = m_fileHandle.m_previous;
-
-    do
-    {
-        int completionStatus = handle->m_completionStatus;
-        if (completionStatus == 2)
-        {
-            int dvdStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
-
-            if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
-            {
-                DrawError(handle->m_dvdFileInfo, dvdStatus);
-                continue;
-            }
-            else if (dvdStatus == 0)
-            {
-                completionStatus = 3;
-                handle->m_completionStatus = completionStatus;
-                result = CheckQueue();
-                break;
-            }
-            else if (dvdStatus < 0)
-            {
-                completionStatus = 4;
-                handle->m_completionStatus = completionStatus;
-            }
-            else
-            {
-                result = handle;
-                break;
-            }
-        }
-
-        if (completionStatus == 3)
-        {
-            result = handle;
-            break;
-        }
-        else
-        {
-            handle = handle->m_previous;
-        }
-    } while (handle != &m_fileHandle);
-
-    return result;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80012bb8
  * PAL Size: 1696b
  * EN Address: TODO
@@ -779,4 +316,466 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
     Sound.PauseDiscError(0);
     m_isDiskError = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CFile::CHandle* CFile::CheckQueue()
+{
+    CHandle* result = 0;
+    CHandle* handle = m_fileHandle.m_previous;
+
+    do
+    {
+        int completionStatus = handle->m_completionStatus;
+        if (completionStatus == 2)
+        {
+            int dvdStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
+
+            if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
+            {
+                DrawError(handle->m_dvdFileInfo, dvdStatus);
+                continue;
+            }
+            else if (dvdStatus == 0)
+            {
+                completionStatus = 3;
+                handle->m_completionStatus = completionStatus;
+                result = CheckQueue();
+                break;
+            }
+            else if (dvdStatus < 0)
+            {
+                completionStatus = 4;
+                handle->m_completionStatus = completionStatus;
+            }
+            else
+            {
+                result = handle;
+                break;
+            }
+        }
+
+        if (completionStatus == 3)
+        {
+            result = handle;
+            break;
+        }
+        else
+        {
+            handle = handle->m_previous;
+        }
+    } while (handle != &m_fileHandle);
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800134f4
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma dont_inline on
+void CFile::kick()
+{
+    CHandle* handle = CheckQueue();
+    if (handle != 0)
+    {
+        return;
+    }
+
+    handle = m_fileHandle.m_previous;
+    do
+    {
+        if ((Game.m_gameWork.m_gamePaused == 0 || handle->m_priority == PRI_CRITICAL)
+            && (handle->m_completionStatus == 1 || handle->m_completionStatus == 4))
+        {
+            u32 readSize;
+
+            handle->m_completionStatus = 2;
+            readSize = (handle->m_chunkSize + 0x1F) & ~0x1F;
+
+            if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
+            {
+                System.Printf(const_cast<char*>(s_readWarnFmt), handle->m_name, readSize);
+            }
+
+            DVDReadAsyncPrio(&handle->m_dvdFileInfo, m_readBuffer, readSize, handle->m_currentOffset, 0, 2);
+            handle->m_nextOffset = handle->m_currentOffset + readSize;
+            if (handle->m_completionStatus != 3)
+            {
+                return;
+            }
+
+            kick();
+            return;
+        }
+
+        handle = handle->m_previous;
+    } while (handle != &m_fileHandle);
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+#pragma dont_inline on
+void CFile::SyncCompleted(CFile::CHandle* fileHandle)
+{
+	while (fileHandle->m_completionStatus != 3)
+	{
+		kick();
+	}
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+bool CFile::IsCompleted(CFile::CHandle* fileHandle)
+{
+	if (fileHandle->m_completionStatus == 3)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001366C
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::Close(CFile::CHandle* fileHandle)
+{
+	if ((fileHandle->m_completionStatus == 2) && (2 <= (unsigned int)System.m_execParam))
+	{
+		System.Printf(const_cast<char*>(s_closeWarnFmt), fileHandle->m_name);
+	}
+
+	DVDClose(&fileHandle->m_dvdFileInfo);
+
+	fileHandle->m_closedFlag = 1;
+	fileHandle->m_next->m_previous = fileHandle->m_previous;
+	fileHandle->m_previous->m_next = fileHandle->m_next;
+	fileHandle->m_previous = m_freeList;
+	m_freeList = fileHandle;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CFile::ReadASync(CFile::CHandle* fileHandle)
+{
+	fileHandle->m_completionStatus = 1;
+	kick();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CFile::UnlockBuffer()
+{
+	kick();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CFile::LockBuffer()
+{
+	CFile::CHandle* fileHandle;
+
+	while(true)
+	{
+		fileHandle = CheckQueue();
+
+		if (fileHandle == 0)
+		{
+			break;
+		}
+
+		SyncCompleted(fileHandle);
+
+		fileHandle->m_completionStatus = 1;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800137b0
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::Read(CFile::CHandle* fileHandle)
+{
+	BackAllFilesToQueue(fileHandle);
+	fileHandle->m_completionStatus = 2;
+	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
+	if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
+	{
+		System.Printf(const_cast<char*>(s_readWarnFmt), fileHandle->m_name, readSize);
+	}
+	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
+	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
+	SyncCompleted(fileHandle);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+#pragma dont_inline on
+void CFile::BackAllFilesToQueue(CHandle* fileHandle)
+{
+    CHandle* inFlight;
+
+    while (1)
+    {
+        inFlight = CheckQueue();
+        if (inFlight == 0)
+        {
+            break;
+        }
+
+        SyncCompleted(inFlight);
+
+        if (fileHandle != 0 && inFlight == fileHandle)
+        {
+            inFlight->m_completionStatus = 0;
+            continue;
+        }
+
+        if (fileHandle != 0)
+        {
+            if ((unsigned int)System.m_execParam >= 2)
+            {
+                System.Printf(const_cast<char*>(s_queueWarnTargetFmt), inFlight->m_name, fileHandle->m_name);
+            }
+        }
+        else if ((unsigned int)System.m_execParam >= 3)
+        {
+            System.Printf(const_cast<char*>(s_queueWarnAnyFmt), inFlight->m_name);
+        }
+
+        inFlight->m_completionStatus = 1;
+    }
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CFile::GetLength(CFile::CHandle* fileHandle)
+{
+	return fileHandle->m_length;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80013968
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
+{
+    if (Game.m_gameWork.m_gamePaused != 0)
+    {
+        pri = CFile::PRI_CRITICAL;
+    }
+
+    CHandle* end = m_fileHandle.m_previous;
+    CHandle* it = end;
+    CHandle* handle = 0;
+    DVDFileInfo fi;
+
+    while (it != end) {
+        if (pri < it->m_priority) {
+            break;
+        }
+        it = it->m_previous;
+    }
+
+    it = it->m_next;
+
+    s32 entry = DVDConvertPathToEntrynum(path);
+
+    if (entry != -1)
+	{
+        u32 length;
+
+        DVDFastOpen(entry, &fi);
+        length = fi.length;
+        handle = m_freeList;
+        m_freeList = handle->m_previous;
+        handle->m_previous = it;
+        handle->m_next = it->m_next;
+        it->m_next->m_previous = handle;
+        it->m_next = handle;
+        handle->m_priority = pri;
+        handle->m_userParam = userParam;
+        handle->m_length = length;
+        handle->m_completionStatus = 0;
+        handle->m_closedFlag = 0;
+        handle->m_flags = 0;
+        strcpy(handle->m_name, path);
+        handle->m_chunkSize = length;
+        handle->m_currentOffset = 0;
+        handle->m_nextOffset = 0;
+        fi.cb.userData = handle;
+        handle->m_dvdFileInfo = fi;
+	}
+
+    if (handle == 0 && (unsigned int)System.m_execParam >= 1)
+	{
+        System.Printf(const_cast<char*>(s_openWarnFmt), path);
+    }
+
+    return handle;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+DVDDiskID* CFile::GetCurrentDiskID()
+{
+	return DVDGetCurrentDiskID();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CFile::Frame()
+{
+	kick();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80013b48
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::Quit()
+{
+    if (m_readBuffer != 0) {
+        delete[] m_readBuffer;
+        m_readBuffer = 0;
+    }
+
+    u32 nextOffset = m_handlePoolHead.m_currentOffset;
+    if (nextOffset != 0) {
+        if (nextOffset != 0) {
+            __dla__FPv((void*)(nextOffset - 0x10));
+        }
+        m_handlePoolHead.m_currentOffset = 0;
+    }
+
+    Memory.DestroyStage((CMemory::CStage*)m_allocStage);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80013bb8
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::Init()
+{
+    DVDInit();
+    m_allocStage = CreateStage__7CMemoryFUlPci(&Memory, 0x10ac00, const_cast<char*>(s_cFile), 0);
+    m_fatalDiskErrorFlag = 0;
+    m_isDiskError = 0;
+    m_readBuffer =
+        __nwa__FUlPQ27CMemory6CStagePci(0x100000, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2b);
+    m_handlePoolHead.m_currentOffset = (u32)__construct_new_array(
+        __nwa__FUlPQ27CMemory6CStagePci(
+            sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
+        0, 0, sizeof(CHandle), 0x80);
+    m_fileHandle.m_next = &m_fileHandle;
+    m_fileHandle.m_previous = &m_fileHandle;
+    m_fileHandle.m_priority = PRI_SENTINEL;
+    m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
+
+    unsigned int handleIndex = 0;
+    int byteOffset = 0;
+    for (int blockCount = 0x20; blockCount != 0; blockCount--) {
+        CHandle* nextHandle;
+
+        if (handleIndex == 0x7F) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x4) = nextHandle;
+        handleIndex++;
+
+        if (handleIndex == 0x7F) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0xB0) = nextHandle;
+        handleIndex++;
+
+        if (handleIndex == 0x7F) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x15C) = nextHandle;
+        handleIndex++;
+
+        if (handleIndex == 0x7F) {
+            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+        } else {
+            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (handleIndex + 1) * sizeof(CHandle));
+        }
+        *(CHandle**)(m_handlePoolHead.m_currentOffset + byteOffset + 0x208) = nextHandle;
+        handleIndex++;
+
+        byteOffset += 0x2B0;
+        handleIndex++;
+    }
 }

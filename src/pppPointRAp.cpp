@@ -19,6 +19,23 @@ struct pppPointRApStep {
 
 /*
  * --INFO--
+ * PAL Address: 0x80060ee4
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
+{
+    u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
+    u32 offset = ctrlData[1];
+    u8* state = (u8*)pObject + offset;
+    state[0x81] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80060d20
  * PAL Size: 452b
  * EN Address: TODO
@@ -62,10 +79,8 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         float spinRand = Math.RandF();
         float spinAngle = gPppPointRApRandomAngleRange * spinRand;
         s32 angleB = (s32)(gPppPointRApSpinScale * spinAngle);
-        float xOff = *(float*)((u8*)trig + (angleB & 0xFFFC));
-        float zOff = *(float*)((u8*)trig + ((angleB + 0x4000) & 0xFFFC));
-        xOff = planarOff * xOff;
-        zOff = planarOff * zOff;
+        float xOff = planarOff * *(float*)((u8*)trig + (angleB & 0xFFFC));
+        float zOff = planarOff * *(float*)((u8*)trig + ((angleB + 0x4000) & 0xFFFC));
         Vec* dstPos = (Vec*)((u8*)obj + payload->m_childPosOffset + 0x80);
         Vec* dstVel = (Vec*)((u8*)obj + payload->m_childVelocityOffset + 0x80);
 
@@ -81,21 +96,4 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     }
 
     state[1]--;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80060ee4
- * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
-{
-    u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
-    u32 offset = ctrlData[1];
-    u8* state = (u8*)pObject + offset;
-    state[0x81] = 0;
 }

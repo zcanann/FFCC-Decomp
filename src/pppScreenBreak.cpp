@@ -66,7 +66,7 @@ struct ScreenBreakModelData {
 struct ScreenBreakModelView {
     u8 _pad0[0x38];
     Mtx m_drawMtx;
-    u8 _pad78[0x2C];
+    u8 _pad78[0x3C];
     ScreenBreakModelData* m_data;
     u8* m_nodes;
     ScreenBreakMeshRef* m_meshes;

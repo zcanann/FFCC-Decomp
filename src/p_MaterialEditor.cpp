@@ -4,10 +4,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 extern "C" {
-extern char* gDebugSpinnerText;
-extern unsigned char gDebugSpinnerTextInitialized;
-extern int gDebugSpinnerFrame;
-extern unsigned char gDebugSpinnerFrameInitialized;
 extern const float kMaterialEditorControlMaxInit;
 extern const float kMaterialEditorControlMinInit;
 extern unsigned int kMaterialEditorDefaultColorRgba;
@@ -474,20 +470,24 @@ void CMaterialEditorPcs::calcViewer()
 void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    static char* pFan;
+    static unsigned char init;
+    static int alive;
+    static unsigned char init_0;
 
-    if (gDebugSpinnerTextInitialized == 0) {
-        gDebugSpinnerText = sMaterialEditorSpinnerText;
-        gDebugSpinnerTextInitialized = 1;
+    if (init == 0) {
+        pFan = sMaterialEditorSpinnerText;
+        init = 1;
     }
-    if (gDebugSpinnerFrameInitialized == 0) {
-        gDebugSpinnerFrame = 0;
-        gDebugSpinnerFrameInitialized = 1;
+    if (init_0 == 0) {
+        alive = 0;
+        init_0 = 1;
     }
 
-    gDebugSpinnerFrame = gDebugSpinnerFrame + 1;
-    int sign = gDebugSpinnerFrame >> 31;
-    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)gDebugSpinnerText[idx]);
+    alive = alive + 1;
+    int sign = alive >> 31;
+    int idx = (sign * 4 | (unsigned int)(((alive >> 4) * 0x40000000) + sign) >> 30) - sign;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)pFan[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

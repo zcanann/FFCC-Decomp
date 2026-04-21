@@ -10,10 +10,6 @@
 #include "ffcc/stopwatch.h"
 extern "C" {
 extern int gPppHeapUseRateWords[3];
-extern char* gDebugSpinnerText;
-extern char gDebugSpinnerTextInitialized;
-extern int gDebugSpinnerFrame;
-extern char gDebugSpinnerFrameInitialized;
 extern char sDebugSpinnerText[];
 extern const float kPppHeapUseRateDivisor;
 extern const float kPartColorIdentityOne;
@@ -23,10 +19,6 @@ extern const float kPartColorIdentityOne;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-char* gDebugSpinnerText = 0;
-char gDebugSpinnerTextInitialized = 0;
-int gDebugSpinnerFrame = 0;
-char gDebugSpinnerFrameInitialized = 0;
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
@@ -1209,6 +1201,10 @@ void CPartPcs::drawAfterViewer()
 {
 	char* stringBase = s_p_tina_rodata_801d7ee0;
 	int frameSign;
+	static char* pFan;
+	static char init;
+	static int alive;
+	static char init_0;
 
 	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
@@ -1222,21 +1218,21 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (gDebugSpinnerTextInitialized == 0) {
-		gDebugSpinnerText = sDebugSpinnerText;
-		gDebugSpinnerTextInitialized = 1;
+	if (init == 0) {
+		pFan = sDebugSpinnerText;
+		init = 1;
 	}
-	if (gDebugSpinnerFrameInitialized == 0) {
-		gDebugSpinnerFrame = 0;
-		gDebugSpinnerFrameInitialized = 1;
+	if (init_0 == 0) {
+		alive = 0;
+		init_0 = 1;
 	}
 
-	gDebugSpinnerFrame++;
-	frameSign = gDebugSpinnerFrame >> 0x1f;
+	alive++;
+	frameSign = alive >> 0x1f;
 	Graphic.Printf(
 		stringBase + 0x134,
-		(int)(char)gDebugSpinnerText[(frameSign * 4 |
-								 (unsigned int)((gDebugSpinnerFrame >> 4) * 0x40000000 + frameSign) >> 0x1e) -
+		(int)(char)pFan[(frameSign * 4 |
+								 (unsigned int)((alive >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
 
 	g_par_calc_prof.ProfEnd();

@@ -73,17 +73,3 @@ void pppRandHCV(void* p1, void* p2, void* p3)
 }
 
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static short randshort(short value, float scale)
-{
-    return (short)(((f32)value * scale) - (f32)value);
-}

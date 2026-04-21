@@ -468,9 +468,8 @@ found:
 	}
 
 	float centerX = pos->x;
-	float centerZ = pos->z;
-
 	obj->type = 1;
+	float centerZ = pos->z;
 	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
 
 	int id = m_nextId;

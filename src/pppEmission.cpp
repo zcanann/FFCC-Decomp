@@ -365,7 +365,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         *(int*)(MaterialManRaw() + 0xD0) = state->m_texture + 0x28;
 
         if (step->m_payload[9] == 0) {
-            for (u32 i = 0; i < step->m_initWOrk; i++) {
+            for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
                 Mtx objMtx;
                 Mtx viewMtx;
@@ -374,9 +374,9 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXCopy(CameraMatrix(), viewMtx);
                 SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
 
-                int remaining = meshData->m_displayListCount;
+                int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
-                while (--remaining >= 0) {
+                while (remaining >= 0) {
                     *(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
@@ -415,6 +415,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     GXSetArray((GXAttr)0xB, &state->m_colorR, 4);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXCallDisplayList(displayList->m_data, displayList->m_size);
+                    remaining--;
                     displayList++;
                 }
             }
@@ -430,9 +431,9 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXConcat(viewMtx, objMtx, objMtx);
                 GXLoadPosMtxImm(objMtx, 0);
 
-                int remaining = meshData->m_displayListCount;
+                int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
-                while (--remaining >= 0) {
+                while (remaining >= 0) {
                     *(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
@@ -471,6 +472,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     GXSetArray((GXAttr)0xB, &particle->m_colorR, 4);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXCallDisplayList(displayList->m_data, displayList->m_size);
+                    remaining--;
                     displayList++;
                 }
                 particle++;

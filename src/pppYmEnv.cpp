@@ -386,6 +386,7 @@ int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 {
     _pppEnvStYmEnv* ymEnv = (_pppEnvStYmEnv*)env;
     int textureIndex;
+    CMapMesh* mapMesh;
     CMapMesh** mapMeshArray;
 
     if (mapMeshIndex == 0xFFFF) {
@@ -393,8 +394,9 @@ int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
     }
 
     mapMeshArray = ymEnv->m_mapMeshPtr;
+    mapMesh = mapMeshArray[mapMeshIndex];
     textureIndex = 0;
-    return GetTexture__8CMapMeshFP12CMaterialSetRi(mapMeshArray[mapMeshIndex], ymEnv->m_materialSetPtr, textureIndex);
+    return GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, ymEnv->m_materialSetPtr, textureIndex);
 }
 
 /*

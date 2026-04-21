@@ -22,14 +22,7 @@ CGraphic Graphic;
 
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern u8 DAT_801E83F2[7];
-extern "C" char DAT_801d637c[];
-extern "C" char DAT_801d63c0[];
-extern "C" char DAT_801d6400[];
-extern "C" char DAT_801d643c[];
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" char s_graphic_cpp_801d6348[];
-extern "C" char s_CGraphic_801d6330[];
-extern "C" char sGraphicMemoryStageName[];
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
@@ -42,6 +35,31 @@ u8 gGraphicNoiseTextureI8_64x96[0xC00] ATTRIBUTE_ALIGN(32) = {
 #include "src/graphic_noise_texture.inc"
 };
 }
+
+static const char s_CGraphic_801d6330[] = "CGraphic";
+static const char s_graphic_cpp_801d6348[] = "graphic.cpp";
+static const char DAT_801d637c[] = {
+    0x50, 0x61, 0x72, 0x74, 0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20,
+    0x3D, 0x20, 0x25, 0x73, 0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x29, 0x20, 0x50, 0x41,
+    0x52, 0x54, 0x20, 0x43, 0x54, 0x52, 0x4C, 0x20, 0x88, 0xC8, 0x8A, 0x4F, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9,
+    0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00};
+static const char DAT_801d63c0[] = {
+    0x50, 0x61, 0x72, 0x74, 0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20,
+    0x3D, 0x20, 0x25, 0x73, 0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x29, 0x20, 0x50, 0x41,
+    0x52, 0x54, 0x20, 0x43, 0x48, 0x41, 0x52, 0x41, 0x20, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9, 0x82, 0xB5, 0x82,
+    0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00};
+static const char DAT_801d6400[] = {
+    0x50, 0x61, 0x72, 0x74, 0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20,
+    0x3D, 0x20, 0x25, 0x73, 0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x29, 0x20, 0x63, 0x74,
+    0x72, 0x6C, 0x3D, 0x25, 0x73, 0x20, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB9,
+    0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00};
+static const char DAT_801d643c[] = {
+    0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x73,
+    0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x20, 0x70, 0x72, 0x6F, 0x63, 0x65, 0x73, 0x73,
+    0x20, 0x3D, 0x20, 0x25, 0x73, 0x28, 0x25, 0x64, 0x29, 0x20, 0x64, 0x61, 0x74, 0x61, 0x20, 0x3D, 0x20, 0x25,
+    0x64, 0x29, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42,
+    0x0A, 0x00};
+static const char sGraphicMemoryStageName[] = "CManager";
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {
     return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);
@@ -127,8 +145,8 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    CMemory::CStage* stageMain = Memory.CreateStage(0x19C000, s_CGraphic_801d6330, 0);
-    CMemory::CStage* stageTemp = Memory.CreateStage(0xD6000, sGraphicMemoryStageName, 0);
+    CMemory::CStage* stageMain = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
+    CMemory::CStage* stageTemp = Memory.CreateStage(0xD6000, const_cast<char*>(sGraphicMemoryStageName), 0);
     PtrAt(this, 0x4) = stageMain;
     PtrAt(this, 0x8) = stageTemp;
 
@@ -159,20 +177,21 @@ void CGraphic::Init()
     u16 efbHeight = U16At(renderMode, 6);
     u16 xfbHeight = U16At(renderMode, 8);
 
-    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), s_graphic_cpp_801d6348, 0x86)
+    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x86)
         u8[alignedWidth * xfbHeight * 2];
     memset(PtrAt(this, 0x71E4), 0, 4);
 
-    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), s_graphic_cpp_801d6348, 0x88)
+    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x88)
         u8[alignedWidth * efbHeight * 2];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
     PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, alignedWidth * efbHeight * 2 + 0x46000,
                                                                      reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                                                                     s_graphic_cpp_801d6348, 0xB53, 0);
+                                                                     const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
-    PtrAt(this, 0x10) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), s_graphic_cpp_801d6348, 0x8B) u8[0x60000];
+    PtrAt(this, 0x10) =
+        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x8B) u8[0x60000];
 
     VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
     GXInit(PtrAt(this, 0x10), 0x60000);
@@ -213,7 +232,7 @@ void CGraphic::Init()
     U8At(this, 0x735D) = 0;
     U8At(this, 0x735E) = 0;
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-    PtrAt(this, 0x7368) = s_graphic_cpp_801d6348;
+    PtrAt(this, 0x7368) = const_cast<char*>(s_graphic_cpp_801d6348);
     S32At(this, 0x736C) = 0xBE;
     S32At(this, 0x7364) = 1;
     GXSetDrawDone();
@@ -527,11 +546,11 @@ void CGraphic::Thread()
                 u16 drawSyncPart = drawSyncRaw & 0x7FFF;
                 if ((drawSyncRaw & 0x8000) != 0) {
                     if (drawSyncPart == 0x7FFF) {
-                        System.Printf(DAT_801d637c, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(const_cast<char*>(DAT_801d637c), PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else if (drawSyncPart == 0x7FFE) {
-                        System.Printf(DAT_801d63c0, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(const_cast<char*>(DAT_801d63c0), PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else {
-                        System.Printf(DAT_801d6400, PtrAt(this, 0x7368), S32At(this, 0x736C),
+                        System.Printf(const_cast<char*>(DAT_801d6400), PtrAt(this, 0x7368), S32At(this, 0x736C),
                                       pppGetSysProgTable()[drawSyncPart].m_pppName);
                     }
                 }
@@ -543,7 +562,7 @@ void CGraphic::Thread()
                     orderName = order->m_debugName;
                     orderIndex = order->m_insertIndex;
                 }
-                System.Printf(DAT_801d643c, PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
+                System.Printf(const_cast<char*>(DAT_801d643c), PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
                               static_cast<int>(static_cast<char>(drawSyncPart)));
             }
         }
@@ -647,7 +666,7 @@ void CGraphic::Flip()
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-        PtrAt(this, 0x7368) = s_graphic_cpp_801d6348;
+        PtrAt(this, 0x7368) = const_cast<char*>(s_graphic_cpp_801d6348);
         S32At(this, 0x736C) = 0x26D;
         S32At(this, 0x7364) = 1;
         GXSetDrawDone();
@@ -1074,7 +1093,8 @@ void CGraphic::makeSphere()
     vertices[vertexCount * 3 + 2] = 0.0f;
 
     S32At(this, 0x71F8) = 0x880;
-    PtrAt(this, 0x71FC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), s_graphic_cpp_801d6348, 0x41A)
+    PtrAt(this, 0x71FC) =
+        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x41A)
         u8[S32At(this, 0x71F8)];
 
     DCInvalidateRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
@@ -2050,7 +2070,7 @@ void CGraphic::CreateTempBuffer()
 	u8* tempBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
 	    &Memory,
 	    alignedWidth * (u32)efbHeight * 2 + 0x46000,
-	    (CMemory::CStage*)PtrAt(this, 0x8), s_graphic_cpp_801d6348, 0xB53, 0));
+	    (CMemory::CStage*)PtrAt(this, 0x8), const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0));
 
 	PtrAt(this, 0x71E8) = tempBuffer;
 	memset(PtrAt(this, 0x71E8), 0, 0x46004);

@@ -170,14 +170,14 @@ void CPad::Frame()
 		uVar8 = Joybus.GetCtrlMode(uVar17);
 		iVar6 = 0;
 		*puVar7 = static_cast<u16>((uVar8 & 0x3FFF) | (*puVar7 & 0xC000));
-		if ((static_cast<s8>(*reinterpret_cast<u8*>(puVar7)) < 0) && ((*puVar7 & 0x3FFF) == 0))
+		if (((*reinterpret_cast<u8*>(puVar7) & 0x80) != 0) && ((*puVar7 & 0x3FFF) == 0))
 		{
 			iVar6 = 1;
 		}
 		*reinterpret_cast<u8*>(puVar7) =
 			static_cast<u8>((iVar6 << 6) | (*reinterpret_cast<u8*>(puVar7) & 0xBF));
 		puVar7[1] = 0;
-		if (static_cast<s8>(*reinterpret_cast<u8*>(puVar7)) < 0)
+		if ((*reinterpret_cast<u8*>(puVar7) & 0x80) != 0)
 		{
 			uVar8 = Joybus.GetPadData(uVar17);
 			puVar7[1] = uVar8;
@@ -189,90 +189,90 @@ void CPad::Frame()
 	iVar6 = reinterpret_cast<int>(_1b0_4_);
 	if ((iVar6 != 0) && ((iVar14 = _1bc_4_), -1 < iVar14))
 	{
-		if (*reinterpret_cast<int*>(iVar6 + 4) == 0)
+		if (*reinterpret_cast<int*>(iVar6 + 4) != 0)
 		{
-			if (iVar14 < 0x1A5E0)
+			if (*reinterpret_cast<int*>(iVar6 + 8) < 0x1A5E0)
 			{
 				iVar6 = 0;
-				iVar19 = 0;
+				iVar14 = 0;
 				puVar7 = local_88;
 				puVar13 = local_98;
-				iVar11 = 4;
+				iVar19 = 4;
 				do
 				{
-					uVar8 = *puVar7;
-					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar6 + 0x0C);
-					*puVar7 = *puVar10;
-					*reinterpret_cast<u8*>(puVar7 + 1) = *reinterpret_cast<u8*>(puVar10 + 1);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 3);
-					*reinterpret_cast<u8*>(puVar7 + 2) = *reinterpret_cast<u8*>(puVar10 + 2);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 5);
-					*reinterpret_cast<u8*>(puVar7 + 3) = *reinterpret_cast<u8*>(puVar10 + 3);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 7);
-					*reinterpret_cast<u8*>(puVar7 + 4) = *reinterpret_cast<u8*>(puVar10 + 4);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 9);
-					*reinterpret_cast<u8*>(puVar7 + 5) = *reinterpret_cast<u8*>(puVar10 + 5);
-					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar19 + 0x3C);
-					uVar1 = puVar10[1];
-					*puVar13 = *puVar10;
-					puVar13[1] = uVar1;
-					if ((uVar8 & PAD_TRIGGER_Z) != 0)
-					{
-						*puVar7 = static_cast<u16>(*puVar7 | uVar8);
-					}
-					puVar7 = puVar7 + 6;
+					uVar8 = *puVar13;
+					uVar1 = puVar13[1];
+					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar6;
 					iVar6 = iVar6 + 0x0C;
-					iVar19 = iVar19 + 4;
 					puVar13 = puVar13 + 2;
-					iVar11 = iVar11 + -1;
-				} while (iVar11 != 0);
+					puVar12 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x0C);
+					*puVar12 = *puVar7;
+					*reinterpret_cast<u8*>(puVar12 + 1) = *reinterpret_cast<u8*>(puVar7 + 1);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
+					*reinterpret_cast<u8*>(puVar12 + 2) = *reinterpret_cast<u8*>(puVar7 + 2);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
+					*reinterpret_cast<u8*>(puVar12 + 3) = *reinterpret_cast<u8*>(puVar7 + 3);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
+					*reinterpret_cast<u8*>(puVar12 + 4) = *reinterpret_cast<u8*>(puVar7 + 4);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) =
+						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
+					puVar10 = puVar7 + 5;
+					puVar7 = puVar7 + 6;
+					*reinterpret_cast<u8*>(puVar12 + 5) = *reinterpret_cast<u8*>(puVar10);
+					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
+					iVar14 = iVar14 + 4;
+					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x3C);
+					*puVar10 = uVar8;
+					puVar10[1] = uVar1;
+					iVar19 = iVar19 + -1;
+				} while (iVar19 != 0);
+				*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) =
+					*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) + 1;
+				*reinterpret_cast<int*>(_1b0_4_) = *reinterpret_cast<int*>(_1b0_4_) + 0x40;
 			}
 		}
-		else if (*reinterpret_cast<int*>(iVar6 + 8) < 0x1A5E0)
+		else if (iVar14 < 0x1A5E0)
 		{
 			iVar6 = 0;
-			iVar14 = 0;
+			iVar19 = 0;
 			puVar7 = local_88;
 			puVar13 = local_98;
-			iVar19 = 4;
+			iVar11 = 4;
 			do
 			{
-				uVar8 = *puVar13;
-				uVar1 = puVar13[1];
-				iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar6;
-				iVar6 = iVar6 + 0x0C;
-				puVar13 = puVar13 + 2;
-				puVar12 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x0C);
-				*puVar12 = *puVar7;
-				*reinterpret_cast<u8*>(puVar12 + 1) = *reinterpret_cast<u8*>(puVar7 + 1);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
-				*reinterpret_cast<u8*>(puVar12 + 2) = *reinterpret_cast<u8*>(puVar7 + 2);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
-				*reinterpret_cast<u8*>(puVar12 + 3) = *reinterpret_cast<u8*>(puVar7 + 3);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
-				*reinterpret_cast<u8*>(puVar12 + 4) = *reinterpret_cast<u8*>(puVar7 + 4);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
-				puVar10 = puVar7 + 5;
+				uVar8 = *puVar7;
+				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar6 + 0x0C);
+				*puVar7 = *puVar10;
+				*reinterpret_cast<u8*>(puVar7 + 1) = *reinterpret_cast<u8*>(puVar10 + 1);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 3);
+				*reinterpret_cast<u8*>(puVar7 + 2) = *reinterpret_cast<u8*>(puVar10 + 2);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 5);
+				*reinterpret_cast<u8*>(puVar7 + 3) = *reinterpret_cast<u8*>(puVar10 + 3);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 7);
+				*reinterpret_cast<u8*>(puVar7 + 4) = *reinterpret_cast<u8*>(puVar10 + 4);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9) =
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 9);
+				*reinterpret_cast<u8*>(puVar7 + 5) = *reinterpret_cast<u8*>(puVar10 + 5);
+				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar19 + 0x3C);
+				uVar1 = puVar10[1];
+				*puVar13 = *puVar10;
+				puVar13[1] = uVar1;
+				if ((uVar8 & PAD_TRIGGER_Z) != 0)
+				{
+					*puVar7 = static_cast<u16>(*puVar7 | uVar8);
+				}
 				puVar7 = puVar7 + 6;
-				*reinterpret_cast<u8*>(puVar12 + 5) = *reinterpret_cast<u8*>(puVar10);
-				iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
-				iVar14 = iVar14 + 4;
-				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x3C);
-				*puVar10 = uVar8;
-				puVar10[1] = uVar1;
-				iVar19 = iVar19 + -1;
-			} while (iVar19 != 0);
-			*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) =
-				*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) + 1;
-			*reinterpret_cast<int*>(_1b0_4_) = *reinterpret_cast<int*>(_1b0_4_) + 0x40;
+				iVar6 = iVar6 + 0x0C;
+				iVar19 = iVar19 + 4;
+				puVar13 = puVar13 + 2;
+				iVar11 = iVar11 + -1;
+			} while (iVar11 != 0);
 		}
 	}
 

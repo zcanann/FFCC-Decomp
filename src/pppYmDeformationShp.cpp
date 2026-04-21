@@ -429,7 +429,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
  */
 int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
-	const f32 (*objMtx)[4] = (const f32(*)[4])((u8*)obj + 4);
+	const f32 (*objMtx)[4] = ((pppYmDeformationShpLayout*)obj)->m_modelMatrix;
 	Vec4d projected[4];
 	Vec worldPos;
 	Vec4d clipPos;
@@ -621,10 +621,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
-	Mtx rotMtx;
-	float indMtx[2][3];
 	Vec vertices[4];
+	Mtx rotMtx;
 	Vec2d uvs[4];
+	float indMtx[2][3];
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
@@ -649,7 +649,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 		GXSetNumIndStages(1);
 		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
-		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_ITW_0, GX_ITM_1);
+		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
 
 		if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
 			work->m_angle = 1;
@@ -662,7 +662,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		indMtx[1][1] = rotMtx[1][1] * work->m_scale;
 		indMtx[0][2] = kPppYmDeformationShpZero;
 		indMtx[1][2] = kPppYmDeformationShpZero;
-		GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
 		if (param_2->m_splitMode == 0) {
 			float quadSize = (float)param_2->m_size;

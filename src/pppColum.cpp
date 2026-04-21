@@ -85,7 +85,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionBase[0x32] != 0) {
-            float* cameraMatrix = &ppvCameraMatrix0[0][0];
             Vec shapePosA;
             Vec shapePosB;
             Vec center;
@@ -104,9 +103,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             PSMTXIdentity(identityMtx);
             baseX = *(float*)(positionBase + 0x10);
             baseY = *(float*)(positionBase + 0x14);
-            cameraDelta.x = cameraMatrix[3] - baseX;
-            cameraDelta.y = cameraMatrix[7] - baseY;
-            cameraDelta.z = cameraMatrix[11] + *(float*)(positionBase + 0x18);
+            cameraDelta.x = 320.0f - baseX;
+            cameraDelta.y = 224.0f - baseY;
+            cameraDelta.z = *(float*)(positionBase + 0x18) - 0.5f;
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
             if (lengthXY > 0.0f) {

@@ -61,7 +61,7 @@ struct _pppPDataVal;
 
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
-extern "C" const f64 DOUBLE_80330DD0 = 4503599627370496.0;
+extern const f64 kPppYmSharedDoubleBias;
 
 /*
  * --INFO--
@@ -158,8 +158,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		case 1:
 			while (count-- != 0) {
 				f32 randValue = Math.RandF();
-				f32 maxValue = (f32)entry->maxValue;
-				int outValue = (int)(randValue * maxValue);
+				f64 maxValue = (f64)entry->maxValue - kPppYmSharedDoubleBias;
+				int outValue = (int)(randValue * (f32)(maxValue + kPppYmSharedDoubleBias));
 				u16* vertexIndices = entry->vertexIndices;
 				u16 vertexIndex = vertexIndices[outValue];
 				Vec* vertex = &points[vertexIndex];

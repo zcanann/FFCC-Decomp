@@ -9,6 +9,7 @@
 class CStopWatch : public OSStopwatch
 {
 public:
+	CStopWatch() {}
 	CStopWatch(char* name);
 	~CStopWatch();
 

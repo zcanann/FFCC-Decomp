@@ -29,6 +29,7 @@ extern "C" {
 void Init__7CSystemFv(CSystem*);
 void Quit__7CSystemFv(CSystem*);
 extern void* __RTTI__7CSystem[];
+CSystem* DumpMapFile__7CSystemFPv(CSystem*, void*);
 void* g_CSystemRttiBase[] = {0, 0, __RTTI__7CSystem};
 void* __vt__7CSystem[] = {0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
 }
@@ -468,8 +469,8 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        CStopWatch watch(reinterpret_cast<char*>(-1));
-        DumpMapFile(&watch);
+        CStopWatch watch;
+        DumpMapFile__7CSystemFPv(reinterpret_cast<CSystem*>(&watch), 0);
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;

@@ -8,7 +8,6 @@ extern "C" {
 extern const float kPppRainTexCoordBase;
 extern const float FLOAT_8033101c;
 extern const float FLOAT_80331020;
-extern const double DOUBLE_80331028;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 }
@@ -166,8 +165,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
             float minX;
             float maxX;
-            float minZ;
-            float maxZ;
+            float zRange;
             float unitA;
             float unitB;
             float lengthDelta;
@@ -180,13 +178,12 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             randB = rand();
             unitA = FLOAT_80331020 * (float)randA;
             unitB = FLOAT_80331020 * (float)randB;
-            maxX = param_2->m_maxX;
             minX = param_2->m_minX;
+            maxX = param_2->m_maxX;
+            zRange = param_2->m_maxZ - param_2->m_minZ;
             dropData[0] = unitA * (maxX - minX) + minX;
             dropData[1] = param_2->m_maxY;
-            maxZ = param_2->m_maxZ;
-            minZ = param_2->m_minZ;
-            dropData[2] = unitB * (maxZ - minZ) + minZ;
+            dropData[2] = unitB * zRange + param_2->m_minZ;
             dropData[3] = -param_2->m_initWOrk;
             dropData[4] = param_2->m_driftY;
             dropData[5] = -param_2->m_arg3;
@@ -228,8 +225,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float* dropData;
             float minX;
             float maxX;
-            float minZ;
-            float maxZ;
+            float zRange;
             float unitA;
             float unitB;
             float lengthDelta;
@@ -243,13 +239,12 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             dropData = (float*)drop;
             unitA = FLOAT_80331020 * (float)randA;
             unitB = FLOAT_80331020 * (float)randB;
-            maxX = param_2->m_maxX;
             minX = param_2->m_minX;
+            maxX = param_2->m_maxX;
+            zRange = param_2->m_maxZ - param_2->m_minZ;
             dropData[0] = unitA * (maxX - minX) + minX;
             dropData[1] = param_2->m_maxY;
-            maxZ = param_2->m_maxZ;
-            minZ = param_2->m_minZ;
-            dropData[2] = unitB * (maxZ - minZ) + minZ;
+            dropData[2] = unitB * zRange + param_2->m_minZ;
             dropData[3] = -param_2->m_initWOrk;
             dropData[4] = param_2->m_driftY;
             dropData[5] = -param_2->m_arg3;
@@ -339,4 +334,3 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 extern const float kPppRainTexCoordBase = 0.0f;
 extern const float FLOAT_8033101c = 1.0f;
 extern const float FLOAT_80331020 = 3.0518509e-05f;
-extern const double DOUBLE_80331028 = 4503601774854144.0;

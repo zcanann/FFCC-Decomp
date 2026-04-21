@@ -12,10 +12,22 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern float FLOAT_80331fd0;
-extern float FLOAT_80331fd4;
-extern float FLOAT_80331fd8;
-extern float FLOAT_80331fdc;
+extern const double DOUBLE_80331FC0 = 2.4;
+extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
+extern const float FLOAT_80331fd0 = -0.5f;
+extern const float FLOAT_80331fd4 = 25.0f;
+extern const float FLOAT_80331fd8 = 1.3333334f;
+extern const float FLOAT_80331fdc = 0.5f;
+extern const float FLOAT_80331FE0 = 2.0f;
+extern const float FLOAT_80331FE4 = -1.0f;
+extern const float FLOAT_80331FE8 = 0.0f;
+extern const double DOUBLE_80331FF0 = 0.5;
+extern const double DOUBLE_80331FF8 = 3.0;
+extern const double DOUBLE_80332000 = 0.0;
+extern const float FLOAT_80332008;
+extern const float FLOAT_8033200C;
+extern const float FLOAT_80332010;
+extern const double DOUBLE_80332018;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -95,13 +107,11 @@ static inline int Crystal2FpClassify(float value)
 
 static inline float Crystal2SqrtPositive(float value)
 {
-    const double half = 0.5;
-    const double three = 3.0;
     double guess = __frsqrte((double)value);
 
-    guess = half * guess * (three - guess * guess * value);
-    guess = half * guess * (three - guess * guess * value);
-    guess = half * guess * (three - guess * guess * value);
+    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
+    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
+    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -258,40 +268,40 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         textureInfo->m_imageCount = 0x100;
         textureInfo->m_bufferSize = textureSize;
 
-        stepX = 2.0f / (float)(textureInfo->m_width - 1);
-        stepY = 2.0f / (float)(textureInfo->m_height - 1);
-        yCoord = -1.0f;
+        stepX = FLOAT_80331FE0 / (float)(textureInfo->m_width - 1);
+        stepY = FLOAT_80331FE0 / (float)(textureInfo->m_height - 1);
+        yCoord = FLOAT_80331FE4;
 
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
             u32 yTile = y >> 2;
             u32 yFine = (y & 3) * 4;
             float ySq = yCoord * yCoord;
-            float xCoord = -1.0f;
+            float xCoord = FLOAT_80331FE4;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
                 float magnitude = xCoord * xCoord + ySq;
 
-                if (magnitude > 1.0f) {
+                if (magnitude > FLOAT_80331FE8) {
                     magnitude = Crystal2SqrtPositive(magnitude);
-                } else if ((double)magnitude < 0.0) {
+                } else if ((double)magnitude < DOUBLE_80332000) {
                     magnitude = NAN;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
                     magnitude = NAN;
                 }
 
-                if (magnitude > 0.8f) {
-                    magnitude = 0.8f;
+                if (magnitude > FLOAT_80332008) {
+                    magnitude = FLOAT_80332008;
                 }
 
                 u32 xFine = x & 3;
-                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
+                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
                     (x & 0x1FFFFFFC) * 8 +
                     (xFine + yFine) * 2;
 
                 pixel[0] = nx;
-                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
+                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
                 xCoord += stepX;
                 pixel[1] = ny;
             }

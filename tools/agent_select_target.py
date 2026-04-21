@@ -25,9 +25,25 @@ COMPLETE_THRESHOLD_PERCENT = 100
 
 # Units permanently excluded from target selection.
 # These units thrash between extab and code improvements, wasting PR cycles.
+# ppp*Rand* IV/CV/HCV: unfixable f2/f3 FPR register swap in MWC 1.3.2 compiler.
+# pppSRand* FV/CV/HCV: similar GPR swap issue.
 PERMANENTLY_BLACKLISTED_UNITS = {
+    # pppRand IV/CV/HCV variants (f2/f3 register allocation bug)
+    "main/pppRandCV",
+    "main/pppRandDownCV",
+    "main/pppRandDownHCV",
+    "main/pppRandDownIV",
+    "main/pppRandHCV",
+    "main/pppRandIV",
+    "main/pppRandUpCV",
+    "main/pppRandUpHCV",
+    "main/pppRandUpIV",
+    # pppSRand variants (GPR swap issue)
     "main/pppSRandCV",
+    "main/pppSRandDownFV",
+    "main/pppSRandFV",
     "main/pppSRandHCV",
+    "main/pppSRandUpFV",
 }
 
 

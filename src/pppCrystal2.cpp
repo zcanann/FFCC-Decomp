@@ -93,6 +93,19 @@ static inline int Crystal2FpClassify(float value)
     return 4;
 }
 
+static inline float Crystal2SqrtPositive(float value)
+{
+    const double half = 0.5;
+    const double three = 3.0;
+    double guess = __frsqrte((double)value);
+
+    guess = half * guess * (three - guess * guess * value);
+    guess = half * guess * (three - guess * guess * value);
+    guess = half * guess * (three - guess * guess * value);
+
+    return (float)(value * guess);
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -206,6 +219,8 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         yCoord = -1.0f;
 
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
+            u32 yTile = y >> 2;
+            u32 yFine = (y & 3) * 4;
             float ySq = yCoord * yCoord;
             float xCoord = -1.0f;
 
@@ -213,8 +228,8 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                 float magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > 1.0f) {
-                    magnitude = sqrtf(magnitude);
-                } else if (magnitude < 0.0f) {
+                    magnitude = Crystal2SqrtPositive(magnitude);
+                } else if ((double)magnitude < 0.0) {
                     magnitude = NAN;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
                     magnitude = NAN;
@@ -224,11 +239,12 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                     magnitude = 0.8f;
                 }
 
+                u32 xFine = x & 3;
                 u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
                 u8* pixel = textureInfo->m_imageData +
-                    (y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
+                    yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
                     (x & 0x1FFFFFFC) * 8 +
-                    ((x & 3) + (y & 3) * 4) * 2;
+                    (xFine + yFine) * 2;
 
                 pixel[0] = nx;
                 u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));

@@ -194,8 +194,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
             dropData[6] += lengthDelta;
 
-            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
             lifeRemainder = randA % param_2->m_lifeRange;
+            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;
@@ -253,8 +253,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
             dropData[6] += lengthDelta;
 
-            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
             lifeRemainder = randA % param_2->m_lifeRange;
+            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;
@@ -269,7 +269,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         float posY;
         float posZ;
 
-        if (Game.m_currentSceneId == 7) {
+        if ((int)Game.m_currentSceneId == 7) {
             posX = ppvCameraMatrix02[0][3];
             posY = ppvCameraMatrix02[1][3];
             posZ = ppvCameraMatrix02[2][3];

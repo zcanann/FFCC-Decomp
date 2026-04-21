@@ -60,26 +60,6 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::MLstInit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::MLstInit1()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80175210
  * PAL Size: 720b
  * EN Address: TODO
@@ -581,14 +561,4 @@ void CMenuPcs::MLstDraw()
 		0,
 		FLOAT_803333F0,
 		(float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::MLstCtrlCur()
-{
-	// TODO
 }

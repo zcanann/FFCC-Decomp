@@ -87,7 +87,7 @@ p_usb.cpp:
 	extabindex  start:0x8000B440 end:0x8000B4AC
 	.text       start:0x8001FF6C end:0x80020494
 	.ctors      start:0x801D53BC end:0x801D53C0
-	.rodata     start:0x801D6D08 end:0x801D6D20
+	.rodata     start:0x801D6D08 end:0x801D6D24
 	.data       start:0x801E8690 end:0x801E8818
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E838 end:0x8032E840
@@ -1327,6 +1327,7 @@ pppYmTracer2.cpp:
 	extabindex  start:0x8000FD84 end:0x8000FDA8
 	.text       start:0x801035DC end:0x80103EC0
 	.rodata     start:0x801DC4B8 end:0x801DC4D0
+	.sdata2     start:0x80331848 end:0x80331870
 
 pppEraseCharaParts.cpp:
 	extab       start:0x80009094 end:0x800090B4

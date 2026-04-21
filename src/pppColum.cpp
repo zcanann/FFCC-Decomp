@@ -36,6 +36,14 @@ struct pppColumPositionWork {
     u8 m_alpha;
 };
 
+enum {
+    ColumFloatQNaN = 1,
+    ColumFloatInfinite = 2,
+    ColumFloatZero = 3,
+    ColumFloatNormal = 4,
+    ColumFloatSubnormal = 5
+};
+
 union ColumFloatBits {
     float value;
     unsigned long bits;
@@ -112,19 +120,37 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             if (lengthXY > 0.0f) {
                 lengthXY = sqrtf(lengthXY);
             } else {
-                ColumFloatBits bits;
-
                 if (lengthXY < 0.0f) {
                     lengthXY = NAN;
                 } else {
+                    ColumFloatBits bits;
+                    int floatClass;
+
                     bits.value = lengthXY;
-                    if ((bits.bits & 0x7F800000) == 0x7F800000 && (bits.bits & 0x007FFFFF) != 0) {
+                    switch (bits.bits & 0x7F800000) {
+                    case 0x7F800000:
+                        if ((bits.bits & 0x007FFFFF) != 0) {
+                            floatClass = ColumFloatQNaN;
+                        } else {
+                            floatClass = ColumFloatInfinite;
+                        }
+                        break;
+                    case 0:
+                        if ((bits.bits & 0x007FFFFF) != 0) {
+                            floatClass = ColumFloatSubnormal;
+                        } else {
+                            floatClass = ColumFloatZero;
+                        }
+                        break;
+                    default:
+                        floatClass = ColumFloatNormal;
+                        break;
+                    }
+
+                    if (floatClass == ColumFloatQNaN) {
                         lengthXY = NAN;
                     }
                 }
-            }
-            if (lengthXY < 0.0f) {
-                lengthXY = NAN;
             }
             if (lengthXY > 0.0f) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);

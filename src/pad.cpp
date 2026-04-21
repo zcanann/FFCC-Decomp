@@ -187,7 +187,7 @@ void CPad::Frame()
 	} while (uVar17 < 4);
 
 	iVar6 = reinterpret_cast<int>(_1b0_4_);
-	if ((iVar6 != 0) && ((iVar14 = _1bc_4_), -1 < iVar14))
+	if ((iVar6 != 0) && ((iVar14 = _1bc_4_), iVar14 >= 0))
 	{
 		if (*reinterpret_cast<int*>(iVar6 + 4) != 0)
 		{
@@ -392,13 +392,13 @@ void CPad::Frame()
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) >> 0x1F;
-							if ((_1c8_4_ <= static_cast<u32>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16)) ||
+							if ((_1c8_4_ <= static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16)) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) >> 0x1F),
-								 (_1c8_4_ <= static_cast<u32>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16))))
+								 (_1c8_4_ <= static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16))))
 							{
 								*puVar12 = static_cast<u16>(*puVar12 & 0xFFF0);
 								*reinterpret_cast<u32*>(iVar6 + 0x40) = 1;
-								if (_1c8_4_ <= static_cast<u32>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
+								if (_1c8_4_ <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_RIGHT);
 								}
@@ -406,7 +406,7 @@ void CPad::Frame()
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_LEFT);
 								}
-								if (_1c8_4_ <= static_cast<u32>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
+								if (_1c8_4_ <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_UP);
 								}

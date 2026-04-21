@@ -61,6 +61,8 @@ struct _pppPDataVal;
 
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
+extern "C" const f64 DOUBLE_80330DD0 = 4503599627370496.0;
+
 /*
  * --INFO--
  * PAL Address: 0x800de360

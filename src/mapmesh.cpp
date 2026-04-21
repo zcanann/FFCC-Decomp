@@ -332,37 +332,37 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
 
                 float* vert = reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset);
                 value = vert[0];
-                if (value > m_bboxMinX) {
+                if (m_bboxMinX < value) {
                     value = m_bboxMinX;
                 }
                 m_bboxMinX = value;
 
                 value = vert[1];
-                if (value > m_bboxMinY) {
+                if (m_bboxMinY < value) {
                     value = m_bboxMinY;
                 }
                 m_bboxMinY = value;
 
                 value = vert[2];
-                if (value > m_bboxMinZ) {
+                if (m_bboxMinZ < value) {
                     value = m_bboxMinZ;
                 }
                 m_bboxMinZ = value;
 
                 value = vert[0];
-                if (value < m_bboxMaxX) {
+                if (m_bboxMaxX > value) {
                     value = m_bboxMaxX;
                 }
                 m_bboxMaxX = value;
 
                 value = vert[1];
-                if (value < m_bboxMaxY) {
+                if (m_bboxMaxY > value) {
                     value = m_bboxMaxY;
                 }
                 m_bboxMaxY = value;
 
                 value = vert[2];
-                if (value < m_bboxMaxZ) {
+                if (m_bboxMaxZ > value) {
                     value = m_bboxMaxZ;
                 }
                 m_bboxMaxZ = value;

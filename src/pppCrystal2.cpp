@@ -12,10 +12,10 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern float FLOAT_80331fd0;
-extern float FLOAT_80331fd4;
-extern float FLOAT_80331fd8;
-extern float FLOAT_80331fdc;
+static const float FLOAT_80331fd0 = -0.5f;
+static const float FLOAT_80331fd4 = 33.3f;
+static const float FLOAT_80331fd8 = 1.3333334f;
+static const float FLOAT_80331fdc = 0.5f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 

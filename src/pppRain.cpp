@@ -170,6 +170,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float unitA;
             float unitB;
             float lengthDelta;
+            u16 lifeRange;
+            s16 lifeBase;
             int lifeJitter;
             int lifeRemainder;
 
@@ -194,8 +196,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
             dropData[6] += lengthDelta;
 
-            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
-            lifeRemainder = randA % param_2->m_lifeRange;
+            lifeRange = param_2->m_lifeRange;
+            lifeBase = param_2->m_lifeBase;
+            lifeRemainder = randA % lifeRange;
+            *(s16*)(dropData + 7) = lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;
@@ -228,6 +232,8 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             float unitA;
             float unitB;
             float lengthDelta;
+            u16 lifeRange;
+            s16 lifeBase;
             int lifeJitter;
             int lifeRemainder;
 
@@ -253,8 +259,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
             dropData[6] += lengthDelta;
 
-            *(s16*)(dropData + 7) = (s16)param_2->m_lifeBase;
-            lifeRemainder = randA % param_2->m_lifeRange;
+            lifeRange = param_2->m_lifeRange;
+            lifeBase = param_2->m_lifeBase;
+            lifeRemainder = randA % lifeRange;
+            *(s16*)(dropData + 7) = lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;

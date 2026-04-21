@@ -144,7 +144,7 @@ public:
     int GetGBAStat(ThreadParam* threadParam);
     int ChgCtrlMode(int portIndex);
     int SetCtrlMode(int portIndex, int controlMode);
-	unsigned char GetCtrlMode(int portIndex);
+	unsigned short GetCtrlMode(int portIndex);
     int GetGBAConnect(int portIndex);
     int IsInitSend(int portIndex);
     bool GetGBAStart(int portIndex);

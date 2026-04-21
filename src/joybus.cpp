@@ -5672,7 +5672,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned char JoyBus::GetCtrlMode(int portIndex)
+unsigned short JoyBus::GetCtrlMode(int portIndex)
 {
     bool single = GbaQue.IsSingleMode(portIndex);
 
@@ -6638,4 +6638,3 @@ int CFile::IsDiskError()
 {
 	return m_isDiskError;
 }
-

@@ -124,7 +124,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		int projectedYInt;
 		float alphaScale;
 
-		alphaScale = (float)sourceAlpha * 0.0078125f;
+		alphaScale = (float)sourceAlpha;
+		alphaScale *= 0.0078125f;
 
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);

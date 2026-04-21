@@ -603,7 +603,7 @@ void CSystem::Init()
 {
     CFile::CHandle* fileHandle;
     unsigned int count;
-    unsigned int mapSize;
+    int mapSize;
     unsigned int offset;
 
     m_initialized = 1;
@@ -663,7 +663,7 @@ void CSystem::Init()
             for (offset = 0; (int)mapSize != 0; mapSize -= count)
             {
                 count = 0x100000;
-                if (mapSize < 0x100000)
+                if ((unsigned int)mapSize < 0x100000)
                 {
                     count = mapSize;
                 }

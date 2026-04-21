@@ -555,44 +555,52 @@ void CFile::kick()
  */
 CFile::CHandle* CFile::CheckQueue()
 {
+    CHandle* result = 0;
     CHandle* handle = m_fileHandle.m_previous;
 
-    while (handle != &m_fileHandle)
+    do
     {
-        if (handle->m_completionStatus == 2)
+        int completionStatus = handle->m_completionStatus;
+        if (completionStatus == 2)
         {
             int dvdStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
 
             if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
             {
                 DrawError(handle->m_dvdFileInfo, dvdStatus);
+                continue;
             }
             else if (dvdStatus == 0)
             {
-                handle->m_completionStatus = 3;
-                return CheckQueue();
+                completionStatus = 3;
+                handle->m_completionStatus = completionStatus;
+                result = CheckQueue();
+                break;
             }
             else if (dvdStatus < 0)
             {
-                handle->m_completionStatus = 4;
-                handle = handle->m_previous;
+                completionStatus = 4;
+                handle->m_completionStatus = completionStatus;
             }
             else
             {
-                return handle;
+                result = handle;
+                break;
             }
         }
-        else if (handle->m_completionStatus == 3)
+
+        if (completionStatus == 3)
         {
-            return handle;
+            result = handle;
+            break;
         }
         else
         {
             handle = handle->m_previous;
         }
-    }
+    } while (handle != &m_fileHandle);
 
-    return 0;
+    return result;
 }
 
 /*

@@ -89,7 +89,7 @@ unsigned int lbl_801EA904[4] = {
 
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
-static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
+extern const char s_CFunnyShapePcs[];
 static const char s_funnyShapeSpinnerText[] = "|/-\\";
 
 namespace {
@@ -413,6 +413,8 @@ void CFunnyShapePcs::drawViewer()
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
     }
 }
+
+const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 
 /*
  * --INFO--

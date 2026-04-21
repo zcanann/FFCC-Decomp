@@ -6,6 +6,9 @@ extern char lbl_80331B10[];
 extern char lbl_8032E9D0[];
 extern char lbl_8032E9D8[];
 
+extern const float FLOAT_80331b18 = 1.0f;
+extern const float FLOAT_80331b1c = 10.0f;
+
 unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(lbl_80331B10), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
 };

@@ -65,36 +65,18 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
     f32 scale = *valuePtr;
     {
         s8 baseValue = in->field8;
-        f32 scaledValue = (f32)baseValue;
-        target[0] = (u8)(target[0] + (s32)(scaledValue * scale));
+        target[0] = (u8)(target[0] + (s32)((f32)baseValue * scale));
     }
     {
         s8 baseValue = in->field9;
-        f32 scaledValue = (f32)baseValue;
-        target[1] = (u8)(target[1] + (s32)(scaledValue * scale));
+        target[1] = (u8)(target[1] + (s32)((f32)baseValue * scale));
     }
     {
         s8 baseValue = in->fieldA;
-        f32 scaledValue = (f32)baseValue;
-        target[2] = (u8)(target[2] + (s32)(scaledValue * scale));
+        target[2] = (u8)(target[2] + (s32)((f32)baseValue * scale));
     }
     {
         s8 baseValue = in->fieldB;
-        f32 scaledValue = (f32)baseValue;
-        target[3] = (u8)(target[3] + (s32)(scaledValue * scale));
+        target[3] = (u8)(target[3] + (s32)((f32)baseValue * scale));
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char randchar(char value, float scale)
-{
-    return (char)((f32)value * scale);
 }

@@ -73,13 +73,11 @@ struct Vec2d {
 
 struct CMapCylinderRaw {
     Vec m_bottom;
-    Vec m_direction;
-    f32 m_radius;
-    f32 m_height;
-    Vec m_top;
-    Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
+    u8 m_pad0C[0xC];
+    Vec m_rayDirection;
+    f32 m_rayPadding;
+    Vec m_topBounds;
+    Vec m_expandBounds;
 };
 
 /*
@@ -114,15 +112,15 @@ extern "C" void CalcPolygonHeight(
     float rayY;
     float top;
     float expand;
-    Vec worldBase;
     Vec rayDirection;
+    Vec worldBase;
     CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
     u8* colorBytes = (u8*)color;
 
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
-    previousY = pppMngStPtr->m_savedPosition.y;
+    previousY = pppMngStPtr->m_previousPosition.x;
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
@@ -138,21 +136,22 @@ extern "C" void CalcPolygonHeight(
         worldBase.x = pppMngStPtr->m_matrix.value[0][3];
         worldBase.y = pppMngStPtr->m_matrix.value[1][3] + vertexData->m_collisionYOffset;
         worldBase.z = pppMngStPtr->m_matrix.value[2][3];
-        pppAddVector(vertex->m_position, vertex->m_position, worldBase);
-
         rayDirection.x = zero;
         rayDirection.y = rayY;
         rayDirection.z = zero;
+        pppAddVector(vertex->m_position, vertex->m_position, worldBase);
+
+        cylinder.m_topBounds.z = top;
+        cylinder.m_topBounds.y = top;
+        cylinder.m_topBounds.x = top;
+        cylinder.m_expandBounds.z = expand;
+        cylinder.m_expandBounds.y = expand;
+        cylinder.m_expandBounds.x = expand;
         cylinder.m_bottom = vertex->m_position;
-        cylinder.m_direction = rayDirection;
-        cylinder.m_radius = zero;
-        cylinder.m_height = zero;
-        cylinder.m_top.x = top;
-        cylinder.m_top.y = top;
-        cylinder.m_top.z = top;
-        cylinder.m_direction2.x = expand;
-        cylinder.m_direction2.y = expand;
-        cylinder.m_direction2.z = expand;
+        cylinder.m_rayDirection.x = rayDirection.x;
+        cylinder.m_rayDirection.y = rayDirection.y;
+        cylinder.m_rayDirection.z = rayDirection.z;
+        cylinder.m_rayPadding = zero;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {

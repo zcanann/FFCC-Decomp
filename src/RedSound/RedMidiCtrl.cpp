@@ -1879,14 +1879,14 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u32* trackData = (u32*)track;
-	u8* command = (u8*)trackData[0];
+	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	trackData[0] = (u32)(command + 1);
-	trackData[0x1d] = PTR_SineSwing__Fi[*command & 0xf];
+	((u32*)track)[0x1d] = PTR_SineSwing__Fi[type & 0xf];
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2076,14 +2076,14 @@ void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u32* trackData = (u32*)track;
-	u8* command = (u8*)trackData[0];
+	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	trackData[0] = (u32)(command + 1);
-	trackData[0x25] = PTR_SineSwing__Fi[*command & 0xf];
+	((u32*)track)[0x25] = PTR_SineSwing__Fi[type & 0xf];
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2246,14 +2246,14 @@ void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	u32* trackData = (u32*)track;
-	u8* command = (u8*)trackData[0];
+	u32 type = *(u8*)(((u32*)track)[0]++);
 
-	trackData[0] = (u32)(command + 1);
-	trackData[0x2d] = PTR_SineSwing__Fi[*command & 0xf];
+	((u32*)track)[0x2d] = PTR_SineSwing__Fi[type & 0xf];
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

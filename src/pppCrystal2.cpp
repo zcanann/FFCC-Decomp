@@ -239,9 +239,12 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         (work->m_refractionMap == 0)) {
         Crystal2RefractionMap* textureInfo;
         u32 textureSize;
+        float magnitude;
         float stepX;
         float stepY;
         float yCoord;
+        float xCoord;
+        float ySq;
         u32 y;
         u32 x;
 
@@ -265,11 +268,11 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
             u32 yTile = y >> 2;
             u32 yFine = (y & 3) * 4;
-            float ySq = yCoord * yCoord;
-            float xCoord = -1.0f;
+            ySq = yCoord * yCoord;
+            xCoord = -1.0f;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
-                float magnitude = xCoord * xCoord + ySq;
+                magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > 1.0f) {
                     magnitude = Crystal2SqrtPositive(magnitude);

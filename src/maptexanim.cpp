@@ -116,6 +116,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             if (ref != 0) {
                 __ct__4CRefFv(ref);
                 *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim;
+                float frameStep = FLOAT_8032fd48;
                 ref->m_keyFrame.m_junTable = 0;
                 ref->m_keyFrame.m_keyFrame = 0;
                 ref->m_keyFrame.m_keyValue = 0;
@@ -123,7 +124,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 ref->m_keyFrame.m_loop = 1;
                 ref->m_keyFrame.m_isRun = 0;
                 ref->m_frameTable = 0;
-                ref->m_frameStep = FLOAT_8032fd48;
+                ref->m_frameStep = frameStep;
                 ref->m_currentFrame = FLOAT_8032fd4c;
                 ref->m_usesBlendTexture = 0;
                 ref->m_usesKeyFrame = 0;
@@ -159,9 +160,8 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B));
             ref->m_frameTable = frameTable;
 
-            unsigned short* frame = frameTable;
-            for (int i = 0; i < ref->m_frameCount; i++, frame++) {
-                *frame = chunkFile.Get2();
+            for (int i = 0; i < ref->m_frameCount; i++) {
+                ref->m_frameTable[i] = chunkFile.Get2();
             }
 
             short count = m_count;

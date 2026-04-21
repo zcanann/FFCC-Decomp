@@ -72,7 +72,6 @@ extern "C" int AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CM
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
-extern "C" char s_no_texture____801da7e8[];
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" float FLOAT_80330BF4;
@@ -112,6 +111,17 @@ static inline Mtx44Ptr GetScreenMatrix()
 
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
 static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
+static const char s_no_texture[] = "no texture...";
+static const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
+static const char s_anim_path_fmt[] = "%splot%d.cha";
+static const char s_load_model[] = "CCharaPcs LoadModel";
+static const char s_load_texture[] = "CCharaPcs LoadTexture";
+static const char s_load_anim[] = "CCharaPcs LoadAnim";
+static const char s_default_chm_path[] = "plot/kmitsuru/plot.chm";
+static const char s_default_chd_path[] = "plot/kmitsuru/plot.chd";
+static const char s_default_cha_path[] = "plot/kmitsuru/plot.cha";
+static const char s_default_tex_path[] = "plot/kmitsuru/plot.tex";
+static const char s_back_tex_fmt[] = "%sback.tex";
 
 /*
  * --INFO--
@@ -216,7 +226,7 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
         unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
         if (model != 0) {
             if (*(int*)(model + 0xB0) == 0) {
-                Printf__8CGraphicFPce(&Graphic, s_no_texture____801da7e8);
+                Printf__8CGraphicFPce(&Graphic, s_no_texture);
             } else {
                 CStopWatch watch(reinterpret_cast<char*>(-1));
                 System.DumpMapFile(&watch);
@@ -279,7 +289,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
     if ((*(int*)(p + 0x2BC) != 0) || (*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x4C4) != 0) || (*(int*)(p + 0x710) != 0)) {
         if (*(int*)(p + 0x2BC) != 0) {
-            Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x2C0);
+            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x2C0);
             fileHandle = File.Open((char*)(p + 0x2C0), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x194);
@@ -295,7 +305,9 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), s_no_texture____801da7e8 + 0x10, 0xEA);
+                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(
+                    0x124, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
+                    const_cast<char*>(s_p_chara_viewer_cpp), 0xEA);
                 if (*(void**)(p + 0x190) != 0) {
                     *(void**)(p + 0x190) = __ct__Q26CChara6CModelFv(*(void**)(p + 0x190));
                 }
@@ -307,7 +319,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         if ((*(int*)(p + 0x5F0) != 0) && (*(void**)(p + 0x190) != 0)) {
-            Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x5F4);
+            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x5F4);
             fileHandle = File.Open((char*)(p + 0x5F4), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
@@ -330,14 +342,16 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
             if (*(int*)(p + 0x3C0) == 0) {
                 for (i = 0; i < *(unsigned int*)(p + 0x1A8); i++) {
                     unsigned int idx = *(unsigned int*)(p + 0x1A4);
-                    sprintf(pathBuf, s_no_texture____801da7e8 + 0x64, p + 0x3C4, idx);
-                    Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, pathBuf);
+                    sprintf(pathBuf, s_anim_path_fmt, p + 0x3C4, idx);
+                    Printf__7CSystemFPce(&System, s_calc_viewer_fmt, pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         releaseRef(p, 0x1B0 + idx * 4);
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), s_no_texture____801da7e8 + 0x10, 0x124);
+                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(
+                            0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
+                            const_cast<char*>(s_p_chara_viewer_cpp), 0x124);
                         if (*(void**)(p + 0x1B0 + idx * 4) != 0) {
                             *(void**)(p + 0x1B0 + idx * 4) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x1B0 + idx * 4));
                         }
@@ -352,12 +366,14 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 }
                 *(int*)(p + 0x710) = 0;
             } else {
-                Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x3C4);
+                Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x3C4);
                 fileHandle = File.Open((char*)(p + 0x3C4), 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), s_no_texture____801da7e8 + 0x10, 0x111);
+                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(
+                        0x30, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058),
+                        const_cast<char*>(s_p_chara_viewer_cpp), 0x111);
                     if (*(void**)(p + 0x198) != 0) {
                         *(void**)(p + 0x198) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x198));
                     }
@@ -369,7 +385,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
 
         if (*(int*)(p + 0x4C4) != 0) {
-            Printf__7CSystemFPce(&System, s_no_texture____801da7e8 + 0x48, p + 0x4C8);
+            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, p + 0x4C8);
             fileHandle = File.Open((char*)(p + 0x4C8), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x2B0);
@@ -519,9 +535,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     Vec lightDir;
 
     memset(p + 0xCC, 0, 0x18);
-    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_no_texture____801da7e8 + 0xDC, 0);
-    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_no_texture____801da7e8 + 0xF0, 0);
-    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_no_texture____801da7e8 + 0x108, 0);
+    *(void**)(p + 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_load_model, 0);
+    *(void**)(p + 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_load_texture, 0);
+    *(void**)(p + 0xD4) = CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0);
 
     p[0xE8] = 0x3F;
     p[0xE9] = 0x3F;
@@ -586,19 +602,19 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
         *(int*)(p + 0x1B0 + i * 4) = 0;
     }
 
-    strcpy((char*)(p + 0x2C0), s_no_texture____801da7e8 + 0x11C);
+    strcpy((char*)(p + 0x2C0), s_default_chm_path);
     *(int*)(p + 0x2BC) = 1;
-    strcpy((char*)(p + 0x5F4), s_no_texture____801da7e8 + 0x134);
+    strcpy((char*)(p + 0x5F4), s_default_chd_path);
     *(int*)(p + 0x5F0) = 1;
-    strcpy((char*)(p + 0x3C4), s_no_texture____801da7e8 + 0x14C);
+    strcpy((char*)(p + 0x3C4), s_default_cha_path);
     *(int*)(p + 0x3C0) = 1;
-    strcpy((char*)(p + 0x4C8), s_no_texture____801da7e8 + 0x164);
+    strcpy((char*)(p + 0x4C8), s_default_tex_path);
     *(int*)(p + 0x4C4) = 1;
     strcpy((char*)(p + 0x5CC), kCharaViewerDefaultModelPath);
     *(int*)(p + 0x5EC) = -1;
     *(int*)(p + 0x5C8) = 1;
 
-    sprintf(pathBuf, s_no_texture____801da7e8 + 0x17C, USBPcs.m_rootPath);
+    sprintf(pathBuf, s_back_tex_fmt, USBPcs.m_rootPath);
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
         File.Read(fileHandle);

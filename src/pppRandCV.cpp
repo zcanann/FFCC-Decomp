@@ -95,7 +95,7 @@ void pppRandCV(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-char randchar(char value, float scale)
+static char randchar(char value, float scale)
 {
     return (char)(((f32)value * scale) - (f32)value);
 }

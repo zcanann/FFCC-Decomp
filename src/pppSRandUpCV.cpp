@@ -119,3 +119,37 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
         target_colors[3] = (u8)(target_colors[3] + delta);
     }
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static float randf(unsigned char flag)
+{
+    float value = Math.RandF();
+    if (flag != 0) {
+        float randomPair = value + Math.RandF();
+        float scale = kPppSRandUpCVDualSampleScale;
+        value = randomPair * scale;
+    }
+    return value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static char randchar(char value, float scale)
+{
+    return (char)((f32)value * scale);
+}

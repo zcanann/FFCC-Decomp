@@ -1107,22 +1107,20 @@ void CGItemObj::onFrameAlways()
 	}
 
 	if (*(int*)(self + 0x500) == 0xA) {
-		unsigned char flatFlags = *(unsigned char*)(CFlat + 4836);
-		int* traceParticleSlot = (int*)(CFlat + 66604);
-		bool canUseTrace =
+		int canUseTrace =
 		    Game.m_gameWork.m_gameInitFlag != 0 &&
-		    (int)(((unsigned int)flatFlags << 0x1C) | ((unsigned int)flatFlags >> 4)) < 0 &&
-		    (int)(((unsigned int)flatFlags << 0x1D) | ((unsigned int)flatFlags >> 3)) < 0 &&
-		    (int)((unsigned int)*(unsigned char*)(self + 0x9A) << 0x18) < 0 &&
+		    (signed char)(*(unsigned char*)(CFlat + 4836) << 4) < 0 &&
+		    (signed char)(*(unsigned char*)(CFlat + 4836) << 3) < 0 &&
+		    (signed char)*(unsigned char*)(self + 0x9A) < 0 &&
 		    *(int*)(CFlat + 4780) == 0 &&
 		    *(int*)(self + 0x550) == 0;
 
-		if (canUseTrace && *traceParticleSlot == 0) {
-			*traceParticleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
-			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *traceParticleSlot, this, FLOAT_80331b18, 0);
-		} else if (!canUseTrace && *traceParticleSlot != 0) {
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *traceParticleSlot, 0);
-			*traceParticleSlot = 0;
+		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
+			*(int*)(CFlat + 66604) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
+		} else if (!canUseTrace && *(int*)(CFlat + 66604) != 0) {
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(CFlat + 66604), 0);
+			*(int*)(CFlat + 66604) = 0;
 		}
 	}
 }

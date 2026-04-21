@@ -75,12 +75,14 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
 #pragma dont_inline on
 unsigned int CRedSound::GetAutoID()
 {
+#define redSoundAutoId (*(volatile int*)&p_ReverbData)
 	do {
-		DAT_8032f4c4 = DAT_8032f4c4 + 1;
-		DAT_8032f4c4 = DAT_8032f4c4 & 0x7FFFFFFF;
-	} while ((int)DAT_8032f4c4 == 0);
+		redSoundAutoId = redSoundAutoId + 1;
+		redSoundAutoId = redSoundAutoId & 0x7FFFFFFF;
+	} while (redSoundAutoId == 0);
 
-	return DAT_8032f4c4;
+	return redSoundAutoId;
+#undef redSoundAutoId
 }
 #pragma dont_inline reset
 
@@ -192,8 +194,10 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
  */
 void CRedSound::Start()
 {
-	DAT_8032f4c8 = (int)RedNew__Fi(0x100);
-	memset((void*)DAT_8032f4c8, 0, 0x100);
+#define redSoundReverbSize (*(u32* volatile*)&p_ReverbSize)
+	redSoundReverbSize = (u32*)RedNew__Fi(0x100);
+	memset((void*)redSoundReverbSize, 0, 0x100);
+#undef redSoundReverbSize
 }
 
 /*

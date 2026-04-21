@@ -56,7 +56,7 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
 extern "C" void* gVtable_CPtrArray_OSFSTexture[];
 extern "C" void* gVtable_CPtrArray_GXTexObj[];
-extern char lbl_801D7DD0[];
+static const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
 extern char lbl_8032E660[];
 
 unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
@@ -65,7 +65,7 @@ unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_ca
 unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
 unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(lbl_801D7DD0),
+    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)),
     m_table_desc0__14CFunnyShapePcs[0],
     m_table_desc0__14CFunnyShapePcs[1],
     m_table_desc0__14CFunnyShapePcs[2],

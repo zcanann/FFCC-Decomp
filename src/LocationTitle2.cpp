@@ -14,13 +14,13 @@
 // External function declarations
 extern "C" int rand(void);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
-extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
+extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, const char*);
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, CChara::CModel*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 // External data references
-extern char DAT_80330f50;
+extern "C" const char DAT_80330f50[];
 
 static int GetGraphFrameFromId(s32 graphId)
 {
@@ -187,6 +187,8 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }
 
+extern "C" const char DAT_80330f50[] = "loc";
+
 /*
  * --INFO--
  * PAL Address: 0x800da3f8
@@ -244,22 +246,22 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
 
-        owner = (CGObject*)pppMngStPtr->m_owner;
+        owner = (CGObject*)pppMngStPtr->m_lookTarget;
         handle = 0;
         if (owner->m_charaModelHandle != 0) {
             handle = owner->m_charaModelHandle;
         }
         model = 0;
-        if (handle != 0) {
+        if (handle->m_model != 0) {
             model = handle->m_model;
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, &DAT_80330f50);
+        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, DAT_80330f50);
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (int frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
@@ -281,33 +283,27 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             particles[work->m_count].m_scaleZ = locationTitle->m_localMatrix.value[2][2];
             work->m_count++;
 
-            {
-                u16 nextCount = work->m_count + 1;
-
-                if (unkB->m_maxCount <= nextCount) {
-                    return;
-                }
+            if ((int)unkB->m_maxCount <= (int)work->m_count + 1) {
+                return;
             }
 
             if (work->m_count > 1) {
                 Vec stepDir;
                 Vec interp[21];
-                u8 stepCount;
                 int startIndex;
                 int inserted;
                 float stepScale;
                 LocationTitle2Particle* startParticle;
                 Vec* interpIt;
 
-                stepCount = unkB->m_stepCount;
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
-                stepScale = 1.0f / (float)(stepCount + 1);
+                stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
                 interpIt = interp;
                 PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &stepDir);
 
-                for (int i = 0; i < stepCount; i++) {
+                for (int i = 0; i < unkB->m_stepCount; i++) {
                     Vec scaled;
                     float t;
 
@@ -317,12 +313,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     inserted++;
                     work->m_count++;
 
-                    {
-                        u16 nextCount = work->m_count + 1;
-
-                        if (unkB->m_maxCount <= nextCount) {
-                            break;
-                        }
+                    if ((int)unkB->m_maxCount <= (int)work->m_count + 1) {
+                        break;
                     }
 
                     interpIt++;

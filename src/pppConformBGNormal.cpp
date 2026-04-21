@@ -12,12 +12,10 @@ double sin(double);
 double cos(double);
 }
 
-extern const f32 kPppConformBgNormalDownRayY = -2000.0f;
-extern const f32 kPppConformBgNormalCylinderRadius = 10000000000.0f;
-extern const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
-extern const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
-extern const f32 FLOAT_80331920 = 1.0f;
-extern const f32 FLOAT_80331924 = 0.0f;
+static const f32 kPppConformBgNormalDownRayY = -2000.0f;
+static const f32 kPppConformBgNormalCylinderRadius = 10000000000.0f;
+static const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
+static const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 
@@ -86,7 +84,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     }
 
     pppMngSt = pppMngStPtr;
-    owner = *(CGObject**)((u8*)pppMngSt + 0xDC);
+    owner = (CGObject*)pppMngSt->m_lookTarget;
     hitFound = 0;
     matrixX = pppMngSt->m_matrix.value[0][3];
     matrixY = pppMngSt->m_matrix.value[1][3];
@@ -222,7 +220,13 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
                     pppMngStPtr->m_matrix.value[1][3] = owner->m_worldPosition.y;
                     pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
-                } else if ((((*(u8*)&owner->m_weaponNodeFlags & 1) == 0) || (owner->m_attachOwner == NULL))) {
+                } else if (((s8)((s32)((u32)*(u8*)&owner->m_weaponNodeFlags << 31) >> 31) != 0) &&
+                    (owner->m_attachOwner != NULL)) {
+                    ownerY = owner->m_attachOwner->m_worldPosition.y;
+                    pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                    pppMngStPtr->m_matrix.value[1][3] = ownerY;
+                    pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
+                } else {
                     CMapCylinderRaw cylinder;
                     Vec rayDirection;
 
@@ -257,11 +261,6 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         pppMngStPtr->m_matrix.value[1][3] = matrixY;
                         pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
                     }
-                } else {
-                    ownerY = owner->m_attachOwner->m_worldPosition.y;
-                    pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
-                    pppMngStPtr->m_matrix.value[1][3] = ownerY;
-                    pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
                 }
             } else if (mode == 1) {
                 if (hitFound == 0) {
@@ -307,3 +306,6 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _p
     pfVar2[0] = scale;
     *(u8*)(pfVar2 + 3) = 0;
 }
+
+extern const f32 FLOAT_80331920 = 1.0f;
+extern const f32 FLOAT_80331924 = 0.0f;

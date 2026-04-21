@@ -6,6 +6,7 @@
 class CMcPcs : public CProcess
 {
 public:
+    CMcPcs();
     void Init();
     void Quit();
     int GetTable(unsigned long);
@@ -17,17 +18,11 @@ public:
 };
 
 extern unsigned int m_table__6CMcPcs[];
-extern unsigned char sMcPcsSingletonData[];
-extern unsigned char* gMcPcsSingletonPtr;
+extern CMcPcs McPcs;
 
 static inline CMcPcs* GetMcPcsSingleton()
 {
-    if (gMcPcsSingletonPtr != 0)
-    {
-        return reinterpret_cast<CMcPcs*>(gMcPcsSingletonPtr);
-    }
-
-    return reinterpret_cast<CMcPcs*>(sMcPcsSingletonData);
+    return &McPcs;
 }
 
 #endif // _FFCC_P_MC_H_

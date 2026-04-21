@@ -537,7 +537,11 @@ s32 THPSimplePreLoad(s32 loop)
             }
         }
 
-        while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
+        for (;;) {
+            status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+            if (status == DVD_STATE_END) {
+                break;
+            }
             status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
             if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                 File.DrawError(SimpleControl.fileInfo, status);

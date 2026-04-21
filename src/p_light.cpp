@@ -52,9 +52,6 @@ extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
 extern float FLOAT_8032ed10;
-extern double DOUBLE_8032fc48;
-extern double DOUBLE_8032fc50;
-extern double DOUBLE_8032fc58;
 extern double DOUBLE_8032fc68;
 extern float DAT_801ea430;
 extern unsigned int DAT_8032e620;
@@ -1109,40 +1106,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 if (dHalf <= dist0) {
                     dist0 = (double)FLOAT_8032fc14;
                 } else {
-                    float diff = (float)(dHalf - dist0);
-                    dist0 = (double)diff;
-                    if (dist0 <= (double)FLOAT_8032fc14) {
-                        if (DOUBLE_8032fc58 <= dist0) {
-                            unsigned int flags = (unsigned int)diff & 0x7f800000;
-                            int classify;
-                            if (flags == 0x7f800000) {
-                                if (((unsigned int)diff & 0x7fffff) == 0) {
-                                    classify = 2;
-                                } else {
-                                    classify = 1;
-                                }
-                            } else if ((flags < 0x7f800000) && (flags == 0)) {
-                                if (((unsigned int)diff & 0x7fffff) == 0) {
-                                    classify = 3;
-                                } else {
-                                    classify = 5;
-                                }
-                            } else {
-                                classify = 4;
-                            }
-                            if (classify == 1) {
-                                dist0 = NAN;
-                            }
-                        } else {
-                            dist0 = NAN;
-                        }
-                    } else {
-                        double inv = 1.0 / sqrt(dist0);
-                        inv = DOUBLE_8032fc48 * inv * -(dist0 * inv * inv - DOUBLE_8032fc50);
-                        inv = DOUBLE_8032fc48 * inv * -(dist0 * inv * inv - DOUBLE_8032fc50);
-                        dist0 = (double)(float)(dist0 * DOUBLE_8032fc48 * inv *
-                                               -(dist0 * inv * inv - DOUBLE_8032fc50));
-                    }
+                    dist0 = (double)sqrtf((float)(dHalf - dist0));
                 }
 
                 GXWGFifo.f32 = x0;
@@ -1156,40 +1120,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 if (dHalf <= dist1) {
                     dist1 = (double)FLOAT_8032fc14;
                 } else {
-                    float diff = (float)(dHalf - dist1);
-                    dist1 = (double)diff;
-                    if (dist1 <= (double)FLOAT_8032fc14) {
-                        if (DOUBLE_8032fc58 <= dist1) {
-                            unsigned int flags = (unsigned int)diff & 0x7f800000;
-                            int classify;
-                            if (flags == 0x7f800000) {
-                                if (((unsigned int)diff & 0x7fffff) == 0) {
-                                    classify = 2;
-                                } else {
-                                    classify = 1;
-                                }
-                            } else if ((flags < 0x7f800000) && (flags == 0)) {
-                                if (((unsigned int)diff & 0x7fffff) == 0) {
-                                    classify = 3;
-                                } else {
-                                    classify = 5;
-                                }
-                            } else {
-                                classify = 4;
-                            }
-                            if (classify == 1) {
-                                dist1 = NAN;
-                            }
-                        } else {
-                            dist1 = NAN;
-                        }
-                    } else {
-                        double inv = 1.0 / sqrt(dist1);
-                        inv = DOUBLE_8032fc48 * inv * -(dist1 * inv * inv - DOUBLE_8032fc50);
-                        inv = DOUBLE_8032fc48 * inv * -(dist1 * inv * inv - DOUBLE_8032fc50);
-                        dist1 = (double)(float)(dist1 * DOUBLE_8032fc48 * inv *
-                                               -(dist1 * inv * inv - DOUBLE_8032fc50));
-                    }
+                    dist1 = (double)sqrtf((float)(dHalf - dist1));
                 }
 
                 GXWGFifo.f32 = x1;

@@ -15,11 +15,6 @@
 
 CWind Wind;
 
-static inline MtxPtr GetCameraMatrix()
-{
-    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
-}
-
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {
     return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
@@ -169,10 +164,11 @@ void CWind::Frame()
  */
 void CWind::Draw()
 {
-    WindObject* obj = m_objects;
+    int i;
+    WindObject* obj;
     Mtx viewMtx;
 
-    PSMTXCopy(GetCameraMatrix(), viewMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
     _GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
     GXSetZCompLoc(0);
     _GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
@@ -189,22 +185,25 @@ void CWind::Draw()
     GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)9, (_GXCompCnt)1, (_GXCompType)4, 0);
 
     if ((*(u32*)(CFlat + 0x129c) & 0x800000) != 0) {
-        for (int i = 0; i < 32; i++, obj++) {
-            if ((s8)obj->flags >= 0) {
-                continue;
+        i = 0;
+        obj = m_objects;
+        do {
+            if ((int)((u32)obj->flags << 0x18) < 0) {
+                if (obj->type == 1) {
+                    CColor color(0xff, 0xff, 0, 0xff);
+                    CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
+                    Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
+                } else {
+                    int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
+                    CColor color(0xff, 0xff, 0x80, alpha);
+                    CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
+                    Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
+                }
             }
 
-            if (obj->type == 1) {
-                CColor color(0xff, 0xff, 0, 0xff);
-                CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
-                Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
-            } else {
-                int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
-                CColor color(0xff, 0xff, 0x80, alpha);
-                CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
-                Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
-            }
-        }
+            i++;
+            obj++;
+        } while (i < 0x20);
     }
 }
 

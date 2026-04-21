@@ -394,7 +394,7 @@ config.libs = [
             Object(NonMatching, "RedSound/RedMemory.cpp", cflags=redsound_cflags),
             Object(NonMatching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_cflags),
             Object(NonMatching, "RedSound/RedSound.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedStream.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedStream.cpp", cflags=[*redsound_cflags, "-Cpp_exceptions on"]),
             Object(NonMatching, "astar.cpp"),
             Object(NonMatching, "baseobj.cpp"),
             Object(NonMatching, "bonus_menu.cpp"),

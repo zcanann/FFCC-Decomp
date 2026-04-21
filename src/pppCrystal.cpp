@@ -11,21 +11,21 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-static const float FLOAT_80330fa8 = 32.0f;
-static const float FLOAT_80330fac = -0.5f;
-static const float FLOAT_80330fb0 = 640.0f;
-static const float FLOAT_80330fb4 = 448.0f;
-static const float FLOAT_80330fb8 = 33.3f;
-static const float FLOAT_80330fbc = 1.3333334f;
-static const float FLOAT_80330fc0 = 0.5f;
-static const float FLOAT_80330fd0 = 2.0f;
-static const float FLOAT_80330fd4 = -1.0f;
-static const float FLOAT_80330fd8 = 1.0f;
-static const float FLOAT_80330ff8 = 0.8f;
-static const double DOUBLE_80331000 = 1.0;
-static const float FLOAT_80331008 = 4.0f;
-static const float FLOAT_8033100c = 128.0f;
-static const float FLOAT_80331010 = 127.0f;
+extern const float FLOAT_80330fa8 = 32.0f;
+extern const float FLOAT_80330fac = -0.5f;
+extern const float FLOAT_80330fb0 = 640.0f;
+extern const float FLOAT_80330fb4 = 448.0f;
+extern const float FLOAT_80330fb8 = 33.3f;
+extern const float FLOAT_80330fbc = 1.3333334f;
+extern const float FLOAT_80330fc0 = 0.5f;
+extern const float FLOAT_80330fd0 = 2.0f;
+extern const float FLOAT_80330fd4 = -1.0f;
+extern const float FLOAT_80330fd8 = 1.0f;
+extern const float FLOAT_80330ff8 = 0.8f;
+extern const double DOUBLE_80331000 = 1.0;
+extern const float FLOAT_80331008 = 4.0f;
+extern const float FLOAT_8033100c = 128.0f;
+extern const float FLOAT_80331010 = 127.0f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 

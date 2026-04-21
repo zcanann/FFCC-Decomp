@@ -63,6 +63,53 @@ _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void apea(_pppPObject* parent, PVertexApMtx* dataRaw, Vec* vec)
+{
+	VertexApMtxData* data = (VertexApMtxData*)dataRaw;
+	VertexApMtxObject* parentObj = (VertexApMtxObject*)parent;
+
+	if ((data->childId + 0x10000) != 0xFFFF) {
+		s32 childId = data->childId;
+		_pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
+		Vec worldPos;
+		Vec pos;
+		Mtx* outMtx;
+		_pppPObject* child;
+
+		if (childData == 0) {
+			child = 0;
+		} else {
+			child = pppCreatePObject(pppMngStPtr, childData);
+			*(void**)((u8*)child + 0x4) = parent;
+		}
+
+		pos = *vec;
+		PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
+		outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
+		if (data->useWorldMtx == 0) {
+			PSMTXIdentity(*outMtx);
+			(*outMtx)[0][3] = pos.x;
+			(*outMtx)[1][3] = pos.y;
+			(*outMtx)[2][3] = pos.z;
+		} else {
+			PSMTXCopy(pppMngStPtr->m_matrix.value, *outMtx);
+			PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, &worldPos);
+			(*outMtx)[0][3] = worldPos.x;
+			(*outMtx)[1][3] = worldPos.y;
+			(*outMtx)[2][3] = worldPos.z;
+		}
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800de360
  * PAL Size: 880b
  * EN Address: TODO

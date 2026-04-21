@@ -2,6 +2,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/util.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
@@ -42,11 +43,11 @@ struct pppYmChangeTexState {
 	float m_value0;
 	float m_value1;
 	float m_value2;
-	int m_meshColorArrays;
-	int m_displayListArrays;
+	void* m_meshColorArrays;
+	void* m_displayListArrays;
 	int _pad14;
 	void* m_charaObj;
-	int m_texture;
+	void* m_texture;
 	int _pad20;
 	void* m_context;
 };
@@ -55,7 +56,6 @@ extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 
 extern float DAT_80330e10;
-extern char gUtil[];
 static const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
 extern double DOUBLE_80330e08;
 extern float FLOAT_80330df8;
@@ -72,7 +72,7 @@ extern "C" {
 	void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-	int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStYmChangeTex*);
+	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStYmChangeTex*);
 	void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 	void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
@@ -157,7 +157,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		state->m_value2 = state->m_value2 + step->m_arg3;
 	}
 
-	int texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	void* texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
 	if (texObj == 0) {
 		return;
 	}
@@ -165,24 +165,24 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	int meshList = *(int*)((char*)model0 + 0xAC);
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
-		state->m_meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		state->m_meshColorArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x15D);
-		state->m_displayListArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		state->m_displayListArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		    *(int*)(*(int*)((char*)model0 + 0xA4) + 0xC) << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x160);
 
 		int* meshColorArrays = (int*)state->m_meshColorArrays;
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
-			*(int*)(state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			*(int*)((char*)state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			    *(int*)(*(int*)(meshList + 8) + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
 			    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x168);
 
 			int dlIdx = *(int*)(*(int*)(meshList + 8) + 0x4C) - 1;
 			int* dlInfo = (int*)(*(int*)(*(int*)(meshList + 8) + 0x50));
-			int* dlEntry = (int*)(*(int*)(state->m_displayListArrays + arrayOffset) + dlIdx * 4);
-			for (; -1 < dlIdx; dlIdx = dlIdx - 1) {
+			int* dlEntry = (int*)(*(int*)((char*)state->m_displayListArrays + arrayOffset) + dlIdx * 4);
+			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 3) {
 				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x172);
 				*dlEntry = dlPair;
@@ -190,10 +190,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				*(int*)*dlEntry = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x174);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
+				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				DCFlushRange(*(void**)*dlEntry, (unsigned long)dlInfo[0]);
 				dlEntry = dlEntry - 1;
-				dlInfo = dlInfo + 3;
 			}
 
 			*meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -220,10 +219,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	PSMTXCopy(*(Mtx*)((char*)model0 + 0x68), modelMtx);
 
 	unsigned char fallbackAlpha;
-	char negativeRamp;
+	u8 negativeRamp;
 	if ((step->m_payload[0] == 2) || (step->m_payload[0] == 1)) {
 		fallbackAlpha = 0;
-		negativeRamp = -1;
+		negativeRamp = 0xFF;
 	} else {
 		fallbackAlpha = 0xFF;
 		negativeRamp = 0;
@@ -232,26 +231,26 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	int meshOffset = 0;
 	for (unsigned int meshIdx = 0; meshIdx < *(unsigned int*)(*(int*)((char*)model0 + 0xA4) + 0xC); meshIdx++) {
 		int pointOffset = 0;
-		int vertColors = *(int*)(state->m_meshColorArrays + meshOffset);
+		int vertColors = *(int*)((char*)state->m_meshColorArrays + meshOffset);
 		for (unsigned int v = 0; v < *(unsigned int*)(*(int*)(curMesh + 8) + 0x14); v++) {
 			int delta = (int)frameShort - (int)*(short*)(*(int*)(curMesh + 0xC) + pointOffset + 2);
-			if (delta < 0) {
-				*(unsigned char*)(vertColors + 3) = fallbackAlpha;
-			} else {
+			if (delta >= 0) {
 				int level = 0;
 				float threshold = FLOAT_80330df8;
 				for (int tries = 7; tries != 0; tries--) {
-					if (FLOAT_80330dfc * threshold < (float)delta) {
-						if (negativeRamp == -1) {
-							*(char*)(vertColors + 3) = -1 - (char)(level << 4);
+					if ((float)delta > FLOAT_80330dfc * threshold) {
+						if (negativeRamp == 0xFF) {
+							*(u8*)(vertColors + 3) = negativeRamp - (level << 4);
 						} else {
-							*(char*)(vertColors + 3) = (char)(level << 4);
+							*(u8*)(vertColors + 3) = (u8)(level << 4);
 						}
 						break;
 					}
 					threshold = threshold - FLOAT_80330e00;
 					level = level + 1;
 				}
+			} else {
+				*(unsigned char*)(vertColors + 3) = fallbackAlpha;
 			}
 
 			pointOffset = pointOffset + 6;

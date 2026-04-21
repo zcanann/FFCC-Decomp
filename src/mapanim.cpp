@@ -12,7 +12,8 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** m_vtable;
+    virtual ~CPtrArray();
+
     unsigned long m_numItems;
     unsigned long m_size;
     unsigned long m_defaultSize;
@@ -21,7 +22,6 @@ public:
     int m_growCapacity;
 
     CPtrArray();
-    ~CPtrArray();
 
     int Add(T item);
     int GetSize();
@@ -40,7 +40,6 @@ extern "C" void __dla__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* __vt__8CPtrArrayIP12CMapAnimNode[];
 extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
 extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
     CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
@@ -68,7 +67,6 @@ static const char s_mapanim_cpp[] = "mapanim.cpp";
 template <>
 CPtrArray<CMapAnimNode*>::CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
     m_size = 0;
     m_numItems = 0;
     m_defaultSize = 0x10;
@@ -89,7 +87,6 @@ CPtrArray<CMapAnimNode*>::CPtrArray()
 template <>
 CPtrArray<CMapAnimNode*>::~CPtrArray()
 {
-    m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
     RemoveAll();
 }
 

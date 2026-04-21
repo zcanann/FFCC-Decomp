@@ -84,7 +84,7 @@ void checkError()
 {
     s32 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
 
-    if ((status == 0xB) || ((status - 4U) < 3) || (status == -1)) {
+    if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
         File.DrawError(SimpleControl.fileInfo, status);
     }
 }
@@ -532,14 +532,14 @@ s32 THPSimplePreLoad(s32 loop)
         while ((status = DVDReadAsyncPrio(&SimpleControl.fileInfo, readPtr, readSize, readOffset,
                                           static_cast<DVDCallback>(0), 2)) == 0) {
             status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
-            if ((status == 0xB) || ((status - 4U) < 3) || (status == -1)) {
+            if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                 File.DrawError(SimpleControl.fileInfo, status);
             }
         }
 
         while ((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb)) != DVD_STATE_END) {
             status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
-            if ((status == 0xB) || ((status - 4U) < 3) || (status == -1)) {
+            if ((status == 0xB) || ((status - 4U) <= 2) || (status == -1)) {
                 File.DrawError(SimpleControl.fileInfo, status);
             }
         }
@@ -681,7 +681,7 @@ restore_interrupts_1:
     OSRestoreInterrupts(interruptState);
 
     if ((SimpleControl.isReadFrameAsync != 0) &&
-        (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) < 3)) ||
+        (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) <= 2)) ||
          (status == -1))) {
         File.DrawError(SimpleControl.fileInfo, status);
     }
@@ -766,7 +766,7 @@ restore_interrupts_2:
     OSRestoreInterrupts(interruptState);
 
     if ((SimpleControl.isReadFrameAsync != 0) &&
-        (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) < 3)) ||
+        (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) <= 2)) ||
          (status == -1))) {
         File.DrawError(SimpleControl.fileInfo, status);
     }

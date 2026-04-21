@@ -164,10 +164,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
     BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
     int textureBase = 0;
-    int textureIndex;
     int objPosBase;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
+    int textureIndex;
     Mtx identityMtx;
     Mtx cameraMtx;
     Mtx44 projection;

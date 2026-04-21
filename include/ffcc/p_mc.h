@@ -3,6 +3,10 @@
 
 #include "ffcc/system.h"
 
+extern unsigned int initData__6CMcPcs[];
+extern unsigned int m_table__6CMcPcs[];
+extern void* __vt__6CMcPcs[];
+
 class CMcPcs : public CProcess
 {
 public:
@@ -16,18 +20,11 @@ public:
     void calc();
 };
 
-extern unsigned int m_table__6CMcPcs[];
-extern unsigned char sMcPcsSingletonData[];
-extern unsigned char* gMcPcsSingletonPtr;
+extern void* McPcs;
 
 static inline CMcPcs* GetMcPcsSingleton()
 {
-    if (gMcPcsSingletonPtr != 0)
-    {
-        return reinterpret_cast<CMcPcs*>(gMcPcsSingletonPtr);
-    }
-
-    return reinterpret_cast<CMcPcs*>(sMcPcsSingletonData);
+    return reinterpret_cast<CMcPcs*>(&McPcs);
 }
 
 #endif // _FFCC_P_MC_H_

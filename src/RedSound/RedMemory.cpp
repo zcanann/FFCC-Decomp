@@ -150,7 +150,7 @@ void RedDelete(int address)
 		int* blockEnd = blockList + 0x800;
 		int* blockPtr = blockList;
 
-		do {
+		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
 			if (*blockPtr == address) {
 				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
 
@@ -160,8 +160,9 @@ void RedDelete(int address)
 				}
 				break;
 			}
+
 			blockPtr += 2;
-		} while (blockPtr[1] != 0 && blockPtr < blockEnd);
+		}
 	}
 
 	OSRestoreInterrupts(interrupts);
@@ -300,7 +301,7 @@ void RedDeleteA(int address)
 		int* blockEnd = blockList + 0x800;
 		int* blockPtr = blockList;
 
-		do {
+		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
 			if (*blockPtr == address) {
 				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
 
@@ -310,8 +311,9 @@ void RedDeleteA(int address)
 				}
 				break;
 			}
+
 			blockPtr += 2;
-		} while (blockPtr[1] != 0 && blockPtr < blockEnd);
+		}
 	}
 
 	OSRestoreInterrupts(interrupts);

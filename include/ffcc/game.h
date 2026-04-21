@@ -72,7 +72,8 @@ public:
         unsigned char m_singleShopOrSmithMenuActiveFlag; // 0x13D3
         unsigned char m_gamePaused;                      // 0x13D4
         unsigned char m_mogScoreRadarType;               // 0x13D5
-        unsigned short m_mcHasSerial;                    // 0x13D6
+        unsigned char m_mcHasSerial;                     // 0x13D6
+        unsigned char unk_0x13D7;                        // 0x13D7
         unsigned int m_mcRandom;                         // 0x13D8
         unsigned char m_mcId;                            // 0x13DC
         unsigned char m_bgmVolume;                       // 0x13DD

@@ -24,11 +24,6 @@ CFontMan FontMan;
 
 namespace {
 typedef void (*VirtualDtorFn)(void*, int);
-
-Mtx44Ptr GetScreenMatrix()
-{
-    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
-}
 }
 
 /*
@@ -216,7 +211,6 @@ CFont::~CFont()
  */
 void CFont::Create(void* filePtr, CMemory::CStage* stage)
 {
-    CChunkFile chunkFile;
     CChunkFile::CChunk chunk;
 
     m_usesEmbeddedData = static_cast<unsigned char>((filePtr == 0) && (stage == 0));
@@ -224,7 +218,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
         filePtr = g_tFont22;
     }
 
-    chunkFile.SetBuf(filePtr);
+    CChunkFile chunkFile(filePtr);
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == 0x464F4E54) {
             chunkFile.PushChunk();
@@ -244,7 +238,8 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     for (int i = 0; i < 64; i++) {
                         m_glyphBuckets[i] = bucket;
-                        bucket += static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = reinterpret_cast<unsigned short*>(
+                            reinterpret_cast<unsigned char*>(bucket) + static_cast<unsigned int>(*bucket) * 8 + 2);
                     }
                 } else if (chunk.m_id == 0x54585452) {
                     texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
@@ -430,13 +425,15 @@ void CFont::SetTlut(int index)
  */
 void CFont::SetTlutColor(int tlutIndex, int colorIndex, _GXColor color)
 {
-	int format = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x60);
-	int colorCount = 0;
+	unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x60);
+	int colorCount;
 
 	if (format == 9) {
 		colorCount = 0x100;
 	} else if (format == 8) {
 		colorCount = 0x10;
+	} else {
+		colorCount = 0;
 	}
 
 	texturePtr->SetExternalTlutColor(&m_tlutData[tlutIndex * 0x40], colorCount, colorIndex, color);
@@ -540,7 +537,7 @@ void CFont::DrawQuit()
 {
     Mtx44 screenMtx;
 
-    PSMTX44Copy(GetScreenMatrix(), screenMtx);
+    PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94), screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
@@ -786,26 +783,6 @@ found_fallback:
 	}
 
 	return static_cast<float>(width);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::searchChar(unsigned short)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::getNextChar(char **, unsigned short*)
-{
-	// TODO
 }
 
 /*

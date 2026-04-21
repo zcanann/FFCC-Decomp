@@ -5,8 +5,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-const float kPppRandUpCVDualSampleScale = 0.5f;
-
 struct RandUpCVParam {
     s32 targetId;
     s32 sourceOffset;
@@ -45,7 +43,7 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         if (in->randomTwice != 0) {
             f32 random = Math.RandF();
             f32 blend = value + random;
-            f32 scale = kPppRandUpCVDualSampleScale;
+            f32 scale = 0.5f;
             value = blend * scale;
         }
 

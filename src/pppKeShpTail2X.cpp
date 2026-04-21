@@ -435,17 +435,3 @@ void pppKeShpTail2XDes(void* obj, void* param_2)
 	tail[0] = 0x1f;
 	memset(tail + 8, 0, 0x174);
 }
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void U8ToF32(pppFVECTOR4*, unsigned char*)
-{
-	// TODO
-}

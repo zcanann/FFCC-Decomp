@@ -152,13 +152,44 @@ static const char DAT_801d6214[] = {
 static const char DAT_801d6234[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
     0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x0A, 0x00};
+static const char s_CGame_Exec_scene_pcts_801D6254[] = "CGame.Exec: scene = %s\n";
+static const char lbl_801D626C[] = {
+    0x83, 0x56, 0x81, 0x5B, 0x83, 0x93, 0x82, 0xAA, 0x88, 0xD9, 0x8F, 0xED, 0x82, 0xC5, 0x82, 0xB7,
+    0x81, 0x42, 0x25, 0x64, 0x0A, 0x00, 0x00, 0x00};
 static const char s_GameDebug_801D6284[] = "GameDebug";
+static const char s_SN_EXIT[] = "SN_EXIT";
+static const char s_SN_DUMMY_801D600C[] = "SN_DUMMY";
+static const char s_SN_CHARA_801D6018[] = "SN_CHARA";
+static const char s_SN_MAP[] = "SN_MAP";
+static const char s_SN_GAME[] = "SN_GAME";
+static const char s_SN_MATERIALEDITOR_801D6024[] = "SN_MATERIALEDITOR";
+static const char s_SN_FUNNYSHAPE_801D6038[] = "SN_FUNNYSHAPE";
+static const char s_SN_PARTVIEW_801D6048[] = "SN_PARTVIEW";
 static const char s_lang_jp[] = "jp/";
 static const char s_lang_uk[] = "uk/";
 static const char s_lang_gr[] = "gr/";
 static const char s_lang_it[] = "it/";
 static const char s_lang_fr[] = "fr/";
 static const char s_lang_sp[] = "sp/";
+static const char* m_tStatus[] = {
+    s_SN_EXIT,
+    s_SN_DUMMY_801D600C,
+    s_SN_CHARA_801D6018,
+    s_SN_MAP,
+    s_SN_GAME,
+    s_SN_MATERIALEDITOR_801D6024,
+    s_SN_FUNNYSHAPE_801D6038,
+    s_SN_PARTVIEW_801D6048,
+    0,
+};
+static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
+const char* PTR_s_dvd__scft_param_cfd[] = {
+    s_dvd_pctscft_param_cfd_801D6054,
+    s_dvd_pctscft_c_system_cfd_801D6068,
+    s_dvd_pctscft_mail_tbl_cfd_801D6080,
+    s_dvd_pctscft_newbattle_cfd_801D6098,
+};
+float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
 static const char* s_localLangDirs[] = {
     s_lang_jp,
     s_lang_uk,
@@ -166,14 +197,6 @@ static const char* s_localLangDirs[] = {
     s_lang_it,
     s_lang_fr,
     s_lang_sp,
-};
-static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
-float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
-const char* PTR_s_dvd__scft_param_cfd[] = {
-    s_dvd_pctscft_param_cfd_801D6054,
-    s_dvd_pctscft_c_system_cfd_801D6068,
-    s_dvd_pctscft_mail_tbl_cfd_801D6080,
-    s_dvd_pctscft_newbattle_cfd_801D6098,
 };
 static const char s_numNameFmt[] = "%d %s";
 static const char s_nameJoinFmt[] = "%s%s%s";
@@ -396,6 +419,13 @@ void CGame::Exec()
 		m_currentMapId = m_mapId;
 		m_currentMapVariantId = m_mapVariant;
 		strcpy(m_currentScriptName, m_sceneScript + 4);
+
+		int sceneId = m_currentSceneId;
+		if (sceneId >= 0 && sceneId < 9) {
+			System.Printf(const_cast<char*>(s_CGame_Exec_scene_pcts_801D6254), m_tStatus[sceneId]);
+		} else {
+			System.Printf(const_cast<char*>(lbl_801D626C), sceneId);
+		}
 
 		switch (m_currentSceneId) {
 		case 2:

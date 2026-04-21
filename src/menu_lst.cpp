@@ -28,6 +28,7 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
 extern double DOUBLE_803333E8;
+extern double DOUBLE_803333D8;
 extern float FLOAT_803333D0;
 extern float FLOAT_803333D4;
 extern float FLOAT_803333E0;
@@ -504,8 +505,8 @@ void CMenuPcs::MLstDraw()
 
 			float v = FLOAT_803333D0;
 			if ((menuMode == 1) && (i == state->cursor)) {
-				x = (float)(x + DOUBLE_803333E8);
-				v += h;
+				x = (float)(x + DOUBLE_803333D8);
+				v += (float)((double)item->height);
 			}
 
 			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
@@ -513,7 +514,7 @@ void CMenuPcs::MLstDraw()
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5c);
 			v = FLOAT_803333D0;
 			if ((menuMode == 1) && (i == state->cursor)) {
-				v += h;
+				v += (float)((double)item->height);
 			}
 			DrawRect__8CMenuPcsFUlfffffffff(
 				&MenuPcs,
@@ -548,7 +549,7 @@ void CMenuPcs::MLstDraw()
 		float textX = (float)(item->x + 0x28);
 		float textY = (float)(item->y + 3) - FLOAT_803333F4;
 		if ((menuMode == 1) && (i == state->cursor)) {
-			textX = (float)(textX + DOUBLE_803333E8);
+			textX = (float)(textX + DOUBLE_803333D8);
 		}
 
 		font->SetPosX(textX);

@@ -25,9 +25,14 @@
 
 extern "C" {
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
+
+void Init__7CSystemFv(CSystem*);
+void Quit__7CSystemFv(CSystem*);
+extern void* __RTTI__7CSystem[];
+void* g_CSystemRttiBase[] = {0, 0, __RTTI__7CSystem};
+void* __vt__7CSystem[] = {0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
 }
 
-extern void* __vt__7CSystem[];
 CSystem System;
 
 class CScenegraphProcessProxy {

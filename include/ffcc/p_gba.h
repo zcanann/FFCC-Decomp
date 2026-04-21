@@ -4,6 +4,12 @@
 #include "ffcc/system.h"
 #include "ffcc/memory.h"
 
+struct CGbaPcsTable
+{
+    char* m_name;
+    unsigned int m_words[0x56];
+};
+
 class CGbaPcs : public CProcess
 {
 public:
@@ -24,14 +30,10 @@ public:
     virtual void onMapChanged(int, int, int);
     virtual void onScriptChanging(char*);
 
+    static CGbaPcsTable m_table;
+
 private:
     CMemory::CStage* m_stage;
-};
-
-struct CGbaPcsTable
-{
-    char* m_name;
-    unsigned int m_words[0x56];
 };
 
 extern CGbaPcs GbaPcs;
@@ -39,6 +41,5 @@ extern unsigned int gGbaStatusWordTriplet0[];
 extern unsigned int gGbaStatusWordTriplet1[];
 extern unsigned int gGbaStatusWordTriplet2[];
 extern unsigned int gGbaStatusWordTriplet3[];
-extern CGbaPcsTable gGbaStatusWordTable;
 
 #endif // _FFCC_P_GBA_H_

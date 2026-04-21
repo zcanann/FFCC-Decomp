@@ -342,7 +342,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	pppFMATRIX mtxOut;
 	pppFMATRIX shapeMtx;
 	Mtx tempMtx;
+	Mtx sphereMtx;
 	Vec shapePos;
+	Vec spherePos;
 	_GXColor color;
 	_GXColor debugColor;
 	int tex;
@@ -411,7 +413,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 	if (step->m_stepValue != 0xFFFF) {
 		long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
-		pppUnitMatrix__FR10pppFMATRIX(&shapeMtx);
+		PSMTXIdentity(shapeMtx.value);
 		shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
 		shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
 		shapeMtx.value[2][2] = shapeMtx.value[0][0];
@@ -478,8 +480,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			GXSetChanAmbColor(GX_COLOR0A0, debugColor);
 			GXSetPointSize(0x28, GX_TO_ZERO);
 			GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(count - 1));
-			for (i = 0; i < count - 1; i++) {
-				GXPosition3f32(points[i].x, points[i].y, points[i].z);
+			for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+				GXPosition3f32(points[j].x, points[j].y, points[j].z);
 				GXColor1u32(*(u32*)&debugColor);
 			}
 
@@ -490,12 +492,12 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			GXSetChanAmbColor(GX_COLOR0A0, debugColor);
 			GXSetLineWidth(0x14, GX_TO_ZERO);
 			GXBegin(GX_LINES, GX_VTXFMT7, (u16)((count - 1) * 4));
-			for (i = 0; i < count - 1; i++) {
-				GXPosition3f32(points[i].x, points[i].y, points[i].z);
+			for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+				GXPosition3f32(points[j].x, points[j].y, points[j].z);
 				GXColor1u32(*(u32*)&debugColor);
-				GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+				GXPosition3f32(points[j + 1].x, points[j + 1].y, points[j + 1].z);
 				GXColor1u32(*(u32*)&debugColor);
-				GXPosition3f32(points[i].x, points[i].y, points[i].z);
+				GXPosition3f32(points[j].x, points[j].y, points[j].z);
 				GXColor1u32(*(u32*)&debugColor);
 				GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
 				GXColor1u32(*(u32*)&debugColor);
@@ -511,20 +513,21 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
 			PSMTXConcat(laser->m_localMatrix.value, tempMtx, tempMtx);
 			PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
-			PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+			PSMTXConcat(ppvCameraMatrix02, tempMtx, tempMtx);
 			shapePos.x = kPppYmLaserOne;
 			shapePos.y = kPppYmLaserOne;
 			shapePos.z = FLOAT_80330DC4;
-			PSMTXMultVec(tempMtx, &shapePos, &shapePos);
-			tempMtx[0][3] = shapePos.x;
-			tempMtx[1][3] = shapePos.y;
-			tempMtx[2][3] = shapePos.z;
+			PSMTXMultVec(tempMtx, &shapePos, &spherePos);
+			tempMtx[0][3] = spherePos.x;
+			tempMtx[1][3] = spherePos.y;
+			tempMtx[2][3] = spherePos.z;
 			debugColor.r = 0xFF;
 			debugColor.g = 0xFF;
 			debugColor.b = 0xFF;
 			debugColor.a = 0xFF;
 			Graphic.DrawSphere(tempMtx, debugColor);
 
+			GXLoadPosMtxImm(laser->m_drawMatrix.value, GX_PNMTX0);
 			for (i = 0; i < count; i++) {
 				if ((points[i].x == kPppYmLaserOne) && (points[i].y == kPppYmLaserOne) &&
 					(points[i].z == kPppYmLaserOne)) {
@@ -534,16 +537,15 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 				tempMtx[0][3] = points[i].x;
 				tempMtx[1][3] = points[i].y;
 				tempMtx[2][3] = points[i].z;
-				PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
-				Graphic.DrawSphere(tempMtx, debugColor);
+				PSMTXConcat(ppvCameraMatrix02, tempMtx, sphereMtx);
+				Graphic.DrawSphere(sphereMtx, debugColor);
 			}
 
-			PSMTXScale(tempMtx, FLOAT_80330DC8, FLOAT_80330DC8, FLOAT_80330DC8);
 			tempMtx[0][3] = work->m_origin.x;
 			tempMtx[1][3] = work->m_origin.y;
 			tempMtx[2][3] = work->m_origin.z;
-			PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
-			Graphic.DrawSphere(tempMtx, debugColor);
+			PSMTXConcat(ppvCameraMatrix02, tempMtx, sphereMtx);
+			Graphic.DrawSphere(sphereMtx, debugColor);
 			pppInitBlendMode();
 		}
 	}

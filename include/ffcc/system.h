@@ -8,6 +8,8 @@
 class CStage;
 struct OSContext;
 struct OSThread;
+struct CScenegraphDesc;
+struct CScenegraphEntry;
 
 class CProcess : public CManager
 {
@@ -37,8 +39,8 @@ public:
         COrder* m_previous;      // 0x10
         COrder* m_next;          // 0x14
         CProcess* m_owner;       // 0x18
-        void* m_descBlock;       // 0x1C
-        void* m_entry;           // 0x20
+        CScenegraphDesc* m_descBlock; // 0x1C
+        CScenegraphEntry* m_entry;    // 0x20
         // sizeof = 0x24
     };
 

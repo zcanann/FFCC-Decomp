@@ -36,7 +36,6 @@ struct pppYmDeformationMdl {
 };
 
 void SetUpIndWarp(VYmDeformationMdl*);
-void DisableIndWarp(void);
 
 #ifdef __cplusplus
 extern "C" {

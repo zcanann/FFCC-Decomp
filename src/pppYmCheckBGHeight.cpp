@@ -39,7 +39,6 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     Vec direction;
     CMapCylinderRaw cylinder;
     Vec hitPos;
-    float nextY;
     float finalY;
     float zero;
     float probeY;
@@ -59,9 +58,8 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         direction.y = probeY;
         direction.z = zero;
 
-        nextY = pppMngStPtr->m_matrix.value[1][3];
-        bottomY = nextY + param_2->m_unk0x4;
-        finalY = nextY;
+        finalY = pppMngStPtr->m_matrix.value[1][3];
+        bottomY = finalY + param_2->m_unk0x4;
         bottomX = pppMngStPtr->m_matrix.value[0][3];
         bottomZ = pppMngStPtr->m_matrix.value[2][3];
         cylinder.m_top.z = scale;
@@ -81,14 +79,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                 &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if ((nextY - param_2->m_unk0xC) > hitPos.y) {
-                finalY = nextY;
-            } else {
-                nextY = hitPos.y + param_2->m_unk0x8;
-                finalY = nextY;
+            if ((finalY - param_2->m_unk0xC) <= hitPos.y) {
+                finalY = hitPos.y + param_2->m_unk0x8;
             }
-        } else {
-            finalY = nextY;
         }
 
         pppMngSt->m_position.y = finalY;

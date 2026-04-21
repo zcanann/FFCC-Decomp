@@ -66,3 +66,17 @@ void pppRandIV(void* param1, void* param2, void* param3)
     target[1] += (s32)((f32)in->fieldC * scale - (f32)in->fieldC);
     target[2] += (s32)((f32)in->field10 * scale - (f32)in->field10);
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static int randint(int value, float scale)
+{
+    return (int)(((float)value * scale) - (float)value);
+}

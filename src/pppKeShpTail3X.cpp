@@ -24,7 +24,7 @@ void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char)
 
 struct KeShpTail3XStep {
     s32 m_graphId;
-    s32 m_dataValIndex;
+    u32 m_dataValIndex;
     s32 m_initWork;
     float m_stepValue;
     float m_arg3;
@@ -245,14 +245,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     u8 nextIndex;
     u8 zEnable;
 
-    if (step->m_dataValIndex == -1) {
+    if (step->m_dataValIndex == 0xffff) {
         return;
     }
 
     count = step->m_drawCount;
-    if (count == 0) {
-        return;
-    }
 
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     invCountMinusOne = (float)(count - 1);
@@ -443,8 +440,6 @@ advance_segment:
         segBaseZ = pos.z;
         goto draw_loop;
     }
-
-    pppSetBlendMode(3);
 }
 
 /*

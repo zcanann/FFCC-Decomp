@@ -18,12 +18,24 @@ CMemoryCardMan MemoryCardMan;
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 static const char sMemoryCardManagerName[] = "CMemoryCardMan";
 static const char sMemoryCardSourceFile[] = "memorycard.cpp";
-extern char sMemoryAllocationError[];
+static const char sMemoryAllocationError[] = {
+    0x25, 0x73, 0x28, 0x25, 0x64, 0x29, 0x3A, 0x20, 0x45, 0x72, 0x72, 0x6F,
+    0x72, 0x3A, 0x20, 0x6D, 0x65, 0x6D, 0x6F, 0x72, 0x79, 0x20, 0x61, 0x6C,
+    0x6C, 0x6F, 0x63, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x20, 0x65, 0x72, 0x72,
+    0x6F, 0x72, 0x0A, 0x00, 0x4D, 0x63, 0x52, 0x65, 0x61, 0x64, 0x28, 0x25,
+    0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28, 0x25, 0x64, 0x29,
+    0x0A, 0x00, 0x00, 0x00, 0x4D, 0x63, 0x46, 0x6F, 0x72, 0x6D, 0x61, 0x74,
+    0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28, 0x25,
+    0x64, 0x29, 0x0A, 0x00, 0x4D, 0x63, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+    0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28, 0x25,
+    0x64, 0x29, 0x0A, 0x00, 0x4D, 0x63, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61,
+    0x74, 0x28, 0x25, 0x64, 0x29, 0x20, 0x65, 0x72, 0x72, 0x6F, 0x72, 0x28,
+    0x25, 0x64, 0x29, 0x0A,
+};
 static const char s_icon_dat_801DA9E8[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
 char* PTR_s_icon_dat = const_cast<char*>(s_icon_dat_801DA9E8);
 char* PTR_s_FF_Crystal_Chronicles = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
-static const char sMemoryAllocationFmt[] = "%s(%d): Error: memory allocation";
 static const char sMemoryCardIconPathFmt[] = "dvd/%smenu/%s";
 static const char sMemoryCardOpenErrorFmt[] = "%s(%d): Error: %s open error";
 static const char sMemoryCardDataErrorFmt[] = "%s(%d): Error: [%s] data error";
@@ -42,14 +54,11 @@ static const char DAT_801db07c[] = {
     (char)0x82, (char)0xB5, (char)0xDC, (char)0x82, (char)0xB5, (char)0xBD, (char)0x81, 0x42,
     0x0A, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-static const char sMcFormatErrorFmt[] = "McFormat(%d) error(%d)";
 static const char sMcMountErrorFmt[] = "McMount(%d) error(%d)";
-static const char sMcCreateErrorFmt[] = "McCreate(%d) error(%d)";
 static const char sMcGetStatErrorFmt[] = "McGetStat(%d) error(%d)";
 static const char sMcWriteErrorFmt[] = "McWrite(%d) error(%d)";
 static const char sMcSetStatErrorFmt[] = "McSetStat(%d) error(%d)";
 static const char sMcOpenErrorFmt[] = "McOpen(%d) error(%d)";
-static const char sMcReadErrorFmt[] = "McRead(%d) error(%d)";
 
 static inline CChara* GetCharaGlobal()
 {
@@ -450,7 +459,7 @@ void CMemoryCardMan::CreateMcBuff()
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            System.Printf(sMemoryAllocationError, const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
     }
 
@@ -532,7 +541,7 @@ void CMemoryCardMan::SetMcIconImage()
 
         if (m_saveBuffer == (char*)nullptr && System.m_execParam != 0)
         {
-            System.Printf(const_cast<char*>(sMemoryAllocationFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
 
         memset(m_saveBuffer, 0, 0xA000);
@@ -1216,7 +1225,7 @@ int CMemoryCardMan::DummySave()
             if (System.m_execParam != 0)
             {
                 // "%s(%d) McFormat(%d) error(%d)"
-                System.Printf("%s", const_cast<char*>(sMcFormatErrorFmt));
+                System.Printf("%s", const_cast<char*>(sMemoryAllocationError + 0x40));
             }
 
             result = CARDUnmount(0);
@@ -1280,7 +1289,7 @@ int CMemoryCardMan::DummySave()
             if (System.m_execParam != 0)
             {
                 // "McCreate(%d) error(%d)"
-                System.Printf("%s", const_cast<char*>(sMcCreateErrorFmt));
+                System.Printf("%s", const_cast<char*>(sMemoryAllocationError + 0x58));
             }
 
             result = CARDUnmount(0);
@@ -1322,7 +1331,7 @@ int CMemoryCardMan::DummySave()
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
                 // "%s(%d): Error: memory allocation"
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationFmt));
+                System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
             }
         }
 
@@ -1409,7 +1418,7 @@ int CMemoryCardMan::DummySave()
 
             if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationFmt));
+                System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
             }
         }
 
@@ -1582,7 +1591,7 @@ int CMemoryCardMan::DummyLoad()
 
         if (m_saveBuffer == 0 && System.m_execParam != 0)
         {
-            System.Printf("%s", const_cast<char*>(sMemoryAllocationFmt));
+            System.Printf("%s", const_cast<char*>(sMemoryAllocationError));
         }
     }
 
@@ -1650,7 +1659,7 @@ int CMemoryCardMan::DummyLoad()
     if (System.m_execParam != 0)
     {
         // "McRead(%d) error(%d)"
-        System.Printf("%s", const_cast<char*>(sMcReadErrorFmt));
+        System.Printf("%s", const_cast<char*>(sMemoryAllocationError + 0x28));
     }
 
     int chan = m_fileInfo.chan;

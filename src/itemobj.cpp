@@ -100,19 +100,19 @@ extern char SoundBuffer[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
-extern char DAT_801dcec0[];
+static const char DAT_801dcec0[] = "num free item = %d\n";
 extern char DAT_801dced4[];
-extern char DAT_801dcef8[];
+static const char DAT_801dcef8[] = "num delete item = %d\n";
 extern char DAT_801dcf10[];
 extern char DAT_801dcf80[];
 extern char DAT_801dcf34[];
-extern char DAT_801dcf58[];
+static const char DAT_801dcf58[] = "itemobj.cpp";
 extern char DAT_801dcf64[];
 extern char DAT_801dd010[];
 extern char DAT_801dcfa4[];
 extern char DAT_801dcfc8[];
 extern char DAT_801dcfec[];
-extern char s_f051_root_801dceb4[];
+static const char s_f051_root_801dceb4[] = "f051_root";
 extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
@@ -500,8 +500,8 @@ void CGItemObj::onFrameStat()
 			prgObj->m_bgColMask |= 0x80000;
 
 			CVector damageOffset(zero, zero, zero);
-			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, s_f051_root_801dceb4, FLOAT_80331b78, FLOAT_80331b78,
-			                                   reinterpret_cast<Vec*>(&damageOffset));
+			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, const_cast<char*>(s_f051_root_801dceb4), FLOAT_80331b78, FLOAT_80331b78,
+			                                  reinterpret_cast<Vec*>(&damageOffset));
 			prgObj->m_damageColliders[1].m_localPosition.x = 9.0f;
 		}
 		break;
@@ -729,7 +729,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
 	int freeItemCount = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
-	Printf__7CSystemFPce(&System, DAT_801dcec0, freeItemCount);
+	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcec0), freeItemCount);
 
 	if (freeItemCount == 0) {
 		int deletedCount = 0;
@@ -760,7 +760,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			deletedCount = 1;
 		}
 
-		Printf__7CSystemFPce(&System, DAT_801dcef8, deletedCount);
+		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcef8), deletedCount);
 		if (deletedCount == 0) {
 			if ((unsigned int)System.m_execParam > 2U) {
 				Printf__7CSystemFPce(&System, DAT_801dcf10);
@@ -838,7 +838,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
 
 		void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-		    0x194, Game.m_mainStage, DAT_801dcf58, 0x28E);
+		    0x194, Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E);
 		if (handle != 0) {
 			handle = __ct__Q29CCharaPcs7CHandleFv(handle);
 		}

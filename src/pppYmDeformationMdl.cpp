@@ -91,106 +91,6 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 /*
  * --INFO--
- * PAL Address: 0x800d20c0
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
-{
-    u8 direction = 1;
-    u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    float fVar1 = 0.0f;
-
-    *puVar2 = 0;
-    *(u8*)(puVar2 + 1) = direction;
-    *(float*)(puVar2 + 6) = fVar1;
-    *(float*)(puVar2 + 4) = fVar1;
-    *(float*)(puVar2 + 2) = fVar1;
-    *(float*)(puVar2 + 0xc) = fVar1;
-    *(float*)(puVar2 + 10) = fVar1;
-    *(float*)(puVar2 + 8) = fVar1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d2090
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
-{
-    float value = FLOAT_80330dac;
-    float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-
-    state[3] = FLOAT_80330dac;
-    state[2] = value;
-    state[1] = value;
-    state[6] = value;
-    state[5] = value;
-    state[4] = value;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d208c
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d1f58
- * PAL Size: 308b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
-{
-    s16* psVar1;
-
-    if ((gPppCalcDisabled == 0) &&
-        ((psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
-         (param_2->m_dataValIndex != 0xFFFF))) {
-        CalcGraphValue(
-            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 2), *(float*)(psVar1 + 4),
-            *(float*)(psVar1 + 6), param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
-        CalcGraphValue(
-            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 8), *(float*)(psVar1 + 10),
-            *(float*)(psVar1 + 0xC), param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
-
-        if (gPppInConstructor == 0) {
-            if (*(u8*)(psVar1 + 1) != 0) {
-                *psVar1 = *psVar1 + (int)*(float*)(psVar1 + 8);
-                if (*psVar1 > param_2->m_payload3) {
-                    *(u8*)(psVar1 + 1) = 0;
-                }
-            } else {
-                *psVar1 = *psVar1 - (int)*(float*)(psVar1 + 8);
-                if ((int)*psVar1 < -(int)param_2->m_payload3) {
-                    *(u8*)(psVar1 + 1) = 1;
-                }
-            }
-        }
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d19f0
  * PAL Size: 1384b
  * EN Address: TODO
@@ -333,4 +233,104 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
         pppInitBlendMode();
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d1f58
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
+{
+    s16* psVar1;
+
+    if ((gPppCalcDisabled == 0) &&
+        ((psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
+         (param_2->m_dataValIndex != 0xFFFF))) {
+        CalcGraphValue(
+            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 2), *(float*)(psVar1 + 4),
+            *(float*)(psVar1 + 6), param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
+        CalcGraphValue(
+            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 8), *(float*)(psVar1 + 10),
+            *(float*)(psVar1 + 0xC), param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
+
+        if (gPppInConstructor == 0) {
+            if (*(u8*)(psVar1 + 1) != 0) {
+                *psVar1 = *psVar1 + (int)*(float*)(psVar1 + 8);
+                if (*psVar1 > param_2->m_payload3) {
+                    *(u8*)(psVar1 + 1) = 0;
+                }
+            } else {
+                *psVar1 = *psVar1 - (int)*(float*)(psVar1 + 8);
+                if ((int)*psVar1 < -(int)param_2->m_payload3) {
+                    *(u8*)(psVar1 + 1) = 1;
+                }
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d208c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
+{
+    return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d2090
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
+{
+    float value = FLOAT_80330dac;
+    float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+
+    state[3] = FLOAT_80330dac;
+    state[2] = value;
+    state[1] = value;
+    state[6] = value;
+    state[5] = value;
+    state[4] = value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d20c0
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
+{
+    u8 direction = 1;
+    u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    float fVar1 = 0.0f;
+
+    *puVar2 = 0;
+    *(u8*)(puVar2 + 1) = direction;
+    *(float*)(puVar2 + 6) = fVar1;
+    *(float*)(puVar2 + 4) = fVar1;
+    *(float*)(puVar2 + 2) = fVar1;
+    *(float*)(puVar2 + 0xc) = fVar1;
+    *(float*)(puVar2 + 10) = fVar1;
+    *(float*)(puVar2 + 8) = fVar1;
 }

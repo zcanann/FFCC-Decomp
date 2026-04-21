@@ -76,7 +76,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-static int randint(int value, float scale)
+int randint(int value, float scale)
 {
     return (int)(((float)value * scale) - (float)value);
 }

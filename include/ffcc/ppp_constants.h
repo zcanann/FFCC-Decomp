@@ -63,7 +63,6 @@ extern float kPppRandIntSingleSampleScale;
 extern float kPppRandIVSingleSampleScale;
 extern float kPppRandShortSingleSampleScale;
 extern float kPppRandUpCharDualSampleScale;
-extern float kPppRandUpCVDualSampleScale;
 extern float kPppRandUpFloatDualSampleScale;
 extern float kPppRandUpFVDualSampleScale;
 extern float kPppRandUpHCVDualSampleScale;

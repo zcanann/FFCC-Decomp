@@ -660,17 +660,16 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 
 	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	if ((flags & 2) != 0) {
-		mainColor.r = 0;
-		mainColor.g = 0;
 		mainColor.b = 0;
+		mainColor.g = 0;
+		mainColor.r = 0;
 	}
 
 	if ((flags & 4) != 0) {
-		int shadowFlags = (flags & ~4) | 2;
-		drawFont(shadowFlags, x - 1, y, text);
-		drawFont(shadowFlags, x, y + 1, text);
-		drawFont(shadowFlags, x + 1, y, text);
-		drawFont(shadowFlags, x, y - 1, text);
+		drawFont((flags & ~4) | 2, x - 1, y, text);
+		drawFont((flags & ~4) | 2, x, y + 1, text);
+		drawFont((flags & ~4) | 2, x + 1, y, text);
+		drawFont((flags & ~4) | 2, x, y - 1, text);
 	}
 
 	GXSetChanMatColor(GX_COLOR0A0, mainColor);
@@ -681,10 +680,10 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 	}
 	if ((flags & 8) != 0) {
 		int textLen = strlen(text);
-		x = (short)(x - (short)((u32)(fontSize * textLen) >> 1));
-		y = (short)(y - (short)(fontSize >> 1));
+		x -= (u32)(fontSize * textLen) >> 1;
+		y -= fontSize / 2;
 	}
-	Graphic.DrawDebugStringDirect((short)x, (short)y, text, (short)fontSize);
+	Graphic.DrawDebugStringDirect(x, y, text, fontSize);
 }
 
 /*

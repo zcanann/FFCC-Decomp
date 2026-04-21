@@ -24,9 +24,6 @@ struct pppYmTracer2 {
     u8 _pad[0x80];
 };
 
-void initTracePolygon(pppYmTracer2*, TRACE_POLYGON&);
-void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

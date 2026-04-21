@@ -1904,11 +1904,14 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
  */
 int CSound::SetSe3DGroup(int se3dHandle, int group)
 {
+    int result;
     if (se3dHandle < 0) {
-        Printf__7CSystemFPce(&System, s_soundErrorFmt);
+        Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
+        result = 0;
     } else {
         char* se = reinterpret_cast<char*>(this) + 0x2C;
         char* found;
+        result = 0;
         int count = 0x20;
         do {
             if ((*se < 0 &&
@@ -1921,6 +1924,7 @@ int CSound::SetSe3DGroup(int se3dHandle, int group)
                   (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
                 goto found_se;
             }
+            result += 3;
             se += 0xA0;
             count--;
         } while (count != 0);
@@ -1930,6 +1934,7 @@ found_se:
             *reinterpret_cast<int*>(found + 0x24) = group;
         }
     }
+    return result;
 }
 
 /*

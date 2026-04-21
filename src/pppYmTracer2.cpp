@@ -76,32 +76,7 @@ union PackedColor {
     u8 bytes[4];
 };
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void initTracePolygon(pppYmTracer2*, TRACE_POLYGON& poly)
-{
-    poly.pos.x = FLOAT_80331840;
-    poly.pos.y = FLOAT_80331840;
-    poly.pos.z = FLOAT_80331840;
-    poly.targetPos.x = FLOAT_80331840;
-    poly.targetPos.y = FLOAT_80331840;
-    poly.targetPos.z = FLOAT_80331840;
-    poly.colorR = 0;
-    poly.colorG = 0;
-    poly.colorB = 0;
-    poly.alpha = 0;
-    poly.active = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
+static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
     dst->active = src->active;
     pppCopyVector(dst->pos, src->pos);

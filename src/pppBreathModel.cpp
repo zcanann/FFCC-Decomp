@@ -921,8 +921,8 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
  */
 extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
-    unsigned char* state = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
     BreathParticleGroup* group;
+    unsigned char* state = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
 
     if (*(void**)(state + 0x30) != NULL) {
         pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(state + 0x30));

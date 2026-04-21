@@ -188,12 +188,14 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     KeShpTail2XWork* work;
     long** shapeTable;
     long* shapeEntry;
-    u16 count;
+    s32 count;
     float alphaMul;
     float colorR;
     float colorG;
     float colorB;
     float colorA;
+    float colorEndA;
+    float zero;
     float colorStepR;
     float colorStepG;
     float colorStepB;
@@ -218,52 +220,49 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     float drawScale;
     float trailStep;
     float scaleStepDelta;
-    u8 curIndex;
-    u8 nextIndex;
-    u8 lastIndex;
-    u8 zEnable;
-    _pppMngSt* mng;
+    s32 curIndex;
+    s32 nextIndex;
+    s32 lastIndex;
+    u32 zEnable;
+    s32 dataValIndex;
 
-    if (step->m_dataValIndex == -1) {
+    zero = kPppKeShpTail2XZero;
+    dataValIndex = step->m_dataValIndex;
+    if (dataValIndex == 0xffff) {
         return;
     }
 
     count = step->m_drawCount;
-    if (count == 0) {
-        return;
-    }
-
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
-    if (invCountMinusOne != kPppKeShpTail2XZero) {
-        colorStepR = ((float)step->m_colorStartR - (float)step->m_colorEndR) / invCountMinusOne;
-        colorStepG = ((float)step->m_colorStartG - (float)step->m_colorEndG) / invCountMinusOne;
-        colorStepB = ((float)step->m_colorStartB - (float)step->m_colorEndB) / invCountMinusOne;
-        colorStepA = (((float)step->m_colorStartA * alphaMul) - ((float)step->m_colorEndA * alphaMul)) / invCountMinusOne;
-    } else {
-        colorStepR = kPppKeShpTail2XZero;
-        colorStepG = kPppKeShpTail2XZero;
-        colorStepB = kPppKeShpTail2XZero;
-        colorStepA = kPppKeShpTail2XZero;
-    }
-
-    work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
-    mng = (_pppMngSt*)pppMngStPtr;
-    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
-    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
-
     colorR = (float)step->m_colorStartR;
     colorG = (float)step->m_colorStartG;
     colorB = (float)step->m_colorStartB;
     colorA = (float)step->m_colorStartA * alphaMul;
+    colorEndA = (float)step->m_colorEndA * alphaMul;
+    if (invCountMinusOne != zero) {
+        colorStepR = (colorR - (float)step->m_colorEndR) / invCountMinusOne;
+        colorStepG = (colorG - (float)step->m_colorEndG) / invCountMinusOne;
+        colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
+        colorStepA = (colorA - colorEndA) / invCountMinusOne;
+    } else {
+        colorStepR = zero;
+        colorStepG = zero;
+        colorStepB = zero;
+        colorStepA = zero;
+    }
+
+    work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
+    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
 
     pppCopyMatrix(localBase, tailObj->m_obj.m_localMatrix);
     pppUnitMatrix(drawMtx);
 
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
-    trailStep = step->m_stepDistance * mng->m_scale.x;
-    if (trailStep <= kPppKeShpTail2XZero) {
+    trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
+    if (trailStep <= zero) {
         return;
     }
 
@@ -282,12 +281,12 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = kPppKeShpTail2XZero;
-    zeroVec.y = kPppKeShpTail2XZero;
-    zeroVec.z = kPppKeShpTail2XZero;
+    zeroVec.x = zero;
+    zeroVec.y = zero;
+    zeroVec.z = zero;
     segLen = PSVECDistance(&zeroVec, &seg);
     segRemain = segLen;
-    segCursor = kPppKeShpTail2XZero;
+    segCursor = zero;
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;
@@ -302,16 +301,16 @@ draw_loop:
     pos.z = segBaseZ;
 
     if (step->m_worldSpaceMode == 0) {
-        PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawScale * mng->m_scale.x,
-                        drawScale * mng->m_scale.y,
-                        drawScale * mng->m_scale.z);
+        PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawScale * pppMngStPtr->m_scale.x,
+                        drawScale * pppMngStPtr->m_scale.y,
+                        drawScale * pppMngStPtr->m_scale.z);
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
         PSMTXCopy(*(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
-        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * mng->m_scale.x);
-        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * mng->m_scale.y);
-        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * mng->m_scale.z);
+        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
+        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
+        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
         PSMTXMultVec(ppvCameraMatrix02, &pos, &pos);
     }
 
@@ -319,9 +318,9 @@ draw_loop:
     drawMtx.value[1][3] = pos.y;
     drawMtx.value[2][3] = pos.z;
 
-    zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
+    zEnable = (u32)__cntlzw((u32)step->m_zDisable) >> 5;
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx,
-                                                               (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
+                                                               (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0,
                                                                step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
 
     {
@@ -346,7 +345,7 @@ draw_loop:
     colorB -= colorStepB;
     colorA -= colorStepA;
     drawScale -= scaleStepDelta;
-    if (trailStep <= kPppKeShpTail2XZero) {
+    if (trailStep <= zero) {
         return;
     }
 

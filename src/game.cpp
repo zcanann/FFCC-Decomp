@@ -541,10 +541,7 @@ void CGame::Create()
     memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
     memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
 
-    m_gameWork.m_scriptSysVal0 = 0;
-    m_gameWork.m_scriptSysVal1 = 0;
-    m_gameWork.m_scriptSysVal2 = 0;
-    m_gameWork.m_scriptSysVal3 = 1;
+    *reinterpret_cast<u32*>(&m_gameWork.m_scriptSysVal0) = 1;
     m_gameWork.m_chaliceElement = 1;
     strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
 
@@ -552,7 +549,13 @@ void CGame::Create()
 
     if (strlen(m_startScriptName) != 0) {
         strcpy(scriptName, m_startScriptName);
-        memcpy(m_nextScript.m_name, scriptName, sizeof(scriptName));
+        u32* src = reinterpret_cast<u32*>(scriptName);
+        u32* dst = reinterpret_cast<u32*>(m_nextScript.m_name);
+        int count = sizeof(scriptName) / (sizeof(u32) * 2);
+        do {
+            *dst++ = *src++;
+            *dst++ = *src++;
+        } while (--count != 0);
         m_newGameFlag = 1;
     }
 

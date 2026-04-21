@@ -31,17 +31,23 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
 RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = p_Stream;
+	RedStreamDATA* result;
+
 	for (;;) {
-		if (*(int*)((u8*)streamData + 0x10C) == 0) {
-			return streamData;
+		if (streamData->m_streamId == 0) {
+			result = streamData;
+			break;
 		}
 
 		streamData = (RedStreamDATA*)((u8*)streamData + 0x130);
 
 		if (!((u8*)streamData < (u8*)p_Stream + 0x4C0)) {
-			return 0;
+			result = 0;
+			break;
 		}
 	}
+
+	return result;
 }
 
 /*

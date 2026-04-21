@@ -11,21 +11,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-static const float FLOAT_80330fa8 = 32.0f;
-static const float FLOAT_80330fac = -0.5f;
-static const float FLOAT_80330fb0 = 640.0f;
-static const float FLOAT_80330fb4 = 448.0f;
-static const float FLOAT_80330fb8 = 33.3f;
-static const float FLOAT_80330fbc = 1.3333334f;
-static const float FLOAT_80330fc0 = 0.5f;
-static const float FLOAT_80330fd0 = 2.0f;
-static const float FLOAT_80330fd4 = -1.0f;
-static const float FLOAT_80330fd8 = 1.0f;
-static const float FLOAT_80330ff8 = 0.8f;
-static const double DOUBLE_80331000 = 1.0;
-static const float FLOAT_80331008 = 4.0f;
-static const float FLOAT_8033100c = 128.0f;
-static const float FLOAT_80331010 = 127.0f;
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -166,8 +151,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	CrystalTexMtx texMtx = s_crystalTexMtxBase;
 
 	if (param_2->m_payload[0] == 1) {
-		texW = FLOAT_80330fa8;
-		texH = FLOAT_80330fa8;
+		texW = 32.0f;
+		texH = 32.0f;
 	}
 	else {
 		texW = (float)*(u32*)(indirectTex + 0x64);
@@ -175,8 +160,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	}
 
 	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
-	indMtx.value[0][0] = ((FLOAT_80330fac * texW) / FLOAT_80330fb0) * param_2->m_stepValue;
-	indMtx.value[1][1] = ((FLOAT_80330fac * texH) / FLOAT_80330fb4) * param_2->m_stepValue;
+	indMtx.value[0][0] = ((-0.5f * texW) / 640.0f) * param_2->m_stepValue;
+	indMtx.value[1][1] = ((-0.5f * texH) / 448.0f) * param_2->m_stepValue;
 
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 	GXSetNumTexGens(3);
@@ -184,10 +169,10 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	if ((int)Game.m_currentSceneId == 7) {
 		C_MTXLightPerspective(
-			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
+			lightMtx, 33.3f, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
 	} else {
 		C_MTXLightPerspective(
-			lightMtx, CameraPcs._252_4_, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
+			lightMtx, CameraPcs._252_4_, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
 	}
 
 	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);
@@ -287,19 +272,19 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				textureInfo->m_imageCount = 0x100;
 				textureInfo->m_bufferSize = textureSize;
 
-				stepX = FLOAT_80330fd0 / (float)(textureInfo->m_width - 1);
-				stepY = FLOAT_80330fd0 / (float)(textureInfo->m_height - 1);
-				yCoord = FLOAT_80330fd4;
+				stepX = 2.0f / (float)(textureInfo->m_width - 1);
+				stepY = 2.0f / (float)(textureInfo->m_height - 1);
+				yCoord = -1.0f;
 
 				for (y = 0; y < (u32)textureInfo->m_height; y++) {
 					u32 yTile = y >> 2;
 					u32 yFine = (y & 3) * 4;
 					float ySq = yCoord * yCoord;
-					float xCoord = FLOAT_80330fd4;
+					float xCoord = -1.0f;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
 						float magnitude = xCoord * xCoord + ySq;
-						if (magnitude > FLOAT_80330fd8) {
+						if (magnitude > 1.0f) {
 							magnitude = CrystalSqrtPositive(magnitude);
 						} else if (magnitude < 0.0f) {
 							magnitude = NAN;
@@ -307,20 +292,20 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 							magnitude = NAN;
 						}
 
-						if (magnitude > FLOAT_80330ff8) {
-							magnitude = FLOAT_80330ff8;
+						if (magnitude > 0.8f) {
+							magnitude = 0.8f;
 						}
 
-						double modulation = fmod(magnitude, DOUBLE_80331000);
-						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
+						double modulation = fmod(magnitude, 1.0);
+						magnitude = 4.0f * (magnitude * (float)modulation);
 						u32 xFine = x & 3;
-						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
+						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * 127.0f + 128.0f));
 						u8* pixel = textureInfo->m_imageData +
 							yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
 							(x & 0x1FFFFFFC) * 8 +
 							(xFine + yFine) * 2;
 						pixel[0] = nx;
-						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
+						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * 127.0f + 128.0f));
 						xCoord += stepX;
 						pixel[1] = ny;
 					}

@@ -61,8 +61,12 @@ extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
 extern "C" void __dt__21CPtrArray_P8CTexture_Fv(void*, int);
+extern "C" bool Add__21CPtrArray_P8CTexture_FP8CTexture(void*, CTexture*);
 extern "C" void SetDefaultSize__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
 extern "C" void SetStage__21CPtrArray_P8CTexture_FPQ27CMemory6CStage(void*, CMemory::CStage*);
+extern "C" int GetSize__21CPtrArray_P8CTexture_Fv(void*);
+extern "C" CTexture* __vc__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
+extern "C" void SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(void*, unsigned long, CTexture*);
 extern "C" void ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(void*);
 
 static const char s_ptrarray_grow_error_801D79D8[] = "CPtrArray grow error";
@@ -1133,6 +1137,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
 {
     CChunkFile::CChunk chunk;
     CChunkFile chunkFile(filePtr);
+    void* textures = Textures(this);
 
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id != 0x54455820) {
@@ -1146,7 +1151,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
                         if (append == 0) {
-                            Textures(this)->ReleaseAndRemoveAll();
+                            ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(textures);
                         }
 
                         chunkFile.PushChunk();
@@ -1175,8 +1180,8 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
 
                                 if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
                                     unsigned int duplicateIdx;
-                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)Textures(this)->GetSize(); duplicateIdx++) {
-                                        CTexture* existing = (*Textures(this))[duplicateIdx];
+                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(textures); duplicateIdx++) {
+                                        CTexture* existing = __vc__21CPtrArray_P8CTexture_FUl(textures, duplicateIdx);
                                         if ((existing != 0)
                                             && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8)))
                                                 == 0)) {
@@ -1199,21 +1204,21 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                             (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
                                         }
 
-                                        texture = (*Textures(this))[duplicateIdx];
+                                        texture = __vc__21CPtrArray_P8CTexture_FUl(textures, duplicateIdx);
                                         *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
                                     }
                                 }
 
                                 if (append != 0) {
-                                    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
-                                        if ((*Textures(this))[i] == 0) {
-                                            Textures(this)->SetAt(i, texture);
+                                    for (unsigned long i = 0; i < static_cast<unsigned long>(GetSize__21CPtrArray_P8CTexture_Fv(textures)); i++) {
+                                        if (__vc__21CPtrArray_P8CTexture_FUl(textures, i) == 0) {
+                                            SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(textures, i, texture);
                                             goto next_texture;
                                         }
                                     }
                                 }
 
-                                Textures(this)->Add(texture);
+                                Add__21CPtrArray_P8CTexture_FP8CTexture(textures, texture);
                             }
                         next_texture:;
                         }
@@ -1240,10 +1245,9 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 {
     CChunkFile::CChunk chunk;
     CTexture* texture;
-    CPtrArray<CTexture*>& textures = *Textures(this);
 
     if (append == 0) {
-        textures.ReleaseAndRemoveAll();
+        ReleaseAndRemoveAll__21CPtrArray_P8CTexture_Fv(Textures(this));
     }
 
     chunkFile.PushChunk();
@@ -1275,8 +1279,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
         if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
             unsigned int duplicateIdx;
-            for (duplicateIdx = 0; duplicateIdx < (unsigned int)textures.GetSize(); duplicateIdx++) {
-                CTexture* existing = textures[duplicateIdx];
+            for (duplicateIdx = 0; duplicateIdx < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(Textures(this)); duplicateIdx++) {
+                CTexture* existing = __vc__21CPtrArray_P8CTexture_FUl(Textures(this), duplicateIdx);
                 if ((existing != 0)
                     && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8))) == 0)) {
                     goto found_duplicate;
@@ -1298,21 +1302,21 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                     (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
                 }
 
-                texture = textures[duplicateIdx];
+                texture = __vc__21CPtrArray_P8CTexture_FUl(Textures(this), duplicateIdx);
                 *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
             }
         }
 
         if (append != 0) {
-            for (unsigned int i = 0; i < (unsigned int)textures.GetSize(); i++) {
-                if (textures[i] == 0) {
-                    textures.SetAt(i, texture);
+            for (unsigned int i = 0; i < (unsigned int)GetSize__21CPtrArray_P8CTexture_Fv(Textures(this)); i++) {
+                if (__vc__21CPtrArray_P8CTexture_FUl(Textures(this), i) == 0) {
+                    SetAt__21CPtrArray_P8CTexture_FUlP8CTexture(Textures(this), i, texture);
                     goto next_chunk;
                 }
             }
         }
 
-        textures.Add(texture);
+        Add__21CPtrArray_P8CTexture_FP8CTexture(Textures(this), texture);
     next_chunk:;
     }
     chunkFile.PopChunk();

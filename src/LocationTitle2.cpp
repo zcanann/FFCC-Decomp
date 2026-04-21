@@ -65,6 +65,11 @@ struct LocationTitle2ModelRaw {
     LocationTitle2AnimRaw* m_anim;
 };
 
+struct pppMngStLocationTitle2Raw {
+    u8 m_pad0[0xDC];
+    CGObject* m_charaObj;
+};
+
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 
 /*
@@ -230,8 +235,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
     if (work->m_particles == 0) {
         LocationTitle2Particle* particles;
-        CGObject* owner;
-        CCharaPcs::CHandle* handle;
         CChara::CModel* model;
         LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
@@ -244,14 +247,19 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
 
-        owner = (CGObject*)pppMngStPtr->m_owner;
-        handle = 0;
-        if (owner->m_charaModelHandle != 0) {
-            handle = owner->m_charaModelHandle;
-        }
         model = 0;
-        if (handle != 0) {
-            model = handle->m_model;
+        {
+            CCharaPcs::CHandle* handle;
+            CGObject* owner;
+
+            owner = ((pppMngStLocationTitle2Raw*)pppMngStPtr)->m_charaObj;
+            handle = 0;
+            if (owner != 0) {
+                handle = owner->m_charaModelHandle;
+            }
+            if (handle != 0) {
+                model = handle->m_model;
+            }
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;

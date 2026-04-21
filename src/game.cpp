@@ -86,27 +86,7 @@ void CheckMenu__10CGPartyObjFv(void);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 unsigned char PartPcs[];
-extern const char DAT_801d61dc[];
-extern const char DAT_801d60d4[];
-extern const char DAT_801d6114[];
-extern const char DAT_801d6154[];
-extern const char s_game_cpp_801d6190[];
-extern const char DAT_801d619c[];
-extern const char DAT_801d61b8[];
-extern const char DAT_801d6214[];
-extern const char DAT_801d6234[];
-extern const char DAT_8032f698[];
-extern const char DAT_8032f6a0;
-extern const char DAT_8032f6a4;
-extern const char DAT_8032f6ac;
-extern const char lbl_8032F6B4[];
-extern const char s_dvd_pctscft_param_cfd_801D6054[];
-extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
-extern const char s_dvd_pctscft_mail_tbl_cfd_801D6080[];
-extern const char s_dvd_pctscft_newbattle_cfd_801D6098[];
-extern const char s_GameDebug_801D6284[];
 extern const s16 DAT_8032e3d0[];
-extern const char* s_localLangDirs[];
 int sprintf(char*, const char*, ...);
 int rand(void);
 void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);
@@ -128,6 +108,65 @@ const float FLOAT_8032f688 = 1.0E+10;
 const float FLOAT_8032f68c = -1.0E+10;
 const float FLOAT_8032f690 = 0.0;
 const float FLOAT_8032f694 = 0.001;
+extern "C" {
+const char DAT_8032f698[] = "ffcc_0";
+const char DAT_8032f6a0[] = "*\n";
+const char DAT_8032f6a4[] = "Tepa";
+const char DAT_8032f6ac[] = "Tipa";
+const char lbl_8032F6B4[] = "Game";
+}
+static const char s_dvd_pctscft_param_cfd_801D6054[] = "dvd/%scft/param.cfd";
+static const char s_dvd_pctscft_c_system_cfd_801D6068[] = "dvd/%scft/c_system.cfd";
+static const char s_dvd_pctscft_mail_tbl_cfd_801D6080[] = "dvd/%scft/mail_tbl.cfd";
+static const char s_dvd_pctscft_newbattle_cfd_801D6098[] = "dvd/%scft/newbattle.cfd";
+static const char DAT_801d60d4[] = {
+    0x70, 0x64, 0x74, 0x69, 0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x70, 0x6E, 0x6F, 0x3D, 0x25, 0x64, 0x20, 0x69,
+    0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x72, 0x61, 0x6D, 0x65, 0x3D, 0x25, 0x64, 0x20, 0x83, 0x70, 0x81, 0x5B,
+    0x83, 0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x8D, 0xED, 0x8F, 0x9C, 0x8B, 0xD6, 0x8E, 0x7E, 0x83, 0x74,
+    0x83, 0x89, 0x83, 0x4F, 0x6F, 0x6E, 0x0A, 0x00};
+static const char DAT_801d6114[] = {
+    0x70, 0x64, 0x74, 0x69, 0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x70, 0x6E, 0x6F, 0x3D, 0x25, 0x64, 0x20, 0x69,
+    0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x72, 0x61, 0x6D, 0x65, 0x3D, 0x25, 0x64, 0x20, 0x83, 0x70, 0x81, 0x5B,
+    0x83, 0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x8E, 0xA9, 0x93, 0xAE, 0x8D, 0xED, 0x8F, 0x9C, 0x83, 0x74,
+    0x83, 0x89, 0x83, 0x4F, 0x6F, 0x6E, 0x0A, 0x00};
+static const char DAT_801d6154[] = {
+    0x70, 0x64, 0x74, 0x69, 0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x70, 0x6E, 0x6F, 0x3D, 0x25, 0x64, 0x20, 0x69,
+    0x64, 0x3D, 0x25, 0x64, 0x20, 0x66, 0x72, 0x61, 0x6D, 0x65, 0x3D, 0x25, 0x64, 0x83, 0x70, 0x81, 0x5B, 0x83,
+    0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x83, 0x60, 0x83, 0x83, 0x81, 0x5B, 0x83, 0x57, 0x8F, 0x49, 0x97,
+    0xB9, 0x6F, 0x6E, 0x0A, 0x00};
+static const char s_game_cpp_801d6190[] = "game.cpp";
+static const char DAT_801d619c[] = {
+    0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
+    0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB7, 0x0A, 0x00};
+static const char DAT_801d61b8[] = {
+    0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xCC, 0x8F, 0xED, 0x92, 0x93, 0x82, 0xF0,
+    0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x0A, 0x00};
+static const char DAT_801d61dc[] = {
+    0x83, 0x54, 0x83, 0x45, 0x83, 0x93, 0x83, 0x68, 0x81, 0x45, 0x83, 0x4C, 0x83, 0x83, 0x83, 0x89, 0x81, 0x45,
+    0x83, 0x70, 0x81, 0x5B, 0x83, 0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x82, 0xCC, 0x8F, 0xED, 0x92, 0x93,
+    0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42,
+    0x0A, 0x00};
+static const char DAT_801d6214[] = {
+    0x2A, 0x83, 0x6A, 0x83, 0x85, 0x81, 0x5B, 0x83, 0x51, 0x81, 0x5B, 0x83, 0x80, 0x8F, 0x89, 0x8A, 0xFA, 0x89,
+    0xBB, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB7, 0x81, 0x42, 0x0A, 0x00};
+static const char DAT_801d6234[] = {
+    0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
+    0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x0A, 0x00};
+static const char s_GameDebug_801D6284[] = "GameDebug";
+static const char s_lang_jp[] = "jp/";
+static const char s_lang_uk[] = "uk/";
+static const char s_lang_gr[] = "gr/";
+static const char s_lang_it[] = "it/";
+static const char s_lang_fr[] = "fr/";
+static const char s_lang_sp[] = "sp/";
+static const char* s_localLangDirs[] = {
+    s_lang_jp,
+    s_lang_uk,
+    s_lang_gr,
+    s_lang_it,
+    s_lang_fr,
+    s_lang_sp,
+};
 static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
 float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
 const char* PTR_s_dvd__scft_param_cfd[] = {
@@ -477,7 +516,7 @@ void CGame::Create()
     m_gameWork.m_scriptSysVal2 = 0;
     m_gameWork.m_scriptSysVal3 = 1;
     m_gameWork.m_chaliceElement = 1;
-    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
+    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
 
     m_gameWork.m_gameInitFlag = 1;
 
@@ -525,9 +564,9 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    Printf__7CSystemFPce(&System, &DAT_8032f6a0);
+    Printf__7CSystemFPce(&System, DAT_8032f6a0);
     Printf__7CSystemFPce(&System, DAT_801d6214);
-    Printf__7CSystemFPce(&System, &DAT_8032f6a0);
+    Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
     CGame* game = &Game;
 
@@ -536,7 +575,7 @@ void CGame::InitNewGame()
 
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
-    strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
+    strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
     InitFurTexBuffer__6CCharaFv(&Chara);
 }
@@ -717,16 +756,16 @@ void CGame::CheckScriptChange()
     if (m_nextScript.m_flags != 0) {
         CGame* game = &Game;
 
-        Printf__7CSystemFPce(&System, &DAT_8032f6a0);
+        Printf__7CSystemFPce(&System, DAT_8032f6a0);
         Printf__7CSystemFPce(&System, DAT_801d6214);
-        Printf__7CSystemFPce(&System, &DAT_8032f6a0);
+        Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
         memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
         memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
         game->m_gameWork.m_chaliceElement = 1;
-        strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
+        strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
         ResetNewGame__13CFlatRuntime2Fv(CFlat);
         InitFurTexBuffer__6CCharaFv(&Chara);
         m_nextScript.m_flags = 0;
@@ -1745,7 +1784,7 @@ CGame::CGameWork::CGameWork()
 
     *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
     m_chaliceElement = 1;
-    strcpy(m_townName, m_languageId == 3 ? &DAT_8032f6a4 : &DAT_8032f6ac);
+    strcpy(m_townName, m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
     m_gameInitFlag = 1;
 }
 

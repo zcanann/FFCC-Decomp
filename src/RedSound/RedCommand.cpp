@@ -7,16 +7,16 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-extern char DAT_801e7e3e;
+char DAT_801e7e3e[] = "\x1B[7;34mSound\x1B[0m:";
 extern char DAT_8021dcab;
 extern char DAT_80333d68;
 extern char DAT_80333d75;
 extern char DAT_80333d70;
-extern char s__sPause___SE___ON__d_801e7e50[];
-extern char s__sPause___SE___OFF__d_801e7e6b[];
-extern char s__s_sWave_is_not_Entry___wave_4_4_801e7e18[];
-extern char s__s_sMusic_Start___Couldn_t_Creat_801e7e86[];
-extern char s__s_s___music_3_3u_bgm___need_0x__801e7eb2[];
+char s__sPause___SE___ON__d_801e7e50[] = "%sPause : SE     : ON  %d\n";
+char s__sPause___SE___OFF__d_801e7e6b[] = "%sPause : SE     : OFF %d\n";
+char s__s_sWave_is_not_Entry___wave_4_4_801e7e18[] = "%s%sWave is not Entry. (wave%4.4u)%s\n";
+char s__s_sMusic_Start___Couldn_t_Creat_801e7e86[] = "%s%sMusic Start : Couldn't Create Track.%s\n";
+char s__s_s___music_3_3u_bgm___need_0x__801e7eb2[] = "%s%s            : music%3.3u.bgm : need 0x%6.6X%s\n";
 
 extern "C" {
 int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);

@@ -24,7 +24,6 @@ extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
-extern char s_CLightPcs_801D7C70[];
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;
@@ -70,18 +69,20 @@ static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
+static const char s_CLightPcs_801D7C70[] = "CLightPcs";
+
 unsigned int m_table_desc0__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
 unsigned int m_table_desc1__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
 unsigned int m_table_desc2__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
 unsigned int m_table_desc3__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
 unsigned int m_table_desc4__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
 unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CLightPcs_801D7C70), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CLightPcs_801D7C70)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
     0, 0x2D, 1
 };
 
 CLightPcs LightPcs;
-static char s_p_light_cpp[] = "p_light.cpp";
+static const char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
 {
@@ -554,7 +555,8 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     *(char*)((char*)slot + 0xb3) = (char)count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    slot[45] = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, texSize * count, stage, s_p_light_cpp, 0x13b, 0);
+    slot[45] = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory, texSize * count, stage, const_cast<char*>(s_p_light_cpp), 0x13b, 0);
 
     int texOffset = 0;
     u32* texObj = slot;

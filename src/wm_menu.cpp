@@ -97,8 +97,8 @@ int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
 static const char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
-extern char s__s__d___Error_WM_menu_no_error___801dc424[];
-extern char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[];
+static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
+static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;

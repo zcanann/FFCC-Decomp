@@ -266,7 +266,7 @@ public:
 };
 
 extern CMenuPcs MenuPcs;
-extern char* sMenuTextureRegionNameTable[];
+extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 #endif // _FFCC_P_MENU_H_

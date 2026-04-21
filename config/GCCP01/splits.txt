@@ -963,7 +963,7 @@ p_menu.cpp:
 	.ctors      start:0x801D541C end:0x801D5420
 	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
-	.sdata2     start:0x803307F8 end:0x80330870
+	.sdata2     start:0x80330714 end:0x80330870
 	.sbss2      start:0x80333DEC end:0x80333DF0
 
 p_gba.cpp:
@@ -1002,6 +1002,7 @@ gobjwork.cpp:
 	extab       start:0x80007E04 end:0x80007F78
 	extabindex  start:0x8000E23C end:0x8000E44C
 	.text       start:0x8009E1C0 end:0x800A2DD4
+	.rodata     start:0x801D9F64 end:0x801DA000
 	.data       start:0x8020FA00 end:0x8020FAC8
 	.sdata2     start:0x803309A8 end:0x803309B8
 
@@ -1009,6 +1010,7 @@ ringmenu.cpp:
 	extab       start:0x80007F78 end:0x80007FC8
 	extabindex  start:0x8000E44C end:0x8000E4C4
 	.text       start:0x800A2DD4 end:0x800A538C
+	.rodata     start:0x801DA01C end:0x801DA048
 	.data       start:0x8020FAE8 end:0x8020FB0C
 
 pppYmMelt.cpp:
@@ -1306,7 +1308,7 @@ wm_menu.cpp:
 	extab       start:0x80008DE4 end:0x80009024
 	extabindex  start:0x8000F9A0 end:0x8000FD00
 	.text       start:0x800E6B98 end:0x80102FB4
-	.rodata     start:0x801DC418 end:0x801DC424
+	.rodata     start:0x801DC418 end:0x801DC448
 	.data       start:0x80210FDC end:0x802111E8
 	.bss        start:0x802FF408 end:0x802FF450
 	.sbss       start:0x8032EE1C end:0x8032EE34

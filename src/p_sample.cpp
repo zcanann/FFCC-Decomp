@@ -1,9 +1,9 @@
 #include "ffcc/p_sample.h"
 
-extern char s_CSamplePcs_801D6CC8[];
+static const char s_CSamplePcs_801D6CC8[] = "CSamplePcs";
 
 CSamplePcsTable m_table__10CSamplePcs = {
-    s_CSamplePcs_801D6CC8,
+    const_cast<char*>(s_CSamplePcs_801D6CC8),
     {
         0,
         0,

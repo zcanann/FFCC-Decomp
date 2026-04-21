@@ -87,10 +87,16 @@ unsigned short s_loadedStageNo__7CMapPcs;
 unsigned short s_loadedMapNo__7CMapPcs;
 extern const float DrawRangeDefault;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
-extern "C" const char s_dvd_map_stg_03d_map_03d_801d7844[];
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
-extern "C" const char s__________________________________801d7734[];
+static const char s_map_load_ok_fmt[] =
+    "\n\n============================================================\n"
+    "                LoadMap [%s] OK\n"
+    "                 m_mapobj_n = %d\n"
+    "                m_octtree_n = %d\n"
+    "                 memFree=%d Kbyte\n"
+    "============================================================\n\n\n";
+static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
@@ -313,7 +319,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
     s_loadedStageNo__7CMapPcs = static_cast<unsigned short>(stageNo);
     s_loadedMapNo__7CMapPcs = static_cast<unsigned short>(mapNo);
-    sprintf(mapPath, s_dvd_map_stg_03d_map_03d_801d7844, stageNo, mapNo);
+    sprintf(mapPath, s_dvd_map_stage_map_fmt, stageNo, mapNo);
 
     if (mode != 2) {
         MapMng.DestroyMap();
@@ -392,7 +398,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
             Printf__7CSystemFPce(
                 &System,
-                s__________________________________801d7734,
+                s_map_load_ok_fmt,
                 mapPath,
                 (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
@@ -576,7 +582,7 @@ void CMapPcs::calc()
 
             Printf__7CSystemFPce(
                 &System,
-                s__________________________________801d7734,
+                s_map_load_ok_fmt,
                 m_mapName,
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),

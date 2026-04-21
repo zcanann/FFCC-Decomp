@@ -5,7 +5,7 @@
 extern "C" void create__10CSystemPcsFv(CSystemPcs*);
 extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
 extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
-extern const char s_CSystemPcs_801D7C48[];
+static const char s_CSystemPcs_801D7C48[] = "CSystemPcs";
 
 CSystemPcs SystemPcs;
 unsigned int m_table_desc0__10CSystemPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};

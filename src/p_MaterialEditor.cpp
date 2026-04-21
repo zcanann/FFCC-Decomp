@@ -4,10 +4,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 extern "C" {
-extern char* gDebugSpinnerText;
-extern unsigned char gDebugSpinnerTextInitialized;
-extern int gDebugSpinnerFrame;
-extern unsigned char gDebugSpinnerFrameInitialized;
 extern const float kMaterialEditorControlMaxInit;
 extern const float kMaterialEditorControlMinInit;
 extern unsigned int kMaterialEditorDefaultColorRgba;
@@ -30,9 +26,9 @@ extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern "C" char __vt__8CManager[];
 extern "C" char __vt_CProcess[];
-extern char s_CMaterialEditorPcs_VIEWER_801D7D18[];
 extern char lbl_8032E648[];
 
+static const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs_VIEWER";
 static const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" void* __vt__18CMaterialEditorPcs[];
 unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
@@ -40,7 +36,7 @@ unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpre
 unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table_desc3__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(s_CMaterialEditorPcs_VIEWER_801D7D18), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcs_VIEWER_801D7D18)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
 };
 unsigned int lbl_801EA624[4] = {
     reinterpret_cast<unsigned int>(lbl_8032E648), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E648)
@@ -521,20 +517,24 @@ struct MaterialEditorPolygon {
 void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    static char* pFan;
+    static unsigned char init;
+    static int alive;
+    static unsigned char init_0;
 
-    if (gDebugSpinnerTextInitialized == 0) {
-        gDebugSpinnerText = sMaterialEditorSpinnerText;
-        gDebugSpinnerTextInitialized = 1;
+    if (init == 0) {
+        pFan = sMaterialEditorSpinnerText;
+        init = 1;
     }
-    if (gDebugSpinnerFrameInitialized == 0) {
-        gDebugSpinnerFrame = 0;
-        gDebugSpinnerFrameInitialized = 1;
+    if (init_0 == 0) {
+        alive = 0;
+        init_0 = 1;
     }
 
-    gDebugSpinnerFrame = gDebugSpinnerFrame + 1;
-    int sign = gDebugSpinnerFrame >> 31;
-    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)gDebugSpinnerText[idx]);
+    alive = alive + 1;
+    int sign = alive >> 31;
+    int idx = (sign * 4 | (unsigned int)(((alive >> 4) * 0x40000000) + sign) >> 30) - sign;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)pFan[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

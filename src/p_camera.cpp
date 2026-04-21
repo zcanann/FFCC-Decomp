@@ -98,7 +98,9 @@ extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
-extern char DAT_801d7928[];
+static const char s_fov_warning_801d7928[] =
+    "!!!!!!!!!!!!!!!!!!FOV\x82\xcc\x92\x6c\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81\x42%f"
+    "!!!!!!!!!!!!!!!!!!!!\n";
 extern double DOUBLE_8032fa28;
 unsigned char DAT_8032ecd8;
 unsigned int m_table_desc0__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
@@ -612,7 +614,7 @@ void CCameraPcs::calc()
 
     float fov = *reinterpret_cast<float*>(self + 0xFC);
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, DAT_801d7928);
+        Printf__7CSystemFPce(&System, const_cast<char*>(s_fov_warning_801d7928));
         fov = FLOAT_8032fab4;
     }
     C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
@@ -681,7 +683,7 @@ void CCameraPcs::SetStdProjectionMatrix()
     float fov = *reinterpret_cast<float*>(self + 0xFC);
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, DAT_801d7928);
+        Printf__7CSystemFPce(&System, const_cast<char*>(s_fov_warning_801d7928));
         fov = FLOAT_8032fab4;
     }
 

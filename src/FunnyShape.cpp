@@ -515,30 +515,34 @@ void CFunnyShape::RenderTexture()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
+    const f32 ndcMin = FLOAT_8032fd80;
+    const f32 ndcMax = FLOAT_8032fd74;
+    const f32 zero = FLOAT_8032fd6c;
+    GXWGFifo.f32 = ndcMin;
+    GXWGFifo.f32 = ndcMax;
+    const u32 colorWord = *reinterpret_cast<u32*>(&color);
+    GXWGFifo.f32 = zero;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = ndcMin;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = ndcMin;
+    GXWGFifo.f32 = ndcMin;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.u32 = colorWord;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = zero;
 }
 
 /*

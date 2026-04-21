@@ -6,6 +6,7 @@
 #include "ffcc/USBStreamData.h"
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
+#include <Dolphin/gx.h>
 
 struct Vec;
 struct ZCANMGRP;
@@ -103,7 +104,14 @@ public:
     Vec field268_0x15c; // 0x15C
     unsigned char _pad168[0xA4];
     pppFMATRIX m_unkMatrix; // 0x20C
-    unsigned char _pad23C[0x3E0 - 0x23C];
+    GXTexObj* m_texObj[16]; // 0x23C
+    s16* m_textureHeader[16]; // 0x27C
+    void* m_textureData[16]; // 0x2BC
+    void* m_tlutData[16]; // 0x2FC
+    GXTlutObj* m_tlutObj0[16]; // 0x33C
+    GXTlutObj* m_tlutObj1[16]; // 0x37C
+    u8 m_loadedTextureCount; // 0x3BC
+    unsigned char _pad3BD[0x3E0 - 0x3BD];
 };
 
 extern CMaterialEditorPcs MaterialEditorPcs;

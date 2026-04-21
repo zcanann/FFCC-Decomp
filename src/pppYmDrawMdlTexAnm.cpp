@@ -1,5 +1,6 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
 #include "dolphin/os.h"
+#include "ffcc/mapmesh.h"
 #include "ffcc/ppp_linkage.h"
 
 struct pppCVECTOR {
@@ -226,28 +227,29 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     pppYmDrawMdlTexAnmObject* ymDrawMdlTexAnm;
     pppYmDrawMdlTexAnmWork* work;
-    CMapMeshUVLayout* uvLayout;
     s32 uvByteOffset;
-    s32 frameU;
+    s32 uvByteOffsetV;
+    CMapMesh* mapMesh;
     s32 i;
+    s32 frameU;
 
     ymDrawMdlTexAnm = (pppYmDrawMdlTexAnmObject*)object;
     work = GetYmDrawMdlTexAnmWork(ymDrawMdlTexAnm, ctrl);
-    if ((work->m_frame != 0) && ((uvLayout = (CMapMeshUVLayout*)GetMapMeshTable()[0]) != NULL)) {
-        for (uvByteOffset = i = 0; i < (s32)(u16)uvLayout->m_uvCount; i++) {
-            s32 uvByteOffsetV = uvByteOffset + 2;
+    if ((work->m_frame != 0) && ((mapMesh = GetMapMeshTable()[0]) != NULL)) {
+        for (uvByteOffset = i = 0; i < (s32)(u16)mapMesh->m_uvCount; i++) {
+            uvByteOffsetV = uvByteOffset + 2;
             frameU = work->m_frame / work->m_tilesU;
             s32 frameModU = work->m_frame - frameU * work->m_tilesU;
 
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset) =
+            *(s16*)((u8*)mapMesh->m_uvPairs + uvByteOffset) =
                 (s16)(int)-(((f32)frameModU * work->m_perU) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffset));
+                            (f32)*(s16*)((u8*)mapMesh->m_uvPairs + uvByteOffset));
             uvByteOffset += 4;
-            *(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV) =
+            *(s16*)((u8*)mapMesh->m_uvPairs + uvByteOffsetV) =
                 (s16)(int)-(((f32)frameU * work->m_perV) -
-                            (f32)*(s16*)((u8*)uvLayout->m_uvPairs + uvByteOffsetV));
+                            (f32)*(s16*)((u8*)mapMesh->m_uvPairs + uvByteOffsetV));
         }
-        DCFlushRange(uvLayout->m_uvPairs, (uvLayout->m_uvCount & 0xFFFF) << 2);
+        DCFlushRange(mapMesh->m_uvPairs, (mapMesh->m_uvCount & 0xFFFF) << 2);
     }
 
     work->m_frame = 0;

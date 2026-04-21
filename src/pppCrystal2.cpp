@@ -247,13 +247,13 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         ((work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80)),
          (param_2->m_payload[0] != 0)) &&
         (work->m_refractionMap == 0)) {
+        u32 y;
+        u32 x;
         Crystal2RefractionMap* textureInfo;
         u32 textureSize;
         float stepX;
         float stepY;
         float yCoord;
-        u32 y;
-        u32 x;
 
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystal2Cpp, 0xA8);

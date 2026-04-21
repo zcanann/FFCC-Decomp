@@ -42,7 +42,7 @@ struct LocationTitle2Particle {
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
-    u16 m_frame;
+    s16 m_frame;
     s16 m_pad0;
     s16 m_pad1;
     s16 m_shape;
@@ -244,13 +244,13 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
         particles = (LocationTitle2Particle*)work->m_particles;
 
-        owner = (CGObject*)pppMngStPtr->m_owner;
+        owner = (CGObject*)pppMngStPtr->m_lookTarget;
         handle = 0;
         if (owner->m_charaModelHandle != 0) {
             handle = owner->m_charaModelHandle;
         }
         model = 0;
-        if (handle != 0) {
+        if (handle->m_model != 0) {
             model = handle->m_model;
         }
 
@@ -259,7 +259,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (int frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
@@ -275,14 +275,14 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             particles[work->m_count].m_pad0 = 0;
             particles[work->m_count].m_shape = 0;
             particles[work->m_count].m_pad1 = 0;
-            particles[work->m_count].m_frame = (s16)frameIndex;
+            particles[work->m_count].m_frame = frameIndex;
             particles[work->m_count].m_scaleX = locationTitle->m_localMatrix.value[0][0];
             particles[work->m_count].m_scaleY = locationTitle->m_localMatrix.value[1][1];
             particles[work->m_count].m_scaleZ = locationTitle->m_localMatrix.value[2][2];
             work->m_count++;
 
             {
-                u16 nextCount = work->m_count + 1;
+                int nextCount = work->m_count + 1;
 
                 if (unkB->m_maxCount <= nextCount) {
                     return;
@@ -292,22 +292,20 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             if (work->m_count > 1) {
                 Vec stepDir;
                 Vec interp[21];
-                u8 stepCount;
                 int startIndex;
                 int inserted;
                 float stepScale;
                 LocationTitle2Particle* startParticle;
                 Vec* interpIt;
 
-                stepCount = unkB->m_stepCount;
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startParticle = &particles[startIndex];
-                stepScale = 1.0f / (float)(stepCount + 1);
+                stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
                 interpIt = interp;
                 PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &stepDir);
 
-                for (int i = 0; i < stepCount; i++) {
+                for (int i = 0; i < unkB->m_stepCount; i++) {
                     Vec scaled;
                     float t;
 
@@ -318,7 +316,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     work->m_count++;
 
                     {
-                        u16 nextCount = work->m_count + 1;
+                        int nextCount = work->m_count + 1;
 
                         if (unkB->m_maxCount <= nextCount) {
                             break;
@@ -345,7 +343,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     dst->m_scaleX = locationTitle->m_localMatrix.value[0][0];
                     dst->m_scaleY = locationTitle->m_localMatrix.value[1][1];
                     dst->m_scaleZ = locationTitle->m_localMatrix.value[2][2];
-                    dst->m_frame = (s16)frameIndex;
+                    dst->m_frame = frameIndex;
                     interpIt++;
                 }
             }

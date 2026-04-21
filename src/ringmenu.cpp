@@ -292,8 +292,7 @@ void CRingMenu::Destroy()
 double CRingMenu::GetDispCounter()
 {
 	const int displayCounter = RingMenuInt(this, 0x500);
-	const float scaled = FLOAT_80330a08 * static_cast<float>(displayCounter) - FLOAT_803309cc;
-	return -static_cast<double>(scaled);
+	return static_cast<double>(FLOAT_803309cc - FLOAT_80330a08 * static_cast<float>(displayCounter));
 }
 
 /*
@@ -1039,7 +1038,7 @@ void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int new
 		RingMenuInt(this, 0x40 + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x40 + buttonGroupIndex * 12);
 	}
 
-	RingMenuInt(this, 0x24 + buttonGroupIndex * 8) = currentCommand;
+	RingMenuInt(this, 0x24 + buttonGroupIndex * 8) = RingMenuInt(this, 0x20 + buttonGroupIndex * 8);
 	RingMenuInt(this, 0x20 + buttonGroupIndex * 8) = newCommandId;
 	RingMenuInt(this, 0x3C + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x38 + buttonGroupIndex * 12);
 	RingMenuInt(this, 0x38 + buttonGroupIndex * 12) = 8 - RingMenuInt(this, 0x38 + buttonGroupIndex * 12);

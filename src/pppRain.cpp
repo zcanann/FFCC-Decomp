@@ -11,8 +11,8 @@ extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
-const float FLOAT_80331020 = 3.0518509e-05f;
-const double DOUBLE_80331028 = 4503601774854144.0;
+extern const float FLOAT_80331020;
+extern const double DOUBLE_80331028;
 static const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {

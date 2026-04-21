@@ -67,6 +67,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
     target[2] += (s32)((f32)in->field10 * scale - (f32)in->field10);
 }
 
+#ifndef VERSION_GCCP01
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -80,3 +81,4 @@ static int randint(int value, float scale)
 {
     return (int)(((float)value * scale) - (float)value);
 }
+#endif

@@ -521,6 +521,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     Vec normalizedPos;
     u32 angleBase;
     u32 signBit;
+    s16 angleRand;
     float speedJitter;
     union {
         unsigned long long ull;
@@ -541,7 +542,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     state->m_shapeCurrentFrame = shapeCount;
     trigCos = *(float*)((u8*)gPppTrigTable + (((u16)(angle + 0x4000) >> 2) << 2));
     trigSin = *(float*)((u8*)gPppTrigTable + (((u16)angle >> 2) << 2));
-    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
+    angleRand = (s16)randomValue;
+    *(short*)((u8*)&particleData->m_velocity.x + 8) = angleRand - (angleRand / 0x168) * 0x168;
     radiusJitter = randomScale * pYmMiasma->m_radiusJitter;
     trigCos = trigCos * (vYmMiasma->m_radius + radiusJitter);
     particleData->m_matrix[0][0] = trigCos;

@@ -271,7 +271,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
                 float magnitude = xCoord * xCoord + ySq;
 
-                if (magnitude > 1.0f) {
+                if (magnitude > 0.0f) {
                     magnitude = Crystal2SqrtPositive(magnitude);
                 } else if ((double)magnitude < 0.0) {
                     magnitude = NAN;

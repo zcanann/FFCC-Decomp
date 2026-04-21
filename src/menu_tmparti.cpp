@@ -11,8 +11,8 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" int __cntlzw(unsigned int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -576,13 +576,13 @@ void CMenuPcs::TmpArtiDraw()
 		int tex = *(int*)(entry + 0xE);
 		if (-1 < tex) {
 			float alpha = *(float*)(entry + 8);
-			float left = (float)entry[0];
-			float top = (float)entry[1];
-			float width = (float)entry[2];
-			float height = (float)entry[3];
-			float s = *(float*)(entry + 4);
-			float t = *(float*)(entry + 6);
-			float z = *(float*)(entry + 10);
+			double left = (float)entry[0];
+			double top = (float)entry[1];
+			double width = (float)entry[2];
+			double height = (float)entry[3];
+			double s = *(float*)(entry + 4);
+			double t = *(float*)(entry + 6);
+			double z = *(float*)(entry + 10);
 
 			if (*(short*)(foodPtr + 0x1F6) < 0) {
 				tex = 0x34;
@@ -591,10 +591,10 @@ void CMenuPcs::TmpArtiDraw()
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332f28 * alpha));
-			GXSetChanMatColor(GX_COLOR0A0, color.color);
+			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332f28 * alpha)};
+			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
+			DrawRect__8CMenuPcsFUlfffffffff(left, top, width, height, s, t, z, z, &MenuPcs, 0);
 		}
 		foodPtr += 2;
 		entry += 0x20;
@@ -607,7 +607,7 @@ void CMenuPcs::TmpArtiDraw()
 		if (-1 < icon) {
 			int posX = (int)entry[0] + (int)entry[2] - 0x10;
 			int posY = (int)(((float)((int)entry[1] + 6)) - FLOAT_80332f30);
-			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
+			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(entry + 8), this, icon, posX, posY, FLOAT_80332f2c);
 		}
 		entry += 0x20;
 		foodPtr += 2;
@@ -629,14 +629,15 @@ void CMenuPcs::TmpArtiDraw()
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332f28 * alpha));
 			SetColor__5CFontF8_GXColor(font, &textColor.color);
 
-			const char* text = flatData->table[0].strings[itemId * 5 + 4];
-			int width = GetWidth__5CFontFPc(font, text);
-			float posX = (float)(((double)((float)entry[2] - (float)width) * DOUBLE_80332f20) + (double)(float)entry[0]);
-			float posY = ((float)((int)entry[1] + 11)) - FLOAT_80332f38;
+			int text = reinterpret_cast<const int*>(flatData->table[0].strings)[itemId * 5 + 4];
+			double width = (double)GetWidth__5CFontFPc(font, reinterpret_cast<const char*>(text));
+			float posX =
+			    (float)((double)(float)((double)(float)entry[2] - width) * DOUBLE_80332f20 + (double)(float)entry[0]);
+			float posY = (float)((double)(float)(entry[1] + 0xB) - (double)FLOAT_80332f38);
 
 			SetPosX__5CFontFf(posX, font);
 			SetPosY__5CFontFf(posY, font);
-			Draw__5CFontFPc(font, text);
+			Draw__5CFontFPc(font, reinterpret_cast<const char*>(text));
 		}
 		entry += 0x20;
 		foodPtr += 2;

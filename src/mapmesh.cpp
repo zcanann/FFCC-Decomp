@@ -261,30 +261,37 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            workSize = Align32(workSize) + chunk.m_size;
+            workSize = Align32(workSize);
+            workSize += chunk.m_size;
             break;
         case 0x4E4F524D:
-            workSize = Align32(workSize) + chunk.m_size;
+            workSize = Align32(workSize);
+            workSize += chunk.m_size;
             break;
         case 0x4E425420:
-            workSize = Align32(workSize) + chunk.m_size;
+            workSize = Align32(workSize);
+            workSize += chunk.m_size;
             break;
         case 0x434F4C52:
-            workSize = Align32(workSize) + chunk.m_size;
+            workSize = Align32(workSize);
+            workSize += chunk.m_size;
             break;
         case 0x55562020:
-            workSize = Align32(workSize) + chunk.m_size;
+            workSize = Align32(workSize);
+            workSize += chunk.m_size;
             break;
         case 0x444C4844:
             U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
-            workSize = Align32(workSize) + (static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U);
+            workSize = Align32(workSize);
+            workSize += static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U;
             reader.PushChunk();
             while (reader.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
                 case 0x444C5354:
                     reader.Align(0x20);
                     if (chunk.m_arg0 != 0) {
-                        workSize = Align32(workSize) + Align32(chunk.m_arg0);
+                        workSize = Align32(workSize);
+                        workSize += Align32(chunk.m_arg0);
                     }
                     reader.Align(0x20);
                     break;

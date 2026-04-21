@@ -1,10 +1,11 @@
 #include "ffcc/pppYmMoveCircle.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
-#include "ffcc/ppp_constants.h"
 #include "types.h"
 #include "dolphin/mtx.h"
-#include "math.h"
+
+double acos(double);
+extern float gPppTrigTable[];
 
 struct pppYmMoveCircleWork {
     f32 m_angle;
@@ -18,6 +19,14 @@ struct pppYmMoveCircleWork {
     Vec m_center;
     u8 m_hasInit;
 };
+
+static const f32 gPppYmMoveCircleTurnSpan = 360.0f;
+static const f32 gPppYmMoveCircleZero = 0.0f;
+static const f32 gPppYmMoveCircleAngleScale = 32768.0f;
+static const f32 gPppYmMoveCircleAngleToTableScale = 0.017453292f;
+static const f32 gPppYmMoveCircleTableDivisor = 3.1415927f;
+static const f32 gPppYmMoveCircleOne = 1.0f;
+static const f32 gPppYmMoveCircleRadToAngleScale = 57.29578f;
 
 
 /*

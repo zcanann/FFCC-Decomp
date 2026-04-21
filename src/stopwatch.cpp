@@ -124,14 +124,3 @@ void CStopWatch::Reset() { OSResetStopwatch(this); }
  * Size:	TODO
  */
 CStopWatch::~CStopWatch() {}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CStopWatch::CStopWatch(char* name)
-{
-	OSInitStopwatch(this, name);
-	OSResetStopwatch(this);
-}

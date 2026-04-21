@@ -267,7 +267,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (int frameIndex = 0; (u32)frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);

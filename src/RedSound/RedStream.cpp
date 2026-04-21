@@ -278,15 +278,14 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
  */
 void StreamStop(int param_1)
 {
-	RedStreamDATA* streamData = p_Stream;
-	RedStreamDATA* streamEnd = p_Stream + 4;
+	volatile RedStreamDATA* streamData = p_Stream;
 
-	while (streamData < streamEnd) {
+	do {
 		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
-			_StreamStop(streamData);
+			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData++;
-	}
+	} while (streamData < p_Stream + 4);
 }
 
 /*

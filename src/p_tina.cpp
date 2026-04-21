@@ -24,11 +24,11 @@ extern "C" {
 const char s_no_name_8032fdcc[] = "no_name";
 }
 static const char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
-extern "C" char s_tina_title_fmt_801d8014[];
-extern "C" char s_tina_calc_fmt_801d8020[];
-extern "C" char s_tina_draw_fmt_801d8038[];
-extern "C" char s_tina_heap_fmt_801d8050[];
-extern "C" char s_tina_prio_time_fmt_801d81a0[];
+static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
+static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
+static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";
+static const char s_tina_heap_fmt_801d8050[] = "hpm=%.3f%%  max=%.3f%%";
+static const char s_tina_prio_time_fmt_801d81a0[] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
@@ -86,26 +86,29 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 
 
 extern char DAT_801ead4c[];
-extern char DAT_801d81d4[];
 extern char s_p_tina_rodata_801d7ee0[];
+static const char DAT_801d81d4[] = {
+    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
+    (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
+    (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5,
+    (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
+    (char)0x00, (char)0x00, (char)0x00, (char)0x00,
+};
 static const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs_GAME";
 static const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs_PART_VIEWER";
-extern char s_CPartPcs_801d7f54[];
-extern char s_CPartPcs_dat_801d810c[];
-extern char s_CPartPcs_amem_801d811c[];
-extern char s_dvd_tina_chobit_801d812c[];
-extern char s_dvd_tina_chobit_0_801d813c[];
-extern char s_dvd_tina_chobit_1_801d8150[];
-extern char s_dvd_tina_chobit_2_801d8164[];
-extern char s_dvd_tina_chobit_3_801d8178[];
-extern char s_dvd_tina_chobit_4_801d818c[];
+static const char s_dvd_tina_chobit_801d812c[] = "dvd/tina/chobit";
+static const char s_dvd_tina_chobit_0_801d813c[] = "dvd/tina/chobit_0";
+static const char s_dvd_tina_chobit_1_801d8150[] = "dvd/tina/chobit_1";
+static const char s_dvd_tina_chobit_2_801d8164[] = "dvd/tina/chobit_2";
+static const char s_dvd_tina_chobit_3_801d8178[] = "dvd/tina/chobit_3";
+static const char s_dvd_tina_chobit_4_801d818c[] = "dvd/tina/chobit_4";
 extern char DAT_801d8068[];
-extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
-extern char s_dvd_tina_stage_03d_title_801d7f94[];
-extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
-extern char s_dvd__smenu__s_801d7fb0[];
-extern char s_dvd_tina_mon_m_03d_801d7fc0[];
-extern char s_dvd_tina_mon_m_03d__c_801d7fd4[];
+static const char s_dvd_tina_stage_03d_mirura_801d7f78[] = "dvd/tina/stage%03d/mirura";
+static const char s_dvd_tina_stage_03d_title_801d7f94[] = "dvd/tina/stage%03d/title";
+static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
+static const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
+static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
+static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
 extern char lbl_8032E69C[];
 unsigned int m_table_desc0__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
 unsigned int m_table_desc1__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
@@ -456,8 +459,6 @@ unsigned int pppFreeMngStPrioForData()
 	unsigned int selectedPrioTime = 0;
 	unsigned char selectedPrio = 1;
 	int index = 0;
-	char* stringBase = s_p_tina_rodata_801d7ee0;
-
 	for (int i = 0xc0; i != 0; i--) {
 		pppMngStPrioData* candidateA = pppMngStBase;
 		if (reinterpret_cast<_pppMngSt*>(candidateA) != pppMngStPtr && candidateA->m_baseTime != -0x1000 &&
@@ -510,7 +511,7 @@ unsigned int pppFreeMngStPrioForData()
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(
-			s_tina_prio_time_fmt_801d81a0,
+			const_cast<char*>(s_tina_prio_time_fmt_801d81a0),
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
@@ -518,13 +519,13 @@ unsigned int pppFreeMngStPrioForData()
 			reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38));
 	}
 	if (2 < (unsigned int)System.m_execParam) {
-		System.Printf(stringBase + 0x2f4);
+		System.Printf(const_cast<char*>(DAT_801d81d4));
 	}
 	if (2 < (unsigned int)System.m_execParam) {
 		System.Printf(DAT_801ead4c);
 	}
 
-	Graphic._WaitDrawDone(stringBase + 0x128, 0xfc);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0xfc);
 	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
 	return 1;
 }
@@ -621,7 +622,6 @@ void CPartPcs::create()
 void CPartPcs::createLoad()
 {
     CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
-    char* stringBase = s_p_tina_rodata_801d7ee0 + 0x24C;
 
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
@@ -630,14 +630,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, stringBase, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, stringBase);
-    pppLoadPan__8CPartMngFPCc(&PartMng, stringBase);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x10, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x24, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x38, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x4C, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x60, 5, 1, 0, 0);
+    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
+    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
+    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 
@@ -1199,21 +1199,20 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
-	char* stringBase = s_p_tina_rodata_801d7ee0;
 	int frameSign;
 	static char* pFan;
 	static char init;
 	static int alive;
 	static char init_0;
 
-	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x3f1);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x3fb);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
@@ -1230,7 +1229,7 @@ void CPartPcs::drawAfterViewer()
 	alive++;
 	frameSign = alive >> 0x1f;
 	Graphic.Printf(
-		stringBase + 0x134,
+		const_cast<char*>(s_tina_title_fmt_801d8014),
 		(int)(char)pFan[(frameSign * 4 |
 								 (unsigned int)((alive >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
@@ -1238,11 +1237,15 @@ void CPartPcs::drawAfterViewer()
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		stringBase + 0x140, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
+		const_cast<char*>(s_tina_calc_fmt_801d8020),
+		(double)g_par_calc_prof.m_lastTime,
+		(double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		stringBase + 0x158, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
+		const_cast<char*>(s_tina_draw_fmt_801d8038),
+		(double)g_par_draw_prof.m_lastTime,
+		(double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		stringBase + 0x170,
+		const_cast<char*>(s_tina_heap_fmt_801d8050),
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }

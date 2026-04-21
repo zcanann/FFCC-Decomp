@@ -63,14 +63,29 @@ unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_ca
 unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+CFunnyShapePcs FunnyShapePcs;
 unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(lbl_801D7DD0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0, 0x42, 1
+    reinterpret_cast<unsigned int>(lbl_801D7DD0),
+    m_table_desc0__14CFunnyShapePcs[0],
+    m_table_desc0__14CFunnyShapePcs[1],
+    m_table_desc0__14CFunnyShapePcs[2],
+    m_table_desc1__14CFunnyShapePcs[0],
+    m_table_desc1__14CFunnyShapePcs[1],
+    m_table_desc1__14CFunnyShapePcs[2],
+    m_table_desc2__14CFunnyShapePcs[0],
+    m_table_desc2__14CFunnyShapePcs[1],
+    m_table_desc2__14CFunnyShapePcs[2],
+    0x21,
+    0,
+    m_table_desc3__14CFunnyShapePcs[0],
+    m_table_desc3__14CFunnyShapePcs[1],
+    m_table_desc3__14CFunnyShapePcs[2],
+    0x42,
+    1
 };
 unsigned int lbl_801EA904[4] = {
     reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
 };
-
-CFunnyShapePcs FunnyShapePcs;
 
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
@@ -192,28 +207,10 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
  */
 CFunnyShapePcs::CFunnyShapePcs()
 {
-    unsigned int* dst = m_table__14CFunnyShapePcs;
-    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
-    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
-    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
-    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
-
     __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x3C);
     __ct__11CFunnyShapeFv(reinterpret_cast<unsigned char*>(this) + 0x50);
     __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(reinterpret_cast<unsigned char*>(this) + 0x61BC);
     __ct__22CPtrArray_P9_GXTexObj_Fv(reinterpret_cast<unsigned char*>(this) + 0x61D8);
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
-    dst[12] = desc3[0];
-    dst[13] = desc3[1];
-    dst[14] = desc3[2];
 }
 
 /*

@@ -52,7 +52,14 @@ extern "C" int GetGBAStart__6JoyBusFi(void*, int);
 extern "C" int IsInitSend__6JoyBusFi(void*, int);
 
 extern unsigned char DAT_8020fab8[];
-extern char DAT_801da01c[];
+static const char DAT_801da01c[] = {
+	0x72, 0x69, 0x6E, 0x67, 0x4D, 0x65, 0x6E, 0x75,
+	(char)0x95, (char)0x8E, (char)0xA6, 0x6F, 0x6E, 0x2F, 0x6F, 0x66,
+	0x66, (char)0x82, (char)0xAA, (char)0x95, (char)0xCF, (char)0x8D, (char)0x58, (char)0x82,
+	(char)0xB3, (char)0x82, (char)0xEA, (char)0x82, (char)0xDC, (char)0x82, (char)0xB5, (char)0x82,
+	(char)0xBD, (char)0x81, (char)0x42, 0x25, 0x64, 0x2D, 0x25, 0x64,
+	0x0A, 0x00, 0x00, 0x00
+};
 extern float FLOAT_803309c0;
 extern float FLOAT_803309c4;
 extern float FLOAT_803309c8;
@@ -306,7 +313,7 @@ void CRingMenu::onCalc()
 		const unsigned int targetAnimDirection =
 			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
 		if (animDirection != static_cast<int>(targetAnimDirection)) {
-			System.Printf(DAT_801da01c, menuIndex);
+			System.Printf(const_cast<char*>(DAT_801da01c), menuIndex);
 			RingMenuInt(this, 0x10) = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
 			RingMenuInt(this, 0x500) = 0x10 - RingMenuInt(this, 0x500);
 		}

@@ -45,7 +45,10 @@ extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
 extern float FLOAT_803309a8;
-extern char DAT_801d9ff0[];
+static const char DAT_801d9ff0[] = {
+	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
+	(char)0x82, (char)0xC8, (char)0x82, (char)0xB5, (char)0x81, (char)0x6A, 0x00, 0x00
+};
 
 /*
  * --INFO--
@@ -152,7 +155,7 @@ CCaravanWork::CCaravanWork()
 	unk_0x3ac = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
+	sprintf((char*)unk_0x3ca_0x3dd, const_cast<char*>(DAT_801d9ff0));
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;
@@ -262,7 +265,7 @@ void CCaravanWork::LoadInit()
 	unk_0x3ac = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
+	sprintf((char*)unk_0x3ca_0x3dd, const_cast<char*>(DAT_801d9ff0));
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;

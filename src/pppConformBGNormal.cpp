@@ -5,18 +5,21 @@
 #include "ffcc/partMng.h"
 #include "ffcc/gobject.h"
 extern "C" {
-static const f32 kPppConformBgNormalZero = 0.0f;
-static const f32 kPppConformBgNormalOne = 1.0f;
+extern const f32 kPppConformBgNormalZero;
+extern const f32 kPppConformBgNormalOne;
 extern int gPppCalcDisabled;
+double sin(double);
+double cos(double);
 }
 
-const f32 kPppConformBgNormalDownRayY = -2000.0f;
-const f32 kPppConformBgNormalCylinderRadius = 10000000000.0f;
-const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
-const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
+extern const f32 kPppConformBgNormalDownRayY = -2000.0f;
+extern const f32 kPppConformBgNormalCylinderRadius = 10000000000.0f;
+extern const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
+extern const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
+extern const f32 FLOAT_80331920 = 1.0f;
+extern const f32 FLOAT_80331924 = 0.0f;
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
-#include <math.h>
 
 struct ConformCylinderQuery {
     Vec m_pos;
@@ -298,7 +301,7 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _p
 
     serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
     pfVar2 = (f32*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
-    scale = 0.0f;
+    scale = kPppConformBgNormalZero;
     pfVar2[2] = scale;
     pfVar2[1] = scale;
     pfVar2[0] = scale;

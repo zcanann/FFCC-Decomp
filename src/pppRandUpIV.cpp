@@ -66,3 +66,17 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     target[1] += (s32)((f32)in->fieldC * scale);
     target[2] += (s32)((f32)in->field10 * scale);
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static int randint(int value, float scale)
+{
+    return (int)((f32)value * scale);
+}

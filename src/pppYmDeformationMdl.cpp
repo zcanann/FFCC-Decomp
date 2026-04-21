@@ -51,7 +51,7 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-extern float FLOAT_80330dac;
+const float FLOAT_80330dac = 0.0f;
 
 static inline Mtx& CameraMatrix()
 {
@@ -125,7 +125,6 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    extern float FLOAT_80330dac;
     float value = FLOAT_80330dac;
     float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 

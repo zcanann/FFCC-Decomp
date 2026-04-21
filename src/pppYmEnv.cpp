@@ -564,7 +564,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 {
     static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
     static const char s_exiting[] = "Exiting";
-    static const char s_display_list_alloc_error[] = "Error allocating display list. Need %u bytes\n";
+    static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     const float kZero = 0.0f;
     const float kOne = 1.0f;
     const float kPi = 3.1415927f;
@@ -638,7 +638,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     *outDisplayListSize = GXEndDisplayList();
     if (displayListSize < *outDisplayListSize) {
-        OSReport(s_display_list_alloc_error, displayListSize);
+        OSReport(s_display_list_alloc_error, displayListSize, *outDisplayListSize);
         OSPanic(s_pppYmEnv_cpp, 0x19f, s_exiting);
     }
 

@@ -908,8 +908,8 @@ void pppConstruct2YmBreath(_pppPObject* obj)
  */
 extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
 {
-    unsigned char* state = (unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets;
     YmBreathParticleGroup* group;
+    unsigned char* state = (unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets;
 
     if (*(void**)(state + 0x30) != NULL) {
         pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(state + 0x30));

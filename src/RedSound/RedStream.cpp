@@ -427,7 +427,6 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 	int stepCount;
 	unsigned int volume;
 	RedStreamDATA* streamData;
-	RedStreamDATA* streamEnd;
 
 	if (param_3 < 1) {
 		stepCount = 1;
@@ -441,19 +440,18 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 	}
 
 	streamData = p_Stream;
-	streamEnd = p_Stream + 4;
-	while (streamData < streamEnd) {
+	do {
 		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
 			if (stepCount > 0) {
-				*(int*)((u8*)streamData + 0xf4) = (int)(volume - *(int*)((u8*)streamData + 0xf0)) / stepCount;
-				*(int*)((u8*)streamData + 0xf8) = stepCount;
+				streamData->m_volumeStep = (int)(volume - streamData->m_volume) / stepCount;
+				streamData->m_volumeStepCount = stepCount;
 			} else {
-				*(unsigned int*)((u8*)streamData + 0xf0) = volume;
-				*(int*)((u8*)streamData + 0xf8) = 0;
+				streamData->m_volume = volume;
+				streamData->m_volumeStepCount = 0;
 			}
 		}
-		streamData++;
-	}
+		streamData = (RedStreamDATA*)((unsigned int)streamData + 0x130);
+	} while ((unsigned int)streamData < (unsigned int)p_Stream + 0x4C0);
 }
 
 /*

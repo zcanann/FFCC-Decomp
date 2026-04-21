@@ -10,7 +10,7 @@ extern "C" void draw0__8CGamePcsFv(CGamePcs*);
 extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
 
-static const char s_CGamePcs_801D7C20[] = "CGamePcs";
+extern const char s_CGamePcs_801D7C20[];
 unsigned int m_table_desc0__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
 unsigned int m_table_desc1__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};
 unsigned int m_table_desc2__8CGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CGamePcsFv)};

@@ -78,7 +78,7 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
         zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
         zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;
         zeroVec.z += stepData->m_offset.z * pppMngStPtr->m_scale.z;
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix02, zeroVec);
+        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix0, zeroVec);
 
         transformMatrix.value[0][3] = zeroVec.x;
         transformMatrix.value[1][3] = zeroVec.y;

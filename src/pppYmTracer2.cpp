@@ -89,6 +89,29 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void initTracePolygon(PYmTracer2*, TRACE_POLYGON& poly)
+{
+    float zero = FLOAT_80331840;
+
+    poly.pos.x = zero;
+    poly.pos.y = zero;
+    poly.pos.z = zero;
+    poly.targetPos.x = zero;
+    poly.targetPos.y = zero;
+    poly.targetPos.z = zero;
+    poly.active = 0;
+    poly.alpha = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80103e68
  * PAL Size: 88b
  * EN Address: TODO

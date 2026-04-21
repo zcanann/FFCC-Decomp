@@ -40,7 +40,6 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     CMapCylinderRaw cylinder;
     Vec hitPos;
     float nextY;
-    float finalY;
     float zero;
     float probeY;
     float scale;
@@ -59,11 +58,12 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         direction.y = probeY;
         direction.z = zero;
 
-        nextY = pppMngStPtr->m_matrix.value[1][3];
-        bottomY = nextY + param_2->m_unk0x4;
-        finalY = nextY;
+        bottomY = pppMngStPtr->m_matrix.value[1][3];
+        nextY = bottomY;
+        float finalY = nextY;
         bottomX = pppMngStPtr->m_matrix.value[0][3];
         bottomZ = pppMngStPtr->m_matrix.value[2][3];
+        bottomY += param_2->m_unk0x4;
         cylinder.m_top.z = scale;
         cylinder.m_top.y = scale;
         cylinder.m_top.x = scale;
@@ -84,8 +84,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
             if ((nextY - param_2->m_unk0xC) > hitPos.y) {
                 finalY = nextY;
             } else {
-                nextY = hitPos.y + param_2->m_unk0x8;
-                finalY = nextY;
+                finalY = hitPos.y + param_2->m_unk0x8;
             }
         } else {
             finalY = nextY;

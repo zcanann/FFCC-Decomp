@@ -316,12 +316,13 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 									node->m_dataOffset = dataOffset;
 								}
 
-								node->m_flags = static_cast<unsigned int>(
-								    __rlwimi(static_cast<int>(node->m_flags), (node->m_flags >> 0xD) | (mode << shift), 13, 1, 18));
+								node->m_flags =
+								    ((((node->m_flags >> 0xD) & 0x3FFFF) | ((static_cast<unsigned int>(mode) << shift) & 0x3FFFF))
+								      << 0xD) |
+								    (node->m_flags & 0x80001FFF);
 
 								if ((5 < i) && (type != 0)) {
-									*reinterpret_cast<unsigned char*>(&node->m_flags) =
-									    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&node->m_flags), 1, 7, 24, 24));
+									*reinterpret_cast<unsigned char*>(&node->m_flags) |= 0x80;
 								}
 
 								i++;
@@ -371,12 +372,10 @@ void CChara::CAnim::InitQuantize()
  */
 CChara::CAnimNode::CAnimNode()
 {
-	int zero = 0;
 	CAnimNodeFields& node = AnimNode(this);
 
-	*reinterpret_cast<unsigned char*>(&node.m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&node.m_flags), zero, 7, 24, 24));
-	node.m_flags = static_cast<unsigned int>(__rlwimi(static_cast<int>(node.m_flags), zero, 13, 1, 18));
+	*reinterpret_cast<unsigned char*>(&node.m_flags) &= 0x7F;
+	node.m_flags &= 0x80001FFF;
 }
 
 /*

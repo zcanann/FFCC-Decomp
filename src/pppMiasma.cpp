@@ -11,12 +11,11 @@
 
 extern float FLOAT_80331928;
 extern float FLOAT_8033192c;
-extern const float FLOAT_80331930 = -1000.0f;
-extern const float FLOAT_80331934 = 1200.0f;
-extern const float FLOAT_80331938 = 10.0f;
-extern const float FLOAT_8033193c = 0.0f;
-extern const float FLOAT_80331940 = 1.0f;
-extern const double DOUBLE_80331948 = 4503601774854144.0;
+static const float FLOAT_80331930 = -1000.0f;
+static const float FLOAT_80331934 = 1200.0f;
+static const float FLOAT_80331938 = 10.0f;
+static const float FLOAT_8033193c = 0.0f;
+static const float FLOAT_80331940 = 1.0f;
 
 extern "C" {
 void GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);

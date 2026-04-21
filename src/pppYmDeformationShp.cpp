@@ -103,9 +103,35 @@ void SetUpIndWarp(VYmDeformationShp*)
  * Address:	TODO
  * Size:	TODO
  */
-void calcBoundaryBox(Vec&, Vec&, Vec4d*)
+void calcBoundaryBox(Vec& min, Vec& max, Vec4d* points)
 {
-	// TODO
+	min.x = FLOAT_80330620;
+	min.y = FLOAT_80330620;
+	min.z = FLOAT_80330620;
+	max.x = FLOAT_80330624;
+	max.y = FLOAT_80330624;
+	max.z = FLOAT_80330624;
+
+	for (int i = 0; i < 4; i++) {
+		if (points[i].x < min.x) {
+			min.x = points[i].x;
+		}
+		if (points[i].y < min.y) {
+			min.y = points[i].y;
+		}
+		if (points[i].z < min.z) {
+			min.z = points[i].z;
+		}
+		if (max.x < points[i].x) {
+			max.x = points[i].x;
+		}
+		if (max.y < points[i].y) {
+			max.y = points[i].y;
+		}
+		if (max.z < points[i].z) {
+			max.z = points[i].z;
+		}
+	}
 }
 
 /*
@@ -113,9 +139,35 @@ void calcBoundaryBox(Vec&, Vec&, Vec4d*)
  * Address:	TODO
  * Size:	TODO
  */
-void setVertexPos(Vec&, Vec&, Vec&, Vec&, float, char)
+void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float size, signed char orientation)
 {
-	// TODO
+	if (orientation == 0) {
+		v0.x = -size;
+		v0.y = size;
+		v0.z = kPppYmDeformationShpZero;
+		v1.x = size;
+		v1.y = size;
+		v1.z = kPppYmDeformationShpZero;
+		v2.x = size;
+		v2.y = -size;
+		v2.z = kPppYmDeformationShpZero;
+		v3.x = -size;
+		v3.y = -size;
+		v3.z = kPppYmDeformationShpZero;
+	} else if (orientation == 1) {
+		v0.x = -size;
+		v0.y = kPppYmDeformationShpZero;
+		v0.z = -size;
+		v1.x = size;
+		v1.y = kPppYmDeformationShpZero;
+		v1.z = -size;
+		v2.x = size;
+		v2.y = kPppYmDeformationShpZero;
+		v2.z = size;
+		v3.x = -size;
+		v3.y = kPppYmDeformationShpZero;
+		v3.z = size;
+	}
 }
 
 /*
@@ -123,9 +175,35 @@ void setVertexPos(Vec&, Vec&, Vec&, Vec&, float, char)
  * Address:	TODO
  * Size:	TODO
  */
-void setVertexPos(Vec*, char, float, float, float, float)
+void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float size, float split, signed char orientation)
 {
-	// TODO
+	if (orientation == 0) {
+		v0.x = -size;
+		v0.y = -split;
+		v0.z = kPppYmDeformationShpZero;
+		v1.x = -split;
+		v1.y = -split;
+		v1.z = kPppYmDeformationShpZero;
+		v2.x = -split;
+		v2.y = split;
+		v2.z = kPppYmDeformationShpZero;
+		v3.x = -size;
+		v3.y = split;
+		v3.z = kPppYmDeformationShpZero;
+	} else if (orientation == 1) {
+		v0.x = -size;
+		v0.y = kPppYmDeformationShpZero;
+		v0.z = -split;
+		v1.x = -split;
+		v1.y = kPppYmDeformationShpZero;
+		v1.z = -split;
+		v2.x = -split;
+		v2.y = kPppYmDeformationShpZero;
+		v2.z = split;
+		v3.x = -size;
+		v3.y = kPppYmDeformationShpZero;
+		v3.z = split;
+	}
 }
 
 /*
@@ -133,9 +211,35 @@ void setVertexPos(Vec*, char, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void setVertexUV(Vec2d*, float, float, float, float)
+void setVertexPos(Vec* vertices, signed char orientation, float left, float top, float right, float bottom)
 {
-	// TODO
+	if (orientation == 0) {
+		vertices[0].x = left;
+		vertices[0].y = top;
+		vertices[0].z = kPppYmDeformationShpZero;
+		vertices[1].x = right;
+		vertices[1].y = top;
+		vertices[1].z = kPppYmDeformationShpZero;
+		vertices[2].x = right;
+		vertices[2].y = bottom;
+		vertices[2].z = kPppYmDeformationShpZero;
+		vertices[3].x = left;
+		vertices[3].y = bottom;
+		vertices[3].z = kPppYmDeformationShpZero;
+	} else if (orientation == 1) {
+		vertices[0].x = left;
+		vertices[0].y = kPppYmDeformationShpZero;
+		vertices[0].z = top;
+		vertices[1].x = right;
+		vertices[1].y = kPppYmDeformationShpZero;
+		vertices[1].z = top;
+		vertices[2].x = right;
+		vertices[2].y = kPppYmDeformationShpZero;
+		vertices[2].z = bottom;
+		vertices[3].x = left;
+		vertices[3].y = kPppYmDeformationShpZero;
+		vertices[3].z = bottom;
+	}
 }
 
 /*
@@ -143,9 +247,16 @@ void setVertexUV(Vec2d*, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void calcScreenPos(Vec4d&, Vec&, float (*)[4], float (*)[4])
+void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
 {
-	// TODO
+	uvs[0].x = left;
+	uvs[0].y = top;
+	uvs[1].x = right;
+	uvs[1].y = top;
+	uvs[2].x = right;
+	uvs[2].y = bottom;
+	uvs[3].x = left;
+	uvs[3].y = bottom;
 }
 
 /*
@@ -153,9 +264,46 @@ void calcScreenPos(Vec4d&, Vec&, float (*)[4], float (*)[4])
  * Address:	TODO
  * Size:	TODO
  */
-void oddToEven(float&)
+void calcScreenPos(Vec4d& dst, Vec src, float (*modelMtx)[4], float (*screenMtx)[4])
 {
-	// TODO
+	Vec worldPos;
+	Vec4d clipPos;
+
+	PSMTXMultVec(modelMtx, &src, &worldPos);
+	clipPos.x = worldPos.x;
+	clipPos.y = worldPos.y;
+	clipPos.z = worldPos.z;
+	clipPos.w = FLOAT_803305f8;
+	MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &clipPos, &dst);
+	dst.x = dst.x / dst.w;
+	dst.y = dst.y / dst.w;
+	dst.z = dst.z / dst.w;
+	dst.x = FLOAT_80330610 + dst.x / FLOAT_80330614;
+	dst.y = FLOAT_80330618 - dst.y / FLOAT_8033061c;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void oddToEven(float& value)
+{
+	if (((int)value & 1) != 0) {
+		value -= FLOAT_803305f8;
+	}
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void oddToEven(int& value)
+{
+	if ((value & 1) != 0) {
+		value--;
+	}
 }
 
 /*

@@ -278,7 +278,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 0);
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 2);
-	int model = 0;
+	u32 model = 0;
 
 	if (handle0 != 0) {
 		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
@@ -288,7 +288,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		*(void**)(model + 0xfc) = 0;
 		*(void**)(model + 0x104) = 0;
 	}
-	int model1;
+	u32 model1;
 	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
 		*(void**)(model1 + 0xe4) = 0;
 		*(void**)(model1 + 0xe8) = 0;
@@ -296,7 +296,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		*(void**)(model1 + 0xfc) = 0;
 		*(void**)(model1 + 0x104) = 0;
 	}
-	int model2;
+	u32 model2;
 	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
 		*(void**)(model2 + 0xe4) = 0;
 		*(void**)(model2 + 0xe8) = 0;

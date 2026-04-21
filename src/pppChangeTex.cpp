@@ -437,7 +437,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 			int dlIdx = *(int*)(*(int*)(meshList + 8) + 0x4C) - 1;
 			int* dlInfo = (int*)(*(int*)(*(int*)(meshList + 8) + 0x50));
 			int* dlEntry = (int*)(*(int*)(work->m_displayListArrays + arrayOffset) + dlIdx * 4);
-			for (; -1 < dlIdx; dlIdx = dlIdx - 1) {
+			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 3) {
 				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x18B);
 				*dlEntry = dlPair;
@@ -447,7 +447,6 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
 				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				dlEntry = dlEntry - 1;
-				dlInfo = dlInfo + 3;
 			}
 
 			*meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -499,7 +498,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 					*(char*)(colorPtr + 3) = 0;
 				}
 			} else if (step->m_payload[0] == 2) {
-				if (splitY < *(short*)(*(int*)(meshList + 0xC) + pointOffset + 2)) {
+				if (*(short*)(*(int*)(meshList + 0xC) + pointOffset + 2) > splitY) {
 					*(char*)(colorPtr + 3) = (char)(int)alphaBase;
 				} else {
 					*(char*)(colorPtr + 3) = 0;

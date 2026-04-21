@@ -249,6 +249,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXTexObj backTexObj;
 	Mtx rot;
 	float indMtx[2][3];
+	Mtx44 screenMtx;
 	float depth;
 	float texU;
 	float texV;
@@ -376,7 +377,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
-	GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
+	GXSetProjection(screenMtx, GX_PERSPECTIVE);
 	pppInitBlendMode();
 }
 

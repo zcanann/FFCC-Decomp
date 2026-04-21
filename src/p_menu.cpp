@@ -48,43 +48,44 @@ struct MenuFontTlutPalette
 };
 extern void* __vt__8CManager;
 extern "C" void* __vt__8CMenuPcs[];
-extern char s_dvd__smenu__s_tex_801d9d6c[];
-extern char s_dvd__smenu__s_fnt_801d9da0[];
-extern char s_dvd__smenu_gc22_fnt_801d9db4[];
-extern char s_dvd__smenu_gc23_fnt_801d9d8c[];
-extern char s_win_kazari_801D9D48[];
-extern char lbl_80330714[];
-extern char lbl_8033071C[];
-extern char lbl_80330724[];
-extern char lbl_8033072C[];
-extern char lbl_80330734[];
-extern char lbl_8033073C[];
-extern char lbl_80330744[];
-extern char lbl_8033074C[];
-extern char lbl_80330754[];
-extern char lbl_8033075C[];
-extern char lbl_80330764[];
-extern char lbl_8033076C[];
-extern char lbl_80330774[];
-extern char lbl_8033077C[];
-extern char lbl_80330784[];
-extern char lbl_8033078C[];
-extern char lbl_80330794[];
-extern char lbl_8033079C[];
-extern char lbl_803307A4[];
-extern char lbl_803307AC[];
-extern char lbl_803307B4[];
-extern char lbl_803307BC[];
-extern char lbl_803307C4[];
-extern char lbl_803307CC[];
-extern char lbl_803307D4[];
-extern char lbl_803307DC[];
-extern char lbl_803307E4[];
-extern char lbl_803307E8[];
-extern char lbl_803307EC[];
-extern char lbl_803307F0[];
-extern char lbl_803307F8[];
-extern char lbl_803307FC[];
+
+static const char s_win_kazari_801D9D48[] = "win_kazari";
+static const char s_dvd__smenu__s_tex_801d9d6c[] = "dvd/%smenu/%s.tex";
+static const char s_dvd__smenu_gc23_fnt_801d9d8c[] = "dvd/%smenu/gc23.fnt";
+static const char s_dvd__smenu__s_fnt_801d9da0[] = "dvd/%smenu/%s.fnt";
+static const char s_dvd__smenu_gc22_fnt_801d9db4[] = "dvd/%smenu/gc22.fnt";
+static const char lbl_80330714[] = "kasoru";
+static const char lbl_8033071C[] = "pause";
+static const char lbl_80330724[] = "win1_0";
+static const char lbl_8033072C[] = "win1_1";
+static const char lbl_80330734[] = "win1_2";
+static const char lbl_8033073C[] = "win1_3";
+static const char lbl_80330744[] = "win1_4";
+static const char lbl_8033074C[] = "win1_5";
+static const char lbl_80330754[] = "win1_6";
+static const char lbl_8033075C[] = "win1_7";
+static const char lbl_80330764[] = "win1_8";
+static const char lbl_8033076C[] = "win2_0";
+static const char lbl_80330774[] = "win2_1";
+static const char lbl_8033077C[] = "win2_2";
+static const char lbl_80330784[] = "win2_3";
+static const char lbl_8033078C[] = "win2_4";
+static const char lbl_80330794[] = "win2_5";
+static const char lbl_8033079C[] = "win2_6";
+static const char lbl_803307A4[] = "win2_7";
+static const char lbl_803307AC[] = "win2_8";
+static const char lbl_803307B4[] = "button";
+static const char lbl_803307BC[] = "shibuya";
+static const char lbl_803307C4[] = "face";
+static const char lbl_803307CC[] = "battle";
+static const char lbl_803307D4[] = "heart";
+static const char lbl_803307DC[] = "navi";
+static const char lbl_803307E4[] = "hp0";
+static const char lbl_803307E8[] = "hp1";
+static const char lbl_803307EC[] = "hp2";
+static const char lbl_803307F0[] = "suna";
+static const char lbl_803307F8[] = "gba";
+static const char lbl_803307FC[] = "battle2";
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
@@ -126,28 +127,28 @@ unsigned int m_table__8CMenuPcs[0x57] = {
 };
 
 int DAT_8020ef9c[] = {
-    0, reinterpret_cast<int>(lbl_80330714),
-    0, reinterpret_cast<int>(lbl_8033071C),
-    1, reinterpret_cast<int>(lbl_80330724),
-    1, reinterpret_cast<int>(lbl_8033072C),
-    1, reinterpret_cast<int>(lbl_80330734),
-    1, reinterpret_cast<int>(lbl_8033073C),
-    1, reinterpret_cast<int>(lbl_80330744),
-    1, reinterpret_cast<int>(lbl_8033074C),
-    1, reinterpret_cast<int>(lbl_80330754),
-    1, reinterpret_cast<int>(lbl_8033075C),
-    1, reinterpret_cast<int>(lbl_80330764),
-    1, reinterpret_cast<int>(lbl_8033076C),
-    1, reinterpret_cast<int>(lbl_80330774),
-    1, reinterpret_cast<int>(lbl_8033077C),
-    1, reinterpret_cast<int>(lbl_80330784),
-    1, reinterpret_cast<int>(lbl_8033078C),
-    1, reinterpret_cast<int>(lbl_80330794),
-    1, reinterpret_cast<int>(lbl_8033079C),
-    1, reinterpret_cast<int>(lbl_803307A4),
-    1, reinterpret_cast<int>(lbl_803307AC),
-    1, reinterpret_cast<int>(s_win_kazari_801D9D48),
-    0, reinterpret_cast<int>(lbl_803307B4)
+    0, reinterpret_cast<int>(const_cast<char*>(lbl_80330714)),
+    0, reinterpret_cast<int>(const_cast<char*>(lbl_8033071C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330724)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033072C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330734)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033073C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330744)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033074C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330754)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033075C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330764)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033076C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330774)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033077C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330784)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033078C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_80330794)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_8033079C)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_803307A4)),
+    1, reinterpret_cast<int>(const_cast<char*>(lbl_803307AC)),
+    1, reinterpret_cast<int>(const_cast<char*>(s_win_kazari_801D9D48)),
+    0, reinterpret_cast<int>(const_cast<char*>(lbl_803307B4))
 };
 
 u8 sMenuFontShadeTable[] = {
@@ -221,21 +222,21 @@ MenuFontTlutPalette sMenuFontTlutPaletteTable[] = {
     {{0x00, 0x00, 0x00, 0xFF}, {0x00, 0x00, 0x00, 0xFF}}
 };
 
-char* sMenuTextureRegionNameTable[] = {
+const char* sMenuTextureRegionNameTable[] = {
     lbl_803307BC, lbl_803307C4, 0, 0, 0, 0, 0, 0, 0
 };
 
 int sMenuTextureInfoTable[] = {
-    2, reinterpret_cast<int>(lbl_803307CC),
-    2, reinterpret_cast<int>(lbl_803307D4),
-    3, reinterpret_cast<int>(lbl_803307C4),
-    2, reinterpret_cast<int>(lbl_803307DC),
-    2, reinterpret_cast<int>(lbl_803307E4),
-    2, reinterpret_cast<int>(lbl_803307E8),
-    2, reinterpret_cast<int>(lbl_803307EC),
-    2, reinterpret_cast<int>(lbl_803307F0),
-    2, reinterpret_cast<int>(lbl_803307F8),
-    2, reinterpret_cast<int>(lbl_803307FC)
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307CC)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307D4)),
+    3, reinterpret_cast<int>(const_cast<char*>(lbl_803307C4)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307DC)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307E4)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307E8)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307EC)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307F0)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307F8)),
+    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307FC))
 };
 
 static inline void ReleaseRefObject(void* object)
@@ -408,11 +409,11 @@ void CMenuPcs::create()
     memset(self + 0x14C, 0, 0x40);
     memset(self + 0x18C, 0, 0x1A4);
 
-    sprintf(fontPath, s_dvd__smenu_gc22_fnt_801d9db4, Game.GetLangString());
+    sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc22_fnt_801d9db4), Game.GetLangString());
     loadFont(0, fontPath, 0, 0);
 
     for (int i = 0; i < 2; i++) {
-        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), sMenuTextureRegionNameTable[i]);
+        sprintf(texPath, const_cast<char*>(s_dvd__smenu__s_tex_801d9d6c), Game.GetLangString(), sMenuTextureRegionNameTable[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -578,7 +579,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureSetCount; i++) {
-        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), *paths);
+        sprintf(texPath, const_cast<char*>(s_dvd__smenu__s_tex_801d9d6c), Game.GetLangString(), *paths);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -1427,7 +1428,7 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
         *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + slot) = 0;
     }
 
-    sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.GetLangString(), fileName);
+    sprintf(path, const_cast<char*>(s_dvd__smenu__s_fnt_801d9da0), Game.GetLangString(), fileName);
     loadFont(2, path, fontNo + 2, -1);
 }
 
@@ -1494,7 +1495,7 @@ void CMenuPcs::createBattle()
 
     for (int i = 0; i < 2; i++) {
         const char* language = Game.GetLangString();
-        sprintf(path, s_dvd__smenu__s_tex_801d9d6c, language, sMenuTextureRegionNameTable[i]);
+        sprintf(path, const_cast<char*>(s_dvd__smenu__s_tex_801d9d6c), language, sMenuTextureRegionNameTable[i]);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -1539,7 +1540,7 @@ void CMenuPcs::createBattle()
         menu->Create();
     }
 
-    sprintf(fontPath, s_dvd__smenu_gc23_fnt_801d9d8c, Game.GetLangString());
+    sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc23_fnt_801d9d8c), Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
 
     CTexture* fontTexture = *reinterpret_cast<CTexture**>(self + 0x1EC);

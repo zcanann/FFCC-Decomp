@@ -134,8 +134,9 @@ extern "C" void CalcPolygonHeight(
         vertex->m_color.m_bytes[3] = colorBytes[3];
 
         worldBase.x = pppMngStPtr->m_matrix.value[0][3];
-        worldBase.y = pppMngStPtr->m_matrix.value[1][3] + vertexData->m_collisionYOffset;
+        worldBase.y = pppMngStPtr->m_matrix.value[1][3];
         worldBase.z = pppMngStPtr->m_matrix.value[2][3];
+        worldBase.y += vertexData->m_collisionYOffset;
         rayDirection.x = zero;
         rayDirection.y = rayY;
         rayDirection.z = zero;

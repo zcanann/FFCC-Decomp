@@ -247,7 +247,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	float* work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
-	Mtx rot;
+	Mtx identity;
 	float indMtx[2][3];
 	Mtx44 screenMtx;
 	float depth;
@@ -290,8 +290,8 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
 	{
-		Mtx identity;
 		Mtx44 orthoMtx;
+		Mtx rot;
 
 		PSMTXIdentity(identity);
 		GXLoadPosMtxImm(identity, 0);
@@ -305,30 +305,31 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		orthoMtx[1][3] = FLOAT_8033067C;
 		orthoMtx[2][3] = FLOAT_80330670;
 		GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+		_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+		_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
+		GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+
+		depth = work[0];
+		GXSetNumIndStages(1);
+		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD0, GX_TEXMAP1);
+		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
+		GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
+
+		if ((*(short*)(work + 1) == 0) || (*(short*)(work + 1) == 0x168)) {
+			*(short*)(work + 1) = 1;
+		}
+
+		PSMTXRotRad(rot, 'z', FLOAT_80330684 * (float)(*(short*)(work + 1)));
+		indMtx[0][0] = rot[0][0] * work[2];
+		indMtx[0][1] = rot[0][1] * work[2];
+		indMtx[0][2] = 0.0f;
+		indMtx[1][0] = rot[1][0] * work[2];
+		indMtx[1][1] = rot[1][1] * work[2];
+		indMtx[1][2] = 0.0f;
+		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 	}
-	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-	_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-
-	depth = work[0];
-	GXSetNumIndStages(1);
-	GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD0, GX_TEXMAP1);
-	GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
-	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-
-	if ((*(short*)(work + 1) == 0) || (*(short*)(work + 1) == 0x168)) {
-		*(short*)(work + 1) = 1;
-	}
-
-	PSMTXRotRad(rot, 'z', FLOAT_80330684 * (float)(*(short*)(work + 1)));
-	indMtx[0][0] = rot[0][0] * work[2];
-	indMtx[0][1] = rot[0][1] * work[2];
-	indMtx[0][2] = 0.0f;
-	indMtx[1][0] = rot[1][0] * work[2];
-	indMtx[1][1] = rot[1][1] * work[2];
-	indMtx[1][2] = 0.0f;
-	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
 	texU = (float)(0x280 / *(unsigned int*)(textureBase + 100));
 	texV = (float)(0x1C0 / *(unsigned int*)(textureBase + 0x68));

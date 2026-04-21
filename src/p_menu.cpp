@@ -24,9 +24,16 @@ extern const f32 kMenuOrthoFar;
 #include "ffcc/fontman.h"
 
 #include <dolphin/mtx.h>
-#include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+
+extern "C" double sin(double);
+extern "C" double cos(double);
+
+static inline float sinf(float x)
+{
+    return static_cast<float>(sin(static_cast<double>(x)));
+}
 
 static unsigned char ARRAY_802ea1a0[0xC];
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);

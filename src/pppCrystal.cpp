@@ -100,6 +100,19 @@ static inline int CrystalFpClassify(float value)
     return 4;
 }
 
+static inline float CrystalSqrtPositive(float value)
+{
+    const double half = 0.5;
+    const double three = 3.0;
+    double guess = __frsqrte((double)value);
+
+    guess = half * guess * (three - guess * guess * value);
+    guess = half * guess * (three - guess * guess * value);
+    guess = half * guess * (three - guess * guess * value);
+
+    return (float)(value * guess);
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -219,13 +232,15 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				yCoord = FLOAT_80330fd4;
 
 				for (y = 0; y < (u32)textureInfo->m_height; y++) {
+					u32 yTile = y >> 2;
+					u32 yFine = (y & 3) * 4;
 					float ySq = yCoord * yCoord;
 					float xCoord = FLOAT_80330fd4;
 
 					for (x = 0; x < (u32)textureInfo->m_width; x++) {
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > FLOAT_80330fd8) {
-							magnitude = sqrtf(magnitude);
+							magnitude = CrystalSqrtPositive(magnitude);
 						} else if (magnitude < 0.0f) {
 							magnitude = NAN;
 						} else if (CrystalFpClassify(magnitude) == 1) {
@@ -238,11 +253,12 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 
 						double modulation = fmod(magnitude, DOUBLE_80331000);
 						magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
+						u32 xFine = x & 3;
 						u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
 						u8* pixel = textureInfo->m_imageData +
-							(y >> 2) * (textureInfo->m_width & 0x1FFFFFFCU) * 8 +
+							yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
 							(x & 0x1FFFFFFC) * 8 +
-							((x & 3) + (y & 3) * 4) * 2;
+							(xFine + yFine) * 2;
 						pixel[0] = nx;
 						u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100c));
 						xCoord += stepX;

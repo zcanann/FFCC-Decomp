@@ -205,25 +205,8 @@ void CFunnyShapePcs::SetUSBData()
         m_displayPending.unk30 = BSWAP32(m_displayPending.unk30);
         DCStoreRange(&m_displayPending, 0x40);
 
-        GXColor clear = m_displayPending.clear;
-        GXSetCopyClear(clear, 0xFFFFFF);
-
-        m_displayCurrent.flags = m_displayPending.flags;
-        memcpy(&m_displayCurrent.clear, &m_displayPending.clear, sizeof(GXColor));
-        m_displayCurrent.unk08 = m_displayPending.unk08;
-        m_displayCurrent.unk0C = m_displayPending.unk0C;
-        m_displayCurrent.unk10 = m_displayPending.unk10;
-        m_displayCurrent.unk14 = m_displayPending.unk14;
-        m_displayCurrent.unk18 = m_displayPending.unk18;
-        m_displayCurrent.unk1C = m_displayPending.unk1C;
-        m_displayCurrent.unk20 = m_displayPending.unk20;
-        m_displayCurrent.unk24 = m_displayPending.unk24;
-        m_displayCurrent.unk28 = m_displayPending.unk28;
-        m_displayCurrent.unk2A = m_displayPending.unk2A;
-        m_displayCurrent.unk2C = m_displayPending.unk2C;
-        m_displayCurrent.unk30 = m_displayPending.unk30;
-        m_displayCurrent.unk34[0] = m_displayPending.unk34[0];
-        memcpy(&m_displayCurrent.unk34[1], &m_displayPending.unk34[1], 0x0B);
+        GXSetCopyClear(m_displayPending.clear, 0xFFFFFF);
+        memcpy(&m_displayCurrent, &m_displayPending, sizeof(m_displayCurrent));
         break;
     }
     case 15: {

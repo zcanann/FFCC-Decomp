@@ -741,11 +741,11 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         return;
     }
 
-    model = (pppModelSt*)(*(void***)(pppEnvStPtr + 8))[step->m_stepValue];
+    model = (pppModelSt*)(*(void***)((u8*)pppEnvStPtr + 8))[step->m_stepValue];
     pppInitBlendMode();
     pppSetBlendMode(step->m_payload[4]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(step->m_payload + 0xB0, NULL, 0.0f, step->m_payload[0xB6],
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(NULL, NULL, *(float*)(step->m_payload + 0xB0), step->m_payload[0xB6],
                                                                step->m_payload[0xB5], step->m_payload[4], step->m_payload[0xB7],
                                                                step->m_payload[0xB8], 1, step->m_payload[0xB9]);
 
@@ -766,9 +766,9 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             int a;
 
             PSMTXScale(scaledMtx,
-                       *(float*)(pppMngStPtr + 0x28) * *(float*)(particleData + 0x64),
-                       *(float*)(pppMngStPtr + 0x2C) * *(float*)(particleData + 0x68),
-                       *(float*)(pppMngStPtr + 0x30) * *(float*)(particleData + 0x6C));
+                       *(float*)((u8*)pppMngStPtr + 0x28) * *(float*)(particleData + 0x64),
+                       *(float*)((u8*)pppMngStPtr + 0x2C) * *(float*)(particleData + 0x68),
+                       *(float*)((u8*)pppMngStPtr + 0x30) * *(float*)(particleData + 0x6C));
             PSMTXConcat(*(Mtx*)particleData, scaledMtx, drawMtx);
             PSMTXConcat(ppvCameraMatrix0, drawMtx, drawMtx);
             PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, worldMtx);
@@ -781,7 +781,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             r = colorR;
             g = colorG;
             b = colorB;
-            a = (int)((double)(int)colorA - *(float*)(particleData + 0x88));
+            a = (int)((float)(int)colorA - *(float*)(particleData + 0x88));
 
             if (particleColor != NULL) {
                 r += (int)particleColor[0];

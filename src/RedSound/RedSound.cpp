@@ -126,7 +126,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	if (param_3 > 0 && param_5 > 0) {
 		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
 			if (gRedMemoryDebugEnabled != 0) {
-				OSReport("%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
+				OSReport(s_redSoundMemorySettingErrorFmt, sRedSoundLogPrefix,
 				         sRedSoundLogErrorColor, (u32)param_2,
 				         param_3, sRedSoundLogReset);
 				fflush(__files + 1);
@@ -136,7 +136,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
 			if (gRedMemoryDebugEnabled != 0) {
-				OSReport("%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
+				OSReport(s_redSoundAMemorySettingErrorFmt, sRedSoundLogPrefix,
 				         sRedSoundLogErrorColor, param_4, param_5,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
@@ -146,7 +146,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 		if (ARCheckInit() == 0) {
 			if (gRedMemoryDebugEnabled != 0) {
-				OSReport("%s\"AR\" was not initialized.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
+				OSReport(s_redSoundArNotInitializedFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
 			}
@@ -163,7 +163,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		gRedDriver.Init();
 
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("%s%sSound Driver Initialize OK.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogInfoColor,
+			OSReport(s_redSoundInitOkFmt, sRedSoundLogPrefix, sRedSoundLogInfoColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}
@@ -171,7 +171,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		param_3 = 0;
 
 		if (gRedMemoryDebugEnabled != 0) {
-			OSReport("%s%sSound Driver Initialize ERROR !!%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
+			OSReport(s_redSoundInitErrorFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
 		}

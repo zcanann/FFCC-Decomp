@@ -236,8 +236,8 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
                     _PARTICLE_COLOR* particleColor)
 {
     unsigned char* breath = (unsigned char*)pYmBreath;
+    int alpha = vColor->m_alpha;
     Vec* particle = reinterpret_cast<Vec*>(particleData);
-    unsigned int alpha = vColor->m_alpha;
     char frameCount;
     Vec step;
 
@@ -259,13 +259,13 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
     }
 
     particle[3].y += particle[3].z;
-    if ((*(unsigned char*)(breath + 0xC2) & 0x10) == 0) {
-        particle[3].z += *(float*)(breath + 0x98);
-    } else {
+    if ((*(unsigned char*)(breath + 0xC2) & 0x10) != 0) {
         particle[3].z = particle[3].z + *(float*)(breath + 0x98) + particle[4].x;
+    } else {
+        particle[3].z += *(float*)(breath + 0x98);
     }
 
-    while (particle[3].y >= 6.2831855f) {
+    while (6.2831855f <= particle[3].y) {
         particle[3].y -= 6.2831855f;
     }
     while (particle[3].y < 0.0f) {
@@ -274,23 +274,22 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
 
     particle[4].y += particle[5].x;
     particle[4].z += particle[5].y;
-    if ((*(unsigned char*)(breath + 0xC1) & 0x10) == 0) {
-        particle[5].x += *(float*)(breath + 0x70);
-        particle[5].y += *(float*)(breath + 0x74);
-    } else {
+    if ((*(unsigned char*)(breath + 0xC1) & 0x10) != 0) {
         particle[5].x = particle[5].x + *(float*)(breath + 0x70) + particle[5].z;
         particle[5].y = particle[5].y + *(float*)(breath + 0x74) + particle[6].x;
+    } else {
+        particle[5].x += *(float*)(breath + 0x70);
+        particle[5].y += *(float*)(breath + 0x74);
     }
 
     particle[6].z += *(float*)(breath + 0xA4);
-    if (*(char*)(breath + 0xC8) == '\0') {
+    if (*(unsigned char*)(breath + 0xC8) == 0) {
         float start = *(float*)(breath + 0xA0);
-        float delta = *(float*)(breath + 0xA4);
-        if ((start > 0.0f) && (delta < 0.0f)) {
+        if ((0.0f < start) && (*(float*)(breath + 0xA4) < 0.0f)) {
             if (particle[6].z < 0.0f) {
                 particle[6].z = 0.0f;
             }
-        } else if ((start < 0.0f) && (0.0f < delta) && (0.0f < particle[6].z)) {
+        } else if ((start < 0.0f) && (0.0f < *(float*)(breath + 0xA4)) && (0.0f < particle[6].z)) {
             particle[6].z = 0.0f;
         }
     }
@@ -298,7 +297,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, _PARTICLE_DATA* 
     PSVECScale(&particle[1], &step, particle[6].z);
     PSVECAdd(&step, &particle[0], &particle[0]);
 
-    if (*(short*)(breath + 0x24) != 0) {
+    if (*(unsigned short*)(breath + 0x24) != 0) {
         *(short*)&particle[2].z = *(short*)&particle[2].z - 1;
     }
     *(char*)&particle[7].x = *(char*)&particle[7].x + 1;

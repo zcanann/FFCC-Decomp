@@ -278,8 +278,12 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, _PARTICLE_DATA*, Mtx*, _pppM
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800DBFD4
+ * PAL Size: 940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
     VBreathModel*, PBreathModel* pBreathModel, _PARTICLE_DATA* particleData, VColor* vColor, _PARTICLE_COLOR* particleColor)
@@ -334,22 +338,25 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP14_PARTICLE_DATA
     }
 
     particle[11].z += *(float*)(breath + 0xA4);
-    if (*(char*)(breath + 0xC8) == '\0') {
+    signed char clampScale = *(signed char*)(breath + 0xC8);
+    if (clampScale == 0) {
         float start = *(float*)(breath + 0xA0);
+        float zero = 0.0f;
         float delta = *(float*)(breath + 0xA4);
-        if ((start > 0.0f) && (delta < 0.0f)) {
-            if (particle[11].z < 0.0f) {
-                particle[11].z = 0.0f;
+        if ((start > zero) && (delta < zero)) {
+            if (particle[11].z < zero) {
+                particle[11].z = zero;
             }
-        } else if ((start < 0.0f) && (0.0f < delta) && (0.0f < particle[11].z)) {
-            particle[11].z = 0.0f;
+        } else if ((start < zero) && (zero < delta) && (zero < particle[11].z)) {
+            particle[11].z = zero;
         }
     }
 
     PSVECScale(&particle[5], &step, particle[11].z);
     PSVECAdd(&step, &particle[4], &particle[4]);
 
-    if (*(short*)(breath + 0x20) != 0) {
+    short life = *(short*)(breath + 0x20);
+    if (life != 0) {
         *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
     }
     *(char*)&particle[12].x = *(char*)&particle[12].x + 1;

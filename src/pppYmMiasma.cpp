@@ -9,7 +9,7 @@
 #include <dolphin/gx.h>
 #include <string.h>
 
-extern int rand();
+extern "C" int rand(void);
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
 extern float FLOAT_80330650;
@@ -162,20 +162,23 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
             YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+            long* shape = (*(long***)pppEnvStPtr->m_particleColors)[step->m_dataValIndex];
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
             Vec worldPos;
             GXColor amb;
+            float scale;
+            s16 shapeAngle;
 
             pppUnitMatrix(model);
-            model.value[2][2] = state->m_speed;
-            model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
-            model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
-            model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
+            scale = state->m_speed;
+            model.value[0][0] = pppMngStPtr->m_scale.x * scale;
+            model.value[1][1] = pppMngStPtr->m_scale.y * scale;
+            model.value[2][2] = pppMngStPtr->m_scale.z * scale;
 
-            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)(double)state->m_shapeAngle);
+            shapeAngle = state->m_shapeAngle;
+            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
             scaleMatrix = model;
             pppMulMatrix(model, rotMatrix, scaleMatrix);
 
@@ -200,7 +203,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
             pppDrawShp__FPlsP12CMaterialSetUc(
-                *shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+                shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);
@@ -232,7 +235,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
     work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
-    if (step->m_graphId == pppYmMiasma_->field0_0x0) {
+    if (step->m_graphId == pppYmMiasma_->m_graphId) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
         work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
         work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;
@@ -255,11 +258,11 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         work->m_speedDecay = FLOAT_80330644;
     }
 
-    if (step->m_emitInterval < work->m_emitTimer) {
+    if (work->m_emitTimer > step->m_emitInterval) {
         int r;
         s16 angleDelta;
         u32 signBit;
-        u32 angleIdx;
+        s32 angleIdx;
         u32 local_28;
         u32 uStack_24;
 
@@ -267,16 +270,16 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
         work->m_speedDecay = step->m_unk18;
 
         r = rand();
-        angleDelta = (s16)r - (s16)(r / (int)step->m_angleRange) * step->m_angleRange;
+        angleDelta = (s16)(r - (r / (int)step->m_angleRange) * step->m_angleRange);
         signBit = (u32)(int)angleDelta >> 31;
-        if ((((int)angleDelta & 1U) ^ signBit) == signBit) {
-            angleDelta = -angleDelta;
+        if (((((int)angleDelta & 1U) ^ signBit) - signBit) == 0) {
+            angleDelta = angleDelta * -1;
         }
 
         local_28 = 0x43300000;
         uStack_24 = (u32)(s16)(angleDelta + step->m_baseAngle) ^ 0x80000000;
         temp.ull = ((unsigned long long)local_28 << 32) | (unsigned long long)uStack_24;
-        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(temp.d - DOUBLE_80330648)) / FLOAT_80330654);
+        angleIdx = (s32)((((float)(temp.d - DOUBLE_80330648) * FLOAT_80330640) * FLOAT_80330650) / FLOAT_80330654);
         work->m_impulse.x = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
         work->m_impulse.y = FLOAT_80330644;
         work->m_impulse.z = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
@@ -506,7 +509,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
 void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
-    u32 angle;
+    s32 angle;
     float trigCos;
     float trigSin;
     u32 randomValue;
@@ -534,7 +537,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
     shapeRandom = rand();
     shapeCount = *(short*)((u8*)*shapeTable + 6);
-    angle = (u32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
+    angle = (s32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
     shapeCount = (short)(shapeRandom - (shapeRandom / (int)shapeCount) * shapeCount);
     state->m_shapeDrawFrame = shapeCount;
     state->m_shapeCurrentFrame = shapeCount;
@@ -561,7 +564,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         pppAddVector(*(Vec*)particleData, *(Vec*)particleData->m_matrix[0], basePos);
     }
-    state->m_lifeFrames = (short)(pYmMiasma->m_lifeBase + (randomValue - (randomValue / pYmMiasma->m_lifeRange) * pYmMiasma->m_lifeRange));
+    state->m_lifeFrames = (short)(pYmMiasma->m_lifeBase
+        + ((int)randomValue - ((int)randomValue / (int)pYmMiasma->m_lifeRange) * pYmMiasma->m_lifeRange));
     state->m_color.m_r = (u16)pYmMiasma->m_colorStartR;
     state->m_color.m_g = (u16)pYmMiasma->m_colorStartG;
     state->m_color.m_b = (u16)pYmMiasma->m_colorStartB;

@@ -39,7 +39,7 @@ extern double DOUBLE_80332f58;
 namespace {
 struct TmpArtiState {
     unsigned char pad_0000[0xB];
-    unsigned char initialized;
+    char initialized;
     unsigned char pad_000C;
     unsigned char closeRequested;
     unsigned char pad_000E[0x10];
@@ -261,7 +261,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		do {
 			dVar1 = DOUBLE_80332f40;
 			if (entry->startFrame <= iVar10) {
-				if (iVar10 < entry->startFrame + entry->duration) {
+				if (entry->startFrame + entry->duration > iVar10) {
 					entry->timer = entry->timer + 1;
 					entry->alpha = (float)((DOUBLE_80332f48 /
 						((double)(unsigned int)entry->duration - dVar1)) *
@@ -480,7 +480,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 		do {
 			dVar2 = DOUBLE_80332f40;
 			if (*(int *)(psVar4 + 0x12) <= iVar7) {
-				if (iVar7 < *(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14)) {
+				if (*(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14) > iVar7) {
 					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
 					dVar3 = DOUBLE_80332f50;
 					*(float *)(psVar4 + 8) =

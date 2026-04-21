@@ -87,7 +87,7 @@ p_usb.cpp:
 	extabindex  start:0x8000B440 end:0x8000B4AC
 	.text       start:0x8001FF6C end:0x80020494
 	.ctors      start:0x801D53BC end:0x801D53C0
-	.rodata     start:0x801D6D08 end:0x801D6D20
+	.rodata     start:0x801D6D08 end:0x801D6D24
 	.data       start:0x801E8690 end:0x801E8818
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E838 end:0x8032E840
@@ -267,6 +267,7 @@ mapanim.cpp:
 	extabindex  start:0x8000C610 end:0x8000C6AC
 	.text       start:0x8004A4A0 end:0x8004B1D0
 	.rodata     start:0x801D7CB8 end:0x801D7CF8
+	.data       start:0x801EA488 end:0x801EA494
 	.sdata2     start:0x8032FC98 end:0x8032FCA8
 
 maplight.cpp:

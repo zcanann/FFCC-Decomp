@@ -54,7 +54,7 @@ extern "C" void* __vc__25CPtrArray_P11CTexAnimSeq_FUl(void*, unsigned long);
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
-static const char DAT_8032fb48[] = "";
+static const char DAT_8032fb48[] = "e1";
 const float FLOAT_8032fb38 = 0.0f;
 const float FLOAT_8032fb3c = 1.0f;
 const float FLOAT_8032fb4c = 1.25f;

@@ -914,26 +914,30 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
-	CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
-	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
-	CMapCylinderRaw cyl;
+	float zero = kPolyGroupBaseX;
+	float probeY = kPolyGroupBaseY;
+	float topOffset = kPolyGroupTopOffsetY;
+	float maxValue = kPolyGroupAabbMax;
+	float minValue = kPolyGroupAabbMin;
+	CVector base(zero, probeY, zero);
+	CVector top(pos->x, pos->y + topOffset, pos->z);
+	CMapCylinder cyl;
 
-	cyl.m_top.x = kPolyGroupAabbMax;
-	cyl.m_top.y = kPolyGroupAabbMax;
-	cyl.m_top.z = kPolyGroupAabbMax;
-	cyl.m_direction2.x = kPolyGroupAabbMin;
-	cyl.m_direction2.y = kPolyGroupAabbMin;
-	cyl.m_direction2.z = kPolyGroupAabbMin;
+	cyl.m_top.z = maxValue;
+	cyl.m_top.y = maxValue;
+	cyl.m_top.x = maxValue;
+	cyl.m_direction2.z = minValue;
+	cyl.m_direction2.y = minValue;
+	cyl.m_direction2.x = minValue;
 	cyl.m_bottom.x = top.x;
 	cyl.m_bottom.y = top.y;
 	cyl.m_bottom.z = top.z;
-	cyl.m_direction.x = base.x;
-	cyl.m_direction.y = base.y;
-	cyl.m_direction.z = base.z;
-	cyl.m_radius = kPolyGroupBaseZ;
+	cyl.m_direction.x = zero;
+	cyl.m_direction.y = probeY;
+	cyl.m_direction.z = zero;
+	cyl.m_radius = zero;
 
-	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-	                                reinterpret_cast<Vec*>(&base), mask) != 0)
+	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&base), mask) != 0)
 	{
 		return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
 	}

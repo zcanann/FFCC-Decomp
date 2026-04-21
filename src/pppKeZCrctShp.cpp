@@ -6,8 +6,8 @@ extern const float FLOAT_803304F8;
 extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
 
 struct pppKeZCrctShpObject {
-    char _pad00[0x10];
-    pppFMATRIX m_localMatrix;
+    u8 _pad0[0xc];
+    _pppPObject m_object;
 };
 
 /*
@@ -21,28 +21,28 @@ struct pppKeZCrctShpObject {
  */
 void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtrlTable* ctrlTable)
 {
-    Vec rowX;
-    Vec rowY;
-    Vec rowZ;
-    Vec rowPos;
-    Vec scaledX;
-    Vec scaledY;
-    Vec scaledZ;
-    Vec transformedPos;
-    Vec zeroVec;
+    Vec transformedPos ATTRIBUTE_ALIGN(8);
+    Vec rowX ATTRIBUTE_ALIGN(8);
+    Vec rowY ATTRIBUTE_ALIGN(8);
+    Vec rowZ ATTRIBUTE_ALIGN(8);
+    Vec rowPos ATTRIBUTE_ALIGN(8);
+    Vec scaledX ATTRIBUTE_ALIGN(8);
+    Vec scaledY ATTRIBUTE_ALIGN(8);
+    Vec scaledZ ATTRIBUTE_ALIGN(8);
+    Vec zeroVec ATTRIBUTE_ALIGN(8);
     pppFMATRIX transformMatrix;
     u8 mode;
 
     (void)ctrlTable;
 
-    pppGetRowVector(((pppKeZCrctShpObject*)object)->m_localMatrix, rowX, rowY, rowZ, rowPos);
+    pppGetRowVector(((pppKeZCrctShpObject*)object)->m_object.m_localMatrix, rowX, rowY, rowZ, rowPos);
     pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
 
-    zeroVec.x = FLOAT_803304F8;
-    zeroVec.y = FLOAT_803304F8;
     zeroVec.z = FLOAT_803304F8;
+    zeroVec.y = FLOAT_803304F8;
+    zeroVec.x = FLOAT_803304F8;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);
@@ -78,7 +78,7 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
         zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
         zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;
         zeroVec.z += stepData->m_offset.z * pppMngStPtr->m_scale.z;
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix0, zeroVec);
+        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix02, zeroVec);
 
         transformMatrix.value[0][3] = zeroVec.x;
         transformMatrix.value[1][3] = zeroVec.y;

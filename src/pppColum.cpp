@@ -43,6 +43,11 @@ union ColumFloatBits {
 
 static const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
 
+extern float FLOAT_80331078;
+extern float FLOAT_8033107C;
+extern float FLOAT_80331080;
+extern float FLOAT_803310A8;
+
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 unsigned char GetNoise__5CUtilFUc(void*, unsigned int);
@@ -85,7 +90,6 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionBase[0x32] != 0) {
-            float* cameraMatrix = &ppvCameraMatrix0[0][0];
             Vec shapePosA;
             Vec shapePosB;
             Vec center;
@@ -104,9 +108,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             PSMTXIdentity(identityMtx);
             baseX = *(float*)(positionBase + 0x10);
             baseY = *(float*)(positionBase + 0x14);
-            cameraDelta.x = cameraMatrix[3] - baseX;
-            cameraDelta.y = cameraMatrix[7] - baseY;
-            cameraDelta.z = cameraMatrix[11] + *(float*)(positionBase + 0x18);
+            cameraDelta.x = FLOAT_80331078 - baseX;
+            cameraDelta.y = FLOAT_8033107C - baseY;
+            cameraDelta.z = FLOAT_80331080 + *(float*)(positionBase + 0x18);
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
             if (lengthXY > 0.0f) {
@@ -132,7 +136,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
             pppInitBlendMode();
             values = *(pppColumValue**)(frameBase + 8);
-            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
+            segmentStep = (FLOAT_803310A8 * lengthXY) / ((float)param_2->m_count - 1.0f);
             drawScale = 0.0f;
 
             for (int i = 0; i < param_2->m_count; i++) {

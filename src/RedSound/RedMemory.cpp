@@ -90,9 +90,9 @@ int RedNew(int param_1)
 	result = 0;
 
 	if (param_1 >= 1) {
-		blockList = m_MemoryBank;
+		blockList = redMainMemoryBank;
 		if (blockList != 0) {
-			address = m_DataBuffer;
+			address = redMainDataBuffer;
 			if (address != 0) {
 				interrupts = OSDisableInterrupts();
 				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
@@ -109,7 +109,8 @@ int RedNew(int param_1)
 							break;
 						}
 
-						if ((unsigned int)(address + alignedSize) <= (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
+						if ((unsigned int)(address + alignedSize) <=
+						    (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
 							if (slot[1] > 0) {
 								moveCount = (int)(blockList + 0x800) - (int)(slot + 2);
 								entryCount = moveCount / 8;

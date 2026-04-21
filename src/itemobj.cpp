@@ -101,17 +101,74 @@ extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
 static const char DAT_801dcec0[] = "num free item = %d\n";
-extern char DAT_801dced4[];
+static const char DAT_801dced4[] = {
+    (char)0x8F, (char)0xC1, (char)0x82, (char)0xB9, (char)0x82, (char)0xE9, (char)0x83, 0x49,
+    (char)0x83, 0x75, (char)0x83, 0x57, (char)0x83, 0x46, (char)0x83, 0x4E,
+    (char)0x83, 0x67, (char)0x82, (char)0xAA, (char)0x82, (char)0xA0, (char)0x82, (char)0xE8,
+    (char)0x82, (char)0xDC, (char)0x82, (char)0xB9, (char)0x82, (char)0xF1, (char)0x81, 0x42,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
 static const char DAT_801dcef8[] = "num delete item = %d\n";
-extern char DAT_801dcf10[];
-extern char DAT_801dcf80[];
-extern char DAT_801dcf34[];
+static const char DAT_801dcf10[] = {
+    (char)0x83, 0x41, (char)0x83, 0x43, (char)0x83, 0x65, (char)0x83, (char)0x80,
+    (char)0x82, (char)0xF0, (char)0x90, (char)0xB6, (char)0x90, (char)0xAC, (char)0x82, (char)0xC5,
+    (char)0x82, (char)0xAB, (char)0x82, (char)0xDC, (char)0x82, (char)0xB9, (char)0x82, (char)0xF1,
+    (char)0x82, (char)0xC5, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD, (char)0x81, 0x42,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
+static const char DAT_801dcf80[] = {
+    (char)0x8E, (char)0x9E, (char)0x8A, (char)0xD4, (char)0x82, (char)0xA9, (char)0x8B, (char)0x97,
+    (char)0x97, (char)0xA3, (char)0x82, (char)0xC5, (char)0x83, 0x41, (char)0x83, 0x43,
+    (char)0x83, 0x65, (char)0x83, (char)0x80, (char)0x82, (char)0xAA, (char)0x8F, (char)0xC1,
+    (char)0x82, (char)0xA6, (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, 0x42,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
+static const char DAT_801dcf34[] = {
+    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
+    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x8D, (char)0xEC,
+    (char)0x90, (char)0xAC, 0x20, 0x69, 0x64, 0x78, 0x50, 0x61,
+    0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
 static const char DAT_801dcf58[] = "itemobj.cpp";
-extern char DAT_801dcf64[];
-extern char DAT_801dd010[];
-extern char DAT_801dcfa4[];
-extern char DAT_801dcfc8[];
-extern char DAT_801dcfec[];
+static const char DAT_801dcf64[] = {
+    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
+    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x94, (char)0xF1,
+    (char)0x93, (char)0xAF, (char)0x8A, (char)0xFA, (char)0x8A, 0x4A, (char)0x8E, 0x6E,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
+static const char DAT_801dd010[] = {
+    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
+    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x94, (char)0xF1,
+    (char)0x93, (char)0xAF, (char)0x8A, (char)0xFA, (char)0x8F, 0x49, (char)0x97, (char)0xB9,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00,
+    0x43, 0x47, 0x50, 0x72, 0x67, 0x4F, 0x62, 0x6A,
+    (char)0x00, (char)0x00, (char)0x00, (char)0x00, 0x43, 0x46, 0x6C, 0x61,
+    0x74, 0x52, 0x75, 0x6E, 0x74, 0x69, 0x6D, 0x65,
+    0x3A, 0x3A, 0x43, 0x4F, 0x62, 0x6A, 0x65, 0x63,
+    0x74, (char)0x00, (char)0x00, (char)0x00,
+};
+static const char DAT_801dcfa4[] = {
+    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
+    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x8E, (char)0xB8,
+    (char)0x94, 0x73, 0x20, 0x69, 0x64, 0x78, 0x50, 0x61,
+    0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
+static const char DAT_801dcfc8[] = {
+    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
+    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x90, (char)0xAC,
+    (char)0x8C, (char)0xF7, 0x20, 0x69, 0x64, 0x78, 0x50, 0x61,
+    0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
+    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+};
+static const char DAT_801dcfec[] = {
+    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x96, (char)0x82,
+    (char)0x90, (char)0xCE, (char)0x82, (char)0xF0, (char)0x90, (char)0xB6, (char)0x90, (char)0xAC,
+    (char)0x82, (char)0xC5, (char)0x82, (char)0xAB, (char)0x82, (char)0xDC, (char)0x82, (char)0xB9,
+    (char)0x82, (char)0xF1, (char)0x82, (char)0xC5, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD,
+    (char)0x81, 0x42, (char)0x0A, (char)0x00,
+};
 static const char s_f051_root_801dceb4[] = "f051_root";
 extern "C" char m_aiWork__8CGMonObj[];
 
@@ -283,7 +340,7 @@ void CGItemObj::onFrame()
 
 	if (handle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(handle) != 0) {
 		if ((unsigned int)System.m_execParam > 2U) {
-			Printf__7CSystemFPce(&System, DAT_801dd010);
+			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
 		}
 
 		*(void**)(self + 0xF8) = *(void**)(self + 0x564);
@@ -360,7 +417,7 @@ void CGItemObj::onFrameStat()
 			}
 
 			if (*(int*)(self + 0x94) < 1 || DOUBLE_80331ba0 < distance) {
-				Printf__7CSystemFPce(&System, DAT_801dcf80);
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf80));
 				*(float*)(self + 0x4b8) = FLOAT_80331b54;
 				*(float*)(self + 0x4b4) = zero;
 				*(unsigned int*)(self + 0x1c0) = 1;
@@ -611,7 +668,8 @@ void CGItemObj::onFrameStat()
 			ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam > 2U) {
-				Printf__7CSystemFPce(&System, (stateId == 0x26) ? DAT_801dcfc8 : DAT_801dcfa4, ownerSlot);
+				Printf__7CSystemFPce(
+				    &System, const_cast<char*>((stateId == 0x26) ? DAT_801dcfc8 : DAT_801dcfa4), ownerSlot);
 			}
 
 			*(int*)(SoundBuffer + ownerSlot * 4 + 0x4F4) = 0;
@@ -619,7 +677,7 @@ void CGItemObj::onFrameStat()
 				CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, FLOAT_80331b20, 0);
 				if (newItem == 0) {
 					if ((unsigned int)System.m_execParam > 1U) {
-						Printf__7CSystemFPce(&System, DAT_801dcfec);
+						Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcfec));
 					}
 				} else {
 					unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
@@ -694,7 +752,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 	}
 
 	if ((unsigned int)System.m_execParam > 2U && deletedCount < maxDeleteCount) {
-		Printf__7CSystemFPce(&System, DAT_801dced4);
+		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 	}
 
 	return deletedCount;
@@ -753,7 +811,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (bestItemObj == 0) {
 			if ((unsigned int)System.m_execParam > 2U) {
-				Printf__7CSystemFPce(&System, DAT_801dced4);
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 			}
 		} else {
 			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
@@ -763,7 +821,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcef8), deletedCount);
 		if (deletedCount == 0) {
 			if ((unsigned int)System.m_execParam > 2U) {
-				Printf__7CSystemFPce(&System, DAT_801dcf10);
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf10));
 			}
 			return 0;
 		}
@@ -833,7 +891,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		void* ownerScriptSlot = owner->m_scriptHandle[0xED];
 		if ((unsigned int)System.m_execParam > 2U) {
-			Printf__7CSystemFPce(&System, DAT_801dcf34, ownerScriptSlot);
+			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
 		}
 		*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
 
@@ -854,7 +912,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 
 		if ((unsigned int)System.m_execParam > 2U) {
-			Printf__7CSystemFPce(&System, DAT_801dcf64);
+			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
 		}
 	}
 

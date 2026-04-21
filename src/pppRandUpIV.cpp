@@ -21,6 +21,8 @@ struct PppRandUpIVParam3 {
     s32* fieldC;
 };
 
+static int randint(int, float);
+
 /*
  * --INFO--
  * PAL Address: 0x80062e0c
@@ -65,4 +67,9 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     target[0] += (s32)((f32)in->field8 * scale);
     target[1] += (s32)((f32)in->fieldC * scale);
     target[2] += (s32)((f32)in->field10 * scale);
+}
+
+static int randint(int value, float scale)
+{
+    return (int)((float)value * scale);
 }

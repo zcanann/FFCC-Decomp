@@ -73,8 +73,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 {
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     u8* objBytes = (u8*)column;
-    u8* frameBase = objBytes + serializedDataOffsets[3] + 0x80;
-    u8* positionBase = objBytes + serializedDataOffsets[2] + 0x80;
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(objBytes + serializedDataOffsets[3] + 0x80);
+    pppColumPositionWork* positionWork = (pppColumPositionWork*)(objBytes + serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
@@ -84,8 +84,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         int texture;
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
-        if (positionBase[0x32] != 0) {
-            float* cameraMatrix = &ppvCameraMatrix0[0][0];
+        if (positionWork->m_alpha != 0) {
             Vec shapePosA;
             Vec shapePosB;
             Vec center;
@@ -102,11 +101,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             pppColumValue* values;
 
             PSMTXIdentity(identityMtx);
-            baseX = *(float*)(positionBase + 0x10);
-            baseY = *(float*)(positionBase + 0x14);
-            cameraDelta.x = cameraMatrix[3] - baseX;
-            cameraDelta.y = cameraMatrix[7] - baseY;
-            cameraDelta.z = cameraMatrix[11] + *(float*)(positionBase + 0x18);
+            baseX = positionWork->m_position.x;
+            baseY = positionWork->m_position.y;
+            cameraDelta.x = 320.0f - baseX;
+            cameraDelta.y = 224.0f - baseY;
+            cameraDelta.z = -0.5f + positionWork->m_position.z;
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
             if (lengthXY > 0.0f) {
@@ -126,25 +125,25 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             if (lengthXY < 0.0f) {
                 lengthXY = NAN;
             }
-            if (lengthXY > 0.0f) {
+            if (lengthXY > 0.000001f) {
                 PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
 
             pppInitBlendMode();
-            values = *(pppColumValue**)(frameBase + 8);
-            segmentStep = (150.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
+            values = frameWork->m_values;
+            segmentStep = (2.0f * lengthXY) / ((float)param_2->m_count - 1.0f);
             drawScale = 0.0f;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
                 float index = (float)(i + 1);
-                u8 alpha = positionBase[0x32];
+                u8 alpha = positionWork->m_alpha;
 
                 center.z = 0.0f;
                 center.x = baseX + positionScale * (cameraDelta.x * index);
                 center.y = baseY + positionScale * (cameraDelta.y * index);
 
-                PSVECSubtract(&center, (Vec*)(positionBase + 0x10), &offset);
+                PSVECSubtract(&center, &positionWork->m_position, &offset);
                 {
                     float dist = PSVECMag(&offset);
                     float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
@@ -172,12 +171,12 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
                 drawScale += values->m_scaleStep;
                 u8* frameData =
-                    (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (*(s16*)(frameBase + 2) * 8) + 0x10);
+                    (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
                 for (int j = 0; j < *(short*)(frameData + 2); j++) {
                     pppGetShapePos__FPlsR3VecR3Veci(
-                        (long*)shapeSt->m_animData, *(s16*)(frameBase + 2), shapePosA, shapePosB, j);
+                        (long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);
                     pppGetShapeUV__FPlsR5Vec2dR5Vec2di(
-                        (long*)shapeSt->m_animData, *(s16*)(frameBase + 2), uvA, uvB, j);
+                        (long*)shapeSt->m_animData, frameWork->m_shapeB, uvA, uvB, j);
 
                     PSVECScale(&shapePosA, &shapePosA, drawScale);
                     PSVECScale(&shapePosB, &shapePosB, drawScale);

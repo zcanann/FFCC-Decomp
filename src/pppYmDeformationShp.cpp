@@ -617,19 +617,19 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	int textureIndex = 0;
-	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
 	YmDeformationShpState* work =
 		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	int textureIndex = 0;
+	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
 	Mtx rotMtx;
 	float indMtx[2][3];
 	Vec vertices[4];
 	Vec2d uvs[4];
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
-		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
 		YmDeformationShpColorInfo* colorInfo =
 			(YmDeformationShpColorInfo*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[1]);
+		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
 		int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
 			env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
@@ -707,9 +707,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[3].y = FLOAT_803305f8;
 			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, vertices, uvs);
 		} else {
-			float size = (float)param_2->m_size;
-			float split = (float)param_2->m_splitSize;
-			float uvSplit = (FLOAT_803305f8 / (size + size)) * (size - split);
+			int size = param_2->m_size;
+			int split = param_2->m_splitSize;
+			float uvSplit = (FLOAT_803305f8 / (float)(size + size)) * (float)(size - split);
 			float uvRemainder = FLOAT_803305f8 - uvSplit;
 
 			if (param_2->m_orientation == 0) {

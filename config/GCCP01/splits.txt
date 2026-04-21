@@ -1002,6 +1002,7 @@ gobjwork.cpp:
 	extab       start:0x80007E04 end:0x80007F78
 	extabindex  start:0x8000E23C end:0x8000E44C
 	.text       start:0x8009E1C0 end:0x800A2DD4
+	.rodata     start:0x801D9F64 end:0x801DA000
 	.data       start:0x8020FA00 end:0x8020FAC8
 	.sdata2     start:0x803309A8 end:0x803309B8
 

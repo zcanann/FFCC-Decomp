@@ -6,6 +6,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+extern const float kQuadObjMaxBounds;
+extern const float kQuadObjMinBounds;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -125,10 +128,10 @@ void CGQuadObj::Reset(float base, float height)
 	m_vertexCount = 0;
 	m_yBase = base;
 	m_yHeight = height;
-	m_bboxMinZ = 20.0f;
-	m_bboxMinX = 20.0f;
-	m_bboxMaxZ = 1.0f;
-	m_bboxMaxX = 1.0f;
+	m_bboxMinZ = kQuadObjMaxBounds;
+	m_bboxMinX = kQuadObjMaxBounds;
+	m_bboxMaxZ = kQuadObjMinBounds;
+	m_bboxMaxX = kQuadObjMinBounds;
 }
 
 /*

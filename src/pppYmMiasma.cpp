@@ -162,20 +162,23 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
             YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+            long* shape = (*(long***)pppEnvStPtr->m_particleColors)[step->m_dataValIndex];
             pppFMATRIX model;
             pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
             Vec worldPos;
             GXColor amb;
+            float scale;
+            s16 shapeAngle;
 
             pppUnitMatrix(model);
-            model.value[2][2] = state->m_speed;
-            model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
-            model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
-            model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
+            scale = state->m_speed;
+            model.value[0][0] = pppMngStPtr->m_scale.x * scale;
+            model.value[1][1] = pppMngStPtr->m_scale.y * scale;
+            model.value[2][2] = pppMngStPtr->m_scale.z * scale;
 
-            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)(double)state->m_shapeAngle);
+            shapeAngle = state->m_shapeAngle;
+            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
             scaleMatrix = model;
             pppMulMatrix(model, rotMatrix, scaleMatrix);
 
@@ -200,7 +203,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
             pppDrawShp__FPlsP12CMaterialSetUc(
-                *shapeTable, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+                shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);

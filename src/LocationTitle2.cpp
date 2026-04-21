@@ -19,9 +19,6 @@ extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, CChara::CMode
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
-// External data references
-extern char DAT_80330f50;
-
 static int GetGraphFrameFromId(s32 graphId)
 {
     return (int)graphId / 0x1000;
@@ -192,6 +189,8 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }
 
+static const char s_locationNodeName[] = "loc";
+
 /*
  * --INFO--
  * PAL Address: 0x800da3f8
@@ -263,7 +262,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, &DAT_80330f50);
+        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, const_cast<char*>(s_locationNodeName));
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 

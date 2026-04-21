@@ -64,23 +64,6 @@ _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
- * PAL Address: 0x80064ae8
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
-{
-    s32 offset = **(s32**)((u8*)vtxAp + 0xC);
-    u16* state = (u16*)((u8*)pobj + offset + 0x80);
-    state[0] = 0;
-    state[1] = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800647e0
  * PAL Size: 776b
  * EN Address: TODO
@@ -219,14 +202,17 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: 0x80064ae8
+ * PAL Size: 32b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void apea(_pppPObject*, PVertexAp*, Vec*)
+void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
 {
-    // Intentionally empty.
+    s32 offset = **(s32**)((u8*)vtxAp + 0xC);
+    u16* state = (u16*)((u8*)pobj + offset + 0x80);
+    state[0] = 0;
+    state[1] = 0;
 }

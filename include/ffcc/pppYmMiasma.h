@@ -4,7 +4,8 @@
 #include <dolphin/types.h>
 
 struct pppYmMiasma {
-    s32 field0_0x0;
+    u8 m_pad0[0xc];
+    s32 m_graphId;
 };
 struct pppYmMiasmaUnkB;
 struct pppYmMiasmaUnkC {

@@ -17,11 +17,11 @@ extern float gPppYmMoveCircleTableDivisor;
 extern float gPppYmMoveCircleOne;
 extern float gPppYmMoveCircleRadToAngleScale;
 
-extern float gPppYmMoveParabolaYOffsetStep;
-extern float gPppYmMoveParabolaZero;
-extern float gPppYmMoveParabolaAngleScale;
-extern float gPppYmMoveParabolaAngleDivisor;
-extern float gPppYmMoveParabolaGravityScale;
+extern const float gPppYmMoveParabolaYOffsetStep;
+extern const float gPppYmMoveParabolaZero;
+extern const float gPppYmMoveParabolaAngleScale;
+extern const float gPppYmMoveParabolaAngleDivisor;
+extern const float gPppYmMoveParabolaGravityScale;
 
 extern float gPppParMoveMatrixZero;
 extern float gPppParMoveMatrixOne;

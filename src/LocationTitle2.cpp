@@ -290,9 +290,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             work->m_count++;
 
             {
-                u16 nextCount = work->m_count + 1;
+                int nextCount = work->m_count + 1;
 
-                if (unkB->m_maxCount <= nextCount) {
+                if (nextCount >= unkB->m_maxCount) {
                     return;
                 }
             }
@@ -326,9 +326,9 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
                     work->m_count++;
 
                     {
-                        u16 nextCount = work->m_count + 1;
+                        int nextCount = work->m_count + 1;
 
-                        if (unkB->m_maxCount <= nextCount) {
+                        if (nextCount >= unkB->m_maxCount) {
                             break;
                         }
                     }

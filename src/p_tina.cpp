@@ -487,51 +487,51 @@ unsigned int pppFreeMngStPrioForData()
 	};
 
 	pppMngStPrioData* selectedMngSt = 0;
-	pppMngStPrioData* pppMngStBase =
-	    reinterpret_cast<pppMngStPrioData*>(reinterpret_cast<char*>(&PartMng) + 0x2A18);
-	unsigned int selectedPrioTime = 0;
-	unsigned char selectedPrio = 1;
+	char* partMngBase = reinterpret_cast<char*>(&PartMng);
+	_pppMngSt* currentMngSt = pppMngStPtr;
+	int selectedPrio = 1;
+	unsigned int selectedPrioTime;
 	int index = 0;
 	for (int i = 0xc0; i != 0; i--) {
-		pppMngStPrioData* candidateA = pppMngStBase;
-		if (reinterpret_cast<_pppMngSt*>(candidateA) != pppMngStPtr && candidateA->m_baseTime != -0x1000 &&
+		pppMngStPrioData* candidateA = reinterpret_cast<pppMngStPrioData*>(partMngBase + 0x2A18);
+		if (reinterpret_cast<_pppMngSt*>(candidateA) != currentMngSt && candidateA->m_baseTime != -0x1000 &&
 		    candidateA->m_kind != 0) {
 			unsigned char prioA = candidateA->m_prio;
 			if (prioA > 1) {
 				if (selectedPrio < prioA) {
-					selectedMngSt = candidateA;
-					selectedPrio = prioA;
 					selectedPrioTime = candidateA->m_prioTime;
+					selectedPrio = prioA;
+					selectedMngSt = candidateA;
 				} else if (selectedPrio == prioA) {
 					unsigned int prioTimeA = candidateA->m_prioTime;
 					if ((int)selectedPrioTime < (int)prioTimeA) {
-						selectedMngSt = candidateA;
 						selectedPrioTime = prioTimeA;
+						selectedMngSt = candidateA;
 					}
 				}
 			}
 		}
 
-		pppMngStPrioData* candidateB = candidateA + 1;
-		if (reinterpret_cast<_pppMngSt*>(candidateB) != pppMngStPtr && candidateB->m_baseTime != -0x1000 &&
+		pppMngStPrioData* candidateB = reinterpret_cast<pppMngStPrioData*>(partMngBase + 0x2B70);
+		if (reinterpret_cast<_pppMngSt*>(candidateB) != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {
 			unsigned char prioB = candidateB->m_prio;
 			if (prioB > 1) {
 				if (selectedPrio < prioB) {
-					selectedMngSt = candidateB;
-					selectedPrio = prioB;
 					selectedPrioTime = candidateB->m_prioTime;
+					selectedPrio = prioB;
+					selectedMngSt = candidateB;
 				} else if (selectedPrio == prioB) {
 					unsigned int prioTimeB = candidateB->m_prioTime;
 					if ((int)selectedPrioTime < (int)prioTimeB) {
-						selectedMngSt = candidateB;
 						selectedPrioTime = prioTimeB;
+						selectedMngSt = candidateB;
 					}
 				}
 			}
 		}
 
-		pppMngStBase += 2;
+		partMngBase += 0x2B0;
 		index++;
 	}
 
@@ -539,10 +539,10 @@ unsigned int pppFreeMngStPrioForData()
 		return 0;
 	}
 
-	if (2 < (unsigned int)System.m_execParam) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(DAT_801ead4c, index);
 	}
-	if (2 < (unsigned int)System.m_execParam) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(
 			const_cast<char*>(s_tina_prio_time_fmt_801d81a0),
 			(unsigned int)selectedMngSt->m_prioTime,
@@ -551,10 +551,10 @@ unsigned int pppFreeMngStPrioForData()
 			(int)selectedMngSt->m_nodeIndex,
 			reinterpret_cast<char*>(&PartMng) + 0x22E30 + ((int)selectedMngSt->m_kind * 0x38));
 	}
-	if (2 < (unsigned int)System.m_execParam) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(DAT_801d81d4));
 	}
-	if (2 < (unsigned int)System.m_execParam) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(DAT_801ead4c);
 	}
 

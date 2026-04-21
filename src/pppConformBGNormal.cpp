@@ -92,7 +92,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     stateNormal = (Vec*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
     stateInitialized = (u8*)&stateNormal[1].x;
 
-    if ((Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
+    if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
 
             if (mode == 0) {

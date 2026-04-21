@@ -38,7 +38,6 @@ struct pppEmissionUnkC {
     s32* m_serializedDataOffsets;
 };
 
-void SetTexGenMode(PEmission*);
 void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 

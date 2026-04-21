@@ -116,263 +116,16 @@ struct EmissionParticle {
 
 /*
  * --INFO--
- * PAL Address: 0x800E6AB4
- * PAL Size: 228b
+ * PAL Address: 0x800E6060
+ * PAL Size: 32b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x64);
-
-    EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
-    EmissionMeshData* meshData = meshList[meshIndex].m_data;
-    EmissionDisplayList* displayList = meshData->m_displayLists;
-    displayList += displayListIndex;
-
-    if (strcmp((const char*)meshData, &DAT_803311fc) == 0) {
-        meshData->m_colors[0] = 0;
-        meshData->m_colors[1] = 0;
-        meshData->m_colors[2] = 0;
-        meshData->m_colors[3] = 0;
-    } else {
-        EmissionModelData* modelData = *(EmissionModelData**)((u8*)model + 0xA4);
-        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-            &MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
-        GXCallDisplayList(displayList->m_data, displayList->m_size);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
-    }
+void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
+    pppInitBlendMode();
 }
-
-/*
- * --INFO--
- * PAL Address: 0x800E65F4
- * PAL Size: 1216b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
-
-    EmissionState* state = (EmissionState*)param_2;
-    pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
-    EmissionMeshData* meshData = ((EmissionModelView*)model)->m_meshes[meshIndex].m_data;
-    if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
-        pppInitBlendMode();
-        pppSetBlendMode(step->m_payload[8]);
-        *(int*)(MaterialManRaw() + 0xD0) = state->m_texture + 0x28;
-
-        if (step->m_payload[9] == 0) {
-            for (u32 i = 0; i < step->m_initWOrk; i++) {
-                float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
-                Mtx objMtx;
-                Mtx viewMtx;
-                PSMTXScale(objMtx, scale, scale, scale);
-                PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraMatrix(), viewMtx);
-                SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
-
-                int remaining = meshData->m_displayListCount;
-                EmissionDisplayList* displayList = meshData->m_displayLists;
-                while (--remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x44) = -1;
-                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x11C) = 0;
-                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x124) = 0;
-                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x58) = 0;
-                    *(int*)(MaterialManRaw() + 0x5C) = 0;
-                    *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
-                    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
-
-                    if (step->m_payload[10] == 0) {
-                        GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-                    } else {
-                        Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
-                        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
-                        if (step->m_payload[10] == 1) {
-                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-                        } else if (step->m_payload[10] == 2) {
-                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
-                        }
-                    }
-
-                    GXSetArray((GXAttr)0xB, &state->m_colorR, 4);
-                    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-                    GXCallDisplayList(displayList->m_data, displayList->m_size);
-                    displayList++;
-                }
-            }
-        } else if (step->m_payload[9] == 1) {
-            EmissionParticle* particle = (EmissionParticle*)state->m_particles;
-            for (int i = 0; i < step->m_initWOrk; i++) {
-                float scale = particle->m_scale;
-                Mtx objMtx;
-                Mtx viewMtx;
-                PSMTXScale(objMtx, scale, scale, scale);
-                PSMTXConcat(param_5, objMtx, objMtx);
-                PSMTXCopy(CameraMatrix(), viewMtx);
-                PSMTXConcat(viewMtx, objMtx, objMtx);
-                GXLoadPosMtxImm(objMtx, 0);
-
-                int remaining = meshData->m_displayListCount;
-                EmissionDisplayList* displayList = meshData->m_displayLists;
-                while (--remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x44) = -1;
-                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x11C) = 0;
-                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x124) = 0;
-                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x58) = 0;
-                    *(int*)(MaterialManRaw() + 0x5C) = 0;
-                    *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
-                    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
-
-                    if (step->m_payload[10] == 0) {
-                        GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-                    } else {
-                        Mtx texMtx;
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
-                        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
-                        if (step->m_payload[10] == 1) {
-                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-                        } else if (step->m_payload[10] == 2) {
-                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
-                        }
-                    }
-
-                    GXSetArray((GXAttr)0xB, &particle->m_colorR, 4);
-                    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-                    GXCallDisplayList(displayList->m_data, displayList->m_size);
-                    displayList++;
-                }
-                particle++;
-            }
-        }
-
-        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x67);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800E6554
- * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
-    struct EmissionState {
-        int field0;
-        int field4;
-        u8 field8;
-        u8 field9;
-        u8 fieldA;
-        u8 fieldB;
-        float fieldC;
-        float field10;
-        float field14;
-        float field18;
-        u8 field1C;
-    };
-
-    float baseScale = FLOAT_803311f8;
-    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    int offset = serializedDataOffsets[2];
-    EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
-
-    state->field4 = 0;
-    state->field8 = 0x80;
-    state->field9 = 0x80;
-    state->fieldA = 0x80;
-    state->fieldB = 0x80;
-    state->field14 = baseScale;
-    state->field10 = baseScale;
-    state->fieldC = baseScale;
-
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
-    *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
-    state->field0 = 0;
-    state->field18 = *(float*)(model + 0x9C);
-    state->field1C = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800E6530
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
-    float baseScale = FLOAT_803311f8;
-    int offset = param_2->m_serializedDataOffsets[2];
-    float* state = (float*)((u8*)pppEmission_ + 0x80 + offset);
-    state[5] = baseScale;
-    state[4] = baseScale;
-    state[3] = baseScale;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800E6490
- * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
-    float baseScale;
-    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-
-    *(u32*)(model + 0xE4) = 0;
-    *(u32*)(model + 0xE8) = 0;
-    *(u32*)(model + 0xFC) = 0;
-    *(u32*)(model + 0x104) = 0;
-
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
-    CMemory::CStage* stage = (CMemory::CStage*)state[0];
-    if (stage != (CMemory::CStage*)0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(stage);
-        state[0] = 0;
-    }
-
-    baseScale = FLOAT_803311f8;
-    *(float*)(state + 5) = FLOAT_803311f8;
-    *(float*)(state + 4) = baseScale;
-    *(float*)(state + 3) = baseScale;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800E6080
@@ -495,52 +248,267 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 
 /*
  * --INFO--
- * PAL Address: 0x800E6060
- * PAL Size: 32b
+ * PAL Address: 0x800E6490
+ * PAL Size: 160b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
-    pppInitBlendMode();
+void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+    float baseScale;
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+
+    *(u32*)(model + 0xE4) = 0;
+    *(u32*)(model + 0xE8) = 0;
+    *(u32*)(model + 0xFC) = 0;
+    *(u32*)(model + 0x104) = 0;
+
+    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
+    CMemory::CStage* stage = (CMemory::CStage*)state[0];
+    if (stage != (CMemory::CStage*)0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(stage);
+        state[0] = 0;
+    }
+
+    baseScale = FLOAT_803311f8;
+    *(float*)(state + 5) = FLOAT_803311f8;
+    *(float*)(state + 4) = baseScale;
+    *(float*)(state + 3) = baseScale;
 }
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 200b
+ * PAL Address: 0x800E6530
+ * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetTexGenMode(PEmission* emission)
-{
-    if (emission->m_payload[10] == 0) {
-        GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    } else {
-        Mtx texMtx;
+void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+    float baseScale = FLOAT_803311f8;
+    int offset = param_2->m_serializedDataOffsets[2];
+    float* state = (float*)((u8*)pppEmission_ + 0x80 + offset);
+    state[5] = baseScale;
+    state[4] = baseScale;
+    state[3] = baseScale;
+}
 
-        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
-        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
-        if (emission->m_payload[10] == 1) {
-            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-        } else if (emission->m_payload[10] == 2) {
-            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
+/*
+ * --INFO--
+ * PAL Address: 0x800E6554
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+    struct EmissionState {
+        int field0;
+        int field4;
+        u8 field8;
+        u8 field9;
+        u8 fieldA;
+        u8 fieldB;
+        float fieldC;
+        float field10;
+        float field14;
+        float field18;
+        u8 field1C;
+    };
+
+    float baseScale = FLOAT_803311f8;
+    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
+    int offset = serializedDataOffsets[2];
+    EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
+
+    state->field4 = 0;
+    state->field8 = 0x80;
+    state->field9 = 0x80;
+    state->fieldA = 0x80;
+    state->fieldB = 0x80;
+    state->field14 = baseScale;
+    state->field10 = baseScale;
+    state->fieldC = baseScale;
+
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
+    *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
+    state->field0 = 0;
+    state->field18 = *(float*)(model + 0x9C);
+    state->field1C = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800E65F4
+ * PAL Size: 1216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
+
+    EmissionState* state = (EmissionState*)param_2;
+    pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
+    EmissionMeshData* meshData = ((EmissionModelView*)model)->m_meshes[meshIndex].m_data;
+    if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
+        pppInitBlendMode();
+        pppSetBlendMode(step->m_payload[8]);
+        *(int*)(MaterialManRaw() + 0xD0) = state->m_texture + 0x28;
+
+        if (step->m_payload[9] == 0) {
+            for (u32 i = 0; i < step->m_initWOrk; i++) {
+                float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
+                Mtx objMtx;
+                Mtx viewMtx;
+                PSMTXScale(objMtx, scale, scale, scale);
+                PSMTXConcat(param_5, objMtx, objMtx);
+                PSMTXCopy(CameraMatrix(), viewMtx);
+                SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx, objMtx);
+
+                int remaining = meshData->m_displayListCount;
+                EmissionDisplayList* displayList = meshData->m_displayLists;
+                while (--remaining >= 0) {
+                    *(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+                    *(int*)(MaterialManRaw() + 0x128) = 0;
+                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x130) = 0;
+                    *(int*)(MaterialManRaw() + 0x44) = -1;
+                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x11C) = 0;
+                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x124) = 0;
+                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x58) = 0;
+                    *(int*)(MaterialManRaw() + 0x5C) = 0;
+                    *(u8*)(MaterialManRaw() + 0x208) = 0;
+                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x128) = 0;
+                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x130) = 0;
+                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
+                    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
+
+                    if (step->m_payload[10] == 0) {
+                        GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+                    } else {
+                        Mtx texMtx;
+                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
+                        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
+                        if (step->m_payload[10] == 1) {
+                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
+                        } else if (step->m_payload[10] == 2) {
+                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
+                        }
+                    }
+
+                    GXSetArray((GXAttr)0xB, &state->m_colorR, 4);
+                    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+                    GXCallDisplayList(displayList->m_data, displayList->m_size);
+                    displayList++;
+                }
+            }
+        } else if (step->m_payload[9] == 1) {
+            EmissionParticle* particle = (EmissionParticle*)state->m_particles;
+            for (int i = 0; i < step->m_initWOrk; i++) {
+                float scale = particle->m_scale;
+                Mtx objMtx;
+                Mtx viewMtx;
+                PSMTXScale(objMtx, scale, scale, scale);
+                PSMTXConcat(param_5, objMtx, objMtx);
+                PSMTXCopy(CameraMatrix(), viewMtx);
+                PSMTXConcat(viewMtx, objMtx, objMtx);
+                GXLoadPosMtxImm(objMtx, 0);
+
+                int remaining = meshData->m_displayListCount;
+                EmissionDisplayList* displayList = meshData->m_displayLists;
+                while (--remaining >= 0) {
+                    *(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+                    *(int*)(MaterialManRaw() + 0x128) = 0;
+                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x130) = 0;
+                    *(int*)(MaterialManRaw() + 0x44) = -1;
+                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x11C) = 0;
+                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x124) = 0;
+                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+                    *(int*)(MaterialManRaw() + 0x58) = 0;
+                    *(int*)(MaterialManRaw() + 0x5C) = 0;
+                    *(u8*)(MaterialManRaw() + 0x208) = 0;
+                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x128) = 0;
+                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
+                    *(int*)(MaterialManRaw() + 0x130) = 0;
+                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
+                    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                        &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
+
+                    if (step->m_payload[10] == 0) {
+                        GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+                    } else {
+                        Mtx texMtx;
+                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx);
+                        GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
+                        if (step->m_payload[10] == 1) {
+                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
+                        } else if (step->m_payload[10] == 2) {
+                            GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
+                        }
+                    }
+
+                    GXSetArray((GXAttr)0xB, &particle->m_colorR, 4);
+                    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+                    GXCallDisplayList(displayList->m_data, displayList->m_size);
+                    displayList++;
+                }
+                particle++;
+            }
         }
+
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x67);
     }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801A1970
- * PAL Size: 64b
+ * PAL Address: 0x800E6AB4
+ * PAL Size: 228b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void GXSetTexCoordGen(void) {
-    // TODO
+void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x64);
+
+    EmissionMeshRef* meshList = *(EmissionMeshRef**)((u8*)model + 0xAC);
+    EmissionMeshData* meshData = meshList[meshIndex].m_data;
+    EmissionDisplayList* displayList = meshData->m_displayLists;
+    displayList += displayListIndex;
+
+    if (strcmp((const char*)meshData, &DAT_803311fc) == 0) {
+        meshData->m_colors[0] = 0;
+        meshData->m_colors[1] = 0;
+        meshData->m_colors[2] = 0;
+        meshData->m_colors[3] = 0;
+    } else {
+        EmissionModelData* modelData = *(EmissionModelData**)((u8*)model + 0xA4);
+        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+            &MaterialMan, modelData->m_materialSet, displayList->m_material, 0, 0);
+        GXCallDisplayList(displayList->m_data, displayList->m_size);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
+    }
 }

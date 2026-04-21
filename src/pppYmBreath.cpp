@@ -456,7 +456,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             if (particleColor != NULL) {
                 particleColor += 0x20;
             }
-            particleData += 0x98;
+            particleData += 0x60;
         }
 
         if (spawnCount > 0) {
@@ -548,10 +548,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         *(int*)(work + 0x40) = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
 
         *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x98), pppEnvStPtr->m_stagePtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(*(int*)(work + 0x40) * 0x60), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppYmBreath_cpp), 0x243);
         if (*(void**)(work + 0x30) != NULL) {
-            memset(*(void**)(work + 0x30), 0, (unsigned long)(*(int*)(work + 0x40) * 0x98));
+            memset(*(void**)(work + 0x30), 0, (unsigned long)(*(int*)(work + 0x40) * 0x60));
         }
 
         *(void**)(work + 0x34) =

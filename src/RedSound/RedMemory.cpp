@@ -68,67 +68,64 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
 int RedNew(int param_1)
 {
 	unsigned int interrupts;
-	unsigned int alignedSize;
+	int alignedSize;
 	int address;
 	int entryCount;
-	unsigned int moveCount;
+	int moveCount;
 	int* blockList;
 	int* blockEnd;
 	int* slot;
+	int result;
 
-	if (param_1 < 1) {
-		return 0;
-	}
+	result = 0;
 
-	blockList = m_MemoryBank;
-	if (blockList == 0) {
-		return 0;
-	}
+	if (param_1 >= 1) {
+		blockList = m_MemoryBank;
+		if (blockList != 0) {
+			address = m_DataBuffer;
+			if (address != 0) {
+				interrupts = OSDisableInterrupts();
+				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
+				blockEnd = blockList + 0x800;
+				slot = blockList;
 
-	address = m_DataBuffer;
-	if (address == 0) {
-		return 0;
-	}
+				do {
+					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
+						if (blockList[0x7FF] > 0) {
+							if (gRedMemoryDebugEnabled != 0) {
+								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
+								fflush(__files + 1);
+							}
+							break;
+						}
 
-	interrupts = OSDisableInterrupts();
-	alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
-	blockEnd = blockList + 0x800;
-	slot = blockList;
+						if ((unsigned int)(address + alignedSize) <= (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
+							if (slot[1] > 0) {
+								moveCount = (int)(blockList + 0x800) - (int)(slot + 2);
+								entryCount = moveCount / 8;
+								if (entryCount > 0) {
+									memmove(slot + 2, slot, entryCount * 8);
+								}
+							}
 
-	do {
-		if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
-			if (blockList[0x7FF] > 0) {
-				if (gRedMemoryDebugEnabled != 0) {
-					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
-					fflush(__files + 1);
-				}
-				break;
-			}
+							*slot = address;
+							slot[1] = alignedSize;
+							OSRestoreInterrupts(interrupts);
+							return address;
+						}
 
-			if ((unsigned int)(address + alignedSize) <= (unsigned int)(m_DataBuffer + m_DataBufferSize)) {
-				if (slot[1] > 0) {
-					moveCount = (int)blockList + (0x2000 - (int)(slot + 2));
-					entryCount = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
-					if (entryCount > 0) {
-						memmove(slot + 2, slot, entryCount * 8);
+						break;
 					}
-				}
 
-				*slot = address;
-				slot[1] = alignedSize;
+					address = *slot + slot[1];
+					slot += 2;
+				} while (slot < blockEnd);
+
 				OSRestoreInterrupts(interrupts);
-				return address;
 			}
-
-			break;
 		}
-
-		address = *slot + slot[1];
-		slot += 2;
-	} while (slot < blockEnd);
-
-	OSRestoreInterrupts(interrupts);
-	return 0;
+	}
+	return result;
 }
 
 /*

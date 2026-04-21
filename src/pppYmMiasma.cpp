@@ -215,8 +215,8 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
     static const char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
-    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     VYmMiasma* work;
+    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     int i;
     PARTICLE_DATA* particle;
     Vec matrixPos;
@@ -232,7 +232,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
 
     work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
-    if (step->m_graphId == pppYmMiasma_->field0_0x0) {
+    if (step->m_graphId == pppYmMiasma_->m_graphId) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
         work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
         work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;

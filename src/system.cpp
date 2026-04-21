@@ -157,7 +157,7 @@ void CSystem::MapChanged(int mapId, int mapVariant, int changedByForce)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == order->m_descBlock->m_entries)
 		{
 			order->m_owner->MapChanged(mapId, mapVariant, changedByForce);
 		}
@@ -172,7 +172,7 @@ void CSystem::MapChanging(int mapId, int mapVariant)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == order->m_descBlock->m_entries)
 		{
 			order->m_owner->MapChanging(mapId, mapVariant);
 		}
@@ -187,7 +187,7 @@ void CSystem::ScriptChanged(char* script, int value)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == order->m_descBlock->m_entries)
 		{
 			order->m_owner->ScriptChanged(script, value);
 		}
@@ -202,7 +202,7 @@ void CSystem::ScriptChanging(char* script)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == order->m_descBlock->m_entries)
 		{
 			order->m_owner->ScriptChanging(script);
 		}
@@ -328,13 +328,21 @@ void CSystem::ExecScenegraph()
 
         if (Pad._452_4_ == 0)
         {
-            unsigned int stepPad = (Pad._448_4_ == 4) ? 4 : 0;
+            unsigned int stepPad = (Pad._448_4_ != 4) ? 4 : 0;
             stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
-            perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + stepPad * 0x54);
         }
         else
         {
             stepTrigger = 0;
+        }
+
+        if (Pad._452_4_ == 0)
+        {
+            unsigned int perfPad = (Pad._448_4_ != 4) ? 4 : 0;
+            perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
+        }
+        else
+        {
             perfTrigger = 0;
         }
 
@@ -367,7 +375,7 @@ void CSystem::ExecScenegraph()
 
         if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x40) != 0) && (Game.m_gameWork.m_gamePaused == 0))
         {
-            for (unsigned int port = 0; port < 4; port++)
+            for (int port = 0; port < 4; port++)
             {
                 unsigned short trigger;
                 unsigned short held;
@@ -383,7 +391,7 @@ void CSystem::ExecScenegraph()
                 }
                 else
                 {
-                    unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
+                    unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
                     trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
                 }
 
@@ -398,24 +406,27 @@ void CSystem::ExecScenegraph()
                 }
                 else
                 {
-                    unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
+                    unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
                     held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
                 }
 
                 if (((trigger | held) & 0x1000) != 0)
                 {
-                    if (System.m_scenegraphStepMode == 2)
+                    if (System.m_scenegraphStepMode != 2)
+                    {
+                        if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
+                        {
+                            Sound.PauseAllSe(1);
+                            System.m_scenegraphStepMode = 2;
+                            GbaQue.SetPauseMode(1);
+                        }
+                    }
+                    else
                     {
                         Sound.PauseAllSe(0);
                         System.m_scenegraphStepMode = 0;
                         GbaQue.ClrShopMode();
                         GbaQue.SetPauseMode(0);
-                    }
-                    else if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
-                    {
-                        Sound.PauseAllSe(1);
-                        System.m_scenegraphStepMode = 2;
-                        GbaQue.SetPauseMode(1);
                     }
                 }
             }
@@ -437,7 +448,14 @@ void CSystem::ExecScenegraph()
         {
             stepGate = ((-(int)(m_frameCounter & 3)) >> 31);
         }
-        else if (scenegraphStepMode < 4)
+        else if (scenegraphStepMode >= 4)
+        {
+            if (scenegraphStepMode < 6)
+            {
+                stepGate = m_frameCounter & 1;
+            }
+        }
+        else
         {
             if (scenegraphStepMode == 2)
             {
@@ -447,10 +465,6 @@ void CSystem::ExecScenegraph()
             {
                 stepGate = ((-(int)(m_frameCounter & 7)) >> 31);
             }
-        }
-        else if (scenegraphStepMode < 6)
-        {
-            stepGate = m_frameCounter & 1;
         }
 
         float totalTime = 0.0f;
@@ -465,7 +479,7 @@ void CSystem::ExecScenegraph()
             m_currentOrder = order;
             m_currentOrderIndex = index;
 
-            unsigned int flags = *(unsigned int*)((unsigned char*)order->m_entry + 0x10);
+            unsigned int flags = order->m_entry->m_flags;
             unsigned int skip;
             if ((flags & 1) == 0)
             {

@@ -32,6 +32,9 @@ public:
     int setSize(unsigned long newSize);
 };
 
+template <>
+CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index);
+
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -42,6 +45,7 @@ extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrAr
 extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
     CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
 extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
+extern "C" CPtrArray<CMapAnimNode*>* __dt__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*, short);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
 extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
 extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
@@ -88,29 +92,6 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
     m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
     RemoveAll();
 }
-
-/*
- * --INFO--
- * PAL Address: 0x8004ae60
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-extern "C" CPtrArray<CMapAnimNode*>* dtor_8004AE60(CPtrArray<CMapAnimNode*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        ptrArray->m_vtable = __vt__8CPtrArrayIP12CMapAnimNode;
-        ptrArray->RemoveAll();
-        if (0 < param_2) {
-            __dl__FPv(ptrArray);
-        }
-    }
-    return ptrArray;
-}
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -547,7 +528,7 @@ CMapAnim::~CMapAnim()
     }
 
     reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->RemoveAll();
-    dtor_8004AE60(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this), -1);
+    __dt__26CPtrArray_P12CMapAnimNode_Fv(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this), -1);
 }
 
 /*
@@ -729,21 +710,6 @@ checkStart:
     }
     run->currentFrame = run->startFrame;
     goto runFrame;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004b978
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
-{
-    return m_items[index];
 }
 
 /*

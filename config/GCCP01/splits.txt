@@ -1124,6 +1124,7 @@ pppYmDeformationMdl.cpp:
 	extab       start:0x80008A7C end:0x80008A8C
 	extabindex  start:0x8000F484 end:0x8000F49C
 	.text       start:0x800D19F0 end:0x800D2100
+	.sdata2     start:0x80330DAC end:0x80330DC0
 
 pppPointApMtx.cpp:
 	extab       start:0x80008A8C end:0x80008A94

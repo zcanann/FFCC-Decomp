@@ -826,16 +826,19 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
         int materialIndex;
 
         if (material != 0) {
-            materialIndex = material[1];
-            material[1] = materialIndex - 1;
-            if (((materialIndex - 1) == 0) && (material != 0)) {
+            materialIndex = material[1] - 1;
+            material[1] = materialIndex;
+            if ((materialIndex == 0) && (material != 0)) {
                 (*(void (**)(int*, int))(*material + 8))(material, 1);
             }
             *reinterpret_cast<int*>((int)texAnim->refData + 0x108) = 0;
         }
 
-        if ((materialSet != 0) &&
-            ((materialIndex = static_cast<int>(materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8)))) >= 0)) {
+        if (materialSet != 0) {
+            materialIndex = static_cast<int>(materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8)));
+            if (materialIndex < 0) {
+                continue;
+            }
             void* foundMaterial =
                 (*reinterpret_cast<CPtrArray<CMaterial*>*>((int)materialSet + 8))[static_cast<unsigned long>(materialIndex)];
             *reinterpret_cast<void**>((int)texAnim->refData + 0x108) = foundMaterial;

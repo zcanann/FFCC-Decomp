@@ -24,7 +24,7 @@ extern f32 FLOAT_80330de0;
 extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
 extern f32 FLOAT_80330dec;
-extern f64 DOUBLE_80330DD0;
+extern const f64 DOUBLE_80330DD0;
 extern f64 DOUBLE_80330dd8;
 
 void pppInitBlendMode(void);

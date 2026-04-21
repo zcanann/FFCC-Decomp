@@ -1,5 +1,5 @@
 #include "ffcc/RedSound/RedMemory.h"
-#include "ffcc/RedSound/RedGlobals.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include <dolphin/os.h>
 
 int m_DataBuffer;
@@ -8,6 +8,16 @@ int m_DataBufferSize;
 int m_ADataBufferSize;
 int* m_MemoryBank;
 int* m_AMemoryBank;
+
+extern int DAT_8032f478;
+extern int DAT_8032f480;
+extern int DAT_8032f484;
+extern int* DAT_8032f488;
+
+#define redMainDataBuffer DAT_8032f478
+#define redMainDataBufferSize DAT_8032f480
+#define redADataBufferSize DAT_8032f484
+#define redMainMemoryBank DAT_8032f488
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
@@ -144,13 +154,13 @@ void RedDelete(int address)
 	}
 
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = m_MemoryBank;
+	int* blockList = redMainMemoryBank;
 
 	if (blockList != 0) {
 		int* blockEnd = blockList + 0x800;
 		int* blockPtr = blockList;
 
-		do {
+		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
 			if (*blockPtr == address) {
 				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
 
@@ -161,7 +171,7 @@ void RedDelete(int address)
 				break;
 			}
 			blockPtr += 2;
-		} while (blockPtr[1] != 0 && blockPtr < blockEnd);
+		}
 	}
 
 	OSRestoreInterrupts(interrupts);
@@ -300,7 +310,7 @@ void RedDeleteA(int address)
 		int* blockEnd = blockList + 0x800;
 		int* blockPtr = blockList;
 
-		do {
+		while ((blockPtr[1] != 0) && (blockPtr < blockEnd)) {
 			if (*blockPtr == address) {
 				int entryCount = ((int)(blockList + 0x800) - (int)(blockPtr + 2)) / 8;
 
@@ -311,7 +321,7 @@ void RedDeleteA(int address)
 				break;
 			}
 			blockPtr += 2;
-		} while (blockPtr[1] != 0 && blockPtr < blockEnd);
+		}
 	}
 
 	OSRestoreInterrupts(interrupts);
@@ -373,7 +383,7 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
  */
 int CRedMemory::GetMainBufferAddress()
 {
-	return m_DataBuffer;
+	return redMainDataBuffer;
 }
 
 /*
@@ -387,7 +397,7 @@ int CRedMemory::GetMainBufferAddress()
  */
 int CRedMemory::GetMainBufferSize()
 {
-	return m_DataBufferSize;
+	return redMainDataBufferSize;
 }
 
 /*
@@ -401,7 +411,7 @@ int CRedMemory::GetMainBufferSize()
  */
 int* CRedMemory::GetMainBankAddress()
 {
-	return m_MemoryBank;
+	return redMainMemoryBank;
 }
 
 /*
@@ -429,7 +439,7 @@ int CRedMemory::GetABufferAddress()
  */
 int CRedMemory::GetABufferSize()
 {
-	return m_ADataBufferSize;
+	return redADataBufferSize;
 }
 
 /*

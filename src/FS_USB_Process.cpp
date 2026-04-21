@@ -45,21 +45,43 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
 void CFunnyShapePcs::SetUSBData()
 {
     CUSBStreamDataHeader* usb = UsbStream(this);
-    CFunnyShape* funny = FunnyShape(this);
-    CMemory::CStage* stage = m_viewerStage;
 
     switch (usb->m_packetCode) {
     case 4:
         m_displayTextureEnabled = 1;
-        funny->ClearTextureData();
+        FunnyShape(this)->ClearTextureData();
         break;
+    case 6:
+        m_displayTextureEnabled = 0;
+        break;
+    case 12: {
+        memcpy(&m_displayPending, usb->m_data, 0x40);
+        m_displayPending.flags = BSWAP32(m_displayPending.flags);
+        m_displayPending.unk08 = BSWAP32(m_displayPending.unk08);
+        m_displayPending.unk0C = BSWAP32(m_displayPending.unk0C);
+        m_displayPending.unk10 = BSWAP32(m_displayPending.unk10);
+        m_displayPending.unk14 = BSWAP32(m_displayPending.unk14);
+        m_displayPending.unk18 = BSWAP32(m_displayPending.unk18);
+        m_displayPending.unk1C = BSWAP32(m_displayPending.unk1C);
+        m_displayPending.unk20 = BSWAP32(m_displayPending.unk20);
+        m_displayPending.unk24 = BSWAP32(m_displayPending.unk24);
+        m_displayPending.unk28 = BSWAP16(m_displayPending.unk28);
+        m_displayPending.unk2A = BSWAP16(m_displayPending.unk2A);
+        m_displayPending.unk2C = BSWAP32(m_displayPending.unk2C);
+        m_displayPending.unk30 = BSWAP32(m_displayPending.unk30);
+        DCStoreRange(&m_displayPending, 0x40);
+
+        GXSetCopyClear(m_displayPending.clear, 0xFFFFFF);
+        m_displayCurrent = m_displayPending;
+        break;
+    }
     case 5: {
         char textureIndex;
         u16* tmp = static_cast<u16*>(__nwa__FUlPQ27CMemory6CStagePci(
-            usb->m_sizeBytes, stage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x55));
+            usb->m_sizeBytes, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x55));
         textureIndex = m_textureCount;
         m_textureHeaders[textureIndex] = __nw__FUlPQ27CMemory6CStagePci(
-            0x30, stage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x57);
+            0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x57);
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
         for (int i = 0; i < 8; i++) {
@@ -72,12 +94,12 @@ void CFunnyShapePcs::SetUSBData()
         memcpy(m_textureHeaders[textureIndex], tmp, 0x30);
 
         m_textureData[textureIndex] = __nwa__FUlPQ27CMemory6CStagePci(
-            usb->m_sizeBytes - 0x30, stage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x6C);
+            usb->m_sizeBytes - 0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x6C);
         memcpy(m_textureData[textureIndex], tmp + 0x18, usb->m_sizeBytes - 0x30);
         DCFlushRange(m_textureData[textureIndex], usb->m_sizeBytes - 0x30);
 
         m_texObjData[textureIndex] = __nw__FUlPQ27CMemory6CStagePci(
-            0x20, stage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x73);
+            0x20, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x73);
         GXInitTexObj(static_cast<GXTexObj*>(m_texObjData[textureIndex]), m_textureData[textureIndex], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
         m_textureCount++;
@@ -86,16 +108,13 @@ void CFunnyShapePcs::SetUSBData()
         }
         break;
     }
-    case 6:
-        m_displayTextureEnabled = 0;
-        break;
     case 10:
-        funny->ClearAnmData();
+        FunnyShape(this)->ClearAnmData();
         if (m_anm.anmData != 0) {
             __dla__FPv(m_anm.anmData);
             m_anm.anmData = 0;
         }
-        memset(funny, 0, 0x30);
+        memset(FunnyShape(this), 0, 0x30);
         memcpy(&m_anm, usb->m_data, 0x10);
         m_anm.unk00 = BSWAP32(m_anm.unk00);
         m_anm.unk04 = BSWAP16(m_anm.unk04);
@@ -107,7 +126,7 @@ void CFunnyShapePcs::SetUSBData()
         break;
     case 11: {
         u8* animData = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
-            usb->m_sizeBytes, stage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x9C));
+            usb->m_sizeBytes, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x9C));
         m_anm.anmData = animData;
 
         memcpy(animData, usb->m_data, usb->m_sizeBytes);
@@ -185,28 +204,7 @@ void CFunnyShapePcs::SetUSBData()
             groupOffset += 8;
         }
         DCStoreRange(animData, usb->m_sizeBytes);
-        funny->InitAnmWork();
-        break;
-    }
-    case 12: {
-        memcpy(&m_displayPending, usb->m_data, 0x40);
-        m_displayPending.flags = BSWAP32(m_displayPending.flags);
-        m_displayPending.unk08 = BSWAP32(m_displayPending.unk08);
-        m_displayPending.unk0C = BSWAP32(m_displayPending.unk0C);
-        m_displayPending.unk10 = BSWAP32(m_displayPending.unk10);
-        m_displayPending.unk14 = BSWAP32(m_displayPending.unk14);
-        m_displayPending.unk18 = BSWAP32(m_displayPending.unk18);
-        m_displayPending.unk1C = BSWAP32(m_displayPending.unk1C);
-        m_displayPending.unk20 = BSWAP32(m_displayPending.unk20);
-        m_displayPending.unk24 = BSWAP32(m_displayPending.unk24);
-        m_displayPending.unk28 = BSWAP16(m_displayPending.unk28);
-        m_displayPending.unk2A = BSWAP16(m_displayPending.unk2A);
-        m_displayPending.unk2C = BSWAP32(m_displayPending.unk2C);
-        m_displayPending.unk30 = BSWAP32(m_displayPending.unk30);
-        DCStoreRange(&m_displayPending, 0x40);
-
-        GXSetCopyClear(m_displayPending.clear, 0xFFFFFF);
-        memcpy(&m_displayCurrent, &m_displayPending, sizeof(m_displayCurrent));
+        FunnyShape(this)->InitAnmWork();
         break;
     }
     case 15: {
@@ -228,7 +226,7 @@ void CFunnyShapePcs::SetUSBData()
         }
 
         u8* meshData = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
-            usb->m_sizeBytes, stage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x106));
+            usb->m_sizeBytes, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801d7e80), 0x106));
         memcpy(meshData, usb->m_data, usb->m_sizeBytes);
         *reinterpret_cast<u16*>(meshData + 0x0) = BSWAP16(*reinterpret_cast<u16*>(meshData + 0x0));
         *reinterpret_cast<u16*>(meshData + 0x2) = BSWAP16(*reinterpret_cast<u16*>(meshData + 0x2));

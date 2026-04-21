@@ -269,7 +269,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         float posY;
         float posZ;
 
-        if (Game.m_currentSceneId == 7) {
+        if ((s32)Game.m_currentSceneId == 7) {
             posX = ppvCameraMatrix02[0][3];
             posY = ppvCameraMatrix02[1][3];
             posZ = ppvCameraMatrix02[2][3];

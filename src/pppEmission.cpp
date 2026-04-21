@@ -397,12 +397,11 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
-    u8 baseAlpha = dataSet[0xB];
-    float alphaScale = (float)baseAlpha / FLOAT_803311e0;
+    float alphaScale = (float)dataSet[0xB] / FLOAT_803311e0;
     state->m_colorR = dataSet[8];
     state->m_colorG = dataSet[9];
     state->m_colorB = dataSet[0xA];
-    state->m_colorA = baseAlpha;
+    state->m_colorA = dataSet[0xB];
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
         pppEmission_, param_2->m_graphId,
@@ -434,16 +433,17 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
+            float scaleBase = FLOAT_803311e4;
             for (u32 i = 0; i < param_2->m_initWOrk; i++) {
                 Math.RandF(FLOAT_803311e4);
 
                 s16 lifeJitter = (s16)(rand() % payload[0xD]);
                 s16 safeJitter = (lifeJitter > 0) ? lifeJitter : 1;
-                s16 fade = (u16)payload[0xC] + safeJitter;
 
                 particle->m_fieldC = payload[0xF] + safeJitter;
+                s16 fade = (u16)payload[0xC] + safeJitter;
                 particle->m_fieldA = particle->m_fieldC + safeJitter + fade;
-                particle->m_scale = ((float)i * Math.RandF(*(float*)(payload + 4))) + FLOAT_803311e4;
+                particle->m_scale = ((float)i * Math.RandF(*(float*)(payload + 4))) + scaleBase;
                 particle->m_alpha = 0;
                 particle->m_fieldE = (u8)((int)payload[0xB] / (int)fade);
                 particle++;
@@ -458,10 +458,10 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
                 particle->m_fieldC = particle->m_fieldC - 1;
                 particle->m_alpha = particle->m_alpha + (payload[0xB] / payload[0xF]);
             } else {
-                if (particle->m_fieldA >= (s16)(u16)payload[0xC]) {
-                    particle->m_alpha = payload[0xB];
-                } else {
+                if ((s16)(u16)payload[0xC] > particle->m_fieldA) {
                     particle->m_alpha = particle->m_alpha - particle->m_fieldE;
+                } else {
+                    particle->m_alpha = payload[0xB];
                 }
             }
 

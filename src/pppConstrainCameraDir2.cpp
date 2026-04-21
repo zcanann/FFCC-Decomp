@@ -11,10 +11,6 @@ extern unsigned char gPppInConstructor;
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern "C" const float FLOAT_80333574 = 64.0f;
-extern "C" const float FLOAT_80333578 = 0.8f;
-extern "C" const float FLOAT_8033357C = 56.0f;
-
 void pppSetFpMatrix(_pppMngSt*);
 
 /*
@@ -50,13 +46,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             float cameraPosX = CameraPcs._224_4_;
             float cameraPosY = CameraPcs._228_4_;
             float cameraPosZ = CameraPcs._232_4_;
-            float scale = ((CameraPcs._252_4_ - 25.0f) / 25.0f) + 1.0f;
+            float scale = ((CameraPcs._252_4_ - 0.8f) / 0.8f) + 64.0f;
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 
-            pppMngSt->m_scale.x = 1.3333f * scale;
+            pppMngSt->m_scale.x = 56.0f * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = 1.0f;
+            pppMngSt->m_scale.z = 64.0f;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);

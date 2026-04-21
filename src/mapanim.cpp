@@ -51,10 +51,10 @@ extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
 extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
 extern "C" int Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(CPtrArray<CMapAnimKeyDt*>*, CMapAnimKeyDt*);
 
-static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
     "\x83\x6F\x83\x62\x83\x74\x83\x40\x90\xAC\x92\xB7\x82\xAA\x95\x73\x8B\x96\x89\xC2\x82\xC5\x82\xB7\x81\x42\x0A";
-static const char s_mapanim_cpp[] = "mapanim.cpp";
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 /*
  * --INFO--

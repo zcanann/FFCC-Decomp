@@ -80,16 +80,6 @@ struct CMapCylinderRaw {
     Vec m_expandBounds;
 };
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void InitPolygonData(PYmMelt*, VERTEX_DATA*, short)
-{
-	// TODO
-}
-
 #define CalcPolygonHeight CalcPolygonHeight__FP7PYmMeltP11VERTEX_DATAP8_GXColorf
 extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float);
 

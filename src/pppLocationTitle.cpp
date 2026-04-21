@@ -216,22 +216,20 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             if (work->m_count > 1) {
                 Vec subVec;
                 Vec interp[50];
-                u8 stepCount;
                 int startIndex;
                 int inserted;
                 float stepScale;
                 Vec* startPos;
                 Vec* interpIt;
 
-                stepCount = param_2->m_stepCount;
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
-                stepScale = 1.0f / (float)(stepCount + 1);
+                stepScale = 1.0f / (float)(param_2->m_stepCount + 1);
                 interpIt = interp;
                 PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
 
-                for (int i = 0; i < stepCount; i++) {
+                for (int i = 0; i < param_2->m_stepCount; i++) {
                     Vec scaled;
                     float t;
 

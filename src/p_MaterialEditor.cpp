@@ -12,6 +12,7 @@ extern char sMaterialEditorSpinnerText[];
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
+#include <dolphin/os/OSCache.h>
 #include <string.h>
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
@@ -68,9 +69,23 @@ static const char s_MaterialEditor[] = "MaterialEditor=%c";
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+    int, int, int, int, int);
+extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+    int, int, int, int, int);
+extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
+                                                                                                        int, int, int);
+extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
+                                                                                                        int, int, int);
+extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+    int, int, int, int, int);
 extern "C" float FLOAT_8032FCC8;
 extern "C" float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
+extern "C" double DOUBLE_8032FCC0;
+extern "C" double DOUBLE_8032FCD0;
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -464,9 +479,41 @@ void CMaterialEditorPcs::calcViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004b2cc
+ * PAL Size: 3068b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+struct MaterialEditorPolygon {
+    u16 flags;
+    u16 blendMode;
+    u32 _04;
+    u16 index0;
+    u16 index1;
+    u16 index2;
+    u16 index3;
+    u16 _10;
+    u16 _12;
+    u16 _14;
+    u16 _16;
+    u8 _18;
+    char textureMarker;
+    u8 _1a[4];
+    s16 textureIndex;
+    s16 u0;
+    s16 v0;
+    s16 u1;
+    s16 v1;
+    s16 u2;
+    s16 v2;
+    s16 u3;
+    s16 v3;
+    u8 _30[0x20];
+    float texCoord[4][2];
+};
+
 void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
@@ -530,6 +577,185 @@ void CMaterialEditorPcs::drawViewer()
         GXSetNumTevStages(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+
+        for (int pass = 0; pass < 2; pass++) {
+            MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(reinterpret_cast<RSDITEM*>(model)->ptr18);
+
+            for (u32 polyIndex = 0; polyIndex < reinterpret_cast<RSDITEM*>(model)->countC; polyIndex++, polygon++) {
+                if ((polygon->flags & 0x200) == 0) {
+                    GXSetCullMode(GX_CULL_FRONT);
+                } else {
+                    GXSetCullMode(GX_CULL_NONE);
+                }
+
+                if (pass == 1) {
+                    if ((polygon->flags & 0x400) == 0) {
+                        continue;
+                    }
+
+                    u16 blendMode = polygon->blendMode;
+                    int blend = 1;
+                    int srcFactor = 1;
+                    int dstFactor = 1;
+                    int src = blendMode & 3;
+                    int dst = (blendMode >> 2) & 3;
+
+                    if ((src == 0) && (dst == 0)) {
+                        srcFactor = 4;
+                        dstFactor = 5;
+                    } else if ((src == 0) && (dst == 2)) {
+                        srcFactor = 4;
+                    } else if ((src == 2) && (dst == 0)) {
+                        blend = 3;
+                    }
+
+                    GXSetZCompLoc(GX_FALSE);
+                    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0);
+                    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(blend, srcFactor, dstFactor, 3);
+                    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+                    GXSetCullMode(GX_CULL_NONE);
+                } else {
+                    if ((polygon->flags & 0x400) != 0) {
+                        continue;
+                    }
+
+                    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+                    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 0, 0, 7);
+                }
+
+                if ((polygon->textureMarker == 'H') && (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount))) {
+                    s16* textureHeader = m_textureHeader[polygon->textureIndex];
+                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[2]) - DOUBLE_8032FCD0));
+                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[3]) - DOUBLE_8032FCD0));
+
+                    polygon->texCoord[0][0] = scaleU * static_cast<float>(polygon->u0);
+                    if (polygon->u0 < 0) {
+                        polygon->texCoord[0][0] += FLOAT_8032FCC8;
+                    }
+                    polygon->texCoord[1][0] = scaleU * static_cast<float>(polygon->u1);
+                    if (polygon->u1 < 0) {
+                        polygon->texCoord[1][0] += FLOAT_8032FCC8;
+                    }
+                    polygon->texCoord[2][0] = scaleU * static_cast<float>(polygon->u2);
+                    if (polygon->u2 < 0) {
+                        polygon->texCoord[2][0] += FLOAT_8032FCC8;
+                    }
+                    polygon->texCoord[3][0] = scaleU * static_cast<float>(polygon->u3);
+                    if (polygon->u3 < 0) {
+                        polygon->texCoord[3][0] += FLOAT_8032FCC8;
+                    }
+
+                    if (polygon->v0 < 0) {
+                        polygon->v0 = -polygon->v0;
+                    }
+                    if (polygon->v1 < 0) {
+                        polygon->v1 = -polygon->v1;
+                    }
+                    if (polygon->v2 < 0) {
+                        polygon->v2 = -polygon->v2;
+                    }
+                    if (polygon->v3 < 0) {
+                        polygon->v3 = -polygon->v3;
+                    }
+
+                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(polygon->v0) - FLOAT_8032FCC8);
+                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(polygon->v1) - FLOAT_8032FCC8);
+                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(polygon->v2) - FLOAT_8032FCC8);
+                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(polygon->v3) - FLOAT_8032FCC8);
+                    DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
+
+                    if (textureHeader[1] == 0x20) {
+                        GXSetNumTevStages(1);
+                        GXSetNumTexGens(1);
+                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP0);
+                        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+                            0, 0xf, 8, 10, 0xf);
+                        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+                        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+                            0, 7, 4, 5, 7);
+                        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 1, 1, 0);
+                    }
+
+                    if ((textureHeader[1] == 4) || (textureHeader[1] == 8)) {
+                        GXColor red = {0xff, 0xff, 0, 0};
+                        GXColor blue = {0, 0, 0xff, 0xff};
+
+                        GXSetNumTevStages(3);
+                        GXSetNumTexGens(1);
+                        GXSetTevColor(GX_TEVREG2, red);
+                        GXSetTevColor(GX_TEVPREV, blue);
+                        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+                            1, 0, 3, 3, 3);
+                        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+                            2, 2, 2, 2, 3);
+                        GXSetTevDirect(GX_TEVSTAGE0);
+                        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+                            0, 0xf, 8, 4, 0xf);
+                        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 0, 0);
+                        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);
+                        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xff);
+                        GXSetTevDirect(GX_TEVSTAGE1);
+                        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+                            1, 0xf, 8, 6, 0);
+                        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+                            1, 7, 6, 4, 7);
+                        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
+                        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
+                        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 2);
+                        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 1, 0xff);
+                        GXSetTevDirect(GX_TEVSTAGE2);
+                        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+                            2, 0xf, 0, 10, 0xf);
+                        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+                            2, 7, 0, 5, 7);
+                        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 1, 1, 0);
+                        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 2, 1, 0);
+                        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
+                        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0xff, 0xff, 4);
+                        GXInitTexObjTlut(m_texObj[polygon->textureIndex], 0);
+                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP0);
+                        GXInitTexObjTlut(m_texObj[polygon->textureIndex], 1);
+                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP1);
+                        GXLoadTlut(m_tlutObj0[polygon->textureIndex], 0);
+                        GXLoadTlut(m_tlutObj1[polygon->textureIndex], 1);
+                    }
+                }
+
+                GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                GXSetArray(GX_VA_TEX0, polygon->texCoord, 4);
+                GXSetArray(GX_VA_CLR0, polygon->texCoord, 8);
+
+                u32 vertexIndex[8];
+                u8 vertexCount = 3;
+                vertexIndex[4] = polygon->index0;
+                vertexIndex[5] = polygon->index1;
+                vertexIndex[6] = polygon->index2;
+                vertexIndex[0] = 0;
+                vertexIndex[1] = 1;
+                vertexIndex[2] = 2;
+
+                if ((polygon->flags & 0xf) == 0) {
+                    GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
+                }
+                if ((polygon->flags & 0xf) == 1) {
+                    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                    vertexCount = 4;
+                    vertexIndex[6] = polygon->index3;
+                    vertexIndex[7] = polygon->index2;
+                    vertexIndex[2] = 3;
+                    vertexIndex[3] = 2;
+                }
+
+                for (u8 i = 0; i < vertexCount; i++) {
+                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i + 4]);
+                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i + 4]);
+                    GXWGFifo.u8 = static_cast<u8>(vertexIndex[i]);
+                    GXWGFifo.u16 = static_cast<u16>(vertexIndex[i]);
+                }
+            }
+        }
     }
 }
 

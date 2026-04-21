@@ -48,30 +48,6 @@ struct CMapCylinderRaw {
 
 /*
  * --INFO--
- * PAL Address: 0x801097e4
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
-{
-    int* serializedDataOffsets;
-    f32* pfVar2;
-    f32 scale;
-
-    serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
-    pfVar2 = (f32*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
-    scale = 0.0f;
-    pfVar2[2] = scale;
-    pfVar2[1] = scale;
-    pfVar2[0] = scale;
-    *(u8*)(pfVar2 + 3) = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x801091d4
  * PAL Size: 1552b
  * EN Address: TODO
@@ -159,19 +135,19 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
                 hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                     &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
-                if (hitFound == 0) {
+                if (hitFound != 0) {
+                    CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
+                    GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_164);
+                    if (local_170.y < matrixY - kPppConformBgNormalGroundSnapLimit) {
+                        local_170.y = matrixY;
+                    }
+                } else {
                     local_164.x = kPppConformBgNormalZero;
                     local_164.y = kPppConformBgNormalOne;
                     local_164.z = kPppConformBgNormalZero;
                     local_170.x = matrixX;
                     local_170.y = matrixY;
                     local_170.z = matrixZ;
-                } else {
-                    CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
-                    GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_164);
-                    if (local_170.y < matrixY - kPppConformBgNormalGroundSnapLimit) {
-                        local_170.y = matrixY;
-                    }
                 }
             }
 
@@ -268,15 +244,15 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
                     hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                         &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
-                    if (hitFound == 0) {
-                        pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
-                        pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                        pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
-                    } else {
-                        CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
+                    if (hitFound != 0) {
+                        CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
                         pppMngStPtr->m_matrix.value[0][3] = local_170.x;
                         pppMngStPtr->m_matrix.value[1][3] = local_170.y;
                         pppMngStPtr->m_matrix.value[2][3] = local_170.z;
+                    } else {
+                        pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                        pppMngStPtr->m_matrix.value[1][3] = matrixY;
+                        pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
                     }
                 } else {
                     ownerY = owner->m_attachOwner->m_worldPosition.y;
@@ -303,4 +279,28 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             pppMngStPtr->m_matrix.value[1][3] += param2->m_dataValIndex;
             pppSetFpMatrix(pppMngSt);
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801097e4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
+{
+    int* serializedDataOffsets;
+    f32* pfVar2;
+    f32 scale;
+
+    serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
+    pfVar2 = (f32*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
+    scale = 0.0f;
+    pfVar2[2] = scale;
+    pfVar2[1] = scale;
+    pfVar2[0] = scale;
+    *(u8*)(pfVar2 + 3) = 0;
 }

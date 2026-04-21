@@ -75,13 +75,13 @@ void _StreamStop(RedStreamDATA* streamData)
 			*(int*)((int)streamData + 0x12c) = 0;
 		}
 		*(unsigned int*)(*(int*)((int)streamData + 4) + 0x90) |= 2;
-		*(unsigned char*)(*(int*)((int)streamData + 0) + 0x26) &= (unsigned char)~2;
-		*(unsigned char*)(*(int*)((int)streamData + 4) + 0x1a) &= (unsigned char)~2;
+		*(unsigned char*)(*(int*)((int)streamData + 0) + 0x26) &= -3;
+		*(unsigned char*)(*(int*)((int)streamData + 4) + 0x1a) &= -3;
 		*(int*)(*(int*)((int)streamData + 4) + 0x8c) = 0;
 		if (*(short*)((int)streamData + 0x2a) == 2) {
 			*(unsigned int*)(*(int*)((int)streamData + 4) + 0x150) |= 2;
-			*(unsigned char*)(*(int*)((int)streamData + 0) + 0x17a) &= (unsigned char)~2;
-			*(unsigned char*)(*(int*)((int)streamData + 4) + 0xda) &= (unsigned char)~2;
+			*(unsigned char*)(*(int*)((int)streamData + 0) + 0x17a) &= -3;
+			*(unsigned char*)(*(int*)((int)streamData + 4) + 0xda) &= -3;
 			*(int*)(*(int*)((int)streamData + 4) + 0x14c) = 0;
 		}
 	}

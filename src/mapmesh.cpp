@@ -303,24 +303,25 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     float minInit;
     float maxInit;
     unsigned int dlOffset;
+    void* drawEntries;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
             m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A);
 
-            minInit = FLOAT_8032F930;
-            maxInit = FLOAT_8032F934;
             offset = 0;
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(m_meshData)));
-            m_bboxMinX = minInit;
-            m_bboxMinY = minInit;
+            minInit = FLOAT_8032F930;
+            maxInit = FLOAT_8032F934;
             m_bboxMinZ = minInit;
-            m_bboxMaxX = maxInit;
-            m_bboxMaxY = maxInit;
-            m_bboxMaxZ = maxInit;
             cursor = reinterpret_cast<unsigned char*>(m_vertices) + chunk.m_size;
+            m_bboxMinY = minInit;
+            m_bboxMinX = minInit;
+            m_bboxMaxZ = maxInit;
+            m_bboxMaxY = maxInit;
+            m_bboxMaxX = maxInit;
 
             for (int i = 0; i < static_cast<int>(m_vertexCount); i++) {
                 float value = reader.GetF4();
@@ -331,89 +332,69 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset + 8) = value;
 
                 float* vert = reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset);
-                value = vert[0];
-                if (m_bboxMinX < value) {
-                    value = m_bboxMinX;
-                }
-                m_bboxMinX = value;
 
-                value = vert[1];
-                if (m_bboxMinY < value) {
-                    value = m_bboxMinY;
-                }
-                m_bboxMinY = value;
-
-                value = vert[2];
-                if (m_bboxMinZ < value) {
-                    value = m_bboxMinZ;
-                }
-                m_bboxMinZ = value;
-
-                value = vert[0];
-                if (m_bboxMaxX > value) {
-                    value = m_bboxMaxX;
-                }
-                m_bboxMaxX = value;
-
-                value = vert[1];
-                if (m_bboxMaxY > value) {
-                    value = m_bboxMaxY;
-                }
-                m_bboxMaxY = value;
-
-                value = vert[2];
-                if (m_bboxMaxZ > value) {
-                    value = m_bboxMaxZ;
-                }
-                m_bboxMaxZ = value;
+                m_bboxMinX = (m_bboxMinX < vert[0]) ? m_bboxMinX : vert[0];
+                m_bboxMinY = (m_bboxMinY < vert[1]) ? m_bboxMinY : vert[1];
+                m_bboxMinZ = (m_bboxMinZ < vert[2]) ? m_bboxMinZ : vert[2];
+                m_bboxMaxX = (m_bboxMaxX > vert[0]) ? m_bboxMaxX : vert[0];
+                m_bboxMaxY = (m_bboxMaxY > vert[1]) ? m_bboxMaxY : vert[1];
+                m_bboxMaxZ = (m_bboxMaxZ > vert[2]) ? m_bboxMaxZ : vert[2];
 
                 offset += 0xC;
             }
             break;
         case 0x4E4F524D:
             m_normalCount = static_cast<unsigned short>(chunk.m_size / 6);
-            m_normals = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            cursor = reinterpret_cast<unsigned char*>(m_normals) + chunk.m_size;
+            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            m_normals = cursor;
+            cursor += chunk.m_size;
 
             offset = 0;
             for (int i = 0; i < static_cast<int>(m_normalCount); i++) {
-                unsigned short* norm = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset);
-                norm[0] = reader.Get2();
-                norm[1] = reader.Get2();
-                norm[2] = reader.Get2();
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset) = reader.Get2();
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset + 2) = reader.Get2();
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset + 4) = reader.Get2();
                 offset += 6;
             }
             break;
         case 0x434F4C52:
             m_colorCount = static_cast<unsigned short>(chunk.m_size >> 2);
-            m_colors = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            cursor = reinterpret_cast<unsigned char*>(m_colors) + chunk.m_size;
+            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            m_colors = cursor;
+            cursor += chunk.m_size;
 
             offset = 0;
             for (int i = 0; i < static_cast<int>(m_colorCount); i++) {
-                unsigned char* rgba = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset);
-                rgba[0] = reader.Get1();
-                rgba[1] = reader.Get1();
-                rgba[2] = reader.Get1();
-                rgba[3] = reader.Get1();
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) = reader.Get1();
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) = reader.Get1();
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) = reader.Get1();
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 3) = reader.Get1();
                 if (halfColor != 0) {
-                    rgba[0] = static_cast<unsigned char>(rgba[0] >> 1);
-                    rgba[1] = static_cast<unsigned char>(rgba[1] >> 1);
-                    rgba[2] = static_cast<unsigned char>(rgba[2] >> 1);
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) =
+                        static_cast<unsigned char>(
+                            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) >> 1);
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) =
+                        static_cast<unsigned char>(
+                            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) >>
+                            1);
+                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) =
+                        static_cast<unsigned char>(
+                            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) >>
+                            1);
                 }
                 offset += 4;
             }
             break;
         case 0x55562020:
             m_uvCount = static_cast<unsigned short>(chunk.m_size >> 2);
-            m_uvPairs = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            cursor = reinterpret_cast<unsigned char*>(m_uvPairs) + chunk.m_size;
+            cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+            m_uvPairs = cursor;
+            cursor += chunk.m_size;
 
             offset = 0;
             for (int i = 0; i < static_cast<int>(m_uvCount); i++) {
-                unsigned short* uv = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset);
-                uv[0] = reader.Get2();
-                uv[1] = reader.Get2();
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset) = reader.Get2();
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset + 2) = reader.Get2();
                 offset += 4;
             }
             break;
@@ -421,16 +402,18 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
                 m_displayListData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x1D5);
-                m_drawEntries = m_displayListData;
+                drawEntries = m_displayListData;
             } else {
-                m_drawEntries = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                drawEntries = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             }
+            m_drawEntries = drawEntries;
 
-            cursor = reinterpret_cast<unsigned char*>(m_drawEntries) + (static_cast<unsigned int>(m_displayListCount) * 0x10U);
-            for (unsigned int i = 0; i < static_cast<unsigned int>(m_displayListCount); i++) {
-                int entry = reinterpret_cast<unsigned int>(m_drawEntries) + i * 0x10;
-                *reinterpret_cast<unsigned int*>(entry + 0) = 0;
-                *reinterpret_cast<unsigned int*>(entry + 4) = 0;
+            cursor = reinterpret_cast<unsigned char*>(drawEntries) + (static_cast<unsigned int>(m_displayListCount) * 0x10U);
+            offset = 0;
+            for (int i = 0; i < static_cast<int>(m_displayListCount); i++) {
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset) = 0;
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset + 4) = 0;
+                offset += 0x10;
             }
 
             dlOffset = 0;
@@ -446,7 +429,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                     reader.Align(0x20);
                     entry->displayList = 0;
                     if (entry->size != 0) {
-                        entry->displayList = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        entry->displayList = cursor;
                         if (usePreallocated != 0) {
                             entry->displayListOffset = reinterpret_cast<unsigned int>(entry->displayList) -
                                                        reinterpret_cast<unsigned int>(m_displayListData);
@@ -455,8 +439,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                                                        reinterpret_cast<unsigned int>(m_meshData);
                         }
 
-                        cursor = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(entry->displayList) +
-                                                                 Align32(chunk.m_arg0));
+                        cursor += Align32(chunk.m_arg0);
                         memset(entry->displayList, 0, Align32(chunk.m_arg0));
                         reader.Get(entry->displayList, chunk.m_arg0);
                         DCFlushRange(entry->displayList, Align32(chunk.m_arg0));

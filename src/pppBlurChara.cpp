@@ -439,9 +439,9 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
+    white.r = 0;
+    white.g = 0;
+    white.b = 0;
     white.a = 0xFF;
 
     posA.x = FLOAT_80331030;
@@ -479,9 +479,14 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_MODULATE);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_REPLACE);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
         GXLoadTexObj(work->m_smallTexObj, GX_TEXMAP0);
+
+        white.r = 0xFF;
+        white.g = 0xFF;
+        white.b = 0xFF;
+        white.a = 0xFF;
 
         posA.x = FLOAT_80331044 * offsetY;
         posA.y = offsetY;

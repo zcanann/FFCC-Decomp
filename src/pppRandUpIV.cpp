@@ -23,6 +23,20 @@ struct PppRandUpIVParam3 {
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline int randint(int value, float scale)
+{
+    return (int)((f32)value * scale);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80062e0c
  * PAL Size: 404b
  * EN Address: TODO
@@ -62,21 +76,7 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     s32* target = (in->field4 == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
     f32 scale = *valuePtr;
 
-    target[0] += (s32)((f32)in->field8 * scale);
-    target[1] += (s32)((f32)in->fieldC * scale);
-    target[2] += (s32)((f32)in->field10 * scale);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static int randint(int value, float scale)
-{
-    return (int)((f32)value * scale);
+    target[0] += randint(in->field8, scale);
+    target[1] += randint(in->fieldC, scale);
+    target[2] += randint(in->field10, scale);
 }

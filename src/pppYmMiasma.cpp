@@ -121,7 +121,7 @@ struct YmMiasmaRenderStep {
     s32 m_dataValIndex;
     u8 m_pad8[4];
     u16 m_particleCount;
-    u8 m_pad0E[0x10];
+    u8 m_pad0E[0x24];
     u8 m_blendMode;
     u8 m_pad33[0x41];
     u8 m_drawEnvA;
@@ -164,7 +164,6 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
             long* shape = (*(long***)pppEnvStPtr->m_particleColors)[step->m_dataValIndex];
             pppFMATRIX model;
-            pppFMATRIX scaleMatrix;
             pppFMATRIX rotMatrix;
             Vec worldPos;
             GXColor amb;
@@ -179,8 +178,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
 
             shapeAngle = state->m_shapeAngle;
             PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
-            scaleMatrix = model;
-            pppMulMatrix(model, rotMatrix, scaleMatrix);
+            pppMulMatrix(model, rotMatrix, model);
 
             pppCopyVector(worldPos, state->m_position);
             if (Game.m_currentSceneId == 7) {

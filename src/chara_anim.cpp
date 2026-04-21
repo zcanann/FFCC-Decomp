@@ -374,8 +374,9 @@ CChara::CAnimNode::CAnimNode()
 {
 	CAnimNodeFields& node = AnimNode(this);
 
-	*reinterpret_cast<unsigned char*>(&node.m_flags) &= 0x7F;
-	node.m_flags &= 0x80001FFF;
+	*reinterpret_cast<unsigned char*>(&node.m_flags) =
+	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&node.m_flags), 0, 7, 24, 24));
+	node.m_flags = __rlwimi(node.m_flags, 0, 13, 1, 18);
 }
 
 /*

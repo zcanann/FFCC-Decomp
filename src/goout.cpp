@@ -12,6 +12,7 @@ extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
 extern "C" void __dl__FPv(void*);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" const char* lbl_80214FE0[];
 
 struct CMenuPcsGoOutLayout
 {
@@ -52,6 +53,7 @@ struct CMenuMcWinState
     signed short m_y;
     signed short m_width;
     signed short m_height;
+    signed short unk8;
     signed short m_mode;
 };
 
@@ -81,6 +83,11 @@ static unsigned short GetGoOutInputMask()
 
     __cntlzw(Pad._448_4_);
     return static_cast<unsigned short>(Pad._8_2_);
+}
+
+static inline const char* GetGoOutMessageLine(int languageId, int line)
+{
+    return lbl_80214FE0[(languageId * 0x6E) + line];
 }
 
 static const char sSlotAErrorText1[] = "The Memory Card in Slot A contains";
@@ -551,67 +558,84 @@ void CGoOutMenu::CalcLoadMenu()
  */
 void CGoOutMenu::SetMainMode(unsigned char mode)
 {
-    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    char prevMainMode;
+    unsigned char prevMainMode;
     int i;
 
-    menuPcsLayout.m_saveLoadMode = 0;
-    menuPcsLayout.m_unknown_88A = 0;
-    menuPcsLayout.m_transferWorkActive = 0;
+    {
+        CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+        menuPcsLayout.m_saveLoadMode = 0;
+        menuPcsLayout.m_unknown_88A = 0;
+        menuPcsLayout.m_transferWorkActive = 0;
+    }
     if (field_0x2c == '\x02') {
         MemoryCardMan.McEnd();
     }
     prevMainMode = field_0x2c;
     field_0x2c = mode;
     field_0x30 = 0;
-    if (mode == '\x02') {
+    switch (mode) {
+    case 1: {
+        field_0x46 = 1;
+        if (prevMainMode != '\x03') {
+            field_0x46 = 0;
+        }
+        MenuPcs.ChgAllModel();
+        CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+        if (field_0x36 >= 0) {
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+        }
+        field_0x45 = 0;
+        field_0x34 = 0x1e;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        field_0x14 = 0;
+        break;
+    }
+    case 2:
         if (Game.m_gameWork.m_mcHasSerial != 1) {
-            SetMenuStr(0, 4, sImportNeedsSaveLine1, sEmptyLine, sImportNeedsSaveLine2,
-                       sImportNeedsSaveLine3);
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 4,
+                       GetGoOutMessageLine(languageId, 5),
+                       GetGoOutMessageLine(languageId, 6),
+                       GetGoOutMessageLine(languageId, 7),
+                       GetGoOutMessageLine(languageId, 8));
             field_0x19 = (char)0xff;
             field_0x18 = 0;
         }
         i = 0;
         do {
-            if (Game.m_caravanWorkArr[i].m_objType != 0 &&
+            if (Game.m_caravanWorkArr[i].m_shopState != 0 &&
                 Game.m_caravanWorkArr[i].m_caravanLocalFlags != 1) {
-                SetMenuStr(0, 5, sImportHasUnsavedLine1, sImportHasUnsavedLine2, sEmptyLine,
-                           sImportNeedsSaveLine2, sImportNeedsSaveLine3);
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 5,
+                           GetGoOutMessageLine(languageId, 9),
+                           GetGoOutMessageLine(languageId, 10),
+                           GetGoOutMessageLine(languageId, 11),
+                           GetGoOutMessageLine(languageId, 12),
+                           GetGoOutMessageLine(languageId, 13));
                 field_0x19 = (char)0xff;
                 field_0x18 = 0;
             }
             i++;
         } while (i < 8);
         field_0x1 = 0;
-        reinterpret_cast<unsigned char*>(this)[0] = 0;
+        field_0x0 = 0;
         field_0x2 = 0;
         field_0x3 = 0;
         field_0x4 = -1;
         field_0x8 = 0;
         SetGoOutMode(7);
-    } else if (mode < '\x02') {
-        if (mode != '\0') {
-            field_0x46 = 1;
-            if (prevMainMode != '\x03') {
-                field_0x46 = 0;
-            }
-            MenuPcs.ChgAllModel();
-            if (field_0x36 >= 0) {
-                MenuMcWinState(menuPcsLayout).m_mode = 2;
-                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
-            }
-            field_0x45 = 0;
-            field_0x34 = 0x1e;
-            field_0x48 = 0;
-            field_0x3c = 0;
-            field_0x14 = 0;
-        }
-    } else if (mode < '\x04') {
+        break;
+    case 3: {
         MenuPcs.ChgAllModel();
+        CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
         menuPcsLayout.m_unknown_888 = 2;
         field_0x14 = 0;
         field_0x24[2] = 0;
         SetDelMode(2);
+        break;
+    }
     }
 }
 

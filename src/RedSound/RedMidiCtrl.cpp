@@ -12,6 +12,8 @@ void* memset(void*, int, unsigned long);
 int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
 
+extern int m_ADataBufferSize;
+
 int PTR_SineSwing__Fi[] = {
     (int)SineSwing, (int)TriangleSwing, (int)SawSwing, (int)DutySwing,
     (int)RandomSwing, (int)DutySwing,     (int)DutySwing, (int)DutySwing,
@@ -1090,7 +1092,7 @@ void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     trackData[10] = volume;
     trackData[0xb] = 0;
     trackData[0xc] = 0;
-    m_ChangeStatus |= 2;
+    m_ADataBufferSize |= 2;
 }
 
 /*
@@ -1143,7 +1145,7 @@ void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
     trackData[0xd] = ((int)(char)*command) << 0xc;
     trackData[0xe] = 0;
     trackData[0xf] = 0;
-    m_ChangeStatus |= 2;
+    m_ADataBufferSize |= 2;
 }
 
 /*
@@ -1194,7 +1196,7 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     if (trackData[0x2d] == 0) {
         trackData[0x33] = 0;
     }
-    m_ChangeStatus |= 2;
+    m_ADataBufferSize |= 2;
 }
 
 /*
@@ -1820,18 +1822,22 @@ void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u32 rate = 0x100;
+	int rate;
 
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)((int*)track)[0] != 0) {
+		rate = *(u8*)((int*)track)[0];
+	} else {
+		rate = 0x100;
 	}
-	trackData[0x1e] = 0x100000 / rate;
-	*(short*)(trackData + 0x23) = 0;
-	trackData[0] += 1;
+	int divisor = rate;
+	((int*)track)[0x1e] = 0x100000 / divisor;
+	*(short*)((int*)track + 0x23) = 0;
+	((int*)track)[0] += 1;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2015,18 +2021,22 @@ void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u32 rate = 0x100;
+	int rate;
 
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)((int*)track)[0] != 0) {
+		rate = *(u8*)((int*)track)[0];
+	} else {
+		rate = 0x100;
 	}
-	trackData[0x26] = 0x100000 / rate;
-	*(short*)(trackData + 0x2b) = 0;
-	trackData[0] += 1;
+	int divisor = rate;
+	((int*)track)[0x26] = 0x100000 / divisor;
+	*(short*)((int*)track + 0x2b) = 0;
+	((int*)track)[0] += 1;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2181,18 +2191,22 @@ void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int* trackData = (int*)track;
-	u32 rate = 0x100;
+	int rate;
 
-	if (*(u8*)trackData[0] != 0) {
-		rate = *(u8*)trackData[0];
+	if (*(u8*)((int*)track)[0] != 0) {
+		rate = *(u8*)((int*)track)[0];
+	} else {
+		rate = 0x100;
 	}
-	trackData[0x2e] = 0x100000 / rate;
-	*(short*)(trackData + 0x34) = 0;
-	trackData[0] += 1;
+	int divisor = rate;
+	((int*)track)[0x2e] = 0x100000 / divisor;
+	*(short*)((int*)track + 0x34) = 0;
+	((int*)track)[0] += 1;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2256,7 +2270,7 @@ void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 
 	((int*)track)[0] = (int)(command + 1);
 	((u8*)track)[0x148] = *command;
-	m_ChangeStatus |= 1;
+	m_ADataBufferSize |= 1;
 }
 
 /*
@@ -2276,7 +2290,7 @@ void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	((int*)track)[0] = (int)(command + 1);
 	register int fineTuneResult = fineTune + *command;
 	((s8*)track)[0x148] = fineTuneResult;
-	m_ChangeStatus |= 1;
+	m_ADataBufferSize |= 1;
 }
 
 /*
@@ -2294,7 +2308,7 @@ void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 
 	((int*)track)[0] = (int)(command + 1);
 	*(short*)((char*)track + 0x142) = (short)(*command << 8);
-	m_ChangeStatus |= 1;
+	m_ADataBufferSize |= 1;
 }
 
 /*
@@ -2313,7 +2327,7 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 
 	((int*)track)[0] = (int)(command + 1);
 	*(short*)((char*)track + 0x142) = keyTranspose + (*command << 8);
-	m_ChangeStatus |= 1;
+	m_ADataBufferSize |= 1;
 }
 
 /*
@@ -2410,7 +2424,7 @@ void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
     trackData[0x3f] |= 0x3c00;
     SetVoiceSwitch(track, trackData[0x3f]);
-    m_ChangeStatus |= 2;
+    m_ADataBufferSize |= 2;
 }
 
 /*
@@ -2429,7 +2443,7 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     trackData[0x3f] &= 0xffffcfff;
     trackData[0x3f] |= 0xc00;
     SetVoiceSwitch(track, trackData[0x3f]);
-    m_ChangeStatus |= 2;
+    m_ADataBufferSize |= 2;
 }
 
 /*
@@ -2469,7 +2483,7 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
     }
     trackData[0] += 2;
     SetVoiceSwitch(track, trackData[0x3f]);
-    m_ChangeStatus |= 2;
+    m_ADataBufferSize |= 2;
 }
 
 /*

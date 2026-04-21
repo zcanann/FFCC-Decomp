@@ -10,7 +10,11 @@ struct RedStreamDATA {
     void* m_buffer;
     u8 m_pad10[0x2A - 0x10];
     s16 m_channelCount;
-    u8 m_pad2C[0x10C - 0x2C];
+    u8 m_pad2C[0xF0 - 0x2C];
+    int m_volume;
+    int m_volumeStep;
+    int m_volumeStepCount;
+    u8 m_padFC[0x10C - 0xFC];
     int m_streamId;
     int m_state;
     int m_dmaId;

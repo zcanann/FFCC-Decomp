@@ -25,9 +25,14 @@
 
 extern "C" {
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
+
+void Init__7CSystemFv(CSystem*);
+void Quit__7CSystemFv(CSystem*);
+extern void* __RTTI__7CSystem[];
+void* g_CSystemRttiBase[] = {0, 0, __RTTI__7CSystem};
+void* __vt__7CSystem[] = {0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
 }
 
-extern void* __vt__7CSystem[];
 CSystem System;
 
 class CScenegraphProcessProxy {
@@ -53,8 +58,8 @@ struct CScenegraphDesc {
 };
 
 static const char s_cSystem[] = "CSystem";
-static const char s_gamePalM_map[] = "gamePalM.map";
 static const char s_system_cpp[] = "system.cpp";
+static const char s_gamePalM_map[] = "gamePalM.map";
 static const char s_compilerMapLoaded[] =
     "\203\122\203\223\203\160\203\103\203\211\202\314\155\141\160\217\356"
     "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
@@ -655,7 +660,7 @@ void CSystem::Init()
             mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
             m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
-            for (offset = 0; mapSize != 0; mapSize -= count)
+            for (offset = 0; (int)mapSize != 0; mapSize -= count)
             {
                 count = 0x100000;
                 if (mapSize < 0x100000)

@@ -49,8 +49,6 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
                                                                                            int);
 }
 
-static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
-
 struct Crystal2IndTexMtx {
     f32 value[2][3];
 };
@@ -82,6 +80,8 @@ static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {
 
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
+
+static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 static inline int Crystal2FpClassify(float value)
 {

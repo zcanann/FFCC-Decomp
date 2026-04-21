@@ -11,34 +11,34 @@
 #include "ffcc/p_dbgmenu.h"
 extern "C" {
 extern char kAStarGroupDebugFormat[];
-extern char kAStarGroupDebugLabel[];
 extern char kAStarPortalDebugFormat[];
+extern const float kPolyGroupBaseXZ;
+extern const float kPolyGroupBaseY;
+extern const float kPolyGroupTopOffsetY;
+extern const float kPolyGroupAabbMax;
+extern const float kPolyGroupAabbMin;
+extern const float kAStarEscapeInitialBestDist;
+extern const char kAStarGroupDebugLabel[] = "//A*\n";
+extern const float kDrawAStarSphereRadius = 10.0f;
+extern const float kInfiniteCost = 10000000.0f;
+extern const char kAStarStepDebugFormat[] = "%d ";
+extern const char kAStarNewLine[] = "\n";
 }
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 
 #include "string.h"
 
-static const float kPolyGroupBaseX = 0.0f;       // FLOAT_80332088
-static const float kPolyGroupBaseY = -100.0f;    // FLOAT_8033208c
-static const float kPolyGroupBaseZ = 0.0f;       // FLOAT_80332088
-static const float kPolyGroupTopOffsetY = 5.0f;  // FLOAT_80332090
-static const float kPolyGroupAabbMax = 1.0e10f;  // FLOAT_80332094
-static const float kPolyGroupAabbMin = -1.0e10f; // FLOAT_80332098
-static const float kInfiniteCost = 10000000.0f;  // FLOAT_8033209c
-static const float kDrawAStarSphereRadius = 5.0f;
 static const char kAStarCostDebugFormat[] = "%d->%d=%.5fm ";
 
 struct CMapCylinderRaw
 {
 	Vec m_bottom;
+	Vec m_unknown;
 	Vec m_direction;
 	float m_radius;
-	float m_height;
 	Vec m_top;
 	Vec m_direction2;
-	float m_radius2;
-	float m_height2;
 };
 
 CAStar AStar;
@@ -510,12 +510,12 @@ void CAStar::calcAStar()
 
 					m_routeTable[current][to][0] = static_cast<unsigned char>(next);
 
-					System.Printf("%d ", static_cast<int>(next));
+					System.Printf(const_cast<char*>(kAStarStepDebugFormat), static_cast<int>(next));
 
 					current = static_cast<int>(next);
 				}
 
-				System.Printf("\n");
+				System.Printf(const_cast<char*>(kAStarNewLine));
 			}
 		}
 	}
@@ -744,7 +744,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	portal.m_groupA = groupLow;
 	portal.m_groupB = groupHigh;
 
-	System.Printf(kAStarGroupDebugLabel);
+	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
 
 	for (int i = 0; i < 64; ++i)
 	{
@@ -794,8 +794,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	escapeDir.Normalize();
 
-	float behindBestDist = -1000000.0f;
-	float aheadBestDist  = -1000000.0f;
+	float behindBestDist = kAStarEscapeInitialBestDist;
+	float aheadBestDist  = kAStarEscapeInitialBestDist;
 
 	CAPos* behindBest = (CAPos*)nullptr;
 	CAPos* aheadBest  = (CAPos*)nullptr;
@@ -914,7 +914,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
-	CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+	CVector base(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 	CMapCylinderRaw cyl;
 
@@ -930,7 +930,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_direction.x = base.x;
 	cyl.m_direction.y = base.y;
 	cyl.m_direction.z = base.z;
-	cyl.m_radius = kPolyGroupBaseZ;
+	cyl.m_radius = kPolyGroupBaseXZ;
 
 	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 	                                reinterpret_cast<Vec*>(&base), mask) != 0)
@@ -954,7 +954,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
 	if ((AStar.m_flags & 1) == 0)
 	{
-		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector base(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 		CMapCylinderRaw cyl;
 
@@ -970,7 +970,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction.x = base.x;
 		cyl.m_direction.y = base.y;
 		cyl.m_direction.z = base.z;
-		cyl.m_radius = kPolyGroupBaseZ;
+		cyl.m_radius = kPolyGroupBaseXZ;
 
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                reinterpret_cast<Vec*>(&base), hitAttributeMask) != 0)
@@ -980,7 +980,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	}
 	else
 	{
-		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector base(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 		CMapCylinderRaw cyl;
 
@@ -996,7 +996,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction.x = base.x;
 		cyl.m_direction.y = base.y;
 		cyl.m_direction.z = base.z;
-		cyl.m_radius = kPolyGroupBaseZ;
+		cyl.m_radius = kPolyGroupBaseXZ;
 
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                reinterpret_cast<Vec*>(&base), m_hitAttributeMask) != 0)

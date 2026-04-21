@@ -55,6 +55,7 @@ public:
     void EndMemCardProc();
 
 private:
+    char field_0x0;
     char field_0x1;
     char field_0x2;
     char field_0x3;
@@ -62,7 +63,8 @@ private:
     int field_0x8;
     int field_0xc;
     int field_0x10;
-    int field_0x14;
+    char field_0x14;
+    char unk_0x15[3];
     char field_0x18;
     char field_0x19;
     char field_0x1a;

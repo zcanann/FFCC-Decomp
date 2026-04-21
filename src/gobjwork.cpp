@@ -39,12 +39,14 @@ extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, unsigned char);
 extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
 extern float FLOAT_803309a8;
+extern char lbl_801D9F20[];
 static const char DAT_801d9ff0[] = {
 	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
 	(char)0x82, (char)0xC8, (char)0x82, (char)0xB5, (char)0x81, (char)0x6A, 0x00, 0x00
@@ -147,7 +149,22 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 	memset(m_statusTimers + 3, 0, 0x4E);
-	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_statusValues[0] = 0xFFFF;
+	m_statusValues[1] = 0xFFFF;
+	m_statusValues[2] = 0xFFFF;
+	m_statusValues[3] = 0xFFFF;
+	m_statusValues[4] = 0xFFFF;
+	m_statusValues[5] = 0xFFFF;
+	m_statusValues[6] = 0xFFFF;
+	m_statusValues[7] = 0xFFFF;
+	m_statusValues[8] = 0xFFFF;
+	m_statusValues[9] = 0xFFFF;
+	m_statusValues[10] = 0xFFFF;
+	m_statusValues[11] = 0xFFFF;
+	m_statusValues[12] = 0xFFFF;
+	m_statusValues[13] = 0xFFFF;
+	m_statusValues[14] = 0xFFFF;
+	m_statusValues[15] = 0xFFFF;
 	m_hp = m_maxHp;
 }
 
@@ -345,7 +362,7 @@ void CCaravanWork::LoadFinished()
  */
 void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	short* romData = reinterpret_cast<short*>(romWork);
+	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 	int value = 0;
 
 	m_baseDataIndex = baseDataIndex;
@@ -356,10 +373,25 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_strength = romData[4];
 	m_magic = romData[5];
 	m_defense = romData[6];
-	m_romWorkPtr = reinterpret_cast<unsigned short*>(romData + 8);
+	m_romWorkPtr = romData + 8;
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
 	memset(m_statusTimers + 3, 0, 0x4E);
-	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_statusValues[0] = 0xFFFF;
+	m_statusValues[1] = 0xFFFF;
+	m_statusValues[2] = 0xFFFF;
+	m_statusValues[3] = 0xFFFF;
+	m_statusValues[4] = 0xFFFF;
+	m_statusValues[5] = 0xFFFF;
+	m_statusValues[6] = 0xFFFF;
+	m_statusValues[7] = 0xFFFF;
+	m_statusValues[8] = 0xFFFF;
+	m_statusValues[9] = 0xFFFF;
+	m_statusValues[10] = 0xFFFF;
+	m_statusValues[11] = 0xFFFF;
+	m_statusValues[12] = 0xFFFF;
+	m_statusValues[13] = 0xFFFF;
+	m_statusValues[14] = 0xFFFF;
+	m_statusValues[15] = 0xFFFF;
 	m_hp = m_maxHp;
 	m_shopState = 1;
 
@@ -2354,6 +2386,18 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 {
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
+	for (int i = 0; i < 0x40; i++) {
+		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0xC, i, m_inventoryItems[i]);
+	}
+
+	for (int i = 2; i < 8; i++) {
+		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x1C, i, m_commandListInventorySlotRef[i]);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x30, i, m_equipment[i]);
+	}
+
 	for (int i = 0; i < 0x3F; i++) {
 		for (int j = i + 1; j < 0x40; j++) {
 			unsigned short lhs = m_inventoryItems[i];
@@ -2398,6 +2442,18 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 				}
 			}
 		}
+	}
+
+	for (int i = 0; i < 0x40; i++) {
+		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0xC, i, m_inventoryItems[i]);
+	}
+
+	for (int i = 2; i < 8; i++) {
+		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x1C, i, m_commandListInventorySlotRef[i]);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		Printf__7CSystemFPce(&System, lbl_801D9F20 + 0x30, i, m_equipment[i]);
 	}
 }
 

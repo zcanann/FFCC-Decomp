@@ -17,14 +17,9 @@ struct pppYmTracerUnkC {
     s32* m_serializedDataOffsets;
 };
 
-struct TRACE_POLYGON;
-
 struct pppYmTracer {
     u8 _pad[0x80];
 };
-
-void initTracePolygon(pppYmTracer*, TRACE_POLYGON*);
-void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);
 
 #ifdef __cplusplus
 extern "C" {

@@ -46,16 +46,6 @@ struct TracerMngRaw {
     TracerDataValue* dataValues;
 };
 
-static float* resolveTracerWorkValue(s32 valueIndex, s32 workOffset)
-{
-    if (valueIndex == -1) {
-        return reinterpret_cast<float*>(gPppDefaultValueBuffer);
-    }
-
-    TracerMngRaw* mng = reinterpret_cast<TracerMngRaw*>(pppMngStPtr);
-    return reinterpret_cast<float*>(mng->dataValues[valueIndex].workBase + 0x80 + workOffset);
-}
-
 struct TRACE_POLYGON {
     Vec from;
     float _pad0;
@@ -86,54 +76,6 @@ union PackedColor {
     u32 value;
     u8 bytes[4];
 };
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void initTracePolygon(pppYmTracer*, TRACE_POLYGON* poly)
-{
-    poly->from.x = FLOAT_803306e8;
-    poly->from.y = FLOAT_803306e8;
-    poly->from.z = FLOAT_803306e8;
-    poly->to.x = FLOAT_803306e8;
-    poly->to.y = FLOAT_803306e8;
-    poly->to.z = FLOAT_803306e8;
-    poly->colorR = 0;
-    poly->colorG = 0;
-    poly->colorB = 0;
-    poly->alpha = 0;
-    poly->life = -1;
-    poly->decay = 0;
-    poly->_pad1 = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
-{
-    dst->life = src->life;
-    dst->decay = src->decay;
-    pppCopyVector(dst->from, src->from);
-    pppCopyVector(dst->to, src->to);
-    dst->colorR = src->colorR;
-    dst->colorG = src->colorG;
-    dst->colorB = src->colorB;
-    dst->alpha = src->alpha;
-    dst->_pad1 = src->_pad1;
-}
 
 /*
  * --INFO--

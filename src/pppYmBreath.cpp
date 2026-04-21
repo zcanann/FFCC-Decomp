@@ -212,9 +212,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
     *(unsigned char*)(particle + 0x84) = 0;
 
-    if (particleWmat != NULL) {
-        PSMTXCopy(*(Mtx*)vYmBreath, *(Mtx*)particleWmat);
-    }
+    PSMTXCopy(*(Mtx*)vYmBreath, *(Mtx*)particleWmat);
     if (particleColor != NULL) {
         *(float*)((unsigned char*)particleColor + 0x10) = *(float*)(breath + 0x2C);
         *(float*)((unsigned char*)particleColor + 0x14) = *(float*)(breath + 0x30);

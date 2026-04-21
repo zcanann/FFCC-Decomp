@@ -8,15 +8,39 @@ extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
 
 const char s_CSoundPcs_801DB4E8[] = "CSoundPcs";
-unsigned int m_table_desc0__9CSoundPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)};
-unsigned int m_table_desc1__9CSoundPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)};
-unsigned int m_table_desc2__9CSoundPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv)};
-unsigned int m_table_desc3__9CSoundPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv)};
 unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CSoundPcs_801DB4E8)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x25, 0, 0, 0, 0, 0x44, 1
 };
+static const unsigned int sSoundTableInitData[] = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv),
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv),
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv),
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv),
+};
 
 CSoundPcs SoundPcs;
+
+struct SoundTableInit {
+    SoundTableInit()
+    {
+        unsigned int* table = &m_table__9CSoundPcs[1];
+
+        table[0] = sSoundTableInitData[0];
+        table[1] = sSoundTableInitData[1];
+        table[2] = sSoundTableInitData[2];
+        table[3] = sSoundTableInitData[3];
+        table[4] = sSoundTableInitData[4];
+        table[5] = sSoundTableInitData[5];
+        table[6] = sSoundTableInitData[6];
+        table[7] = sSoundTableInitData[7];
+        table[8] = sSoundTableInitData[8];
+        table[11] = sSoundTableInitData[9];
+        table[12] = sSoundTableInitData[10];
+        table[13] = sSoundTableInitData[11];
+    }
+};
+
+static SoundTableInit sSoundTableInit;
 
 /*
  * --INFO--

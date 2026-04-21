@@ -325,12 +325,12 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
         while (self[0x649C] != 0)
         {
-            GbaThreadSleep((OS_BUS_CLOCK / 4000) * 100);
+            MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 100);
         }
 
         while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
         {
-            GbaThreadSleep((OS_BUS_CLOCK / 4000) * 100);
+            MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 100);
         }
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
@@ -403,9 +403,18 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         offset += 0xE;
     }
 
-    for (; offset < 0xBD; offset++)
+    int remaining = 0xBD - offset;
+    char* checksumBytes = reinterpret_cast<char*>(managerBase + offset);
+    if (offset < 0xBD)
     {
-        checksum -= *reinterpret_cast<char*>(managerBase + offset);
+        do
+        {
+            char value = *checksumBytes;
+            offset++;
+            checksumBytes++;
+            checksum -= value;
+            remaining--;
+        } while (remaining != 0);
     }
     *reinterpret_cast<char*>(managerBase + offset) = checksum;
 
@@ -441,9 +450,18 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         offset += 0xE;
     }
 
-    for (; offset < 0xBD; offset++)
+    remaining = 0xBD - offset;
+    checksumBytes = reinterpret_cast<char*>(managerBase + offset);
+    if (offset < 0xBD)
     {
-        checksum -= *reinterpret_cast<char*>(managerBase + offset);
+        do
+        {
+            char value = *checksumBytes;
+            offset++;
+            checksumBytes++;
+            checksum -= value;
+            remaining--;
+        } while (remaining != 0);
     }
     *reinterpret_cast<char*>(managerBase + offset) = checksum;
 

@@ -55,11 +55,11 @@ extern "C" void SetStage__25CPtrArray_P11CTexAnimSeq_Fv(void*, CMemory::CStage*)
 extern "C" {
 char s_texanim_cpp_801d7adc[] = "texanim.cpp";
 }
-static const char DAT_8032fb48[] = "e1";
-const float FLOAT_8032fb38 = 0.0f;
-const float FLOAT_8032fb3c = 1.0f;
-const float FLOAT_8032fb4c = 1.25f;
-const double DOUBLE_8032fb40 = 4503599627370496.0;
+extern const float FLOAT_8032fb38 = 0.0f;
+extern const float FLOAT_8032fb3c = 1.0f;
+extern const double DOUBLE_8032fb40 = 4503599627370496.0;
+extern const char DAT_8032fb48[] = "e1";
+extern const float FLOAT_8032fb4c = 1.25f;
 
 static char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error_801D7B14[] = "CPtrArray grow error";

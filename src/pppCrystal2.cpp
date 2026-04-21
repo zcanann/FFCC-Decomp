@@ -81,7 +81,7 @@ static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {
 static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
-static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
+extern const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 static inline int Crystal2FpClassify(float value)
 {

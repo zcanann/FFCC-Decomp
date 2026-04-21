@@ -51,19 +51,31 @@ void CGQuadObj::onDraw()
             u32 count;
 
             i = i + 1;
-            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
+            GXWGFifo.f32 = current->m_vertices[0].x;
+            GXWGFifo.f32 = m_yBase;
+            GXWGFifo.f32 = current->m_vertices[0].z;
             count = m_vertexCount;
             next = next - (next / (int)count) * count;
-            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
-            GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
+            GXWGFifo.f32 = m_vertices[next].x;
+            GXWGFifo.f32 = m_yBase;
+            GXWGFifo.f32 = m_vertices[next].z;
+            GXWGFifo.f32 = current->m_vertices[0].x;
+            GXWGFifo.f32 = m_yBase + m_yHeight;
+            GXWGFifo.f32 = current->m_vertices[0].z;
             count = m_vertexCount;
             next = next - (next / (int)count) * count;
-            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
-            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
+            GXWGFifo.f32 = m_vertices[next].x;
+            GXWGFifo.f32 = m_yBase + m_yHeight;
+            GXWGFifo.f32 = m_vertices[next].z;
+            GXWGFifo.f32 = current->m_vertices[0].x;
+            GXWGFifo.f32 = m_yBase;
+            GXWGFifo.f32 = current->m_vertices[0].z;
             vertex2 = current->m_vertices;
             vertex1 = current->m_vertices;
             current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(current) + sizeof(QuadVertex));
-            GXPosition3f32(vertex1->x, m_yBase + m_yHeight, vertex2->z);
+            GXWGFifo.f32 = vertex1->x;
+            GXWGFifo.f32 = m_yBase + m_yHeight;
+            GXWGFifo.f32 = vertex2->z;
         }
     }
 }

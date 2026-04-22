@@ -216,8 +216,8 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
     static const char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
-    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     VYmMiasma* work;
+    YmMiasmaFrameStep* step = (YmMiasmaFrameStep*)param_2;
     int i;
     PARTICLE_DATA* particle;
     Vec matrixPos;

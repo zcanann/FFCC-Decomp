@@ -307,7 +307,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		int arOffset = c_RedMemory.GetABufferSize() < 0x800000 ? 0 : 0x300000;
 		streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
 		if (streamData[0x4b] == 0) {
-			DAT_8032e154.WaveOldClear(0, arOffset);
+			c_RedEntry.WaveOldClear(0, arOffset);
 			streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
 		}
 
@@ -318,7 +318,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			if (streamData[0x4b] != 0) {
 				RedDeleteA(streamData[0x4b]);
 			}
-			if (DAT_8032f408 != 0) {
+			if (m_ReportPrint != 0) {
 				fflush(&DAT_8021d1a8);
 			}
 			return param_1;
@@ -344,7 +344,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		streamData[0x47] = 0;
 		streamData[0x48] = 0x1000;
 		streamData[0x49] = 0;
-		streamData[1] = (int)DAT_8032f444 + *(char*)(*streamData + 0x14e) * 0xc0;
+		streamData[1] = (int)p_VoiceData + *(char*)(*streamData + 0x14e) * 0xc0;
 		streamData[2] = (int)param_2;
 		streamData[0x46] = param_3;
 
@@ -369,7 +369,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			voice[0x2c] = 0x8000;
 			voice[1] = (int)(streamData + iVar2 * 0x18 + 0xc);
 			voice[0x27] = pitch;
-			*(int*)(*voice + 0x68) = *(int*)((int)DAT_8032f474 + 0xc);
+			*(int*)(*voice + 0x68) = *(int*)((int)p_ReverbDepth + 0xc);
 			*(int*)(*voice + 0x70) = 0;
 
 			if (*(short*)((int)streamData + 0x2a) == 2) {
@@ -470,7 +470,7 @@ void StreamPause(int param_1, int param_2)
 	RedStreamDATA* streamEnd;
 
 	streamData = p_Stream;
-	if (DAT_8032f408 != 0) {
+	if (m_ReportPrint != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
 		} else {

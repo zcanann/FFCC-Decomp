@@ -240,7 +240,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 {
 	unsigned int interruptLevel = OSDisableInterrupts();
 	int found = 0;
-	int soundBase = (int)DAT_8032f3f0 + 0x494;
+	int soundBase = (int)p_SoundControlBuffer + 0x494;
 
 	do {
 		if ((-1 < *(int*)(soundBase + 0x470)) && (*(int*)(soundBase + 0x47c) == waveNo)) {
@@ -248,9 +248,9 @@ int CRedEntry::SearchUseWave(int waveNo)
 			MusicStop(*(int*)(soundBase + 0x470));
 		}
 		soundBase -= 0x494;
-	} while ((int)DAT_8032f3f0 <= soundBase);
+	} while ((int)p_SoundControlBuffer <= soundBase);
 
-	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
+	int* trackBasePtr = (int*)((char*)p_SoundControlBuffer + 0xdbc);
 	int* track = (int*)*trackBasePtr;
 	do {
 		if ((*track != 0) && (track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
@@ -290,7 +290,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 		sequenceNo = SearchWaveSequence(iVar2);
 		if (sequenceNo < 0) {
 			iVar1 = SearchUseWave(iVar2);
-			if ((iVar1 != 0) && (DAT_8032f408 != 0)) {
+			if ((iVar1 != 0) && (m_ReportPrint != 0)) {
 				OSReport(s__s_s__s_801e78d8, DAT_801e7905, DAT_80333d30, DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 				OSReport(s__s_s__________ERROR___________s_801e7917, DAT_801e7905, DAT_80333d30, DAT_80333d38);
@@ -443,12 +443,12 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			}
 		} while (WaveOldClear(minOffset, maxOffset) != 0);
 
-		if (DAT_8032f408 != 0) {
+		if (m_ReportPrint != 0) {
 			OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, DAT_801e7905, DAT_80333d30, (int)*(short*)(head + 2),
 			         *(int*)(head + 4), DAT_80333d38);
 			fflush(&DAT_8021d1a8);
 		}
-	} else if (DAT_8032f408 != 0) {
+	} else if (m_ReportPrint != 0) {
 		OSReport(s__s_sWave_Header_was_broken__s_801e7972, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 		fflush(&DAT_8021d1a8);
 	}
@@ -535,7 +535,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		if (entry[4] < 1) {
-			if (DAT_8032f408 != 0) {
+			if (m_ReportPrint != 0) {
 				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, DAT_801e7905, DAT_80333d45, entry[3], DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 			}
@@ -737,21 +737,21 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 
 	if (mode == 0) {
 		used = false;
-		if ((*(short*)((char*)DAT_8032f3f0 + 0x48e) != 0) && (*(int*)((char*)DAT_8032f3f0 + 0x47c) == waveNo)) {
+		if ((*(short*)((char*)p_SoundControlBuffer + 0x48e) != 0) && (*(int*)((char*)p_SoundControlBuffer + 0x47c) == waveNo)) {
 			used = true;
 		}
-		if ((*(short*)((char*)DAT_8032f3f0 + 0x922) != 0) && (*(int*)((char*)DAT_8032f3f0 + 0x910) == waveNo)) {
+		if ((*(short*)((char*)p_SoundControlBuffer + 0x922) != 0) && (*(int*)((char*)p_SoundControlBuffer + 0x910) == waveNo)) {
 			used = true;
 		}
 		if (!used) {
-			track = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+			track = *(int**)((char*)p_SoundControlBuffer + 0xdbc);
 			do {
 				if (((*track != 0) && (track[6] != 0)) && (*(short*)(track[6] + 2) == waveNo)) {
 					used = true;
 					break;
 				}
 				track += 0x55;
-			} while (track < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+			} while (track < (int*)(*(int*)((char*)p_SoundControlBuffer + 0xdbc) + 0x2a80));
 		}
 		if (((!used) && (seq = SearchWaveSequence__9CRedEntryFi(this, waveNo), 0xf < seq)) &&
 		    (*(int*)(*entry + seq * 0x10 + 4) == 0)) {
@@ -780,7 +780,7 @@ void CRedEntry::DisplayWaveInfo()
 {
 	int* entry = (int*)this;
 
-	if (DAT_8032f408 != 0) {
+	if (m_ReportPrint != 0) {
 		OSReport(DAT_80333d4d);
 		fflush(&DAT_8021d1a8);
 		OSReport(s__s_____AMemory_Information______801e79ed, DAT_801e7905);
@@ -1071,7 +1071,7 @@ int CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 		}
 	} else {
 		RedDelete(seSepHead);
-		if (DAT_8032f408 != 0) {
+		if (m_ReportPrint != 0) {
 			OSReport(s__s_sSE_Sep_Header_was_broken__s_801e7b50, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 			fflush(&DAT_8021d1a8);
 		}
@@ -1181,7 +1181,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 {
 	if (mode == 0) {
 		bool inUse = false;
-		int* track = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+		int* track = *(int**)((int)p_SoundControlBuffer + 0xdbc);
 
 		do {
 			if ((*track != 0) && (track[0x3D] == seNo)) {
@@ -1189,7 +1189,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 				break;
 			}
 			track += 0x55;
-		} while (track < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+		} while (track < (int*)(*(int*)((int)p_SoundControlBuffer + 0xdbc) + 0x2a80));
 
 		int sequenceNo = SearchSeSepSequence(seNo);
 		if ((!inUse) && (-1 < sequenceNo) &&
@@ -1217,7 +1217,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
  */
 void CRedEntry::DisplaySePlayInfo()
 {
-	if (DAT_8032f408 != 0) {
+	if (m_ReportPrint != 0) {
 		OSReport(DAT_80333d4d);
 		fflush(&DAT_8021d1a8);
 		OSReport(s__s_____SE_Play_Information______801e7b71, DAT_801e7905);
@@ -1225,7 +1225,7 @@ void CRedEntry::DisplaySePlayInfo()
 		OSReport(s__s_Track___Name___Wave_801e7b92, DAT_801e7905);
 		fflush(&DAT_8021d1a8);
 
-		int* trackHead = (int*)((int)DAT_8032f3f0 + 0xdbc);
+		int* trackHead = (int*)((int)p_SoundControlBuffer + 0xdbc);
 		int* track = (int*)*trackHead;
 		do {
 			int trackIndex = ((int)track - *trackHead) / 0x154 + (((int)track - *trackHead) >> 0x1F);
@@ -1241,8 +1241,8 @@ void CRedEntry::DisplaySePlayInfo()
 			} else {
 				unsigned int seDataNo = (unsigned int)track[0x3D];
 				int songNo = (int)(seDataNo & 0x7FFFFFFF) >> 9;
-				int seqBase = ((int*)&DAT_8032e12c)[songNo] + 0x10;
-				seqBase += *(short*)(((int*)&DAT_8032e12c)[songNo] + 10) * 4;
+				int seqBase = ((int*)&p_SeBlockData)[songNo] + 0x10;
+				seqBase += *(short*)(((int*)&p_SeBlockData)[songNo] + 10) * 4;
 				seqBase += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
 
 				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, DAT_801e7905,
@@ -1463,12 +1463,12 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 {
 	if (mode == 0) {
 		bool inUse = false;
-		if ((*reinterpret_cast<short*>((int)DAT_8032f3f0 + 0x48E) != 0)
-		    && (*reinterpret_cast<int*>((int)DAT_8032f3f0 + 0x470) == musicNo)) {
+		if ((*reinterpret_cast<short*>((int)p_SoundControlBuffer + 0x48E) != 0)
+		    && (*reinterpret_cast<int*>((int)p_SoundControlBuffer + 0x470) == musicNo)) {
 			inUse = true;
 		}
-		if ((*reinterpret_cast<short*>((int)DAT_8032f3f0 + 0x922) != 0)
-		    && (*reinterpret_cast<int*>((int)DAT_8032f3f0 + 0x904) == musicNo)) {
+		if ((*reinterpret_cast<short*>((int)p_SoundControlBuffer + 0x922) != 0)
+		    && (*reinterpret_cast<int*>((int)p_SoundControlBuffer + 0x904) == musicNo)) {
 			inUse = true;
 		}
 
@@ -1543,7 +1543,7 @@ int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 		}
 	} else {
 		RedDelete(musicHead);
-		if (DAT_8032f408 != 0) {
+		if (m_ReportPrint != 0) {
 			OSReport(s__s_sMusic_Header_was_broken__s_801e7c1d, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 			fflush(&DAT_8021d1a8);
 		}
@@ -1577,7 +1577,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	int* seBlockBase;
 	int* entry = (int*)this;
 
-	if (DAT_8032f408 == 0) {
+	if (m_ReportPrint == 0) {
 		return;
 	}
 
@@ -1595,7 +1595,7 @@ void CRedEntry::DisplayMMemoryInfo()
     memoryBank = c_RedMemory.GetMainBankAddress();
     bufferTop = nextAddress + c_RedMemory.GetMainBufferSize();
 	bankEntry = memoryBank;
-	seBlockBase = (int*)DAT_8032e12c;
+	seBlockBase = (int*)p_SeBlockData;
 
 	do {
 		if (bankEntry[1] != 0) {

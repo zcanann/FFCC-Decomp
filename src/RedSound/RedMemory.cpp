@@ -91,7 +91,7 @@ int RedNew(int param_1)
 				do {
 					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
 						if (blockList[0x7FF] > 0) {
-							if (DAT_8032f408 != 0) {
+							if (m_ReportPrint != 0) {
 								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 								fflush(__files + 1);
 							}
@@ -208,7 +208,7 @@ int RedNewA(int size, int offset, int maxSize)
 		return 0;
 	}
 	if (m_AMemoryBank[0x7FF] > 0) {
-		if (DAT_8032f408 != 0) {
+		if (m_ReportPrint != 0) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
 		}

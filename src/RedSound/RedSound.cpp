@@ -20,8 +20,8 @@ extern "C" {
 
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
-int DAT_8032e17c[0x41];
-volatile unsigned int DAT_8032f4c4;
+int m_StandbyStatus[0x40];
+volatile unsigned int m_AutoID;
 volatile int DAT_8032f4c8;
 static const char s_redSoundMemorySettingErrorFmt[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
@@ -73,10 +73,10 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
 unsigned int CRedSound::GetAutoID()
 {
 	do {
-		DAT_8032f4c4 = (DAT_8032f4c4 + 1) & 0x7FFFFFFF;
-	} while (DAT_8032f4c4 == 0);
+		m_AutoID = (m_AutoID + 1) & 0x7FFFFFFF;
+	} while (m_AutoID == 0);
 
-	return DAT_8032f4c4;
+	return m_AutoID;
 }
 
 /*
@@ -90,14 +90,14 @@ unsigned int CRedSound::GetAutoID()
  */
 int* CRedSound::EntryStandbyID(int id)
 {
-	int* slot = DAT_8032e17c;
+	int* slot = m_StandbyStatus;
 	do {
 		if (*slot == 0) {
 			*slot = id;
 			return slot;
 		}
 		slot++;
-	} while (slot < (DAT_8032e17c + 0x40));
+	} while (slot < (m_StandbyStatus + 0x40));
 
 	return 0;
 }
@@ -113,11 +113,11 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
-	memset(DAT_8032e17c, 0, 0x100);
+	memset(m_StandbyStatus, 0, 0x100);
 
 	if (param_3 > 0 && param_5 > 0) {
 		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
-			if (DAT_8032f408 != 0) {
+			if (m_ReportPrint != 0) {
 				OSReport("%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
 				         sRedSoundLogErrorColor, (u32)param_2,
 				         param_3, sRedSoundLogReset);
@@ -127,7 +127,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		}
 
 		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
-			if (DAT_8032f408 != 0) {
+			if (m_ReportPrint != 0) {
 				OSReport("%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
 				         sRedSoundLogErrorColor, param_4, param_5,
 				         sRedSoundLogReset);
@@ -137,7 +137,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		}
 
 		if (ARCheckInit() == 0) {
-			if (DAT_8032f408 != 0) {
+			if (m_ReportPrint != 0) {
 				OSReport("%s\"AR\" was not initialized.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
@@ -150,11 +150,11 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		AXInit();
 		AXARTInit();
         c_RedMemory.Init((int)param_2, param_3, param_4, param_5);
-		DAT_8032e154.Init();
+		c_RedEntry.Init();
 		Start();
 		c_Driver.Init();
 
-		if (DAT_8032f408 != 0) {
+		if (m_ReportPrint != 0) {
 			OSReport("%s%sSound Driver Initialize OK.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogInfoColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
@@ -162,7 +162,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	} else {
 		param_3 = 0;
 
-		if (DAT_8032f408 != 0) {
+		if (m_ReportPrint != 0) {
 			OSReport("%s%sSound Driver Initialize ERROR !!%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
@@ -230,7 +230,7 @@ void CRedSound::GetProgramTime()
  */
 void CRedSound::ReportPrint(int debugFlag)
 {
-	DAT_8032f408 = debugFlag;
+	m_ReportPrint = debugFlag;
 }
 
 /*
@@ -249,7 +249,7 @@ int CRedSound::ReportStandby(int id)
 	if (id == 0) {
 		i = 0;
 		do {
-			if (DAT_8032e17c[i] != 0) {
+			if (m_StandbyStatus[i] != 0) {
 				return 1;
 			}
 			i++;
@@ -257,7 +257,7 @@ int CRedSound::ReportStandby(int id)
 	} else {
 		i = 0;
 		do {
-			if (id == DAT_8032e17c[i]) {
+			if (id == m_StandbyStatus[i]) {
 				return 1;
 			}
 			i++;
@@ -756,7 +756,7 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 	if (streamData[0] == 'S' && streamData[1] == 'T' && streamData[2] == 'R') {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, param_3, param_4, param_5);
-	} else if (DAT_8032f408 != 0) {
+	} else if (m_ReportPrint != 0) {
 		OSReport(s_redSoundInvalidStreamDataFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
 		fflush(__files + 1);
 	}

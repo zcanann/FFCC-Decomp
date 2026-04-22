@@ -1,7 +1,7 @@
 #ifndef _FFCC_REDSOUND_REDMEMORY_H
 #define _FFCC_REDSOUND_REDMEMORY_H
 
-extern int DAT_8032f408;
+extern int m_ReportPrint;
 
 extern const char sRedMemoryLogPrefix[];
 extern const char sRedMemoryLogSuffixA[];

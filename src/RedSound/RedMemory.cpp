@@ -110,8 +110,14 @@ int RedNew(int size)
 							return address;
 						}
 
-						break;
+						*slot = address;
+						slot[1] = param_1;
+						OSRestoreInterrupts(interrupts);
+						return address;
 					}
+				}
+				break;
+			}
 
 					address = *slot + slot[1];
 					slot += 2;
@@ -196,7 +202,6 @@ void RedDelete(void* param_1)
 #pragma optimization_level 0
 int RedNewA(int size, int offset, int maxSize)
 {
-	unsigned int alignedSize;
 	unsigned int moveCount;
 	unsigned int interrupts;
 	int result;
@@ -224,7 +229,7 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
-	alignedSize = (size + 0x1F) & 0xFFFFFFE0;
+	size = (size + 0x1F) & 0xFFFFFFE0;
 	result = rangeStart;
 	maxGap = maxSize;
 	bestBlock = 0;
@@ -236,7 +241,7 @@ int RedNewA(int size, int offset, int maxSize)
 		currentAddress = rangeStart;
 		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
 			if (currentAddress < rangeStart + maxSize) {
-				if ((int)(currentAddress + alignedSize) <= *blockPtr) {
+				if ((int)(currentAddress + size) <= *blockPtr) {
 					gap = *blockPtr - currentAddress;
 					if (gap < maxGap) {
 						maxGap = gap;
@@ -251,7 +256,7 @@ int RedNewA(int size, int offset, int maxSize)
 		}
 
 		if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
-		    (gap = (rangeStart + maxSize) - currentAddress, (int)alignedSize <= gap) &&
+		    (gap = (rangeStart + maxSize) - currentAddress, size <= gap) &&
 		    (gap < maxGap)) {
 			result = currentAddress;
 			bestBlock = blockPtr;
@@ -260,7 +265,7 @@ int RedNewA(int size, int offset, int maxSize)
 		bestBlock = blockPtr;
 	}
 
-	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + alignedSize)) {
+	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + size)) {
 		OSRestoreInterrupts(interrupts);
 		return 0;
 	}
@@ -273,7 +278,7 @@ int RedNewA(int size, int offset, int maxSize)
 		}
 	}
 	*blockPtr = result;
-	blockPtr[1] = alignedSize;
+	blockPtr[1] = size;
 	OSRestoreInterrupts(interrupts);
 	return result;
 }

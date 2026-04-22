@@ -361,15 +361,20 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
     EmissionMeshData* meshData = ((EmissionModelView*)model)->m_meshes[meshIndex].m_data;
     if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
+        int texture = state->m_texture;
+        int drawTevBits = 0xACE0F;
+        int fullTevBits = drawTevBits | 0x40000;
+
         pppInitBlendMode();
         pppSetBlendMode(step->m_payload[8]);
-        *(int*)(MaterialManRaw() + 0xD0) = state->m_texture + 0x28;
+        *(int*)(MaterialManRaw() + 0xD0) = texture + 0x28;
 
         if (step->m_payload[9] == 0) {
             for (int i = 0; i < step->m_initWOrk; i++) {
-                float scale = ((float)i * state->m_scale0) + FLOAT_803311e4;
-                Mtx objMtx;
+                float scale = FLOAT_803311e4;
+                scale += (float)i * state->m_scale0;
                 Mtx viewMtx;
+                Mtx objMtx;
                 PSMTXScale(objMtx, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx, objMtx);
                 PSMTXCopy(CameraMatrix(), viewMtx);
@@ -378,7 +383,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+                    *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
@@ -392,11 +397,11 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x58) = 0;
                     *(int*)(MaterialManRaw() + 0x5C) = 0;
                     *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x48) = fullTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x40) = fullTevBits;
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
                         &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
 
@@ -435,7 +440,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x48) = 0xACE0F;
+                    *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
@@ -449,11 +454,11 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x58) = 0;
                     *(int*)(MaterialManRaw() + 0x5C) = 0;
                     *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(int*)(MaterialManRaw() + 0x48) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x48) = fullTevBits;
                     *(int*)(MaterialManRaw() + 0x128) = 0;
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(int*)(MaterialManRaw() + 0x40) = 0xECE0F;
+                    *(int*)(MaterialManRaw() + 0x40) = fullTevBits;
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
                         &MaterialMan, ((EmissionModelView*)model)->m_data->m_materialSet, displayList->m_material, 0, 0);
 

@@ -51,9 +51,6 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-extern const float FLOAT_80330dac = 0.0f;
-extern const double DOUBLE_80330DB0 = 4503601774854144.0;
-extern const double kPppYmSharedDoubleBias = 4503601774854144.0;
 
 static inline Mtx& CameraMatrix()
 {
@@ -208,10 +205,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         PSMTXRotRad(rotMtx, 'z', FLOAT_80330DA8 * (float)state->m_angle);
         indMtx[0][0] = rotMtx[0][0] * state->m_scale;
         indMtx[0][1] = rotMtx[0][1] * state->m_scale;
-        indMtx[0][2] = FLOAT_80330dac;
+        indMtx[0][2] = 0.0f;
         indMtx[1][0] = rotMtx[1][0] * state->m_scale;
         indMtx[1][1] = rotMtx[1][1] * state->m_scale;
-        indMtx[1][2] = FLOAT_80330dac;
+        indMtx[1][2] = 0.0f;
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
         GXLoadTexObj((_GXTexObj*)backTexture, GX_TEXMAP0);
@@ -222,13 +219,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetNumIndStages(0);
         GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-        PSMTXRotRad(resetRotMtx, 'z', FLOAT_80330dac);
-        resetIndMtx[0][0] = FLOAT_80330dac;
-        resetIndMtx[0][1] = FLOAT_80330dac;
-        resetIndMtx[0][2] = FLOAT_80330dac;
-        resetIndMtx[1][0] = FLOAT_80330dac;
-        resetIndMtx[1][1] = FLOAT_80330dac;
-        resetIndMtx[1][2] = FLOAT_80330dac;
+        PSMTXRotRad(resetRotMtx, 'z', 0.0f);
+        resetIndMtx[0][0] = 0.0f;
+        resetIndMtx[0][1] = 0.0f;
+        resetIndMtx[0][2] = 0.0f;
+        resetIndMtx[1][0] = 0.0f;
+        resetIndMtx[1][1] = 0.0f;
+        resetIndMtx[1][2] = 0.0f;
         GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
 
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
@@ -301,10 +298,10 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
-    float value = FLOAT_80330dac;
+    float value = 0.0f;
     float* state = (float*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-    state[3] = FLOAT_80330dac;
+    state[3] = 0.0f;
     state[2] = value;
     state[1] = value;
     state[6] = value;

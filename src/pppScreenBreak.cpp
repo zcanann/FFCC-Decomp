@@ -87,8 +87,12 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
-extern float FLOAT_80331cc0;
-extern float FLOAT_80331cc4;
+extern const float FLOAT_80331cc0;
+extern const float FLOAT_80331cc4;
+extern const float FLOAT_80331cd0;
+extern const float FLOAT_80331ce8;
+extern const float FLOAT_80331cec;
+extern const float FLOAT_80331cf0;
 static const float kPppScreenBreakDoubleScale = 2.0f;
 static const float kPppScreenBreakZero = 0.0f;
 static const float kPppScreenBreakRandRange = 0.3f;
@@ -350,7 +354,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    float f = 0.0f;
+    float f = FLOAT_80331cc4;
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
@@ -640,16 +644,15 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     u8* camera = reinterpret_cast<u8*>(&CameraPcs);
-    const float cameraOffset = kPppScreenBreakCameraOffset;
-    const float zero = 0.0f;
 
-    lightDir.x = *(float*)(camera + 0xEC) - (cameraOffset + *(float*)(camera + 0xE0));
-    lightDir.y = *(float*)(camera + 0xF0) - (cameraOffset + *(float*)(camera + 0xE4));
-    lightDir.z = *(float*)(camera + 0xF4) - (cameraOffset + *(float*)(camera + 0xE8));
+    lightDir.x = *(float*)(camera + 0xEC) - (FLOAT_80331ce8 + *(float*)(camera + 0xE0));
+    lightDir.y = *(float*)(camera + 0xF0) - (FLOAT_80331ce8 + *(float*)(camera + 0xE4));
+    lightDir.z = *(float*)(camera + 0xF4) - (FLOAT_80331ce8 + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, kPppScreenBreakOne, zero);
-    GXInitLightAttn(&lightObj, zero, zero, kPppScreenBreakOne, kPppScreenBreakLightAttn, zero, kPppScreenBreakLightBias);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);
+    GXInitLightAttn(&lightObj, FLOAT_80331cc4, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cec, FLOAT_80331cc4,
+                    FLOAT_80331cf0);
 
     GXInitLightColor(&lightObj,
                      *reinterpret_cast<GXColor*>(__ct__6CColorFUcUcUcUc(&colorStorage, 0xFF, 0xFF, 0xFF, 0xFF)));

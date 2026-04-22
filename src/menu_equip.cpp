@@ -565,7 +565,7 @@ void CMenuPcs::EquipCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::EquipClose()
+int CMenuPcs::EquipClose()
 {
 	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
 	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
@@ -605,7 +605,9 @@ void CMenuPcs::EquipClose()
 			*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			item += 0x20;
 		}
+		return 1;
 	}
+	return 0;
 }
 
 /*

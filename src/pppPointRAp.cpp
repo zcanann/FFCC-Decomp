@@ -62,10 +62,12 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         float spinRand = Math.RandF();
         float spinAngle = gPppPointRApRandomAngleRange * spinRand;
         s32 angleB = (s32)(gPppPointRApSpinScale * spinAngle);
-        float xOff = planarOff * *(float*)((u8*)trig + (angleB & 0xFFFC));
-        float zOff = planarOff * *(float*)((u8*)trig + ((angleB + 0x4000) & 0xFFFC));
-        Vec* dstPos = (Vec*)((u8*)obj + payload->m_childPosOffset + 0x80);
-        Vec* dstVel = (Vec*)((u8*)obj + payload->m_childVelocityOffset + 0x80);
+        u32 childPosOffset = payload->m_childPosOffset;
+        u32 childVelocityOffset = payload->m_childVelocityOffset;
+        float xOff = planarOff * *(float*)((u8*)gPppTrigTable + (angleB & 0xFFFC));
+        float zOff = planarOff * *(float*)((u8*)gPppTrigTable + ((angleB + 0x4000) & 0xFFFC));
+        Vec* dstPos = (Vec*)((u8*)obj + childPosOffset + 0x80);
+        Vec* dstVel = (Vec*)((u8*)obj + childVelocityOffset + 0x80);
 
         dstPos->x = srcPos->x + xOff;
         dstPos->y = srcPos->y + yOff;

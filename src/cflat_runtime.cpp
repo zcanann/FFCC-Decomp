@@ -1367,7 +1367,6 @@ void CFlatRuntime::setSystemVal(CFlatRuntime::CObject*, int)
 int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 {
 	CStopWatch watch(reinterpret_cast<char*>(-1));
-	System.DumpMapFile(&watch);
 	watch.Reset();
 	watch.Start();
 
@@ -1715,7 +1714,6 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			result = 0;
 		} else {
 			CStopWatch watch(reinterpret_cast<char*>(-1));
-			System.DumpMapFile(&watch);
 			watch.Reset();
 			watch.Start();
 			typedef int (*OnClassSystemFuncFn)(CFlatRuntime*, CFlatRuntime::CObject*, int, int, int*);
@@ -1833,7 +1831,6 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		}
 
 		CStopWatch watch(reinterpret_cast<char*>(-1));
-		System.DumpMapFile(&watch);
 		watch.Reset();
 		watch.Start();
 		typedef int (*OnSystemFuncFn)(CFlatRuntime*, CFlatRuntime::CObject*, int, int, int*);

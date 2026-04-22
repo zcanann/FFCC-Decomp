@@ -208,24 +208,25 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         for (int i = 0; i < param_2->m_initWOrk; i++) {
             particle->m_scale = particle->m_scale + (state->m_scale0 + Math.RandF(*(float*)(payload + 4)));
 
-            if (particle->m_fieldC >= 1) {
-                particle->m_fieldC = particle->m_fieldC - 1;
+            int delay = particle->m_fieldC;
+            if (delay > 0) {
+                particle->m_fieldC = delay - 1;
                 particle->m_alpha = particle->m_alpha + (payload[0xB] / payload[0xF]);
             } else {
-                if (particle->m_fieldA < payload[0xC]) {
-                    particle->m_alpha = particle->m_alpha - particle->m_fieldE;
-                } else {
+                if (payload[0xC] <= particle->m_fieldA) {
                     particle->m_alpha = payload[0xB];
+                } else {
+                    particle->m_alpha = particle->m_alpha - particle->m_fieldE;
                 }
             }
 
-            particle->m_fieldA = particle->m_fieldA - 1;
             int alpha = (int)((float)particle->m_alpha * alphaScale);
+            particle->m_fieldA = particle->m_fieldA - 1;
 
-            if (particle->m_fieldA < 1) {
-                s16 jitter = 0;
+            if (particle->m_fieldA <= 0) {
+                int jitter = 0;
                 if (payload[0xD] != 0) {
-                    jitter = (s16)(rand() % payload[0xD]);
+                    jitter = rand() % payload[0xD];
                 }
 
                 particle->m_fieldC = payload[0xF];

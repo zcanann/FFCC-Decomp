@@ -851,8 +851,9 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
  */
 void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    *trackData = *trackData + 1;
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    ((int*)track)[0] = (int)(command + 1);
+    int signature = command[0];
 }
 
 /*

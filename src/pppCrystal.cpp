@@ -11,6 +11,16 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
+extern const float FLOAT_80330fa8 = 32.0f;
+extern const float FLOAT_80330fac = -0.5f;
+extern const float FLOAT_80330fb0 = 640.0f;
+extern const float FLOAT_80330fb4 = 448.0f;
+extern const float FLOAT_80330fb8 = 33.3f;
+extern const float FLOAT_80330fbc = 1.3333334f;
+extern const float FLOAT_80330fc0 = 0.5f;
+extern const double DOUBLE_80330FC8 = 4503599627370496.0;
+extern const float FLOAT_80330FD0 = 2.0f;
+
 #define CRYSTAL_REFRACTION_SIZE 32.0f
 #define CRYSTAL_HALF_NEGATIVE -0.5f
 #define CRYSTAL_SCREEN_WIDTH 640.0f

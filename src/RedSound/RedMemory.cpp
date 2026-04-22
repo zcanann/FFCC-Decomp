@@ -1,4 +1,5 @@
 #include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedGlobals.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include <dolphin/os.h>
 
@@ -9,15 +10,10 @@ int m_ADataBufferSize;
 int* m_MemoryBank;
 int* m_AMemoryBank;
 
-extern int DAT_8032f478;
-extern int DAT_8032f480;
-extern int DAT_8032f484;
-extern int* DAT_8032f488;
-
-#define redMainDataBuffer DAT_8032f478
+#define redMainDataBuffer DAT_8032f478[0]
 #define redMainDataBufferSize DAT_8032f480
 #define redADataBufferSize DAT_8032f484
-#define redMainMemoryBank DAT_8032f488
+#define redMainMemoryBank ((int*)DAT_8032f488[0])
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";

@@ -29,7 +29,6 @@ extern "C" {
 void Init__7CSystemFv(CSystem*);
 void Quit__7CSystemFv(CSystem*);
 extern void* __RTTI__7CSystem[];
-CSystem* DumpMapFile__7CSystemFPv(CSystem*, void*);
 void* g_CSystemRttiBase[] = {0, 0, __RTTI__7CSystem};
 void* __vt__7CSystem[] = {0, (void*)Init__7CSystemFv, (void*)Quit__7CSystemFv, 0};
 }
@@ -67,19 +66,6 @@ static const char s_compilerMapLoaded[] =
     "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
     "\201\102\012";
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CSystem* CSystem::DumpMapFile(void* name)
-{
-	// TODO: Where the hell do we get these from?
-	// There is very obviously <not> a stopwatch at position 0 in this class. Maybe leftover debug code?
-	OSInitStopwatch((OSStopwatch*)this, (char*)name);
-	OSResetStopwatch((OSStopwatch*)this);
-	return this;
-}
 /*
  * --INFO--
  * Address:	TODO
@@ -469,8 +455,7 @@ void CSystem::ExecScenegraph()
         }
 
         float totalTime = 0.0f;
-        CStopWatch watch;
-        DumpMapFile__7CSystemFPv(reinterpret_cast<CSystem*>(&watch), 0);
+        CStopWatch watch(0);
 
         int index = 0;
         for (COrder* order = m_orderSentinel.m_next;

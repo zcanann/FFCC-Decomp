@@ -60,7 +60,6 @@ public:
     COrder* GetOrder(int);
     unsigned int GetCounter();
     int IsGdev();
-    CSystem* DumpMapFile(void*);
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
 
     // void* vtable;             // 0x0000 (4 bytes)

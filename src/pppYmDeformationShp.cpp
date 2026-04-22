@@ -22,6 +22,7 @@ extern float FLOAT_80330618;
 extern float FLOAT_8033061c;
 extern float FLOAT_80330620;
 extern float FLOAT_80330624;
+extern float FLOAT_80330628;
 extern float FLOAT_8033062c;
 extern float FLOAT_80330630;
 
@@ -289,7 +290,7 @@ void calcScreenPos(Vec4d& dst, Vec src, float (*modelMtx)[4], float (*screenMtx)
  */
 void oddToEven(float& value)
 {
-	if (((int)value & 1) != 0) {
+	if (((int)value % 2) != 0) {
 		value -= FLOAT_803305f8;
 	}
 }
@@ -487,16 +488,16 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		}
 	}
 
-	if (((int)minX & 1) != 0) {
+	if (((int)minX % 2) != 0) {
 		minX = minX - FLOAT_803305f8;
 	}
-	if (((int)minY & 1) != 0) {
+	if (((int)minY % 2) != 0) {
 		minY = minY - FLOAT_803305f8;
 	}
-	if (((int)maxX & 1) != 0) {
+	if (((int)maxX % 2) != 0) {
 		maxX = maxX + FLOAT_803305f8;
 	}
-	if (((int)maxY & 1) != 0) {
+	if (((int)maxY % 2) != 0) {
 		maxY = maxY + FLOAT_803305f8;
 	}
 
@@ -518,8 +519,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[2][0] = ppvScreenMatrix[2][0];
 	texMtx[0][1] = ppvScreenMatrix[0][1];
 	texMtx[2][1] = ppvScreenMatrix[2][1];
-	texMtx[0][2] = 0.0f;
-	texMtx[1][2] = 0.0f;
+	texMtx[0][2] = FLOAT_80330628;
+	texMtx[1][2] = FLOAT_80330628;
 	texMtx[2][2] = FLOAT_8033062c;
 
 	PSMTXConcat(texMtx, objMtx, tempMtx);

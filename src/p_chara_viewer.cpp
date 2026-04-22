@@ -229,7 +229,6 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 Printf__8CGraphicFPce(&Graphic, s_no_texture);
             } else {
                 CStopWatch watch(reinterpret_cast<char*>(-1));
-                System.DumpMapFile(&watch);
                 watch.Reset();
                 watch.Start();
                 SetFog__8CGraphicFii(&Graphic, 0, 0);

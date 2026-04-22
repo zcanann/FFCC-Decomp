@@ -104,15 +104,15 @@ pad.cpp:
 	.sdata2     start:0x8032F818 end:0x8032F840
 
 stopwatch.cpp:
-	extab       start:0x80005C44 end:0x80005CA0
-	extabindex  start:0x8000B4D0 end:0x8000B53C
-	.text       start:0x800211D4 end:0x8002147C
+	extab       start:0x80005C44 end:0x80005CA8
+	extabindex  start:0x8000B4D0 end:0x8000B548
+	.text       start:0x800211D4 end:0x800214B4
 	.sdata2     start:0x8032F850 end:0x8032F868
 
 system.cpp:
-	extab       start:0x80005CA0 end:0x80005D18
-	extabindex  start:0x8000B53C end:0x8000B5D8
-	.text       start:0x8002147C end:0x8002244C
+	extab       start:0x80005CA8 end:0x80005D18
+	extabindex  start:0x8000B548 end:0x8000B5D8
+	.text       start:0x800214B4 end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
 	.data       start:0x801E8838 end:0x801E8898
 	.bss        start:0x80244340 end:0x802455C0
@@ -1340,7 +1340,7 @@ THPSimple.cpp:
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
-	.bss        start:0x802FFA80 end:0x80300134
+	.bss        start:0x802FFA80 end:0x80300140
 	.sdata      start:0x8032E8C0 end:0x8032E8C4
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
@@ -1514,7 +1514,7 @@ pppCrystal2.cpp:
 	extabindex  start:0x80010D5C end:0x80010D80
 	.text       start:0x8013E694 end:0x8013EF94
 	.rodata     start:0x801DD608 end:0x801DD660
-	.sdata2     start:0x80331FC0 end:0x80332008
+	.sdata2     start:0x80331FC0 end:0x80332010
 
 pppChangeTex.cpp:
 	extab       start:0x80009B24 end:0x80009B4C

@@ -95,8 +95,8 @@ extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float)
 extern "C" void CalcPolygonHeight(
     VERTEX_DATA* vertexData, YmMeltVertex* vertexBuffer, _GXColor* color, float yOffset)
 {
-    int pointCount;
     int i;
+    int pointCount;
     float expand;
     float top;
     float rayY;
@@ -115,9 +115,9 @@ extern "C" void CalcPolygonHeight(
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
     expand = FLOAT_80330b18;
-    vertex = vertexBuffer;
+    for (i = 0; i < pointCount; i++) {
+        vertex = &vertexBuffer[i];
 
-    for (i = 0; i < pointCount; i++, vertex++) {
         vertex->m_color.m_bytes[0] = colorBytes[0];
         vertex->m_color.m_bytes[1] = colorBytes[1];
         vertex->m_color.m_bytes[2] = colorBytes[2];

@@ -298,9 +298,9 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		GXSetCurrentMtx(0);
 
 		PSMTX44Identity(orthoMtx);
+		orthoMtx[2][2] = FLOAT_8033067C;
 		orthoMtx[0][0] = FLOAT_80330674;
 		orthoMtx[1][1] = FLOAT_80330678;
-		orthoMtx[2][2] = FLOAT_8033067C;
 		orthoMtx[0][3] = FLOAT_80330680;
 		orthoMtx[1][3] = FLOAT_8033067C;
 		orthoMtx[2][3] = FLOAT_80330670;

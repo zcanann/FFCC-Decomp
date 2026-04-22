@@ -7,27 +7,30 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
-#include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
 extern const double DOUBLE_80331FC0 = 2.4;
 extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
-extern const float FLOAT_80331fd0 = -0.5f;
-extern const float FLOAT_80331fd4 = 25.0f;
-extern const float FLOAT_80331fd8 = 1.3333334f;
-extern const float FLOAT_80331fdc = 0.5f;
-extern const float FLOAT_80331FE0 = 2.0f;
-extern const float FLOAT_80331FE4 = -1.0f;
-extern const float FLOAT_80331FE8 = 0.0f;
-extern const double DOUBLE_80331FF0 = 0.5;
-extern const double DOUBLE_80331FF8 = 3.0;
-extern const double DOUBLE_80332000 = 0.0;
+
+#define CRYSTAL2_INDIRECT_SCALE -0.5f
+#define CRYSTAL2_SCENE_FOVY 25.0f
+#define CRYSTAL2_ASPECT 1.3333334f
+#define CRYSTAL2_HALF 0.5f
+#define CRYSTAL2_COORD_RANGE 2.0f
+#define CRYSTAL2_COORD_MIN -1.0f
+#define CRYSTAL2_ZERO 0.0f
+#define CRYSTAL2_SQRT_HALF 0.5
+#define CRYSTAL2_SQRT_THREE 3.0
+
 extern const float FLOAT_80332008;
 extern const float FLOAT_8033200C;
 extern const float FLOAT_80332010;
 extern const double DOUBLE_80332018;
+extern "C" unsigned long __float_nan[];
+#define CRYSTAL2_NAN (*(float*)__float_nan)
+
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -109,9 +112,9 @@ static inline float Crystal2SqrtPositive(float value)
 {
     double guess = __frsqrte((double)value);
 
-    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
-    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
-    guess = DOUBLE_80331FF0 * guess * (DOUBLE_80331FF8 - guess * guess * value);
+    guess = CRYSTAL2_SQRT_HALF * guess * (CRYSTAL2_SQRT_THREE - guess * guess * value);
+    guess = CRYSTAL2_SQRT_HALF * guess * (CRYSTAL2_SQRT_THREE - guess * guess * value);
+    guess = CRYSTAL2_SQRT_HALF * guess * (CRYSTAL2_SQRT_THREE - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -168,7 +171,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 
         indTexMtx = s_crystal2IndTexMtxBase;
-        indTexMtx.value[0][0] = FLOAT_80331fd0 * param_2->m_stepValue;
+        indTexMtx.value[0][0] = CRYSTAL2_INDIRECT_SCALE * param_2->m_stepValue;
         indTexMtx.value[1][1] = indTexMtx.value[0][0];
         texMtx = s_crystal2TexMtxBase;
 
@@ -177,13 +180,13 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         PSMTXConcat(pppMngStPtr->m_matrix.value, object->m_localMatrix.value, cameraMtx);
         if ((int)Game.m_currentSceneId == 7) {
             f32 perspectiveScale = param_2->m_perspectiveScale;
-            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
-                                  FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, CRYSTAL2_SCENE_FOVY, CRYSTAL2_ASPECT, perspectiveScale,
+                                  -perspectiveScale, CRYSTAL2_HALF, CRYSTAL2_HALF);
             PSMTXConcat(ppvCameraMatrix02, cameraMtx, tmpMtx);
         } else {
             f32 perspectiveScale = param_2->m_perspectiveScale;
-            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
-                                  FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, CRYSTAL2_ASPECT, perspectiveScale, -perspectiveScale,
+                                  CRYSTAL2_HALF, CRYSTAL2_HALF);
             PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);
@@ -268,25 +271,25 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
         textureInfo->m_imageCount = 0x100;
         textureInfo->m_bufferSize = textureSize;
 
-        stepX = FLOAT_80331FE0 / (float)(textureInfo->m_width - 1);
-        stepY = FLOAT_80331FE0 / (float)(textureInfo->m_height - 1);
-        yCoord = FLOAT_80331FE4;
+        stepX = CRYSTAL2_COORD_RANGE / (float)(textureInfo->m_width - 1);
+        stepY = CRYSTAL2_COORD_RANGE / (float)(textureInfo->m_height - 1);
+        yCoord = CRYSTAL2_COORD_MIN;
 
         for (y = 0; y < (u32)textureInfo->m_height; y++) {
             u32 yTile = y >> 2;
             u32 yFine = (y & 3) * 4;
             float ySq = yCoord * yCoord;
-            float xCoord = FLOAT_80331FE4;
+            float xCoord = CRYSTAL2_COORD_MIN;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
                 float magnitude = xCoord * xCoord + ySq;
 
-                if (magnitude > FLOAT_80331FE8) {
+                if (magnitude > CRYSTAL2_ZERO) {
                     magnitude = Crystal2SqrtPositive(magnitude);
-                } else if ((double)magnitude < DOUBLE_80332000) {
-                    magnitude = NAN;
+                } else if ((double)magnitude < 0.0) {
+                    magnitude = CRYSTAL2_NAN;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
-                    magnitude = NAN;
+                    magnitude = CRYSTAL2_NAN;
                 }
 
                 if (magnitude > FLOAT_80332008) {
@@ -294,14 +297,16 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                 }
 
                 u32 xFine = x & 3;
-                u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
+                u8 nx =
+                    (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
                 u8* pixel = textureInfo->m_imageData +
                     yTile * ((textureInfo->m_width & 0x1FFFFFFCU) << 3) +
                     (x & 0x1FFFFFFC) * 8 +
                     (xFine + yFine) * 2;
 
                 pixel[0] = nx;
-                u8 ny = (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
+                u8 ny =
+                    (u8)__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80332010 + FLOAT_8033200C));
                 xCoord += stepX;
                 pixel[1] = ny;
             }

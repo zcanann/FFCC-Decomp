@@ -267,7 +267,8 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         vertexBase = work->m_vertexData;
         angleSeed = rand();
         phaseWork = *(s16*)((u8*)&ctrl->m_arg3 + 2);
-        work->m_phaseOffset = angleSeed - angleSeed / phaseWork * phaseWork;
+        int phaseQuotient = angleSeed / phaseWork;
+        work->m_phaseOffset = angleSeed - phaseQuotient * phaseWork;
         halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
         phaseWork = work->m_phaseOffset;
         step = ctrl->m_stepValue / (f32)*(u16*)((u8*)&ctrl->m_initWOrk + 2);

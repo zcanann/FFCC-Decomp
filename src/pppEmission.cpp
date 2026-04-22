@@ -151,11 +151,12 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
-    float alphaScale = (float)dataSet[0xB] / FLOAT_803311e0;
+    u8 baseAlpha = dataSet[0xB];
     state->m_colorR = dataSet[8];
+    double alphaScale = (double)baseAlpha / FLOAT_803311e0;
     state->m_colorG = dataSet[9];
     state->m_colorB = dataSet[0xA];
-    state->m_colorA = dataSet[0xB];
+    state->m_colorA = baseAlpha;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
         pppEmission_, param_2->m_graphId,

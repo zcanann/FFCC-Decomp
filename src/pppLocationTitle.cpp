@@ -252,19 +252,13 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                     interpWrite++;
                 }
 
-                {
-                    int dstIndex = startIndex + inserted;
-
-                    pppCopyVector(particles[dstIndex + 1].m_pos,
-                                  particles[startIndex + 1].m_pos);
-                }
+                pppCopyVector(particles[startIndex + (inserted + 1)].m_pos,
+                              particles[startIndex + 1].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
-                    int dstIndex;
                     LocationTitleParticle* dst;
 
-                    dstIndex = startIndex + i;
-                    dst = &particles[dstIndex + 1];
+                    dst = &particles[startIndex + (i + 1)];
 
                     pppCopyVector(dst->m_pos, *interpRead);
                     memcpy(&dst->m_color, &colorData->m_color, 4);

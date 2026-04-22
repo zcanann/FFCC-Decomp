@@ -22,8 +22,8 @@ CMath Math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
 static float s_hSpline[65];
-static float s_wSpline[65];
 static float s_dSpline[65];
+static float s_wSpline[65];
 
 struct Vec4d {
     float x;
@@ -908,9 +908,6 @@ void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float,
  */
 void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDerivatives)
 {
-    if (count <= 0) {
-        return;
-    }
     int i;
     for (i = 0; i < count; ++i) {
         s_hSpline[i] = x[i + 1] - x[i];
@@ -919,18 +916,19 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
     s_wSpline[count] = s_wSpline[0];
 
     for (i = 1; i < count; ++i) {
-        s_dSpline[i] = 2.0f * (x[i + 1] - x[i - 1]);
+        s_dSpline[i] = FLOAT_8032F75C * (x[i + 1] - x[i - 1]);
     }
-    s_dSpline[count] = 2.0f * (s_hSpline[count - 1] + s_hSpline[0]);
+    s_dSpline[count] = FLOAT_8032F75C * (s_hSpline[count - 1] + s_hSpline[0]);
 
     for (i = 1; i <= count; ++i) {
         outSecondDerivatives[i] = s_wSpline[i] - s_wSpline[i - 1];
     }
 
-    s_wSpline[0] = s_hSpline[0];
+    s_wSpline[1] = s_hSpline[0];
+    s_wSpline[count - 1] = s_hSpline[count - 1];
     s_wSpline[count] = s_dSpline[count];
-    for (i = 1; i < count; ++i) {
-        s_wSpline[i] = 0.0f;
+    for (i = 2; i < count - 1; ++i) {
+        s_wSpline[i] = kZeroF;
     }
 
     for (i = 1; i < count; ++i) {
@@ -942,17 +940,17 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
 
     s_wSpline[0] = s_wSpline[count];
     outSecondDerivatives[0] = outSecondDerivatives[count];
-    for (i = count - 1; i >= 1; --i) {
-        float r = s_wSpline[i + 1] / s_dSpline[i + 1];
+    for (i = count - 2; i >= 0; --i) {
+        float r = s_hSpline[i] / s_dSpline[i + 1];
         outSecondDerivatives[i] = -(r * outSecondDerivatives[i + 1] - outSecondDerivatives[i]);
-        s_dSpline[i] = -(r * s_dSpline[i + 1] - s_dSpline[i]);
+        s_wSpline[i] = -(r * s_wSpline[i + 1] - s_wSpline[i]);
     }
 
-    outSecondDerivatives[0] /= s_wSpline[0];
-    outSecondDerivatives[count] = outSecondDerivatives[0];
+    float firstDerivative = outSecondDerivatives[0] / s_wSpline[0];
+    outSecondDerivatives[0] = firstDerivative;
+    outSecondDerivatives[count] = firstDerivative;
     for (i = 1; i < count; ++i) {
-        outSecondDerivatives[i] =
-            -(outSecondDerivatives[0] * s_wSpline[i] - outSecondDerivatives[i]) / s_dSpline[i];
+        outSecondDerivatives[i] = -(firstDerivative * s_wSpline[i] - outSecondDerivatives[i]) / s_dSpline[i];
     }
 }
 

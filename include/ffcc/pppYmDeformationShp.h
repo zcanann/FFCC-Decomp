@@ -30,15 +30,6 @@ struct pppYmDeformationShpUnkC {
     s32* m_serializedDataOffsets;
 };
 
-void SetUpIndWarp(VYmDeformationShp*);
-void calcBoundaryBox(Vec&, Vec&, Vec4d*);
-void setVertexPos(Vec&, Vec&, Vec&, Vec&, float, signed char);
-void setVertexPos(Vec&, Vec&, Vec&, Vec&, float, float, signed char);
-void setVertexPos(Vec*, signed char, float, float, float, float);
-void setVertexUV(Vec2d*, float, float, float, float);
-void calcScreenPos(Vec4d&, Vec, float (*)[4], float (*)[4]);
-void oddToEven(float&);
-void oddToEven(int&);
 int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 #ifdef __cplusplus

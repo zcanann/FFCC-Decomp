@@ -297,12 +297,11 @@ s32 THPSimpleClose(void)
             SimpleControl.isBufferSet = 0;
         }
 
-        if (SimpleControl.isReadFrameAsync != 0U) {
-            return 0;
+        if (SimpleControl.isReadFrameAsync == 0U) {
+            SimpleControl.isOpen = 0;
+            DVDClose(&SimpleControl.fileInfo);
+            return 1;
         }
-        SimpleControl.isOpen = 0;
-        DVDClose(&SimpleControl.fileInfo);
-        return 1;
     }
     return 0;
 }

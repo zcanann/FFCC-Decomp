@@ -12,8 +12,6 @@ extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
-extern "C" CTexture* __vc__21CPtrArray_P8CTexture_FUl(void*, unsigned long);
-extern "C" CMaterial* __vc__22CPtrArray_P9CMaterial_FUl(void*, unsigned long);
 extern "C" void* PTR_PTR_s_CMapTexAnim[];
 extern "C" {
 static const char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
@@ -56,12 +54,12 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
 
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
-    return __vc__22CPtrArray_P9CMaterial_FUl(Ptr(materialSet, 8), index);
+    return (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[index];
 }
 
 static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 {
-    return __vc__21CPtrArray_P8CTexture_FUl(Ptr(textureSet, 8), index);
+    return (*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[index];
 }
 
 static inline void ReplaceRef(void** slot, void* ref)

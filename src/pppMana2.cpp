@@ -95,6 +95,7 @@ void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned lon
 void BeginQuadEnv__5CUtilFv(void*);
 void EndQuadEnv__5CUtilFv(void*);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
     CUtil* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
     _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
@@ -481,6 +482,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     s32 i;
     u32 meshIndex;
     s32 setupOffset;
+    s32 meshData;
+    s32 meshShape;
+    s32 dlOffset;
+    u32 meshIndex;
+    u32 vertexIndex;
 
     if (gPppCalcDisabled != 0) {
         return;

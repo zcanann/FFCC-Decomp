@@ -16,7 +16,7 @@ extern f32 FLOAT_803306e8;
 extern f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
-extern f64 DOUBLE_803306F0;
+extern const f64 DOUBLE_803306F0;
 extern f64 DOUBLE_803306f8;
 
 extern "C" {
@@ -452,3 +452,5 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
     work->to.x = fVar1;
     work->_pad2e = 0;
 }
+
+extern const f64 DOUBLE_803306F0 = 4503601774854144.0;

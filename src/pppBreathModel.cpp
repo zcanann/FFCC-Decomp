@@ -217,18 +217,12 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
     }
     *(unsigned char*)(particle + 0x90) = 0;
 
-    if (particleWmat != NULL) {
-        PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
-    }
+    PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
     if (particleColor != NULL) {
         *(u32*)((unsigned char*)particleColor + 0x10) = *(u32*)(breath + 0x28);
         *(u32*)((unsigned char*)particleColor + 0x14) = *(u32*)(breath + 0x2C);
         *(u32*)((unsigned char*)particleColor + 0x18) = *(u32*)(breath + 0x30);
         *(u32*)((unsigned char*)particleColor + 0x1C) = *(u32*)(breath + 0x34);
-    }
-
-    if (particleWmat == NULL) {
-        return;
     }
 
     PSMTXCopy(*(Mtx*)particleWmat, workMtx);

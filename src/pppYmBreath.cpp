@@ -698,7 +698,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     pppSetBlendMode(step->m_payload[8]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        step->m_payload + 0xB0, 0, 0.0f, step->m_payload[0xB6], step->m_payload[0xB5], step->m_payload[8], 0, 1, 1, 0);
+        0, 0, *reinterpret_cast<float*>(step->m_payload + 0xB0), step->m_payload[0xB6], step->m_payload[0xB5],
+        step->m_payload[8], 0, 1, 1, 0);
 
     colorR = color[0];
     colorG = color[1];

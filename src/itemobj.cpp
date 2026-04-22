@@ -313,14 +313,13 @@ void CGItemObj::onChangeStat(int state)
  */
 void CGItemObj::onCancelStat(int)
 {
-	extern float FLOAT_80331b18;
 	unsigned char* self = (unsigned char*)this;
 
 	if (*(int*)(self + 0x520) == 0x1b) {
 		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = FLOAT_80331b18;
-		*(float*)(self + 0x178) = FLOAT_80331b18;
-		*(float*)(self + 0x174) = FLOAT_80331b18;
+		*(float*)(self + 0x17c) = 1.0f;
+		*(float*)(self + 0x178) = 1.0f;
+		*(float*)(self + 0x174) = 1.0f;
 	}
 }
 

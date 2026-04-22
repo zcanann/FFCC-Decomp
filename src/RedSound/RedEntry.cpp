@@ -72,7 +72,6 @@ CRedEntry::CRedEntry()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete)
 {
 	if (redEntry != 0) {
@@ -82,7 +81,6 @@ extern "C" CRedEntry* __dt__9CRedEntryFv(CRedEntry* redEntry, short shouldDelete
 	}
 	return redEntry;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -712,7 +710,6 @@ int CRedEntry::SearchWaveBase(int waveNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 int CRedEntry::ReentryWaveData(int waveNo)
 {
 	waveNo = SearchWaveSequence(waveNo);
@@ -721,7 +718,6 @@ int CRedEntry::ReentryWaveData(int waveNo)
 	}
 	return waveNo;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -976,7 +972,6 @@ int CRedEntry::SearchSeSepSequence(int seNo)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 {
 	int* bankData = reinterpret_cast<int*>(bank);
@@ -1168,7 +1163,6 @@ int* CRedEntry::SearchSeSepBank(int seNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 int CRedEntry::ReentrySeSepData(int seNo)
 {
 	seNo = SearchSeSepSequence(seNo);
@@ -1177,7 +1171,6 @@ int CRedEntry::ReentrySeSepData(int seNo)
 	}
 	return seNo;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1448,7 +1441,6 @@ int* CRedEntry::SearchMusicBank(int musicNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 int CRedEntry::ReentryMusicData(int musicNo)
 {
 	musicNo = SearchMusicSequence(musicNo);
@@ -1457,7 +1449,6 @@ int CRedEntry::ReentryMusicData(int musicNo)
 	}
 	return musicNo;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1561,7 +1552,6 @@ int CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 
 	return result;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -53,7 +53,6 @@ CRedSound::CRedSound()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete)
 {
     if ((redSound != 0) && (0 < shouldDelete)) {
@@ -61,7 +60,6 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
     }
     return redSound;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -72,7 +70,6 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 unsigned int CRedSound::GetAutoID()
 {
 #define redSoundAutoId (*(volatile int*)&p_ReverbData)
@@ -84,7 +81,6 @@ unsigned int CRedSound::GetAutoID()
 	return redSoundAutoId;
 #undef redSoundAutoId
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -95,7 +91,6 @@ unsigned int CRedSound::GetAutoID()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = DAT_8032e17c;
@@ -109,7 +104,6 @@ int* CRedSound::EntryStandbyID(int id)
 
 	return 0;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -120,7 +114,6 @@ int* CRedSound::EntryStandbyID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
 	memset(DAT_8032e17c, 0, 0x100);
@@ -181,7 +174,6 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 	return param_3;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -253,7 +245,6 @@ void CRedSound::ReportPrint(int debugFlag)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedSound::ReportStandby(int id)
 {
 	int result = 0;
@@ -281,7 +272,6 @@ int CRedSound::ReportStandby(int id)
 
 	return result;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -292,12 +282,10 @@ int CRedSound::ReportStandby(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
 	RedDmaEntry(type, src, dst, length, flags, callback, userData);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -308,12 +296,10 @@ void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::DMACheck(int id)
 {
 	RedDmaSearchID(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -324,12 +310,10 @@ void CRedSound::DMACheck(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SetSoundMode(int mode)
 {
 	gRedDriver.SetSoundMode(mode);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -354,7 +338,6 @@ void CRedSound::GetSoundMode()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SetReverb(int bank, int kind)
 {
 	gRedDriver.SetReverb(bank, kind);
@@ -431,7 +414,6 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 {
 	gRedDriver.MusicCrossPlay(id, vol, fadeTime);
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -530,48 +512,40 @@ void CRedSound::ClearSeSepData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
 {
 	gRedDriver.ClearSeSepDataMG(bank, sep, group, kind);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::ReentrySeSepData(int id)
 {
 	gRedDriver.ReentrySeSepData(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::SePlayState(int id)
 {
 	gRedDriver.SePlayState(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::SeStop(int id)
 {
 	gRedDriver.SeStop(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -582,12 +556,10 @@ void CRedSound::SeStop(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
 {
 	gRedDriver.SeStopMG(bank, sep, group, kind);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -598,14 +570,12 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
 	unsigned int autoID = GetAutoID();
 	gRedDriver.SePlay(seID, sepID, autoID, unk, volume, pitch);
 	return autoID;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -616,12 +586,10 @@ int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SeMasterVolume(int volume)
 {
 	gRedDriver.SeMasterVolume(volume);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -632,12 +600,10 @@ void CRedSound::SeMasterVolume(int volume)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SeFadeOut(int seID, int frameCount)
 {
 	gRedDriver.SeFadeOut(seID, frameCount);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -648,12 +614,10 @@ void CRedSound::SeFadeOut(int seID, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SeVolume(int seID, int volume, int frameCount)
 {
 	gRedDriver.SeVolume(seID, volume, frameCount);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -664,12 +628,10 @@ void CRedSound::SeVolume(int seID, int volume, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SePan(int seID, int pan, int frameCount)
 {
 	gRedDriver.SePan(seID, pan, frameCount);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -680,12 +642,10 @@ void CRedSound::SePan(int seID, int pan, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SePitch(int seID, int pitch, int frameCount)
 {
 	gRedDriver.SePitch(seID, pitch, frameCount);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -696,12 +656,10 @@ void CRedSound::SePitch(int seID, int pitch, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::SePause(int seID, int pause)
 {
 	gRedDriver.SePause(seID, pause);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -712,12 +670,10 @@ void CRedSound::SePause(int seID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedSound::GetSeVolume(int seID, int outVolume)
 {
 	return gRedDriver.GetSeVolume(seID, outVolume);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -728,12 +684,10 @@ int CRedSound::GetSeVolume(int seID, int outVolume)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::ReportSeLoop(int mode)
 {
 	gRedDriver.ReportSeLoop(mode);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -758,12 +712,10 @@ void CRedSound::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::StreamPlayState(int streamID)
 {
 	gRedDriver.StreamPlayState(streamID);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -774,12 +726,10 @@ void CRedSound::StreamPlayState(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
 {
 	gRedDriver.GetStreamPlayPoint(streamID, point1, point2);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -790,12 +740,10 @@ void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::StreamStop(int streamID)
 {
 	gRedDriver.StreamStop(streamID);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -806,7 +754,6 @@ void CRedSound::StreamStop(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 {
 	int id = 0;
@@ -822,7 +769,6 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 
 	return id;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -833,12 +779,10 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
 {
 	gRedDriver.StreamVolume(streamID, volume, frameCount);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -849,12 +793,10 @@ void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::StreamPause(int streamID, int pause)
 {
 	gRedDriver.StreamPause(streamID, pause);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -865,8 +807,6 @@ void CRedSound::StreamPause(int streamID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
-#pragma optimization_level 0
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
 	unsigned int id = GetAutoID();
@@ -876,20 +816,16 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 	}
 	return id;
 }
-#pragma optimization_level 4
-#pragma dont_inline reset
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::ClearWaveData(int id)
 {
 	gRedDriver.ClearWaveData(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -900,36 +836,30 @@ void CRedSound::ClearWaveData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
 {
 	gRedDriver.ClearWaveDataM(bank, sep, group, kind);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::ClearWaveBank(int id)
 {
 	gRedDriver.ClearWaveBank(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::ReentryWaveData(int id)
 {
 	gRedDriver.ReentryWaveData(id);
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -946,7 +876,6 @@ void CRedSound::DisplayWaveInfo()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void CRedSound::TestProcess(int mode)
 {
 	gRedDriver.TestProcess(mode);

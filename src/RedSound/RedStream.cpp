@@ -59,7 +59,6 @@ RedStreamDATA* _SearchEmptyStreamData()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _StreamStop(RedStreamDATA* streamData)
 {
 	fflush(__files + 1);
@@ -86,7 +85,6 @@ void _StreamStop(RedStreamDATA* streamData)
 		}
 	}
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

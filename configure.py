@@ -16,7 +16,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 from tools.project import (
     Object,
@@ -318,6 +318,8 @@ def redsound_flags_from_profile(profile: str) -> List[str]:
         return base
     if profile == "char_signed":
         return [*base, "-char signed"]
+    if profile == "inline_deferred":
+        return replace_flag_prefix(base, "-inline ", "-inline deferred")
     if profile == "inline_auto_deferred":
         return replace_flag_prefix(base, "-inline ", "-inline auto,deferred")
     if profile == "str_pool_common_off":
@@ -349,10 +351,34 @@ def redsound_flags_from_profile(profile: str) -> List[str]:
     return base
 
 
-# RedSound currently benchmarks best with game-like flags in aggregate fuzzy
-# objdiff metrics; keep the environment override for quick re-testing.
-redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "game")
+def parse_unit_env_set(name: str) -> Set[str]:
+    value = os.environ.get(name, "")
+    return {part.strip() for part in value.split(",") if part.strip()}
+
+
+# RedSound is built pragma-free; inline-deferred currently gives the best
+# aggregate objdiff score across the RedSound units.
+redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "inline_deferred")
 redsound_cflags = redsound_flags_from_profile(redsound_profile)
+redsound_cpp_exceptions_cflags = replace_flag_prefix(
+    redsound_cflags, "-Cpp_exceptions ", "-Cpp_exceptions on"
+)
+redsound_opt0_units = parse_unit_env_set("FFCC_REDSOUND_OPT0_UNITS")
+redsound_inline_off_units = parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS")
+redsound_inline_deferred_units = parse_unit_env_set(
+    "FFCC_REDSOUND_INLINE_DEFERRED_UNITS"
+)
+
+
+def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> List[str]:
+    flags = redsound_cpp_exceptions_cflags if cpp_exceptions else redsound_cflags
+    if unit_name in redsound_opt0_units:
+        flags = replace_flag_prefix(flags, "-O", "-O0")
+    if unit_name in redsound_inline_off_units:
+        flags = replace_flag_prefix(flags, "-inline ", "-inline off")
+    elif unit_name in redsound_inline_deferred_units:
+        flags = replace_flag_prefix(flags, "-inline ", "-inline deferred")
+    return flags
 
 config.linker_version = "GC/1.3.2"
 
@@ -364,6 +390,18 @@ def DolphinLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
         "mw_version": "GC/1.2.5n",
         "cflags": cflags_base,
         "progress_category": "sdk",
+        "objects": objects,
+    }
+
+
+def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
+    return {
+        # PAL MAP ownership attributes these units to RedSound.a rather than
+        # the main game archive, so keep their shared flags at the library level.
+        "lib": "RedSound",
+        "mw_version": config.linker_version,
+        "cflags": redsound_cflags,
+        "progress_category": "game",
         "objects": objects,
     }
 
@@ -381,20 +419,26 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
+    RedSoundLib([
+        Object(NonMatching, "RedSound/RedCommand.cpp", cflags=redsound_unit_cflags("RedCommand")),
+        Object(NonMatching, "RedSound/RedDriver.cpp", cflags=redsound_unit_cflags("RedDriver")),
+        Object(NonMatching, "RedSound/RedEntry.cpp", cflags=redsound_unit_cflags("RedEntry")),
+        Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_unit_cflags("RedExecute")),
+        Object(NonMatching, "RedSound/RedMemory.cpp", cflags=redsound_unit_cflags("RedMemory")),
+        Object(NonMatching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_unit_cflags("RedMidiCtrl")),
+        Object(NonMatching, "RedSound/RedSound.cpp", cflags=redsound_unit_cflags("RedSound")),
+        Object(
+            NonMatching,
+            "RedSound/RedStream.cpp",
+            cflags=redsound_unit_cflags("RedStream", cpp_exceptions=True),
+        ),
+    ]),
     {
         "lib": "Game",
         "mw_version": config.linker_version,
         "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "RedSound/RedCommand.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedDriver.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedEntry.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedMemory.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedSound.cpp", cflags=redsound_cflags),
-            Object(NonMatching, "RedSound/RedStream.cpp", cflags=[*redsound_cflags, "-Cpp_exceptions on"]),
             Object(NonMatching, "astar.cpp"),
             Object(NonMatching, "baseobj.cpp"),
             Object(NonMatching, "bonus_menu.cpp"),

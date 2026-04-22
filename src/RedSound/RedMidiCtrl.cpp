@@ -76,7 +76,6 @@ int gRedCommandHandlerTable[] = {
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 int DataAddCompute(int* current, int target, int* delta)
 {
     int result = 0;
@@ -91,7 +90,6 @@ int DataAddCompute(int* current, int target, int* delta)
 
     return result;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -122,7 +120,6 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int* slot;
@@ -156,7 +153,6 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         slot += 2;
     } while (slot < limit);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -167,7 +163,6 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     char key;
@@ -195,7 +190,6 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
         } while (slot < (int*)(DAT_8032f444 + 0xc00));
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -206,7 +200,6 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int SineSwing(int phase)
 {
     u32 index = (u32)phase & 0x1FF;
@@ -227,7 +220,6 @@ int SineSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 4
 int TriangleSwing(int phase)
 {
     u32 low = (u32)phase & 0xFF;
@@ -247,7 +239,6 @@ int TriangleSwing(int phase)
 
     return (low | result);
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -274,7 +265,6 @@ int SawSwing(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int DutySwing(int phase)
 {
     int value;
@@ -330,7 +320,6 @@ int SineSwingR(int phase)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 4
 int TriangleSwingR(int phase)
 {
     int mode;
@@ -352,7 +341,6 @@ int TriangleSwingR(int phase)
     }
     return (phase & 0xFF) | result;
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -871,8 +859,6 @@ void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDAT
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
-#pragma dont_inline on
 void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int* trackData = reinterpret_cast<int*>(track);
@@ -926,8 +912,6 @@ void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrac
 
     KeyOnReserve(keyOnData, track);
 }
-#pragma dont_inline reset
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1822,7 +1806,6 @@ void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int rate;
@@ -1837,7 +1820,6 @@ void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 	*(short*)((int*)track + 0x23) = 0;
 	((int*)track)[0] += 1;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1879,14 +1861,12 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
 	((u32*)track)[0x1d] = PTR_SineSwing__Fi[type & 0xf];
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2021,7 +2001,6 @@ void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int rate;
@@ -2036,7 +2015,6 @@ void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 	*(short*)((int*)track + 0x2b) = 0;
 	((int*)track)[0] += 1;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2076,14 +2054,12 @@ void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
 	((u32*)track)[0x25] = PTR_SineSwing__Fi[type & 0xf];
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2191,7 +2167,6 @@ void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	int rate;
@@ -2206,7 +2181,6 @@ void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 	*(short*)((int*)track + 0x34) = 0;
 	((int*)track)[0] += 1;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2246,14 +2220,12 @@ void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
 	u32 type = *(u8*)(((u32*)track)[0]++);
 
 	((u32*)track)[0x2d] = PTR_SineSwing__Fi[type & 0xf];
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -2339,7 +2311,6 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _PitchBendCompute(RedTrackDATA* track, int bend)
 {
     int* voiceData = (int*)DAT_8032f444;
@@ -2407,7 +2378,6 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     *(short*)((char*)trackData + 0x13e) = (*(short*)(trackData + 0x50) * range) >> 5;
     _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

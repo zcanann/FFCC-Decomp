@@ -231,12 +231,10 @@ void _SetReverbDepth(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 0
 void _SetMusicData(int* param_1)
 {
     SetMusicData__9CRedEntryFP12RedMusicHEAD(&DAT_8032e154, (RedMusicHEAD*)*param_1);
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -263,7 +261,6 @@ void _MusicStop(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _MusicPlaySequence(int* param_1)
 {
     int iVar1;
@@ -291,7 +288,6 @@ void _MusicPlaySequence(int* param_1)
         MusicPlay__Fiii(*param_1, param_1[1], iVar1);
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -661,7 +657,6 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
                        int param_6, int param_7, int param_8)
 {
@@ -686,7 +681,6 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     DAT_8032f3d8 = nextPos;
     OSRestoreInterrupts(interruptLevel);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -697,7 +691,6 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _ExecuteCommand()
 {
 	unsigned int* executePos = (unsigned int*)DAT_8032f3d8;
@@ -715,7 +708,6 @@ void _ExecuteCommand()
 
 	DAT_8032f3dc = readPos;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -748,7 +740,6 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 unsigned int GetMyEntryID()
 {
     DAT_8032f3bc = (DAT_8032f3bc + 1) & 0x7fffffff;
@@ -757,7 +748,6 @@ unsigned int GetMyEntryID()
     }
     return DAT_8032f3bc;
 }
-#pragma dont_inline reset
 
 struct RedSleepAlarm {
     OSAlarm alarm;
@@ -787,7 +777,6 @@ void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void RedSleep(int param_1)
 {
     unsigned int interruptLevel;
@@ -805,7 +794,6 @@ void RedSleep(int param_1)
     OSSuspendThread(currentThread);
     OSRestoreInterrupts(interruptLevel);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -896,7 +884,6 @@ int _WaveSettingThread(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void _DMACheckProcess()
 {
     int semCount;
@@ -923,7 +910,6 @@ void _DMACheckProcess()
 
     fflush(&DAT_8021d1a8);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1211,7 +1197,6 @@ CRedDriver::CRedDriver()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldDelete)
 {
     if ((redDriver != 0) && (0 < shouldDelete)) {
@@ -1219,7 +1204,6 @@ extern "C" CRedDriver* __dt__10CRedDriverFv(CRedDriver* redDriver, short shouldD
     }
     return redDriver;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -1397,7 +1381,6 @@ void CRedDriver::End()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 int CRedDriver::GetProgramTime()
 {
     int sum;
@@ -1411,7 +1394,6 @@ int CRedDriver::GetProgramTime()
     } while (p < DAT_8032f3cc + 100);
     return sum;
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--

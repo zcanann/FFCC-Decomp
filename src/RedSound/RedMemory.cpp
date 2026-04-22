@@ -52,7 +52,6 @@ CRedMemory::CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldDelete)
 {
 	if ((redMemory != 0) && (0 < shouldDelete)) {
@@ -60,7 +59,6 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
 	}
 	return redMemory;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -184,14 +182,10 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
-#pragma optimization_level 0
 void RedDelete(void* param_1)
 {
 	RedDelete((int)param_1);
 }
-#pragma optimization_level 4
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -335,14 +329,10 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
-#pragma optimization_level 0
 void RedDeleteA(void* param_1)
 {
 	RedDeleteA((int)param_1);
 }
-#pragma optimization_level 4
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -353,7 +343,6 @@ void RedDeleteA(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
 	unsigned int bankSize = 0x2000U;
@@ -369,7 +358,6 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	m_ADataBuffer = param3;
 	m_ADataBufferSize = param4;
 }
-#pragma optimization_level 4
 
 /*
  * --INFO--

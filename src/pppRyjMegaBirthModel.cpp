@@ -128,9 +128,9 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         *(float*)(work + 0x8) = *(float*)(payload + 0x100);
         PSVECNormalize((Vec*)(work + 0x0), (Vec*)(work + 0x0));
 
-        posX = pObject->m_localMatrix.value[0][3];
-        posY = pObject->m_localMatrix.value[1][3];
-        posZ = pObject->m_localMatrix.value[2][3];
+        posX = *f32_at(pObject, 0x1C);
+        posY = *f32_at(pObject, 0x2C);
+        posZ = *f32_at(pObject, 0x3C);
         *(float*)(work + 0x20) = posX;
         *(float*)(work + 0x24) = posY;
         *(float*)(work + 0x28) = posZ;

@@ -59,9 +59,11 @@ int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 
     octaveAdjust = 0;
     pitch = (param_1 >> 12) + param_2 + (param_3 >> 16);
-    while (pitch < 0) {
-        pitch += 0xC00;
-        octaveAdjust -= 1;
+    if (pitch < 0) {
+        do {
+            pitch += 0xC00;
+            octaveAdjust -= 1;
+        } while (pitch < 0);
     }
 
     noteBand = (pitch >> 8) & 0x7F;

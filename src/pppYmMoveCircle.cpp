@@ -20,15 +20,6 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
-static const f32 gPppYmMoveCircleTurnSpan = 360.0f;
-static const f32 gPppYmMoveCircleZero = 0.0f;
-static const f32 gPppYmMoveCircleAngleScale = 32768.0f;
-static const f32 gPppYmMoveCircleAngleToTableScale = 0.017453292f;
-static const f32 gPppYmMoveCircleTableDivisor = 3.1415927f;
-static const f32 gPppYmMoveCircleOne = 1.0f;
-static const f32 gPppYmMoveCircleRadToAngleScale = 57.29578f;
-
-
 /*
  * --INFO--
  * PAL Address: 0x800d160c
@@ -47,8 +38,6 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     s32 tableIndex;
     f32 sinAngle;
     f32 cosAngle;
-    f32 radiusX;
-    f32 radiusZ;
     f32 turnSpan;
 
     if (gPppCalcDisabled != 0) {
@@ -72,29 +61,27 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStep += stepData->m_angleStepStep;
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
-    turnSpan = gPppYmMoveCircleTurnSpan;
+    turnSpan = 360.0f;
     work->m_angle += work->m_angleStep;
 
     if (work->m_angle > turnSpan) {
         work->m_angle -= turnSpan;
     }
-    if (work->m_angle < gPppYmMoveCircleZero) {
-        work->m_angle += gPppYmMoveCircleTurnSpan;
+    if (work->m_angle < 0.0f) {
+        work->m_angle += 360.0f;
     }
 
     {
         f32 tableAngle =
-            (gPppYmMoveCircleAngleScale * (gPppYmMoveCircleAngleToTableScale * work->m_angle)) /
-            gPppYmMoveCircleTableDivisor;
+            (32768.0f * (0.017453292f * work->m_angle)) /
+            3.1415927f;
         tableIndex = (s32)tableAngle;
     }
     sinAngle = *(f32*)((u8*)gPppTrigTable + (tableIndex & 0xFFFC));
     cosAngle = *(f32*)((u8*)gPppTrigTable + ((tableIndex + 0x4000) & 0xFFFC));
-    nextPos.y = gPppYmMoveCircleZero;
-    radiusX = work->m_radius * cosAngle;
-    radiusZ = work->m_radius * -sinAngle;
-    nextPos.x = radiusX;
-    nextPos.z = radiusZ;
+    nextPos.x = work->m_radius * cosAngle;
+    nextPos.z = work->m_radius * -sinAngle;
+    nextPos.y = 0.0f;
     nextPos.x += work->m_center.x;
     nextPos.y = *(f32*)(pppMngSt + 0xC);
     nextPos.z += work->m_center.z;
@@ -119,7 +106,6 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
  */
 extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
 {
-    const f32 kOne = 1.0f;
     Vec tempUp;
     Vec temp1;
     _pppMngSt* pppMngSt;
@@ -130,26 +116,26 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
-    tempUp.x = kOne;
-    tempUp.y = gPppYmMoveCircleZero;
-    tempUp.z = gPppYmMoveCircleZero;
+    tempUp.x = 1.0f;
+    tempUp.y = 0.0f;
+    tempUp.z = 0.0f;
 
     PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = gPppYmMoveCircleRadToAngleScale * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
+    work->m_angle = 57.29578f * (f32)acos(PSVECDotProduct(&tempUp, &temp1));
 
-    if ((temp1.x <= gPppYmMoveCircleZero && temp1.z >= gPppYmMoveCircleZero) ||
-        (temp1.x >= gPppYmMoveCircleZero && temp1.z >= gPppYmMoveCircleZero)) {
-        work->m_angle = gPppYmMoveCircleTurnSpan - work->m_angle;
+    if ((temp1.x <= 0.0f && temp1.z >= 0.0f) ||
+        (temp1.x >= 0.0f && temp1.z >= 0.0f)) {
+        work->m_angle = 360.0f - work->m_angle;
     }
 
-    work->m_radiusStepStep = gPppYmMoveCircleZero;
-    work->m_radiusStep = gPppYmMoveCircleZero;
-    work->m_radius = gPppYmMoveCircleZero;
-    work->m_angleStepStepStep = gPppYmMoveCircleZero;
-    work->m_angleStepStep = gPppYmMoveCircleZero;
-    work->m_angleStep = gPppYmMoveCircleZero;
+    work->m_radiusStepStep = 0.0f;
+    work->m_radiusStep = 0.0f;
+    work->m_radius = 0.0f;
+    work->m_angleStepStepStep = 0.0f;
+    work->m_angleStepStep = 0.0f;
+    work->m_angleStep = 0.0f;
     pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
     work->m_hasInit = 0;
 }

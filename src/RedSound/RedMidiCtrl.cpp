@@ -2531,19 +2531,17 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char value;
-    short step;
-    unsigned char* command;
     int* trackData = (int*)track;
+    unsigned char* command = (unsigned char*)trackData[0];
+    unsigned char value;
+    int step;
 
-    command = (unsigned char*)trackData[0];
     trackData[0] = (int)(command + 1);
     value = *command;
     *(short*)(trackData + 0x4e) = 0;
 
-    if (value == 0) {
-        step = 0;
-    } else {
+    step = 0;
+    if (value != 0) {
         step = *(short*)((char*)trackData + 0x13a) + (unsigned short)value;
     }
     *(short*)((char*)trackData + 0x13a) = step;

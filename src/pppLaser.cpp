@@ -511,12 +511,12 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
         GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
         alphaMax = step->m_payload[0x2b];
-        alphaStep = (u8)((u32)alphaMax / count);
+        alphaStep = (u8)((u32)alphaMax / step->m_payload[0x1e]);
         colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
         points = work->m_points;
 
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
-        for (i = 0; i < count - 1; i++) {
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
+        for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
             alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
             color0 = colorBase | alpha0;
             color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
@@ -549,9 +549,9 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, debugColor);
             GXSetPointSize(0x28, GX_TO_ZERO);
-            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(count - 1));
-            for (i = 0; i < count - 1; i++) {
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_payload[0x1e] - 1));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
             }
 
@@ -561,13 +561,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, debugColor);
             GXSetLineWidth(0x14, GX_TO_ZERO);
-            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((count - 1) * 4));
-            for (i = 0; i < count - 1; i++) {
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 4));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+                GXPosition3f32(points[j + 1].x, points[j + 1].y, points[j + 1].z);
                 GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
                 GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
                 GXColor1u32(*(u32*)&debugColor);
@@ -580,7 +580,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             PSMTXIdentity(tempMtx);
             tempMtx[0][0] = *(float*)((u8*)pppMngStPtr + 0x64) * *(float*)(step->m_payload + 0x24);
             tempMtx[1][1] = tempMtx[0][0];
-	            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
+            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
             PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
             PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
@@ -598,7 +598,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             Graphic.DrawSphere(tempMtx, debugColor);
 
             GXLoadPosMtxImm(pppLaser->m_drawMatrix.value, GX_PNMTX0);
-            for (i = 0; i < count; i++) {
+            for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
                 if ((points[i].x == kPppLaserZero) && (points[i].y == kPppLaserZero) && (points[i].z == kPppLaserZero)) {
                     continue;
                 }

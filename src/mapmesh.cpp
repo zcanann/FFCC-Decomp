@@ -413,16 +413,15 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             break;
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
-            unsigned int drawEntriesBase;
             if (usePreallocated != 0) {
                 m_displayListData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x1D5);
-                drawEntriesBase = reinterpret_cast<unsigned int>(m_displayListData);
+                cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
-                drawEntriesBase = Align32(reinterpret_cast<unsigned int>(cursor));
+                cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             }
-            m_drawEntries = reinterpret_cast<void*>(drawEntriesBase);
+            m_drawEntries = cursor;
 
-            cursor = reinterpret_cast<unsigned char*>(drawEntriesBase + (static_cast<unsigned int>(m_displayListCount) * 0x10U));
+            cursor += static_cast<unsigned int>(m_displayListCount) * 0x10U;
             offset = 0;
             for (int i = 0; i < static_cast<int>(m_displayListCount); i++) {
                 *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset) = 0;
@@ -443,7 +442,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                     reader.Align(0x20);
                     entry->displayList = 0;
                     if (entry->size != 0) {
-                        entry->displayList = reinterpret_cast<void*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
+                        entry->displayList = cursor;
                         if (usePreallocated != 0) {
                             entry->displayListOffset = reinterpret_cast<unsigned int>(entry->displayList) -
                                                        reinterpret_cast<unsigned int>(m_displayListData);
@@ -452,8 +452,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                                                        reinterpret_cast<unsigned int>(m_meshData);
                         }
 
-                        cursor = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(entry->displayList) +
-                                                                 Align32(chunk.m_arg0));
+                        cursor += Align32(chunk.m_arg0);
                         memset(entry->displayList, 0, Align32(entry->size));
                         reader.Get(entry->displayList, entry->size);
                         DCFlushRange(entry->displayList, Align32(entry->size));

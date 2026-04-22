@@ -120,7 +120,7 @@ public:
     int GetStrengthData(int, unsigned char*);
     unsigned int GetArtiDatFlg(int);
     void ClrArtiDatFlg(int);
-    void MakeArtiData(int, char*);
+    int MakeArtiData(int, char*);
     int GetTmpArtifactData(int, unsigned char*);
     char GetRadarType(int);
     void ClrRadarTypeFlg();

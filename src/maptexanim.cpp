@@ -68,9 +68,9 @@ static inline void ReplaceRef(void** slot, void* ref)
 {
     int* current = reinterpret_cast<int*>(*slot);
     if (current != 0) {
-        const int refCount = current[1];
-        current[1] = refCount - 1;
-        if (((refCount - 1) == 0) && (*slot != 0)) {
+        int refCount = current[1] - 1;
+        current[1] = refCount;
+        if ((refCount == 0) && (current != 0)) {
             reinterpret_cast<void (**)(void*, int)>(*reinterpret_cast<void**>(current))[2](current, 1);
         }
         *slot = 0;
@@ -200,26 +200,12 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     float frame;
 
     if (m_usesKeyFrame != 0) {
-        CMapKeyFrame* keyFrame = &m_keyFrame;
-        if (keyFrame->IsRun() != 0) {
+        if (m_keyFrame.IsRun() != 0) {
             int keyFrameIndex;
             int keyFrameIndexNext;
-            int reachedFrame = keyFrame->Get(keyFrameIndex, keyFrameIndexNext, frame);
+            int reachedFrame = m_keyFrame.Get(keyFrameIndex, keyFrameIndexNext, frame);
 
-            if (reachedFrame == 0) {
-                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
-                void* texture = TextureAt(textureSet, textureIndex);
-                void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
-                SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot), texture);
-
-                if (m_usesBlendTexture != 0) {
-                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
-                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
-                    SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
-                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
-                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
-                }
-            } else {
+            if (reachedFrame != 0) {
                 const unsigned short textureIndex = m_frameTable[keyFrameIndex];
                 void* texture = TextureAt(textureSet, textureIndex);
                 void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
@@ -232,9 +218,22 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
                     *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * frame);
                     *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
                 }
+            } else {
+                const unsigned short textureIndex = m_frameTable[keyFrameIndex];
+                void* texture = TextureAt(textureSet, textureIndex);
+                void* material = MaterialAt(materialSet, static_cast<unsigned long>(m_materialIndex));
+                SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot), texture);
+
+                if (m_usesBlendTexture != 0) {
+                    const unsigned short nextTextureIndex = m_frameTable[keyFrameIndexNext];
+                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(material, static_cast<unsigned long>(m_textureSlot + 1), nextTexture);
+                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
+                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+                }
             }
 
-            keyFrame->Calc();
+            m_keyFrame.Calc();
         }
         return;
     }

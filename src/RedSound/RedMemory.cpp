@@ -9,11 +9,19 @@ int m_DataBufferSize;
 int m_ADataBufferSize;
 int* m_MemoryBank;
 int* m_AMemoryBank;
+extern int DAT_8032f490;
+extern int DAT_8032f494;
+extern int DAT_8032f498;
+extern int DAT_8032f49c;
+extern int* DAT_8032f4a0;
+extern int* DAT_8032f4a4;
 
-#define redMainDataBuffer DAT_8032f478[0]
-#define redMainDataBufferSize DAT_8032f480
-#define redADataBufferSize DAT_8032f484
-#define redMainMemoryBank ((int*)DAT_8032f488[0])
+#define redMainDataBuffer DAT_8032f490
+#define redADataBuffer DAT_8032f494
+#define redMainDataBufferSize DAT_8032f498
+#define redADataBufferSize DAT_8032f49c
+#define redMainMemoryBank DAT_8032f4a0
+#define redAMemoryBank DAT_8032f4a4
 
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
@@ -200,10 +208,10 @@ int RedNewA(int size, int offset, int maxSize)
 	int* bestBlock;
 	int* blockPtr;
 
-	if ((size < 1) || (m_AMemoryBank == 0) || (m_ADataBuffer == 0)) {
+	if ((size < 1) || (redAMemoryBank == 0) || (redADataBuffer == 0)) {
 		return 0;
 	}
-	if (m_AMemoryBank[0x7FF] > 0) {
+	if (redAMemoryBank[0x7FF] > 0) {
 		if (gRedMemoryDebugEnabled != 0) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
@@ -212,9 +220,9 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	interrupts = OSDisableInterrupts();
-	rangeStart = m_ADataBuffer + offset;
+	rangeStart = redADataBuffer + offset;
 	if (maxSize == 0) {
-		maxSize = m_ADataBufferSize;
+		maxSize = redADataBufferSize;
 	}
 	maxSize -= offset;
 	size = (size + 0x1F) & 0xFFFFFFE0;
@@ -222,12 +230,12 @@ int RedNewA(int size, int offset, int maxSize)
 	maxGap = maxSize;
 	bestBlock = 0;
 
-	for (blockPtr = m_AMemoryBank; (blockPtr[1] != 0) && (*blockPtr < rangeStart); blockPtr += 2) {
+	for (blockPtr = redAMemoryBank; (blockPtr[1] != 0) && (*blockPtr < rangeStart); blockPtr += 2) {
 	}
 
 	if (blockPtr[1] != 0) {
 		currentAddress = rangeStart;
-		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
+		for (; (blockPtr[1] != 0) && (blockPtr < redAMemoryBank + 0x800); blockPtr += 2) {
 			if (currentAddress < rangeStart + maxSize) {
 				if ((int)(currentAddress + size) <= *blockPtr) {
 					gap = *blockPtr - currentAddress;
@@ -238,12 +246,12 @@ int RedNewA(int size, int offset, int maxSize)
 					bestBlock = blockPtr;
 				}
 			} else {
-				blockPtr = m_AMemoryBank + 0x800;
+				blockPtr = redAMemoryBank + 0x800;
 			}
 			currentAddress = blockPtr[0] + blockPtr[1];
 		}
 
-		if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
+		if (((blockPtr[1] == 0) && (blockPtr < redAMemoryBank + 0x800)) &&
 		    (gap = (rangeStart + maxSize) - currentAddress, size <= gap) &&
 		    (gap < maxGap)) {
 			result = currentAddress;
@@ -260,7 +268,7 @@ int RedNewA(int size, int offset, int maxSize)
 
 	blockPtr = bestBlock;
 	if (blockPtr[1] > 0) {
-		moveCount = ((int)(m_AMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
+		moveCount = ((int)(redAMemoryBank + 0x800) - (int)(blockPtr + 2)) / 8;
 		if ((int)moveCount > 0) {
 			memmove(blockPtr + 2, blockPtr, moveCount * 8);
 		}
@@ -288,7 +296,7 @@ void RedDeleteA(int address)
 	}
 
 	unsigned int interrupts = OSDisableInterrupts();
-	int* blockList = m_AMemoryBank;
+	int* blockList = redAMemoryBank;
 
 	if (blockList != 0) {
 		int* blockEnd = blockList + 0x800;
@@ -346,14 +354,14 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	bankSize += 0x1FU;
 	bankSize &= 0xFFFFFFE0;
 
-	m_MemoryBank = (int*)param1;
-	m_DataBufferSize = param2 - (bankSize * 2);
-	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
-	m_DataBuffer = (int)m_AMemoryBank + bankSize;
-	memset(m_MemoryBank, 0, bankSize);
-	memset(m_AMemoryBank, 0, bankSize);
-	m_ADataBuffer = param3;
-	m_ADataBufferSize = param4;
+	redMainMemoryBank = (int*)param1;
+	redMainDataBufferSize = param2 - (bankSize * 2);
+	redAMemoryBank = (int*)((int)redMainMemoryBank + bankSize);
+	redMainDataBuffer = (int)redAMemoryBank + bankSize;
+	memset(redMainMemoryBank, 0, bankSize);
+	memset(redAMemoryBank, 0, bankSize);
+	redADataBuffer = param3;
+	redADataBufferSize = param4;
 }
 #pragma optimization_level 4
 
@@ -410,7 +418,7 @@ int* CRedMemory::GetMainBankAddress()
  */
 int CRedMemory::GetABufferAddress()
 {
-	return m_ADataBuffer;
+	return redADataBuffer;
 }
 
 /*
@@ -438,5 +446,5 @@ int CRedMemory::GetABufferSize()
  */
 int* CRedMemory::GetABankAddress()
 {
-	return m_AMemoryBank;
+	return redAMemoryBank;
 }

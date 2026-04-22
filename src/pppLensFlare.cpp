@@ -217,20 +217,20 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
  */
 void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	char* work = (char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80;
+	LensFlareWork* work = (LensFlareWork*)((char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80);
 
 	float initValue = 0.0f;
 
-	*((float*)(work + 0x18)) = initValue;
-	*((float*)(work + 0x14)) = initValue;
-	*((float*)(work + 0x10)) = initValue;
-	*((float*)(work + 0x28)) = initValue;
-	*((float*)(work + 0x24)) = initValue;
-	*((float*)(work + 0x20)) = initValue;
+	work->m_projectedZ = initValue;
+	work->m_projectedY = initValue;
+	work->m_projectedX = initValue;
+	work->m_viewPosition.z = initValue;
+	work->m_viewPosition.y = initValue;
+	work->m_viewPosition.x = initValue;
 
-	*((short*)(work + 0x30)) = 0;
-	*((short*)(work + 0x2e)) = 0;
-	*((short*)(work + 0x2c)) = 0;
-	*(work + 0x32) = 0;
-	*((float*)(work + 0x34)) = initValue;
+	work->m_shapeFrame2 = 0;
+	work->m_shapeFrame1 = 0;
+	work->m_shapeFrame0 = 0;
+	work->m_alpha = 0;
+	work->m_dot = initValue;
 }

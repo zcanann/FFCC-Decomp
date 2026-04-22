@@ -430,18 +430,19 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
  */
 int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
-	const f32 (*objMtx)[4] = ((pppYmDeformationShpLayout*)obj)->m_modelMatrix;
+	pppYmDeformationShpLayout* layout = (pppYmDeformationShpLayout*)obj;
 	Vec4d projected[4];
-	Vec worldPos;
+	Vec localVertex;
 	Vec4d clipPos;
+	Vec worldPos;
 	float maxX;
 	float maxY;
 	float minX;
 	float minY;
-	int left;
-	int top;
-	int width;
-	int height;
+	int left = 0;
+	int top = 0;
+	int width = 0;
+	int height = 0;
 	Mtx texMtx;
 	Mtx tempMtx;
 	Vec origin;
@@ -453,20 +454,26 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	float texScaleY;
 	float offsetX;
 	float offsetY;
+	float one = FLOAT_803305f8;
+	float screenCenterX = FLOAT_80330610;
+	float screenScaleX = FLOAT_80330614;
+	float screenCenterY = FLOAT_80330618;
+	float screenScaleY = FLOAT_8033061c;
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		PSMTXMultVec(objMtx, &vertices[i], &worldPos);
+		localVertex = vertices[i];
+		PSMTXMultVec(layout->m_modelMatrix, &localVertex, &worldPos);
 		clipPos.x = worldPos.x;
 		clipPos.y = worldPos.y;
 		clipPos.z = worldPos.z;
-		clipPos.w = FLOAT_803305f8;
+		clipPos.w = one;
 		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, ppvScreenMatrix, &clipPos, &projected[i]);
 		projected[i].x = projected[i].x / projected[i].w;
 		projected[i].y = projected[i].y / projected[i].w;
 		projected[i].z = projected[i].z / projected[i].w;
-		projected[i].x = FLOAT_80330610 + projected[i].x / FLOAT_80330614;
-		projected[i].y = FLOAT_80330618 - projected[i].y / FLOAT_8033061c;
+		projected[i].x = screenCenterX + projected[i].x / screenScaleX;
+		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
 	}
 
 	maxX = FLOAT_80330624;
@@ -523,7 +530,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[1][2] = FLOAT_80330628;
 	texMtx[2][2] = FLOAT_8033062c;
 
-	PSMTXConcat(texMtx, objMtx, tempMtx);
+	PSMTXConcat(texMtx, layout->m_modelMatrix, tempMtx);
 	origin.x = kPppYmDeformationShpZero;
 	origin.y = kPppYmDeformationShpZero;
 	origin.z = kPppYmDeformationShpZero;
@@ -532,7 +539,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	cameraPos.y = cameraPos.y / cameraPos.z;
 	texMtx[0][2] = FLOAT_8033062c + cameraPos.x;
 	texMtx[1][2] = FLOAT_8033062c + cameraPos.y;
-	PSMTXConcat(texMtx, objMtx, tempMtx);
+	PSMTXConcat(texMtx, layout->m_modelMatrix, tempMtx);
 
 	for (i = 0; i < 4; i++) {
 		PSMTXMultVec(tempMtx, &vertices[i], &projectedObj[i]);
@@ -551,8 +558,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		}
 	}
 
-	texScaleX = FLOAT_803305f8 / (float)width;
-	texScaleY = FLOAT_803305f8 / (float)height;
+	texScaleX = one / (float)width;
+	texScaleY = one / (float)height;
 	offsetX = projectedObj[maxXIndex].x - texScaleX * (projected[maxXIndex].x - (float)left);
 	offsetY = projectedObj[maxYIndex].y - texScaleY * (projected[maxYIndex].y - (float)top);
 
@@ -590,7 +597,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		texMtx[1][2] = texMtx[1][2] + offsetY;
 	}
 
-	PSMTXConcat(texMtx, objMtx, texMtx);
+	PSMTXConcat(texMtx, layout->m_modelMatrix, texMtx);
 	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX2x4);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
@@ -622,6 +629,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		(YmDeformationShpState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	pppYmDeformationShpLayout* obj = (pppYmDeformationShpLayout*)pppYmDeformationShp_;
+	Mtx identityMtx;
 	Vec vertices[4];
 	Mtx rotMtx;
 	Vec2d uvs[4];
@@ -634,7 +642,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
 			env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
-		PSMTXIdentity(rotMtx);
+		PSMTXIdentity(identityMtx);
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -659,9 +667,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		PSMTXRotRad(rotMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
 		indMtx[0][0] = rotMtx[0][0] * work->m_scale;
 		indMtx[0][1] = rotMtx[0][1] * work->m_scale;
+		indMtx[0][2] = kPppYmDeformationShpZero;
 		indMtx[1][0] = rotMtx[1][0] * work->m_scale;
 		indMtx[1][1] = rotMtx[1][1] * work->m_scale;
-		indMtx[0][2] = kPppYmDeformationShpZero;
 		indMtx[1][2] = kPppYmDeformationShpZero;
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 

@@ -1,10 +1,11 @@
 #include "ffcc/LocationTitle2.h"
 #include "ffcc/chara.h"
 #include "ffcc/gobject.h"
+#include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

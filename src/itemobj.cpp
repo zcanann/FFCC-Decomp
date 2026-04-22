@@ -1294,7 +1294,8 @@ void CGItemObj::loadModel()
  */
 void CGItemObj::onNewFinished()
 {
-	*(u32*)((u8*)this + 0x568) = *(u32*)((u8*)this + 0x144);
+	float bodyEllipsoidRadius = *(float*)((u8*)this + 0x144);
+	*(float*)((u8*)this + 0x568) = bodyEllipsoidRadius;
 	*(u16*)((u8*)this + 0x560) = (u16)((gItemObjCreateFlags >> 3) & 1);
 	loadModel();
 }

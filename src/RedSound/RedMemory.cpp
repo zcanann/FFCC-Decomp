@@ -15,11 +15,8 @@ int* m_AMemoryBank;
 #define redADataBufferSize DAT_8032f484
 #define redMainMemoryBank ((int*)DAT_8032f488[0])
 
-const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
-const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
-const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 
 // Memory functions
 extern "C" {

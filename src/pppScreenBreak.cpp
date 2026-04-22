@@ -409,20 +409,17 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     u32 uVar15;
     Vec* inVec;
     s32 iVar16;
-    double dVar17;
-    const double dVar18 = -(double)kPppScreenBreakRandRange;
-    const double dVar19 = (double)kPppScreenBreakRandRange;
-    const double dVar20 = (double)kPppScreenBreakOne;
-    const double dVar21 = (double)kPppScreenBreakNegOne;
-    const double dVar22 = (double)kPppScreenBreakZero;
-    const double dVar24 = (double)kPppScreenBreakDoubleScale;
-    const double dVar25 = (double)kPppScreenBreakDegreesToRadians;
+    float dVar17;
+    const float dVar18 = -kPppScreenBreakRandRange;
+    const float dVar19 = kPppScreenBreakRandRange;
+    const float dVar20 = kPppScreenBreakOne;
+    const float dVar21 = kPppScreenBreakNegOne;
+    const float dVar22 = kPppScreenBreakZero;
+    const float dVar24 = kPppScreenBreakDoubleScale;
+    const float dVar25 = kPppScreenBreakDegreesToRadians;
     S16Vec local_e8;
     S16Vec local_e0;
     S16Vec local_d8;
-    s16 local_d0;
-    s16 sStack_ce;
-    s16 local_cc;
     Vec local_c8;
     u32 uStack_b4;
     s16 sVar8;
@@ -433,9 +430,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(modelData + 0xC) * 0x3C);
     iVar16 = *(s32*)((u8*)model + 0xAC);
     inVec = *(Vec**)((u8*)work + 0xC);
-    local_d0 = -0x7FFF;
-    sStack_ce = -0x7FFF;
-    local_cc = -0x7FFF;
+    local_e8.x = -0x7FFF;
+    local_e8.y = -0x7FFF;
+    local_e8.z = -0x7FFF;
 
     for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
@@ -457,16 +454,16 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
         for (; iVar5 != 0; iVar5--) {
             s16 sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
-            if (local_d0 < sVar1) {
-                local_d0 = sVar1;
+            if (local_e8.x < sVar1) {
+                local_e8.x = sVar1;
             }
             sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
-            if (sStack_ce < sVar1) {
-                sStack_ce = sVar1;
+            if (local_e8.y < sVar1) {
+                local_e8.y = sVar1;
             }
             sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
-            if (local_cc < sVar1) {
-                local_cc = sVar1;
+            if (local_e8.z < sVar1) {
+                local_e8.z = sVar1;
             }
 
             psVar11 = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
@@ -522,42 +519,39 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, local_e0, *(u32*)(modelData + 0x34));
         PSVECScale(inVec + 3, inVec + 3, kPppScreenBreakVelocityScale);
 
-        dVar17 = (double)inVec[3].x;
+        dVar17 = inVec[3].x;
         if (dVar19 < dVar17) {
-            dVar17 = (double)Math.RandF(kPppScreenBreakRandRange);
+            dVar17 = Math.RandF(kPppScreenBreakRandRange);
         }
-        if ((double)inVec[3].x < dVar18) {
-            dVar17 = -(double)Math.RandF(kPppScreenBreakRandRange);
+        if (inVec[3].x < dVar18) {
+            dVar17 = -Math.RandF(kPppScreenBreakRandRange);
         }
 
-        inVec->x = (float)dVar17;
-        inVec->y = (float)dVar20;
-        inVec->z = (float)dVar21;
+        inVec->x = dVar17;
+        inVec->y = dVar20;
+        inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
         local_c8.x = DAT_801dd4b0;
         local_c8.y = DAT_801dd4b4;
         local_c8.z = DAT_801dd4b8;
         PSVECCrossProduct(inVec, &local_c8, inVec + 2);
 
-        dVar17 = (double)Math.RandF(*(float*)((u8*)step + 0x3C));
-        PSVECScale(inVec, inVec, (float)((double)*(float*)((u8*)step + 0x38) + dVar17));
+        dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
+        PSVECScale(inVec, inVec, *(float*)((u8*)step + 0x38) + dVar17);
 
-        inVec[1].x = (float)dVar22;
-        inVec[1].y = (float)dVar22;
-        inVec[1].z = (float)dVar22;
-        inVec[4].x = (float)dVar22;
+        inVec[1].x = dVar22;
+        inVec[1].y = dVar22;
+        inVec[1].z = dVar22;
+        inVec[4].x = dVar22;
 
         uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);
-        dVar17 = (double)Math.RandF((float)uStack_b4);
+        dVar17 = Math.RandF((float)uStack_b4);
         iVar16 += 0x14;
-        inVec[4].y = (float)(dVar25 * (double)(float)(dVar24 + dVar17));
+        inVec[4].y = dVar25 * (dVar24 + dVar17);
         *(u8*)&inVec[4].z = 0;
         inVec += 5;
     }
 
-    local_e8.x = local_d0;
-    local_e8.y = sStack_ce;
-    local_e8.z = local_cc;
     ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), local_e8, *(u32*)(modelData + 0x34));
 }
 

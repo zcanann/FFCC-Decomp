@@ -21,7 +21,7 @@ extern const float kPartColorIdentityOne;
 
 extern "C" const char s_no_name_8032fdcc[];
 extern "C" {
-const char s_no_name_8032fdcc[] = "no_name";
+const char s_no_name_8032fdcc[] = "no name";
 }
 static const char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
 static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";

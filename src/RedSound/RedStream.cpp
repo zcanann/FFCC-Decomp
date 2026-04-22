@@ -60,9 +60,9 @@ void _StreamStop(RedStreamDATA* streamData)
 	if (*(int*)((int)streamData + 0x10c) != 0) {
 		*(int*)((int)streamData + 0x10c) = 0;
 		*(int*)((int)streamData + 0x110) = 0;
-		if (*(int*)((int)streamData + 0xc) != 0) {
-			RedDelete__FPv((void*)*(int*)((int)streamData + 0xc));
-			*(int*)((int)streamData + 0xc) = 0;
+		if (streamData->m_buffer != 0) {
+			RedDelete__FPv(streamData->m_buffer);
+			streamData->m_buffer = 0;
 		}
 		if (*(int*)((int)streamData + 0x12c) != 0) {
 			RedDeleteA__Fi(*(int*)((int)streamData + 0x12c));

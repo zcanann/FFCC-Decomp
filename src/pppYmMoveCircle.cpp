@@ -4,7 +4,7 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-double acos(double);
+extern "C" double acos(double);
 extern float gPppTrigTable[];
 
 struct pppYmMoveCircleWork {

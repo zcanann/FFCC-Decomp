@@ -3,9 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern const float kPppKeShpTail2XZero;
-extern const float kPppKeShpTail2XAlphaScale;
-extern const float kPppKeShpTail3XOne;
 extern int gPppCalcDisabled;
 }
 #include <dolphin/mtx.h>
@@ -13,6 +10,12 @@ extern int gPppCalcDisabled;
 #include <string.h>
 
 extern "C" int rand(void);
+
+static const float kPppKeShpTail3XZero = 0.0f;
+static const float kPppKeShpTail3XAlphaScale = 16384.0f;
+static const float kPppKeShpTail3XOne = 1.0f;
+static const float kPppKeShpTail3XRandomMax = 65535.0f;
+static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
 extern "C" {
 int __cntlzw(unsigned int);
@@ -196,22 +199,22 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
     work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
+    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail3XAlphaScale;
     colorR = (float)(work->m_values[0] >> 7);
     colorG = (float)(work->m_values[1] >> 7);
     colorB = (float)(work->m_values[2] >> 7);
     colorA = (float)(work->m_values[3] >> 7) * alphaMul;
 
-    if (invCountMinusOne != kPppKeShpTail2XZero) {
+    if (invCountMinusOne != kPppKeShpTail3XZero) {
         colorStepR = (colorR - (float)(work->m_values[4] >> 7)) / invCountMinusOne;
         colorStepG = (colorG - (float)(work->m_values[5] >> 7)) / invCountMinusOne;
         colorStepB = (colorB - (float)(work->m_values[6] >> 7)) / invCountMinusOne;
         colorStepA = (colorA - ((float)(work->m_values[7] >> 7) * alphaMul)) / invCountMinusOne;
     } else {
-        colorStepR = kPppKeShpTail2XZero;
-        colorStepG = kPppKeShpTail2XZero;
-        colorStepB = kPppKeShpTail2XZero;
-        colorStepA = kPppKeShpTail2XZero;
+        colorStepR = kPppKeShpTail3XZero;
+        colorStepG = kPppKeShpTail3XZero;
+        colorStepB = kPppKeShpTail3XZero;
+        colorStepA = kPppKeShpTail3XZero;
     }
 
     mng = (_pppMngSt*)pppMngStPtr;
@@ -225,7 +228,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     shapeScaleStep = ((float)step->m_stepValue - (float)step->m_arg3) / invCountMinusOne;
     trailStep = step->m_stepDistance * mng->m_scale.x;
     trailStepDelta = trailStep * (shapeScaleStep / (float)step->m_stepValue);
-    if (trailStep == kPppKeShpTail2XZero) {
+    if (trailStep == kPppKeShpTail3XZero) {
         return;
     }
 
@@ -243,12 +246,12 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
-    zeroVec.x = kPppKeShpTail2XZero;
-    zeroVec.y = kPppKeShpTail2XZero;
-    zeroVec.z = kPppKeShpTail2XZero;
+    zeroVec.x = kPppKeShpTail3XZero;
+    zeroVec.y = kPppKeShpTail3XZero;
+    zeroVec.z = kPppKeShpTail3XZero;
     segLen = PSVECDistance(&zeroVec, &seg);
     segRemain = segLen;
-    segCursor = kPppKeShpTail2XZero;
+    segCursor = kPppKeShpTail3XZero;
     segBaseX = pos.x;
     segBaseY = pos.y;
     segBaseZ = pos.z;
@@ -260,13 +263,13 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
 draw_loop:
     while (count != 0) {
-        envDepth = kPppKeShpTail2XZero;
+        envDepth = kPppKeShpTail3XZero;
         drawScale = shapeScale;
 
         if (step->m_useRandomShape != 0) {
             u32 lcg = (u32)rng * 0x80du + 7u;
             rng = (u16)lcg;
-            drawScale *= -((((float)rng / 65535.0f) * step->m_randomScale) - 1.0f);
+            drawScale *= -((((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale) - kPppKeShpTail3XOne);
             {
                 u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
                 shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
@@ -283,7 +286,7 @@ draw_loop:
             PSMTXScaleApply(localBase.value, obj->field_0x40.value, drawScale * mng->m_scale.x, drawScale * mng->m_scale.y,
                             drawScale * mng->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
-                PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)work->m_angles[count]);
+                PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, obj->field_0x40);
                 pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
             }
@@ -295,7 +298,7 @@ draw_loop:
             drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * mng->m_scale.y);
             drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * mng->m_scale.z);
             if ((step->m_rotateEnabled != 0) && (count != 0)) {
-                PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)work->m_angles[count]);
+                PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
                 pppCopyMatrix(tmpMtx, drawMtx);
                 pppMulMatrix(drawMtx, rotMtx, tmpMtx);
             }

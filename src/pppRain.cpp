@@ -143,11 +143,11 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
  */
 void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DATA* param_3)
 {
+    RainDrop* drop;
+    RainWork* work;
     int i;
     int randA;
     int randB;
-    RainWork* work;
-    RainDrop* drop;
     if (gPppCalcDisabled != 0) {
         return;
     }

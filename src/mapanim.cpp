@@ -41,14 +41,10 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
-extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
-    CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
-extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
-extern "C" CPtrArray<CMapAnimNode*>* __dt__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*, short);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
 extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
-extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
-extern "C" int Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(CPtrArray<CMapAnimKeyDt*>*, CMapAnimKeyDt*);
+extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
+extern "C" CPtrArray<CMapAnimNode*>* __dt__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*, short);
 
 static const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
@@ -187,9 +183,11 @@ void CMapAnim::Calc(long frame)
     int nodeCount;
     int i;
 
-    nodeCount = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->GetSize();
+    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
+
+    nodeCount = nodeArray->GetSize();
     for (i = 0; i < nodeCount; i = i + 1) {
-        CMapAnimNode* node = (*reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this))[i];
+        CMapAnimNode* node = (*nodeArray)[i];
         node->Interp(frame);
     }
 }
@@ -245,9 +243,8 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     }
 
                     item[2] = keyData;
-                    Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(
-                        reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418),
-                        reinterpret_cast<CMapAnimKeyDt*>(item[2]));
+                    reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418)
+                        ->Add(reinterpret_cast<CMapAnimKeyDt*>(item[2]));
                     *reinterpret_cast<unsigned int*>(item[2]) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x4) = reinterpret_cast<int>(
                         __nwa__FUlPQ27CMemory6CStagePci(
@@ -277,8 +274,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                 }
             }
             chunkFile.PopChunk();
-            Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(
-                reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this), reinterpret_cast<CMapAnimNode*>(item));
+            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->Add(reinterpret_cast<CMapAnimNode*>(item));
         }
     }
     chunkFile.PopChunk();
@@ -324,7 +320,7 @@ CMapAnim::CMapAnim()
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
     __ct__26CPtrArray_P12CMapAnimNode_Fv(nodeArray);
-    SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(nodeArray, *reinterpret_cast<CMemory::CStage**>(&MapMng));
+    nodeArray->SetStage(*reinterpret_cast<CMemory::CStage**>(&MapMng));
 }
 
 /*

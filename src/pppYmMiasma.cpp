@@ -394,6 +394,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     s16 alpha;
     Vec basePos;
     Vec worldPos;
+    float zero;
 
     frameCount = state->m_fadeFrames;
     if (frameCount > 0) {
@@ -470,12 +471,13 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         state->m_speedDecay = pYmMiasma->m_minSpeed;
     }
 
+    zero = FLOAT_80330644;
     particleData->m_matrix[0][0] = particleData->m_matrix[0][0] + state->m_speedDecay * particleData->m_matrix[1][0];
     particleData->m_matrix[0][1] = particleData->m_matrix[0][1] + pYmMiasma->m_heightJitter;
     particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + state->m_speedDecay * particleData->m_matrix[1][2];
     state->m_speedDecay = state->m_speedDecay - pYmMiasma->m_speedDecay;
 
-    if (vData->m_speedDecay != FLOAT_80330644) {
+    if (vData->m_speedDecay != zero) {
         if (state->m_hasImpulse == 0) {
             Vec impulse;
 

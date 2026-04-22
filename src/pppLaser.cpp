@@ -112,6 +112,13 @@ struct LaserColorData {
     pppCVECTOR m_color;
 };
 
+struct LaserBaseObject {
+    s32 m_graphId;
+    u8 m_pad4[0x0C];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+};
+
 /*
  * --INFO--
  * PAL Address: 801766ec
@@ -231,8 +238,8 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
+    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     LaserWork* work;
-    _pppPObject* baseObj = (_pppPObject*)pppLaser;
     Vec localA;
     Vec localB;
     Vec localPos;
@@ -259,9 +266,9 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         emptyHistory = true;
     }
 
-    CalcGraphValue(baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
         *(float*)(step->m_payload + 0x10), *(float*)(step->m_payload + 0x14), *(float*)(step->m_payload + 0x18));
-    CalcGraphValue(baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
         *(float*)(step->m_payload + 4), *(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
     pppCalcFrameShape(
@@ -390,7 +397,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
-    _pppPObject* baseObj = (_pppPObject*)pppLaser;
+    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     Vec* points;
     int colorOffset = param_3->m_serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
@@ -580,7 +587,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             PSMTXIdentity(tempMtx);
             tempMtx[0][0] = *(float*)((u8*)pppMngStPtr + 0x64) * *(float*)(step->m_payload + 0x24);
             tempMtx[1][1] = tempMtx[0][0];
-	            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
+            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
             PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
             PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);

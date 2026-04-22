@@ -351,84 +351,83 @@ s32 THPSimpleSetBuffer(u8* buffer)
     u32 frameBufferSize;
     u8* cursor;
 
-    if ((SimpleControl.isOpen == 0) || (SimpleControl.isPreLoaded != 0)) {
-        return 0;
-    }
-    if (SimpleControl.isBufferSet == 1) {
-        return 0;
-    }
+    if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
+        if (SimpleControl.isBufferSet == 1) {
+            return 0;
+        }
 
-    cursor = buffer;
-    lumaSize = (SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize + 0x1F) & ~0x1F;
-    chromaSize = (((SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize) >> 2) + 0x1F) & ~0x1F;
+        cursor = buffer;
+        lumaSize = (SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize + 0x1F) & ~0x1F;
+        chromaSize = (((SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize) >> 2) + 0x1F) & ~0x1F;
 
-    SimpleControl.yImage = reinterpret_cast<u32*>(cursor);
-    DCInvalidateRange(SimpleControl.yImage, lumaSize);
-    cursor += lumaSize;
+        SimpleControl.yImage = reinterpret_cast<u32*>(cursor);
+        DCInvalidateRange(SimpleControl.yImage, lumaSize);
+        cursor += lumaSize;
 
-    SimpleControl.uImage = reinterpret_cast<u32*>(cursor);
-    DCInvalidateRange(SimpleControl.uImage, chromaSize);
-    cursor += chromaSize;
+        SimpleControl.uImage = reinterpret_cast<u32*>(cursor);
+        DCInvalidateRange(SimpleControl.uImage, chromaSize);
+        cursor += chromaSize;
 
-    SimpleControl.vImage = reinterpret_cast<u32*>(cursor);
-    DCInvalidateRange(SimpleControl.vImage, chromaSize);
-    cursor += chromaSize;
+        SimpleControl.vImage = reinterpret_cast<u32*>(cursor);
+        DCInvalidateRange(SimpleControl.vImage, chromaSize);
+        cursor += chromaSize;
 
-    frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
-    SimpleControl.readBuffer[0].mPtr = cursor;
-    cursor += frameBufferSize;
+        frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
+        SimpleControl.readBuffer[0].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[1].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[1].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[2].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[2].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[3].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[3].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[4].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[4].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[5].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[5].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[6].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[6].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[7].mPtr = cursor;
-    cursor += frameBufferSize;
+        SimpleControl.readBuffer[7].mPtr = cursor;
+        cursor += frameBufferSize;
 
-    SimpleControl.readBuffer[0].mIsValid = 0;
-    SimpleControl.readBuffer[1].mIsValid = 0;
-    SimpleControl.readBuffer[2].mIsValid = 0;
-    SimpleControl.readBuffer[3].mIsValid = 0;
-    SimpleControl.readBuffer[4].mIsValid = 0;
-    SimpleControl.readBuffer[5].mIsValid = 0;
-    SimpleControl.readBuffer[6].mIsValid = 0;
-    SimpleControl.readBuffer[7].mIsValid = 0;
-    SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
-    SimpleControl.curFrame = -1;
-
-    if (SimpleControl.hasAudio != 0) {
-        u32 audioBufferSize = ((SimpleControl.audioInfo.mSndNumSamples * 4) + 0x1F) & ~0x1F;
-
-        SimpleControl.audioBuffer[0].mBuffer = reinterpret_cast<s16*>(cursor);
-        SimpleControl.audioBuffer[0].mCurPtr = SimpleControl.audioBuffer[0].mBuffer;
-        SimpleControl.audioBuffer[0].mValidSample = 0;
-        cursor += audioBufferSize;
-
-        SimpleControl.audioBuffer[1].mBuffer = reinterpret_cast<s16*>(cursor);
-        SimpleControl.audioBuffer[1].mCurPtr = SimpleControl.audioBuffer[1].mBuffer;
-        SimpleControl.audioBuffer[1].mValidSample = 0;
-        cursor += audioBufferSize;
-
-        SimpleControl.audioBuffer[2].mBuffer = reinterpret_cast<s16*>(cursor);
-        SimpleControl.audioBuffer[2].mCurPtr = SimpleControl.audioBuffer[2].mBuffer;
-        SimpleControl.audioBuffer[2].mValidSample = 0;
-        cursor += audioBufferSize;
-
+        SimpleControl.readBuffer[0].mIsValid = 0;
+        SimpleControl.readBuffer[1].mIsValid = 0;
+        SimpleControl.readBuffer[2].mIsValid = 0;
+        SimpleControl.readBuffer[3].mIsValid = 0;
+        SimpleControl.readBuffer[4].mIsValid = 0;
+        SimpleControl.readBuffer[5].mIsValid = 0;
+        SimpleControl.readBuffer[6].mIsValid = 0;
+        SimpleControl.readBuffer[7].mIsValid = 0;
         SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
+        SimpleControl.curFrame = -1;
+
+        if (SimpleControl.hasAudio != 0) {
+            u32 audioBufferSize = ((SimpleControl.audioInfo.mSndNumSamples * 4) + 0x1F) & ~0x1F;
+
+            SimpleControl.audioBuffer[0].mBuffer = reinterpret_cast<s16*>(cursor);
+            SimpleControl.audioBuffer[0].mCurPtr = SimpleControl.audioBuffer[0].mBuffer;
+            SimpleControl.audioBuffer[0].mValidSample = 0;
+            cursor += audioBufferSize;
+
+            SimpleControl.audioBuffer[1].mBuffer = reinterpret_cast<s16*>(cursor);
+            SimpleControl.audioBuffer[1].mCurPtr = SimpleControl.audioBuffer[1].mBuffer;
+            SimpleControl.audioBuffer[1].mValidSample = 0;
+            cursor += audioBufferSize;
+
+            SimpleControl.audioBuffer[2].mBuffer = reinterpret_cast<s16*>(cursor);
+            SimpleControl.audioBuffer[2].mCurPtr = SimpleControl.audioBuffer[2].mBuffer;
+            SimpleControl.audioBuffer[2].mValidSample = 0;
+            cursor += audioBufferSize;
+
+            SimpleControl.unk_9C = reinterpret_cast<u32>(cursor);
+        }
     }
 
     return 1;

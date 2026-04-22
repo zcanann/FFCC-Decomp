@@ -83,7 +83,7 @@ extern "C" {
 
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
+		void* GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 		int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStChangeTex*);
@@ -277,40 +277,40 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
-	int model = 0;
+	void* model = 0;
 
 	if (handle0 != 0) {
 		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
-		*(void**)(model + 0xe4) = 0;
-		*(void**)(model + 0xe8) = 0;
-		*(void**)(model + 0xf4) = 0;
-		*(void**)(model + 0xfc) = 0;
-		*(void**)(model + 0x104) = 0;
+		*(void**)((char*)model + 0xe4) = 0;
+		*(void**)((char*)model + 0xe8) = 0;
+		*(void**)((char*)model + 0xf4) = 0;
+		*(void**)((char*)model + 0xfc) = 0;
+		*(void**)((char*)model + 0x104) = 0;
 	}
-	int model1;
+	void* model1;
 	if ((handle1 != 0) && ((model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
-		*(void**)(model1 + 0xe4) = 0;
-		*(void**)(model1 + 0xe8) = 0;
-		*(void**)(model1 + 0xf4) = 0;
-		*(void**)(model1 + 0xfc) = 0;
-		*(void**)(model1 + 0x104) = 0;
+		*(void**)((char*)model1 + 0xe4) = 0;
+		*(void**)((char*)model1 + 0xe8) = 0;
+		*(void**)((char*)model1 + 0xf4) = 0;
+		*(void**)((char*)model1 + 0xfc) = 0;
+		*(void**)((char*)model1 + 0x104) = 0;
 	}
-	int model2;
+	void* model2;
 	if ((handle2 != 0) && ((model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
-		*(void**)(model2 + 0xe4) = 0;
-		*(void**)(model2 + 0xe8) = 0;
-		*(void**)(model2 + 0xf4) = 0;
-		*(void**)(model2 + 0xfc) = 0;
-		*(void**)(model2 + 0x104) = 0;
+		*(void**)((char*)model2 + 0xe4) = 0;
+		*(void**)((char*)model2 + 0xe8) = 0;
+		*(void**)((char*)model2 + 0xf4) = 0;
+		*(void**)((char*)model2 + 0xfc) = 0;
+		*(void**)((char*)model2 + 0x104) = 0;
 	}
 
 	void** stageArray = (void**)work->m_displayListArrays;
 	void** meshArray;
 	if ((stageArray != 0) && ((meshArray = (void**)work->m_meshColorArrays), meshArray != 0)) {
-		int meshList = *(int*)(model + 0xac);
+		int meshList = *(int*)((char*)model + 0xac);
 		void** curStageArray = stageArray;
 		void** curMeshArray = meshArray;
-		for (unsigned int i = 0; i < *(unsigned int*)(*(int*)(model + 0xA4) + 0xC); i++) {
+		for (unsigned int i = 0; i < *(unsigned int*)(*(int*)((char*)model + 0xA4) + 0xC); i++) {
 			int meshData = *(int*)(meshList + 8);
 			void** dlEntries = (void**)*curStageArray;
 			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {

@@ -28,26 +28,20 @@ int SearchSeEmptyTrack__Fiii(int, int, int);
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 RedStreamDATA* _SearchEmptyStreamData()
 {
 	RedStreamDATA* streamData = (RedStreamDATA*)DAT_8032f420;
-	RedStreamDATA* result;
 
-	for (;;) {
+	do {
 		if (streamData->m_streamId == 0) {
-			result = streamData;
-			break;
+			return streamData;
 		}
 
-		streamData = (RedStreamDATA*)((u8*)streamData + 0x130);
+		streamData++;
+	} while (streamData < (RedStreamDATA*)DAT_8032f420 + 4);
 
-		if (!((u8*)streamData < (u8*)DAT_8032f420 + 0x4C0)) {
-			result = 0;
-			break;
-		}
-	}
-
-	return result;
+	return 0;
 }
 
 /*
@@ -598,3 +592,4 @@ void StreamControl()
 		streamData += 0x130;
 	} while (streamData < (unsigned int)DAT_8032f420 + 0x4c0);
 }
+#pragma optimization_level 4

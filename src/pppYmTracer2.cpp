@@ -27,7 +27,11 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern float FLOAT_80331840;
 extern float FLOAT_80331844;
 extern const float FLOAT_80331848 = 255.0f;
-extern float FLOAT_80331860;
+extern const double DOUBLE_80331850 = 4503599627370496.0;
+extern const double DOUBLE_80331858 = 4503601774854144.0;
+extern const float FLOAT_80331860[2] = { -1.0f, 0.0f };
+extern const char lbl_80331868[] = "THP";
+extern const float FLOAT_8033186C = 127.0f;
 
 static const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
@@ -291,7 +295,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
-            frameT = (FLOAT_80331860 / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
+            frameT = (FLOAT_80331860[0] / (f32)((s32)param_2->m_payload[9] + 1)) * (f32)(s32)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
                 useFallback = true;
             } else {
@@ -347,8 +351,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 {
     TracerWork* work;
     CMapMesh* mapMesh;
-    u8* colorData;
     TRACE_POLYGON* poly;
+    u8* colorData;
     CTexture* texture;
     s32 i;
     s32 dataOffset;
@@ -362,10 +366,10 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     dataOffset = *param_3->m_serializedDataOffsets;
     colorOffset = param_3->m_serializedDataOffsets[1];
     work = (TracerWork*)((u8*)pppYmTracer2 + 0x80 + dataOffset);
-    colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
     poly = work->entries;
     dataValIndex = param_2->m_dataValIndex;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+    colorData = (u8*)pppYmTracer2 + 0x80 + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_payload[10]);

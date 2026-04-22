@@ -1,7 +1,7 @@
 #include "ffcc/pppConformBGNormal.h"
 #include "types.h"
+#include "ffcc/game.h"
 #include "ffcc/map.h"
-#include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/gobject.h"
 extern "C" {
@@ -18,6 +18,8 @@ static const f32 kPppConformBgNormalCylinderHeight = -10000000000.0f;
 static const f32 kPppConformBgNormalGroundSnapLimit = 10.0f;
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
+
+extern CGame Game;
 
 struct ConformCylinderQuery {
     Vec m_pos;

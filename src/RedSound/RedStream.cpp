@@ -466,7 +466,6 @@ void StreamPause(int param_1, int param_2)
 	int voiceData;
 	int pitch;
 
-	streamData = (RedStreamDATA*)DAT_8032f420;
 	if (gRedMemoryDebugEnabled != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
@@ -474,13 +473,13 @@ void StreamPause(int param_1, int param_2)
 			OSReport(s_redStreamPauseOffFmt, sRedStreamLogPrefix, param_1);
 		}
 		fflush(__files + 1);
-		streamData = (RedStreamDATA*)DAT_8032f420;
 	}
+	streamData = (RedStreamDATA*)DAT_8032f420;
 	do {
 		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
 			voiceData = streamData->m_voiceData;
 			if (param_2 == 1) {
-				if (*(int*)(voiceData + 0x14) != 0) {
+				if (*(void**)(voiceData + 0x14) != 0) {
 					*(int*)(voiceData + 0x9c) = 0;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 					if (streamData->m_channelCount == 2) {
@@ -488,7 +487,7 @@ void StreamPause(int param_1, int param_2)
 						*(unsigned int*)(voiceData + 0x150) |= 0x10;
 					}
 				}
-			} else if (*(int*)(voiceData + 0x14) != 0) {
+			} else if (*(void**)(voiceData + 0x14) != 0) {
 				pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)((u8*)streamData + 0x24), 0);
 				if (streamData->m_channelCount == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;

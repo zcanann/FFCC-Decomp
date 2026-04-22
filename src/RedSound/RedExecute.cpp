@@ -16,7 +16,7 @@ struct RedReverbDATA {
     int kind;
 };
 
-u8 m_RandomIndex;
+volatile u8 m_RandomIndex;
 int p_ReverbData;
 u32* p_ReverbSize;
 u32 m_ChangeStatus;

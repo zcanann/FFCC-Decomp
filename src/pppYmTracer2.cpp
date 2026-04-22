@@ -428,26 +428,3 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2
 	*(u16*)(puVar2 + 0x30) = 0;
 	*(u16*)(puVar2 + 0x32) = 0;
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void initTracePolygon(PYmTracer2*, TRACE_POLYGON& poly)
-{
-    float zero = FLOAT_80331840;
-
-    poly.pos.x = zero;
-    poly.pos.y = zero;
-    poly.pos.z = zero;
-    poly.targetPos.x = zero;
-    poly.targetPos.y = zero;
-    poly.targetPos.z = zero;
-    poly.active = 0;
-    poly.alpha = 0;
-}

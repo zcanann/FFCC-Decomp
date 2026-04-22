@@ -66,13 +66,19 @@ struct BreathModelRenderStep {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void get_rand()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -262,13 +268,19 @@ extern "C" void BirthParticle__FP11_pppPObjectP12VBreathModelP12PBreathModelP6VC
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -310,7 +322,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
         particle[7].z += *(float*)(breath + 0x98);
     }
 
-    while (particle[7].y >= FLOAT_80330F88) {
+    while (FLOAT_80330F88 <= particle[7].y) {
         particle[7].y -= FLOAT_80330F84;
     }
     while (particle[7].y < FLOAT_80330F8C) {
@@ -322,9 +334,9 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     particle[9].x += particle[10].x;
 
     if (*(unsigned char*)(breath + 0xC0) & 0x10) {
-        particle[9].y = particle[9].y + *(float*)(breath + 0x70) + particle[10].y;
-        particle[9].z = particle[9].z + *(float*)(breath + 0x74) + particle[10].z;
-        particle[10].x = particle[10].x + *(float*)(breath + 0x78) + particle[11].x;
+        particle[9].y = *(float*)(breath + 0x70) + particle[10].y + particle[9].y;
+        particle[9].z = *(float*)(breath + 0x74) + particle[10].z + particle[9].z;
+        particle[10].x = *(float*)(breath + 0x78) + particle[11].x + particle[10].x;
     } else {
         particle[9].y += *(float*)(breath + 0x70);
         particle[9].z += *(float*)(breath + 0x74);
@@ -332,24 +344,27 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
     }
 
     particle[11].z += *(float*)(breath + 0xA4);
-    signed char clampScale = *(signed char*)(breath + 0xC8);
+    unsigned char clampScale = *(unsigned char*)(breath + 0xC8);
     if (clampScale == 0) {
+        float zero = kPppBreathModelZero;
         float start = *(float*)(breath + 0xA0);
-        float zero = 0.0f;
-        float delta = *(float*)(breath + 0xA4);
-        if ((start > zero) && (delta < zero)) {
-            if (particle[11].z < zero) {
+        if (zero < start) {
+            if (*(float*)(breath + 0xA4) < zero) {
+                if (particle[11].z < zero) {
+                    particle[11].z = zero;
+                }
+            }
+        } else if (start < zero) {
+            if ((zero < *(float*)(breath + 0xA4)) && (zero < particle[11].z)) {
                 particle[11].z = zero;
             }
-        } else if ((start < zero) && (zero < delta) && (zero < particle[11].z)) {
-            particle[11].z = zero;
         }
     }
 
     PSVECScale(&particle[5], &step, particle[11].z);
     PSVECAdd(&step, &particle[4], &particle[4]);
 
-    short life = *(short*)(breath + 0x20);
+    unsigned short life = *(unsigned short*)(breath + 0x20);
     if (life != 0) {
         *(short*)&particle[6].z = *(short*)&particle[6].z - 1;
     }
@@ -357,7 +372,7 @@ extern "C" void UpdateParticle__FP12VBreathModelP12PBreathModelP13PARTICLE_DATAP
 
     frameCount = *(char*)&particle[7].x;
     if ((frameCount != '\0') && ((int)(unsigned int)*(unsigned char*)&particle[12].x <= (int)frameCount)) {
-        *(float*)&particle[11].y -= (float)alpha / (float)(unsigned int)(unsigned char)frameCount;
+        *(float*)&particle[11].y -= (float)alpha / (float)(int)frameCount;
     }
 
     frameCount = *(char*)((unsigned char*)&particle[7].x + 1);
@@ -972,9 +987,14 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
 {
     int i;
@@ -1004,12 +1024,18 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
         groupData->active = 0;
     }
 }
+#endif
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& slotIndex, short& groupIndex, short particleIndex)
 {
     int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C);
@@ -1030,12 +1056,18 @@ void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& 
     slotIndex = -1;
     groupIndex = -1;
 }
+#endif
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short particleIndex)
 {
     short slotIndex;
@@ -1048,3 +1080,4 @@ void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel
         groupArray[groupIndex].particleIndices[slotIndex] = -1;
     }
 }
+#endif

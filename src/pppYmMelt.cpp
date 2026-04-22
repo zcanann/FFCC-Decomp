@@ -150,8 +150,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    u32 format = (u32)texture->m_format;
-    if ((format == 8) || (format == 9)) {
+    if (((u32)texture->m_format == 8) || ((u32)texture->m_format == 9)) {
         SetUpPaletteEnv(texture);
     }
 
@@ -252,7 +251,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         }
     }
 
-    if ((format == 8) || (format == 9)) {
+    if (((u32)texture->m_format == 8) || ((u32)texture->m_format == 9)) {
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     }
 }

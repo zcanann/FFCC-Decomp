@@ -314,7 +314,7 @@ p_FunnyShape.cpp:
 	.data       start:0x801EA778 end:0x801EA914
 	.data       start:0x801EA914 end:0x801EA948
 	.bss        start:0x8026D728 end:0x80273928
-	.sbss       start:0x8032ED28 end:0x8032ED35
+	.sbss       start:0x8032ED30 end:0x8032ED3D
 
 FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8
@@ -349,7 +349,7 @@ p_tina.cpp:
 	.data       start:0x801EA9B0 end:0x801EAD94
 	.data       start:0x801EAD94 end:0x801EADC8
 	.bss        start:0x80273928 end:0x80273A68
-	.sbss       start:0x8032ED38 end:0x8032ED50
+	.sbss       start:0x8032ED40 end:0x8032ED58
 	.sdata2     start:0x8032FDC8 end:0x8032FDD8
 
 pppPart.cpp:
@@ -357,7 +357,7 @@ pppPart.cpp:
 	extabindex  start:0x8000CA9C end:0x8000CC70
 	.text       start:0x80053D04 end:0x80057794
 	.bss        start:0x80273A68 end:0x80275EE8
-	.sbss       start:0x8032ED50 end:0x8032ED68
+	.sbss       start:0x8032ED58 end:0x8032ED68
 
 partMng.cpp:
 	extab       start:0x80006E80 end:0x80007020

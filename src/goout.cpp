@@ -10,6 +10,7 @@ extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
 extern "C" void __dl__FPv(void*);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* lbl_80214FE0[];
@@ -184,6 +185,18 @@ static const char sRestorePromptLine2[] = "to the state it was in before transfe
 static const char sRestorePromptLine3[] = "It will also prevent the transferred data";
 static const char sRestorePromptLine4[] = "from returning to this save location.";
 static const char sRestoredLine1[] = "The character has been restored.";
+static const char s_gooutCpp[] = "goout.cpp";
+
+static void InitGoOutWinMessage(int message, short startIndex)
+{
+    short* winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, message));
+
+    winMessage[0] = 0;
+    winMessage[1] = 0;
+    for (int i = 0; i < 8; i++) {
+        winMessage[i + 2] = startIndex + i;
+    }
+}
 
 /*
  * --INFO--
@@ -1492,6 +1505,17 @@ void CGoOutMenu::Calc()
         field_0x34 = -1;
         field_0x38 = 0;
         SetMainMode(1);
+        menuPcsLayout.m_transferSaveData = static_cast<Mc::SaveDat*>(
+            __nw__FUlPQ27CMemory6CStagePci(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B));
+        menuPcsLayout.m_transferWork =
+            __nw__FUlPQ27CMemory6CStagePci(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D);
+        menuPcsLayout.m_transferWorkActive = 0;
+        menuPcsLayout.m_unknown_888 = 0;
+        menuPcsLayout.m_saveLoadMode = 0;
+        menuPcsLayout.m_unknown_88A = 0;
+        InitGoOutWinMessage(0x22, 0);
+        InitGoOutWinMessage(0x23, 10);
+        MenuMcWinState(menuPcsLayout).m_mode = 3;
         field_0x44 = 1;
     }
 
@@ -1567,6 +1591,20 @@ void CGoOutMenu::Calc()
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x40 = field_0x3c;
             field_0x44 = 0;
+        }
+    }
+
+    if (field_0x40 != 0) {
+        field_0x40--;
+        if (field_0x40 == 0) {
+            if (field_0x36 >= 0) {
+                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+            }
+            field_0x45 = 0;
+            field_0x34 = -1;
+            field_0x48 = 0;
+            field_0x3c = 0;
         }
     }
 }

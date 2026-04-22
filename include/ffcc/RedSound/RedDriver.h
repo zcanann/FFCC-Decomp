@@ -72,7 +72,7 @@ public:
 	void SetMusicPhraseStop(int);
 
 	void SetSeBlockData(int, void*);
-	void SetSeSepData(void*);
+	int SetSeSepData(void*);
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);
 	int ReentrySeSepData(int);

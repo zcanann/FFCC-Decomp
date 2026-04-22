@@ -39,7 +39,6 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, cha
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
-int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
@@ -110,6 +109,13 @@ struct LaserWork {
 struct LaserColorData {
     u8 m_pad0[8];
     pppCVECTOR m_color;
+};
+
+struct LaserBaseObject {
+    s32 m_graphId;
+    u8 m_pad4[0x0C];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
 };
 
 /*
@@ -231,8 +237,8 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
+    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     LaserWork* work;
-    _pppPObject* baseObj = (_pppPObject*)pppLaser;
     Vec localA;
     Vec localB;
     Vec localPos;
@@ -259,9 +265,9 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         emptyHistory = true;
     }
 
-    CalcGraphValue(baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
         *(float*)(step->m_payload + 0x10), *(float*)(step->m_payload + 0x14), *(float*)(step->m_payload + 0x18));
-    CalcGraphValue(baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+    CalcGraphValue((_pppPObject*)baseObj, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
         *(float*)(step->m_payload + 4), *(float*)(step->m_payload + 8), *(float*)(step->m_payload + 0xc));
 
     pppCalcFrameShape(
@@ -349,23 +355,35 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         if (step->m_payload[0x3c] == 0) {
-            u8* hitFrame = &work->m_hitFrame;
-            if (*hitFrame >= step->m_payload[0x1d]) {
-                *hitFrame = 0;
-                if (hit && step->m_arg3 != -1) {
-                    u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
-                    if (dataVals != 0) {
-                        int created =
-                            pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-                        *(struct pppLaser**)(created + 4) = pppLaser;
-                        Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
-                        createdPos->x = points[i].x;
-                        createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
-                        createdPos->z = points[i].z;
-                    }
-                }
+            int createHitObject = 0;
+            if (step->m_arg3 != -1) {
+                createHitObject = 1;
+            }
+            if (!hit) {
+                createHitObject = 0;
+            }
+
+            if (work->m_hitFrame < step->m_payload[0x1d]) {
+                work->m_hitFrame++;
+                createHitObject = 0;
             } else {
-                (*hitFrame)++;
+                work->m_hitFrame = 0;
+            }
+
+            if (createHitObject != 0) {
+                _pppPDataVal* dataVal = pppMngStPtr->m_pppPDataVals + step->m_arg3;
+                _pppPObject* created;
+                if (dataVal == 0) {
+                    created = 0;
+                } else {
+                    created = pppCreatePObject(pppMngStPtr, dataVal);
+                    *(_pppPObject**)((u8*)created + 4) = baseObj;
+                }
+
+                Vec* createdPos = (Vec*)((u8*)created + *(int*)step->m_payload + 0x80);
+                createdPos->x = points[i].x;
+                createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+                createdPos->z = points[i].z;
             }
         }
     }
@@ -390,7 +408,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, _pppCtrlTable *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
-    _pppPObject* baseObj = (_pppPObject*)pppLaser;
+    LaserBaseObject* baseObj = (LaserBaseObject*)pppLaser;
     Vec* points;
     int colorOffset = param_3->m_serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
@@ -511,12 +529,12 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
         GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
         alphaMax = step->m_payload[0x2b];
-        alphaStep = (u8)((u32)alphaMax / count);
+        alphaStep = (u8)((u32)alphaMax / step->m_payload[0x1e]);
         colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
         points = work->m_points;
 
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
-        for (i = 0; i < count - 1; i++) {
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
+        for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
             alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
             color0 = colorBase | alpha0;
             color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
@@ -549,9 +567,9 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, debugColor);
             GXSetPointSize(0x28, GX_TO_ZERO);
-            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(count - 1));
-            for (i = 0; i < count - 1; i++) {
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_payload[0x1e] - 1));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
             }
 
@@ -561,13 +579,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             debugColor.a = 0xFF;
             GXSetChanAmbColor(GX_COLOR0A0, debugColor);
             GXSetLineWidth(0x14, GX_TO_ZERO);
-            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((count - 1) * 4));
-            for (i = 0; i < count - 1; i++) {
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 4));
+            for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+                GXPosition3f32(points[j + 1].x, points[j + 1].y, points[j + 1].z);
                 GXColor1u32(*(u32*)&debugColor);
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXPosition3f32(points[j].x, points[j].y, points[j].z);
                 GXColor1u32(*(u32*)&debugColor);
                 GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
                 GXColor1u32(*(u32*)&debugColor);
@@ -580,7 +598,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             PSMTXIdentity(tempMtx);
             tempMtx[0][0] = *(float*)((u8*)pppMngStPtr + 0x64) * *(float*)(step->m_payload + 0x24);
             tempMtx[1][1] = tempMtx[0][0];
-	            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
+            tempMtx[2][2] = PSVECDistance(work->m_points, &work->m_origin);
             PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
             PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
@@ -598,7 +616,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             Graphic.DrawSphere(tempMtx, debugColor);
 
             GXLoadPosMtxImm(pppLaser->m_drawMatrix.value, GX_PNMTX0);
-            for (i = 0; i < count; i++) {
+            for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
                 if ((points[i].x == kPppLaserZero) && (points[i].y == kPppLaserZero) && (points[i].z == kPppLaserZero)) {
                     continue;
                 }

@@ -1683,13 +1683,15 @@ void CRedDriver::SetSeBlockData(int param_1, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetSeSepData(void* param_1)
+int CRedDriver::SetSeSepData(void* param_1)
 {
     int iVar1;
     int iVar2;
     void* pvVar3;
     char* pcVar4;
+    int result;
 
+    result = -1;
     pcVar4 = (char*)param_1;
     if ((((pcVar4[0] == 'S') && (pcVar4[1] == 'e')) && (pcVar4[2] == 'S')) &&
         ((pcVar4[3] == 'e' && (pcVar4[4] == 'p')))) {
@@ -1699,13 +1701,13 @@ void CRedDriver::SetSeSepData(void* param_1)
             memcpy(pvVar3, param_1, iVar1);
             iVar2 = *(int*)((int)pvVar3 + 8);
             _EntryExecCommand(_SetSeSepData, (int)pvVar3, 0, 0, 0, 0, 0, 0);
-            (void)iVar2;
+            result = iVar2;
         }
-        return;
-    }
-    if (gRedMemoryDebugEnabled != 0) {
+    } else if (gRedMemoryDebugEnabled != 0) {
         OSReport("SE Sep Header was broken.\n");
+        fflush(&DAT_8021d1a8);
     }
+    return result;
 }
 
 /*

@@ -172,10 +172,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     Mtx cameraMtx;
     Mtx44 projection;
     Mtx44 screenMtx;
-    Vec cameraTarget;
     Vec cameraPos;
-    Vec objPos;
     Vec cameraDir;
+    Vec objPos;
+    Vec cameraTarget;
     Vec4d inVec;
     Vec4d outVec;
     float gxProjection[7];

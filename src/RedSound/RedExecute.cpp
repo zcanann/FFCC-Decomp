@@ -16,8 +16,8 @@ struct RedReverbDATA {
     int kind;
 };
 
-u8 DAT_8032f4a8;
-int DAT_8032f4ac;
+volatile u8 m_RandomIndex;
+int p_ReverbData;
 u32* p_ReverbSize;
 u32 m_ChangeStatus;
 int* p_SkipKeyOn;
@@ -33,8 +33,8 @@ int* p_SkipKeyOn;
  */
 u8 GetRandomData()
 {
-    u8 value = (u8)DAT_8021dcce[DAT_8032f4a8];
-    DAT_8032f4a8 = DAT_8032f4a8 + 1;
+    u8 value = (u8)DAT_8021dcce[m_RandomIndex];
+    m_RandomIndex = m_RandomIndex + 1;
     return value;
 }
 
@@ -132,8 +132,8 @@ void ReverbAreaFree(void* param_1)
  */
 void InitReverb()
 {
-    DAT_8032f4ac = RedNew(0x18);
-    memset((void*)DAT_8032f4ac, 0, 0x18);
+    p_ReverbData = RedNew(0x18);
+    memset((void*)p_ReverbData, 0, 0x18);
     p_ReverbSize = (u32*)RedNew(4);
 }
 
@@ -225,7 +225,7 @@ void _SetReverbData(RedReverbDATA* reverb, int* params)
  */
 void _ClearReverb(int bank)
 {
-    RedReverbDATA* reverb = (RedReverbDATA*)(DAT_8032f4ac + (bank & 1) * 0xC);
+    RedReverbDATA* reverb = (RedReverbDATA*)(p_ReverbData + (bank & 1) * 0xC);
     if (reverb->callback == 0) {
         return;
     }
@@ -284,7 +284,7 @@ int* SetReverb(int bank, int kind, int* params)
         return 0;
     }
 
-    reverb = (RedReverbDATA*)(DAT_8032f4ac + (bank & 1) * 0xC);
+    reverb = (RedReverbDATA*)(p_ReverbData + (bank & 1) * 0xC);
     if ((reverb->callback != nullptr) && (reverb->kind == kind)) {
         _SetReverbData(reverb, params);
         return (int*)p_ReverbSize;

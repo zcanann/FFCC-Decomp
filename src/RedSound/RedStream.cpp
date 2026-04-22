@@ -304,7 +304,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		streamData[3] = RedNew(0x4000);
 
 		int amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
-        int arOffset = c_RedMemory.GetABufferSize() < 0x800000 ? 0 : 0x300000;
+		int arOffset = c_RedMemory.GetABufferSize() < 0x800000 ? 0 : 0x300000;
 		streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
 		if (streamData[0x4b] == 0) {
 			DAT_8032e154.WaveOldClear(0, arOffset);
@@ -427,34 +427,32 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
  */
 void SetStreamVolume(int param_1, int param_2, int param_3)
 {
-	int stepCount;
-	unsigned int volume;
-	RedStreamDATA* streamData;
+	volatile RedStreamDATA* streamData;
 
 	if (param_3 < 1) {
-		stepCount = 1;
+		param_3 = 1;
 	} else {
-		stepCount = (param_3 * 200) / 60;
+		param_3 = (param_3 * 200) / 60;
 	}
 
-	volume = (unsigned int)(param_2 & 0x7f);
-	if (volume != 0) {
-		volume = ((volume + 1) * 0x100 - 1) * 0x1000 | 0x800;
+	param_2 &= 0x7f;
+	if (param_2 != 0) {
+		param_2 = ((param_2 + 1) * 0x100 - 1) * 0x1000 | 0x800;
 	}
 
 	streamData = p_Stream;
 	do {
 		if ((streamData->m_streamId != 0) && ((param_1 == -1) || (param_1 == streamData->m_streamId))) {
-			if (stepCount > 0) {
-				streamData->m_volumeStep = (int)(volume - streamData->m_volume) / stepCount;
-				streamData->m_volumeStepCount = stepCount;
+			if (param_3 > 0) {
+				streamData->m_volumeStep = (param_2 - streamData->m_volume) / param_3;
+				streamData->m_volumeStepCount = param_3;
 			} else {
-				streamData->m_volume = volume;
+				streamData->m_volume = param_2;
 				streamData->m_volumeStepCount = 0;
 			}
 		}
-		streamData = (RedStreamDATA*)((unsigned int)streamData + 0x130);
-	} while ((unsigned int)streamData < (unsigned int)p_Stream + 0x4C0);
+		streamData++;
+	} while (streamData < p_Stream + 4);
 }
 
 /*

@@ -203,10 +203,12 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
  */
 CFunnyShapePcs::CFunnyShapePcs()
 {
-    __ct__14CUSBStreamDataFv(reinterpret_cast<unsigned char*>(this) + 0x3C);
-    __ct__11CFunnyShapeFv(reinterpret_cast<unsigned char*>(this) + 0x50);
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(reinterpret_cast<unsigned char*>(this) + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(reinterpret_cast<unsigned char*>(this) + 0x61D8);
+    u8* self = reinterpret_cast<u8*>(this);
+
+    __ct__14CUSBStreamDataFv(self + 0x3C);
+    __ct__11CFunnyShapeFv(self + 0x50);
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
+    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
 }
 
 /*

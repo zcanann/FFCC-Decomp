@@ -8,8 +8,8 @@
 
 extern const float kQuadObjMaxBounds;
 extern const float kQuadObjMinBounds;
-extern const float FLOAT_80331960 = 20.0f;
-extern const float kOneF32 = 1.0f;
+extern const float FLOAT_80331960;
+extern const float kOneF32;
 
 /*
  * --INFO--
@@ -119,6 +119,9 @@ bool CGQuadObj::isInner(Vec* vec)
 
 	return false;
 }
+
+extern const float FLOAT_80331960 = 20.0f;
+extern const float kOneF32 = 1.0f;
 
 /*
  * --INFO--

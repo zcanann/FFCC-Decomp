@@ -33,7 +33,29 @@ class CMapTexAnim : public CRef
 public:
     ~CMapTexAnim();
     void Calc(CMaterialSet*, CTextureSet*);
-    void SetMapTexAnim(int, int, int);
+    void SetMapTexAnim(int frameStart, int frameEnd, int wrapMode)
+    {
+        int end = frameEnd;
+
+        if (m_usesKeyFrame != 0) {
+            m_keyFrame.m_startFrame = frameStart;
+            m_keyFrame.m_currentFrame = frameStart;
+            if (frameEnd > m_keyFrame.m_frameCount) {
+                end = m_keyFrame.m_frameCount;
+            }
+            m_keyFrame.m_endFrame = end;
+            m_keyFrame.m_loop = static_cast<unsigned char>(wrapMode);
+            m_keyFrame.m_isRun = 1;
+        } else {
+            m_startFrame = static_cast<short>(frameStart);
+            m_currentFrame = static_cast<float>(static_cast<short>(frameStart));
+            if (frameEnd > m_frameCount) {
+                end = m_frameCount;
+            }
+            m_endFrame = static_cast<short>(end);
+            m_wrapMode = static_cast<unsigned char>(wrapMode);
+        }
+    }
 
 private:
     friend class CMapTexAnimSet;

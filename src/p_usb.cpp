@@ -62,29 +62,34 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
+    int elementCount;
+    int dataCode;
+    void* dataSrc;
     unsigned int count;
+    unsigned int value;
     unsigned int* ptr;
-    unsigned int* alloc;
     int connected;
     unsigned int* dstBuffer;
     CMemory::CStage* stage;
     int result;
 
-    count = (unsigned int)(elemSize * elemCount);
-    unsigned int value = (count + 0x5F) & ~0x1F;
+    elementCount = elemCount;
+    dataCode = code;
+    dataSrc = src;
+    count = (unsigned int)(elemSize * elementCount);
+    value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    ptr = alloc = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
+    ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
         value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
-    unsigned int type = 4;
-    alloc[1] = value;
-    ptr[0] = type;
-    ptr[9] = Swap32((unsigned int)code);
-    ptr[10] = Swap32((unsigned int)elemCount);
+    ptr[1] = value;
+    ptr[0] = 4;
+    ptr[9] = Swap32((unsigned int)dataCode);
+    ptr[10] = Swap32((unsigned int)elementCount);
     ptr[12] = Swap32(count);
     ptr[11] = Swap32(0);
     ptr[8] = Swap32(count);
-    memcpy(ptr + 0x10, src, count);
+    memcpy(ptr + 0x10, dataSrc, count);
 
     connected = USB.IsConnected();
     if (connected == 0) {

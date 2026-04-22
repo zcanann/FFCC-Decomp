@@ -116,9 +116,10 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             if (ref != 0) {
                 __ct__4CRefFv(ref);
                 *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim;
+                float currentFrame;
                 float frameStep = FLOAT_8032fd48;
                 ref->m_keyFrame.m_junTable = 0;
-                float currentFrame = FLOAT_8032fd4c;
+                currentFrame = FLOAT_8032fd4c;
                 ref->m_keyFrame.m_keyFrame = 0;
                 ref->m_keyFrame.m_keyValue = 0;
                 ref->m_keyFrame.m_splineTable = 0;

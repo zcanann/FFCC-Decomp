@@ -84,7 +84,7 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
     ReplaceRef(slot, texture);
 
     unsigned short& numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
-    if (numTexture <= slotIndex) {
+    if (slotIndex >= numTexture) {
         numTexture = static_cast<unsigned short>(slotIndex + 1);
     }
 }

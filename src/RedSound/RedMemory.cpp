@@ -11,6 +11,10 @@ int* m_MemoryBank;
 int* m_AMemoryBank;
 
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
+#define redMainDataBuffer DAT_8032f478[0]
+#define redMainDataBufferSize DAT_8032f480
+#define redADataBufferSize DAT_8032f484
+#define redMainMemoryBank ((int*)DAT_8032f488[0])
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
 const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
@@ -64,6 +68,7 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int RedNew(int param_1)
 {
 	unsigned int interrupts;
@@ -127,6 +132,7 @@ int RedNew(int param_1)
 	}
 	return result;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -191,6 +197,7 @@ void RedDelete(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int alignedSize;
@@ -274,6 +281,7 @@ int RedNewA(int size, int offset, int maxSize)
 	OSRestoreInterrupts(interrupts);
 	return result;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

@@ -27,8 +27,6 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern float FLOAT_80331840;
 extern float FLOAT_80331844;
 extern const float FLOAT_80331848 = 255.0f;
-extern const double DOUBLE_80331850 = 4503599627370496.0;
-extern const double DOUBLE_80331858 = 4503601774854144.0;
 extern float FLOAT_80331860;
 
 static const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";

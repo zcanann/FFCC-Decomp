@@ -277,13 +277,13 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 			}
 
 			if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
+				u32 y;
+				u32 x;
 				CrystalRefractionMap* textureInfo;
 				u32 textureSize;
 				float stepX;
 				float stepY;
 				float yCoord;
-				u32 y;
-				u32 x;
 
 				work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 					sizeof(CrystalRefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);

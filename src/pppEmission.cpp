@@ -27,11 +27,9 @@ extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
 extern const char DAT_803311fc;
-extern float FLOAT_803311e0;
-extern float FLOAT_803311e4;
+static const float FLOAT_803311e0 = 255.0f;
+static const float FLOAT_803311e4 = 1.0f;
 extern const float FLOAT_803311f8;
-extern double DOUBLE_803311e8;
-extern double DOUBLE_803311f0;
 static const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }

@@ -398,7 +398,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     frameCount = state->m_fadeFrames;
     if (frameCount > 0) {
         alpha = state->m_color.m_a;
-        alpha = alpha + (pYmMiasma->m_colorStartA - alpha) / frameCount;
+        alpha = alpha + (u8)(pYmMiasma->m_colorStartA - alpha) / frameCount;
         state->m_color.m_a = alpha;
         state->m_fadeFrames = state->m_fadeFrames - 1;
     }
@@ -586,7 +586,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     speedJitter = randomScale * pYmMiasma->m_speedVariance;
     angleBase = (u32)(int)speedJitter;
     signBit = angleBase >> 0x1f;
-    if (((angleBase & 1U) ^ signBit) != signBit) {
+    if ((((angleBase & 1U) ^ signBit) - signBit) != 0) {
         speedJitter = speedJitter * FLOAT_80330668;
     }
     state->m_speed = pYmMiasma->m_baseSpeed + speedJitter;

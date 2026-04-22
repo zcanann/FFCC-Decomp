@@ -46,6 +46,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             float cameraPosX = CameraPcs._224_4_;
             float cameraPosY = CameraPcs._228_4_;
             float cameraPosZ = CameraPcs._232_4_;
+            float localX;
+            float localY;
             float scale = ((CameraPcs._252_4_ - 0.8f) / 0.8f) + 64.0f;
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
@@ -72,8 +74,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                 resultPos.z = cameraDir.z * *value + resultPos.z;
             }
 
-            float localY = param_1->m_object.m_localMatrix.value[1][3];
-            float localX = param_1->m_object.m_localMatrix.value[0][3];
+            localX = param_1->m_object.m_localMatrix.value[0][3];
+            localY = param_1->m_object.m_localMatrix.value[1][3];
 
             Vec direct0;
             Vec direct1;

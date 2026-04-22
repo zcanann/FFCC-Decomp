@@ -654,27 +654,27 @@ void CMapPcs::drawBefore()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
         }
 
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
+        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
         _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
@@ -688,7 +688,7 @@ void CMapPcs::drawBefore()
 
         MapMng.DrawBefore();
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2B2);
         }
     }
@@ -710,27 +710,27 @@ void CMapPcs::draw()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
         }
 
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
+        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
         _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
@@ -744,7 +744,7 @@ void CMapPcs::draw()
 
         MapMng.Draw();
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
         }
     }
@@ -766,27 +766,27 @@ void CMapPcs::drawBeforeViewer()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
         }
 
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
+        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
         _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
@@ -800,7 +800,7 @@ void CMapPcs::drawBeforeViewer()
 
         MapMng.DrawBefore();
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2B2);
         }
     }
@@ -822,27 +822,27 @@ void CMapPcs::drawViewer()
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
         }
 
-        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
+        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
         _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
@@ -856,7 +856,7 @@ void CMapPcs::drawViewer()
 
         MapMng.Draw();
 
-        if (Game.m_currentSceneId == 3) {
+        if (static_cast<int>(Game.m_currentSceneId) == 3) {
             _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
         }
     }
@@ -879,13 +879,13 @@ void CMapPcs::drawAfter()
             Mtx cameraMtx;
             Mtx44 screenMtx;
 
-            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -893,7 +893,7 @@ void CMapPcs::drawAfter()
 
             GXSetColorUpdate(GX_TRUE);
             GXSetAlphaUpdate(GX_FALSE);
-            GXSetCullMode(GX_CULL_BACK);
+            GXSetCullMode(GX_CULL_FRONT);
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
             _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
@@ -933,13 +933,13 @@ void CMapPcs::drawAfterViewer()
             Mtx cameraMtx;
             Mtx44 screenMtx;
 
-            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
                 *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -947,7 +947,7 @@ void CMapPcs::drawAfterViewer()
 
             GXSetColorUpdate(GX_TRUE);
             GXSetAlphaUpdate(GX_FALSE);
-            GXSetCullMode(GX_CULL_BACK);
+            GXSetCullMode(GX_CULL_FRONT);
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
             _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);

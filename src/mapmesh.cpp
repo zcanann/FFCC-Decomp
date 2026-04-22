@@ -318,11 +318,11 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, DAT_8032EC98, s_mapmesh_cpp_801D70B0, 0x13A);
 
             minInit = FLOAT_8032F930;
-            maxInit = FLOAT_8032F934;
             offset = 0;
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(m_meshData)));
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             m_vertices = cursor;
+            maxInit = FLOAT_8032F934;
             m_bboxMinZ = minInit;
             m_bboxMinY = minInit;
             m_bboxMinX = minInit;

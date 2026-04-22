@@ -62,13 +62,10 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     pppNormalize(direction, normalizedSource);
 
     s32 sinIndex = (s32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
-    f32 distance = work->m_distance;
-    f32 sinValue = *(f32*)((u8*)gPppTrigTable + (sinIndex & 0xFFFC));
-    f32 cosValue = *(f32*)((u8*)gPppTrigTable + ((sinIndex + 0x4000) & 0xFFFC));
-    f32 xzScale = frameCount * (distance * cosValue);
+    f32 xzScale = frameCount * (work->m_distance * *(f32*)((u8*)gPppTrigTable + ((sinIndex + 0x4000) & 0xFFFC)));
     newPosition.x = direction.x * xzScale;
     f32 gravityOffset = gPppYmMoveParabolaGravityScale * stepData->m_initWOrk;
-    newPosition.y = (frameCount * (distance * sinValue)) -
+    newPosition.y = (frameCount * (work->m_distance * *(f32*)((u8*)gPppTrigTable + (sinIndex & 0xFFFC)))) -
                     (frameCount * (gravityOffset * frameCount));
     newPosition.z = direction.z * xzScale;
     if ((s32)Game.m_currentSceneId == 7) {

@@ -28,6 +28,7 @@ extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" int AddGil__12CCaravanWorkFi(void*, int);
+extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
@@ -2279,12 +2280,64 @@ void GbaQueue::ClrLetterDatFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CD2DC
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::MoveLetterItem(int, unsigned int)
+void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
-	// TODO
+	unsigned int stackValue = value;
+	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
+	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+	int letterIndex = valueBytes[2];
+	int letterOffset = letterIndex * 0xC;
+	unsigned char* letter = reinterpret_cast<unsigned char*>(caravanWork) + letterOffset;
+	int hasGil = (letter[0x3EC] >> 3) & 1;
+	int result;
+
+	if (hasGil == 0) {
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		if (item != 0) {
+			if ((item < 1) || (item > 0x9E)) {
+				if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), item, 0) == 0) {
+					result = 1;
+				} else {
+					result = 0;
+				}
+			}
+		}
+	}
+	if (hasGil != 0) {
+		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		if (item != 0) {
+			int gil = item * 100;
+			if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gil) == 0) {
+				result = 1;
+			} else {
+				AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*scriptFoodBase), gil);
+				result = 0;
+			}
+		}
+	}
+
+	int i = 0;
+	do {
+		if (Joybus.SendResult(channel, result, valueBytes[0], valueBytes[1]) == 0) {
+			break;
+		}
+		i++;
+	} while (i < 10);
+
+	if ((result == 0) && (i < 10)) {
+		unsigned char* letterBase = reinterpret_cast<unsigned char*>(*scriptFoodBase);
+		int readFlag = 1;
+		letterBase[letterOffset + 0x3EC] =
+			static_cast<unsigned char>((letterBase[letterOffset + 0x3EC] & 0xBF) | ((readFlag << 6) & 0x40));
+	}
 }
 
 /*
@@ -3878,12 +3931,28 @@ void GbaQueue::ClrArtifactFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA5D4
+ * PAL Size: 468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetArtifactData(int, unsigned char*)
+int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 {
-	return 0;
+	unsigned char localPlayerData[0xDC];
+	unsigned int artifactData[3];
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454,
+	       sizeof(localPlayerData));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	artifactData[0] = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x24));
+	artifactData[1] = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x28));
+	artifactData[2] = SwapU32(*reinterpret_cast<unsigned int*>(localPlayerData + 0x2C));
+	memcpy(outData, artifactData, sizeof(artifactData));
+	return 0xC;
 }
 
 /*

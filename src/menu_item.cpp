@@ -382,8 +382,8 @@ bool CMenuPcs::ItemOpen()
         do {
             dVar3 = DOUBLE_80332ea0;
             fVar1 = FLOAT_80332e60;
-            if (*(int*)(psVar4 + 0x12) <= iVar7) {
-                if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+            if (iVar7 >= *(int*)(psVar4 + 0x12)) {
+                if (*(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14) > iVar7) {
                     *(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
                     dVar2 = DOUBLE_80332e68;
                     *(float*)(psVar4 + 8) =
@@ -482,8 +482,8 @@ bool CMenuPcs::ItemClose()
         do {
             double dVar3 = DOUBLE_80332ea0;
             float zero = FLOAT_80332e60;
-            if (anim->startFrame <= step) {
-                if (step < anim->startFrame + anim->duration) {
+            if (step >= anim->startFrame) {
+                if (anim->startFrame + anim->duration > step) {
                     double dVar2 = DOUBLE_80332e68;
                     anim->frame = anim->frame + 1;
                     anim->progress =

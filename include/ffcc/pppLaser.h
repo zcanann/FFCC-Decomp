@@ -4,18 +4,10 @@
 #include "ffcc/partMng.h"
 
 struct pppLaser {
-    u8 field_0x0[0x84];
-    f32 field_0x84;     // 0x84
-    f32 field_0x88;     // 0x88
-    f32 field_0x8c;     // 0x8c
-    f32 field_0x90;     // 0x90
-    f32 field_0x94;     // 0x94
-    f32 field_0x98;     // 0x98
-    f32 field_0x9c;     // 0x9c
-    f32 field_0xa0;     // 0xa0
-    f32 field_0xa4;     // 0xa4
-    f32 field_0xa8;     // 0xa8
-    u8 field_0xac;      // 0xac
+    u8 m_header[0x10];
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX m_drawMatrix;
+    u8 m_pad70[0x10];
 };
 
 struct pppLaserUnkB {

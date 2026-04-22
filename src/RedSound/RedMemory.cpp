@@ -71,6 +71,7 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int RedNew(int param_1)
 {
 	unsigned int interrupts;
@@ -134,6 +135,7 @@ int RedNew(int param_1)
 	}
 	return result;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -202,6 +204,7 @@ void RedDelete(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int alignedSize;
@@ -285,6 +288,7 @@ int RedNewA(int size, int offset, int maxSize)
 	OSRestoreInterrupts(interrupts);
 	return result;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

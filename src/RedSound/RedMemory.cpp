@@ -15,6 +15,9 @@ int* m_AMemoryBank;
 #define redADataBufferSize DAT_8032f484
 #define redMainMemoryBank ((int*)DAT_8032f488[0])
 
+extern int DAT_8032f47c;
+extern int DAT_8032f48c;
+
 const char sRedMemoryLogSuffixA[] = "\x1b[7;31m";
 const char sRedMemoryLogSuffixB[8] = "\x1b[0m";
 
@@ -361,14 +364,14 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 	bankSize += 0x1FU;
 	bankSize &= 0xFFFFFFE0;
 
-	m_MemoryBank = (int*)param1;
-	m_DataBufferSize = param2 - (bankSize * 2);
-	m_AMemoryBank = (int*)((int)m_MemoryBank + bankSize);
-	m_DataBuffer = (int)m_AMemoryBank + bankSize;
-	memset(m_MemoryBank, 0, bankSize);
-	memset(m_AMemoryBank, 0, bankSize);
-	m_ADataBuffer = param3;
-	m_ADataBufferSize = param4;
+	DAT_8032f488[0] = param1;
+	DAT_8032f480 = param2 - (bankSize * 2);
+	DAT_8032f48c = DAT_8032f488[0] + bankSize;
+	DAT_8032f478[0] = DAT_8032f48c + bankSize;
+	memset((int*)DAT_8032f488[0], 0, bankSize);
+	memset((int*)DAT_8032f48c, 0, bankSize);
+	DAT_8032f47c = param3;
+	DAT_8032f484 = param4;
 }
 #pragma optimization_level 4
 
@@ -425,7 +428,7 @@ int* CRedMemory::GetMainBankAddress()
  */
 int CRedMemory::GetABufferAddress()
 {
-	return m_ADataBuffer;
+	return DAT_8032f47c;
 }
 
 /*
@@ -453,5 +456,5 @@ int CRedMemory::GetABufferSize()
  */
 int* CRedMemory::GetABankAddress()
 {
-	return m_AMemoryBank;
+	return (int*)DAT_8032f48c;
 }

@@ -93,8 +93,8 @@ void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short,
 void DispCharaParts__8CGObjectFi(CGObject*, int);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
 int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
-void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
-void ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl(void*, S16Vec2d*, Vec2d*, long);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec, unsigned long);
+void ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl(void*, S16Vec2d*, Vec2d, long);
 void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
     void* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
     _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
@@ -1723,8 +1723,8 @@ void CalcReflectionVector2(
                 next = dl + 5;
             }
 
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &position, &positions[posIndex], posScale);
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normal, &normals[normalIndex], normalScale);
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &position, positions[posIndex], posScale);
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normal, normals[normalIndex], normalScale);
             PSMTXMultVec(nodeRotMtx, &position, &position);
             PSMTXMultVec(workMtx, &normal, &normal);
 
@@ -1752,14 +1752,14 @@ void CalcReflectionVector2(
             vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
             uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
             uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
-            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordA[posIndex], &uv, 12);
+            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordA[posIndex], uv, 12);
 
             denom = (float)(denomBias - (double)reflectionVec[posIndex].z);
             uVal = (double)(float)((double)(-reflectionVec[posIndex].x / denom) * half + half);
             vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
             uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
             uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
-            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordB[posIndex], &uv, 12);
+            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordB[posIndex], uv, 12);
 
             dl = next;
         }

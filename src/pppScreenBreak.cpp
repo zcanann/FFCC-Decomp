@@ -140,7 +140,7 @@ void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, fl
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
-void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec*, unsigned long);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 }
 
@@ -519,7 +519,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         local_e0.x = local_d8.x;
         local_e0.y = local_d8.y;
         local_d8.z = local_e0.z;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, &local_e0, *(u32*)(modelData + 0x34));
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, local_e0, *(u32*)(modelData + 0x34));
         PSVECScale(inVec + 3, inVec + 3, kPppScreenBreakVelocityScale);
 
         dVar17 = (double)inVec[3].x;
@@ -558,7 +558,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     local_e8.x = local_d0;
     local_e8.y = sStack_ce;
     local_e8.z = local_cc;
-    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), &local_e8, *(u32*)(modelData + 0x34));
+    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), local_e8, *(u32*)(modelData + 0x34));
 }
 
 /*

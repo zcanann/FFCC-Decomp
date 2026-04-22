@@ -68,7 +68,7 @@ const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs_GAME";
 const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs_VIEWER";
 const char s_CMapPcs_PART_801D7700[] = "CMapPcs_PART";
 
-unsigned int PTR_s_CMapPcs_GAME__801e8ad8[3][0x414 / 3 / sizeof(unsigned int)] = {
+unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
     {reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_GAME_801D76E0)), 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0x14, 0, 0, 0, 0, 0x1E, 0, 0, 0, 0, 0x2F, 1, 0, 0, 0, 0x35, 1, 0, 0, 0, 0x37, 1, 0, 0, 0,
      0x3F, 1},
@@ -145,7 +145,7 @@ CRelProfile::~CRelProfile()
  */
 CMapPcs::CMapPcs()
 {
-    unsigned int* dst = &PTR_s_CMapPcs_GAME__801e8ad8[0][0];
+    unsigned int* dst = &m_table__7CMapPcs[0][0];
 
     dst[0x004 / 4] = m_table_desc0__7CMapPcs[0];
     dst[0x008 / 4] = m_table_desc0__7CMapPcs[1];
@@ -248,7 +248,7 @@ void CMapPcs::Quit()
  */
 int CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return reinterpret_cast<int>(PTR_s_CMapPcs_GAME__801e8ad8[tableIndex]);
+	return reinterpret_cast<int>(m_table__7CMapPcs[tableIndex]);
 }
 
 /*

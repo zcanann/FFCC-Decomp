@@ -33,6 +33,9 @@ extern "C" char SoundBuffer_1248_[];
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
+extern double DOUBLE_803319E0;
+extern double DOUBLE_80331A10;
+extern double DOUBLE_80331A18;
 struct MonAiFuncTable;
 extern "C" MonAiFuncTable funcsDefault;
 extern "C" MonAiFuncTable funcsGiantCrab;
@@ -720,12 +723,93 @@ void CGMonObj::isValidTarget()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80116654
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::seKiduki()
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	if (mon[0x6BE] != 0) {
+		return;
+	}
+
+	bool notice = false;
+	int partyIndex = -1;
+
+	if (mon[0x6BD] == 0) {
+		double soundLimit = DOUBLE_80331A18;
+		if (Game.m_gameWork.m_soundOptionFlag != 0) {
+			soundLimit = DOUBLE_80331A10;
+		}
+
+		if (*reinterpret_cast<float*>(mon + 0x5BC) < soundLimit) {
+			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
+			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+			float hitScale;
+
+			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
+			         static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xC8)) -
+			                            DOUBLE_803319E0),
+			         &hitScale, &partyIndex);
+		}
+	} else {
+		partyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
+	}
+
+	if (partyIndex >= 0) {
+		int action = *reinterpret_cast<int*>(mon + 0x6D0);
+		int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
+		unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+		unsigned short noticeFlags = *reinterpret_cast<unsigned short*>(script + 0xFE);
+
+		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
+			notice = true;
+			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x32;
+		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
+			notice = true;
+			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x33;
+		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (scriptHandle[4] == 0x39))) {
+			notice = true;
+			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x34;
+		}
+	}
+
+	int classId = (*reinterpret_cast<int**>(mon + 0x58))[4];
+	if (classId != 0x70) {
+		if (classId < 0x70) {
+			if (classId == 0x6A) {
+				notice = true;
+				*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x35;
+			}
+		} else if (classId == 0x7B) {
+			notice = true;
+		}
+	} else {
+		notice = true;
+	}
+
+	if (notice) {
+		if (classId == 0x7B) {
+			*reinterpret_cast<int*>(mon + 0x6D8) = 0;
+			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+		} else if (mon[0x6BD] == 0) {
+			*reinterpret_cast<int*>(mon + 0x6D8) = 2;
+			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+		} else {
+			*reinterpret_cast<int*>(mon + 0x6D8) = 2;
+			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+		}
+
+		*reinterpret_cast<int*>(mon + 0x6C4) = partyIndex;
+	}
 }
 
 /*

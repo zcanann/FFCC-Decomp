@@ -7,10 +7,10 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include <math.h>
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
+extern int __float_nan[];
 extern const float FLOAT_80330fa8 = 32.0f;
 extern const float FLOAT_80330fac = -0.5f;
 extern const float FLOAT_80330fb0 = 640.0f;
@@ -20,23 +20,36 @@ extern const float FLOAT_80330fbc = 1.3333334f;
 extern const float FLOAT_80330fc0 = 0.5f;
 extern const double DOUBLE_80330FC8 = 4503599627370496.0;
 extern const float FLOAT_80330FD0 = 2.0f;
+extern const float FLOAT_80330FD4;
+extern const float FLOAT_80330FD8;
+extern const double DOUBLE_80330FE0;
+extern const double DOUBLE_80330FE8;
+extern const double DOUBLE_80330FF0;
+extern const float FLOAT_80330FF8;
+extern const double DOUBLE_80331000;
+extern const float FLOAT_80331008;
+extern const float FLOAT_8033100C;
+extern const float FLOAT_80331010;
 
-#define CRYSTAL_REFRACTION_SIZE 32.0f
-#define CRYSTAL_HALF_NEGATIVE -0.5f
-#define CRYSTAL_SCREEN_WIDTH 640.0f
-#define CRYSTAL_SCREEN_HEIGHT 448.0f
-#define CRYSTAL_SCENE_FOVY 33.3f
-#define CRYSTAL_ASPECT 1.3333334f
-#define CRYSTAL_HALF 0.5f
-#define CRYSTAL_COORD_RANGE 2.0f
-#define CRYSTAL_COORD_MIN -1.0f
-#define CRYSTAL_MAGNITUDE_UNIT 1.0f
-#define CRYSTAL_MAGNITUDE_CAP 0.8f
-#define CRYSTAL_FMOD_PERIOD 1.0
-#define CRYSTAL_MODULATION_SCALE 4.0f
-#define CRYSTAL_NORMAL_OFFSET 128.0f
-#define CRYSTAL_NORMAL_SCALE 127.0f
+#define CRYSTAL_REFRACTION_SIZE FLOAT_80330fa8
+#define CRYSTAL_HALF_NEGATIVE FLOAT_80330fac
+#define CRYSTAL_SCREEN_WIDTH FLOAT_80330fb0
+#define CRYSTAL_SCREEN_HEIGHT FLOAT_80330fb4
+#define CRYSTAL_SCENE_FOVY FLOAT_80330fb8
+#define CRYSTAL_ASPECT FLOAT_80330fbc
+#define CRYSTAL_HALF FLOAT_80330fc0
+#define CRYSTAL_COORD_RANGE FLOAT_80330FD0
+#define CRYSTAL_COORD_MIN FLOAT_80330FD4
+#define CRYSTAL_MAGNITUDE_UNIT FLOAT_80330FD8
+#define CRYSTAL_MAGNITUDE_CAP FLOAT_80330FF8
+#define CRYSTAL_FMOD_PERIOD DOUBLE_80331000
+#define CRYSTAL_MODULATION_SCALE FLOAT_80331008
+#define CRYSTAL_NORMAL_OFFSET FLOAT_8033100C
+#define CRYSTAL_NORMAL_SCALE FLOAT_80331010
+#define CRYSTAL_ZERO_DOUBLE DOUBLE_80330FF0
+#define CRYSTAL_NAN (*(float*)__float_nan)
 extern "C" unsigned int __cvt_fp2unsigned(double);
+extern "C" double fmod(double, double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 extern "C" {
@@ -112,13 +125,11 @@ static inline int CrystalFpClassify(float value)
 
 static inline float CrystalSqrtPositive(float value)
 {
-    const double half = 0.5;
-    const double three = 3.0;
     double guess = __frsqrte((double)value);
 
-    guess = half * guess * (three - guess * guess * value);
-    guess = half * guess * (three - guess * guess * value);
-    guess = half * guess * (three - guess * guess * value);
+    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
+    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
+    guess = DOUBLE_80330FE0 * guess * (DOUBLE_80330FE8 - guess * guess * value);
 
     return (float)(value * guess);
 }
@@ -311,10 +322,10 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 						float magnitude = xCoord * xCoord + ySq;
 						if (magnitude > CRYSTAL_MAGNITUDE_UNIT) {
 							magnitude = CrystalSqrtPositive(magnitude);
-						} else if ((double)magnitude < 0.0) {
-							magnitude = NAN;
+						} else if ((double)magnitude < CRYSTAL_ZERO_DOUBLE) {
+							magnitude = CRYSTAL_NAN;
 						} else if (CrystalFpClassify(magnitude) == 1) {
-							magnitude = NAN;
+							magnitude = CRYSTAL_NAN;
 						}
 
 						if (magnitude > CRYSTAL_MAGNITUDE_CAP) {

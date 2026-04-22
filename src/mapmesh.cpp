@@ -730,26 +730,6 @@ void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80027774
  * PAL Size: 120b
  * EN Address: TODO

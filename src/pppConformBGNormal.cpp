@@ -257,9 +257,11 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         pppMngStPtr->m_matrix.value[1][3] = local_170.y;
                         pppMngStPtr->m_matrix.value[2][3] = local_170.z;
                     } else {
-                        pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                        ownerZ = owner->m_worldPosition.z;
+                        ownerX = owner->m_worldPosition.x;
+                        pppMngStPtr->m_matrix.value[0][3] = ownerX;
                         pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                        pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
+                        pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                     }
                 }
             } else if (mode == 1) {

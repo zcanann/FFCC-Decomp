@@ -406,7 +406,9 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     decayCount = state->m_colorDecayFrames;
     if (state->m_lifeFrames <= decayCount) {
         if (state->m_hasImpulse == 0) {
-            state->m_color.m_a = state->m_color.m_a - (state->m_color.m_a / decayCount);
+            alpha = state->m_color.m_a;
+            alpha = alpha - alpha / decayCount;
+            state->m_color.m_a = alpha;
             state->m_colorDecayFrames = state->m_colorDecayFrames - 1;
         }
     }

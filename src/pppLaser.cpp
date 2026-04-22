@@ -1,7 +1,6 @@
 #include "ffcc/pppLaser.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
-#include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"

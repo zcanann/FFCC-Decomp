@@ -154,7 +154,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     Vec cameraPos;
     float radius;
     float maxRadius;
-    float radiusScale;
+    int radiusScaleOffset;
     int texWidth;
     int texHeight;
     int i4TexSize;
@@ -162,9 +162,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     int colorOffset;
     int textureIndex;
     int yOffset;
+    float yPos;
     u32 colorRaw;
     u16 i;
-    u32 slice;
+    int slice;
     int tevSwapChannel;
     int tevAlphaScale;
     bool inFarZone;
@@ -184,7 +185,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
 
     work = (s16*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
     colorOffset = param_3->m_serializedDataOffsets[1];
-    radiusScale = *(float*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[3]);
+    radiusScaleOffset = param_3->m_serializedDataOffsets[3];
 
     textureIndex = 0;
     model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex]);
@@ -194,14 +195,15 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         param_2->m_payload[0x1E] = 0xFE;
     }
 
+    texWidth = (int)FLOAT_80331928;
+    texHeight = (int)FLOAT_8033192c;
+
     packedColor.raw = *(u32*)((u8*)pppMiasma + 0x88 + colorOffset);
     packedWork.bytes[0] = (u8)(work[0] >> 7);
     packedWork.bytes[1] = (u8)(work[1] >> 7);
     packedWork.bytes[2] = (u8)(work[2] >> 7);
     packedWork.bytes[3] = (u8)(work[3] >> 7);
 
-    texWidth = (int)FLOAT_80331928;
-    texHeight = (int)FLOAT_8033192c;
     i4TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)6, GX_FALSE, 0);
     rgba8TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)0x28, GX_FALSE, 0);
 
@@ -233,7 +235,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         maxRadius = FLOAT_80331934;
     }
 
-    maxRadius = maxRadius * radiusScale;
+    maxRadius = maxRadius * *(float*)((u8*)pppMiasma + 0x80 + radiusScaleOffset);
     if (Game.m_currentSceneId != 7) {
         Game.unkFloat_0xca10 = maxRadius;
     }
@@ -241,7 +243,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
     inFarZone = (FLOAT_80331938 + maxRadius) <= PSVECDistance(&cameraPos, &managerPos);
 
     for (slice = 0; slice < 2; slice++) {
-        yOffset = (int)((float)slice * FLOAT_8033192c);
+        yPos = (float)slice * FLOAT_8033192c;
+        yOffset = (int)yPos;
 
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
         GXSetScissor(0, yOffset, (u32)FLOAT_80331928, (u32)FLOAT_8033192c);
@@ -250,7 +253,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         drawColor.rgba[1] = drawColor.rgba[0];
         drawColor.rgba[2] = drawColor.rgba[0];
         drawColor.rgba[3] = 0xFF;
-        gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
+        gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             &drawColor, &pppMiasma->m_drawMatrix, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
@@ -328,7 +331,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             drawColor.rgba[1] = drawColor.rgba[0];
             drawColor.rgba[2] = drawColor.rgba[0];
             drawColor.rgba[3] = 0xFF;
-            gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
+            gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX8);
             GXSetVtxDesc((GXAttr)10, GX_INDEX8);
@@ -393,7 +396,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
         }
 
         Graphic.SetViewport();
-        gUtil.RenderTextureQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
+        gUtil.RenderTextureQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
                                        0, (GXBlendFactor)4, (GXBlendFactor)5);
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
@@ -471,10 +474,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             GXSetNumTevStages(5);
 
             quadA.x = FLOAT_8033193c;
-            quadA.y = (float)yOffset;
+            quadA.y = yPos;
             quadA.z = FLOAT_8033193c;
             quadB.x = FLOAT_80331928;
-            quadB.y = (float)yOffset + FLOAT_8033192c;
+            quadB.y = yPos + FLOAT_8033192c;
             quadB.z = FLOAT_8033193c;
 
             pppInitBlendMode();
@@ -578,10 +581,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, pppMias
             GXSetNumTevStages(3);
             GXSetNumTexGens(1);
             quadA.x = FLOAT_8033193c;
-            quadA.y = (float)yOffset;
+            quadA.y = yPos;
             quadA.z = FLOAT_8033193c;
             quadB.x = FLOAT_80331928;
-            quadB.y = (float)yOffset + FLOAT_8033192c;
+            quadB.y = yPos + FLOAT_8033192c;
             quadB.z = FLOAT_8033193c;
             gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }

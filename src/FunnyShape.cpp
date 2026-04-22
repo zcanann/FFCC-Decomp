@@ -344,7 +344,7 @@ void CFunnyShape::Update()
 
     CFunnyShapeAnmWork* work = AnmWork(this);
     const float zero = 0.0f;
-    const u8 noSpread = static_cast<u8>(((ShapeFlags(this) >> 7) & 1) ^ 1);
+    const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
     for (s32 i = 0; i < ShapeCount(this); i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
         if (work->delay <= 0) {

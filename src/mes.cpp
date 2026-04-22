@@ -965,25 +965,28 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 	unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
 	while (*(int*)((char*)this + 0x3c10) < maxCount)
 	{
-		unsigned char type = *flagEntry;
+		int type = *flagEntry;
 
-		if ((type != 3) && (type < 3))
+		if (type != 3)
 		{
-			if (type == 1)
+			if (type < 3)
 			{
-				int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-				*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+				if (type == 1)
+				{
+					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+				}
+				else if (type != 0)
+				{
+					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
+				}
 			}
-			else if (type != 0)
+			else if ((type < 5) &&
+			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
+			         (stopOnClear == 0))
 			{
-				*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
+				return 0;
 			}
-		}
-		else if ((type < 5) &&
-		         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
-		         (stopOnClear == 0))
-		{
-			return 0;
 		}
 
 		flagEntry += 6;

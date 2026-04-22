@@ -16,6 +16,7 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/sound.h"
 #include "ffcc/texanim.h"
+#include "ffcc/vector.h"
 
 #include <dolphin/gx.h>
 #include <math.h>
@@ -65,6 +66,17 @@ struct CModelAnimState {
     float m_time;
     float m_animStart;
     float m_animEnd;
+};
+
+struct CMapCylinderRaw {
+    Vec m_bottom;
+    Vec m_direction;
+    float m_radius;
+    float m_height;
+    Vec m_top;
+    Vec m_direction2;
+    float m_radius2;
+    float m_height2;
 };
 
 static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
@@ -1070,27 +1082,29 @@ void CGObject::bgAttribCollision()
 
     if ((m_displayFlags & 4) != 0) {
         Vec probePos;
-        Vec probeMove;
-        probePos.x = m_worldPosition.x;
-        probePos.y = m_worldPosition.y + sHitProbeHeight;
-        probePos.z = m_worldPosition.z;
-        probeMove.x = sZeroFloat;
-        probeMove.y = sDownProbeDistance;
-        probeMove.z = sZeroFloat;
+        CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
+        CVector probeBase(m_worldPosition.x, m_worldPosition.y + sHitProbeHeight, m_worldPosition.z);
 
-        CMapCylinder charmCylinder;
+        CMapCylinderRaw charmCylinder;
+        probePos.x = probeBase.x;
+        probePos.y = probeBase.y;
+        probePos.z = probeBase.z;
         charmCylinder.m_bottom = probePos;
-        charmCylinder.m_direction = probeMove;
+        charmCylinder.m_direction.x = probeMove.x;
+        charmCylinder.m_direction.y = probeMove.y;
+        charmCylinder.m_direction.z = probeMove.z;
         charmCylinder.m_radius = sHugeCylinderExtent;
         charmCylinder.m_height = sHugeCylinderExtent;
-        charmCylinder.m_top = probeMove;
+        charmCylinder.m_top = charmCylinder.m_direction;
         charmCylinder.m_direction2.x = sNegHugeCylinderExtent;
         charmCylinder.m_direction2.y = sNegHugeCylinderExtent;
         charmCylinder.m_direction2.z = sNegHugeCylinderExtent;
         charmCylinder.m_radius2 = sZeroFloat;
         charmCylinder.m_height2 = sZeroFloat;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &charmCylinder, &probeMove, 0x80000000) != 0) {
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                &MapMng, reinterpret_cast<CMapCylinder*>(&charmCylinder), reinterpret_cast<Vec*>(&probeMove),
+                0x80000000) != 0) {
             Vec hitPos;
             CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &hitPos);
             m_bgCharmFactor = m_worldPosition.y - hitPos.y;
@@ -1100,49 +1114,56 @@ void CGObject::bgAttribCollision()
 
     if ((m_weaponNodeFlags & 1) == 0) {
         if ((m_groundHitOffset.x != sZeroFloat) || (m_groundHitOffset.z != sZeroFloat)) {
-            Vec probePos;
-            Vec probeMove;
-            probePos.x = m_worldPosition.x;
-            probePos.y = m_worldPosition.y + sStepProbeHeight;
-            probePos.z = m_worldPosition.z;
-            probeMove.x = sZeroFloat;
-            probeMove.y = sDownProbeDistance;
-            probeMove.z = sZeroFloat;
+            const bool hasModel =
+                (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
+                (m_charaModelHandle->m_model != (CChara::CModel*)0);
+            if (hasModel) {
+                Vec probePos;
+                CVector probeMove(sZeroFloat, sDownProbeDistance, sZeroFloat);
+                CVector probeBase(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
 
-            CMapCylinder attrCylinder;
-            attrCylinder.m_bottom = probePos;
-            attrCylinder.m_direction = probeMove;
-            attrCylinder.m_radius = sHugeCylinderExtent;
-            attrCylinder.m_height = sHugeCylinderExtent;
-            attrCylinder.m_top = probeMove;
-            attrCylinder.m_direction2.x = sNegHugeCylinderExtent;
-            attrCylinder.m_direction2.y = sNegHugeCylinderExtent;
-            attrCylinder.m_direction2.z = sNegHugeCylinderExtent;
-            attrCylinder.m_radius2 = sZeroFloat;
-            attrCylinder.m_height2 = sZeroFloat;
+                CMapCylinderRaw attrCylinder;
+                probePos.x = probeBase.x;
+                probePos.y = probeBase.y;
+                probePos.z = probeBase.z;
+                attrCylinder.m_bottom = probePos;
+                attrCylinder.m_direction.x = probeMove.x;
+                attrCylinder.m_direction.y = probeMove.y;
+                attrCylinder.m_direction.z = probeMove.z;
+                attrCylinder.m_radius = sHugeCylinderExtent;
+                attrCylinder.m_height = sHugeCylinderExtent;
+                attrCylinder.m_top = attrCylinder.m_direction;
+                attrCylinder.m_direction2.x = sNegHugeCylinderExtent;
+                attrCylinder.m_direction2.y = sNegHugeCylinderExtent;
+                attrCylinder.m_direction2.z = sNegHugeCylinderExtent;
+                attrCylinder.m_radius2 = sZeroFloat;
+                attrCylinder.m_height2 = sZeroFloat;
 
-            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &attrCylinder, &probeMove, 0x78000000) == 0) {
-                m_bgAttrValue = sAnimFrameOffset;
-            } else {
-                switch (reinterpret_cast<unsigned char*>(gMapHitFace)[0x47]) {
-                case 0x28:
-                    m_bgAttrValue = sBgAttrSlow;
-                    break;
-                case 0x29:
-                    m_bgAttrValue = sBgAttrNormal;
-                    break;
-                case 0x2A:
-                    m_bgAttrValue = sBgAttrFast;
-                    break;
-                case 0x2B:
-                    m_bgAttrValue = sZeroFloat;
-                    break;
-                default:
-                    break;
+                if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                        &MapMng, reinterpret_cast<CMapCylinder*>(&attrCylinder), reinterpret_cast<Vec*>(&probeMove),
+                        0x78000000) != 0) {
+                    switch (reinterpret_cast<unsigned char*>(gMapHitFace)[0x47] - 0x28) {
+                    case 0:
+                        m_bgAttrValue = sBgAttrSlow;
+                        break;
+                    case 1:
+                        m_bgAttrValue = sBgAttrNormal;
+                        break;
+                    case 2:
+                        m_bgAttrValue = sBgAttrFast;
+                        break;
+                    case 3:
+                        m_bgAttrValue = sZeroFloat;
+                        break;
+                    default:
+                        break;
+                    }
+                } else {
+                    m_bgAttrValue = sAnimFrameOffset;
                 }
             }
         }
-    } else if (m_attachOwner != 0) {
+    } else {
         m_bgAttrValue = m_attachOwner->m_bgAttrValue;
     }
 }

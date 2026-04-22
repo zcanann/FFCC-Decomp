@@ -7,7 +7,7 @@ extern "C" {
 extern const float kMaterialEditorControlMaxInit;
 extern const float kMaterialEditorControlMinInit;
 extern unsigned int kMaterialEditorDefaultColorRgba;
-extern char sMaterialEditorSpinnerText[];
+extern const char sMaterialEditorSpinnerText[];
 }
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
@@ -63,7 +63,13 @@ struct MaterialEditorTableInit {
 };
 
 static MaterialEditorTableInit sMaterialEditorTableInit;
-static const char s_MaterialEditor[] = "MaterialEditor=%c";
+extern "C" {
+const char* gDebugSpinnerText_addr;
+char gDebugSpinnerTextInitialized_addr;
+int gDebugSpinnerFrame_addr;
+char gDebugSpinnerFrameInitialized_addr;
+const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor=%c";
+}
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -516,24 +522,20 @@ struct MaterialEditorPolygon {
 void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    static char* pFan;
-    static unsigned char init;
-    static int alive;
-    static unsigned char init_0;
 
-    if (init == 0) {
-        pFan = sMaterialEditorSpinnerText;
-        init = 1;
+    if (gDebugSpinnerTextInitialized_addr == 0) {
+        gDebugSpinnerText_addr = sMaterialEditorSpinnerText;
+        gDebugSpinnerTextInitialized_addr = 1;
     }
-    if (init_0 == 0) {
-        alive = 0;
-        init_0 = 1;
+    if (gDebugSpinnerFrameInitialized_addr == 0) {
+        gDebugSpinnerFrame_addr = 0;
+        gDebugSpinnerFrameInitialized_addr = 1;
     }
 
-    alive = alive + 1;
-    int sign = alive >> 31;
-    int idx = (sign * 4 | (unsigned int)(((alive >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)pFan[idx]);
+    gDebugSpinnerFrame_addr = gDebugSpinnerFrame_addr + 1;
+    int sign = gDebugSpinnerFrame_addr >> 31;
+    int idx = (sign * 4 | (unsigned int)(((gDebugSpinnerFrame_addr >> 4) * 0x40000000) + sign) >> 30) - sign;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)gDebugSpinnerText_addr[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;
@@ -549,38 +551,38 @@ void CMaterialEditorPcs::drawViewer()
         GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(model + 0x14), 0xC);
         GXSetNumChans(1);
         GXClearVtxDesc();
-        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
         GXSetNumTevStages(1);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
         GXColor matColor;
-        matColor.r = static_cast<unsigned char>((kMaterialEditorDefaultColorRgba >> 24) & 0xFF);
-        matColor.g = static_cast<unsigned char>((kMaterialEditorDefaultColorRgba >> 16) & 0xFF);
-        matColor.b = static_cast<unsigned char>((kMaterialEditorDefaultColorRgba >> 8) & 0xFF);
-        matColor.a = static_cast<unsigned char>(kMaterialEditorDefaultColorRgba & 0xFF);
-        GXSetChanAmbColor(GX_COLOR0A0, matColor);
-        GXSetChanMatColor(GX_COLOR0A0, matColor);
+        *reinterpret_cast<u32*>(&matColor) = kMaterialEditorDefaultColorRgba;
+        GXSetChanAmbColor(GX_COLOR0, matColor);
+        GXSetChanMatColor(GX_COLOR0, matColor);
 
         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
         GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-        GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+        GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
+        GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
-        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXSetNumTexGens(1);
         GXSetNumTevStages(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
 
         for (int pass = 0; pass < 2; pass++) {
-            MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(reinterpret_cast<RSDITEM*>(model)->ptr18);
+            unsigned char* polygons = reinterpret_cast<unsigned char*>(reinterpret_cast<RSDITEM*>(model)->ptr18);
 
-            for (u32 polyIndex = 0; polyIndex < reinterpret_cast<RSDITEM*>(model)->countC; polyIndex++, polygon++) {
+            for (u32 polyIndex = 0, polygonOffset = 0; polyIndex < reinterpret_cast<RSDITEM*>(model)->countC;
+                 polyIndex++, polygonOffset += sizeof(MaterialEditorPolygon)) {
+                MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(polygons + polygonOffset);
+
                 if ((polygon->flags & 0x200) == 0) {
                     GXSetCullMode(GX_CULL_FRONT);
                 } else {
@@ -722,9 +724,9 @@ void CMaterialEditorPcs::drawViewer()
                 }
 
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                GXSetArray(GX_VA_TEX0, polygon->texCoord, 4);
-                GXSetArray(GX_VA_CLR0, polygon->texCoord, 8);
+                GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                GXSetArray(GX_VA_CLR0, polygon->_30, 4);
+                GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
 
                 u32 vertexIndex[8];
                 u8 vertexCount = 3;

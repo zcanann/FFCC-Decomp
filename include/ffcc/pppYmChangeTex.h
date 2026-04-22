@@ -8,8 +8,9 @@ struct pppYmChangeTex {
     union {
         void* ptr;
         struct {
-            u32 m_graphId;
-        };
+            u8 _pad0[0xC];
+            s32 m_graphId;
+        } data;
     } field0_0x0;
 };
 

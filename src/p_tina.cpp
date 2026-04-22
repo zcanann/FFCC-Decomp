@@ -1164,14 +1164,22 @@ void CPartPcs::GetParLocIdx(int index, Vec& location)
  */
 void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 {
-	_pppMngSt* pppMngSt = &PartMng.m_pppMng[index];
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
 	float* colorValues = reinterpret_cast<float*>(&color);
 	float one = kPartColorIdentityOne;
 
-	pppMngSt->m_userFloat0 = colorValues[0];
-	pppMngSt->m_userFloat1 = colorValues[1];
-	pppMngSt->m_scaleFactor = colorValues[2];
-	pppMngSt->m_ownerScale = colorValues[3];
+	pppMngSt->r = colorValues[0];
+	pppMngSt->g = colorValues[1];
+	pppMngSt->b = colorValues[2];
+	pppMngSt->a = colorValues[3];
 
 	if (one == colorValues[0] && one == colorValues[1] && one == colorValues[2] && one == colorValues[3]) {
 		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;

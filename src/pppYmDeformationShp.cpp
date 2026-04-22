@@ -175,9 +175,6 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].x = -quadSize;
 				vertices[3].y = kPppYmDeformationShpZero;
 				vertices[3].z = quadSize;
-			} else {
-				DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
-				return;
 			}
 
 			uvs[0].x = kPppYmDeformationShpZero;
@@ -221,9 +218,6 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].x = -size;
 				vertices[3].y = kPppYmDeformationShpZero;
 				vertices[3].z = split;
-			} else {
-				DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
-				return;
 			}
 
 			uvs[0].x = kPppYmDeformationShpZero;

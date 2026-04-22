@@ -76,8 +76,8 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 
     ptr = alloc = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(
         value, stage, const_cast<char*>(s_p_usb_cpp_801D6D08), 0x1ca);
-    alloc[1] = value;
     unsigned int type = 4;
+    alloc[1] = value;
     ptr[0] = type;
     ptr[9] = Swap32((unsigned int)code);
     ptr[10] = Swap32((unsigned int)elemCount);

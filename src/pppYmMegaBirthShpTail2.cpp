@@ -265,7 +265,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
  */
 extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
     _pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
-    PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA*, VColor* vColor, _PARTICLE_COLOR* particleColor)
+    PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     u8* color = (u8*)vColor;
     u32 alpha = ((u8*)particleColor)[0xb];
@@ -409,12 +409,8 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             }
         }
 
-        work->m_tailScaleDirection.x = param->m_directionTail.x;
-        work->m_tailScaleDirection.y = param->m_directionTail.y;
-        work->m_tailScaleDirection.z = param->m_directionTail.z;
-        tailScale.x = work->m_tailScaleDirection.x;
-        tailScale.y = work->m_tailScaleDirection.y;
-        tailScale.z = work->m_tailScaleDirection.z;
+        work->m_tailScaleDirection = param->m_directionTail;
+        tailScale = work->m_tailScaleDirection;
         pppNormalize(work->m_tailScaleDirection, tailScale);
     }
 
@@ -434,12 +430,8 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
 
     switch (paramPayload[0x18]) {
     default:
-    {
-        pppFMATRIX emitterMatrix = pppMngStPtr->m_matrix;
-
-        pppCopyMatrix(work->m_emitterMatrix, emitterMatrix);
+        pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
         break;
-    }
     case 1:
     case 3:
     case 5:
@@ -501,7 +493,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             }
         } else {
             calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                &object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData, (VColor*)particleData,
+                &object->field0_0x0, work, param, (VColor*)particleData,
                 (_PARTICLE_COLOR*)((u8*)object + 0x80 + colorOffset));
         }
 

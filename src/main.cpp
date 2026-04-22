@@ -89,15 +89,15 @@ void game(int argc, char** argv)
                         if (cmp == 0) {
                             Game.m_gameWork.m_languageId = 2;
                         } else {
-                            cmp = strcmp(*argument, kLanguageArgFr);
+                            cmp = strcmp(*argument, kLanguageArgIt);
                             if (cmp == 0) {
                                 Game.m_gameWork.m_languageId = 3;
                             } else {
-                                cmp = strcmp(*argument, kLanguageArgSp);
+                                cmp = strcmp(*argument, kLanguageArgFr);
                                 if (cmp == 0) {
                                     Game.m_gameWork.m_languageId = 4;
                                 } else {
-                                    cmp = strcmp(*argument, kLanguageArgIt);
+                                    cmp = strcmp(*argument, kLanguageArgSp);
                                     if (cmp == 0) {
                                         Game.m_gameWork.m_languageId = 5;
                                     } else {

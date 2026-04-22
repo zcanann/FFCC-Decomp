@@ -166,10 +166,11 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
             System.Printf(const_cast<char*>(s_drawErrorFmt), errorCode);
         }
 
-        bool usingFallbackFont = MenuPcs.m_fonts[0] == 0;
+        int usingFallbackFont = 0;
         CFont* font = MenuPcs.m_fonts[0];
-        if (usingFallbackFont)
+        if (font == 0)
         {
+            usingFallbackFont = 1;
             font = FontMan.m_font;
         }
 
@@ -181,10 +182,10 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x2CC);
 
-        bool compactLayout = false;
+        int compactLayout = 0;
         if (Graphic.m_scratchTextureBuffer != 0 && !usingFallbackFont)
         {
-            compactLayout = true;
+            compactLayout = 1;
         }
 
         if (compactLayout)

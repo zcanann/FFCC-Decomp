@@ -7,25 +7,25 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
-#include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
+extern int __float_nan[];
 extern const double DOUBLE_80331FC0 = 2.4;
-extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
-extern const float FLOAT_80331fd0 = -0.5f;
-extern const float FLOAT_80331fd4 = 25.0f;
-extern const float FLOAT_80331fd8 = 1.3333334f;
-extern const float FLOAT_80331fdc = 0.5f;
-extern const float FLOAT_80331FE0 = 2.0f;
-extern const float FLOAT_80331FE4 = -1.0f;
-extern const float FLOAT_80331FE8 = 0.0f;
-extern const double DOUBLE_80331FF0 = 0.5;
-extern const double DOUBLE_80331FF8 = 3.0;
-extern const double DOUBLE_80332000 = 0.0;
-extern const float FLOAT_80332008 = 1.0f;
-extern const float FLOAT_8033200C = 128.0f;
+static const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
+static const float FLOAT_80331fd0 = -0.5f;
+static const float FLOAT_80331fd4 = 25.0f;
+static const float FLOAT_80331fd8 = 1.3333334f;
+static const float FLOAT_80331fdc = 0.5f;
+static const float FLOAT_80331FE0 = 2.0f;
+static const float FLOAT_80331FE4 = -1.0f;
+static const float FLOAT_80331FE8 = 0.0f;
+static const double DOUBLE_80331FF0 = 0.5;
+static const double DOUBLE_80331FF8 = 3.0;
+static const double DOUBLE_80332000 = 0.0;
+static const float FLOAT_80332008 = 1.0f;
+static const float FLOAT_8033200C = 128.0f;
 extern const float FLOAT_80332010;
 extern const double DOUBLE_80332018;
 extern "C" unsigned int __cvt_fp2unsigned(double);
@@ -284,9 +284,9 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                 if (magnitude > FLOAT_80331FE8) {
                     magnitude = Crystal2SqrtPositive(magnitude);
                 } else if ((double)magnitude < DOUBLE_80332000) {
-                    magnitude = NAN;
+                    magnitude = *(float*)__float_nan;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
-                    magnitude = NAN;
+                    magnitude = *(float*)__float_nan;
                 }
 
                 if (magnitude > FLOAT_80332008) {

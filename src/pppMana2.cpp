@@ -94,6 +94,7 @@ void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short,
 void BeginQuadEnv__5CUtilFv(void*);
 void EndQuadEnv__5CUtilFv(void*);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
     CUtil* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
     _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
@@ -478,6 +479,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     CGObject* gObject;
     s32 i;
     s32 setupOffset;
+    s32 meshData;
+    s32 meshShape;
+    s32 dlOffset;
+    u32 meshIndex;
+    u32 vertexIndex;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -564,6 +570,133 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);
         genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
+    }
+
+    meshData = *(s32*)(model + 0xAC);
+    if (work[0xF] == 0 && work[0x10] == 0 && work[0x12] == 0) {
+        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
+            meshShape = *(s32*)(meshData + 8);
+            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+
+            if (((type == 1) && strcmp((char*)meshShape, DAT_803318d4) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, DAT_803318dc) == 0) ||
+                ((type == 3) && strcmp((char*)meshShape, DAT_803318e4) == 0)) {
+                if (work[0x19] == 0) {
+                    work[0x19] =
+                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppMana2_cpp), 0x232);
+                    Vec* reflectionVec = (Vec*)work[0x19];
+                    float zero = FLOAT_80331898;
+                    for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
+                        reflectionVec->z = zero;
+                        reflectionVec->y = zero;
+                        reflectionVec->x = zero;
+                        reflectionVec++;
+                    }
+                }
+
+                if (work[0x1A] == 0) {
+                    work[0x1A] =
+                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppMana2_cpp), 0x23B);
+                    u8* color = (u8*)work[0x1A];
+                    for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
+                        color[0] = 0xFF;
+                        color[1] = 0xFF;
+                        color[2] = 0xFF;
+                        color[3] = 0xFF;
+                        color += 4;
+                    }
+                }
+
+                if (work[0x1B] == 0) {
+                    work[0x1B] =
+                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 6, pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppMana2_cpp), 0x244);
+                    u16* texCoord = (u16*)work[0x1B];
+                    for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
+                        texCoord[1] = 0;
+                        texCoord[0] = 0;
+                        texCoord += 3;
+                    }
+                }
+
+                work[0x18] = (u32)pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
+                                              const_cast<char*>(s_pppMana2_cpp), 0x24B);
+                u32* dlInfo = *(u32**)(meshShape + 0x50);
+                dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
+                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+                    *(u32*)(work[0x18] + dlOffset) =
+                        (u32)pppMemAlloc(dlInfo[0], pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
+                    *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
+                    work[0x3A] = dlInfo[0];
+                    memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
+                    DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
+                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, (void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 1);
+                    dlOffset -= 4;
+                    dlInfo += 3;
+                }
+            }
+
+            if (((type == 1) && strcmp((char*)meshShape, DAT_803318ec) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, DAT_803318f4) == 0)) {
+                work[0xF] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A);
+                work[0x10] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B);
+                work[0x17] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C);
+                work[0x15] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26D);
+                work[0x16] = (u32)pppMemAlloc(0x908, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26E);
+                work[0x12] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26F);
+                work[0x13] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x270);
+                work[0x14] = (u32)pppMemAlloc(0xC00, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x271);
+                work[0x11] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x272);
+
+                float* waterHeightA = (float*)work[0x12];
+                float* waterHeightB = (float*)work[0x13];
+                float zero = FLOAT_80331898;
+                for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
+                    waterHeightA[vertexIndex] = zero;
+                    waterHeightB[vertexIndex] = zero;
+                }
+
+                CreateWaterMesh((Vec*)work[0xF], (Vec*)work[0x10], (Vec2d*)work[0x15], (unsigned short*)work[0x14],
+                                *(float*)((u8*)param_2 + 0x30));
+            }
+
+            meshData += 0x14;
+        }
+    }
+
+    if ((*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) && work[0x12] != 0) {
+        *(u32*)(work[0x12] + 0x240) = *(u32*)((u8*)param_2 + 0x38);
+    }
+
+    if (*(u8*)((u8*)param_2 + 0x1C) != 0) {
+        if (*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) {
+            UpdateWaterMesh((VMana2*)work);
+        }
+
+        meshData = *(s32*)(model + 0xAC);
+        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
+            meshShape = *(s32*)(meshData + 8);
+            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+
+            if (((type == 1) && strcmp((char*)meshShape, DAT_803318d4) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, DAT_803318dc) == 0) ||
+                ((type == 3) && strcmp((char*)meshShape, DAT_803318e4) == 0)) {
+                dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
+                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+                    CalcReflectionVector2(
+                        (Vec*)work[0x19], *(S16Vec**)(meshShape + 0x18), *(S16Vec**)(meshShape + 0x20),
+                        *(s32*)(meshShape + 0x14), *(u32*)(*(s32*)(model + 0xA4) + 0x34),
+                        *(u32*)(*(s32*)(model + 0xA4) + 0x38), (float(*)[4])(model + 8),
+                        *(void**)(work[0x18] + dlOffset), work[0x3A], (_GXColor*)work[0x1A], (S16Vec2d*)work[0x1B],
+                        (CChara::CNode*)(*(s32*)(model + 0xA8) + *(s32*)(meshShape + 0x5C) * 0xC0));
+                    dlOffset -= 4;
+                }
+            }
+
+            meshData += 0x14;
+        }
     }
 }
 

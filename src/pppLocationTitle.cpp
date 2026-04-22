@@ -220,14 +220,16 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
                 int inserted;
                 float stepScale;
                 Vec* startPos;
-                Vec* interpIt;
+                Vec* interpRead;
+                Vec* interpWrite;
 
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
                 stepScale = 1.0f / (float)(param_2->m_stepCount + 1);
-                interpIt = interp;
                 PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
+                interpRead = interp;
+                interpWrite = interpRead;
 
                 for (int i = 0; i < param_2->m_stepCount; i++) {
                     Vec scaled;
@@ -235,32 +237,39 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
-                    PSVECAdd(startPos, &scaled, interpIt);
+                    PSVECAdd(startPos, &scaled, interpWrite);
                     inserted++;
                     work->m_count++;
 
                     {
-                        u16 nextCount = work->m_count + 1;
+                        int nextCount = work->m_count + 1;
 
-                        if (param_2->m_maxCount <= nextCount) {
+                        if (nextCount >= param_2->m_maxCount) {
                             break;
                         }
                     }
 
-                    interpIt++;
+                    interpWrite++;
                 }
 
-                pppCopyVector(particles[startIndex + inserted + 1].m_pos,
-                              particles[startIndex + 1].m_pos);
+                {
+                    int dstIndex = startIndex + inserted;
 
-                interpIt = interp;
+                    pppCopyVector(particles[dstIndex + 1].m_pos,
+                                  particles[startIndex + 1].m_pos);
+                }
+
                 for (int i = 0; i < inserted; i++) {
-                    LocationTitleParticle* dst = &particles[startIndex + i + 1];
+                    int dstIndex;
+                    LocationTitleParticle* dst;
 
-                    pppCopyVector(dst->m_pos, *interpIt);
+                    dstIndex = startIndex + i;
+                    dst = &particles[dstIndex + 1];
+
+                    pppCopyVector(dst->m_pos, *interpRead);
                     memcpy(&dst->m_color, &colorData->m_color, 4);
                     dst->m_frame = work->m_cur;
-                    interpIt++;
+                    interpRead++;
                 }
             }
         }

@@ -195,11 +195,15 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     TracerMngRaw* mng;
     TracerWork* work;
     TRACE_POLYGON* entries;
+    TRACE_POLYGON* entry;
+    TRACE_POLYGON* source;
+    TRACE_POLYGON* dest;
+    TRACE_POLYGON* poly;
     float* valuePtr;
     f32 fVar3;
     u8 alpha;
     u8 decay;
-    u16 maxCount;
+    s32 i;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -208,28 +212,28 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     baseObj = (_pppPObject*)pppYmTracer;
     work = (TracerWork*)((u8*)pppYmTracer + 0x80 + *param_3->m_serializedDataOffsets);
     entries = work->entries;
-    maxCount = *(u16*)(param_2->m_payload + 4);
 
     if (entries == 0) {
         alpha = param_2->m_payload[8];
         decay = (u8)((u16)alpha / *(u16*)(param_2->m_payload + 6));
-        entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * sizeof(TRACE_POLYGON),
-                                                                         pppEnvStPtr->m_stagePtr,
-                                                                         const_cast<char*>(s_pppYmTracer_cpp_801d9ce0),
-                                                                         0xEB);
+        entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (u32)*(u16*)(param_2->m_payload + 4) * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
+            const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
         work->entries = entries;
         fVar3 = FLOAT_803306e8;
 
-        for (s32 i = 0; i < (s32)maxCount; i++) {
-            entries[i].life = -1;
-            entries[i].alpha = alpha;
-            entries[i].decay = decay;
-            entries[i].from.z = fVar3;
-            entries[i].from.y = fVar3;
-            entries[i].from.x = fVar3;
-            entries[i].to.z = fVar3;
-            entries[i].to.y = fVar3;
-            entries[i].to.x = fVar3;
+        entry = entries;
+        for (i = 0; i < (s32)(u32)*(u16*)(param_2->m_payload + 4); i++) {
+            entry->life = -1;
+            entry->alpha = alpha;
+            entry->decay = decay;
+            entry->from.z = fVar3;
+            entry->from.y = fVar3;
+            entry->from.x = fVar3;
+            entry->to.z = fVar3;
+            entry->to.y = fVar3;
+            entry->to.x = fVar3;
+            entry++;
         }
     }
 
@@ -253,19 +257,22 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         work->arg3Work = valuePtr;
     }
 
-    if (work->count + 1 < maxCount) {
-        for (s32 i = maxCount - 2; i >= 0; i--) {
-            TRACE_POLYGON* src = &entries[i];
-            TRACE_POLYGON* dst = &entries[i + 1];
+    if (work->count + 1 < *(u16*)(param_2->m_payload + 4)) {
+        source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
+        for (i = *(u16*)(param_2->m_payload + 4) - 2; i >= 0; i--) {
+            Vec from = source->from;
+            Vec to = source->to;
 
-            pppCopyVector(dst->from, src->from);
-            pppCopyVector(dst->to, src->to);
-            dst->life = src->life;
-            dst->decay = src->decay;
-            dst->colorR = src->colorR;
-            dst->colorG = src->colorG;
-            dst->colorB = src->colorB;
-            dst->alpha = src->alpha;
+            dest = source + 1;
+            pppCopyVector(dest->from, from);
+            pppCopyVector(dest->to, to);
+            dest->life = source->life;
+            dest->decay = source->decay;
+            dest->colorR = source->colorR;
+            dest->colorG = source->colorG;
+            dest->colorB = source->colorB;
+            dest->alpha = source->alpha;
+            source--;
         }
 
         entries[0].life = -1;
@@ -315,7 +322,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             s16 splineCount = 0;
             f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
 
-            for (s32 i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
+            for (i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
                 f32 t = (f32)(stepScale * (f64)(i + 1));
 
                 gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
@@ -325,28 +332,31 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
 
                 splineCount++;
                 work->count++;
-                if (maxCount <= work->count + 1) {
+                if (*(u16*)(param_2->m_payload + 4) <= work->count + 1) {
                     break;
                 }
             }
 
-            for (s32 i = 0; i < splineCount; i++) {
-                for (s32 j = maxCount - 2; j > 1; j--) {
-                    TRACE_POLYGON* src = &entries[j];
-                    TRACE_POLYGON* dst = &entries[j + 1];
+            for (i = 0; i < splineCount; i++) {
+                source = entries + (*(u16*)(param_2->m_payload + 4) - 2);
+                for (s32 j = *(u16*)(param_2->m_payload + 4) - 2; j > 1; j--) {
+                    Vec from = source->from;
+                    Vec to = source->to;
 
-                    pppCopyVector(dst->from, src->from);
-                    pppCopyVector(dst->to, src->to);
-                    dst->life = src->life;
-                    dst->decay = src->decay;
-                    dst->colorR = src->colorR;
-                    dst->colorG = src->colorG;
-                    dst->colorB = src->colorB;
-                    dst->alpha = src->alpha;
+                    dest = source + 1;
+                    pppCopyVector(dest->from, from);
+                    pppCopyVector(dest->to, to);
+                    dest->life = source->life;
+                    dest->decay = source->decay;
+                    dest->colorR = source->colorR;
+                    dest->colorG = source->colorG;
+                    dest->colorB = source->colorB;
+                    dest->alpha = source->alpha;
+                    source--;
                 }
             }
 
-            for (s32 i = 0; i < splineCount; i++) {
+            for (i = 0; i < splineCount; i++) {
                 s32 idx = i + 2;
                 entries[idx].alpha = (u8)(param_2->m_payload[8] - (u8)(idx * entries[0].decay));
                 pppCopyVector(entries[idx].from, splineFrom[i]);
@@ -355,21 +365,24 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
         }
     }
 
-    entries = work->entries;
-    for (s32 i = 0; i < (s32)(u32)work->count; i++) {
-        if (entries[i].life > 0) {
-            if ((s32)((u32)entries[i].alpha - (u32)entries[i].decay) < 1) {
-                entries[i].alpha = 0;
+    poly = work->entries;
+    for (i = 0; i < (s32)(u32)work->count; i++) {
+        if (poly->life > 0) {
+            alpha = poly->alpha;
+            decay = poly->decay;
+            if ((s32)((u32)alpha - (u32)decay) < 1) {
+                poly->alpha = 0;
             } else {
-                entries[i].alpha = entries[i].alpha - entries[i].decay;
+                poly->alpha = alpha - decay;
             }
 
-            entries[i].life--;
-            if (entries[i].life < 1) {
+            poly->life--;
+            if (poly->life < 1) {
                 work->count--;
-                entries[i].life = 0;
+                poly->life = 0;
             }
         }
+        poly++;
     }
 }
 

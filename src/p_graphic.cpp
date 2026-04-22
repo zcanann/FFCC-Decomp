@@ -4,6 +4,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/gobject.h"
 #include "ffcc/joybus.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
@@ -748,13 +749,6 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
  */
 void CGraphicPcs::drawScreenFade()
 {
-    struct ScreenFadeObjPos {
-        char _padding0[0x15C];
-        float x;
-        float y;
-        float z;
-    };
-
     Mtx44 orthoMtx;
     Mtx cameraMtx;
     Mtx screenMtx;
@@ -889,12 +883,10 @@ void CGraphicPcs::drawScreenFade()
         if (slot == 2) {
             const int mode = slotData->m_mode;
             if (mode == 1) {
-                ScreenFadeObjPos* obj = (ScreenFadeObjPos*)slotData->m_targetObj;
+                CGObject* obj = static_cast<CGObject*>(slotData->m_targetObj);
                 if (obj != NULL) {
-                    Vec pos;
-                    pos.x = obj->x;
-                    pos.y = obj->y + slotData->m_targetYOffs;
-                    pos.z = obj->z;
+                    Vec pos = obj->m_worldPosition;
+                    pos.y += slotData->m_targetYOffs;
                     PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
                     float sx = pos.x * 320.0f + 320.0f;
@@ -940,9 +932,9 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
-                const float phase = m_screenFade[0].m_phase;
-                const float stretch = m_screenFade[0].m_stretch;
-                const float amp = m_screenFade[0].m_amplitude * (1.0f - t);
+                const float phase = slotData->m_phase;
+                const float stretch = slotData->m_stretch;
+                const float amp = slotData->m_amplitude * (1.0f - t);
                 const float size = amp + 1.0f;
                 const float offX = stretch * (320.0f * amp) * (float)sin((double)phase);
                 const float offY = stretch * (240.0f * amp) * (float)cos((double)phase);

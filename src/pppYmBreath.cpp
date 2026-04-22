@@ -52,12 +52,18 @@ static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--
- * Address:	800bfe74
- * Size:	4
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void get_rand()
 {
 }
+#endif
 
 /*
  * --INFO--
@@ -489,13 +495,19 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void SetParticleMatrix(_pppPObject*, VYmBreath*, _PARTICLE_DATA*, Mtx*)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -949,9 +961,14 @@ extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* data
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short groupIndex)
 {
     int i;
@@ -981,12 +998,18 @@ void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short grou
         groupData[0] = 0;
     }
 }
+#endif
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, short& groupIndex, short particleIndex)
 {
     int groupTable = *(int*)((unsigned char*)vYmBreath + 0x3C);
@@ -1007,12 +1030,18 @@ void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, s
     slotIndex = -1;
     groupIndex = -1;
 }
+#endif
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short particleIndex)
 {
     short slotIndex;
@@ -1025,3 +1054,4 @@ void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short part
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
+#endif

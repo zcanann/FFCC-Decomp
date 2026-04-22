@@ -30,10 +30,9 @@ public:
     virtual void onMapChanged(int, int, int);
     virtual void onScriptChanging(char*);
 
-    static CGbaPcsTable m_table;
-
-private:
     CMemory::CStage* m_stage;
+
+    static CGbaPcsTable m_table;
 };
 
 extern CGbaPcs GbaPcs;

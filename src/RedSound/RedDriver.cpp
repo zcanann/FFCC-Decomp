@@ -93,7 +93,7 @@ int DAT_8032f42c;
 int* DAT_8032f3cc;
 void* DAT_8032f3d0;
 int* DAT_8032f41c;
-int* DAT_8032f420;
+int* volatile DAT_8032f420;
 void* DAT_8032f3d4;
 void* DAT_8032f3d8;
 void* DAT_8032f3dc;

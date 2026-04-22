@@ -1235,15 +1235,16 @@ void CPartPcs::drawAfterViewer()
 	static char init;
 	static int alive;
 	static char init_0;
+	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x3f1);
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x3fb);
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
@@ -1260,7 +1261,7 @@ void CPartPcs::drawAfterViewer()
 	alive++;
 	frameSign = alive >> 0x1f;
 	Graphic.Printf(
-		const_cast<char*>(s_tina_title_fmt_801d8014),
+		stringBase + 0x134,
 		(int)(char)pFan[(frameSign * 4 |
 								 (unsigned int)((alive >> 4) * 0x40000000 + frameSign) >> 0x1e) -
 								frameSign]);
@@ -1268,15 +1269,15 @@ void CPartPcs::drawAfterViewer()
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		const_cast<char*>(s_tina_calc_fmt_801d8020),
+		stringBase + 0x140,
 		(double)g_par_calc_prof.m_lastTime,
 		(double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		const_cast<char*>(s_tina_draw_fmt_801d8038),
+		stringBase + 0x158,
 		(double)g_par_draw_prof.m_lastTime,
 		(double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		const_cast<char*>(s_tina_heap_fmt_801d8050),
+		stringBase + 0x170,
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }

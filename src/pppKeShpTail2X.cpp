@@ -353,8 +353,10 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XStep* step;
     KeShpTail2XWork* work;
     KeShpTail2XObject* tailObj;
-    Vec pos;
+    pppFMATRIX outMatrix;
     Vec historyPos ATTRIBUTE_ALIGN(8);
+    Vec initPos ATTRIBUTE_ALIGN(8);
+    Vec pos ATTRIBUTE_ALIGN(8);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -366,19 +368,17 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
 
     if (tailObj->m_obj.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {
-            pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
-            pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
-            pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
+            initPos.x = tailObj->m_obj.m_localMatrix.value[0][3];
+            initPos.y = tailObj->m_obj.m_localMatrix.value[1][3];
+            initPos.z = tailObj->m_obj.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppFMATRIX outMatrix;
-
             pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
-            pos.x = outMatrix.value[0][3];
-            pos.y = outMatrix.value[1][3];
-            pos.z = outMatrix.value[2][3];
+            initPos.x = outMatrix.value[0][3];
+            initPos.y = outMatrix.value[1][3];
+            initPos.z = outMatrix.value[2][3];
         }
 
-        pppCopyVector(historyPos, pos);
+        pppCopyVector(historyPos, initPos);
 
         Vec* history = work->m_posHistory;
         s32 count = work->m_count;
@@ -398,8 +398,6 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
         pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppFMATRIX outMatrix;
-
         pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, tailObj->m_obj.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
@@ -411,8 +409,8 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     {
         long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* shape = (u8*)*shapeTable;
-        KeShpTail2XShapeFrame* frameEntry;
         u16 shapeFrame;
+        KeShpTail2XShapeFrame* frameEntry;
 
         shapeFrame = work->m_shapeFrame;
         work->m_shapePrevFrame = shapeFrame;

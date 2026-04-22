@@ -67,97 +67,66 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
 
 /*
  * --INFO--
- * PAL Address: 0x80050064
- * PAL Size: 700b
+ * PAL Address: 0x8004f910
+ * PAL Size: 276b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CTextureSet* textureSet)
+void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    CMapTexAnim* ref = 0;
-    CChunkFile::CChunk chunk;
-    m_materialSet = materialSet;
-    m_textureSet = textureSet;
+    int found = 0;
+    int setPtr = reinterpret_cast<int>(this);
+    short targetMaterialId = static_cast<short>(materialId);
 
-    chunkFile.PushChunk();
-    while (chunkFile.GetNextChunk(chunk) != 0) {
-        switch (chunk.m_id) {
-        case 0x54414E4D:
-            ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maptexanim_cpp_801d7ec4),
-                0x24));
-            if (ref != 0) {
-                __ct__4CRefFv(ref);
-                *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim;
-                float currentFrame;
-                float frameStep = FLOAT_8032fd48;
-                ref->m_keyFrame.m_junTable = 0;
-                currentFrame = FLOAT_8032fd4c;
-                ref->m_keyFrame.m_keyFrame = 0;
-                ref->m_keyFrame.m_keyValue = 0;
-                ref->m_keyFrame.m_splineTable = 0;
-                ref->m_keyFrame.m_loop = 1;
-                ref->m_keyFrame.m_isRun = 0;
-                ref->m_frameTable = 0;
-                ref->m_frameStep = frameStep;
-                ref->m_currentFrame = currentFrame;
-                ref->m_usesBlendTexture = 0;
-                ref->m_usesKeyFrame = 0;
-                ref->m_materialId = -1;
-                ref->m_wrapMode = 1;
-            }
-
-            ref->m_materialIndex = chunkFile.Get2();
-            ref->m_textureSlot = chunkFile.Get2();
-            ref->m_frameCount = chunkFile.Get2();
-            ref->m_endFrame = ref->m_frameCount;
-            ref->m_currentFrame = static_cast<float>(static_cast<short>(chunkFile.Get2()));
-            ref->m_startFrame = 0;
-            ref->m_frameStep = chunkFile.GetF4();
-            ref->m_usesBlendTexture = chunkFile.Get1();
-            chunkFile.Get1();
-            chunkFile.Get1();
-            chunkFile.Get1();
-
-            if (chunk.m_version == 0) {
-                chunkFile.Get4();
-                ref->m_materialId = -1;
+    for (int i = 0; i < m_count; i++) {
+        void* animPtr = reinterpret_cast<void*>(*reinterpret_cast<int*>(setPtr + 0xC));
+        if (S16At(animPtr, 0x12) == targetMaterialId) {
+            if (U8At(animPtr, 0x15) != 0) {
+                int end = frameEnd;
+                S32At(animPtr, 0x30) = frameStart;
+                S32At(animPtr, 0x2C) = frameStart;
+                if (frameEnd > S32At(animPtr, 0x38)) {
+                    end = S32At(animPtr, 0x38);
+                }
+                S32At(animPtr, 0x34) = end;
+                U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
+                U8At(animPtr, 0x28) = 1;
             } else {
-                ref->m_materialId = chunkFile.Get2();
-                chunkFile.Get2();
+                int end = frameEnd;
+                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
+                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
+                if (frameEnd > S16At(animPtr, 0xC)) {
+                    end = S16At(animPtr, 0xC);
+                }
+                S16At(animPtr, 0x10) = static_cast<short>(end);
+                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
             }
-
-            chunkFile.Get4();
-            chunkFile.Get4();
-            unsigned short* frameTable = reinterpret_cast<unsigned short*>(__nwa__FUlPQ27CMemory6CStagePci(
-                static_cast<unsigned long>(ref->m_frameCount << 1),
-                *reinterpret_cast<CMemory::CStage**>(&MapMng),
-                const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B));
-            ref->m_frameTable = frameTable;
-
-            for (int i = 0; i < ref->m_frameCount; i++) {
-                ref->m_frameTable[i] = chunkFile.Get2();
-            }
-
-            short count = m_count;
-            m_count = count + 1;
-            m_anims[count] = ref;
-            break;
-        case 0x4A554E20:
-            ref->m_keyFrame.ReadJun(chunkFile, chunk.m_arg0);
-            break;
-        case 0x4652414D:
-            ref->m_keyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-            break;
-        case 0x4B455920:
-            ref->m_keyFrame.ReadKey(chunkFile, chunk.m_arg0);
-            ref->m_usesKeyFrame = 1;
-            break;
+            found = 1;
         }
+        setPtr += 4;
     }
-    chunkFile.PopChunk();
+
+    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+        System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004fa24
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapTexAnimSet::Calc()
+{
+    for (int i = 0; i < m_count; i++) {
+        Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(m_anims[i], m_materialSet, m_textureSet);
+    }
 }
 
 /*
@@ -244,19 +213,19 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 
 /*
  * --INFO--
- * PAL Address: 0x8004fa24
- * PAL Size: 104b
+ * PAL Address: 0x80050064
+ * PAL Size: 700b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapTexAnimSet::Calc()
+void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CTextureSet* textureSet)
 {
-    for (int i = 0; i < m_count; i++) {
-        Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(m_anims[i], m_materialSet, m_textureSet);
-    }
-}
+    CMapTexAnim* ref = 0;
+    CChunkFile::CChunk chunk;
+    m_materialSet = materialSet;
+    m_textureSet = textureSet;
 
 /*
  * --INFO--
@@ -280,9 +249,35 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
         }
     }
 
-    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
+            chunkFile.Get4();
+            chunkFile.Get4();
+            unsigned short* frameTable = reinterpret_cast<unsigned short*>(__nwa__FUlPQ27CMemory6CStagePci(
+                static_cast<unsigned long>(ref->m_frameCount << 1),
+                *reinterpret_cast<CMemory::CStage**>(&MapMng),
+                const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B));
+            ref->m_frameTable = frameTable;
+
+            for (int i = 0; i < ref->m_frameCount; i++) {
+                ref->m_frameTable[i] = chunkFile.Get2();
+            }
+
+            short count = m_count;
+            m_count = count + 1;
+            m_anims[count] = ref;
+            break;
+        case 0x4A554E20:
+            ref->m_keyFrame.ReadJun(chunkFile, chunk.m_arg0);
+            break;
+        case 0x4652414D:
+            ref->m_keyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+            break;
+        case 0x4B455920:
+            ref->m_keyFrame.ReadKey(chunkFile, chunk.m_arg0);
+            ref->m_usesKeyFrame = 1;
+            break;
+        }
     }
+    chunkFile.PopChunk();
 }
 
 /*

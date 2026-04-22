@@ -24,8 +24,6 @@ struct FS_DISPLAY_STATUS
     u32 unk2C;        // 0x2C
     u32 unk30;        // 0x30
     u8 unk34[0xC];    // 0x34
-
-	FS_DISPLAY_STATUS& operator=(const FS_DISPLAY_STATUS&);
 };
 
 struct OSFS_SHAPE_ST
@@ -36,8 +34,6 @@ struct OSFS_SHAPE_ST
     u16 unk08;      // 0x08
     u8 unk0A[4];    // 0x0A
     u16 unk0E;      // 0x0E
-
-	OSFS_SHAPE_ST& operator=(const OSFS_SHAPE_ST&);
 };
 
 struct OSFS_ANM_ST

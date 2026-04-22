@@ -86,8 +86,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 {
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     u8* objBytes = (u8*)column;
-    u8* frameBase = objBytes + serializedDataOffsets[3] + 0x80;
-    u8* positionBase = objBytes + serializedDataOffsets[2] + 0x80;
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(objBytes + serializedDataOffsets[3] + 0x80);
+    pppColumPositionWork* positionWork =
+        (pppColumPositionWork*)(objBytes + serializedDataOffsets[2] + 0x80);
     int textureIndex = 0;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
@@ -97,11 +98,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         int texture;
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
-        if (positionBase[0x32] != 0) {
-            Vec shapePosA;
+        if (positionWork->m_alpha != 0) {
             Vec shapePosB;
-            Vec center;
+            Vec shapePosA;
             Vec offset;
+            Vec center;
             Vec cameraDelta;
             Mtx identityMtx;
             Vec2d uvA;
@@ -114,11 +115,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             pppColumValue* values;
 
             PSMTXIdentity(identityMtx);
-            baseX = *(float*)(positionBase + 0x10);
-            baseY = *(float*)(positionBase + 0x14);
+            baseX = positionWork->m_position.x;
+            baseY = positionWork->m_position.y;
             cameraDelta.x = FLOAT_80331078 - baseX;
             cameraDelta.y = FLOAT_8033107C - baseY;
-            cameraDelta.z = FLOAT_80331080 + *(float*)(positionBase + 0x18);
+            cameraDelta.z = FLOAT_80331080 + positionWork->m_position.z;
 
             lengthXY = cameraDelta.x * cameraDelta.x + cameraDelta.y * cameraDelta.y;
             if (lengthXY > 0.0f) {
@@ -161,20 +162,20 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             }
 
             pppInitBlendMode();
-            values = *(pppColumValue**)(frameBase + 8);
+            values = frameWork->m_values;
             segmentStep = (FLOAT_803310A8 * lengthXY) / ((float)param_2->m_count - 1.0f);
             drawScale = 0.0f;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
                 float index = (float)(i + 1);
-                u8 alpha = positionBase[0x32];
+                u8 alpha = positionWork->m_alpha;
 
                 center.z = 0.0f;
                 center.x = baseX + positionScale * (cameraDelta.x * index);
                 center.y = baseY + positionScale * (cameraDelta.y * index);
 
-                PSVECSubtract(&center, (Vec*)(positionBase + 0x10), &offset);
+                PSVECSubtract(&center, &positionWork->m_position, &offset);
                 {
                     float dist = PSVECMag(&offset);
                     float fadeAmount = dist / *(float*)(param_2->m_payload + 0x10);
@@ -202,12 +203,13 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
                 drawScale += values->m_scaleStep;
                 u8* frameData =
-                    (u8*)shapeSt->m_animData + *(short*)((u8*)shapeSt->m_animData + (*(s16*)(frameBase + 2) * 8) + 0x10);
+                    (u8*)shapeSt->m_animData +
+                    *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
                 for (int j = 0; j < *(short*)(frameData + 2); j++) {
                     pppGetShapePos__FPlsR3VecR3Veci(
-                        (long*)shapeSt->m_animData, *(s16*)(frameBase + 2), shapePosA, shapePosB, j);
+                        (long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);
                     pppGetShapeUV__FPlsR5Vec2dR5Vec2di(
-                        (long*)shapeSt->m_animData, *(s16*)(frameBase + 2), uvA, uvB, j);
+                        (long*)shapeSt->m_animData, frameWork->m_shapeB, uvA, uvB, j);
 
                     PSVECScale(&shapePosA, &shapePosA, drawScale);
                     PSVECScale(&shapePosB, &shapePosB, drawScale);
@@ -288,11 +290,11 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
 {
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    char* work = (char*)column + 0x80 + serializedDataOffsets[3];
+    pppColumFrameWork* work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
 
-    if (*(CMemory::CStage**)(work + 8) != 0) {
-        pppHeapUseRate(*(CMemory::CStage**)(work + 8));
-        *(void**)(work + 8) = 0;
+    if (work->m_values != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_values);
+        work->m_values = 0;
     }
 }
 
@@ -308,9 +310,9 @@ void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
 void pppConstructColum(pppColum *column, pppColumUnkC *param_2)
 {
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    unsigned short *puVar1 = (unsigned short *)((char*)column + 0x80 + serializedDataOffsets[3]);
-    puVar1[2] = 0;
-    puVar1[1] = 0;
-    *puVar1 = 0;
-    *(unsigned int *)(puVar1 + 4) = 0;
+    pppColumFrameWork* work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
+    work->m_shapeC = 0;
+    work->m_shapeB = 0;
+    work->m_shapeA = 0;
+    work->m_values = 0;
 }

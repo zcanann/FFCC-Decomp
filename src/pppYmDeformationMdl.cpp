@@ -333,3 +333,5 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
     *(float*)(puVar2 + 10) = fVar1;
     *(float*)(puVar2 + 8) = fVar1;
 }
+
+extern const double kPppYmSharedDoubleBias = 4503601774854144.0;

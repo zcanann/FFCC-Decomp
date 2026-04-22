@@ -69,33 +69,25 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
  * JP Size: TODO
  */
 #pragma optimization_level 0
-int RedNew(int param_1)
+int RedNew(int size)
 {
 	unsigned int interrupts;
-	int alignedSize;
 	int address;
 	int entryCount;
 	int moveCount;
-	int* blockList;
-	int* blockEnd;
 	int* slot;
-	int result;
 
-	result = 0;
-
-	if (param_1 >= 1) {
-		blockList = redMainMemoryBank;
-		if (blockList != 0) {
-			address = redMainDataBuffer;
-			if (address != 0) {
+	if (size >= 1) {
+		if (redMainMemoryBank != 0) {
+			if (redMainDataBuffer != 0) {
 				interrupts = OSDisableInterrupts();
-				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
-				blockEnd = blockList + 0x800;
-				slot = blockList;
+				size = (size + 0x1F) & 0xFFFFFFE0;
+				address = redMainDataBuffer;
+				slot = redMainMemoryBank;
 
 				do {
-					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
-						if (blockList[0x7FF] > 0) {
+					if ((slot[1] == 0) || ((address + size) <= *slot)) {
+						if (redMainMemoryBank[0x7FF] > 0) {
 							if (gRedMemoryDebugEnabled != 0) {
 								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 								fflush(__files + 1);
@@ -103,10 +95,9 @@ int RedNew(int param_1)
 							break;
 						}
 
-						if ((unsigned int)(address + alignedSize) <=
-						    (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
+						if ((unsigned int)(address + size) <= (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
 							if (slot[1] > 0) {
-								moveCount = (int)(blockList + 0x800) - (int)(slot + 2);
+								moveCount = (int)(redMainMemoryBank + 0x800) - (int)(slot + 2);
 								entryCount = moveCount / 8;
 								if (entryCount > 0) {
 									memmove(slot + 2, slot, entryCount * 8);
@@ -114,7 +105,7 @@ int RedNew(int param_1)
 							}
 
 							*slot = address;
-							slot[1] = alignedSize;
+							slot[1] = size;
 							OSRestoreInterrupts(interrupts);
 							return address;
 						}
@@ -124,13 +115,14 @@ int RedNew(int param_1)
 
 					address = *slot + slot[1];
 					slot += 2;
-				} while (slot < blockEnd);
+				} while (slot < redMainMemoryBank + 0x800);
 
 				OSRestoreInterrupts(interrupts);
+				return 0;
 			}
 		}
 	}
-	return result;
+	return 0;
 }
 #pragma optimization_level 4
 

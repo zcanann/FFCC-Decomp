@@ -87,7 +87,9 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
 }
+#endif

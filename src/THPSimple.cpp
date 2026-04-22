@@ -659,9 +659,9 @@ s32 THPSimpleDecode(s32 audioTrack)
     u32 interruptState;
 
     interruptState = OSDisableInterrupts();
-    if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0) &&
+    if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0U) &&
         (SimpleControl.readError == 0) && (SimpleControl.isPreLoaded == 1)) {
-        if ((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) {
+        if (static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) {
             if (SimpleControl.isLooping != 1) {
                 goto restore_interrupts_1;
             }
@@ -671,9 +671,9 @@ s32 THPSimpleDecode(s32 audioTrack)
         }
 
         SimpleControl.isReadFrameAsync = 1;
-        if (!DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
-                              SimpleControl.readSize, SimpleControl.readOffset,
-                              static_cast<DVDCallback>(__THPSimpleDVDCallback), 2)) {
+        if (DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
+                             SimpleControl.readSize, SimpleControl.readOffset,
+                             static_cast<DVDCallback>(__THPSimpleDVDCallback), 2) != 1) {
             SimpleControl.isReadFrameAsync = 0;
             SimpleControl.readError = 1;
         }
@@ -682,7 +682,7 @@ s32 THPSimpleDecode(s32 audioTrack)
 restore_interrupts_1:
     OSRestoreInterrupts(interruptState);
 
-    if ((SimpleControl.isReadFrameAsync != 0) &&
+    if ((SimpleControl.isReadFrameAsync != 0U) &&
         (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) <= 2)) ||
          (status == -1))) {
         File.DrawError(SimpleControl.fileInfo, status);
@@ -694,20 +694,9 @@ restore_interrupts_1:
 
     u32* compSizeTable = reinterpret_cast<u32*>(SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8);
     u8* compData = SimpleControl.readBuffer[SimpleControl.readFrame].mPtr + 8 + SimpleControl.compInfo.mNumComponents * 4;
+    u8* frameComp = SimpleControl.compInfo.mFrameComp;
 
-    if (SimpleControl.hasAudio == 0) {
-        for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-            if (SimpleControl.compInfo.mFrameComp[i] == 0) {
-                decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
-                                              reinterpret_cast<void*>(SimpleControl.unk_9C));
-                if (decodeResult != 0) {
-                    return 1;
-                }
-                SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
-            }
-            compData += compSizeTable[i];
-        }
-    } else {
+    if (SimpleControl.hasAudio != 0) {
         if ((audioTrack < 0) || (static_cast<u32>(audioTrack) >= SimpleControl.audioInfo.mSndNumTracks)) {
             return 4;
         }
@@ -716,37 +705,59 @@ restore_interrupts_1:
         }
 
         for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
-            if (SimpleControl.compInfo.mFrameComp[i] == 1) {
-                u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
-                                             compData + compSizeTable[i] * audioTrack, 0);
-                u32 lock = OSDisableInterrupts();
-                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
-                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
-                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
-                OSRestoreInterrupts(lock);
-                SimpleControl.audioDecodeIndex++;
-                if (SimpleControl.audioDecodeIndex > 2) {
-                    SimpleControl.audioDecodeIndex = 0;
-                }
-            } else if (SimpleControl.compInfo.mFrameComp[i] == 0) {
+            switch (*frameComp) {
+            case 0:
                 decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
                                               reinterpret_cast<void*>(SimpleControl.unk_9C));
                 if (decodeResult != 0) {
                     return 1;
                 }
                 SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                break;
+            case 1: {
+                u32 samples = THPAudioDecode(SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer,
+                                             compData + *compSizeTable * audioTrack, 0);
+                u32 lock = OSDisableInterrupts();
+                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mValidSample = samples;
+                SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mCurPtr =
+                    SimpleControl.audioBuffer[SimpleControl.audioDecodeIndex].mBuffer;
+                OSRestoreInterrupts(lock);
+                SimpleControl.audioDecodeIndex++;
+                if (SimpleControl.audioDecodeIndex >= 3) {
+                    SimpleControl.audioDecodeIndex = 0;
+                }
+                break;
             }
-            compData += compSizeTable[i];
+            }
+            compData += *compSizeTable;
+            compSizeTable++;
+            frameComp++;
+        }
+    } else {
+        for (u32 i = 0; i < SimpleControl.compInfo.mNumComponents; i++) {
+            switch (*frameComp) {
+            case 0:
+                decodeResult = THPVideoDecode(compData, SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage,
+                                              reinterpret_cast<void*>(SimpleControl.unk_9C));
+                if (decodeResult != 0) {
+                    return 1;
+                }
+                SimpleControl.curFrame = SimpleControl.readBuffer[SimpleControl.readFrame].mFrameNumber;
+                break;
+            }
+            compData += *compSizeTable;
+            compSizeTable++;
+            frameComp++;
         }
     }
 
     SimpleControl.readBuffer[SimpleControl.readFrame].mIsValid = 0;
-    SimpleControl.readFrame = (SimpleControl.readFrame + 1) & 7;
+    SimpleControl.readFrame = (SimpleControl.readFrame + 1) % 8;
 
     interruptState = OSDisableInterrupts();
-    if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0) &&
+    if ((SimpleControl.readBuffer[SimpleControl.readIndex].mIsValid == 0) && (SimpleControl.isReadFrameAsync == 0U) &&
         (SimpleControl.readError == 0) && (SimpleControl.isPreLoaded == 1)) {
-        if ((SimpleControl.header.mNumFrames - 1) < static_cast<u32>(SimpleControl.curAudioTrack)) {
+        if (static_cast<u32>(SimpleControl.curAudioTrack) > (SimpleControl.header.mNumFrames - 1)) {
             if (SimpleControl.isLooping != 1) {
                 goto restore_interrupts_2;
             }
@@ -756,9 +767,9 @@ restore_interrupts_1:
         }
 
         SimpleControl.isReadFrameAsync = 1;
-        if (!DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
-                              SimpleControl.readSize, SimpleControl.readOffset,
-                              static_cast<DVDCallback>(__THPSimpleDVDCallback), 2)) {
+        if (DVDReadAsyncPrio(&SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].mPtr,
+                             SimpleControl.readSize, SimpleControl.readOffset,
+                             static_cast<DVDCallback>(__THPSimpleDVDCallback), 2) != 1) {
             SimpleControl.isReadFrameAsync = 0;
             SimpleControl.readError = 1;
         }
@@ -767,7 +778,7 @@ restore_interrupts_1:
 restore_interrupts_2:
     OSRestoreInterrupts(interruptState);
 
-    if ((SimpleControl.isReadFrameAsync != 0) &&
+    if ((SimpleControl.isReadFrameAsync != 0U) &&
         (((status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb), status == 0xB) || ((status - 4U) <= 2)) ||
          (status == -1))) {
         File.DrawError(SimpleControl.fileInfo, status);

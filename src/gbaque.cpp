@@ -3250,8 +3250,14 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	unsigned char localPlayerData[0xDC];
 	unsigned char equipIndices[0x40];
 	unsigned int indexBytes;
-	unsigned char equipCount;
+	int equipCount;
 	unsigned char* writePtr;
+	unsigned short equipData[4];
+	int dataSize;
+	unsigned char* itemPtr;
+	unsigned char* indexPtr;
+	char itemIndex;
+	int remaining;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3261,13 +3267,21 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
 	equipCount = 0;
-	for (i = 0; i < 0x40; i++) {
-		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + i * 2);
+	itemPtr = localPlayerData;
+	indexPtr = equipIndices;
+	itemIndex = 0;
+	remaining = 0x40;
+	do {
+		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (itemId >= 0 && itemId < 0x9F) {
-			equipIndices[equipCount] = static_cast<unsigned char>(i);
+			*indexPtr = static_cast<unsigned char>(itemIndex);
 			equipCount++;
+			indexPtr++;
 		}
-	}
+		itemPtr += 2;
+		itemIndex++;
+		remaining--;
+	} while (remaining != 0);
 
 	indexBytes = static_cast<unsigned int>(equipCount) + 1;
 	if ((indexBytes & 3) != 0) {
@@ -3277,22 +3291,22 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	outData[4] = equipCount;
 	memcpy(outData + 5, equipIndices, indexBytes - 1);
 
+	dataSize = indexBytes + 4;
 	writePtr = outData + 4 + indexBytes;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
-		*reinterpret_cast<unsigned short*>(writePtr + 0) =
-			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
-		*reinterpret_cast<unsigned short*>(writePtr + 2) =
-			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
-		*reinterpret_cast<unsigned short*>(writePtr + 4) =
-			SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
-		*reinterpret_cast<unsigned short*>(writePtr + 6) = 0;
+		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
+		equipData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
+		equipData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+		equipData[3] = 0;
+		memcpy(writePtr, equipData, sizeof(equipData));
 		writePtr += 8;
+		dataSize += 8;
 	}
 
-	return static_cast<int>((writePtr - outData));
+	return dataSize;
 }
 
 /*

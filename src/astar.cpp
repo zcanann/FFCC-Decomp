@@ -497,22 +497,22 @@ void CAStar::calcAStar()
 
 				for (int i = 0; i < m_bestPath.m_pathLength; ++i)
 				{
-					unsigned char portalIndex = m_bestPath.m_path[i];
+					int portalIndex = m_bestPath.m_path[i];
 
 					m_routeTable[current][to][1] = portalIndex;
 
-					unsigned int next = m_portals[portalIndex].m_groupA;
+					int next = m_portals[portalIndex].m_groupA;
 
-					if (next == static_cast<unsigned int>(current))
+					if (next == current)
 					{
 						next = m_portals[portalIndex].m_groupB;
 					}
 
 					m_routeTable[current][to][0] = static_cast<unsigned char>(next);
 
-					System.Printf(const_cast<char*>(kAStarStepDebugFormat), static_cast<int>(next));
+					current = static_cast<unsigned char>(next);
 
-					current = static_cast<int>(next);
+					System.Printf(const_cast<char*>(kAStarStepDebugFormat), current);
 				}
 
 				System.Printf(const_cast<char*>(kAStarNewLine));
@@ -918,12 +918,12 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 	CMapCylinderRaw cyl;
 
-	cyl.m_top.x = kPolyGroupAabbMax;
-	cyl.m_top.y = kPolyGroupAabbMax;
 	cyl.m_top.z = kPolyGroupAabbMax;
-	cyl.m_direction2.x = kPolyGroupAabbMin;
-	cyl.m_direction2.y = kPolyGroupAabbMin;
+	cyl.m_top.y = kPolyGroupAabbMax;
+	cyl.m_top.x = kPolyGroupAabbMax;
 	cyl.m_direction2.z = kPolyGroupAabbMin;
+	cyl.m_direction2.y = kPolyGroupAabbMin;
+	cyl.m_direction2.x = kPolyGroupAabbMin;
 	cyl.m_bottom.x = top.x;
 	cyl.m_bottom.y = top.y;
 	cyl.m_bottom.z = top.z;
@@ -958,12 +958,12 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 		CMapCylinderRaw cyl;
 
-		cyl.m_top.x = kPolyGroupAabbMax;
-		cyl.m_top.y = kPolyGroupAabbMax;
 		cyl.m_top.z = kPolyGroupAabbMax;
-		cyl.m_direction2.x = kPolyGroupAabbMin;
-		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
 		cyl.m_bottom.x = top.x;
 		cyl.m_bottom.y = top.y;
 		cyl.m_bottom.z = top.z;
@@ -984,12 +984,12 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 		CMapCylinderRaw cyl;
 
-		cyl.m_top.x = kPolyGroupAabbMax;
-		cyl.m_top.y = kPolyGroupAabbMax;
 		cyl.m_top.z = kPolyGroupAabbMax;
-		cyl.m_direction2.x = kPolyGroupAabbMin;
-		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
 		cyl.m_bottom.x = top.x;
 		cyl.m_bottom.y = top.y;
 		cyl.m_bottom.z = top.z;

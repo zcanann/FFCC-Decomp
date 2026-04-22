@@ -10,7 +10,7 @@
 #include "ffcc/stopwatch.h"
 extern "C" {
 extern int gPppHeapUseRateWords[3];
-extern char sDebugSpinnerText[];
+extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
 extern const float kPartColorIdentityOne;
 }
@@ -1230,8 +1230,7 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::drawAfterViewer()
 {
-	int frameSign;
-	static char* pFan;
+	static const char* pFan;
 	static char init;
 	static int alive;
 	static char init_0;
@@ -1258,12 +1257,7 @@ void CPartPcs::drawAfterViewer()
 	}
 
 	alive++;
-	frameSign = alive >> 0x1f;
-	Graphic.Printf(
-		const_cast<char*>(s_tina_title_fmt_801d8014),
-		(int)(char)pFan[(frameSign * 4 |
-								 (unsigned int)((alive >> 4) * 0x40000000 + frameSign) >> 0x1e) -
-								frameSign]);
+	Graphic.Printf(const_cast<char*>(s_tina_title_fmt_801d8014), pFan[(alive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();

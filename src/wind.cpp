@@ -435,7 +435,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 
     i = 0;
     do {
-        if ((s8)obj->flags < 0) {
+        if (GetWindActiveFlag(obj) != 0) {
             if (obj->type == 0) {
                 if (randomize == 0) {
                     PSVECAdd(out, &obj->force, out);
@@ -511,7 +511,7 @@ void CWind::Draw()
         i = 0;
         obj = m_objects;
         do {
-            if ((int)((u32)obj->flags << 0x18) < 0) {
+            if (GetWindActiveFlag(obj) != 0) {
                 if (obj->type == 1) {
                     CColor color(0xff, 0xff, 0, 0xff);
                     CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
@@ -552,8 +552,8 @@ void CWind::Frame()
     obj = m_objects;
     i = 0;
 
-    while (true) {
-        if ((obj->flags & 0x80) != 0) {
+    do {
+        if (GetWindActiveFlag(obj) != 0) {
             rnd = Math.Rand(10);
             if (rnd == 0) {
                 rnd = Math.Rand(3);
@@ -565,8 +565,11 @@ void CWind::Frame()
 
                 obj->targetPower = obj->basePower * f0 + obj->targetPower;
                 f0 = obj->targetPower;
-                if ((f1 <= f0) && ((f1 = f0), (obj->basePower < f0))) {
-                    f1 = obj->basePower;
+                if (!(f0 < f1)) {
+                    f1 = f0;
+                    if (obj->basePower < f0) {
+                        f1 = obj->basePower;
+                    }
                 }
                 obj->targetPower = f1;
             }
@@ -582,21 +585,24 @@ void CWind::Frame()
                 obj->targetDir = obj->baseDir * f0 + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
-                if ((f1 <= f0) && ((f2 = FLOAT_80330f34 + f1), (f1 = f0), (f2 < f0))) {
-                    f1 = f2;
+                if (!(f0 < f1)) {
+                    f2 = FLOAT_80330f34 + f1;
+                    f1 = f0;
+                    if (f2 < f0) {
+                        f1 = f2;
+                    }
                 }
                 obj->targetDir = f1;
             }
 
             if (obj->type == 2) {
                 obj->lifeTimer = obj->lifeTimer + 1;
-                if ((u32)obj->life <= (u32)obj->lifeTimer) {
-                    obj->flags = obj->flags & 0x7F;
+                if (obj->life <= obj->lifeTimer) {
+                    obj->flags = static_cast<u8>(__rlwimi(obj->flags, 0, 7, 24, 24));
                     goto next;
                 }
 
-                obj->lifeRatio = (float)(((double)obj->lifeTimer - DOUBLE_80330f40) /
-                                         ((double)obj->life - DOUBLE_80330f40));
+                obj->lifeRatio = (float)obj->lifeTimer / (float)obj->life;
                 obj->radius = obj->baseRadius * obj->lifeRatio;
                 obj->radiusSq = obj->radius * obj->radius;
                 obj->minX = obj->centerX - obj->radius;
@@ -624,10 +630,7 @@ void CWind::Frame()
     next:
         i = i + 1;
         obj++;
-        if (0x1F < i) {
-            return;
-        }
-    }
+    } while (i < 32);
 }
 
 /*

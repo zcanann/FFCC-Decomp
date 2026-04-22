@@ -353,11 +353,10 @@ void CFunnyShape::Update()
                 work->frame = 0;
 
                 s32 r = rand();
-                const s16 range = ShapeRange(this);
-                work->x = static_cast<float>(r % range);
+                work->x = static_cast<float>(r % ShapeRange(this));
 
                 r = rand();
-                work->y = static_cast<float>(r % range);
+                work->y = static_cast<float>(r % ShapeRange(this));
                 work->z = zero;
                 work->delay = 0x200;
                 work->viewportY = zero;

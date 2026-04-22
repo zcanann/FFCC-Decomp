@@ -1,4 +1,4 @@
-# AGENTS_NEW.md - Agent Runbook (FFCC-Decomp)
+# AGENTS_NEW.md - Agent Runbook (FFCC-Decomp) 
 
 This is the concise runbook for automated contributions to **FFCC-Decomp**.
 

@@ -337,7 +337,7 @@ int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
 	waveBase = SearchWaveBase__9CRedEntryFi(&DAT_8032e154, deltaTime);
 	if (waveBase == 0) {
-		if (gRedMemoryDebugEnabled != 0) {
+		if (DAT_8032f408 != 0) {
 			OSReport(s__s_sWave_is_not_Entry___wave_4_4_801e7e18, &DAT_801e7e3e, &DAT_80333d68,
 			         deltaTime, &DAT_80333d70);
 			fflush(&DAT_8021d1a8);
@@ -646,7 +646,7 @@ void SePause(int seId, int pause)
 	unsigned int track;
 	unsigned int voice;
 
-	if (gRedMemoryDebugEnabled != 0) {
+	if (DAT_8032f408 != 0) {
 		if (pause == 1) {
 			OSReport(s__sPause___SE___ON__d_801e7e50, &DAT_801e7e3e, seId);
 		} else {
@@ -717,7 +717,7 @@ void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int music
 
 	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
 	if (trackBase == 0) {
-		if (gRedMemoryDebugEnabled != 0) {
+		if (DAT_8032f408 != 0) {
 			OSReport(s__s_sMusic_Start___Couldn_t_Creat_801e7e86, &DAT_801e7e3e, &DAT_80333d75,
 			         &DAT_80333d70);
 			fflush(&DAT_8021d1a8);

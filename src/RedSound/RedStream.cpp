@@ -304,7 +304,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 		streamData[3] = RedNew(0x4000);
 
 		int amemSize = *(short*)((int)streamData + 0x2a) << 0xd;
-        int arOffset = DAT_8032f468.GetABufferSize() < 0x800000 ? 0 : 0x300000;
+        int arOffset = c_RedMemory.GetABufferSize() < 0x800000 ? 0 : 0x300000;
 		streamData[0x4b] = RedNewA(amemSize, 0, arOffset);
 		if (streamData[0x4b] == 0) {
 			DAT_8032e154.WaveOldClear(0, arOffset);
@@ -318,7 +318,7 @@ int StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5
 			if (streamData[0x4b] != 0) {
 				RedDeleteA(streamData[0x4b]);
 			}
-			if (gRedMemoryDebugEnabled != 0) {
+			if (DAT_8032f408 != 0) {
 				fflush(&DAT_8021d1a8);
 			}
 			return param_1;
@@ -472,7 +472,7 @@ void StreamPause(int param_1, int param_2)
 	RedStreamDATA* streamEnd;
 
 	streamData = p_Stream;
-	if (gRedMemoryDebugEnabled != 0) {
+	if (DAT_8032f408 != 0) {
 		if (param_2 == 1) {
 			OSReport(s_redStreamPauseOnFmt, sRedStreamLogPrefix, param_1);
 		} else {

@@ -60,7 +60,7 @@ public:
 	int GetProgramTime();
 	void SetSoundMode(int);
 	int GetSoundMode();
-	void SetMusicData(void*);
+	int SetMusicData(void*);
 	int ReentryMusicData(int);
 	void MusicStop(int);
 	int MusicPlay(int, int, int);
@@ -72,7 +72,7 @@ public:
 	void SetMusicPhraseStop(int);
 
 	void SetSeBlockData(int, void*);
-	void SetSeSepData(void*);
+	int SetSeSepData(void*);
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);
 	int ReentrySeSepData(int);

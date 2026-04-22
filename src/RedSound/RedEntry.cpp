@@ -326,7 +326,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	unsigned int selected = 0;
 	int maxBankSize = 0;
 	int* entry = (int*)this;
-    int aBase = DAT_8032f468.GetABufferAddress();
+    int aBase = c_RedMemory.GetABufferAddress();
 	offset += aBase;
 	maxSize += aBase;
 	unsigned int history = (unsigned int)entry[0] + 0x100;
@@ -443,12 +443,12 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			}
 		} while (WaveOldClear(minOffset, maxOffset) != 0);
 
-		if (gRedMemoryDebugEnabled != 0) {
+		if (DAT_8032f408 != 0) {
 			OSReport(s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991, DAT_801e7905, DAT_80333d30, (int)*(short*)(head + 2),
 			         *(int*)(head + 4), DAT_80333d38);
 			fflush(&DAT_8021d1a8);
 		}
-	} else if (gRedMemoryDebugEnabled != 0) {
+	} else if (DAT_8032f408 != 0) {
 		OSReport(s__s_sWave_Header_was_broken__s_801e7972, DAT_801e7905, DAT_80333d3d, DAT_80333d38);
 		fflush(&DAT_8021d1a8);
 	}
@@ -535,7 +535,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		if (entry[4] < 1) {
-			if (gRedMemoryDebugEnabled != 0) {
+			if (DAT_8032f408 != 0) {
 				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, DAT_801e7905, DAT_80333d45, entry[3], DAT_80333d38);
 				fflush(&DAT_8021d1a8);
 			}
@@ -780,7 +780,7 @@ void CRedEntry::DisplayWaveInfo()
 {
 	int* entry = (int*)this;
 
-	if (gRedMemoryDebugEnabled != 0) {
+	if (DAT_8032f408 != 0) {
 		OSReport(DAT_80333d4d);
 		fflush(&DAT_8021d1a8);
 		OSReport(s__s_____AMemory_Information______801e79ed, DAT_801e7905);
@@ -791,9 +791,9 @@ void CRedEntry::DisplayWaveInfo()
 		int maxFreeSize = 0;
 		int totalSize = 0;
 		int entryWave = 0;
-        int aBufferAddress = DAT_8032f468.GetABufferAddress();
-        int* aBankAddress = (int*)DAT_8032f468.GetABankAddress();
-        int aBufferEnd = aBufferAddress + DAT_8032f468.GetABufferSize();
+        int aBufferAddress = c_RedMemory.GetABufferAddress();
+        int* aBankAddress = (int*)c_RedMemory.GetABankAddress();
+        int aBufferEnd = aBufferAddress + c_RedMemory.GetABufferSize();
 
 		int* bank = aBankAddress;
 		do {
@@ -843,10 +843,10 @@ void CRedEntry::DisplayWaveInfo()
 			bank += 2;
 		} while (bank < aBankAddress + 0x800);
 
-        int aBase = DAT_8032f468.GetABufferAddress();
-        int aSize = DAT_8032f468.GetABufferSize();
+        int aBase = c_RedMemory.GetABufferAddress();
+        int aSize = c_RedMemory.GetABufferSize();
 		if (maxFreeSize < (aBase + aSize) - aBufferAddress) {
-            maxFreeSize = (aBase + DAT_8032f468.GetABufferSize()) - aBufferAddress;
+            maxFreeSize = (aBase + c_RedMemory.GetABufferSize()) - aBufferAddress;
 		}
 
 		OSReport(DAT_80333d4f, DAT_801e7905);
@@ -1217,7 +1217,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
  */
 void CRedEntry::DisplaySePlayInfo()
 {
-	if (gRedMemoryDebugEnabled != 0) {
+	if (DAT_8032f408 != 0) {
 		OSReport(DAT_80333d4d);
 		fflush(&DAT_8021d1a8);
 		OSReport(s__s_____SE_Play_Information______801e7b71, DAT_801e7905);
@@ -1577,7 +1577,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	int* seBlockBase;
 	int* entry = (int*)this;
 
-	if (gRedMemoryDebugEnabled == 0) {
+	if (DAT_8032f408 == 0) {
 		return;
 	}
 
@@ -1591,9 +1591,9 @@ void CRedEntry::DisplayMMemoryInfo()
 	maxFreeSize = 0;
 	totalSize = 0;
 	entryCount = 0;
-    nextAddress = DAT_8032f468.GetMainBufferAddress();
-    memoryBank = DAT_8032f468.GetMainBankAddress();
-    bufferTop = nextAddress + DAT_8032f468.GetMainBufferSize();
+    nextAddress = c_RedMemory.GetMainBufferAddress();
+    memoryBank = c_RedMemory.GetMainBankAddress();
+    bufferTop = nextAddress + c_RedMemory.GetMainBufferSize();
 	bankEntry = memoryBank;
 	seBlockBase = (int*)DAT_8032e12c;
 
@@ -1679,7 +1679,7 @@ void CRedEntry::DisplayMMemoryInfo()
 		bankEntry += 2;
 	} while (bankEntry < memoryBank + 0x800);
 
-    freeSize = (DAT_8032f468.GetMainBufferAddress() + DAT_8032f468.GetMainBufferSize()) - nextAddress;
+    freeSize = (c_RedMemory.GetMainBufferAddress() + c_RedMemory.GetMainBufferSize()) - nextAddress;
 	if (maxFreeSize < freeSize) {
 		maxFreeSize = freeSize;
 	}

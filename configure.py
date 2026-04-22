@@ -356,6 +356,11 @@ def parse_unit_env_set(name: str) -> Set[str]:
     return {part.strip() for part in value.split(",") if part.strip()}
 
 
+def parse_flag_env_list(name: str) -> List[str]:
+    value = os.environ.get(name, "")
+    return [part.strip() for part in value.split(";") if part.strip()]
+
+
 # RedSound is built pragma-free; inline-deferred currently gives the best
 # aggregate objdiff score across the RedSound units.
 redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "inline_deferred")
@@ -368,16 +373,21 @@ redsound_inline_off_units = parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS")
 redsound_inline_deferred_units = parse_unit_env_set(
     "FFCC_REDSOUND_INLINE_DEFERRED_UNITS"
 )
+redsound_remove_flag_prefixes = parse_flag_env_list("FFCC_REDSOUND_REMOVE_PREFIXES")
+redsound_extra_flags = parse_flag_env_list("FFCC_REDSOUND_EXTRA_FLAGS")
 
 
 def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> List[str]:
     flags = redsound_cpp_exceptions_cflags if cpp_exceptions else redsound_cflags
+    for prefix in redsound_remove_flag_prefixes:
+        flags = [flag for flag in flags if not flag.startswith(prefix)]
     if unit_name in redsound_opt0_units:
         flags = replace_flag_prefix(flags, "-O", "-O0")
     if unit_name in redsound_inline_off_units:
         flags = replace_flag_prefix(flags, "-inline ", "-inline off")
     elif unit_name in redsound_inline_deferred_units:
         flags = replace_flag_prefix(flags, "-inline ", "-inline deferred")
+    flags = [*flags, *redsound_extra_flags]
     return flags
 
 config.linker_version = "GC/1.3.2"

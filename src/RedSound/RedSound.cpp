@@ -19,7 +19,7 @@ extern "C" {
 }
 
 // RedSound global linkage that is shared across Red* units.
-CRedDriver gRedDriver;
+CRedDriver c_Driver;
 int DAT_8032e17c[0x41];
 volatile unsigned int DAT_8032f4c4;
 volatile int DAT_8032f4c8;
@@ -72,14 +72,11 @@ extern "C" CRedSound* __dt__9CRedSoundFv(CRedSound* redSound, short shouldDelete
  */
 unsigned int CRedSound::GetAutoID()
 {
-#define redSoundAutoId (*(volatile int*)&p_ReverbData)
 	do {
-		redSoundAutoId = redSoundAutoId + 1;
-		redSoundAutoId = redSoundAutoId & 0x7FFFFFFF;
-	} while (redSoundAutoId == 0);
+		DAT_8032f4c4 = (DAT_8032f4c4 + 1) & 0x7FFFFFFF;
+	} while (DAT_8032f4c4 == 0);
 
-	return redSoundAutoId;
-#undef redSoundAutoId
+	return DAT_8032f4c4;
 }
 
 /*
@@ -120,7 +117,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 	if (param_3 > 0 && param_5 > 0) {
 		if ((((u32)param_2 & 0x1F) != 0) || (((u32)param_3 & 0x1F) != 0)) {
-			if (gRedMemoryDebugEnabled != 0) {
+			if (DAT_8032f408 != 0) {
 				OSReport("%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
 				         sRedSoundLogErrorColor, (u32)param_2,
 				         param_3, sRedSoundLogReset);
@@ -130,7 +127,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		}
 
 		if ((((u32)param_4 & 0x1F) != 0) || (((u32)param_5 & 0x1F) != 0)) {
-			if (gRedMemoryDebugEnabled != 0) {
+			if (DAT_8032f408 != 0) {
 				OSReport("%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n", "\x1B[7;34mSound\x1B[0m:",
 				         sRedSoundLogErrorColor, param_4, param_5,
 				         sRedSoundLogReset);
@@ -140,7 +137,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		}
 
 		if (ARCheckInit() == 0) {
-			if (gRedMemoryDebugEnabled != 0) {
+			if (DAT_8032f408 != 0) {
 				OSReport("%s\"AR\" was not initialized.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
 				         sRedSoundLogReset);
 				fflush(__files + 1);
@@ -152,12 +149,12 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 		AIInit(0);
 		AXInit();
 		AXARTInit();
-        DAT_8032f468.Init((int)param_2, param_3, param_4, param_5);
+        c_RedMemory.Init((int)param_2, param_3, param_4, param_5);
 		DAT_8032e154.Init();
 		Start();
-		gRedDriver.Init();
+		c_Driver.Init();
 
-		if (gRedMemoryDebugEnabled != 0) {
+		if (DAT_8032f408 != 0) {
 			OSReport("%s%sSound Driver Initialize OK.%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogInfoColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
@@ -165,7 +162,7 @@ int CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	} else {
 		param_3 = 0;
 
-		if (gRedMemoryDebugEnabled != 0) {
+		if (DAT_8032f408 != 0) {
 			OSReport("%s%sSound Driver Initialize ERROR !!%s\n", "\x1B[7;34mSound\x1B[0m:", sRedSoundLogErrorColor,
 			         sRedSoundLogReset);
 			fflush(__files + 1);
@@ -203,7 +200,7 @@ void CRedSound::Start()
  */
 void CRedSound::End()
 {
-	gRedDriver.End();
+	c_Driver.End();
 	AXARTQuit();
 	AXQuit();
 }
@@ -219,7 +216,7 @@ void CRedSound::End()
  */
 void CRedSound::GetProgramTime()
 {
-	gRedDriver.GetProgramTime();
+	c_Driver.GetProgramTime();
 }
 
 /*
@@ -233,7 +230,7 @@ void CRedSound::GetProgramTime()
  */
 void CRedSound::ReportPrint(int debugFlag)
 {
-	gRedMemoryDebugEnabled = debugFlag;
+	DAT_8032f408 = debugFlag;
 }
 
 /*
@@ -247,15 +244,13 @@ void CRedSound::ReportPrint(int debugFlag)
  */
 int CRedSound::ReportStandby(int id)
 {
-	int result = 0;
 	int i;
 
 	if (id == 0) {
 		i = 0;
 		do {
 			if (DAT_8032e17c[i] != 0) {
-				result++;
-				break;
+				return 1;
 			}
 			i++;
 		} while (i < 0x40);
@@ -263,14 +258,13 @@ int CRedSound::ReportStandby(int id)
 		i = 0;
 		do {
 			if (id == DAT_8032e17c[i]) {
-				result++;
-				break;
+				return 1;
 			}
 			i++;
 		} while (i < 0x40);
 	}
 
-	return result;
+	return 0;
 }
 
 /*
@@ -312,7 +306,7 @@ void CRedSound::DMACheck(int id)
  */
 void CRedSound::SetSoundMode(int mode)
 {
-	gRedDriver.SetSoundMode(mode);
+	c_Driver.SetSoundMode(mode);
 }
 
 /*
@@ -326,7 +320,7 @@ void CRedSound::SetSoundMode(int mode)
  */
 void CRedSound::GetSoundMode()
 {
-	gRedDriver.GetSoundMode();
+	c_Driver.GetSoundMode();
 }
 
 /*
@@ -340,7 +334,7 @@ void CRedSound::GetSoundMode()
  */
 void CRedSound::SetReverb(int bank, int kind)
 {
-	gRedDriver.SetReverb(bank, kind);
+	c_Driver.SetReverb(bank, kind);
 }
 
 /*
@@ -354,7 +348,7 @@ void CRedSound::SetReverb(int bank, int kind)
  */
 void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 {
-	gRedDriver.SetReverbDepth(bank, sep, depth);
+	c_Driver.SetReverbDepth(bank, sep, depth);
 }
 
 /*
@@ -368,7 +362,7 @@ void CRedSound::SetReverbDepth(int bank, int sep, int depth)
  */
 void CRedSound::SetMusicData(void* musicData)
 {
-	gRedDriver.SetMusicData(musicData);
+	c_Driver.SetMusicData(musicData);
 }
 
 /*
@@ -382,7 +376,7 @@ void CRedSound::SetMusicData(void* musicData)
  */
 void CRedSound::ReentryMusicData(int bank)
 {
-	gRedDriver.ReentryMusicData(bank);
+	c_Driver.ReentryMusicData(bank);
 }
 
 /*
@@ -392,7 +386,7 @@ void CRedSound::ReentryMusicData(int bank)
  */
 void CRedSound::MusicStop(int id)
 {
-	gRedDriver.MusicStop(id);
+	c_Driver.MusicStop(id);
 }
 
 /*
@@ -402,7 +396,7 @@ void CRedSound::MusicStop(int id)
  */
 void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 {
-	gRedDriver.MusicPlay(id, vol, fadeTime);
+	c_Driver.MusicPlay(id, vol, fadeTime);
 }
 
 /*
@@ -412,7 +406,7 @@ void CRedSound::MusicPlay(int id, int vol, int fadeTime)
  */
 void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 {
-	gRedDriver.MusicCrossPlay(id, vol, fadeTime);
+	c_Driver.MusicCrossPlay(id, vol, fadeTime);
 }
 
 /*
@@ -422,7 +416,7 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
  */
 void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
-	gRedDriver.MusicNextPlay(id, vol, fadeTime);
+	c_Driver.MusicNextPlay(id, vol, fadeTime);
 }
 
 /*
@@ -432,7 +426,7 @@ void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
  */
 void CRedSound::MusicMasterVolume(int volume)
 {
-	gRedDriver.MusicMasterVolume(volume);
+	c_Driver.MusicMasterVolume(volume);
 }
 
 /*
@@ -442,7 +436,7 @@ void CRedSound::MusicMasterVolume(int volume)
  */
 void CRedSound::MusicFadeOut(int id, int fadeTime)
 {
-	gRedDriver.MusicFadeOut(id, fadeTime);
+	c_Driver.MusicFadeOut(id, fadeTime);
 }
 
 /*
@@ -452,7 +446,7 @@ void CRedSound::MusicFadeOut(int id, int fadeTime)
  */
 void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 {
-	gRedDriver.MusicVolume(id, volume, fadeTime);
+	c_Driver.MusicVolume(id, volume, fadeTime);
 }
 
 /*
@@ -462,7 +456,7 @@ void CRedSound::MusicVolume(int id, int volume, int fadeTime)
  */
 void CRedSound::SetMusicPhraseStop(int id)
 {
-	gRedDriver.SetMusicPhraseStop(id);
+	c_Driver.SetMusicPhraseStop(id);
 }
 
 /*
@@ -476,7 +470,7 @@ void CRedSound::SetMusicPhraseStop(int id)
  */
 void CRedSound::SetSeBlockData(int bank, void* blockData)
 {
-	gRedDriver.SetSeBlockData(bank, blockData);
+	c_Driver.SetSeBlockData(bank, blockData);
 }
 
 /*
@@ -490,7 +484,7 @@ void CRedSound::SetSeBlockData(int bank, void* blockData)
  */
 void CRedSound::SetSeSepData(void* seSepData)
 {
-	gRedDriver.SetSeSepData(seSepData);
+	c_Driver.SetSeSepData(seSepData);
 }
 
 /*
@@ -500,7 +494,7 @@ void CRedSound::SetSeSepData(void* seSepData)
  */
 void CRedSound::ClearSeSepData(int id)
 {
-	gRedDriver.ClearSeSepData(id);
+	c_Driver.ClearSeSepData(id);
 }
 
 /*
@@ -514,7 +508,7 @@ void CRedSound::ClearSeSepData(int id)
  */
 void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
 {
-	gRedDriver.ClearSeSepDataMG(bank, sep, group, kind);
+	c_Driver.ClearSeSepDataMG(bank, sep, group, kind);
 }
 
 /*
@@ -524,7 +518,7 @@ void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
  */
 void CRedSound::ReentrySeSepData(int id)
 {
-	gRedDriver.ReentrySeSepData(id);
+	c_Driver.ReentrySeSepData(id);
 }
 
 /*
@@ -534,7 +528,7 @@ void CRedSound::ReentrySeSepData(int id)
  */
 void CRedSound::SePlayState(int id)
 {
-	gRedDriver.SePlayState(id);
+	c_Driver.SePlayState(id);
 }
 
 /*
@@ -544,7 +538,7 @@ void CRedSound::SePlayState(int id)
  */
 void CRedSound::SeStop(int id)
 {
-	gRedDriver.SeStop(id);
+	c_Driver.SeStop(id);
 }
 
 /*
@@ -558,7 +552,7 @@ void CRedSound::SeStop(int id)
  */
 void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
 {
-	gRedDriver.SeStopMG(bank, sep, group, kind);
+	c_Driver.SeStopMG(bank, sep, group, kind);
 }
 
 /*
@@ -573,7 +567,7 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
 int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
 	unsigned int autoID = GetAutoID();
-	gRedDriver.SePlay(seID, sepID, autoID, unk, volume, pitch);
+	c_Driver.SePlay(seID, sepID, autoID, unk, volume, pitch);
 	return autoID;
 }
 
@@ -588,7 +582,7 @@ int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
  */
 void CRedSound::SeMasterVolume(int volume)
 {
-	gRedDriver.SeMasterVolume(volume);
+	c_Driver.SeMasterVolume(volume);
 }
 
 /*
@@ -602,7 +596,7 @@ void CRedSound::SeMasterVolume(int volume)
  */
 void CRedSound::SeFadeOut(int seID, int frameCount)
 {
-	gRedDriver.SeFadeOut(seID, frameCount);
+	c_Driver.SeFadeOut(seID, frameCount);
 }
 
 /*
@@ -616,7 +610,7 @@ void CRedSound::SeFadeOut(int seID, int frameCount)
  */
 void CRedSound::SeVolume(int seID, int volume, int frameCount)
 {
-	gRedDriver.SeVolume(seID, volume, frameCount);
+	c_Driver.SeVolume(seID, volume, frameCount);
 }
 
 /*
@@ -630,7 +624,7 @@ void CRedSound::SeVolume(int seID, int volume, int frameCount)
  */
 void CRedSound::SePan(int seID, int pan, int frameCount)
 {
-	gRedDriver.SePan(seID, pan, frameCount);
+	c_Driver.SePan(seID, pan, frameCount);
 }
 
 /*
@@ -644,7 +638,7 @@ void CRedSound::SePan(int seID, int pan, int frameCount)
  */
 void CRedSound::SePitch(int seID, int pitch, int frameCount)
 {
-	gRedDriver.SePitch(seID, pitch, frameCount);
+	c_Driver.SePitch(seID, pitch, frameCount);
 }
 
 /*
@@ -658,7 +652,7 @@ void CRedSound::SePitch(int seID, int pitch, int frameCount)
  */
 void CRedSound::SePause(int seID, int pause)
 {
-	gRedDriver.SePause(seID, pause);
+	c_Driver.SePause(seID, pause);
 }
 
 /*
@@ -670,9 +664,9 @@ void CRedSound::SePause(int seID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedSound::GetSeVolume(int seID, int outVolume)
+void CRedSound::GetSeVolume(int seID, int outVolume)
 {
-	return gRedDriver.GetSeVolume(seID, outVolume);
+	c_Driver.GetSeVolume(seID, outVolume);
 }
 
 /*
@@ -686,7 +680,7 @@ int CRedSound::GetSeVolume(int seID, int outVolume)
  */
 void CRedSound::ReportSeLoop(int mode)
 {
-	gRedDriver.ReportSeLoop(mode);
+	c_Driver.ReportSeLoop(mode);
 }
 
 /*
@@ -700,7 +694,7 @@ void CRedSound::ReportSeLoop(int mode)
  */
 void CRedSound::DisplaySePlayInfo()
 {
-	gRedDriver.DisplaySePlayInfo();
+	c_Driver.DisplaySePlayInfo();
 }
 
 /*
@@ -714,7 +708,7 @@ void CRedSound::DisplaySePlayInfo()
  */
 void CRedSound::StreamPlayState(int streamID)
 {
-	gRedDriver.StreamPlayState(streamID);
+	c_Driver.StreamPlayState(streamID);
 }
 
 /*
@@ -728,7 +722,7 @@ void CRedSound::StreamPlayState(int streamID)
  */
 void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
 {
-	gRedDriver.GetStreamPlayPoint(streamID, point1, point2);
+	c_Driver.GetStreamPlayPoint(streamID, point1, point2);
 }
 
 /*
@@ -742,7 +736,7 @@ void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
  */
 void CRedSound::StreamStop(int streamID)
 {
-	gRedDriver.StreamStop(streamID);
+	c_Driver.StreamStop(streamID);
 }
 
 /*
@@ -761,8 +755,8 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 
 	if (streamData[0] == 'S' && streamData[1] == 'T' && streamData[2] == 'R') {
 		id = GetAutoID();
-		gRedDriver.StreamPlay(id, data, param_3, param_4, param_5);
-	} else if (gRedMemoryDebugEnabled != 0) {
+		c_Driver.StreamPlay(id, data, param_3, param_4, param_5);
+	} else if (DAT_8032f408 != 0) {
 		OSReport(s_redSoundInvalidStreamDataFmt, sRedSoundLogPrefix, sRedSoundLogErrorColor, sRedSoundLogReset);
 		fflush(__files + 1);
 	}
@@ -781,7 +775,7 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
  */
 void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
 {
-	gRedDriver.StreamVolume(streamID, volume, frameCount);
+	c_Driver.StreamVolume(streamID, volume, frameCount);
 }
 
 /*
@@ -795,7 +789,7 @@ void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
  */
 void CRedSound::StreamPause(int streamID, int pause)
 {
-	gRedDriver.StreamPause(streamID, pause);
+	c_Driver.StreamPause(streamID, pause);
 }
 
 /*
@@ -812,7 +806,7 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 	unsigned int id = GetAutoID();
 	int* slot = EntryStandbyID(id);
 	if (slot != 0) {
-		gRedDriver.SetWaveData((int)slot, waveID, waveData, waveSize);
+		c_Driver.SetWaveData((int)slot, waveID, waveData, waveSize);
 	}
 	return id;
 }
@@ -824,7 +818,7 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
  */
 void CRedSound::ClearWaveData(int id)
 {
-	gRedDriver.ClearWaveData(id);
+	c_Driver.ClearWaveData(id);
 }
 
 /*
@@ -838,7 +832,7 @@ void CRedSound::ClearWaveData(int id)
  */
 void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
 {
-	gRedDriver.ClearWaveDataM(bank, sep, group, kind);
+	c_Driver.ClearWaveDataM(bank, sep, group, kind);
 }
 
 /*
@@ -848,7 +842,7 @@ void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
  */
 void CRedSound::ClearWaveBank(int id)
 {
-	gRedDriver.ClearWaveBank(id);
+	c_Driver.ClearWaveBank(id);
 }
 
 /*
@@ -858,7 +852,7 @@ void CRedSound::ClearWaveBank(int id)
  */
 void CRedSound::ReentryWaveData(int id)
 {
-	gRedDriver.ReentryWaveData(id);
+	c_Driver.ReentryWaveData(id);
 }
 
 /*
@@ -868,7 +862,7 @@ void CRedSound::ReentryWaveData(int id)
  */
 void CRedSound::DisplayWaveInfo()
 {
-	gRedDriver.DisplayWaveInfo();
+	c_Driver.DisplayWaveInfo();
 }
 
 /*
@@ -878,5 +872,5 @@ void CRedSound::DisplayWaveInfo()
  */
 void CRedSound::TestProcess(int mode)
 {
-	gRedDriver.TestProcess(mode);
+	c_Driver.TestProcess(mode);
 }

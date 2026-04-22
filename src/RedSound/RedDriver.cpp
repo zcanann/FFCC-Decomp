@@ -69,55 +69,55 @@ struct RedDriverSyncState {
 };
 
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
-int DAT_8032f3c4;
+int DAT_8032f3b8;
+int DAT_8032f3bc;
 int DAT_8032f3c0;
+int DAT_8032f3c4;
 int DAT_8032f3c8;
-int gRedMemoryDebugEnabled;
-int DAT_8032f400;
-int DAT_8032f414;
-int DAT_8032f404;
-int DAT_8032f410;
-int DAT_8032f40c;
-int gRedDriverStatus;
-int DAT_8032f484;
-int DAT_8032f434;
-int DAT_8032f430;
-int DAT_8032f424;
-int DAT_8032f440;
-int DAT_8032f43c;
-int DAT_8032f470;
-int DAT_8032f458;
-void* DAT_8032f3f0;
-void* DAT_8032f418;
-int DAT_8032f42c;
 int* DAT_8032f3cc;
 void* DAT_8032f3d0;
-int* DAT_8032f41c;
-int* DAT_8032f420;
 void* DAT_8032f3d4;
 void* DAT_8032f3d8;
 void* DAT_8032f3dc;
+void* DAT_8032f3e0[2];
+void* DAT_8032f3e8[2];
+void* DAT_8032f3f0;
 void* DAT_8032f3f4;
 int DAT_8032f3f8;
 void* DAT_8032f3fc;
-unsigned int* DAT_8032f444;
-void* DAT_8032f450;
-void* DAT_8032f474;
+int DAT_8032f400;
+int DAT_8032f404;
+int DAT_8032f408;
+int DAT_8032f410;
+int DAT_8032f40c;
+int DAT_8032f414;
+void* DAT_8032f418;
+int* DAT_8032f41c;
+int* DAT_8032f420;
+int DAT_8032f424;
 int* DAT_8032f428;
+int DAT_8032f42c;
+int DAT_8032f430;
+int DAT_8032f434;
 RedStreamDATA* p_Stream;
-void* DAT_8032f464;
-void* DAT_8032f45c;
-void* DAT_8032f46c;
-void* DAT_8032f454;
-int DAT_8032f460;
-
-int DAT_8032f488[2];
+int DAT_8032f43c;
+int DAT_8032f440;
+unsigned int* DAT_8032f444;
 int DAT_8032f448[2];
+void* DAT_8032f450;
+void* DAT_8032f454;
+int DAT_8032f458;
+void* DAT_8032f45c;
+int DAT_8032f460;
+void* DAT_8032f464;
+int DAT_8032f468;
+void* DAT_8032f46c;
+int DAT_8032f470;
+void* DAT_8032f474;
 int DAT_8032f478[2];
-int DAT_8032f3bc;
-int DAT_8032f3b8;
-void* DAT_8032f3e0[2];
-void* DAT_8032f3e8[2];
+CRedMemory c_RedMemory;
+int DAT_8032f484;
+int DAT_8032f488;
 u8 gRedDriverSyncBuffer[0x1F18];
 OSSemaphore DAT_8032d778;
 OSThread DAT_8032d788;
@@ -129,7 +129,6 @@ ARQRequest DAT_8032dde4;
 OSThread DAT_8032de08;
 OSSemaphore DAT_8032e120;
 void* DAT_8032e12c[4];
-CRedMemory DAT_8032f468;
 CRedEntry DAT_8032e154;
 
 static inline RedDriverSyncState& RedDriverSync()
@@ -889,19 +888,19 @@ void _DMACheckProcess()
     int semCount;
     int* dmaInfo;
 
-    if (gRedMemoryDebugEnabled != 0) {
+    if (DAT_8032f408 != 0) {
         OSReport("[%s]------DMA_CHECK_PROCESS------\n", "RedDriver");
         fflush(&DAT_8021d1a8);
 
         semCount = OSGetSemaphoreCount(&DAT_8032ddd8);
-        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", gRedDriverStatus, semCount, DAT_8032f484,
-                 DAT_8032f488[0]);
+        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", DAT_8032f468, semCount, DAT_8032f484,
+                 DAT_8032f488);
         fflush(&DAT_8021d1a8);
     }
 
     dmaInfo = RedDriverMainDmaQueue();
     do {
-        if ((*dmaInfo != 0) && (gRedMemoryDebugEnabled != 0)) {
+        if ((*dmaInfo != 0) && (DAT_8032f408 != 0)) {
             OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
             fflush(&DAT_8021d1a8);
         }
@@ -922,7 +921,7 @@ void _DMACheckProcess()
  */
 void _DmaCallback(unsigned long)
 {
-    gRedDriverStatus = 0;
+    DAT_8032f468 = 0;
 }
 
 /*
@@ -1058,7 +1057,7 @@ void _DmaExecute()
     do {
         do {
             if ((DAT_8032f3e0[0] == DAT_8032f3e8[0]) && (DAT_8032f3e0[1] == DAT_8032f3e8[1])) {
-                DAT_8032f488[0] = 0;
+                DAT_8032f488 = 0;
                 return;
             }
             if (DAT_8032f3e0[0] == DAT_8032f3e8[0]) {
@@ -1069,10 +1068,10 @@ void _DmaExecute()
                 piVar4 = RedDriverMainDmaQueue();
             }
             piVar7 = *ppiVar5;
-            DAT_8032f488[0] = 2;
+            DAT_8032f488 = 2;
             piVar6 = 0;
             if (*piVar7 != 0) {
-                gRedDriverStatus = 1;
+                DAT_8032f468 = 1;
                 if (piVar7[1] == 0) {
                     DCFlushRange((void*)piVar7[2], (u32)piVar7[4]);
                     iVar3 = piVar7[2];
@@ -1082,7 +1081,7 @@ void _DmaExecute()
                     iVar3 = piVar7[3];
                     iVar2 = piVar7[2];
                 }
-                DAT_8032f488[0] = 3;
+                DAT_8032f488 = 3;
                 ARQSetChunkSize((u32)piVar7[4]);
                 ARQPostRequest(&DAT_8032dde4, 0x469, (u32)piVar7[1], 1, (u32)iVar3, (u32)iVar2,
                                (u32)piVar7[4], _DmaCallback);
@@ -1095,15 +1094,15 @@ void _DmaExecute()
             *ppiVar5 = piVar8;
         } while (piVar6 == 0);
         while (piVar6 != 0) {
-            DAT_8032f488[0] = 7;
-            if (gRedDriverStatus == 0) {
-                DAT_8032f488[0] = 8;
+            DAT_8032f488 = 7;
+            if (DAT_8032f468 == 0) {
+                DAT_8032f488 = 8;
                 if (piVar6[5] != 0) {
                     uVar1 = OSDisableInterrupts();
                     ((void (*)(void*))piVar6[5])((void*)piVar6[6]);
                     OSRestoreInterrupts(uVar1);
                 }
-                DAT_8032f488[0] = 9;
+                DAT_8032f488 = 9;
                 if (piVar6[1] == 1) {
                     DCFlushRange((void*)piVar6[2], (u32)piVar6[4]);
                 }
@@ -1128,7 +1127,7 @@ int _DmaExecuteThread(void*)
 {
     DAT_8032f3c4 |= 2;
     DAT_8032f484 = 0;
-    DAT_8032f488[0] = 0;
+    DAT_8032f488 = 0;
     while (DAT_8032f3c0 != 0) {
         OSWaitSemaphore(&DAT_8032ddd8);
         DAT_8032f484 = 1;
@@ -1225,7 +1224,7 @@ void CRedDriver::Init()
 
     DAT_8032f3c4 = 0;
     DAT_8032f3c0 = 1;
-    gRedMemoryDebugEnabled = 1;
+    DAT_8032f408 = 1;
     DAT_8032f3c8 = 0;
     GetSoundMode();
     if (DAT_8032f400 == 2) {
@@ -1240,7 +1239,7 @@ void CRedDriver::Init()
     DAT_8032f404 = 0;
     DAT_8032f410 = 0;
     DAT_8032f40c = 0;
-    gRedDriverStatus = 0;
+    DAT_8032f468 = 0;
     DAT_8032f42c = 0;
     DAT_8032f434 = 0x1ff;
     DAT_8032f430 = 0x1ff;
@@ -1383,15 +1382,13 @@ void CRedDriver::End()
  */
 int CRedDriver::GetProgramTime()
 {
-    int sum;
-    int* p;
+    int sum = 0;
+    int* p = DAT_8032f3cc;
 
-    sum = 0;
-    p = DAT_8032f3cc;
-    do {
-        sum = sum + *p;
-        p = p + 1;
-    } while (p < DAT_8032f3cc + 100);
+    while (p < DAT_8032f3cc + 100) {
+        sum += *p;
+        p++;
+    }
     return sum;
 }
 
@@ -1439,7 +1436,7 @@ int CRedDriver::GetSoundMode()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetMusicData(void* param_1)
+int CRedDriver::SetMusicData(void* param_1)
 {
     char localHeader[0x20];
     char* musicHeader = (char*)param_1;
@@ -1455,14 +1452,15 @@ void CRedDriver::SetMusicData(void* param_1)
             memcpy(copiedHeader, musicHeader, headerSize);
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
             musicID = *(short*)(localHeader + 4);
-            (void)musicID;
-            return;
+            return musicID;
         }
+        return -1;
     }
-    if (gRedMemoryDebugEnabled != 0) {
+    if (DAT_8032f408 != 0) {
         OSReport("Music Header was broken.\n");
         fflush(&DAT_8021d1a8);
     }
+    return -1;
 }
 
 /*
@@ -1632,7 +1630,7 @@ void CRedDriver::SetSeBlockData(int param_1, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetSeSepData(void* param_1)
+int CRedDriver::SetSeSepData(void* param_1)
 {
     int iVar1;
     int iVar2;
@@ -1648,13 +1646,15 @@ void CRedDriver::SetSeSepData(void* param_1)
             memcpy(pvVar3, param_1, iVar1);
             iVar2 = *(int*)((int)pvVar3 + 8);
             _EntryExecCommand(_SetSeSepData, (int)pvVar3, 0, 0, 0, 0, 0, 0);
-            (void)iVar2;
+            return iVar2;
         }
-        return;
+        return -1;
     }
-    if (gRedMemoryDebugEnabled != 0) {
+    if (DAT_8032f408 != 0) {
         OSReport("SE Sep Header was broken.\n");
+        fflush(&DAT_8021d1a8);
     }
+    return -1;
 }
 
 /*
@@ -1715,38 +1715,36 @@ int CRedDriver::SePlayState(int param_1)
     unsigned int uVar1;
     int* piVar2;
     int* piVar3;
-    int iVar4;
 
     uVar1 = OSDisableInterrupts();
-    iVar4 = 0;
     piVar3 = *(int**)((int)DAT_8032f3f0 + 0xdbc);
-    while (piVar3 < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80)) {
-        if ((*piVar3 != 0) && ((param_1 == -1 || (piVar3[0x3e] == param_1)))) {
-            iVar4 = 1;
+    do {
+        piVar2 = piVar3;
+        if ((*piVar2 != 0) && ((param_1 == -1 || (piVar2[0x3e] == param_1)))) {
             break;
         }
-        piVar3 = piVar3 + 0x55;
-    }
-    if (iVar4 == 0) {
-        piVar3 = (int*)DAT_8032f3dc;
-        while (piVar3 != (int*)DAT_8032f3d8) {
-            piVar2 = piVar3;
-            if (((*piVar2 != 0) &&
-                ((((void (*)(int*))*piVar2 == _SeBlockPlay) ||
-                  (((void (*)(int*))*piVar2 == _SeSepPlay))) ||
-                 ((void (*)(int*))*piVar2 == _SeSepPlaySequence))) &&
-                ((param_1 == -1 || (param_1 == piVar2[1])))) {
-                iVar4 = 1;
+        piVar3 = piVar2 + 0x55;
+        piVar2 = 0;
+    } while (piVar3 < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+    piVar3 = (int*)DAT_8032f3dc;
+    if (piVar2 == 0) {
+        while ((int*)DAT_8032f3d8 != piVar3) {
+            if (((*piVar3 != 0) &&
+                ((((void (*)(int*))*piVar3 == _SeBlockPlay) ||
+                  (((void (*)(int*))*piVar3 == _SeSepPlay))) ||
+                 ((void (*)(int*))*piVar3 == _SeSepPlaySequence))) &&
+                ((param_1 == -1 || (param_1 == piVar3[1])))) {
+                piVar2 = (int*)1;
                 break;
             }
-            piVar3 = piVar2 + 8;
+            piVar3 = piVar3 + 8;
             if (piVar3 == (int*)DAT_8032f3d4 + 0x800) {
                 piVar3 = (int*)DAT_8032f3d4;
             }
         }
     }
     OSRestoreInterrupts(uVar1);
-    return iVar4;
+    return (int)piVar2;
 }
 
 /*

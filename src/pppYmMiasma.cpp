@@ -162,7 +162,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
             YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            long* shape = (*(long***)pppEnvStPtr->m_particleColors)[step->m_dataValIndex];
+            long** shape = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
             pppFMATRIX model;
             pppFMATRIX rotMatrix;
             Vec worldPos;
@@ -181,7 +181,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             pppMulMatrix(model, rotMatrix, model);
 
             pppCopyVector(worldPos, state->m_position);
-            if (Game.m_currentSceneId == 7) {
+            if ((s32)Game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
             } else {
                 PSMTXMultVec(ppvCameraMatrix02, &worldPos, &worldPos);
@@ -201,7 +201,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppY
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
             pppDrawShp__FPlsP12CMaterialSetUc(
-                shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+                *shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);
@@ -458,8 +458,6 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         basePos.y = pppMngStPtr->m_matrix.value[1][3];
         basePos.z = pppMngStPtr->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
-    } else {
-        basePos = worldPos;
     }
 
     pppSubVector(basePos, worldPos, basePos);
@@ -482,7 +480,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
             Vec impulse;
 
             impulse = vData->m_impulse;
-            PSVECScale(&impulse, &impulse, state->m_speedDecay);
+            PSVECScale(&impulse, &impulse, vData->m_speedDecay);
             pppAddVector(*(Vec*)particleData, *(Vec*)particleData, impulse);
         }
     }

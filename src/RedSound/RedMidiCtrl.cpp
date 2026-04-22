@@ -102,16 +102,18 @@ int DataAddCompute(int* current, int target, int* delta)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* slot = (int*)keyOnData;
+    register u32* slot = (u32*)keyOnData;
     do {
-        if (*slot == (int)track) {
+        if (*slot == (u32)track) {
             *slot = 0;
         }
         slot += 2;
-    } while (slot < (int*)((int)keyOnData + 0x600));
+    } while (slot < (u32*)((int)keyOnData + 0x600));
 }
+#pragma optimization_level reset
 
 /*
  * --INFO--

@@ -38,13 +38,11 @@ void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 
 struct CMapCylinderRaw {
     Vec m_bottom;
+    u8 m_pad0C[0x0C];
     Vec m_direction;
     f32 m_radius;
-    f32 m_height;
     Vec m_top;
     Vec m_direction2;
-    f32 m_radius2;
-    f32 m_height2;
 };
 
 /*
@@ -63,19 +61,28 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 matrixY;
     f32 matrixZ;
     f32 ownerY;
+    f32 ownerX;
+    f32 ownerZ;
+    f32 cylinderY;
     _pppMngSt* pppMngSt;
     s32 hitFound;
     CGObject* owner;
     f64 trigValue;
-    Quaternion local_1ac;
-    Quaternion local_19c;
-    Quaternion local_18c;
+    Mtx basisMtx;
+    Mtx scaleMtx;
+    CMapCylinderRaw firstCylinder;
+    CMapCylinderRaw secondCylinder;
+    Vec local_140;
+    Vec local_14c;
+    Vec local_158;
+    Vec local_164;
     Vec* stateNormal;
     Vec local_170;
-    Vec local_164;
-    Vec local_158;
-    Vec local_14c;
-    Vec local_140;
+    Vec firstRayDirection;
+    Quaternion local_18c;
+    Quaternion local_19c;
+    Quaternion local_1ac;
+    Vec secondRayDirection;
     s32 dataOffset;
     u8* stateInitialized;
 
@@ -110,36 +117,31 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 hitFound = 1;
                 Game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
             } else if (mode == 2) {
-                CMapCylinderRaw cylinder;
-                Vec rayDirection;
+                firstRayDirection.x = kPppConformBgNormalZero;
+                firstRayDirection.y = kPppConformBgNormalDownRayY;
+                firstRayDirection.z = kPppConformBgNormalZero;
 
-                rayDirection.x = kPppConformBgNormalZero;
-                rayDirection.y = kPppConformBgNormalDownRayY;
-                rayDirection.z = kPppConformBgNormalZero;
-
-                cylinder.m_bottom.x = matrixX;
-                cylinder.m_bottom.y = matrixY + param2->m_arg3;
-                cylinder.m_bottom.z = matrixZ;
-                cylinder.m_direction.x = kPppConformBgNormalCylinderRadius;
-                cylinder.m_direction.y = kPppConformBgNormalCylinderRadius;
-                cylinder.m_direction.z = kPppConformBgNormalCylinderRadius;
-                cylinder.m_radius = kPppConformBgNormalCylinderHeight;
-                cylinder.m_height = kPppConformBgNormalCylinderHeight;
-                cylinder.m_top.x = kPppConformBgNormalCylinderHeight;
-                cylinder.m_top.y = kPppConformBgNormalZero;
-                cylinder.m_top.z = kPppConformBgNormalDownRayY;
-                cylinder.m_direction2.x = kPppConformBgNormalZero;
-                cylinder.m_direction2.y = kPppConformBgNormalZero;
-                cylinder.m_direction2.z = kPppConformBgNormalZero;
-                cylinder.m_radius2 = kPppConformBgNormalZero;
-                cylinder.m_height2 = kPppConformBgNormalZero;
+                cylinderY = matrixY + param2->m_arg3;
+                firstCylinder.m_top.z = kPppConformBgNormalCylinderRadius;
+                firstCylinder.m_top.y = kPppConformBgNormalCylinderRadius;
+                firstCylinder.m_top.x = kPppConformBgNormalCylinderRadius;
+                firstCylinder.m_direction2.z = kPppConformBgNormalCylinderHeight;
+                firstCylinder.m_direction2.y = kPppConformBgNormalCylinderHeight;
+                firstCylinder.m_direction2.x = kPppConformBgNormalCylinderHeight;
+                firstCylinder.m_bottom.x = matrixX;
+                firstCylinder.m_bottom.y = cylinderY;
+                firstCylinder.m_bottom.z = matrixZ;
+                firstCylinder.m_direction.x = kPppConformBgNormalZero;
+                firstCylinder.m_direction.y = kPppConformBgNormalDownRayY;
+                firstCylinder.m_direction.z = kPppConformBgNormalZero;
+                firstCylinder.m_radius = kPppConformBgNormalZero;
 
                 hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
+                    &MapMng, (CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
                 if (hitFound != 0) {
                     CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
                     GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_164);
-                    if (local_170.y < matrixY - kPppConformBgNormalGroundSnapLimit) {
+                    if ((matrixY - kPppConformBgNormalGroundSnapLimit) > local_170.y) {
                         local_170.y = matrixY;
                     }
                 } else {
@@ -185,8 +187,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
             } else {
-                local_140.x = kPppConformBgNormalOne;
                 local_140.y = kPppConformBgNormalZero;
+                local_140.x = kPppConformBgNormalOne;
                 local_140.z = kPppConformBgNormalZero;
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
@@ -194,25 +196,20 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 PSVECNormalize(&local_140, &local_140);
             }
 
-            {
-                Mtx basisMtx;
-                Mtx scaleMtx;
+            PSMTXIdentity(basisMtx);
+            basisMtx[0][0] = local_140.x;
+            basisMtx[0][1] = local_14c.x;
+            basisMtx[0][2] = local_158.x;
+            basisMtx[1][0] = local_140.y;
+            basisMtx[1][1] = local_14c.y;
+            basisMtx[1][2] = local_158.y;
+            basisMtx[2][0] = local_140.z;
+            basisMtx[2][1] = local_14c.z;
+            basisMtx[2][2] = local_158.z;
 
-                PSMTXIdentity(basisMtx);
-                basisMtx[0][0] = local_140.x;
-                basisMtx[0][1] = local_14c.x;
-                basisMtx[0][2] = local_158.x;
-                basisMtx[1][0] = local_140.y;
-                basisMtx[1][1] = local_14c.y;
-                basisMtx[1][2] = local_158.y;
-                basisMtx[2][0] = local_140.z;
-                basisMtx[2][1] = local_14c.z;
-                basisMtx[2][2] = local_158.z;
-
-                PSMTXCopy(basisMtx, pppMngStPtr->m_matrix.value);
-                PSMTXScale(scaleMtx, pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z);
-                PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-            }
+            PSMTXCopy(basisMtx, pppMngStPtr->m_matrix.value);
+            PSMTXScale(scaleMtx, pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z);
+            PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 
             mode = param2->m_stepValue;
             if (mode == 0) {
@@ -223,34 +220,35 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 } else if (((s8)((s32)((u32)*(u8*)&owner->m_weaponNodeFlags << 31) >> 31) != 0) &&
                     (owner->m_attachOwner != NULL)) {
                     ownerY = owner->m_attachOwner->m_worldPosition.y;
-                    pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                    ownerZ = owner->m_worldPosition.z;
+                    ownerX = owner->m_worldPosition.x;
+                    pppMngStPtr->m_matrix.value[0][3] = ownerX;
                     pppMngStPtr->m_matrix.value[1][3] = ownerY;
-                    pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
+                    pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                 } else {
-                    CMapCylinderRaw cylinder;
-                    Vec rayDirection;
+                    ownerX = owner->m_worldPosition.x;
+                    ownerY = owner->m_worldPosition.y;
+                    ownerZ = owner->m_worldPosition.z;
+                    secondRayDirection.x = kPppConformBgNormalZero;
+                    secondRayDirection.y = kPppConformBgNormalDownRayY;
+                    secondRayDirection.z = kPppConformBgNormalZero;
 
-                    rayDirection.x = kPppConformBgNormalZero;
-                    rayDirection.y = kPppConformBgNormalDownRayY;
-                    rayDirection.z = kPppConformBgNormalZero;
-
-                    cylinder.m_bottom = owner->m_worldPosition;
-                    cylinder.m_direction.x = kPppConformBgNormalCylinderRadius;
-                    cylinder.m_direction.y = kPppConformBgNormalCylinderRadius;
-                    cylinder.m_direction.z = kPppConformBgNormalCylinderRadius;
-                    cylinder.m_radius = kPppConformBgNormalCylinderHeight;
-                    cylinder.m_height = kPppConformBgNormalCylinderHeight;
-                    cylinder.m_top.x = kPppConformBgNormalCylinderHeight;
-                    cylinder.m_top.y = kPppConformBgNormalZero;
-                    cylinder.m_top.z = kPppConformBgNormalDownRayY;
-                    cylinder.m_direction2.x = kPppConformBgNormalZero;
-                    cylinder.m_direction2.y = kPppConformBgNormalZero;
-                    cylinder.m_direction2.z = kPppConformBgNormalZero;
-                    cylinder.m_radius2 = kPppConformBgNormalZero;
-                    cylinder.m_height2 = kPppConformBgNormalZero;
+                    secondCylinder.m_top.z = kPppConformBgNormalCylinderRadius;
+                    secondCylinder.m_top.y = kPppConformBgNormalCylinderRadius;
+                    secondCylinder.m_top.x = kPppConformBgNormalCylinderRadius;
+                    secondCylinder.m_direction2.z = kPppConformBgNormalCylinderHeight;
+                    secondCylinder.m_direction2.y = kPppConformBgNormalCylinderHeight;
+                    secondCylinder.m_direction2.x = kPppConformBgNormalCylinderHeight;
+                    secondCylinder.m_bottom.x = ownerX;
+                    secondCylinder.m_bottom.y = ownerY;
+                    secondCylinder.m_bottom.z = ownerZ;
+                    secondCylinder.m_direction.x = kPppConformBgNormalZero;
+                    secondCylinder.m_direction.y = kPppConformBgNormalDownRayY;
+                    secondCylinder.m_direction.z = kPppConformBgNormalZero;
+                    secondCylinder.m_radius = kPppConformBgNormalZero;
 
                     hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                        &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xffffffff);
+                        &MapMng, (CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
                         CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
                         pppMngStPtr->m_matrix.value[0][3] = local_170.x;
@@ -263,14 +261,14 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     }
                 }
             } else if (mode == 1) {
-                if (hitFound == 0) {
-                    pppMngStPtr->m_matrix.value[0][3] = matrixX;
-                    pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                    pppMngStPtr->m_matrix.value[2][3] = matrixZ;
-                } else {
+                if (hitFound != 0) {
                     pppMngStPtr->m_matrix.value[0][3] = local_170.x;
                     pppMngStPtr->m_matrix.value[1][3] = local_170.y;
                     pppMngStPtr->m_matrix.value[2][3] = local_170.z;
+                } else {
+                    pppMngStPtr->m_matrix.value[0][3] = matrixX;
+                    pppMngStPtr->m_matrix.value[1][3] = matrixY;
+                    pppMngStPtr->m_matrix.value[2][3] = matrixZ;
                 }
             } else if (mode == 2) {
                 pppMngStPtr->m_matrix.value[0][3] = local_170.x;

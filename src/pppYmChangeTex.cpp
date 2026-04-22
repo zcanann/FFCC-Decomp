@@ -213,7 +213,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	frameScale.u[1] = ((1 << *(int*)(*(int*)((char*)model0 + 0xA4) + 0x34)) ^ 0x80000000);
 
 	int curMesh = *(int*)((char*)model0 + 0xAC);
-	int frame = (int)(state->m_value0 * (float)(frameScale.d - DOUBLE_80330e08));
+	int frame = (int)(state->m_value0 * (frameScale.d - DOUBLE_80330e08));
 	short frameShort = (short)frame;
 	Mtx modelMtx;
 	PSMTXCopy(*(Mtx*)((char*)model0 + 0x68), modelMtx);

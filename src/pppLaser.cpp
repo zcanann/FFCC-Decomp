@@ -39,7 +39,6 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, cha
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
-int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
@@ -349,23 +348,35 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         if (step->m_payload[0x3c] == 0) {
-            u8* hitFrame = &work->m_hitFrame;
-            if (*hitFrame >= step->m_payload[0x1d]) {
-                *hitFrame = 0;
-                if (hit && step->m_arg3 != -1) {
-                    u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
-                    if (dataVals != 0) {
-                        int created =
-                            pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-                        *(struct pppLaser**)(created + 4) = pppLaser;
-                        Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
-                        createdPos->x = points[i].x;
-                        createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
-                        createdPos->z = points[i].z;
-                    }
-                }
+            int createHitObject = 0;
+            if (step->m_arg3 != -1) {
+                createHitObject = 1;
+            }
+            if (!hit) {
+                createHitObject = 0;
+            }
+
+            if (work->m_hitFrame < step->m_payload[0x1d]) {
+                work->m_hitFrame++;
+                createHitObject = 0;
             } else {
-                (*hitFrame)++;
+                work->m_hitFrame = 0;
+            }
+
+            if (createHitObject != 0) {
+                _pppPDataVal* dataVal = pppMngStPtr->m_pppPDataVals + step->m_arg3;
+                _pppPObject* created;
+                if (dataVal == 0) {
+                    created = 0;
+                } else {
+                    created = pppCreatePObject(pppMngStPtr, dataVal);
+                    *(_pppPObject**)((u8*)created + 4) = baseObj;
+                }
+
+                Vec* createdPos = (Vec*)((u8*)created + *(int*)step->m_payload + 0x80);
+                createdPos->x = points[i].x;
+                createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+                createdPos->z = points[i].z;
             }
         }
     }

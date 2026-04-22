@@ -53,7 +53,7 @@ struct TracerWork {
     TRACE_POLYGON* entries;
     u16 visibleCount;
     u16 pad2e;
-    u16 alphaStep;
+    s16 alphaStep;
     u16 pad32;
 };
 
@@ -225,10 +225,6 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
     TracerWork* work;
-    Vec local_a8;
-    Vec local_9c;
-    Vec local_90;
-    Vec local_84;
     Mtx MStack_78;
     float frameT;
 
@@ -334,14 +330,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         TRACE_POLYGON* pFallback = entries;
 
         for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(param_2->m_payload + 4); iVar4++) {
-            local_84.x = entries->pos.x;
-            local_84.y = entries->pos.y;
-            local_84.z = entries->pos.z;
-            pppCopyVector(pFallback->pos, local_84);
-            local_90.x = entries->targetPos.x;
-            local_90.y = entries->targetPos.y;
-            local_90.z = entries->targetPos.z;
-            pppCopyVector(pFallback->targetPos, local_90);
+            pppCopyVector(pFallback->pos, entries->pos);
+            pppCopyVector(pFallback->targetPos, entries->targetPos);
             pFallback++;
         }
     }
@@ -427,27 +417,4 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2
 	*(u16*)(puVar2 + 0x2e) = 0;
 	*(u16*)(puVar2 + 0x30) = 0;
 	*(u16*)(puVar2 + 0x32) = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void initTracePolygon(PYmTracer2*, TRACE_POLYGON& poly)
-{
-    float zero = FLOAT_80331840;
-
-    poly.pos.x = zero;
-    poly.pos.y = zero;
-    poly.pos.z = zero;
-    poly.targetPos.x = zero;
-    poly.targetPos.y = zero;
-    poly.targetPos.z = zero;
-    poly.active = 0;
-    poly.alpha = 0;
 }

@@ -447,18 +447,19 @@ void CFunnyShape::Render()
         count = 1;
     }
 
-    const double baseX = FLOAT_8032fd9c;
-    const double baseY = FLOAT_8032fda0;
+    const float baseX = FLOAT_8032fd9c;
+    const float baseY = FLOAT_8032fda0;
     CFunnyShape* work = this;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d pos;
-        pos.x = static_cast<float>(baseX + static_cast<double>(*reinterpret_cast<float*>(Ptr(work, 8))));
-        pos.y = static_cast<float>(baseY + static_cast<double>(*reinterpret_cast<float*>(Ptr(work, 0xC))));
+        pos.x = baseX + *reinterpret_cast<float*>(Ptr(work, 8));
+        pos.y = baseY + *reinterpret_cast<float*>(Ptr(work, 0xC));
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
+        const s16* shapeOffsets = reinterpret_cast<s16*>(animData + 0x10);
         const s16 frame = *reinterpret_cast<s16*>(Ptr(work, 0x14));
-        const s16 shapeOffset = *reinterpret_cast<s16*>(animData + 0x10 + frame * 8);
+        const s16 shapeOffset = shapeOffsets[frame * 4];
         RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(animData + shapeOffset), pos, *reinterpret_cast<float*>(Ptr(work, 0x28)));
         work = reinterpret_cast<CFunnyShape*>(Ptr(work, 0x30));
     }

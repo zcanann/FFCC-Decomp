@@ -525,6 +525,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     u32 signBit;
     s16 angleRand;
     float speedJitter;
+    u32 local_58;
+    u32 uStack_54;
     union {
         unsigned long long ull;
         double d;
@@ -533,7 +535,9 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     (void)pppPObject;
 
     randomValue = rand();
-    temp.ull = (0x4330000000000000ULL | (u32)(randomValue ^ 0x80000000));
+    uStack_54 = randomValue ^ 0x80000000;
+    local_58 = 0x43300000;
+    temp.ull = ((unsigned long long)local_58 << 0x20) | (unsigned long long)uStack_54;
     randomScale = FLOAT_8033065c * (float)(temp.d - DOUBLE_80330648);
     shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
     shapeRandom = rand();

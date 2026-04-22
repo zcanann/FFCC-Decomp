@@ -22,6 +22,10 @@ extern float FLOAT_80330e60;
 extern float FLOAT_80330e64;
 extern float FLOAT_80330e6c;
 extern float FLOAT_80330e68;
+extern float FLOAT_80330E78;
+extern float FLOAT_80330E7C;
+extern float FLOAT_80330E80;
+extern float FLOAT_80330E84;
 extern float FLOAT_80330eb8;
 extern float FLOAT_80330ec0;
 extern double DOUBLE_80330e70;
@@ -51,12 +55,12 @@ static inline float CameraWorldZ()
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
 }
 
 static inline Mtx44& CameraScreenMatrix()
 {
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x3C);
+    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
 }
 
 struct Vec2d {
@@ -908,12 +912,12 @@ void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*)
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     u32* work = (u32*)workPtr;
+    Mtx identityMtx;
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
     Mtx44 savedScreenMtx;
     Mtx44 projectionMtx;
     _GXTexObj sceneTexObj;
-    _GXTexObj depthTexObj;
     Vec centerPos;
     Vec cameraPos;
     Vec cameraUp;
@@ -922,6 +926,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     s32 model;
     u32 depthTexSize;
     u32 sourceTexObjs;
+    u32 captureTexObjs;
     u32 targetTexObjs;
     s32 i;
     f32 savedViewport[6];
@@ -935,6 +940,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     }
 
     Graphic.SetViewport();
+    PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
@@ -945,9 +951,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     }
 
     handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(u32*)(model + 0xF0) = 0;
-    *(u32*)(model + 0xFC) = 0;
+    GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     if (Game.m_currentSceneId == 7) {
         centerPos.x = FLOAT_80330e4c;
@@ -956,59 +960,75 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     } else {
         centerPos = gObject->m_worldPosition;
     }
-    centerPos.y += FLOAT_80330e60;
+    centerPos.y += FLOAT_80330E78;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_Z24X8, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     sourceTexObjs = work[8];
+    captureTexObjs = work[0x1E];
 
     if (*(u8*)((u8*)step + 0x38) != 0) {
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
-                                   (_GXTexFmt)0x16, 1);
-        GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
-        C_MTXPerspective(projectionMtx, FLOAT_80330eb8, FLOAT_80330e58, FLOAT_80330e58, FLOAT_80330ec0);
+        C_MTXPerspective(projectionMtx, FLOAT_80330E7C, FLOAT_80330e58, FLOAT_80330e58, FLOAT_80330E80);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
+        char* compareName = (char*)&Game + 0xC7F4;
         for (i = 0; i < 6; i++) {
+            int mapNameMatches;
+
             cameraPos = centerPos;
             cameraUp.x = FLOAT_80330e4c;
             cameraUp.y = FLOAT_80330e58;
             cameraUp.z = FLOAT_80330e4c;
 
-            if (i == 3) {
-                cameraPos.z -= FLOAT_80330e58;
-            } else if (i < 3) {
-                if (i == 1) {
-                    cameraPos.z += FLOAT_80330e58;
-                } else if (i < 1) {
+            mapNameMatches = strcmp(DAT_80330e50, compareName);
+            if (mapNameMatches == 0) {
+                if (i == 0) {
+                    cameraPos.z -= FLOAT_80330e58;
+                } else if (i == 1) {
                     cameraPos.x += FLOAT_80330e58;
-                } else {
+                } else if (i == 2) {
+                    cameraPos.z += FLOAT_80330e58;
+                } else if (i == 3) {
                     cameraPos.x -= FLOAT_80330e58;
                 }
-            } else if (i == 5) {
-                cameraPos.y -= FLOAT_80330e58;
-                cameraUp.y = FLOAT_80330e4c;
-                cameraUp.z = FLOAT_80330e4c;
-            } else {
-                cameraPos.y += FLOAT_80330e58;
-                cameraUp.y = FLOAT_80330e4c;
-                cameraUp.z = FLOAT_80330e68;
+            }
+
+            if (mapNameMatches != 0 || i == 4 || i == 5) {
+                if (i == 3) {
+                    cameraPos.z -= FLOAT_80330e58;
+                } else if (i < 3) {
+                    if (i == 1) {
+                        cameraPos.z += FLOAT_80330e58;
+                    } else if (i == 0) {
+                        cameraPos.x += FLOAT_80330e58;
+                    } else {
+                        cameraPos.x -= FLOAT_80330e58;
+                    }
+                } else if (i == 5) {
+                    cameraPos.y -= FLOAT_80330e58;
+                    cameraUp.y = FLOAT_80330e4c;
+                    cameraUp.z = FLOAT_80330e58;
+                } else if (i < 5) {
+                    cameraPos.y += FLOAT_80330e58;
+                    cameraUp.y = FLOAT_80330e4c;
+                    cameraUp.z = FLOAT_80330e68;
+                }
             }
 
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x80, 0x80);
             RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, (GXTexObj*)sourceTexObjs,
+                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, (GXTexObj*)sourceTexObjs,
                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
-            GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
+            GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, FLOAT_80330e4c, FLOAT_80330e58);
             GXSetScissor(0, 0, 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
             if (((gObject->m_weaponNodeFlags & 1) != 0 || gObject->m_attachOwner != NULL) &&
-                gObject->m_attachOwner != NULL && gObject->m_attachOwner->m_charaModelHandle != NULL) {
+                gObject->m_attachOwner->m_charaModelHandle != NULL) {
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
                 s32 ownerModel = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(owner);
 
@@ -1023,9 +1043,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 *(u32*)(ownerModel + 0x100) = 0;
             }
 
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
-                                       GX_NEAR, GX_TF_RGBA8, 0);
+            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)captureTexObjs, 0, 0, 0x80, 0x80,
+                                       depthTexSize, GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
+            captureTexObjs += 0x20;
             sourceTexObjs += 0x20;
         }
 
@@ -1050,7 +1071,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
                               (GXTexObj*)(targetTexObjs + 0x28), 0);
             RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
+                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj, 0, 0, 0,
                 (_GXBlendFactor)4, (_GXBlendFactor)5);
             *((u8*)work + 0xF4) = 1;
         }
@@ -1067,7 +1088,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
         RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
+            gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj, 0, 0, 0,
             (_GXBlendFactor)4, (_GXBlendFactor)5);
     }
 

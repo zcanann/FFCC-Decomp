@@ -701,8 +701,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     Mtx44 screenMtx;
     float indMtx[2][3];
     GXColor white;
-    float x2 = x + width;
-    float y2 = y + height;
+    float x2;
+    float y2;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -750,6 +750,9 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     }
+
+    x2 = x + width;
+    y2 = y + height;
 
     if (color == 0) {
         float u1 = kUtilZero;
@@ -840,8 +843,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     Mtx44 screenMtx;
     float indMtx[2][3];
     GXColor white;
-    float x2 = x + width;
-    float y2 = y + height;
+    float x2;
+    float y2;
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
@@ -892,6 +895,9 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     } else if (textureFormat == 9 || textureFormat == 8) {
         SetPaletteEnv(texture);
     }
+
+    x2 = x + width;
+    y2 = y + height;
 
     if (color == 0) {
         float u1 = kUtilZero;

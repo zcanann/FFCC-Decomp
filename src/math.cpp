@@ -1,6 +1,11 @@
 #include "ffcc/math.h"
 
 #include "dolphin/mtx.h"
+extern "C" {
+double sin(double);
+double cos(double);
+double acos(double);
+}
 #include "math.h"
 #include "string.h"
 
@@ -125,6 +130,8 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     float cosY;
     float sinZ;
     float cosZ;
+    float sinXSinY;
+    float cosXSinY;
     float* matrix = &out[0][0];
     float* values = reinterpret_cast<float*>(srt);
 
@@ -134,15 +141,17 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     cosY = (float)cos((double)values[4]);
     sinZ = (float)sin((double)values[5]);
     cosZ = (float)cos((double)values[5]);
+    sinXSinY = sinX * sinY;
+    cosXSinY = cosX * sinY;
 
     matrix[0] = cosY * cosZ;
     matrix[4] = cosY * sinZ;
     matrix[8] = -sinY;
-    matrix[1] = cosZ * sinX * sinY - cosX * sinZ;
-    matrix[5] = sinZ * sinX * sinY + cosX * cosZ;
+    matrix[1] = cosZ * sinXSinY - cosX * sinZ;
+    matrix[5] = sinZ * sinXSinY + cosX * cosZ;
     matrix[9] = sinX * cosY;
-    matrix[2] = cosZ * cosX * sinY + sinX * sinZ;
-    matrix[6] = sinZ * cosX * sinY - sinX * cosZ;
+    matrix[2] = cosZ * cosXSinY + sinX * sinZ;
+    matrix[6] = sinZ * cosXSinY - sinX * cosZ;
     matrix[10] = cosX * cosY;
     matrix[3] = values[0];
     matrix[7] = values[1];

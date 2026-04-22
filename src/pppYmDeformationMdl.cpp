@@ -51,7 +51,9 @@ extern float FLOAT_80330D9C;
 extern float FLOAT_80330DA0;
 extern float FLOAT_80330DA4;
 extern float FLOAT_80330DA8;
-const float FLOAT_80330dac = 0.0f;
+extern const float FLOAT_80330dac = 0.0f;
+extern const double DOUBLE_80330DB0 = 4503601774854144.0;
+extern const double kPppYmSharedDoubleBias = 4503601774854144.0;
 
 static inline Mtx& CameraMatrix()
 {

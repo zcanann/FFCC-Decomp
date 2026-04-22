@@ -929,6 +929,8 @@ void CMemoryCardMan::MakeSaveData()
 
     Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
     GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    *reinterpret_cast<u32*>(save + 0x1C) = CalcCrc((Mc::SaveDat*)nullptr);
+    EncodeData();
 }
 
 /*
@@ -1781,23 +1783,27 @@ inline int rotrwi(int, int)
  */
 void CMemoryCardMan::EncodeData()
 {
-    const u32 rotAmount = m_saveBuffer[0x11] & 0x1F;
+    const int rotAmount = reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20;
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
-    int count = 0x5B6;
 
-    do
+    for (int count = 0; count < 0x5B6; count++)
     {
-        ptr[0] = (ptr[0] << rotAmount) | (ptr[0] >> (0x20 - rotAmount));
-        ptr[1] = (ptr[1] << rotAmount) | (ptr[1] >> (0x20 - rotAmount));
-        ptr[2] = (ptr[2] << rotAmount) | (ptr[2] >> (0x20 - rotAmount));
-        ptr[3] = (ptr[3] << rotAmount) | (ptr[3] >> (0x20 - rotAmount));
-        ptr[4] = (ptr[4] << rotAmount) | (ptr[4] >> (0x20 - rotAmount));
-        ptr[5] = (ptr[5] << rotAmount) | (ptr[5] >> (0x20 - rotAmount));
-        ptr[6] = (ptr[6] << rotAmount) | (ptr[6] >> (0x20 - rotAmount));
+        u32 rotated = __rlwnm(ptr[0], rotAmount, 0, 31);
+        ptr[0] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[1], rotAmount, 0, 31);
+        ptr[1] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[2], rotAmount, 0, 31);
+        ptr[2] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[3], rotAmount, 0, 31);
+        ptr[3] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[4], rotAmount, 0, 31);
+        ptr[4] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[5], rotAmount, 0, 31);
+        ptr[5] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[6], rotAmount, 0, 31);
+        ptr[6] = __lwbrx(&rotated, 0);
         ptr += 7;
-        count--;
     }
-    while (count != 0);
 }
 
 /*

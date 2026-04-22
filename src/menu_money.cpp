@@ -35,7 +35,7 @@ extern double DOUBLE_80332f88;
 extern double DOUBLE_80332F90;
 
 namespace {
-unsigned int gMenuMoneyTransferAmount = 0;
+unsigned int s_Money = 0;
 signed char s_place[16];
 
 struct MenuMoneyMembers {
@@ -134,12 +134,95 @@ static void UpdateDigits(unsigned int value, signed char* outDigits) {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::MoneyInit()
 {
-	// TODO
+	float fVar1;
+	int iVar4;
+	int iVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
+	int iVar9;
+	signed char* puVar10;
+	signed char* puVar11;
+
+	memset(GetMoneyPanel(this), 0, 0x1008);
+
+	fVar1 = FLOAT_80332f70;
+	iVar4 = GetMoneyPanelBase(this) + 8;
+	iVar5 = 8;
+	do {
+		*(float *)(iVar4 + 0x14) = fVar1;
+		*(float *)(iVar4 + 0x54) = fVar1;
+		*(float *)(iVar4 + 0x94) = fVar1;
+		*(float *)(iVar4 + 0xd4) = fVar1;
+		*(float *)(iVar4 + 0x114) = fVar1;
+		*(float *)(iVar4 + 0x154) = fVar1;
+		*(float *)(iVar4 + 0x194) = fVar1;
+		*(float *)(iVar4 + 0x1d4) = fVar1;
+		iVar4 = iVar4 + 0x200;
+		iVar5 = iVar5 - 1;
+	} while (iVar5 != 0);
+
+	iVar4 = GetMoneyPanelBase(this);
+	*(int *)(iVar4 + 0x24) = 0x3b;
+	*(short *)(iVar4 + 10) = 0x68;
+	*(short *)(iVar4 + 0xc) = 0xf8;
+	*(short *)(iVar4 + 0xe) = 0x88;
+	*(short *)(iVar4 + 8) = static_cast<short>(-(static_cast<int>(*(short *)(iVar4 + 0xc)) / 2));
+	*(float *)(iVar4 + 0x10) = FLOAT_80332f64;
+	*(float *)(iVar4 + 0x14) = FLOAT_80332f64;
+	*(float *)(iVar4 + 0x1c) = FLOAT_80332f70;
+	*(int *)(iVar4 + 0x2c) = 0;
+	*(int *)(iVar4 + 0x30) = 10;
+	*GetMoneyPanel(this) = 1;
+
+	s_Money = 0;
+	puVar10 = s_place;
+	iVar5 = 0;
+	do {
+		iVar4 = 10000000;
+		if (iVar5 == 0) {
+			iVar8 = *(int *)(Game.m_scriptFoodBase[0] + 0x200);
+		} else {
+			iVar8 = 0;
+		}
+		iVar9 = 0;
+		iVar6 = 8;
+		bool started = false;
+		puVar11 = puVar10;
+		do {
+			if ((!started) && (iVar4 <= iVar8)) {
+				started = true;
+			}
+			if (((started) || (iVar4 <= iVar8)) || (6 < iVar9)) {
+				iVar7 = iVar8 / iVar4;
+				if (9 < iVar7) {
+					iVar7 = 9;
+				}
+				*puVar11 = static_cast<signed char>(iVar7);
+				iVar8 = iVar8 - (iVar8 / iVar4) * iVar4;
+			} else {
+				*puVar11 = -1;
+			}
+			puVar11 = puVar11 + 1;
+			iVar9 = iVar9 + 1;
+			iVar4 /= 10;
+			iVar6 = iVar6 - 1;
+		} while (iVar6 != 0);
+		iVar5 = iVar5 + 1;
+		puVar10 = puVar10 + 8;
+	} while (iVar5 < 2);
+
+	*(short*)(GetMoneyStateBase(this) + 0x26) = 0;
+	*(char*)(GetMoneyStateBase(this) + 0xB) = 1;
 }
 
 /*
@@ -196,7 +279,7 @@ bool CMenuPcs::MoneyOpen()
 		*(int *)(iVar8 + 0x30) = 10;
 		*GetMoneyPanel(this) = 1;
 
-		gMenuMoneyTransferAmount = 0;
+		s_Money = 0;
 		puVar9 = s_place;
 		iVar15 = 0;
 		do {
@@ -335,6 +418,7 @@ bool CMenuPcs::MoneyClose()
     count = (int)*GetMoneyPanel(this);
     anim = (MenuMoneyOpenAnim*)(GetMoneyPanel(this) + 4);
     step = (int)*(short*)(GetMoneyStateBase(this) + 0x22);
+
     remaining = count;
 
     if (0 < count) {
@@ -549,8 +633,8 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((press & 0x100) != 0) {
 			if (*selectedFlag == 0) {
-				caravanWork->FGPutGil(static_cast<int>(gMenuMoneyTransferAmount));
-				gMenuMoneyTransferAmount = 0;
+				caravanWork->FGPutGil(static_cast<int>(s_Money));
+				s_Money = 0;
 				UpdateDigits(static_cast<unsigned int>(caravanWork->m_gil), s_place);
 				UpdateDigits(0, s_place + 8);
 			}
@@ -572,17 +656,17 @@ int CMenuPcs::MoneyCtrlCur()
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
 			unsigned int maxValue = static_cast<unsigned int>(caravanWork->m_gil);
-			unsigned int nextValue = gMenuMoneyTransferAmount + placeValue;
-			gMenuMoneyTransferAmount = (nextValue < maxValue) ? nextValue : maxValue;
-			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
+			unsigned int nextValue = s_Money + placeValue;
+			s_Money = (nextValue < maxValue) ? nextValue : maxValue;
+			UpdateDigits(s_Money, s_place + 8);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	} else if ((hold & 4) != 0) {
-		if (gMenuMoneyTransferAmount == 0) {
+		if (s_Money == 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
-			gMenuMoneyTransferAmount = (gMenuMoneyTransferAmount >= placeValue) ? (gMenuMoneyTransferAmount - placeValue) : 0;
-			UpdateDigits(gMenuMoneyTransferAmount, s_place + 8);
+			s_Money = (s_Money >= placeValue) ? (s_Money - placeValue) : 0;
+			UpdateDigits(s_Money, s_place + 8);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	}
@@ -620,7 +704,7 @@ int CMenuPcs::MoneyCtrlCur()
 			return 0;
 		}
 		if ((press & 0x100) != 0) {
-			if (gMenuMoneyTransferAmount < 1) {
+			if (s_Money < 1) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
 				*reinterpret_cast<char*>(menuState + 9) = 2;
@@ -637,10 +721,44 @@ int CMenuPcs::MoneyCtrlCur()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::MoneySetPlace(int)
+void CMenuPcs::MoneySetPlace(int money)
 {
-	// TODO
+	int place;
+	int digit;
+	int index;
+	int count;
+	bool started;
+	signed char* out;
+
+	place = 10000000;
+	index = 0;
+	count = 8;
+	started = false;
+	out = s_place;
+	do {
+		if ((!started) && (place <= money)) {
+			started = true;
+		}
+		if (((started) || (place <= money)) || (6 < index)) {
+			digit = money / place;
+			if (9 < digit) {
+				digit = 9;
+			}
+			*out = static_cast<signed char>(digit);
+			money = money - (money / place) * place;
+		} else {
+			*out = -1;
+		}
+		out = out + 1;
+		index = index + 1;
+		place /= 10;
+		count = count - 1;
+	} while (count != 0);
 }

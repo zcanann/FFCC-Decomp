@@ -377,7 +377,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                     created = 0;
                 } else {
                     created = pppCreatePObject(pppMngStPtr, dataVal);
-                    *(_pppPObject**)((u8*)created + 4) = baseObj;
+                    *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)baseObj;
                 }
 
                 Vec* createdPos = (Vec*)((u8*)created + *(int*)step->m_payload + 0x80);

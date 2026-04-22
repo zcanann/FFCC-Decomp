@@ -87,7 +87,6 @@ unsigned int lbl_801EA904[4] = {
     reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
 };
 
-extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern const char s_CFunnyShapePcs[];
 static const char s_funnyShapeSpinnerText[] = "|/-\\";
@@ -201,7 +200,7 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
  * Address: TODO
  * Size: TODO
  */
-CFunnyShapePcs::CFunnyShapePcs()
+inline CFunnyShapePcs::CFunnyShapePcs()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
@@ -484,32 +483,6 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
     }
     numItems = 0;
     size = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004ead0
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete)
-{
-    if (ptrArray != 0) {
-        SetPtrArrayDtorVtable(ptrArray);
-        if (ptrArray->items != 0) {
-            __dla__FPv(ptrArray->items);
-            ptrArray->items = 0;
-        }
-        ptrArray->numItems = 0;
-        ptrArray->size = 0;
-        if (shouldDelete > 0) {
-            __dl__FPv(ptrArray);
-        }
-    }
-    return ptrArray;
 }
 
 template class CPtrArray<_GXTexObj*>;

@@ -537,7 +537,8 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		break;
 	case 3:
 		*(reinterpret_cast<unsigned char*>(this) + 0x6B8) =
-		    (value << 3) & 8 | (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
+		    (static_cast<signed char>(value) << 3) & 8 |
+		    (*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0xF7);
 		break;
 	case 4:
 	{

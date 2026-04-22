@@ -15,18 +15,18 @@ public:
     ~McCtrl();
 
     void Init();
-    void LoadMcList();
+    int LoadMcList();
     void SetListDat(int, int);
     void SetBrokenFile(int);
-    void SaveDat();
-    void LoadDat();
+    int SaveDat();
+    int LoadDat();
     void Format(int);
     int ChkEmpty(int param_2);
     int ChkConnect(int chan);
     int ChkNowData();
     void SaveDataBuffer(char*);
     void ChkParty(char*);
-    void EraseDat();
+    int EraseDat();
     void GetDno();
     void GetSerial();
     void SetDataBuff(char*);

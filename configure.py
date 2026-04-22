@@ -464,7 +464,7 @@ config.libs = [
             Object(NonMatching, "p_chara_viewer.cpp"),
             Object(NonMatching, "p_dbgmenu.cpp"),
             Object(NonMatching, "p_FunnyShape.cpp"),
-            Object(NonMatching, "p_game.cpp"),
+            Object(Matching, "p_game.cpp"),
             Object(NonMatching, "p_gba.cpp"),
             Object(NonMatching, "p_graphic.cpp"),
             Object(NonMatching, "p_light.cpp"),

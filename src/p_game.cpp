@@ -17,6 +17,11 @@ unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
     0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
 };
 
+unsigned int sCGamePcsMeta0[3] = {};
+unsigned int sCGamePcsMeta1[2] = {};
+unsigned int sCGamePcsMeta2[3] = {};
+u32 CFlatFlags;
+
 CGamePcs GamePcs;
 
 /*

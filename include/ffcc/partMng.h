@@ -252,7 +252,14 @@ struct _pppMngSt
     float m_userFloat0;                // 0x48
     float m_userFloat1;                // 0x4C
     Vec m_savedPosition;               // 0x50
-    Vec m_previousPosition;            // 0x5C
+    union {
+        Vec m_previousPosition;        // 0x5C
+        struct {
+            float m_previousPositionX; // 0x5C
+            float m_previousPositionY; // 0x60
+            float m_paramD;            // 0x64
+        } m_previousPositionFields;
+    };
     Vec m_paramVec0;                   // 0x68
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76

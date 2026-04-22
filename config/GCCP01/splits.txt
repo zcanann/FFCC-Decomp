@@ -1340,7 +1340,7 @@ THPSimple.cpp:
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
-	.bss        start:0x802FFA80 end:0x80300134
+	.bss        start:0x802FFA80 end:0x80300140
 	.sdata      start:0x8032E8C0 end:0x8032E8C4
 	.sbss       start:0x8032EE48 end:0x8032EE60
 

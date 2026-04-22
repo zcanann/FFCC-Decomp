@@ -73,7 +73,7 @@ u16 gTHPSimpleVolumeTable[0x80] = {
     0x638C, 0x6555, 0x6722, 0x68F4, 0x6AC9, 0x6CA2, 0x6E80, 0x7061,
     0x7247, 0x7430, 0x761E, 0x7810, 0x7A06, 0x7C00, 0x7DFE, 0x8000,
 };
-s16 WorkBuffer_32_[0x280];
+s16 WorkBuffer_32_[0x280] ATTRIBUTE_ALIGN(32);
 
 /*
  * --INFO--
@@ -289,7 +289,7 @@ s32 THPSimpleOpen(const char* path)
 s32 THPSimpleClose(void)
 {
     if ((SimpleControl.isOpen != 0) && (SimpleControl.isPreLoaded == 0)) {
-        if (SimpleControl.hasAudio == 0) {
+        if (SimpleControl.hasAudio != 0) {
             if (SimpleControl.isBufferSet == 1) {
                 return 0;
             }
@@ -297,7 +297,7 @@ s32 THPSimpleClose(void)
             SimpleControl.isBufferSet = 0;
         }
 
-        if (SimpleControl.isReadFrameAsync != 0) {
+        if (SimpleControl.isReadFrameAsync != 0U) {
             return 0;
         }
         SimpleControl.isOpen = 0;

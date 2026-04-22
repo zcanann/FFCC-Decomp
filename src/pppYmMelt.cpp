@@ -236,14 +236,14 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     int angleSeed;
     YmMeltWork* work;
     YmMeltColorWork* colorWork;
-    YmMeltVertex* vertexBase;
-    YmMeltVertex* vertex;
     YmMeltVertex* rowVertex;
-    float matrixY;
-    float halfWidth;
+    YmMeltVertex* vertex;
+    YmMeltVertex* vertexBase;
     float step;
-    float rot;
+    float halfWidth;
+    float matrixY;
     float x;
+    float rot;
     float z;
     Mtx rotMtx;
 

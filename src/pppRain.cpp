@@ -7,13 +7,14 @@
 extern "C" {
 extern const float kPppRainTexCoordBase;
 extern const float FLOAT_8033101c;
-extern const float FLOAT_80331020;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 static const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
+
+extern const float FLOAT_80331020 = 3.0518509e-05f;
 
 extern "C" {
 int rand(void);
@@ -333,4 +334,3 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 
 extern const float kPppRainTexCoordBase = 0.0f;
 extern const float FLOAT_8033101c = 1.0f;
-extern const float FLOAT_80331020 = 3.0518509e-05f;

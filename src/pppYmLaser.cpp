@@ -452,12 +452,12 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 		GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
 		alphaMax = step->m_payload[0x2b];
-		alphaStep = (u8)((u32)alphaMax / count);
+		alphaStep = (u8)((u32)alphaMax / step->m_payload[0x1e]);
 		colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
 		points = work->m_points;
 
-		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
-		for (i = 0; i < count - 1; i++) {
+		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 3));
+		for (i = 0; (int)i < (int)(step->m_payload[0x1e] - 1); i++) {
 			alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
 			color0 = colorBase | alpha0;
 			color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
@@ -490,7 +490,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			debugColor.a = 0xFF;
 			GXSetChanAmbColor(GX_COLOR0A0, debugColor);
 			GXSetPointSize(0x28, GX_TO_ZERO);
-			GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(count - 1));
+			GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_payload[0x1e] - 1));
 			for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
 				GXPosition3f32(points[j].x, points[j].y, points[j].z);
 				GXColor1u32(*(u32*)&debugColor);
@@ -502,7 +502,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			debugColor.a = 0xFF;
 			GXSetChanAmbColor(GX_COLOR0A0, debugColor);
 			GXSetLineWidth(0x14, GX_TO_ZERO);
-			GXBegin(GX_LINES, GX_VTXFMT7, (u16)((count - 1) * 4));
+			GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_payload[0x1e] - 1) * 4));
 			for (int j = 0; j < (int)(step->m_payload[0x1e] - 1); j++) {
 				GXPosition3f32(points[j].x, points[j].y, points[j].z);
 				GXColor1u32(*(u32*)&debugColor);
@@ -539,7 +539,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			Graphic.DrawSphere(tempMtx, debugColor);
 
 			GXLoadPosMtxImm(laser->m_drawMatrix.value, GX_PNMTX0);
-			for (i = 0; i < count; i++) {
+			for (i = 0; (int)i < (int)(u32)step->m_payload[0x1e]; i++) {
 				if ((points[i].x == kPppYmLaserOne) && (points[i].y == kPppYmLaserOne) &&
 					(points[i].z == kPppYmLaserOne)) {
 					continue;

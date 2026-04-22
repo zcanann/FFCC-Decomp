@@ -76,13 +76,11 @@ struct LaserStep {
 
 struct CMapCylinderRaw {
     Vec m_bottom;
+    u8 m_pad0C[0x0C];
     Vec m_direction;
-    float m_radius;
-    float m_height;
+    f32 m_radius;
     Vec m_top;
     Vec m_direction2;
-    float m_radius2;
-    float m_height2;
 };
 
 struct LaserWork {
@@ -308,17 +306,20 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         pppSubVector(localA, points[i], localPos);
         PSVECScale(&localA, &localA, FLOAT_8033344c);
 
-        cyl.m_bottom = localPos;
+        cyl.m_bottom = work->m_origin;
         cyl.m_direction = localA;
         cyl.m_radius = kPppLaserZero;
-        cyl.m_height = FLOAT_80333450;
-        cyl.m_radius2 = FLOAT_80333454;
-        cyl.m_height2 = FLOAT_80333454;
+        cyl.m_top.x = FLOAT_80333450;
+        cyl.m_top.y = FLOAT_80333450;
+        cyl.m_top.z = FLOAT_80333450;
+        cyl.m_direction2.x = FLOAT_80333454;
+        cyl.m_direction2.y = FLOAT_80333454;
+        cyl.m_direction2.z = FLOAT_80333454;
 
         bool hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                       &MapMng, &cyl, &cyl.m_direction, 0xffffffff) != 0;
+                       &MapMng, &cyl, &localA, 0xffffffff) != 0;
         if (hit) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &points[i]);
+            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &points[i]);
             work->m_length = PSVECDistance(&points[i], &work->m_origin);
         } else if (i == 0 && work->m_spawnEnabled != 0) {
             if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
@@ -326,7 +327,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                 work->m_length = work->m_maxLength - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
                     &Game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
-                    (int)((u32)baseObj->m_graphId >> 12), &points[i]);
+                    baseObj->m_graphId / 0x1000, &points[i]);
                 work->m_spawnEnabled = 0;
             }
             if (work->m_spawnEnabled != 0) {
@@ -335,6 +336,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         if (i == 0) {
+            localB.x = kPppLaserZero;
+            localB.y = kPppLaserZero;
             localB.z = work->m_length;
             PSMTXMultVec(tempMtx, &localB, &points[0]);
         }

@@ -266,37 +266,6 @@ static unsigned char& GetMngStLockScaleFromOwner(_pppMngSt* pppMngSt)
 	return *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x4d);
 }
 
-struct CUSBStreamDataRaw {
-    unsigned char* m_data;
-    int m_headerReady;
-    int m_dataReady;
-    unsigned int m_sizeBytes;
-    int m_packetCode;
-    void* m_stageDefault;
-    void* m_stageLoad;
-    void* m_stageAmem;
-    void* m_stageExtra;
-    void* m_freePtr;
-    unsigned char m_fieldLoadReq;
-    unsigned char m_printFreeOnNext;
-    unsigned char m_blockOnFrame;
-    unsigned char m_miruraEventActive;
-    unsigned char m_disableShokiDraw;
-};
-
-struct CPartPcsViewerState {
-    unsigned char unk0[0x18];
-    void* m_stageDefault;
-    void* m_stageLoad;
-    void* m_stageAmem;
-    void* m_stageExtra;
-    void* m_freePtr;
-    unsigned char unk2C[2];
-    unsigned char m_blockOnFrame;
-    unsigned char m_miruraEventActive;
-    unsigned char m_disableShokiDraw;
-};
-
 struct CPartMngState {
     unsigned char unk0[0x236F4];
     unsigned int m_partAMemBase;
@@ -411,9 +380,8 @@ CPartPcs::~CPartPcs()
  */
 void CPartPcs::Init()
 {
-	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x4);
-	usbStream->m_fieldLoadReq = 0;
-	usbStream->m_printFreeOnNext = 0;
+	m_usbStreamData.m_fieldLoadReq = 0;
+	m_usbStreamData.m_printFreeOnNext = 0;
 }
 
 /*
@@ -433,8 +401,7 @@ void CPartPcs::Quit()
  */
 void CPartPcs::onScriptChanging(char*)
 {
-	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x4);
-	usbStream->m_fieldLoadReq = 0;
+	m_usbStreamData.m_fieldLoadReq = 0;
 }
 
 /*
@@ -604,33 +571,33 @@ void CPartPcs::create0()
  */
 void CPartPcs::create()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
     char* stringBase = const_cast<char*>(DAT_801d8068);
     void* stage;
 
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
+    m_usbStreamData.m_freePtr = 0;
+    m_usbStreamData.m_stageExtra = 0;
+    m_usbStreamData.m_blockOnFrame = 0;
+    m_usbStreamData.m_miruraEventActive = 0;
+    m_usbStreamData.m_disableShokiDraw = 0;
 
-    if (Game.m_currentSceneId == 7) {
+    if (Game.m_currentSceneId == 7U) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
+        m_usbStreamData.m_stageLoad = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageDefault = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageAmem = 0;
     } else {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        m_usbStreamData.m_stageLoad = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageDefault = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageAmem =
+            static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2));
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         &ppvAmemCacheSet,
         stringBase + 0x74,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageLoad,
-        reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(&PartPcs) + 4)->m_stageAmem,
+        PartPcs.m_usbStreamData.m_stageLoad,
+        PartPcs.m_usbStreamData.m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -682,35 +649,34 @@ void CPartPcs::createLoad()
  */
 void CPartPcs::createViewer()
 {
-    CPartPcsViewerState* viewer = reinterpret_cast<CPartPcsViewerState*>(this);
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     void* stage;
 
     IsBigAlloc__7CUSBPcsFi(&USBPcs, 1);
-    viewer->m_freePtr = 0;
-    viewer->m_stageExtra = 0;
-    viewer->m_blockOnFrame = 0;
-    viewer->m_miruraEventActive = 0;
-    viewer->m_disableShokiDraw = 0;
+    m_usbStreamData.m_freePtr = 0;
+    m_usbStreamData.m_stageExtra = 0;
+    m_usbStreamData.m_blockOnFrame = 0;
+    m_usbStreamData.m_miruraEventActive = 0;
+    m_usbStreamData.m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
-        viewer->m_stageLoad = stage;
-        viewer->m_stageDefault = stage;
-        viewer->m_stageAmem = 0;
+        m_usbStreamData.m_stageLoad = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageDefault = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageAmem = 0;
     } else {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
-        viewer->m_stageLoad = stage;
-        viewer->m_stageDefault = stage;
+        m_usbStreamData.m_stageLoad = static_cast<CMemory::CStage*>(stage);
+        m_usbStreamData.m_stageDefault = static_cast<CMemory::CStage*>(stage);
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
-        viewer->m_stageAmem = stage;
+        m_usbStreamData.m_stageAmem = static_cast<CMemory::CStage*>(stage);
     }
 
     Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
         &ppvAmemCacheSet,
         stringBase + 0x74,
-        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
-        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
+        PartPcs.m_usbStreamData.m_stageLoad,
+        PartPcs.m_usbStreamData.m_stageAmem,
         0x400,
         reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
         0,
@@ -735,26 +701,24 @@ void CPartPcs::createViewer()
  */
 void CPartPcs::destroy()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-
     IsBigAlloc__7CUSBPcsFi(&USBPcs, 0);
     Destroy__8CPartMngFv(&PartMng);
 
-    if (usb->m_stageAmem != 0) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageAmem);
+    if (m_usbStreamData.m_stageAmem != 0) {
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_usbStreamData.m_stageAmem);
     }
 
     AssertCache__13CAmemCacheSetFv(&ppvAmemCacheSet);
     Destroy__13CAmemCacheSetFv(&ppvAmemCacheSet);
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageDefault);
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_usbStreamData.m_stageDefault);
 
-    if (usb->m_freePtr != 0) {
-        Free__7CMemoryFPv(&Memory, usb->m_freePtr);
+    if (m_usbStreamData.m_freePtr != 0) {
+        Free__7CMemoryFPv(&Memory, m_usbStreamData.m_freePtr);
     }
 
-    if (usb->m_stageExtra != 0) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageExtra);
+    if (m_usbStreamData.m_stageExtra != 0) {
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_usbStreamData.m_stageExtra);
     }
 }
 
@@ -889,10 +853,9 @@ void CPartPcs::ClearOt()
  */
 void CPartPcs::drawShadow()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
     CGame* game = &Game;
 
-    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
+    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0 &&
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404)) != 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(1);
@@ -914,10 +877,9 @@ void CPartPcs::drawShadow()
  */
 void CPartPcs::drawCharaBefore()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
     CGame* game = &Game;
 
-    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
+    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -939,7 +901,6 @@ void CPartPcs::drawCharaBefore()
  */
 void CPartPcs::draw()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
     CGame* game = &Game;
 
     SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
@@ -949,7 +910,7 @@ void CPartPcs::draw()
         return;
     }
 
-    if (usb->m_disableShokiDraw != 0) {
+    if (m_usbStreamData.m_disableShokiDraw != 0) {
         DrawOt__10pppDrawMngFv(&ppvDrawMng);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
         return;
@@ -1068,9 +1029,7 @@ void CPartPcs::DrawMenu(int fpNo)
  */
 void CPartPcs::DrawShoki()
 {
-    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 4);
-
-    if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
+    if (m_usbStreamData.m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
         if (Game.m_gameWork.m_gamePaused == 0 &&
             (int)*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {

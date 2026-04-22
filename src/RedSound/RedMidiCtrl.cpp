@@ -77,20 +77,21 @@ int gRedCommandHandlerTable[] = {
  * JP Size: TODO
  */
 #pragma dont_inline on
+#pragma optimization_level 0
 int DataAddCompute(int* current, int target, int* delta)
 {
     int result = 0;
-    int value = *current;
 
-    if (target != (value >> 0xc)) {
-        int targetValue = (target << 0xc) | 0x800;
-        result = (targetValue - value) / *delta;
+    if ((target - (*current >> 0xc)) != 0) {
+        result = ((target << 0xc) | 0x800) - *current;
+        result = result / *delta;
     } else {
         *delta = 0;
     }
 
     return result;
 }
+#pragma optimization_level 4
 #pragma dont_inline reset
 
 /*

@@ -8,12 +8,14 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/p_game.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/sound.h"
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
 #include "ffcc/THPSimple.h"
 
 #include <dolphin/mtx.h>
+#include <dolphin/os.h>
 #include <math.h>
 #include <string.h>
 #include "ffcc/fontman.h"
@@ -34,6 +36,7 @@ extern "C" void AddFrame__Q26CChara6CModelFf(float, void*);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
+extern "C" int IsModelLoaded__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, void*, int, int, int, void*, void*);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
@@ -53,10 +56,35 @@ extern "C" void pppDestroyAll__8CPartMngFv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
+extern "C" int GetPadType__7CJoybusFi(void*, int);
+extern "C" char GetGBAConnect__7CJoybusFi(void*, int);
+extern "C" void ClrCmakeInfo__8GbaQueueFi(void*, int);
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
+extern "C" int DAT_801dc118[];
+extern "C" int DAT_801dc140;
+extern float* DAT_8032e8b4;
+extern int DAT_8032e8b0;
+extern float* DAT_8032e8bc;
+extern int DAT_8032e8b8;
+extern float* DAT_8032e8c4;
+extern int DAT_8032e8c0;
+extern float* DAT_8032e8cc;
+extern int DAT_8032e8c8;
+extern int DAT_8032e8ac;
+extern int DAT_8032ef08;
+extern int DAT_80238028;
+extern unsigned char DAT_8032ee30;
+extern char cRam8032ee21;
 
 float FLOAT_8032ee18;
+int DAT_8032ee1c;
+unsigned char DAT_8032ee20;
+unsigned char uRam8032ee21;
+unsigned char DAT_8032ee24;
+unsigned char uRam8032ee25;
+int DAT_8032ee28;
+int DAT_8032ee2c;
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;
@@ -82,9 +110,74 @@ extern float FLOAT_80331748;
 extern float FLOAT_8033174c;
 extern float FLOAT_80331750;
 extern float FLOAT_80331754;
+extern float FLOAT_80331618;
+extern float FLOAT_80331410;
+extern float FLOAT_80331458;
+extern float FLOAT_803316d4;
+extern float FLOAT_80331760;
+extern float FLOAT_80331764;
+extern float FLOAT_803315b0;
+extern float FLOAT_80331440;
+extern float FLOAT_80331664;
+extern float FLOAT_80331434;
+extern float FLOAT_80331524;
+extern float FLOAT_80331704;
+extern float FLOAT_80331708;
+extern float FLOAT_8033170c;
+extern float FLOAT_80331710;
+extern float FLOAT_80331714;
+extern float FLOAT_80331718;
+extern float FLOAT_80331728;
+extern float FLOAT_8033172c;
+extern float FLOAT_80331668;
+extern float FLOAT_80331740;
+extern float FLOAT_80331744;
+extern float FLOAT_80331768;
+extern float FLOAT_80331414;
+extern float FLOAT_80331468;
+extern float FLOAT_80331490;
+extern float FLOAT_80331498;
+extern float FLOAT_803314d8;
+extern float FLOAT_803314dc;
+extern float FLOAT_803314e0;
+extern float FLOAT_803314e8;
+extern float FLOAT_803314f0;
+extern float FLOAT_803314f8;
+extern float FLOAT_803314fc;
+extern float FLOAT_80331500;
+extern float FLOAT_80331554;
+extern float FLOAT_80331568;
+extern float FLOAT_80331594;
+extern float FLOAT_803315b4;
+extern float FLOAT_80331778;
+extern float FLOAT_8033177c;
+extern float FLOAT_80331780;
+extern float FLOAT_803317b8;
+extern float FLOAT_803317bc;
+extern float FLOAT_803317c0;
+extern float FLOAT_803317c4;
+extern float FLOAT_803317c8;
+extern float FLOAT_803317cc;
+extern float FLOAT_803314a4;
+extern double DOUBLE_80331420;
+extern double DOUBLE_803314a8;
+extern double DOUBLE_803314d0;
+extern double DOUBLE_803314f0;
+extern double DOUBLE_80331490;
+extern double DOUBLE_80331538;
+extern double DOUBLE_80331540;
+extern double DOUBLE_803316e8;
+extern double DOUBLE_80331720;
+extern double DOUBLE_80331730;
+extern double DOUBLE_80331738;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
+extern double DOUBLE_803313f8;
+extern double DOUBLE_80331408;
+extern double DOUBLE_803314e8;
+extern unsigned char DAT_80331758;
+extern unsigned char DAT_8033175c;
 extern char s_stand_80331638[];
 extern char DAT_80331640[];
 extern char DAT_80331648[];
@@ -98,7 +191,9 @@ int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
 static const char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
+static const char s_ClrCMakeFlg___chan____d_cur____d_801dc390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
+static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
@@ -402,10 +497,10 @@ void CMenuPcs::InitFrame0Info()
 	reinterpret_cast<float*>(frame + 0x18)[0] = FLOAT_803313e8;
 	reinterpret_cast<unsigned int*>(frame + 0x1C)[0] = 0;
 
-	reinterpret_cast<unsigned short*>(frame + 0x20)[0] = reinterpret_cast<unsigned short*>(frame + 4)[0];
-	reinterpret_cast<unsigned short*>(frame + 0x22)[0] = reinterpret_cast<unsigned short*>(frame + 6)[0];
-	reinterpret_cast<unsigned short*>(frame + 0x24)[0] = reinterpret_cast<unsigned short*>(frame + 8)[0];
-	reinterpret_cast<unsigned short*>(frame + 0x26)[0] = reinterpret_cast<unsigned short*>(frame + 0xA)[0];
+	reinterpret_cast<short*>(frame + 0x20)[0] = *reinterpret_cast<short*>(frame + 4);
+	reinterpret_cast<short*>(frame + 0x22)[0] = *reinterpret_cast<short*>(frame + 6);
+	reinterpret_cast<short*>(frame + 0x24)[0] = *reinterpret_cast<short*>(frame + 8);
+	reinterpret_cast<short*>(frame + 0x26)[0] = *reinterpret_cast<short*>(frame + 0xA);
 	reinterpret_cast<unsigned int*>(frame + 0x28)[0] = reinterpret_cast<unsigned int*>(frame + 0xC)[0];
 	reinterpret_cast<unsigned int*>(frame + 0x2C)[0] = reinterpret_cast<unsigned int*>(frame + 0x10)[0];
 	reinterpret_cast<unsigned int*>(frame + 0x30)[0] = reinterpret_cast<unsigned int*>(frame + 0x14)[0];
@@ -545,9 +640,35 @@ void CMenuPcs::destroyWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	releaseRefCounted(reinterpret_cast<void**>(bytes + 0x11C));
-	releaseRefCounted(reinterpret_cast<void**>(bytes + 0x120));
-	releaseRefCounted(reinterpret_cast<void**>(bytes + 0xFC));
+	unsigned char* puVar5 = bytes + 0x10;
+	int iVar4 = 4;
+	do {
+		int** piVar2 = reinterpret_cast<int**>(puVar5 + 0x10C);
+		if (*piVar2 != 0) {
+			int* obj = *piVar2;
+			int refCount = obj[1] - 1;
+			obj[1] = refCount;
+			if (refCount == 0 && obj != 0) {
+				reinterpret_cast<void (*)(int*, int)>(reinterpret_cast<int**>(obj[0])[2])(obj, 1);
+			}
+			*reinterpret_cast<int*>(puVar5 + 0x10C) = 0;
+		}
+		iVar4 = iVar4 + 1;
+		puVar5 = puVar5 + 4;
+	} while (iVar4 < 6);
+
+	{
+		int** piVar2 = reinterpret_cast<int**>(bytes + 0xFC);
+		if (*piVar2 != 0) {
+			int* obj = *piVar2;
+			int refCount = obj[1] - 1;
+			obj[1] = refCount;
+			if (refCount == 0 && obj != 0) {
+				reinterpret_cast<void (*)(int*, int)>(reinterpret_cast<int**>(obj[0])[2])(obj, 1);
+			}
+			*reinterpret_cast<int*>(bytes + 0xFC) = 0;
+		}
+	}
 
 	if (reinterpret_cast<void**>(bytes + 0x81C)[0] != 0) {
 		__dl__FPv(reinterpret_cast<void**>(bytes + 0x81C)[0]);
@@ -556,8 +677,15 @@ void CMenuPcs::destroyWorld()
 
 	freeTexture(2, 3, 0x16, 0x2F);
 
-	if (reinterpret_cast<void**>(bytes + 0xBC)[0] != 0) {
-		releaseRefCounted(reinterpret_cast<void**>(bytes + 0xBC));
+	{
+		int** piVar2 = reinterpret_cast<int**>(bytes + 0xBC);
+		if (*piVar2 != 0) {
+			int* obj = *piVar2;
+			if (obj != 0) {
+				reinterpret_cast<void (*)(int*, int)>(reinterpret_cast<int**>(obj[0])[2])(obj, 1);
+			}
+			*reinterpret_cast<int*>(bytes + 0xBC) = 0;
+		}
 	}
 
 	if (reinterpret_cast<void**>(bytes + 0x814)[0] != 0) {
@@ -600,10 +728,14 @@ void CMenuPcs::destroyWorld()
 		__dl__FPv(reinterpret_cast<void**>(bytes + 0x83C)[0]);
 		reinterpret_cast<void**>(bytes + 0x83C)[0] = 0;
 	}
-	if (reinterpret_cast<void**>(bytes + 0x840)[0] != 0) {
-		unsigned char* const slotAlloc = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x840)[0]);
-		__dla__FPv(slotAlloc - 0x10);
-		reinterpret_cast<void**>(bytes + 0x840)[0] = 0;
+	{
+		int iVar = *reinterpret_cast<int*>(bytes + 0x840);
+		if (iVar != 0) {
+			if (iVar != 0) {
+				__dla__FPv(reinterpret_cast<void*>(iVar - 0x10));
+			}
+			reinterpret_cast<void**>(bytes + 0x840)[0] = 0;
+		}
 	}
 	if (reinterpret_cast<void**>(bytes + 0x848)[0] != 0) {
 		__dl__FPv(reinterpret_cast<void**>(bytes + 0x848)[0]);
@@ -615,8 +747,12 @@ void CMenuPcs::destroyWorld()
 		THPSimpleLoadStop();
 		THPSimpleClose();
 		THPSimpleQuit();
-		if (reinterpret_cast<void**>(bytes + 0x854)[0] != 0) {
-			Free__7CMemoryFPv(&Memory, reinterpret_cast<void**>(bytes + 0x854)[0]);
+		bool bVar1 = reinterpret_cast<void**>(bytes + 0x854)[0] != 0;
+		if (bVar1) {
+			if (bVar1) {
+				Free__7CMemoryFPv(&Memory, reinterpret_cast<void**>(bytes + 0x854)[0]);
+				reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
+			}
 			reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
 		}
 		bytes[0x858] = 0;
@@ -661,8 +797,8 @@ void CMenuPcs::calcWorld()
 
 	void* const handle = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x778)[0]);
 	void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(handle) + 0x168)[0]);
-	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x10)[0];
-	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 8)[0];
+	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
+	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
 	const short animState = reinterpret_cast<short*>(worldState + 0x10)[0];
 
 	if (animState == 1) {
@@ -884,54 +1020,698 @@ void CMenuPcs::CalcDiaryMenu()
 void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	unsigned char* const frameState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
 
-	if (worldState != 0 && frameState != 0) {
-		if (worldState[8] == 0) {
-			memset(bytes + 0x838, 0, 0x120);
-			worldState[0x0A] = 0;
-			worldState[8] = 1;
+	bool bVar1 = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		bVar1 = true;
+	}
+	unsigned short uVar3;
+	if (bVar1) {
+		uVar3 = 0;
+	} else {
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		uVar3 = Pad._8_2_;
+	}
+	unsigned short uVar6 = GetButtonRepeat(0);
+
+	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) == 0) {
+		mcCtrl.m_previousState = 0;
+		mcCtrl.m_state = 0;
+		mcCtrl.m_lastResult = 0;
+		mcCtrl.m_iteration = 0;
+		mcCtrl.m_userBuffer = 0;
+		mcCtrl.m_createFlag = 0;
+		if ((char)DAT_8032ee20 < 0 || 1 < (char)DAT_8032ee20) {
+			mcCtrl.m_cardChannel = 0;
+		} else {
+			mcCtrl.m_cardChannel = (int)DAT_8032ee20;
 		}
-
-		const short menuAnim = *reinterpret_cast<short*>(worldState + 0x10);
-		int offset = 0;
-		if (menuAnim == 0) {
-			offset = static_cast<int>(*reinterpret_cast<short*>(worldState + 0x22)) - 10;
-		} else if (menuAnim < 1 || menuAnim > 3) {
-			offset = -static_cast<int>(*reinterpret_cast<short*>(worldState + 0x22));
+		if ((char)uRam8032ee21 < 0 || 3 < (char)uRam8032ee21) {
+			mcCtrl.m_saveIndex = 0;
+		} else {
+			mcCtrl.m_saveIndex = (int)uRam8032ee21;
 		}
-
-		*reinterpret_cast<short*>(frameState + 4) = 0x10;
-		*reinterpret_cast<short*>(frameState + 0x20) =
-		    static_cast<short>(0x280 - (*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4)));
-
-		if (offset < 0) {
-			float shift = 0.0f;
-			if (offset > -11) {
-				int absOffset = offset < 0 ? -offset : offset;
-				if (absOffset > 10) {
-					absOffset = 10;
-				}
-				const float t = static_cast<float>(absOffset);
-				const float baseWidth =
-				    static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
-				shift = baseWidth * FLOAT_8033151c * t;
-				shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_80331698));
-			}
-
-			*reinterpret_cast<short*>(frameState + 4) =
-			    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 4)) - shift);
-			*reinterpret_cast<short*>(frameState + 0x20) =
-			    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 0x20)) + shift);
-		}
+		memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+		int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+		Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(iVar14 + 0x36);
+		Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(iVar14 + 0x38);
+		Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(iVar14 + 0x3A);
+		Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(iVar14 + 0x3C);
+		*reinterpret_cast<unsigned char*>(iVar14 + 10) = 0;
+		*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 1;
 	}
 
-	CalcMainMenuSub();
-	CalcMcObj();
-	CalcWMFrame();
-	CalcFukidashi();
-	CalcCharaBase();
+	int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+	short sVar7 = *reinterpret_cast<short*>(iVar14 + 0x10);
+	unsigned int uVar15;
+	if (sVar7 == 0) {
+		uVar15 = (int)*reinterpret_cast<short*>(iVar14 + 0x22) - 10;
+	} else if (sVar7 < 1 || sVar7 > 3) {
+		uVar15 = -(int)*reinterpret_cast<short*>(iVar14 + 0x22);
+	} else {
+		uVar15 = 0;
+	}
+
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) = 0x10;
+	int iVar12 = *reinterpret_cast<int*>(bytes + 0x820);
+	int frameSum = (int)*reinterpret_cast<short*>(iVar12 + 8) + (int)*reinterpret_cast<short*>(iVar12 + 4);
+	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
+	*reinterpret_cast<short*>(iVar12 + 0x20) = (short)iVar14;
+
+	if ((int)uVar15 < 0) {
+		double dVar22;
+		float baseWidth = (float)((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 8) + (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4));
+		if ((int)uVar15 > -11) {
+			unsigned int absOff;
+			if ((int)uVar15 < 0) {
+				absOff = -(int)uVar15;
+			} else {
+				absOff = uVar15;
+			}
+			if ((int)absOff < 0) absOff = 0;
+			if ((int)absOff > 10) absOff = 10;
+			double dVar23 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
+			dVar22 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
+			dVar22 = (double)(float)(dVar23 * (double)(float)dVar22);
+		} else {
+			dVar22 = (double)baseWidth;
+		}
+
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) - (float)dVar22);
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20) + (float)dVar22);
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20) = (short)iVar14;
+	}
+
+	float fVar2 = FLOAT_803313e8;
+	iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+	if (*reinterpret_cast<short*>(iVar14 + 0x10) != 2) {
+		return;
+	}
+
+	iVar12 = (int)*reinterpret_cast<short*>(iVar14 + 0x16);
+	switch (iVar12) {
+	case 0:
+	case 2:
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			*reinterpret_cast<short*>(iVar14 + 0x26) = (short)mcCtrl.m_cardChannel;
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(fVar2);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
+			iVar14 = 0;
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 0));
+			int* piVar18 = piVar4;
+			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
+				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
+				if (pcVar10 != 0) {
+					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
+			}
+			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
+			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
+			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
+			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar12;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar7;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar16;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+				if ((uVar6 & 3) == 0) {
+					if ((uVar3 & 0x100) == 0) {
+						if ((uVar3 & 0x200) != 0) {
+							*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+							Sound.PlaySe(3, 0x40, 0x7F, 0);
+						}
+					} else {
+						*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+						mcCtrl.m_cardChannel = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
+						if ((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) == (int)DAT_8032ee20) {
+							mcCtrl.m_saveIndex = (int)uRam8032ee21;
+						}
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+						Sound.PlaySe(2, 0x40, 0x7F, 0);
+					}
+				} else {
+					*reinterpret_cast<unsigned short*>(iVar14 + 0x26) = *reinterpret_cast<unsigned short*>(iVar14 + 0x26) ^ 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				}
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar7 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	case 3:
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		break;
+	case 4:
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
+			iVar14 = 0;
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 6));
+			int* piVar18 = piVar4;
+			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
+				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
+				if (pcVar10 != 0) {
+					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
+			}
+			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
+			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
+			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
+			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar12;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar7;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar16;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			mcCtrl.m_previousState = 0;
+			mcCtrl.m_state = 0;
+			mcCtrl.m_lastResult = 0;
+			mcCtrl.m_iteration = 0;
+			mcCtrl.m_userBuffer = 0;
+			mcCtrl.m_createFlag = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+		} else if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		           && *reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+			short chkResult = (short)mcCtrl.ChkEmpty(0);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = chkResult;
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar7 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	case 5:
+	case 6:
+	case 7:
+	case 9:
+	case 10:
+	case 0xE:
+	case 0xF:
+	case 0x14:
+	case 0x15:
+	case 0x1B:
+	case 0x1C: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			bVar1 = true;
+			int uVar20 = 0;
+			int uVar17;
+			if (iVar12 == 5) { uVar17 = 1; }
+			else if (iVar12 == 6) { uVar17 = 2; }
+			else if (iVar12 == 7) { uVar17 = 3; }
+			else if (iVar12 == 9) { uVar17 = 10; }
+			else if (iVar12 == 10) { uVar17 = 0xB; }
+			else if (iVar12 == 0xE) { uVar17 = 0xC; }
+			else if (iVar12 == 0xF) { uVar17 = 0xD; }
+			else if (iVar12 == 0x1C) { uVar20 = 1; uVar17 = 0x1B; }
+			else if (iVar12 == 0x1B) { uVar20 = 1; uVar17 = 0x1C; }
+			else if (iVar12 == 0x15) { bVar1 = false; uVar17 = 0xE; }
+			else { uVar17 = 0xF; }
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar20);
+			iVar14 = 0;
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar17));
+			int* piVar18 = piVar4;
+			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
+				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
+				if (pcVar10 != 0) {
+					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
+			}
+			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
+			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
+			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
+			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar12;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar7;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar16;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
+			if (bVar1) {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+			if (sVar7 == 0xE || sVar7 == 0x15) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) goto LAB_chk;
+			} else if (sVar7 == 5) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+			LAB_chk:
+				iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+				sVar7 = *reinterpret_cast<short*>(iVar14 + 0x16);
+				short sVar16;
+				if (sVar7 == 5) { sVar16 = -1; }
+				else if (sVar7 == 6) { sVar16 = -3; }
+				else if (sVar7 == 7) { sVar16 = -4; }
+				else { sVar16 = 0; }
+				if (sVar7 == 7) {
+					short chk = *reinterpret_cast<short*>(iVar14 + 0x2E);
+					if (chk != 0 && chk != sVar16 && chk != 1) {
+						*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+						break;
+					}
+				} else if (*reinterpret_cast<short*>(iVar14 + 0x2E) != sVar16 && *reinterpret_cast<short*>(iVar14 + 0x2E) != 1) {
+					*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+					break;
+				}
+			}
+			if ((uVar3 & 0x300) != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x15) {
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+				}
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar7 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 8:
+	case 0xB:
+	case 0x12:
+	case 0x19: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			int uVar20 = 0;
+			int uVar17;
+			if (iVar12 == 8) {
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 0;
+				uVar17 = 4;
+			} else if (iVar12 == 0xB) {
+				uVar17 = 5;
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+			} else if (iVar12 == 0x19) {
+				uVar20 = 1;
+				uVar17 = 0x19;
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+			} else {
+				uVar17 = 0x12;
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+			}
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar20);
+			iVar14 = 0;
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar17));
+			int* piVar18 = piVar4;
+			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
+				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
+				if (pcVar10 != 0) {
+					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
+			}
+			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
+			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
+			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
+			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar12;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar7;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar16;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+				if (*reinterpret_cast<short*>(iVar14 + 0x16) == 0x19) {
+					*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0x5A;
+					break;
+				}
+				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
+				iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0) {
+					if ((uVar6 & 3) == 0) {
+						if ((uVar3 & 0x100) == 0) {
+							if ((uVar3 & 0x200) != 0) {
+								*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+								*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
+								*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+								Sound.PlaySe(3, 0x40, 0x7F, 0);
+							}
+						} else {
+							if (*reinterpret_cast<short*>(iVar14 + 0x26) == 0) {
+								*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+							} else {
+								*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+							}
+							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+							Sound.PlaySe(2, 0x40, 0x7F, 0);
+						}
+					} else {
+						*reinterpret_cast<unsigned short*>(iVar14 + 0x26) = *reinterpret_cast<unsigned short*>(iVar14 + 0x26) ^ 1;
+						Sound.PlaySe(1, 0x40, 0x7F, 0);
+					}
+				} else {
+					*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				}
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) != 0) {
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x19) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) - 1;
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+			}
+		}
+		break;
+	}
+	case 0xC: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			*reinterpret_cast<unsigned char*>(iVar14 + 9) = 1;
+			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			mcCtrl.m_previousState = 0;
+			mcCtrl.m_state = 0;
+			mcCtrl.m_lastResult = 0;
+			mcCtrl.m_iteration = 0;
+			mcCtrl.m_userBuffer = 0;
+			mcCtrl.m_createFlag = 0;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+			short listRes = (short)mcCtrl.LoadMcList();
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = listRes;
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0) break;
+			if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8) {
+				int iVar21 = 0;
+				int cnt = 4;
+				int iVar13 = 0;
+				do {
+					if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x838) + iVar13 + 0x42) == 0
+					    && *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x838) + iVar13 + 8) > 0) {
+						iVar21++;
+					}
+					iVar13 += 0x48;
+					cnt--;
+				} while (cnt != 0);
+				if (iVar21 == 0) {
+					*reinterpret_cast<short*>(iVar14 + 0x2E) = (short)0xFC19;
+				}
+			}
+			if ((char)uRam8032ee21 < 0 || (int)DAT_8032ee20 != mcCtrl.m_cardChannel) {
+			LAB_saveIdx:
+				int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+				uVar15 = 0;
+				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(unk838 + 8) > 0) {
+					uVar15 = 1;
+					if (*reinterpret_cast<char*>(unk838 + 0x8A) == 0 && *reinterpret_cast<int*>(unk838 + 0x50) > 0) {
+						uVar15 = 2;
+						if (*reinterpret_cast<char*>(unk838 + 0xD2) == 0 && *reinterpret_cast<int*>(unk838 + 0x98) > 0) {
+							uVar15 = 3;
+							if (*reinterpret_cast<char*>(unk838 + 0x11A) == 0 && *reinterpret_cast<int*>(unk838 + 0xE0) > 0) {
+								uVar15 = 4;
+							} else {
+								mcCtrl.m_saveIndex = 3;
+							}
+						} else {
+							mcCtrl.m_saveIndex = 2;
+						}
+					} else {
+						mcCtrl.m_saveIndex = 1;
+					}
+				} else {
+					mcCtrl.m_saveIndex = 0;
+				}
+				if (3 < uVar15) {
+					mcCtrl.m_saveIndex = 0;
+				}
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)mcCtrl.m_saveIndex;
+			} else {
+				unsigned int uVar11 = mcCtrl.m_serialLo;
+				uVar15 = DAT_8032ee2c ^ mcCtrl.m_serialHi;
+				if (uVar15 != 0 || DAT_8032ee28 != (int)uVar11) goto LAB_saveIdx;
+				if (uVar15 == 0 && DAT_8032ee28 == (int)uVar11) {
+					mcCtrl.m_saveIndex = (int)uRam8032ee21;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)mcCtrl.m_saveIndex;
+				}
+			}
+			iVar12 = 0;
+			iVar14 = 0;
+			int iVar21 = 4;
+			do {
+				if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x838) + iVar14 + 0x42) != 0) {
+					mcCtrl.m_saveIndex = iVar12;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)iVar12;
+					break;
+				}
+				iVar14 += 0x48;
+				iVar12++;
+				iVar21--;
+			} while (iVar21 != 0);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar7 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 0xD:
+	case 0x13:
+	case 0x1A: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			int uVar20 = 0;
+			int uVar17;
+			if (iVar12 == 0xD) { uVar17 = 7; }
+			else if (iVar12 == 0x1A) { uVar17 = 0x1A; uVar20 = 1; }
+			else { uVar17 = 8; }
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar20);
+			iVar14 = 0;
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar17));
+			int* piVar18 = piVar4;
+			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
+				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
+				if (pcVar10 != 0) {
+					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
+			}
+			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
+			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
+			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
+			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar12;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar7;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar16;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			mcCtrl.m_previousState = 0;
+			mcCtrl.m_state = 0;
+			mcCtrl.m_lastResult = 0;
+			mcCtrl.m_iteration = 0;
+			mcCtrl.m_userBuffer = 0;
+			mcCtrl.m_createFlag = 0;
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 8
+			    && *reinterpret_cast<int*>(bytes + 0x88C) != 0) {
+				mcCtrl.m_userBuffer = reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x88C));
+			} else {
+				mcCtrl.m_userBuffer = 0;
+			}
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+		} else if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		           && *reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+			if (iVar12 == 0xD) {
+				mcCtrl.Format(1);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)mcCtrl.m_lastResult;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else if (iVar12 == 0x1A) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)mcCtrl.EraseDat();
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)mcCtrl.SaveDat();
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			}
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0) break;
+			if (*reinterpret_cast<short*>(iVar14 + 0x16) == 0x13) {
+				if (*reinterpret_cast<short*>(iVar14 + 0x1C) != 8) {
+					DAT_8032ee28 = mcCtrl.m_serialLo;
+					DAT_8032ee2c = mcCtrl.m_serialHi;
+					DAT_8032ee20 = (unsigned char)mcCtrl.m_cardChannel;
+					uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
+				}
+				int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+				*reinterpret_cast<int*>(unk838 + mcCtrl.m_saveIndex * 0x48 + 8) = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8);
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar7 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 0x11:
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+		if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0 && uVar6 != 0) {
+			if ((uVar6 & 8) == 0) {
+				if ((uVar6 & 4) != 0) {
+					if (*reinterpret_cast<short*>(iVar14 + 0x26) < 3) {
+						*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 0x26) + 1;
+					} else {
+						*reinterpret_cast<short*>(iVar14 + 0x26) = 0;
+					}
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				}
+			} else {
+				if (*reinterpret_cast<short*>(iVar14 + 0x26) < 1) {
+					*reinterpret_cast<short*>(iVar14 + 0x26) = 3;
+				} else {
+					*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 0x26) - 1;
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			}
+			if ((uVar6 & 0xC) == 0) {
+				if ((uVar3 & 0x100) != 0) {
+					sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE);
+					if (sVar7 != -1 && sVar7 != 1) {
+						mcCtrl.m_saveIndex = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+						Sound.PlaySe(2, 0x40, 0x7F, 0);
+					}
+				}
+				if ((uVar3 & 0x200) != 0) {
+					sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE);
+					if (sVar7 != -1 && sVar7 != 1) {
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
+						Sound.PlaySe(3, 0x40, 0x7F, 0);
+					}
+				}
+			}
+		}
+		break;
+	}
+
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
+		CalcMcObj();
+	}
 }
 
 /*
@@ -1031,78 +1811,800 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	unsigned char* const frameState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
 	bytes[0x86E] = 0;
 
-	if (worldState != 0 && frameState != 0) {
-		if (worldState[8] == 0) {
-			*reinterpret_cast<short*>(frameState + 4) = 0x10;
-			*reinterpret_cast<short*>(frameState + 6) = 0x10;
-			*reinterpret_cast<short*>(frameState + 8) = 0xE8;
-			*reinterpret_cast<short*>(frameState + 0x0A) = 0x168;
-			*reinterpret_cast<float*>(frameState + 0x0C) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(frameState + 0x10) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(frameState + 0x14) = FLOAT_803313e8;
-			*reinterpret_cast<float*>(frameState + 0x18) = FLOAT_803313e8;
-			*reinterpret_cast<unsigned int*>(frameState + 0x1C) = 0;
+	bool bVar1 = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		bVar1 = true;
+	}
+	unsigned short uVar4;
+	if (bVar1) {
+		uVar4 = 0;
+	} else {
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		uVar4 = Pad._8_2_;
+	}
+	unsigned short uVar7 = GetButtonRepeat(0);
 
-			*reinterpret_cast<unsigned short*>(frameState + 0x20) = *reinterpret_cast<unsigned short*>(frameState + 4);
-			*reinterpret_cast<unsigned short*>(frameState + 0x22) = *reinterpret_cast<unsigned short*>(frameState + 6);
-			*reinterpret_cast<unsigned short*>(frameState + 0x24) = *reinterpret_cast<unsigned short*>(frameState + 8);
-			*reinterpret_cast<unsigned short*>(frameState + 0x26) = *reinterpret_cast<unsigned short*>(frameState + 0x0A);
-			*reinterpret_cast<unsigned int*>(frameState + 0x28) = *reinterpret_cast<unsigned int*>(frameState + 0x0C);
-			*reinterpret_cast<unsigned int*>(frameState + 0x2C) = *reinterpret_cast<unsigned int*>(frameState + 0x10);
-			*reinterpret_cast<unsigned int*>(frameState + 0x30) = *reinterpret_cast<unsigned int*>(frameState + 0x14);
-			*reinterpret_cast<unsigned int*>(frameState + 0x34) = *reinterpret_cast<unsigned int*>(frameState + 0x18);
-			*reinterpret_cast<unsigned int*>(frameState + 0x38) = *reinterpret_cast<unsigned int*>(frameState + 0x1C);
-			*reinterpret_cast<short*>(frameState + 0x20) =
-			    static_cast<short>(0x280 - (*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4)));
-			*reinterpret_cast<unsigned int*>(frameState + 0x38) = 8;
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	if (*reinterpret_cast<char*>(worldState + 8) == 0) {
+		int frame = *reinterpret_cast<int*>(bytes + 0x820);
+		*reinterpret_cast<short*>(frame + 4) = 0x10;
+		float fVar5 = FLOAT_803313e8;
+		float fVar4 = FLOAT_803313dc;
+		*reinterpret_cast<short*>(frame + 6) = 0x10;
+		*reinterpret_cast<short*>(frame + 8) = 0xE8;
+		*reinterpret_cast<short*>(frame + 10) = 0x168;
+		*reinterpret_cast<float*>(frame + 0xC) = fVar4;
+		*reinterpret_cast<float*>(frame + 0x10) = fVar4;
+		*reinterpret_cast<float*>(frame + 0x14) = fVar5;
+		*reinterpret_cast<float*>(frame + 0x18) = fVar5;
+		*reinterpret_cast<int*>(frame + 0x1C) = 0;
+		int iVar14 = *reinterpret_cast<int*>(bytes + 0x820);
+		*reinterpret_cast<short*>(iVar14 + 0x20) = *reinterpret_cast<short*>(iVar14 + 4);
+		*reinterpret_cast<short*>(iVar14 + 0x22) = *reinterpret_cast<short*>(iVar14 + 6);
+		*reinterpret_cast<short*>(iVar14 + 0x24) = *reinterpret_cast<short*>(iVar14 + 8);
+		*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 10);
+		*reinterpret_cast<int*>(iVar14 + 0x28) = *reinterpret_cast<int*>(iVar14 + 0xC);
+		*reinterpret_cast<int*>(iVar14 + 0x2C) = *reinterpret_cast<int*>(iVar14 + 0x10);
+		*reinterpret_cast<int*>(iVar14 + 0x30) = *reinterpret_cast<int*>(iVar14 + 0x14);
+		*reinterpret_cast<int*>(iVar14 + 0x34) = *reinterpret_cast<int*>(iVar14 + 0x18);
+		*reinterpret_cast<int*>(iVar14 + 0x38) = *reinterpret_cast<int*>(iVar14 + 0x1C);
+		iVar14 = *reinterpret_cast<int*>(bytes + 0x820);
+		*reinterpret_cast<short*>(iVar14 + 0x20) = 0x280 - (*reinterpret_cast<short*>(iVar14 + 8) + *reinterpret_cast<short*>(iVar14 + 4));
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x38) = 8;
 
-			memset(bytes + 0x838, 0, 0x120);
-			worldState[0x0A] = 0;
-			worldState[8] = 1;
+		mcCtrl.m_previousState = 0;
+		mcCtrl.m_state = 0;
+		mcCtrl.m_lastResult = 0;
+		mcCtrl.m_iteration = 0;
+		mcCtrl.m_userBuffer = 0;
+		mcCtrl.m_createFlag = 0;
+		mcCtrl.m_cardChannel = 0;
+		mcCtrl.m_saveIndex = 0;
+		memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+
+		iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+		Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(iVar14 + 0x36);
+		Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(iVar14 + 0x38);
+		Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(iVar14 + 0x3A);
+		Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(iVar14 + 0x3C);
+		if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8 && bytes[0x889] != 0) {
+			mcCtrl.m_cardChannel = (int)bytes[0x889] - 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 3;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
 		}
-
-		const short menuAnim = *reinterpret_cast<short*>(worldState + 0x10);
-		int offset = 0;
-		if (menuAnim == 0) {
-			offset = static_cast<int>(*reinterpret_cast<short*>(worldState + 0x22)) - 10;
-		} else if (menuAnim < 1 || menuAnim > 3) {
-			offset = -static_cast<int>(*reinterpret_cast<short*>(worldState + 0x22));
-		}
-
-		*reinterpret_cast<short*>(frameState + 4) = 0x10;
-		*reinterpret_cast<short*>(frameState + 0x20) =
-		    static_cast<short>(0x280 - (*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4)));
-
-		if (offset < 0) {
-			float shift = 0.0f;
-			if (offset > -11) {
-				int absOffset = offset < 0 ? -offset : offset;
-				if (absOffset > 10) {
-					absOffset = 10;
-				}
-				const float t = static_cast<float>(absOffset);
-				const float baseWidth =
-				    static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
-				shift = baseWidth * FLOAT_8033151c * t;
-				shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_80331698));
-			}
-
-			*reinterpret_cast<short*>(frameState + 4) =
-			    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 4)) - shift);
-			*reinterpret_cast<short*>(frameState + 0x20) =
-			    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 0x20)) + shift);
-		}
+		*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
+		*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 1;
 	}
 
-	CalcMainMenuSub();
-	CalcMcObj();
-	CalcWMFrame();
-	CalcFukidashi();
-	CalcCharaBase();
+	int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+	short sVar8 = *reinterpret_cast<short*>(iVar14 + 0x10);
+	unsigned int uVar15;
+	if (sVar8 == 0) {
+		uVar15 = (int)*reinterpret_cast<short*>(iVar14 + 0x22) - 10;
+	} else if (sVar8 < 1 || sVar8 > 3) {
+		uVar15 = -(int)*reinterpret_cast<short*>(iVar14 + 0x22);
+	} else {
+		uVar15 = 0;
+	}
+
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) = 0x10;
+	int iVar10 = *reinterpret_cast<int*>(bytes + 0x820);
+	int frameSum = (int)*reinterpret_cast<short*>(iVar10 + 8) + (int)*reinterpret_cast<short*>(iVar10 + 4);
+	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
+	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
+
+	if ((int)uVar15 < 0) {
+		double dVar26;
+		float baseWidth = (float)((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 8) + (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4));
+		if ((int)uVar15 > -11) {
+			unsigned int absOff;
+			if ((int)uVar15 < 0) {
+				absOff = -(int)uVar15;
+			} else {
+				absOff = uVar15;
+			}
+			if ((int)absOff < 0) absOff = 0;
+			if ((int)absOff > 10) absOff = 10;
+			double dVar27 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
+			dVar26 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
+			dVar26 = (double)(float)(dVar27 * (double)(float)dVar26);
+		} else {
+			dVar26 = (double)baseWidth;
+		}
+
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) - (float)dVar26);
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20) + (float)dVar26);
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20) = (short)iVar14;
+	}
+
+	float fVar2 = FLOAT_803313e8;
+	iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+	if (*reinterpret_cast<short*>(iVar14 + 0x10) != 2) {
+		return;
+	}
+
+	iVar10 = (int)*reinterpret_cast<short*>(iVar14 + 0x16);
+	switch (iVar10) {
+	case 0:
+	case 2:
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			*reinterpret_cast<short*>(iVar14 + 0x26) = (short)mcCtrl.m_cardChannel;
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(fVar2);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 0));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
+			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
+			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
+			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar10;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar18;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+				if ((uVar7 & 3) == 0) {
+					if ((uVar4 & 0x100) == 0) {
+						if ((uVar4 & 0x200) != 0) {
+							*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+							Sound.PlaySe(3, 0x40, 0x7F, 0);
+						}
+					} else {
+						*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+						mcCtrl.m_cardChannel = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+						Sound.PlaySe(2, 0x40, 0x7F, 0);
+					}
+				} else {
+					*reinterpret_cast<unsigned short*>(iVar14 + 0x26) = *reinterpret_cast<unsigned short*>(iVar14 + 0x26) ^ 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				}
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar8 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	case 3:
+		MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		break;
+	case 4:
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 6));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
+			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
+			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
+			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar10;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar18;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			mcCtrl.m_previousState = 0;
+			mcCtrl.m_state = 0;
+			mcCtrl.m_lastResult = 0;
+			mcCtrl.m_iteration = 0;
+			mcCtrl.m_userBuffer = 0;
+			mcCtrl.m_createFlag = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+		} else if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		           && *reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+			short chkResult = (short)mcCtrl.ChkEmpty(1);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = chkResult;
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar8 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	case 5:
+	case 6:
+	case 7:
+	case 10:
+	case 0xE:
+	case 0xF:
+	case 0x10:
+	case 0x17:
+	case 0x18:
+	case 0x1B:
+	case 0x1C: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			bVar1 = true;
+			int uVar22 = 0;
+			int uVar19;
+			if (iVar10 == 5) { uVar19 = 1; }
+			else if (iVar10 == 6) { uVar19 = 2; }
+			else if (iVar10 == 7) { uVar19 = 3; }
+			else if (iVar10 == 10) { uVar19 = 0xB; }
+			else if (iVar10 == 0xE) { uVar19 = 0xC; }
+			else if (iVar10 == 0xF) { uVar19 = 0xD; }
+			else if (iVar10 == 0x1C) { uVar19 = 0x1B; uVar22 = 1; }
+			else if (iVar10 == 0x1B) { uVar19 = 0x1C; uVar22 = 1; }
+			else if (iVar10 == 0x18) { bVar1 = false; uVar19 = 0x10; }
+			else if (iVar10 == 0x17) { uVar19 = 0x11; }
+			else { uVar19 = 0x13; }
+			if (bVar1) {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			}
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar22);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar19));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
+			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
+			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
+			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar10;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar18;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+			if (sVar8 == 0xE || sVar8 == 5) {
+				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+					iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+					sVar8 = *reinterpret_cast<short*>(iVar14 + 0x16);
+					short sVar18;
+					if (sVar8 == 5) { sVar18 = -1; }
+					else if (sVar8 == 6) { sVar18 = -3; }
+					else if (sVar8 == 7) { sVar18 = -4; }
+					else { sVar18 = 0; }
+					if (sVar8 == 7) {
+						short chk = *reinterpret_cast<short*>(iVar14 + 0x2E);
+						if (chk != 0 && chk != sVar18 && chk != 1) {
+							*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+							break;
+						}
+					} else if (*reinterpret_cast<short*>(iVar14 + 0x2E) != sVar18 && *reinterpret_cast<short*>(iVar14 + 0x2E) != 1) {
+						*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+						break;
+					}
+				}
+			}
+			if ((uVar4 & 0x300) != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar8 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 8:
+	case 0xB:
+	case 0x19: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			int uVar22 = 0;
+			int uVar19;
+			if (iVar10 == 8) {
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 0;
+				uVar19 = 4;
+			} else if (iVar10 == 0x19) {
+				uVar22 = 1;
+				uVar19 = 0x19;
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+			} else {
+				uVar19 = 5;
+				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+			}
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar22);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar19));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
+			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
+			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
+			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar10;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar18;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+				if (*reinterpret_cast<short*>(iVar14 + 0x16) == 0x19) {
+					*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0x5A;
+					break;
+				}
+				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
+				iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0) {
+					if ((uVar7 & 3) == 0) {
+						if ((uVar4 & 0x100) == 0) {
+							if ((uVar4 & 0x200) != 0) {
+								*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+								*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
+								*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+								Sound.PlaySe(3, 0x40, 0x7F, 0);
+							}
+						} else {
+							if (*reinterpret_cast<short*>(iVar14 + 0x26) == 0) {
+								*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+							} else {
+								*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+							}
+							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+							Sound.PlaySe(2, 0x40, 0x7F, 0);
+						}
+					} else {
+						*reinterpret_cast<unsigned short*>(iVar14 + 0x26) = *reinterpret_cast<unsigned short*>(iVar14 + 0x26) ^ 1;
+						Sound.PlaySe(1, 0x40, 0x7F, 0);
+					}
+				} else {
+					*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				}
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) != 0) {
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x19) {
+				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) - 1;
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+			}
+		}
+		break;
+	}
+	case 0xC: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			*reinterpret_cast<unsigned char*>(iVar14 + 9) = 1;
+			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			mcCtrl.m_previousState = 0;
+			mcCtrl.m_state = 0;
+			mcCtrl.m_lastResult = 0;
+			mcCtrl.m_iteration = 0;
+			mcCtrl.m_userBuffer = 0;
+			mcCtrl.m_createFlag = 0;
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+			short listRes = (short)mcCtrl.LoadMcList();
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = listRes;
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x2E) != 0) {
+				if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8) {
+					int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+					int iVar23 = 0;
+					int cnt = 4;
+					int off = 0;
+					do {
+						if (*reinterpret_cast<char*>(unk838 + off + 0x42) == 0
+						    && *reinterpret_cast<int*>(unk838 + off + 8) > 0) {
+							iVar23++;
+						}
+						off += 0x48;
+						cnt--;
+					} while (cnt != 0);
+					if (iVar23 == 0) {
+						*reinterpret_cast<short*>(iVar14 + 0x2E) = (short)0xFC19;
+					}
+				}
+				int calTimes[40];
+				int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+				iVar10 = 0;
+				iVar14 = 0;
+				int* piVar20 = calTimes;
+				do {
+					int* pSrc = reinterpret_cast<int*>(unk838 + iVar14);
+					OSTicksToCalendarTime(*reinterpret_cast<long long*>(pSrc), reinterpret_cast<OSCalendarTime*>(piVar20));
+					iVar10++;
+					piVar20 += 10;
+					iVar14 += 0x48;
+				} while (iVar10 < 4);
+
+				int iVar23 = 0;
+				iVar10 = 0;
+				int cnt2 = 4;
+				int bestIdx = -1;
+				int* piVar5 = calTimes;
+				do {
+					int iVar17 = bestIdx;
+					if (*reinterpret_cast<char*>(unk838 + iVar10 + 0x42) == 0
+					    && *reinterpret_cast<int*>(unk838 + iVar10 + 8) > 0) {
+						iVar17 = iVar23;
+						if (bestIdx >= 0) {
+							iVar17 = bestIdx;
+							if (calTimes[bestIdx * 10 + 5] <= piVar5[5]
+							    && (calTimes[bestIdx * 10 + 5] < piVar5[5]
+							        || (calTimes[bestIdx * 10 + 7] <= piVar5[7]
+							            && (calTimes[bestIdx * 10 + 7] < piVar5[7]
+							                || (calTimes[bestIdx * 10 + 2] <= piVar5[2]
+							                    && (calTimes[bestIdx * 10 + 2] < piVar5[2]
+							                        || (calTimes[bestIdx * 10 + 1] <= piVar5[1]
+							                            && (calTimes[bestIdx * 10 + 1] < piVar5[1]
+							                                || (calTimes[bestIdx * 10] <= *piVar5
+							                                    && (calTimes[bestIdx * 10] < *piVar5
+							                                        || (calTimes[bestIdx * 10 + 8] <= piVar5[8]
+							                                            && (calTimes[bestIdx * 10 + 8] < piVar5[8]
+							                                                || calTimes[bestIdx * 10 + 9] < piVar5[9])))))))))))) {
+								iVar17 = iVar23;
+							}
+						}
+					}
+					iVar10 += 0x48;
+					piVar5 += 10;
+					iVar23++;
+					cnt2--;
+					bestIdx = iVar17;
+				} while (cnt2 != 0);
+				if (bestIdx < 0) bestIdx = 0;
+
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)bestIdx;
+				iVar10 = 0;
+				iVar14 = 0;
+				int cnt3 = 4;
+				do {
+					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
+						mcCtrl.m_saveIndex = iVar10;
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)iVar10;
+						break;
+					}
+					iVar14 += 0x48;
+					iVar10++;
+					cnt3--;
+				} while (cnt3 != 0);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar8 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 0xD:
+	case 0x16:
+	case 0x1A: {
+		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+			int uVar22 = 0;
+			int uVar19;
+			if (iVar10 == 0xD) { uVar19 = 7; }
+			else if (iVar10 == 0x1A) { uVar19 = 0x1A; uVar22 = 1; }
+			else { uVar19 = 9; }
+			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar22);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar19));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar14 < iVar25) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
+			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
+			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
+			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
+			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
+			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)iVar14;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)iVar10;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = sVar8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = sVar18;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
+			mcCtrl.m_previousState = 0;
+			mcCtrl.m_state = 0;
+			mcCtrl.m_lastResult = 0;
+			mcCtrl.m_iteration = 0;
+			mcCtrl.m_userBuffer = 0;
+			mcCtrl.m_createFlag = 0;
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 8
+			    && *reinterpret_cast<int*>(bytes + 0x88C) != 0) {
+				mcCtrl.m_userBuffer = reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x88C));
+			} else {
+				mcCtrl.m_userBuffer = 0;
+			}
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+		} else if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1
+		           && *reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+			iVar10 = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+			if (iVar10 == 0xD) {
+				mcCtrl.Format(1);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)mcCtrl.m_lastResult;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else if (iVar10 == 0x1A) {
+				short erRes = (short)mcCtrl.EraseDat();
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = erRes;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else {
+				short ldRes = (short)mcCtrl.LoadDat();
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = ldRes;
+			}
+
+			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(iVar14 + 0x2E) != 0) {
+				if (*reinterpret_cast<short*>(iVar14 + 0x16) == 0x16) {
+					if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8 || *reinterpret_cast<short*>(iVar14 + 0x2E) != 1) {
+						DAT_8032ee24 = (unsigned char)mcCtrl.m_cardChannel;
+						uRam8032ee25 = (unsigned char)mcCtrl.m_saveIndex;
+					} else {
+						DAT_8032ee28 = mcCtrl.m_serialLo;
+						DAT_8032ee2c = mcCtrl.m_serialHi;
+						DAT_8032ee20 = (unsigned char)mcCtrl.m_cardChannel;
+						uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
+					}
+					iVar10 = 0;
+					int iVar25 = *reinterpret_cast<int*>(bytes + 0x814) + 0x7930;
+					int iVar23 = 0;
+					iVar14 = 0;
+					int pOff = 0;
+					do {
+						int iVar17 = *reinterpret_cast<int*>(bytes + 0x824) + iVar10;
+						if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 8
+						    && *reinterpret_cast<int*>(bytes + 0x88C) != 0) {
+							int iVar6 = *reinterpret_cast<int*>(bytes + 0x88C) + iVar23 + 0x14D0;
+							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
+								*reinterpret_cast<int*>(iVar17 + 8) = -1;
+							} else {
+								unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
+								unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
+								unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
+								int cost = uVar15b * 200 + 100;
+								if (uVar11 != 0) cost = uVar15b * 200 + 200;
+								*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+							}
+						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) == 0) {
+							*reinterpret_cast<int*>(iVar17 + 8) = -1;
+						} else {
+							unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
+							unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
+							unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
+							int cost = uVar15b * 200 + 100;
+							if (uVar11 != 0) cost = uVar15b * 200 + 200;
+							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+						}
+						iVar17 = *reinterpret_cast<int*>(bytes + 0x824) + iVar10;
+						int charaId = *reinterpret_cast<int*>(iVar17 + 8);
+						int uVar22;
+						if (charaId < 0) {
+							uVar22 = 3;
+							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 0;
+							charaId = 0x43;
+						} else {
+							uVar22 = 0;
+							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 1;
+						}
+						LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+						    *reinterpret_cast<void**>(bytes + 0x7F4 + pOff), uVar22, charaId, 0);
+						iVar14++;
+						iVar23 += 0x9C0;
+						iVar25 += 0xC30;
+						pOff += 4;
+						iVar10 += 0x34;
+					} while (iVar14 < 8);
+					if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) != 8) {
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x36) = (short)Game.m_gameWork.m_wmBackupParams[0];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3E) = (short)Game.m_gameWork.m_wmBackupParams[0];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x38) = (short)Game.m_gameWork.m_wmBackupParams[1];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x40) = (short)Game.m_gameWork.m_wmBackupParams[1];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3A) = (short)Game.m_gameWork.m_wmBackupParams[2];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x42) = (short)Game.m_gameWork.m_wmBackupParams[2];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3C) = (short)Game.m_gameWork.m_wmBackupParams[3];
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x44) = (short)Game.m_gameWork.m_wmBackupParams[3];
+					}
+				}
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+			}
+		}
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 1) {
+			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			if (sVar8 != 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 0x11: {
+		int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
+		iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
+		if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0 && uVar7 != 0) {
+			if ((uVar7 & 8) == 0) {
+				if ((uVar7 & 4) != 0) {
+					if (*reinterpret_cast<short*>(iVar14 + 0x26) < 3) {
+						*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 0x26) + 1;
+					} else {
+						*reinterpret_cast<short*>(iVar14 + 0x26) = 0;
+					}
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				}
+			} else {
+				if (*reinterpret_cast<short*>(iVar14 + 0x26) < 1) {
+					*reinterpret_cast<short*>(iVar14 + 0x26) = 3;
+				} else {
+					*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 0x26) - 1;
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			}
+			if ((uVar7 & 0xC) == 0) {
+				if ((uVar4 & 0x100) != 0) {
+					sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE);
+					if (sVar8 != -1 && sVar8 != 1) {
+						int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+						iVar14 = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
+						if (*reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x41) == 0
+						    || *reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x42) != 0) {
+							Sound.PlaySe(4, 0x40, 0x7F, 0);
+						} else {
+							mcCtrl.m_saveIndex = iVar14;
+							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
+							Sound.PlaySe(2, 0x40, 0x7F, 0);
+						}
+					}
+				}
+				if ((uVar4 & 0x200) != 0) {
+					sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE);
+					if (sVar8 != -1 && sVar8 != 1) {
+						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
+						Sound.PlaySe(3, 0x40, 0x7F, 0);
+					}
+				}
+			}
+		}
+		break;
+	}
+	}
+
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
+		CalcMcObj();
+	}
 }
 
 /*
@@ -1446,11 +2948,333 @@ void CMenuPcs::DrawDiaryMenu()
  */
 void CMenuPcs::DrawMCardMenu()
 {
-	DrawMainMenuSub();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	Mtx m_cameraMatrix;
+	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	short state = *reinterpret_cast<short*>(worldState + 0x10);
+
+	if (state > 0 && state < 4) {
+		float alpha;
+		if (state == 1) {
+			alpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+		} else if (state == 2) {
+			alpha = FLOAT_803313e8;
+		} else {
+			alpha = FLOAT_803313e8 - (float)*reinterpret_cast<short*>(worldState + 0x22);
+		}
+		if (alpha > FLOAT_803314f0) {
+			SetAttrFmt((FMT)0);
+			unsigned int bgColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
+			bgColor = bgColor | 0xFFFFFF00;
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&bgColor);
+			SetTexture((TEX)0x1F);
+			DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
+			         FLOAT_803313e0, FLOAT_80331440,
+			         FLOAT_803313dc, FLOAT_803313dc,
+			         FLOAT_803313e8, FLOAT_803313e8, 0);
+		}
+	}
+
 	DrawMCList();
-	DrawMcWin(0, 0);
-	DrawWMFrame();
-	DrawPageMark();
+
+	worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	state = *reinterpret_cast<short*>(worldState + 0x10);
+	if (state == 2 && *reinterpret_cast<short*>(worldState + 0x16) > 0x10) {
+		unsigned int saveIdx;
+		if (*reinterpret_cast<short*>(worldState + 0x16) == 0x11) {
+			saveIdx = (unsigned int)*reinterpret_cast<short*>(worldState + 0x26);
+		} else {
+			saveIdx = (unsigned int)mcCtrl.m_saveIndex;
+		}
+		SetAttrFmt((FMT)0);
+		unsigned int cursorColor = 0xFFFFFFFF;
+		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
+		SetTexture((TEX)0);
+		DrawRect(0xFFFFFFFF, FLOAT_803314d8, (float)(FLOAT_803314d8 + FLOAT_80331410 + (float)(saveIdx * 0x28)),
+		         FLOAT_80331410, FLOAT_80331410,
+		         FLOAT_803313dc, FLOAT_803313dc,
+		         FLOAT_803313e8, FLOAT_803313e8, 0);
+
+		// 3D character viewports (4 slots)
+		for (int i = 0; i < 4; i++) {
+			int viewOff = *reinterpret_cast<int*>(bytes + 0x814) + (i * 0x50 + 0x550);
+			int* piVar12 = reinterpret_cast<int*>(viewOff);
+			if (*piVar12 != 0) {
+				Mtx44 projMtx;
+				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+				GXSetProjection(projMtx, GX_PERSPECTIVE);
+
+				Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
+				Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+				Mtx lookAtMtx;
+				C_MTXLookAt(lookAtMtx, (Vec*)(piVar12 + 4), &up, &target);
+				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+				InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+				GXSetColorUpdate(0);
+				GXSetAlphaUpdate(0);
+				unsigned int clearColor = 0;
+				GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+				GXSetColorUpdate(1);
+				GXSetAlphaUpdate(1);
+				GXSetViewport(
+					(float)*reinterpret_cast<short*>(piVar12 + 2),
+					(float)*reinterpret_cast<short*>((int)(piVar12 + 2) + 2),
+					(float)*reinterpret_cast<short*>(piVar12 + 3),
+					(float)*reinterpret_cast<short*>((int)(piVar12 + 3) + 2),
+					FLOAT_803313dc, FLOAT_803313e8);
+				GXSetScissor(piVar12[0x10], piVar12[0x11], piVar12[0x12], piVar12[0x13]);
+				SetFog__8CGraphicFii(&Graphic, 1, 0);
+				unsigned int ambColor = DAT_80210830[0];
+				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
+				SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+				for (int j = 0; j < DAT_8021082c[0]; j++) {
+					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
+				}
+				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+			}
+		}
+		DrawInit__8CMenuPcsFv(this);
+		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		SetViewport__8CGraphicFv(&Graphic);
+		GXSetScissor(0, 0, 0x280, 0x1C0);
+		DrawInit__8CMenuPcsFv(this);
+	}
+
+	// State machine for MC operations
+	worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	state = *reinterpret_cast<short*>(worldState + 0x10);
+	short subState = *reinterpret_cast<short*>(worldState + 0x16);
+	if (state == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
+		short winState;
+		switch ((int)subState) {
+		case 0:
+		case 2:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(0, 0);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x1E) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+					*reinterpret_cast<short*>(bytes + 0x870) = 1;
+				} else if (subState == 2) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 1;
+				}
+			}
+			break;
+		case 1:
+			if (*reinterpret_cast<short*>(worldState + 0x22) > 0x12) {
+				*reinterpret_cast<short*>(worldState + 0x16) = 3;
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) + 1;
+			break;
+		case 3:
+			if (*reinterpret_cast<short*>(worldState + 0x2E) != 1) {
+				memset(*reinterpret_cast<void**>(bytes + 0x838), 0, 0x120);
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short mcResult = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (mcResult == -1) *reinterpret_cast<short*>(worldState + 0x16) = 5;
+				else if (mcResult == -2) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (mcResult == -3) *reinterpret_cast<short*>(worldState + 0x16) = 6;
+				else if (mcResult == -4) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+				else if (mcResult == 0) *reinterpret_cast<short*>(worldState + 0x16) = 4;
+			}
+			break;
+		case 4:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(6, 0);
+			} else if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short mcRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (mcRes == -3) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (mcRes == -4) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (mcRes == -5) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+				else if (mcRes == -6) *reinterpret_cast<short*>(worldState + 0x16) = 0x10;
+				else *reinterpret_cast<short*>(worldState + 0x16) = 10;
+			}
+			break;
+		case 5:
+		case 6:
+		case 7:
+		case 10:
+		case 0x0E:
+		case 0x0F:
+		case 0x10:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(0, 0);
+			if (winState == 1) {
+				int msgId = 0;
+				int msgParam = 0;
+				short ss = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+				if (ss == 5) msgId = 1;
+				else if (ss == 6) msgId = 2;
+				else if (ss == 7) msgId = 3;
+				else if (ss == 10) msgId = 0xB;
+				else if (ss == 0x0E) msgId = 0xC;
+				else if (ss == 0x0F) msgId = 0xD;
+				else if (ss == 0x13) msgId = 0x14;
+				else if (ss == 0x14) msgId = 0x15;
+				else if (ss == 0x15) msgId = 0x16;
+				else msgId = 0x13;
+				DrawMcWinMess(msgId, msgParam);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+				}
+			}
+			break;
+		case 8:
+		case 0x0B:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(0, 0);
+			if (winState == 1) {
+				int ymsgId = (subState == 8) ? 4 : 5;
+				DrawMcWinMess(ymsgId, 0);
+				SetAttrFmt((FMT)0);
+				unsigned int ynColor = 0xFFFFFFFF;
+				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&ynColor);
+				SetTexture((TEX)0);
+				DrawRect(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_80331410, FLOAT_80331410,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, 0);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short ynRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (ynRes < 0) {
+					if (ynRes == -1) *reinterpret_cast<short*>(worldState + 0x16) = 5;
+					else if (ynRes == -2) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+					else if (ynRes == -3) *reinterpret_cast<short*>(worldState + 0x16) = 6;
+					else *reinterpret_cast<short*>(worldState + 0x16) = 7;
+				} else if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+				} else if (subState == 8) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x0B;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x0D;
+				}
+			}
+			break;
+		case 0x0C:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(0, 0);
+			if (winState == 1) {
+				DrawMcWinMess(6, 0);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short cRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (cRes == -1) *reinterpret_cast<short*>(worldState + 0x16) = 10;
+				else if (cRes == -2) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (cRes == -3) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (cRes == -4) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+				else if (cRes == -999) {
+					*reinterpret_cast<short*>(worldState + 0x1E) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+					*reinterpret_cast<short*>(bytes + 0x870) = 2;
+				} else {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 0x11;
+				}
+			}
+			break;
+		case 0x0D:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(0, 0);
+			if (winState == 1) {
+				DrawMcWinMess(7, 0);
+			} else if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short dRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (dRes == 1) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x0E;
+				} else if (dRes == -2) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 7;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x0F;
+				}
+			}
+			break;
+		case 0x11:
+			if (*reinterpret_cast<short*>(worldState + 0x2E) < 0) {
+				*reinterpret_cast<short*>(worldState + 0x16) = 3;
+			} else if (*reinterpret_cast<short*>(worldState + 0x0E) != 0) {
+				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x12;
+				}
+			}
+			break;
+		case 0x12:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(0, 0);
+			if (winState == 1) {
+				DrawMcWinMess(9, 0);
+			} else if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short eRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (eRes == 1) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x13;
+					Sound.PlaySe(0x42, 0x40, 0x7F, 0);
+				} else if (eRes == -4) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 7;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x14;
+				}
+			}
+			break;
+		}
+		if ((int)subState != (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16)) {
+			*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) = 0;
+		}
+	} else if (state == 2 && *reinterpret_cast<short*>(worldState + 0x18) != 0) {
+		*reinterpret_cast<short*>(worldState + 0x18) = *reinterpret_cast<short*>(worldState + 0x18) - 1;
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		if (*reinterpret_cast<short*>(worldState + 0x18) < 1) {
+			*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+			Sound.PlaySe(0x31 - ((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) >> 0x1F), 0x40, 0x7F, 0);
+		}
+	} else {
+		*reinterpret_cast<short*>(worldState + 0x22) = *reinterpret_cast<short*>(worldState + 0x22) + 1;
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		short threshold = 10;
+		if (*reinterpret_cast<short*>(worldState + 0x10) == 3 && *reinterpret_cast<short*>(worldState + 0x16) != 0) {
+			threshold = 0x13;
+		}
+		if (*reinterpret_cast<short*>(worldState + 0x22) >= threshold) {
+			*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(worldState + 0x10) > 4) {
+				if (*reinterpret_cast<short*>(worldState + 0x1C) != 8) {
+					*reinterpret_cast<short*>(worldState + 0x20) = *reinterpret_cast<short*>(worldState + 0x1E);
+				}
+				bytes[0x86E] = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) = 0;
+			}
+		}
+	}
 }
 
 /*
@@ -1507,12 +3331,372 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
-	DrawMainMenuSub();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	Mtx m_cameraMatrix;
+	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	if (*reinterpret_cast<char*>(worldState + 8) == 0) {
+		return;
+	}
+
+	short state = *reinterpret_cast<short*>(worldState + 0x10);
+	float alpha = FLOAT_803313e8;
+	if (state > 0 && state < 4) {
+		if (state == 1) {
+			alpha = (float)(*reinterpret_cast<short*>(worldState + 0x22));
+		} else if (state == 3) {
+			alpha = FLOAT_803313e8 - (float)(*reinterpret_cast<short*>(worldState + 0x22));
+		}
+		if (alpha > FLOAT_803314f0) {
+			SetAttrFmt((FMT)0);
+			unsigned int bgColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
+			bgColor = bgColor | 0xFFFFFF00;
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&bgColor);
+			SetTexture((TEX)0x1F);
+			DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
+			         FLOAT_803313e0, FLOAT_80331440,
+			         FLOAT_803313dc, FLOAT_803313dc,
+			         FLOAT_803313e8, FLOAT_803313e8, 0);
+		}
+	}
+	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
+	if (alpha > FLOAT_803313e8) alpha = FLOAT_803313e8;
+
+	unsigned int uAlpha = (unsigned int)(FLOAT_80331458 * alpha);
+	if (uAlpha > 0xFF) uAlpha = 0xFF;
+
+	// Header text
+	if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {
+		// DrawFont2 call omitted - extern not available
+	}
+
 	DrawMCList();
-	DrawMcWin(-1, 0);
-	DrawWMFrame();
-	DrawPageMark();
-	DrawCharaBase();
+
+	// Cursor / selection rendering
+	worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	state = *reinterpret_cast<short*>(worldState + 0x10);
+	if (state == 2 && *reinterpret_cast<short*>(worldState + 0x16) > 0x10) {
+		unsigned int saveIdx;
+		if (*reinterpret_cast<short*>(worldState + 0x16) == 0x11) {
+			saveIdx = (unsigned int)*reinterpret_cast<short*>(worldState + 0x26);
+		} else {
+			saveIdx = (unsigned int)mcCtrl.m_saveIndex;
+		}
+		SetAttrFmt((FMT)0);
+		unsigned int cursorColor = 0xFFFFFFFF;
+		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
+		SetTexture((TEX)0);
+		DrawRect(0xFFFFFFFF, FLOAT_803314d8, (float)(FLOAT_803314d8 + FLOAT_80331410 + (float)(saveIdx * 0x28)),
+		         FLOAT_80331410, FLOAT_80331410,
+		         FLOAT_803313dc, FLOAT_803313dc,
+		         FLOAT_803313e8, FLOAT_803313e8, 0);
+
+		// 3D character model viewports
+		for (int i = 0; i < 4; i++) {
+			int viewOff = *reinterpret_cast<int*>(bytes + 0x814) + (i * 0x50 + 0x550);
+			int* piVar13 = reinterpret_cast<int*>(viewOff);
+			if (*piVar13 != 0) {
+				Mtx44 projMtx;
+				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+				GXSetProjection(projMtx, GX_PERSPECTIVE);
+
+				Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
+				Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+				Mtx lookAtMtx;
+				C_MTXLookAt(lookAtMtx, (Vec*)(piVar13 + 4), &up, &target);
+				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+				InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+				GXSetColorUpdate(0);
+				GXSetAlphaUpdate(0);
+				unsigned int clearColor = 0;
+				GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+				GXSetColorUpdate(1);
+				GXSetAlphaUpdate(1);
+				GXSetViewport(
+					(float)*reinterpret_cast<short*>(piVar13 + 2),
+					(float)*reinterpret_cast<short*>((int)(piVar13 + 2) + 2),
+					(float)*reinterpret_cast<short*>(piVar13 + 3),
+					(float)*reinterpret_cast<short*>((int)(piVar13 + 3) + 2),
+					FLOAT_803313dc, FLOAT_803313e8);
+				GXSetScissor(piVar13[0x10], piVar13[0x11], piVar13[0x12], piVar13[0x13]);
+				SetFog__8CGraphicFii(&Graphic, 1, 0);
+				unsigned int ambColor = DAT_80210830[0];
+				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
+				SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+				for (int j = 0; j < DAT_8021082c[0]; j++) {
+					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
+				}
+				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+			}
+		}
+		DrawInit__8CMenuPcsFv(this);
+		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		SetViewport__8CGraphicFv(&Graphic);
+		GXSetScissor(0, 0, 0x280, 0x1C0);
+		DrawInit__8CMenuPcsFv(this);
+	}
+
+	// State machine for MC operations
+	worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	state = *reinterpret_cast<short*>(worldState + 0x10);
+	short subState = *reinterpret_cast<short*>(worldState + 0x16);
+	if (state == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
+		short winState;
+		switch ((int)subState) {
+		case 0:
+		case 2:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(0, 0);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x1E) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+					*reinterpret_cast<short*>(bytes + 0x870) = 1;
+				} else if (subState == 2) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 1;
+				}
+			}
+			break;
+		case 1:
+			if (*reinterpret_cast<short*>(worldState + 0x22) > 0x12) {
+				*reinterpret_cast<short*>(worldState + 0x16) = 3;
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) + 1;
+			break;
+		case 3:
+			if (*reinterpret_cast<short*>(worldState + 0x2E) != 1) {
+				memset(*reinterpret_cast<void**>(bytes + 0x838), 0, 0x120);
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short mcResult = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (mcResult == -1) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 5;
+				} else if (mcResult == -2) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 8;
+				} else if (mcResult == -3) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 6;
+				} else if (mcResult == -4) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 7;
+				} else if (mcResult == 0) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 4;
+				}
+			}
+			break;
+		case 4:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(6, 0);
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) == 1) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 0xC;
+				}
+			} else if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short mcRes2 = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (mcRes2 == -3) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 8;
+				} else if (mcRes2 == -4) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 8;
+				} else if (mcRes2 == -5) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 7;
+				} else if (mcRes2 == -6) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x10;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 10;
+				}
+			}
+			break;
+		case 5:
+		case 6:
+		case 7:
+		case 10:
+		case 0x0E:
+		case 0x0F:
+		case 0x10:
+		case 0x17:
+		case 0x18:
+		case 0x1B:
+		case 0x1C:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				int msgId = 0;
+				int msgParam = 0;
+				short ss = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+				if (ss == 5) msgId = 1;
+				else if (ss == 6) msgId = 2;
+				else if (ss == 7) msgId = 3;
+				else if (ss == 10) msgId = 0xB;
+				else if (ss == 0x0E) msgId = 0xC;
+				else if (ss == 0x0F) msgId = 0xD;
+				else if (ss == 0x1C) { msgId = 0x1B; msgParam = 1; }
+				else if (ss == 0x1B) { msgId = 0x1C; msgParam = 1; }
+				else if (ss == 0x18) msgId = 0x10;
+				else if (ss == 0x17) msgId = 0x11;
+				else msgId = 0x13;
+				DrawMcWinMess(msgId, msgParam);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0 ||
+				    subState == 0x1C || subState == 0x1B || subState == 0x17) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+				} else if (subState == 0x18) {
+					*reinterpret_cast<short*>(worldState + 0x1E) = 1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+					*reinterpret_cast<short*>(bytes + 0x870) = 4;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+				}
+			}
+			break;
+		case 8:
+		case 0x0B:
+		case 0x19:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				int ymsgId = 0;
+				int ymsgParam = 0;
+				short ys = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+				if (ys == 8) ymsgId = 4;
+				else if (ys == 0x19) { ymsgId = 0x19; ymsgParam = 1; }
+				else ymsgId = 5;
+				DrawMcWinMess(ymsgId, ymsgParam);
+
+				// Yes/No cursor
+				SetAttrFmt((FMT)0);
+				unsigned int ynColor = 0xFFFFFFFF;
+				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&ynColor);
+				SetTexture((TEX)0);
+				DrawRect(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_80331410, FLOAT_80331410,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, 0);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short ynResult = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (ynResult < 0) {
+					if (ynResult == -1) *reinterpret_cast<short*>(worldState + 0x16) = 5;
+					else if (ynResult == -2) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+					else if (ynResult == -3) *reinterpret_cast<short*>(worldState + 0x16) = 6;
+					else *reinterpret_cast<short*>(worldState + 0x16) = 7;
+				} else if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+				} else if (subState == 8) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x0B;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x0D;
+				}
+			}
+			break;
+		case 0x0C:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(6, 0);
+			}
+			if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short cRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (cRes == -1) *reinterpret_cast<short*>(worldState + 0x16) = 10;
+				else if (cRes == -2) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (cRes == -3) *reinterpret_cast<short*>(worldState + 0x16) = 8;
+				else if (cRes == -4) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+				else if (cRes == -999) {
+					*reinterpret_cast<short*>(worldState + 0x1E) = -1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+					*reinterpret_cast<short*>(bytes + 0x870) = 2;
+				} else {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 0x11;
+				}
+			}
+			break;
+		case 0x0D:
+		case 0x16:
+		case 0x1A:
+			winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				int dmsgId = 7;
+				int dmsgParam = 0;
+				short ds = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+				if (ds == 0x1A) { dmsgId = 0x1A; dmsgParam = 1; }
+				else if (ds == 0x16) dmsgId = 9;
+				DrawMcWinMess(dmsgId, dmsgParam);
+			} else if (winState == 2 && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) == 3) {
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				short dRes = *reinterpret_cast<short*>(worldState + 0x2E);
+				if (subState == 0x0D) {
+					if (dRes == 1) *reinterpret_cast<short*>(worldState + 0x16) = 0x0E;
+					else if (dRes == -2) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+					else *reinterpret_cast<short*>(worldState + 0x16) = 0x0F;
+				} else if (subState == 0x1A) {
+					if (dRes == 1) *reinterpret_cast<short*>(worldState + 0x16) = 0x1C;
+					else if (dRes == -2) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+					else *reinterpret_cast<short*>(worldState + 0x16) = 0x1B;
+				} else {
+					if (dRes == 1) {
+						*reinterpret_cast<short*>(worldState + 0x16) = 0x18;
+						Sound.PlaySe(0x42, 0x40, 0x7F, 0);
+					} else if (dRes == -4) *reinterpret_cast<short*>(worldState + 0x16) = 7;
+					else *reinterpret_cast<short*>(worldState + 0x16) = 0x17;
+				}
+			}
+			break;
+		case 0x11:
+			if (*reinterpret_cast<short*>(worldState + 0x2E) < 0) {
+				*reinterpret_cast<short*>(worldState + 0x16) = 3;
+			} else if (*reinterpret_cast<short*>(worldState + 0x0E) != 0) {
+				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
+					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+				} else {
+					*reinterpret_cast<short*>(worldState + 0x16) = 0x16;
+				}
+			}
+			break;
+		}
+		if ((int)subState != (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16)) {
+			*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) = 0;
+		}
+	} else if (state == 2 && *reinterpret_cast<short*>(worldState + 0x18) != 0) {
+		*reinterpret_cast<short*>(worldState + 0x18) = *reinterpret_cast<short*>(worldState + 0x18) - 1;
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		if (*reinterpret_cast<short*>(worldState + 0x18) < 1) {
+			*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+			Sound.PlaySe(0x31 - ((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) >> 0x1F), 0x40, 0x7F, 0);
+		}
+	} else {
+		*reinterpret_cast<short*>(worldState + 0x22) = *reinterpret_cast<short*>(worldState + 0x22) + 1;
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		short threshold = 10;
+		if (*reinterpret_cast<short*>(worldState + 0x10) == 3 && *reinterpret_cast<short*>(worldState + 0x16) != 0) {
+			threshold = 0x13;
+		}
+		if (*reinterpret_cast<short*>(worldState + 0x22) >= threshold) {
+			*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(worldState + 0x10) > 4) {
+				if (*reinterpret_cast<short*>(worldState + 0x1C) != 8) {
+					*reinterpret_cast<short*>(worldState + 0x20) = *reinterpret_cast<short*>(worldState + 0x1E);
+				}
+				bytes[0x86E] = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) = 0;
+			}
+		}
+	}
 }
 
 /*
@@ -1526,10 +3710,275 @@ void CMenuPcs::DrawLoadMenu()
  */
 void CMenuPcs::DrawTitleMenu()
 {
-	DrawWMFrame();
-	DrawChara();
-	DrawFukidashi();
-	DrawPageMark();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	Mtx m_cameraMatrix;
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	short state = *reinterpret_cast<short*>(worldState + 0x10);
+
+	if (state == 0 && *reinterpret_cast<char*>(worldState + 8) != 0) {
+		if (bytes[0x858] != 0) {
+			THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
+		}
+		short sVarE = *reinterpret_cast<short*>(worldState + 0x0E);
+		if (sVarE != 0 || *reinterpret_cast<short*>(worldState + 0x22) > 0xB42) {
+			if (sVarE != -1) {
+				THPSimpleAudioStop();
+				THPSimpleLoadStop();
+				THPSimpleClose();
+				THPSimpleQuit();
+				if (*reinterpret_cast<int*>(bytes + 0x854) != 0) {
+					Free__7CMemoryFPv(&Memory, reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x854)));
+					*reinterpret_cast<int*>(bytes + 0x854) = 0;
+				}
+				bytes[0x858] = 0;
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) = 0;
+			int flatArgs[3];
+			flatArgs[0] = 9;
+			flatArgs[1] = 0;
+			flatArgs[2] = 0;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			    &CFlat, 0, 1, 4, 3, flatArgs, 0);
+		}
+	} else {
+		// 3D viewport setup
+		Mtx44 projMtx;
+		C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+		GXSetProjection(projMtx, GX_PERSPECTIVE);
+
+		Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_80331768 };
+		Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
+		Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+		Mtx lookAtMtx;
+		C_MTXLookAt(lookAtMtx, &eye, &up, &target);
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+		InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+		GXSetColorUpdate(0);
+		GXSetAlphaUpdate(0);
+		unsigned int clearColor = 0;
+		GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+		GXSetColorUpdate(1);
+		GXSetAlphaUpdate(1);
+		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
+		              FLOAT_803313dc, FLOAT_803313e8);
+
+		// Draw background part
+		// DrawMenuIdx - *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
+		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+
+		Mtx44 projMtx2;
+		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);
+		GXSetProjection(projMtx2, GX_PERSPECTIVE);
+		SetViewport__8CGraphicFv(&Graphic);
+		GXSetScissor(0, 0, 0x280, 0x1C0);
+		DrawInit__8CMenuPcsFv(this);
+
+		// Fade-in overlay (state 1)
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (state == 1 && DAT_8032e8ac == 0) {
+			float fadeAlpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+			SetAttrFmt((FMT)2);
+			unsigned int fadeColor = (unsigned int)(FLOAT_80331458 * fadeAlpha) & 0xFF;
+			fadeColor = fadeColor | (fadeColor << 8) | (fadeColor << 16) | (fadeColor << 24);
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor);
+			SetTexture((TEX)0xFFFFFFFF);
+		}
+
+		// Menu items
+		SetAttrFmt((FMT)0);
+		SetTexture((TEX)0x43);
+
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (state > 1) {
+			float fY = FLOAT_8033177c;
+			if (*reinterpret_cast<short*>(worldState + 0x26) != 0) {
+				fY = FLOAT_8033177c + (float)(*reinterpret_cast<short*>(worldState + 0x26) * 0x28 - 8);
+			}
+			float alpha = FLOAT_803313e8;
+			if (state == 2 && *reinterpret_cast<short*>(worldState + 0x12) == 0) {
+				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
+				alpha = (float)(timer);
+			}
+			unsigned int itemColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
+			itemColor = itemColor | 0xFFFFFF00;
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
+			DrawRect(0xFFFFFFFF, FLOAT_80331778 - FLOAT_80331414, fY - FLOAT_80331780,
+			         FLOAT_80331568, FLOAT_80331554,
+			         FLOAT_803313dc, FLOAT_803313dc,
+			         FLOAT_803313e8, FLOAT_803313e8, 0);
+		}
+
+		// Menu item labels (2 items: New Game, Continue)
+		SetAttrFmt((FMT)0);
+		unsigned int itemLabelColor = 0xFFFFFFFF;
+		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemLabelColor);
+		unsigned int uVar7 = 0xFFFFFFF8;
+		unsigned int uVar6 = 0x70;
+		for (int i = 0; i < 2; i++) {
+			float labelAlpha = FLOAT_803313e8;
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(worldState + 0x10) == 1) {
+				labelAlpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+			}
+			unsigned int labelColor = (unsigned int)(FLOAT_80331458 * labelAlpha) & 0xFF;
+			labelColor = labelColor | 0xFFFFFF00;
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&labelColor);
+
+			float yPos = FLOAT_8033177c;
+			if (i != 0) {
+				yPos = yPos + (float)((int)uVar7);
+			}
+			DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
+			         FLOAT_80331568, FLOAT_80331440,
+			         FLOAT_803313dc, (float)((int)uVar6),
+			         FLOAT_803313e8, FLOAT_803313e8, 0);
+
+			// Cursor on selected item
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<char*>(worldState + 9) == 0 &&
+			    i == *reinterpret_cast<short*>(worldState + 0x26)) {
+				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
+				float cursorAlpha = FLOAT_803313e8;
+				if (timer > 0) {
+					cursorAlpha = (float)(timer);
+				}
+				unsigned int cursorColor = (unsigned int)(FLOAT_80331458 * cursorAlpha) & 0xFF;
+				cursorColor = cursorColor | 0xFFFFFF00;
+				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
+				DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
+				         FLOAT_80331568, FLOAT_80331440,
+				         FLOAT_803313dc, (float)((int)uVar6),
+				         FLOAT_803313e8, FLOAT_803313e8, 0);
+			}
+			uVar6 += 0x28;
+			uVar7 += 0x28;
+		}
+
+		// Logo and copyright textures
+		SetAttrFmt((FMT)0);
+		unsigned int logoColor = 0xFFFFFFFF;
+		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&logoColor);
+		SetTexture((TEX)0x42);
+		DrawRect(0xFFFFFFFF, FLOAT_803317b8, FLOAT_803317bc, FLOAT_803317c0, FLOAT_803315b4,
+		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
+
+		SetTexture((TEX)0x44);
+		float copyrightAlpha = FLOAT_803313e8;
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		if (*reinterpret_cast<short*>(worldState + 0x10) == 1) {
+			copyrightAlpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+		}
+		unsigned int crColor = (unsigned int)(FLOAT_80331458 * copyrightAlpha) & 0xFF;
+		crColor = crColor | 0xFFFFFF00;
+		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&crColor);
+		DrawRect(0xFFFFFFFF, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
+		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
+
+		// Timer / state transitions
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (state > 1) {
+			*reinterpret_cast<short*>(worldState + 0x24) = *reinterpret_cast<short*>(worldState + 0x24) + 1;
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(worldState + 0x12) == 0 &&
+			    *reinterpret_cast<short*>(worldState + 0x24) > 4) {
+				*reinterpret_cast<char*>(worldState + 9) = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) =
+				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) + 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0x14;
+			}
+		}
+
+		// Fade out / transition to next state
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (state == 3 || (state == 1 && DAT_8032e8ac != 0)) {
+			float fadeAlpha2;
+			if (state == 3) {
+				fadeAlpha2 = (float)(*reinterpret_cast<short*>(worldState + 0x22) + 1);
+			} else {
+				fadeAlpha2 = (float)*reinterpret_cast<short*>(worldState + 0x22);
+			}
+			if (fadeAlpha2 > FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
+			SetAttrFmt((FMT)2);
+			unsigned int fadeColor2 = (unsigned int)(FLOAT_80331458 * fadeAlpha2) & 0xFF;
+			fadeColor2 = fadeColor2 | (fadeColor2 << 8) | (fadeColor2 << 16) | (fadeColor2 << 24);
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor2);
+			SetTexture((TEX)0xFFFFFFFF);
+		}
+
+		// End state handling
+		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (state == 3 && *reinterpret_cast<short*>(worldState + 0x22) > 9) {
+			pppDeletePart__8CPartMngFi(&PartMng, *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) == 0) {
+				DAT_8032e8ac = 0;
+			} else {
+				DAT_8032e8ac = 1;
+				int flatArgs2[3];
+				flatArgs2[0] = 7;
+				flatArgs2[1] = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
+				flatArgs2[2] = 0;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 1;
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    &CFlat, 0, 1, 4, 3, flatArgs2, 0);
+				bytes[0x0D] = 0;
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+			*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 0;
+		} else if (state == 2) {
+			if (*reinterpret_cast<short*>(worldState + 0x18) != 0) {
+				*reinterpret_cast<short*>(worldState + 0x18) = *reinterpret_cast<short*>(worldState + 0x18) - 1;
+				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+				if (*reinterpret_cast<short*>(worldState + 0x18) < 1) {
+					*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+					int flatArgs3[3];
+					flatArgs3[0] = 9;
+					flatArgs3[1] = 1;
+					flatArgs3[2] = 0;
+					SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+					    &CFlat, 0, 1, 4, 3, flatArgs3, 0);
+				}
+			} else if (*reinterpret_cast<short*>(worldState + 0x22) > 0x991) {
+				*reinterpret_cast<short*>(worldState + 0x0E) = 0;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
+				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+				int flatArgs4[3];
+				flatArgs4[0] = 9;
+				flatArgs4[1] = 1;
+				flatArgs4[2] = 0;
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    &CFlat, 0, 1, 4, 3, flatArgs4, 0);
+			}
+		} else {
+			short threshold = 10;
+			*reinterpret_cast<short*>(worldState + 0x22) = *reinterpret_cast<short*>(worldState + 0x22) + 1;
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			if (*reinterpret_cast<short*>(worldState + 0x10) == 1) {
+				threshold = 0x28;
+			}
+			if (*reinterpret_cast<short*>(worldState + 0x22) > threshold) {
+				*reinterpret_cast<short*>(worldState + 0x22) = 0;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
+				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
+			}
+		}
+	}
 }
 
 /*
@@ -1545,65 +3994,134 @@ void CMenuPcs::SetWorldParam(int code, int value)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char bVar6 = static_cast<unsigned char>(value);
+	unsigned short uVar5 = static_cast<unsigned short>(value);
+	unsigned char bVar1 = static_cast<unsigned char>(static_cast<unsigned int>(value) >> 24);
 
 	switch (code) {
 	case 0:
 		bytes[5] = bytes[4];
-		bytes[4] = static_cast<unsigned char>(value);
+		bytes[4] = bVar6;
+		bytes[0xA] = bytes[0xA] | DAT_80331758;
 		break;
 	case 1:
-		bytes[6] = static_cast<unsigned char>(value);
+		bytes[6] = bVar6;
 		break;
 	case 2:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1A) = static_cast<unsigned short>(value) & 0x3FF;
+		*reinterpret_cast<unsigned short*>(bytes + 0x1A) = uVar5 & 0x3FF;
 		break;
 	case 3:
-		bytes[7] = static_cast<unsigned char>(value);
+		bytes[7] = bVar6;
 		break;
 	case 4:
-		bytes[8] = static_cast<unsigned char>(value);
+		bytes[8] = bVar6;
 		break;
 	case 5:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1C) = static_cast<unsigned short>(value);
+		*reinterpret_cast<unsigned short*>(bytes + 0x1C) = uVar5;
 		break;
 	case 6:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1E) = static_cast<unsigned short>(value);
+		*reinterpret_cast<unsigned short*>(bytes + 0x1E) = uVar5;
 		break;
 	case 7:
-		bytes[9] = static_cast<unsigned char>(value);
+		bytes[9] = bVar6;
 		break;
 	case 8:
 		bytes[0xB] = bytes[0xC];
-		bytes[0xC] = static_cast<unsigned char>(value);
+		bytes[0xC] = bVar6;
+		bytes[0xA] = bytes[0xA] | DAT_8033175c;
 		break;
 	case 9:
-		if (static_cast<signed char>(bytes[0xD]) != value) {
-			bytes[0xD] = static_cast<unsigned char>(value);
+		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
+			bytes[0xD] = bVar6;
 		}
 		*reinterpret_cast<unsigned short*>(worldState + 0x20) = 2;
 		break;
 	case 10:
-		bytes[0x10] = static_cast<unsigned char>(value != 0);
+		bytes[0x10] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
 		break;
 	case 11:
-		bytes[0x11] = static_cast<unsigned char>(value != 0);
+		bytes[0x11] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
 		break;
 	case 12:
-		bytes[0xE] = static_cast<unsigned char>(value);
+		bytes[0xE] = bVar6;
 		break;
 	case 13:
-		bytes[0xF] = static_cast<unsigned char>(value & 3);
+		bytes[0xF] = bVar6 & 3;
 		break;
 	case 14:
-		bytes[0x12] = static_cast<unsigned char>(value != 0);
+		bytes[0x12] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
 		break;
 	case 15:
-		bytes[0x13] = static_cast<unsigned char>(value != 0);
+		bytes[0x13] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
 		break;
 	case 16:
-		bytes[0x17] = static_cast<unsigned char>(value);
+		bytes[0x17] = bVar6;
 		break;
 	default:
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s__s__d___Error_function_code_not_f_801dc3ec, s_wm_menu_cpp_801dc418, 0x1482, code);
+		}
+		break;
+	case 0x12: {
+		McCtrl* mc = reinterpret_cast<McCtrl*>(bytes + 0x20);
+		mc->m_previousState = 0;
+		mc->m_state = 0;
+		mc->m_lastResult = 0;
+		mc->m_iteration = 0;
+		mc->m_userBuffer = 0;
+		mc->m_createFlag = 0;
+		mc->m_cardChannel = static_cast<int>(static_cast<signed char>(bytes[0x17]));
+		bytes[0x18] = 0x12;
+		break;
+	}
+	case 0x13: {
+		McCtrl* mc = reinterpret_cast<McCtrl*>(bytes + 0x20);
+		mc->m_previousState = 0;
+		mc->m_state = 0;
+		mc->m_lastResult = 0;
+		mc->m_iteration = 0;
+		mc->m_userBuffer = 0;
+		mc->m_createFlag = 0;
+		mc->m_cardChannel = static_cast<int>(static_cast<signed char>(bytes[0x17]));
+		bytes[0x18] = 0x13;
+		break;
+	}
+	case 0x14:
+		MemoryCardMan.McEnd();
+		bytes[0x14] = 1;
+		break;
+	case 0x16:
+		bytes[0x15] = 1;
+		changeMode(static_cast<MENUMODE>(2));
+		bytes[0x15] = 1;
+		break;
+	case 0x17: {
+		unsigned int clz = __cntlzw(static_cast<unsigned int>(value));
+		unsigned char* camBytes = reinterpret_cast<unsigned char*>(&CameraPcs);
+		camBytes[0x47C] = static_cast<unsigned char>(static_cast<int>(static_cast<signed char>(clz >> 5)) << 7) | (camBytes[0x47C] & 0x7F);
+		*reinterpret_cast<unsigned short*>(camBytes + 0x480) = 0x4B;
+		*reinterpret_cast<unsigned short*>(camBytes + 0x47E) = 0x4B;
+		*reinterpret_cast<float*>(camBytes + 0x484) = FLOAT_80331618;
+		*reinterpret_cast<float*>(camBytes + 0x488) = FLOAT_80331760;
+		*reinterpret_cast<float*>(camBytes + 0x48C) = FLOAT_80331764;
+		break;
+	}
+	case 0x18:
+		loadData();
+		break;
+	case 0x19:
+		bytes[0x16] = 1;
+		break;
+	case 0x1a: {
+		int i = 0;
+		do {
+			GbaQue.SetRadarMode(i, 0);
+			i = i + 1;
+		} while (i < 4);
+		break;
+	}
+	case 0x1b:
+		GbaQue.SetControllerMode(static_cast<int>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31));
 		break;
 	}
 }
@@ -1654,10 +4172,10 @@ void CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xD]));
 		break;
 	case 10:
-		result = bytes[0x10] ? 1u : 0u;
+		result = -static_cast<unsigned int>(bytes[0x10]) >> 31;
 		break;
 	case 11:
-		result = bytes[0x11] ? 1u : 0u;
+		result = -static_cast<unsigned int>(bytes[0x11]) >> 31;
 		break;
 	case 12:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xE]));
@@ -1666,15 +4184,63 @@ void CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
 		break;
 	case 14:
-		result = bytes[0x12] ? 1u : 0u;
+		result = -static_cast<unsigned int>(bytes[0x12]) >> 31;
 		break;
 	case 15:
-		result = bytes[0x13] ? 1u : 0u;
+		result = -static_cast<unsigned int>(bytes[0x13]) >> 31;
 		break;
 	case 16:
 		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0x17]));
 		break;
+	case 0x11: {
+		int iVar1;
+		int iVar3 = 0;
+		do {
+			iVar1 = MemoryCardMan.McChkConnect(0);
+			if (iVar1 != 1) break;
+			iVar3 = iVar3 + 1;
+		} while (iVar3 < 10);
+		if (iVar1 == 0) {
+			result = 1;
+		} else if (iVar1 == 1) {
+			result = 7;
+		} else if (iVar1 != -1) {
+			if (iVar1 == -2) {
+				result = 2;
+			} else if (iVar1 == -3) {
+				result = 3;
+			} else {
+				result = 6;
+			}
+		}
+		iVar3 = 0;
+		do {
+			iVar1 = MemoryCardMan.McChkConnect(1);
+			if (iVar1 != 1) break;
+			iVar3 = iVar3 + 1;
+		} while (iVar3 < 10);
+		if (iVar1 == 0) {
+			result = result | 0x10;
+		} else if (iVar1 == 1) {
+			result = result | 0x70;
+		} else if (iVar1 != -1) {
+			if (iVar1 == -2) {
+				result = result | 0x20;
+			} else if (iVar1 == -3) {
+				result = result | 0x30;
+			} else {
+				result = result | 0x60;
+			}
+		}
+		break;
+	}
 	default:
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s__s__d___Error_function_code_not_f_801dc3ec, s_wm_menu_cpp_801dc418, 0x1521, code);
+		}
+		break;
+	case 0x15:
+		result = 0x16;
 		break;
 	}
 
@@ -1733,9 +4299,46 @@ void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetFcvValue(CMenuPcs::FCV, float value)
+double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 {
-	FLOAT_8032ee18 = value;
+	int keyCount = fcv.keyCount;
+	float t = value / FLOAT_803314c0;
+	float* keys = fcv.keys;
+
+	if (keys[keyCount * 4 - 4] <= t) {
+		return static_cast<double>(keys[keyCount * 4 - 3]);
+	}
+
+	int idx = 0;
+	float* cur = keys;
+	if (keyCount < 1) {
+		return static_cast<double>(FLOAT_803313dc);
+	}
+
+	while (*cur < t) {
+		cur = cur + 4;
+		idx = idx + 1;
+		keyCount = keyCount - 1;
+		if (keyCount == 0) {
+			return static_cast<double>(FLOAT_803313dc);
+		}
+	}
+
+	if (idx == 0) {
+		return static_cast<double>(keys[1]);
+	}
+
+	float* next = keys + idx * 4;
+	float* prev = keys + (idx - 1) * 4;
+	float span = *next - *prev;
+	float u = (t - *prev) / span;
+	float u2 = u * u;
+	float u3 = u2 * u;
+
+	return static_cast<double>(
+	    span * (prev[3] * (u + -(FLOAT_803314c8 * u2 - u3)) + next[2] * (u3 - u2)) +
+	    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+	    next[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 }
 
 /*
@@ -1918,9 +4521,447 @@ void CMenuPcs::CalcPitcher()
  */
 void CMenuPcs::CalcFukidashi()
 {
-	CalcWMFrame();
-	CalcPitcher();
-	CalcMainMenuSub();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	float fVar1 = FLOAT_803313dc;
+	if (bytes[0x09] != 1) {
+		return;
+	}
+
+	int bubbleData = *reinterpret_cast<int*>(bytes + 0x818);
+	*reinterpret_cast<short*>(bubbleData) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<short*>(bubbleData + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
+	*reinterpret_cast<short*>(bubbleData + 4) = 0xF0;
+	*reinterpret_cast<short*>(bubbleData + 6) = 0xC4;
+	*reinterpret_cast<float*>(bubbleData + 0x0C) = fVar1;
+	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_803313dc;
+	} else {
+		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_80331704;
+	}
+
+	fVar1 = FLOAT_80331708;
+	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	if ((uVar3 & 0x3F0) != 0) {
+		bubbleData = *reinterpret_cast<int*>(bytes + 0x818);
+		*reinterpret_cast<short*>(bubbleData + 0x20) = 0x50;
+		float fVar2 = FLOAT_803313dc;
+		*reinterpret_cast<short*>(bubbleData + 0x22) = 0x48;
+		*reinterpret_cast<float*>(bubbleData + 0x24) = fVar1;
+		*reinterpret_cast<float*>(bubbleData + 0x28) = fVar2;
+		*reinterpret_cast<short*>(bubbleData + 0x1E) = *reinterpret_cast<short*>(bubbleData + 2) + 0x1C;
+		if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+			*reinterpret_cast<short*>(bubbleData + 0x1E) = *reinterpret_cast<short*>(bubbleData + 0x1E) + 0x10;
+		}
+		*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData);
+		if ((uVar3 & 0xF) == 0) {
+			if ((uVar3 & 0x200) == 0) {
+				*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x38;
+			} else {
+				*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x50;
+			}
+		} else {
+			*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x20;
+		}
+	}
+
+	fVar1 = FLOAT_803313dc;
+	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	if ((uVar3 & 0x1FF) != 0) {
+		bubbleData = *reinterpret_cast<int*>(bytes + 0x818);
+		*reinterpret_cast<short*>(bubbleData + 0x3C) = 0x20;
+		*reinterpret_cast<short*>(bubbleData + 0x3E) = 0x20;
+		*reinterpret_cast<float*>(bubbleData + 0x40) = fVar1;
+		*reinterpret_cast<float*>(bubbleData + 0x44) = fVar1;
+
+		// Copy first icon rect to second
+		int iVar9 = *reinterpret_cast<int*>(bytes + 0x818);
+		*reinterpret_cast<short*>(iVar9 + 0x54) = *reinterpret_cast<short*>(iVar9 + 0x38);
+		*reinterpret_cast<short*>(iVar9 + 0x56) = *reinterpret_cast<short*>(iVar9 + 0x3A);
+		*reinterpret_cast<short*>(iVar9 + 0x58) = *reinterpret_cast<short*>(iVar9 + 0x3C);
+		*reinterpret_cast<short*>(iVar9 + 0x5A) = *reinterpret_cast<short*>(iVar9 + 0x3E);
+		*reinterpret_cast<int*>(iVar9 + 0x5C) = *reinterpret_cast<int*>(iVar9 + 0x40);
+		*reinterpret_cast<int*>(iVar9 + 0x60) = *reinterpret_cast<int*>(iVar9 + 0x44);
+		*reinterpret_cast<int*>(iVar9 + 0x64) = *reinterpret_cast<int*>(iVar9 + 0x48);
+		*reinterpret_cast<int*>(iVar9 + 0x68) = *reinterpret_cast<int*>(iVar9 + 0x4C);
+		*reinterpret_cast<int*>(iVar9 + 0x6C) = *reinterpret_cast<int*>(iVar9 + 0x50);
+
+		iVar9 = *reinterpret_cast<int*>(bytes + 0x818);
+		short sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
+		if ((uVar3 & 0xF) == 0) {
+			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38) = sVar15 + 8;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x1E);
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
+			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) + 0x14;
+		} else {
+			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15;
+			int cnt = 0;
+			int iter = 4;
+			int iVar11 = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38) = sVar15;
+			do {
+				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar11)) != 0) {
+					cnt++;
+				}
+				iVar11++;
+				iter--;
+			} while (iter != 0);
+			if (cnt == 1) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
+				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x1E);
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
+				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) + 0x14;
+			} else {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
+				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x1E);
+				iVar9 = *reinterpret_cast<int*>(bytes + 0x818);
+				*reinterpret_cast<short*>(iVar9 + 0x56) =
+				    *reinterpret_cast<short*>(iVar9 + 0x1E) + *reinterpret_cast<short*>(iVar9 + 0x22) - 0x20;
+			}
+		}
+	}
+
+	// Font name text processing
+	CFont* fontFC = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	fontFC->SetMargin(FLOAT_803313e8);
+	fontFC->SetShadow(0);
+	fontFC->SetScale(FLOAT_803313e8);
+
+	char nameBuffer[64];
+	int fieldVal = (int)(char)bytes[0x07];
+	if (fieldVal == 0x0F) {
+		strcpy(nameBuffer, "");
+	} else if (fieldVal == 0x16) {
+		strcpy(nameBuffer, "");
+	} else {
+		strcpy(nameBuffer, "");
+	}
+
+	unsigned int textWidth = 0xD8;
+	CFont* font = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
+		textWidth = 0xA2;
+	}
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803313e8);
+	double dVar23 = (double)font->GetWidth(nameBuffer);
+
+	short sVar15 = 0x4C;
+	float fVar2 = FLOAT_803314a4;
+	fVar1 = FLOAT_803313dc;
+	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	if ((uVar3 & 0x3F0) != 0) {
+		sVar15 = 0x6C;
+	}
+	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+		sVar15 = sVar15 + 0x10;
+	}
+
+	// Set text position
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) =
+	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 2) + sVar15 - 4;
+
+	// Setup model viewport slots
+	int iVar11 = 6;
+	int iVar9 = 0x1E0;
+	short sVar22 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)) - 0x28;
+	short sVarY = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 2) - 0x0E;
+	int iVar13 = 2;
+	do {
+		int* puVar20 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + iVar9);
+		// Initialize 5 viewport slots per iteration
+		for (int k = 0; k < 5; k++) {
+			int* slot = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + iVar9 + k * 0x50);
+			slot[0] = 0;
+			*reinterpret_cast<short*>(slot + 2) = sVar22;
+			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
+			*reinterpret_cast<short*>(slot + 3) = 0x140;
+			*reinterpret_cast<short*>((int)(slot + 3) + 2) = 0xE0;
+			*reinterpret_cast<float*>(slot + 4) = fVar1;
+			*reinterpret_cast<float*>(slot + 5) = fVar1;
+			*reinterpret_cast<float*>(slot + 6) = fVar2;
+		}
+		iVar9 = iVar9 + 400;
+		iVar11 = iVar11 + 5;
+		iVar13--;
+	} while (iVar13 != 0);
+
+	// Fill remaining viewport slots
+	int remaining = 0x11 - iVar11;
+	int fillOff = iVar11 * 0x50;
+	if (iVar11 < 0x11) {
+		do {
+			int* slot = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + fillOff);
+			fillOff += 0x50;
+			slot[0] = 0;
+			*reinterpret_cast<short*>(slot + 2) = sVar22;
+			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
+			*reinterpret_cast<short*>(slot + 3) = 0x140;
+			*reinterpret_cast<short*>((int)(slot + 3) + 2) = 0xE0;
+			*reinterpret_cast<float*>(slot + 4) = fVar1;
+			*reinterpret_cast<float*>(slot + 5) = fVar1;
+			*reinterpret_cast<float*>(slot + 6) = fVar2;
+			remaining--;
+		} while (remaining != 0);
+	}
+
+	// Setup tribe/character model slot
+	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	if ((uVar3 & 0x3F0) != 0) {
+		int modelIdx;
+		if ((uVar3 & 0x200) == 0) {
+			modelIdx = 0;
+			if ((uVar3 & 0x10) == 0) { modelIdx = 1;
+			if ((uVar3 & 0x20) == 0) { modelIdx = 2;
+			if ((uVar3 & 0x40) == 0) { modelIdx = 3;
+			if ((uVar3 & 0x80) == 0) { modelIdx = 4;
+			if ((uVar3 & 0x100) == 0) { modelIdx = 5; }}}}}
+			modelIdx = modelIdx + 0x0C;
+		} else if (bytes[0x06] == 1) {
+			modelIdx = 7;
+		} else {
+			modelIdx = 6;
+		}
+
+		int* puVar20 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + modelIdx * 0x50);
+		puVar20[0] = 1;
+		*reinterpret_cast<float*>(puVar20 + 7) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 8) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 9) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_8033170c;
+		*reinterpret_cast<float*>(puVar20 + 0xE) = FLOAT_8033170c;
+		*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_8033170c;
+
+		// Spline evaluation for Y position
+		float t = (float)(puVar20[1]) / FLOAT_803314c0;
+		float yResult = fVar1;
+		if (t < DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) {
+			int idx = 0;
+			float* pf = DAT_8032e8b4;
+			int splineCnt = DAT_8032e8b0;
+			if (splineCnt > 0) {
+				do {
+					if (t <= *pf) {
+						if (idx == 0) {
+							yResult = DAT_8032e8b4[1];
+						} else {
+							float* cur = DAT_8032e8b4 + idx * 4;
+							float* prev = DAT_8032e8b4 + (idx - 1) * 4;
+							float dt2 = *cur - *prev;
+							float u = (t - *prev) / dt2;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							yResult = dt2 * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
+							          prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+							          cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+						}
+						break;
+					}
+					pf += 4;
+					idx++;
+					splineCnt--;
+				} while (splineCnt != 0);
+			}
+		} else {
+			yResult = DAT_8032e8b4[DAT_8032e8b0 * 4 - 3];
+		}
+		*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yResult;
+
+		// Spline evaluation for rotation
+		float rotResult = FLOAT_803313dc;
+		t = (float)(puVar20[1]) / FLOAT_803314c0;
+		if (t < DAT_8032e8bc[DAT_8032e8b8 * 4 - 4]) {
+			int idx = 0;
+			float* pf = DAT_8032e8bc;
+			int splineCnt = DAT_8032e8b8;
+			if (splineCnt > 0) {
+				do {
+					if (t <= *pf) {
+						if (idx == 0) {
+							rotResult = DAT_8032e8bc[1];
+						} else {
+							float* cur = DAT_8032e8bc + idx * 4;
+							float* prev = DAT_8032e8bc + (idx - 1) * 4;
+							float dt2 = *cur - *prev;
+							float u = (t - *prev) / dt2;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							rotResult = dt2 * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
+							            prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+							            cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+						}
+						break;
+					}
+					pf += 4;
+					idx++;
+					splineCnt--;
+				} while (splineCnt != 0);
+			}
+		} else {
+			rotResult = DAT_8032e8bc[DAT_8032e8b8 * 4 - 3];
+		}
+		*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotResult;
+		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
+
+		// Matrix setup
+		Mtx scaleMtx, rotXMtx, rotYMtx;
+		PSMTXScale(scaleMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
+		PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(puVar20 + 0xA));
+		PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(puVar20 + 0xB));
+		PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
+		rotXMtx[0][3] = *reinterpret_cast<float*>(puVar20 + 7);
+		rotXMtx[1][3] = *reinterpret_cast<float*>(puVar20 + 8);
+		rotXMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
+		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
+
+		void* modelPtr = *reinterpret_cast<void**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168);
+		SetMatrix__Q26CChara6CModelFPA4_f(modelPtr, scaleMtx);
+		CalcMatrix__Q26CChara6CModelFv(modelPtr);
+		CalcSkin__Q26CChara6CModelFv(modelPtr);
+
+		puVar20[1] = puVar20[1] + 1;
+		if ((double)(DOUBLE_803314a8 * (double)DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) <=
+		    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
+			puVar20[1] = 0;
+		}
+	}
+
+	// Player character model slots
+	unsigned int field1a = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
+	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
+		int playerCount = 0;
+		int iter = 4;
+		int idx = 0;
+		do {
+			if ((field1a & (1 << idx)) != 0) playerCount++;
+			idx++;
+			iter--;
+		} while (iter != 0);
+
+		int slotIdx = 0;
+		for (int padIdx = 0; padIdx < 4; padIdx++) {
+			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
+				int* puVar20 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + (padIdx + 8) * 0x50);
+				puVar20[0] = 1;
+				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331728;
+				if (slotIdx == 0) {
+					if (playerCount == 2) {
+						*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_8033172c;
+					} else {
+						*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331668;
+					}
+				} else {
+					*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
+				}
+				if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+					*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) - (float)DOUBLE_80331738;
+				}
+				*reinterpret_cast<float*>(puVar20 + 9) = FLOAT_803313dc;
+				*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_80331740;
+				*reinterpret_cast<float*>(puVar20 + 0xE) = FLOAT_80331740;
+				*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_80331740;
+
+				// Spline Y for player models
+				float t2 = (float)(puVar20[1]) / FLOAT_803314c0;
+				float yRes2 = FLOAT_803313dc;
+				if (t2 < DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) {
+					int si = 0;
+					float* spf = DAT_8032e8b4;
+					int sc = DAT_8032e8b0;
+					if (sc > 0) {
+						do {
+							if (t2 <= *spf) {
+								if (si == 0) {
+									yRes2 = DAT_8032e8b4[1];
+								} else {
+									float* cr = DAT_8032e8b4 + si * 4;
+									float* pr = DAT_8032e8b4 + (si - 1) * 4;
+									float d = *cr - *pr;
+									float u = (t2 - *pr) / d;
+									float u2 = u * u;
+									float u3 = u2 * u;
+									yRes2 = d * (pr[3] * (u - FLOAT_803314c8 * u2 + u3) + cr[2] * (u3 - u2)) +
+									        pr[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+									        cr[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+								}
+								break;
+							}
+							spf += 4;
+							si++;
+							sc--;
+						} while (sc != 0);
+					}
+				} else {
+					yRes2 = DAT_8032e8b4[DAT_8032e8b0 * 4 - 3];
+				}
+				*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yRes2;
+
+				// Spline rotation for player models
+				float rotRes2 = FLOAT_803313dc;
+				t2 = (float)(puVar20[1]) / FLOAT_803314c0;
+				if (t2 < DAT_8032e8bc[DAT_8032e8b8 * 4 - 4]) {
+					int si = 0;
+					float* spf = DAT_8032e8bc;
+					int sc = DAT_8032e8b8;
+					if (sc > 0) {
+						do {
+							if (t2 <= *spf) {
+								if (si == 0) {
+									rotRes2 = DAT_8032e8bc[1];
+								} else {
+									float* cr = DAT_8032e8bc + si * 4;
+									float* pr = DAT_8032e8bc + (si - 1) * 4;
+									float d = *cr - *pr;
+									float u = (t2 - *pr) / d;
+									float u2 = u * u;
+									float u3 = u2 * u;
+									rotRes2 = d * (pr[3] * (u - FLOAT_803314c8 * u2 + u3) + cr[2] * (u3 - u2)) +
+									          pr[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+									          cr[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+								}
+								break;
+							}
+							spf += 4;
+							si++;
+							sc--;
+						} while (sc != 0);
+					}
+				} else {
+					rotRes2 = DAT_8032e8bc[DAT_8032e8b8 * 4 - 3];
+				}
+				*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotRes2;
+				if (playerCount == 1) {
+					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_80331744;
+				} else {
+					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
+				}
+
+				Mtx sMtx, rxMtx, ryMtx;
+				PSMTXScale(sMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
+				PSMTXRotRad(rxMtx, 'x', *reinterpret_cast<float*>(puVar20 + 0xA));
+				PSMTXRotRad(ryMtx, 'y', *reinterpret_cast<float*>(puVar20 + 0xB));
+				PSMTXConcat(rxMtx, ryMtx, rxMtx);
+				rxMtx[0][3] = *reinterpret_cast<float*>(puVar20 + 7);
+				rxMtx[1][3] = *reinterpret_cast<float*>(puVar20 + 8);
+				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
+				PSMTXConcat(rxMtx, sMtx, sMtx);
+
+				void* mdl = *reinterpret_cast<void**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168);
+				SetMatrix__Q26CChara6CModelFPA4_f(mdl, sMtx);
+				CalcMatrix__Q26CChara6CModelFv(mdl);
+				CalcSkin__Q26CChara6CModelFv(mdl);
+
+				puVar20[1] = puVar20[1] + 1;
+				if ((double)(DOUBLE_803314a8 * (double)DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) <=
+				    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
+					puVar20[1] = 0;
+				}
+				slotIdx++;
+			}
+		}
+	}
 }
 
 /*
@@ -1934,9 +4975,193 @@ void CMenuPcs::CalcFukidashi()
  */
 void CMenuPcs::DrawFukidashi()
 {
-	DrawWMFrame();
-	DrawWMFrame0(3, 1.0f);
-	DrawMainMenuSub();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	Mtx m_cameraMatrix;
+	CFont* fontFC = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	if (bytes[0x09] != 1) {
+		return;
+	}
+
+	int texMode;
+	if (bytes[0x08] == 0 || bytes[0x08] == 2) {
+		texMode = 0;
+	} else {
+		texMode = 8;
+	}
+
+	SetAttrFmt((FMT)0);
+	unsigned int color = 0xFFFFFFFF;
+	GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&color);
+	SetTexture((TEX)0x18);
+
+	short* bubData = *reinterpret_cast<short**>(bytes + 0x818);
+	DrawRect(0xFFFFFFFF, 
+		(float)(int)bubData[0], (float)(int)bubData[1],
+		(float)(int)bubData[2], (float)(int)bubData[3],
+		*reinterpret_cast<float*>(bubData + 4), *reinterpret_cast<float*>(bubData + 6),
+		FLOAT_803313e8, FLOAT_803313e8, (float)texMode);
+
+	unsigned int uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	if ((uVar3 & 0x3F0) != 0) {
+		int bd = *reinterpret_cast<int*>(bytes + 0x818);
+		DrawRect(0xFFFFFFFF, 
+			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
+			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
+			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
+			FLOAT_803313e8, FLOAT_803313e8, 0);
+	}
+
+	uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	if ((uVar3 & 0x3F0) != 0 && (uVar3 & 0x1FF) != 0) {
+		if ((uVar3 & 0xF) == 0) {
+			int idx = 0;
+			int cnt = 5;
+			do {
+				if ((uVar3 & (0x10 << idx)) != 0) {
+					SetTexture((TEX)(idx + 0x19));
+					int bd = *reinterpret_cast<int*>(bytes + 0x818);
+					DrawRect(0xFFFFFFFF, 
+						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
+						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
+						*reinterpret_cast<float*>(bd + 0x40), *reinterpret_cast<float*>(bd + 0x44),
+						FLOAT_803313e8, FLOAT_803313e8, 0);
+					break;
+				}
+				idx++;
+				cnt--;
+			} while (cnt != 0);
+		} else {
+			int iVar9 = 0;
+			int iVar5 = 0;
+			while (iVar5 < 4 && iVar9 < 2) {
+				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar5)) != 0) {
+					SetTexture((TEX)(iVar5 + 0x19));
+					short* psVar4;
+					if (iVar9 == 0) {
+						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38);
+					} else {
+						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x54);
+					}
+					DrawRect(0xFFFFFFFF, 
+						(float)(int)psVar4[0], (float)(int)psVar4[1],
+						(float)(int)psVar4[2], (float)(int)psVar4[3],
+						*reinterpret_cast<float*>(psVar4 + 4), *reinterpret_cast<float*>(psVar4 + 6),
+						FLOAT_803313e8, FLOAT_803313e8, 0);
+					iVar9++;
+				}
+				iVar5++;
+			}
+		}
+	}
+
+	// Name text
+	char nameBuffer[68];
+	int fieldVal = (int)(char)bytes[0x07];
+	if (fieldVal == 0x0F) {
+		strcpy(nameBuffer, "");
+	} else if (fieldVal == 0x16) {
+		strcpy(nameBuffer, "");
+	} else {
+		strcpy(nameBuffer, "");
+	}
+
+	unsigned int textW = 0xD8;
+	char secondLine[64];
+	secondLine[0] = 0;
+	CFont* font = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
+		textW = 0xA2;
+	}
+	fontFC->SetMargin(FLOAT_803313e8);
+	fontFC->SetShadow(0);
+	fontFC->SetScale(FLOAT_803313e8);
+	double nameWidth = (double)fontFC->GetWidth(nameBuffer);
+	bool twoLines = nameWidth > (double)(float)textW;
+	if (twoLines) {
+		char tempBuf[64];
+		strcpy(tempBuf, nameBuffer);
+		char* spacePos = strrchr(tempBuf, 0x20);
+		if (spacePos == NULL) {
+			secondLine[0] = 0;
+		} else {
+			*spacePos = 0;
+			strcpy(secondLine, spacePos + 1);
+		}
+		strcpy(nameBuffer, tempBuf);
+	}
+
+	fontFC->SetMargin(FLOAT_803313e8);
+	fontFC->SetShadow(0);
+	fontFC->SetScale(FLOAT_803313e8);
+	fontFC->DrawInit();
+	unsigned int whiteColor = 0xFFFFFFFF;
+	fontFC->SetColor(*(_GXColor*)&whiteColor);
+	fontFC->SetPosX((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x70));
+	fontFC->SetPosY((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72));
+	fontFC->Draw(nameBuffer);
+
+	if (twoLines) {
+		double w2 = (double)fontFC->GetWidth(secondLine);
+		fontFC->SetPosX((float)((double)FLOAT_80331704 - w2) * FLOAT_80331434 +
+		                (float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)));
+		fontFC->SetPosY((float)(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) + 0x16));
+		fontFC->Draw(secondLine);
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+
+	// 3D viewport rendering
+	bool viewportSetup = false;
+	if ((*reinterpret_cast<unsigned short*>(bytes + 0x1A) & 0x3F0) != 0) {
+		int viewOff = 0x1E0;
+		for (int slot = 6; slot < 0x11; slot++) {
+			int* piVar10 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + viewOff);
+			if (*piVar10 != 0) {
+				if (!viewportSetup) {
+					Mtx44 projMtx;
+					C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+					GXSetProjection(projMtx, GX_PERSPECTIVE);
+
+					Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
+					Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+					Mtx lookAtMtx;
+					C_MTXLookAt(lookAtMtx, &eye, &up, (Vec*)(piVar10 + 4));
+					PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+					InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+					GXSetColorUpdate(0);
+					GXSetAlphaUpdate(0);
+					unsigned int clearColor = 0;
+					GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+					GXSetColorUpdate(1);
+					GXSetAlphaUpdate(1);
+
+					GXSetViewport(
+						(float)*reinterpret_cast<short*>(piVar10 + 2),
+						(float)*reinterpret_cast<short*>((int)(piVar10 + 2) + 2),
+						(float)*reinterpret_cast<short*>(piVar10 + 3),
+						(float)*reinterpret_cast<short*>((int)(piVar10 + 3) + 2),
+						FLOAT_803313dc, FLOAT_803313e8);
+					GXSetScissor(piVar10[0x10], piVar10[0x11], piVar10[0x12], piVar10[0x13]);
+					viewportSetup = true;
+				}
+				SetFog__8CGraphicFii(&Graphic, 1, 0);
+				unsigned int ambColor = DAT_80210830[0];
+				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
+				SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+				for (int j = 0; j < DAT_8021082c[0]; j++) {
+					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
+				}
+				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+			}
+			viewOff += 0x50;
+		}
+	}
+
+	if (viewportSetup) {
+		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		DrawInit__8CMenuPcsFv(this);
+	}
 }
 
 /*
@@ -2040,7 +5265,207 @@ void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, in
  */
 void CMenuPcs::CalcWMFrame()
 {
-	CalcWMFrame0(0);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	short sVar3 = *reinterpret_cast<short*>(worldState + 0x10);
+	if (sVar3 == 0 || sVar3 > 2) {
+		return;
+	}
+
+	int wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	if (sVar3 == 2 && bytes[0x13] != 0) {
+		*reinterpret_cast<int*>(wmFrame + 4) = *reinterpret_cast<int*>(wmFrame + 4) - 1;
+		if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
+			*reinterpret_cast<int*>(wmFrame + 4) = 0;
+		}
+	} else {
+		if ((bytes[0x0A] & 1) != 0) {
+			int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
+			if (iVar16 != 0) {
+				*reinterpret_cast<int*>(wmFrame + 4) = iVar16 - 1;
+				if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
+					*reinterpret_cast<int*>(wmFrame + 4) = 0;
+				}
+				if (*reinterpret_cast<int*>(wmFrame + 4) == 0) {
+					bytes[0x0A] = bytes[0x0A] & 0xFE;
+				}
+				goto LAB_calc;
+			}
+		}
+		int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
+		if (iVar16 < 10) {
+			*reinterpret_cast<int*>(wmFrame + 4) = iVar16 + 1;
+		}
+	}
+LAB_calc:
+	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	*reinterpret_cast<short*>(wmFrame + 0x98) = 0x68;
+	float fVar1 = FLOAT_803313dc;
+	*reinterpret_cast<short*>(wmFrame + 0x9A) = 0x14;
+	*reinterpret_cast<short*>(wmFrame + 0x9C) = 200;
+	*reinterpret_cast<short*>(wmFrame + 0x9E) = 0x28;
+	*reinterpret_cast<float*>(wmFrame + 0xA0) = fVar1;
+
+	if ((bytes[0x0A] & 1) == 0) {
+		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x04];
+		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
+	} else {
+		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x05];
+		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
+	}
+
+	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	*reinterpret_cast<short*>(wmFrame + 0x98) = (short)(10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
+
+	if (((bytes[0x0A] & 2) != 0 ||
+	     (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) == 2 && bytes[0x13] != 0))
+	    && *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 8) > 9) {
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 8) = 0;
+		bytes[0x0A] = bytes[0x0A] & 0xFD;
+	}
+
+	fVar1 = FLOAT_803313e8;
+	char cVar2;
+	if ((bytes[0x0A] & 2) == 0) {
+		cVar2 = (char)bytes[0x0C];
+	} else {
+		cVar2 = (char)bytes[0x0B];
+	}
+	unsigned int uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)cVar2;
+	DAT_8032ee30 = (unsigned char)uVar13;
+	if ((int)uVar13 > 99) {
+		DAT_8032ee30 = 100;
+	}
+
+	unsigned int uVar14 = 1 - ((int)(((int)(uVar13 ^ 9) >> 1) - ((uVar13 ^ 9) & uVar13)) >> 0x1F);
+	if ((int)uVar13 > 99) {
+		uVar14 = 3;
+	}
+
+	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	*reinterpret_cast<float*>(wmFrame + 200) = FLOAT_803313e8;
+	*reinterpret_cast<float*>(wmFrame + 0xE4) = fVar1;
+
+	int iVar16 = DAT_801dc140;
+	if (uVar14 == 3) {
+		*reinterpret_cast<short*>(wmFrame + 0xB4) = (short)((0x2B - DAT_801dc140) / 2) + 0x2C;
+		*reinterpret_cast<short*>(wmFrame + 0xB6) = 0x43;
+		*reinterpret_cast<short*>(wmFrame + 0xB8) = (short)iVar16;
+		*reinterpret_cast<short*>(wmFrame + 0xBA) = 0x20;
+		*reinterpret_cast<float*>(wmFrame + 0xBC) = FLOAT_80331524;
+		*reinterpret_cast<float*>(wmFrame + 0xC0) = FLOAT_80331528;
+	} else {
+		int digits[4];
+		iVar16 = (int)uVar13 / 10 + ((int)uVar13 >> 0x1F);
+		digits[0] = uVar13 + (iVar16 - (iVar16 >> 0x1F)) * -10;
+		if (uVar14 > 1) {
+			digits[1] = iVar16 - (iVar16 >> 0x1F);
+		}
+		iVar16 = DAT_801dc118[digits[0]];
+		if (uVar14 > 1) {
+			int iVar15 = (int)uVar13 / 10 + ((int)uVar13 >> 0x1F);
+			iVar16 = iVar16 + DAT_801dc118[iVar15 - (iVar15 >> 0x1F)];
+		}
+		int iVar19 = uVar14 - 1;
+		int iVar15 = (0x2B - iVar16) / 2 + 0x2C;
+		int off = iVar19 * 0x1C;
+		int* piVar17 = digits + iVar19;
+		unsigned int cnt = uVar14;
+		if (iVar19 >= 0) {
+			do {
+				int digit = *piVar17;
+				*reinterpret_cast<short*>(wmFrame + off + 0xB4) = (short)iVar15;
+				int digitW = DAT_801dc118[digit];
+				piVar17--;
+				int iVar21 = digit / 5 + (digit >> 0x1F);
+				*reinterpret_cast<short*>(wmFrame + off + 0xB6) = 0x43;
+				*reinterpret_cast<short*>(wmFrame + off + 0xB8) = (short)digitW;
+				*reinterpret_cast<short*>(wmFrame + off + 0xBA) = 0x20;
+				int col = digit + (iVar21 - (iVar21 >> 0x1F)) * -5;
+				int row = iVar21 - (iVar21 >> 0x1F);
+				*reinterpret_cast<float*>(wmFrame + off + 0xBC) = (float)((double)col * DOUBLE_80331490);
+				*reinterpret_cast<float*>(wmFrame + off + 0xC0) = (float)((double)row * DOUBLE_80331540 + DOUBLE_80331538);
+				iVar15 = iVar15 + digitW;
+				off = off - 0x1C;
+				cnt--;
+			} while (cnt != 0);
+		}
+	}
+
+	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	if ((bytes[0x0A] & 2) == 0 &&
+	    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) != 2 || bytes[0x13] == 0)) {
+		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(wmFrame + 8);
+		float t = (float)(uVar) / FLOAT_803314c0;
+		if (t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
+			int idx = 0;
+			float* pf = DAT_8032e8c4;
+			int cnt = DAT_8032e8c0;
+			float result = FLOAT_803313dc;
+			if (cnt > 0) {
+				do {
+					if (t <= *pf) {
+						if (idx == 0) {
+							result = DAT_8032e8c4[1];
+						} else {
+							float* cur = DAT_8032e8c4 + idx * 4;
+							float* prev = DAT_8032e8c4 + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							result = dt * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
+							         prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+						}
+						break;
+					}
+					pf += 4;
+					idx++;
+					cnt--;
+				} while (cnt != 0);
+			}
+			*reinterpret_cast<short*>(wmFrame + 0xD2) = (short)(int)result;
+			*reinterpret_cast<short*>(wmFrame + 0xE0) = (short)(int)result;
+		}
+
+		t = (float)(uVar) / FLOAT_803314c0;
+		if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+			int idx = 0;
+			float* pf = DAT_8032e8cc;
+			int cnt = DAT_8032e8c8;
+			float result = FLOAT_803313dc;
+			if (cnt > 0) {
+				do {
+					if (t <= *pf) {
+						if (idx == 0) {
+							result = DAT_8032e8cc[1];
+						} else {
+							float* cur = DAT_8032e8cc + idx * 4;
+							float* prev = DAT_8032e8cc + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							result = dt * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
+							         prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+						}
+						break;
+					}
+					pf += 4;
+					idx++;
+					cnt--;
+				} while (cnt != 0);
+			}
+			*reinterpret_cast<short*>(wmFrame + 0xB6) = (short)(int)result;
+			*reinterpret_cast<short*>(wmFrame + 0xC4) = (short)(int)result;
+		}
+
+		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;
+	} else {
+		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;
+	}
 }
 
 /*
@@ -2054,7 +5479,117 @@ void CMenuPcs::CalcWMFrame()
  */
 void CMenuPcs::DrawWMFrame()
 {
-	DrawWMFrame0(3, 1.0f);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	int wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+
+	float rotation = *reinterpret_cast<float*>(worldState) * FLOAT_803314bc;
+	Mtx rotMtx;
+	PSMTXRotRad(rotMtx, 'z', rotation);
+
+	short sVar = *reinterpret_cast<short*>(worldState + 0x10);
+	float alpha;
+	if (sVar == 0) {
+		alpha = (float)(int)*reinterpret_cast<short*>(worldState + 0x22) * FLOAT_803314e8;
+	} else if (sVar >= 3) {
+		alpha = FLOAT_803313e8 - (float)(int)*reinterpret_cast<short*>(worldState + 0x22) * FLOAT_803314e8;
+	} else {
+		alpha = FLOAT_803313e8;
+	}
+	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
+	if (alpha > FLOAT_803313e8) alpha = FLOAT_803313e8;
+
+	unsigned int uAlpha = (unsigned int)(FLOAT_80331458 * alpha);
+
+	for (int i = 0; i < 5; i++) {
+		int off = wmFrame + 0x0C + i * 0x1C;
+		SetAttrFmt((FMT)0);
+		SetTexture((TEX)(0x16 + i));
+		DrawRect2(
+			uAlpha,
+			(float)*reinterpret_cast<short*>(off),
+			(float)*reinterpret_cast<short*>(off + 2),
+			(float)*reinterpret_cast<short*>(off + 4),
+			(float)*reinterpret_cast<short*>(off + 6),
+			*reinterpret_cast<float*>(off + 8),
+			*reinterpret_cast<float*>(off + 0xC),
+			*reinterpret_cast<float*>(off + 0x10),
+			*reinterpret_cast<float*>(off + 0x14),
+			rotMtx);
+	}
+
+	if (sVar == 1 || sVar == 2) {
+		SetAttrFmt((FMT)0);
+		SetTexture((TEX)0x17);
+		int gaugeAlpha = *reinterpret_cast<int*>(wmFrame + 4);
+		DrawRect(0xFFFFFFFF, 
+			(float)*reinterpret_cast<short*>(wmFrame + 0x98),
+			(float)*reinterpret_cast<short*>(wmFrame + 0x9A),
+			(float)*reinterpret_cast<short*>(wmFrame + 0x9C),
+			(float)*reinterpret_cast<short*>(wmFrame + 0x9E),
+			*reinterpret_cast<float*>(wmFrame + 0xA0),
+			FLOAT_803313dc,
+			FLOAT_803313e8,
+			FLOAT_803313e8,
+			gaugeAlpha);
+
+		if (sVar < 3) {
+			SetAttrFmt((FMT)0);
+			SetTexture((TEX)0x21);
+			DrawRect(0xFFFFFFFF, 
+				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803313e8, FLOAT_803313e8,
+				uAlpha);
+
+			int digitCnt = 1;
+			unsigned int lvl = (unsigned int)DAT_8032ee30;
+			if (lvl > 99) digitCnt = 3;
+			else if (lvl > 9) digitCnt = 2;
+
+			if (digitCnt == 3) {
+				int off = wmFrame + 0xB4;
+				SetAttrFmt((FMT)0);
+				SetTexture((TEX)0x20);
+				DrawRect(0xFFFFFFFF, 
+					(float)*reinterpret_cast<short*>(off),
+					(float)*reinterpret_cast<short*>(off + 2),
+					(float)*reinterpret_cast<short*>(off + 4),
+					(float)*reinterpret_cast<short*>(off + 6),
+					*reinterpret_cast<float*>(off + 8),
+					*reinterpret_cast<float*>(off + 0xC),
+					FLOAT_803313e8,
+					FLOAT_803313e8,
+					uAlpha);
+			} else {
+				for (int i = 0; i < (int)digitCnt; i++) {
+					int off = wmFrame + 0xB4 + i * 0x1C;
+					SetAttrFmt((FMT)0);
+					SetTexture((TEX)0x1F);
+					DrawRect(0xFFFFFFFF, 
+						(float)*reinterpret_cast<short*>(off),
+						(float)*reinterpret_cast<short*>(off + 2),
+						(float)*reinterpret_cast<short*>(off + 4),
+						(float)*reinterpret_cast<short*>(off + 6),
+						*reinterpret_cast<float*>(off + 8),
+						*reinterpret_cast<float*>(off + 0xC),
+						FLOAT_803313e8,
+						FLOAT_803313e8,
+						uAlpha);
+				}
+			}
+
+			SetAttrFmt((FMT)0);
+			SetTexture((TEX)0x34);
+			DrawRect(0xFFFFFFFF, 
+				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803313e8, FLOAT_803313e8,
+				uAlpha);
+		}
+	}
 }
 
 /*
@@ -2071,26 +5606,28 @@ void CMenuPcs::CalcWMFrame0(int param)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
 
-	if (frame == 0) {
-		return;
-	}
-
 	reinterpret_cast<short*>(frame + 4)[0] = 0x10;
-	reinterpret_cast<short*>(frame + 0x20)[0] = static_cast<short>(640 - (reinterpret_cast<short*>(frame + 8)[0] + reinterpret_cast<short*>(frame + 4)[0]));
+	int iVar1 = *reinterpret_cast<int*>(bytes + 0x820);
+	reinterpret_cast<short*>(iVar1 + 0x20)[0] = static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(iVar1 + 8)) + static_cast<int>(*reinterpret_cast<short*>(iVar1 + 4)))));
 
 	if (param < 0) {
-		float offset = static_cast<float>(reinterpret_cast<short*>(frame + 8)[0] + reinterpret_cast<short*>(frame + 4)[0]);
+		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 8)) + static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4)));
 		if (param > -11) {
-			int absParam = -param;
-			if (absParam > 10) {
+			unsigned int sign = static_cast<unsigned int>(param) >> 31;
+			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
+			float t_unclamped = static_cast<float>(static_cast<int>(absParam));
+			float dVar4 = offset * 0.1f * t_unclamped;
+			if (static_cast<int>(absParam) < 0) {
+				absParam = 0;
+			}
+			if (static_cast<int>(absParam) > 10) {
 				absParam = 10;
 			}
-			float t = static_cast<float>(absParam);
-			offset = offset * 0.1f * t;
-			offset = offset * static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_80331698));
+			float t_clamped = static_cast<float>(static_cast<int>(absParam));
+			offset = dVar4 * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316d4)));
 		}
-		reinterpret_cast<short*>(frame + 4)[0] = static_cast<short>(static_cast<float>(reinterpret_cast<short*>(frame + 4)[0]) - offset);
-		reinterpret_cast<short*>(frame + 0x20)[0] = static_cast<short>(static_cast<float>(reinterpret_cast<short*>(frame + 0x20)[0]) + offset);
+		reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4))) - offset));
+		reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20))) + offset));
 	}
 }
 
@@ -2106,49 +5643,28 @@ void CMenuPcs::CalcWMFrame0(int param)
 void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
-	if (frame == 0) {
-		return;
-	}
-
-	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
-	}
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(255.0f * alpha);
+	unsigned char alphaU8 = static_cast<unsigned char>(static_cast<int>(255.0 * static_cast<double>(alpha)));
+	GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
-	if (mask == 0) {
-		mask = 3;
-	}
-
-	for (int i = 0; i < 2; i++) {
-		if ((mask & (1 << i)) == 0) {
-			continue;
+	int i = 0;
+	int offset = 0;
+	do {
+		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
+			short* psVar1 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + offset + 4);
+			DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
+			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
+			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
+			         1.0f, 1.0f, *reinterpret_cast<float*>(psVar1 + 0xC));
 		}
-
-		unsigned char* const entry = frame + 4 + i * 0x1C;
-		const short x = reinterpret_cast<short*>(entry + 0)[0];
-		const short y = reinterpret_cast<short*>(entry + 2)[0];
-		const short w = reinterpret_cast<short*>(entry + 4)[0];
-		const short h = reinterpret_cast<short*>(entry + 6)[0];
-		const float u = reinterpret_cast<float*>(entry + 8)[0];
-		const float v = reinterpret_cast<float*>(entry + 0xC)[0];
-		const unsigned int flags = reinterpret_cast<unsigned int*>(entry + 0x18)[0];
-
-		DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h), u, v, 1.0f, 1.0f,
-		         static_cast<float>(flags));
-	}
+		i = i + 1;
+		offset = offset + 0x1C;
+	} while (i < 2);
 }
 
 /*
@@ -2336,12 +5852,12 @@ void CMenuPcs::PCAnimCtrl()
 		}
 
 		unsigned char* const model = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0x18)[0] == 0 || reinterpret_cast<int*>(handle)[0] == 3) {
+		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0xB0)[0] == 0 || reinterpret_cast<int*>(handle)[0] == 3) {
 			continue;
 		}
 
 		const unsigned int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
-		animState[3] = reinterpret_cast<int*>(model + 8)[0];
+		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 		const int baseAnim = (static_cast<int>(reinterpret_cast<unsigned int*>(handle + 4)[0] / 100) - 1) * 6;
 		const int currentAnimIndex = reinterpret_cast<int*>(handle + 0x16C)[0];
 		const int blendMode = -1 - (currentAnimIndex >> 31);
@@ -2350,19 +5866,19 @@ void CMenuPcs::PCAnimCtrl()
 			animState[0] = animState[1];
 			animState[1] = -1;
 			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 8)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 			animState[2] = 0;
 			continue;
 		}
 
-		const float frame = reinterpret_cast<float*>(model + 8)[0];
-		const float frameEnd = reinterpret_cast<float*>(model + 0x10)[0];
+		const float frame = reinterpret_cast<float*>(model + 0xB4)[0];
+		const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
 		if (isSelected == 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8 && animState[0] == 0 && animState[2] > 2999) {
 			animState[0] = 4;
 			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 8)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 			animState[2] = 0;
 		} else if (isSelected != 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8) {
 			if (animState[0] == 1 && animState[2] > 11999) {
@@ -2379,8 +5895,8 @@ void CMenuPcs::PCAnimCtrl()
 					if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 						animState[0] = 0;
 						SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
-						animState[3] = reinterpret_cast<int*>(model + 8)[0];
-						animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+						animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+						animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 						animState[2] = isSelected == 0 ? 0 : 0x834;
 					}
 					SetFrame__Q26CChara6CModelFf(FLOAT_803313dc, model);
@@ -2392,15 +5908,15 @@ void CMenuPcs::PCAnimCtrl()
 			}
 
 			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 8)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 		} else {
 			if (frameEnd <= frame) {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
 					SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
-					animState[3] = reinterpret_cast<int*>(model + 8)[0];
-					animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+					animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+					animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 					animState[2] = isSelected == 0 ? 0 : 0x834;
 				}
 				SetFrame__Q26CChara6CModelFf(FLOAT_803313dc, model);
@@ -2473,7 +5989,129 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
  */
 void CMenuPcs::CalcCharaSelect()
 {
-	CalcMainMenuSub();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<short*>(bytes + 0x74) = *reinterpret_cast<short*>(bytes + 0x74) + 1;
+
+	unsigned int clz = __cntlzw((unsigned int)Game.m_gameWork.m_menuStageMode);
+	if ((int)(((clz >> 5) + 2) * 0x4B) <= (int)*reinterpret_cast<short*>(bytes + 0x74)) {
+		*reinterpret_cast<short*>(bytes + 0x74) = 0;
+	}
+
+	// Read pad states for each port
+	unsigned short padTrig[4];
+	unsigned short padHeld[4];
+	for (int i = 0; i < 4; i++) {
+		int padState = *reinterpret_cast<int*>(bytes + 0x828) + i * 0x10;
+		padTrig[i] = 0;
+		padHeld[i] = 0;
+		if (i == 0 || Game.m_gameWork.m_menuStageMode == 0) {
+			int padType = GetPadType__7CJoybusFi(&Joybus, i);
+			*reinterpret_cast<int*>(padState) = padType;
+			if (padType == 0x9000000 || padType == -0x74F00000 || padType == -0x78000000) {
+				if (Game.m_gameWork.m_menuStageMode == 0) {
+					*reinterpret_cast<char*>(padState + 0x0D) = 0;
+				} else {
+					*reinterpret_cast<char*>(padState + 0x0D) = 1;
+				}
+			} else {
+				*reinterpret_cast<char*>(padState + 0x0D) = GetGBAConnect__7CJoybusFi(&Joybus, i);
+			}
+		} else {
+			*reinterpret_cast<char*>(padState + 0x0D) = 0;
+		}
+	}
+
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	if (*reinterpret_cast<short*>(worldState + 0x10) == 2 &&
+	    *reinterpret_cast<short*>(worldState + 0x1E) == 0) {
+		short winState = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10);
+		if (winState == 3) {
+			// Character slot assignment and model loading
+			unsigned int charMask = 0;
+			int padBase = *reinterpret_cast<int*>(bytes + 0x828);
+			if (Game.m_gameWork.m_menuStageMode == 0) {
+				for (int j = 0; j < 4; j++) {
+					int ps = padBase + j * 0x10;
+					if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
+						charMask |= 1 << (int)*reinterpret_cast<short*>(ps + 4);
+					}
+				}
+			}
+
+			// Process pad disconnect/reconnect
+			for (int j = 0; j < 4; j++) {
+				if (Game.m_gameWork.m_menuStageMode != 0) break;
+				int ps = padBase + j * 0x10;
+				if (*reinterpret_cast<char*>(ps + 0x0D) == 0) {
+					ClrCmakeInfo__8GbaQueueFi(&GbaQue, j);
+					if (*reinterpret_cast<char*>(ps + 0x0C) == 1) {
+						*reinterpret_cast<char*>(ps + 0x0C) = 0;
+					}
+				}
+			}
+
+			// Count confirmed players
+			unsigned int confirmedMask = 0;
+			for (int j = 0; j < 4; j++) {
+				int ps = padBase + j * 0x10;
+				if (*reinterpret_cast<char*>(ps + 0x0A) != 0) {
+					confirmedMask |= 1 << (int)*reinterpret_cast<short*>(ps + 4);
+				}
+			}
+
+			// Check ready state
+			int padIdx = 0;
+			int readyCount = 0;
+			for (int j = 0; j < 4; j++) {
+				int ps = padBase + j * 0x10;
+				if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
+					readyCount++;
+				}
+			}
+
+			// Handle start button
+			if (readyCount > 0) {
+				for (int j = 0; j < 4; j++) {
+					int ps = padBase + j * 0x10;
+					if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
+						if ((padTrig[j] & 0x1000) != 0) {
+							// Start pressed - confirm selection
+							if (*reinterpret_cast<char*>(ps + 0x0A) == 0) {
+								*reinterpret_cast<char*>(ps + 0x0A) = 1;
+								Sound.PlaySe(0x42, 0x40, 0x7F, 0);
+							}
+						}
+						if ((padTrig[j] & 0x2000) != 0) {
+							// B pressed - cancel
+							if (*reinterpret_cast<char*>(ps + 0x0A) != 0) {
+								*reinterpret_cast<char*>(ps + 0x0A) = 0;
+								Sound.PlaySe(0x43, 0x40, 0x7F, 0);
+							}
+						}
+					}
+				}
+			}
+
+			// Check all confirmed
+			int confirmedCount = 0;
+			int totalJoined = 0;
+			for (int j = 0; j < 4; j++) {
+				int ps = padBase + j * 0x10;
+				if (*reinterpret_cast<char*>(ps + 0x0B) != 0) {
+					totalJoined++;
+					if (*reinterpret_cast<char*>(ps + 0x0A) != 0) {
+						confirmedCount++;
+					}
+				}
+			}
+			if (confirmedCount > 0 && confirmedCount == totalJoined) {
+				// All players confirmed - advance state
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) = 1;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+				*reinterpret_cast<short*>(bytes + 0x870) = 3;
+			}
+		}
+	}
 }
 
 /*
@@ -2534,7 +6172,442 @@ void CMenuPcs::WMSubMenuInit()
 void CMenuPcs::WMChgMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[4] = bytes[5];
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+
+	if (*reinterpret_cast<short*>(worldState + 0x20) == 0) {
+		return;
+	}
+
+	int iVar14 = (int)*reinterpret_cast<short*>(worldState + 0x1C);
+	DAT_8032ee1c = 1;
+
+	short sVar2 = *reinterpret_cast<short*>(worldState + 0x20);
+
+	if (sVar2 == 2) {
+		char cVar1 = bytes[0xD];
+		if (cVar1 == 1) {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		} else if (cVar1 == 2) {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 5;
+		} else if (cVar1 == 3) {
+			DAT_8032ee1c = 1;
+			if (iVar14 == 6) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 0;
+				return;
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 6;
+		} else if (cVar1 == 4) {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 4;
+		} else {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 1;
+		}
+	} else if (iVar14 == 0) {
+		if (sVar2 == 1) {
+			short sVar2b = *reinterpret_cast<short*>(worldState + 0x26);
+			if (sVar2b == 0) {
+				*reinterpret_cast<short*>(worldState + 0x1C) = 3;
+			} else if (sVar2b == 1) {
+				*reinterpret_cast<short*>(worldState + 0x1C) = 1;
+				memset(*reinterpret_cast<void**>(bytes + 0x83C), 0, 0x10);
+			} else if (sVar2b == 2) {
+				*reinterpret_cast<short*>(worldState + 0x1C) = 8;
+			} else if (sVar2b == 3) {
+				*reinterpret_cast<short*>(worldState + 0x1C) = 7;
+			} else {
+				*reinterpret_cast<short*>(worldState + 0x1C) = 2;
+			}
+		} else {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 4;
+		}
+	} else if (iVar14 == 1) {
+		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 1;
+	} else if (iVar14 == 8) {
+		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 2;
+	} else if (iVar14 == 7) {
+		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 3;
+	} else if (iVar14 == 2) {
+		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 4;
+	} else if (iVar14 == 5) {
+		if (sVar2 == 1) {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+			bytes[0xD] = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
+			int stackA[3];
+			stackA[0] = 1;
+			stackA[1] = 1;
+			stackA[2] = 0;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			    CFlat, 0, 1, 4, 3, stackA, 0);
+		} else if (sVar2 == -1) {
+			DAT_8032ee1c = 1;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 6;
+			int stackB[3];
+			stackB[0] = 1;
+			stackB[1] = 0;
+			stackB[2] = 0;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			    CFlat, 0, 1, 4, 3, stackB, 0);
+		}
+	} else if (iVar14 == 6) {
+		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+	} else if (sVar2 == 1) {
+		if (*reinterpret_cast<short*>(worldState + 0x1C) < 8) {
+			*reinterpret_cast<short*>(worldState + 0x1C) = *reinterpret_cast<short*>(worldState + 0x1C) + 1;
+		} else {
+			bytes[0xD] = 0;
+		}
+	} else if (sVar2 == -1) {
+		short sVar2c = *reinterpret_cast<short*>(worldState + 0x1C);
+		if (sVar2c < 1) {
+			bytes[0xD] = 0;
+		} else if (sVar2c == 3) {
+			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
+		} else {
+			*reinterpret_cast<short*>(worldState + 0x1C) = sVar2c - 1;
+		}
+	}
+
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) != 0) {
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
+	}
+
+	float fVar6 = FLOAT_803315b0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+	float fVar5 = FLOAT_803313e8;
+	float fVar4 = FLOAT_803313dc;
+	double local_40 = (double)(long long)(int)fVar6;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+	double dVar16 = DOUBLE_803313f8;
+	double dVar15 = (double)FLOAT_80331430;
+	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 0;
+	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 0;
+	double local_38 = (double)(long long)(int)(float)(dVar15 * dVar16);
+	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
+	*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x82C) + 4) = fVar5;
+	*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x82C)) = fVar4;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = 0;
+	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xB) = 0;
+	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xC) = 0;
+
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848)) = (short)(int)fVar6;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 2) = (short)(int)(float)(dVar15 * dVar16);
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 4) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 6) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
+	bytes[0x86E] = 0;
+
+	int frame = *reinterpret_cast<int*>(bytes + 0x820);
+	*reinterpret_cast<short*>(frame + 4) = 0x10;
+	*reinterpret_cast<short*>(frame + 6) = 0x10;
+	*reinterpret_cast<short*>(frame + 8) = 0xE8;
+	*reinterpret_cast<short*>(frame + 10) = 0x168;
+	*reinterpret_cast<float*>(frame + 0xC) = fVar4;
+	*reinterpret_cast<float*>(frame + 0x10) = fVar4;
+	*reinterpret_cast<float*>(frame + 0x14) = fVar5;
+	*reinterpret_cast<float*>(frame + 0x18) = fVar5;
+	*reinterpret_cast<int*>(frame + 0x1C) = 0;
+
+	frame = *reinterpret_cast<int*>(bytes + 0x820);
+	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
+	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
+	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
+	*reinterpret_cast<short*>(frame + 0x26) = *reinterpret_cast<short*>(frame + 10);
+	*reinterpret_cast<int*>(frame + 0x28) = *reinterpret_cast<int*>(frame + 0xC);
+	*reinterpret_cast<int*>(frame + 0x2C) = *reinterpret_cast<int*>(frame + 0x10);
+	*reinterpret_cast<int*>(frame + 0x30) = *reinterpret_cast<int*>(frame + 0x14);
+	*reinterpret_cast<int*>(frame + 0x34) = *reinterpret_cast<int*>(frame + 0x18);
+	*reinterpret_cast<int*>(frame + 0x38) = *reinterpret_cast<int*>(frame + 0x1C);
+
+	frame = *reinterpret_cast<int*>(bytes + 0x820);
+	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
+	*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x38) = 8;
+
+	if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
+	    && *reinterpret_cast<short*>(bytes + 0x86A) >= 0
+	    && *reinterpret_cast<short*>(bytes + 0x86A) < 8) {
+		*reinterpret_cast<short*>(bytes + 0x868) = 1;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 3;
+	} else if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
+	           && *reinterpret_cast<short*>(bytes + 0x86A) > 7) {
+		*reinterpret_cast<short*>(bytes + 0x868) = 0;
+		*reinterpret_cast<short*>(bytes + 0x86A) = (short)0xFFFF;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 3;
+	} else {
+		*reinterpret_cast<short*>(bytes + 0x868) = 0;
+		*reinterpret_cast<short*>(bytes + 0x86A) = (short)0xFFFF;
+	}
+
+	int iVar8 = 0;
+	*reinterpret_cast<short*>(bytes + 0x870) = 0;
+
+	sVar2 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C);
+	if (sVar2 == 4) {
+		*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x82C)) = FLOAT_80331440;
+	} else if (sVar2 < 4) {
+		if (sVar2 == 0) {
+			int iVar11 = *reinterpret_cast<int*>(bytes + 0x814) + 0xA00;
+			int count = 4;
+			do {
+				if (Game.m_caravanWorkArr[*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar8 + 0x36)].m_shopState == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar8 + 0x36) = (short)0xFFFF;
+				}
+				if (Game.m_caravanWorkArr[*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar8 + 0x3E)].m_shopState == 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar8 + 0x3E) = (short)0xFFFF;
+				}
+				int iVar13 = *reinterpret_cast<int*>(iVar11 + 0x20);
+				if (Game.m_caravanWorkArr[iVar13].m_shopState == 0) {
+					*reinterpret_cast<int*>(iVar11 + 0x20) = -1;
+				}
+				if (Game.m_caravanWorkArr[iVar13].m_shopBusyFlag != 0) {
+					*reinterpret_cast<int*>(iVar11 + 0x20) = -1;
+				}
+				fVar4 = FLOAT_8033151c;
+				dVar16 = DOUBLE_803313f8;
+				iVar8 = iVar8 + 2;
+				iVar11 = iVar11 + 4;
+				count = count - 1;
+			} while (count != 0);
+
+			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26)));
+			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26)));
+			*reinterpret_cast<int*>(bytes + 0x80) = 0;
+		} else if (sVar2 > 0 && sVar2 > 2) {
+			int iVar11 = 0;
+			double dVar16b = (double)FLOAT_80331664;
+			int iVar12 = 0;
+			int iVar13 = *reinterpret_cast<int*>(bytes + 0x814) + 0xA00;
+			do {
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x824) + iVar8 + 0xC) = 1;
+				int iVar3 = iVar12 * 4;
+				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
+				int selectData = *reinterpret_cast<int*>(bytes + 0x828) + iVar11;
+				*reinterpret_cast<short*>(selectData + 6) = *reinterpret_cast<short*>(selectData + 4);
+				int iVar9 = IsModelLoaded__Q29CCharaPcs7CHandleFi(
+				    *reinterpret_cast<void**>(bytes + 0x7F4 + iVar3), 1);
+				if (iVar9 != 0) {
+					Mtx mtx;
+					PSMTXIdentity(mtx);
+					void* handle = *reinterpret_cast<void**>(bytes + 0x7F4 + iVar3);
+					SetMatrix__Q26CChara6CModelFPA4_f(*reinterpret_cast<void**>(reinterpret_cast<int>(handle) + 0x168), mtx);
+					CalcMatrix__Q26CChara6CModelFv(*reinterpret_cast<void**>(reinterpret_cast<int>(handle) + 0x168));
+					CalcSkin__Q26CChara6CModelFv(*reinterpret_cast<void**>(reinterpret_cast<int>(handle) + 0x168));
+				}
+				iVar12 = iVar12 + 1;
+				iVar11 = iVar11 + 0x10;
+				iVar13 = iVar13 + 0x50;
+				iVar8 = iVar8 + 0x34;
+			} while (iVar12 < 8);
+
+			iVar8 = 0;
+			do {
+				GbaQue.ClrCmakeInfo(iVar8);
+				iVar8 = iVar8 + 1;
+			} while (iVar8 < 4);
+		}
+	} else if (sVar2 == 7) {
+		GetOptionData();
+	}
+
+	switch (iVar14) {
+	case 0: {
+		int ws = *reinterpret_cast<int*>(bytes + 0x82C);
+		if (*reinterpret_cast<short*>(ws + 0x1C) == 4) {
+			Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(ws + 0x3E);
+			Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(ws + 0x40);
+			Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(ws + 0x42);
+			Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(ws + 0x44);
+			bytes[0x10] = 1;
+			bytes[0x12] = 0;
+			bytes[0x13] = 0;
+		} else {
+			memset(*reinterpret_cast<void**>(bytes + 0x828), 0, 0x80);
+			unsigned char bVar7 = 0;
+			iVar8 = 0;
+			int iVar11 = 0;
+			int iVar12 = 2;
+			do {
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xC) = 0;
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xB) = 0;
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 10) = 0;
+				short sv = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar11 + 0x3E);
+				if (sv < 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)0xFFFF;
+				} else {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = sv;
+					bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+				}
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1C) = 0;
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1B) = 0;
+				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1A) = 0;
+				sv = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar11 + 0x40);
+				if (sv < 0) {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = (short)0xFFFF;
+				} else {
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = sv;
+					bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+				}
+				iVar8 = iVar8 + 0x20;
+				iVar11 = iVar11 + 4;
+				iVar12 = iVar12 - 1;
+			} while (iVar12 != 0);
+
+			iVar8 = 0;
+			iVar11 = 4;
+			do {
+				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) < 0) {
+					int iVar12b = 0;
+					unsigned int uVar10 = (unsigned int)(char)bVar7;
+					if ((uVar10 & 1) != 0) { iVar12b = 1;
+					if ((uVar10 & 2) != 0) { iVar12b = 2;
+					if ((uVar10 & 4) != 0) { iVar12b = 3;
+					if ((uVar10 & 8) != 0) { iVar12b = 4;
+					if ((uVar10 & 0x10) != 0) { iVar12b = 5;
+					if ((uVar10 & 0x20) != 0) { iVar12b = 6;
+					if ((uVar10 & 0x40) != 0) { iVar12b = 7;
+					if ((uVar10 & 0x80) != 0) { iVar12b = 8;
+					}}}}}}}}
+					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)iVar12b;
+					bVar7 = bVar7 | (unsigned char)(1 << iVar12b);
+				}
+				int iVar12c = *reinterpret_cast<int*>(bytes + 0x828) + iVar8;
+				iVar8 = iVar8 + 0x10;
+				*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
+				iVar11 = iVar11 - 1;
+			} while (iVar11 != 0);
+		}
+		break;
+	}
+	case 1:
+		memset(*reinterpret_cast<void**>(bytes + 0x83C), 0, 0x10);
+		bytes[0x11] = 0;
+		break;
+	case 3: {
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 4) {
+			int selectBase = *reinterpret_cast<int*>(bytes + 0x828);
+			if (*reinterpret_cast<char*>(selectBase + 10) == 0) {
+				Game.m_gameWork.m_wmBackupParams[0] = -1;
+			} else {
+				Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(selectBase + 4);
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3E) = (short)Game.m_gameWork.m_wmBackupParams[0];
+
+			if (*reinterpret_cast<char*>(selectBase + 0x1A) == 0) {
+				Game.m_gameWork.m_wmBackupParams[1] = -1;
+			} else {
+				Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(selectBase + 0x14);
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x40) = (short)Game.m_gameWork.m_wmBackupParams[1];
+
+			if (*reinterpret_cast<char*>(selectBase + 0x2A) == 0) {
+				Game.m_gameWork.m_wmBackupParams[2] = -1;
+			} else {
+				Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(selectBase + 0x24);
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x42) = (short)Game.m_gameWork.m_wmBackupParams[2];
+
+			if (*reinterpret_cast<char*>(selectBase + 0x3A) == 0) {
+				Game.m_gameWork.m_wmBackupParams[3] = -1;
+			} else {
+				Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(selectBase + 0x34);
+			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x44) = (short)Game.m_gameWork.m_wmBackupParams[3];
+
+			bytes[0x10] = 1;
+			bytes[0x12] = 0;
+			bytes[0x13] = 0;
+		}
+		break;
+	}
+	case 4: {
+		Sound.PlaySe(0x31, 0x40, 0x7F, 0);
+		bytes[0x10] = 0;
+		memset(*reinterpret_cast<void**>(bytes + 0x828), 0, 0x80);
+		unsigned char bVar7 = 0;
+		iVar8 = 0;
+		int iVar11 = 0;
+		int iVar12 = 2;
+		do {
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xC) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xB) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 10) = 0;
+			short sv = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar11 + 0x3E);
+			if (sv < 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)0xFFFF;
+			} else {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = sv;
+				bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+			}
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1C) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1B) = 0;
+			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1A) = 0;
+			sv = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + iVar11 + 0x40);
+			if (sv < 0) {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = (short)0xFFFF;
+			} else {
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = sv;
+				bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+			}
+			iVar8 = iVar8 + 0x20;
+			iVar11 = iVar11 + 4;
+			iVar12 = iVar12 - 1;
+		} while (iVar12 != 0);
+
+		iVar8 = 0;
+		iVar11 = 4;
+		do {
+			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) < 0) {
+				int iVar12b = 0;
+				unsigned int uVar10 = (unsigned int)(char)bVar7;
+				if ((uVar10 & 1) != 0) { iVar12b = 1;
+				if ((uVar10 & 2) != 0) { iVar12b = 2;
+				if ((uVar10 & 4) != 0) { iVar12b = 3;
+				if ((uVar10 & 8) != 0) { iVar12b = 4;
+				if ((uVar10 & 0x10) != 0) { iVar12b = 5;
+				if ((uVar10 & 0x20) != 0) { iVar12b = 6;
+				if ((uVar10 & 0x40) != 0) { iVar12b = 7;
+				if ((uVar10 & 0x80) != 0) { iVar12b = 8;
+				}}}}}}}}
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)iVar12b;
+				bVar7 = bVar7 | (unsigned char)(1 << iVar12b);
+			}
+			int iVar12c = *reinterpret_cast<int*>(bytes + 0x828) + iVar8;
+			iVar8 = iVar8 + 0x10;
+			*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
+			iVar11 = iVar11 - 1;
+		} while (iVar11 != 0);
+		break;
+	}
+	}
+
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) == 2
+	    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 4) {
+		bytes[0x10] = 1;
+		bytes[0x12] = 0;
+		bytes[0x13] = 0;
+	}
+
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) = 0;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 0;
+
+	sVar2 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C);
+	if (sVar2 == 6) {
+		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22857) = 0;
+	} else if (iVar14 == 6 && sVar2 != 6) {
+		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22857) = 1;
+	}
 }
 
 /*
@@ -2609,6 +6682,9 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
+	if ((unsigned int)System.m_execParam > 2) {
+		Printf__7CSystemFPce(&System, s_ClrCMakeFlg___chan____d_cur____d_801dc390, channel, current);
+	}
 	modelData[current * 0x34 + 0xC] = 0;
 	LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[current]), 3, 0x43, 0);
 }
@@ -2740,8 +6816,8 @@ void CMenuPcs::SetAnim(int anim)
 
 	unsigned char* const model = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
 	if (model != 0) {
-		animState[3] = reinterpret_cast<int*>(model + 8)[0];
-		animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+		animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 	}
 }
 
@@ -2756,13 +6832,12 @@ void CMenuPcs::SetAnim(int anim)
  */
 void CMenuPcs::DrawCursor(int x, int y, float scale)
 {
-	float size = 20.0f * scale;
-	if (size < 1.0f) {
-		size = 1.0f;
-	}
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80331458) * static_cast<double>(scale)));
+	GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 	SetTexture(static_cast<CMenuPcs::TEX>(0));
-	DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), size, size, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -2977,11 +7052,132 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
-	ChkMcDataCnt();
-	DrawPageMark();
-	if (gWmMenuWorkA > 0) {
-		DrawMcWin(0, 0);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	CFont* fontF8 = *reinterpret_cast<CFont**>(bytes + 0xF8);
+	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	short state = *reinterpret_cast<short*>(worldState + 0x10);
+
+	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(worldState + 0x16) != 0) {
+		unsigned int slotIdx = 0;
+		int iVar16 = 0;
+		do {
+			int ws = *reinterpret_cast<int*>(bytes + 0x82C);
+			float yPos = FLOAT_803314d8;
+			float alpha = FLOAT_803313e8;
+			short sub = *reinterpret_cast<short*>(ws + 0x16);
+			if (sub == 1 || *reinterpret_cast<short*>(ws + 0x10) == 3) {
+				int animFrames;
+				if (*reinterpret_cast<short*>(ws + 0x10) == 2) {
+					animFrames = (int)*reinterpret_cast<short*>(ws + 0x22) - iVar16;
+				} else {
+					animFrames = 10 - ((int)*reinterpret_cast<short*>(ws + 0x22) + (3 - (int)slotIdx) * -3);
+				}
+				if (animFrames >= 0) {
+					if (animFrames < 11) {
+						alpha = (float)animFrames;
+						yPos = (float)animFrames * FLOAT_803314e0 + FLOAT_803314dc;
+					}
+					goto LAB_draw;
+				}
+			} else {
+LAB_draw:
+				if (alpha > FLOAT_803314f0) {
+					float slotY = (float)(slotIdx) * FLOAT_80331498 + FLOAT_80331490;
+					SetAttrFmt((FMT)0);
+					unsigned int slotAlpha = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
+					slotAlpha = slotAlpha | 0xFFFFFF00;
+					GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&slotAlpha);
+
+					// Draw slot background
+					SetTexture((TEX)0x24);
+					DrawRect(0xFFFFFFFF, yPos, slotY, FLOAT_80331468, FLOAT_803314f8,
+					         FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, 0);
+					SetTexture((TEX)0x25);
+					DrawRect(0xFFFFFFFF, yPos + FLOAT_80331468, slotY, FLOAT_803314fc, FLOAT_803314f8,
+					         FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, 0);
+
+					// Draw slot content area
+					SetAttrFmt((FMT)1);
+					float contentX = yPos + FLOAT_80331468 + FLOAT_803314fc;
+					DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
+					         FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, 0);
+				}
+			}
+			slotIdx++;
+			iVar16 += 3;
+		} while ((int)slotIdx < 4);
 	}
+
+	// Draw text info for each save slot
+	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
+		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);
+		for (int slot = 0; slot < 4; slot++) {
+			int ws2 = *reinterpret_cast<int*>(bytes + 0x82C);
+			float alpha2 = FLOAT_803313e8;
+			float yPos2 = FLOAT_803314d8;
+			short sub2 = *reinterpret_cast<short*>(ws2 + 0x16);
+			if (sub2 == 1 || *reinterpret_cast<short*>(ws2 + 0x10) == 3) {
+				int af2;
+				if (*reinterpret_cast<short*>(ws2 + 0x10) == 2) {
+					af2 = (int)*reinterpret_cast<short*>(ws2 + 0x22) - slot * 3;
+				} else {
+					af2 = 10 - ((int)*reinterpret_cast<short*>(ws2 + 0x22) + (3 - slot) * -3);
+				}
+				if (af2 < 0) continue;
+				if (af2 < 11) {
+					alpha2 = (float)af2;
+				}
+			}
+
+			if (alpha2 <= FLOAT_803314f0) continue;
+
+			// Check if slot has data
+			unsigned char* slotData = reinterpret_cast<unsigned char*>(mcData) + slot * 0x48;
+			if (*reinterpret_cast<char*>(slotData + 0x42) == 0) {
+				// Empty slot - "No Data"
+				fontF8->SetMargin(FLOAT_803313e8);
+				fontF8->SetShadow(0);
+				fontF8->SetScale(FLOAT_803313e8);
+				fontF8->DrawInit();
+				unsigned int noDataColor = 0xFFFFFFFF;
+				fontF8->SetColor(*(_GXColor*)&noDataColor);
+				fontF8->SetPosX(FLOAT_803314d8);
+				fontF8->SetPosY((float)(slot) * FLOAT_80331498 + FLOAT_80331490);
+				fontF8->Draw("No Data");
+			} else {
+				// Slot has save data - draw character names, levels, play time
+				fontF8->SetMargin(FLOAT_803313e8);
+				fontF8->SetShadow(0);
+				fontF8->SetScale(FLOAT_803313e8);
+				fontF8->DrawInit();
+				unsigned int nameColor = 0xFFFFFFFF;
+				fontF8->SetColor(*(_GXColor*)&nameColor);
+				fontF8->SetPosX(FLOAT_803314d8);
+				fontF8->SetPosY((float)(slot) * FLOAT_80331498 + FLOAT_80331490);
+
+				// Draw character name
+				char nameStr[64];
+				nameStr[0] = 0;
+				fontF8->Draw(nameStr);
+
+				// Level number
+				fontF8->SetPosX(FLOAT_803314d8 + FLOAT_80331500);
+				char levelStr[16];
+				levelStr[0] = 0;
+				fontF8->Draw(levelStr);
+
+				// Play time
+				char timeStr[32];
+				timeStr[0] = 0;
+				fontF8->SetPosX(FLOAT_803314d8 + FLOAT_80331500 + FLOAT_803314fc);
+				fontF8->Draw(timeStr);
+			}
+		}
+	}
+	DrawInit__8CMenuPcsFv(this);
 }
 
 /*
@@ -3791,11 +7987,8 @@ void CMenuPcs::DrawFilter(unsigned char r, unsigned char g, unsigned char b, uns
 {
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(2));
 
-	GXColor color;
-	color.r = r;
-	color.g = g;
-	color.b = b;
-	color.a = a;
+	unsigned int packed = (static_cast<unsigned int>(r) << 24) | (static_cast<unsigned int>(g) << 16) | (static_cast<unsigned int>(b) << 8) | static_cast<unsigned int>(a);
+	GXColor color = *reinterpret_cast<GXColor*>(&packed);
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(-1));
@@ -4011,7 +8204,7 @@ void McCtrl::Init()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::LoadMcList()
+int McCtrl::LoadMcList()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
@@ -4282,7 +8475,7 @@ void McCtrl::SetBrokenFile(int isBroken)
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::SaveDat()
+int McCtrl::SaveDat()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
@@ -4573,7 +8766,7 @@ void McCtrl::SaveDat()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::LoadDat()
+int McCtrl::LoadDat()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
@@ -4996,8 +9189,8 @@ int McCtrl::ChkConnect(int chan)
  */
 int McCtrl::ChkNowData()
 {
-	unsigned int serialLo = 0;
-	unsigned int serialHi = 0;
+	unsigned int serialLo;
+	unsigned int serialHi;
 
 	if (m_state < 0)
 	{
@@ -5019,25 +9212,26 @@ int McCtrl::ChkNowData()
 		if (MemoryCardMan.AsyncFinished() == 1)
 		{
 			m_lastResult = MemoryCardMan.GetResult();
+			int iVar3 = m_lastResult;
 
-			if (m_lastResult < 0)
+			if (iVar3 < 0)
 			{
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
 
-				if (m_lastResult == -6)
+				if (iVar3 == -6)
 				{
 					m_state = 2;
 				}
 				else
 				{
-					if (m_lastResult == -0x0D)
+					if (iVar3 == -0x0D)
 					{
 						m_state = -1;
 						return -0x0D;
 					}
 
-					if (m_lastResult == -5)
+					if (iVar3 == -5)
 					{
 						m_state = -1;
 						return -5;
@@ -5070,11 +9264,8 @@ int McCtrl::ChkNowData()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = 7;
 
-				if (m_lastResult == -5)
-				{
-					return -5;
-				}
-				return -6;
+				unsigned int uVar1 = __cntlzw(static_cast<unsigned int>(-5 - m_lastResult));
+				return static_cast<int>(uVar1 >> 5) - 6;
 			}
 
 			m_state = 4;
@@ -5396,7 +9587,7 @@ void McCtrl::ChkParty(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::EraseDat()
+int McCtrl::EraseDat()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;

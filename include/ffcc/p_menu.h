@@ -43,7 +43,8 @@ public:
     };
     struct FCV
     {
-
+        int keyCount;
+        float* keys;
     };
     struct EffectInfo
     {
@@ -186,7 +187,7 @@ public:
     void GetWorldParam(int);
     void CallWorldParam(int, int, int);
     void CalcSpl(SPL*, SPL*, float);
-    void GetFcvValue(FCV, float);
+    double GetFcvValue(FCV, float);
     void SetProjection(int);
     void RestoreProjection();
     void DrawObj(int);
@@ -213,6 +214,7 @@ public:
     void DrawCMLife();
     void WMSubMenuInit();
     void WMChgMenu();
+    void GetOptionData();
     void SetParty();
     void SetCMakeEnd(int);
     void ClrCMakeFlg(int);

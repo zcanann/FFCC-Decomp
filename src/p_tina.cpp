@@ -1164,34 +1164,22 @@ void CPartPcs::GetParLocIdx(int index, Vec& location)
  */
 void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 {
-	struct PartMngColorWriteView {
-		u8 pad0[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-		u8 pad1[0xA7];
-		u8 ownerScaleMode;
-		u8 pad2[1];
-		u8 lockScaleFromOwner;
-	};
-	PartMngColorWriteView* pppMngSt =
-	    reinterpret_cast<PartMngColorWriteView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	_pppMngSt* pppMngSt = &PartMng.m_pppMng[index];
 	float* colorValues = reinterpret_cast<float*>(&color);
 	float one = kPartColorIdentityOne;
 
-	pppMngSt->r = colorValues[0];
-	pppMngSt->g = colorValues[1];
-	pppMngSt->b = colorValues[2];
-	pppMngSt->a = colorValues[3];
+	pppMngSt->m_userFloat0 = colorValues[0];
+	pppMngSt->m_userFloat1 = colorValues[1];
+	pppMngSt->m_scaleFactor = colorValues[2];
+	pppMngSt->m_ownerScale = colorValues[3];
 
 	if (one == colorValues[0] && one == colorValues[1] && one == colorValues[2] && one == colorValues[3]) {
-		pppMngSt->ownerScaleMode = 0;
+		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;
 		return;
 	}
 
-	pppMngSt->ownerScaleMode = 1;
-	pppMngSt->lockScaleFromOwner = 1;
+	PartMng.m_pppMng[index].m_useOwnerScaleSign = 1;
+	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
 }
 
 /*

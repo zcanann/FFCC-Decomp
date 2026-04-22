@@ -7,7 +7,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
-#include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
@@ -28,6 +27,7 @@ extern const float FLOAT_80332008 = 1.0f;
 extern const float FLOAT_8033200C = 128.0f;
 extern const float FLOAT_80332010;
 extern const double DOUBLE_80332018;
+extern int __float_nan[];
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -284,9 +284,9 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
                 if (magnitude > FLOAT_80331FE8) {
                     magnitude = Crystal2SqrtPositive(magnitude);
                 } else if ((double)magnitude < DOUBLE_80332000) {
-                    magnitude = NAN;
+                    magnitude = *(float*)__float_nan;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
-                    magnitude = NAN;
+                    magnitude = *(float*)__float_nan;
                 }
 
                 if (magnitude > FLOAT_80332008) {

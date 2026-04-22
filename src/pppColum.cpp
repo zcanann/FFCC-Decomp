@@ -99,11 +99,11 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
         texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionWork->m_alpha != 0) {
-            Vec shapePosB;
-            Vec shapePosA;
-            Vec offset;
-            Vec center;
             Vec cameraDelta;
+            Vec center;
+            Vec offset;
+            Vec shapePosA;
+            Vec shapePosB;
             Mtx identityMtx;
             Vec2d uvA;
             Vec2d uvB;

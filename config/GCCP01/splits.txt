@@ -124,7 +124,7 @@ usb.cpp:
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
 	.rodata     start:0x801D6F9C end:0x801D7058
-	.data       start:0x801E88A4 end:0x801E88C4
+	.data       start:0x801E8898 end:0x801E88B8
 	.bss        start:0x802455C0 end:0x80245640
 
 util.cpp:
@@ -132,7 +132,7 @@ util.cpp:
 	extabindex  start:0x8000B5FC end:0x8000B734
 	.text       start:0x80022724 end:0x80024E60
 	.ctors      start:0x801D53CC end:0x801D53D0
-	.data       start:0x801E88C4 end:0x801E88D4
+	.data       start:0x801E88B8 end:0x801E88D4
 	.sbss       start:0x8032EC70 end:0x8032EC74
 
 maphit.cpp:

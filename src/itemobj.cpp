@@ -317,10 +317,12 @@ void CGItemObj::onCancelStat(int)
 	unsigned char* self = (unsigned char*)this;
 
 	if (*(int*)(self + 0x520) == 0x1b) {
-		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = FLOAT_80331b18;
-		*(float*)(self + 0x178) = FLOAT_80331b18;
-		*(float*)(self + 0x174) = FLOAT_80331b18;
+		unsigned int flags = *(unsigned int*)(self + 0x1c0);
+		float value = FLOAT_80331b18;
+		*(unsigned int*)(self + 0x1c0) = flags | 2;
+		*(float*)(self + 0x17c) = value;
+		*(float*)(self + 0x178) = value;
+		*(float*)(self + 0x174) = value;
 	}
 }
 

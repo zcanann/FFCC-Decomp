@@ -72,65 +72,51 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, short shouldD
 int RedNew(int param_1)
 {
 	unsigned int interrupts;
-	int alignedSize;
 	int address;
 	int entryCount;
 	int moveCount;
-	int* blockList;
-	int* blockEnd;
 	int* slot;
-	int result;
 
-	result = 0;
+	if (((0 < param_1) && (redMainMemoryBank != 0)) && (redMainDataBuffer != 0)) {
+		interrupts = OSDisableInterrupts();
+		param_1 = (param_1 + 0x1F) & 0xFFFFFFE0;
+		slot = redMainMemoryBank;
+		address = redMainDataBuffer;
 
-	if (param_1 >= 1) {
-		blockList = redMainMemoryBank;
-		if (blockList != 0) {
-			address = redMainDataBuffer;
-			if (address != 0) {
-				interrupts = OSDisableInterrupts();
-				alignedSize = (param_1 + 0x1F) & 0xFFFFFFE0;
-				blockEnd = blockList + 0x800;
-				slot = blockList;
-
-				do {
-					if ((slot[1] == 0) || ((address + alignedSize) <= *slot)) {
-						if (blockList[0x7FF] > 0) {
-							if (gRedMemoryDebugEnabled != 0) {
-								OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
-								fflush(__files + 1);
-							}
-							break;
-						}
-
-						if ((unsigned int)(address + alignedSize) <=
-						    (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
-							if (slot[1] > 0) {
-								moveCount = (int)(blockList + 0x800) - (int)(slot + 2);
-								entryCount = moveCount / 8;
-								if (entryCount > 0) {
-									memmove(slot + 2, slot, entryCount * 8);
-								}
-							}
-
-							*slot = address;
-							slot[1] = alignedSize;
-							OSRestoreInterrupts(interrupts);
-							return address;
-						}
-
-						break;
+		do {
+			if ((slot[1] == 0) || ((int)(address + param_1) <= *slot)) {
+				if (redMainMemoryBank[0x7FF] > 0) {
+					if (gRedMemoryDebugEnabled != 0) {
+						OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
+						fflush(__files + 1);
 					}
+				} else {
+					if ((unsigned int)(address + param_1) <=
+					    (unsigned int)(redMainDataBuffer + redMainDataBufferSize)) {
+						if (0 < slot[1]) {
+							moveCount = (int)redMainMemoryBank + (0x2000 - (int)(slot + 2));
+							entryCount = moveCount / 8;
+							if (0 < entryCount) {
+								memmove(slot + 2, slot, entryCount * 8);
+							}
+						}
 
-					address = *slot + slot[1];
-					slot += 2;
-				} while (slot < blockEnd);
-
-				OSRestoreInterrupts(interrupts);
+						*slot = address;
+						slot[1] = param_1;
+						OSRestoreInterrupts(interrupts);
+						return address;
+					}
+				}
+				break;
 			}
-		}
+
+			address = *slot + slot[1];
+			slot += 2;
+		} while (slot < redMainMemoryBank + 0x800);
+
+		OSRestoreInterrupts(interrupts);
 	}
-	return result;
+	return 0;
 }
 #pragma optimization_level 4
 
@@ -204,7 +190,6 @@ void RedDelete(void* param_1)
 #pragma optimization_level 0
 int RedNewA(int size, int offset, int maxSize)
 {
-	unsigned int alignedSize;
 	unsigned int moveCount;
 	unsigned int interrupts;
 	int result;
@@ -232,7 +217,7 @@ int RedNewA(int size, int offset, int maxSize)
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
-	alignedSize = (size + 0x1F) & 0xFFFFFFE0;
+	size = (size + 0x1F) & 0xFFFFFFE0;
 	result = rangeStart;
 	maxGap = maxSize;
 	bestBlock = 0;
@@ -244,7 +229,7 @@ int RedNewA(int size, int offset, int maxSize)
 		currentAddress = rangeStart;
 		for (; (blockPtr[1] != 0) && (blockPtr < m_AMemoryBank + 0x800); blockPtr += 2) {
 			if (currentAddress < rangeStart + maxSize) {
-				if ((int)(currentAddress + alignedSize) <= *blockPtr) {
+				if ((int)(currentAddress + size) <= *blockPtr) {
 					gap = *blockPtr - currentAddress;
 					if (gap < maxGap) {
 						maxGap = gap;
@@ -259,7 +244,7 @@ int RedNewA(int size, int offset, int maxSize)
 		}
 
 		if (((blockPtr[1] == 0) && (blockPtr < m_AMemoryBank + 0x800)) &&
-		    (gap = (rangeStart + maxSize) - currentAddress, (int)alignedSize <= gap) &&
+		    (gap = (rangeStart + maxSize) - currentAddress, size <= gap) &&
 		    (gap < maxGap)) {
 			result = currentAddress;
 			bestBlock = blockPtr;
@@ -268,7 +253,7 @@ int RedNewA(int size, int offset, int maxSize)
 		bestBlock = blockPtr;
 	}
 
-	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + alignedSize)) {
+	if ((bestBlock == 0) || ((unsigned int)(rangeStart + maxSize) < result + size)) {
 		OSRestoreInterrupts(interrupts);
 		return 0;
 	}
@@ -281,7 +266,7 @@ int RedNewA(int size, int offset, int maxSize)
 		}
 	}
 	*blockPtr = result;
-	blockPtr[1] = alignedSize;
+	blockPtr[1] = size;
 	OSRestoreInterrupts(interrupts);
 	return result;
 }

@@ -1047,7 +1047,6 @@ void* CFlatRuntime2::intToClass(int classId)
 void CFlatRuntime2::Frame(int arg0, int mode)
 {
 	CStopWatch watch((char*)-1);
-	System.DumpMapFile(&watch);
 
 	if (mode == 0) {
 		StaticFrame__10CGCharaObjFv();

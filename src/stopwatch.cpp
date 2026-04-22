@@ -124,3 +124,18 @@ void CStopWatch::Reset() { OSResetStopwatch(this); }
  * Size:	TODO
  */
 CStopWatch::~CStopWatch() {}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002147C
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CStopWatch::CStopWatch(char* name)
+{
+	OSInitStopwatch(this, name);
+	OSResetStopwatch(this);
+}

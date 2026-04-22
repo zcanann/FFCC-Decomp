@@ -104,15 +104,15 @@ pad.cpp:
 	.sdata2     start:0x8032F818 end:0x8032F840
 
 stopwatch.cpp:
-	extab       start:0x80005C44 end:0x80005CA0
-	extabindex  start:0x8000B4D0 end:0x8000B53C
-	.text       start:0x800211D4 end:0x8002147C
+	extab       start:0x80005C44 end:0x80005CA8
+	extabindex  start:0x8000B4D0 end:0x8000B548
+	.text       start:0x800211D4 end:0x800214B4
 	.sdata2     start:0x8032F850 end:0x8032F868
 
 system.cpp:
-	extab       start:0x80005CA0 end:0x80005D18
-	extabindex  start:0x8000B53C end:0x8000B5D8
-	.text       start:0x8002147C end:0x8002244C
+	extab       start:0x80005CA8 end:0x80005D18
+	extabindex  start:0x8000B548 end:0x8000B5D8
+	.text       start:0x800214B4 end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
 	.data       start:0x801E8838 end:0x801E8898
 	.bss        start:0x80244340 end:0x802455C0

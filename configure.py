@@ -537,7 +537,7 @@ config.libs = [
             Object(Matching, "pppKeLns.cpp"),
             Object(Matching, "pppKeShpTail.cpp"),
             Object(NonMatching, "pppKeShpTail2X.cpp"),
-            Object(NonMatching, "pppKeShpTail3X.cpp", mw_version="GC/2.7"),
+            Object(NonMatching, "pppKeShpTail3X.cpp"),
             Object(NonMatching, "pppKeZCrctShp.cpp"),
             Object(NonMatching, "pppLaser.cpp"),
             Object(NonMatching, "pppLensFlare.cpp"),

@@ -977,9 +977,6 @@ _GXColor CTexture::GetTlutColor(int index)
 {
     unsigned int format = static_cast<unsigned int>(m_format);
     int offset;
-    unsigned short* tlut = reinterpret_cast<unsigned short*>(m_tlutData);
-    unsigned short color0;
-    unsigned short color1;
     _GXColor color;
 
     if (format == 9) {
@@ -990,12 +987,14 @@ _GXColor CTexture::GetTlutColor(int index)
         offset = 0;
     }
 
-    color1 = tlut[index + offset];
-    color0 = tlut[index];
-    color.r = static_cast<unsigned char>(color0);
-    color.g = static_cast<unsigned char>(color0 >> 8);
-    color.b = static_cast<unsigned char>(color1);
-    color.a = static_cast<unsigned char>(color1 >> 8);
+    unsigned short* tlut = reinterpret_cast<unsigned short*>(m_tlutData);
+    unsigned int packed = tlut[index] | (tlut[index + offset] << 16);
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(&packed);
+
+    color.a = bytes[0];
+    color.r = bytes[3];
+    color.g = bytes[2];
+    color.b = bytes[1];
     return color;
 }
 

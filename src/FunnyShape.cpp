@@ -516,34 +516,31 @@ void CFunnyShape::RenderTexture()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
-    const f32 ndcMin = FLOAT_8032fd80;
-    const f32 ndcMax = FLOAT_8032fd74;
-    const f32 zero = FLOAT_8032fd6c;
-    GXWGFifo.f32 = ndcMin;
-    GXWGFifo.f32 = ndcMax;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
     const u32 colorWord = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = zero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = zero;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = ndcMin;
-    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = ndcMax;
-    GXWGFifo.f32 = zero;
-    GXWGFifo.f32 = ndcMin;
-    GXWGFifo.f32 = ndcMin;
-    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = FLOAT_8032fd74;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd80;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = zero;
-    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = FLOAT_8032fd6c;
 }
 
 /*
@@ -766,8 +763,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 drawAngle = FLOAT_8032fd6c;
             }
 
-            const float sinA = static_cast<float>(sin(drawAngle));
-            const float cosA = static_cast<float>(cos(drawAngle));
             const float x0 = static_cast<float>(Div16Floor(S16At(entry, 0x20)));
             const float y0 = static_cast<float>(Div16Floor(S16At(entry, 0x22)));
             const float x1 = static_cast<float>(Div16Floor(S16At(entry, 0x24)));
@@ -776,6 +771,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const float y2 = static_cast<float>(Div16Floor(S16At(entry, 0x2A)));
             const float x3 = static_cast<float>(Div16Floor(S16At(entry, 0x2C)));
             const float y3 = static_cast<float>(Div16Floor(S16At(entry, 0x2E)));
+            const float sinA = static_cast<float>(sin(drawAngle));
+            const float cosA = static_cast<float>(cos(drawAngle));
             const float rx0 = x0 * cosA - y0 * sinA;
             const float ry0 = x0 * sinA + y0 * cosA;
             const float rx1 = x1 * cosA - y1 * sinA;

@@ -102,16 +102,18 @@ int DataAddCompute(int* current, int target, int* delta)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* slot = (int*)keyOnData;
+    unsigned int* slot = (unsigned int*)keyOnData;
     do {
-        if (*slot == (int)track) {
+        if (*slot == (unsigned int)track) {
             *slot = 0;
         }
         slot += 2;
-    } while (slot < (int*)((int)keyOnData + 0x600));
+    } while (slot < (unsigned int*)((int)keyOnData + 0x600));
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -300,7 +302,9 @@ int DutySwing(int phase)
  */
 int RandomSwing(int phase)
 {
-    int result = (int)DAT_8021dcce[(phase >> 8) & 0xFF] << 8;
+    phase >>= 8;
+    phase = (unsigned char)phase;
+    int result = (int)DAT_8021dcce[phase] << 8;
 
     return result;
 }
@@ -398,7 +402,10 @@ int SawSwingR(int phase)
  */
 int RandomSwingR(int phase)
 {
-    int result = (int)DAT_8021dcce[((phase >> 8) & 0xFF) ^ 0x40] << 8;
+    phase >>= 8;
+    phase = (unsigned char)phase;
+    phase ^= 0x40;
+    int result = (int)DAT_8021dcce[phase] << 8;
 
     return result;
 }

@@ -614,7 +614,7 @@ void CPartPcs::create()
     usb->m_miruraEventActive = 0;
     usb->m_disableShokiDraw = 0;
 
-    if (Game.m_currentSceneId == 7) {
+    if (static_cast<int>(Game.m_currentSceneId) == 7) {
         stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;

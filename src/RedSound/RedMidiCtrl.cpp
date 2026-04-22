@@ -638,25 +638,25 @@ void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     unsigned char* command;
-    int* trackData = (int*)track;
-    unsigned int loopCount;
     int loopIndexOffset;
+    unsigned short loopCount;
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
+    command = *(unsigned char**)track;
+    *(unsigned char**)track = command + 1;
     loopCount = command[0];
     if (loopCount == 0) {
         loopCount = 0x100;
     }
 
-    loopIndexOffset = *(short*)(trackData + 0x4f) * 2 + 0x128;
-    *(short*)((char*)trackData + loopIndexOffset) = *(short*)((char*)trackData + loopIndexOffset) + 1;
-    if (*(unsigned short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x128) == loopCount) {
-        *(short*)(trackData + 0x4f) = *(short*)(trackData + 0x4f) - 1;
-        *(unsigned short*)(trackData + 0x4f) &= 3;
+    loopIndexOffset = *(short*)((char*)track + 0x13C) * 2 + 0x128;
+    *(short*)((char*)track + loopIndexOffset) = *(short*)((char*)track + loopIndexOffset) + 1;
+    if (*(unsigned short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x128) == loopCount) {
+        *(short*)((char*)track + 0x13C) = *(short*)((char*)track + 0x13C) - 1;
+        *(unsigned short*)((char*)track + 0x13C) &= 3;
     } else {
-        trackData[0] = trackData[*(short*)(trackData + 0x4f) + 2];
-        *(short*)(trackData + 0x51) = *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130);
+        *(int*)track = ((int*)track)[*(short*)((char*)track + 0x13C) + 2];
+        *(unsigned short*)((char*)track + 0x144) =
+            *(unsigned short*)((char*)track + *(short*)((char*)track + 0x13C) * 2 + 0x130);
     }
 }
 
@@ -2531,19 +2531,17 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  */
 void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char value;
-    short step;
-    unsigned char* command;
     int* trackData = (int*)track;
+    unsigned char* command = (unsigned char*)trackData[0];
+    unsigned char value;
+    int step;
 
-    command = (unsigned char*)trackData[0];
     trackData[0] = (int)(command + 1);
     value = *command;
     *(short*)(trackData + 0x4e) = 0;
 
-    if (value == 0) {
-        step = 0;
-    } else {
+    step = 0;
+    if (value != 0) {
         step = *(short*)((char*)trackData + 0x13a) + (unsigned short)value;
     }
     *(short*)((char*)trackData + 0x13a) = step;

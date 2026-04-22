@@ -66,6 +66,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f32 cylinderY;
     _pppMngSt* pppMngSt;
     s32 hitFound;
+    s32 checkResult;
     CGObject* owner;
     f64 trigValue;
     Mtx basisMtx;
@@ -136,9 +137,10 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 firstCylinder.m_direction.z = kPppConformBgNormalZero;
                 firstCylinder.m_radius = kPppConformBgNormalZero;
 
-                hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                checkResult = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                     &MapMng, (CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
-                if (hitFound != 0) {
+                hitFound = checkResult;
+                if (checkResult != 0) {
                     CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
                     GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_164);
                     if ((matrixY - kPppConformBgNormalGroundSnapLimit) > local_170.y) {
@@ -255,9 +257,11 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         pppMngStPtr->m_matrix.value[1][3] = local_170.y;
                         pppMngStPtr->m_matrix.value[2][3] = local_170.z;
                     } else {
-                        pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                        ownerZ = owner->m_worldPosition.z;
+                        ownerX = owner->m_worldPosition.x;
+                        pppMngStPtr->m_matrix.value[0][3] = ownerX;
                         pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                        pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
+                        pppMngStPtr->m_matrix.value[2][3] = ownerZ;
                     }
                 }
             } else if (mode == 1) {

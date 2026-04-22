@@ -58,12 +58,12 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
 
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
-    return __vc__22CPtrArray_P9CMaterial_FUl(Ptr(materialSet, 8), index);
+    return (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[index];
 }
 
 static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 {
-    return __vc__21CPtrArray_P8CTexture_FUl(Ptr(textureSet, 8), index);
+    return (*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[index];
 }
 
 static inline void ReplaceRef(void** slot, void* ref)

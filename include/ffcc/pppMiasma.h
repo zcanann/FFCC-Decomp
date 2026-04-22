@@ -36,6 +36,7 @@ typedef struct {
     u8 m_pad_0x0a[2];
     float m_stepValue;
     u8 m_arg3;
+    u8 m_pad_0x11[3];
     u8 m_payload[0x1f];
 } pppMiasmaRenderStep;
 

@@ -63,7 +63,7 @@ struct MaterialEditorTableInit {
 };
 
 static MaterialEditorTableInit sMaterialEditorTableInit;
-static const char s_MaterialEditor[] = "MaterialEditor=%c";
+static const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor=%c";
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -533,7 +533,7 @@ void CMaterialEditorPcs::drawViewer()
     alive = alive + 1;
     int sign = alive >> 31;
     int idx = (sign * 4 | (unsigned int)(((alive >> 4) * 0x40000000) + sign) >> 30) - sign;
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)pFan[idx]);
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)(char)pFan[idx]);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;
